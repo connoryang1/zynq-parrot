@@ -1,4 +1,4 @@
-
+set_msg_config -id {Synth 8-9123} -new_severity "WARNING"
 source $::env(COSIM_TCL_DIR)/vivado-utils.tcl
 source $::env(COSIM_TCL_DIR)/bsg-utils.tcl
 

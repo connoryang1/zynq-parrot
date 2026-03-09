@@ -66,7 +66,7 @@ NBF_NCPUS ?= 1
 
 VPATH := $(wildcard $(BLACKPARROT_SDK_DIR)/prog/*)
 %.nbf: %.riscv
-	cp $< $(CURR)/
+	# cp $< $(CURR)/
 	$(RISCV_OBJCOPY) -O verilog $< $*.mem
 	$(SED) -i "s/@8/@0/g" $*.mem
 	$(PYTHON) $(BP_COMMON_DIR)/software/py/nbf.py \
