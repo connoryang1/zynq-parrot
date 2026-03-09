@@ -1,5 +1,4 @@
 
-`timescale 1 ps / 1 ps
 `include "bsg_defines.sv"
 
 module bsg_nonsynth_zynq_testbench;
@@ -72,14 +71,18 @@ module bsg_nonsynth_zynq_testbench;
     (.clk_i(aclk), .async_reset_o(areset));
   wire aresetn = ~areset;
 
+`ifdef RT_CLK_ENABLE
   localparam rt_clk_period_lp = 2500000;
   logic rt_clk;
   bsg_nonsynth_clock_gen
    #(.cycle_time_p(rt_clk_period_lp))
    rt_clk_gen
     (.o(rt_clk));
+`endif
 
+`ifdef TAG_ENABLE
   logic tag_ck, tag_data, sys_resetn;
+`endif
 
 `ifdef GP0_ENABLE
   logic [C_GP0_AXI_ADDR_WIDTH-1:0] gp0_axi_awaddr;
@@ -263,7 +266,7 @@ module bsg_nonsynth_zynq_testbench;
       ,.axi_addr_width_p(C_HP0_AXI_ADDR_WIDTH)
       ,.axi_data_width_p(C_HP0_AXI_DATA_WIDTH)
       ,.axi_len_width_p(8)
-      ,.mem_els_p(2**28) // 256 MB
+      ,.mem_els_p(2**28)
       ,.init_data_p('0)
     )
   axi_mem
@@ -424,7 +427,6 @@ module bsg_nonsynth_zynq_testbench;
 `ifdef SP0_ENABLE
   logic sp0_axi_tvalid, sp0_axi_tready;
   logic [C_SP0_AXI_DATA_WIDTH-1:0] sp0_axi_tdata;
-  logic [(C_SP0_AXI_DATA_WIDTH/8)-1:0] sp0_axi_tkeep;
   logic sp0_axi_tlast;
   bsg_nonsynth_dpi_to_axis
    #(.data_width_p(C_SP0_AXI_DATA_WIDTH))
@@ -434,7 +436,6 @@ module bsg_nonsynth_zynq_testbench;
 
      ,.tdata_o(sp0_axi_tdata)
      ,.tvalid_o(sp0_axi_tvalid)
-     ,.tkeep_o(sp0_axi_tkeep)
      ,.tlast_o(sp0_axi_tlast)
      ,.tready_i(sp0_axi_tready)
      );
@@ -443,7 +444,6 @@ module bsg_nonsynth_zynq_testbench;
 `ifdef SP1_ENABLE
   logic sp1_axi_tvalid, sp1_axi_tready;
   logic [C_SP1_AXI_DATA_WIDTH-1:0] sp1_axi_tdata;
-  logic [(C_SP1_AXI_DATA_WIDTH/8)-1:0] sp1_axi_tkeep;
   logic sp1_axi_tlast;
   bsg_nonsynth_dpi_to_axis
    #(.data_width_p(C_SP1_AXI_DATA_WIDTH))
@@ -453,7 +453,6 @@ module bsg_nonsynth_zynq_testbench;
 
      ,.tdata_o(sp1_axi_tdata)
      ,.tvalid_o(sp1_axi_tvalid)
-     ,.tkeep_o(sp1_axi_tkeep)
      ,.tlast_o(sp1_axi_tlast)
      ,.tready_i(sp1_axi_tready)
      );
@@ -462,7 +461,6 @@ module bsg_nonsynth_zynq_testbench;
 `ifdef SP2_ENABLE
   logic sp2_axi_tvalid, sp2_axi_tready;
   logic [C_SP2_AXI_DATA_WIDTH-1:0] sp2_axi_tdata;
-  logic [(C_SP2_AXI_DATA_WIDTH/8)-1:0] sp2_axi_tkeep;
   logic sp2_axi_tlast;
   bsg_nonsynth_dpi_to_axis
    #(.data_width_p(C_SP2_AXI_DATA_WIDTH))
@@ -472,7 +470,6 @@ module bsg_nonsynth_zynq_testbench;
 
      ,.tdata_o(sp2_axi_tdata)
      ,.tvalid_o(sp2_axi_tvalid)
-     ,.tkeep_o(sp2_axi_tkeep)
      ,.tlast_o(sp2_axi_tlast)
      ,.tready_i(sp2_axi_tready)
      );
@@ -481,7 +478,6 @@ module bsg_nonsynth_zynq_testbench;
 `ifdef MP0_ENABLE
   logic mp0_axi_tvalid, mp0_axi_tready;
   logic [C_MP0_AXI_DATA_WIDTH-1:0] mp0_axi_tdata;
-  logic [(C_MP0_AXI_DATA_WIDTH/8)-1:0] mp0_axi_tkeep;
   logic mp0_axi_tlast;
   bsg_nonsynth_axis_to_dpi
    #(.data_width_p(C_MP0_AXI_DATA_WIDTH))
@@ -491,7 +487,6 @@ module bsg_nonsynth_zynq_testbench;
 
      ,.tdata_i(mp0_axi_tdata)
      ,.tvalid_i(mp0_axi_tvalid)
-     ,.tkeep_i(mp0_axi_tkeep)
      ,.tready_o(mp0_axi_tready)
      ,.tlast_i(mp0_axi_tlast)
      );
@@ -500,7 +495,6 @@ module bsg_nonsynth_zynq_testbench;
 `ifdef MP1_ENABLE
   logic mp1_axi_tvalid, mp1_axi_tready;
   logic [C_MP1_AXI_DATA_WIDTH-1:0] mp1_axi_tdata;
-  logic [(C_MP1_AXI_DATA_WIDTH/8)-1:0] mp1_axi_tkeep;
   logic mp1_axi_tlast;
   bsg_nonsynth_axis_to_dpi
    #(.data_width_p(C_MP1_AXI_DATA_WIDTH))
@@ -510,7 +504,6 @@ module bsg_nonsynth_zynq_testbench;
 
      ,.tdata_i(mp1_axi_tdata)
      ,.tvalid_i(mp1_axi_tvalid)
-     ,.tkeep_i(mp1_axi_tkeep)
      ,.tready_o(mp1_axi_tready)
      ,.tlast_i(mp1_axi_tlast)
      );
@@ -519,7 +512,6 @@ module bsg_nonsynth_zynq_testbench;
 `ifdef MP2_ENABLE
   logic mp2_axi_tvalid, mp2_axi_tready;
   logic [C_MP2_AXI_DATA_WIDTH-1:0] mp2_axi_tdata;
-  logic [(C_MP2_AXI_DATA_WIDTH/8)-1:0] mp2_axi_tkeep;
   logic mp2_axi_tlast;
   bsg_nonsynth_axis_to_dpi
    #(.data_width_p(C_MP2_AXI_DATA_WIDTH))
@@ -529,7 +521,6 @@ module bsg_nonsynth_zynq_testbench;
 
      ,.tdata_i(mp2_axi_tdata)
      ,.tvalid_i(mp2_axi_tvalid)
-     ,.tkeep_i(mp2_axi_tkeep)
      ,.tready_o(mp2_axi_tready)
      ,.tlast_i(mp2_axi_tlast)
      );
@@ -583,63 +574,60 @@ module bsg_nonsynth_zynq_testbench;
    dut
     (.*);
 
-`ifdef VERILATOR
-   initial
-     begin
-       if ($test$plusargs("bsg_trace") != 0)
-         begin
-           $display("[%0t] Tracing to trace.fst...\n", $time);
-           $dumpfile("trace.fst");
-           $dumpvars();
-         end
-     end
+  wire waveform_en_li = 1'b1;
+  bsg_nonsynth_waveform_tracer
+   #(.trace_str_p("bsg_trace"))
+   tracer
+    (.clk_i(bsg_nonsynth_zynq_testbench.aclk)
+     ,.reset_i(~bsg_nonsynth_zynq_testbench.aresetn)
+     ,.en_i(bsg_nonsynth_zynq_testbench.waveform_en_li)
+     );
+
+  wire assert_en_li = 1'b1;
+  bsg_nonsynth_assert
+   _assert
+    (.clk_i(bsg_nonsynth_zynq_testbench.aclk)
+     ,.reset_i(~bsg_nonsynth_zynq_testbench.aresetn)
+     ,.en_i(bsg_nonsynth_zynq_testbench.assert_en_li)
+     );
+
+`ifdef HAS_COSIM_MAIN
+  import "DPI-C" context task cosim_main(string c_args);
+  string c_args;
+  initial
+    begin
+      if ($test$plusargs("c_args"))
+        begin
+          $value$plusargs("c_args=%s", c_args);
+        end
+      cosim_main(c_args);
+      $finish;
+    end
+  // Evaluate the simulation, until the next clk_i positive edge.
+  //
+  // Call bsg_dpi_next in simulators where the C testbench does not
+  // control the progression of time (i.e. NOT Verilator).
+  //
+  // The #1 statement guarantees that the positive edge has been
+  // evaluated, which is necessary for ordering in all of the DPI
+  // functions.
+  export "DPI-C" task bsg_dpi_next;
+  task bsg_dpi_next();
+    @(posedge aclk);
+    #1;
+  endtask
 `else
-   import "DPI-C" context task cosim_main(string c_args);
-   string c_args;
-   initial
-     begin
-       if ($test$plusargs("bsg_trace") != 0)
-`ifdef VCS
-         begin
-           $display("[%0t] Tracing to vcdplus.vpd...\n", $time);
-           $vcdplusfile("vcdplus.vpd");
-           $vcdpluson();
-           $vcdplusautoflushon();
-         end
-`endif
-`ifdef XCELIUM
-         begin
-           $shm_open("dump.shm");
-           $shm_probe("ASM");
-         end
-`endif
-       if ($test$plusargs("c_args") != 0)
-         begin
-           $value$plusargs("c_args=%s", c_args);
-         end
-       cosim_main(c_args);
-       $finish;
-     end
-
-   // Evaluate the simulation, until the next clk_i positive edge.
-   //
-   // Call bsg_dpi_next in simulators where the C testbench does not
-   // control the progression of time (i.e. NOT Verilator).
-   //
-   // The #1 statement guarantees that the positive edge has been
-   // evaluated, which is necessary for ordering in all of the DPI
-   // functions.
-   export "DPI-C" task bsg_dpi_next;
-   task bsg_dpi_next();
-     @(posedge aclk);
-     #1;
-   endtask
+  export "DPI-C" function bsg_dpi_finish;
+  function int bsg_dpi_finish();
+    $finish;
+  endfunction
 `endif
 
-   export "DPI-C" function bsg_dpi_time;
-   function int bsg_dpi_time();
-     return $time;
-   endfunction
+  // Other useful DPI functions
+  export "DPI-C" function bsg_dpi_time;
+  function int bsg_dpi_time();
+    return int'($time);
+  endfunction
 
 endmodule
 

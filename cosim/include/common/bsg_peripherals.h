@@ -12,7 +12,7 @@
 #define SCRATCHPAD_BASE 0x1000000
 #define SCRATCHPAD_SIZE 0x0100000
 class zynq_scratchpad : public s_axil_device {
-    std::vector<int32_t> mem;
+    std::vector<long> mem;
 
   public:
     zynq_scratchpad() { mem.resize(SCRATCHPAD_SIZE, 0); }
@@ -31,18 +31,18 @@ class zynq_scratchpad : public s_axil_device {
 
     bool can_write(uintptr_t address) override { return true; }
 
-    int32_t read(uintptr_t address) override {
+    long read(uintptr_t address) override {
         uintptr_t final_addr =
             ((address - SCRATCHPAD_BASE) + SCRATCHPAD_SIZE) % SCRATCHPAD_SIZE;
-        bsg_pr_dbg_pl("  bsg_zynq_pl: scratchpad read [%x] == %x\n", final_addr,
-                      mem.at(final_addr));
+        bsg_pr_dbg_pl("  bsg_zynq_pl: scratchpad read [%" PRIxPTR "] == %x\n",
+                      final_addr, mem.at(final_addr));
         return mem.at(final_addr);
     }
 
-    void write(uintptr_t address, int32_t data) override {
-        int final_addr =
+    void write(uintptr_t address, long data) override {
+        uintptr_t final_addr =
             ((address - SCRATCHPAD_BASE) + SCRATCHPAD_SIZE) % SCRATCHPAD_SIZE;
-        bsg_pr_dbg_pl("  bsg_zynq_pl: scratchpad write [%x] <- %x\n",
+        bsg_pr_dbg_pl("  bsg_zynq_pl: scratchpad write [%" PRIxPTR "] <- %x\n",
                       final_addr, data);
         mem.at(final_addr) = data;
     }
@@ -56,8 +56,8 @@ class zynq_scratchpad : public s_axil_device {
 #define UART_REG_STAT 0x008
 #define UART_REG_CTRL 0x00c
 class zynq_uart : public s_axil_device {
-    std::queue<uint8_t> rx_fifo;
-    std::queue<uint8_t> tx_fifo;
+    std::queue<char> rx_fifo;
+    std::queue<char> tx_fifo;
 
   public:
     zynq_uart() {}
@@ -75,9 +75,9 @@ class zynq_uart : public s_axil_device {
 
     bool can_write(uintptr_t address) override { return true; }
 
-    int32_t read(uintptr_t address) override {
+    long read(uintptr_t address) override {
         uintptr_t final_addr = ((address - UART_BASE) + UART_SIZE) % UART_SIZE;
-        int32_t retval = 0;
+        long retval = 0;
         if (final_addr == UART_REG_RX_FIFO) {
             if (!rx_fifo.empty()) {
                 retval = rx_fifo.front();
@@ -87,15 +87,16 @@ class zynq_uart : public s_axil_device {
             retval = ((1 & tx_fifo.empty()) << 2)     // TX empty
                      | ((1 & !rx_fifo.empty()) << 0); // RX valid
         } else {
-            bsg_pr_info("  bsg_zynq_pl: errant uart read: %x\n", final_addr);
+            bsg_pr_info("  bsg_zynq_pl: errant uart read: [%" PRIxPTR "]\n",
+                        final_addr);
         }
 
-        bsg_pr_dbg_pl("  bsg_zynq_pl: uart read [%x] == %x\n", final_addr,
-                      retval);
+        bsg_pr_dbg_pl("  bsg_zynq_pl: uart read [%" PRIxPTR "] == %x\n",
+                      final_addr, retval);
         return retval;
     }
 
-    void write(uintptr_t address, int32_t data) override {
+    void write(uintptr_t address, long data) override {
         int final_addr = ((address - UART_BASE) + UART_SIZE) % UART_SIZE;
         if (final_addr == UART_REG_TX_FIFO) {
             tx_fifo.push(data);
@@ -121,14 +122,14 @@ class zynq_uart : public s_axil_device {
     }
 
     // USER Functions
-    bool tx_helper(uint8_t c) {
+    bool tx_helper(char c) {
         rx_fifo.push(c);
         bsg_pr_dbg_pl("  bsg_zynq_pl: uart tx %x \n", c);
 
         return true;
     }
 
-    bool rx_helper(uint8_t *c) {
+    bool rx_helper(char *c) {
         if (tx_fifo.empty()) {
             return false;
         };
@@ -147,7 +148,7 @@ class zynq_watchdog : public m_axil_device {
     int count = 0;
 
   public:
-    bool pending_write(uintptr_t *address, int32_t *data, uint8_t *wmask) {
+    bool pending_write(uintptr_t *address, long *data, long *wmask) {
         // Every time we check for pending, we increment the count
         if (count++ % WATCHDOG_PERIOD == 0) {
             *address = WATCHDOG_ADDRESS;
@@ -164,21 +165,20 @@ class zynq_watchdog : public m_axil_device {
 
     void return_write() { bsg_pr_dbg_pl("  bsg_zynq_pl: watchdog return\n"); }
 
-    void return_read(int32_t data) { /* Unimp */
-    }
+    void return_read(long data) { /* Unimp */ }
 };
 
 // Buffer
 class zynq_buffer : public s_axis_device, m_axis_device {
     bool buffer_full = false;
-    std::queue<int32_t> buffer;
+    std::queue<long> buffer;
 
   public:
     zynq_buffer() {}
 
-    bool can_write(uint8_t last) { return !buffer_full; }
+    bool can_write() { return !buffer_full; }
 
-    void write(int32_t data, uint8_t last) {
+    void write(long data, bool last) {
         bsg_pr_dbg_pl("  bsg_zynq_pl: fifo write <- %x\n", data);
         buffer.push(data);
         if (last) {
@@ -186,7 +186,7 @@ class zynq_buffer : public s_axis_device, m_axis_device {
         }
     }
 
-    bool pending_write(int32_t *data, uint8_t *last) {
+    bool pending_write(long *data, bool *last) {
         if (buffer_full) {
             *data = buffer.front();
             bsg_pr_dbg_pl("  bsg_zynq_pl: fifo read -> %x\n", *data);
@@ -232,16 +232,16 @@ class zynq_debug : public s_axil_device, m_axil_device {
 
     bool can_write(uintptr_t address) override { return true; }
 
-    int32_t read(uintptr_t address) override {
+    long read(uintptr_t address) override {
         return 0; // Unimplemented
     }
 
-    void write(uintptr_t address, int32_t data) override {
+    void write(uintptr_t address, long data) override {
         return; // Unimplemented
     }
 
     // M AXI
-    bool pending_write(uintptr_t *address, int32_t *data, uint8_t *wmask) {
+    bool pending_write(uintptr_t *address, long *data, long *wmask) {
         return false;
     }
 
@@ -249,8 +249,7 @@ class zynq_debug : public s_axil_device, m_axil_device {
 
     void return_write() { bsg_pr_dbg_pl("  bsg_zynq_pl: debug return\n"); }
 
-    void return_read(int32_t data) { /* Unimp */
-    }
+    void return_read(long data) { /* Unimp */ }
 
     // USER Functions
 };
@@ -282,16 +281,16 @@ class zynq_plic : public s_axil_device, m_axil_device {
 
     bool can_write(uintptr_t address) override { return true; }
 
-    int32_t read(uintptr_t address) override {
+    long read(uintptr_t address) override {
         return 0; // Unimplemented
     }
 
-    void write(uintptr_t address, int32_t data) override {
+    void write(uintptr_t address, long data) override {
         return; // Unimplemented
     }
 
     // M AXI
-    bool pending_write(uintptr_t *address, int32_t *data, uint8_t *wmask) {
+    bool pending_write(uintptr_t *address, long *data, long *wmask) {
         if (raised) {
             *address = PLIC_INTERRUPT_ADDRESS;
             *data = 1;
@@ -310,8 +309,7 @@ class zynq_plic : public s_axil_device, m_axil_device {
 
     void return_write() { bsg_pr_dbg_pl("  bsg_zynq_pl: plic return\n"); }
 
-    void return_read(int32_t data) { /* Unimp */
-    }
+    void return_read(long data) { /* Unimp */ }
 
     // USER Functions
 
@@ -349,16 +347,16 @@ class zynq_dma : public s_axil_device, m_axil_device {
 
     bool can_write(uintptr_t address) override { return true; }
 
-    int32_t read(uintptr_t address) override {
+    long read(uintptr_t address) override {
         return 0; // Unimplemented
     }
 
-    void write(uintptr_t address, int32_t data) override {
+    void write(uintptr_t address, long data) override {
         return; // Unimplemented
     }
 
     // M AXI
-    bool pending_write(uintptr_t *address, int32_t *data, uint8_t *wmask) {
+    bool pending_write(uintptr_t *address, long *data, long *wmask) {
         return false;
     }
 
@@ -366,8 +364,7 @@ class zynq_dma : public s_axil_device, m_axil_device {
 
     void return_write() { bsg_pr_dbg_pl("  bsg_zynq_pl: debug return\n"); }
 
-    void return_read(int32_t data) { /* Unimp */
-    }
+    void return_read(long data) { /* Unimp */ }
 
     // USER Functions
 };

@@ -1,7 +1,6 @@
-TOP  := $(shell git rev-parse --show-toplevel)
-CURR := $(shell pwd)
+TOP ?= $(shell git rev-parse --show-toplevel)
 include $(TOP)/Makefile.common
-include $(TOP)/Makefile.config
+include $(TOP)/Makefile.env
 
 #############################
 # Design Settings
@@ -10,7 +9,14 @@ TB_MODULE  ?= bsg_nonsynth_zynq_testbench
 BASENAME   ?= hammerblade
 
 MAIN_PROGRAM ?= $(COSIM_CSRC_DIR)/main.cpp
-HOST_PROGRAM ?= $(CURR_DESIGN_DIR)/ps.cpp
+HOST_PROGRAM ?= $(DESIGN_DIR)/ps.cpp
+
+CFG ?= e_bp_unicore_hammerblade_cfg
+BSG_MACHINE ?= pod_X1Y1_mesh_X2Y2_hbm_one_pseudo_channel
+BSG_MACHINE_PATH ?= $(BSG_REPLICANT_DIR)/machines/$(BSG_MACHINE)
+
+NBF_FILE ?= hello.hello_world.nbf
+RUN_ARGS += +c_args=$(NBF_FILE)
 
 #############################
 # Design Defines
@@ -23,109 +29,19 @@ DEFINES += HP0_ENABLE=1
 DEFINES += HP0_DATA_WIDTH=32 HP0_ADDR_WIDTH=32
 DEFINES += HP1_ENABLE=1
 DEFINES += HP1_ADDR_WIDTH=32 HP1_DATA_WIDTH=32
-DEFINES += ACLK_MHZ=55
+DEFINES += ACLK_MHZ=20
 DEFINES += RTCLK_MHZ=8
+#DEFINES += VERIFY_NBF
+DEFINES += NUM_BP_FINISH=1
+DEFINES += NUM_MC_FINISH=1
+DEFINES += BSG_MANYCORE_MACHINE_LOADER_COORD_X=2 BSG_MANYCORE_MACHINE_LOADER_COORD_Y=0
+DEFINES += RT_CLK_ENABLE=1
 
-#############################
-# Build Collateral
-#############################
-# Override to zynq-parrot machine path
-CFG ?= e_bp_unicore_hammerblade_cfg
-BSG_MACHINE_PATH ?= $(BSG_REPLICANT_DIR)/machines/pod_X1Y1_mesh_X2Y2_hbm_one_pseudo_channel
-include $(BSG_MACHINE_PATH)/Makefile.machine.include
-# Arbitrary, need to be set
-HARDWARE_PATH     := $(BSG_REPLICANT_DIR)/hardware
-LIBRARIES_PATH    := $(BSG_REPLICANT_DIR)/libraries
-BSG_PLATFORM_PATH := $(LIBRARIES_PATH)/platforms/bigblade-vcs
-BSG_F1_DIR        := $(BSG_REPLICANT_DIR)
-include $(BSG_REPLICANT_DIR)/hardware/hardware.mk
+CFLAGS += -I$(BSG_REPLICANT_DIR)/libraries
 
-$(CURR_VSRC_DIR)/bsg_blackparrot_pkg.sv:
-	echo "package bsg_blackparrot_pkg;" >> $@
-	echo >> $@
-	echo "import bp_common_pkg::*;" >> $@
-	echo >> $@
-	echo "localparam bp_params_e bp_cfg_gp = $(CFG);" >> $@
-	echo >> $@
-	echo "endpackage" >> $@
-	echo >> $@
+# suppress cadenv warning
+$(eval export (_BSG_REPLICANT_CADENV_MK) := 1)
+$(eval export IGNORE_CADENV := 1)
 
-$(CURR_VSRC_DIR)/bsg_bladerunner_pkg.sv: $(BSG_MACHINE_PATH)/bsg_bladerunner_pkg.sv
-	cp $< $@
-	$(SED) -i "/parameter int bsg_machine_hetero_type_vec_gp/d" $@
-
-$(CURR_VSRC_DIR)/bsg_bladerunner_configuration.sv: $(BSG_MACHINE_PATH)/bsg_bladerunner_configuration.rom
-	$(PYTHON2) $(ASCII_TO_ROM_PY) $< bsg_bladerunner_configuration > $@
-
-$(CURR_DESIGN_DIR)/bsg_manycore_machine.h: $(BSG_MACHINE_PATH)/bsg_manycore_machine.h
-	cp $< $@
-
-BUILD_COLLATERAL = $(CURR_VSRC_DIR)/bsg_bladerunner_pkg.sv $(CURR_VSRC_DIR)/bsg_bladerunner_configuration.sv $(CURR_DESIGN_DIR)/bsg_manycore_machine.h $(CURR_VSRC_DIR)/bsg_blackparrot_pkg.sv
-
-#############################
-# Run Collateral
-#############################
-MANYCORE_DRAM_BASE    ?= 0x80000000
-BLACKPARROT_DRAM_BASE ?= 0x82000000
-BLACKPARROT_DRAM_OFFSET ?= 0x02000000
-
-NBF_FILE ?= hello.hello_world.nbf
-NBF_SCRIPT ?= $(BSG_MANYCORE_DIR)/software/py/nbf.py
-RISCV_OBJCOPY ?= riscv64-unknown-elf-dramfs-objcopy
-%.riscv32:
-	$(MAKE) BSG_MACHINE_PATH=$(BSG_MACHINE_PATH) -C $(BSG_MANYCORE_SOFTWARE_DIR)/spmd/$* \
-		clean main.riscv
-	mv $(BSG_MANYCORE_SOFTWARE_DIR)/spmd/$*/main.riscv $@
-
-VPATH := $(wildcard $(BLACKPARROT_SDK_DIR)/prog/*)
-%.riscv64: %.riscv
-	cp $< $@
-
-%.rv64o: %.riscv64
-	$(RISCV_OBJCOPY) -O binary $< $@
-
-%.rv32o: %.riscv32
-	$(RISCV_OBJCOPY) -O binary $< $@
-
-NBF_FILE         ?= hello.hello_world.nbf
-MANYCORE_PROG    ?= $(word 1, $(subst ., ,$(NBF_FILE))).riscv32
-BLACKPARROT_PROG ?= $(word 2, $(subst ., ,$(NBF_FILE))).riscv64
-BLACKPARROT_OBJ  ?= $(subst .riscv64,.rv64o,$(BLACKPARROT_PROG))
-
-COMBINED_PROG    ?= combined.riscv
-$(COMBINED_PROG): $(MANYCORE_PROG) $(BLACKPARROT_OBJ)
-	$(RISCV_OBJCOPY) $(MANYCORE_PROG) $(COMBINED_PROG) -O elf32-littleriscv --add-section .blackparrot.dram=$(BLACKPARROT_OBJ) --set-section-flags .blackparrot.dram="alloc,contents,load"  --change-section-address .text.dram=$(MANYCORE_DRAM_BASE) --change-section-address .blackparrot.dram=$(BLACKPARROT_DRAM_BASE)
-
-# Vary per program
-bsg_tiles_org_X            ?= 0
-bsg_tiles_org_Y            ?= 0
-bsg_tiles_X                ?= 1
-bsg_tiles_Y                ?= 1
-bsg_pods_X                 ?= 1
-bsg_pods_Y                 ?= 1
-bsg_elf_off_chip_mem       ?= 1
-skip_dram_instruction_load ?= 0
-skip_zeros                 ?= 1
-ipoly_hashing              ?= 0
-
-%.nbf: $(COMBINED_PROG)
-	$(PYTHON) $(NBF_SCRIPT) \
-		$< \
-		$(BSG_MACHINE_GLOBAL_X) $(BSG_MACHINE_GLOBAL_Y) \
-		$(BSG_MACHINE_VCACHE_WAY) $(BSG_MACHINE_VCACHE_SET) \
-		$(BSG_MACHINE_VCACHE_BLOCK_SIZE_WORDS) \
-		$(__BSG_MACHINE_DRAMSIM3_CHIP_SIZE_IN_WORDS) $(BSG_MACHINE_MAX_EPA_WIDTH) \
-		$(bsg_tiles_org_X) $(bsg_tiles_org_Y) \
-		$(bsg_tiles_X) $(bsg_tiles_Y) $(bsg_elf_off_chip_mem) \
-		$(BSG_MACHINE_ORIGIN_COORD_X) $(BSG_MACHINE_ORIGIN_COORD_Y) \
-		$(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) \
-		$(bsg_pods_X) $(bsg_pods_Y) \
-		$(skip_dram_instruction_load) \
-		$(skip_zeros) \
-		$(ipoly_hashing) \
-		 > $@
-	rm main_dram.mem main_dmem.mem
-
-# Manycore program . BlackParrot program
-RUN_COLLATERAL = $(NBF_FILE)
+include $(COSIM_MK_DIR)/Makefile.master
 

@@ -1,16 +1,22 @@
-TOP  := $(shell git rev-parse --show-toplevel)
-CURR := $(shell pwd)
+TOP ?= $(shell git rev-parse --show-toplevel)
 include $(TOP)/Makefile.common
-include $(TOP)/Makefile.config
+include $(TOP)/Makefile.env
 
 #############################
 # Design Settings
 #############################
 TB_MODULE  ?= bsg_nonsynth_zynq_testbench
-BASENAME   ?= blackparrot
+BASENAME   ?= black_parrot
 
 MAIN_PROGRAM ?= $(COSIM_CSRC_DIR)/main.cpp
-HOST_PROGRAM ?= $(CURR_DESIGN_DIR)/ps.cpp
+HOST_PROGRAM ?= $(DESIGN_DIR)/ps.cpp
+
+BP_NCPUS ?= 1
+
+PROG ?= hello_world
+NBF_FILE ?= prog.nbf
+
+RUN_ARGS += +c_args=$(NBF_FILE)
 
 #############################
 # Design Defines
@@ -27,6 +33,11 @@ DEFINES += HP1_ENABLE=1
 DEFINES += HP1_ADDR_WIDTH=32 HP1_DATA_WIDTH=32
 DEFINES += ACLK_MHZ=20
 DEFINES += RTCLK_MHZ=8
+DEFINES += RT_CLK_ENABLE=1
+DEFINES += TAG_ENABLE=1
+#DEFINES += DRAM_TEST
+#DEFINES += ZERO_DRAM
+DEFINES += BP_NCPUS=$(BP_NCPUS)
 
 #############################
 # Build Collateral
@@ -78,4 +89,5 @@ NBF_FILE ?= $(PROG).nbf
 ELF_FILE ?= $(PROG).riscv
 
 prog: $(NBF_FILE) $(ELF_FILE)
-
+=======
+include $(COSIM_MK_DIR)/Makefile.master

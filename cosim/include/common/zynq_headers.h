@@ -11,21 +11,6 @@
 #define ZYNQ_PL_DEBUG 0
 #endif
 
-#ifndef ZYNQ
-#ifndef BRIDGE
-#ifndef VIVADO
-#define SIMULATION
-#endif
-#endif
-#endif
-
-#ifdef VCS
-#define HAS_COSIM_MAIN
-#endif
-#ifdef XCELIUM
-#define HAS_COSIM_MAIN
-#endif
-
 #ifdef NEON
 #include "arm_neon.h"
 #else
@@ -62,6 +47,26 @@ static uintptr_t gp0_addr_base = (uintptr_t)GP0_ADDR_BASE;
 #error GP0_HIER_BASE must be defined
 #endif
 #endif
+
+#ifndef GP0_SHELL_PS2PL_REGS
+#define GP0_SHELL_PS2PL_REGS 1
+#endif
+#ifndef GP0_SHELL_PL2PS_REGS
+#define GP0_SHELL_PL2PS_REGS 1
+#endif
+#ifndef GP0_SHELL_PL2PS_FIFOS
+#define GP0_SHELL_PL2PS_FIFOS 1
+#endif
+#ifndef GP0_SHELL_PS2PL_FIFOS
+#define GP0_SHELL_PS2PL_FIFOS 1
+#endif
+#define GP0_RD_PS2PL_CSR_ADDR_BASE  (GP0_ADDR_BASE               +                          0x0 )
+#define GP0_RD_PL2PS_FIFO_DATA_BASE (GP0_RD_PS2PL_CSR_ADDR_BASE  + (GP0_SHELL_PS2PL_REGS  * 0x4))
+#define GP0_RD_PL2PS_FIFO_CTRS_BASE (GP0_RD_PL2PS_FIFO_DATA_BASE + (GP0_SHELL_PL2PS_FIFOS * 0x4))
+#define GP0_RD_PS2PL_FIFO_CTRS_BASE (GP0_RD_PL2PS_FIFO_CTRS_BASE + (GP0_SHELL_PL2PS_FIFOS * 0x4))
+#define GP0_RD_PL2PS_CSR_ADDR_BASE  (GP0_RD_PS2PL_FIFO_CTRS_BASE + (GP0_SHELL_PS2PL_FIFOS * 0x4))
+#define GP0_WR_PS2PL_CSR_ADDR_BASE  (GP0_RD_PS2PL_CSR_ADDR_BASE  +                          0x0 )
+#define GP0_WR_PS2PL_FIFO_DATA_BASE (GP0_WR_PS2PL_CSR_ADDR_BASE  + (GP0_SHELL_PS2PL_REGS  * 0x4))
 
 #ifndef GP1_ENABLE
 #define GP1_ADDR_WIDTH 0
@@ -104,6 +109,26 @@ static uintptr_t gp1_addr_base = (uintptr_t)GP1_ADDR_BASE;
 #ifdef GP2_ENABLE
 #define AXIL_ENABLE
 #endif
+
+#ifndef GP1_SHELL_PS2PL_REGS
+#define GP1_SHELL_PS2PL_REGS 1
+#endif
+#ifndef GP1_SHELL_PL2PS_REGS
+#define GP1_SHELL_PL2PS_REGS 1
+#endif
+#ifndef GP1_SHELL_PL2PS_FIFOS
+#define GP1_SHELL_PL2PS_FIFOS 1
+#endif
+#ifndef GP1_SHELL_PS2PL_FIFOS
+#define GP1_SHELL_PS2PL_FIFOS 1
+#endif
+#define GP1_RD_PS2PL_CSR_ADDR_BASE  (GP1_ADDR_BASE               +                          0x0 )
+#define GP1_RD_PL2PS_FIFO_DATA_BASE (GP1_RD_CSR_ADDR_BASE        + (GP1_SHELL_PS2PL_REGS  * 0x4))
+#define GP1_RD_PL2PS_FIFO_CTRS_BASE (GP1_RD_PL2PS_FIFO_DATA_BASE + (GP1_SHELL_PL2PS_FIFOS * 0x4))
+#define GP1_RD_PS2PL_FIFO_CTRS_BASE (GP1_RD_PL2PS_FIFO_CTRS_BASE + (GP1_SHELL_PL2PS_FIFOS * 0x4))
+#define GP1_RD_PL2PS_CSR_ADDR_BASE  (GP1_RD_PS2PS_FIFO_CTRS_BASE + (GP1_SHELL_PS2PL_FIFOS * 0x4))
+#define GP1_WR_PS2PL_CSR_ADDR_BASE  (GP1_RD_PS2PL_CSR_ADDR_BASE  +                          0x0 )
+#define GP1_WR_PS2PL_FIFO_DATA_BASE (GP1_WR_PS2PL_CSR_ADDR_BASE  + (GP1_SHELL_PS2PL_REGS  * 0x4))
 
 #ifndef GP2_ENABLE
 #define GP2_ADDR_WIDTH 0

@@ -7,7 +7,6 @@
 #include <bitset>
 #include <cmath>
 #include <locale.h>
-#include <pthread.h>
 #include <queue>
 #include <stdio.h>
 #include <stdlib.h>
@@ -123,22 +122,7 @@ inline int32_t send_mc_read(bsg_zynq_pl *zpl, uint8_t x, uint8_t y,
     return resp_pkt.data;
 }
 
-std::queue<int> getchar_queue;
-void *monitor(void *vargp) {
-    char c;
-    while (1) {
-        c = getchar();
-        if (c != -1)
-            getchar_queue.push(c);
-    }
-    bsg_pr_info("Exiting from pthread\n");
-
-    return NULL;
-}
-
-int ps_main(int argc, char **argv) {
-    bsg_zynq_pl *zpl = new bsg_zynq_pl(argc, argv);
-
+int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     pthread_t thread_id;
 
     bsg_pr_info("ps.cpp: reading three base registers\n");
@@ -193,9 +177,6 @@ int ps_main(int argc, char **argv) {
 
     nbf_load(zpl, argv[1]);
 
-    bsg_pr_info("ps.cpp: Starting scan thread\n");
-    pthread_create(&thread_id, NULL, monitor, NULL);
-
     bsg_pr_info("ps.cpp: Starting MC i/o polling thread\n");
     int mc_finished = 0;
     while (mc_finished != NUM_MC_FINISH) {
@@ -229,16 +210,7 @@ int ps_main(int argc, char **argv) {
         int mc_epa = (mc_pkt.addr << 2) & 0xffff; // Trim to 16b EPA
         int mc_data = mc_pkt.payload;
         bsg_pr_dbg_ps("Request packet [%x] = %x\n", mc_epa, mc_data);
-        if (mc_epa == 0x0000) {
-            hb_mc_response_packet_fill(&ep_rsp, &mc_pkt);
-            if (getchar_queue.empty()) {
-                ep_rsp.data = -1;
-            } else {
-                ep_rsp.data = getchar_queue.front();
-                getchar_queue.pop();
-            }
-            send_mc_response_packet(zpl, &ep_rsp);
-        } else if (mc_epa == 0x1000) {
+        if (mc_epa == 0x1000) {
             printf("%c", mc_data & 0xff);
             fflush(stdout);
         } else if (mc_epa == 0x2000) {
@@ -254,9 +226,7 @@ int ps_main(int argc, char **argv) {
         }
     }
 
-    zpl->done();
-    delete zpl;
-    return 0;
+    return zpl->done();
 }
 
 // Configure BlackParrot
@@ -308,15 +278,15 @@ void configure_blackparrot(bsg_zynq_pl *zpl) {
 }
 
 void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
-    string nbf_command;
-    string tmp;
-    string delimiter = "_";
+    std::string nbf_command;
+    std::string tmp;
+    std::string delimiter = "_";
 
     long long int nbf[4];
     int pos = 0;
     long unsigned int base_addr;
     int data;
-    ifstream nbf_file(nbf_filename);
+    std::ifstream nbf_file(nbf_filename);
 
     if (!nbf_file.is_open()) {
         bsg_pr_err("ps.cpp: error opening nbf file.\n");
@@ -368,12 +338,12 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
             verif_data = send_mc_read(zpl, x_tile, y_tile, epa << 2);
 
             // Some verification reads are expected to fail e.g. CSRs
-            if (req_pkt.payload == resp_pkt.data) {
-                bsg_pr_info("Received verification: %x==%x\n", req_pkt.payload,
-                            resp_pkt.data);
+            if (nbf_data == verif_data) {
+                bsg_pr_info("Received verification: %x==%x\n", verif_data,
+                            nbf_data);
             } else {
-                bsg_pr_info("Failed verification: %x!=%x\n", req_pkt.payload,
-                            resp_pkt.data);
+                bsg_pr_info("Failed verification: %x!=%x\n", verif_data,
+                            nbf_data);
             }
 #endif
         }

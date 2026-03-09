@@ -28,10 +28,6 @@
 #endif
 #define DRAM_ALLOCATE_SIZE (DRAM_ALLOCATE_SIZE_MB * 1024 * 1024)
 
-#ifndef ZYNQ_PL_DEBUG
-#define ZYNQ_PL_DEBUG 0
-#endif
-
 void nbf_load(bsg_zynq_pl *zpl, char *filename);
 
 inline void send_mc_request_packet(bsg_zynq_pl *zpl,
@@ -109,8 +105,7 @@ inline int32_t send_mc_read(bsg_zynq_pl *zpl, uint8_t x, uint8_t y,
     return resp_pkt.data;
 }
 
-int ps_main(int argc, char **argv) {
-    bsg_zynq_pl *zpl = new bsg_zynq_pl(argc, argv);
+int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
 
     bsg_pr_info("ps.cpp: reading three base registers\n");
     bsg_pr_info("ps.cpp: dram_base=%lx\n",
@@ -122,19 +117,17 @@ int ps_main(int argc, char **argv) {
     zpl->shell_write(GP0_WR_CSR_DRAM_BASE, val, 0xf);
     assert((zpl->shell_read(GP0_RD_CSR_DRAM_BASE) == val));
 
-    bsg_tag_bitbang *btb = new bsg_tag_bitbang(zpl, GP0_WR_CSR_TAG_BITBANG,
-                                               TAG_NUM_CLIENTS, TAG_MAX_LEN);
-    bsg_tag_client *mc_reset_client =
-        new bsg_tag_client(TAG_CLIENT_MC_RESET_ID, TAG_CLIENT_MC_RESET_WIDTH);
+    std::unique_ptr<bsg_tag_bitbang> btb = std::make_unique<bsg_tag_bitbang>(zpl, GP0_WR_CSR_TAG_BITBANG, TAG_NUM_CLIENTS, TAG_MAX_LEN);
+    bsg_tag_client mc_reset_client(TAG_CLIENT_MC_RESET_ID, TAG_CLIENT_MC_RESET_WIDTH);
 
     // Reset the bsg tag master
     btb->reset_master();
     // Reset bsg client0
-    btb->reset_client(mc_reset_client);
+    btb->reset_client(&mc_reset_client);
     // Set bsg client0 to 1 (assert BP reset)
-    btb->set_client(mc_reset_client, 0x1);
+    btb->set_client(&mc_reset_client, 0x1);
     // Set bsg client0 to 0 (deassert BP reset)
-    btb->set_client(mc_reset_client, 0x0);
+    btb->set_client(&mc_reset_client, 0x0);
 
     // We need some additional toggles for data to propagate through
     btb->idle(50);
@@ -158,7 +151,6 @@ int ps_main(int argc, char **argv) {
             "No nbf file specified, sleeping for 2^31 seconds (this will hold "
             "onto allocated DRAM)\n");
         sleep(1U << 31);
-        delete zpl;
         return -1;
     }
 
@@ -183,25 +175,22 @@ int ps_main(int argc, char **argv) {
         }
     }
 
-    zpl->done();
-    delete zpl;
-    return 0;
+    return zpl->done();
 }
 
 void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
-    string nbf_command;
-    string tmp;
-    string delimiter = "_";
+    std::string nbf_command;
+    std::string tmp;
+    std::string delimiter = "_";
 
     long long int nbf[4];
     int pos = 0;
     long unsigned int base_addr;
     int data;
-    ifstream nbf_file(nbf_filename);
+    std::ifstream nbf_file(nbf_filename);
 
     if (!nbf_file.is_open()) {
         bsg_pr_err("ps.cpp: error opening nbf file.\n");
-        delete zpl;
         return;
     }
 

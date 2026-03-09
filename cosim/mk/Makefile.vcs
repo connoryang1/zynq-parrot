@@ -1,87 +1,79 @@
 
-include $(COSIM_MK_DIR)/Makefile.env
+include $(COSIM_MK_DIR)/Makefile.sim
 
-VCS_OPTS += -full64
-VCS_OPTS += -notice
-VCS_OPTS += -V
-VCS_OPTS += +v2k -sverilog
-VCS_OPTS += -assert svaext
-VCS_OPTS += +noportcoerce
-VCS_OPTS += -timescale=1ps/1ps
-VCS_OPTS += -diag timescale
-VCS_OPTS += -f flist.vcs
-VCS_OPTS += -top $(TB_MODULE)
-VCS_OPTS += -debug_pp
-VCS_OPTS += +vcs+vcdpluson +vcs+vcdplusautoflushon
-VCS_OPTS += +vcs+lic+wait
-VCS_OPTS += +incdir+$(COSIM_DIR)/include/vcs
-VCS_OPTS += $(addprefix +define+,$(DEFINES))
-VCS_OPTS += $(MAIN_PROGRAM)
-VCS_OPTS += $(BP_SDK_LIB_DIR)/libboost_coroutine.a
-VCS_OPTS += $(BP_SDK_LIB_DIR)/libboost_context.a
-VCS_OPTS += $(BP_SDK_LIB_DIR)/libboost_system.a
+DEFINES += HAS_COSIM_MAIN
+DEFINES += SIMULATION
 
-CFLAGS += -DVCS
-CFLAGS += -DHOST_$(call upper,$(HOST))
-CFLAGS += -std=c++14
-CFLAGS += -D_DEFAULT_SOURCE -D_BSD_SOURCE
-CFLAGS += $(addprefix -D,$(DEFINES))
-# PL Debug
-ifeq ($(ZYNQ_PL_DEBUG),1)
-CFLAGS += -DZYNQ_PL_DEBUG
+VCS_VFLAGS += $(addprefix +define+,$(DEFINES))
+VCS_VFLAGS += $(addprefix +incdir+,$(VINCLUDES))
+
+VCS_CFLAGS += $(CFLAGS)
+VCS_CFLAGS += -fPIC -std=c++14
+VCS_CFLAGS += $(addprefix -D,$(DEFINES))
+VCS_CFLAGS += $(addprefix -I,$(CINCLUDES))
+VCS_CFLAGS += $(addprefix -L,$(CLIBDIRS))
+
+VCS_LDFLAGS += $(LDFLAGS)
+VCS_LDFLAGS += -lpthread
+VCS_LDFLAGS += $(addprefix -L,$(CLIBDIRS))
+VCS_LDFLAGS += $(addprefix -l,$(CLIBS))
+
+VCS_BUILD_OPTS += -full64
+VCS_BUILD_OPTS += -notice
+VCS_BUILD_OPTS += -V
+VCS_BUILD_OPTS += +v2k -sverilog
+VCS_BUILD_OPTS += +lint=TFIPC-L
+VCS_BUILD_OPTS += -assert svaext
+VCS_BUILD_OPTS += +noportcoerce
+VCS_BUILD_OPTS += +vcs+lic+wait
+VCS_BUILD_OPTS += -CFLAGS "$(VCS_CFLAGS)"
+VCS_BUILD_OPTS += -LDFLAGS "$(VCS_LDFLAGS)"
+VCS_BUILD_OPTS += $(VCS_LDFLAGS)
+VCS_BUILD_OPTS += $(VCS_VFLAGS)
+
+VCS_BUILD_OPTS += -top $(TB_MODULE)
+VCS_BUILD_OPTS += -o simv
+
+VCS_RUN_OPTS += -no_save
+
+ifeq ($(ENABLE_VERDI),1)
+DUMP_FILE ?= dump.fsdb
+else
+DUMP_FILE ?= dump.vpd
 endif
-# PS Debug
-ifeq ($(ZYNQ_PS_DEBUG),1)
-CFLAGS += -DZYNQ_PS_DEBUG
+
+ifeq ($(ASSERT),1)
+VCS_BUILD_OPTS += +define+BSG_NONSYNTH_ASSERT_ENABLE
+VCS_BUILD_OPTS += -assert svaext # Enable elaboration system tasks
 endif
 
-CINCLUDES += -I$(BLACKPARROT_SUB_DIR)/blackparrot/src
-CINCLUDES += -I$(BP_SDK_INSTALL_DIR)/include
-CINCLUDES += -I$(COSIM_INCLUDE_DIR)/common
-CINCLUDES += -I$(COSIM_INCLUDE_DIR)/vcs
-CINCLUDES += -I$(BASEJUMP_STL_DIR)/bsg_mem
-CINCLUDES += -I$(BASEJUMP_STL_DIR)/bsg_test
-CINCLUDES += -I$(CURR_DESIGN_DIR)
+ifneq (,$(TRACE))
+RUN_ARGS += +bsg_trace=$(DUMP_FILE)
+RUN_ARGS += +vpdfilesize+512
+endif
+run: ## runs the simv executable, TRACE=1 to trace
+run: simv | $(RUN_COLLATERAL)
+	./$< $(VCS_RUN_OPTS) $(RUN_ARGS) 2>&1 | $(TEE_I) run.log
 
-TRACE ?= +bsg_trace +vpdfilesize+512
+ENABLE_VERDI ?= $(if $(shell which verdi 2> /dev/null),1,0)
+ifneq (,$(TRACE))
+BUILD_ARGS += -debug_access+r
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_ENABLE
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_DEPTH=0
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_HIER=bsg_nonsynth_zynq_testbench.dut
+ifeq ($(ENABLE_VERDI),1)
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_FSDB
+else
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_VPD
+endif
+endif
 
-all:
-	@echo "## See the makefile for the fun things you can do in this directory"
+build: ## builds the simv executable
+build: simv
+simv: $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
+	$(VCS) $(VCS_BUILD_OPTS) $(BUILD_ARGS) $^ 2>&1 | $(TEE_I) build.log
 
-RUN_LOG ?= run.log
-run: simv $(RUN_COLLATERAL)
-	./$< $(SIM_ARGS) $(TRACE) 2>&1 | tee -i $(RUN_LOG)
-
-BUILD_LOG ?= build.log
-simv: $(HOST_PROGRAM) $(FLIST) $(BUILD_COLLATERAL)
-	$(VCS) $(VCS_OPTS) -CFLAGS "$(CFLAGS)" -CFLAGS "$(CINCLUDES)" \
-		-LDFLAGS "$(LDFLAGS)" -o $@ $< \
-		2>&1 | tee -i $(BUILD_LOG)
-
-clean:
-	rm -rf csrc/
-	rm -rf ucli.key
-	rm -rf vc_hdrs.h
-	rm -rf flist*.vcs
-	rm -rf simv* vcdplus.vpd
-	rm -rf build.log
-	rm -rf run.log
-	rm -rf *.nbf
-	rm -rf *.elf
-	rm -rf *.trace
-	rm -rf *.riscv*
-	rm -rf *.rv*o*
-	rm -rf *.dump*
-	rm -rf $(BUILD_COLLATERAL) $(SIM_COLLATERAL)
-
-view:
-	$(_DVE) -full64 -vpd vcdplus.vpd
-
-help:
-	@echo -e "Usage: make"
-	@echo -e "\tclean - Cleans directory"
-	@echo -e "\tview - Open waveform in gtkwave"
-	@echo -e "\tall - Runs the current test"
-	@echo -e "Options"
-	@echo -e "\tTRACE = whether to dump a .fst waveform"
+view: ## views the dump with DVE
+view: $(DUMP_FILE)
+	@$(DVE) -full64 -vpd $< &
 

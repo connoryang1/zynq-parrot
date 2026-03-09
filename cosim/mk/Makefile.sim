@@ -1,0 +1,56 @@
+
+#############################
+# Common variables
+#############################
+
+DEFINES += BSG_NO_TIMESCALE
+
+VPACKAGES +=
+
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_misc/bsg_cycle_counter.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_clock_gen.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_reset_gen.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_clock_gen.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_cycle_counter.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_from_fifo.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_gpio.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_to_fifo.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_rom.sv
+VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_axi_mem.sv
+VSOURCES += $(BP_RTL_DIR)/bp_top/test/common/bsg_nonsynth_waveform_tracer.sv
+VSOURCES += $(BP_RTL_DIR)/bp_top/test/common/bsg_nonsynth_assert.sv
+VSOURCES += $(COSIM_VSRC_DIR)/bsg_nonsynth_dpi_to_axil.sv
+VSOURCES += $(COSIM_VSRC_DIR)/bsg_nonsynth_axil_to_dpi.sv
+VSOURCES += $(COSIM_VSRC_DIR)/bsg_nonsynth_dpi_to_axis.sv
+VSOURCES += $(COSIM_VSRC_DIR)/bsg_nonsynth_axis_to_dpi.sv
+VSOURCES += $(COSIM_VSRC_DIR)/bsg_nonsynth_zynq_testbench.sv
+
+ifeq ($(DROMAJO_COSIM),1)
+VSOURCES += $(BP_RTL_DIR)/bp_top/test/common/bp_nonsynth_cosim.sv
+endif
+
+VINCLUDES +=
+
+CSOURCES  += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_clock_gen.cpp
+CSOURCES  += $(MAIN_PROGRAM)
+CSOURCES  += $(HOST_PROGRAM)
+
+CINCLUDES += $(CURDIR)
+CINCLUDES += $(COSIM_INCLUDE_DIR)/common
+CINCLUDES += $(COSIM_INCLUDE_DIR)/$(TOOL)
+CINCLUDES += $(ZP_INSTALL_DIR)/include
+CINCLUDES += $(BASEJUMP_STL_DIR)/bsg_mem
+CINCLUDES += $(BP_SUB_DIR)/blackparrot/src
+CINCLUDES += $(BSG_REPLICANT_DIR)/libraries
+CINCLUDES += $(BASEJUMP_STL_DIR)/bsg_test
+
+CFLAGS += -D_DEFAULT_SOURCE -D_BSD_SOURCE
+
+CLIBDIRS += $(ZP_INSTALL_DIR)/lib
+
+CLIBS += boost_coroutine
+CLIBS += boost_context
+CLIBS += boost_system
+
+LDFLAGS +=
+

@@ -1,16 +1,22 @@
-TOP  := $(shell git rev-parse --show-toplevel)
-CURR := $(shell pwd)
+TOP ?= $(shell git rev-parse --show-toplevel)
 include $(TOP)/Makefile.common
-include $(TOP)/Makefile.config
+include $(TOP)/Makefile.env
 
 #############################
 # Design Settings
 #############################
 TB_MODULE  ?= bsg_nonsynth_zynq_testbench
-BASENAME   ?= blackparrot
+BASENAME   ?= black_parrot_minimal
 
 MAIN_PROGRAM ?= $(COSIM_CSRC_DIR)/main.cpp
-HOST_PROGRAM ?= $(CURR_DESIGN_DIR)/ps.cpp
+HOST_PROGRAM ?= $(DESIGN_DIR)/ps.cpp
+
+BP_NCPUS ?= 1
+
+PROG ?= hello_world
+NBF_FILE ?= prog.nbf
+
+RUN_ARGS += +c_args=$(NBF_FILE)
 
 #############################
 # Design Defines
@@ -19,52 +25,10 @@ DEFINES += GP0_ENABLE=1
 DEFINES += GP0_ADDR_WIDTH=10 GP0_DATA_WIDTH=32
 DEFINES += HP0_ENABLE=1
 DEFINES += HP0_DATA_WIDTH=32 HP0_ADDR_WIDTH=32
-DEFINES += ACLK_MHZ=25
-DEFINES += RTCLK_MHZ=8
+DEFINES += ACLK_MHZ=20
+DEFINES += BP_NCPUS=$(BP_NCPUS)
 
-#############################
-# Build Collateral
-#############################
-RISCV_OBJCOPY ?= riscv64-unknown-elf-dramfs-objcopy
-ASCII_TO_ROM ?= $(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py
+CINCLUDES += $(BP_SUB_DIR)/blackparrot/src/
 
-CFG ?= e_bp_unicore_zynqparrot_cfg
-$(CURR_VSRC_DIR)/bsg_blackparrot_pkg.sv:
-	echo "package bsg_blackparrot_pkg;" >> $@
-	echo >> $@
-	echo "import bp_common_pkg::*;" >> $@
-	echo >> $@
-	echo "localparam bp_params_e bp_cfg_gp = $(CFG);" >> $@
-	echo >> $@
-	echo "endpackage" >> $@
-	echo >> $@
-
-$(CURR_VSRC_DIR)/bsg_bootrom.bin: $(BP_SDK_DIR)/prog/bootrom/bootrom.riscv
-	$(RISCV_OBJCOPY) -O binary $< $@
-
-$(CURR_VSRC_DIR)/bsg_bootrom.rom: $(CURR_VSRC_DIR)/bsg_bootrom.bin
-	$(XXD) -b -g4 -c4 $< | $(AWK) '{print $$2}' > $@
-
-$(CURR_VSRC_DIR)/bsg_bootrom.v: $(CURR_VSRC_DIR)/bsg_bootrom.rom
-	$(PYTHON) $(ASCII_TO_ROM) $< bsg_bootrom zero > $@
-
-BUILD_COLLATERAL  = $(CURR_VSRC_DIR)/bsg_blackparrot_pkg.sv
-BUILD_COLLATERAL += $(CURR_VSRC_DIR)/bsg_bootrom.v
-
-#############################
-# Run Collateral
-#############################
-NBF_NCPUS ?= 1
-
-NBF_FILE ?= hello_world.nbf
-ELF_FILE ?= hello_world.elf
-VPATH := $(wildcard $(BLACKPARROT_SDK_DIR)/prog/*)
-%.nbf: %.riscv
-	$(RISCV_OBJCOPY) -O verilog $< $*.mem
-	$(SED) -i "s/@8/@0/g" $*.mem
-	$(PYTHON) $(BP_COMMON_DIR)/software/py/nbf.py \
-		--skip_zeros --mem $*.mem --ncpus $(NBF_NCPUS) > $@
-	rm $*.mem
-
-RUN_COLLATERAL = $(NBF_FILE)
+include $(COSIM_MK_DIR)/Makefile.master
 

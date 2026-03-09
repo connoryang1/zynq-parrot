@@ -1,6 +1,3 @@
-source $::env(COSIM_TCL_DIR)/vivado-utils.tcl
-source $::env(COSIM_TCL_DIR)/bsg-utils.tcl
-
 
 proc vivado_create_ip { args } {
     create_bd_cell -type ip -vlnv user.org:user:top:1.0 top_0
@@ -29,8 +26,8 @@ proc vivado_create_ip { args } {
 }
 
 proc vivado_constrain_ip { args } {
-    set aclk [get_clocks -of_objects [get_pins blackparrot_bd_1_i/vps_0/aclk]]
-    set rt_clk [get_clocks -of_objects [get_pins blackparrot_bd_1_i/vps_0/rt_clk]]
+    set aclk [get_clocks -of_objects [get_pins */vps_0/aclk]]
+    set rt_clk [get_clocks -of_objects [get_pins */vps_0/rt_clk]]
 
     set_clock_groups -logically_exclusive -group ${aclk} -group ${rt_clk}
 

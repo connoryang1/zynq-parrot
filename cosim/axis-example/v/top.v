@@ -1,7 +1,4 @@
 
-`timescale 1 ps / 1 ps
-`include "bsg_zynq_pl.vh"
-
     module top #
     (
         // Users to add parameters here
@@ -49,13 +46,11 @@
 
         input wire [C_SP0_AXI_DATA_WIDTH-1:0] sp0_axi_tdata,
         input wire sp0_axi_tvalid,
-        input wire [(C_SP0_AXI_DATA_WIDTH/8)-1:0] sp0_axi_tkeep,
         input wire sp0_axi_tlast,
         output wire sp0_axi_tready,
 
         output wire [C_MP0_AXI_DATA_WIDTH-1:0] mp0_axi_tdata,
         output wire mp0_axi_tvalid,
-        output wire [(C_MP0_AXI_DATA_WIDTH/8)-1:0] mp0_axi_tkeep,
         output wire mp0_axi_tlast,
         input wire mp0_axi_tready
     );
@@ -94,13 +89,11 @@
 
        ,.sp0_axi_tdata(sp0_axi_tdata)
        ,.sp0_axi_tvalid(sp0_axi_tvalid)
-       ,.sp0_axi_tkeep(sp0_axi_tkeep)
        ,.sp0_axi_tlast(sp0_axi_tlast)
        ,.sp0_axi_tready(sp0_axi_tready)
 
        ,.mp0_axi_tdata(mp0_axi_tdata)
        ,.mp0_axi_tvalid(mp0_axi_tvalid)
-       ,.mp0_axi_tkeep(mp0_axi_tkeep)
        ,.mp0_axi_tlast(mp0_axi_tlast)
        ,.mp0_axi_tready(mp0_axi_tready)
        );

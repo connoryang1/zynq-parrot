@@ -1,7 +1,6 @@
-TOP  := $(shell git rev-parse --show-toplevel)
-CURR := $(shell pwd)
+TOP ?= $(shell git rev-parse --show-toplevel)
 include $(TOP)/Makefile.common
-include $(TOP)/Makefile.config
+include $(TOP)/Makefile.env
 
 #############################
 # Design Settings
@@ -10,83 +9,33 @@ TB_MODULE  ?= bsg_nonsynth_zynq_testbench
 BASENAME   ?= manycore
 
 MAIN_PROGRAM ?= $(COSIM_CSRC_DIR)/main.cpp
-HOST_PROGRAM ?= $(CURR_DESIGN_DIR)/ps.cpp
+HOST_PROGRAM ?= $(DESIGN_DIR)/ps.cpp
+
+BSG_MACHINE ?= pod_X1Y1_mesh_X2Y2_hbm_one_pseudo_channel
+BSG_MACHINE_PATH ?= $(BSG_REPLICANT_DIR)/machines/$(BSG_MACHINE)
+
+PROG ?= hello
+NBF_FILE ?= prog.nbf
+
+RUN_ARGS += +c_args=$(NBF_FILE)
 
 #############################
 # Design Defines
 #############################
 DEFINES += GP0_ENABLE=1
 DEFINES += GP0_ADDR_WIDTH=10 GP0_DATA_WIDTH=32
-DEFINES += GP0_HIER_BASE=bsg_nonsynth_zynq_testbench.axil0
 DEFINES += HP0_ENABLE=1
 DEFINES += HP0_DATA_WIDTH=64 HP0_ADDR_WIDTH=32
 DEFINES += ACLK_MHZ=55
 DEFINES += RTCLK_MHZ=8
+#DEFINES += VERIFY_NBF
+DEFINES += NUM_FINISH=1
 
-#############################
-# Override to zynq-parrot machine path
-BSG_MACHINE_PATH ?= $(BSG_REPLICANT_DIR)/machines/pod_X1Y1_mesh_X2Y2_hbm_one_pseudo_channel
-include $(BSG_MACHINE_PATH)/Makefile.machine.include
-# Arbitrary, need to be set
-HARDWARE_PATH     := $(BSG_REPLICANT_DIR)/hardware
-LIBRARIES_PATH    := $(BSG_REPLICANT_DIR)/libraries
-BSG_PLATFORM_PATH := $(LIBRARIES_PATH)/platforms/bigblade-vcs
-BSG_F1_DIR        := $(BSG_REPLICANT_DIR)
-include $(BSG_REPLICANT_DIR)/hardware/hardware.mk
+# suppress cadenv warning
+$(eval export (_BSG_REPLICANT_CADENV_MK) := 1)
+$(eval export IGNORE_CADENV := 1)
 
-$(CURR_VSRC_DIR)/bsg_bladerunner_pkg.sv: $(BSG_MACHINE_PATH)/bsg_bladerunner_pkg.sv
-	cp $< $@
-	$(SED) -i "/parameter int bsg_machine_hetero_type_vec_gp/d" $@
-
-$(CURR_VSRC_DIR)/bsg_bladerunner_configuration.sv: $(BSG_MACHINE_PATH)/bsg_bladerunner_configuration.rom
-	$(PYTHON2) $(ASCII_TO_ROM_PY) $< bsg_bladerunner_configuration > $@
-
-$(CURR_DESIGN_DIR)/bsg_manycore_machine.h: $(BSG_MACHINE_PATH)/bsg_manycore_machine.h
-	cp $< $@
-
-.PHONY: $(BUILD_COLLATERAL)
-BUILD_COLLATERAL = $(CURR_VSRC_DIR)/bsg_bladerunner_pkg.sv $(CURR_VSRC_DIR)/bsg_bladerunner_configuration.sv $(CURR_DESIGN_DIR)/bsg_manycore_machine.h
-
-#############################
-# Run Collateral
-#############################
-NBF_FILE   ?= hello.nbf
-NBF_SCRIPT ?= $(BSG_MANYCORE_DIR)/software/py/nbf.py
-%.riscv32:
-	$(MAKE) BSG_MACHINE_PATH=$(BSG_MACHINE_PATH) -C $(BSG_MANYCORE_SOFTWARE_DIR)/spmd/$* \
-		clean main.riscv
-	mv $(BSG_MANYCORE_SOFTWARE_DIR)/spmd/$*/main.riscv $@
-
-# Vary per program
-bsg_tiles_org_X            ?= 0
-bsg_tiles_org_Y            ?= 0
-bsg_tiles_X                ?= 1
-bsg_tiles_Y                ?= 1
-bsg_pods_X                 ?= 1
-bsg_pods_Y                 ?= 1
-bsg_elf_off_chip_mem       ?= 1
-skip_dram_instruction_load ?= 0
-skip_zeros                 ?= 1
-ipoly_hashing              ?= 0
-
-%.nbf: %.riscv32
-	python $(NBF_SCRIPT) \
-		$< \
-		$(BSG_MACHINE_GLOBAL_X) $(BSG_MACHINE_GLOBAL_Y) \
-		$(BSG_MACHINE_VCACHE_WAY) $(BSG_MACHINE_VCACHE_SET) \
-		$(BSG_MACHINE_VCACHE_BLOCK_SIZE_WORDS) \
-		$(__BSG_MACHINE_DRAMSIM3_CHIP_SIZE_IN_WORDS) $(BSG_MACHINE_MAX_EPA_WIDTH) \
-		$(bsg_tiles_org_X) $(bsg_tiles_org_Y) \
-		$(bsg_tiles_X) $(bsg_tiles_Y) $(bsg_elf_off_chip_mem) \
-		$(BSG_MACHINE_ORIGIN_COORD_X) $(BSG_MACHINE_ORIGIN_COORD_Y) \
-		$(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) \
-		$(bsg_pods_X) $(bsg_pods_Y) \
-		$(skip_dram_instruction_load) \
-		$(skip_zeros) \
-		$(ipoly_hashing) \
-		  > $*.nbf
-	rm main_dram.mem main_dmem.mem
-
-NBF_FILE ?= hello.nbf
 RUN_COLLATERAL = $(NBF_FILE)
+
+include $(COSIM_MK_DIR)/Makefile.master
 

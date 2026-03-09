@@ -1,8 +1,4 @@
 
-`timescale 1 ps / 1 ps
-
-`include "bsg_zynq_pl.vh"
-
 module top
   #(
     // Parameters of Axi Slave Bus Interface S00_AXI
@@ -16,7 +12,6 @@ module top
     // Ports of Axi Slave Bus Interface S00_AXI
     input wire                                   aclk
     ,input wire                                  aresetn
-    ,input wire                                  rt_clk
 
     ,input wire [C_GP0_AXI_ADDR_WIDTH-1 : 0]     gp0_axi_awaddr
     ,input wire [2 : 0]                          gp0_axi_awprot
@@ -91,7 +86,6 @@ module top
      top_fpga_inst
      (.aclk            (aclk)
       ,.aresetn        (aresetn)
-      ,.rt_clk         (rt_clk)
 
       ,.gp0_axi_awaddr (gp0_axi_awaddr)
       ,.gp0_axi_awprot (gp0_axi_awprot)
