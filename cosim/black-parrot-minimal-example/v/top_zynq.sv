@@ -230,7 +230,7 @@ module top_zynq
    // instantiate counters, and then pull control signals out of the DUT in order to figure out when
    // to increment the counters.
    //
-   assign minstret_lo = blackparrot.core_minimal.be.calculator.pipe_sys.csr.minstret_lo;
+   assign minstret_lo = blackparrot.core_minimal.be.calculator.pipe_sys.csr.gen_csr[0].csr_inst.minstret_lo;
 
   bsg_bootrom
    #(.width_p(bootrom_data_lp), .addr_width_p(bootrom_addr_lp))
@@ -526,4 +526,3 @@ module top_zynq
    assign hp0_axi_rready = m_axil_rvalid;
 
 endmodule
-
