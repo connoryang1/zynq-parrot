@@ -13,8 +13,8 @@ checkout::
 	@$(MAKE) -C $(BSG_MANYCORE_DIR) checkout_submodules
 	@# initialize basejump_stl
 	@git -C $(BASEJUMP_STL_DIR) submodule update --init --recursive
-	@$(MAKE) -C $(BSG_MANYCORE_DIR)/software/riscv-tools checkout-riscv-gnu-tools
-	@$(MAKE) -C $(BSG_MANYCORE_DIR)/software/riscv-tools checkout-llvm
+	@$(MAKE) -C $(BSG_MANYCORE_DIR)/software/riscv-tools IGNORE_CADENV=1 checkout-riscv-gnu-tools
+	@$(MAKE) -C $(BSG_MANYCORE_DIR)/software/riscv-tools IGNORE_CADENV=1 checkout-llvm
 
 prep_lite: ## Minimal preparation for simulation
 prep_lite:
