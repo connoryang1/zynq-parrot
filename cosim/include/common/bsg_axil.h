@@ -255,8 +255,8 @@ template <unsigned int A, unsigned int D> class maxil : public axil<A, D> {
         this->p_bready = 1;
         do {
             if (timeout_counter++ == ZYNQ_AXI_TIMEOUT) {
-                bsg_pr_err("bsg_zynq_pl: %s, AXI M bvalid timeout at %d\n,",
-                           base.c_str(), bsg_dpi_time());
+                bsg_pr_err("bsg_zynq_pl: %s, AXI M bvalid timeout\n",
+                           base.c_str());
             }
 
             if (this->p_bvalid == 1) {
