@@ -13,6 +13,7 @@ TESTS := \
     multithreading_demo \
     mt_csr_isolation_test \
     mt_benchmark \
+    mt_ctxtsw_microbench \
     mt_frf_isolation_test \
     mt_banyan_benchmark \
     mt_regfile_test
