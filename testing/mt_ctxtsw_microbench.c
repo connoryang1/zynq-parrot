@@ -28,6 +28,18 @@ static inline void write_ctxt(uint64_t v) {
   __asm__ volatile("csrw 0x081, %0" : : "r"(v));
 }
 
+static inline void write_ctxt_1(void) {
+  __asm__ volatile("csrwi 0x081, 1");
+}
+
+static inline void write_ctxt_2(void) {
+  __asm__ volatile("csrwi 0x081, 2");
+}
+
+static inline void write_ctxt_3(void) {
+  __asm__ volatile("csrwi 0x081, 3");
+}
+
 static inline void seed_npc(uint64_t tid, uint64_t npc) {
   uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
   __asm__ volatile("csrw 0x082, %0" : : "r"(v));
@@ -58,9 +70,21 @@ static inline void restore_gp(void) {
   );
 }
 
-static inline uint64_t round_trip_once(uint64_t tid) {
+static inline uint64_t round_trip_once_1(void) {
   uint64_t before = read_cycle();
-  write_ctxt(tid);
+  write_ctxt_1();
+  return read_cycle() - before;
+}
+
+static inline uint64_t round_trip_once_2(void) {
+  uint64_t before = read_cycle();
+  write_ctxt_2();
+  return read_cycle() - before;
+}
+
+static inline uint64_t round_trip_once_3(void) {
+  uint64_t before = read_cycle();
+  write_ctxt_3();
   return read_cycle() - before;
 }
 
@@ -77,12 +101,7 @@ static inline void seed_thread(uint64_t tid, uint64_t *stack_top) {
  * ever falls through instead of being redirected away by the context switch. */
 void __attribute__((naked, noinline, noreturn)) t1_ping(void) {
   __asm__ volatile(
-    ".option push\n"
-    ".option norelax\n"
-    "la   gp, __global_pointer$\n"
-    ".option pop\n"
-    "li   t0, 0\n"
-    "csrw 0x081, t0\n"
+    "csrwi 0x081, 0\n"
     "1:\n"
     "j    1b\n"
   );
@@ -94,13 +113,13 @@ int main(void) {
   uint64_t cold, warm0, warm1;
 
   seed_thread(1, &t1_stack[STACK_WORDS]);
-  cold = round_trip_once(1);
+  cold = round_trip_once_1();
 
   seed_thread(2, &t2_stack[STACK_WORDS]);
-  warm0 = round_trip_once(2);
+  warm0 = round_trip_once_2();
 
   seed_thread(3, &t3_stack[STACK_WORDS]);
-  warm1 = round_trip_once(3);
+  warm1 = round_trip_once_3();
 
   uint64_t warm_min = warm0;
   if (warm1 < warm_min)
