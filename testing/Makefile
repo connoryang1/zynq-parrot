@@ -15,6 +15,7 @@ TESTS := \
     mt_benchmark \
     mt_ctxtsw_microbench \
     mt_ctxtsw_repeat_benchmark \
+    mt_ctxtsw_hotness_benchmark \
     mt_ctxtsw_boundary_benchmark \
     mt_frf_isolation_test \
     mt_banyan_benchmark \
