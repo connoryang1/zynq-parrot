@@ -171,6 +171,37 @@ switch when:
 
 It does not mean every arbitrary workload switch will always be 7 cycles.
 
+## Why One Ring Benchmark Read As 9 Cycles
+
+After the restore-path correctness fixes, the repo still showed an apparent
+discrepancy:
+
+- `mt_ctxtsw_microbench`: warm round-trip `14`, implying `7` per switch
+- naive steady-state ring benchmark: `9` cycles/switch
+
+That looked like a hardware discrepancy at first, but disassembly showed the
+naive ring benchmark was not a pure switch stream. Each resumed thread was
+executing:
+
+- `csrw 0x081, next_tid`
+- `addi counter, -1`
+- `bnez counter, loop`
+
+So the benchmark was charging two extra retired loop-control instructions to
+every switch.
+
+To check that directly, a partial-unroll ring benchmark was added that keeps
+the same seeded-thread/resume model but performs four ctxtsw instructions per
+loop iteration. That reduces the `addi + bnez` overhead to one pair per four
+switches instead of one pair per switch.
+
+With that benchmark shape, the repo again measures:
+
+- `7 cycles/switch`
+
+So the earlier `9`-cycle number was a benchmark artifact, not evidence that the
+hardware fast path had regressed.
+
 ## When It Will Take Longer
 
 The switch will legitimately exceed 7 cycles when:
@@ -194,13 +225,14 @@ phase is robustness, not proof-of-possibility.
    - `4a02afe`
    - `3affb651`
 
-2. Add one or two more narrow measurements.
+2. Keep at least one steady-state benchmark that amortizes loop bookkeeping.
+   - The partial-unroll ring benchmark is a useful complement to the round-trip
+     microbench because it validates `7 cycles/switch` without relying only on
+     `14 / 2`.
+
+3. Add one or two more narrow measurements if needed.
    - warm switch with target-thread I$ line intentionally hot
    - warm switch with target-thread code placed to stress a nearby miss boundary
-
-3. Quantify frequency, not just best case.
-   - run repeated warm switches
-   - track how often the switch remains at 7 vs. drifting higher
 
 4. Investigate the remaining non-clean console behavior separately.
    - do not mix console cleanup with further ctxtsw hardware work
@@ -219,3 +251,4 @@ phase is robustness, not proof-of-possibility.
 - `import/black-parrot/bp_fe/src/v/bp_fe_pc_gen.sv`
 - `import/black-parrot/bp_fe/src/v/bp_fe_icache.sv`
 - `testing/mt_ctxtsw_microbench.c`
+- `testing/mt_ctxtsw_partial_unroll_benchmark.c`
