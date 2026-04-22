@@ -10,6 +10,31 @@ Current verified checkpoints:
 - `zynq-parrot`: `4a02afe` (`tighten ctxtsw microbenchmark to immediate csr writes`)
 - `import/black-parrot`: `3affb651` (`allow ctxtsw to escape icache miss state`)
 
+## Current Bottom Line
+
+The current repo has two independently useful timing checks for ctxtsw:
+
+- `mt_ctxtsw_microbench`
+  - measures the minimal warm `T0 -> T1 -> T0` round-trip
+  - current result: `14` cycles round-trip, i.e. `7` cycles per switch
+- `mt_ctxtsw_partial_unroll_benchmark`
+  - measures steady-state switch cost in a ring while amortizing loop overhead
+  - current result: `7` cycles/switch
+
+Together, those are enough to support the practical claim that the warm ctxtsw
+fast path is `7 cycles/switch` on this implementation.
+
+For correctness coverage, the most important supporting tests are:
+
+- `mt_regfile_test`
+- `mt_csr_isolation_test`
+- `mt_frf_isolation_test`
+- `mt_banyan_benchmark`
+
+Older timing variants such as the naive round-trip benchmark with heavier
+printing and the extra hotness/boundary sweep tests were useful during bring-up
+but are no longer the primary checkpoints.
+
 ## Big Picture
 
 This machine is still a normal pipelined BlackParrot core. The multithreading
