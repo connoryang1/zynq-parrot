@@ -14,6 +14,7 @@ TESTS := \
     mt_csr_isolation_test \
     mt_ctxtsw_microbench \
     mt_ctxtsw_partial_unroll_benchmark \
+    mt_ctxtsw_unrolled_ring_stress \
     mt_frf_isolation_test \
     mt_banyan_benchmark \
     mt_regfile_test
