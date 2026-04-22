@@ -20,6 +20,9 @@ The current repo has two independently useful timing checks for ctxtsw:
 - `mt_ctxtsw_partial_unroll_benchmark`
   - measures steady-state switch cost in a ring while amortizing loop overhead
   - current result: `7` cycles/switch
+- `mt_ctxtsw_unrolled_ring_stress`
+  - checks a dense 4-context pure ring with 8 consecutive `csrwi` per context
+  - current result: `CORE PASS` / `BSG PASS`
 
 Together, those are enough to support the practical claim that the warm ctxtsw
 fast path is `7 cycles/switch` on this implementation.
@@ -226,6 +229,21 @@ With that benchmark shape, the repo again measures:
 
 So the earlier `9`-cycle number was a benchmark artifact, not evidence that the
 hardware fast path had regressed.
+
+## Unrolled Ring Robustness
+
+One remaining concern was whether the machine could handle a denser pure-switch
+pattern with no loop bookkeeping at all. A 4-context stress test was added that
+seeds three worker contexts and then runs a pure ring:
+
+- T0 executes 8 straight `csrwi 0x081, 1`
+- T1 executes 8 straight `csrwi 0x081, 2`
+- T2 executes 8 straight `csrwi 0x081, 3`
+- T3 executes 8 straight `csrwi 0x081, 0`
+
+This test now passes cleanly. An earlier apparent "wedge" turned out to be a
+simulation-timeout artifact during slow Verilator startup/rebuilds, not a
+confirmed RTL bug.
 
 ## When It Will Take Longer
 
