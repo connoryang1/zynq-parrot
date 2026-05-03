@@ -43,7 +43,7 @@ prog.riscv:
 
 BP_NBF_SCRIPT ?= $(BP_RTL_DIR)/bp_common/software/py/nbf.py
 %.nbf: %.mem
-	@$(PYTHON) $(BP_NBF_SCRIPT) --skip_zeros --mem $*.mem > $@
+	@$(PYTHON) $(BP_NBF_SCRIPT) \
+		--skip_zeros --mem $*.mem --ncpus $(BP_NCPUS) > $@
 
 RUN_COLLATERAL = $(NBF_FILE)
-

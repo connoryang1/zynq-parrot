@@ -354,9 +354,9 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
                 send_bp_write(zpl, nbf[1], nbf[2], 0xf);
             }
         } else if (nbf[0] == 0xfe) {
-            continue;
+            while (zpl->shell_read(GP0_RD_CREDITS))
+                ;
         } else if (nbf[0] == 0xff) {
-            bsg_pr_dbg_ps("ps.cpp: nbf finish command, line %d\n", line_count);
             continue;
         } else {
             bsg_pr_dbg_ps("ps.cpp: unrecognized nbf command, line %d : %llx\n",
@@ -364,10 +364,5 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
             return;
         }
     }
-    bsg_pr_dbg_ps("ps.cpp: waiting for credit returns.\n", credit_count);
-    while (zpl->shell_read(GP0_RD_CREDITS))
-        ;
-
     bsg_pr_dbg_ps("ps.cpp: finished loading %d lines of nbf.\n", line_count);
 }
-
