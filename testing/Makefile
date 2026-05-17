@@ -26,6 +26,7 @@ TESTS := \
     mt_ctxtsw_microbench_trace \
     mt_ctxtsw_live_regs_test \
     mt_ctxtsw_late_wb_hazard_test \
+    mt_ctxtsw_overhead_benchmark \
     mt_ctxtsw_partial_unroll_benchmark \
     mt_ctxtsw_unrolled_ring_stress \
     mt_frf_isolation_test \
