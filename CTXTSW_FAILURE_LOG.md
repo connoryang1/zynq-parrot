@@ -984,3 +984,86 @@ Interpretation:
   to compare the original microbench or gap1 against gap8 warm1 and identify
   how many cycles are caused by I-cache abort/refill versus FE/BE redirect
   sequencing after `commit_pkt.ctxtsw`.
+
+## 2026-05-16 ISD Forwarding Timing Experiments
+
+Added `tools/ctxtsw_delta_scan.py` to extract context-switch timing deltas from
+VCD waveforms. It tracks, per ctxtsw dispatch:
+
+- scheduler dispatch of the ctxtsw
+- calculator `fast_ctxtsw_v_o`
+- FE sideband accept
+- target PC arrival in IF1/IF2
+- first accepted FE queue packet / next ctxtsw dispatch
+- commit-time ctxtsw cleanup
+
+Baseline/current checkpoint before new experiments:
+
+- `mt_ctxtsw_microbench_gap8`: PASS
+  - cold `0x6b`, warm0 `0x32`, warm1 `0x0c`, estimate `0x6`
+  - waveform: sideband accept at dispatch `+2`, target IF2 at `+4`
+  - useful target FE queue / next dense ctxtsw generally appears at `+5/+6`
+- `mt_ctxtsw_partial_unroll_benchmark`: PASS
+  - cycles/switch `0x6`
+  - same dense waveform shape: sideband `+2`, target IF2 `+4`, useful target
+    queue/dispatch `+5/+6`
+
+Experiment A: launch FE sideband directly from calculator `fast_ctxtsw_v_o`
+instead of waiting for the pending token register.
+
+- Change:
+  - `fe_ctxtsw_v_o = fast_ctxtsw_launch_v_li | ctxtsw_launch_lo`
+  - sideband payload muxes between the calculator fast ctxtsw bundle and the
+    pending token bundle.
+- Results:
+  - `mt_ctxtsw_microbench_gap8`: PASS, estimate still `0x6`
+  - `mt_ctxtsw_partial_unroll_benchmark`: PASS, cycles/switch still `0x6`
+- Waveform effect:
+  - sideband accept moved from dispatch `+2` to `+1`
+  - target IF2 moved from `+4` to `+3`
+  - useful FE queue/next ctxtsw did not improve because the earlier target IF2
+    now collides with commit-time `commit_pkt.ctxtsw` cleanup:
+    `fe_queue_clr_li`, `ctxtsw_queue_hold_li`, and calculator `pipe_flush_v`
+    are high at the commit cycle.
+- Interpretation:
+  - The one-cycle FE redirect improvement is real internally.
+  - Benchmark-visible improvement is absorbed by commit-time scheduler/queue
+    cleanup.
+
+Experiment B: create/capture/launch the pending ctxtsw token directly from
+`dispatch_pkt.ctxtsw_v` in `bp_be_top.sv`, using the dispatch-stage target
+bundle.
+
+- Result:
+  - `mt_ctxtsw_microbench_gap8`: PASS, but regressed:
+    - cold `0x10`, warm0 `0x32`, warm1 `0x10`, estimate `0x8`
+- Waveform effect:
+  - sideband accept moved to dispatch `+0`
+  - target IF2 can appear at `+2`
+  - first redirect after the cold transition drove a bad transient target
+    (`0x0`) before later recovery/cleanup corrected progress.
+- Interpretation:
+  - Dispatch-cycle sideband launch is not a safe surgical change in this
+    structure. It creates a same-cycle combinational path through scheduler
+    dispatch classification, top-level context target muxing, FE redirect, and
+    frontend state.
+  - This is likely why the measured estimate regressed despite earlier IF1/IF2
+    timing.
+- Action:
+  - Reverted Experiment B.
+  - Do not retry zero-cycle ISD launch without first breaking the target bundle
+    out of the same-cycle redirect loop or adding a separate predecoded/latched
+    target source.
+
+Current bottleneck after Experiment A:
+
+- `bp_be_scheduler.sv` holds FE queue ready low from ctxtsw dispatch until
+  commit:
+  - `ctxtsw_issue_hold_r`
+  - `ctxtsw_queue_hold_li`
+  - `fe_queue_ready_and_o = issue_queue_ready_and_lo & ~ctxtsw_queue_hold_li`
+- At commit, the queue is also cleared:
+  - `fe_queue_clr_li = clear_iss_i | commit_pkt_cast_i.ctxtsw`
+- Therefore the next optimization target is not sideband accept timing alone.
+  It is the safe treatment of target-context FE queue packets across
+  commit-time ctxtsw cleanup.

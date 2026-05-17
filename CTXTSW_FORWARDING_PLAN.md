@@ -916,3 +916,33 @@ commit.
   branch?
 - Which tests should become mandatory pre-commit gates versus occasional
   waveform/debug checks?
+
+## Updated ISD Performance Direction
+
+The current verified ISD-sideband path can move FE sideband accept one cycle
+earlier by launching from calculator `fast_ctxtsw_v_o`, but that alone does not
+improve `gap8` or partial-unroll benchmark cycles. Waveforms show the saved
+cycle is absorbed when the target IF2 packet reaches the frontend/backend
+boundary in the same cycle as `commit_pkt.ctxtsw` cleanup.
+
+Avoid the tempting direct-dispatch version for now:
+
+- `dispatch_pkt.ctxtsw_v -> fe_ctxtsw_v_o` moved sideband accept to dispatch
+  `+0`, but regressed `gap8` from estimate `0x6` to `0x8`.
+- The waveform showed a bad transient redirect target on the first transition,
+  consistent with a same-cycle combinational path through dispatch
+  classification, target context muxing, and FE redirect.
+- A clean zero-cycle ISD launch would need a predecoded or latched target source
+  that is not part of that same-cycle loop.
+
+Next optimization work should focus on the commit cleanup boundary:
+
+1. Keep Experiment A's calculator-fast sideband launch only if we want the
+   internal FE timing improvement as a stepping stone.
+2. Characterize whether a target FE queue packet is present during
+   `commit_pkt.ctxtsw` and is lost, delayed, or converted into a partial packet.
+3. Investigate a safe way to preserve or accept the target packet across
+   `fe_queue_clr_li` without reintroducing stale old-thread replay.
+4. Do not allow target BE dispatch before commit unless the scheduler regfile
+   and dispatch thread-id paths are explicitly made per-entry-thread based and
+   verified.
