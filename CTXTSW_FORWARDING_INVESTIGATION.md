@@ -9,12 +9,22 @@ hypotheses.
 
 ## Current Working Theory
 
-ISD-level forwarding can overlap some frontend work, but the first robust repair
-is conservative: keep the commit-time cleanup semantics and prevent the FE
-I-cache from exposing a partially completed miss fill after a redirect. This
-fixes the dense gap8 hang, but it regresses the single-switch estimate from the
-fast-path target toward the `0x16`-`0x1b` range because redirects can no longer
-abort an outstanding I-cache miss.
+ISD-level forwarding can overlap some frontend work, but correctness currently
+depends on preserving commit-time cleanup and preventing the FE I-cache from
+exposing a partially completed miss fill after a redirect.
+
+The first robust repair was conservative: hold `bp_fe_icache` in `e_miss` after
+`force_i` until the outstanding fill reaches `complete_recv`. That fixed the
+dense gap8 hang, but regressed the single-switch estimate toward the
+`0x16`-`0x1b` range because redirected context switches could no longer abort an
+outstanding I-cache miss.
+
+The current speed experiment is narrower: on `force_i` during an I-cache miss,
+return the I-cache to `e_ready`, invalidate the abandoned victim way, and drain
+the old fill response while suppressing its tag/data/stat writes. This keeps
+the stale-fill hazard from reappearing in tested cases, but performance remains
+layout sensitive: the original microbench and gap1 still pay a large refill tail,
+while gap8/gap14 can expose a much lower one-way estimate.
 
 Older stacked sideband/fast-path experiments showed `mt_ctxtsw_smoke_test`
 passing while `mt_ctxtsw_microbench_gap14` timed out. The first concrete
@@ -63,17 +73,58 @@ Latest verified result on branch `ctxtsw-isd-repair`:
     corrupted around printed strings
   - `make -j24 prep_lite`: PASS
 
+Latest checkpoint:
+
+- RTL diff:
+  - `bp_fe_icache.sv`: adds `abort_miss_r`, invalidates the aborted miss victim
+    way on `force_i`, returns from `e_miss` to `e_ready`, and drains the old fill
+    with slow tag/data/stat writes suppressed until `cache_req_last_i`.
+- Verified tests with clean rebuilds and `TRACE=1`:
+  - `mt_ctxtsw_microbench_gap1`: PASS, warm min single-switch estimate `0x36`
+  - `mt_ctxtsw_microbench_gap4`: PASS, warm min single-switch estimate `0x34`
+  - `mt_ctxtsw_microbench_gap8`: PASS, warm min single-switch estimate `0x6`
+  - `mt_ctxtsw_microbench_gap14`: PASS, warm min single-switch estimate `0x6`
+  - `mt_ctxtsw_microbench`: PASS, warm min round-trip `0x6c`, estimate `0x36`
+  - `mt_ctxtsw_partial_unroll_benchmark`: PASS, cycles/switch `0x6`
+  - `mt_ctxtsw_smoke_test`: PASS
+  - `mt_regfile_test`: PASS
+  - `mt_csr_isolation_test`: PASS
+  - `mt_frf_isolation_test`: PASS
+- Waveform evidence:
+  - Conservative gap8 trace `/tmp/gap8_final_candidate.vcd`: context-switch
+    redirect collides with `icache.state_r=e_miss`; I-cache waits roughly from
+    cycle `294052` to `294105` for `complete_recv`.
+  - Abort+invalidate gap8 trace `/tmp/gap8_icache_abort_inval.vcd`: redirect
+    starts abort at cycle `294573`, old fill drains by `294602`, and stale
+    instruction data (`0xd0c29ab0...`) does not reappear in the focused trace.
+  - Microbench abort+invalidate trace `/tmp/microbench_abort_inval.vcd`: dense
+    switches still encounter miss/abort/fill windows after some redirects, so
+    the benchmark remains around `0x8` per switch instead of the `0x4` unrolled
+    throughput.
+  - Partial-unroll abort+invalidate trace
+    `/tmp/partial_unroll_abort_inval.vcd`: tightly staggered ctxtsw sequences
+    remain possible; observed issue/commit/switch cadence supports the measured
+    `0x4` cycles/switch.
+
 Interpretation:
 
 - The hang/corrupt-instruction failure is fixed by holding the I-cache in miss
   until the fill completes.
-- The current repair is not the desired performance solution. Recovering the
-  5-cycle/IF2-forwarding path likely requires a more precise I-cache fill
-  protocol, such as transaction/epoch tagging or delaying tag visibility until
-  the corresponding line data is definitely coherent under redirects.
+- The abort+invalidate experiment recovers most of that conservative
+  performance loss without reintroducing the stale-fill hazard in tested cases.
+- Not every benchmark is slow: gap8/gap14 can still show a `0x6` one-way
+  estimate, but the original microbench and gap1 are much slower. The slowdown
+  is workload/layout dependent and appears when redirects collide with I-cache
+  fill state.
+- Recovering the 5-cycle/IF2-forwarding path more generally likely requires a
+  more precise I-cache fill protocol, such as transaction/epoch tagging or
+  delaying tag visibility until the corresponding line data is definitely
+  coherent under redirects.
 - The print corruption should be tracked separately from the context-switch
   hang. It does not currently block `BSG PASS`, but it means host I/O ordering
   around dense switches is still not cleanly explained.
+- A scheduler-side hold after `issue_ctxtsw_v` was tried and reverted because it
+  did not change the `mt_regfile_test` console corruption.
 
 Important correction from Claude's later report:
 
