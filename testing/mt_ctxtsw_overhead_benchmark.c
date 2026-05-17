@@ -17,11 +17,18 @@
 
 #define NUM_CONTEXTS 4
 #define SWITCHES_PER_CONTEXT 256
-#define UNROLL_FACTOR 4
+#define UNROLL_FACTOR 16
 #define LOOP_ITERS (SWITCHES_PER_CONTEXT / UNROLL_FACTOR)
 #define CONTROL_ITERS (NUM_CONTEXTS * LOOP_ITERS)
 #define TOTAL_SWITCHES (NUM_CONTEXTS * SWITCHES_PER_CONTEXT)
 #define STACK_WORDS 512
+
+#define REP2(op)  op op
+#define REP4(op)  REP2(op) REP2(op)
+#define REP8(op)  REP4(op) REP4(op)
+#define REP16(op) REP8(op) REP8(op)
+#define STR2(x) #x
+#define STR(x) STR2(x)
 
 static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
@@ -54,58 +61,80 @@ static inline void seed_thread(uint64_t tid, uint64_t *stack_top, uint64_t entry
   seed_npc(tid, entry);
 }
 
-static void __attribute__((noinline)) control_loop(void) {
-  for (uint64_t i = 0; i < CONTROL_ITERS; i++) {
-    __asm__ volatile(
-      "nop\n"
-      "nop\n"
-      "nop\n"
-      "nop\n"
-      : : : "memory"
-    );
-  }
+static void __attribute__((noinline, aligned(8))) control_loop(void) {
+  __asm__ volatile(
+    ".option push\n"
+    ".option norvc\n"
+    "li t0, " STR(CONTROL_ITERS) "\n"
+    "1:\n"
+    REP16("addi x0, x0, 0\n")
+    "addi t0, t0, -1\n"
+    "bnez t0, 1b\n"
+    ".option pop\n"
+    : : : "t0", "memory"
+  );
 }
 
-void __attribute__((noinline, noreturn)) t1_ring(void) {
-  for (uint64_t i = 0; i < LOOP_ITERS; i++) {
-    __asm__ volatile(
-      "csrwi 0x081, 2\n"
-      "csrwi 0x081, 2\n"
-      "csrwi 0x081, 2\n"
-      "csrwi 0x081, 2\n"
-      : : : "memory"
-    );
-  }
+static void __attribute__((noinline, aligned(8))) t0_ring(void) {
+  __asm__ volatile(
+    ".option push\n"
+    ".option norvc\n"
+    "li t0, " STR(LOOP_ITERS) "\n"
+    "1:\n"
+    REP16("csrwi 0x081, 1\n")
+    "addi t0, t0, -1\n"
+    "bnez t0, 1b\n"
+    ".option pop\n"
+    : : : "t0", "memory"
+  );
+}
+
+void __attribute__((noinline, noreturn, aligned(8))) t1_ring(void) {
+  __asm__ volatile(
+    ".option push\n"
+    ".option norvc\n"
+    "li t0, " STR(LOOP_ITERS) "\n"
+    "1:\n"
+    REP16("csrwi 0x081, 2\n")
+    "addi t0, t0, -1\n"
+    "bnez t0, 1b\n"
+    ".option pop\n"
+    : : : "t0", "memory"
+  );
 
   for (;;)
     ;
 }
 
-void __attribute__((noinline, noreturn)) t2_ring(void) {
-  for (uint64_t i = 0; i < LOOP_ITERS; i++) {
-    __asm__ volatile(
-      "csrwi 0x081, 3\n"
-      "csrwi 0x081, 3\n"
-      "csrwi 0x081, 3\n"
-      "csrwi 0x081, 3\n"
-      : : : "memory"
-    );
-  }
+void __attribute__((noinline, noreturn, aligned(8))) t2_ring(void) {
+  __asm__ volatile(
+    ".option push\n"
+    ".option norvc\n"
+    "li t0, " STR(LOOP_ITERS) "\n"
+    "1:\n"
+    REP16("csrwi 0x081, 3\n")
+    "addi t0, t0, -1\n"
+    "bnez t0, 1b\n"
+    ".option pop\n"
+    : : : "t0", "memory"
+  );
 
   for (;;)
     ;
 }
 
-void __attribute__((noinline, noreturn)) t3_ring(void) {
-  for (uint64_t i = 0; i < LOOP_ITERS; i++) {
-    __asm__ volatile(
-      "csrwi 0x081, 0\n"
-      "csrwi 0x081, 0\n"
-      "csrwi 0x081, 0\n"
-      "csrwi 0x081, 0\n"
-      : : : "memory"
-    );
-  }
+void __attribute__((noinline, noreturn, aligned(8))) t3_ring(void) {
+  __asm__ volatile(
+    ".option push\n"
+    ".option norvc\n"
+    "li t0, " STR(LOOP_ITERS) "\n"
+    "1:\n"
+    REP16("csrwi 0x081, 0\n")
+    "addi t0, t0, -1\n"
+    "bnez t0, 1b\n"
+    ".option pop\n"
+    : : : "t0", "memory"
+  );
 
   for (;;)
     ;
@@ -122,15 +151,7 @@ int main(void) {
   seed_thread(3, &t3_stack[STACK_WORDS], (uint64_t)t3_ring);
 
   uint64_t switch_begin = read_cycle();
-  for (uint64_t i = 0; i < LOOP_ITERS; i++) {
-    __asm__ volatile(
-      "csrwi 0x081, 1\n"
-      "csrwi 0x081, 1\n"
-      "csrwi 0x081, 1\n"
-      "csrwi 0x081, 1\n"
-      : : : "memory"
-    );
-  }
+  t0_ring();
   uint64_t switch_end = read_cycle();
   uint64_t switch_cycles = switch_end - switch_begin;
 
