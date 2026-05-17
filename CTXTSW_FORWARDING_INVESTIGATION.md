@@ -9,6 +9,52 @@ hypotheses.
 
 ## Current Working Theory
 
+Latest verified result on branch `ctxtsw-isd-repair` after the
+commit-accept repair:
+
+- RTL diff:
+  - `bp_be_scheduler.sv`: when `commit_pkt.ctxtsw` arrives after the early FE
+    sideband was already accepted (`pending_ctxtsw_sent_i`), the scheduler no
+    longer treats the commit cleanup as a reason to hold off the next FE packet.
+  - `bp_be_issue_queue.sv`: supports a same-cycle clear plus enqueue so the
+    target-context FE packet accepted during ctxtsw commit cleanup is not
+    discarded.
+  - `bp_be_top.sv`: during that same commit-accept cycle, the scheduler sees
+    the pending target thread ID for regfile read/dispatch purposes. The
+    architectural `current_thread_id_lo` still changes at commit through the
+    normal backend finalization path.
+- Verified tests with clean rebuilds and `TRACE=1`:
+  - `mt_ctxtsw_microbench_gap8`: PASS, warm min single-switch estimate `0x5`
+  - `mt_ctxtsw_partial_unroll_benchmark`: PASS, cycles/switch `0x5`
+  - `mt_regfile_test`: PASS
+  - `mt_ctxtsw_smoke_test`: PASS
+  - `mt_ctxtsw_microbench`: PASS, but still slow: warm min round-trip `0x6b`,
+    estimate `0x35`
+  - `mt_csr_isolation_test`: PASS
+  - `mt_frf_isolation_test`: PASS
+- Waveform evidence:
+  - `/tmp/gap8_effective_tid.vcd`: after warm-up, target IF2 is 3 cycles after
+    ctxtsw dispatch, target FE queue accept is 3-4 cycles after dispatch, and
+    the next ctxtsw reaches ISD 4-5 cycles after dispatch.
+  - `/tmp/partial_effective_tid.vcd`: after warm-up, most switch-to-switch
+    gaps are 4 cycles with occasional 5-cycle cases when FE queue acceptance
+    slips by one cycle.
+- Interpretation:
+  - The previous same-cycle commit cleanup was wasting the already-fetched
+    target packet. Preserving that packet recovers roughly one cycle in the
+    favorable gap/unrolled cases.
+  - The first version of this optimization hung `mt_ctxtsw_partial_unroll` by
+    preissuing the accepted target packet with the old `current_thread_id_i`.
+    The narrow fix is to present the pending target thread ID to the scheduler
+    only during the commit-accept cycle.
+  - A broader "use FE packet thread tag for reads/dispatch" attempt was
+    rejected because the sideband target FE packet still carries old-thread
+    metadata in this design. That made target `ctxtsw` instructions compare
+    against the wrong thread and stop switching.
+  - The original dense `mt_ctxtsw_microbench` remains much slower than gap8 and
+    partial-unroll. That is now a workload/layout performance issue, not a
+    stall/corruption failure in the covered tests.
+
 ISD-level forwarding can overlap some frontend work, but correctness currently
 depends on preserving commit-time cleanup and preventing the FE I-cache from
 exposing a partially completed miss fill after a redirect.

@@ -9,11 +9,19 @@ path is worth implementing.
 
 ## Current Starting Point
 
-ISD forwarding is now reconstructed in a scheduler-only baseline and passes some
-focused Stage 1 tests, but it is not yet proven correct across the dense/gap
-suite. Stage 1 is still a verification and repair phase: finish waveform
-confirmation, keep the change set clean, and fix the current queue/ownership
-boundary before moving logic earlier into IF2.
+ISD forwarding is currently in a verified commit-accept repair state. The
+current change keeps commit-time backend finalization authoritative, but lets
+the scheduler accept the already-fetched target FE packet during ctxtsw commit
+cleanup when the early sideband was already accepted. This improves the
+favorable gap/unrolled cases to the `0x5` class without reintroducing the known
+stalls in the covered tests.
+
+Stage 1 is still a verification and repair phase before any IF2 forwarding
+work. The main remaining performance question is why the original dense
+`mt_ctxtsw_microbench` still reports a much longer `0x35` single-switch
+estimate while `gap8` and partial-unroll show the intended low-overhead path.
+Treat that as a separate waveform/code-analysis item before moving detection
+earlier.
 
 Recommended workflow:
 
@@ -113,28 +121,23 @@ Waveform policy:
   rebuilds, and the gap helper compiling into an out-of-line call/return
   sequence.
 - Current `ctxtsw-isd-repair` scheduler-only reconstruction:
-  - active BP submodule RTL diff is the scheduler rollback mask plus the
-    pre-existing `bp_be_regfile_mt.sv` remote-write forwarding change.
-  - stale stacked sideband changes were saved to
-    `/tmp/ctxtsw_stacked_current.patch` and removed from the active RTL.
-  - fixed straight-line `gap14` passes non-trace with `0xe/0xe/0xe`, estimate
-    `0x7`.
-  - `gap12`, `gap13`, and `gap16` also pass non-trace with warm estimate
-    `0x7`.
-  - after a clean non-trace rebuild and smoke pass, `gap8` and `gap4` hang
-    before benchmark output; this is now the controlled-gap boundary to debug.
-  - dense `mt_ctxtsw_microbench` passes with `0xe` round-trip and `0x7`
-    estimate.
-  - `mt_ctxtsw_partial_unroll_benchmark` passes and reports `0x4` cycles per
-    switch for its endpoint. A clean traced run on 2026-05-14 confirmed this is
-    a real steady-state throughput result: consecutive switch detections and
-    commit redirects appear at the expected cadence. It is not proof of
-    arbitrary single-switch latency or correctness with nearby memory/replay
-    events.
-  - `mt_csr_isolation_test`, `mt_regfile_test`, and
+  - active BP submodule RTL diff now includes the commit-accept scheduler path,
+    same-cycle issue-queue clear/enqueue support, and a one-cycle effective
+    scheduler thread ID on ctxtsw commit accept.
+  - the broad packet-thread-tag experiment was rejected because sideband target
+    FE metadata still carries the old thread tag in this design.
+  - `mt_ctxtsw_microbench_gap8` passes with warm estimate `0x5`.
+  - `mt_ctxtsw_partial_unroll_benchmark` passes and reports `0x5` cycles per
+    switch.
+  - `mt_regfile_test`, `mt_csr_isolation_test`, and
     `mt_frf_isolation_test` all end in `BSG PASS`.
-  - next Stage 1 work is waveform confirmation and checkpoint cleanup before
-    reintroducing any sideband/fast-path changes.
+  - `mt_ctxtsw_smoke_test` ends in `BSG PASS`.
+  - dense `mt_ctxtsw_microbench` ends in `BSG PASS`, but still reports warm min
+    round-trip `0x6b` and estimate `0x35`; this is the next performance
+    investigation target.
+  - next Stage 1 work is to either explain the dense microbench's long tail via
+    waveform evidence or split correctness and performance checkpoints before
+    reintroducing any IF2 fast-path changes.
 - Claude created waveform-analysis scripts in `/tmp`:
   - `/tmp/analyze_postfix.py` is the best starting point because it parses VCD
     headers and matches signals by name fragments.

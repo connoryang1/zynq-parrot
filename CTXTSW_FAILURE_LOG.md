@@ -95,6 +95,51 @@ The next working design likely needs a real three-phase protocol:
 
 ## Failure / Regression Records
 
+### 0. Commit-Accept Target Packet Repair
+
+Intent:
+
+- Keep early FE sideband forwarding from wasting the target FE packet at
+  `commit_pkt.ctxtsw`.
+- Preserve backend architectural finalization at commit.
+- Avoid reusing the broader packet-thread-tag experiment until FE metadata is
+  made target-thread accurate.
+
+Working fix:
+
+- `bp_be_scheduler.sv` accepts a target FE packet on the ctxtsw commit cleanup
+  cycle when `pending_ctxtsw_sent_i` is already high.
+- `bp_be_issue_queue.sv` supports same-cycle clear plus enqueue for that target
+  packet.
+- `bp_be_top.sv` presents the pending target thread ID to the scheduler only on
+  that commit-accept cycle, so the same-cycle preissue reads the target
+  regfile.
+
+Important failed intermediate:
+
+- Accepting the packet without the effective scheduler thread ID made
+  `mt_ctxtsw_partial_unroll_benchmark` run into the terminal loop instead of
+  completing all switches.
+- A broad attempt to use FE packet thread tags for regfile reads/dispatch also
+  failed because sideband target FE packets still carried old-thread metadata.
+
+Verified result:
+
+- `mt_ctxtsw_microbench_gap8`: PASS, warm min estimate `0x5`
+- `mt_ctxtsw_partial_unroll_benchmark`: PASS, `0x5` cycles/switch
+- `mt_regfile_test`: PASS
+- `mt_ctxtsw_smoke_test`: PASS
+- `mt_ctxtsw_microbench`: PASS, but still slow: `0x6b` warm round-trip,
+  `0x35` estimate
+- `mt_csr_isolation_test`: PASS
+- `mt_frf_isolation_test`: PASS
+
+Remaining issue:
+
+- The original dense microbench is still much slower than the favorable
+  gap/unrolled cases. That should be treated as a performance diagnosis item,
+  not as the same correctness failure as the earlier hangs.
+
 ### 1. Dispatch-Time Prepared Bundle Experiments
 
 Relevant commits in `import/black-parrot` history:
