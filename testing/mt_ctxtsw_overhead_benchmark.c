@@ -17,7 +17,7 @@
 
 #define NUM_CONTEXTS 4
 #define SWITCHES_PER_CONTEXT 256
-#define UNROLL_FACTOR 32
+#define UNROLL_FACTOR 64
 #define LOOP_ITERS (SWITCHES_PER_CONTEXT / UNROLL_FACTOR)
 #define CONTROL_ITERS (NUM_CONTEXTS * LOOP_ITERS)
 #define TOTAL_SWITCHES (NUM_CONTEXTS * SWITCHES_PER_CONTEXT)
@@ -28,6 +28,7 @@
 #define REP8(op)  REP4(op) REP4(op)
 #define REP16(op) REP8(op) REP8(op)
 #define REP32(op) REP16(op) REP16(op)
+#define REP64(op) REP32(op) REP32(op)
 #define STR2(x) #x
 #define STR(x) STR2(x)
 
@@ -68,7 +69,7 @@ static void __attribute__((noinline, aligned(8))) control_loop(void) {
     ".option norvc\n"
     "li t0, " STR(CONTROL_ITERS) "\n"
     "1:\n"
-    REP32("addi x0, x0, 0\n")
+    REP64("addi x0, x0, 0\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -82,7 +83,7 @@ static void __attribute__((noinline, aligned(8))) t0_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 1\n")
+    REP64("csrwi 0x081, 1\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -96,7 +97,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t1_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 2\n")
+    REP64("csrwi 0x081, 2\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -113,7 +114,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t2_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 3\n")
+    REP64("csrwi 0x081, 3\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -130,7 +131,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t3_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 0\n")
+    REP64("csrwi 0x081, 0\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
