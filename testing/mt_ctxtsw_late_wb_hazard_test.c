@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include "bp_utils.h"
+#include "mt_seed.h"
 
 #define STACK_WORDS 512
 #define ROUNDS 8
@@ -38,27 +39,6 @@ static volatile uint64_t t0_load_lines[ROUNDS * 8] __attribute__((aligned(64), u
 
 void __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line);
 void __attribute__((naked, noinline, noreturn)) t1_entry(void);
-
-static inline void seed_npc(uint64_t tid, uint64_t npc) {
-  uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v) : "memory");
-}
-
-static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
-  uint64_t v = (val & 0x7FFFFFFFFFULL)
-             | ((tid & 0x3ULL) << 39)
-             | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v) : "memory");
-}
-
-static inline void seed_thread(uint64_t tid, uint64_t *stack_top, uint64_t entry) {
-  uint64_t gp_val;
-  __asm__ volatile("mv %0, gp" : "=r"(gp_val));
-
-  seed_reg(tid, 3 /* x3=gp */, gp_val);
-  seed_reg(tid, 2 /* x2=sp */, (uint64_t)stack_top);
-  seed_npc(tid, entry);
-}
 
 void __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line) {
   __asm__ volatile(

@@ -23,6 +23,11 @@
 - Re-run the most relevant smoke test after every critical RTL or software change.
 - For this project, after RTL or test-program changes use the clean target flow:
   `make clean run ... TRACE=1`.
+- When using the testing harness directly, prefer the equivalent `make -C testing ... TRACE=1`
+  form so commands run from the repository root without changing directories.
+- Do not run testing flows concurrently by default. The testing harness and simulator flow share
+  program, build, waveform, and log artifacts, so parallel runs can overwrite each other unless
+  separate output/build directories have been explicitly configured and verified.
 - Always include `TRACE=1` for context-switch debug and performance validation runs so
   waveform evidence is available by default.
 - When changing shared infrastructure, rerun at least one previously known-good flow before trusting new debug results.

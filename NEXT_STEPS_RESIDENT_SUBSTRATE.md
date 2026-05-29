@@ -1,165 +1,92 @@
-# Next Steps: Resident Substrate
+# Current Plan: Resident Context-Switch Substrate
 
-## Goal
+The current milestone is to finish validating the resident hardware-thread
+substrate before taking on broader Linux-facing or cache-backed context work.
 
-Establish whether the current implementation is strong enough to keep scaling
-toward Banyan-style threading before committing to a threading-first refactor.
+## Immediate Goal
 
-The immediate objective is not Linux bring-up or cache-backed contexts. The
-immediate objective is to finish and validate the resident-context substrate so
-that later design decisions are driven by evidence rather than style
-preferences.
+Make the `ctxtsw-isd-repair` branch reviewable:
 
-## Current Baseline
+- keep commit-time architectural ownership coherent
+- preserve the ISD/commit-accept repair where it is correct
+- explain the remaining dense-microbench performance tail with waveform evidence
+- avoid reintroducing broad speculative handoff experiments until the current
+  path is measured and stable
 
-The current repo has already established:
+## Phase 1: Lock Down Current Correctness
 
-- fast resident context handoff
-- verified `7 cycles/switch` on the warm fast path
-- restore-path correctness fixes for:
-  - target-thread `translation_en`
-  - per-thread ASID save/restore wiring
-- dense pure-switch robustness via:
-  - `mt_ctxtsw_unrolled_ring_stress`
+Use serialized `make -C testing ... TRACE=1` runs. Do not run testing flows
+concurrently unless separate simulator/build outputs are deliberately configured.
 
-What is not yet established:
+Minimum correctness ladder:
 
-- larger context counts at Banyan-like scale
-- multicontext trap/exception behavior
-- Linux-facing thread/control semantics
-- cache-backed context residency
+```bash
+make -C testing run-mt_ctxtsw_smoke_test TRACE=1
+make -C testing run-mt_regfile_test TRACE=1
+make -C testing run-mt_csr_isolation_test TRACE=1
+make -C testing run-mt_frf_isolation_test TRACE=1
+make -C testing run-mt_ctxtsw_late_wb_hazard_test TRACE=1
+```
 
-## Phase 1: Lock Down The Current Model
+Add the ABI/GPR/ring tests when touching register ownership, writeback, hazard,
+or multi-context behavior.
 
-Write down the current resident-thread model clearly and keep it stable while
-the next validation steps are executed.
+## Phase 2: Explain Current Performance
 
-The model should explicitly define:
+Primary tests:
 
-- what per-context state exists today
-  - integer register file
-  - floating-point register file
-  - CSR state
-  - FE thread identity / predictor state
-  - saved NPC / privilege / translation / ASID state
-- what software-visible operations exist today
-  - `ctxtsw` via CSR `0x081`
-  - thread NPC seeding via CSR `0x082`
-  - remote register seeding via CSR `0x083`
-- what the current guarantees are
-  - fast resident handoff
-  - isolation at the current tested scope
-- what remains intentionally undefined or unimplemented
+```bash
+make -C testing run-mt_ctxtsw_gap8_benchmark TRACE=1
+make -C testing run-mt_ctxtsw_ring_throughput_benchmark TRACE=1
+make -C testing run-mt_ctxtsw_roundtrip_benchmark TRACE=1
+```
 
-This step is complete when the current design can be explained as a coherent
-resident-thread model rather than as a collection of benchmark mechanisms.
+For each performance claim, collect:
 
-## Phase 2: Expand Resident-Context Validation
+- exact command
+- pass/fail output
+- waveform path
+- measured endpoints
+- cycle deltas
+- whether I-cache miss/abort/refill tails are part of the measured number
 
-The next tests should stress the current design, not a refactored one.
+The known open question is why favorable gap/unrolled shapes can reach the
+`0x5` class while the dense original microbench has shown a much longer tail.
 
-Priority coverage gaps:
+## Phase 3: Expand Resident-Context Validation
 
-- more contexts than the smallest proof-point cases
-- repeated switching across more privilege-mode combinations
-- repeated switching across more address-space combinations
-- exception and trap behavior after a context switch
-- timer/interrupt behavior after a context switch
+After the current branch is stable, expand coverage before refactoring:
 
-The main question is:
+- larger context counts
+- repeated switching across privilege-mode combinations
+- repeated switching across address-space / ASID combinations
+- exception and trap behavior after a switch
+- timer/interrupt behavior after a switch
+- call/return predictor behavior, especially shared RAS behavior
 
-> does the current design remain correct and understandable as the exercised
-> multicontext cases become richer?
+## Phase 4: Define Control Semantics
 
-## Phase 3: Make The Control Model Explicit
-
-Even if the RTL remains unchanged for a while, the software-visible thread model
-should be described explicitly.
-
-Define:
+Write the software-visible model clearly:
 
 - how a context is created or seeded
-- when it is considered dormant, runnable, or currently executing
-- how another context may modify its architectural state
-- what a committed `ctxtsw` means architecturally
-- what the expected resume point is after a switch
+- what dormant, resident, runnable, and live mean
+- how one context may modify another context's architectural state
+- what committed `ctxtsw` means architecturally
+- what resume PC/state is expected after a switch
 
-If this model is awkward to explain cleanly, that is evidence that a later
-threading-first refactor may be worthwhile.
+If this model cannot be explained cleanly, that is evidence that a
+threading-first refactor may be justified.
 
-## Phase 4: Push Context Scale Modestly
+## Refactor Decision Gate
 
-Before discussing cache-backed contexts, test how far the resident design can go
-without changing the architecture qualitatively.
+Do not start a first-class/speculative redesign just because the current path is
+not ideal. Revisit the design only after the current resident substrate has been
+pushed far enough to show a real structural limit.
 
-Questions to answer:
+A larger refactor is justified if:
 
-- can the current design stand up a noticeably larger number of contexts?
-- do the current parameterization and tests scale cleanly?
-- does debug and reasoning complexity remain manageable?
-
-This phase does not need to jump immediately to the final Banyan target. The
-goal is to determine whether the current implementation still scales naturally
-once it is pushed beyond the smallest validated cases.
-
-## Phase 5: Revisit The Refactor Question
-
-After the steps above, decide between:
-
-- extending the current design further
-- or doing a focused threading-first refactor
-
-That decision should be made only after the resident substrate has been pushed
-far enough to reveal where the current structure does or does not hold up.
-
-## Validation Checklist
-
-### Correctness
-
-- context isolation across larger context counts
-- translation/ASID correctness under repeated switching
-- privilege-mode switching correctness
-- FP/int/CSR integrity after long switch sequences
-
-### Control Semantics
-
-- clear meaning of dormant/resident/running
-- exact architectural meaning of `ctxtsw`
-- exact semantics of remote seeding/manipulation
-
-### Robustness
-
-- repeated ring switching
-- dense back-to-back switching
-- larger multicontext switching patterns
-- fault/trap behavior after resume
-
-### Scalability
-
-- parameterized context-count experiments
-- resource-growth awareness
-- assessment of debug complexity as scale increases
-
-## Criteria For A Refactor
-
-A threading-first refactor becomes justified if one or more of the following is
-true:
-
-- new thread-control features feel bolted on rather than natural
-- scaling the context count requires too much scattered plumbing
-- software-visible semantics become hard to explain coherently
-- Linux integration would require ad hoc interfaces rather than a clear model
-- cache-backed contexts cannot be layered cleanly on top of the resident design
-
-If these conditions do not appear yet, the current design should continue to be
-extended incrementally.
-
-## Recommendation
-
-The next milestone should be:
-
-> prove whether the current resident design is a solid Banyan substrate by
-> expanding validation and making the control model explicit.
-
-Linux bring-up and cache-backed context storage should be treated as subsequent
-phases, not as substitutes for finishing the resident substrate first.
+- scaling context count requires scattered, fragile plumbing
+- software-visible semantics become awkward or inconsistent
+- rollback/cancel behavior cannot be made explicit in the current structure
+- Linux-facing control semantics would require ad hoc interfaces
+- cache-backed contexts cannot layer cleanly on top of resident contexts
