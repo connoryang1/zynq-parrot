@@ -126,14 +126,17 @@ static inline void write_mscratch(uint64_t v) {
 }
 
 int main(void) {
-  bp_print_string("=== 4-Context Ring CSR Isolation Test ===\n");
-  bp_print_string("Ring: T0->T1->T2->T3->T0\n\n");
-
   /* Pre-seed all ring threads before entering the ring */
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_entry);
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_entry);
   seed_thread(3, &t3_stack[STACK_WORDS], (uint64_t)t3_entry);
 
+  /*
+   * Keep host MMIO output after the ring. Pre-ring bp_print_string() traffic
+   * leaves uncached stores outstanding, and the thread bodies intentionally use
+   * fences before switching. Printing here can make this test cover host I/O
+   * ordering instead of CSR/thread isolation.
+   */
   write_mscratch(SENTINEL_T0);
   __asm__ volatile("csrwi 0x081, 1" ::: "memory");
   /* T0 resumes here after T3 switches back */
