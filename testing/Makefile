@@ -70,6 +70,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
 	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
@@ -88,6 +89,7 @@ run-mt_ctxtsw_$(1)ctx_ring_throughput_benchmark: $(ZP_RISCV_DIR)/bp-tests/mt_ctx
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing mt_ctxtsw_$(1)ctx_ring_throughput_benchmark in $(1)-context simulator..."
 	@$$(MAKE) -C $$(SIM_DIR) run PROG=mt_ctxtsw_$(1)ctx_ring_throughput_benchmark NUM_THREADS=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 
 $(foreach n,$(SCALE_CONTEXTS),$(eval $(call SCALE_TEST_RULES,$(n))))
