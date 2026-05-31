@@ -20,17 +20,23 @@ Run tests serially. The harness uses shared simulator/program artifacts under
   a T0/T1 switch.
 - `mt_csr_isolation_test`: per-thread CSR state isolation using `mscratch`.
 - `mt_frf_isolation_test`: per-thread floating-point register state isolation.
+  It checks for non-aliasing and preservation, not reset-to-IEEE-zero, because
+  FP register storage may use recoded values internally.
 
 ## Correctness Tests
 
 - `mt_abi_preservation_test`: verifies ABI-visible integer state, especially
   `gp` and callee-saved `s*` registers, survives a T0->T1->T0 switch.
 - `mt_ctxtsw_4ctx_ring_isolation`: checks CSR isolation across the default
-  four-context ring, T0->T1->T2->T3->T0.
+  four-context ring, T0->T1->T2->T3->T0. It intentionally prints only after the
+  ring completes, because pre-ring host MMIO stores can interact with the
+  thread-body fences and turn this into a host-I/O ordering test.
 - `mt_ctxtsw_gpr_ring_stress`: checks live GPR preservation across a full
   four-context ring.
 - `mt_ctxtsw_late_wb_hazard_test`: regression for late writeback and
   wrong-thread scoreboard/hazard clearing around a context switch.
+- `mt_ctxtsw_pure_ring_stress_test`: dense four-context ring with consecutive
+  immediate context-switch CSRs and no loop bookkeeping in the switched stream.
 
 ## Benchmarks And Focused Probes
 

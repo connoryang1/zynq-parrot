@@ -49,6 +49,20 @@ Check the binary shape with objdump. A gap helper that becomes an out-of-line
 call/return sequence is no longer testing the same straight-line gap. The
 controlled-gap helper should remain forced inline.
 
+### CSR isolation reports a stale written value
+
+If `mt_csr_isolation_test` reports that T1 wrote the value produced by the first
+instruction of a `li` sequence, such as `0x5a5a6000` instead of `0x5a5a5a5a`,
+check the register-form CSR write RAW path. The CSR source operand must not
+consume an early integer producer before the final value is available.
+
+### Ring isolation is quiet after NBF load
+
+`mt_ctxtsw_4ctx_ring_isolation` intentionally prints only after the ring
+returns to T0. A pre-ring banner can leave host MMIO stores outstanding; combined
+with the thread-body fences, that exercises host I/O ordering instead of just
+CSR/thread isolation.
+
 ## Durable Lessons
 
 - `commit_pkt.ctxtsw` is the baseline architectural authority.
@@ -69,6 +83,12 @@ controlled-gap helper should remain forced inline.
   old-thread fills as valid target-thread instruction data.
 - Thread IDs must follow queue entries, hazards, replay, late writeback,
   regfile writes, and host/MMIO side effects.
+- BE-to-FE redirect metadata must preserve the owning thread id. A nonzero
+  thread that takes a CSR/translation redirect with zeroed branch metadata can
+  restart FE under thread 0.
+- UCE request credits are used as an ordering signal by fences. Count one
+  outstanding request per complete forward command and verify `credits_empty`
+  before trusting fence-related deadlock conclusions.
 
 ## Early-Handoff Contract
 

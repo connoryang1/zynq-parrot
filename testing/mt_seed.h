@@ -60,6 +60,8 @@ static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
 }
 
 static inline void seed_fp_reg(uint64_t tid, uint64_t reg, uint64_t val) {
+  /* val is written directly into the FP regfile storage encoding. For recoded
+   * FP implementations this is not the same as an IEEE double bit pattern. */
   uint64_t v = (val & BP_VAL_MASK)
              | ((tid & BP_TID_MASK) << BP_TID_SHIFT)
              | ((reg & BP_REG_MASK) << BP_REG_SHIFT)

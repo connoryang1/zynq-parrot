@@ -98,6 +98,7 @@ void __attribute__((naked, noinline, noreturn)) t3_entry(void) {
     "csrr  t0, mscratch\n"
     "la    t1, t3_written\n"
     "sd    t0, 0(t1)\n"
+    "fence\n"
     /* switch back to T0 */
     "csrwi 0x081, 0\n"
     "1:\n"

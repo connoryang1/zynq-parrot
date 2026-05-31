@@ -33,7 +33,8 @@ CORRECTNESS_TESTS := \
     mt_abi_preservation_test \
     mt_ctxtsw_4ctx_ring_isolation \
     mt_ctxtsw_gpr_ring_stress \
-    mt_ctxtsw_late_wb_hazard_test
+    mt_ctxtsw_late_wb_hazard_test \
+    mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
     mt_ctxtsw_roundtrip_benchmark \

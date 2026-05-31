@@ -5,8 +5,12 @@ switching for BlackParrot.
 
 Current working branches:
 
-- `zynq-parrot`: `ctxtsw-isd-repair` at `21c289b`
-- `import/black-parrot`: `ctxtsw-isd-repair` at `574be82f`
+- `zynq-parrot`: `ctxtsw-isd-repair`
+- `import/black-parrot`: `ctxtsw-isd-repair`
+
+Use `git rev-parse --short HEAD` in each repository for the exact local
+checkpoint. These docs describe the branch state after the ring-deadlock,
+thread-metadata, UCE-credit, and CSR RAW-hazard fixes.
 
 The top-level repo carries test programs, harness changes, waveform tools, and
 writeups. The actual RTL implementation lives in `import/black-parrot`.
@@ -68,6 +72,9 @@ Current source-level facts:
 
 - `bp_be_scheduler.sv` classifies immediate context switches in the issue path
   as CSR writes to `12'h081`.
+- `bp_be_detector.sv` treats register-form CSR writes as dependent on a
+  preceding early integer producer when they use the same `rs1`; this avoids
+  writing stale source data into CSRs such as `mscratch`.
 - `bp_be_top.sv` captures a pending target bundle from the fast context-switch
   event when the core is not frozen or resuming.
 - `bp_be_top.sv` can drive the FE sideband outputs:
@@ -80,6 +87,9 @@ Current source-level facts:
   architectural finalization.
 - `current_thread_id_lo` still updates on `commit_pkt.ctxtsw`; a non-ctxtsw
   redirect while a pending switch exists restores the previous thread id.
+- BE-to-FE redirects that resume the current thread must preserve branch
+  metadata carrying the current frontend thread id; otherwise a nonzero-thread
+  CSR redirect can silently retag FE fetch as thread 0.
 - The scheduler has a commit-accept path so a target FE packet already available
   during context-switch commit cleanup can be accepted under the pending target
   thread id.
