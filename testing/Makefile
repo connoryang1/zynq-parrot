@@ -31,9 +31,11 @@ SMOKE_TESTS := \
 
 CORRECTNESS_TESTS := \
     mt_abi_preservation_test \
+    mt_ctxtsw_asid_translation_test \
     mt_ctxtsw_4ctx_ring_isolation \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test \
+    mt_ctxtsw_privilege_isolation_test \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
@@ -43,7 +45,8 @@ BENCHMARKS := \
     mt_ctxtsw_ring_overhead_benchmark \
     mt_ctxtsw_single_overhead_benchmark \
     mt_ctxtsw_banyan_poll_worker_benchmark \
-    mt_ctxtsw_predictor_pollution
+    mt_ctxtsw_predictor_pollution \
+    mt_ctxtsw_return_predictor_test
 
 DEMOS := \
     multithreading_demo

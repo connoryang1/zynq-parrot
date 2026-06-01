@@ -27,6 +27,9 @@ Run tests serially. The harness uses shared simulator/program artifacts under
 
 - `mt_abi_preservation_test`: verifies ABI-visible integer state, especially
   `gp` and callee-saved `s*` registers, survives a T0->T1->T0 switch.
+- `mt_ctxtsw_asid_translation_test`: verifies per-context `satp`/ASID
+  ownership across switch-out and resume. This is an ASID-state probe, not yet a
+  full distinct virtual mapping test.
 - `mt_ctxtsw_4ctx_ring_isolation`: checks CSR isolation across the default
   four-context ring, T0->T1->T2->T3->T0. It intentionally prints only after the
   ring completes, because pre-ring host MMIO stores can interact with the
@@ -35,6 +38,10 @@ Run tests serially. The harness uses shared simulator/program artifacts under
   four-context ring.
 - `mt_ctxtsw_late_wb_hazard_test`: regression for late writeback and
   wrong-thread scoreboard/hazard clearing around a context switch.
+- `mt_ctxtsw_privilege_isolation_test`: validates per-context ownership of
+  privilege-control CSRs such as `mstatus`, `mepc`, and `mscratch`. It is
+  intentionally bounded and does not yet execute the switched context in S/U
+  mode.
 - `mt_ctxtsw_pure_ring_stress_test`: dense four-context ring with consecutive
   immediate context-switch CSRs and no loop bookkeeping in the switched stream.
 
@@ -54,6 +61,8 @@ Run tests serially. The harness uses shared simulator/program artifacts under
   comparison that includes shared-memory request/response and synthetic work.
 - `mt_ctxtsw_predictor_pollution`: checks whether a switched-to context's
   branch pattern affects the resumed context's predictor behavior.
+- `mt_ctxtsw_return_predictor_test`: characterizes call/return predictor timing
+  before and after a switched-to context exercises a return-heavy call chain.
 
 ## Scale Tests
 
