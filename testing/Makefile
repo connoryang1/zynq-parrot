@@ -51,12 +51,15 @@ BENCHMARKS := \
 DEMOS := \
     multithreading_demo
 
+EXPERIMENTAL_TESTS := \
+    mt_ctxtsw_sv39_asid_remap_test
+
 SCALE_CONTEXTS := 8 16 32 64
 SCALE_TESTS := $(foreach n,$(SCALE_CONTEXTS),mt_ctxtsw_$(n)ctx_ring_throughput_benchmark)
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(DEMOS)
 
-.PHONY: all clean build-sim rebuild-sim $(addprefix rebuild-sim-, $(addsuffix ctx, $(SCALE_CONTEXTS))) help $(addprefix run-, $(TESTS) $(SCALE_TESTS))
+.PHONY: all clean build-sim rebuild-sim $(addprefix rebuild-sim-, $(addsuffix ctx, $(SCALE_CONTEXTS))) help $(addprefix run-, $(TESTS) $(EXPERIMENTAL_TESTS) $(SCALE_TESTS))
 
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS)))
 
@@ -76,7 +79,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 
-$(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
+$(foreach t,$(TESTS) $(EXPERIMENTAL_TESTS),$(eval $(call TEST_RULES,$(t))))
 
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_gap8_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_gap_benchmark_common.h
 
@@ -144,6 +147,9 @@ help:
 	@echo ""
 	@echo "Demos:"
 	@$(foreach t,$(DEMOS),echo "  $(t)";)
+	@echo ""
+	@echo "Experimental tests:"
+	@$(foreach t,$(EXPERIMENTAL_TESTS),echo "  $(t)";)
 	@echo ""
 	@echo "Scale tests:"
 	@$(foreach t,$(SCALE_TESTS),echo "  $(t)";)

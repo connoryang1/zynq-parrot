@@ -148,6 +148,16 @@ slower context-switch commit path.
   `0x082`, and `0x083` thread seeding and switching. Keep it as a user-facing
   demo, not as the primary regression signal.
 
+## Experimental Tests
+
+- `mt_ctxtsw_sv39_asid_remap_test`: experimental repro for full SV39/ASID
+  remap validation. It maps one virtual address to different physical pages in
+  T0 and T1, then uses `mstatus.MPRV` with `MPP=S` for translated data access
+  while keeping control flow in M-mode. As of 2026-06-01 it compiles but times
+  out under `TRACE=1`; the run reaches the banner and then wedges before
+  completing the first remap check. Keep it out of the normal correctness set
+  until the DTLB/PTW/cache path is understood.
+
 ## Suggested Order
 
 1. `mt_ctxtsw_smoke_test`

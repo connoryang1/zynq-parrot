@@ -12,11 +12,11 @@ TLB tags. This is enough to validate Banyan-style fast resident switching.
 
 The remaining gaps are mostly validation and system integration:
 
-- cross-privilege and SATP/ASID behavior needs targeted tests
+- cross-privilege and full SATP/ASID remap behavior needs targeted tests
 - BTB/BHT are per-thread, but RAS and global history still need explicit
   characterization
-- full distinct virtual-address-space switching has not yet been proven by a
-  page-table remapping test
+- full distinct virtual-address-space switching has not yet passed a page-table
+  remapping test
 - monitor/mwait, thread descriptor tables, Linux scheduler integration, and
   cache-backed context eviction are future work
 
@@ -30,7 +30,7 @@ The remaining gaps are mostly validation and system integration:
 | Per-context CSR file | Implemented | `mt_csr_isolation_test`; wrapper instantiates one CSR file per context. |
 | Per-context resume PC | Implemented | `0x082` seeding and ring/round-trip tests. |
 | Different privilege modes per context | Under-tested | `mt_ctxtsw_privilege_isolation_test` validates privilege-control CSR ownership; full S/U-mode switch/resume remains future validation. |
-| Different address spaces / ASIDs | Implemented but under-tested | `mt_ctxtsw_asid_translation_test` validates SATP/ASID ownership; full virtual remap test remains future work. |
+| Different address spaces / ASIDs | Implemented but not fully validated | `mt_ctxtsw_asid_translation_test` validates SATP/ASID ownership. Experimental `mt_ctxtsw_sv39_asid_remap_test` is a DTLB remap repro, but currently times out before proving the remap. Full S-mode fetch/resume remains future validation. |
 | ASID-tagged TLB entries | Implemented | TLB tags include ASID; FE shadow ASID updates on context switch. |
 | Per-context BTB/BHT | Implemented | `bp_fe_pc_gen.sv` instantiates per-thread BTB/BHT; benchmark coverage exists. |
 | RAS isolation | Under-tested / likely shared | `mt_ctxtsw_return_predictor_test` characterizes return-path pollution. |
