@@ -21,7 +21,11 @@ Run tests serially. The harness uses shared simulator/program artifacts under
 - `mt_csr_isolation_test`: per-thread CSR state isolation using `mscratch`.
 - `mt_frf_isolation_test`: per-thread floating-point register state isolation.
   It checks for non-aliasing and preservation, not reset-to-IEEE-zero, because
-  FP register storage may use recoded values internally.
+  FP register storage may use recoded values internally. This is also the
+  current regression for the FE/I-cache duplicate-hit context-switch bug: the
+  run resumes T0 at a halfword PC immediately after `csrw 0x081`, and the fixed
+  I-cache must not feed a multi-hot instruction data select even if raw
+  duplicate tag hits appear in the waveform.
 
 ## Correctness Tests
 
@@ -125,6 +129,21 @@ parses `Total cycles` from the run log. Use `d_first_instr_dispatch` as the
 primary hardware metric: ctxtsw dispatch to first target-context instruction
 dispatch. Use `d_next_ctxtsw` only for benchmark throughput, since it includes
 loop/control instructions before the next `csrw 0x081`.
+
+For FE/I-cache context-switch regressions, especially illegal-instruction
+failures after a switch, also check the I-cache hit-select path:
+
+```bash
+python3 tools/ctxtsw_icache_select_scan.py path/to/dump.vcd \
+  --fail-on-bad-select
+```
+
+This scanner reports raw duplicate hit samples separately from bad data-select
+samples. Raw `hit_v_tv_r` can be multi-hot after an aborted miss/refill
+sequence; the correctness condition is that `ld_data_way_select_tv` remains
+one-hot on I-cache hit cycles. On the 2026-06-03 `mt_frf_isolation_test` TRACE
+run, the scan observed 17 raw duplicate-hit samples and
+`bad_data_select_on_hit=0`.
 
 Do not blindly increase `SCALE_UNROLL`. A same-day sweep with
 `SCALE_SWITCHES=256` and `SCALE_WARMUP=64` measured:
