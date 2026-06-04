@@ -70,6 +70,40 @@ Run tests serially. The harness uses shared simulator/program artifacts under
 
 ## Scale Tests
 
+- `ctxtsw_benchmark`: hardcoded 16-context best-case throughput benchmark.
+  This is the preferred simple reporting test when you want the lowest current
+  software-visible context-switch average without sweeping scale knobs. It uses
+  one fully unrolled hot block per context: 256 measured switches/context, 256
+  warmup switches/context, and 256 straight-line `csrw` operations in the timed
+  body. There is no timed loop counter or block-backedge branch. Build the
+  matching simulator first:
+
+```bash
+make -C testing rebuild-sim-16ctx TRACE=1
+make -C testing run-ctxtsw_benchmark TRACE=1
+```
+
+  On the 2026-06-04 traced 16-context model this reported:
+
+```text
+Total cycles:         0x000000000000403e
+Total switches:       0x0000000000001000
+Measured throughput:  0x403e / 0x1000 = 4.015136719 cycles/switch
+Excess over 4/switch: 0x3e cycles
+```
+
+  The remaining software excess over exactly 4 cycles/switch comes from the
+  benchmark harness around the hot `csrw` stream: `rdcycle` bracketing, the
+  call/return path around the unrolled block, final exit/bookkeeping, and the
+  fact that software measures next-switch throughput rather than the waveform
+  handoff metric. The previous 2048-switch simple version measured
+  `0x20217 / 0x8000 = 4.016326904` cycles/switch with `0x217` excess because it
+  ran eight 256-switch blocks per context and therefore paid 128 loop block
+  boundaries. The one-block version removes those repeated boundaries and drops
+  the total excess to `0x3e`. In the corrected 16-context waveform window, the
+  hardware handoff metric itself was exactly 4 cycles for every measured
+  dispatch-to-first-target-dispatch interval, with 100% I-cache hits.
+
 - `mt_ctxtsw_8ctx_ring_throughput_benchmark`: eight-context version of the ring
   throughput benchmark. Build the simulator with `make -C testing
   rebuild-sim-8ctx` before running it.

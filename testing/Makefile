@@ -48,6 +48,9 @@ BENCHMARKS := \
     mt_ctxtsw_predictor_pollution \
     mt_ctxtsw_return_predictor_test
 
+BEST_CONTEXT_BENCHMARKS := \
+    ctxtsw_benchmark
+
 DEMOS := \
     multithreading_demo
 
@@ -59,7 +62,7 @@ SCALE_TESTS := $(foreach n,$(SCALE_CONTEXTS),mt_ctxtsw_$(n)ctx_ring_throughput_b
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(DEMOS)
 
-.PHONY: all clean build-sim rebuild-sim $(addprefix rebuild-sim-, $(addsuffix ctx, $(SCALE_CONTEXTS))) help $(addprefix run-, $(TESTS) $(EXPERIMENTAL_TESTS) $(SCALE_TESTS))
+.PHONY: all clean build-sim rebuild-sim $(addprefix rebuild-sim-, $(addsuffix ctx, $(SCALE_CONTEXTS))) help $(addprefix run-, $(TESTS) $(EXPERIMENTAL_TESTS) $(SCALE_TESTS) $(BEST_CONTEXT_BENCHMARKS))
 
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS)))
 
@@ -83,6 +86,19 @@ $(foreach t,$(TESTS) $(EXPERIMENTAL_TESTS),$(eval $(call TEST_RULES,$(t))))
 
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_gap8_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_gap_benchmark_common.h
 
+$(ZP_RISCV_DIR)/bp-tests/ctxtsw_benchmark.riscv: NUM_THREADS=16
+$(ZP_RISCV_DIR)/bp-tests/ctxtsw_benchmark.riscv: $(TOP)/testing/ctxtsw_benchmark.c $(TOP)/testing/mt_seed.h | $(LOG_DIR)
+	@echo "  [CC]    Compiling ctxtsw_benchmark.riscv (Threads: 16)..."
+	@$(CC) -o $@ $< $(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
+
+run-ctxtsw_benchmark: NUM_THREADS=16
+run-ctxtsw_benchmark: $(ZP_RISCV_DIR)/bp-tests/ctxtsw_benchmark.riscv
+	@echo "  [CLEAN] Refreshing ctxtsw_benchmark environment..."
+	@rm -f $(SIM_DIR)/prog.riscv $(SIM_DIR)/prog.mem $(SIM_DIR)/prog.nbf
+	@echo "  [RUN]   Executing ctxtsw_benchmark in 16-context simulator..."
+	@$(MAKE) -C $(SIM_DIR) run PROG=ctxtsw_benchmark NUM_THREADS=16 $(if $(TRACE),TRACE=$(TRACE),) | grep -E "$(RUN_LOG_FILTER)"
+	@! grep -Eq "CORE FAIL|\[BSG-FAIL\]" $(SIM_DIR)/run.log
+
 define SCALE_TEST_RULES
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_$(1)ctx_ring_throughput_benchmark.riscv: NUM_THREADS=$(1)
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_$(1)ctx_ring_throughput_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_8ctx_ring_throughput_benchmark.c $(TOP)/testing/mt_seed.h $(TOP)/testing/Makefile | $(LOG_DIR)
@@ -102,7 +118,7 @@ $(foreach n,$(SCALE_CONTEXTS),$(eval $(call SCALE_TEST_RULES,$(n))))
 
 clean::
 	@echo "  [RM] Cleaning build artifacts..."
-	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(SCALE_TESTS)))
+	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(SCALE_TESTS) $(BEST_CONTEXT_BENCHMARKS)))
 	@$(RM) -rf $(LOG_DIR)
 
 build-sim: | $(LOG_DIR)
@@ -135,6 +151,8 @@ help:
 	@echo "  SCALE_UNROLL=N          straight-line csrw unroll factor (default: 256)"
 	@echo "  SCALE_ALIGN=0|64        hot-region alignment mode (default: 64)"
 	@echo "  SCALE_SAME_LOOP=0|1     reuse one hot loop body for warmup and measurement (default: 1)"
+	@echo "  make run-ctxtsw_benchmark"
+	@echo "                          run hardcoded 16-context best-case benchmark"
 	@echo ""
 	@echo "Smoke tests:"
 	@$(foreach t,$(SMOKE_TESTS),echo "  $(t)";)
@@ -153,3 +171,6 @@ help:
 	@echo ""
 	@echo "Scale tests:"
 	@$(foreach t,$(SCALE_TESTS),echo "  $(t)";)
+	@echo ""
+	@echo "Best-case benchmark:"
+	@$(foreach t,$(BEST_CONTEXT_BENCHMARKS),echo "  $(t)";)
