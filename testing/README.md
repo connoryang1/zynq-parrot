@@ -96,21 +96,21 @@ make -C testing run-mt_ctxtsw_16ctx_ring_throughput_benchmark \
   TRACE=1 SCALE_SWITCHES=256 SCALE_WARMUP=64 SCALE_UNROLL=8
 ```
 
-On the 2026-05-29 traced 16-context model this reported `0x4a76` cycles for
-`16 * 256` switches, or about 4.65 cycles/switch. The benchmark prints this as
+On the 2026-06-03 traced 16-context model this reported `0x4a0e` cycles for
+`16 * 256` switches, or about 4.63 cycles/switch. The benchmark prints this as
 integer software throughput:
 
 ```text
-Total cycles:         0x0000000000004a76
+Total cycles:         0x0000000000004a0e
 Total switches:       0x0000000000001000
 Measured throughput cyc/switch: 0x0000000000000004
-Excess cycles over 4/switch: 0x0000000000000a76
+Excess cycles over 4/switch: 0x0000000000000a0e
 Expected TRACE hot first-instr dispatch: 0x0000000000000004
 ```
 
 The throughput line is measured with `rdcycle` around the ring loop and includes
 benchmark loop/control spacing. The exact ratio is `Total cycles / Total
-switches`; for this run, `0x4a76 / 0x1000 = 19062 / 4096 = 4.65`. The excess
+switches`; for this run, `0x4a0e / 0x1000 = 18958 / 4096 = 4.63`. The excess
 line shows how far the software throughput run is from an ideal 4-cycle-per-
 switch total. The expected TRACE line is the hot hardware handoff metric to
 verify from waveform analysis; it is not directly measured by the bare-metal
@@ -144,6 +144,20 @@ sequence; the correctness condition is that `ld_data_way_select_tv` remains
 one-hot on I-cache hit cycles. On the 2026-06-03 `mt_frf_isolation_test` TRACE
 run, the scan observed 17 raw duplicate-hit samples and
 `bad_data_select_on_hit=0`.
+
+For D-cache UCE credit regressions, especially `counter underflow` messages
+during scale runs, scan the D-cache UCE credit path:
+
+```bash
+python3 tools/dcache_uce_credit_scan.py path/to/dump.vcd \
+  --min-cycle <cycle> --max-cycle <cycle>
+```
+
+This scanner flags the hardware underflow condition directly: a reverse final
+beat accepted while the RTL credit count is zero and no same-cycle first
+forward beat allocates credit. On the 2026-06-03 pre-fix 16-context throughput
+waveform it reported one underflow at cycle 326917 in the old failing window;
+on the fixed waveform the same window reports `rtl_underflows=0`.
 
 Do not blindly increase `SCALE_UNROLL`. A same-day sweep with
 `SCALE_SWITCHES=256` and `SCALE_WARMUP=64` measured:
