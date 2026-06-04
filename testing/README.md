@@ -81,24 +81,52 @@ Run tests serially. The harness uses shared simulator/program artifacts under
 
 Scale benchmark knobs:
 
-- `SCALE_SWITCHES`: measured switches per context. Use larger values for
-  throughput reporting; small values are mostly smoke tests.
-- `SCALE_WARMUP`: unmeasured switches per context before `rdcycle` timing.
-  This warms the ring path and reduces cold-start inflation.
+- `SCALE_SWITCHES`: measured switches per context. The default is the
+  aggressive reporting setting, 2048. Smaller values are mostly smoke tests.
+- `SCALE_WARMUP`: unmeasured switches per context before `rdcycle` timing. The
+  default is 256. This warms the ring path and reduces cold-start inflation.
 - `SCALE_UNROLL`: number of straight-line `csrw 0x081,next` operations per loop
-  iteration. This trades loop bookkeeping against instruction footprint.
+  iteration. The default is 256 to remove the measured loop backedge as much as
+  possible.
+- `SCALE_ALIGN`: hot-region alignment mode. The default is 64 for the aggressive
+  benchmark path.
+- `SCALE_SAME_LOOP`: use the same noinline hot loop body for warmup and
+  measurement. The default is 1 so warmup heats the exact measured addresses.
 
 Recommended 16-context best-case throughput repro:
 
 ```bash
 make -C testing rebuild-sim-16ctx TRACE=1
-make -C testing run-mt_ctxtsw_16ctx_ring_throughput_benchmark \
-  TRACE=1 SCALE_SWITCHES=256 SCALE_WARMUP=64 SCALE_UNROLL=8
+make -C testing run-mt_ctxtsw_16ctx_ring_throughput_benchmark TRACE=1
 ```
 
-On the 2026-06-03 traced 16-context model this reported `0x4a0e` cycles for
-`16 * 256` switches, or about 4.63 cycles/switch. The benchmark prints this as
-integer software throughput:
+This uses the aggressive default knobs:
+
+```text
+SCALE_SWITCHES=2048 SCALE_WARMUP=256 SCALE_UNROLL=256 SCALE_ALIGN=64 SCALE_SAME_LOOP=1
+```
+
+On the 2026-06-03 traced 16-context model this reported about 4.02
+cycles/switch. The benchmark prints integer software throughput:
+
+```text
+Total cycles:         0x0000000000020317
+Total switches:       0x0000000000008000
+Measured throughput cyc/switch: 0x0000000000000004
+Excess cycles over 4/switch: 0x0000000000000317
+Expected TRACE hot first-instr dispatch: 0x0000000000000004
+```
+
+The older compact command:
+
+```bash
+make -C testing run-mt_ctxtsw_16ctx_ring_throughput_benchmark \
+  TRACE=1 SCALE_SWITCHES=256 SCALE_WARMUP=64 SCALE_UNROLL=8 SCALE_ALIGN=0 SCALE_SAME_LOOP=0
+```
+
+reported `0x4a0e` cycles for `16 * 256` switches, or about 4.63
+cycles/switch. Treat that as a compact smoke-style run, not the main reporting
+configuration. The benchmark prints integer software throughput:
 
 ```text
 Total cycles:         0x0000000000004a0e
@@ -110,7 +138,7 @@ Expected TRACE hot first-instr dispatch: 0x0000000000000004
 
 The throughput line is measured with `rdcycle` around the ring loop and includes
 benchmark loop/control spacing. The exact ratio is `Total cycles / Total
-switches`; for this run, `0x4a0e / 0x1000 = 18958 / 4096 = 4.63`. The excess
+switches`; for the compact run, `0x4a0e / 0x1000 = 18958 / 4096 = 4.63`. The excess
 line shows how far the software throughput run is from an ideal 4-cycle-per-
 switch total. The expected TRACE line is the hot hardware handoff metric to
 verify from waveform analysis; it is not directly measured by the bare-metal

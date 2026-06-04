@@ -6,11 +6,11 @@ LOG_DIR := $(shell pwd)/logs
 
 # Default NUM_THREADS if not specified on command line
 NUM_THREADS ?= 4
-SCALE_SWITCHES ?= 128
-SCALE_WARMUP ?= 32
-SCALE_UNROLL ?= 4
-SCALE_ALIGN ?= 0
-SCALE_SAME_LOOP ?= 0
+SCALE_SWITCHES ?= 2048
+SCALE_WARMUP ?= 256
+SCALE_UNROLL ?= 256
+SCALE_ALIGN ?= 64
+SCALE_SAME_LOOP ?= 1
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 CFLAGS = -O2 \
@@ -85,7 +85,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_gap8_benchmark.riscv: $(TOP)/testing/mt_ctxts
 
 define SCALE_TEST_RULES
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_$(1)ctx_ring_throughput_benchmark.riscv: NUM_THREADS=$(1)
-$(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_$(1)ctx_ring_throughput_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_8ctx_ring_throughput_benchmark.c $(TOP)/testing/mt_seed.h | $(LOG_DIR)
+$(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_$(1)ctx_ring_throughput_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_8ctx_ring_throughput_benchmark.c $(TOP)/testing/mt_seed.h $(TOP)/testing/Makefile | $(LOG_DIR)
 	@echo "  [CC]    Compiling mt_ctxtsw_$(1)ctx_ring_throughput_benchmark.riscv (Threads: $(1))..."
 	@$$(CC) -o $$@ $$< $$(CFLAGS) -DNUM_CONTEXTS=$(1) -DSWITCHES_PER_CONTEXT=$$(SCALE_SWITCHES) -DWARMUP_SWITCHES_PER_CONTEXT=$$(SCALE_WARMUP) -DUNROLL_FACTOR=$$(SCALE_UNROLL) -DHOT_ALIGN_MODE=$$(SCALE_ALIGN) -DSAME_LOOP_WARMUP=$$(SCALE_SAME_LOOP) >> $(LOG_DIR)/software_build.log 2>&1
 
@@ -130,11 +130,11 @@ help:
 	@echo "  make build-sim          build hardware model"
 	@echo "  make rebuild-sim        clean hardware and rebuild"
 	@echo "  make rebuild-sim-Nctx   clean hardware and rebuild for N contexts (8/16/32/64)"
-	@echo "  SCALE_SWITCHES=N        measured switches/context for scale benchmarks"
-	@echo "  SCALE_WARMUP=N          unmeasured warmup switches/context"
-	@echo "  SCALE_UNROLL=N          straight-line csrw unroll factor (4/8/16/32/64/128/256)"
-	@echo "  SCALE_ALIGN=0|64        optional hot-region alignment experiment"
-	@echo "  SCALE_SAME_LOOP=0|1     reuse one hot loop body for warmup and measurement"
+	@echo "  SCALE_SWITCHES=N        measured switches/context for scale benchmarks (default: 2048)"
+	@echo "  SCALE_WARMUP=N          unmeasured warmup switches/context (default: 256)"
+	@echo "  SCALE_UNROLL=N          straight-line csrw unroll factor (default: 256)"
+	@echo "  SCALE_ALIGN=0|64        hot-region alignment mode (default: 64)"
+	@echo "  SCALE_SAME_LOOP=0|1     reuse one hot loop body for warmup and measurement (default: 1)"
 	@echo ""
 	@echo "Smoke tests:"
 	@$(foreach t,$(SMOKE_TESTS),echo "  $(t)";)
