@@ -63,6 +63,9 @@ Run tests serially. The harness uses shared simulator/program artifacts under
   between hot straight-line instruction streams.
 - `mt_ctxtsw_banyan_poll_worker_benchmark`: Banyan-style poller/worker
   comparison that includes shared-memory request/response and synthetic work.
+  This benchmark keeps T0 as the only poller/driver and routes T1 through a
+  deterministic seeded worker entry so secondary startup paths cannot run the
+  driver and corrupt the shared request/response state.
 - `mt_ctxtsw_predictor_pollution`: checks whether a switched-to context's
   branch pattern affects the resumed context's predictor behavior.
 - `mt_ctxtsw_return_predictor_test`: characterizes call/return predictor timing
@@ -248,10 +251,9 @@ slower context-switch commit path.
 - `mt_ctxtsw_sv39_asid_remap_test`: experimental repro for full SV39/ASID
   remap validation. It maps one virtual address to different physical pages in
   T0 and T1, then uses `mstatus.MPRV` with `MPP=S` for translated data access
-  while keeping control flow in M-mode. As of 2026-06-01 it compiles but times
-  out under `TRACE=1`; the run reaches the banner and then wedges before
-  completing the first remap check. Keep it out of the normal correctness set
-  until the DTLB/PTW/cache path is understood.
+  while keeping control flow in M-mode. It passed the 2026-06-20 serialized
+  `TRACE=1` sweep, but remains experimental because it is a focused virtual
+  remap probe rather than part of the normal correctness ladder.
 
 ## Suggested Order
 
