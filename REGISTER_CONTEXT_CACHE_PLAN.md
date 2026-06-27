@@ -23,6 +23,25 @@ These are grounded in the current code and should constrain the implementation:
 - The detector scoreboards are already thread-tagged by physical resident slot. That is correct for resident slots, but it does not by itself prove a victim slot is safe to evict.
 - Normal D-cache requests are formed inside `bp_be_pipe_mem.sv` from a pipeline reservation and then passed to `bp_be_dcache.sv`. `bp_be_top.sv` only exposes the lower cache-engine interface, so a context-cache memory engine is not a trivial top-level request mux.
 
+Concrete code references:
+
+- `bp_common_aviary_defines.svh:53-54`: `num_threads_p` and `thread_id_width_p`.
+- `bp_be_defines.svh:68-73`: dispatch packets carry physical `thread_id` and CTXT target as `thread_id_width_p`.
+- `bp_be_defines.svh:90-92`: reservation packets carry physical `thread_id` and CTXT target as `thread_id_width_p`.
+- `bp_be_defines.svh:267-274`: packet width macros only account for one `thread_id_width_p` field; widening CTXT target requires width macro changes.
+- `bp_common_core_if.svh:57-67`: FE context-switch command operand is explicitly a target hardware thread ID.
+- `bp_fe_controller.sv:157-164`: FE redirects to `ctxtsw_thread_id_i` and writes that physical ID into branch metadata.
+- `bp_fe_pc_gen.sv:86-91`: FE PC/predictor selection register is physical `thread_id_r`.
+- `bp_fe_pc_gen.sv:180-206` and `240-269`: BTB/BHT arrays are selected by physical `thread_id_r`.
+- `bp_be_csr.sv:251`: CTXT CSR writes are excluded from normal CSR writes through `~retire_ctxtsw_v_i`.
+- `bp_be_csr.sv:326-334`: privilege and translation enable are sequential CSR state.
+- `bp_be_csr.sv:467-490`: SATP and many privilege CSRs are normal CSR state.
+- `bp_be_csr.sv:730-735`: memory translation info comes from CSR state, including SATP base PPN and ASID.
+- `bp_be_csr.sv:756-771`: bootstrap CSRs `0x082` and `0x083` also encode target IDs with `thread_id_width_p`.
+- `bp_be_pipe_mem.sv:222-259`: normal D-cache packets are constructed from pipeline reservations inside the memory pipe.
+- `bp_be_dcache.sv:837-838`: D-cache busy/ordered are internal state derived from cache pipeline/credits.
+- `testing/mt_seed.h`: software seeding helpers derive `BP_TID_BITS` from `BP_NUM_THREADS`, so they also address physical slots today.
+
 ## Terminology
 
 - `logical_context_id`: software-visible context ID written to CSR `0x081`.
@@ -46,12 +65,16 @@ Keep existing `current_thread_id_lo` as the resident physical slot ID. Add a sep
 
 This requires updating the CTXT-specific path before truncation:
 
-- scheduler CTXT target decode
-- dispatch packet CTXT target field
-- calculator fast CTXT handoff fields
+- scheduler CTXT target decode in `bp_be_scheduler.sv`
+- dispatch packet CTXT target field in `bp_be_defines.svh`
+- reservation packet CTXT target field in `bp_be_defines.svh`
+- width macros for dispatch/reservation packets in `bp_be_defines.svh`
+- calculator fast CTXT handoff fields in `bp_be_calculator_top.sv`
 - pending CTXT target registers in `bp_be_top.sv`
 
 Normal FE/BE thread ownership should continue to use `resident_slot_id`.
+
+Do not widen FE physical thread IDs. The FE command and predictor state should continue to see only resident slot IDs. Logical IDs should be translated before FE redirect.
 
 ### Fast Path: Resident Hit
 
@@ -134,6 +157,13 @@ Design decision to verify before implementation:
 
 Tests for V1 must avoid relying on the omitted state across nonresident evictions.
 
+Practical V1 recommendation:
+
+- V1A: GPR + NPC + existing resume metadata only. This validates logical-to-resident mapping, resident miss detection, save/restore sequencing, and synthesis scaling.
+- V1B: add SATP and the minimum CSR state required for address-space/privilege tests.
+
+Do not claim support for Banyan-style different address spaces until V1B works.
+
 ### Backing Store
 
 Use a reserved cacheable memory range:
@@ -191,6 +221,88 @@ Alternative implementation to consider before RTL edits:
 - use existing software-visible stores/loads in a tiny firmware assist for the first scaling experiment
 - then replace the firmware assist with the hardware context FSM once the saved-image format and tests are proven
 
+This is especially useful because current bootstrap CSRs `0x082` and `0x083` are physical-slot addressed. Nonresident logical contexts need either:
+
+- a memory image initialized by software before first switch, or
+- new logical-context bootstrap CSRs, or
+- widened versions of the existing bootstrap CSRs.
+
+The memory image is the least invasive starting point.
+
+## Concrete Implementation Surfaces
+
+### Parameter And Type Plumbing
+
+Likely files:
+
+- `bp_common_aviary_cfg_pkgdef.svh`: add `num_contexts` to the processor configuration struct if we want it to be a first-class config parameter.
+- `bp_common_aviary_defines.svh`: derive `num_contexts_p` and `context_id_width_p`.
+- `bp_be_defines.svh`: add logical CTXT target fields to dispatch/reservation packets and update packet width macros.
+- `bp_be_scheduler.sv`: decode CTXT target into `context_id_width_p` while preserving issue packet `thread_id` as physical.
+- `bp_be_calculator_top.sv`: carry logical CTXT target through reservation/fast handoff until `bp_be_top.sv` can translate it.
+- `bp_be_top.sv`: own resident map, pending logical target, physical resident target, and slow-path FSM.
+
+### FE Boundary
+
+Keep FE physical:
+
+- `fe_ctxtsw_thread_id_o`
+- `bp_fe_cmd_pc_redirect_operands_s.context_switch_thread_id`
+- branch metadata `thread_id`
+- PC-gen predictor array selection
+
+Logical IDs should never enter FE in this design. FE only needs the resident slot selected by the map.
+
+### CSR Boundary
+
+The current CTXT CSR read path returns `current_thread_id_i`. With logical contexts, CSR `0x081` should probably read `current_logical_context_id_r`, not the physical resident slot. Otherwise software-visible CTXT semantics break.
+
+CSR `0x082` and `0x083` currently seed physical slots. Options:
+
+- keep them physical-only and use memory images for nonresident context initialization
+- add new logical-image init CSRs
+- widen/redefine them to use `context_id_width_p`
+
+The first option is lowest risk for initial resident-cache work.
+
+### Drain Detection
+
+Signals that are already available near `bp_be_top.sv` and should be evaluated:
+
+- `hazard_v`
+- `ordered_v`
+- `mem_busy_lo`
+- `mem_ordered_lo`
+- `late_wb_v_lo`
+- `late_wb_yumi_li`
+- `late_wb_pkt.thread_id`
+- `cmd_full_n_lo`, `cmd_full_r_lo`, `cmd_empty_n_lo`, `cmd_empty_r_lo`
+- scheduler `ptw_busy_lo` is local today, so exposing a PTW-busy/drained signal may be necessary.
+
+The drain condition should be verified with waveform before save begins.
+
+### Regfile Service
+
+The low-risk path is to add service controls to `bp_be_regfile_mt` and connect them through `bp_be_scheduler`:
+
+- service read enable/address/thread
+- service read data valid/data, accounting for synchronous memory latency
+- service write enable/address/thread/data
+- arbitration against normal writeback and `rpush`
+
+Because `bp_be_regfile_mt` has one write port, restore must occur only when normal writeback/rpush are inactive by construction.
+
+### D-Cache Service
+
+First hardware implementation should not mux at the top-level LCE interface. Add a context-service request source where `bp_be_pipe_mem` currently constructs `bp_be_dcache_pkt_s`, or add an adjacent service path next to `bp_be_dcache` that still respects:
+
+- DTLB/physical addressing choice for the reserved backing region
+- cache busy/ordered state
+- cache request credits
+- one outstanding request at a time for V1
+
+For simplicity, V1 should use physical/cacheable backing addresses and avoid requiring address translation for context-image loads/stores.
+
 ## Verification Plan
 
 ### Cleanup Checkpoint
@@ -232,6 +344,10 @@ Add focused tests:
 - `mt_ctxtsw_context_cache_dirty_regs`: each context writes distinct integer register values, gets evicted, then verifies restore.
 - `mt_ctxtsw_context_cache_hit_miss_mix`: alternate resident hits and resident misses to verify fast path is preserved.
 - `mt_ctxtsw_context_cache_metadata`: verify NPC, privilege/translation metadata, and ASID/SATP behavior according to the chosen V1 scope.
+
+Before these, add a narrow plumbing test:
+
+- `mt_ctxtsw_logical_id_decode`: build with two resident slots and at least four logical contexts; write CTXT target `2` or `3`; verify waveform shows the full logical ID before resident-miss handling, not a truncated physical slot.
 
 ### Waveform Acceptance
 
