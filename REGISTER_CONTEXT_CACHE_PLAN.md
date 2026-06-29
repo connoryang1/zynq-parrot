@@ -265,7 +265,7 @@ Logical IDs must never enter FE in this design. FE only needs the resident slot 
 
 ### CSR Boundary
 
-The current CTXT CSR read path returns `current_thread_id_i`. If CSR `0x081` is defined as the software-visible context ID in the logical-context design, it must read `current_logical_context_id_r`, not the physical resident slot. If we instead choose to expose physical resident slots through `0x081`, that is a different ISA/API contract and must be documented as such.
+CSR `0x081` is the software-visible logical context ID. The read path now carries `current_context_id_i` from `bp_be_top.sv` through `bp_be_calculator_top.sv`, `bp_be_pipe_sys.sv`, and `bp_be_csr_wrapper_mt.sv` into `bp_be_csr.sv`, where CSR reads return the logical ID rather than the physical resident slot. Existing resident-only tests cover this as a no-regression path; a logical-ID-not-equal-physical-slot runtime check still needs the nonresident restore path.
 
 CSR `0x082` and `0x083` currently seed physical slots. Options:
 
