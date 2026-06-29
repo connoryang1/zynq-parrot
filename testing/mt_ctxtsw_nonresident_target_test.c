@@ -1,23 +1,49 @@
 /**
  * mt_ctxtsw_nonresident_target_test.c
  *
- * Negative probe for resident-context-map plumbing. Build/run with
- * NUM_THREADS=2 NUM_CONTEXTS=4. Context IDs 0/1 are resident hardware slots;
- * context ID 2 is logical-only until the context cache save/restore FSM exists.
- *
- * Expected behavior today: simulator stops in RTL with
- * "Nonresident context switch target 2 is not implemented yet".
+ * Minimal positive probe for resident-miss context-cache plumbing. Build/run
+ * with NUM_THREADS=2 NUM_CONTEXTS=4. Context IDs 0/1 are resident hardware
+ * slots at reset; context ID 2 is logical-only and must be restored through
+ * the context-cache slow path.
  */
 
 #include "bp_utils.h"
+#include "mt_seed.h"
+
+#define STACK_WORDS 256
+
+static uint64_t t2_stack[STACK_WORDS];
+static volatile uint64_t t2_seen;
+
+static inline void ctxtsw_to_0(void) {
+  __asm__ volatile("csrwi 0x081, 0" ::: "memory");
+}
+
+static inline void ctxtsw_to_2(void) {
+  __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+}
+
+void __attribute__((noinline, noreturn)) t2_entry(void) {
+  t2_seen = 1;
+  ctxtsw_to_0();
+
+  for (;;)
+    ;
+}
 
 int main(void) {
-  bp_print_string("=== Nonresident Context-Switch Target Test ===\n");
-  bp_print_string("Attempting csrwi 0x081,2 with only two resident threads.\n");
+  t2_seen = 0;
+  seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_entry);
 
-  __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+  ctxtsw_to_2();
 
-  bp_print_string("[BSG-FAIL] nonresident ctxtsw unexpectedly continued\n");
-  bp_finish(1);
-  return 1;
+  if (t2_seen != 1) {
+    bp_print_string("[BSG-FAIL] logical context 2 did not run\n");
+    bp_finish(1);
+    return 1;
+  }
+
+  bp_print_string("[BSG-PASS] nonresident context switch completed\n");
+  bp_finish(0);
+  return 0;
 }
