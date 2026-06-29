@@ -429,7 +429,7 @@ Use small commits:
 2. Done: add resident map and logical-to-resident translation for resident hits; verify existing resident tests.
 3. Done: add resident-miss detection that reports an explicit unsupported/halt condition; verify target IDs above resident count are no longer truncated.
 4. Done: add context image format and tests that initialize/check images without hardware eviction.
-5. Add context-cache FSM skeleton with counters/waveform signals but no active save/restore.
+5. Done: add passive context-cache FSM skeleton with counters/waveform signals but no active save/restore. Verified with `git -C import/black-parrot diff --check -- bp_be/src/v/bp_be_top.sv`, `make -j24 prep_lite`, clean traced `mt_ctxtsw_smoke_test`, and clean traced `mt_regfile_test`.
 6. Add explicit drain detection and waveform assertions.
 7. Add regfile scan save/restore support without D-cache traffic; verify with internal test hooks or waveform-only shadow storage.
 8. Add D-cache save path.
