@@ -57,6 +57,7 @@ DEMOS := \
     multithreading_demo
 
 EXPERIMENTAL_TESTS := \
+    mt_ctxtsw_nonresident_target_test \
     mt_ctxtsw_sv39_asid_remap_test
 
 SCALE_CONTEXTS := 8 16 32 64
