@@ -45,6 +45,7 @@ BENCHMARKS := \
     mt_ctxtsw_gap8_benchmark \
     mt_ctxtsw_ring_throughput_benchmark \
     mt_ctxtsw_ring_overhead_benchmark \
+    mt_ctxtsw_nonresident_overhead_benchmark \
     mt_ctxtsw_single_overhead_benchmark \
     mt_ctxtsw_banyan_poll_worker_benchmark \
     mt_ctxtsw_predictor_pollution \
