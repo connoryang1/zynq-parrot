@@ -431,7 +431,7 @@ Use small commits:
 4. Done: add context image format and tests that initialize/check images without hardware eviction.
 5. Done: add passive context-cache FSM skeleton with counters/waveform signals but no active save/restore. Verified with `git -C import/black-parrot diff --check -- bp_be/src/v/bp_be_top.sv`, `make -j24 prep_lite`, clean traced `mt_ctxtsw_smoke_test`, and clean traced `mt_regfile_test`.
 6. Done: add explicit scheduler/calculator drain-ready observation signals and gate the passive FSM's `wait_drain -> save_regs` transition on the combined drain-safe condition. Verified with `git -C import/black-parrot diff --check`, `make -j24 prep_lite`, clean traced `mt_ctxtsw_smoke_test`, and clean traced `mt_regfile_test`.
-7. Add regfile scan save/restore support without D-cache traffic; verify with internal test hooks or waveform-only shadow storage.
+7. In progress: add regfile scan save/restore support without D-cache traffic. Current checkpoint adds integer-regfile scan read/write plumbing and local shadow storage, verified not to disturb resident-hit smoke/regfile flows; it is not yet end-to-end exercised because nonresident switches still stop at the intentional simulation fatal before scan states run.
 8. Add D-cache save path.
 9. Add D-cache restore path.
 10. Add resident-miss end-to-end tests.
