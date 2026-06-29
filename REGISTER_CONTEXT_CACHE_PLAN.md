@@ -181,16 +181,19 @@ context_base + logical_context_id * context_stride + field_offset
 
 Suggested layout:
 
-- `0x000`: metadata / valid word
-- `0x008`: NPC
-- `0x010`: privilege / translation / ASID metadata
-- `0x018`: optional SATP or reserved CSR metadata
-- `0x020`: `x1`
-- `0x028`: `x2`
+- `0x000`: magic
+- `0x008`: version
+- `0x010`: logical context ID
+- `0x018`: valid word
+- `0x020`: NPC
+- `0x028`: privilege / translation / ASID metadata
+- `0x030`: SATP or reserved CSR metadata
+- `0x040`: `x0`
+- `0x048`: `x1`
 - ...
-- end of integer register area, rounded for alignment
+- end of integer register area, rounded to a 512-byte stride
 
-Start with 64-bit word accesses because the existing D-cache supports doubleword load/store operations. The exact hardware service path is still a design item: a request through `bp_be_calculator/bp_be_pipe_mem.sv` must deal with DMMU translation, while a lower path near `bp_be_dcache` must supply physical tag/metadata correctly. Line-wide transfers can be a later optimization.
+`testing/mt_context_image.h` defines this concrete V1A image format, and `mt_ctxtsw_context_cache_cooperative_image` verifies the stride, field offsets, and independent logical image slots without requiring transparent hardware eviction. Start with 64-bit word accesses because the existing D-cache supports doubleword load/store operations. The exact hardware service path is still a design item: a request through `bp_be_calculator/bp_be_pipe_mem.sv` must deal with DMMU translation, while a lower path near `bp_be_dcache` must supply physical tag/metadata correctly. Line-wide transfers can be a later optimization.
 
 ### Regfile Access
 
@@ -425,7 +428,7 @@ Use small commits:
 1. Done: add `num_contexts_p` / `context_id_width_p` and CTXT logical-target plumbing with no behavior change for `num_contexts_p == num_threads_p`.
 2. Done: add resident map and logical-to-resident translation for resident hits; verify existing resident tests.
 3. Done: add resident-miss detection that reports an explicit unsupported/halt condition; verify target IDs above resident count are no longer truncated.
-4. Add context image format and tests that initialize/check images without hardware eviction.
+4. Done: add context image format and tests that initialize/check images without hardware eviction.
 5. Add context-cache FSM skeleton with counters/waveform signals but no active save/restore.
 6. Add explicit drain detection and waveform assertions.
 7. Add regfile scan save/restore support without D-cache traffic; verify with internal test hooks or waveform-only shadow storage.

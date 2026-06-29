@@ -57,6 +57,7 @@ DEMOS := \
     multithreading_demo
 
 EXPERIMENTAL_TESTS := \
+    mt_ctxtsw_context_cache_cooperative_image \
     mt_ctxtsw_nonresident_target_test \
     mt_ctxtsw_sv39_asid_remap_test
 
@@ -73,7 +74,7 @@ $(LOG_DIR):
 	@mkdir -p $@
 
 define TEST_RULES
-$(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h | $(LOG_DIR)
+$(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h $(TOP)/testing/mt_context_image.h | $(LOG_DIR)
 	@echo "  [CC]    Compiling $(1).riscv (Threads: $(NUM_THREADS))..."
 	@$$(CC) -o $$@ $$< $$(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
 
