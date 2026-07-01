@@ -59,6 +59,8 @@ DEMOS := \
 
 EXPERIMENTAL_TESTS := \
     mt_ctxtsw_context_cache_cooperative_image \
+    mt_ctxtsw_nonresident_fp_ring_test \
+    mt_ctxtsw_nonresident_fp_target_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_nonresident_target_test \
     mt_ctxtsw_sv39_asid_remap_test
