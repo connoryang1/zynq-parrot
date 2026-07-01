@@ -4,6 +4,20 @@
 
 Support more software-visible contexts than the number of physically resident hardware slots. The fast resident-hit path must preserve the current ISD-forwarding behavior. Resident misses are correctness-first: stall, save the evicted resident slot to a reserved cacheable memory image, restore the requested logical context into a resident slot, then resume through the existing context-switch redirect path.
 
+## Current Branch Scope
+
+The current `ctxtsw-regfile-caching` branch implements only the first restore-capable subset:
+
+- resident-hit ctxtsw remains on the existing fast path
+- nonresident restore/save is implemented for integer GPR state plus logical NPC / privilege /
+  translation-enable / ASID metadata
+- nonresident floating-point state is not implemented
+- nonresident full CSR backing is not implemented
+
+The RTL now fails fast in simulation if software tries to seed nonresident FP state through
+CSR `0x083`. Treat nonresident contexts as integer-only unless and until FP/CSR backing is
+added explicitly.
+
 ## Starting Point
 
 - The current optimized path is ISD forwarding for resident context switches.
