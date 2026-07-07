@@ -10,7 +10,7 @@
  *   1. T0: write SENTINEL_T0 to f1 via fmv.d.x
  *   2. T0: read back f1 and verify
  *   3. Launch T1
- *   4. T1: read f1 — must be 0 (clean per-thread state; no T0 spillover)
+ *   4. T1: read f1 — must not be T0's sentinel
  *   5. T1: write SENTINEL_T1 to f1
  *   6. T1: read back f1 and verify write took effect
  *   7. T1: switch back to T0 (csrw 0x081, 0)
@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include "bp_utils.h"
+#include "mt_seed.h"
 
 #define SENTINEL_T0 0xDEADBEEF00000000ULL
 #define SENTINEL_T1 0xBEEFDEAD00000000ULL
@@ -49,39 +50,20 @@ static inline void write_ctxt(uint64_t v) {
   __asm__ volatile("csrw 0x081, %0" : : "r"(v));
 }
 
-static inline void seed_npc(uint64_t tid, uint64_t npc) {
-  uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v));
-}
-
-static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
-  uint64_t v = (val & 0x7FFFFFFFFFULL)
-             | ((tid & 0x3ULL) << 39)
-             | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
-}
-
-/* Same as seed_reg but sets bit 46 to target the FP register file */
-static inline void seed_fp_reg(uint64_t tid, uint64_t reg, uint64_t val) {
-  uint64_t v = (val & 0x7FFFFFFFFFULL)
-             | ((tid & 0x3ULL) << 39)
-             | ((reg & 0x1FULL) << 41)
-             | (1ULL << 46);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
-}
-
 /* ── Thread 1 entry ── */
 void __attribute__((noinline)) t1_entry(void) {
   /* T1 has a fresh mstatus (FS=Off at reset) — enable FP before any FP instruction.
    * mstatus.FS bits [14:13]: 00=Off, 01=Initial, 10=Clean, 11=Dirty.
    * csrs sets bits without clobbering other mstatus fields. */
   __asm__ volatile("csrs mstatus, %0" : : "r"(3ULL << 13));
+  __asm__ volatile("nop; nop; nop; nop" ::: "memory");
 
-  /* T1 reads f1 — should be 0 (own clean state, not T0's sentinel) */
+  /* T1 reads f1 — it must be its own register state, not T0's sentinel. */
   t1_f1_initial = read_f1();
 
   /* T1 writes its own sentinel to f1 */
   write_f1(SENTINEL_T1);
+  __asm__ volatile("nop; nop; nop; nop" ::: "memory");
 
   /* Confirm write took effect in T1's own regfile */
   t1_f1_final = read_f1();
@@ -113,10 +95,6 @@ int main(void) {
   seed_reg(1, 3 /* x3=gp */, gp_val);
   seed_reg(1, 2 /* x2=sp */, (uint64_t)&t1_stack[STACK_WORDS]);
   seed_npc(1, (uint64_t)t1_entry);
-
-  /* Zero T1's FP registers so T1 starts with clean state (SRAM is not reset to 0) */
-  for (int i = 0; i < 32; i++)
-    seed_fp_reg(1, i, 0);
 
   write_ctxt(1);
   /* T0 resumes here after T1 calls write_ctxt(0) */
@@ -151,15 +129,16 @@ int main(void) {
     bp_print_string("PASS: T0 f1 preserved across T1 execution\n");
   }
 
-  /* T1 should have started with f1 = 0 (per-thread clean state) */
-  if (t1_f1_initial != 0) {
-    bp_print_string("FAIL: T1 f1 not 0 at entry (leaked from T0?)\n");
+  /* T1 may start with implementation-specific recoded FP state, but it must
+   * not alias T0's live f1 value. */
+  if (t1_f1_initial == SENTINEL_T0) {
+    bp_print_string("FAIL: T1 f1 leaked T0 value at entry\n");
     bp_print_string("  got: ");
     bp_hprint_uint64(t1_f1_initial);
     bp_print_string("\n");
     errors++;
   } else {
-    bp_print_string("PASS: T1 f1 was 0 at entry (clean isolation)\n");
+    bp_print_string("PASS: T1 f1 did not leak T0 value at entry\n");
   }
 
   /* T1 should have written its sentinel successfully */

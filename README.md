@@ -17,6 +17,21 @@ See [The ZynqParrot Co-simulation Development Flow](https://docs.google.com/docu
   examples. For example, RISC-V compilers and programs for the BlackParrot RISC-V processor.
 - **docker/** contains files needed for a Docker-based simulation environment
 
+## Current Context-Switch Work
+
+This checkout is currently used for fast resident hardware-thread context
+switching work on BlackParrot. The active top-level docs are:
+
+- `CONTEXT_SWITCH_ARCHITECTURE.md`: current model, branch status, RTL areas, and measurement definitions.
+- `NEXT_STEPS_RESIDENT_SUBSTRATE.md`: current validation and planning path.
+- `CTXTSW_TROUBLESHOOTING.md`: durable debugging lessons from older failed or ambiguous experiments.
+- `CONTEXT_SWITCH_PR_GUIDE.md`: PR/review structure and evidence checklist.
+- `AGENTS.md`: repo-local workflow rules for Codex, including serialized `make -C testing ... TRACE=1` runs.
+
+Older experiment diaries and speculative plans were intentionally consolidated
+into those files so the top-level documentation reflects the current
+`ctxtsw-isd-repair` work instead of several superseded branch states.
+
 For most users, the following makefile targets will be the most useful:
 
     make prep_lite;     # minimal set of simulation preparation

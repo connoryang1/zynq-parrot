@@ -29,6 +29,7 @@
 
 #include <stdint.h>
 #include "bp_utils.h"
+#include "mt_seed.h"
 
 /* CSR accessors */
 static inline uint64_t read_ctxt(void) {
@@ -39,20 +40,6 @@ static inline uint64_t read_ctxt(void) {
 
 static inline void write_ctxt(uint64_t val) {
   __asm__ volatile("csrw 0x081, %0" : : "r"(val) :);
-}
-
-/* CSR 0x082: seed a thread's entry NPC.
- * We encode: val = target_npc (thread_id goes in upper bits per RTL)
- * RTL: ctx_npc_write_tid_o = csr_data_li[vaddr_width_p +: thread_id_width_p]
- *      ctx_npc_write_npc_o = csr_data_li[0 +: vaddr_width_p]
- * With vaddr_width_p=39, thread_id_width_p=2:
- *   bits [38:0] = NPC (39-bit vaddr)
- *   bits [40:39] = thread_id
- */
-static inline void seed_thread_npc(uint64_t thread_id, uint64_t npc) {
-  /* Pack: thread_id in bits [40:39], npc in bits [38:0] (vaddr_width_p=39) */
-  uint64_t val = ((thread_id & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(val) :);
 }
 
 /* Shared state between threads */
@@ -148,7 +135,7 @@ int main(int argc, char** argv) {
   bp_hprint_uint64(t1_npc);
   bp_print_string("\n");
 
-  seed_thread_npc(1, t1_npc);
+  seed_npc(1, t1_npc);
 
   /* Store sentinels in thread 0's "state" (memory-backed for C) */
   t0_sentinel_a = 0xAAAAAAAAAAAAAAAAULL;

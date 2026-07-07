@@ -56,7 +56,7 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
     }
 
     ~bsg_zynq_pl(void) {
-        //tb->final();
+        tb->final();
         contextp->statsPrintSummary();
     }
 

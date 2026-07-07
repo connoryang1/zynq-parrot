@@ -1,32 +1,19 @@
+/**
+ * mt_ctxtsw_pure_ring_stress_test.c
+ *
+ * Dense 4-context context-switch ring with no loop bookkeeping in the measured
+ * stream. This is a stress/regression test, not a benchmark.
+ */
+
 #include <stdint.h>
 #include "bp_utils.h"
+#include "mt_seed.h"
 
 #define STACK_WORDS 512
 
 static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
 static uint64_t t3_stack[STACK_WORDS];
-
-static inline void seed_npc(uint64_t tid, uint64_t npc) {
-  uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v));
-}
-
-static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
-  uint64_t v = (val & 0x7FFFFFFFFFULL)
-             | ((tid & 0x3ULL) << 39)
-             | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
-}
-
-static inline void seed_thread(uint64_t tid, uint64_t *stack_top, uint64_t entry) {
-  uint64_t gp_val;
-  __asm__ volatile("mv %0, gp" : "=r"(gp_val));
-
-  seed_reg(tid, 3 /* x3=gp */, gp_val);
-  seed_reg(tid, 2 /* x2=sp */, (uint64_t)stack_top);
-  seed_npc(tid, entry);
-}
 
 void __attribute__((naked, noinline, noreturn, aligned(64))) t1_ring(void) {
   __asm__ volatile(
@@ -74,7 +61,7 @@ void __attribute__((naked, noinline, noreturn, aligned(64))) t3_ring(void) {
 }
 
 int main(void) {
-  bp_print_string("=== Pure unrolled ctxtsw ring stress ===\n");
+  bp_print_string("=== Pure Context-Switch Ring Stress Test ===\n");
   bp_print_string("4 contexts, 8 consecutive csrwi per context, no loop bookkeeping.\n");
 
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_ring);
@@ -92,7 +79,7 @@ int main(void) {
     "csrwi 0x081, 1\n"
   );
 
-  bp_print_string("[BSG-PASS] pure unrolled ctxtsw ring stress completed\n");
+  bp_print_string("[BSG-PASS] pure ctxtsw ring stress completed\n");
   bp_finish(0);
   return 0;
 }

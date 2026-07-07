@@ -23,9 +23,9 @@ int main(int argc, char **argv) {
     // so that we can see what is happening in real time
     setvbuf(stdout, NULL, _IOLBF, 0);
 
-    // call the main PS program
-    // for now, use the same argc/argv but we could separate out PS and ZPL arguments
-    bsg_zynq_pl zpl(ps_argc, ps_argv);
+    // Verilator needs the original argv so $value$plusargs sees simulator args
+    // like +bsg_trace=..., while ps_main still consumes the filtered +c_args payload.
+    bsg_zynq_pl zpl(argc, argv);
     int rc = ps_main(&zpl, ps_argc, ps_argv);
     bsg_pr_info("Returning from ps_main with RC: %x\n", rc);
     if (!rc) {

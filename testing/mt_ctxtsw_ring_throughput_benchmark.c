@@ -1,8 +1,8 @@
 /**
- * mt_ctxtsw_partial_unroll_benchmark.c
+ * mt_ctxtsw_ring_throughput_benchmark.c
  *
  * Purpose:
- *   Measure steady-state ctxtsw cost in a ring of contexts while reducing the
+ *   Measure steady-state ctxtsw throughput in a ring of contexts while reducing the
  *   per-switch loop bookkeeping that inflates a naive switch-only loop.
  *
  * Why this exists:
@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "bp_utils.h"
+#include "mt_seed.h"
 
 #define NUM_CONTEXTS 4
 #define SWITCHES_PER_CONTEXT 256
@@ -32,31 +33,10 @@ static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
 static uint64_t t3_stack[STACK_WORDS];
 
-static inline void seed_npc(uint64_t tid, uint64_t npc) {
-  uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v));
-}
-
-static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
-  uint64_t v = (val & 0x7FFFFFFFFFULL)
-             | ((tid & 0x3ULL) << 39)
-             | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
-}
-
 static inline uint64_t read_cycle(void) {
   uint64_t v;
   __asm__ volatile("rdcycle %0" : "=r"(v));
   return v;
-}
-
-static inline void seed_thread(uint64_t tid, uint64_t *stack_top, uint64_t entry) {
-  uint64_t gp_val;
-  __asm__ volatile("mv %0, gp" : "=r"(gp_val));
-
-  seed_reg(tid, 3 /* x3=gp */, gp_val);
-  seed_reg(tid, 2 /* x2=sp */, (uint64_t)stack_top);
-  seed_npc(tid, entry);
 }
 
 void __attribute__((noinline, noreturn)) t1_ring(void) {
@@ -121,7 +101,7 @@ int main(void) {
   uint64_t num_switches = NUM_CONTEXTS * SWITCHES_PER_CONTEXT;
   uint64_t cycles_per_switch = diff / num_switches;
 
-  bp_print_string("=== Partial-Unroll Switch Benchmark ===\n");
+  bp_print_string("=== Context Switch Ring Throughput Benchmark ===\n");
   bp_print_string("Loop bookkeeping amortized across multiple switches\n");
   bp_print_string("Contexts:             ");
   bp_hprint_uint64(NUM_CONTEXTS);

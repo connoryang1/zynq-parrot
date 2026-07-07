@@ -1,7 +1,7 @@
 /**
- * mt_ctxtsw_microbench.c
+ * mt_ctxtsw_roundtrip_benchmark.c
  *
- * Stripped-down context switch microbenchmark.
+ * Minimal context-switch round-trip benchmark.
  *
  * Purpose:
  *   Measure the raw T0->T1->T0 round-trip latency with as little benchmark
@@ -10,12 +10,13 @@
  *   - no worker-side C code
  *   - only a bare T1 asm stub that switches back to T0 once
  *
- * This is not a replacement for mt_benchmark.c. It is a narrower diagnostic
- * test for the Banyan-style 7-cycle single-switch target.
+ * This is the primary warm T0->worker->T0 benchmark for estimating
+ * single-switch latency as warm_min_round_trip / 2.
  */
 
 #include <stdint.h>
 #include "bp_utils.h"
+#include "mt_seed.h"
 
 #define STACK_WORDS 512
 static uint64_t t1_stack[STACK_WORDS];
@@ -38,18 +39,6 @@ static inline void write_ctxt_2(void) {
 
 static inline void write_ctxt_3(void) {
   __asm__ volatile("csrwi 0x081, 3");
-}
-
-static inline void seed_npc(uint64_t tid, uint64_t npc) {
-  uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v));
-}
-
-static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
-  uint64_t v = (val & 0x7FFFFFFFFFULL)
-             | ((tid & 0x3ULL) << 39)
-             | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
 }
 
 static inline uint64_t read_cycle(void) {
@@ -88,7 +77,7 @@ static inline uint64_t round_trip_once_3(void) {
   return read_cycle() - before;
 }
 
-static inline void seed_thread(uint64_t tid, uint64_t *stack_top) {
+static inline void seed_thread_to_ping(uint64_t tid, uint64_t *stack_top) {
   uint64_t gp_val;
   __asm__ volatile("mv %0, gp" : "=r"(gp_val));
 
@@ -112,13 +101,13 @@ int main(void) {
    * Use threads 1, 2, and 3 exactly once each. */
   uint64_t cold, warm0, warm1;
 
-  seed_thread(1, &t1_stack[STACK_WORDS]);
+  seed_thread_to_ping(1, &t1_stack[STACK_WORDS]);
   cold = round_trip_once_1();
 
-  seed_thread(2, &t2_stack[STACK_WORDS]);
+  seed_thread_to_ping(2, &t2_stack[STACK_WORDS]);
   warm0 = round_trip_once_2();
 
-  seed_thread(3, &t3_stack[STACK_WORDS]);
+  seed_thread_to_ping(3, &t3_stack[STACK_WORDS]);
   warm1 = round_trip_once_3();
 
   uint64_t warm_min = warm0;
@@ -126,7 +115,7 @@ int main(void) {
     warm_min = warm1;
 
   restore_gp();
-  bp_print_string("=== Context Switch Microbenchmark ===\n");
+  bp_print_string("=== Context Switch Round-Trip Benchmark ===\n");
   bp_print_string("Target: ~7 cycles per switch, ~14 cycles round-trip\n");
   bp_print_string("Method: fixed-count T0->T1->T0 measurements, no per-trial loop output\n\n");
 

@@ -7,11 +7,16 @@
 #include <bitset>
 #include <locale.h>
 #include <queue>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+
+// Set by SIGALRM/SIGTERM/SIGINT to gracefully terminate and flush the FST.
+static volatile sig_atomic_t g_trace_timed_out = 0;
+static void handle_trace_signal(int) { g_trace_timed_out = 1; }
 
 #include "ps.hpp"
 
@@ -57,8 +62,10 @@ inline void recv_bp_fwd_packet(bsg_zynq_pl *zpl, bp_bedrock_packet *packet) {
 
     uint32_t *pkt_data = reinterpret_cast<uint32_t *>(packet);
     for (int i = 0; i < axil_len; i++) {
-        while (!zpl->shell_read(GP0_RD_PL2PS_FIFO_CTRS + 4))
-            ;
+        while (!zpl->shell_read(GP0_RD_PL2PS_FIFO_CTRS + 4)) {
+            if (g_trace_timed_out) return;
+        }
+        if (g_trace_timed_out) return;
         pkt_data[i] = zpl->shell_read(GP0_RD_PL2PS_FIFO_DATA + 4);
     }
 }
@@ -262,7 +269,17 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     send_bp_write(zpl, 0x200608, 1, 0xff); // cce mode
 
     bsg_pr_info("ps.cpp: beginning nbf load\n");
+
+    struct timespec nbf_start_wall, nbf_end_wall; // New timers
+    clock_gettime(CLOCK_MONOTONIC, &nbf_start_wall); // Start NBF Timer
+
     nbf_load(zpl, argv[1]);
+
+    clock_gettime(CLOCK_MONOTONIC, &nbf_end_wall); // End NBF Timer
+    double nbf_time = (nbf_end_wall.tv_sec - nbf_start_wall.tv_sec) +
+                     (nbf_end_wall.tv_nsec - nbf_start_wall.tv_nsec) / 1e9;
+    bsg_pr_info("ps.cpp: NBF load took %f seconds\n", nbf_time);
+
     send_bp_write(zpl, 0x200008, 0, 0xff); // unfreeze 
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -272,10 +289,38 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     // unfreeze shell
     zpl->shell_write(GP0_WR_CSR_FREEZEN, 0x0, 0xF);
 
+    signal(SIGTERM, handle_trace_signal);
+    signal(SIGINT, handle_trace_signal);
+    signal(SIGALRM, handle_trace_signal);
+    const char *timeout_env = getenv("BSG_TRACE_TIMEOUT_S");
+    if (timeout_env && atoi(timeout_env) > 0) {
+        alarm(atoi(timeout_env));
+        bsg_pr_info("ps.cpp: trace timeout armed for %s seconds\n", timeout_env);
+    }
+
     bsg_spack_t spack;
     bp_bedrock_packet fwd_packet;
+
+    int timeout_count = 0;
+    long long int last_minstret = 0;
+
     do {
         recv_bp_fwd_packet(zpl, &fwd_packet);
+        if (g_trace_timed_out) {
+            bsg_pr_info("ps.cpp: trace timeout reached, flushing FST and exiting\n");
+            break;
+        }
+
+	if (timeout_count++ % 1000 == 0) {
+            unsigned long long current_minstret = get_counter_64(zpl, GP0_RD_MINSTRET);
+            if (current_minstret == last_minstret) {
+                printf("ps.cpp: Heartbeat - Cycles are ticking, but 0 instructions retired (Stalled)\n");
+            } else {
+                printf("ps.cpp: Heartbeat - Retired %llu instructions...\n", current_minstret);
+            }
+            last_minstret = current_minstret;
+        }
+	
         spack.data = fwd_packet.data0;
         spack.address = fwd_packet.addr0;
         spack.wr_not_rd = fwd_packet.msg_type == BEDROCK_MEM_WR;
@@ -334,10 +379,33 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
         return;
     }
 
+    // --- NEW: COUNT TOTAL LINES FIRST ---
+    int total_lines = 0;
+    while (std::getline(nbf_file, nbf_command)) {
+        total_lines++;
+    }
+    // Clear the end-of-file flag and jump back to the start
+    nbf_file.clear();
+    nbf_file.seekg(0, std::ios::beg);
+
+    bsg_pr_info("ps.cpp: NBF file has %d lines. Starting load...\n", total_lines);
+    // -------------------------------------
+
     int line_count = 0;
+    int last_percent = -1;
     int credit_count = 0;
+
     while (getline(nbf_file, nbf_command)) {
         line_count++;
+
+	// --- NEW: SHOW PROGRESS PERCENTAGE ---
+        int current_percent = (line_count * 100) / total_lines;
+        if (current_percent % 5 == 0 && current_percent != last_percent) {
+            bsg_pr_info("ps.cpp: NBF Load Progress: %d%%\n", current_percent);
+            last_percent = current_percent;
+        }
+        // -------------------------------------
+
         int i = 0;
         while ((pos = nbf_command.find(delimiter)) != std::string::npos) {
             tmp = nbf_command.substr(0, pos);
@@ -354,9 +422,9 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
                 send_bp_write(zpl, nbf[1], nbf[2], 0xf);
             }
         } else if (nbf[0] == 0xfe) {
-            continue;
+            while (zpl->shell_read(GP0_RD_CREDITS))
+                ;
         } else if (nbf[0] == 0xff) {
-            bsg_pr_dbg_ps("ps.cpp: nbf finish command, line %d\n", line_count);
             continue;
         } else {
             bsg_pr_dbg_ps("ps.cpp: unrecognized nbf command, line %d : %llx\n",
@@ -364,10 +432,5 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
             return;
         }
     }
-    bsg_pr_dbg_ps("ps.cpp: waiting for credit returns.\n", credit_count);
-    while (zpl->shell_read(GP0_RD_CREDITS))
-        ;
-
     bsg_pr_dbg_ps("ps.cpp: finished loading %d lines of nbf.\n", line_count);
 }
-

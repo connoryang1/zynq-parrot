@@ -28,7 +28,15 @@ DEFINES += HP0_DATA_WIDTH=32 HP0_ADDR_WIDTH=32
 DEFINES += ACLK_MHZ=20
 DEFINES += BP_NCPUS=$(BP_NCPUS)
 
+ifneq ($(NUM_THREADS),)
+THREAD_ID_WIDTH := $(shell awk 'BEGIN { n=$(NUM_THREADS)-1; w=0; while (n > 0) { w++; n=int(n/2); } print w; }')
+BRANCH_METADATA_FWD_WIDTH ?= $(shell awk 'BEGIN { print 49 + $(THREAD_ID_WIDTH); }')
+CFG ?= e_bp_custom_cfg
+DEFINES += BP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p
+DEFINES += BP_NUM_THREADS=$(NUM_THREADS)
+DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)
+endif
+
 CINCLUDES += $(BP_SUB_DIR)/blackparrot/src/
 
 include $(COSIM_MK_DIR)/Makefile.master
-

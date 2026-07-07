@@ -3,6 +3,8 @@ include $(COSIM_MK_DIR)/Makefile.sim
 
 DEFINES += SIMULATION
 
+DUMP_FILE ?= dump.fst
+
 VV_VFLAGS += $(addprefix +define+,$(filter-out VERILATOR,$(DEFINES)))
 VV_VFLAGS += $(addprefix +incdir+,$(VINCLUDES))
 
@@ -25,17 +27,18 @@ VV_BUILD_OPTS += $(VV_VFLAGS)
 
 VV_RUN_OPTS +=
 
-ifneq (,$(TRACE))
-RUN_ARGS += +bsg_trace
-endif
-
 run: ## runs the verilated executable
 run: obj_dir/V$(TB_MODULE) | $(RUN_COLLATERAL)
 	@./$< $(VV_RUN_OPTS) $(RUN_ARGS) 2>&1 | $(TEE_I) run.log
 
 ifneq (,$(TRACE))
+RUN_ARGS += +bsg_trace=$(DUMP_FILE)
 BUILD_ARGS += --trace-fst --trace-structs
 BUILD_ARGS += +define+FSTON
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_ENABLE
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_DEPTH=0
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_HIER=bsg_nonsynth_zynq_testbench.dut
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_FST
 endif
 build: ## builds the verilated executable
 build: %/V$(TB_MODULE)
@@ -45,4 +48,3 @@ build: %/V$(TB_MODULE)
 view: ## View the dump with GTKwave
 view: dump.fst
 	@$(GTKWAVE) -f $<
-
