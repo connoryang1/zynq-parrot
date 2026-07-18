@@ -574,7 +574,21 @@ module bsg_nonsynth_zynq_testbench;
    dut
     (.*);
 
-  wire waveform_en_li = 1'b1;
+  longint unsigned waveform_start_cycle_r;
+  longint unsigned waveform_cycle_count_r;
+  initial begin
+    waveform_start_cycle_r = '0;
+    void'($value$plusargs("bsg_trace_start_cycle=%d", waveform_start_cycle_r));
+  end
+
+  always_ff @(posedge aclk) begin
+    if (!aresetn)
+      waveform_cycle_count_r <= '0;
+    else
+      waveform_cycle_count_r <= waveform_cycle_count_r + 1'b1;
+  end
+
+  wire waveform_en_li = (waveform_cycle_count_r >= waveform_start_cycle_r);
   bsg_nonsynth_waveform_tracer
    #(.trace_str_p("bsg_trace"))
    tracer
@@ -630,4 +644,3 @@ module bsg_nonsynth_zynq_testbench;
   endfunction
 
 endmodule
-
