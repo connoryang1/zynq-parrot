@@ -575,10 +575,47 @@ module bsg_nonsynth_zynq_testbench;
     (.*);
 
   longint unsigned waveform_start_cycle_r;
+  longint unsigned waveform_stop_cycle_r;
+  logic waveform_stop_cycle_v_r;
   longint unsigned waveform_cycle_count_r;
+  longint unsigned cycle_marker_pc0_r, cycle_marker_pc1_r;
+  longint unsigned cycle_marker_pc2_r, cycle_marker_pc3_r;
+  logic [3:0] cycle_marker_v_r;
+  longint unsigned context_cache_trace_start_cycle_r;
+  longint unsigned context_cache_trace_stop_cycle_r;
+  logic context_cache_trace_v_r, context_cache_trace_stop_v_r;
+  logic [3:0] context_cache_state_prev_r;
+  longint unsigned context_cache_state_start_cycle_r;
+  longint unsigned context_cache_l1_req_count_r, context_cache_l1_resp_count_r;
+  wire marker_dispatch_v_li = dut.top_fpga_inst.blackparrot.core_minimal.be.scheduler.dispatch_pkt_cast_o.v;
+  wire [63:0] marker_dispatch_pc_li = dut.top_fpga_inst.blackparrot.core_minimal.be.scheduler.dispatch_pkt_cast_o.pc;
+  wire [3:0] context_cache_state_li = dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_state_r;
+  wire context_cache_l1_req_li = dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_int_l1_req_v_r
+                                 & dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_dcache_yumi_lo;
+  wire context_cache_l1_resp_li = dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_int_l1_wait_resp_r
+                                  & dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_dcache_resp_v_lo;
+  wire [31:0] context_cache_victim_int_dirty_li =
+    dut.top_fpga_inst.blackparrot.core_minimal.be.physical_thread_int_dirty_r[
+      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_victim_physical_thread_id_r];
+  wire [31:0] context_cache_target_int_dirty_li =
+    dut.top_fpga_inst.blackparrot.core_minimal.be.virtual_context_int_dirty_r[
+      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_target_virtual_context_id_r];
+  wire [31:0] context_cache_victim_fp_dirty_li =
+    dut.top_fpga_inst.blackparrot.core_minimal.be.physical_thread_fp_dirty_r[
+      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_victim_physical_thread_id_r];
+  wire [31:0] context_cache_target_fp_dirty_li =
+    dut.top_fpga_inst.blackparrot.core_minimal.be.virtual_context_fp_dirty_r[
+      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_target_virtual_context_id_r];
   initial begin
     waveform_start_cycle_r = '0;
     void'($value$plusargs("bsg_trace_start_cycle=%d", waveform_start_cycle_r));
+    waveform_stop_cycle_v_r = $value$plusargs("bsg_trace_stop_cycle=%d", waveform_stop_cycle_r);
+    cycle_marker_v_r[0] = $value$plusargs("bsg_cycle_marker_pc0=%h", cycle_marker_pc0_r);
+    cycle_marker_v_r[1] = $value$plusargs("bsg_cycle_marker_pc1=%h", cycle_marker_pc1_r);
+    cycle_marker_v_r[2] = $value$plusargs("bsg_cycle_marker_pc2=%h", cycle_marker_pc2_r);
+    cycle_marker_v_r[3] = $value$plusargs("bsg_cycle_marker_pc3=%h", cycle_marker_pc3_r);
+    context_cache_trace_v_r = $value$plusargs("bsg_context_cache_trace_start_cycle=%d", context_cache_trace_start_cycle_r);
+    context_cache_trace_stop_v_r = $value$plusargs("bsg_context_cache_trace_stop_cycle=%d", context_cache_trace_stop_cycle_r);
   end
 
   always_ff @(posedge aclk) begin
@@ -588,7 +625,54 @@ module bsg_nonsynth_zynq_testbench;
       waveform_cycle_count_r <= waveform_cycle_count_r + 1'b1;
   end
 
-  wire waveform_en_li = (waveform_cycle_count_r >= waveform_start_cycle_r);
+  always_ff @(posedge aclk)
+    if (aresetn && marker_dispatch_v_li)
+      for (int i = 0; i < 4; i++)
+        if (cycle_marker_v_r[i]
+            && (marker_dispatch_pc_li == (i == 0 ? cycle_marker_pc0_r
+                                       : i == 1 ? cycle_marker_pc1_r
+                                       : i == 2 ? cycle_marker_pc2_r
+                                                : cycle_marker_pc3_r)))
+          $display("BSG-INFO: cycle marker %0d pc=%h cycle=%0d", i,
+                   marker_dispatch_pc_li, waveform_cycle_count_r);
+
+  always_ff @(posedge aclk) begin
+    if (!aresetn) begin
+      context_cache_state_prev_r <= '0;
+      context_cache_state_start_cycle_r <= '0;
+      context_cache_l1_req_count_r <= '0;
+      context_cache_l1_resp_count_r <= '0;
+    end else if (context_cache_trace_v_r
+                 && (waveform_cycle_count_r >= context_cache_trace_start_cycle_r)
+                 && (!context_cache_trace_stop_v_r
+                     || (waveform_cycle_count_r < context_cache_trace_stop_cycle_r))) begin
+      if (waveform_cycle_count_r == context_cache_trace_start_cycle_r) begin
+        context_cache_state_prev_r <= context_cache_state_li;
+        context_cache_state_start_cycle_r <= waveform_cycle_count_r;
+      end else if (context_cache_state_li != context_cache_state_prev_r) begin
+        $display("BSG-INFO: context-cache state %0d -> %0d at cycle=%0d duration=%0d l1_req=%0d l1_resp=%0d",
+                 context_cache_state_prev_r, context_cache_state_li, waveform_cycle_count_r,
+                 waveform_cycle_count_r - context_cache_state_start_cycle_r,
+                 context_cache_l1_req_count_r, context_cache_l1_resp_count_r);
+        if ((context_cache_state_prev_r == 4'd2) && (context_cache_state_li == 4'd3))
+          $display("BSG-INFO: context-cache dirty masks int save=%0d restore-target=%0d fp save=%0d restore-target=%0d",
+                   $countones(context_cache_victim_int_dirty_li),
+                   $countones(context_cache_target_int_dirty_li),
+                   $countones(context_cache_victim_fp_dirty_li),
+                   $countones(context_cache_target_fp_dirty_li));
+        context_cache_state_prev_r <= context_cache_state_li;
+        context_cache_state_start_cycle_r <= waveform_cycle_count_r;
+      end
+      if (context_cache_l1_req_li)
+        context_cache_l1_req_count_r <= context_cache_l1_req_count_r + 1'b1;
+      if (context_cache_l1_resp_li)
+        context_cache_l1_resp_count_r <= context_cache_l1_resp_count_r + 1'b1;
+    end
+  end
+
+  wire waveform_en_li = (waveform_cycle_count_r >= waveform_start_cycle_r)
+                        & (~waveform_stop_cycle_v_r
+                           | (waveform_cycle_count_r < waveform_stop_cycle_r));
   bsg_nonsynth_waveform_tracer
    #(.trace_str_p("bsg_trace"))
    tracer

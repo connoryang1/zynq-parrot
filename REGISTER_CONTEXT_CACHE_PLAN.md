@@ -6,17 +6,50 @@ Support more software-visible contexts than the number of physically resident ha
 
 ## Current Branch Scope
 
-The current `ctxtsw-regfile-caching` branch implements only the first restore-capable subset:
+The current `ctxtsw-regfile-caching` branch implements a restore-capable prototype:
 
 - resident-hit ctxtsw remains on the existing fast path
-- nonresident restore/save is implemented for integer GPR state plus logical NPC / privilege /
-  translation-enable / ASID metadata
-- nonresident floating-point state is not implemented
-- nonresident full CSR backing is not implemented
+- nonresident GPR state is saved to and restored from the reserved cacheable L1-backed image
+- nonresident FP state is saved to and restored from an RTL shadow image, with two regfile
+  scan lanes; it is not yet L1-backed
+- logical NPC / privilege / translation-enable / ASID metadata is virtualized
+- virtual CSR state is saved/restored on a resident miss
 
-The RTL now fails fast in simulation if software tries to seed nonresident FP state through
-CSR `0x083`. Treat nonresident contexts as integer-only unless and until FP/CSR backing is
-added explicitly.
+`mt_ctxtsw_nonresident_fp_ring_test` and `mt_ctxtsw_nonresident_fp_target_test` pass on
+this branch. The implementation has not yet been validated for every CSR architectural corner
+case, and restoring virtual `mcycle` means `rdcycle` is not a wall-clock performance metric
+across a nonresident switch.
+
+## Measured Nonresident Cost (2026-07-18)
+
+The minimal nonresident benchmark was measured with global testbench cycle markers, rather
+than `rdcycle`:
+
+- resident `0 <-> 1`: `1053 / 256 = 4.11` global cycles per switch
+- nonresident `0 <-> 2`: `52131 / 256 = 203.64` global cycles per switch
+
+The apparent old `rdcycle` result of `3.55` cold cycles/switch is invalid. A nonresident
+launch restores virtual CSR state, including `mcycle`, so each logical context excludes time
+while the other context owns the resident slot.
+
+Debug state accounting in the timed cold region establishes the steady-state alternating
+directions:
+
+| Direction | GPR dirty state at save/restore entry | GPR FSM cycles | FP FSM cycles | Approx. launch-to-launch cost |
+| --- | --- | ---: | ---: | ---: |
+| `0 -> 2` | save 31, target has 3 | 195 | 32 | 239 |
+| `2 -> 0` | save 3, target has 31 | 139 | 17 | 170 |
+
+Each direction has exactly 34 GPR L1 requests and responses: 31+3. The GPR path is serialized
+because `bp_be_top.sv` allows one context-cache GPR request at a time, and
+`bp_be_pipe_mem.sv` holds `context_cache_dcache_active_r` until that load/store responds.
+The FP path does not issue these D-cache requests; it uses the direct two-lane regfile scan path.
+
+This makes the first performance conclusion unambiguous: dirty-mask tuning cannot remove the
+dominant cost for a context that genuinely owns a broad register image. A material improvement
+requires a bounded multiword/line context-copy service or a distinct context-store interface.
+Do not attempt to increase GPR scan picks alone: the D-cache service interface still permits only
+one active 64-bit request.
 
 ## Starting Point
 
