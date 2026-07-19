@@ -2,7 +2,9 @@
  * mt_ctxtsw_nonresident_fp_overhead_benchmark.c
  *
  * Warm/cold nonresident context-switch benchmark that keeps a broad floating
- * point register set live across every switch.
+ * point register set live across every switch. The nonresident elapsed cost
+ * is measured with testbench global-cycle markers: virtual CSR restore also
+ * restores mcycle for the logical context.
  */
 
 #include <stdint.h>
@@ -212,8 +214,6 @@ int main(void) {
   }
 
   uint64_t warm_cycles_per_switch_x100 = (warm_cycles * 100) / TOTAL_SWITCHES;
-  uint64_t cold_cycles_per_switch_x100 = (cold_cycles * 100) / TOTAL_SWITCHES;
-  uint64_t added_cycles_per_switch_x100 = ((cold_cycles - warm_cycles) * 100) / TOTAL_SWITCHES;
 
   bp_print_string("=== Nonresident FP Stress Overhead Benchmark ===\n");
   bp_print_string("Rounds/context:                  ");
@@ -229,15 +229,10 @@ int main(void) {
   bp_print_string("Warm cycles/switch x100:         ");
   bp_hprint_uint64(warm_cycles_per_switch_x100);
   bp_print_string("\n");
-  bp_print_string("Cold total cycles:               ");
+  bp_print_string("Cold virtual rdcycle delta:      ");
   bp_hprint_uint64(cold_cycles);
   bp_print_string("\n");
-  bp_print_string("Cold cycles/switch x100:         ");
-  bp_hprint_uint64(cold_cycles_per_switch_x100);
-  bp_print_string("\n");
-  bp_print_string("Added cold-warm x100:            ");
-  bp_hprint_uint64(added_cycles_per_switch_x100);
-  bp_print_string("\n");
+  bp_print_string("Cold elapsed cycles:             use global testbench markers\n");
 
   bp_finish(0);
   return 0;
