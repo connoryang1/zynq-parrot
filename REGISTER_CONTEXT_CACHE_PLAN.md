@@ -45,6 +45,37 @@ The benchmark writes host signal markers `0xb1`/`0xb2` around `t0_warm_bench()` 
 simulator timekeeper cycle when each marker packet reaches the host. These are
 host-observed whole-loop intervals, not virtualized `rdcycle` values.
 
+### Current Dedicated-Memory Phase Accounting
+
+A clean traced run instrumented the nonresident FSM without changing its
+functional inputs or outputs. All 512 cold switches had one of two steady-state
+profiles, alternating by direction:
+
+| Direction class | Count | Saved dirty GPRs | Restored GPRs | FSM cycles |
+| --- | ---: | ---: | ---: | ---: |
+| Full-save direction | 256 | 31 | 31 | 45 |
+| Partial-save direction | 256 | 17 | 31 | 38 |
+
+The components of those 45 / 38 cycles are respectively:
+
+| Phase | Full-save | Partial-save | Notes |
+| --- | ---: | ---: | --- |
+| Wait for `commit_pkt.ctxtsw` | 3 | 3 | The miss cannot repurpose its resident slot before the switching CSR retires. |
+| Drain | 2 | 2 | The existing safe-to-evict predicate must observe an empty/no-writeback backend. |
+| Two-lane GPR save | 16 | 9 | `ceil(31/2)` or `ceil(17/2)` existing physical-regfile read lanes. |
+| Four-line context-memory fetch | 5 | 5 | Four back-to-back synchronous line requests plus response visibility. |
+| Two-lane GPR restore | 16 | 16 | `ceil(31/2)` physical-regfile write cycles. |
+| FSM tails | 2 | 2 | The registered transition to launch. |
+| FE accept handshake | 1 | 1 | `fe_ctxtsw_yumi_i`. |
+
+Thus the average context-cache FSM residency is `41.5` cycles per cold switch.
+The matched global-marker measurement is `66.59` cycles per switch above the
+resident control, leaving `25.09` cycles outside this FSM interval. That
+remainder is not yet attributed; it includes timing before miss-state entry and
+after the FE launch handshake. It must be separated with waveform timestamps or
+additional boundary markers before assigning it to frontend recovery, target
+fetch, or benchmark-code layout.
+
 ## Storage Clarification
 
 The older RTL shadow image and the current `bp_be_context_mem` are *not* the
