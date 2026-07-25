@@ -65,16 +65,16 @@ The components of those 45 / 38 cycles are respectively:
 | Two-lane GPR save | 16 | 9 | `ceil(31/2)` or `ceil(17/2)` existing physical-regfile read lanes. |
 | Four-line context-memory fetch | 5 | 5 | Four back-to-back synchronous line requests plus response visibility. |
 | Two-lane GPR restore | 16 | 16 | `ceil(31/2)` physical-regfile write cycles. |
+| FP save/restore | 32 | 17 | Existing FP dirty-state path; this benchmark does not execute FP code, but prior logical-context FP state remains dirty. |
 | FSM tails | 2 | 2 | The registered transition to launch. |
 | FE accept handshake | 1 | 1 | `fe_ctxtsw_yumi_i`. |
 
-Thus the average context-cache FSM residency is `41.5` cycles per cold switch.
-The matched global-marker measurement is `66.59` cycles per switch above the
-resident control, leaving `25.09` cycles outside this FSM interval. That
-remainder is not yet attributed; it includes timing before miss-state entry and
-after the FE launch handshake. It must be separated with waveform timestamps or
-additional boundary markers before assigning it to frontend recovery, target
-fetch, or benchmark-code layout.
+The full miss-to-launch spans are therefore `77` and `55` cycles, with a fixed
+five cycles from FE acceptance to the first target-context BE dispatch (`82` and
+`60` detect-to-dispatch). The average miss-to-launch time is `66` cycles. This
+accounts for the matched `66.59`-cycle cold-vs-resident loop increment: the
+previous apparent `25.09`-cycle gap was the uncounted existing FP save/restore
+phase, not frontend recovery or a context-memory fetch delay.
 
 ## Storage Clarification
 
