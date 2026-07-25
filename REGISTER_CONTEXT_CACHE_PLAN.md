@@ -23,9 +23,10 @@ The dedicated-memory restore is verified by clean `TRACE=1` runs of
 Use global simulator cycles for nonresident timing. `rdcycle` is virtualized
 per logical context and is not a wall-clock timer while a context is evicted.
 
-| Configuration | Cold nonresident result | Evidence / interpretation |
+| Configuration | Result | Evidence / interpretation |
 | --- | ---: | --- |
-| Original resident-only Banyan path | 7 cycles/switch | Minimal resident warm path; not a nonresident result. |
+| Original resident-only Banyan path | 7 cycles/switch | Original minimal resident warm path; not a nonresident result. |
+| Current ISD-forwarded resident path | about 4 cycles added overhead | Best-case warm/steady result: redirect begins when ctxtsw reaches ISD, before architectural commit. |
 | Original serialized Dcache GPR service | 203.64 global cycles/switch | `52131 / 256` in the 2026-07-18 global-marker run. Each switch serialized 34 64-bit Dcache requests/responses. |
 | Dedicated context memory, one GPR restore port | Absolute cold cost not yet re-baselined | Functional checkpoint. It removes the normal-Dcache transaction dependency and restores from a four-line local buffer. |
 | Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
