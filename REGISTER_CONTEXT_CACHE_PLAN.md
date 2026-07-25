@@ -1,4 +1,58 @@
-# Simple L1-Backed Register Context Cache Plan
+# Register Context Cache Plan
+
+## Current Implementation Status (2026-07-25)
+
+The original L1/Dcache-backed GPR service has been replaced on branch
+`ctxtsw-context-sram` by a dedicated private context-memory interface:
+
+- `bp_be_context_mem.sv` stores logical-context GPR images independently of the
+  normal Dcache.
+- Nonresident saves write the context memory directly; restores request four
+  wide register lines into a local buffer before writing the physical regfile.
+- Restore uses both existing physical-regfile write ports, so it installs two
+  GPRs per cycle. Save currently remains one GPR per cycle.
+- FP and CSR nonresident state remain on their existing paths and are not part
+  of this GPR-specific performance result.
+
+The dedicated-memory restore is verified by clean `TRACE=1` runs of
+`mt_ctxtsw_nonresident_gpr_overhead_benchmark` and
+`mt_ctxtsw_nonresident_ring_test`.
+
+## Context-Switch Timing Record
+
+Use global simulator cycles for nonresident timing. `rdcycle` is virtualized
+per logical context and is not a wall-clock timer while a context is evicted.
+
+| Configuration | Cold nonresident result | Evidence / interpretation |
+| --- | ---: | --- |
+| Original resident-only Banyan path | 7 cycles/switch | Minimal resident warm path; not a nonresident result. |
+| Original serialized Dcache GPR service | 203.64 global cycles/switch | `52131 / 256` in the 2026-07-18 global-marker run. Each switch serialized 34 64-bit Dcache requests/responses. |
+| Dedicated context memory, one GPR restore port | Absolute cold cost not yet re-baselined | Functional checkpoint. It removes the normal-Dcache transaction dependency and restores from a four-line local buffer. |
+| Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
+
+Do not subtract the 15-cycle delta from the historical 203.64-cycle Dcache
+measurement and call that an absolute current result: the required same-test,
+same-build global-marker re-baseline has not yet been run. The next performance
+task is to produce that direct baseline/current comparison, then separately
+measure save and restore state-machine residency from the waveform.
+
+## Storage Clarification
+
+The older RTL shadow image and the current `bp_be_context_mem` are *not* the
+physical ISA register file. The physical active-thread GPR banks are implemented
+by `bp_be_regfile_mt.sv` and are indexed by `{physical_thread_id, register}`.
+Arrays such as `context_cache_int_shadow_r` and the `mem` array inside
+`bp_be_context_mem` describe separate hardware storage for nonresident logical
+contexts.
+
+In RTL simulation, a `logic` array behaves like stored values. In synthesis it
+may infer flops or a memory macro depending on the coding style, reset behavior,
+and target technology. It does not silently reuse the processor's physical GPR
+cells. The problem with the original design was primarily the serialized
+64-bit Dcache save/restore protocol, not that the shadow array itself was a
+physical regfile. The current private-memory module is an interface intended to
+map to dedicated SRAM/BRAM later; its behavioral array is still a model, not a
+PPA claim.
 
 ## Goal
 
