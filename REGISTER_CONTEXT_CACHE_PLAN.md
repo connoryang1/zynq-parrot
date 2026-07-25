@@ -31,13 +31,19 @@ per logical context and is not a wall-clock timer while a context is evicted.
 | Original serialized Dcache GPR service | 203.64 global cycles/switch | `52131 / 256` in the 2026-07-18 global-marker run. Each switch serialized 34 64-bit Dcache requests/responses. |
 | Dedicated context memory, one GPR restore port | Absolute cold cost not yet re-baselined | Functional checkpoint. It removes the normal-Dcache transaction dependency and restores from a four-line local buffer. |
 | Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
-| Dedicated context memory, two GPR save and restore ports | 11.50 additional global cycles saved per cold switch vs. two-restore/one-save | Final global time fell from `27,196,150,000 ps` to `26,901,850,000 ps`: `5,886 / 512 = 11.50` cycles across the two cold phases. |
+| Dedicated context memory, two GPR save and restore ports | 191.41 global cycles/cold switch | Direct clean `TRACE=1` measurement: marker `0xc1` at cycle `454679`, marker `0xc2` at `503681`; `(503681 - 454679) / 256 = 191.41`. This phase contains only the measured 256 cold switches. |
 
-Do not subtract the 15-cycle delta from the historical 203.64-cycle Dcache
-measurement and call that an absolute current result: the required same-test,
-same-build global-marker re-baseline has not yet been run. The next performance
-task is to produce that direct baseline/current comparison, then separately
-measure save and restore state-machine residency from the waveform.
+The direct current measurement is 12.23 global cycles/switch below the historical
+serialized-Dcache result (`203.64 - 191.41`). The prior controlled deltas still
+attribute 15 cycles to the second restore lane and 11.50 cycles to the second save
+lane across their respective builds. Separately measure save and restore state-machine
+residency from the waveform before assigning the remaining cold cost to individual
+states.
+
+The benchmark writes host signal markers `0xc1` and `0xc2` immediately before and
+after `t0_cold_bench()`. Under Verilator, `bsg_host` records the simulator timekeeper
+cycle when each marker packet reaches the host. This is a host-observed whole-loop
+interval, not a virtualized `rdcycle` value.
 
 ## Storage Clarification
 

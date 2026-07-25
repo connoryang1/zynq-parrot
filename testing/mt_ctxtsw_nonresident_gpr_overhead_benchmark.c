@@ -10,8 +10,9 @@
  *
  * Cold path: logical context 2 is nonresident at reset. Repeated 0 <-> 2
  * switching forces the nonresident restore path on every switch. The
- * nonresident elapsed cost is measured with testbench global-cycle markers:
- * virtual CSR restore also restores mcycle for the logical context.
+ * nonresident elapsed cost is measured by explicit host markers around the
+ * timed loop: virtual CSR restore also restores mcycle for the logical
+ * context.
  */
 
 #include <stdint.h>
@@ -22,6 +23,12 @@
 #define STACK_WORDS 512
 #define ROUNDS 128
 #define TOTAL_SWITCHES (2 * ROUNDS)
+#define HOST_SIGNAL_BASE_ADDR ((volatile uint8_t *)(HOST_DEV_BASE_ADDR | 0x04000))
+
+static inline void global_marker(uint8_t id) {
+  *HOST_SIGNAL_BASE_ADDR = id;
+  __asm__ volatile("fence" ::: "memory");
+}
 
 #define GPR_LOAD_SEQ \
   "li a0, 0x1111222233334444\n" \
@@ -198,9 +205,11 @@ int main(void) {
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_cold_entry);
   cold_steps = 0;
   fail_code = 0;
+  global_marker(0xc1);
   uint64_t cold_begin = read_cycle();
   t0_cold_bench();
   uint64_t cold_end = read_cycle();
+  global_marker(0xc2);
   uint64_t cold_cycles = cold_end - cold_begin;
 
   if (fail_code != 0 || cold_steps != ROUNDS) {
@@ -232,7 +241,7 @@ int main(void) {
   bp_print_string("Cold virtual rdcycle delta:      ");
   bp_hprint_uint64(cold_cycles);
   bp_print_string("\n");
-  bp_print_string("Cold elapsed cycles:             use global testbench markers\n");
+  bp_print_string("Cold global interval:             marker 0xc1 -> 0xc2\n");
 
   bp_finish(0);
   return 0;

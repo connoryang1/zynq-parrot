@@ -84,6 +84,14 @@ class bsg_host {
             finished = true;
         } else if (putint) {
             printf("%x", packet->data);
+        } else if (sig) {
+#ifdef SIMULATION
+            const long long time_ps = bsg_nonsynth_dpi::bsg_timekeeper::current_timeval();
+            bsg_pr_info("CTXTSW_GLOBAL_MARKER id=%u time_ps=%lld cycle=%lld\n"
+                        , packet->data, time_ps, time_ps / 50000);
+#else
+            bsg_pr_info("CTXTSW_GLOBAL_MARKER id=%u\n", packet->data);
+#endif
         } else {
             bsg_pr_err("ps.cpp: Errant write to %lx\n", packet->address);
             finished = true;

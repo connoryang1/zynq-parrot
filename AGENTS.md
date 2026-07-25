@@ -25,6 +25,8 @@
   `make clean run ... TRACE=1`.
 - When using the testing harness directly, prefer the equivalent `make -C testing ... TRACE=1`
   form so commands run from the repository root without changing directories.
+- A direct simulator `make -C cosim/.../verilator run` only copies an existing ELF; rebuild a
+  changed test through `make -C testing` before using that lower-level flow.
 - Do not run testing flows concurrently by default. The testing harness and simulator flow share
   program, build, waveform, and log artifacts, so parallel runs can overwrite each other unless
   separate output/build directories have been explicitly configured and verified.
