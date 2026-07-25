@@ -33,12 +33,12 @@ per logical context and is not a wall-clock timer while a context is evicted.
 | Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
 | Dedicated context memory, two GPR save and restore ports | 191.41 global cycles/cold switch | Direct clean `TRACE=1` measurement: marker `0xc1` at cycle `454679`, marker `0xc2` at `503681`; `(503681 - 454679) / 256 = 191.41`. This phase contains only the measured 256 cold switches. |
 
-The direct current measurement is 12.23 global cycles/switch below the historical
-serialized-Dcache result (`203.64 - 191.41`). The prior controlled deltas still
-attribute 15 cycles to the second restore lane and 11.50 cycles to the second save
-lane across their respective builds. Separately measure save and restore state-machine
-residency from the waveform before assigning the remaining cold cost to individual
-states.
+The historical serialized-Dcache measurement is not a same-build baseline for this
+marker interval, so `203.64 - 191.41` is not a validated optimization saving. The
+prior controlled deltas still attribute 15 cycles to the second restore lane and
+11.50 cycles to the second save lane across their respective builds. Add equivalent
+warm markers and measure save/restore state-machine residency before assigning the
+current cold cost to individual states or comparing it to the old Dcache path.
 
 The benchmark writes host signal markers `0xc1` and `0xc2` immediately before and
 after `t0_cold_bench()`. Under Verilator, `bsg_host` records the simulator timekeeper
