@@ -31,19 +31,19 @@ per logical context and is not a wall-clock timer while a context is evicted.
 | Original serialized Dcache GPR service | 203.64 global cycles/switch | `52131 / 256` in the 2026-07-18 global-marker run. Each switch serialized 34 64-bit Dcache requests/responses. |
 | Dedicated context memory, one GPR restore port | Absolute cold cost not yet re-baselined | Functional checkpoint. It removes the normal-Dcache transaction dependency and restores from a four-line local buffer. |
 | Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
-| Dedicated context memory, two GPR save and restore ports | 191.41 global cycles/cold switch | Direct clean `TRACE=1` measurement: marker `0xc1` at cycle `454679`, marker `0xc2` at `503681`; `(503681 - 454679) / 256 = 191.41`. This phase contains only the measured 256 cold switches. |
+| Dedicated context memory, two GPR save and restore ports | 66.59 global cycles/switch added over resident control | Direct clean `TRACE=1` measurement: resident markers `0xb1 -> 0xb2` span `31938 / 256 = 124.76` cycles/switch; cold markers `0xc1 -> 0xc2` span `48984 / 256 = 191.34`; `191.34 - 124.76 = 66.59`. |
 
 The historical serialized-Dcache measurement is not a same-build baseline for this
-marker interval, so `203.64 - 191.41` is not a validated optimization saving. The
-prior controlled deltas still attribute 15 cycles to the second restore lane and
-11.50 cycles to the second save lane across their respective builds. Add equivalent
-warm markers and measure save/restore state-machine residency before assigning the
-current cold cost to individual states or comparing it to the old Dcache path.
+marker interval, so it cannot be subtracted from the current result. The prior
+controlled deltas still attribute 15 cycles to the second restore lane and 11.50
+cycles to the second save lane across their respective builds. Measure save/restore
+state-machine residency before assigning the current 66.59-cycle added cost to
+individual states or comparing it to the old Dcache path.
 
-The benchmark writes host signal markers `0xc1` and `0xc2` immediately before and
-after `t0_cold_bench()`. Under Verilator, `bsg_host` records the simulator timekeeper
-cycle when each marker packet reaches the host. This is a host-observed whole-loop
-interval, not a virtualized `rdcycle` value.
+The benchmark writes host signal markers `0xb1`/`0xb2` around `t0_warm_bench()` and
+`0xc1`/`0xc2` around `t0_cold_bench()`. Under Verilator, `bsg_host` records the
+simulator timekeeper cycle when each marker packet reaches the host. These are
+host-observed whole-loop intervals, not virtualized `rdcycle` values.
 
 ## Storage Clarification
 

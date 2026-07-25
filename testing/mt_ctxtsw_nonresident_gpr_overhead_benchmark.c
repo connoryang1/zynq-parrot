@@ -182,9 +182,11 @@ int main(void) {
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_warm_entry);
   warm_steps = 0;
   fail_code = 0;
+  global_marker(0xb1);
   uint64_t warm_begin = read_cycle();
   t0_warm_bench();
   uint64_t warm_end = read_cycle();
+  global_marker(0xb2);
   uint64_t warm_cycles = warm_end - warm_begin;
 
   if (fail_code != 0 || warm_steps != ROUNDS) {
@@ -238,6 +240,7 @@ int main(void) {
   bp_print_string("Warm cycles/switch x100:         ");
   bp_hprint_uint64(warm_cycles_per_switch_x100);
   bp_print_string("\n");
+  bp_print_string("Warm global interval:             marker 0xb1 -> 0xb2\n");
   bp_print_string("Cold virtual rdcycle delta:      ");
   bp_hprint_uint64(cold_cycles);
   bp_print_string("\n");
