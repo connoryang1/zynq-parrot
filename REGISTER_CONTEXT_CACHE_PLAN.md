@@ -10,7 +10,8 @@ The original L1/Dcache-backed GPR service has been replaced on branch
 - Nonresident saves write the context memory directly; restores request four
   wide register lines into a local buffer before writing the physical regfile.
 - Restore uses both existing physical-regfile write ports, so it installs two
-  GPRs per cycle. Save currently remains one GPR per cycle.
+  GPRs per cycle. Save now uses both physical-regfile read lanes and two
+  context-memory write lanes.
 - FP and CSR nonresident state remain on their existing paths and are not part
   of this GPR-specific performance result.
 
@@ -30,6 +31,7 @@ per logical context and is not a wall-clock timer while a context is evicted.
 | Original serialized Dcache GPR service | 203.64 global cycles/switch | `52131 / 256` in the 2026-07-18 global-marker run. Each switch serialized 34 64-bit Dcache requests/responses. |
 | Dedicated context memory, one GPR restore port | Absolute cold cost not yet re-baselined | Functional checkpoint. It removes the normal-Dcache transaction dependency and restores from a four-line local buffer. |
 | Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
+| Dedicated context memory, two GPR save and restore ports | 11.50 additional global cycles saved per cold switch vs. two-restore/one-save | Final global time fell from `27,196,150,000 ps` to `26,901,850,000 ps`: `5,886 / 512 = 11.50` cycles across the two cold phases. |
 
 Do not subtract the 15-cycle delta from the historical 203.64-cycle Dcache
 measurement and call that an absolute current result: the required same-test,
