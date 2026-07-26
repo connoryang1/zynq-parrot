@@ -12,8 +12,8 @@ The original L1/Dcache-backed GPR service has been replaced on branch
 - Restore uses both existing physical-regfile write ports, so it installs two
   GPRs per cycle. Save now uses both physical-regfile read lanes and two
   context-memory write lanes.
-- FP and CSR nonresident state remain on their existing paths and are not part
-  of this GPR-specific performance result.
+- FP nonresident copying is explicitly disabled for this GPR-only phase; CSR
+  and execution metadata remain virtualized.
 
 The dedicated-memory restore is verified by clean `TRACE=1` runs of
 `mt_ctxtsw_nonresident_gpr_overhead_benchmark` and
@@ -32,6 +32,7 @@ per logical context and is not a wall-clock timer while a context is evicted.
 | Dedicated context memory, one GPR restore port | Absolute cold cost not yet re-baselined | Functional checkpoint. It removes the normal-Dcache transaction dependency and restores from a four-line local buffer. |
 | Dedicated context memory, two GPR restore ports | 15 global cycles saved per cold switch vs. one-port dedicated restore | Two otherwise-identical traced runs differed by 7,680 global cycles. Only the two 256-switch cold phases use this path: `7680 / 512 = 15`. |
 | Dedicated context memory, two GPR save and restore ports | 66.59 global cycles/switch added over resident control | Direct clean `TRACE=1` measurement: resident markers `0xb1 -> 0xb2` span `31938 / 256 = 124.76` cycles/switch; cold markers `0xc1 -> 0xc2` span `48984 / 256 = 191.34`; `191.34 - 124.76 = 66.59`. |
+| Dedicated context memory, GPR-only mode | 41.09 global cycles/switch added over resident control | Clean `TRACE=1` measurement with nonresident FP copy disabled: cold markers span `42456 / 256 = 165.84`; `165.84 - 124.76 = 41.09`. |
 
 The historical serialized-Dcache measurement is not a same-build baseline for this
 marker interval, so it cannot be subtracted from the current result. The prior
@@ -65,16 +66,15 @@ The components of those 45 / 38 cycles are respectively:
 | Two-lane GPR save | 16 | 9 | `ceil(31/2)` or `ceil(17/2)` existing physical-regfile read lanes. |
 | Four-line context-memory fetch | 5 | 5 | Four back-to-back synchronous line requests plus response visibility. |
 | Two-lane GPR restore | 16 | 16 | `ceil(31/2)` physical-regfile write cycles. |
-| FP save/restore | 32 | 17 | Existing FP dirty-state path; this benchmark does not execute FP code, but prior logical-context FP state remains dirty. |
 | FSM tails | 2 | 2 | The registered transition to launch. |
 | FE accept handshake | 1 | 1 | `fe_ctxtsw_yumi_i`. |
 
-The full miss-to-launch spans are therefore `77` and `55` cycles, with a fixed
-five cycles from FE acceptance to the first target-context BE dispatch (`82` and
-`60` detect-to-dispatch). The average miss-to-launch time is `66` cycles. This
-accounts for the matched `66.59`-cycle cold-vs-resident loop increment: the
-previous apparent `25.09`-cycle gap was the uncounted existing FP save/restore
-phase, not frontend recovery or a context-memory fetch delay.
+In GPR-only mode, the full miss-to-launch spans are `45` and `38` cycles, with a
+fixed five cycles from FE acceptance to the first target-context BE dispatch.
+The average miss-to-launch time is `41.5` cycles, consistent with the measured
+`41.09`-cycle cold-vs-resident loop increment. The earlier `66.59` result had
+also run the pre-existing FP save/restore phase, contributing 32 or 17 cycles
+per direction; it is retained above as a separate full-state historical result.
 
 ## Storage Clarification
 
