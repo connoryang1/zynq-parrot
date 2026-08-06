@@ -67,6 +67,7 @@ case ${1:-} in
     make -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
       BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
       CFG=e_bp_unicore_zynqparrot_cfg \
+      VIVADO_RUN="$script_dir/run_vivado_2024_2.sh" \
       ZP_INSTALL_DIR="$repo_dir/install" ZP_RISCV_DIR="$repo_dir/riscv"
     "$script_dir/summarize_vivado.sh" "$worktree/cosim/black-parrot-example/vivado" >"$job_dir/summary.txt"
     find "$worktree/cosim/black-parrot-example" -maxdepth 1 -name '*.tar.xz.b64' -exec cp -p {} "$job_dir/" \;

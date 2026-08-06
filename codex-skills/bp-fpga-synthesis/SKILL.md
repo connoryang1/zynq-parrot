@@ -24,6 +24,10 @@ If the cosimulation build cannot find Boost coroutine headers or libraries, run
 `scripts/setup_vivado_boost.sh`. It links the Boost 1.72 headers and shared libraries bundled
 with Vivado 2024.2 into the ignored `install/` prefix and does not modify the host system.
 
+Use `scripts/run_vivado_2024_2.sh` instead of invoking Vivado directly on this VM. The installed
+Vivado copy has a damaged core library, and the wrapper supplies the valid same-release library
+from Vitis 2024.2 without modifying either installation.
+
 Read [references/pynqz2-flow.md](references/pynqz2-flow.md) when preparing dependencies,
 deploying to a board, or diagnosing an old command.
 

@@ -20,6 +20,14 @@ check_path() {
 printf 'Top-level:   %s\n' "$(git -C "$repo_dir" rev-parse --short HEAD)"
 printf 'Branch:      %s\n' "$(git -C "$repo_dir" branch --show-current)"
 check_path /tools/Xilinx/Vivado/2024.2/settings64.sh "Vivado 2024.2"
+if file /tools/Xilinx/Vivado/2024.2/lib/lnx64.o/libxv_bda.so 2>/dev/null | grep -q 'ELF 64-bit'; then
+  echo "OK   Vivado core library"
+elif file /tools/Xilinx/Vitis/2024.2/lib/lnx64.o/libxv_bda.so 2>/dev/null | grep -q 'ELF 64-bit'; then
+  echo "OK   Vivado core library fallback from Vitis 2024.2"
+else
+  echo "MISS valid Vivado/Vitis 2024.2 libxv_bda.so"
+  fail=1
+fi
 check_path "$repo_dir/import/black-parrot/.git" "BlackParrot submodule"
 check_path "$repo_dir/import/basejump_stl/.git" "BaseJump submodule"
 check_path "$repo_dir/install/bin" "prepared tool installation"
