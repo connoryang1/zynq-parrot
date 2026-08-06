@@ -21,8 +21,8 @@ case ${1:-} in
       [[ -e "$status_file" ]] || continue
       [[ "$(cat "$status_file")" == RUNNING ]] || continue
       active_dir=$(dirname "$status_file")
-      active_pid=$(cat "$active_dir/pid" 2>/dev/null || true)
-      if [[ -n "$active_pid" ]] && kill -0 "$active_pid" 2>/dev/null; then
+      active_session=$(cat "$active_dir/session" 2>/dev/null || true)
+      if [[ -n "$active_session" ]] && tmux has-session -t "$active_session" 2>/dev/null; then
         echo "Refusing to compete with active job $(basename "$active_dir")." >&2
         exit 1
       fi
@@ -32,8 +32,11 @@ case ${1:-} in
     job_dir="$run_root/$job_id"
     mkdir -p "$job_dir"
     commit=$(git -C "$repo_dir" rev-parse HEAD)
-    nohup "$0" worker "$job_id" "$commit" >"$job_dir/console.log" 2>&1 &
-    pid=$!
+    session_name="bp-fpga-$job_id"
+    tmux new-session -d -s "$session_name" \
+      "$0 worker $job_id $commit >$job_dir/console.log 2>&1"
+    pid=$(tmux display-message -p -t "$session_name" '#{pane_pid}')
+    printf '%s\n' "$session_name" >"$job_dir/session"
     printf '%s\n' "$pid" >"$job_dir/pid"
     printf 'RUNNING\n' >"$job_dir/status"
     printf 'job=%s\npid=%s\nlog=%s\n' "$job_id" "$pid" "$job_dir/console.log"
