@@ -49,7 +49,20 @@ case ${1:-} in
     trap 'code=$?; if (( code == 0 )); then echo PASS >"$job_dir/status"; else echo FAIL >"$job_dir/status"; fi; exit $code' EXIT
     printf 'top_commit=%s\n' "$commit" >"$job_dir/revisions.txt"
     git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
-    git -C "$worktree" submodule update --init --recursive import/basejump_stl import/black-parrot import/black-parrot-sdk import/black-parrot-subsystems import/black-parrot-tools
+    git -C "$worktree" submodule update --init \
+      import/basejump_stl import/black-parrot import/black-parrot-subsystems
+    git -C "$worktree/import/black-parrot" submodule update --init \
+      external/basejump_stl external/HardFloat external/bedrock
+    for required in \
+      import/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
+      import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
+      import/black-parrot/external/HardFloat/source/HardFloat_primitives.v \
+      import/black-parrot-subsystems/blackparrot/v/bp_axi_top.sv; do
+      if [[ ! -f "$worktree/$required" ]]; then
+        echo "Missing required FPGA source: $required" >&2
+        exit 1
+      fi
+    done
     git -C "$worktree/import/black-parrot" rev-parse HEAD | sed 's/^/black_parrot_commit=/' >>"$job_dir/revisions.txt"
     make -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
       BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
