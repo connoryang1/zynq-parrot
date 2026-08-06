@@ -1,5 +1,14 @@
 # AGENTS
 
+## Repository Skills
+
+- Read the matching `codex-skills/*/SKILL.md` before acting on BlackParrot-specific workflows.
+- Use `bp-targeted-verification` to select simulation gates.
+- Use `bp-benchmark-validation` before interpreting context-switch measurements.
+- Use `bp-fpga-synthesis` for build-readiness, background Vivado implementation, utilization,
+  timing, bitstream fit, or FPGA deployment work.
+- Use `bp-parallel-safe-runs` before launching concurrent or background jobs.
+
 ## Development Philosophy
 
 - Prefer small, isolated changes over broad refactors.
@@ -46,6 +55,9 @@
   - rebuild
   - rerun the targeted test
   - compare behavior before moving on
+- For RTL changes that can affect FPGA area or timing, run a routed PYNQ-Z2 implementation at
+  milestone checkpoints. Keep it out of the foreground iteration loop and record exact revisions,
+  utilization, WNS/TNS, Vivado version, configuration, and artifact path.
 
 ## Debugging Expectations
 

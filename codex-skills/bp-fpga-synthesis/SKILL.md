@@ -1,0 +1,77 @@
+---
+name: bp-fpga-synthesis
+description: Prepare, launch, monitor, and interpret BlackParrot FPGA builds for zynq-parrot, especially PYNQ-Z2 Vivado synthesis, implementation, utilization, timing, bitstream fit checks, and comparisons between context-switch optimization checkpoints. Use for build-readiness checks, FPGA fit questions, background synthesis, or review-ready hardware validation.
+---
+
+# BlackParrot FPGA Synthesis
+
+Keep quick iteration separate from slow implementation. Treat a routed bitstream with
+acceptable timing as the fit gate; elaboration or synthesis alone is not enough.
+
+## Before Any Build
+
+1. Run `scripts/check_build_ready.sh` from anywhere in the checkout.
+2. Record the top-level commit and pinned `import/black-parrot` commit.
+3. Require a clean top-level worktree and clean BlackParrot submodule for a comparison build.
+4. Run the relevant simulation/correctness gate before spending hours on Vivado.
+5. Use `CFG=e_bp_unicore_zynqparrot_cfg` unless the branch defines and documents another enum.
+
+If Sourceware returns HTTP 429 during `prep_lite`, run
+`scripts/setup_sourceware_mirrors.sh`. It installs checkout-local mirror URLs and shallowly
+checks out the exact gitlink commits; it must not advance dependency revisions.
+
+If the cosimulation build cannot find Boost coroutine headers or libraries, run
+`scripts/setup_vivado_boost.sh`. It links the Boost 1.72 headers and shared libraries bundled
+with Vivado 2024.2 into the ignored `install/` prefix and does not modify the host system.
+
+Read [references/pynqz2-flow.md](references/pynqz2-flow.md) when preparing dependencies,
+deploying to a board, or diagnosing an old command.
+
+## Iteration Modes
+
+Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,
+and targeted simulation. Serialize tests that share the same Verilator directory.
+
+Launch routed FPGA implementation in an isolated background worktree:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh start
+```
+
+The launcher returns immediately and writes the job ID, PID, immutable source revisions,
+console log, reports, and artifact under `logs/fpga/<job-id>/`. It uses shared `install/` and
+`riscv/` dependencies but a separate source/build tree, so normal edits do not alter the run.
+
+Inspect jobs without blocking:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh list
+codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh status <job-id>
+```
+
+Do not launch two Vivado implementations concurrently by default; they compete for memory and
+make timing comparisons noisy. Do not delete an active job worktree.
+
+## Acceptance Gate
+
+Require all of the following:
+
+- the build command exits zero
+- the `.bit`, `.hwh`, and `.map` files exist
+- the packed `.tar.xz.b64` artifact exists and is nonempty
+- routed timing exists; report WNS and TNS
+- utilization exists; report LUT, FF, BRAM, and DSP use and percentages
+- no unresolved Vivado `ERROR` or material `CRITICAL WARNING` remains
+- the exact top-level and RTL revisions accompany the result
+
+Run `scripts/summarize_vivado.sh <vivado-directory>` to extract the stable report summary.
+Compare against a same-board, same-Vivado, same-CFG baseline. Never claim a hardware
+improvement from simulation cycles alone or compare a routed result with a synthesis estimate.
+
+## Reporting And Logging
+
+Report configuration, revisions, command, elapsed time, result, WNS/TNS, utilization, warnings,
+and artifact path. Append accepted results to the optimization timing ledger; keep failed or
+reverted experiments in the experiment log with their failure reason.
+
+Program or copy files to an FPGA only when the user authorizes that external action.

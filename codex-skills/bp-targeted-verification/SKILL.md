@@ -16,6 +16,7 @@ Verification should match the changed surface.
 - `bp_be` / `bp_fe` / `bp_common` RTL changes:
   - run the most relevant smoke test
   - rerun the benchmark or workload that exercises the modified path
+  - after area-significant storage, port, or datapath changes, launch the routed FPGA fit gate
 - build-system or collateral changes:
   - do one clean rebuild of the affected flow
   - rerun one previously known-good test in that flow
@@ -31,6 +32,19 @@ Verification should match the changed surface.
 2. make one change
 3. run the narrowest relevant smoke test
 4. if that passes, run the higher-value benchmark only if it exercises the same path
+
+## Iteration Cost Model
+
+- Compile and run one test with `make -C testing run-<test> TRACE=1`; the branch's testing
+  harness compiles that source directly and avoids rebuilding every SDK test.
+- Do not use `make -C import/black-parrot-sdk build.bp-tests -B` for ordinary iteration. It is
+  the old coarse-grained all-tests path.
+- Reuse one Verilator hardware model across software-only test changes.
+- Run `make -C testing rebuild-sim` only after RTL, configuration, wrapper, or source-list
+  changes. Treat the model rebuild as all-or-nothing because Verilator makes global scheduling
+  decisions and incremental reuse is not a reliable correctness gate.
+- Do not rewrite upstream Makefiles merely to force fine-grained Verilator compilation unless
+  measurements show a maintainable, reliable win.
 
 ## BlackParrot-Specific Heuristics
 
@@ -76,3 +90,6 @@ When done, report:
 - command run
 - pass/fail
 - one-line meaning of the result
+
+Use `bp-fpga-synthesis` at milestone checkpoints; do not put full Vivado implementation in the
+per-edit foreground loop.

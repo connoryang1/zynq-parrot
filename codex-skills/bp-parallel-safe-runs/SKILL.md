@@ -24,18 +24,22 @@ Parallelize only tasks with disjoint write sets or read-only work.
 - concurrent rebuilds in the same `verilator` directory
 - two tests that both regenerate the same collateral
 - benchmarking runs whose outputs or timing can interfere
+- multiple Vivado implementations competing for memory or using the same project directory
 
 ## BlackParrot-Specific Cautions
 
 - `cosim/.../verilator` directories are usually single-writer workspaces
 - benchmark runs against shared `prog.*` collateral should be serialized unless isolated into separate directories
 - do not run a clean rebuild in parallel with another command using the same build tree
+- one built Verilator model may run many software tests sequentially; avoid rebuilding it for
+  each test
 
 ## Recommended Pattern
 
 1. parallelize context gathering first
 2. parallelize non-conflicting static checks next
 3. serialize runtime tests unless the working directories are isolated
+4. launch long FPGA builds in an immutable isolated worktree and monitor their log asynchronously
 
 ## Before Parallelizing a Command
 
@@ -55,4 +59,3 @@ When using parallelism, say briefly:
 - what was parallelized
 - why it was safe
 - what remained serialized
-
