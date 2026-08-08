@@ -76,6 +76,29 @@ The average miss-to-launch time is `41.5` cycles, consistent with the measured
 also run the pre-existing FP save/restore phase, contributing 32 or 17 cycles
 per direction; it is retained above as a separate full-state historical result.
 
+### Optimization 1: Parallel GPR Eviction and Installation (2026-08-07)
+
+The outgoing physical-regfile reads/context-memory writes now run concurrently
+with incoming physical-regfile writes after the four restore lines arrive. The
+integer regfile already has independent two-lane read and write paths, so this
+does not add ports.
+
+A clean 2-resident/4-context `TRACE=1` run of
+`mt_ctxtsw_nonresident_overhead_benchmark` passed, followed by a clean traced
+`mt_ctxtsw_nonresident_ring_test` integrity pass. Waveform analysis over 511
+switch intervals measured:
+
+| Metric | Serialized baseline | Parallel save/restore |
+| --- | ---: | ---: |
+| Steady partial-save direction, first useful dispatch | 34 cycles | 32 cycles |
+| Steady full-save direction, first useful dispatch | 48 cycles | 32 cycles |
+| Dominant steady bucket | split: 222 at 34, 233 at 48 | 455 at 32 |
+
+Cold-I-cache/refill outliers are excluded from those steady buckets and remain
+separately visible in the waveform histogram. The remaining 32-cycle path is
+now dominated by the two-register-per-cycle restore width plus fixed
+commit/drain/launch latency; it is the next optimization target.
+
 ## Storage Clarification
 
 The older RTL shadow image and the current `bp_be_context_mem` are *not* the
