@@ -24,6 +24,7 @@ if file /tools/Xilinx/Vivado/2024.2/lib/lnx64.o/libxv_bda.so 2>/dev/null | grep 
   echo "OK   Vivado core library"
 elif file /tools/Xilinx/Vitis/2024.2/lib/lnx64.o/libxv_bda.so 2>/dev/null | grep -q 'ELF 64-bit'; then
   echo "OK   Vivado core library fallback from Vitis 2024.2"
+  check_path "$(command -v gcc 2>/dev/null)" "host compiler for Vivado preload guard"
 else
   echo "MISS valid Vivado/Vitis 2024.2 libxv_bda.so"
   fail=1

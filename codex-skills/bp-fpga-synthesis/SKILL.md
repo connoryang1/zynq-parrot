@@ -26,7 +26,8 @@ with Vivado 2024.2 into the ignored `install/` prefix and does not modify the ho
 
 Use `scripts/run_vivado_2024_2.sh` instead of invoking Vivado directly on this VM. The installed
 Vivado copy has a damaged core library, and the wrapper supplies the valid same-release library
-from Vitis 2024.2 without modifying either installation.
+from Vitis 2024.2 without modifying either installation. Its preload guard removes the override
+before Vivado launches synthesis helpers, so child utilities retain their normal loader state.
 
 Read [references/pynqz2-flow.md](references/pynqz2-flow.md) when preparing dependencies,
 deploying to a board, or diagnosing an old command.
