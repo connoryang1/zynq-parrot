@@ -68,6 +68,26 @@ EXPERIMENTAL_TESTS := \
     mt_ctxtsw_nonresident_target_test \
     mt_ctxtsw_sv39_asid_remap_test
 
+# These tests deliberately address logical contexts beyond the two physical
+# resident slots.  Keep their software and simulator configurations coupled so
+# a default four-thread build cannot silently turn the cold path into a
+# resident context switch.
+NONRESIDENT_TESTS := \
+    mt_ctxtsw_nonresident_fp_overhead_benchmark \
+    mt_ctxtsw_nonresident_gpr_overhead_benchmark \
+    mt_ctxtsw_nonresident_overhead_benchmark \
+    mt_ctxtsw_nonresident_fp_ring_test \
+    mt_ctxtsw_nonresident_fp_target_test \
+    mt_ctxtsw_nonresident_ring_test \
+    mt_ctxtsw_nonresident_target_test
+
+NONRESIDENT_TARGETS := \
+    $(addprefix run-,$(NONRESIDENT_TESTS)) \
+    $(addprefix $(ZP_RISCV_DIR)/bp-tests/,$(addsuffix .riscv,$(NONRESIDENT_TESTS)))
+
+$(NONRESIDENT_TARGETS): NUM_THREADS=2
+$(NONRESIDENT_TARGETS): NUM_CONTEXTS=4
+
 SCALE_CONTEXTS := 8 16 32 64
 SCALE_TESTS := $(foreach n,$(SCALE_CONTEXTS),mt_ctxtsw_$(n)ctx_ring_throughput_benchmark)
 
@@ -82,7 +102,7 @@ $(LOG_DIR):
 
 define TEST_RULES
 $(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h $(TOP)/testing/mt_context_image.h | $(LOG_DIR)
-	@echo "  [CC]    Compiling $(1).riscv (Threads: $(NUM_THREADS))..."
+	@echo "  [CC]    Compiling $(1).riscv (Threads: $$(NUM_THREADS), Contexts: $$(NUM_CONTEXTS))..."
 	@$$(CC) -o $$@ $$< $$(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
 
 run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
