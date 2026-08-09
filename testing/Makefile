@@ -149,7 +149,7 @@ $(foreach n,$(SCALE_CONTEXTS),$(eval $(call SCALE_TEST_RULES,$(n))))
 
 clean::
 	@echo "  [RM] Cleaning build artifacts..."
-	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(SCALE_TESTS) $(BEST_CONTEXT_BENCHMARKS)))
+	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(EXPERIMENTAL_TESTS) $(SCALE_TESTS) $(BEST_CONTEXT_BENCHMARKS)))
 	@$(RM) -rf $(LOG_DIR)
 
 build-sim: | $(LOG_DIR)
