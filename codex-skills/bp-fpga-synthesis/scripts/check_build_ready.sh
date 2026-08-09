@@ -39,6 +39,7 @@ check_path "$repo_dir/install/lib/libboost_context.so.1.72.0" "Boost context run
 check_path "$repo_dir/install/lib/libboost_system.so" "Boost system library"
 check_path "$repo_dir/install/lib/libboost_system.so.1.72.0" "Boost system runtime SONAME"
 check_path "$repo_dir/riscv/bootrom/bootrom.none.riscv" "RISC-V boot ROM"
+check_path "$repo_dir/install/gen/v/rv_plic/rtl/rv_plic_reg_pkg.sv" "generated OpenTitan PLIC RTL"
 
 if [[ -e "$repo_dir/import/black-parrot/.git" ]]; then
   expected=$(git -C "$repo_dir" ls-tree HEAD import/black-parrot | awk '{print $3}')

@@ -59,6 +59,8 @@ case ${1:-} in
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree/import/black-parrot" submodule update --init \
       external/basejump_stl external/HardFloat external/bedrock
+    git -C "$worktree/import/black-parrot-subsystems" submodule update --init \
+      import/riscv-dbg
     for required in \
       import/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
       import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
@@ -69,6 +71,10 @@ case ${1:-} in
         exit 1
       fi
     done
+    if [[ ! -s "$repo_dir/install/gen/v/rv_plic/rtl/rv_plic_reg_pkg.sv" ]]; then
+      echo "Missing generated OpenTitan PLIC RTL in the shared install prefix." >&2
+      exit 1
+    fi
     git -C "$worktree/import/black-parrot" rev-parse HEAD | sed 's/^/black_parrot_commit=/' >>"$job_dir/revisions.txt"
     make -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
       BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
