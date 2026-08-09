@@ -49,6 +49,12 @@ case ${1:-} in
     trap 'code=$?; if (( code == 0 )); then echo PASS >"$job_dir/status"; else echo FAIL >"$job_dir/status"; fi; exit $code' EXIT
     printf 'top_commit=%s\n' "$commit" >"$job_dir/revisions.txt"
     git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
+    # Optimization checkpoints may pin a local BlackParrot commit that has not
+    # been pushed upstream yet.  Seed that submodule from the source checkout;
+    # the other immutable dependencies can continue using their normal URLs.
+    git -C "$worktree" submodule init \
+      import/basejump_stl import/black-parrot import/black-parrot-subsystems
+    git -C "$worktree" config submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
     git -C "$worktree" submodule update --init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree/import/black-parrot" submodule update --init \
