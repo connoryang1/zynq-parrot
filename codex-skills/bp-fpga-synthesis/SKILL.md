@@ -24,6 +24,11 @@ If the cosimulation build cannot find Boost coroutine headers or libraries, run
 `scripts/setup_vivado_boost.sh`. It links the Boost 1.72 headers and shared libraries bundled
 with Vivado 2024.2 into the ignored `install/` prefix and does not modify the host system.
 
+If readiness reports missing generated OpenTitan PLIC RTL, run
+`scripts/setup_opentitan_plic.sh`. It installs the pinned Python dependencies under the ignored
+`install/` prefix, applies the legacy patches in numeric order to a temporary source snapshot,
+and atomically replaces the generated output without dirtying the OpenTitan submodule.
+
 Use `scripts/run_vivado_2024_2.sh` instead of invoking Vivado directly on this VM. The installed
 Vivado copy has a damaged core library, and the wrapper supplies the valid same-release library
 from Vitis 2024.2 without modifying either installation. It exposes the replacement through
