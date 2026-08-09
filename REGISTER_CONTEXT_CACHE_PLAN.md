@@ -99,6 +99,35 @@ separately visible in the waveform histogram. The remaining 32-cycle path is
 now dominated by the two-register-per-cycle restore width plus fixed
 commit/drain/launch latency; it is the next optimization target.
 
+### Optimization 2: Atomic Physical-Bank Exchange (2026-08-08)
+
+Because the dual-write physical GPR file already synthesizes as an explicitly
+written array, the nonresident path now exposes a drained whole-bank exchange:
+the victim bank is masked into the private context store while the target image
+is installed under the union of victim/target dirty masks at the same edge.
+This removes the remaining serial register loop without changing the resident
+context-switch path.
+
+Clean `TRACE=1` evidence on the 2-resident/4-context model:
+
+| Gate / metric | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS |
+| Steady first useful target dispatch | 478/511 at 12 cycles; 10/511 at 13 cycles |
+| Steady next-context-switch throughput | 470/511 at 12 cycles |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS |
+| `mt_ctxtsw_late_wb_hazard_test` (2 slots / 4 contexts) | CORE/BSG PASS |
+| `mt_ctxtsw_smoke_test` resident regression (2 / 4) | CORE/BSG PASS |
+| `mt_ctxtsw_nonresident_gpr_overhead_benchmark` | CORE/BSG PASS |
+
+For the GPR stress benchmark, the host-observed resident marker interval is
+`31938 / 256 = 124.76` cycles/switch and the nonresident interval is
+`34134 / 256 = 133.34`, an `8.58` cycle loop-level increment. That loop delta
+is distinct from the primary waveform metric: the architectural nonresident
+redirect reaches the first useful target dispatch in the dominant 12-cycle
+bucket. Longer 68--118-cycle observations correlate with frontend
+abort/refill tails and are not register-transfer latency.
+
 ## Storage Clarification
 
 The older RTL shadow image and the current `bp_be_context_mem` are *not* the
