@@ -21,6 +21,11 @@ package bp_common_pkg;
   localparam bp_proc_param_s bp_unicore_zynqparrot_cfg_override_p =
     '{paddr_width: 34
 
+      // Two physical register banks and four architectural contexts exercise
+      // the nonresident context-store path used by the optimized design.
+      ,num_threads: 2
+      ,num_contexts: 4
+
       ,icache_fill_width: 64
 
       ,dcache_fill_width: 64
@@ -130,4 +135,3 @@ package bp_common_pkg;
   `include "bp_common_rv64_pkgdef.svh"
 
 endpackage
-

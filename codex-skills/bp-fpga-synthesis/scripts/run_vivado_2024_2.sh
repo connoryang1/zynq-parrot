@@ -22,6 +22,11 @@ if ! file "$vivado_root/lib/lnx64.o/libxv_bda.so" | grep -q 'ELF 64-bit'; then
   mkdir -p "$patch_root/lib/lnx64.o"
   ln -sfn "$vitis_lib/libxv_bda.so" "$patch_root/lib/lnx64.o/libxv_bda.so"
   export XILINX_PATH="$patch_root${XILINX_PATH:+:$XILINX_PATH}"
+  # XILINX_PATH makes the replacement visible to Vivado's data-file lookup,
+  # while the dynamic loader still searches Vivado's damaged baseline library
+  # first.  Prefer the matching Vitis library directory without force-loading
+  # libxv_bda into helper processes (the latter breaks SmartConnect XIT).
+  export LD_LIBRARY_PATH="$vitis_lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
 
 exec vivado -mode batch "$@"
