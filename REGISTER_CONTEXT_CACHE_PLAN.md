@@ -128,6 +128,30 @@ redirect reaches the first useful target dispatch in the dominant 12-cycle
 bucket. Longer 68--118-cycle observations correlate with frontend
 abort/refill tails and are not register-transfer latency.
 
+### Cold-I-cache Overlap Assessment (2026-08-08)
+
+The trace shows that the 12-cycle architectural path is already hidden beneath
+frontend activity when the target line is present. First-touch switches instead
+form 68--118-cycle tails with repeated I-cache abort/request/refill activity.
+Only about four committed backend cycles remain between `commit_pkt.ctxtsw` and
+the normal FE launch, so even ideal overlap at that point can hide only a small
+fraction of a cold refill.
+
+An isolated experiment asserted the existing architectural FE context redirect
+immediately after context-switch commit and held backend issue suppressed until
+the bank exchange completed. A clean traced run deadlocked after NBF load,
+before the benchmark banner. The experiment was removed. The existing redirect
+is therefore not a safe prefetch mechanism: it mutates FE context/predictor
+ownership and participates in a handshake designed to coincide with state
+installation.
+
+A safe future implementation needs a separate, non-state-changing I-cache
+prefetch request carrying target physical address/ASID/translation metadata,
+plus cancellation and MSHR arbitration semantics. Given the observed refill
+length and only four committed transfer cycles available for overlap, that is
+not justified as part of this minimum-overhead checkpoint without a broader FE
+prefetch design and dedicated correctness tests.
+
 ## Storage Clarification
 
 The older RTL shadow image and the current `bp_be_context_mem` are *not* the
