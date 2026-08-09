@@ -55,7 +55,7 @@ case ${1:-} in
     git -C "$worktree" submodule init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree" config submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
-    git -C "$worktree" submodule update --init \
+    git -c protocol.file.allow=always -C "$worktree" submodule update --init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree/import/black-parrot" submodule update --init \
       external/basejump_stl external/HardFloat external/bedrock
