@@ -8,62 +8,67 @@
  * CSR 0x081 (CTXT)    : read/write current thread ID; write triggers NPC redirect
  * CSR 0x082 (CTXT_NPC): seed the NPC for a target thread
  *   bits [38:0]                    = NPC (vaddr_width_p = 39)
- *   bits [38+BP_TID_BITS : 39]     = thread ID
+ *   bits [38+BP_CONTEXT_BITS : 39] = logical context ID
  * CSR 0x083 (CTXT_REG): seed an integer or FP register for a target thread
  *   bits [38:0]                    = value (sign-extended to vaddr_width_p)
- *   bits [38+BP_TID_BITS : 39]     = thread ID
- *   bits [38+BP_TID_BITS+5 : 39+BP_TID_BITS] = register address (5-bit)
- *   bit  [39+BP_TID_BITS+5]        = fp_sel (1 = FP regfile, 0 = INT regfile)
+ *   bits [38+BP_CONTEXT_BITS : 39] = logical context ID
+ *   bits [38+BP_CONTEXT_BITS+5 : 39+BP_CONTEXT_BITS] = register address (5-bit)
+ *   bit  [39+BP_CONTEXT_BITS+5]    = fp_sel (1 = FP regfile, 0 = INT regfile)
  *
- * Set BP_NUM_THREADS before including this header (or pass -DBP_NUM_THREADS=N)
- * to match the RTL elaboration. Defaults to 4.
+ * Set BP_NUM_THREADS and BP_NUM_CONTEXTS before including this header
+ * (or pass -DBP_NUM_THREADS=N -DBP_NUM_CONTEXTS=M) to match RTL elaboration.
+ * BP_NUM_CONTEXTS defaults to BP_NUM_THREADS.
  */
 
 #ifndef BP_NUM_THREADS
 #define BP_NUM_THREADS 4
 #endif
 
-#if   BP_NUM_THREADS <= 2
-#  define BP_TID_BITS 1
-#elif BP_NUM_THREADS <= 4
-#  define BP_TID_BITS 2
-#elif BP_NUM_THREADS <= 8
-#  define BP_TID_BITS 3
-#elif BP_NUM_THREADS <= 16
-#  define BP_TID_BITS 4
-#elif BP_NUM_THREADS <= 32
-#  define BP_TID_BITS 5
-#elif BP_NUM_THREADS <= 64
-#  define BP_TID_BITS 6
-#else
-#  error "BP_NUM_THREADS > 64 not supported"
+#ifndef BP_NUM_CONTEXTS
+#define BP_NUM_CONTEXTS BP_NUM_THREADS
 #endif
 
-#define BP_TID_MASK  ((1ULL << BP_TID_BITS) - 1ULL)
+#if   BP_NUM_CONTEXTS <= 2
+#  define BP_CONTEXT_BITS 1
+#elif BP_NUM_CONTEXTS <= 4
+#  define BP_CONTEXT_BITS 2
+#elif BP_NUM_CONTEXTS <= 8
+#  define BP_CONTEXT_BITS 3
+#elif BP_NUM_CONTEXTS <= 16
+#  define BP_CONTEXT_BITS 4
+#elif BP_NUM_CONTEXTS <= 32
+#  define BP_CONTEXT_BITS 5
+#elif BP_NUM_CONTEXTS <= 64
+#  define BP_CONTEXT_BITS 6
+#else
+#  error "BP_NUM_CONTEXTS > 64 not supported"
+#endif
+
+#define BP_CONTEXT_MASK ((1ULL << BP_CONTEXT_BITS) - 1ULL)
 #define BP_NPC_MASK  0x7FFFFFFFFFULL        /* vaddr_width_p = 39 */
 #define BP_VAL_MASK  0x7FFFFFFFFFULL
 #define BP_REG_MASK  0x1FULL                /* 5-bit register address */
-#define BP_TID_SHIFT 39                     /* vaddr_width_p */
-#define BP_REG_SHIFT (BP_TID_SHIFT + BP_TID_BITS)
+#define BP_CONTEXT_SHIFT 39                 /* vaddr_width_p */
+#define BP_REG_SHIFT (BP_CONTEXT_SHIFT + BP_CONTEXT_BITS)
 #define BP_FP_SHIFT  (BP_REG_SHIFT + 5)
 
-static inline void seed_npc(uint64_t tid, uint64_t npc) {
-  uint64_t v = ((tid & BP_TID_MASK) << BP_TID_SHIFT) | (npc & BP_NPC_MASK);
+static inline void seed_npc(uint64_t context_id, uint64_t npc) {
+  uint64_t v = ((context_id & BP_CONTEXT_MASK) << BP_CONTEXT_SHIFT) | (npc & BP_NPC_MASK);
   __asm__ volatile("csrw 0x082, %0" : : "r"(v) : "memory");
 }
 
-static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
+static inline void seed_reg(uint64_t context_id, uint64_t reg, uint64_t val) {
   uint64_t v = (val & BP_VAL_MASK)
-             | ((tid & BP_TID_MASK) << BP_TID_SHIFT)
+             | ((context_id & BP_CONTEXT_MASK) << BP_CONTEXT_SHIFT)
              | ((reg & BP_REG_MASK) << BP_REG_SHIFT);
   __asm__ volatile("csrw 0x083, %0" : : "r"(v) : "memory");
 }
 
-static inline void seed_fp_reg(uint64_t tid, uint64_t reg, uint64_t val) {
+static inline void seed_fp_reg(uint64_t context_id, uint64_t reg, uint64_t val) {
   /* val is written directly into the FP regfile storage encoding. For recoded
    * FP implementations this is not the same as an IEEE double bit pattern. */
   uint64_t v = (val & BP_VAL_MASK)
-             | ((tid & BP_TID_MASK) << BP_TID_SHIFT)
+             | ((context_id & BP_CONTEXT_MASK) << BP_CONTEXT_SHIFT)
              | ((reg & BP_REG_MASK) << BP_REG_SHIFT)
              | (1ULL << BP_FP_SHIFT);
   __asm__ volatile("csrw 0x083, %0" : : "r"(v) : "memory");

@@ -6,6 +6,7 @@ LOG_DIR := $(shell pwd)/logs
 
 # Default NUM_THREADS if not specified on command line
 NUM_THREADS ?= 4
+NUM_CONTEXTS ?= $(NUM_THREADS)
 SCALE_SWITCHES ?= 2048
 SCALE_WARMUP ?= 256
 SCALE_UNROLL ?= 256
@@ -18,7 +19,8 @@ CFLAGS = -O2 \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/dramfs.specs \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/perch.specs \
           -DNUM_THREADS=$(NUM_THREADS) \
-          -DBP_NUM_THREADS=$(NUM_THREADS)
+          -DBP_NUM_THREADS=$(NUM_THREADS) \
+          -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
@@ -43,6 +45,9 @@ BENCHMARKS := \
     mt_ctxtsw_gap8_benchmark \
     mt_ctxtsw_ring_throughput_benchmark \
     mt_ctxtsw_ring_overhead_benchmark \
+    mt_ctxtsw_nonresident_fp_overhead_benchmark \
+    mt_ctxtsw_nonresident_gpr_overhead_benchmark \
+    mt_ctxtsw_nonresident_overhead_benchmark \
     mt_ctxtsw_single_overhead_benchmark \
     mt_ctxtsw_banyan_poll_worker_benchmark \
     mt_ctxtsw_predictor_pollution \
@@ -55,6 +60,12 @@ DEMOS := \
     multithreading_demo
 
 EXPERIMENTAL_TESTS := \
+    mt_ctxtsw_context_cache_cooperative_image \
+    mt_context_cache_l1_service_test \
+    mt_ctxtsw_nonresident_fp_ring_test \
+    mt_ctxtsw_nonresident_fp_target_test \
+    mt_ctxtsw_nonresident_ring_test \
+    mt_ctxtsw_nonresident_target_test \
     mt_ctxtsw_sv39_asid_remap_test
 
 SCALE_CONTEXTS := 8 16 32 64
@@ -70,7 +81,7 @@ $(LOG_DIR):
 	@mkdir -p $@
 
 define TEST_RULES
-$(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h | $(LOG_DIR)
+$(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h $(TOP)/testing/mt_context_image.h | $(LOG_DIR)
 	@echo "  [CC]    Compiling $(1).riscv (Threads: $(NUM_THREADS))..."
 	@$$(CC) -o $$@ $$< $$(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
 
@@ -78,7 +89,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
-	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 
@@ -96,7 +107,7 @@ run-ctxtsw_benchmark: $(ZP_RISCV_DIR)/bp-tests/ctxtsw_benchmark.riscv
 	@echo "  [CLEAN] Refreshing ctxtsw_benchmark environment..."
 	@rm -f $(SIM_DIR)/prog.riscv $(SIM_DIR)/prog.mem $(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing ctxtsw_benchmark in 16-context simulator..."
-	@$(MAKE) -C $(SIM_DIR) run PROG=ctxtsw_benchmark NUM_THREADS=16 $(if $(TRACE),TRACE=$(TRACE),) | grep -E "$(RUN_LOG_FILTER)"
+	@$(MAKE) -C $(SIM_DIR) run PROG=ctxtsw_benchmark NUM_THREADS=16 NUM_CONTEXTS=16 $(if $(TRACE),TRACE=$(TRACE),) | grep -E "$(RUN_LOG_FILTER)"
 	@! grep -Eq "CORE FAIL|\[BSG-FAIL\]" $(SIM_DIR)/run.log
 
 define SCALE_TEST_RULES
@@ -110,7 +121,7 @@ run-mt_ctxtsw_$(1)ctx_ring_throughput_benchmark: $(ZP_RISCV_DIR)/bp-tests/mt_ctx
 	@echo "  [CLEAN] Refreshing mt_ctxtsw_$(1)ctx_ring_throughput_benchmark environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing mt_ctxtsw_$(1)ctx_ring_throughput_benchmark in $(1)-context simulator..."
-	@$$(MAKE) -C $$(SIM_DIR) run PROG=mt_ctxtsw_$(1)ctx_ring_throughput_benchmark NUM_THREADS=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@$$(MAKE) -C $$(SIM_DIR) run PROG=mt_ctxtsw_$(1)ctx_ring_throughput_benchmark NUM_THREADS=$(1) NUM_CONTEXTS=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 
@@ -122,8 +133,8 @@ clean::
 	@$(RM) -rf $(LOG_DIR)
 
 build-sim: | $(LOG_DIR)
-	@echo "  [MODEL] Building Verilator model (Threads: $(NUM_THREADS))..."
-	@$(MAKE) -C $(SIM_DIR) build $(if $(filter-out 4,$(NUM_THREADS)),NUM_THREADS=$(NUM_THREADS),) > $(LOG_DIR)/verilator_build.log 2>&1 || \
+	@echo "  [MODEL] Building Verilator model (Threads: $(NUM_THREADS), Contexts: $(NUM_CONTEXTS))..."
+	@$(MAKE) -C $(SIM_DIR) build NUM_THREADS=$(NUM_THREADS) NUM_CONTEXTS=$(NUM_CONTEXTS) > $(LOG_DIR)/verilator_build.log 2>&1 || \
 		(echo "ERROR: Verilator build failed. Check $(LOG_DIR)/verilator_build.log"; exit 1)
 	@echo "  [SUCCESS] Model ready."
 
