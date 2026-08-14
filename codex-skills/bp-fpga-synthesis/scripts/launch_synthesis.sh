@@ -54,12 +54,13 @@ case ${1:-} in
     trap 'code=$?; if (( worker_ok )); then printf "PASS\n" >"$job_dir/status"; else printf "FAIL\n" >"$job_dir/status"; fi; exit $code' EXIT
     printf 'top_commit=%s\n' "$commit" >"$job_dir/revisions.txt"
     git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
-    # Optimization checkpoints may pin a local BlackParrot commit that has not
-    # been pushed upstream yet.  Seed that submodule from the source checkout;
-    # the other immutable dependencies can continue using their normal URLs.
+    # Optimization checkpoints may pin local BlackParrot or BaseJump commits
+    # that have not been pushed upstream yet. Seed those submodules from the
+    # source checkout; other immutable dependencies use their normal URLs.
     git -C "$worktree" submodule init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree" config submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
+    git -C "$worktree" config submodule.import/basejump_stl.url "$repo_dir/import/basejump_stl"
     git -c protocol.file.allow=always -C "$worktree" submodule update --init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree/import/black-parrot" submodule update --init \
@@ -81,6 +82,7 @@ case ${1:-} in
       exit 1
     fi
     git -C "$worktree/import/black-parrot" rev-parse HEAD | sed 's/^/black_parrot_commit=/' >>"$job_dir/revisions.txt"
+    git -C "$worktree/import/basejump_stl" rev-parse HEAD | sed 's/^/basejump_commit=/' >>"$job_dir/revisions.txt"
     make -j1 -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
       BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
       CFG=e_bp_unicore_zynqparrot_cfg \

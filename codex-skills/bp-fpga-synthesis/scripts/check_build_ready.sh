@@ -52,6 +52,17 @@ if [[ -e "$repo_dir/import/black-parrot/.git" ]]; then
   fi
 fi
 
+if [[ -e "$repo_dir/import/basejump_stl/.git" ]]; then
+  expected=$(git -C "$repo_dir" ls-tree HEAD import/basejump_stl | awk '{print $3}')
+  actual=$(git -C "$repo_dir/import/basejump_stl" rev-parse HEAD 2>/dev/null || true)
+  printf 'BSG pinned:  %.12s\n' "$expected"
+  printf 'BSG checkout:%.12s\n' "$actual"
+  if [[ "$expected" != "$actual" ]]; then
+    echo "FAIL: BaseJump checkout does not match the top-level gitlink"
+    fail=1
+  fi
+fi
+
 if [[ -n "$(git -C "$repo_dir" status --short --untracked-files=no)" ]]; then
   echo "WARN: tracked top-level files are modified; do not use this state for a baseline"
 fi
