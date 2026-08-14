@@ -46,7 +46,12 @@ case ${1:-} in
     commit=$3
     job_dir="$run_root/$job_id"
     worktree="/tmp/zynq-parrot-fpga-$job_id"
-    trap 'code=$?; if (( code == 0 )); then echo PASS >"$job_dir/status"; else echo FAIL >"$job_dir/status"; fi; exit $code' EXIT
+    # A shell exit code alone is not enough: interrupted Vivado child runs have
+    # previously made GNU make print "No child processes" while the worker's
+    # EXIT trap still observed zero.  Keep the pessimistic marker until every
+    # routed acceptance artifact has been checked explicitly.
+    worker_ok=0
+    trap 'code=$?; if (( worker_ok )); then printf "PASS\n" >"$job_dir/status"; else printf "FAIL\n" >"$job_dir/status"; fi; exit $code' EXIT
     printf 'top_commit=%s\n' "$commit" >"$job_dir/revisions.txt"
     git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
     # Optimization checkpoints may pin a local BlackParrot commit that has not
@@ -76,13 +81,38 @@ case ${1:-} in
       exit 1
     fi
     git -C "$worktree/import/black-parrot" rev-parse HEAD | sed 's/^/black_parrot_commit=/' >>"$job_dir/revisions.txt"
-    make -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
+    make -j1 -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
       BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
       CFG=e_bp_unicore_zynqparrot_cfg \
+      THREADS=4 \
       VIVADO_RUN="$script_dir/run_vivado_2024_2.sh" \
       ZP_INSTALL_DIR="$repo_dir/install" ZP_RISCV_DIR="$repo_dir/riscv"
-    "$script_dir/summarize_vivado.sh" "$worktree/cosim/black-parrot-example/vivado" >"$job_dir/summary.txt"
-    find "$worktree/cosim/black-parrot-example" -maxdepth 1 -name '*.tar.xz.b64' -exec cp -p {} "$job_dir/" \;
+    vivado_dir="$worktree/cosim/black-parrot-example/vivado"
+    example_dir="$worktree/cosim/black-parrot-example"
+    "$script_dir/summarize_vivado.sh" "$vivado_dir" >"$job_dir/summary.txt"
+
+    timing=$(find "$vivado_dir" -type f -name '*timing_summary_routed.rpt' -print -quit)
+    util=$(find "$vivado_dir" -type f \
+      \( -name '*utilization*placed*.rpt' -o -name '*utilization*routed*.rpt' \) \
+      -print -quit)
+    for required in \
+      "$vivado_dir/black_parrot_bd_1.bit" \
+      "$vivado_dir/black_parrot_bd_1.hwh" \
+      "$vivado_dir/black_parrot_bd_1.map" \
+      "$timing" "$util"; do
+      if [[ -z "$required" || ! -s "$required" ]]; then
+        echo "Missing routed acceptance artifact: ${required:-<report not found>}" >&2
+        exit 1
+      fi
+    done
+
+    packed=$(find "$example_dir" -maxdepth 1 -name '*.tar.xz.b64' -print -quit)
+    if [[ -z "$packed" || ! -s "$packed" ]]; then
+      echo "Missing packed bitstream artifact." >&2
+      exit 1
+    fi
+    cp -p "$packed" "$job_dir/"
+    worker_ok=1
     ;;
   list)
     mkdir -p "$run_root"
