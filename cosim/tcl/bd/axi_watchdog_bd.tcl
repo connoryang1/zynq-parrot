@@ -17,18 +17,22 @@ proc vivado_create_ip { args } {
     set file_list [list]
 
     set BASEJUMP_STL_DIR $::env(BASEJUMP_STL_DIR)
+    set BP_RTL_DIR $::env(BP_RTL_DIR)
     set BP_SUB_DIR $::env(BP_SUB_DIR)
     set DESIGN_VSRC_DIR $::env(DESIGN_VSRC_DIR)
     set COSIM_VSRC_DIR $::env(COSIM_VSRC_DIR)
 
-    lappend dir_list "${BASEJUMP_STL_DIR}/bsg_misc"
+    # Use the same bsg_defines.sv revision as the BlackParrot IP. Packaging
+    # different macro headers into the top and watchdog IPs makes Vivado issue
+    # filemgmt 20-1741 and declare the combined result unpredictable.
+    lappend dir_list "${BP_RTL_DIR}/external/basejump_stl/bsg_misc"
     lappend dir_list "${BASEJUMP_STL_DIR}/bsg_tag"
-    lappend file_list "${BASEJUMP_STL_DIR}/bsg_misc/bsg_defines.sv"
+    lappend file_list "${BP_RTL_DIR}/external/basejump_stl/bsg_misc/bsg_defines.sv"
     lappend file_list "${BASEJUMP_STL_DIR}/bsg_tag/bsg_tag.svh"
 
     lappend file_list "${BASEJUMP_STL_DIR}/bsg_axi/bsg_axi_pkg.sv"
     lappend file_list "${BASEJUMP_STL_DIR}/bsg_tag/bsg_tag_pkg.sv"
-    lappend file_list "${BASEJUMP_STL_DIR}/bsg_misc/bsg_defines.sv"
+    lappend file_list "${BP_RTL_DIR}/external/basejump_stl/bsg_misc/bsg_defines.sv"
     lappend file_list "${BASEJUMP_STL_DIR}/bsg_tag/bsg_tag.svh"
     lappend file_list "${BASEJUMP_STL_DIR}/hard/ultrascale_plus/bsg_async/bsg_launch_sync_sync.sv"
     lappend file_list "${BASEJUMP_STL_DIR}/bsg_dataflow/bsg_one_fifo.sv"
@@ -73,4 +77,3 @@ proc vivado_create_ip { args } {
 proc vivado_ipx_customize { args } {
     ipx::remove_bus_parameter FREQ_HZ [ipx::get_bus_interfaces CLK.ACLK -of_objects [ipx::current_core]]
 }
-
