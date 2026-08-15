@@ -200,9 +200,14 @@ restore lines. Its clean benchmark waveform measured a dominant 16-cycle
 nonresident first dispatch and next-switch interval, exactly four cycles above
 the rejected atomic/control lower bound.
 
-The current revision `3de88ae9` doubles the line to sixteen registers and banks
-the physical register file by lane. Two synchronous 1,024-bit lines restore a
-context. Clean acceptance evidence is:
+Revision `3de88ae9` doubles the line to sixteen registers and banks the physical
+register file by lane. Two synchronous 1,024-bit lines restore a context.
+Revision `056da4f5` removes the now-redundant restore tail: the final line is
+written on the edge that enters FE launch, so the redirect cannot expose
+partial register state. Revision `be73b6e7` banks the dedicated backing store
+into the same sixteen 64-bit lanes and replaces data-array reset with compact
+valid bits, allowing each lane to infer as a one-read/one-write synchronous
+RAM. Clean acceptance evidence for the current checkpoint is:
 
 | Gate / metric | Result |
 | --- | ---: |
@@ -210,16 +215,17 @@ context. Clean acceptance evidence is:
 | `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,280 retired |
 | Resident first useful dispatch | 502 intervals at 4 cycles |
-| Nonresident first useful dispatch | 470 intervals at 14 cycles; 10 at 15 cycles |
-| Steady next-context-switch throughput | 462 intervals at 14 cycles |
+| Nonresident first useful dispatch | 474 intervals at 13 cycles; 10 at 14 cycles |
+| Steady next-context-switch throughput | 466 intervals at 13 cycles |
 | CTXT dispatch to architectural commit | 1,023 intervals at 3 cycles |
-| I-cache fetches in measured window | 79,163 / 79,163 hits; no classified misses |
+| I-cache fetches in measured window | 78,253 / 78,253 hits; no classified misses |
 
-The lane-banked storage refactor has the identical waveform histogram to the
-flat two-line implementation, so it adds no architectural latency. The
-remaining acceptance question is whether Vivado maps the dedicated store and
-lane memories densely enough to fit and route on PYNQ-Z2; no FPGA-fit claim is
-made until the routed reports and bitstream exist.
+The physical-register and backing-store banking refactors have identical
+waveform histograms to their corresponding flat implementation, so neither adds
+architectural latency. The live 14-cycle FPGA checkpoint already reports the
+resident register file as sixteen inferred `4 x 66` distributed-RAM banks; the
+current backing-store banking still requires its own routed checkpoint. No
+final FPGA-fit claim is made until the routed reports and bitstream exist.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
