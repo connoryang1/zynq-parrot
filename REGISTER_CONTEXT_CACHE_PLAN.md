@@ -1,23 +1,29 @@
 # Register Context Cache Plan
 
-## Current Implementation Status (2026-07-25)
+## Current Implementation Status (2026-08-15)
 
-The original L1/Dcache-backed GPR service has been replaced on branch
-`ctxtsw-context-sram` by a dedicated private context-memory interface:
+Branch `ctxtsw-context-sram` again has genuinely bounded GPR residency: two
+physical integer-register banks serve the two hardware slots, while logical
+context images live in a dedicated private context store. The store is
+write-through, so ordinary writeback and CSR remote writes keep each logical
+image current and eviction requires no save scan. A nonresident miss restores
+the incoming 32-register image as two synchronous 16-register lines before
+installing its saved NPC/privilege/translation/CSR metadata and redirecting FE.
 
-- `bp_be_context_mem.sv` stores logical-context GPR images independently of the
-  normal Dcache.
-- Nonresident saves write the context memory directly; restores request four
-  wide register lines into a local buffer before writing the physical regfile.
-- Restore uses both existing physical-regfile write ports, so it installs two
-  GPRs per cycle. Save now uses both physical-regfile read lanes and two
-  context-memory write lanes.
-- FP nonresident copying is explicitly disabled for this GPR-only phase; CSR
-  and execution metadata remain virtualized.
+The physical register file is partitioned into sixteen 64-bit lanes. Each lane
+has the normal scalar write path and one restore write, avoiding synthesis of a
+single array with sixteen arbitrary write ports. This preserves capacity
+separation: increasing logical contexts grows the dense backing store, not the
+number of pipeline-facing GPR banks.
 
-The dedicated-memory restore is verified by clean `TRACE=1` runs of
-`mt_ctxtsw_nonresident_gpr_overhead_benchmark` and
-`mt_ctxtsw_nonresident_ring_test`.
+Nonresident FP copying is explicitly disabled for this GPR-only configuration;
+ordinary resident FP execution remains enabled and passes the clean traced FP
+register-isolation test. CSR and execution metadata remain virtualized.
+
+The current checkpoint is verified by clean `TRACE=1` runs of the nonresident
+overhead benchmark, nonresident ring test, and late-writeback hazard test, plus
+waveform analysis of 1,023 architectural context-switch intervals. Routed FPGA
+mapping remains the active acceptance gate.
 
 ## Context-Switch Timing Record
 
@@ -127,6 +133,93 @@ is distinct from the primary waveform metric: the architectural nonresident
 redirect reaches the first useful target dispatch in the dominant 12-cycle
 bucket. Longer 68--118-cycle observations correlate with frontend
 abort/refill tails and are not register-transfer latency.
+
+### Optimization 3: Virtual-Context Integer Register File (2026-08-14)
+
+The integer register file is now indexed by virtual context rather than by the
+smaller set of physical resident slots. This removes the physical-bank/shadow
+image GPR transfer entirely. The nonresident FSM still waits for architectural
+commit and a safe backend drain, updates the virtual-context slot mapping and
+metadata, preserves an ordering tail, and launches the normal FE redirect.
+
+A fresh from-scratch `TRACE=1` build is required for this checkpoint. An older
+preserved waveform had been produced with reused generated hardware and mixed
+resident and nonresident observations; it is retained only as stale-artifact
+evidence and is not used for the current claim. The clean current waveform over
+1,023 intervals reports:
+
+| Path / metric | Result |
+| --- | ---: |
+| Resident first useful dispatch | 502 intervals at 4 cycles |
+| Nonresident first useful dispatch | 478 intervals at 12 cycles; 10 at 13 cycles |
+| CTXT dispatch to architectural commit | 1,023 intervals at 3 cycles |
+| Frontend abort/refill tails | 33 intervals, 60--118 cycles to first dispatch |
+| I-cache fetches in measured window | 77,337 / 77,337 hits; no classified misses |
+
+The dominant nonresident accounting is three cycles from CTXT dispatch to
+commit, approximately six cycles from commit through drain observation,
+mapping/metadata installation, ordering, FE launch, and target FE-queue
+arrival, then three cycles from FE-queue arrival to first useful BE dispatch.
+The unified register file therefore removes transfer hardware and storage
+crossbars without reducing the already fixed 12-cycle architectural path from
+the atomic-bank checkpoint. It should not be reported as a 12-to-4-cycle
+nonresident speedup; the 4-cycle bucket is resident switching.
+
+This checkpoint was subsequently rejected as the final architecture. It
+allocated one complete pipeline-facing GPR bank per logical context, so its
+12-cycle result removed the capacity-cache property rather than implementing a
+scalable resident/nonresident store. It remains useful only as the measured
+control-only lower bound.
+
+Clean acceptance gates for the final RTL checkpoint:
+
+| Gate | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS |
+| Warm benchmark interval | `0x421 / 256 = 4.12` cycles/switch; not a nonresident-only latency |
+
+The PYNQ-Z2 implementation at top revision `2686658` and BlackParrot revision
+`02fccc8a` placed and routed at 51,398 / 53,200 LUTs (96.61%) with WNS
+`+1.759 ns` and TNS `0`, but bitstream generation correctly failed on Vivado
+`LUTLP-1`, a context-redirect/I-cache/UCE combinational-loop DRC. The forced
+request acceptance rewrite at top revision `021230c` / BlackParrot `8deb7016`
+also routed but failed the same bitstream DRC in FPGA job
+`20260814T213419Z-021230c`. BlackParrot revision `af19f5e0` instead removes the
+feedback structurally by holding the speculative TV stage flushed for the
+entire pending redirect; it passed clean traced ring and late-writeback tests.
+
+### Optimization 4: Write-Through, Synchronous SRAM Lines (2026-08-15)
+
+BlackParrot revision `fb987b60` restored two physical GPR banks and the active
+dedicated context store. Revision `a24d2711` made that store write-through,
+eliminating outgoing save traffic. Revision `b945330f` replaced the
+non-synthesizable one-edge 2,048-bit exchange with four synchronous 512-bit
+restore lines. Its clean benchmark waveform measured a dominant 16-cycle
+nonresident first dispatch and next-switch interval, exactly four cycles above
+the rejected atomic/control lower bound.
+
+The current revision `3de88ae9` doubles the line to sixteen registers and banks
+the physical register file by lane. Two synchronous 1,024-bit lines restore a
+context. Clean acceptance evidence is:
+
+| Gate / metric | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,280 retired |
+| Resident first useful dispatch | 502 intervals at 4 cycles |
+| Nonresident first useful dispatch | 470 intervals at 14 cycles; 10 at 15 cycles |
+| Steady next-context-switch throughput | 462 intervals at 14 cycles |
+| CTXT dispatch to architectural commit | 1,023 intervals at 3 cycles |
+| I-cache fetches in measured window | 79,163 / 79,163 hits; no classified misses |
+
+The lane-banked storage refactor has the identical waveform histogram to the
+flat two-line implementation, so it adds no architectural latency. The
+remaining acceptance question is whether Vivado maps the dedicated store and
+lane memories densely enough to fit and route on PYNQ-Z2; no FPGA-fit claim is
+made until the routed reports and bitstream exist.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
