@@ -26,6 +26,11 @@ package bp_common_pkg;
       ,num_threads: 2
       ,num_contexts: 4
 
+      // The PYNQ-Z2 context-switch image is integer-only.  Omitting the FP
+      // execution units recovers the LUT margin required by the scalable
+      // resident/nonresident context store; integer mul/div remain enabled.
+      ,fpu_support: 0
+
       ,icache_fill_width: 64
 
       ,dcache_fill_width: 64

@@ -298,6 +298,32 @@ and +6; FE redirect acceptance at +7; and first useful target-context dispatch
 at +12. Relative to Optimization 5, overlapping the two synchronous reads
 removes exactly one cycle/switch from the dominant scalable SRAM-backed path.
 
+### FPGA Fit Step: Integer-Only ZynqParrot Configuration (2026-08-16)
+
+The failed scalable synthesis checkpoint was 2,061 slice LUTs over the PYNQ-Z2
+capacity. A depth-30 hierarchical utilization report attributed 1,654 LUTs to
+the FP FMA pipe, 1,262 LUTs to FP divide/square-root, and additional LUTs and
+RAM to the FP register/control path. The context-switch workload and target
+FPGA image are integer-only, so `fpu_support` is now zero in both ZynqParrot
+configuration packages. Integer multiply/divide remain enabled. This is an
+FPGA/configuration fit step, not a context-switch cycle optimization.
+
+After a from-scratch `TRACE=1` rebuild, clean isolated validation produced:
+
+| Gate / metric | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,280 retired |
+| Resident first useful dispatch | 502 switches at 4 cycles/switch |
+| Nonresident first useful dispatch | 479 switches at 12 cycles/switch; 10 at 13 cycles/switch |
+| Steady nonresident next-switch throughput | 470 intervals at 12 cycles/switch |
+| Sampled I-cache misses | 0 |
+
+The waveform histogram is identical to the FP-capable 12-cycle checkpoint, so
+the area change adds zero cycles/switch. Routed utilization, timing, and
+bitstream evidence is required before claiming that it fits.
+
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
 The trace shows that the 12-cycle architectural path is already hidden beneath
