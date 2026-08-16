@@ -235,6 +235,33 @@ resident register file as sixteen inferred `4 x 66` distributed-RAM banks; the
 current backing-store banking still requires its own routed checkpoint. No
 final FPGA-fit claim is made until the routed reports and bitstream exist.
 
+### Optimization 5: FPGA Block-RAM Mapping (2026-08-16)
+
+The scalable two-slot design exceeded the PYNQ-Z2 LUT capacity because both the
+sixteen-lane dedicated context store and the two-read physical GPR file mapped
+to distributed RAM and surrounding LUT logic.  Each context-store lane now
+requests block RAM.  Each physical GPR lane uses two mirrored one-read/one-write
+block memories, one per architectural read port, with identical writes to both
+copies.  This preserves the existing two-read/one-write interface and does not
+add a register-transfer cycle.
+
+A from-scratch `TRACE=1` Verilator rebuild and clean tests produced:
+
+| Gate / metric | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,280 retired |
+| Resident first useful dispatch | 502 intervals at 4 cycles/switch |
+| Nonresident first useful dispatch | 475 intervals at 13 cycles/switch; 10 at 14 cycles/switch |
+| Steady nonresident next-switch throughput | 466 intervals at 13 cycles/switch |
+| Sampled I-cache misses | 0 |
+
+The prior accepted waveform had 474 rather than 475 intervals in the dominant
+13-cycle first-dispatch bucket because of measurement-window classification;
+the steady 466-at-13 next-switch bucket is identical.  Routed PYNQ-Z2 resource,
+timing, and bitstream validation remains pending for this checkpoint.
+
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
 The trace shows that the 12-cycle architectural path is already hidden beneath
