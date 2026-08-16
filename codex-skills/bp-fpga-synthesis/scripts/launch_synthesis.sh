@@ -70,7 +70,13 @@ case ${1:-} in
     git -C "$worktree" config submodule.import/basejump_stl.url "$repo_dir/import/basejump_stl"
     git -c protocol.file.allow=always -C "$worktree" submodule update --init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
-    git -C "$worktree/import/black-parrot" submodule update --init \
+    git -C "$worktree/import/black-parrot" submodule init \
+      external/basejump_stl external/HardFloat external/bedrock
+    git -C "$worktree/import/black-parrot" config \
+      submodule.external/basejump_stl.url \
+      "$repo_dir/import/black-parrot/external/basejump_stl"
+    git -c protocol.file.allow=always -C "$worktree/import/black-parrot" \
+      submodule update --init \
       external/basejump_stl external/HardFloat external/bedrock
     git -C "$worktree/import/black-parrot-subsystems" submodule update --init \
       import/riscv-dbg
@@ -90,6 +96,8 @@ case ${1:-} in
     fi
     git -C "$worktree/import/black-parrot" rev-parse HEAD | sed 's/^/black_parrot_commit=/' >>"$job_dir/revisions.txt"
     git -C "$worktree/import/basejump_stl" rev-parse HEAD | sed 's/^/basejump_commit=/' >>"$job_dir/revisions.txt"
+    git -C "$worktree/import/black-parrot/external/basejump_stl" rev-parse HEAD \
+      | sed 's/^/black_parrot_basejump_commit=/' >>"$job_dir/revisions.txt"
     make -j1 -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
       BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
       CFG=e_bp_unicore_zynqparrot_cfg \
