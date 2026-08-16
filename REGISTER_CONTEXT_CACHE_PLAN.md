@@ -186,9 +186,14 @@ The PYNQ-Z2 implementation at top revision `2686658` and BlackParrot revision
 `LUTLP-1`, a context-redirect/I-cache/UCE combinational-loop DRC. The forced
 request acceptance rewrite at top revision `021230c` / BlackParrot `8deb7016`
 also routed but failed the same bitstream DRC in FPGA job
-`20260814T213419Z-021230c`. BlackParrot revision `af19f5e0` instead removes the
-feedback structurally by holding the speculative TV stage flushed for the
-entire pending redirect; it passed clean traced ring and late-writeback tests.
+`20260814T213419Z-021230c`. BlackParrot revision `af19f5e0` held the
+speculative TV stage flushed for the entire pending redirect and passed clean
+traced ring and late-writeback tests, but FPGA job
+`20260815T222727Z-fb55152` proved that the broader `e_resume` acceptance path
+still contained the same FE/I-cache/UCE feedback loop. Revision `e47c3b5e`
+forces I-cache acceptance in `e_resume`, making TL acceptance independent of
+TV/controller state. This is the current structural loop fix; its routed DRC
+result is still pending.
 
 ### Optimization 4: Write-Through, Synchronous SRAM Lines (2026-08-15)
 
@@ -207,11 +212,14 @@ written on the edge that enters FE launch, so the redirect cannot expose
 partial register state. Revision `be73b6e7` banks the dedicated backing store
 into the same sixteen 64-bit lanes and replaces data-array reset with compact
 valid bits, allowing each lane to infer as a one-read/one-write synchronous
-RAM. Clean acceptance evidence for the current checkpoint is:
+RAM. Revision `e47c3b5e` adds the independent frontend resume-loop fix. Clean
+acceptance evidence for the current checkpoint is:
 
 | Gate / metric | Result |
 | --- | ---: |
 | `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_smoke_test` | CORE/BSG PASS, 3,515 retired |
+| `mt_frf_isolation_test` | CORE/BSG PASS, 13,358 retired |
 | `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,280 retired |
 | Resident first useful dispatch | 502 intervals at 4 cycles |
