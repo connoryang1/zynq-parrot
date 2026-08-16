@@ -335,8 +335,41 @@ configuration and reduces replicated L2 control/data-path logic. It changes
 aggregate L2 capacity/bandwidth, not the dedicated context SRAM, physical
 resident-bank count, or context-switch handoff sequence, so its expected
 context-switch cost is zero cycles/switch. `make -j24 prep_lite` and the FPGA
-build-readiness audit pass. Routed utilization, timing, and packaged-bitstream
-evidence remain required before accepting this fit checkpoint.
+build-readiness audit pass.
+
+Top revision `1341957` with BlackParrot revision `1af58ce5` synthesized,
+placed, and fully routed. The placed image uses 47,638 / 53,200 slice LUTs
+(89.55%), 21,323 / 106,400 slice registers (20.04%), 80 / 140 block-RAM tiles
+(57.14%), and 11 / 220 DSPs (5.00%). All 73,981 routable nets are fully routed
+with zero routing errors. Routed timing meets constraints with WNS +1.454 ns,
+TNS 0.000 ns, WHS +0.026 ns, and THS 0.000 ns. Bitstream generation was blocked
+only by DRC `LUTLP-1`, which found one nine-LUT combinational loop from frontend
+context-redirect acceptance through the I-cache/UCE ready path.
+
+### FPGA DRC Fix: Registered Frontend Redirect Slice (2026-08-16)
+
+The BE-to-FE context redirect now crosses a one-entry registered ready/valid
+slice. The frontend captures the NPC, physical thread, privilege, translation,
+and ASID payload only after the BE has reached its launch point, holds it while
+the I-cache is backpressured, and acknowledges I-cache acceptance separately.
+This removes the routed ready-to-valid feedback without waiving the DRC or
+exposing a nonresident redirect before register installation completes.
+
+A direct valid/ready split was tested first and rejected: although functional
+smoke tests passed, waveform analysis showed premature 4-cycle nonresident
+redirects and 256 additional retired instructions. That experiment was fully
+reverted before implementing the registered slice.
+
+The registered slice passes a from-scratch `TRACE=1` model rebuild and clean
+isolated gates: nonresident ring CORE/BSG PASS with 4,021 retired instructions,
+late-writeback CORE/BSG PASS with 5,402 retired instructions, and the overhead
+benchmark CORE/BSG PASS with 20,277 retired instructions. Waveform analysis of
+1,023 switches reports zero sampled I-cache misses. Resident first-useful
+dispatch moves from four to five cycles/switch (502 samples), while the primary
+nonresident result remains twelve cycles/switch (474 samples; ten at thirteen)
+and steady nonresident next-switch throughput remains dominated by twelve
+cycles/switch (466 samples). A new routed implementation and packaged bitstream
+are still required to prove that `LUTLP-1` is eliminated.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
