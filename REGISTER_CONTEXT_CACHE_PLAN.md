@@ -321,8 +321,22 @@ After a from-scratch `TRACE=1` rebuild, clean isolated validation produced:
 | Sampled I-cache misses | 0 |
 
 The waveform histogram is identical to the FP-capable 12-cycle checkpoint, so
-the area change adds zero cycles/switch. Routed utilization, timing, and
-bitstream evidence is required before claiming that it fits.
+the area change adds zero cycles/switch. Routed implementation at top revision
+`1c4d260` passed global placement but failed detail packing: 58,113 combined
+LUTs and 24,397 FFs required 11,802 slices while 11,188 were available. Vivado
+reported 401 control sets; the low FF count and excess combined LUT count show
+that LUT/slice pressure, not register or BRAM capacity, remains the limiter.
+
+### FPGA Fit Step: Single-Slice L2 (2026-08-16)
+
+The PYNQ-Z2 unicore configuration now uses one L2 slice and one bank rather
+than two of each. This matches the already verified minimal simulation
+configuration and reduces replicated L2 control/data-path logic. It changes
+aggregate L2 capacity/bandwidth, not the dedicated context SRAM, physical
+resident-bank count, or context-switch handoff sequence, so its expected
+context-switch cost is zero cycles/switch. `make -j24 prep_lite` and the FPGA
+build-readiness audit pass. Routed utilization, timing, and packaged-bitstream
+evidence remain required before accepting this fit checkpoint.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
