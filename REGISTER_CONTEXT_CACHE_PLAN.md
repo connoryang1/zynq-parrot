@@ -1,6 +1,6 @@
 # Register Context Cache Plan
 
-## Current Implementation Status (2026-08-15)
+## Current Implementation Status (2026-08-16)
 
 Branch `ctxtsw-context-sram` again has genuinely bounded GPR residency: two
 physical integer-register banks serve the two hardware slots, while logical
@@ -22,8 +22,10 @@ register-isolation test. CSR and execution metadata remain virtualized.
 
 The current checkpoint is verified by clean `TRACE=1` runs of the nonresident
 overhead benchmark, nonresident ring test, and late-writeback hazard test, plus
-waveform analysis of 1,023 architectural context-switch intervals. Routed FPGA
-mapping remains the active acceptance gate.
+waveform analysis of 1,024 architectural context switches. Early backing-store
+reads now overlap the architectural commit/drain wait, reducing the dominant
+nonresident path from 13 to 12 cycles/switch without installing speculative
+state. Routed FPGA fit remains the active acceptance gate.
 
 ## Context-Switch Timing Record
 
@@ -260,7 +262,41 @@ A from-scratch `TRACE=1` Verilator rebuild and clean tests produced:
 The prior accepted waveform had 474 rather than 475 intervals in the dominant
 13-cycle first-dispatch bucket because of measurement-window classification;
 the steady 466-at-13 next-switch bucket is identical.  Routed PYNQ-Z2 resource,
-timing, and bitstream validation remains pending for this checkpoint.
+timing, and bitstream validation failed at placement for top revision `a492da0`
+and BlackParrot revision `8097cb9c`: synthesis used 55,261 / 53,200 slice LUTs
+(103.87%) and 89 / 140 block-RAM tiles (63.57%). The placer reported 64,751 raw
+LUTs, 399 control sets, and 11,625 slices required with 11,165 available. This
+proves the RAMs infer correctly, but the scalable checkpoint still needs an
+independent area reduction before it fits the PYNQ-Z2.
+
+### Optimization 6: Commit/Drain-Overlapped SRAM Prefetch (2026-08-16)
+
+The two incoming SRAM lines are now requested immediately after a nonresident
+miss is captured, while the switching instruction proceeds to architectural
+commit and the victim backend drains. Responses remain in private line
+buffers. The physical GPR bank is not modified until the existing drain-safe
+predicate has been observed, after which the two lines are installed on two
+successive clocks. This consumes the existing one-read/one-write context-SRAM
+interface and adds no memory ports or register-file ports.
+
+A from-scratch `TRACE=1` model rebuild and clean isolated runs produced:
+
+| Gate / metric | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,280 retired |
+| Resident first useful dispatch | 502 switches at 4 cycles/switch |
+| Nonresident first useful dispatch | 479 switches at 12 cycles/switch; 10 at 13 cycles/switch |
+| Steady nonresident next-switch throughput | 470 intervals at 12 cycles/switch |
+| Sampled I-cache misses | 0 |
+
+The representative dominant path is: miss dispatch at cycle 0; SRAM line 0
+request at +1; line 0 response and line 1 request at +2; line 1 response and
+architectural commit at +3; drain observation at +4; line installation at +5
+and +6; FE redirect acceptance at +7; and first useful target-context dispatch
+at +12. Relative to Optimization 5, overlapping the two synchronous reads
+removes exactly one cycle/switch from the dominant scalable SRAM-backed path.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
