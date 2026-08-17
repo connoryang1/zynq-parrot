@@ -371,6 +371,45 @@ and steady nonresident next-switch throughput remains dominated by twelve
 cycles/switch (466 samples). A new routed implementation and packaged bitstream
 are still required to prove that `LUTLP-1` is eliminated.
 
+The routed PYNQ-Z2 implementation at top revision `13f996e` and BlackParrot
+revision `41569c9b` proves that the registered redirect removed the earlier
+BE-to-FE loop. It fits at 47,671 / 53,200 slice LUTs (89.61%), 21,368 /
+106,400 registers (20.08%), 80 / 140 block-RAM tiles (57.14%), and 11 / 220
+DSPs (5.00%). Routing completed with zero routing errors and met timing with
+WNS `+0.434 ns`, TNS `0`, WHS `+0.023 ns`, and THS `0`. Bitstream generation
+found one different nine-LUT `LUTLP-1` path through I-cache miss-abort
+completion, SRAM arbitration, and UCE refill counters. Reports are preserved
+under `logs/fpga/20260816T220048Z-13f996e/routed-reports/`.
+
+### FPGA DRC Fix: Independent I-cache Abort Decision (2026-08-16)
+
+BlackParrot revision `1f28f68f` removes the remaining feedback equation without
+buffering or prematurely accepting a refill packet. The UCE already holds
+`cache_req_last_i` and its associated refill packets until their SRAM
+handshakes complete. The I-cache therefore uses that held last-beat intent only
+to decide whether a simultaneous frontend force should abort the miss. Its
+actual miss-to-recover transition continues to use `complete_recv`, which
+requires every valid tag, data, and stat packet to have been accepted.
+
+A combined response-buffer experiment was rejected before this change because
+it reproduced the known premature-redirect signature: the tests completed, but
+the benchmark retired 20,533 rather than 20,277 instructions. The independent
+abort decision preserves the accepted architectural results:
+
+| Gate / metric | Result |
+| --- | ---: |
+| `mt_ctxtsw_nonresident_ring_test` | CORE/BSG PASS, 4,021 retired |
+| `mt_ctxtsw_late_wb_hazard_test` | CORE/BSG PASS, 5,402 retired |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | CORE/BSG PASS, 20,277 retired |
+| Resident first useful dispatch | 502 switches at 5 cycles/switch |
+| Nonresident first useful dispatch | 474 switches at 12 cycles/switch; 10 at 13 cycles/switch |
+| Steady nonresident next-switch throughput | 466 intervals at 12 cycles/switch |
+| Sampled I-cache fetches | 78,213 / 78,213 hits; no classified misses |
+| I-cache data-select audit | 0 bad selections on hits |
+
+A fresh routed implementation and packaged bitstream remain required before
+this DRC fix is accepted as the FPGA checkpoint.
+
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
 The trace shows that the 12-cycle architectural path is already hidden beneath
