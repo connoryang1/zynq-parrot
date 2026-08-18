@@ -47,6 +47,7 @@ BENCHMARKS := \
     mt_ctxtsw_ring_overhead_benchmark \
     mt_ctxtsw_nonresident_fp_overhead_benchmark \
     mt_ctxtsw_nonresident_gpr_overhead_benchmark \
+    mt_ctxtsw_nonresident_cold_icache_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark \
     mt_ctxtsw_single_overhead_benchmark \
     mt_ctxtsw_banyan_poll_worker_benchmark \
@@ -75,6 +76,7 @@ EXPERIMENTAL_TESTS := \
 NONRESIDENT_TESTS := \
     mt_ctxtsw_nonresident_fp_overhead_benchmark \
     mt_ctxtsw_nonresident_gpr_overhead_benchmark \
+    mt_ctxtsw_nonresident_cold_icache_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark \
     mt_ctxtsw_nonresident_fp_ring_test \
     mt_ctxtsw_nonresident_fp_target_test \

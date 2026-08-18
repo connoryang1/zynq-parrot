@@ -429,17 +429,39 @@ abort decision preserves the accepted architectural results:
 | Sampled I-cache fetches | 78,213 / 78,213 hits; no classified misses |
 | I-cache data-select audit | 0 bad selections on hits |
 
-A fresh routed implementation and packaged bitstream of revision `12fc8983`
-remain required before this DRC fix is accepted as the FPGA checkpoint.
+A fresh PYNQ-Z2 implementation at top revision `6986071` and BlackParrot
+revision `12fc8983` completed as FPGA job
+`20260818T015748Z-6986071`. All routable nets were routed, bitstream
+precondition DRC completed with zero errors, and the packaged
+`black_parrot_bd_1.zynq.pynqz2.tar.xz.b64` artifact was produced. Final timing
+is WNS `+2.341 ns`, TNS `0`, WHS `+0.025 ns`, and THS `0`. The placed image
+uses 47,950 / 53,200 slice LUTs (90.13%), 21,368 / 106,400 registers
+(20.08%), 80 / 140 block-RAM tiles (57.14%), and 11 / 220 DSPs (5.00%). No
+`LUTLP-1` or timing-loop finding remains. The console log, packaged artifact,
+summary, and preserved routed reports are under
+`logs/fpga/20260818T015748Z-6986071/`.
 
-### Cold-I-cache Overlap Assessment (2026-08-08)
+### Cold-I-cache Overlap Assessment (2026-08-18)
 
-The trace shows that the 12-cycle architectural path is already hidden beneath
-frontend activity when the target line is present. First-touch switches instead
-form 68--118-cycle tails with repeated I-cache abort/request/refill activity.
-Only about four committed backend cycles remain between `commit_pkt.ctxtsw` and
-the normal FE launch, so even ideal overlap at that point can hide only a small
-fraction of a cold refill.
+`mt_ctxtsw_nonresident_cold_icache_benchmark` forces the two separately aligned
+target loops cold with `fence.i`. A 128-instruction runway follows each fence so
+cache maintenance is complete before the context-switch CSR dispatches; placing
+the CSR directly behind `fence.i` was rejected because the waveform showed the
+CSR dispatch while the fence transaction was still active, after which the CSR
+never committed. The corrected four-iteration test produces eight alternating
+nonresident switches and reaches CORE/BSG PASS with 8,191 retired instructions.
+
+The clean `TRACE=1` baseline contains two cold-tail classes. With no stale
+old-context miss, the target request starts 12 cycles after context-switch
+dispatch, its critical beat arrives at +24, its final beat at +66, and the first
+useful target dispatch occurs at +69 (four samples). When speculative
+fall-through fetch has already started an old-context miss, abort begins at +9,
+finishes at +59, the target request starts at +60, its final beat arrives at
++114, and first useful dispatch occurs at +117 (four samples). Context-switch
+commit itself remains +3. Thus the accepted 12-cycle SRAM transfer floor is
+unchanged; the additional 57 or 105 cycles are entirely single-MSHR frontend
+abort/refill tails. The data-select audit found zero bad selections across
+8,769 hit samples.
 
 An isolated experiment asserted the existing architectural FE context redirect
 immediately after context-switch commit and held backend issue suppressed until
@@ -455,6 +477,16 @@ plus cancellation and MSHR arbitration semantics. Given the observed refill
 length and only four committed transfer cycles available for overlap, that is
 not justified as part of this minimum-overhead checkpoint without a broader FE
 prefetch design and dedicated correctness tests.
+
+The existing critical-beat datapath was also tested as a narrower alternative:
+allowing its snooped word through `hit_v_o` before the cache FSM reached
+`e_ready` reduced the apparent tail but changed the known-good nonresident ring
+from 4,021 to 4,071 retired instructions. That replay/duplication experiment was
+fully reverted. A safe critical-word restart needs an explicit one-shot
+ready/valid holding stage while refill continues; it is not a low-risk gate
+change. A second MSHR could also avoid the 48-cycle stale-miss penalty, but at
+90.13% LUT utilization it is a larger area/timing project requiring its own
+routed checkpoint.
 
 ## Storage Clarification
 
