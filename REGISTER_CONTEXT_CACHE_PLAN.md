@@ -401,6 +401,18 @@ existing frontend-fast-path priority. The actual miss-to-recover transition
 continues to use `complete_recv`; no response is buffered, replayed, or exposed
 before its memory packets are applied.
 
+Synthesis job `20260818T004321Z-2cc1d00` showed that this event-priority mux was
+still not structurally acyclic: the UCE sideband selected the priority branch,
+while the resulting yumi advanced the counter that generated that sideband.
+That job was also stopped after the synthesis timing-loop report. BlackParrot
+revision `12fc8983` removes the dependency completely. Any UCE memory packet
+stalls the frontend cache pipeline for that cycle and is accepted
+unconditionally; a simultaneous forced abort discards the packet while its tag
+invalidation takes priority. Consequently critical/last are already aligned
+accepted events and no SRAM availability signal feeds a UCE counter. This can
+affect only cycles containing I-cache refill/maintenance traffic, not the hot
+context-SRAM transfer path.
+
 A combined response-buffer experiment was rejected before this change because
 it reproduced the known premature-redirect signature: the tests completed, but
 the benchmark retired 20,533 rather than 20,277 instructions. The independent
@@ -417,7 +429,7 @@ abort decision preserves the accepted architectural results:
 | Sampled I-cache fetches | 78,213 / 78,213 hits; no classified misses |
 | I-cache data-select audit | 0 bad selections on hits |
 
-A fresh routed implementation and packaged bitstream of revision `629a4757`
+A fresh routed implementation and packaged bitstream of revision `12fc8983`
 remain required before this DRC fix is accepted as the FPGA checkpoint.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
