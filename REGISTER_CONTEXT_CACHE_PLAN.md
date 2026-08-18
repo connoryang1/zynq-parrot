@@ -383,13 +383,23 @@ under `logs/fpga/20260816T220048Z-13f996e/routed-reports/`.
 
 ### FPGA DRC Fix: Independent I-cache Abort Decision (2026-08-16)
 
-BlackParrot revision `1f28f68f` removes the remaining feedback equation without
-buffering or prematurely accepting a refill packet. The UCE already holds
-`cache_req_last_i` and its associated refill packets until their SRAM
-handshakes complete. The I-cache therefore uses that held last-beat intent only
-to decide whether a simultaneous frontend force should abort the miss. Its
-actual miss-to-recover transition continues to use `complete_recv`, which
-requires every valid tag, data, and stat packet to have been accepted.
+BlackParrot revision `1f28f68f` first removed the abort-decision portion of the
+feedback equation without buffering or prematurely accepting a refill packet.
+The UCE already holds `cache_req_last_i` and its associated refill packets until
+their SRAM handshakes complete, so the I-cache uses that held last-beat intent
+only to decide whether a simultaneous frontend force should abort the miss.
+Synthesis job `20260818T000026Z-422e84b` then localized a remaining timing loop
+through `critical_recv`, tag-SRAM arbitration, and the UCE refill counters. The
+job was stopped after synthesis reported the loop, before wasting a placement
+run on a design that could not pass bitstream DRC.
+
+BlackParrot revision `629a4757` gives a critical or final UCE refill beat
+deterministic priority over a conflicting frontend SRAM access. Thus every
+valid tag, data, and stat packet associated with the restart/completion event is
+accepted in that same cycle, while ordinary non-event refill beats retain the
+existing frontend-fast-path priority. The actual miss-to-recover transition
+continues to use `complete_recv`; no response is buffered, replayed, or exposed
+before its memory packets are applied.
 
 A combined response-buffer experiment was rejected before this change because
 it reproduced the known premature-redirect signature: the tests completed, but
@@ -407,8 +417,8 @@ abort decision preserves the accepted architectural results:
 | Sampled I-cache fetches | 78,213 / 78,213 hits; no classified misses |
 | I-cache data-select audit | 0 bad selections on hits |
 
-A fresh routed implementation and packaged bitstream remain required before
-this DRC fix is accepted as the FPGA checkpoint.
+A fresh routed implementation and packaged bitstream of revision `629a4757`
+remain required before this DRC fix is accepted as the FPGA checkpoint.
 
 ### Cold-I-cache Overlap Assessment (2026-08-08)
 
