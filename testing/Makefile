@@ -23,7 +23,7 @@ CFLAGS = -O2 \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|\[STAGE\]|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -65,6 +65,7 @@ EXPERIMENTAL_TESTS := \
     mt_context_cache_l1_service_test \
     mt_ctxtsw_nonresident_fp_ring_test \
     mt_ctxtsw_nonresident_fp_target_test \
+    mt_ctxtsw_fpga_stage_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_nonresident_target_test \
     mt_ctxtsw_sv39_asid_remap_test
@@ -80,6 +81,7 @@ NONRESIDENT_TESTS := \
     mt_ctxtsw_nonresident_overhead_benchmark \
     mt_ctxtsw_nonresident_fp_ring_test \
     mt_ctxtsw_nonresident_fp_target_test \
+    mt_ctxtsw_fpga_stage_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_nonresident_target_test
 
