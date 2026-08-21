@@ -1,23 +1,26 @@
 # Register Context Cache Plan
 
-## PYNQ-Z2 Hardware Smoke Validation (2026-08-18)
+## PYNQ-Z2 Deployment Attempt (2026-08-18, invalidated)
 
-The accepted routed checkpoint was programmed onto the physical PYNQ-Z2 and
-successfully ran `hello_world.nbf`. The board-side control path verified the ARM
-GP0 register connection, loaded 3,212 NBF lines, printed `Hello World!!!`, and
-reported `CORE[0] PASS`. The run retired 16,316 instructions during the measured
-interval and exited normally after freeing its allocated DRAM buffer.
+The board-side flow successfully ran `hello_world.nbf`, verified the ARM GP0
+register connection, loaded 3,212 NBF lines, printed `Hello World!!!`, and
+reported `CORE[0] PASS`. This result was later invalidated as validation of the
+optimized checkpoint: `make unpack_bitstream` did not refresh the already
+unpacked collateral, and the programmed `blackparrot_bd_1.bit` retained a
+January 2025 timestamp. The accepted package contains an August 17, 2026
+bitstream with SHA-256
+`1b3680283fdfa631e7ac7276b69019aa4b6bec40eab67585e92963ee6da2f8d1`.
 
 - Top-level revision: `ac256e689f656db010fd20719c1daa50cf7017ed`
 - BlackParrot revision: `12fc8983a2b63243b86e878fce4f4f0935a1801b`
 - FPGA job: `20260818T015748Z-6986071`
 - Artifact SHA-256: `c7f1fc0ccc1975c93fb095148ba82e2396dcbe3ea670a5e7a5d9c31101c0e0cf`
 - Board/configuration: PYNQ-Z2, Vivado 2024.2, `e_bp_unicore_zynqparrot_cfg`
-- Result: physical FPGA programming, NBF loading, execution, and host I/O PASS
+- Result: old-image board runtime PASS; optimized-image hardware validation pending
 
-This is a hardware smoke/correctness result, not a measurement of context-switch
-latency. The next hardware gate is a context-switch-specific NBF with explicit
-register-isolation and nonresident-switch checks.
+Do not use this run as evidence that the optimized context-cache RTL works in
+hardware. Force extraction of the accepted package, verify the unpacked `.bit`
+checksum, and then rerun `hello_world` and the staged context-switch probe.
 
 ## Current Implementation Status (2026-08-16)
 

@@ -45,8 +45,15 @@ void __attribute__((noinline, noreturn)) t2_entry(void) {
 int main(void) {
   t1_seen = 0;
   t2_seen = 0;
+
+  bp_print_string("[STAGE] main entered\n");
+  bp_print_string("[STAGE] before seed resident context 1\n");
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_entry);
+  bp_print_string("[STAGE] after seed resident context 1\n");
+  bp_print_string("[STAGE] before seed nonresident context 2\n");
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_entry);
+  bp_print_string("[STAGE] after seed nonresident context 2\n");
+
   bp_print_string("[STAGE] before resident 0->1->0\n");
   ctxtsw(1);
   bp_print_string("[STAGE] after resident 0->1->0\n");
