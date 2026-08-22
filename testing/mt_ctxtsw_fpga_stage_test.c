@@ -45,7 +45,10 @@ int main(void) {
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_entry);
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_entry);
 
+  raw_putc('R');
   ctxtsw(1);
+  raw_putc('r');
+  raw_putc('N');
   ctxtsw(2);
 
   raw_putc('P');

@@ -21,6 +21,17 @@ WATCH = {
     "dispatch_ctxtsw": "be.scheduler.dispatch_pkt_cast_o.ctxtsw_v",
     "commit_ctxtsw": "be.calculator.commit_pkt_cast_o.ctxtsw",
     "cache_state": "context_cache_state_r",
+    "capture": "ctxtsw_capture_v_li",
+    "finalize": "ctxtsw_token_finalize_v_li",
+    "pending_v": "pending_ctxtsw_v_r",
+    "pending_sent": "pending_ctxtsw_sent_r",
+    "current_tid": "current_physical_thread_id_lo",
+    "pending_prev_tid": "pending_ctxtsw_prev_physical_thread_id_r",
+    "pending_target_tid": "pending_ctxtsw_physical_thread_id_r",
+    "fast_old_tid": "fast_ctxtsw_old_physical_thread_id_lo",
+    "fast_target_tid": "fast_ctxtsw_physical_thread_id_lo",
+    "retire_tid": "retire_thread_id_lo",
+    "fe_yumi": "fe_ctxtsw_yumi_i",
 }
 
 
@@ -34,6 +45,7 @@ def main() -> int:
     parser.add_argument("--min-cycle", type=int, default=0)
     parser.add_argument("--max-cycle", type=int)
     parser.add_argument("--period", type=int, default=50_000)
+    parser.add_argument("--show-signals", action="store_true")
     args = parser.parse_args()
 
     selected: dict[str, str] = {}
@@ -66,6 +78,9 @@ def main() -> int:
     missing = sorted(set(WATCH) - set(selected))
     if missing:
         print("missing: " + ", ".join(missing), file=sys.stderr)
+    if args.show_signals:
+        for label in sorted(selected):
+            print(f"signal {label}={selected[label]}", file=sys.stderr)
 
     labels_by_code: dict[str, list[str]] = {}
     for label, code in selected.items():
@@ -74,11 +89,13 @@ def main() -> int:
     values: dict[str, int | None] = {}
     last_dispatch = None
     last_commit = 0
+    last_capture = 0
+    last_fe_yumi = 0
     current_time = 0
     in_values = False
 
     def sample() -> None:
-        nonlocal last_dispatch, last_commit
+        nonlocal last_dispatch, last_commit, last_capture, last_fe_yumi
         cycle = current_time // args.period
         if cycle < args.min_cycle:
             return
@@ -91,8 +108,30 @@ def main() -> int:
         last_dispatch = identity
         commit = values.get("commit_ctxtsw") == 1
         if commit and not last_commit:
-            print(f"cycle={cycle} commit_ctxtsw cache_state={values.get('cache_state')}")
+            print(
+                f"cycle={cycle} commit_ctxtsw cache_state={values.get('cache_state')}"
+                f" current={values.get('current_tid')} retire={values.get('retire_tid')}"
+                f" pending={values.get('pending_v')}/{values.get('pending_sent')}"
+                f" prev={values.get('pending_prev_tid')} target={values.get('pending_target_tid')}"
+            )
         last_commit = int(commit)
+        capture = values.get("capture") == 1
+        if capture and not last_capture:
+            print(
+                f"cycle={cycle} capture current={values.get('current_tid')}"
+                f" fast_old={values.get('fast_old_tid')} fast_target={values.get('fast_target_tid')}"
+                f" pending={values.get('pending_v')}/{values.get('pending_sent')}"
+                f" finalize={values.get('finalize')}"
+            )
+        last_capture = int(capture)
+        fe_yumi = values.get("fe_yumi") == 1
+        if fe_yumi and not last_fe_yumi:
+            print(
+                f"cycle={cycle} fe_yumi current={values.get('current_tid')}"
+                f" pending={values.get('pending_v')}/{values.get('pending_sent')}"
+                f" prev={values.get('pending_prev_tid')} target={values.get('pending_target_tid')}"
+            )
+        last_fe_yumi = int(fe_yumi)
 
     for raw in sys.stdin:
         line = raw.rstrip()

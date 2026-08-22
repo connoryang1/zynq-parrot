@@ -43,8 +43,20 @@ The retirement-fix implementation routed successfully as FPGA job
 - bitstream SHA-256
   `54791ec50e74974e75221347f320e4c3cc027718785b2300f6069a975bc0f4c2`
 
-That exact bitstream and the staged NBF are present on the PYNQ VM. Final board
-execution is pending only the interactive privileged overlay-programming step.
+That exact bitstream was checksum-verified after extraction and programmed on
+the PYNQ-Z2.  The fence-free staged probe printed `ABRrNP`, reported
+`CORE[0] PASS`, and exercised both the resident `0->1->0` round trip and the
+nonresident SRAM-backed `0->2->0` round trip on hardware.  The run retired
+6,989 instructions with an MTIME delta of 1,351 (MTIME is one eighth of a BP
+cycle in this host report).
+
+An intermediate `ABR1` probe was not a valid return-switch localization: its
+`1` marker was followed by a host-MMIO `fence rw,rw` before the return CSR, so a
+stall there could be in the fence/drain path.  Removing target-entry host I/O
+and fences restored the intended pure-control test.  Board validation also
+requires a normal `control-program` build without the checkout's unconditional
+`DRAM_TEST`; that diagnostic path exits after the 64 MiB L2 write and never
+loads the NBF.
 
 ## PYNQ-Z2 Deployment Attempt (2026-08-18, invalidated)
 
