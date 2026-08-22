@@ -14,6 +14,8 @@ SCALE_ALIGN ?= 64
 SCALE_SAME_LOOP ?= 1
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
+LD     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-ld
+OBJCOPY := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-objcopy
 CFLAGS = -O2 \
           -I$(ZP_INSTALL_DIR)/riscv64-unknown-elf/include \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/dramfs.specs \
@@ -23,6 +25,11 @@ CFLAGS = -O2 \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
+FPGA_CRT_SRC_DIR := $(TOP)/import/black-parrot-sdk/libgloss-dramfs/misc
+FPGA_BUILD_DIR := $(LOG_DIR)/fpga
+FPGA_CRT_OBJ := $(FPGA_BUILD_DIR)/dramfs_integer_crt0.o
+FPGA_TESTS := mt_fpga_current_toolchain_smoke mt_ctxtsw_fpga_stage_test
+BP_NBF_SCRIPT := $(TOP)/import/black-parrot/bp_common/software/py/nbf.py
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|\[STAGE\]|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
 
 SMOKE_TESTS := \
@@ -61,6 +68,7 @@ DEMOS := \
     multithreading_demo
 
 EXPERIMENTAL_TESTS := \
+    mt_fpga_current_toolchain_smoke \
     mt_ctxtsw_context_cache_cooperative_image \
     mt_context_cache_l1_service_test \
     mt_ctxtsw_nonresident_fp_ring_test \
@@ -75,6 +83,7 @@ EXPERIMENTAL_TESTS := \
 # a default four-thread build cannot silently turn the cold path into a
 # resident context switch.
 NONRESIDENT_TESTS := \
+    mt_fpga_current_toolchain_smoke \
     mt_ctxtsw_nonresident_fp_overhead_benchmark \
     mt_ctxtsw_nonresident_gpr_overhead_benchmark \
     mt_ctxtsw_nonresident_cold_icache_benchmark \
@@ -101,8 +110,55 @@ TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(DEMOS)
 
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS)))
 
+.PHONY: fpga-tests
+fpga-tests: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.nbf, $(FPGA_TESTS)))
+
 $(LOG_DIR):
 	@mkdir -p $@
+
+$(FPGA_CRT_OBJ): $(TOP)/testing/mt_fpga_early_start.S \
+                 $(FPGA_CRT_SRC_DIR)/crt0.S \
+                 $(FPGA_CRT_SRC_DIR)/crtmain.S \
+                 $(FPGA_CRT_SRC_DIR)/tls.c \
+                 $(FPGA_CRT_SRC_DIR)/traps.c \
+                 $(FPGA_CRT_SRC_DIR)/main.c | $(LOG_DIR)
+	@echo "  [CRT]   Building integer-only FPGA startup..."
+	@mkdir -p $(FPGA_BUILD_DIR)
+	@$(CC) -c $(TOP)/testing/mt_fpga_early_start.S -o $(FPGA_BUILD_DIR)/early.o \
+		-I$(FPGA_CRT_SRC_DIR) -I$(TOP)/import/black-parrot-sdk/libgloss-dramfs \
+		-D__ASSEMBLY__ -mcmodel=medany -mstrict-align
+	@$(CC) -c $(FPGA_CRT_SRC_DIR)/crt0.S -o $(FPGA_BUILD_DIR)/crt0.o \
+		-I$(FPGA_CRT_SRC_DIR) -I$(TOP)/import/black-parrot-sdk/libgloss-dramfs \
+		-D__ASSEMBLY__ -D_start=dramfs_start -U__riscv_flen \
+		-mcmodel=medany -mstrict-align
+	@$(CC) -c $(FPGA_CRT_SRC_DIR)/crtmain.S -o $(FPGA_BUILD_DIR)/crtmain.o \
+		-I$(FPGA_CRT_SRC_DIR) -I$(TOP)/import/black-parrot-sdk/libgloss-dramfs \
+		-D__ASSEMBLY__ -mcmodel=medany -mstrict-align
+	@for src in tls traps main; do \
+		$(CC) -c $(FPGA_CRT_SRC_DIR)/$$src.c -o $(FPGA_BUILD_DIR)/$$src.o \
+		-I$(FPGA_CRT_SRC_DIR) -I$(TOP)/import/black-parrot-sdk/libgloss-dramfs \
+		-fno-common -fno-builtin -mcmodel=medany -nostdlib -nostartfiles -mstrict-align; \
+	done
+	@$(LD) -r -o $@ $(FPGA_BUILD_DIR)/early.o $(FPGA_BUILD_DIR)/crt0.o \
+		$(FPGA_BUILD_DIR)/crtmain.o $(FPGA_BUILD_DIR)/tls.o \
+		$(FPGA_BUILD_DIR)/traps.o $(FPGA_BUILD_DIR)/main.o
+
+define FPGA_TEST_RULES
+$(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.riscv: $(TOP)/testing/$(1).c $(FPGA_CRT_OBJ) $(TOP)/testing/mt_seed.h | $(LOG_DIR)
+	@echo "  [CC]    Compiling $(1)_fpga.riscv (Threads: $$(NUM_THREADS), Contexts: $$(NUM_CONTEXTS))..."
+	@$$(CC) -o $$@ $$(FPGA_CRT_OBJ) $$< $$(CFLAGS) -nostartfiles >> $(LOG_DIR)/software_build.log 2>&1
+
+$(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.mem: $(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.riscv
+	@$$(OBJCOPY) -O verilog $$< $$@
+	@sed -i "s/@8/@0/g" $$@
+
+$(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.nbf: $(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.mem
+	@echo "  [NBF]   Packaging $(1)_fpga.nbf with config preamble..."
+	@python3 $$(BP_NBF_SCRIPT) --skip_zeros --config --debug \
+		--mem $$< --ncpus 1 > $$@
+endef
+
+$(foreach t,$(FPGA_TESTS),$(eval $(call FPGA_TEST_RULES,$(t))))
 
 define TEST_RULES
 $(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h $(TOP)/testing/mt_context_image.h | $(LOG_DIR)
@@ -154,6 +210,9 @@ $(foreach n,$(SCALE_CONTEXTS),$(eval $(call SCALE_TEST_RULES,$(n))))
 clean::
 	@echo "  [RM] Cleaning build artifacts..."
 	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(EXPERIMENTAL_TESTS) $(SCALE_TESTS) $(BEST_CONTEXT_BENCHMARKS)))
+	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.riscv, $(FPGA_TESTS)))
+	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.mem, $(FPGA_TESTS)))
+	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.nbf, $(FPGA_TESTS)))
 	@$(RM) -rf $(LOG_DIR)
 
 build-sim: | $(LOG_DIR)
