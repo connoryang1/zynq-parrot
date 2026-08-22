@@ -26,9 +26,25 @@ optional FPU register initialization and packages NBFs with the required config
 and debug preamble. This keeps the integer-only PYNQ-Z2 configuration usable
 without turning floating-point support into an optimization dependency.
 
-The optimized bitstream has passed the current-toolchain board smoke test
-(`CORE[0] PASS`). A new routed implementation for the retirement fix and the
-final board staged resident/nonresident probe remain the active hardware gates.
+The optimized pre-fix bitstream passed the current-toolchain board smoke test
+(`CORE[0] PASS`) but reproduced the staged probe's expected failure signature:
+integer startup printed `AB`, then the first context-switch round trip stalled.
+
+The retirement-fix implementation routed successfully as FPGA job
+`20260822T162606Z-cad5f89`:
+
+- routed WNS `+1.482 ns`, TNS `0.000 ns`
+- 47,555 / 53,200 slice LUTs (`89.39%`)
+- 21,361 / 106,400 slice registers (`20.08%`)
+- 80 / 140 block-RAM tiles (`57.14%`)
+- 11 / 220 DSPs (`5.00%`)
+- packed artifact SHA-256
+  `c987c77f65da3db6852972187464846ccafde7425788640597b9dcc4e6af4df`
+- bitstream SHA-256
+  `54791ec50e74974e75221347f320e4c3cc027718785b2300f6069a975bc0f4c2`
+
+That exact bitstream and the staged NBF are present on the PYNQ VM. Final board
+execution is pending only the interactive privileged overlay-programming step.
 
 ## PYNQ-Z2 Deployment Attempt (2026-08-18, invalidated)
 
