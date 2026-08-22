@@ -587,25 +587,31 @@ module bsg_nonsynth_zynq_testbench;
   logic [3:0] context_cache_state_prev_r;
   longint unsigned context_cache_state_start_cycle_r;
   longint unsigned context_cache_l1_req_count_r, context_cache_l1_resp_count_r;
-  wire marker_dispatch_v_li = dut.top_fpga_inst.blackparrot.core_minimal.be.scheduler.dispatch_pkt_cast_o.v;
-  wire [63:0] marker_dispatch_pc_li = dut.top_fpga_inst.blackparrot.core_minimal.be.scheduler.dispatch_pkt_cast_o.pc;
-  wire [3:0] context_cache_state_li = dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_state_r;
-  wire context_cache_l1_req_li = dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_int_l1_req_v_r
-                                 & dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_dcache_yumi_lo;
-  wire context_cache_l1_resp_li = dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_int_l1_wait_resp_r
-                                  & dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_dcache_resp_v_lo;
+`ifdef ZYNQ_MINIMAL_EXAMPLE
+  `define BP_CONTEXT_CACHE_HIER dut.top_fpga_inst.blackparrot.core_minimal.be
+`else
+  `define BP_CONTEXT_CACHE_HIER dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be
+`endif
+  wire marker_dispatch_v_li = `BP_CONTEXT_CACHE_HIER.scheduler.dispatch_pkt_cast_o.v;
+  wire [63:0] marker_dispatch_pc_li = `BP_CONTEXT_CACHE_HIER.scheduler.dispatch_pkt_cast_o.pc;
+  wire [3:0] context_cache_state_li = `BP_CONTEXT_CACHE_HIER.context_cache_state_r;
+  wire context_cache_l1_req_li = `BP_CONTEXT_CACHE_HIER.context_cache_int_l1_req_v_r
+                                 & `BP_CONTEXT_CACHE_HIER.context_cache_dcache_yumi_lo;
+  wire context_cache_l1_resp_li = `BP_CONTEXT_CACHE_HIER.context_cache_int_l1_wait_resp_r
+                                  & `BP_CONTEXT_CACHE_HIER.context_cache_dcache_resp_v_lo;
   wire [31:0] context_cache_victim_int_dirty_li =
-    dut.top_fpga_inst.blackparrot.core_minimal.be.physical_thread_int_dirty_r[
-      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_victim_physical_thread_id_r];
+    `BP_CONTEXT_CACHE_HIER.physical_thread_int_dirty_r[
+      `BP_CONTEXT_CACHE_HIER.context_cache_victim_physical_thread_id_r];
   wire [31:0] context_cache_target_int_dirty_li =
-    dut.top_fpga_inst.blackparrot.core_minimal.be.virtual_context_int_dirty_r[
-      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_target_virtual_context_id_r];
+    `BP_CONTEXT_CACHE_HIER.virtual_context_int_dirty_r[
+      `BP_CONTEXT_CACHE_HIER.context_cache_target_virtual_context_id_r];
   wire [31:0] context_cache_victim_fp_dirty_li =
-    dut.top_fpga_inst.blackparrot.core_minimal.be.physical_thread_fp_dirty_r[
-      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_victim_physical_thread_id_r];
+    `BP_CONTEXT_CACHE_HIER.physical_thread_fp_dirty_r[
+      `BP_CONTEXT_CACHE_HIER.context_cache_victim_physical_thread_id_r];
   wire [31:0] context_cache_target_fp_dirty_li =
-    dut.top_fpga_inst.blackparrot.core_minimal.be.virtual_context_fp_dirty_r[
-      dut.top_fpga_inst.blackparrot.core_minimal.be.context_cache_target_virtual_context_id_r];
+    `BP_CONTEXT_CACHE_HIER.virtual_context_fp_dirty_r[
+      `BP_CONTEXT_CACHE_HIER.context_cache_target_virtual_context_id_r];
+  `undef BP_CONTEXT_CACHE_HIER
   initial begin
     waveform_start_cycle_r = '0;
     void'($value$plusargs("bsg_trace_start_cycle=%d", waveform_start_cycle_r));
