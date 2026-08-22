@@ -52,21 +52,67 @@ configuration.
 
 ## Board deployment
 
-Keep deployment separate from build validation. With authorization, copy the packed bitstream to
-the board, unpack it from `cosim/black-parrot-example/zynq`, and run:
+Keep deployment separate from build validation. First verify the package locally:
 
 ```bash
-make unpack_bitstream load_bitstream run \
-  BOARDNAME=pynqz2 \
-  VIVADO_VERSION=2024.2 \
-  VIVADO_MODE=batch \
-  NBF_FILE=hello_world.nbf
+codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh \
+  cosim/black-parrot-example/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64
 ```
 
-Confirm the board address, user, destination checkout, and NBF before copying or programming.
+Record the package SHA, bitstream SHA, and reported artifact stem. With authorization, copy the
+exact package and NBF to the board. Do not trust already unpacked collateral. Explicitly extract
+the selected package and verify the resulting `.bit`:
+
+```bash
+base64 -d ../black_parrot_bd_1.zynq.pynqz2.tar.xz.b64 | tar xvJ
+sha256sum black_parrot_bd_1.bit
+```
+
+The board checkout and package should come from the same top-level revision. Older checkouts may
+use `blackparrot_bd_1.*` while current packages contain `black_parrot_bd_1.*`. Update the board
+checkout or copy the verified `.bit`, `.hwh`, and `.map` to the expected stem together; never mix
+members from different packages.
+
+Before an application run, inspect the Makefile or compile command for `DRAM_TEST`. It must be
+absent. That mode performs a destructive 64 MiB connectivity diagnostic and is not evidence that
+an NBF loaded or executed. Program the freshly extracted overlay in an interactive board shell:
+
+```bash
+make load_bitstream \
+  BOARDNAME=pynqz2 \
+  VIVADO_VERSION=2024.2 \
+  VIVADO_MODE=batch
+
+sudo ./control-program <program>.nbf
+```
+
+Record the board-side bitstream and NBF SHA immediately before the run. A successful staged
+context-cache probe prints `ABRrNP` and `CORE[0] PASS`. Do not put host MMIO followed by a fence
+inside the measured switch region; that tests the I/O drain path rather than a pure handoff.
 
 ## Application image
 
-Build the RISC-V application through the pinned SDK. Copy the resulting `.riscv` into the
-BlackParrot Verilator directory and run `make prog PROG=<name>` to create the NBF. Preserve the
-exact SDK revision and compiler flags with performance-sensitive programs.
+For the maintained FPGA regression images, use:
+
+```bash
+make -C testing fpga-tests NUM_THREADS=2 NUM_CONTEXTS=4
+```
+
+This rebuilds the integer-only DRAMFS startup and emits NBFs with the required `--config --debug`
+preamble. Preserve the exact SDK revision and compiler flags with performance-sensitive programs.
+
+## Required run-state checks
+
+Before interpreting a failure, distinguish these stages in order:
+
+1. package extracted and board-side bitstream SHA matches
+2. overlay explicitly reloaded after extraction
+3. host runner built without `DRAM_TEST`
+4. NBF SHA matches and loader reports its finish command
+5. integer startup markers execute
+6. resident round trip completes
+7. nonresident SRAM-backed round trip completes
+
+Do not change RTL until the failing stage is localized. A host allocation error, diagnostic-only
+runner exit, startup/FPU mismatch, MMIO fence stall, and context-switch failure can otherwise all
+look like “no output.”

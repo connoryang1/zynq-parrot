@@ -39,7 +39,7 @@ The retirement-fix implementation routed successfully as FPGA job
 - 80 / 140 block-RAM tiles (`57.14%`)
 - 11 / 220 DSPs (`5.00%`)
 - packed artifact SHA-256
-  `c987c77f65da3db6852972187464846ccafde7425788640597b9dcc4e6af4df`
+  `c987c77f65da3db6852972187464846ccafde7425788640597b9d9cc4e6af4df`
 - bitstream SHA-256
   `54791ec50e74974e75221347f320e4c3cc027718785b2300f6069a975bc0f4c2`
 

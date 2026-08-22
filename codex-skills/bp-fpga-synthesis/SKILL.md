@@ -38,6 +38,11 @@ state.
 Read [references/pynqz2-flow.md](references/pynqz2-flow.md) when preparing dependencies,
 deploying to a board, or diagnosing an old command.
 
+Before copying a package to a board, run
+`scripts/verify_pynq_package.sh <package> [expected-bit-sha256]`. Treat the reported artifact
+stem and SHA as authoritative; do not infer them from an older board Makefile or reuse already
+unpacked files.
+
 ## Iteration Modes
 
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,
@@ -86,3 +91,8 @@ and artifact path. Append accepted results to the optimization timing ledger; ke
 reverted experiments in the experiment log with their failure reason.
 
 Program or copy files to an FPGA only when the user authorizes that external action.
+
+For board validation, record three independent identities: packed-package SHA, extracted
+bitstream SHA, and NBF SHA. Reload the overlay after extraction, even when PYNQ reports an overlay
+is already present. Confirm the board checkout's Zynq Makefile does not enable `DRAM_TEST` for an
+application run; that diagnostic is not an NBF execution gate.
