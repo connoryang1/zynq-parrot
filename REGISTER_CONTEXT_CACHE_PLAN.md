@@ -1,5 +1,35 @@
 # Register Context Cache Plan
 
+## Retirement-Bank Fix and Final Validation (2026-08-22)
+
+Full-system FPGA-configuration simulation exposed a correctness bug that the
+minimal model could not trigger: after a speculative handoff, the target FE
+packet can still carry the old physical-thread metadata. The context-switch
+retirement bookkeeping captured that stale packet field, so the CSR wrapper
+could select the wrong per-resident-thread commit bank on a return switch. The
+fix captures the architectural `current_physical_thread_id_lo` instead. It adds
+no state-machine phase and no context-switch cycles.
+
+- Top-level functional checkpoint: `21dd6bf`
+- BlackParrot checkpoint: `c20c7a466bf16471fc718db41dbac1daa5fcdf53`
+- Clean traced gates: smoke PASS, late-writeback hazard PASS, nonresident target PASS
+- Exact `e_bp_unicore_zynqparrot_cfg` model: resident `0->1->0` and nonresident
+  SRAM-backed `0->2->0` staged probe PASS
+- Waveform result over 1,023 switches: resident dominant 4 cycles to FE / 5 to
+  first useful dispatch; nonresident dominant 11 cycles to FE / 12 to first
+  useful dispatch
+- I-cache result in the measured window: 78,213 fetches, 100% hits; cold/abort
+  tails remain reported separately from the steady context-switch overhead
+
+The FPGA test-image flow now rebuilds only the DRAMFS startup object without
+optional FPU register initialization and packages NBFs with the required config
+and debug preamble. This keeps the integer-only PYNQ-Z2 configuration usable
+without turning floating-point support into an optimization dependency.
+
+The optimized bitstream has passed the current-toolchain board smoke test
+(`CORE[0] PASS`). A new routed implementation for the retirement fix and the
+final board staged resident/nonresident probe remain the active hardware gates.
+
 ## PYNQ-Z2 Deployment Attempt (2026-08-18, invalidated)
 
 The board-side flow successfully ran `hello_world.nbf`, verified the ARM GP0
