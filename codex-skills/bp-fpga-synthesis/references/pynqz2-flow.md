@@ -73,6 +73,16 @@ use `blackparrot_bd_1.*` while current packages contain `black_parrot_bd_1.*`. U
 checkout or copy the verified `.bit`, `.hwh`, and `.map` to the expected stem together; never mix
 members from different packages.
 
+Prefer the guarded staging helper for this sequence:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh \
+  <package.tar.xz.b64> xilinx@192.168.4.35 <program.nbf> [...]
+```
+
+It detects the board Makefile's load stem and prevents a new NBF from being run against an old
+same-directory bitstream under the historical `blackparrot_bd_1` name.
+
 Before an application run, inspect the Makefile or compile command for `DRAM_TEST`. It must be
 absent. That mode performs a destructive 64 MiB connectivity diagnostic and is not evidence that
 an NBF loaded or executed. Program the freshly extracted overlay in an interactive board shell:

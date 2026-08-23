@@ -43,6 +43,12 @@ Before copying a package to a board, run
 stem and SHA as authoritative; do not infer them from an older board Makefile or reuse already
 unpacked files.
 
+Stage a verified package and its NBFs with
+`scripts/stage_pynq_artifacts.sh <package> <ssh-host> [program.nbf ...]`. The helper reads the
+overlay filename from the board's dry-run load command, extracts the package, copies BIT/HWH/MAP
+together when legacy and current stems differ, and verifies package, bitstream, and NBF hashes.
+It deliberately does not invoke sudo or load the overlay.
+
 ## Iteration Modes
 
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,
