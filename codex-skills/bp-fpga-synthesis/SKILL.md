@@ -96,3 +96,8 @@ For board validation, record three independent identities: packed-package SHA, e
 bitstream SHA, and NBF SHA. Reload the overlay after extraction, even when PYNQ reports an overlay
 is already present. Confirm the board checkout's Zynq Makefile does not enable `DRAM_TEST` for an
 application run; that diagnostic is not an NBF execution gate.
+
+After the interactive overlay reload and NBF upload, run the serialized reusable ladder with
+`scripts/run_pynq_validation.sh <ssh-host> [remote-zynq-directory]`. It rejects a `DRAM_TEST`
+runner, verifies every local/remote NBF SHA pair, preserves one host log per image, and stops at
+the first missing PASS marker.

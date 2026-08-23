@@ -83,6 +83,11 @@ Do a clean rebuild when:
 - preparing a review-ready branch
 - many incremental edits have accumulated without a from-scratch check
 
+For the Zynq Verilator directories, invoke `make clean` and `make build` as two
+separate commands. Do not request both goals in one Make invocation: Make may
+resolve generated collateral such as `bsg_bootrom.sv` before `clean` removes it,
+then fail to regenerate it during `build`.
+
 ## Reporting
 
 When done, report:

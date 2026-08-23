@@ -28,7 +28,16 @@ SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
 FPGA_CRT_SRC_DIR := $(TOP)/import/black-parrot-sdk/libgloss-dramfs/misc
 FPGA_BUILD_DIR := $(LOG_DIR)/fpga
 FPGA_CRT_OBJ := $(FPGA_BUILD_DIR)/dramfs_integer_crt0.o
-FPGA_TESTS := mt_fpga_current_toolchain_smoke mt_ctxtsw_fpga_stage_test
+FPGA_SMOKE_TESTS := \
+    mt_fpga_current_toolchain_smoke \
+    mt_ctxtsw_fpga_stage_test
+FPGA_CORRECTNESS_TESTS := \
+    mt_ctxtsw_nonresident_ring_test \
+    mt_ctxtsw_gpr_ring_stress \
+    mt_ctxtsw_late_wb_hazard_test
+FPGA_BENCHMARKS := \
+    mt_ctxtsw_nonresident_cold_icache_benchmark
+FPGA_TESTS := $(FPGA_SMOKE_TESTS) $(FPGA_CORRECTNESS_TESTS) $(FPGA_BENCHMARKS)
 BP_NBF_SCRIPT := $(TOP)/import/black-parrot/bp_common/software/py/nbf.py
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|\[STAGE\]|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
 
@@ -110,8 +119,11 @@ TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(DEMOS)
 
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS)))
 
-.PHONY: fpga-tests
+.PHONY: fpga-tests fpga-smoke-tests fpga-correctness-tests fpga-benchmarks
 fpga-tests: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.nbf, $(FPGA_TESTS)))
+fpga-smoke-tests: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.nbf, $(FPGA_SMOKE_TESTS)))
+fpga-correctness-tests: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.nbf, $(FPGA_CORRECTNESS_TESTS)))
+fpga-benchmarks: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix _fpga.nbf, $(FPGA_BENCHMARKS)))
 
 $(LOG_DIR):
 	@mkdir -p $@
