@@ -1,5 +1,52 @@
 # Register Context Cache Plan
 
+## Physical-Cycle FPGA Measurement (2026-08-23)
+
+A core-wide 64-bit counter is now exposed through standard `rdtime` and the
+read-only custom CSR `0xCC0`. It resets only with the core and is deliberately
+absent from the virtual context image, so resident and evicted logical contexts
+observe one monotonic physical timebase. The implementation is BlackParrot
+commit `d65c820f`; the top-level CSR-test checkpoint is `323abe7`.
+
+`mt_ctxtsw_nonresident_overhead_benchmark` now brackets equal 256-switch
+resident (`0 <-> 1`) and nonresident (`0 <-> 2`) unrolled rings with CSR
+`0xCC0`. Top-level commit `2179a69` also makes every FPGA nonresident target
+compile as two physical threads and four logical contexts. This prevents
+logical context 2 from silently becoming resident under the old four-thread
+FPGA software default.
+
+The exact PYNQ configuration simulator and the physical PYNQ-Z2 produced the
+same totals:
+
+| Metric | Total / x100 value | Cycles/switch | Meaning |
+| --- | ---: | ---: | --- |
+| Resident ring | `0x519`; x100 `0x1fd` | 5.09 | Raw steady-state software-visible spacing for 256 resident switches. |
+| Nonresident ring | `0xc25`; x100 `0x4be` | 12.14 | Raw steady-state software-visible spacing for 256 SRAM-backed eviction/restores. |
+| Nonresident minus resident | x100 `0x2c0` | 7.04 | Incremental nonresident cost in this matched benchmark shape. |
+
+The board run reported `CORE[0] PASS`. These numbers do not replace the
+waveform-derived redirect-to-first-useful-work result: that architectural
+metric remains dominated by 12 cycles for nonresident switches and 5 cycles
+for resident switches at the routed checkpoint. The benchmark instead proves
+that the complete unrolled handoff stream sustains 12.14 physical
+cycles/switch on the FPGA without relying on host markers or virtualized
+`mcycle`.
+
+The global-counter design routed for PYNQ-Z2 at top revision `323abe7` and
+BlackParrot revision `d65c820f`. Independently verified routed artifacts met
+timing at WNS `+1.283 ns`, TNS `0`, and used 47,518 / 53,200 slice LUTs
+(`89.32%`), 21,427 / 106,400 registers (`20.14%`), 80 / 140 block-RAM tiles
+(`57.14%`), and 11 / 220 DSPs (`5.00%`). Package SHA-256 is
+`3997df39a9c80116de20f278702e65d649a2b1731819643b2f4f54415e96411d`;
+bitstream SHA-256 is
+`803ea2933043d26619e703bcdb793fc2afc7898e18edc23d077000a26455569b`.
+
+Deployment exposed a legacy stem mismatch: the package contains
+`black_parrot_bd_1.*`, while the board Makefile loads `blackparrot_bd_1.bit`.
+Skill checkpoint `5a975c2` adds a guarded staging helper that detects the load
+stem, copies BIT/HWH/MAP as one set, and verifies package, bitstream, and NBF
+hashes before any privileged overlay load.
+
 ## Retirement-Bank Fix and Final Validation (2026-08-22)
 
 Full-system FPGA-configuration simulation exposed a correctness bug that the

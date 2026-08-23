@@ -13,6 +13,12 @@ A benchmark result is only meaningful relative to what the benchmark shape actua
 
 ## For Ctxtsw Work
 
+For nonresident measurements on branches that provide it, use the core-wide
+physical-cycle CSR `0xCC0`. Do not use `rdcycle`/`mcycle`: virtual context
+restore can roll those counters backward. Compile FPGA nonresident images for
+the RTL's two physical threads and four logical contexts; otherwise context 2
+is accidentally measured as resident.
+
 Use the benchmarks for different questions:
 
 - `mt_ctxtsw_microbench`
@@ -31,6 +37,10 @@ Use the benchmarks for different questions:
   - inferred single-switch cost
   - steady-state amortized measurement
 - if two benchmarks differ, explain the structural reason
+- keep physical-cycle ring spacing distinct from the waveform-derived interval
+  from architectural context-switch redirect to first useful target work
+- for matched resident/nonresident rings, report raw resident spacing, raw
+  nonresident spacing, and nonresident-minus-resident incremental cost
 
 ## Serializing Test Policy
 
@@ -49,4 +59,3 @@ Always report:
 - benchmark name
 - exact observed result
 - what it actually validates
-
