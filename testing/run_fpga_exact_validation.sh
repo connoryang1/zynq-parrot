@@ -13,6 +13,7 @@ else
   tests=(
     mt_fpga_current_toolchain_smoke
     mt_ctxtsw_fpga_stage_test
+    mt_global_cycle_csr_test
     mt_ctxtsw_nonresident_ring_test
     mt_ctxtsw_gpr_ring_stress
     mt_ctxtsw_late_wb_hazard_test
@@ -28,7 +29,8 @@ for test_name in "${tests[@]}"; do
   set +e
   timeout "${FPGA_EXACT_TIMEOUT_SECONDS:-180}" \
     make -C "$sim_dir" run \
-      CFG=e_bp_unicore_zynqparrot_cfg TRACE=1 NBF_FILE="$nbf" >"$log" 2>&1
+      CFG=e_bp_unicore_zynqparrot_cfg TRACE=1 NBF_FILE="$nbf" \
+      </dev/null >"$log" 2>&1
   run_rc=$?
   set -e
   if grep -Eq 'CORE FAIL|BSG-FAIL' "$log" || ! grep -Eq 'CORE PASS|CORE\[0\] PASS' "$log"; then

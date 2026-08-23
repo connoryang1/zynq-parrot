@@ -32,6 +32,7 @@ FPGA_SMOKE_TESTS := \
     mt_fpga_current_toolchain_smoke \
     mt_ctxtsw_fpga_stage_test
 FPGA_CORRECTNESS_TESTS := \
+    mt_global_cycle_csr_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test
@@ -48,6 +49,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_global_cycle_csr_test \
     mt_abi_preservation_test \
     mt_ctxtsw_asid_translation_test \
     mt_ctxtsw_4ctx_ring_isolation \
@@ -92,6 +94,7 @@ EXPERIMENTAL_TESTS := \
 # a default four-thread build cannot silently turn the cold path into a
 # resident context switch.
 NONRESIDENT_TESTS := \
+    mt_global_cycle_csr_test \
     mt_fpga_current_toolchain_smoke \
     mt_ctxtsw_nonresident_fp_overhead_benchmark \
     mt_ctxtsw_nonresident_gpr_overhead_benchmark \
