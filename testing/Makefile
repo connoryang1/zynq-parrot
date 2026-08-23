@@ -37,10 +37,11 @@ FPGA_CORRECTNESS_TESTS := \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test
 FPGA_BENCHMARKS := \
-    mt_ctxtsw_nonresident_cold_icache_benchmark
+    mt_ctxtsw_nonresident_cold_icache_benchmark \
+    mt_ctxtsw_nonresident_overhead_benchmark
 FPGA_TESTS := $(FPGA_SMOKE_TESTS) $(FPGA_CORRECTNESS_TESTS) $(FPGA_BENCHMARKS)
 BP_NBF_SCRIPT := $(TOP)/import/black-parrot/bp_common/software/py/nbf.py
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|\[STAGE\]|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|\[STAGE\]|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|cycles/switch|Measured throughput|Excess cycles|Expected TRACE
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -110,8 +111,15 @@ NONRESIDENT_TARGETS := \
     $(addprefix run-,$(NONRESIDENT_TESTS)) \
     $(addprefix $(ZP_RISCV_DIR)/bp-tests/,$(addsuffix .riscv,$(NONRESIDENT_TESTS)))
 
+FPGA_NONRESIDENT_TARGETS := \
+    $(addprefix $(ZP_RISCV_DIR)/bp-tests/,$(addsuffix _fpga.riscv,$(NONRESIDENT_TESTS))) \
+    $(addprefix $(ZP_RISCV_DIR)/bp-tests/,$(addsuffix _fpga.mem,$(NONRESIDENT_TESTS))) \
+    $(addprefix $(ZP_RISCV_DIR)/bp-tests/,$(addsuffix _fpga.nbf,$(NONRESIDENT_TESTS)))
+
 $(NONRESIDENT_TARGETS): NUM_THREADS=2
 $(NONRESIDENT_TARGETS): NUM_CONTEXTS=4
+$(FPGA_NONRESIDENT_TARGETS): NUM_THREADS=2
+$(FPGA_NONRESIDENT_TARGETS): NUM_CONTEXTS=4
 
 SCALE_CONTEXTS := 8 16 32 64
 SCALE_TESTS := $(foreach n,$(SCALE_CONTEXTS),mt_ctxtsw_$(n)ctx_ring_throughput_benchmark)

@@ -10,8 +10,9 @@
  * Cold path: logical context 2 is nonresident at reset. Repeated 0 <-> 2
  * switching forces the slow restore path on every switch because each switch
  * evicts the previous logical owner of the physical slot. The nonresident
- * elapsed cost is measured with testbench global-cycle markers, not rdcycle:
- * virtual CSR restore also restores mcycle for the logical context.
+ * elapsed cost is measured with the core-wide physical cycle CSR. Unlike
+ * rdcycle/mcycle, CSR 0xCC0 is not part of the virtual context image, so the
+ * same measurement works in simulation and on the FPGA.
  */
 
 #include <stdint.h>
@@ -36,9 +37,9 @@
 static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
 
-static inline uint64_t read_cycle(void) {
+static inline uint64_t read_global_cycle(void) {
   uint64_t v;
-  __asm__ volatile("rdcycle %0" : "=r"(v));
+  __asm__ volatile("csrr %0, 0xcc0" : "=r"(v) :: "memory");
   return v;
 }
 
@@ -109,22 +110,26 @@ int main(void) {
   t0_warm_ring();
 
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_warm_ring);
-  uint64_t warm_begin = read_cycle();
+  uint64_t warm_begin = read_global_cycle();
   t0_warm_ring();
-  uint64_t warm_end = read_cycle();
+  uint64_t warm_end = read_global_cycle();
   uint64_t warm_cycles = warm_end - warm_begin;
 
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_cold_ring);
   t0_cold_ring();
 
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_cold_ring);
-  uint64_t cold_begin = read_cycle();
+  uint64_t cold_begin = read_global_cycle();
   t0_cold_ring();
-  uint64_t cold_end = read_cycle();
+  uint64_t cold_end = read_global_cycle();
   uint64_t cold_cycles = cold_end - cold_begin;
 
   uint64_t warm_cycles_per_switch = warm_cycles / TOTAL_SWITCHES;
   uint64_t warm_cycles_per_switch_x100 = (warm_cycles * 100) / TOTAL_SWITCHES;
+  uint64_t cold_cycles_per_switch = cold_cycles / TOTAL_SWITCHES;
+  uint64_t cold_cycles_per_switch_x100 = (cold_cycles * 100) / TOTAL_SWITCHES;
+  uint64_t added_cycles = cold_cycles - warm_cycles;
+  uint64_t added_cycles_per_switch_x100 = (added_cycles * 100) / TOTAL_SWITCHES;
 
   bp_print_string("=== Nonresident Context Switch Overhead Benchmark ===\n");
   bp_print_string("Switches/context:                ");
@@ -145,10 +150,18 @@ int main(void) {
   bp_print_string("Warm cycles/switch x100:         ");
   bp_hprint_uint64(warm_cycles_per_switch_x100);
   bp_print_string("\n");
-  bp_print_string("Cold virtual rdcycle delta:      ");
+  bp_print_string("Cold total cycles:               ");
   bp_hprint_uint64(cold_cycles);
   bp_print_string("\n");
-  bp_print_string("Cold elapsed cycles:             use global testbench markers\n");
+  bp_print_string("Cold cycles/switch:              ");
+  bp_hprint_uint64(cold_cycles_per_switch);
+  bp_print_string("\n");
+  bp_print_string("Cold cycles/switch x100:         ");
+  bp_hprint_uint64(cold_cycles_per_switch_x100);
+  bp_print_string("\n");
+  bp_print_string("Cold minus warm cycles/switch x100: ");
+  bp_hprint_uint64(added_cycles_per_switch_x100);
+  bp_print_string("\n");
   bp_print_string("\n");
 
   bp_finish(0);
