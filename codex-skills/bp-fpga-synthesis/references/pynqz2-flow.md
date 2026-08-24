@@ -111,6 +111,25 @@ make -C testing fpga-tests NUM_THREADS=2 NUM_CONTEXTS=4
 This rebuilds the integer-only DRAMFS startup and emits NBFs with the required `--config --debug`
 preamble. Preserve the exact SDK revision and compiler flags with performance-sensitive programs.
 
+### Interactive Linux image
+
+Stage Linux with the same package/NBF checksum procedure, but run it separately from
+`run_pynq_validation.sh`. The host runner must be built without `DRAM_TEST` and with `ZERO_DRAM`;
+the latter is required because the OpenSBI payload does not preserve enough section information
+to identify untouched DRAM. The PYNQ-Z2 allocation is 64 MiB, so verify that the Linux NBF's
+highest DRAM write remains inside `0x80000000` through `0x83ffffff`.
+
+Large Linux images take much longer to load than the roughly 3,000-line bare-metal tests. Do not
+classify the run as hung while DRAM-zero or NBF-load progress is advancing. After the loader's
+finish command, require the OpenSBI banner, kernel banner, init output, and an interactive shell.
+Linux does not call the bare-metal BSG finish mechanism and therefore is not expected to print
+`CORE[0] PASS` or return from `control-program` on its own.
+
+For a small libc-free guest test, build a static RV64 ELF and paste a chunked Base64 payload into
+the BusyBox console. Record the ELF SHA and require a guest-visible pass marker plus exit status
+zero. Keep this transport for smoke tests only; rebuild the root filesystem once a maintained
+test suite or kernel module is introduced.
+
 ## Required run-state checks
 
 Before interpreting a failure, distinguish these stages in order:

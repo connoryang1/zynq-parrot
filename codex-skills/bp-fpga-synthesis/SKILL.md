@@ -107,3 +107,10 @@ After the interactive overlay reload and NBF upload, run the serialized reusable
 `scripts/run_pynq_validation.sh <ssh-host> [remote-zynq-directory]`. It rejects a `DRAM_TEST`
 runner, verifies every local/remote NBF SHA pair, preserves one host log per image, and stops at
 the first missing PASS marker.
+
+Linux NBFs are a separate interactive flow and must not be passed to the bare-metal validation
+ladder. A Linux payload can contain millions of NBF writes and requires the host runner to zero
+all allocated DRAM, so reaching `finished nbf load` may take minutes. Localize progress in this
+order: DRAM allocation/zeroing, NBF finish command, OpenSBI banner, Linux banner, init, shell,
+then the userspace test marker. An interactive Linux shell normally never emits `CORE[0] PASS`;
+capture its console log and terminate it deliberately after guest tests complete.
