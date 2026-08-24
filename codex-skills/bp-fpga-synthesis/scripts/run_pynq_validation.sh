@@ -22,9 +22,12 @@ else
     mt_ctxtsw_fpga_stage_test
     mt_global_cycle_csr_test
     mt_ctxtsw_nonresident_ring_test
+    mt_ctxtsw_nonresident_fp_target_test
+    mt_ctxtsw_nonresident_fp_ring_test
     mt_ctxtsw_gpr_ring_stress
     mt_ctxtsw_late_wb_hazard_test
     mt_ctxtsw_nonresident_overhead_benchmark
+    mt_ctxtsw_nonresident_fp_overhead_benchmark
     mt_ctxtsw_nonresident_cold_icache_benchmark
   )
 fi

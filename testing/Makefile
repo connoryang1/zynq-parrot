@@ -34,11 +34,14 @@ FPGA_SMOKE_TESTS := \
 FPGA_CORRECTNESS_TESTS := \
     mt_global_cycle_csr_test \
     mt_ctxtsw_nonresident_ring_test \
+    mt_ctxtsw_nonresident_fp_target_test \
+    mt_ctxtsw_nonresident_fp_ring_test \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test
 FPGA_BENCHMARKS := \
     mt_ctxtsw_nonresident_cold_icache_benchmark \
-    mt_ctxtsw_nonresident_overhead_benchmark
+    mt_ctxtsw_nonresident_overhead_benchmark \
+    mt_ctxtsw_nonresident_fp_overhead_benchmark
 FPGA_TESTS := $(FPGA_SMOKE_TESTS) $(FPGA_CORRECTNESS_TESTS) $(FPGA_BENCHMARKS)
 BP_NBF_SCRIPT := $(TOP)/import/black-parrot/bp_common/software/py/nbf.py
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|\[STAGE\]|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|cycles/switch|Measured throughput|Excess cycles|Expected TRACE
