@@ -19,6 +19,14 @@ restore can roll those counters backward. Compile FPGA nonresident images for
 the RTL's two physical threads and four logical contexts; otherwise context 2
 is accidentally measured as resident.
 
+If a simulator benchmark cannot use `0xCC0`, bracket both the matched resident
+and nonresident timed loops with host signal writes and verify that
+`CTXTSW_GLOBAL_MARKER` timestamps appear in `run.log`. A comment saying to use
+global markers is not evidence that the program actually emitted them. For
+dirty-state benchmarks, subtract the matched resident loop first, then compare
+that increment with the clean nonresident increment; instruction-heavy state
+checks belong to both loops and are not context-switch overhead.
+
 Use the benchmarks for different questions:
 
 - `mt_ctxtsw_microbench`

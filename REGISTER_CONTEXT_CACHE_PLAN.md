@@ -1,5 +1,35 @@
 # Register Context Cache Plan
 
+## Dirty FP Context Preservation (2026-08-24)
+
+FP execution has been restored while preserving the established integer-clean
+context-switch path. Nonresident FP state is copied two registers per cycle,
+but only for registers whose recoded value differs from the crt0 initial FP
+state. The crt0 `fmv.s.x fN, zero` sequence therefore leaves an integer-only
+context clean instead of falsely forcing a 32-register FP scan.
+
+BlackParrot checkpoint `4cc5bccf` passes clean/incremental `TRACE=1` runs of
+the nonresident FP target test, the repeated contexts 0/2/3 FP eviction ring,
+and the integer-only nonresident overhead benchmark. The clean benchmark is
+unchanged at 5.12 resident and 12.15 nonresident cycles/switch (7.03 cycles of
+matched nonresident increment).
+
+The eight-live-FP-register stress benchmark now emits simulator-global marker
+pairs because per-context CSR restoration virtualizes `rdcycle`. Its steady
+warm interval was 23,436 cycles and its cold interval was 27,672 cycles over
+256 switches, an additional 16.55 cycles/switch for the nonresident dirty-FP
+path. Subtracting the 7.03-cycle clean nonresident increment attributes about
+9.52 cycles/switch to saving/restoring eight live FP registers. Waveform
+analysis agrees: resident switches reach first useful dispatch in 5 cycles,
+while dirty nonresident switches alternate between 22 and 23 cycles with no
+I-cache misses in the measured window.
+
+The preceding FP-execution-only top-level checkpoint `f7950fb` routed on the
+PYNQ-Z2 with Vivado 2024.2 at WNS `+2.739 ns`, TNS `0`, 47,409 / 53,200 slice
+LUTs (`89.11%`), 21,428 registers (`20.14%`), 80 block-RAM tiles (`57.14%`),
+and 11 DSPs (`5.00%`). A separate routed implementation of the full dirty-copy
+checkpoint is required before accepting it for FPGA deployment.
+
 ## Physical-Cycle FPGA Measurement (2026-08-23)
 
 A core-wide 64-bit counter is now exposed through standard `rdtime` and the

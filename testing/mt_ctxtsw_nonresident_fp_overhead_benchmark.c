@@ -16,6 +16,12 @@
 #define ROUNDS 128
 #define TOTAL_SWITCHES (2 * ROUNDS)
 #define FP_ENABLE_MASK (3ULL << 13)
+#define HOST_SIGNAL_BASE_ADDR ((volatile uint8_t *)(HOST_DEV_BASE_ADDR | 0x04000))
+
+static inline void global_marker(uint8_t id) {
+  *HOST_SIGNAL_BASE_ADDR = id;
+  __asm__ volatile("fence" ::: "memory");
+}
 
 #define FP_LOAD_SEQ \
   "li t2, 0x1111222233334444\n" "fmv.d.x f1, t2\n" \
@@ -175,9 +181,11 @@ int main(void) {
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_warm_entry);
   warm_steps = 0;
   fail_code = 0;
+  global_marker(0xd1);
   uint64_t warm_begin = read_cycle();
   t0_warm_bench();
   uint64_t warm_end = read_cycle();
+  global_marker(0xd2);
   uint64_t warm_cycles = warm_end - warm_begin;
 
   if (fail_code != 0 || warm_steps != ROUNDS) {
@@ -198,9 +206,11 @@ int main(void) {
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_cold_entry);
   cold_steps = 0;
   fail_code = 0;
+  global_marker(0xe1);
   uint64_t cold_begin = read_cycle();
   t0_cold_bench();
   uint64_t cold_end = read_cycle();
+  global_marker(0xe2);
   uint64_t cold_cycles = cold_end - cold_begin;
 
   if (fail_code != 0 || cold_steps != ROUNDS) {
@@ -229,10 +239,11 @@ int main(void) {
   bp_print_string("Warm cycles/switch x100:         ");
   bp_hprint_uint64(warm_cycles_per_switch_x100);
   bp_print_string("\n");
+  bp_print_string("Warm global interval:             marker 0xd1 -> 0xd2\n");
   bp_print_string("Cold virtual rdcycle delta:      ");
   bp_hprint_uint64(cold_cycles);
   bp_print_string("\n");
-  bp_print_string("Cold elapsed cycles:             use global testbench markers\n");
+  bp_print_string("Cold global interval:             marker 0xe1 -> 0xe2\n");
 
   bp_finish(0);
   return 0;
