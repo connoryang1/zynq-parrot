@@ -26,10 +26,9 @@ package bp_common_pkg;
       ,num_threads: 2
       ,num_contexts: 4
 
-      // The PYNQ-Z2 context-switch image is integer-only.  Omitting the FP
-      // execution units recovers the LUT margin required by the scalable
-      // resident/nonresident context store; integer mul/div remain enabled.
-      ,fpu_support: 0
+      // Keep the standard BlackParrot F/D execution support. Nonresident
+      // context switching may optimize FP state movement, but the architectural
+      // floating-point capability remains available to software.
 
       ,icache_fill_width: 64
 

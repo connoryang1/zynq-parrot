@@ -68,6 +68,23 @@ Known temporary analyzers from prior ctxtsw work:
   - useful references for old captured VCDs
   - mostly hardcoded to specific VCD identifiers, so update before reuse
 
+## FP Register Boundary Analysis
+
+For resident or nonresident FP-state failures, stream the compressed waveform
+through the checked-in analyzer instead of expanding it to a multi-gigabyte
+VCD:
+
+```bash
+fst2vcd cosim/black-parrot-minimal-example/verilator/dump.fst \
+  | python3 -u tools/fp_regfile_vcd_events.py --reg 1
+```
+
+Use `--pc <address>` to report the operand actually presented at dispatch and
+`--int-reg <n>` for FP-to-integer completion/writeback. Use `--all-dispatch`
+only with a narrow `--min-cycle` / `--max-cycle` window. The raw synchronous
+register-file read request and `rs_data_o` are one stage apart; treat the
+dispatch operand as the architectural consumption boundary.
+
 For ctxtsw hangs, start with `/tmp/analyze_postfix.py` and compare the smallest
 failing case against the nearest passing case. Add signals by name fragment
 rather than hardcoded VCD IDs.
