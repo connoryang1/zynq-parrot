@@ -1,44 +1,43 @@
 # Register Context Cache Plan
 
-## Dirty FP Context Preservation (2026-08-24)
+## Direct Integer-Style FP Context Storage (2026-08-24)
 
-FP execution has been restored while preserving the established integer-clean
-context-switch path. Nonresident FP state is saved two registers per cycle and
-restored one register per cycle, but only for registers whose recoded value
-differs from the crt0 initial FP state. The crt0 `fmv.s.x fN, zero` sequence
-therefore leaves an integer-only context clean instead of falsely forcing a
-32-register FP scan.
+BlackParrot checkpoint `8708eff7` gives FP state the same write-through context
+architecture as the integer registers. Ordinary FP writeback and remote FP
+`rpush` operations update a dedicated `bp_be_context_mem`, and the two 16-register
+FP lines are read alongside the integer lines. The physical FP register file
+now accepts the same line-install operation as the integer register file, so
+both register classes are restored during the same two drained cycles. Registers
+which have never been written receive the canonical recoded single-precision
+zero rather than an uninitialized backing-memory value.
 
-BlackParrot checkpoint `7938359e` passes clean/incremental `TRACE=1` runs of
-the nonresident FP target test, the repeated contexts 0/2/3 FP eviction ring,
-the integer-only nonresident overhead benchmark, late-writeback hazard, ABI
-preservation, and resident FP-register isolation. The clean benchmark is
-unchanged at 5.12 resident and 12.15 nonresident cycles/switch (7.03 cycles of
-matched nonresident increment).
+Clean `TRACE=1` verification passes the nonresident FP target, repeated contexts
+0/2/3 FP eviction ring, integer-only overhead benchmark, dirty-FP stress
+benchmark, late-writeback hazard, ABI preservation, and resident FP isolation.
+`make -j24 prep_lite` also passes. The integer-only benchmark remains exactly
+5.12 resident and 12.15 nonresident cycles/switch, a matched 7.03-cycle
+increment.
 
-The eight-live-FP-register stress benchmark emits simulator-global marker
-pairs because per-context CSR restoration virtualizes `rdcycle`. With the
-accepted one-port restore, its steady warm interval is 23,436 cycles and its
-cold interval is 28,692 cycles over 256 switches: 91.55 and 112.08
-cycles/switch including the FP verification workload, or a 20.53-cycle cold
-minus warm increment. The preceding two-write-lane experiment measured 108.09
-cold cycles/switch, so serializing restores costs about 3.98 cycles/switch for
-this eight-live-register workload and does not affect the integer-clean path.
-Waveform analysis over 1,534 switches agrees: resident switches reach the FE
-queue / first useful dispatch in 4 / 5 cycles, while dirty nonresident switches
-alternate between 25/26 cycles to the FE queue and 26/27 cycles to first useful
-dispatch. All 361,989 measured I-cache fetches hit, so this difference is FP
-state transfer rather than a cache-refill tail.
+The dirty-FP stress benchmark's simulator-global marker spans are 23,418 cycles
+for its matched resident loop and 23,436 cycles for its nonresident loop over
+256 switches: 91.48 and 91.55 cycles/switch including the benchmark's FP
+verification work. The difference is only 18 total cycles, or 0.07
+cycles/switch. Waveform analysis over 1,342 switches finds resident FE-queue /
+first-dispatch intervals of 4 / 5 cycles and dirty nonresident intervals of
+11-12 / 12-13 cycles. All 265,808 measured I-cache fetches hit. This removes
+the serial FP implementation's 25-26-cycle FE-queue and 26-27-cycle dispatch
+tail without changing the clean path.
 
-The preceding FP-execution-only top-level checkpoint `f7950fb` routed on the
-PYNQ-Z2 with Vivado 2024.2 at WNS `+2.739 ns`, TNS `0`, 47,409 / 53,200 slice
-LUTs (`89.11%`), 21,428 registers (`20.14%`), 80 block-RAM tiles (`57.14%`),
-and 11 DSPs (`5.00%`). The two-write-lane dirty-copy checkpoint
-`00a7259`/`4cc5bccf` was rejected after more than one hour in Vivado synthesis
-timing optimization: the extra write port dissolved the FP RAM into registers
-and made compilation pathological. It is recorded as failed job
-`20260824T183043Z-00a7259`, not as an accepted implementation. A routed
-implementation of the one-port checkpoint is required before FPGA deployment.
+The FP-execution-only top-level checkpoint `f7950fb` routed on the PYNQ-Z2 with
+Vivado 2024.2 at WNS `+2.739 ns`, TNS `0`, 47,409 / 53,200 slice LUTs
+(`89.11%`), 21,428 registers (`20.14%`), 80 block-RAM tiles (`57.14%`), and 11
+DSPs (`5.00%`). The two-write-lane logic-shadow job
+`20260824T183043Z-00a7259` was abandoned after more than one hour in synthesis
+timing optimization. Its one-write-lane successor
+`20260824T201027Z-9c4da79` completed synthesis but failed placement DRC because
+it required 62,820 LUT-as-logic cells on a device with 53,200. Those experiments
+are rejected. The direct block-RAM/line-install checkpoint still requires a
+routed PYNQ-Z2 implementation before FPGA deployment.
 
 ## Physical-Cycle FPGA Measurement (2026-08-23)
 
