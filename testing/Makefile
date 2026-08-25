@@ -33,6 +33,13 @@ FPGA_SMOKE_TESTS := \
     mt_ctxtsw_fpga_stage_test
 FPGA_CORRECTNESS_TESTS := \
     mt_global_cycle_csr_test \
+    mt_trap_csr_bank_test \
+    mt_timer_trap_csr_bank_test \
+    mt_mip_pending_read_test \
+    mt_satp_sfence_test \
+    mt_mprv_page_fault_test \
+    mt_smode_sv39_entry_test \
+    mt_smode_delegated_page_fault_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_nonresident_fp_target_test \
     mt_ctxtsw_nonresident_fp_ring_test \
@@ -84,6 +91,13 @@ DEMOS := \
 
 EXPERIMENTAL_TESTS := \
     mt_fpga_current_toolchain_smoke \
+    mt_trap_csr_bank_test \
+    mt_timer_trap_csr_bank_test \
+    mt_mip_pending_read_test \
+    mt_satp_sfence_test \
+    mt_mprv_page_fault_test \
+    mt_smode_sv39_entry_test \
+    mt_smode_delegated_page_fault_test \
     mt_ctxtsw_context_cache_cooperative_image \
     mt_context_cache_l1_service_test \
     mt_ctxtsw_nonresident_fp_ring_test \
