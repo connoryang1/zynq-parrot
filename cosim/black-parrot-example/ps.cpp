@@ -5,6 +5,7 @@
 // communication plumbing differences.
 
 #include <bitset>
+#include <errno.h>
 #include <locale.h>
 #include <queue>
 #include <stdio.h>
@@ -29,6 +30,20 @@
 void nbf_load(bsg_zynq_pl *zpl, char *filename);
 
 int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
+
+    unsigned long long max_runtime_ms = 0;
+    if (argc >= 3) {
+        char *end = nullptr;
+        errno = 0;
+        max_runtime_ms = strtoull(argv[2], &end, 0);
+        if (errno || end == argv[2] || *end != '\0') {
+            bsg_pr_err("ps.cpp: invalid max runtime in milliseconds: %s\n",
+                       argv[2]);
+            return -1;
+        }
+        bsg_pr_info("ps.cpp: limiting target runtime to %llu ms\n",
+                    max_runtime_ms);
+    }
 
     long data;
     long val1 = 0x1;
@@ -222,11 +237,29 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     zpl->start();
 
     bsg_spack_t spack;
+    bool runtime_limit_reached = false;
+    unsigned long long empty_poll_count = 0;
     do {
         if (host->get_next_packet(&spack)) {
             host->process_spack(&spack);
         } else {
             for (int i = 0; i < 10; i++) zpl->tick();
+        }
+        empty_poll_count++;
+        if (max_runtime_ms && ((empty_poll_count & 0x3ff) == 0)) {
+            struct timespec now;
+            clock_gettime(CLOCK_MONOTONIC, &now);
+            long long elapsed_ns =
+                1000000000LL * (now.tv_sec - start.tv_sec)
+                + (now.tv_nsec - start.tv_nsec);
+            unsigned long long elapsed_ms = elapsed_ns / 1000000LL;
+            if (elapsed_ms >= max_runtime_ms) {
+                bsg_pr_warn(
+                    "ps.cpp: target runtime limit reached after %llu ms\n",
+                    elapsed_ms);
+                runtime_limit_reached = true;
+                break;
+            }
         }
     } while (!host->is_finished());
 
@@ -292,7 +325,8 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);
 #endif // FREE_DRAM
 
-    return zpl->done();
+    int done_rc = zpl->done();
+    return runtime_limit_reached ? 124 : done_rc;
 }
 
 void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
@@ -371,4 +405,3 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
 
     bsg_pr_dbg_ps("ps.cpp: finished loading %d lines of nbf.\n", line_count);
 }
-

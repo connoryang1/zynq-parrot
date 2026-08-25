@@ -12,6 +12,8 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo_dir=$(git -C "$script_dir" rev-parse --show-toplevel)
 nbf_dir="$repo_dir/riscv/bp-tests"
 log_dir=${PYNQ_VALIDATION_LOG_DIR:-"$repo_dir/logs/pynq-validation"}
+timeout_seconds=${PYNQ_VALIDATION_TIMEOUT_SECONDS:-180}
+runtime_limit_ms=$((timeout_seconds * 1000))
 mkdir -p "$log_dir"
 
 if [[ -n "${PYNQ_VALIDATION_TESTS:-}" ]]; then
@@ -56,7 +58,10 @@ for test_name in "${tests[@]}"; do
   }
   echo "RUN  $test_name sha256=$local_sha"
   set +e
-  remote "timeout ${PYNQ_VALIDATION_TIMEOUT_SECONDS:-180} sudo -n ./control-program $image" >"$log" 2>&1
+  # The control program runs as root, so wrapping sudo with a user-owned
+  # timeout cannot reliably signal the actual worker.  Pass the bound to the
+  # control program itself; it shuts down the target and exits with 124.
+  remote "sudo -n \"\$(pwd)/control-program\" $image $runtime_limit_ms" >"$log" 2>&1
   run_rc=$?
   set -e
   if grep -Eq 'CORE FAIL|BSG-FAIL' "$log" || ! grep -Eq 'CORE\[0\] PASS|CORE PASS' "$log"; then
