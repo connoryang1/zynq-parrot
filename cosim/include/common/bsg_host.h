@@ -8,6 +8,10 @@
 
 #include "bsg_zynq_pl.h"
 
+#ifndef BP_NCPUS
+#define BP_NCPUS 1
+#endif
+
 #define TICKS_PER_UPDATE 100
 
 typedef struct __attribute__((packed)) {
@@ -26,7 +30,8 @@ class bsg_host {
   public:
     // Construct a host
     bsg_host(bsg_zynq_pl *zpl, uintptr_t ctr_addr, uintptr_t data_addr) : zpl(zpl), ctr_addr(ctr_addr), data_addr(data_addr), finished(false) {
-        bsg_pr_info("Creating host: %p %" PRIxPTR " %d %d\n", zpl, ctr_addr, data_addr);
+        bsg_pr_info("Creating host: %p %" PRIxPTR " %" PRIxPTR "\n",
+                    zpl, ctr_addr, data_addr);
 
         bsg_pr_info("Setting non-blocking terminal mode\n");
         tcgetattr(STDIN_FILENO, &init_termios);
@@ -93,7 +98,8 @@ class bsg_host {
             bsg_pr_info("CTXTSW_GLOBAL_MARKER id=%u\n", packet->data);
 #endif
         } else {
-            bsg_pr_err("ps.cpp: Errant write to %lx\n", packet->address);
+            bsg_pr_err("ps.cpp: Errant write to %lx\n",
+                       (unsigned long)packet->address);
             finished = true;
         }
 
@@ -104,7 +110,8 @@ class bsg_host {
             zpl->shell_write(GP0_WR_PS2PL_FIFO_DATA, c, 0xf);
         } else if (brom) {
             // bootrom only partially implemented
-            bsg_pr_dbg_ps("ps.cpp: bootrom read from (%lx)\n", packet->address);
+            bsg_pr_dbg_ps("ps.cpp: bootrom read from (%lx)\n",
+                          (unsigned long)packet->address);
             int bootrom_addr = (packet->address >> 2) & 0xfff;
             zpl->shell_write(GP0_WR_CSR_BOOTROM_ADDR, bootrom_addr, 0xf);
             int bootrom_data = zpl->shell_read(GP0_RD_BOOTROM_DATA);
@@ -117,7 +124,8 @@ class bsg_host {
 				zpl->shell_write(GP0_WR_PS2PL_FIFO_DATA, 1, 0xf);
 			}
         } else {
-            bsg_pr_err("ps.cpp: Errant read from %lx\n", packet->address);
+            bsg_pr_err("ps.cpp: Errant read from %lx\n",
+                       (unsigned long)packet->address);
             finished = true;
         }
     }
