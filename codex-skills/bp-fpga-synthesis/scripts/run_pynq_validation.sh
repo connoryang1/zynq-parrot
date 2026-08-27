@@ -21,6 +21,7 @@ if [[ -n "${PYNQ_VALIDATION_TESTS:-}" ]]; then
 else
   tests=(
     mt_fpga_current_toolchain_smoke
+    mt_amo_swap_return_test
     mt_ctxtsw_fpga_stage_test
     mt_global_cycle_csr_test
     mt_ctxtsw_nonresident_ring_test
