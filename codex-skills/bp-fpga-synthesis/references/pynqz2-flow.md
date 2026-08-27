@@ -200,6 +200,15 @@ memory-result catchup case. Record all four
 architectural values (two returned old values and two memory values), both immediate branch
 decisions, the NBF SHA, and the waveform around the AMO/branch window.
 
+When patching firmware instructions for a board probe, emit aligned 8-byte NBF writes that preserve
+the surrounding instruction bytes. Do not emit command `00` or `01` byte/halfword writes. The
+current host loader's read-modify-write path uses an incorrect subword shift and ambiguous operator
+precedence, so an offline reconstruction of the intended NBF can disassemble correctly even though
+the board received different bytes. Confirm the final NBF contains a command `03` at an 8-byte
+aligned address for every code patch. If the focused AMO test passes, patch OpenSBI's aligned
+`_start_hang` window to report `mcause` through host MMIO before changing RTL; this distinguishes a
+post-lottery machine-mode trap from an intentional firmware polling loop.
+
 Board automation calls `sudo -n` so it cannot pause invisibly at a password prompt. Before a
 remote run, execute `sudo -v` and confirm `sudo -n true` in the same board terminal that will
 launch the command. Older images commonly keep sudo timestamps per TTY, so a separate SSH session
