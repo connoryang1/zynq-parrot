@@ -116,4 +116,12 @@ application run; that diagnostic is not an NBF execution gate.
 After the interactive overlay reload and NBF upload, run the serialized reusable ladder with
 `scripts/run_pynq_validation.sh <ssh-host> [remote-zynq-directory]`. It rejects a `DRAM_TEST`
 runner, verifies every local/remote NBF SHA pair, preserves one host log per image, and stops at
-the first missing PASS marker.
+the first missing PASS marker. Remote execution uses `sudo -n`; refresh the board's credential
+timestamp with `sudo -v` in an interactive SSH session immediately before launching the ladder.
+
+If a Linux image retires instructions but emits no console output, do not begin in the kernel.
+First run an OpenSBI-only NBF prefix. If that has the same execution signature, build and run
+`mt_amo_swap_return_test_fpga.nbf`; it reproduces OpenSBI's boot-hart lottery with the address and
+AMO destination both in `a6`, followed immediately by the dependent branch. A separate AMO
+destination is not an equivalent test because its stale value can accidentally match the expected
+old value. Read the OpenSBI triage section in `references/pynqz2-flow.md` before changing RTL.

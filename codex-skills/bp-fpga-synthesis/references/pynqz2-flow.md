@@ -167,3 +167,36 @@ Before interpreting a failure, distinguish these stages in order:
 Do not change RTL until the failing stage is localized. A host allocation error, diagnostic-only
 runner exit, startup/FPU mismatch, MMIO fence stall, and context-switch failure can otherwise all
 look like “no output.”
+
+### Silent pre-console Linux triage
+
+When the loader finishes and the core continues retiring instructions but neither OpenSBI nor
+Linux prints anything, reduce the image before changing the kernel or host runner:
+
+1. Preserve every NBF configuration record, but keep only firmware memory writes below the Linux
+   payload boundary (normally `0x80200000`). Run this OpenSBI-only prefix with the same bitstream
+   and runner.
+2. If the reduced image has the same IPC/instruction-retirement signature, treat the failure as
+   machine-mode firmware startup rather than Linux.
+3. Disassemble the exact firmware image. OpenSBI's single-hart election normally loads the
+   `_boot_status` address into `a6`, executes `amoswap.w a6,a7,(a6)`, and immediately branches on
+   the returned old value. A wrong or stale nonzero value sends the only hart into the deliberate
+   secondary-hart wait loop before console initialization.
+4. Build the focused diagnostic and verify it in a clean traced simulator before the board:
+
+   ```bash
+   make -C testing clean run-mt_amo_swap_return_test \
+     TRACE=1 NUM_THREADS=2 NUM_CONTEXTS=4
+   make -C testing \
+     "$PWD/riscv/bp-tests/mt_amo_swap_return_test_fpga.nbf" \
+     NUM_THREADS=2 NUM_CONTEXTS=4
+   ```
+
+The diagnostic intentionally uses `a6` as both the nonzero address input and AMO destination and
+places the conditional branch immediately after the AMO. Do not simplify it to a separate
+destination register: that misses the speculative memory-result catchup case. Record all four
+architectural values (two returned old values and two memory values), both immediate branch
+decisions, the NBF SHA, and the waveform around the AMO/branch window.
+
+Board automation calls `sudo -n` so it cannot pause invisibly at a password prompt. Before a
+remote run, execute `sudo -v` interactively on the board and confirm `sudo -n true` succeeds.
