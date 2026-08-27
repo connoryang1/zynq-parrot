@@ -54,6 +54,11 @@ If the PYNQ board stops accepting SSH, use
 environment, never in tracked files or logs. A power cycle restores the board's default overlay;
 explicitly reload and verify the intended BlackParrot bitstream before interpreting any run.
 
+For an interactive variant of the maintained Linux regression NBF, use
+`scripts/make_linux_shell_nbf.py <linux.nbf> <linux-shell.nbf>`. The helper changes only the
+embedded bootargs to `rdinit=/bin/sh` and emits aligned 8-byte NBF writes; do not use the legacy
+byte or halfword NBF writes for this patch.
+
 ## Iteration Modes
 
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,

@@ -100,6 +100,30 @@ SSH reconnect only as evidence that the board OS rebooted. Power cycling removes
 BlackParrot overlay and invalidates prior CMA/DRAM allocation state, so reload the intended overlay
 and recheck the bitstream and NBF hashes before running a test.
 
+### Interactive Linux image
+
+The dated Jan. 25 Linux regression image runs `/init`, executes its test scripts, and powers off;
+it is not Jack's missing interactive `linux.nbf`. Create a shell derivative without rebuilding
+the kernel or initramfs:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py \
+  riscv/linux/linux-6.6-jhumphri-20250125.nbf /tmp/linux-shell.nbf
+```
+
+This replaces `root=/dev/ram0` with the equal-length `rdinit=/bin/sh`. The NBF loader's byte and
+halfword read-modify-write expressions are unsafe, so the helper preserves surrounding bytes and
+uses aligned 8-byte commands only. Validate success with `Run /bin/sh as init process`, a shell
+marker, `uname -a`, `poweroff -f`, and `CORE[0] PASS`. A direct `rdinit` shell does not run the
+normal init scripts; mount `/proc` manually before reading `/proc/cpuinfo`.
+
+The Jan. 24 historical bitstream must use its historical threaded FIFO decoder. The newer
+`bsg_host` polling runner can stall this image at about 0.133 IPC with no console output, while the
+compatible runner boots near 0.5 IPC. Preserve the threaded decoder and apply only the owned-CMA
+fix: never reuse a DRAM pointer from a previous `control-program` process. The historical monitor
+thread is not joined and can segfault after a clean target poweroff; treat that as a host teardown
+bug only when `CORE[0] PASS` and the target poweroff are already present.
+
 Before an application run, inspect the Makefile or compile command for `DRAM_TEST`. It must be
 absent. That mode performs a destructive 64 MiB connectivity diagnostic and is not evidence that
 an NBF loaded or executed. Program the freshly extracted overlay in an interactive board shell:
