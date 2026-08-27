@@ -199,4 +199,7 @@ architectural values (two returned old values and two memory values), both immed
 decisions, the NBF SHA, and the waveform around the AMO/branch window.
 
 Board automation calls `sudo -n` so it cannot pause invisibly at a password prompt. Before a
-remote run, execute `sudo -v` interactively on the board and confirm `sudo -n true` succeeds.
+remote run, execute `sudo -v` and confirm `sudo -n true` in the same board terminal that will
+launch the command. Older images commonly keep sudo timestamps per TTY, so a separate SSH session
+will still require a password. In that case, run the exact validation command manually in the
+authorized terminal; do not create an unvalidated sudoers fragment merely to bridge sessions.

@@ -117,7 +117,9 @@ After the interactive overlay reload and NBF upload, run the serialized reusable
 `scripts/run_pynq_validation.sh <ssh-host> [remote-zynq-directory]`. It rejects a `DRAM_TEST`
 runner, verifies every local/remote NBF SHA pair, preserves one host log per image, and stops at
 the first missing PASS marker. Remote execution uses `sudo -n`; refresh the board's credential
-timestamp with `sudo -v` in an interactive SSH session immediately before launching the ladder.
+timestamp with `sudo -v` in the same interactive SSH session that launches the ladder. On images
+with per-TTY sudo timestamps, a fresh automation SSH connection cannot inherit that authorization;
+run the validation command in the authorized terminal instead of weakening sudo policy ad hoc.
 
 If a Linux image retires instructions but emits no console output, do not begin in the kernel.
 First run an OpenSBI-only NBF prefix. If that has the same execution signature, build and run
