@@ -25,7 +25,7 @@ static inline uint64_t amoswap_w_branch(volatile uint32_t *address,
    */
   __asm__ volatile("mv a6, %2\n\t"
                    "mv a7, %3\n\t"
-                   "amoswap.w.aqrl a6, a7, (a6)\n\t"
+                   "amoswap.w a6, a7, (a6)\n\t"
                    "beqz a6, 1f\n\t"
                    "li %1, 1\n\t"
                    "j 2f\n"

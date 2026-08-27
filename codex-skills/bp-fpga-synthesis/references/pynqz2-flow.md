@@ -192,9 +192,11 @@ Linux prints anything, reduce the image before changing the kernel or host runne
      NUM_THREADS=2 NUM_CONTEXTS=4
    ```
 
-The diagnostic intentionally uses `a6` as both the nonzero address input and AMO destination and
-places the conditional branch immediately after the AMO. Do not simplify it to a separate
-destination register: that misses the speculative memory-result catchup case. Record all four
+The diagnostic intentionally uses `a6` as both the nonzero address input and AMO destination,
+uses OpenSBI's plain `amoswap.w` without `.aq`, `.rl`, or `.aqrl`, and places the conditional
+branch immediately after the AMO. Do not change the ordering bits or simplify it to a separate
+destination register: either change can exercise a different pipeline path or miss the speculative
+memory-result catchup case. Record all four
 architectural values (two returned old values and two memory values), both immediate branch
 decisions, the NBF SHA, and the waveform around the AMO/branch window.
 

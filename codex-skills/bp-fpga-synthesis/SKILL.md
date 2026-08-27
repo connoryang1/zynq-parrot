@@ -124,6 +124,8 @@ run the validation command in the authorized terminal instead of weakening sudo 
 If a Linux image retires instructions but emits no console output, do not begin in the kernel.
 First run an OpenSBI-only NBF prefix. If that has the same execution signature, build and run
 `mt_amo_swap_return_test_fpga.nbf`; it reproduces OpenSBI's boot-hart lottery with the address and
-AMO destination both in `a6`, followed immediately by the dependent branch. A separate AMO
-destination is not an equivalent test because its stale value can accidentally match the expected
-old value. Read the OpenSBI triage section in `references/pynqz2-flow.md` before changing RTL.
+AMO destination both in `a6`, a plain `amoswap.w` with no acquire/release bits, and the dependent
+branch immediately afterward. A different AMO ordering or separate AMO destination is not an
+equivalent test because it can exercise a different pipeline path or its stale value can
+accidentally match the expected old value. Read the OpenSBI triage section in
+`references/pynqz2-flow.md` before changing RTL.
