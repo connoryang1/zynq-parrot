@@ -33,6 +33,7 @@ FPGA_SMOKE_TESTS := \
     mt_ctxtsw_fpga_stage_test
 FPGA_CORRECTNESS_TESTS := \
     mt_global_cycle_csr_test \
+    mt_amo_swap_return_test \
     mt_trap_csr_bank_test \
     mt_timer_trap_csr_bank_test \
     mt_mip_pending_read_test \
@@ -91,6 +92,7 @@ DEMOS := \
 
 EXPERIMENTAL_TESTS := \
     mt_fpga_current_toolchain_smoke \
+    mt_amo_swap_return_test \
     mt_trap_csr_bank_test \
     mt_timer_trap_csr_bank_test \
     mt_mip_pending_read_test \
