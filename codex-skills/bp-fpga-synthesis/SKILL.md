@@ -49,6 +49,11 @@ overlay filename from the board's dry-run load command, extracts the package, co
 together when legacy and current stems differ, and verifies package, bitstream, and NBF hashes.
 It deliberately does not invoke sudo or load the overlay.
 
+If the PYNQ board stops accepting SSH, use
+`PYNQ_POWER_STATE_URL=... scripts/power_cycle_pynq.sh <ssh-host>`. Keep the controller URL in the
+environment, never in tracked files or logs. A power cycle restores the board's default overlay;
+explicitly reload and verify the intended BlackParrot bitstream before interpreting any run.
+
 ## Iteration Modes
 
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,

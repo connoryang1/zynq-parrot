@@ -83,6 +83,23 @@ codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh \
 It detects the board Makefile's load stem and prevents a new NBF from being run against an old
 same-directory bitstream under the historical `blackparrot_bd_1` name.
 
+### Recovering an unreachable board
+
+If the board refuses SSH and the controlled outlet is available, export its state endpoint only
+for the current shell and run:
+
+```bash
+PYNQ_POWER_STATE_URL='<private-state-endpoint>' \
+  codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh \
+  xilinx@192.168.4.35
+```
+
+The helper powers the outlet off, waits briefly, powers it on, and polls SSH with bounded timeouts.
+Do not commit or print the endpoint because it contains a controller credential. Treat a successful
+SSH reconnect only as evidence that the board OS rebooted. Power cycling removes the loaded
+BlackParrot overlay and invalidates prior CMA/DRAM allocation state, so reload the intended overlay
+and recheck the bitstream and NBF hashes before running a test.
+
 Before an application run, inspect the Makefile or compile command for `DRAM_TEST`. It must be
 absent. That mode performs a destructive 64 MiB connectivity diagnostic and is not evidence that
 an NBF loaded or executed. Program the freshly extracted overlay in an interactive board shell:
