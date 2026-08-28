@@ -23,16 +23,24 @@ static inline uint64_t amoswap_w_branch(volatile uint32_t *address,
    * separate destination register can accidentally start with the expected
    * zero and hide a broken correction.
    */
-  __asm__ volatile("mv a6, %2\n\t"
+  __asm__ volatile(".option push\n\t"
+                   ".option rvc\n\t"
+                   ".p2align 3\n\t"
+                   "c.nop\n\t"
+                   "c.nop\n\t"
+                   "c.nop\n\t"
+                   ".option norvc\n\t"
+                   "mv a6, %2\n\t"
                    "mv a7, %3\n\t"
                    "amoswap.w a6, a7, (a6)\n\t"
-                   "beqz a6, 1f\n\t"
-                   "li %1, 1\n\t"
+                   "bnez a6, 1f\n\t"
+                   "li %1, 0\n\t"
                    "j 2f\n"
                    "1:\n\t"
-                   "li %1, 0\n"
+                   "li %1, 1\n"
                    "2:\n\t"
-                   "mv %0, a6"
+                   "mv %0, a6\n\t"
+                   ".option pop"
                    : "=&r"(old_value), "=&r"(nonzero)
                    : "r"(address), "r"(value)
                    : "a6", "a7", "memory");
