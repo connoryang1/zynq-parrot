@@ -40,13 +40,15 @@ proc vivado_create_ip { args } {
     apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 -config {make_external "FIXED_IO, DDR" Master "Disable" Slave "Disable"} [get_bd_cells processing_system7_0]
 
     create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset proc_sys_reset_0
-    create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_0
-    create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_1
-    create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_2
+    # The VM's SmartConnect XIT service is damaged. These links are all 1:1,
+    # so use the stable AXI Interconnect IP for protocol/width adaptation.
+    create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 smartconnect_0
+    create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 smartconnect_1
+    create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 smartconnect_2
 
-    set_property CONFIG.NUM_SI {1} [get_bd_cells smartconnect_0]
-    set_property CONFIG.NUM_SI {1} [get_bd_cells smartconnect_1]
-    set_property CONFIG.NUM_SI {1} [get_bd_cells smartconnect_2]
+    set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {1}] [get_bd_cells smartconnect_0]
+    set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {1}] [get_bd_cells smartconnect_1]
+    set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {1}] [get_bd_cells smartconnect_2]
 
     create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0
 
@@ -85,13 +87,17 @@ proc vivado_create_ip { args } {
     connect_bd_net [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins clk_wiz_0/clk_in1]
     connect_bd_net [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins proc_sys_reset_0/ext_reset_in]
 
-    connect_bd_net [get_bd_port aclk] [get_bd_pins smartconnect_0/aclk]
-    connect_bd_net [get_bd_port aclk] [get_bd_pins smartconnect_1/aclk]
-    connect_bd_net [get_bd_port aclk] [get_bd_pins smartconnect_2/aclk]
+    foreach interconnect {smartconnect_0 smartconnect_1 smartconnect_2} {
+        connect_bd_net [get_bd_port aclk] [get_bd_pins ${interconnect}/ACLK]
+        connect_bd_net [get_bd_port aclk] [get_bd_pins ${interconnect}/S00_ACLK]
+        connect_bd_net [get_bd_port aclk] [get_bd_pins ${interconnect}/M00_ACLK]
+    }
     connect_bd_net [get_bd_port aclk] [get_bd_pins proc_sys_reset_0/slowest_sync_clk]
-    connect_bd_net [get_bd_port aresetn] [get_bd_pins smartconnect_0/aresetn]
-    connect_bd_net [get_bd_port aresetn] [get_bd_pins smartconnect_1/aresetn]
-    connect_bd_net [get_bd_port aresetn] [get_bd_pins smartconnect_2/aresetn]
+    foreach interconnect {smartconnect_0 smartconnect_1 smartconnect_2} {
+        connect_bd_net [get_bd_port aresetn] [get_bd_pins ${interconnect}/ARESETN]
+        connect_bd_net [get_bd_port aresetn] [get_bd_pins ${interconnect}/S00_ARESETN]
+        connect_bd_net [get_bd_port aresetn] [get_bd_pins ${interconnect}/M00_ARESETN]
+    }
 
     set_property CONFIG.ASSOCIATED_BUSIF {GP0_AXI:GP1_AXI:HP0_AXI} [get_bd_ports aclk]
     set_property CONFIG.ASSOCIATED_RESET {aresetn} [get_bd_ports aclk]
@@ -122,4 +128,3 @@ proc vivado_create_ip { args } {
 proc vivado_ipx_customize { args } {
 
 }
-
