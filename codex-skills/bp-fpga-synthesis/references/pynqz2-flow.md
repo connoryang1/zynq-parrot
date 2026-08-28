@@ -124,6 +124,37 @@ fix: never reuse a DRAM pointer from a previous `control-program` process. The h
 thread is not joined and can segfault after a clean target poweroff; treat that as a host teardown
 bug only when `CORE[0] PASS` and the target poweroff are already present.
 
+Reload the overlay immediately before every Linux trial, even when the previous `control-program`
+exited normally. The tag-client reset does not reliably return every historical design register to
+its power-on state: repeated runs without reprogramming have started with `reset(lo)=1`, retired no
+instructions, and produced no console output. A fresh load starts with `reset(lo)=0`. If an external
+timeout or interrupted SSH session kills the host runner, consider the fabric state contaminated
+and reload before drawing any conclusion.
+
+Do not pass the optional third argument to archived `control-program-protocol-compatible-bounded`
+binaries as though it were a wall-clock millisecond deadline. At least one archived binary applies
+that limit according to polling activity and can stop a healthy target less than a second after
+release. Omit that argument. Do not wrap an unprivileged `sudo ./control-program` invocation with
+GNU `timeout`: on the PYNQ image, `sudo` may fork the root runner, after which `timeout` kills only
+the `sudo` parent and leaves `control-program` running as an orphan. A deadline is reliable only
+when `timeout` itself is launched as root, for example when that exact command has been granted
+non-interactive sudo access:
+
+```bash
+sudo -n timeout --signal=TERM --kill-after=5s 300s \
+  ./control-program <program>.nbf
+```
+
+Without that narrow sudo permission, supervise the run from the VM and use
+`scripts/power_cycle_pynq.sh` when the deadline expires. A power cycle is the dependable way to
+terminate an orphaned root runner and also restores a known board state. Reload the intended
+overlay after the board returns before starting the next trial.
+
+The verified control identity is the Jan. 24 bitstream SHA-256 beginning `d45f7e3e` with the Jan. 25
+Linux NBF SHA-256 beginning `994bd900` and the compatible owned-DRAM runner SHA-256 beginning
+`76db506e`. On a freshly loaded overlay this pair reaches `/init`, powers down, and reports
+`CORE[0] PASS`; one Aug. 28 control run retired 321,538,678 instructions at 0.514 IPC.
+
 Before an application run, inspect the Makefile or compile command for `DRAM_TEST`. It must be
 absent. That mode performs a destructive 64 MiB connectivity diagnostic and is not evidence that
 an NBF loaded or executed. Program the freshly extracted overlay in an interactive board shell:
