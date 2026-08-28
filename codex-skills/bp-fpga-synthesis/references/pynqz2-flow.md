@@ -236,7 +236,15 @@ the surrounding instruction bytes. Do not emit command `00` or `01` byte/halfwor
 current host loader's read-modify-write path uses an incorrect subword shift and ambiguous operator
 precedence, so an offline reconstruction of the intended NBF can disassemble correctly even though
 the board received different bytes. Confirm the final NBF contains a command `03` at an 8-byte
-aligned address for every code patch. If the focused AMO test passes, patch OpenSBI's aligned
+aligned address for every code patch. Use the repository helper rather than editing NBF lines by
+hand; it reconstructs each touched 8-byte block from the source NBF before overlaying the patch:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/patch_nbf_bytes.py \
+  input.nbf output.nbf --patch 0x80000000:probe.bin
+```
+
+If the focused AMO test passes, patch OpenSBI's aligned
 `_start_hang` window to report `mcause` through host MMIO before changing RTL; this distinguishes a
 post-lottery machine-mode trap from an intentional firmware polling loop.
 
