@@ -22,6 +22,7 @@ runner rules. In particular, do not classify a reused overlay and do not wrap un
 | `4015d0f` | `08edfb479c7` | GOOD | Archived control booted Linux 6.6 through `/init`, rootFS checks, poweroff, and `CORE[0] PASS`. |
 | `69b939b` | `c39ee12b735` | GOOD | Initial multithreading/context-switch implementation booted the exact archived image through `/init`, rootFS checks, poweroff, and `CORE[0] PASS`. |
 | `64e247a` | `7331fbd0958` | BAD | OpenSBI completed its banner and domain report, then stalled at the handoff to Linux S-mode before the kernel banner. |
+| `079e4eb` | `b4143dcd9c0` | BAD | Isolated rollback of the global FE command-queue bypass still completed OpenSBI and stalled at the same Linux S-mode handoff. |
 | `e031866` | `3affb651cbb` | BAD | Fresh overlay and exact inputs remained silent through the healthy-boot window after the target started; clean traced CSR-isolation simulation still passed. |
 | `212f9c3` | `518249289e6` | BAD | Fresh overlay and exact inputs retired instructions indefinitely with no OpenSBI/Linux console output. |
 | `797d379` | `8708eff` | BAD | Current optimized context-switch design shows the same silent Linux failure. |
@@ -38,6 +39,7 @@ The first bad revision is `7331fbd0`, the context-switch fast-path checkpoint. T
 
 - `c39ee12b735`: full Linux boot succeeds
 - `7331fbd0958`: OpenSBI succeeds, Linux S-mode handoff stalls
+- `b4143dcd9c0`: restoring the pre-fast-path FE command FIFO behavior does not change that stall
 - `3affb651cbb`: no OpenSBI console output
 
 ## Verified `69b939b` FPGA Build
@@ -74,6 +76,27 @@ The first bad revision is `7331fbd0`, the context-switch fast-path checkpoint. T
 - Linux run: OpenSBI v1.4 completed its platform/domain/HART report and selected Linux at
   `0x80200000` in S-mode, but no Linux kernel banner appeared through the full boot window
 - Board log: `linux-bisect/64e247a/linux-run.log`
+
+## Verified FE Queue Rollback Experiment
+
+- Experiment top revision: `079e4eb4923`
+- Experiment BP revision: `b4143dcd9c0`
+- Change: restore the pre-`7331fbd0` queued FE command delivery while retaining every other
+  fast-path change from `7331fbd0`
+- Clean traced `mt_csr_isolation_test`: `CORE PASS`, 15,698 retired instructions
+- Build job: `20260829T005406Z-079e4eb`
+- Package SHA-256: `7588155f2643c08e23252039217de6f9d27a34f5fc235e7c5621cfdfe8e60a6a`
+- Bitstream SHA-256: `7a90d3d26a1ec56239220f585c3093ed157ab1e4d324a029b9cde710d51b35d0`
+- Routed timing: WNS `+1.588 ns`, TNS `0`, WHS `+0.008 ns`, THS `0`
+- Utilization: 50,683 LUTs (95.27%), 20,015 registers (18.81%), 46 BRAM tiles
+  (32.86%), 11 DSPs (5.00%)
+- Linux result: OpenSBI completed its platform/domain/HART report and selected Linux at
+  `0x80200000` in S-mode, but no Linux kernel banner appeared through the full observation window
+- Board log: `linux-bisect/733-no-global-bypass/linux-run.log`
+
+This rules out the global FE command-queue bypass as the sole cause of the first Linux regression.
+The remaining functional changes in `7331fbd0` must be isolated independently, particularly the
+context-switch-specific FE state-reset removal and PC-generator thread-ID update behavior.
 
 The four commits applied on disposable build worktrees are tool-compatibility changes only: remove
 a stale source-list entry, use the stable AXI interconnect wrapper, exclude unused accelerators,
