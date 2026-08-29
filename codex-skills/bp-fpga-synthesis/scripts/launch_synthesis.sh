@@ -12,7 +12,10 @@ usage() {
 case ${1:-} in
   start)
     "$script_dir/check_build_ready.sh"
-    if [[ -n "$(git -C "$repo_dir" status --porcelain)" ]]; then
+    # The worker builds an isolated worktree at the recorded commit.  Untracked
+    # analysis artifacts cannot affect it and should not block a routed build;
+    # tracked modifications still make the requested revision ambiguous.
+    if [[ -n "$(git -C "$repo_dir" status --porcelain --untracked-files=no)" ]]; then
       echo "Refusing comparison build from a dirty checkout." >&2
       exit 1
     fi
