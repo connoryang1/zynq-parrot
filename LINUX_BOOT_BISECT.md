@@ -23,6 +23,7 @@ runner rules. In particular, do not classify a reused overlay and do not wrap un
 | `69b939b` | `c39ee12b735` | GOOD | Initial multithreading/context-switch implementation booted the exact archived image through `/init`, rootFS checks, poweroff, and `CORE[0] PASS`. |
 | `64e247a` | `7331fbd0958` | BAD | OpenSBI completed its banner and domain report, then stalled at the handoff to Linux S-mode before the kernel banner. |
 | `079e4eb` | `b4143dcd9c0` | BAD | Isolated rollback of the global FE command-queue bypass still completed OpenSBI and stalled at the same Linux S-mode handoff. |
+| `ef49245` | `c4b745f5930` | BAD | Isolated rollback of the FE PC-generator thread-selector update still completed OpenSBI and stalled at the same Linux S-mode handoff. |
 | `e031866` | `3affb651cbb` | BAD | Fresh overlay and exact inputs remained silent through the healthy-boot window after the target started; clean traced CSR-isolation simulation still passed. |
 | `212f9c3` | `518249289e6` | BAD | Fresh overlay and exact inputs retired instructions indefinitely with no OpenSBI/Linux console output. |
 | `797d379` | `8708eff` | BAD | Current optimized context-switch design shows the same silent Linux failure. |
@@ -97,6 +98,28 @@ The first bad revision is `7331fbd0`, the context-switch fast-path checkpoint. T
 This rules out the global FE command-queue bypass as the sole cause of the first Linux regression.
 The remaining functional changes in `7331fbd0` must be isolated independently, particularly the
 context-switch-specific FE state-reset removal and PC-generator thread-ID update behavior.
+
+## Verified FE PC-Generator Rollback Experiment
+
+- Experiment top revision: `ef492456002`
+- Experiment BP revision: `c4b745f5930`
+- Change: restrict the FE predictor-bank thread selector to the pre-`7331fbd0` state-reset update
+  condition while retaining every other fast-path change from `7331fbd0`
+- Clean traced `mt_csr_isolation_test`: `CORE PASS`, 15,695 retired instructions
+- Build job: `20260829T014613Z-ef49245`
+- Package SHA-256: `89577c0005785de1037b2bbf80b72001deaa0781222f0101756a20c63568698d`
+- Bitstream SHA-256: `7903b4c63718f1bfda08f47796d973b119200999797c773230b5be1129a0dec6`
+- Routed timing: WNS `+2.380 ns`, TNS `0`, WHS `+0.013 ns`, THS `0`
+- Utilization: 50,724 LUTs (95.35%), 20,015 registers (18.81%), 46 BRAM tiles
+  (32.86%), 11 DSPs (5.00%)
+- Linux result: OpenSBI completed its platform/domain/HART report and selected Linux at
+  `0x80200000` in S-mode, but no Linux kernel banner appeared for more than 120 seconds after
+  handoff
+- Board log: `linux-bisect/733-pcgen-stable/linux-run.log`
+
+This rules out the PC-generator selector update as the sole cause. Together with the FE queue
+rollback result, the next high-confidence test is the combined rollback. It distinguishes an
+interaction between the two FE fast paths from the remaining `7331fbd0` changes.
 
 The four commits applied on disposable build worktrees are tool-compatibility changes only: remove
 a stale source-list entry, use the stable AXI interconnect wrapper, exclude unused accelerators,
