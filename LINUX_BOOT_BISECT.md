@@ -118,9 +118,9 @@ context-switch-specific FE state-reset removal and PC-generator thread-ID update
   handoff
 - Board log: `linux-bisect/733-pcgen-stable/linux-run.log`
 
-This rules out the PC-generator selector update as the sole cause. Together with the FE queue
-rollback result, the next high-confidence test is the combined rollback. It distinguishes an
-interaction between the two FE fast paths from the remaining `7331fbd0` changes.
+This rules out the PC-generator selector update as the only required cause. Together with the FE
+queue rollback result, the combined rollback distinguishes whether either unsafe behavior is
+sufficient from the remaining `7331fbd0` changes.
 
 ## Verified Combined FE Rollback Experiment
 
@@ -139,11 +139,13 @@ interaction between the two FE fast paths from the remaining `7331fbd0` changes.
   `CORE[0] PASS`; 321,310,043 retired instructions, IPC `0.518394`, target wall time about 99.17 s
 - Board log: `linux-bisect/733-combined-fe-rollback/linux-run.log`
 
-The two single rollbacks are BAD while their combination is GOOD. Therefore the first Linux
-regression is an interaction between the global FE command bypass and updating the FE
-predictor-bank selector on every redirect. The unrelated remaining changes in `7331fbd0` are not
-required to reproduce this failure. A production fix should keep context-switch metadata and the
-fast path explicit rather than coupling the predictor selector to all redirects.
+The two single rollbacks are BAD while their combination is GOOD. In this four-point test, either
+new FE behavior is independently sufficient to trigger the Linux failure: the global command
+bypass fails with the old selector behavior, and the all-redirect selector update fails with the
+old queue behavior. Both must therefore be addressed. The unrelated remaining changes in
+`7331fbd0` are not required to reproduce the failure. A production fix should keep the bypass and
+predictor-selector update explicitly context-switch-specific rather than applying either behavior
+to every redirect.
 
 The four commits applied on disposable build worktrees are tool-compatibility changes only: remove
 a stale source-list entry, use the stable AXI interconnect wrapper, exclude unused accelerators,
