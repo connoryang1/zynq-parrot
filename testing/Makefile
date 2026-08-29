@@ -30,6 +30,8 @@ FPGA_BUILD_DIR := $(LOG_DIR)/fpga
 FPGA_CRT_OBJ := $(FPGA_BUILD_DIR)/dramfs_integer_crt0.o
 FPGA_SMOKE_TESTS := \
     mt_fpga_current_toolchain_smoke \
+    mt_fpga_gpr_late_writeback_smoke \
+    mt_fpga_fp_execution_smoke \
     mt_ctxtsw_fpga_stage_test
 FPGA_CORRECTNESS_TESTS := \
     mt_global_cycle_csr_test \
@@ -92,6 +94,8 @@ DEMOS := \
 
 EXPERIMENTAL_TESTS := \
     mt_fpga_current_toolchain_smoke \
+    mt_fpga_gpr_late_writeback_smoke \
+    mt_fpga_fp_execution_smoke \
     mt_amo_swap_return_test \
     mt_trap_csr_bank_test \
     mt_timer_trap_csr_bank_test \
