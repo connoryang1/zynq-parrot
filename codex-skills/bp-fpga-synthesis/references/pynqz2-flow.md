@@ -83,6 +83,35 @@ codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh \
 It detects the board Makefile's load stem and prevents a new NBF from being run against an old
 same-directory bitstream under the historical `blackparrot_bd_1` name.
 
+### Unattended overlay reload
+
+Install the root-owned fixed-path loader once on the board. Copy the installer from this skill to
+the board, inspect it, and run:
+
+```bash
+sudo ./install_pynq_overlay_loader.sh
+```
+
+The installer validates its sudoers fragment before activation and installs:
+
+- `/usr/local/sbin/load-blackparrot-overlay`, owned by root and mode `0755`
+- `/etc/sudoers.d/blackparrot-overlay`, owned by root and mode `0440`
+
+The sudo rule permits only that helper. The helper accepts no arguments and loads only
+`/home/xilinx/zynq-parrot/cosim/black-parrot-example/zynq/blackparrot_bd_1.bit` with its matching
+HWH. It does not grant passwordless Python, shell, `make`, or arbitrary-path execution. Because
+the `xilinx` user can replace the fixed-path bitstream, this deliberately grants unattended FPGA
+programming capability; do not use the rule on a shared or untrusted board account.
+
+After staging a verified package, load it from the VM with:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh xilinx@192.168.4.35
+```
+
+Require `LOADING_BIT_SHA256` to match the staged `BOARD_BIT_SHA256` and require both
+`OVERLAY_LOAD_OK=1` and `REMOTE_OVERLAY_LOAD_OK=1` before launching a target image.
+
 ### Recovering an unreachable board
 
 If the board refuses SSH and the controlled outlet is available, export its state endpoint only
@@ -248,8 +277,8 @@ If the focused AMO test passes, patch OpenSBI's aligned
 `_start_hang` window to report `mcause` through host MMIO before changing RTL; this distinguishes a
 post-lottery machine-mode trap from an intentional firmware polling loop.
 
-Board automation calls `sudo -n` so it cannot pause invisibly at a password prompt. Before a
-remote run, execute `sudo -v` and confirm `sudo -n true` in the same board terminal that will
-launch the command. Older images commonly keep sudo timestamps per TTY, so a separate SSH session
-will still require a password. In that case, run the exact validation command manually in the
-authorized terminal; do not create an unvalidated sudoers fragment merely to bridge sessions.
+Board automation calls `sudo -n` so it cannot pause invisibly at a password prompt. Use only the
+validated fixed-path overlay helper above and the separately scoped `control-program *` rule for
+unattended runs. If either rule is absent, run the exact command manually in an authorized board
+terminal; never grant passwordless Python, a shell, `make`, or a wildcard executable merely to
+bridge per-TTY sudo timestamps.

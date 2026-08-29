@@ -49,6 +49,12 @@ overlay filename from the board's dry-run load command, extracts the package, co
 together when legacy and current stems differ, and verifies package, bitstream, and NBF hashes.
 It deliberately does not invoke sudo or load the overlay.
 
+For unattended overlay reloads, install the fixed-path board helper once with
+`sudo scripts/install_pynq_overlay_loader.sh` on the board. Then run
+`scripts/load_pynq_overlay.sh <ssh-host>` from the VM after every stage, interrupted run, or power
+cycle. The sudo rule grants only `/usr/local/sbin/load-blackparrot-overlay`; never grant
+passwordless access to Python, a shell, `make`, or arbitrary overlay paths.
+
 If the PYNQ board stops accepting SSH, use
 `PYNQ_POWER_STATE_URL=... scripts/power_cycle_pynq.sh <ssh-host>`. Keep the controller URL in the
 environment, never in tracked files or logs. A power cycle restores the board's default overlay;
@@ -113,13 +119,12 @@ bitstream SHA, and NBF SHA. Reload the overlay after extraction, even when PYNQ 
 is already present. Confirm the board checkout's Zynq Makefile does not enable `DRAM_TEST` for an
 application run; that diagnostic is not an NBF execution gate.
 
-After the interactive overlay reload and NBF upload, run the serialized reusable ladder with
+After the overlay reload and NBF upload, run the serialized reusable ladder with
 `scripts/run_pynq_validation.sh <ssh-host> [remote-zynq-directory]`. It rejects a `DRAM_TEST`
 runner, verifies every local/remote NBF SHA pair, preserves one host log per image, and stops at
-the first missing PASS marker. Remote execution uses `sudo -n`; refresh the board's credential
-timestamp with `sudo -v` in the same interactive SSH session that launches the ladder. On images
-with per-TTY sudo timestamps, a fresh automation SSH connection cannot inherit that authorization;
-run the validation command in the authorized terminal instead of weakening sudo policy ad hoc.
+the first missing PASS marker. Remote execution uses the separately scoped `control-program *`
+sudo rule; confirm it and the fixed-path overlay helper both work with `sudo -n` before starting a
+long unattended ladder.
 
 If a Linux image retires instructions but emits no console output, do not begin in the kernel.
 First run an OpenSBI-only NBF prefix. If that has the same execution signature, build and run
