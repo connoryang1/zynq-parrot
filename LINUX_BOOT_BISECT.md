@@ -24,6 +24,7 @@ runner rules. In particular, do not classify a reused overlay and do not wrap un
 | `64e247a` | `7331fbd0958` | BAD | OpenSBI completed its banner and domain report, then stalled at the handoff to Linux S-mode before the kernel banner. |
 | `079e4eb` | `b4143dcd9c0` | BAD | Isolated rollback of the global FE command-queue bypass still completed OpenSBI and stalled at the same Linux S-mode handoff. |
 | `ef49245` | `c4b745f5930` | BAD | Isolated rollback of the FE PC-generator thread-selector update still completed OpenSBI and stalled at the same Linux S-mode handoff. |
+| `2a1f883` | `ce328a77536` | GOOD | Combined rollback of both FE changes booted Linux through `/init`, rootFS checks, clean poweroff, and `CORE[0] PASS`. |
 | `e031866` | `3affb651cbb` | BAD | Fresh overlay and exact inputs remained silent through the healthy-boot window after the target started; clean traced CSR-isolation simulation still passed. |
 | `212f9c3` | `518249289e6` | BAD | Fresh overlay and exact inputs retired instructions indefinitely with no OpenSBI/Linux console output. |
 | `797d379` | `8708eff` | BAD | Current optimized context-switch design shows the same silent Linux failure. |
@@ -120,6 +121,29 @@ context-switch-specific FE state-reset removal and PC-generator thread-ID update
 This rules out the PC-generator selector update as the sole cause. Together with the FE queue
 rollback result, the next high-confidence test is the combined rollback. It distinguishes an
 interaction between the two FE fast paths from the remaining `7331fbd0` changes.
+
+## Verified Combined FE Rollback Experiment
+
+- Experiment top revision: `2a1f8834768`
+- Experiment BP revision: `ce328a77536`
+- Change: combine the pre-`7331fbd0` queued FE command delivery and pre-`7331fbd0` FE
+  predictor-bank thread-selector update condition while retaining the other fast-path changes
+- Clean traced `mt_csr_isolation_test`: `CORE PASS`, 15,698 retired instructions
+- Build job: `20260829T032555Z-2a1f883`
+- Package SHA-256: `d9de8e74fea7402fb4ec4146e1297d725d5e243caf0e6f8418e1ed3316e722a6`
+- Bitstream SHA-256: `47fada1291ced1b5ac8b5c346e4645816f9151319dde85973433e7a4dcb3545c`
+- Routed timing: WNS `+5.104 ns`, TNS `0`, WHS `+0.037 ns`, THS `0`
+- Utilization: 50,662 LUTs (95.23%), 20,015 registers (18.81%), 46 BRAM tiles
+  (32.86%), 11 DSPs (5.00%)
+- Linux result: Linux 6.6 completed `/init`, rootFS and `/proc` checks, clean poweroff, and
+  `CORE[0] PASS`; 321,310,043 retired instructions, IPC `0.518394`, target wall time about 99.17 s
+- Board log: `linux-bisect/733-combined-fe-rollback/linux-run.log`
+
+The two single rollbacks are BAD while their combination is GOOD. Therefore the first Linux
+regression is an interaction between the global FE command bypass and updating the FE
+predictor-bank selector on every redirect. The unrelated remaining changes in `7331fbd0` are not
+required to reproduce this failure. A production fix should keep context-switch metadata and the
+fast path explicit rather than coupling the predictor selector to all redirects.
 
 The four commits applied on disposable build worktrees are tool-compatibility changes only: remove
 a stale source-list entry, use the stable AXI interconnect wrapper, exclude unused accelerators,
