@@ -41,6 +41,7 @@ FPGA_CORRECTNESS_TESTS := \
     mt_mip_pending_read_test \
     mt_satp_sfence_test \
     mt_mprv_page_fault_test \
+    mt_smode_mret_smoke_test \
     mt_smode_sv39_entry_test \
     mt_smode_delegated_page_fault_test \
     mt_ctxtsw_nonresident_ring_test \
@@ -102,6 +103,7 @@ EXPERIMENTAL_TESTS := \
     mt_mip_pending_read_test \
     mt_satp_sfence_test \
     mt_mprv_page_fault_test \
+    mt_smode_mret_smoke_test \
     mt_smode_sv39_entry_test \
     mt_smode_delegated_page_fault_test \
     mt_ctxtsw_context_cache_cooperative_image \
