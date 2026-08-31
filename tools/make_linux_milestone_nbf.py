@@ -144,7 +144,17 @@ def main() -> None:
         ]
         parser.error("probe window is not fully backed by source NBF: " + ", ".join(missing))
 
-    original_first = int.from_bytes(blocks[args.pc & ~0x7][args.pc & 0x7 : (args.pc & 0x7) + 4], "little")
+    # A valid 32-bit instruction may start at either halfword within an
+    # aligned NBF block.  In particular, an instruction at offset six spans
+    # two 8-byte writes.  Assemble the guard word bytewise rather than using
+    # one block slice, which would silently compare only two bytes there.
+    original_first = int.from_bytes(
+        bytes(
+            blocks[(args.pc + offset) & ~0x7][(args.pc + offset) & 0x7]
+            for offset in range(4)
+        ),
+        "little",
+    )
     if args.expect_first_word is not None and original_first != args.expect_first_word:
         parser.error(
             f"first word mismatch at 0x{args.pc:x}: "
