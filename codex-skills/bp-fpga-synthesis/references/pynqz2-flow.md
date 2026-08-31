@@ -112,6 +112,26 @@ codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh xilinx@192.168.4.35
 Require `LOADING_BIT_SHA256` to match the staged `BOARD_BIT_SHA256` and require both
 `OVERLAY_LOAD_OK=1` and `REMOTE_OVERLAY_LOAD_OK=1` before launching a target image.
 
+### Retained board-run transcripts
+
+`control-program` configures terminal state and must be given a pseudo-terminal. A plain detached
+SSH command can lose all target output (or leave an uninspectable root child), so launch retained
+board tests through `script` and poll the board-side transcript:
+
+```bash
+ssh xilinx@<board> '\
+  cd ~/zynq-parrot/cosim/black-parrot-example/zynq && \
+  nohup /usr/bin/script -qef -c "sudo -n ./control-program <program>.nbf" \
+    <run>.log </dev/null >/dev/null 2>&1 & \
+  echo $! > <run>.pid'
+ssh xilinx@<board> 'tail -n 120 ~/zynq-parrot/cosim/black-parrot-example/zynq/<run>.log'
+```
+
+Require the transcript to contain the target marker (`CORE[0] PASS` or `CORE PASS`) and record its
+bitstream and NBF hashes. Treat an SSH-stream cutoff as inconclusive until the retained log is
+read. If the root runner cannot be stopped through its parent `script` process, power-cycle the
+board, reload the overlay, and start a fresh run; do not reuse a possibly contaminated fabric.
+
 ### Recovering an unreachable board
 
 If the board refuses SSH and the controlled outlet is available, export its state endpoint only
