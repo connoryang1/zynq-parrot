@@ -173,9 +173,11 @@ proc vivado_create_design { vpackages vsources vincludes } {
 
     # The context-cache dimensions are preprocessor overrides, not IP
     # parameters.  Make propagates them into vivado.tcl, but Vivado does not
-    # infer them from the environment when packaging an IP.  Apply them to the
-    # source fileset explicitly so both the packaged top IP and its generated
-    # block-design instance elaborate the same custom aviary configuration.
+    # infer them from the environment when packaging an IP.  Apply them only
+    # when the generated collateral selects e_bp_custom_cfg.  The PYNQ TCL
+    # always exports these environment variables; applying them to the static
+    # e_bp_unicore_zynqparrot_cfg would perturb a configuration that does not
+    # consume the custom aviary parameters.
     set context_define_names [list \
         BP_CUSTOM_BASE_CFG BP_NUM_THREADS BP_NUM_CONTEXTS BRANCH_METADATA_FWD_WIDTH]
     set context_defines [list]
@@ -184,13 +186,26 @@ proc vivado_create_design { vpackages vsources vincludes } {
             lappend context_defines "${define_name}=$::env(${define_name})"
         }
     }
-    if {[llength ${context_defines}] > 0} {
+    set selected_custom_cfg 0
+    set cfg_pkg_files [get_files -quiet bsg_blackparrot_pkg.sv]
+    foreach cfg_pkg ${cfg_pkg_files} {
+        set cfg_fd [open ${cfg_pkg} r]
+        set cfg_text [read ${cfg_fd}]
+        close ${cfg_fd}
+        if {[regexp {bp_cfg_gp\s*=\s*e_bp_custom_cfg} ${cfg_text}]} {
+            set selected_custom_cfg 1
+        }
+    }
+
+    if {[llength ${context_defines}] > 0 && ${selected_custom_cfg}} {
         if {[llength ${context_defines}] != [llength ${context_define_names}]} {
             error "incomplete context-cache Verilog defines: ${context_defines}"
         }
         set fileset [get_filesets sources_1]
         set_property verilog_define [concat [get_property verilog_define ${fileset}] ${context_defines}] ${fileset}
         puts "BP-CONTEXT-CONFIG: applied Verilog defines ${context_defines}"
+    } elseif {[llength ${context_defines}] > 0} {
+        puts "BP-CONTEXT-CONFIG: static cfg selected; ignored custom Verilog defines"
     }
 
     update_compile_order -verbose -fileset sources_1
