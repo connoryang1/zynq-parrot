@@ -120,6 +120,7 @@ EXPERIMENTAL_TESTS := \
     mt_ctxtsw_fpga_stage_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_nonresident_target_test \
+    mt_ctxtsw_nonresident_csr_bootstrap_test \
     mt_ctxtsw_sv39_asid_remap_test
 
 # These tests deliberately address logical contexts beyond the two physical
@@ -137,7 +138,8 @@ NONRESIDENT_TESTS := \
     mt_ctxtsw_nonresident_fp_target_test \
     mt_ctxtsw_fpga_stage_test \
     mt_ctxtsw_nonresident_ring_test \
-    mt_ctxtsw_nonresident_target_test
+    mt_ctxtsw_nonresident_target_test \
+    mt_ctxtsw_nonresident_csr_bootstrap_test
 
 NONRESIDENT_TARGETS := \
     $(addprefix run-,$(NONRESIDENT_TESTS)) \
