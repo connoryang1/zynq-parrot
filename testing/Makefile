@@ -36,6 +36,7 @@ FPGA_SMOKE_TESTS := \
 FPGA_CORRECTNESS_TESTS := \
     mt_global_cycle_csr_test \
     mt_amo_swap_return_test \
+    mt_amo_add_return_test \
     mt_trap_csr_bank_test \
     mt_timer_trap_csr_bank_test \
     mt_mip_pending_read_test \
@@ -44,6 +45,7 @@ FPGA_CORRECTNESS_TESTS := \
     mt_smode_mret_smoke_test \
     mt_smode_sv39_entry_test \
     mt_smode_delegated_page_fault_test \
+    mt_smode_linux_entry_smoke_test \
     mt_ctxtsw_nonresident_ring_test \
     mt_ctxtsw_nonresident_fp_target_test \
     mt_ctxtsw_nonresident_fp_ring_test \
@@ -98,6 +100,7 @@ EXPERIMENTAL_TESTS := \
     mt_fpga_gpr_late_writeback_smoke \
     mt_fpga_fp_execution_smoke \
     mt_amo_swap_return_test \
+    mt_amo_add_return_test \
     mt_trap_csr_bank_test \
     mt_timer_trap_csr_bank_test \
     mt_mip_pending_read_test \
@@ -106,6 +109,7 @@ EXPERIMENTAL_TESTS := \
     mt_smode_mret_smoke_test \
     mt_smode_sv39_entry_test \
     mt_smode_delegated_page_fault_test \
+    mt_smode_linux_entry_smoke_test \
     mt_ctxtsw_context_cache_cooperative_image \
     mt_context_cache_l1_service_test \
     mt_ctxtsw_nonresident_fp_ring_test \
@@ -207,6 +211,11 @@ $(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.nbf: $(ZP_RISCV_DIR)/bp-tests/$(1)_fpga.mem
 endef
 
 $(foreach t,$(FPGA_TESTS),$(eval $(call FPGA_TEST_RULES,$(t))))
+
+# Match Linux's first post-entry transfer while retaining the ordinary DRAMFS
+# reset vector at 0x80000000.  The test's probe function lives at the exact
+# physical address used by Linux's first higher-address initialization call.
+$(ZP_RISCV_DIR)/bp-tests/mt_smode_linux_entry_smoke_test_fpga.riscv: CFLAGS += -Wl,--section-start=.linux_high_text=0x80c05544
 
 define TEST_RULES
 $(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h $(TOP)/testing/mt_context_image.h | $(LOG_DIR)
