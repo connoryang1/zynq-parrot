@@ -120,10 +120,11 @@ board tests through `script` and poll the board-side transcript:
 
 ```bash
 ssh xilinx@<board> '\
-  cd ~/zynq-parrot/cosim/black-parrot-example/zynq && \
+  cd ~/zynq-parrot/cosim/black-parrot-example/zynq || exit 1; \
+  rm -f <run>.log <run>.pid; \
   nohup /usr/bin/script -qef -c "sudo -n ./control-program <program>.nbf" \
     <run>.log </dev/null >/dev/null 2>&1 & \
-  echo $! > <run>.pid'
+  runner_pid=$!; echo "$runner_pid" > <run>.pid; echo "RUNNER_STARTED_PID=$runner_pid"'
 ssh xilinx@<board> 'tail -n 120 ~/zynq-parrot/cosim/black-parrot-example/zynq/<run>.log'
 ```
 
