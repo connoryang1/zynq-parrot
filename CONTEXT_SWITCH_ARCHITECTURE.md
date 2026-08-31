@@ -22,9 +22,9 @@ resident architectural contexts and switches which context is live.
 
 Software controls contexts through CSRs:
 
-- `0x081`: switch to a target resident context
-- `0x082`: seed a dormant context's entry/resume PC
-- `0x083`: remotely seed architectural register state, including branch-specific
+- `0x800`: switch to a target resident context
+- `0x801`: seed a dormant context's entry/resume PC
+- `0x802`: remotely seed architectural register state, including branch-specific
   FP register support where present
 
 Per-context state includes:
@@ -51,7 +51,7 @@ finalize, and cancel semantics.
 
 In the committed-switch model:
 
-1. Software writes the target thread id to CSR `0x081`.
+1. Software writes the target thread id to CSR `0x800`.
 2. The instruction flows through the normal backend pipeline.
 3. On commit, BE recognizes `commit_pkt.ctxtsw`.
 4. Old-thread resume state is saved.
@@ -71,7 +71,7 @@ of the committed-switch model.
 Current source-level facts:
 
 - `bp_be_scheduler.sv` classifies immediate context switches in the issue path
-  as CSR writes to `12'h081`.
+  as CSR writes to `12'h800`.
 - `bp_be_detector.sv` treats register-form CSR writes as dependent on a
   preceding early integer producer when they use the same `rs1`; this avoids
   writing stale source data into CSRs such as `mscratch`.
@@ -145,7 +145,7 @@ Backend:
   accept/clear/roll behavior, hazard and thread-id ownership
 - calculator / pipe memory files: commit packet generation, replay, side
   effects, late writeback
-- CSR/regfile files: CSR `0x081`/`0x082`/`0x083`, per-thread register/CSR state
+- CSR/regfile files: CSR `0x800`/`0x801`/`0x802`, per-thread register/CSR state
 
 Frontend:
 

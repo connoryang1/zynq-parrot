@@ -24,18 +24,18 @@ The remaining gaps are mostly validation and system integration:
 
 | Banyan feature | Current status | Evidence / next action |
 | --- | --- | --- |
-| CTXT CSR switch (`0x081`) | Implemented | Tested by smoke, ring, throughput, and Banyan-style benchmarks. |
+| CTXT CSR switch (`0x800`) | Implemented | Tested by smoke, ring, throughput, and Banyan-style benchmarks. |
 | Per-context integer register file | Implemented | `mt_regfile_test`, ABI preservation, GPR ring stress. |
 | Per-context floating-point register file | Implemented | `mt_frf_isolation_test`. |
 | Per-context CSR file | Implemented | `mt_csr_isolation_test`; wrapper instantiates one CSR file per context. |
-| Per-context resume PC | Implemented | `0x082` seeding and ring/round-trip tests. |
+| Per-context resume PC | Implemented | `0x801` seeding and ring/round-trip tests. |
 | Different privilege modes per context | Under-tested | `mt_ctxtsw_privilege_isolation_test` validates privilege-control CSR ownership; full S/U-mode switch/resume remains future validation. |
 | Different address spaces / ASIDs | Implemented but not fully validated | `mt_ctxtsw_asid_translation_test` validates SATP/ASID ownership. Experimental `mt_ctxtsw_sv39_asid_remap_test` is a DTLB remap repro, but currently times out before proving the remap. Full S-mode fetch/resume remains future validation. |
 | ASID-tagged TLB entries | Implemented | TLB tags include ASID; FE shadow ASID updates on context switch. |
 | Per-context BTB/BHT | Implemented | `bp_fe_pc_gen.sv` instantiates per-thread BTB/BHT; benchmark coverage exists. |
 | RAS isolation | Under-tested / likely shared | `mt_ctxtsw_return_predictor_test` characterizes return-path pollution. |
 | Global history isolation | Under-tested / likely shared | `mt_ctxtsw_predictor_pollution` characterizes branch-history pollution. |
-| `rpush` / `rpull` instructions | Partial | CSR `0x083` provides remote integer/FP register writes; no true instruction pair yet. |
+| `rpush` / `rpull` instructions | Partial | CSR `0x802` provides remote integer/FP register writes; no true instruction pair yet. |
 | Monitor/mwait | Not implemented | Future fast-I/O and wakeup work. |
 | Thread descriptor table | Not implemented | Future software-visible context management work. |
 | Linux / ghOSt integration | Not implemented | Future system software work after resident substrate is stable. |

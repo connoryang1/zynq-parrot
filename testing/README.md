@@ -23,7 +23,7 @@ Run tests serially. The harness uses shared simulator/program artifacts under
   It checks for non-aliasing and preservation, not reset-to-IEEE-zero, because
   FP register storage may use recoded values internally. This is also the
   current regression for the FE/I-cache duplicate-hit context-switch bug: the
-  run resumes T0 at a halfword PC immediately after `csrw 0x081`, and the fixed
+  run resumes T0 at a halfword PC immediately after `csrw 0x800`, and the fixed
   I-cache must not feed a multi-hot instruction data select even if raw
   duplicate tag hits appear in the waveform.
 
@@ -122,7 +122,7 @@ Scale benchmark knobs:
   aggressive reporting setting, 2048. Smaller values are mostly smoke tests.
 - `SCALE_WARMUP`: unmeasured switches per context before `rdcycle` timing. The
   default is 256. This warms the ring path and reduces cold-start inflation.
-- `SCALE_UNROLL`: number of straight-line `csrw 0x081,next` operations per loop
+- `SCALE_UNROLL`: number of straight-line `csrw 0x800,next` operations per loop
   iteration. The default is 256 to remove the measured loop backedge as much as
   possible.
 - `SCALE_ALIGN`: hot-region alignment mode. The default is 64 for the aggressive
@@ -189,11 +189,11 @@ python3 tools/ctxtsw_perf_report.py path/to/dump.vcd \
   --run-log cosim/black-parrot-minimal-example/verilator/run.log
 ```
 
-The report auto-finds the first timed-loop `csrw 0x081` after `rdcycle` and
+The report auto-finds the first timed-loop `csrw 0x800` after `rdcycle` and
 parses `Total cycles` from the run log. Use `d_first_instr_dispatch` as the
 primary hardware metric: ctxtsw dispatch to first target-context instruction
 dispatch. Use `d_next_ctxtsw` only for benchmark throughput, since it includes
-loop/control instructions before the next `csrw 0x081`.
+loop/control instructions before the next `csrw 0x800`.
 
 For FE/I-cache context-switch regressions, especially illegal-instruction
 failures after a switch, also check the I-cache hit-select path:
@@ -242,8 +242,8 @@ slower context-switch commit path.
 
 ## Demo
 
-- `multithreading_demo`: older end-to-end demonstration of CSR `0x081`,
-  `0x082`, and `0x083` thread seeding and switching. Keep it as a user-facing
+- `multithreading_demo`: older end-to-end demonstration of CSR `0x800`,
+  `0x801`, and `0x802` thread seeding and switching. Keep it as a user-facing
   demo, not as the primary regression signal.
 
 ## Experimental Tests

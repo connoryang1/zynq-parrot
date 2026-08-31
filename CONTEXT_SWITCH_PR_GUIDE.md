@@ -9,9 +9,9 @@ Use this when preparing or reviewing a PR for the resident context-switch work.
    - What behavioral or performance claim it supports.
    - What kind of review is needed.
 2. Software model
-   - `CSR 0x081`: switch to a target resident context.
-   - `CSR 0x082`: seed a dormant context's entry/resume PC.
-   - `CSR 0x083`: seed remote architectural register state.
+   - `CSR 0x800`: switch to a target resident context.
+   - `CSR 0x801`: seed a dormant context's entry/resume PC.
+   - `CSR 0x802`: seed remote architectural register state.
 3. Architecture
    - BE owns architectural switch finalization.
    - The current `ctxtsw-isd-repair` branch may perform early FE

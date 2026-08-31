@@ -743,7 +743,7 @@ These are grounded in the current code and constrain the implementation:
 - The detector scoreboards are already thread-tagged by physical resident slot. That is correct for resident slots, but it does not by itself prove a victim slot is safe to evict.
 - Normal D-cache requests are formed inside `bp_be_calculator/bp_be_pipe_mem.sv` from a pipeline reservation and then passed to `bp_be_dcache.sv`. `bp_be_top.sv` only exposes the lower cache-engine interface, so a context-cache memory engine is not a trivial top-level request mux.
 - Normal memory operations enter the D-cache through the DMMU in `bp_be_calculator/bp_be_pipe_mem.sv`. A context-service path that wants physical backing addresses must either disable translation for its generated request or bypass/supply translation explicitly.
-- Existing software can remotely write another resident slot through CSR `0x083`, but no remote-read or `rpull` path exists in the current RTL/tests.
+- Existing software can remotely write another resident slot through CSR `0x802`, but no remote-read or `rpull` path exists in the current RTL/tests.
 
 Concrete code references:
 
@@ -759,7 +759,7 @@ Concrete code references:
 - `bp_be_csr.sv:326-334`: privilege and translation enable are sequential CSR state.
 - `bp_be_csr.sv:467-490`: SATP and many privilege CSRs are normal CSR state.
 - `bp_be_csr.sv:730-735`: memory translation info comes from CSR state, including SATP base PPN and ASID.
-- `bp_be_csr.sv:756-771`: bootstrap CSRs `0x082` and `0x083` also encode target IDs with `thread_id_width_p`.
+- `bp_be_csr.sv:756-771`: bootstrap CSRs `0x801` and `0x802` also encode target IDs with `thread_id_width_p`.
 - `bp_be_csr_wrapper_mt.sv:108-119`: one CSR instance is generated per resident hardware thread.
 - `bp_be_csr_wrapper_mt.sv:165-179`: CSR outputs and bootstrap side effects are selected from `current_thread_id_i`.
 - `bp_be_calculator/bp_be_pipe_mem.sv:222-259`: normal D-cache packets are constructed from pipeline reservations inside the memory pipe.
@@ -770,7 +770,7 @@ Concrete code references:
 
 ## Terminology
 
-- `logical_context_id`: software-visible context ID written to CSR `0x081`.
+- `logical_context_id`: software-visible context ID written to CSR `0x800`.
 - `resident_slot_id`: physical hardware slot used by the frontend PC/predictor state, backend regfile bank, scheduler hazards, and writeback routing.
 - `resident hit`: target logical context is already mapped to a resident slot.
 - `resident miss`: target logical context is not currently resident and must be restored from memory before it can run.
@@ -951,7 +951,7 @@ Alternative implementation to consider before RTL edits:
 - optionally use cooperative self-save/self-restore test code
 - then replace the software-only image handling with the hardware context FSM once the saved-image format and tests are proven
 
-This is especially useful because current bootstrap CSRs `0x082` and `0x083` are physical-slot addressed. Nonresident logical contexts need either:
+This is especially useful because current bootstrap CSRs `0x801` and `0x802` are physical-slot addressed. Nonresident logical contexts need either:
 
 - a memory image initialized by software before first switch, or
 - new logical-context bootstrap CSRs, or
@@ -959,7 +959,7 @@ This is especially useful because current bootstrap CSRs `0x082` and `0x083` are
 
 The memory image is the least invasive starting point.
 
-Limitation: software cannot non-cooperatively save an arbitrary resident slot's GPRs today. CSR `0x083` is remote write only; no remote-read/`rpull` equivalent was found. Hardware regfile scan is still required for transparent eviction.
+Limitation: software cannot non-cooperatively save an arbitrary resident slot's GPRs today. CSR `0x802` is remote write only; no remote-read/`rpull` equivalent was found. Hardware regfile scan is still required for transparent eviction.
 
 ## Concrete Implementation Surfaces
 
@@ -987,9 +987,9 @@ Logical IDs must never enter FE in this design. FE only needs the resident slot 
 
 ### CSR Boundary
 
-CSR `0x081` is the software-visible logical context ID. The read path now carries `current_context_id_i` from `bp_be_top.sv` through `bp_be_calculator_top.sv`, `bp_be_pipe_sys.sv`, and `bp_be_csr_wrapper_mt.sv` into `bp_be_csr.sv`, where CSR reads return the logical ID rather than the physical resident slot. Existing resident-only tests cover this as a no-regression path; a logical-ID-not-equal-physical-slot runtime check still needs the nonresident restore path.
+CSR `0x800` is the software-visible logical context ID. The read path now carries `current_context_id_i` from `bp_be_top.sv` through `bp_be_calculator_top.sv`, `bp_be_pipe_sys.sv`, and `bp_be_csr_wrapper_mt.sv` into `bp_be_csr.sv`, where CSR reads return the logical ID rather than the physical resident slot. Existing resident-only tests cover this as a no-regression path; a logical-ID-not-equal-physical-slot runtime check still needs the nonresident restore path.
 
-CSR `0x082` and `0x083` currently seed physical slots. Options:
+CSR `0x801` and `0x802` currently seed physical slots. Options:
 
 - keep them physical-only and use memory images for nonresident context initialization
 - add new logical-image init CSRs
