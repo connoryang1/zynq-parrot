@@ -43,6 +43,12 @@ Before copying a package to a board, run
 stem and SHA as authoritative; do not infer them from an older board Makefile or reuse already
 unpacked files.
 
+Before deploying a Linux NBF after adding or changing custom CSRs, reject CSR-address collisions
+in the exact image: `scripts/check_nbf_csr_collisions.sh <linux.nbf> <custom-csr> [...]`.
+Use an ISA-reserved custom range at the intended privilege level—for the current user-accessible
+context interface, `0x800`–`0x802`—rather than a standard CSR address. A collision is a functional
+blocker even if the Linux source never names the project extension.
+
 Stage a verified package and its NBFs with
 `scripts/stage_pynq_artifacts.sh <package> <ssh-host> [program.nbf ...]`. The helper reads the
 overlay filename from the board's dry-run load command, extracts the package, copies BIT/HWH/MAP
