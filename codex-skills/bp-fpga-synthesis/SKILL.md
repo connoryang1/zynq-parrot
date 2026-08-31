@@ -140,3 +140,9 @@ branch immediately afterward. A different AMO ordering or separate AMO destinati
 equivalent test because it can exercise a different pipeline path or its stale value can
 accidentally match the expected old value. Read the OpenSBI triage section in
 `references/pynqz2-flow.md` before changing RTL.
+
+For every silent-Linux FPGA iteration, use the diagnostic bundle in that reference before another
+RTL change or synthesis: record the trusted runner/bit/NBF hashes, run the ordered physical
+pre-SATP milestone probes, retain the board log, and run the matching traced local privilege/SATP
+gate. Do not treat a physical NBF marker after SATP as evidence unless its virtual-to-physical
+mapping has been established. The current PYNQ-Z2 image has no spare BRAM for an ILA.

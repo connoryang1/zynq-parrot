@@ -12,6 +12,9 @@ SCALE_WARMUP ?= 256
 SCALE_UNROLL ?= 256
 SCALE_ALIGN ?= 64
 SCALE_SAME_LOOP ?= 1
+# Extra plusargs for the shared Verilator runner.  Keep this separate from
+# program build flags so a focused trace window does not require a new model.
+SIM_RUN_ARGS ?=
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 LD     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-ld
@@ -226,8 +229,9 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
-	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) EXTRA_RUN_ARGS="$$(SIM_RUN_ARGS)" | grep -E "$$(RUN_LOG_FILTER)"
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
+	@grep -Eq "CORE(\\[0\\])? PASS|\\[BSG-PASS\\]" $$(SIM_DIR)/run.log
 endef
 
 $(foreach t,$(TESTS) $(EXPERIMENTAL_TESTS),$(eval $(call TEST_RULES,$(t))))

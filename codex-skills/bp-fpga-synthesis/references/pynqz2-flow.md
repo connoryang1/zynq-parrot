@@ -294,6 +294,85 @@ codex-skills/bp-fpga-synthesis/scripts/patch_nbf_bytes.py \
   input.nbf output.nbf --patch 0x80000000:probe.bin
 ```
 
+### Linux PC milestone probes
+
+For a post-OpenSBI silent Linux image, prefer a disposable stop-at-PC probe before adding RTL
+instrumentation. `tools/make_linux_milestone_nbf.py` replaces a small physical instruction
+window with two long-standing host put-character writes and a normal finish packet:
+
+```bash
+python3 tools/make_linux_milestone_nbf.py \
+  riscv/linux/linux-6.6-jhumphri-20250125.nbf /tmp/linux-m1.nbf \
+  --pc 0x802010d0 --marker 1 --expect-first-word 0x10401073
+```
+
+The runner prints `M1` immediately before `CORE PASS` only if execution reached
+that exact PC. Run separate probes at increasingly later known physical PCs to bracket a stall.
+The optional expected-word guard rejects stale addresses or a mismatched image. These probes are
+diagnostic only: host MMIO changes timing and the probe intentionally terminates, so never use them
+to measure performance or certify an uninstrumented Linux boot. They are reliable before virtual
+memory is enabled. A source-NBF patch after the first main-kernel `satp` write is conclusive only
+when the translated physical address of that PC is known: the pre-translation physical address need
+not contain the next fetched instruction. `--disable-satp` is safe only after that mapping has been
+established, because it clears translation and exits immediately; it is not a continuing Linux
+instrumentation mechanism.
+
+For the archived `linux-6.6-jhumphri-20250125.nbf`, begin with this ordered map (each value is
+the guard word at that physical PC):
+
+| Marker | PC | Guard word | Meaning |
+| --- | --- | --- | --- |
+| 1 | `0x802010d0` | `0x10401073` | Linux S-mode entry |
+| 2 | `0x80201102` | `0x016eb697` | boot-hart AMO path completed |
+| 3 | `0x80201120` | `0x016eb617` | BSS clear completed |
+| 4 | `0x8020113c` | `0x4097852e` | stack initialized, first kernel call pending |
+| 5 | `0x80c05544` | `0xe8a2711d` | early main-kernel target reached |
+| 6 | `0x80c06430` | `0x18079073` | immediately before first main-kernel `satp` write |
+| 7 | `0x80201146` | `0x00004517` | early main-kernel routine returned to its S-mode caller |
+| 8 | `0x80201000` | `0x01299597` | caller's relocation / `stvec` / `satp` transition helper entered |
+| 9 | `0x80201044` | `0x18051073` | immediately before the helper's first `satp` write |
+
+Start at 1 and 6. If one fails, use the intervening entries; add a narrower address range only
+after those coarse boundaries identify it. Derive virtual-to-physical translation before attempting
+a post-`satp` probe.
+
+### Silent-Linux diagnostic bundle
+
+Treat a silent Linux boot as a staged diagnosis, not a single pass/fail result. Before any RTL
+change or another routed build, retain a directory containing:
+
+1. top-level, BlackParrot, package, extracted-bitstream, runner, and NBF SHA-256 values;
+2. the exact board console log and whether the overlay was freshly loaded;
+3. ordered physical milestones through marker 9, stopping as soon as the first expected marker is
+   absent; and
+4. a matching local `TRACE=1` S-mode/Sv39 run and its FST, analyzed with
+   `tools/satp_fst_tail.awk`:
+
+   ```bash
+   BSG_TRACE_TIMEOUT_S=120 \
+     make -C testing clean run-mt_smode_sv39_entry_test TRACE=1
+   fst2vcd cosim/black-parrot-minimal-example/verilator/dump.fst \
+     | awk -v tail=128 -f tools/satp_fst_tail.awk
+   ```
+
+`BSG_TRACE_TIMEOUT_S` is a simulator-internal clean trace bound. Prefer it to an external
+`timeout` around the simulator Makefile: a process-group timeout can kill the parent while leaving
+the Verilator child and shared `run.log` alive. The tail extractor records SATP writes and the
+final retired PCs/virtual addresses without materializing a giant VCD. Once an earlier run has
+identified a useful cycle range, pass it without rebuilding the test program:
+
+```bash
+SIM_RUN_ARGS='+bsg_trace_start_cycle=<first> +bsg_trace_stop_cycle=<last>' \
+  BSG_TRACE_TIMEOUT_S=120 \
+  make -C testing run-mt_smode_sv39_entry_test TRACE=1
+```
+
+This dramatically reduces FST conversion time by excluding the slow NBF load from the waveform.
+
+Do not add an ILA merely to obtain these milestones: the current candidate already uses all 140
+PYNQ-Z2 BRAM tiles. A translation-aware software probe or a focused local FST is lower risk and
+does not perturb a resource-limited routed image.
+
 If the focused AMO test passes, patch OpenSBI's aligned
 `_start_hang` window to report `mcause` through host MMIO before changing RTL; this distinguishes a
 post-lottery machine-mode trap from an intentional firmware polling loop.
