@@ -170,6 +170,29 @@ proc vivado_create_design { vpackages vsources vincludes } {
     set_property -quiet file_type "Verilog" [get_files -quiet top.v]
 
     set_property top top [get_filesets sources_1]
+
+    # The context-cache dimensions are preprocessor overrides, not IP
+    # parameters.  Make propagates them into vivado.tcl, but Vivado does not
+    # infer them from the environment when packaging an IP.  Apply them to the
+    # source fileset explicitly so both the packaged top IP and its generated
+    # block-design instance elaborate the same custom aviary configuration.
+    set context_define_names [list \
+        BP_CUSTOM_BASE_CFG BP_NUM_THREADS BP_NUM_CONTEXTS BRANCH_METADATA_FWD_WIDTH]
+    set context_defines [list]
+    foreach define_name ${context_define_names} {
+        if {[info exists ::env(${define_name})]} {
+            lappend context_defines "${define_name}=$::env(${define_name})"
+        }
+    }
+    if {[llength ${context_defines}] > 0} {
+        if {[llength ${context_defines}] != [llength ${context_define_names}]} {
+            error "incomplete context-cache Verilog defines: ${context_defines}"
+        }
+        set fileset [get_filesets sources_1]
+        set_property verilog_define [concat [get_property verilog_define ${fileset}] ${context_defines}] ${fileset}
+        puts "BP-CONTEXT-CONFIG: applied Verilog defines ${context_defines}"
+    }
+
     update_compile_order -verbose -fileset sources_1
 }
 
@@ -212,4 +235,3 @@ proc vivado_create_ip_proj { proj_name proj_bd ip_name part ip_script args } {
     vivado_create_ip ${args}
     vivado_save_bd_design ${proj_name} ${proj_bd}
 }
-
