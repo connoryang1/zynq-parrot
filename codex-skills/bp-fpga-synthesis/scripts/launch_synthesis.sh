@@ -5,8 +5,31 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo_dir=$(git -C "$script_dir" rev-parse --show-toplevel)
 run_root="$repo_dir/logs/fpga"
 
+# Keep the immutable worker and its recorded configuration in lock-step.  The
+# historical full-system flow defaults to the stock aviary configuration, but
+# the context-cache PYNQ build must explicitly select its custom dimensions.
+fpga_cfg=${FPGA_CFG:-e_bp_unicore_zynqparrot_cfg}
+fpga_threads=${FPGA_VIVADO_THREADS:-4}
+fpga_num_threads=${FPGA_NUM_THREADS:-}
+fpga_num_contexts=${FPGA_NUM_CONTEXTS:-}
+
+if [[ -n "$fpga_num_threads" || -n "$fpga_num_contexts" ]]; then
+  if [[ -z "$fpga_num_threads" || -z "$fpga_num_contexts" ]]; then
+    echo "FPGA_NUM_THREADS and FPGA_NUM_CONTEXTS must be supplied together." >&2
+    exit 2
+  fi
+fi
+
+# The worker is a fresh tmux-launched invocation of this script.  Export the
+# resolved values so it cannot fall back to a different configuration.
+export FPGA_CFG="$fpga_cfg"
+export FPGA_VIVADO_THREADS="$fpga_threads"
+export FPGA_NUM_THREADS="$fpga_num_threads"
+export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
+
 usage() {
   echo "usage: $0 start | list | status <job-id> | worker <job-id> <commit>"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS"
 }
 
 case ${1:-} in
@@ -49,7 +72,9 @@ case ${1:-} in
     printf '%s\n' "$session_name" >"$job_dir/session"
     printf '%s\n' "$pid" >"$job_dir/pid"
     printf 'RUNNING\n' >"$job_dir/status"
-    printf 'job=%s\npid=%s\nlog=%s\n' "$job_id" "$pid" "$job_dir/console.log"
+    printf 'job=%s\npid=%s\nlog=%s\nconfig=%s threads=%s contexts=%s\n' \
+      "$job_id" "$pid" "$job_dir/console.log" "$fpga_cfg" \
+      "${fpga_num_threads:-<default>}" "${fpga_num_contexts:-<default>}"
     ;;
   worker)
     job_id=$2
@@ -63,6 +88,9 @@ case ${1:-} in
     worker_ok=0
     trap 'code=$?; if (( worker_ok )); then printf "PASS\n" >"$job_dir/status"; else printf "FAIL\n" >"$job_dir/status"; fi; exit $code' EXIT
     printf 'top_commit=%s\n' "$commit" >"$job_dir/revisions.txt"
+    printf 'cfg=%s\nvivado_threads=%s\nnum_threads=%s\nnum_contexts=%s\n' \
+      "$fpga_cfg" "$fpga_threads" "${fpga_num_threads:-<default>}" \
+      "${fpga_num_contexts:-<default>}" >>"$job_dir/revisions.txt"
     git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
     # Optimization checkpoints may pin local BlackParrot or BaseJump commits
     # that have not been pushed upstream yet. Seed those submodules from the
@@ -101,12 +129,22 @@ case ${1:-} in
     git -C "$worktree/import/basejump_stl" rev-parse HEAD | sed 's/^/basejump_commit=/' >>"$job_dir/revisions.txt"
     git -C "$worktree/import/black-parrot/external/basejump_stl" rev-parse HEAD \
       | sed 's/^/black_parrot_basejump_commit=/' >>"$job_dir/revisions.txt"
+    build_args=(
+      "BOARDNAME=pynqz2"
+      "VIVADO_VERSION=2024.2"
+      "VIVADO_MODE=batch"
+      "CFG=$fpga_cfg"
+      "THREADS=$fpga_threads"
+      "VIVADO_RUN=$script_dir/run_vivado_2024_2.sh"
+      "ZP_INSTALL_DIR=$repo_dir/install"
+      "ZP_RISCV_DIR=$repo_dir/riscv"
+    )
+    if [[ -n "$fpga_num_threads" ]]; then
+      build_args+=("NUM_THREADS=$fpga_num_threads" "NUM_CONTEXTS=$fpga_num_contexts")
+    fi
+    make -j1 -C "$worktree/cosim/black-parrot-example/vivado" clean "${build_args[@]}"
     make -j1 -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
-      BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
-      CFG=e_bp_unicore_zynqparrot_cfg \
-      THREADS=4 \
-      VIVADO_RUN="$script_dir/run_vivado_2024_2.sh" \
-      ZP_INSTALL_DIR="$repo_dir/install" ZP_RISCV_DIR="$repo_dir/riscv"
+      "${build_args[@]}"
     vivado_dir="$worktree/cosim/black-parrot-example/vivado"
     example_dir="$worktree/cosim/black-parrot-example"
     "$script_dir/summarize_vivado.sh" "$vivado_dir" >"$job_dir/summary.txt"
