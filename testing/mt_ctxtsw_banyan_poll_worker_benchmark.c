@@ -37,11 +37,11 @@ static volatile uint64_t shared_response = 0;
 static volatile uint64_t work_result     = 0;
 
 static inline void write_ctxt_0(void) {
-  __asm__ volatile("csrwi 0x081, 0" : : : "memory");
+  __asm__ volatile("csrwi 0x800, 0" : : : "memory");
 }
 
 static inline void write_ctxt_1(void) {
-  __asm__ volatile("csrwi 0x081, 1" : : : "memory");
+  __asm__ volatile("csrwi 0x800, 1" : : : "memory");
 }
 
 static inline uint64_t read_mhartid(void) {
@@ -52,7 +52,7 @@ static inline uint64_t read_mhartid(void) {
 
 static inline uint64_t read_ctxt(void) {
   uint64_t v;
-  __asm__ volatile("csrr %0, 0x081" : "=r"(v) : : "memory");
+  __asm__ volatile("csrr %0, 0x800" : "=r"(v) : : "memory");
   return v;
 }
 

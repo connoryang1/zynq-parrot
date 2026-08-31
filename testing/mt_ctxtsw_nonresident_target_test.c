@@ -16,11 +16,11 @@ static uint64_t t2_stack[STACK_WORDS];
 static volatile uint64_t t2_seen;
 
 static inline void ctxtsw_to_0(void) {
-  __asm__ volatile("csrwi 0x081, 0" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 0" ::: "memory");
 }
 
 static inline void ctxtsw_to_2(void) {
-  __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 2" ::: "memory");
 }
 
 void __attribute__((noinline, noreturn)) t2_entry(void) {

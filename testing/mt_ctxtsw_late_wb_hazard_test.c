@@ -46,7 +46,7 @@ void __attribute__((naked, noinline, noreturn)) t1_entry(void);
 void __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line) {
   __asm__ volatile(
     "ld    a5, 0(a0)\n"
-    "csrwi 0x081, 1\n"
+    "csrwi 0x800, 1\n"
     "ret\n"
   );
 }
@@ -64,7 +64,7 @@ void __attribute__((naked, noinline, noreturn)) t1_entry(void) {
     "li    t1, 1\n"
     "la    t0, t1_done\n"
     "sd    t1, 0(t0)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j     1b\n"
   );

@@ -72,13 +72,13 @@ void __attribute__((naked, noinline, noreturn)) t1_warm_entry(void) {
     "ld   t1, 0(t0)\n"
     "addi t1, t1, 1\n"
     "sd   t1, 0(t0)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j    1b\n"
     "9:\n"
     "la   t0, fail_code\n"
     "li   t1, 1\n"
     "sd   t1, 0(t0)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j    9b\n"
     :
     : "i"(FP_ENABLE_MASK)
@@ -101,13 +101,13 @@ void __attribute__((naked, noinline, noreturn)) t2_cold_entry(void) {
     "ld   t1, 0(t0)\n"
     "addi t1, t1, 1\n"
     "sd   t1, 0(t0)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j    1b\n"
     "9:\n"
     "la   t0, fail_code\n"
     "li   t1, 2\n"
     "sd   t1, 0(t0)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j    9b\n"
     :
     : "i"(FP_ENABLE_MASK)
@@ -127,7 +127,7 @@ static void __attribute__((noinline, aligned(8))) t0_warm_bench(void) {
     FP_CHECK_SEQ("9f")
     "beqz t0, 2f\n"
     "addi t0, t0, -1\n"
-    "csrwi 0x081, 1\n"
+    "csrwi 0x800, 1\n"
     "j    1b\n"
     "2:\n"
     ".option pop\n"
@@ -156,7 +156,7 @@ static void __attribute__((noinline, aligned(8))) t0_cold_bench(void) {
     FP_CHECK_SEQ("9f")
     "beqz t0, 2f\n"
     "addi t0, t0, -1\n"
-    "csrwi 0x081, 2\n"
+    "csrwi 0x800, 2\n"
     "j    1b\n"
     "2:\n"
     ".option pop\n"

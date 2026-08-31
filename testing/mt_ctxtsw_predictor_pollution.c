@@ -71,7 +71,7 @@ void __attribute__((naked, noinline, noreturn)) t1_pollute(void) {
     "andi t2, t1, 1\n"      /* LSB of count */
     "bnez t2, 1b\n"         /* taken on odd counts, falls through on even */
     "bnez t1, 1b\n"         /* outer always-taken until count reaches 0 */
-    "csrwi 0x081, 0\n"      /* switch back to T0 */
+    "csrwi 0x800, 0\n"      /* switch back to T0 */
     "1:\n"
     "j 1b\n"
     :
@@ -98,7 +98,7 @@ int main(void) {
 
   /* Switch to T1; T1 scrambles GHR with alternating branches */
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_pollute);
-  __asm__ volatile("csrwi 0x081, 1" : : : "memory");
+  __asm__ volatile("csrwi 0x800, 1" : : : "memory");
   /* T0 resumes here */
 
   restore_gp();

@@ -26,19 +26,19 @@ static uint64_t t3_stack[STACK_WORDS];
 void __attribute__((naked, noinline, noreturn)) t1_ping(void);
 
 static inline void write_ctxt(uint64_t v) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v));
 }
 
 static inline void write_ctxt_1(void) {
-  __asm__ volatile("csrwi 0x081, 1");
+  __asm__ volatile("csrwi 0x800, 1");
 }
 
 static inline void write_ctxt_2(void) {
-  __asm__ volatile("csrwi 0x081, 2");
+  __asm__ volatile("csrwi 0x800, 2");
 }
 
 static inline void write_ctxt_3(void) {
-  __asm__ volatile("csrwi 0x081, 3");
+  __asm__ volatile("csrwi 0x800, 3");
 }
 
 static inline uint64_t read_cycle(void) {
@@ -90,7 +90,7 @@ static inline void seed_thread_to_ping(uint64_t tid, uint64_t *stack_top) {
  * ever falls through instead of being redirected away by the context switch. */
 void __attribute__((naked, noinline, noreturn)) t1_ping(void) {
   __asm__ volatile(
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j    1b\n"
   );

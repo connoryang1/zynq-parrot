@@ -7,7 +7,7 @@
  *
  * Why this exists:
  *   A simple ring benchmark of
- *     csrw 0x081, next
+ *     csrw 0x800, next
  *     addi loop_counter, -1
  *     bnez loop
  *   measures the switch plus two extra retired instructions per iteration.
@@ -42,10 +42,10 @@ static inline uint64_t read_cycle(void) {
 void __attribute__((noinline, noreturn)) t1_ring(void) {
   for (uint64_t i = 0; i < LOOP_ITERS; i++) {
     __asm__ volatile(
-      "csrwi 0x081, 2\n"
-      "csrwi 0x081, 2\n"
-      "csrwi 0x081, 2\n"
-      "csrwi 0x081, 2\n"
+      "csrwi 0x800, 2\n"
+      "csrwi 0x800, 2\n"
+      "csrwi 0x800, 2\n"
+      "csrwi 0x800, 2\n"
     );
   }
 
@@ -56,10 +56,10 @@ void __attribute__((noinline, noreturn)) t1_ring(void) {
 void __attribute__((noinline, noreturn)) t2_ring(void) {
   for (uint64_t i = 0; i < LOOP_ITERS; i++) {
     __asm__ volatile(
-      "csrwi 0x081, 3\n"
-      "csrwi 0x081, 3\n"
-      "csrwi 0x081, 3\n"
-      "csrwi 0x081, 3\n"
+      "csrwi 0x800, 3\n"
+      "csrwi 0x800, 3\n"
+      "csrwi 0x800, 3\n"
+      "csrwi 0x800, 3\n"
     );
   }
 
@@ -70,10 +70,10 @@ void __attribute__((noinline, noreturn)) t2_ring(void) {
 void __attribute__((noinline, noreturn)) t3_ring(void) {
   for (uint64_t i = 0; i < LOOP_ITERS; i++) {
     __asm__ volatile(
-      "csrwi 0x081, 0\n"
-      "csrwi 0x081, 0\n"
-      "csrwi 0x081, 0\n"
-      "csrwi 0x081, 0\n"
+      "csrwi 0x800, 0\n"
+      "csrwi 0x800, 0\n"
+      "csrwi 0x800, 0\n"
+      "csrwi 0x800, 0\n"
     );
   }
 
@@ -89,10 +89,10 @@ int main(void) {
   uint64_t begin = read_cycle();
   for (uint64_t i = 0; i < LOOP_ITERS; i++) {
     __asm__ volatile(
-      "csrwi 0x081, 1\n"
-      "csrwi 0x081, 1\n"
-      "csrwi 0x081, 1\n"
-      "csrwi 0x081, 1\n"
+      "csrwi 0x800, 1\n"
+      "csrwi 0x800, 1\n"
+      "csrwi 0x800, 1\n"
+      "csrwi 0x800, 1\n"
     );
   }
   uint64_t end = read_cycle();

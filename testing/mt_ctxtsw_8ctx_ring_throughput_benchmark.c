@@ -151,7 +151,7 @@
 #define REP128(op) REP64(op) REP64(op)
 #define REP256(op) REP128(op) REP128(op)
 
-#define ASM_CSRW_NEXT "csrw 0x081, %[next]\n\t"
+#define ASM_CSRW_NEXT "csrw 0x800, %[next]\n\t"
 #define ASM_REP2(op)  op op
 #define ASM_REP4(op)  ASM_REP2(op) ASM_REP2(op)
 #define ASM_REP8(op)  ASM_REP4(op) ASM_REP4(op)
@@ -203,12 +203,12 @@ static inline uint64_t read_cycle(void) {
 
 static inline uint64_t read_context(void) {
   uint64_t v;
-  __asm__ volatile("csrr %0, 0x081" : "=r"(v));
+  __asm__ volatile("csrr %0, 0x800" : "=r"(v));
   return v;
 }
 
 static inline void switch_context(uint64_t tid) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(tid) : "memory");
+  __asm__ volatile("csrw 0x800, %0" : : "r"(tid) : "memory");
 }
 
 #if SAME_LOOP_WARMUP

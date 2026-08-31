@@ -22,21 +22,21 @@ static inline void ctxtsw(unsigned int target) {
   /* Do not carry host-I/O or flag stores across the context boundary. */
   __asm__ volatile("fence rw, rw" ::: "memory");
   if (target == 0)
-    __asm__ volatile("csrwi 0x081, 0" ::: "memory");
+    __asm__ volatile("csrwi 0x800, 0" ::: "memory");
   else if (target == 1)
-    __asm__ volatile("csrwi 0x081, 1" ::: "memory");
+    __asm__ volatile("csrwi 0x800, 1" ::: "memory");
   else
-    __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+    __asm__ volatile("csrwi 0x800, 2" ::: "memory");
 }
 
 void __attribute__((noinline, noreturn)) t1_entry(void) {
-  __asm__ volatile("csrwi 0x081, 0" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 0" ::: "memory");
   for (;;)
     ;
 }
 
 void __attribute__((noinline, noreturn)) t2_entry(void) {
-  __asm__ volatile("csrwi 0x081, 0" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 0" ::: "memory");
   for (;;)
     ;
 }

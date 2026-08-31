@@ -32,7 +32,7 @@ void __attribute__((interrupt, aligned(4))) timer_trap_entry(void) {
   __asm__ volatile("csrr %0, mepc" : "=r"(timer_trap_mepc));
   __asm__ volatile("csrr %0, mtval" : "=r"(timer_trap_mtval));
   __asm__ volatile("csrr %0, mip" : "=r"(timer_trap_mip));
-  __asm__ volatile("csrr %0, 0x081" : "=r"(timer_trap_context));
+  __asm__ volatile("csrr %0, 0x800" : "=r"(timer_trap_context));
 
   __asm__ volatile("csrc mie, %0" : : "r"(MIE_MTIE) : "memory");
   timer_trap_seen = 1;

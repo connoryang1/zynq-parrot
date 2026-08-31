@@ -49,7 +49,7 @@ static void __attribute__((noinline, aligned(8))) t0_warm_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 1\n")
+    REP32("csrwi 0x800, 1\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -63,7 +63,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t1_warm_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 0\n")
+    REP32("csrwi 0x800, 0\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -80,7 +80,7 @@ static void __attribute__((noinline, aligned(8))) t0_cold_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 2\n")
+    REP32("csrwi 0x800, 2\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -94,7 +94,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t2_cold_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP32("csrwi 0x081, 0\n")
+    REP32("csrwi 0x800, 0\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"

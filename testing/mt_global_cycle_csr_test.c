@@ -29,11 +29,11 @@ static inline uint64_t read_time(void) {
 
 static inline void switch_to(unsigned int context_id) {
   if (context_id == 0)
-    __asm__ volatile("csrwi 0x081, 0" ::: "memory");
+    __asm__ volatile("csrwi 0x800, 0" ::: "memory");
   else if (context_id == 1)
-    __asm__ volatile("csrwi 0x081, 1" ::: "memory");
+    __asm__ volatile("csrwi 0x800, 1" ::: "memory");
   else
-    __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+    __asm__ volatile("csrwi 0x800, 2" ::: "memory");
 }
 
 void __attribute__((noinline, noreturn)) resident_entry(void) {

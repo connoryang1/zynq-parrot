@@ -53,13 +53,13 @@ void __attribute__((naked, noinline, noreturn)) t2_entry(void) {
     "la    t2, t2_seen\n"
     "li    t3, 1\n"
     "sd    t3, 0(t2)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j     .\n"
     "1:\n"
     "la    t2, t2_seen\n"
     "li    t3, 2\n"
     "sd    t3, 0(t2)\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j     .\n"
     :
     : "i"(3ULL << 13), "i"(T2_SENTINEL)
@@ -74,7 +74,7 @@ int main(void) {
 
   enable_fp();
   write_f1(T0_SENTINEL);
-  __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 2" ::: "memory");
 
   if (t2_seen != 1) {
     bp_print_string("[BSG-FAIL] nonresident FP context 2 did not verify f1, code=");

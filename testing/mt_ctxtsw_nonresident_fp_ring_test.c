@@ -65,14 +65,14 @@ void __attribute__((naked, noinline, noreturn)) t2_entry(void) {
     "addi  t1, t1, 1\n"
     "sd    t1, 0(t0)\n"
     "fence\n"
-    "csrwi 0x081, 3\n"
+    "csrwi 0x800, 3\n"
     "j     1b\n"
     "9:\n"
     "la    t0, fail_code\n"
     "li    t1, 2\n"
     "sd    t1, 0(t0)\n"
     "fence\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j     9b\n"
     :
     : "i"(3ULL << 13), "i"(T2_SENTINEL)
@@ -105,17 +105,17 @@ void __attribute__((naked, noinline, noreturn)) t3_entry(void) {
     "fence\n"
     "li    t2, %2\n"
     "bltu  t1, t2, 2f\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j     1b\n"
     "2:\n"
-    "csrwi 0x081, 2\n"
+    "csrwi 0x800, 2\n"
     "j     1b\n"
     "9:\n"
     "la    t0, fail_code\n"
     "li    t1, 3\n"
     "sd    t1, 0(t0)\n"
     "fence\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "j     9b\n"
     :
     : "i"(3ULL << 13), "i"(T3_SENTINEL), "i"(ROUNDS)
@@ -133,7 +133,7 @@ int main(void) {
 
   enable_fp();
   write_f1(T0_SENTINEL);
-  __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 2" ::: "memory");
 
   if (read_f1() != T0_SENTINEL) {
     bp_print_string("[BSG-FAIL] logical context 0 lost f1 across restore\n");

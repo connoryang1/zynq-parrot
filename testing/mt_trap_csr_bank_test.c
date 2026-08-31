@@ -30,7 +30,7 @@ void __attribute__((naked, aligned(4))) trap_entry(void) {
       "csrr t0, mtval\n"
       "la t1, trap_mtval\n"
       "sd t0, 0(t1)\n"
-      "csrr t0, 0x081\n"
+      "csrr t0, 0x800\n"
       "la t1, trap_context\n"
       "sd t0, 0(t1)\n"
       "li t0, 1\n"

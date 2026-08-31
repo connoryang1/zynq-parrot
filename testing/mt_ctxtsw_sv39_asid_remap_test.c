@@ -65,11 +65,11 @@ static volatile uint64_t t1_satp_after_write = 0;
 static volatile uint64_t progress = 0;
 
 static inline void write_ctxt(uint64_t v) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(v) : "memory");
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v) : "memory");
 }
 
 static inline void write_ctxt0(void) {
-  __asm__ volatile("csrw 0x081, x0" : : : "memory");
+  __asm__ volatile("csrw 0x800, x0" : : : "memory");
 }
 
 static inline uint64_t read_satp(void) {

@@ -41,12 +41,12 @@ static inline uint64_t read_cycle(void) {
 
 static inline uint64_t read_context(void) {
   uint64_t v;
-  __asm__ volatile("csrr %0, 0x081" : "=r"(v));
+  __asm__ volatile("csrr %0, 0x800" : "=r"(v));
   return v;
 }
 
 static inline void switch_context(uint64_t tid) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(tid) : "memory");
+  __asm__ volatile("csrw 0x800, %0" : : "r"(tid) : "memory");
 }
 
 static void __attribute__((noinline, aligned(64)))
@@ -54,7 +54,7 @@ ring_switch_256(uint64_t next_tid) {
   __asm__ volatile(
     ".p2align 3\n"
     ".rept 256\n"
-    "csrw 0x081, %[next]\n"
+    "csrw 0x800, %[next]\n"
     ".endr\n"
     :
     : [next] "r"(next_tid)

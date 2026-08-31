@@ -7,16 +7,16 @@
  * properly isolates register state between hardware threads.
  *
  * Mechanism:
- *   CSR 0x081 (CTXT): read/write current thread ID; writing triggers NPC redirect
- *   CSR 0x082 (CTXT_NPC): write-only bootstrap of thread NPC.
+ *   CSR 0x800 (CTXT): read/write current thread ID; writing triggers NPC redirect
+ *   CSR 0x801 (CTXT_NPC): write-only bootstrap of thread NPC.
  *                          Value format: {thread_id[7:0], target_npc[63:0]}
  *                          (packed as a 64-bit value with thread_id in upper bits)
  *
  * Test flow:
  *   Thread 0 (main):
- *     1. Seed thread 1 entry via CSR 0x082
+ *     1. Seed thread 1 entry via CSR 0x801
  *     2. Store sentinel values in global vars (thread 0's "registers")
- *     3. Switch to thread 1 via CSR 0x081 = 1
+ *     3. Switch to thread 1 via CSR 0x800 = 1
  *     4. Thread 0 resumes after thread 1 switches back
  *     5. Verify globals are intact (register isolation)
  *
@@ -24,7 +24,7 @@
  *     1. Clobbers local registers with different values
  *     2. Verifies it sees its OWN registers (not thread 0's)
  *     3. Writes result to shared memory
- *     4. Switches back to thread 0 via CSR 0x081 = 0
+ *     4. Switches back to thread 0 via CSR 0x800 = 0
  */
 
 #include <stdint.h>
@@ -34,12 +34,12 @@
 /* CSR accessors */
 static inline uint64_t read_ctxt(void) {
   uint64_t val;
-  __asm__ volatile("csrr %0, 0x081" : "=r"(val) : :);
+  __asm__ volatile("csrr %0, 0x800" : "=r"(val) : :);
   return val;
 }
 
 static inline void write_ctxt(uint64_t val) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(val) :);
+  __asm__ volatile("csrw 0x800, %0" : : "r"(val) :);
 }
 
 /* Shared state between threads */
@@ -97,7 +97,7 @@ static void __attribute__((noinline, used)) thread1_main(void) {
   bp_finish(1);
 }
 
-/* Thread 1 naked entry point — seeded via CSR 0x082.
+/* Thread 1 naked entry point — seeded via CSR 0x801.
  * All registers (including sp/x2) start as 0 in thread 1's register file,
  * so we must set sp in assembly before calling any C function. */
 void __attribute__((naked, noinline)) thread1_entry(void) {
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
 
   /* Context switch: hardware saves thread 0's NPC (next instruction after this)
    * and redirects frontend to thread 1's seeded NPC (thread1_entry).
-   * Thread 0 will resume here when thread 1 does csrw 0x081, 0. */
+   * Thread 0 will resume here when thread 1 does csrw 0x800, 0. */
   write_ctxt(1);
 
   /* === Thread 0 resumes here after thread 1 switches back === */

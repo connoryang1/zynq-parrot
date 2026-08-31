@@ -66,7 +66,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t1_timed_entry(void) {
   raw_redirect_cycles[trial] = target_begin - before_switch_cycle;
   switch_cycles[trial] = end - switch_start_cycle;
 
-  __asm__ volatile("csrwi 0x081, 0" : : : "memory");
+  __asm__ volatile("csrwi 0x800, 0" : : : "memory");
   for (;;)
     ;
 }
@@ -77,7 +77,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t1_warm_entry(void) {
     ".option norvc\n"
     ALU_STREAM
     ".option pop\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     : : : "memory"
   );
 
@@ -99,7 +99,7 @@ int main(void) {
   __asm__ volatile("mv %0, sp" : "=r"(sp_val));
   seed_thread(0, (uint64_t *)sp_val, (uint64_t)&&after_warm_switch);
   seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_warm_entry);
-  __asm__ volatile("csrwi 0x081, 1" : : : "memory");
+  __asm__ volatile("csrwi 0x800, 1" : : : "memory");
 
 after_warm_switch:
   for (uint64_t trial = 0; trial < TRIALS; trial++) {
@@ -131,7 +131,7 @@ after_warm_switch:
     uint64_t before_switch = read_cycle();
     before_switch_cycle = before_switch;
     pre_switch_cycles[trial] = before_switch - switch_begin;
-    __asm__ volatile("csrwi 0x081, 1" : : : "memory");
+    __asm__ volatile("csrwi 0x800, 1" : : : "memory");
 
 after_timed_switch:
     ;

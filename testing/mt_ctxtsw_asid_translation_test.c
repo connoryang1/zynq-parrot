@@ -23,7 +23,7 @@ static volatile uint64_t t1_after_write_satp = ~0ULL;
 static volatile uint64_t t1_after_resume_satp = ~0ULL;
 
 static inline void write_ctxt(uint64_t v) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(v) : "memory");
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v) : "memory");
 }
 
 static inline uint64_t read_satp(void) {
