@@ -58,12 +58,32 @@ def sw(rs2: int, rs1: int, imm: int = 0) -> int:
     )
 
 
-def probe_words(marker: int, disable_satp: bool) -> list[int]:
+def sltu(rd: int, rs1: int, rs2: int) -> int:
+    return (rs2 << 20) | (rs1 << 15) | (0b011 << 12) | (rd << 7) | 0x33
+
+
+def probe_words(
+    marker: int, disable_satp: bool, report_nonzero_reg: int | None
+) -> list[int]:
     """Emit ``M<marker>`` through long-standing host channels, then finish."""
     # t0=x5, t1=x6.  marker is deliberately limited to ADDI's immediate so
     # the probe remains compact and its complete effect is obvious in a dump.
     prefix = [0x18001073, 0x12000073] if disable_satp else []
-    return prefix + [
+    report = []
+    if report_nonzero_reg is not None:
+        # Print V0 or V1 without changing the reported register.  This is
+        # intentionally just a predicate: it remains safe at a marker site
+        # with minimal register liveness assumptions and is enough to compare
+        # control-flow selectors between FPGA images.
+        report = [
+            lui(5, HOST_PUTC),
+            addi(6, 0, ord("V")),
+            sw(6, 5),
+            sltu(6, 0, report_nonzero_reg),
+            addi(6, 6, ord("0")),
+            sw(6, 5),
+        ]
+    return prefix + report + [
         # Do not use the newer signature or integer-print channels here.
         # Several archived PYNQ runners predate them, whereas putc exists in
         # every runner that can boot the shipped Linux image.  The two printable
@@ -99,10 +119,16 @@ def main() -> None:
         "--disable-satp", action="store_true",
         help="clear SATP and flush translations before reporting (post-MMU probes only)",
     )
+    parser.add_argument(
+        "--report-nonzero-reg", type=int,
+        help="print V0/V1 for whether this integer register (0 through 31) is nonzero",
+    )
     args = parser.parse_args()
 
     if not 0 <= args.marker < len(MARKER_DIGITS):
         parser.error(f"--marker must be in 0..{len(MARKER_DIGITS) - 1}")
+    if args.report_nonzero_reg is not None and not 0 <= args.report_nonzero_reg < 32:
+        parser.error("--report-nonzero-reg must be in 0..31")
     # Linux's handoff path uses compressed instructions.  IALIGN is therefore
     # 16 bits: an instruction can legitimately begin at address 2 mod 4 even
     # when the replacement instructions themselves are standard 32-bit words.
@@ -110,7 +136,10 @@ def main() -> None:
         parser.error("--pc must be 2-byte instruction aligned")
 
     data = b"".join(
-        word.to_bytes(4, "little") for word in probe_words(args.marker, args.disable_satp)
+        word.to_bytes(4, "little")
+        for word in probe_words(
+            args.marker, args.disable_satp, args.report_nonzero_reg
+        )
     )
     start = args.pc & ~0x7
     end = (args.pc + len(data) + 7) & ~0x7
@@ -179,6 +208,7 @@ def main() -> None:
     print(f"pc=0x{args.pc:x} original_first_word=0x{original_first:08x}")
     print(
         f"marker={args.marker} disable_satp={int(args.disable_satp)} "
+        f"report_nonzero_reg={args.report_nonzero_reg} "
         f"overwritten_bytes={len(data)} aligned_writes={len(writes)}"
     )
     print(
