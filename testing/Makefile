@@ -44,6 +44,7 @@ FPGA_CORRECTNESS_TESTS := \
     mt_timer_trap_csr_bank_test \
     mt_mip_pending_read_test \
     mt_satp_sfence_test \
+    mt_satp_mode_filter_test \
     mt_mprv_page_fault_test \
     mt_smode_mret_smoke_test \
     mt_smode_sv39_entry_test \
@@ -108,6 +109,7 @@ EXPERIMENTAL_TESTS := \
     mt_timer_trap_csr_bank_test \
     mt_mip_pending_read_test \
     mt_satp_sfence_test \
+    mt_satp_mode_filter_test \
     mt_mprv_page_fault_test \
     mt_smode_mret_smoke_test \
     mt_smode_sv39_entry_test \
