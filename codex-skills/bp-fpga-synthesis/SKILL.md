@@ -64,7 +64,8 @@ passwordless access to Python, a shell, `make`, or arbitrary overlay paths.
 If the PYNQ board stops accepting SSH, use
 `PYNQ_POWER_STATE_URL=... scripts/power_cycle_pynq.sh <ssh-host>`. Keep the controller URL in the
 environment, never in tracked files or logs. A power cycle restores the board's default overlay;
-explicitly reload and verify the intended BlackParrot bitstream before interpreting any run.
+the helper waits for both SSH and the PYNQ PL manager before returning. Explicitly reload and
+verify the intended BlackParrot bitstream before interpreting any run.
 
 For an interactive variant of the maintained Linux regression NBF, use
 `scripts/make_linux_shell_nbf.py <linux.nbf> <linux-shell.nbf>`. The helper changes only the

@@ -144,9 +144,11 @@ PYNQ_POWER_STATE_URL='<private-state-endpoint>' \
   xilinx@192.168.4.35
 ```
 
-The helper powers the outlet off, waits briefly, powers it on, and polls SSH with bounded timeouts.
-Do not commit or print the endpoint because it contains a controller credential. Treat a successful
-SSH reconnect only as evidence that the board OS rebooted. Power cycling removes the loaded
+The helper powers the outlet off, waits briefly, powers it on, and waits for both SSH and the
+`start_pl_server.py` PYNQ PL manager with bounded timeouts. Do not reload an overlay merely
+because SSH returned: on this image it can precede PL-manager readiness and leave the board
+unreachable. Do not commit or print the endpoint because it contains a controller credential.
+Power cycling removes the loaded
 BlackParrot overlay and invalidates prior CMA/DRAM allocation state, so reload the intended overlay
 and recheck the bitstream and NBF hashes before running a test.
 
