@@ -10,6 +10,7 @@ ssh_host=$1
 remote_dir=${2:-'~/zynq-parrot/cosim/black-parrot-example/zynq'}
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo_dir=$(git -C "$script_dir" rev-parse --show-toplevel)
+serial_runner="$script_dir/run_pynq_serial.sh"
 nbf_dir="$repo_dir/riscv/bp-tests"
 log_dir=${PYNQ_VALIDATION_LOG_DIR:-"$repo_dir/logs/pynq-validation"}
 timeout_seconds=${PYNQ_VALIDATION_TIMEOUT_SECONDS:-180}
@@ -39,6 +40,17 @@ remote() {
   ssh -o BatchMode=yes "$ssh_host" "cd $remote_dir && $1"
 }
 
+require_idle_runner() {
+  # The board has one PL/DRAM control path.  A previously orphaned manual
+  # control-program run invalidates every later result, even if this harness
+  # itself is otherwise sequential.
+  if remote "pgrep -x control-program >/dev/null || pgrep -f '[s]cript .*control-program' >/dev/null"; then
+    echo "FAIL: board already has an active control-program runner" >&2
+    remote "pgrep -af 'control-program' || true" >&2
+    exit 1
+  fi
+}
+
 if remote "grep -q -- '-DDRAM_TEST' build.log"; then
   echo "FAIL: board control-program build.log contains -DDRAM_TEST" >&2
   exit 1
@@ -47,6 +59,7 @@ fi
 remote "sha256sum blackparrot_bd_1.bit 2>/dev/null || sha256sum black_parrot_bd_1.bit"
 
 for test_name in "${tests[@]}"; do
+  require_idle_runner
   image="${test_name}_fpga.nbf"
   local_image="$nbf_dir/$image"
   log="$log_dir/${test_name}.log"
@@ -59,10 +72,11 @@ for test_name in "${tests[@]}"; do
   }
   echo "RUN  $test_name sha256=$local_sha"
   set +e
-  # The control program runs as root, so wrapping sudo with a user-owned
-  # timeout cannot reliably signal the actual worker.  Pass the bound to the
-  # control program itself; it shuts down the target and exits with 124.
-  remote "sudo -n \"\$(pwd)/control-program\" $image $runtime_limit_ms" >"$log" 2>&1
+  # The serial wrapper owns the atomic board lock and waits for the exact
+  # privileged worker.  Passing the limit through control-program preserves
+  # its clean shutdown semantics without leaving an orphan behind.
+  PYNQ_CONTROL_PROGRAM_TIMEOUT_MS="$runtime_limit_ms" \
+    "$serial_runner" "$ssh_host" "$image" "$remote_dir" >"$log" 2>&1
   run_rc=$?
   set -e
   if grep -Eq 'CORE FAIL|BSG-FAIL' "$log" || ! grep -Eq 'CORE\[0\] PASS|CORE PASS' "$log"; then

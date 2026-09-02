@@ -46,9 +46,12 @@ change only the fetch transport:
 Run `../scripts/setup_sourceware_mirrors.sh` from this skill instead of editing the SDK's tracked
 `.gitmodules`. The helper uses shallow checkouts and verifies the final commits against gitlinks.
 
-The historical `bp_unicore_zynqparrot_cfg_p` argument is not the current enum used by this
-repository. Prefer `e_bp_unicore_zynqparrot_cfg` unless the active branch explicitly adds a new
-configuration.
+`bp_unicore_zynqparrot_cfg_p` is the base definition behind the top-level
+`e_bp_unicore_zynqparrot_cfg` Make enum. The static enum is the deployable
+context-cache configuration: it encodes two resident banks and four
+architectural contexts. Do not use `e_bp_custom_cfg`: the dynamic macro path
+tests an unexpanded parameter name and silently falls back to an incompatible
+four-resident-thread design.
 
 ## Board deployment
 
@@ -116,22 +119,41 @@ Require `LOADING_BIT_SHA256` to match the staged `BOARD_BIT_SHA256` and require 
 
 `control-program` configures terminal state and must be given a pseudo-terminal. A plain detached
 SSH command can lose all target output (or leave an uninspectable root child), so launch retained
-board tests through `script` and poll the board-side transcript:
+board tests through `script` and poll the board-side transcript. **There must be exactly one
+control-program run on the board at a time.** Use the serial helper; it atomically acquires a
+board-side lock, rejects a legacy/manual runner, retains the transcript under `~/bp-logs`, and
+waits for the exact launched PID to write its exit status before it returns:
+
+```bash
+codex-skills/bp-fpga-synthesis/scripts/run_pynq_serial.sh \
+  xilinx@<board> <program>.nbf
+```
+
+Do not schedule a delayed remote launch behind a local timeout: the local caller can disappear
+while its remote command later starts, causing two runners to compete for PL DRAM and GP ports.
+If the helper reports `ACTIVE_RUNNER`, do not retry; inspect the retained transcript or power-cycle,
+reload the overlay, and then start a fresh run. It reclaims only a lock whose recorded wrapper PID
+is dead and only after confirming no direct `control-program` or `script` runner remains.
+
+For manual inspection only, the underlying retained-run form is:
 
 ```bash
 ssh xilinx@<board> '\
   cd ~/zynq-parrot/cosim/black-parrot-example/zynq || exit 1; \
-  rm -f <run>.log <run>.pid; \
+  mkdir -p ~/bp-logs; \
+  log=~/bp-logs/<run>.log; rm -f "$log"; \
   nohup /usr/bin/script -qef -c "sudo -n ./control-program <program>.nbf" \
-    <run>.log </dev/null >/dev/null 2>&1 & \
-  runner_pid=$!; echo "$runner_pid" > <run>.pid; echo "RUNNER_STARTED_PID=$runner_pid"'
-ssh xilinx@<board> 'tail -n 120 ~/zynq-parrot/cosim/black-parrot-example/zynq/<run>.log'
+    "$log" </dev/null >/dev/null 2>&1 & \
+  runner_pid=$!; echo "$runner_pid" > ~/bp-logs/<run>.pid; echo "RUNNER_STARTED_PID=$runner_pid LOG=$log"'
+ssh xilinx@<board> 'tail -n 120 ~/bp-logs/<run>.log'
 ```
 
 Require the transcript to contain the target marker (`CORE[0] PASS` or `CORE PASS`) and record its
-bitstream and NBF hashes. Treat an SSH-stream cutoff as inconclusive until the retained log is
-read. If the root runner cannot be stopped through its parent `script` process, power-cycle the
-board, reload the overlay, and start a fresh run; do not reuse a possibly contaminated fabric.
+bitstream and NBF hashes. Store Linux-run transcripts under `~/bp-logs`, not `/tmp`: a board
+power-cycle removes `/tmp` evidence, while user-home storage survives the recovery. Treat an
+SSH-stream cutoff as inconclusive until the retained log is read. If the root runner cannot be
+stopped through its parent `script` process, power-cycle the board, reload the overlay, and start a
+fresh run; do not reuse a possibly contaminated fabric.
 
 ### Recovering an unreachable board
 

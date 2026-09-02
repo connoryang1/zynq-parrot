@@ -14,7 +14,11 @@ acceptable timing as the fit gate; elaboration or synthesis alone is not enough.
 2. Record the top-level commit and pinned `import/black-parrot` commit.
 3. Require a clean top-level worktree and clean BlackParrot submodule for a comparison build.
 4. Run the relevant simulation/correctness gate before spending hours on Vivado.
-5. Use `CFG=e_bp_unicore_zynqparrot_cfg` unless the branch defines and documents another enum.
+5. Use the exact configuration that produced the NBF. The deployed PYNQ-Z2
+   context-cache image uses the static `CFG=e_bp_unicore_zynqparrot_cfg`,
+   which encodes two resident banks and four architectural contexts. Do not
+   use the dynamic `e_bp_custom_cfg` path: its macro expansion is broken here
+   and silently selects an incompatible four-resident-thread design.
 
 If Sourceware returns HTTP 429 during `prep_lite`, run
 `scripts/setup_sourceware_mirrors.sh`. It installs checkout-local mirror URLs and shallowly
@@ -144,6 +148,7 @@ accidentally match the expected old value. Read the OpenSBI triage section in
 
 For every silent-Linux FPGA iteration, use the diagnostic bundle in that reference before another
 RTL change or synthesis: record the trusted runner/bit/NBF hashes, run the ordered physical
-pre-SATP milestone probes, retain the board log, and run the matching traced local privilege/SATP
-gate. Do not treat a physical NBF marker after SATP as evidence unless its virtual-to-physical
-mapping has been established. The current PYNQ-Z2 image has no spare BRAM for an ILA.
+pre-SATP milestone probes, retain the board log in persistent board-home storage (never `/tmp`),
+and run the matching traced local privilege/SATP gate. Do not treat a physical NBF marker after
+SATP as evidence unless its virtual-to-physical mapping has been established. The current PYNQ-Z2
+image has no spare BRAM for an ILA.
