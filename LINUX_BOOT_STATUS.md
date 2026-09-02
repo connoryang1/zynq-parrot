@@ -19,8 +19,9 @@ context-switch work; **fixed here** names a repair authored during this work;
 | 4 | OpenSBI initializes machine CSRs, timer/interrupt delegation, PMP, and its trap path. | **Pre-existing:** working. On the current routed FPGA image, M-mode synchronous traps, timer traps, AMOSWAP, and AMOADD all pass. |
 | 5 | OpenSBI executes `mret`, transferring to the Linux kernel in supervisor mode (S-mode). | **Pre-existing:** working; the exact 2-thread/4-context simulator M-to-S smoke passes. |
 | 6 | Linux performs early CPU, page-table, and trap initialization. | **Fixed here / FPGA verified:** the scoped frontend/I-cache repairs let the current image pass these stages, enable Sv39, initialize interrupts/RCU, and reach the early DMA allocator. |
-| 7 | Linux allocates its two 128 KiB atomic DMA pools and continues device/kernel initialization. | **Current blocker:** the unchanged Linux image prints both successful pool-allocation messages, then makes no further console progress. The stop is after kernel time 1.34 s; it is not yet attributed to one RTL line. |
-| 8 | Linux mounts/uses the bundled initramfs and executes `/init`. | **Pre-existing baseline:** known to work and prints `Hello from rootFS`; **remaining:** prove it with the repaired image after step 7 is fixed. |
+| 7 | Linux allocates its two 128 KiB atomic DMA pools and continues device/kernel initialization. | **Fixed as a false boundary:** `initcall_debug` proves `dma_atomic_pool_init` returns 0 and many later initcalls complete. |
+| 8 | Linux's RISC-V unaligned-access capability probe runs. | **Current blocker / FPGA verified:** `check_unaligned_access_boot_cpu` prints its initcall entry but never its return. This is a synchronous misaligned-access/exception-path failure, not a DMA allocator or context-switch command. |
+| 9 | Linux mounts/uses the bundled initramfs and executes `/init`. | **Pre-existing baseline:** known to work and prints `Hello from rootFS`; **remaining:** prove it with the repaired image after step 8 is fixed. |
 
 ## Repairs made during this work
 
@@ -37,9 +38,9 @@ context-switch work; **fixed here** names a repair authored during this work;
 
 | Step | Required result |
 | --- | --- |
-| 1 | Localize the post-DMA stall with translation-aware software markers or an equally narrow architectural test; do not infer a source location from a post-SATP physical patch alone. |
-| 2 | Continue the parallel RTL audit of the 40-file context-switch range, prioritizing globally active CSR, redirect, exception, atomic, and return paths over context-switch-only logic. |
-| 3 | Make one isolated RTL correction only after a reproduction identifies it; rerun the focused FPGA gate, then a fresh-overlay unchanged Linux boot. |
+| 1 | Reproduce `check_unaligned_access_boot_cpu` with the existing M-mode and delegated-S-mode misaligned-load tests, including a waveform trace. |
+| 2 | Audit the synchronous exception / redirect path exercised by the misaligned trap; context-switch-only state remains a lower-priority candidate because Linux does not invoke the custom command. |
+| 3 | Make one isolated RTL correction only after the misaligned-access reproduction identifies it; rerun the focused FPGA gate, then a fresh-overlay unchanged Linux boot. |
 | 4 | Require the rootfs banner plus `Run /init as init process` (the default image then powers off and reports PASS), then add and run the Linux-resident context-switch C demonstration. |
 
 ## Notes
