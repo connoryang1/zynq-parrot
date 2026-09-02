@@ -1,5 +1,7 @@
 # AGENTS
 
+> Purpose: This file defines the engineering workflow for this BlackParrot-on-FPGA checkout. It explains how to make changes, validate them safely, and preserve reproducible evidence. It also records the project conventions that keep the Linux/context-switch investigation understandable to someone joining later.
+
 ## Repository Skills
 
 - Read the matching `codex-skills/*/SKILL.md` before acting on BlackParrot-specific workflows.
@@ -77,6 +79,17 @@
   without blocking the critical path.
 - Remove temporary debug instrumentation once the result is understood or checkpointed.
 - If debugging changes start to break unrelated known-good flows, return to the last proven baseline before continuing.
+
+## Iteration Log
+
+- Maintain [`WORK_LOG.md`](WORK_LOG.md) as the chronological record of meaningful engineering events.
+- Add a one- or two-sentence, self-contained entry for every confirmed reproduction, failed reproduction,
+  definitive fix or revert, FPGA/Linux execution attempt, material infrastructure failure or recovery,
+  and every commit or push that changes the investigation state.
+- State the command or artifact when it is useful, distinguish confirmed results from hypotheses, and link
+  to persistent logs or documents where available. Append the entry before moving on to the next material step.
+- Every Markdown file created or edited in this repository must begin with a short plain-language purpose
+  statement (two to four sentences) so it is understandable without prior project context.
 
 ## Cleanup / Refactor Policy
 
