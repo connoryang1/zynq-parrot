@@ -13,7 +13,7 @@
 
 #define LINUX_LOTTERY_ADDR  0x818eb330ULL
 #define LINUX_BSS_BEGIN     0x818ec000ULL
-#define LINUX_BSS_END       0x8194d2f0ULL
+#define LINUX_BSS_PROBE_BYTES 4096ULL
 #define LINUX_STACK_TOP      0x81803ee0ULL
 
 static volatile uint64_t trap_mcause;
@@ -78,12 +78,20 @@ void __attribute__((noinline, noreturn)) supervisor_entry(void)
   __asm__ volatile("csrw sip, zero" : : : "memory");
   bp_print_string("[STAGE] SIP cleared\n");
 
+  /* The host-model DRAM allocator is intentionally uninitialized.  Linux
+   * starts after the board runner has cleared DRAM, so establish that same
+   * lottery precondition here before checking the atomic return value. */
+  *lottery = 0;
   old = amoadd_w(lottery, 1);
   bp_print_string("[STAGE] high-DRAM AMOADD old=");
   bp_hprint_uint64(old);
   bp_print_string("\n");
 
-  for (address = LINUX_BSS_BEGIN; address < LINUX_BSS_END; address += sizeof(uint64_t))
+  /* Exercise the high-DRAM zeroing path without making this fast local gate
+   * spend seconds emulating Linux's entire early BSS sweep. */
+  for (address = LINUX_BSS_BEGIN;
+       address < LINUX_BSS_BEGIN + LINUX_BSS_PROBE_BYTES;
+       address += sizeof(uint64_t))
     *(volatile uint64_t *)address = 0;
 
   bp_print_string("[STAGE] high-text/high-stack fetch\n");
