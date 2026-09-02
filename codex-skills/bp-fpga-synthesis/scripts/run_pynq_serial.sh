@@ -29,12 +29,17 @@ runtime_limit_ms=${PYNQ_CONTROL_PROGRAM_TIMEOUT_MS:-}
 run_id="${image%.nbf}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
 
 set +e
-launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$runtime_limit_ms" <<'REMOTE'
+# OpenSSH serializes the remote command as text and drops a trailing empty
+# argument.  Preserve "no target runtime limit" explicitly so the remote
+# script always receives its required fourth parameter.
+remote_timeout_arg=${runtime_limit_ms:--}
+launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" <<'REMOTE'
 set -euo pipefail
 remote_dir=$1
 image=$2
 run_id=$3
 runtime_limit_ms=$4
+[[ "$runtime_limit_ms" == '-' ]] && runtime_limit_ms=
 eval "cd $remote_dir"
 mkdir -p "$HOME/bp-logs"
 lock="$HOME/bp-logs/.control-program.lock"
