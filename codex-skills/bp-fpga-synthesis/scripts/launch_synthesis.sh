@@ -106,6 +106,14 @@ case ${1:-} in
     git -C "$worktree/import/black-parrot" config \
       submodule.external/basejump_stl.url \
       "$repo_dir/import/black-parrot/external/basejump_stl"
+    # A detached source worktree may have only the top-level BlackParrot
+    # gitlink populated.  Seed its pinned nested dependencies before using it
+    # as the local source for the isolated implementation worktree below.
+    git -C "$repo_dir/import/black-parrot" submodule init \
+      external/basejump_stl external/HardFloat external/bedrock
+    git -c protocol.file.allow=always -C "$repo_dir/import/black-parrot" \
+      submodule update --init \
+      external/basejump_stl external/HardFloat external/bedrock
     git -c protocol.file.allow=always -C "$worktree/import/black-parrot" \
       submodule update --init \
       external/basejump_stl external/HardFloat external/bedrock
