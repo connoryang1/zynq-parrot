@@ -63,6 +63,10 @@
 
 - Localize the failing stage before changing logic.
 - Prefer measurement and traces over speculation.
+- For every workflow mistake, misleading result, or infrastructure failure, record a concise
+  entry in the relevant persistent troubleshooting/verification log before moving on: symptom,
+  confirmed or suspected cause, evidence, and the guardrail or procedure that prevents a repeat.
+  Do not record a root cause as confirmed until the evidence distinguishes it from alternatives.
 - For context-switch performance, track the waveform-derived added overhead
   separately from benchmark latency/throughput. The primary overhead metric is
   the number of dead or discarded cycles from architectural `commit_pkt.ctxtsw`

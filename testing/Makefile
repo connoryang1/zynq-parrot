@@ -28,6 +28,13 @@ CFLAGS = -O2 \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
+# The minimal model intentionally omits the CLINT.  Timer, interrupt, SBI,
+# and Linux-stage diagnostics must run against the board-style full model, but
+# must not pass NUM_THREADS/NUM_CONTEXTS to it: those selects rebuild a dynamic
+# e_bp_custom_cfg model instead of the static PYNQ-Z2 configuration.
+FULL_SIM_DIR ?= $(TOP)/cosim/black-parrot-example/verilator
+FULL_SIM_CFG ?= e_bp_unicore_zynqparrot_cfg
+FULL_SIM_RUNTIME_MS ?= 2000
 FPGA_CRT_SRC_DIR := $(TOP)/import/black-parrot-sdk/libgloss-dramfs/misc
 FPGA_BUILD_DIR := $(LOG_DIR)/fpga
 FPGA_CRT_OBJ := $(FPGA_BUILD_DIR)/dramfs_integer_crt0.o
@@ -239,6 +246,21 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 endef
 
 $(foreach t,$(TESTS) $(EXPERIMENTAL_TESTS),$(eval $(call TEST_RULES,$(t))))
+
+# Run a target program on the static, CLINT-capable board-style Verilator
+# model.  Keep program compilation at the PYNQ context dimensions, but do not
+# propagate those dimension selectors into the simulator submake: its static
+# configuration already provides the correct two-resident/four-context shape.
+run-full-%:
+	@$(MAKE) $(ZP_RISCV_DIR)/bp-tests/$*.riscv NUM_THREADS=2 NUM_CONTEXTS=4
+	@echo "  [CLEAN] Refreshing $* full-system collateral..."
+	@$(RM) $(FULL_SIM_DIR)/prog.riscv $(FULL_SIM_DIR)/prog.mem $(FULL_SIM_DIR)/prog.nbf
+	@echo "  [RUN]   Executing $* in static CLINT-capable simulator..."
+	@$(MAKE) -C $(FULL_SIM_DIR) run PROG=$* CFG=$(FULL_SIM_CFG) \
+		$(if $(TRACE),TRACE=$(TRACE),) TARGET_RUNTIME_MS=$(FULL_SIM_RUNTIME_MS) \
+		EXTRA_RUN_ARGS="$(SIM_RUN_ARGS)" | grep -E "$(RUN_LOG_FILTER)|\[BSG-(PASS|FAIL)\]|^==="
+	@! grep -Eq "CORE FAIL|\[BSG-FAIL\]|BSG FAIL" $(FULL_SIM_DIR)/run.log
+	@grep -Eq "CORE(\[0\])? PASS|\[BSG-PASS\]|BSG PASS" $(FULL_SIM_DIR)/run.log
 
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_gap8_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_gap_benchmark_common.h
 

@@ -61,5 +61,11 @@ int main(void) {
     bp_print_string("[BSG-FAIL] unsupported SATP mode was accepted\n");
     bp_finish(1);
   }
-  return 0;
+  /*
+   * The FPGA/full-cosim host observes bp_finish asynchronously.  Returning
+   * through the DRAMFS startup path can resume execution before that write is
+   * consumed, which turns an otherwise successful test into a host timeout.
+   * Match the other FPGA-oriented tests and remain parked after the signal.
+   */
+  while (1) { }
 }
