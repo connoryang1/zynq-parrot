@@ -4,12 +4,15 @@ set -euo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 repo_dir=${ZP_REPO_DIR:-$(git -C "$script_dir" rev-parse --show-toplevel)}
 repo_dir=$(cd "$repo_dir" && pwd)
+seed_repo_dir=${ZP_FPGA_SEED_REPO_DIR:-$repo_dir}
+seed_repo_dir=$(cd "$seed_repo_dir" && pwd)
 run_root=${ZP_FPGA_LOG_ROOT:-"$repo_dir/logs/fpga"}
 run_root=$(mkdir -p "$run_root" && cd "$run_root" && pwd)
 # Allow a clean detached source snapshot to drive the build while retaining
 # logs in the active checkout.  This avoids mixing unrelated development edits
 # into an otherwise immutable routed implementation.
 export ZP_REPO_DIR="$repo_dir"
+export ZP_FPGA_SEED_REPO_DIR="$seed_repo_dir"
 export ZP_FPGA_LOG_ROOT="$run_root"
 
 # Keep the immutable worker and its recorded configuration in lock-step.  The
@@ -36,7 +39,7 @@ export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
 
 usage() {
   echo "usage: $0 start | list | status <job-id> | worker <job-id> <commit>"
-  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, ZP_FPGA_SEED_REPO_DIR"
 }
 
 case ${1:-} in
@@ -112,10 +115,30 @@ case ${1:-} in
       external/basejump_stl external/HardFloat external/bedrock
     git -C "$worktree/import/black-parrot" config --local \
       submodule.external/basejump_stl.url \
-      "$repo_dir/import/black-parrot/external/basejump_stl"
+      "$seed_repo_dir/import/black-parrot/external/basejump_stl"
     # A detached source worktree may have only the top-level BlackParrot
     # gitlink populated.  Seed its pinned nested dependencies before using it
     # as the local source for the isolated implementation worktree below.
+    # A detached source snapshot may have only gitlinks, while the active
+    # checkout owns pinned nested submodule objects that old upstream remotes
+    # no longer advertise. Seed the snapshot from that checkout before the
+    # implementation worktree asks for the same exact objects.
+    for nested in external/basejump_stl external/HardFloat external/bedrock; do
+      if [[ ! -d "$seed_repo_dir/import/black-parrot/$nested/.git" \
+            && ! -f "$seed_repo_dir/import/black-parrot/$nested/.git" ]]; then
+        echo "Missing nested submodule seed: $seed_repo_dir/import/black-parrot/$nested" >&2
+        exit 1
+      fi
+    done
+    git -C "$repo_dir/import/black-parrot" config --local \
+      submodule.external/basejump_stl.url \
+      "$seed_repo_dir/import/black-parrot/external/basejump_stl"
+    git -C "$repo_dir/import/black-parrot" config --local \
+      submodule.external/HardFloat.url \
+      "$seed_repo_dir/import/black-parrot/external/HardFloat"
+    git -C "$repo_dir/import/black-parrot" config --local \
+      submodule.external/bedrock.url \
+      "$seed_repo_dir/import/black-parrot/external/bedrock"
     git -C "$repo_dir/import/black-parrot" submodule init \
       external/basejump_stl external/HardFloat external/bedrock
     git -c protocol.file.allow=always -C "$repo_dir/import/black-parrot" \
