@@ -2,7 +2,8 @@
 set -u
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-repo_dir=$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null) || {
+repo_dir=${ZP_REPO_DIR:-$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null)}
+[[ -n "$repo_dir" ]] && repo_dir=$(cd "$repo_dir" && pwd) || {
   echo "FAIL: skill is not inside a git checkout" >&2
   exit 1
 }

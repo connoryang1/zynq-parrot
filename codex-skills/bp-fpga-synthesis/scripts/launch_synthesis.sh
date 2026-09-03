@@ -2,8 +2,15 @@
 set -euo pipefail
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-repo_dir=$(git -C "$script_dir" rev-parse --show-toplevel)
-run_root="$repo_dir/logs/fpga"
+repo_dir=${ZP_REPO_DIR:-$(git -C "$script_dir" rev-parse --show-toplevel)}
+repo_dir=$(cd "$repo_dir" && pwd)
+run_root=${ZP_FPGA_LOG_ROOT:-"$repo_dir/logs/fpga"}
+run_root=$(mkdir -p "$run_root" && cd "$run_root" && pwd)
+# Allow a clean detached source snapshot to drive the build while retaining
+# logs in the active checkout.  This avoids mixing unrelated development edits
+# into an otherwise immutable routed implementation.
+export ZP_REPO_DIR="$repo_dir"
+export ZP_FPGA_LOG_ROOT="$run_root"
 
 # Keep the immutable worker and its recorded configuration in lock-step.  The
 # historical full-system flow defaults to the stock aviary configuration, but
@@ -97,13 +104,13 @@ case ${1:-} in
     # source checkout; other immutable dependencies use their normal URLs.
     git -C "$worktree" submodule init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
-    git -C "$worktree" config submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
-    git -C "$worktree" config submodule.import/basejump_stl.url "$repo_dir/import/basejump_stl"
+    git -C "$worktree" config --local submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
+    git -C "$worktree" config --local submodule.import/basejump_stl.url "$repo_dir/import/basejump_stl"
     git -c protocol.file.allow=always -C "$worktree" submodule update --init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree/import/black-parrot" submodule init \
       external/basejump_stl external/HardFloat external/bedrock
-    git -C "$worktree/import/black-parrot" config \
+    git -C "$worktree/import/black-parrot" config --local \
       submodule.external/basejump_stl.url \
       "$repo_dir/import/black-parrot/external/basejump_stl"
     # A detached source worktree may have only the top-level BlackParrot
