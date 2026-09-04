@@ -183,6 +183,26 @@ control, not a replacement for the missing saved artifact of the later
 silently fails with either current-runner DRAM policy. Do not use this success
 to absolve the current rebuild or to attribute its failure to the CSR migration.
 
+### Reproducible pre-feature source control (2026-09-04)
+
+The recovered pre-feature source pair, top `4015d0f21db0dd78922cb1419e4034b810c0f1ed`
+and BlackParrot `08edfb479c7b5d55d665a63464785044c6b4cd35`, was rebuilt with its
+recursive historical submodules and generated PLIC collateral. It routed and
+packaged as `93b3a3ce50b90aadb36026ab6c115740dcfcefaf082be16c49324365e9d50d42`
+(bitstream `16c4e22994141f9bf04d8668ae95e831f031b2c32460f92c99da1735e00cd03d`),
+with WNS 0.000 ns, TNS 0, WHS +0.021 ns, 39,310 LUTs, and 49.5 BRAM tiles.
+
+The current board runner is a newer pybind/PYNQ polling implementation and is
+not protocol-compatible with this historical design. A safe legacy runner was
+therefore rebuilt from the matched source without `DRAM_TEST`, using
+`FREE_DRAM=1 ZERO_DRAM=1` (SHA-256
+`b774f71d2ca5c8b92fdc1acae04f87d3e006f0c7e3207b4c904f7b0f5f85674f`). On a
+fresh overlay load, the exact archived Linux NBF booted through OpenSBI, Linux,
+and `Run /init as init process`, completed the bundled rootfs tests and
+poweroff, then returned `CORE[0] PASS` at 321,577,541 retired instructions and
+IPC 0.525264. This confirms the prior source-rebuild silent loop was a
+host-runner protocol mismatch, not a demonstrated RTL regression.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |

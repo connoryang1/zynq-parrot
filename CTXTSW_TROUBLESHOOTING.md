@@ -34,6 +34,15 @@ value and does not reach NBF configuration, stop and power-cycle; restore the
 candidate's reviewed runner before continuing. That is a host/bitstream
 protocol mismatch, not guest or RTL evidence.
 
+### Detached serial launch disappears before creating a transcript
+
+On this PYNQ image, a `setsid`/`nohup` control-program wrapper can be reaped
+when its originating SSH session closes, before it creates either its retained
+log or status file. This is a launcher failure, not a board run: verify that
+no `control-program` is alive, reload the intended overlay, and use the
+serial helper with `PYNQ_CONTROL_PROGRAM_FOREGROUND=1` for the next bounded
+or self-terminating control.
+
 ### Historical source checkpoint silently times out under a current runner
 
 An old source revision that once booted Linux is not itself a sufficient FPGA
@@ -43,6 +52,12 @@ reviewed runner, so do not attribute the candidate result to its RTL delta.
 First establish a freshly bootable source/bitstream/host-runner control, then
 perform an A/B comparison using identical NBF, runner hash, power-cycle, and
 overlay-load procedure.
+
+That control now exists for the pre-feature `4015d0f` / `08edfb` pair: its
+freshly built bitstream reaches `/init` only with the source-matched legacy
+threaded FIFO runner (`b774f7…`), while the newer pybind/PYNQ runner produces
+the misleading silent 0.133-IPC loop. Treat the host runner as a versioned
+component of every Linux classification, not incidental board tooling.
 
 ### Linux runner must explicitly zero DRAM, but zeroing is not a boot proof
 

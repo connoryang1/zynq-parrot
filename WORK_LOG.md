@@ -50,6 +50,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Archived Linux control restored (0/113):** the preserved pre-feature package (`c211216…`, bitstream `d45f7e…`) with its matched runner (`76db…`) booted the unchanged Linux image through `/init`, rootfs checks, poweroff, and `CORE[0] PASS` (321,255,862 retired, IPC 0.512492). The board/image are proven healthy; phase remains **baseline/deployment compatibility diagnosis** because the missing historical `2a1f8834` artifact is not interchangeable with this archived pre-feature control.
 
+- **Reproducible source baseline (0/113):** recovered pre-feature source `4015d0f` / `08edfb` routed as package `93b3a3…` (bitstream `16c4e2…`) and, with the source-matched legacy threaded host runner `b774f7…`, booted the archived Linux NBF through `/init`, rootfs checks, poweroff, and `CORE[0] PASS` (321,577,541 retired, IPC 0.525264). The earlier silent controls used an incompatible newer runner, so phase advances to **feature replay verification**; all 113 feature commits remain to classify.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).
