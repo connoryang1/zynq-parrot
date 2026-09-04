@@ -21,25 +21,48 @@ runtime_limit_ms=${PYNQ_CONTROL_PROGRAM_TIMEOUT_MS:-}
   echo "FAIL: PYNQ_CONTROL_PROGRAM_TIMEOUT_MS must be a positive integer" >&2
   exit 2
 }
+# A full-width register-state terminal probe writes into a fixed DRAM scratch
+# area, then asks ps.cpp to dump that bounded range after the target stops.
+# Keep the sole optional control-program argument syntactically narrow: this
+# helper is also the board's concurrency and sudo boundary.
+extra_arg=${PYNQ_CONTROL_PROGRAM_EXTRA_ARG:-}
+[[ -z "$extra_arg" || "$extra_arg" =~ ^--state-dump=0x[0-9A-Fa-f]+:[1-9][0-9]*$ ]] || {
+  echo "FAIL: PYNQ_CONTROL_PROGRAM_EXTRA_ARG supports only --state-dump=0xOFFSET:WORDS" >&2
+  exit 2
+}
+foreground=${PYNQ_CONTROL_PROGRAM_FOREGROUND:-0}
+[[ "$foreground" == 0 || "$foreground" == 1 ]] || {
+  echo "FAIL: PYNQ_CONTROL_PROGRAM_FOREGROUND must be 0 or 1" >&2
+  exit 2
+}
 [[ "$image" =~ ^[A-Za-z0-9._-]+\.nbf$ ]] || {
   echo "FAIL: program must be a simple .nbf filename" >&2
   exit 2
 }
 
 run_id="${image%.nbf}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+expected_sha=$(sha256sum "$2" | awk '{print $1}')
 
 set +e
 # OpenSSH serializes the remote command as text and drops a trailing empty
 # argument.  Preserve "no target runtime limit" explicitly so the remote
 # script always receives its required fourth parameter.
 remote_timeout_arg=${runtime_limit_ms:--}
-launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" <<'REMOTE'
+# SSH drops an empty trailing positional parameter when it serializes the
+# remote command.  Encode the optional argument explicitly so foreground is
+# never shifted out of the remote script's argument vector.
+remote_extra_arg=${extra_arg:--}
+launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" <<'REMOTE'
 set -euo pipefail
 remote_dir=$1
 image=$2
 run_id=$3
 runtime_limit_ms=$4
+expected_sha=$5
+extra_arg=$6
+foreground=$7
 [[ "$runtime_limit_ms" == '-' ]] && runtime_limit_ms=
+[[ "$extra_arg" == '-' ]] && extra_arg=
 eval "cd $remote_dir"
 mkdir -p "$HOME/bp-logs"
 lock="$HOME/bp-logs/.control-program.lock"
@@ -71,28 +94,48 @@ if pgrep -x control-program >/dev/null || pgrep -f '[s]cript .*control-program' 
   exit 75
 fi
 [[ -f "$image" ]] || { echo "MISSING_NBF=$image"; exit 66; }
+actual_sha=$(sha256sum "$image" | awk '{print $1}')
+[[ "$actual_sha" == "$expected_sha" ]] || {
+  echo "NBF_SHA_MISMATCH=$image expected=$expected_sha actual=$actual_sha"
+  exit 65
+}
 
 # mkdir is atomic, closing the race between two simultaneous SSH launchers.
 mkdir "$lock" || { echo "ACTIVE_RUNNER"; exit 75; }
 rm -f "$log" "$status" "$pidfile"
-nohup bash -c '
+if [[ "$foreground" == 1 ]]; then
+  # A foreground diagnostic is resilient to PYNQ's SSH-session child reaper.
+  # It still retains the same transcript, lock, and completion status as the
+  # detached path, but is preferable for a short state-capture probe.
+  printf 'RUNNER_STARTED_PID=%s LOG=%s STATUS=%s\n' "$$" "$log" "$status"
+  command=(sudo -n ./control-program "$image")
+  [[ -n "$runtime_limit_ms" ]] && command+=("$runtime_limit_ms")
+  [[ -n "$extra_arg" ]] && command+=("$extra_arg")
+  printf -v command_text '%q ' "${command[@]}"
   set +e
-  log=$1
-  status=$2
-  lock=$3
-  image=$4
-  cd "$5" || exit 111
-  if [[ -n "$6" ]]; then
-    /usr/bin/script -qef -c "sudo -n ./control-program $image $6" "$log"
-  else
-    /usr/bin/script -qef -c "sudo -n ./control-program $image" "$log"
-  fi
+  /usr/bin/script -qef -c "$command_text" "$log"
   rc=$?
-  printf "RUNNER_EXIT=%s\\n" "$rc" > "$status"
-  rm -f "$lock/owner"
+  set -e
+  printf 'RUNNER_EXIT=%s\n' "$rc" > "$status"
   rmdir "$lock"
   exit "$rc"
-' bash "$log" "$status" "$lock" "$image" "$PWD" "$runtime_limit_ms" </dev/null >"$HOME/bp-logs/$run_id.launch.log" 2>&1 &
+fi
+nohup setsid --wait env RUN_LOG="$log" RUN_STATUS="$status" RUN_LOCK="$lock" \
+  RUN_IMAGE="$image" RUN_DIRECTORY="$PWD" RUN_TIMEOUT="$runtime_limit_ms" \
+  RUN_EXTRA="$extra_arg" bash -c '
+  set +e
+  cd "$RUN_DIRECTORY" || exit 111
+  command=(sudo -n ./control-program "$RUN_IMAGE")
+  [[ -n "$RUN_TIMEOUT" ]] && command+=("$RUN_TIMEOUT")
+  [[ -n "$RUN_EXTRA" ]] && command+=("$RUN_EXTRA")
+  printf -v command_text '%q ' "${command[@]}"
+  /usr/bin/script -qef -c "$command_text" "$RUN_LOG"
+  rc=$?
+  printf "RUNNER_EXIT=%s\\n" "$rc" > "$RUN_STATUS"
+  rm -f "$RUN_LOCK/owner"
+  rmdir "$RUN_LOCK"
+  exit "$rc"
+' </dev/null >"$HOME/bp-logs/$run_id.launch.log" 2>&1 &
 runner_pid=$!
 printf '%s\n' "$runner_pid" > "$lock/owner"
 printf '%s\n' "$runner_pid" > "$pidfile"
@@ -104,7 +147,13 @@ set -e
 printf '%s\n' "$launch_output"
 
 start_line=$(grep '^RUNNER_STARTED_PID=' <<<"$launch_output" || true)
-if [[ $launch_rc -ne 0 || -z "$start_line" ]]; then
+# A foreground run keeps the SSH session attached to control-program.  Its
+# target result is consequently also the SSH result (for example 124 after a
+# deliberate target-runtime limit).  Once the remote side has emitted the
+# atomic start record, retain and report that completed run below instead of
+# mislabeling it as a failed launch.  A nonzero launch without that record is
+# still a genuine pre-launch failure.
+if [[ -z "$start_line" ]]; then
   echo "FAIL: board refused serial launch" >&2
   [[ $launch_rc -ne 0 ]] && exit "$launch_rc"
   exit 1

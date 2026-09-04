@@ -102,6 +102,17 @@ the CSR-only migration, not a result for any of the 113 feature commits. The
 board was power-cycled immediately afterward; wait for readiness and reload
 before any follow-up probe.
 
+### CSR-only OpenSBI classification (2026-09-04)
+
+An OpenSBI-only prefix of the same Linux image retained all configuration
+records and 17,142 firmware writes below `0x80200000` while omitting 1,861,337
+Linux-payload writes. On the freshly reloaded CSR-only candidate it reached a
+clean 5,000 ms target limit at 4,173,746 retired instructions and IPC 0.133536
+with no console output. This matches the full-image 0.133339-IPC signature and
+proves the active minimal-endpoint failure is inside M-mode OpenSBI startup,
+not the Linux payload or `/init`; the board was power-cycled after the bounded
+probe.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |
@@ -266,6 +277,7 @@ rules out the alternatives.
 | A host-side `timeout` killed its parent test make but left the child simulator in the same process group running, producing an incomplete FST. | The unbounded minimal high-VA run had to be signaled manually and its FST could not be opened. | For expected-hang diagnostics, set the simulator's native `TARGET_RUNTIME_MS` and verify no runner process remains before launching another test; archive only the cleanly closed trace. |
 | The historical CSR-only endpoint's context microbenchmark did not terminate after completing its three warm measurements. | The clean `380377a3` / `7f41bca9` model passes CSR isolation, but this zero-feature implementation predates the frontend handoff that the later benchmark needs; it also lacks the native target-runtime control. | Treat CSR isolation as the migration gate at this depth. Do not run a nonterminal benchmark until that feature dependency exists; add bounded runtime support to an isolated historical wrapper first and verify no simulator child remains after any stop. |
 | A detached serialized Linux launch vanished before creating its status, even though its board lock remained. | The retained log was empty and no `control-program` process existed, so the target had not begun; a foreground launch immediately afterward started the target and produced the valid retained 180-second result. | On this PYNQ image, use the serial helper's foreground mode for long Linux boots unless detached-run persistence has been revalidated; reclaim only its dead lock after confirming no direct runner exists. |
+| A foreground bounded run executed correctly but `run_pynq_serial.sh` reported a launch failure after the target stopped. | The remote foreground process returns the target's expected nonzero timeout status; the helper previously rejected that status before reading its already-written `RUNNER_STARTED_PID` and retained completion transcript. | Once a valid atomic start line exists, the helper now polls and returns the retained target status; only a nonzero remote result without a start line is a launch failure. |
 | Focused MTIP test initially reported pending timer state without handler entry. | Its NBF remained in debug mode; `mgie` deliberately masks interrupts there even after MSTATUS.MIE reads back set. After adding the boot-ROM-equivalent `dret`, `mt_timer_trap_naked_test` passes MTIP → handler → `mret` in the traced static full model. | Every focused interrupt test must execute the same `dret` handoff as the boot ROM before enabling interrupts. Do not use the original debug-mode failure as Linux evidence. |
 | A fresh isolated replay worktree could not initialize `import/black-parrot`. | Its recorded submodule URL is an intentional local source snapshot, but Git's default security policy rejected the `file` transport before any candidate RTL was checked out; after that override, the historical pinned BaseJump commit was no longer advertised by its upstream remote. | Initialize with the scoped `protocol.file.allow=always` override, then seed the exact nested BaseJump object from an existing local checkout rather than advancing it; keep both workarounds local to the immutable replay snapshot. |
 | The modern context-CSR migration did not cherry-pick onto the `ce328a77536` Linux-good seed. | All eight conflicts are only the old context-CSR constants and port names: the historical implementation predates later context-state restructuring, so a textual cherry-pick would falsely import unrelated later RTL. | Resolve this overlay semantically as a verified `0x081`--`0x083` to `0x800`--`0x802` interface migration, record the resulting candidate commit, and retain the exact-NBF collision scan as the acceptance check. |
