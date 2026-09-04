@@ -38,6 +38,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Firmware boundary confirmed (0/113):** a fresh 5-second OpenSBI-only prefix on the same CSR-only endpoint matched the full image's 0.133-IPC silent loop (4,173,746 retired instructions), proving the active regression is in M-mode firmware startup before Linux is fetched. The phase remains **compatibility endpoint diagnosis** with all 113 feature commits unclassified.
 
+- **Pre-handoff boundary confirmed (0/113):** a fresh bounded `0x80200000` terminal probe on `380377a3` / `7f41bca9` reached no `M1` marker in 15 seconds while retiring 12,506,848 instructions at IPC 0.133402. The phase remains **compatibility endpoint diagnosis**: the CSR-only regression is definitively before OpenSBI's Linux `mret`, with all 113 feature commits unclassified.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).

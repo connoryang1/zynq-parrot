@@ -113,6 +113,13 @@ proves the active minimal-endpoint failure is inside M-mode OpenSBI startup,
 not the Linux payload or `/init`; the board was power-cycled after the bounded
 probe.
 
+A fresh, hash-verified terminal probe replacing the Linux handoff instruction
+at physical `0x80200000` with marker `M1` also reached its clean 15,000 ms
+limit with no marker after 12,506,848 retired instructions (IPC 0.133402).
+This independently proves that the CSR-only candidate stalls before OpenSBI's
+`mret` to Linux, so future localization stays within the OpenSBI prefix. The
+board was power-cycled immediately after this bounded result.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |

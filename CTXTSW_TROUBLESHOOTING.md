@@ -18,6 +18,13 @@ the measurement is understood.
 
 ## Common Failure Signatures
 
+### Board disappears during overlay reload
+
+If artifact staging has verified the package and NBF hashes but SSH is refused
+while `load-blackparrot-overlay` is still running, no guest result exists. Treat
+the board as contaminated, power-cycle it, wait for the PYNQ-ready gate, and
+reload before retrying; do not classify that interruption as an RTL failure.
+
 ### Stall after NBF load
 
 Typical output:
