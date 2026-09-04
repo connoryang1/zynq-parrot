@@ -157,6 +157,45 @@ The next proof is one isolated endpoint repair with a matching local gate and
 a new fresh-board `/init` result; only then can it set the first binary-search
 boundary.
 
+## Current endpoint-repair loop (2026-09-04)
+
+The all-seven-fix overlay is not a valid replay baseline because its zero-feature
+endpoint timed out before emitting an OpenSBI or Linux console. The active
+repair candidate is therefore top-level `380377a3` on branch
+`ce-minimal-overlay-linux-verify`, paired only with BlackParrot `7f41bca9`.
+That one commit migrates the context-switch CSRs from Linux-colliding
+`0x081`--`0x083` to reserved custom-user `0x800`--`0x802`; it deliberately
+does not carry the six later speculative compatibility changes.
+
+Use the following loop until the zero-feature endpoint is classifiable:
+
+1. **Verify the minimal candidate locally.** Run a clean static traced model
+   build, scan the archived Linux NBF for the retired CSR range, and run the
+   migrated CSR-isolation and context-switch smoke guests serially. Stop here
+   if a local gate fails; record it as a minimal-overlay defect and repair only
+   the corresponding change.
+2. **Classify it on hardware.** If local gates pass, route the exact committed
+   pair with `e_bp_unicore_zynqparrot_cfg`, archive utilization/timing and
+   package hashes, then load it after the board-readiness gate and run one
+   fresh serialized archived-Linux boot. A board timeout or interrupted run
+   requires a power cycle, readiness wait, and overlay reload before any retry.
+3. **Choose the smallest next overlay.** If the minimal candidate reaches
+   `/init`, it becomes the replay baseline and the feature search begins at
+   **0/113 good**. If it fails cleanly, add or remove exactly one compatibility
+   semantic that exists at this historical depth, prove its local gate, and
+   repeat step 2. Do not reintroduce the full seven-fix stack merely to make a
+   later local test pass.
+4. **Resume the feature replay only after classification.** Once a zero-feature
+   candidate reaches `/init`, push and retain that exact pair, update the
+   scoreboard to `0/113 good`, and test feature midpoints with the same local
+   preflight then one route/boot decision. The count changes only for a
+   classified feature prefix, never for an overlay repair.
+
+This loop favors a small, attributable RTL delta over optimistic replay speed.
+It also keeps slow synthesis and board work off the critical path until a
+candidate has passed the inexpensive local checks; all test runs remain
+serialized because they share program, trace, and simulator artifacts.
+
 ## Result record
 
 For every hardware decision retain: feature revision, overlay patch hash and

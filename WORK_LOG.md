@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Feature commits verified | Feature commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 0 / 113 | 113 | 7 / 7 fixes reconstructed and pushed; endpoint still fails Linux | top `c12d52f8` + BlackParrot `faa584e9`; **compatibility endpoint repair** | Localize and repair the zero-feature endpoint before replaying any feature commit. |
+| 0 / 113 | 113 | Minimal 1 / 7 semantic under verification | top `380377a3` + BlackParrot `7f41bca9`; **compatibility endpoint repair** | Complete local gates, then classify the minimal zero-feature endpoint on FPGA before replaying any feature commit. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -29,6 +29,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Routed endpoint (0/113):** the committed static PYNQ-Z2 endpoint (`c12d52f8` / `faa584e9`) now routes and packages successfully as `ea8b3fea…8b09` (bitstream `9f8c0c5f…2bd91`), with WNS +6.506 ns, TNS 0, WHS +0.013 ns, 50,428/53,200 LUTs, and 46/140 BRAM tiles. Phase: **Linux board verification**; all 113 feature commits remain unclassified until a fresh serialized archived-Linux run reaches `/init` or establishes a reproducible non-`/init` result.
 
 - **Endpoint Linux result (0/113):** the fresh hash-verified archived-Linux run on that routed endpoint reached its clean 180-second target limit after 150,007,078 retired instructions (IPC 0.133339), without console output or `/init`. This is **compatibility endpoint repair**, not a feature result: all 113 commits remain unclassified and replay is suspended until the zero-feature baseline is repaired.
+
+- **Minimal endpoint repair (0/113):** pushed candidate `380377a3` pairs the Linux-good historical top revision with BlackParrot `7f41bca9`, retaining only the mandatory custom-CSR migration and removing six unproven late compatibility changes. Phase: **local verification**; 113 feature commits remain because only a fresh routed `/init` result can establish this zero-feature baseline.
 
 ## 2026-09-02 — current investigation
 
