@@ -171,9 +171,12 @@ Use the following loop until the zero-feature endpoint is classifiable:
 
 1. **Verify the minimal candidate locally.** Run a clean static traced model
    build, scan the archived Linux NBF for the retired CSR range, and run the
-   migrated CSR-isolation and context-switch smoke guests serially. Stop here
-   if a local gate fails; record it as a minimal-overlay defect and repair only
-   the corresponding change.
+   migrated CSR-isolation guest. Run the context-switch microbenchmark only
+   once the replayed prefix contains its required frontend handoff: the
+   zero-feature historical seed is allowed to be nonterminal after proving the
+   migration because that benchmark depends on later feature mechanics. Stop
+   for a local failure only when it contradicts a gate supported by the
+   candidate's historical feature depth; repair only the corresponding change.
 2. **Classify it on hardware.** If local gates pass, route the exact committed
    pair with `e_bp_unicore_zynqparrot_cfg`, archive utilization/timing and
    package hashes, then load it after the board-readiness gate and run one

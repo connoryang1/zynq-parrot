@@ -65,6 +65,24 @@ named-NBF invocation therefore fails before simulation; generate the selected
 program with `make -B prog.nbf PROG=<name>` and then run it serially. This
 prevents a stale program image from being mistaken for the selected smoke.
 
+### Minimal-overlay local gate (2026-09-04)
+
+The clean traced static model for top-level `380377a3` / BlackParrot `7f41bca9`
+passes the migrated CSR-isolation guest (`CORE PASS`), proving that the
+non-colliding `0x800`--`0x802` interface still creates and resumes an isolated
+second context. The later `mt_ctxtsw_microbench` reaches all three initial
+switch measurements but does not finish on this zero-feature historical
+implementation; it relies on frontend handoff mechanics introduced later in
+the 113-commit replay interval and is not evidence that the CSR-only overlay
+is defective.
+
+The candidate lacks the newer native target-runtime argument in `ps.cpp`, so
+the nonterminal local run was stopped explicitly and its child simulator was
+verified absent before continuing. Do not reuse that trace or treat a
+host-side interruption as a performance or Linux result. Historical candidate
+wrappers should gain the bounded target-runtime control before any future
+expected-stall diagnostic; normal candidate gates remain serialized.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |
@@ -227,6 +245,7 @@ rules out the alternatives.
 | The first exact-state local test skipped the faulting C.LD, while Linux emulates it in S-mode. | `mt_smode_sv39_linux_c_ld_emulation_test` reproduces Linux's C.LD instruction re-fetch, eight Sv39 byte loads from `stval`, saved-`a4` update, `sepc += 2`, and `sret`; it passes in both the traced minimal and static PYNQ-style models (`MRP`, `CORE PASS`). | This is the final synthetic gate for this boundary. If Linux still stops here, instrument the actual Linux vector/handler state rather than adding another approximation or changing RTL speculatively. |
 | A first high-kernel-alias analogue used a simplified 1 GiB Sv39 leaf, unlike Linux's real multi-level kernel mapping. | Its initial load page fault was a test bug: a high alias was added twice to a PC-relative `source_words` reference, producing canonical VA `0xfffffffe80005dc3`. The corrected `mt_smode_sv39_linux_c_ld_emulation_highva_test` passes the traced static PYNQ-style model (`MRP`, `CORE PASS`) with high kernel-text `sepc`/`stvec` and the configured `0xfffffffe…` direct-map data alias. | Keep it experimental: it now proves both relevant high address classes, C.LD emulation, and SRET, but capture real Linux `sepc`/`stvec` state before treating it as an exact Linux reproducer. |
 | A host-side `timeout` killed its parent test make but left the child simulator in the same process group running, producing an incomplete FST. | The unbounded minimal high-VA run had to be signaled manually and its FST could not be opened. | For expected-hang diagnostics, set the simulator's native `TARGET_RUNTIME_MS` and verify no runner process remains before launching another test; archive only the cleanly closed trace. |
+| The historical CSR-only endpoint's context microbenchmark did not terminate after completing its three warm measurements. | The clean `380377a3` / `7f41bca9` model passes CSR isolation, but this zero-feature implementation predates the frontend handoff that the later benchmark needs; it also lacks the native target-runtime control. | Treat CSR isolation as the migration gate at this depth. Do not run a nonterminal benchmark until that feature dependency exists; add bounded runtime support to an isolated historical wrapper first and verify no simulator child remains after any stop. |
 | Focused MTIP test initially reported pending timer state without handler entry. | Its NBF remained in debug mode; `mgie` deliberately masks interrupts there even after MSTATUS.MIE reads back set. After adding the boot-ROM-equivalent `dret`, `mt_timer_trap_naked_test` passes MTIP → handler → `mret` in the traced static full model. | Every focused interrupt test must execute the same `dret` handoff as the boot ROM before enabling interrupts. Do not use the original debug-mode failure as Linux evidence. |
 | A fresh isolated replay worktree could not initialize `import/black-parrot`. | Its recorded submodule URL is an intentional local source snapshot, but Git's default security policy rejected the `file` transport before any candidate RTL was checked out; after that override, the historical pinned BaseJump commit was no longer advertised by its upstream remote. | Initialize with the scoped `protocol.file.allow=always` override, then seed the exact nested BaseJump object from an existing local checkout rather than advancing it; keep both workarounds local to the immutable replay snapshot. |
 | The modern context-CSR migration did not cherry-pick onto the `ce328a77536` Linux-good seed. | All eight conflicts are only the old context-CSR constants and port names: the historical implementation predates later context-state restructuring, so a textual cherry-pick would falsely import unrelated later RTL. | Resolve this overlay semantically as a verified `0x081`--`0x083` to `0x800`--`0x802` interface migration, record the resulting candidate commit, and retain the exact-NBF collision scan as the acceptance check. |
