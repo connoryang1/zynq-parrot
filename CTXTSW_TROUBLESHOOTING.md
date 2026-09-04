@@ -114,6 +114,15 @@ followed by no benchmark banner or pass/fail output.
 This usually means the change disturbed startup/freeze/resume/control
 sequencing, not only the measured context-switch loop.
 
+### Guarding a probe at a compressed instruction
+
+`make_linux_milestone_nbf.py --expect-first-word` checks four bytes, even when
+the target instruction is a two-byte compressed instruction.  At Linux's
+`0x8020294a` C.LD, the correct guard is the overlapping word `0x659c6198`,
+not the C.LD's `0x6198` halfword padded with an assumed neighbor.  Let the
+generator reject a mismatch and correct the source window before staging; a
+rejected local generation is not a board or RTL result.
+
 ### Wrong or illegal instruction after sideband/fast-path work
 
 Older failed sideband experiments produced wrong instruction fetches around
