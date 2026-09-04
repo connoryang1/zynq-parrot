@@ -34,6 +34,14 @@ terminal text includes reproducible non-ASCII prefixes after a switch, so this
 is a console-path anomaly rather than a claimed full architectural proof; the
 routed FPGA/Linux run remains the endpoint classification gate.
 
+The static PYNQ-Z2 implementation has now routed successfully as job
+`20260904T152933Z-c12d52f8`: WNS +6.506 ns, TNS 0, WHS +0.013 ns, 50,428/53,200
+LUTs, and 46/140 BRAM tiles.  The hash-verified deployable package is
+`ea8b3feafc76d35474ac3ed3fcc1dde83ac438c9e8caa017d2c670f73ac8b09`; the
+extracted bitstream hash is `9f8c0c5f8f7a8d0ff61229deff843cf5f17e57cc68e5802679111fa319a2bd91`.
+This proves fit and timing only—the next and still-required result is a fresh
+serialized board run of the unchanged archived Linux NBF through `/init`.
+
 The historical collateral only defines the default `prog.nbf` target. A
 named-NBF invocation therefore fails before simulation; generate the selected
 program with `make -B prog.nbf PROG=<name>` and then run it serially. This

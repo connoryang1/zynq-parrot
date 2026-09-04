@@ -126,12 +126,16 @@ BlackParrot `faa584e9`, both pushed to their named replay branches. It holds
 all seven recorded compatibility semantics and migrates the two local
 context-smoke guests to the non-colliding `0x800`--`0x802` CSR range.
 
-Progress is **0/113 verified, 113 remaining, FPGA verification**. The exact
-Linux NBF collision scan and clean traced static model build pass; the CSR
-isolation and six-switch microbenchmark guests reach `CORE PASS` (12-cycle
-warm minimum). The only remaining endpoint proof is a static-PYNQ-Z2 routed
-implementation and a fresh archived-Linux run through `/init`; it will set
-the first binary-search boundary.
+Progress is **0/113 verified, 113 remaining, Linux board verification**. The
+exact Linux NBF collision scan and clean traced static model build pass; the
+CSR isolation and six-switch microbenchmark guests reach `CORE PASS` (12-cycle
+warm minimum). The static PYNQ-Z2 implementation also routes cleanly as job
+`20260904T152933Z-c12d52f8`: WNS +6.506 ns, TNS 0, WHS +0.013 ns, 50,428 LUTs
+(94.79%), and 46 BRAM tiles (32.86%). Its package SHA-256 is
+`ea8b3feafc76d35474ac3ed3fcc1dde83ac438c9e8caa017d2c670f73ac8b09` and its
+bitstream SHA-256 is `9f8c0c5f8f7a8d0ff61229deff843cf5f17e57cc68e5802679111fa319a2bd91`.
+The only remaining endpoint proof is a fresh serialized archived-Linux run
+through `/init`; it will set the first binary-search boundary.
 
 ## Result record
 
