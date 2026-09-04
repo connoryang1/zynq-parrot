@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Feature commits verified | Feature commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 0 / 113 | 113 | 7 / 7 fixes reconstructed and pushed; exact NBF collision-free | top `c12d52f8` + BlackParrot `faa584e9`; **Linux board verification** | Stage the routed package and run the archived Linux NBF through `/init`. |
+| 0 / 113 | 113 | 7 / 7 fixes reconstructed and pushed; endpoint still fails Linux | top `c12d52f8` + BlackParrot `faa584e9`; **compatibility endpoint repair** | Localize and repair the zero-feature endpoint before replaying any feature commit. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -27,6 +27,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Local context gate (0/113):** after migrating the two smoke programs to the reserved `0x800`--`0x802` interface (`c12d52f8`), the traced static model passed CSR isolation and the six-switch microbenchmark (warm minimum 12 cycles/switch). The endpoint is now **FPGA verifying**; all 113 feature commits remain unclassified until its routed Linux result.
 
 - **Routed endpoint (0/113):** the committed static PYNQ-Z2 endpoint (`c12d52f8` / `faa584e9`) now routes and packages successfully as `ea8b3fea…8b09` (bitstream `9f8c0c5f…2bd91`), with WNS +6.506 ns, TNS 0, WHS +0.013 ns, 50,428/53,200 LUTs, and 46/140 BRAM tiles. Phase: **Linux board verification**; all 113 feature commits remain unclassified until a fresh serialized archived-Linux run reaches `/init` or establishes a reproducible non-`/init` result.
+
+- **Endpoint Linux result (0/113):** the fresh hash-verified archived-Linux run on that routed endpoint reached its clean 180-second target limit after 150,007,078 retired instructions (IPC 0.133339), without console output or `/init`. This is **compatibility endpoint repair**, not a feature result: all 113 commits remain unclassified and replay is suspended until the zero-feature baseline is repaired.
 
 ## 2026-09-02 — current investigation
 

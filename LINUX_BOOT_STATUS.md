@@ -42,6 +42,24 @@ extracted bitstream hash is `9f8c0c5f8f7a8d0ff61229deff843cf5f17e57cc68e58026791
 This proves fit and timing only—the next and still-required result is a fresh
 serialized board run of the unchanged archived Linux NBF through `/init`.
 
+The first fresh run used the verified package/bit/NBF identities above and
+cleanly reached its 180-second target limit after 150,007,078 retired
+instructions (IPC 0.133339), without an OpenSBI/Linux console line or `/init`.
+It is valid evidence that this reconstructed zero-feature endpoint is still
+incompatible with Linux; it is not evidence against any one of the 113 later
+SRAM-context feature commits. The replay is paused while this endpoint is
+localized and repaired.
+
+### Board-runner incident (2026-09-04)
+
+The initial detached serialized runner disappeared before it created a board
+log or completion status, leaving only its lock directory; no `control-program`
+process was present. Cause is not yet confirmed, so it is recorded as a
+board-session infrastructure failure rather than RTL evidence. The board was
+power-cycled, PYNQ readiness was re-established, the overlay was reloaded and
+hash-checked, and the retained foreground transcript above was used for the
+valid Linux result; do not infer a test result from a missing-status launch.
+
 The historical collateral only defines the default `prog.nbf` target. A
 named-NBF invocation therefore fails before simulation; generate the selected
 program with `make -B prog.nbf PROG=<name>` and then run it serially. This

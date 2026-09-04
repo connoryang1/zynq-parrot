@@ -86,6 +86,12 @@ a local probe as a Linux result.
    choose the next midpoint; never stack speculative fixes across multiple
    unclassified feature commits.
 
+If the zero-feature compatibility endpoint itself does not reach `/init`, stop
+the replay immediately. Record the run as an endpoint-repair problem, keep the
+count at **0/113**, and repair or remove only the compatibility overlay before
+selecting any feature midpoint. A feature bisect cannot distinguish a feature
+regression from a bad baseline.
+
 `WORK_LOG.md` is the concise dashboard.  Add one row only when the phase,
 checkpoint, feature count, compatibility-fix count, or Linux classification
 changes.  Each row must name the current commit, show `verified/113` and
@@ -126,16 +132,22 @@ BlackParrot `faa584e9`, both pushed to their named replay branches. It holds
 all seven recorded compatibility semantics and migrates the two local
 context-smoke guests to the non-colliding `0x800`--`0x802` CSR range.
 
-Progress is **0/113 verified, 113 remaining, Linux board verification**. The
-exact Linux NBF collision scan and clean traced static model build pass; the
+Progress is **0/113 verified, 113 remaining, compatibility endpoint repair**.
+The first fresh serialized archived-Linux run used the package and bitstream
+hashes below and reached its clean 180-second target limit with 150,007,078
+retired instructions at IPC 0.133339, but no OpenSBI/Linux console or `/init`.
+It is an endpoint result, not a feature classification: the overlay itself
+must be repaired or reduced before a midpoint can be chosen. The exact Linux
+NBF collision scan and clean traced static model build pass; the
 CSR isolation and six-switch microbenchmark guests reach `CORE PASS` (12-cycle
 warm minimum). The static PYNQ-Z2 implementation also routes cleanly as job
 `20260904T152933Z-c12d52f8`: WNS +6.506 ns, TNS 0, WHS +0.013 ns, 50,428 LUTs
 (94.79%), and 46 BRAM tiles (32.86%). Its package SHA-256 is
 `ea8b3feafc76d35474ac3ed3fcc1dde83ac438c9e8caa017d2c670f73ac8b09` and its
 bitstream SHA-256 is `9f8c0c5f8f7a8d0ff61229deff843cf5f17e57cc68e5802679111fa319a2bd91`.
-The only remaining endpoint proof is a fresh serialized archived-Linux run
-through `/init`; it will set the first binary-search boundary.
+The next proof is one isolated endpoint repair with a matching local gate and
+a new fresh-board `/init` result; only then can it set the first binary-search
+boundary.
 
 ## Result record
 
