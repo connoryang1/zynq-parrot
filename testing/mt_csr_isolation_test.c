@@ -34,13 +34,13 @@ static volatile uint64_t t1_final_mscratch   = 0xFFFFFFFFFFFFFFFFULL;
 
 /* ── CSR helpers ── */
 static inline void write_ctxt(uint64_t v) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v));
 }
 
 static inline void seed_npc(uint64_t tid, uint64_t npc) {
   /* bits [38:0] = NPC, bits [40:39] = thread_id (vaddr_width_p=39) */
   uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x801, %0" : : "r"(v));
 }
 
 static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
@@ -48,7 +48,7 @@ static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
   uint64_t v = (val & 0x7FFFFFFFFFULL)
              | ((tid & 0x3ULL) << 39)
              | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x802, %0" : : "r"(v));
 }
 
 static inline uint64_t read_mscratch(void) {

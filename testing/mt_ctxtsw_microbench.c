@@ -25,19 +25,19 @@ static uint64_t t3_stack[STACK_WORDS];
 void __attribute__((naked, noinline, noreturn)) t1_ping(void);
 
 static inline void write_ctxt(uint64_t v) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v));
 }
 
 static inline void seed_npc(uint64_t tid, uint64_t npc) {
   uint64_t v = ((tid & 0x3ULL) << 39) | (npc & 0x7FFFFFFFFFULL);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x801, %0" : : "r"(v));
 }
 
 static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
   uint64_t v = (val & 0x7FFFFFFFFFULL)
              | ((tid & 0x3ULL) << 39)
              | ((reg & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x802, %0" : : "r"(v));
 }
 
 static inline uint64_t read_cycle(void) {
@@ -82,7 +82,7 @@ void __attribute__((naked, noinline, noreturn)) t1_ping(void) {
     "la   gp, __global_pointer$\n"
     ".option pop\n"
     "li   t0, 0\n"
-    "csrw 0x081, t0\n"
+    "csrw 0x800, t0\n"
     "1:\n"
     "j    1b\n"
   );
