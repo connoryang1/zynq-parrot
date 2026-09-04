@@ -48,6 +48,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **DRAM-clear control rejected (0/113):** the prior successful runner did contain 64-MiB DRAM zeroing while the normal runner did not, so a rebuilt zeroing runner (`00fb07…`) was tested against the exact baseline. It also timed out cleanly (150,004,374 retired, IPC 0.133338), ruling out missing DRAM initialization as the sole historical-control failure; the normal runner was restored and the board power-cycled.
 
+- **Archived Linux control restored (0/113):** the preserved pre-feature package (`c211216…`, bitstream `d45f7e…`) with its matched runner (`76db…`) booted the unchanged Linux image through `/init`, rootfs checks, poweroff, and `CORE[0] PASS` (321,255,862 retired, IPC 0.512492). The board/image are proven healthy; phase remains **baseline/deployment compatibility diagnosis** because the missing historical `2a1f8834` artifact is not interchangeable with this archived pre-feature control.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).

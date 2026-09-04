@@ -164,6 +164,25 @@ necessary historical-flow parity but not sufficient to restore the old boot.
 The ordinary reviewed runner was hash-verified and restored before the required
 post-timeout board power cycle.
 
+### Preserved pre-feature artifact control (2026-09-04)
+
+The board retains the original `bp_unicore-linux-baseline.tar.xz.b64` package
+(SHA-256 `c211216c16e936b12c81a2f96c8e033ebfeb810c083c8fd3f7c3cda93e1c9a93`)
+and its matched historical runner `76db506ed632b3e68eb3201fe010b2d06e5161a2cfbe1823b71a2fbb50513be8`.
+The extracted historical bitstream is `d45f7e3e73b88a3eab2573415f3ff9ea050877e1246eebd5b145de5ea851cd5a`.
+After an atomic runner selection and readiness-gated overlay load, that exact
+pair booted the same Linux NBF through kernel initialization and `/init`, ran
+the bundled rootfs CPU/memory tests, powered down, and produced `CORE[0] PASS`.
+The terminal measurements were 321,255,862 retired instructions, IPC 0.512492,
+and 100.297 seconds wall time.
+
+This proves that the physical board, image, DRAM initialization, and historical
+host protocol are functional. It is an archived **pre-feature** artifact
+control, not a replacement for the missing saved artifact of the later
+`2a1f8834` / `ce328a77` compatibility seed; the newly rebuilt seed still
+silently fails with either current-runner DRAM policy. Do not use this success
+to absolve the current rebuild or to attribute its failure to the CSR migration.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |
