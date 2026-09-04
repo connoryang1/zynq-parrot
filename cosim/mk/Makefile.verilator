@@ -38,11 +38,10 @@ BUILD_ARGS += --trace-fst --trace-structs
 BUILD_ARGS += +define+FSTON
 endif
 build: ## builds the verilated executable
-build: %/V$(TB_MODULE)
-%/V$(TB_MODULE): $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
+build: obj_dir/V$(TB_MODULE)
+obj_dir/V$(TB_MODULE): $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
 	$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS) $^ 2>&1 | $(TEE_I) build.log
 
 view: ## View the dump with GTKwave
 view: dump.fst
 	@$(GTKWAVE) -f $<
-
