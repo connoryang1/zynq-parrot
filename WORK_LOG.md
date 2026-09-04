@@ -32,7 +32,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Minimal endpoint repair (0/113):** pushed candidate `380377a3` pairs the Linux-good historical top revision with BlackParrot `7f41bca9`, retaining only the mandatory custom-CSR migration and removing six unproven late compatibility changes. Phase: **local verification**; 113 feature commits remain because only a fresh routed `/init` result can establish this zero-feature baseline.
 
-- **Minimal local migration gate (0/113):** `380377a3` / `7f41bca9` completed a clean traced static build and passes migrated CSR isolation (`CORE PASS`). Its later microbenchmark is nonterminal at this historical depth because it requires a frontend handoff introduced within the feature sequence, so phase advances to **FPGA verifying** on the CSR-only endpoint; all 113 feature commits remain unclassified.
+- **Minimal local migration gate (0/113):** `380377a3` / `7f41bca9` completed a clean traced static build, passes migrated CSR isolation (`CORE PASS`), and the exact archived Linux NBF is collision-free for `0x800`--`0x802`. Its later microbenchmark is nonterminal at this historical depth because it requires a frontend handoff introduced within the feature sequence, so phase advances to **FPGA verifying** on the CSR-only endpoint; all 113 feature commits remain unclassified.
 
 ## 2026-09-02 — current investigation
 
