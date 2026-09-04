@@ -54,6 +54,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Full-stack Linux classification (0/113):** the same source-matched legacy runner (`b774f7…`) ran the exact routed `1c42e9f2` package (`73342c3…`, bitstream `8ee250aa…`) and collision-free Linux NBF. It reached Linux's two atomic-DMA-pool messages through 1.342125 s, then stayed unchanged for over two minutes with the target still running; this confirms the remaining stall is not the historical host-runner mismatch. The board was power-cycled before further work; phase is **current-stack RTL diagnosis**.
 
+- **Live Linux bracket restored (0/113):** a bounded legacy-ABI runner (`be771785…`) passes the full-image FPGA smoke, then a fresh guarded probe reaches `check_unaligned_access_boot_cpu` at `0x8020319e` (`CORE[0] PASS`, 3,029,117 retired). Its guarded return probe at `0x802031ac` instead reaches the clean 15-second target limit (63,852,157 retired), so the active failure is now confined inside that initcall rather than merely after the DMA-pool console messages.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).
