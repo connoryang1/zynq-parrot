@@ -1,0 +1,142 @@
+# Linux Feature Compatibility Bisect
+
+> Purpose: This document defines the reproducible search for the first
+> SRAM-backed context-switch feature prefix that still prevents the archived
+> Linux image from reaching `/init` after the known Linux-compatibility fixes
+> are applied. It separates feature history from later repair history so every
+> expensive FPGA result has a clear interpretation.
+
+## Question
+
+Which commit in the SRAM-backed context-switch feature sequence first remains
+incompatible with Linux after the established frontend, I-cache, CSR, SATP,
+and stale-fault repair semantics are present?
+
+## Fixed endpoints
+
+| Role | BlackParrot revision | Meaning |
+| --- | --- | --- |
+| Good feature baseline | `c39ee12b735` | Initial context-switch implementation; FPGA-verified Linux boot through `/init`. |
+| Good compatibility seed | `ce328a77536` | `7331fbd0` plus the two independently required frontend safety restorations; FPGA-verified Linux boot through `/init`. |
+| Feature tip | `8708eff7` | Last SRAM-backed context-switch feature commit before the compatibility repair series starts. |
+| Bad repaired endpoint | `1c42e9f2` | Feature tip plus the current compatibility stack; FPGA reaches the later unaligned-access boundary but not `/init`. |
+
+The raw feature interval has 114 commits (`c39ee12b735..8708eff7`). The
+practical replay starts at the good compatibility seed and replays the 113
+post-`7331fbd0` feature commits through `8708eff7`; a binary search still
+requires at most seven decisive hardware results after endpoint validation.
+
+## Candidate construction
+
+Create an isolated replay worktree from `ce328a77536`, which already contains
+the two FPGA-proven safety constraints for the first fast-path regression.
+Replay selected post-`7331fbd0` feature commits into that worktree, resolving
+only where a later feature overwrites one of those constraints. Then apply a
+small **compatibility overlay** for repair semantics that are meaningful at the
+selected feature depth. The overlay must be resolved and recorded explicitly;
+it is not a blind whole-stack cherry-pick because several later repairs target
+RTL that does not exist in early feature prefixes.
+
+Before interpreting any midpoint, prove both endpoints under the same overlay
+semantics:
+
+1. the compatibility seed must retain its known Linux boot through `/init`;
+2. feature tip + overlay must exhibit the current known non-`/init` result;
+3. only then classify a midpoint as **good** (`/init` and `CORE[0] PASS`) or
+   **bad** (fails to reach `/init` with a fresh package and run).
+
+## Efficient execution
+
+Each candidate first receives a serialized local preflight: clean static
+PYNQ-style build, a normal context-switch smoke gate, and the high-Sv39
+Linux-shaped C.LD gate. A candidate that cannot build or fails a local gate is
+recorded separately and is not a Linux classification.
+
+A locally clean candidate then requires one routed PYNQ-Z2 implementation and
+one fresh-overlay Linux boot. Routing is necessary for a conclusive answer;
+it cannot be replaced by simulation. Existing exact-revision packages may be
+reused, but no two Vivado jobs or board runs may overlap. A normal fresh
+overlay load does not require a power cycle; power-cycle only after an
+interrupted, timed-out, or SBI-reset terminal board run.
+
+## Iteration loop and progress reporting
+
+This is the authoritative loop for the replay.  It exists so that an
+interrupted investigation can resume at the same checkpoint without treating
+a local probe as a Linux result.
+
+1. **Constructing candidate:** start from the last Linux-good feature prefix,
+   apply only the selected feature commits plus the explicitly recorded
+   compatibility semantics, and commit the isolated overlay.  Push the
+   candidate branch before any long-running build so a disposable worktree is
+   recoverable.
+2. **Local verification:** record the top-level and BlackParrot commits, scan
+   the exact archived Linux NBF for custom-CSR collisions, then perform a
+   clean traced static-model build and the smallest relevant context and
+   privilege/CSR gates.  A local failure is a repair or localization task, not
+   a good/bad Linux classification.
+3. **FPGA/Linux verification:** route exactly that clean committed candidate
+   with static `e_bp_unicore_zynqparrot_cfg`, retain timing/utilization and
+   artifact hashes, then use a fresh serialized board run of the archived
+   Linux NBF.  Only `/init` plus `CORE[0] PASS` is **good**; a clean,
+   reproducible non-`/init` run is **bad**.
+4. **Repair or bisect:** if a candidate is not classifiable, make one isolated
+   RTL or collateral repair, rerun the matching local gate, and repeat the
+   FPGA stage.  If it is classifiable, update the binary-search boundary and
+   choose the next midpoint; never stack speculative fixes across multiple
+   unclassified feature commits.
+
+`WORK_LOG.md` is the concise dashboard.  Add one row only when the phase,
+checkpoint, feature count, compatibility-fix count, or Linux classification
+changes.  Each row must name the current commit, show `verified/113` and
+`remaining`, and say whether the work is **constructing**, **verifying**,
+**repairing**, or **classified good/bad**.  Retain commands and routine
+failures in `LINUX_BOOT_STATUS.md` instead.
+
+## Current midpoint checkpoint (2026-09-03)
+
+The first replay midpoint is BlackParrot `a9ee78ab1ea` (feature source
+`7e886ad6e783`) plus the recorded narrow I-cache compatibility overlay. The
+first routed attempt found a real combinational FE/UCE I-cache-refill loop
+caused by the overlay's context-switch abort signal; it was deliberately
+stopped and is not a valid FPGA candidate. The repaired overlay holds
+`miss_abort` low, preserving redirect/context state while waiting for a refill
+to finish. After restoring the midpoint's pinned nested BaseJump revision
+(`4db526e68d`), its clean traced two-resident/four-context PYNQ-style model
+passed the toolchain smoke and Linux-entry CSR/AMO/BSS gate.
+
+Before the corrected FPGA route completed, an exact-NBF CSR preflight found
+nine Linux instructions addressed to `0x081`--`0x083`, the midpoint's
+context-switch CSR range. This makes the candidate inherently incompatible
+with the archived Linux image, independently of the remaining frontend logic;
+the route was cleanly stopped and no board result will be attributed to this
+revision. The isolated migration overlay has since moved all 31 decode and
+documentation references to the non-colliding `0x800`--`0x802` range: the
+exact NBF preflight is collision-free and the static Linux-entry gate passes.
+That early feature prefix still lacks its later frontend handoff and therefore
+times out in the context-switch smoke; it is not a full feature acceptance or
+a routed Linux classification. Future historical replay candidates must carry
+both the acyclic refill behavior and the migrated CSR interface before a
+routed Linux classification.
+
+## Active endpoint candidate (2026-09-04)
+
+The zero-feature compatibility endpoint is top-level `c12d52f8` paired with
+BlackParrot `faa584e9`, both pushed to their named replay branches. It holds
+all seven recorded compatibility semantics and migrates the two local
+context-smoke guests to the non-colliding `0x800`--`0x802` CSR range.
+
+Progress is **0/113 verified, 113 remaining, FPGA verification**. The exact
+Linux NBF collision scan and clean traced static model build pass; the CSR
+isolation and six-switch microbenchmark guests reach `CORE PASS` (12-cycle
+warm minimum). The only remaining endpoint proof is a static-PYNQ-Z2 routed
+implementation and a fresh archived-Linux run through `/init`; it will set
+the first binary-search boundary.
+
+## Result record
+
+For every hardware decision retain: feature revision, overlay patch hash and
+manual resolutions, top-level revision, package/bit/NBF hashes, Vivado
+utilization and timing, local preflight log, and board transcript. Add only
+the resulting good/bad boundary changes to `LINUX_BOOT_BISECT.md` and the
+concise `WORK_LOG.md`.
