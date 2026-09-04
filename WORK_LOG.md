@@ -40,6 +40,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Pre-handoff boundary confirmed (0/113):** a fresh bounded `0x80200000` terminal probe on `380377a3` / `7f41bca9` reached no `M1` marker in 15 seconds while retiring 12,506,848 instructions at IPC 0.133402. The phase remains **compatibility endpoint diagnosis**: the CSR-only regression is definitively before OpenSBI's Linux `mret`, with all 113 feature commits unclassified.
 
+- **Runner identity gate (0/113):** pushed `fe3612f0` pins the board-side `control-program` SHA before every serialized run and preserved/restored the candidate runner after an incompatible archived-runner control. The phase remains **compatibility endpoint diagnosis** while the exact historical `2a1f8834` / `ce328a77` FPGA control is routing; 113 feature commits remain unclassified.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).
