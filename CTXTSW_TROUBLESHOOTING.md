@@ -70,6 +70,15 @@ the exact submodule's recursive initialization and verify `src/dm_pkg.sv` is
 present.  A missing file is a reproducible checkout failure, not a missing RTL
 source or a synthesis result.
 
+### Historical PLIC sources are generated collateral
+
+The older `zynq/v/gen` PLIC directory is not committed with its source
+snapshot.  Regenerate its patched OpenTitan PLIC first and stage the required
+primitive and generated `rv_plic_*` files as one matched bundle; the pinned
+historical configuration yields the same PLIC RTL hashes as the maintained
+generator.  Do not substitute an arbitrary OpenTitan revision, because the
+wrapper and register-package interfaces must match the historical PLIC glue.
+
 ### Stall after NBF load
 
 Typical output:
