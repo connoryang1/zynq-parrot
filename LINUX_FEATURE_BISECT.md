@@ -37,6 +37,12 @@ selected feature depth. The overlay must be resolved and recorded explicitly;
 it is not a blind whole-stack cherry-pick because several later repairs target
 RTL that does not exist in early feature prefixes.
 
+The historical submodule URL resolves to a local BlackParrot checkout in this
+workspace. Initialize a new replay worktree with
+`git -c protocol.file.allow=always submodule update --init --recursive` rather
+than weakening Git's global file-transport policy; record and reuse the exact
+submodule revision afterward.
+
 Before interpreting any midpoint, prove both endpoints under the same overlay
 semantics:
 
