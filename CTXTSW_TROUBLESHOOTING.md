@@ -44,6 +44,15 @@ First establish a freshly bootable source/bitstream/host-runner control, then
 perform an A/B comparison using identical NBF, runner hash, power-cycle, and
 overlay-load procedure.
 
+### Linux runner must explicitly zero DRAM, but zeroing is not a boot proof
+
+The archived Linux runner includes `FREE_DRAM=1 ZERO_DRAM=1`; a normal runner
+compiled with `ZERO_DRAM=0` is not an equivalent test even if the source and
+NBF hashes match. Build a temporary hash-pinned zeroing runner and require its
+`zero-d 0 MB` through `zero-d 63 MB` transcript before comparing Linux runs.
+That condition is necessary but not sufficient: the exact historical baseline
+still showed the same silent loop after a verified zeroing-runner control.
+
 ### Stall after NBF load
 
 Typical output:

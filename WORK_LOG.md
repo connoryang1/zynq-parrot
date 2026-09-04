@@ -46,6 +46,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Baseline control invalidates CSR attribution (0/113):** the newly routed, hash-verified exact historical control (`2a1f8834` / `ce328a77`, package `0d7073…`, bitstream `32060f…`) also reached a clean 180-second timeout with no console or `/init` at 150,005,765 retired instructions and IPC 0.133339. The CSR-only candidate is therefore not yet a proven regression; phase changes to **baseline/deployment compatibility diagnosis** with all 113 feature commits still unclassified.
 
+- **DRAM-clear control rejected (0/113):** the prior successful runner did contain 64-MiB DRAM zeroing while the normal runner did not, so a rebuilt zeroing runner (`00fb07…`) was tested against the exact baseline. It also timed out cleanly (150,004,374 retired, IPC 0.133338), ruling out missing DRAM initialization as the sole historical-control failure; the normal runner was restored and the board power-cycled.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).

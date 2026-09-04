@@ -151,6 +151,19 @@ transcript under the present host/board deployment environment. The board was
 power-cycled immediately after this valid bounded run; do not run another
 overlay/test until the PYNQ readiness gate passes.
 
+The old runner (`76db…`) includes the compiled `Zero-ing DRAM` path, whereas
+the ordinary current runner (`fd2f…`) does not. To eliminate that material
+workflow difference, a current-source runner was rebuilt with every duplicate
+definition forced to `FREE_DRAM=1 ZERO_DRAM=1` (runner
+`00fb07f60d1473da8a42ec96f61ece8ff24c54ad2dd732b6d076ad29c7221f60`) and
+verified to contain the zeroing string. On a fresh reload of the exact same
+baseline bitstream, it zeroed all 64 MiB and completed NBF loading, but still
+reached the controlled 180-second limit with 150,004,374 retired instructions
+at IPC 0.133338 and no console or `/init`. DRAM clearing is therefore
+necessary historical-flow parity but not sufficient to restore the old boot.
+The ordinary reviewed runner was hash-verified and restored before the required
+post-timeout board power cycle.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |
