@@ -39,7 +39,7 @@ RTL that does not exist in early feature prefixes.
 
 The historical submodule URL resolves to a local BlackParrot checkout in this
 workspace. Initialize only the required top-level dependencies with
-`git -c protocol.file.allow=always submodule update --init import/HardFloat import/basejump_stl import/black-parrot`,
+`git -c protocol.file.allow=always submodule update --init import/HardFloat import/basejump_stl import/black-parrot import/black-parrot-subsystems`,
 then initialize BlackParrot's pinned `external/basejump_stl` in the same way.
 Do not use a recursive update: it needlessly fetches SDK submodules such as
 WolfSSL. This keeps Git's global file-transport policy intact while recording
