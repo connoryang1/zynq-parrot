@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Feature commits verified | Feature commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 0 / 113 | 113 | Minimal 1 / 7 semantic under verification | top `380377a3` + BlackParrot `7f41bca9`; **compatibility endpoint repair** | Complete local gates, then classify the minimal zero-feature endpoint on FPGA before replaying any feature commit. |
+| 0 / 113 | 113 | Minimal 1 / 7 semantic classified bad | top `380377a3` + BlackParrot `7f41bca9`; **compatibility endpoint diagnosis** | Localize why the mandatory non-colliding CSR migration changes the pre-console firmware path, then make one CE-shaped repair before replaying any feature commit. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -33,6 +33,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Minimal endpoint repair (0/113):** pushed candidate `380377a3` pairs the Linux-good historical top revision with BlackParrot `7f41bca9`, retaining only the mandatory custom-CSR migration and removing six unproven late compatibility changes. Phase: **local verification**; 113 feature commits remain because only a fresh routed `/init` result can establish this zero-feature baseline.
 
 - **Minimal local migration gate (0/113):** `380377a3` / `7f41bca9` completed a clean traced static build, passes migrated CSR isolation (`CORE PASS`), and the exact archived Linux NBF is collision-free for `0x800`--`0x802`. Its later microbenchmark is nonterminal at this historical depth because it requires a frontend handoff introduced within the feature sequence, so phase advances to **FPGA verifying** on the CSR-only endpoint; all 113 feature commits remain unclassified.
+
+- **Minimal endpoint classified bad (0/113):** routed static PYNQ-Z2 candidate `380377a3` / `7f41bca9` fits (WNS +4.580 ns, WHS +0.022 ns, 50,324 LUTs, 46 BRAM) but its freshly staged exact Linux run reached the clean 180-second limit with 150,006,825 retired instructions at IPC 0.133339 and no console or `/init`. This isolates the current regression to the mandatory CSR-only compatibility change rather than the six removed overlays; 113 feature commits remain unclassified and phase is **compatibility endpoint diagnosis**.
 
 ## 2026-09-02 — current investigation
 

@@ -167,6 +167,18 @@ That one commit migrates the context-switch CSRs from Linux-colliding
 `0x081`--`0x083` to reserved custom-user `0x800`--`0x802`; it deliberately
 does not carry the six later speculative compatibility changes.
 
+This minimal candidate has now been classified **bad** on a fresh board. Its
+static PYNQ-Z2 route `20260904T163508Z-380377a3` passed timing and fit (WNS
+`+4.580 ns`, WHS `+0.022 ns`, 50,324 LUTs, and 46 BRAM tiles); the verified
+package/bitstream hashes are `7463ea1a…473997` and `4d756d07…3afbf`.
+The unchanged Linux NBF (`994bd900…821d5`) loaded successfully but reached
+its controlled 180-second limit at 150,006,825 retired instructions and IPC
+0.133339 without OpenSBI/Linux console output or `/init`. Therefore the
+custom-CSR migration is necessary but not sufficient in the CE code shape;
+the next iteration must localize its changed decode/commit path rather than
+reintroducing any of the six removed overlays or advancing the 113-commit
+feature replay.
+
 Use the following loop until the zero-feature endpoint is classifiable:
 
 1. **Verify the minimal candidate locally.** Run a clean static traced model
@@ -184,10 +196,11 @@ Use the following loop until the zero-feature endpoint is classifiable:
    requires a power cycle, readiness wait, and overlay reload before any retry.
 3. **Choose the smallest next overlay.** If the minimal candidate reaches
    `/init`, it becomes the replay baseline and the feature search begins at
-   **0/113 good**. If it fails cleanly, add or remove exactly one compatibility
-   semantic that exists at this historical depth, prove its local gate, and
-   repeat step 2. Do not reintroduce the full seven-fix stack merely to make a
-   later local test pass.
+   **0/113 good**. If it fails cleanly, first capture whether the actual
+   firmware executes a migrated CSR access or a changed CSR/commit side path;
+   then add or remove exactly one CE-shaped compatibility semantic, prove its
+   local gate, and repeat step 2. Do not reintroduce the full seven-fix stack
+   merely to make a later local test pass.
 4. **Resume the feature replay only after classification.** Once a zero-feature
    candidate reaches `/init`, push and retain that exact pair, update the
    scoreboard to `0/113 good`, and test feature midpoints with the same local
