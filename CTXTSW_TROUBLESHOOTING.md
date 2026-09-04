@@ -34,6 +34,16 @@ value and does not reach NBF configuration, stop and power-cycle; restore the
 candidate's reviewed runner before continuing. That is a host/bitstream
 protocol mismatch, not guest or RTL evidence.
 
+### Historical source checkpoint silently times out under a current runner
+
+An old source revision that once booted Linux is not itself a sufficient FPGA
+control. The rebuilt `2a1f8834` / `ce328a77` pair and the CSR-only candidate
+both timed out silently with the same 0.133339 IPC signature under the current
+reviewed runner, so do not attribute the candidate result to its RTL delta.
+First establish a freshly bootable source/bitstream/host-runner control, then
+perform an A/B comparison using identical NBF, runner hash, power-cycle, and
+overlay-load procedure.
+
 ### Stall after NBF load
 
 Typical output:

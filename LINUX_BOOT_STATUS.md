@@ -127,6 +127,30 @@ was immediately power-cycled and the candidate runner will be restored; this
 is a host/bitstream protocol mismatch, not evidence for or against the CSR
 migration.
 
+### Exact historical-baseline control (2026-09-04)
+
+The exact historical top-level/RTL pair previously recorded as Linux-good was
+rebuilt without the CSR migration: top `2a1f88347681e3ccc77d3eb3665ca23b6b8ae6c8`
+with BlackParrot `ce328a77536764187cd5174c44289fee05383ae8`. It routed and
+packaged as `0d7073d7f78a34bddb45b78036523c84bae974a1bc46f16bf774aa457a7beae3`
+(bitstream `32060f933c2120d227b961b7c642955d399a9f270335912f3fdedc0496d59d7f`),
+meeting timing with WNS +5.104 ns, TNS 0, WHS +0.037 ns, 50,662/53,200 LUTs,
+and 46/140 BRAM tiles. The same Linux NBF
+`994bd900593ffb0eba6c6bdc0f413b321d755c538ecbe105f6b9f48c17d821d5` was staged
+atomically, the normal reviewed board runner was SHA-pinned to
+`fd2f0291a9021c19f3ebd2d825d22a7dfe9d22ae33fbbeae3fde4a800d26bd2b`, and the
+overlay was confirmed operating before launch.
+
+Despite that exact source control, the retained 180,000-ms run was silent
+after `bsg_zynq_pl: start()` and stopped at 150,005,765 retired instructions,
+IPC 0.133339, without an OpenSBI/Linux console line or `/init`. It is nearly
+identical to the CSR-only candidate's 150,006,825-retirement result. Therefore
+the candidate failure cannot be attributed to the CSR address migration: the
+currently rebuilt historical pair is not reproducing its older Linux-success
+transcript under the present host/board deployment environment. The board was
+power-cycled immediately after this valid bounded run; do not run another
+overlay/test until the PYNQ readiness gate passes.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |

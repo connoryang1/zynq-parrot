@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Feature commits verified | Feature commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 0 / 113 | 113 | Minimal 1 / 7 semantic classified bad | top `380377a3` + BlackParrot `7f41bca9`; **compatibility endpoint diagnosis** | Localize why the mandatory non-colliding CSR migration changes the pre-console firmware path, then make one CE-shaped repair before replaying any feature commit. |
+| 0 / 113 | 113 | CSR-only candidate result not attributable | exact historical baseline and `380377a3` both silently time out; **baseline/deployment compatibility diagnosis** | Re-establish a presently bootable historical control with a matched host runner/bitstream, then compare the CSR migration against that control. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -43,6 +43,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Runner identity gate (0/113):** pushed `fe3612f0` pins the board-side `control-program` SHA before every serialized run and preserved/restored the candidate runner after an incompatible archived-runner control. The phase remains **compatibility endpoint diagnosis** while the exact historical `2a1f8834` / `ce328a77` FPGA control is routing; 113 feature commits remain unclassified.
 
 - **FPGA worker scaling (0/113):** pushed `1538b0ef` and `080608bd` make future isolated routes use all host CPUs for both Vivado run scheduling and internal synthesis/implementation workers; the in-flight four-worker historical control is retained to avoid discarding completed synthesis. The phase and replay count are unchanged while that control routes.
+
+- **Baseline control invalidates CSR attribution (0/113):** the newly routed, hash-verified exact historical control (`2a1f8834` / `ce328a77`, package `0d7073…`, bitstream `32060f…`) also reached a clean 180-second timeout with no console or `/init` at 150,005,765 retired instructions and IPC 0.133339. The CSR-only candidate is therefore not yet a proven regression; phase changes to **baseline/deployment compatibility diagnosis** with all 113 feature commits still unclassified.
 
 ## 2026-09-02 — current investigation
 
