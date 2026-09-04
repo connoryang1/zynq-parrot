@@ -36,8 +36,9 @@ package bp_common_pkg;
 
       ,l2_data_width: 64
       ,l2_fill_width: 64
-      ,l2_slices    : 2
-      ,l2_banks     : 2
+      // Keep the PYNQ-Z2 implementation within the xc7z020 LUT/slice budget.
+      ,l2_slices    : 1
+      ,l2_banks     : 1
 
       ,itlb_els_4k : 16
       ,itlb_els_2m : 1
