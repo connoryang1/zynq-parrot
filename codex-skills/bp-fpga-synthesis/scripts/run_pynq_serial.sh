@@ -21,6 +21,16 @@ runtime_limit_ms=${PYNQ_CONTROL_PROGRAM_TIMEOUT_MS:-}
   echo "FAIL: PYNQ_CONTROL_PROGRAM_TIMEOUT_MS must be a positive integer" >&2
   exit 2
 }
+# The Linux image is coupled to the host-side control-program protocol as well
+# as the bitstream.  A caller may pin the expected runner hash so an accidental
+# replacement cannot masquerade as an RTL regression.  The board sudo rule
+# deliberately still names only ./control-program; selecting a reviewed
+# archived runner therefore happens explicitly before launch.
+expected_runner_sha=${PYNQ_CONTROL_PROGRAM_SHA256:-}
+[[ -z "$expected_runner_sha" || "$expected_runner_sha" =~ ^[0-9a-fA-F]{64}$ ]] || {
+  echo "FAIL: PYNQ_CONTROL_PROGRAM_SHA256 must be a 64-character SHA-256" >&2
+  exit 2
+}
 # A full-width register-state terminal probe writes into a fixed DRAM scratch
 # area, then asks ps.cpp to dump that bounded range after the target stops.
 # Keep the sole optional control-program argument syntactically narrow: this
@@ -52,7 +62,7 @@ remote_timeout_arg=${runtime_limit_ms:--}
 # remote command.  Encode the optional argument explicitly so foreground is
 # never shifted out of the remote script's argument vector.
 remote_extra_arg=${extra_arg:--}
-launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" <<'REMOTE'
+launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$expected_runner_sha" <<'REMOTE'
 set -euo pipefail
 remote_dir=$1
 image=$2
@@ -61,6 +71,7 @@ runtime_limit_ms=$4
 expected_sha=$5
 extra_arg=$6
 foreground=$7
+expected_runner_sha=$8
 [[ "$runtime_limit_ms" == '-' ]] && runtime_limit_ms=
 [[ "$extra_arg" == '-' ]] && extra_arg=
 eval "cd $remote_dir"
@@ -99,6 +110,12 @@ actual_sha=$(sha256sum "$image" | awk '{print $1}')
   echo "NBF_SHA_MISMATCH=$image expected=$expected_sha actual=$actual_sha"
   exit 65
 }
+actual_runner_sha=$(sha256sum ./control-program | awk '{print $1}')
+if [[ -n "$expected_runner_sha" && "$actual_runner_sha" != "$expected_runner_sha" ]]; then
+  echo "CONTROL_PROGRAM_SHA_MISMATCH expected=$expected_runner_sha actual=$actual_runner_sha"
+  exit 64
+fi
+echo "CONTROL_PROGRAM_SHA256=$actual_runner_sha"
 
 # mkdir is atomic, closing the race between two simultaneous SSH launchers.
 mkdir "$lock" || { echo "ACTIVE_RUNNER"; exit 75; }

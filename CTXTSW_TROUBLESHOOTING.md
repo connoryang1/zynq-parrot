@@ -25,6 +25,15 @@ while `load-blackparrot-overlay` is still running, no guest result exists. Treat
 the board as contaminated, power-cycle it, wait for the PYNQ-ready gate, and
 reload before retrying; do not classify that interruption as an RTL failure.
 
+### Archived Linux runner reads an invalid reset CSR
+
+The protocol-compatible runner identified by SHA-256 `76db…` is required for
+the archived January bitstream, but it is not interchangeable with every
+routed candidate. If its first base-register read reports a non-Boolean reset
+value and does not reach NBF configuration, stop and power-cycle; restore the
+candidate's reviewed runner before continuing. That is a host/bitstream
+protocol mismatch, not guest or RTL evidence.
+
 ### Stall after NBF load
 
 Typical output:

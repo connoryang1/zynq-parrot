@@ -120,6 +120,13 @@ This independently proves that the CSR-only candidate stalls before OpenSBI's
 `mret` to Linux, so future localization stays within the OpenSBI prefix. The
 board was power-cycled immediately after this bounded result.
 
+An attempted control using the archived threaded runner (`76db…`) is
+inconclusive: on this candidate overlay its initial reset CSR read was the
+invalid value `-1207959552` and it never reached NBF configuration. The board
+was immediately power-cycled and the candidate runner will be restored; this
+is a host/bitstream protocol mismatch, not evidence for or against the CSR
+migration.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |
