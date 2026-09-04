@@ -53,6 +53,14 @@ NBF hashes match. Build a temporary hash-pinned zeroing runner and require its
 That condition is necessary but not sufficient: the exact historical baseline
 still showed the same silent loop after a verified zeroing-runner control.
 
+### Legacy Vivado flow supplies its own mode
+
+The preserved pre-feature source invokes Vivado as `-mode batch`, whereas the
+maintained 2024.2 wrapper historically added that option unconditionally.  Do
+not treat Vivado's `mode can only be specified once` error as a source or RTL
+failure: the wrapper now preserves a caller-supplied mode and only defaults to
+batch when none is present.
+
 ### Stall after NBF load
 
 Typical output:

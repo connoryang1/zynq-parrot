@@ -29,4 +29,13 @@ if ! file "$vivado_root/lib/lnx64.o/libxv_bda.so" | grep -q 'ELF 64-bit'; then
   export LD_LIBRARY_PATH="$vitis_lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
 
+# Modern callers hand this wrapper a Tcl source only, while the preserved
+# zynq-parrot flow also passes its own `-mode batch`.  Keep the wrapper usable
+# from both layouts without emitting Vivado's fatal duplicate-mode error.
+for arg in "$@"; do
+  if [[ "$arg" == "-mode" ]]; then
+    exec vivado "$@"
+  fi
+done
+
 exec vivado -mode batch "$@"
