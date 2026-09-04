@@ -203,6 +203,27 @@ poweroff, then returned `CORE[0] PASS` at 321,577,541 retired instructions and
 IPC 0.525264. This confirms the prior source-rebuild silent loop was a
 host-runner protocol mismatch, not a demonstrated RTL regression.
 
+### Current full-stack classification with the matched runner (2026-09-04)
+
+The source-matched runner also classified the routed full context-switch stack,
+so this conclusion is not extrapolated from the historical control. The exact
+BlackParrot `1c42e9f2` package
+`73342c3cd4adfa0084a0b8cf37d022710280d5a3eddd5a47337b12a57ce98fc5`
+(bitstream `8ee250aa172c03bffe52f29cf4ac5ad916a48f8ad9b3e6aeccbb3db029d6eadb`)
+was staged, re-extracted, and loaded with the archived Linux NBF (SHA-256
+`994bd900593ffb0eba6c6bdc0f413b321d755c538ecbe105f6b9f48c17d821d5`). The
+NBF collision scan passed for CSRs `0x800`--`0x802` and the pinned legacy
+runner was `b774f71d2ca5c8b92fdc1acae04f87d3e006f0c7e3207b4c904f7b0f5f85674f`.
+
+This run reached normal OpenSBI handoff and Linux output through both atomic
+DMA-pool lines (`1.331154` and `1.342125` kernel seconds), but its transcript
+then remained unchanged for more than two wall-clock minutes while the target
+continued to run. It did not reach `/init` or `CORE[0] PASS`. Therefore the
+legacy runner mismatch explains the recovered pre-feature false regression but
+does **not** explain the current full-stack post-DMA Linux stall. The board was
+power-cycled after the observed stall; the retained board transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260904T195409Z-289907.log`.
+
 ## Repairs made during this work
 
 | Repair | Why it was needed | Evidence / status |

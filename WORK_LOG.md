@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Feature commits verified | Feature commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 0 / 113 | 113 | CSR-only candidate result not attributable | exact historical baseline and `380377a3` both silently time out; **baseline/deployment compatibility diagnosis** | Re-establish a presently bootable historical control with a matched host runner/bitstream, then compare the CSR migration against that control. |
+| 0 / 113 | 113 | Host protocol now controlled | full `1c42e9f2` reproduces the post-DMA Linux stall even with the source-matched legacy runner; **current-stack RTL diagnosis** | Capture/repair the post-atomic-DMA kernel path, then route and boot the repaired feature stack through `/init`. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -51,6 +51,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Archived Linux control restored (0/113):** the preserved pre-feature package (`c211216…`, bitstream `d45f7e…`) with its matched runner (`76db…`) booted the unchanged Linux image through `/init`, rootfs checks, poweroff, and `CORE[0] PASS` (321,255,862 retired, IPC 0.512492). The board/image are proven healthy; phase remains **baseline/deployment compatibility diagnosis** because the missing historical `2a1f8834` artifact is not interchangeable with this archived pre-feature control.
 
 - **Reproducible source baseline (0/113):** recovered pre-feature source `4015d0f` / `08edfb` routed as package `93b3a3…` (bitstream `16c4e2…`) and, with the source-matched legacy threaded host runner `b774f7…`, booted the archived Linux NBF through `/init`, rootfs checks, poweroff, and `CORE[0] PASS` (321,577,541 retired, IPC 0.525264). The earlier silent controls used an incompatible newer runner, so phase advances to **feature replay verification**; all 113 feature commits remain to classify.
+
+- **Full-stack Linux classification (0/113):** the same source-matched legacy runner (`b774f7…`) ran the exact routed `1c42e9f2` package (`73342c3…`, bitstream `8ee250aa…`) and collision-free Linux NBF. It reached Linux's two atomic-DMA-pool messages through 1.342125 s, then stayed unchanged for over two minutes with the target still running; this confirms the remaining stall is not the historical host-runner mismatch. The board was power-cycled before further work; phase is **current-stack RTL diagnosis**.
 
 ## 2026-09-02 — current investigation
 

@@ -59,6 +59,13 @@ threaded FIFO runner (`b774f7…`), while the newer pybind/PYNQ runner produces
 the misleading silent 0.133-IPC loop. Treat the host runner as a versioned
 component of every Linux classification, not incidental board tooling.
 
+The runner match is a necessary control, not a universal cure. The full routed
+context-switch stack (`1c42e9f2`, package `73342c3…`, bitstream `8ee250aa…`)
+has now been tested with that same pinned runner and reaches Linux's atomic
+DMA-pool boundary before stalling. Do not reclassify this post-DMA failure as a
+host protocol issue without a new A/B control; it is currently a credible RTL
+or architecture-state failure.
+
 ### Linux runner must explicitly zero DRAM, but zeroing is not a boot proof
 
 The archived Linux runner includes `FREE_DRAM=1 ZERO_DRAM=1`; a normal runner
