@@ -61,6 +61,15 @@ not treat Vivado's `mode can only be specified once` error as a source or RTL
 failure: the wrapper now preserves a caller-supplied mode and only defaults to
 batch when none is present.
 
+### Historical source uses nested FPGA submodules
+
+The 2015-style source graph contains a nested
+`black-parrot-subsystems/zynq/import/riscv-dbg` gitlink.  A top-level
+submodule initialization is insufficient: before legacy Vivado packaging, run
+the exact submodule's recursive initialization and verify `src/dm_pkg.sv` is
+present.  A missing file is a reproducible checkout failure, not a missing RTL
+source or a synthesis result.
+
 ### Stall after NBF load
 
 Typical output:
