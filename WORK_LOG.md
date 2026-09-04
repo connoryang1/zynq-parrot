@@ -42,6 +42,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Runner identity gate (0/113):** pushed `fe3612f0` pins the board-side `control-program` SHA before every serialized run and preserved/restored the candidate runner after an incompatible archived-runner control. The phase remains **compatibility endpoint diagnosis** while the exact historical `2a1f8834` / `ce328a77` FPGA control is routing; 113 feature commits remain unclassified.
 
+- **FPGA worker scaling (0/113):** pushed `1538b0ef` and `080608bd` make future isolated routes use all host CPUs for both Vivado run scheduling and internal synthesis/implementation workers; the in-flight four-worker historical control is retained to avoid discarding completed synthesis. The phase and replay count are unchanged while that control routes.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).
