@@ -19,7 +19,10 @@ export ZP_FPGA_LOG_ROOT="$run_root"
 # historical full-system flow defaults to the stock aviary configuration, but
 # the context-cache PYNQ build must explicitly select its custom dimensions.
 fpga_cfg=${FPGA_CFG:-e_bp_unicore_zynqparrot_cfg}
-fpga_threads=${FPGA_VIVADO_THREADS:-4}
+# A routed implementation is the sole heavyweight Vivado job by policy, so
+# let that one job use the host's available CPU parallelism unless a caller
+# deliberately supplies a smaller memory-aware cap.
+fpga_threads=${FPGA_VIVADO_THREADS:-$(nproc)}
 fpga_num_threads=${FPGA_NUM_THREADS:-}
 fpga_num_contexts=${FPGA_NUM_CONTEXTS:-}
 
