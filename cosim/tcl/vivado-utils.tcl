@@ -83,6 +83,10 @@ proc vivado_elab_wrap { do_elab proj_bd } {
 
 proc vivado_synth_wrap { do_synth threads } {
     if {${do_synth}} {
+        # ``launch_runs -jobs`` schedules independent runs but does not raise
+        # the worker count inside the one synth run in this flow.  Keep both
+        # limits aligned with the explicitly recorded host cap.
+        set_param general.maxThreads ${threads}
         # Uncomment for faster TTR with worse QoR
         #set_property strategy Flow_RuntimeOptimized [get_runs synth_1]
         set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY rebuilt [get_runs synth_1]
@@ -95,6 +99,8 @@ proc vivado_synth_wrap { do_synth threads } {
 
 proc vivado_impl_wrap { do_impl threads } {
     if {${do_impl}} {
+        # See vivado_synth_wrap: implementation is likewise a single run.
+        set_param general.maxThreads ${threads}
         # Uncomment for faster TTR with worse QoR
         #set_property strategy Flow_RuntimeOptimized [get_runs impl_1]
         launch_runs impl_1 -to_step write_bitstream -jobs ${threads}
