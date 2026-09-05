@@ -81,6 +81,21 @@ if [[ -e "$repo_dir/import/basejump_stl/.git" ]]; then
   fi
 fi
 
+# The PYNQ Vivado source list resolves the top-level BaseJump memory wrapper.
+# Historical BlackParrot revisions can request ram_style_p while an older
+# top-level BaseJump gitlink silently supplies a wrapper without that parameter;
+# Verilator may resolve the nested copy instead, so catch the mismatch here.
+context_mem="$repo_dir/import/black-parrot/bp_be/src/v/bp_be_context_mem.sv"
+top_bsg_mem="$repo_dir/import/basejump_stl/bsg_mem/bsg_mem_1r1w_sync.sv"
+if [[ -f "$context_mem" ]] && grep -Eq '\.ram_style_p[[:space:]]*\(' "$context_mem"; then
+  if [[ -f "$top_bsg_mem" ]] && grep -Eq 'parameter[[:space:]]+ram_style_p' "$top_bsg_mem"; then
+    echo "OK   BaseJump context-SRAM ram_style parameter"
+  else
+    echo "FAIL: BlackParrot context SRAM requests ram_style_p but the top-level BaseJump wrapper does not declare it"
+    fail=1
+  fi
+fi
+
 if [[ -n "$(git -C "$repo_dir" status --short --untracked-files=no)" ]]; then
   echo "WARN: tracked top-level files are modified; do not use this state for a baseline"
 fi

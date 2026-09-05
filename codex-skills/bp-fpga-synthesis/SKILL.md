@@ -20,6 +20,12 @@ acceptable timing as the fit gate; elaboration or synthesis alone is not enough.
    use the dynamic `e_bp_custom_cfg` path: its macro expansion is broken here
    and silently selects an incompatible four-resident-thread design.
 
+Readiness also rejects a historical dependency mismatch where BlackParrot's
+context SRAM requests BaseJump's `ram_style_p`, but the top-level BaseJump
+wrapper selected by Vivado predates that parameter. Resolve it with the exact
+top-level BaseJump revision from the corresponding BRAM-backed feature
+checkpoint; do not remove the RAM-style request merely to make elaboration pass.
+
 If Sourceware returns HTTP 429 during `prep_lite`, run
 `scripts/setup_sourceware_mirrors.sh`. It installs checkout-local mirror URLs and shallowly
 checks out the exact gitlink commits; it must not advance dependency revisions.
