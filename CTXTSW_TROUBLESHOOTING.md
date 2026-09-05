@@ -336,3 +336,11 @@ When debugging a switch window, start with:
 
 Use `$zynq-parrot-waveform-debug` for the repo tool map and cycle-level analysis
 workflow.
+
+## Historical Submodule Identity Guard
+
+A prepared candidate once recorded a nonexistent BlackParrot gitlink because a
+short commit prefix was manually expanded instead of queried. The submodule
+clone then failed with an unadvertised-object error; always obtain the complete
+object ID with `git rev-parse HEAD`, use that exact value for `git update-index
+--cacheinfo`, and verify it afterward with `git ls-tree HEAD import/black-parrot`.
