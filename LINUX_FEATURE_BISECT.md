@@ -256,13 +256,13 @@ historical development point predates the intended banked-SRAM/BRAM-inference
 transition. It is therefore not FPGA-classifiable and establishes no Linux
 boundary.
 
-The next meaningful checkpoint is repaired commit 101: top-level `1bf4bfc2`
+The next meaningful checkpoint is repaired commit 101: top-level `b7133b51`
 with BlackParrot `c302d219`. It omits bad commit 51, replays commits 52--101,
 and includes the narrow-address and block-RAM compatibility changes. Its clean
 traced Linux-entry privilege/CSR/AMO/high-address gate passes (`CORE PASS`,
 9,130 retired), with evidence under
 `logs/bisect/20260905-repaired-midpoint101-bram/`. Routed job
-`20260905T061225Z-1bf4bfc2` is the decisive FPGA/Linux classification; a boot
+`20260905T061726Z-b7133b51` is the decisive FPGA/Linux classification; a boot
 would verify 51 additional feature commits and leave only commits 102--113.
 
 ## Refreshed hardware bracket (2026-09-04)

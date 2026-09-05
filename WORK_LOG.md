@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 50 good / 51 bad | 51 later commits are included in the repaired commit-101 candidate; 12 remain beyond it | Omit `00910cd4` + narrow-address cast + historical static dimensions | repaired commit 101 (`1bf4bfc2` / `c302d219`) passes the clean traced Linux-entry gate and is routing | Classify commit 101 with the exact archived Linux boot. |
+| 50 good / 51 bad | 51 later commits are included in the repaired commit-101 candidate; 12 remain beyond it | Omit `00910cd4` + narrow-address cast + historical static dimensions | repaired commit 101 (`b7133b51` / `c302d219`) passes the clean traced Linux-entry gate and is routing | Classify commit 101 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -82,7 +82,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Repaired midpoint 81 locally verified (good 50, 31 repaired commits under test):** pushed candidate `0a77641a` / `a60851d7` omits bad commit 51, replays commits 52--81, and carries the later narrow-physical-address cast required by the static PYNQ configuration. Its clean traced build and Linux-entry gate pass; the first Vivado attempt exposed only that now-fixed out-of-range address slice, and job `20260905T053121Z-0a77641a` is rerunning synthesis. Phase: **FPGA verifying repaired midpoint 81**; a boot would leave 32 feature commits to classify.
 
-- **Repaired commit 101 locally verified (good 50, 51 repaired commits under test):** midpoint 81 was not FPGA-classifiable because its transient pre-banking context arrays synthesized to 87,933 LUTs; no Linux conclusion was drawn. Pushed candidate `1bf4bfc2` / `c302d219` advances through the intended SRAM banking and BRAM inference, still omits bad commit 51, passes the clean traced Linux-entry gate, and is routing as `20260905T061225Z-1bf4bfc2`; 12 feature commits remain beyond it.
+- **Repaired commit 101 locally verified (good 50, 51 repaired commits under test):** midpoint 81 was not FPGA-classifiable because its transient pre-banking context arrays synthesized to 87,933 LUTs; no Linux conclusion was drawn. Pushed candidate `b7133b51` / `c302d219` advances through the intended SRAM banking and BRAM inference, still omits bad commit 51, passes the clean traced Linux-entry gate, and is routing as `20260905T061726Z-b7133b51`; 12 feature commits remain beyond it.
 
 ## 2026-09-02 — current investigation
 
