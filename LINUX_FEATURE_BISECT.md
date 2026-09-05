@@ -287,9 +287,22 @@ BlackParrot `9060cac5`. This is exactly proven-good commit 50 plus the
 duplicate-I-cache-hit selection change, while still omitting bad commit 51.
 Its clean 12-worker traced Linux-entry gate passes (`CORE PASS`, 9,137
 retired), with evidence under `logs/bisect/20260905-repaired-commit52/`, and
-routed job `20260905T072559Z-388de489` is in progress. Repaired commit 53
-(`94353d42` / `8ee2dd28`) is also built and passes the same local gate, so it
-is ready without another local compile if commit 52 boots Linux.
+routed job `20260905T072559Z-388de489` fit at 41,435 LUTs and 34 BRAM tiles
+with WNS +0.063 ns, TNS 0, and WHS +0.023 ns. Its package SHA-256 is
+`bbdff7edf257633ed68781b9d3bf269e1d62634a828fc872e4c61354b1d188ab`
+and bitstream SHA-256 is
+`8aae20ef225fa6ec61e42b9572cdbf03e5403c0c6a4acc986c41985b5a964c0a`.
+The clean repeated archived-Linux run reached `/init`, completed rootfs
+service and CPU/memory checks, powered off normally, and ended in
+`CORE[0] PASS` after 321,457,141 retired instructions. Its retained transcript
+is `/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T081126Z-1064208.log`.
+Repaired commit 52 is therefore **good**.
+
+The active candidate is repaired commit 53 (`94353d42` / `8ee2dd28`), which
+adds only the streamed-response UCE credit-accounting change to the repaired
+good boundary. It passes the same clean traced local gate and is routing as
+job `20260905T081420Z-94353d42`; 49 commits remain in the active 53--101
+good/bad interval.
 
 ## Refreshed hardware bracket (2026-09-04)
 

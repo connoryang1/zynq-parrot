@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 50 good / repaired 101 bad | 50 commits remain in the repaired 52--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired commit 52 (`388de489` / `9060cac5`) passes the clean traced Linux-entry gate and is routing | Classify repaired commit 52 with the exact archived Linux boot. |
+| 52 good / repaired 101 bad | 49 commits remain in the repaired 53--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired commit 53 (`94353d42` / `8ee2dd28`) passes the clean traced Linux-entry gate and is routing | Classify repaired commit 53 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -87,6 +87,10 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Repaired commit 101 classified bad (good 50, repaired bad 101; 50 remain):** routed candidate `b7133b51` / `c302d219` fits at 46,340 LUTs and 80 BRAM tiles with WNS +2.204 ns, then boots through OpenSBI and early Linux but stops after the two atomic-DMA-pool messages at 0.089464 s before `/init`. This proves the commit-51 queue-clearing regression is repaired enough to enter Linux, but a later independent regression remains; repaired commit 107 passes the clean traced local gate and is routing as `20260905T071112Z-2e283a74`.
 
 - **Second-regression search tightened (good 50, repaired bad 101; 50 remain):** source review identified commits 52 and 53 as the first post-boundary changes affecting ordinary cache/credit paths, and both exact repaired checkpoints pass clean 12-worker traced Linux-entry gates. The context-gated commit-107 route was stopped cleanly before completion; repaired commit 52 (`388de489` / `9060cac5`) is now FPGA-verifying as job `20260905T072559Z-388de489`, which will either isolate commit 52 or advance the good boundary.
+
+- **Repaired commit 52 classified good (good 52, repaired bad 101; 49 remain):** routed candidate `388de489` / `9060cac5` fit at 41,435 LUTs and 34 BRAM tiles with WNS +0.063 ns and cleanly booted the hash-pinned Linux image through `/init`, rootfs checks, orderly poweroff, and `CORE[0] PASS`. The second regression is therefore after commit 52; repaired commit 53 (`94353d42` / `8ee2dd28`) is now routing as job `20260905T081420Z-94353d42`.
+
+- **Board runner input isolation:** the first candidate-52 foreground run reached `/init` but consumed the unread SSH wrapper heredoc as guest-console input. The guarded runner now closes stdin for foreground targets; the repeated run completed all rootfs checks and `CORE[0] PASS` without injected text or guest faults.
 
 ## 2026-09-02 — current investigation
 

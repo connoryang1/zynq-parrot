@@ -130,7 +130,10 @@ if [[ "$foreground" == 1 ]]; then
   [[ -n "$extra_arg" ]] && command+=("$extra_arg")
   printf -v command_text '%q ' "${command[@]}"
   set +e
-  /usr/bin/script -qef -c "$command_text" "$log"
+  # The remote wrapper itself arrives on bash's stdin through an SSH heredoc.
+  # Do not let an interactive guest consume the unread remainder as console
+  # input after it reaches /init.
+  /usr/bin/script -qef -c "$command_text" "$log" </dev/null
   rc=$?
   set -e
   printf 'RUNNER_EXIT=%s\n' "$rc" > "$status"
