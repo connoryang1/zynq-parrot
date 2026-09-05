@@ -21,10 +21,9 @@ package bp_common_pkg;
   localparam bp_proc_param_s bp_unicore_zynqparrot_cfg_override_p =
     '{paddr_width: 34
 
-      // Match the validated static FPGA target: two resident register banks
-      // and four logical contexts exercise the nonresident context path.
+      // This historical schema has no separate logical-context count. Keep
+      // the resident register banks at the validated PYNQ-Z2 fit dimension.
       ,num_threads: 2
-      ,num_contexts: 4
 
       ,icache_fill_width: 64
 
