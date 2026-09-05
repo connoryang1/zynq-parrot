@@ -171,6 +171,16 @@ jobserver. Some old host runners also ignore `TARGET_RUNTIME_MS`, so a modern
 context smoke that is unsupported at that feature depth must be interrupted,
 its child process checked absent, and recorded as non-classifying.
 
+### Historical accelerator source can fail full Vivado elaboration
+
+Some early snapshots assign the nonexistent `offset` member of
+`bp_be_dcache_pkt_s` in `bp_cacc_vdp.sv`, even though the packet schema already
+uses `vaddr`. A selected Verilator configuration may not elaborate that
+disabled accelerator, while Vivado still diagnoses it during full source-set
+elaboration; apply the upstream one-line `offset`-to-`vaddr` correction before
+classifying the candidate, and do not treat this build failure as Linux or
+context-switch evidence.
+
 ### Historical PLIC sources are generated collateral
 
 The older `zynq/v/gen` PLIC directory is not committed with its source
