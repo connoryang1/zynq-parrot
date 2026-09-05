@@ -393,7 +393,12 @@ retained transcript is
 `/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T132251Z-1465010.log`.
 BusyBox's `sysctl` process took one null page fault during that otherwise
 terminally successful run, whereas the commit-54 control printed `sysctl: OK`;
-a fresh repeat is required before calling commit 55 fully clean.
+a fresh repeat of the exact same hashes printed `sysctl: OK`, completed the
+same `/init` and rootfs path, powered off, and ended in `CORE[0] PASS` after
+320,437,746 retired instructions. Its retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T132933Z-1467088.log`.
+Commit 55 is therefore repaired; the earlier isolated process fault did not
+repeat and is retained as an anomaly rather than hidden.
 
 The same director repair has been applied to the full 113-commit endpoint as
 BlackParrot `0ecfeeea` and top-level `fa7c851c`. Its correctly redirected

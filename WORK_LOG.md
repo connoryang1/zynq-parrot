@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Repaired 54 good / repaired 55 fixed | No bisect commits remain; full 113-commit endpoint is next | Omit `00910cd4` + historical static dimensions; remove the ordinary D-cache replay redirect while retaining resident mapping | fixed commit 55 (`4674d583` / `9a7e0425`) reached `/init`, rootfs checks, poweroff, and `CORE[0] PASS`; full endpoint `fa7c851c` / `0ecfeeea` is routing | Repeat the fixed-55 boot to classify its one BusyBox `sysctl` segfault, then boot the full endpoint and run the Linux C context-switch demo. |
+| Repaired 54 good / repaired 55 fixed | No bisect commits remain; full 113-commit endpoint is next | Omit `00910cd4` + historical static dimensions; remove the ordinary D-cache replay redirect while retaining resident mapping | fixed commit 55 (`4674d583` / `9a7e0425`) has a clean repeat through `/init`, rootfs checks, poweroff, and `CORE[0] PASS`; full endpoint `fa7c851c` / `0ecfeeea` is routing | Boot the full endpoint, then run the Linux C context-switch demo through the serialized interactive runner. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -207,3 +207,5 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **First bad feature identified (54/113 good, 55/113 bad):** repaired commit 54 (`30a74bfe` / `b740b610`) routed at 41,518 LUTs with WNS +1.144 ns, then booted the unchanged Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`; commit 55 is therefore the exact first bad feature. The isolated commit-55 repair (`4674d583` / `9a7e0425`) removes its ordinary D-cache replay redirect while preserving resident mapping, passes the local traced gate, and is routing as `20260905T123843Z-4674d583`.
 
 - **Commit-55 Linux regression fixed:** the isolated repair (`4674d583` / `9a7e0425`) routed at 41,523 LUTs, 34 BRAM tiles, and WNS +2.314 ns, then booted the unchanged Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`. This proves commit 55's always-active D-cache replay redirect caused the original stall; one BusyBox `sysctl` process segfaulted during this run, so a clean repeat is pending while the locally verified full 113-commit repair routes as `20260905T132659Z-fa7c851c`.
+
+- **Commit-55 clean repeat and interactive tooling:** after the required board power cycle and exact overlay reload, the same fixed-55 hashes booted again with `sysctl: OK`, `/init`, rootfs checks, poweroff, and `CORE[0] PASS`, so the one prior user-process fault did not repeat. The FPGA skill now has a hash-verified, locked interactive runner for executing the tiny Linux C context-switch demo without bypassing board serialization.
