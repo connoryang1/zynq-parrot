@@ -344,6 +344,10 @@ short commit prefix was manually expanded instead of queried. The submodule
 clone then failed with an unadvertised-object error; always obtain the complete
 object ID with `git rev-parse HEAD`, use that exact value for `git update-index
 --cacheinfo`, and verify it afterward with `git ls-tree HEAD import/black-parrot`.
+This mistake recurred while preparing the full-endpoint replay fix when a hash
+was typed into `update-index`; the commit was amended before validation. Pass
+the `rev-parse` result through a shell variable and require an exact
+actual-versus-gitlink comparison before committing or pushing.
 
 A manually chained smoke-image conversion once continued after `objcopy`
 failed, leaving an empty redirected NBF that was then launched. Image-generation
