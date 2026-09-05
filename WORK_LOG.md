@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 53 good / repaired 101 bad | 48 commits remain in the repaired 54--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired commit 77 (`17e4db38` / `eee61e7f`) passes the clean traced Linux-entry gate and is entering FPGA verification | Route and classify repaired commit 77 with the exact archived Linux boot. |
+| 53 good / repaired 101 bad | 48 commits remain in the repaired 54--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | commit 77 is non-fit; repaired commit 61 (`98d46c71` / `3d6a10b0`) passes the pinned traced Linux-entry gate and is routing | Classify repaired commit 61 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -91,6 +91,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Repaired commit 52 classified good (good 52, repaired bad 101; 49 remain):** routed candidate `388de489` / `9060cac5` fit at 41,435 LUTs and 34 BRAM tiles with WNS +0.063 ns and cleanly booted the hash-pinned Linux image through `/init`, rootfs checks, orderly poweroff, and `CORE[0] PASS`. The second regression is therefore after commit 52; repaired commit 53 (`94353d42` / `8ee2dd28`) is now routing as job `20260905T081420Z-94353d42`.
 
 - **Repaired commit 53 classified good (good 53, repaired bad 101; 48 remain):** routed candidate `94353d42` / `8ee2dd28` fit at 41,483 LUTs and 34 BRAM tiles with WNS +2.343 ns, then booted the exact Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`. The active search advances to repaired midpoint 77 (`17e4db38` / `eee61e7f`); the speculative UCE full-credit correction is not part of the repair chain.
+
+- **Commit 77 non-fit; commit 61 FPGA-verifying (good 53, repaired bad 101):** exact commit 77 synthesized without RTL errors but required 89,437/53,200 LUTs because it predates the BRAM-backed context store, so it received no Linux classification and placement was stopped. Exact repaired commit 61 (`98d46c71` / `3d6a10b0`) passes the pinned traced Linux-entry gate and is routing as `20260905T093432Z-98d46c71` in the normal 2-resident/4-logical configuration.
 
 - **Board runner input isolation:** the first candidate-52 foreground run reached `/init` but consumed the unread SSH wrapper heredoc as guest-console input. The guarded runner now closes stdin for foreground targets; the repeated run completed all rootfs checks and `CORE[0] PASS` without injected text or guest faults.
 

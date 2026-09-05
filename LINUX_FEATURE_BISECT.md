@@ -312,9 +312,19 @@ instructions. Its retained transcript is
 Repaired commit 53 is therefore **good**; the speculative UCE full-credit
 correction is not required and is excluded from the repair chain.
 
-The active candidate is repaired midpoint 77 (`17e4db38` / `eee61e7f`). It
-passes the clean traced Linux-entry gate, leaving 48 commits in the active
-54--101 good/bad interval, and is entering FPGA verification.
+Repaired midpoint 77 (`17e4db38` / `eee61e7f`) passed the clean traced
+Linux-entry gate, but exact synthesis required 89,437 of the PYNQ-Z2's 53,200
+LUTs (168.11%). This is a historical pre-BRAM representation limit, not a
+Linux classification; placement was stopped once the definitive utilization
+report existed.
+
+The active exact-fit candidate is repaired commit 61 (`98d46c71` /
+`3d6a10b0`), immediately before commit 62 introduces the large logical-context
+backing arrays. The pinned trace-enabled Linux-entry NBF passes with
+`CORE PASS` and 9,130 retired instructions; job
+`20260905T093432Z-98d46c71` is routing it in the normal two-resident/four-logical
+configuration. A Linux pass advances the good boundary from 53 to 61 without
+using a reduced-context or future-storage compatibility approximation.
 
 ## Refreshed hardware bracket (2026-09-04)
 
