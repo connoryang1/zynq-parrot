@@ -393,3 +393,4 @@ and the eventual legacy simulator run had no native target limit. Use the
 current root harness with both `ZP_DIR` and `FULL_SIM_DIR` aimed at the candidate,
 or skip the redundant local run when the candidate is only a clean application
 of two independently verified RTL deltas; never launch an unbounded guest.
+**Farm collection wildcard mismatch (2026-09-05):** the first multi-VM artifact collection failed because GNU tar did not expand the requested package wildcard even though the routed package existed. The collector now transfers the complete immutable PASS job directory and verifies the status, revision, summary, console, and packed-bitstream files locally before reporting success.

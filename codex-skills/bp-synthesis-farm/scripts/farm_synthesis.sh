@@ -188,8 +188,19 @@ REMOTE
     IFS=$'\t' read -r target port workers < <(builder_fields "$builder")
     ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 \
       -p "$port" "$target" \
-      "tar -C $(printf %q "$log_root/$job_id") -cf - status revisions.txt summary.txt console.log --wildcards '*.tar.xz.b64'" \
+      "tar -C $(printf %q "$log_root/$job_id") -cf - ." \
       | tar -C "$destination" -xf -
+    for required in status revisions.txt summary.txt console.log; do
+      if [[ ! -s $destination/$required ]]; then
+        echo "Collected job is missing $required." >&2
+        exit 1
+      fi
+    done
+    package=$(find "$destination" -maxdepth 1 -name '*.tar.xz.b64' -print -quit)
+    if [[ -z $package || ! -s $package ]]; then
+      echo "Collected job is missing its packed bitstream." >&2
+      exit 1
+    fi
     printf 'collected=%s\n' "$destination"
     ;;
   *)
