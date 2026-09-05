@@ -298,11 +298,23 @@ service and CPU/memory checks, powered off normally, and ended in
 is `/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T081126Z-1064208.log`.
 Repaired commit 52 is therefore **good**.
 
-The active candidate is repaired commit 53 (`94353d42` / `8ee2dd28`), which
-adds only the streamed-response UCE credit-accounting change to the repaired
-good boundary. It passes the same clean traced local gate and is routing as
-job `20260905T081420Z-94353d42`; 49 commits remain in the active 53--101
-good/bad interval.
+Repaired commit 53 (`94353d42` / `8ee2dd28`) adds only the streamed-response
+UCE credit-accounting change to the repaired good boundary. It routed at
+41,483 LUTs and 34 BRAM tiles with WNS +2.343 ns, TNS 0, and WHS +0.023 ns.
+Its package SHA-256 is
+`25e30c3d0d75858ec68c066c38323a3993c3ab5ef083d69bdcb282e1143accbd`
+and bitstream SHA-256 is
+`21a92c2939cb9ff77a8dce98364ce453412240676e98127c504a6153d4d58fc5`.
+The exact archived-Linux run reached `/init`, completed rootfs checks and
+clean poweroff, and ended in `CORE[0] PASS` after 321,991,236 retired
+instructions. Its retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T085503Z-1132981.log`.
+Repaired commit 53 is therefore **good**; the speculative UCE full-credit
+correction is not required and is excluded from the repair chain.
+
+The active candidate is repaired midpoint 77 (`17e4db38` / `eee61e7f`). It
+passes the clean traced Linux-entry gate, leaving 48 commits in the active
+54--101 good/bad interval, and is entering FPGA verification.
 
 ## Refreshed hardware bracket (2026-09-04)
 
