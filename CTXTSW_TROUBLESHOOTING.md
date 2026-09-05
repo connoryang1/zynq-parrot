@@ -16,6 +16,11 @@ cycle count:
 Keep debug instrumentation separate from functional fixes and remove it once
 the measurement is understood.
 
+When continuing a cherry-pick after resolving conflicts in an unattended
+session, set `GIT_EDITOR=true`; otherwise Git may open an interactive editor
+and fail on the non-interactive input stream. Verify the sequencer state before
+retrying so commits are neither skipped nor applied twice.
+
 ## Common Failure Signatures
 
 ### Board disappears during overlay reload

@@ -177,6 +177,22 @@ Midpoint 42 is therefore **good**, so the first bad feature is in commits
 `b6e427fad5cd4877b6bb982221533cfa102b45ec`; 15 commits remain in the active
 good/bad interval.
 
+Midpoint 49 is pushed as top-level `5f2cc57b` with BlackParrot `ff6db40b`;
+its underlying feature source is `b6e427fad5cd4877b6bb982221533cfa102b45ec`.
+The clean traced Linux-entry privilege/CSR/AMO/high-address gate passed. Routed
+job `20260905T015855Z-5f2cc57b` fit at 40,358 LUTs and 34 BRAM tiles, with WNS
++3.113 ns and WHS +0.014 ns. Its package SHA-256 is
+`4fbf34bcac0c2f8424723d69b474f34ad2ec54e917a84e0465bddd81432a1f97`
+and bitstream SHA-256 is
+`99d6968872e1a3fd6e45c8b80149be4475e1a58d0cc945022b4efe6751d063c3`.
+The fresh hash-verified archived Linux run reached `/init`, completed rootfs
+checks and clean poweroff, and ended in `CORE[0] PASS` after 323,132,331
+retired instructions at IPC 0.513599. The retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T023647Z-693175.log`.
+Midpoint 49 is therefore **good**, so the first bad feature is in commits
+50--57. The next candidate is midpoint 53/113; 8 commits remain in the active
+good/bad interval.
+
 ## Refreshed hardware bracket (2026-09-04)
 
 The board and archived Linux payload have been revalidated independently of
