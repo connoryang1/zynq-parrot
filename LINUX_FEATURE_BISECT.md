@@ -170,16 +170,34 @@ not the physical victim slot. That candidate passes local nonresident switching
 but cannot place because its pre-banking register representation requires
 64,089 LUTs, so no board conclusion was drawn from it.
 
-The next admissible hardware checkpoint is reconstructed feature 101, the
+The next admissible hardware checkpoint was reconstructed feature 101, the
 first replay point with the BRAM-backed context store. Exact top-level
 `a6549ff3b1ef` pins BlackParrot `7ed4a89d7ff2`; its first-install fix clones the
 current CSR image only when CSR `0x801` seeds a previously invalid target, so a
 Linux U-mode context retains privilege and SATP state without overwriting an
 initialized context. A clean two-thread/four-context model passes the ordinary
 smoke, repeated nonresident ring, and the formerly failing CSR-bootstrap test.
-The only admitted route is farm job `20260905T200324Z-a6549ff3`; its result will
-either provide the overlay for Linux acceptance or establish that later
-compaction is required for fit.
+The first route exposed an obsolete top-level BaseJump wrapper; changing only
+that dependency to the historical `ram_style_p`-capable `6cd7d830` produced
+exact pair `1e552170` / `7ed4a89d`. It routed successfully at 45,726 LUTs and
+80 BRAM tiles with WNS +1.607 ns, but its fresh exact hardware smoke retired
+only 61 instructions before the clean 30-second target limit. This classifies
+repaired feature 101 as FPGA-smoke bad despite its local gates, so neither its
+ring nor Linux image was run on the board.
+
+The next hardware checkpoint is reconstructed feature 110 at top-level
+`811e4eb0` and BlackParrot `68ed89eb`. It retains feature 102's context-SRAM
+prefetch, the registered redirect and first-target tag fixes, and the safe
+context-only I-cache abort overlay; original features 104--106 are omitted
+because they rewrite ordinary refill arbitration already covered by the safer
+repair. It also keeps the shared global-cycle counter at custom CSR `0xCC0`
+without overriding standard CSR `time`: the original override advanced at the
+core clock while CLINT `mtime` advances at core/8, making Linux/OpenSBI timer
+deadlines use incompatible domains. The clean traced model passes Linux
+high-address Sv39 refill, ordinary smoke, repeated nonresident ring, first-use
+CSR bootstrap, and custom-cycle tests. Two benchmark samples are identical at
+5.1328 warm and 13.1641 cold cycles/switch; routed job
+`20260905T204048Z-811e4eb0` is the only active follow-up.
 
 ## Historical first-regression search (2026-09-04)
 

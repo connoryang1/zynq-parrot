@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Fixed 55 good / feature 110 bad | 55 (features 56--110) | Preserve `0x800`--`0x804`, the D-cache replay fix, FE selector/typed metadata, logical-context identity, and first-install CSR inheritance | repaired feature 101 passes all three local gates and is routing as `20260905T200324Z-a6549ff3` | If it fits, run the bare-metal ladder and the hash-pinned Linux PID-1 context-switch proof; meanwhile prepare feature 110 locally without another speculative route. |
+| Fixed 55 good / repaired feature 101 FPGA-smoke bad | 46 (features 56--101) | Preserve `0x800`--`0x804`, D-cache replay, FE selector/typed metadata, logical-context identity, first-install CSR inheritance, and Linux-compatible `time` semantics | repaired feature 110 passes the full local gate set and is routing as `20260905T204048Z-811e4eb0` | If it routes, run the ordered bare-metal ladder and then the hash-pinned Linux PID-1 context-switch proof. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -234,3 +234,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Linux demo acceptance image:** pushed `c9c5cb9a` adds a reproducible PID-1 Linux image whose U-mode `0 -> 2 -> 0` test proves logical-ID, target execution, and distinct `s11` backing/restoration; the clean image is NBF `7939f8db…` and validation binds its ELF, initramfs, DTB, kernel, and OpenSBI payload.
 
 - **Feature101 CSR bootstrap fixed (fixed 55 good, feature 110 bad):** exact repaired feature101 (`a6549ff3` / `7ed4a89d`) now passes a clean ordinary smoke, the real repeated nonresident ring, and the formerly failing nonresident CSR-bootstrap after first-install CSR inheritance was limited to invalid targets. Its sole admitted PYNQ route is farm job `20260905T200324Z-a6549ff3`; repaired feature110 is only being reconstructed/local-tested in parallel.
+
+- **Feature101 routed but FPGA-smoke bad (fixed 55 good, repaired feature 101 bad; 46 remain):** the exact dependency-corrected pair `1e552170` / `7ed4a89d` passed all three clean traced local gates and routed at 45,726 LUTs, 80 BRAM tiles, WNS +1.607 ns, and TNS 0. On a fresh board with exact bitstream/NBF/runner hashes, its ordinary smoke retired only 61 instructions and reached the clean 30-second target limit, so ring and Linux were not run at this boundary.
+
+- **Linux-safe feature110 admitted (fixed 55 good, repaired feature 101 bad; 46 remain):** reconstructed `811e4eb0` / `68ed89eb` omits the broad ordinary I-cache rewrites and keeps global cycles only at custom CSR `0xCC0`; standard `time` retains the CLINT/OpenSBI path because the original core-clock mapping was eight times the configured CLINT rate. Linux high-VA refill, ordinary smoke, nonresident ring, CSR bootstrap, custom-cycle, and two identical 13.164-cycle cold-switch benchmark samples pass locally; the sole conditional follow-up route is `20260905T204048Z-811e4eb0`.
