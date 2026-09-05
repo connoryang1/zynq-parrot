@@ -15,6 +15,8 @@ mistaken for validated functional results.
 - Use `bp-fpga-synthesis` for build-readiness, background Vivado implementation, utilization,
   timing, bitstream fit, or FPGA deployment work.
 - Use `bp-parallel-safe-runs` before launching concurrent or background jobs.
+- Use `bp-synthesis-farm` to distribute independent routed candidates across the configured build
+  VMs. Keep one Vivado job per VM and keep all live FPGA-board operations serialized.
 
 ## Development Philosophy
 
