@@ -137,15 +137,28 @@ This classifies midpoint 57 as **bad**, eliminates feature commits 58--113,
 and confines the first bad feature to commits 1--57. The next candidate is
 midpoint 28/113, feature revision `ea83faa8b42a`.
 
-Midpoint 28 is now pushed as top-level `be6a1dd6` with BlackParrot
-`d6cdcd70`; its underlying feature source is `ea83faa8b42a`. Because this
+Midpoint 28 is pushed as top-level `517a7521` with BlackParrot
+`70018be9`; its underlying feature source is `ea83faa8b42a`. Because this
 revision predates the separate `num_contexts` parameter, its static fit shape
 uses two resident threads and a 1x1 L2 without injecting a nonexistent logical
 context field. The compatibility overlay retains the two proven frontend
 safety fixes, moves the context CSRs to `0x800`--`0x802`, and restores the
 pre-feature rule that an I-cache refill completes before the miss state exits.
-The clean traced Linux-entry CSR/AMO/high-address gate passes with `CORE PASS`;
-the next decisive result is its routed archived-Linux run.
+The clean traced Linux-entry CSR/AMO/high-address gate passes with `CORE PASS`.
+The final BlackParrot revision also carries upstream's exact one-line CACC
+packet-field correction (`offset` to `vaddr`), needed only because full Vivado
+elaborates that disabled historical accelerator source.
+
+Routed job `20260905T001700Z-517a7521` fit at 40,054 LUTs and 34 BRAM tiles,
+with WNS +4.772 ns and WHS +0.018 ns. Its package SHA-256 is `49d22ce6…b3ae`
+and bitstream SHA-256 is `36e1b254…a662`. The fresh hash-verified archived
+Linux run reached `/init`, completed rootfs checks and clean poweroff, and
+ended in `CORE[0] PASS`; the retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T005136Z-554143.log`.
+Midpoint 28 is therefore **good**, so the first bad feature is in commits
+29--57. The next candidate is midpoint 42/113, feature revision
+`9883fc6fc970c63dfd78382e431c5950d57bb2b5`; 29 commits remain in the active
+good/bad interval.
 
 ## Refreshed hardware bracket (2026-09-04)
 
