@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 53 good / repaired 55 bad | 2 commits remain in the repaired 54--55 interval; later commits are excluded by the bad boundary | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired commit 54 (`30a74bfe` / `b740b610`) passes the clean traced Linux-entry gate and is routing | Classify repaired commit 54 with the exact archived Linux boot, identifying commit 54 or 55 as first bad. |
+| Repaired 54 good / repaired 55 bad | First bad is exactly feature commit 55; no bisect commits remain | Omit `00910cd4` + historical static dimensions; candidate fix removes commit 55's ordinary D-cache replay redirect while retaining resident mapping | fixed commit 55 (`4674d583` / `9a7e0425`) passes the clean traced Linux-entry gate and is routing | Boot the fixed commit 55 image through `/init`; a pass proves the isolated replay redirect caused the regression. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -204,4 +204,4 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Early-Linux physical bracket:** on the latest static routed image, guarded host markers reach Linux stack setup (`0x8020113c`), its first main-kernel routine (`0x80c05544`), and the returns from its first five real helper calls through `0x80c0590c` (all `CORE PASS`). The next marker at `0x80c059c0` does not reach, reducing the live interval to the preceding 184-byte setup with two explicit `ebreak` assertion paths. The original 720-byte span is therefore a coarse milestone gap, not an assertion that every intervening byte is dynamically executed; current probes bisect the actual call path.
 
-- **Repaired replay narrowed (good 53, bad 55; 2 remain):** repaired commit 55 (`2ff15d44` / `465d3af0`) passed the clean traced local gate and routed at 41,501 LUTs with positive timing, but its exact Linux run stalled after atomic DMA-pool setup until the clean 180-second limit. Repaired commit 54 (`30a74bfe` / `b740b610`) passes the same local gate and is routing as `20260905T115448Z-30a74bfe`; its board result will identify commit 54 or 55 as the exact next regression.
+- **First bad feature identified (54/113 good, 55/113 bad):** repaired commit 54 (`30a74bfe` / `b740b610`) routed at 41,518 LUTs with WNS +1.144 ns, then booted the unchanged Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`; commit 55 is therefore the exact first bad feature. The isolated commit-55 repair (`4674d583` / `9a7e0425`) removes its ordinary D-cache replay redirect while preserving resident mapping, passes the local traced gate, and is routing as `20260905T123843Z-4674d583`.

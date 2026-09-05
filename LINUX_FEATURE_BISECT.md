@@ -362,10 +362,25 @@ Repaired commit 54 (`30a74bfe` / `b740b610`) is pushed and passes the clean
 12-worker trace-enabled Linux-entry gate (`CORE PASS`, 9,137 retired), with
 program, transcript, and waveform identities under
 `logs/bisect/20260905-repaired-commit54/`. Routed job
-`20260905T115448Z-30a74bfe` is the active FPGA/Linux classification. A good
-result identifies commit 55 (`465d3af0`, "Map resident ctxtsw targets") as the
-first bad; a bad result identifies commit 54 (`b740b610`, "plumb logical
-context id width") as the first bad.
+`20260905T115448Z-30a74bfe` fit at 41,518 LUTs and 34 BRAM tiles with WNS
++1.144 ns, TNS 0, and WHS +0.018 ns. Its package SHA-256 is
+`03d98107277c48a9982a05e593ed70f8f40ecd2d16fe55ab7c663a2d2cc7b2ca`
+and bitstream SHA-256 is
+`d03f203de0cf4526c5cfefbb9cbc622d68924de12fa88e0ebbbc4866d58c8c98`.
+The exact archived-Linux run reached `/init`, completed rootfs checks and clean
+poweroff, and ended in `CORE[0] PASS` after 323,303,531 retired instructions at
+IPC 0.514104. Its transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T123545Z-1389380.log`.
+Commit 54 is therefore **good**, and commit 55 (`465d3af0`, "Map resident
+ctxtsw targets") is the exact first bad feature commit.
+
+Commit 55 mixes its intended resident-target mapping with an ordinary-path
+D-cache replay redirect in `bp_be_director.sv`; Linux can execute the latter
+without issuing a context switch. The isolated repair at top-level `4674d583`
+and BlackParrot `9a7e0425` retains the resident mapping but restores the
+commit-54 director behavior. It passes the clean traced Linux-entry gate, and
+routed job `20260905T123843Z-4674d583` is the active proof of that root-cause
+hypothesis.
 
 ## Refreshed hardware bracket (2026-09-04)
 
