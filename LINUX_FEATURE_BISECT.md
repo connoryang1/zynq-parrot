@@ -594,13 +594,14 @@ slot 0, `csrwi 0x800,0` was suppressed because the scheduler compared its
 logical target against the physical slot ID. The three-line repair passes the
 full repeated nonresident ring and the ordinary current-toolchain smoke.
 
-Only one Vivado job is admitted now: `20260905T191111Z-c2e17847` on `bp3`.
-If its Linux/demo run passes, the next useful candidate is reconstructed
-feature 101, the first known BRAM-backed FPGA-fit checkpoint; a feature-101
-pass then admits reconstructed feature 110, the 13-cycle GPR-fit endpoint. If
-feature 63 fails, the next repair remains confined to features 56--63. Features
-64--100 are not routed merely as intermediate history because many are known
-not to fit and do not answer a decision that cheaper local gates cannot.
+Exact job `20260905T191111Z-c2e17847` synthesized but could not place: its
+early LUT/register backing state required 64,089 LUTs against the xc7z020's
+53,200. This is a fit boundary rather than a functional-gate failure, so the
+next useful candidate is reconstructed feature 101, the first known
+BRAM-backed FPGA-fit checkpoint; a feature-101 pass then admits reconstructed
+feature 110, the 13-cycle GPR-fit endpoint. Features 64--100 are not routed
+merely as intermediate history because they cannot answer a hardware question
+that the deployable BRAM checkpoint does not answer more directly.
 
 ## Result record
 
