@@ -209,6 +209,23 @@ Midpoint 53 is therefore **bad**, so the first bad feature is in commits
 50--53. The next candidate is midpoint 51/113; 4 commits remain in the active
 good/bad interval.
 
+Midpoint 51 is pushed as top-level `11000f6c` with BlackParrot `3cd4ea75`;
+its underlying feature source is `00910cd4a50c49f5cb9f1ecdcff2e027e4c2521e`.
+Its exact Linux-NBF CSR collision scan, clean 12-worker traced static build,
+and Linux-entry privilege/CSR/AMO/high-address gate all passed. Routed job
+`20260905T033325Z-11000f6c` fit at 41,295 LUTs and 34 BRAM tiles, with WNS
++3.502 ns and WHS +0.023 ns. Its package SHA-256 is
+`3011da16c78c62f6a158b3666bd44ed76158d1c102cbb264a9a4065300a0b8ba`
+and bitstream SHA-256 is
+`93c5e20997f8948bc347a68b03e6fdc286d085cc4a6108fa96da453d527c396a`.
+The fresh hash-verified archived Linux run printed the complete OpenSBI report
+but no Linux banner before the clean 180-second target limit, retiring 989,258
+instructions at IPC 0.000879. The retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T041141Z-815814.log`.
+Midpoint 51 is therefore **bad**, so the first bad feature is commit 50 or 51.
+The next candidate is midpoint 50/113; 2 commits remain in the active good/bad
+interval.
+
 ## Refreshed hardware bracket (2026-09-04)
 
 The board and archived Linux payload have been revalidated independently of
