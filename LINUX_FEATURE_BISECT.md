@@ -256,14 +256,30 @@ historical development point predates the intended banked-SRAM/BRAM-inference
 transition. It is therefore not FPGA-classifiable and establishes no Linux
 boundary.
 
-The next meaningful checkpoint is repaired commit 101: top-level `b7133b51`
-with BlackParrot `c302d219`. It omits bad commit 51, replays commits 52--101,
-and includes the narrow-address and block-RAM compatibility changes. Its clean
-traced Linux-entry privilege/CSR/AMO/high-address gate passes (`CORE PASS`,
-9,130 retired), with evidence under
-`logs/bisect/20260905-repaired-midpoint101-bram/`. Routed job
-`20260905T061726Z-b7133b51` is the decisive FPGA/Linux classification; a boot
-would verify 51 additional feature commits and leave only commits 102--113.
+Repaired commit 101 is top-level `b7133b51` with BlackParrot `c302d219`. It
+omits bad commit 51, replays commits 52--101, and includes the narrow-address
+and block-RAM compatibility changes. Its clean traced Linux-entry gate passes
+(`CORE PASS`, 9,130 retired), and routed job
+`20260905T061726Z-b7133b51` fits at 46,340 LUTs, 19,198 registers, 80 BRAM
+tiles, and 11 DSPs with WNS +2.204 ns, TNS 0, and WHS +0.023 ns. The package
+SHA-256 is `f695898c038d012b4bb86fc23337342effef36beee8fcc463a5a9e18965444ef`.
+
+Its fresh hash-verified archived-Linux run printed OpenSBI and entered Linux,
+then stopped after the two atomic-DMA-pool messages at kernel time 0.089464 s
+before the 180-second target limit; it did not reach `/init`. The retained
+transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T070054Z-979654.log`.
+Repaired commit 101 is therefore **bad**, but its later boundary proves that
+omitting commit 51 repairs the original pre-Linux failure and exposes another
+regression within commits 52--101.
+
+The next checkpoint is repaired commit 107: top-level `2e283a74` with
+BlackParrot `89afc656`. It adds commits 102--107 while preserving the safe
+frontend refill compatibility overlay and still omitting bad commit 51. Its
+clean traced Linux-entry gate passes (`CORE PASS`, 9,130 retired), with
+evidence under `logs/bisect/20260905-repaired-midpoint107/`; routed job
+`20260905T071112Z-2e283a74` is in progress. Six feature commits remain beyond
+this checkpoint.
 
 ## Refreshed hardware bracket (2026-09-04)
 
