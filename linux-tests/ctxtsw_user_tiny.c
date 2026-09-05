@@ -27,6 +27,8 @@ typedef long s64;
  * prevents a redirect-only implementation from being mistaken for a full
  * nonresident save/restore. */
 static volatile u64 target_result[4] __attribute__((used, aligned(16)));
+static const char target_entered[] __attribute__((used)) =
+  "[BP-LINUX-CTXTSW] target context entered\n";
 
 static s64 sys_write(const char *buffer, u64 length)
 {
@@ -108,6 +110,11 @@ static inline u64 read_s11(void)
 static __attribute__((naked, noinline, noreturn, used)) void context2_return(void)
 {
   __asm__ volatile (
+    "li a0, 1\n\t"
+    "lla a1, target_entered\n\t"
+    "li a2, 41\n\t"
+    "li a7, 64\n\t"
+    "ecall\n\t"
     "lla t0, target_result\n\t"
     "li t1, 0x4354585452475432\n\t"
     "sd t1, 0(t0)\n\t"
@@ -137,6 +144,11 @@ void _start(void)
    * so seed the NPC immediately before the handoff. */
   seed_context2_npc((u64)context2_return);
   __asm__ volatile ("csrwi 0x800, 2" : : : "memory");
+
+  if (read_context() != 0) {
+    PUT("[BP-LINUX-CTXTSW] FAIL: source resumed in wrong context\n");
+    sys_exit(1);
+  }
 
   if (target_result[0] != BP_TARGET_MAGIC) {
     PUT("[BP-LINUX-CTXTSW] FAIL: target context did not execute\n");
