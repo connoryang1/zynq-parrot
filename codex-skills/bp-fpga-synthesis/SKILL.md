@@ -67,9 +67,13 @@ passwordless access to Python, a shell, `make`, or arbitrary overlay paths.
 
 If the PYNQ board stops accepting SSH, use
 `PYNQ_POWER_STATE_URL=... scripts/power_cycle_pynq.sh <ssh-host>`. Keep the controller URL in the
-environment, never in tracked files or logs. A power cycle restores the board's default overlay;
-the helper waits for both SSH and the PYNQ PL manager before returning. Explicitly reload and
-verify the intended BlackParrot bitstream before interpreting any run.
+environment, never in tracked files or logs. A power cycle restores the board's default overlay.
+SSH and the PL manager become available before PYNQ's own boot service is stable, so always run
+`scripts/wait_pynq_ready.sh <ssh-host>` after any power cycle and before loading an overlay; it
+requires both the `Startup finished` journal milestone and a 90-second uptime by default.
+Explicitly reload and verify the intended BlackParrot bitstream before interpreting any run. After
+every overlay reload, also require the FPGA manager state to read `operating` before launching
+`control-program`; the maintained loader enforces and records this gate.
 
 For an interactive variant of the maintained Linux regression NBF, use
 `scripts/make_linux_shell_nbf.py <linux.nbf> <linux-shell.nbf>`. The helper changes only the
@@ -81,11 +85,29 @@ byte or halfword NBF writes for this patch.
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,
 and targeted simulation. Serialize tests that share the same Verilator directory.
 
+For a clean trace-enabled Verilator build on this checkout, remove the parent make jobserver
+from Verilator's environment and give Verilator the worker count explicitly:
+`make -C <verilator-dir> clean CFG=<cfg> TRACE=1`, then
+`make -C <verilator-dir> obj_dir/Vbsg_nonsynth_zynq_testbench CFG=<cfg> TRACE=1 VERILATOR='env -u MAKEFLAGS verilator --build-jobs 12'`.
+Without `env -u MAKEFLAGS`, Verilator's generated make can inherit closed jobserver descriptors,
+warn that the jobserver is unavailable, and silently compile with one worker.
+
 Launch routed FPGA implementation in an isolated background worktree:
 
 ```bash
 codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh start
 ```
+
+If the active checkout has unrelated tracked edits, do not weaken the dirty-tree
+guard or route those edits accidentally. Create a clean detached source snapshot
+at the committed checkpoint, initialize its pinned submodules, expose only the
+shared ignored `install/` and `riscv/` directories, then invoke the launcher with
+`ZP_REPO_DIR=<clean-snapshot>`,
+`ZP_FPGA_SEED_REPO_DIR=<active-checkout-with-submodules>`, and
+`ZP_FPGA_LOG_ROOT=<persistent-log-dir>`. The seed checkout supplies exact nested
+submodule objects that an upstream remote may no longer advertise.
+The recorded source revision remains immutable while logs stay outside temporary
+storage.
 
 The launcher returns immediately and writes the job ID, PID, immutable source revisions,
 console log, reports, and artifact under `logs/fpga/<job-id>/`. It uses shared `install/` and
@@ -152,3 +174,18 @@ pre-SATP milestone probes, retain the board log in persistent board-home storage
 and run the matching traced local privilege/SATP gate. Do not treat a physical NBF marker after
 SATP as evidence unless its virtual-to-physical mapping has been established. The current PYNQ-Z2
 image has no spare BRAM for an ILA.
+
+When a physical probe localizes a Linux failure to an instruction boundary, capture the live
+architectural inputs at that same boundary before creating or interpreting a local reproducer.
+Use a guarded terminal NBF probe and fixed-character SBI state reporting (for example, selected
+register or CSR nibbles); it must branch on the captured value before its first SBI call, because
+the call may clobber caller-saved registers. A simplified local page table, register image, or
+trap setup is only a hypothesis until it agrees with this physical capture. After any timed-out,
+interrupted, or SBI-reset terminal board run, power-cycle and reload the overlay before the next
+program; do not infer behavior from a follow-on PL state.
+
+Before accepting a data-dependent terminal reporter, execute the same-PC reporter with `x0` (or
+another known value) and require the expected dynamic character plus `CORE[0] PASS`. Keep the
+reporter bounded and dependency-safe with explicit settling between value construction and its
+branch; reject any result from a large table, stale register, or post-call register read that has
+not passed this control.
