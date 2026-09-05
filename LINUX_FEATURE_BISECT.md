@@ -379,8 +379,28 @@ D-cache replay redirect in `bp_be_director.sv`; Linux can execute the latter
 without issuing a context switch. The isolated repair at top-level `4674d583`
 and BlackParrot `9a7e0425` retains the resident mapping but restores the
 commit-54 director behavior. It passes the clean traced Linux-entry gate, and
-routed job `20260905T123843Z-4674d583` is the active proof of that root-cause
-hypothesis.
+routed job `20260905T123843Z-4674d583` fits at 41,523 LUTs and 34 BRAM tiles
+with WNS +2.314 ns, WHS +0.023 ns, and no timing failures. Its package SHA-256
+is `3dc4299d8babecd68958cdfe1cafa755228a1e0c1cb40744eecb99f0eb93ef36`
+and bitstream SHA-256 is
+`138b56077779528812a37bd072e64e08362bd2e2f5551eb6e5ccd354552cd578`.
+
+The exact unchanged Linux image then reached `/init`, ran the rootfs checks,
+powered off, and ended in `CORE[0] PASS` after 320,192,695 retired
+instructions. This proves the ordinary D-cache replay redirect caused the
+commit-55 boot stall and that resident target mapping itself can remain. The
+retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T132251Z-1465010.log`.
+BusyBox's `sysctl` process took one null page fault during that otherwise
+terminally successful run, whereas the commit-54 control printed `sysctl: OK`;
+a fresh repeat is required before calling commit 55 fully clean.
+
+The same director repair has been applied to the full 113-commit endpoint as
+BlackParrot `0ecfeeea` and top-level `fa7c851c`. Its correctly redirected
+trace-enabled static model passes the Linux-entry gate, repeated nonresident
+integer and FP restore rings, and the nonresident benchmark at 5 warm and 13
+cold cycles per switch. Routed job `20260905T132659Z-fa7c851c` is the active
+full-endpoint hardware proof.
 
 ## Refreshed hardware bracket (2026-09-04)
 
