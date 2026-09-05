@@ -4,6 +4,7 @@ include $(COSIM_MK_DIR)/Makefile.sim
 DEFINES += SIMULATION
 
 DUMP_FILE ?= dump.fst
+VERILATOR_BUILD_JOBS ?= $(shell nproc)
 
 VV_VFLAGS += $(addprefix +define+,$(filter-out VERILATOR,$(DEFINES)))
 VV_VFLAGS += $(addprefix +incdir+,$(VINCLUDES))
@@ -18,7 +19,7 @@ VV_LDFLAGS += $(addprefix -L,$(CLIBDIRS))
 VV_LDFLAGS += $(addprefix -l,$(CLIBS))
 
 VV_BUILD_OPTS += $(COSIM_VSRC_DIR)/waiver.vlt
-VV_BUILD_OPTS += --cc --sv --exe --build
+VV_BUILD_OPTS += --cc --sv --exe --build --build-jobs $(VERILATOR_BUILD_JOBS)
 VV_BUILD_OPTS += -Wno-fatal
 VV_BUILD_OPTS += -top-module $(TB_MODULE)
 VV_BUILD_OPTS += -CFLAGS "$(VV_CFLAGS)"
@@ -41,8 +42,8 @@ BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_HIER=bsg_nonsynth_zynq_testbe
 BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_FST
 endif
 build: ## builds the verilated executable
-build: %/V$(TB_MODULE)
-%/V$(TB_MODULE): $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
+build: obj_dir/V$(TB_MODULE)
+obj_dir/V$(TB_MODULE): $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
 	$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS) $^ 2>&1 | $(TEE_I) build.log
 
 view: ## View the dump with GTKwave
