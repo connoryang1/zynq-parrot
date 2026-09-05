@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 50 good / repaired 101 bad | 50 commits remain in the repaired 52--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + narrow-address cast + historical static dimensions | repaired commit 107 (`2e283a74` / `89afc656`) passes the clean traced Linux-entry gate and is routing | Classify repaired commit 107 with the exact archived Linux boot. |
+| 50 good / repaired 101 bad | 50 commits remain in the repaired 52--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired commit 52 (`388de489` / `9060cac5`) passes the clean traced Linux-entry gate and is routing | Classify repaired commit 52 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -85,6 +85,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Repaired commit 101 locally verified (good 50, 51 repaired commits under test):** midpoint 81 was not FPGA-classifiable because its transient pre-banking context arrays synthesized to 87,933 LUTs; no Linux conclusion was drawn. Pushed candidate `b7133b51` / `c302d219` advances through the intended SRAM banking and BRAM inference, still omits bad commit 51, passes the clean traced Linux-entry gate, and is routing as `20260905T061726Z-b7133b51`; 12 feature commits remain beyond it.
 
 - **Repaired commit 101 classified bad (good 50, repaired bad 101; 50 remain):** routed candidate `b7133b51` / `c302d219` fits at 46,340 LUTs and 80 BRAM tiles with WNS +2.204 ns, then boots through OpenSBI and early Linux but stops after the two atomic-DMA-pool messages at 0.089464 s before `/init`. This proves the commit-51 queue-clearing regression is repaired enough to enter Linux, but a later independent regression remains; repaired commit 107 passes the clean traced local gate and is routing as `20260905T071112Z-2e283a74`.
+
+- **Second-regression search tightened (good 50, repaired bad 101; 50 remain):** source review identified commits 52 and 53 as the first post-boundary changes affecting ordinary cache/credit paths, and both exact repaired checkpoints pass clean 12-worker traced Linux-entry gates. The context-gated commit-107 route was stopped cleanly before completion; repaired commit 52 (`388de489` / `9060cac5`) is now FPGA-verifying as job `20260905T072559Z-388de489`, which will either isolate commit 52 or advance the good boundary.
 
 ## 2026-09-02 — current investigation
 

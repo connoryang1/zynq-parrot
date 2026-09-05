@@ -277,9 +277,19 @@ The next checkpoint is repaired commit 107: top-level `2e283a74` with
 BlackParrot `89afc656`. It adds commits 102--107 while preserving the safe
 frontend refill compatibility overlay and still omitting bad commit 51. Its
 clean traced Linux-entry gate passes (`CORE PASS`, 9,130 retired), with
-evidence under `logs/bisect/20260905-repaired-midpoint107/`; routed job
-`20260905T071112Z-2e283a74` is in progress. Six feature commits remain beyond
-this checkpoint.
+evidence under `logs/bisect/20260905-repaired-midpoint107/`. Source review
+showed those added changes are context-switch-gated and cannot efficiently
+classify the ordinary Linux-path regression exposed by commit 101, so routed
+job `20260905T071112Z-2e283a74` was stopped cleanly before completion.
+
+The active candidate is instead repaired commit 52: top-level `388de489` with
+BlackParrot `9060cac5`. This is exactly proven-good commit 50 plus the
+duplicate-I-cache-hit selection change, while still omitting bad commit 51.
+Its clean 12-worker traced Linux-entry gate passes (`CORE PASS`, 9,137
+retired), with evidence under `logs/bisect/20260905-repaired-commit52/`, and
+routed job `20260905T072559Z-388de489` is in progress. Repaired commit 53
+(`94353d42` / `8ee2dd28`) is also built and passes the same local gate, so it
+is ready without another local compile if commit 52 boots Linux.
 
 ## Refreshed hardware bracket (2026-09-04)
 
