@@ -105,7 +105,9 @@ shared ignored `install/` and `riscv/` directories, then invoke the launcher wit
 `ZP_REPO_DIR=<clean-snapshot>`,
 `ZP_FPGA_SEED_REPO_DIR=<active-checkout-with-submodules>`, and
 `ZP_FPGA_LOG_ROOT=<persistent-log-dir>`. The seed checkout supplies exact nested
-submodule objects that an upstream remote may no longer advertise.
+BlackParrot submodule objects (`external/basejump_stl`, `external/HardFloat`, and
+`external/bedrock`) that an upstream remote may no longer advertise. Run the readiness check
+against the seed first so a missing nested dependency fails before the background job is created.
 The recorded source revision remains immutable while logs stay outside temporary
 storage.
 

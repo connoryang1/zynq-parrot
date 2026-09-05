@@ -31,6 +31,9 @@ else
 fi
 check_path "$repo_dir/import/black-parrot/.git" "BlackParrot submodule"
 check_path "$repo_dir/import/basejump_stl/.git" "BaseJump submodule"
+check_path "$repo_dir/import/black-parrot/external/basejump_stl/.git" "BlackParrot nested BaseJump submodule"
+check_path "$repo_dir/import/black-parrot/external/HardFloat/.git" "BlackParrot nested HardFloat submodule"
+check_path "$repo_dir/import/black-parrot/external/bedrock/.git" "BlackParrot nested BedRock submodule"
 check_path "$repo_dir/install/bin" "prepared tool installation"
 check_path "$repo_dir/install/include/boost/coroutine2/all.hpp" "Boost coroutine headers"
 check_path "$repo_dir/install/lib/libboost_coroutine.so" "Boost coroutine library"
@@ -51,6 +54,20 @@ if [[ -e "$repo_dir/import/black-parrot/.git" ]]; then
     echo "FAIL: BlackParrot checkout does not match the top-level gitlink"
     fail=1
   fi
+fi
+
+if [[ -e "$repo_dir/import/black-parrot/.git" ]]; then
+  for nested in external/basejump_stl external/HardFloat external/bedrock; do
+    if [[ -e "$repo_dir/import/black-parrot/$nested/.git" ]]; then
+      expected=$(git -C "$repo_dir/import/black-parrot" ls-tree HEAD "$nested" | awk '{print $3}')
+      actual=$(git -C "$repo_dir/import/black-parrot/$nested" rev-parse HEAD 2>/dev/null || true)
+      printf 'BP %-20s pinned: %.12s checkout: %.12s\n' "$nested" "$expected" "$actual"
+      if [[ -z "$expected" || "$expected" != "$actual" ]]; then
+        echo "FAIL: BlackParrot nested $nested checkout does not match its gitlink"
+        fail=1
+      fi
+    fi
+  done
 fi
 
 if [[ -e "$repo_dir/import/basejump_stl/.git" ]]; then
