@@ -16,4 +16,13 @@ grep -qx 'OVERLAY_LOAD_OK=1' <<<"$output" || {
   exit 1
 }
 
+fpga_state=$(ssh -o BatchMode=yes "$ssh_host" \
+  'cat /sys/class/fpga_manager/fpga0/state')
+printf 'REMOTE_FPGA_STATE=%s\n' "$fpga_state"
+[[ "$fpga_state" == operating ]] || {
+  echo "FAIL: FPGA manager is not operating after overlay load" >&2
+  exit 1
+}
+
+echo "REMOTE_FPGA_STATE_OK=1"
 echo "REMOTE_OVERLAY_LOAD_OK=1"

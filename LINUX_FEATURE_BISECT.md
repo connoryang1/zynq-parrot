@@ -149,12 +149,20 @@ evidence showed it never changed a value.
 
 The clean static traced model at that exact RTL tree passes both the two-way
 context-switch smoke (`prog.riscv` SHA-256 `19851341…ab9d`) and the independent
-current-toolchain smoke (`393241e8…2a2`). The sole admitted route is farm job
-`20260905T174711Z-37179e21` on `bp2`; no other builder is occupied because this
-nearest-boundary result alone decides whether the confirmed fixes restore
-feature-56 Linux boot. A clean `/init`, rootfs shutdown, and `CORE[0] PASS`
-moves the second-regression search to commits 57--110; a failure keeps the
-boundary at feature 56 and confines the next audit to this four-file repair.
+current-toolchain smoke (`393241e8…2a2`). Its sole admitted route, farm job
+`20260905T174711Z-37179e21`, completed at 41,523 LUTs, 34 BRAM tiles, WNS
++1.929 ns, and TNS 0; package SHA-256 is `f6e7c405…79bf` and bitstream SHA-256
+is `b8497448…0b21`.
+
+Two fresh, hash-verified boots prove the repair crosses feature 56's former
+`start plist test` stall, prints `end plist test`, and reaches `/init`. It is
+not yet clean-good: the first run printed `Running sysctl: Aborted` before
+poweroff and `CORE[0] PASS`, while the required clean repeat faulted BusyBox
+`rcS` with `badaddr=0x0000000101010100` and remained at a shell until the
+controlled target limit. The second-regression boundary therefore remains
+fixed 55 **good**, repaired feature 56 **bad**. No feature-57 route is admitted
+until a local discriminator isolates the residual state/tag corruption and
+justifies one new feature-56 candidate.
 
 ## Historical first-regression search (2026-09-04)
 

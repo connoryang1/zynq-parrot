@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Fixed 55 good / feature 56 repair verifying | 1 (feature 56) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | minimal selector/typed-metadata repair (`37179e21` / `e66e2e9a`) passes clean context and ordinary local gates; one routed build is running | Route once, then require a fresh exact Linux `/init` plus `CORE[0] PASS` result. |
+| Fixed 55 good / repaired feature 56 still bad | 1 (feature 56) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | selector/typed-metadata repair (`37179e21` / `e66e2e9a`) fixes the kernel plist stall but two boots fault in BusyBox after `/init` | Isolate the remaining userspace-corruption path before admitting one new route. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -224,3 +224,5 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Packet-width hypothesis rejected (feature 56 remains bad; 1 suspect commit):** the exact-width repair (`29550200` / `004571b3`) routed at 41,517 LUTs, 34 BRAM tiles, and WNS +0.961 ns, with the dispatch/reservation width warnings removed. Its exact Linux run still stalled at `start plist test`, so padding in those two packet macros is not the boot root cause; feature 56's logical-ID behavior is the remaining differential to isolate.
 
 - **Feature-56 root cause localized (fixed 55 good, feature 56 repair verifying; 1 suspect commit):** an exact traced two-way switch proved feature 56 failed to update the FE selector on a direct context redirect and then extracted the issue thread ID from a one-bit packet-container pad instead of the typed metadata field. Minimal pushed candidate `37179e21` / `e66e2e9a` fixes only those two paths, passes both the clean context-switch and ordinary-toolchain traced gates, and is now the sole admitted routed build (`20260905T174711Z-37179e21`) on `bp2`.
+
+- **Feature-56 kernel stall fixed but userspace remains bad (fixed 55 good, repaired feature 56 bad; 1 suspect commit):** `37179e21` / `e66e2e9a` routed at 41,523 LUTs, 34 BRAM tiles, and WNS +1.929 ns; two fresh exact Linux boots both crossed the former plist stall and reached `/init`, but one aborted `sysctl` and the clean repeat faulted BusyBox `rcS` at `0x0101010100`. The selector/metadata fixes are confirmed progress, but feature 56 is not yet clean-good and no feature-57 route is admitted until the residual tag/state corruption is isolated.
