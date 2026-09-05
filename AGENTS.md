@@ -1,5 +1,10 @@
 # AGENTS
 
+This file defines the repository-specific development, verification, and
+operational rules for the BlackParrot FPGA worktree.  It keeps long-running
+hardware experiments reproducible and prevents debugging shortcuts from being
+mistaken for validated functional results.
+
 > Purpose: This file defines the engineering workflow for this BlackParrot-on-FPGA checkout. It explains how to make changes, validate them safely, and preserve reproducible evidence. It also records the project conventions that keep the Linux/context-switch investigation understandable to someone joining later.
 
 ## Repository Skills
@@ -28,12 +33,19 @@
 - Make checkpoint commits at verified working states so there is always a clear rollback point.
 - If a line of investigation fails, revert the experiment instead of stacking more guesses on top of it.
 - Prefer branch-based experimentation over leaving long-lived uncommitted changes in the main worktree.
+- In a new historical top-level worktree, initialize a submodule and verify that its `.git` file
+  exists before running `git -C <submodule> ...`. An uninitialized but existing submodule directory
+  can make Git discover the parent repository and accidentally apply the command to the top-level
+  worktree instead.
 
 ## Testing Expectations
 
 - Re-run the most relevant smoke test after every critical RTL or software change.
 - For this project, after RTL or test-program changes use the clean target flow:
   `make clean run ... TRACE=1`.
+- When using parallel Make, invoke `clean` to completion first and launch the build/run as a
+  separate command. Multiple top-level goals such as `make -j12 clean run-...` may execute in
+  parallel, deleting simulator artifacts while the run target is building them.
 - When using the testing harness directly, prefer the equivalent `make -C testing ... TRACE=1`
   form so commands run from the repository root without changing directories.
 - A direct simulator `make -C cosim/.../verilator run` only copies an existing ELF; rebuild a
@@ -41,8 +53,25 @@
 - Do not run testing flows concurrently by default. The testing harness and simulator flow share
   program, build, waveform, and log artifacts, so parallel runs can overwrite each other unless
   separate output/build directories have been explicitly configured and verified.
+- For an expected local guest stall, use the simulator's native target-runtime limit rather than
+  only a host-side `timeout`; verify no child simulator remains before another run and archive a
+  waveform only after the target exits cleanly.
+- If a board `control-program` run ends through its target-runtime limit, an SBI-reset terminal
+  probe, or interruption, power-cycle the board and reload the overlay before another run.  The PL
+  may no longer have a trustworthy reset/retirement state; never infer RTL behavior from a
+  follow-on run that skipped this recovery.
+- Never use `sudo -n ./control-program` with a placeholder file to test board authorization: a
+  permitted command begins a real privileged run before it reads the image. Use the serialized
+  runner with a verified NBF, and treat any accidental direct launch as a contaminated-board event
+  requiring a power cycle and overlay reload.
+- After any PYNQ power cycle, wait for `scripts/wait_pynq_ready.sh <ssh-host>` before loading an
+  overlay. An open SSH port is not sufficient: PYNQ's own boot service continues for roughly a
+  minute, and an early overlay load has caused invalid board runs.
 - Always include `TRACE=1` for context-switch debug and performance validation runs so
   waveform evidence is available by default.
+- Before a trace-enabled full rebuild, check free temporary-space capacity. Do not let a
+  failed trace build fall through to an existing simulator executable: treat any result after
+  a failed build as invalid, clean the target artifacts, and rerun only after the build succeeds.
 - When changing shared infrastructure, rerun at least one previously known-good flow before trusting new debug results.
 - Incremental tests are acceptable only for quick local checks that do not depend on
   regenerated programs, RTL, wrappers, or waveform output.
@@ -69,6 +98,11 @@
   entry in the relevant persistent troubleshooting/verification log before moving on: symptom,
   confirmed or suspected cause, evidence, and the guardrail or procedure that prevents a repeat.
   Do not record a root cause as confirmed until the evidence distinguishes it from alternatives.
+- When an FPGA marker localizes a Linux failure to an instruction boundary, capture the live
+  architectural input at that same boundary before designing a local reproduction.  First validate
+  any injected value reporter at the same PC with a known-zero source, then retain only a compact,
+  dependency-safe transcript that ends in `CORE[0] PASS`; an unvalidated or stale reporter value is
+  not evidence.
 - For context-switch performance, track the waveform-derived added overhead
   separately from benchmark latency/throughput. The primary overhead metric is
   the number of dead or discarded cycles from architectural `commit_pkt.ctxtsw`
@@ -83,11 +117,12 @@
 ## Iteration Log
 
 - Maintain [`WORK_LOG.md`](WORK_LOG.md) as the chronological record of meaningful engineering events.
-- Add a one- or two-sentence, self-contained entry for every confirmed reproduction, failed reproduction,
-  definitive fix or revert, FPGA/Linux execution attempt, material infrastructure failure or recovery,
-  and every commit or push that changes the investigation state.
-- State the command or artifact when it is useful, distinguish confirmed results from hypotheses, and link
-  to persistent logs or documents where available. Append the entry before moving on to the next material step.
+- Add a one- or two-sentence, self-contained entry only for substantial progress: a confirmed root cause,
+  definitive fix or revert, meaningful FPGA/Linux outcome, material tooling change, or commit/push.
+- Keep routine probes, repeated failures, and intermediate marker splits in retained transcripts or detailed
+  status documents rather than this log. State the artifact or command when useful and distinguish confirmed
+  results from hypotheses. Start every entry with a short bold milestone title such as **Linux boot progress**,
+  **New reproduction**, **Fix validation**, or **FPGA build/deployment**.
 - Every Markdown file created or edited in this repository must begin with a short plain-language purpose
   statement (two to four sentences) so it is understandable without prior project context.
 
