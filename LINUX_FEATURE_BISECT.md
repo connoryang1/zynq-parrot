@@ -128,9 +128,33 @@ The feature-56 audit found that its dispatch and reservation width macros are
 bits. Fixed 55 already had stale 409/563-bit macros, but feature 56 adds the
 new thread-ID field without removing the old extra virtual-address term. The
 minimal repair at top-level `295502002c10` and BlackParrot `004571b36f8a`
-makes both formulas exactly match `$bits`; it is routing on `bp2` as job
-`20260905T164105Z-29550200`. No later feature checkpoint will consume board
-time until this one-commit repair is classified.
+makes both formulas exactly match `$bits`. Job
+`20260905T164105Z-29550200` routed at 41,517 LUTs, 34 BRAM tiles, and WNS
++0.961 ns, and the two corresponding width warnings disappeared. Its exact
+Linux run nevertheless reproduced the same `start plist test` stall, so the
+packet-padding hypothesis is rejected. The next candidate must isolate feature
+56's logical-context comparison/state tracking from this representation-only
+cleanup; no later feature checkpoint should consume board time first.
+
+That isolation is now complete locally. An exact two-way traced switch showed
+two causal defects in feature 56: `pc_gen.thread_id_r` changed only for a
+generic state reset and therefore remained on the source thread after a direct
+context redirect; after that was repaired, the issue queue still decoded the
+thread ID from bit 50 of a 51-bit container even though the typed 50-bit branch
+metadata places the field at bit 49. The minimal candidate is top-level
+`37179e21db16` with BlackParrot `e66e2e9a2d55`; it adds an explicit valid bit
+for the context-redirect selector update and uses typed pack/unpack assignments
+for branch metadata. A speculative dispatch guard was removed because waveform
+evidence showed it never changed a value.
+
+The clean static traced model at that exact RTL tree passes both the two-way
+context-switch smoke (`prog.riscv` SHA-256 `19851341…ab9d`) and the independent
+current-toolchain smoke (`393241e8…2a2`). The sole admitted route is farm job
+`20260905T174711Z-37179e21` on `bp2`; no other builder is occupied because this
+nearest-boundary result alone decides whether the confirmed fixes restore
+feature-56 Linux boot. A clean `/init`, rootfs shutdown, and `CORE[0] PASS`
+moves the second-regression search to commits 57--110; a failure keeps the
+boundary at feature 56 and confines the next audit to this four-file repair.
 
 ## Historical first-regression search (2026-09-04)
 

@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Fixed 55 good / repaired 56 bad | 1 (feature 56) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | feature 56 (`d29987b2` / `220cb8d2`) stalled in the kernel plist self-test; exact packet-width repair (`29550200` / `004571b3`) is routing on `bp2` | Boot the repaired feature 56 and require `/init`, clean poweroff, and `CORE[0] PASS`. |
+| Fixed 55 good / feature 56 repair verifying | 1 (feature 56) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | minimal selector/typed-metadata repair (`37179e21` / `e66e2e9a`) passes clean context and ordinary local gates; one routed build is running | Route once, then require a fresh exact Linux `/init` plus `CORE[0] PASS` result. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -220,3 +220,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Second regression narrowed (fixed 55 good, feature 57 bad; 2 suspect commits):** exact feature 57 (`17f1d8fa` / `93b2e860`) routed at 41,520 LUTs with WNS +1.368 ns, then reached `/init` and rootfs startup twice on fresh board states but reproducibly faulted BusyBox `rcS` before shutdown. Exact feature 56 (`d29987b2` / `220cb8d2`) is now **FPGA verifying** on the 64-core `bp3` builder; it will distinguish feature 56 from feature 57.
 
 - **Second regression isolated (fixed 55 good, feature 56 bad; 1 suspect commit):** exact feature 56 (`d29987b2` / `220cb8d2`) routed at 41,517 LUTs and 34 BRAM tiles with WNS +0.961 ns, then reproducibly progressed through OpenSBI and most kernel initialization but stalled at `start plist test` until its clean target limit. The only differential packet macros describe 370/525-bit structs as 410/564-bit ports; the exact-width repair (`29550200` / `004571b3`) is now **FPGA verifying** on `bp2`.
+
+- **Packet-width hypothesis rejected (feature 56 remains bad; 1 suspect commit):** the exact-width repair (`29550200` / `004571b3`) routed at 41,517 LUTs, 34 BRAM tiles, and WNS +0.961 ns, with the dispatch/reservation width warnings removed. Its exact Linux run still stalled at `start plist test`, so padding in those two packet macros is not the boot root cause; feature 56's logical-ID behavior is the remaining differential to isolate.
+
+- **Feature-56 root cause localized (fixed 55 good, feature 56 repair verifying; 1 suspect commit):** an exact traced two-way switch proved feature 56 failed to update the FE selector on a direct context redirect and then extracted the issue thread ID from a one-bit packet-container pad instead of the typed metadata field. Minimal pushed candidate `37179e21` / `e66e2e9a` fixes only those two paths, passes both the clean context-switch and ordinary-toolchain traced gates, and is now the sole admitted routed build (`20260905T174711Z-37179e21`) on `bp2`.

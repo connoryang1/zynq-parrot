@@ -41,6 +41,17 @@ Verification should match the changed surface.
   `ZP_DIR` explicitly, force-rebuild the single test ELF, and disassemble the
   relevant CSR/instruction before running. A shared ignored `riscv/` symlink can
   otherwise make an incompatible prebuilt ELF appear up to date.
+- Match both the physical-thread and logical-context compile-time dimensions to
+  the historical RTL stage; later tests may encode fields that an earlier CSR
+  decoder does not yet implement. Before a direct historical-model run, move
+  `prog.riscv`, `prog.mem`, and `prog.nbf` aside, regenerate them, and require
+  the selected ELF and copied `prog.riscv` hashes to match.
+- For an expected historical-model stall, confirm the printed simulator command
+  actually carries the native target-runtime argument. Backport the bounded
+  runner support as uncommitted diagnostic infrastructure when the old Makefile
+  silently ignores it; do not rely on the variable name alone.
+- Copy every closed FST to a revision/test-specific immutable artifact and hash
+  it before starting another trace in the same simulator directory.
 - Do not use `make -C import/black-parrot-sdk build.bp-tests -B` for ordinary iteration. It is
   the old coarse-grained all-tests path.
 - Reuse one Verilator hardware model across software-only test changes.

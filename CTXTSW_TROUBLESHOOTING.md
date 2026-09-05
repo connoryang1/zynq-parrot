@@ -408,3 +408,13 @@ of two independently verified RTL deltas; never launch an unbounded guest.
 **Skill validator was invoked as an executable (2026-09-05):** the repository skill validated successfully once `quick_validate.py` was run through `python3`; its installed mode is not executable. Invoke the validator with its interpreter instead of relying on file mode.
 
 **Multi-builder probe stopped after bp1 (2026-09-05):** SSH consumed the `while read` loop's builder-name input, so `probe all` silently skipped bp2 and bp3. Multi-builder probe/list calls now redirect each SSH stdin from `/dev/null`; heredoc-based launch and cancellation retain their required stdin.
+
+**Serialized runner was given only a remote basename (2026-09-05):** `run_pynq_serial.sh` rejected the call locally because it hashes and verifies a local NBF before selecting its staged remote basename. Pass the exact local NBF path; this failed before acquiring the board lock or starting `control-program`, so no board recovery was required.
+
+**Lower-level simulation reused stale program collateral (2026-09-05):** replacing the test ELF did not rebuild `prog.riscv`, `prog.mem`, or `prog.nbf` because the historical Verilator Makefile declares those outputs without useful prerequisites. Before any direct historical-model run, move the old collateral aside, regenerate it, and require the copied `prog.riscv` SHA-256 to equal the selected ELF before interpreting the waveform.
+
+**Existing simulator binary was not a reusable-model guarantee (2026-09-05):** invoking `make run` on a supposedly reusable historical model rebuilt generated objects because its RTL timestamps/dependencies had changed, while a separate stale program image could still survive. Treat model identity and guest-image identity as two independent gates: verify the exact BlackParrot revision used to build the executable and verify the exact ELF-to-`prog.riscv` hash before every run.
+
+**Passing waveform was overwritten before analysis (2026-09-05):** a known-passing context-switch trace was replaced by the next ordinary smoke run while waveform analysis was still pending. Archive each closed FST under a revision/test-specific immutable name immediately after the run, and do not launch another trace in that simulator directory until the archived hash is recorded.
+
+**Successful historical simulations end with cleanup noise (2026-09-05):** the legacy Verilator harness prints `CORE PASS` and returns success before a DPI GPIO final-block assertion reports that `fini()` was not called. Treat the explicit terminal result and process exit code as the functional gate, retain the log, and do not misclassify this known post-result teardown assertion as a guest failure.
