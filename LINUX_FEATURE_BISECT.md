@@ -404,8 +404,20 @@ The same director repair has been applied to the full 113-commit endpoint as
 BlackParrot `0ecfeeea` and top-level `fa7c851c`. Its correctly redirected
 trace-enabled static model passes the Linux-entry gate, repeated nonresident
 integer and FP restore rings, and the nonresident benchmark at 5 warm and 13
-cold cycles per switch. Routed job `20260905T132659Z-fa7c851c` is the active
-full-endpoint hardware proof.
+cold cycles per switch. Routed job `20260905T132659Z-fa7c851c` definitively
+failed detail placement: 62,948 LUTs required versus 53,200 available. The
+excess is confined to the last three nonresident-FP preservation/copy commits;
+it is the same area class already recorded for the rejected logic-shadow FP
+experiments, not a Linux or integer-context failure.
+
+The FPGA-fit endpoint is top-level `7fd64a63` and BlackParrot `b5fe1e93`. It
+retains the full dedicated-SRAM GPR context path, physical cycle CSR, frontend
+repairs, normal F/D execution, and the proven D-cache replay fix, while leaving
+nonresident FP preservation unsupported. A fresh static traced model passes
+the Linux-entry sequence and repeated nonresident GPR ring; its physical-cycle
+benchmark reports 5.13 resident and 13.16 nonresident cycles/switch, and the
+independent FP-execution smoke passes. Routed job
+`20260905T141747Z-7fd64a63` is the active fit/Linux proof.
 
 ## Refreshed hardware bracket (2026-09-04)
 

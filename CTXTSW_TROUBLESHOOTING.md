@@ -348,6 +348,9 @@ This mistake recurred while preparing the full-endpoint replay fix when a hash
 was typed into `update-index`; the commit was amended before validation. Pass
 the `rev-parse` result through a shell variable and require an exact
 actual-versus-gitlink comparison before committing or pushing.
+It recurred once more while preparing the GPR-fit endpoint; the invalid gitlink
+was caught by submodule checkout, amended before push, and the exact `ls-tree`
+comparison is now mandatory before any candidate build starts.
 
 An unrestricted recursive submodule update in a fresh replay worktree began
 cloning the entire SDK dependency graph even though FPGA readiness needs only
