@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Repaired 54 good / repaired 55 fixed | No bisect commits remain; full 113-commit endpoint is next | Omit `00910cd4` + historical static dimensions; remove the ordinary D-cache replay redirect while retaining resident mapping | fixed commit 55 (`4674d583` / `9a7e0425`) has a clean repeat through `/init`, rootfs checks, poweroff, and `CORE[0] PASS`; full endpoint `fa7c851c` / `0ecfeeea` is routing | Boot the full endpoint, then run the Linux C context-switch demo through the serialized interactive runner. |
+| Fixed 55 good / repaired 57 bad | 2 (features 56--57) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | feature 57 (`17f1d8fa` / `93b2e860`) reached `/init` twice but reproducibly corrupted BusyBox `rcS`; exact feature 56 (`d29987b2` / `220cb8d2`) is routing on `bp3` | Boot feature 56 to identify whether feature 56 or 57 is the first bad change. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -216,3 +216,5 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **Second-regression midpoint constructing (fixed 55, testing 57; 53 after candidate):** pushed candidate `17f1d8fa` / `93b2e860` applies the proven ordinary-D-cache replay repair to feature commit 57, retaining only commits 56--57 beyond the Linux-good fixed-55 boundary. Routed job `20260905T152318Z-17f1d8fa` is the next decisive Linux classification; a good result moves the search to commits 58--110, while a bad result confines it to commits 56--57.
 - **Parallel synthesis farm (fixed 55, testing 57/59/60; 55 remain at the bad endpoint):** added the reusable `bp-synthesis-farm` workflow and started isolated feature-59 and feature-60 routed candidates on the two new 64-core VMs alongside feature 57 locally. Live FPGA deployment remains serialized while three implementations progress concurrently.
+
+- **Second regression narrowed (fixed 55 good, feature 57 bad; 2 suspect commits):** exact feature 57 (`17f1d8fa` / `93b2e860`) routed at 41,520 LUTs with WNS +1.368 ns, then reached `/init` and rootfs startup twice on fresh board states but reproducibly faulted BusyBox `rcS` before shutdown. Exact feature 56 (`d29987b2` / `220cb8d2`) is now **FPGA verifying** on the 64-core `bp3` builder; it will distinguish feature 56 from feature 57.

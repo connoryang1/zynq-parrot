@@ -24,6 +24,9 @@ build, and log directories.
 - Use the builder's advertised worker count unless memory or tool evidence requires a lower cap.
 - Never load an overlay or run `control-program` from a synthesis worker. FPGA
   deployment and Linux execution remain serialized on the single board.
+- A yielded SSH or build command is still active: retain its session identifier
+  and poll it to a real exit code before consuming its output or scheduling a
+  dependent operation.
 
 ## Builders
 

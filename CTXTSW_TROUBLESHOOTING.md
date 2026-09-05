@@ -394,3 +394,5 @@ current root harness with both `ZP_DIR` and `FULL_SIM_DIR` aimed at the candidat
 or skip the redundant local run when the candidate is only a clean application
 of two independently verified RTL deltas; never launch an unbounded guest.
 **Farm collection wildcard mismatch (2026-09-05):** the first multi-VM artifact collection failed because GNU tar did not expand the requested package wildcard even though the routed package existed. The collector now transfers the complete immutable PASS job directory and verifies the status, revision, summary, console, and packed-bitstream files locally before reporting success.
+
+**Unpolled staging session left the old overlay in place (2026-09-05):** a short-yield orchestration call returned an active session with no visible output, and treating that as completion left the board's prior bitstream on disk. Always retain and poll an active command session to its exit code, then compare the board bitstream hash with the verified package before loading or running any NBF.

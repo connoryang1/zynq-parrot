@@ -107,7 +107,24 @@ changes.  Each row must name the current commit, show `verified/113` and
 **repairing**, or **classified good/bad**.  Retain commands and routine
 failures in `LINUX_BOOT_STATUS.md` instead.
 
-## Current binary-search boundary (2026-09-04)
+## Current second-regression boundary (2026-09-05)
+
+The first Linux regression is definitively repaired at top-level `4674d583`
+and BlackParrot `9a7e0425`. The repaired feature-57 candidate (`17f1d8fa` /
+`93b2e860`) routes at 41,520 LUTs and 34 BRAM tiles with WNS +1.368 ns, but two
+fresh-board runs reach `/init` and then fault BusyBox `rcS` at different
+userspace addresses before the scripted shutdown. This is **bad** under the
+required clean `/init` plus `CORE[0] PASS` criterion and confines the next
+regression to feature commits 56--57.
+
+The exact feature-56 candidate is top-level `d29987b205f4` paired with
+BlackParrot `220cb8d285ee`. It preserves the collision-free custom CSR range and
+the proven ordinary-D-cache redirect repair, and is routing on `bp3` as job
+`20260905T161321Z-d29987b2`. A clean boot makes feature 57 the first bad
+change; another reproducible userspace failure makes feature 56 the first bad
+change.
+
+## Historical first-regression search (2026-09-04)
 
 The 57/113 midpoint is historical top-level `f8a59c0d` paired with
 BlackParrot `11bb7e7d`; the underlying feature source is `7e886ad6e783`.  Its
