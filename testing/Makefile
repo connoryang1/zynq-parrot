@@ -21,7 +21,7 @@ CFLAGS = -O2 \
           -DBP_NUM_THREADS=$(NUM_THREADS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -30,6 +30,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_noctxtsw_tag_invariant_stress \
     mt_abi_preservation_test \
     mt_ctxtsw_asid_translation_test \
     mt_ctxtsw_4ctx_ring_isolation \
@@ -75,7 +76,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
-	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) EXTRA_RUN_ARGS=$$(if $$(filter mt_noctxtsw_tag_invariant_stress,$(1)),+bp_noctxtsw_tag_check,) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)|NOCTXT_TAG_FAIL|no-context-switch"
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 
