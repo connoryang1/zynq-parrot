@@ -42,6 +42,18 @@ credentials out of tracked files.
 
 ## Launch And Monitor
 
+When preparing a top-level candidate, stage its BlackParrot gitlink directly
+from the source worktree instead of copying an object ID by hand:
+
+```bash
+codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh link \
+  /path/to/top-worktree /path/to/black-parrot-worktree
+```
+
+The command refuses to overwrite an already modified gitlink and verifies the
+exact indexed object. Review and commit the staged gitlink from the top-level
+worktree before launching the build.
+
 Launch with pushed branch names so the remote can fetch and independently
 resolve both commits:
 

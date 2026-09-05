@@ -10,6 +10,7 @@ usage() {
 usage:
   farm_synthesis.sh builders
   farm_synthesis.sh probe <bp1|bp2|bp3|all>
+  farm_synthesis.sh link <top-worktree> <black-parrot-worktree>
   farm_synthesis.sh launch <builder> <label> <top-branch> <black-parrot-branch> [workers]
   farm_synthesis.sh list <builder|all>
   farm_synthesis.sh status <builder> <job-id> <remote-log-root>
@@ -57,6 +58,29 @@ case ${1:-} in
       printf '=== %s ===\n' "$builder"
       ssh_builder "$builder" 'set -eu; printf "host=%s\nworkers=%s\n" "$(hostname)" "$(nproc)"; free -h | sed -n "1,2p"; df -h /home | tail -1; test -d /tools/Xilinx/Vivado/2024.2 && echo vivado_2024_2=present || echo vivado_2024_2=missing; if pgrep -af "[/]tools/Xilinx/.*/vivado|[/]bin/vivado"; then echo vivado_job=active; else echo vivado_job=idle; fi'
     done < <(builder_names "${2:?builder or all required}")
+    ;;
+  link)
+    top_worktree=${2:?top-level worktree required}
+    bp_worktree=${3:?BlackParrot worktree required}
+    git -C "$top_worktree" rev-parse --show-toplevel >/dev/null
+    git -C "$bp_worktree" rev-parse --show-toplevel >/dev/null
+    if ! git -C "$top_worktree" diff --quiet -- import/black-parrot \
+       || ! git -C "$top_worktree" diff --cached --quiet -- import/black-parrot; then
+      echo "Refusing to replace a modified import/black-parrot gitlink." >&2
+      exit 1
+    fi
+    bp_commit=$(git -C "$bp_worktree" rev-parse HEAD)
+    git -C "$top_worktree" update-index \
+      --cacheinfo 160000,"$bp_commit",import/black-parrot
+    indexed=$(git -C "$top_worktree" ls-files -s import/black-parrot | awk '{print $2}')
+    if [[ $indexed != "$bp_commit" ]]; then
+      echo "Indexed gitlink $indexed does not match BlackParrot $bp_commit." >&2
+      exit 1
+    fi
+    printf 'top_worktree=%s\nblack_parrot_worktree=%s\nblack_parrot_commit=%s\n' \
+      "$(git -C "$top_worktree" rev-parse --show-toplevel)" \
+      "$(git -C "$bp_worktree" rev-parse --show-toplevel)" \
+      "$bp_commit"
     ;;
   launch)
     builder=${2:?builder required}
