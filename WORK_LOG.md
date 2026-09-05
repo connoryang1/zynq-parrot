@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 53 good / repaired 101 bad | 48 commits remain in the repaired 54--101 interval; 12 later commits are not yet FPGA-classified | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | commit 77 is non-fit; repaired commit 61 (`98d46c71` / `3d6a10b0`) passes the pinned traced Linux-entry gate and is routing | Classify repaired commit 61 with the exact archived Linux boot. |
+| 53 good / repaired 61 bad | 8 commits remain in the repaired 54--61 interval; later commits are excluded by the bad boundary | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired midpoint 57 (`04f6922c` / `5b3a2dab`) passes the clean traced Linux-entry gate and is routing | Classify repaired midpoint 57 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -93,6 +93,10 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Repaired commit 53 classified good (good 53, repaired bad 101; 48 remain):** routed candidate `94353d42` / `8ee2dd28` fit at 41,483 LUTs and 34 BRAM tiles with WNS +2.343 ns, then booted the exact Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`. The active search advances to repaired midpoint 77 (`17e4db38` / `eee61e7f`); the speculative UCE full-credit correction is not part of the repair chain.
 
 - **Commit 77 non-fit; commit 61 FPGA-verifying (good 53, repaired bad 101):** exact commit 77 synthesized without RTL errors but required 89,437/53,200 LUTs because it predates the BRAM-backed context store, so it received no Linux classification and placement was stopped. Exact repaired commit 61 (`98d46c71` / `3d6a10b0`) passes the pinned traced Linux-entry gate and is routing as `20260905T093432Z-98d46c71` in the normal 2-resident/4-logical configuration.
+
+- **Repaired commit 61 classified bad (good 53, repaired bad 61; 8 remain):** exact candidate `98d46c71` / `3d6a10b0` fit at 42,116 LUTs and 34 BRAM tiles with WNS +2.293 ns, then entered Linux but stopped after its two atomic DMA-pool messages until the clean 180-second target limit. The second regression is now confined to commits 54--61; phase advances to **constructing repaired midpoint 57**.
+
+- **Repaired midpoint 57 locally verified (good 53, repaired bad 61; 8 remain):** pushed candidate `04f6922c` / `5b3a2dab` passes the clean 12-worker trace-enabled Linux-entry CSR/AMO/high-address gate (`CORE PASS`, 9,130 retired). Phase advances to **FPGA verifying midpoint 57** as job `20260905T102204Z-04f6922c`.
 
 - **Board runner input isolation:** the first candidate-52 foreground run reached `/init` but consumed the unread SSH wrapper heredoc as guest-console input. The guarded runner now closes stdin for foreground targets; the repeated run completed all rootfs checks and `CORE[0] PASS` without injected text or guest faults.
 

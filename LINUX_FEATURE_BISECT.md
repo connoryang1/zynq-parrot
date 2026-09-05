@@ -318,13 +318,25 @@ LUTs (168.11%). This is a historical pre-BRAM representation limit, not a
 Linux classification; placement was stopped once the definitive utilization
 report existed.
 
-The active exact-fit candidate is repaired commit 61 (`98d46c71` /
-`3d6a10b0`), immediately before commit 62 introduces the large logical-context
-backing arrays. The pinned trace-enabled Linux-entry NBF passes with
-`CORE PASS` and 9,130 retired instructions; job
-`20260905T093432Z-98d46c71` is routing it in the normal two-resident/four-logical
-configuration. A Linux pass advances the good boundary from 53 to 61 without
-using a reduced-context or future-storage compatibility approximation.
+Repaired commit 61 (`98d46c71` / `3d6a10b0`), immediately before commit 62
+introduces the large logical-context backing arrays, passed the pinned traced
+Linux-entry gate and routed in the normal two-resident/four-logical
+configuration. It used 42,116 LUTs and 34 BRAM tiles with WNS +2.293 ns, TNS
+0, and WHS +0.031 ns. Package SHA-256 is
+`7d53cb38cb007fa505366e40c3d8c8465e337574425b7f74241d31ef70e4c6d7`;
+bitstream SHA-256 is
+`da3ef196a9b2f73439b670b034f4b646b0a9f295f0643d3d40f8a5194644d7a9`.
+The exact archived-Linux run entered Linux but stopped after the two atomic
+DMA-pool messages until the clean 180-second target limit. Its transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T101219Z-1201541.log`.
+Commit 61 is therefore **bad**, reducing the active bracket to good commit 53 /
+bad commit 61 (eight commits 54--61); repaired midpoint 57 is next.
+
+Repaired midpoint 57 (`04f6922c` / `5b3a2dab`) is pushed and passes the clean
+12-worker trace-enabled Linux-entry gate with `CORE PASS` and 9,130 retired
+instructions. Its exact local evidence is retained under
+`logs/bisect/20260905-repaired-commit57/`; routed job
+`20260905T102204Z-04f6922c` is the active FPGA/Linux classification.
 
 ## Refreshed hardware bracket (2026-09-04)
 
