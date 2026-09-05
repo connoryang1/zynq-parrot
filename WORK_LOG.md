@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 50 good / 51 bad | 0 in the first-bad interval; 62 later commits await repaired replay | CSR migration + safe refill completion + historical static dimensions | commit 51 (`00910cd4`) is the **exact first bad feature**; its broad D-cache replay queue clear was later removed by `78837f53` | Carry the replay-preservation repair forward and classify commits 52--113. |
+| 50 good / 51 bad | 51 later commits are included in the repaired commit-101 candidate; 12 remain beyond it | Omit `00910cd4` + narrow-address cast + historical static dimensions | repaired commit 101 (`1bf4bfc2` / `c302d219`) passes the clean traced Linux-entry gate and is routing | Classify commit 101 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -81,6 +81,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **First Linux regression isolated (good 50, bad 51; 0 remain in first interval):** routed midpoint 50 (`5e55b377` / `f6863917`) fit at 41,291 LUTs and 34 BRAM with WNS +2.290 ns and WHS +0.032 ns, then booted the exact archived Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`. Commit `00910cd4` is therefore the exact first bad feature; phase advances to **repaired replay of commits 52--113** using the later-established `78837f53` queue-preservation correction.
 
 - **Repaired midpoint 81 locally verified (good 50, 31 repaired commits under test):** pushed candidate `0a77641a` / `a60851d7` omits bad commit 51, replays commits 52--81, and carries the later narrow-physical-address cast required by the static PYNQ configuration. Its clean traced build and Linux-entry gate pass; the first Vivado attempt exposed only that now-fixed out-of-range address slice, and job `20260905T053121Z-0a77641a` is rerunning synthesis. Phase: **FPGA verifying repaired midpoint 81**; a boot would leave 32 feature commits to classify.
+
+- **Repaired commit 101 locally verified (good 50, 51 repaired commits under test):** midpoint 81 was not FPGA-classifiable because its transient pre-banking context arrays synthesized to 87,933 LUTs; no Linux conclusion was drawn. Pushed candidate `1bf4bfc2` / `c302d219` advances through the intended SRAM banking and BRAM inference, still omits bad commit 51, passes the clean traced Linux-entry gate, and is routing as `20260905T061225Z-1bf4bfc2`; 12 feature commits remain beyond it.
 
 ## 2026-09-02 — current investigation
 

@@ -249,18 +249,21 @@ lines to preserve DTLB-fill replay. It is independent of the SRAM context
 storage mechanics. The next phase carries that narrow repair as a fixed
 compatibility overlay while classifying feature commits 52--113.
 
-The first repaired replay candidate is midpoint 81: top-level `0a77641a`
-with BlackParrot `a60851d7`. It omits commit 51 and replays commits 52--81;
-the candidate also carries global commit 88's sized physical-address cast as
-an FPGA-configuration compatibility fix, without otherwise classifying that
-later feature interval. A clean 12-worker traced model build and the
-Linux-entry privilege/CSR/AMO/high-address gate pass. The initial Vivado run
-failed during synthesis because the pre-fix code selected a 39-bit virtual
-address from the static target's 34-bit physical address; the sized cast is
-the already-existing upstream correction for exactly that case. Routed job
-`20260905T053121Z-0a77641a` is the clean retry. If it reaches `/init`, commits
-52--81 become good under the commit-51 repair and 32 feature commits remain;
-otherwise the repaired 52--81 interval will be bisected.
+The first repaired replay candidate, midpoint 81 (`0a77641a` / `a60851d7`),
+passed the clean traced Linux-entry gate after carrying global commit 88's
+sized physical-address cast. Its synthesis then used 87,933 LUTs because this
+historical development point predates the intended banked-SRAM/BRAM-inference
+transition. It is therefore not FPGA-classifiable and establishes no Linux
+boundary.
+
+The next meaningful checkpoint is repaired commit 101: top-level `1bf4bfc2`
+with BlackParrot `c302d219`. It omits bad commit 51, replays commits 52--101,
+and includes the narrow-address and block-RAM compatibility changes. Its clean
+traced Linux-entry privilege/CSR/AMO/high-address gate passes (`CORE PASS`,
+9,130 retired), with evidence under
+`logs/bisect/20260905-repaired-midpoint101-bram/`. Routed job
+`20260905T061225Z-1bf4bfc2` is the decisive FPGA/Linux classification; a boot
+would verify 51 additional feature commits and leave only commits 102--113.
 
 ## Refreshed hardware bracket (2026-09-04)
 
