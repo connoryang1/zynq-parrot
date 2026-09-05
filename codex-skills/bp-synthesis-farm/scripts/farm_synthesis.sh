@@ -12,6 +12,7 @@ usage:
   farm_synthesis.sh probe <bp1|bp2|bp3|all>
   farm_synthesis.sh link <top-worktree> <black-parrot-worktree>
   farm_synthesis.sh launch <builder> <label> <top-branch> <black-parrot-branch> [workers]
+  farm_synthesis.sh cancel <builder> <job-id> <remote-log-root>
   farm_synthesis.sh list <builder|all>
   farm_synthesis.sh status <builder> <job-id> <remote-log-root>
   farm_synthesis.sh collect <builder> <job-id> <remote-log-root> [destination]
@@ -20,9 +21,9 @@ EOF
 
 builder_fields() {
   case ${1:-} in
-    bp1) printf '%s\t%s\t%s\n' 'coyang@haight.chillysky.com' '30041' '12' ;;
-    bp2) printf '%s\t%s\t%s\n' 'coyang@haight.chillysky.com' '30042' '64' ;;
-    bp3) printf '%s\t%s\t%s\n' 'coyang@haight.chillysky.com' '30043' '64' ;;
+    bp1) printf '%s\t%s\t%s\t%s\n' 'coyang@haight.chillysky.com' '30041' '12' '8' ;;
+    bp2) printf '%s\t%s\t%s\t%s\n' 'coyang@haight.chillysky.com' '30042' '64' '8' ;;
+    bp3) printf '%s\t%s\t%s\t%s\n' 'coyang@haight.chillysky.com' '30043' '64' '8' ;;
     *) echo "Unknown builder: ${1:-<empty>}" >&2; return 2 ;;
   esac
 }
@@ -39,24 +40,24 @@ builder_names() {
 ssh_builder() {
   local builder=$1
   shift
-  local target port workers
-  IFS=$'\t' read -r target port workers < <(builder_fields "$builder")
+  local target port host_cores vivado_threads
+  IFS=$'\t' read -r target port host_cores vivado_threads < <(builder_fields "$builder")
   ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 \
     -p "$port" "$target" "$@"
 }
 
 case ${1:-} in
   builders)
-    printf 'builder\ttarget\tport\tworkers\n'
+    printf 'builder\ttarget\tport\thost_cores\tdefault_vivado_threads\n'
     for builder in bp1 bp2 bp3; do
-      IFS=$'\t' read -r target port workers < <(builder_fields "$builder")
-      printf '%s\t%s\t%s\t%s\n' "$builder" "$target" "$port" "$workers"
+      IFS=$'\t' read -r target port host_cores vivado_threads < <(builder_fields "$builder")
+      printf '%s\t%s\t%s\t%s\t%s\n' "$builder" "$target" "$port" "$host_cores" "$vivado_threads"
     done
     ;;
   probe)
     while read -r builder; do
       printf '=== %s ===\n' "$builder"
-      ssh_builder "$builder" 'set -eu; printf "host=%s\nworkers=%s\n" "$(hostname)" "$(nproc)"; free -h | sed -n "1,2p"; df -h /home | tail -1; test -d /tools/Xilinx/Vivado/2024.2 && echo vivado_2024_2=present || echo vivado_2024_2=missing; if pgrep -af "[/]tools/Xilinx/.*/vivado|[/]bin/vivado"; then echo vivado_job=active; else echo vivado_job=idle; fi'
+      ssh_builder "$builder" 'set -eu; printf "host=%s\nworkers=%s\n" "$(hostname)" "$(nproc)"; free -h | sed -n "1,2p"; df -h /home | tail -1; test -d /tools/Xilinx/Vivado/2024.2 && echo vivado_2024_2=present || echo vivado_2024_2=missing; if pgrep -a -x vivado; then echo vivado_job=active; else echo vivado_job=idle; fi' </dev/null
     done < <(builder_names "${2:?builder or all required}")
     ;;
   link)
@@ -87,7 +88,7 @@ case ${1:-} in
     label=${3:?label required}
     top_branch=${4:?top branch required}
     bp_branch=${5:?BlackParrot branch required}
-    IFS=$'\t' read -r target port default_workers < <(builder_fields "$builder")
+    IFS=$'\t' read -r target port host_cores default_workers < <(builder_fields "$builder")
     workers=${6:-$default_workers}
     if [[ ! $label =~ ^[A-Za-z0-9._-]+$ || ! $workers =~ ^[1-9][0-9]*$ ]]; then
       echo "Label or worker count is invalid." >&2
@@ -186,10 +187,55 @@ REMOTE
     } >"$manifest"
     printf 'manifest=%s\n' "$manifest"
     ;;
+  cancel)
+    builder=${2:?builder required}
+    job_id=${3:?job id required}
+    log_root=${4:?remote log root required}
+    if [[ ! $job_id =~ ^[A-Za-z0-9._-]+$ || ! $log_root =~ ^/home/coyang/fpga-logs-[A-Za-z0-9._/-]+$ ]]; then
+      echo "Job ID or remote log root is invalid." >&2
+      exit 2
+    fi
+    ssh_builder "$builder" bash -s -- "$job_id" "$log_root" <<'REMOTE'
+set -euo pipefail
+job_id=$1
+log_root=$2
+job_dir=$log_root/$job_id
+test -d "$job_dir"
+test "$(cat "$job_dir/status")" = RUNNING
+session=$(cat "$job_dir/session" 2>/dev/null || true)
+pid=$(cat "$job_dir/pid" 2>/dev/null || true)
+pgid=
+if [[ $pid =~ ^[0-9]+$ ]]; then
+  pgid=$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d ' ' || true)
+fi
+if [[ -n $session ]] && tmux has-session -t "$session" 2>/dev/null; then
+  tmux kill-session -t "$session"
+fi
+if [[ $pgid =~ ^[0-9]+$ ]]; then
+  kill -TERM -- "-$pgid" 2>/dev/null || true
+  for attempt in {1..20}; do
+    kill -0 -- "-$pgid" 2>/dev/null || break
+    sleep 0.5
+  done
+  kill -KILL -- "-$pgid" 2>/dev/null || true
+  sleep 1
+  if kill -0 -- "-$pgid" 2>/dev/null; then
+    echo "Job process group $pgid remains after cancellation." >&2
+    exit 1
+  fi
+fi
+if pgrep -a -x vivado; then
+  echo "Vivado processes remain on the builder after cancellation." >&2
+  exit 1
+fi
+printf 'CANCELLED\n' >"$job_dir/status"
+printf 'cancelled=%s\n' "$job_id"
+REMOTE
+    ;;
   list)
     while read -r builder; do
       printf '=== %s ===\n' "$builder"
-      ssh_builder "$builder" 'set -eu; shopt -s nullglob; found=0; for status in /home/coyang/fpga-logs-*/*/status; do found=1; printf "%s %s\n" "$(basename "$(dirname "$status")")" "$(cat "$status")"; done; (( found )) || echo no_farm_jobs'
+      ssh_builder "$builder" 'set -eu; shopt -s nullglob; found=0; for status in /home/coyang/fpga-logs-*/*/status; do found=1; printf "%s %s\n" "$(basename "$(dirname "$status")")" "$(cat "$status")"; done; (( found )) || echo no_farm_jobs' </dev/null
     done < <(builder_names "${2:?builder or all required}")
     ;;
   status)
@@ -209,7 +255,7 @@ REMOTE
       exit 1
     fi
     mkdir -p "$destination"
-    IFS=$'\t' read -r target port workers < <(builder_fields "$builder")
+    IFS=$'\t' read -r target port host_cores vivado_threads < <(builder_fields "$builder")
     ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 \
       -p "$port" "$target" \
       "tar -C $(printf %q "$log_root/$job_id") -cf - ." \

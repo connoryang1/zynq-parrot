@@ -21,7 +21,7 @@ build, and log directories.
 - Use a clean detached remote worktree; never build the builder's dirty coordination checkout.
 - Use the current coordination checkout's maintained synthesis scripts while
   `ZP_REPO_DIR` points at the immutable historical source worktree.
-- Use the builder's advertised worker count unless memory or tool evidence requires a lower cap.
+- Use the controller's measured Vivado thread default unless new tool evidence justifies an override.
 - Never load an overlay or run `control-program` from a synthesis worker. FPGA
   deployment and Linux execution remain serialized on the single board.
 - A yielded SSH or build command is still active: retain its session identifier
@@ -36,9 +36,13 @@ The controller knows `bp1`, `bp2`, and `bp3`. Probe them before scheduling:
 codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh probe all
 ```
 
-`bp1` has 12 workers. `bp2` and `bp3` have 64 workers and enough memory for one
-Vivado job apiece. The controller uses SSH host aliases internally and keeps
-credentials out of tracked files.
+`bp1` has 12 host cores. `bp2` and `bp3` have 64 host cores and enough memory
+for one Vivado job apiece. Measured Vivado 2024.2 runs cap this design at seven
+synthesis and eight implementation workers, so the controller defaults every
+builder to eight Vivado threads; the faster 64-core hosts still reduce a route
+from roughly 37 to 17.5 minutes through better host performance. Candidate-level
+parallelism across VMs is the meaningful throughput gain. The controller uses
+SSH host aliases internally and keeps credentials out of tracked files.
 
 ## Launch And Monitor
 
@@ -76,6 +80,14 @@ codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh status bp2 <job-id> <re
 codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh collect bp2 <job-id> <remote-log-root>
 ```
 
+If new evidence makes a running candidate irrelevant, cancel that exact job
+and verify its Vivado processes are gone before reusing the builder:
+
+```bash
+codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh cancel \
+  bp2 <job-id> <remote-log-root>
+```
+
 Only collect a `PASS` job. Re-run the package verifier locally before staging an
 artifact to the board.
 
@@ -87,3 +99,13 @@ irrelevant, and a later failure does not localize the first bad change until the
 nearest earlier candidate is classified. Keep the board queue ordered around
 the current good/bad boundary and record only meaningful classifications in
 `WORK_LOG.md`.
+
+## Build Admission
+
+Do not occupy a builder merely because it is idle. Before launch, state the
+single decision the result will make, both possible outcomes, and why neither
+an existing artifact nor a cheaper local gate answers it. Prefer the nearest
+untested boundary candidate; allow at most one conditional follow-up build in
+parallel when it isolates a specific line-level hypothesis and will be useful
+under either outcome of the boundary test. Archive completed later checkpoints
+without spending board time on them until all earlier changes are classified.

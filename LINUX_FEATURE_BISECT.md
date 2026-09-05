@@ -118,11 +118,19 @@ required clean `/init` plus `CORE[0] PASS` criterion and confines the next
 regression to feature commits 56--57.
 
 The exact feature-56 candidate is top-level `d29987b205f4` paired with
-BlackParrot `220cb8d285ee`. It preserves the collision-free custom CSR range and
-the proven ordinary-D-cache redirect repair, and is routing on `bp3` as job
-`20260905T161321Z-d29987b2`. A clean boot makes feature 57 the first bad
-change; another reproducible userspace failure makes feature 56 the first bad
-change.
+BlackParrot `220cb8d285ee`. It routed at 41,517 LUTs and 34 BRAM tiles with WNS
++0.961 ns, then passed OpenSBI and most kernel initialization but stopped at
+`start plist test` until its 30-second target limit. Feature 56 is therefore
+the first bad change after the clean fixed-55 boundary.
+
+The feature-56 audit found that its dispatch and reservation width macros are
+410 and 564 bits even though their packed structures are exactly 370 and 525
+bits. Fixed 55 already had stale 409/563-bit macros, but feature 56 adds the
+new thread-ID field without removing the old extra virtual-address term. The
+minimal repair at top-level `295502002c10` and BlackParrot `004571b36f8a`
+makes both formulas exactly match `$bits`; it is routing on `bp2` as job
+`20260905T164105Z-29550200`. No later feature checkpoint will consume board
+time until this one-commit repair is classified.
 
 ## Historical first-regression search (2026-09-04)
 

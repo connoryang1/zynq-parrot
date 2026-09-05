@@ -37,6 +37,10 @@ Verification should match the changed surface.
 
 - Compile and run one test with `make -C testing run-<test> TRACE=1`; the branch's testing
   harness compiles that source directly and avoids rebuilding every SDK test.
+- When a current harness drives a historical RTL worktree, pass that worktree's
+  `ZP_DIR` explicitly, force-rebuild the single test ELF, and disassemble the
+  relevant CSR/instruction before running. A shared ignored `riscv/` symlink can
+  otherwise make an incompatible prebuilt ELF appear up to date.
 - Do not use `make -C import/black-parrot-sdk build.bp-tests -B` for ordinary iteration. It is
   the old coarse-grained all-tests path.
 - Reuse one Verilator hardware model across software-only test changes.

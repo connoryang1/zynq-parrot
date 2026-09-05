@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Fixed 55 good / repaired 57 bad | 2 (features 56--57) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | feature 57 (`17f1d8fa` / `93b2e860`) reached `/init` twice but reproducibly corrupted BusyBox `rcS`; exact feature 56 (`d29987b2` / `220cb8d2`) is routing on `bp3` | Boot feature 56 to identify whether feature 56 or 57 is the first bad change. |
+| Fixed 55 good / repaired 56 bad | 1 (feature 56) | Preserve the collision-free `0x800`--`0x802` CSRs and remove the ordinary D-cache replay redirect | feature 56 (`d29987b2` / `220cb8d2`) stalled in the kernel plist self-test; exact packet-width repair (`29550200` / `004571b3`) is routing on `bp2` | Boot the repaired feature 56 and require `/init`, clean poweroff, and `CORE[0] PASS`. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -218,3 +218,5 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Parallel synthesis farm (fixed 55, testing 57/59/60; 55 remain at the bad endpoint):** added the reusable `bp-synthesis-farm` workflow and started isolated feature-59 and feature-60 routed candidates on the two new 64-core VMs alongside feature 57 locally. Live FPGA deployment remains serialized while three implementations progress concurrently.
 
 - **Second regression narrowed (fixed 55 good, feature 57 bad; 2 suspect commits):** exact feature 57 (`17f1d8fa` / `93b2e860`) routed at 41,520 LUTs with WNS +1.368 ns, then reached `/init` and rootfs startup twice on fresh board states but reproducibly faulted BusyBox `rcS` before shutdown. Exact feature 56 (`d29987b2` / `220cb8d2`) is now **FPGA verifying** on the 64-core `bp3` builder; it will distinguish feature 56 from feature 57.
+
+- **Second regression isolated (fixed 55 good, feature 56 bad; 1 suspect commit):** exact feature 56 (`d29987b2` / `220cb8d2`) routed at 41,517 LUTs and 34 BRAM tiles with WNS +0.961 ns, then reproducibly progressed through OpenSBI and most kernel initialization but stalled at `start plist test` until its clean target limit. The only differential packet macros describe 370/525-bit structs as 410/564-bit ports; the exact-width repair (`29550200` / `004571b3`) is now **FPGA verifying** on `bp2`.
