@@ -45,7 +45,10 @@ Verification should match the changed surface.
   the historical RTL stage; later tests may encode fields that an earlier CSR
   decoder does not yet implement. Before a direct historical-model run, move
   `prog.riscv`, `prog.mem`, and `prog.nbf` aside, regenerate them, and require
-  the selected ELF and copied `prog.riscv` hashes to match.
+  the selected ELF and copied `prog.riscv` hashes to match. Archive and hash the
+  regenerated `prog.nbf` with the log and waveform, and require the guest's
+  test-specific PASS marker; a generic `CORE PASS` is not sufficient evidence
+  that the intended NBF ran.
 - For an expected historical-model stall, confirm the printed simulator command
   actually carries the native target-runtime argument. Backport the bounded
   runner support as uncommitted diagnostic infrastructure when the old Makefile
