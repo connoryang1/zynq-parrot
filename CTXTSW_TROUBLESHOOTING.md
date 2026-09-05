@@ -349,6 +349,27 @@ was typed into `update-index`; the commit was amended before validation. Pass
 the `rev-parse` result through a shell variable and require an exact
 actual-versus-gitlink comparison before committing or pushing.
 
+An unrestricted recursive submodule update in a fresh replay worktree began
+cloning the entire SDK dependency graph even though FPGA readiness needs only
+the top-level RTL dependencies and BlackParrot's three externals. Stop that
+update cleanly and initialize only the submodule paths named by the FPGA
+readiness check; use `protocol.file.allow=always` when those reviewed sources
+are local worktree paths.
+
+Setting only `ZP_DIR` in the root testing harness changes the program and RTL
+dependency paths but does not change `FULL_SIM_DIR`, which is derived from the
+harness checkout's `TOP`. An endpoint preflight accidentally ran three guests
+on the main checkout's model and was discarded. For every alternate-worktree
+full-model run, pass both `ZP_DIR=<worktree>` and
+`FULL_SIM_DIR=<worktree>/cosim/black-parrot-example/verilator`, then confirm the
+simulator artifact path before interpreting the result.
+
+Launching the outer Verilator make with `-j` caused its generated nested make
+to report that the GNU make jobserver was unavailable, so compilation fell back
+to one worker despite a requested build-job count. Let Verilator own the worker
+count (or mark the nested recipe jobserver-aware) and verify multiple compiler
+processes before relying on a parallel-build claim.
+
 A manually chained smoke-image conversion once continued after `objcopy`
 failed, leaving an empty redirected NBF that was then launched. Image-generation
 chains must use `set -e`, the checkout's fully qualified cross-tool path, and a
