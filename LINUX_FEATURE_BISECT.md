@@ -638,6 +638,23 @@ feature 110, the 13-cycle GPR-fit endpoint. Features 64--100 are not routed
 merely as intermediate history because they cannot answer a hardware question
 that the deployable BRAM checkpoint does not answer more directly.
 
+Reconstructed feature101 and Linux-safe feature110 both pass their clean traced
+local gates and route within the PYNQ-Z2, but their exact bitstreams stop after
+61 instructions in the current-toolchain startup, before any context-switch CSR
+or Linux instruction. The old routed feature110 endpoint reproduces that exact
+61-retire result with the identical NBF, eliminating the repaired feature delta
+as the cause. The boundary is the FP-register initialization sequence, Vivado
+warns that its inferred register-file BRAM has an unhandled read/write
+collision, and the isolated historical bypass `9a9e4f19` previously made this
+same smoke plus a dedicated FP-register test pass on hardware.
+
+The only admitted successor is therefore `8b48a65b` / `49d4b1f4`: Linux-safe
+feature110 plus that seven-line live replacement bypass. It must pass a clean
+local ordinary/FP/context-switch ladder before occupying one builder. A routed
+PASS will first run the exact ordinary and FP startup tests, then the
+nonresident benchmark and Linux PID-1 image; a routed or hardware smoke failure
+rejects the bypass hypothesis without launching speculative sibling builds.
+
 ## Result record
 
 For every hardware decision retain: feature revision, overlay patch hash and
