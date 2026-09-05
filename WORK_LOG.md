@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 57 / 113 | 8 | CSR migration + safe refill completion + historical static dimensions | midpoint 49/113 (`5f2cc57b` / `ff6db40b`) is **classified good**; next midpoint 53/113 is constructing | Build and classify archived Linux at midpoint 53. |
+| 53 / 113 | 4 | CSR migration + safe refill completion + historical static dimensions | midpoint 53/113 (`ab7eee9b` / `07a43589`) is **classified bad**; next midpoint 51/113 is constructing | Build and classify archived Linux at midpoint 51. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -73,6 +73,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Midpoint 42 classified good (good 42, bad 57; 15 remain):** routed candidate `3992f34d` / `cbc0a57e` fit at 40,232 LUTs and 34 BRAM with WNS +2.007 ns and WHS +0.009 ns. Its hash-verified archived Linux run reached `/init`, completed rootfs checks and clean poweroff, and ended in `CORE[0] PASS`; phase advances to **constructing midpoint 49/113**.
 
 - **Midpoint 49 classified good (good 49, bad 57; 8 remain):** routed candidate `5f2cc57b` / `ff6db40b` fit at 40,358 LUTs and 34 BRAM with WNS +3.113 ns and WHS +0.014 ns. Its hash-verified archived Linux run reached `/init`, completed rootfs checks and clean poweroff, and ended in `CORE[0] PASS`; phase advances to **constructing midpoint 53/113**.
+
+- **Midpoint 53 classified bad (good 49, bad 53; 4 remain):** routed candidate `ab7eee9b` / `07a43589` fit at 41,495 LUTs and 34 BRAM with WNS +3.130 ns and WHS +0.012 ns. Its hash-verified archived Linux run printed the complete OpenSBI report but no Linux banner before the clean 180-second limit; phase advances to **constructing midpoint 51/113**.
 
 ## 2026-09-02 — current investigation
 
