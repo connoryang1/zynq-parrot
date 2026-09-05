@@ -348,8 +348,24 @@ Commit 57 is **bad**, reducing the bracket to good 53 / bad 57.
 Repaired midpoint 55 (`2ff15d44` / `465d3af0`) is pushed and passes the same
 clean traced Linux-entry gate (`CORE PASS`, 9,130 retired), with evidence under
 `logs/bisect/20260905-repaired-commit55/`. Routed job
-`20260905T110918Z-2ff15d44` is the active FPGA/Linux classification; its result
-will leave only commits 54--55 or 56--57.
+`20260905T110918Z-2ff15d44` fit at 41,501 LUTs and 34 BRAM tiles with WNS
++1.226 ns, TNS 0, and WHS +0.023 ns. Its package SHA-256 is
+`3034b249fb3ec6b50a79bff588aef7a621ade64fef3b552f1b75b04b687dfd7a`
+and bitstream SHA-256 is
+`be6729c97edda26467e0897a4dec0340a21cb24092c17a510d8068ce6a252cd1`.
+The exact Linux run stopped after the two atomic DMA-pool messages until its
+clean 180-second limit; transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T114846Z-1325932.log`.
+Commit 55 is **bad**, reducing the bracket to good 53 / bad 55.
+
+Repaired commit 54 (`30a74bfe` / `b740b610`) is pushed and passes the clean
+12-worker trace-enabled Linux-entry gate (`CORE PASS`, 9,137 retired), with
+program, transcript, and waveform identities under
+`logs/bisect/20260905-repaired-commit54/`. Routed job
+`20260905T115448Z-30a74bfe` is the active FPGA/Linux classification. A good
+result identifies commit 55 (`465d3af0`, "Map resident ctxtsw targets") as the
+first bad; a bad result identifies commit 54 (`b740b610`, "plumb logical
+context id width") as the first bad.
 
 ## Refreshed hardware bracket (2026-09-04)
 
