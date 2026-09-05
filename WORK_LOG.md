@@ -80,6 +80,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 - **First Linux regression isolated (good 50, bad 51; 0 remain in first interval):** routed midpoint 50 (`5e55b377` / `f6863917`) fit at 41,291 LUTs and 34 BRAM with WNS +2.290 ns and WHS +0.032 ns, then booted the exact archived Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`. Commit `00910cd4` is therefore the exact first bad feature; phase advances to **repaired replay of commits 52--113** using the later-established `78837f53` queue-preservation correction.
 
+- **Repaired midpoint 81 locally verified (good 50, 31 repaired commits under test):** pushed candidate `0a77641a` / `a60851d7` omits bad commit 51, replays commits 52--81, and carries the later narrow-physical-address cast required by the static PYNQ configuration. Its clean traced build and Linux-entry gate pass; the first Vivado attempt exposed only that now-fixed out-of-range address slice, and job `20260905T053121Z-0a77641a` is rerunning synthesis. Phase: **FPGA verifying repaired midpoint 81**; a boot would leave 32 feature commits to classify.
+
 ## 2026-09-02 — current investigation
 
 - **Project baseline and regression:** root `69b939b` with BlackParrot `c39ee12b735` booted the archived Linux image through `/init` and `CORE[0] PASS`; BlackParrot `7331fbd0958` is the first known historical Linux regression. The bisect evidence is in [`LINUX_BOOT_BISECT.md`](LINUX_BOOT_BISECT.md).
