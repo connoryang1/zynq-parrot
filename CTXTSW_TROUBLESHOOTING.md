@@ -344,3 +344,13 @@ short commit prefix was manually expanded instead of queried. The submodule
 clone then failed with an unadvertised-object error; always obtain the complete
 object ID with `git rev-parse HEAD`, use that exact value for `git update-index
 --cacheinfo`, and verify it afterward with `git ls-tree HEAD import/black-parrot`.
+
+A manually chained smoke-image conversion once continued after `objcopy`
+failed, leaving an empty redirected NBF that was then launched. Image-generation
+chains must use `set -e`, the checkout's fully qualified cross-tool path, and a
+nonempty/hash check before starting the simulator or board runner.
+
+A historical two-resident/four-logical smoke was initially compiled with only
+`BP_NUM_THREADS=2`, so its seeding payload used a one-bit context field while
+the RTL decoded two bits. Always pass both physical `BP_NUM_THREADS` and logical
+`BP_NUM_CONTEXTS` values matching the elaborated configuration.
