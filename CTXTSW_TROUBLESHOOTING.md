@@ -351,6 +351,10 @@ actual-versus-gitlink comparison before committing or pushing.
 It recurred once more while preparing the GPR-fit endpoint; the invalid gitlink
 was caught by submodule checkout, amended before push, and the exact `ls-tree`
 comparison is now mandatory before any candidate build starts.
+The same manual expansion error recurred while creating repaired feature 57;
+the top-level commit was amended before push. Candidate creation must assign
+the output of `git rev-parse HEAD` directly to the `update-index --cacheinfo`
+command rather than copying even a freshly printed object ID by hand.
 
 An unrestricted recursive submodule update in a fresh replay worktree began
 cloning the entire SDK dependency graph even though FPGA readiness needs only
@@ -382,3 +386,10 @@ A historical two-resident/four-logical smoke was initially compiled with only
 `BP_NUM_THREADS=2`, so its seeding payload used a one-bit context field while
 the RTL decoded two bits. Always pass both physical `BP_NUM_THREADS` and logical
 `BP_NUM_CONTEXTS` values matching the elaborated configuration.
+
+A fresh historical worktree was initially tested through its old local
+`testing/Makefile`; missing generated collateral caused repeated setup failures,
+and the eventual legacy simulator run had no native target limit. Use the
+current root harness with both `ZP_DIR` and `FULL_SIM_DIR` aimed at the candidate,
+or skip the redundant local run when the candidate is only a clean application
+of two independently verified RTL deltas; never launch an unbounded guest.

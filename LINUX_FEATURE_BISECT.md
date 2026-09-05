@@ -417,7 +417,18 @@ nonresident FP preservation unsupported. A fresh static traced model passes
 the Linux-entry sequence and repeated nonresident GPR ring; its physical-cycle
 benchmark reports 5.13 resident and 13.16 nonresident cycles/switch, and the
 independent FP-execution smoke passes. Routed job
-`20260905T141747Z-7fd64a63` is the active fit/Linux proof.
+`20260905T141747Z-7fd64a63` completed at 47,710 LUTs and 80 BRAM tiles with
+WNS +0.672 ns and WHS +0.002 ns. Its exact archived-Linux run entered Linux
+but stopped after the two atomic DMA-pool messages at kernel time 1.324745 s
+until the clean 180-second limit, retiring 234,219,274 instructions. This
+proves a second Linux regression remains after the fixed commit-55 defect.
+
+The active second-regression bracket is fixed commit 55 **good** and the
+FPGA-fit commit 110 endpoint **bad**. Candidate feature 57 is pushed as
+top-level `17f1d8fa` with BlackParrot `93b2e860`; it applies the same proven
+ordinary-D-cache replay repair to commits 56--57. Routed job
+`20260905T152318Z-17f1d8fa` will decide whether the second regression is in
+commits 56--57 or 58--110.
 
 ## Refreshed hardware bracket (2026-09-04)
 
