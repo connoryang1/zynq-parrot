@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 53 good / repaired 61 bad | 8 commits remain in the repaired 54--61 interval; later commits are excluded by the bad boundary | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired midpoint 57 (`04f6922c` / `5b3a2dab`) passes the clean traced Linux-entry gate and is routing | Classify repaired midpoint 57 with the exact archived Linux boot. |
+| 53 good / repaired 57 bad | 4 commits remain in the repaired 54--57 interval; later commits are excluded by the bad boundary | Omit `00910cd4` + historical static dimensions; later candidates add only their required compatibility | repaired midpoint 55 (`2ff15d44` / `465d3af0`) passes the clean traced Linux-entry gate and is routing | Classify repaired midpoint 55 with the exact archived Linux boot. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -97,6 +97,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Repaired commit 61 classified bad (good 53, repaired bad 61; 8 remain):** exact candidate `98d46c71` / `3d6a10b0` fit at 42,116 LUTs and 34 BRAM tiles with WNS +2.293 ns, then entered Linux but stopped after its two atomic DMA-pool messages until the clean 180-second target limit. The second regression is now confined to commits 54--61; phase advances to **constructing repaired midpoint 57**.
 
 - **Repaired midpoint 57 locally verified (good 53, repaired bad 61; 8 remain):** pushed candidate `04f6922c` / `5b3a2dab` passes the clean 12-worker trace-enabled Linux-entry CSR/AMO/high-address gate (`CORE PASS`, 9,130 retired). Phase advances to **FPGA verifying midpoint 57** as job `20260905T102204Z-04f6922c`.
+
+- **Repaired midpoint 57 classified bad; midpoint 55 routing (good 53, bad 57; 4 remain):** candidate `04f6922c` / `5b3a2dab` fit at 41,485 LUTs and 34 BRAM with WNS +0.707 ns, then reproduced the clean 180-second early-Linux stall after atomic DMA-pool setup. Pushed midpoint 55 (`2ff15d44` / `465d3af0`) passes the clean traced Linux-entry gate and is FPGA-verifying as `20260905T110918Z-2ff15d44`.
 
 - **Board runner input isolation:** the first candidate-52 foreground run reached `/init` but consumed the unread SSH wrapper heredoc as guest-console input. The guarded runner now closes stdin for foreground targets; the repeated run completed all rootfs checks and `CORE[0] PASS` without injected text or guest faults.
 

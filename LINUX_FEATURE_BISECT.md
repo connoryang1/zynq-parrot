@@ -335,8 +335,21 @@ bad commit 61 (eight commits 54--61); repaired midpoint 57 is next.
 Repaired midpoint 57 (`04f6922c` / `5b3a2dab`) is pushed and passes the clean
 12-worker trace-enabled Linux-entry gate with `CORE PASS` and 9,130 retired
 instructions. Its exact local evidence is retained under
-`logs/bisect/20260905-repaired-commit57/`; routed job
-`20260905T102204Z-04f6922c` is the active FPGA/Linux classification.
+`logs/bisect/20260905-repaired-commit57/`. It routed at 41,485 LUTs and 34
+BRAM tiles with WNS +0.707 ns, TNS 0, and WHS +0.003 ns; package SHA-256 is
+`5f53884f34a6ec6d29268fd0cc8d11171573f0880f2cf8115f18f00bf8c9c88a`
+and bitstream SHA-256 is
+`acbb6d579dd2a00fbbe6c7c72634452ff28434b19e0bfa637134ab9519281477`.
+The exact Linux run stopped after the two atomic DMA-pool messages until its
+clean 180-second limit; transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T110147Z-1262643.log`.
+Commit 57 is **bad**, reducing the bracket to good 53 / bad 57.
+
+Repaired midpoint 55 (`2ff15d44` / `465d3af0`) is pushed and passes the same
+clean traced Linux-entry gate (`CORE PASS`, 9,130 retired), with evidence under
+`logs/bisect/20260905-repaired-commit55/`. Routed job
+`20260905T110918Z-2ff15d44` is the active FPGA/Linux classification; its result
+will leave only commits 54--55 or 56--57.
 
 ## Refreshed hardware bracket (2026-09-04)
 
