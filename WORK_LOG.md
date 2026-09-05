@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 57 / 113 | 29 | CSR migration + safe refill completion + historical static dimensions | midpoint 28/113 (`517a7521` / `70018be9`) is **classified good**; next midpoint 42/113 is constructing | Build and classify archived Linux at midpoint 42. |
+| 57 / 113 | 15 | CSR migration + safe refill completion + historical static dimensions | midpoint 42/113 (`3992f34d` / `cbc0a57e`) is **classified good**; next midpoint 49/113 is constructing | Build and classify archived Linux at midpoint 49. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -69,6 +69,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Midpoint 28 locally verified (57/113 boundary):** pushed candidate `be6a1dd6` / `d6cdcd70` uses the early schema's two resident threads and 1x1 L2, removes obsolete historical source-list entries, and passes the clean traced Linux-entry CSR/AMO/high-address gate (`CORE PASS`, 9,142 retired). Its optional modern CSR-isolation guest is unsupported and nonterminal at this feature depth, so the decisive phase is **FPGA verifying midpoint 28/113**.
 
 - **Midpoint 28 classified good (good 28, bad 57; 29 remain):** after the exact upstream one-line historical CACC packet-field correction, routed candidate `517a7521` / `70018be9` fit at 40,054 LUTs and 34 BRAM with WNS +4.772 ns and WHS +0.018 ns. Its hash-verified archived Linux run reached `/init`, completed rootfs checks and clean poweroff, and ended in `CORE[0] PASS`; phase advances to **constructing midpoint 42/113**.
+
+- **Midpoint 42 classified good (good 42, bad 57; 15 remain):** routed candidate `3992f34d` / `cbc0a57e` fit at 40,232 LUTs and 34 BRAM with WNS +2.007 ns and WHS +0.009 ns. Its hash-verified archived Linux run reached `/init`, completed rootfs checks and clean poweroff, and ended in `CORE[0] PASS`; phase advances to **constructing midpoint 49/113**.
 
 ## 2026-09-02 — current investigation
 
