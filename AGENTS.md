@@ -37,6 +37,9 @@ mistaken for validated functional results.
   exists before running `git -C <submodule> ...`. An uninitialized but existing submodule directory
   can make Git discover the parent repository and accidentally apply the command to the top-level
   worktree instead.
+- Before building a historical BlackParrot candidate, materialize and verify both of its nested
+  source submodules, `external/basejump_stl` and `external/HardFloat`, at the recorded gitlinks.
+  A top-level `import/HardFloat` checkout does not satisfy BlackParrot's nested source path.
 
 ## Testing Expectations
 
