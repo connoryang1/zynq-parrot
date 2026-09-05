@@ -583,6 +583,25 @@ It also keeps slow synthesis and board work off the critical path until a
 candidate has passed the inexpensive local checks; all test runs remain
 serialized because they share program, trace, and simulator artifacts.
 
+## Current admission-gated route sequence (2026-09-05)
+
+The current hardware bracket is fixed feature 55 **good** and the old feature
+110 GPR-fit endpoint **bad**. Repaired feature 63 is the earliest prefix that
+can execute a nonresident logical-context switch; its exact candidate is
+top-level `c2e178475af0` with BlackParrot `e577de938c65`. A clean traced ring
+initially exposed one deterministic defect: after context 3 occupied physical
+slot 0, `csrwi 0x800,0` was suppressed because the scheduler compared its
+logical target against the physical slot ID. The three-line repair passes the
+full repeated nonresident ring and the ordinary current-toolchain smoke.
+
+Only one Vivado job is admitted now: `20260905T191111Z-c2e17847` on `bp3`.
+If its Linux/demo run passes, the next useful candidate is reconstructed
+feature 101, the first known BRAM-backed FPGA-fit checkpoint; a feature-101
+pass then admits reconstructed feature 110, the 13-cycle GPR-fit endpoint. If
+feature 63 fails, the next repair remains confined to features 56--63. Features
+64--100 are not routed merely as intermediate history because many are known
+not to fit and do not answer a decision that cheaper local gates cannot.
+
 ## Result record
 
 For every hardware decision retain: feature revision, overlay patch hash and

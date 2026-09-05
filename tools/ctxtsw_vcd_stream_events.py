@@ -15,23 +15,52 @@ import sys
 
 
 WATCH = {
-    "dispatch_v": "be.scheduler.dispatch_pkt_cast_o.v",
-    "dispatch_pc": "be.scheduler.dispatch_pkt_cast_o.pc",
-    "dispatch_tid": "be.scheduler.dispatch_pkt_cast_o.thread_id",
-    "dispatch_ctxtsw": "be.scheduler.dispatch_pkt_cast_o.ctxtsw_v",
-    "commit_ctxtsw": "be.calculator.commit_pkt_cast_o.ctxtsw",
-    "cache_state": "context_cache_state_r",
-    "capture": "ctxtsw_capture_v_li",
-    "finalize": "ctxtsw_token_finalize_v_li",
-    "pending_v": "pending_ctxtsw_v_r",
-    "pending_sent": "pending_ctxtsw_sent_r",
-    "current_tid": "current_physical_thread_id_lo",
-    "pending_prev_tid": "pending_ctxtsw_prev_physical_thread_id_r",
-    "pending_target_tid": "pending_ctxtsw_physical_thread_id_r",
-    "fast_old_tid": "fast_ctxtsw_old_physical_thread_id_lo",
-    "fast_target_tid": "fast_ctxtsw_physical_thread_id_lo",
-    "retire_tid": "retire_thread_id_lo",
-    "fe_yumi": "fe_ctxtsw_yumi_i",
+    # Newer traces expose the flattened scheduler cast while historical
+    # feature checkpoints expose the same packet as a struct under ``be``.
+    "dispatch_v": ("be.scheduler.dispatch_pkt_cast_o.v", "be.dispatch_pkt.v"),
+    "dispatch_pc": ("be.scheduler.dispatch_pkt_cast_o.pc", "be.dispatch_pkt.pc"),
+    "dispatch_tid": ("be.scheduler.dispatch_pkt_cast_o.thread_id", "be.dispatch_pkt.thread_id"),
+    "dispatch_ctxtsw": ("be.scheduler.dispatch_pkt_cast_o.ctxtsw_v", "be.dispatch_pkt.ctxtsw_v"),
+    "dispatch_target_ctx": (
+        "be.scheduler.dispatch_pkt_cast_o.ctxtsw_target_tid",
+        "be.dispatch_pkt.ctxtsw_target_tid",
+    ),
+    "commit_ctxtsw": ("be.calculator.commit_pkt_cast_o.ctxtsw", "be.commit_pkt.ctxtsw"),
+    "commit_pc": ("be.calculator.commit_pkt_cast_o.pc", "be.commit_pkt.pc"),
+    "commit_instret": ("be.calculator.commit_pkt_cast_o.instret", "be.commit_pkt.instret"),
+    "cache_state": ("context_cache_state_r",),
+    "cache_miss": ("context_cache_miss_v_li",),
+    "cache_miss_ctx": ("context_cache_miss_context_id_li",),
+    "cache_target_ctx": ("context_cache_target_context_id_r",),
+    "cache_victim_ctx": ("context_cache_victim_context_id_r",),
+    "cache_reg": ("context_cache_reg_idx_r",),
+    "cache_drain_safe": ("context_cache_drain_safe_li",),
+    "cache_launch": ("context_cache_launch_v_li",),
+    "target_resident": ("ctxtsw_target_resident_v_li",),
+    "capture": ("ctxtsw_capture_v_li",),
+    "finalize": ("ctxtsw_token_finalize_v_li",),
+    "pending_v": ("pending_ctxtsw_v_r",),
+    "pending_sent": ("pending_ctxtsw_sent_r",),
+    "current_tid": ("current_physical_thread_id_lo", "current_thread_id_lo"),
+    "current_ctx": ("current_context_id_r",),
+    "pending_prev_tid": (
+        "pending_ctxtsw_prev_physical_thread_id_r",
+        "pending_ctxtsw_prev_thread_id_r",
+    ),
+    "pending_target_tid": (
+        "pending_ctxtsw_physical_thread_id_r",
+        "pending_ctxtsw_thread_id_r",
+    ),
+    "fast_old_tid": (
+        "fast_ctxtsw_old_physical_thread_id_lo",
+        "fast_ctxtsw_old_thread_id_lo",
+    ),
+    "fast_target_tid": (
+        "fast_ctxtsw_physical_thread_id_lo",
+        "fast_ctxtsw_thread_id_lo",
+    ),
+    "retire_tid": ("retire_thread_id_lo",),
+    "fe_yumi": ("fe_ctxtsw_yumi_i",),
 }
 
 
@@ -46,6 +75,7 @@ def main() -> int:
     parser.add_argument("--max-cycle", type=int)
     parser.add_argument("--period", type=int, default=50_000)
     parser.add_argument("--show-signals", action="store_true")
+    parser.add_argument("--all-commits", action="store_true")
     args = parser.parse_args()
 
     selected: dict[str, str] = {}
@@ -70,8 +100,8 @@ def main() -> int:
             if match:
                 width, code, name = match.groups()
                 full = ".".join(scopes + [name.split()[0]])
-                for label, fragment in WATCH.items():
-                    if fragment in full and label not in selected:
+                for label, fragments in WATCH.items():
+                    if any(fragment in full for fragment in fragments) and label not in selected:
                         selected[label] = code
                         widths[code] = int(width)
 
@@ -88,37 +118,68 @@ def main() -> int:
 
     values: dict[str, int | None] = {}
     last_dispatch = None
+    last_cache_state = None
     last_commit = 0
+    last_commit_record = None
     last_capture = 0
     last_fe_yumi = 0
     current_time = 0
     in_values = False
 
     def sample() -> None:
-        nonlocal last_dispatch, last_commit, last_capture, last_fe_yumi
+        nonlocal last_dispatch, last_cache_state, last_commit, last_commit_record, last_capture, last_fe_yumi
         cycle = current_time // args.period
         if cycle < args.min_cycle:
             return
         dispatch = values.get("dispatch_v") == 1
         pc = values.get("dispatch_pc")
         tid = values.get("dispatch_tid")
-        identity = (pc, tid, values.get("dispatch_ctxtsw")) if dispatch else None
+        identity = (
+            pc,
+            tid,
+            values.get("dispatch_ctxtsw"),
+            values.get("dispatch_target_ctx"),
+        ) if dispatch else None
         if dispatch and pc in args.pc and identity != last_dispatch:
-            print(f"cycle={cycle} dispatch pc=0x{pc:x} tid={tid} ctxtsw={values.get('dispatch_ctxtsw')}")
+            print(
+                f"cycle={cycle} dispatch pc=0x{pc:x} tid={tid}"
+                f" ctxtsw={values.get('dispatch_ctxtsw')} target_ctx={values.get('dispatch_target_ctx')}"
+                f" resident={values.get('target_resident')}"
+            )
         last_dispatch = identity
+        cache_state = values.get("cache_state")
+        if cache_state != last_cache_state and cache_state is not None:
+            print(
+                f"cycle={cycle} cache_state={cache_state} current_ctx={values.get('current_ctx')}"
+                f" current_tid={values.get('current_tid')} miss={values.get('cache_miss')}"
+                f" miss_ctx={values.get('cache_miss_ctx')} target_ctx={values.get('cache_target_ctx')}"
+                f" victim_ctx={values.get('cache_victim_ctx')} reg={values.get('cache_reg')}"
+                f" drain_safe={values.get('cache_drain_safe')} launch={values.get('cache_launch')}"
+            )
+        last_cache_state = cache_state
         commit = values.get("commit_ctxtsw") == 1
         if commit and not last_commit:
             print(
                 f"cycle={cycle} commit_ctxtsw cache_state={values.get('cache_state')}"
-                f" current={values.get('current_tid')} retire={values.get('retire_tid')}"
+                f" current={values.get('current_tid')}/{values.get('current_ctx')}"
+                f" retire={values.get('retire_tid')} target_ctx={values.get('dispatch_target_ctx')}"
+                f" resident={values.get('target_resident')} miss={values.get('cache_miss')}"
                 f" pending={values.get('pending_v')}/{values.get('pending_sent')}"
                 f" prev={values.get('pending_prev_tid')} target={values.get('pending_target_tid')}"
             )
         last_commit = int(commit)
+        commit_record = (values.get("commit_pc"), values.get("current_ctx"))
+        if args.all_commits and values.get("commit_instret") == 1 and commit_record != last_commit_record:
+            commit_pc = values.get("commit_pc")
+            print(
+                f"cycle={cycle} commit pc={'x' if commit_pc is None else f'0x{commit_pc:x}'}"
+                f" current={values.get('current_tid')}/{values.get('current_ctx')}"
+            )
+        last_commit_record = commit_record if values.get("commit_instret") == 1 else None
         capture = values.get("capture") == 1
         if capture and not last_capture:
             print(
-                f"cycle={cycle} capture current={values.get('current_tid')}"
+                f"cycle={cycle} capture current={values.get('current_tid')}/{values.get('current_ctx')}"
                 f" fast_old={values.get('fast_old_tid')} fast_target={values.get('fast_target_tid')}"
                 f" pending={values.get('pending_v')}/{values.get('pending_sent')}"
                 f" finalize={values.get('finalize')}"
@@ -127,7 +188,7 @@ def main() -> int:
         fe_yumi = values.get("fe_yumi") == 1
         if fe_yumi and not last_fe_yumi:
             print(
-                f"cycle={cycle} fe_yumi current={values.get('current_tid')}"
+                f"cycle={cycle} fe_yumi current={values.get('current_tid')}/{values.get('current_ctx')}"
                 f" pending={values.get('pending_v')}/{values.get('pending_sent')}"
                 f" prev={values.get('pending_prev_tid')} target={values.get('pending_target_tid')}"
             )
