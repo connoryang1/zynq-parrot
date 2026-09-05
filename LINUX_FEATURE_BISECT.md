@@ -164,6 +164,23 @@ fixed 55 **good**, repaired feature 56 **bad**. No feature-57 route is admitted
 until a local discriminator isolates the residual state/tag corruption and
 justifies one new feature-56 candidate.
 
+Waveform-guided replay subsequently proved the repaired feature-63 scheduler
+must compare the requested logical context against the active logical context,
+not the physical victim slot. That candidate passes local nonresident switching
+but cannot place because its pre-banking register representation requires
+64,089 LUTs, so no board conclusion was drawn from it.
+
+The next admissible hardware checkpoint is reconstructed feature 101, the
+first replay point with the BRAM-backed context store. Exact top-level
+`a6549ff3b1ef` pins BlackParrot `7ed4a89d7ff2`; its first-install fix clones the
+current CSR image only when CSR `0x801` seeds a previously invalid target, so a
+Linux U-mode context retains privilege and SATP state without overwriting an
+initialized context. A clean two-thread/four-context model passes the ordinary
+smoke, repeated nonresident ring, and the formerly failing CSR-bootstrap test.
+The only admitted route is farm job `20260905T200324Z-a6549ff3`; its result will
+either provide the overlay for Linux acceptance or establish that later
+compaction is required for fit.
+
 ## Historical first-regression search (2026-09-04)
 
 The 57/113 midpoint is historical top-level `f8a59c0d` paired with

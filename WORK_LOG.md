@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| Fixed 55 good / feature 110 bad | 55 (features 56--110) | Preserve `0x800`--`0x804`, the D-cache replay fix, FE selector/typed metadata, and logical-context identity | repaired feature 63 passes three local gates but cannot place at 64,089 LUTs; reconstructed feature 101 is being prepared | Route feature 101, the first BRAM-backed fit checkpoint; a fit candidate can then receive bare-metal and Linux board classification. |
+| Fixed 55 good / feature 110 bad | 55 (features 56--110) | Preserve `0x800`--`0x804`, the D-cache replay fix, FE selector/typed metadata, logical-context identity, and first-install CSR inheritance | repaired feature 101 passes all three local gates and is routing as `20260905T200324Z-a6549ff3` | If it fits, run the bare-metal ladder and the hash-pinned Linux PID-1 context-switch proof; meanwhile prepare feature 110 locally without another speculative route. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -230,3 +230,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Feature-63 logical-return fix (fixed 55 good, testing 63; 55 remain):** waveform analysis showed eight nonresident evict/restores completed before `csrwi 0x800,0` was suppressed because the scheduler compared logical target 0 with physical slot 0; `e577de93` fixes the comparison against the active logical context. Exact `c2e17847` now passes clean traced repeated-ring, ordinary-toolchain, and nonresident CSR-bootstrap gates, while routed job `20260905T191111Z-c2e17847` remains the sole admitted Vivado build on `bp3`.
 
 - **Feature-63 fit boundary (fixed 55 good, feature 63 locally correct/non-fit; 55 remain):** exact job `20260905T191111Z-c2e17847` synthesized but failed placement at 64,089 LUTs against 53,200 available, confirming the early backing store is not deployable as LUT/register state. The next admitted route moves directly to reconstructed feature 101, the first BRAM-backed fit checkpoint; no intermediate non-fit prefix will consume a build slot.
+
+- **Linux demo acceptance image:** pushed `c9c5cb9a` adds a reproducible PID-1 Linux image whose U-mode `0 -> 2 -> 0` test proves logical-ID, target execution, and distinct `s11` backing/restoration; the clean image is NBF `7939f8db…` and validation binds its ELF, initramfs, DTB, kernel, and OpenSBI payload.
+
+- **Feature101 CSR bootstrap fixed (fixed 55 good, feature 110 bad):** exact repaired feature101 (`a6549ff3` / `7ed4a89d`) now passes a clean ordinary smoke, the real repeated nonresident ring, and the formerly failing nonresident CSR-bootstrap after first-install CSR inheritance was limited to invalid targets. Its sole admitted PYNQ route is farm job `20260905T200324Z-a6549ff3`; repaired feature110 is only being reconstructed/local-tested in parallel.
