@@ -5,11 +5,11 @@
 
 /* CSR seeding helpers for BlackParrot hardware threading.
  *
- * CSR 0x081 (CTXT)    : read/write current thread ID; write triggers NPC redirect
- * CSR 0x082 (CTXT_NPC): seed the NPC for a target thread
+ * CSR 0x800 (CTXT)    : read/write current context ID; write triggers NPC redirect
+ * CSR 0x801 (CTXT_NPC): seed the NPC for a target thread
  *   bits [38:0]                    = NPC (vaddr_width_p = 39)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
- * CSR 0x083 (CTXT_REG): seed an integer or FP register for a target thread
+ * CSR 0x802 (CTXT_REG): seed an integer or FP register for a target thread
  *   bits [38:0]                    = value (sign-extended to vaddr_width_p)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
  *   bits [38+BP_TID_BITS+5 : 39+BP_TID_BITS] = register address (5-bit)
@@ -49,14 +49,14 @@
 
 static inline void seed_npc(uint64_t tid, uint64_t npc) {
   uint64_t v = ((tid & BP_TID_MASK) << BP_TID_SHIFT) | (npc & BP_NPC_MASK);
-  __asm__ volatile("csrw 0x082, %0" : : "r"(v) : "memory");
+  __asm__ volatile("csrw 0x801, %0" : : "r"(v) : "memory");
 }
 
 static inline void seed_reg(uint64_t tid, uint64_t reg, uint64_t val) {
   uint64_t v = (val & BP_VAL_MASK)
              | ((tid & BP_TID_MASK) << BP_TID_SHIFT)
              | ((reg & BP_REG_MASK) << BP_REG_SHIFT);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v) : "memory");
+  __asm__ volatile("csrw 0x802, %0" : : "r"(v) : "memory");
 }
 
 static inline void seed_fp_reg(uint64_t tid, uint64_t reg, uint64_t val) {
@@ -66,7 +66,7 @@ static inline void seed_fp_reg(uint64_t tid, uint64_t reg, uint64_t val) {
              | ((tid & BP_TID_MASK) << BP_TID_SHIFT)
              | ((reg & BP_REG_MASK) << BP_REG_SHIFT)
              | (1ULL << BP_FP_SHIFT);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(v) : "memory");
+  __asm__ volatile("csrw 0x802, %0" : : "r"(v) : "memory");
 }
 
 /* Convenience: seed gp, sp, and NPC for a thread. */

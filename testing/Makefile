@@ -26,6 +26,7 @@ RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/contex
 SMOKE_TESTS := \
     mt_csr_isolation_test \
     mt_ctxtsw_smoke_test \
+    mt_ctxtsw_logical_csr_readback_test \
     mt_frf_isolation_test \
     mt_regfile_test
 
