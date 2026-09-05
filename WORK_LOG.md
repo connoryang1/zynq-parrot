@@ -10,9 +10,9 @@ Add only major milestones: confirmed root causes, definitive fixes or reverts, m
 
 The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed through the SRAM-backed feature tip `8708eff7`. A feature commit counts as verified only after its candidate has passed local gates, routed on the PYNQ-Z2, and either booted through `/init` or produced a reproducible fresh-board non-`/init` result.
 
-| Feature commits verified | Feature commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
+| Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 0 / 113 | 113 | Host protocol now controlled | full `1c42e9f2` reproduces the post-DMA Linux stall even with the source-matched legacy runner; **current-stack RTL diagnosis** | Capture/repair the post-atomic-DMA kernel path, then route and boot the repaired feature stack through `/init`. |
+| 57 / 113 | 57 | CSR migration + safe refill completion + historical static dimensions | midpoint 28/113 (`be6a1dd6` / `d6cdcd70`) is **FPGA verifying** after its clean traced Linux-entry pass | Route, load, and classify archived Linux at midpoint 28. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -55,6 +55,18 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Full-stack Linux classification (0/113):** the same source-matched legacy runner (`b774f7…`) ran the exact routed `1c42e9f2` package (`73342c3…`, bitstream `8ee250aa…`) and collision-free Linux NBF. It reached Linux's two atomic-DMA-pool messages through 1.342125 s, then stayed unchanged for over two minutes with the target still running; this confirms the remaining stall is not the historical host-runner mismatch. The board was power-cycled before further work; phase is **current-stack RTL diagnosis**.
 
 - **Live Linux bracket restored (0/113):** a bounded legacy-ABI runner (`be771785…`) passes the full-image FPGA smoke, then a fresh guarded probe reaches `check_unaligned_access_boot_cpu` at `0x8020319e` (`CORE[0] PASS`, 3,029,117 retired). Its guarded return probe at `0x802031ac` instead reaches the clean 15-second target limit (63,852,157 retired), so the active failure is now confined inside that initcall rather than merely after the DMA-pool console messages.
+
+- **Pre-feature baseline revalidated (0/113):** the preserved pre-feature package (`c211216…`, bitstream `d45f7e…`), matched legacy runner (`76db506…`), and unchanged Linux NBF (`994bd900…`) again booted through `/init`, rootfs checks, poweroff, and `CORE[0] PASS` (323,748,753 retired, IPC 0.515197). The board and payload are healthy; phase is **repaired feature-endpoint classification** before selecting a midpoint.
+
+- **Repaired feature endpoint classified bad (0/113):** the routed full feature/repair endpoint (`05b1e786` / BlackParrot `3df31a94`, package `455f7768…`, bitstream `5713f7da…`) used the exact bounded runner and unchanged Linux NBF, printed the complete OpenSBI v1.4 report, then reached the clean 180-second limit without a Linux banner while retiring 1,884,254,103 instructions. Together with the fresh pre-feature `/init` pass, this establishes a healthy-board good/bad bracket; phase is **constructing/verifying midpoint 57 of 113**.
+
+- **Midpoint 57 locally verified (0/113):** pushed historical candidate `72e26e71` / `11bb7e7d` is collision-free and passes a clean rebuilt trace-enabled Linux-entry CSR/AMO/BSS gate; its top collateral carries the two previously routed historical Vivado compatibility fixes. Job `20260904T223244Z-72e26e71` is routing with all host workers; phase is **FPGA verifying midpoint 57 of 113**.
+
+- **Midpoint configuration repaired (0/113):** the first midpoint route exposed stale historical top-level dimensions—four resident threads and a 2x2 L2 required 63,298 LUTs and could not place—rather than a feature-prefix failure. Pushed `f8a59c0d` restores the validated two-resident/four-logical, 1x1-L2 static FPGA shape, passes a clean traced Linux-entry gate, and is routing as `20260904T230622Z-f8a59c0d`; phase remains **FPGA verifying midpoint 57 of 113**.
+
+- **Midpoint 57 classified bad (57/113 boundary):** routed candidate `f8a59c0d` / `11bb7e7d` (package `bac66fe5…`, bitstream `e48e2378…`) printed the complete OpenSBI report, then reached the clean 180-second limit with no Linux banner and only 989,256 retired instructions. Commits 58--113 are eliminated; the first bad feature is within commits 1--57 and the next midpoint is 28/113.
+
+- **Midpoint 28 locally verified (57/113 boundary):** pushed candidate `be6a1dd6` / `d6cdcd70` uses the early schema's two resident threads and 1x1 L2, removes obsolete historical source-list entries, and passes the clean traced Linux-entry CSR/AMO/high-address gate (`CORE PASS`, 9,142 retired). Its optional modern CSR-isolation guest is unsupported and nonterminal at this feature depth, so the decisive phase is **FPGA verifying midpoint 28/113**.
 
 ## 2026-09-02 — current investigation
 

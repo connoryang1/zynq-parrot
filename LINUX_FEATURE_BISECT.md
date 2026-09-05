@@ -19,7 +19,7 @@ and stale-fault repair semantics are present?
 | Good feature baseline | `c39ee12b735` | Initial context-switch implementation; FPGA-verified Linux boot through `/init`. |
 | Good compatibility seed | `ce328a77536` | `7331fbd0` plus the two independently required frontend safety restorations; FPGA-verified Linux boot through `/init`. |
 | Feature tip | `8708eff7` | Last SRAM-backed context-switch feature commit before the compatibility repair series starts. |
-| Bad repaired endpoint | `1c42e9f2` | Feature tip plus the current compatibility stack; FPGA reaches the later unaligned-access boundary but not `/init`. |
+| Bad repaired endpoint | `3df31a94e532` | Feature tip plus the compatibility stack and three OpenSBI CSR repairs; a fresh FPGA run prints the complete OpenSBI report but no Linux banner before its clean 180-second limit. |
 
 The raw feature interval has 114 commits (`c39ee12b735..8708eff7`). The
 practical replay starts at the good compatibility seed and replays the 113
@@ -107,31 +107,62 @@ changes.  Each row must name the current commit, show `verified/113` and
 **repairing**, or **classified good/bad**.  Retain commands and routine
 failures in `LINUX_BOOT_STATUS.md` instead.
 
-## Current midpoint checkpoint (2026-09-03)
+## Current binary-search boundary (2026-09-04)
 
-The first replay midpoint is BlackParrot `a9ee78ab1ea` (feature source
-`7e886ad6e783`) plus the recorded narrow I-cache compatibility overlay. The
-first routed attempt found a real combinational FE/UCE I-cache-refill loop
-caused by the overlay's context-switch abort signal; it was deliberately
-stopped and is not a valid FPGA candidate. The repaired overlay holds
-`miss_abort` low, preserving redirect/context state while waiting for a refill
-to finish. After restoring the midpoint's pinned nested BaseJump revision
-(`4db526e68d`), its clean traced two-resident/four-context PYNQ-style model
-passed the toolchain smoke and Linux-entry CSR/AMO/BSS gate.
+The 57/113 midpoint is historical top-level `f8a59c0d` paired with
+BlackParrot `11bb7e7d`; the underlying feature source is `7e886ad6e783`.  Its
+narrow compatibility overlay migrates the context CSRs to collision-free
+`0x800`--`0x802` and restores acyclic I-cache refill semantics while preserving
+the midpoint's original behavior.  The top-level checkpoint also carries the
+already FPGA-proven AXI Interconnect substitution for this VM's damaged
+SmartConnect XIT service and the routed-baseline source-list fix for its
+instantiated masked-write memory adapter. It also explicitly restores the
+validated static PYNQ dimensions (two resident threads, four logical contexts,
+and a 1x1 L2); the preceding historical default used four resident threads and
+a 2x2 L2 and failed placement at 63,298 LUTs. Both branches are pushed.
 
-Before the corrected FPGA route completed, an exact-NBF CSR preflight found
-nine Linux instructions addressed to `0x081`--`0x083`, the midpoint's
-context-switch CSR range. This makes the candidate inherently incompatible
-with the archived Linux image, independently of the remaining frontend logic;
-the route was cleanly stopped and no board result will be attributed to this
-revision. The isolated migration overlay has since moved all 31 decode and
-documentation references to the non-colliding `0x800`--`0x802` range: the
-exact NBF preflight is collision-free and the static Linux-entry gate passes.
-That early feature prefix still lacks its later frontend handoff and therefore
-times out in the context-switch smoke; it is not a full feature acceptance or
-a routed Linux classification. Future historical replay candidates must carry
-both the acyclic refill behavior and the migrated CSR interface before a
-routed Linux classification.
+The clean trace-enabled static PYNQ model passed the current-toolchain smoke
+and the complete Linux-entry CSR/AMO/BSS gate, including M-to-S entry,
+interrupt-CSR clearing, high-DRAM atomics, and high-address code/stack access.
+The exact Linux NBF collision scan also passes. Routed job
+`20260904T230622Z-f8a59c0d` fit at 41,525 LUTs and 34 BRAM tiles with WNS
++2.684 ns and WHS +0.020 ns. Its package SHA-256 begins `bac66fe5` and its
+bitstream SHA-256 begins `e48e2378`.
+
+The fresh hash-verified Linux run printed the complete OpenSBI v1.4 report,
+then reached the clean 180-second target limit without a Linux banner while
+retiring 989,256 instructions at IPC 0.000879. The retained board transcript
+is `/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260904T234431Z-472032.log`.
+This classifies midpoint 57 as **bad**, eliminates feature commits 58--113,
+and confines the first bad feature to commits 1--57. The next candidate is
+midpoint 28/113, feature revision `ea83faa8b42a`.
+
+Midpoint 28 is now pushed as top-level `be6a1dd6` with BlackParrot
+`d6cdcd70`; its underlying feature source is `ea83faa8b42a`. Because this
+revision predates the separate `num_contexts` parameter, its static fit shape
+uses two resident threads and a 1x1 L2 without injecting a nonexistent logical
+context field. The compatibility overlay retains the two proven frontend
+safety fixes, moves the context CSRs to `0x800`--`0x802`, and restores the
+pre-feature rule that an I-cache refill completes before the miss state exits.
+The clean traced Linux-entry CSR/AMO/high-address gate passes with `CORE PASS`;
+the next decisive result is its routed archived-Linux run.
+
+## Refreshed hardware bracket (2026-09-04)
+
+The board and archived Linux payload have been revalidated independently of
+the feature stack. The preserved pre-feature package (`c211216c…`, bitstream
+`d45f7e3e…`) with its source-matched runner (`76db506e…`) booted through
+`/init`, rootfs checks, poweroff, and `CORE[0] PASS`; the unchanged Linux NBF
+hash is `994bd900…`.
+
+The routed full feature/repair endpoint (`05b1e786` / BlackParrot
+`3df31a94e532`, package `455f7768…`, bitstream `5713f7da…`) was then loaded
+with the exact bounded runner (`be771785…`). It printed the complete OpenSBI
+v1.4 capability report but no Linux banner before the clean 180-second target
+limit, while retiring 1,884,254,103 instructions. This is the current bad
+endpoint. The next decisive candidate is the already prepared replay midpoint
+`f8a59c0d` / `11bb7e7de7fd` (feature source `7e886ad6e783`), representing
+57 of the 113 post-`7331fbd0` feature commits.
 
 ## Active endpoint candidate (2026-09-04)
 

@@ -43,6 +43,25 @@ no `control-program` is alive, reload the intended overlay, and use the
 serial helper with `PYNQ_CONTROL_PROGRAM_FOREGROUND=1` for the next bounded
 or self-terminating control.
 
+### Power-cycling immediately after artifact staging can truncate the overlay
+
+A baseline package was verified and extracted successfully, then the board was
+power-cycled immediately because the prior PL run had timed out.  On reboot the
+new BIT/HWH/MAP files existed but were zero length, showing that the abrupt
+power loss occurred before the filesystem had persisted the extraction.  Do
+board recovery before staging whenever possible; if staging must precede a
+power cycle, run `sync`, verify the artifact hashes again, and only then remove
+power.  A zero-length or hash-mismatched overlay must be re-staged after the
+PYNQ readiness gate and must never be loaded or treated as RTL evidence.
+
+### Generated Linux probes can exhaust board storage
+
+The board accumulated 104 temporary 69-MB Linux/OpenSBI probe NBFs and reached
+100% filesystem usage, making atomic package staging unsafe.  Preserve the
+canonical Linux NBF and exact runner by hash, remove only regenerable probe
+variants after their transcripts are retained, run `sync`, and require ample
+free space before every stage; the 2026-09-04 cleanup recovered 7.23 GB.
+
 ### Historical source checkpoint silently times out under a current runner
 
 An old source revision that once booted Linux is not itself a sufficient FPGA
@@ -83,6 +102,24 @@ not treat Vivado's `mode can only be specified once` error as a source or RTL
 failure: the wrapper now preserves a caller-supplied mode and only defaults to
 batch when none is present.
 
+### Vivado SmartConnect can fail before RTL synthesis
+
+Midpoint route `20260904T221938Z-6a915e3b` failed while creating three
+SmartConnect adapter IPs with XML `Unexpected end of message`; it never ran
+RTL synthesis and therefore provides no candidate evidence.  A clean retry
+reproduced the same failure, while the already routed historical AXI
+Interconnect substitution advanced immediately past block-design validation;
+carry that proven top-collateral patch on historical candidates rather than
+retrying the damaged SmartConnect XIT service.
+
+### Historical Vivado file list omitted a masked-write adapter
+
+After SmartConnect was bypassed, Vivado reached RTL synthesis and reported
+`bsg_mem_1rw_sync_mask_write_bit_from_1r1w` missing even though its parent
+instantiated it.  Carry the previously routed one-line source-list fix, then
+perform a clean traced model rebuild and known-good guest gate before routing;
+the pre-fix synthesis failure is collateral evidence, not a feature result.
+
 ### Historical source uses nested FPGA submodules
 
 The 2015-style source graph contains a nested
@@ -91,6 +128,48 @@ submodule initialization is insufficient: before legacy Vivado packaging, run
 the exact submodule's recursive initialization and verify `src/dm_pkg.sv` is
 present.  A missing file is a reproducible checkout failure, not a missing RTL
 source or a synthesis result.
+
+### Historical simulator runs retain the previous program image
+
+The legacy Verilator `run` target only creates `prog.riscv` when it is absent,
+so changing `PROG=` can silently rerun the preceding test.  Before every
+lower-level historical run, explicitly remove `prog.riscv`, `prog.mem`, and
+`prog.nbf`, then confirm the expected test banner in `run.log`; a command-line
+program name alone is not evidence that the requested binary ran.
+
+### Pair historical BlackParrot RTL with its historical top collateral
+
+A current zynq-parrot testbench directly probes internal context-cache signals
+that do not exist at earlier feature midpoints.  Such an elaboration failure is
+a wrapper/source-age mismatch, not a midpoint classification: use the top-level
+commit that originally pinned the selected BlackParrot revision, and apply only
+the narrowly reviewed compatibility overlays needed by the FPGA toolchain.
+
+### Historical configuration names do not preserve FPGA dimensions
+
+The first 57/113 midpoint used the expected `e_bp_unicore_zynqparrot_cfg` name
+but inherited that revision's defaults: four resident threads and a 2x2 L2.
+It synthesized to 63,298 LUTs and failed placement on the 53,200-LUT xc7z020;
+this was not a feature or Linux result. Every replay candidate must explicitly
+override the validated static shape—two resident threads, four logical
+contexts, and a 1x1 L2—then pass a clean local gate before routing.
+
+Early feature revisions may not yet contain a separate `num_contexts` member.
+For those schemas, set only `num_threads=2` and the 1x1 L2 dimensions; adding a
+later field is an elaboration error, not a feature result. The corresponding
+prefix can classify Linux compatibility but cannot represent four logical
+contexts until that field appears later in the feature sequence.
+
+### Historical Verilator recipes can mask failures and ignore runtime limits
+
+The historical Verilator recipe pipes its command through `tee` without
+`pipefail`, so GNU Make can exit zero even when the log ends in `%Error` and no
+simulator executable exists. Require both an executable and an error-free log;
+its generated inner Makefile can be resumed directly with `make -C obj_dir -f
+Vbsg_nonsynth_zynq_testbench.mk -j$(nproc)` when the wrapper loses its
+jobserver. Some old host runners also ignore `TARGET_RUNTIME_MS`, so a modern
+context smoke that is unsupported at that feature depth must be interrupted,
+its child process checked absent, and recorded as non-classifying.
 
 ### Historical PLIC sources are generated collateral
 
