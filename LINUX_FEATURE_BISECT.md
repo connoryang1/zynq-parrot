@@ -226,6 +226,29 @@ Midpoint 51 is therefore **bad**, so the first bad feature is commit 50 or 51.
 The next candidate is midpoint 50/113; 2 commits remain in the active good/bad
 interval.
 
+Midpoint 50 is pushed as top-level `5e55b377` with BlackParrot `f6863917`;
+its underlying feature source is `acd832c19b4003c578420c032e4b694b486c433c`.
+Its exact Linux-NBF CSR collision scan and clean traced Linux-entry gate passed
+before hardware implementation. Routed job `20260905T042410Z-5e55b377` fit at
+41,291 LUTs, 15,425 registers, 34 BRAM tiles, and 11 DSPs, with WNS +2.290 ns,
+WHS +0.032 ns, and no timing failures. Its package SHA-256 is
+`b08a5e36ae3c6f8c1435be5422e3adb5da80fa7f8164c17e8a42e91134754ae1`
+and bitstream SHA-256 is
+`ea0b8d6ea1d028116da6edd7ba2870fec92a1d6252a79b4570e5cf6ea8e29998`.
+The fresh hash-verified archived Linux run reached `/init`, completed rootfs
+checks and clean poweroff, and ended in `CORE[0] PASS` after 322,577,322
+retired instructions at IPC 0.513384. The retained transcript is
+`/home/xilinx/bp-logs/linux-6.6-jhumphri-20250125-20260905T050252Z-890139.log`.
+
+Midpoint 50 is therefore **good**, and commit 51,
+`00910cd4a50c49f5cb9f1ecdcff2e027e4c2521e` ("Clear FE queue on dcache replay
+redirects"), is the exact first Linux regression. That change clears rather
+than rolls the ordinary FE issue queue on D-cache miss/replay redirects; later
+repair `78837f53e8733c55bc40efc301cb5e8630776542` explicitly removes those ten
+lines to preserve DTLB-fill replay. It is independent of the SRAM context
+storage mechanics. The next phase carries that narrow repair as a fixed
+compatibility overlay while classifying feature commits 52--113.
+
 ## Refreshed hardware bracket (2026-09-04)
 
 The board and archived Linux payload have been revalidated independently of

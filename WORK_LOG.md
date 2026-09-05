@@ -12,7 +12,7 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 
 | Classified bad boundary | Suspect commits remaining | Compatibility overlay | Current checkpoint / phase | Next significant proof |
 | ---: | ---: | --- | --- | --- |
-| 51 / 113 | 2 | CSR migration + safe refill completion + historical static dimensions | midpoint 51/113 (`11000f6c` / `3cd4ea75`) is **classified bad**; next midpoint 50/113 is constructing | Build and classify archived Linux at midpoint 50. |
+| 50 good / 51 bad | 0 in the first-bad interval; 62 later commits await repaired replay | CSR migration + safe refill completion + historical static dimensions | commit 51 (`00910cd4`) is the **exact first bad feature**; its broad D-cache replay queue clear was later removed by `78837f53` | Carry the replay-preservation repair forward and classify commits 52--113. |
 
 ## 2026-09-04 — feature replay restart
 
@@ -77,6 +77,8 @@ The feature sequence has 113 commits after the Linux-good `7331fbd0958` seed thr
 - **Midpoint 53 classified bad (good 49, bad 53; 4 remain):** routed candidate `ab7eee9b` / `07a43589` fit at 41,495 LUTs and 34 BRAM with WNS +3.130 ns and WHS +0.012 ns. Its hash-verified archived Linux run printed the complete OpenSBI report but no Linux banner before the clean 180-second limit; phase advances to **constructing midpoint 51/113**.
 
 - **Midpoint 51 classified bad (good 49, bad 51; 2 remain):** routed candidate `11000f6c` / `3cd4ea75` fit at 41,295 LUTs and 34 BRAM with WNS +3.502 ns and WHS +0.023 ns. Its hash-verified archived Linux run printed the complete OpenSBI report but no Linux banner before the clean 180-second limit; phase advances to **constructing midpoint 50/113**, which will identify whether commit 50 or 51 is first bad.
+
+- **First Linux regression isolated (good 50, bad 51; 0 remain in first interval):** routed midpoint 50 (`5e55b377` / `f6863917`) fit at 41,291 LUTs and 34 BRAM with WNS +2.290 ns and WHS +0.032 ns, then booted the exact archived Linux image through `/init`, rootfs checks, clean poweroff, and `CORE[0] PASS`. Commit `00910cd4` is therefore the exact first bad feature; phase advances to **repaired replay of commits 52--113** using the later-established `78837f53` queue-preservation correction.
 
 ## 2026-09-02 — current investigation
 
