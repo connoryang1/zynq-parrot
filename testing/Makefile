@@ -4,8 +4,13 @@ include $(TOP)/Makefile.env
 # Ensure LOG_DIR is a solid absolute path
 LOG_DIR := $(shell pwd)/logs
 
+# Preserve the simulator's exit status when concise run output is filtered.
+SHELL := /bin/bash
+.SHELLFLAGS := -o pipefail -c
+
 # Default NUM_THREADS if not specified on command line
 NUM_THREADS ?= 4
+NUM_CONTEXTS ?= $(NUM_THREADS)
 SCALE_SWITCHES ?= 128
 SCALE_WARMUP ?= 32
 SCALE_UNROLL ?= 4
@@ -18,7 +23,8 @@ CFLAGS = -O2 \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/dramfs.specs \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/perch.specs \
           -DNUM_THREADS=$(NUM_THREADS) \
-          -DBP_NUM_THREADS=$(NUM_THREADS)
+          -DBP_NUM_THREADS=$(NUM_THREADS) \
+          -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
@@ -53,6 +59,7 @@ DEMOS := \
     multithreading_demo
 
 EXPERIMENTAL_TESTS := \
+    mt_umode_nonresident_handoff_test \
     mt_ctxtsw_sv39_asid_remap_test
 
 SCALE_CONTEXTS := 8 16 32 64
@@ -76,7 +83,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
-	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
 endef
 

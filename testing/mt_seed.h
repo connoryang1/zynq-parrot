@@ -15,25 +15,29 @@
  *   bits [38+BP_TID_BITS+5 : 39+BP_TID_BITS] = register address (5-bit)
  *   bit  [39+BP_TID_BITS+5]        = fp_sel (1 = FP regfile, 0 = INT regfile)
  *
- * Set BP_NUM_THREADS before including this header (or pass -DBP_NUM_THREADS=N)
- * to match the RTL elaboration. Defaults to 4.
+ * Set BP_NUM_CONTEXTS before including this header (or pass
+ * -DBP_NUM_CONTEXTS=N) to match the logical-context RTL elaboration.
  */
 
 #ifndef BP_NUM_THREADS
 #define BP_NUM_THREADS 4
 #endif
 
-#if   BP_NUM_THREADS <= 2
+#ifndef BP_NUM_CONTEXTS
+#define BP_NUM_CONTEXTS BP_NUM_THREADS
+#endif
+
+#if   BP_NUM_CONTEXTS <= 2
 #  define BP_TID_BITS 1
-#elif BP_NUM_THREADS <= 4
+#elif BP_NUM_CONTEXTS <= 4
 #  define BP_TID_BITS 2
-#elif BP_NUM_THREADS <= 8
+#elif BP_NUM_CONTEXTS <= 8
 #  define BP_TID_BITS 3
-#elif BP_NUM_THREADS <= 16
+#elif BP_NUM_CONTEXTS <= 16
 #  define BP_TID_BITS 4
-#elif BP_NUM_THREADS <= 32
+#elif BP_NUM_CONTEXTS <= 32
 #  define BP_TID_BITS 5
-#elif BP_NUM_THREADS <= 64
+#elif BP_NUM_CONTEXTS <= 64
 #  define BP_TID_BITS 6
 #else
 #  error "BP_NUM_THREADS > 64 not supported"
