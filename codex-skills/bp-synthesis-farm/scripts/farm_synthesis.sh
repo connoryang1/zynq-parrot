@@ -11,12 +11,79 @@ usage:
   farm_synthesis.sh builders
   farm_synthesis.sh probe <bp1|bp2|bp3|all>
   farm_synthesis.sh link <top-worktree> <black-parrot-worktree>
+  BP_SYNTH_DECISION='...' BP_SYNTH_CHEAPER_GATES='...' \
+    BP_SYNTH_PASS_ACTION='...' BP_SYNTH_FAIL_ACTION='...' \
+    farm_synthesis.sh admit <builder> <label> <top-branch> <black-parrot-branch> <priority>
+  farm_synthesis.sh plan <builder> <label> <top-branch> <black-parrot-branch>
   farm_synthesis.sh launch <builder> <label> <top-branch> <black-parrot-branch> [workers]
   farm_synthesis.sh cancel <builder> <job-id> <remote-log-root>
   farm_synthesis.sh list <builder|all>
   farm_synthesis.sh status <builder> <job-id> <remote-log-root>
   farm_synthesis.sh collect <builder> <job-id> <remote-log-root> [destination]
 EOF
+}
+
+admission_path() {
+  local builder=$1
+  local label=$2
+  printf '%s/admissions/%s/%s.env\n' "$manifest_root" "$builder" "$label"
+}
+
+require_admission_text() {
+  local name=$1
+  local value=$2
+  if [[ -z $value || $value == *$'\n'* || $value == *$'\r'* ]]; then
+    echo "$name must be a non-empty single-line statement." >&2
+    return 2
+  fi
+}
+
+load_admission() {
+  local file=$1
+  admission_builder=
+  admission_label=
+  admission_top_branch=
+  admission_bp_branch=
+  admission_priority=
+  admission_decision=
+  admission_cheaper_gates=
+  admission_pass_action=
+  admission_fail_action=
+  admission_created_utc=
+  admission_launched_job=
+  # Admission files are generated locally by this script with shell-escaped values.
+  # shellcheck disable=SC1090
+  source "$file"
+  require_admission_text admission_decision "$admission_decision"
+  require_admission_text admission_cheaper_gates "$admission_cheaper_gates"
+  require_admission_text admission_pass_action "$admission_pass_action"
+  require_admission_text admission_fail_action "$admission_fail_action"
+  if [[ ! $admission_priority =~ ^[1-9][0-9]*$ ]]; then
+    echo "Admission priority must be a positive integer (1 is highest)." >&2
+    return 2
+  fi
+}
+
+print_admission() {
+  printf 'admission=%s\n' "$1"
+  printf 'candidate=%s/%s top=%s black_parrot=%s priority=%s\n' \
+    "$admission_builder" "$admission_label" "$admission_top_branch" \
+    "$admission_bp_branch" "$admission_priority"
+  printf 'decision=%s\ncheaper_gates_insufficient=%s\npass_next=%s\nfail_next=%s\n' \
+    "$admission_decision" "$admission_cheaper_gates" \
+    "$admission_pass_action" "$admission_fail_action"
+}
+
+require_admission_match() {
+  local builder=$1
+  local label=$2
+  local top_branch=$3
+  local bp_branch=$4
+  if [[ $admission_builder != "$builder" || $admission_label != "$label" \
+     || $admission_top_branch != "$top_branch" || $admission_bp_branch != "$bp_branch" ]]; then
+    echo "Admission does not match the requested builder, label, or branches." >&2
+    return 1
+  fi
 }
 
 builder_fields() {
@@ -83,6 +150,67 @@ case ${1:-} in
       "$(git -C "$bp_worktree" rev-parse --show-toplevel)" \
       "$bp_commit"
     ;;
+  admit)
+    builder=${2:?builder required}
+    label=${3:?label required}
+    top_branch=${4:?top branch required}
+    bp_branch=${5:?BlackParrot branch required}
+    priority=${6:?candidate priority required; use 1 for highest}
+    builder_fields "$builder" >/dev/null
+    if [[ ! $label =~ ^[A-Za-z0-9._-]+$ || ! $priority =~ ^[1-9][0-9]*$ ]]; then
+      echo "Label or priority is invalid; priority is a positive integer (1 is highest)." >&2
+      exit 2
+    fi
+    decision=${BP_SYNTH_DECISION:-}
+    cheaper_gates=${BP_SYNTH_CHEAPER_GATES:-}
+    pass_action=${BP_SYNTH_PASS_ACTION:-}
+    fail_action=${BP_SYNTH_FAIL_ACTION:-}
+    require_admission_text BP_SYNTH_DECISION "$decision"
+    require_admission_text BP_SYNTH_CHEAPER_GATES "$cheaper_gates"
+    require_admission_text BP_SYNTH_PASS_ACTION "$pass_action"
+    require_admission_text BP_SYNTH_FAIL_ACTION "$fail_action"
+    admission_file=$(admission_path "$builder" "$label")
+    if [[ -e $admission_file ]]; then
+      echo "Refusing to replace existing admission: $admission_file" >&2
+      echo "Use a new candidate label so every synthesis decision remains immutable." >&2
+      exit 1
+    fi
+    mkdir -p "$(dirname "$admission_file")"
+    {
+      printf 'admission_builder=%q\n' "$builder"
+      printf 'admission_label=%q\n' "$label"
+      printf 'admission_top_branch=%q\n' "$top_branch"
+      printf 'admission_bp_branch=%q\n' "$bp_branch"
+      printf 'admission_priority=%q\n' "$priority"
+      printf 'admission_decision=%q\n' "$decision"
+      printf 'admission_cheaper_gates=%q\n' "$cheaper_gates"
+      printf 'admission_pass_action=%q\n' "$pass_action"
+      printf 'admission_fail_action=%q\n' "$fail_action"
+      printf 'admission_created_utc=%q\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    } >"$admission_file"
+    load_admission "$admission_file"
+    print_admission "$admission_file"
+    ;;
+  plan)
+    builder=${2:?builder required}
+    label=${3:?label required}
+    top_branch=${4:?top branch required}
+    bp_branch=${5:?BlackParrot branch required}
+    builder_fields "$builder" >/dev/null
+    admission_file=$(admission_path "$builder" "$label")
+    if [[ ! -f $admission_file ]]; then
+      echo "No admission exists for $builder/$label." >&2
+      exit 1
+    fi
+    load_admission "$admission_file"
+    require_admission_match "$builder" "$label" "$top_branch" "$bp_branch"
+    print_admission "$admission_file"
+    if [[ -n $admission_launched_job ]]; then
+      printf 'state=launched job=%s\n' "$admission_launched_job"
+    else
+      printf 'state=admitted\n'
+    fi
+    ;;
   launch)
     builder=${2:?builder required}
     label=${3:?label required}
@@ -94,6 +222,22 @@ case ${1:-} in
       echo "Label or worker count is invalid." >&2
       exit 2
     fi
+    admission_file=$(admission_path "$builder" "$label")
+    if [[ ! -f $admission_file ]]; then
+      echo "Refusing unadmitted synthesis candidate: $builder/$label" >&2
+      echo "Run 'farm_synthesis.sh admit' with a decision and both outcome actions first." >&2
+      exit 1
+    fi
+    load_admission "$admission_file"
+    if ! require_admission_match "$builder" "$label" "$top_branch" "$bp_branch"; then
+      print_admission "$admission_file" >&2
+      exit 1
+    fi
+    if [[ -n $admission_launched_job ]]; then
+      echo "Admission was already consumed by job $admission_launched_job; use a new label." >&2
+      exit 1
+    fi
+    print_admission "$admission_file"
     mkdir -p "$manifest_root/$builder"
     output=$(ssh_builder "$builder" bash -s -- "$label" "$top_branch" "$bp_branch" "$workers" <<'REMOTE'
 set -euo pipefail
@@ -184,7 +328,14 @@ REMOTE
       printf 'remote_log_root=%q\n' "$log_root"
       printf 'remote_source_dir=%q\n' "$source_dir"
       printf 'workers=%q\n' "$workers"
+      printf 'admission_file=%q\n' "$admission_file"
+      printf 'candidate_priority=%q\n' "$admission_priority"
+      printf 'decision=%q\n' "$admission_decision"
+      printf 'cheaper_gates_insufficient=%q\n' "$admission_cheaper_gates"
+      printf 'pass_next=%q\n' "$admission_pass_action"
+      printf 'fail_next=%q\n' "$admission_fail_action"
     } >"$manifest"
+    printf 'admission_launched_job=%q\n' "$job_id" >>"$admission_file"
     printf 'manifest=%s\n' "$manifest"
     ;;
   cancel)

@@ -58,12 +58,35 @@ The command refuses to overwrite an already modified gitlink and verifies the
 exact indexed object. Review and commit the staged gitlink from the top-level
 worktree before launching the build.
 
-Launch with pushed branch names so the remote can fetch and independently
-resolve both commits:
+First admit the candidate. An admission is an immutable local record keyed to
+the builder, label, and both pushed branches. Priority is numeric with `1` as
+the highest priority; use a distinct label if the hypothesis changes:
+
+```bash
+BP_SYNTH_DECISION='Does the FE completion wait fix Linux handoff while retaining fit?' \
+BP_SYNTH_CHEAPER_GATES='The local reproducer fails before and passes after, but cannot prove routed timing or board behavior.' \
+BP_SYNTH_PASS_ACTION='Run the minimal Linux handoff probe, then reuse this image for the full Linux test and benchmark.' \
+BP_SYNTH_FAIL_ACTION='Do not route variants; inspect the failed fit/timing report or return to the FE handshake trace.' \
+  codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh admit \
+    bp2 fe-completion-wait top-branch black-parrot-branch 1
+```
+
+Each field must be a non-empty single-line statement. The controller refuses
+to replace or reuse an admission, so the resulting evidence cannot silently be
+retargeted to another branch or candidate. It also prints the complete plan
+before any remote work begins. Review it without contacting a builder with:
+
+```bash
+codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh plan \
+  bp2 fe-completion-wait top-branch black-parrot-branch
+```
+
+After admission, launch with the same builder, label, and pushed branch names
+so the remote can fetch and independently resolve both commits:
 
 ```bash
 codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh launch \
-  bp2 candidate-name top-branch black-parrot-branch
+  bp2 fe-completion-wait top-branch black-parrot-branch
 ```
 
 The controller verifies that the BlackParrot gitlink in the top revision equals
@@ -102,10 +125,11 @@ the current good/bad boundary and record only meaningful classifications in
 
 ## Build Admission
 
-Do not occupy a builder merely because it is idle. Before launch, state the
-single decision the result will make, both possible outcomes, and why neither
-an existing artifact nor a cheaper local gate answers it. Prefer the nearest
-untested boundary candidate; allow at most one conditional follow-up build in
-parallel when it isolates a specific line-level hypothesis and will be useful
-under either outcome of the boundary test. Archive completed later checkpoints
-without spending board time on them until all earlier changes are classified.
+Do not occupy a builder merely because it is idle. The required admission must
+state the single decision the result will make, why neither an existing artifact
+nor a cheaper local gate answers it, and the next action for both pass and fail.
+Prefer the nearest untested boundary candidate. Admit at most one conditional
+follow-up build in parallel, and only when it isolates a specific line-level
+hypothesis and remains useful under either result of the boundary test. Archive
+completed later checkpoints without spending board time on them until all
+earlier changes are classified.
