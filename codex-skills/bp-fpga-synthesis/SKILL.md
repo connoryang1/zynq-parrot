@@ -80,6 +80,13 @@ For an interactive variant of the maintained Linux regression NBF, use
 embedded bootargs to `rdinit=/bin/sh` and emits aligned 8-byte NBF writes; do not use the legacy
 byte or halfword NBF writes for this patch.
 
+For a real interactive Linux console, install the unprivileged serialization helper once with
+`scripts/install_pynq_interactive_runner.sh <ssh-host>`, then run
+`PYNQ_CONTROL_PROGRAM_SHA256=<reviewed-sha> scripts/run_pynq_interactive.sh <ssh-host> <linux-shell.nbf>`
+from a PTY. This retains the same board lock, exact NBF/runner hash checks, fixed checkout path,
+bounded target runtime, and persistent transcript as automated runs while allowing typed guest
+input. Never fall back to a direct `sudo ./control-program` session merely to gain stdin.
+
 ## Iteration Modes
 
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,
