@@ -34,8 +34,9 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched resident/nonresident ring spacing using global cycles |
+| `mt_pointer_compute_benchmark` | Equal-work sequential, single-thread fused, and resident-switched pointer traversal plus arithmetic |
 
-These 13 programs retain distinct state, hazard, and redirect regressions.
+These programs retain distinct state, hazard, redirect, and workload comparisons.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 `make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set;
@@ -57,6 +58,53 @@ teardown prints `BSG PASS`. The known GPIO teardown assertion after guest PASS
 must be reported separately.
 
 ## Scope and interpretation
+
+### Equal-work pointer traversal and computation
+
+```sh
+make -C testing clean
+BSG_TRACE_TIMEOUT_S=600 make -C testing run-mt_pointer_compute_benchmark \
+  NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12
+```
+
+Reuse an already verified, unchanged traced model; otherwise clean/rebuild the
+model first as above. Each measured trial performs 64 dependent pointer loads
+with an order-sensitive digest and 512 independent xorshift rounds. Modes are
+0 (separate sequential loops), 1 (single-thread fused load/compute/consume), and
+2 (load/switch/compute/switch/consume using resident contexts 0 and 1).
+
+Data case 0 is an eight-node, 512-byte hot ring. Case 1 deliberately uses 128
+nodes spaced 512 bytes apart: an 8 KiB cache-line footprint within a 64 KiB span,
+competing for eight D-cache sets. This is synthetic conflict pressure, not a
+claim that uniformly distributed 8 KiB data exceeds the 32 KiB D-cache. Every
+trial receives a full untimed ring pass after context setup; trial order is
+0,1,2,2,1,0 to expose order effects. Instruction paths are warmed first.
+
+Timing uses physical CSR `0xCC0`, includes loop/call/switch overhead, and ends
+after both useful computations finish; setup, preconditioning, final result
+collection, and output are excluded. Both digests must match in every trial.
+Compare raw total cycles and observed misses, not just switching overhead.
+The fused control matters: gains over separate loops alone do not demonstrate
+an advantage over compiler/programmer-managed same-thread overlap. No prefetch
+opcode, OS scheduling, nonresident eviction, or realistic-application claim is
+part of this benchmark.
+
+Initial verified simulation results (two reversed-order trials, unchanged RTL
+`1b9e611d4`, two resident/four logical contexts):
+
+| Total cycles for 64 walk steps + 512 mix rounds | Sequential | Fused single thread | Resident switching |
+| --- | ---: | ---: | ---: |
+| Cache-hot | 3,748 | 3,615 | 4,370–4,374 |
+| Sparse cache pressure | 6,864 | 3,885 | 4,971–4,977 |
+
+Both digests pass for all trials. Traces show zero timed ring misses in the hot
+case and exactly 64 in every pressure trial: requested data arrives 11 cycles
+after miss acceptance, full refill finishes at 53. Resident computation overlaps
+all 64 full refills, but not their earlier critical-word arrivals; the sequential
+case overlaps only its final refill with computation. Thus resident switching
+improves this synthetic case by 1.38× over separate loops, but loses to explicit
+single-thread fusion and is slower on hot data. This is not an FPGA/Linux or
+DRAM-latency measurement. Evidence: `logs/pointer-compute-benchmark-20260906/`.
 
 ### Ordinary-load overlap probe
 
@@ -83,6 +131,18 @@ as well: speculative switch requests or late register writeback alone do not
 prove memory-latency hiding. Distinguish initial long misses from short later
 misses, which may finish before target execution. Nonresident bank replacement
 has an additional drain requirement and is not validated by this probe.
+
+For faster extraction of the same events from a closed FST, use:
+
+```sh
+python3 tools/load_switch_fst_events.py path/to/archived/dump.fst \
+  --pc <load-PC> --pc <target-PC>
+```
+
+This masks unrelated signals before decoding and reuses the same event parser.
+The first invocation builds a small helper against the installed Verilator
+FST library using GCC/G++ and zlib; subsequent invocations reuse an ignored,
+locked build cache. Its events were byte-compared against full `fst2vcd` output.
 
 A nonresident result requires `NUM_CONTEXTS > NUM_THREADS`; default all-resident
 topologies do not test SRAM eviction. The benchmark reports amortized
