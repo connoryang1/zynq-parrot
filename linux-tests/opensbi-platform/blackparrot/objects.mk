@@ -28,7 +28,7 @@ platform-ldflags-y = $(PLATFORM_ADDITIONAL_LDFLAGS)
 #
 PLATFORM_RISCV_XLEN = 64
 PLATFORM_RISCV_ABI = lp64d
-PLATFORM_RISCV_ISA = rv64imafdc
+PLATFORM_RISCV_ISA = rv64imafdc_zicsr_zifencei
 PLATFORM_RISCV_CODE_MODEL = medany
 
 # Space separated list of object file names to be compiled for the platform

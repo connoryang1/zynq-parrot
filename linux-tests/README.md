@@ -52,8 +52,10 @@ independent of another user's home directory.
 
 If that full build finishes the kernel but stops later because of a packaging
 or host-tool problem, `tiny-init-linux-image-resume` continues from the
-prepared work tree.  It is a recovery target, not a substitute for the clean
-acceptance build.
+prepared work tree. It re-stages the current tiny ELF before rebuilding the
+rootfs, kernel payload, and NBF, so an application edit cannot silently reuse
+an older embedded executable. It is a recovery target, not a substitute for
+the clean acceptance build.
 
 The older `linux-image` target remains available for a libc/BusyBox integration
 test, but it is not the acceptance path because rcS and sysctl have shown
