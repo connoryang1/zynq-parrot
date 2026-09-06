@@ -26,11 +26,11 @@ static uint64_t t1_stack[STACK_WORDS];
 void __attribute__((naked, noinline, noreturn)) t1_entry(void);
 
 static inline void write_ctxt_1(void) {
-  __asm__ volatile("csrwi 0x081, 1");
+  __asm__ volatile("csrwi 0x800, 1");
 }
 
 static inline void write_ctxt_0(void) {
-  __asm__ volatile("csrwi 0x081, 0");
+  __asm__ volatile("csrwi 0x800, 0");
 }
 
 static inline void restore_gp(void) {
@@ -98,7 +98,7 @@ static inline void seed_t0_abi_regs(uint64_t vals[13]) {
 
 void __attribute__((naked, noinline, noreturn)) t1_entry(void) {
   __asm__ volatile(
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j 1b\n"
   );

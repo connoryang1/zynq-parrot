@@ -13,7 +13,7 @@
  *   4. T1: read f1 — must not be T0's sentinel
  *   5. T1: write SENTINEL_T1 to f1
  *   6. T1: read back f1 and verify write took effect
- *   7. T1: switch back to T0 (csrw 0x081, 0)
+ *   7. T1: switch back to T0 (csrw 0x800, 0)
  *   8. T0: read f1 — must still be SENTINEL_T0 (not corrupted by T1)
  *
  * Before FP regfile isolation: T0 would see SENTINEL_T1 → FAIL
@@ -47,7 +47,7 @@ static inline uint64_t read_f1(void) {
 
 /* ── CSR helpers ── */
 static inline void write_ctxt(uint64_t v) {
-  __asm__ volatile("csrw 0x081, %0" : : "r"(v));
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v));
 }
 
 /* ── Thread 1 entry ── */

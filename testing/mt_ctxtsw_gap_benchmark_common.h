@@ -21,15 +21,15 @@ static uint64_t t3_stack[STACK_WORDS];
 void __attribute__((naked, noinline, noreturn)) t_ping(void);
 
 static inline void write_ctxt_1(void) {
-  __asm__ volatile("csrwi 0x081, 1" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 1" ::: "memory");
 }
 
 static inline void write_ctxt_2(void) {
-  __asm__ volatile("csrwi 0x081, 2" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 2" ::: "memory");
 }
 
 static inline void write_ctxt_3(void) {
-  __asm__ volatile("csrwi 0x081, 3" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 3" ::: "memory");
 }
 
 static inline uint64_t read_cycle(void) {
@@ -96,7 +96,7 @@ static inline void seed_thread_to_ping(uint64_t tid, uint64_t *stack_top) {
 
 void __attribute__((naked, noinline, noreturn)) t_ping(void) {
   __asm__ volatile(
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j    1b\n"
   );

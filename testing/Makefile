@@ -84,7 +84,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
 	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
-	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]|BSG FAIL" $$(SIM_DIR)/run.log
+	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]|BSG FAIL|trace timeout reached" $$(SIM_DIR)/run.log
 	@if grep -Eq "Assertion failed|%Error:|Aborting" $$(SIM_DIR)/run.log \
 		&& ! { grep -q "BSG PASS" $$(SIM_DIR)/run.log \
 		       && grep -q "final block executed before fini() was called" $$(SIM_DIR)/run.log; }; then \

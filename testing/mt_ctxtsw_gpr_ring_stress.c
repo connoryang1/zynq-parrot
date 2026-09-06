@@ -32,7 +32,7 @@ uint64_t saved_s_regs[4];
 
 void __attribute__((naked, noinline, noreturn)) t1_stub(void) {
   __asm__ volatile(
-    "csrwi 0x081, 2\n"
+    "csrwi 0x800, 2\n"
     "1:\n"
     "j 1b\n"
   );
@@ -40,7 +40,7 @@ void __attribute__((naked, noinline, noreturn)) t1_stub(void) {
 
 void __attribute__((naked, noinline, noreturn)) t2_stub(void) {
   __asm__ volatile(
-    "csrwi 0x081, 3\n"
+    "csrwi 0x800, 3\n"
     "1:\n"
     "j 1b\n"
   );
@@ -48,7 +48,7 @@ void __attribute__((naked, noinline, noreturn)) t2_stub(void) {
 
 void __attribute__((naked, noinline, noreturn)) t3_stub(void) {
   __asm__ volatile(
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j 1b\n"
   );
@@ -72,7 +72,7 @@ void __attribute__((naked, noinline)) gpr_ring_roundtrip(void) {
     "li   s3, 0xddddeeeeffff0001\n"
 
     /* Drive the ring: T0 -> T1 -> T2 -> T3 -> T0 */
-    "csrwi 0x081, 1\n"
+    "csrwi 0x800, 1\n"
 
     /* T0 resumes here; store observed values to memory */
     "la   t0, observed_a4\n"  "sd   a4, 0(t0)\n"

@@ -3,10 +3,10 @@
  *
  * Phase 1.4: Hardware Context Switching Demo
  *
- * Tests CSR 0x081 (CTXT) and CSR 0x082 (CTXT_NPC bootstrap).
+ * Tests CSR 0x800 (CTXT) and CSR 0x801 (CTXT_NPC bootstrap).
  *
- * Each thread is seeded with its own entry point via CSR 0x082, then
- * activated via CSR 0x081. Each thread runs compute_sum() + compute_fibonacci(),
+ * Each thread is seeded with its own entry point via CSR 0x801, then
+ * activated via CSR 0x800. Each thread runs compute_sum() + compute_fibonacci(),
  * stores its results, then switches back to thread 0.
  *
  * Expected results:
@@ -22,7 +22,7 @@
 /* Inline CSR accessors */
 static inline uint64_t read_ctxt(void) {
   uint64_t val;
-  __asm__ volatile("csrr %0, 0x081" : "=r"(val) : :);
+  __asm__ volatile("csrr %0, 0x800" : "=r"(val) : :);
   return val;
 }
 
@@ -32,7 +32,7 @@ static inline void write_ctxt(uint64_t val) {
   // bp_print_string("] Writing CTXT = ");
   // bp_hprint_uint64(val);
   // bp_print_string("\n");
-  __asm__ volatile("csrw 0x081, %0" : : "r"(val) :);
+  __asm__ volatile("csrw 0x800, %0" : : "r"(val) :);
   // bp_print_string("[T");
   // bp_hprint_uint64(read_ctxt());
   // bp_print_string("] After writing CTXT to ");
@@ -42,7 +42,7 @@ static inline void write_ctxt(uint64_t val) {
   // bp_print_string("\n");
 }
 
-/* CSR 0x082: seed a thread's entry NPC.
+/* CSR 0x801: seed a thread's entry NPC.
  * RTL: ctx_npc_write_tid_o = csr_data_li[vaddr_width_p +: thread_id_width_p]
  *      ctx_npc_write_npc_o = csr_data_li[0 +: vaddr_width_p]
  * With vaddr_width_p=39, thread_id_width_p=2:
@@ -51,14 +51,14 @@ static inline void write_ctxt(uint64_t val) {
 static inline void seed_thread_npc(uint64_t thread_id, uint64_t npc) {
   uint64_t val = ((thread_id & 0x3) << 39) | (npc & 0x7FFFFFFFFFULL);
 
-  // bp_print_string("Writing to CSR 0x082: ");
+  // bp_print_string("Writing to CSR 0x801: ");
   // bp_hprint_uint64(val);
   // bp_print_string("\n");
 
-  __asm__ volatile("csrw 0x082, %0" : : "r"(val) :);
+  __asm__ volatile("csrw 0x801, %0" : : "r"(val) :);
 }
 
-/* CSR 0x083: rpush — write an arbitrary register of a disabled thread.
+/* CSR 0x802: rpush — write an arbitrary register of a disabled thread.
  * Encoding (vaddr_width_p=39, thread_id_width_p=2, reg_addr_width_gp=5):
  *   bits [38:0]  = value (39-bit)
  *   bits [40:39] = thread_id
@@ -69,7 +69,7 @@ static inline void seed_thread_reg(uint64_t thread_id, uint64_t reg_addr, uint64
   uint64_t val = (value & 0x7FFFFFFFFFULL)
                | ((thread_id & 0x3ULL) << 39)
                | ((reg_addr & 0x1FULL) << 41);
-  __asm__ volatile("csrw 0x083, %0" : : "r"(val) :);
+  __asm__ volatile("csrw 0x802, %0" : : "r"(val) :);
 }
 
 /* Static stacks for threads 1, 2, 3 (4KB each).
@@ -123,7 +123,7 @@ static uint64_t compute_fibonacci(uint64_t n) {
 /* Thread entry points for threads 1, 2, 3.
  * Each thread does its work, stores results, and switches back to thread 0.
  * Thread 0's NPC is already saved in context_storage from when it did
- * the csrw 0x081 to launch us — so switching back to 0 resumes thread 0
+ * the csrw 0x800 to launch us — so switching back to 0 resumes thread 0
  * at the instruction after the csrw.
  */
 void __attribute__((noinline)) thread1_entry(void) {
@@ -166,7 +166,7 @@ static inline uint64_t read_cycle(void) {
 
 uint64_t read_npc(void) {
   uint64_t npc;
-  __asm__ volatile("csrr %0, 0x082" : "=r"(npc) : :);
+  __asm__ volatile("csrr %0, 0x801" : "=r"(npc) : :);
   return npc;
 }
 
@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
   // }
 
   bp_print_string("=== BlackParrot Phase 1.4 Context Switching Demo ===\n");
-  bp_print_string("Testing CSR 0x081 (CTXT) + CSR 0x082 (NPC bootstrap)\n\n");
+  bp_print_string("Testing CSR 0x800 (CTXT) + CSR 0x801 (NPC bootstrap)\n\n");
 
   /* Ensure we start on thread 0 */
   write_ctxt(0);
@@ -199,8 +199,8 @@ int main(int argc, char** argv) {
   uint64_t begin = read_cycle();
 
   /* Seed and launch threads 1, 2, 3 one at a time.
-   * After each csrw 0x081, hardware redirects to that thread's entry.
-   * That thread does work and returns via csrw 0x081, 0 — which resumes
+   * After each csrw 0x800, hardware redirects to that thread's entry.
+   * That thread does work and returns via csrw 0x800, 0 — which resumes
    * thread 0 at the instruction after the csrw below. */
 
   // bp_print_string("Seeding and launching thread 1...\n");

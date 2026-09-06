@@ -17,14 +17,14 @@ static uint64_t t3_stack[STACK_WORDS];
 
 void __attribute__((naked, noinline, noreturn, aligned(64))) t1_ring(void) {
   __asm__ volatile(
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
-    "csrwi 0x081, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
+    "csrwi 0x800, 2\n"
     "1:\n"
     "j 1b\n"
   );
@@ -32,14 +32,14 @@ void __attribute__((naked, noinline, noreturn, aligned(64))) t1_ring(void) {
 
 void __attribute__((naked, noinline, noreturn, aligned(64))) t2_ring(void) {
   __asm__ volatile(
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
-    "csrwi 0x081, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
+    "csrwi 0x800, 3\n"
     "1:\n"
     "j 1b\n"
   );
@@ -47,14 +47,14 @@ void __attribute__((naked, noinline, noreturn, aligned(64))) t2_ring(void) {
 
 void __attribute__((naked, noinline, noreturn, aligned(64))) t3_ring(void) {
   __asm__ volatile(
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j 1b\n"
   );
@@ -69,14 +69,14 @@ int main(void) {
   seed_thread(3, &t3_stack[STACK_WORDS], (uint64_t)t3_ring);
 
   __asm__ volatile(
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
-    "csrwi 0x081, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
+    "csrwi 0x800, 1\n"
   );
 
   bp_print_string("[BSG-PASS] pure ctxtsw ring stress completed\n");

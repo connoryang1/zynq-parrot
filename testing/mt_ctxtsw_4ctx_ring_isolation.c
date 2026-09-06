@@ -55,7 +55,7 @@ void __attribute__((naked, noinline, noreturn)) t1_entry(void) {
     "sd    t0, 0(t1)\n"
     "fence\n"                        /* drain store before switch to non-T0 */
     /* switch to T2 */
-    "csrwi 0x081, 2\n"
+    "csrwi 0x800, 2\n"
     "1:\n"
     "j     1b\n"
   );
@@ -77,7 +77,7 @@ void __attribute__((naked, noinline, noreturn)) t2_entry(void) {
     "la    t1, t2_written\n"
     "sd    t0, 0(t1)\n"
     "fence\n"
-    "csrwi 0x081, 3\n"
+    "csrwi 0x800, 3\n"
     "1:\n"
     "j     1b\n"
   );
@@ -100,7 +100,7 @@ void __attribute__((naked, noinline, noreturn)) t3_entry(void) {
     "sd    t0, 0(t1)\n"
     "fence\n"
     /* switch back to T0 */
-    "csrwi 0x081, 0\n"
+    "csrwi 0x800, 0\n"
     "1:\n"
     "j     1b\n"
   );
@@ -139,7 +139,7 @@ int main(void) {
    * ordering instead of CSR/thread isolation.
    */
   write_mscratch(SENTINEL_T0);
-  __asm__ volatile("csrwi 0x081, 1" ::: "memory");
+  __asm__ volatile("csrwi 0x800, 1" ::: "memory");
   /* T0 resumes here after T3 switches back */
 
   restore_gp();

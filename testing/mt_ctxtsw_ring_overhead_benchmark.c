@@ -63,7 +63,7 @@ static void __attribute__((noinline, aligned(8))) t0_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP64("csrwi 0x081, 1\n")
+    REP64("csrwi 0x800, 1\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -77,7 +77,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t1_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP64("csrwi 0x081, 2\n")
+    REP64("csrwi 0x800, 2\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -94,7 +94,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t2_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP64("csrwi 0x081, 3\n")
+    REP64("csrwi 0x800, 3\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
@@ -111,7 +111,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t3_ring(void) {
     ".option norvc\n"
     "li t0, " STR(LOOP_ITERS) "\n"
     "1:\n"
-    REP64("csrwi 0x081, 0\n")
+    REP64("csrwi 0x800, 0\n")
     "addi t0, t0, -1\n"
     "bnez t0, 1b\n"
     ".option pop\n"
