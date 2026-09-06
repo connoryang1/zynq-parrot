@@ -7,6 +7,7 @@ BP_LINUX_CC ?= riscv64-unknown-linux-gnu-gcc
 BP_LINUX_CC_PATH := $(shell command -v $(BP_LINUX_CC) 2>/dev/null)
 BP_LINUX_PREFIX ?= $(patsubst %gcc,%,$(BP_LINUX_CC_PATH))
 BP_LINUX_TOOLCHAIN_BIN ?= $(dir $(BP_LINUX_CC_PATH))
+BP_LINUX_TARGET ?= $(patsubst %-gcc,%,$(notdir $(BP_LINUX_CC_PATH)))
 BP_OBJCOPY ?= $(TOP)/install/bin/riscv64-unknown-elf-objcopy
 BP_DTS_PYTHON ?= python3
 BP_CPIO ?= cpio
@@ -29,6 +30,7 @@ KERNEL_INITRAMFS := $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6/usr/initramf
 VMLINUX_BIN := $(SDK_LINUX_DIR)/work/buildroot/images/vmlinux.bin
 OPENSBI_PAYLOAD := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/firmware/fw_payload.elf
 TINY_BOOTARGS := console=hvc0 loglevel=8 rdinit=/ctxtsw_user_tiny
+TINY_TARGET_SYSCALL ?= 1
 
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
@@ -50,6 +52,7 @@ $(TINY_APP): ctxtsw_user_tiny.c
 	@mkdir -p $(OUT)
 	$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
 	  -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
+	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) \
 	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $<
 
 # Print a self-contained command suitable for an interactive BusyBox shell.
@@ -119,7 +122,8 @@ linux-image: check-image-toolchain stage-opensbi-platform
 	$(MAKE) -C $(SDK_LINUX_DIR) clean_sysroot
 	$(MAKE) -C $(SDK_LINUX_DIR) sysroot WITH_SHELL=$(INIT_SCRIPT)
 	$(MAKE) stage-rootfs
-	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL=$(INIT_SCRIPT)
+	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL=$(INIT_SCRIPT) \
+	  LINUX_TARGET=$(BP_LINUX_TARGET)
 	@mkdir -p $(OUT)
 	$(BP_OBJCOPY) -O verilog $(LINUX_RISCV) $(OUT)/linux-ctxtsw-user-smoke.mem
 	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-user-smoke.mem
@@ -142,6 +146,7 @@ tiny-init-linux-image: check-image-toolchain tiny stage-opensbi-platform
 	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
 	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
+	  LINUX_TARGET=$(BP_LINUX_TARGET) \
 	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS)
 	$(MAKE) package-tiny-init-nbf
 
@@ -152,13 +157,12 @@ tiny-init-linux-image-resume: check-image-toolchain tiny stage-opensbi-platform
 	@test -d $(SDK_LINUX_DIR)/work/buildroot || { \
 	  echo "missing prepared Buildroot work tree; run tiny-init-linux-image" >&2; exit 2; \
 	}
-	@test -x $(SDK_LINUX_DIR)/work/sysroot/ctxtsw_user_tiny || { \
-	  echo "missing staged PID-1 executable; run tiny-init-linux-image" >&2; exit 2; \
-	}
+	install -D -m 0755 $(TINY_APP) $(SDK_LINUX_DIR)/work/sysroot/ctxtsw_user_tiny
 	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
 	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
 	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
+	  LINUX_TARGET=$(BP_LINUX_TARGET) \
 	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS)
 	$(MAKE) package-tiny-init-nbf
 

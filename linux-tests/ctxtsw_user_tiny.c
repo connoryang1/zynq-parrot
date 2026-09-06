@@ -22,6 +22,10 @@ typedef long s64;
 #define BP_TARGET_S11_IN  0x000000002468ace0UL
 #define BP_TARGET_S11_OUT 0x0000000031415926UL
 
+#ifndef BP_TARGET_SYSCALL
+#define BP_TARGET_SYSCALL 1
+#endif
+
 /* The target context writes all fields before returning.  Requiring both
  * target-owned control-flow evidence and independently seeded GPR state
  * prevents a redirect-only implementation from being mistaken for a full
@@ -110,11 +114,13 @@ static inline u64 read_s11(void)
 static __attribute__((naked, noinline, noreturn, used)) void context2_return(void)
 {
   __asm__ volatile (
+#if BP_TARGET_SYSCALL
     "li a0, 1\n\t"
     "lla a1, target_entered\n\t"
     "li a2, 41\n\t"
     "li a7, 64\n\t"
     "ecall\n\t"
+#endif
     "lla t0, target_result\n\t"
     "li t1, 0x4354585452475432\n\t"
     "sd t1, 0(t0)\n\t"
