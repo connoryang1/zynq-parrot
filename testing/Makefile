@@ -38,6 +38,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_scan_early_stop_benchmark \
     mt_independent_requests_benchmark \
     mt_pointer_compute_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark

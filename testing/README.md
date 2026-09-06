@@ -36,6 +36,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched resident/nonresident ring spacing using global cycles |
 | `mt_pointer_compute_benchmark` | Equal-work sequential, single-thread fused, and resident-switched pointer traversal plus arithmetic |
 | `mt_independent_requests_benchmark` | Two independent pointer chains: sequential, manually batched loads, and resident load/yield/consume handlers |
+| `mt_scan_early_stop_benchmark` | Matched buffered scans: iterator, software coroutine, and resident/nonresident hardware coroutines across batch sizes |
 
 These programs retain distinct state, hazard, redirect, and workload comparisons.
 The two Sv39 handoff variants include the base handoff source, keeping the
@@ -59,6 +60,64 @@ teardown prints `BSG PASS`. The known GPIO teardown assertion after guest PASS
 must be reported separately.
 
 ## Scope and interpretation
+
+### Minimal scan with early stopping
+
+```sh
+make -C testing clean
+BSG_TRACE_TIMEOUT_S=900 make -C testing run-mt_scan_early_stop_benchmark \
+  NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12
+```
+
+The test binary-searches a sorted array of 512 key/value records, then scans
+until three values satisfy `(value & 3) == 0` or the requested range ends.
+Eight fixed requests include empty/end-of-index and one-record boundaries.
+Batches of 1, 4, 16, and 100 trade fewer handoffs against records fetched but
+never consumed. An independent unbatched oracle checks sums, consumed records,
+fetched records, and batch counts in every warmup and measured run.
+
+Modes are 0=explicit iterator, 1=integer software coroutine, 2=resident hardware
+coroutine (0/1), and 3=nonresident hardware coroutine (0/2). All use the same
+batch-filling function and volatile transfer buffer; the coroutine modes also
+share the producer. The software switch saves only integer ABI state
+(`ra`, `sp`, `s0`–`s11`), not all architectural registers. It is a benchmark-local
+integer-only helper, not a general FP-capable coroutine library.
+
+Timing uses global CSR `0xCC0` and includes binary searches, batch production,
+consumption, counters, and both directions of every handoff. Seeding/priming and
+printing are outside timing; each batch size warms all modes before forward and
+reverse measured orders. `[SCAN]` rows contain hexadecimal batch, mode,
+the two cycle totals for all eight queries, consumed records, fetched records,
+and batch count (one row per batch/mode).
+
+Hardware handoffs use the accepted immediate-target `csrwi` form. The initial
+register-target version exposed stale target selection and stalled; its closed
+trace and source are retained in `logs/scan-early-stop-20260906/first-pass/`.
+That is a separate unresolved RTL issue, not a validated register-target API.
+
+This is a matched buffered-interface screening test, not full YCSB E, a B+ tree,
+Linux/FUSE, protected IPC, or memory/I/O overlap. Keys are selected uniformly,
+there are no inserts, and the producer retains only an array position. A direct
+iterator or fused consumer could avoid this buffer and overfetch entirely;
+do not infer a general database advantage from beating the software coroutine.
+
+Traced simulation, 2026-09-06: all 48 warmup/measured checks pass; every printed
+interval matches the waveform, including two switches per coroutine batch and
+two SRAM-line installations per nonresident restore. Best of two warmed runs,
+in total cycles for eight queries (all consume the same 64 records):
+
+| Batch | Fetched records | Buffered iterator | Software coroutine | Resident HW | Nonresident HW |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 64 | 4,977 | 10,293 | 7,640 | 8,390 |
+| 4 | 69 | 3,962 | 5,719 | 4,817 | 5,074 |
+| 16 | 77 | 3,708 | 4,470 | 4,047 | 4,155 |
+| 100 | 165 | 4,763 | 5,438 | 5,048 | 5,148 |
+
+Batch 16 wins for every backend despite some overfetch. At those best settings,
+resident/nonresident hardware use about 9%/7% fewer cycles than software
+coroutines, but the iterator wins overall. This small sample supports cheaper
+coroutine handoffs, not a general database throughput advantage. Evidence:
+`logs/scan-early-stop-20260906/verified/`; no FPGA/Linux workload result claimed.
 
 ### Independent memory-bound requests
 
