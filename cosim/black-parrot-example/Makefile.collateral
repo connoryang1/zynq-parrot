@@ -44,9 +44,9 @@ prog.riscv:
 	@$(SED) -i "s/@8/@0/g" $@
 
 BP_NBF_SCRIPT ?= $(BP_RTL_DIR)/bp_common/software/py/nbf.py
+BP_NBF_FLAGS ?= --config --debug
 %.nbf: %.mem
 	@$(PYTHON) $(BP_NBF_SCRIPT) \
-		--skip_zeros --mem $*.mem --ncpus $(BP_NCPUS) > $@
+		--skip_zeros $(BP_NBF_FLAGS) --mem $*.mem --ncpus $(BP_NCPUS) > $@
 
 RUN_COLLATERAL = $(NBF_FILE)
-
