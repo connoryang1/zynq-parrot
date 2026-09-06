@@ -24,8 +24,10 @@ Each removed worktree has:
 
 Archives do not follow symlinks into shared installations. The cleanup helper
 compares the archive against the original before permitting `git worktree remove`.
-Branches are retained, including accepted `linux-user-handoff-fix`; removal of a
-worktree is not deletion of its commits. These archives and tags are local backups,
+Removing worktrees did not delete their commits. Subsequent branch cleanup
+replaced obsolete local branch names (including `linux-user-handoff-fix`) with
+exact-tip tags under `archive/branches-20260906/`; published remote branches
+remain intact. These directory archives and worktree tags are local backups,
 not automatically uploaded to GitHub.
 
 ## Inspect or recover

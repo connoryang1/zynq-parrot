@@ -2,7 +2,7 @@ This file identifies the supported BlackParrot checkout and explains the older e
 
 # Canonical checkout
 
-Use `/home/coyang/zynq-parrot` for development and its `import/black-parrot` directory for RTL. Both repositories use branch `consolidated-linux-context-switch`; the RTL is exactly `25089713baa090aba719ec0f18f82ff9214d5f0d`, not the old `linux-satp-mode-filter` checkout.
+Use `/home/coyang/zynq-parrot` for development and its `import/black-parrot` directory for RTL. Top-level `master` contains the stable integration; start new work on a dedicated branch. The published `consolidated-linux-context-switch` branch preserves the detailed development history. The RTL gitlink is `5d5646ff9` (documentation only over FPGA-accepted `25089713baa090aba719ec0f18f82ff9214d5f0d`), not the old `linux-satp-mode-filter` checkout. Do not switch the submodule to its divergent `master`; see [HISTORY.md](HISTORY.md).
 
 The RTL-facing configuration and active test suite come from accepted top-level checkpoint `57bcd994`. Its RTL matches routed checkpoint `032420c3`; subsequent changes packaged the acceptance tests. The coordinator's host runtime limits, owned-DRAM handling, native command-line arguments, configuration stamps, farm controls, skills, Linux-image tooling, and investigation records are retained rather than replaced by older copies. The FPGA validation ladder now requires explicit test selection; stale or unsupported default FP-copy tests are no longer selected automatically.
 
@@ -18,10 +18,10 @@ For a traced local translated handoff gate, run cleanup to completion before sta
 ```bash
 make -C testing clean
 make -C cosim/black-parrot-minimal-example/verilator clean
-make -C testing -j12 run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1
+make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12
 ```
 
-Archive existing logs/waveforms before cleanup. Run tests serially; `-j12` parallelizes compilation, not access to the shared simulator outputs. See [linux-tests/README.md](linux-tests/README.md) for the Linux C demonstration and image builder.
+Archive existing logs/waveforms before cleanup. Run tests serially; the inner build-job setting parallelizes compilation, not access to shared simulator outputs. See [linux-tests/README.md](linux-tests/README.md) for the Linux C demonstration and image builder.
 
 ## Consolidation verification
 
@@ -33,6 +33,13 @@ GPIO `fini()` teardown assertion still occurs after guest PASS; the accepted
 harness explicitly handles that known post-PASS issue, so these are guest
 correctness passes, not a claim of warning-free simulator shutdown.
 
+Documentation/integration cleanup was rechecked with a clean traced 2/4 model:
+translated data handoff and resident smoke passed, and two benchmark runs matched
+the prior simulator's 5.13 resident / 11.13 nonresident cycles/switch. Evidence is
+under `logs/docs-integration-20260906/`. Hardware sources, configuration, and
+dependency gitlinks are unchanged from the accepted endpoint; no new FPGA run
+was needed for documentation changes.
+
 ## What the other attempts were
 
 | Directory family | Purpose | Status now |
@@ -42,7 +49,7 @@ correctness passes, not a claim of warning-free simulator shutdown.
 | `zp-linux-user-handoff-fix`, `bp-linux-user-handoff-fix` | Final translated userspace handoff repair and acceptance work | Source of the canonical RTL; preserved in the experiment archive |
 | `/tmp/zynq-parrot-fpga-*` | Immutable inputs to individual synthesis jobs | Build evidence, not development checkouts |
 
-The inventory found 47 `zp-*` and 35 `bp-*` registered worktrees plus 32 temporary synthesis worktrees. All 114 have now been archived, verified, and removed from their original locations; only the canonical checkout remains registered in each repository. Branches, commits, dirty files, and build evidence are preserved, not discarded. See [EXPERIMENT_ARCHIVE.md](EXPERIMENT_ARCHIVE.md) for the backup location and recovery instructions.
+The inventory found 47 `zp-*` and 35 `bp-*` registered worktrees plus 32 temporary synthesis worktrees. All 114 have now been archived, verified, and removed from their original locations; only the canonical checkout remains registered in each repository. Obsolete local branch tips now have exact archive tags; commits, dirty files, and build evidence are preserved. See [EXPERIMENT_ARCHIVE.md](EXPERIMENT_ARCHIVE.md) and [HISTORY.md](HISTORY.md) for recovery instructions.
 
 ## Preserved work and recovery
 

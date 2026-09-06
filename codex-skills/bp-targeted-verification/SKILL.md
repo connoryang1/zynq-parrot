@@ -3,11 +3,11 @@ name: bp-targeted-verification
 description: Use when choosing or running verification for BlackParrot or zynq-parrot changes, especially to match the test scope to RTL, cosim, benchmark, or build-system modifications.
 ---
 
-# BlackParrot Targeted Verification
-
 This skill chooses the smallest BlackParrot verification set that still gives
-credible evidence. It also prevents stale artifacts and incorrect hardware
+credible evidence. It prevents stale artifacts and incorrect hardware
 topologies from turning a fast check into a misleading result.
+
+# BlackParrot Targeted Verification
 
 ## Core Rule
 
@@ -69,32 +69,19 @@ Verification should match the changed surface.
 - Do not rewrite upstream Makefiles merely to force fine-grained Verilator compilation unless
   measurements show a maintainable, reliable win.
 
-## BlackParrot-Specific Heuristics
+## Current Test Selection
 
-- after major RTL churn, run `make -j24 prep_lite`
-- before trusting waveform/debug conclusions, do a clean rebuild of the specific cosim flow
-- for ctxtsw work, prefer:
-  - `mt_ctxtsw_smoke_test`
-  - `mt_ctxtsw_live_regs_test`
-  - controlled gap tests around the known pass/fail boundary
-  - `mt_ctxtsw_microbench`
-  - `mt_ctxtsw_partial_unroll_benchmark`
-  - `mt_ctxtsw_unrolled_ring_stress`
+Use [the maintained test guide](../../testing/README.md) for the accepted
+resident smoke, translated nonresident handoff, and global-cycle benchmark.
+Confirm that each selected source and harness target exists before launching;
+removed historical tests must not be run from leftover prebuilt ELFs.
+Do not depend on temporary scripts outside the repository.
 
-## Ctxtsw Verification Ladder
-
-For ctxtsw forwarding repair:
-
-1. run `mt_ctxtsw_smoke_test`
-2. run `mt_ctxtsw_live_regs_test`
-3. run wide-to-narrow gap tests such as `gap16`, `gap14`, `gap13`, `gap8`, `gap1`
-4. run `mt_ctxtsw_partial_unroll_benchmark`
-5. run `mt_ctxtsw_microbench_trace` and `mt_ctxtsw_microbench_barrier`
-6. run dense `mt_ctxtsw_microbench`
-
-Use `/tmp/run_tests.sh` only as a quick sweep after a focused failing case has
-already been fixed. It uses a hard timeout and compresses logs, so it is not
-enough for root-cause analysis by itself.
+For a clean compile, set `VERILATOR_BUILD_JOBS` to the available CPU/memory
+budget and inspect the actual nested compiler command. A parallel outer Make
+can lose its jobserver in this harness and unexpectedly serialize the model
+build. Serial outer Make with explicit inner build jobs avoids that observed
+failure; this does not authorize concurrent simulator runs.
 
 For SRAM-backed nonresident handoff work, explicitly elaborate fewer physical
 slots than logical contexts, normally:

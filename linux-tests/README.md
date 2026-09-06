@@ -1,8 +1,8 @@
-# Linux Context-Switch Smoke Test
-
 This directory builds a Linux-resident proof of BlackParrot's user
 context-switch interface.  Its acceptance image runs a tiny static program as
 PID 1 so the result is independent of BusyBox startup and filesystem tools.
+
+# Linux Context-Switch Smoke Test
 
 The program runs in Linux U-mode in context 0, writes the naked return
 trampoline address to context 2 using CSR `0x801`, and invokes CSR `0x800` to

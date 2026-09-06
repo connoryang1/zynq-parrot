@@ -2,13 +2,6 @@ This file describes how to develop and verify the BlackParrot FPGA checkout safe
 
 # AGENTS
 
-This file defines the repository-specific development, verification, and
-operational rules for the BlackParrot FPGA worktree.  It keeps long-running
-hardware experiments reproducible and prevents debugging shortcuts from being
-mistaken for validated functional results.
-
-> Purpose: This file defines the engineering workflow for this BlackParrot-on-FPGA checkout. It explains how to make changes, validate them safely, and preserve reproducible evidence. It also records the project conventions that keep the Linux/context-switch investigation understandable to someone joining later.
-
 ## Repository Skills
 
 - Read the matching `codex-skills/*/SKILL.md` before acting on BlackParrot-specific workflows.
@@ -31,8 +24,9 @@ mistaken for validated functional results.
 
 ## Git Workflow
 
-- The canonical development checkout is `/home/coyang/zynq-parrot`, including
-  `import/black-parrot`, on `consolidated-linux-context-switch`. See `CURRENT_CHECKOUT.md`.
+- The canonical checkout is `/home/coyang/zynq-parrot`, including
+  `import/black-parrot`. See `CURRENT_CHECKOUT.md` for the integration branch and
+  exact accepted RTL; do not select a different RTL branch merely to match names.
 - Use isolated worktrees for experiments/builds, but after acceptance integrate the exact
   validated RTL and matching collateral back here. State explicitly when a result exists only
   in another worktree; historical `zp-*`/`bp-*` directories are not competing active defaults.
@@ -58,9 +52,6 @@ mistaken for validated functional results.
   `make clean run ... TRACE=1`.
 - When parallel Make is enabled, execute `make clean` to completion before a separate
   `make -j... run ...`; never submit cleanup and a consuming target as concurrent goals.
-- When using parallel Make, invoke `clean` to completion first and launch the build/run as a
-  separate command. Multiple top-level goals such as `make -j12 clean run-...` may execute in
-  parallel, deleting simulator artifacts while the run target is building them.
 - When using the testing harness directly, prefer the equivalent `make -C testing ... TRACE=1`
   form so commands run from the repository root without changing directories.
 - A direct simulator `make -C cosim/.../verilator run` only copies an existing ELF; rebuild a
@@ -79,7 +70,7 @@ mistaken for validated functional results.
   permitted command begins a real privileged run before it reads the image. Use the serialized
   runner with a verified NBF, and treat any accidental direct launch as a contaminated-board event
   requiring a power cycle and overlay reload.
-- After any PYNQ power cycle, wait for `scripts/wait_pynq_ready.sh <ssh-host>` before loading an
+- After any PYNQ power cycle, wait for `codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh <ssh-host>` before loading an
   overlay. An open SSH port is not sufficient: PYNQ's own boot service continues for roughly a
   minute, and an early overlay load has caused invalid board runs.
 - Always include `TRACE=1` for context-switch debug and performance validation runs so
@@ -143,6 +134,11 @@ mistaken for validated functional results.
   **New reproduction**, **Fix validation**, or **FPGA build/deployment**.
 - Every Markdown file created or edited in this repository must begin with a short plain-language purpose
   statement (two to four sentences) so it is understandable without prior project context.
+- Prefer implementation rationale and protocol invariants in nearby code comments,
+  and explain intent, scope, and validation in commit messages. Keep documentation
+  for cross-component architecture, reproducible workflows, limits, and acceptance;
+  avoid duplicate status/plan documents. Retire superseded diaries into a named Git
+  checkpoint, retaining only concise major milestones in the current work log.
 
 ## Cleanup / Refactor Policy
 

@@ -22,18 +22,20 @@ See [The ZynqParrot Co-simulation Development Flow](https://docs.google.com/docu
 ## Current Context-Switch Work
 
 This checkout contains the validated SRAM-backed resident/nonresident context-switch
-implementation. Use branch `consolidated-linux-context-switch` in both this repository
-and `import/black-parrot`; see [CURRENT_CHECKOUT.md](CURRENT_CHECKOUT.md) for exact
-revisions and recovery information. The active top-level docs are:
+implementation. See [CURRENT_CHECKOUT.md](CURRENT_CHECKOUT.md) for the supported
+source, exact revisions, and verification commands. Start with:
 
-- `CONTEXT_SWITCH_ARCHITECTURE.md`: current model, branch status, RTL areas, and measurement definitions.
-- `NEXT_STEPS_RESIDENT_SUBSTRATE.md`: current validation and planning path.
-- `CTXTSW_TROUBLESHOOTING.md`: durable debugging lessons from older failed or ambiguous experiments.
-- `CONTEXT_SWITCH_PR_GUIDE.md`: PR/review structure and evidence checklist.
-- `AGENTS.md`: repo-local workflow rules for Codex, including serialized `make -C testing ... TRACE=1` runs.
+- [Architecture](CONTEXT_SWITCH_ARCHITECTURE.md): state storage, source map, and limitations.
+- [Tests](testing/README.md) and [Linux demonstration](linux-tests/README.md): reproducible entry points.
+- [Linux acceptance](LINUX_BOOT_STATUS.md): exact FPGA identities and proved behavior.
+- [Troubleshooting](CTXTSW_TROUBLESHOOTING.md): durable operational and correctness lessons.
+- [Research direction](PAPER_DIRECTION.md): the next application-level question, not promised features.
+- [History](HISTORY.md): recovery of old plans, experiments, and detailed logs.
 
-Older experiment diaries and speculative plans remain historical records, not
-instructions to switch away from the canonical checkout.
+Keep implementation rationale near the code and explain verified changes in
+commit messages. Use [WORK_LOG.md](WORK_LOG.md) only for major acceptance milestones,
+not a second transcript of every command. Repository workflow rules are in
+[AGENTS.md](AGENTS.md).
 
 For most users, the following makefile targets will be the most useful:
 

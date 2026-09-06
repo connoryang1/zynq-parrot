@@ -1,175 +1,40 @@
-# Context Switch Architecture And Current Status
+This file is a short map of the accepted SRAM-backed context-switch implementation. It points to the code that defines behavior and states the limits of the current prototype; dated experiment narratives are preserved in Git.
 
-This repo is currently focused on fast resident hardware-thread context
-switching for BlackParrot.
+# Context-switch architecture
 
-Current working branches:
+BlackParrot still executes through one shared pipeline. The deployed PYNQ-Z2 configuration has two resident register banks and four software-visible logical contexts; hardware maps a logical context into a resident bank before resuming it.
 
-- `zynq-parrot`: `ctxtsw-isd-repair`
-- `import/black-parrot`: `ctxtsw-isd-repair`
+## Where the state lives
 
-Use `git rev-parse --short HEAD` in each repository for the exact local
-checkpoint. These docs describe the branch state after the ring-deadlock,
-thread-metadata, UCE-credit, and CSR RAW-hazard fixes.
+- [Integer backing memory](import/black-parrot/bp_be/src/v/bp_be_context_mem.sv): private, on-chip synchronous RAM, separate from Linux DRAM and the coherent data cache. Integer writes update the backing image; nonresident restore reads wide lines.
+- [Resident register banks](import/black-parrot/bp_be/src/v/bp_be_regfile_mt.sv): operand-read storage and line installation. Increasing logical capacity costs backing memory and metadata, even when the resident-bank count stays fixed.
+- [CSR ownership](import/black-parrot/bp_be/src/v/bp_be_csr_wrapper_mt.sv): per-bank control state. The accepted fix restores the target's architectural replay PC rather than inheriting the victim's.
+- [Scheduler](import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_scheduler.sv) and frontend logic: serialize architectural handoff, preserve thread identity, and cancel speculative work when an older trap wins.
 
-The top-level repo carries test programs, harness changes, waveform tools, and
-writeups. The actual RTL implementation lives in `import/black-parrot`.
+Inline comments and the RTL are authoritative for protocol details. Do not treat an old experiment's state diagram or cycle count as the current contract.
 
-## Current Model
+## Software interface and limits
 
-The machine is still one shared BlackParrot pipeline. It now holds multiple
-resident architectural contexts and switches which context is live.
+The prototype uses custom CSRs: `0x800` switches/reads logical context ID,
+`0x801` seeds a target PC, `0x802` seeds remote register state, and read-only
+`0xCC0` supplies a core-wide cycle counter. Encoding examples live in
+[the Linux demonstration](linux-tests/ctxtsw_user_tiny.c) and the test helpers;
+these are not standard RISC-V threading instructions.
 
-Software controls contexts through CSRs:
+Ordinary floating-point execution is supported, but the accepted FPGA endpoint
+does **not** provide complete nonresident FP context preservation. It also does
+not make hardware contexts independently scheduled Linux tasks, implement a
+permission-protected thread API, or establish isolation between mutually
+untrusted contexts. The Linux proof uses cooperating contexts in one process.
 
-- `0x800`: switch to a target resident context
-- `0x801`: seed a dormant context's entry/resume PC
-- `0x802`: remotely seed architectural register state, including branch-specific
-  FP register support where present
+## Validation and measurement
 
-Per-context state includes:
+[Linux status](LINUX_BOOT_STATUS.md) records exact FPGA identities and acceptance.
+[The canonical guide](CURRENT_CHECKOUT.md) identifies the supported checkout.
+Measure nonresident behavior with fewer resident banks than logical contexts:
+`NUM_THREADS=2 NUM_CONTEXTS=4`.
 
-- integer register state
-- floating-point register state
-- CSR/control state
-- saved next PC / resume PC
-- privilege mode
-- translation-enable state
-- ASID
-- frontend thread identity and predictor state where implemented
-
-The baseline architectural rule is:
-
-> `commit_pkt.ctxtsw` is the authority for architectural context-switch
-> finalization.
-
-Early or speculative work must reconcile back to that authority unless the RTL
-introduces an explicit replacement protocol with event identity, launch,
-finalize, and cancel semantics.
-
-## Baseline End-To-End Switch Path
-
-In the committed-switch model:
-
-1. Software writes the target thread id to CSR `0x800`.
-2. The instruction flows through the normal backend pipeline.
-3. On commit, BE recognizes `commit_pkt.ctxtsw`.
-4. Old-thread resume state is saved.
-5. Target-thread state is selected and live ownership changes.
-6. BE emits an FE context-switch/restart command.
-7. FE restarts fetch under the target thread's PC, privilege, translation, ASID,
-   and frontend thread identity.
-
-This is a BE-driven architectural switch followed by FE restart. It is not a
-frontend-only redirect.
-
-## Current Branch Path
-
-The checked-out `ctxtsw-isd-repair` RTL adds an early sideband/token path on top
-of the committed-switch model.
-
-Current source-level facts:
-
-- `bp_be_scheduler.sv` classifies immediate context switches in the issue path
-  as CSR writes to `12'h800`.
-- `bp_be_detector.sv` treats register-form CSR writes as dependent on a
-  preceding early integer producer when they use the same `rs1`; this avoids
-  writing stale source data into CSRs such as `mscratch`.
-- `bp_be_top.sv` captures a pending target bundle from the fast context-switch
-  event when the core is not frozen or resuming.
-- `bp_be_top.sv` can drive the FE sideband outputs:
-  `fe_ctxtsw_v_o`, `fe_ctxtsw_npc_o`, `fe_ctxtsw_thread_id_o`,
-  `fe_ctxtsw_priv_o`, `fe_ctxtsw_translation_en_o`, and `fe_ctxtsw_asid_o`.
-- `bp_fe_controller.sv` accepts that sideband only when FE is in run state and
-  the I-cache path accepts the redirect (`ctxtsw_v_i & is_run & icache_yumi_i`).
-- `pending_ctxtsw_sent_r` records that FE accepted the early sideband, so the
-  later commit-time FE command can be suppressed without suppressing
-  architectural finalization.
-- `current_thread_id_lo` still updates on `commit_pkt.ctxtsw`; a non-ctxtsw
-  redirect while a pending switch exists restores the previous thread id.
-- BE-to-FE redirects that resume the current thread must preserve branch
-  metadata carrying the current frontend thread id; otherwise a nonzero-thread
-  CSR redirect can silently retag FE fetch as thread 0.
-- The scheduler has a commit-accept path so a target FE packet already available
-  during context-switch commit cleanup can be accepted under the pending target
-  thread id.
-
-So the current branch should be understood as:
-
-> early FE preparation/redirect plus commit-time BE architectural finalization.
-
-It is not a fully speculative BE ownership handoff. Any future change that moves
-BE ownership earlier must add a stronger finalize/cancel protocol.
-
-## Verified Baseline Claim
-
-The older stable committed path established the useful reference point:
-
-- `mt_ctxtsw_roundtrip_benchmark`: warm round-trip `0x0e`, implying `0x07` cycles/switch
-- `mt_ctxtsw_ring_throughput_benchmark`: `0x07` cycles/switch
-- `mt_ctxtsw_pure_ring_stress_test`: dense pure-ring stress passed
-
-That `7 cycles/switch` result means a warm, minimal resident-context handoff
-where the target context is pre-seeded, target instructions are hot, and the
-benchmark excludes setup, printing, loop bookkeeping, and miss/refill tails.
-
-It does not mean every context switch in an arbitrary workload is always seven
-cycles.
-
-## Current ISD Repair Status
-
-The current `ctxtsw-isd-repair` work is no longer just the old 7-cycle committed
-path. It explores an ISD/commit-accept repair that can preserve an already
-fetched target packet during context-switch commit cleanup.
-
-Current local documentation, branch history, and RTL shape indicate the important
-result:
-
-- favorable gap/unrolled cases can reach the `0x5` class
-- correctness tests such as regfile/CSR/FRF isolation and smoke tests have
-  passed in the repaired state
-- the dense `mt_ctxtsw_roundtrip_benchmark` can still report a much longer tail
-  (`0x6b` round-trip / `0x35` estimate in recorded runs)
-
-Treat that dense microbench behavior as the active performance investigation,
-not as proof that the basic state-isolation repairs are broken.
-
-## Main RTL Areas
-
-Backend:
-
-- `bp_be_top.sv`: live thread selection, pending context-switch state, saved
-  context state, target context selection
-- `bp_be_director.sv`: FE command/restart sequencing and commit-time cleanup
-- scheduler / issue queue / detector files: ISD classification, FE queue
-  accept/clear/roll behavior, hazard and thread-id ownership
-- calculator / pipe memory files: commit packet generation, replay, side
-  effects, late writeback
-- CSR/regfile files: CSR `0x800`/`0x801`/`0x802`, per-thread register/CSR state
-
-Frontend:
-
-- `bp_fe_controller.sv`: context-switch restart acceptance and redirect control
-- `bp_fe_pc_gen.sv`: active FE thread identity and predictor context selection
-- `bp_fe_icache.sv`: stale old-thread miss/recover escape, abort/fill behavior,
-  and target fetch availability
-- TLB/MMU files: ASID and translation state across switches
-
-## Measurement Rule
-
-For performance claims, name the endpoints.
-
-Useful endpoints include:
-
-- `ctxtsw detect`
-- FE sideband/command accept
-- redirect / target fetch launch
-- first target FE queue entry
-- first target BE dispatch
-- `commit_pkt.ctxtsw`
-- first target `instret`
-
-The primary context-switch overhead metric is the number of dead or discarded
-cycles from architectural `commit_pkt.ctxtsw` / redirect to the first useful
-target-context FE queue or BE dispatch. I-cache miss, abort, and refill tails
-should be reported separately.
+Keep benchmark spacing separate from architectural handoff latency. The accepted
+FPGA benchmark measured 5.10 resident and 11.12 nonresident cycles/switch;
+waveform endpoints and cache/refill tails must be reported separately. Use
+`0xCC0`, not a context-restored `mcycle`, for cross-context elapsed cycles.

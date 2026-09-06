@@ -3,9 +3,11 @@ name: bp-benchmark-validation
 description: Use when validating or interpreting BlackParrot benchmark results, especially to separate true hardware latency from benchmark-shape overhead and to choose the right benchmark for the claim being made.
 ---
 
-# BlackParrot Benchmark Validation
+This skill distinguishes measured context-switch throughput from architectural
+handoff latency. It defines the counter, topology, and evidence needed to compare
+results without mistaking a different benchmark shape for a hardware improvement.
 
-Use this skill when a result needs interpretation, not just execution.
+# BlackParrot Benchmark Validation
 
 ## Core Principle
 
@@ -29,13 +31,18 @@ checks belong to both loops and are not context-switch overhead.
 
 Use the benchmarks for different questions:
 
-- `mt_ctxtsw_microbench`
-  - fast sanity check
-  - warm round-trip estimate
-- `mt_ctxtsw_partial_unroll_benchmark`
-  - better steady-state estimate with reduced loop-overhead distortion
-- `mt_ctxtsw_unrolled_ring_stress`
-  - correctness and robustness under dense switching
+- `mt_ctxtsw_nonresident_overhead_benchmark`
+  - current matched resident/nonresident rings using physical CSR `0xCC0`
+  - primary performance regression gate for the accepted SRAM-backed topology
+- `mt_ctxtsw_roundtrip_benchmark`
+  - focused resident round-trip workload; confirm its counter and topology
+    before comparison with the physical-cycle nonresident benchmark
+- `mt_ctxtsw_pure_ring_stress_test`
+  - correctness under dense switching, not itself a measured speedup
+
+See [the maintained test guide](../../testing/README.md) for current commands.
+Use a prior simulator run with the same benchmark and configuration for simulator
+regression comparisons; FPGA and simulator baseline values are not interchangeable.
 
 ## Interpretation Rules
 
