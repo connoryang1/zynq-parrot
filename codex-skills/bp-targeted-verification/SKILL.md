@@ -5,7 +5,9 @@ description: Use when choosing or running verification for BlackParrot or zynq-p
 
 # BlackParrot Targeted Verification
 
-Use this skill to choose the smallest verification set that still gives credible evidence.
+This skill chooses the smallest BlackParrot verification set that still gives
+credible evidence. It also prevents stale artifacts and incorrect hardware
+topologies from turning a fast check into a misleading result.
 
 ## Core Rule
 
@@ -37,6 +39,9 @@ Verification should match the changed surface.
 
 - Compile and run one test with `make -C testing run-<test> TRACE=1`; the branch's testing
   harness compiles that source directly and avoids rebuilding every SDK test.
+- With parallel Make, finish `make -C testing clean` first and invoke the
+  `run-<test>` goal separately with `-j`; never make `clean` and `run` concurrent
+  goals because cleanup can delete the ELF or simulator collateral being consumed.
 - When a current harness drives a historical RTL worktree, pass that worktree's
   `ZP_DIR` explicitly, force-rebuild the single test ELF, and disassemble the
   relevant CSR/instruction before running. A shared ignored `riscv/` symlink can
@@ -90,6 +95,18 @@ For ctxtsw forwarding repair:
 Use `/tmp/run_tests.sh` only as a quick sweep after a focused failing case has
 already been fixed. It uses a hard timeout and compresses logs, so it is not
 enough for root-cause analysis by itself.
+
+For SRAM-backed nonresident handoff work, explicitly elaborate fewer physical
+slots than logical contexts, normally:
+
+```bash
+make -C testing run-mt_umode_nonresident_handoff_test \
+  NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1
+```
+
+The test is invalid as nonresident evidence when `NUM_CONTEXTS <= NUM_THREADS`.
+Require its test-specific `[BSG-PASS]` marker and `CORE PASS`; a native trace or
+target-runtime limit is a failure even if host teardown later prints `BSG PASS`.
 
 ## Clean Rebuild Triggers
 
