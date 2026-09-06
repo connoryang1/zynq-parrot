@@ -54,12 +54,15 @@ BENCHMARKS := \
     mt_ctxtsw_banyan_poll_worker_benchmark \
     mt_ctxtsw_predictor_pollution \
     mt_ctxtsw_return_predictor_test
+BENCHMARKS += mt_ctxtsw_nonresident_overhead_benchmark
 
 DEMOS := \
     multithreading_demo
 
 EXPERIMENTAL_TESTS := \
     mt_umode_nonresident_handoff_test \
+    mt_umode_nonresident_sv39_handoff_test \
+    mt_umode_nonresident_sv39_data_handoff_test \
     mt_ctxtsw_sv39_asid_remap_test
 
 SCALE_CONTEXTS := 8 16 32 64
@@ -83,7 +86,15 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
-	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
+	@set +e; \
+	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"; \
+	sim_rc=$$$${PIPESTATUS[0]}; \
+	set -e; \
+	if (( sim_rc != 0 )) \
+	   && ! { grep -q "BSG PASS" $$(SIM_DIR)/run.log \
+	           && grep -q "final block executed before fini() was called" $$(SIM_DIR)/run.log; }; then \
+		exit $$$$sim_rc; \
+	fi
 	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]|BSG FAIL|trace timeout reached" $$(SIM_DIR)/run.log
 	@if grep -Eq "Assertion failed|%Error:|Aborting" $$(SIM_DIR)/run.log \
 		&& ! { grep -q "BSG PASS" $$(SIM_DIR)/run.log \
@@ -95,6 +106,9 @@ endef
 
 $(foreach t,$(TESTS) $(EXPERIMENTAL_TESTS),$(eval $(call TEST_RULES,$(t))))
 
+$(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
+$(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
+
 .PHONY: check-nonresident-config
 check-nonresident-config:
 	@if (( $(NUM_CONTEXTS) <= $(NUM_THREADS) )); then \
@@ -103,6 +117,8 @@ check-nonresident-config:
 	fi
 
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
+run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
+run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_gap8_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_gap_benchmark_common.h
 

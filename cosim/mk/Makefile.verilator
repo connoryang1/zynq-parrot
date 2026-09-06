@@ -1,6 +1,9 @@
 
 include $(COSIM_MK_DIR)/Makefile.sim
 
+SHELL := /bin/bash
+.SHELLFLAGS := -o pipefail -c
+
 DEFINES += SIMULATION
 
 DUMP_FILE ?= dump.fst
