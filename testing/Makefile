@@ -27,7 +27,7 @@ CFLAGS = -O2 \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -84,10 +84,25 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf
 	@echo "  [RUN]   Executing $(1) in simulator..."
 	@$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"
-	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]" $$(SIM_DIR)/run.log
+	@! grep -Eq "CORE FAIL|\\[BSG-FAIL\\]|BSG FAIL" $$(SIM_DIR)/run.log
+	@if grep -Eq "Assertion failed|%Error:|Aborting" $$(SIM_DIR)/run.log \
+		&& ! { grep -q "BSG PASS" $$(SIM_DIR)/run.log \
+		       && grep -q "final block executed before fini() was called" $$(SIM_DIR)/run.log; }; then \
+		echo "ERROR: simulator reported a fatal error before a successful guest result"; \
+		exit 1; \
+	fi
 endef
 
 $(foreach t,$(TESTS) $(EXPERIMENTAL_TESTS),$(eval $(call TEST_RULES,$(t))))
+
+.PHONY: check-nonresident-config
+check-nonresident-config:
+	@if (( $(NUM_CONTEXTS) <= $(NUM_THREADS) )); then \
+		echo "ERROR: nonresident handoff requires NUM_CONTEXTS > NUM_THREADS"; \
+		exit 1; \
+	fi
+
+run-mt_umode_nonresident_handoff_test: check-nonresident-config
 
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_gap8_benchmark.riscv: $(TOP)/testing/mt_ctxtsw_gap_benchmark_common.h
 
@@ -110,7 +125,7 @@ $(foreach n,$(SCALE_CONTEXTS),$(eval $(call SCALE_TEST_RULES,$(n))))
 
 clean::
 	@echo "  [RM] Cleaning build artifacts..."
-	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(SCALE_TESTS)))
+	@$(RM) $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS) $(EXPERIMENTAL_TESTS) $(SCALE_TESTS)))
 	@$(RM) -rf $(LOG_DIR)
 
 build-sim: | $(LOG_DIR)
