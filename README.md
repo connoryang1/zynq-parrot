@@ -1,3 +1,5 @@
+This repository builds and tests processors implemented on Zynq FPGAs. For the validated BlackParrot Linux/context-switch implementation, start with [the canonical checkout guide](CURRENT_CHECKOUT.md), which identifies the supported source, tests, and historical experiments.
+
 # ZynqParrot Co-simulation / Co-emulation Environment
 
 ZynqParrot enables rapid design iteration of Accelerators on Zynq FPGAs.
@@ -19,8 +21,10 @@ See [The ZynqParrot Co-simulation Development Flow](https://docs.google.com/docu
 
 ## Current Context-Switch Work
 
-This checkout is currently used for fast resident hardware-thread context
-switching work on BlackParrot. The active top-level docs are:
+This checkout contains the validated SRAM-backed resident/nonresident context-switch
+implementation. Use branch `consolidated-linux-context-switch` in both this repository
+and `import/black-parrot`; see [CURRENT_CHECKOUT.md](CURRENT_CHECKOUT.md) for exact
+revisions and recovery information. The active top-level docs are:
 
 - `CONTEXT_SWITCH_ARCHITECTURE.md`: current model, branch status, RTL areas, and measurement definitions.
 - `NEXT_STEPS_RESIDENT_SUBSTRATE.md`: current validation and planning path.
@@ -28,9 +32,8 @@ switching work on BlackParrot. The active top-level docs are:
 - `CONTEXT_SWITCH_PR_GUIDE.md`: PR/review structure and evidence checklist.
 - `AGENTS.md`: repo-local workflow rules for Codex, including serialized `make -C testing ... TRACE=1` runs.
 
-Older experiment diaries and speculative plans were intentionally consolidated
-into those files so the top-level documentation reflects the current
-`ctxtsw-isd-repair` work instead of several superseded branch states.
+Older experiment diaries and speculative plans remain historical records, not
+instructions to switch away from the canonical checkout.
 
 For most users, the following makefile targets will be the most useful:
 

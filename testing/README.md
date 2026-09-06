@@ -1,3 +1,5 @@
+This directory contains the active bare-metal regression suite for the accepted BlackParrot context-switch implementation. It tests resident and SRAM-backed nonresident handoffs; historical boot probes remain recoverable as described in [CURRENT_CHECKOUT.md](../CURRENT_CHECKOUT.md).
+
 # Testing
 
 This directory contains small bare-metal programs for validating and measuring
@@ -21,11 +23,7 @@ Run tests serially. The harness uses shared simulator/program artifacts under
 - `mt_csr_isolation_test`: per-thread CSR state isolation using `mscratch`.
 - `mt_frf_isolation_test`: per-thread floating-point register state isolation.
   It checks for non-aliasing and preservation, not reset-to-IEEE-zero, because
-  FP register storage may use recoded values internally. This is also the
-  current regression for the FE/I-cache duplicate-hit context-switch bug: the
-  run resumes T0 at a halfword PC immediately after `csrw 0x800`, and the fixed
-  I-cache must not feed a multi-hot instruction data select even if raw
-  duplicate tag hits appear in the waveform.
+  FP register storage may use recoded values internally.
 
 ## Correctness Tests
 
@@ -63,49 +61,12 @@ Run tests serially. The harness uses shared simulator/program artifacts under
   between hot straight-line instruction streams.
 - `mt_ctxtsw_banyan_poll_worker_benchmark`: Banyan-style poller/worker
   comparison that includes shared-memory request/response and synthetic work.
-  This benchmark keeps T0 as the only poller/driver and routes T1 through a
-  deterministic seeded worker entry so secondary startup paths cannot run the
-  driver and corrupt the shared request/response state.
 - `mt_ctxtsw_predictor_pollution`: checks whether a switched-to context's
   branch pattern affects the resumed context's predictor behavior.
 - `mt_ctxtsw_return_predictor_test`: characterizes call/return predictor timing
   before and after a switched-to context exercises a return-heavy call chain.
 
 ## Scale Tests
-
-- `ctxtsw_benchmark`: hardcoded 16-context best-case throughput benchmark.
-  This is the preferred simple reporting test when you want the lowest current
-  software-visible context-switch average without sweeping scale knobs. It uses
-  one fully unrolled hot block per context: 256 measured switches/context, 256
-  warmup switches/context, and 256 straight-line `csrw` operations in the timed
-  body. There is no timed loop counter or block-backedge branch. Build the
-  matching simulator first:
-
-```bash
-make -C testing rebuild-sim-16ctx TRACE=1
-make -C testing run-ctxtsw_benchmark TRACE=1
-```
-
-  On the 2026-06-04 traced 16-context model this reported:
-
-```text
-Total cycles:         0x000000000000403e
-Total switches:       0x0000000000001000
-Measured throughput:  0x403e / 0x1000 = 4.015136719 cycles/switch
-Excess over 4/switch: 0x3e cycles
-```
-
-  The remaining software excess over exactly 4 cycles/switch comes from the
-  benchmark harness around the hot `csrw` stream: `rdcycle` bracketing, the
-  call/return path around the unrolled block, final exit/bookkeeping, and the
-  fact that software measures next-switch throughput rather than the waveform
-  handoff metric. The previous 2048-switch simple version measured
-  `0x20217 / 0x8000 = 4.016326904` cycles/switch with `0x217` excess because it
-  ran eight 256-switch blocks per context and therefore paid 128 loop block
-  boundaries. The one-block version removes those repeated boundaries and drops
-  the total excess to `0x3e`. In the corrected 16-context waveform window, the
-  hardware handoff metric itself was exactly 4 cycles for every measured
-  dispatch-to-first-target-dispatch interval, with 100% I-cache hits.
 
 - `mt_ctxtsw_8ctx_ring_throughput_benchmark`: eight-context version of the ring
   throughput benchmark. Build the simulator with `make -C testing
@@ -118,64 +79,36 @@ Excess over 4/switch: 0x3e cycles
 
 Scale benchmark knobs:
 
-- `SCALE_SWITCHES`: measured switches per context. The default is the
-  aggressive reporting setting, 2048. Smaller values are mostly smoke tests.
-- `SCALE_WARMUP`: unmeasured switches per context before `rdcycle` timing. The
-  default is 256. This warms the ring path and reduces cold-start inflation.
-- `SCALE_UNROLL`: number of straight-line `csrw 0x800,next` operations per loop
-  iteration. The default is 256 to remove the measured loop backedge as much as
-  possible.
-- `SCALE_ALIGN`: hot-region alignment mode. The default is 64 for the aggressive
-  benchmark path.
-- `SCALE_SAME_LOOP`: use the same noinline hot loop body for warmup and
-  measurement. The default is 1 so warmup heats the exact measured addresses.
+- `SCALE_SWITCHES`: measured switches per context. Use larger values for
+  throughput reporting; small values are mostly smoke tests.
+- `SCALE_WARMUP`: unmeasured switches per context before `rdcycle` timing.
+  This warms the ring path and reduces cold-start inflation.
+- `SCALE_UNROLL`: number of straight-line `csrw 0x081,next` operations per loop
+  iteration. This trades loop bookkeeping against instruction footprint.
 
 Recommended 16-context best-case throughput repro:
 
 ```bash
 make -C testing rebuild-sim-16ctx TRACE=1
-make -C testing run-mt_ctxtsw_16ctx_ring_throughput_benchmark TRACE=1
-```
-
-This uses the aggressive default knobs:
-
-```text
-SCALE_SWITCHES=2048 SCALE_WARMUP=256 SCALE_UNROLL=256 SCALE_ALIGN=64 SCALE_SAME_LOOP=1
-```
-
-On the 2026-06-03 traced 16-context model this reported about 4.02
-cycles/switch. The benchmark prints integer software throughput:
-
-```text
-Total cycles:         0x0000000000020317
-Total switches:       0x0000000000008000
-Measured throughput cyc/switch: 0x0000000000000004
-Excess cycles over 4/switch: 0x0000000000000317
-Expected TRACE hot first-instr dispatch: 0x0000000000000004
-```
-
-The older compact command:
-
-```bash
 make -C testing run-mt_ctxtsw_16ctx_ring_throughput_benchmark \
-  TRACE=1 SCALE_SWITCHES=256 SCALE_WARMUP=64 SCALE_UNROLL=8 SCALE_ALIGN=0 SCALE_SAME_LOOP=0
+  TRACE=1 SCALE_SWITCHES=256 SCALE_WARMUP=64 SCALE_UNROLL=8
 ```
 
-reported `0x4a0e` cycles for `16 * 256` switches, or about 4.63
-cycles/switch. Treat that as a compact smoke-style run, not the main reporting
-configuration. The benchmark prints integer software throughput:
+On the 2026-05-29 traced 16-context model this reported `0x4a76` cycles for
+`16 * 256` switches, or about 4.65 cycles/switch. The benchmark prints this as
+integer software throughput:
 
 ```text
-Total cycles:         0x0000000000004a0e
+Total cycles:         0x0000000000004a76
 Total switches:       0x0000000000001000
 Measured throughput cyc/switch: 0x0000000000000004
-Excess cycles over 4/switch: 0x0000000000000a0e
+Excess cycles over 4/switch: 0x0000000000000a76
 Expected TRACE hot first-instr dispatch: 0x0000000000000004
 ```
 
 The throughput line is measured with `rdcycle` around the ring loop and includes
 benchmark loop/control spacing. The exact ratio is `Total cycles / Total
-switches`; for the compact run, `0x4a0e / 0x1000 = 18958 / 4096 = 4.63`. The excess
+switches`; for this run, `0x4a76 / 0x1000 = 19062 / 4096 = 4.65`. The excess
 line shows how far the software throughput run is from an ideal 4-cycle-per-
 switch total. The expected TRACE line is the hot hardware handoff metric to
 verify from waveform analysis; it is not directly measured by the bare-metal
@@ -189,40 +122,11 @@ python3 tools/ctxtsw_perf_report.py path/to/dump.vcd \
   --run-log cosim/black-parrot-minimal-example/verilator/run.log
 ```
 
-The report auto-finds the first timed-loop `csrw 0x800` after `rdcycle` and
+The report auto-finds the first timed-loop `csrw 0x081` after `rdcycle` and
 parses `Total cycles` from the run log. Use `d_first_instr_dispatch` as the
 primary hardware metric: ctxtsw dispatch to first target-context instruction
 dispatch. Use `d_next_ctxtsw` only for benchmark throughput, since it includes
-loop/control instructions before the next `csrw 0x800`.
-
-For FE/I-cache context-switch regressions, especially illegal-instruction
-failures after a switch, also check the I-cache hit-select path:
-
-```bash
-python3 tools/ctxtsw_icache_select_scan.py path/to/dump.vcd \
-  --fail-on-bad-select
-```
-
-This scanner reports raw duplicate hit samples separately from bad data-select
-samples. Raw `hit_v_tv_r` can be multi-hot after an aborted miss/refill
-sequence; the correctness condition is that `ld_data_way_select_tv` remains
-one-hot on I-cache hit cycles. On the 2026-06-03 `mt_frf_isolation_test` TRACE
-run, the scan observed 17 raw duplicate-hit samples and
-`bad_data_select_on_hit=0`.
-
-For D-cache UCE credit regressions, especially `counter underflow` messages
-during scale runs, scan the D-cache UCE credit path:
-
-```bash
-python3 tools/dcache_uce_credit_scan.py path/to/dump.vcd \
-  --min-cycle <cycle> --max-cycle <cycle>
-```
-
-This scanner flags the hardware underflow condition directly: a reverse final
-beat accepted while the RTL credit count is zero and no same-cycle first
-forward beat allocates credit. On the 2026-06-03 pre-fix 16-context throughput
-waveform it reported one underflow at cycle 326917 in the old failing window;
-on the fixed waveform the same window reports `rtl_underflows=0`.
+loop/control instructions before the next `csrw 0x081`.
 
 Do not blindly increase `SCALE_UNROLL`. A same-day sweep with
 `SCALE_SWITCHES=256` and `SCALE_WARMUP=64` measured:
@@ -242,8 +146,8 @@ slower context-switch commit path.
 
 ## Demo
 
-- `multithreading_demo`: older end-to-end demonstration of CSR `0x800`,
-  `0x801`, and `0x802` thread seeding and switching. Keep it as a user-facing
+- `multithreading_demo`: older end-to-end demonstration of CSR `0x081`,
+  `0x082`, and `0x083` thread seeding and switching. Keep it as a user-facing
   demo, not as the primary regression signal.
 
 ## Experimental Tests
@@ -251,9 +155,10 @@ slower context-switch commit path.
 - `mt_ctxtsw_sv39_asid_remap_test`: experimental repro for full SV39/ASID
   remap validation. It maps one virtual address to different physical pages in
   T0 and T1, then uses `mstatus.MPRV` with `MPP=S` for translated data access
-  while keeping control flow in M-mode. It passed the 2026-06-20 serialized
-  `TRACE=1` sweep, but remains experimental because it is a focused virtual
-  remap probe rather than part of the normal correctness ladder.
+  while keeping control flow in M-mode. As of 2026-06-01 it compiles but times
+  out under `TRACE=1`; the run reaches the banner and then wedges before
+  completing the first remap check. Keep it out of the normal correctness set
+  until the DTLB/PTW/cache path is understood.
 
 ## Suggested Order
 

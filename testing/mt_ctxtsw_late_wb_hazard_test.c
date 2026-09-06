@@ -17,9 +17,6 @@
 static uint64_t t1_stack[STACK_WORDS];
 static volatile uint64_t t1_done;
 static volatile uint64_t t1_observed;
-static volatile uint64_t t1_dividend_observed;
-static volatile uint64_t t1_divisor_observed;
-static volatile uint64_t expected_before_switch;
 
 static volatile uint64_t t0_load_lines[ROUNDS * 8] __attribute__((aligned(64), used)) = {
   0x9100000000000001ULL, 0x9100000000000002ULL, 0x9100000000000003ULL, 0x9100000000000004ULL,
@@ -53,10 +50,6 @@ void __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line) {
 
 void __attribute__((naked, noinline, noreturn)) t1_entry(void) {
   __asm__ volatile(
-    "la    t0, t1_dividend_observed\n"
-    "sd    a0, 0(t0)\n"
-    "la    t0, t1_divisor_observed\n"
-    "sd    a1, 0(t0)\n"
     "divu  a5, a0, a1\n"
     "addi  a6, a5, 5\n"
     "la    t0, t1_observed\n"
@@ -76,12 +69,10 @@ int main(void) {
   for (uint64_t i = 0; i < ROUNDS; i++) {
     const uint64_t dividend = 0x1234567800ULL + (i * 0x10001ULL);
     const uint64_t divisor = 17ULL;
-    expected_before_switch = (dividend / divisor) + 5ULL;
+    const uint64_t expected = (dividend / divisor) + 5ULL;
 
     t1_done = 0;
     t1_observed = 0;
-    t1_dividend_observed = 0;
-    t1_divisor_observed = 0;
 
     seed_thread(1, &t1_stack[STACK_WORDS], (uint64_t)t1_entry);
     seed_reg(1, 10 /* x10=a0 */, dividend);
@@ -95,16 +86,11 @@ int main(void) {
       bp_finish(1);
     }
 
-    if (t1_observed != expected_before_switch) {
-      bp_print_string("[BSG-INFO] thread 1 dividend ");
-      bp_hprint_uint64(t1_dividend_observed);
-      bp_print_string(" divisor ");
-      bp_hprint_uint64(t1_divisor_observed);
-      bp_print_string("\n");
+    if (t1_observed != expected) {
       bp_print_string("[BSG-FAIL] dependent read observed ");
       bp_hprint_uint64(t1_observed);
       bp_print_string(" expected ");
-      bp_hprint_uint64(expected_before_switch);
+      bp_hprint_uint64(expected);
       bp_print_string("\n");
       bp_finish(1);
     }

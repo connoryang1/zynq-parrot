@@ -99,17 +99,69 @@ int main(void) {
   write_ctxt(1);
   /* T0 resumes here after T1 calls write_ctxt(0) */
 
-  /* ── Step 3: Verify T0's f1 is unchanged ──
-   *
-   * Keep this return path free of printing and other function calls until all
-   * values have been checked.  That keeps this test focused on architectural
-   * FP state rather than post-switch host-I/O or stack-memory behavior. */
+  /* ── Step 3: Verify T0's f1 is unchanged ── */
   uint64_t t0_f1_after = read_f1();
 
-  int errors = (t0_f1_after != SENTINEL_T0)
-               + (t1_f1_initial == SENTINEL_T0)
-               + (t1_f1_final != SENTINEL_T1);
-  bp_finish(errors != 0);
+  bp_print_string("T0 f1 after T1: ");
+  bp_hprint_uint64(t0_f1_after);
+  bp_print_string("\n");
+
+  bp_print_string("T1 f1 initial:  ");
+  bp_hprint_uint64(t1_f1_initial);
+  bp_print_string("\n");
+
+  bp_print_string("T1 f1 final:    ");
+  bp_hprint_uint64(t1_f1_final);
+  bp_print_string("\n");
+
+  int errors = 0;
+
+  /* T0's f1 must still be SENTINEL_T0 */
+  if (t0_f1_after != SENTINEL_T0) {
+    bp_print_string("FAIL: T0 f1 was corrupted by T1\n");
+    bp_print_string("  expected: ");
+    bp_hprint_uint64(SENTINEL_T0);
+    bp_print_string("\n  got:      ");
+    bp_hprint_uint64(t0_f1_after);
+    bp_print_string("\n");
+    errors++;
+  } else {
+    bp_print_string("PASS: T0 f1 preserved across T1 execution\n");
+  }
+
+  /* T1 may start with implementation-specific recoded FP state, but it must
+   * not alias T0's live f1 value. */
+  if (t1_f1_initial == SENTINEL_T0) {
+    bp_print_string("FAIL: T1 f1 leaked T0 value at entry\n");
+    bp_print_string("  got: ");
+    bp_hprint_uint64(t1_f1_initial);
+    bp_print_string("\n");
+    errors++;
+  } else {
+    bp_print_string("PASS: T1 f1 did not leak T0 value at entry\n");
+  }
+
+  /* T1 should have written its sentinel successfully */
+  if (t1_f1_final != SENTINEL_T1) {
+    bp_print_string("FAIL: T1 f1 write did not take effect\n");
+    bp_print_string("  expected: ");
+    bp_hprint_uint64(SENTINEL_T1);
+    bp_print_string("\n  got:      ");
+    bp_hprint_uint64(t1_f1_final);
+    bp_print_string("\n");
+    errors++;
+  } else {
+    bp_print_string("PASS: T1 f1 write succeeded\n");
+  }
+
+  bp_print_string("\n");
+  if (errors == 0) {
+    bp_print_string("[BSG-PASS] FP regfile isolation verified\n");
+    bp_finish(0);
+  } else {
+    bp_print_string("[BSG-FAIL] FP regfile isolation test failed\n");
+    bp_finish(1);
+  }
 
   return 0;
 }

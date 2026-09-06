@@ -1,4 +1,13 @@
+This file records debugging pitfalls and the safeguards that prevent repeating them. It distinguishes confirmed failures from hypotheses and preserves recovery information for historical experiments.
+
 # Context-Switch Troubleshooting Notes
+
+## Checkout consolidation (2026-09-06)
+
+- The coordinator still selected `linux-satp-mode-filter` after acceptance occurred in a separate worktree. The canonical branch now selects accepted RTL `25089713` with matching RTL/test collateral and preserved coordinator host safeguards; `CURRENT_CHECKOUT.md` identifies archived attempts so a stale checkout is not mistaken for a regression.
+- Review caught a consolidation hazard before any board deployment: copying the whole historical `cosim/` tree would remove native target limits, owned-DRAM handling, native argv forwarding, and configuration checks used by maintained tools. Preserve those coordinator files separately from the accepted RTL, and require explicit active-source test selection instead of the old validation ladder's archived/FP-copy defaults.
+- Git emitted an encoding warning and corrupted the descriptive branch text while creating the top-level stash. The stash's parent is verified as `e4242c1c`, its tracked/untracked files are retained, and the stable tag `archive/pre-consolidation-dirty-20260906` identifies it independently of the message; do not use the garbled description as provenance.
+- The initial documentation patch was rejected for an empty update hunk and changed no files; it was corrected before application. Use explicit, nonempty hunks and verify file contents after generated patches; EOF whitespace differences are not RTL changes.
 
 This file keeps the durable lessons from older context-switch experiments. It is
 not a complete diary of every branch state.

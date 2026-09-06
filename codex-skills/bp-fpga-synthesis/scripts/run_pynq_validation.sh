@@ -20,21 +20,23 @@ mkdir -p "$log_dir"
 if [[ -n "${PYNQ_VALIDATION_TESTS:-}" ]]; then
   read -r -a tests <<<"$PYNQ_VALIDATION_TESTS"
 else
-  tests=(
-    mt_fpga_current_toolchain_smoke
-    mt_amo_swap_return_test
-    mt_ctxtsw_fpga_stage_test
-    mt_global_cycle_csr_test
-    mt_ctxtsw_nonresident_ring_test
-    mt_ctxtsw_nonresident_fp_target_test
-    mt_ctxtsw_nonresident_fp_ring_test
-    mt_ctxtsw_gpr_ring_stress
-    mt_ctxtsw_late_wb_hazard_test
-    mt_ctxtsw_nonresident_overhead_benchmark
-    mt_ctxtsw_nonresident_fp_overhead_benchmark
-    mt_ctxtsw_nonresident_cold_icache_benchmark
-  )
+  echo "FAIL: set PYNQ_VALIDATION_TESTS to explicitly reviewed, freshly packaged tests; the historical default suite is archived" >&2
+  exit 2
 fi
+
+# Fail before any board interaction if the selected source is archived or the
+# image is absent. Existing ignored NBFs alone do not identify a supported test.
+for test_name in "${tests[@]}"; do
+  [[ "$test_name" =~ ^[a-zA-Z0-9_]+$ ]] || {
+    echo "FAIL: invalid test name: $test_name" >&2; exit 2;
+  }
+  [[ -f "$repo_dir/testing/$test_name.c" ]] || {
+    echo "FAIL: no active test source for $test_name; inspect CURRENT_CHECKOUT.md" >&2; exit 2;
+  }
+  [[ -s "$nbf_dir/${test_name}_fpga.nbf" ]] || {
+    echo "FAIL: missing $nbf_dir/${test_name}_fpga.nbf" >&2; exit 1;
+  }
+done
 
 remote() {
   ssh -o BatchMode=yes "$ssh_host" "cd $remote_dir && $1"
@@ -79,7 +81,7 @@ for test_name in "${tests[@]}"; do
     "$serial_runner" "$ssh_host" "$image" "$remote_dir" >"$log" 2>&1
   run_rc=$?
   set -e
-  if grep -Eq 'CORE FAIL|BSG-FAIL' "$log" || ! grep -Eq 'CORE\[0\] PASS|CORE PASS' "$log"; then
+  if (( run_rc != 0 )) || grep -Eq 'CORE(\[0\])? FAIL|BSG-FAIL' "$log" || ! grep -Eq 'CORE\[0\] PASS|CORE PASS' "$log"; then
     echo "FAIL $test_name host_rc=$run_rc (see $log)" >&2
     exit 1
   fi

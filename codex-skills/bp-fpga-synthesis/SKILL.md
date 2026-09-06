@@ -3,12 +3,24 @@ name: bp-fpga-synthesis
 description: Prepare, launch, monitor, and interpret BlackParrot FPGA builds for zynq-parrot, especially PYNQ-Z2 Vivado synthesis, implementation, utilization, timing, bitstream fit checks, and comparisons between context-switch optimization checkpoints. Use for build-readiness checks, FPGA fit questions, background synthesis, or review-ready hardware validation.
 ---
 
-# BlackParrot FPGA Synthesis
-
 This file defines the reproducible build and deployment procedure for the
 PYNQ-Z2 BlackParrot image. It separates cheap local evidence, expensive routed
 implementation, and serialized board acceptance so each result answers a
 specific engineering question.
+
+# BlackParrot FPGA Synthesis
+
+Use the canonical checkout identified in `CURRENT_CHECKOUT.md`. The old probe/FP-copy
+suite is archived; the validation runner requires explicit `PYNQ_VALIDATION_TESTS` and
+active source files rather than guessing a suite from stale ignored NBFs. Rebuild/package
+the selected test and record its source/ELF/NBF hashes before running it; source presence
+and local/remote NBF equality alone do not prove freshness. The current test harness has
+no blanket `fpga-tests` target. Recover an old diagnostic and its build rule from
+`e4242c1c` on an isolated branch only when that diagnostic is needed.
+
+Preserve the coordinator's bounded host runner, owned-DRAM handling, native argv support,
+and build configuration checks when integrating historical RTL. They are separate from
+the accepted RTL/synthesis source snapshot and must not be replaced by its older host code.
 
 Keep quick iteration separate from slow implementation. Treat a routed bitstream with
 acceptable timing as the fit gate; elaboration or synthesis alone is not enough.

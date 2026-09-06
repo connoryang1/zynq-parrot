@@ -36,24 +36,9 @@ static volatile uint64_t shared_request  = 0;
 static volatile uint64_t shared_response = 0;
 static volatile uint64_t work_result     = 0;
 
-static inline void write_ctxt_0(void) {
-  __asm__ volatile("csrwi 0x800, 0" : : : "memory");
-}
-
-static inline void write_ctxt_1(void) {
-  __asm__ volatile("csrwi 0x800, 1" : : : "memory");
-}
-
-static inline uint64_t read_mhartid(void) {
-  uint64_t v;
-  __asm__ volatile("csrr %0, mhartid" : "=r"(v) : : "memory");
-  return v;
-}
-
-static inline uint64_t read_ctxt(void) {
-  uint64_t v;
-  __asm__ volatile("csrr %0, 0x800" : "=r"(v) : : "memory");
-  return v;
+/* ── CSR helpers ── */
+static inline void write_ctxt(uint64_t v) {
+  __asm__ volatile("csrw 0x800, %0" : : "r"(v));
 }
 
 static inline uint64_t read_cycle(void) {
@@ -72,25 +57,7 @@ static inline uint64_t read_cycle(void) {
  * The inner loop's branch is the target for BTB/BHT warm-up: after a few
  * activations T1's private predictor should know the branch pattern.
  */
-void __attribute__((naked, noinline, noreturn)) t1_worker(void) {
-  __asm__ volatile(
-    ".option push\n"
-    ".option norelax\n"
-    "la   gp, __global_pointer$\n"
-    ".option pop\n"
-    "la   sp, t1_stack\n"
-    "li   t0, %0\n"
-    "add  sp, sp, t0\n"
-    "call t1_worker_body\n"
-    "1:\n"
-    "j    1b\n"
-    :
-    : "i"(STACK_WORDS * 8)
-    : "t0"
-  );
-}
-
-void __attribute__((noinline, noreturn)) t1_worker_body(void) {
+void __attribute__((noinline)) t1_worker(void) {
   while (1) {
     uint64_t acc = shared_request;
 
@@ -106,27 +73,12 @@ void __attribute__((noinline, noreturn)) t1_worker_body(void) {
     work_result     = acc;
     shared_response = shared_request + 1;   /* response token = req + 1 */
 
-    write_ctxt_0();  /* switch back to T0; T1 resumes here next activation */
+    write_ctxt(0);   /* switch back to T0; T1 resumes here next activation */
   }
   bp_finish(1);  /* unreachable */
 }
 
 int main(void) {
-  uint64_t ctxt = read_ctxt();
-
-  if (ctxt == 1) {
-    t1_worker();
-  }
-
-  if (ctxt != 0 || read_mhartid() != 0) {
-    /*
-     * The bare-metal startup path can let non-driver hardware contexts reach
-     * main. Keep T0 as the only poller/driver; T1 is the worker above.
-     */
-    for (;;)
-      ;
-  }
-
   bp_print_string("=== Banyan-style Benchmark: Poller+Worker ===\n");
   bp_print_string("T0=poller, T1=worker, work_iters=");
   bp_hprint_uint64(WORK_ITERS);
@@ -153,7 +105,7 @@ int main(void) {
 
     /* Measure full round-trip: T0 → T1 (work) → T0 */
     uint64_t before = read_cycle();
-    write_ctxt_1();
+    write_ctxt(1);
     /* T0 resumes here after T1 calls write_ctxt(0) */
     uint64_t after = read_cycle();
 

@@ -1,3 +1,5 @@
+This file describes how to develop and verify the BlackParrot FPGA checkout safely. It identifies the canonical worktree and the rules for preserving evidence, isolating experiments, and reporting validated results.
+
 # AGENTS
 
 This file defines the repository-specific development, verification, and
@@ -29,6 +31,11 @@ mistaken for validated functional results.
 
 ## Git Workflow
 
+- The canonical development checkout is `/home/coyang/zynq-parrot`, including
+  `import/black-parrot`, on `consolidated-linux-context-switch`. See `CURRENT_CHECKOUT.md`.
+- Use isolated worktrees for experiments/builds, but after acceptance integrate the exact
+  validated RTL and matching collateral back here. State explicitly when a result exists only
+  in another worktree; historical `zp-*`/`bp-*` directories are not competing active defaults.
 - Do new development on a dedicated branch, not on `master`.
 - Create a fresh branch before substantial work whenever practical.
 - Keep `master` as a stable integration branch.

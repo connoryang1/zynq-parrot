@@ -21,14 +21,9 @@ package bp_common_pkg;
   localparam bp_proc_param_s bp_unicore_zynqparrot_cfg_override_p =
     '{paddr_width: 34
 
-      // Two physical register banks and four architectural contexts exercise
-      // the nonresident context-store path used by the optimized design.
+      // This historical schema has no separate logical-context count. Keep
+      // the resident register banks at the validated PYNQ-Z2 fit dimension.
       ,num_threads: 2
-      ,num_contexts: 4
-
-      // Keep the standard BlackParrot F/D execution support. Nonresident
-      // context switching may optimize FP state movement, but the architectural
-      // floating-point capability remains available to software.
 
       ,icache_fill_width: 64
 
@@ -40,10 +35,7 @@ package bp_common_pkg;
 
       ,l2_data_width: 64
       ,l2_fill_width: 64
-      // A single L2 slice/bank matches the verified minimal simulation image
-      // and leaves enough LUT/slice margin for the SRAM-backed context store
-      // on the xc7z020.  This changes aggregate L2 bandwidth, not the context
-      // switch datapath or its 12-cycle handoff latency.
+      // Keep the PYNQ-Z2 implementation within the xc7z020 LUT/slice budget.
       ,l2_slices    : 1
       ,l2_banks     : 1
 

@@ -1,4 +1,13 @@
+This file explains FPGA build, deployment, and historical Linux debugging procedures. Use the canonical checkout guide to distinguish the currently supported application flow from older diagnostic recipes preserved below.
+
 # PYNQ-Z2 Build And Deployment Reference
+
+The canonical branch is documented in `CURRENT_CHECKOUT.md`. Historical `fpga-tests`,
+AMO-probe, and S-mode-probe recipes below refer to the archived `e4242c1c` harness,
+not targets in the current active suite; restore them on an isolated diagnostic branch
+if needed. For current Linux application packaging use `linux-tests/README.md` and
+explicitly select freshly built images for the serialized runner. The current accepted
+route uses 80/140 BRAM tiles; statements below about exhausted BRAM describe older candidates.
 
 ## Current build
 
