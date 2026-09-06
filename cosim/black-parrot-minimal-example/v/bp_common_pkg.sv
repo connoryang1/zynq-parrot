@@ -80,4 +80,3 @@ package bp_common_pkg;
   `include "bp_common_rv64_pkgdef.svh"
 
 endpackage
-

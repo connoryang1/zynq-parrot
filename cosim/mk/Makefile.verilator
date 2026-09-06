@@ -1,7 +1,13 @@
 
 include $(COSIM_MK_DIR)/Makefile.sim
 
+SHELL := /bin/bash
+.SHELLFLAGS := -o pipefail -c
+
 DEFINES += SIMULATION
+
+DUMP_FILE ?= dump.fst
+VERILATOR_BUILD_JOBS ?= $(shell nproc)
 
 VV_VFLAGS += $(addprefix +define+,$(filter-out VERILATOR,$(DEFINES)))
 VV_VFLAGS += $(addprefix +incdir+,$(VINCLUDES))
@@ -16,7 +22,7 @@ VV_LDFLAGS += $(addprefix -L,$(CLIBDIRS))
 VV_LDFLAGS += $(addprefix -l,$(CLIBS))
 
 VV_BUILD_OPTS += $(COSIM_VSRC_DIR)/waiver.vlt
-VV_BUILD_OPTS += --cc --sv --exe --build
+VV_BUILD_OPTS += --cc --sv --exe --build --build-jobs $(VERILATOR_BUILD_JOBS)
 VV_BUILD_OPTS += -Wno-fatal
 VV_BUILD_OPTS += -top-module $(TB_MODULE)
 VV_BUILD_OPTS += -CFLAGS "$(VV_CFLAGS)"
@@ -24,25 +30,37 @@ VV_BUILD_OPTS += -LDFLAGS "$(VV_LDFLAGS)"
 VV_BUILD_OPTS += $(VV_VFLAGS)
 
 VV_RUN_OPTS +=
-
-ifneq (,$(TRACE))
-RUN_ARGS += +bsg_trace
-endif
+EXTRA_RUN_ARGS ?=
 
 run: ## runs the verilated executable
 run: obj_dir/V$(TB_MODULE) | $(RUN_COLLATERAL)
-	@./$< $(VV_RUN_OPTS) $(RUN_ARGS) 2>&1 | $(TEE_I) run.log
+	@./$< $(VV_RUN_OPTS) $(RUN_ARGS) $(EXTRA_RUN_ARGS) 2>&1 | $(TEE_I) run.log
 
 ifneq (,$(TRACE))
+RUN_ARGS += +bsg_trace=$(DUMP_FILE)
 BUILD_ARGS += --trace-fst --trace-structs
 BUILD_ARGS += +define+FSTON
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_ENABLE
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_DEPTH=0
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_HIER=bsg_nonsynth_zynq_testbench.dut
+BUILD_ARGS += +define+BSG_NONSYNTH_WAVEFORM_TRACER_FST
 endif
 build: ## builds the verilated executable
-build: %/V$(TB_MODULE)
-%/V$(TB_MODULE): $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
-	$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS) $^ 2>&1 | $(TEE_I) build.log
+build: obj_dir/V$(TB_MODULE)
+
+# Keep the coordinator's configuration stamp: the executable name alone does
+# not distinguish topology, configuration, or tracing. Still clean explicitly
+# before a verification checkpoint, as documented in AGENTS.md.
+MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)
+MODEL_CONFIG_STAMP := obj_dir/.build_config-$(MODEL_CONFIG_TAG)
+
+$(MODEL_CONFIG_STAMP): | $(BUILD_COLLATERAL)
+	@mkdir -p $(@D)
+	@touch $@
+
+obj_dir/V$(TB_MODULE): $(MODEL_CONFIG_STAMP) $(VPACKAGES) $(VSOURCES) $(CSOURCES) | $(BUILD_COLLATERAL)
+	$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS) $(filter-out obj_dir/.build_config-%,$^) 2>&1 | $(TEE_I) build.log
 
 view: ## View the dump with GTKwave
 view: dump.fst
 	@$(GTKWAVE) -f $<
-

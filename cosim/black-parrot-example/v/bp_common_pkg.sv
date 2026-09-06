@@ -21,6 +21,10 @@ package bp_common_pkg;
   localparam bp_proc_param_s bp_unicore_zynqparrot_cfg_override_p =
     '{paddr_width: 34
 
+      // This historical schema has no separate logical-context count. Keep
+      // the resident register banks at the validated PYNQ-Z2 fit dimension.
+      ,num_threads: 2
+
       ,icache_fill_width: 64
 
       ,dcache_fill_width: 64
@@ -31,8 +35,9 @@ package bp_common_pkg;
 
       ,l2_data_width: 64
       ,l2_fill_width: 64
-      ,l2_slices    : 2
-      ,l2_banks     : 2
+      // Keep the PYNQ-Z2 implementation within the xc7z020 LUT/slice budget.
+      ,l2_slices    : 1
+      ,l2_banks     : 1
 
       ,itlb_els_4k : 16
       ,itlb_els_2m : 1
@@ -130,4 +135,3 @@ package bp_common_pkg;
   `include "bp_common_rv64_pkgdef.svh"
 
 endpackage
-

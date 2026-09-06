@@ -15,12 +15,13 @@ BP_NCPUS ?= 1
 
 PROG ?= hello_world
 NBF_FILE ?= prog.nbf
+TARGET_RUNTIME_MS ?=
 
 # GP2 watchdog heartbeat transactions can legitimately take longer than the
 # default AXI timeout threshold in this full-system cosim path.
 CFLAGS += -DZYNQ_AXI_TIMEOUT=100000
 
-RUN_ARGS += +c_args=$(NBF_FILE)
+RUN_ARGS += +c_args="$(NBF_FILE)$(if $(TARGET_RUNTIME_MS), $(TARGET_RUNTIME_MS))"
 
 #############################
 # Design Defines
@@ -43,4 +44,38 @@ DEFINES += TAG_ENABLE=1
 #DEFINES += ZERO_DRAM
 DEFINES += BP_NCPUS=$(BP_NCPUS)
 
+# The PYNQ-Z2 context-cache configuration uses two resident hardware slots
+# and four software-visible contexts.  Keep this aligned with the targeted
+# nonresident tests and pass the generated custom configuration into Vivado;
+# otherwise e_bp_custom_cfg falls back to the four-resident-thread default,
+# which exceeds the device's LUT capacity.
+ifneq ($(NUM_THREADS),)
+NUM_CONTEXTS ?= $(NUM_THREADS)
+THREAD_ID_WIDTH := $(shell awk 'BEGIN { n=$(NUM_THREADS)-1; w=0; while (n > 0) { w++; n=int(n/2); } print w; }')
+BRANCH_METADATA_FWD_WIDTH ?= $(shell awk 'BEGIN { print 49 + $(THREAD_ID_WIDTH); }')
+CFG ?= e_bp_custom_cfg
+DEFINES += BP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p
+DEFINES += BP_NUM_THREADS=$(NUM_THREADS)
+DEFINES += BP_NUM_CONTEXTS=$(NUM_CONTEXTS)
+DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)
+endif
+
 include $(COSIM_MK_DIR)/Makefile.master
+
+# A custom aviary configuration without explicit dimensions silently uses the
+# package defaults (currently four resident threads).  That configuration is
+# not placeable on the PYNQ-Z2, so reject it before collateral generation or
+# Vivado can spend hours on an invalid implementation.
+ifeq ($(CFG),e_bp_custom_cfg)
+ifeq ($(strip $(NUM_THREADS)),)
+$(error CFG=e_bp_custom_cfg requires NUM_THREADS=<resident slots> and NUM_CONTEXTS=<logical contexts>; use NUM_THREADS=2 NUM_CONTEXTS=4 for the PYNQ-Z2 context-cache build)
+endif
+ifeq ($(strip $(NUM_CONTEXTS)),)
+$(error CFG=e_bp_custom_cfg requires NUM_CONTEXTS=<logical contexts>; use NUM_THREADS=2 NUM_CONTEXTS=4 for the PYNQ-Z2 context-cache build)
+endif
+endif
+ifneq ($(strip $(NUM_THREADS)),)
+ifneq ($(CFG),e_bp_custom_cfg)
+$(error NUM_THREADS/NUM_CONTEXTS select custom context-cache dimensions and require CFG=e_bp_custom_cfg)
+endif
+endif
