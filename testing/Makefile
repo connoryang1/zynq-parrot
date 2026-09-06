@@ -37,7 +37,8 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_late_wb_hazard_test \
     mt_ctxtsw_pure_ring_stress_test
 
-BENCHMARKS :=
+BENCHMARKS := \
+    mt_ctxtsw_nonresident_overhead_benchmark
 
 NONRESIDENT_TESTS := \
     mt_umode_nonresident_handoff_test \
