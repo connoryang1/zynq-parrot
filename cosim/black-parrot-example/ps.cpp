@@ -5,12 +5,15 @@
 // communication plumbing differences.
 
 #include <bitset>
+#include <errno.h>
 #include <locale.h>
 #include <queue>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <type_traits>
 #include <unistd.h>
+#include <utility>
 
 #include "ps.hpp"
 
@@ -28,7 +31,39 @@
 // Helper functions
 void nbf_load(bsg_zynq_pl *zpl, char *filename);
 
+// Older PYNQ deployment checkouts expose done() as void, while current
+// simulation and hardware backends return a status code. Keep the shared host
+// program source-compatible with both interfaces.
+template <typename Zpl>
+typename std::enable_if<std::is_void<decltype(std::declval<Zpl &>().done())>::value,
+                        int>::type
+finish(Zpl *zpl) {
+    zpl->done();
+    return 0;
+}
+
+template <typename Zpl>
+typename std::enable_if<!std::is_void<decltype(std::declval<Zpl &>().done())>::value,
+                        int>::type
+finish(Zpl *zpl) {
+    return zpl->done();
+}
+
 int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
+
+    unsigned long long max_runtime_ms = 0;
+    if (argc >= 3) {
+        char *end = nullptr;
+        errno = 0;
+        max_runtime_ms = strtoull(argv[2], &end, 0);
+        if (errno || end == argv[2] || *end != '\0') {
+            bsg_pr_err("ps.cpp: invalid max runtime in milliseconds: %s\n",
+                       argv[2]);
+            return -1;
+        }
+        bsg_pr_info("ps.cpp: limiting target runtime to %llu ms\n",
+                    max_runtime_ms);
+    }
 
     long data;
     long val1 = 0x1;
@@ -83,22 +118,21 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     unsigned long phys_ptr;
     volatile int *buf;
     data = zpl->shell_read(GP0_RD_CSR_DRAM_INITED);
-    if (data == 0) {
-        bsg_pr_info(
-            "ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate "
-            "dram with size %ld\n",
-            (long)DRAM_ALLOCATE_SIZE);
-        buf = (volatile int *)zpl->allocate_dram(DRAM_ALLOCATE_SIZE, &phys_ptr);
-        bsg_pr_info("ps.cpp: received %p (phys = %lx)\n", buf, phys_ptr);
-        zpl->shell_write(GP0_WR_CSR_DRAM_BASE, phys_ptr, mask1);
-        assert((zpl->shell_read(GP0_RD_CSR_DRAM_BASE) == (int32_t)(phys_ptr)));
-        bsg_pr_info("ps.cpp: wrote and verified base register\n");
-        zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x1, mask2);
-        assert(zpl->shell_read(GP0_RD_CSR_DRAM_INITED) == 1);
-    } else {
-        bsg_pr_info("ps.cpp: reusing dram base pointer %x\n",
-                    zpl->shell_read(GP0_RD_CSR_DRAM_BASE));
-    }
+    if (data != 0)
+        bsg_pr_warn(
+            "ps.cpp: ignoring stale cross-process DRAM base pointer %x\n",
+            zpl->shell_read(GP0_RD_CSR_DRAM_BASE));
+    zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);
+
+    bsg_pr_info("ps.cpp: allocating owned DRAM buffer with size %ld\n",
+                (long)DRAM_ALLOCATE_SIZE);
+    buf = (volatile int *)zpl->allocate_dram(DRAM_ALLOCATE_SIZE, &phys_ptr);
+    bsg_pr_info("ps.cpp: received %p (phys = %lx)\n", buf, phys_ptr);
+    zpl->shell_write(GP0_WR_CSR_DRAM_BASE, phys_ptr, mask1);
+    assert((zpl->shell_read(GP0_RD_CSR_DRAM_BASE) == (int32_t)(phys_ptr)));
+    bsg_pr_info("ps.cpp: wrote and verified base register\n");
+    zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x1, mask2);
+    assert(zpl->shell_read(GP0_RD_CSR_DRAM_INITED) == 1);
 
     if (argc == 1) {
         bsg_pr_warn(
@@ -184,17 +218,15 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
 
     // Must zero DRAM for FPGA Linux boot, because opensbi payload mode
     //   obliterates the section names of the payload (Linux)
-#ifdef ZERO_DRAM
+#if defined(ZERO_DRAM) && ZERO_DRAM
     bsg_pr_info("ps.cpp: Zero-ing DRAM (%d bytes)\n",
                 (int)DRAM_ALLOCATE_SIZE);
     for (int i = 0; i < DRAM_ALLOCATE_SIZE; i += 4) {
-        // if (i % (1024 * 1024) == 0)
-        if (i % (1024) == 0)
-            bsg_pr_info("ps.cpp: (%d) zero-d %d MB\n", i,
-                        i / (1024 * 1024));
+        if (i % (1024 * 1024) == 0)
+            bsg_pr_info("ps.cpp: zero-d %d MB\n", i / (1024 * 1024));
         zpl->shell_write(gp1_addr_base + i, 0x0, mask1);
     }
-#endif // ZERO_DRAM
+#endif // defined(ZERO_DRAM) && ZERO_DRAM
 
     bsg_pr_info("ps.cpp: beginning config\n");
     uintptr_t base_addr = GP1_CSR_BASE_ADDR;
@@ -222,11 +254,29 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     zpl->start();
 
     bsg_spack_t spack;
+    bool runtime_limit_reached = false;
+    unsigned long long empty_poll_count = 0;
     do {
         if (host->get_next_packet(&spack)) {
             host->process_spack(&spack);
         } else {
             for (int i = 0; i < 10; i++) zpl->tick();
+        }
+        empty_poll_count++;
+        if (max_runtime_ms && ((empty_poll_count & 0x3ff) == 0)) {
+            struct timespec now;
+            clock_gettime(CLOCK_MONOTONIC, &now);
+            long long elapsed_ns =
+                1000000000LL * (now.tv_sec - start.tv_sec)
+                + (now.tv_nsec - start.tv_nsec);
+            unsigned long long elapsed_ms = elapsed_ns / 1000000LL;
+            if (elapsed_ms >= max_runtime_ms) {
+                bsg_pr_warn(
+                    "ps.cpp: target runtime limit reached after %llu ms\n",
+                    elapsed_ms);
+                runtime_limit_reached = true;
+                break;
+            }
         }
     } while (!host->is_finished());
 
@@ -280,19 +330,12 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         "%-8.8d%-8.8d%-8.8d%-8.8d\n",
         zpl->shell_read(GP0_RD_MEM_PROF_3), zpl->shell_read(GP0_RD_MEM_PROF_2),
         zpl->shell_read(GP0_RD_MEM_PROF_1), zpl->shell_read(GP0_RD_MEM_PROF_0));
-    // in general we do not want to free the dram; the Xilinx allocator has a
-    // tendency to
-    // fail after many allocate/fail cycle. instead we keep a pointer to the
-    // dram in a CSR in the accelerator, and if we reload the bitstream, we copy
-    // the pointer back in.
-
-#ifdef FREE_DRAM
     bsg_pr_info("ps.cpp: freeing DRAM buffer\n");
     zpl->free_dram((void *)buf);
     zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);
-#endif // FREE_DRAM
 
-    return zpl->done();
+    int done_rc = finish(zpl);
+    return runtime_limit_reached ? 124 : done_rc;
 }
 
 void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
@@ -371,4 +414,3 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
 
     bsg_pr_dbg_ps("ps.cpp: finished loading %d lines of nbf.\n", line_count);
 }
-

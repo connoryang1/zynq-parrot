@@ -83,6 +83,10 @@ proc vivado_elab_wrap { do_elab proj_bd } {
 
 proc vivado_synth_wrap { do_synth threads } {
     if {${do_synth}} {
+        # ``launch_runs -jobs`` schedules independent runs but does not raise
+        # the worker count inside the one synth run in this flow.  Keep both
+        # limits aligned with the explicitly recorded host cap.
+        set_param general.maxThreads ${threads}
         # Uncomment for faster TTR with worse QoR
         #set_property strategy Flow_RuntimeOptimized [get_runs synth_1]
         set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY rebuilt [get_runs synth_1]
@@ -95,6 +99,8 @@ proc vivado_synth_wrap { do_synth threads } {
 
 proc vivado_impl_wrap { do_impl threads } {
     if {${do_impl}} {
+        # See vivado_synth_wrap: implementation is likewise a single run.
+        set_param general.maxThreads ${threads}
         # Uncomment for faster TTR with worse QoR
         #set_property strategy Flow_RuntimeOptimized [get_runs impl_1]
         launch_runs impl_1 -to_step write_bitstream -jobs ${threads}
@@ -170,6 +176,44 @@ proc vivado_create_design { vpackages vsources vincludes } {
     set_property -quiet file_type "Verilog" [get_files -quiet top.v]
 
     set_property top top [get_filesets sources_1]
+
+    # The context-cache dimensions are preprocessor overrides, not IP
+    # parameters.  Make propagates them into vivado.tcl, but Vivado does not
+    # infer them from the environment when packaging an IP.  Apply them only
+    # when the generated collateral selects e_bp_custom_cfg.  The PYNQ TCL
+    # always exports these environment variables; applying them to the static
+    # e_bp_unicore_zynqparrot_cfg would perturb a configuration that does not
+    # consume the custom aviary parameters.
+    set context_define_names [list \
+        BP_CUSTOM_BASE_CFG BP_NUM_THREADS BP_NUM_CONTEXTS BRANCH_METADATA_FWD_WIDTH]
+    set context_defines [list]
+    foreach define_name ${context_define_names} {
+        if {[info exists ::env(${define_name})]} {
+            lappend context_defines "${define_name}=$::env(${define_name})"
+        }
+    }
+    set selected_custom_cfg 0
+    set cfg_pkg_files [get_files -quiet bsg_blackparrot_pkg.sv]
+    foreach cfg_pkg ${cfg_pkg_files} {
+        set cfg_fd [open ${cfg_pkg} r]
+        set cfg_text [read ${cfg_fd}]
+        close ${cfg_fd}
+        if {[regexp {bp_cfg_gp\s*=\s*e_bp_custom_cfg} ${cfg_text}]} {
+            set selected_custom_cfg 1
+        }
+    }
+
+    if {[llength ${context_defines}] > 0 && ${selected_custom_cfg}} {
+        if {[llength ${context_defines}] != [llength ${context_define_names}]} {
+            error "incomplete context-cache Verilog defines: ${context_defines}"
+        }
+        set fileset [get_filesets sources_1]
+        set_property verilog_define [concat [get_property verilog_define ${fileset}] ${context_defines}] ${fileset}
+        puts "BP-CONTEXT-CONFIG: applied Verilog defines ${context_defines}"
+    } elseif {[llength ${context_defines}] > 0} {
+        puts "BP-CONTEXT-CONFIG: static cfg selected; ignored custom Verilog defines"
+    }
+
     update_compile_order -verbose -fileset sources_1
 }
 
@@ -212,4 +256,3 @@ proc vivado_create_ip_proj { proj_name proj_bd ip_name part ip_script args } {
     vivado_create_ip ${args}
     vivado_save_bd_design ${proj_name} ${proj_bd}
 }
-
