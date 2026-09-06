@@ -27,7 +27,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_csr_isolation_test` | Independent resident `mscratch` state |
 | `mt_frf_isolation_test` | Resident floating-point register isolation; not nonresident FP preservation |
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
-| `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
+| `mt_ctxtsw_late_wb_hazard_test` | Source load result survives a resident round trip; source late writeback must not clear the target's scoreboard hazard |
 | `mt_ctxtsw_gpr_ring_stress` | Live integer-register sentinels survive a ring through all four logical IDs |
 | `mt_ctxtsw_pure_ring_stress_test` | Progress through dense consecutive switches across all four logical IDs |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
@@ -57,6 +57,32 @@ teardown prints `BSG PASS`. The known GPIO teardown assertion after guest PASS
 must be reported separately.
 
 ## Scope and interpretation
+
+### Ordinary-load overlap probe
+
+`mt_ctxtsw_late_wb_hazard_test` issues a normal load into context 0's `a5`,
+immediately requests a resident switch, and runs an independent divide plus
+dependent arithmetic in context 1. It checks both contexts' results after the
+round trip. Run with `NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1`; contexts 0 and 1
+remain resident. No prefetch instruction is used.
+
+PASS establishes correctness, not overlap or speedup. Disassemble the freshly
+built ELF to locate `t0_roundtrip` and `t1_entry`; pass their load, switch, and
+target arithmetic PCs to `tools/load_switch_vcd_events.py`:
+
+```sh
+fst2vcd path/to/archived/dump.fst \
+  | python3 tools/load_switch_vcd_events.py --pc <load-PC> --pc <target-PC>
+```
+
+The JSON rows sample pre-rising-edge signals; the default period assumes the
+normal 20 MHz clock and 1 ps trace ticks. Require a source `miss`, an actual
+target `dv=1,dq=1,tid=1` dispatch, and matching source `critical` data arrival
+in that order. Check committed target arithmetic (`cv,cp`) and guest results
+as well: speculative switch requests or late register writeback alone do not
+prove memory-latency hiding. Distinguish initial long misses from short later
+misses, which may finish before target execution. Nonresident bank replacement
+has an additional drain requirement and is not validated by this probe.
 
 A nonresident result requires `NUM_CONTEXTS > NUM_THREADS`; default all-resident
 topologies do not test SRAM eviction. The benchmark reports amortized

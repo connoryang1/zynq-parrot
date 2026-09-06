@@ -2,9 +2,11 @@
  * mt_ctxtsw_late_wb_hazard_test.c
  *
  * Regression for cross-thread scoreboard clearing. Thread 0 launches a cold
- * load to x15/a5 and switches before the late writeback returns. Thread 1 then
+ * load to x15/a5 and immediately requests a switch. Thread 1 then
  * launches a scored divide to the same architectural register and immediately
- * consumes it. A late T0 writeback must not clear T1's x15 hazard.
+ * consumes it. A late T0 writeback must not clear T1's x15 hazard, and T0 must
+ * receive its own load result after switching back. PASS checks correctness;
+ * use the waveform to establish whether target execution overlaps the miss.
  */
 
 #include <stdint.h>
@@ -37,13 +39,14 @@ static volatile uint64_t t0_load_lines[ROUNDS * 8] __attribute__((aligned(64), u
   0x9800000000000005ULL, 0x9800000000000006ULL, 0x9800000000000007ULL, 0x9800000000000008ULL
 };
 
-void __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line);
+uint64_t __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line);
 void __attribute__((naked, noinline, noreturn)) t1_entry(void);
 
-void __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line) {
+uint64_t __attribute__((naked, noinline)) t0_roundtrip(volatile uint64_t *line) {
   __asm__ volatile(
     "ld    a5, 0(a0)\n"
     "csrwi 0x800, 1\n"
+    "mv    a0, a5\n"
     "ret\n"
   );
 }
@@ -79,7 +82,13 @@ int main(void) {
     seed_reg(1, 11 /* x11=a1 */, divisor);
     seed_reg(1, 15 /* x15=a5 */, 0x5555000000000000ULL + i);
 
-    t0_roundtrip(&t0_load_lines[i * 8]);
+    const uint64_t loaded = t0_roundtrip(&t0_load_lines[i * 8]);
+    // Compute the expected value without warming the tested cache line.
+    const uint64_t expected_load = 0x9100000000000001ULL + (i << 56);
+    if (loaded != expected_load) {
+      bp_print_string("[BSG-FAIL] source load result changed across switch\n");
+      bp_finish(1);
+    }
 
     if (!t1_done) {
       bp_print_string("[BSG-FAIL] thread 1 did not switch back\n");
