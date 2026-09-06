@@ -39,7 +39,10 @@ CORRECTNESS_TESTS := \
 
 BENCHMARKS :=
 
-NONRESIDENT_TESTS :=
+NONRESIDENT_TESTS := \
+    mt_umode_nonresident_handoff_test \
+    mt_umode_nonresident_sv39_handoff_test \
+    mt_umode_nonresident_sv39_data_handoff_test
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
 
@@ -78,6 +81,20 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 endef
 
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
+
+$(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
+$(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
+
+.PHONY: check-nonresident-config
+check-nonresident-config:
+	@if (( $(NUM_CONTEXTS) <= $(NUM_THREADS) )); then \
+		echo "ERROR: nonresident handoff requires NUM_CONTEXTS > NUM_THREADS"; \
+		exit 1; \
+	fi
+
+run-mt_umode_nonresident_handoff_test: check-nonresident-config
+run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
+run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 
 clean::
 	@echo "  [RM] Cleaning build artifacts..."
