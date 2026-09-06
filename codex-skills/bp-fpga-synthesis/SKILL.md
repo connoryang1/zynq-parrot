@@ -5,6 +5,11 @@ description: Prepare, launch, monitor, and interpret BlackParrot FPGA builds for
 
 # BlackParrot FPGA Synthesis
 
+This file defines the reproducible build and deployment procedure for the
+PYNQ-Z2 BlackParrot image. It separates cheap local evidence, expensive routed
+implementation, and serialized board acceptance so each result answers a
+specific engineering question.
+
 Keep quick iteration separate from slow implementation. Treat a routed bitstream with
 acceptable timing as the fit gate; elaboration or synthesis alone is not enough.
 
@@ -97,6 +102,15 @@ input. Never fall back to a direct `sudo ./control-program` session merely to ga
 
 Use the foreground only for quick checks such as readiness, `git diff --check`, compilation,
 and targeted simulation. Serialize tests that share the same Verilator directory.
+
+When an isolated or historical candidate predates the maintained `_fpga.nbf`
+rules or board CRT sources, do not launch another Vivado build and do not copy
+unreviewed infrastructure into the RTL checkpoint. Compile the candidate's
+exact test source against the known-reviewed integer board CRT from the
+coordination checkout, define `BP_FPGA_PROGRAM`, package it with the candidate's
+NBF tool, and record the source, CRT, ELF, and NBF hashes. This is a software
+collateral change only; keep its revision identity separate from the committed
+RTL revision used by the bitstream.
 
 For a clean trace-enabled Verilator build on this checkout, remove the parent make jobserver
 from Verilator's environment and give Verilator the worker count explicitly:
