@@ -64,7 +64,7 @@ must be reported separately.
 
 ```sh
 make -C testing clean
-BSG_TRACE_TIMEOUT_S=600 make -C testing run-mt_independent_requests_benchmark \
+BSG_TRACE_TIMEOUT_S=900 make -C testing run-mt_independent_requests_benchmark \
   NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12
 ```
 
@@ -94,13 +94,22 @@ uniform capacity or DRAM-latency test. Validate timed miss counts and critical
 word/full-refill latencies from the closed waveform before interpreting ratios.
 No unrelated arithmetic worker or prefetch instruction is used.
 
-Verified simulation on RTL `1b9e611d4`, two resident/four logical contexts,
+Data IDs are `0=hot/hot`, `1=pressure/pressure`, `2=pressure/hot`, and
+`3=hot/pressure`, in handler A/B order. Hot A/B use sets 1/2 modulo eight,
+disjoint from pressure A/B's sets 0/4, so the mixed cases do not accidentally
+evict the hot handler's ring. Mixed preconditioning traverses 128 steps in
+both rings (sixteen laps of the eight-node hot ring). There are two reversed
+order repetitions per mode and data case, plus three checked warmups.
+
+Verified four-case simulation on RTL `1b9e611d4`, two resident/four logical contexts,
 `TRACE=1` (2026-09-06), total cycles for both 64-load chains:
 
 | Data | Sequential | Batched ordinary loads | Resident handlers |
 | --- | ---: | ---: | ---: |
 | Hot | 1,057 / 1,057 | 924 / 920 | 1,693 / 1,689 |
 | Set pressure | 7,295 / 7,295 | 7,298 / 7,298 | 7,326 / 7,325 |
+| Pressure / hot | 4,166 / 4,166 | 3,650 / 3,650 | 3,685 / 3,685 |
+| Hot / pressure | 4,156 / 4,156 | 3,650 / 3,650 | 3,672 / 3,668 |
 
 All checks and guest PASS succeed (known post-PASS GPIO teardown assertion).
 Counter intervals match waveform cycles exactly; every interval commits 128
@@ -109,18 +118,37 @@ trial accepts 128 misses, each with an 11-cycle critical-word response and
 53-cycle full refill, with no overlapping accepted ring misses. Sequential
 and batched timers end after consuming the final result but 24 and 21 cycles
 before its full refill ends; resident timing includes that tail. Hot trials
-have no ring misses.
+have no ring misses. These original two cases exactly reproduce the previous
+two-case run at top `4ef915ac`, despite the hot-layout adjustment.
 
-There is **no memory-bound throughput gain** here: switching is about 0.4%
-slower than sequential, and even batching cannot overlap the fetches. The
+The mixed cases each have 64 misses from the pressure chain and zero from the
+hot chain, with the same 11/53-cycle response/refill latencies in every mode.
+Resident switching saves **11.5–11.7% of cycles (about 1.13× throughput)** and
+comes within 1% of batching. Waveforms show the other handler's digest commits
+during at least 63 of 64 refill intervals, but none before the requested word
+arrives in the resident mode: this hides refill-tail stalls, not simultaneous
+DRAM accesses. Every demanded result and digest completes inside timing;
+some final refill tails finish afterward (1–5 cycles for hot/pressure resident,
+16–21 for mixed batching, 24 for hot/pressure sequential).
+
+There is **no gain when both chains miss**: switching is about 0.4%
+slower than sequential, and even batching cannot overlap those fetches. The
 current D-cache gates requests on `is_ready`, leaves that state on a blocking
 request, and waits for `complete_recv` before accepting another miss
 (`import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache.sv`, request gating
 and state machine). This test is a reusable baseline for a future memory-level
 parallelism change, not evidence that the intended prefetch/yield application
 speedup is already achieved. Evidence, exact ELF/NBF and closed waveform:
-`logs/independent-requests-benchmark-20260906/`; no RTL, Linux, or FPGA change
-was made for this measurement.
+`logs/mixed-requests-benchmark-20260906/` (original two-case evidence remains
+in `logs/independent-requests-benchmark-20260906/`). All three warmups and 24
+measured checks pass; no RTL, Linux, or FPGA change was made.
+
+Two concurrent demand misses are not a configuration-only extension: D-cache
+has one descriptor and partial-fill tracker, `bp_uce.sv` waits for a complete
+read response, and the L2 slice uses blocking `bsg_cache`. A future experiment
+must preserve response/thread ownership and nonresident drain, and prove a
+second request is accepted before the first completes. Queuing a second L1
+request alone is not proof of concurrent DRAM fetches or acceptable FPGA fit.
 
 ### Equal-work pointer traversal and computation
 

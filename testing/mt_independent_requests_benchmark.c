@@ -26,7 +26,12 @@
  * total 16 KiB. This is intentional set pressure, not a uniform capacity test.
  * The two independently permuted rings never share a cache line or D$ set.
  */
-struct hot_node { uintptr_t a; uint8_t pad_a[56]; uintptr_t b; uint8_t pad_b[56]; };
+/* Hot A/B select sets 1/2 modulo eight, disjoint from pressure A/B (0/4).
+ * Padding preserves hot residency in BOTH mixed cases, not only one order. */
+struct hot_node {
+  uint8_t prefix[64]; uintptr_t a; uint8_t pad_a[56];
+  uintptr_t b; uint8_t pad_b[376];
+};
 struct pressure_node { uintptr_t a; uint8_t pad_a[248]; uintptr_t b; uint8_t pad_b[248]; };
 static struct hot_node hot[HOT_NODES] __attribute__((aligned(4096)));
 static struct pressure_node pressure[PRESSURE_NODES] __attribute__((aligned(4096)));
@@ -151,21 +156,29 @@ run(unsigned mode, uintptr_t a, uintptr_t b, unsigned nodes, struct pair *result
 
 int main(void)
 {
-  struct pair expected[2], observed;
-  uintptr_t roots[2][2];
-  uint64_t times[2][6];
+  struct pair expected[4], observed;
+  uintptr_t roots[4][2];
+  uint64_t times[4][6];
   const unsigned order[6] = {0, 1, 2, 2, 1, 0};
   roots[0][0] = make_ring((uintptr_t)&hot[0].a, sizeof(hot[0]), HOT_NODES, 0x314159, &expected[0].a);
   roots[0][1] = make_ring((uintptr_t)&hot[0].b, sizeof(hot[0]), HOT_NODES, 0x271828, &expected[0].b);
   roots[1][0] = make_ring((uintptr_t)&pressure[0].a, sizeof(pressure[0]), PRESSURE_NODES, 0x314159, &expected[1].a);
   roots[1][1] = make_ring((uintptr_t)&pressure[0].b, sizeof(pressure[0]), PRESSURE_NODES, 0x271828, &expected[1].b);
+  /* Mixed cases retain one real pointer-walking handler, not an arithmetic
+   * stand-in. Test both launch orders so a favorable first context is not
+   * mistaken for general miss overlap. Data: 0=hot/hot, 1=pressure/pressure,
+   * 2=pressure/hot, 3=hot/pressure (A/B). */
+  roots[2][0] = roots[1][0]; roots[2][1] = roots[0][1];
+  expected[2].a = expected[1].a; expected[2].b = expected[0].b;
+  roots[3][0] = roots[0][0]; roots[3][1] = roots[1][1];
+  expected[3].a = expected[0].a; expected[3].b = expected[1].b;
   bp_print_string("=== Independent Requests Benchmark (ordinary loads) ===\n");
   /* Warm all instruction paths, then execute each trial order and its reverse. */
   for (unsigned mode = 0; mode < 3; ++mode) {
     run(mode, roots[0][0], roots[0][1], HOT_NODES, &observed);
     if (observed.a != expected[0].a || observed.b != expected[0].b) goto fail;
   }
-  for (unsigned data = 0; data < 2; ++data) {
+  for (unsigned data = 0; data < 4; ++data) {
     for (unsigned trial = 0; trial < 6; ++trial) {
       bp_print_string("[BSG-INFO] trial data/mode: ");
       bp_hprint_uint64(data * 16 + order[trial]); bp_print_string("\n");
@@ -176,7 +189,7 @@ int main(void)
   }
   bp_print_string("[BSG-INFO] chains/loads-per-chain: ");
   bp_hprint_uint64(2); bp_print_string(" "); bp_hprint_uint64(STEPS); bp_print_string("\n");
-  for (unsigned data = 0; data < 2; ++data) {
+  for (unsigned data = 0; data < 4; ++data) {
     for (unsigned trial = 0; trial < 6; ++trial) {
       bp_print_string("[BSG-INFO] result data/mode/cycles: ");
       bp_hprint_uint64(data); bp_print_string(" ");
