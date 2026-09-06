@@ -39,10 +39,10 @@ correctness passes, not a claim of warning-free simulator shutdown.
 | --- | --- | --- |
 | `zp-ce-*`, `bp-ce-overlay`, `zp-4015-original` | Historical Linux baselines and compatibility overlays | Historical comparisons, not current fixes to merge |
 | `zp-feature-*`, `bp-feature-*` | Feature-prefix bisection and focused replay, CSR, cache, and register-file repair candidates | Superseded integration candidates; retain their individual evidence |
-| `zp-linux-user-handoff-fix`, `bp-linux-user-handoff-fix` | Final translated userspace handoff repair and acceptance work | Source of the canonical RTL; retained as rollback/evidence snapshots |
+| `zp-linux-user-handoff-fix`, `bp-linux-user-handoff-fix` | Final translated userspace handoff repair and acceptance work | Source of the canonical RTL; preserved in the experiment archive |
 | `/tmp/zynq-parrot-fpga-*` | Immutable inputs to individual synthesis jobs | Build evidence, not development checkouts |
 
-The inventory found 47 `zp-*` and 35 `bp-*` registered worktrees plus 32 temporary synthesis worktrees. These counts describe accumulated experiments, not separate supported implementations. This consolidation does not delete those directories, rewrite their history, or remove bitstreams and transcripts.
+The inventory found 47 `zp-*` and 35 `bp-*` registered worktrees plus 32 temporary synthesis worktrees. All 114 have now been archived, verified, and removed from their original locations; only the canonical checkout remains registered in each repository. Branches, commits, dirty files, and build evidence are preserved, not discarded. See [EXPERIMENT_ARCHIVE.md](EXPERIMENT_ARCHIVE.md) for the backup location and recovery instructions.
 
 ## Preserved work and recovery
 
