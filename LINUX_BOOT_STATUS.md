@@ -7,7 +7,7 @@ the Linux kernel in S-mode; Linux then starts the root filesystem's `/init`.
 
 Status labels: **pre-existing** means it was known to work before this
 context-switch work; **fixed here** names a repair authored during this work;
-**current** means not yet proved on the repaired FPGA image.
+**accepted** means the exact repaired image has passed on the FPGA.
 
 ## Boot path and status
 
@@ -16,12 +16,37 @@ context-switch work; **fixed here** names a repair authored during this work;
 | 1 | The ARM host resets the PYNQ programmable logic and loads the BlackParrot bitstream. | **Pre-existing:** working. |
 | 2 | The host allocates/zeros 64 MiB of board DRAM and loads the Linux NBF into it. | **Pre-existing:** working. |
 | 3 | The host releases BlackParrot reset; its boot ROM enters the NBF-provided OpenSBI firmware in machine mode (M-mode). | **Pre-existing:** working. |
-| 4 | OpenSBI initializes machine CSRs, timer/interrupt delegation, PMP, and its trap path. | **Fixed here:** PMP, absent HPM, and the six later optional capability CSRs are legal hardwired-zero WARL registers, so OpenSBI reports no unsupported capability without entering temporary-`mtvec` fault handling. **Physical proof:** the routed image passes `sbi_ecall_init` (`M8`), the late `sbi_init` midpoint (`M9`), and final PMP configuration (`Ma`). **Current proof:** the final-HSM path reaches the `atomic_cmpxchg` return, the expected-state branch, the subsequent `atomic_write` return, and the real `sbi_hart_switch_mode` entry, all through untouched firmware followed by a terminal `CORE PASS`. The original static e5ee trap probe was invalid because its NBF began at the target halfword: both a cold complete-line redirect and the exact archived line plus full HSM call prefix pass locally. |
-| 5 | OpenSBI executes `mret`, transferring to the Linux kernel in supervisor mode (S-mode). | **Fixed/proved here:** a fresh, hash-verified current-image terminal at Linux physical entry `0x80200000` reaches `CORE PASS` after the complete untouched OpenSBI path. |
-| 6 | Linux performs early CPU, page-table, and trap initialization. | **Current physical bracket:** guarded markers on the `05b1e786` routed image reach the first main-kernel routine (`0x80c05544`, `Me`) and return from its first five real helper calls (`0x80c05598`, `Mg`; `0x80c05610`, `Mh`; `0x80c05884`, `Mi`; `0x80c0590c`, `Mk`). The marker immediately before the next call (`0x80c059c0`) does not reach, confining the live path to its preceding 184-byte setup, including two explicit `ebreak` assertion paths. Thus the old 720-byte span is only a coarse landmark gap—not 720 bytes of proven dynamic execution—and the active pre-`satp` path is now being split at those assertions. |
-| 7 | Linux allocates its two 128 KiB atomic DMA pools and continues device/kernel initialization. | **Fixed as a false boundary:** `initcall_debug` proves `dma_atomic_pool_init` returns 0 and many later initcalls complete. |
-| 8 | Linux's RISC-V unaligned-access capability probe runs. | **Current physical bracket:** with the matched bounded legacy runner, a guarded terminal at `check_unaligned_access_boot_cpu` entry (`0x8020319e`) reaches `CORE[0] PASS` after 3,029,117 retired instructions, while its guarded return site (`0x802031ac`) reaches a clean 15-second target limit after 63,852,157 retired instructions. The active failure is therefore inside this initcall. Earlier three-byte-unaligned C.LD and trap-path gates remain useful but do not yet identify its exact dynamic boundary. |
-| 9 | Linux mounts/uses the bundled initramfs and executes `/init`. | **Pre-existing baseline:** known to work and prints `Hello from rootFS`; **remaining:** prove it with the repaired image after step 8 is fixed. |
+| 4 | OpenSBI initializes machine CSRs, timer/interrupt delegation, PMP, and its trap path. | **Accepted:** the repaired routed image prints the complete OpenSBI v1.4 banner and capability report without temporary-trap failure. |
+| 5 | OpenSBI executes `mret`, transferring to the Linux kernel in supervisor mode (S-mode). | **Accepted:** the repaired routed image enters Linux and prints its normal kernel banner. |
+| 6 | Linux performs early CPU, page-table, and trap initialization. | **Accepted:** the repaired routed image completes this stage and prints the normal Linux boot log. |
+| 7 | Linux allocates its DMA pools and continues device/kernel initialization. | **Accepted:** the repaired routed image completes all kernel initialization through the initramfs handoff. |
+| 8 | Linux runs architecture capability probes, including unaligned-access checks. | **Accepted:** the repaired routed image completes these probes and frees the unused kernel image. |
+| 9 | Linux mounts the bundled initramfs and executes the selected init program. | **Accepted:** Linux runs `/ctxtsw_user_tiny`; the U-mode C program switches 0→2→0, executes a Linux `write` syscall from context 2, verifies logical ID and independent/restored `s11`, prints PASS, powers off, and returns `CORE[0] PASS`. |
+
+## Accepted repaired checkpoint (2026-09-06)
+
+The accepted bitstream uses top-level RTL `032420c33624d08df2a5852da9d0c49394fa1cef`
+and BlackParrot `25089713baa090aba719ec0f18f82ff9214d5f0d`. It routed for the
+static two-resident/four-logical PYNQ-Z2 configuration at 46,851 LUTs
+(88.07%), 80 BRAM tiles (57.14%), 11 DSPs, WNS +1.781 ns, and TNS 0. The
+package SHA-256 is `ffbb0142dcac50ff2d3406cc0d56a85cd4bf6457c2e7506f599f408160d998c9`
+and the extracted bitstream SHA-256 is
+`9ce659b764213adbf7ca1b347b8c43e4a58c6661e092a35b12ca1ceb9a3b9824`.
+
+The translated bare-metal handoff NBF
+(`6cbee152430e0aa5ec471664cf8e1874487d166a459fcce69c38c8082e69bb01`)
+passed first. The freshly validated Linux PID-1 image
+(`0728cd34650d49c4fe38522d6e139befb51732b426be1b1d1eec11d3ced36959`)
+then booted through
+OpenSBI and Linux, reached the context-switch program, printed its target and
+PASS markers, and ended cleanly. Finally, the physical global-cycle benchmark
+(`da85ec1f46c8217241adacb0b8c801bef65968db2c6f25d09bfca8fd337152f2`)
+measured 5.10 resident and 11.12 nonresident cycles/switch;
+the waveform-derived architectural handoff remains 11--12 cycles before any
+separate cold translation/refill tail.
+
+The dated sections below preserve the investigation history and should not be
+read as the current acceptance state when they describe an earlier blocker.
 
 ## Compatibility-endpoint preflight (2026-09-04)
 
