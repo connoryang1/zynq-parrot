@@ -187,7 +187,9 @@ int main(void)
 
   bp_print_string("[BSG-INFO] U-mode handoff test reached M-mode setup\n");
   /* The minimal Verilator wrapper enters through debug mode.  Leave it before
-   * provoking an ECALL so architectural exceptions use mtvec, as on Linux. */
+   * provoking an ECALL so architectural exceptions use mtvec, as on Linux.
+   * The integer-only FPGA CRT has already completed this handoff. */
+#ifndef BP_FPGA_PROGRAM
   __asm__ volatile(
     "csrr t0, dcsr\n\t"
     "ori t0, t0, 3\n\t"
@@ -200,6 +202,7 @@ int main(void)
     :
     : "t0", "memory"
   );
+#endif
   /* Bare-metal startup may delegate U-mode ECALLs to S-mode.  This test owns
    * the trap path, so route all exceptions and interrupts directly to M-mode. */
   __asm__ volatile("csrw medeleg, zero\n\tcsrw mideleg, zero" ::: "memory");
