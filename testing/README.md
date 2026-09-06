@@ -35,6 +35,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched resident/nonresident ring spacing using global cycles |
 | `mt_pointer_compute_benchmark` | Equal-work sequential, single-thread fused, and resident-switched pointer traversal plus arithmetic |
+| `mt_independent_requests_benchmark` | Two independent pointer chains: sequential, manually batched loads, and resident load/yield/consume handlers |
 
 These programs retain distinct state, hazard, redirect, and workload comparisons.
 The two Sv39 handoff variants include the base handoff source, keeping the
@@ -58,6 +59,68 @@ teardown prints `BSG PASS`. The known GPIO teardown assertion after guest PASS
 must be reported separately.
 
 ## Scope and interpretation
+
+### Independent memory-bound requests
+
+```sh
+make -C testing clean
+BSG_TRACE_TIMEOUT_S=600 make -C testing run-mt_independent_requests_benchmark \
+  NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12
+```
+
+Reuse the unchanged traced hardware model, or build it first as described above.
+Each trial completes 64 dependent loads in each of two independently randomized
+pointer chains and checks both order-sensitive digests. The three modes are:
+
+- **Sequential:** finish one request's chain, then the other; no OS scheduling cost.
+- **Batched:** one instruction stream issues both ordinary loads before consuming
+  their results. This is a current-hardware reference, not an idealized machine
+  capable of ten simultaneous prefetches.
+- **Resident:** each handler loads, yields directly to its peer, then consumes
+  the result on resumption. Both handlers and all 130 timed handoffs finish
+  before the ending counter read; no separate scheduler context is required.
+
+The resident mode includes fixed cooperative round-robin control, not a Linux
+thread pool or general-purpose scheduler. All modes include the same per-load
+checksum work and use physical-cycle CSR `0xCC0`; setup, printing, and collection
+of the already-complete second digest are excluded. Common full-ring cache
+preconditioning follows mode-specific setup, and trial order is reversed for
+the second repetition.
+
+The hot case touches 16 cache lines (1 KiB). The pressure case touches 256 lines
+(16 KiB) across a 64 KiB span, with sixteen lines per selected eight-way D-cache
+set; the chains use disjoint sets. This is synthetic conflict pressure, not a
+uniform capacity or DRAM-latency test. Validate timed miss counts and critical
+word/full-refill latencies from the closed waveform before interpreting ratios.
+No unrelated arithmetic worker or prefetch instruction is used.
+
+Verified simulation on RTL `1b9e611d4`, two resident/four logical contexts,
+`TRACE=1` (2026-09-06), total cycles for both 64-load chains:
+
+| Data | Sequential | Batched ordinary loads | Resident handlers |
+| --- | ---: | ---: | ---: |
+| Hot | 1,057 / 1,057 | 924 / 920 | 1,693 / 1,689 |
+| Set pressure | 7,295 / 7,295 | 7,298 / 7,298 | 7,326 / 7,325 |
+
+All checks and guest PASS succeed (known post-PASS GPIO teardown assertion).
+Counter intervals match waveform cycles exactly; every interval commits 128
+digest updates, and resident intervals commit 130 handoffs. Every pressure
+trial accepts 128 misses, each with an 11-cycle critical-word response and
+53-cycle full refill, with no overlapping accepted ring misses. Sequential
+and batched timers end after consuming the final result but 24 and 21 cycles
+before its full refill ends; resident timing includes that tail. Hot trials
+have no ring misses.
+
+There is **no memory-bound throughput gain** here: switching is about 0.4%
+slower than sequential, and even batching cannot overlap the fetches. The
+current D-cache gates requests on `is_ready`, leaves that state on a blocking
+request, and waits for `complete_recv` before accepting another miss
+(`import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache.sv`, request gating
+and state machine). This test is a reusable baseline for a future memory-level
+parallelism change, not evidence that the intended prefetch/yield application
+speedup is already achieved. Evidence, exact ELF/NBF and closed waveform:
+`logs/independent-requests-benchmark-20260906/`; no RTL, Linux, or FPGA change
+was made for this measurement.
 
 ### Equal-work pointer traversal and computation
 
