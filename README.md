@@ -1,3 +1,5 @@
+This repository builds and tests processors implemented on Zynq FPGAs. For the validated BlackParrot Linux/context-switch implementation, start with [the canonical checkout guide](CURRENT_CHECKOUT.md), which identifies the supported source, tests, and historical experiments.
+
 # ZynqParrot Co-simulation / Co-emulation Environment
 
 ZynqParrot enables rapid design iteration of Accelerators on Zynq FPGAs.
@@ -16,6 +18,22 @@ See [The ZynqParrot Co-simulation Development Flow](https://docs.google.com/docu
 - **software/** contains software infrastructure for generating tests used in cosimulation
   examples. For example, RISC-V compilers and programs for the BlackParrot RISC-V processor.
 - **docker/** contains files needed for a Docker-based simulation environment
+
+## Current Context-Switch Work
+
+This checkout contains the validated SRAM-backed resident/nonresident context-switch
+implementation. See [CURRENT_CHECKOUT.md](CURRENT_CHECKOUT.md) for the supported
+source, exact revisions, and verification commands. Start with:
+
+- [Architecture](CONTEXT_SWITCH_ARCHITECTURE.md): state storage, source map, and limitations.
+- [Tests](testing/README.md) and [Linux demonstration](linux-tests/README.md): reproducible entry points.
+- [Checkout guide](CURRENT_CHECKOUT.md): exact FPGA acceptance, test commands, and recovery.
+- [Research direction](PAPER_DIRECTION.md): the next application-level question, not promised features.
+
+Keep implementation rationale near the code and explain verified changes in
+commit messages. Use [WORK_LOG.md](WORK_LOG.md) only for major acceptance milestones,
+not a second transcript of every command. Repository workflow rules are in
+[AGENTS.md](AGENTS.md).
 
 For most users, the following makefile targets will be the most useful:
 
