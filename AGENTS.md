@@ -49,6 +49,8 @@ mistaken for validated functional results.
 - Re-run the most relevant smoke test after every critical RTL or software change.
 - For this project, after RTL or test-program changes use the clean target flow:
   `make clean run ... TRACE=1`.
+- When parallel Make is enabled, execute `make clean` to completion before a separate
+  `make -j... run ...`; never submit cleanup and a consuming target as concurrent goals.
 - When using parallel Make, invoke `clean` to completion first and launch the build/run as a
   separate command. Multiple top-level goals such as `make -j12 clean run-...` may execute in
   parallel, deleting simulator artifacts while the run target is building them.
@@ -81,6 +83,9 @@ mistaken for validated functional results.
 - When changing shared infrastructure, rerun at least one previously known-good flow before trusting new debug results.
 - Incremental tests are acceptable only for quick local checks that do not depend on
   regenerated programs, RTL, wrappers, or waveform output.
+- A nonresident-context test must elaborate fewer resident hardware slots than logical
+  contexts (normally `NUM_THREADS=2 NUM_CONTEXTS=4`); an all-resident topology is not
+  evidence for the SRAM eviction/restore path.
 - Do require a clean rebuild at key checkpoints:
   - before waveform/debug sessions that depend on the local build wrapper
   - after substantial cross-cutting RTL or build-system changes
