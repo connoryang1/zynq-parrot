@@ -34,6 +34,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_umode_resident_sv39_data_handoff_test \
     mt_ctxtsw_register_target_test \
     mt_abi_preservation_test \
     mt_ctxtsw_gpr_ring_stress \
@@ -92,6 +93,7 @@ check-nonresident-config:
 	fi
 
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
+run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config

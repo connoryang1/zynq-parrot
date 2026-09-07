@@ -1,20 +1,13 @@
 /**
  * mt_csr_isolation_test.c
  *
- * Phase 2A: CSR Isolation Test
- *
- * Verifies that each hardware thread has its own independent CSR state.
+ * Verifies that first NPC seeding inherits the caller's CSR state, after
+ * which each hardware thread has independent state, including across reseeds.
  * Uses mscratch (0x340) as the sentinel register — a plain R/W CSR with
  * no special accumulation or auto-update behavior.
  *
- * Test sequence:
- *   1. Thread 0: write SENTINEL_T0 to mscratch
- *   2. Switch to thread 1; thread 1 writes SENTINEL_T1 to mscratch
- *   3. Thread 1 switches back to thread 0
- *   4. Thread 0 reads mscratch — must be SENTINEL_T0 (not SENTINEL_T1)
- *
- * Before Phase 2A (shared CSR file): T0 would see SENTINEL_T1 → FAIL
- * After  Phase 2A (per-thread CSRs): T0 sees SENTINEL_T0          → PASS
+ * T0 seeds T1 after writing its sentinel. T1 must inherit that value, keep
+ * its subsequent write private, and retain it when T0 reseeds only its NPC.
  */
 
 #include <stdint.h>
@@ -32,6 +25,7 @@ static uint64_t t1_stack[STACK_WORDS];
 /* Shared result area written by thread 1 so thread 0 can check it */
 static volatile uint64_t t1_initial_mscratch = 0xFFFFFFFFFFFFFFFFULL;
 static volatile uint64_t t1_final_mscratch   = 0xFFFFFFFFFFFFFFFFULL;
+static volatile uint64_t t1_reseed_mscratch  = 0xFFFFFFFFFFFFFFFFULL;
 
 /* ── CSR helpers ── */
 static inline void write_ctxt(uint64_t v) {
@@ -50,7 +44,7 @@ static inline void write_mscratch(uint64_t v) {
 
 /* ── Thread 1 entry ── */
 void __attribute__((noinline)) t1_entry(void) {
-  /* After Phase 2A: T1 starts with its own CSR file, mscratch = 0 (reset) */
+  /* First seeding installs a snapshot of T0; later writes stay private. */
   t1_initial_mscratch = read_mscratch();
 
   /* Write T1's sentinel */
@@ -64,8 +58,14 @@ void __attribute__((noinline)) t1_entry(void) {
   bp_finish(1);  /* unreachable */
 }
 
+void __attribute__((noinline)) t1_reseed_entry(void) {
+  t1_reseed_mscratch = read_mscratch();
+  write_ctxt(0);
+  bp_finish(1);
+}
+
 int main(void) {
-  bp_print_string("=== Phase 2A: CSR Isolation Test ===\n");
+  bp_print_string("=== CSR Inheritance and Isolation Test ===\n");
 
   /* ── Step 1: T0 writes sentinel ── */
   write_mscratch(SENTINEL_T0);
@@ -92,6 +92,10 @@ int main(void) {
 
   /* ── Step 3: Verify T0's mscratch is unchanged ── */
   uint64_t t0_after = read_mscratch();
+
+  /* An existing context's NPC can change without replacing its private CSRs. */
+  seed_npc(1, (uint64_t)t1_reseed_entry);
+  write_ctxt(1);
 
   bp_print_string("T0 mscratch after T1: ");
   bp_hprint_uint64(t0_after);
@@ -120,12 +124,18 @@ int main(void) {
     bp_print_string("PASS: T0 mscratch preserved across T1 execution\n");
   }
 
-  /* T1 should have started with mscratch = 0 (per-thread reset state) */
-  if (t1_initial_mscratch != 0) {
-    bp_print_string("FAIL: T1 mscratch not 0 at entry (leaked from T0?)\n");
+  /* Resident initialization follows the same inheritance contract as SRAM restore. */
+  if (t1_initial_mscratch != SENTINEL_T0) {
+    bp_print_string("FAIL: T1 did not inherit the seeding CSR snapshot\n");
     errors++;
   } else {
-    bp_print_string("PASS: T1 mscratch was 0 at entry (clean isolation)\n");
+    bp_print_string("PASS: T1 inherited the initial CSR snapshot\n");
+  }
+  if (t1_reseed_mscratch != SENTINEL_T1 || read_mscratch() != SENTINEL_T0) {
+    bp_print_string("FAIL: NPC reseed overwrote independent CSR state\n");
+    errors++;
+  } else {
+    bp_print_string("PASS: NPC reseed preserved independent CSR state\n");
   }
 
   /* T1 should have written its sentinel successfully */

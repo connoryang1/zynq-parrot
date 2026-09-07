@@ -52,7 +52,7 @@ static inline void write_ctxt(uint64_t v) {
 
 /* ── Thread 1 entry ── */
 void __attribute__((noinline)) t1_entry(void) {
-  /* T1 has a fresh mstatus (FS=Off at reset) — enable FP before any FP instruction.
+  /* Explicitly enable FP without depending on the caller's inherited FS state.
    * mstatus.FS bits [14:13]: 00=Off, 01=Initial, 10=Clean, 11=Dirty.
    * csrs sets bits without clobbering other mstatus fields. */
   __asm__ volatile("csrs mstatus, %0" : : "r"(3ULL << 13));

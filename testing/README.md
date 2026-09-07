@@ -31,19 +31,20 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_smoke_test` | Resident 0→1→0 handoff |
 | `mt_ctxtsw_logical_csr_readback_test` | Committed logical ID and side-effect-free reads of CSR `0x800` |
 | `mt_regfile_test` | Integer-context execution, private stack, and return-state isolation |
-| `mt_csr_isolation_test` | Independent resident `mscratch` state |
+| `mt_csr_isolation_test` | First-seed CSR inheritance, independent `mscratch`, and NPC reseed preservation |
 | `mt_frf_isolation_test` | Resident floating-point register isolation; not nonresident FP preservation |
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
 | `mt_ctxtsw_register_target_test` | Fresh computed targets and returns after ALU/load/multiply/divide/CSR producers, including same-context writes and SRAM restores |
 | `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
 | `mt_ctxtsw_gpr_ring_stress` | Live integer-register sentinels survive a ring through all four logical IDs |
 | `mt_ctxtsw_pure_ring_stress_test` | Progress through dense consecutive switches across all four logical IDs |
+| `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched resident/nonresident ring spacing using global cycles |
 
-These 14 programs retain distinct state, hazard, and redirect regressions.
+These 15 programs retain distinct state, hazard, and redirect regressions.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 `make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set;
