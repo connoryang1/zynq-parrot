@@ -2,6 +2,13 @@ This directory contains the active bare-metal tests for resident and SRAM-backed
 
 # Tests
 
+Bare `make -C testing` shows help; cleanup must be requested explicitly.
+The harness defaults to the accepted two-resident/four-logical topology.
+`make -C testing check-harness` checks the fail-closed simulator verdict logic.
+Each selected test ELF is rebuilt to match the requested topology/compiler flags.
+The runner clears old transcripts before building and requires fresh guest and
+host PASS markers, rejecting timeouts and unrelated assertions even after PASS.
+
 Run from the repository root. First preserve any logs and waveforms you need;
 then finish each cleanup command before launching the consuming build.
 
@@ -65,8 +72,9 @@ writeback before classifying a register-form switch; immediate targets are
 unchanged. Both simulator and FPGA regression evidence, plus the accepted Linux
 and performance gates, are recorded in [the checkout guide](../CURRENT_CHECKOUT.md).
 
-A nonresident result requires `NUM_CONTEXTS > NUM_THREADS`; default all-resident
-topologies do not test SRAM eviction. The benchmark reports amortized
+A nonresident result requires `NUM_CONTEXTS > NUM_THREADS`; all-resident
+topologies do not test SRAM eviction. Maintained nonresident gates enforce the
+accepted `NUM_THREADS=2 NUM_CONTEXTS=4` configuration. The benchmark reports amortized
 cycles/switch, not an isolated redirect latency. Use `0xCC0` across contexts;
 context-restored `mcycle` is not a physical elapsed-time counter.
 
