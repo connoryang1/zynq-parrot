@@ -131,3 +131,41 @@ exit status, subsequent shell command, and clean poweroff on RTL `6c97bcc0a`;
 evidence is in `logs/linux-shell-demo-20260907/`. The initial here-document
 transfer crashed BusyBox before the test ran; the short-command method above
 passed, but that result does not establish the earlier crash's root cause.
+
+## Linux switch-spacing benchmark
+
+`ctxtsw_user_benchmark.c` measures the already-validated nonresident `0↔2`
+path from a shell-launched Linux process. Each of seven samples times 256
+switches using core-wide CSR `0xCC0`, after an untimed warm-up. A separate
+untimed handoff finishes the peer's loop and checks its identity and seeded
+register, along with the source's restored register. Console output is outside
+the measurement; interrupts remain enabled.
+
+Prepare its transfer file on the VM:
+
+```sh
+make -s -C linux-tests emit-benchmark-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/ctxtsw_user_benchmark.transfer
+sha256sum linux-tests/out/ctxtsw_user_benchmark
+```
+
+Use the shell workflow above with this transfer file instead of the smoke
+test's file. After checking the guest executable's checksum, run
+`/tmp/ctxtsw_user_benchmark`, immediately followed by `echo BENCH_EXIT=$?`.
+Require the benchmark-specific PASS and exit zero. Do not run the smoke and
+benchmark executables in the same guest boot: the extra context state is not
+reclaimed between processes.
+
+On September 7, 2026, FPGA RTL `6c97bcc0a` measured raw totals
+`2856 2852 2852 2852 2852 2852 2852` cycles: median 11.140625 and maximum
+11.15625 cycles/switch. The program's `x100` display truncates to integers.
+All checks, shell return, and clean poweroff passed; evidence is in
+`logs/linux-shell-benchmark-20260907/`.
+
+These are amortized loop costs including calls, counter reads, loop control,
+and possible Linux interference—not isolated hardware redirect latency or
+a speedup against the Linux scheduler. The earlier bare-metal 11.12 result
+uses a different binary and is contextual, not an identical regression gate.
+Resident `0↔1` is deliberately excluded: its physical CSR bank's Linux
+initialization is not established by the validated nonresident restore path.

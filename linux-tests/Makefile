@@ -19,6 +19,7 @@ OUT ?= $(CURDIR)/out
 APP := $(OUT)/ctxtsw_user_smoke
 TINY_APP := $(OUT)/ctxtsw_user_tiny
 SHELL_APP := $(OUT)/ctxtsw_user_shell
+BENCH_APP := $(OUT)/ctxtsw_user_benchmark
 APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
 TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
 DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
@@ -59,6 +60,21 @@ $(TINY_APP): ctxtsw_user_tiny.c
 # Keep the shell variant separate: do not change the PID-1 acceptance binary.
 .PHONY: shell-app emit-shell-transfer
 shell-app: $(SHELL_APP)
+
+.PHONY: benchmark emit-benchmark-transfer
+benchmark: $(BENCH_APP)
+
+$(BENCH_APP): ctxtsw_user_benchmark.c Makefile
+	@mkdir -p $(OUT)
+	# No CRT initializes gp: disable linker relaxation into gp-relative accesses.
+	$(BP_LINUX_CC) -Os -Wall -Wextra -Werror -static -nostdlib -nostartfiles \
+	  -ffreestanding -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -mno-relax -o $@ $<
+
+emit-benchmark-transfer: check-linux-cc benchmark
+	@printf '%s\n' ': > /tmp/ctxtsw_user_benchmark.b64'
+	@base64 -w 76 $(BENCH_APP) | sed "s|.*|echo '&' >> /tmp/ctxtsw_user_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
 
 $(SHELL_APP): ctxtsw_user_tiny.c Makefile
 	@mkdir -p $(OUT)
