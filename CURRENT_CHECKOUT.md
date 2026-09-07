@@ -12,7 +12,7 @@ regression ELF that fails on its parent. On the FPGA, the same regression NBF
 fails on the old accepted bitstream and passes on the new one; Linux and the
 physical performance gates also pass. The identities below select the new fix.
 
-The reviewable history has twelve top-level commits separating integration,
+The initial reviewable history has twelve top-level commits separating integration,
 correctness tests, translated handoffs, benchmarks, waveform tools, Vivado builds,
 board operation, the Linux demo, image diagnostics, synthesis-farm orchestration,
 workflow guidance, and project documentation. Seven RTL commits separate
@@ -23,6 +23,20 @@ interfaces must change together; known fixes stay with the features they repair.
 These organize the accepted endpoint, not seven separate FPGA/Linux acceptances.
 Separate upstream changes from the old fork master were not merged into this
 accepted source.
+
+## Stable-branch policy
+
+`master` contains the accepted implementation, focused regressions, and reusable
+operational tools. Exploratory application benchmarks remain on experiment
+branches; SQLite is retained at `archive/sqlite-progress-screen-20260907`, not in
+the maintained suite. Neither cleanup nor a passing smoke test makes this a
+general production threading facility.
+
+The supported scope is cooperative integer-context execution on the fixed
+PYNQ-Z2 topology below. Production use would additionally need an explicit safe
+ABI/FP policy, isolation and privilege enforcement where contexts are untrusted,
+OS lifecycle/preemption integration, and broader fault/stress qualification.
+Do not infer those guarantees from the Linux demonstration.
 
 ## What works and what is not claimed
 
@@ -54,6 +68,14 @@ Use the available CPU/memory budget for inner build jobs, but serialize guests.
 The maintained suite has 14 tests; its README explains the invariant each covers.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`.
+
+Stable integration verification is retained in `logs/stable-master-20260907/`:
+all 14 programs compile for the default 2/4 topology; a clean traced model passes
+the register-target regression, resident smoke, translated nonresident data
+handoff, and the unchanged 5.13/11.13-cycle ring benchmark. Ten isolated harness
+test groups also pass, covering failed builds/stale logs, safe defaults, and
+configuration-stamp transitions. These are new local checks, not a new FPGA run;
+the FPGA identities below still refer to the exact previously accepted RTL.
 
 The register-target fix has a clean traced two-bank/four-context model and seven
 runtime passes: its new 46-case regression, resident smoke, register isolation,
