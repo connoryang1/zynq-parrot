@@ -32,6 +32,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_ctxtsw_register_target_test \
     mt_abi_preservation_test \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test \

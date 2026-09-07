@@ -27,6 +27,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_csr_isolation_test` | Independent resident `mscratch` state |
 | `mt_frf_isolation_test` | Resident floating-point register isolation; not nonresident FP preservation |
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
+| `mt_ctxtsw_register_target_test` | Fresh computed targets and returns after ALU/load/multiply/divide/CSR producers, including same-context writes and SRAM restores |
 | `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
 | `mt_ctxtsw_gpr_ring_stress` | Live integer-register sentinels survive a ring through all four logical IDs |
 | `mt_ctxtsw_pure_ring_stress_test` | Progress through dense consecutive switches across all four logical IDs |
@@ -35,7 +36,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched resident/nonresident ring spacing using global cycles |
 
-These 13 programs retain distinct state, hazard, and redirect regressions.
+These 14 programs retain distinct state, hazard, and redirect regressions.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 `make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set;
@@ -57,6 +58,12 @@ teardown prints `BSG PASS`. The known GPIO teardown assertion after guest PASS
 must be reported separately.
 
 ## Scope and interpretation
+
+The 46-case register-target regression fails on RTL `1b9e611d4` and passes on
+`6c97bcc0a` with the same executable. Its scoped fix waits for same-bank GPR
+writeback before classifying a register-form switch; immediate targets are
+unchanged. Both simulator and FPGA regression evidence, plus the accepted Linux
+and performance gates, are recorded in [the checkout guide](../CURRENT_CHECKOUT.md).
 
 A nonresident result requires `NUM_CONTEXTS > NUM_THREADS`; default all-resident
 topologies do not test SRAM eviction. The benchmark reports amortized

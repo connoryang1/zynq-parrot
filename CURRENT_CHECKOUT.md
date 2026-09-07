@@ -4,8 +4,13 @@ This file is the entry point for the supported BlackParrot FPGA checkout. It rec
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
 Both fork repositories integrate on `master`; start new work on dedicated branches.
-The top-level gitlink selects RTL `1b9e611d4`, whose hardware and dependency
-content is identical to FPGA-accepted `25089713baa090aba719ec0f18f82ff9214d5f0d`.
+The top-level gitlink selects RTL `6c97bcc0a`. It adds a narrowly
+scoped source-register writeback wait to parent `1b9e611d4`, whose hardware and
+dependency content is identical to FPGA-accepted
+`25089713baa090aba719ec0f18f82ff9214d5f0d`. The new fix passes the identical local
+regression ELF that fails on its parent. On the FPGA, the same regression NBF
+fails on the old accepted bitstream and passes on the new one; Linux and the
+physical performance gates also pass. The identities below select the new fix.
 
 The reviewable history has twelve top-level commits separating integration,
 correctness tests, translated handoffs, benchmarks, waveform tools, Vivado builds,
@@ -46,9 +51,21 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 13 tests; its README explains the invariant each covers.
+The maintained suite has 14 tests; its README explains the invariant each covers.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`.
+
+The register-target fix has a clean traced two-bank/four-context model and seven
+runtime passes: its new 46-case regression, resident smoke, register isolation,
+late writeback, translated nonresident data handoff, logical CSR readback, and
+the overhead benchmark. On the earlier fix branch, all 19 test programs compile; the byte-identical ring
+ELF still reports 5.13/11.13 cycles per resident/nonresident switch. Evidence is
+in `logs/register-target-fix-20260906/`. The routed build of top `8ecb909a` / RTL
+`6c97bcc0a` passes timing and fit. Its FPGA passes the register-target regression,
+translated handoff, Linux PID-1 context-switch demo, unchanged overhead benchmark,
+and the original scan workload without its immediate-target workaround.
+Board evidence is in `logs/register-target-fpga-20260907/board-fixed/`;
+the old-bitstream failure is in the adjacent `board-baseline/` directory.
 
 The prior clean simulator baseline is 5.13 resident and 11.13 nonresident
 cycles/switch, with two matching runs in `logs/docs-integration-20260906/`.
@@ -72,24 +89,38 @@ No new FPGA run is claimed for this history-only rewrite.
 
 ## FPGA acceptance identities
 
-The 2026-09-06 accepted route used top `032420c33624d08df2a5852da9d0c49394fa1cef`
-and RTL `25089713b`: 46,851 LUTs, 80 BRAM tiles, 11 DSPs, WNS +1.781 ns,
-TNS 0. Physical benchmark spacing was 5.10 resident / 11.12 nonresident
-cycles/switch, distinct from waveform handoff latency and cold-cache tails.
+The register-target acceptance route uses top
+`8ecb909ae316f6c0daaafe455b6ac61f5212c168` and RTL `6c97bcc0a`, with Vivado
+2024.2 and static `e_bp_unicore_zynqparrot_cfg`: 47,042 LUTs, 21,446 registers,
+80 BRAM tiles, 11 DSPs, WNS +2.969 ns, TNS 0, WHS +0.023 ns, and THS 0.
+Physical benchmark spacing remains 5.10 resident / 11.12 nonresident cycles
+per switch, distinct from waveform handoff latency and cold-cache tails.
+The parent route used 46,851 LUTs with the same BRAM/DSP counts and WNS +1.781 ns;
+the extra 191 LUTs fit, and no frequency increase is claimed from the timing margin.
 
 | Artifact | SHA-256 |
 | --- | --- |
-| Packed FPGA image | `ffbb0142dcac50ff2d3406cc0d56a85cd4bf6457c2e7506f599f408160d998c9` |
-| Extracted bitstream | `9ce659b764213adbf7ca1b347b8c43e4a58c6661e092a35b12ca1ceb9a3b9824` |
+| Packed FPGA image | `81dc436aa6b68b278b5841a9cf3128b34e63deae9837ae354e18c075e32eefa9` |
+| Extracted bitstream | `7dd91dac345937daa96442411c57c9023d66e5563fdb8532083369910b0db9d5` |
+| Register-target regression | `0b37b9007f5e73e728f34303d183398cc3da0030a5091c733a91e1ecf5628b9b` |
 | Linux PID-1 image | `0728cd34650d49c4fe38522d6e139befb51732b426be1b1d1eec11d3ced36959` |
 | Translated bare-metal handoff | `6cbee152430e0aa5ec471664cf8e1874487d166a459fcce69c38c8082e69bb01` |
 | FPGA global-cycle benchmark | `da85ec1f46c8217241adacb0b8c801bef65968db2c6f25d09bfca8fd337152f2` |
+| Original register-target scan | `af4b7aaeb45e84d4091764612659efcbbb747d27330ff489222d9826cb92694e` |
 
-Packages are under `logs/fpga-farm/bp3/20260906T032705Z-032420c3/`;
-board evidence is under `logs/pynq-validation/translated-handoff-recovery-20260906/`.
-That directory's `accepted-images/` retains the exact bare-metal NBFs formerly
-in the removed handoff worktree. Generated test files elsewhere are not necessarily
-byte-identical substitutes.
+The package and retained route reports are under
+`logs/fpga/20260907T021217Z-8ecb909a/`. Fresh bare-metal inputs, CRT/build recipes,
+disassembly, hash manifests, and the serialized board ladder are under
+`logs/register-target-fpga-20260907/`; the unchanged Linux image remains
+`linux-tests/out/linux-ctxtsw-tiny-init.nbf`. The runner hash is
+`be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e`.
+All five runs reload the verified overlay and require their guest marker plus
+`CORE[0] PASS`; a zero host exit alone is insufficient. No power cycle was needed.
+
+Parent acceptance evidence remains in
+`logs/pynq-validation/translated-handoff-recovery-20260906/` and its package in
+`logs/fpga-farm/bp3/20260906T032705Z-032420c3/`. Fresh benchmark and translated
+handoff NBFs are byte-identical to that baseline; the Linux NBF is also unchanged.
 
 ## History and recovery
 
