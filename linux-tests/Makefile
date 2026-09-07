@@ -18,6 +18,7 @@ BASELINE_LINUX_NBF ?= $(TOP)/riscv/linux/linux-6.6-jhumphri-20250125.nbf
 OUT ?= $(CURDIR)/out
 APP := $(OUT)/ctxtsw_user_smoke
 TINY_APP := $(OUT)/ctxtsw_user_tiny
+SHELL_APP := $(OUT)/ctxtsw_user_shell
 APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
 TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
 DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
@@ -55,12 +56,23 @@ $(TINY_APP): ctxtsw_user_tiny.c
 	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) \
 	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $<
 
-# Print a self-contained command suitable for an interactive BusyBox shell.
+# Keep the shell variant separate: do not change the PID-1 acceptance binary.
+.PHONY: shell-app emit-shell-transfer
+shell-app: $(SHELL_APP)
+
+$(SHELL_APP): ctxtsw_user_tiny.c Makefile
+	@mkdir -p $(OUT)
+	$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
+	  -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
+	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) -DBP_POWEROFF_ON_PASS=0 \
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $<
+
+# Print commands suitable for an interactive BusyBox shell.
 # The shell needs only its standard base64 applet and a writable /tmp.
-emit-tiny-transfer: check-linux-cc tiny
-	@printf "base64 -d > /tmp/ctxtsw_user_tiny <<'BP_EOF'\\n"
-	@base64 -w 76 $(TINY_APP)
-	@printf '%s\n' 'BP_EOF' 'chmod +x /tmp/ctxtsw_user_tiny' '/tmp/ctxtsw_user_tiny' 'echo CONTEXT_SWITCH_EXIT=$$?'
+emit-tiny-transfer emit-shell-transfer: check-linux-cc shell-app
+	@printf '%s\n' ': > /tmp/ctxtsw_user_shell.b64'
+	@base64 -w 76 $(SHELL_APP) | sed "s|.*|echo '&' >> /tmp/ctxtsw_user_shell.b64|"
+	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_shell.b64 > /tmp/ctxtsw_user_shell' 'chmod +x /tmp/ctxtsw_user_shell'
 
 check-linux-cc:
 	@command -v $(BP_LINUX_CC) >/dev/null || { \

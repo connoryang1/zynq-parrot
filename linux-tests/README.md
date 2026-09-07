@@ -61,21 +61,73 @@ The older `linux-image` target remains available for a libc/BusyBox integration
 test, but it is not the acceptance path because rcS and sysctl have shown
 unrelated intermittent failures on the baseline overlay.
 
-For the first, faster FPGA proof, do not rebuild Linux.  Build the tiny
-no-libc C ELF and paste its generated command into an interactive Linux shell:
+## Run a separate executable from the Linux shell
+
+This path transfers the program into an already-running guest; it does not
+embed the test in Linux or rebuild the kernel. The shell variant uses Linux
+`exit(0)` after PASS instead of the PID-1 variant's poweroff syscall.
+
+On the VM, prepare the shell image and transfer commands:
 
 ```sh
-make -C linux-tests emit-tiny-transfer \
-  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc
+make -s -C linux-tests emit-shell-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/ctxtsw_user_shell.transfer
+sha256sum linux-tests/out/ctxtsw_user_shell
+python3 codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py \
+  riscv/linux/linux-6.6-jhumphri-20250125.nbf linux-tests/out/linux-shell.nbf
+scp linux-tests/out/linux-shell.nbf linux-tests/out/ctxtsw_user_shell.transfer \
+  xilinx@192.168.4.35:~/zynq-parrot/cosim/black-parrot-example/zynq/
 ```
 
-The command writes the tiny ELF to `/tmp`, marks it executable, runs it, and
-prints the program's real `CONTEXT_SWITCH_EXIT=<status>` after the handoff
-marker.  This is still a normal Linux U-mode program; it simply avoids needing
-a compiler or persistent storage on the board.
+On the board's ARM Linux shell, with the accepted context-switch overlay and
+reviewed `control-program` already staged:
 
-The expected console marker is:
+```sh
+cd ~/zynq-parrot/cosim/black-parrot-example/zynq
+cat ctxtsw_user_shell.transfer
+```
+
+Copy the printed commands for later, then boot the RISC-V guest:
+
+```sh
+make -o control-program load_bitstream run \
+  BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
+  NBF_FILE=linux-shell.nbf
+```
+
+`-o control-program` preserves the reviewed host executable; the old board
+Makefile must not rebuild it with different DRAM settings. These are manual
+terminal instructions: ensure no other board run is active. Automated agents
+must use the serialized interactive runner from the FPGA skill instead.
+
+At the guest's `~ #` prompt, paste the transfer commands in small groups
+(about five lines), waiting for them to finish. They create the executable in
+`/tmp` using `echo`, `base64`, and `chmod`, but do not run it. Check
+`sha256sum /tmp/ctxtsw_user_shell` against the VM's hash before continuing:
+
+```sh
+/tmp/ctxtsw_user_shell
+echo CONTEXT_SWITCH_EXIT=$?
+uname -m
+```
+
+Require the program-specific marker, exit status zero, and a usable shell:
 
 ```text
 [BP-LINUX-CTXTSW] PASS: tiny user-mode handoff
+CONTEXT_SWITCH_EXIT=0
+riscv64
 ```
+
+Finish with `poweroff -f` inside the guest, which should return to the ARM
+shell through `CORE[0] PASS`. Use the test **once per fresh overlay/Linux boot**:
+Linux does not reclaim context 2's saved CSR state when this process exits.
+This demonstrates a shell-launched cooperative handoff, not general process
+lifecycle management or independently scheduled Linux hardware threads.
+
+The September 7, 2026 board run verified the transferred ELF hash, handoff,
+exit status, subsequent shell command, and clean poweroff on RTL `6c97bcc0a`;
+evidence is in `logs/linux-shell-demo-20260907/`. The initial here-document
+transfer crashed BusyBox before the test ran; the short-command method above
+passed, but that result does not establish the earlier crash's root cause.

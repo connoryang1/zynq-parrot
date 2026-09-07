@@ -4,7 +4,9 @@
  * This is intentionally suitable for transfer through an interactive serial
  * shell: it has no dynamic loader, no libc, and no filesystem dependencies.
  * It still executes as an ordinary Linux U-mode ELF and uses Linux write/exit
- * syscalls for its evidence.  Context 2 remains register/stack independent.
+ * syscalls for its evidence. Context 2 checks independent GPR state; its naked
+ * entry does not use a user stack. Use once per fresh boot: context CSR state
+ * is not automatically reclaimed when a Linux process exits.
  */
 
 typedef unsigned long u64;
@@ -24,6 +26,11 @@ typedef long s64;
 
 #ifndef BP_TARGET_SYSCALL
 #define BP_TARGET_SYSCALL 1
+#endif
+
+/* The acceptance image is PID 1; a shell child must instead return normally. */
+#ifndef BP_POWEROFF_ON_PASS
+#define BP_POWEROFF_ON_PASS 1
 #endif
 
 /* The target context writes all fields before returning.  Requiring both
@@ -55,6 +62,7 @@ static __attribute__((noreturn)) void sys_exit(s64 status)
   __builtin_unreachable();
 }
 
+#if BP_POWEROFF_ON_PASS
 static __attribute__((noreturn)) void sys_poweroff(void)
 {
   register s64 a0 __asm__("a0") = 0xfee1dead;
@@ -70,6 +78,7 @@ static __attribute__((noreturn)) void sys_poweroff(void)
   /* A successful reboot syscall does not return. */
   sys_exit(2);
 }
+#endif
 
 static void put(const char *string, u64 length)
 {
@@ -178,5 +187,9 @@ void _start(void)
     sys_exit(1);
   }
   PUT("[BP-LINUX-CTXTSW] PASS: tiny user-mode handoff\n");
+#if BP_POWEROFF_ON_PASS
   sys_poweroff();
+#else
+  sys_exit(0);
+#endif
 }
