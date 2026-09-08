@@ -33,12 +33,18 @@ if [[ -n "$fpga_num_threads" || -n "$fpga_num_contexts" ]]; then
   fi
 fi
 
-# The worker is a fresh tmux-launched invocation of this script.  Export the
-# resolved values so it cannot fall back to a different configuration.
+# Export for local subprocesses. An existing tmux server has its own older
+# environment, so the worker command below also passes every value explicitly.
 export FPGA_CFG="$fpga_cfg"
 export FPGA_VIVADO_THREADS="$fpga_threads"
 export FPGA_NUM_THREADS="$fpga_num_threads"
 export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
+
+shell_quote() {
+  # tmux 3.0 accepts a shell-command string. POSIX single quotes preserve even
+  # spaces, newlines, and shell metacharacters without assuming a Bash pane.
+  printf "'%s'" "${1//\'/\'\\\'\'}"
+}
 
 usage() {
   echo "usage: $0 start | list | status <job-id> | worker <job-id> <commit>"
@@ -79,8 +85,22 @@ case ${1:-} in
     # make, and Vivado children inherit that disposition and survive loss of
     # the tmux server/PTY.  The pane PID becomes the worker PID after exec and
     # is also used above as an independent liveness check.
-    tmux new-session -d -s "$session_name" \
-      "trap '' HUP; exec $0 worker $job_id $commit >$job_dir/console.log 2>&1"
+    worker_args=(env
+      "ZP_REPO_DIR=$repo_dir"
+      "ZP_FPGA_SEED_REPO_DIR=$seed_repo_dir"
+      "ZP_FPGA_LOG_ROOT=$run_root"
+      "FPGA_CFG=$fpga_cfg"
+      "FPGA_VIVADO_THREADS=$fpga_threads"
+      "FPGA_NUM_THREADS=$fpga_num_threads"
+      "FPGA_NUM_CONTEXTS=$fpga_num_contexts"
+      "$script_dir/launch_synthesis.sh" worker "$job_id" "$commit"
+    )
+    worker_command="trap '' HUP; exec"
+    for arg in "${worker_args[@]}"; do
+      worker_command+=" $(shell_quote "$arg")"
+    done
+    worker_command+=" >$(shell_quote "$job_dir/console.log") 2>&1"
+    tmux new-session -d -s "$session_name" "$worker_command"
     pid=$(tmux display-message -p -t "$session_name" '#{pane_pid}')
     printf '%s\n' "$session_name" >"$job_dir/session"
     printf '%s\n' "$pid" >"$job_dir/pid"
