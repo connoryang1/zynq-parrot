@@ -259,6 +259,20 @@ and credit drain. A separate malformed-response case must trigger the expected
 assertion. The runner uses an explicit-cycle C++ driver and records source and
 artifact identities in its verification manifest.
 
+Run the real L2 controller against controlled mock banks with:
+
+```sh
+python3 testing/rtl/run_l2_prefetch.py --out logs/l2-prefetch-controller
+```
+
+It requires a ready demand to pass a stalled opposite-bank hint, while checking
+ordinary and same-bank ordering, eight-beat read/write packet locking, collapsed
+store acknowledgements, AMO responses, queue capacity, and uncached draining.
+`--controller <saved-controller.sv> --baseline-hol` additionally reproduces the
+old shared-FIFO delay and requires the ordinary regression to reject it.
+The named FPGA configuration matches the complete parameter struct of the
+macro-selected two-bank simulator configuration, including metadata width 50.
+
 ## Other context-switch limits
 
 The 46-case register-target regression fails on RTL `1b9e611d4` and passes on

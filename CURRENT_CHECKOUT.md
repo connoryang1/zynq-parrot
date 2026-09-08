@@ -54,14 +54,22 @@ experiment branches; SQLite remains at
 ## Prefetch development checkpoint
 
 `feat/nonblocking-prefetch` adds nonfaulting L2 hints with two UCE request slots
-(top `848e6ee7`, RTL `f284f766b`), plus an optional two-bank L2 of unchanged total capacity.
-The full simulator passes hint correctness, resident switching, U-mode Sv39
-permissions, and the independent-request benchmark. Its controlled AXI model
-and traces prove two concurrent cold-data requests in batch2. The resident
-worker schedule still serializes backing-data reads at the tested latency;
-see [the experiment](PAPER_DIRECTION.md#nonfaulting-prefetch-implementation-and-first-simulation-result).
+and an equal-capacity two-bank L2 (top `fd5a7872`, RTL `f7eedd955`). The response
+controller permits a ready bank to reply past a pending hint while preserving
+ordinary order. The full simulator passes hint correctness, resident switching,
+U-mode Sv39 permissions, and the independent-request benchmark. Traces now
+prove two concurrent cold-data requests in both batch2 and the resident worker
+schedule. Median resident time is 3867 cycles versus 5079 for its matched
+control in three controlled simulator samples; see
+[the experiment](PAPER_DIRECTION.md#removing-the-l2-response-bottleneck).
 
 This is a development checkpoint awaiting routed fit and FPGA/Linux acceptance.
+PYNQ-Z2 job `20260908T221834Z-4425a9d3` was canceled after Vivado exposed an
+undriven implicit bank-select net caused by declaration order. A declaration
+move passed targeted old/fixed Vivado synthesis and the clean simulator gates.
+Replacement job `20260908T223358Z-fd5a7872` is running on bp2 with the named
+prefetch configuration, Vivado 2024.2, and eight workers; it is not yet an
+accepted FPGA image.
 The deployed image and accepted baseline identities below remain unchanged.
 Reproduce the new gates using [the testing guide](testing/README.md#full-simulator-and-waveform-evidence).
 

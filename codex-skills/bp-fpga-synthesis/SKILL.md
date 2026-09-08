@@ -31,11 +31,15 @@ acceptable timing as the fit gate; elaboration or synthesis alone is not enough.
 2. Record the top-level commit and pinned `import/black-parrot` commit.
 3. Require a clean top-level worktree and clean BlackParrot submodule for a comparison build.
 4. Run the relevant simulation/correctness gate before spending hours on Vivado.
-5. Use the exact configuration that produced the NBF. The deployed PYNQ-Z2
-   context-cache image uses the static `CFG=e_bp_unicore_zynqparrot_cfg`,
-   which encodes two resident banks and four architectural contexts. Do not
-   use the dynamic `e_bp_custom_cfg` path: its macro expansion is broken here
-   and silently selects an incompatible four-resident-thread design.
+5. Match the hardware configuration to the program image. The baseline and
+   launcher default is static `CFG=e_bp_unicore_zynqparrot_cfg`, with two
+   resident slots and four architectural contexts. The nonblocking-prefetch
+   candidate uses static `CFG=e_bp_unicore_zynqparrot_prefetch_cfg`: the same
+   context counts, two L2 banks with 16 sets each, and 50-bit branch metadata.
+   Require routed fit and board acceptance before deployment; consult
+   [CURRENT_CHECKOUT.md](../../CURRENT_CHECKOUT.md) for current status and identities.
+   Do not use the dynamic `e_bp_custom_cfg` FPGA path: its macro expansion can
+   silently select an incompatible four-resident-thread design.
 
 Readiness also rejects a historical dependency mismatch where BlackParrot's
 context SRAM requests BaseJump's `ram_style_p`, but the top-level BaseJump
@@ -149,6 +153,21 @@ BlackParrot submodule objects (`external/basejump_stl`, `external/HardFloat`, an
 against the seed first so a missing nested dependency fails before the background job is created.
 The recorded source revision remains immutable while logs stay outside temporary
 storage.
+
+For a reviewed nonblocking-prefetch candidate, select its static configuration
+explicitly using the same clean snapshot procedure:
+
+```bash
+FPGA_CFG=e_bp_unicore_zynqparrot_prefetch_cfg \
+ZP_REPO_DIR=/path/to/clean-snapshot \
+ZP_FPGA_SEED_REPO_DIR=/home/coyang/zynq-parrot \
+ZP_FPGA_LOG_ROOT=/path/to/persistent-prefetch-logs \
+  codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh start
+```
+
+The launcher records `FPGA_CFG` and passes it as `CFG` to the immutable worker.
+The farm controller currently hardcodes the baseline configuration; setting
+`FPGA_CFG` on a farm `launch` command does not select the prefetch configuration.
 
 The launcher returns immediately and writes the job ID, PID, immutable source revisions,
 console log, reports, and artifact under `logs/fpga/<job-id>/`. It uses shared `install/` and
