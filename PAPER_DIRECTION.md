@@ -57,9 +57,10 @@ production-readiness gaps, including lifecycle, FP state, and isolation.
 
 ## Second gate: demonstrate actual memory overlap
 
-The existing tests qualify a mechanism only. Their peer performs arithmetic,
+The earlier arithmetic tests qualify a mechanism only. Their peer performs arithmetic,
 not another random load, so they do not implement the reference workload or
-establish a speedup for independent requests. That application gate remains open.
+establish a speedup for independent requests. The independent-request experiment
+and its separate acceptance evidence are described below.
 
 The September 8 load-ahead experiment establishes overlap with a pending full-line
 refill. `bp_load_ahead()` in `software/include/bp_load_ahead.h` emits an ordinary
@@ -151,8 +152,9 @@ On this RTL, `lbu x0` uses the ordinary load path and the cache has only one
 outstanding blocking miss. The batched instruction schedule is therefore a
 comparison to measure, not evidence that ten cold fetches run concurrently.
 Trace whether B's request is accepted before A's critical data and full refill
-complete, and whether a second miss serializes progress. This is the next
-mechanism experiment; the arithmetic-overlap result does not answer it. A
+complete, and whether a second miss serializes progress. The new
+`mt_request_interleave_benchmark` measures this boundary; the arithmetic-overlap
+result does not answer it. A
 dedicated prefetch instruction and additional miss capacity are separate design
 changes to assess from that evidence.
 
@@ -172,3 +174,37 @@ architectural redirect-to-useful-work cycles, and instruction/data cache tails.
 Keep FPGA area/timing cost and exact binary/RTL identities with the results.
 A speedup must survive these matched controls; the existing 5.10/11.12 FPGA
 cycles/switch are a mechanism measurement, not an application-speedup claim.
+
+## Independent-request mechanism result
+
+The September 8 two-resident test passes on the accepted FPGA RTL and a clean
+traced simulator, with a known-good resident smoke also passing. Each mode
+consumes the same 64 shuffled, first-touch lines without arithmetic padding.
+Three disjoint data replicas rotate execution order; each worker's 32-load
+count, checksum, and the final peer completion are checked. The OS-thread
+comparison remains a separate Linux acceptance gate using matched runtime data.
+
+| Schedule | Simulator cycles, three samples | FPGA cycles, three samples |
+| --- | --- | --- |
+| Resident no-prefetch handoff control | 3642, 4782, 3642 | 3163, 3563, 3163 |
+| Single-context batch2 | 4037, 4037, 4145 | 3089, 3077, 3129 |
+| Resident load-ahead/yield/load | 4145, 4309, 4145 | 3110, 3179, 3109 |
+
+These are complete schedule costs, including 66 ring switches and final peer
+publication in resident modes; batch2 publishes results after timing. The
+three samples show cache-state sensitivity, and do not establish a broad
+application speedup. Board and simulator startup ELFs differ.
+
+The accepted trace checks all 768 cold misses across warmup and measured
+pages, including each worker's exact request order and 64 distinct lines per
+page. All 756 within-page pairs serialize: the next miss is admitted at least
+four BE cycles after the previous full refill completes. Peer prefetch
+instructions can dispatch during an outstanding fill, but independent cold
+misses do not overlap. Dispatch order also differs from memory admission order;
+this evidence alone does not establish a dropped-prefetch or replay root cause.
+
+This identifies miss admission as a limit on the proposed overlap. A cheaper
+prefetch instruction alone would not establish support for multiple outstanding
+fetches. Any follow-up design must address request capacity and ownership as well
+as issue overhead. Exact sources, binaries, closed traces, per-request analysis,
+and board transcripts are in `logs/independent-requests-20260908/`.

@@ -48,8 +48,9 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
+| `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
 
-These 17 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
+These 18 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
@@ -112,6 +113,42 @@ The required OS-thread baseline, batched ideal, and prefetch/yield/load schedule
 are specified in [the application experiment](../PAPER_DIRECTION.md#matched-application-experiment).
 Retain exact ELF and board/simulator
 identities; do not compare their raw totals as identical-binary results.
+
+`mt_request_interleave_benchmark` tests independent memory requests without
+arithmetic padding. Each worker owns alternate entries of a fixed 64-line
+permutation, starts one faulting load-ahead operation, yields, then consumes
+that request on resumption. The resident control removes only load-ahead;
+batch2 prepares and preloads both addresses before consuming either. Each mode
+consumes 64 useful loads, with separate per-worker checksums (1076 and 1004)
+and counts. The ring explicitly drains the peer's last load and records its
+context ID. It performs 66 switches, including priming and draining.
+
+One untimed warmup per mode uses separate data. Three measured trials rotate
+mode order and use disjoint NBF-initialized pages with identical values and
+request order. The printed rows are raw `0xCC0` cycles in control/batch2/ahead
+order. Resident intervals include final peer result publication and return;
+batch2 publishes its results after stopping the counter. Do not attribute the
+entire batch-to-ring difference to cache behavior or isolated switch cost.
+This first-touch mechanism test does not measure Linux scheduling; that
+comparison is specified in [the application experiment](../PAPER_DIRECTION.md#matched-application-experiment).
+
+To check actual request admission, obtain `request_data` and
+`request_peer_prefetch` addresses from the exact traced ELF. Each
+`request_data[sample][mode]` occupies 4096 bytes (sample 0 is warmup; modes
+0/1/2 are control/batch2/ahead). Stream the closed waveform through:
+
+```sh
+fst2vcd path/to/dump.fst | python3 -B tools/request_overlap_vcd.py \
+  --address <selected-page-address> --span-lines 64 \
+  --target-pc <request_peer_prefetch-address> --target-thread 1 \
+  --expected-requests 64 --require-serialized
+```
+
+The last option asserts serialized admission for the current single-miss RTL;
+it does not establish an improvement. The report separates attempted peer
+instruction dispatch from accepted cache requests and critical/full refill
+boundaries. It rejects incomplete evidence and conflicting untagged refills;
+hardware with multiple outstanding requests will need transaction-aware analysis.
 
 The 46-case register-target regression fails on RTL `1b9e611d4` and passes on
 `6c97bcc0a` with the same executable. Its scoped fix waits for same-bank GPR

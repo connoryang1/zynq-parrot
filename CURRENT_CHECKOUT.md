@@ -62,7 +62,7 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 17 programs; its README explains each invariant.
+The maintained suite has 18 programs; its README explains each invariant.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`. The runner must see the selected test's
 completion marker before `CORE PASS`, plus host `BSG PASS`. The known post-PASS
