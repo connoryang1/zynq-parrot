@@ -99,24 +99,37 @@ def header(stream):
     return {label: matches[0] for label, matches in found.items()}, ''.join(timescale), capabilities
 
 
-def rising_edges(stream, selected):
-    """Batch each timestamp: delta ordering cannot affect the pre-edge snapshot."""
+def rising_edges(stream, selected, clock_labels=('clock',)):
+    """Batch timestamps and sample before any selected clock's rising edge.
+
+    Multiple clocks add ``_rising_clocks`` to each snapshot; the returned cycle
+    then counts edge timestamps, so callers maintain per-domain cycle counts.
+    The default single-clock interface and snapshots remain unchanged.
+    """
+    if not clock_labels or any(label not in selected for label in clock_labels):
+        raise EvidenceError('missing selected sampling clock')
     labels = {}
     for label, (code, _) in selected.items():
         labels.setdefault(code, []).append(label)
     values, updates = {}, {}
     timestamp, cycle = 0, 0
-    clock_seen = False
+    clock_seen = set()
 
     def finish():
-        nonlocal clock_seen
-        old_clock = values.get('clock')
-        new_clock = updates.get('clock', old_clock)
-        if 'clock' in updates:
-            if new_clock is None and clock_seen:
-                raise EvidenceError('unknown BE clock after clock sampling began')
-            clock_seen |= new_clock is not None
-        sample = dict(values) if old_clock == 0 and new_clock == 1 else None
+        edges = []
+        for label in clock_labels:
+            old_clock = values.get(label)
+            new_clock = updates.get(label, old_clock)
+            if label in updates:
+                if new_clock is None and label in clock_seen:
+                    raise EvidenceError('unknown BE clock after clock sampling began: ' + label)
+                if new_clock is not None:
+                    clock_seen.add(label)
+            if old_clock == 0 and new_clock == 1:
+                edges.append(label)
+        sample = dict(values) if edges else None
+        if sample is not None and len(clock_labels) > 1:
+            sample['_rising_clocks'] = edges
         values.update(updates)
         updates.clear()
         return sample
