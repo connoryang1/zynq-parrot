@@ -4,20 +4,39 @@
  * GPR preservation through a full T0->T1->T2->T3->T0 ring.
  *
  * T0 loads distinctive magic constants into a4, a5, and s0-s3 using naked
- * asm, then drives the ring. T1/T2/T3 are minimal stubs that immediately pass
- * control to the next context. T0 verifies all six registers hold their
- * original values when it resumes.
+ * asm, then drives the ring. Each peer records its logical ID and overwrites
+ * all six registers before passing control onward. T0 requires every peer's
+ * evidence and verifies its original register values were restored.
  */
 
 #include <stdint.h>
 #include "bp_utils.h"
 #include "mt_seed.h"
 
+#if BP_NUM_THREADS < 2 || BP_NUM_CONTEXTS < 4
+#error "The four-context ring requires at least two banks and four logical contexts"
+#endif
+
 #define STACK_WORDS 512
 
 static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
 static uint64_t t3_stack[STACK_WORDS];
+static volatile uint64_t peer_contexts[3] __attribute__((used, aligned(8)));
+
+/* A no-op switch leaves these records zero; a redirect without register
+ * restoration leaves the peer's logical ID in the source's live registers. */
+#define PEER_STATE(offset) \
+    "la t0, peer_contexts\n" \
+    "csrr t1, 0x800\n" \
+    "sd t1, " offset "(t0)\n" \
+    "mv a4, t1\n" \
+    "mv a5, t1\n" \
+    "mv s0, t1\n" \
+    "mv s1, t1\n" \
+    "mv s2, t1\n" \
+    "mv s3, t1\n" \
+    "fence rw, rw\n"
 
 /* Written by the ring-roundtrip asm stub after the ring completes */
 static volatile uint64_t observed_a4;
@@ -32,6 +51,7 @@ uint64_t saved_s_regs[4];
 
 void __attribute__((naked, noinline, noreturn)) t1_stub(void) {
   __asm__ volatile(
+    PEER_STATE("0")
     "csrwi 0x800, 2\n"
     "1:\n"
     "j 1b\n"
@@ -40,6 +60,7 @@ void __attribute__((naked, noinline, noreturn)) t1_stub(void) {
 
 void __attribute__((naked, noinline, noreturn)) t2_stub(void) {
   __asm__ volatile(
+    PEER_STATE("8")
     "csrwi 0x800, 3\n"
     "1:\n"
     "j 1b\n"
@@ -48,6 +69,7 @@ void __attribute__((naked, noinline, noreturn)) t2_stub(void) {
 
 void __attribute__((naked, noinline, noreturn)) t3_stub(void) {
   __asm__ volatile(
+    PEER_STATE("16")
     "csrwi 0x800, 0\n"
     "1:\n"
     "j 1b\n"
@@ -117,6 +139,12 @@ int main(void) {
   restore_gp();
 
   int errors = 0;
+  for (unsigned i = 0; i < 3; ++i) {
+    if (peer_contexts[i] != i + 1) {
+      bp_print_string("FAIL: ring peer did not execute with its logical ID\n");
+      errors++;
+    }
+  }
 
 #define CHECK_REG(name, got, want) \
   bp_print_string(name ": "); \
