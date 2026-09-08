@@ -127,6 +127,13 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     bsg_pr_info("ps.cpp: allocating owned DRAM buffer with size %ld\n",
                 (long)DRAM_ALLOCATE_SIZE);
     buf = (volatile int *)zpl->allocate_dram(DRAM_ALLOCATE_SIZE, &phys_ptr);
+#ifdef AXI_MEM_ENABLE
+    // The simulation AXI RAM is a separate address space, not a mapping of
+    // this host allocation. A malloc pointer is neither page aligned nor
+    // bounded by that RAM and shifts otherwise legal cache-line bursts across
+    // AXI's 4 KiB boundaries. NBF writes initialize the simulated RAM via AXI.
+    phys_ptr = 0;
+#endif
     bsg_pr_info("ps.cpp: received %p (phys = %lx)\n", buf, phys_ptr);
     zpl->shell_write(GP0_WR_CSR_DRAM_BASE, phys_ptr, mask1);
     assert((zpl->shell_read(GP0_RD_CSR_DRAM_BASE) == (int32_t)(phys_ptr)));

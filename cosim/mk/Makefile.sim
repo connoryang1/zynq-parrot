@@ -17,6 +17,7 @@ VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_gpio.sv
 VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_to_fifo.sv
 VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_dpi_rom.sv
 VSOURCES += $(BASEJUMP_STL_DIR)/bsg_test/bsg_nonsynth_axi_mem.sv
+VSOURCES += $(COSIM_VSRC_DIR)/bp_nonsynth_axi_mem_pipelined.sv
 VSOURCES += $(BP_RTL_DIR)/bp_top/test/common/bsg_nonsynth_waveform_tracer.sv
 VSOURCES += $(BP_RTL_DIR)/bp_top/test/common/bsg_nonsynth_assert.sv
 VSOURCES += $(COSIM_VSRC_DIR)/bsg_nonsynth_dpi_to_axil.sv
@@ -53,4 +54,3 @@ CLIBS += boost_context
 CLIBS += boost_system
 
 LDFLAGS +=
-

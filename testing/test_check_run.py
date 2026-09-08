@@ -125,12 +125,30 @@ class HarnessTests(unittest.TestCase):
         for key in ("MAKEFLAGS", "MFLAGS", "MAKEOVERRIDES"):
             env.pop(key, None)
         with tempfile.TemporaryDirectory() as directory:
-            for contexts in (4, 8, 4):
-                stamp = ".build_config-nt2-nc{}-cfgtest-trace1".format(contexts)
+            cases = ((4, "", ""), (8, "", ""), (4, "", ""),
+                     (4, "BP_ZYNQ_PREFETCH_TWO_BANKS", "-pfbanks2"), (4, "", ""),
+                     (4, "BP_ZYNQ_PREFETCH_TWO_BANKS=0", "-pfbanks2"), (4, "", ""),
+                     (4, "BP_AXI_MEM_PIPELINED", "-axipipe-lat40-q4"),
+                     (4, "BP_AXI_MEM_PIPELINED=0", "-axipipe-lat40-q4"),
+                     (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=60", "-axipipe-lat60-q4"),
+                     (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=60 BP_AXI_MEM_READ_QUEUE_DEPTH=8",
+                      "-axipipe-lat60-q8"),
+                     (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_QUEUE_DEPTH=2", "-axipipe-lat40-q2"),
+                     (4, "BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED=0", "-pfbanks2-axipipe-lat40-q4"),
+                     (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=60 BP_AXI_MEM_READ_LATENCY=40",
+                      "-axipipe-lat40-q4"),
+                     (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=0 BP_AXI_MEM_READ_QUEUE_DEPTH=0",
+                      "-axipipe-lat0-q0"),
+                     (4, "BP_AXI_MEM_READ_LATENCY=60 BP_AXI_MEM_READ_QUEUE_DEPTH=8", ""),
+                     (4, "", ""))
+            for contexts, defines, suffix in cases:
+                stamp = ".build_config-nt2-nc{}-cfgtest-trace1{}".format(
+                    contexts, suffix)
                 result = subprocess.run(
                     ["make", "-C", directory, "-f", str(make_dir / "Makefile.verilator"),
                      "COSIM_MK_DIR=" + str(make_dir), "NUM_THREADS=2",
                      "NUM_CONTEXTS=" + str(contexts), "CFG=test", "TRACE=1",
+                     "DEFINES=" + defines,
                      "BUILD_COLLATERAL=", "obj_dir/" + stamp],
                     env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=10)
                 self.assertEqual(result.returncode, 0, result.stdout)

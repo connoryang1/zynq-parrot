@@ -261,13 +261,27 @@ module bsg_nonsynth_zynq_testbench;
   logic [1:0]                           hp0_axi_rresp;
 
 `ifdef AXI_MEM_ENABLE
+`ifdef BP_AXI_MEM_PIPELINED
+`ifndef BP_AXI_MEM_READ_LATENCY
+`define BP_AXI_MEM_READ_LATENCY 40
+`endif
+`ifndef BP_AXI_MEM_READ_QUEUE_DEPTH
+`define BP_AXI_MEM_READ_QUEUE_DEPTH 4
+`endif
+  bp_nonsynth_axi_mem_pipelined
+`else
   bsg_nonsynth_axi_mem
+`endif
     #(.axi_id_width_p(6)
       ,.axi_addr_width_p(C_HP0_AXI_ADDR_WIDTH)
       ,.axi_data_width_p(C_HP0_AXI_DATA_WIDTH)
       ,.axi_len_width_p(8)
       ,.mem_els_p(2**28)
       ,.init_data_p('0)
+`ifdef BP_AXI_MEM_PIPELINED
+      ,.read_latency_p(`BP_AXI_MEM_READ_LATENCY)
+      ,.read_queue_els_p(`BP_AXI_MEM_READ_QUEUE_DEPTH)
+`endif
     )
   axi_mem
     (.clk_i(aclk)
@@ -276,6 +290,9 @@ module bsg_nonsynth_zynq_testbench;
      ,.axi_awid_i(hp0_axi_awid)
      ,.axi_awaddr_i(hp0_axi_awaddr)
      ,.axi_awlen_i(hp0_axi_awlen)
+`ifdef BP_AXI_MEM_PIPELINED
+     ,.axi_awsize_i(hp0_axi_awsize)
+`endif
      ,.axi_awburst_i(hp0_axi_awburst)
      ,.axi_awvalid_i(hp0_axi_awvalid)
      ,.axi_awready_o(hp0_axi_awready)
@@ -294,6 +311,9 @@ module bsg_nonsynth_zynq_testbench;
      ,.axi_arid_i(hp0_axi_arid)
      ,.axi_araddr_i(hp0_axi_araddr)
      ,.axi_arlen_i(hp0_axi_arlen)
+`ifdef BP_AXI_MEM_PIPELINED
+     ,.axi_arsize_i(hp0_axi_arsize)
+`endif
      ,.axi_arburst_i(hp0_axi_arburst)
      ,.axi_arvalid_i(hp0_axi_arvalid)
      ,.axi_arready_o(hp0_axi_arready)
