@@ -24,15 +24,25 @@ WATCH = {
     "dispatch_target_ctx": (
         "be.scheduler.dispatch_pkt_cast_o.ctxtsw_target_tid",
         "be.dispatch_pkt.ctxtsw_target_tid",
+        "be.ctxtsw_target_virtual_context_id_li",
     ),
     "commit_ctxtsw": ("be.calculator.commit_pkt_cast_o.ctxtsw", "be.commit_pkt.ctxtsw"),
     "commit_pc": ("be.calculator.commit_pkt_cast_o.pc", "be.commit_pkt.pc"),
     "commit_instret": ("be.calculator.commit_pkt_cast_o.instret", "be.commit_pkt.instret"),
     "cache_state": ("context_cache_state_r",),
     "cache_miss": ("context_cache_miss_v_li",),
-    "cache_miss_ctx": ("context_cache_miss_context_id_li",),
-    "cache_target_ctx": ("context_cache_target_context_id_r",),
-    "cache_victim_ctx": ("context_cache_victim_context_id_r",),
+    "cache_miss_ctx": (
+        "context_cache_miss_virtual_context_id_li",
+        "context_cache_miss_context_id_li",
+    ),
+    "cache_target_ctx": (
+        "context_cache_target_virtual_context_id_r",
+        "context_cache_target_context_id_r",
+    ),
+    "cache_victim_ctx": (
+        "context_cache_victim_virtual_context_id_r",
+        "context_cache_victim_context_id_r",
+    ),
     "cache_reg": ("context_cache_reg_idx_r",),
     "cache_drain_safe": ("context_cache_drain_safe_li",),
     "cache_launch": ("context_cache_launch_v_li",),
@@ -42,7 +52,7 @@ WATCH = {
     "pending_v": ("pending_ctxtsw_v_r",),
     "pending_sent": ("pending_ctxtsw_sent_r",),
     "current_tid": ("current_physical_thread_id_lo", "current_thread_id_lo"),
-    "current_ctx": ("current_context_id_r",),
+    "current_ctx": ("current_virtual_context_id_r", "current_context_id_r"),
     "pending_prev_tid": (
         "pending_ctxtsw_prev_physical_thread_id_r",
         "pending_ctxtsw_prev_thread_id_r",
