@@ -1,4 +1,4 @@
-This directory contains the active bare-metal tests for resident and SRAM-backed nonresident context switches. Use this guide for the accepted two-resident/four-logical configuration; older scale experiments and measurements remain in the historical Git checkpoint.
+This directory contains the active bare-metal tests for resident and SRAM-backed nonresident context switches, plus prefetch correctness and request-scheduling experiments. Use this guide to reproduce the two-resident/four-logical tests and distinguish the optional prefetch simulator configuration from accepted FPGA results.
 
 # Tests
 
@@ -43,14 +43,17 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_gpr_ring_stress` | Six live GPR sentinels survive peer overwrites; all three peers record their logical IDs |
 | `mt_ctxtsw_pure_ring_stress_test` | Eight consecutive switches per context, followed by a lap verifying every peer completed |
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
+| `mt_prefetch_hint_test` | Nonfaulting invalid hints, signed offsets, ordinary ORI behavior, all word offsets, and dirty-line/store data preservation |
+| `mt_umode_prefetch_test` | Sv39 readable and denied mappings, expected demand fault, nonfaulting hints, and permitted demand data without context switching |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
+| `mt_prefetch_interleave_benchmark` | The same independent request streams and controls using nonblocking `prefetch.r` hints instead of discarded byte loads |
 
-These 18 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
+These 21 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
@@ -77,8 +80,9 @@ must be reported separately.
 
 The load-ahead experiments use ordinary `lbu x0` on valid cacheable data. This
 can warm a line without a destination register; it still performs translation,
-can fault, and must not be used on MMIO as a harmless hint. No new prefetch ISA
-instruction or additional outstanding-miss capacity is implemented.
+can fault, and must not be used on MMIO as a harmless hint. These original
+programs retain that baseline; the separate `prefetch.r` implementation and
+tests are described below.
 
 `mt_ctxtsw_load_overlap_test` verifies eight distinct cold lines for each of
 delayed `ld a5` and discarded `lbu x0`, after separate instruction-path warmups.
@@ -144,11 +148,118 @@ fst2vcd path/to/dump.fst | python3 -B tools/request_overlap_vcd.py \
   --expected-requests 64 --require-serialized
 ```
 
-The last option asserts serialized admission for the current single-miss RTL;
-it does not establish an improvement. The report separates attempted peer
+The last option asserts serialized ordinary-load admission in this discarded-load
+baseline; it does not establish an improvement. The report separates attempted peer
 instruction dispatch from accepted cache requests and critical/full refill
 boundaries. It rejects incomplete evidence and conflicting untagged refills;
-hardware with multiple outstanding requests will need transaction-aware analysis.
+use the transaction-aware prefetch analyzer below for the new hint requests.
+
+## Nonblocking prefetch
+
+[`bp_prefetch_r`](../software/include/bp_prefetch.h) emits the Zicbop read-hint
+encoding. In the noncoherent writeback Dcache path, hints to permitted cacheable
+DRAM can issue without allocating the ordinary demand-miss state. A usable
+DTLB translation must already exist in translated mode: a hint does not start
+a page-table walk. Invalid, denied, missing-translation, L1-hit, and busy-path
+hints are dropped without an architectural exception. There is no guarantee
+that any individual hint reaches memory.
+
+Two UCE slots track accepted hints through their replies. Same-line hints
+coalesce; a full pair of slots causes additional hints to be dropped. Each
+request is an aligned eight-byte L2 read whose flagged response is discarded.
+The L2 bank fills its normal 64-byte line, and a later demand uses the ordinary
+L1 refill path. A same-line demand waits for the pending hint; unrelated
+demands can proceed. Accepted hints survive context switches and are included
+in credit-drain checks.
+
+`mt_prefetch_hint_test` checks functional hint behavior and subsequent demand
+values. `mt_umode_prefetch_test` primes a readable 4 KiB Sv39 mapping, confirms
+an execute-only mapping raises the expected demand-load page fault, then
+checks that hints to denied, unmapped, noncanonical, and mapped MMIO addresses
+do not trap. It also hints and reads a separate line on the readable page.
+The MMIO translation is not primed, so that hint can drop on a DTLB miss;
+PASS alone does not prove a PMA rejection or a retained denied DTLB entry.
+The test does not switch contexts or establish hint-triggered page walking.
+
+`mt_prefetch_interleave_benchmark` includes the original request benchmark with
+the hint helper selected. It preserves the same 64 useful loads, two worker
+checksums/counts, 66 switches, disjoint data pages, rotating three-trial order,
+and control/batch2/resident modes described above. There is no arithmetic
+padding. Its batch2 control issues two hints before the two demand loads;
+each resident worker hints its own request, yields, and consumes it on return.
+The resident timing includes peer result publication, while batch2 publishes
+after its stop counter. This is a bare-metal mechanism test; it does not replace
+the Linux thread baseline or establish an FPGA/Linux performance gain.
+
+### Full simulator and waveform evidence
+
+The minimal core simulator can check instruction and UCE behavior. To test
+downstream concurrency, select the full simulator and optional two-bank L2.
+`BP_ZYNQ_PREFETCH_TWO_BANKS` retains the total 4 KiB L2 capacity and maps adjacent
+cache lines to different banks. Each bank still has one miss handler, so
+same-bank requests serialize. The optional `BP_AXI_MEM_PIPELINED` model queues
+AXI reads with ordered responses; its default synthetic read latency is 40
+cycles and queue depth is four. It is a simulator model, not a DDR timing model.
+See [AXI model tests](../cosim/tests/README.md) for its controls and limitations.
+
+From the repository root, preserve previous artifacts and finish the clean
+before the run. Use an environment `DEFINES` value so the design Makefile can
+append its required definitions:
+
+```sh
+make -C cosim/black-parrot-example/verilator clean
+env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' \
+  make -C testing run-mt_prefetch_interleave_benchmark \
+  SIM_DIR="$PWD/cosim/black-parrot-example/verilator" \
+  NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12 \
+  TARGET_RUNTIME_MS=120000
+```
+
+Run the two hint-correctness programs through the same configuration by
+substituting their `run-<test>` targets. Keep guests serialized and archive the
+exact ELF, model configuration, unfiltered log, and closed trace for each run.
+The optional two-bank configuration still requires FPGA implementation and
+Linux validation before deployment or application performance claims.
+
+For a closed full-simulator waveform:
+
+```sh
+fst2vcd path/to/dump.fst | python3 -B tools/prefetch_overlap_vcd.py \
+  --uce-prefix dcache_uce --axi-prefix axi_mem --fill-bytes 8 \
+  --require-uce-overlap --require-axi-overlap
+python3 -B tools/test_prefetch_overlap_vcd.py
+```
+
+The analyzer matches flagged UCE requests/replies by slot and address, and AXI
+bursts by their accepted transaction sequence. It rejects incomplete evidence.
+The overlap gates require a later request to be accepted before an earlier
+request's first response beat at each observed interface. UCE and AXI clocks
+are sampled separately. AXI acceptance proves outstanding transactions, not
+parallel DRAM service; that interface also carries traffic other than hints.
+Inspect the individual transactions before attributing overlap to the measured
+request sequence or claiming a latency improvement.
+For a measured page, add `--address <physical-page-address> --span-bytes 4096`
+using `request_data[sample][mode]` from the exact ELF. If the AXI port remaps
+physical addresses, also supply the verified `--axi-address-xor` mapping.
+With a region selected, the gates use only its hints and AXI reads correlated
+by physical line and transaction lifetime. This correlation is not an AXI
+source identifier; inspect the retained matches and configuration.
+
+The isolated UCE regression uses the real UCE and stream pumps with controlled
+memory responses; it does not rebuild or run either shared core simulator:
+
+```sh
+python3 testing/rtl/run_uce_prefetch.py \
+  --out logs/nonblocking-prefetch-20260908/uce-unit
+```
+
+It checks two pending hints, capacity refusal, same-line merging, out-of-order
+responses, slot reuse, unrelated and same-line demands, response backpressure,
+and credit drain. A separate malformed-response case must trigger the expected
+assertion. The runner uses an explicit-cycle C++ driver and records source and
+artifact identities in its verification manifest.
+
+## Other context-switch limits
 
 The 46-case register-target regression fails on RTL `1b9e611d4` and passes on
 `6c97bcc0a` with the same executable. Its scoped fix waits for same-bank GPR

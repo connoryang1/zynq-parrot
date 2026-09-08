@@ -65,7 +65,7 @@ and its separate acceptance evidence are described below.
 The September 8 load-ahead experiment establishes overlap with a pending full-line
 refill. `bp_load_ahead()` in `software/include/bp_load_ahead.h` emits an ordinary
 faulting `lbu x0` to valid cacheable data; it is not a nonfaulting prefetch hint.
-The active unicore Dcache enables hit-under-miss (`features_p=0x1f5`), retains one
+The deployed baseline unicore Dcache enables hit-under-miss (`features_p=0x1f5`), retains one
 outstanding blocking miss, and can continue integer work and resident switching.
 Nonresident handoffs still drain outstanding memory activity.
 
@@ -106,10 +106,10 @@ Both new programs pass simulator and FPGA checks; exact sources, hashes, closed
 traces/transcripts, and timing analysis are retained in
 `logs/resident-cache-overlap-20260908/`.
 
-Multiple simultaneous cold misses remain unimplemented. Before expanding miss
-capacity or adding a nonfaulting prefetch instruction, qualify request ownership,
-backpressure, translation/fault handling, and refill completion. The current
-software helper must not be treated as a safe hint for arbitrary addresses.
+That baseline does not support multiple simultaneous cold misses. The new
+nonfaulting hint path adds separate request slots; ownership, backpressure,
+translation/fault handling, and refill completion are acceptance gates. The
+original `bp_load_ahead` helper remains unsafe for arbitrary addresses.
 
 ## Matched application experiment
 
@@ -148,15 +148,14 @@ ten software workers as ten resident hardware contexts. Four logical workers
 exercise nonresident switches, which currently drain memory activity, and must
 be reported separately.
 
-On this RTL, `lbu x0` uses the ordinary load path and the cache has only one
+On the deployed baseline RTL, `lbu x0` uses the ordinary load path and the cache has only one
 outstanding blocking miss. The batched instruction schedule is therefore a
 comparison to measure, not evidence that ten cold fetches run concurrently.
 Trace whether B's request is accepted before A's critical data and full refill
-complete, and whether a second miss serializes progress. The new
-`mt_request_interleave_benchmark` measures this boundary; the arithmetic-overlap
-result does not answer it. A
-dedicated prefetch instruction and additional miss capacity are separate design
-changes to assess from that evidence.
+complete, and whether a second miss serializes progress. `mt_request_interleave_benchmark` measures this baseline boundary; the
+arithmetic-overlap result does not answer it. Its new
+`mt_prefetch_interleave_benchmark` variant substitutes the dedicated hint while
+retaining the same request streams and correctness checks.
 
 Use the same data values, deterministic per-worker random request streams,
 total request counts, and expected checksums across matched cases. Keep one
@@ -208,3 +207,54 @@ prefetch instruction alone would not establish support for multiple outstanding
 fetches. Any follow-up design must address request capacity and ownership as well
 as issue overhead. Exact sources, binaries, closed traces, per-request analysis,
 and board transcripts are in `logs/independent-requests-20260908/`.
+
+
+## Nonfaulting prefetch implementation and first simulation result
+
+The `feat/nonblocking-prefetch` implementation adds standard `prefetch.r` decode
+and two outstanding physical hint slots in the UCE. Hints warm L2 through an
+8-byte cached read; an L2 miss fetches the full 64-byte line. Their replies
+never install L1 state or complete an architectural load. Unavailable or denied
+translations and unavailable request capacity drop the hint. The ordinary L1
+demand path remains blocking. The two-bank configuration preserves the 4 KiB
+L2 capacity; same-bank misses still serialize.
+
+The full-system simulator uses an optional four-entry AXI read queue with
+40-cycle service latency from each accepted address and ordered responses.
+This is controlled memory latency, not a model of physical DDR performance.
+The instruction/data correctness, resident smoke, U-mode Sv39 hint permission,
+and independent-request tests pass. Standalone UCE tests cover capacity,
+backpressure, coalescing, response ownership, same-line demand waits, and credit
+drain; malformed responses are rejected.
+
+The same 64-load request schedule gives the following raw totals. The mode order
+rotates across three disjoint measured datasets, after an untimed warmup.
+
+| Schedule | Full-system cycles, three samples |
+| --- | --- |
+| Resident no-prefetch handoff control | 5079, 6022, 5079 |
+| Single-context batch2 with `prefetch.r` | 4059, 4059, 4221 |
+| Resident `prefetch.r` / yield / load | 4933, 5143, 4933 |
+
+Waveform evidence qualifies each dataset separately. Each page has 64 ordinary
+L1 reads with the expected unique lines and per-worker order. Batch2 issues
+paired hints one cycle apart; its 18 opposite-bank pairs per dataset each admit
+the second AXI read before the first read returns data. Maximum outstanding
+data reads is two. This establishes concurrent requests through L2 and AXI.
+
+The resident schedule has no overlapping data/data AXI reads in this run.
+Its median successive hint issue gap is 76 cycles, versus a median 60-cycle
+hint response lifetime. The first measured pair overlaps at the UCE but uses
+the same bank (lines 23 and 25), so its backing reads serialize. This schedule
+therefore does not yet demonstrate the intended sustained worker-to-worker
+memory overlap. The cycle reduction against its handoff control alone does
+not establish that mechanism. Best-effort hints also need not all be accepted:
+one dataset allocates 61 of 64 hints, while all useful loads complete correctly.
+
+Evidence is retained in `logs/nonblocking-prefetch-20260908/full-requests/`,
+including exact ELF/NBF, closed FST, transaction-aware reports, page summaries,
+and source hashes. Region and transaction-lifetime correlation exclude loader
+and unrelated instruction reads; aggregate AXI overlap alone is insufficient.
+The next measurements must localize the resident schedule's issue gap, then
+qualify the routed FPGA image and the Linux OS-thread comparison. The prior
+FPGA results above remain tied to their original deployed RTL.

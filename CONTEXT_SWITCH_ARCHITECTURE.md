@@ -39,14 +39,31 @@ regression described in the checkout guide before relying on retained CSR state.
 ## Cache overlap is a separate capability
 
 Integer backing RAM holds register state; it does not warm the instruction or
-data caches. The active Dcache enables hit-under-miss while retaining one blocking
+data caches. The deployed baseline Dcache enables hit-under-miss while retaining one blocking
 miss; integer execution and resident handoffs can continue while it fills.
 `software/include/bp_load_ahead.h` uses an ordinary faulting byte load to x0 to
 warm valid cacheable data. Traces prove useful resident arithmetic before full
 refill completion, but after the critical data beat in the tested simulator.
-There is no new nonfaulting prefetch instruction or additional miss capacity.
+The development implementation adds a nonfaulting `prefetch.r` path with two
+outstanding physical requests in `bp_uce.sv`. Hints warm L2, return no architectural
+value, and never install L1 data or complete a demand load. Translation must
+already be present, readable, and cacheable; unavailable translations, denied
+accesses, MMIO, full queues, and busy demand paths drop the hint. Ordinary loads
+retain their fault and completion behavior.
+
+Each hint issues one tagged 8-byte cached read. An L2 miss fetches the full line;
+request tags remain owned until the response drains, including across resident
+switches. Duplicate lines coalesce, and a demand for an outstanding hint's line
+waits for that hint before starting its normal L1 fill. The dedicated
+`e_bp_unicore_zynqparrot_prefetch_cfg` provides two L2 banks with 16 sets each,
+preserving the baseline's total 4 KiB capacity. Distinct banks can service
+independent misses; same-bank misses still serialize. This does not make the
+ordinary L1 demand path a multiple-MSHR cache.
+
 Nonresident replacement still drains outstanding memory activity before
-installing state. See [the measured controls and limits](PAPER_DIRECTION.md).
+installing state. The new implementation is under simulation and routed FPGA
+qualification; deployed-image identities remain in the checkout guide. See
+[the measured controls and limits](PAPER_DIRECTION.md).
 
 ## Validation and measurement
 

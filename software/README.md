@@ -1,6 +1,40 @@
-This directory contains build support for ZynqParrot host environments and small target-side helpers. The load-ahead helper uses BlackParrot's existing memory instructions; its behavior and limits are described below.
+This directory contains build support for ZynqParrot host environments and small target-side helpers. The helpers below distinguish the implemented nonblocking prefetch hint from the ordinary discarded-load baseline used in earlier experiments.
 
-## BlackParrot load-ahead helper
+## BlackParrot prefetch helper
+
+Include `bp_prefetch.h` with `-Isoftware/include` to request a line before other
+work or a resident context switch:
+
+```c
+#include "bp_prefetch.h"
+
+bp_prefetch_r(address);
+/* Other independent requests can issue before this demand load. */
+value = *address;
+```
+
+The helper emits the Zicbop `prefetch.r` encoding (`ori zero, base, 1`, offset
+zero) and a compiler memory barrier. The hint is best effort: it does not
+return data, fence memory operations, or guarantee that a request is issued.
+Hardware without support executes this encoding as a no-op.
+
+In the implemented noncoherent writeback Dcache path, a hint can issue for a
+permitted, cacheable DRAM address with an existing usable translation. Missing
+translations are dropped without starting a page-table walk, and invalid or
+denied hints do not raise an architectural fault. L1 hits and hints that cannot
+be accepted immediately are also dropped. The UCE tracks at most two pending
+requests and coalesces hints to the same cache line. Its word reads warm L2;
+responses are discarded, and a later demand uses the normal L1 refill path.
+Switching resident contexts does not cancel accepted hints.
+
+The [prefetch tests and simulator workflow](../testing/README.md#nonblocking-prefetch)
+cover hint correctness, U-mode permissions, and independent request streams.
+Concurrent downstream misses require separate L2 banks; the optional two-bank
+full simulator configuration and queued AXI memory model make that mechanism
+testable. This implementation does not yet establish an FPGA or Linux
+performance gain.
+
+## Ordinary load-ahead baseline
 
 Include `bp_load_ahead.h` with `-Isoftware/include` to issue a discarded byte
 load before doing independent work:

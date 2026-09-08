@@ -6,7 +6,7 @@ Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
 Both forks integrate on `master`; develop on dedicated branches. The verified
 cleanup and Linux resident acceptance are integrated into both masters.
 
-The current gitlink selects RTL `808ba6ced`. Its hardware content is unchanged
+The deployed baseline gitlink selects RTL `808ba6ced`. Its hardware content is unchanged
 from `aad56bd92`, originally pinned by top-level `873deeb7`; the cleanup removes
 stale debug comments and updates documentation. This endpoint adds first-seed resident CSR initialization
 (`83fc32d29`) and correct register-bank ownership through instruction refill and
@@ -15,7 +15,7 @@ replay (`aad56bd92`) to `6c97bcc0a`.
 **FPGA/Linux resident acceptance is at `aad56bd92`.** On September 8 the exact
 routed resident-fix image passed a shell-launched 0↔1 and 0↔2 benchmark,
 including target-context syscalls, private/restored register checks, process
-exit, a subsequent shell command, and clean poweroff. The current gitlink adds
+exit, a subsequent shell command, and clean poweroff. That baseline gitlink adds
 only comments/documentation to that hardware. Exact artifact identities and
 the earlier `6c97bcc0a` baseline are recorded below.
 
@@ -51,6 +51,20 @@ and [research direction](PAPER_DIRECTION.md). Application experiments belong on
 experiment branches; SQLite remains at
 `archive/sqlite-progress-screen-20260907`.
 
+## Prefetch development checkpoint
+
+`feat/nonblocking-prefetch` adds nonfaulting L2 hints with two UCE request slots
+(top `848e6ee7`, RTL `f284f766b`), plus an optional two-bank L2 of unchanged total capacity.
+The full simulator passes hint correctness, resident switching, U-mode Sv39
+permissions, and the independent-request benchmark. Its controlled AXI model
+and traces prove two concurrent cold-data requests in batch2. The resident
+worker schedule still serializes backing-data reads at the tested latency;
+see [the experiment](PAPER_DIRECTION.md#nonfaulting-prefetch-implementation-and-first-simulation-result).
+
+This is a development checkpoint awaiting routed fit and FPGA/Linux acceptance.
+The deployed image and accepted baseline identities below remain unchanged.
+Reproduce the new gates using [the testing guide](testing/README.md#full-simulator-and-waveform-evidence).
+
 ## Verification
 
 Preserve existing logs/waveforms, finish each clean command, then build/run:
@@ -62,7 +76,7 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 18 programs; its README explains each invariant.
+The maintained suite has 21 programs; its README explains each invariant.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`. The runner must see the selected test's
 completion marker before `CORE PASS`, plus host `BSG PASS`. The known post-PASS
