@@ -4,7 +4,9 @@ This file records the research objective and the acceptance criteria for the nex
 
 The objective is to make cooperative context switches cheap enough that one
 worker can request data, yield while it arrives, and resume with less exposed
-memory latency. Cold-cache cost is a hypothesis to measure for the selected
+memory latency. The next worker issues its own independent memory request:
+the target is overlap between requests, not arithmetic inserted to cover a fill.
+Cold-cache cost is a hypothesis to measure for the selected
 workload; the existing switch-spacing numbers do not establish that it dominates
 or that prefetching will produce a speedup.
 
@@ -54,6 +56,10 @@ target syscalls, private registers, usable shell return, and clean poweroff. The
 production-readiness gaps, including lifecycle, FP state, and isolation.
 
 ## Second gate: demonstrate actual memory overlap
+
+The existing tests qualify a mechanism only. Their peer performs arithmetic,
+not another random load, so they do not implement the reference workload or
+establish a speedup for independent requests. That application gate remains open.
 
 The September 8 load-ahead experiment establishes overlap with a pending full-line
 refill. `bp_load_ahead()` in `software/include/bp_load_ahead.h` emits an ordinary
@@ -106,22 +112,59 @@ software helper must not be treated as a safe hint for arbitrary addresses.
 
 ## Matched application experiment
 
-Next, extend the small scheduling experiment to a controlled memory workload
-with repeated independent datasets, mode-order rotation, working-set and useful-work
-sweeps, then compare these application modes:
+The workload models independent requests assigned to a thread pool on one
+logical CPU. Each request consumes one random memory load; repeat requests to
+obtain stable timing. Each worker owns its request address and result. Do not
+pad the request with arithmetic or let one worker prefetch another's addresses
+in the threaded cases. The batched case deliberately relaxes that constraint
+to represent the ideal scheduling opportunity described in the proposal.
 
-1. Serial dependent loads with no prefetch.
-2. Single-worker batched prefetch/load.
-3. Software coroutine prefetch/yield/load.
-4. Hardware context prefetch/switch/load.
+| Case | Required schedule | Purpose |
+| --- | --- | --- |
+| OS-thread baseline | `n` Linux threads pinned to one CPU, each consuming its own random loads without prefetch or explicit per-request yield | Original independent-request baseline |
+| Batched ideal | One thread issues 10 prefetches, then consumes those same 10 loads | Original batching reference, assuming all request addresses are available together |
+| Cheap-context candidate | Each worker prefetches its own address, yields to the next worker, and consumes that load when resumed | Test whether cheap handoffs recover the batching benefit |
 
-Use identical data, deterministic random indices or independent pointer chains,
-request counts, worker work, checksums, and timing boundaries. Allocate, seed,
-and warm up outside steady-state timing; report cold-start separately. Start
-with the supported two-resident/four-logical topology and vary workers within
-that capacity, then sweep working-set size across cache capacity and vary useful
-work between request and consumption. Include a no-prefetch handoff control to
-separate scheduler overhead from cache benefit.
+For the candidate, the initial round is `A: prefetch(A) -> yield`, then
+`B: prefetch(B) -> yield`, continuing through the workers. On resumption each
+worker consumes its pending load, obtains its next request, prefetches it, and
+yields again. Prime and drain the ring explicitly; count only completed useful
+loads in throughput. No worker issues multiple requests ahead to create hidden
+batching within a thread.
+
+A cache miss in the baseline stalls the running logical CPU; it does not itself
+invoke the Linux scheduler. Do not add a forced handoff after every baseline
+load. Add separate software cooperative prefetch/yield/load and matched
+no-prefetch handoff controls to distinguish scheduler cost from memory benefit;
+neither replaces the original OS-thread baseline. A claimed round-robin control
+must enforce and verify that order rather than assume `sched_yield()` provides it.
+
+The accepted FPGA has two resident banks and four logical contexts. Start the
+hardware candidate with two resident workers and compare it with two OS threads
+and batch size two. Retain the original 10-thread/batch-10 reference separately;
+do not compare different worker counts as a matched hardware speedup or label
+ten software workers as ten resident hardware contexts. Four logical workers
+exercise nonresident switches, which currently drain memory activity, and must
+be reported separately.
+
+On this RTL, `lbu x0` uses the ordinary load path and the cache has only one
+outstanding blocking miss. The batched instruction schedule is therefore a
+comparison to measure, not evidence that ten cold fetches run concurrently.
+Trace whether B's request is accepted before A's critical data and full refill
+complete, and whether a second miss serializes progress. This is the next
+mechanism experiment; the arithmetic-overlap result does not answer it. A
+dedicated prefetch instruction and additional miss capacity are separate design
+changes to assess from that evidence.
+
+Use the same data values, deterministic per-worker random request streams,
+total request counts, and expected checksums across matched cases. Keep one
+request outstanding per worker and preserve the per-worker consume-before-next
+request dependency. Allocate, seed, create workers, and warm code outside
+steady-state timing; use a common start/completion boundary, and account for
+ring priming and draining consistently. Report setup and cold-start separately.
+Sweep working sets across cache capacity, repeat independent datasets, and
+rotate mode order. Random addresses alone do not prove cold misses: verify
+cache behavior and document the cache-state preparation used for each sample.
 
 Report raw core-wide `0xCC0` cycles, cycles/request, throughput, sample spread,
 and checksum correctness. Pair these with waveform request/refill overlap,

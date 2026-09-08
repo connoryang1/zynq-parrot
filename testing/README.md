@@ -106,7 +106,11 @@ measurement, with a fixed measurement order. Peer setup, final checksum/count
 checks, fences, and console output are outside the global-counter intervals.
 Resident modes include two switches per line and peer loop bookkeeping.
 These are small scheduling measurements, not a random-access application or
-evidence of multiple concurrent misses. Retain exact ELF and board/simulator
+evidence of multiple concurrent misses. The peer performs arithmetic, so this
+does not test workers taking turns prefetching their own independent requests.
+The required OS-thread baseline, batched ideal, and prefetch/yield/load schedule
+are specified in [the application experiment](../PAPER_DIRECTION.md#matched-application-experiment).
+Retain exact ELF and board/simulator
 identities; do not compare their raw totals as identical-binary results.
 
 The 46-case register-target regression fails on RTL `1b9e611d4` and passes on
