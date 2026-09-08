@@ -150,7 +150,7 @@ outside the measurement; interrupts remain enabled.
 
 The combined benchmark requires the resident-initialization and fetch/replay
 ownership fixes in RTL `aad56bd92`, now integrated into `master`. Use the
-resident-fix bitstream identified in [the checkout guide](../CURRENT_CHECKOUT.md#fpga-acceptance-identities);
+accepted bitstream identified in [the checkout guide](../CURRENT_CHECKOUT.md);
 the earlier `6c97bcc0a` bitstream does not qualify the resident case.
 
 Prepare its transfer file on the VM:
@@ -193,3 +193,13 @@ a speedup against the Linux scheduler. The earlier bare-metal 11.12 result
 uses a different binary and is contextual, not an identical regression gate.
 The combined version uses a matched indirect call for both rings; its totals
 are not an identical-binary regression comparison with that earlier version.
+
+
+The same shell benchmark and Linux NBF also pass on prefetch RTL `f7eedd955`
+(top `fd5a7872`, static `e_bp_unicore_zynqparrot_prefetch_cfg`). All seven raw
+resident and nonresident samples are identical to the resident-fix results
+above, and ELF integrity, register/syscall checks, exit zero, usable shell,
+and clean poweroff pass. Exact new-image evidence is retained in
+`logs/nonblocking-prefetch-20260908/linux-shell/`; the checkout guide records
+its bitstream identity. This regression does not qualify the separate Linux
+request benchmark's unresolved second resident launch.

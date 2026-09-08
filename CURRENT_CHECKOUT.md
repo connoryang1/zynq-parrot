@@ -1,32 +1,26 @@
-This file identifies the current BlackParrot context-switch sources, routed candidate, and historical FPGA/Linux baseline. It records reproducible checks, remaining qualification work, and where to recover older experiments without treating them as current guidance.
+This file identifies the accepted BlackParrot context-switch and prefetch sources and their verified FPGA image. It records reproducible checks, remaining production limits, and historical artifact identities.
 
 # Supported checkout
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
-Both forks integrate on `master`; develop on dedicated branches. The verified
-cleanup and Linux resident acceptance are integrated into both masters.
+Both forks integrate on `master`; develop on dedicated branches. The accepted
+RTL is `f7eedd955`, routed from top `fd5a7872` with static
+`e_bp_unicore_zynqparrot_prefetch_cfg`. Its exact image passes six bare-metal
+gates and shell-launched Linux resident/nonresident switching, register and
+syscall checks, process exit, a subsequent shell command, and clean poweroff.
 
-The historical resident baseline gitlink selects RTL `808ba6ced`. Its hardware content is unchanged
-from `aad56bd92`, originally pinned by top-level `873deeb7`; the cleanup removes
-stale debug comments and updates documentation. This endpoint adds first-seed resident CSR initialization
-(`83fc32d29`) and correct register-bank ownership through instruction refill and
-replay (`aad56bd92`) to `6c97bcc0a`.
-
-**Historical FPGA/Linux resident acceptance is at `aad56bd92`.** On September 8 the exact
-routed resident-fix image passed a shell-launched 0↔1 and 0↔2 benchmark,
-including target-context syscalls, private/restored register checks, process
-exit, a subsequent shell command, and clean poweroff. That baseline gitlink adds
-only comments/documentation to that hardware. Exact artifact identities and
-the earlier `6c97bcc0a` baseline are recorded below.
+This adds nonfaulting prefetch hints and independent L2-bank responses to the
+previously accepted resident initialization and refill/replay ownership fixes.
+The current image and historical resident baseline are identified below.
 
 ## Scope and readiness
 
 The maintained configuration is PYNQ-Z2 with two resident register banks and
-four logical integer contexts sharing one pipeline. Historical accepted FPGA evidence
+four logical integer contexts sharing one pipeline. Accepted FPGA evidence
 covers nonresident translated U-mode 0→2→0 handoff, a target-context syscall,
 logical identity, register restoration, and Linux shutdown. A separately
-transferred shell executable also passed on `6c97bcc0a`. The resident-fix image adds
-verified resident 0↔1 initialization, repeated handoffs/reseeding, and syscalls;
+transferred shell executable also passed on `6c97bcc0a`. The current image
+retains verified resident 0↔1 initialization, repeated handoffs/reseeding, and syscalls;
 see the
 [Linux guide](linux-tests/README.md) for that evidence and its one-run-per-boot
 restriction.
@@ -51,9 +45,9 @@ and [research direction](PAPER_DIRECTION.md). Application experiments belong on
 experiment branches; SQLite remains at
 `archive/sqlite-progress-screen-20260907`.
 
-## Prefetch development checkpoint
+## Accepted prefetch implementation
 
-`feat/nonblocking-prefetch` adds nonfaulting L2 hints with two UCE request slots
+The implementation adds nonfaulting L2 hints with two UCE request slots
 and an equal-capacity two-bank L2 (top `fd5a7872`, RTL `f7eedd955`). The response
 controller permits a ready bank to reply past a pending hint while preserving
 ordinary order. The full simulator passes hint correctness, resident switching,
@@ -63,7 +57,7 @@ schedule. Median resident time is 3867 cycles versus 5079 for its matched
 control in three controlled simulator samples; see
 [the experiment](PAPER_DIRECTION.md#removing-the-l2-response-bottleneck).
 
-This checkpoint has passed routed fit; complete FPGA/Linux qualification is pending.
+This checkpoint has passed routed fit and the selected FPGA/Linux gates.
 PYNQ-Z2 job `20260908T221834Z-4425a9d3` was canceled after Vivado exposed an
 undriven implicit bank-select net caused by declaration order. A declaration
 move passed targeted old/fixed Vivado synthesis and the clean simulator gates.
@@ -91,9 +85,24 @@ smoke run that passed.
 
 **Board qualification:** all six bare-metal gates pass: resident smoke, hints,
 U-mode Sv39 hints, the matched worker benchmark, computed targets, and
-translated nonresident data handoff. Linux shell qualification is PENDING;
-master integration awaits that result. The historical resident acceptance
-below does not substitute for running the new image.
+translated nonresident data handoff. Three measured board samples give median
+2398 resident-prefetch cycles versus 3164 matched-control cycles (24.2% fewer).
+This is a 64-load bare-metal workload; the Linux request-pool comparison is
+still unqualified.
+
+The unchanged Linux shell NBF and benchmark ELF identified below also pass on
+this exact prefetch image. Guest ELF SHA, both resident/nonresident correctness
+markers, `BENCH_EXIT=0`, `uname -m=riscv64`, clean `CORE[0] PASS` poweroff, and
+runner exit zero are retained in `logs/nonblocking-prefetch-20260908/linux-shell/`.
+The seven 256-switch samples match the previous image exactly: resident
+`1311 1307 1307 1307 1307 1307 1307`, nonresident
+`2857 2853 2853 2853 2853 2853 2853`. Median spacing remains 5.10546875 and
+11.14453125 cycles/switch. The guest is powered off; the new overlay remains loaded.
+
+The unfinished Linux request benchmark remains at commit `a6b2349d` on
+`feat/nonblocking-prefetch`, excluded from this integration because its second
+resident launch still hangs. The shell regression does not qualify that
+application's argument-reseeding lifecycle.
 Reproduce the new gates using [the testing guide](testing/README.md#full-simulator-and-waveform-evidence).
 
 ## Verification
@@ -153,6 +162,9 @@ Earlier history-split verification is retained in the dated artifact directories
 and Git history, rather than repeated here as current suite counts.
 
 ## FPGA acceptance identities
+
+Current prefetch identities and acceptance are recorded above. The following
+records preserve the earlier images and their original measurement scope.
 
 The historical accepted resident RTL also passes the September 8 software load-ahead
 correctness test and four-schedule microbenchmark on FPGA. Their clean traced

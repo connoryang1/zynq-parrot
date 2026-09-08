@@ -64,8 +64,9 @@ another bank. Ordinary responses retain their global order, and each reply
 stays locked through its final accepted beat.
 
 Nonresident replacement still drains outstanding memory activity before
-installing state. The new implementation is under simulation and routed FPGA
-qualification; deployed-image identities remain in the checkout guide. See
+installing state. The implementation passes traced simulation, routed FPGA
+fit, six bare-metal FPGA gates, and the Linux shell switch regression; exact
+identities and remaining production limits are in the checkout guide. See
 [the measured controls and limits](PAPER_DIRECTION.md).
 
 ## Validation and measurement

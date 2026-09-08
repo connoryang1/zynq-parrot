@@ -304,3 +304,37 @@ the first route was canceled after implicit undriven nets were detected. An
 isolated old/fixed synthesis comparison reproduces and eliminates those warnings,
 and the corrected clean simulator benchmark and smoke retain identical totals.
 This is a declaration-order correction, with no protocol logic change.
+
+
+### Physical FPGA qualification
+
+The exact `fd5a7872` / `f7eedd955` endpoint passes routed PYNQ-Z2 fit and six
+bare-metal correctness gates. It uses 51,334 LUTs (96.49%) and 81 BRAM tiles,
+with WNS +2.905 ns, TNS 0, WHS +0.020 ns, and THS 0. This leaves 1,866 LUTs
+for expansion; the cache remains 4 KiB in total.
+
+The matching board benchmark measures 64 useful loads per sample:
+
+| Schedule | Cycles, three measured samples | Median |
+| --- | --- | --- |
+| Resident no-prefetch handoff control | 3164, 3541, 3161 | 3164 |
+| Single-context batch2 with `prefetch.r` | 2688, 2688, 2757 | 2688 |
+| Resident `prefetch.r` / yield / load | 2398, 2495, 2388 | 2398 |
+
+Resident prefetch uses 24.2% fewer cycles than its matched control in this run.
+Its median is also 10.8% below batch2 for this particular schedule and sample
+size; that does not establish superiority over batching in general. The runner
+replays its transcript, so the six displayed rows represent three samples,
+not six. The board ELF uses FPGA startup code and differs from the simulator
+ELF; comparisons above stay within each platform. Source, binary, and log
+checks are in `logs/nonblocking-prefetch-20260908/board-prefetch/benchmark-summary.json`.
+
+The physical board establishes correctness and cycle measurements. The final
+simulator trace separately establishes overlapping cold-data transactions;
+there is no physical AXI waveform capture in this result. The unchanged Linux
+shell resident/nonresident benchmark also passes on the new image, with the
+same 5.10546875 / 11.14453125 median cycles per switch and clean process exit,
+usable shell, and poweroff. These checks do not qualify the Linux request-pool
+benchmark: its second resident launch remains unresolved on the feature branch.
+The next application gate is that lifecycle fix, followed by the pinned
+OS-thread baseline, matched two-worker candidate, and batch-ten reference.
