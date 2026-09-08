@@ -1,6 +1,7 @@
-This directory builds a Linux-resident proof of BlackParrot's user
-context-switch interface.  Its acceptance image runs a tiny static program as
-PID 1 so the result is independent of BusyBox startup and filesystem tools.
+This directory builds Linux demonstrations of BlackParrot's user context-switch
+interface and independent-request benchmark comparisons. The context-switch
+acceptance image runs a tiny static program as PID 1 so the result is independent
+of BusyBox startup and filesystem tools.
 
 # Linux Context-Switch Smoke Test
 
@@ -203,3 +204,181 @@ and clean poweroff pass. Exact new-image evidence is retained in
 `logs/nonblocking-prefetch-20260908/linux-shell/`; the checkout guide records
 its bitstream identity. This regression does not qualify the separate Linux
 request benchmark's unresolved second resident launch.
+
+## Independent random-request comparisons
+
+`request_benchmark.c` implements the baseline and batching comparisons from the
+[`context-switches` proposal](https://github.com/connoryang1/context-switches):
+
+- `linux-threads-demand`: `n` persistent POSIX threads pinned to one Linux CPU.
+  Each worker consumes one random data load per request, with no prefetch and
+  no voluntary yield between requests. Linux schedules the workers normally.
+- `batched-prefetch-load`: one thread issues `n` prefetches, one for each
+  worker's current request, then consumes those `n` loads. This is the batching
+  reference; batching independent requests in an application may be impractical.
+
+On BlackParrot, `--hardware --workers 2` additionally enables two matched modes
+on the accepted two-resident/four-logical configuration:
+
+- `resident-prefetch-yield-load`: each hardware context computes its own request
+  address, issues `prefetch.r`, yields to its peer, then consumes its load when resumed.
+- `resident-demand-handoff`: the same address/yield/load sequence, without the
+  hint. This measures the handoff schedule's cost without prefetching.
+
+The hardware source and peer are leaf assembly with no padding computation.
+Both resident modes time the final drain handoff, so the last response from each context
+has completed before timing ends. Peer count, context identity, and both
+checksums must pass. Register seeding is untimed; the final NPC seed is inside
+the wall-clock interval and before the physical-cycle interval. These modes are cooperative
+contexts inside one Linux thread, not two independently scheduled Linux tasks;
+the pthread mode remains the actual Linux scheduler baseline.
+
+All enabled modes execute identical per-worker request streams and demand-load counts.
+Every response contributes to a per-worker checksum verified against the
+address-derived expected value after every run, including warm-up. Each next
+request's index depends on its worker's previous response through a runtime-zero
+mask; this prevents speculative overlap of later requests within a baseline
+worker. Data values occupy the first eight bytes of separate 64-byte lines.
+Xorshift32 generates precomputed indices using worker seed
+`0x9e3779b9 ^ (worker + 1)`; generation and data initialization are untimed.
+
+Create and validate a host executable:
+
+```sh
+make -C linux-tests request-benchmark-host check-request-benchmark
+linux-tests/out/request_benchmark_host --workers 2 --requests 4096 --samples 5
+linux-tests/out/request_benchmark_host --workers 10 --requests 4096 --samples 5
+```
+
+Two workers match the accepted hardware's resident capacity; ten workers match
+the original proposal. Compare modes within the same invocation and report
+their worker count. The host executable uses an explicit x86 `prefetcht0`
+instruction. Its timings describe that host and are not BlackParrot results.
+Unsupported architectures fail at compilation instead of silently omitting
+prefetches.
+
+Build the static BlackParrot Linux executable with the matching SDK:
+
+```sh
+make -C linux-tests request-benchmark \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc
+make -s -C linux-tests emit-request-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/request_benchmark.transfer
+sha256sum linux-tests/out/request_benchmark
+```
+
+The default BlackParrot backend is `blackparrot-zicbop-prefetch-r-l2`.
+Both C batching and resident assembly use [`bp_prefetch.h`](../software/include/bp_prefetch.h),
+which emits the standard Zicbop read hint (`ori zero, base, 1`). On the implemented
+noncoherent writeback path, a permitted cacheable DRAM address with a usable
+DTLB hit can issue a best-effort L2-warming request. Missing translations are
+dropped without page walks or architectural faults. L1 hits and unavailable
+request capacity can also drop hints. Two UCE slots track accepted hints;
+two separate L2 banks can overlap misses, while a single bank still serializes
+them. A batching width of ten does not create ten hardware slots. The compiler
+memory barrier is not a hardware fence or an issuance guarantee.
+
+This executable uses libc and pthreads, so it is much larger than the existing
+no-libc shell demos. The transfer file is optional and follows the same
+short-command shell transfer and checksum-validation procedure above; transferring
+it over the guest console can be slow. For the accepted shell image, use the
+compact dynamically linked variant instead:
+
+```sh
+make -s -C linux-tests emit-request-dynamic-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/request_benchmark_dynamic.transfer
+sha256sum linux-tests/out/request_benchmark_dynamic
+```
+
+`request-benchmark-dynamic` builds the same source with the same optimization,
+ISA, ABI, topology, and pthread flags, removing `-static` and adding `-no-pie`.
+The static `request-benchmark` target remains available. The dynamic executable
+requires `/lib/ld-linux-riscv64-lp64d.so.1` plus `libc.so.6`. Check the exact ELF's
+loader and symbol-version requirements with the matching SDK `readelf -l` and
+`readelf --version-info` before transfer. The earlier discarded-load executable's
+33 versioned imports were checked against libraries extracted from
+`riscv/linux/linux-6.6-jhumphri-20250125.nbf`; its compatibility evidence is in
+`logs/independent-requests-20260908/linux-dynamic-build/`. That historical check
+does not identify a newly built ELF or substitute for its guest execution.
+
+The ordinary discarded-load control remains available under separate names:
+
+```sh
+make -C linux-tests request-benchmark-load-ahead request-benchmark-load-ahead-dynamic \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc
+make -s -C linux-tests emit-request-load-ahead-dynamic-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/request_benchmark_load_ahead_dynamic.transfer
+sha256sum linux-tests/out/request_benchmark_load_ahead_dynamic
+```
+
+These variants print backend `blackparrot-faulting-lbu-x0`, with
+`batched-load-ahead-load` and `resident-load-ahead-yield-load` mode names.
+Their `lbu x0` operations are ordinary faulting loads and retain the historical
+single-demand-miss behavior. They use the same request streams, control modes,
+context protocol, and timing as the hint variants. The static transfer target
+is `emit-request-load-ahead-transfer`. Keep their ELF and result identities
+separate from actual prefetch hints; the host build rejects this RV64 control
+instead of silently substituting x86 prefetches.
+
+Use the transferred executable's own name in the guest commands below:
+`/tmp/request_benchmark_dynamic` for the dynamic variant or
+`/tmp/request_benchmark` for the static variant. Once transferred and its hash checked,
+run `/tmp/request_benchmark --workers 2 --hardware`, followed immediately by
+`echo REQUEST_EXIT=$?`; require `[REQUEST-BENCH] PASS` and exit zero. Repeat with
+`--workers 10` without `--hardware` for the original baseline and batching width.
+The prefetch experiment requires an overlay containing the implemented hint
+path and its L2-controller changes; the earlier resident-fix overlay alone does
+not implement hints. The hardware option requires
+**one hardware-enabled invocation per fresh overlay/Linux boot**. Linux does
+not reclaim the extra context when the process exits. Do not run another
+context-switch demo in the same boot. Without the option, the program allocates
+only ordinary Linux threads and can be repeated normally. Host hardware mode
+and hardware runs with a worker count other than two fail instead of being
+silently skipped.
+
+The earlier discarded-load candidate completed its first resident mode but
+hung on its second resident mode. Changing the helper preserves the resident
+seeding and handoff protocol; it does not resolve or diagnose that failure.
+The retained `WARMUP_BEGIN` and `WARMUP_PASS` markers localize untimed failures.
+The hint executable is a candidate for a fresh Linux acceptance run on the new
+overlay. Cross compilation, host checks, and bare-metal prefetch tests do not
+establish that this complete Linux comparison passes or improves performance.
+
+The defaults are two workers, 4,096 requests per worker, a 2 MiB data working
+set, and five measured samples. Use `--help` for validated bounds and an explicit
+`--cpu` selection; the default is the first CPU allowed by the process affinity
+mask. The program fails if it cannot verify singleton CPU affinity. Choose a
+working set larger than the cache under study. Before each mode it scans a
+separate buffer twice the data size to displace cached lines; this is not a
+cache flush, and random requests can revisit lines. Do not infer a miss rate
+without cache or trace measurements. The first trial warms and checks all
+enabled modes without printing timing rows; subsequent trials rotate their execution order.
+The displacement scan can also evict data translations. Random hints can
+therefore drop on DTLB misses even when the corresponding demand later succeeds.
+Do not add translation-priming loads to only one mode or infer accepted hint
+counts from the number of executed hint instructions.
+
+Output retains each sample's raw `CLOCK_MONOTONIC` nanoseconds, request count,
+checksum, backend, and configuration. BlackParrot also reports core-wide
+physical-cycle CSR `0xCC0` for every mode, including the Linux threads. The
+cycle interval nests inside the wall-clock interval and excludes the
+`clock_gettime` calls; both intervals include the complete request operation.
+For resident modes the wall-clock interval additionally includes the final
+NPC seed, keeping deliberate syscalls outside the seed-to-handoff sequence.
+Linux interrupts and scheduling remain enabled. The program does not use
+virtualized `rdcycle` for these measurements. Allocation, page initialization, index
+generation, thread creation/join, cache displacement, checksum checks, and
+printing are outside timing. The threaded interval includes releasing the
+worker pool, normal Linux scheduling, and recording completion by the last
+worker; it does not force a kernel switch per request. These fixed costs can
+dominate tiny runs, so increase request count when evaluating throughput. The
+batched interval covers the single-thread request loop. Hardware intervals
+include the source loop and final peer completion handoff. These intervals are not
+isolated context-switch latency measurements. The batched loop is compiler-generated
+C while hardware loops are leaf assembly, so their bookkeeping costs differ;
+compare complete implementations rather than attributing the entire difference
+to switching or cache behavior. Bare-metal results from a
+different request stream or cache state are not a matched speedup comparison.

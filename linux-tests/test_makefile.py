@@ -17,7 +17,11 @@ import unittest
 
 HERE = Path(__file__).resolve().parent
 APPS = {"app": "ctxtsw_user_smoke", "tiny": "ctxtsw_user_tiny",
-        "shell-app": "ctxtsw_user_shell", "benchmark": "ctxtsw_user_benchmark"}
+        "shell-app": "ctxtsw_user_shell", "benchmark": "ctxtsw_user_benchmark",
+        "request-benchmark": "request_benchmark",
+        "request-benchmark-dynamic": "request_benchmark_dynamic",
+        "request-benchmark-load-ahead": "request_benchmark_load_ahead",
+        "request-benchmark-load-ahead-dynamic": "request_benchmark_load_ahead_dynamic"}
 FAKE_COMPILER = """#!/usr/bin/env python3
 import json, os, pathlib, sys
 args = sys.argv[1:]
@@ -85,10 +89,29 @@ class LinuxHarnessTests(unittest.TestCase):
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(self.read_app(target)["compiler"], compiler)
 
+    def test_dynamic_request_preserves_flags_except_static(self):
+        flags = "-O2 -static -Wall -Wextra -Werror -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany"
+        for target in (name for name in APPS if name.startswith("request-benchmark")):
+            result = self.make(target, "CFLAGS=" + flags)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            args = self.read_app(target)["args"]
+            self.assertEqual("-static" in args, not target.endswith("-dynamic"))
+            self.assertEqual("-no-pie" in args, target.endswith("-dynamic"))
+            self.assertIn("-DBP_REQUEST_LOAD_AHEAD=" + str(int("load-ahead" in target)), args)
+            for flag in flags.split():
+                if flag != "-static":
+                    self.assertIn(flag, args)
+            for flag in ("-pthread", "-DBP_NUM_THREADS=2", "-DBP_NUM_CONTEXTS=4"):
+                self.assertIn(flag, args)
+
     def test_transfer_is_only_shell_commands_and_current_base64(self):
         for target, app in (("emit-shell-transfer", "ctxtsw_user_shell"),
                             ("emit-tiny-transfer", "ctxtsw_user_shell"),
-                            ("emit-benchmark-transfer", "ctxtsw_user_benchmark")):
+                            ("emit-benchmark-transfer", "ctxtsw_user_benchmark"),
+                            ("emit-request-transfer", "request_benchmark"),
+                            ("emit-request-dynamic-transfer", "request_benchmark_dynamic"),
+                            ("emit-request-load-ahead-transfer", "request_benchmark_load_ahead"),
+                            ("emit-request-load-ahead-dynamic-transfer", "request_benchmark_load_ahead_dynamic")):
             for flag in (1, 0, 1):
                 with self.subTest(target=target, flag=flag):
                     result = self.make(target, "TINY_TARGET_SYSCALL=" + str(flag))
@@ -111,7 +134,11 @@ class LinuxHarnessTests(unittest.TestCase):
 
     def test_failed_rebuild_never_emits_stale_transfer(self):
         for target, app in (("emit-shell-transfer", "ctxtsw_user_shell"),
-                            ("emit-benchmark-transfer", "ctxtsw_user_benchmark")):
+                            ("emit-benchmark-transfer", "ctxtsw_user_benchmark"),
+                            ("emit-request-transfer", "request_benchmark"),
+                            ("emit-request-dynamic-transfer", "request_benchmark_dynamic"),
+                            ("emit-request-load-ahead-transfer", "request_benchmark_load_ahead"),
+                            ("emit-request-load-ahead-dynamic-transfer", "request_benchmark_load_ahead_dynamic")):
             with self.subTest(target=target):
                 good = self.make(target)
                 self.assertEqual(good.returncode, 0, good.stderr)

@@ -20,6 +20,12 @@ APP := $(OUT)/ctxtsw_user_smoke
 TINY_APP := $(OUT)/ctxtsw_user_tiny
 SHELL_APP := $(OUT)/ctxtsw_user_shell
 BENCH_APP := $(OUT)/ctxtsw_user_benchmark
+REQUEST_APP := $(OUT)/request_benchmark
+REQUEST_DYNAMIC_APP := $(OUT)/request_benchmark_dynamic
+REQUEST_LOAD_AHEAD_APP := $(OUT)/request_benchmark_load_ahead
+REQUEST_LOAD_AHEAD_DYNAMIC_APP := $(OUT)/request_benchmark_load_ahead_dynamic
+REQUEST_HOST_APP := $(OUT)/request_benchmark_host
+BP_HOST_CC ?= cc
 APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
 TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
 DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
@@ -82,6 +88,56 @@ emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' ': > /tmp/ctxtsw_user_benchmark.b64'
 	@base64 -w 76 $(BENCH_APP) | sed "s|.*|echo '&' >> /tmp/ctxtsw_user_benchmark.b64|"
 	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
+
+# These pthread comparisons are independent of the custom-CSR shell demo.
+.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer
+request-benchmark: $(REQUEST_APP)
+request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
+request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
+request-benchmark-load-ahead-dynamic: $(REQUEST_LOAD_AHEAD_DYNAMIC_APP)
+request-benchmark-host: $(REQUEST_HOST_APP)
+
+# Separate output names retain the historical faulting-load control. The default
+# emits the implemented Zicbop hint in both C batching and resident assembly.
+$(REQUEST_APP) $(REQUEST_LOAD_AHEAD_APP): request_benchmark.c ../software/include/bp_prefetch.h ../software/include/bp_load_ahead.h ../testing/mt_seed.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=4 \
+	  -DBP_REQUEST_LOAD_AHEAD=$(if $(filter $(REQUEST_LOAD_AHEAD_APP),$@),1,0) -o $@ $< >&2
+
+# Optional compact shell-transfer ELF. The guest must provide the matching
+# RV64 lp64d dynamic loader and all required GLIBC symbol versions.
+$(REQUEST_DYNAMIC_APP) $(REQUEST_LOAD_AHEAD_DYNAMIC_APP): request_benchmark.c ../software/include/bp_prefetch.h ../software/include/bp_load_ahead.h ../testing/mt_seed.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread \
+	  -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=4 \
+	  -DBP_REQUEST_LOAD_AHEAD=$(if $(filter $(REQUEST_LOAD_AHEAD_DYNAMIC_APP),$@),1,0) -o $@ $< >&2
+
+$(REQUEST_HOST_APP): request_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_HOST_CC) -std=c11 -O2 -Wall -Wextra -Werror -pthread -o $@ $< >&2
+
+emit-request-transfer: check-linux-cc request-benchmark
+	@printf '%s\n' ': > /tmp/request_benchmark.b64'
+	@base64 -w 76 $(REQUEST_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark.b64 > /tmp/request_benchmark' 'chmod +x /tmp/request_benchmark'
+
+emit-request-dynamic-transfer: check-linux-cc request-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/request_benchmark_dynamic.b64'
+	@base64 -w 76 $(REQUEST_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark_dynamic.b64 > /tmp/request_benchmark_dynamic' 'chmod +x /tmp/request_benchmark_dynamic'
+
+emit-request-load-ahead-transfer: check-linux-cc request-benchmark-load-ahead
+	@printf '%s\n' ': > /tmp/request_benchmark_load_ahead.b64'
+	@base64 -w 76 $(REQUEST_LOAD_AHEAD_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_load_ahead.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark_load_ahead.b64 > /tmp/request_benchmark_load_ahead' 'chmod +x /tmp/request_benchmark_load_ahead'
+
+emit-request-load-ahead-dynamic-transfer: check-linux-cc request-benchmark-load-ahead-dynamic
+	@printf '%s\n' ': > /tmp/request_benchmark_load_ahead_dynamic.b64'
+	@base64 -w 76 $(REQUEST_LOAD_AHEAD_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_load_ahead_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark_load_ahead_dynamic.b64 > /tmp/request_benchmark_load_ahead_dynamic' 'chmod +x /tmp/request_benchmark_load_ahead_dynamic'
+
+check-request-benchmark:
+	@BP_HOST_CC='$(BP_HOST_CC)' python3 -m unittest discover -s $(CURDIR) -p test_request_benchmark.py
 
 $(SHELL_APP): ctxtsw_user_tiny.c Makefile FORCE
 	@mkdir -p $(OUT)
