@@ -1,11 +1,9 @@
 /*
- * bp_common_test_pkg.sv
+ * bp_common_pkg.sv
  *
- * This package contains extra testing configs which are not intended to be
- *   synthesized or used in production. However, they are useful for testing.
- *   This file can also be used as a template for 3rd parties wishing to
- *   synthesize extra configs without modifying the BP source directly.
- *
+ * This package defines the Zynq-Parrot simulation and FPGA configurations.
+ * Named configurations provide reproducible synthesis endpoints; experimental
+ * configurations still require simulation, routed timing, and board validation.
  */
 
   `include "bp_common_defines.svh"
@@ -37,7 +35,16 @@ package bp_common_pkg;
       ,l2_fill_width: 64
       // Keep the PYNQ-Z2 implementation within the xc7z020 LUT/slice budget.
       ,l2_slices    : 1
+`ifdef BP_ZYNQ_PREFETCH_TWO_BANKS
+      // Experimental downstream capacity: retain 4 KiB total (2 ways, 64 B
+      // lines), with adjacent lines in different banks. Each bank still has
+      // one miss handler; the shared controller must also admit both requests
+      // before this can overlap cold fills. Requires full-top and routed gates.
+      ,l2_banks     : 2
+      ,l2_sets      : bp_default_cfg_p.l2_sets / 2
+`else
       ,l2_banks     : 1
+`endif
 
       ,itlb_els_4k : 16
       ,itlb_els_2m : 1
@@ -101,10 +108,28 @@ package bp_common_pkg;
                         ,bp_default_cfg_p
                         );
 
+  // Explicit synthesis endpoint: no environment-only define is needed to
+  // reproduce the two-bank, same-capacity prefetch experiment on the FPGA.
+  localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch_cfg_override_p =
+    '{l2_banks: 2
+      // Branch metadata includes the resident thread ID. The default has four
+      // slots; this two-slot endpoint needs one fewer bit (50 rather than 51).
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+                                  - $clog2(bp_default_cfg_p.num_threads)
+                                  + $clog2(bp_unicore_zynqparrot_cfg_p.num_threads)
+      ,l2_sets: (bp_unicore_zynqparrot_cfg_p.l2_banks
+                 * bp_unicore_zynqparrot_cfg_p.l2_sets) / 2
+      ,default: "inv"
+      };
+  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch_cfg_p
+                        ,bp_unicore_zynqparrot_prefetch_cfg_override_p
+                        ,bp_unicore_zynqparrot_cfg_p
+                        );
 
   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =
   {
-    bp_multicore_zynqparrot_cfg_p
+    bp_unicore_zynqparrot_prefetch_cfg_p
+    ,bp_multicore_zynqparrot_cfg_p
     ,bp_unicore_zynqparrot_cfg_p
 
     // A custom BP configuration generated from Makefile
@@ -116,7 +141,8 @@ package bp_common_pkg;
   // This enum MUST be kept up to date with the parameter array above
   typedef enum bit [lg_max_cfgs-1:0]
   {
-    e_bp_multicore_zynqparrot_cfg                   = 3
+    e_bp_unicore_zynqparrot_prefetch_cfg            = 4
+    ,e_bp_multicore_zynqparrot_cfg                  = 3
     ,e_bp_unicore_zynqparrot_cfg                    = 2
 
     // A custom BP configuration generated from `defines

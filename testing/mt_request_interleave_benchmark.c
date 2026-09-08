@@ -6,7 +6,17 @@
 #include <stdint.h>
 #include "bp_utils.h"
 #include "mt_seed.h"
+#ifdef BP_REQUEST_PREFETCH_R
+#include "bp_prefetch.h"
+#define REQUEST_HINT_ASM(base) BP_PREFETCH_R_ASM(base)
+#define REQUEST_BACKEND "nonfaulting prefetch.r to L2"
+#define REQUEST_PASS "[BSG-PASS] independent prefetch requests\n"
+#else
 #include "bp_load_ahead.h"
+#define REQUEST_HINT_ASM(base) BP_LOAD_AHEAD_ASM(base)
+#define REQUEST_BACKEND "faulting lbu x0"
+#define REQUEST_PASS "[BSG-PASS] independent requests\n"
+#endif
 
 #if BP_NUM_THREADS != 2 || BP_NUM_CONTEXTS != 4
 #error "Independent-request test requires two resident banks/four logical contexts"
@@ -78,7 +88,7 @@ void resident_ahead(const volatile struct cache_line *data,
 {
   __asm__ volatile(SOURCE_BEGIN PREPARE
     ".global request_source_prefetch\nrequest_source_prefetch:\n"
-    BP_LOAD_AHEAD_ASM("t2") "csrwi 0x800, 1\n" CONSUME SOURCE_END);
+    REQUEST_HINT_ASM("t2") "csrwi 0x800, 1\n" CONSUME SOURCE_END);
 }
 
 #define PEER_BEGIN \
@@ -100,12 +110,13 @@ void ahead_peer(void)
 {
   __asm__ volatile(PEER_BEGIN PREPARE
     ".global request_peer_prefetch\nrequest_peer_prefetch:\n"
-    BP_LOAD_AHEAD_ASM("t2") PEER_END);
+    REQUEST_HINT_ASM("t2") PEER_END);
 }
 
 /* The batched schedule alone may see both request streams. Prepare the two
  * addresses, issue both load-ahead operations, then consume both useful loads.
- * lbu x0 is a faulting ordinary load in every ahead mode, not an ISA hint.
+ * The selected backend is the only difference between the faulting-load and
+ * nonfaulting-prefetch variants; neither variant assumes actual overlap.
  */
 static __attribute__((naked, noinline, aligned(64)))
 void batch_two(const volatile struct cache_line *data,
@@ -116,7 +127,7 @@ void batch_two(const volatile struct cache_line *data,
     ".option push\n.option norvc\nli t0, 0\nli t6, 0\n"
     "li a4, 0\nfence rw, rw\ncsrr t3, 0xcc0\n1:\n"
     PREPARE "lhu t4, 2(a1)\nslli t4, t4, 6\nadd t5, a0, t4\n"
-    BP_LOAD_AHEAD_ASM("t2") BP_LOAD_AHEAD_ASM("t5")
+    REQUEST_HINT_ASM("t2") REQUEST_HINT_ASM("t5")
     "ld t4, 0(t2)\nadd t0, t0, t4\nld t4, 0(t5)\nadd t6, t6, t4\n"
     "addi a4, a4, 1\n" ADVANCE
     "csrr t5, 0xcc0\nsub t5, t5, t3\nfence rw, rw\n"
@@ -175,7 +186,7 @@ int main(void)
     }
   }
   bp_print_string("Benchmark: two independent resident request streams\n");
-  bp_print_string("64 loads/sample; cold shuffled lines; faulting lbu x0\n");
+  bp_print_string("64 loads/sample; cold shuffled lines; " REQUEST_BACKEND "\n");
   bp_print_string("Hex cycles: resident control / batch2 / resident ahead\n");
   for (unsigned sample = 0; sample < SAMPLES; ++sample) {
     for (unsigned mode = 0; mode < MODES; ++mode) {
@@ -183,7 +194,7 @@ int main(void)
       bp_print_string(mode == MODES - 1 ? "\n" : " / ");
     }
   }
-  bp_print_string("[BSG-PASS] independent requests\n");
+  bp_print_string(REQUEST_PASS);
   bp_finish(0);
   return 0;
 }
