@@ -4,10 +4,13 @@ This directory contains the active bare-metal tests for resident and SRAM-backed
 
 Bare `make -C testing` shows help; cleanup must be requested explicitly.
 The harness defaults to the accepted two-resident/four-logical topology.
-`make -C testing check-harness` checks the fail-closed simulator verdict logic.
+`make -C testing check-harness` checks the simulator verdict logic and stale-artifact
+guards. `python3 -B tools/test_ctxtsw_vcd_stream_events.py` checks that waveform
+reports distinguish logical contexts from physical register banks.
 Each selected test ELF is rebuilt to match the requested topology/compiler flags.
 The runner clears old transcripts before building and requires fresh guest and
-host PASS markers, rejecting timeouts and unrelated assertions even after PASS.
+host PASS markers and the selected program's completion marker before CORE PASS,
+rejecting timeouts and unrelated assertions even after PASS.
 
 Run from the repository root. First preserve any logs and waveforms you need;
 then finish each cleanup command before launching the consuming build.
@@ -36,17 +39,19 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
 | `mt_ctxtsw_register_target_test` | Fresh computed targets and returns after ALU/load/multiply/divide/CSR producers, including same-context writes and SRAM restores |
 | `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
-| `mt_ctxtsw_gpr_ring_stress` | Live integer-register sentinels survive a ring through all four logical IDs |
-| `mt_ctxtsw_pure_ring_stress_test` | Progress through dense consecutive switches across all four logical IDs |
+| `mt_ctxtsw_gpr_ring_stress` | Six live GPR sentinels survive peer overwrites; all three peers record their logical IDs |
+| `mt_ctxtsw_pure_ring_stress_test` | Eight consecutive switches per context, followed by a lap verifying every peer completed |
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
-| `mt_ctxtsw_nonresident_overhead_benchmark` | Matched resident/nonresident ring spacing using global cycles |
+| `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
 
 These 15 programs retain distinct state, hazard, and redirect regressions.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
+Each variant emits its own completion marker, and unexpected traps invalidate
+the result even if the round-trip checks had already completed.
 `make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set;
 compilation alone is not a runtime pass. Use that topology for the handoff tests
 and benchmark: the benchmark specifically compares resident context 1 with
@@ -78,6 +83,12 @@ topologies do not test SRAM eviction. Maintained nonresident gates enforce the
 accepted `NUM_THREADS=2 NUM_CONTEXTS=4` configuration. The benchmark reports amortized
 cycles/switch, not an isolated redirect latency. Use `0xCC0` across contexts;
 context-restored `mcycle` is not a physical elapsed-time counter.
+The benchmark's warm/cold labels refer to resident/nonresident register state;
+both rings have untimed warm-ups. They do not measure cold instruction/data
+caches. The reported nonresident-minus-resident increment may be negative. Peer
+completion checks happen after the stop counters. Although the timed loop
+instructions are unchanged, the hardened benchmark is a new ELF; retain its
+identity rather than calling it an identical-binary comparison with older runs.
 
 Removed scale, gap/unroll, synthetic-worker, predictor, and alternate timing
 experiments remain recoverable at Git checkpoint `f028d66a`. The global-cycle

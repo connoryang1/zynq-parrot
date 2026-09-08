@@ -2,8 +2,8 @@
  * Minimal user-mode Linux smoke test for the BlackParrot context-switch CSRs.
  *
  * The primary Linux context (0) seeds context 2 with a naked trampoline and
- * switches to it.  The trampoline immediately switches back to context 0.
- * It deliberately uses no stack, globals, libc, or ABI state in context 2:
+ * switches to it. The trampoline records a marker and logical ID in shared
+ * memory, then switches back to context 0. It uses no stack or libc in context 2:
  * this is a handoff demonstration, not an attempt to make context 2 a Linux
  * task.  On return, the original C function proves that its saved context was
  * restored correctly.

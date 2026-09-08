@@ -21,8 +21,8 @@ See [The ZynqParrot Co-simulation Development Flow](https://docs.google.com/docu
 
 ## Current Context-Switch Work
 
-This checkout contains the validated SRAM-backed resident/nonresident context-switch
-implementation. See [CURRENT_CHECKOUT.md](CURRENT_CHECKOUT.md) for the supported
+This checkout contains SRAM-backed resident/nonresident context switching and
+newer resident-context fixes awaiting FPGA/Linux acceptance. See [CURRENT_CHECKOUT.md](CURRENT_CHECKOUT.md) for the supported
 source, exact revisions, and verification commands. Start with:
 
 - [Architecture](CONTEXT_SWITCH_ARCHITECTURE.md): state storage, source map, and limitations.

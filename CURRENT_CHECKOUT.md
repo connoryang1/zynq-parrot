@@ -1,58 +1,53 @@
-This file is the entry point for the supported BlackParrot FPGA checkout. It records what has been validated, where to run tests, and how to recover the older experiments without confusing them with the current implementation.
+This file identifies the current BlackParrot context-switch sources and the separately validated FPGA baseline. It records reproducible checks, remaining qualification work, and where to recover older experiments without treating them as current guidance.
 
 # Supported checkout
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
-Both fork repositories integrate on `master`; start new work on dedicated branches.
-The top-level gitlink selects RTL `6c97bcc0a`. It adds a narrowly
-scoped source-register writeback wait to parent `1b9e611d4`, whose hardware and
-dependency content is identical to FPGA-accepted
-`25089713baa090aba719ec0f18f82ff9214d5f0d`. The new fix passes the identical local
-regression ELF that fails on its parent. On the FPGA, the same regression NBF
-fails on the old accepted bitstream and passes on the new one; Linux and the
-physical performance gates also pass. The identities below select the new fix.
+Both forks integrate on `master`; develop on dedicated branches. The cleanup
+branch is `cleanup/context-switch-readiness-20260908` in both repositories.
 
-The initial reviewable history has twelve top-level commits separating integration,
-correctness tests, translated handoffs, benchmarks, waveform tools, Vivado builds,
-board operation, the Linux demo, image diagnostics, synthesis-farm orchestration,
-workflow guidance, and project documentation. Seven RTL commits separate
-dependencies/loading, streamed-write credit accounting, MPRV data privilege,
-storage primitives, coupled pipeline integration, the global counter, and docs.
-The pipeline integration remains the largest commit because its FE/BE/CSR
-interfaces must change together; known fixes stay with the features they repair.
-These organize the accepted endpoint, not seven separate FPGA/Linux acceptances.
-Separate upstream changes from the old fork master were not merged into this
-accepted source.
+The current gitlink selects RTL `b0806d223`. Its hardware content is unchanged
+from `aad56bd92`, originally pinned by top-level `873deeb7`; the cleanup removes
+stale debug comments and updates documentation. This endpoint adds first-seed resident CSR initialization
+(`83fc32d29`) and correct register-bank ownership through instruction refill and
+replay (`aad56bd92`) to `6c97bcc0a`.
 
-## Stable-branch policy
+**FPGA/Linux acceptance remains at `6c97bcc0a`.** The newer resident fixes have
+local regression and routed-build evidence, but their Linux resident-switch
+board acceptance is pending. A successful route is not a successful board run.
+The artifact identities below describe the accepted baseline, not every change
+in this working branch.
 
-`master` contains the accepted implementation, focused regressions, and reusable
-operational tools. Exploratory application benchmarks remain on experiment
-branches; SQLite is retained at `archive/sqlite-progress-screen-20260907`, not in
-the maintained suite. Neither cleanup nor a passing smoke test makes this a
-general production threading facility.
+## Scope and readiness
 
-The supported scope is cooperative integer-context execution on the fixed
-PYNQ-Z2 topology below. Production use would additionally need an explicit safe
-ABI/FP policy, isolation and privilege enforcement where contexts are untrusted,
-OS lifecycle/preemption integration, and broader fault/stress qualification.
-Do not infer those guarantees from the Linux demonstration.
+The maintained configuration is PYNQ-Z2 with two resident register banks and
+four logical integer contexts sharing one pipeline. Accepted FPGA evidence
+covers nonresident translated U-mode 0→2→0 handoff, a target-context syscall,
+logical identity, register restoration, and Linux shutdown. A separately
+transferred shell executable also passed on `6c97bcc0a`; see the
+[Linux guide](linux-tests/README.md) for that evidence and its one-run-per-boot
+restriction.
 
-## What works and what is not claimed
+This is a cooperative integer-context prototype. Production readiness still
+requires:
 
-- PYNQ-Z2, static two resident register banks and four logical integer contexts.
-- Private on-chip integer backing memory and translated U-mode 0→2→0 handoff.
-- Linux boots through OpenSBI to a PID-1 C program, performs a target-context
-  syscall, verifies logical ID and independent/restored `s11`, then powers off
-  with `CORE[0] PASS`.
-- Ordinary floating-point execution remains. Complete nonresident FP preservation,
-  independent Linux scheduling of contexts, and untrusted-context isolation are
-  **not** accepted features. The PID-1 test is not an interactive-shell acceptance
-  test.
+- FPGA/Linux acceptance of the current resident initialization and replay fixes.
+- A defined ABI and complete FP-state policy; ordinary FP and resident FP tests
+  do not establish nonresident FP preservation.
+- Context allocation, teardown, and reuse across Linux process exit, traps,
+  timer preemption, and scheduling. Hardware contexts currently are not
+  independently scheduled Linux tasks.
+- Permission enforcement and address-space isolation for untrusted contexts.
+- Broader fault/stress qualification, including NPC reseeding from a context
+  with different privilege/SATP/ASID. Static review found that `bp_be_top.sv`
+  updates target fetch metadata from the caller on reseed while retaining the
+  initialized target CSR image; a differing-environment regression is needed
+  before changing that protocol or claiming it safe.
 
 See [architecture](CONTEXT_SWITCH_ARCHITECTURE.md), [tests](testing/README.md),
-and [Linux demo](linux-tests/README.md). Keep protocol rationale near the RTL and
-use commit messages to explain changes, rather than adding another status diary.
+and [research direction](PAPER_DIRECTION.md). Application experiments belong on
+experiment branches; SQLite remains at
+`archive/sqlite-progress-screen-20260907`.
 
 ## Verification
 
@@ -65,49 +60,50 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 14 tests; its README explains the invariant each covers.
+The maintained suite has 15 programs; its README explains each invariant.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
-substitute a context-restored `mcycle`.
+substitute a context-restored `mcycle`. The runner must see the selected test's
+completion marker before `CORE PASS`, plus host `BSG PASS`. The known post-PASS
+GPIO `fini()` assertion remains a separately checked teardown exception.
 
-Stable integration verification is retained in `logs/stable-master-20260907/`:
-all 14 programs compile for the default 2/4 topology; a clean traced model passes
-the register-target regression, resident smoke, translated nonresident data
-handoff, and the unchanged 5.13/11.13-cycle ring benchmark. Ten isolated harness
-test groups also pass, covering failed builds/stale logs, safe defaults, and
-configuration-stamp transitions. These are new local checks, not a new FPGA run;
-the FPGA identities below still refer to the exact previously accepted RTL.
+Cleanup verification on September 8 is retained in
+`logs/readiness-cleanup-20260908/`: all 15 maintained programs compile and pass
+on one clean traced 2/4 model, and 21 host checks pass (13 bare-metal harness,
+5 Linux build/transfer, 3 waveform-decoding checks). Disabled-switch variants of
+both rings and the benchmark are rejected. An injected late illegal instruction
+reproduces the legacy handoff test's false PASS and is rejected by the fixed
+verdict with `mcause=2`. Logs, closed FSTs, source snapshots, and hashes are
+retained; the known post-PASS GPIO teardown assertion remains.
 
-The register-target fix has a clean traced two-bank/four-context model and seven
-runtime passes: its new 46-case regression, resident smoke, register isolation,
-late writeback, translated nonresident data handoff, logical CSR readback, and
-the overhead benchmark. On the earlier fix branch, all 19 test programs compile; the byte-identical ring
-ELF still reports 5.13/11.13 cycles per resident/nonresident switch. Evidence is
-in `logs/register-target-fix-20260906/`. The routed build of top `8ecb909a` / RTL
-`6c97bcc0a` passes timing and fit. Its FPGA passes the register-target regression,
-translated handoff, Linux PID-1 context-switch demo, unchanged overhead benchmark,
-and the original scan workload without its immediate-target workaround.
-Board evidence is in `logs/register-target-fpga-20260907/board-fixed/`;
-the old-bitstream failure is in the adjacent `board-baseline/` directory.
+The hardened benchmark reports 5.12 resident / 11.32 nonresident cycles per
+switch and a separately truncated nonresident-minus-resident increment of 6.19.
+Its timed loop instructions and counter boundaries are unchanged, but untimed
+completion checks change code placement and counter destination registers.
+These are new-ELF measurements, not evidence of a hardware performance change.
+Rebuilding the original benchmark from `873deeb7` on the same model reproduces
+5.13 / 11.13 cycles per switch, increment 6.00; its separate artifacts are in
+`logs/readiness-cleanup-20260908/benchmark-original/`. No specific cache-related
+cause is established for the new binary's different result.
+All four Linux applications compile; the default tiny, shell, and benchmark
+ELFs are byte-identical across the build-freshness fix. No new FPGA/Linux
+acceptance is claimed by this cleanup.
 
-The prior clean simulator baseline is 5.13 resident and 11.13 nonresident
-cycles/switch, with two matching runs in `logs/docs-integration-20260906/`.
-Final suite/history validation is retained in `logs/reviewable-integration-20260906/`.
-All 13 tests compile; the clean traced handoff and resident smoke pass, and both
-benchmark repeats match the prior 5.13/11.13-cycle result.
-Guest success must precede the known GPIO `fini()` teardown assertion; these are
-not claims of warning-free simulator shutdown.
+Current resident-fix evidence is in `logs/resident-csr-init-20260907/`:
+the translated resident regression fails on the old RTL and passes after both
+fixes; CSR inheritance/reseed, resident smoke, translated nonresident data
+handoff, FP isolation, computed targets, and the ring benchmark pass locally.
+The unchanged simulator benchmark reports 5.13 resident / 11.13 nonresident
+cycles per switch. The September 7 work-log entry records the routed candidate
+`20260907T225642Z-873deeb7`: 47,640 LUTs, 80 BRAM tiles, WNS +1.973 ns and TNS 0;
+board acceptance of this candidate remains pending.
 
-The finer history split is checked in `logs/refined-history-20260906/`: isolated
-storage/CSR/UCE modules and complete cores before pipeline integration and before
-the global counter pass Verilator lint/elaboration. These intermediate checks
-establish elaboration, not runtime correctness or Linux boot acceptance.
-The top-level stages also pass test-source/helper prerequisite checks, shell
-syntax checks, and Python compilation; the harness introduces 9, then 12, then
-13 tests as their sources become available.
-Fresh endpoint evidence is in `logs/commit-split-validation-20260906/`: clean
-model build, all 13 programs compiled, resident smoke and translated data handoff
-passed, and both benchmark repeats still report 5.13/11.13 cycles per switch.
-No new FPGA run is claimed for this history-only rewrite.
+Baseline acceptance evidence remains in
+`logs/register-target-fpga-20260907/board-fixed/`, with its old-bitstream
+regression failure in adjacent `board-baseline/`. The identical computed-target
+regression fails on parent RTL `1b9e611d4` and passes on `6c97bcc0a` in simulation
+and on FPGA. Stable integration checks are in `logs/stable-master-20260907/`.
+Earlier history-split verification is retained in the dated artifact directories
+and Git history, rather than repeated here as current suite counts.
 
 ## FPGA acceptance identities
 
@@ -145,6 +141,16 @@ Parent acceptance evidence remains in
 handoff NBFs are byte-identical to that baseline; the Linux NBF is also unchanged.
 
 ## History and recovery
+
+This cleanup moved 46 retired or superseded `.riscv`/`.mem`/`.nbf` experiment artifacts out of
+`riscv/bp-tests` into
+`logs/readiness-cleanup-20260908/retired-test-artifacts/`. Its `manifest.json`
+records original paths and verified SHA-256 values; freshly rebuilt simulator tests remain active. Older FPGA variants of the
+hardened handoff tests and benchmark were also archived so they cannot be
+mistaken for the new checks; accepted board evidence remains at the paths above. The older FPGA guide is recoverable with
+`git show archive/pynq-recipes-before-cleanup-20260908:codex-skills/bp-fpga-synthesis/references/pynqz2-flow.md`.
+That tag and the artifact archive are local; no publication is implied.
+
 
 Original commits and authorship are retained at published tags:
 `archive/pre-review-series-20260906` preserves the full pre-split snapshot in

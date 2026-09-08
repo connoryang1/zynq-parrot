@@ -10,7 +10,7 @@
  *   bits [38:0]                    = NPC (vaddr_width_p = 39)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
  * CSR 0x802 (CTXT_REG): seed an integer or FP register for a target thread
- *   bits [38:0]                    = value (sign-extended to vaddr_width_p)
+ *   bits [38:0]                    = value (sign-extended from 39 bits)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
  *   bits [38+BP_TID_BITS+5 : 39+BP_TID_BITS] = register address (5-bit)
  *   bit  [39+BP_TID_BITS+5]        = fp_sel (1 = FP regfile, 0 = INT regfile)
@@ -40,7 +40,7 @@
 #elif BP_NUM_CONTEXTS <= 64
 #  define BP_TID_BITS 6
 #else
-#  error "BP_NUM_THREADS > 64 not supported"
+#  error "BP_NUM_CONTEXTS > 64 not supported"
 #endif
 
 #define BP_TID_MASK  ((1ULL << BP_TID_BITS) - 1ULL)

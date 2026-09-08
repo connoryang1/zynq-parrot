@@ -9,8 +9,8 @@
  * Mechanism:
  *   CSR 0x800 (CTXT): read/write current thread ID; writing triggers NPC redirect
  *   CSR 0x801 (CTXT_NPC): write-only bootstrap of thread NPC.
- *                          Value format: {thread_id[7:0], target_npc[63:0]}
- *                          (packed as a 64-bit value with thread_id in upper bits)
+ *                          Packed value uses NPC bits [38:0] followed by the
+ *                          logical context ID; see mt_seed.h for its width.
  *
  * Test flow:
  *   Thread 0 (main):

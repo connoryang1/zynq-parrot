@@ -1,13 +1,14 @@
-This file explains FPGA build, deployment, and historical Linux debugging procedures. Use the canonical checkout guide to distinguish the currently supported application flow from older diagnostic recipes preserved below.
+This file explains maintained FPGA build, deployment, and Linux debugging procedures. Historical commands are recoverable at named Git checkpoints; use the canonical checkout guide for accepted source and artifact identities.
 
 # PYNQ-Z2 Build And Deployment Reference
 
-The canonical branch is documented in `CURRENT_CHECKOUT.md`. Historical `fpga-tests`,
-AMO-probe, and S-mode-probe recipes below refer to the archived `e4242c1c` harness,
-not targets in the current active suite; restore them on an isolated diagnostic branch
-if needed. For current Linux application packaging use `linux-tests/README.md` and
-explicitly select freshly built images for the serialized runner. The current accepted
-route uses 80/140 BRAM tiles; statements below about exhausted BRAM describe older candidates.
+The canonical branch and accepted identities are documented in
+[CURRENT_CHECKOUT.md](../../../CURRENT_CHECKOUT.md). Current Linux application
+packaging is in [linux-tests/README.md](../../../linux-tests/README.md).
+Historical Jan. 24 runner recipes and removed AMO/S-mode test commands are
+preserved in local tag `archive/pynq-recipes-before-cleanup-20260908`; their old
+harness is at `e4242c1c`. Recover those on an isolated diagnostic branch only
+when needed, rather than running leftover binaries in the active checkout.
 
 ## Current build
 
@@ -200,71 +201,23 @@ uses aligned 8-byte commands only. Validate success with `Run /bin/sh as init pr
 marker, `uname -a`, `poweroff -f`, and `CORE[0] PASS`. A direct `rdinit` shell does not run the
 normal init scripts; mount `/proc` manually before reading `/proc/cpuinfo`.
 
-The Jan. 24 historical bitstream must use its historical threaded FIFO decoder. The newer
-`bsg_host` polling runner can stall this image at about 0.133 IPC with no console output, while the
-compatible runner boots near 0.5 IPC. Preserve the threaded decoder and apply only the owned-CMA
-fix: never reuse a DRAM pointer from a previous `control-program` process. The historical monitor
-thread is not joined and can segfault after a clean target poweroff; treat that as a host teardown
-bug only when `CORE[0] PASS` and the target poweroff are already present.
-
-Reload the overlay immediately before every Linux trial, even when the previous `control-program`
-exited normally. The tag-client reset does not reliably return every historical design register to
-its power-on state: repeated runs without reprogramming have started with `reset(lo)=1`, retired no
-instructions, and produced no console output. A fresh load starts with `reset(lo)=0`. If an external
-timeout or interrupted SSH session kills the host runner, consider the fabric state contaminated
-and reload before drawing any conclusion.
-
-Do not pass the optional third argument to archived `control-program-protocol-compatible-bounded`
-binaries as though it were a wall-clock millisecond deadline. At least one archived binary applies
-that limit according to polling activity and can stop a healthy target less than a second after
-release. Omit that argument. Do not wrap an unprivileged `sudo ./control-program` invocation with
-GNU `timeout`: on the PYNQ image, `sudo` may fork the root runner, after which `timeout` kills only
-the `sudo` parent and leaves `control-program` running as an orphan. A deadline is reliable only
-when `timeout` itself is launched as root, for example when that exact command has been granted
-non-interactive sudo access:
-
-```bash
-sudo -n timeout --signal=TERM --kill-after=5s 300s \
-  ./control-program <program>.nbf
-```
-
-Without that narrow sudo permission, supervise the run from the VM and use
-`scripts/power_cycle_pynq.sh` when the deadline expires. A power cycle is the dependable way to
-terminate an orphaned root runner and also restores a known board state. Reload the intended
-overlay after the board returns before starting the next trial.
-
-The verified control identity is the Jan. 24 bitstream SHA-256 beginning `d45f7e3e` with the Jan. 25
-Linux NBF SHA-256 beginning `994bd900` and the compatible owned-DRAM runner SHA-256 beginning
-`76db506e`. On a freshly loaded overlay this pair reaches `/init`, powers down, and reports
-`CORE[0] PASS`; one Aug. 28 control run retired 321,538,678 instructions at 0.514 IPC.
-
-Before an application run, inspect the Makefile or compile command for `DRAM_TEST`. It must be
-absent. That mode performs a destructive 64 MiB connectivity diagnostic and is not evidence that
-an NBF loaded or executed. Program the freshly extracted overlay in an interactive board shell:
-
-```bash
-make load_bitstream \
-  BOARDNAME=pynqz2 \
-  VIVADO_VERSION=2024.2 \
-  VIVADO_MODE=batch
-
-sudo ./control-program <program>.nbf
-```
-
-Record the board-side bitstream and NBF SHA immediately before the run. A successful staged
-context-cache probe prints `ABRrNP` and `CORE[0] PASS`. Do not put host MMIO followed by a fence
-inside the measured switch region; that tests the I/O drain path rather than a pure handoff.
+Use the maintained serialized interactive runner described above. After a
+native runtime limit, interruption, or SBI-reset terminal probe, power-cycle the
+board, wait for PYNQ readiness, and reload the verified overlay before another
+run. Before launching, verify that the runner was built without `DRAM_TEST` and
+record exact runner, bitstream, and NBF hashes. Keep host MMIO and fences outside
+measured switch regions.
 
 ## Application image
 
-For the maintained FPGA regression images, use:
-
-```bash
-make -C testing fpga-tests NUM_THREADS=2 NUM_CONTEXTS=4
-```
-
-This rebuilds the integer-only DRAMFS startup and emits NBFs with the required `--config --debug`
-preamble. Preserve the exact SDK revision and compiler flags with performance-sensitive programs.
+The maintained harness has no `fpga-tests` target. For the Linux application
+proof, follow the clean `tiny-init-linux-image` flow in
+[the Linux guide](../../../linux-tests/README.md). For bare-metal acceptance,
+retain the source, integer-only board CRT, compiler flags, ELF, and NBF identities
+with the run; the accepted recipes and artifacts are recorded in
+[the checkout guide](../../../CURRENT_CHECKOUT.md#fpga-acceptance-identities).
+A simulator ELF is not automatically an FPGA image: the board startup and NBF
+`--config --debug` preamble must match the selected hardware.
 
 ## Required run-state checks
 
@@ -296,15 +249,11 @@ Linux prints anything, reduce the image before changing the kernel or host runne
    `_boot_status` address into `a6`, executes `amoswap.w a6,a7,(a6)`, and immediately branches on
    the returned old value. A wrong or stale nonzero value sends the only hart into the deliberate
    secondary-hart wait loop before console initialization.
-4. Build the focused diagnostic and verify it in a clean traced simulator before the board:
-
-   ```bash
-   make -C testing clean run-mt_amo_swap_return_test \
-     TRACE=1 NUM_THREADS=2 NUM_CONTEXTS=4
-   make -C testing \
-     "$PWD/riscv/bp-tests/mt_amo_swap_return_test_fpga.nbf" \
-     NUM_THREADS=2 NUM_CONTEXTS=4
-   ```
+4. Construct a focused local AMO/branch reproduction using the captured
+   architectural inputs. The old `mt_amo_swap_return_test` source/build rule is
+   recoverable from `e4242c1c` on an isolated branch; it is not an active harness
+   target. Require a clean traced pass before packaging that reproduction for
+   the board, and retain source/CRT/ELF/NBF hashes.
 
 The diagnostic intentionally uses `a6` as both the nonzero address input and AMO destination,
 uses OpenSBI's plain `amoswap.w` without `.aq`, `.rl`, or `.aqrl`, and places the conditional
@@ -371,47 +320,23 @@ a post-`satp` probe.
 
 ### Silent-Linux diagnostic bundle
 
-Treat a silent Linux boot as a staged diagnosis, not a single pass/fail result. Before any RTL
-change or another routed build, retain a directory containing:
+Before changing RTL or spending another routed build, retain exact source,
+runner, package, bitstream, and NBF identities; the closed board transcript;
+and the first failed milestone. Select a local reproduction matching the live
+architectural inputs. The maintained translated U-mode tests do not by
+themselves reproduce an arbitrary S-mode Linux fault.
 
-1. top-level, BlackParrot, package, extracted-bitstream, runner, and NBF SHA-256 values;
-2. the exact board console log and whether the overlay was freshly loaded;
-3. ordered physical milestones through marker 9, stopping as soon as the first expected marker is
-   absent; and
-4. a matching local `TRACE=1` S-mode/Sv39 run and its FST, analyzed with
-   `tools/satp_fst_tail.awk`:
+Use the [test guide](../../../testing/README.md) for clean, bounded `TRACE=1`
+runs and retain the closed FST. `tools/satp_fst_tail.awk` can extract SATP writes
+and retired-PC tails from streamed VCD; do not resurrect the removed
+`run-mt_smode_sv39_entry_test` target from a leftover ELF. The old trace-window
+command-line options are not implemented by the current tracer.
 
-   ```bash
-   BSG_TRACE_TIMEOUT_S=120 \
-     make -C testing clean run-mt_smode_sv39_entry_test TRACE=1
-   fst2vcd cosim/black-parrot-minimal-example/verilator/dump.fst \
-     | awk -v tail=128 -f tools/satp_fst_tail.awk
-   ```
+The accepted route uses 80 of 140 BRAM tiles; older claims that the image fills
+all BRAM are obsolete. Decide whether instrumentation fits using the exact
+candidate's routed reports, and first try bounded software probes or local
+waveforms when they can answer the question without changing hardware.
 
-`BSG_TRACE_TIMEOUT_S` is a simulator-internal clean trace bound. Prefer it to an external
-`timeout` around the simulator Makefile: a process-group timeout can kill the parent while leaving
-the Verilator child and shared `run.log` alive. The tail extractor records SATP writes and the
-final retired PCs/virtual addresses without materializing a giant VCD. Once an earlier run has
-identified a useful cycle range, pass it without rebuilding the test program:
-
-```bash
-SIM_RUN_ARGS='+bsg_trace_start_cycle=<first> +bsg_trace_stop_cycle=<last>' \
-  BSG_TRACE_TIMEOUT_S=120 \
-  make -C testing run-mt_smode_sv39_entry_test TRACE=1
-```
-
-This dramatically reduces FST conversion time by excluding the slow NBF load from the waveform.
-
-Do not add an ILA merely to obtain these milestones: the current candidate already uses all 140
-PYNQ-Z2 BRAM tiles. A translation-aware software probe or a focused local FST is lower risk and
-does not perturb a resource-limited routed image.
-
-If the focused AMO test passes, patch OpenSBI's aligned
-`_start_hang` window to report `mcause` through host MMIO before changing RTL; this distinguishes a
-post-lottery machine-mode trap from an intentional firmware polling loop.
-
-Board automation calls `sudo -n` so it cannot pause invisibly at a password prompt. Use only the
-validated fixed-path overlay helper above and the separately scoped `control-program *` rule for
-unattended runs. If either rule is absent, run the exact command manually in an authorized board
-terminal; never grant passwordless Python, a shell, `make`, or a wildcard executable merely to
-bridge per-TTY sudo timestamps.
+Board automation uses the fixed-path overlay helper and serialized runner from
+the skill. Keep permission scope tied to those reviewed executables; archived
+runner commands are recovery material, not current deployment instructions.

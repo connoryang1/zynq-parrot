@@ -124,12 +124,12 @@ NBF tool, and record the source, CRT, ELF, and NBF hashes. This is a software
 collateral change only; keep its revision identity separate from the committed
 RTL revision used by the bitstream.
 
-For a clean trace-enabled Verilator build on this checkout, remove the parent make jobserver
-from Verilator's environment and give Verilator the worker count explicitly:
-`make -C <verilator-dir> clean CFG=<cfg> TRACE=1`, then
-`make -C <verilator-dir> obj_dir/Vbsg_nonsynth_zynq_testbench CFG=<cfg> TRACE=1 VERILATOR='env -u MAKEFLAGS verilator --build-jobs 12'`.
-Without `env -u MAKEFLAGS`, Verilator's generated make can inherit closed jobserver descriptors,
-warn that the jobserver is unavailable, and silently compile with one worker.
+For clean trace-enabled simulation, follow `bp-targeted-verification`: finish
+`make -C testing clean` and the simulator clean separately, then use
+`make -C testing run-<test> NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12`.
+The current Verilator Makefile passes the explicit inner worker count. Inspect
+the actual compiler command if a parent Make jobserver unexpectedly serializes
+compilation; do not replace the maintained build flow with an archived recipe.
 
 Launch routed FPGA implementation in an isolated background worktree:
 
@@ -183,8 +183,9 @@ improvement from simulation cycles alone or compare a routed result with a synth
 ## Reporting And Logging
 
 Report configuration, revisions, command, elapsed time, result, WNS/TNS, utilization, warnings,
-and artifact path. Append accepted results to the optimization timing ledger; keep failed or
-reverted experiments in the experiment log with their failure reason.
+and artifact path. Record major outcomes in `WORK_LOG.md`, update accepted
+identities in `CURRENT_CHECKOUT.md`, and retain detailed failures with their
+artifacts rather than creating another status diary.
 
 Program or copy files to an FPGA only when the user authorizes that external action.
 
@@ -201,8 +202,10 @@ sudo rule; confirm it and the fixed-path overlay helper both work with `sudo -n`
 long unattended ladder.
 
 If a Linux image retires instructions but emits no console output, do not begin in the kernel.
-First run an OpenSBI-only NBF prefix. If that has the same execution signature, build and run
-`mt_amo_swap_return_test_fpga.nbf`; it reproduces OpenSBI's boot-hart lottery with the address and
+First run an OpenSBI-only NBF prefix. If that has the same execution signature,
+construct a focused AMO/branch reproduction from the live architectural inputs.
+The historical `mt_amo_swap_return_test` in `e4242c1c` is a starting point on an
+isolated diagnostic branch, not a maintained test target. It reproduces OpenSBI's boot-hart lottery with the address and
 AMO destination both in `a6`, a plain `amoswap.w` with no acquire/release bits, and the dependent
 branch immediately afterward. A different AMO ordering or separate AMO destination is not an
 equivalent test because it can exercise a different pipeline path or its stale value can
@@ -214,7 +217,8 @@ RTL change or synthesis: record the trusted runner/bit/NBF hashes, run the order
 pre-SATP milestone probes, retain the board log in persistent board-home storage (never `/tmp`),
 and run the matching traced local privilege/SATP gate. Do not treat a physical NBF marker after
 SATP as evidence unless its virtual-to-physical mapping has been established. The current PYNQ-Z2
-image has no spare BRAM for an ILA.
+accepted route uses 80 of 140 BRAM tiles; use the exact candidate's routed
+reports to assess instrumentation cost rather than assuming older capacity limits.
 
 When a physical probe localizes a Linux failure to an instruction boundary, capture the live
 architectural inputs at that same boundary before creating or interpreting a local reproducer.
