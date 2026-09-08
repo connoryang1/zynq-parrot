@@ -25,6 +25,12 @@ make -C linux-tests app \
   BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc
 ```
 
+Each application target recompiles its small ELF so compiler or option changes
+cannot reuse stale executables. Compiler diagnostics go to stderr, keeping
+redirected transfer commands usable even when the ELF is rebuilt. Run
+`make -C linux-tests check-harness` for isolated host checks of compiler/flag
+changes, failed builds, and transfer integrity; no cross toolchain is required.
+
 To create the definitive, reproducible PID-1 boot image, run:
 
 ```sh

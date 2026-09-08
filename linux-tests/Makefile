@@ -41,21 +41,28 @@ CFLAGS := -O2 -static -Wall -Wextra -Werror \
 
 app: $(APP)
 
-$(APP): ctxtsw_user_smoke.c
+# These small ELFs must reflect the selected compiler and flags on every call,
+# including A -> B -> A changes with the same output name. Keep compiler output
+# on stderr so redirected emit-*-transfer output remains executable shell text.
+.PHONY: FORCE check-harness
+.DELETE_ON_ERROR:
+FORCE:
+
+$(APP): ctxtsw_user_smoke.c Makefile FORCE
 	@mkdir -p $(OUT)
-	$(BP_LINUX_CC) $(CFLAGS) -o $@ $<
+	@$(BP_LINUX_CC) $(CFLAGS) -o $@ $< >&2
 
 # No-libc version for the first interactive-shell demonstration.  Its small
 # static ELF can be transferred through the BlackParrot console without
 # rebuilding Buildroot or the kernel.
 tiny: $(TINY_APP)
 
-$(TINY_APP): ctxtsw_user_tiny.c
+$(TINY_APP): ctxtsw_user_tiny.c Makefile FORCE
 	@mkdir -p $(OUT)
-	$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
+	@$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
 	  -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
 	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) \
-	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $<
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $< >&2
 
 # Keep the shell variant separate: do not change the PID-1 acceptance binary.
 .PHONY: shell-app emit-shell-transfer
@@ -64,24 +71,24 @@ shell-app: $(SHELL_APP)
 .PHONY: benchmark emit-benchmark-transfer
 benchmark: $(BENCH_APP)
 
-$(BENCH_APP): ctxtsw_user_benchmark.c Makefile
+# No CRT initializes gp: disable linker relaxation into gp-relative accesses.
+$(BENCH_APP): ctxtsw_user_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
-	# No CRT initializes gp: disable linker relaxation into gp-relative accesses.
-	$(BP_LINUX_CC) -Os -Wall -Wextra -Werror -static -nostdlib -nostartfiles \
+	@$(BP_LINUX_CC) -Os -Wall -Wextra -Werror -static -nostdlib -nostartfiles \
 	  -ffreestanding -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
-	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -mno-relax -o $@ $<
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -mno-relax -o $@ $< >&2
 
 emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' ': > /tmp/ctxtsw_user_benchmark.b64'
 	@base64 -w 76 $(BENCH_APP) | sed "s|.*|echo '&' >> /tmp/ctxtsw_user_benchmark.b64|"
 	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
 
-$(SHELL_APP): ctxtsw_user_tiny.c Makefile
+$(SHELL_APP): ctxtsw_user_tiny.c Makefile FORCE
 	@mkdir -p $(OUT)
-	$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
+	@$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
 	  -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
 	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) -DBP_POWEROFF_ON_PASS=0 \
-	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $<
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $< >&2
 
 # Print commands suitable for an interactive BusyBox shell.
 # The shell needs only its standard base64 applet and a writable /tmp.
@@ -246,3 +253,6 @@ package-tiny-init-nbf: validate-tiny-init-image
 
 clean:
 	rm -rf $(OUT)
+
+check-harness:
+	@python3 -m unittest discover -s $(CURDIR) -p test_makefile.py
