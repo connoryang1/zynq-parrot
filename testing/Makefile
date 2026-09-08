@@ -24,7 +24,7 @@ CFLAGS = -O2 \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|Benchmark|minstret|Contexts:|Switches/context:|Warmup|Unroll|Same-loop|Total cycles:|Total switches:|Measured throughput|Excess cycles|Expected TRACE|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -77,7 +77,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
-	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --exit-code $$$$sim_rc
+	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc
 endef
 
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))

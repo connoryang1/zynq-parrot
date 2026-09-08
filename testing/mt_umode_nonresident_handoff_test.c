@@ -53,8 +53,14 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 {
   if ((result_code == 0) && (target_seen == 1)
       && (!BP_TARGET_PRE_ECALL_STORE || (target_entered == 1))
-      && (result_context == 0)) {
-    bp_print_string("[BSG-PASS] U-mode nonresident handoff redirected before sequential issue\n");
+      && (result_context == 0) && (unexpected_mcause == 0)) {
+#if BP_TARGET_PRE_ECALL_STORE
+    bp_print_string("[BSG-PASS] U-mode nonresident Sv39 instruction/data handoff redirected before sequential issue\n");
+#elif BP_ENABLE_SV39
+    bp_print_string("[BSG-PASS] U-mode nonresident Sv39 instruction handoff redirected before sequential issue\n");
+#else
+    bp_print_string("[BSG-PASS] U-mode nonresident bare handoff redirected before sequential issue\n");
+#endif
     bp_finish(0);
   } else {
     bp_print_string("[BSG-FAIL] U-mode nonresident handoff leaked sequential execution\n");
@@ -104,6 +110,10 @@ static void __attribute__((naked, aligned(4))) machine_trap_entry(void)
     "mret\n\t"
     "4:\n\t"
     "la t1, unexpected_mcause\n\t"
+    "sd t0, 0(t1)\n\t"
+    /* Cause zero is also a fault, so invalidate an already completed result. */
+    "la t1, result_code\n\t"
+    "li t0, 1\n\t"
     "sd t0, 0(t1)\n\t"
     "li a0, 3\n\t"
     "j 3b\n\t"

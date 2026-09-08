@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 
-from check_run import check_transcript
+from check_run import TEST_MARKERS, check_transcript
 
 
 PASS = "BSG-INFO: CORE PASS\nBSG-INFO: BSG PASS\n"
@@ -21,6 +21,23 @@ GPIO = (
 
 
 class TranscriptTests(unittest.TestCase):
+    def test_selected_program_must_complete_before_core_pass(self):
+        for name, marker in TEST_MARKERS.items():
+            with self.subTest(name=name):
+                check_transcript(marker + "\n" + PASS + GPIO, 2, name)
+                for text in (PASS, PASS + marker, "prefix " + marker + "\n" + PASS):
+                    with self.assertRaises(ValueError):
+                        check_transcript(text, test=name)
+        with self.assertRaises(ValueError):
+            check_transcript(PASS, test="removed_test")
+
+    def test_wrong_program_and_handoff_variant_are_rejected(self):
+        for wrong in ("mt_ctxtsw_smoke_test", "mt_umode_nonresident_handoff_test",
+                      "mt_umode_nonresident_sv39_handoff_test"):
+            with self.subTest(wrong=wrong), self.assertRaises(ValueError):
+                check_transcript(TEST_MARKERS[wrong] + "\n" + PASS,
+                                 test="mt_umode_nonresident_sv39_data_handoff_test")
+
     def test_pass(self):
         check_transcript(PASS)
         check_transcript(PASS.replace("CORE PASS", "CORE[0] PASS"))
@@ -75,6 +92,32 @@ class TranscriptTests(unittest.TestCase):
 
 
 class HarnessTests(unittest.TestCase):
+    def test_real_makefile_rejects_another_programs_success(self):
+        root = Path(__file__).resolve().parents[1]
+        env = os.environ.copy()
+        for key in ("MAKEFLAGS", "MFLAGS", "MAKEOVERRIDES"):
+            env.pop(key, None)
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            sim = base / "sim"
+            sim.mkdir()
+            (base / "riscv" / "bp-tests").mkdir(parents=True)
+            (sim / "Makefile").write_text(
+                ".PHONY: build run\nbuild:\n\t@true\n"
+                "run:\n\t@cp fixture.log run.log\n\t@cat run.log\n")
+            command = ["make", "-C", str(root / "testing"), "TOP=" + str(root),
+                       "SIM_DIR=" + str(sim), "LOG_DIR=" + str(base / "logs"),
+                       "ZP_RISCV_DIR=" + str(base / "riscv"), "CC=true",
+                       "run-mt_ctxtsw_smoke_test"]
+            for marker, expected in (("", False),
+                                     (TEST_MARKERS["mt_csr_isolation_test"], False),
+                                     (TEST_MARKERS["mt_ctxtsw_smoke_test"], True)):
+                with self.subTest(marker=marker):
+                    (sim / "fixture.log").write_text(marker + "\n" + PASS)
+                    result = subprocess.run(command, env=env, stdout=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT, timeout=10)
+                    self.assertEqual(result.returncode == 0, expected, result.stdout)
+
     def test_model_stamp_round_trip(self):
         """Changing A -> B -> A must recreate A, never retain B's identity."""
         make_dir = Path(__file__).resolve().parents[1] / "cosim" / "mk"
