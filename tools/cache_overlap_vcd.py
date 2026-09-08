@@ -176,6 +176,7 @@ def analyze(stream, address, target_pc, target_thread=1, line_bytes=64, span_lin
         'integer_divider_overlap': False, 'full_refill_retirement_overlap': False, 'issues': [],
     }
     pending = None
+    blocking_pending = False
 
     def event(kind, cycle, timestamp, **fields):
         item = dict(kind=kind, cycle=cycle, timestamp=timestamp, **fields)
@@ -187,6 +188,7 @@ def analyze(stream, address, target_pc, target_thread=1, line_bytes=64, span_lin
             if pending is not None:
                 pending['issues'].append('reset or unknown reset before completion')
                 pending = None
+            blocking_pending = False
             continue
         accepted = v.get('request_v') == 1 and v.get('request_yumi') == 1
         matching = accepted and v.get('address') is not None and first_line <= v['address'] // line_bytes < first_line + span_lines
@@ -196,12 +198,17 @@ def analyze(stream, address, target_pc, target_thread=1, line_bytes=64, span_lin
         # Dcache supports one outstanding blocking transaction. Tracking all
         # blocking requests prevents an unrelated refill being credited to ours.
         if accepted and v.get('blocking_sent') == 1:
+            conflict = blocking_pending
+            if conflict:
+                report['issues'].append('second blocking request before completion')
             if pending is not None:
                 pending['issues'].append('second blocking request before completion')
             pending = None
+            blocking_pending = True
             if matching and v.get('msg_type') == 0:  # e_miss_load
                 pending = {'accept': event('cold_load_accepted', cycle, timestamp, address=v['address']),
-                           'critical': None, 'complete': None, 'issues': [],
+                           'critical': None, 'complete': None,
+                           'issues': ['second blocking request before completion'] if conflict else [],
                            'dispatch': [], 'retirement': [], 'integer_divider': []}
                 report['requests'].append(pending)
         for kind, prefix in (('dispatch', 'dispatch'), ('retirement', 'commit')):
@@ -217,6 +224,12 @@ def analyze(stream, address, target_pc, target_thread=1, line_bytes=64, span_lin
                 pending['integer_divider'].append(work)
         if pending is not None and capabilities['late_writeback'] and v.get('late_v') == 1 and v.get('late_yumi') == 1:
             event('late_writeback', cycle, timestamp, thread=v.get('late_thread'), rd=v.get('late_rd'))
+        if blocking_pending and v.get('complete_recv') is None:
+            issue = 'unknown complete_recv while blocking transaction pending'
+            if issue not in report['issues']:
+                report['issues'].append(issue)
+        if v.get('complete_recv') == 1:
+            blocking_pending = False
         if pending is None:
             continue
         for field in ('critical_recv', 'complete_recv', 'blocking_sent', 'request_v', 'request_yumi'):
