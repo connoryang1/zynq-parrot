@@ -24,6 +24,17 @@
 
 static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
+static volatile uint64_t peer_contexts[2] __attribute__((used, aligned(8)));
+
+/* The final timed return suspends the peer before its loop tail completes.
+ * One untimed handoff resumes that tail and records independent execution
+ * evidence; warmup reseeding intentionally discards the unfinished warmup tail. */
+#define RECORD_COMPLETION(offset) \
+    "la t0, peer_contexts\n" \
+    "csrr t1, 0x800\n" \
+    "sd t1, " offset "(t0)\n" \
+    "fence rw, rw\n" \
+    "csrwi 0x800, 0\n"
 
 static inline uint64_t read_global_cycle(void)
 {
@@ -50,6 +61,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t1_warm_ring(void)
     REP32("csrwi 0x800, 0\n")
     "addi t0, t0, -1\nbnez t0, 1b\n.option pop\n"
     : : : "t0", "memory");
+  __asm__ volatile(RECORD_COMPLETION("0") : : : "t0", "t1", "memory");
   for (;;)
     ;
 }
@@ -72,6 +84,7 @@ void __attribute__((noinline, noreturn, aligned(8))) t2_cold_ring(void)
     REP32("csrwi 0x800, 0\n")
     "addi t0, t0, -1\nbnez t0, 1b\n.option pop\n"
     : : : "t0", "memory");
+  __asm__ volatile(RECORD_COMPLETION("8") : : : "t0", "t1", "memory");
   for (;;)
     ;
 }
@@ -84,6 +97,7 @@ int main(void)
   uint64_t warm_begin = read_global_cycle();
   t0_warm_ring();
   uint64_t warm_cycles = read_global_cycle() - warm_begin;
+  __asm__ volatile("csrwi 0x800, 1" : : : "memory");
 
   seed_thread(2, &t2_stack[STACK_WORDS], (uint64_t)t2_cold_ring);
   t0_cold_ring();
@@ -91,6 +105,13 @@ int main(void)
   uint64_t cold_begin = read_global_cycle();
   t0_cold_ring();
   uint64_t cold_cycles = read_global_cycle() - cold_begin;
+  __asm__ volatile("csrwi 0x800, 2" : : : "memory");
+
+  if (peer_contexts[0] != 1 || peer_contexts[1] != 2) {
+    bp_print_string("[BSG-FAIL] context-switch benchmark peer completion missing\n");
+    bp_finish(1);
+    return 1;
+  }
 
   bp_print_string("=== Nonresident Context Switch Overhead Benchmark ===\n");
   bp_print_string("Switches/context:                ");
@@ -100,7 +121,14 @@ int main(void)
   bp_print_string("\nCold cycles/switch x100:         ");
   bp_hprint_uint64((cold_cycles * 100) / TOTAL_SWITCHES);
   bp_print_string("\nCold minus warm cycles/switch x100: ");
-  bp_hprint_uint64(((cold_cycles - warm_cycles) * 100) / TOTAL_SWITCHES);
+  /* Report a negative increment without wrapping the unsigned counter delta.
+   * Warm/cold here describe register-bank residency; both loops are warmed. */
+  if (cold_cycles < warm_cycles) {
+    bp_print_string("-");
+    bp_hprint_uint64(((warm_cycles - cold_cycles) * 100) / TOTAL_SWITCHES);
+  } else {
+    bp_hprint_uint64(((cold_cycles - warm_cycles) * 100) / TOTAL_SWITCHES);
+  }
   bp_print_string("\n");
   bp_finish(0);
   return 0;
