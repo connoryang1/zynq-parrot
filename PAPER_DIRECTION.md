@@ -45,9 +45,11 @@ not changes to the reference repository.
 ## First gate: finish context-switch qualification
 
 Context switching is already integrated into BlackParrot. Before adding an
-application benchmark, complete FPGA/Linux acceptance of the current resident
-CSR initialization and fetch/replay ownership fixes, while preserving the
-nonresident translated handoff and register-target regressions. The
+application benchmark, qualify resident CSR initialization and fetch/replay
+ownership while preserving nonresident translated handoff and register-target
+regressions. This gate passed local regressions and September 8 FPGA/Linux
+shell acceptance on RTL `aad56bd92`, including resident/nonresident rings,
+target syscalls, private registers, usable shell return, and clean poweroff. The
 [checkout guide](CURRENT_CHECKOUT.md) records current revisions and the remaining
 production-readiness gaps, including lifecycle, FP state, and isolation.
 

@@ -13,8 +13,9 @@ BlackParrot still executes through one shared pipeline. The deployed PYNQ-Z2 con
 
 The current resident fixes initialize an inactive CSR bank on its first PC seed
 and keep instruction/refill/replay metadata paired with the owning register
-bank. These additions are locally verified; their board acceptance is pending
-as recorded in [the checkout guide](CURRENT_CHECKOUT.md).
+bank. These additions pass local regressions and the September 8 FPGA/Linux
+shell resident/nonresident benchmark, including private registers and target
+syscalls, as recorded in [the checkout guide](CURRENT_CHECKOUT.md).
 
 Inline comments and the RTL are authoritative for protocol details. Do not treat an old experiment's state diagram or cycle count as the current contract.
 
@@ -53,6 +54,8 @@ Measure nonresident behavior with fewer resident banks than logical contexts:
 `NUM_THREADS=2 NUM_CONTEXTS=4`.
 
 Keep benchmark spacing separate from architectural handoff latency. The accepted
-FPGA benchmark measured 5.10 resident and 11.12 nonresident cycles/switch;
+bare-metal FPGA benchmark measured 5.10 resident and 11.12 nonresident
+cycles/switch on the earlier image. The current Linux shell benchmark measures
+median 5.10546875 resident and 11.14453125 nonresident cycles/switch;
 waveform endpoints and cache/refill tails must be reported separately. Use
 `0xCC0`, not a context-restored `mcycle`, for cross-context elapsed cycles.

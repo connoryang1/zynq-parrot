@@ -149,9 +149,9 @@ restored register and the returned process ID. Console output and syscalls are
 outside the measurement; interrupts remain enabled.
 
 The combined benchmark requires the resident-initialization and fetch/replay
-ownership fixes under verification on `fix/linux-resident-csr-init`. Do not
-use the previously accepted `6c97bcc0a` bitstream for the resident case; FPGA
-acceptance of the combined test is still pending.
+ownership fixes in RTL `aad56bd92`, now integrated into `master`. Use the
+resident-fix bitstream identified in [the checkout guide](../CURRENT_CHECKOUT.md#fpga-acceptance-identities);
+the earlier `6c97bcc0a` bitstream does not qualify the resident case.
 
 Prepare its transfer file on the VM:
 
@@ -168,6 +168,18 @@ test's file. After checking the guest executable's checksum, run
 Require the benchmark-specific PASS and exit zero. Do not run the smoke and
 benchmark executables in the same guest boot: the extra context state is not
 reclaimed between processes.
+
+On September 8, 2026, the combined benchmark passed on the exact resident-fix
+image. The first warm-up exercises first-seed initialization and performs all
+correctness checks; subsequent trials also check reseeding. Resident raw
+256-switch samples were `1311 1307 1307 1307 1307 1307 1307`, with median
+5.10546875 and maximum 5.12109375 cycles/switch. Nonresident samples were
+`2857 2853 2853 2853 2853 2853 2853`, with median 11.14453125 and maximum
+11.16015625. The median difference is 6.0390625 cycles/switch.
+The guest ELF checksum, resident/final PASS markers, `BENCH_EXIT=0`, subsequent
+`uname -m`, and `poweroff -f` through `CORE[0] PASS` all passed; the runner exited
+zero. Exact artifacts, a serialized acceptance driver, and both closed
+transcripts are retained in `logs/linux-resident-shell-20260908/`.
 
 The earlier nonresident-only version on FPGA RTL `6c97bcc0a` measured raw totals
 `2856 2852 2852 2852 2852 2852 2852` cycles: median 11.140625 and maximum

@@ -3,20 +3,21 @@ This file identifies the current BlackParrot context-switch sources and the sepa
 # Supported checkout
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
-Both forks integrate on `master`; develop on dedicated branches. The cleanup
-branch is `cleanup/context-switch-readiness-20260908` in both repositories.
+Both forks integrate on `master`; develop on dedicated branches. The verified
+cleanup and Linux resident acceptance are integrated into both masters.
 
-The current gitlink selects RTL `b0806d223`. Its hardware content is unchanged
+The current gitlink selects RTL `808ba6ced`. Its hardware content is unchanged
 from `aad56bd92`, originally pinned by top-level `873deeb7`; the cleanup removes
 stale debug comments and updates documentation. This endpoint adds first-seed resident CSR initialization
 (`83fc32d29`) and correct register-bank ownership through instruction refill and
 replay (`aad56bd92`) to `6c97bcc0a`.
 
-**FPGA/Linux acceptance remains at `6c97bcc0a`.** The newer resident fixes have
-local regression and routed-build evidence, but their Linux resident-switch
-board acceptance is pending. A successful route is not a successful board run.
-The artifact identities below describe the accepted baseline, not every change
-in this working branch.
+**FPGA/Linux resident acceptance is at `aad56bd92`.** On September 8 the exact
+routed resident-fix image passed a shell-launched 0↔1 and 0↔2 benchmark,
+including target-context syscalls, private/restored register checks, process
+exit, a subsequent shell command, and clean poweroff. The current gitlink adds
+only comments/documentation to that hardware. Exact artifact identities and
+the earlier `6c97bcc0a` baseline are recorded below.
 
 ## Scope and readiness
 
@@ -24,14 +25,15 @@ The maintained configuration is PYNQ-Z2 with two resident register banks and
 four logical integer contexts sharing one pipeline. Accepted FPGA evidence
 covers nonresident translated U-mode 0→2→0 handoff, a target-context syscall,
 logical identity, register restoration, and Linux shutdown. A separately
-transferred shell executable also passed on `6c97bcc0a`; see the
+transferred shell executable also passed on `6c97bcc0a`. The current image adds
+verified resident 0↔1 initialization, repeated handoffs/reseeding, and syscalls;
+see the
 [Linux guide](linux-tests/README.md) for that evidence and its one-run-per-boot
 restriction.
 
 This is a cooperative integer-context prototype. Production readiness still
 requires:
 
-- FPGA/Linux acceptance of the current resident initialization and replay fixes.
 - A defined ABI and complete FP-state policy; ordinary FP and resident FP tests
   do not establish nonresident FP preservation.
 - Context allocation, teardown, and reuse across Linux process exit, traps,
@@ -95,7 +97,7 @@ handoff, FP isolation, computed targets, and the ring benchmark pass locally.
 The unchanged simulator benchmark reports 5.13 resident / 11.13 nonresident
 cycles per switch. The September 7 work-log entry records the routed candidate
 `20260907T225642Z-873deeb7`: 47,640 LUTs, 80 BRAM tiles, WNS +1.973 ns and TNS 0;
-board acceptance of this candidate remains pending.
+this exact candidate passed the September 8 Linux shell acceptance below.
 
 Baseline acceptance evidence remains in
 `logs/register-target-fpga-20260907/board-fixed/`, with its old-bitstream
@@ -106,6 +108,41 @@ Earlier history-split verification is retained in the dated artifact directories
 and Git history, rather than repeated here as current suite counts.
 
 ## FPGA acceptance identities
+
+The current resident-fix route is job `20260907T225642Z-873deeb7`, top
+`873deeb7c9aa6ec7165ee29d71d229699340d5e9` / RTL
+`aad56bd922c5246ad90d6f4d58d90e56c85bd121`, Vivado 2024.2 and static
+`e_bp_unicore_zynqparrot_cfg`: 47,640 LUTs, 21,446 registers, 80 BRAM tiles,
+11 DSPs, WNS +1.973 ns, TNS 0, WHS +0.007 ns, THS 0.
+
+| Current acceptance artifact | SHA-256 |
+| --- | --- |
+| Packed FPGA image | `aa73d6e28c67c3fbba20552ce948fce13561a0adeb3f5ce1817cab3cbc16a461` |
+| Extracted bitstream | `10b8c179c35d1938da1103b33f4f1ba7842ffbef4f54a557846f93b429da886a` |
+| Linux shell NBF | `af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3` |
+| Shell benchmark ELF | `d3351f9de2c3567cd40c31453b8101781195fbb0bf797a10253323c25b2146f9` |
+
+Evidence is in `logs/linux-resident-shell-20260908/`: package/revision/route
+records, exact source/ELF/disassembly, transfer integrity checks, readiness and
+overlay-load logs, the reproducible `run_shell_acceptance.py`, and closed local
+and board-retained transcripts. The board was power-cycled with authorization,
+passed the PYNQ startup/90-second gate, and loaded the verified bitstream.
+The reviewed runner SHA remains
+`be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e`.
+
+The first resident warm-up checks initialization; all 14 resident and 14
+nonresident trials check target identity, independent/restored `s11`, completion,
+and matching target `getpid`. Seven measured 256-switch samples were
+`1311 1307 1307 1307 1307 1307 1307` resident and
+`2857 2853 2853 2853 2853 2853 2853` nonresident. Medians are 5.10546875 and
+11.14453125 cycles/switch, difference 6.0390625. These are loop-inclusive Linux
+measurements with interrupts enabled, not isolated redirect latency or scheduler
+speedups. Guest ELF SHA, both PASS markers, `BENCH_EXIT=0`, `uname -m=riscv64`,
+`CORE[0] PASS`, and host exit zero all passed. Linux is powered off and no
+runner remains; the resident-fix overlay remains loaded. Context lifecycle
+limits still require one demonstration process per fresh overlay/Linux boot.
+
+### Earlier register-target acceptance
 
 The register-target acceptance route uses top
 `8ecb909ae316f6c0daaafe455b6ac61f5212c168` and RTL `6c97bcc0a`, with Vivado
