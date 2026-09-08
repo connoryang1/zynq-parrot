@@ -44,6 +44,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_request_interleave_benchmark \
     mt_load_ahead_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark
 
@@ -88,6 +89,7 @@ $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
+$(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 
 .PHONY: check-nonresident-config
 check-nonresident-config:
@@ -100,6 +102,7 @@ run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_load_overlap_test: check-nonresident-config
 run-mt_load_ahead_benchmark: check-nonresident-config
+run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config
