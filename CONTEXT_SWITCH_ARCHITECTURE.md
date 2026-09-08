@@ -58,7 +58,10 @@ waits for that hint before starting its normal L1 fill. The dedicated
 `e_bp_unicore_zynqparrot_prefetch_cfg` provides two L2 banks with 16 sets each,
 preserving the baseline's total 4 KiB capacity. Distinct banks can service
 independent misses; same-bank misses still serialize. This does not make the
-ordinary L1 demand path a multiple-MSHR cache.
+ordinary L1 demand path a multiple-MSHR cache. The multi-bank L2 controller
+keeps metadata per bank so an available demand can pass a pending hint in
+another bank. Ordinary responses retain their global order, and each reply
+stays locked through its final accepted beat.
 
 Nonresident replacement still drains outstanding memory activity before
 installing state. The new implementation is under simulation and routed FPGA

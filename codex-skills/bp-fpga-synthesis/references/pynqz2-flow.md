@@ -1,4 +1,5 @@
 This file explains maintained FPGA build, deployment, and Linux debugging procedures. Historical commands are recoverable at named Git checkpoints; use the canonical checkout guide for accepted source and artifact identities.
+It distinguishes the baseline configuration from the prefetch candidate and the validation each image requires.
 
 # PYNQ-Z2 Build And Deployment Reference
 
@@ -12,7 +13,7 @@ when needed, rather than running leftover binaries in the active checkout.
 
 ## Current build
 
-From `cosim/black-parrot-example/vivado`:
+The baseline command, from `cosim/black-parrot-example/vivado`, is:
 
 ```bash
 make fpga_build pack_bitstream \
@@ -21,6 +22,13 @@ make fpga_build pack_bitstream \
   VIVADO_MODE=batch \
   CFG=e_bp_unicore_zynqparrot_cfg
 ```
+
+For the nonblocking-prefetch candidate, use the maintained launcher's
+`FPGA_CFG=e_bp_unicore_zynqparrot_prefetch_cfg` override with a clean immutable
+source snapshot, pinned dependencies, and separate persistent logs as shown in
+[the synthesis skill](../SKILL.md#iteration-modes). The baseline remains the
+launcher default. The prefetch candidate requires FPGA fit and board
+acceptance; consult [CURRENT_CHECKOUT.md](../../../CURRENT_CHECKOUT.md) for status.
 
 A clean milestone build may prefix `make clean`, but a fresh isolated worktree does not need it.
 The expected packed artifact is:
@@ -57,11 +65,12 @@ Run `../scripts/setup_sourceware_mirrors.sh` from this skill instead of editing 
 `.gitmodules`. The helper uses shallow checkouts and verifies the final commits against gitlinks.
 
 `bp_unicore_zynqparrot_cfg_p` is the base definition behind the top-level
-`e_bp_unicore_zynqparrot_cfg` Make enum. The static enum is the deployable
-context-cache configuration: it encodes two resident banks and four
-architectural contexts. Do not use `e_bp_custom_cfg`: the dynamic macro path
-tests an unexpanded parameter name and silently falls back to an incompatible
-four-resident-thread design.
+`e_bp_unicore_zynqparrot_cfg` Make enum. This baseline has two resident slots
+and four architectural contexts. The separate static
+`e_bp_unicore_zynqparrot_prefetch_cfg` retains those context counts and selects
+two L2 banks, 16 sets per bank, and 50-bit branch metadata. Use these named FPGA
+configurations rather than `e_bp_custom_cfg`: the dynamic FPGA macro path can
+silently fall back to an incompatible four-resident-thread design.
 
 ## Board deployment
 

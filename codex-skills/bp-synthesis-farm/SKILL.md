@@ -16,7 +16,8 @@ build, and log directories.
 
 - Each builder may run at most one Vivado implementation at a time.
 - Separate builders may synthesize different immutable candidates concurrently.
-- Always use `CFG=e_bp_unicore_zynqparrot_cfg` for the context-cache PYNQ image.
+- The farm controller currently hardcodes the baseline
+  `CFG=e_bp_unicore_zynqparrot_cfg`; it does not forward `FPGA_CFG` overrides.
 - Identify a candidate by both its exact top-level and BlackParrot commits.
 - Use a clean detached remote worktree; never build the builder's dirty coordination checkout.
 - Use the current coordination checkout's maintained synthesis scripts while
@@ -45,6 +46,16 @@ parallelism across VMs is the meaningful throughput gain. The controller uses
 SSH host aliases internally and keeps credentials out of tracked files.
 
 ## Launch And Monitor
+
+For the nonblocking-prefetch candidate's static
+`e_bp_unicore_zynqparrot_prefetch_cfg`, invoke the maintained synthesis launcher
+directly on the selected idle builder with
+`FPGA_CFG=e_bp_unicore_zynqparrot_prefetch_cfg` and a clean immutable source
+snapshot. Follow [the synthesis skill's explicit override procedure](../bp-fpga-synthesis/SKILL.md#iteration-modes)
+and retain the same admission, revision, isolation, and one-job-per-builder checks.
+The farm commands below remain baseline commands. Check prefetch FPGA fit and board
+acceptance in [CURRENT_CHECKOUT.md](../../CURRENT_CHECKOUT.md), which records
+the current status and source identities.
 
 When preparing a top-level candidate, stage its BlackParrot gitlink directly
 from the source worktree instead of copying an object ID by hand:

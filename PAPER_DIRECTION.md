@@ -255,6 +255,52 @@ Evidence is retained in `logs/nonblocking-prefetch-20260908/full-requests/`,
 including exact ELF/NBF, closed FST, transaction-aware reports, page summaries,
 and source hashes. Region and transaction-lifetime correlation exclude loader
 and unrelated instruction reads; aggregate AXI overlap alone is insufficient.
-The next measurements must localize the resident schedule's issue gap, then
-qualify the routed FPGA image and the Linux OS-thread comparison. The prior
+At this initial checkpoint, the remaining work was to localize the resident
+schedule's issue gap, then qualify the FPGA image and Linux OS-thread comparison. The prior
 FPGA results above remain tied to their original deployed RTL.
+
+### Removing the L2 response bottleneck
+
+The first implementation's shared response metadata FIFO selected a pending
+prefetch's bank even while the other bank had a ready demand. In the retained
+window, the context switch reaches the peer's load in two BE cycles; the ready
+demand then remains unacknowledged for 47 L2 edge opportunities. This is a
+response-ordering delay, not the context switch's intrinsic cost.
+
+RTL `070ae616a` keeps headers per bank, preserves global ordinary response order,
+and lets ready responses pass pending hints. A selected packet remains locked
+through its last accepted beat, including silent store acknowledgements and
+backpressure. The isolated controller regression reproduces and rejects the old
+behavior, and checks ordinary/same-bank ordering, eight-beat reads and writes,
+store response collapse, AMO, capacity, initialization, and uncached draining.
+
+The clean full-system run uses the named FPGA configuration with the same
+parameters and the **identical ELF and NBF** as the first implementation.
+
+| Schedule | Cycles, three measured samples |
+| --- | --- |
+| Resident no-prefetch handoff control | 5079, 6022, 5079 |
+| Single-context batch2 with `prefetch.r` | 4059, 4059, 4221 |
+| Resident `prefetch.r` / yield / load | 3867, 4100, 3867 |
+
+Each measured resident page now has 12 cold-data prefetch pairs whose second
+AXI address is accepted before the first read returns data; all use different
+banks, and maximum outstanding data reads is two. Batch2 retains 18 pairs per
+page, and the control remains serialized. All 64 useful loads per page retain
+the expected unique lines and worker order. The previously blocked demand's
+first-response latency falls from 55 to 8 UCE cycles; median successive hint
+issue spacing falls from 76 to 55 cycles.
+
+The median resident total is 23.9% below the matched handoff control and 21.6%
+below the prior controller. These three controlled simulator samples establish
+memory overlap in the proposed resident schedule; they do not establish a Linux
+thread-pool or physical DDR speedup. Same-bank requests still serialize and
+hints remain best effort. Exact identities, per-page transactions and comparison
+reports are in `logs/nonblocking-prefetch-20260908/l2-unblocked/`.
+
+The synthesis-corrected endpoint is RTL `f7eedd955`, pinned by top `fd5a7872`.
+Vivado required moving the bank-select declaration before its generated uses;
+the first route was canceled after implicit undriven nets were detected. An
+isolated old/fixed synthesis comparison reproduces and eliminates those warnings,
+and the corrected clean simulator benchmark and smoke retain identical totals.
+This is a declaration-order correction, with no protocol logic change.
