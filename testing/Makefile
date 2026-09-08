@@ -16,6 +16,7 @@ NUM_CONTEXTS ?= 4
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 CFLAGS = -O2 \
+          -I$(TOP)/software/include \
           -I$(ZP_INSTALL_DIR)/riscv64-unknown-elf/include \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/dramfs.specs \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/perch.specs \
@@ -39,9 +40,11 @@ CORRECTNESS_TESTS := \
     mt_abi_preservation_test \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test \
+    mt_ctxtsw_load_overlap_test \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_load_ahead_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark
 
 NONRESIDENT_TESTS := \
@@ -84,6 +87,7 @@ $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
+$(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 
 .PHONY: check-nonresident-config
 check-nonresident-config:
@@ -94,6 +98,8 @@ check-nonresident-config:
 
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
+run-mt_ctxtsw_load_overlap_test: check-nonresident-config
+run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config

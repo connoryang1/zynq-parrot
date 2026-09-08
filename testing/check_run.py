@@ -37,6 +37,8 @@ TEST_MARKERS = {
     "mt_abi_preservation_test": "[BSG-PASS] ABI state preserved across ctxtsw",
     "mt_ctxtsw_register_target_test": "[BSG-PASS] register targets and computed returns",
     "mt_ctxtsw_late_wb_hazard_test": "[BSG-PASS] ctxtsw late writeback hazard test completed",
+    "mt_ctxtsw_load_overlap_test": "[BSG-PASS] resident delayed-load and load-ahead data/register checks",
+    "mt_load_ahead_benchmark": "[BSG-PASS] load-ahead benchmark completed",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
     "mt_ctxtsw_pure_ring_stress_test": "[BSG-PASS] pure ctxtsw ring stress completed",
     "mt_umode_resident_sv39_data_handoff_test": "[BSG-PASS] resident U-mode Sv39 instruction/data handoff and ECALL preserved state",

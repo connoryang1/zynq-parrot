@@ -39,6 +39,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
 | `mt_ctxtsw_register_target_test` | Fresh computed targets and returns after ALU/load/multiply/divide/CSR producers, including same-context writes and SRAM restores |
 | `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
+| `mt_ctxtsw_load_overlap_test` | Delayed source load and faulting byte-load-ahead preserve data and private registers across resident switching; timing requires its trace |
 | `mt_ctxtsw_gpr_ring_stress` | Six live GPR sentinels survive peer overwrites; all three peers record their logical IDs |
 | `mt_ctxtsw_pure_ring_stress_test` | Eight consecutive switches per context, followed by a lap verifying every peer completed |
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
@@ -46,8 +47,9 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
+| `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 
-These 15 programs retain distinct state, hazard, and redirect regressions.
+These 17 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
@@ -71,6 +73,41 @@ teardown prints `BSG PASS`. The known GPIO teardown assertion after guest PASS
 must be reported separately.
 
 ## Scope and interpretation
+
+The load-ahead experiments use ordinary `lbu x0` on valid cacheable data. This
+can warm a line without a destination register; it still performs translation,
+can fault, and must not be used on MMIO as a harmless hint. No new prefetch ISA
+instruction or additional outstanding-miss capacity is implemented.
+
+`mt_ctxtsw_load_overlap_test` verifies eight distinct cold lines for each of
+delayed `ld a5` and discarded `lbu x0`, after separate instruction-path warmups.
+Peer arithmetic uses the same architectural register as the delayed source
+load to check bank ownership. Its PASS verifies values, identities, and return;
+it does not by itself prove that the peer ran before a refill.
+
+Stream its closed FST through `tools/cache_overlap_vcd.py`. Use `nm -n` on the
+exact ELF to locate `input` and `overlap_peer_work`; measured delayed-load lines
+start at `input+64`, and load-ahead lines at `input+576`. `--address` identifies
+the first physical cache line, `--span-lines 8` selects the series,
+`--target-pc` identifies the useful peer instruction, and `--target-thread 1`
+selects its physical bank. `--require-overlap` requires architectural retirement
+strictly before the critical data beat; `--require-full-refill-overlap` checks
+retirement before full-line completion. Each gate requires at least one proven
+request, so inspect the per-request results to qualify a whole series.
+The analyzer samples stable values before BE rising edges and rejects missing
+or ambiguous required signals. Run its host controls with
+`python3 -B tools/test_cache_overlap_vcd.py`.
+
+`mt_load_ahead_benchmark` uses 16 separate initialized 64-byte lines per mode,
+one useful demand byte load and 64 dependent additions per line. Only ahead
+modes pay for the extra discarded load. Each mode has distinct, initially
+untouched data; warmups use a separate region. All four modes warm before any
+measurement, with a fixed measurement order. Peer setup, final checksum/count
+checks, fences, and console output are outside the global-counter intervals.
+Resident modes include two switches per line and peer loop bookkeeping.
+These are small scheduling measurements, not a random-access application or
+evidence of multiple concurrent misses. Retain exact ELF and board/simulator
+identities; do not compare their raw totals as identical-binary results.
 
 The 46-case register-target regression fails on RTL `1b9e611d4` and passes on
 `6c97bcc0a` with the same executable. Its scoped fix waits for same-bank GPR

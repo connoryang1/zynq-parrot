@@ -55,22 +55,60 @@ production-readiness gaps, including lifecycle, FP state, and isolation.
 
 ## Second gate: demonstrate actual memory overlap
 
-Trace a cold data request and prove that useful work in another resident context
-executes before the refill completes. Check emitted instructions and the active
-cache request path; a compiler prefetch builtin that becomes a no-op is not an
-experiment. The current Dcache permits some hit-under-miss activity but classifies
-load misses as blocking requests, and no software-prefetch instruction has been
-established for this endpoint. Nonresident handoffs drain outstanding memory
-activity, so measure resident and nonresident behavior separately.
+The September 8 load-ahead experiment establishes overlap with a pending full-line
+refill. `bp_load_ahead()` in `software/include/bp_load_ahead.h` emits an ordinary
+faulting `lbu x0` to valid cacheable data; it is not a nonfaulting prefetch hint.
+The active unicore Dcache enables hit-under-miss (`features_p=0x1f5`), retains one
+outstanding blocking miss, and can continue integer work and resident switching.
+Nonresident handoffs still drain outstanding memory activity.
 
-If this gate fails, define and qualify the required nonblocking request and
-completion mechanism before expecting a prefetch/yield benchmark to hide
-latency. It must handle request ownership, backpressure, traps, and refill
-completion correctly. Cheap register-state replacement alone is insufficient.
+In the controlled simulator test, each of eight cold lines per mode returns its
+critical data beat 11 BE cycles after request acceptance and completes the full
+refill at +53. Useful peer arithmetic retires at +17 for delayed `ld a5`, or +16
+for `lbu x0` followed by a resident switch. Both overlap outstanding full-line
+fills, but neither hides critical-word latency in this simulator configuration.
+The streaming analyzer distinguishes these boundaries; correctness PASS alone
+does not establish either timing claim.
+
+The matched 16-line benchmark gives the following raw totals, including loop and
+switch overhead. Each mode consumes identical values and performs 64 additions
+per line; ahead modes additionally execute the discarded load. Separate arrays
+provide cold first-touch data, and setup/checks/output are untimed.
+
+| Schedule | Simulator cycles | FPGA cycles |
+| --- | ---: | ---: |
+| Serial demand load then computation | 1,357 | 1,675 |
+| Same-context load-ahead then computation | 1,173 | 1,173 |
+| Resident computation then demand load | 1,561 | 1,882 |
+| Load-ahead, resident computation, demand load | 1,465 | 1,465 |
+
+On FPGA, resident load-ahead reduces cycles by 12.5% versus serial and 22.2%
+versus the resident control in this run. Same-context load-ahead is faster still.
+The simulator resident load-ahead case remains slower than serial. These are
+one small fixed-order first-touch series per platform, not statistical estimates
+or a hardware-context advantage over an optimized single-context schedule.
+The board and simulator use different startup ELFs, so cross-platform totals
+are not identical-binary regression comparisons. The accepted RTL is unchanged.
+Full-trace checks find exactly one cold miss for each of all 16 measured lines
+in every simulator mode. Same-context load-ahead retires useful arithmetic at
++5 cycles, before the critical beat, for all 16 requests; resident load-ahead
+does so at +17 (15 requests) or +21 (the first), after critical but before full
+completion. In the resident control, peer work during a pending fill belongs to
+the next loop iteration, not to a prefetch of its upcoming demand.
+Both new programs pass simulator and FPGA checks; exact sources, hashes, closed
+traces/transcripts, and timing analysis are retained in
+`logs/resident-cache-overlap-20260908/`.
+
+Multiple simultaneous cold misses remain unimplemented. Before expanding miss
+capacity or adding a nonfaulting prefetch instruction, qualify request ownership,
+backpressure, translation/fault handling, and refill completion. The current
+software helper must not be treated as a safe hint for arbitrary addresses.
 
 ## Matched application experiment
 
-Once overlap works, compare four modes in one controlled memory workload:
+Next, extend the small scheduling experiment to a controlled memory workload
+with repeated independent datasets, mode-order rotation, working-set and useful-work
+sweeps, then compare these application modes:
 
 1. Serial dependent loads with no prefetch.
 2. Single-worker batched prefetch/load.

@@ -62,7 +62,7 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 15 programs; its README explains each invariant.
+The maintained suite has 17 programs; its README explains each invariant.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`. The runner must see the selected test's
 completion marker before `CORE PASS`, plus host `BSG PASS`. The known post-PASS
@@ -108,6 +108,16 @@ Earlier history-split verification is retained in the dated artifact directories
 and Git history, rather than repeated here as current suite counts.
 
 ## FPGA acceptance identities
+
+The unchanged accepted RTL also passes the September 8 software load-ahead
+correctness test and four-schedule microbenchmark on FPGA. Their clean traced
+simulator runs and the resident smoke pass; the new analyzer has 19 passing host
+controls. The helper's final refactor produces byte-identical simulator and
+FPGA ELFs to those exercised. Full-refill overlap, critical-beat limits, exact
+raw cycle totals, and the single-series measurement scope are recorded in
+[research direction](PAPER_DIRECTION.md) and `logs/resident-cache-overlap-20260908/`.
+This adds a faulting software load-ahead helper, not a new ISA hint or multiple
+outstanding misses. Existing simulator GPIO teardown behavior is unchanged.
 
 The current resident-fix route is job `20260907T225642Z-873deeb7`, top
 `873deeb7c9aa6ec7165ee29d71d229699340d5e9` / RTL

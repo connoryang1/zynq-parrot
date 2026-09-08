@@ -39,12 +39,14 @@ regression described in the checkout guide before relying on retained CSR state.
 ## Cache overlap is a separate capability
 
 Integer backing RAM holds register state; it does not warm the instruction or
-data caches. The Dcache classifies load misses as blocking requests and supports
-some hit-under-miss activity. Nonresident context replacement drains outstanding
-memory activity before installing state. Consequently, a cheap handoff does not
-by itself prove that independent misses overlap or that a software prefetch
-instruction exists. Establish that behavior in traces before interpreting a
-prefetching workload; see [the experiment criteria](PAPER_DIRECTION.md).
+data caches. The active Dcache enables hit-under-miss while retaining one blocking
+miss; integer execution and resident handoffs can continue while it fills.
+`software/include/bp_load_ahead.h` uses an ordinary faulting byte load to x0 to
+warm valid cacheable data. Traces prove useful resident arithmetic before full
+refill completion, but after the critical data beat in the tested simulator.
+There is no new nonfaulting prefetch instruction or additional miss capacity.
+Nonresident replacement still drains outstanding memory activity before
+installing state. See [the measured controls and limits](PAPER_DIRECTION.md).
 
 ## Validation and measurement
 
