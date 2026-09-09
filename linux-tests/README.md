@@ -202,8 +202,9 @@ resident and nonresident samples are identical to the resident-fix results
 above, and ELF integrity, register/syscall checks, exit zero, usable shell,
 and clean poweroff pass. Exact new-image evidence is retained in
 `logs/nonblocking-prefetch-20260908/linux-shell/`; the checkout guide records
-its bitstream identity. This regression does not qualify the separate Linux
-request benchmark's unresolved second resident launch.
+its bitstream identity. That regression did not qualify the separate Linux
+request benchmark's second resident launch; its later qualification is recorded
+below.
 
 ## Independent random-request comparisons
 
@@ -343,16 +344,69 @@ The earlier discarded-load candidate completed its first resident mode but
 hung on its second resident mode. Changing the helper preserves the resident
 seeding and handoff protocol; it does not resolve or diagnose that failure.
 The retained `WARMUP_BEGIN` and `WARMUP_PASS` markers localize untimed failures.
-The real-hint executable also fails the second resident warmup on the accepted
-prefetch overlay with one request per worker. A same-PC known-zero/live reporter
+The real-hint executable also failed the second resident warmup on the previous
+`f7eedd955` prefetch overlay with one request per worker. A same-PC known-zero/live reporter
 verifies that the second NPC operand selects context 1 and the intended entry
 `0x11cb8`; it does not establish the subsequent failing instruction. Separate
-bare-metal regressions exposed adjacent NPC-seed ordering and remote-register
-write-port conflicts. Their fixes require FPGA qualification and a rerun of the
-unchanged Linux executable before either can explain this failure. Evidence is
-retained under `logs/linux-request-lifecycle-20260908/`. Cross compilation, host
-checks, and bare-metal prefetch tests do not establish that this complete Linux
-comparison passes or improves performance.
+bare-metal regressions exposed adjacent NPC-seed ordering, remote-register
+write-port conflicts, and stale interrupt return PCs after resident reseeding.
+RTL `f6e004283`, routed from top `dc6d0e89`, passes all nine physical FPGA gates.
+On this exact image, the unchanged Linux ELF now passes the original one-request
+case and all four modes in a seven-sample run with 4,096 requests per worker.
+Both runs verify checksums, exit zero, a subsequent shell command, and clean
+`CORE[0] PASS` poweroff. The combined corrections resolve the observed hang;
+these tests do not isolate which fix was necessary in the original Linux run.
+Evidence is retained under `logs/linux-request-lifecycle-20260908/` in
+`linux-one-request/` and `linux-matched2/`. Exact source, ELF, libraries, runner,
+bitstream identities, raw samples, and closed verdicts are retained there.
+
+The two-worker Linux run uses a 2 MiB data allocation, 8,192 completed requests
+per mode/sample, and seven measured samples with rotating mode order:
+
+| Mode | Median physical cycles | Median nanoseconds |
+| --- | ---: | ---: |
+| Linux threads, demand-only | 681,398 | 4,271,300 |
+| Single-thread batch2 prefetch/load | 838,352 | 5,247,300 |
+| Resident demand/handoff | 613,012 | 3,844,700 |
+| Resident prefetch/yield/load | 629,204 | 3,945,500 |
+
+Adding prefetches costs 2.64% more cycles than the matched resident demand
+schedule in this run. Its lower elapsed time than pthreads does not establish
+a prefetch benefit: the demand-only resident schedule is faster still. The
+separate 64-load bare-metal benchmark's improvement is not a Linux workload
+result. Admission, translation misses, and actual memory overlap in this Linux
+workload have not yet been measured.
+
+The ten-worker reference also passes on the same image and unchanged ELF:
+
+```sh
+/tmp/request_benchmark_dynamic --workers 10 --requests 4096 --samples 7 --data-kib 2048
+```
+
+This completes 40,960 requests per mode/sample, with matching checksum
+670,731,338. Seven-sample medians are:
+
+| Mode | Median physical cycles | Median nanoseconds |
+| --- | ---: | ---: |
+| Ten Linux threads, demand-only | 3,270,749 | 20,456,100 |
+| Single-thread batch10 prefetch/load | 6,111,512 | 38,210,200 |
+
+The batch10 schedule takes 86.85% more cycles in this workload. This is a
+comparison of complete schedules, not an isolated measurement of prefetch cost.
+All 14 timing rows, both warmups, checksums, exit zero, subsequent `uname -m`,
+and clean poweroff pass; artifacts are in
+`logs/linux-request-lifecycle-20260908/linux-reference10/`.
+
+No ten-resident-context result is claimed. The current FPGA image has only
+two resident slots and four logical contexts; `--hardware --workers 10` is
+rejected. A ten-resident experiment needs a generalized worker ring, a new
+configuration, and simulation/FPGA qualification. The existing seed encoding
+accommodates IDs 0 through 9, but ten-slot operation and FPGA fit are unverified.
+The two-slot image already uses 96.84% of LUTs. Increasing only logical contexts
+would exercise replacement, which currently drains pending hints before the
+handoff. Increasing resident workers alone also leaves the two UCE prefetch
+slots and two L2 banks unchanged; issuing ten hints does not establish ten
+concurrent memory requests.
 
 The defaults are two workers, 4,096 requests per worker, a 2 MiB data working
 set, and five measured samples. Use `--help` for validated bounds and an explicit

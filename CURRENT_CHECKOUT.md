@@ -20,10 +20,26 @@ inactive resident context. The same pending-interrupt binary fails on `d18f16849
 with the old parked PC and passes with this correction, preserving private state.
 Six final traced full-system gates pass; the earlier two ordering fixes also pass
 nine gates. All three raw prefetch benchmark samples remain unchanged.
-These changes still require routed FPGA and Linux qualification. The accepted
-image remains `f7eedd955`, and the original Linux request-pool comparison remains
-blocked on its second resident launch; the directed interrupt test does not by
-itself identify Linux's trap path.
+This candidate has completed routed implementation and all nine physical FPGA
+gates. The unchanged Linux request executable now passes its original one-request
+case and the seven-sample, two-worker comparison, including all four modes,
+checksums, exit zero, a usable shell, and clean poweroff. The combined corrections
+resolve the observed hang; the directed tests do not isolate which correction
+was necessary in Linux. The previous shell resident/nonresident compatibility
+gate remains to be rerun before integrating this candidate into `master`.
+
+Candidate route `20260909T015657Z-dc6d0e89` uses 51,518/53,200 LUTs (96.84%),
+22,671 registers, 81 BRAM tiles, and 11 DSPs. WNS is +1.619 ns, TNS 0, WHS
++0.024 ns, and THS 0; all 79,534 routable nets are routed, with zero routing
+or bitstream DRC errors. The inherited 42 no-clock pins and 50 unconstrained
+internal endpoints remain; this is not complete timing-constraint coverage.
+The verified bitstream SHA-256 is
+`b82832901d6a4e45e2e245be3f669aa2b32d3e7db6b8eaa257394b0f1cd35673`.
+Evidence is retained under `logs/linux-request-lifecycle-20260908/` in `route/`,
+`board-qualified/`, `linux-one-request/`, `linux-matched2/`, and
+`linux-reference10/`; see the
+[Linux guide](linux-tests/README.md#independent-random-request-comparisons)
+for the application measurements and their limits.
 
 ## Scope and readiness
 
@@ -99,8 +115,9 @@ smoke run that passed.
 U-mode Sv39 hints, the matched worker benchmark, computed targets, and
 translated nonresident data handoff. Three measured board samples give median
 2398 resident-prefetch cycles versus 3164 matched-control cycles (24.2% fewer).
-This is a 64-load bare-metal workload; the Linux request-pool comparison is
-still unqualified.
+This is a 64-load bare-metal workload; that checkpoint did not qualify the
+Linux request-pool comparison. The later lifecycle candidate's Linux results
+are linked above.
 
 The unchanged Linux shell NBF and benchmark ELF identified below also pass on
 this exact prefetch image. Guest ELF SHA, both resident/nonresident correctness
@@ -109,12 +126,12 @@ runner exit zero are retained in `logs/nonblocking-prefetch-20260908/linux-shell
 The seven 256-switch samples match the previous image exactly: resident
 `1311 1307 1307 1307 1307 1307 1307`, nonresident
 `2857 2853 2853 2853 2853 2853 2853`. Median spacing remains 5.10546875 and
-11.14453125 cycles/switch. The guest is powered off; the new overlay remains loaded.
+11.14453125 cycles/switch. That run ended with the guest powered off.
 
-The unfinished Linux request benchmark remains at commit `a6b2349d` on
-`feat/nonblocking-prefetch`, excluded from this integration because its second
-resident launch still hangs. The shell regression does not qualify that
-application's argument-reseeding lifecycle.
+The Linux request benchmark at commit `a6b2349d` on `feat/nonblocking-prefetch`
+was excluded from that integration because its second resident launch hung.
+The shell regression did not qualify that application's argument-reseeding
+lifecycle; the current candidate's successful rerun is recorded above.
 Reproduce the new gates using [the testing guide](testing/README.md#full-simulator-and-waveform-evidence).
 
 ## Verification
@@ -128,7 +145,7 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 21 programs; its README explains each invariant.
+The maintained suite has 24 programs; its README explains each invariant.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`. The runner must see the selected test's
 completion marker before `CORE PASS`, plus host `BSG PASS`. The known post-PASS

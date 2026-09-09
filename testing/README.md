@@ -227,8 +227,11 @@ env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' \
 Run the two hint-correctness programs through the same configuration by
 substituting their `run-<test>` targets. Keep guests serialized and archive the
 exact ELF, model configuration, unfiltered log, and closed trace for each run.
-The optional two-bank configuration still requires FPGA implementation and
-Linux validation before deployment or application performance claims.
+The corresponding static two-bank FPGA configuration has routed and passed
+physical FPGA gates. The Linux request comparison also completes on the latest
+lifecycle candidate; see [the checkout guide](../CURRENT_CHECKOUT.md) for exact
+identities and [the Linux guide](../linux-tests/README.md#independent-random-request-comparisons)
+for measured results. A passing program alone does not establish prefetch benefit.
 
 For a closed full-simulator waveform:
 
