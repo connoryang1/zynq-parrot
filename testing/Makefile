@@ -40,6 +40,7 @@ CORRECTNESS_TESTS := \
     mt_resident_reseed_irq_test \
     mt_umode_prefetch_test \
     mt_prefetch_hint_test \
+    mt_prefetch_queue_depth_test \
     mt_umode_resident_sv39_data_handoff_test \
     mt_ctxtsw_register_target_test \
     mt_abi_preservation_test \
@@ -98,6 +99,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-te
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_interleave_benchmark.riscv: $(TOP)/testing/mt_request_interleave_benchmark.c $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
 
 .PHONY: check-nonresident-config

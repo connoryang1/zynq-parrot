@@ -47,6 +47,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_pure_ring_stress_test` | Eight consecutive switches per context, followed by a lap verifying every peer completed |
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
 | `mt_prefetch_hint_test` | Nonfaulting invalid hints, signed offsets, ordinary ORI behavior, all word offsets, and dirty-line/store data preservation |
+| `mt_prefetch_queue_depth_test` | Two batches of ten hints followed by ten demand loads, with distinct cold lines and verified sums |
 | `mt_umode_prefetch_test` | Sv39 readable and denied mappings, expected demand fault, nonfaulting hints, and permitted demand data without context switching |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
@@ -56,7 +57,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
 | `mt_prefetch_interleave_benchmark` | The same independent request streams and controls using nonblocking `prefetch.r` hints instead of discarded byte loads |
 
-These 24 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
+These 25 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
@@ -173,8 +174,9 @@ a page-table walk. Invalid, denied, missing-translation, L1-hit, and busy-path
 hints are dropped without an architectural exception. There is no guarantee
 that any individual hint reaches memory.
 
-Two UCE slots track accepted hints through their replies. Same-line hints
-coalesce; a full pair of slots causes additional hints to be dropped. Each
+The UCE queue depth is configurable. The normal default remains two entries;
+`e_bp_unicore_zynqparrot_prefetch_cfg` and `BP_ZYNQ_PREFETCH_TWO_BANKS` use ten.
+Same-line hints coalesce, and a full queue causes additional hints to be dropped. Each
 request is an aligned eight-byte L2 read whose flagged response is discarded.
 The L2 bank fills its normal 64-byte line, and a later demand uses the ordinary
 L1 refill path. A same-line demand waits for the pending hint; unrelated
@@ -182,7 +184,10 @@ demands can proceed. Accepted hints survive context switches and are included
 in credit-drain checks.
 
 `mt_prefetch_hint_test` checks functional hint behavior and subsequent demand
-values. `mt_umode_prefetch_test` primes a readable 4 KiB Sv39 mapping, confirms
+values. `mt_prefetch_queue_depth_test` issues ten hints before any of its ten
+loads and checks two disjoint arrays; waveform analysis is required to prove
+that all ten hints were retained and overlapped. `mt_umode_prefetch_test` primes
+a readable 4 KiB Sv39 mapping, confirms
 an execute-only mapping raises the expected demand-load page fault, then
 checks that hints to denied, unmapped, noncanonical, and mapped MMIO addresses
 do not trap. It also hints and reads a separate line on the readable page.
@@ -224,7 +229,7 @@ env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' \
   TARGET_RUNTIME_MS=120000
 ```
 
-Run the two hint-correctness programs through the same configuration by
+Run the three hint-correctness programs through the same configuration by
 substituting their `run-<test>` targets. Keep guests serialized and archive the
 exact ELF, model configuration, unfiltered log, and closed trace for each run.
 The corresponding static two-bank FPGA configuration has routed and passed
@@ -238,7 +243,8 @@ For a closed full-simulator waveform:
 ```sh
 fst2vcd path/to/dump.fst | python3 -B tools/prefetch_overlap_vcd.py \
   --uce-prefix dcache_uce --axi-prefix axi_mem --fill-bytes 8 \
-  --require-uce-overlap --require-axi-overlap
+  --prefetch-slots 10 --require-uce-overlap --require-axi-overlap \
+  --require-reserved-slots 10
 python3 -B tools/test_prefetch_overlap_vcd.py
 ```
 
@@ -265,9 +271,9 @@ python3 testing/rtl/run_uce_prefetch.py \
   --out logs/nonblocking-prefetch-20260908/uce-unit
 ```
 
-It checks two pending hints, capacity refusal, same-line merging, out-of-order
-responses, slot reuse, unrelated and same-line demands, response backpressure,
-and credit drain. A separate malformed-response case must trigger the expected
+It checks ten pending hints, capacity refusal, same-line merging, out-of-order
+responses, wrapped three-bit wire tags, slot reuse, unrelated and same-line
+demands, response backpressure, and credit drain. A separate malformed-response case must trigger the expected
 assertion. The runner uses an explicit-cycle C++ driver and records source and
 artifact identities in its verification manifest.
 

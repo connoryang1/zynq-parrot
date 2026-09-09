@@ -88,13 +88,16 @@ def trace(samples, axi=False, missing=None, duplicate=None, edge_updates=None):
 
 class PrefetchTests(unittest.TestCase):
     def analyze(self, samples=None, axi=False, **kwargs):
+        prefetch_slots = kwargs.pop('prefetch_slots', 2)
         return analyzer.analyze(io.StringIO(trace(case(axi) if samples is None else samples,
                                                   axi=axi, **kwargs)),
-                                axi_prefix='axi_mem' if axi else None)
+                                axi_prefix='axi_mem' if axi else None,
+                                prefetch_slots=prefetch_slots)
 
     def test_slots_duplicate_hint_and_normal_fill_are_distinct(self):
         report = self.analyze()
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 2)
+        self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 2)
         self.assertTrue(report['prefetch_summary']['issue_before_prior_first_response'])
         self.assertEqual(report['prefetch_summary']['before_first_response_pairs'], [[0, 1]])
         self.assertEqual(len(report['accepted_hints']), 3)
@@ -145,6 +148,19 @@ class PrefetchTests(unittest.TestCase):
         with self.assertRaisesRegex(analyzer.EvidenceError, 'slot allocation'):
             self.analyze(samples)
 
+    def test_ten_slots_use_address_and_echoed_wire_tag_for_responses(self):
+        samples = [idle() for _ in range(32)]
+        for slot in range(10):
+            address = 0x80010000 + slot * 64
+            samples[slot].update(allocate(slot, address))
+            samples[slot + 1].update(issue(slot, address), fwd_slot=slot & 7)
+            samples[slot + 20].update(response(slot & 7, address))
+        report = self.analyze(samples, prefetch_slots=10)
+        self.assertEqual(report['configured_prefetch_slots'], 10)
+        self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 10)
+        self.assertEqual(report['prefetch_summary']['max_outstanding'], 10)
+        self.assertEqual([record['slot'] for record in report['prefetches']], list(range(10)))
+
     def test_duplicate_line_without_merge_rejected(self):
         samples = case()
         samples[2].update(allocate(1, 0x80008008))
@@ -159,7 +175,7 @@ class PrefetchTests(unittest.TestCase):
 
     def test_unmatched_and_wrong_identity_responses_rejected(self):
         for field, value, message in (('rev_slot', 2, 'unmatched'),
-                                       ('rev_address', 0x80008008, 'address/size'),
+                                       ('rev_address', 0x80008008, 'unmatched'),
                                        ('rev_size', 6, 'address/size'),
                                        ('rev_last', 0, 'boundary'),
                                        ('rev_prefetch', 0, 'unmatched normal')):
@@ -240,6 +256,7 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(len(result['axi_correlated_reads']), 2)
         self.assertEqual(result['axi_correlated_reads'][0]['matching_prefetch_ids'], [0])
         self.assertTrue(result['axi_summary']['issue_before_prior_first_response'])
+        self.assertEqual(result['prefetch_summary']['max_reserved_slots'], 2)
         result = analyzer.region_summary(report, 0x80008000, 64, 0x80000000)
         self.assertEqual(result['axi_summary']['transactions'], 1)
         self.assertFalse(result['axi_summary']['issue_before_prior_completion'])
@@ -255,6 +272,7 @@ class PrefetchTests(unittest.TestCase):
     def test_cli_separate_overlap_gates_and_invalid_evidence(self):
         command = [sys.executable, str(Path(analyzer.__file__))]
         for content, flags, expected in ((trace(case()), ['--require-uce-overlap'], 0),
+                                          (trace(case()), ['--require-reserved-slots', '3'], 1),
                                           (trace(case()), ['--require-axi-overlap'], 1),
                                           (trace(case(True), axi=True), ['--axi-prefix', 'axi_mem', '--require-axi-overlap'], 0),
                                           (trace(case()[:4]), [], 2)):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate two-slot UCE prefetch transactions in streaming fst2vcd output.
+"""Validate configurable-depth UCE prefetch transactions in fst2vcd output.
 
 UCE admission, forward-pump issue, and consumed responses are separate events.
 Optional AXI evidence tracks accepted AR transactions through ordered R bursts
@@ -129,11 +129,14 @@ def overlap_summary(records):
 
 
 class Transactions:
-    def __init__(self, line_bytes=64, fill_bytes=8, axi=False):
+    def __init__(self, line_bytes=64, fill_bytes=8, axi=False, prefetch_slots=2):
         for name, value in (('line-bytes', line_bytes), ('fill-bytes', fill_bytes)):
             if value <= 0 or value & (value - 1):
                 raise EvidenceError(name + ' must be a positive power of two')
+        if prefetch_slots <= 0:
+            raise EvidenceError('prefetch-slots must be positive')
         self.line_bytes, self.fill_bytes, self.axi = line_bytes, fill_bytes, axi
+        self.prefetch_slots = prefetch_slots
         self.slots, self.normal_pending, self.axi_pending = {}, [], deque()
         self.prefetches, self.normal_reads, self.hints, self.demands, self.axi_reads = [], [], [], [], []
         self.axi_id = None
@@ -166,7 +169,7 @@ class Transactions:
                 if not v['allocate'] or matching:
                     raise EvidenceError('new hint did not allocate a unique line')
                 slot = known(v, 'allocate_slot')
-                if slot not in (0, 1) or slot in self.slots:
+                if not 0 <= slot < self.prefetch_slots or slot in self.slots:
                     raise EvidenceError('duplicate or invalid prefetch slot allocation')
                 record = dict(id=len(self.prefetches), slot=slot, address=address & ~7,
                               accept=event, issue=None, first_response=None, complete=None)
@@ -186,20 +189,22 @@ class Transactions:
             if msg_type in (0, 2):
                 if not bit(v, 'fwd_new') or not bit(v, 'fwd_last'):
                     raise EvidenceError('unsupported multibeat forward read/AMO')
-                address, size, slot = (known(v, 'fwd_' + key) for key in ('address', 'size', 'slot'))
+                address, size, wire_tag = (known(v, 'fwd_' + key) for key in ('address', 'size', 'slot'))
                 if size > 6:
                     raise EvidenceError('unsupported BedRock read size')
                 if prefetch:
+                    slot = known(v, 'issue_slot')
                     record = self.slots.get(slot)
                     if (record is None or record['issue'] is not None
                             or record['accept']['timestamp'] >= timestamp):
                         raise EvidenceError('prefetch issue has no earlier unissued slot allocation')
                     if size != 3 or address != record['address']:
                         raise EvidenceError('prefetch issue address/size mismatch')
-                    if not v['issue'] or known(v, 'issue_slot') != slot:
+                    if not v['issue']:
                         raise EvidenceError('prefetch issue pulse/slot mismatch')
                     record['_prior'] = [other for other in self.slots.values()
                                         if other['issue'] is not None]
+                    record['wire_tag'] = wire_tag
                     record['issue'] = event
                     issued_prefetch = True
                 else:
@@ -208,7 +213,7 @@ class Transactions:
                     if any(other['address'] // self.line_bytes == address // self.line_bytes
                            for other in self.slots.values()):
                         raise EvidenceError('normal read issued before same-line prefetch completion')
-                    record = dict(id=len(self.normal_reads), address=address, slot=slot,
+                    record = dict(id=len(self.normal_reads), address=address, slot=wire_tag,
                                   msg_type=msg_type, size=size, issue=event,
                                   first_response=None, complete=None, beats=0)
                     self.normal_reads.append(record)
@@ -223,22 +228,26 @@ class Transactions:
             if prefetch and msg_type != 0:
                 raise EvidenceError('prefetch response is not mem_rd')
             if msg_type in (0, 2):
-                address, size, slot = (known(v, 'rev_' + key) for key in ('address', 'size', 'slot'))
+                address, size, wire_tag = (known(v, 'rev_' + key) for key in ('address', 'size', 'slot'))
                 first, last = bit(v, 'rev_new'), bit(v, 'rev_last')
                 if prefetch:
-                    record = self.slots.get(slot)
-                    if record is None or record['issue'] is None:
+                    matching = [record for record in self.slots.values()
+                                if record['issue'] is not None
+                                and record['address'] == address
+                                and record['wire_tag'] == wire_tag]
+                    if len(matching) != 1:
                         raise EvidenceError('unmatched prefetch response')
+                    record = matching[0]
                     if address != record['address'] or size != 3 or not first or not last:
                         raise EvidenceError('prefetch response address/size/boundary mismatch')
                     record['first_response'] = record['complete'] = event
-                    del self.slots[slot]
+                    del self.slots[record['slot']]
                     consumed_prefetch = True
                 else:
                     if not self.normal_pending:
                         raise EvidenceError('unmatched normal read response')
                     record = self.normal_pending[0]
-                    if (address, size, slot, msg_type) != tuple(record[key] for key in ('address', 'size', 'slot', 'msg_type')):
+                    if (address, size, wire_tag, msg_type) != tuple(record[key] for key in ('address', 'size', 'slot', 'msg_type')):
                         raise EvidenceError('normal read response identity mismatch')
                     expected = max(1, (1 << size) // self.fill_bytes)
                     if first != (record['beats'] == 0) or last != (record['beats'] + 1 == expected):
@@ -297,6 +306,7 @@ class Transactions:
         if not self.prefetches:
             raise EvidenceError('no allocated prefetch transactions')
         uce = overlap_summary(self.prefetches)
+        uce['max_reserved_slots'] = max_reserved_slots(self.prefetches)
         axi = overlap_summary(self.axi_reads) if self.axi else None
         return dict(verdict='valid_transactions', prefetch_summary=uce, axi_summary=axi,
                     prefetches=self.prefetches, accepted_hints=self.hints,
@@ -306,9 +316,10 @@ class Transactions:
                     axi_prefetch_attribution='not inferred; AXI also carries other cache traffic')
 
 
-def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fill_bytes=8):
+def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fill_bytes=8,
+            prefetch_slots=2):
     selected, timescale = read_header(stream, signal_names(uce_prefix, axi_prefix))
-    tracker = Transactions(line_bytes, fill_bytes, axi_prefix is not None)
+    tracker = Transactions(line_bytes, fill_bytes, axi_prefix is not None, prefetch_slots)
     clocks = ('clock', 'axi_clock') if axi_prefix is not None else ('clock',)
     for _, timestamp, values in rising_edges(stream, selected, clocks):
         for clock in values.get('_rising_clocks', ['clock']):
@@ -326,11 +337,24 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
             raise EvidenceError('no observed rising edges for ' + clock)
     report = tracker.finish()
     report.update(timescale=timescale, line_bytes=line_bytes, fill_bytes=fill_bytes,
+                  configured_prefetch_slots=prefetch_slots,
                   signals={key: value[1] for key, value in selected.items()},
                   cycles=tracker.cycles,
                   sampling='stable values before each domain rising edge; independent cycle counters',
                   uce_issue_boundary='accepted UCE forward-pump read, not AXI acceptance')
     return report
+
+
+def max_reserved_slots(records):
+    """Return peak accepted/issued-but-incomplete transactions in *records*."""
+    events = [((record.get('accept') or record['issue'])['timestamp'], 1)
+              for record in records]
+    events += [(record['complete']['timestamp'], -1) for record in records]
+    reserved = maximum = 0
+    for _, delta in sorted(events):
+        reserved += delta
+        maximum = max(maximum, reserved)
+    return maximum
 
 
 def region_summary(report, address, span_bytes, axi_address_xor=0):
@@ -359,7 +383,9 @@ def region_summary(report, address, span_bytes, axi_address_xor=0):
             record['_prior'] = list(pending)
             copies.append(record)
             pending.append(record)
-        return overlap_summary(copies)
+        summary = overlap_summary(copies)
+        summary['max_reserved_slots'] = max_reserved_slots(records)
+        return summary
 
     prefetches = [record for record in report['prefetches'] if in_region(record['address'])]
     if not prefetches:
@@ -393,17 +419,21 @@ def main():
     parser.add_argument('--axi-prefix', help='optional AXI memory module prefix, typically axi_mem')
     parser.add_argument('--line-bytes', type=int, default=64)
     parser.add_argument('--fill-bytes', type=int, default=8)
+    parser.add_argument('--prefetch-slots', type=int, default=2)
     parser.add_argument('--address', type=lambda value: int(value, 0), help='optional physical data-region start')
     parser.add_argument('--span-bytes', type=lambda value: int(value, 0))
     parser.add_argument('--axi-address-xor', type=lambda value: int(value, 0), default=0,
                         help='map AXI addresses to physical addresses for region correlation')
     parser.add_argument('--require-uce-overlap', action='store_true')
     parser.add_argument('--require-axi-overlap', action='store_true')
+    parser.add_argument('--require-reserved-slots', type=int, default=0,
+                        help='fail unless at least this many UCE slots coexist')
     args = parser.parse_args()
     try:
         if (args.address is None) != (args.span_bytes is None):
             raise EvidenceError('address and span-bytes must be supplied together')
-        report = analyze(sys.stdin, args.uce_prefix, args.axi_prefix, args.line_bytes, args.fill_bytes)
+        report = analyze(sys.stdin, args.uce_prefix, args.axi_prefix, args.line_bytes,
+                         args.fill_bytes, args.prefetch_slots)
         if args.address is not None:
             report['region'] = region_summary(report, args.address, args.span_bytes, args.axi_address_xor)
     except (EvidenceError, ValueError) as error:
@@ -412,7 +442,8 @@ def main():
     print(json.dumps(report, indent=2))
     gate = report.get('region', report)
     return int((args.require_uce_overlap and not gate['prefetch_summary']['issue_before_prior_first_response'])
-               or (args.require_axi_overlap and not (gate['axi_summary'] and gate['axi_summary']['issue_before_prior_first_response'])))
+               or (args.require_axi_overlap and not (gate['axi_summary'] and gate['axi_summary']['issue_before_prior_first_response']))
+               or gate['prefetch_summary']['max_reserved_slots'] < args.require_reserved_slots)
 
 
 if __name__ == '__main__':

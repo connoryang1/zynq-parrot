@@ -42,6 +42,7 @@ package bp_common_pkg;
       // before this can overlap cold fills. Requires full-top and routed gates.
       ,l2_banks     : 2
       ,l2_sets      : bp_default_cfg_p.l2_sets / 2
+      ,dcache_prefetch_els: 10
 `else
       ,l2_banks     : 1
 `endif
@@ -112,6 +113,7 @@ package bp_common_pkg;
   // reproduce the two-bank, same-capacity prefetch experiment on the FPGA.
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch_cfg_override_p =
     '{l2_banks: 2
+      ,dcache_prefetch_els: 10
       // Branch metadata includes the resident thread ID. The default has four
       // slots; this two-slot endpoint needs one fewer bit (50 rather than 51).
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width

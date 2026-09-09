@@ -42,7 +42,7 @@ class Test {
       Header h{dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o,
                dut.fwd_addr_o, bool(dut.fwd_prefetch_o)};
       require(h.type == memory_read, "unexpected forward message type");
-      require(!h.prefetch || (h.size == 3 && !(h.addr & 7) && h.way < 2),
+      require(!h.prefetch || (h.size == 3 && !(h.addr & 7) && h.way < 8),
               "hint word-size/alignment/slot encoding invalid");
       sent.push_back(h);
     }
@@ -137,43 +137,48 @@ public:
     cycles(4); dut.reset_i = 0; cycles(9);
     require(!dut.req_lock_o, "UCE initialization did not complete");
     checking = true;
-    request(hint, 0x80010003);
-    request(hint, 0x8001100f);
+    for (unsigned i = 0; i < 10; ++i)
+      request(hint, 0x80010003 + uint64_t(i)*0x1000);
     require(!dut.credits_empty_o, "queued/unsent hints invisible to fences");
-    request(hint, 0x80012000, false);
-    request(hint, 0x80010018);
+    request(hint, 0x8001a000, false);
+    request(hint, 0x80010018); // Duplicate line merges even when the queue is full.
     require(sent.empty(), "forward backpressure was ignored");
-    dut.fwd_ready_i = 1; wait_sent(2);
-    require(sent[0].prefetch && sent[1].prefetch && sent[0].way != sent[1].way
-            && sent[0].addr == 0x80010000 && sent[1].addr == 0x80011008,
-            "two hints did not retain distinct slots/correct addresses");
+    dut.fwd_ready_i = 1; wait_sent(10);
+    for (unsigned i = 0; i < 10; ++i)
+      require(sent[i].prefetch && sent[i].way == i % 8
+              && sent[i].addr == ((0x80010003 + uint64_t(i)*0x1000) & ~UINT64_C(7)),
+              "ten hints did not retain their queue order, wrapped tags, or addresses");
     if (malformed) {
-      Header bad = sent[0];
+      Header bad = sent[9];
       bad.addr ^= 8; // Same slot and cache line, but not the requested word.
       response(bad); cycles(8);
       throw std::runtime_error("malformed hint response was not rejected by RTL assertion");
     }
-    response(sent[1]); cycles(5);
+    // Slots 8 and 9 deliberately reuse wire tags 0 and 1. Exact address plus
+    // the echoed low tag must still identify each internal queue entry.
+    response(sent[9]); cycles(5);
     require(!dut.credits_empty_o, "one response drained two hints");
-    request(hint, 0x80012000); wait_sent(3);
-    require(sent[2].way == sent[1].way, "returned hint slot was not reusable");
-    response(sent[0]); response(sent[2]); wait_empty();
+    request(hint, 0x8001a000); wait_sent(11);
+    require(sent[10].way == sent[9].way, "returned wrapped-tag slot was not reusable");
+    response(sent[8]);
+    for (unsigned i = 0; i < 8; ++i) response(sent[i]);
+    response(sent[10]); wait_empty();
     require(writes == 0 && completions == 0, "hint-only sequence changed L1");
 
-    request(hint, 0x80020000); request(hint, 0x80021000); wait_sent(5);
+    request(hint, 0x80020000); request(hint, 0x80021000); wait_sent(13);
     demand_active = true; fills = 0;
     unsigned old_writes = writes, old_completions = completions;
-    request(demand, 0x80022000); wait_sent(6);
-    require(!sent[5].prefetch && sent[5].size == 6, "normal demand became a hint");
+    request(demand, 0x80022000); wait_sent(14);
+    require(!sent[13].prefetch && sent[13].size == 6, "normal demand became a hint");
     dut.arrays_accept_i = 0;
     release_arrays_at = steps + 12;
     writes_at_stall = writes; completions_at_stall = completions;
-    response(sent[5]); normal_done(old_writes, old_completions);
+    response(sent[13]); normal_done(old_writes, old_completions);
     require(reverse_stalls > 0, "test did not exercise reverse-channel backpressure");
     require(!dut.credits_empty_o, "normal demand lost pending hint credits");
-    response(sent[4]); response(sent[3]); wait_empty();
+    response(sent[12]); response(sent[11]); wait_empty();
 
-    request(hint, 0x80030008); wait_sent(7);
+    request(hint, 0x80030008); wait_sent(15);
     demand_active = true; fills = 0;
     old_writes = writes; old_completions = completions;
     // The implementation may queue a matching demand or defer its acceptance.
@@ -186,21 +191,21 @@ public:
         accepted = true; dut.req_v_i = 0;
         dut.metadata_way_i = 3; dut.metadata_v_i = 1;
       }
-      require(sent.size() == 7 && !dut.credits_empty_o,
+      require(sent.size() == 15 && !dut.credits_empty_o,
               "matching demand passed its pending hint");
     }
     dut.metadata_v_i = 0;
     if (!accepted) dut.req_v_i = 0;
-    response(sent[6]);
+    response(sent[14]);
     if (!accepted) request(demand, 0x80030000);
-    wait_sent(8);
-    require(!sent[7].prefetch && sent[7].addr == 0x80030000,
+    wait_sent(16);
+    require(!sent[15].prefetch && sent[15].addr == 0x80030000,
             "matching demand lost its normal memory transaction");
-    response(sent[7]); normal_done(old_writes, old_completions); wait_empty();
+    response(sent[15]); normal_done(old_writes, old_completions); wait_empty();
     cycles(8);
-    require(sent.size() == 8 && writes == 8 && completions == 2,
+    require(sent.size() == 16 && writes == 8 && completions == 2,
             "final request/response accounting mismatch");
-    std::cout << "[UCE-PREFETCH] PASS: two slots, drops, merging, reordered replies, "
+    std::cout << "[UCE-PREFETCH] PASS: ten slots, wrapped tags, drops, merging, reordered replies, "
                  "demand routing, stalls, credits\n";
   }
 };
