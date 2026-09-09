@@ -273,6 +273,8 @@ class PrefetchTests(unittest.TestCase):
         command = [sys.executable, str(Path(analyzer.__file__))]
         for content, flags, expected in ((trace(case()), ['--require-uce-overlap'], 0),
                                           (trace(case()), ['--require-reserved-slots', '3'], 1),
+                                          (trace(case()), ['--address', '0x80008000', '--span-bytes', '128',
+                                                           '--require-reserved-slots', '2'], 0),
                                           (trace(case()), ['--require-axi-overlap'], 1),
                                           (trace(case(True), axi=True), ['--axi-prefix', 'axi_mem', '--require-axi-overlap'], 0),
                                           (trace(case()[:4]), [], 2)):
