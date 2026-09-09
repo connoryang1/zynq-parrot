@@ -21,17 +21,24 @@ UCE_SIGNALS = {
     'request_v': 'cache_req_v_i', 'request_yumi': 'cache_req_yumi_o',
     'request_address': 'cache_req_cast_i.addr', 'request_type': 'cache_req_cast_i.msg_type',
     'allocate': 'prefetch_allocate', 'allocate_slot': 'prefetch_free_slot',
-    'duplicate': 'prefetch_duplicate', 'issue': 'prefetch_issue',
+    'issue': 'prefetch_issue',
     'issue_slot': 'prefetch_issue_slot', 'response': 'prefetch_response',
     'fwd_v': 'fsm_fwd_v_lo', 'fwd_ready': 'fsm_fwd_ready_then_li',
     'fwd_new': 'fsm_fwd_new_lo', 'fwd_last': 'fsm_fwd_last_lo',
     'rev_v': 'fsm_rev_v_li', 'rev_yumi': 'fsm_rev_yumi_lo',
     'rev_new': 'fsm_rev_new_li', 'rev_last': 'fsm_rev_last_li',
 }
+OPTIONAL_UCE_SIGNALS = {
+    # Older traces expose same-line merging. Current RTL acknowledges and drops
+    # hints only when all configured slots are reserved.
+    'duplicate': 'prefetch_duplicate',
+    'drop': 'prefetch_drop',
+}
 for _side, _header in (('fwd', 'fsm_fwd_header_lo'), ('rev', 'fsm_rev_header_li')):
     # Verilator traces the BedRock message-type union through its members.
     for _label, _field in (('address', 'addr'), ('type', 'msg_type.' + _side), ('size', 'size'),
-                           ('prefetch', 'payload.prefetch'), ('slot', 'payload.way_id')):
+                           ('prefetch', 'payload.prefetch'), ('slot', 'payload.way_id'),
+                           ('state', 'payload.state')):
         UCE_SIGNALS[_side + '_' + _label] = _header + '.' + _field
 
 AXI_SIGNALS = {
@@ -45,12 +52,14 @@ AXI_SIGNALS = {
 
 def signal_names(uce_prefix='dcache_uce', axi_prefix=None):
     names = {key: uce_prefix.rstrip('.') + '.' + suffix for key, suffix in UCE_SIGNALS.items()}
+    names.update({key: uce_prefix.rstrip('.') + '.' + suffix
+                  for key, suffix in OPTIONAL_UCE_SIGNALS.items()})
     if axi_prefix is not None:
         names.update({key: axi_prefix.rstrip('.') + '.' + suffix for key, suffix in AXI_SIGNALS.items()})
     return names
 
 
-def read_header(stream, names):
+def read_header(stream, names, optional=()):
     """Resolve exact suffixes; never silently select one of several cores."""
     scopes, found, timescale = [], {}, []
     in_timescale = False
@@ -77,6 +86,8 @@ def read_header(stream, names):
         raise EvidenceError('missing VCD enddefinitions')
     for label, suffix in names.items():
         if label not in found:
+            if label in optional:
+                continue
             raise EvidenceError('missing required signal: ' + suffix)
         if len(found[label]) != 1:
             raise EvidenceError('ambiguous signal: ' + suffix)
@@ -129,7 +140,8 @@ def overlap_summary(records):
 
 
 class Transactions:
-    def __init__(self, line_bytes=64, fill_bytes=8, axi=False, prefetch_slots=2):
+    def __init__(self, line_bytes=64, fill_bytes=8, axi=False, prefetch_slots=2,
+                 admission_mode='drop'):
         for name, value in (('line-bytes', line_bytes), ('fill-bytes', fill_bytes)):
             if value <= 0 or value & (value - 1):
                 raise EvidenceError(name + ' must be a positive power of two')
@@ -137,6 +149,7 @@ class Transactions:
             raise EvidenceError('prefetch-slots must be positive')
         self.line_bytes, self.fill_bytes, self.axi = line_bytes, fill_bytes, axi
         self.prefetch_slots = prefetch_slots
+        self.admission_mode = admission_mode
         self.slots, self.normal_pending, self.axi_pending = {}, [], deque()
         self.prefetches, self.normal_reads, self.hints, self.demands, self.axi_reads = [], [], [], [], []
         self.axi_id = None
@@ -148,7 +161,8 @@ class Transactions:
             if self.slots or self.normal_pending:
                 raise EvidenceError('UCE reset with incomplete transactions')
             return
-        for label in ('request_v', 'request_yumi', 'allocate', 'duplicate', 'issue',
+        admission = 'drop' if self.admission_mode == 'drop' else 'duplicate'
+        for label in ('request_v', 'request_yumi', 'allocate', admission, 'issue',
                       'response', 'fwd_v', 'fwd_ready', 'rev_v', 'rev_yumi'):
             bit(v, label)
         accepted = v['request_v'] and v['request_yumi']
@@ -157,16 +171,24 @@ class Transactions:
         hint = accepted and known(v, 'request_type') == 9
         if v['allocate'] and not hint:
             raise EvidenceError('prefetch allocation without accepted hint')
+        if v[admission] and not hint:
+            raise EvidenceError('prefetch %s without accepted hint' % admission)
         if hint:
             address = known(v, 'request_address')
             matching = [record for record in self.slots.values()
                         if record['address'] // self.line_bytes == address // self.line_bytes]
-            self.hints.append(dict(event, address=address, duplicate=bool(v['duplicate'])))
-            if v['duplicate']:
+            self.hints.append(dict(event, address=address,
+                                   **{admission: bool(v[admission])}))
+            if self.admission_mode == 'duplicate' and v['duplicate']:
                 if v['allocate'] or not matching:
                     raise EvidenceError('duplicate hint has no matching reserved line')
+            elif self.admission_mode == 'drop' and v['drop']:
+                if v['allocate'] or len(self.slots) != self.prefetch_slots:
+                    raise EvidenceError('dropped hint without a full prefetch queue')
             else:
-                if not v['allocate'] or matching:
+                if not v['allocate']:
+                    raise EvidenceError('accepted hint was neither allocated nor advisory-dropped')
+                if self.admission_mode == 'duplicate' and matching:
                     raise EvidenceError('new hint did not allocate a unique line')
                 slot = known(v, 'allocate_slot')
                 if not 0 <= slot < self.prefetch_slots or slot in self.slots:
@@ -189,7 +211,8 @@ class Transactions:
             if msg_type in (0, 2):
                 if not bit(v, 'fwd_new') or not bit(v, 'fwd_last'):
                     raise EvidenceError('unsupported multibeat forward read/AMO')
-                address, size, wire_tag = (known(v, 'fwd_' + key) for key in ('address', 'size', 'slot'))
+                address, size, wire_tag, wire_state = (
+                    known(v, 'fwd_' + key) for key in ('address', 'size', 'slot', 'state'))
                 if size > 6:
                     raise EvidenceError('unsupported BedRock read size')
                 if prefetch:
@@ -202,9 +225,14 @@ class Transactions:
                         raise EvidenceError('prefetch issue address/size mismatch')
                     if not v['issue']:
                         raise EvidenceError('prefetch issue pulse/slot mismatch')
+                    if any(other.get('wire_tag') == wire_tag
+                           and other.get('wire_state') == wire_state
+                           for other in self.slots.values() if other is not record):
+                        raise EvidenceError('duplicate outstanding prefetch response identity')
                     record['_prior'] = [other for other in self.slots.values()
                                         if other['issue'] is not None]
                     record['wire_tag'] = wire_tag
+                    record['wire_state'] = wire_state
                     record['issue'] = event
                     issued_prefetch = True
                 else:
@@ -228,13 +256,14 @@ class Transactions:
             if prefetch and msg_type != 0:
                 raise EvidenceError('prefetch response is not mem_rd')
             if msg_type in (0, 2):
-                address, size, wire_tag = (known(v, 'rev_' + key) for key in ('address', 'size', 'slot'))
+                address, size, wire_tag, wire_state = (
+                    known(v, 'rev_' + key) for key in ('address', 'size', 'slot', 'state'))
                 first, last = bit(v, 'rev_new'), bit(v, 'rev_last')
                 if prefetch:
                     matching = [record for record in self.slots.values()
                                 if record['issue'] is not None
-                                and record['address'] == address
-                                and record['wire_tag'] == wire_tag]
+                                and record['wire_tag'] == wire_tag
+                                and record['wire_state'] == wire_state]
                     if len(matching) != 1:
                         raise EvidenceError('unmatched prefetch response')
                     record = matching[0]
@@ -318,8 +347,13 @@ class Transactions:
 
 def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fill_bytes=8,
             prefetch_slots=2):
-    selected, timescale = read_header(stream, signal_names(uce_prefix, axi_prefix))
-    tracker = Transactions(line_bytes, fill_bytes, axi_prefix is not None, prefetch_slots)
+    selected, timescale = read_header(stream, signal_names(uce_prefix, axi_prefix),
+                                      optional=OPTIONAL_UCE_SIGNALS)
+    admission_modes = [label for label in OPTIONAL_UCE_SIGNALS if label in selected]
+    if len(admission_modes) != 1:
+        raise EvidenceError('trace must contain exactly one prefetch admission policy signal')
+    tracker = Transactions(line_bytes, fill_bytes, axi_prefix is not None, prefetch_slots,
+                           admission_modes[0])
     clocks = ('clock', 'axi_clock') if axi_prefix is not None else ('clock',)
     for _, timestamp, values in rising_edges(stream, selected, clocks):
         for clock in values.get('_rising_clocks', ['clock']):
@@ -338,6 +372,7 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
     report = tracker.finish()
     report.update(timescale=timescale, line_bytes=line_bytes, fill_bytes=fill_bytes,
                   configured_prefetch_slots=prefetch_slots,
+                  prefetch_admission_mode=admission_modes[0],
                   signals={key: value[1] for key, value in selected.items()},
                   cycles=tracker.cycles,
                   sampling='stable values before each domain rising edge; independent cycle counters',

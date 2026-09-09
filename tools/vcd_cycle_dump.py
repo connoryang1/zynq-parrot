@@ -94,6 +94,7 @@ WATCH = [
     ("dcache_uce.prefetch_sent_r$", "uce_pf_sent"),
     ("dcache_uce.prefetch_sent_count$", "uce_pf_sent_count"),
     ("dcache_uce.prefetch_demand_match$", "uce_pf_demand_match"),
+    ("dcache_uce.prefetch_drop$", "uce_pf_drop"),
     ("dcache_uce.prefetch_response_match$", "uce_pf_resp_match"),
     ("dcache_uce.prefetch_only_credits$", "uce_pf_only_credits"),
     ("be.calculator.pipe_mem.dcache.cache_hit_tv$", "dc_cache_hit"),

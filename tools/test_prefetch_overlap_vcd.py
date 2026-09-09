@@ -23,14 +23,16 @@ def allocate(slot, address):
                 allocate=1, allocate_slot=slot)
 
 
-def issue(slot, address):
+def issue(slot, address, state=0):
     return dict(fwd_v=1, fwd_type=0, fwd_prefetch=1, fwd_address=address,
-                fwd_size=3, fwd_slot=slot, issue=1, issue_slot=slot)
+                fwd_size=3, fwd_slot=slot, fwd_state=state,
+                issue=1, issue_slot=slot)
 
 
-def response(slot, address):
+def response(slot, address, state=0):
     return dict(rev_v=1, rev_yumi=1, rev_type=0, rev_prefetch=1, rev_address=address,
-                rev_size=3, rev_slot=slot, response=1, rev_new=1, rev_last=1)
+                rev_size=3, rev_slot=slot, rev_state=state,
+                response=1, rev_new=1, rev_last=1)
 
 
 def case(axi=False, second_issue=3):
@@ -40,7 +42,7 @@ def case(axi=False, second_issue=3):
     samples[2].update(allocate(1, 0x80008040))
     samples[second_issue].update(issue(1, 0x80008040))
     samples[4].update(request_v=1, request_yumi=1, request_type=9,
-                      request_address=0x80008007, duplicate=1)
+                      request_address=0x80008007, drop=1)
     samples[6].update(response(0, 0x80008000))
     samples[8].update(response(1, 0x80008040))
     # A normal full-line read must retain a separate response identity.
@@ -58,15 +60,17 @@ def case(axi=False, second_issue=3):
     return samples
 
 
-def trace(samples, axi=False, missing=None, duplicate=None, edge_updates=None):
+def trace(samples, axi=False, missing=None, duplicate_signal=None, edge_updates=None,
+          legacy=False):
     names = analyzer.signal_names(axi_prefix='axi_mem' if axi else None)
+    names.pop('drop' if legacy else 'duplicate')
     names.pop(missing, None)
     codes = {key: 's' + str(index) for index, key in enumerate(names)}
     lines = ['$timescale 1 ps $end', '$scope module top $end']
     for key, name in names.items():
         lines.append('$var wire 64 %s %s $end' % (codes[key], name))
-    if duplicate:
-        lines.append('$var wire 64 duplicate other.' + names[duplicate] + ' $end')
+    if duplicate_signal:
+        lines.append('$var wire 64 duplicate other.' + names[duplicate_signal] + ' $end')
     lines.extend(['$upscope $end', '$enddefinitions $end', '#0'])
     lines.extend('b0 ' + code for code in codes.values())
     for index, sample in enumerate(samples):
@@ -94,13 +98,14 @@ class PrefetchTests(unittest.TestCase):
                                 axi_prefix='axi_mem' if axi else None,
                                 prefetch_slots=prefetch_slots)
 
-    def test_slots_duplicate_hint_and_normal_fill_are_distinct(self):
+    def test_slots_dropped_hint_and_normal_fill_are_distinct(self):
         report = self.analyze()
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 2)
         self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 2)
         self.assertTrue(report['prefetch_summary']['issue_before_prior_first_response'])
         self.assertEqual(report['prefetch_summary']['before_first_response_pairs'], [[0, 1]])
         self.assertEqual(len(report['accepted_hints']), 3)
+        self.assertTrue(report['accepted_hints'][2]['drop'])
         self.assertEqual(len(report['prefetches']), 2)
         self.assertEqual(report['normal_reads'][0]['beats'], 8)
         self.assertIsNone(report['axi_summary'])
@@ -148,23 +153,43 @@ class PrefetchTests(unittest.TestCase):
         with self.assertRaisesRegex(analyzer.EvidenceError, 'slot allocation'):
             self.analyze(samples)
 
-    def test_ten_slots_use_address_and_echoed_wire_tag_for_responses(self):
+    def test_ten_slots_use_complete_echoed_identity_for_responses(self):
         samples = [idle() for _ in range(32)]
         for slot in range(10):
             address = 0x80010000 + slot * 64
             samples[slot].update(allocate(slot, address))
-            samples[slot + 1].update(issue(slot, address), fwd_slot=slot & 7)
-            samples[slot + 20].update(response(slot & 7, address))
+            state = slot >> 3
+            samples[slot + 1].update(issue(slot, address, state), fwd_slot=slot & 7)
+            samples[slot + 20].update(response(slot & 7, address, state))
         report = self.analyze(samples, prefetch_slots=10)
         self.assertEqual(report['configured_prefetch_slots'], 10)
         self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 10)
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 10)
         self.assertEqual([record['slot'] for record in report['prefetches']], list(range(10)))
 
-    def test_duplicate_line_without_merge_rejected(self):
+    def test_same_line_hints_have_distinct_response_identities(self):
         samples = case()
         samples[2].update(allocate(1, 0x80008008))
-        with self.assertRaisesRegex(analyzer.EvidenceError, 'unique line'):
+        samples[3].update(issue(1, 0x80008008))
+        samples[8].update(response(1, 0x80008008))
+        report = self.analyze(samples)
+        self.assertEqual(len(report['prefetches']), 2)
+
+    def test_legacy_duplicate_merge_trace_remains_supported(self):
+        samples = case()
+        samples[4].update(drop=0, duplicate=1)
+        report = self.analyze(samples, legacy=True)
+        self.assertEqual(report['prefetch_admission_mode'], 'duplicate')
+        self.assertTrue(report['accepted_hints'][2]['duplicate'])
+
+    def test_drop_requires_full_queue_and_no_allocation(self):
+        samples = case()
+        samples[0].update(allocate=0, drop=1)
+        with self.assertRaisesRegex(analyzer.EvidenceError, 'full prefetch queue'):
+            self.analyze(samples)
+        samples = case()
+        samples[4]['allocate'] = 1
+        with self.assertRaisesRegex(analyzer.EvidenceError, 'full prefetch queue'):
             self.analyze(samples)
 
     def test_same_line_demand_cannot_overtake_prefetch(self):
@@ -175,7 +200,8 @@ class PrefetchTests(unittest.TestCase):
 
     def test_unmatched_and_wrong_identity_responses_rejected(self):
         for field, value, message in (('rev_slot', 2, 'unmatched'),
-                                       ('rev_address', 0x80008008, 'unmatched'),
+                                       ('rev_state', 1, 'unmatched'),
+                                       ('rev_address', 0x80008008, 'address/size'),
                                        ('rev_size', 6, 'address/size'),
                                        ('rev_last', 0, 'boundary'),
                                        ('rev_prefetch', 0, 'unmatched normal')):
@@ -227,7 +253,7 @@ class PrefetchTests(unittest.TestCase):
         with self.assertRaisesRegex(analyzer.EvidenceError, 'missing required signal'):
             self.analyze(missing='issue')
         with self.assertRaisesRegex(analyzer.EvidenceError, 'ambiguous signal'):
-            self.analyze(duplicate='issue')
+            self.analyze(duplicate_signal='issue')
 
     def test_pre_edge_values_ignore_textual_delta_order(self):
         report = self.analyze(edge_updates={1: dict(issue=0, fwd_v=0),

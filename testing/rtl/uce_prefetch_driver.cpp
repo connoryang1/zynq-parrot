@@ -142,8 +142,8 @@ public:
     for (unsigned i = 0; i < 10; ++i)
       request(hint, 0x80010003 + uint64_t(i)*0x1000);
     require(!dut.credits_empty_o, "queued/unsent hints invisible to fences");
-    request(hint, 0x8001a000, false);
-    request(hint, 0x80010018); // Duplicate line merges even when the queue is full.
+    request(hint, 0x8001a000); // Full-queue hints are acknowledged and dropped.
+    request(hint, 0x80010018); // This duplicate is also dropped without a stall.
     require(sent.empty(), "forward backpressure was ignored");
     dut.fwd_ready_i = 1; wait_sent(10);
     for (unsigned i = 0; i < 10; ++i)
@@ -157,7 +157,7 @@ public:
       throw std::runtime_error("malformed hint response was not rejected by RTL assertion");
     }
     // Slots 8 and 9 reuse way tags 0 and 1; the echoed coherence-state field
-    // carries the high slot bit and keeps their response IDs unique.
+    // carries the high slot bits and keeps their response IDs unique.
     response(sent[9]); cycles(5);
     require(!dut.credits_empty_o, "one response drained two hints");
     request(hint, 0x8001a000); wait_sent(11);
@@ -208,7 +208,7 @@ public:
     cycles(8);
     require(sent.size() == 16 && writes == 8 && completions == 2,
             "final request/response accounting mismatch");
-    std::cout << "[UCE-PREFETCH] PASS: ten slots, wrapped tags, drops, merging, reordered replies, "
+    std::cout << "[UCE-PREFETCH] PASS: ten slots, wrapped tags, full-queue drops, reordered replies, "
                  "demand routing, stalls, credits\n";
   }
 };

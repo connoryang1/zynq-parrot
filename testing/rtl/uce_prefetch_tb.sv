@@ -27,7 +27,7 @@ module uce_prefetch_tb
    output [2:0] fwd_size_o,
    output [63:0] fwd_addr_o,
    output [7:0] fwd_way_o,
-   output [1:0] fwd_state_o,
+   output [2:0] fwd_state_o,
    output fwd_prefetch_o,
    input rev_v_i,
    output rev_ready_o,
@@ -35,7 +35,7 @@ module uce_prefetch_tb
    input [2:0] rev_size_i,
    input [63:0] rev_addr_i,
    input [7:0] rev_way_i,
-   input [1:0] rev_state_i,
+   input [2:0] rev_state_i,
    input rev_prefetch_i,
    input [63:0] rev_word0_i, rev_word1_i
    );

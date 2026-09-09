@@ -60,7 +60,7 @@ def main():
                                    cwd=negative, stdout=log, stderr=subprocess.STDOUT,
                                    timeout=30, preexec_fn=lambda: resource.setrlimit(resource.RLIMIT_CORE, (0, 0)))
     rejected_log = (negative / "run.log").read_text()
-    if rejection.returncode == 0 or "UCE prefetch response has no matching outstanding word request" not in rejected_log:
+    if rejection.returncode == 0 or "UCE prefetch response address does not match its slot" not in rejected_log:
         raise RuntimeError("malformed-response negative gate did not trip its specific RTL assertion")
     dependencies = set(sources + [driver, Path(__file__).resolve()])
     for line in (out / "obj/Vuce_prefetch__verFiles.dat").read_text().splitlines():

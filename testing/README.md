@@ -271,7 +271,7 @@ python3 testing/rtl/run_uce_prefetch.py \
   --out logs/nonblocking-prefetch-20260908/uce-unit
 ```
 
-It checks ten pending hints, capacity refusal, same-line merging, out-of-order
+It checks ten pending hints, nonblocking full-queue drops, out-of-order
 responses, wrapped three-bit way tags plus high slot bits in the echoed prefetch
 state field, slot reuse, unrelated and same-line demands, response backpressure,
 and credit drain. A separate malformed-response case must trigger the expected
