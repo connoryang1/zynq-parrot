@@ -13,6 +13,14 @@ This adds nonfaulting prefetch hints and independent L2-bank responses to the
 previously accepted resident initialization and refill/replay ownership fixes.
 The current image and historical resident baseline are identified below.
 
+Development branch `fix/linux-request-lifecycle` pins RTL `d18f16849` and adds ordering between NPC seeds
+and handoffs, plus remote-register seed serialization to prevent lost ordinary
+writebacks. Nine traced full-system gates pass, including the two new regressions;
+all three raw prefetch benchmark samples match the accepted simulator baseline.
+These changes still require routed FPGA and Linux qualification. The accepted
+image remains `f7eedd955`, and the Linux request-pool comparison remains blocked
+on its second resident launch.
+
 ## Scope and readiness
 
 The maintained configuration is PYNQ-Z2 with two resident register banks and

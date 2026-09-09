@@ -35,6 +35,8 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_remote_seed_order_test \
+    mt_resident_reseed_fetch_test \
     mt_umode_prefetch_test \
     mt_prefetch_hint_test \
     mt_umode_resident_sv39_data_handoff_test \
@@ -106,6 +108,8 @@ check-nonresident-config:
 
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
+run-mt_resident_reseed_fetch_test: check-nonresident-config
+run-mt_remote_seed_order_test: check-nonresident-config
 run-mt_ctxtsw_load_overlap_test: check-nonresident-config
 run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_request_interleave_benchmark: check-nonresident-config

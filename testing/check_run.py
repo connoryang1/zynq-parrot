@@ -29,6 +29,8 @@ GPIO_STOP = re.compile(
 # Match the selected program's completed checks, not just the common CRT exit.
 # The benchmark banner is emitted only after both measured rings return.
 TEST_MARKERS = {
+    "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",
+    "mt_resident_reseed_fetch_test": "[BSG-PASS] resident reseed cold-fetch and CSR preservation",
     "mt_ctxtsw_smoke_test": "[BSG-PASS] ctxtsw smoke test completed",
     "mt_ctxtsw_logical_csr_readback_test": "[BSG-PASS] logical context CSR reported 0 -> 1 -> 0",
     "mt_regfile_test": "ALL TESTS PASSED",

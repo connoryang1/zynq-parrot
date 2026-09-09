@@ -343,9 +343,16 @@ The earlier discarded-load candidate completed its first resident mode but
 hung on its second resident mode. Changing the helper preserves the resident
 seeding and handoff protocol; it does not resolve or diagnose that failure.
 The retained `WARMUP_BEGIN` and `WARMUP_PASS` markers localize untimed failures.
-The hint executable is a candidate for a fresh Linux acceptance run on the new
-overlay. Cross compilation, host checks, and bare-metal prefetch tests do not
-establish that this complete Linux comparison passes or improves performance.
+The real-hint executable also fails the second resident warmup on the accepted
+prefetch overlay with one request per worker. A same-PC known-zero/live reporter
+verifies that the second NPC operand selects context 1 and the intended entry
+`0x11cb8`; it does not establish the subsequent failing instruction. Separate
+bare-metal regressions exposed adjacent NPC-seed ordering and remote-register
+write-port conflicts. Their fixes require FPGA qualification and a rerun of the
+unchanged Linux executable before either can explain this failure. Evidence is
+retained under `logs/linux-request-lifecycle-20260908/`. Cross compilation, host
+checks, and bare-metal prefetch tests do not establish that this complete Linux
+comparison passes or improves performance.
 
 The defaults are two workers, 4,096 requests per worker, a 2 MiB data working
 set, and five measured samples. Use `--help` for validated bounds and an explicit
