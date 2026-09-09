@@ -12,7 +12,7 @@
 namespace {
 constexpr unsigned hint = 9, demand = 0, memory_read = 0;
 constexpr uint64_t seed = UINT64_C(0x1234567800000000);
-struct Header { unsigned type, size, way; uint64_t addr; bool prefetch; };
+struct Header { unsigned type, size, way, state; uint64_t addr; bool prefetch; };
 struct Handshake { bool req, rev; };
 void require(bool condition, const char *message) {
   if (!condition) throw std::runtime_error(message);
@@ -39,7 +39,7 @@ class Test {
     dut.clk_i = 0; dut.eval(); context.timeInc(5); trace.dump(context.time());
     Handshake accepted{bool(dut.req_yumi_o), bool(dut.rev_ready_o)};
     if (!dut.reset_i && dut.fwd_v_o && dut.fwd_ready_i) {
-      Header h{dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o,
+      Header h{dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o, dut.fwd_state_o,
                dut.fwd_addr_o, bool(dut.fwd_prefetch_o)};
       require(h.type == memory_read, "unexpected forward message type");
       require(!h.prefetch || (h.size == 3 && !(h.addr & 7) && h.way < 8),
@@ -101,7 +101,8 @@ class Test {
   void response(Header h) {
     for (unsigned beat = 0; beat < (h.prefetch ? 1u : 4u); ++beat) {
       dut.rev_type_i = h.type; dut.rev_size_i = h.size;
-      dut.rev_addr_i = h.addr; dut.rev_way_i = h.way; dut.rev_prefetch_i = h.prefetch;
+      dut.rev_addr_i = h.addr; dut.rev_way_i = h.way; dut.rev_state_i = h.state;
+      dut.rev_prefetch_i = h.prefetch;
       dut.rev_word0_i = h.prefetch ? UINT64_C(0xbad0bad0bad0bad0) : seed + beat*2;
       dut.rev_word1_i = h.prefetch ? UINT64_C(0xbad0bad0bad0bad0) : seed + beat*2 + 1;
       dut.rev_v_i = 1;
@@ -145,21 +146,22 @@ public:
     require(sent.empty(), "forward backpressure was ignored");
     dut.fwd_ready_i = 1; wait_sent(10);
     for (unsigned i = 0; i < 10; ++i)
-      require(sent[i].prefetch && sent[i].way == i % 8
+      require(sent[i].prefetch && sent[i].way == i % 8 && sent[i].state == i / 8
               && sent[i].addr == ((0x80010003 + uint64_t(i)*0x1000) & ~UINT64_C(7)),
-              "ten hints did not retain their queue order, wrapped tags, or addresses");
+              "ten hints did not retain their queue order, slot IDs, or addresses");
     if (malformed) {
       Header bad = sent[9];
-      bad.addr ^= 8; // Same slot and cache line, but not the requested word.
+      bad.state ^= 1; // Corrupt the high slot bits while retaining the address.
       response(bad); cycles(8);
       throw std::runtime_error("malformed hint response was not rejected by RTL assertion");
     }
-    // Slots 8 and 9 deliberately reuse wire tags 0 and 1. Exact address plus
-    // the echoed low tag must still identify each internal queue entry.
+    // Slots 8 and 9 reuse way tags 0 and 1; the echoed coherence-state field
+    // carries the high slot bit and keeps their response IDs unique.
     response(sent[9]); cycles(5);
     require(!dut.credits_empty_o, "one response drained two hints");
     request(hint, 0x8001a000); wait_sent(11);
-    require(sent[10].way == sent[9].way, "returned wrapped-tag slot was not reusable");
+    require(sent[10].way == sent[9].way && sent[10].state == sent[9].state,
+            "returned wrapped-tag slot was not reusable");
     response(sent[8]);
     for (unsigned i = 0; i < 8; ++i) response(sent[i]);
     response(sent[10]); wait_empty();

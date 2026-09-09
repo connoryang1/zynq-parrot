@@ -27,6 +27,7 @@ module uce_prefetch_tb
    output [2:0] fwd_size_o,
    output [63:0] fwd_addr_o,
    output [7:0] fwd_way_o,
+   output [1:0] fwd_state_o,
    output fwd_prefetch_o,
    input rev_v_i,
    output rev_ready_o,
@@ -34,6 +35,7 @@ module uce_prefetch_tb
    input [2:0] rev_size_i,
    input [63:0] rev_addr_i,
    input [7:0] rev_way_i,
+   input [1:0] rev_state_i,
    input rev_prefetch_i,
    input [63:0] rev_word0_i, rev_word1_i
    );
@@ -69,6 +71,7 @@ module uce_prefetch_tb
     rev.size = bp_bedrock_msg_size_e'(rev_size_i);
     rev.addr = paddr_width_p'(rev_addr_i);
     rev.payload.way_id = $bits(rev.payload.way_id)'(rev_way_i);
+    rev.payload.state = bp_coh_states_e'(rev_state_i);
     rev.payload.prefetch = rev_prefetch_i;
   end
   assign tag_opcode_o = tag_pkt.opcode;
@@ -81,6 +84,7 @@ module uce_prefetch_tb
   assign fwd_size_o = fwd.size;
   assign fwd_addr_o = 64'(fwd.addr);
   assign fwd_way_o = 8'(fwd.payload.way_id);
+  assign fwd_state_o = fwd.payload.state;
   assign fwd_prefetch_o = fwd.payload.prefetch;
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(1), .assoc_p(assoc_lp),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
