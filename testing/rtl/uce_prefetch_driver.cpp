@@ -131,7 +131,8 @@ public:
     context.traceEverOn(true);
     dut.trace(&trace, 99); trace.open("uce-prefetch.fst");
     dut.reset_i = 1; dut.arrays_accept_i = 1;
-    dut.req_v_i = 0; dut.metadata_v_i = 0; dut.rev_v_i = 0; dut.fwd_ready_i = 0;
+    dut.req_v_i = 0; dut.metadata_v_i = 0; dut.rev_v_i = 0; dut.rev_state_i = 0;
+    dut.fwd_ready_i = 0;
   }
   ~Test() { dut.final(); trace.close(); }
   void run(bool malformed) {
