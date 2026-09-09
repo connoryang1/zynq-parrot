@@ -36,6 +36,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_regfile_test` | Integer-context execution, private stack, and return-state isolation |
 | `mt_csr_isolation_test` | First-seed CSR inheritance, independent `mscratch`, and NPC reseed preservation |
 | `mt_resident_reseed_fetch_test` | Adjacent NPC seeds and immediate/register switches into cold Sv39 code, with private CSR/GPR preservation and refreshed arguments |
+| `mt_resident_reseed_irq_test` | Pending CLINT software interrupt before a reseeded resident target retires: trap PC, private CSR/GPR state, arguments, and return to the new entry |
 | `mt_remote_seed_order_test` | Source and target writeback ordering across ALU, cold load, divide, FP, consecutive remote seeds and nonzero CSR destinations |
 | `mt_frf_isolation_test` | Resident floating-point register isolation; not nonresident FP preservation |
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
@@ -55,7 +56,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
 | `mt_prefetch_interleave_benchmark` | The same independent request streams and controls using nonblocking `prefetch.r` hints instead of discarded byte loads |
 
-These 23 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
+These 24 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
@@ -65,6 +66,12 @@ compilation alone is not a runtime pass. Use that topology for the handoff tests
 and benchmark: the benchmark specifically compares resident context 1 with
 nonresident context 2. The four-ID ring tests require at least four logical
 contexts; resident-only isolation tests use contexts 0 and 1.
+
+The resident reseed IRQ variant shares the cold-fetch program and arms a real
+CLINT software interrupt while the target is inactive. It checks the pending
+bit before switching, requires the saved interrupt PC to equal the new entry,
+and returns through that unchanged PC. This isolates interrupt return bookkeeping;
+it does not recreate Linux's trap or scheduler state.
 
 For example, after the model build:
 

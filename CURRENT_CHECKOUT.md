@@ -13,13 +13,17 @@ This adds nonfaulting prefetch hints and independent L2-bank responses to the
 previously accepted resident initialization and refill/replay ownership fixes.
 The current image and historical resident baseline are identified below.
 
-Development branch `fix/linux-request-lifecycle` pins RTL `d18f16849` and adds ordering between NPC seeds
-and handoffs, plus remote-register seed serialization to prevent lost ordinary
-writebacks. Nine traced full-system gates pass, including the two new regressions;
-all three raw prefetch benchmark samples match the accepted simulator baseline.
+Development branch `fix/linux-request-lifecycle` pins RTL `f6e004283`. It orders
+NPC seeds before handoffs, serializes remote-register seeds to prevent lost
+ordinary writebacks, and updates the interrupted PC when reseeding an initialized
+inactive resident context. The same pending-interrupt binary fails on `d18f16849`
+with the old parked PC and passes with this correction, preserving private state.
+Six final traced full-system gates pass; the earlier two ordering fixes also pass
+nine gates. All three raw prefetch benchmark samples remain unchanged.
 These changes still require routed FPGA and Linux qualification. The accepted
-image remains `f7eedd955`, and the Linux request-pool comparison remains blocked
-on its second resident launch.
+image remains `f7eedd955`, and the original Linux request-pool comparison remains
+blocked on its second resident launch; the directed interrupt test does not by
+itself identify Linux's trap path.
 
 ## Scope and readiness
 

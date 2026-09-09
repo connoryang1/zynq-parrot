@@ -20,6 +20,12 @@
 #define TARGET_CSR 0x2468ULL
 #define INITIAL_GPR 0x1234ULL
 #define PRIVATE_GPR 0x5678ULL
+#ifdef BP_RESEED_IRQ_TEST
+#define TEST_DESCRIPTION "resident reseed interrupt PC and CSR preservation"
+#define CLINT_MSIP 0x00300000ULL
+#else
+#define TEST_DESCRIPTION "resident reseed cold-fetch and CSR preservation"
+#endif
 
 /* This buffer contains no PC-relative references outside itself. Padding
  * places instructions at the captured virtual offsets, not timing gaps.
@@ -56,6 +62,9 @@ static volatile struct {
   uint64_t first_seen, second_seen, old_park, unexpected;
   uint64_t cause, pc, tval, finish_context, finish_scratch, finish_satp;
   uint64_t target_scratch, target_s11, target_a1, target_a2;
+#ifdef BP_RESEED_IRQ_TEST
+  uint64_t irq_seen, irq_pc, irq_mie, irq_armed, finish_mie, source_gpr;
+#endif
 } outcome __attribute__((used));
 
 static void __attribute__((used, noinline, noreturn)) machine_finish(void)
@@ -65,11 +74,17 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
       && outcome.finish_context == 0 && outcome.finish_scratch == SOURCE_CSR
       && outcome.finish_satp == expected_satp
       && outcome.target_scratch == TARGET_CSR && outcome.target_s11 == PRIVATE_GPR
-      && outcome.target_a1 == 0x300 && outcome.target_a2 == 7) {
-    bp_print_string("[BSG-PASS] resident reseed cold-fetch and CSR preservation\n");
+      && outcome.target_a1 == 0x300 && outcome.target_a2 == 7
+#ifdef BP_RESEED_IRQ_TEST
+      && outcome.irq_seen == 1 && outcome.irq_pc == SECOND_ENTRY
+      && outcome.irq_mie == 8 && outcome.irq_armed == 1
+      && outcome.finish_mie == 0 && outcome.source_gpr == 0x6abc
+#endif
+      ) {
+    bp_print_string("[BSG-PASS] " TEST_DESCRIPTION "\n");
     bp_finish(0);
   } else {
-    bp_print_string("[BSG-FAIL] resident reseed cold-fetch and CSR preservation\n");
+    bp_print_string("[BSG-FAIL] " TEST_DESCRIPTION "\n");
     if (outcome.old_park)
       bp_print_string("stale return reached the previous target park path\n");
     bp_print_string("first/second/old-park/unexpected/cause/pc/tval: ");
@@ -88,13 +103,23 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
     bp_hprint_uint64(outcome.target_s11);
     bp_hprint_uint64(outcome.target_a1);
     bp_hprint_uint64(outcome.target_a2);
+#ifdef BP_RESEED_IRQ_TEST
+    bp_print_string("\nIRQ seen/mepc/mie/armed; source mie/GPR: ");
+    bp_hprint_uint64(outcome.irq_seen);
+    bp_hprint_uint64(outcome.irq_pc);
+    bp_hprint_uint64(outcome.irq_mie);
+    bp_hprint_uint64(outcome.irq_armed);
+    bp_hprint_uint64(outcome.finish_mie);
+    bp_hprint_uint64(outcome.source_gpr);
+#endif
     bp_print_string("\n");
     bp_finish(1);
   }
   for (;;) ;
 }
 
-/* Every entry must be a checked U ECALL. Target CSR writes happen here because
+/* Entries are checked U ECALLs, plus one controlled MSIP in the IRQ variant.
+ * Target CSR writes happen here because
  * U-mode cannot access mscratch. They establish a private target CSR value
  * that an overly broad 'clone CSR state on every reseed' fix would destroy.
  * The handler uses only t0/t1/t2 and leaves the peer's arguments/s11 intact.
@@ -114,9 +139,16 @@ static void __attribute__((naked, aligned(4))) trap_entry(void)
     "sd a1, 96(t2)\nsd a2, 104(t2)\n"
     "1: csrr t0, satp\nsd t0, 72(t2)\n"
     "la t1, expected_satp\nld t1, 0(t1)\nbne t0, t1, 8f\n"
+#ifdef BP_RESEED_IRQ_TEST
+    "csrr t0, mie\nsd t0, 144(t2)\nsd s10, 152(t2)\n"
+    "ld t0, 32(t2)\nbltz t0, .Lreseed_irq\n"
+#endif
     "ld t0, 32(t2)\nli t1, 8\nbne t0, t1, 8f\n"
     "li t0, 127\nbeq a0, t0, 7f\n"
     "li t0, 3\nbeq a0, t0, 6f\n"
+#ifdef BP_RESEED_IRQ_TEST
+    "li t0, 4\nbeq a0, t0, .Lreseed_arm\n"
+#endif
     "ld t0, 56(t2)\nli t1, 1\nbne t0, t1, 8f\n"
     "li t0, 1\nbeq a0, t0, 2f\n"
     "li t0, 2\nbeq a0, t0, 3f\nj 8f\n"
@@ -126,7 +158,12 @@ static void __attribute__((naked, aligned(4))) trap_entry(void)
     "csrr t0, mscratch\nli t1, 0x1357\nbne t0, t1, 8f\n"
     "li t0, 0x1234\nbne s11, t0, 8f\n"
     "li t0, 0x100\nbne a1, t0, 8f\nli t0, 1\nbne a2, t0, 8f\n"
-    "sd t0, 0(t2)\nli t0, 0x2468\ncsrw mscratch, t0\nj 4f\n"
+    "sd t0, 0(t2)\nli t0, 0x2468\ncsrw mscratch, t0\n"
+#ifdef BP_RESEED_IRQ_TEST
+    /* Only the target enables MSIE. CLINT is still clear on this first visit. */
+    "li t0, 8\ncsrw mie, t0\n"
+#endif
+    "j 4f\n"
     /* Second entry: private CSR/GPR preserved, consumed arguments reseeded. */
     "3: ld t0, 0(t2)\nli t1, 1\nbne t0, t1, 8f\n"
     "ld t0, 8(t2)\nbnez t0, 8f\n"
@@ -134,13 +171,54 @@ static void __attribute__((naked, aligned(4))) trap_entry(void)
     "csrr t0, mscratch\nli t1, 0x2468\nbne t0, t1, 8f\n"
     "li t0, 0x5678\nbne s11, t0, 8f\n"
     "li t0, 0x300\nbne a1, t0, 8f\nli t0, 7\nbne a2, t0, 8f\n"
+#ifdef BP_RESEED_IRQ_TEST
+    "ld t0, 112(t2)\nli t1, 1\nbne t0, t1, 8f\n"
+#endif
     "li t0, 1\nsd t0, 8(t2)\n"
     "4: csrr t0, mepc\naddi t0, t0, 4\ncsrw mepc, t0\nmret\n"
     "6: ld t0, 56(t2)\nbnez t0, 8f\nj 9f\n"
     "7: li t0, 1\nsd t0, 16(t2)\nj 9f\n"
     "8: li t0, 1\nsd t0, 24(t2)\n"
-    "9: csrr t0, mstatus\nli t1, 0x1800\nor t0, t0, t1\ncsrw mstatus, t0\n"
+    "9:\n"
+#ifdef BP_RESEED_IRQ_TEST
+    /* All terminal paths disable and deassert the real IRQ before reporting. */
+    "csrw mie, zero\nli t0, 0x300000\nsd zero, 0(t0)\nfence iorw, iorw\n"
+#endif
+    "csrr t0, mstatus\nli t1, 0x1800\nor t0, t0, t1\ncsrw mstatus, t0\n"
     "la t0, machine_finish\ncsrw mepc, t0\nmret\n"
+#ifdef BP_RESEED_IRQ_TEST
+    /* Arm from source M-mode after the target has parked. Readback of the
+     * actual pending bit, not an elapsed delay, establishes readiness. IRQs
+     * are broadcast to inactive CSR banks; source mie remains zero.
+     */
+    ".Lreseed_arm:\n"
+    "ld t0, 56(t2)\nbnez t0, 8b\ncsrr t0, mie\nbnez t0, 8b\n"
+    "ld t0, 0(t2)\nli t1, 1\nbne t0, t1, 8b\n"
+    "ld t0, 136(t2)\nbnez t0, 8b\n"
+    "li t0, 0x300000\nsd t1, 0(t0)\nfence iorw, iorw\nli t1, 256\n"
+    ".Lreseed_arm_poll: csrr t0, mip\nandi t0, t0, 8\nbnez t0, .Lreseed_armed\n"
+    "addi t1, t1, -1\nbnez t1, .Lreseed_arm_poll\nj 8b\n"
+    ".Lreseed_armed: li t0, 1\nsd t0, 136(t2)\nj 4b\n"
+    ".Lreseed_irq:\n"
+    "csrr t0, mepc\nsd t0, 120(t2)\ncsrr t0, mie\nsd t0, 128(t2)\n"
+    "csrw mie, zero\nli t0, 0x300000\nsd zero, 0(t0)\nfence iorw, iorw\n"
+    "li t1, 256\n"
+    ".Lreseed_clear_poll: csrr t0, mip\nandi t0, t0, 8\nbeqz t0, .Lreseed_irq_check\n"
+    "addi t1, t1, -1\nbnez t1, .Lreseed_clear_poll\nj 8b\n"
+    ".Lreseed_irq_check:\n"
+    "ld t0, 32(t2)\nli t1, 0x8000000000000003\nbne t0, t1, 8b\n"
+    "ld t0, 56(t2)\nli t1, 1\nbne t0, t1, 8b\n"
+    "csrr t0, mstatus\nsrli t0, t0, 11\nandi t0, t0, 3\nbnez t0, 8b\n"
+    "ld t0, 0(t2)\nbne t0, t1, 8b\nld t0, 136(t2)\nbne t0, t1, 8b\n"
+    "ld t0, 8(t2)\nbnez t0, 8b\nld t0, 112(t2)\nbnez t0, 8b\n"
+    /* Fail on stale APC immediately; never repair mepc in software. */
+    "ld t0, 120(t2)\nli t1, 0x11cb8\nbne t0, t1, 8b\n"
+    "ld t0, 128(t2)\nli t1, 8\nbne t0, t1, 8b\n"
+    "csrr t0, mscratch\nli t1, 0x2468\nbne t0, t1, 8b\n"
+    "li t0, 0x5678\nbne s11, t0, 8b\n"
+    "li t0, 0x300\nbne a1, t0, 8b\nli t0, 7\nbne a2, t0, 8b\n"
+    "li t0, 1\nsd t0, 112(t2)\nmret\n"
+#endif
     ".option pop\n");
 }
 
@@ -153,6 +231,13 @@ static void __attribute__((noinline, noreturn, aligned(4096))) user_entry(void)
   seed_reg(1, 12, 1);
   seed_npc(1, FIRST_ENTRY);
   __asm__ volatile("csrwi 0x800, 1" : : : "memory");
+
+#ifdef BP_RESEED_IRQ_TEST
+  register uint64_t source_guard __asm__("s10") = 0x6abc;
+  register uint64_t arm_code __asm__("a0") = 4;
+  __asm__ volatile("ecall" : "+r"(arm_code), "+r"(source_guard)
+                   : : "t0", "t1", "t2", "memory");
+#endif
 
   /* The completed peer has advanced a1, exhausted a2, changed private s11,
    * and retained TARGET_CSR. Preserve its private state while reseeding only
@@ -179,7 +264,11 @@ static void __attribute__((noinline, noreturn, aligned(4096))) user_entry(void)
     : : [a1_seed] "r"(a1_seed), [a2_seed] "r"(a2_seed), [next_npc] "r"(next_npc)
     : "t3", "memory");
   register uint64_t finish_code __asm__("a0") = 3;
-  __asm__ volatile("ecall" : "+r"(finish_code) : : "t0", "t1", "t2", "memory");
+  __asm__ volatile("ecall" : "+r"(finish_code)
+#ifdef BP_RESEED_IRQ_TEST
+                   , "+r"(source_guard)
+#endif
+                   : : "t0", "t1", "t2", "memory");
   for (;;) ;
 }
 
@@ -187,7 +276,11 @@ int main(void)
 {
   uint64_t status, gp;
   volatile uint64_t user_pc = (uint64_t)user_entry;
+#ifdef BP_RESEED_IRQ_TEST
+  bp_print_string("[BSG-INFO] resident reseed at captured VA 0x11cb8 with pending CLINT MSIP\n");
+#else
   bp_print_string("[BSG-INFO] resident reseed at captured VA 0x11cb8 with cold first fetch\n");
+#endif
 #ifndef BP_FPGA_PROGRAM
   __asm__ volatile(
     "csrr t0, dcsr\nori t0, t0, 3\ncsrw dcsr, t0\n"
@@ -196,6 +289,10 @@ int main(void)
 #endif
   __asm__ volatile("csrw medeleg, zero\ncsrw mideleg, zero\ncsrw mie, zero"
                    : : : "memory");
+#ifdef BP_RESEED_IRQ_TEST
+  *(volatile uint64_t *)CLINT_MSIP = 0;
+  __asm__ volatile("fence iorw, iorw" : : : "memory");
+#endif
   const uint64_t broad = PTE_V | PTE_R | PTE_W | PTE_X | PTE_U | PTE_A | PTE_D;
   /* The source's code alias and its original physical stack/gp alias map DRAM.
    * Only low VA page 0x11000 maps the controlled instruction buffer. This is
