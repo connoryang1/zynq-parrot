@@ -236,7 +236,7 @@ RTL change or synthesis: record the trusted runner/bit/NBF hashes, run the order
 pre-SATP milestone probes, retain the board log in persistent board-home storage (never `/tmp`),
 and run the matching traced local privilege/SATP gate. Do not treat a physical NBF marker after
 SATP as evidence unless its virtual-to-physical mapping has been established. The current PYNQ-Z2
-accepted route uses 80 of 140 BRAM tiles; use the exact candidate's routed
+accepted route uses 81 of 140 BRAM tiles; use the exact candidate's routed
 reports to assess instrumentation cost rather than assuming older capacity limits.
 
 When a physical probe localizes a Linux failure to an instruction boundary, capture the live

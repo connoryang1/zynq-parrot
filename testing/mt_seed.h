@@ -10,7 +10,7 @@
  *   bits [38:0]                    = NPC (vaddr_width_p = 39)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
  * CSR 0x802 (CTXT_REG): seed an integer or FP register for a target thread
- *   bits [38:0]                    = value (sign-extended from 39 bits)
+ *   bits [38:0]                    = value (zero-extended by hardware)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
  *   bits [38+BP_TID_BITS+5 : 39+BP_TID_BITS] = register address (5-bit)
  *   bit  [39+BP_TID_BITS+5]        = fp_sel (1 = FP regfile, 0 = INT regfile)

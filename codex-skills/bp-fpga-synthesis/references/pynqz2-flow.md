@@ -341,7 +341,7 @@ and retired-PC tails from streamed VCD; do not resurrect the removed
 `run-mt_smode_sv39_entry_test` target from a leftover ELF. The old trace-window
 command-line options are not implemented by the current tracer.
 
-The accepted route uses 80 of 140 BRAM tiles; older claims that the image fills
+The accepted route uses 81 of 140 BRAM tiles; older claims that the image fills
 all BRAM are obsolete. Decide whether instrumentation fits using the exact
 candidate's routed reports, and first try bounded software probes or local
 waveforms when they can answer the question without changing hardware.
