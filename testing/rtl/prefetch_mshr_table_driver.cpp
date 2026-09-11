@@ -31,7 +31,7 @@ int main() {
   assert(d.alloc_yumi_o && d.alloc_duplicate_o && d.alloc_id_o == 1); d.alloc_v_i = 0;
   d.response_id_i = 1; d.response_beat_i = 2; d.response_v_i = 1; d.response_last_i = 0; d.eval(); assert(d.response_ready_o); tick(d, 0); d.response_v_i = 0;
   assert(d.valid_o == 3 && d.issued_o == 3 && d.fill_mask1_o == 4);
-  d.response_v_i = d.response_last_i = 1; d.eval(); assert(d.response_ready_o); tick(d, 0); d.response_v_i = d.response_last_i = 0;
+  d.response_v_i = d.response_last_i = 1; d.eval(); assert(d.response_ready_o && d.demand_release_o && d.demand_release_id_o == 1); tick(d, 0); d.response_v_i = d.response_last_i = 0;
   assert(d.valid_o == 1 && d.issued_o == 1);
   assert(d.occupancy_o == 1 && d.max_occupancy_o == 2);
   d.response_id_i = 0; d.response_v_i = d.response_last_i = 1; d.eval(); assert(d.response_ready_o); tick(d, 0); d.response_v_i = d.response_last_i = 0;
