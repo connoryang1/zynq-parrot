@@ -338,10 +338,10 @@ class Transactions:
                 record['complete'] = event
                 self.axi_pending.popleft()
 
-    def finish(self):
+    def finish(self, allow_no_prefetch=False):
         if self.slots or self.normal_pending or self.axi_pending:
             raise EvidenceError('trace ended with incomplete transactions')
-        if not self.prefetches:
+        if not self.prefetches and not allow_no_prefetch:
             raise EvidenceError('no allocated prefetch transactions')
         uce = overlap_summary(self.prefetches)
         uce['max_reserved_slots'] = max_reserved_slots(self.prefetches)
@@ -356,7 +356,7 @@ class Transactions:
 
 
 def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fill_bytes=8,
-            prefetch_slots=2):
+            prefetch_slots=2, allow_no_prefetch=False):
     selected, timescale = read_header(stream, signal_names(uce_prefix, axi_prefix),
                                       optional=OPTIONAL_UCE_SIGNALS)
     admission_modes = [label for label in OPTIONAL_UCE_SIGNALS if label in selected]
@@ -379,7 +379,7 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
     for clock in clocks:
         if tracker.cycles[clock] == 0:
             raise EvidenceError('no observed rising edges for ' + clock)
-    report = tracker.finish()
+    report = tracker.finish(allow_no_prefetch=allow_no_prefetch)
     report.update(timescale=timescale, line_bytes=line_bytes, fill_bytes=fill_bytes,
                   configured_prefetch_slots=prefetch_slots,
                   prefetch_admission_mode=admission_modes[0],
@@ -473,12 +473,14 @@ def main():
     parser.add_argument('--require-axi-overlap', action='store_true')
     parser.add_argument('--require-reserved-slots', type=int, default=0,
                         help='fail unless at least this many UCE slots coexist')
+    parser.add_argument('--allow-no-prefetch', action='store_true',
+                        help='accept a demand-only trace and still report cache traffic')
     args = parser.parse_args()
     try:
         if (args.address is None) != (args.span_bytes is None):
             raise EvidenceError('address and span-bytes must be supplied together')
         report = analyze(sys.stdin, args.uce_prefix, args.axi_prefix, args.line_bytes,
-                         args.fill_bytes, args.prefetch_slots)
+                         args.fill_bytes, args.prefetch_slots, args.allow_no_prefetch)
         if args.address is not None:
             report['region'] = region_summary(report, args.address, args.span_bytes, args.axi_address_xor)
     except (EvidenceError, ValueError) as error:

@@ -389,3 +389,10 @@ instruction-refill overhead, but the high-latency prefetch schedule remains
 slower because requests are still serialized.
 
 For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`), roughly 0.075% of the demand total, so the measured candidate gap is cache/refill and memory traffic rather than the raw context-handoff instruction sequence. The high-latency version was not completed within a 120-second simulator timeout and is intentionally not used as a performance result.
+
+Matched fresh-boot traces also expose the traffic composition. Demand accepted 370
+normal UCE requests (18 miss loads, 194 miss stores, 158 uncached reads) and 4,032
+AXI bursts. The prefetch schedule accepted 383 normal requests (19, 193, and 171
+respectively), plus ten hint transactions, and 4,084 AXI bursts. The extra traffic
+is therefore visible and the hint is not optimized away, but no request overlaps
+another at either the UCE or AXI handshake (`max_outstanding=1`).

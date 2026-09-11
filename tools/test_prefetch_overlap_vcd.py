@@ -121,6 +121,16 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(summary['by_msg_type'], {'0': 1, '4': 2})
         self.assertEqual(summary['by_4k_page'], {'0x1000': 2, '0x80001000': 1})
 
+    def test_demand_only_trace_can_report_cache_traffic(self):
+        samples = [idle() for _ in range(4)]
+        samples[1].update(request_v=1, request_yumi=1, request_type=0,
+                          request_address=0x80008000)
+        report = analyzer.analyze(io.StringIO(trace(samples)),
+                                  allow_no_prefetch=True)
+        self.assertEqual(report['prefetch_summary']['transactions'], 0)
+        self.assertEqual(report['normal_request_summary']['count'], 1)
+        self.assertEqual(report['normal_request_summary']['by_msg_type'], {'0': 1})
+
     def test_different_clock_phases_sample_their_own_edges(self):
         report = self.analyze(axi=True)
         self.assertEqual(report['prefetches'][0]['issue'], dict(cycle=1, timestamp=25))
