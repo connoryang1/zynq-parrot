@@ -7,10 +7,13 @@
  * This is a nonfaulting, best-effort hint, with no register result or ordering
  * guarantee. BlackParrot currently accepts permitted DTLB hits to cacheable,
  * idempotent DRAM in its noncoherent writeback configuration and may drop a
- * hint for any unavailable translation or cache/request capacity. Unsupported
- * hardware executes it as a no-op; qualify actual request issuance in a trace
- * before interpreting benchmark timing. The memory clobber constrains the
- * compiler, not the hardware memory-ordering model.
+ * hint for any unavailable translation or cache/request capacity. The current
+ * implementation forwards accepted hints to the L2 as advisory traffic and
+ * does not allocate or fill the L1; a later demand load must still be checked
+ * for an L1 miss. Unsupported hardware executes it as a no-op. Qualify actual
+ * request issuance and same-line demand misses in a trace before interpreting
+ * benchmark timing. The memory clobber constrains the compiler, not the
+ * hardware memory-ordering model.
  */
 #define BP_PREFETCH_R_ASM(base) "ori zero, " base ", 1\n"
 
