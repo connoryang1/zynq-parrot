@@ -28,11 +28,14 @@ static volatile uint64_t sums[WORKERS] __attribute__((aligned(64), used));
 static volatile uint64_t done[WORKERS] __attribute__((aligned(64), used));
 static uint64_t stacks[WORKERS][128] __attribute__((aligned(64)));
 
+/* The volatile asm and memory clobber keep the hint observable to the
+ * compiler; a hardware fence would only order later demand loads and cannot
+ * wait for prefetch completion. */
 #define WORKER(NAME, ID, NEXT, FINAL) \
   static __attribute__((naked, noinline, aligned(64))) void NAME(void) { \
     __asm__ volatile( \
       "addi t2, a0, " #ID "*64\n" \
-      "beqz a2, 1f\nori zero, t2, 1\nfence r, r\n1: csrwi 0x800, " #NEXT "\n" \
+      "beqz a2, 1f\nori zero, t2, 1\n1: csrwi 0x800, " #NEXT "\n" \
       "ld t3, 0(t2)\n" \
       "la t0, sums\nsd t3, " #ID "*8(t0)\n" \
       "la t0, done\nli t1, 1\nsd t1, " #ID "*8(t0)\n" \
