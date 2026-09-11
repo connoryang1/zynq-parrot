@@ -156,7 +156,7 @@ public:
               "ten hints did not retain their queue order, slot IDs, or addresses");
     if (malformed) {
       Header bad = sent[9];
-      bad.state ^= 1; // Corrupt the high slot bits while retaining the address.
+      bad.addr ^= 0x40; // Corrupt the line identity while retaining the slot fields.
       response(bad); cycles(8);
       throw std::runtime_error("malformed hint response was not rejected by RTL assertion");
     }
