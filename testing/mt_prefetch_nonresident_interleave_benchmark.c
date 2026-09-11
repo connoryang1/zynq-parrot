@@ -15,8 +15,8 @@
 #ifndef BENCH_MODE
 #define BENCH_MODE 2
 #endif
-#if BENCH_MODE < 0 || BENCH_MODE > 2
-#error "BENCH_MODE must be 0 (demand), 1 (batch), or 2 (prefetch)"
+#if BENCH_MODE < 0 || BENCH_MODE > 3
+#error "BENCH_MODE must be 0 (demand), 1 (batch), 2 (prefetch), or 3 (switch-only)"
 #endif
 struct line { uint64_t value, pad[7]; };
 #define L(n) { (n) + 1, {0} }
@@ -31,14 +31,21 @@ static uint64_t stacks[WORKERS][128] __attribute__((aligned(64)));
 /* The volatile asm and memory clobber keep the hint observable to the
  * compiler; a hardware fence would only order later demand loads and cannot
  * wait for prefetch completion. */
+#if BENCH_MODE == 3
+#define WORKER_TAIL(ID, NEXT, FINAL) FINAL
+#else
+#define WORKER_TAIL(ID, NEXT, FINAL) \
+      "ld t3, 0(a0)\n" \
+      "sd t3, 0(a1)\n" \
+      "la t0, done\nli t1, 1\nsd t1, " #ID "*8(t0)\n" \
+      "csrwi 0x800, " #NEXT "\n" FINAL
+#endif
+
 #define WORKER(NAME, ID, NEXT, FINAL) \
   static __attribute__((naked, noinline)) void NAME(void) { \
     __asm__ volatile( \
       "beqz a2, 1f\nori zero, a0, 1\n1: csrwi 0x800, " #NEXT "\n" \
-      "ld t3, 0(a0)\n" \
-      "sd t3, 0(a1)\n" \
-      "la t0, done\nli t1, 1\nsd t1, " #ID "*8(t0)\n" \
-      "csrwi 0x800, " #NEXT "\n" FINAL ); }
+      WORKER_TAIL(ID, NEXT, FINAL) ); }
 
 WORKER(w0, 0, 1, "ret\n")
 WORKER(w1, 1, 2, "1: j 1b\n")
@@ -74,7 +81,7 @@ static uint64_t ring(const volatile struct line *src, unsigned hint)
                    : : "r"(&src[0]), "r"((uint64_t)&sums[0]), "r"((uint64_t)hint)
                    : "a0", "a1", "a2", "memory");
   __asm__ volatile("csrr %0, 0xcc0" : "=r"(end) : : "memory");
-  for (unsigned i = 0; i < WORKERS; ++i)
+  for (unsigned i = 0; i < WORKERS && BENCH_MODE != 3; ++i)
     if (done[i] != 1 || sums[i] != i + 1) {
       bp_print_string("[BSG-FAIL] worker "); bp_hprint_uint64(i);
       bp_print_string(" done/sum "); bp_hprint_uint64(done[i]);
@@ -100,7 +107,7 @@ int main(void)
   uint64_t cycles = BENCH_MODE == 1 ? batch(data) : ring(data, BENCH_MODE == 2);
   bp_print_string("Benchmark: ten logical workers / two resident banks\n");
   bp_print_string("Mode: ");
-  bp_print_string(BENCH_MODE == 0 ? "nonresident demand" : BENCH_MODE == 1 ? "batched ideal" : "nonresident prefetch/yield/load");
+  bp_print_string(BENCH_MODE == 0 ? "nonresident demand" : BENCH_MODE == 1 ? "batched ideal" : BENCH_MODE == 2 ? "nonresident prefetch/yield/load" : "nonresident switch-only");
   bp_print_string("; cycles: "); bp_hprint_uint64(cycles); bp_print_string("\n");
   bp_print_string("[BSG-PASS] ten logical nonresident prefetch workers\n");
   bp_finish(0);

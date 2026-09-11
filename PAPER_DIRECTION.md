@@ -387,3 +387,5 @@ materialization. All three schedules pass; normal demand/prefetch are
 `0x10fe42`/`0x1126cf` (1,113,666/1,124,047 cycles). This removes software and
 instruction-refill overhead, but the high-latency prefetch schedule remains
 slower because requests are still serialized.
+
+For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`), roughly 0.075% of the demand total, so the measured candidate gap is cache/refill and memory traffic rather than the raw context-handoff instruction sequence. The high-latency version was not completed within a 120-second simulator timeout and is intentionally not used as a performance result.
