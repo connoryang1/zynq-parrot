@@ -32,7 +32,7 @@ static uint64_t stacks[WORKERS][128] __attribute__((aligned(64)));
  * compiler; a hardware fence would only order later demand loads and cannot
  * wait for prefetch completion. */
 #define WORKER(NAME, ID, NEXT, FINAL) \
-  static __attribute__((naked, noinline, aligned(64))) void NAME(void) { \
+  static __attribute__((naked, noinline)) void NAME(void) { \
     __asm__ volatile( \
       "addi t2, a0, " #ID "*64\n" \
       "beqz a2, 1f\nori zero, t2, 1\n1: csrwi 0x800, " #NEXT "\n" \

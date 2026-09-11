@@ -369,3 +369,12 @@ prefetch issue through the UCE; increasing slot count alone cannot create the
 intended overlap.
 The trace also records 384 accepted non-prefetch UCE requests: 171 uncached
 reads, 194 miss stores, and 19 miss loads.
+
+The validated benchmark now leaves worker entry functions naturally packed instead
+of forcing each one onto a separate 64-byte boundary. This preserves the static
+continuation protocol while reducing instruction-cache footprint. With the
+200-cycle pipelined model, packed demand measured `0x110d1d` (1,117,469 cycles)
+and packed prefetch/yield/load measured `0x111cfe` (1,121,534 cycles); the
+prefetch schedule remains 0.36% slower, while both schedules improve by roughly
+1% versus the aligned layout. The change removes avoidable instruction-refill
+noise but does not itself produce data-prefetch overlap.
