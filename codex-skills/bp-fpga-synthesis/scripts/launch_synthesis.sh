@@ -139,6 +139,12 @@ case ${1:-} in
     git -C "$worktree/import/black-parrot" config --local \
       submodule.external/basejump_stl.url \
       "$seed_repo_dir/import/black-parrot/external/basejump_stl"
+    git -C "$worktree/import/black-parrot" config --local \
+      submodule.external/HardFloat.url \
+      "$seed_repo_dir/import/black-parrot/external/HardFloat"
+    git -C "$worktree/import/black-parrot" config --local \
+      submodule.external/bedrock.url \
+      "$seed_repo_dir/import/black-parrot/external/bedrock"
     # A detached source worktree may have only the top-level BlackParrot
     # gitlink populated.  Seed its pinned nested dependencies before using it
     # as the local source for the isolated implementation worktree below.
