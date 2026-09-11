@@ -20,6 +20,7 @@ int main() {
   d.alloc_addr_i = 0x2000; d.alloc_context_i = 2; d.alloc_way_i = 5; d.alloc_v_i = 1;
   d.eval(); assert(d.alloc_yumi_o && d.alloc_id_o == 1); tick(d, 0); d.alloc_v_i = 0;
   d.issue_id_i = 0; d.issue_v_i = 1; d.eval(); assert(d.issue_ready_o); tick(d, 0); d.issue_v_i = 0;
+  d.issue_id_i = 3; d.issue_v_i = 1; d.eval(); assert(!d.issue_ready_o); d.issue_v_i = 0;
   d.issue_id_i = 1; d.issue_v_i = 1; d.eval(); assert(d.issue_ready_o); tick(d, 0); d.issue_v_i = 0;
   assert(d.valid_o == 3 && d.issued_o == 3 && d.addr0_o == 0x1000 && d.addr1_o == 0x2000);
   assert(d.occupancy_o == 2 && d.max_occupancy_o == 2);
