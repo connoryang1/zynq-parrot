@@ -253,6 +253,15 @@ for measured results. A passing program alone does not establish prefetch benefi
 
 For a closed full-simulator waveform:
 
+The detached-prefetch transaction table has a standalone regression that checks
+out-of-order issue and retirement before it is connected to the live cache:
+
+```sh
+python3 testing/rtl/run_prefetch_mshr_table.py --out /tmp/prefetch-mshr-table
+```
+
+It must print `[PREFETCH-MSHR] PASS`.
+
 ```sh
 fst2vcd path/to/dump.fst | python3 -B tools/prefetch_overlap_vcd.py \
   --uce-prefix dcache_uce --axi-prefix axi_mem --fill-bytes 8 \
