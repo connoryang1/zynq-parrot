@@ -367,3 +367,5 @@ but reported `max_outstanding=1`: each hint completed before the next was
 issued. This is evidence that the current nonresident handoff path serializes
 prefetch issue through the UCE; increasing slot count alone cannot create the
 intended overlap.
+The trace also records 384 accepted non-prefetch UCE requests: 171 uncached
+reads, 194 miss stores, and 19 miss loads.
