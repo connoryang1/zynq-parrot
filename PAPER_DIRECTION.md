@@ -396,3 +396,9 @@ AXI bursts. The prefetch schedule accepted 383 normal requests (19, 193, and 171
 respectively), plus ten hint transactions, and 4,084 AXI bursts. The extra traffic
 is therefore visible and the hint is not optimized away, but no request overlaps
 another at either the UCE or AXI handshake (`max_outstanding=1`).
+
+The analyzer now correlates each accepted hint with later normal miss requests by
+64-byte line. In the ten-worker prefetch trace, all ten hints are followed by a
+same-line normal miss, so the current advisory path does not eliminate any of the
+worker L1 misses. This is direct trace evidence for the L2-only behavior and the
+candidate's extra serialized traffic.

@@ -148,6 +148,20 @@ def request_summary(records):
                 by_4k_page={hex(key << 12): value for key, value in sorted(by_page.items())})
 
 
+def prefetch_demand_matches(prefetches, demands, line_bytes=64):
+    """Correlate accepted hints with later normal L1 miss requests by line."""
+    result = []
+    for hint in prefetches:
+        matches = [request for request in demands
+                   if request['msg_type'] == 0
+                   and request['address'] // line_bytes == hint['address'] // line_bytes
+                   and request['timestamp'] > hint['issue']['timestamp']]
+        result.append(dict(prefetch_id=hint['id'], address=hint['address'],
+                           normal_miss_count=len(matches),
+                           normal_miss_cycles=[request['cycle'] for request in matches]))
+    return result
+
+
 class Transactions:
     def __init__(self, line_bytes=64, fill_bytes=8, axi=False, prefetch_slots=2,
                  admission_mode='drop'):
@@ -380,6 +394,8 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
         if tracker.cycles[clock] == 0:
             raise EvidenceError('no observed rising edges for ' + clock)
     report = tracker.finish(allow_no_prefetch=allow_no_prefetch)
+    report['prefetch_demand_matches'] = prefetch_demand_matches(
+        report['prefetches'], report['normal_requests'], line_bytes)
     report.update(timescale=timescale, line_bytes=line_bytes, fill_bytes=fill_bytes,
                   configured_prefetch_slots=prefetch_slots,
                   prefetch_admission_mode=admission_modes[0],

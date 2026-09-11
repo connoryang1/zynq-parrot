@@ -121,6 +121,13 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(summary['by_msg_type'], {'0': 1, '4': 2})
         self.assertEqual(summary['by_4k_page'], {'0x1000': 2, '0x80001000': 1})
 
+    def test_prefetch_demand_matches_use_cache_lines(self):
+        hints = [dict(id=0, address=0x80007008, issue=dict(timestamp=10))]
+        demands = [dict(msg_type=0, address=0x80007000, timestamp=20, cycle=2)]
+        matches = analyzer.prefetch_demand_matches(hints, demands)
+        self.assertEqual(matches[0]['normal_miss_count'], 1)
+        self.assertEqual(matches[0]['normal_miss_cycles'], [2])
+
     def test_demand_only_trace_can_report_cache_traffic(self):
         samples = [idle() for _ in range(4)]
         samples[1].update(request_v=1, request_yumi=1, request_type=0,
