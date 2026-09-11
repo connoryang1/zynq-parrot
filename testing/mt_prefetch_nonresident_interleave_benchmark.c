@@ -34,10 +34,9 @@ static uint64_t stacks[WORKERS][128] __attribute__((aligned(64)));
 #define WORKER(NAME, ID, NEXT, FINAL) \
   static __attribute__((naked, noinline)) void NAME(void) { \
     __asm__ volatile( \
-      "addi t2, a0, " #ID "*64\n" \
-      "beqz a2, 1f\nori zero, t2, 1\n1: csrwi 0x800, " #NEXT "\n" \
-      "ld t3, 0(t2)\n" \
-      "la t0, sums\nsd t3, " #ID "*8(t0)\n" \
+      "beqz a2, 1f\nori zero, a0, 1\n1: csrwi 0x800, " #NEXT "\n" \
+      "ld t3, 0(a0)\n" \
+      "sd t3, 0(a1)\n" \
       "la t0, done\nli t1, 1\nsd t1, " #ID "*8(t0)\n" \
       "csrwi 0x800, " #NEXT "\n" FINAL ); }
 
@@ -63,8 +62,8 @@ static uint64_t ring(const volatile struct line *src, unsigned hint)
     __asm__ volatile("mv %0, gp" : "=r"(gp_value));
     seed_reg(i, 3, gp_value);
     seed_reg(i, 2, (uint64_t)&stacks[i][128]);
-    seed_reg(i, 10, (uint64_t)src);
-    seed_reg(i, 11, (uint64_t)sums);
+    seed_reg(i, 10, (uint64_t)&src[i]);
+    seed_reg(i, 11, (uint64_t)&sums[i]);
     seed_reg(i, 12, hint);
     seed_npc(i, (uint64_t)entries[i]);
     __asm__ volatile("fence rw, rw" : : : "memory");
@@ -72,7 +71,7 @@ static uint64_t ring(const volatile struct line *src, unsigned hint)
   uint64_t begin, end;
   __asm__ volatile("csrr %0, 0xcc0" : "=r"(begin) : : "memory");
   __asm__ volatile("mv a0,%0\nmv a1,%1\nmv a2,%2\ncall w0\n"
-                   : : "r"(src), "r"((uint64_t)sums), "r"((uint64_t)hint)
+                   : : "r"(&src[0]), "r"((uint64_t)&sums[0]), "r"((uint64_t)hint)
                    : "a0", "a1", "a2", "memory");
   __asm__ volatile("csrr %0, 0xcc0" : "=r"(end) : : "memory");
   for (unsigned i = 0; i < WORKERS; ++i)

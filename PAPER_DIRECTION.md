@@ -378,3 +378,12 @@ and packed prefetch/yield/load measured `0x111cfe` (1,121,534 cycles); the
 prefetch schedule remains 0.36% slower, while both schedules improve by roughly
 1% versus the aligned layout. The change removes avoidable instruction-refill
 noise but does not itself produce data-prefetch overlap.
+
+The worker bodies were then reduced without changing their per-context NPC or
+continuation protocol: each context is seeded with its own data/result pointers,
+so the timed body no longer performs address arithmetic or repeated global-address
+materialization. All three schedules pass; normal demand/prefetch are
+`0x56e22`/`0x56e44` (355,874/355,908 cycles), while the 200-cycle model gives
+`0x10fe42`/`0x1126cf` (1,113,666/1,124,047 cycles). This removes software and
+instruction-refill overhead, but the high-latency prefetch schedule remains
+slower because requests are still serialized.
