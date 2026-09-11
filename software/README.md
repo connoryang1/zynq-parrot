@@ -22,10 +22,12 @@ In the implemented noncoherent writeback Dcache path, a hint can issue for a
 permitted, cacheable DRAM address with an existing usable translation. Missing
 translations are dropped without starting a page-table walk, and invalid or
 denied hints do not raise an architectural fault. L1 hits and hints that cannot
-be accepted immediately are also dropped. The UCE tracks at most two pending
-requests and coalesces hints to the same cache line. Its word reads warm L2;
-responses are discarded, and a later demand uses the normal L1 refill path.
-Switching resident contexts does not cancel accepted hints.
+be accepted immediately are also dropped. The hint now follows the ordinary
+full-line miss path rather than a separate advisory queue, so accepted traffic
+can install L1 state before the corresponding demand load. The L2 line is still
+the downstream fill destination, but a later demand can still hit in L1 when the
+line already arrived. Switching resident contexts does not cancel accepted
+hints.
 
 The [prefetch tests and simulator workflow](../testing/README.md#nonblocking-prefetch)
 cover hint correctness, U-mode permissions, and independent request streams.

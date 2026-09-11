@@ -44,24 +44,19 @@ miss; integer execution and resident handoffs can continue while it fills.
 `software/include/bp_load_ahead.h` uses an ordinary faulting byte load to x0 to
 warm valid cacheable data. Traces prove useful resident arithmetic before full
 refill completion, but after the critical data beat in the tested simulator.
-The development implementation adds a nonfaulting `prefetch.r` path with two
-outstanding physical requests in `bp_uce.sv`. Hints warm L2, return no architectural
-value, and never install L1 data or complete a demand load. Translation must
-already be present, readable, and cacheable; unavailable translations, denied
-accesses, MMIO, full queues, and busy demand paths drop the hint. Ordinary loads
-retain their fault and completion behavior.
+The current implementation routes prefetches through ordinary miss handling as
+nonfaulting hints in `bp_uce.sv`. Hints can be accepted when translation is
+already known and the line is not in L1/L2; accepted requests still flow through
+the same cache and response path as normal misses. If accepted, a later demand can
+consume the prefetched line directly. Translation misses, denied mappings, MMIO, and
+capacity pressure still drop hints without architectural effect. Ordinary loads keep
+their fault and completion behavior.
 
-Each hint issues one tagged 8-byte cached read. An L2 miss fetches the full line;
-request tags remain owned until the response drains, including across resident
-switches. Duplicate lines coalesce, and a demand for an outstanding hint's line
-waits for that hint before starting its normal L1 fill. The dedicated
-`e_bp_unicore_zynqparrot_prefetch_cfg` provides two L2 banks with 16 sets each,
-preserving the baseline's total 4 KiB capacity. Distinct banks can service
-independent misses; same-bank misses still serialize. This does not make the
-ordinary L1 demand path a multiple-MSHR cache. The multi-bank L2 controller
-keeps metadata per bank so an available demand can pass a pending hint in
-another bank. Ordinary responses retain their global order, and each reply
-stays locked through its final accepted beat.
+This no longer uses a separate dedicated hint queue in the active RTL. The
+`e_cache_prefetch` opcode is not the preferred implementation state today; both
+evidence and software controls should use normal request-admission and line-correlation
+checks. The current L2-bank configuration still preserves baseline capacity and bank
+ordering behavior.
 
 Nonresident replacement still drains outstanding memory activity before
 installing state. The implementation passes traced simulation, routed FPGA
@@ -78,7 +73,9 @@ Measure nonresident behavior with fewer resident banks than logical contexts:
 
 Keep benchmark spacing separate from architectural handoff latency. The accepted
 bare-metal FPGA benchmark measured 5.10 resident and 11.12 nonresident
-cycles/switch on the earlier image. The current Linux shell benchmark measures
-median 5.10546875 resident and 11.14453125 nonresident cycles/switch;
-waveform endpoints and cache/refill tails must be reported separately. Use
+cycles/switch on the earlier image. Current prefetch timing runs should be interpreted
+with the normal miss-ordering rules: a lower cycle count is not implied by prefetch
+issue alone. The current Linux shell benchmark measures median 5.10546875 resident
+and 11.14453125 nonresident cycles/switch; waveform endpoints and cache/refill
+tails must be reported separately. Use
 `0xCC0`, not a context-restored `mcycle`, for cross-context elapsed cycles.

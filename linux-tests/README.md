@@ -275,10 +275,12 @@ which emits the standard Zicbop read hint (`ori zero, base, 1`). On the implemen
 noncoherent writeback path, a permitted cacheable DRAM address with a usable
 DTLB hit can issue a best-effort L2-warming request. Missing translations are
 dropped without page walks or architectural faults. L1 hits and unavailable
-request capacity can also drop hints. Two UCE slots track accepted hints;
-two separate L2 banks can overlap misses, while a single bank still serializes
-them. A batching width of ten does not create ten hardware slots. The compiler
-memory barrier is not a hardware fence or an issuance guarantee.
+request capacity can also drop hints. The current implementation shares ordinary
+miss credits between hints and loads, so this statement is about ordering and
+capacity rather than a separate two-slot count. Two-bank L2 can hide some opposite-bank
+service effects, while a single bank still serializes same-bank traffic. A batching
+width of ten does not create ten hardware slots. The compiler memory barrier is not
+a hardware fence or an issuance guarantee.
 
 This executable uses libc and pthreads, so it is much larger than the existing
 no-libc shell demos. The transfer file is optional and follows the same
@@ -402,11 +404,11 @@ two resident slots and four logical contexts; `--hardware --workers 10` is
 rejected. A ten-resident experiment needs a generalized worker ring, a new
 configuration, and simulation/FPGA qualification. The existing seed encoding
 accommodates IDs 0 through 9, but ten-slot operation and FPGA fit are unverified.
-The two-slot image already uses 96.84% of LUTs. Increasing only logical contexts
-would exercise replacement, which currently drains pending hints before the
-handoff. Increasing resident workers alone also leaves the two UCE prefetch
-slots and two L2 banks unchanged; issuing ten hints does not establish ten
-concurrent memory requests.
+The current image uses 96.84% of LUTs in this configuration. Increasing only
+logical contexts exercises replacement, which currently drains pending requests
+before the handoff. Increasing resident workers alone leaves two resident banks
+and two L2 banks unchanged; issuing ten hints does not establish ten concurrent
+memory requests.
 
 The defaults are two workers, 4,096 requests per worker, a 2 MiB data working
 set, and five measured samples. Use `--help` for validated bounds and an explicit

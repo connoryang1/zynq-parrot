@@ -75,15 +75,14 @@ experiment branches; SQLite remains at
 
 ## Accepted prefetch implementation
 
-The implementation adds nonfaulting L2 hints with two UCE request slots
-and an equal-capacity two-bank L2 (top `fd5a7872`, RTL `f7eedd955`). The response
-controller permits a ready bank to reply past a pending hint while preserving
-ordinary order. The full simulator passes hint correctness, resident switching,
-U-mode Sv39 permissions, and the independent-request benchmark. Traces now
-prove two concurrent cold-data requests in both batch2 and the resident worker
-schedule. Median resident time is 3867 cycles versus 5079 for its matched
-control in three controlled simulator samples; see
-[the experiment](PAPER_DIRECTION.md#removing-the-l2-response-bottleneck).
+This checkpoint records the routed two-slot hint implementation and its matched
+benchmarks from the current branch history (top `fd5a7872`, RTL `f7eedd955`).
+That design uses a dedicated hint path and two UCE hint slots in that artifact.
+Subsequent local RTL work in this branch routes prefetch hints through the normal
+`e_miss_load` queue so this section is historical relative to the live `feat/l1-prefetch`
+cleanup state. See the active benchmark notes in this file and
+[paper direction](PAPER_DIRECTION.md) for current-cycle measurements and ongoing
+constraints.
 
 This checkpoint has passed routed fit and the selected FPGA/Linux gates.
 PYNQ-Z2 job `20260908T221834Z-4425a9d3` was canceled after Vivado exposed an

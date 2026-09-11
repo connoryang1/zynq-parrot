@@ -9,7 +9,7 @@
 #ifdef BP_REQUEST_PREFETCH_R
 #include "bp_prefetch.h"
 #define REQUEST_HINT_ASM(base) BP_PREFETCH_R_ASM(base)
-#define REQUEST_BACKEND "nonfaulting prefetch.r to L2"
+#define REQUEST_BACKEND "nonfaulting prefetch.r to demand-queue (full-line)"
 #define REQUEST_PASS "[BSG-PASS] independent prefetch requests\n"
 #else
 #include "bp_load_ahead.h"

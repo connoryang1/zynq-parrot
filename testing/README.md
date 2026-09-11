@@ -182,25 +182,24 @@ use the transaction-aware prefetch analyzer below for the new hint requests.
 
 [`bp_prefetch_r`](../software/include/bp_prefetch.h) emits the Zicbop read-hint
 encoding. In the noncoherent writeback Dcache path, hints to permitted cacheable
-DRAM can issue without allocating the ordinary demand-miss state. A usable
-DTLB translation must already exist in translated mode: a hint does not start
-a page-table walk. Invalid, denied, missing-translation, L1-hit, and busy-path
-hints are dropped without an architectural exception. There is no guarantee
-that any individual hint reaches memory.
+DRAM now issue as normal full-line demand traffic. A usable DTLB translation
+must already exist in translated mode: a hint does not start a page-table walk.
+Invalid, denied, missing-translation, L1-hit, and busy-path hints are dropped
+without an architectural exception. Accepted traffic can populate L1, so a later
+demand can consume a filled line directly; there is still no hard guarantee that
+every issued hint will complete.
 
-The UCE queue depth is configurable. The normal default remains two entries;
-`e_bp_unicore_zynqparrot_prefetch_cfg` and `BP_ZYNQ_PREFETCH_TWO_BANKS` use ten.
-Same-line hints coalesce, and a full queue causes additional hints to be dropped. Each
-request is an aligned eight-byte L2 read whose flagged response is discarded.
-The L2 bank fills its normal 64-byte line, and a later demand uses the ordinary
-L1 refill path. A same-line demand waits for the pending hint; unrelated
-demands can proceed. Accepted hints survive context switches and are included
-in credit-drain checks.
+The active RTL does not keep a dedicated standalone hint queue. Accepted hints use
+the same credits and miss queue as ordinary misses, so queue pressure and ordering
+are shared. Same-line requests may still coalesce at the fetch side, and a full
+credit window drops additional requests. A same-line demand may therefore consume
+the same request that preceded its hint, while unrelated demand misses proceed when
+credits permit.
 
 `mt_prefetch_hint_test` checks functional hint behavior and subsequent demand
 values. `mt_prefetch_queue_depth_test` issues ten hints before any of its ten
-loads and checks two disjoint arrays; waveform analysis is required to prove
-that all ten hints were retained and overlapped. `mt_umode_prefetch_test` primes
+loads and checks two disjoint arrays; the test verifies admitted request sequence,
+line ownership, and demand completion. `mt_umode_prefetch_test` primes
 a readable 4 KiB Sv39 mapping, confirms
 an execute-only mapping raises the expected demand-load page fault, then
 checks that hints to denied, unmapped, noncanonical, and mapped MMIO addresses
@@ -213,8 +212,8 @@ The test does not switch contexts or establish hint-triggered page walking.
 the hint helper selected. It preserves the same 64 useful loads, two worker
 checksums/counts, 66 switches, disjoint data pages, rotating three-trial order,
 and control/batch2/resident modes described above. There is no arithmetic
-padding. Its batch2 control issues two hints before the two demand loads;
-each resident worker hints its own request, yields, and consumes it on return.
+padding. Its batch2 control issues two hints before the two demand loads; each
+resident worker issues its own request, yields, and consumes it on return.
 The resident timing includes peer result publication, while batch2 publishes
 after its stop counter. This is a bare-metal mechanism test; it does not replace
 the Linux thread baseline or establish an FPGA/Linux performance gain.
@@ -262,20 +261,34 @@ fst2vcd path/to/dump.fst | python3 -B tools/prefetch_overlap_vcd.py \
 python3 -B tools/test_prefetch_overlap_vcd.py
 ```
 
-The analyzer matches flagged UCE requests/replies by slot and address, and AXI
-bursts by their accepted transaction sequence. It rejects incomplete evidence.
-The overlap gates require a later request to be accepted before an earlier
-request's first response beat at each observed interface. UCE and AXI clocks
-are sampled separately. AXI acceptance proves outstanding transactions, not
-parallel DRAM service; that interface also carries traffic other than hints.
-Inspect the individual transactions before attributing overlap to the measured
-request sequence or claiming a latency improvement.
+For current RTL traces (no dedicated prefetch-admission signals), use admission
+and line-based correlation directly:
+
+```sh
+fst2vcd path/to/dump.fst | python3 -B tools/request_overlap_vcd.py \
+  --address <selected-page-address> --span-lines 64 --span-bytes 4096 \
+  --target-pc <request_peer_prefetch-address> --target-thread 1 \
+  --expected-requests 64 --require-serialized
+```
+
+The legacy transaction-aware prefetch analyzer in `tools/prefetch_overlap_vcd.py`
+still supports only the old dedicated-queue traces that expose `prefetch_allocate`
+and related signals. For current RTL traces, use `tools/request_overlap_vcd.py`
+for admission checks and accepted request ordering; use the prefetch analyzer only
+for historical designs and scripts that declare the legacy signal set.
+  
+It still rejects incomplete evidence. In that legacy mode, overlap gates require a
+later request to be accepted before an earlier request's first response beat at
+each observed interface. UCE and AXI clocks are sampled separately. AXI acceptance
+proves outstanding transactions, not parallel DRAM service; that interface also
+carries traffic other than hints. Inspect individual transactions before attributing
+overlap to the measured request sequence or claiming a latency improvement.
 For a measured page, add `--address <physical-page-address> --span-bytes 4096`
 using `request_data[sample][mode]` from the exact ELF. If the AXI port remaps
 physical addresses, also supply the verified `--axi-address-xor` mapping.
-With a region selected, the gates use only its hints and AXI reads correlated
-by physical line and transaction lifetime. This correlation is not an AXI
-source identifier; inspect the retained matches and configuration.
+With the legacy hint analyzer, the gates use only legacy-admitted hint/AXI pairs.
+`request_overlap_vcd.py` can be used on the same waveform to validate the actual
+admitted miss stream for current traces.
 
 The isolated UCE regression uses the real UCE and stream pumps with controlled
 memory responses; it does not rebuild or run either shared core simulator:

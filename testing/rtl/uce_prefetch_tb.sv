@@ -45,7 +45,6 @@ module uce_prefetch_tb
   localparam fill_lp = dcache_fill_width_p;
   localparam tag_lp = paddr_width_p-$clog2(sets_lp)-$clog2(block_lp/8);
   localparam id_lp = 4;
-  localparam prefetch_els_lp = 10;
   `declare_bp_cache_engine_generic_if(paddr_width_p, tag_lp, sets_lp, assoc_lp,
                                     dcache_data_width_p, block_lp, fill_lp, id_lp, cache);
   `declare_bp_bedrock_if(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p);
@@ -88,8 +87,7 @@ module uce_prefetch_tb
   assign fwd_prefetch_o = fwd.payload.prefetch;
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(1), .assoc_p(assoc_lp),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
-           .data_width_p(dcache_data_width_p), .tag_width_p(tag_lp), .id_width_p(id_lp),
-           .prefetch_els_p(prefetch_els_lp))
+           .data_width_p(dcache_data_width_p), .tag_width_p(tag_lp), .id_width_p(id_lp))
     dut (.clk_i(clk_i), .reset_i(reset_i), .did_i('0), .lce_id_i('0),
          .cache_req_i(req), .cache_req_v_i(req_v_i), .cache_req_yumi_o(req_yumi_o),
          .cache_req_lock_o(req_lock_o), .cache_req_metadata_i(metadata),
