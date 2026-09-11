@@ -111,6 +111,16 @@ class PrefetchTests(unittest.TestCase):
         self.assertIsNone(report['axi_summary'])
         self.assertIn('not observable', report['backing_service_overlap'])
 
+    def test_request_summary_groups_type_and_page(self):
+        summary = analyzer.request_summary([
+            {'msg_type': 0, 'address': 0x80001000},
+            {'msg_type': 4, 'address': 0x00001040},
+            {'msg_type': 4, 'address': 0x00001080},
+        ])
+        self.assertEqual(summary['count'], 3)
+        self.assertEqual(summary['by_msg_type'], {'0': 1, '4': 2})
+        self.assertEqual(summary['by_4k_page'], {'0x1000': 2, '0x80001000': 1})
+
     def test_different_clock_phases_sample_their_own_edges(self):
         report = self.analyze(axi=True)
         self.assertEqual(report['prefetches'][0]['issue'], dict(cycle=1, timestamp=25))

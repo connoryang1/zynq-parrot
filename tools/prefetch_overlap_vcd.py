@@ -9,7 +9,7 @@ slot reuse, malformed bursts, and incomplete transactions invalidate the trace.
 """
 
 import argparse
-from collections import deque
+from collections import Counter, deque
 import json
 import sys
 
@@ -137,6 +137,15 @@ def overlap_summary(records):
                 issue_before_prior_first_response=bool(before_first),
                 issue_before_prior_completion=bool(before_complete),
                 before_first_response_pairs=before_first, before_completion_pairs=before_complete)
+
+
+def request_summary(records):
+    """Summarize accepted non-prefetch UCE requests by type and 4 KiB page."""
+    by_type = Counter(record['msg_type'] for record in records)
+    by_page = Counter(record['address'] >> 12 for record in records)
+    return dict(count=len(records),
+                by_msg_type={str(key): value for key, value in sorted(by_type.items())},
+                by_4k_page={hex(key << 12): value for key, value in sorted(by_page.items())})
 
 
 class Transactions:
@@ -340,6 +349,7 @@ class Transactions:
         return dict(verdict='valid_transactions', prefetch_summary=uce, axi_summary=axi,
                     prefetches=self.prefetches, accepted_hints=self.hints,
                     normal_requests=self.demands, normal_reads=self.normal_reads,
+                    normal_request_summary=request_summary(self.demands),
                     axi_reads=self.axi_reads if self.axi else None,
                     backing_service_overlap='not observable from AXI handshakes',
                     axi_prefetch_attribution='not inferred; AXI also carries other cache traffic')
