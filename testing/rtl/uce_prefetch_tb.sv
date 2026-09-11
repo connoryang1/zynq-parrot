@@ -86,6 +86,7 @@ module uce_prefetch_tb
   assign fwd_state_o = fwd.payload.state;
   assign fwd_prefetch_o = fwd.payload.prefetch;
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(1), .assoc_p(assoc_lp),
+           .prefetch_els_p(10),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
            .data_width_p(dcache_data_width_p), .tag_width_p(tag_lp), .id_width_p(id_lp))
     dut (.clk_i(clk_i), .reset_i(reset_i), .did_i('0), .lce_id_i('0),
