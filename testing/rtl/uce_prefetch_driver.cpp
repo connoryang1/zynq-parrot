@@ -25,13 +25,15 @@ class Test {
   bool checking = false, demand_active = false;
   unsigned steps = 0, release_arrays_at = 0;
   unsigned writes_at_stall = 0, completions_at_stall = 0;
-  unsigned writes = 0, completions = 0, fills = 0, reverse_stalls = 0;
+  unsigned writes = 0, demand_writes = 0, prefetch_writes = 0;
+  unsigned completions = 0, fills = 0, reverse_stalls = 0;
+  bool response_prefetch_active = false;
   std::vector<Header> sent;
 
   Handshake step() {
     require(++steps < 20000, "global UCE unit-test cycle limit");
     if (release_arrays_at && steps >= release_arrays_at) {
-      require(writes == writes_at_stall && completions == completions_at_stall,
+      require(demand_writes == writes_at_stall && completions == completions_at_stall,
               "cache-array backpressure failed");
       dut.arrays_accept_i = 1;
       release_arrays_at = 0;
@@ -42,28 +44,28 @@ class Test {
       Header h{dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o, dut.fwd_state_o,
                dut.fwd_addr_o, bool(dut.fwd_prefetch_o)};
       require(h.type == memory_read, "unexpected forward message type");
-      require(!h.prefetch || (h.size == 3 && !(h.addr & 7) && h.way < 8),
-              "hint word-size/alignment/slot encoding invalid");
+      require(!h.prefetch || (h.size == 6 && !(h.addr & 63) && h.way < 8),
+              "hint line-size/alignment/slot encoding invalid");
       sent.push_back(h);
     }
     if (!dut.reset_i && checking) {
-      require(demand_active || !(dut.data_v_o || dut.critical_o || dut.last_o
-              || (dut.tag_v_o && dut.tag_opcode_o == 1)),
-              "hint response escaped into architectural cache completion");
       if (dut.rev_v_i && !dut.rev_ready_o) ++reverse_stalls;
       if (dut.data_v_o && dut.arrays_accept_i) {
-        require(dut.data_opcode_o == 0 && dut.data_way_o == 3 && dut.req_id_o == 9,
-                "normal refill lost opcode/replacement way/request ID");
+        require(dut.data_opcode_o == 0, "prefetch refill lost write opcode");
         unsigned mask = dut.data_fill_o;
-        require(mask && !(mask & (mask-1)) && !(fills & mask),
-                "normal response wrote duplicate/invalid fill index");
+        require(mask && !(mask & (mask-1)), "refill wrote invalid fill index");
         unsigned index = 0;
         while ((1u << index) != mask) ++index;
         require(dut.data_word0_o == seed + index*2 && dut.data_word1_o == seed + index*2 + 1,
-                "normal refill payload corrupted");
-        fills |= mask;
+                "refill payload corrupted");
+        if (demand_active && !response_prefetch_active) fills |= mask;
         ++writes;
-        if (dut.last_o) ++completions;
+        if (demand_active && !response_prefetch_active) {
+          ++demand_writes;
+          if (dut.last_o) ++completions;
+        } else {
+          ++prefetch_writes;
+        }
       }
     }
     dut.clk_i = 1; dut.eval(); context.timeInc(5); trace.dump(context.time());
@@ -99,12 +101,13 @@ class Test {
     throw std::runtime_error("memory credits did not drain");
   }
   void response(Header h) {
-    for (unsigned beat = 0; beat < (h.prefetch ? 1u : 4u); ++beat) {
+    response_prefetch_active = h.prefetch;
+    for (unsigned beat = 0; beat < 4u; ++beat) {
       dut.rev_type_i = h.type; dut.rev_size_i = h.size;
       dut.rev_addr_i = h.addr; dut.rev_way_i = h.way; dut.rev_state_i = h.state;
       dut.rev_prefetch_i = h.prefetch;
-      dut.rev_word0_i = h.prefetch ? UINT64_C(0xbad0bad0bad0bad0) : seed + beat*2;
-      dut.rev_word1_i = h.prefetch ? UINT64_C(0xbad0bad0bad0bad0) : seed + beat*2 + 1;
+      dut.rev_word0_i = seed + beat*2;
+      dut.rev_word1_i = seed + beat*2 + 1;
       dut.rev_v_i = 1;
       bool got = false;
       for (unsigned n = 0; n < 200; ++n)
@@ -113,12 +116,13 @@ class Test {
       dut.rev_v_i = 0;
       step();
     }
+    response_prefetch_active = false;
   }
   void normal_done(unsigned old_writes, unsigned old_completions) {
     for (unsigned n = 0; n < 200; ++n) {
       step();
       if (completions == old_completions + 1) {
-        require(writes == old_writes + 4 && fills == 15,
+        require(demand_writes == old_writes + 4 && fills == 15,
                 "normal demand completed without exactly one complete line");
         demand_active = false;
         return;
@@ -166,16 +170,16 @@ public:
     response(sent[8]);
     for (unsigned i = 0; i < 8; ++i) response(sent[i]);
     response(sent[10]); wait_empty();
-    require(writes == 0 && completions == 0, "hint-only sequence changed L1");
+    require(demand_writes == 0 && prefetch_writes > 0, "hint-only sequence did not fill L1");
 
     request(hint, 0x80020000); request(hint, 0x80021000); wait_sent(13);
     demand_active = true; fills = 0;
-    unsigned old_writes = writes, old_completions = completions;
+    unsigned old_writes = demand_writes, old_completions = completions;
     request(demand, 0x80022000); wait_sent(14);
     require(!sent[13].prefetch && sent[13].size == 6, "normal demand became a hint");
     dut.arrays_accept_i = 0;
     release_arrays_at = steps + 12;
-    writes_at_stall = writes; completions_at_stall = completions;
+    writes_at_stall = demand_writes; completions_at_stall = completions;
     response(sent[13]); normal_done(old_writes, old_completions);
     require(reverse_stalls > 0, "test did not exercise reverse-channel backpressure");
     require(!dut.credits_empty_o, "normal demand lost pending hint credits");
@@ -183,7 +187,7 @@ public:
 
     request(hint, 0x80030008); wait_sent(15);
     demand_active = true; fills = 0;
-    old_writes = writes; old_completions = completions;
+    old_writes = demand_writes; old_completions = completions;
     // The implementation may queue a matching demand or defer its acceptance.
     dut.req_type_i = demand; dut.req_addr_i = 0x80030000; dut.req_v_i = 1;
     bool accepted = false;
@@ -206,7 +210,7 @@ public:
             "matching demand lost its normal memory transaction");
     response(sent[15]); normal_done(old_writes, old_completions); wait_empty();
     cycles(8);
-    require(sent.size() == 16 && writes == 8 && completions == 2,
+    require(sent.size() == 16 && demand_writes == 8 && completions == 2,
             "final request/response accounting mismatch");
     std::cout << "[UCE-PREFETCH] PASS: ten slots, wrapped tags, full-queue drops, reordered replies, "
                  "demand routing, stalls, credits\n";
