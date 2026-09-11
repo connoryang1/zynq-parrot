@@ -24,6 +24,8 @@ int main() {
   assert(d.valid_o == 3 && d.issued_o == 3 && d.addr0_o == 0x1000 && d.addr1_o == 0x2000);
   d.demand_addr_i = 0x2038; d.demand_v_i = 1; d.eval();
   assert(d.demand_join_o && d.demand_id_o == 1); d.demand_v_i = 0;
+  d.alloc_addr_i = 0x2010; d.alloc_v_i = 1; d.eval();
+  assert(d.alloc_yumi_o && d.alloc_duplicate_o && d.alloc_id_o == 1); d.alloc_v_i = 0;
   d.response_id_i = 1; d.response_beat_i = 2; d.response_v_i = 1; d.response_last_i = 0; d.eval(); assert(d.response_ready_o); tick(d, 0); d.response_v_i = 0;
   assert(d.valid_o == 3 && d.issued_o == 3 && d.fill_mask1_o == 4);
   d.response_v_i = d.response_last_i = 1; d.eval(); assert(d.response_ready_o); tick(d, 0); d.response_v_i = d.response_last_i = 0;
