@@ -13,6 +13,7 @@ SHELL := /bin/bash
 # Default to the accepted static FPGA topology, including SRAM eviction.
 NUM_THREADS ?= 2
 NUM_CONTEXTS ?= 4
+BENCH_MODE ?= 2
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 CFLAGS = -O2 \
@@ -23,9 +24,10 @@ CFLAGS = -O2 \
           -DNUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
+CFLAGS += -DBENCH_MODE=$(BENCH_MODE)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -51,6 +53,7 @@ CORRECTNESS_TESTS := \
 
 BENCHMARKS := \
     mt_prefetch_interleave_benchmark \
+    mt_prefetch_nonresident_interleave_benchmark \
     mt_request_interleave_benchmark \
     mt_load_ahead_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark
@@ -98,6 +101,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TO
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_interleave_benchmark.riscv: $(TOP)/testing/mt_request_interleave_benchmark.c $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
@@ -109,6 +113,11 @@ check-nonresident-config:
 		exit 1; \
 	fi
 
+.PHONY: check-ten-logical-config
+check-ten-logical-config:
+	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 )); then \
+		echo "ERROR: ten-worker benchmark requires NUM_THREADS=2 NUM_CONTEXTS=10"; exit 1; \
+	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
@@ -118,6 +127,7 @@ run-mt_ctxtsw_load_overlap_test: check-nonresident-config
 run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_interleave_benchmark: check-nonresident-config
+run-mt_prefetch_nonresident_interleave_benchmark: check-ten-logical-config
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config

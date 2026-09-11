@@ -44,6 +44,7 @@ TEST_MARKERS = {
     "mt_load_ahead_benchmark": "[BSG-PASS] load-ahead benchmark completed",
     "mt_request_interleave_benchmark": "[BSG-PASS] independent requests",
     "mt_prefetch_interleave_benchmark": "[BSG-PASS] independent prefetch requests",
+    "mt_prefetch_nonresident_interleave_benchmark": "[BSG-PASS] ten logical nonresident prefetch workers",
     "mt_prefetch_hint_test": "[BSG-PASS] nonfaulting prefetch hints",
     "mt_prefetch_queue_depth_test": "[BSG-PASS] ten queued prefetch hints",
     "mt_umode_prefetch_test": "[BSG-PASS] U-mode Sv39 nonfaulting prefetch permissions",

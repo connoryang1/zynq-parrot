@@ -56,8 +56,9 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
 | `mt_prefetch_interleave_benchmark` | The same independent request streams and controls using nonblocking `prefetch.r` hints instead of discarded byte loads |
+| `mt_prefetch_nonresident_interleave_benchmark` | Ten logical workers on two resident banks; each worker issues one demand or prefetch request, yields through the logical ring, and consumes after resumption |
 
-These 25 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
+These 26 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
@@ -67,6 +68,19 @@ compilation alone is not a runtime pass. Use that topology for the handoff tests
 and benchmark: the benchmark specifically compares resident context 1 with
 nonresident context 2. The four-ID ring tests require at least four logical
 contexts; resident-only isolation tests use contexts 0 and 1.
+
+The ten-worker benchmark requires a fresh boot for each schedule because the
+current prototype does not reclaim context state after a run. Select one mode
+per boot with `BENCH_MODE=0` (ten-worker demand), `BENCH_MODE=1` (single-thread
+batched ideal), or `BENCH_MODE=2` (ten-worker prefetch/yield/load):
+
+```sh
+make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
+  NUM_THREADS=2 NUM_CONTEXTS=10 BENCH_MODE=2
+```
+
+Compare the printed cycle rows from three fresh boots. The benchmark checks all
+ten per-worker completions and checksums before printing its result.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending

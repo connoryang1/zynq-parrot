@@ -338,3 +338,22 @@ usable shell, and poweroff. These checks do not qualify the Linux request-pool
 benchmark: its second resident launch remains unresolved on the feature branch.
 The next application gate is that lifecycle fix, followed by the pinned
 OS-thread baseline, matched two-worker candidate, and batch-ten reference.
+
+## Ten logical workers on two resident banks
+
+The simulator now has a direct ten-worker experiment using `NUM_THREADS=2` and
+`NUM_CONTEXTS=10`. Each logical worker owns one cold cache line. Demand mode
+yields without a hint; candidate mode issues `prefetch.r`, yields, and consumes
+the line after resumption. The batched mode issues ten prefetches and then ten
+loads. Each schedule runs from a fresh boot because context state is not
+reclaimed between independent launches.
+
+The first clean runs measured 359,870 cycles for ten-worker demand, 359,971
+cycles for ten-worker prefetch/yield/load (0.03% slower), and 714 cycles for the
+batched ideal. The candidate is therefore about 503x slower than the ideal on
+this small cold-line test; the nonresident ring and all ten completion checks
+pass, but this run does not yet show a latency benefit from prefetching. The
+existing FPGA Linux ten-thread reference uses a larger 40,960-request workload
+and measured 3,270,749 demand cycles versus 6,111,512 batched cycles, so it is
+retained as a separate OS baseline rather than combined into the simulator
+ratio.
