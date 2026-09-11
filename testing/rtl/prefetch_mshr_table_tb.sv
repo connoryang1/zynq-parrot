@@ -7,7 +7,8 @@ module prefetch_mshr_table_tb
    output demand_join_o, output [1:0] demand_id_o, output alloc_duplicate_o,
    output [1:0] alloc_id_o, output [1:0] valid_o, output [1:0] issued_o,
    output [55:0] addr0_o, addr1_o, output [1:0] context0_o, context1_o,
-   output [2:0] way0_o, way1_o, output [3:0] fill_mask0_o, fill_mask1_o);
+   output [2:0] way0_o, way1_o, output [3:0] fill_mask0_o, fill_mask1_o,
+   output [1:0] occupancy_o, max_occupancy_o);
   logic [1:0] valid, issued;
   logic [1:0][55:0] addr;
   logic [1:0][1:0] ctx;
@@ -20,7 +21,8 @@ module prefetch_mshr_table_tb
      .issue_v_i, .issue_id_i, .issue_ready_o, .response_v_i, .response_id_i,
      .response_ready_o, .response_last_i, .response_beat_i, .demand_v_i, .demand_addr_i,
      .demand_join_o, .demand_id_o, .alloc_duplicate_o, .valid_o(valid), .issued_o(issued),
-     .addr_o(addr), .context_o(ctx), .way_o(way), .fill_mask_o(fill_mask));
+     .addr_o(addr), .context_o(ctx), .way_o(way), .fill_mask_o(fill_mask),
+     .occupancy_o, .max_occupancy_o);
   assign valid_o = valid; assign issued_o = issued;
   assign addr0_o = addr[0]; assign addr1_o = addr[1];
   assign context0_o = ctx[0]; assign context1_o = ctx[1];
