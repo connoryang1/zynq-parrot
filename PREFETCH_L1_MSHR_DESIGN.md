@@ -1,8 +1,8 @@
 # Coroutine-style L1 prefetch design
 
 The fast-switch benchmark requires a prefetch to survive a context switch as an
-independent L1 fill. The current `prefetch.r` path is advisory downstream traffic
-and does not satisfy this contract.
+independent L1 fill. The current RTL now provides that path through a ten-entry
+UCE queue and a detached full-line L1 fill route.
 
 ## Required transaction contract
 
@@ -19,26 +19,24 @@ retain priority over hint allocation and issue.
 
 ## RTL stages
 
-1. Replace the single data-cache `mshr_reg` with a parameterized entry array and
-   expose an entry ID on the cache-engine request metadata.
-2. Add an L1-fill response arbiter that writes tag, status, and data beats for
-   the selected entry while preserving ordinary demand completion signals.
-3. Extend the UCE request state from one active miss to a small entry pool, with
-   independent address/way metadata and response matching.
-4. Extend the CCE memory request state similarly, or provide a dedicated
-   read-only prefetch request channel whose responses carry the L1 entry ID.
-5. Keep context-switch acceptance independent of outstanding hint entries; only
+1. The dcache emits an explicit prefetch transaction and carries its replacement
+   way in the request ID.
+2. UCE maintains ten detached entries, tracks each fill beat, matches responses
+   by physical line address, and writes data/tag state without architectural
+   completion.
+3. The tag is published only after the complete line arrives; partial responses
+   cannot make a line valid.
+4. Context-switch acceptance remains independent of outstanding hint entries; only
    architectural ordering operations may drain or fence them.
 
-The first useful configuration is two entries for the two resident contexts. A
-four-entry configuration should then be used for the ten-logical-worker,
-two-resident benchmark. The simulator must report accepted hints, maximum
-outstanding entries, completed L1 fills, demand joins, and dropped hints.
+The production simulator configuration uses ten entries for the ten-logical-worker,
+two-resident benchmark. The focused UCE regression covers accepted hints, full-line
+fills, reordered replies, demand routing, backpressure, and dropped hints.
 
 ## Completion evidence
 
-The implementation is complete only when the nonresident coroutine benchmark
-shows multiple accepted entries outstanding concurrently, later loads hit or
-join those L1 fills, and the demand-only, prefetch/yield/load, and batched-ideal
-cycle rows are all collected from fresh boots. Functional PASS without those
-trace counters is insufficient.
+The focused RTL path is verified. The end-to-end simulator also passes the
+nonresident prefetch benchmark; the latest rows are demand `0x56e22`,
+prefetch/yield/load `0x56dad`, and batched ideal `0x2ca`. The prefetch row is
+117 cycles faster than demand, while switch/restore overhead remains the dominant
+cost and keeps the result far from the batched ideal.

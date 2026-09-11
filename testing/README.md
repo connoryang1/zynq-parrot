@@ -181,20 +181,19 @@ use the transaction-aware prefetch analyzer below for the new hint requests.
 ## Nonblocking prefetch
 
 [`bp_prefetch_r`](../software/include/bp_prefetch.h) emits the Zicbop read-hint
-encoding. In the noncoherent writeback Dcache path, hints to permitted cacheable
-DRAM now issue as normal full-line demand traffic. A usable DTLB translation
+encoding. In the writeback Dcache path, hints to permitted cacheable DRAM issue
+as detached full-line requests, including coherent configurations. A usable DTLB translation
 must already exist in translated mode: a hint does not start a page-table walk.
 Invalid, denied, missing-translation, L1-hit, and busy-path hints are dropped
-without an architectural exception. Accepted traffic can populate L1, so a later
-demand can consume a filled line directly; there is still no hard guarantee that
-every issued hint will complete.
+without an architectural exception. Accepted traffic populates L1 after all
+returned beats arrive, so a later demand can consume a filled line directly;
+there is still no hard guarantee that every issued hint will complete.
 
-The active RTL does not keep a dedicated standalone hint queue. Accepted hints use
-the same credits and miss queue as ordinary misses, so queue pressure and ordering
-are shared. Same-line requests may still coalesce at the fetch side, and a full
-credit window drops additional requests. A same-line demand may therefore consume
-the same request that preceded its hint, while unrelated demand misses proceed when
-credits permit.
+The active RTL keeps a ten-entry detached UCE hint queue. Hints use the existing
+coherence credits, may issue while a demand miss is active, and are matched to
+responses by physical line address. Each response tracks its own fill beat and
+replacement way; the tag is published only after the complete line arrives. A
+full queue drops additional hints, while same-line demand traffic remains ordered.
 
 `mt_prefetch_hint_test` checks functional hint behavior and subsequent demand
 values. `mt_prefetch_queue_depth_test` issues ten hints before any of its ten
