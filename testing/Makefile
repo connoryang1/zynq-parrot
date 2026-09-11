@@ -14,6 +14,7 @@ SHELL := /bin/bash
 NUM_THREADS ?= 2
 NUM_CONTEXTS ?= 4
 BENCH_MODE ?= 2
+SIM_DEFINES ?=
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 CFLAGS = -O2 \
@@ -84,11 +85,11 @@ $(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_see
 run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
 	@rm -f $$(SIM_DIR)/prog.riscv $$(SIM_DIR)/prog.mem $$(SIM_DIR)/prog.nbf $$(SIM_DIR)/run.log
-	@$$(MAKE) -C $$(SIM_DIR) build NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) > $(LOG_DIR)/verilator_build.log 2>&1 || \
+	@$$(MAKE) -C $$(SIM_DIR) build NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) > $(LOG_DIR)/verilator_build.log 2>&1 || \
 		{ echo "ERROR: model build failed; no previous runtime result is valid"; exit 1; }
 	@echo "  [RUN]   Executing $(1) in simulator..."
 	@set +e; \
-	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"; \
+	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
 	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc

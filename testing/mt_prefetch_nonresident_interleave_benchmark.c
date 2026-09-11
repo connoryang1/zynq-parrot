@@ -32,7 +32,7 @@ static uint64_t stacks[WORKERS][128] __attribute__((aligned(64)));
   static __attribute__((naked, noinline, aligned(64))) void NAME(void) { \
     __asm__ volatile( \
       "addi t2, a0, " #ID "*64\n" \
-      "beqz a2, 1f\nori zero, t2, 1\n1: csrwi 0x800, " #NEXT "\n" \
+      "beqz a2, 1f\nori zero, t2, 1\nfence r, r\n1: csrwi 0x800, " #NEXT "\n" \
       "ld t3, 0(t2)\n" \
       "la t0, sums\nsd t3, " #ID "*8(t0)\n" \
       "la t0, done\nli t1, 1\nsd t1, " #ID "*8(t0)\n" \

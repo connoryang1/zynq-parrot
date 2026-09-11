@@ -357,3 +357,13 @@ existing FPGA Linux ten-thread reference uses a larger 40,960-request workload
 and measured 3,270,749 demand cycles versus 6,111,512 batched cycles, so it is
 retained as a separate OS baseline rather than combined into the simulator
 ratio.
+
+A high-latency simulator control uses the simulation-only pipelined AXI model
+(`BP_AXI_MEM_READ_LATENCY=200`, queue depth 10). Fresh-boot results are demand
+`0x114d21` (1,133,857 cycles), prefetch/yield/load `0x11696f` (1,141,103 cycles), and batched ideal
+`0x9c9d` (40,093 cycles). The candidate is about 0.6% slower than demand and
+about 28x slower than the ideal. A traced candidate run accepted all ten hints,
+but reported `max_outstanding=1`: each hint completed before the next was
+issued. This is evidence that the current nonresident handoff path serializes
+prefetch issue through the UCE; increasing slot count alone cannot create the
+intended overlap.

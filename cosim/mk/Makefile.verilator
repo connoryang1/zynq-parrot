@@ -5,6 +5,7 @@ SHELL := /bin/bash
 .SHELLFLAGS := -o pipefail -c
 
 DEFINES += SIMULATION
+DEFINES += $(EXTRA_DEFINES)
 
 DUMP_FILE ?= dump.fst
 VERILATOR_BUILD_JOBS ?= $(shell nproc)

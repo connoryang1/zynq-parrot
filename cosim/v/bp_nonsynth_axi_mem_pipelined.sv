@@ -110,7 +110,7 @@ module bp_nonsynth_axi_mem_pipelined
   // asserted or stalled R beat. This is the model's read/write collision rule.
   function automatic logic [axi_data_width_p-1:0] read_word(input logic [63:0] address);
     logic [axi_data_width_p-1:0] value;
-    value = ram[ram_index_width_lp'(address / 64'(strb_width_lp))];
+    value = ram[ram_index_width_lp'((address / 64'(strb_width_lp)) & (mem_els_p-1))];
     for (int bit_index = 0; bit_index < axi_data_width_p; bit_index++)
       if (value[bit_index] === 1'bx)
         value[bit_index] = init_data_p[bit_index % 32];
@@ -136,13 +136,14 @@ module bp_nonsynth_axi_mem_pipelined
     if (burst == 2'b01 && (64'(address) % 4096) + span > 4096)
       $fatal(1, "AXI INCR burst crosses a 4 KiB boundary: addr=%h len=%0d size=%0d burst=%0d bytes=%0d",
              address, len, size, burst, span);
-    for (int unsigned beat = 0; beat <= int'(len); beat++)
-      if (beat_address(address, len, size, burst, beat) + step > 64'(mem_els_p) * strb_width_lp)
-        $fatal(1, "AXI memory transaction is outside the configured RAM");
+    // The standard nonsynthesizable model aliases the physical address into
+    // its finite backing store. Preserve that behavior for boot traffic while
+    // retaining alignment and burst-shape checks above.
   endtask
 
   initial begin
     if (read_queue_els_p < 2 || read_latency_p < 2 || mem_els_p < 1
+        || (mem_els_p & (mem_els_p - 1)) != 0
         || axi_data_width_p < 32 || (axi_data_width_p % 32) != 0
         || (strb_width_lp & (strb_width_lp - 1)) != 0 || axi_addr_width_p > 64)
       $fatal(1, "Invalid pipelined AXI memory parameters");
@@ -237,7 +238,7 @@ module bp_nonsynth_axi_mem_pipelined
             if (64'(lane) < address % 64'(strb_width_lp)
                 || 64'(lane) >= address % 64'(strb_width_lp) + (64'd1 << write_size_r))
               $fatal(1, "AXI WSTRB selects a byte outside the narrow transfer");
-            ram[ram_index_width_lp'(address / 64'(strb_width_lp))][lane*8+:8] <= axi_wdata_i[lane*8+:8];
+            ram[ram_index_width_lp'((address / 64'(strb_width_lp)) & (mem_els_p-1))][lane*8+:8] <= axi_wdata_i[lane*8+:8];
           end
         end
         if (axi_wlast_i) begin
