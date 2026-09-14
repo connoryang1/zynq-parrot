@@ -225,10 +225,15 @@ class PrefetchTests(unittest.TestCase):
         with self.assertRaisesRegex(analyzer.EvidenceError, 'same-line prefetch completion'):
             self.analyze(samples)
 
-    def test_unmatched_and_wrong_identity_responses_rejected(self):
-        for field, value, message in (('rev_slot', 2, 'unmatched'),
-                                       ('rev_state', 1, 'unmatched'),
-                                       ('rev_address', 0x80008008, 'address/size'),
+    def test_response_matching_uses_line_address_not_legacy_payload_id(self):
+        for field, value in (('rev_slot', 2), ('rev_state', 1)):
+            samples = case()
+            samples[6][field] = value
+            with self.subTest(field=field):
+                self.assertEqual(len(self.analyze(samples)['prefetches']), 2)
+
+    def test_malformed_responses_are_rejected(self):
+        for field, value, message in (('rev_address', 0x80008008, 'unmatched'),
                                        ('rev_size', 6, 'address/size'),
                                        ('rev_last', 0, 'boundary'),
                                        ('rev_prefetch', 0, 'unmatched normal')):
@@ -236,6 +241,28 @@ class PrefetchTests(unittest.TestCase):
             samples[6][field] = value
             with self.subTest(field=field), self.assertRaisesRegex(analyzer.EvidenceError, message):
                 self.analyze(samples)
+
+    def test_full_line_prefetch_response_tracks_all_beats(self):
+        samples = [idle() for _ in range(12)]
+        samples[0].update(allocate(0, 0x80010000))
+        samples[1].update(issue(0, 0x80010000), fwd_size=6)
+        for beat in range(8):
+            samples[2 + beat].update(
+                response(0, 0x80010000 + beat * 8), rev_size=3,
+                rev_new=int(beat == 0), rev_last=int(beat == 7))
+        report = self.analyze(samples)
+        self.assertEqual(report['prefetches'][0]['beats'], 8)
+        self.assertEqual(report['prefetches'][0]['complete']['cycle'], 9)
+
+    def test_full_line_response_may_repeat_header_address(self):
+        samples = [idle() for _ in range(12)]
+        samples[0].update(allocate(0, 0x80010000))
+        samples[1].update(issue(0, 0x80010000), fwd_size=6)
+        for beat in range(8):
+            samples[2 + beat].update(
+                response(0, 0x80010000), rev_size=6,
+                rev_new=int(beat == 0), rev_last=int(beat == 7))
+        self.assertEqual(self.analyze(samples)['prefetches'][0]['beats'], 8)
 
     def test_unknown_controls_and_reset_pending_rejected(self):
         for field in ('request_v', 'issue', 'rev_yumi', 'reset'):

@@ -32,19 +32,7 @@ package bp_common_pkg;
       ,l2_data_width: 64
       ,l2_fill_width: 64
       ,l2_slices    : 1
-`ifdef BP_L2_BANKS
-      // Simulation override for testing detached-request service width while
-      // preserving the default 4 KiB total L2 capacity when BP_L2_SETS is
-      // supplied alongside a larger bank count.
-      ,l2_banks     : `BP_L2_BANKS
-`ifdef BP_L2_SETS
-      ,l2_sets      : `BP_L2_SETS
-`else
-      ,l2_sets      : bp_default_cfg_p.l2_sets / `BP_L2_BANKS
-`endif
-`else
       ,l2_banks     : 1
-`endif
 
       ,itlb_els_4k : 16
       ,itlb_els_2m : 1

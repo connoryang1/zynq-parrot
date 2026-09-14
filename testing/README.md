@@ -219,8 +219,10 @@ the Linux thread baseline or establish an FPGA/Linux performance gain.
 
 ### Full simulator and waveform evidence
 
-The minimal core simulator can check instruction and UCE behavior. To test
-downstream concurrency, select the full simulator and optional two-bank L2.
+The minimal core simulator can check instruction and UCE behavior. Its memory
+device is the single-request `bp_axil_master`; changing L2 configuration fields
+does not add an L2 to this topology. To test the existing two-bank L2 path,
+select the full simulator and optional two-bank L2.
 `BP_ZYNQ_PREFETCH_TWO_BANKS` retains the total 4 KiB L2 capacity and maps adjacent
 cache lines to different banks. Each bank still has one miss handler, so
 same-bank requests serialize. The optional `BP_AXI_MEM_PIPELINED` model queues
@@ -269,8 +271,8 @@ fst2vcd path/to/dump.fst | python3 -B tools/prefetch_overlap_vcd.py \
 python3 -B tools/test_prefetch_overlap_vcd.py
 ```
 
-For current RTL traces (no dedicated prefetch-admission signals), use admission
-and line-based correlation directly:
+For traces from older RTL without dedicated prefetch-admission signals, use
+admission and line-based correlation directly:
 
 ```sh
 fst2vcd path/to/dump.fst | python3 -B tools/request_overlap_vcd.py \
@@ -279,13 +281,11 @@ fst2vcd path/to/dump.fst | python3 -B tools/request_overlap_vcd.py \
   --expected-requests 64 --require-serialized
 ```
 
-The legacy transaction-aware prefetch analyzer in `tools/prefetch_overlap_vcd.py`
-still supports only the old dedicated-queue traces that expose `prefetch_allocate`
-and related signals. For current RTL traces, use `tools/request_overlap_vcd.py`
-for admission checks and accepted request ordering; use the prefetch analyzer only
-for historical designs and scripts that declare the legacy signal set.
-  
-It still rejects incomplete evidence. In that legacy mode, overlap gates require a
+The transaction-aware analyzer supports both the earlier one-beat hint response
+and the current full-line detached response. It matches current responses by
+physical line, validates every response beat and first/last boundary, and
+correlates each hint with later normal L1 misses. It rejects incomplete evidence.
+Overlap gates require a
 later request to be accepted before an earlier request's first response beat at
 each observed interface. UCE and AXI clocks are sampled separately. AXI acceptance
 proves outstanding transactions, not parallel DRAM service; that interface also
@@ -294,9 +294,9 @@ overlap to the measured request sequence or claiming a latency improvement.
 For a measured page, add `--address <physical-page-address> --span-bytes 4096`
 using `request_data[sample][mode]` from the exact ELF. If the AXI port remaps
 physical addresses, also supply the verified `--axi-address-xor` mapping.
-With the legacy hint analyzer, the gates use only legacy-admitted hint/AXI pairs.
-`request_overlap_vcd.py` can be used on the same waveform to validate the actual
-admitted miss stream for current traces.
+The hint analyzer's gates use only admitted hint/AXI pairs.
+`request_overlap_vcd.py` can be used on an older waveform to validate the actual
+admitted miss stream when detached-transaction signals are unavailable.
 
 The isolated UCE regression uses the real UCE and stream pumps with controlled
 memory responses; it does not rebuild or run either shared core simulator:

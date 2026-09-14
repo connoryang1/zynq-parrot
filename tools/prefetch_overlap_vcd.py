@@ -171,6 +171,8 @@ class Transactions:
         if prefetch_slots <= 0:
             raise EvidenceError('prefetch-slots must be positive')
         self.line_bytes, self.fill_bytes, self.axi = line_bytes, fill_bytes, axi
+        self.line_size = line_bytes.bit_length() - 1
+        self.fill_size = fill_bytes.bit_length() - 1
         self.prefetch_slots = prefetch_slots
         self.admission_mode = admission_mode
         self.slots, self.normal_pending, self.axi_pending = {}, [], deque()
@@ -217,7 +219,8 @@ class Transactions:
                 if not 0 <= slot < self.prefetch_slots or slot in self.slots:
                     raise EvidenceError('duplicate or invalid prefetch slot allocation')
                 record = dict(id=len(self.prefetches), slot=slot, address=address & ~7,
-                              accept=event, issue=None, first_response=None, complete=None)
+                              accept=event, issue=None, first_response=None, complete=None,
+                              beats=0, expected_beats=None, size=None)
                 self.slots[slot] = record
                 self.prefetches.append(record)
         elif accepted:
@@ -244,18 +247,16 @@ class Transactions:
                     if (record is None or record['issue'] is not None
                             or record['accept']['timestamp'] >= timestamp):
                         raise EvidenceError('prefetch issue has no earlier unissued slot allocation')
-                    if size != 3 or address != record['address']:
+                    if size not in (3, self.line_size) or address != record['address']:
                         raise EvidenceError('prefetch issue address/size mismatch')
                     if not v['issue']:
                         raise EvidenceError('prefetch issue pulse/slot mismatch')
-                    if any(other.get('wire_tag') == wire_tag
-                           and other.get('wire_state') == wire_state
-                           for other in self.slots.values() if other is not record):
-                        raise EvidenceError('duplicate outstanding prefetch response identity')
                     record['_prior'] = [other for other in self.slots.values()
                                         if other['issue'] is not None]
                     record['wire_tag'] = wire_tag
                     record['wire_state'] = wire_state
+                    record['size'] = size
+                    record['expected_beats'] = max(1, (1 << size) // self.fill_bytes)
                     record['issue'] = event
                     issued_prefetch = True
                 else:
@@ -285,15 +286,26 @@ class Transactions:
                 if prefetch:
                     matching = [record for record in self.slots.values()
                                 if record['issue'] is not None
-                                and record['wire_tag'] == wire_tag
-                                and record['wire_state'] == wire_state]
+                                and (address == record['address'] + record['beats'] * self.fill_bytes
+                                     or (record['beats'] > 0 and address == record['address']))]
                     if len(matching) != 1:
-                        raise EvidenceError('unmatched prefetch response')
+                        pending = [(record['id'], hex(record['address']), record['beats'],
+                                    record['expected_beats'])
+                                   for record in self.slots.values()
+                                   if record['issue'] is not None]
+                        raise EvidenceError('unmatched prefetch response address=%s size=%d pending=%s'
+                                            % (hex(address), size, pending))
                     record = matching[0]
-                    if address != record['address'] or size != 3 or not first or not last:
+                    if (size not in (record['size'], self.fill_size)
+                            or first != (record['beats'] == 0)
+                            or last != (record['beats'] + 1 == record['expected_beats'])):
                         raise EvidenceError('prefetch response address/size/boundary mismatch')
-                    record['first_response'] = record['complete'] = event
-                    del self.slots[record['slot']]
+                    record['beats'] += 1
+                    if first:
+                        record['first_response'] = event
+                    if last:
+                        record['complete'] = event
+                        del self.slots[record['slot']]
                     consumed_prefetch = True
                 else:
                     if not self.normal_pending:

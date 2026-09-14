@@ -360,8 +360,8 @@ A high-latency simulator control uses the simulation-only pipelined AXI model
 is demand `0x10fe42` (1,113,666 cycles) and prefetch/yield/load `0x110961`
 (1,117,793 cycles), with a batched ideal of `0x9c9d` (40,093 cycles). This
 stress control still loses 0.37% because nonresident register traffic dominates
-and the single-bank L2 serializes backing-memory service. It is not a claim of
-near-ideal performance.
+and the minimal system's BedRock-to-AXI-Lite adapter serializes backing-memory
+service. It is not a claim of near-ideal performance.
 
 The validated benchmark now leaves worker entry functions naturally packed instead
 of forcing each one onto a separate 64-byte boundary. This preserves the static
@@ -375,8 +375,11 @@ noise but does not itself produce data-prefetch overlap.
 The worker bodies are seeded with per-context data/result pointers, so the timed
 body contains no address arithmetic. The UCE now accepts hints while its demand
 FSM waits, and context handoff drains ordinary credits while leaving detached
-hint credits live. A trace shows multiple hint slots outstanding; downstream L2
-service width and nonresident state traffic remain the limiting factors.
+hint credits live. A two-bank configuration experiment did not change this
+minimal topology because it instantiates no L2. The closed high-latency trace
+shows up to three UCE hints outstanding but only one AXI read outstanding; the
+single-request memory adapter and nonresident state traffic are the limiting
+factors.
 
 For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`) at normal latency and 6,634 cycles (`0x19ea`) with the 200-cycle pipelined model. The control confirms that high-latency candidate cost is dominated by cache/refill traffic rather than the raw handoff instruction sequence.
 
@@ -387,7 +390,8 @@ slot 0 retires. A passing benchmark alone still does not establish a near-ideal
 speedup.
 
 The analyzer correlates each accepted hint with later normal miss requests by
-64-byte line. The current trace shows detached hints admitted while earlier
-slots are live; whether a demand hits the filled L1 still depends on replacement
-and L2 service ordering. This is why the end-to-end cycle result and a closed
-request trace must both be reported.
+64-byte line. In the current trace, nine of ten later useful loads have no
+same-line normal miss, so their detached responses installed usable L1 lines;
+the tenth load misses. The same trace shows a maximum of three outstanding UCE
+hints and one outstanding AXI read. This is why the end-to-end cycle result and
+a closed request trace must both be reported.
