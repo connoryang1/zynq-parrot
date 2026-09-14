@@ -58,11 +58,14 @@ evidence and software controls should use normal request-admission and line-corr
 checks. The current L2-bank configuration still preserves baseline capacity and bank
 ordering behavior.
 
-Nonresident replacement still drains outstanding memory activity before
-installing state. The implementation passes traced simulation, routed FPGA
-fit, six bare-metal FPGA gates, and the Linux shell switch regression; exact
-identities and remaining production limits are in the checkout guide. See
-[the measured controls and limits](PAPER_DIRECTION.md).
+Nonresident replacement drains ordinary demand and writeback activity before
+installing state, while detached prefetch responses remain live and may fill
+the shared L1 during the handoff. This distinction is required for a worker
+that hints, yields, and lets the next worker issue another independent hint.
+The implementation passes traced simulation, routed FPGA fit, six bare-metal
+FPGA gates, and the Linux shell switch regression; exact identities and
+remaining production limits are in the checkout guide. See [the measured
+controls and limits](PAPER_DIRECTION.md).
 
 ## Validation and measurement
 

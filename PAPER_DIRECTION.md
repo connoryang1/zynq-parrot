@@ -348,27 +348,20 @@ the line after resumption. The batched mode issues ten prefetches and then ten
 loads. Each schedule runs from a fresh boot because context state is not
 reclaimed between independent launches.
 
-The first clean runs measured 359,870 cycles for ten-worker demand, 359,971
-cycles for ten-worker prefetch/yield/load (0.03% slower), and 714 cycles for the
-batched ideal. The candidate is therefore about 503x slower than the ideal on
-this small cold-line test; the nonresident ring and all ten completion checks
-pass, but this run does not yet show a latency benefit from prefetching. The
-existing FPGA Linux ten-thread reference uses a larger 40,960-request workload
-and measured 3,270,749 demand cycles versus 6,111,512 batched cycles, so it is
-retained as a separate OS baseline rather than combined into the simulator
-ratio.
+The current normal-latency run measures 355,874 cycles for ten-worker demand,
+355,591 cycles for ten-worker prefetch/yield/load, and 714 cycles for the
+batched ideal. The detached path saves 283 cycles (0.08%), while the candidate
+remains roughly 498x slower than the ideal on this cold-line test. All ten
+completions and checksums pass. The existing FPGA Linux ten-thread reference
+uses a larger 40,960-request workload and remains a separate OS baseline.
 
 A high-latency simulator control uses the simulation-only pipelined AXI model
-(`BP_AXI_MEM_READ_LATENCY=200`, queue depth 10). Fresh-boot results are demand
-`0x114d21` (1,133,857 cycles), prefetch/yield/load `0x11696f` (1,141,103 cycles), and batched ideal
-`0x9c9d` (40,093 cycles). The candidate is about 0.6% slower than demand and
-about 28x slower than the ideal. A traced candidate run accepted all ten hints,
-but reported `max_outstanding=1`: each hint completed before the next was
-issued. This is evidence that the current nonresident handoff path serializes
-prefetch issue through the UCE; increasing slot count alone cannot create the
-intended overlap.
-The trace also records 384 accepted non-prefetch UCE requests: 171 uncached
-reads, 194 miss stores, and 19 miss loads.
+(`BP_AXI_MEM_READ_LATENCY=200`, queue depth 10). The matched fresh-boot result
+is demand `0x10fe42` (1,113,666 cycles) and prefetch/yield/load `0x110961`
+(1,117,793 cycles), with a batched ideal of `0x9c9d` (40,093 cycles). This
+stress control still loses 0.37% because nonresident register traffic dominates
+and the single-bank L2 serializes backing-memory service. It is not a claim of
+near-ideal performance.
 
 The validated benchmark now leaves worker entry functions naturally packed instead
 of forcing each one onto a separate 64-byte boundary. This preserves the static
@@ -379,26 +372,22 @@ prefetch schedule remains 0.36% slower, while both schedules improve by roughly
 1% versus the aligned layout. The change removes avoidable instruction-refill
 noise but does not itself produce data-prefetch overlap.
 
-The worker bodies were then reduced without changing their per-context NPC or
-continuation protocol: each context is seeded with its own data/result pointers,
-so the timed body no longer performs address arithmetic or repeated global-address
-materialization. All three schedules pass; normal demand/prefetch are
-`0x56e22`/`0x56e44` (355,874/355,908 cycles), while the 200-cycle model gives
-`0x10fe42`/`0x1126cf` (1,113,666/1,124,047 cycles). This removes software and
-instruction-refill overhead, but the high-latency prefetch schedule remains
-slower because requests are still serialized.
+The worker bodies are seeded with per-context data/result pointers, so the timed
+body contains no address arithmetic. The UCE now accepts hints while its demand
+FSM waits, and context handoff drains ordinary credits while leaving detached
+hint credits live. A trace shows multiple hint slots outstanding; downstream L2
+service width and nonresident state traffic remain the limiting factors.
 
 For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`), roughly 0.075% of the demand total, so the measured candidate gap is cache/refill and memory traffic rather than the raw context-handoff instruction sequence. The high-latency version was not completed within a 120-second simulator timeout and is intentionally not used as a performance result.
 
-Matched fresh-boot traces also expose the traffic composition. Demand accepted 370
-normal UCE requests (18 miss loads, 194 miss stores, 158 uncached reads) and 4,032
-AXI bursts. The prefetch schedule accepted 383 normal requests (19, 193, and 171
-respectively), plus ten hint transactions, and 4,084 AXI bursts. The extra traffic
-is therefore visible and the hint is not optimized away, but no request overlaps
-another at either the UCE or AXI handshake (`max_outstanding=1`).
+Matched fresh-boot traces expose the traffic composition and should be retained
+with each result. The hint is an actual detached transaction, rather than a
+compiler-elided instruction; current traces show slots 1 and 2 admitted before
+slot 0 retires. A passing benchmark alone still does not establish a near-ideal
+speedup.
 
-The analyzer now correlates each accepted hint with later normal miss requests by
-64-byte line. In the ten-worker prefetch trace, all ten hints are followed by a
-same-line normal miss, so the current advisory path does not eliminate any of the
-worker L1 misses. This is direct trace evidence for the L2-only behavior and the
-candidate's extra serialized traffic.
+The analyzer correlates each accepted hint with later normal miss requests by
+64-byte line. The current trace shows detached hints admitted while earlier
+slots are live; whether a demand hits the filled L1 still depends on replacement
+and L2 service ordering. This is why the end-to-end cycle result and a closed
+request trace must both be reported.

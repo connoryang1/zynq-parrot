@@ -36,7 +36,9 @@ fills, reordered replies, demand routing, backpressure, and dropped hints.
 ## Completion evidence
 
 The focused RTL path is verified. The end-to-end simulator also passes the
-nonresident prefetch benchmark; the latest rows are demand `0x56e22`,
-prefetch/yield/load `0x56dad`, and batched ideal `0x2ca`. The prefetch row is
-117 cycles faster than demand, while switch/restore overhead remains the dominant
-cost and keeps the result far from the batched ideal.
+nonresident prefetch benchmark; the latest normal-latency rows are demand
+`0x56e22`, prefetch/yield/load `0x56d07`, and batched ideal `0x2ca`. The
+prefetch row is 283 cycles faster than demand, while nonresident state traffic
+and L2 service width remain dominant, keeping the result far from the batched
+ideal. A high-latency matched run is still slightly slower than demand, so this
+is evidence of overlap capability rather than a finished performance result.
