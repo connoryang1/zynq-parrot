@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Detached prefetch across nonresident handoff — 2026-09-14:** RTL `9e06fbd34` accepts hints into the ten-entry UCE table while the demand FSM waits, allows hint responses to coexist with ordinary refill traffic, and lets the context handoff drain ordinary credits while detached hint credits remain live. The focused UCE and MSHR regressions pass. The normal ten-worker simulator run improves from `0x56e22` (355,874) demand to `0x56d07` (355,591) prefetch cycles; the 200-cycle pipelined stress run remains slightly slower (`0x110961` versus `0x10fe42`) because nonresident state traffic and L2 service width dominate. This is overlap capability evidence, not a near-ideal speedup claim.
+
 - **FPGA/Linux acceptance — 2026-09-06:** top `032420c3` / RTL `25089713` fit the PYNQ-Z2 at 46,851 LUTs, 80 BRAM tiles, WNS +1.781 ns, and TNS 0; Linux ran the PID-1 U-mode 0→2→0 handoff, target syscall, and register-restoration checks through `CORE[0] PASS`. The physical benchmark measured 5.10 resident and 11.12 nonresident cycles/switch; [the checkout guide](CURRENT_CHECKOUT.md) retains exact identities.
 - **Canonical checkout — 2026-09-06:** `91fce0dd` consolidated the accepted RTL, matching tests, and host/farm safeguards into `zynq-parrot/import/black-parrot`; clean traced translated handoff and resident smoke passed, with the known post-PASS GPIO teardown assertion.
 - **Recoverable directory cleanup — 2026-09-06:** `e88503c6` records archival and removal of 114 old local worktrees, preserving dirty work and evidence while recovering roughly 14 GB. See [recovery instructions](CURRENT_CHECKOUT.md#history-and-recovery); no remote VM or board state changed.
