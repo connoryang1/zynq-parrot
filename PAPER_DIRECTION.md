@@ -378,7 +378,7 @@ FSM waits, and context handoff drains ordinary credits while leaving detached
 hint credits live. A trace shows multiple hint slots outstanding; downstream L2
 service width and nonresident state traffic remain the limiting factors.
 
-For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`), roughly 0.075% of the demand total, so the measured candidate gap is cache/refill and memory traffic rather than the raw context-handoff instruction sequence. The high-latency version was not completed within a 120-second simulator timeout and is intentionally not used as a performance result.
+For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`) at normal latency and 6,634 cycles (`0x19ea`) with the 200-cycle pipelined model. The control confirms that high-latency candidate cost is dominated by cache/refill traffic rather than the raw handoff instruction sequence.
 
 Matched fresh-boot traces expose the traffic composition and should be retained
 with each result. The hint is an actual detached transaction, rather than a
