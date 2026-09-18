@@ -402,9 +402,12 @@ instruction lines from the experiment while retaining ten independent logical
 contexts, including eight nonresident contexts. Result bookkeeping is placed in
 different L1 sets from the ten measured lines.
 
-The ten-slot full FPGA configuration has not routed on PYNQ-Z2. Isolated job
-`20260918T023254Z-7fb976ac` completed synthesis but failed placement at 55,781
-combined LUTs versus 53,200 available and 11,528 required slices versus 11,306
-available, with 383 control sets. These simulator results therefore qualify the
-mechanism and workload, while FPGA deployment requires an area reduction and a
-new route/board qualification.
+The UCE capacity is now a real configuration parameter rather than a hardcoded
+ten-entry override. The ten-worker simulator explicitly requests ten entries and
+retains the results above. The PYNQ-Z2 endpoint uses four entries: isolated job
+`20260918T041813Z-e66721e2` routes at 51,791/53,200 LUTs (97.35%) with WNS
++2.178 ns, TNS 0, WHS +0.035 ns, and THS 0. Direct response-ID decoding removes
+the ten-way response-address CAM while simulation assertions retain address and
+live-slot checks. The earlier ten-entry full endpoint failed placement at 55,781
+combined LUTs and 11,528 required slices versus 11,306 available. The routed
+four-entry image still requires physical-board qualification.

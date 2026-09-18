@@ -47,15 +47,13 @@ SSH host aliases internally and keeps credentials out of tracked files.
 
 ## Launch And Monitor
 
-For the nonblocking-prefetch candidate's static
-`e_bp_unicore_zynqparrot_prefetch_cfg`, invoke the maintained synthesis launcher
-directly on the selected idle builder with
-`FPGA_CFG=e_bp_unicore_zynqparrot_prefetch_cfg` and a clean immutable source
-snapshot. Follow [the synthesis skill's explicit override procedure](../bp-fpga-synthesis/SKILL.md#iteration-modes)
-and retain the same admission, revision, isolation, and one-job-per-builder checks.
-The farm commands below remain baseline commands. Check prefetch FPGA fit and board
-acceptance in [CURRENT_CHECKOUT.md](../../CURRENT_CHECKOUT.md), which records
-the current status and source identities.
+The optional final `admit` argument selects a named FPGA configuration and stores
+it in the immutable admission. Omit it for `e_bp_unicore_zynqparrot_cfg`; pass
+`e_bp_unicore_zynqparrot_prefetch_cfg` for the nonblocking-prefetch endpoint.
+The launch command reads the recorded value and writes it to the remote and local
+manifests. Check prefetch FPGA fit and board acceptance in
+[CURRENT_CHECKOUT.md](../../CURRENT_CHECKOUT.md), which records the current
+status and source identities.
 
 When preparing a top-level candidate, stage its BlackParrot gitlink directly
 from the source worktree instead of copying an object ID by hand:
@@ -79,7 +77,8 @@ BP_SYNTH_CHEAPER_GATES='The local reproducer fails before and passes after, but 
 BP_SYNTH_PASS_ACTION='Run the minimal Linux handoff probe, then reuse this image for the full Linux test and benchmark.' \
 BP_SYNTH_FAIL_ACTION='Do not route variants; inspect the failed fit/timing report or return to the FE handshake trace.' \
   codex-skills/bp-synthesis-farm/scripts/farm_synthesis.sh admit \
-    bp2 fe-completion-wait top-branch black-parrot-branch 1
+    bp2 fe-completion-wait top-branch black-parrot-branch 1 \
+    e_bp_unicore_zynqparrot_prefetch_cfg
 ```
 
 Each field must be a non-empty single-line statement. The controller refuses
