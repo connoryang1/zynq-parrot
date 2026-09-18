@@ -14,6 +14,8 @@ module bp_axi_top
  #(parameter bp_params_e bp_params_p = e_bp_default_cfg
    `declare_bp_proc_params(bp_params_p)
    , parameter axi_core_clk_async_p = 0
+   , parameter prefetch_bypass_p = 0
+   , parameter prefetch_outstanding_p = 10
    , localparam lg_async_fifo_size_lp = 3
 
    // AXI4-LITE PARAMS
@@ -147,6 +149,13 @@ module bp_axi_top
   logic [bedrock_fill_width_p-1:0] mem_rev_data_li;
   logic mem_rev_v_li, mem_rev_ready_and_lo;
 
+  bp_bedrock_mem_fwd_header_s prefetch_mem_fwd_header_lo;
+  logic [bedrock_fill_width_p-1:0] prefetch_mem_fwd_data_lo;
+  logic prefetch_mem_fwd_v_lo, prefetch_mem_fwd_ready_and_li;
+  bp_bedrock_mem_rev_header_s prefetch_mem_rev_header_li;
+  logic [bedrock_fill_width_p-1:0] prefetch_mem_rev_data_li;
+  logic prefetch_mem_rev_v_li, prefetch_mem_rev_ready_and_lo;
+
   // DMA interface from BP to cache2axi
   `declare_bsg_cache_dma_pkt_s(daddr_width_p, l2_block_size_in_words_p);
   bsg_cache_dma_pkt_s [num_cce_p*l2_dmas_p-1:0] dma_pkt_lo;
@@ -177,7 +186,9 @@ module bp_axi_top
   wire [did_width_p-1:0] my_did_li = 1'b1;
   wire [did_width_p-1:0] host_did_li = '1;
   bp_processor
-   #(.bp_params_p(bp_params_p))
+   #(.bp_params_p(bp_params_p)
+     ,.prefetch_bypass_p(prefetch_bypass_p)
+     )
    processor
     (.clk_i(core_clk_i)
      ,.rt_clk_i(rt_clk_i)
@@ -207,6 +218,17 @@ module bp_axi_top
      ,.mem_rev_data_o(mem_rev_data_lo)
      ,.mem_rev_v_o(mem_rev_v_lo)
      ,.mem_rev_ready_and_i(mem_rev_ready_and_li)
+
+     // Detached dcache prefetches bypass the blocking L2 DMA path.
+     ,.prefetch_mem_fwd_header_o(prefetch_mem_fwd_header_lo)
+     ,.prefetch_mem_fwd_data_o(prefetch_mem_fwd_data_lo)
+     ,.prefetch_mem_fwd_v_o(prefetch_mem_fwd_v_lo)
+     ,.prefetch_mem_fwd_ready_and_i(prefetch_mem_fwd_ready_and_li)
+
+     ,.prefetch_mem_rev_header_i(prefetch_mem_rev_header_li)
+     ,.prefetch_mem_rev_data_i(prefetch_mem_rev_data_li)
+     ,.prefetch_mem_rev_v_i(prefetch_mem_rev_v_li)
+     ,.prefetch_mem_rev_ready_and_o(prefetch_mem_rev_ready_and_lo)
 
      // DMA (memory) to cache2axi
      ,.dma_pkt_o(dma_pkt_lo)
@@ -289,7 +311,15 @@ module bp_axi_top
      );
 
   logic [daddr_width_p-1:0] m_axi_awaddr_addr;
-  logic [daddr_width_p-1:0] m_axi_araddr_addr;
+  logic [daddr_width_p-1:0] cache_axi_araddr;
+  logic [axi_id_width_p-1:0] cache_axi_arid;
+  logic [7:0] cache_axi_arlen;
+  logic [2:0] cache_axi_arsize;
+  logic [1:0] cache_axi_arburst;
+  logic [3:0] cache_axi_arcache;
+  logic [2:0] cache_axi_arprot;
+  logic cache_axi_arlock, cache_axi_arvalid, cache_axi_arready;
+  logic cache_axi_rvalid, cache_axi_rready;
   bsg_cache_to_axi
    #(.addr_width_p(daddr_width_p)
      ,.data_width_p(axi_data_width_p)
@@ -340,31 +370,151 @@ module bp_axi_top
      ,.axi_bvalid_i(m_axi_bvalid_i)
      ,.axi_bready_o(m_axi_bready_o)
 
-     ,.axi_arid_o(m_axi_arid_o)
-     ,.axi_araddr_addr_o(m_axi_araddr_addr)
-     ,.axi_arlen_o(m_axi_arlen_o)
-     ,.axi_arsize_o(m_axi_arsize_o)
-     ,.axi_arburst_o(m_axi_arburst_o)
-     ,.axi_arcache_o(m_axi_arcache_o)
-     ,.axi_arprot_o(m_axi_arprot_o)
-     ,.axi_arlock_o(m_axi_arlock_o)
-     ,.axi_arvalid_o(m_axi_arvalid_o)
-     ,.axi_arready_i(m_axi_arready_i)
+     ,.axi_arid_o(cache_axi_arid)
+     ,.axi_araddr_addr_o(cache_axi_araddr)
+     ,.axi_arlen_o(cache_axi_arlen)
+     ,.axi_arsize_o(cache_axi_arsize)
+     ,.axi_arburst_o(cache_axi_arburst)
+     ,.axi_arcache_o(cache_axi_arcache)
+     ,.axi_arprot_o(cache_axi_arprot)
+     ,.axi_arlock_o(cache_axi_arlock)
+     ,.axi_arvalid_o(cache_axi_arvalid)
+     ,.axi_arready_i(cache_axi_arready)
 
      ,.axi_rid_i(m_axi_rid_i)
      ,.axi_rdata_i(m_axi_rdata_i)
      ,.axi_rresp_i(m_axi_rresp_i)
      ,.axi_rlast_i(m_axi_rlast_i)
-     ,.axi_rvalid_i(m_axi_rvalid_i)
-     ,.axi_rready_o(m_axi_rready_o)
+     ,.axi_rvalid_i(cache_axi_rvalid)
+     ,.axi_rready_o(cache_axi_rready)
 
      // Unused
      ,.axi_awaddr_cache_id_o()
      ,.axi_araddr_cache_id_o()
      );
 
-  assign m_axi_araddr_o = m_axi_araddr_addr;
   assign m_axi_awaddr_o = m_axi_awaddr_addr;
+  assign m_axi_awqos_o = '0;
+  assign m_axi_wid_o = '0;
+
+  if (prefetch_bypass_p)
+    begin : prefetch_axi
+      logic [axi_addr_width_p-1:0] prefetch_axi_araddr;
+      logic [axi_id_width_p-1:0] prefetch_axi_arid;
+      logic [7:0] prefetch_axi_arlen;
+      logic [2:0] prefetch_axi_arsize;
+      logic [1:0] prefetch_axi_arburst;
+      logic prefetch_axi_arvalid, prefetch_axi_arready;
+      logic prefetch_axi_rvalid, prefetch_axi_rready;
+
+      bp_prefetch_axi_master
+       #(.bp_params_p(bp_params_p)
+         ,.axi_addr_width_p(axi_addr_width_p)
+         ,.axi_data_width_p(axi_data_width_p)
+         ,.axi_id_width_p(axi_id_width_p)
+         ,.outstanding_p(prefetch_outstanding_p)
+         )
+       prefetch_master
+        (.clk_i(axi_clk_i)
+         ,.reset_i(axi_reset_li)
+
+         ,.mem_fwd_header_i(prefetch_mem_fwd_header_lo)
+         ,.mem_fwd_data_i(prefetch_mem_fwd_data_lo)
+         ,.mem_fwd_v_i(prefetch_mem_fwd_v_lo)
+         ,.mem_fwd_ready_and_o(prefetch_mem_fwd_ready_and_li)
+
+         ,.mem_rev_header_o(prefetch_mem_rev_header_li)
+         ,.mem_rev_data_o(prefetch_mem_rev_data_li)
+         ,.mem_rev_v_o(prefetch_mem_rev_v_li)
+         ,.mem_rev_ready_and_i(prefetch_mem_rev_ready_and_lo)
+
+         ,.axi_araddr_o(prefetch_axi_araddr)
+         ,.axi_arid_o(prefetch_axi_arid)
+         ,.axi_arlen_o(prefetch_axi_arlen)
+         ,.axi_arsize_o(prefetch_axi_arsize)
+         ,.axi_arburst_o(prefetch_axi_arburst)
+         ,.axi_arvalid_o(prefetch_axi_arvalid)
+         ,.axi_arready_i(prefetch_axi_arready)
+
+         ,.axi_rid_i(m_axi_rid_i)
+         ,.axi_rdata_i(m_axi_rdata_i)
+         ,.axi_rresp_i(m_axi_rresp_i)
+         ,.axi_rlast_i(m_axi_rlast_i)
+         ,.axi_rvalid_i(prefetch_axi_rvalid)
+         ,.axi_rready_o(prefetch_axi_rready)
+         );
+
+      logic ar_hold_v_r, ar_hold_prefetch_r;
+      wire ar_select_prefetch = ar_hold_v_r
+        ? ar_hold_prefetch_r
+        : (~cache_axi_arvalid & prefetch_axi_arvalid);
+      wire selected_arvalid = ar_select_prefetch
+        ? prefetch_axi_arvalid : cache_axi_arvalid;
+
+      // Keep every AR field on the selected source while the AXI slave
+      // applies backpressure. Demand traffic has priority between transfers.
+      always_ff @(posedge axi_clk_i) begin
+        if (axi_reset_li) begin
+          ar_hold_v_r <= 1'b0;
+          ar_hold_prefetch_r <= 1'b0;
+        end else if (ar_hold_v_r) begin
+          if (m_axi_arvalid_o & m_axi_arready_i)
+            ar_hold_v_r <= 1'b0;
+        end else if (m_axi_arvalid_o & ~m_axi_arready_i) begin
+          ar_hold_v_r <= 1'b1;
+          ar_hold_prefetch_r <= ar_select_prefetch;
+        end
+      end
+
+      assign m_axi_araddr_o = ar_select_prefetch
+        ? prefetch_axi_araddr : axi_addr_width_p'(cache_axi_araddr);
+      assign m_axi_arid_o = ar_select_prefetch ? prefetch_axi_arid : cache_axi_arid;
+      assign m_axi_arlen_o = ar_select_prefetch ? prefetch_axi_arlen : cache_axi_arlen;
+      assign m_axi_arsize_o = ar_select_prefetch ? prefetch_axi_arsize : cache_axi_arsize;
+      assign m_axi_arburst_o = ar_select_prefetch ? prefetch_axi_arburst : cache_axi_arburst;
+      assign m_axi_arcache_o = ar_select_prefetch ? '0 : cache_axi_arcache;
+      assign m_axi_arprot_o = ar_select_prefetch ? '0 : cache_axi_arprot;
+      assign m_axi_arlock_o = ar_select_prefetch ? '0 : cache_axi_arlock;
+      assign m_axi_arqos_o = '0;
+      assign m_axi_arvalid_o = selected_arvalid;
+      assign cache_axi_arready = m_axi_arready_i & ~ar_select_prefetch;
+      assign prefetch_axi_arready = m_axi_arready_i & ar_select_prefetch;
+
+      wire response_is_prefetch = m_axi_rid_i != '0;
+      assign cache_axi_rvalid = m_axi_rvalid_i & ~response_is_prefetch;
+      assign prefetch_axi_rvalid = m_axi_rvalid_i & response_is_prefetch;
+      assign m_axi_rready_o = response_is_prefetch
+        ? prefetch_axi_rready : cache_axi_rready;
+    end
+  else
+    begin : no_prefetch_axi
+      assign prefetch_mem_fwd_ready_and_li = 1'b0;
+      assign prefetch_mem_rev_header_li = '0;
+      assign prefetch_mem_rev_data_li = '0;
+      assign prefetch_mem_rev_v_li = 1'b0;
+
+      assign m_axi_araddr_o = axi_addr_width_p'(cache_axi_araddr);
+      assign m_axi_arid_o = cache_axi_arid;
+      assign m_axi_arlen_o = cache_axi_arlen;
+      assign m_axi_arsize_o = cache_axi_arsize;
+      assign m_axi_arburst_o = cache_axi_arburst;
+      assign m_axi_arcache_o = cache_axi_arcache;
+      assign m_axi_arprot_o = cache_axi_arprot;
+      assign m_axi_arlock_o = cache_axi_arlock;
+      assign m_axi_arqos_o = '0;
+      assign m_axi_arvalid_o = cache_axi_arvalid;
+      assign cache_axi_arready = m_axi_arready_i;
+
+      assign cache_axi_rvalid = m_axi_rvalid_i;
+      assign m_axi_rready_o = cache_axi_rready;
+    end
+
+  initial begin
+    if (prefetch_bypass_p && axi_core_clk_async_p)
+      $fatal(1, "Prefetch bypass requires synchronous AXI and core clocks");
+    if (prefetch_bypass_p && cce_type_p != e_cce_uce)
+      $fatal(1, "Prefetch bypass is only supported by the unicore UCE memory path");
+  end
 
   if (axi_core_clk_async_p)
     begin : async
@@ -548,4 +698,3 @@ module bp_axi_top
     end
 
 endmodule
-
