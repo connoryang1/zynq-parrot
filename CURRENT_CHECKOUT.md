@@ -3,49 +3,29 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 # Supported checkout
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
-Both forks integrate on `master`; develop on dedicated branches. The accepted
-RTL is `f7eedd955`, routed from top `fd5a7872` with static
-`e_bp_unicore_zynqparrot_prefetch_cfg`. Its exact image passes six bare-metal
-gates and shell-launched Linux resident/nonresident switching, register and
-syscall checks, process exit, a subsequent shell command, and clean poweroff.
+Both forks integrate on `master`; develop on dedicated branches. The current
+simulator-validated prefetch checkpoint is top `689be63a` with BlackParrot RTL
+`c53ed6c37`. It adds a ten-entry detached L1-fill queue and a dedicated ten-ID
+AXI burst path in the minimal Zynq top. Focused UCE, MSHR, bridge, analyzer, and
+harness gates pass, as do clean trace-enabled ten-worker demand, candidate, and
+ideal runs. Exact results and commands are in [the research direction](PAPER_DIRECTION.md)
+and [testing guide](testing/README.md).
 
-This adds nonfaulting prefetch hints and independent L2-bank responses to the
-previously accepted resident initialization and refill/replay ownership fixes.
-The current image and historical resident baseline are identified below.
-
-Development branch `fix/linux-request-lifecycle` pins RTL `f6e004283`. It orders
-NPC seeds before handoffs, serializes remote-register seeds to prevent lost
-ordinary writebacks, and updates the interrupted PC when reseeding an initialized
-inactive resident context. The same pending-interrupt binary fails on `d18f16849`
-with the old parked PC and passes with this correction, preserving private state.
-Six final traced full-system gates pass; the earlier two ordering fixes also pass
-nine gates. All three raw prefetch benchmark samples remain unchanged.
-This candidate has completed routed implementation and all nine physical FPGA
-gates. The unchanged Linux request executable now passes its original one-request
-case and the seven-sample, two-worker comparison, including all four modes,
-checksums, exit zero, a usable shell, and clean poweroff. The combined corrections
-resolve the observed hang; the directed tests do not isolate which correction
-was necessary in Linux. The previous shell resident/nonresident compatibility
-gate remains to be rerun before integrating this candidate into `master`.
-
-Candidate route `20260909T015657Z-dc6d0e89` uses 51,518/53,200 LUTs (96.84%),
-22,671 registers, 81 BRAM tiles, and 11 DSPs. WNS is +1.619 ns, TNS 0, WHS
-+0.024 ns, and THS 0; all 79,534 routable nets are routed, with zero routing
-or bitstream DRC errors. The inherited 42 no-clock pins and 50 unconstrained
-internal endpoints remain; this is not complete timing-constraint coverage.
-The verified bitstream SHA-256 is
-`b82832901d6a4e45e2e245be3f669aa2b32d3e7db6b8eaa257394b0f1cd35673`.
-Evidence is retained under `logs/linux-request-lifecycle-20260908/` in `route/`,
-`board-qualified/`, `linux-one-request/`, `linux-matched2/`, and
-`linux-reference10/`; see the
-[Linux guide](linux-tests/README.md#independent-random-request-comparisons)
-for the application measurements and their limits.
+This new transport has simulator evidence only. The latest routed and physical
+FPGA/Linux-qualified prefetch image remains top `fd5a7872` with RTL `f7eedd955`
+and static `e_bp_unicore_zynqparrot_prefetch_cfg`. Its exact image passes six
+bare-metal gates and shell-launched Linux resident/nonresident switching,
+register and syscall checks, process exit, a subsequent shell command, and clean
+poweroff. A new routed fit and board qualification are required before deploying
+the ten-slot AXI transport. The routed artifact and historical resident baseline
+are identified below.
 
 ## Scope and readiness
 
-The maintained configuration is PYNQ-Z2 with two resident register banks and
-four logical integer contexts sharing one pipeline. Accepted FPGA evidence
-covers nonresident translated U-mode 0→2→0 handoff, a target-context syscall,
+The maintained PYNQ-Z2 configuration has two resident register banks and four
+logical integer contexts sharing one pipeline; the simulator-only request
+benchmark elaborates ten logical contexts on the same two resident banks. FPGA
+evidence covers nonresident translated U-mode 0→2→0 handoff, a target-context syscall,
 logical identity, register restoration, and Linux shutdown. A separately
 transferred shell executable also passed on `6c97bcc0a`. The current image
 retains verified resident 0↔1 initialization, repeated handoffs/reseeding, and syscalls;
@@ -69,20 +49,15 @@ requires:
   before changing that protocol or claiming it safe.
 
 See [architecture](CONTEXT_SWITCH_ARCHITECTURE.md), [tests](testing/README.md),
-and [research direction](PAPER_DIRECTION.md). Application experiments belong on
-experiment branches; SQLite remains at
+and [research direction](PAPER_DIRECTION.md). SQLite remains at
 `archive/sqlite-progress-screen-20260907`.
 
-## Accepted prefetch implementation
+## FPGA-qualified prefetch predecessor
 
-This checkpoint records the routed two-slot hint implementation and its matched
-benchmarks from the current branch history (top `fd5a7872`, RTL `f7eedd955`).
-That design uses a dedicated hint path and two UCE hint slots in that artifact.
-Subsequent local RTL work in this branch routes prefetch hints through the normal
-`e_miss_load` queue so this section is historical relative to the live `feat/l1-prefetch`
-cleanup state. See the active benchmark notes in this file and
-[paper direction](PAPER_DIRECTION.md) for current-cycle measurements and ongoing
-constraints.
+This section records the routed two-slot predecessor (top `fd5a7872`, RTL
+`f7eedd955`). It is historical relative to the ten-slot simulator checkpoint
+identified above. See [paper direction](PAPER_DIRECTION.md) for current-cycle
+measurements and remaining constraints.
 
 This checkpoint has passed routed fit and the selected FPGA/Linux gates.
 PYNQ-Z2 job `20260908T221834Z-4425a9d3` was canceled after Vivado exposed an
@@ -144,7 +119,7 @@ make -C testing run-mt_umode_nonresident_sv39_data_handoff_test NUM_THREADS=2 NU
 ```
 
 Use the available CPU/memory budget for inner build jobs, but serialize guests.
-The maintained suite has 24 programs; its README explains each invariant.
+The maintained suite has 26 programs; its README explains each invariant.
 Core-wide CSR `0xCC0` measures elapsed cycles across context switches; do not
 substitute a context-restored `mcycle`. The runner must see the selected test's
 completion marker before `CORE PASS`, plus host `BSG PASS`. The known post-PASS
