@@ -285,11 +285,10 @@ class PrefetchTests(unittest.TestCase):
 
     def test_axi_unmatched_id_error_and_burst_boundaries_fail_closed(self):
         for index, field, value, message in ((1, 'r_v', 1, 'RLAST/count'),
-                                            (5, 'r_id', 1, 'ID mismatch'),
+                                            (5, 'r_id', 1, 'unmatched AXI response ID'),
                                             (5, 'r_resp', 2, 'non-OKAY'),
                                             (5, 'r_last', 1, 'RLAST/count'),
                                             (12, 'r_last', 0, 'RLAST/count'),
-                                            (2, 'ar_id', 1, 'multiple AXI IDs'),
                                             (3, 'ar_ready', None, 'unknown ar_ready')):
             samples = case(True)
             samples[index][field] = value
@@ -299,6 +298,28 @@ class PrefetchTests(unittest.TestCase):
         samples[21]['r_v'] = 1
         with self.assertRaisesRegex(analyzer.EvidenceError, 'unmatched AXI'):
             self.analyze(samples, axi=True)
+
+    def test_axi_ids_may_complete_out_of_address_order(self):
+        samples = case(True)
+        samples[2]['ar_id'] = 1
+        for index in range(5, 13):
+            samples[index]['r_id'] = 1
+        for index in range(13, 21):
+            samples[index]['r_id'] = 0
+        report = self.analyze(samples, axi=True)
+        self.assertEqual([record['axi_id'] for record in report['axi_reads']], [0, 1])
+        self.assertEqual(report['axi_reads'][1]['complete']['cycle'], 12)
+        self.assertEqual(report['axi_reads'][0]['complete']['cycle'], 20)
+
+    def test_axi_response_beats_may_interleave_ids(self):
+        samples = case(True)
+        samples[2]['ar_id'] = 1
+        for index in range(5, 21):
+            samples[index]['r_id'] = (index - 5) % 2
+            samples[index]['r_last'] = int(index >= 19)
+        report = self.analyze(samples, axi=True)
+        self.assertEqual(report['axi_reads'][0]['complete']['cycle'], 19)
+        self.assertEqual(report['axi_reads'][1]['complete']['cycle'], 20)
 
     def test_incomplete_and_missing_signals_rejected(self):
         for end in (3, 7, 18):

@@ -348,50 +348,45 @@ the line after resumption. The batched mode issues ten prefetches and then ten
 loads. Each schedule runs from a fresh boot because context state is not
 reclaimed between independent launches.
 
-The current normal-latency run measures 355,874 cycles for ten-worker demand,
-355,591 cycles for ten-worker prefetch/yield/load, and 714 cycles for the
-batched ideal. The detached path saves 283 cycles (0.08%), while the candidate
-remains roughly 498x slower than the ideal on this cold-line test. All ten
-completions and checksums pass. The existing FPGA Linux ten-thread reference
-uses a larger 40,960-request workload and remains a separate OS baseline.
+The current high-latency control uses the simulation-only pipelined AXI model
+with 200-cycle reads and ten queue entries. A dedicated prefetch transport turns
+each 64-byte hint into one 16-beat AXI burst with a nonzero transaction ID;
+ordinary instruction, demand, and context-state traffic remains on the existing
+single-request bridge with AXI ID zero. The address arbiter locks its selected
+source under backpressure, and the prefetch bridge can reassemble interleaved
+read beats independently for ten IDs.
 
-A high-latency simulator control uses the simulation-only pipelined AXI model
-(`BP_AXI_MEM_READ_LATENCY=200`, queue depth 10). The matched fresh-boot result
-is demand `0x10fe42` (1,113,666 cycles) and prefetch/yield/load `0x110961`
-(1,117,793 cycles), with a batched ideal of `0x9c9d` (40,093 cycles). This
-stress control still loses 0.37% because nonresident register traffic dominates
-and the minimal system's BedRock-to-AXI-Lite adapter serializes backing-memory
-service. It is not a claim of near-ideal performance.
+The revision-matched fresh-boot results are:
 
-The validated benchmark now leaves worker entry functions naturally packed instead
-of forcing each one onto a separate 64-byte boundary. This preserves the static
-continuation protocol while reducing instruction-cache footprint. With the
-200-cycle pipelined model, packed demand measured `0x110d1d` (1,117,469 cycles)
-and packed prefetch/yield/load measured `0x111cfe` (1,121,534 cycles); the
-prefetch schedule remains 0.36% slower, while both schedules improve by roughly
-1% versus the aligned layout. The change removes avoidable instruction-refill
-noise but does not itself produce data-prefetch overlap.
+| Schedule | Cycles |
+| --- | ---: |
+| Ten-worker demand | `0x10ff2a` (1,113,898) |
+| Ten-worker prefetch/yield/load | `0x108d56` (1,084,758) |
+| Single-thread batched ideal | `0x288f` (10,383) |
+
+The cheap-context candidate saves 29,140 cycles, a 2.616% cycle reduction or
+1.0269x speedup. The dedicated transport also reduces the batched reference
+from the earlier serialized `0x9c9d` (40,093) cycles to 10,383 cycles. That
+establishes that the new AXI path can expose memory-level parallelism when the
+requests are available together. The candidate remains 104.47x slower than the
+matched ideal and closes only 2.64% of the demand-to-ideal gap.
 
 The worker bodies are seeded with per-context data/result pointers, so the timed
-body contains no address arithmetic. The UCE now accepts hints while its demand
-FSM waits, and context handoff drains ordinary credits while leaving detached
-hint credits live. A two-bank configuration experiment did not change this
-minimal topology because it instantiates no L2. The closed high-latency trace
-shows up to three UCE hints outstanding but only one AXI read outstanding; the
-single-request memory adapter and nonresident state traffic are the limiting
-factors.
+body contains no address arithmetic. The UCE accepts hints while its demand FSM
+waits, preserves detached credits across handoff, waits for the dcache's matching
+replacement metadata before issue, and drops duplicate same-line hints. The
+minimal topology contains no L2.
 
 For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`) at normal latency and 6,634 cycles (`0x19ea`) with the 200-cycle pipelined model. The control confirms that high-latency candidate cost is dominated by cache/refill traffic rather than the raw handoff instruction sequence.
 
-Matched fresh-boot traces expose the traffic composition and should be retained
-with each result. The hint is an actual detached transaction, rather than a
-compiler-elided instruction; current traces show slots 1 and 2 admitted before
-slot 0 retires. A passing benchmark alone still does not establish a near-ideal
-speedup.
+The final closed trace passes the transaction gate with all ten hints complete.
+It reaches two simultaneously reserved UCE slots and three outstanding AXI reads;
+both interfaces accept a later request before an earlier first response. Nine of
+ten later useful loads have no same-line normal miss, while the tenth misses once.
+AXI acceptance proves outstanding requests, not parallel DRAM-bank service.
 
-The analyzer correlates each accepted hint with later normal miss requests by
-64-byte line. In the current trace, nine of ten later useful loads have no
-same-line normal miss, so their detached responses installed usable L1 lines;
-the tenth load misses. The same trace shows a maximum of three outstanding UCE
-hints and one outstanding AXI read. This is why the end-to-end cycle result and
-a closed request trace must both be reported.
+Only two worker hints overlap because each worker reaches its hint after the
+preceding nonresident handoff and associated instruction/context traffic. Raising
+the slot limit alone cannot approach the batched reference. The next performance
+step must decouple or overlap that ordinary traffic so more of the ten hints reach
+the already-capable AXI transport before the first data responses return.

@@ -325,6 +325,36 @@ module top_zynq
    logic [C_HP0_AXI_DATA_WIDTH-1:0] m_axil_rdata;
    logic [1:0] m_axil_rresp;
    logic m_axil_rvalid, m_axil_rready;
+
+   bp_bedrock_mem_fwd_header_s ordinary_mem_fwd_header;
+   logic [bedrock_fill_width_p-1:0] ordinary_mem_fwd_data;
+   logic ordinary_mem_fwd_v, ordinary_mem_fwd_ready;
+   bp_bedrock_mem_rev_header_s ordinary_mem_rev_header;
+   logic [bedrock_fill_width_p-1:0] ordinary_mem_rev_data;
+   logic ordinary_mem_rev_v, ordinary_mem_rev_ready;
+
+   wire mem_fwd_is_prefetch = dev_fwd_v_li[mem_dev_id_lp]
+     && dev_fwd_header_li[mem_dev_id_lp].payload.prefetch
+     && (dev_fwd_header_li[mem_dev_id_lp].msg_type == e_bedrock_mem_rd);
+   assign ordinary_mem_fwd_header = dev_fwd_header_li[mem_dev_id_lp];
+   assign ordinary_mem_fwd_data = dev_fwd_data_li[mem_dev_id_lp];
+   assign ordinary_mem_fwd_v = dev_fwd_v_li[mem_dev_id_lp] & ~mem_fwd_is_prefetch;
+
+   bp_bedrock_mem_rev_header_s prefetch_mem_rev_header;
+   logic [bedrock_fill_width_p-1:0] prefetch_mem_rev_data;
+   logic prefetch_mem_rev_v, prefetch_mem_rev_ready;
+   logic prefetch_mem_fwd_ready;
+   logic [C_HP0_AXI_ADDR_WIDTH-1:0] prefetch_axi_araddr;
+   logic [5:0] prefetch_axi_arid;
+   logic [7:0] prefetch_axi_arlen;
+   logic [2:0] prefetch_axi_arsize;
+   logic [1:0] prefetch_axi_arburst;
+   logic prefetch_axi_arvalid, prefetch_axi_arready;
+   logic prefetch_axi_rvalid, prefetch_axi_rready;
+
+   assign dev_fwd_ready_and_lo[mem_dev_id_lp] = mem_fwd_is_prefetch
+     ? prefetch_mem_fwd_ready : ordinary_mem_fwd_ready;
+
    bp_axil_master
     #(.bp_params_p(bp_params_p)
       ,.axil_data_width_p(C_HP0_AXI_DATA_WIDTH)
@@ -334,15 +364,15 @@ module top_zynq
      (.clk_i(aclk)
       ,.reset_i(~sys_resetn)
 
-      ,.mem_fwd_header_i(dev_fwd_header_li[mem_dev_id_lp])
-      ,.mem_fwd_data_i(dev_fwd_data_li[mem_dev_id_lp])
-      ,.mem_fwd_v_i(dev_fwd_v_li[mem_dev_id_lp])
-      ,.mem_fwd_ready_and_o(dev_fwd_ready_and_lo[mem_dev_id_lp])
+      ,.mem_fwd_header_i(ordinary_mem_fwd_header)
+      ,.mem_fwd_data_i(ordinary_mem_fwd_data)
+      ,.mem_fwd_v_i(ordinary_mem_fwd_v)
+      ,.mem_fwd_ready_and_o(ordinary_mem_fwd_ready)
 
-      ,.mem_rev_header_o(dev_rev_header_lo[mem_dev_id_lp])
-      ,.mem_rev_data_o(dev_rev_data_lo[mem_dev_id_lp])
-      ,.mem_rev_v_o(dev_rev_v_lo[mem_dev_id_lp])
-      ,.mem_rev_ready_and_i(dev_rev_ready_and_li[mem_dev_id_lp])
+      ,.mem_rev_header_o(ordinary_mem_rev_header)
+      ,.mem_rev_data_o(ordinary_mem_rev_data)
+      ,.mem_rev_v_o(ordinary_mem_rev_v)
+      ,.mem_rev_ready_and_i(ordinary_mem_rev_ready)
 
       ,.m_axil_awaddr_o(m_axil_awaddr)
       ,.m_axil_awprot_o(m_axil_awprot)
@@ -367,6 +397,81 @@ module top_zynq
       ,.m_axil_rresp_i(m_axil_rresp)
       ,.m_axil_rvalid_i(m_axil_rvalid)
       ,.m_axil_rready_o(m_axil_rready)
+      );
+
+   bp_prefetch_axi_master
+    #(.bp_params_p(bp_params_p)
+      ,.axi_addr_width_p(C_HP0_AXI_ADDR_WIDTH)
+      ,.axi_data_width_p(C_HP0_AXI_DATA_WIDTH)
+      ,.axi_id_width_p(6)
+      ,.outstanding_p(10)
+      )
+    prefetch_mem
+     (.clk_i(aclk)
+      ,.reset_i(~sys_resetn)
+
+      ,.mem_fwd_header_i(dev_fwd_header_li[mem_dev_id_lp])
+      ,.mem_fwd_data_i(dev_fwd_data_li[mem_dev_id_lp])
+      ,.mem_fwd_v_i(dev_fwd_v_li[mem_dev_id_lp] & mem_fwd_is_prefetch)
+      ,.mem_fwd_ready_and_o(prefetch_mem_fwd_ready)
+
+      ,.mem_rev_header_o(prefetch_mem_rev_header)
+      ,.mem_rev_data_o(prefetch_mem_rev_data)
+      ,.mem_rev_v_o(prefetch_mem_rev_v)
+      ,.mem_rev_ready_and_i(prefetch_mem_rev_ready)
+
+      ,.axi_araddr_o(prefetch_axi_araddr)
+      ,.axi_arid_o(prefetch_axi_arid)
+      ,.axi_arlen_o(prefetch_axi_arlen)
+      ,.axi_arsize_o(prefetch_axi_arsize)
+      ,.axi_arburst_o(prefetch_axi_arburst)
+      ,.axi_arvalid_o(prefetch_axi_arvalid)
+      ,.axi_arready_i(prefetch_axi_arready)
+
+      ,.axi_rid_i(hp0_axi_rid)
+      ,.axi_rdata_i(hp0_axi_rdata)
+      ,.axi_rresp_i(hp0_axi_rresp)
+      ,.axi_rlast_i(hp0_axi_rlast)
+      ,.axi_rvalid_i(prefetch_axi_rvalid)
+      ,.axi_rready_o(prefetch_axi_rready)
+      );
+
+   bp_bedrock_mem_rev_header_s [1:0] mem_rev_source_header;
+   logic [1:0][bedrock_fill_width_p-1:0] mem_rev_source_data;
+   logic [1:0] mem_rev_source_v, mem_rev_source_ready;
+   logic [1:0][0:0] mem_rev_source_dst;
+   bp_bedrock_mem_rev_header_s [0:0] merged_mem_rev_header;
+   logic [0:0][bedrock_fill_width_p-1:0] merged_mem_rev_data;
+   logic [0:0] merged_mem_rev_v, merged_mem_rev_ready;
+   assign mem_rev_source_header = {prefetch_mem_rev_header, ordinary_mem_rev_header};
+   assign mem_rev_source_data = {prefetch_mem_rev_data, ordinary_mem_rev_data};
+   assign mem_rev_source_v = {prefetch_mem_rev_v, ordinary_mem_rev_v};
+   assign {prefetch_mem_rev_ready, ordinary_mem_rev_ready} = mem_rev_source_ready;
+   assign mem_rev_source_dst = '0;
+   assign dev_rev_header_lo[mem_dev_id_lp] = merged_mem_rev_header[0];
+   assign dev_rev_data_lo[mem_dev_id_lp] = merged_mem_rev_data[0];
+   assign dev_rev_v_lo[mem_dev_id_lp] = merged_mem_rev_v[0];
+   assign merged_mem_rev_ready[0] = dev_rev_ready_and_li[mem_dev_id_lp];
+
+   bp_me_xbar_stream
+    #(.bp_params_p(bp_params_p)
+      ,.payload_width_p(mem_rev_payload_width_lp)
+      ,.stream_mask_p(mem_rev_stream_mask_gp)
+      ,.num_source_p(2)
+      ,.num_sink_p(1)
+      )
+    mem_rev_merge
+     (.clk_i(aclk)
+      ,.reset_i(~sys_resetn)
+      ,.msg_header_i(mem_rev_source_header)
+      ,.msg_data_i(mem_rev_source_data)
+      ,.msg_v_i(mem_rev_source_v)
+      ,.msg_ready_and_o(mem_rev_source_ready)
+      ,.msg_dst_i(mem_rev_source_dst)
+      ,.msg_header_o(merged_mem_rev_header)
+      ,.msg_data_o(merged_mem_rev_data)
+      ,.msg_v_o(merged_mem_rev_v)
+      ,.msg_ready_and_i(merged_mem_rev_ready)
       );
 
   // May want to make a config register
@@ -508,21 +613,48 @@ module top_zynq
    assign m_axil_bvalid = hp0_axi_bvalid;
    assign hp0_axi_bready = m_axil_bready;
 
-   assign hp0_axi_araddr = (m_axil_araddr ^ 32'h8000_0000) + dram_base_li;
-   assign hp0_axi_arvalid = m_axil_arvalid;
-   assign m_axil_arready = hp0_axi_arready;
-   assign hp0_axi_arid = '0;
+   logic axi_ar_hold_v_r, axi_ar_hold_prefetch_r;
+   wire axi_ar_select_prefetch = axi_ar_hold_v_r
+     ? axi_ar_hold_prefetch_r
+     : (~m_axil_arvalid & prefetch_axi_arvalid);
+   wire selected_axi_arvalid = axi_ar_select_prefetch
+     ? prefetch_axi_arvalid : m_axil_arvalid;
+
+   // Preserve the selected source while the PS applies AR backpressure. AXI
+   // requires every address-channel field to remain stable until handshake.
+   always_ff @(posedge aclk) begin
+      if (~sys_resetn) begin
+         axi_ar_hold_v_r <= 1'b0;
+         axi_ar_hold_prefetch_r <= 1'b0;
+      end else if (axi_ar_hold_v_r) begin
+         if (hp0_axi_arvalid & hp0_axi_arready)
+           axi_ar_hold_v_r <= 1'b0;
+      end else if (hp0_axi_arvalid & ~hp0_axi_arready) begin
+         axi_ar_hold_v_r <= 1'b1;
+         axi_ar_hold_prefetch_r <= axi_ar_select_prefetch;
+      end
+   end
+
+   assign hp0_axi_araddr = ((axi_ar_select_prefetch
+                             ? prefetch_axi_araddr : m_axil_araddr)
+                            ^ 32'h8000_0000) + dram_base_li;
+   assign hp0_axi_arvalid = selected_axi_arvalid;
+   assign m_axil_arready = hp0_axi_arready & ~axi_ar_select_prefetch;
+   assign prefetch_axi_arready = hp0_axi_arready & axi_ar_select_prefetch;
+   assign hp0_axi_arid = axi_ar_select_prefetch ? prefetch_axi_arid : '0;
    assign hp0_axi_arlock = '0;
    assign hp0_axi_arcache = '0;
    assign hp0_axi_arprot = '0;
-   assign hp0_axi_arlen = '0;
-   assign hp0_axi_arsize = 3'b010; // 32b
-   assign hp0_axi_arburst = 2'b01; // incr
+   assign hp0_axi_arlen = axi_ar_select_prefetch ? prefetch_axi_arlen : '0;
+   assign hp0_axi_arsize = axi_ar_select_prefetch ? prefetch_axi_arsize : 3'b010;
+   assign hp0_axi_arburst = axi_ar_select_prefetch ? prefetch_axi_arburst : 2'b01;
    assign hp0_axi_arqos = '0;
 
    assign m_axil_rdata = hp0_axi_rdata;
    assign m_axil_rresp = hp0_axi_rresp;
-   assign m_axil_rvalid = hp0_axi_rvalid;
-   assign hp0_axi_rready = m_axil_rvalid;
+   wire ordinary_axi_r_select = (hp0_axi_rid == '0);
+   assign m_axil_rvalid = hp0_axi_rvalid & ordinary_axi_r_select;
+   assign prefetch_axi_rvalid = hp0_axi_rvalid & ~ordinary_axi_r_select;
+   assign hp0_axi_rready = ordinary_axi_r_select ? m_axil_rready : prefetch_axi_rready;
 
 endmodule

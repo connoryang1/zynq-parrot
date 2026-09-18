@@ -65,6 +65,7 @@ NONRESIDENT_TESTS := \
     mt_umode_nonresident_sv39_data_handoff_test
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
+DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark,$(TESTS))
 
 .PHONY: all clean build-sim rebuild-sim help check-harness FORCE $(addprefix run-, $(TESTS))
 
@@ -72,7 +73,9 @@ TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
 # even when a user alternates A -> B -> A with the same output ELF name.
 FORCE:
 
-all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(TESTS)))
+all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(DEFAULT_TOPOLOGY_TESTS)))
+	@$(MAKE) $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv \
+		NUM_THREADS=2 NUM_CONTEXTS=10
 
 $(LOG_DIR):
 	@mkdir -p $@

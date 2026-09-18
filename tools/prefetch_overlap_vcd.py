@@ -2,14 +2,14 @@
 """Validate configurable-depth UCE prefetch transactions in fst2vcd output.
 
 UCE admission, forward-pump issue, and consumed responses are separate events.
-Optional AXI evidence tracks accepted AR transactions through ordered R bursts
-on the AXI clock, independently of the UCE clock. AXI acceptance overlap does
+Optional AXI evidence tracks accepted AR transactions through AXI-ID-tagged R
+bursts on the AXI clock, independently of the UCE clock. AXI acceptance overlap does
 not establish parallel DRAM-bank service. Unknown controls, unmatched replies,
 slot reuse, malformed bursts, and incomplete transactions invalidate the trace.
 """
 
 import argparse
-from collections import Counter, deque
+from collections import Counter
 import json
 import sys
 
@@ -175,9 +175,8 @@ class Transactions:
         self.fill_size = fill_bytes.bit_length() - 1
         self.prefetch_slots = prefetch_slots
         self.admission_mode = admission_mode
-        self.slots, self.normal_pending, self.axi_pending = {}, [], deque()
+        self.slots, self.normal_pending, self.axi_pending = {}, [], []
         self.prefetches, self.normal_reads, self.hints, self.demands, self.axi_reads = [], [], [], [], []
-        self.axi_id = None
         self.cycles = dict(clock=0, axi_clock=0)
 
     def uce(self, v, cycle, timestamp):
@@ -330,15 +329,11 @@ class Transactions:
         if bit(v, 'axi_reset'):
             if self.axi_pending:
                 raise EvidenceError('AXI reset with incomplete transactions')
-            self.axi_id = None
             return
         for label in ('ar_v', 'ar_ready', 'r_v', 'r_ready'):
             bit(v, label)
         if v['ar_v'] and v['ar_ready']:
             txn_id = known(v, 'ar_id')
-            if self.axi_id is not None and txn_id != self.axi_id:
-                raise EvidenceError('multiple AXI IDs unsupported; ordered same-ID trace required')
-            self.axi_id = txn_id
             length = known(v, 'ar_len')
             if not 0 <= length <= 255:
                 raise EvidenceError('invalid AXI ARLEN')
@@ -351,9 +346,14 @@ class Transactions:
         if v['r_v'] and v['r_ready']:
             if not self.axi_pending:
                 raise EvidenceError('unmatched AXI response')
-            record = self.axi_pending[0]
-            if known(v, 'r_id') != record['axi_id'] or known(v, 'r_resp') != 0:
-                raise EvidenceError('AXI response ID mismatch or non-OKAY response')
+            response_id = known(v, 'r_id')
+            if known(v, 'r_resp') != 0:
+                raise EvidenceError('AXI non-OKAY response')
+            matches = [record for record in self.axi_pending
+                       if record['axi_id'] == response_id]
+            if not matches:
+                raise EvidenceError('unmatched AXI response ID')
+            record = matches[0]
             record['beats'] += 1
             last = bit(v, 'r_last')
             if last != (record['beats'] == record['expected_beats']):
@@ -362,7 +362,7 @@ class Transactions:
                 record['first_response'] = event
             if last:
                 record['complete'] = event
-                self.axi_pending.popleft()
+                self.axi_pending.remove(record)
 
     def finish(self, allow_no_prefetch=False):
         if self.slots or self.normal_pending or self.axi_pending:

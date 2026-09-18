@@ -63,9 +63,10 @@ The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate
 the result even if the round-trip checks had already completed.
-`make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set;
-compilation alone is not a runtime pass. Use that topology for the handoff tests
-and benchmark: the benchmark specifically compares resident context 1 with
+`make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set. It
+uses the requested 2/4 topology for the maintained gates and automatically uses
+2/10 for `mt_prefetch_nonresident_interleave_benchmark`; compilation alone is
+not a runtime pass. The two-worker benchmark compares resident context 1 with
 nonresident context 2. The four-ID ring tests require at least four logical
 contexts; resident-only isolation tests use contexts 0 and 1.
 
@@ -76,7 +77,9 @@ batched ideal), or `BENCH_MODE=2` (ten-worker prefetch/yield/load):
 
 ```sh
 make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
-  NUM_THREADS=2 NUM_CONTEXTS=10 BENCH_MODE=2
+  NUM_THREADS=2 NUM_CONTEXTS=10 BENCH_MODE=2 TRACE=1 \
+  SIM_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10' \
+  VERILATOR_BUILD_JOBS=12
 ```
 
 Compare the printed cycle rows from three fresh boots. The benchmark checks all
@@ -219,8 +222,9 @@ the Linux thread baseline or establish an FPGA/Linux performance gain.
 
 ### Full simulator and waveform evidence
 
-The minimal core simulator can check instruction and UCE behavior. Its memory
-device is the single-request `bp_axil_master`; changing L2 configuration fields
+The minimal core simulator can check instruction and UCE behavior. It has no L2.
+Ordinary traffic uses the single-request `bp_axil_master`; full-line detached
+hints use the dedicated ten-ID AXI burst bridge. Changing L2 configuration fields
 does not add an L2 to this topology. To test the existing two-bank L2 path,
 select the full simulator and optional two-bank L2.
 `BP_ZYNQ_PREFETCH_TWO_BANKS` retains the total 4 KiB L2 capacity and maps adjacent
@@ -263,11 +267,20 @@ python3 testing/rtl/run_prefetch_mshr_table.py --out /tmp/prefetch-mshr-table
 
 It must print `[PREFETCH-MSHR] PASS`.
 
+The minimal-top AXI bridge has a separate protocol and data-path regression:
+
+```sh
+python3 testing/rtl/run_prefetch_axi_master.py --out /tmp/prefetch-axi-master
+```
+
+It fills all slots, interleaves three response IDs, applies BedRock response
+backpressure, checks 32-to-64-bit data assembly, and verifies slot reuse.
+
 ```sh
 fst2vcd path/to/dump.fst | python3 -B tools/prefetch_overlap_vcd.py \
   --uce-prefix dcache_uce --axi-prefix axi_mem --fill-bytes 8 \
   --prefetch-slots 10 --require-uce-overlap --require-axi-overlap \
-  --require-reserved-slots 10
+  --require-reserved-slots 2
 python3 -B tools/test_prefetch_overlap_vcd.py
 ```
 
@@ -306,12 +319,12 @@ python3 testing/rtl/run_uce_prefetch.py \
   --out logs/nonblocking-prefetch-20260908/uce-unit
 ```
 
-It checks ten pending hints, nonblocking full-queue drops, out-of-order
-responses, wrapped three-bit way tags plus high slot bits in the echoed prefetch
-state field, slot reuse, unrelated and same-line demands, response backpressure,
-and credit drain. A separate malformed-response case must trigger the expected
-assertion. The runner uses an explicit-cycle C++ driver and records source and
-artifact identities in its verification manifest.
+It checks ten pending hints, replacement metadata arriving after admission,
+duplicate and full-queue drops, out-of-order responses, wrapped slot tags, slot
+reuse, unrelated and same-line demands, exact replacement-way fills, response
+backpressure, and credit drain. A separate malformed-response case must trigger
+the expected assertion. The runner uses an explicit-cycle C++ driver and records
+source and artifact identities in its verification manifest.
 
 Run the real L2 controller against controlled mock banks with:
 

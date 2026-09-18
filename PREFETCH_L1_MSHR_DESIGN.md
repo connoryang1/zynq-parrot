@@ -6,27 +6,30 @@ UCE queue and a detached full-line L1 fill route.
 
 ## Required transaction contract
 
-An accepted hint reserves one L1 miss entry and returns to the pipeline without an
-architectural completion. The entry contains the physical line address, selected
-way and set, logical context ID, fill-beat mask, and a demand-waiter bit. The
-memory request carries the entry ID. A response may arrive after any other entry;
-the ID selects the destination and releases the entry after the final beat.
+An accepted hint reserves one UCE slot and returns to the pipeline without an
+architectural completion. The dcache supplies its replacement metadata on the
+following cycle; the slot cannot issue until that metadata arrives. Each slot
+stores the physical line address, selected way, sent state, and fill-beat count.
+A response may arrive after any other slot and matches the unique reserved line.
 
-A demand for a line with an active hint joins that entry. A demand for another
-line can allocate another entry while the first request is in memory. Duplicate
-hints coalesce, and hints are dropped when no entry is available. Demand misses
-retain priority over hint allocation and issue.
+A demand for a line with an active hint waits until that hint completes before
+issuing its normal access. A demand for another line can proceed while hints are
+in memory. Duplicate same-line hints and hints accepted while the table is full
+are acknowledged and dropped; their following metadata beat is consumed without
+polluting the ordinary metadata FIFO. Demand traffic retains issue priority.
 
 ## RTL stages
 
-1. The dcache emits an explicit prefetch transaction and carries its replacement
-   way in the request ID.
+1. The dcache emits an explicit prefetch transaction followed by its normal
+   replacement metadata beat.
 2. UCE maintains ten detached entries, tracks each fill beat, matches responses
    by physical line address, and writes data/tag state without architectural
    completion.
 3. The tag is published only after the complete line arrives; partial responses
    cannot make a line valid.
-4. Context-switch acceptance remains independent of outstanding hint entries; only
+4. The minimal Zynq top routes full-line hints through a ten-ID AXI burst bridge;
+   ordinary traffic retains AXI ID zero and priority at a backpressure-safe arbiter.
+5. Context-switch acceptance remains independent of outstanding hint entries; only
    architectural ordering operations may drain or fence them.
 
 The production simulator configuration uses ten entries for the ten-logical-worker,
@@ -35,10 +38,15 @@ fills, reordered replies, demand routing, backpressure, and dropped hints.
 
 ## Completion evidence
 
-The focused RTL path is verified. The end-to-end simulator also passes the
-nonresident prefetch benchmark; the latest normal-latency rows are demand
-`0x56e22`, prefetch/yield/load `0x56d07`, and batched ideal `0x2ca`. The
-prefetch row is 283 cycles faster than demand, while nonresident state traffic
-and L2 service width remain dominant, keeping the result far from the batched
-ideal. A high-latency matched run is still slightly slower than demand, so this
-is evidence of overlap capability rather than a finished performance result.
+The focused UCE regression verifies ten slots, delayed replacement metadata,
+duplicate and full-queue drops, reordered replies, backpressure, demand routing,
+and malformed-response rejection. The bridge regression verifies a full queue,
+interleaved AXI IDs, BedRock backpressure, 32-to-64-bit data assembly, and slot
+reuse.
+
+On the final 200-cycle simulator model, demand takes 1,113,898 cycles, the
+ten-worker prefetch/yield/load schedule takes 1,084,758, and the batched ideal
+takes 10,383. The candidate is 2.616% shorter than demand, with two UCE hints and
+three AXI reads observed outstanding. Nine of ten later loads avoid a normal
+same-line miss. The remaining 104.47x candidate-to-ideal gap is dominated by the
+ordinary instruction/context traffic between worker hint admissions.

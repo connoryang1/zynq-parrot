@@ -28,6 +28,7 @@ class Test {
   unsigned writes = 0, demand_writes = 0, prefetch_writes = 0;
   unsigned completions = 0, fills = 0, reverse_stalls = 0;
   bool response_prefetch_active = false;
+  unsigned response_prefetch_way = 0;
   std::vector<Header> sent;
 
   Handshake step() {
@@ -52,6 +53,9 @@ class Test {
       if (dut.rev_v_i && !dut.rev_ready_o) ++reverse_stalls;
       if (dut.data_v_o && dut.arrays_accept_i) {
         require(dut.data_opcode_o == 0, "prefetch refill lost write opcode");
+        if (response_prefetch_active)
+          require(dut.data_way_o == response_prefetch_way,
+                  "prefetch refill used stale or truncated replacement metadata");
         unsigned mask = dut.data_fill_o;
         require(mask && !(mask & (mask-1)), "refill wrote invalid fill index");
         unsigned index = 0;
@@ -79,8 +83,9 @@ class Test {
       if (step().req) { got = true; break; }
     dut.req_v_i = 0;
     require(got == expected, "cache request acceptance mismatch");
-    if (got && type != hint) {
-      dut.metadata_way_i = 3; dut.metadata_v_i = 1;
+    if (got) {
+      dut.metadata_way_i = type == hint ? ((addr >> 12) & 7) : 3;
+      dut.metadata_v_i = 1;
       step(); dut.metadata_v_i = 0;
     }
     step();
@@ -102,6 +107,7 @@ class Test {
   }
   void response(Header h) {
     response_prefetch_active = h.prefetch;
+    response_prefetch_way = (h.addr >> 12) & 7;
     for (unsigned beat = 0; beat < 4u; ++beat) {
       dut.rev_type_i = h.type; dut.rev_size_i = h.size;
       dut.rev_addr_i = h.addr; dut.rev_way_i = h.way; dut.rev_state_i = h.state;
@@ -164,6 +170,9 @@ public:
     // carries the high slot bits and keeps their response IDs unique.
     response(sent[9]); cycles(5);
     require(!dut.credits_empty_o, "one response drained two hints");
+    request(hint, 0x80010018); cycles(5);
+    require(sent.size() == 10,
+            "same-line duplicate consumed a free slot or issued another request");
     request(hint, 0x8001a000); wait_sent(11);
     require(sent[10].way == sent[9].way && sent[10].state == sent[9].state,
             "returned wrapped-tag slot was not reusable");
@@ -212,7 +221,7 @@ public:
     cycles(8);
     require(sent.size() == 16 && demand_writes == 8 && completions == 2,
             "final request/response accounting mismatch");
-    std::cout << "[UCE-PREFETCH] PASS: ten slots, wrapped tags, full-queue drops, reordered replies, "
+    std::cout << "[UCE-PREFETCH] PASS: ten slots, duplicate/full-queue drops, wrapped tags, reordered replies, "
                  "demand routing, stalls, credits\n";
   }
 };
