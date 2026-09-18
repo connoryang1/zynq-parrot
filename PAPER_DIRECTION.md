@@ -348,30 +348,31 @@ the line after resumption. The batched mode issues ten prefetches and then ten
 loads. Each schedule runs from a fresh boot because context state is not
 reclaimed between independent launches.
 
-The current high-latency control uses the simulation-only pipelined AXI model
-with 200-cycle reads and ten queue entries. A dedicated prefetch transport turns
-each 64-byte hint into one 16-beat AXI burst with a nonzero transaction ID;
-ordinary instruction, demand, and context-state traffic remains on the existing
-single-request bridge with AXI ID zero. The address arbiter locks its selected
-source under backpressure, and the prefetch bridge can reassemble interleaved
-read beats independently for ten IDs.
+The current high-latency control uses the full BlackParrot Zynq top and the
+simulation-only pipelined AXI model with 200-cycle reads and ten queue entries.
+A dedicated prefetch transport bypasses the blocking L2 DMA path and turns each
+64-byte hint into one eight-beat, 64-bit AXI burst with a nonzero transaction
+ID. Ordinary instruction, demand, context-state, and write traffic remains on
+the existing path with AXI ID zero. The address arbiter locks its selected
+source under backpressure, demand has priority between transfers, and the
+prefetch bridge reassembles interleaved read beats independently for ten IDs.
 
 The revision-matched fresh-boot results are:
 
 | Schedule | Cycles |
 | --- | ---: |
-| Ten-worker demand | `0x8c10` (35,856) |
-| Ten-worker prefetch/yield/load | `0x2763` (10,083) |
-| Single-thread batched reference | `0x3368` (13,160) |
-| Two-ring switch-only control | `0x0d9a` (3,482) |
+| Ten-worker demand | `0x0acb` (2,763) |
+| Ten-worker prefetch/yield/load | `0x040e` (1,038) |
+| Single-thread batched reference | `0x0406` (1,030) |
+| Two-ring switch-only control | `0x01d8` (472) |
 
-The cheap-context candidate saves 25,773 cycles, a 71.88% cycle reduction or
-3.556x speedup over the matched demand schedule. After subtracting the 3,482-cycle
-two-ring handoff control, demand spends 32,374 cycles on its data path while the
-candidate spends 6,601. The candidate is also 23.38% faster than the immediate
-single-thread prefetch-then-load reference in this model: its handoff work gives
-the fills time to finish before the second-lap loads, while the single thread
-reaches its first load with fills still pending.
+The cheap-context candidate saves 1,725 cycles, a 62.43% cycle reduction or
+2.662x speedup over the matched demand schedule. It is eight cycles, or 0.777%,
+slower than the ideal single-thread prefetch-then-load reference. After
+subtracting the 472-cycle switch-only control, demand spends 2,291 cycles on
+its data path while the candidate spends 566. This is the intended result: ten
+independent workers recover essentially all of the batching benefit through
+cheap handoffs without making their addresses available to one software thread.
 
 Earlier million-cycle rows were invalid benchmark output. The inline-assembly
 call did not declare the RISC-V call-clobbered registers, so the shared worker's
@@ -383,17 +384,17 @@ The worker bodies are seeded with per-context data/result pointers, so the timed
 body contains no address arithmetic. The UCE accepts hints while its demand FSM
 waits, preserves detached credits across handoff, waits for the dcache's matching
 replacement metadata before issue, and drops duplicate same-line hints. The
-minimal topology contains no L2.
+full-top bypass keeps these detached fills out of the L2 path that previously
+serialized their external requests.
 
 For attribution, `BENCH_MODE=3` runs the same two complete ten-context rings with
-data operations removed. The high-latency control passes in 3,482 cycles.
+data operations removed. The high-latency control passes in 472 cycles.
 
 The final closed trace passes the transaction gate with all ten hints complete.
 It reaches ten simultaneously reserved UCE slots and ten outstanding AXI reads;
-all ten hints are admitted over 119 cycles before the first response, and both
-interfaces accept later requests before earlier first responses. Nine of ten
-later useful loads have no same-line normal miss, while context zero joins its
-still-pending fill once.
+both interfaces accept later requests before earlier first responses, and AXI
+IDs 1 through 10 all appear. Nine of ten later useful loads have no same-line
+normal miss, while context zero joins its still-pending fill once.
 AXI acceptance proves outstanding requests, not parallel DRAM-bank service.
 
 All workers execute one shared 64-byte-aligned body, with private data/result
@@ -402,9 +403,9 @@ instruction lines from the experiment while retaining ten independent logical
 contexts, including eight nonresident contexts. Result bookkeeping is placed in
 different L1 sets from the ten measured lines.
 
-The UCE capacity is now a real configuration parameter rather than a hardcoded
-ten-entry override. The ten-worker simulator explicitly requests ten entries and
-retains the results above. The first PYNQ-Z2 endpoint uses four entries: isolated
+The UCE capacity is a configuration parameter rather than a hardcoded ten-entry
+override. The ten-worker simulator explicitly requests ten entries and retains
+the results above. The first PYNQ-Z2 endpoint used four entries: isolated
 job `20260918T041813Z-e66721e2` routes at 51,791/53,200 LUTs (97.35%) with WNS
 +2.178 ns, TNS 0, WHS +0.035 ns, and THS 0. Direct response-ID decoding removes
 the ten-way response-address CAM while simulation assertions retain address and
@@ -425,13 +426,20 @@ bitstream SHA-256 is
 The exact benchmark NBF, SHA-256
 `56878463ea4e8d3d217e5a26712b47add85d4ded9cdea9770231c86ef4adef28`, passes
 the full-system simulator on that static configuration. The image has not been
-board-qualified. The full endpoint uses the standard two-bank L2-to-AXI path,
-not the minimal simulator's dedicated ten-ID bridge. This route proves capacity
-and timing; a board trace or equivalent full-path evidence must establish the
-actual downstream concurrency before transferring the 3.556x simulator claim.
+board-qualified. It predates the current full-top ten-ID transport and is the
+fit baseline for route job `20260918T081302Z-154554ae`. That candidate routes
+at 49,197/53,200 LUTs (92.48%), 28,065 registers, 83.5 BRAM tiles, and 11 DSPs,
+with final WNS/TNS +0.755 ns/0 and WHS/THS +0.037 ns/0. Bitstream DRC reports
+zero errors. The verified package SHA-256 is
+`65ce394e07a5d176ccc1c94bb767d396c265f8920fec45a66bbb377a2a1d0316` and the
+bitstream SHA-256 is
+`58d8dc8b945d6db67fc3eb666f3183a3b4670d007e94e1714204802416c46082`.
+The current simulation trace establishes downstream concurrency in the real
+full top, and the route establishes FPGA capacity and timing. Physical-board
+qualification remains.
 
-A capacity-matched simulator run quantifies that compromise on the same
-ten-worker, 200-cycle workload:
+A prior minimal-top capacity experiment quantified the queue-depth compromise
+on the same ten-worker, 200-cycle workload:
 
 | Prefetch entries | Demand cycles | Prefetch/yield/load cycles | Speedup | Cycle reduction |
 | ---: | ---: | ---: | ---: | ---: |
@@ -443,6 +451,6 @@ nonblocking, a full four-entry table drops the remaining six hints rather than
 stalling the issuing contexts; their later demand loads therefore still miss.
 The four-entry result demonstrates a measurable benefit, but it cannot reproduce
 the batch-of-ten overlap without enough capacity for all ten outstanding lines.
-The exact routed ten-entry/ten-logical endpoint removes that queue limit. Running
-the hash-identified benchmark on the physical board is the remaining experiment
-gate.
+The current ten-entry candidate removes both that queue limit and the serialized
+full-top transport, and it passes routed fit and timing. The hash-identified
+benchmark on the physical board is the remaining experiment gate.

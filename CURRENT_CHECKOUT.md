@@ -2,20 +2,30 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
-Both forks integrate on `master`; develop on dedicated branches. The current
-simulator-validated and FPGA-routed prefetch checkpoint is top `9e4b021d` with
-BlackParrot RTL `cc8297dec`. The RTL parameterizes the detached L1-fill queue;
-the simulator uses ten entries and a dedicated ten-ID AXI burst path in the
-minimal Zynq top. Separate PYNQ-Z2 configurations provide four- and ten-entry
-endpoints. Ten logical workers now share one hot worker body while keeping
-private addresses and continuations. The 200-cycle model measures 35,856 demand
-versus 10,083 prefetch/yield/load cycles, a 3.556x
-speedup with ten entries. A capacity-matched four-entry run measures 32,624
-cycles, a 1.099x speedup over the same demand baseline. Focused UCE, MSHR,
-bridge, analyzer, and harness gates pass, as do all 26 program builds. Exact
-results and commands are in
-[the research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
+Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
+changes on `master`; develop on dedicated branches. The current
+simulator-validated candidate is top `154554ae`, BlackParrot RTL `bf65c54fa`,
+and subsystem RTL `93e88366`. It adds an optional full-top prefetch path that
+bypasses the blocking L2 DMA bridge while leaving instruction, demand, context
+state, and write traffic on the existing AXI ID-zero path. Detached 64-byte
+prefetch reads use AXI IDs 1 through 10 and may complete out of order.
+
+On the exact full BlackParrot top with 200-cycle memory reads, fresh boots
+measure 2,763 demand cycles, 1,030 ideal batched cycles, 1,038 ten-worker
+prefetch/yield/load cycles, and 472 switch-only cycles. The practical candidate
+is 2.662x faster than demand and only eight cycles, or 0.777%, slower than the
+ideal batch. A closed trace proves ten UCE requests and ten AXI reads
+outstanding together; all nonzero IDs 1 through 10 occur, and nine resumed loads
+have no later normal miss while the first joins its pending fill. The focused
+UCE, 32/64-bit bridge, analyzer, harness, enabled full-top, and disabled
+full-top gates pass. FPGA job `20260918T081302Z-154554ae` routes at 49,197 LUTs
+(92.48%), 28,065 registers, 83.5 BRAM tiles, and 11 DSPs. Final WNS/TNS are
++0.755 ns/0 and WHS/THS are +0.037 ns/0; bitstream DRC reports zero errors. The
+verified package and bitstream SHA-256 values are
+`65ce394e07a5d176ccc1c94bb767d396c265f8920fec45a66bbb377a2a1d0316` and
+`58d8dc8b945d6db67fc3eb666f3183a3b4670d007e94e1714204802416c46082`.
+The image has not been board-qualified. Exact results and commands are in [the
+research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
 The exact two-resident/ten-logical/ten-slot endpoint routes in farm job
 `20260918T064050Z-9e4b021d` at 48,645/53,200 LUTs (91.44%), 28,029 registers,
@@ -28,11 +38,9 @@ The package verifier reports the matching BIT/HWH/MAP set. The exact benchmark
 NBF SHA-256 is
 `56878463ea4e8d3d217e5a26712b47add85d4ded9cdea9770231c86ef4adef28`;
 it passes the full-system simulator with all ten worker checks, `CORE PASS`, and
-host `BSG PASS`. This image has not been loaded on a board.
-The full PYNQ endpoint retains its standard two-bank L2-to-AXI path; it does not
-contain the minimal simulator's dedicated ten-ID AXI bridge. Routed fit and the
-full-system functional pass therefore do not prove ten outstanding DDR reads or
-the simulator's 3.556x speedup on the board.
+host `BSG PASS`. This image has not been loaded on a board. It predates the
+current full-top ten-ID transport and remains the routed fit baseline for the
+candidate route.
 
 The four-logical-context ten-slot fit predecessor is job
 `20260918T055255Z-bcf24d47`: 46,033 LUTs (86.53%), WNS +0.219 ns, and no setup

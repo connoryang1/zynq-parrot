@@ -83,34 +83,36 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
   VERILATOR_BUILD_JOBS=12
 ```
 
-The target appends `BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)`, with
-`PREFETCH_ELS=10` by default; callers do not repeat it in `SIM_DEFINES`. Use
+The target appends `BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)` and
+`BP_PREFETCH_AXI_BYPASS`, with `PREFETCH_ELS=10` by default; callers do not
+repeat either definition in `SIM_DEFINES`. Use
 `PREFETCH_ELS=4` for a capacity-matched comparison with the first routed PYNQ-Z2
 endpoint. The slot count is part of the Verilator model stamp, so a model built
 for another capacity cannot be reused for this experiment.
 Static PYNQ-Z2 configurations now provide a four-slot/four-logical endpoint and
 an exact ten-slot/ten-logical endpoint. The latter routes with two resident banks
 and can run this program; physical-board qualification remains pending.
-The full endpoint uses the standard two-bank L2-to-AXI path rather than the
-minimal simulator's dedicated ten-ID bridge, so routed fit does not prove ten
-outstanding DDR reads or reproduce the minimal model's speedup.
+The current full-top candidate routes detached prefetches around the blocking
+L2 DMA bridge into the same dedicated ten-ID AXI bridge used by the minimal
+top. Ordinary instruction, demand, context-state, and write traffic remains on
+AXI ID zero. FPGA job `20260918T081302Z-154554ae` routes this exact endpoint at
+92.48% LUT utilization with +0.755 ns setup slack and +0.037 ns hold slack.
+Physical-board qualification remains pending.
 
-Compare the printed cycle rows from fresh boots. With the 200-cycle model, the
-accepted revision reports 35,856 demand, 10,083 prefetch/yield/load, 13,160
-batched-reference, and 3,482 switch-only cycles. The candidate is 3.556x faster
-than demand. The benchmark checks all ten per-worker completions and checksums
-before printing its result. All workers execute one shared aligned body so cold
+Compare the printed cycle rows from fresh boots. On the matched full top with
+the 200-cycle model, the candidate reports 2,763 demand, 1,038
+prefetch/yield/load, 1,030 batched-reference, and 472 switch-only cycles. The
+candidate is 2.662x faster than demand and 0.777% slower than ideal batching.
+The benchmark checks all ten per-worker completions and checksums before
+printing its result. All workers execute one shared aligned body so cold
 instruction lines do not serialize the independent data requests.
 
-With `PREFETCH_ELS=4`, matching the first routed PYNQ-Z2 capacity, fresh demand and
-prefetch/yield/load runs report 35,856 and 32,624 cycles. This is a 1.099x
-speedup (9.014% fewer cycles). The hints are nonblocking and may be dropped when
-all entries are occupied, so four entries cannot retain all ten independent
-requests issued on the first lap. Use the ten-entry result to measure the
-original batch-of-ten hypothesis and the four-entry result to predict the
-capacity limit of the four-slot endpoint. The separate ten-slot PYNQ-Z2 endpoint
-routes the exact two-resident/ten-logical configuration with positive setup and
-hold slack. Its full-system simulator run passes; the board run remains required.
+In the earlier minimal-top capacity study, `PREFETCH_ELS=4` produced 35,856
+demand and 32,624 prefetch/yield/load cycles, a 1.099x speedup. Nonblocking
+hints may be dropped when all entries are occupied, so four entries cannot
+retain all ten independent first-lap requests. The current full-top result uses
+ten entries to measure the original batch-of-ten hypothesis. Its route passes;
+the physical-board run remains required.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending
