@@ -60,6 +60,14 @@ DEFINES += BP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)
 endif
 
+# The ten-entry endpoint is above the xc7z020's default-flow packing limit.
+# Keep the accepted four-entry build on the validated defaults and select the
+# tool's named area strategies only for this explicit fit experiment.
+ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_cfg)
+SYNTH_STRATEGY ?= Flow_AreaOptimized_high
+IMPL_STRATEGY ?= Area_Explore
+endif
+
 include $(COSIM_MK_DIR)/Makefile.master
 
 # A custom aviary configuration without explicit dimensions silently uses the

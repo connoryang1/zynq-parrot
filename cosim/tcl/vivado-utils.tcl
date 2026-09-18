@@ -87,8 +87,11 @@ proc vivado_synth_wrap { do_synth threads } {
         # the worker count inside the one synth run in this flow.  Keep both
         # limits aligned with the explicitly recorded host cap.
         set_param general.maxThreads ${threads}
-        # Uncomment for faster TTR with worse QoR
-        #set_property strategy Flow_RuntimeOptimized [get_runs synth_1]
+        set strategy [vivado_env_default SYNTH_STRATEGY ""]
+        if {${strategy} ne ""} {
+            puts "BSG-INFO: synthesis strategy ${strategy}"
+            set_property strategy ${strategy} [get_runs synth_1]
+        }
         set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY rebuilt [get_runs synth_1]
         set_property STEPS.SYNTH_DESIGN.ARGS.RETIMING true [get_runs synth_1]
         launch_runs synth_1 -jobs ${threads}
@@ -101,8 +104,11 @@ proc vivado_impl_wrap { do_impl threads } {
     if {${do_impl}} {
         # See vivado_synth_wrap: implementation is likewise a single run.
         set_param general.maxThreads ${threads}
-        # Uncomment for faster TTR with worse QoR
-        #set_property strategy Flow_RuntimeOptimized [get_runs impl_1]
+        set strategy [vivado_env_default IMPL_STRATEGY ""]
+        if {${strategy} ne ""} {
+            puts "BSG-INFO: implementation strategy ${strategy}"
+            set_property strategy ${strategy} [get_runs impl_1]
+        }
         launch_runs impl_1 -to_step write_bitstream -jobs ${threads}
         wait_on_run impl_1
         open_run impl_1 -name impl_1
