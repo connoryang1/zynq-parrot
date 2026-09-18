@@ -262,7 +262,7 @@ if pgrep -af '[/]tools/Xilinx/.*/vivado|[/]bin/vivado' >/dev/null; then
   exit 1
 fi
 test -x "$main/codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh"
-git -C "$main" fetch --no-tags origin \
+git -C "$main" fetch --no-tags --no-recurse-submodules origin \
   "refs/heads/$top_branch:refs/remotes/origin/$top_branch"
 top_commit=$(git -C "$main" rev-parse "refs/remotes/origin/$top_branch")
 if ! git -C "$bp_seed" remote get-url connoryang >/dev/null 2>&1; then
@@ -274,6 +274,19 @@ bp_commit=$(git -C "$bp_seed" rev-parse "refs/remotes/connoryang/$bp_branch")
 gitlink=$(git -C "$main" ls-tree "$top_commit" import/black-parrot | awk '{print $3}')
 if [[ $gitlink != "$bp_commit" ]]; then
   echo "Top gitlink $gitlink does not match BlackParrot $bp_commit." >&2
+  exit 1
+fi
+
+subsystem_seed=$main/import/black-parrot-subsystems
+subsystem_gitlink=$(git -C "$main" ls-tree "$top_commit" import/black-parrot-subsystems | awk '{print $3}')
+subsystem_url=$(git -C "$main" show "$top_commit:.gitmodules" \
+  | git config --file /dev/stdin --get submodule.import/black-parrot-subsystems.url)
+subsystem_branch=$(git -C "$main" show "$top_commit:.gitmodules" \
+  | git config --file /dev/stdin --get submodule.import/black-parrot-subsystems.branch)
+git -C "$subsystem_seed" fetch --no-tags "$subsystem_url" \
+  "refs/heads/$subsystem_branch:refs/remotes/candidate/$subsystem_branch"
+if [[ $(git -C "$subsystem_seed" rev-parse "refs/remotes/candidate/$subsystem_branch") != "$subsystem_gitlink" ]]; then
+  echo "Top subsystem gitlink $subsystem_gitlink does not match $subsystem_branch." >&2
   exit 1
 fi
 
