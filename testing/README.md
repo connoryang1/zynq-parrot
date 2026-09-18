@@ -102,7 +102,12 @@ Physical-board qualification remains pending.
 Compare the printed cycle rows from fresh boots. On the matched full top with
 the 200-cycle model, the candidate reports 2,763 demand, 1,038
 prefetch/yield/load, 1,030 batched-reference, and 472 switch-only cycles. The
-candidate is 2.662x faster than demand and 0.777% slower than ideal batching.
+candidate is 2.662x faster than its matched demand control. The raw 0.777% gap
+to the separately compiled batched reference is not a qualified ideal gap: its
+timer starts about 450 cycles before the first hint while ordinary/cold
+instruction traffic completes, versus about 12 cycles in the ring. Use that row
+as a functional batching reference until all modes share matched startup,
+layout, traffic drain, and bookkeeping.
 The benchmark checks all ten per-worker completions and checksums before
 printing its result. All workers execute one shared aligned body so cold
 instruction lines do not serialize the independent data requests.

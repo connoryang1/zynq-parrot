@@ -13,8 +13,13 @@ prefetch reads use AXI IDs 1 through 10 and may complete out of order.
 On the exact full BlackParrot top with 200-cycle memory reads, fresh boots
 measure 2,763 demand cycles, 1,030 ideal batched cycles, 1,038 ten-worker
 prefetch/yield/load cycles, and 472 switch-only cycles. The practical candidate
-is 2.662x faster than demand and only eight cycles, or 0.777%, slower than the
-ideal batch. A closed trace proves ten UCE requests and ten AXI reads
+is 2.662x faster than its matched demand control. Do not interpret the raw
+eight-cycle difference from the separately compiled batched reference as
+context-switch overhead or a qualified gap from ideal. A post-run waveform
+audit found that the batched timer precedes its first hint by about 450 cycles
+of ordinary/cold instruction traffic, versus about 12 cycles for the ring. The
+472-cycle switch-only result is consistent with that startup mismatch masking
+most of the ring's handoff cost. A closed trace proves ten UCE requests and ten AXI reads
 outstanding together; all nonzero IDs 1 through 10 occur, and nine resumed loads
 have no later normal miss while the first joins its pending fill. The focused
 UCE, 32/64-bit bridge, analyzer, harness, enabled full-top, and disabled
@@ -24,7 +29,9 @@ full-top gates pass. FPGA job `20260918T081302Z-154554ae` routes at 49,197 LUTs
 verified package and bitstream SHA-256 values are
 `65ce394e07a5d176ccc1c94bb767d396c265f8920fec45a66bbb377a2a1d0316` and
 `58d8dc8b945d6db67fc3eb666f3183a3b4670d007e94e1714204802416c46082`.
-The image has not been board-qualified. Exact results and commands are in [the
+The image has not been board-qualified, and a layout- and startup-matched
+batched reference remains required to quantify distance from ideal. Exact raw
+results and commands are in [the
 research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
 The exact two-resident/ten-logical/ten-slot endpoint routes in farm job

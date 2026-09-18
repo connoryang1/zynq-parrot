@@ -367,12 +367,27 @@ The revision-matched fresh-boot results are:
 | Two-ring switch-only control | `0x01d8` (472) |
 
 The cheap-context candidate saves 1,725 cycles, a 62.43% cycle reduction or
-2.662x speedup over the matched demand schedule. It is eight cycles, or 0.777%,
-slower than the ideal single-thread prefetch-then-load reference. After
-subtracting the 472-cycle switch-only control, demand spends 2,291 cycles on
-its data path while the candidate spends 566. This is the intended result: ten
-independent workers recover essentially all of the batching benefit through
-cheap handoffs without making their addresses available to one software thread.
+2.662x speedup over the matched demand schedule. That comparison is valid
+because both ring modes use the same worker, setup, loads, result stores,
+checks, and twenty handoffs; only hint issue differs.
+
+The raw candidate is eight cycles, or 0.777%, slower than the separately
+compiled single-thread reference, but that number is not a qualified
+distance-from-ideal result. A waveform audit found that the batched timer begins
+about 450 cycles before its first hint while ordinary and cold instruction
+refills complete. The ring reaches its first hint about 12 cycles after its
+timer begins because its untimed context seeding and result clearing leave a
+different front-end state. The roughly 438-cycle startup skew nearly cancels
+the 472-cycle switch-only control. The batched run also admits its first hint
+before the remaining nine, whereas the candidate admits all ten before the
+first response. Subtracting the switch-only row from either data row therefore
+does not repair the comparison.
+
+The supported conclusion is that ten independent worker requests overlap and
+the prefetch/yield/load schedule is 2.662x faster than its matched demand
+control. Quantifying distance from ideal requires one binary with identical
+untimed setup, warmed instruction paths, drained ordinary traffic, explicit
+timing markers, and equivalent bookkeeping for every mode.
 
 Earlier million-cycle rows were invalid benchmark output. The inline-assembly
 call did not declare the RISC-V call-clobbered registers, so the shared worker's
