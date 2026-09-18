@@ -88,9 +88,12 @@ The target appends `BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)`, with
 `PREFETCH_ELS=4` for a capacity-matched comparison with the first routed PYNQ-Z2
 endpoint. The slot count is part of the Verilator model stamp, so a model built
 for another capacity cannot be reused for this experiment.
-Static PYNQ-Z2 configurations now provide four- and ten-slot endpoints. Both
-currently inherit four logical contexts, so the routed ten-slot image proves
-queue fit but cannot yet run this ten-logical-worker program on the board.
+Static PYNQ-Z2 configurations now provide a four-slot/four-logical endpoint and
+an exact ten-slot/ten-logical endpoint. The latter routes with two resident banks
+and can run this program; physical-board qualification remains pending.
+The full endpoint uses the standard two-bank L2-to-AXI path rather than the
+minimal simulator's dedicated ten-ID bridge, so routed fit does not prove ten
+outstanding DDR reads or reproduce the minimal model's speedup.
 
 Compare the printed cycle rows from fresh boots. With the 200-cycle model, the
 accepted revision reports 35,856 demand, 10,083 prefetch/yield/load, 13,160
@@ -106,8 +109,8 @@ all entries are occupied, so four entries cannot retain all ten independent
 requests issued on the first lap. Use the ten-entry result to measure the
 original batch-of-ten hypothesis and the four-entry result to predict the
 capacity limit of the four-slot endpoint. The separate ten-slot PYNQ-Z2 endpoint
-routes with positive setup and hold slack, but an exact two-resident/ten-logical
-configuration and board run remain required.
+routes the exact two-resident/ten-logical configuration with positive setup and
+hold slack. Its full-system simulator run passes; the board run remains required.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending

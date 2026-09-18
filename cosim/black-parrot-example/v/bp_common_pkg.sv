@@ -133,8 +133,8 @@ package bp_common_pkg;
   // Area-exploration endpoint for the original ten-worker workload: two
   // resident register banks, ten SRAM-backed logical contexts, and enough
   // detached fills to retain every worker's first-lap hint. Keep the routed
-  // four-entry configuration above stable until this endpoint has also passed
-  // implementation and board qualification.
+  // four-entry configuration above stable; this endpoint still requires board
+  // qualification before it becomes the physical acceptance image.
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_cfg_override_p =
     '{num_contexts: 10
       ,dcache_prefetch_els: 10

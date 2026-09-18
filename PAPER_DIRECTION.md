@@ -411,17 +411,24 @@ the ten-way response-address CAM while simulation assertions retain address and
 live-slot checks. A default-flow ten-entry endpoint still failed placement at
 54,081 LUTs and 11,535 required slices versus 11,333 available.
 
-A named Vivado area flow resolves that capacity limit. Job
-`20260918T055255Z-bcf24d47`, top `bcf24d47` and RTL `cc8297dec`, routes the
-ten-entry configuration at 46,033/53,200 LUTs (86.53%), 22,908 registers,
-83.5 BRAM tiles, and 11 DSPs. Final WNS/TNS are +0.219 ns/0 and WHS/THS are
-+0.019 ns/0. The verified package SHA-256 is
-`cd0e585186e40eee0496926ff392d5faf9133650e1ab4bbb3387e6fa45eea479`; its
+A named Vivado area flow resolves that capacity limit. Fit-only job
+`20260918T055255Z-bcf24d47` routes ten entries with four logical contexts at
+46,033 LUTs (86.53%). The exact experiment endpoint then expands the same static
+configuration to two resident banks and ten logical contexts. Job
+`20260918T064050Z-9e4b021d`, top `9e4b021d` and RTL `cc8297dec`, routes it at
+48,645/53,200 LUTs (91.44%), 28,029 registers, 83.5 BRAM tiles, and 11 DSPs.
+Final WNS/TNS are +0.251 ns/0 and WHS/THS are +0.023 ns/0. The verified package
+SHA-256 is
+`5b30e21e92d7693133c3e65e2e53721dc40dc1ea2d65faa7f94c1c07245f8b84`; its
 bitstream SHA-256 is
-`d2225b8318d6e4fdb74ecd7b6c35b8efcc1e792bb77113eab9335e2662d66757`.
-This endpoint still inherits four logical contexts. It proves that ten detached
-fills fit, but the exact physical experiment requires a separate route with two
-resident banks and ten logical contexts. Neither new image has board qualification.
+`b7e05606979f79c0bf759c3a69fd10705d13ec026d85e2d2e621c643f0555a47`.
+The exact benchmark NBF, SHA-256
+`56878463ea4e8d3d217e5a26712b47add85d4ded9cdea9770231c86ef4adef28`, passes
+the full-system simulator on that static configuration. The image has not been
+board-qualified. The full endpoint uses the standard two-bank L2-to-AXI path,
+not the minimal simulator's dedicated ten-ID bridge. This route proves capacity
+and timing; a board trace or equivalent full-path evidence must establish the
+actual downstream concurrency before transferring the 3.556x simulator claim.
 
 A capacity-matched simulator run quantifies that compromise on the same
 ten-worker, 200-cycle workload:
@@ -436,6 +443,6 @@ nonblocking, a full four-entry table drops the remaining six hints rather than
 stalling the issuing contexts; their later demand loads therefore still miss.
 The four-entry result demonstrates a measurable benefit, but it cannot reproduce
 the batch-of-ten overlap without enough capacity for all ten outstanding lines.
-The routed ten-entry endpoint removes that queue limit; increasing its logical
-context count and running the exact board benchmark are the remaining physical
-experiment gates.
+The exact routed ten-entry/ten-logical endpoint removes that queue limit. Running
+the hash-identified benchmark on the physical board is the remaining experiment
+gate.

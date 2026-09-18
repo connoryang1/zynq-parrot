@@ -4,30 +4,41 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
 Both forks integrate on `master`; develop on dedicated branches. The current
-simulator-validated and FPGA-routed prefetch checkpoint is top `bcf24d47` with
+simulator-validated and FPGA-routed prefetch checkpoint is top `9e4b021d` with
 BlackParrot RTL `cc8297dec`. The RTL parameterizes the detached L1-fill queue;
 the simulator uses ten entries and a dedicated ten-ID AXI burst path in the
 minimal Zynq top. Separate PYNQ-Z2 configurations provide four- and ten-entry
-endpoints. Ten logical
-workers now share one hot worker body while keeping private addresses and
-continuations. The 200-cycle
-model measures 35,856 demand versus 10,083 prefetch/yield/load cycles, a 3.556x
+endpoints. Ten logical workers now share one hot worker body while keeping
+private addresses and continuations. The 200-cycle model measures 35,856 demand
+versus 10,083 prefetch/yield/load cycles, a 3.556x
 speedup with ten entries. A capacity-matched four-entry run measures 32,624
 cycles, a 1.099x speedup over the same demand baseline. Focused UCE, MSHR,
 bridge, analyzer, and harness gates pass, as do all 26 program builds. Exact
 results and commands are in
 [the research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
-The ten-slot endpoint routes in farm job
-`20260918T055255Z-bcf24d47` at 46,033/53,200 LUTs (86.53%), 22,908 registers,
-83.5 BRAM tiles, and 11 DSPs. Routed WNS is +0.219 ns, TNS 0, WHS +0.019 ns,
+The exact two-resident/ten-logical/ten-slot endpoint routes in farm job
+`20260918T064050Z-9e4b021d` at 48,645/53,200 LUTs (91.44%), 28,029 registers,
+83.5 BRAM tiles, and 11 DSPs. Routed WNS is +0.251 ns, TNS 0, WHS +0.023 ns,
 and THS 0. The packed image SHA-256 is
-`cd0e585186e40eee0496926ff392d5faf9133650e1ab4bbb3387e6fa45eea479`.
+`5b30e21e92d7693133c3e65e2e53721dc40dc1ea2d65faa7f94c1c07245f8b84`.
 The extracted bitstream SHA-256 is
+`b7e05606979f79c0bf759c3a69fd10705d13ec026d85e2d2e621c643f0555a47`.
+The package verifier reports the matching BIT/HWH/MAP set. The exact benchmark
+NBF SHA-256 is
+`56878463ea4e8d3d217e5a26712b47add85d4ded9cdea9770231c86ef4adef28`;
+it passes the full-system simulator with all ten worker checks, `CORE PASS`, and
+host `BSG PASS`. This image has not been loaded on a board.
+The full PYNQ endpoint retains its standard two-bank L2-to-AXI path; it does not
+contain the minimal simulator's dedicated ten-ID AXI bridge. Routed fit and the
+full-system functional pass therefore do not prove ten outstanding DDR reads or
+the simulator's 3.556x speedup on the board.
+
+The four-logical-context ten-slot fit predecessor is job
+`20260918T055255Z-bcf24d47`: 46,033 LUTs (86.53%), WNS +0.219 ns, and no setup
+or hold violations. Its verified packed-image and bitstream SHA-256 values are
+`cd0e585186e40eee0496926ff392d5faf9133650e1ab4bbb3387e6fa45eea479` and
 `d2225b8318d6e4fdb74ecd7b6c35b8efcc1e792bb77113eab9335e2662d66757`.
-The package verifier reports the matching BIT/HWH/MAP set. This image has not
-been loaded on a board and still inherits four logical contexts; it establishes
-ten-slot fit, not execution of the ten-logical-worker benchmark on FPGA.
 
 The four-slot predecessor routes in farm job `20260918T041813Z-e66721e2` at
 51,791 LUTs (97.35%) with WNS +2.178 ns and no setup or hold violations. Its
@@ -45,19 +56,20 @@ poweroff. The earlier default-flow ten-slot full configuration, job
 `20260918T023254Z-7fb976ac`, passed synthesis but failed placement: 55,781
 combined LUTs exceed the device's 53,200, and 11,528 required slices exceed the
 11,306 available after fixed resources. The named area flow resolves that fit
-limit; an exact two-resident/ten-logical route and board qualification remain
-required before the original ten-worker experiment can run physically. The
-physical predecessor and historical resident baseline are identified below.
+limit for the exact two-resident/ten-logical endpoint. Board qualification
+remains required before the original ten-worker experiment can run physically.
+The physical predecessor and historical resident baseline are identified below.
 
 ## Scope and readiness
 
-The maintained PYNQ-Z2 configuration has two resident register banks and four
-logical integer contexts sharing one pipeline; the simulator-only request
-benchmark elaborates ten logical contexts on the same two resident banks. FPGA
+The board-qualified PYNQ-Z2 predecessor has two resident register banks and four
+logical integer contexts sharing one pipeline. The new routed endpoint and the
+request benchmark use ten logical contexts on the same two resident banks. FPGA
 evidence covers nonresident translated U-mode 0→2→0 handoff, a target-context syscall,
 logical identity, register restoration, and Linux shutdown. A separately
-transferred shell executable also passed on `6c97bcc0a`. The current image
-retains verified resident 0↔1 initialization, repeated handoffs/reseeding, and syscalls;
+transferred shell executable also passed on `6c97bcc0a`. The underlying RTL
+retains simulator verification of resident 0↔1 initialization, repeated
+handoffs/reseeding, and syscalls;
 see the
 [Linux guide](linux-tests/README.md) for that evidence and its one-run-per-boot
 restriction.
