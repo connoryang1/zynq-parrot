@@ -28,33 +28,41 @@ static void issue(Vprefetch_axi_master_tb &d, uint64_t address,
   assert(d.req_ready_o && d.arvalid_o && d.arready_i);
   assert(d.araddr_o == static_cast<uint32_t>(address));
   assert(d.arid_o == expected_id);
-  assert(d.arlen_o == 15 && d.arsize_o == 2 && d.arburst_o == 1);
+  const int bytes = d.axi_data_width_o / 8;
+  const int beats = 64 / bytes;
+  assert(d.arlen_o == beats - 1 && d.arsize_o == (bytes == 4 ? 2 : 3)
+         && d.arburst_o == 1);
   rise(d);
   d.req_v_i = 0;
 }
 
 static void response(Vprefetch_axi_master_tb &d, uint8_t id, int beat,
                      uint64_t address, bool stall) {
-  const uint32_t data = (static_cast<uint32_t>(id) << 24) | beat;
+  const bool axi64 = d.axi_data_width_o == 64;
+  const uint64_t data = axi64
+    ? (static_cast<uint64_t>(id) << 56) | beat
+    : (static_cast<uint32_t>(id) << 24) | beat;
+  const int beats = axi64 ? 8 : 16;
   d.rid_i = id;
   d.rdata_i = data;
   d.rresp_i = 0;
-  d.rlast_i = beat == 15;
+  d.rlast_i = beat == beats - 1;
   d.rvalid_i = 1;
   d.rev_ready_i = stall ? 0 : 1;
   fall(d);
 
-  const bool second_half = beat & 1;
-  assert(d.rev_v_o == second_half);
-  if (second_half) {
+  const bool fill_complete = axi64 || (beat & 1);
+  assert(d.rev_v_o == fill_complete);
+  if (fill_complete) {
     const uint32_t prior = (static_cast<uint32_t>(id) << 24) | (beat - 1);
-    const uint64_t expected = (static_cast<uint64_t>(data) << 32) | prior;
+    const uint64_t expected = axi64
+      ? data : (static_cast<uint64_t>(data) << 32) | prior;
     assert(d.rev_addr_o == address);
     assert(d.rev_data_o == expected);
   }
 
   if (stall) {
-    assert(second_half && !d.rready_o);
+    assert(fill_complete && !d.rready_o);
     rise(d);
     d.rev_ready_i = 1;
     fall(d);
@@ -97,14 +105,16 @@ int main(int argc, char **argv) {
 
   // Interleave every AXI beat across IDs and finish ID 3 before IDs 1 and 2.
   constexpr std::array<uint8_t, 3> order = {3, 1, 2};
-  for (int beat = 0; beat < 16; ++beat)
+  const int beats = d.axi_data_width_o == 64 ? 8 : 16;
+  for (int beat = 0; beat < beats; ++beat)
     for (uint8_t id : order)
       response(d, id, beat, base + (id - 1) * 64,
                id == 2 && beat == 1);
 
   // Every slot is free again and allocation restarts at the lowest AXI ID.
   issue(d, base + 192, 1);
-  std::cout << "[PREFETCH-AXI] PASS: full queue, interleaved IDs, backpressure, data assembly, slot reuse\n";
+  std::cout << "[PREFETCH-AXI] PASS: " << static_cast<int>(d.axi_data_width_o)
+            << "-bit AXI, full queue, interleaved IDs, backpressure, data assembly, slot reuse\n";
   d.final();
   return 0;
 }

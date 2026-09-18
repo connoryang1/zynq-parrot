@@ -28,43 +28,52 @@ def main():
     libraries = [bsg / name for name in ("bsg_misc", "bsg_dataflow", "bsg_mem")]
     sources = [root / "cosim/black-parrot-minimal-example/v/bp_common_pkg.sv",
                bp / "bp_me/src/include/bp_me_pkg.sv",
-               root / "cosim/black-parrot-minimal-example/v/bp_prefetch_axi_master.sv",
+               root / "import/black-parrot-subsystems/blackparrot/v/bp_prefetch_axi_master.sv",
                Path(__file__).resolve().with_name("prefetch_axi_master_tb.sv")]
     driver = Path(__file__).resolve().with_name("prefetch_axi_master_driver.cpp")
-    command = [str(args.verilator.resolve()), "--cc", "--exe", "--build", "--assert",
-               "--top-module", "prefetch_axi_master_tb", "--Mdir", str(out / "obj"),
-               "-j", "2", "-Wno-fatal"]
-    command += [f"+incdir+{path}" for path in includes]
-    for path in libraries:
-        command += ["-y", str(path)]
-    command += list(map(str, sources)) + [str(driver)]
-    (out / "build-command.json").write_text(json.dumps(command, indent=2) + "\n")
-    with (out / "build.log").open("w") as log:
-        subprocess.run(command, cwd=root, stdout=log, stderr=subprocess.STDOUT,
-                       check=True, timeout=180)
-    result = subprocess.run([str(out / "obj/Vprefetch_axi_master_tb")], cwd=out,
-                            text=True, capture_output=True, check=True, timeout=30)
-    if "[PREFETCH-AXI] PASS:" not in result.stdout:
-        raise RuntimeError("prefetch AXI regression completed without PASS marker")
-    (out / "run.log").write_text(result.stdout)
+    commands = {}
+    run_output = []
+    for width in (32, 64):
+        obj = out / f"obj{width}"
+        command = [str(args.verilator.resolve()), "--cc", "--exe", "--build", "--assert",
+                   "--top-module", "prefetch_axi_master_tb", "--Mdir", str(obj),
+                   f"-Gaxi_data_width_p={width}", "-j", "2", "-Wno-fatal"]
+        command += [f"+incdir+{path}" for path in includes]
+        for path in libraries:
+            command += ["-y", str(path)]
+        command += list(map(str, sources)) + [str(driver)]
+        commands[str(width)] = command
+        with (out / f"build-{width}.log").open("w") as log:
+            subprocess.run(command, cwd=root, stdout=log, stderr=subprocess.STDOUT,
+                           check=True, timeout=180)
+        result = subprocess.run([str(obj / "Vprefetch_axi_master_tb")], cwd=out,
+                                text=True, capture_output=True, check=True, timeout=30)
+        marker = f"[PREFETCH-AXI] PASS: {width}-bit AXI"
+        if marker not in result.stdout:
+            raise RuntimeError(f"{width}-bit prefetch AXI regression completed without PASS marker")
+        run_output.append(result.stdout)
+    (out / "build-command.json").write_text(json.dumps(commands, indent=2) + "\n")
+    (out / "run.log").write_text("".join(run_output))
 
     dependencies = set(sources + [driver, Path(__file__).resolve()])
-    for line in (out / "obj/Vprefetch_axi_master_tb__verFiles.dat").read_text().splitlines():
-        if line.startswith("S "):
-            dependencies.add(Path(shlex.split(line)[-1]))
+    for width in (32, 64):
+        verfiles = out / f"obj{width}/Vprefetch_axi_master_tb__verFiles.dat"
+        for line in verfiles.read_text().splitlines():
+            if line.startswith("S "):
+                dependencies.add(Path(shlex.split(line)[-1]))
     hashes = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in sorted(dependencies)}
-    artifact = out / "obj/Vprefetch_axi_master_tb"
+    artifacts = {f"obj{width}/Vprefetch_axi_master_tb":
+                 hashlib.sha256((out / f"obj{width}/Vprefetch_axi_master_tb").read_bytes()).hexdigest()
+                 for width in (32, 64)}
+    artifacts["run.log"] = hashlib.sha256((out / "run.log").read_bytes()).hexdigest()
     verification.write_text(json.dumps({
         "scope": "Dedicated prefetch AXI bridge protocol and data-path regression",
         "source_sha256": hashes,
-        "artifact_sha256": {
-            "run.log": hashlib.sha256((out / "run.log").read_bytes()).hexdigest(),
-            str(artifact.relative_to(out)): hashlib.sha256(artifact.read_bytes()).hexdigest(),
-        },
+        "artifact_sha256": artifacts,
         "passed": True,
     }, indent=2) + "\n")
-    print(result.stdout, end="")
+    print("".join(run_output), end="")
 
 
 if __name__ == "__main__":

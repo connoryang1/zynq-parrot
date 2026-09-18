@@ -171,6 +171,12 @@ module top_zynq
    localparam bp_axil_data_width_lp = 32;
    localparam bp_axi_addr_width_lp  = 32;
    localparam bp_axi_data_width_lp  = 64;
+`ifdef BP_PREFETCH_AXI_BYPASS
+   localparam prefetch_axi_bypass_lp = 1'b1;
+`else
+   localparam prefetch_axi_bypass_lp =
+     bp_params_p == e_bp_unicore_zynqparrot_prefetch10_cfg;
+`endif
    localparam num_regs_ps_to_pl_lp  = 5;
    localparam num_regs_pl_to_ps_lp  = 8;
    localparam num_fifos_ps_to_pl_lp = 1;
@@ -701,6 +707,8 @@ module top_zynq
       ,.axi_data_width_p(bp_axi_data_width_lp)
       ,.axi_id_width_p(6)
       ,.axi_core_clk_async_p(0)
+      ,.prefetch_bypass_p(prefetch_axi_bypass_lp)
+      ,.prefetch_outstanding_p(10)
       )
    blackparrot
      (.axi_clk_i(aclk)

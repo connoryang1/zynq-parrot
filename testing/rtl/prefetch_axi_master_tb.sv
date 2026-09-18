@@ -7,6 +7,7 @@ module prefetch_axi_master_tb
   import bp_common_pkg::*;
   import bp_me_pkg::*;
   #(parameter bp_params_e bp_params_p = e_bp_unicore_zynqparrot_cfg
+    , parameter axi_data_width_p = 32
     `declare_bp_proc_params(bp_params_p)
     `declare_bp_bedrock_if_widths(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p)
     )
@@ -19,10 +20,11 @@ module prefetch_axi_master_tb
    , output [7:0] arlen_o
    , output [2:0] arsize_o
    , output [1:0] arburst_o
+   , output [7:0] axi_data_width_o
    , output arvalid_o
    , input arready_i
    , input [2:0] rid_i
-   , input [31:0] rdata_i
+   , input [axi_data_width_p-1:0] rdata_i
    , input [1:0] rresp_i
    , input rlast_i, rvalid_i
    , output rready_o
@@ -47,11 +49,12 @@ module prefetch_axi_master_tb
 
   assign rev_addr_o = 64'(rev_header.addr);
   assign rev_data_o = rev_data;
+  assign axi_data_width_o = 8'(axi_data_width_p);
 
   bp_prefetch_axi_master
    #(.bp_params_p(bp_params_p)
      ,.axi_addr_width_p(32)
-     ,.axi_data_width_p(32)
+     ,.axi_data_width_p(axi_data_width_p)
      ,.axi_id_width_p(3)
      ,.outstanding_p(3)
      )
