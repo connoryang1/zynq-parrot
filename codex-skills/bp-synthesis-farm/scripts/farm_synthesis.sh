@@ -13,7 +13,7 @@ usage:
   farm_synthesis.sh link <top-worktree> <black-parrot-worktree>
   BP_SYNTH_DECISION='...' BP_SYNTH_CHEAPER_GATES='...' \
     BP_SYNTH_PASS_ACTION='...' BP_SYNTH_FAIL_ACTION='...' \
-    farm_synthesis.sh admit <builder> <label> <top-branch> <black-parrot-branch> <priority>
+    farm_synthesis.sh admit <builder> <label> <top-branch> <black-parrot-branch> <priority> [fpga-config]
   farm_synthesis.sh plan <builder> <label> <top-branch> <black-parrot-branch>
   farm_synthesis.sh launch <builder> <label> <top-branch> <black-parrot-branch> [workers]
   farm_synthesis.sh cancel <builder> <job-id> <remote-log-root>
@@ -45,6 +45,7 @@ load_admission() {
   admission_top_branch=
   admission_bp_branch=
   admission_priority=
+  admission_fpga_cfg=
   admission_decision=
   admission_cheaper_gates=
   admission_pass_action=
@@ -54,6 +55,7 @@ load_admission() {
   # Admission files are generated locally by this script with shell-escaped values.
   # shellcheck disable=SC1090
   source "$file"
+  admission_fpga_cfg=${admission_fpga_cfg:-e_bp_unicore_zynqparrot_cfg}
   require_admission_text admission_decision "$admission_decision"
   require_admission_text admission_cheaper_gates "$admission_cheaper_gates"
   require_admission_text admission_pass_action "$admission_pass_action"
@@ -69,6 +71,7 @@ print_admission() {
   printf 'candidate=%s/%s top=%s black_parrot=%s priority=%s\n' \
     "$admission_builder" "$admission_label" "$admission_top_branch" \
     "$admission_bp_branch" "$admission_priority"
+  printf 'fpga_config=%s\n' "$admission_fpga_cfg"
   printf 'decision=%s\ncheaper_gates_insufficient=%s\npass_next=%s\nfail_next=%s\n' \
     "$admission_decision" "$admission_cheaper_gates" \
     "$admission_pass_action" "$admission_fail_action"
@@ -156,9 +159,11 @@ case ${1:-} in
     top_branch=${4:?top branch required}
     bp_branch=${5:?BlackParrot branch required}
     priority=${6:?candidate priority required; use 1 for highest}
+    fpga_cfg=${7:-e_bp_unicore_zynqparrot_cfg}
     builder_fields "$builder" >/dev/null
-    if [[ ! $label =~ ^[A-Za-z0-9._-]+$ || ! $priority =~ ^[1-9][0-9]*$ ]]; then
-      echo "Label or priority is invalid; priority is a positive integer (1 is highest)." >&2
+    if [[ ! $label =~ ^[A-Za-z0-9._-]+$ || ! $priority =~ ^[1-9][0-9]*$ \
+       || ! $fpga_cfg =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      echo "Label, FPGA config, or priority is invalid; priority is a positive integer (1 is highest)." >&2
       exit 2
     fi
     decision=${BP_SYNTH_DECISION:-}
@@ -182,6 +187,7 @@ case ${1:-} in
       printf 'admission_top_branch=%q\n' "$top_branch"
       printf 'admission_bp_branch=%q\n' "$bp_branch"
       printf 'admission_priority=%q\n' "$priority"
+      printf 'admission_fpga_cfg=%q\n' "$fpga_cfg"
       printf 'admission_decision=%q\n' "$decision"
       printf 'admission_cheaper_gates=%q\n' "$cheaper_gates"
       printf 'admission_pass_action=%q\n' "$pass_action"
@@ -239,12 +245,13 @@ case ${1:-} in
     fi
     print_admission "$admission_file"
     mkdir -p "$manifest_root/$builder"
-    output=$(ssh_builder "$builder" bash -s -- "$label" "$top_branch" "$bp_branch" "$workers" <<'REMOTE'
+    output=$(ssh_builder "$builder" bash -s -- "$label" "$top_branch" "$bp_branch" "$workers" "$admission_fpga_cfg" <<'REMOTE'
 set -euo pipefail
 label=$1
 top_branch=$2
 bp_branch=$3
 workers=$4
+fpga_cfg=$5
 main=/home/coyang/zynq-parrot
 bp_seed=$main/import/black-parrot
 source_root=/home/coyang/fpga-sources
@@ -303,19 +310,20 @@ launch_output=$(env \
   ZP_REPO_DIR="$source_dir" \
   ZP_FPGA_SEED_REPO_DIR="$source_dir" \
   ZP_FPGA_LOG_ROOT="$log_root" \
-  FPGA_CFG=e_bp_unicore_zynqparrot_cfg \
+  FPGA_CFG="$fpga_cfg" \
   FPGA_VIVADO_THREADS="$workers" \
   "$main/codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh" start)
 printf '%s\n' "$launch_output"
 job_id=$(printf '%s\n' "$launch_output" | sed -n 's/^job=//p' | head -1)
-printf 'FARM_BUILDER=%s\nFARM_JOB=%s\nFARM_TOP=%s\nFARM_BP=%s\nFARM_LOG_ROOT=%s\nFARM_SOURCE=%s\n' \
-  "$(hostname)" "$job_id" "$top_commit" "$bp_commit" "$log_root" "$source_dir"
+printf 'FARM_BUILDER=%s\nFARM_JOB=%s\nFARM_TOP=%s\nFARM_BP=%s\nFARM_CFG=%s\nFARM_LOG_ROOT=%s\nFARM_SOURCE=%s\n' \
+  "$(hostname)" "$job_id" "$top_commit" "$bp_commit" "$fpga_cfg" "$log_root" "$source_dir"
 REMOTE
 )
     printf '%s\n' "$output"
     job_id=$(printf '%s\n' "$output" | sed -n 's/^FARM_JOB=//p' | tail -1)
     top_commit=$(printf '%s\n' "$output" | sed -n 's/^FARM_TOP=//p' | tail -1)
     bp_commit=$(printf '%s\n' "$output" | sed -n 's/^FARM_BP=//p' | tail -1)
+    fpga_cfg=$(printf '%s\n' "$output" | sed -n 's/^FARM_CFG=//p' | tail -1)
     log_root=$(printf '%s\n' "$output" | sed -n 's/^FARM_LOG_ROOT=//p' | tail -1)
     source_dir=$(printf '%s\n' "$output" | sed -n 's/^FARM_SOURCE=//p' | tail -1)
     manifest=$manifest_root/$builder/$job_id.env
@@ -325,6 +333,7 @@ REMOTE
       printf 'job_id=%q\n' "$job_id"
       printf 'top_commit=%q\n' "$top_commit"
       printf 'black_parrot_commit=%q\n' "$bp_commit"
+      printf 'fpga_cfg=%q\n' "$fpga_cfg"
       printf 'remote_log_root=%q\n' "$log_root"
       printf 'remote_source_dir=%q\n' "$source_dir"
       printf 'workers=%q\n' "$workers"
