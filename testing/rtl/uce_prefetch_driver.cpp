@@ -105,7 +105,7 @@ class Test {
     }
     throw std::runtime_error("memory credits did not drain");
   }
-  void response(Header h) {
+  void response(Header h, bool stall_final = false) {
     response_prefetch_active = h.prefetch;
     response_prefetch_way = (h.addr >> 12) & 7;
     for (unsigned beat = 0; beat < 4u; ++beat) {
@@ -116,8 +116,25 @@ class Test {
       dut.rev_word1_i = seed + beat*2 + 1;
       dut.rev_v_i = 1;
       bool got = false;
+      if (stall_final && beat == 3) {
+        dut.arrays_accept_i = 0;
+        unsigned old_prefetch_writes = prefetch_writes;
+        for (unsigned n = 0; n < 5; ++n) {
+          bool offered = dut.rev_v_i;
+          bool accepted = step().rev && offered;
+          require(!accepted || !got,
+                  "backpressured final prefetch beat entered the reverse pump twice");
+          if (accepted) {
+            got = true;
+            dut.rev_v_i = 0;
+          }
+          require(!dut.credits_empty_o && prefetch_writes == old_prefetch_writes,
+                  "backpressured final prefetch beat retired its slot");
+        }
+        dut.arrays_accept_i = 1;
+      }
       for (unsigned n = 0; n < 200; ++n)
-        if (step().rev) { got = true; break; }
+        if (got || step().rev) { got = true; break; }
       require(got, "reverse response stalled permanently");
       dut.rev_v_i = 0;
       step();
@@ -168,7 +185,7 @@ public:
     }
     // Slots 8 and 9 reuse way tags 0 and 1; the echoed coherence-state field
     // carries the high slot bits and keeps their response IDs unique.
-    response(sent[9]); cycles(5);
+    response(sent[9], true); cycles(5);
     require(!dut.credits_empty_o, "one response drained two hints");
     request(hint, 0x80010018); cycles(5);
     require(sent.size() == 10,
@@ -222,7 +239,7 @@ public:
     require(sent.size() == 16 && demand_writes == 8 && completions == 2,
             "final request/response accounting mismatch");
     std::cout << "[UCE-PREFETCH] PASS: ten slots, duplicate/full-queue drops, wrapped tags, reordered replies, "
-                 "demand routing, stalls, credits\n";
+                 "demand routing, final-beat backpressure, credits\n";
   }
 };
 }
