@@ -16,8 +16,8 @@ build, and log directories.
 
 - Each builder may run at most one Vivado implementation at a time.
 - Separate builders may synthesize different immutable candidates concurrently.
-- The farm controller currently hardcodes the baseline
-  `CFG=e_bp_unicore_zynqparrot_cfg`; it does not forward `FPGA_CFG` overrides.
+- The farm controller records the admitted FPGA configuration and forwards it
+  unchanged to the synthesis launcher and both manifests.
 - Identify a candidate by both its exact top-level and BlackParrot commits.
 - Use a clean detached remote worktree; never build the builder's dirty coordination checkout.
 - Use the current coordination checkout's maintained synthesis scripts while
@@ -50,6 +50,8 @@ SSH host aliases internally and keeps credentials out of tracked files.
 The optional final `admit` argument selects a named FPGA configuration and stores
 it in the immutable admission. Omit it for `e_bp_unicore_zynqparrot_cfg`; pass
 `e_bp_unicore_zynqparrot_prefetch_cfg` for the nonblocking-prefetch endpoint.
+Use `e_bp_unicore_zynqparrot_prefetch10_cfg` only for the ten-entry fit
+experiment until routed and board evidence promotes it to an accepted endpoint.
 The launch command reads the recorded value and writes it to the remote and local
 manifests. Check prefetch FPGA fit and board acceptance in
 [CURRENT_CHECKOUT.md](../../CURRENT_CHECKOUT.md), which records the current
