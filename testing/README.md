@@ -83,6 +83,10 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
   VERILATOR_BUILD_JOBS=12
 ```
 
+The target appends `BP_DCACHE_PREFETCH_ELS=10`; callers do not need to repeat
+it in `SIM_DEFINES`. The slot count is part of the Verilator model stamp, so a
+smaller prior model cannot be reused for this experiment.
+
 Compare the printed cycle rows from fresh boots. With the 200-cycle model, the
 accepted revision reports 35,856 demand, 10,083 prefetch/yield/load, 13,160
 batched-reference, and 3,482 switch-only cycles. The candidate is 3.556x faster

@@ -126,6 +126,8 @@ class HarnessTests(unittest.TestCase):
             env.pop(key, None)
         with tempfile.TemporaryDirectory() as directory:
             cases = ((4, "", ""), (8, "", ""), (4, "", ""),
+                     (4, "BP_DCACHE_PREFETCH_ELS=10", "-pfels10"), (4, "", ""),
+                     (4, "BP_DCACHE_PREFETCH_ELS BP_DCACHE_PREFETCH_ELS=6", "-pfels6"),
                      (4, "BP_ZYNQ_PREFETCH_TWO_BANKS", "-pfbanks2"), (4, "", ""),
                      (4, "BP_ZYNQ_PREFETCH_TWO_BANKS=0", "-pfbanks2"), (4, "", ""),
                      (4, "BP_AXI_MEM_PIPELINED", "-axipipe-lat40-q4"),

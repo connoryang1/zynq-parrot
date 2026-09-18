@@ -113,7 +113,9 @@ package bp_common_pkg;
   // reproduce the two-bank, same-capacity prefetch experiment on the FPGA.
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch_cfg_override_p =
     '{l2_banks: 2
-      ,dcache_prefetch_els: 10
+      // Four detached fills fit the PYNQ-Z2 target while the parameterized
+      // simulator can still request ten for the ten-worker experiment.
+      ,dcache_prefetch_els: 4
       // Branch metadata includes the resident thread ID. The default has four
       // slots; this two-slot endpoint needs one fewer bit (50 rather than 51).
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
