@@ -85,11 +85,12 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
 
 The target appends `BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)`, with
 `PREFETCH_ELS=10` by default; callers do not repeat it in `SIM_DEFINES`. Use
-`PREFETCH_ELS=4` for a capacity-matched comparison with the routed PYNQ-Z2
+`PREFETCH_ELS=4` for a capacity-matched comparison with the first routed PYNQ-Z2
 endpoint. The slot count is part of the Verilator model stamp, so a model built
 for another capacity cannot be reused for this experiment.
-The static PYNQ-Z2 prefetch configuration uses four slots to fit the device;
-that routed endpoint and this ten-slot simulator experiment are distinct.
+Static PYNQ-Z2 configurations now provide four- and ten-slot endpoints. Both
+currently inherit four logical contexts, so the routed ten-slot image proves
+queue fit but cannot yet run this ten-logical-worker program on the board.
 
 Compare the printed cycle rows from fresh boots. With the 200-cycle model, the
 accepted revision reports 35,856 demand, 10,083 prefetch/yield/load, 13,160
@@ -98,13 +99,15 @@ than demand. The benchmark checks all ten per-worker completions and checksums
 before printing its result. All workers execute one shared aligned body so cold
 instruction lines do not serialize the independent data requests.
 
-With `PREFETCH_ELS=4`, matching the routed PYNQ-Z2 capacity, fresh demand and
+With `PREFETCH_ELS=4`, matching the first routed PYNQ-Z2 capacity, fresh demand and
 prefetch/yield/load runs report 35,856 and 32,624 cycles. This is a 1.099x
 speedup (9.014% fewer cycles). The hints are nonblocking and may be dropped when
 all entries are occupied, so four entries cannot retain all ten independent
 requests issued on the first lap. Use the ten-entry result to measure the
 original batch-of-ten hypothesis and the four-entry result to predict the
-capacity limit of the routed endpoint.
+capacity limit of the four-slot endpoint. The separate ten-slot PYNQ-Z2 endpoint
+routes with positive setup and hold slack, but an exact two-resident/ten-logical
+configuration and board run remain required.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending

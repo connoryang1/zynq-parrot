@@ -4,10 +4,11 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
 Both forks integrate on `master`; develop on dedicated branches. The current
-simulator-validated and FPGA-routed prefetch checkpoint is top `e66721e2` with
+simulator-validated and FPGA-routed prefetch checkpoint is top `bcf24d47` with
 BlackParrot RTL `cc8297dec`. The RTL parameterizes the detached L1-fill queue;
 the simulator uses ten entries and a dedicated ten-ID AXI burst path in the
-minimal Zynq top, while the PYNQ-Z2 endpoint uses four entries. Ten logical
+minimal Zynq top. Separate PYNQ-Z2 configurations provide four- and ten-entry
+endpoints. Ten logical
 workers now share one hot worker body while keeping private addresses and
 continuations. The 200-cycle
 model measures 35,856 demand versus 10,083 prefetch/yield/load cycles, a 3.556x
@@ -17,26 +18,36 @@ bridge, analyzer, and harness gates pass, as do all 26 program builds. Exact
 results and commands are in
 [the research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
-The current four-slot endpoint routes in farm job
-`20260918T041813Z-e66721e2` at 51,791/53,200 LUTs (97.35%), 22,744 registers,
-81 BRAM tiles, and 11 DSPs. Routed WNS is +2.178 ns, TNS 0, WHS +0.035 ns, and
-THS 0. The packed image SHA-256 is
-`5df1c2ef65cadb929e6816e808c0c789afe43c5fc4e298b36bf876a205617e94`.
+The ten-slot endpoint routes in farm job
+`20260918T055255Z-bcf24d47` at 46,033/53,200 LUTs (86.53%), 22,908 registers,
+83.5 BRAM tiles, and 11 DSPs. Routed WNS is +0.219 ns, TNS 0, WHS +0.019 ns,
+and THS 0. The packed image SHA-256 is
+`cd0e585186e40eee0496926ff392d5faf9133650e1ab4bbb3387e6fa45eea479`.
 The extracted bitstream SHA-256 is
+`d2225b8318d6e4fdb74ecd7b6c35b8efcc1e792bb77113eab9335e2662d66757`.
+The package verifier reports the matching BIT/HWH/MAP set. This image has not
+been loaded on a board and still inherits four logical contexts; it establishes
+ten-slot fit, not execution of the ten-logical-worker benchmark on FPGA.
+
+The four-slot predecessor routes in farm job `20260918T041813Z-e66721e2` at
+51,791 LUTs (97.35%) with WNS +2.178 ns and no setup or hold violations. Its
+packed-image SHA-256 is
+`5df1c2ef65cadb929e6816e808c0c789afe43c5fc4e298b36bf876a205617e94`,
+and its bitstream SHA-256 is
 `13eaa5fa5a0f404668dd5e4326329adb6b264e5b2231dccc94adb2d037a3af6d`.
-This exact image has not been loaded on a board.
 
 The latest routed and physical
 FPGA/Linux-qualified prefetch image remains top `fd5a7872` with RTL `f7eedd955`
 and static `e_bp_unicore_zynqparrot_prefetch_cfg`. Its exact image passes six
 bare-metal gates and shell-launched Linux resident/nonresident switching,
 register and syscall checks, process exit, a subsequent shell command, and clean
-poweroff. The earlier ten-slot full configuration, job
+poweroff. The earlier default-flow ten-slot full configuration, job
 `20260918T023254Z-7fb976ac`, passed synthesis but failed placement: 55,781
 combined LUTs exceed the device's 53,200, and 11,528 required slices exceed the
-11,306 available after fixed resources. The four-slot endpoint resolves fit;
-board qualification remains required before deployment. The physical predecessor
-and historical resident baseline are identified below.
+11,306 available after fixed resources. The named area flow resolves that fit
+limit; an exact two-resident/ten-logical route and board qualification remain
+required before the original ten-worker experiment can run physically. The
+physical predecessor and historical resident baseline are identified below.
 
 ## Scope and readiness
 
