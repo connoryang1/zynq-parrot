@@ -73,7 +73,8 @@ contexts; resident-only isolation tests use contexts 0 and 1.
 The ten-worker benchmark requires a fresh boot for each schedule because the
 current prototype does not reclaim context state after a run. Select one mode
 per boot with `BENCH_MODE=0` (ten-worker demand), `BENCH_MODE=1` (single-thread
-batched ideal), or `BENCH_MODE=2` (ten-worker prefetch/yield/load):
+batched reference), `BENCH_MODE=2` (ten-worker prefetch/yield/load), or
+`BENCH_MODE=3` (the candidate's two handoff rings without data operations):
 
 ```sh
 make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
@@ -82,8 +83,12 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
   VERILATOR_BUILD_JOBS=12
 ```
 
-Compare the printed cycle rows from three fresh boots. The benchmark checks all
-ten per-worker completions and checksums before printing its result.
+Compare the printed cycle rows from fresh boots. With the 200-cycle model, the
+accepted revision reports 35,856 demand, 10,083 prefetch/yield/load, 13,160
+batched-reference, and 3,482 switch-only cycles. The candidate is 3.556x faster
+than demand. The benchmark checks all ten per-worker completions and checksums
+before printing its result. All workers execute one shared aligned body so cold
+instruction lines do not serialize the independent data requests.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending
@@ -322,9 +327,10 @@ python3 testing/rtl/run_uce_prefetch.py \
 It checks ten pending hints, replacement metadata arriving after admission,
 duplicate and full-queue drops, out-of-order responses, wrapped slot tags, slot
 reuse, unrelated and same-line demands, exact replacement-way fills, response
-backpressure, and credit drain. A separate malformed-response case must trigger
-the expected assertion. The runner uses an explicit-cycle C++ driver and records
-source and artifact identities in its verification manifest.
+backpressure including a stalled final beat, and credit drain. A separate
+malformed-response case must trigger the expected assertion. The runner uses an
+explicit-cycle C++ driver and records source and artifact identities in its
+verification manifest.
 
 Run the real L2 controller against controlled mock banks with:
 

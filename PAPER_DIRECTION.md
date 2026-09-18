@@ -360,16 +360,24 @@ The revision-matched fresh-boot results are:
 
 | Schedule | Cycles |
 | --- | ---: |
-| Ten-worker demand | `0x10ff2a` (1,113,898) |
-| Ten-worker prefetch/yield/load | `0x108d56` (1,084,758) |
-| Single-thread batched ideal | `0x288f` (10,383) |
+| Ten-worker demand | `0x8c10` (35,856) |
+| Ten-worker prefetch/yield/load | `0x2763` (10,083) |
+| Single-thread batched reference | `0x3368` (13,160) |
+| Two-ring switch-only control | `0x0d9a` (3,482) |
 
-The cheap-context candidate saves 29,140 cycles, a 2.616% cycle reduction or
-1.0269x speedup. The dedicated transport also reduces the batched reference
-from the earlier serialized `0x9c9d` (40,093) cycles to 10,383 cycles. That
-establishes that the new AXI path can expose memory-level parallelism when the
-requests are available together. The candidate remains 104.47x slower than the
-matched ideal and closes only 2.64% of the demand-to-ideal gap.
+The cheap-context candidate saves 25,773 cycles, a 71.88% cycle reduction or
+3.556x speedup over the matched demand schedule. After subtracting the 3,482-cycle
+two-ring handoff control, demand spends 32,374 cycles on its data path while the
+candidate spends 6,601. The candidate is also 23.38% faster than the immediate
+single-thread prefetch-then-load reference in this model: its handoff work gives
+the fills time to finish before the second-lap loads, while the single thread
+reaches its first load with fills still pending.
+
+Earlier million-cycle rows were invalid benchmark output. The inline-assembly
+call did not declare the RISC-V call-clobbered registers, so the shared worker's
+`li t1, 1` overwrote the start timestamp held in `t1`; the printed result was
+effectively the absolute end cycle. The corrected source makes an ABI-visible
+call and the disassembly keeps the timestamp in callee-saved `s2`.
 
 The worker bodies are seeded with per-context data/result pointers, so the timed
 body contains no address arithmetic. The UCE accepts hints while its demand FSM
@@ -377,16 +385,26 @@ waits, preserves detached credits across handoff, waits for the dcache's matchin
 replacement metadata before issue, and drops duplicate same-line hints. The
 minimal topology contains no L2.
 
-For attribution, `BENCH_MODE=3` runs the same ten-context ring with data operations removed. It passes in 266 cycles (`0x10a`) at normal latency and 6,634 cycles (`0x19ea`) with the 200-cycle pipelined model. The control confirms that high-latency candidate cost is dominated by cache/refill traffic rather than the raw handoff instruction sequence.
+For attribution, `BENCH_MODE=3` runs the same two complete ten-context rings with
+data operations removed. The high-latency control passes in 3,482 cycles.
 
 The final closed trace passes the transaction gate with all ten hints complete.
-It reaches two simultaneously reserved UCE slots and three outstanding AXI reads;
-both interfaces accept a later request before an earlier first response. Nine of
-ten later useful loads have no same-line normal miss, while the tenth misses once.
+It reaches ten simultaneously reserved UCE slots and ten outstanding AXI reads;
+all ten hints are admitted over 119 cycles before the first response, and both
+interfaces accept later requests before earlier first responses. Nine of ten
+later useful loads have no same-line normal miss, while context zero joins its
+still-pending fill once.
 AXI acceptance proves outstanding requests, not parallel DRAM-bank service.
 
-Only two worker hints overlap because each worker reaches its hint after the
-preceding nonresident handoff and associated instruction/context traffic. Raising
-the slot limit alone cannot approach the batched reference. The next performance
-step must decouple or overlap that ordinary traffic so more of the ten hints reach
-the already-capable AXI transport before the first data responses return.
+All workers execute one shared 64-byte-aligned body, with private data/result
+pointers and next-context IDs seeded in registers. This removes ten cold worker
+instruction lines from the experiment while retaining ten independent logical
+contexts, including eight nonresident contexts. Result bookkeeping is placed in
+different L1 sets from the ten measured lines.
+
+The ten-slot full FPGA configuration has not routed on PYNQ-Z2. Isolated job
+`20260918T023254Z-7fb976ac` completed synthesis but failed placement at 55,781
+combined LUTs versus 53,200 available and 11,528 required slices versus 11,306
+available, with 383 control sets. These simulator results therefore qualify the
+mechanism and workload, while FPGA deployment requires an area reduction and a
+new route/board qualification.

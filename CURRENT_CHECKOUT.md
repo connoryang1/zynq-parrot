@@ -4,21 +4,26 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 Use `/home/coyang/zynq-parrot` and its `import/black-parrot` submodule.
 Both forks integrate on `master`; develop on dedicated branches. The current
-simulator-validated prefetch checkpoint is top `689be63a` with BlackParrot RTL
-`c53ed6c37`. It adds a ten-entry detached L1-fill queue and a dedicated ten-ID
-AXI burst path in the minimal Zynq top. Focused UCE, MSHR, bridge, analyzer, and
-harness gates pass, as do clean trace-enabled ten-worker demand, candidate, and
-ideal runs. Exact results and commands are in [the research direction](PAPER_DIRECTION.md)
-and [testing guide](testing/README.md).
+simulator-validated prefetch checkpoint is top `5b3e4344` with BlackParrot RTL
+`43015ad30`. It adds a ten-entry detached L1-fill queue and a dedicated ten-ID
+AXI burst path in the minimal Zynq top. Ten logical workers now share one hot
+worker body while keeping private addresses and continuations. The 200-cycle
+model measures 35,856 demand versus 10,083 prefetch/yield/load cycles, a 3.556x
+speedup. Focused UCE, MSHR, bridge, analyzer, and harness gates pass, as do all
+26 program builds. Exact results and commands are in
+[the research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
 This new transport has simulator evidence only. The latest routed and physical
 FPGA/Linux-qualified prefetch image remains top `fd5a7872` with RTL `f7eedd955`
 and static `e_bp_unicore_zynqparrot_prefetch_cfg`. Its exact image passes six
 bare-metal gates and shell-launched Linux resident/nonresident switching,
 register and syscall checks, process exit, a subsequent shell command, and clean
-poweroff. A new routed fit and board qualification are required before deploying
-the ten-slot AXI transport. The routed artifact and historical resident baseline
-are identified below.
+poweroff. The first isolated route of the ten-slot full configuration, job
+`20260918T023254Z-7fb976ac`, passed synthesis but failed placement: 55,781
+combined LUTs exceed the device's 53,200, and 11,528 required slices exceed the
+11,306 available after fixed resources. An area reduction, successful route,
+and board qualification are required before deploying the ten-slot transport.
+The routed predecessor and historical resident baseline are identified below.
 
 ## Scope and readiness
 
