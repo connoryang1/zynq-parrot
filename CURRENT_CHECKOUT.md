@@ -11,8 +11,10 @@ minimal Zynq top, while the PYNQ-Z2 endpoint uses four entries. Ten logical
 workers now share one hot worker body while keeping private addresses and
 continuations. The 200-cycle
 model measures 35,856 demand versus 10,083 prefetch/yield/load cycles, a 3.556x
-speedup. Focused UCE, MSHR, bridge, analyzer, and harness gates pass, as do all
-26 program builds. Exact results and commands are in
+speedup with ten entries. A capacity-matched four-entry run measures 32,624
+cycles, a 1.099x speedup over the same demand baseline. Focused UCE, MSHR,
+bridge, analyzer, and harness gates pass, as do all 26 program builds. Exact
+results and commands are in
 [the research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
 The current four-slot endpoint routes in farm job

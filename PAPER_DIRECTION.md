@@ -411,3 +411,17 @@ the ten-way response-address CAM while simulation assertions retain address and
 live-slot checks. The earlier ten-entry full endpoint failed placement at 55,781
 combined LUTs and 11,528 required slices versus 11,306 available. The routed
 four-entry image still requires physical-board qualification.
+
+A capacity-matched simulator run quantifies that compromise on the same
+ten-worker, 200-cycle workload:
+
+| Prefetch entries | Demand cycles | Prefetch/yield/load cycles | Speedup | Cycle reduction |
+| ---: | ---: | ---: | ---: | ---: |
+| 4 (routed PYNQ-Z2 capacity) | 35,856 | 32,624 | 1.099x | 9.014% |
+| 10 (original experiment) | 35,856 | 10,083 | 3.556x | 71.879% |
+
+All ten workers issue once before any worker consumes. Because hints are
+nonblocking, a full four-entry table drops the remaining six hints rather than
+stalling the issuing contexts; their later demand loads therefore still miss.
+The routed design demonstrates a measurable benefit, but it cannot reproduce
+the batch-of-ten overlap without enough capacity for all ten outstanding lines.

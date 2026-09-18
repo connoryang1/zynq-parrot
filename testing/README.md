@@ -83,9 +83,11 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
   VERILATOR_BUILD_JOBS=12
 ```
 
-The target appends `BP_DCACHE_PREFETCH_ELS=10`; callers do not need to repeat
-it in `SIM_DEFINES`. The slot count is part of the Verilator model stamp, so a
-smaller prior model cannot be reused for this experiment.
+The target appends `BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)`, with
+`PREFETCH_ELS=10` by default; callers do not repeat it in `SIM_DEFINES`. Use
+`PREFETCH_ELS=4` for a capacity-matched comparison with the routed PYNQ-Z2
+endpoint. The slot count is part of the Verilator model stamp, so a model built
+for another capacity cannot be reused for this experiment.
 The static PYNQ-Z2 prefetch configuration uses four slots to fit the device;
 that routed endpoint and this ten-slot simulator experiment are distinct.
 
@@ -95,6 +97,14 @@ batched-reference, and 3,482 switch-only cycles. The candidate is 3.556x faster
 than demand. The benchmark checks all ten per-worker completions and checksums
 before printing its result. All workers execute one shared aligned body so cold
 instruction lines do not serialize the independent data requests.
+
+With `PREFETCH_ELS=4`, matching the routed PYNQ-Z2 capacity, fresh demand and
+prefetch/yield/load runs report 35,856 and 32,624 cycles. This is a 1.099x
+speedup (9.014% fewer cycles). The hints are nonblocking and may be dropped when
+all entries are occupied, so four entries cannot retain all ten independent
+requests issued on the first lap. Use the ten-entry result to measure the
+original batch-of-ten hypothesis and the four-entry result to predict the
+capacity limit of the routed endpoint.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending

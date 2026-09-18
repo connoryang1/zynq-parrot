@@ -14,6 +14,7 @@ SHELL := /bin/bash
 NUM_THREADS ?= 2
 NUM_CONTEXTS ?= 4
 BENCH_MODE ?= 2
+PREFETCH_ELS ?= 10
 SIM_DEFINES ?=
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
@@ -122,6 +123,9 @@ check-ten-logical-config:
 	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 )); then \
 		echo "ERROR: ten-worker benchmark requires NUM_THREADS=2 NUM_CONTEXTS=10"; exit 1; \
 	fi
+	@if (( $(PREFETCH_ELS) < 1 || $(PREFETCH_ELS) > 10 )); then \
+		echo "ERROR: ten-worker benchmark PREFETCH_ELS must be in [1,10]"; exit 1; \
+	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
@@ -131,7 +135,7 @@ run-mt_ctxtsw_load_overlap_test: check-nonresident-config
 run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_interleave_benchmark: check-nonresident-config
-run-mt_prefetch_nonresident_interleave_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=10
+run-mt_prefetch_nonresident_interleave_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)
 run-mt_prefetch_nonresident_interleave_benchmark: check-ten-logical-config
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
