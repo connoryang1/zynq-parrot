@@ -4,7 +4,7 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
 changes on `master`; develop on dedicated branches. The current
-simulator-validated candidate is top `154554ae`, BlackParrot RTL `bf65c54fa`,
+simulator-validated candidate is top `d1a7ed2c`, BlackParrot RTL `78b64f448`,
 and subsystem RTL `93e88366`. It adds an optional full-top prefetch path that
 bypasses the blocking L2 DMA bridge while leaving instruction, demand, context
 state, and write traffic on the existing AXI ID-zero path. Detached 64-byte
@@ -19,10 +19,11 @@ not match the rings.
 Branch `bench/matched-prefetch-reference` now supplies one runtime-selected ELF
 for all four modes, fixed dummy warmup on a separate page, common setup and
 traffic drain, explicit markers, and untimed common checking. On the traced
-minimal top with 200-cycle reads it measures 32,661 demand, 3,645 worker
-prefetch, 724 matched batch, and 289 switch-only cycles. The worker is
-8.960x faster than demand and 403.453% slower than the fair batch; no switch-only
-subtraction is used. Batch and worker each accept all ten UCE and nonzero-ID
+minimal top with 200-cycle reads the historical software candidate measured
+32,661 demand, 3,645 worker prefetch, 724 matched batch, and 289 switch-only
+cycles. The current RTL demand-join candidate measures 418 worker cycles versus
+396 matched batch at 200-cycle reads, and 618 versus 596 at 400-cycle reads.
+No switch-only subtraction is used. Batch and worker each accept all ten UCE and nonzero-ID
 AXI requests before the first response and reach ten outstanding, but their
 issue spans are 36 and 136 cycles respectively. Exact hashes and closed traces
 are in [`logs/matched-prefetch-20260919`](logs/matched-prefetch-20260919/README.md).
