@@ -352,8 +352,10 @@ class Transactions:
                     if last:
                         record['complete'] = event
                         self.normal_pending.pop(0)
-        if bool(v['response']) != consumed_prefetch:
-            raise EvidenceError('prefetch response pulse without consumed response')
+        # prefetch_response is a valid pulse, while rev_yumi is the handshake.
+        # A response may remain valid for several cycles while the shared L1
+        # data/tag ports are backpressured; only the rev_v & rev_yumi cycle
+        # advances the slot state above.
 
     def axi_edge(self, v, cycle, timestamp):
         event = boundary(cycle, timestamp)

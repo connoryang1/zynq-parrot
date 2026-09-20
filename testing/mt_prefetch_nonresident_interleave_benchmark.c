@@ -16,6 +16,9 @@
 #ifndef BENCH_DIAGNOSTIC
 #define BENCH_DIAGNOSTIC 0
 #endif
+#ifndef BENCH_BARRIER
+#define BENCH_BARRIER 0
+#endif
 #define SIGNAL_BASE_ADDR ((volatile uint8_t *)0x00104000)
 #define BEGIN_MARKER_BASE 0x10
 #define END_MARKER_BASE   0x20
@@ -62,14 +65,21 @@ volatile uint64_t benchmark_mode = UINT64_MAX;
  *   a0: data address       a1: result address     a2: runtime mode
  *   a3: next context ID    a4: done address       a5: park after lap two
  *
- * Mode 2 issues one hint before the first handoff. Modes 0 and 2 perform the
- * same load and result stores after resumption. Mode 3 performs the same two
- * complete handoff rings with those data operations removed.
+ * Mode 2 issues one hint before the first handoff. An optional BENCH_BARRIER
+ * count adds extra handoff rounds after resumption so the benchmark can test
+ * whether the line is actually installed before the consuming load. Modes 0
+ * and 2 perform the same load and result stores after resumption. Mode 3
+ * performs the same two complete handoff rings with those data operations
+ * removed.
  */
 static __attribute__((naked, noinline, aligned(64))) void shared_worker
   (const volatile struct line *data_addr, volatile uint64_t *sum_addr,
    unsigned mode, unsigned next_context,
-   volatile uint64_t *done_addr, unsigned park)
+   volatile uint64_t *done_addr, unsigned park
+#if BENCH_BARRIER
+   , unsigned barrier
+#endif
+   )
 {
   __asm__ volatile(
     ".option push\n"
@@ -81,6 +91,13 @@ static __attribute__((naked, noinline, aligned(64))) void shared_worker
 #if BENCH_DIAGNOSTIC
     "csrr t4, 0xcc0\n"
     "sd t4, 16(a1)\n"
+#endif
+#if BENCH_BARRIER
+    "bnez a6, 5f\n"
+    "j 6f\n"
+    "5: addi a6, a6, -1\n"
+    "csrw 0x800, a3\n"
+    "6:\n"
 #endif
     "li t0, 3\n"
     "beq a2, t0, 2f\n"
@@ -166,6 +183,9 @@ static void prepare(const volatile struct line *src, unsigned mode)
     seed_reg(i, 13, (i + 1) % WORKERS);
     seed_reg(i, 14, (uint64_t)&results.worker[i].done);
     seed_reg(i, 15, 1);
+#if BENCH_BARRIER
+    seed_reg(i, 16, mode == MODE_WORKER_PREFETCH ? BENCH_BARRIER : 0);
+#endif
     seed_npc(i, (uint64_t)shared_worker);
     __asm__ volatile("fence rw, rw" : : : "memory");
   }
@@ -176,7 +196,11 @@ static void ring(const volatile struct line *src, unsigned mode)
   /* A normal C call applies the ABI clobber set across the nonresident round
    * trip; an inline call previously let a worker overwrite a live timestamp. */
   shared_worker(&src[0], &results.worker[0].sum, mode, 1,
-                &results.worker[0].done, 0);
+                &results.worker[0].done, 0
+#if BENCH_BARRIER
+                , mode == MODE_WORKER_PREFETCH ? BENCH_BARRIER : 0
+#endif
+                );
 }
 
 static void run_operation(unsigned mode, const volatile struct line *src)

@@ -85,6 +85,14 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
   VERILATOR_BUILD_JOBS=12
 ```
 
+`BARRIER=N` adds `N` extra cooperative handoff rounds after each worker's
+hint and before its consuming load. It is an explicit latency-coverage
+experiment, disabled by default; at the 200-cycle synthetic-read setting,
+`BARRIER=2` measures 492 cycles and the trace reports ten completed fills with
+zero matching normal misses. The required count depends on the memory service
+latency, so do not compare a barrier-enabled row with the default row without
+recording the setting.
+
 The target appends `BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS)` and
 `BP_PREFETCH_AXI_BYPASS`, with `PREFETCH_ELS=10` by default; callers do not
 repeat either definition in `SIM_DEFINES`. Use

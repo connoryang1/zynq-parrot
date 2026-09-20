@@ -15,6 +15,7 @@ NUM_THREADS ?= 2
 NUM_CONTEXTS ?= 4
 BENCH_MODE ?= 2
 DIAGNOSTIC ?= 0
+BARRIER ?= 0
 PREFETCH_ELS ?= 10
 SIM_DEFINES ?=
 
@@ -28,7 +29,8 @@ CFLAGS = -O2 \
           -DNUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS) \
-          -DBENCH_DIAGNOSTIC=$(DIAGNOSTIC)
+          -DBENCH_DIAGNOSTIC=$(DIAGNOSTIC) \
+          -DBENCH_BARRIER=$(BARRIER)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
