@@ -14,6 +14,7 @@ SHELL := /bin/bash
 NUM_THREADS ?= 2
 NUM_CONTEXTS ?= 4
 BENCH_MODE ?= 2
+DIAGNOSTIC ?= 0
 PREFETCH_ELS ?= 10
 SIM_DEFINES ?=
 
@@ -26,7 +27,8 @@ CFLAGS = -O2 \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/perch.specs \
           -DNUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_THREADS=$(NUM_THREADS) \
-          -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
+          -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS) \
+          -DBENCH_DIAGNOSTIC=$(DIAGNOSTIC)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL

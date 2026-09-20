@@ -13,6 +13,9 @@
 #endif
 
 #define WORKERS 10
+#ifndef BENCH_DIAGNOSTIC
+#define BENCH_DIAGNOSTIC 0
+#endif
 #define SIGNAL_BASE_ADDR ((volatile uint8_t *)0x00104000)
 #define BEGIN_MARKER_BASE 0x10
 #define END_MARKER_BASE   0x20
@@ -36,7 +39,12 @@ static const volatile struct line warm_data[WORKERS]
 static const volatile struct line measured_data[WORKERS]
   __attribute__((aligned(4096), used)) = DATA_SET;
 
-struct worker_result { uint64_t sum, done; };
+struct worker_result {
+  uint64_t sum, done;
+#if BENCH_DIAGNOSTIC
+  uint64_t load_cycle;
+#endif
+};
 struct result_block {
   struct line avoid_data_sets[16];
   struct worker_result worker[WORKERS];
@@ -75,6 +83,10 @@ static __attribute__((naked, noinline, aligned(64))) void shared_worker
     ".global matched_worker_consume_load\n"
     "matched_worker_consume_load:\n"
     "ld t3, 0(a0)\n"
+#if BENCH_DIAGNOSTIC
+    "csrr t4, 0xcc0\n"
+    "sd t4, 16(a1)\n"
+#endif
     "sd t3, 0(a1)\n"
     "li t1, 1\n"
     "sd t1, 0(a4)\n"
@@ -106,10 +118,20 @@ static __attribute__((naked, noinline, aligned(64))) void batch_worker
     ".global matched_batch_consume_load\n"
     "matched_batch_consume_load:\n"
     "ld t2, 0(a0)\n"
+#if BENCH_DIAGNOSTIC
+    "csrr t3, 0xcc0\n"
+#endif
     "sd t2, 0(a1)\n"
     "sd t1, 8(a1)\n"
+#if BENCH_DIAGNOSTIC
+    "sd t3, 16(a1)\n"
+#endif
     "addi a0, a0, 64\n"
+#if BENCH_DIAGNOSTIC
+    "addi a1, a1, 24\n"
+#else
     "addi a1, a1, 16\n"
+#endif
     "addi t0, t0, -1\n"
     "bnez t0, 2b\n"
     "ret\n"
@@ -265,6 +287,14 @@ int main(void)
   bp_print_string("Mode: "); bp_print_string((char *)mode_name(mode));
   bp_print_string("; cycles: "); bp_hprint_uint64(cycles);
   bp_print_string("; checks: pass\n");
+#if BENCH_DIAGNOSTIC
+  bp_print_string("Load completion cycles: ");
+  for (unsigned i = 0; i < WORKERS; ++i) {
+    if (i) bp_print_string(",");
+    bp_hprint_uint64(results.worker[i].load_cycle);
+  }
+  bp_print_string("\n");
+#endif
   bp_print_string("[BSG-PASS] ten logical nonresident prefetch workers\n");
   bp_finish(0);
   return 0;
