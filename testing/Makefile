@@ -18,6 +18,7 @@ PREFETCH_ELS ?= 10
 SIM_DEFINES ?=
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
+NM     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-nm
 CFLAGS = -O2 \
           -I$(TOP)/software/include \
           -I$(ZP_INSTALL_DIR)/riscv64-unknown-elf/include \
@@ -26,7 +27,6 @@ CFLAGS = -O2 \
           -DNUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_THREADS=$(NUM_THREADS) \
           -DBP_NUM_CONTEXTS=$(NUM_CONTEXTS)
-CFLAGS += -DBENCH_MODE=$(BENCH_MODE)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
 RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
@@ -93,7 +93,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 		{ echo "ERROR: model build failed; no previous runtime result is valid"; exit 1; }
 	@echo "  [RUN]   Executing $(1) in simulator..."
 	@set +e; \
-	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) | grep -E "$$(RUN_LOG_FILTER)"; \
+	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) $$(if $$(RUN_INPUT),RUN_INPUT="$$(RUN_INPUT)" RUN_INPUT_ADDR="$$(RUN_INPUT_ADDR)",) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
 	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc
@@ -126,6 +126,9 @@ check-ten-logical-config:
 	@if (( $(PREFETCH_ELS) < 1 || $(PREFETCH_ELS) > 10 )); then \
 		echo "ERROR: ten-worker benchmark PREFETCH_ELS must be in [1,10]"; exit 1; \
 	fi
+	@if (( $(BENCH_MODE) < 0 || $(BENCH_MODE) > 3 )); then \
+		echo "ERROR: ten-worker benchmark BENCH_MODE must be in [0,3]"; exit 1; \
+	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
@@ -136,6 +139,8 @@ run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_nonresident_interleave_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT := $(BENCH_MODE)
+run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
 run-mt_prefetch_nonresident_interleave_benchmark: check-ten-logical-config
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config

@@ -10,28 +10,37 @@ bypasses the blocking L2 DMA bridge while leaving instruction, demand, context
 state, and write traffic on the existing AXI ID-zero path. Detached 64-byte
 prefetch reads use AXI IDs 1 through 10 and may complete out of order.
 
-On the exact full BlackParrot top with 200-cycle memory reads, fresh boots
-measure 2,763 demand cycles, 1,030 ideal batched cycles, 1,038 ten-worker
-prefetch/yield/load cycles, and 472 switch-only cycles. The practical candidate
-is 2.662x faster than its matched demand control. Do not interpret the raw
-eight-cycle difference from the separately compiled batched reference as
-context-switch overhead or a qualified gap from ideal. A post-run waveform
-audit found that the batched timer precedes its first hint by about 450 cycles
-of ordinary/cold instruction traffic, versus about 12 cycles for the ring. The
-472-cycle switch-only result is consistent with that startup mismatch masking
-most of the ring's handoff cost. A closed trace proves ten UCE requests and ten AXI reads
-outstanding together; all nonzero IDs 1 through 10 occur, and nine resumed loads
-have no later normal miss while the first joins its pending fill. The focused
-UCE, 32/64-bit bridge, analyzer, harness, enabled full-top, and disabled
-full-top gates pass. FPGA job `20260918T081302Z-154554ae` routes at 49,197 LUTs
+The earlier exact-full-top fresh boots measured 2,763 demand, 1,030 separately
+compiled batch, 1,038 prefetch/yield/load, and 472 switch-only cycles. Only the
+2.662x demand comparison is supported from those rows; the 1,030-cycle batch is
+a functional historical reference because its startup and front-end state did
+not match the rings.
+
+Branch `bench/matched-prefetch-reference` now supplies one runtime-selected ELF
+for all four modes, fixed dummy warmup on a separate page, common setup and
+traffic drain, explicit markers, and untimed common checking. On the traced
+minimal top with 200-cycle reads it measures 32,661 demand, 3,645 worker
+prefetch, 724 matched batch, and 289 switch-only cycles. The worker is
+8.960x faster than demand and 403.453% slower than the fair batch; no switch-only
+subtraction is used. Batch and worker each accept all ten UCE and nonzero-ID
+AXI requests before the first response and reach ten outstanding, but their
+issue spans are 36 and 136 cycles respectively. Exact hashes and closed traces
+are in [`logs/matched-prefetch-20260919`](logs/matched-prefetch-20260919/README.md).
+
+The earlier 35,893/6,877/3,955/3,521 sweep is rejected because a cold
+instruction refill crossed its BEGIN boundary. The accepted trace uses the
+committed timer PCs, verifies zero outstanding UCE/AXI work at BEGIN, and
+matches the printed interval.
+
+The focused UCE, 32/64-bit bridge, analyzer, harness, enabled full-top, and
+disabled full-top gates pass. FPGA job `20260918T081302Z-154554ae` routes at 49,197 LUTs
 (92.48%), 28,065 registers, 83.5 BRAM tiles, and 11 DSPs. Final WNS/TNS are
 +0.755 ns/0 and WHS/THS are +0.037 ns/0; bitstream DRC reports zero errors. The
 verified package and bitstream SHA-256 values are
 `65ce394e07a5d176ccc1c94bb767d396c265f8920fec45a66bbb377a2a1d0316` and
 `58d8dc8b945d6db67fc3eb666f3183a3b4670d007e94e1714204802416c46082`.
-The image has not been board-qualified, and a layout- and startup-matched
-batched reference remains required to quantify distance from ideal. Exact raw
-results and commands are in [the
+The image has not been board-qualified, and the new matched simulator benchmark
+has not been run on the physical board. Exact raw results and commands are in [the
 research direction](PAPER_DIRECTION.md) and [testing guide](testing/README.md).
 
 The exact two-resident/ten-logical/ten-slot endpoint routes in farm job

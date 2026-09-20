@@ -11,8 +11,9 @@ import unittest
 import prefetch_overlap_vcd as analyzer
 
 
-def idle():
-    values = {key: 0 for key in analyzer.signal_names(axi_prefix='axi_mem')}
+def idle(consumers=False):
+    values = {key: 0 for key in analyzer.signal_names(axi_prefix='axi_mem',
+                                                       consumers=consumers)}
     values.update(fwd_ready=1, fwd_new=1, fwd_last=1, rev_new=1, rev_last=1,
                   ar_ready=1, r_ready=1)
     return values
@@ -61,8 +62,9 @@ def case(axi=False, second_issue=3):
 
 
 def trace(samples, axi=False, missing=None, duplicate_signal=None, edge_updates=None,
-          legacy=False):
-    names = analyzer.signal_names(axi_prefix='axi_mem' if axi else None)
+          legacy=False, consumers=False):
+    names = analyzer.signal_names(axi_prefix='axi_mem' if axi else None,
+                                  consumers=consumers)
     names.pop('drop' if legacy else 'duplicate')
     names.pop(missing, None)
     codes = {key: 's' + str(index) for index, key in enumerate(names)}
@@ -84,6 +86,9 @@ def trace(samples, axi=False, missing=None, duplicate_signal=None, edge_updates=
                 lines.append('b%s %s' % (format(value, 'b'), codes[key]))
         lines.extend(['b1 ' + codes.get('clock', 'missing'), '#' + str(index * 20 + 10),
                       'b0 ' + codes.get('clock', 'missing')])
+        if consumers:
+            lines.extend(['#' + str(index * 20 + 12), 'b1 ' + codes['be_clock'],
+                          '#' + str(index * 20 + 14), 'b0 ' + codes['be_clock']])
         if axi:
             lines.extend(['#' + str(index * 20 + 15), 'b1 ' + codes['axi_clock'],
                           '#' + str(index * 20 + 20), 'b0 ' + codes['axi_clock']])
@@ -93,16 +98,19 @@ def trace(samples, axi=False, missing=None, duplicate_signal=None, edge_updates=
 class PrefetchTests(unittest.TestCase):
     def analyze(self, samples=None, axi=False, **kwargs):
         prefetch_slots = kwargs.pop('prefetch_slots', 2)
+        consume_pcs = kwargs.pop('consume_pcs', ())
         return analyzer.analyze(io.StringIO(trace(case(axi) if samples is None else samples,
-                                                  axi=axi, **kwargs)),
+                                                  axi=axi, consumers=bool(consume_pcs), **kwargs)),
                                 axi_prefix='axi_mem' if axi else None,
-                                prefetch_slots=prefetch_slots)
+                                prefetch_slots=prefetch_slots, consume_pcs=consume_pcs)
 
     def test_slots_dropped_hint_and_normal_fill_are_distinct(self):
         report = self.analyze()
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 2)
         self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 2)
         self.assertTrue(report['prefetch_summary']['issue_before_prior_first_response'])
+        self.assertTrue(report['prefetch_summary']['all_issued_before_first_response'])
+        self.assertEqual(report['prefetch_summary']['issue_span'], 40)
         self.assertEqual(report['prefetch_summary']['before_first_response_pairs'], [[0, 1]])
         self.assertEqual(len(report['accepted_hints']), 3)
         self.assertTrue(report['accepted_hints'][2]['drop'])
@@ -168,6 +176,162 @@ class PrefetchTests(unittest.TestCase):
         report = self.analyze(case(second_issue=6))
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 1)
         self.assertFalse(report['prefetch_summary']['issue_before_prior_completion'])
+        self.assertFalse(report['prefetch_summary']['all_issued_before_first_response'])
+
+    def test_consuming_load_retirements_are_recorded_by_exact_pc(self):
+        samples = case()
+        samples[3].update(commit_v=1, commit_pc=0x80000518, commit_thread=1)
+        samples[4].update(commit_v=1, commit_pc=0x80000560, commit_thread=0)
+        samples[5].update(commit_v=0)
+        report = self.analyze(samples, consume_pcs=(0x80000518, 0x80000560))
+        self.assertEqual([event['pc'] for event in report['consuming_loads']],
+                         [0x80000518, 0x80000560])
+        self.assertEqual(report['cycles'], dict(clock=23, be_clock=23))
+
+    def test_marker_window_and_matched_summary_are_strict(self):
+        window = analyzer.marker_window(io.StringIO(
+            'CTXTSW_GLOBAL_MARKER id=18 time_ps=0 cycle=0\n'
+            'CTXTSW_GLOBAL_MARKER id=34 time_ps=500 cycle=10\n'), 18, 34)
+        report = self.analyze(consume_pcs=(0x80000518,))
+        report['consuming_loads'] = [dict(timestamp=80, cycle=4, pc=0x80000518, thread=0)]
+        summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
+        self.assertEqual(summary['request_kind'], 'prefetch')
+        self.assertEqual(summary['uce']['transactions'], 2)
+        self.assertTrue(summary['uce']['all_issued_before_first_response'])
+        self.assertTrue(summary['uce']['issue_before_prior_first_response'])
+        self.assertEqual(summary['uce']['before_first_response_pairs'], [[0, 1]])
+        self.assertEqual(summary['consuming_loads']['count'], 1)
+        self.assertEqual(summary['outstanding_at_begin'],
+                         dict(uce=0, axi=0, uce_transactions=[], axi_transactions=[]))
+
+    def test_commit_window_selects_final_dummy_reuse(self):
+        events = [dict(timestamp=10, cycle=1, pc=0x100, thread=0),
+                  dict(timestamp=20, cycle=2, pc=0x104, thread=0),
+                  dict(timestamp=30, cycle=3, pc=0x100, thread=0),
+                  dict(timestamp=40, cycle=4, pc=0x104, thread=0)]
+        window = analyzer.commit_window(events, 0x100, 0x104)
+        self.assertEqual(window['begin']['timestamp'], 30)
+        self.assertEqual(window['end']['timestamp'], 40)
+        self.assertEqual(window['window_count'], 2)
+
+    def test_commit_window_requires_measured_pass_after_four_dummy_passes(self):
+        events = [dict(timestamp=10 * index + offset, pc=pc, thread=0)
+                  for index in range(5) for offset, pc in ((1, 0x100), (2, 0x104))]
+        window = analyzer.commit_window(events, 0x100, 0x104, expected_windows=5)
+        self.assertEqual(window['begin']['timestamp'], 41)
+        self.assertEqual(window['window_count'], 5)
+        with self.assertRaisesRegex(analyzer.EvidenceError, 'expected 5.*observed 4'):
+            analyzer.commit_window(events[:-2], 0x100, 0x104, expected_windows=5)
+        with self.assertRaisesRegex(analyzer.EvidenceError, 'incomplete final'):
+            analyzer.commit_window(events[:-1], 0x100, 0x104, expected_windows=5)
+
+    def test_commit_window_rejects_malformed_boundary_sequences(self):
+        for sequence, error in (([0x104, 0x100, 0x104], 'without preceding'),
+                                ([0x100, 0x100, 0x104], 'previous window'),
+                                ([0x100, 0x104, 0x104], 'without preceding')):
+            with self.subTest(sequence=sequence):
+                events = [dict(timestamp=index, pc=pc, thread=0)
+                          for index, pc in enumerate(sequence)]
+                with self.assertRaisesRegex(analyzer.EvidenceError, error):
+                    analyzer.commit_window(events, 0x100, 0x104)
+        events = [dict(timestamp=2, pc=0x100, thread=0),
+                  dict(timestamp=1, pc=0x104, thread=0)]
+        with self.assertRaisesRegex(analyzer.EvidenceError, 'strictly ordered'):
+            analyzer.commit_window(events, 0x100, 0x104)
+        events[1].update(timestamp=3, thread=1)
+        # A logical context can move physical resident banks between timers.
+        window = analyzer.commit_window(events, 0x100, 0x104)
+        self.assertEqual(window['begin']['thread'], 0)
+        self.assertEqual(window['end']['thread'], 1)
+        with self.assertRaisesRegex(analyzer.EvidenceError, 'must differ'):
+            analyzer.commit_window([], 0x100, 0x100)
+
+    def test_matched_overlap_excludes_prior_windows_and_same_edge_completion(self):
+        report = self.analyze(axi=True, consume_pcs=(0x100,))
+        window = dict(begin=dict(timestamp=0), end=dict(timestamp=500))
+        summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
+        self.assertTrue(summary['axi']['issue_before_prior_first_response'])
+        self.assertEqual(summary['axi']['before_first_response_pairs'], [[0, 1]])
+        # The first request overlaps this window but was admitted in warmup.
+        window['begin']['timestamp'] = 30
+        summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
+        self.assertEqual(summary['uce']['transactions'], 1)
+        self.assertFalse(summary['uce']['issue_before_prior_first_response'])
+        self.assertEqual(summary['uce']['before_completion_pairs'], [])
+        window['begin']['timestamp'] = 0
+        report = self.analyze(case(second_issue=6))
+        summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
+        self.assertFalse(summary['uce']['issue_before_prior_completion'])
+
+    def test_cli_expected_windows_validates_five_complete_pairs(self):
+        samples = case()
+        for index in range(5):
+            samples[2 * index].update(commit_v=1, commit_pc=0x100, commit_thread=0)
+            samples[2 * index + 1].update(commit_v=1, commit_pc=0x104, commit_thread=0)
+        samples[10].update(commit_v=0)
+        command = [sys.executable, str(Path(analyzer.__file__)), '--matched-only',
+                   '--begin-pc', '0x100', '--end-pc', '0x104',
+                   '--address', '0x80008000', '--span-bytes', '128']
+        for count, expected in ((5, 0), (4, 2), (0, 2)):
+            result = subprocess.run(command + ['--expected-windows', str(count)],
+                                    input=trace(samples, consumers=True),
+                                    text=True, capture_output=True)
+            self.assertEqual(result.returncode, expected, result.stderr + result.stdout)
+            if count == 5:
+                self.assertEqual(json.loads(result.stdout)['window']['window_count'], 5)
+        result = subprocess.run([sys.executable, str(Path(analyzer.__file__)),
+                                 '--expected-windows', '5'], input='',
+                                text=True, capture_output=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('requires begin-pc and end-pc', json.loads(result.stdout)['error'])
+
+    def test_cli_matched_gates_cannot_use_warmup_or_demand_reservations(self):
+        samples = case(axi=True)
+        for sample in samples:
+            sample.update(commit_v=0, ar_id=1, r_id=1)
+        samples[9].update(commit_v=1, commit_pc=0x100, commit_thread=0)
+        samples[21].update(commit_v=1, commit_pc=0x104, commit_thread=0)
+        command = [sys.executable, str(Path(analyzer.__file__)), '--axi-prefix', 'axi_mem',
+                   '--begin-pc', '0x100', '--end-pc', '0x104', '--expected-windows', '1',
+                   '--address', '0x80008000', '--span-bytes', '128']
+        for output_flags in ([], ['--matched-only']):
+            for flags, expected in (([], 0), (['--require-uce-overlap'], 1),
+                                    (['--require-axi-overlap'], 1),
+                                    (['--require-reserved-slots', '1'], 1)):
+                with self.subTest(output_flags=output_flags, flags=flags):
+                    result = subprocess.run(command + output_flags + flags,
+                                            input=trace(samples, axi=True, consumers=True),
+                                            text=True, capture_output=True)
+                    self.assertEqual(result.returncode, expected, result.stderr + result.stdout)
+                    report = json.loads(result.stdout)
+                    window = report if output_flags else report['matched_window']
+                    self.assertEqual(window['request_kind'], 'demand')
+                    self.assertEqual(window['uce']['transactions'], 1)
+                    self.assertEqual(window['prefetch_max_reserved_slots'], 0)
+                    if not output_flags:
+                        self.assertTrue(report['prefetch_summary']['issue_before_prior_first_response'])
+                        self.assertTrue(report['axi_summary']['issue_before_prior_first_response'])
+
+    def test_cli_matched_axi_gate_requires_selected_prefetch_ids(self):
+        samples = [idle(consumers=True)] + case(axi=True)
+        for sample in samples:
+            sample['commit_v'] = 0
+        samples[0].update(commit_v=1, commit_pc=0x100, commit_thread=0)
+        samples[22].update(commit_v=1, commit_pc=0x104, commit_thread=0)
+        command = [sys.executable, str(Path(analyzer.__file__)), '--matched-only',
+                   '--axi-prefix', 'axi_mem', '--begin-pc', '0x100', '--end-pc', '0x104',
+                   '--expected-windows', '1', '--address', '0x80008000', '--span-bytes', '128',
+                   '--require-uce-overlap', '--require-axi-overlap', '--require-reserved-slots', '2']
+        for axi_id, expected in ((0, 1), (1, 0)):
+            for sample in samples:
+                sample.update(ar_id=axi_id, r_id=axi_id)
+            result = subprocess.run(command, input=trace(samples, axi=True, consumers=True),
+                                    text=True, capture_output=True)
+            self.assertEqual(result.returncode, expected, result.stderr + result.stdout)
+            window = json.loads(result.stdout)
+            self.assertTrue(window['axi']['issue_before_prior_first_response'])
+            self.assertEqual(window['axi_prefetch']['issue_before_prior_first_response'], bool(axi_id))
+            self.assertEqual(window['prefetch_max_reserved_slots'], 2)
 
     def test_reuse_only_after_previous_completion(self):
         samples = case()
@@ -363,6 +527,10 @@ class PrefetchTests(unittest.TestCase):
         self.assertFalse(result['axi_summary']['issue_before_prior_completion'])
         result = analyzer.region_summary(report, 0x80008000, 128)
         self.assertEqual(result['axi_summary']['transactions'], 0)
+        for record in report['axi_reads']:
+            record['address'] += 0x1000
+        result = analyzer.region_summary(report, 0x80008000, 128, 0x80000000, 0x1000)
+        self.assertEqual(len(result['axi_correlated_reads']), 2)
 
     def test_region_rejects_missing_workload_and_incomplete_selection(self):
         with self.assertRaisesRegex(analyzer.EvidenceError, 'no prefetch transactions'):

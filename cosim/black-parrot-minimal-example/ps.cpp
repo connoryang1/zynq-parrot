@@ -275,6 +275,24 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
 
     nbf_load(zpl, argv[1]);
 
+    const char *patch_addr_text = getenv("BSG_RUNTIME_PATCH_ADDR");
+    const char *patch_value_text = getenv("BSG_RUNTIME_PATCH_VALUE");
+    if (patch_addr_text && patch_value_text) {
+        char *addr_end = nullptr;
+        char *value_end = nullptr;
+        uint64_t patch_addr = strtoull(patch_addr_text, &addr_end, 0);
+        uint64_t patch_value = strtoull(patch_value_text, &value_end, 0);
+        if (!*patch_addr_text || !addr_end || *addr_end
+            || !*patch_value_text || !value_end || *value_end) {
+            bsg_pr_err("ps.cpp: invalid runtime patch address/value\n");
+            return 1;
+        }
+        send_bp_write(zpl, patch_addr, patch_value, 0xff);
+        bsg_pr_info("ps.cpp: runtime patch address=0x%llx value=0x%llx\n",
+                    (unsigned long long)patch_addr,
+                    (unsigned long long)patch_value);
+    }
+
     clock_gettime(CLOCK_MONOTONIC, &nbf_end_wall); // End NBF Timer
     double nbf_time = (nbf_end_wall.tv_sec - nbf_start_wall.tv_sec) +
                      (nbf_end_wall.tv_nsec - nbf_start_wall.tv_nsec) / 1e9;

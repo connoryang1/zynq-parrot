@@ -357,7 +357,7 @@ the existing path with AXI ID zero. The address arbiter locks its selected
 source under backpressure, demand has priority between transfers, and the
 prefetch bridge reassembles interleaved read beats independently for ten IDs.
 
-The revision-matched fresh-boot results are:
+The earlier separately compiled full-top results were:
 
 | Schedule | Cycles |
 | --- | ---: |
@@ -366,10 +366,9 @@ The revision-matched fresh-boot results are:
 | Single-thread batched reference | `0x0406` (1,030) |
 | Two-ring switch-only control | `0x01d8` (472) |
 
-The cheap-context candidate saves 1,725 cycles, a 62.43% cycle reduction or
-2.662x speedup over the matched demand schedule. That comparison is valid
-because both ring modes use the same worker, setup, loads, result stores,
-checks, and twenty handoffs; only hint issue differs.
+Those rows establish a 2.662x candidate speedup over the demand ring, but the
+1,030-cycle batch is only a functional reference. It is not used for the
+distance-from-ideal result below.
 
 The raw candidate is eight cycles, or 0.777%, slower than the separately
 compiled single-thread reference, but that number is not a qualified
@@ -383,11 +382,40 @@ before the remaining nine, whereas the candidate admits all ten before the
 first response. Subtracting the switch-only row from either data row therefore
 does not repair the comparison.
 
-The supported conclusion is that ten independent worker requests overlap and
-the prefetch/yield/load schedule is 2.662x faster than its matched demand
-control. Quantifying distance from ideal requires one binary with identical
-untimed setup, warmed instruction paths, drained ordinary traffic, explicit
-timing markers, and equivalent bookkeeping for every mode.
+The corrected experiment implements those requirements in one executable. A
+runtime word, patched after NBF load and before core release, selects the one
+measured mode without changing the ELF or NBF. Every run first executes all
+four dummy schedules in a fixed order on a separate warm-data page, then seeds
+the same context state, clears the same result storage, drains traffic, and
+uses explicit BEGIN/END markers around the measured operation. These MMIO
+writes are posted, so host receipt times are not synchronous timer boundaries.
+The trace window uses the exact committed `0xCC0` start/end PCs, requires four
+complete warmup windows followed by the measured fifth window, and checks
+agreement with the printed cycle count. Checks are outside the measured
+interval for every mode.
+
+The accepted matched minimal-top results with 200-cycle reads are:
+
+| Schedule | Cycles | Issue span | Checks |
+| --- | ---: | ---: | --- |
+| Ten-worker demand | 32,661 | n/a | pass |
+| Ten-worker prefetch/yield/load | 3,645 | 136 | pass |
+| Single-thread matched batch | 724 | 36 | pass |
+| Two-ring switch-only control | 289 | n/a | pass |
+
+Thus the worker schedule is `32,661 / 3,645 = 8.960x` faster than demand and
+`(3,645 - 724) / 724 = 403.453%` slower than the fair batched reference.
+The switch-only control is not subtracted. Batch and worker both accept all ten
+UCE requests and all ten nonzero-ID AXI reads before the first response, and
+both peak at ten outstanding; the worker nevertheless needs 136 cycles to
+issue them versus 36 for batch. This 100-cycle issue difference is a measured
+implementation gap under common AXI capacity and arbitration.
+
+The earlier `35,893 / 6,877 / 3,955 / 3,521` sweep is retained only as
+rejected diagnostic evidence. Its timing window crossed a cold instruction
+refill at BEGIN, so it cannot be used as a matched result. The accepted trace
+uses the committed start/end counter PCs, has zero outstanding UCE or AXI work
+at BEGIN, and agrees with the printed 3,645-cycle interval.
 
 Earlier million-cycle rows were invalid benchmark output. The inline-assembly
 call did not declare the RISC-V call-clobbered registers, so the shared worker's
@@ -402,15 +430,17 @@ replacement metadata before issue, and drops duplicate same-line hints. The
 full-top bypass keeps these detached fills out of the L2 path that previously
 serialized their external requests.
 
-For attribution, `BENCH_MODE=3` runs the same two complete ten-context rings with
-data operations removed. The high-latency control passes in 472 cycles.
+For attribution, runtime `BENCH_MODE=3` runs the same two complete ten-context
+rings with data operations removed. The matched minimal-top control passes in
+289 cycles; the older separately compiled full-top control was 472 cycles.
 
-The final closed trace passes the transaction gate with all ten hints complete.
-It reaches ten simultaneously reserved UCE slots and ten outstanding AXI reads;
-both interfaces accept later requests before earlier first responses, and AXI
-IDs 1 through 10 all appear. Nine of ten later useful loads have no same-line
-normal miss, while context zero joins its still-pending fill once.
-AXI acceptance proves outstanding requests, not parallel DRAM-bank service.
+The accepted worker trace passes the transaction gate with all ten hints
+complete. It reaches ten simultaneously reserved UCE slots and ten outstanding
+AXI reads; all ten requests are accepted before the first response, and AXI IDs
+1 through 10 all appear. AXI acceptance proves outstanding requests, not
+parallel DRAM-bank service. Exact event boundaries, run-specific
+AXI relocation bases, hashes, and artifacts are retained in
+[`logs/matched-prefetch-20260919`](logs/matched-prefetch-20260919/README.md).
 
 All workers execute one shared 64-byte-aligned body, with private data/result
 pointers and next-context IDs seeded in registers. This removes ten cold worker

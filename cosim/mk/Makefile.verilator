@@ -32,10 +32,12 @@ VV_BUILD_OPTS += $(VV_VFLAGS)
 
 VV_RUN_OPTS +=
 EXTRA_RUN_ARGS ?=
+RUN_INPUT ?=
+RUN_INPUT_ADDR ?=
 
 run: ## runs the verilated executable
 run: obj_dir/V$(TB_MODULE) | $(RUN_COLLATERAL)
-	@./$< $(VV_RUN_OPTS) $(RUN_ARGS) $(EXTRA_RUN_ARGS) 2>&1 | $(TEE_I) run.log
+	@$(if $(strip $(RUN_INPUT)),BSG_RUNTIME_PATCH_ADDR='$(RUN_INPUT_ADDR)' BSG_RUNTIME_PATCH_VALUE='$(RUN_INPUT)' ,)./$< $(VV_RUN_OPTS) $(RUN_ARGS) $(EXTRA_RUN_ARGS) 2>&1 | $(TEE_I) run.log
 
 ifneq (,$(TRACE))
 RUN_ARGS += +bsg_trace=$(DUMP_FILE)

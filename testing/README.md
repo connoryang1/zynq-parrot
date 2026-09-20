@@ -70,11 +70,13 @@ not a runtime pass. The two-worker benchmark compares resident context 1 with
 nonresident context 2. The four-ID ring tests require at least four logical
 contexts; resident-only isolation tests use contexts 0 and 1.
 
-The ten-worker benchmark requires a fresh boot for each schedule because the
-current prototype does not reclaim context state after a run. Select one mode
-per boot with `BENCH_MODE=0` (ten-worker demand), `BENCH_MODE=1` (single-thread
-batched reference), `BENCH_MODE=2` (ten-worker prefetch/yield/load), or
-`BENCH_MODE=3` (the candidate's two handoff rings without data operations):
+The ten-worker benchmark is one executable with a runtime-selected mode. The
+host resolves `benchmark_mode` from the exact ELF and patches that word after
+loading the unchanged NBF but before unfreezing the core. Select one measured
+mode per fresh boot with `BENCH_MODE=0` (ten-worker demand), `BENCH_MODE=1`
+(single-thread matched batch), `BENCH_MODE=2` (ten-worker
+prefetch/yield/load), or `BENCH_MODE=3` (the candidate's two handoff rings
+without data operations):
 
 ```sh
 make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
@@ -99,18 +101,29 @@ AXI ID zero. FPGA job `20260918T081302Z-154554ae` routes this exact endpoint at
 92.48% LUT utilization with +0.755 ns setup slack and +0.037 ns hold slack.
 Physical-board qualification remains pending.
 
-Compare the printed cycle rows from fresh boots. On the matched full top with
-the 200-cycle model, the candidate reports 2,763 demand, 1,038
-prefetch/yield/load, 1,030 batched-reference, and 472 switch-only cycles. The
-candidate is 2.662x faster than its matched demand control. The raw 0.777% gap
-to the separately compiled batched reference is not a qualified ideal gap: its
-timer starts about 450 cycles before the first hint while ordinary/cold
-instruction traffic completes, versus about 12 cycles in the ring. Use that row
-as a functional batching reference until all modes share matched startup,
-layout, traffic drain, and bookkeeping.
-The benchmark checks all ten per-worker completions and checksums before
-printing its result. All workers execute one shared aligned body so cold
-instruction lines do not serialize the independent data requests.
+Before the timer, every mode executes the same four dummy schedules in a fixed
+order against a warm-data page, seeds the same context fields, clears the same
+result storage, and fences traffic. The measured operation uses a distinct cold
+data page. Source-level BEGIN/END marker writes surround the `0xCC0` interval,
+and the common result checker runs after END. Marker writes are posted: their
+host-observed timestamps are not timer boundaries. Trace analysis uses the
+exact committed start/end counter PCs and requires five complete windows
+(four dummy schedules plus the measured schedule), matching the printed cycle
+count and checking for UCE/AXI reads outstanding at the measured start.
+
+The accepted minimal-top 200-cycle experiment reports 32,661 demand, 3,645
+prefetch/yield/load, 724 matched-batch, and 289 switch-only cycles. The
+candidate is 8.960x faster than demand and 403.453% slower than the fair batch.
+The earlier 35,893/6,877/3,955/3,521 sweep is rejected because a cold
+instruction refill crossed its BEGIN boundary. The accepted trace uses the
+committed timer PCs and verifies zero outstanding UCE/AXI work at BEGIN.
+Both prefetch schedules accept all ten UCE and nonzero-ID AXI requests before
+the first response; their issue spans are 136 worker cycles versus 36 batch
+cycles. Do not subtract the switch-only row. Exact timestamps, hashes, and
+closed waveforms are in
+[`logs/matched-prefetch-20260919`](../logs/matched-prefetch-20260919/README.md).
+The old separately compiled 1,030-cycle batch remains a functional historical
+reference only.
 
 In the earlier minimal-top capacity study, `PREFETCH_ELS=4` produced 35,856
 demand and 32,624 prefetch/yield/load cycles, a 1.099x speedup. Nonblocking
