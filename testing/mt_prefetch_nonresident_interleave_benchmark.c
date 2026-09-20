@@ -42,7 +42,7 @@ static const volatile struct line measured_data[WORKERS]
 struct worker_result {
   uint64_t sum, done;
 #if BENCH_DIAGNOSTIC
-  uint64_t load_cycle;
+  uint64_t resume_cycle, load_cycle;
 #endif
 };
 struct result_block {
@@ -78,6 +78,10 @@ static __attribute__((naked, noinline, aligned(64))) void shared_worker
     "bne a2, t0, 1f\n"
     BP_PREFETCH_R_ASM("a0")
     "1: csrw 0x800, a3\n"
+#if BENCH_DIAGNOSTIC
+    "csrr t4, 0xcc0\n"
+    "sd t4, 16(a1)\n"
+#endif
     "li t0, 3\n"
     "beq a2, t0, 2f\n"
     ".global matched_worker_consume_load\n"
@@ -85,7 +89,7 @@ static __attribute__((naked, noinline, aligned(64))) void shared_worker
     "ld t3, 0(a0)\n"
 #if BENCH_DIAGNOSTIC
     "csrr t4, 0xcc0\n"
-    "sd t4, 16(a1)\n"
+    "sd t4, 24(a1)\n"
 #endif
     "sd t3, 0(a1)\n"
     "li t1, 1\n"
@@ -124,11 +128,11 @@ static __attribute__((naked, noinline, aligned(64))) void batch_worker
     "sd t2, 0(a1)\n"
     "sd t1, 8(a1)\n"
 #if BENCH_DIAGNOSTIC
-    "sd t3, 16(a1)\n"
+    "sd t3, 24(a1)\n"
 #endif
     "addi a0, a0, 64\n"
 #if BENCH_DIAGNOSTIC
-    "addi a1, a1, 24\n"
+    "addi a1, a1, 32\n"
 #else
     "addi a1, a1, 16\n"
 #endif
@@ -288,6 +292,12 @@ int main(void)
   bp_print_string("; cycles: "); bp_hprint_uint64(cycles);
   bp_print_string("; checks: pass\n");
 #if BENCH_DIAGNOSTIC
+  bp_print_string("Resume cycles: ");
+  for (unsigned i = 0; i < WORKERS; ++i) {
+    if (i) bp_print_string(",");
+    bp_hprint_uint64(results.worker[i].resume_cycle);
+  }
+  bp_print_string("\n");
   bp_print_string("Load completion cycles: ");
   for (unsigned i = 0; i < WORKERS; ++i) {
     if (i) bp_print_string(",");
