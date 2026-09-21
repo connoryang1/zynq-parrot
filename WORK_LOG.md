@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Frontend-accept fast-exit probe reverted — 2026-09-21:** exposed the FE's actual I-cache redirect acceptance pulse and allowed the backend context-cache FSM to leave `done` on that pulse. The exact 200-cycle worker benchmark remained `418` cycles with guest/host checks passing, so the `done` state is not exposed on the measured critical path. The four-interface RTL change was reverted; no performance claim is retained.
+
 - **Compact worker-register probe reverted — 2026-09-21:** replaced temporary `t3/t4` registers with `t0/t1` so the measured worker appeared to touch only one 16-register line. The exact 200-cycle full-system run still measured `418` cycles with all checks passing, identical to the validated worker. The register-line count is therefore not the critical residual in this schedule; the benchmark-only assembly change was reverted.
 
 - **Dedicated switch-control comparison — 2026-09-21:** the standalone nonresident overhead benchmark passes with resident/warm switches at `5.13` cycles each and nonresident/cold switches at `11.26` cycles each (`6.13`-cycle cold penalty). The ten-worker switch-only ring averages `289/20 = 14.45` cycles per handoff, so it includes the CSR handoff instruction, frontend scheduling, and loop boundaries in addition to the isolated context-cache transaction. This directly invalidates the original additive estimate that treated 14.45 cycles as pure switch latency.
