@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Compact worker-register probe reverted — 2026-09-21:** replaced temporary `t3/t4` registers with `t0/t1` so the measured worker appeared to touch only one 16-register line. The exact 200-cycle full-system run still measured `418` cycles with all checks passing, identical to the validated worker. The register-line count is therefore not the critical residual in this schedule; the benchmark-only assembly change was reverted.
+
 - **Dedicated switch-control comparison — 2026-09-21:** the standalone nonresident overhead benchmark passes with resident/warm switches at `5.13` cycles each and nonresident/cold switches at `11.26` cycles each (`6.13`-cycle cold penalty). The ten-worker switch-only ring averages `289/20 = 14.45` cycles per handoff, so it includes the CSR handoff instruction, frontend scheduling, and loop boundaries in addition to the isolated context-cache transaction. This directly invalidates the original additive estimate that treated 14.45 cycles as pure switch latency.
 
 - **Wide context-line probe reverted — 2026-09-21:** tried changing the nonresident integer context image from two 16-register lines to one 32-register line to remove a restore cycle. The full-system 200-cycle worker run compiled but hung for hours without reaching the benchmark pass marker, consistent with an address/valid pipeline mismatch in the widened synchronous context memory. All four RTL edits were reverted; no performance or correctness claim is retained. The validated 16-register-line implementation remains unchanged.
