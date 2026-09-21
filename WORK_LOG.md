@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Early context-line restore — 2026-09-21:** allowed the first valid integer context line to write into the drained physical register bank on the same edge that `wait_drain` transitions into `save_restore_regs`. The write is gated by backend drain safety, a valid prefetched line, and nonzero integer dirty state; the existing FSM path remains for all other cases. Exact full-system 200-cycle runs pass with worker `408` cycles (down from `418`), matched batch `396` (unchanged), and switch-only `271` (down from `289`). Focused UCE, 37 analyzer, and 13 harness tests all pass. This saves one restore bubble per ring while preserving the demand-join behavior.
+
 - **Frontend-accept fast-exit probe reverted — 2026-09-21:** exposed the FE's actual I-cache redirect acceptance pulse and allowed the backend context-cache FSM to leave `done` on that pulse. The exact 200-cycle worker benchmark remained `418` cycles with guest/host checks passing, so the `done` state is not exposed on the measured critical path. The four-interface RTL change was reverted; no performance claim is retained.
 
 - **Compact worker-register probe reverted — 2026-09-21:** replaced temporary `t3/t4` registers with `t0/t1` so the measured worker appeared to touch only one 16-register line. The exact 200-cycle full-system run still measured `418` cycles with all checks passing, identical to the validated worker. The register-line count is therefore not the critical residual in this schedule; the benchmark-only assembly change was reverted.
