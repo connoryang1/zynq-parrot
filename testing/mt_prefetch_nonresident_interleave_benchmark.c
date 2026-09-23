@@ -36,7 +36,8 @@ struct line { uint64_t value, pad[7]; };
 #define DATA_SET { L(0),L(1),L(2),L(3),L(4),L(5),L(6),L(7),L(8),L(9) }
 
 /* The dummy and measured arrays occupy corresponding offsets on distinct
- * pages. The common warmup never references measured_data. */
+ * pages. By default the common warmup never references measured_data; the
+ * runtime warm-data control deliberately warms it for a matched comparison. */
 static const volatile struct line warm_data[WORKERS]
   __attribute__((aligned(4096), used)) = DATA_SET;
 static const volatile struct line measured_data[WORKERS]
@@ -59,6 +60,12 @@ static uint64_t stacks[WORKERS][128] __attribute__((aligned(64)));
 /* The host overwrites this word after loading the unchanged NBF and before
  * unfreezing the core. Its symbol address is resolved from this exact ELF. */
 volatile uint64_t benchmark_mode = UINT64_MAX;
+/* Diagnostic control, selected before execution through the same NBF patch
+ * mechanism as benchmark_mode. The timed instruction bodies stay unchanged;
+ * only the page used by the common warmup differs. */
+/* NBF patches precede CRT startup, so this must not be cleared with BSS. */
+volatile uint64_t benchmark_warm_measured_data
+  __attribute__((section(".data"))) = 0;
 
 /* Every logical context executes this shared body. Context-private registers
  * hold values that would otherwise require ten separately laid-out bodies:
@@ -266,12 +273,14 @@ static void drain_traffic(void)
 
 static void warm_instruction_paths(void)
 {
+  const volatile struct line *warm_src = benchmark_warm_measured_data
+                                        ? measured_data : warm_data;
   /* Run every body in a fixed order so runtime mode selection cannot change
    * the instruction-cache or final front-end state at the measured boundary. */
   for (unsigned mode = 0; mode < MODE_COUNT; ++mode) {
-    prepare(warm_data, mode);
+    prepare(warm_src, mode);
     drain_traffic();
-    run_window(mode, warm_data, 0x50 + mode, 0x40 + mode);
+    run_window(mode, warm_src, 0x50 + mode, 0x40 + mode);
     drain_traffic();
     check_results(mode);
   }
@@ -302,7 +311,8 @@ int main(void)
   warm_instruction_paths();
 
   /* This is the common measured-run boundary: identical initialization and
-   * drain, warm instructions, and a data page untouched by the dummy runs. */
+   * drain and warm instructions. The data page is untouched by dummy runs
+   * unless the explicit warm-data control is enabled. */
   prepare(measured_data, mode);
   drain_traffic();
 
@@ -311,6 +321,9 @@ int main(void)
                                END_MARKER_BASE + mode);
 
   check_results(mode);
+  bp_print_string("Warmup uses measured data: ");
+  bp_hprint_uint64(benchmark_warm_measured_data);
+  bp_print_string("\n");
   bp_print_string("Benchmark: matched ten-request schedules / two resident banks\n");
   bp_print_string("Mode: "); bp_print_string((char *)mode_name(mode));
   bp_print_string("; cycles: "); bp_hprint_uint64(cycles);

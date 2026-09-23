@@ -17,6 +17,7 @@ BENCH_MODE ?= 2
 DIAGNOSTIC ?= 0
 BARRIER ?= 0
 PREFETCH_ELS ?= 10
+DDR_LATENCY_VERBOSE ?= 1
 SIM_DEFINES ?=
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
@@ -59,6 +60,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
     mt_prefetch_nonresident_interleave_benchmark \
     mt_request_interleave_benchmark \
@@ -113,6 +115,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_interleave_benchmark.riscv: $(TOP)/testing/mt_request_interleave_benchmark.c $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: CFLAGS += -DDDR_LATENCY_VERBOSE=$(DDR_LATENCY_VERBOSE)
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
 
@@ -145,6 +149,7 @@ run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_nonresident_interleave_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_ddr_latency_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT := $(BENCH_MODE)
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
 run-mt_prefetch_nonresident_interleave_benchmark: check-ten-logical-config

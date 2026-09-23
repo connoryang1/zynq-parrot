@@ -2,7 +2,7 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-The current development branch is `perf/real-ddr-board-20260923`,
+The current development branch is `perf/fpga-memory-latency-20260923`,
 pinning BlackParrot `97cc0932d`. It fixes an accepted late result being discarded
 when a context switch commits. The exact regression ELF fails on predecessor
 `952ec7cb5` and passes all 24 trials on this fix; four related correctness gates
@@ -11,6 +11,15 @@ cycles**. The fix is integrated locally and passes routed FPGA fit/timing under
 the retained constraints. The physical board also passes the resident smoke and
 matched ten-request benchmarks; broader application qualification remains separate.
 See [bug evidence](logs/context-launch-20260922/late-result-fix/README.md).
+
+The same FPGA now has direct processor-visible latency measurements: 48 first-touch
+loads have a 41-cycle median (41–44 range), versus three cycles cached. In the
+same-ELF cold/warm controls, worker stays at 310 cycles while batch drops from
+176 to 136; the warm trace verifies ten three-cycle loads and 174 extra non-load
+cycles in worker. The reusable latency probe, raw samples, prefetch lead sweep,
+and verification are in [the memory-latency report](logs/fpga-memory-latency-20260923/README.md).
+The Verilator host allocator now preserves AXI page alignment; generated RTL
+and the accepted FPGA image remain unchanged.
 
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
 changes on `master`; develop on dedicated branches. The ten-ID transport

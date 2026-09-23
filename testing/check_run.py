@@ -29,6 +29,7 @@ GPIO_STOP = re.compile(
 # Match the selected program's completed checks, not just the common CRT exit.
 # The benchmark banner is emitted only after both measured rings return.
 TEST_MARKERS = {
+    "mt_ddr_latency_benchmark": "[BSG-PASS] DDR dependent-load latency and prefetch lead sweep",
     "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",
     "mt_resident_reseed_fetch_test": "[BSG-PASS] resident reseed cold-fetch and CSR preservation",
     "mt_resident_reseed_irq_test": "[BSG-PASS] resident reseed interrupt PC and CSR preservation",

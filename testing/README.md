@@ -54,6 +54,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
+| `mt_ddr_latency_benchmark` | First-touch and immediately cached dependent loads, matched timer controls, and six prefetch lead times on disjoint lines; processor-visible physical cycles |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
 | `mt_prefetch_interleave_benchmark` | The same independent request streams and controls using nonblocking `prefetch.r` hints instead of discarded byte loads |
@@ -86,6 +87,34 @@ make -C testing run-mt_prefetch_nonresident_interleave_benchmark \
   VERILATOR_BUILD_JOBS=12
 ```
 
+For a matched prewarmed-data control, patch the eight-byte runtime word
+`benchmark_warm_measured_data` to one before unfreezing the guest. Resolve its
+address from the exact ELF and use the maintained `patch_nbf_bytes.py` helper;
+it defaults to zero. This changes only which page the common warmup uses, and
+prints the selected value after measurement. Compare cold and warm modes from
+the same ELF because recompilation can move code and affect predictor aliases.
+
+`mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
+prints all samples after measuring. Each load interval is CSR `0xCC0`, load,
+dependent add, CSR `0xCC0`; a register-only control and an immediate same-line
+reload quantify timer and cache-hit costs. Its prefetch sweep inserts 0, 4, 8,
+16, 32, or 64 dependent adds and reports the actual instrumented interval from
+before the hint to the consuming-load timer. Run it with:
+
+```sh
+make -C testing run-mt_ddr_latency_benchmark NUM_THREADS=2 NUM_CONTEXTS=10 TRACE=1 DDR_LATENCY_VERBOSE=0
+```
+
+`DDR_LATENCY_VERBOSE=0` skips only the 112 slow post-measurement console rows;
+all samples and value checks still execute and all timer windows remain in the
+trace. Omit it for raw sample output (the default, also used on the FPGA).
+The target enables the detached-prefetch AXI path, as the ten-worker target does.
+Report raw physical cycles and cold-minus-hot separately. These measurements
+include the processor/cache/interconnect/controller path; they do not isolate
+DDR-chip timing or prove a nanosecond conversion. Ordinary loads and detached
+prefetches can also use different refill transports. Warmup uses separate data;
+sequential first-touch lines do not characterize arbitrary DRAM row states.
+
 `BARRIER=N` adds `N` extra cooperative handoff rounds after each worker's
 hint and before its consuming load. It is an explicit latency-coverage
 experiment, disabled by default; at the 200-cycle synthetic-read setting,
@@ -102,25 +131,28 @@ endpoint. The slot count is part of the Verilator model stamp, so a model built
 for another capacity cannot be reused for this experiment.
 Static PYNQ-Z2 configurations now provide a four-slot/four-logical endpoint and
 an exact ten-slot/ten-logical endpoint. The latter routes with two resident banks
-and can run this program; physical-board qualification remains pending.
+and can run this program. The fixed `97cc0932d` RTL has now passed physical-board
+qualification for this benchmark; see `CURRENT_CHECKOUT.md` and
+`logs/real-ddr-20260923/README.md` for exact image identities and scope.
 The current full-top candidate routes detached prefetches around the blocking
 L2 DMA bridge into the same dedicated ten-ID AXI bridge used by the minimal
 top. Ordinary instruction, demand, context-state, and write traffic remains on
 AXI ID zero. FPGA job `20260918T081302Z-154554ae` routes this exact endpoint at
 92.48% LUT utilization with +0.755 ns setup slack and +0.037 ns hold slack.
-Physical-board qualification remains pending.
+That earlier route is historical; the fixed September 23 image and its measured
+310-worker/176-batch result supersede its pending qualification status.
 
 Before the timer, every mode executes the same four dummy schedules in a fixed
 order against a warm-data page, seeds the same context fields, clears the same
 result storage, and fences traffic. The measured operation uses a distinct cold
-data page. Source-level BEGIN/END marker writes surround the `0xCC0` interval,
+data page unless the explicit warm-data control is selected. Source-level BEGIN/END marker writes surround the `0xCC0` interval,
 and the common result checker runs after END. Marker writes are posted: their
 host-observed timestamps are not timer boundaries. Trace analysis uses the
 exact committed start/end counter PCs and requires five complete windows
 (four dummy schedules plus the measured schedule), matching the printed cycle
 count and checking for UCE/AXI reads outstanding at the measured start.
 
-The accepted minimal-top 200-cycle experiment reports 32,661 demand, 3,645
+The historical minimal-top 200-cycle experiment reports 32,661 demand, 3,645
 prefetch/yield/load, 724 matched-batch, and 289 switch-only cycles. The
 candidate is 8.960x faster than demand and 403.453% slower than the fair batch.
 The earlier 35,893/6,877/3,955/3,521 sweep is rejected because a cold
@@ -138,8 +170,8 @@ In the earlier minimal-top capacity study, `PREFETCH_ELS=4` produced 35,856
 demand and 32,624 prefetch/yield/load cycles, a 1.099x speedup. Nonblocking
 hints may be dropped when all entries are occupied, so four entries cannot
 retain all ten independent first-lap requests. The current full-top result uses
-ten entries to measure the original batch-of-ten hypothesis. Its route passes;
-the physical-board run remains required.
+ten entries to measure the original batch-of-ten hypothesis. Its fixed successor
+has now passed the physical-board run described above.
 
 The resident reseed IRQ variant shares the cold-fetch program and arms a real
 CLINT software interrupt while the target is inactive. It checks the pending
