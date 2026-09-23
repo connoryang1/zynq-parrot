@@ -12,8 +12,11 @@
 #include "bsg_printing.h"
 #include "zynq_headers.h"
 #include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
+#include <new>
 #include <stdio.h>
 #include <string>
 
@@ -79,8 +82,21 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
 
     void *allocate_dram(unsigned long len_in_bytes,
                         unsigned long *physical_ptr) {
+        // The simulated physical address is this host pointer. Preserve the
+        // guest's page offset when translating DRAM addresses, or an aligned
+        // guest cache-line burst can spuriously cross an AXI 4 KiB boundary.
+        // posix_memalign accepts arbitrary byte counts and remains free()-able.
+        void *virtual_ptr = nullptr;
+        *physical_ptr = 0;
+        const int error = posix_memalign(&virtual_ptr, 4096, len_in_bytes);
+        if (error != 0) {
+            bsg_pr_err("  bsg_zynq_pl: DRAM allocation of %lu bytes failed: %s\n",
+                       len_in_bytes, std::strerror(error));
+            // Callers program the returned address without a null check.
+            // Fail before they can install a bogus DRAM base or access it.
+            throw std::bad_alloc();
+        }
         bsg_pr_info("  bsg_zynq_pl: Allocated dummy DRAM\n");
-        void *virtual_ptr = (unsigned long *)malloc(len_in_bytes);
         *physical_ptr = (unsigned long)virtual_ptr;
 
         return virtual_ptr;
