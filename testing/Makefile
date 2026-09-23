@@ -54,6 +54,7 @@ CORRECTNESS_TESTS := \
     mt_abi_preservation_test \
     mt_ctxtsw_gpr_ring_stress \
     mt_ctxtsw_late_wb_hazard_test \
+    mt_nonresident_independent_late_result_test \
     mt_ctxtsw_load_overlap_test \
     mt_ctxtsw_pure_ring_stress_test
 
@@ -138,6 +139,7 @@ run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
 run-mt_resident_reseed_irq_test: check-nonresident-config
 run-mt_remote_seed_order_test: check-nonresident-config
+run-mt_nonresident_independent_late_result_test: check-nonresident-config
 run-mt_ctxtsw_load_overlap_test: check-nonresident-config
 run-mt_load_ahead_benchmark: check-nonresident-config
 run-mt_request_interleave_benchmark: check-nonresident-config

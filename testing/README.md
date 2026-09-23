@@ -42,6 +42,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
 | `mt_ctxtsw_register_target_test` | Fresh computed targets and returns after ALU/load/multiply/divide/CSR producers, including same-context writes and SRAM restores |
 | `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
+| `mt_nonresident_independent_late_result_test` | Independent cold loads/divides into x15 and x28 survive 24 nonresident 0→2→3→0 round trips and target overwrites; checks accepted completions across switch flushes |
 | `mt_ctxtsw_load_overlap_test` | Delayed source load and faulting byte-load-ahead preserve data and private registers across resident switching; timing requires its trace |
 | `mt_ctxtsw_gpr_ring_stress` | Six live GPR sentinels survive peer overwrites; all three peers record their logical IDs |
 | `mt_ctxtsw_pure_ring_stress_test` | Eight consecutive switches per context, followed by a lap verifying every peer completed |
@@ -58,7 +59,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_prefetch_interleave_benchmark` | The same independent request streams and controls using nonblocking `prefetch.r` hints instead of discarded byte loads |
 | `mt_prefetch_nonresident_interleave_benchmark` | Ten logical workers on two resident banks; each worker issues one demand or prefetch request, yields through the logical ring, and consumes after resumption |
 
-These 26 programs retain distinct state, hazard, redirect, and memory-scheduling checks.
+These programs retain distinct state, hazard, redirect, and memory-scheduling checks.
 The two Sv39 handoff variants include the base handoff source, keeping the
 instruction-only and instruction/data cases comparable without duplicate tests.
 Each variant emits its own completion marker, and unexpected traps invalidate

@@ -40,6 +40,7 @@ TEST_MARKERS = {
     "mt_abi_preservation_test": "[BSG-PASS] ABI state preserved across ctxtsw",
     "mt_ctxtsw_register_target_test": "[BSG-PASS] register targets and computed returns",
     "mt_ctxtsw_late_wb_hazard_test": "[BSG-PASS] ctxtsw late writeback hazard test completed",
+    "mt_nonresident_independent_late_result_test": "[BSG-PASS] independent cold-load/divide results survive nonresident eviction in both GPR lines",
     "mt_ctxtsw_load_overlap_test": "[BSG-PASS] resident delayed-load and load-ahead data/register checks",
     "mt_load_ahead_benchmark": "[BSG-PASS] load-ahead benchmark completed",
     "mt_request_interleave_benchmark": "[BSG-PASS] independent requests",

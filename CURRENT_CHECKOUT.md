@@ -2,6 +2,14 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
+The current development branch is `fix/nonresident-completion-preservation-20260923`,
+pinning BlackParrot `97cc0932d`. It fixes an accepted late result being discarded
+when a context switch commits. The exact regression ELF fails on predecessor
+`952ec7cb5` and passes all 24 trials on this fix; four related correctness gates
+also pass. Fresh independently audited fixed worker/batch runs retain **398/396
+cycles**. The fix is integrated locally; FPGA timing qualification is pending.
+See [bug evidence](logs/context-launch-20260922/late-result-fix/README.md).
+
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
 changes on `master`; develop on dedicated branches. The ten-ID transport
 checkpoint is top `d1a7ed2c`, BlackParrot RTL `78b64f448`,
@@ -87,23 +95,48 @@ The physical predecessor and historical resident baseline are identified below.
 
 ## Latest context-switch candidate
 
-Branch `perf/overlap-context-launch-20260922` adds final-line frontend capture
-with BlackParrot RTL `952ec7cb5`, building on early restore `7db31e6d2`.
-Fresh clean traced runs of one identical ELF give **398 worker, 396 batch,
-and 247 switch-only cycles** at 200-cycle reads with two resident banks, ten
-logical contexts, ten prefetch slots, and ten AXI read slots. The worker and
-batch traffic audits start empty, reach ten outstanding fills, and show no
-ordinary data-region refill. All eighteen nonresident handoffs improve from
-eight to seven cycles from commit to first target dispatch; an eight-cycle
-longer first-load wait leaves a net ten-cycle gain from the 408-cycle baseline.
+The current RTL `97cc0932d` preserves nonspeculative completions through the
+context-switch flush while keeping speculative instruction and queue flushes.
+The directed cold-load/divide regression verifies 72 actual nonresident
+handoffs and all 32 producer results written exactly once into the source
+image before incoming context installation. Clean traced Sv39 data handoff,
+remote-seed ordering, resident late-writeback, and computed-target gates pass;
+the maintained regression compiles to the exact tested ELF, and all 13 harness
+checks pass. Fixed worker/batch runs use one identical benchmark ELF and one
+simulator executable, start with no outstanding memory traffic, reach ten
+outstanding prefetches, and have no ordinary AXI reads in the measured interval.
+Their printed and waveform-derived intervals agree at **398/396 cycles**.
 
-The translated nonresident data handoff, both-line GPR ring, computed targets,
-late writeback, and standalone overhead gates pass on a clean traced 2/4 model.
-The standalone control measures 5.13 resident and 9.26 nonresident cycles per
-switch, including loop overhead. Nonresident FP remains disabled. Cross-latency
-checks and a routed fit check of this exact 2/10 candidate are pending; the
-completed `20260921T052750Z-5edcf5b3` route used default 2/4 topology and does
-not qualify the ten-worker endpoint. See [retained evidence](logs/context-launch-20260922/README.md).
+Its predecessor `952ec7cb5` on `perf/overlap-context-launch-20260922` adds
+final-line frontend capture to early restore `7db31e6d2`. At 200-cycle reads,
+its worker/batch/switch-only results are 398/396/247 with two resident banks,
+ten logical contexts, ten prefetch slots, and ten AXI read slots. All eighteen
+nonresident handoffs improve from eight to seven cycles from commit to first
+target dispatch; an eight-cycle longer first-load wait leaves a net ten-cycle
+gain from the 408-cycle baseline. Its standalone control measures 5.13 resident
+and 9.26 nonresident cycles per switch, including loop overhead. At 40-cycle
+reads, its worker/batch/switch controls pass at 310/236/247; the 400-cycle run
+reached its native runtime limit and has no accepted result. These additional
+controls predate the completion-preservation fix. Nonresident FP remains disabled.
+
+Routed fit of the current exact 2/10 candidate remains pending. The pre-fix
+job `20260923T041645Z-f3718f90` was intentionally canceled as superseded,
+with its artifacts preserved; it supplies no routed acceptance. The completed
+`20260921T052750Z-5edcf5b3` route used default 2/4 topology and does not qualify
+the ten-worker endpoint. See [retained evidence](logs/context-launch-20260922/README.md).
+
+Independent full-waveform re-decoding reproduces 398/396 with identical ELF/NBF,
+physical-cycle timers, 20 actual worker handoffs, no prior measured-data traffic,
+and no outstanding requests at the measured start. A disjoint interval partition
+shows 174 extra non-load cycles offset by 172 fewer load-span cycles; both receive
+a full line every 16 cycles through the same prefetch path. Fresh clean-build
+worker/batch/demand reruns reproduce 398/396/32,619 with matching simulator
+executable, ELF, and NBF hashes. The demand control has no prefetches and
+serializes 160 ordinary AXI reads, while worker/batch each sustain ten detached
+prefetches. Its larger gap includes transport and concurrency differences,
+not just context-switch overlap.
+See the [overlap audit](logs/context-launch-20260922/verification-200-analysis/README.md)
+and [timeline plot](logs/context-launch-20260922/verification-200-analysis/prefetch-overlap-200.png).
 
 ## Scope and readiness
 
