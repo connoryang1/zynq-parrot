@@ -92,7 +92,12 @@ For unattended overlay reloads, install the fixed-path board helper once with
 cycle. The sudo rule grants only `/usr/local/sbin/load-blackparrot-overlay`; never grant
 passwordless access to Python, a shell, `make`, or arbitrary overlay paths.
 
-If the PYNQ board stops accepting SSH, use
+If board recovery needs a power cycle, first check the environment for
+`PYNQ_POWER_STATE_URL`. On this VM, `/home/coyang/power_cycle.sh` also contains
+the configured outlet endpoint; inspect it without exposing its URL and pass
+that endpoint through the environment to the maintained helper. Check this
+local fallback before asking the user to cycle power manually. Do not copy
+the credential into tracked files, command text, or logs. Use
 `PYNQ_POWER_STATE_URL=... scripts/power_cycle_pynq.sh <ssh-host>`. Keep the controller URL in the
 environment, never in tracked files or logs. A power cycle restores the board's default overlay.
 SSH and the PL manager become available before PYNQ's own boot service is stable, so always run

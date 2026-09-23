@@ -2,13 +2,14 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-The current development branch is `fix/nonresident-completion-preservation-20260923`,
+The current development branch is `perf/real-ddr-board-20260923`,
 pinning BlackParrot `97cc0932d`. It fixes an accepted late result being discarded
 when a context switch commits. The exact regression ELF fails on predecessor
 `952ec7cb5` and passes all 24 trials on this fix; four related correctness gates
 also pass. Fresh independently audited fixed worker/batch runs retain **398/396
 cycles**. The fix is integrated locally and passes routed FPGA fit/timing under
-the retained constraints; physical-board qualification remains separate.
+the retained constraints. The physical board also passes the resident smoke and
+matched ten-request benchmarks; broader application qualification remains separate.
 See [bug evidence](logs/context-launch-20260922/late-result-fix/README.md).
 
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
@@ -154,6 +155,18 @@ prefetches. Its larger gap includes transport and concurrency differences,
 not just context-switch overlap.
 See the [overlap audit](logs/context-launch-20260922/verification-200-analysis/README.md)
 and [timeline plot](logs/context-launch-20260922/verification-200-analysis/prefetch-overlap-200.png).
+
+The fixed image now passes a real-DDR PYNQ-Z2 follow-up: seven samples each
+measure **310 worker / 176 batch cycles** (all samples identical), a **134-cycle
+gap**. Single-sample demand and switch-only controls measure 652 and 253 cycles.
+These use one fresh board ELF with runtime mode patches, physical CSR 0xcc0,
+2/10 context encoding, and guest/CORE PASS with native exit 0; resident smoke
+also passes. The FPGA has 64-bit HP0, unlike the 32-bit interface in the 398/396
+simulator run. This qualifies the measured bare-metal workload on real DDR,
+not the simulator's overlap timeline or broader Linux/application behavior.
+No board AXI waveform was collected; the expected out-of-window host marker
+messages and initial recovered DDR allocation failure are retained in the
+[physical-board evidence](logs/real-ddr-20260923/README.md).
 
 ## Scope and readiness
 
