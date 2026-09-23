@@ -3,8 +3,8 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 # Supported checkout
 
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
-changes on `master`; develop on dedicated branches. The current
-simulator-validated candidate is top `d1a7ed2c`, BlackParrot RTL `78b64f448`,
+changes on `master`; develop on dedicated branches. The ten-ID transport
+checkpoint is top `d1a7ed2c`, BlackParrot RTL `78b64f448`,
 and subsystem RTL `93e88366`. It adds an optional full-top prefetch path that
 bypasses the blocking L2 DMA bridge while leaving instruction, demand, context
 state, and write traffic on the existing AXI ID-zero path. Detached 64-byte
@@ -16,12 +16,12 @@ compiled batch, 1,038 prefetch/yield/load, and 472 switch-only cycles. Only the
 a functional historical reference because its startup and front-end state did
 not match the rings.
 
-Branch `bench/matched-prefetch-reference` now supplies one runtime-selected ELF
+The matched benchmark supplies one runtime-selected ELF
 for all four modes, fixed dummy warmup on a separate page, common setup and
 traffic drain, explicit markers, and untimed common checking. On the traced
 minimal top with 200-cycle reads the historical software candidate measured
 32,661 demand, 3,645 worker prefetch, 724 matched batch, and 289 switch-only
-cycles. The current RTL demand-join candidate measures 418 worker cycles versus
+cycles. The RTL demand-join checkpoint measured 418 worker cycles versus
 396 matched batch at 200-cycle reads, and 618 versus 596 at 400-cycle reads.
 No switch-only subtraction is used. Batch and worker each accept all ten UCE and nonzero-ID
 AXI requests before the first response and reach ten outstanding, but their
@@ -84,6 +84,26 @@ combined LUTs exceed the device's 53,200, and 11,528 required slices exceed the
 limit for the exact two-resident/ten-logical endpoint. Board qualification
 remains required before the original ten-worker experiment can run physically.
 The physical predecessor and historical resident baseline are identified below.
+
+## Latest context-switch candidate
+
+Branch `perf/overlap-context-launch-20260922` adds final-line frontend capture
+with BlackParrot RTL `952ec7cb5`, building on early restore `7db31e6d2`.
+Fresh clean traced runs of one identical ELF give **398 worker, 396 batch,
+and 247 switch-only cycles** at 200-cycle reads with two resident banks, ten
+logical contexts, ten prefetch slots, and ten AXI read slots. The worker and
+batch traffic audits start empty, reach ten outstanding fills, and show no
+ordinary data-region refill. All eighteen nonresident handoffs improve from
+eight to seven cycles from commit to first target dispatch; an eight-cycle
+longer first-load wait leaves a net ten-cycle gain from the 408-cycle baseline.
+
+The translated nonresident data handoff, both-line GPR ring, computed targets,
+late writeback, and standalone overhead gates pass on a clean traced 2/4 model.
+The standalone control measures 5.13 resident and 9.26 nonresident cycles per
+switch, including loop overhead. Nonresident FP remains disabled. Cross-latency
+checks and a routed fit check of this exact 2/10 candidate are pending; the
+completed `20260921T052750Z-5edcf5b3` route used default 2/4 topology and does
+not qualify the ten-worker endpoint. See [retained evidence](logs/context-launch-20260922/README.md).
 
 ## Scope and readiness
 
