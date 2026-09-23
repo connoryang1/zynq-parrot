@@ -7,7 +7,8 @@ pinning BlackParrot `97cc0932d`. It fixes an accepted late result being discarde
 when a context switch commits. The exact regression ELF fails on predecessor
 `952ec7cb5` and passes all 24 trials on this fix; four related correctness gates
 also pass. Fresh independently audited fixed worker/batch runs retain **398/396
-cycles**. The fix is integrated locally; FPGA timing qualification is pending.
+cycles**. The fix is integrated locally and passes routed FPGA fit/timing under
+the retained constraints; physical-board qualification remains separate.
 See [bug evidence](logs/context-launch-20260922/late-result-fix/README.md).
 
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
@@ -119,11 +120,27 @@ reads, its worker/batch/switch controls pass at 310/236/247; the 400-cycle run
 reached its native runtime limit and has no accepted result. These additional
 controls predate the completion-preservation fix. Nonresident FP remains disabled.
 
-Routed fit of the current exact 2/10 candidate remains pending. The pre-fix
-job `20260923T041645Z-f3718f90` was intentionally canceled as superseded,
-with its artifacts preserved; it supplies no routed acceptance. The completed
-`20260921T052750Z-5edcf5b3` route used default 2/4 topology and does not qualify
-the ten-worker endpoint. See [retained evidence](logs/context-launch-20260922/README.md).
+The exact fixed top `93ef30cf` / RTL `97cc0932d` passes routed PYNQ-Z2 fit
+in job `20260923T052713Z-93ef30cf`, using Vivado 2024.2 and static
+`e_bp_unicore_zynqparrot_prefetch10_cfg` (2 resident banks / 10 contexts / 10
+prefetch slots). At 20 MHz core clock, final WNS is **+0.694 ns**, TNS 0,
+WHS **+0.012 ns**, and THS 0. Placed utilization is 48,614 LUTs (91.38%),
+28,085 registers, 83.5 BRAM tiles and 11 DSPs; slice occupancy is 99.84%.
+The package's BIT/HWH/MAP contents and exact bitstream hash are verified:
+
+- Package SHA-256: `39da11c02a2f39937f9e5d1a21faa553ed249105ae0a0cfa65458bac8f4fdc49`.
+- BIT SHA-256: `d3342360bdcb8f5e97e9bc4ce3970fa4d34466fec603ca1360e075c546f500c8`.
+- [Build and acceptance evidence](/home/coyang/fpga-logs-context-launch-20260923/20260923T052713Z-93ef30cf/final-review.json).
+- [Timing coverage review](/home/coyang/fpga-logs-context-launch-20260923/20260923T052713Z-93ef30cf/timing-coverage-review.md).
+
+The exhaustive timing query confines all 76 unconstrained endpoints, including
+26 additions versus the prior route, to reset-configuration tag masters/clients.
+Inherited tag-clock coverage, primary-clock redefinition and RTC clock-mux
+limitations remain; this is fit/timing under the retained constraints, not full
+constraint/CDC or physical-board acceptance. The pre-fix job
+`20260923T041645Z-f3718f90` was canceled as superseded; the prior 2/4 route
+`20260921T052750Z-5edcf5b3` supplies constraint comparison only.
+See [retained evidence](logs/context-launch-20260922/README.md).
 
 Independent full-waveform re-decoding reproduces 398/396 with identical ELF/NBF,
 physical-cycle timers, 20 actual worker handoffs, no prior measured-data traffic,
