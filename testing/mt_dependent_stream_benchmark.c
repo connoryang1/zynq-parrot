@@ -23,7 +23,7 @@ volatile uint64_t benchmark_config __attribute__((section(".data"))) =
   UINT64_C(3) | (UINT64_C(4) << 8) | (UINT64_C(1280) << 16);
 
 struct result { uint64_t sum, count, cursor, done; };
-static volatile struct result results[4] __attribute__((aligned(64)));
+static volatile struct result results[10] __attribute__((aligned(64)));
 
 #define ASM_BEGIN ".option push\n.option norvc\n"
 #define ASM_END "ret\n.option pop\n"
@@ -103,10 +103,53 @@ static __attribute__((naked, noinline, aligned(64))) void software_four
     SW_PUBLISH("t0", "t4") SW_PUBLISH("t1", "t5") SW_PUBLISH("t2", "t6") SW_PUBLISH("t3", "a3") ASM_END);
 }
 
+/* Ten cursors and ten sums require callee-saved registers. Save them once,
+ * inside the timed interval, and keep the hot loop entirely in registers.
+ * s0 retains the physical starting timestamp in run_window; this leaf never
+ * modifies it or ra. The 96-byte frame preserves the ABI's 16-byte alignment.
+ */
+#define SW_TEN_PUBLISH(cursor, sum) \
+  PUBLISH(sum, "a0", cursor, "a1") "addi a1, a1, 32\n"
+static __attribute__((naked, noinline, aligned(64))) void software_ten
+  (const volatile struct node *const *heads, volatile struct result *out,
+   uint64_t steps)
+{
+  __asm__ volatile(ASM_BEGIN
+    "addi sp, sp, -96\n"
+    "sd s1, 0(sp)\nsd s2, 8(sp)\nsd s3, 16(sp)\nsd s4, 24(sp)\n"
+    "sd s5, 32(sp)\nsd s6, 40(sp)\nsd s7, 48(sp)\nsd s8, 56(sp)\n"
+    "sd s9, 64(sp)\nsd s10, 72(sp)\nsd s11, 80(sp)\n"
+    "ld t0, 0(a0)\nld t1, 8(a0)\nld t2, 16(a0)\nld t3, 24(a0)\n"
+    "ld t4, 32(a0)\nld t5, 40(a0)\nld t6, 48(a0)\n"
+    "ld s1, 56(a0)\nld s2, 64(a0)\nld s3, 72(a0)\nmv a0, a2\n"
+    "li s4, 0\nli s5, 0\nli s6, 0\nli s7, 0\nli s8, 0\n"
+    "li s9, 0\nli s10, 0\nli s11, 0\nli a3, 0\nli a4, 0\n"
+    BP_PREFETCH_R_ASM("t0") BP_PREFETCH_R_ASM("t1")
+    BP_PREFETCH_R_ASM("t2") BP_PREFETCH_R_ASM("t3")
+    BP_PREFETCH_R_ASM("t4") BP_PREFETCH_R_ASM("t5")
+    BP_PREFETCH_R_ASM("t6") BP_PREFETCH_R_ASM("s1")
+    BP_PREFETCH_R_ASM("s2") BP_PREFETCH_R_ASM("s3")
+    "1: addi a2, a2, -1\n"
+    SW_NODE("t0", "s4") SW_NODE("t1", "s5") SW_NODE("t2", "s6")
+    SW_NODE("t3", "s7") SW_NODE("t4", "s8") SW_NODE("t5", "s9")
+    SW_NODE("t6", "s10") SW_NODE("s1", "s11")
+    SW_NODE("s2", "a3") SW_NODE("s3", "a4")
+    "bnez a2, 1b\n"
+    SW_TEN_PUBLISH("t0", "s4") SW_TEN_PUBLISH("t1", "s5")
+    SW_TEN_PUBLISH("t2", "s6") SW_TEN_PUBLISH("t3", "s7")
+    SW_TEN_PUBLISH("t4", "s8") SW_TEN_PUBLISH("t5", "s9")
+    SW_TEN_PUBLISH("t6", "s10") SW_TEN_PUBLISH("s1", "s11")
+    SW_TEN_PUBLISH("s2", "a3") SW_TEN_PUBLISH("s3", "a4")
+    "ld s1, 0(sp)\nld s2, 8(sp)\nld s3, 16(sp)\nld s4, 24(sp)\n"
+    "ld s5, 32(sp)\nld s6, 40(sp)\nld s7, 48(sp)\nld s8, 56(sp)\n"
+    "ld s9, 64(sp)\nld s10, 72(sp)\nld s11, 80(sp)\n"
+    "addi sp, sp, 96\n" ASM_END);
+}
+
 static void prepare(const volatile struct node *const *heads, unsigned streams,
                     uint64_t steps)
 {
-  for (unsigned i = 0; i < 4; ++i) {
+  for (unsigned i = 0; i < 10; ++i) {
     results[i].sum = results[i].count = results[i].cursor = results[i].done = 0;
   }
   /* Setup is common even for software/serial modes and is outside timing. */
@@ -132,7 +175,8 @@ static __attribute__((noinline, used)) void run_operation
     }
   } else if (mode == 2) {
     if (streams == 2) software_two(heads, out, steps);
-    else software_four(heads, out, steps);
+    else if (streams == 4) software_four(heads, out, steps);
+    else software_ten(heads, out, steps);
   } else {
     hardware_worker(heads[0], out, steps, 1, 0);
   }
@@ -156,7 +200,7 @@ static __attribute__((naked, noinline, aligned(64))) uint64_t run_window
 static void check_results(unsigned streams, uint64_t steps, unsigned warm)
 {
   for (unsigned i = 0; i < streams; ++i) {
-    uint64_t graph_nodes = warm ? 16 : STREAM_DATA_NODES;
+    uint64_t graph_nodes = warm ? STREAM_WARM_NODES : STREAM_DATA_NODES;
     uint64_t first = i * (graph_nodes / streams);
     uint64_t expected_sum = steps * (first + 1) + steps * (steps - 1) / 2;
     uint64_t final = (first + steps) % graph_nodes;
@@ -176,14 +220,16 @@ int main(void)
   uint64_t config = benchmark_config;
   unsigned mode = config & 255, streams = (config >> 8) & 255;
   uint64_t nodes = (config >> 16) & 65535;
-  if ((config >> 32) || mode > 3 || (streams != 2 && streams != 4) || !nodes
-      || nodes > 1280 || nodes % streams) {
+  if ((config >> 32) || mode > 3 || (streams != 2 && streams != 4 && streams != 10) || !nodes
+      || nodes > STREAM_DATA_NODES || nodes % streams) {
     bp_print_string("[BSG-FAIL] dependent stream runtime configuration\n");
     bp_finish(1);
   }
   uint64_t steps = nodes / streams;
-  const volatile struct node *const *warm_heads = streams == 2 ? warm_heads_2 : warm_heads_4;
-  const volatile struct node *const *measured_heads = streams == 2 ? measured_heads_2 : measured_heads_4;
+  const volatile struct node *const *warm_heads =
+    streams == 2 ? warm_heads_2 : streams == 4 ? warm_heads_4 : warm_heads_10;
+  const volatile struct node *const *measured_heads =
+    streams == 2 ? measured_heads_2 : streams == 4 ? measured_heads_4 : measured_heads_10;
   for (unsigned warm_mode = 0; warm_mode < 4; ++warm_mode) {
     prepare(warm_heads, streams, 4);
     run_window(warm_mode, warm_heads, results, 4, streams);

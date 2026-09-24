@@ -2,12 +2,21 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-The current development branch is `perf/dependent-streams-20260923`, pinning
+The accepted correction is on `perf/dependent-streams-20260923`, pinning
 BlackParrot RTL `a3a674732e54cd28af419f47f51a0804c2caf8fc`. It includes the
 late-result preservation fix and now protects dirty cache victims from detached
 prefetch installation. The old path could overwrite a dirty stack line without
 writeback; the unchanged full-footprint reproducer and directed race/progress
 checks pass with the correction.
+
+The current follow-up branch `perf/dependent-ten-streams-20260924` extends the matched
+pointer workload to all ten logical contexts without changing RTL or the measured
+1,280-node graph. Six traced simulations and 36 board invocations pass. On the
+same executable, ten-stream hardware takes 67,107 median cycles versus 58,492
+for software interleaving and 55,966 for serial prefetch. Synthetic traces show
+that outstanding fills can preselect the same victim way, overwrite an earlier
+prefetched line before use, and trigger ordinary retries followed by lost hints;
+see [the completed ten-stream report](logs/dependent-ten-streams-20260924/RESULTS.md).
 
 The exact routed top `8c24f32442c6a61e73cd10d7030e282f322b44a4` / RTL `a3a674732`
 pair is qualified on the PYNQ-Z2 board in the 2-resident/10-logical/10-slot

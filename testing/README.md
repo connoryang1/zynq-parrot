@@ -105,7 +105,10 @@ one next-pointer dependency and one payload checksum per node. Select
 software interleaving with register-held cursors/checksums, or `3` for hardware
 context interleaving. The harness defaults to software mode (`BENCH_MODE=2`),
 four streams and 32 total nodes. `STREAMS=2` uses resident contexts 0/1; `STREAMS=4` also
-exercises nonresident contexts 2/3 on the same two-bank/ten-context image.
+exercises nonresident contexts 2/3. `STREAMS=10` uses all ten logical contexts on
+the same two-bank image; select `STREAM_NODES=40` for a short qualification or
+`STREAM_NODES=1280` for the matched full graph. The node count must divide evenly
+among streams, and the prefetch slot count must be at least the stream count.
 
 ```sh
 make -C testing run-mt_dependent_stream_benchmark \
@@ -117,12 +120,17 @@ make -C testing run-mt_dependent_stream_benchmark \
 The host patches one initialized `benchmark_config` word: mode in bits 7:0,
 streams in bits 15:8, total nodes in bits 31:16. All modes share an ELF and
 perform the same per-stream work. `STREAM_NODES=1280` visits all 80 KiB exactly
-once at either stream count; the default 32-node prefixes qualify correctness
+once at every supported stream count; the default 32-node prefixes qualify correctness
 quickly but use different subsets across stream counts. Do not compare those
 prefix timings as a stream-count performance experiment. Regenerate the
 checked-in graph with `python3 testing/generate_dependent_stream_data.py`.
 
-All modes warm their code on a separate graph. Context seeding is common,
+All modes warm their code on a separate 40-node graph, traversing four nodes
+per active stream in each warmup. The ten-stream software loop keeps every
+cursor and checksum in registers; its one-time 96-byte callee-save frame and
+restoration are included in timing, with no hot-loop stack traffic. Rebuild
+and rerun all stream-count controls from the same ELF when comparing scaling;
+adding this variant changes code and warmup layout. Context seeding is common,
 outside timing; priming, traversal, checksums, result publication and the final
 fence are inside physical CSR `0xCC0` timing. Post-timer checks verify every
 stream's checksum, count, final cursor and completion. The simulator harness

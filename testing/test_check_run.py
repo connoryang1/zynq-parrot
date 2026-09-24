@@ -92,6 +92,25 @@ class TranscriptTests(unittest.TestCase):
 
 
 class HarnessTests(unittest.TestCase):
+    def test_dependent_stream_counts_require_divisible_work_and_enough_slots(self):
+        root = Path(__file__).resolve().parents[1]
+        env = os.environ.copy()
+        for key in ("MAKEFLAGS", "MFLAGS", "MAKEOVERRIDES"):
+            env.pop(key, None)
+        cases = ((2, 32, 10, True), (4, 32, 10, True),
+                 (10, 40, 10, True), (10, 1280, 10, True),
+                 (10, 32, 10, False), (10, 40, 9, False),
+                 (8, 40, 10, False), (10, 0, 10, False))
+        for streams, nodes, slots, expected in cases:
+            with self.subTest(streams=streams, nodes=nodes, slots=slots):
+                result = subprocess.run(
+                    ["make", "-C", str(root / "testing"), "TOP=" + str(root),
+                     f"STREAMS={streams}", f"STREAM_NODES={nodes}",
+                     f"PREFETCH_ELS={slots}", "check-dependent-config"],
+                    env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    timeout=10)
+                self.assertEqual(result.returncode == 0, expected, result.stdout)
+
     def test_dependent_selector_corruption_is_rejected_after_guest_pass(self):
         root = Path(__file__).resolve().parents[1]
         env = os.environ.copy()
@@ -108,19 +127,22 @@ class HarnessTests(unittest.TestCase):
             command = ["make", "-C", str(root / "testing"), "TOP=" + str(root),
                        "SIM_DIR=" + str(sim), "LOG_DIR=" + str(base / "logs"),
                        "ZP_RISCV_DIR=" + str(base / "riscv"), "CC=true", "NM=true",
-                       "NUM_THREADS=2", "NUM_CONTEXTS=10", "BENCH_MODE=2",
-                       "STREAMS=4", "STREAM_NODES=32", "run-mt_dependent_stream_benchmark"]
-            good = "Benchmark: DEPENDENT mode=0x2 streams=0x4 nodes=0x20 cycles=0x123\n"
-            for row, expected in ((good, True), (good.replace("mode=0x2", "mode=0x0"), False),
-                                  (good.replace("streams=0x4", "streams=0x2"), False),
-                                  (good.replace("nodes=0x20", "nodes=0x500"), False),
-                                  ("", False), (good + good, False)):
-                with self.subTest(row=row):
-                    (sim / "fixture.log").write_text(
-                        row + TEST_MARKERS["mt_dependent_stream_benchmark"] + "\n" + PASS)
-                    result = subprocess.run(command, env=env, stdout=subprocess.PIPE,
-                                            stderr=subprocess.STDOUT, timeout=10)
-                    self.assertEqual(result.returncode == 0, expected, result.stdout)
+                       "NUM_THREADS=2", "NUM_CONTEXTS=10", "BENCH_MODE=2"]
+            for streams, nodes in ((4, 32), (10, 40)):
+                run_command = command + [f"STREAMS={streams}", f"STREAM_NODES={nodes}",
+                                         "run-mt_dependent_stream_benchmark"]
+                good = (f"Benchmark: DEPENDENT mode=0x2 streams={streams:#x} "
+                        f"nodes={nodes:#x} cycles=0x123\n")
+                for row, expected in ((good, True), (good.replace("mode=0x2", "mode=0x0"), False),
+                                      (good.replace(f"streams={streams:#x}", "streams=0x2"), False),
+                                      (good.replace(f"nodes={nodes:#x}", "nodes=0x500"), False),
+                                      ("", False), (good + good, False)):
+                    with self.subTest(streams=streams, row=row):
+                        (sim / "fixture.log").write_text(
+                            row + TEST_MARKERS["mt_dependent_stream_benchmark"] + "\n" + PASS)
+                        result = subprocess.run(run_command, env=env, stdout=subprocess.PIPE,
+                                                stderr=subprocess.STDOUT, timeout=10)
+                        self.assertEqual(result.returncode == 0, expected, result.stdout)
 
     def test_real_makefile_rejects_another_programs_success(self):
         root = Path(__file__).resolve().parents[1]
