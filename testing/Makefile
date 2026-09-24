@@ -19,6 +19,8 @@ BARRIER ?= 0
 PREFETCH_ELS ?= 10
 PROTOCOL_CASE ?= 1
 DDR_LATENCY_VERBOSE ?= 1
+STREAMS ?= 4
+STREAM_NODES ?= 32
 SIM_DEFINES ?=
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
@@ -63,6 +65,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_dependent_stream_benchmark \
     mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
     mt_prefetch_nonresident_interleave_benchmark \
@@ -76,7 +79,7 @@ NONRESIDENT_TESTS := \
     mt_umode_nonresident_sv39_data_handoff_test
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
-DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
+DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_dependent_stream_benchmark mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
 
 .PHONY: all clean build-sim rebuild-sim help check-harness FORCE $(addprefix run-, $(TESTS))
 
@@ -86,6 +89,7 @@ FORCE:
 
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(DEFAULT_TOPOLOGY_TESTS)))
 	@$(MAKE) $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv \
+		$(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv \
 		NUM_THREADS=2 NUM_CONTEXTS=10
@@ -108,7 +112,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) $$(if $$(RUN_INPUT),RUN_INPUT="$$(RUN_INPUT)" RUN_INPUT_ADDR="$$(RUN_INPUT_ADDR)",) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
-	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc
+	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),)
 endef
 
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
@@ -123,6 +127,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: CFLAGS += -DDDR_LATENCY_VERBOSE=$(DDR_LATENCY_VERBOSE)
+$(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/testing/dependent_stream_data.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
 
@@ -136,13 +142,13 @@ check-nonresident-config:
 .PHONY: check-ten-logical-config
 check-ten-logical-config:
 	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 )); then \
-		echo "ERROR: ten-worker benchmark requires NUM_THREADS=2 NUM_CONTEXTS=10"; exit 1; \
+		echo "ERROR: ten-logical-context benchmarks requires NUM_THREADS=2 NUM_CONTEXTS=10"; exit 1; \
 	fi
 	@if (( $(PREFETCH_ELS) < 1 || $(PREFETCH_ELS) > 10 )); then \
-		echo "ERROR: ten-worker benchmark PREFETCH_ELS must be in [1,10]"; exit 1; \
+		echo "ERROR: ten-logical-context benchmarks PREFETCH_ELS must be in [1,10]"; exit 1; \
 	fi
 	@if (( $(BENCH_MODE) < 0 || $(BENCH_MODE) > 3 )); then \
-		echo "ERROR: ten-worker benchmark BENCH_MODE must be in [0,3]"; exit 1; \
+		echo "ERROR: ten-logical-context benchmarks BENCH_MODE must be in [0,3]"; exit 1; \
 	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
@@ -156,9 +162,20 @@ run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_nonresident_interleave_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_ddr_latency_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_dependent_stream_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_dependent_stream_benchmark: RUN_INPUT = $(shell echo $$(( $(BENCH_MODE) | ($(STREAMS) << 8) | ($(STREAM_NODES) << 16) )))
+run-mt_dependent_stream_benchmark: RUN_EXPECT_DEPENDENT = $(RUN_INPUT)
+run-mt_dependent_stream_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_config" { print "0x" $$1; exit }')
+run-mt_dependent_stream_benchmark: check-ten-logical-config check-dependent-config
+.PHONY: check-dependent-config
+check-dependent-config:
+	@if (( ($(STREAMS) != 2 && $(STREAMS) != 4) || $(STREAM_NODES) < $(STREAMS) || $(STREAM_NODES) > 1280 || $(STREAM_NODES) % $(STREAMS) != 0 || $(PREFETCH_ELS) < $(STREAMS) )); then \
+		echo "ERROR: dependent streams require STREAMS=2 or 4, divisible STREAM_NODES in [STREAMS,1280], and enough prefetch slots"; exit 1; \
+	fi
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT := $(BENCH_MODE)
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
 run-mt_prefetch_nonresident_interleave_benchmark: check-ten-logical-config
+
 # Directed victim/progress regressions use the qualified two-bank/ten-context
 # detached-prefetch configuration. Their critical sections use one context.
 .PHONY: check-prefetch-victim-config check-prefetch-protocol-config

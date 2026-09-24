@@ -56,6 +56,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
 | `mt_umode_nonresident_sv39_data_handoff_test` | Translated instructions/data and target replay recovery |
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
+| `mt_dependent_stream_benchmark` | Shuffled dependent pointer chains; serial demand/prefetch, register-held software interleaving, and hardware context interleaving on the same graph |
 | `mt_ddr_latency_benchmark` | First-touch and immediately cached dependent loads, matched timer controls, and six prefetch lead times on disjoint lines; processor-visible physical cycles |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
@@ -70,7 +71,8 @@ the result even if the round-trip checks had already completed.
 `make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set. It
 uses the requested 2/4 topology for the maintained gates and automatically uses
 2/10 for `mt_prefetch_nonresident_interleave_benchmark`,
-`mt_prefetch_dirty_victim_test`, and `mt_prefetch_protocol_test`; compilation alone is
+`mt_dependent_stream_benchmark`, `mt_prefetch_dirty_victim_test`, and
+`mt_prefetch_protocol_test`; compilation alone is
 not a runtime pass. The two-worker benchmark compares resident context 1 with
 nonresident context 2. The four-ID ring tests require at least four logical
 contexts; resident-only isolation tests use contexts 0 and 1.
@@ -96,6 +98,46 @@ address from the exact ELF and use the maintained `patch_nbf_bytes.py` helper;
 it defaults to zero. This changes only which page the common warmup uses, and
 prints the selected value after measurement. Compare cold and warm modes from
 the same ELF because recompilation can move code and affect predictor aliases.
+
+`mt_dependent_stream_benchmark` traverses a deterministic shuffled graph, with
+one next-pointer dependency and one payload checksum per node. Select
+`BENCH_MODE=0` for serial demand, `1` for serial detached-prefetch, `2` for
+software interleaving with register-held cursors/checksums, or `3` for hardware
+context interleaving. The harness defaults to software mode (`BENCH_MODE=2`),
+four streams and 32 total nodes. `STREAMS=2` uses resident contexts 0/1; `STREAMS=4` also
+exercises nonresident contexts 2/3 on the same two-bank/ten-context image.
+
+```sh
+make -C testing run-mt_dependent_stream_benchmark \
+  NUM_THREADS=2 NUM_CONTEXTS=10 BENCH_MODE=3 STREAMS=4 STREAM_NODES=32 TRACE=1 \
+  SIM_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10' \
+  VERILATOR_BUILD_JOBS=12
+```
+
+The host patches one initialized `benchmark_config` word: mode in bits 7:0,
+streams in bits 15:8, total nodes in bits 31:16. All modes share an ELF and
+perform the same per-stream work. `STREAM_NODES=1280` visits all 80 KiB exactly
+once at either stream count; the default 32-node prefixes qualify correctness
+quickly but use different subsets across stream counts. Do not compare those
+prefix timings as a stream-count performance experiment. Regenerate the
+checked-in graph with `python3 testing/generate_dependent_stream_data.py`.
+
+All modes warm their code on a separate graph. Context seeding is common,
+outside timing; priming, traversal, checksums, result publication and the final
+fence are inside physical CSR `0xCC0` timing. Post-timer checks verify every
+stream's checksum, count, final cursor and completion. The simulator harness
+also rejects a printed mode/stream/node selector that differs from the request,
+even if guest and CORE PASS markers are present. No unused successor is
+prefetched after a stream's final node. The hardware schedule yields once per
+node plus a priming lap; its total is a workload time, not isolated handoff
+latency. Compare hardware against software interleaving to isolate scheduling
+benefits, and serial prefetch against serial demand to expose transport effects.
+For FPGA repetitions, load and verify the selected overlay, then use the pinned
+runner's processor reset for each sample. Check the printed mode, stream count
+and node count against the requested selector, in addition to all PASS markers.
+The initial FPGA runs exposed detached-prefetch dirty-victim corruption and are
+excluded; the correction is undergoing full-workload and FPGA qualification.
+Evidence is retained in [the dependent-stream report](../logs/dependent-streams-20260923/README.md).
 
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
 prints all samples after measuring. Each load interval is CSR `0xCC0`, load,

@@ -29,6 +29,7 @@ GPIO_STOP = re.compile(
 # Match the selected program's completed checks, not just the common CRT exit.
 # The benchmark banner is emitted only after both measured rings return.
 TEST_MARKERS = {
+    "mt_dependent_stream_benchmark": "[BSG-PASS] dependent streams, checksums and completion",
     "mt_ddr_latency_benchmark": "[BSG-PASS] DDR dependent-load latency and prefetch lead sweep",
     "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",
     "mt_resident_reseed_fetch_test": "[BSG-PASS] resident reseed cold-fetch and CSR preservation",
@@ -62,7 +63,7 @@ TEST_MARKERS = {
 }
 
 
-def check_transcript(transcript, exit_code=0, test=None):
+def check_transcript(transcript, exit_code=0, test=None, dependent_config=None):
     """Raise ValueError unless both guest and host succeeded without other errors."""
     lines = transcript.splitlines()
     core = [i for i, line in enumerate(lines) if CORE_PASS.search(line)]
@@ -74,6 +75,18 @@ def check_transcript(transcript, exit_code=0, test=None):
             raise ValueError("unknown test: {}".format(test))
         if not any(line.strip() == TEST_MARKERS[test] for line in lines[:core[0]]):
             raise ValueError("missing success marker for {} before CORE PASS".format(test))
+    if dependent_config is not None:
+        if test != "mt_dependent_stream_benchmark":
+            raise ValueError("dependent configuration requires the dependent-stream test")
+        rows = re.findall(
+            r"^Benchmark: DEPENDENT mode=(0x[0-9a-fA-F]+) "
+            r"streams=(0x[0-9a-fA-F]+) nodes=(0x[0-9a-fA-F]+) "
+            r"cycles=(0x[0-9a-fA-F]+)$",
+            "\n".join(lines[:core[0]]), re.M)
+        expected = (dependent_config & 255, (dependent_config >> 8) & 255,
+                    (dependent_config >> 16) & 65535)
+        if len(rows) != 1 or tuple(int(v, 16) for v in rows[0][:3]) != expected:
+            raise ValueError("dependent-stream result does not match requested mode/streams/nodes")
     if any(FAIL.search(line) or TIMEOUT.search(line) for line in lines):
         raise ValueError("guest failure or runtime timeout")
 
@@ -98,9 +111,12 @@ def main():
     parser.add_argument("log", type=Path)
     parser.add_argument("--exit-code", type=int, default=0)
     parser.add_argument("--test", choices=sorted(TEST_MARKERS))
+    parser.add_argument("--dependent-config", type=lambda value: int(value, 0),
+                        help="expected packed mode/stream/node selector")
     args = parser.parse_args()
     try:
-        check_transcript(args.log.read_text(), args.exit_code, args.test)
+        check_transcript(args.log.read_text(), args.exit_code, args.test,
+                         args.dependent_config)
     except (OSError, UnicodeError, ValueError) as error:
         print("INVALID RUN: {}".format(error), file=sys.stderr)
         return 1

@@ -92,6 +92,36 @@ class TranscriptTests(unittest.TestCase):
 
 
 class HarnessTests(unittest.TestCase):
+    def test_dependent_selector_corruption_is_rejected_after_guest_pass(self):
+        root = Path(__file__).resolve().parents[1]
+        env = os.environ.copy()
+        for key in ("MAKEFLAGS", "MFLAGS", "MAKEOVERRIDES"):
+            env.pop(key, None)
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            sim = base / "sim"
+            sim.mkdir()
+            (base / "riscv" / "bp-tests").mkdir(parents=True)
+            (sim / "Makefile").write_text(
+                ".PHONY: build run\nbuild:\n\t@true\n"
+                "run:\n\t@cp fixture.log run.log\n\t@cat run.log\n")
+            command = ["make", "-C", str(root / "testing"), "TOP=" + str(root),
+                       "SIM_DIR=" + str(sim), "LOG_DIR=" + str(base / "logs"),
+                       "ZP_RISCV_DIR=" + str(base / "riscv"), "CC=true", "NM=true",
+                       "NUM_THREADS=2", "NUM_CONTEXTS=10", "BENCH_MODE=2",
+                       "STREAMS=4", "STREAM_NODES=32", "run-mt_dependent_stream_benchmark"]
+            good = "Benchmark: DEPENDENT mode=0x2 streams=0x4 nodes=0x20 cycles=0x123\n"
+            for row, expected in ((good, True), (good.replace("mode=0x2", "mode=0x0"), False),
+                                  (good.replace("streams=0x4", "streams=0x2"), False),
+                                  (good.replace("nodes=0x20", "nodes=0x500"), False),
+                                  ("", False), (good + good, False)):
+                with self.subTest(row=row):
+                    (sim / "fixture.log").write_text(
+                        row + TEST_MARKERS["mt_dependent_stream_benchmark"] + "\n" + PASS)
+                    result = subprocess.run(command, env=env, stdout=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT, timeout=10)
+                    self.assertEqual(result.returncode == 0, expected, result.stdout)
+
     def test_real_makefile_rejects_another_programs_success(self):
         root = Path(__file__).resolve().parents[1]
         env = os.environ.copy()
