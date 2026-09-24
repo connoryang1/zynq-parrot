@@ -2,31 +2,45 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-**New correctness finding:** the broader dependent-stream workload exposes dirty
-cache data loss in the detached-prefetch installation path on RTL `97cc0932d`.
-A focused context-free test and closed waveform reproduce a dirty victim being
-overwritten without writeback. The prior small-workload measurements retain
-their stated scope; full-workload FPGA performance is not accepted while this
-fix is under verification. See [the new evidence](logs/dependent-streams-20260923/README.md).
+The current development branch is `perf/dependent-streams-20260923`, pinning
+BlackParrot RTL `a3a674732e54cd28af419f47f51a0804c2caf8fc`. It includes the
+late-result preservation fix and now protects dirty cache victims from detached
+prefetch installation. The old path could overwrite a dirty stack line without
+writeback; the unchanged full-footprint reproducer and directed race/progress
+checks pass with the correction.
 
-The current development branch is `perf/dependent-streams-20260923`,
-pinning BlackParrot `97cc0932d`. It fixes an accepted late result being discarded
-when a context switch commits. The exact regression ELF fails on predecessor
-`952ec7cb5` and passes all 24 trials on this fix; four related correctness gates
-also pass. Fresh independently audited fixed worker/batch runs retain **398/396
-cycles**. The fix is integrated locally and passes routed FPGA fit/timing under
-the retained constraints. The physical board also passes the resident smoke and
-matched ten-request benchmarks; broader application qualification remains separate.
-See [bug evidence](logs/context-launch-20260922/late-result-fix/README.md).
+The exact routed top `8c24f32442c6a61e73cd10d7030e282f322b44a4` / RTL `a3a674732`
+pair is qualified on the PYNQ-Z2 board in the 2-resident/10-logical/10-slot
+configuration. Four directed regression cases, all 24 full dependent-workload
+runs, and 13 latency/small-schedule controls pass. One incomplete protocol
+transcript was rejected and its exact repeat passed; the rejected artifact is
+retained. The new image has not undergone Linux qualification.
 
-The same FPGA now has direct processor-visible latency measurements: 48 first-touch
-loads have a 41-cycle median (41–44 range), versus three cycles cached. In the
-same-ELF cold/warm controls, worker stays at 310 cycles while batch drops from
-176 to 136; the warm trace verifies ten three-cycle loads and 174 extra non-load
-cycles in worker. The reusable latency probe, raw samples, prefetch lead sweep,
-and verification are in [the memory-latency report](logs/fpga-memory-latency-20260923/README.md).
-The Verilator host allocator now preserves AXI page alignment; generated RTL
-and the accepted FPGA image remain unchanged.
+For the same 1,280-node/80-KiB graph, median software/hardware times are
+**52,642/62,289 cycles with two streams**, and
+**56,952/65,458 with four streams** (three runs each).
+These are workload totals, not isolated switching overhead. The correction
+improves data integrity, but hardware contexts do not outperform optimized
+software interleaving here. Earlier corrupted full-workload timings are
+excluded. The original tiny synthetic worker/batch result changes from
+398/396 to 563/479: request concurrency remains, while the installation lock
+reduces consumption overlap. See [the completed measurements and limits](logs/dependent-streams-20260923/RESULTS.md).
+
+The unchanged board latency probe reports a 41-cycle first-touch median
+(41–45, 16 loads), versus three cycles for cached reloads
+and register-only timer controls. The verified BIT SHA-256 is
+`0ac434fdba2592dfc7e5345a8c3eca53b00b473818354df0d662b03aea56ea58`;
+package SHA-256 is
+`c279085c5fb4535785336731cc0f153cce7bc44478f5416937dce7e78f3bcb8e`.
+Vivado 2024.2 reports WNS +0.878 ns/TNS 0, 48,562 LUTs, 28,079 registers,
+83.5 BRAM tiles and 11 DSPs. The inherited 42 no-clock pins and 76 unconstrained
+endpoints remain; acceptance is under retained constraints. Exact reports are
+in [the routed review](logs/dependent-streams-20260923/fpga-review/acceptance.md).
+
+## Historical checkpoints
+
+The following measurements and images predate the current correction and retain
+their original scope. They are not interchangeable with the accepted image above.
 
 Use `/home/coyang/zynq-parrot` and its pinned RTL submodules. Integrate accepted
 changes on `master`; develop on dedicated branches. The ten-ID transport

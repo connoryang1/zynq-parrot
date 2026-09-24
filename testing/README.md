@@ -136,8 +136,10 @@ For FPGA repetitions, load and verify the selected overlay, then use the pinned
 runner's processor reset for each sample. Check the printed mode, stream count
 and node count against the requested selector, in addition to all PASS markers.
 The initial FPGA runs exposed detached-prefetch dirty-victim corruption and are
-excluded; the correction is undergoing full-workload and FPGA qualification.
-Evidence is retained in [the dependent-stream report](../logs/dependent-streams-20260923/README.md).
+excluded. Corrected RTL `a3a674732` passes the directed regressions and all 24
+full-workload board samples (three per schedule/stream count). Hardware contexts
+are slower than optimized software interleaving in both tested stream counts;
+see [the accepted results and scope](../logs/dependent-streams-20260923/RESULTS.md).
 
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
 prints all samples after measuring. Each load interval is CSR `0xCC0`, load,
