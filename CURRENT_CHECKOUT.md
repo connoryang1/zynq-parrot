@@ -2,7 +2,14 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-The current development branch is `perf/fpga-memory-latency-20260923`,
+**New correctness finding:** the broader dependent-stream workload exposes dirty
+cache data loss in the detached-prefetch installation path on RTL `97cc0932d`.
+A focused context-free test and closed waveform reproduce a dirty victim being
+overwritten without writeback. The prior small-workload measurements retain
+their stated scope; full-workload FPGA performance is not accepted while this
+fix is under verification. See [the new evidence](logs/dependent-streams-20260923/README.md).
+
+The current development branch is `perf/dependent-streams-20260923`,
 pinning BlackParrot `97cc0932d`. It fixes an accepted late result being discarded
 when a context switch commits. The exact regression ELF fails on predecessor
 `952ec7cb5` and passes all 24 trials on this fix; four related correctness gates
