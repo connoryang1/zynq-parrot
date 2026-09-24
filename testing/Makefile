@@ -17,6 +17,7 @@ BENCH_MODE ?= 2
 DIAGNOSTIC ?= 0
 BARRIER ?= 0
 PREFETCH_ELS ?= 10
+PROTOCOL_CASE ?= 1
 DDR_LATENCY_VERBOSE ?= 1
 SIM_DEFINES ?=
 
@@ -50,6 +51,8 @@ CORRECTNESS_TESTS := \
     mt_umode_prefetch_test \
     mt_prefetch_hint_test \
     mt_prefetch_queue_depth_test \
+    mt_prefetch_dirty_victim_test \
+    mt_prefetch_protocol_test \
     mt_umode_resident_sv39_data_handoff_test \
     mt_ctxtsw_register_target_test \
     mt_abi_preservation_test \
@@ -73,7 +76,7 @@ NONRESIDENT_TESTS := \
     mt_umode_nonresident_sv39_data_handoff_test
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
-DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark,$(TESTS))
+DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
 
 .PHONY: all clean build-sim rebuild-sim help check-harness FORCE $(addprefix run-, $(TESTS))
 
@@ -83,6 +86,8 @@ FORCE:
 
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(DEFAULT_TOPOLOGY_TESTS)))
 	@$(MAKE) $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv \
+		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv \
+		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv \
 		NUM_THREADS=2 NUM_CONTEXTS=10
 
 $(LOG_DIR):
@@ -115,6 +120,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_interleave_benchmark.riscv: $(TOP)/testing/mt_request_interleave_benchmark.c $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: CFLAGS += -DDDR_LATENCY_VERBOSE=$(DDR_LATENCY_VERBOSE)
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
@@ -153,6 +159,22 @@ run-mt_ddr_latency_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(P
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT := $(BENCH_MODE)
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
 run-mt_prefetch_nonresident_interleave_benchmark: check-ten-logical-config
+# Directed victim/progress regressions use the qualified two-bank/ten-context
+# detached-prefetch configuration. Their critical sections use one context.
+.PHONY: check-prefetch-victim-config check-prefetch-protocol-config
+check-prefetch-victim-config:
+	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 1 || $(PREFETCH_ELS) > 10 )); then \
+		echo "ERROR: prefetch victim gates require NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS in [1,10]"; exit 1; \
+	fi
+check-prefetch-protocol-config: check-prefetch-victim-config
+	@if (( $(PROTOCOL_CASE) < 1 || $(PROTOCOL_CASE) > 3 || $(PREFETCH_ELS) < 2 )); then \
+		echo "ERROR: prefetch protocol gate requires PROTOCOL_CASE in [1,3] and PREFETCH_ELS >= 2"; exit 1; \
+	fi
+run-mt_prefetch_dirty_victim_test run-mt_prefetch_protocol_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_prefetch_dirty_victim_test: check-prefetch-victim-config
+run-mt_prefetch_protocol_test: check-prefetch-protocol-config
+run-mt_prefetch_protocol_test: RUN_INPUT = $(PROTOCOL_CASE)
+run-mt_prefetch_protocol_test: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv 2>/dev/null | awk '$$3 == "protocol_case" { print "0x" $$1; exit }')
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config

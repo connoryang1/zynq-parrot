@@ -49,6 +49,8 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
 | `mt_prefetch_hint_test` | Nonfaulting invalid hints, signed offsets, ordinary ORI behavior, all word offsets, and dirty-line/store data preservation |
 | `mt_prefetch_queue_depth_test` | Two batches of ten hints followed by ten demand loads, with distinct cold lines and verified sums |
+| `mt_prefetch_dirty_victim_test` | Eight dirty same-set cache lines survive a ninth-line detached prefetch; all 64 dirty words are checked |
+| `mt_prefetch_protocol_test` | Runtime cases cover a victim dirtied after a hint, two same-set hints with a conflicting miss, and prefetch response ahead of an ordinary response |
 | `mt_umode_prefetch_test` | Sv39 readable and denied mappings, expected demand fault, nonfaulting hints, and permitted demand data without context switching |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |
@@ -67,7 +69,8 @@ Each variant emits its own completion marker, and unexpected traps invalidate
 the result even if the round-trip checks had already completed.
 `make -C testing all NUM_THREADS=2 NUM_CONTEXTS=4` compiles the complete set. It
 uses the requested 2/4 topology for the maintained gates and automatically uses
-2/10 for `mt_prefetch_nonresident_interleave_benchmark`; compilation alone is
+2/10 for `mt_prefetch_nonresident_interleave_benchmark`,
+`mt_prefetch_dirty_victim_test`, and `mt_prefetch_protocol_test`; compilation alone is
 not a runtime pass. The two-worker benchmark compares resident context 1 with
 nonresident context 2. The four-ID ring tests require at least four logical
 contexts; resident-only isolation tests use contexts 0 and 1.
@@ -297,6 +300,36 @@ do not trap. It also hints and reads a separate line on the readable page.
 The MMIO translation is not primed, so that hint can drop on a DTLB miss;
 PASS alone does not prove a PMA rejection or a retained denied DTLB entry.
 The test does not switch contexts or establish hint-triggered page walking.
+
+The directed victim regressions use one architectural context and register-only
+critical sections. They require the qualified 2/10 topology, detached-prefetch
+path, and the default 64-set, eight-way, 64-byte-line D-cache. The protocol test
+requires at least two prefetch slots. With delayed memory, run:
+
+```sh
+make -C testing clean
+BSG_TRACE_TIMEOUT_S=1200 make -C testing run-mt_prefetch_dirty_victim_test \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 TRACE=1 \
+  SIM_DEFINES="BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10"
+```
+
+Preserve the closed log and waveform before the next run. Select each protocol
+case in a fresh boot, repeating this command with `PROTOCOL_CASE=2` and `3`:
+
+```sh
+BSG_TRACE_TIMEOUT_S=1200 make -C testing run-mt_prefetch_protocol_test \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 PROTOCOL_CASE=1 TRACE=1 \
+  SIM_DEFINES="BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10"
+```
+
+Case 1 dirties all possible victims after hint acceptance. Case 2 combines two
+same-set hints with an ordinary conflicting miss. Case 3 places a prefetch
+response ahead of an unrelated ordinary response. `PROTOCOL_CASE` patches the
+initialized `protocol_case` word resolved from the rebuilt ELF. Each test
+requires its exact guest PASS marker and normal harness verdict; waveform
+qualification must also confirm the intended overlapping requests and dirty
+transition. Guest PASS alone cannot prove those races occurred. Both sources
+support `BP_FPGA_PROGRAM` to omit the simulator's debug-mode entry sequence.
 
 `mt_prefetch_interleave_benchmark` includes the original request benchmark with
 the hint helper selected. It preserves the same 64 useful loads, two worker

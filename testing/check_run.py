@@ -49,6 +49,8 @@ TEST_MARKERS = {
     "mt_prefetch_nonresident_interleave_benchmark": "[BSG-PASS] ten logical nonresident prefetch workers",
     "mt_prefetch_hint_test": "[BSG-PASS] nonfaulting prefetch hints",
     "mt_prefetch_queue_depth_test": "[BSG-PASS] ten queued prefetch hints",
+    "mt_prefetch_dirty_victim_test": "[BSG-PASS] detached prefetch dirty victim",
+    "mt_prefetch_protocol_test": "[BSG-PASS] detached prefetch protocol",
     "mt_umode_prefetch_test": "[BSG-PASS] U-mode Sv39 nonfaulting prefetch permissions",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
     "mt_ctxtsw_pure_ring_stress_test": "[BSG-PASS] pure ctxtsw ring stress completed",
