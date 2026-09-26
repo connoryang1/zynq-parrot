@@ -2,28 +2,39 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 # Supported checkout
 
-The accepted correction is on `perf/dependent-streams-20260923`, pinning
+The accepted dirty-victim baseline is on `perf/dependent-streams-20260923`, pinning
 BlackParrot RTL `a3a674732e54cd28af419f47f51a0804c2caf8fc`. It includes the
 late-result preservation fix and now protects dirty cache victims from detached
 prefetch installation. The old path could overwrite a dirty stack line without
 writeback; the unchanged full-footprint reproducer and directed race/progress
 checks pass with the correction.
 
-The current follow-up branch `perf/dependent-ten-streams-20260924` extends the matched
-pointer workload to all ten logical contexts without changing RTL or the measured
-1,280-node graph. Six traced simulations and 36 board invocations pass. On the
-same executable, ten-stream hardware takes 67,107 median cycles versus 58,492
-for software interleaving and 55,966 for serial prefetch. Synthetic traces show
-that outstanding fills can preselect the same victim way, overwrite an earlier
-prefetched line before use, and trigger ordinary retries followed by lost hints;
-see [the completed ten-stream report](logs/dependent-ten-streams-20260924/RESULTS.md).
+The current follow-up branch `perf/dependent-ten-streams-20260924` fixes the
+sustained detached-prefetch failure exposed by the same 1,280-node pointer
+graph. Outstanding same-set fills now reserve distinct ways, response-time
+installation rereads dirty/LRU state, and temporarily blocked hints replay
+instead of disappearing. The matched 200-cycle model installs all 40 hints,
+performs no ordinary graph refills, and measures 1,750 cycles for software
+interleaving versus 1,835 for hardware contexts. The dirty-victim and all
+three response-protocol regressions pass in simulation and on the board.
 
-The exact routed top `8c24f32442c6a61e73cd10d7030e282f322b44a4` / RTL `a3a674732`
-pair is qualified on the PYNQ-Z2 board in the 2-resident/10-logical/10-slot
+The exact routed top `134200b1e03abaf5400c5690fbe4e2e9ba18bc6e` / RTL
+`74b213c565e9010f4ab420c7ff3e48433353e888` pair passes 36 real-DDR workload
+runs. At ten streams, median cycles are 60,369 serial demand, 49,796 serial
+prefetch, 44,636 software interleaving, and **41,570 hardware contexts**. The
+hardware schedule is 31.1% faster than demand and 6.9% faster than software;
+its broken-image predecessor took 67,107 cycles. At two streams software wins
+34,680 versus 38,749, and at four it wins 44,810 versus 51,552, so the hardware
+advantage requires enough independent streams. See [the sustained-coverage
+report](logs/prefetch-sustained-coverage-20260924/RESULTS.md).
+
+The previous routed top `8c24f32442c6a61e73cd10d7030e282f322b44a4` / RTL `a3a674732`
+pair is retained as the pre-correction PYNQ-Z2 reference in the 2-resident/10-logical/10-slot
 configuration. Four directed regression cases, all 24 full dependent-workload
 runs, and 13 latency/small-schedule controls pass. One incomplete protocol
 transcript was rejected and its exact repeat passed; the rejected artifact is
-retained. The new image has not undergone Linux qualification.
+retained. The replacement above has bare-metal real-DDR qualification but has
+not undergone Linux qualification.
 
 For the same 1,280-node/80-KiB graph, median software/hardware times are
 **52,642/62,289 cycles with two streams**, and
