@@ -62,6 +62,7 @@ module bp_prefetch_axi_master
   logic [outstanding_p-1:0] slot_v_r;
   bp_bedrock_mem_rev_header_s slot_header_r [outstanding_p];
   logic [outstanding_p-1:0][beat_count_width_lp-1:0] slot_beat_r;
+  logic [outstanding_p-1:0][beat_count_width_lp-1:0] slot_last_beat_r;
   logic [outstanding_p-1:0][subbeat_count_width_lp-1:0] slot_subbeat_r;
   logic [outstanding_p-1:0][bedrock_fill_width_p-1:0] slot_fill_data_r;
 
@@ -79,7 +80,9 @@ module bp_prefetch_axi_master
 
   assign axi_araddr_o = mem_fwd_header_cast_i.addr[0+:axi_addr_width_p];
   assign axi_arid_o = axi_id_width_p'(free_slot + 1'b1);
-  assign axi_arlen_o = 8'(block_beats_lp-1);
+  wire [7:0] request_axi_beats
+    = (8'(1) << mem_fwd_header_cast_i.size) >> $clog2(axi_bytes_lp);
+  assign axi_arlen_o = request_axi_beats - 1'b1;
   assign axi_arsize_o = 3'($clog2(axi_bytes_lp));
   assign axi_arburst_o = 2'b01;
   assign axi_arvalid_o = mem_fwd_v_i & free_v;
@@ -118,6 +121,7 @@ module bp_prefetch_axi_master
     if (reset_i) begin
       slot_v_r <= '0;
       slot_beat_r <= '0;
+      slot_last_beat_r <= '0;
       slot_subbeat_r <= '0;
       slot_fill_data_r <= '0;
     end else begin
@@ -125,6 +129,8 @@ module bp_prefetch_axi_master
         slot_v_r[free_slot] <= 1'b1;
         slot_header_r[free_slot] <= mem_fwd_header_cast_i;
         slot_beat_r[free_slot] <= '0;
+        slot_last_beat_r[free_slot]
+          <= beat_count_width_lp'(request_axi_beats - 1'b1);
         slot_subbeat_r[free_slot] <= '0;
         slot_fill_data_r[free_slot] <= '0;
       end
@@ -139,6 +145,7 @@ module bp_prefetch_axi_master
           if (axi_rlast_i) begin
             slot_v_r[response_slot] <= 1'b0;
             slot_beat_r[response_slot] <= '0;
+            slot_last_beat_r[response_slot] <= '0;
             slot_fill_data_r[response_slot] <= '0;
           end
         end
@@ -161,7 +168,8 @@ module bp_prefetch_axi_master
     if (request_accept)
       assert (mem_fwd_header_cast_i.payload.prefetch
               && (mem_fwd_header_cast_i.msg_type == e_bedrock_mem_rd)
-              && (mem_fwd_header_cast_i.size == e_bedrock_msg_size_64))
+              && (mem_fwd_header_cast_i.size inside
+                  {e_bedrock_msg_size_16, e_bedrock_msg_size_64}))
         else $error("Prefetch AXI bridge accepted a malformed BedRock request");
     if (axi_rvalid_i)
       assert (response_slot_valid)
@@ -169,7 +177,8 @@ module bp_prefetch_axi_master
     if (response_accept) begin
       assert (axi_rresp_i == 2'b00)
         else $error("Prefetch AXI bridge received an AXI error response");
-      assert (axi_rlast_i == (slot_beat_r[response_slot] == block_beats_lp-1))
+      assert (axi_rlast_i
+              == (slot_beat_r[response_slot] == slot_last_beat_r[response_slot]))
         else $error("Prefetch AXI bridge received AXI RLAST at the wrong beat");
       assert (!axi_rlast_i || response_fill_complete)
         else $error("Prefetch AXI bridge received AXI RLAST on a partial BedRock beat");
