@@ -131,6 +131,7 @@ case ${1:-} in
     git -C "$worktree" submodule init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
     git -C "$worktree" config --local submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
+    git -C "$worktree" config --local submodule.import/black-parrot-subsystems.url "$repo_dir/import/black-parrot-subsystems"
     git -C "$worktree" config --local submodule.import/basejump_stl.url "$repo_dir/import/basejump_stl"
     git -c protocol.file.allow=always -C "$worktree" submodule update --init \
       import/basejump_stl import/black-parrot import/black-parrot-subsystems
