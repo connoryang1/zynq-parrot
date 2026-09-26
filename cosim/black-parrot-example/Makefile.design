@@ -36,7 +36,16 @@ DEFINES += HP0_ENABLE=1
 DEFINES += HP0_ADDR_WIDTH=32 HP0_DATA_WIDTH=64
 DEFINES += HP1_ENABLE=1
 DEFINES += HP1_ADDR_WIDTH=32 HP1_DATA_WIDTH=32
-DEFINES += ACLK_MHZ=20
+# The dense ten-context endpoint routes through the same long backend-to-I$
+# metadata path as the smaller configurations, but has less placement freedom.
+# Give that endpoint explicit timing margin while keeping existing qualified
+# images at 20 MHz.  Cycle-count benchmarks remain directly comparable.
+ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_cfg)
+ACLK_MHZ ?= 18
+else
+ACLK_MHZ ?= 20
+endif
+DEFINES += ACLK_MHZ=$(ACLK_MHZ)
 DEFINES += RTCLK_MHZ=8
 DEFINES += RT_CLK_ENABLE=1
 DEFINES += TAG_ENABLE=1
