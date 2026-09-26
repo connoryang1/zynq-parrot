@@ -41,8 +41,9 @@ static __attribute__((naked, noinline, aligned(64))) void name \
 { \
   __asm__ volatile(ASM_BEGIN \
     "mv a3, a2\nli a4, 0\n" prime \
-    "1: ld t0, 0(a0)\naddi a2, a2, -1\n" successor_hint \
-    "ld t1, 8(a0)\nadd a4, a4, t1\nmv a0, t0\nbnez a2, 1b\n" \
+    "1: ld t0, 0(a0)\naddi a2, a2, -1\n" \
+    "ld t1, 8(a0)\nadd a4, a4, t1\n" successor_hint \
+    "mv a0, t0\nbnez a2, 1b\n" \
     PUBLISH("a4", "a3", "a0", "a1") ASM_END); \
 }
 DEFINE_SERIAL(serial_demand, "", "")
@@ -61,9 +62,10 @@ static __attribute__((naked, noinline, aligned(64))) void hardware_worker
   __asm__ volatile(ASM_BEGIN
     "mv a5, a2\nli a6, 0\n" BP_PREFETCH_R_ASM("a0")
     "csrw 0x800, a3\n"
-    "1: ld t0, 0(a0)\naddi a2, a2, -1\nbeqz a2, 2f\n"
+    "1: ld t0, 0(a0)\naddi a2, a2, -1\n"
+    "ld t1, 8(a0)\nadd a6, a6, t1\nbeqz a2, 2f\n"
     BP_PREFETCH_R_ASM("t0")
-    "2: ld t1, 8(a0)\nadd a6, a6, t1\nmv a0, t0\nbeqz a2, 3f\n"
+    "2: mv a0, t0\nbeqz a2, 3f\n"
     "csrw 0x800, a3\nj 1b\n"
     "3:\n" PUBLISH("a6", "a5", "a0", "a1")
     "csrw 0x800, a3\nbeqz a4, 5f\n4: j 4b\n5:\n" ASM_END);
@@ -74,8 +76,9 @@ static __attribute__((naked, noinline, aligned(64))) void hardware_worker
  * count is decremented once per lap. No hint is issued on the final lap.
  */
 #define SW_NODE(cursor, sum) \
-  "ld a5, 0(" cursor ")\nbeqz a2, 2f\n" BP_PREFETCH_R_ASM("a5") \
-  "2: ld a6, 8(" cursor ")\nadd " sum ", " sum ", a6\nmv " cursor ", a5\n"
+  "ld a5, 0(" cursor ")\nld a6, 8(" cursor ")\n" \
+  "add " sum ", " sum ", a6\nbeqz a2, 2f\n" BP_PREFETCH_R_ASM("a5") \
+  "2: mv " cursor ", a5\n"
 #define SW_PUBLISH(cursor, sum) \
   PUBLISH(sum, "a4", cursor, "a1") "addi a1, a1, 32\n"
 static __attribute__((naked, noinline, aligned(64))) void software_two
