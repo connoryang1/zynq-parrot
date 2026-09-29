@@ -37,10 +37,10 @@ DEFINES += HP0_ADDR_WIDTH=32 HP0_DATA_WIDTH=64
 DEFINES += HP1_ENABLE=1
 DEFINES += HP1_ADDR_WIDTH=32 HP1_DATA_WIDTH=32
 # The integer-only ten-context endpoint is the clock-refactor experiment.  Its
-# routed result determines whether recovering the floating-point area gives the
-# placer enough freedom to reach 25 MHz without changing pipeline latency.
+# 25 MHz experiment routes to an implied 22.58 MHz limit.  Use 22 MHz for the
+# timing-clean endpoint while retaining margin for route variation.
 ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_cfg)
-ACLK_MHZ ?= 25
+ACLK_MHZ ?= 22
 else
 ACLK_MHZ ?= 20
 endif
