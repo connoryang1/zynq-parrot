@@ -36,12 +36,11 @@ DEFINES += HP0_ENABLE=1
 DEFINES += HP0_ADDR_WIDTH=32 HP0_DATA_WIDTH=64
 DEFINES += HP1_ENABLE=1
 DEFINES += HP1_ADDR_WIDTH=32 HP1_DATA_WIDTH=32
-# The dense ten-context endpoint routes through the same long backend-to-I$
-# metadata path as the smaller configurations, but has less placement freedom.
-# Give that endpoint explicit timing margin while keeping existing qualified
-# images at 20 MHz.  Cycle-count benchmarks remain directly comparable.
+# The integer-only ten-context endpoint is the clock-refactor experiment.  Its
+# routed result determines whether recovering the floating-point area gives the
+# placer enough freedom to reach 25 MHz without changing pipeline latency.
 ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_cfg)
-ACLK_MHZ ?= 18
+ACLK_MHZ ?= 25
 else
 ACLK_MHZ ?= 20
 endif
