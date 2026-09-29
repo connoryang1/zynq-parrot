@@ -138,6 +138,10 @@ package bp_common_pkg;
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_cfg_override_p =
     '{num_contexts: 10
       ,dcache_prefetch_els: 10
+      // This FPGA research endpoint runs integer pointer-chasing workloads.
+      // Remove the F/D execution hardware to recover routing space while
+      // retaining the integer multiply/divide support used by the runtime.
+      ,fpu_support: 0
       ,default: "inv"
       };
   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch10_cfg_p
