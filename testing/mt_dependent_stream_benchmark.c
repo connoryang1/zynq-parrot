@@ -17,6 +17,19 @@ struct node { const volatile struct node *next; uint64_t value, pad[6]; };
 _Static_assert(sizeof(struct node) == 64, "one node per cache line");
 #include "dependent_stream_data.h"
 
+/* Three streams use equal 426-node measured partitions (1278 nodes total).
+ * The generated graphs contain 1280 measured and 40 warm nodes, so integer
+ * thirds select disjoint starts while leaving the final two measured nodes
+ * outside this diagnostic workload. */
+static const volatile struct node *const warm_heads_3[3] = {
+  &warm_nodes[0], &warm_nodes[STREAM_WARM_NODES / 3],
+  &warm_nodes[2 * (STREAM_WARM_NODES / 3)]
+};
+static const volatile struct node *const measured_heads_3[3] = {
+  expected_cursors[0], expected_cursors[STREAM_DATA_NODES / 3],
+  expected_cursors[2 * (STREAM_DATA_NODES / 3)]
+};
+
 /* One host-patched word: mode bits7:0, streams bits15:8, total nodes bits31:16.
  * It lives in initialized data, never CRT-zeroed BSS. */
 volatile uint64_t benchmark_config __attribute__((section(".data"))) =
@@ -90,6 +103,19 @@ static __attribute__((naked, noinline, aligned(64))) void software_two
     BP_PREFETCH_R_ASM("t0") BP_PREFETCH_R_ASM("t1")
     "1: addi a2, a2, -1\n" SW_NODE("t0", "t4") SW_NODE("t1", "t5")
     "bnez a2, 1b\n" SW_PUBLISH("t0", "t4") SW_PUBLISH("t1", "t5") ASM_END);
+}
+static __attribute__((naked, noinline, aligned(64))) void software_three
+  (const volatile struct node *const *heads, volatile struct result *out,
+   uint64_t steps)
+{
+  __asm__ volatile(ASM_BEGIN
+    "ld t0, 0(a0)\nld t1, 8(a0)\nld t2, 16(a0)\n"
+    "li t3, 0\nli t4, 0\nli t5, 0\nmv a4, a2\n"
+    BP_PREFETCH_R_ASM("t0") BP_PREFETCH_R_ASM("t1") BP_PREFETCH_R_ASM("t2")
+    "1: addi a2, a2, -1\n"
+    SW_NODE("t0", "t3") SW_NODE("t1", "t4") SW_NODE("t2", "t5")
+    "bnez a2, 1b\n"
+    SW_PUBLISH("t0", "t3") SW_PUBLISH("t1", "t4") SW_PUBLISH("t2", "t5") ASM_END);
 }
 static __attribute__((naked, noinline, aligned(64))) void software_four
   (const volatile struct node *const *heads, volatile struct result *out,
@@ -178,6 +204,7 @@ static __attribute__((noinline, used)) void run_operation
     }
   } else if (mode == 2) {
     if (streams == 2) software_two(heads, out, steps);
+    else if (streams == 3) software_three(heads, out, steps);
     else if (streams == 4) software_four(heads, out, steps);
     else software_ten(heads, out, steps);
   } else {
@@ -223,16 +250,18 @@ int main(void)
   uint64_t config = benchmark_config;
   unsigned mode = config & 255, streams = (config >> 8) & 255;
   uint64_t nodes = (config >> 16) & 65535;
-  if ((config >> 32) || mode > 3 || (streams != 2 && streams != 4 && streams != 10) || !nodes
+  if ((config >> 32) || mode > 3 || (streams != 2 && streams != 3 && streams != 4 && streams != 10) || !nodes
       || nodes > STREAM_DATA_NODES || nodes % streams) {
     bp_print_string("[BSG-FAIL] dependent stream runtime configuration\n");
     bp_finish(1);
   }
   uint64_t steps = nodes / streams;
   const volatile struct node *const *warm_heads =
-    streams == 2 ? warm_heads_2 : streams == 4 ? warm_heads_4 : warm_heads_10;
+    streams == 2 ? warm_heads_2 : streams == 3 ? warm_heads_3
+    : streams == 4 ? warm_heads_4 : warm_heads_10;
   const volatile struct node *const *measured_heads =
-    streams == 2 ? measured_heads_2 : streams == 4 ? measured_heads_4 : measured_heads_10;
+    streams == 2 ? measured_heads_2 : streams == 3 ? measured_heads_3
+    : streams == 4 ? measured_heads_4 : measured_heads_10;
   for (unsigned warm_mode = 0; warm_mode < 4; ++warm_mode) {
     prepare(warm_heads, streams, 4);
     run_window(warm_mode, warm_heads, results, 4, streams);
