@@ -239,6 +239,13 @@ static void check_results(unsigned streams, uint64_t steps, unsigned warm)
         || results[i].cursor != (uint64_t)expected_cursor || results[i].done != 1) {
       bp_print_string("[BSG-FAIL] dependent stream result mismatch; stream=");
       bp_hprint_uint64(i);
+      bp_print_string(" sum="); bp_hprint_uint64(results[i].sum);
+      bp_print_string(" expected_sum="); bp_hprint_uint64(expected_sum);
+      bp_print_string(" count="); bp_hprint_uint64(results[i].count);
+      bp_print_string(" expected_count="); bp_hprint_uint64(steps);
+      bp_print_string(" cursor="); bp_hprint_uint64(results[i].cursor);
+      bp_print_string(" expected_cursor="); bp_hprint_uint64((uint64_t)expected_cursor);
+      bp_print_string(" done="); bp_hprint_uint64(results[i].done);
       bp_print_string("\n");
       bp_finish(1);
     }
