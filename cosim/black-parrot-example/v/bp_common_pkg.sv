@@ -154,6 +154,7 @@ package bp_common_pkg;
   // also enables complete detached-line installation in L1.
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg_override_p =
     '{num_threads: 4
+      ,dcache_prefetch_full_line: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
       ,default: "inv"
       };
@@ -164,6 +165,7 @@ package bp_common_pkg;
 
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg_override_p =
     '{num_threads: 3
+      ,dcache_prefetch_full_line: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
       ,default: "inv"
       };

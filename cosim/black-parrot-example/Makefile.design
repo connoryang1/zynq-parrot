@@ -69,10 +69,6 @@ SYNTH_STRATEGY ?= Flow_AreaOptimized_high
 IMPL_STRATEGY ?= Area_Explore
 endif
 
-ifneq ($(filter e_bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg,$(CFG)),)
-DEFINES += BP_PREFETCH_FULL_LINE
-endif
-
 include $(COSIM_MK_DIR)/Makefile.master
 
 # A custom aviary configuration without explicit dimensions silently uses the
