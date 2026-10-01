@@ -7,6 +7,7 @@ ASCII_TO_ROM ?= $(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py
 
 CFG ?= e_bp_unicore_zynqparrot_cfg
 bsg_blackparrot_pkg.sv:
+	$(if $(filter BP_PREFETCH_FULL_LINE,$(DEFINES)),@$(ECHO) '`define BP_PREFETCH_FULL_LINE' >> $@)
 	@$(ECHO) "package bsg_blackparrot_pkg;" >> $@
 	@$(ECHO) >> $@
 	@$(ECHO) "import bp_common_pkg::*;" >> $@
