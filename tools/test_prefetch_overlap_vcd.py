@@ -418,6 +418,21 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(report['prefetches'][0]['beats'], 8)
         self.assertEqual(report['prefetches'][0]['complete']['cycle'], 9)
 
+    def test_narrow_prefetch_requires_natural_alignment(self):
+        samples = [idle() for _ in range(4)]
+        samples[0].update(allocate(0, 0x1000))
+        samples[1].update(issue(0, 0x1000), fwd_size=4)
+        samples[2].update(response(0, 0x1000), rev_new=1, rev_last=0)
+        samples[3].update(response(0, 0x1008), rev_new=0, rev_last=1)
+        report = self.analyze(samples)
+        self.assertEqual(report['prefetches'][0]['size'], 4)
+
+        samples[0].update(allocate(0, 0x1008))
+        samples[1].update(issue(0, 0x1008), fwd_size=4)
+        with self.assertRaisesRegex(analyzer.EvidenceError,
+                                    'prefetch issue address/size mismatch'):
+            self.analyze(samples)
+
     def test_full_line_response_may_repeat_header_address(self):
         samples = [idle() for _ in range(12)]
         samples[0].update(allocate(0, 0x80010000))

@@ -277,7 +277,16 @@ class Transactions:
                     if (record is None or record['issue'] is not None
                             or record['accept']['timestamp'] >= timestamp):
                         raise EvidenceError('prefetch issue has no earlier unissued slot allocation')
-                    if size not in (3, self.line_size) or address != record['address']:
+                    # Detached reads may fetch only the critical payload
+                    # (for example, the pointer/value pair in a 16-byte node
+                    # prefix) or any larger power-of-two region through a
+                    # complete cache line.  BedRock encodes that size as log2
+                    # bytes; require natural alignment and the admitted
+                    # request address rather than assuming only 8-byte and
+                    # full-line requests exist.
+                    if (not 3 <= size <= self.line_size
+                            or address & ((1 << size) - 1)
+                            or address != record['address']):
                         raise EvidenceError('prefetch issue address/size mismatch')
                     if not v['issue']:
                         raise EvidenceError('prefetch issue pulse/slot mismatch')
