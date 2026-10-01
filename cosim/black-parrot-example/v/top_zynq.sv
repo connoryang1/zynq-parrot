@@ -176,6 +176,7 @@ module top_zynq
 `else
    localparam prefetch_axi_bypass_lp =
      bp_params_p inside {e_bp_unicore_zynqparrot_prefetch10_cfg
+                         ,e_bp_unicore_zynqparrot_prefetch10_t3_cfg
                          ,e_bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg
                          ,e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg};
 `endif

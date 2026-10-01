@@ -54,3 +54,34 @@ The candidate was therefore 756 available slices over the packing limit and
 never reached routing or timing analysis. A three-resident full-line endpoint
 is the next fit experiment because its simulated handoff latency is still two
 cycles and it retains the three-stream 4,455-cycle result.
+
+The three-resident full-line endpoint also failed detail placement, but only
+by 17 slices: job `20261001T033357Z-f89a76dd` needed 11,230 slices with 11,213
+available. `Area_ExploreWithRemap` and `Area_ExploreSequential` retries on the
+same synthesized checkpoint were worse at 11,500 and 11,360 required slices.
+The full-line ablation therefore does not fit with an added resident bank in
+the current flow. The separate `e_bp_unicore_zynqparrot_prefetch10_t3_cfg`
+candidate keeps the optimized 16-byte path while testing whether the third
+resident bank fits without the full-line installer cost.
+
+## Three-resident narrow-path candidate
+
+The optimized 16-byte side-buffer path benefits directly from the added
+resident bank. With the same pipelined 40-cycle memory model and 120 nodes,
+serial narrow prefetch takes 6,827 cycles while three-resident hardware
+switching takes 2,292 cycles, a 2.98x speedup. The hardware result is 19.10
+cycles per node versus 56.89 cycles per node for serial prefetch.
+
+A closed 33-node trace measures 697 cycles. It contains 33 accepted hints,
+33 UCE reads, and 33 AXI reads, reaches three outstanding requests at both
+interfaces, and has no ordinary fallback reads. All 36 committed resident
+switches reach the first target-context dispatch in two cycles. This shows
+that the third resident context supplies useful memory overlap without
+lengthening the resident handoff in simulation. It also shows why the narrow
+side buffer should remain in the performance endpoint: the corresponding
+three-resident full-line result is 4,455 cycles for 120 nodes.
+
+The trace and machine-readable audit are retained locally under
+`reverted-no-fe-fifo/trace-k3-m3-t3-lat40-narrow/`. FPGA place-and-route is
+still required before claiming that the third resident bank fits or preserves
+clock frequency on the PYNQ-Z2.

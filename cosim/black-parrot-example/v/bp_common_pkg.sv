@@ -172,9 +172,22 @@ package bp_common_pkg;
                         ,bp_unicore_zynqparrot_prefetch10_cfg_p
                         );
 
+  // Performance endpoint candidate: retain the 16-byte critical-data return
+  // path while making a third logical context resident.
+  localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_t3_cfg_override_p =
+    '{num_threads: 3
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+      ,default: "inv"
+      };
+  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch10_t3_cfg_p
+                        ,bp_unicore_zynqparrot_prefetch10_t3_cfg_override_p
+                        ,bp_unicore_zynqparrot_prefetch10_cfg_p
+                        );
+
   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =
   {
-    bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg_p
+    bp_unicore_zynqparrot_prefetch10_t3_cfg_p
+    ,bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg_p
     ,bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg_p
     ,bp_unicore_zynqparrot_prefetch10_cfg_p
     ,bp_unicore_zynqparrot_prefetch_cfg_p
@@ -190,7 +203,8 @@ package bp_common_pkg;
   // This enum MUST be kept up to date with the parameter array above
   typedef enum bit [lg_max_cfgs-1:0]
   {
-    e_bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg = 7
+    e_bp_unicore_zynqparrot_prefetch10_t3_cfg = 8
+    ,e_bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg = 7
     ,e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg = 6
     ,e_bp_unicore_zynqparrot_prefetch10_cfg         = 5
     ,e_bp_unicore_zynqparrot_prefetch_cfg           = 4

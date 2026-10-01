@@ -197,11 +197,14 @@ measurements; leave it at the default zero for the optimized critical-data
 path. The selector changes the Verilator model and requires a clean rebuild
 when comparing the two configurations.
 For full-top simulation and FPGA implementation, the named
+`e_bp_unicore_zynqparrot_prefetch10_t3_cfg`,
 `e_bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg` and
 `e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg` endpoints combine this
-mode with three or four resident banks, ten logical contexts, ten request
-slots, and the integer-only execution configuration. They are experimental
-endpoints until routed timing and board validation are recorded.
+experiment with three or four resident banks, ten logical contexts, ten
+request slots, and the integer-only execution configuration. The first name
+retains the optimized 16-byte side-buffer path; the latter two select the
+full-line ablation. They are experimental endpoints until routed timing and
+board validation are recorded.
 Static PYNQ-Z2 configurations now provide a four-slot/four-logical endpoint and
 an exact ten-slot/ten-logical endpoint. The latter routes with two resident banks
 and can run this program. The fixed `97cc0932d` RTL has now passed physical-board
