@@ -91,3 +91,28 @@ The trace and machine-readable audit are retained locally under
 endpoint fails placement by 17 slices, so the third resident bank does not fit
 in the current PYNQ-Z2 design. It never reaches routing or timing analysis, and
 no clock-frequency preservation claim is made.
+
+## Decoupled fill-buffer experiment
+
+A follow-up prototype gave every outstanding full-line request its own 64-byte
+fill buffer and forwarded the requested 16-byte sector to the D-cache as soon
+as those two response beats arrived. Complete lines then drained through the
+existing L1 victim-selection and write path in the background. D-cache hits
+and already queued hint issues were allowed during fill writes, while victim
+selection, invalidation, misses, and conflicting SRAM accesses retained their
+existing safety interlocks.
+
+The prototype passed the checksum and completion checks but did not improve
+throughput. The 120-node, three-resident result was 4,505 cycles versus 4,455
+for the accepted direct-install path, a 50-cycle (1.12%) regression. A
+33-node diagnostic fell from 1,844 to 1,307 cycles when the global fill lock
+was narrowed, but the steady-state result shows that buffering only moves the
+work: every line still pays victim preparation and eight serialized writes
+through the single L1 installation port. The prototype was reverted. Its
+patch and transcripts are retained locally in `fill-buffer-prototype/`.
+
+This result narrows the remaining architectural option. Beating the narrow
+side buffer while retaining full-line installation requires increasing the
+installer's physical service rate—for example, a wider or additional cache
+write interface with independently banked tag, state, and data updates. More
+request slots or response buffers alone do not remove this bottleneck.
