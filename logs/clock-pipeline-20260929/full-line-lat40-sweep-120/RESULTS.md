@@ -126,3 +126,18 @@ also reproduces exactly 2,292 cycles. Trace evidence is retained under
 `fill-buffer-concurrent/trace-k3-m3-n33/`. FPGA fit remains a separate gate:
 ten 64-byte response buffers add storage even though the L1 keeps one physical
 write port.
+
+## Banked BRAM response storage
+
+The response buffer is now split into one dual-port memory bank per 64-bit
+line beat. A returning response writes one bank while every bank independently
+reads the selected install slot into its output register. The installer then
+drains those eight registered beats through the existing L1 port. This removes
+the 40-to-1 distributed-memory read structure without adding an L1 SRAM write
+port or inserting a read bubble between install beats.
+
+The exact three-resident hardware schedule improves from 2,542 to 2,512 cycles
+for 120 nodes. The matching 33-node check improves from 802 to 771 cycles. The
+dirty-victim gate and all three protocol cases pass with guest and host PASS;
+the simulator retains its known post-PASS GPIO teardown assertion. A corrected
+FPGA build is still required to prove BRAM inference, placement, and timing.
