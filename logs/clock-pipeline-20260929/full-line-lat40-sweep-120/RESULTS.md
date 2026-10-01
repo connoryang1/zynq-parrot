@@ -46,23 +46,28 @@ the same 40-cycle setting. The static FPGA candidate is
 `e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg`; routed fit and timing are
 required before treating four resident banks as a PYNQ-Z2 result.
 
-The exact four-resident candidate failed PYNQ-Z2 detail placement in job
+The nominal four-resident candidate failed PYNQ-Z2 detail placement in job
 `20261001T022140Z-b994f1bf`. Synthesis reported 56,937 slice LUTs against
 53,200 available. After physical LUT combining, 57,993 combined LUTs and
 1,527 control sets required 11,947 slices, while only 11,191 were available.
 The candidate was therefore 756 available slices over the packing limit and
-never reached routing or timing analysis. A three-resident full-line endpoint
-is the next fit experiment because its simulated handoff latency is still two
-cycles and it retains the three-stream 4,455-cycle result.
+never reached routing or timing analysis. The later define-propagation audit
+described below shows that this job also compiled the narrow path despite its
+full-line endpoint name; it is evidence about four resident banks, not an FPGA
+full-line implementation.
 
-The three-resident full-line endpoint also failed detail placement, but only
-by 17 slices: job `20261001T033357Z-f89a76dd` needed 11,230 slices with 11,213
+The nominal three-resident full-line endpoint failed detail placement by 17
+slices: job `20261001T033357Z-f89a76dd` needed 11,230 slices with 11,213
 available. `Area_ExploreWithRemap` and `Area_ExploreSequential` retries on the
 same synthesized checkpoint were worse at 11,500 and 11,360 required slices.
-The full-line ablation therefore does not fit with an added resident bank in
-the current flow. The separate `e_bp_unicore_zynqparrot_prefetch10_t3_cfg`
-candidate keeps the optimized 16-byte path while testing whether the third
-resident bank fits without the full-line installer cost.
+A later narrow-endpoint build, `20261001T063657Z-f05fb1e1`, produced the exact
+same synthesis checksum (`ca95e229`), utilization, control-set count, and
+17-slice failure. This exposed a build-plumbing error: Make exported
+`BP_PREFETCH_FULL_LINE` into Tcl, but the IP-packaging flow did not attach it
+to the BlackParrot source fileset. The earlier FPGA job therefore built the
+narrow path despite its endpoint name. The simulator ablation remains valid
+because Verilator receives the define directly; no FPGA full-line fit claim
+is retained.
 
 ## Three-resident narrow-path candidate
 
@@ -82,6 +87,7 @@ side buffer should remain in the performance endpoint: the corresponding
 three-resident full-line result is 4,455 cycles for 120 nodes.
 
 The trace and machine-readable audit are retained locally under
-`reverted-no-fe-fifo/trace-k3-m3-t3-lat40-narrow/`. FPGA place-and-route is
-still required before claiming that the third resident bank fits or preserves
-clock frequency on the PYNQ-Z2.
+`reverted-no-fe-fifo/trace-k3-m3-t3-lat40-narrow/`. The exact narrow FPGA
+endpoint fails placement by 17 slices, so the third resident bank does not fit
+in the current PYNQ-Z2 design. It never reaches routing or timing analysis, and
+no clock-frequency preservation claim is made.

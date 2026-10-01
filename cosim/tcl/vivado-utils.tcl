@@ -220,6 +220,17 @@ proc vivado_create_design { vpackages vsources vincludes } {
         puts "BP-CONTEXT-CONFIG: static cfg selected; ignored custom Verilog defines"
     }
 
+    # The full-line experiment is selected inside the packaged BlackParrot
+    # sources. Exporting the Make variable into Tcl does not attach it to that
+    # IP's fileset, so apply it explicitly for the named static endpoints.
+    if {[info exists ::env(BP_PREFETCH_FULL_LINE)]} {
+        set fileset [get_filesets sources_1]
+        set_property verilog_define \
+            [concat [get_property verilog_define ${fileset}] BP_PREFETCH_FULL_LINE] \
+            ${fileset}
+        puts "BP-PREFETCH-CONFIG: applied Verilog define BP_PREFETCH_FULL_LINE"
+    }
+
     update_compile_order -verbose -fileset sources_1
 }
 
