@@ -165,6 +165,10 @@ package bp_common_pkg;
 
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg_override_p =
     '{num_threads: 3
+      // The memory path has four transaction slots and measured runs never
+      // exceed four outstanding fills.  Keep ten logical contexts, but avoid
+      // paying FPGA area for six queue entries that cannot increase MLP.
+      ,dcache_prefetch_els: 4
       ,dcache_prefetch_full_line: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
       ,default: "inv"

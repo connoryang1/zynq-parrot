@@ -141,3 +141,18 @@ for 120 nodes. The matching 33-node check improves from 802 to 771 cycles. The
 dirty-victim gate and all three protocol cases pass with guest and host PASS;
 the simulator retains its known post-PASS GPIO teardown assertion. A corrected
 FPGA build is still required to prove BRAM inference, placement, and timing.
+
+The corrected ten-slot build (`20261001T210232Z-e149688c`) proves the storage
+mapping: each of the eight `10 x 64` beat banks becomes one dual-port RAMB36,
+and the former 44-RAM64M flat payload is absent. Synthesis completes with zero
+errors. Detail placement still fails at 11,394 required slices versus 11,222
+available, a 172-slice deficit; the flat full-line build needed 11,385 with
+only 11,179 available, so banking improves the deficit by 34 slices but is not
+sufficient by itself.
+
+Measured UCE and AXI occupancy never exceeds four, so the physical queue was
+reduced from ten entries to four while retaining ten logical contexts. This
+does not change performance: the 33-node run remains 771 cycles and the
+120-node run remains 2,512 cycles. Dirty-victim and protocol cases 1-3 also
+retain guest and host PASS. The four-slot FPGA implementation remains the next
+physical fit and timing gate.
