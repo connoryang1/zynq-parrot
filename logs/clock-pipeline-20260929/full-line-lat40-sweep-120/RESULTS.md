@@ -92,27 +92,37 @@ endpoint fails placement by 17 slices, so the third resident bank does not fit
 in the current PYNQ-Z2 design. It never reaches routing or timing analysis, and
 no clock-frequency preservation claim is made.
 
-## Decoupled fill-buffer experiment
+## Concurrent fill-buffer installation
 
-A follow-up prototype gave every outstanding full-line request its own 64-byte
-fill buffer and forwarded the requested 16-byte sector to the D-cache as soon
-as those two response beats arrived. Complete lines then drained through the
-existing L1 victim-selection and write path in the background. D-cache hits
-and already queued hint issues were allowed during fill writes, while victim
-selection, invalidation, misses, and conflicting SRAM accesses retained their
-existing safety interlocks.
+The retained implementation gives every outstanding full-line request its own
+64-byte response buffer and forwards the requested 16-byte sector to the
+D-cache as soon as those two response beats arrive. Complete lines drain
+through the existing L1 victim-selection and write path in the background.
+Victim selection and invalidation still lock cache metadata, but the eight
+data writes no longer prevent a later detached hint from being admitted or
+issued. The existing SRAM handshakes arbitrate a returning critical sector or
+cache access against a background fill write, so this does not add an L1 data
+write port.
 
-The prototype passed the checksum and completion checks but did not improve
-throughput. The 120-node, three-resident result was 4,505 cycles versus 4,455
-for the accepted direct-install path, a 50-cycle (1.12%) regression. A
-33-node diagnostic fell from 1,844 to 1,307 cycles when the global fill lock
-was narrowed, but the steady-state result shows that buffering only moves the
-work: every line still pays victim preparation and eight serialized writes
-through the single L1 installation port. The prototype was reverted. Its
-patch and transcripts are retained locally in `fill-buffer-prototype/`.
+Buffering alone was insufficient: the first prototype took 4,505 cycles for
+the 120-node, three-resident run, slightly worse than the 4,455-cycle direct
+installer. Allowing new hint admission during background fill changes the
+same run to 2,542 cycles. That is 1,913 cycles (42.9%) faster than direct
+installation and only 250 cycles (10.9%) slower than the specialized narrow
+path's 2,292 cycles. The matching serial full-line-prefetch run is 6,743
+cycles, so three-stream hardware switching is 2.65x faster.
 
-This result narrows the remaining architectural option. Beating the narrow
-side buffer while retaining full-line installation requires increasing the
-installer's physical service rate—for example, a wider or additional cache
-write interface with independently banked tag, state, and data updates. More
-request slots or response buffers alone do not remove this bottleneck.
+A closed 33-node trace takes 802 cycles and accounts for all work: 33 accepted
+hints become 33 full-line UCE reads and 33 AXI reads, both interfaces reach
+four outstanding transactions, and there are no ordinary fallback reads.
+Twenty-seven of the 33 hint allocations and issues occur while the installer
+is in its fill state. This directly establishes that later memory requests
+overlap installation of prior lines; the improvement is not caused by omitted
+nodes, early benchmark completion, or a demand fallback path.
+
+The clean-to-dirty, same-set conflict, response-before-demand, and dirty-victim
+directed cases all pass with the new buffering. The narrow 120-node control
+also reproduces exactly 2,292 cycles. Trace evidence is retained under
+`fill-buffer-concurrent/trace-k3-m3-n33/`. FPGA fit remains a separate gate:
+ten 64-byte response buffers add storage even though the L1 keeps one physical
+write port.
