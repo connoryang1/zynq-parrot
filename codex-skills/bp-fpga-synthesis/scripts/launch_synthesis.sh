@@ -177,7 +177,16 @@ case ${1:-} in
     git -c protocol.file.allow=always -C "$worktree/import/black-parrot" \
       submodule update --init \
       external/basejump_stl external/HardFloat external/bedrock
-    git -C "$worktree/import/black-parrot-subsystems" submodule update --init \
+    # The build only needs riscv-dbg from this submodule. Seed it from the
+    # canonical checkout so an immutable FPGA job does not depend on network
+    # access or on an upstream object remaining fetchable.
+    git -C "$worktree/import/black-parrot-subsystems" submodule init \
+      import/riscv-dbg
+    git -C "$worktree/import/black-parrot-subsystems" config --local \
+      submodule.import/riscv-dbg.url \
+      "$seed_repo_dir/import/black-parrot-subsystems/import/riscv-dbg"
+    git -c protocol.file.allow=always \
+      -C "$worktree/import/black-parrot-subsystems" submodule update --init \
       import/riscv-dbg
     for required in \
       import/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
