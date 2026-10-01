@@ -17,11 +17,18 @@ BENCH_MODE ?= 2
 DIAGNOSTIC ?= 0
 BARRIER ?= 0
 PREFETCH_ELS ?= 10
+PREFETCH_FULL_LINE ?= 0
 PROTOCOL_CASE ?= 1
 DDR_LATENCY_VERBOSE ?= 1
 STREAMS ?= 4
 STREAM_NODES ?= 32
 SIM_DEFINES ?=
+
+ifeq ($(PREFETCH_FULL_LINE),1)
+override SIM_DEFINES += BP_PREFETCH_FULL_LINE
+else ifneq ($(PREFETCH_FULL_LINE),0)
+$(error PREFETCH_FULL_LINE must be 0 or 1)
+endif
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 NM     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-nm
@@ -166,7 +173,15 @@ run-mt_dependent_stream_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_EL
 run-mt_dependent_stream_benchmark: RUN_INPUT = $(shell echo $$(( $(BENCH_MODE) | ($(STREAMS) << 8) | ($(STREAM_NODES) << 16) )))
 run-mt_dependent_stream_benchmark: RUN_EXPECT_DEPENDENT = $(RUN_INPUT)
 run-mt_dependent_stream_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_config" { print "0x" $$1; exit }')
-run-mt_dependent_stream_benchmark: check-ten-logical-config check-dependent-config
+run-mt_dependent_stream_benchmark: check-dependent-topology check-dependent-config
+.PHONY: check-dependent-topology
+check-dependent-topology:
+	@if (( $(NUM_THREADS) < 2 || $(NUM_THREADS) > 4 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 1 || $(PREFETCH_ELS) > 10 )); then \
+		echo "ERROR: dependent streams require NUM_THREADS in [2,4], NUM_CONTEXTS=10, and PREFETCH_ELS in [1,10]"; exit 1; \
+	fi
+	@if (( $(BENCH_MODE) < 0 || $(BENCH_MODE) > 3 )); then \
+		echo "ERROR: dependent streams BENCH_MODE must be in [0,3]"; exit 1; \
+	fi
 .PHONY: check-dependent-config
 check-dependent-config:
 	@if (( ($(STREAMS) != 2 && $(STREAMS) != 3 && $(STREAMS) != 4 && $(STREAMS) != 10) || $(STREAM_NODES) < $(STREAMS) || $(STREAM_NODES) > 1280 || $(STREAM_NODES) % $(STREAMS) != 0 || $(PREFETCH_ELS) < $(STREAMS) )); then \

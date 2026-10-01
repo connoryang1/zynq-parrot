@@ -9,8 +9,8 @@
 #include "bp_prefetch.h"
 #include "mt_seed.h"
 
-#if BP_NUM_THREADS != 2 || BP_NUM_CONTEXTS != 10
-#error "Use NUM_THREADS=2 NUM_CONTEXTS=10 for the fixed FPGA image"
+#if BP_NUM_THREADS < 2 || BP_NUM_THREADS > 4 || BP_NUM_CONTEXTS != 10
+#error "Use two to four resident threads and ten logical contexts"
 #endif
 
 struct node { const volatile struct node *next; uint64_t value, pad[6]; };

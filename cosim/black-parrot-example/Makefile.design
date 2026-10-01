@@ -64,9 +64,13 @@ endif
 # The ten-entry endpoint is above the xc7z020's default-flow packing limit.
 # Keep the accepted four-entry build on the validated defaults and select the
 # tool's named area strategies only for this explicit fit experiment.
-ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_cfg)
+ifneq ($(filter e_bp_unicore_zynqparrot_prefetch10_cfg e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg,$(CFG)),)
 SYNTH_STRATEGY ?= Flow_AreaOptimized_high
 IMPL_STRATEGY ?= Area_Explore
+endif
+
+ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg)
+DEFINES += BP_PREFETCH_FULL_LINE
 endif
 
 include $(COSIM_MK_DIR)/Makefile.master

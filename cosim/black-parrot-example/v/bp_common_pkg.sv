@@ -149,9 +149,23 @@ package bp_common_pkg;
                         ,bp_unicore_zynqparrot_prefetch_cfg_p
                         );
 
+  // Full-line latency-hiding experiment: keep the ten logical contexts and
+  // request slots while making contexts 0..3 resident. The build selector
+  // also enables complete detached-line installation in L1.
+  localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg_override_p =
+    '{num_threads: 4
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+      ,default: "inv"
+      };
+  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg_p
+                        ,bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg_override_p
+                        ,bp_unicore_zynqparrot_prefetch10_cfg_p
+                        );
+
   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =
   {
-    bp_unicore_zynqparrot_prefetch10_cfg_p
+    bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg_p
+    ,bp_unicore_zynqparrot_prefetch10_cfg_p
     ,bp_unicore_zynqparrot_prefetch_cfg_p
     ,bp_multicore_zynqparrot_cfg_p
     ,bp_unicore_zynqparrot_cfg_p
@@ -165,7 +179,8 @@ package bp_common_pkg;
   // This enum MUST be kept up to date with the parameter array above
   typedef enum bit [lg_max_cfgs-1:0]
   {
-    e_bp_unicore_zynqparrot_prefetch10_cfg          = 5
+    e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg = 6
+    ,e_bp_unicore_zynqparrot_prefetch10_cfg         = 5
     ,e_bp_unicore_zynqparrot_prefetch_cfg           = 4
     ,e_bp_multicore_zynqparrot_cfg                  = 3
     ,e_bp_unicore_zynqparrot_cfg                    = 2

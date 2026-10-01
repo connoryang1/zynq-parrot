@@ -109,6 +109,10 @@ exercises nonresident contexts 2/3. `STREAMS=10` uses all ten logical contexts o
 the same two-bank image; select `STREAM_NODES=40` for a short qualification or
 `STREAM_NODES=1280` for the matched full graph. The node count must divide evenly
 among streams, and the prefetch slot count must be at least the stream count.
+The benchmark also accepts `NUM_THREADS=3` or `4` for simulator and synthesis
+experiments that make the first three or four logical contexts resident. Record
+the resident-bank count with every result; the accepted FPGA image remains the
+two-bank topology unless a new routed candidate is explicitly qualified.
 
 ```sh
 make -C testing run-mt_dependent_stream_benchmark \
@@ -184,6 +188,19 @@ repeat either definition in `SIM_DEFINES`. Use
 `PREFETCH_ELS=4` for a capacity-matched comparison with the first routed PYNQ-Z2
 endpoint. The slot count is part of the Verilator model stamp, so a model built
 for another capacity cannot be reused for this experiment.
+
+Set `PREFETCH_FULL_LINE=1` to keep the same nonblocking hint and scheduling
+code while fetching and safely installing a complete cache line in L1 instead
+of returning a 16-byte pointer/value prefix through the specialized D-cache
+side buffer. This is the generic-prefetch ablation for dependent-stream
+measurements; leave it at the default zero for the optimized critical-data
+path. The selector changes the Verilator model and requires a clean rebuild
+when comparing the two configurations.
+For full-top simulation and FPGA implementation, the named
+`e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg` endpoint combines this
+mode with four resident banks, ten logical contexts, ten request slots, and
+the integer-only execution configuration. It is an experimental endpoint
+until routed timing and board validation are recorded.
 Static PYNQ-Z2 configurations now provide a four-slot/four-logical endpoint and
 an exact ten-slot/ten-logical endpoint. The latter routes with two resident banks
 and can run this program. The fixed `97cc0932d` RTL has now passed physical-board
