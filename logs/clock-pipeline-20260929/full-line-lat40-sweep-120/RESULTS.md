@@ -45,3 +45,12 @@ All three directed detached-response protocol cases pass in full-line mode at
 the same 40-cycle setting. The static FPGA candidate is
 `e_bp_unicore_zynqparrot_prefetch10_t4_full_line_cfg`; routed fit and timing are
 required before treating four resident banks as a PYNQ-Z2 result.
+
+The exact four-resident candidate failed PYNQ-Z2 detail placement in job
+`20261001T022140Z-b994f1bf`. Synthesis reported 56,937 slice LUTs against
+53,200 available. After physical LUT combining, 57,993 combined LUTs and
+1,527 control sets required 11,947 slices, while only 11,191 were available.
+The candidate was therefore 756 available slices over the packing limit and
+never reached routing or timing analysis. A three-resident full-line endpoint
+is the next fit experiment because its simulated handoff latency is still two
+cycles and it retains the three-stream 4,455-cycle result.
