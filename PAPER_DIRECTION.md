@@ -17,6 +17,62 @@ The current project implements a subset: cooperative contexts sharing one
 pipeline, with inactive integer state in private SRAM. The paper's broader
 permission, lifecycle, and notification interface remains separate work.
 
+## Linux scheduling decomposition and hardware groups
+
+The October 3 physical measurements separate three costs that must not be
+reported as one context-switch number. A same-address-space Linux handoff takes
+median 5,496--5,595 cycles. A `sched_yield` with no runnable peer already takes
+3,357 cycles, while selecting, switching to, and returning from the peer adds
+about 2,139--2,238 cycles. The same FPGA executes a direct U-mode hardware
+handoff in 5.109 resident or 9.160 nonresident cycles. These direct numbers are
+mechanism throughput under Linux, not Linux scheduler latency.
+
+Cold-cache resume is an additional cost. The current probes measure about
+5,580 cycles beyond a hot resume for the selected data footprint, about 6,610
+for the selected instruction footprint, and about 11,800 when both are cold.
+Prefetching can reduce this refill tail, but it does not remove the thousands of
+instructions executed by the Linux scheduling path. Conversely, replacing the
+scheduler does not by itself make a cold target's cache lines ready.
+
+The implementable paper direction is a hardware-scheduled context group. Linux
+schedules and protects the group as one task. Cooperating software contexts in
+that group share its address space and privilege state, keep their private
+architectural register images in the existing context storage, and publish a
+ready bitmap. A U-mode instruction either names the next ready context or asks
+hardware to select one. Blocking system calls, page faults, signals, accounting,
+debugging, and scheduling between protection groups still enter Linux. The
+first software experiment can implement this as hardware fibers inside one
+Linux process, with a futex fallback only when no local context is runnable.
+
+This first experiment implements only the local scheduling slice of the HotOS
+proposal. The proposal additionally defines runnable, waiting, and disabled
+hardware-thread states; `monitor`/`mwait` wakeup from memory or device writes;
+start/stop and remote-register operations; virtual-to-physical thread mapping;
+and a permission table for cross-thread control. The current CSR interface can
+name and seed cooperating contexts, but it does not yet provide those lifecycle,
+notification, virtualization, or protection semantics. A same-process hardware
+fiber result can validate the performance premise before adding that broader
+OS/ISA contract, but it cannot by itself claim the complete proposal.
+
+This makes the defensible redundancy claim narrower than eliminating every OS
+context switch: frequent cooperative handoffs within one protection group no
+longer require a Linux scheduler round trip. It also gives an explicit
+application model. For useful work `W`, measured Linux overhead `S`, measured
+cold tail `C`, local hardware selection cost `H`, and residual cold tail `R`,
+the comparison is `(W + S + C) / (W + H + R)`.
+
+The matched 192-line post-resume probe shows why component and end-to-end
+speedups differ. Completed replay reduces its application work window from
+8,441 to 1,388.5 cycles, or 6.08x, but the run still pays about 11.37k cycles
+to resume through Linux. The combined interval therefore changes from about
+19.81k to 12.76k cycles, only 1.55x. Combining the replayed application window
+with the separately measured 5.55k hot Linux floor projects about 6.94k cycles,
+or 2.85x. Replacing that floor with a projected 20-cycle local group decision
+would instead give about 1.41k cycles and a 14.1x upper-bound opportunity.
+That last number requires the replay traffic to finish off the critical path;
+the existing probe completes replay before its timestamp and does not establish
+an integrated 14.1x result.
+
 ## Reference benchmark review
 
 [context-switches](https://github.com/connoryang1/context-switches) has a proposal

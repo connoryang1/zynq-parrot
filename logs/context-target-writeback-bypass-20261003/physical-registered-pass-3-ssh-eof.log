@@ -1,0 +1,45 @@
+CONTROL_PROGRAM_SHA256=be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e
+NBF_SHA256=af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3
+LOG=/home/xilinx/bp-logs/linux-shell-interactive-20261003T191753Z-930.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0x4d8ab8 40000004 16 1
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 67108864
+bsg_zynq_pl: allocate_dram() called with size 67108864 bytes --> virtual ptr=0xb2aca000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb2aca000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-2573179
+DEBUG-PS: ps.cpp: 1-2579893
+DEBUG-PS: ps.cpp: 2-2586169
+DEBUG-PS: ps.cpp: 3-2592524
+DEBUG-PS: ps.cpp: 4-2598781
+DEBUG-PS: ps.cpp: 5-2605116
+DEBUG-PS: ps.cpp: 6-2611327
+DEBUG-PS: ps.cpp: 7-2617592
+DEBUG-PS: ps.cpp: 8-2623848
+DEBUG-PS: ps.cpp: 9-2630193
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: Zero-ing DRAM (67108864 bytes)
+INFO:    ps.cpp: zero-d 0 MB
+INFO:    ps.cpp: zero-d 1 MB
+INFO:    ps.cpp: zero-d 2 MB
+INFO:    ps.cpp: zero-d 3 MB
+Connection to 192.168.4.35 closed by remote host.
+Connection to 192.168.4.35 closed.

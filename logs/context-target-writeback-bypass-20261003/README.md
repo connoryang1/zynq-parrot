@@ -55,7 +55,34 @@ The follow-up RTL holds a dependent CSR800 through the producer's live IWB cycle
 | Adjacent load | 3,176 / 12.31 | 4,150 / 16.08 |
 | Adjacent load and CTZ | 3,380 / 13.10 | 4,399 / 17.05 |
 
-Relative to the same-cycle bypass simulation, dependent paths gain exactly one cycle per operation while stable-register switching is unchanged. `mt_ctxtsw_register_target_test`, `mt_ctxtsw_late_wb_hazard_test`, `mt_remote_seed_order_test`, and all 15 harness unit tests also pass. Routed timing and physical acceptance of this follow-up revision remain required. The exact trace records 1,028 registered-bypass assertions, 1,028 target-hazard rises, and 1,548 switch dispatches, proving that every dependent ring operation exercises the registered path.
+Relative to the same-cycle bypass simulation, dependent paths gain exactly one cycle per operation while stable-register switching is unchanged. `mt_ctxtsw_register_target_test`, `mt_ctxtsw_late_wb_hazard_test`, `mt_remote_seed_order_test`, and all 15 harness unit tests also pass. The exact trace records 1,028 registered-bypass assertions, 1,028 target-hazard rises, and 1,548 switch dispatches, proving that every dependent ring operation exercises the registered path.
+
+### Routed and physical acceptance
+
+The registered path is BlackParrot `57302ca5b0ccd03d282a7cab798b9e7fbeb1664f`, built from top `7a38ae96ffa89306cde38fc9f22cf2d856ccaa54` with `e_bp_unicore_zynqparrot_prefetch10_cfg`. Farm job `20261003T182131Z-7a38ae96` finished with zero setup or hold violations:
+
+| Route metric | Registered path | Rejected same-cycle path | Difference |
+| --- | ---: | ---: | ---: |
+| WNS | +0.983 ns | +1.063 ns | -0.080 ns |
+| WHS | +0.020 ns | +0.035 ns | -0.015 ns |
+| Slice LUTs | 50,653 (95.21%) | 50,211 (94.38%) | +442 |
+| Slice registers | 28,384 | 28,492 | -108 |
+| BRAM tiles | 83.5 | 83.5 | 0 |
+| DSPs | 11 | 11 | 0 |
+
+The verified package SHA-256 is `cd499c0cad88fee820f3dcb335ba931869e6aa22d25146aa1c02fc71d4809abc`; its bitstream SHA-256 is `9704dd6e0265654adbca272a08a3aae0830bef1893716c6ce25ed80bf2f55ccf`. `registered-route-summary.txt` and `registered-route-revisions.txt` preserve the collected route record.
+
+The exact no-NOP Linux compact binary, SHA-256 `bb8c9de49e19cb9780400a328b52fe38b9d1b38a85373efffd8a4187707f40c6`, passes all six physical rows on that bitstream. The runner verified the guest hash, `[COMPACT-READY-SELECTION] PASS`, `PROBE_EXIT=0`, `CORE[0] PASS`, and a zero host exit before the guest powered off:
+
+| Target source | Context 1 | Context 2 |
+| --- | ---: | ---: |
+| Stable register | 2,028 cycles / 7.86 per operation | 3,173 / 12.29 |
+| Adjacent load | 3,246 / 12.58 | 4,148 / 16.07 |
+| Adjacent load and CTZ | 3,418 / 13.24 | 4,601 / 17.83 |
+
+The two stable-register rows are unchanged within 0.16 cycle/operation of the rejected image. The next three comparable dependent rows are 0.88, 0.99, and 0.98 cycle/operation slower, matching the registered one-cycle design. The final context-2 bitmap row is 1.69 cycles/operation slower than the one-NOP workaround's 16.14 result. It is one physical sample and should not be interpreted as a second fixed hardware penalty: two fresh-boot replication attempts failed before the benchmark, one at the fixed 240-second Linux startup timeout and one when board-side SSH closed during startup memory clearing. Both rejected attempts are retained, and the board was power-cycled back to a responsive management state afterward.
+
+The physical PASS eliminates the original no-NOP stall and establishes that loaded and computed register targets use the freshly produced value without depending on same-cycle FPGA memory behavior. It does not turn the six-row compact check into a statistical performance benchmark; the simulator remains the cycle-exact evidence for the added dependency stage.
 
 The first nested-repository push command was accidentally issued from the top repository and failed with an unknown refspec before changing either remote. The successful retry used `git -C import/black-parrot push`; future nested pushes must retain that explicit repository selection.
 
