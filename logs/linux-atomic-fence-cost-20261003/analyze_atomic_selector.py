@@ -40,6 +40,36 @@ def analyze(name, physical, label, expected_state, pass_marker):
     return result
 
 
+def analyze_multiready(name, physical, peer):
+    text = (HERE / name).read_text(errors='replace').replace('\r', '')
+    row_pattern = re.compile(
+        r'Atomic multiready sample/peer/cycles/x100-per-op/ok/observed/'
+        r'complete/word/source/ring-sc/peer-sc: '
+        + ' '.join([r'(0x[0-9a-f]+)'] * 11))
+    rows = [[int(value, 16) for value in match.groups()]
+            for match in row_pattern.finditer(text)]
+    steady = [row for row in rows if row[0] > 0]
+    per_op = [row[3] / 100 for row in steady]
+    aggregate = [row[2] for row in steady]
+    expected_word = (1 << peer) | 8
+    return {
+        'parseable_rows': len(rows),
+        'steady_samples': len(steady),
+        'median_cycles_per_operation': statistics.median(per_op),
+        'range_cycles_per_operation': [min(per_op), max(per_op)],
+        'median_aggregate_cycles': statistics.median(aggregate),
+        'range_aggregate_cycles': [min(aggregate), max(aggregate)],
+        'all_rows_correct': all(
+            row[1] == peer
+            and row[4:] == [1, peer, 1, expected_word, 0, 0, 0]
+            for row in rows),
+        'spectator_bit_preserved': all(row[7] & 8 for row in rows),
+        'total_sc_failures': sum(row[9] + row[10] for row in rows),
+        'custom_pass': '[BSG-PASS] atomic multiready selector' in text,
+        'core_pass': ('CORE[0] PASS' if physical else 'CORE PASS') in text,
+    }
+
+
 nonresident = {
     'simulator': analyze('sim-run-accepted.log', False, 'fence',
                          (1, 2, 1, 4, 0),
@@ -63,9 +93,28 @@ atomic_resident = resident['fpga']['modes']['aqrl'][
     'median_cycles_per_operation']
 atomic_nonresident = nonresident['fpga']['modes']['aqrl'][
     'median_cycles_per_operation']
+multiready = {
+    'resident': {
+        'simulator': analyze_multiready(
+            'multiready-resident-sim-run.log', False, 1),
+        'fpga': analyze_multiready(
+            'multiready-resident-physical.log', True, 1),
+    },
+    'nonresident': {
+        'simulator': analyze_multiready(
+            'multiready-nonresident-sim-run.log', False, 2),
+        'fpga': analyze_multiready(
+            'multiready-nonresident-physical.log', True, 2),
+    },
+}
+multiready_resident = multiready['resident']['fpga'][
+    'median_cycles_per_operation']
+multiready_nonresident = multiready['nonresident']['fpga'][
+    'median_cycles_per_operation']
 report = {
     'nonresident': nonresident,
     'resident': resident,
+    'multiready': multiready,
     'expected_fpga_rows': 32,
     'derived_fpga_cycles': {
         'atomic_residency_penalty': round(
@@ -76,6 +125,16 @@ report = {
             atomic_resident - direct['register_resident'], 2),
         'ready_selection_over_direct_nonresident': round(
             atomic_nonresident - direct['register_nonresident'], 2),
+        'multiready_over_mailbox_resident': round(
+            multiready_resident - atomic_resident, 2),
+        'multiready_over_mailbox_nonresident': round(
+            multiready_nonresident - atomic_nonresident, 2),
+        'multiready_over_direct_resident': round(
+            multiready_resident - direct['register_resident'], 2),
+        'multiready_over_direct_nonresident': round(
+            multiready_nonresident - direct['register_nonresident'], 2),
+        'multiready_residency_penalty': round(
+            multiready_nonresident - multiready_resident, 2),
     },
 }
 for kind in ('resident', 'nonresident'):
@@ -83,4 +142,9 @@ for kind in ('resident', 'nonresident'):
     assert fpga['parseable_rows'] == report['expected_fpga_rows']
     assert fpga['custom_pass'] and fpga['core_pass']
     assert all(mode['all_rows_correct'] for mode in fpga['modes'].values())
+    multi = report['multiready'][kind]['fpga']
+    assert multi['parseable_rows'] == 16
+    assert multi['custom_pass'] and multi['core_pass']
+    assert multi['all_rows_correct'] and multi['spectator_bit_preserved']
+    assert multi['total_sc_failures'] == 0
 print(json.dumps(report, indent=2, sort_keys=True))

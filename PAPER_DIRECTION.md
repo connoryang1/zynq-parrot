@@ -45,19 +45,18 @@ first software experiment can implement this as hardware fibers inside one
 Linux process, with a futex fallback only when no local context is runnable.
 
 The ready-bitmap step now has a measured physical mechanism cost rather than
-only a projection. On the exact routed FPGA image, an atomic claim and dynamic
-handoff (`amoswap.d.aqrl; ctz; csrw`) has a steady median of 18.04 cycles per
-operation, versus 18.06 in simulation. A full `fence rw,rw` raises the physical
-median to 19.06 cycles. All 32 samples validate the selected context,
-completion, ready-word transition, and return source before the custom/core
-pass markers and runner exit zero. This supports the 15--25-cycle local
-group-decision budget on hardware. A matched resident-peer run takes 14.06
-cycles, versus 18.04 nonresident. Compared with separately measured 5.125/9.164
-cycle direct register-target handoffs, ready claim and selection add 8.94/8.88
-cycles while nonresident state movement adds 3.98 cycles versus 4.04 in the
-direct control. This supports treating selection and residency as approximately
-additive costs rather than attributing the whole 18-cycle scheduler to context
-movement (`logs/linux-atomic-fence-cost-20261003/`).
+only a projection. A one-ready-peer `amoswap.d.aqrl; ctz; csrw` mailbox takes
+14.06 resident or 18.04 nonresident cycles on the exact routed FPGA image. It
+is useful for 1:1 handoff, but replacing the whole word does not preserve other
+runnable threads. The paper-safe general selector uses LR/SC to clear only the
+lowest selected bit, add the source context, and preserve a third runnable
+spectator. It passes at 17.03 resident and 22.03 nonresident cycles, versus
+17.04/22.05 in simulation, with zero SC retries across all measured samples.
+This remains inside the 15--25-cycle group-decision budget without new
+scheduler hardware. Its 11.91--12.87-cycle overhead above direct dispatch is
+the opportunity for a fused select-and-switch instruction; its five-cycle
+resident/nonresident gap is the opportunity for another resident register bank
+(`logs/linux-atomic-fence-cost-20261003/`).
 
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled

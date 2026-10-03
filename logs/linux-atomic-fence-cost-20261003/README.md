@@ -1,15 +1,18 @@
 # Atomic ready-selector cost
 
-This experiment asks whether a realistic hardware-managed scheduling handoff
-still fits the paper's projected 15--25-cycle fast path.  Each timed operation
-atomically claims a ready-context bitmap, finds the selected context, and
+This experiment asks whether hardware-managed scheduling still fits the
+paper's projected 15--25-cycle fast path. The first sequence atomically
+exchanges one known ready peer with the source context, finds that peer, and
 switches to it:
 
 ```text
 amoswap.d.aqrl -> ctz -> CSR 0x800
 ```
 
-The conservative comparison inserts `fence rw,rw` between the AMO and `ctz`.
+This is a one-ready-peer mailbox. Because `amoswap` replaces the whole word, it
+does not preserve additional runnable bits and is not by itself a general
+ready-bitmap scheduler. The conservative comparison inserts `fence rw,rw`
+between the AMO and `ctz`.
 `sim-disassembly.txt` confirms these are the only instructions that differ in
 the measured loop.
 
@@ -71,7 +74,7 @@ same-address-space handoff, the complete atomic selection mechanism is
 9.16-cycle direct nonresident handoff, which quantifies the ready-word atomic,
 selection, and loop cost instead of assuming that policy is free.
 
-## Resident versus nonresident decomposition
+## One-ready-peer resident versus nonresident decomposition
 
 The same experiment was repeated with context 1, the other resident register
 bank, instead of nonresident context 2. The instruction sequence, 128-round-trip
@@ -92,6 +95,38 @@ ready-word claim and selection cost about 8.9
 cycles regardless of residency, while moving a nonresident context adds about
 4.0 cycles. The FPGA resident result is 14.06 cycles versus 14.05 in simulation;
 the FPGA nonresident result is 18.04 versus 18.06 in simulation.
+
+## General multi-ready selector
+
+A second benchmark uses an LR/SC update that selects the lowest runnable
+context, clears only that target bit, adds the source context, and preserves all
+other runnable bits before switching. Context 3 remains ready as a spectator
+through every handoff, so the final word must be `0xa` for resident peer 1 or
+`0xc` for nonresident peer 2. Each sample also counts SC retries independently
+in the source and peer contexts.
+
+```text
+lr.d.aq -> ctz -> clear selected bit -> add source bit -> sc.d.rl -> CSR 0x800
+```
+
+| Peer state | FPGA cycles/handoff | FPGA range | Simulator | Over mailbox | Over direct switch |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Resident | 17.03 | 17.03--17.06 | 17.04 | 2.97 | 11.91 |
+| Nonresident | 22.03 | 22.03--22.06 | 22.05 | 3.99 | 12.87 |
+
+Both physical NBFs produce all 16 rows, preserve the spectator bit in every
+row, observe the requested peer and return source, record zero SC retries, and
+finish with the custom pass marker, `CORE[0] PASS`, and runner exit zero. This
+is the paper-safe general-group result. It stays within the projected 25-cycle
+budget without new scheduler hardware. At 18 MHz it takes about 0.946
+microseconds resident or 1.224 microseconds nonresident. The latter is still
+249--254 times smaller than the measured Linux same-address-space handoff.
+
+The zero-retry result covers the intended uncontended single-pipeline handoff.
+It does not measure interference from another core writing the same ready word.
+A fused select-and-switch instruction could target the measured 11.9--12.9
+cycles above direct dispatch, while a third resident register bank would remove
+about five cycles from the general nonresident path.
 
 For an ordinary coherent ready word, the AMO's acquire/release ordering is the
 relevant publication and claim primitive.  This result does not justify
@@ -132,8 +167,15 @@ efae3a82b6edefc049e65f2c71e7744435e927415d496d7907d299cc37938cc0  physical-disas
 14043100ca59a5873f88f723a01fcb44ac4e88f1b1805cad933aa81558be5f4e  mt_atomic_resident_selector_benchmark_fpga.riscv
 9cbcf311e8e3b91dfcdc396ee20b2e1e938e8c61420d506ca7fe31e5dda3dd37  mt_atomic_resident_selector_benchmark_fpga.nbf
 cb9d3124a86cca832762196da4f3997de4603e53f2f5748fdbc927084452b33b  resident-physical.log
-72b25e7732569884c3802b281fa4732b0320b932c2512e08b1a3cf180aa6174f  analyze_atomic_selector.py
-bffc7ac870f48941c8acdd4ad7a5b3c5d8df98484eb784f25532d5ed68fb852c  analysis.json
+dd30d203b8c7d85506265e751b6a77f8b231bd1e24b4210622c2098e4d8c8b36  mt_atomic_multiready_selector_benchmark.c
+2e8fbe15948284c3a77d0252fcb664cf26eb46e1f93c076d4040423d1c7ce18a  mt_atomic_multiready_resident_benchmark_fpga.riscv
+99ccc25c57c7d5b5728018a548ae0daff6f29af89f7aecbff8172b6e7ac6cbf0  mt_atomic_multiready_resident_benchmark_fpga.nbf
+0581a8cbcc07d16d95f53fa15695936b04c20757b02f6b211c725bb3e92db1ab  mt_atomic_multiready_nonresident_benchmark_fpga.riscv
+1dd073113f4671d22435450e20a2732897156903264a71e41c1f8cceff10c3fd  mt_atomic_multiready_nonresident_benchmark_fpga.nbf
+84c824187fd19ad7fc947137ab2fc6529cc745f56cb22677c47d9668283fbdd7  multiready-resident-physical.log
+f6c3e37e79b7e364e67a475afcdde00f7319ce581f4fb1854ef076b287d4f2db  multiready-nonresident-physical.log
+2dbe40ff79756e8d9322c91e70f8cb9e6e4c2655c423e9e659f60767f0516d32  analyze_atomic_selector.py
+ba5f320f421796e6d53a3f9e4d69459b3b0ec568d89dc44f0d82b05f9aa74551  analysis.json
 ee40d2b976beb6f63c3c2b10c4051d577a7e4fd3828468240277d5126bd2c9a1  atomic_fence_cost
 bbd804800b68125cb7abf1996cfd4a217f5528cc26ecad3930bb255b9719061c  atomic_fence_cost.c
 ```

@@ -2,10 +2,97 @@
   "derived_fpga_cycles": {
     "atomic_residency_penalty": 3.98,
     "direct_register_residency_penalty": 4.04,
+    "multiready_over_direct_nonresident": 12.87,
+    "multiready_over_direct_resident": 11.91,
+    "multiready_over_mailbox_nonresident": 3.99,
+    "multiready_over_mailbox_resident": 2.97,
+    "multiready_residency_penalty": 5.0,
     "ready_selection_over_direct_nonresident": 8.88,
     "ready_selection_over_direct_resident": 8.94
   },
   "expected_fpga_rows": 32,
+  "multiready": {
+    "nonresident": {
+      "fpga": {
+        "all_rows_correct": true,
+        "core_pass": true,
+        "custom_pass": true,
+        "median_aggregate_cycles": 5685,
+        "median_cycles_per_operation": 22.03,
+        "parseable_rows": 16,
+        "range_aggregate_cycles": [
+          5685,
+          5692
+        ],
+        "range_cycles_per_operation": [
+          22.03,
+          22.06
+        ],
+        "spectator_bit_preserved": true,
+        "steady_samples": 15,
+        "total_sc_failures": 0
+      },
+      "simulator": {
+        "all_rows_correct": true,
+        "core_pass": true,
+        "custom_pass": true,
+        "median_aggregate_cycles": 5689.0,
+        "median_cycles_per_operation": 22.05,
+        "parseable_rows": 13,
+        "range_aggregate_cycles": [
+          5689,
+          5708
+        ],
+        "range_cycles_per_operation": [
+          22.05,
+          22.12
+        ],
+        "spectator_bit_preserved": true,
+        "steady_samples": 12,
+        "total_sc_failures": 0
+      }
+    },
+    "resident": {
+      "fpga": {
+        "all_rows_correct": true,
+        "core_pass": true,
+        "custom_pass": true,
+        "median_aggregate_cycles": 4395,
+        "median_cycles_per_operation": 17.03,
+        "parseable_rows": 16,
+        "range_aggregate_cycles": [
+          4395,
+          4403
+        ],
+        "range_cycles_per_operation": [
+          17.03,
+          17.06
+        ],
+        "spectator_bit_preserved": true,
+        "steady_samples": 15,
+        "total_sc_failures": 0
+      },
+      "simulator": {
+        "all_rows_correct": true,
+        "core_pass": true,
+        "custom_pass": true,
+        "median_aggregate_cycles": 4398.0,
+        "median_cycles_per_operation": 17.04,
+        "parseable_rows": 13,
+        "range_aggregate_cycles": [
+          4398,
+          4419
+        ],
+        "range_cycles_per_operation": [
+          17.04,
+          17.12
+        ],
+        "spectator_bit_preserved": true,
+        "steady_samples": 12,
+        "total_sc_failures": 0
+      }
+    }
+  },
   "nonresident": {
     "fpga": {
       "core_pass": true,
