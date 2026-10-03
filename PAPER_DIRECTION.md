@@ -86,10 +86,19 @@ Six cold-displaced launches of 256 requests per resident context all pass. The
 closed trace records 3,072 hints, 6,144 returned 8-byte beats, 3,072 useful
 side-buffer hits, zero UCE drops, and zero residual side-buffer or UCE valid
 entries at every launch boundary. Epochs five and six are therefore clean in
-the physical-address core model. The physical Linux stall now requires a
-condition absent from that model, such as U-mode Sv39 state or the full L2/DDR
-path; repeated translated handoff is the next isolating experiment
+the physical-address core model. This made repeated translated handoff the next
+isolating experiment
 (`logs/prefetch-handoff-lifecycle-20261003/`).
+
+The translated follow-up also passes six launches with explicit 4 KiB mappings
+for eight request and sixteen displacement pages. Each epoch executes 512
+logical hints, but only 334 (65.23%) produce a detached completion and useful
+side-buffer hit under DTLB/cache pressure. Translation-stage retry counts and
+miss attempts stabilize after the first epoch; UCE drops remain zero, maximum
+detached occupancy is one, and all side-buffer/UCE state drains between every
+launch. Sv39 alone is therefore not the physical stall trigger. The remaining
+isolating target is the full L2/memory path and then the physical DDR/Linux
+environment (`logs/umode-prefetch-handoff-lifecycle-20261003/`).
 
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled

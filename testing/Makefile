@@ -61,6 +61,7 @@ CORRECTNESS_TESTS := \
     mt_prefetch_hint_test \
     mt_prefetch_queue_depth_test \
     mt_prefetch_handoff_lifecycle_test \
+    mt_umode_prefetch_handoff_lifecycle_test \
     mt_prefetch_dirty_victim_test \
     mt_prefetch_protocol_test \
     mt_umode_resident_sv39_data_handoff_test \
@@ -88,7 +89,7 @@ NONRESIDENT_TESTS := \
     mt_umode_nonresident_sv39_data_handoff_test
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
-DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_dependent_stream_benchmark mt_prefetch_handoff_lifecycle_test mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
+DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_dependent_stream_benchmark mt_prefetch_handoff_lifecycle_test mt_umode_prefetch_handoff_lifecycle_test mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
 
 .PHONY: all clean build-sim rebuild-sim help check-harness FORCE $(addprefix run-, $(TESTS))
 
@@ -100,6 +101,7 @@ all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(DEFAULT_TOPOLO
 	@$(MAKE) $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv \
+		$(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv \
 		NUM_THREADS=2 NUM_CONTEXTS=10
@@ -141,6 +143,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/software/in
 $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/testing/dependent_stream_data.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
 
 .PHONY: check-nonresident-config
@@ -174,6 +177,7 @@ run-mt_request_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_interleave_benchmark: check-nonresident-config
 run-mt_prefetch_nonresident_interleave_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_prefetch_handoff_lifecycle_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_umode_prefetch_handoff_lifecycle_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_ddr_latency_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_dependent_stream_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_dependent_stream_benchmark: RUN_INPUT = $(shell echo $$(( $(BENCH_MODE) | ($(STREAMS) << 8) | ($(STREAM_NODES) << 16) )))
@@ -210,6 +214,7 @@ check-prefetch-protocol-config: check-prefetch-victim-config
 	fi
 run-mt_prefetch_dirty_victim_test run-mt_prefetch_protocol_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_prefetch_handoff_lifecycle_test: check-ten-logical-config
+run-mt_umode_prefetch_handoff_lifecycle_test: check-ten-logical-config
 run-mt_prefetch_dirty_victim_test: check-prefetch-victim-config
 run-mt_prefetch_protocol_test: check-prefetch-protocol-config
 run-mt_prefetch_protocol_test: RUN_INPUT = $(PROTOCOL_CASE)
