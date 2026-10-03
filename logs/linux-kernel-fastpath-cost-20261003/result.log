@@ -1,0 +1,14 @@
+LINUX_KERNEL_FASTPATH_COST samples=512 warmups=64
+RESULT path=empty metric=cycles samples=512 min=8 p25=8 median_x2=16 p75=8 p95=8 p99=8 max=8
+RESULT path=empty metric=instructions samples=512 min=5 p25=5 median_x2=10 p75=5 p95=5 p99=5 max=5
+RESULT path=gettid metric=cycles samples=512 min=616 p25=616 median_x2=1240 p75=620 p95=636 p99=702 max=1104
+RESULT path=gettid metric=instructions samples=512 min=249 p25=249 median_x2=498 p75=249 p95=249 p99=249 max=249
+RESULT path=futex_wake_no_waiter metric=cycles samples=512 min=980 p25=994 median_x2=2018 p75=1009 p95=1009 p99=1054 max=1364
+RESULT path=futex_wake_no_waiter metric=instructions samples=512 min=495 p25=495 median_x2=990 p75=495 p95=495 p99=495 max=495
+RESULT path=futex_wait_mismatch metric=cycles samples=512 min=1743 p25=1745 median_x2=3522 p75=1768 p95=1796 p99=2162 max=59378
+RESULT path=futex_wait_mismatch metric=instructions samples=512 min=800 p25=800 median_x2=1600 p75=800 p95=800 p99=800 max=15464
+RESULT path=sched_yield_no_peer metric=cycles samples=512 min=3444 p25=3455 median_x2=6946 p75=3478 p95=3561 p99=5705 max=65045
+RESULT path=sched_yield_no_peer metric=instructions samples=512 min=1505 p25=1505 median_x2=3010 p75=1505 p95=1512 p99=1512 max=18197
+[LINUX-KERNEL-FASTPATH-COST] PASS
+PROBE_EXIT=0
+INFO:    CORE[0] PASS
