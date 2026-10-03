@@ -1,0 +1,405 @@
+CONTROL_PROGRAM_SHA256=be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e
+NBF_SHA256=af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3
+LOG=/home/xilinx/bp-logs/linux-shell-interactive-20261003T175713Z-1623.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0x4c9ab8 40000004 16 1
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 67108864
+bsg_zynq_pl: allocate_dram() called with size 67108864 bytes --> virtual ptr=0xb2b33000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb2b33000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1930765
+DEBUG-PS: ps.cpp: 1-1930951
+DEBUG-PS: ps.cpp: 2-1931119
+DEBUG-PS: ps.cpp: 3-1931291
+DEBUG-PS: ps.cpp: 4-1931453
+DEBUG-PS: ps.cpp: 5-1931618
+DEBUG-PS: ps.cpp: 6-1931778
+DEBUG-PS: ps.cpp: 7-1931934
+DEBUG-PS: ps.cpp: 8-1932096
+DEBUG-PS: ps.cpp: 9-1932255
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: Zero-ing DRAM (67108864 bytes)
+INFO:    ps.cpp: zero-d 0 MB
+INFO:    ps.cpp: zero-d 1 MB
+INFO:    ps.cpp: zero-d 2 MB
+INFO:    ps.cpp: zero-d 3 MB
+INFO:    ps.cpp: zero-d 4 MB
+INFO:    ps.cpp: zero-d 5 MB
+INFO:    ps.cpp: zero-d 6 MB
+INFO:    ps.cpp: zero-d 7 MB
+INFO:    ps.cpp: zero-d 8 MB
+INFO:    ps.cpp: zero-d 9 MB
+INFO:    ps.cpp: zero-d 10 MB
+INFO:    ps.cpp: zero-d 11 MB
+INFO:    ps.cpp: zero-d 12 MB
+INFO:    ps.cpp: zero-d 13 MB
+INFO:    ps.cpp: zero-d 14 MB
+INFO:    ps.cpp: zero-d 15 MB
+INFO:    ps.cpp: zero-d 16 MB
+INFO:    ps.cpp: zero-d 17 MB
+INFO:    ps.cpp: zero-d 18 MB
+INFO:    ps.cpp: zero-d 19 MB
+INFO:    ps.cpp: zero-d 20 MB
+INFO:    ps.cpp: zero-d 21 MB
+INFO:    ps.cpp: zero-d 22 MB
+INFO:    ps.cpp: zero-d 23 MB
+INFO:    ps.cpp: zero-d 24 MB
+INFO:    ps.cpp: zero-d 25 MB
+INFO:    ps.cpp: zero-d 26 MB
+INFO:    ps.cpp: zero-d 27 MB
+INFO:    ps.cpp: zero-d 28 MB
+INFO:    ps.cpp: zero-d 29 MB
+INFO:    ps.cpp: zero-d 30 MB
+INFO:    ps.cpp: zero-d 31 MB
+INFO:    ps.cpp: zero-d 32 MB
+INFO:    ps.cpp: zero-d 33 MB
+INFO:    ps.cpp: zero-d 34 MB
+INFO:    ps.cpp: zero-d 35 MB
+INFO:    ps.cpp: zero-d 36 MB
+INFO:    ps.cpp: zero-d 37 MB
+INFO:    ps.cpp: zero-d 38 MB
+INFO:    ps.cpp: zero-d 39 MB
+INFO:    ps.cpp: zero-d 40 MB
+INFO:    ps.cpp: zero-d 41 MB
+INFO:    ps.cpp: zero-d 42 MB
+INFO:    ps.cpp: zero-d 43 MB
+INFO:    ps.cpp: zero-d 44 MB
+INFO:    ps.cpp: zero-d 45 MB
+INFO:    ps.cpp: zero-d 46 MB
+INFO:    ps.cpp: zero-d 47 MB
+INFO:    ps.cpp: zero-d 48 MB
+INFO:    ps.cpp: zero-d 49 MB
+INFO:    ps.cpp: zero-d 50 MB
+INFO:    ps.cpp: zero-d 51 MB
+INFO:    ps.cpp: zero-d 52 MB
+INFO:    ps.cpp: zero-d 53 MB
+INFO:    ps.cpp: zero-d 54 MB
+INFO:    ps.cpp: zero-d 55 MB
+INFO:    ps.cpp: zero-d 56 MB
+INFO:    ps.cpp: zero-d 57 MB
+INFO:    ps.cpp: zero-d 58 MB
+INFO:    ps.cpp: zero-d 59 MB
+INFO:    ps.cpp: zero-d 60 MB
+INFO:    ps.cpp: zero-d 61 MB
+INFO:    ps.cpp: zero-d 62 MB
+INFO:    ps.cpp: zero-d 63 MB
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878498
+DEBUG-PS: ps.cpp: finished loading 1878498 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+INFO:    ps.cpp: Starting scan thread
+INFO:    ps.cpp: Starting i/o polling thread
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 50000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+[    0.000013] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
+[    0.001031] Console: colour dummy device 80x25
+[    0.001160] printk: console [hvc0] enabled
+[    0.017026] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
+[    0.017633] pid_max: default: 32768 minimum: 301
+[    0.019259] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.019771] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.043718] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.045508] riscv: ELF compat mode unsupported
+[    0.046138] ASID allocator using 16 bits (65536 entries)
+[    0.048345] rcu: Hierarchical SRCU implementation.
+[    0.048661] rcu: 	Max phase no-delay instances is 1000.
+[    0.052438] EFI services will not be available.
+[    0.054830] smp: Bringing up secondary CPUs ...
+[    0.055227] smp: Brought up 1 node, 1 CPU
+[    0.059676] devtmpfs: initialized
+[    0.073070] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.073685] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.083379] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.088035] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.088737] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.128379] cpu0: Ratio of byte access time to unaligned word access is 0.01, unaligned accesses are slow
+[    0.153452] SCSI subsystem initialized
+[    0.155875] libata version 3.00 loaded.
+[    0.158401] usbcore: registered new interface driver usbfs
+[    0.159122] usbcore: registered new interface driver hub
+[    0.159799] usbcore: registered new device driver usb
+[    0.171771] vgaarb: loaded
+[    0.172953] clocksource: Switched to clocksource riscv_clocksource
+[    0.298016] NET: Registered PF_INET protocol family
+[    0.300091] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.306779] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    0.307410] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.307899] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.308405] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    0.309640] TCP: Hash tables configured (established 512 bind 512)
+[    0.310966] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.311898] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.314206] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.321489] RPC: Registered named UNIX socket transport module.
+[    0.321867] RPC: Registered udp transport module.
+[    0.322135] RPC: Registered tcp transport module.
+[    0.322402] RPC: Registered tcp-with-tls transport module.
+[    0.322701] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.323075] PCI: CLS 0 bytes, default 64
+[    0.338327] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    0.357116] NFS: Registering the id_resolver key type
+[    0.357833] Key type id_resolver registered
+[    0.358104] Key type id_legacy registered
+[    0.358651] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    0.359046] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    0.369386] 9p: Installing v9fs 9p2000 file system support
+[    0.371853] NET: Registered PF_ALG protocol family
+[    0.372671] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    0.373328] io scheduler mq-deadline registered
+[    0.373627] io scheduler kyber registered
+[    1.945563] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    1.987098] [drm] radeon kernel modesetting enabled.
+[    2.134799] loop: module loaded
+[    2.155123] e1000e: Intel(R) PRO/1000 Network Driver
+[    2.155436] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    2.190016] usbcore: registered new interface driver uas
+[    2.190724] usbcore: registered new interface driver usb-storage
+[    2.193575] mousedev: PS/2 mouse device common for all mice
+[    2.197680] sdhci: Secure Digital Host Controller Interface driver
+[    2.198044] sdhci: Copyright(c) Pierre Ossman
+[    2.198595] sdhci-pltfm: SDHCI platform and OF driver helper
+[    2.201082] usbcore: registered new interface driver usbhid
+[    2.201438] usbhid: USB HID core driver
+[    2.204405] NET: Registered PF_INET6 protocol family
+[    2.235141] Segment Routing with IPv6
+[    2.236084] In-situ OAM (IOAM) with IPv6
+[    2.237334] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[    2.244305] NET: Registered PF_PACKET protocol family
+[    2.245759] 9pnet: Installing 9P2000 support
+[    2.247098] Key type dns_resolver registered
+[    2.248010] start plist test
+[    2.288215] end plist test
+[    2.509001] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[    2.582691] clk: Disabling unused clocks
+[    3.530173] Freeing unused kernel image (initmem) memory: 5100K
+[    3.530741] Run /bin/sh as init process
+[    3.530989]   with arguments:
+[    3.531176]     /bin/sh
+[    3.531349]   with environment:
+[    3.531544]     HOME=/
+[    3.531713]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # : > /tmp/probe.b64
+: > /tmp/probe.b64
+~ # echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAATgQBAAAAAABAAAAAAAAAAPANAAAAAAAABQAAAEAAOAAEAEAACgAJAAMAAHAEAAAA4gcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAC0BwAAAAAAALQHAAAAAAAAABAAAAAAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAFHldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAg0cFAKqFAUaZxwUGs4fFAIPHBwD9+wVFkwgABHMAAACCgHlxBvQjDgEA0UcpRqVIM3fFAv03k5YHAoGSk4UGAjOIJQCqhRsHBwMjBOj+M1XFAuPvuPw8ADOF1wCXAAAA54BA+qJwRWGCgAEAEwAAAJMOAACTAgAIc5AOgJOC8v/jnAL+FxMAABMDw+1zLgCAIzDDARcTAAATA8PwEw4QACMwwwEPADADcxAAgG8AAACXEwAAk4MD55MCAAiDvgMAc5AOgJOC8v/jmgL+FxMAABMDQ+lzLgCAIzDDARcTAAATA0PsEw4QACMwwwEPADADcxAAgG8AAACXEwAAk4OD4pMCAAiDvgMAk54eYHOQDoCTgvL/45gC/hcTAAATA4Pk' >> /tmp/probe.b64
+echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAATgQBAAAAAABAAAAAAAAAAPANAAAAAAAABQAAAE
+AAOAAEAEAACgAJAAMAAHAEAAAA4gcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
+EAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAC0BwAAAAAAALQHAAAAAAAAABAAAA
+AAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAF
+HldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAg0cFAK
+qFAUaZxwUGs4fFAIPHBwD9+wVFkwgABHMAAACCgHlxBvQjDgEA0UcpRqVIM3fFAv03k5YHAoGSk4UGAj
+OIJQCqhRsHBwMjBOj+M1XFAuPvuPw8ADOF1wCXAAAA54BA+qJwRWGCgAEAEwAAAJMOAACTAgAIc5AOgJ
+OC8v/jnAL+FxMAABMDw+1zLgCAIzDDARcTAAATA8PwEw4QACMwwwEPADADcxAAgG8AAACXEwAAk4MD55
+MCAAiDvgMAc5AOgJOC8v/jmgL+FxMAABMDQ+lzLgCAIzDDARcTAAATA0PsEw4QACMwwwEPADADcxAAgG
+8AAACXEwAAk4OD4pMCAAiDvgMAk54eYHOQDoCTgvL/45gC/hcTAAATA4Pk' >> /tmp/probe.b64
+~ # echo 'cy4AgCMwwwEXEwAAEwOD5xMOEAAjMMMBDwAwA3MQAIBvAAAAEwAAAJMOEACTAgAIc5AOgJOC8v/jnAL+goABAJMOIACTAgAIc5AOgJOC8v/jnAL+goABAJcTAACTg4PWkwIACIO+AwBzkA6Ak4Ly/+OaAv6CgAEAlxMAAJODg9STAgAIg74DAJOeHmBzkA6Ak4Ly/+OYAv6CgHlxFxgAACMy6NJ9VxcYAAAjPfjUIvCTV5cBSuhO5Ab0JuxS4BcZAAATCSnQ/Y4jMOkIk5d1Ai6EqonVjxcXAAAjNQfac5AXgA8AMANzKgDMApZzEASA8yQAzBcFAAATBUUnlwAAAOeAQN5OhZcAAADngKDdFwUAABMFJSuXAAAA54Cg3CKFlwAAAOeAIN4XBQAAEwWFKZcAAADngADbAzUJCJcAAADngGDcFwUAABMFxSeXAAAA54BA2QM1CQyXAAAA54Cg2hcFAAATBQUmlwAAAOeAgNdzJQCAlwAAAOeA4NgXBQAAEwVFJJcAAADngMDVs4REQSaFlwAAAOeAANcXBQAAEwVlIpcAAADngODTkwdABrOE9AITBSAQM9WkApcAAADngIDUFwUAABMFZSCXAAAA54Bg0YM3CQgBRWOKhwCicAJ04mRCaaJpAmpFYYKAAzcJDIVHAUXjFPf+cyUAgBM1FQDxv4FFAUaTCNAFcwAAAHlxBvTzJwCAIvAm7EroTuRS4JHHCUWXAAAA54Dg/YFHBUeXBgAAk4YG0hcGAAATBgbf' >> /tmp/probe.b64
+echo 'cy4AgCMwwwEXEwAAEwOD5xMOEAAjMMMBDwAwA3MQAIBvAAAAEwAAAJMOEACTAgAIc5AOgJ
+OC8v/jnAL+goABAJMOIACTAgAIc5AOgJOC8v/jnAL+goABAJcTAACTg4PWkwIACIO+AwBzkA6Ak4Ly/+
+OaAv6CgAEAlxMAAJODg9STAgAIg74DAJOeHmBzkA6Ak4Ly/+OYAv6CgHlxFxgAACMy6NJ9VxcYAAAjPf
+jUIvCTV5cBSuhO5Ab0JuxS4BcZAAATCSnQ/Y4jMOkIk5d1Ai6EqonVjxcXAAAjNQfac5AXgA8AMANzKg
+DMApZzEASA8yQAzBcFAAATBUUnlwAAAOeAQN5OhZcAAADngKDdFwUAABMFJSuXAAAA54Cg3CKFlwAAAO
+eAIN4XBQAAEwWFKZcAAADngADbAzUJCJcAAADngGDcFwUAABMFxSeXAAAA54BA2QM1CQyXAAAA54Cg2h
+cFAAATBQUmlwAAAOeAgNdzJQCAlwAAAOeA4NgXBQAAEwVFJJcAAADngMDVs4REQSaFlwAAAOeAANcXBQ
+AAEwVlIpcAAADngODTkwdABrOE9AITBSAQM9WkApcAAADngIDUFwUAABMFZSCXAAAA54Bg0YM3CQgBRW
+OKhwCicAJ04mRCaaJpAmpFYYKAAzcJDIVHAUXjFPf+cyUAgBM1FQDxv4FFAUaTCNAFcwAAAHlxBvTzJw
+CAIvAm7EroTuRS4JHHCUWXAAAA54Dg/YFHBUeXBgAAk4YG0hcGAAATBgbf' >> /tmp/probe.b64
+~ # echo 'hUUXBQAAEwXlGJcAAADngADlKoqBRwlHlwYAAJOGhs8XBgAAEwYG3olFFwUAABMFZRaXAAAA54CA4qqJgUcFR5cGAACThgbRFwYAABMGBt2FRRcFAAATBeUUlwAAAOeAAOAqiYFHCUeXBgAAk4aGzhcGAAATBobaiUUXBQAAEwVlEpcAAADngIDdqoSFRwlHlwYAAJOGhtAXBgAAEwYG2oVFFwUAABMFZRCXAAAA54AA2yqEhUcRR5cGAACThgbOFwYAABMGhteJRRcFAAATBeUNlwAAAOeAgNgzeqoAs/lJATN5OQGz9CQBZYwFiBHsFwUAABMFBQyXAAAA54CAugVFlwAAAOeAAOwXBQAAEwVlDJcAAADngOC4AUWXAAAA54Bg6hMAAABDT01QQUNUX1JFQURZIG5hbWUvdGFyZ2V0L29ic2VydmVkL2NvbXBsZXRlL3NvdXJjZS9jeWNsZXMvY3ljbGVzX3gxMDBfcGVyX3N3aXRjaDogAAAAAAAAIAAAAAAAAAAKAAAAAAAAAHJlZ2lzdGVyAAAAAAAAAABsb2FkZWQAAGJpdG1hcAAAW0NPTVBBQ1QtUkVBRFktU0VMRUNUSU9OXSBGQUlMCgBbQ09NUEFDVC1SRUFEWS1TRUxFQ1RJT05dIFBBU1MKABAAAAAAAAAAA3pSAAF8AQEbDQIAEAAAABgAAACU+v//IgAAAAAAAAAcAAAALAAAAKL6//9IAAAAAEIOMEKBAgJAwUIOAAAAABAAAABMAAAA' >> /tmp/probe.b64
+echo 'hUUXBQAAEwXlGJcAAADngADlKoqBRwlHlwYAAJOGhs8XBgAAEwYG3olFFwUAABMFZRaXAA
+AA54CA4qqJgUcFR5cGAACThgbRFwYAABMGBt2FRRcFAAATBeUUlwAAAOeAAOAqiYFHCUeXBgAAk4aGzh
+cGAAATBobaiUUXBQAAEwVlEpcAAADngIDdqoSFRwlHlwYAAJOGhtAXBgAAEwYG2oVFFwUAABMFZRCXAA
+AA54AA2yqEhUcRR5cGAACThgbOFwYAABMGhteJRRcFAAATBeUNlwAAAOeAgNgzeqoAs/lJATN5OQGz9C
+QBZYwFiBHsFwUAABMFBQyXAAAA54CAugVFlwAAAOeAAOwXBQAAEwVlDJcAAADngOC4AUWXAAAA54Bg6h
+MAAABDT01QQUNUX1JFQURZIG5hbWUvdGFyZ2V0L29ic2VydmVkL2NvbXBsZXRlL3NvdXJjZS9jeWNsZX
+MvY3ljbGVzX3gxMDBfcGVyX3N3aXRjaDogAAAAAAAAIAAAAAAAAAAKAAAAAAAAAHJlZ2lzdGVyAAAAAA
+AAAABsb2FkZWQAAGJpdG1hcAAAW0NPTVBBQ1QtUkVBRFktU0VMRUNUSU9OXSBGQUlMCgBbQ09NUEFDVC
+1SRUFEWS1TRUxFQ1RJT05dIFBBU1MKABAAAAAAAAAAA3pSAAF8AQEbDQIAEAAAABgAAACU+v//IgAAAA
+AAAAAcAAAALAAAAKL6//9IAAAAAEIOMEKBAgJAwUIOAAAAABAAAABMAAAA' >> /tmp/probe.b64
+~ # echo '0Pr//0AAAAAAAAAAEAAAAGAAAAD8+v//SAAAAAAAAAAQAAAAdAAAADD7//9MAAAAAAAAABAAAACIAAAAbPv//xYAAAAAAAAAEAAAAJwAAABw+///FgAAAAAAAAAQAAAAsAAAAHT7//8eAAAAAAAAABAAAADEAAAAgPv//yIAAAAAAAAANAAAANgAAACO+///aAEAAABCDjBiiASSCJMKgQKJBpQMAyABCsFCyELJQtJC00LUQg4AQgsAAAAQAAAAEAEAAL78//8MAAAAAAAAACAAAAAkAQAAtvz//1YBAAAAQg4wUIECiASJBpIIkwqUDAAAAEdDQzogKEJ1aWxkcm9vdCAyMDIxLjExLTg1NDctZzdlNjVhMWEpIDEzLjIuMABBXQAAAHJpc2N2AAFTAAAABBAFcnY2NGkycDFfbTJwMF9hMnAxX2YycDJfZDJwMl9jMnAwX3ppY3NyMnAwX3ppZmVuY2VpMnAwX3ptbXVsMXAwX3piYjFwMAAIAQoLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAQAgAQEAAAAAAAAAAAAAAAAAAAAAAAMAAgCoBQEAAAAAAAAAAAAAAAAAAAAAAAMAAwBwBgEAAAAAAAAAAAAAAAAAAAAAAAMABAAAEAEAAAAAAAAAAAAAAAAAAAAAAAMABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAMABgAAAAAAAAAAAAAAAAAAAAAAAQAAAAQA8f8AAAAAAAAAAAAAAAAAAAAA' >> /tmp/probe.b64
+echo '0Pr//0AAAAAAAAAAEAAAAGAAAAD8+v//SAAAAAAAAAAQAAAAdAAAADD7//9MAAAAAAAAAB
+AAAACIAAAAbPv//xYAAAAAAAAAEAAAAJwAAABw+///FgAAAAAAAAAQAAAAsAAAAHT7//8eAAAAAAAAAB
+AAAADEAAAAgPv//yIAAAAAAAAANAAAANgAAACO+///aAEAAABCDjBiiASSCJMKgQKJBpQMAyABCsFCyE
+LJQtJC00LUQg4AQgsAAAAQAAAAEAEAAL78//8MAAAAAAAAACAAAAAkAQAAtvz//1YBAAAAQg4wUIECiA
+SJBpIIkwqUDAAAAEdDQzogKEJ1aWxkcm9vdCAyMDIxLjExLTg1NDctZzdlNjVhMWEpIDEzLjIuMABBXQ
+AAAHJpc2N2AAFTAAAABBAFcnY2NGkycDFfbTJwMF9hMnAxX2YycDJfZDJwMl9jMnAwX3ppY3NyMnAwX3
+ppZmVuY2VpMnAwX3ptbXVsMXAwX3piYjFwMAAIAQoLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+MAAQAgAQEAAAAAAAAAAAAAAAAAAAAAAAMAAgCoBQEAAAAAAAAAAAAAAAAAAAAAAAMAAwBwBgEAAAAAAA
+AAAAAAAAAAAAAAAAMABAAAEAEAAAAAAAAAAAAAAAAAAAAAAAMABQAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+MABgAAAAAAAAAAAAAAAAAAAAAAAQAAAAQA8f8AAAAAAAAAAAAAAAAAAAAA' >> /tmp/probe.b64
+~ # echo 'GwAAAAIAAQAgAQEAAAAAACIAAAAAAAAAHwAAAAAAAQAgAQEAAAAAAAAAAAAAAAAAaAAAAAIAAQBCAQEAAAAAAEgAAAAAAAAAbwAAAAIAAQCQAQEAAAAAAEAAAAAAAAAAfQAAAAAAAQCQAQEAAAAAAAAAAAAAAAAAwQAAAAEABACAEAEAAAAAAAgAAAAAAAAAygAAAAEABADAEAEAAAAAAAgAAAAAAAAA0wAAAAIAAQDQAQEAAAAAAEgAAAAAAAAA3wAAAAEABABAEAEAAAAAAAgAAAAAAAAA6QAAAAIAAQAYAgEAAAAAAEwAAAAAAAAA9QAAAAIAAQBoAgEAAAAAABYAAAAAAAAAHwAAAAAAAQB8AgEAAAAAAAAAAAAAAAAABQEAAAIAAQCAAgEAAAAAABYAAAAAAAAAfQAAAAAAAQCAAgEAAAAAAAAAAAAAAAAAHwAAAAAAAQCUAgEAAAAAAAAAAAAAAAAAFQEAAAIAAQCYAgEAAAAAAB4AAAAAAAAAfQAAAAAAAQCYAgEAAAAAAAAAAAAAAAAAIQEAAAEABAAAEAEAAAAAAAgAAAAAAAAAHwAAAAAAAQC0AgEAAAAAAAAAAAAAAAAALQEAAAIAAQC4AgEAAAAAACIAAAAAAAAAfQAAAAAAAQC4AgEAAAAAAAAAAAAAAAAAHwAAAAAAAQDYAgEAAAAAAAAAAAAAAAAAOQEAAAIAAQDaAgEAAAAAAGgBAAAAAAAAPwEAAAIAAQBCBAEAAAAAAAwAAAAAAAAA' >> /tmp/probe.b64
+echo 'GwAAAAIAAQAgAQEAAAAAACIAAAAAAAAAHwAAAAAAAQAgAQEAAAAAAAAAAAAAAAAAaAAAAA
+IAAQBCAQEAAAAAAEgAAAAAAAAAbwAAAAIAAQCQAQEAAAAAAEAAAAAAAAAAfQAAAAAAAQCQAQEAAAAAAA
+AAAAAAAAAAwQAAAAEABACAEAEAAAAAAAgAAAAAAAAAygAAAAEABADAEAEAAAAAAAgAAAAAAAAA0wAAAA
+IAAQDQAQEAAAAAAEgAAAAAAAAA3wAAAAEABABAEAEAAAAAAAgAAAAAAAAA6QAAAAIAAQAYAgEAAAAAAE
+wAAAAAAAAA9QAAAAIAAQBoAgEAAAAAABYAAAAAAAAAHwAAAAAAAQB8AgEAAAAAAAAAAAAAAAAABQEAAA
+IAAQCAAgEAAAAAABYAAAAAAAAAfQAAAAAAAQCAAgEAAAAAAAAAAAAAAAAAHwAAAAAAAQCUAgEAAAAAAA
+AAAAAAAAAAFQEAAAIAAQCYAgEAAAAAAB4AAAAAAAAAfQAAAAAAAQCYAgEAAAAAAAAAAAAAAAAAIQEAAA
+EABAAAEAEAAAAAAAgAAAAAAAAAHwAAAAAAAQC0AgEAAAAAAAAAAAAAAAAALQEAAAIAAQC4AgEAAAAAAC
+IAAAAAAAAAfQAAAAAAAQC4AgEAAAAAAAAAAAAAAAAAHwAAAAAAAQDYAgEAAAAAAAAAAAAAAAAAOQEAAA
+IAAQDaAgEAAAAAAGgBAAAAAAAAPwEAAAIAAQBCBAEAAAAAAAwAAAAAAAAA' >> /tmp/probe.b64
+~ # echo 'RgEAABAA8f8AGAEAAAAAAAAAAAAAAAAAWAEAABAAAwAAEAEAAAAAAAAAAAAAAAAAeQEAABIAAQBOBAEAAAAAAFYBAAAAAAAAaAEAABAABADIEAEAAAAAAAAAAAAAAAAAdAEAABAABAAAEAEAAAAAAAAAAAAAAAAAgAEAABAAAwAAEAEAAAAAAAAAAAAAAAAAjwEAABAAAwAAEAEAAAAAAAAAAAAAAAAAlgEAABAABADIEAEAAAAAAAAAAAAAAAAAAGNvbXBhY3RfcmVhZHlfc2VsZWN0aW9uLmMAcHV0ACR4cnY2NGkycDFfbTJwMF9hMnAxX2YycDJfZDJwMl9jMnAwX3ppY3NyMnAwX3ppZmVuY2VpMnAwX3ptbXVsMXAwX3piYjFwMABudW1iZXIAcGVlcl9yZWdpc3RlcgAkeHJ2NjRpMnAxX20ycDBfYTJwMV9mMnAyX2QycDJfemljc3IycDBfemlmZW5jZWkycDBfem1tdWwxcDBfemJiMXAwAG9ic2VydmVkAGNvbXBsZXRlAHBlZXJfbG9hZGVkAHBlZXJfd29yZABwZWVyX2JpdG1hcAByaW5nX3JlZ2lzdGVyXzEAcmluZ19yZWdpc3Rlcl8yAHJpbmdfbG9hZGVkAHNvdXJjZV93b3JkAHJpbmdfYml0bWFwAHRyaWFsAGZpbmlzaABfX2dsb2JhbF9wb2ludGVyJABfX1NEQVRBX0JFR0lOX18AX19CU1NfRU5EX18AX19ic3Nfc3RhcnQA' >> /tmp/probe.b64
+echo 'RgEAABAA8f8AGAEAAAAAAAAAAAAAAAAAWAEAABAAAwAAEAEAAAAAAAAAAAAAAAAAeQEAAB
+IAAQBOBAEAAAAAAFYBAAAAAAAAaAEAABAABADIEAEAAAAAAAAAAAAAAAAAdAEAABAABAAAEAEAAAAAAA
+AAAAAAAAAAgAEAABAAAwAAEAEAAAAAAAAAAAAAAAAAjwEAABAAAwAAEAEAAAAAAAAAAAAAAAAAlgEAAB
+AABADIEAEAAAAAAAAAAAAAAAAAAGNvbXBhY3RfcmVhZHlfc2VsZWN0aW9uLmMAcHV0ACR4cnY2NGkycD
+FfbTJwMF9hMnAxX2YycDJfZDJwMl9jMnAwX3ppY3NyMnAwX3ppZmVuY2VpMnAwX3ptbXVsMXAwX3piYj
+FwMABudW1iZXIAcGVlcl9yZWdpc3RlcgAkeHJ2NjRpMnAxX20ycDBfYTJwMV9mMnAyX2QycDJfemljc3
+IycDBfemlmZW5jZWkycDBfem1tdWwxcDBfemJiMXAwAG9ic2VydmVkAGNvbXBsZXRlAHBlZXJfbG9hZG
+VkAHBlZXJfd29yZABwZWVyX2JpdG1hcAByaW5nX3JlZ2lzdGVyXzEAcmluZ19yZWdpc3Rlcl8yAHJpbm
+dfbG9hZGVkAHNvdXJjZV93b3JkAHJpbmdfYml0bWFwAHRyaWFsAGZpbmlzaABfX2dsb2JhbF9wb2ludG
+VyJABfX1NEQVRBX0JFR0lOX18AX19CU1NfRU5EX18AX19ic3Nfc3RhcnQA' >> /tmp/probe.b64
+~ # echo 'X19EQVRBX0JFR0lOX18AX2VkYXRhAF9lbmQAAC5zeW10YWIALnN0cnRhYgAuc2hzdHJ0YWIALnRleHQALnJvZGF0YQAuZWhfZnJhbWUALmJzcwAuY29tbWVudAAucmlzY3YuYXR0cmlidXRlcwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAQAAAAYAAAAAAAAAIAEBAAAAAAAgAQAAAAAAAIgEAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAIQAAAAEAAAAyAAAAAAAAAKgFAQAAAAAAqAUAAAAAAADIAAAAAAAAAAAAAAAAAAAACAAAAAAAAAABAAAAAAAAACkAAAABAAAAAgAAAAAAAABwBgEAAAAAAHAGAAAAAAAARAEAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAzAAAACAAAAAMAAAAAAAAAABABAAAAAAAAEAAAAAAAAMgAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAOAAAAAEAAAAwAAAAAAAAAAAAAAAAAAAAtAcAAAAAAAAuAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAEEAAAADAABwAAAAAAAAAAAAAAAAAAAAAOIHAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAA' >> /tmp/probe.b64
+echo 'X19EQVRBX0JFR0lOX18AX2VkYXRhAF9lbmQAAC5zeW10YWIALnN0cnRhYgAuc2hzdHJ0YW
+IALnRleHQALnJvZGF0YQAuZWhfZnJhbWUALmJzcwAuY29tbWVudAAucmlzY3YuYXR0cmlidXRlcwAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAbAAAAAQAAAAYAAAAAAAAAIAEBAAAAAAAgAQAAAAAAAIgEAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA
+AAAAAAAAAAIQAAAAEAAAAyAAAAAAAAAKgFAQAAAAAAqAUAAAAAAADIAAAAAAAAAAAAAAAAAAAACAAAAA
+AAAAABAAAAAAAAACkAAAABAAAAAgAAAAAAAABwBgEAAAAAAHAGAAAAAAAARAEAAAAAAAAAAAAAAAAAAA
+gAAAAAAAAAAAAAAAAAAAAzAAAACAAAAAMAAAAAAAAAABABAAAAAAAAEAAAAAAAAMgAAAAAAAAAAAAAAA
+AAAABAAAAAAAAAAAAAAAAAAAAAOAAAAAEAAAAwAAAAAAAAAAAAAAAAAAAAtAcAAAAAAAAuAAAAAAAAAA
+AAAAAAAAAAAQAAAAAAAAABAAAAAAAAAEEAAAADAABwAAAAAAAAAAAAAAAAAAAAAOIHAAAAAAAAXgAAAA
+AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAA' >> /tmp/probe.b64
+~ # echo 'AAAAAAAAAABACAAAAAAAAMADAAAAAAAACAAAACAAAAAIAAAAAAAAABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAACbAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAAAAAAAAAAAAAAAAAJsNAAAAAAAAUwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/probe.b64
+echo 'AAAAAAAAAABACAAAAAAAAMADAAAAAAAACAAAACAAAAAIAAAAAAAAABgAAAAAAAAACQAAAA
+MAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAACbAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAB
+EAAAADAAAAAAAAAAAAAAAAAAAAAAAAAJsNAAAAAAAAUwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA
+AAAAA=' >> /tmp/probe.b64
+~ # base64 -d /tmp/probe.b64 > /tmp/probe; chmod 755 /tmp/probe
+base64 -d /tmp/probe.b64 > /tmp/probe; chmod 755 /tmp/probe
+~ # sha256sum /tmp/probe
+sha256sum /tmp/probe
+bb8c9de49e19cb9780400a328b52fe38b9d1b38a85373efffd8a4187707f40c6  /tmp/probe
+~ # /tmp/probe
+/tmp/probe
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 1 1 1 0 2027 785
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 2 2 1 0 3173 1229
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: loaded 1 1 1 0 3020 1170
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: loaded 2 2 1 0 3892 1508
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: bitmap 1 1 1 0 3164 1226
