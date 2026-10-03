@@ -41,6 +41,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_frf_isolation_test` | Resident floating-point register isolation; not nonresident FP preservation |
 | `mt_abi_preservation_test` | Live `gp` and callee-saved integer registers across a resident round trip |
 | `mt_ctxtsw_register_target_test` | Fresh computed targets and returns after ALU/load/multiply/divide/CSR producers, including same-context writes and SRAM restores |
+| `mt_ctxtsw_target_bypass_stress_test` | Repeated register, adjacent-load, and adjacent-CTZ targets through resident and SRAM-backed 128-round-trip rings |
 | `mt_ctxtsw_late_wb_hazard_test` | A source-context late writeback must not clear a target-context scoreboard hazard |
 | `mt_nonresident_independent_late_result_test` | Independent cold loads/divides into x15 and x28 survive 24 nonresident 0→2→3→0 round trips and target overwrites; checks accepted completions across switch flushes |
 | `mt_ctxtsw_load_overlap_test` | Delayed source load and faulting byte-load-ahead preserve data and private registers across resident switching; timing requires its trace |

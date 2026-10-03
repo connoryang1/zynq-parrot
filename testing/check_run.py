@@ -41,6 +41,7 @@ TEST_MARKERS = {
     "mt_frf_isolation_test": "[BSG-PASS] FP regfile isolation verified",
     "mt_abi_preservation_test": "[BSG-PASS] ABI state preserved across ctxtsw",
     "mt_ctxtsw_register_target_test": "[BSG-PASS] register targets and computed returns",
+    "mt_ctxtsw_target_bypass_stress_test": "[BSG-PASS] sustained register target bypass",
     "mt_ctxtsw_late_wb_hazard_test": "[BSG-PASS] ctxtsw late writeback hazard test completed",
     "mt_nonresident_independent_late_result_test": "[BSG-PASS] independent cold-load/divide results survive nonresident eviction in both GPR lines",
     "mt_ctxtsw_load_overlap_test": "[BSG-PASS] resident delayed-load and load-ahead data/register checks",
