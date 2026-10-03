@@ -55,7 +55,7 @@ The follow-up RTL holds a dependent CSR800 through the producer's live IWB cycle
 | Adjacent load | 3,176 / 12.31 | 4,150 / 16.08 |
 | Adjacent load and CTZ | 3,380 / 13.10 | 4,399 / 17.05 |
 
-Relative to the same-cycle bypass simulation, dependent paths gain exactly one cycle per operation while stable-register switching is unchanged. `mt_ctxtsw_register_target_test`, `mt_ctxtsw_late_wb_hazard_test`, `mt_remote_seed_order_test`, and all 15 harness unit tests also pass. Routed timing and physical acceptance of this follow-up revision remain required.
+Relative to the same-cycle bypass simulation, dependent paths gain exactly one cycle per operation while stable-register switching is unchanged. `mt_ctxtsw_register_target_test`, `mt_ctxtsw_late_wb_hazard_test`, `mt_remote_seed_order_test`, and all 15 harness unit tests also pass. Routed timing and physical acceptance of this follow-up revision remain required. The exact trace records 1,028 registered-bypass assertions, 1,028 target-hazard rises, and 1,548 switch dispatches, proving that every dependent ring operation exercises the registered path.
 
 The first nested-repository push command was accidentally issued from the top repository and failed with an unknown refspec before changing either remote. The successful retry used `git -C import/black-parrot push`; future nested pushes must retain that explicit repository selection.
 
