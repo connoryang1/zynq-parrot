@@ -24,6 +24,28 @@ static const volatile struct cache_line depth_data[HINTS]
     LINE(11), LINE(12), LINE(13), LINE(14), LINE(15),
     LINE(16), LINE(17), LINE(18), LINE(19), LINE(20)
   };
+static const volatile struct cache_line stale_data[HINTS]
+  __attribute__((aligned(4096), used)) = {
+    LINE(21), LINE(22), LINE(23), LINE(24), LINE(25),
+    LINE(26), LINE(27), LINE(28), LINE(29), LINE(30)
+  };
+
+static inline uint64_t cycles(void)
+{
+  uint64_t value;
+  __asm__ volatile("csrr %0, 0xcc0" : "=r"(value) : : "memory");
+  return value;
+}
+
+static void hint_without_load(const volatile struct cache_line *lines)
+{
+  for (unsigned i = 0; i < HINTS; i++)
+    bp_prefetch_r(&lines[i].value);
+
+  uint64_t start = cycles();
+  while (cycles() - start < 1000)
+    __asm__ volatile("nop");
+}
 
 static __attribute__((noinline))
 uint64_t hint_then_load(const volatile struct cache_line *lines)
@@ -41,6 +63,9 @@ int main(void)
 {
   if (hint_then_load(warm_data) != 55)
     bp_finish(1);
+  // Fill every side-buffer entry with an unused prediction, then require ten
+  // newer replies to replace those stale entries independently.
+  hint_without_load(stale_data);
   if (hint_then_load(depth_data) != 155)
     bp_finish(1);
 
