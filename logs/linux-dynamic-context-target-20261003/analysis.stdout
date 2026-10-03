@@ -1,0 +1,48 @@
+{
+  "aggregate_samples_per_mode": 128,
+  "switches_per_aggregate": 256,
+  "total_timed_handoffs": 131072,
+  "median_cycles_per_handoff": {
+    "immediate_resident": 5.09765625,
+    "immediate_nonresident": 9.140625,
+    "register_resident": 5.125,
+    "register_nonresident": 9.1640625
+  },
+  "register_minus_immediate_cycles_per_handoff": {
+    "resident": 0.02734375,
+    "nonresident": 0.0234375
+  },
+  "register_target_percent_overhead": {
+    "resident": 0.5363984674329414,
+    "nonresident": 0.2564102564102555
+  },
+  "aggregate_min_median_max": {
+    "immediate_resident": [
+      1305,
+      1305.0,
+      70787
+    ],
+    "immediate_nonresident": [
+      2340,
+      2340.0,
+      2350
+    ],
+    "register_resident": [
+      1312,
+      1312.0,
+      20690
+    ],
+    "register_nonresident": [
+      2346,
+      2346.0,
+      2349
+    ]
+  },
+  "aggregates_over_2x_median": {
+    "immediate_resident": 1,
+    "immediate_nonresident": 0,
+    "register_resident": 1,
+    "register_nonresident": 0
+  },
+  "scope": "The register-target ID is already resident in a GPR before each timed ring. The result measures dynamic dispatch encoding and its register dependency, not the software policy needed to select a ready context."
+}
