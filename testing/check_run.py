@@ -51,6 +51,7 @@ TEST_MARKERS = {
     "mt_prefetch_nonresident_interleave_benchmark": "[BSG-PASS] ten logical nonresident prefetch workers",
     "mt_prefetch_hint_test": "[BSG-PASS] nonfaulting prefetch hints",
     "mt_prefetch_queue_depth_test": "[BSG-PASS] ten queued prefetch hints",
+    "mt_prefetch_handoff_lifecycle_test": "[BSG-PASS] repeated prefetch handoff lifecycle",
     "mt_prefetch_dirty_victim_test": "[BSG-PASS] detached prefetch dirty victim",
     "mt_prefetch_protocol_test": "[BSG-PASS] detached prefetch protocol",
     "mt_umode_prefetch_test": "[BSG-PASS] U-mode Sv39 nonfaulting prefetch permissions",

@@ -81,6 +81,16 @@ next gate to sustained cold hint/cache lifecycle across hardware handoffs, not
 ready-context selection or Linux ABI width
 (`logs/linux-hardware-group-request-20261003/`).
 
+A repeated-launch minimal simulation rejects the simplest accumulation model.
+Six cold-displaced launches of 256 requests per resident context all pass. The
+closed trace records 3,072 hints, 6,144 returned 8-byte beats, 3,072 useful
+side-buffer hits, zero UCE drops, and zero residual side-buffer or UCE valid
+entries at every launch boundary. Epochs five and six are therefore clean in
+the physical-address core model. The physical Linux stall now requires a
+condition absent from that model, such as U-mode Sv39 state or the full L2/DDR
+path; repeated translated handoff is the next isolating experiment
+(`logs/prefetch-handoff-lifecycle-20261003/`).
+
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled
 hardware-thread states; `monitor`/`mwait` wakeup from memory or device writes;

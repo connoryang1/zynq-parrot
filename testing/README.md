@@ -50,6 +50,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
 | `mt_prefetch_hint_test` | Nonfaulting invalid hints, signed offsets, ordinary ORI behavior, all word offsets, and dirty-line/store data preservation |
 | `mt_prefetch_queue_depth_test` | Two batches of ten hints followed by ten demand loads, with distinct cold lines and verified sums |
+| `mt_prefetch_handoff_lifecycle_test` | Six cold-displaced 256-request-per-context launches drain detached state across repeated resident handoffs |
 | `mt_prefetch_dirty_victim_test` | Eight dirty same-set cache lines survive a ninth-line detached prefetch; all 64 dirty words are checked |
 | `mt_prefetch_protocol_test` | Runtime cases cover a victim dirtied after a hint, two same-set hints with a conflicting miss, and prefetch response ahead of an ordinary response |
 | `mt_umode_prefetch_test` | Sv39 readable and denied mappings, expected demand fault, nonfaulting hints, and permitted demand data without context switching |
@@ -374,6 +375,21 @@ do not trap. It also hints and reads a separate line on the readable page.
 The MMIO translation is not primed, so that hint can drop on a DTLB miss;
 PASS alone does not prove a PMA rejection or a retained denied DTLB entry.
 The test does not switch contexts or establish hint-triggered page walking.
+
+`mt_prefetch_handoff_lifecycle_test` repeats the resident
+`prefetch.r; switch; load` sequence for six launches in one boot. Run it with
+the qualified ten-context topology and retain the trace:
+
+```sh
+BSG_TRACE_TIMEOUT_S=1200 VERILATOR_BUILD_JOBS=8 \
+  make -C testing run-mt_prefetch_handoff_lifecycle_test \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 TRACE=1
+```
+
+Program PASS proves liveness and register preservation. The waveform must also
+show 512 side-buffer hits and zero residual side-buffer/UCE valid entries at
+each launch boundary. This minimal physical-address test does not cover Linux,
+Sv39, the full L2, or physical DDR.
 
 The directed victim regressions use one architectural context and register-only
 critical sections. They require the qualified 2/10 topology, detached-prefetch
