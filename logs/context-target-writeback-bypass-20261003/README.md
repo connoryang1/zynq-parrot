@@ -24,3 +24,5 @@ The test runs 128 round trips in each direction, followed by two drain operation
 All six cases pass target identity, peer completion, guest `CORE PASS`, host `BSG PASS`, and the fail-closed harness. Across the exact clean waveform, CSR800 dispatch asserts 1,548 times; the register-source hazard and matching integer-writeback bypass each assert 1,028 times. Thus the new path is exercised repeatedly across loaded and computed targets rather than only during initialization.
 
 The ELF SHA-256 is `1fa9e5445db0837de5457eaa7d82775b5c2c3a3d88a54d900483bcd8aaf99614`; the waveform SHA-256 is `52a08a1ecfde78d87bea757d0e01fe3e03c6da265bb7581ccb3b9aadfdf79fa3`. Routed timing and physical FPGA/Linux acceptance remain required because the original failure was FPGA-specific.
+
+The first nested-repository push command was accidentally issued from the top repository and failed with an unknown refspec before changing either remote. The successful retry used `git -C import/black-parrot push`; future nested pushes must retain that explicit repository selection.
