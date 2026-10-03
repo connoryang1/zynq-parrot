@@ -58,3 +58,5 @@ The follow-up RTL holds a dependent CSR800 through the producer's live IWB cycle
 Relative to the same-cycle bypass simulation, dependent paths gain exactly one cycle per operation while stable-register switching is unchanged. `mt_ctxtsw_register_target_test`, `mt_ctxtsw_late_wb_hazard_test`, `mt_remote_seed_order_test`, and all 15 harness unit tests also pass. Routed timing and physical acceptance of this follow-up revision remain required.
 
 The first nested-repository push command was accidentally issued from the top repository and failed with an unknown refspec before changing either remote. The successful retry used `git -C import/black-parrot push`; future nested pushes must retain that explicit repository selection.
+
+The first evidence-staging command ran `git diff --cached --check` without `set -e`; serial-console carriage returns produced whitespace diagnostics but the following commit still ran. The transcripts were normalized to LF immediately afterward. Future evidence commits must use `set -e` or `&&` before the commit so a failed staged-diff check is terminal.

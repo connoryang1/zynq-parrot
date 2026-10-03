@@ -111,292 +111,292 @@ INFO:    Idling for 50
 bsg_zynq_pl: start() called
 INFO:    ps.cpp: Starting scan thread
 INFO:    ps.cpp: Starting i/o polling thread
-
-OpenSBI v1.4
-   ____                    _____ ____ _____
-  / __ \                  / ____|  _ \_   _|
- | |  | |_ __   ___ _ __ | (___ | |_) || |
- | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
- | |__| | |_) |  __/ | | |____) | |_) || |_
-  \____/| .__/ \___|_| |_|_____/|____/_____|
-        | |
-        |_|
-
-Platform Name             : blackparrot
-Platform Features         : medeleg
-Platform HART Count       : 1
-Platform IPI Device       : bp-ipi
-Platform Timer Device     : bp-timer @ 50000000Hz
-Platform Console Device   : bp-console
-Platform HSM Device       : ---
-Platform PMU Device       : ---
-Platform Reboot Device    : ---
-Platform Shutdown Device  : bp-reset
-Platform Suspend Device   : ---
-Platform CPPC Device      : ---
-Firmware Base             : 0x80000000
-Firmware Size             : 310 KB
-Firmware RW Offset        : 0x40000
-Firmware RW Size          : 54 KB
-Firmware Heap Offset      : 0x45000
-Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
-Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
-Runtime SBI Version       : 2.0
-
-Domain0 Name              : root
-Domain0 Boot HART         : 0
-Domain0 HARTs             : 0*
-Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
-Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
-Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
-Domain0 Next Address      : 0x0000000080200000
-Domain0 Next Arg1         : 0x0000000082200000
-Domain0 Next Mode         : S-mode
-Domain0 SysReset          : yes
-Domain0 SysSuspend        : yes
-
-Boot HART ID              : 0
-Boot HART Domain          : root
-Boot HART Priv Version    : v1.11
-Boot HART Base ISA        : rv64imafdcb
-Boot HART ISA Extensions  : none
-Boot HART PMP Count       : 0
-Boot HART PMP Granularity : 0 bits
-Boot HART PMP Address Bits: 0
-Boot HART MHPM Info       : 0 (0x00000000)
-Boot HART Debug Triggers  : 0 triggers
-Boot HART MIDELEG         : 0x0000000000000222
-Boot HART MEDELEG         : 0x000000000000b109
-[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
-[    0.000000] Machine model: blackparrot,riscv64
-[    0.000000] SBI specification v2.0 detected
-[    0.000000] SBI implementation ID=0x1 Version=0x10004
-[    0.000000] SBI TIME extension detected
-[    0.000000] SBI IPI extension detected
-[    0.000000] SBI RFENCE extension detected
-[    0.000000] SBI SRST extension detected
-[    0.000000] efi: UEFI not found.
-[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
-[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
-[    0.000000] Zone ranges:
-[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
-[    0.000000]   Normal   empty
-[    0.000000] Movable zone start for each node
-[    0.000000] Early memory node ranges
-[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
-[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
-[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
-[    0.000000] SBI HSM extension detected
-[    0.000000] Falling back to deprecated "riscv,isa"
-[    0.000000] riscv: base ISA extensions acdfim
-[    0.000000] riscv: ELF capabilities acdfim
-[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
-[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
-[    0.000000] pcpu-alloc: [0] 0 
-[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
-[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
-[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
-[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
-[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
-[    0.000000] Virtual kernel memory layout:
-[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
-[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
-[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
-[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
-[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
-[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
-[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
-[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25996K reserved, 0K cma-reserved)
-[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-[    0.000000] rcu: Hierarchical RCU implementation.
-[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
-[    0.000000] rcu: 	RCU debug extended QS entry/exit.
-[    0.000000] 	Tracing variant of Tasks RCU enabled.
-[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
-[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
-[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
-[    0.000000] riscv-intc: 64 local interrupts mapped
-[    0.000000] riscv: providing IPIs using SBI IPI extension
-[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
-[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
-[    0.000013] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
-[    0.001031] Console: colour dummy device 80x25
-[    0.001160] printk: console [hvc0] enabled
-[    0.017026] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
-[    0.017633] pid_max: default: 32768 minimum: 301
-[    0.019259] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.019771] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.043715] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
-[    0.045506] riscv: ELF compat mode unsupported
-[    0.046136] ASID allocator using 16 bits (65536 entries)
-[    0.048343] rcu: Hierarchical SRCU implementation.
-[    0.048658] rcu: 	Max phase no-delay instances is 1000.
-[    0.052436] EFI services will not be available.
-[    0.054828] smp: Bringing up secondary CPUs ...
-[    0.055225] smp: Brought up 1 node, 1 CPU
-[    0.059676] devtmpfs: initialized
-[    0.073068] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
-[    0.073684] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
-[    0.083380] NET: Registered PF_NETLINK/PF_ROUTE protocol family
-[    0.088034] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
-[    0.088736] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
-[    0.128383] cpu0: Ratio of byte access time to unaligned word access is 0.01, unaligned accesses are slow
-[    0.153457] SCSI subsystem initialized
-[    0.155879] libata version 3.00 loaded.
-[    0.158405] usbcore: registered new interface driver usbfs
-[    0.159126] usbcore: registered new interface driver hub
-[    0.159803] usbcore: registered new device driver usb
-[    0.171776] vgaarb: loaded
-[    0.172958] clocksource: Switched to clocksource riscv_clocksource
-[    0.298021] NET: Registered PF_INET protocol family
-[    0.300096] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
-[    0.306786] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
-[    0.307417] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
-[    0.307907] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.308412] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
-[    0.309648] TCP: Hash tables configured (established 512 bind 512)
-[    0.310971] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
-[    0.311903] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
-[    0.314212] NET: Registered PF_UNIX/PF_LOCAL protocol family
-[    0.321497] RPC: Registered named UNIX socket transport module.
-[    0.321876] RPC: Registered udp transport module.
-[    0.322144] RPC: Registered tcp transport module.
-[    0.322411] RPC: Registered tcp-with-tls transport module.
-[    0.322710] RPC: Registered tcp NFSv4.1 backchannel transport module.
-[    0.323084] PCI: CLS 0 bytes, default 64
-[    0.338333] workingset: timestamp_bits=62 max_order=14 bucket_order=0
-[    0.357125] NFS: Registering the id_resolver key type
-[    0.357706] Key type id_resolver registered
-[    0.357977] Key type id_legacy registered
-[    0.358524] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
-[    0.358919] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
-[    0.369270] 9p: Installing v9fs 9p2000 file system support
-[    0.371736] NET: Registered PF_ALG protocol family
-[    0.372552] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
-[    0.373208] io scheduler mq-deadline registered
-[    0.373508] io scheduler kyber registered
-[    1.957250] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
-[    1.999792] [drm] radeon kernel modesetting enabled.
-[    2.149911] loop: module loaded
-[    2.170243] e1000e: Intel(R) PRO/1000 Network Driver
-[    2.170555] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
-[    2.201926] usbcore: registered new interface driver uas
-[    2.202635] usbcore: registered new interface driver usb-storage
-[    2.214149] mousedev: PS/2 mouse device common for all mice
-[    2.218366] sdhci: Secure Digital Host Controller Interface driver
-[    2.218731] sdhci: Copyright(c) Pierre Ossman
-[    2.219279] sdhci-pltfm: SDHCI platform and OF driver helper
-[    2.221797] usbcore: registered new interface driver usbhid
-[    2.222149] usbhid: USB HID core driver
-[    2.225323] NET: Registered PF_INET6 protocol family
-[    2.256837] Segment Routing with IPv6
-[    2.258026] In-situ OAM (IOAM) with IPv6
-[    2.259090] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
-[    2.266244] NET: Registered PF_PACKET protocol family
-[    2.267500] 9pnet: Installing 9P2000 support
-[    2.268420] Key type dns_resolver registered
-[    2.269527] start plist test
-[    2.323819] end plist test
-[    2.544283] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
-[    2.626895] clk: Disabling unused clocks
-[    3.542744] Freeing unused kernel image (initmem) memory: 5100K
-[    3.543312] Run /bin/sh as init process
-[    3.543559]   with arguments:
-[    3.543746]     /bin/sh
-[    3.543919]   with environment:
-[    3.544115]     HOME=/
-[    3.544284]     TERM=linux
-/bin/sh: can't access tty; job control turned off
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 50000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+[    0.000013] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
+[    0.001031] Console: colour dummy device 80x25
+[    0.001160] printk: console [hvc0] enabled
+[    0.017026] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
+[    0.017633] pid_max: default: 32768 minimum: 301
+[    0.019259] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.019771] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.043715] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.045506] riscv: ELF compat mode unsupported
+[    0.046136] ASID allocator using 16 bits (65536 entries)
+[    0.048343] rcu: Hierarchical SRCU implementation.
+[    0.048658] rcu: 	Max phase no-delay instances is 1000.
+[    0.052436] EFI services will not be available.
+[    0.054828] smp: Bringing up secondary CPUs ...
+[    0.055225] smp: Brought up 1 node, 1 CPU
+[    0.059676] devtmpfs: initialized
+[    0.073068] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.073684] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.083380] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.088034] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.088736] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.128383] cpu0: Ratio of byte access time to unaligned word access is 0.01, unaligned accesses are slow
+[    0.153457] SCSI subsystem initialized
+[    0.155879] libata version 3.00 loaded.
+[    0.158405] usbcore: registered new interface driver usbfs
+[    0.159126] usbcore: registered new interface driver hub
+[    0.159803] usbcore: registered new device driver usb
+[    0.171776] vgaarb: loaded
+[    0.172958] clocksource: Switched to clocksource riscv_clocksource
+[    0.298021] NET: Registered PF_INET protocol family
+[    0.300096] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.306786] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    0.307417] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.307907] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.308412] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    0.309648] TCP: Hash tables configured (established 512 bind 512)
+[    0.310971] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.311903] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.314212] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.321497] RPC: Registered named UNIX socket transport module.
+[    0.321876] RPC: Registered udp transport module.
+[    0.322144] RPC: Registered tcp transport module.
+[    0.322411] RPC: Registered tcp-with-tls transport module.
+[    0.322710] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.323084] PCI: CLS 0 bytes, default 64
+[    0.338333] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    0.357125] NFS: Registering the id_resolver key type
+[    0.357706] Key type id_resolver registered
+[    0.357977] Key type id_legacy registered
+[    0.358524] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    0.358919] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    0.369270] 9p: Installing v9fs 9p2000 file system support
+[    0.371736] NET: Registered PF_ALG protocol family
+[    0.372552] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    0.373208] io scheduler mq-deadline registered
+[    0.373508] io scheduler kyber registered
+[    1.957250] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    1.999792] [drm] radeon kernel modesetting enabled.
+[    2.149911] loop: module loaded
+[    2.170243] e1000e: Intel(R) PRO/1000 Network Driver
+[    2.170555] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    2.201926] usbcore: registered new interface driver uas
+[    2.202635] usbcore: registered new interface driver usb-storage
+[    2.214149] mousedev: PS/2 mouse device common for all mice
+[    2.218366] sdhci: Secure Digital Host Controller Interface driver
+[    2.218731] sdhci: Copyright(c) Pierre Ossman
+[    2.219279] sdhci-pltfm: SDHCI platform and OF driver helper
+[    2.221797] usbcore: registered new interface driver usbhid
+[    2.222149] usbhid: USB HID core driver
+[    2.225323] NET: Registered PF_INET6 protocol family
+[    2.256837] Segment Routing with IPv6
+[    2.258026] In-situ OAM (IOAM) with IPv6
+[    2.259090] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[    2.266244] NET: Registered PF_PACKET protocol family
+[    2.267500] 9pnet: Installing 9P2000 support
+[    2.268420] Key type dns_resolver registered
+[    2.269527] start plist test
+[    2.323819] end plist test
+[    2.544283] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[    2.626895] clk: Disabling unused clocks
+[    3.542744] Freeing unused kernel image (initmem) memory: 5100K
+[    3.543312] Run /bin/sh as init process
+[    3.543559]   with arguments:
+[    3.543746]     /bin/sh
+[    3.543919]   with environment:
+[    3.544115]     HOME=/
+[    3.544284]     TERM=linux
+/bin/sh: can't access tty; job control turned off
 ~ # : > /tmp/bitmap2_repeat.b64
-: > /tmp/bitmap2_repeat.b64
+: > /tmp/bitmap2_repeat.b64
 ~ # echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAACAIBAAAAAABAAAAAAAAAAGAJAAAAAAAABQAAAEAAOAAEAEAACgAJAAMAAHAEAAAA3QQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAC8BAAAAAAAALwEAAAAAAAAABAAAAAAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAFHldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAlxMAAJODA/aTAgAIg74DAJOeHmBzkA6Ak4Ly/+OYAv4XEwAAEwMD8HMuAIAjMMMBFxMAABMDA+sTDhAAIzDDAQ8AMANzEACAbwAAABMAAACXEwAAk4MD9ZMCAAiDvgMAk54eYHOQDoCTgvL/45gC/oKAqoUBRrOHxQCDxwcAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIXgZMThwcCMwgnADN31QIbBwcDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgIFFAUaTCNAFcwAAAFlxhvSi8KbsyujO5NLgVvxa+F70YvBm7GrocyQAgAlFYxsEFH1ak1eaAZcEAACThOTu/YyFR6IX' >> /tmp/bitmap2_repeat.b64
-echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAACAIBAAAAAABAAAAAAAAAAGAJAAAAAAAABQAAAE
-AAOAAEAEAACgAJAAMAAHAEAAAA3QQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
-EAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAC8BAAAAAAAALwEAAAAAAAAABAAAA
-AAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAF
-HldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAlxMAAJ
-ODA/aTAgAIg74DAJOeHmBzkA6Ak4Ly/+OYAv4XEwAAEwMD8HMuAIAjMMMBFxMAABMDA+sTDhAAIzDDAQ
-8AMANzEACAbwAAABMAAACXEwAAk4MD9ZMCAAiDvgMAk54eYHOQDoCTgvL/45gC/oKAqoUBRrOHxQCDxw
-cAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIXgZMThwcCMwgnADN31QIbBw
-cDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgIFFAUaTCNAFcwAAAFlxhvSi8KbsyujO5N
-LgVvxa+F70YvBm7GrocyQAgAlFYxsEFH1ak1eaAZcEAACThOTu/YyFR6IX' >> /tmp/bitmap2_repe
-at.b64
+echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAACAIBAAAAAABAAAAAAAAAAGAJAAAAAAAABQAAAE
+AAOAAEAEAACgAJAAMAAHAEAAAA3QQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
+EAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAC8BAAAAAAAALwEAAAAAAAAABAAAA
+AAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAF
+HldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAlxMAAJ
+ODA/aTAgAIg74DAJOeHmBzkA6Ak4Ly/+OYAv4XEwAAEwMD8HMuAIAjMMMBFxMAABMDA+sTDhAAIzDDAQ
+8AMANzEACAbwAAABMAAACXEwAAk4MD9ZMCAAiDvgMAk54eYHOQDoCTgvL/45gC/oKAqoUBRrOHxQCDxw
+cAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIXgZMThwcCMwgnADN31QIbBw
+cDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgIFFAUaTCNAFcwAAAFlxhvSi8KbsyujO5N
+LgVvxa+F70YvBm7GrocyQAgAlFYxsEFH1ak1eaAZcEAACThOTu/YyFR6IX' >> /tmp/bitmap2_repe
+at.b64
 ~ # echo 'FxsAABMLC+iRTJcbAACTi2vjBUwFTd2MIzCbASOwqwGXGQAAk4kJ3iOwSQGXGgAAk4pK2ZcXAAAjtgfYc5AUgA8AMANzKQDMlwAAAOeAgO6JQnOQAoBzJwDMFwUAABMF5Q465JcAAADngODuIoWXAAAA54Ag8BcFAAATBSURlwAAAOeAQO0DtQkAlwAAAOeAYO4XBQAAEwVlD5cAAADngIDrA7UKAJcAAADngKDsFwUAABMFpQ2XAAAA54DA6XMlAICXAAAA54Dg6hcFAAATBeULlwAAAOeAAOgiZzMFJ0GXAAAA54AA6RcFAAATBYUKlwAAAOeAIOYDtwkAiUdjF/cCg7cKAGOThwPzJwCAme8FBKFH4xL08BcFAAATBYUJlwAAAOeAIOMBRRGoFwUAABMFxQaXAAAA54Dg4QVFlwAAAOeA4OcBAEJJVE1BUDJfUkVQRUFUIGl0ZXJhdGlvbi9vYnNlcnZlZC9jb21wbGV0ZS9zb3VyY2UvY3ljbGVzOiAAAAAAAAAgAAAAAAAAAAoAAAAAAAAAW0JJVE1BUDItUkVQRUFUXSBGQUlMCgAAW0JJVE1BUDItUkVQRUFUXSBQQVNTCgAAEAAAAAAAAAADelIAAXwBARsMAgAQAAAAGAAAAPz8//9MAAAAAAAAABAAAAAsAAAAOP3//yIAAAAAAAAAEAAAAEAAAABG/f//HgAAAAAAAAAcAAAAVAAAAFD9//9MAAAAAEIOMEKBAgJEwUIOAAAAABAAAAB0AAAA' >> /tmp/bitmap2_repeat.b64
-echo 'FxsAABMLC+iRTJcbAACTi2vjBUwFTd2MIzCbASOwqwGXGQAAk4kJ3iOwSQGXGgAAk4pK2Z
-cXAAAjtgfYc5AUgA8AMANzKQDMlwAAAOeAgO6JQnOQAoBzJwDMFwUAABMF5Q465JcAAADngODuIoWXAA
-AA54Ag8BcFAAATBSURlwAAAOeAQO0DtQkAlwAAAOeAYO4XBQAAEwVlD5cAAADngIDrA7UKAJcAAADngK
-DsFwUAABMFpQ2XAAAA54DA6XMlAICXAAAA54Dg6hcFAAATBeULlwAAAOeAAOgiZzMFJ0GXAAAA54AA6R
-cFAAATBYUKlwAAAOeAIOYDtwkAiUdjF/cCg7cKAGOThwPzJwCAme8FBKFH4xL08BcFAAATBYUJlwAAAO
-eAIOMBRRGoFwUAABMFxQaXAAAA54Dg4QVFlwAAAOeA4OcBAEJJVE1BUDJfUkVQRUFUIGl0ZXJhdGlvbi
-9vYnNlcnZlZC9jb21wbGV0ZS9zb3VyY2UvY3ljbGVzOiAAAAAAAAAgAAAAAAAAAAoAAAAAAAAAW0JJVE
-1BUDItUkVQRUFUXSBGQUlMCgAAW0JJVE1BUDItUkVQRUFUXSBQQVNTCgAAEAAAAAAAAAADelIAAXwBAR
-sMAgAQAAAAGAAAAPz8//9MAAAAAAAAABAAAAAsAAAAOP3//yIAAAAAAAAAEAAAAEAAAABG/f//HgAAAA
-AAAAAcAAAAVAAAAFD9//9MAAAAAEIOMEKBAgJEwUIOAAAAABAAAAB0AAAA' >> /tmp/bitmap2_repe
-at.b64
+echo 'FxsAABMLC+iRTJcbAACTi2vjBUwFTd2MIzCbASOwqwGXGQAAk4kJ3iOwSQGXGgAAk4pK2Z
+cXAAAjtgfYc5AUgA8AMANzKQDMlwAAAOeAgO6JQnOQAoBzJwDMFwUAABMF5Q465JcAAADngODuIoWXAA
+AA54Ag8BcFAAATBSURlwAAAOeAQO0DtQkAlwAAAOeAYO4XBQAAEwVlD5cAAADngIDrA7UKAJcAAADngK
+DsFwUAABMFpQ2XAAAA54DA6XMlAICXAAAA54Dg6hcFAAATBeULlwAAAOeAAOgiZzMFJ0GXAAAA54AA6R
+cFAAATBYUKlwAAAOeAIOYDtwkAiUdjF/cCg7cKAGOThwPzJwCAme8FBKFH4xL08BcFAAATBYUJlwAAAO
+eAIOMBRRGoFwUAABMFxQaXAAAA54Dg4QVFlwAAAOeA4OcBAEJJVE1BUDJfUkVQRUFUIGl0ZXJhdGlvbi
+9vYnNlcnZlZC9jb21wbGV0ZS9zb3VyY2UvY3ljbGVzOiAAAAAAAAAgAAAAAAAAAAoAAAAAAAAAW0JJVE
+1BUDItUkVQRUFUXSBGQUlMCgAAW0JJVE1BUDItUkVQRUFUXSBQQVNTCgAAEAAAAAAAAAADelIAAXwBAR
+sMAgAQAAAAGAAAAPz8//9MAAAAAAAAABAAAAAsAAAAOP3//yIAAAAAAAAAEAAAAEAAAABG/f//HgAAAA
+AAAAAcAAAAVAAAAFD9//9MAAAAAEIOMEKBAgJEwUIOAAAAABAAAAB0AAAA' >> /tmp/bitmap2_repe
+at.b64
 ~ # echo 'fP3//wwAAAAAAAAALAAAAIgAAAB0/f//fgEAAABCDnBYgQKIBIkGkgiTCpQMlQ6WEJcSmBSZFpoYAAAAR0NDOiAoZ2M4OTFkOGRjMjNlLWRpcnR5KSAxMy4yLjAAQV0AAAByaXNjdgABUwAAAAQQBXJ2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF96bW11bDFwMF96YWFtbzFwMF96YWxyc2MxcDBfemJiMXAwAAYBCAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAQAgAQEAAAAAAAAAAAAAAAAAAAAAAAMAAgCIAwEAAAAAAAAAAAAAAAAAAAAAAAMAAwAIBAEAAAAAAAAAAAAAAAAAAAAAAAMABAAAEAEAAAAAAAAAAAAAAAAAAAAAAAMABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAMABgAAAAAAAAAAAAAAAAAAAAAAAQAAAAQA8f8AAAAAAAAAAAAAAAAAAAAAEgAAAAIAAQAgAQEAAAAAAEwAAAAAAAAAHgAAAAAAAQAgAQEAAAAAAAAAAAAAAAAAYAAAAAEABACAEAEAAAAAAAgAAAAAAAAAagAAAAEABABAEAEAAAAAAAgAAAAAAAAAcwAAAAEABAAAEAEAAAAAAAgAAAAAAAAAfAAAAAIAAQBwAQEAAAAAACIAAAAAAAAAiAAAAAEABADAEAEAAAAAAAgAAAAAAAAAlAAAAAAAAQCQAQEAAAAAAAAAAAAAAAAA' >> /tmp/bitmap2_repeat.b64
-echo 'fP3//wwAAAAAAAAALAAAAIgAAAB0/f//fgEAAABCDnBYgQKIBIkGkgiTCpQMlQ6WEJcSmB
-SZFpoYAAAAR0NDOiAoZ2M4OTFkOGRjMjNlLWRpcnR5KSAxMy4yLjAAQV0AAAByaXNjdgABUwAAAAQQBX
-J2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF96bW11bDFwMF96YWFtbzFwMF96YWxyc2MxcD
-BfemJiMXAwAAYBCAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAQAgAQEAAAAAAA
-AAAAAAAAAAAAAAAAMAAgCIAwEAAAAAAAAAAAAAAAAAAAAAAAMAAwAIBAEAAAAAAAAAAAAAAAAAAAAAAA
-MABAAAEAEAAAAAAAAAAAAAAAAAAAAAAAMABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAMABgAAAAAAAAAAAA
-AAAAAAAAAAAQAAAAQA8f8AAAAAAAAAAAAAAAAAAAAAEgAAAAIAAQAgAQEAAAAAAEwAAAAAAAAAHgAAAA
-AAAQAgAQEAAAAAAAAAAAAAAAAAYAAAAAEABACAEAEAAAAAAAgAAAAAAAAAagAAAAEABABAEAEAAAAAAA
-gAAAAAAAAAcwAAAAEABAAAEAEAAAAAAAgAAAAAAAAAfAAAAAIAAQBwAQEAAAAAACIAAAAAAAAAiAAAAA
-EABADAEAEAAAAAAAgAAAAAAAAAlAAAAAAAAQCQAQEAAAAAAAAAAAAAAAAA' >> /tmp/bitmap2_repe
-at.b64
+echo 'fP3//wwAAAAAAAAALAAAAIgAAAB0/f//fgEAAABCDnBYgQKIBIkGkgiTCpQMlQ6WEJcSmB
+SZFpoYAAAAR0NDOiAoZ2M4OTFkOGRjMjNlLWRpcnR5KSAxMy4yLjAAQV0AAAByaXNjdgABUwAAAAQQBX
+J2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF96bW11bDFwMF96YWFtbzFwMF96YWxyc2MxcD
+BfemJiMXAwAAYBCAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAQAgAQEAAAAAAA
+AAAAAAAAAAAAAAAAMAAgCIAwEAAAAAAAAAAAAAAAAAAAAAAAMAAwAIBAEAAAAAAAAAAAAAAAAAAAAAAA
+MABAAAEAEAAAAAAAAAAAAAAAAAAAAAAAMABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAMABgAAAAAAAAAAAA
+AAAAAAAAAAAQAAAAQA8f8AAAAAAAAAAAAAAAAAAAAAEgAAAAIAAQAgAQEAAAAAAEwAAAAAAAAAHgAAAA
+AAAQAgAQEAAAAAAAAAAAAAAAAAYAAAAAEABACAEAEAAAAAAAgAAAAAAAAAagAAAAEABABAEAEAAAAAAA
+gAAAAAAAAAcwAAAAEABAAAEAEAAAAAAAgAAAAAAAAAfAAAAAIAAQBwAQEAAAAAACIAAAAAAAAAiAAAAA
+EABADAEAEAAAAAAAgAAAAAAAAAlAAAAAAAAQCQAQEAAAAAAAAAAAAAAAAA' >> /tmp/bitmap2_repe
+at.b64
 ~ # echo '2wAAAAIAAQCSAQEAAAAAAB4AAAAAAAAA3wAAAAIAAQCwAQEAAAAAAEwAAAAAAAAA5gAAAAIAAQD8AQEAAAAAAAwAAAAAAAAA7QAAABAA8f8AGAEAAAAAAAAAAAAAAAAA/wAAABAAAwAAEAEAAAAAAAAAAAAAAAAAIAEAABIAAQAIAgEAAAAAAH4BAAAAAAAADwEAABAABADIEAEAAAAAAAAAAAAAAAAAGwEAABAABAAAEAEAAAAAAAAAAAAAAAAAJwEAABAAAwAAEAEAAAAAAAAAAAAAAAAANgEAABAAAwAAEAEAAAAAAAAAAAAAAAAAPQEAABAABADIEAEAAAAAAAAAAAAAAAAAAGJpdG1hcDJfcmVwZWF0LmMAcGVlcl9iaXRtYXAAJHhydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYzFwMF96YmIxcDAAcGVlcl93b3JkAG9ic2VydmVkAGNvbXBsZXRlAHJpbmdfYml0bWFwAHNvdXJjZV93b3JkACR4cnY2NGkycDBfbTJwMF9hMnAwX2YycDBfZDJwMF9jMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYzFwMF96YmIxcDAAcHV0AG51bWJlcgBmaW5pc2gAX19nbG9iYWxfcG9pbnRlciQAX19TREFUQV9CRUdJTl9fAF9fQlNTX0VORF9fAF9fYnNzX3N0YXJ0AF9fREFUQV9CRUdJTl9fAF9l' >> /tmp/bitmap2_repeat.b64
-echo '2wAAAAIAAQCSAQEAAAAAAB4AAAAAAAAA3wAAAAIAAQCwAQEAAAAAAEwAAAAAAAAA5gAAAA
-IAAQD8AQEAAAAAAAwAAAAAAAAA7QAAABAA8f8AGAEAAAAAAAAAAAAAAAAA/wAAABAAAwAAEAEAAAAAAA
-AAAAAAAAAAIAEAABIAAQAIAgEAAAAAAH4BAAAAAAAADwEAABAABADIEAEAAAAAAAAAAAAAAAAAGwEAAB
-AABAAAEAEAAAAAAAAAAAAAAAAAJwEAABAAAwAAEAEAAAAAAAAAAAAAAAAANgEAABAAAwAAEAEAAAAAAA
-AAAAAAAAAAPQEAABAABADIEAEAAAAAAAAAAAAAAAAAAGJpdG1hcDJfcmVwZWF0LmMAcGVlcl9iaXRtYX
-AAJHhydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYzFwMF
-96YmIxcDAAcGVlcl93b3JkAG9ic2VydmVkAGNvbXBsZXRlAHJpbmdfYml0bWFwAHNvdXJjZV93b3JkAC
-R4cnY2NGkycDBfbTJwMF9hMnAwX2YycDBfZDJwMF9jMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYz
-FwMF96YmIxcDAAcHV0AG51bWJlcgBmaW5pc2gAX19nbG9iYWxfcG9pbnRlciQAX19TREFUQV9CRUdJTl
-9fAF9fQlNTX0VORF9fAF9fYnNzX3N0YXJ0AF9fREFUQV9CRUdJTl9fAF9l' >> /tmp/bitmap2_repe
-at.b64
+echo '2wAAAAIAAQCSAQEAAAAAAB4AAAAAAAAA3wAAAAIAAQCwAQEAAAAAAEwAAAAAAAAA5gAAAA
+IAAQD8AQEAAAAAAAwAAAAAAAAA7QAAABAA8f8AGAEAAAAAAAAAAAAAAAAA/wAAABAAAwAAEAEAAAAAAA
+AAAAAAAAAAIAEAABIAAQAIAgEAAAAAAH4BAAAAAAAADwEAABAABADIEAEAAAAAAAAAAAAAAAAAGwEAAB
+AABAAAEAEAAAAAAAAAAAAAAAAAJwEAABAAAwAAEAEAAAAAAAAAAAAAAAAANgEAABAAAwAAEAEAAAAAAA
+AAAAAAAAAAPQEAABAABADIEAEAAAAAAAAAAAAAAAAAAGJpdG1hcDJfcmVwZWF0LmMAcGVlcl9iaXRtYX
+AAJHhydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYzFwMF
+96YmIxcDAAcGVlcl93b3JkAG9ic2VydmVkAGNvbXBsZXRlAHJpbmdfYml0bWFwAHNvdXJjZV93b3JkAC
+R4cnY2NGkycDBfbTJwMF9hMnAwX2YycDBfZDJwMF9jMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYz
+FwMF96YmIxcDAAcHV0AG51bWJlcgBmaW5pc2gAX19nbG9iYWxfcG9pbnRlciQAX19TREFUQV9CRUdJTl
+9fAF9fQlNTX0VORF9fAF9fYnNzX3N0YXJ0AF9fREFUQV9CRUdJTl9fAF9l' >> /tmp/bitmap2_repe
+at.b64
 ~ # echo 'ZGF0YQBfZW5kAAAuc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC50ZXh0AC5yb2RhdGEALmVoX2ZyYW1lAC5zYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsAAAABAAAABgAAAAAAAAAgAQEAAAAAACABAAAAAAAAaAIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAhAAAAAQAAADIAAAAAAAAAiAMBAAAAAACIAwAAAAAAAH8AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAEAAAAAAAAAKQAAAAEAAAACAAAAAAAAAAgEAQAAAAAACAQAAAAAAAC0AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAADMAAAAIAAAAAwAAAAAAAAAAEAEAAAAAAAAQAAAAAAAAyAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA5AAAAAQAAADAAAAAAAAAAAAAAAAAAAAC8BAAAAAAAACEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAQgAAAAMAAHAAAAAAAAAAAAAAAAAAAAAA3QQAAAAAAABeAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAACAAAAAAAAAAAAAAAAAAAAAAAAAEAFAAAAAAAA' >> /tmp/bitmap2_repeat.b64
-echo 'ZGF0YQBfZW5kAAAuc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC50ZXh0AC5yb2RhdGEALm
-VoX2ZyYW1lAC5zYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsAAAABAAAABgAAAA
-AAAAAgAQEAAAAAACABAAAAAAAAaAIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAhAAAAAQAAAD
-IAAAAAAAAAiAMBAAAAAACIAwAAAAAAAH8AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAEAAAAAAAAAKQAAAA
-EAAAACAAAAAAAAAAgEAQAAAAAACAQAAAAAAAC0AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAD
-MAAAAIAAAAAwAAAAAAAAAAEAEAAAAAAAAQAAAAAAAAyAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA
-AAAAA5AAAAAQAAADAAAAAAAAAAAAAAAAAAAAC8BAAAAAAAACEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAA
-EAAAAAAAAAQgAAAAMAAHAAAAAAAAAAAAAAAAAAAAAA3QQAAAAAAABeAAAAAAAAAAAAAAAAAAAAAQAAAA
-AAAAAAAAAAAAAAAAEAAAACAAAAAAAAAAAAAAAAAAAAAAAAAEAFAAAAAAAA' >> /tmp/bitmap2_repe
-at.b64
+echo 'ZGF0YQBfZW5kAAAuc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC50ZXh0AC5yb2RhdGEALm
+VoX2ZyYW1lAC5zYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsAAAABAAAABgAAAA
+AAAAAgAQEAAAAAACABAAAAAAAAaAIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAhAAAAAQAAAD
+IAAAAAAAAAiAMBAAAAAACIAwAAAAAAAH8AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAEAAAAAAAAAKQAAAA
+EAAAACAAAAAAAAAAgEAQAAAAAACAQAAAAAAAC0AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAD
+MAAAAIAAAAAwAAAAAAAAAAEAEAAAAAAAAQAAAAAAAAyAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA
+AAAAA5AAAAAQAAADAAAAAAAAAAAAAAAAAAAAC8BAAAAAAAACEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAA
+EAAAAAAAAAQgAAAAMAAHAAAAAAAAAAAAAAAAAAAAAA3QQAAAAAAABeAAAAAAAAAAAAAAAAAAAAAQAAAA
+AAAAAAAAAAAAAAAAEAAAACAAAAAAAAAAAAAAAAAAAAAAAAAEAFAAAAAAAA' >> /tmp/bitmap2_repe
+at.b64
 ~ # echo 'iAIAAAAAAAAIAAAAEwAAAAgAAAAAAAAAGAAAAAAAAAAJAAAAAwAAAAAAAAAAAAAAAAAAAAAAAADIBwAAAAAAAEIBAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAEQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAACgkAAAAAAABUAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA==' >> /tmp/bitmap2_repeat.b64
-echo 'iAIAAAAAAAAIAAAAEwAAAAgAAAAAAAAAGAAAAAAAAAAJAAAAAwAAAAAAAAAAAAAAAAAAAA
-AAAADIBwAAAAAAAEIBAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAEQAAAAMAAAAAAAAAAAAAAA
-AAAAAAAAAACgkAAAAAAABUAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA==' >> /tmp/bitm
-ap2_repeat.b64
+echo 'iAIAAAAAAAAIAAAAEwAAAAgAAAAAAAAAGAAAAAAAAAAJAAAAAwAAAAAAAAAAAAAAAAAAAA
+AAAADIBwAAAAAAAEIBAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAEQAAAAMAAAAAAAAAAAAAAA
+AAAAAAAAAACgkAAAAAAABUAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA==' >> /tmp/bitm
+ap2_repeat.b64
 ~ # base64 -d /tmp/bitmap2_repeat.b64 > /tmp/bitmap2_repeat; chmod 755 /tmp/bitmap2_repeat
-base64 -d /tmp/bitmap2_repeat.b64 > /tmp/bitmap2_repeat; chmod 755 /tmp/bitm
-ap2_repeat
+base64 -d /tmp/bitmap2_repeat.b64 > /tmp/bitmap2_repeat; chmod 755 /tmp/bitm
+ap2_repeat
 ~ # sha256sum /tmp/bitmap2_repeat
-sha256sum /tmp/bitmap2_repeat
-2967b70a925567535c85f0911923faa609051afd3ff6251055eff6af23e90c44  /tmp/bitmap2_repeat
+sha256sum /tmp/bitmap2_repeat
+2967b70a925567535c85f0911923faa609051afd3ff6251055eff6af23e90c44  /tmp/bitmap2_repeat
 ~ # /tmp/bitmap2_repeat
-/tmp/bitmap2_repeat
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 0 2 1 0 4319
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 1 2 1 0 4238
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 2 2 1 0 4148
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 3 2 1 0 4148
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 4 2 1 0 4148
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 5 2 1 0 4148
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 6 2 1 0 4238
-BITMAP2_REPEAT iteration/observed/complete/source/cycles: 7 2 1 0 4148
-[BITMAP2-REPEAT] PASS
+/tmp/bitmap2_repeat
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 0 2 1 0 4319
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 1 2 1 0 4238
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 2 2 1 0 4148
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 3 2 1 0 4148
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 4 2 1 0 4148
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 5 2 1 0 4148
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 6 2 1 0 4238
+BITMAP2_REPEAT iteration/observed/complete/source/cycles: 7 2 1 0 4148
+[BITMAP2-REPEAT] PASS
 ~ # echo PROBE_EXIT=$?
-echo PROBE_EXIT=$?
-PROBE_EXIT=0
+echo PROBE_EXIT=$?
+PROBE_EXIT=0
 ~ # poweroff -f
-poweroff -f
-[    4.602290] reboot: Power down
+poweroff -f
+[    4.602290] reboot: Power down
 INFO:    CORE[0] PASS
 INFO:    Setting Tag Client 1<-1
 INFO:    ps.cpp: stopping watchdog
@@ -417,4 +417,4 @@ INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 000000000000000000000000
 INFO:    ps.cpp: freeing DRAM buffer
 bsg_zynq_pl: free_dram() called on virtual ptr=0xb2b5e000
 bsg_zynq_pl: done() called, exiting
-Connection to 192.168.4.35 closed.
+Connection to 192.168.4.35 closed.

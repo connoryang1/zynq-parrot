@@ -111,313 +111,313 @@ INFO:    Idling for 50
 bsg_zynq_pl: start() called
 INFO:    ps.cpp: Starting scan thread
 INFO:    ps.cpp: Starting i/o polling thread
-
-OpenSBI v1.4
-   ____                    _____ ____ _____
-  / __ \                  / ____|  _ \_   _|
- | |  | |_ __   ___ _ __ | (___ | |_) || |
- | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
- | |__| | |_) |  __/ | | |____) | |_) || |_
-  \____/| .__/ \___|_| |_|_____/|____/_____|
-        | |
-        |_|
-
-Platform Name             : blackparrot
-Platform Features         : medeleg
-Platform HART Count       : 1
-Platform IPI Device       : bp-ipi
-Platform Timer Device     : bp-timer @ 50000000Hz
-Platform Console Device   : bp-console
-Platform HSM Device       : ---
-Platform PMU Device       : ---
-Platform Reboot Device    : ---
-Platform Shutdown Device  : bp-reset
-Platform Suspend Device   : ---
-Platform CPPC Device      : ---
-Firmware Base             : 0x80000000
-Firmware Size             : 310 KB
-Firmware RW Offset        : 0x40000
-Firmware RW Size          : 54 KB
-Firmware Heap Offset      : 0x45000
-Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
-Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
-Runtime SBI Version       : 2.0
-
-Domain0 Name              : root
-Domain0 Boot HART         : 0
-Domain0 HARTs             : 0*
-Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
-Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
-Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
-Domain0 Next Address      : 0x0000000080200000
-Domain0 Next Arg1         : 0x0000000082200000
-Domain0 Next Mode         : S-mode
-Domain0 SysReset          : yes
-Domain0 SysSuspend        : yes
-
-Boot HART ID              : 0
-Boot HART Domain          : root
-Boot HART Priv Version    : v1.11
-Boot HART Base ISA        : rv64imafdcb
-Boot HART ISA Extensions  : none
-Boot HART PMP Count       : 0
-Boot HART PMP Granularity : 0 bits
-Boot HART PMP Address Bits: 0
-Boot HART MHPM Info       : 0 (0x00000000)
-Boot HART Debug Triggers  : 0 triggers
-Boot HART MIDELEG         : 0x0000000000000222
-Boot HART MEDELEG         : 0x000000000000b109
-[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
-[    0.000000] Machine model: blackparrot,riscv64
-[    0.000000] SBI specification v2.0 detected
-[    0.000000] SBI implementation ID=0x1 Version=0x10004
-[    0.000000] SBI TIME extension detected
-[    0.000000] SBI IPI extension detected
-[    0.000000] SBI RFENCE extension detected
-[    0.000000] SBI SRST extension detected
-[    0.000000] efi: UEFI not found.
-[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
-[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
-[    0.000000] Zone ranges:
-[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
-[    0.000000]   Normal   empty
-[    0.000000] Movable zone start for each node
-[    0.000000] Early memory node ranges
-[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
-[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
-[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
-[    0.000000] SBI HSM extension detected
-[    0.000000] Falling back to deprecated "riscv,isa"
-[    0.000000] riscv: base ISA extensions acdfim
-[    0.000000] riscv: ELF capabilities acdfim
-[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
-[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
-[    0.000000] pcpu-alloc: [0] 0 
-[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
-[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
-[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
-[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
-[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
-[    0.000000] Virtual kernel memory layout:
-[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
-[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
-[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
-[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
-[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
-[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
-[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
-[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25996K reserved, 0K cma-reserved)
-[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-[    0.000000] rcu: Hierarchical RCU implementation.
-[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
-[    0.000000] rcu: 	RCU debug extended QS entry/exit.
-[    0.000000] 	Tracing variant of Tasks RCU enabled.
-[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
-[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
-[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
-[    0.000000] riscv-intc: 64 local interrupts mapped
-[    0.000000] riscv: providing IPIs using SBI IPI extension
-[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
-[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
-[    0.000013] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
-[    0.001031] Console: colour dummy device 80x25
-[    0.001160] printk: console [hvc0] enabled
-[    0.017039] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
-[    0.017644] pid_max: default: 32768 minimum: 301
-[    0.019269] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.019781] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.043736] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
-[    0.045522] riscv: ELF compat mode unsupported
-[    0.046155] ASID allocator using 16 bits (65536 entries)
-[    0.048360] rcu: Hierarchical SRCU implementation.
-[    0.048676] rcu: 	Max phase no-delay instances is 1000.
-[    0.052452] EFI services will not be available.
-[    0.054833] smp: Bringing up secondary CPUs ...
-[    0.055230] smp: Brought up 1 node, 1 CPU
-[    0.059639] devtmpfs: initialized
-[    0.073056] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
-[    0.073665] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
-[    0.083353] NET: Registered PF_NETLINK/PF_ROUTE protocol family
-[    0.088010] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
-[    0.088710] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
-[    0.128356] cpu0: Ratio of byte access time to unaligned word access is 0.01, unaligned accesses are slow
-[    0.153419] SCSI subsystem initialized
-[    0.155846] libata version 3.00 loaded.
-[    0.158373] usbcore: registered new interface driver usbfs
-[    0.159094] usbcore: registered new interface driver hub
-[    0.159771] usbcore: registered new device driver usb
-[    0.171744] vgaarb: loaded
-[    0.172925] clocksource: Switched to clocksource riscv_clocksource
-[    0.298006] NET: Registered PF_INET protocol family
-[    0.300079] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
-[    0.306772] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
-[    0.307403] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
-[    0.307891] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
-[    0.308396] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
-[    0.309632] TCP: Hash tables configured (established 512 bind 512)
-[    0.310957] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
-[    0.311891] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
-[    0.314194] NET: Registered PF_UNIX/PF_LOCAL protocol family
-[    0.321478] RPC: Registered named UNIX socket transport module.
-[    0.321855] RPC: Registered udp transport module.
-[    0.322123] RPC: Registered tcp transport module.
-[    0.322391] RPC: Registered tcp-with-tls transport module.
-[    0.322689] RPC: Registered tcp NFSv4.1 backchannel transport module.
-[    0.323063] PCI: CLS 0 bytes, default 64
-[    0.338317] workingset: timestamp_bits=62 max_order=14 bucket_order=0
-[    0.357102] NFS: Registering the id_resolver key type
-[    0.357683] Key type id_resolver registered
-[    0.357954] Key type id_legacy registered
-[    0.358500] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
-[    0.358896] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
-[    0.369247] 9p: Installing v9fs 9p2000 file system support
-[    0.371711] NET: Registered PF_ALG protocol family
-[    0.372527] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
-[    0.373184] io scheduler mq-deadline registered
-[    0.373484] io scheduler kyber registered
-[    1.949304] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
-[    1.991280] [drm] radeon kernel modesetting enabled.
-[    2.132228] loop: module loaded
-[    2.152491] e1000e: Intel(R) PRO/1000 Network Driver
-[    2.152804] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
-[    2.187480] usbcore: registered new interface driver uas
-[    2.188187] usbcore: registered new interface driver usb-storage
-[    2.190881] mousedev: PS/2 mouse device common for all mice
-[    2.195012] sdhci: Secure Digital Host Controller Interface driver
-[    2.195377] sdhci: Copyright(c) Pierre Ossman
-[    2.195926] sdhci-pltfm: SDHCI platform and OF driver helper
-[    2.198402] usbcore: registered new interface driver usbhid
-[    2.198754] usbhid: USB HID core driver
-[    2.201903] NET: Registered PF_INET6 protocol family
-[    2.236146] Segment Routing with IPv6
-[    2.237394] In-situ OAM (IOAM) with IPv6
-[    2.238469] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
-[    2.245655] NET: Registered PF_PACKET protocol family
-[    2.246906] 9pnet: Installing 9P2000 support
-[    2.247825] Key type dns_resolver registered
-[    2.248734] start plist test
-[    2.279386] end plist test
-[    2.499430] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
-[    2.570715] clk: Disabling unused clocks
-[    3.517837] Freeing unused kernel image (initmem) memory: 5100K
-[    3.518404] Run /bin/sh as init process
-[    3.518652]   with arguments:
-[    3.518838]     /bin/sh
-[    3.519011]   with environment:
-[    3.519206]     HOME=/
-[    3.519374]     TERM=linux
-/bin/sh: can't access tty; job control turned off
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 50000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+[    0.000013] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
+[    0.001031] Console: colour dummy device 80x25
+[    0.001160] printk: console [hvc0] enabled
+[    0.017039] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
+[    0.017644] pid_max: default: 32768 minimum: 301
+[    0.019269] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.019781] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.043736] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.045522] riscv: ELF compat mode unsupported
+[    0.046155] ASID allocator using 16 bits (65536 entries)
+[    0.048360] rcu: Hierarchical SRCU implementation.
+[    0.048676] rcu: 	Max phase no-delay instances is 1000.
+[    0.052452] EFI services will not be available.
+[    0.054833] smp: Bringing up secondary CPUs ...
+[    0.055230] smp: Brought up 1 node, 1 CPU
+[    0.059639] devtmpfs: initialized
+[    0.073056] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.073665] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.083353] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.088010] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.088710] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.128356] cpu0: Ratio of byte access time to unaligned word access is 0.01, unaligned accesses are slow
+[    0.153419] SCSI subsystem initialized
+[    0.155846] libata version 3.00 loaded.
+[    0.158373] usbcore: registered new interface driver usbfs
+[    0.159094] usbcore: registered new interface driver hub
+[    0.159771] usbcore: registered new device driver usb
+[    0.171744] vgaarb: loaded
+[    0.172925] clocksource: Switched to clocksource riscv_clocksource
+[    0.298006] NET: Registered PF_INET protocol family
+[    0.300079] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.306772] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    0.307403] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.307891] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.308396] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    0.309632] TCP: Hash tables configured (established 512 bind 512)
+[    0.310957] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.311891] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.314194] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.321478] RPC: Registered named UNIX socket transport module.
+[    0.321855] RPC: Registered udp transport module.
+[    0.322123] RPC: Registered tcp transport module.
+[    0.322391] RPC: Registered tcp-with-tls transport module.
+[    0.322689] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.323063] PCI: CLS 0 bytes, default 64
+[    0.338317] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    0.357102] NFS: Registering the id_resolver key type
+[    0.357683] Key type id_resolver registered
+[    0.357954] Key type id_legacy registered
+[    0.358500] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    0.358896] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    0.369247] 9p: Installing v9fs 9p2000 file system support
+[    0.371711] NET: Registered PF_ALG protocol family
+[    0.372527] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    0.373184] io scheduler mq-deadline registered
+[    0.373484] io scheduler kyber registered
+[    1.949304] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    1.991280] [drm] radeon kernel modesetting enabled.
+[    2.132228] loop: module loaded
+[    2.152491] e1000e: Intel(R) PRO/1000 Network Driver
+[    2.152804] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    2.187480] usbcore: registered new interface driver uas
+[    2.188187] usbcore: registered new interface driver usb-storage
+[    2.190881] mousedev: PS/2 mouse device common for all mice
+[    2.195012] sdhci: Secure Digital Host Controller Interface driver
+[    2.195377] sdhci: Copyright(c) Pierre Ossman
+[    2.195926] sdhci-pltfm: SDHCI platform and OF driver helper
+[    2.198402] usbcore: registered new interface driver usbhid
+[    2.198754] usbhid: USB HID core driver
+[    2.201903] NET: Registered PF_INET6 protocol family
+[    2.236146] Segment Routing with IPv6
+[    2.237394] In-situ OAM (IOAM) with IPv6
+[    2.238469] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[    2.245655] NET: Registered PF_PACKET protocol family
+[    2.246906] 9pnet: Installing 9P2000 support
+[    2.247825] Key type dns_resolver registered
+[    2.248734] start plist test
+[    2.279386] end plist test
+[    2.499430] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[    2.570715] clk: Disabling unused clocks
+[    3.517837] Freeing unused kernel image (initmem) memory: 5100K
+[    3.518404] Run /bin/sh as init process
+[    3.518652]   with arguments:
+[    3.518838]     /bin/sh
+[    3.519011]   with environment:
+[    3.519206]     HOME=/
+[    3.519374]     TERM=linux
+/bin/sh: can't access tty; job control turned off
 ~ # : > /tmp/loaded_evict.b64
-: > /tmp/loaded_evict.b64
+: > /tmp/loaded_evict.b64
 ~ # echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAUAQBAAAAAABAAAAAAAAAAKgNAAAAAAAABQAAAEAAOAAEAEAACgAJAAMAAHAEAAAAvQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAACcBwAAAAAAAJwHAAAAAAAAABAAAAAAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAFHldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAkw4AAJMCAAhzkA6Ak4Ly/+OcAv4XEwAAEwPD8HMuAIAjMMMBFxMAABMDw+sTDhAAIzDDAQ8AMANzEACAbwAAAJcTAACTgwPykwIACIO+AwBzkA6Ak4Ly/+OaAv4XEwAAEwND7HMuAIAjMMMBFxMAABMDQ+cTDhAAIzDDAQ8AMANzEACAbwAAAJcTAACTg4PtkwIACIO+AwCTnh5gc5AOgJOC8v/jmAL+FxMAABMDg+dzLgCAIzDDARcTAAATA4PiEw4QACMwwwEPADADcxAAgG8AAAATAAAAkw4QAJMCAAhzkA6Ak4Ly/+OcAv6CgAEAkw4gAJMCAAhzkA6Ak4Ly/+OcAv6CgAEAlxMAAJODg+mTAgAIg74DAHOQDoCTgvL/' >> /tmp/loaded_evict.b64
-echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAUAQBAAAAAABAAAAAAAAAAKgNAAAAAAAABQAAAE
-AAOAAEAEAACgAJAAMAAHAEAAAAvQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
-EAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAACcBwAAAAAAAJwHAAAAAAAAABAAAA
-AAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAF
-HldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAkw4AAJ
-MCAAhzkA6Ak4Ly/+OcAv4XEwAAEwPD8HMuAIAjMMMBFxMAABMDw+sTDhAAIzDDAQ8AMANzEACAbwAAAJ
-cTAACTgwPykwIACIO+AwBzkA6Ak4Ly/+OaAv4XEwAAEwND7HMuAIAjMMMBFxMAABMDQ+cTDhAAIzDDAQ
-8AMANzEACAbwAAAJcTAACTg4PtkwIACIO+AwCTnh5gc5AOgJOC8v/jmAL+FxMAABMDg+dzLgCAIzDDAR
-cTAAATA4PiEw4QACMwwwEPADADcxAAgG8AAAATAAAAkw4QAJMCAAhzkA6Ak4Ly/+OcAv6CgAEAkw4gAJ
-MCAAhzkA6Ak4Ly/+OcAv6CgAEAlxMAAJODg+mTAgAIg74DAHOQDoCTgvL/' >> /tmp/loaded_evict
-.b64
+echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAUAQBAAAAAABAAAAAAAAAAKgNAAAAAAAABQAAAE
+AAOAAEAEAACgAJAAMAAHAEAAAAvQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
+EAAAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAACcBwAAAAAAAJwHAAAAAAAAABAAAA
+AAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAyAAAAAAAAAAAEAAAAAAAAF
+HldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAkw4AAJ
+MCAAhzkA6Ak4Ly/+OcAv4XEwAAEwPD8HMuAIAjMMMBFxMAABMDw+sTDhAAIzDDAQ8AMANzEACAbwAAAJ
+cTAACTgwPykwIACIO+AwBzkA6Ak4Ly/+OaAv4XEwAAEwND7HMuAIAjMMMBFxMAABMDQ+cTDhAAIzDDAQ
+8AMANzEACAbwAAAJcTAACTg4PtkwIACIO+AwCTnh5gc5AOgJOC8v/jmAL+FxMAABMDg+dzLgCAIzDDAR
+cTAAATA4PiEw4QACMwwwEPADADcxAAgG8AAAATAAAAkw4QAJMCAAhzkA6Ak4Ly/+OcAv6CgAEAkw4gAJ
+MCAAhzkA6Ak4Ly/+OcAv6CgAEAlxMAAJODg+mTAgAIg74DAHOQDoCTgvL/' >> /tmp/loaded_evict
+.b64
 ~ # echo '45oC/oKAAQCXEwAAk4OD55MCAAiDvgMAk54eYHOQDoCTgvL/45gC/oKAqoUBRrOHxQCDxwcAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIXgZMThwcCMwgnADN31QIbBwcDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgDlxIvguhJcVAAAjs+XeFxcAACM/99hK8E7sUugG/Cb0VuQXGQAAEwmp1P1XIzD5ABcXAAAjPgfO5YMTF3QC/Y6qiRcaAAATCqrOVY9zEBeADwAwA/MqAMwClnMQBIDzJADMFwUAABMFpSaXAAAA54DA8k6FlwAAAOeAIPIXBQAAEwWFKpcAAADngCDxIoWXAAAA54Bg8hcFAAATBeUolwAAAOeAgO8DNQkAlwAAAOeAoPAXBQAAEwUlJ5cAAADngMDtAzUKAJcAAADngODuFwUAABMFZSWXAAAA54AA7HMlAICXAAAA54Ag7RcFAAATBaUjlwAAAOeAQOqzhFRBJoWXAAAA54BA6xcFAAATBcUhlwAAAOeAYOiTB0AGs4T0AhMFIBAz1aQClwAAAOeAwOgXBQAAEwXFH5cAAADngODlgzcJAAFFY5yHAAM3CgCFRwFFYxb3AHMlAIATNRUA4nBCdKJ0AnniaUJqomohYYKAgUUBRpMI0AVzAAAAeXEG9CLwJuxK6E7kUuDzJwCACUVjnQcQgUcFR5cGAACThkbLFwYAABMGRtiFRRcF' >> /tmp/loaded_evict.b64
-echo '45oC/oKAAQCXEwAAk4OD55MCAAiDvgMAk54eYHOQDoCTgvL/45gC/oKAqoUBRrOHxQCDxw
-cAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIXgZMThwcCMwgnADN31QIbBw
-cDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgDlxIvguhJcVAAAjs+XeFxcAACM/99hK8E
-7sUugG/Cb0VuQXGQAAEwmp1P1XIzD5ABcXAAAjPgfO5YMTF3QC/Y6qiRcaAAATCqrOVY9zEBeADwAwA/
-MqAMwClnMQBIDzJADMFwUAABMFpSaXAAAA54DA8k6FlwAAAOeAIPIXBQAAEwWFKpcAAADngCDxIoWXAA
-AA54Bg8hcFAAATBeUolwAAAOeAgO8DNQkAlwAAAOeAoPAXBQAAEwUlJ5cAAADngMDtAzUKAJcAAADngO
-DuFwUAABMFZSWXAAAA54AA7HMlAICXAAAA54Ag7RcFAAATBaUjlwAAAOeAQOqzhFRBJoWXAAAA54BA6x
-cFAAATBcUhlwAAAOeAYOiTB0AGs4T0AhMFIBAz1aQClwAAAOeAwOgXBQAAEwXFH5cAAADngODlgzcJAA
-FFY5yHAAM3CgCFRwFFYxb3AHMlAIATNRUA4nBCdKJ0AnniaUJqomohYYKAgUUBRpMI0AVzAAAAeXEG9C
-LwJuxK6E7kUuDzJwCACUVjnQcQgUcFR5cGAACThkbLFwYAABMGRtiFRRcF' >> /tmp/loaded_evict
-.b64
+echo '45oC/oKAAQCXEwAAk4OD55MCAAiDvgMAk54eYHOQDoCTgvL/45gC/oKAqoUBRrOHxQCDxw
+cAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIXgZMThwcCMwgnADN31QIbBw
+cDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgDlxIvguhJcVAAAjs+XeFxcAACM/99hK8E
+7sUugG/Cb0VuQXGQAAEwmp1P1XIzD5ABcXAAAjPgfO5YMTF3QC/Y6qiRcaAAATCqrOVY9zEBeADwAwA/
+MqAMwClnMQBIDzJADMFwUAABMFpSaXAAAA54DA8k6FlwAAAOeAIPIXBQAAEwWFKpcAAADngCDxIoWXAA
+AA54Bg8hcFAAATBeUolwAAAOeAgO8DNQkAlwAAAOeAoPAXBQAAEwUlJ5cAAADngMDtAzUKAJcAAADngO
+DuFwUAABMFZSWXAAAA54AA7HMlAICXAAAA54Ag7RcFAAATBaUjlwAAAOeAQOqzhFRBJoWXAAAA54BA6x
+cFAAATBcUhlwAAAOeAYOiTB0AGs4T0AhMFIBAz1aQClwAAAOeAwOgXBQAAEwXFH5cAAADngODlgzcJAA
+FFY5yHAAM3CgCFRwFFYxb3AHMlAIATNRUA4nBCdKJ0AnniaUJqomohYYKAgUUBRpMI0AVzAAAAeXEG9C
+LwJuxK6E7kUuDzJwCACUVjnQcQgUcFR5cGAACThkbLFwYAABMGRtiFRRcF' >> /tmp/loaded_evict
+.b64
 ~ # echo 'AAATBaUYlwAAAOeA4OQqioFHCUeXBgAAk4bGyBcGAAATBkbXiUUXBQAAEwUlFpcAAADngGDiqomBRwVHlwYAAJOGRsoXBgAAEwZG1oVFFwUAABMFpRSXAAAA54Dg3yqJgUcJR5cGAACThsbHFwYAABMGxtOJRRcFAAATBSUSlwAAAOeAYN2qhIFHBUeXBgAAk4ZGwRcGAAATBkbOhUUXBQAAEwWlDpcAAADngODaKoSFRxFHlwYAAJOGRscXBgAAEwbG0IlFFwUAABMFpQ2XAAAA54Bg2DN6qgCz+UkBM3k5AbP0JAFljAWIEewXBQAAEwXFC5cAAADngGDPBUWXAAAA54Bg7BcFAAATBaULlwAAAOeAwM0BRd23AQATAAAAQ09NUEFDVF9SRUFEWSBuYW1lL3RhcmdldC9vYnNlcnZlZC9jb21wbGV0ZS9zb3VyY2UvY3ljbGVzL2N5Y2xlc194MTAwX3Blcl9zd2l0Y2g6IAAAAAAAACAAAAAAAAAACgAAAAAAAAByZWdpc3RlcgAAAAAAAAAAbG9hZGVkAABiaXRtYXAAAFtMT0FERUQtRVZJQ1RdIEZBSUwKAAAAAFtMT0FERUQtRVZJQ1RdIFBBU1MKAAAAABAAAAAAAAAAA3pSAAF8AQEbDAIAEAAAABgAAACs+v//QAAAAAAAAAAQAAAALAAAANj6//9IAAAAAAAAABAAAABAAAAADPv//0wAAAAAAAAAEAAAAFQAAABI+///FgAAAAAAAAAQAAAA' >> /tmp/loaded_evict.b64
-echo 'AAATBaUYlwAAAOeA4OQqioFHCUeXBgAAk4bGyBcGAAATBkbXiUUXBQAAEwUlFpcAAADngG
-DiqomBRwVHlwYAAJOGRsoXBgAAEwZG1oVFFwUAABMFpRSXAAAA54Dg3yqJgUcJR5cGAACThsbHFwYAAB
-MGxtOJRRcFAAATBSUSlwAAAOeAYN2qhIFHBUeXBgAAk4ZGwRcGAAATBkbOhUUXBQAAEwWlDpcAAADngO
-DaKoSFRxFHlwYAAJOGRscXBgAAEwbG0IlFFwUAABMFpQ2XAAAA54Bg2DN6qgCz+UkBM3k5AbP0JAFljA
-WIEewXBQAAEwXFC5cAAADngGDPBUWXAAAA54Bg7BcFAAATBaULlwAAAOeAwM0BRd23AQATAAAAQ09NUE
-FDVF9SRUFEWSBuYW1lL3RhcmdldC9vYnNlcnZlZC9jb21wbGV0ZS9zb3VyY2UvY3ljbGVzL2N5Y2xlc1
-94MTAwX3Blcl9zd2l0Y2g6IAAAAAAAACAAAAAAAAAACgAAAAAAAAByZWdpc3RlcgAAAAAAAAAAbG9hZG
-VkAABiaXRtYXAAAFtMT0FERUQtRVZJQ1RdIEZBSUwKAAAAAFtMT0FERUQtRVZJQ1RdIFBBU1MKAAAAAB
-AAAAAAAAAAA3pSAAF8AQEbDAIAEAAAABgAAACs+v//QAAAAAAAAAAQAAAALAAAANj6//9IAAAAAAAAAB
-AAAABAAAAADPv//0wAAAAAAAAAEAAAAFQAAABI+///FgAAAAAAAAAQAAAA' >> /tmp/loaded_evict
-.b64
+echo 'AAATBaUYlwAAAOeA4OQqioFHCUeXBgAAk4bGyBcGAAATBkbXiUUXBQAAEwUlFpcAAADngG
+DiqomBRwVHlwYAAJOGRsoXBgAAEwZG1oVFFwUAABMFpRSXAAAA54Dg3yqJgUcJR5cGAACThsbHFwYAAB
+MGxtOJRRcFAAATBSUSlwAAAOeAYN2qhIFHBUeXBgAAk4ZGwRcGAAATBkbOhUUXBQAAEwWlDpcAAADngO
+DaKoSFRxFHlwYAAJOGRscXBgAAEwbG0IlFFwUAABMFpQ2XAAAA54Bg2DN6qgCz+UkBM3k5AbP0JAFljA
+WIEewXBQAAEwXFC5cAAADngGDPBUWXAAAA54Bg7BcFAAATBaULlwAAAOeAwM0BRd23AQATAAAAQ09NUE
+FDVF9SRUFEWSBuYW1lL3RhcmdldC9vYnNlcnZlZC9jb21wbGV0ZS9zb3VyY2UvY3ljbGVzL2N5Y2xlc1
+94MTAwX3Blcl9zd2l0Y2g6IAAAAAAAACAAAAAAAAAACgAAAAAAAAByZWdpc3RlcgAAAAAAAAAAbG9hZG
+VkAABiaXRtYXAAAFtMT0FERUQtRVZJQ1RdIEZBSUwKAAAAAFtMT0FERUQtRVZJQ1RdIFBBU1MKAAAAAB
+AAAAAAAAAAA3pSAAF8AQEbDAIAEAAAABgAAACs+v//QAAAAAAAAAAQAAAALAAAANj6//9IAAAAAAAAAB
+AAAABAAAAADPv//0wAAAAAAAAAEAAAAFQAAABI+///FgAAAAAAAAAQAAAA' >> /tmp/loaded_evict
+.b64
 ~ # echo 'aAAAAEz7//8WAAAAAAAAABAAAAB8AAAAUPv//x4AAAAAAAAAEAAAAJAAAABc+///IgAAAAAAAAAQAAAApAAAAGr7//8eAAAAAAAAABwAAAC4AAAAdPv//0wAAAAAQg4wQoECAkTBQg4AAAAANAAAANgAAACg+///cAEAAABCDkBCiARekgiTCpQMgQKJBpUOAz4BwULIQslC0kLTQtRC1UIOAAAQAAAAEAEAANj8//8MAAAAAAAAACAAAAAkAQAA0Pz//0oBAAAAQg4wTIECiASJBpIIkwqUDAAAAEdDQzogKGdjODkxZDhkYzIzZS1kaXJ0eSkgMTMuMi4wAEFdAAAAcmlzY3YAAVMAAAAEEAVydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX2MycDBfem1tdWwxcDBfemFhbW8xcDBfemFscnNjMXAwX3piYjFwMAAGAQgBCgsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAEAIAEBAAAAAAAAAAAAAAAAAAAAAAADAAIAoAUBAAAAAAAAAAAAAAAAAAAAAAADAAMAWAYBAAAAAAAAAAAAAAAAAAAAAAADAAQAABABAAAAAAAAAAAAAAAAAAAAAAADAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAYAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAPH/AAAAAAAAAAAAAAAAAAAAABAAAAACAAEAIAEBAAAAAABAAAAAAAAAAB4AAAAAAAEA' >> /tmp/loaded_evict.b64
-echo 'aAAAAEz7//8WAAAAAAAAABAAAAB8AAAAUPv//x4AAAAAAAAAEAAAAJAAAABc+///IgAAAA
-AAAAAQAAAApAAAAGr7//8eAAAAAAAAABwAAAC4AAAAdPv//0wAAAAAQg4wQoECAkTBQg4AAAAANAAAAN
-gAAACg+///cAEAAABCDkBCiARekgiTCpQMgQKJBpUOAz4BwULIQslC0kLTQtRC1UIOAAAQAAAAEAEAAN
-j8//8MAAAAAAAAACAAAAAkAQAA0Pz//0oBAAAAQg4wTIECiASJBpIIkwqUDAAAAEdDQzogKGdjODkxZD
-hkYzIzZS1kaXJ0eSkgMTMuMi4wAEFdAAAAcmlzY3YAAVMAAAAEEAVydjY0aTJwMF9tMnAwX2EycDBfZj
-JwMF9kMnAwX2MycDBfem1tdWwxcDBfemFhbW8xcDBfemFscnNjMXAwX3piYjFwMAAGAQgBCgsAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAEAIAEBAAAAAAAAAAAAAAAAAAAAAAADAAIAoAUBAA
-AAAAAAAAAAAAAAAAAAAAADAAMAWAYBAAAAAAAAAAAAAAAAAAAAAAADAAQAABABAAAAAAAAAAAAAAAAAA
-AAAAADAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAYAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAPH/AAAAAA
-AAAAAAAAAAAAAAABAAAAACAAEAIAEBAAAAAABAAAAAAAAAAB4AAAAAAAEA' >> /tmp/loaded_evict
-.b64
+echo 'aAAAAEz7//8WAAAAAAAAABAAAAB8AAAAUPv//x4AAAAAAAAAEAAAAJAAAABc+///IgAAAA
+AAAAAQAAAApAAAAGr7//8eAAAAAAAAABwAAAC4AAAAdPv//0wAAAAAQg4wQoECAkTBQg4AAAAANAAAAN
+gAAACg+///cAEAAABCDkBCiARekgiTCpQMgQKJBpUOAz4BwULIQslC0kLTQtRC1UIOAAAQAAAAEAEAAN
+j8//8MAAAAAAAAACAAAAAkAQAA0Pz//0oBAAAAQg4wTIECiASJBpIIkwqUDAAAAEdDQzogKGdjODkxZD
+hkYzIzZS1kaXJ0eSkgMTMuMi4wAEFdAAAAcmlzY3YAAVMAAAAEEAVydjY0aTJwMF9tMnAwX2EycDBfZj
+JwMF9kMnAwX2MycDBfem1tdWwxcDBfemFhbW8xcDBfemFscnNjMXAwX3piYjFwMAAGAQgBCgsAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAEAIAEBAAAAAAAAAAAAAAAAAAAAAAADAAIAoAUBAA
+AAAAAAAAAAAAAAAAAAAAADAAMAWAYBAAAAAAAAAAAAAAAAAAAAAAADAAQAABABAAAAAAAAAAAAAAAAAA
+AAAAADAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAYAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAPH/AAAAAA
+AAAAAAAAAAAAAAABAAAAACAAEAIAEBAAAAAABAAAAAAAAAAB4AAAAAAAEA' >> /tmp/loaded_evict
+.b64
 ~ # echo 'IAEBAAAAAAAAAAAAAAAAAGAAAAABAAQAQBABAAAAAAAIAAAAAAAAAGkAAAABAAQAABABAAAAAAAIAAAAAAAAAHIAAAACAAEAYAEBAAAAAABIAAAAAAAAAH4AAAABAAQAgBABAAAAAAAIAAAAAAAAAIgAAAACAAEAqAEBAAAAAABMAAAAAAAAAJQAAAACAAEA+AEBAAAAAAAWAAAAAAAAAKQAAAAAAAEADAIBAAAAAAAAAAAAAAAAAOsAAAACAAEAEAIBAAAAAAAWAAAAAAAAAB4AAAAAAAEAEAIBAAAAAAAAAAAAAAAAAKQAAAAAAAEAJAIBAAAAAAAAAAAAAAAAAPsAAAACAAEAKAIBAAAAAAAeAAAAAAAAAB4AAAAAAAEAKAIBAAAAAAAAAAAAAAAAAAcBAAABAAQAwBABAAAAAAAIAAAAAAAAAKQAAAAAAAEARAIBAAAAAAAAAAAAAAAAABMBAAACAAEASAIBAAAAAAAiAAAAAAAAAB4AAAAAAAEASAIBAAAAAAAAAAAAAAAAAKQAAAAAAAEAaAIBAAAAAAAAAAAAAAAAAB8BAAACAAEAagIBAAAAAAAeAAAAAAAAACMBAAACAAEAiAIBAAAAAABMAAAAAAAAACoBAAACAAEA1AIBAAAAAABwAQAAAAAAADABAAACAAEARAQBAAAAAAAMAAAAAAAAADcBAAAQAPH/ABgBAAAAAAAAAAAAAAAAAEkBAAAQAAMAABABAAAAAAAAAAAAAAAAAGoBAAASAAEA' >> /tmp/loaded_evict.b64
-echo 'IAEBAAAAAAAAAAAAAAAAAGAAAAABAAQAQBABAAAAAAAIAAAAAAAAAGkAAAABAAQAABABAA
-AAAAAIAAAAAAAAAHIAAAACAAEAYAEBAAAAAABIAAAAAAAAAH4AAAABAAQAgBABAAAAAAAIAAAAAAAAAI
-gAAAACAAEAqAEBAAAAAABMAAAAAAAAAJQAAAACAAEA+AEBAAAAAAAWAAAAAAAAAKQAAAAAAAEADAIBAA
-AAAAAAAAAAAAAAAOsAAAACAAEAEAIBAAAAAAAWAAAAAAAAAB4AAAAAAAEAEAIBAAAAAAAAAAAAAAAAAK
-QAAAAAAAEAJAIBAAAAAAAAAAAAAAAAAPsAAAACAAEAKAIBAAAAAAAeAAAAAAAAAB4AAAAAAAEAKAIBAA
-AAAAAAAAAAAAAAAAcBAAABAAQAwBABAAAAAAAIAAAAAAAAAKQAAAAAAAEARAIBAAAAAAAAAAAAAAAAAB
-MBAAACAAEASAIBAAAAAAAiAAAAAAAAAB4AAAAAAAEASAIBAAAAAAAAAAAAAAAAAKQAAAAAAAEAaAIBAA
-AAAAAAAAAAAAAAAB8BAAACAAEAagIBAAAAAAAeAAAAAAAAACMBAAACAAEAiAIBAAAAAABMAAAAAAAAAC
-oBAAACAAEA1AIBAAAAAABwAQAAAAAAADABAAACAAEARAQBAAAAAAAMAAAAAAAAADcBAAAQAPH/ABgBAA
-AAAAAAAAAAAAAAAEkBAAAQAAMAABABAAAAAAAAAAAAAAAAAGoBAAASAAEA' >> /tmp/loaded_evict
-.b64
+echo 'IAEBAAAAAAAAAAAAAAAAAGAAAAABAAQAQBABAAAAAAAIAAAAAAAAAGkAAAABAAQAABABAA
+AAAAAIAAAAAAAAAHIAAAACAAEAYAEBAAAAAABIAAAAAAAAAH4AAAABAAQAgBABAAAAAAAIAAAAAAAAAI
+gAAAACAAEAqAEBAAAAAABMAAAAAAAAAJQAAAACAAEA+AEBAAAAAAAWAAAAAAAAAKQAAAAAAAEADAIBAA
+AAAAAAAAAAAAAAAOsAAAACAAEAEAIBAAAAAAAWAAAAAAAAAB4AAAAAAAEAEAIBAAAAAAAAAAAAAAAAAK
+QAAAAAAAEAJAIBAAAAAAAAAAAAAAAAAPsAAAACAAEAKAIBAAAAAAAeAAAAAAAAAB4AAAAAAAEAKAIBAA
+AAAAAAAAAAAAAAAAcBAAABAAQAwBABAAAAAAAIAAAAAAAAAKQAAAAAAAEARAIBAAAAAAAAAAAAAAAAAB
+MBAAACAAEASAIBAAAAAAAiAAAAAAAAAB4AAAAAAAEASAIBAAAAAAAAAAAAAAAAAKQAAAAAAAEAaAIBAA
+AAAAAAAAAAAAAAAB8BAAACAAEAagIBAAAAAAAeAAAAAAAAACMBAAACAAEAiAIBAAAAAABMAAAAAAAAAC
+oBAAACAAEA1AIBAAAAAABwAQAAAAAAADABAAACAAEARAQBAAAAAAAMAAAAAAAAADcBAAAQAPH/ABgBAA
+AAAAAAAAAAAAAAAEkBAAAQAAMAABABAAAAAAAAAAAAAAAAAGoBAAASAAEA' >> /tmp/loaded_evict
+.b64
 ~ # echo 'UAQBAAAAAABKAQAAAAAAAFkBAAAQAAQAyBABAAAAAAAAAAAAAAAAAGUBAAAQAAQAABABAAAAAAAAAAAAAAAAAHEBAAAQAAMAABABAAAAAAAAAAAAAAAAAIABAAAQAAMAABABAAAAAAAAAAAAAAAAAIcBAAAQAAQAyBABAAAAAAAAAAAAAAAAAABsb2FkZWRfZXZpY3QuYwBwZWVyX3JlZ2lzdGVyACR4cnY2NGkycDBfbTJwMF9hMnAwX2YycDBfZDJwMF96bW11bDFwMF96YWFtbzFwMF96YWxyc2MxcDBfemJiMXAwAG9ic2VydmVkAGNvbXBsZXRlAHBlZXJfbG9hZGVkAHBlZXJfd29yZABwZWVyX2JpdG1hcAByaW5nX3JlZ2lzdGVyXzEAJHhydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX2MycDBfem1tdWwxcDBfemFhbW8xcDBfemFscnNjMXAwX3piYjFwMAByaW5nX3JlZ2lzdGVyXzIAcmluZ19sb2FkZWQAc291cmNlX3dvcmQAcmluZ19iaXRtYXAAcHV0AG51bWJlcgB0cmlhbABmaW5pc2gAX19nbG9iYWxfcG9pbnRlciQAX19TREFUQV9CRUdJTl9fAF9fQlNTX0VORF9fAF9fYnNzX3N0YXJ0AF9fREFUQV9CRUdJTl9fAF9lZGF0YQBfZW5kAAAuc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC50ZXh0AC5yb2RhdGEALmVo' >> /tmp/loaded_evict.b64
-echo 'UAQBAAAAAABKAQAAAAAAAFkBAAAQAAQAyBABAAAAAAAAAAAAAAAAAGUBAAAQAAQAABABAA
-AAAAAAAAAAAAAAAHEBAAAQAAMAABABAAAAAAAAAAAAAAAAAIABAAAQAAMAABABAAAAAAAAAAAAAAAAAI
-cBAAAQAAQAyBABAAAAAAAAAAAAAAAAAABsb2FkZWRfZXZpY3QuYwBwZWVyX3JlZ2lzdGVyACR4cnY2NG
-kycDBfbTJwMF9hMnAwX2YycDBfZDJwMF96bW11bDFwMF96YWFtbzFwMF96YWxyc2MxcDBfemJiMXAwAG
-9ic2VydmVkAGNvbXBsZXRlAHBlZXJfbG9hZGVkAHBlZXJfd29yZABwZWVyX2JpdG1hcAByaW5nX3JlZ2
-lzdGVyXzEAJHhydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX2MycDBfem1tdWwxcDBfemFhbW8xcD
-BfemFscnNjMXAwX3piYjFwMAByaW5nX3JlZ2lzdGVyXzIAcmluZ19sb2FkZWQAc291cmNlX3dvcmQAcm
-luZ19iaXRtYXAAcHV0AG51bWJlcgB0cmlhbABmaW5pc2gAX19nbG9iYWxfcG9pbnRlciQAX19TREFUQV
-9CRUdJTl9fAF9fQlNTX0VORF9fAF9fYnNzX3N0YXJ0AF9fREFUQV9CRUdJTl9fAF9lZGF0YQBfZW5kAA
-Auc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC50ZXh0AC5yb2RhdGEALmVo' >> /tmp/loaded_evict
-.b64
+echo 'UAQBAAAAAABKAQAAAAAAAFkBAAAQAAQAyBABAAAAAAAAAAAAAAAAAGUBAAAQAAQAABABAA
+AAAAAAAAAAAAAAAHEBAAAQAAMAABABAAAAAAAAAAAAAAAAAIABAAAQAAMAABABAAAAAAAAAAAAAAAAAI
+cBAAAQAAQAyBABAAAAAAAAAAAAAAAAAABsb2FkZWRfZXZpY3QuYwBwZWVyX3JlZ2lzdGVyACR4cnY2NG
+kycDBfbTJwMF9hMnAwX2YycDBfZDJwMF96bW11bDFwMF96YWFtbzFwMF96YWxyc2MxcDBfemJiMXAwAG
+9ic2VydmVkAGNvbXBsZXRlAHBlZXJfbG9hZGVkAHBlZXJfd29yZABwZWVyX2JpdG1hcAByaW5nX3JlZ2
+lzdGVyXzEAJHhydjY0aTJwMF9tMnAwX2EycDBfZjJwMF9kMnAwX2MycDBfem1tdWwxcDBfemFhbW8xcD
+BfemFscnNjMXAwX3piYjFwMAByaW5nX3JlZ2lzdGVyXzIAcmluZ19sb2FkZWQAc291cmNlX3dvcmQAcm
+luZ19iaXRtYXAAcHV0AG51bWJlcgB0cmlhbABmaW5pc2gAX19nbG9iYWxfcG9pbnRlciQAX19TREFUQV
+9CRUdJTl9fAF9fQlNTX0VORF9fAF9fYnNzX3N0YXJ0AF9fREFUQV9CRUdJTl9fAF9lZGF0YQBfZW5kAA
+Auc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC50ZXh0AC5yb2RhdGEALmVo' >> /tmp/loaded_evict
+.b64
 ~ # echo 'X2ZyYW1lAC5zYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAQAAAAYAAAAAAAAAIAEBAAAAAAAgAQAAAAAAAIAEAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAIQAAAAEAAAAyAAAAAAAAAKAFAQAAAAAAoAUAAAAAAAC1AAAAAAAAAAAAAAAAAAAACAAAAAAAAAABAAAAAAAAACkAAAABAAAAAgAAAAAAAABYBgEAAAAAAFgGAAAAAAAARAEAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAzAAAACAAAAAMAAAAAAAAAABABAAAAAAAAEAAAAAAAAMgAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAOQAAAAEAAAAwAAAAAAAAAAAAAAAAAAAAnAcAAAAAAAAhAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAEIAAAADAABwAAAAAAAAAAAAAAAAAAAAAL0HAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgCAAAAAAAAKgDAAAAAAAACAAAAB8AAAAIAAAAAAAAABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/loaded_evict.b64
-echo 'X2ZyYW1lAC5zYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAQAAAA
-YAAAAAAAAAIAEBAAAAAAAgAQAAAAAAAIAEAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAIQAAAA
-EAAAAyAAAAAAAAAKAFAQAAAAAAoAUAAAAAAAC1AAAAAAAAAAAAAAAAAAAACAAAAAAAAAABAAAAAAAAAC
-kAAAABAAAAAgAAAAAAAABYBgEAAAAAAFgGAAAAAAAARAEAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA
-AAAAAzAAAACAAAAAMAAAAAAAAAABABAAAAAAAAEAAAAAAAAMgAAAAAAAAAAAAAAAAAAABAAAAAAAAAAA
-AAAAAAAAAAOQAAAAEAAAAwAAAAAAAAAAAAAAAAAAAAnAcAAAAAAAAhAAAAAAAAAAAAAAAAAAAAAQAAAA
-AAAAABAAAAAAAAAEIAAAADAABwAAAAAAAAAAAAAAAAAAAAAL0HAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
-EAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgCAAAAAAAAKgDAAAAAAAACAAAAB
-8AAAAIAAAAAAAAABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/loaded_evict
-.b64
+echo 'X2ZyYW1lAC5zYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAQAAAA
+YAAAAAAAAAIAEBAAAAAAAgAQAAAAAAAIAEAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAIQAAAA
+EAAAAyAAAAAAAAAKAFAQAAAAAAoAUAAAAAAAC1AAAAAAAAAAAAAAAAAAAACAAAAAAAAAABAAAAAAAAAC
+kAAAABAAAAAgAAAAAAAABYBgEAAAAAAFgGAAAAAAAARAEAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA
+AAAAAzAAAACAAAAAMAAAAAAAAAABABAAAAAAAAEAAAAAAAAMgAAAAAAAAAAAAAAAAAAABAAAAAAAAAAA
+AAAAAAAAAAOQAAAAEAAAAwAAAAAAAAAAAAAAAAAAAAnAcAAAAAAAAhAAAAAAAAAAAAAAAAAAAAAQAAAA
+AAAAABAAAAAAAAAEIAAAADAABwAAAAAAAAAAAAAAAAAAAAAL0HAAAAAAAAXgAAAAAAAAAAAAAAAAAAAA
+EAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgCAAAAAAAAKgDAAAAAAAACAAAAB
+8AAAAIAAAAAAAAABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/loaded_evict
+.b64
 ~ # echo 'yAsAAAAAAACMAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAAAAAAAAAAAAAAAAAFQNAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/loaded_evict.b64
-echo 'yAsAAAAAAACMAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAA
-AAAAAAAAAAAAAAAFQNAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/
-loaded_evict.b64
+echo 'yAsAAAAAAACMAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAA
+AAAAAAAAAAAAAAAFQNAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/
+loaded_evict.b64
 ~ # base64 -d /tmp/loaded_evict.b64 > /tmp/loaded_evict; chmod 755 /tmp/loaded_evict
-base64 -d /tmp/loaded_evict.b64 > /tmp/loaded_evict; chmod 755 /tmp/loaded_e
-vict
+base64 -d /tmp/loaded_evict.b64 > /tmp/loaded_evict; chmod 755 /tmp/loaded_e
+vict
 ~ # sha256sum /tmp/loaded_evict
-sha256sum /tmp/loaded_evict
-60c4de6350a022c9181969ab150b2135bfc194a9982df2a2616e71a15516368e  /tmp/loaded_evict
+sha256sum /tmp/loaded_evict
+60c4de6350a022c9181969ab150b2135bfc194a9982df2a2616e71a15516368e  /tmp/loaded_evict
 ~ # /tmp/loaded_evict
-/tmp/loaded_evict
-COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 1 1 1 0 2033 787
-COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 2 2 1 0 3251 1260
-COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: loaded 1 1 1 0 2914 1129
-COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: loaded 2 2 1 0 3908 1514
-COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 1 1 1 0 1893 733
-COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: bitmap 2 2 1 0 4243 1644
-[LOADED-EVICT] PASS
+/tmp/loaded_evict
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 1 1 1 0 2033 787
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 2 2 1 0 3251 1260
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: loaded 1 1 1 0 2914 1129
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: loaded 2 2 1 0 3908 1514
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: register 1 1 1 0 1893 733
+COMPACT_READY name/target/observed/complete/source/cycles/cycles_x100_per_switch: bitmap 2 2 1 0 4243 1644
+[LOADED-EVICT] PASS
 ~ # echo PROBE_EXIT=$?
-echo PROBE_EXIT=$?
-PROBE_EXIT=0
+echo PROBE_EXIT=$?
+PROBE_EXIT=0
 ~ # poweroff -f
-poweroff -f
-[    4.833939] reboot: Power down
+poweroff -f
+[    4.833939] reboot: Power down
 INFO:    CORE[0] PASS
 INFO:    Setting Tag Client 1<-1
 INFO:    ps.cpp: stopping watchdog
@@ -438,4 +438,4 @@ INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 000000000000000000000000
 INFO:    ps.cpp: freeing DRAM buffer
 bsg_zynq_pl: free_dram() called on virtual ptr=0xb2ac4000
 bsg_zynq_pl: done() called, exiting
-Connection to 192.168.4.35 closed.
+Connection to 192.168.4.35 closed.
