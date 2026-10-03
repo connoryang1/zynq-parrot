@@ -51,9 +51,13 @@ operation, versus 18.06 in simulation. A full `fence rw,rw` raises the physical
 median to 19.06 cycles. All 32 samples validate the selected context,
 completion, ready-word transition, and return source before the custom/core
 pass markers and runner exit zero. This supports the 15--25-cycle local
-group-decision budget on hardware. It also separates 8.88 cycles of atomic
-ready selection and loop work from the separately measured 9.16-cycle direct
-nonresident handoff (`logs/linux-atomic-fence-cost-20261003/`).
+group-decision budget on hardware. A matched resident-peer run takes 14.06
+cycles, versus 18.04 nonresident. Compared with separately measured 5.125/9.164
+cycle direct register-target handoffs, ready claim and selection add 8.94/8.88
+cycles while nonresident state movement adds 3.98 cycles versus 4.04 in the
+direct control. This supports treating selection and residency as approximately
+additive costs rather than attributing the whole 18-cycle scheduler to context
+movement (`logs/linux-atomic-fence-cost-20261003/`).
 
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled

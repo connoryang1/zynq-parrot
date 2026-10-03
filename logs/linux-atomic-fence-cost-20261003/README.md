@@ -71,6 +71,28 @@ same-address-space handoff, the complete atomic selection mechanism is
 9.16-cycle direct nonresident handoff, which quantifies the ready-word atomic,
 selection, and loop cost instead of assuming that policy is free.
 
+## Resident versus nonresident decomposition
+
+The same experiment was repeated with context 1, the other resident register
+bank, instead of nonresident context 2. The instruction sequence, 128-round-trip
+sample size, alternating fence order, FPGA image, and five correctness checks
+are unchanged. All 32 resident FPGA samples pass before
+`[BSG-PASS] atomic resident selector`, `CORE[0] PASS`, and runner exit zero.
+
+| Peer state | Atomic scheduler | With full fence | Direct register-target switch | Selection over direct |
+| --- | ---: | ---: | ---: | ---: |
+| Resident | 14.06 | 15.08 | 5.125 | 8.94 |
+| Nonresident | 18.04 | 19.06 | 9.164 | 8.88 |
+
+The complete atomic scheduler's nonresident premium is 3.98 cycles. The
+separately measured direct register-target switch has a 4.04-cycle nonresident
+premium. Their 0.06-cycle difference is 1.5% of the roughly four-cycle
+residency penalty. Thus the evidence supports a simple additive decomposition:
+ready-word claim and selection cost about 8.9
+cycles regardless of residency, while moving a nonresident context adds about
+4.0 cycles. The FPGA resident result is 14.06 cycles versus 14.05 in simulation;
+the FPGA nonresident result is 18.04 versus 18.06 in simulation.
+
 For an ordinary coherent ready word, the AMO's acquire/release ordering is the
 relevant publication and claim primitive.  This result does not justify
 removing fences needed for unrelated MMIO or device ordering.
@@ -104,8 +126,14 @@ c56d585b20332b9f0d4e85cf0b56948d7d0398f6f344ebf880e7de830fd22694  mt_atomic_fenc
 f1846cb06071020af349d2b8f9487005e444f38f3132c5fbf23debab12dfbe7d  mt_atomic_fence_cost_benchmark_fpga.nbf
 04333c882c4b84d5204b68c87157c4561aa4e155312716745426b9010bf2c9e9  physical-baremetal.log
 efae3a82b6edefc049e65f2c71e7744435e927415d496d7907d299cc37938cc0  physical-disassembly.txt
-dbecdf3f7d945e8fced9a5107f50f81bf279f043878a6613a0c2300c65fe7b10  analyze_atomic_selector.py
-f9d3aea4268ca29ac4e93951a714a692751809ac5d1d73863337d31f8959e708  analysis.json
+3b27da23615ff0dac42f00d8065f490d91091edd5ffc300dfed5763e4d8f4eee  mt_atomic_resident_selector_benchmark.c
+9a46e7440cf592e84bd10980451d3dc5a1a4ae623eb27017d0d0ab689a1b42e0  mt_atomic_resident_selector_benchmark.riscv
+8d5551b8d93a861cd3b2842f471cc48df1e5a5593a727f10e1afb31566c9d7c3  resident-sim-run.log
+14043100ca59a5873f88f723a01fcb44ac4e88f1b1805cad933aa81558be5f4e  mt_atomic_resident_selector_benchmark_fpga.riscv
+9cbcf311e8e3b91dfcdc396ee20b2e1e938e8c61420d506ca7fe31e5dda3dd37  mt_atomic_resident_selector_benchmark_fpga.nbf
+cb9d3124a86cca832762196da4f3997de4603e53f2f5748fdbc927084452b33b  resident-physical.log
+72b25e7732569884c3802b281fa4732b0320b932c2512e08b1a3cf180aa6174f  analyze_atomic_selector.py
+bffc7ac870f48941c8acdd4ad7a5b3c5d8df98484eb784f25532d5ed68fb852c  analysis.json
 ee40d2b976beb6f63c3c2b10c4051d577a7e4fd3828468240277d5126bd2c9a1  atomic_fence_cost
 bbd804800b68125cb7abf1996cfd4a217f5528cc26ecad3930bb255b9719061c  atomic_fence_cost.c
 ```

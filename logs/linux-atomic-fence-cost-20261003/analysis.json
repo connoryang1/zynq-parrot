@@ -1,75 +1,157 @@
 {
-  "expected_fpga_rows": 32,
-  "fpga": {
-    "core_pass": true,
-    "custom_pass": true,
-    "fence_delta_cycles_per_operation": 1.02,
-    "modes": {
-      "aqrl": {
-        "all_rows_correct": true,
-        "median_aggregate_cycles": 4656,
-        "median_cycles_per_operation": 18.04,
-        "range_aggregate_cycles": [
-          4656,
-          4668
-        ],
-        "range_cycles_per_operation": [
-          18.04,
-          18.09
-        ],
-        "steady_samples": 15
-      },
-      "fence": {
-        "all_rows_correct": true,
-        "median_aggregate_cycles": 4918,
-        "median_cycles_per_operation": 19.06,
-        "range_aggregate_cycles": [
-          4918,
-          4922
-        ],
-        "range_cycles_per_operation": [
-          19.06,
-          19.07
-        ],
-        "steady_samples": 15
-      }
-    },
-    "parseable_rows": 32
+  "derived_fpga_cycles": {
+    "atomic_residency_penalty": 3.98,
+    "direct_register_residency_penalty": 4.04,
+    "ready_selection_over_direct_nonresident": 8.88,
+    "ready_selection_over_direct_resident": 8.94
   },
-  "simulator": {
-    "core_pass": true,
-    "custom_pass": true,
-    "fence_delta_cycles_per_operation": 1.01,
-    "modes": {
-      "aqrl": {
-        "all_rows_correct": true,
-        "median_aggregate_cycles": 4660.0,
-        "median_cycles_per_operation": 18.06,
-        "range_aggregate_cycles": [
-          4660,
-          4676
-        ],
-        "range_cycles_per_operation": [
-          18.06,
-          18.12
-        ],
-        "steady_samples": 12
+  "expected_fpga_rows": 32,
+  "nonresident": {
+    "fpga": {
+      "core_pass": true,
+      "custom_pass": true,
+      "fence_delta_cycles_per_operation": 1.02,
+      "modes": {
+        "aqrl": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 4656,
+          "median_cycles_per_operation": 18.04,
+          "range_aggregate_cycles": [
+            4656,
+            4668
+          ],
+          "range_cycles_per_operation": [
+            18.04,
+            18.09
+          ],
+          "steady_samples": 15
+        },
+        "fence": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 4918,
+          "median_cycles_per_operation": 19.06,
+          "range_aggregate_cycles": [
+            4918,
+            4922
+          ],
+          "range_cycles_per_operation": [
+            19.06,
+            19.07
+          ],
+          "steady_samples": 15
+        }
       },
-      "fence": {
-        "all_rows_correct": true,
-        "median_aggregate_cycles": 4922.0,
-        "median_cycles_per_operation": 19.07,
-        "range_aggregate_cycles": [
-          4914,
-          4930
-        ],
-        "range_cycles_per_operation": [
-          19.04,
-          19.1
-        ],
-        "steady_samples": 12
-      }
+      "parseable_rows": 32
     },
-    "parseable_rows": 26
+    "simulator": {
+      "core_pass": true,
+      "custom_pass": true,
+      "fence_delta_cycles_per_operation": 1.01,
+      "modes": {
+        "aqrl": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 4660.0,
+          "median_cycles_per_operation": 18.06,
+          "range_aggregate_cycles": [
+            4660,
+            4676
+          ],
+          "range_cycles_per_operation": [
+            18.06,
+            18.12
+          ],
+          "steady_samples": 12
+        },
+        "fence": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 4922.0,
+          "median_cycles_per_operation": 19.07,
+          "range_aggregate_cycles": [
+            4914,
+            4930
+          ],
+          "range_cycles_per_operation": [
+            19.04,
+            19.1
+          ],
+          "steady_samples": 12
+        }
+      },
+      "parseable_rows": 26
+    }
+  },
+  "resident": {
+    "fpga": {
+      "core_pass": true,
+      "custom_pass": true,
+      "fence_delta_cycles_per_operation": 1.02,
+      "modes": {
+        "aqrl": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 3629,
+          "median_cycles_per_operation": 14.06,
+          "range_aggregate_cycles": [
+            3622,
+            3634
+          ],
+          "range_cycles_per_operation": [
+            14.03,
+            14.08
+          ],
+          "steady_samples": 15
+        },
+        "fence": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 3893,
+          "median_cycles_per_operation": 15.08,
+          "range_aggregate_cycles": [
+            3889,
+            3901
+          ],
+          "range_cycles_per_operation": [
+            15.07,
+            15.12
+          ],
+          "steady_samples": 15
+        }
+      },
+      "parseable_rows": 32
+    },
+    "simulator": {
+      "core_pass": true,
+      "custom_pass": true,
+      "fence_delta_cycles_per_operation": 1.03,
+      "modes": {
+        "aqrl": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 3626,
+          "median_cycles_per_operation": 14.05,
+          "range_aggregate_cycles": [
+            3626,
+            3643
+          ],
+          "range_cycles_per_operation": [
+            14.05,
+            14.12
+          ],
+          "steady_samples": 13
+        },
+        "fence": {
+          "all_rows_correct": true,
+          "median_aggregate_cycles": 3893,
+          "median_cycles_per_operation": 15.08,
+          "range_aggregate_cycles": [
+            3893,
+            3901
+          ],
+          "range_cycles_per_operation": [
+            15.08,
+            15.12
+          ],
+          "steady_samples": 11
+        }
+      },
+      "parseable_rows": 26
+    }
   }
 }
