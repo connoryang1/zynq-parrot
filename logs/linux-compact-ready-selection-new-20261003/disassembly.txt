@@ -1,0 +1,366 @@
+
+logs/linux-compact-ready-selection-new-20261003/compact_ready_selection:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000010120 <put>:
+   10120:	00054783          	lbu	a5,0(a0)
+   10124:	85aa                	mv	a1,a0
+   10126:	4601                	li	a2,0
+   10128:	c799                	beqz	a5,10136 <put+0x16>
+   1012a:	0605                	add	a2,a2,1
+   1012c:	00c587b3          	add	a5,a1,a2
+   10130:	0007c783          	lbu	a5,0(a5)
+   10134:	fbfd                	bnez	a5,1012a <put+0xa>
+   10136:	4505                	li	a0,1
+   10138:	04000893          	li	a7,64
+   1013c:	00000073          	ecall
+   10140:	8082                	ret
+
+0000000000010142 <number>:
+   10142:	7179                	add	sp,sp,-48
+   10144:	f406                	sd	ra,40(sp)
+   10146:	00010e23          	sb	zero,28(sp)
+   1014a:	47d1                	li	a5,20
+   1014c:	4629                	li	a2,10
+   1014e:	48a5                	li	a7,9
+   10150:	02c57733          	remu	a4,a0,a2
+   10154:	37fd                	addw	a5,a5,-1
+   10156:	02079693          	sll	a3,a5,0x20
+   1015a:	9281                	srl	a3,a3,0x20
+   1015c:	02068593          	add	a1,a3,32
+   10160:	00258833          	add	a6,a1,sp
+   10164:	85aa                	mv	a1,a0
+   10166:	0307071b          	addw	a4,a4,48
+   1016a:	fee80423          	sb	a4,-24(a6)
+   1016e:	02c55533          	divu	a0,a0,a2
+   10172:	fcb8efe3          	bltu	a7,a1,10150 <number+0xe>
+   10176:	003c                	add	a5,sp,8
+   10178:	00d78533          	add	a0,a5,a3
+   1017c:	00000097          	auipc	ra,0x0
+   10180:	fa4080e7          	jalr	-92(ra) # 10120 <put>
+   10184:	70a2                	ld	ra,40(sp)
+   10186:	6145                	add	sp,sp,48
+   10188:	8082                	ret
+   1018a:	0001                	nop
+   1018c:	00000013          	nop
+
+0000000000010190 <peer_register>:
+   10190:	00000e93          	li	t4,0
+   10194:	08000293          	li	t0,128
+   10198:	800e9073          	csrw	0x800,t4
+   1019c:	fff28293          	add	t0,t0,-1
+   101a0:	fe029ce3          	bnez	t0,10198 <peer_register+0x8>
+   101a4:	00001317          	auipc	t1,0x1
+   101a8:	edc30313          	add	t1,t1,-292 # 11080 <observed>
+   101ac:	80002e73          	csrr	t3,0x800
+   101b0:	01c33023          	sd	t3,0(t1)
+   101b4:	00001317          	auipc	t1,0x1
+   101b8:	f0c30313          	add	t1,t1,-244 # 110c0 <complete>
+   101bc:	00100e13          	li	t3,1
+   101c0:	01c33023          	sd	t3,0(t1)
+   101c4:	0330000f          	fence	rw,rw
+   101c8:	80001073          	csrw	0x800,zero
+   101cc:	0000006f          	j	101cc <peer_register+0x3c>
+
+00000000000101d0 <peer_loaded>:
+   101d0:	00001397          	auipc	t2,0x1
+   101d4:	e7038393          	add	t2,t2,-400 # 11040 <peer_word>
+   101d8:	08000293          	li	t0,128
+   101dc:	0003be83          	ld	t4,0(t2)
+   101e0:	800e9073          	csrw	0x800,t4
+   101e4:	fff28293          	add	t0,t0,-1
+   101e8:	fe029ae3          	bnez	t0,101dc <peer_loaded+0xc>
+   101ec:	00001317          	auipc	t1,0x1
+   101f0:	e9430313          	add	t1,t1,-364 # 11080 <observed>
+   101f4:	80002e73          	csrr	t3,0x800
+   101f8:	01c33023          	sd	t3,0(t1)
+   101fc:	00001317          	auipc	t1,0x1
+   10200:	ec430313          	add	t1,t1,-316 # 110c0 <complete>
+   10204:	00100e13          	li	t3,1
+   10208:	01c33023          	sd	t3,0(t1)
+   1020c:	0330000f          	fence	rw,rw
+   10210:	80001073          	csrw	0x800,zero
+   10214:	0000006f          	j	10214 <peer_loaded+0x44>
+
+0000000000010218 <peer_bitmap>:
+   10218:	00001397          	auipc	t2,0x1
+   1021c:	e2838393          	add	t2,t2,-472 # 11040 <peer_word>
+   10220:	08000293          	li	t0,128
+   10224:	0003be83          	ld	t4,0(t2)
+   10228:	601e9e93          	ctz	t4,t4
+   1022c:	800e9073          	csrw	0x800,t4
+   10230:	fff28293          	add	t0,t0,-1
+   10234:	fe0298e3          	bnez	t0,10224 <peer_bitmap+0xc>
+   10238:	00001317          	auipc	t1,0x1
+   1023c:	e4830313          	add	t1,t1,-440 # 11080 <observed>
+   10240:	80002e73          	csrr	t3,0x800
+   10244:	01c33023          	sd	t3,0(t1)
+   10248:	00001317          	auipc	t1,0x1
+   1024c:	e7830313          	add	t1,t1,-392 # 110c0 <complete>
+   10250:	00100e13          	li	t3,1
+   10254:	01c33023          	sd	t3,0(t1)
+   10258:	0330000f          	fence	rw,rw
+   1025c:	80001073          	csrw	0x800,zero
+   10260:	0000006f          	j	10260 <peer_bitmap+0x48>
+   10264:	00000013          	nop
+
+0000000000010268 <ring_register_1>:
+   10268:	00100e93          	li	t4,1
+   1026c:	08000293          	li	t0,128
+   10270:	800e9073          	csrw	0x800,t4
+   10274:	fff28293          	add	t0,t0,-1
+   10278:	fe029ce3          	bnez	t0,10270 <ring_register_1+0x8>
+   1027c:	8082                	ret
+   1027e:	0001                	nop
+
+0000000000010280 <ring_register_2>:
+   10280:	00200e93          	li	t4,2
+   10284:	08000293          	li	t0,128
+   10288:	800e9073          	csrw	0x800,t4
+   1028c:	fff28293          	add	t0,t0,-1
+   10290:	fe029ce3          	bnez	t0,10288 <ring_register_2+0x8>
+   10294:	8082                	ret
+   10296:	0001                	nop
+
+0000000000010298 <ring_loaded>:
+   10298:	00001397          	auipc	t2,0x1
+   1029c:	d6838393          	add	t2,t2,-664 # 11000 <source_word>
+   102a0:	08000293          	li	t0,128
+   102a4:	0003be83          	ld	t4,0(t2)
+   102a8:	800e9073          	csrw	0x800,t4
+   102ac:	fff28293          	add	t0,t0,-1
+   102b0:	fe029ae3          	bnez	t0,102a4 <ring_loaded+0xc>
+   102b4:	8082                	ret
+   102b6:	0001                	nop
+
+00000000000102b8 <ring_bitmap>:
+   102b8:	00001397          	auipc	t2,0x1
+   102bc:	d4838393          	add	t2,t2,-696 # 11000 <source_word>
+   102c0:	08000293          	li	t0,128
+   102c4:	0003be83          	ld	t4,0(t2)
+   102c8:	601e9e93          	ctz	t4,t4
+   102cc:	800e9073          	csrw	0x800,t4
+   102d0:	fff28293          	add	t0,t0,-1
+   102d4:	fe0298e3          	bnez	t0,102c4 <ring_bitmap+0xc>
+   102d8:	8082                	ret
+
+00000000000102da <trial>:
+   102da:	7179                	add	sp,sp,-48
+   102dc:	00001817          	auipc	a6,0x1
+   102e0:	d2e83223          	sd	a4,-732(a6) # 11000 <source_word>
+   102e4:	577d                	li	a4,-1
+   102e6:	00001817          	auipc	a6,0x1
+   102ea:	d4f83d23          	sd	a5,-678(a6) # 11040 <peer_word>
+   102ee:	f022                	sd	s0,32(sp)
+   102f0:	01975793          	srl	a5,a4,0x19
+   102f4:	e84a                	sd	s2,16(sp)
+   102f6:	e44e                	sd	s3,8(sp)
+   102f8:	f406                	sd	ra,40(sp)
+   102fa:	ec26                	sd	s1,24(sp)
+   102fc:	e052                	sd	s4,0(sp)
+   102fe:	00001917          	auipc	s2,0x1
+   10302:	d0290913          	add	s2,s2,-766 # 11000 <source_word>
+   10306:	8efd                	and	a3,a3,a5
+   10308:	08e93023          	sd	a4,128(s2)
+   1030c:	02759793          	sll	a5,a1,0x27
+   10310:	842e                	mv	s0,a1
+   10312:	89aa                	mv	s3,a0
+   10314:	8fd5                	or	a5,a5,a3
+   10316:	00001717          	auipc	a4,0x1
+   1031a:	da073523          	sd	zero,-598(a4) # 110c0 <complete>
+   1031e:	80179073          	csrw	0x801,a5
+   10322:	0330000f          	fence	rw,rw
+   10326:	cc002a73          	csrr	s4,0xcc0
+   1032a:	9602                	jalr	a2
+   1032c:	80041073          	csrw	0x800,s0
+   10330:	cc0024f3          	csrr	s1,0xcc0
+   10334:	00000517          	auipc	a0,0x0
+   10338:	27450513          	add	a0,a0,628 # 105a8 <_start+0x15a>
+   1033c:	00000097          	auipc	ra,0x0
+   10340:	de4080e7          	jalr	-540(ra) # 10120 <put>
+   10344:	854e                	mv	a0,s3
+   10346:	00000097          	auipc	ra,0x0
+   1034a:	dda080e7          	jalr	-550(ra) # 10120 <put>
+   1034e:	00000517          	auipc	a0,0x0
+   10352:	2b250513          	add	a0,a0,690 # 10600 <_start+0x1b2>
+   10356:	00000097          	auipc	ra,0x0
+   1035a:	dca080e7          	jalr	-566(ra) # 10120 <put>
+   1035e:	8522                	mv	a0,s0
+   10360:	00000097          	auipc	ra,0x0
+   10364:	de2080e7          	jalr	-542(ra) # 10142 <number>
+   10368:	00000517          	auipc	a0,0x0
+   1036c:	29850513          	add	a0,a0,664 # 10600 <_start+0x1b2>
+   10370:	00000097          	auipc	ra,0x0
+   10374:	db0080e7          	jalr	-592(ra) # 10120 <put>
+   10378:	08093503          	ld	a0,128(s2)
+   1037c:	00000097          	auipc	ra,0x0
+   10380:	dc6080e7          	jalr	-570(ra) # 10142 <number>
+   10384:	00000517          	auipc	a0,0x0
+   10388:	27c50513          	add	a0,a0,636 # 10600 <_start+0x1b2>
+   1038c:	00000097          	auipc	ra,0x0
+   10390:	d94080e7          	jalr	-620(ra) # 10120 <put>
+   10394:	0c093503          	ld	a0,192(s2)
+   10398:	00000097          	auipc	ra,0x0
+   1039c:	daa080e7          	jalr	-598(ra) # 10142 <number>
+   103a0:	00000517          	auipc	a0,0x0
+   103a4:	26050513          	add	a0,a0,608 # 10600 <_start+0x1b2>
+   103a8:	00000097          	auipc	ra,0x0
+   103ac:	d78080e7          	jalr	-648(ra) # 10120 <put>
+   103b0:	80002573          	csrr	a0,0x800
+   103b4:	00000097          	auipc	ra,0x0
+   103b8:	d8e080e7          	jalr	-626(ra) # 10142 <number>
+   103bc:	00000517          	auipc	a0,0x0
+   103c0:	24450513          	add	a0,a0,580 # 10600 <_start+0x1b2>
+   103c4:	00000097          	auipc	ra,0x0
+   103c8:	d5c080e7          	jalr	-676(ra) # 10120 <put>
+   103cc:	414484b3          	sub	s1,s1,s4
+   103d0:	8526                	mv	a0,s1
+   103d2:	00000097          	auipc	ra,0x0
+   103d6:	d70080e7          	jalr	-656(ra) # 10142 <number>
+   103da:	00000517          	auipc	a0,0x0
+   103de:	22650513          	add	a0,a0,550 # 10600 <_start+0x1b2>
+   103e2:	00000097          	auipc	ra,0x0
+   103e6:	d3e080e7          	jalr	-706(ra) # 10120 <put>
+   103ea:	06400793          	li	a5,100
+   103ee:	02f484b3          	mul	s1,s1,a5
+   103f2:	10200513          	li	a0,258
+   103f6:	02a4d533          	divu	a0,s1,a0
+   103fa:	00000097          	auipc	ra,0x0
+   103fe:	d48080e7          	jalr	-696(ra) # 10142 <number>
+   10402:	00000517          	auipc	a0,0x0
+   10406:	20650513          	add	a0,a0,518 # 10608 <_start+0x1ba>
+   1040a:	00000097          	auipc	ra,0x0
+   1040e:	d16080e7          	jalr	-746(ra) # 10120 <put>
+   10412:	08093783          	ld	a5,128(s2)
+   10416:	4501                	li	a0,0
+   10418:	00878a63          	beq	a5,s0,1042c <trial+0x152>
+   1041c:	70a2                	ld	ra,40(sp)
+   1041e:	7402                	ld	s0,32(sp)
+   10420:	64e2                	ld	s1,24(sp)
+   10422:	6942                	ld	s2,16(sp)
+   10424:	69a2                	ld	s3,8(sp)
+   10426:	6a02                	ld	s4,0(sp)
+   10428:	6145                	add	sp,sp,48
+   1042a:	8082                	ret
+   1042c:	0c093703          	ld	a4,192(s2)
+   10430:	4785                	li	a5,1
+   10432:	4501                	li	a0,0
+   10434:	fef714e3          	bne	a4,a5,1041c <trial+0x142>
+   10438:	80002573          	csrr	a0,0x800
+   1043c:	00153513          	seqz	a0,a0
+   10440:	bff1                	j	1041c <trial+0x142>
+
+0000000000010442 <finish>:
+   10442:	4581                	li	a1,0
+   10444:	4601                	li	a2,0
+   10446:	05d00893          	li	a7,93
+   1044a:	00000073          	ecall
+
+000000000001044e <_start>:
+   1044e:	7179                	add	sp,sp,-48
+   10450:	f406                	sd	ra,40(sp)
+   10452:	800027f3          	csrr	a5,0x800
+   10456:	f022                	sd	s0,32(sp)
+   10458:	ec26                	sd	s1,24(sp)
+   1045a:	e84a                	sd	s2,16(sp)
+   1045c:	e44e                	sd	s3,8(sp)
+   1045e:	e052                	sd	s4,0(sp)
+   10460:	c791                	beqz	a5,1046c <_start+0x1e>
+   10462:	4509                	li	a0,2
+   10464:	00000097          	auipc	ra,0x0
+   10468:	fde080e7          	jalr	-34(ra) # 10442 <finish>
+   1046c:	4781                	li	a5,0
+   1046e:	4705                	li	a4,1
+   10470:	00000697          	auipc	a3,0x0
+   10474:	d2068693          	add	a3,a3,-736 # 10190 <peer_register>
+   10478:	00000617          	auipc	a2,0x0
+   1047c:	df060613          	add	a2,a2,-528 # 10268 <ring_register_1>
+   10480:	4585                	li	a1,1
+   10482:	00000517          	auipc	a0,0x0
+   10486:	18e50513          	add	a0,a0,398 # 10610 <_start+0x1c2>
+   1048a:	00000097          	auipc	ra,0x0
+   1048e:	e50080e7          	jalr	-432(ra) # 102da <trial>
+   10492:	8a2a                	mv	s4,a0
+   10494:	4781                	li	a5,0
+   10496:	4709                	li	a4,2
+   10498:	00000697          	auipc	a3,0x0
+   1049c:	cf868693          	add	a3,a3,-776 # 10190 <peer_register>
+   104a0:	00000617          	auipc	a2,0x0
+   104a4:	de060613          	add	a2,a2,-544 # 10280 <ring_register_2>
+   104a8:	4589                	li	a1,2
+   104aa:	00000517          	auipc	a0,0x0
+   104ae:	16650513          	add	a0,a0,358 # 10610 <_start+0x1c2>
+   104b2:	00000097          	auipc	ra,0x0
+   104b6:	e28080e7          	jalr	-472(ra) # 102da <trial>
+   104ba:	89aa                	mv	s3,a0
+   104bc:	4781                	li	a5,0
+   104be:	4705                	li	a4,1
+   104c0:	00000697          	auipc	a3,0x0
+   104c4:	d1068693          	add	a3,a3,-752 # 101d0 <peer_loaded>
+   104c8:	00000617          	auipc	a2,0x0
+   104cc:	dd060613          	add	a2,a2,-560 # 10298 <ring_loaded>
+   104d0:	4585                	li	a1,1
+   104d2:	00000517          	auipc	a0,0x0
+   104d6:	14e50513          	add	a0,a0,334 # 10620 <_start+0x1d2>
+   104da:	00000097          	auipc	ra,0x0
+   104de:	e00080e7          	jalr	-512(ra) # 102da <trial>
+   104e2:	892a                	mv	s2,a0
+   104e4:	4781                	li	a5,0
+   104e6:	4709                	li	a4,2
+   104e8:	00000697          	auipc	a3,0x0
+   104ec:	ce868693          	add	a3,a3,-792 # 101d0 <peer_loaded>
+   104f0:	00000617          	auipc	a2,0x0
+   104f4:	da860613          	add	a2,a2,-600 # 10298 <ring_loaded>
+   104f8:	4589                	li	a1,2
+   104fa:	00000517          	auipc	a0,0x0
+   104fe:	12650513          	add	a0,a0,294 # 10620 <_start+0x1d2>
+   10502:	00000097          	auipc	ra,0x0
+   10506:	dd8080e7          	jalr	-552(ra) # 102da <trial>
+   1050a:	84aa                	mv	s1,a0
+   1050c:	4785                	li	a5,1
+   1050e:	4709                	li	a4,2
+   10510:	00000697          	auipc	a3,0x0
+   10514:	d0868693          	add	a3,a3,-760 # 10218 <peer_bitmap>
+   10518:	00000617          	auipc	a2,0x0
+   1051c:	da060613          	add	a2,a2,-608 # 102b8 <ring_bitmap>
+   10520:	4585                	li	a1,1
+   10522:	00000517          	auipc	a0,0x0
+   10526:	10650513          	add	a0,a0,262 # 10628 <_start+0x1da>
+   1052a:	00000097          	auipc	ra,0x0
+   1052e:	db0080e7          	jalr	-592(ra) # 102da <trial>
+   10532:	842a                	mv	s0,a0
+   10534:	4785                	li	a5,1
+   10536:	4711                	li	a4,4
+   10538:	00000697          	auipc	a3,0x0
+   1053c:	ce068693          	add	a3,a3,-800 # 10218 <peer_bitmap>
+   10540:	00000617          	auipc	a2,0x0
+   10544:	d7860613          	add	a2,a2,-648 # 102b8 <ring_bitmap>
+   10548:	4589                	li	a1,2
+   1054a:	00000517          	auipc	a0,0x0
+   1054e:	0de50513          	add	a0,a0,222 # 10628 <_start+0x1da>
+   10552:	00000097          	auipc	ra,0x0
+   10556:	d88080e7          	jalr	-632(ra) # 102da <trial>
+   1055a:	00aa7a33          	and	s4,s4,a0
+   1055e:	0149f9b3          	and	s3,s3,s4
+   10562:	01397933          	and	s2,s2,s3
+   10566:	0124f4b3          	and	s1,s1,s2
+   1056a:	8c65                	and	s0,s0,s1
+   1056c:	8805                	and	s0,s0,1
+   1056e:	ec11                	bnez	s0,1058a <_start+0x13c>
+   10570:	00000517          	auipc	a0,0x0
+   10574:	0c050513          	add	a0,a0,192 # 10630 <_start+0x1e2>
+   10578:	00000097          	auipc	ra,0x0
+   1057c:	ba8080e7          	jalr	-1112(ra) # 10120 <put>
+   10580:	4505                	li	a0,1
+   10582:	00000097          	auipc	ra,0x0
+   10586:	ec0080e7          	jalr	-320(ra) # 10442 <finish>
+   1058a:	00000517          	auipc	a0,0x0
+   1058e:	0c650513          	add	a0,a0,198 # 10650 <_start+0x202>
+   10592:	00000097          	auipc	ra,0x0
+   10596:	b8e080e7          	jalr	-1138(ra) # 10120 <put>
+   1059a:	4501                	li	a0,0
+   1059c:	00000097          	auipc	ra,0x0
+   105a0:	ea6080e7          	jalr	-346(ra) # 10442 <finish>
+   105a4:	00000013          	nop

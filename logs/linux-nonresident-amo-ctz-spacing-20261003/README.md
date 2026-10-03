@@ -1,0 +1,5 @@
+This recoverable FPGA probe measures one-shot `AMOSWAP -> CTZ -> CSR800` target selection with zero through eight explicit bubbles. It seeds every valid stale target with one return stub so a wrong but valid selection is reported instead of wedging the core.
+
+On the qualified old image, every spacing selected logical context 2, completed the peer, published word `1`, and returned to context 0. The zero-bubble case therefore works for a one-shot atomic selector; it does not prove a hot repeated ring. The exact ELF SHA-256 is `c4e5c5411100f586181abfbd5936beb17e525c663a20a2076bbcafc1e24c7d46`.
+
+An initial no-libc build faulted before the probe because linker relaxation emitted a `gp`-relative global access while `_start` had no CRT initialization. The accepted rebuild uses `-msmall-data-limit=0 -mno-relax -Wl,--no-relax`, and its disassembly contains no `gp`-relative access. The accepted run passed guest hash, native exit zero, and `CORE[0] PASS` on bitstream `3c5b4ccf...` and Linux NBF `af22d24f...`.

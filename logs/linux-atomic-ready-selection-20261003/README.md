@@ -1,0 +1,5 @@
+This artifact tests register, loaded, and atomic ready-bitmap targets in the original large unrolled Linux ring. It also documents why that ring is retained as a negative stress control rather than the primary atomic performance result.
+
+The original atomic drain stored bitmap zero before `ctz`; because `ctz(0)` is 64, that drain did not semantically name context 0. The corrected drain stores bit 0 (`1`) first. On the qualified old image, the final tested binary uses two bubbles before and two after each atomic switch, passes modes 0 through 4, and still stalls in mode 5, the nonresident atomic ring. A compact sustained ring independently passes at two pre-switch bubbles, so the remaining mode-5 failure depends on the unrolled layout or repeated trial lifecycle rather than the basic atomic selector.
+
+The final stress binary SHA-256 is `ae0b68971118c8a4f4b6643be7d3be1a6158f803bfb8fb8e887423e009c2df42`. The mode-5 run was intentionally interrupted and the board hard-reset; it is not a performance result.

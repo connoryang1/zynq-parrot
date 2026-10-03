@@ -1,0 +1,167 @@
+
+logs/linux-amo-board-probe-20261003/amo_probe:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000010120 <put>:
+   10120:	85aa                	mv	a1,a0
+   10122:	4601                	li	a2,0
+   10124:	00c587b3          	add	a5,a1,a2
+   10128:	0007c783          	lbu	a5,0(a5)
+   1012c:	e799                	bnez	a5,1013a <put+0x1a>
+   1012e:	4505                	li	a0,1
+   10130:	04000893          	li	a7,64
+   10134:	00000073          	ecall
+   10138:	8082                	ret
+   1013a:	0605                	addi	a2,a2,1
+   1013c:	b7e5                	j	10124 <put+0x4>
+
+000000000001013e <number>:
+   1013e:	7179                	addi	sp,sp,-48
+   10140:	f406                	sd	ra,40(sp)
+   10142:	00010e23          	sb	zero,28(sp)
+   10146:	4651                	li	a2,20
+   10148:	46a9                	li	a3,10
+   1014a:	45a5                	li	a1,9
+   1014c:	fff6079b          	addiw	a5,a2,-1
+   10150:	0007861b          	sext.w	a2,a5
+   10154:	1782                	slli	a5,a5,0x20
+   10156:	9381                	srli	a5,a5,0x20
+   10158:	02078713          	addi	a4,a5,32
+   1015c:	00270833          	add	a6,a4,sp
+   10160:	02d57733          	remu	a4,a0,a3
+   10164:	0307071b          	addiw	a4,a4,48
+   10168:	fee80423          	sb	a4,-24(a6)
+   1016c:	872a                	mv	a4,a0
+   1016e:	02d55533          	divu	a0,a0,a3
+   10172:	fce5ede3          	bltu	a1,a4,1014c <number+0xe>
+   10176:	0038                	addi	a4,sp,8
+   10178:	00f70533          	add	a0,a4,a5
+   1017c:	00000097          	auipc	ra,0x0
+   10180:	fa4080e7          	jalr	-92(ra) # 10120 <put>
+   10184:	70a2                	ld	ra,40(sp)
+   10186:	6145                	addi	sp,sp,48
+   10188:	8082                	ret
+
+000000000001018a <_start>:
+   1018a:	715d                	addi	sp,sp,-80
+   1018c:	f84a                	sd	s2,48(sp)
+   1018e:	f44e                	sd	s3,40(sp)
+   10190:	e486                	sd	ra,72(sp)
+   10192:	e0a2                	sd	s0,64(sp)
+   10194:	fc26                	sd	s1,56(sp)
+   10196:	f052                	sd	s4,32(sp)
+   10198:	ec56                	sd	s5,24(sp)
+   1019a:	e85a                	sd	s6,16(sp)
+   1019c:	e45e                	sd	s7,8(sp)
+   1019e:	00001917          	auipc	s2,0x1
+   101a2:	e6290913          	addi	s2,s2,-414 # 11000 <words>
+   101a6:	00001997          	auipc	s3,0x1
+   101aa:	e8298993          	addi	s3,s3,-382 # 11028 <outputs>
+   101ae:	4785                	li	a5,1
+   101b0:	0ef932af          	amoswap.d.aqrl	t0,a5,(s2)
+   101b4:	60129293          	ctz	t0,t0
+   101b8:	0059b023          	sd	t0,0(s3)
+   101bc:	00001717          	auipc	a4,0x1
+   101c0:	e4c70713          	addi	a4,a4,-436 # 11008 <words+0x8>
+   101c4:	00001697          	auipc	a3,0x1
+   101c8:	e6c68693          	addi	a3,a3,-404 # 11030 <outputs+0x8>
+   101cc:	0ef732af          	amoswap.d.aqrl	t0,a5,(a4)
+   101d0:	00000013          	nop
+   101d4:	60129293          	ctz	t0,t0
+   101d8:	0056b023          	sd	t0,0(a3)
+   101dc:	00001717          	auipc	a4,0x1
+   101e0:	e3470713          	addi	a4,a4,-460 # 11010 <words+0x10>
+   101e4:	00001697          	auipc	a3,0x1
+   101e8:	e5468693          	addi	a3,a3,-428 # 11038 <outputs+0x10>
+   101ec:	0ef732af          	amoswap.d.aqrl	t0,a5,(a4)
+   101f0:	00000013          	nop
+   101f4:	00000013          	nop
+   101f8:	60129293          	ctz	t0,t0
+   101fc:	0056b023          	sd	t0,0(a3)
+   10200:	00001717          	auipc	a4,0x1
+   10204:	e1870713          	addi	a4,a4,-488 # 11018 <words+0x18>
+   10208:	00001697          	auipc	a3,0x1
+   1020c:	e3868693          	addi	a3,a3,-456 # 11040 <outputs+0x18>
+   10210:	0ef732af          	amoswap.d.aqrl	t0,a5,(a4)
+   10214:	00000013          	nop
+   10218:	00000013          	nop
+   1021c:	00000013          	nop
+   10220:	60129293          	ctz	t0,t0
+   10224:	0056b023          	sd	t0,0(a3)
+   10228:	00001717          	auipc	a4,0x1
+   1022c:	df870713          	addi	a4,a4,-520 # 11020 <words+0x20>
+   10230:	00001697          	auipc	a3,0x1
+   10234:	e1868693          	addi	a3,a3,-488 # 11048 <outputs+0x20>
+   10238:	0ef732af          	amoswap.d.aqrl	t0,a5,(a4)
+   1023c:	00000013          	nop
+   10240:	00000013          	nop
+   10244:	00000013          	nop
+   10248:	00000013          	nop
+   1024c:	60129293          	ctz	t0,t0
+   10250:	0056b023          	sd	t0,0(a3)
+   10254:	4481                	li	s1,0
+   10256:	00000b97          	auipc	s7,0x0
+   1025a:	0d2b8b93          	addi	s7,s7,210 # 10328 <_start+0x19e>
+   1025e:	00000a17          	auipc	s4,0x0
+   10262:	0eaa0a13          	addi	s4,s4,234 # 10348 <_start+0x1be>
+   10266:	00000b17          	auipc	s6,0x0
+   1026a:	0eab0b13          	addi	s6,s6,234 # 10350 <_start+0x1c6>
+   1026e:	4a95                	li	s5,5
+   10270:	855e                	mv	a0,s7
+   10272:	00000097          	auipc	ra,0x0
+   10276:	eae080e7          	jalr	-338(ra) # 10120 <put>
+   1027a:	8526                	mv	a0,s1
+   1027c:	00000097          	auipc	ra,0x0
+   10280:	ec2080e7          	jalr	-318(ra) # 1013e <number>
+   10284:	8552                	mv	a0,s4
+   10286:	0004841b          	sext.w	s0,s1
+   1028a:	00000097          	auipc	ra,0x0
+   1028e:	e96080e7          	jalr	-362(ra) # 10120 <put>
+   10292:	02041793          	slli	a5,s0,0x20
+   10296:	01d7d413          	srli	s0,a5,0x1d
+   1029a:	008987b3          	add	a5,s3,s0
+   1029e:	6388                	ld	a0,0(a5)
+   102a0:	944a                	add	s0,s0,s2
+   102a2:	00000097          	auipc	ra,0x0
+   102a6:	e9c080e7          	jalr	-356(ra) # 1013e <number>
+   102aa:	8552                	mv	a0,s4
+   102ac:	00000097          	auipc	ra,0x0
+   102b0:	e74080e7          	jalr	-396(ra) # 10120 <put>
+   102b4:	6008                	ld	a0,0(s0)
+   102b6:	0485                	addi	s1,s1,1
+   102b8:	00000097          	auipc	ra,0x0
+   102bc:	e86080e7          	jalr	-378(ra) # 1013e <number>
+   102c0:	855a                	mv	a0,s6
+   102c2:	00000097          	auipc	ra,0x0
+   102c6:	e5e080e7          	jalr	-418(ra) # 10120 <put>
+   102ca:	fb5493e3          	bne	s1,s5,10270 <_start+0xe6>
+   102ce:	4781                	li	a5,0
+   102d0:	4685                	li	a3,1
+   102d2:	4615                	li	a2,5
+   102d4:	02079593          	slli	a1,a5,0x20
+   102d8:	01d5d713          	srli	a4,a1,0x1d
+   102dc:	00e985b3          	add	a1,s3,a4
+   102e0:	618c                	ld	a1,0(a1)
+   102e2:	00d59663          	bne	a1,a3,102ee <_start+0x164>
+   102e6:	974a                	add	a4,a4,s2
+   102e8:	6318                	ld	a4,0(a4)
+   102ea:	02d70163          	beq	a4,a3,1030c <_start+0x182>
+   102ee:	00000517          	auipc	a0,0x0
+   102f2:	06a50513          	addi	a0,a0,106 # 10358 <_start+0x1ce>
+   102f6:	00000097          	auipc	ra,0x0
+   102fa:	e2a080e7          	jalr	-470(ra) # 10120 <put>
+   102fe:	4505                	li	a0,1
+   10300:	4581                	li	a1,0
+   10302:	4601                	li	a2,0
+   10304:	05d00893          	li	a7,93
+   10308:	00000073          	ecall
+   1030c:	2785                	addiw	a5,a5,1
+   1030e:	fcc793e3          	bne	a5,a2,102d4 <_start+0x14a>
+   10312:	00000517          	auipc	a0,0x0
+   10316:	05e50513          	addi	a0,a0,94 # 10370 <_start+0x1e6>
+   1031a:	00000097          	auipc	ra,0x0
+   1031e:	e06080e7          	jalr	-506(ra) # 10120 <put>
+   10322:	4501                	li	a0,0
+   10324:	bff1                	j	10300 <_start+0x176>

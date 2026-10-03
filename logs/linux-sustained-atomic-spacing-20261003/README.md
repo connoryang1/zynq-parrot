@@ -1,0 +1,5 @@
+This probe finds the steady-state spacing required by a realistic atomic ready-bitmap selector on the qualified old FPGA image. Contexts 0 and 2 exchange one shared bitmap for 128 round trips per case; a direct constant-target drain keeps drain behavior outside the protocol under test.
+
+Cases run from eight bubbles downward. Spacings eight through two completed with the correct context, bitmap, and return state; the one-bubble case stalled. The shortest passing case took 5,021 cycles for 256 atomic protocol handoffs plus two direct drains, or 19.46 cycles per operation if the two drains are included. This establishes a sustained threshold of two bubbles for the tested `AMOSWAP.aqrl; fence rw,rw; ctz; [NOPs]; CSR800` sequence, even though the one-shot form passes with zero.
+
+The exact ELF SHA-256 is `e423ee77853a9988be20db87cd2612f6e50f24c3f6c206eece96602160aa7efd`. The expected one-bubble stall required an interrupted runner and subsequent hard reset; no result below one bubble is claimed.
