@@ -15,3 +15,29 @@ Relative to the measured 5,496-cycle same-address-space Linux handoff, ready-bit
 The accepted run is `sim-run-gp-fixed.log`, SHA-256 `6b3197bd3845c59d7aa1bcb9f86ff628284e042972ebdc2159fd3bac28ceebd1`. It reached `CORE PASS` and `BSG PASS`; the subsequent DPI final-block failure is the established simulator teardown artifact. The ELF and NBF hashes are recorded in `sim-analysis.json`.
 
 Earlier simulator attempts in this directory are invalid. One reused a stale NBF. Two later attempts omitted the peer context's global pointer, so linker-relaxed GP-relative result accesses faulted after the handoff loop. The accepted benchmark seeds the peer GP and byte-matches the intended ELF before NBF generation.
+
+
+## FPGA qualification and dependency localization
+
+The exact routed image passed CTZ arithmetic independently, but the no-NOP Linux ready-bitmap ring stalled at the first bitmap mode. The original Linux binary also exposed a separate compiler issue: without `-ffixed-s11`, GCC reused the benchmark's state sentinel register. `build-linux.sh` records the corrected reproducible flags.
+
+Three controlled FPGA variants localize the remaining hardware dependency:
+
+| Sequence | Result |
+| --- | --- |
+| `load; ctz; csrw` | stalls at resident bitmap mode |
+| `load; nop; ctz; csrw` | stalls at resident bitmap mode |
+| ready register `ctz; csrw` | stalls at resident bitmap mode |
+| `load; ctz; nop; csrw` | **PASS**, all six modes and state checks |
+
+Thus neither CTZ arithmetic nor the load-to-CTZ dependency is faulty. The early context-switch target read sees a CTZ destination one cycle before it is safe. The verified one-NOP sequence measures the same useful medians as simulation within rounding:
+
+| Target source | Resident cycles/handoff | Nonresident cycles/handoff |
+| --- | ---: | ---: |
+| Register | 5.14 | 9.16 |
+| Hot loaded target | 10.12 | 14.15 |
+| Ready bitmap with safe CTZ spacing | 11.12 | 15.13 |
+
+The accepted FPGA workaround binary is `variants/nop-after-ctz/ready_selection_benchmark`, SHA-256 `ebc795e8e0e6f16c5692145f3b27126021cd6106ebd536c2304794f6df6ec8bd`. It passed guest hash verification, all timed rings and state checks, native exit zero, `CORE[0] PASS`, and runner exit zero. `variants/nop-after-load` and `variants/ctz-register-source` are negative localization controls and are not performance results.
+
+The RTL candidate extends the existing computed-target dependency interlock with one lightweight tail stage (valid, thread ID, and register ID). The existing 46-case register-target simulator regression passes after this change. A newly routed no-NOP FPGA rerun remains the acceptance gate.
