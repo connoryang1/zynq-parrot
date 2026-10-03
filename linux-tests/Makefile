@@ -39,6 +39,7 @@ VMLINUX_BIN := $(SDK_LINUX_DIR)/work/buildroot/images/vmlinux.bin
 OPENSBI_PAYLOAD := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/firmware/fw_payload.elf
 TINY_BOOTARGS := console=hvc0 loglevel=8 rdinit=/ctxtsw_user_tiny
 TINY_TARGET_SYSCALL ?= 1
+BENCH_NUM_CONTEXTS ?= 4
 
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
@@ -78,11 +79,12 @@ shell-app: $(SHELL_APP)
 benchmark: $(BENCH_APP)
 
 # No CRT initializes gp: disable linker relaxation into gp-relative accesses.
-$(BENCH_APP): ctxtsw_user_benchmark.c Makefile FORCE
+$(BENCH_APP): ctxtsw_user_benchmark.c ../testing/mt_seed.h Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) -Os -Wall -Wextra -Werror -static -nostdlib -nostartfiles \
 	  -ffreestanding -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
-	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -mno-relax -o $@ $< >&2
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -mno-relax \
+	  -DBP_NUM_CONTEXTS=$(BENCH_NUM_CONTEXTS) -o $@ $< >&2
 
 emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' ': > /tmp/ctxtsw_user_benchmark.b64'

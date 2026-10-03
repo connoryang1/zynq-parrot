@@ -9,7 +9,7 @@
 #include "../testing/mt_seed.h"
 
 typedef unsigned long u64;
-#define REPEATS 7
+#define REPEATS 128
 #define SWITCHES 256
 #define SOURCE_S11 0x13579bdfUL
 #define PEER_S11 0x2468ace0UL

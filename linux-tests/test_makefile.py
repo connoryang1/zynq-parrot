@@ -81,6 +81,13 @@ class LinuxHarnessTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(self.read_app("app")["args"][0], flag)
 
+    def test_benchmark_context_count_round_trip(self):
+        for contexts in (4, 10, 4):
+            result = self.make("benchmark", "BENCH_NUM_CONTEXTS=" + str(contexts))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("-DBP_NUM_CONTEXTS=" + str(contexts),
+                          self.read_app("benchmark")["args"])
+
     def test_compiler_change_for_every_app(self):
         for target in APPS:
             for compiler in ("first-gcc", "second-gcc", "first-gcc"):

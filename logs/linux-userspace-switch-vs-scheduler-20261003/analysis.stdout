@@ -1,0 +1,35 @@
+{
+  "aggregate_samples_per_mode": 128,
+  "switches_per_aggregate": 256,
+  "total_timed_switches": 65536,
+  "direct_handoff_physical_cycles": {
+    "resident_median_per_switch": 5.109375,
+    "nonresident_median_per_switch": 9.16015625,
+    "resident_aggregate_min_median_max": [
+      1308,
+      1308.0,
+      68064
+    ],
+    "nonresident_aggregate_min_median_max": [
+      2345,
+      2345.0,
+      2348
+    ],
+    "resident_aggregates_over_2x_median": 1,
+    "nonresident_aggregates_over_2x_median": 0
+  },
+  "linux_handoff_medians_physical_cycles": {
+    "to_main": 5595.0,
+    "to_worker": 5496.0,
+    "no_peer_yield": 3357.0
+  },
+  "linux_over_direct_latency_ratio": {
+    "handoff_to_main_over_resident": 1095.045871559633,
+    "handoff_to_worker_over_resident": 1075.6697247706422,
+    "handoff_to_main_over_nonresident": 610.7974413646056,
+    "handoff_to_worker_over_nonresident": 599.9897654584222,
+    "no_peer_yield_over_resident": 657.0275229357799,
+    "no_peer_yield_over_nonresident": 366.4784648187633
+  },
+  "scope": "Direct measurements are hot assembly rings within one Linux process. They include loop overhead and asynchronous interrupts but exclude runtime policy, context ownership, wakeup bookkeeping, and cross-address-space switching."
+}

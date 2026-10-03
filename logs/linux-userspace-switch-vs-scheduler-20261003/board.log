@@ -1,0 +1,1411 @@
+CONTROL_PROGRAM_SHA256=be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e
+NBF_SHA256=af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3
+LOG=/home/xilinx/bp-logs/linux-shell-interactive-20261003T085054Z-2605.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0x523ab8 40000004 16 1
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 67108864
+bsg_zynq_pl: allocate_dram() called with size 67108864 bytes --> virtual ptr=0xb2afc000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb2afc000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1907939
+DEBUG-PS: ps.cpp: 1-1908117
+DEBUG-PS: ps.cpp: 2-1908285
+DEBUG-PS: ps.cpp: 3-1908448
+DEBUG-PS: ps.cpp: 4-1908611
+DEBUG-PS: ps.cpp: 5-1908774
+DEBUG-PS: ps.cpp: 6-1908932
+DEBUG-PS: ps.cpp: 7-1909091
+DEBUG-PS: ps.cpp: 8-1909253
+DEBUG-PS: ps.cpp: 9-1909413
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: Zero-ing DRAM (67108864 bytes)
+INFO:    ps.cpp: zero-d 0 MB
+INFO:    ps.cpp: zero-d 1 MB
+INFO:    ps.cpp: zero-d 2 MB
+INFO:    ps.cpp: zero-d 3 MB
+INFO:    ps.cpp: zero-d 4 MB
+INFO:    ps.cpp: zero-d 5 MB
+INFO:    ps.cpp: zero-d 6 MB
+INFO:    ps.cpp: zero-d 7 MB
+INFO:    ps.cpp: zero-d 8 MB
+INFO:    ps.cpp: zero-d 9 MB
+INFO:    ps.cpp: zero-d 10 MB
+INFO:    ps.cpp: zero-d 11 MB
+INFO:    ps.cpp: zero-d 12 MB
+INFO:    ps.cpp: zero-d 13 MB
+INFO:    ps.cpp: zero-d 14 MB
+INFO:    ps.cpp: zero-d 15 MB
+INFO:    ps.cpp: zero-d 16 MB
+INFO:    ps.cpp: zero-d 17 MB
+INFO:    ps.cpp: zero-d 18 MB
+INFO:    ps.cpp: zero-d 19 MB
+INFO:    ps.cpp: zero-d 20 MB
+INFO:    ps.cpp: zero-d 21 MB
+INFO:    ps.cpp: zero-d 22 MB
+INFO:    ps.cpp: zero-d 23 MB
+INFO:    ps.cpp: zero-d 24 MB
+INFO:    ps.cpp: zero-d 25 MB
+INFO:    ps.cpp: zero-d 26 MB
+INFO:    ps.cpp: zero-d 27 MB
+INFO:    ps.cpp: zero-d 28 MB
+INFO:    ps.cpp: zero-d 29 MB
+INFO:    ps.cpp: zero-d 30 MB
+INFO:    ps.cpp: zero-d 31 MB
+INFO:    ps.cpp: zero-d 32 MB
+INFO:    ps.cpp: zero-d 33 MB
+INFO:    ps.cpp: zero-d 34 MB
+INFO:    ps.cpp: zero-d 35 MB
+INFO:    ps.cpp: zero-d 36 MB
+INFO:    ps.cpp: zero-d 37 MB
+INFO:    ps.cpp: zero-d 38 MB
+INFO:    ps.cpp: zero-d 39 MB
+INFO:    ps.cpp: zero-d 40 MB
+INFO:    ps.cpp: zero-d 41 MB
+INFO:    ps.cpp: zero-d 42 MB
+INFO:    ps.cpp: zero-d 43 MB
+INFO:    ps.cpp: zero-d 44 MB
+INFO:    ps.cpp: zero-d 45 MB
+INFO:    ps.cpp: zero-d 46 MB
+INFO:    ps.cpp: zero-d 47 MB
+INFO:    ps.cpp: zero-d 48 MB
+INFO:    ps.cpp: zero-d 49 MB
+INFO:    ps.cpp: zero-d 50 MB
+INFO:    ps.cpp: zero-d 51 MB
+INFO:    ps.cpp: zero-d 52 MB
+INFO:    ps.cpp: zero-d 53 MB
+INFO:    ps.cpp: zero-d 54 MB
+INFO:    ps.cpp: zero-d 55 MB
+INFO:    ps.cpp: zero-d 56 MB
+INFO:    ps.cpp: zero-d 57 MB
+INFO:    ps.cpp: zero-d 58 MB
+INFO:    ps.cpp: zero-d 59 MB
+INFO:    ps.cpp: zero-d 60 MB
+INFO:    ps.cpp: zero-d 61 MB
+INFO:    ps.cpp: zero-d 62 MB
+INFO:    ps.cpp: zero-d 63 MB
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878498
+DEBUG-PS: ps.cpp: finished loading 1878498 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+INFO:    ps.cpp: Starting scan thread
+INFO:    ps.cpp: Starting i/o polling thread
+
+
+OpenSBI v1.4
+
+   ____                    _____ ____ _____
+
+  / __ \                  / ____|  _ \_   _|
+
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+
+        | |
+
+        |_|
+
+
+
+Platform Name             : blackparrot
+
+Platform Features         : medeleg
+
+Platform HART Count       : 1
+
+Platform IPI Device       : bp-ipi
+
+Platform Timer Device     : bp-timer @ 50000000Hz
+
+Platform Console Device   : bp-console
+
+Platform HSM Device       : ---
+
+Platform PMU Device       : ---
+
+Platform Reboot Device    : ---
+
+Platform Shutdown Device  : bp-reset
+
+Platform Suspend Device   : ---
+
+Platform CPPC Device      : ---
+
+Firmware Base             : 0x80000000
+
+Firmware Size             : 310 KB
+
+Firmware RW Offset        : 0x40000
+
+Firmware RW Size          : 54 KB
+
+Firmware Heap Offset      : 0x45000
+
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+
+Runtime SBI Version       : 2.0
+
+
+
+Domain0 Name              : root
+
+Domain0 Boot HART         : 0
+
+Domain0 HARTs             : 0*
+
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+
+Domain0 Next Address      : 0x0000000080200000
+
+Domain0 Next Arg1         : 0x0000000082200000
+
+Domain0 Next Mode         : S-mode
+
+Domain0 SysReset          : yes
+
+Domain0 SysSuspend        : yes
+
+
+
+Boot HART ID              : 0
+
+Boot HART Domain          : root
+
+Boot HART Priv Version    : v1.11
+
+Boot HART Base ISA        : rv64imafdcb
+
+Boot HART ISA Extensions  : none
+
+Boot HART PMP Count       : 0
+
+Boot HART PMP Granularity : 0 bits
+
+Boot HART PMP Address Bits: 0
+
+Boot HART MHPM Info       : 0 (0x00000000)
+
+Boot HART Debug Triggers  : 0 triggers
+
+Boot HART MIDELEG         : 0x0000000000000222
+
+Boot HART MEDELEG         : 0x000000000000b109
+
+[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
+
+
+[    0.000000] Machine model: blackparrot,riscv64
+
+
+[    0.000000] SBI specification v2.0 detected
+
+
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+
+
+[    0.000000] SBI TIME extension detected
+
+
+[    0.000000] SBI IPI extension detected
+
+
+[    0.000000] SBI RFENCE extension detected
+
+
+[    0.000000] SBI SRST extension detected
+
+
+[    0.000000] efi: UEFI not found.
+
+
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+
+
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+
+
+[    0.000000] Zone ranges:
+
+
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+
+
+[    0.000000]   Normal   empty
+
+
+[    0.000000] Movable zone start for each node
+
+
+[    0.000000] Early memory node ranges
+
+
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+
+
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+
+
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+
+
+[    0.000000] SBI HSM extension detected
+
+
+[    0.000000] Falling back to deprecated "riscv,isa"
+
+
+[    0.000000] riscv: base ISA extensions acdfim
+
+
+[    0.000000] riscv: ELF capabilities acdfim
+
+
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+
+
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+
+
+[    0.000000] pcpu-alloc: [0] 0
+
+
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+
+
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+
+
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+
+
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+
+
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+
+
+[    0.000000] Virtual kernel memory layout:
+
+
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+
+
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+
+
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+
+
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+
+
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+
+
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+
+
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+
+
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25996K reserved, 0K cma-reserved)
+
+
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+
+
+[    0.000000] rcu: Hierarchical RCU implementation.
+
+
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+
+
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+
+
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+
+
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+
+
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+
+
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+
+
+[    0.000000] riscv-intc: 64 local interrupts mapped
+
+
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+
+
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+
+
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+
+
+[    0.000013] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
+
+
+[    0.001031] Console: colour dummy device 80x25
+
+
+[    0.001160] printk: console [hvc0] enabled
+
+
+[    0.017026] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
+
+
+[    0.017633] pid_max: default: 32768 minimum: 301
+
+
+[    0.019260] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+
+
+[    0.019771] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+
+
+[    0.043714] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+
+
+[    0.045505] riscv: ELF compat mode unsupported
+
+
+[    0.046136] ASID allocator using 16 bits (65536 entries)
+
+
+[    0.048342] rcu: Hierarchical SRCU implementation.
+
+
+[    0.048658] rcu: 	Max phase no-delay instances is 1000.
+
+
+[    0.052435] EFI services will not be available.
+
+
+[    0.054828] smp: Bringing up secondary CPUs ...
+
+
+[    0.055225] smp: Brought up 1 node, 1 CPU
+
+
+[    0.059675] devtmpfs: initialized
+
+
+[    0.073069] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+
+
+[    0.073685] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+
+
+[    0.083381] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+
+
+[    0.088037] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+
+
+[    0.088739] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+
+
+[    0.128382] cpu0: Ratio of byte access time to unaligned word access is 0.01, unaligned accesses are slow
+
+
+[    0.153459] SCSI subsystem initialized
+
+
+[    0.155882] libata version 3.00 loaded.
+
+
+[    0.158409] usbcore: registered new interface driver usbfs
+
+
+[    0.159130] usbcore: registered new interface driver hub
+
+
+[    0.159808] usbcore: registered new device driver usb
+
+
+[    0.171780] vgaarb: loaded
+
+
+[    0.172961] clocksource: Switched to clocksource riscv_clocksource
+
+
+[    0.297990] NET: Registered PF_INET protocol family
+
+
+[    0.300061] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+
+
+[    0.306738] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+
+
+[    0.307368] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+
+
+[    0.307856] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+
+
+[    0.308361] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+
+
+[    0.309599] TCP: Hash tables configured (established 512 bind 512)
+
+
+[    0.310921] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+
+
+[    0.311855] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+
+
+[    0.314166] NET: Registered PF_UNIX/PF_LOCAL protocol family
+
+
+[    0.321455] RPC: Registered named UNIX socket transport module.
+
+
+[    0.321833] RPC: Registered udp transport module.
+
+
+[    0.322101] RPC: Registered tcp transport module.
+
+
+[    0.322369] RPC: Registered tcp-with-tls transport module.
+
+
+[    0.322668] RPC: Registered tcp NFSv4.1 backchannel transport module.
+
+
+[    0.323042] PCI: CLS 0 bytes, default 64
+
+
+[    0.338306] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+
+
+[    0.357100] NFS: Registering the id_resolver key type
+
+
+[    0.357816] Key type id_resolver registered
+
+
+[    0.358088] Key type id_legacy registered
+
+
+[    0.358634] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+
+
+[    0.359030] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+
+
+[    0.369379] 9p: Installing v9fs 9p2000 file system support
+
+
+[    0.371846] NET: Registered PF_ALG protocol family
+
+
+[    0.372664] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+
+
+[    0.373320] io scheduler mq-deadline registered
+
+
+[    0.373619] io scheduler kyber registered
+
+
+[    1.951117] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+
+
+[    1.993375] [drm] radeon kernel modesetting enabled.
+
+
+[    2.139000] loop: module loaded
+
+
+[    2.159310] e1000e: Intel(R) PRO/1000 Network Driver
+
+
+[    2.159622] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+
+
+[    2.189148] usbcore: registered new interface driver uas
+
+
+[    2.189874] usbcore: registered new interface driver usb-storage
+
+
+[    2.199805] mousedev: PS/2 mouse device common for all mice
+
+
+[    2.203925] sdhci: Secure Digital Host Controller Interface driver
+
+
+[    2.204293] sdhci: Copyright(c) Pierre Ossman
+
+
+[    2.204842] sdhci-pltfm: SDHCI platform and OF driver helper
+
+
+[    2.207381] usbcore: registered new interface driver usbhid
+
+
+[    2.207731] usbhid: USB HID core driver
+
+
+[    2.210855] NET: Registered PF_INET6 protocol family
+
+
+[    2.242929] Segment Routing with IPv6
+
+
+[    2.243871] In-situ OAM (IOAM) with IPv6
+
+
+[    2.245156] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+
+
+[    2.252111] NET: Registered PF_PACKET protocol family
+
+
+[    2.253561] 9pnet: Installing 9P2000 support
+
+
+[    2.254624] Key type dns_resolver registered
+
+
+[    2.255532] start plist test
+
+
+[    2.295258] end plist test
+
+
+[    2.515221] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+
+
+[    2.586997] clk: Disabling unused clocks
+
+
+[    3.528422] Freeing unused kernel image (initmem) memory: 5100K
+
+
+[    3.529204] Run /bin/sh as init process
+
+
+[    3.529476]   with arguments:
+
+
+[    3.529664]     /bin/sh
+
+
+[    3.529837]   with environment:
+
+
+[    3.530032]     HOME=/
+
+
+[    3.530200]     TERM=linux
+
+
+/bin/sh: can't access tty; job control turned off
+
+
+~ # : > /tmp/ctxtsw_user_benchmark.b64
+: > /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAEgcBAAAAAABAAAAAAAAAADgQAAAAAAAABQAAAEAAOAAE' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAEgcBAAAAAABAAAAAAAAAADgQAAAAAAAABQAAAE
+
+
+
+AAOAAE' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AEAACwAKAAMAAHAEAAAAkgsAAAAAAAAAAAAAAAAAAAAAAAAAAAAASwAAAAAAAAAAAAAAAAAAAAEA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AEAACwAKAAMAAHAEAAAAkgsAAAAAAAAAAAAAAAAAAAAAAAAAAAAASwAAAAAAAAAAAAAAAA
+
+
+
+AAAAEA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAABkCwAAAAAAAGQLAAAAAAAAABAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAQAAAAUAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAABkCwAAAAAAAGQLAAAAAA
+
+
+
+AAABAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAMAAAAAAAAAAAEAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAABAAAABgAAAAAAAAAAAAAAABABAAAAAAAAEAEAAAAAAAAAAAAAAAAAMAAAAAAAAA
+
+
+
+AAEAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAFHldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAFHldGQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAqoUBRrOHxQCDxwcAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4YHAIIX' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAqoUBRrOHxQCDxwcAmecFRZMIAARzAAAAgoAFBuW3eXEG9CMOAQBRRqlGpUWbB/b/G4
+
+
+
+YHAIIX' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'gZMThwcCMwgnADN31QIbBwcDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgAEAEwAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'gZMThwcCMwgnADN31QIbBwcDIwTo/iqHM1XVAuPt5fw4ADMF9wCXAAAA54BA+qJwRWGCgA
+
+
+
+EAEwAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AJMCQABzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AJMCQABzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAI
+
+
+
+BzUACA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'c1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBz' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'c1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgHNQAIBzUACAc1AAgH
+
+
+
+NQAIBz' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'UACAc1AAgHNQAIBzUACAc1AAgJOC8v/jngL2kwjACnMAAAAXEwAAEwPD3vMjAIAjMHMAIzSzAZMD' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'UACAc1AAgHNQAIBzUACAc1AAgJOC8v/jngL2kwjACnMAAAAXEwAAEwPD3vMjAIAjMHMAIz
+
+
+
+SzAZMD' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAgjOHMAIzyjAA8AMANzUACAbwAAAJMCQABz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAgjOHMAIzyjAA8AMANzUACAbwAAAJMCQABz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0A
+
+
+
+CAc9AA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'gHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'gHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAI
+
+
+
+Bz0ACA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'c9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgJOC8v/jngL2goABAJMCQABz' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'c9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgHPQAIBz0ACAc9AAgJOC8v/jngL2goABAJ
+
+
+
+MCQABz' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'UAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQ' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'UAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1
+
+
+
+ABgHNQ' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1AB' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUAGAc1ABgHNQAYBzUA
+
+
+
+GAc1AB' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'gHNQAYBzUAGAc1ABgJOC8v/jngL2goATAQG7IzyRQoRhIzQRRCMwgUQjOCFDLoQjNDFDIzBBQyM8' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'gHNQAYBzUAGAc1ABgJOC8v/jngL2goATAQG7IzyRQoRhIzQRRCMwgUQjOCFDLoQjNDFDIz
+
+
+
+BBQyM8' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'UUEjOGFBIzRxQSqKlwAAAOeAQNgXBQAAEwXFSwqJlwAAAOeAINcTCwRAyoqmiZcLAACTi6tMXoWX' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'UUEjOGFBIzRxQSqKlwAAAOeAQNgXBQAAEwXFSwqJlwAAAOeAINcTCwRAyoqmiZcLAACTi6
+
+
+
+tMXoWX' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAA54CA1QhglwAAAOeAwNYcYGPzlwC+hGPz+QC+iSOw+gAhBKEK4xtk/QVHEwgACIM1iQDKhiEJ' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAA54CA1QhglwAAAOeAwNYcYGPzlwC+hGPz+QC+iSOw+gAhBKEK4xtk/QVHEwgACIM1iQ
+
+
+
+DKhiEJ' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'Soa6h4him4gHAP03Y+SlAMaHKaAI4uEWYRbt95OWBwKT19YBk4cHQIqXI7C3wAUn4xQH/RcFAAAT' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'Soa6h4him4gHAP03Y+SlAMaHKaAI4uEWYRbt95OWBwKT19YBk4cHQIqXI7C3wAUn4xQH/R
+
+
+
+cFAAAT' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'BaVFlwAAAOeAIM5ShZcAAADngIDNFwUAABMFhUSXAAAA54CAzBMEQAYzhYQCIYGXAAAA54BAzRcF' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'BaVFlwAAAOeAIM5ShZcAAADngIDNFwUAABMFhUSXAAAA54CAzBMEQAYzhYQCIYGXAAAA54
+
+
+
+BAzRcF' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAATBeVElwAAAOeAYMqDNAEgM4WEAiGBlwAAAOeAIMsXBQAAEwXFQpcAAADngEDIM4WJAiGBlwAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAATBeVElwAAAOeAYMqDNAEgM4WEAiGBlwAAAOeAIMsXBQAAEwXFQpcAAADngEDIM4WJAi
+
+
+
+GBlwAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AOeAQMkXBQAAEwXlPZcAAADngGDGgzCBRAM0AUQDOQFDgzmBQgM6AUKDOoFBAzsBQYM7gUAmhYM0' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AOeAQMkXBQAAEwXlPZcAAADngGDGgzCBRAM0AUQDOQFDgzmBQgM6AUKDOoFBAzsBQYM7gU
+
+
+
+AmhYM0' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'gUMTAQFFgoB5cSbsBvQi8EroTuRS4IVHqoQXBwAAEwcH1WMG9QAXBwAAEwdH3ZcXAAAjugewlxcA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'gUMTAQFFgoB5cSbsBvQi8EroTuRS4IVHqoQXBwAAEwcH1WMG9QAXBwAAEwdH3ZcXAAAjug
+
+
+
+ewlxcA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'ACOyB7CXFwAAI7oHrpcXAAAjsgeutwcAG5OH10i6B5OHd1aTlnQClgfVj3OQJ4CXBwAAk4cnxOYH' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'ACOyB7CXFwAAI7oHrpcXAAAjsgeutwcAG5OH10i6B5OHd1aTlnQClgfVj3OQJ4CXBwAAk4
+
+
+
+cnxOYH' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo '5YPVj3OQF4BzKQDMApfzKQDMhUdjl/QUc9AAgBcUAAATBMSpFxoAABMKSqhjbjkTFwUAABMFBTSX' >> /tmp/ctxtsw_user_benchmark.b64
+echo '5YPVj3OQF4BzKQDMApfzKQDMhUdjl/QUc9AAgBcUAAATBMSpFxoAABMKSqhjbjkTFwUAAB
+
+
+
+MFBTSX' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAA54AAuRcFAAATBQUvlwAAAOeAALgmhZcAAADngEC5FwUAABMFZS2XAAAA54BgtkqFlwAAAOeA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAA54AAuRcFAAATBQUvlwAAAOeAALgmhZcAAADngEC5FwUAABMFZS2XAAAA54BgtkqFlw
+
+
+
+AAAOeA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'oLcXBQAAEwXFK5cAAADngMC0ToWXAAAA54AAthcFAAATBSUqlwAAAOeAILNzJQCAlwAAAOeAQLQX' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'oLcXBQAAEwXFK5cAAADngMC0ToWXAAAA54AAthcFAAATBSUqlwAAAOeAILNzJQCAlwAAAO
+
+
+
+eAQLQX' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'BQAAEwVlKJcAAADngGCxboWXAAAA54CgshcFAAATBcUmlwAAAOeAwK8IYJcAAADngACxFwUAABMF' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'BQAAEwVlKJcAAADngGCxboWXAAAA54CgshcFAAATBcUmlwAAAOeAwK8IYJcAAADngACxFw
+
+
+
+UAABMF' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'JSWXAAAA54AgrghklwAAAOeAYK8XBQAAEwWFI5cAAADngICsCGiXAAAA54DArRcFAAATBeUhlwAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'JSWXAAAA54AgrghklwAAAOeAYK8XBQAAEwWFI5cAAADngICsCGiXAAAA54DArRcFAAATBe
+
+
+
+UhlwAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AOeA4KoIbJcAAADngCCsFwUAABMFRSCXAAAA54BAqQM1CgCXAAAA54BgqhcFAAATBQUflwAAAOeA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AOeA4KoIbJcAAADngCCsFwUAABMFRSCXAAAA54BAqQM1CgCXAAAA54BgqhcFAAATBQUflw
+
+
+
+AAAOeA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'gKcFRZMI0AVzAAAAc1ABgF298ycAgOOSB+xuh7enVxOTh/e94xv36hxg45iX6hhkt7doJJOHB87j' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'gKcFRZMI0AVzAAAAc1ABgF298ycAgOOSB+xuh7enVxOTh/e94xv36hxg45iX6hhkt7doJJ
+
+
+
+OHB87j' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'EffqGGiTBwAI4xz36BhsgzcKAOMX9+iicAJ0M4UpQeJkQmmiaQJqRWGCgHlxBvQi8CbsSugXBQAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'EffqGGiTBwAI4xz36BhsgzcKAOMX9+iicAJ0M4UpQeJkQmmiaQJqRWGCgHlxBvQi8CbsSu
+
+
+
+gXBQAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'EwXFIBMBAYGXAAAA54CAnylFlwAAAOeAwKAXBQAAEwVlFZcAAADngOCd8ycAgJHHBUWTCNAFcwAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'EwXFIBMBAYGXAAAA54CAnylFlwAAAOeAwKAXBQAAEwVlFZcAAADngOCd8ycAgJHHBUWTCN
+
+
+
+AFcwAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AJMIwApzAAAAlxcAACO/p4jjU6D+t6dXE5OH972+jQqEEwkBQAVFlwAAAOeA4NYFRZcAAADngEDW' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AJMIwApzAAAAlxcAACO/p4jjU6D+t6dXE5OH972+jQqEEwkBQAVFlwAAAOeA4NYFRZcAAA
+
+
+
+DngEDW' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'COAhBIqF4xMk/xcFAAATBcUclwAAAOeAoLwqhBcFAAATBaUclwAAAOeAoJbKhAlFlwAAAOeAwNIJ' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'COAhBIqF4xMk/xcFAAATBcUclwAAAOeAoLwqhBcFAAATBaUclwAAAOeAoJbKhAlFlwAAAO
+
+
+
+eAwNIJ' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'RZcAAADngCDShWeThweAiOCKl6EE45D0/sqFFwUAABMFpRyXAAAA54AAuKqEFwUAABMFhRyXAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'RZcAAADngCDShWeThweAiOCKl6EE45D0/sqFFwUAABMFpRyXAAAA54AAuKqEFwUAABMFhR
+
+
+
+yXAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo '54AAkmPghAQzhIRAkwdABjME9AITVYQAlwAAAOeAIJIXBQAAEwXFBpcAAADngECPFwUAABMFxRyX' >> /tmp/ctxtsw_user_benchmark.b64
+echo '54AAkmPghAQzhIRAkwdABjME9AITVYQAlwAAAOeAIJIXBQAAEwXFBpcAAADngECPFwUAAB
+
+
+
+MFxRyX' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAA54BAjgFFMbcXBQAAEwUFG5cAAADngACNBYxdvxMAAAAgcmF3IGN5Y2xlcyAoMjU2IHN3aXRj' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAA54BAjgFFMbcXBQAAEwUFG5cAAADngACNBYxdvxMAAAAgcmF3IGN5Y2xlcyAoMjU2IH
+
+
+
+N3aXRj' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'aGVzIGVhY2gpOgAAAAAAAAAAIAAAAAAAAAAKAAAAAAAAACBjeWNsZXMvc3dpdGNoIHgxMDAgbWlu' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'aGVzIGVhY2gpOgAAAAAAAAAAIAAAAAAAAAAKAAAAAAAAACBjeWNsZXMvc3dpdGNoIHgxMD
+
+
+
+AgbWlu' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'L21lZGlhbi9tYXg6IAAAAAAvAAAAAAAAAFtCUC1MSU5VWC1CRU5DSF0gRkFJTCB0YXJnZXQvYmVn' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'L21lZGlhbi9tYXg6IAAAAAAvAAAAAAAAAFtCUC1MSU5VWC1CRU5DSF0gRkFJTCB0YXJnZX
+
+
+
+QvYmVn' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'aW4vZW5kL2NvbnRleHQvc291cmNlX3MxMS9yZXN1bHQwL3Jlc3VsdDEvcmVzdWx0Mi9yZXN1bHQz' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'aW4vZW5kL2NvbnRleHQvc291cmNlX3MxMS9yZXN1bHQwL3Jlc3VsdDEvcmVzdWx0Mi9yZX
+
+
+
+N1bHQz' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'L3BpZDoAAFtCUC1MSU5VWC1CRU5DSF0gc3RhcnQ6IDIgcmVzaWRlbnQgYmFua3MsIGxvZ2ljYWwg' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'L3BpZDoAAFtCUC1MSU5VWC1CRU5DSF0gc3RhcnQ6IDIgcmVzaWRlbnQgYmFua3MsIGxvZ2
+
+
+
+ljYWwg' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'Y29udGV4dHM9AAAAAAByZXNpZGVudAAAAAAAAAAAW0JQLUxJTlVYLUJFTkNIXSByZXNpZGVudCBy' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'Y29udGV4dHM9AAAAAAByZXNpZGVudAAAAAAAAAAAW0JQLUxJTlVYLUJFTkNIXSByZXNpZG
+
+
+
+VudCBy' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'ZWdpc3Rlci9zeXNjYWxsIGNoZWNrcyBQQVNTCgBub25yZXNpZGVudAAAAAAAbm9ucmVzaWRlbnQg' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'ZWdpc3Rlci9zeXNjYWxsIGNoZWNrcyBQQVNTCgBub25yZXNpZGVudAAAAAAAbm9ucmVzaW
+
+
+
+RlbnQg' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'bWludXMgcmVzaWRlbnQgbWVkaWFuIGN5Y2xlcy9zd2l0Y2ggeDEwMDogAAAtAAAAAAAAAFtCUC1M' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'bWludXMgcmVzaWRlbnQgbWVkaWFuIGN5Y2xlcy9zd2l0Y2ggeDEwMDogAAAtAAAAAAAAAF
+
+
+
+tCUC1M' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'SU5VWC1CRU5DSF0gUEFTUzogYWxsIHRpbWVkIHJpbmdzLCByZWdpc3RlciBhbmQgc3lzY2FsbCBj' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'SU5VWC1CRU5DSF0gUEFTUzogYWxsIHRpbWVkIHJpbmdzLCByZWdpc3RlciBhbmQgc3lzY2
+
+
+
+FsbCBj' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'aGVja3MKAAAAABAAAAAAAAAAA3pSAAF8AQEbDQIAEAAAABgAAAC89v//HgAAAAAAAAAcAAAALAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'aGVja3MKAAAAABAAAAAAAAAAA3pSAAF8AQEbDQIAEAAAABgAAAC89v//HgAAAAAAAAAcAA
+
+
+
+AALAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AMb2//9MAAAAAEIOMEKBAgJEwUIOAAAAABAAAABMAAAA+Pb//8AAAAAAAAAAEAAAAGAAAACk9///' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AMb2//9MAAAAAEIOMEKBAgJEwUIOAAAAABAAAABMAAAA+Pb//8AAAAAAAAAAEAAAAGAAAA
+
+
+
+Ck9///' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'jgAAAAAAAAAQAAAAdAAAACD4//+OAAAAAAAAAEAAAACIAAAAmvj//4ABAAAARA7QCESJBk6BAogE' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'jgAAAAAAAAAQAAAAdAAAACD4//+OAAAAAAAAAEAAAACIAAAAmvj//4ABAAAARA7QCESJBk
+
+
+
+6BAogE' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'kghWkwqUDJUOlhCXEgMsAcFEyETSRNNE1ETVRNZE10bJRA4AAAAAMAAAAMwAAADW+f//JAIAAABC' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'kghWkwqUDJUOlhCXEgMsAcFEyETSRNNE1ETVRNZE10bJRA4AAAAAMAAAAMwAAADW+f//JA
+
+
+
+IAAABC' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'DjBMiQaBAogEkgiTCpQMAwQCwULIRslC0kLTQtRCDgAAABwAAAAAAQAAxvv//0oBAAAAQg4wVA6g' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'DjBMiQaBAogEkgiTCpQMAwQCwULIRslC0kLTQtRCDgAAABwAAAAAAQAAxvv//0oBAAAAQg
+
+
+
+4wVA6g' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'EIECiASJBpIIR0NDOiAoQnVpbGRyb290IDIwMjEuMTEtODU0Ny1nN2U2NWExYSkgMTMuMi4wAEFK' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'EIECiASJBpIIR0NDOiAoQnVpbGRyb290IDIwMjEuMTEtODU0Ny1nN2U2NWExYSkgMTMuMi
+
+
+
+4wAEFK' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAcmlzY3YAAUAAAAAEEAVydjY0aTJwMV9tMnAwX2EycDFfZjJwMl9kMnAyX2MycDBfemljc3Iy' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAcmlzY3YAAUAAAAAEEAVydjY0aTJwMV9tMnAwX2EycDFfZjJwMl9kMnAyX2MycDBfem
+
+
+
+ljc3Iy' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'cDBfem1tdWwxcDAACAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAEAIAEBAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'cDBfem1tdWwxcDAACAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAEAIA
+
+
+
+EBAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAAAAAADAAIAYAgBAAAAAAAAAAAAAAAAAAAAAAADAAMASAoBAAAAAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAAAAAADAAIAYAgBAAAAAAAAAAAAAAAAAAAAAAADAAMASAoBAAAAAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAADAAQAABABAAAAAAAAAAAAAAAAAAAAAAADAAUAEBABAAAAAAAAAAAAAAAAAAAAAAADAAYA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAADAAQAABABAAAAAAAAAAAAAAAAAAAAAAADAAUAEBABAAAAAAAAAAAAAAAAAAAAAA
+
+
+
+ADAAYA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAADAAcAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAPH/AAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAADAAcAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAPH/AAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAABkAAAACAAEAIAEBAAAAAAAeAAAAAAAAAB0AAAAAAAEAIAEBAAAAAAAAAAAAAAAAAFMA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAABkAAAACAAEAIAEBAAAAAAAeAAAAAAAAAB0AAAAAAAEAIAEBAAAAAAAAAAAAAA
+
+
+
+AAAFMA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAACAAEAPgEBAAAAAABMAAAAAAAAAFoAAAACAAEAkAEBAAAAAADAAAAAAAAAAF8AAAAAAAEAkAEB' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAACAAEAPgEBAAAAAABMAAAAAAAAAFoAAAACAAEAkAEBAAAAAADAAAAAAAAAAF8AAAAAAA
+
+
+
+EAkAEB' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAAAAJAAAAABAAUAEBABAAAAAAAgAAAAAAAAAJoAAAACAAEAUAIBAAAAAACOAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAAAAJAAAAABAAUAEBABAAAAAAAgAAAAAAAAAJoAAAACAAEAUAIBAAAAAA
+
+
+
+COAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAB0AAAAAAAEA3AIBAAAAAAAAAAAAAAAAAJcAAAACAAEA4AIBAAAAAACOAAAAAAAAAF8AAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAB0AAAAAAAEA3AIBAAAAAAAAAAAAAAAAAJcAAAACAAEA4AIBAAAAAACOAAAAAAAAAF
+
+
+
+8AAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAEA4AIBAAAAAAAAAAAAAAAAAB0AAAAAAAEAbAMBAAAAAAAAAAAAAAAAAKgAAAACAAEAbgMBAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAEA4AIBAAAAAAAAAAAAAAAAAB0AAAAAAAEAbAMBAAAAAAAAAAAAAAAAAKgAAAACAAEAbg
+
+
+
+MBAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AACAAQAAAAAAAK8AAAACAAEA7gQBAAAAAAAkAgAAAAAAALUAAAABAAQAABABAAAAAAAIAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AACAAQAAAAAAAK8AAAACAAEA7gQBAAAAAAAkAgAAAAAAALUAAAABAAQAABABAAAAAAAIAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AL0AAAAQAPH/ABgBAAAAAAAAAAAAAAAAAM8AAAAQAAMAABABAAAAAAAAAAAAAAAAAPAAAAASAAEA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AL0AAAAQAPH/ABgBAAAAAAAAAAAAAAAAAM8AAAAQAAMAABABAAAAAAAAAAAAAAAAAPAAAA
+
+
+
+ASAAEA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'EgcBAAAAAABKAQAAAAAAAN8AAAAQAAUAMBABAAAAAAAAAAAAAAAAAOsAAAAQAAQAABABAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'EgcBAAAAAABKAQAAAAAAAN8AAAAQAAUAMBABAAAAAAAAAAAAAAAAAOsAAAAQAAQAABABAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAPcAAAAQAAMAABABAAAAAAAAAAAAAAAAAAYBAAAQAAMAABABAAAAAAAAAAAAAAAAAA0B' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAPcAAAAQAAMAABABAAAAAAAAAAAAAAAAAAYBAAAQAAMAABABAAAAAAAAAAAAAA
+
+
+
+AAAA0B' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAQAAUAMBABAAAAAAAAAAAAAAAAAABjdHh0c3dfdXNlcl9iZW5jaG1hcmsuYwBwdXQAJHhydjY0' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAQAAUAMBABAAAAAAAAAAAAAAAAAABjdHh0c3dfdXNlcl9iZW5jaG1hcmsuYwBwdXQAJH
+
+
+
+hydjY0' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'aTJwMV9tMnAwX2EycDFfZjJwMl9kMnAyX2MycDBfemljc3IycDBfem1tdWwxcDAAbnVtYmVyAHBl' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'aTJwMV9tMnAwX2EycDFfZjJwMl9kMnAyX2MycDBfemljc3IycDBfem1tdWwxcDAAbnVtYm
+
+
+
+VyAHBl' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'ZXIAJHhydjY0aTJwMV9tMnAwX2EycDFfZjJwMl9kMnAyX3ppY3NyMnAwX3ptbXVsMXAwAHJlc3Vs' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'ZXIAJHhydjY0aTJwMV9tMnAwX2EycDFfZjJwMl9kMnAyX3ppY3NyMnAwX3ptbXVsMXAwAH
+
+
+
+Jlc3Vs' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'dABub25yZXNpZGVudF9yaW5nAHJlcG9ydAB0cmlhbABvd25fcGlkAF9fZ2xvYmFsX3BvaW50ZXIk' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'dABub25yZXNpZGVudF9yaW5nAHJlcG9ydAB0cmlhbABvd25fcGlkAF9fZ2xvYmFsX3BvaW
+
+
+
+50ZXIk' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AF9fU0RBVEFfQkVHSU5fXwBfX0JTU19FTkRfXwBfX2Jzc19zdGFydABfX0RBVEFfQkVHSU5fXwBf' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AF9fU0RBVEFfQkVHSU5fXwBfX0JTU19FTkRfXwBfX2Jzc19zdGFydABfX0RBVEFfQkVHSU
+
+
+
+5fXwBf' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'ZWRhdGEAX2VuZAAALnN5bXRhYgAuc3RydGFiAC5zaHN0cnRhYgAudGV4dAAucm9kYXRhAC5laF9m' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'ZWRhdGEAX2VuZAAALnN5bXRhYgAuc3RydGFiAC5zaHN0cnRhYgAudGV4dAAucm9kYXRhAC
+
+
+
+5laF9m' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'cmFtZQAuc2JzcwAuYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'cmFtZQAuc2JzcwAuYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+
+
+AAABsA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAABAAAABgAAAAAAAAAgAQEAAAAAACABAAAAAAAAQAcAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAABAAAABgAAAAAAAAAgAQEAAAAAACABAAAAAAAAQAcAAAAAAAAAAAAAAAAAAAgAAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAhAAAAAQAAADIAAAAAAAAAYAgBAAAAAABgCAAAAAAAAOUBAAAAAAAAAAAAAAAAAAAIAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAhAAAAAQAAADIAAAAAAAAAYAgBAAAAAABgCAAAAAAAAOUBAAAAAAAAAAAAAAAAAA
+
+
+
+AIAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAEAAAAAAAAAKQAAAAEAAAACAAAAAAAAAEgKAQAAAAAASAoAAAAAAAAcAQAAAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAEAAAAAAAAAKQAAAAEAAAACAAAAAAAAAEgKAQAAAAAASAoAAAAAAAAcAQAAAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAACAAAAAAAAAAAAAAAAAAAADMAAAAIAAAAAwAAAAAAAAAAEAEAAAAAAAAQAAAAAAAACAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAACAAAAAAAAAAAAAAAAAAAADMAAAAIAAAAAwAAAAAAAAAAEAEAAAAAAAAQAAAAAAAACA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA5AAAACAAAAAMAAAAAAAAAEBABAAAAAAAAEAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA5AAAACAAAAAMAAAAAAAAAEBABAAAAAAAAEA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'ACAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAPgAAAAEAAAAwAAAAAAAAAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'ACAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAPgAAAAEAAAAwAAAAAAAAAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'ZAsAAAAAAAAuAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAEcAAAADAABwAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'ZAsAAAAAAAAuAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAEcAAAADAABwAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAJILAAAAAAAASwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAJILAAAAAAAASwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAg
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAAAAADgCwAAAAAAAOgCAAAAAAAACQAAABcAAAAIAAAAAAAAABgAAAAAAAAACQAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAAAAADgCwAAAAAAAOgCAAAAAAAACQAAABcAAAAIAAAAAAAAABgAAAAAAA
+
+
+
+AACQAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAMAAAAAAAAAAAAAAAAAAAAAAAAAyA4AAAAAAAASAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAMAAAAAAAAAAAAAAAAAAAAAAAAAyA4AAAAAAAASAQAAAAAAAAAAAAAAAAAAAQAAAAAAAA
+
+
+
+AAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAABEAAAADAAAAAAAAAAAAAAAAAAAAAAAAANoPAAAAAAAAWQAAAAAAAAAAAAAAAAAAAAEAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAABEAAAADAAAAAAAAAAAAAAAAAAAAAAAAANoPAAAAAAAAWQAAAAAAAAAAAAAAAAAAAA
+
+
+
+EAAAAA' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # echo 'AAAAAAAAAAAAAAA=' >> /tmp/ctxtsw_user_benchmark.b64
+echo 'AAAAAAAAAAAAAAA=' >> /tmp/ctxtsw_user_benchmark.b64
+
+
+~ # base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark
+base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark
+
+
+~ # chmod +x /tmp/ctxtsw_user_benchmark
+chmod +x /tmp/ctxtsw_user_benchmark
+
+
+~ # sha256sum /tmp/ctxtsw_user_benchmark
+sha256sum /tmp/ctxtsw_user_benchmark
+
+
+9706d0fa29a9bee28500d6183261c88129d37ff9cf1f0f5626bcbe351c2fffea  /tmp/ctxtsw_user_benchmark
+
+
+~ # /tmp/ctxtsw_user_benchmark
+/tmp/ctxtsw_user_benchmark
+
+
+[BP-LINUX-BENCH] start: 2 resident banks, logical contexts=10
+
+
+resident raw cycles (256 switches each): 1312 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 1308 68064 1308 1308 1308 1308 1308 1308 1308
+
+
+resident cycles/switch x100 min/median/max: 510/510/26587
+
+
+[BP-LINUX-BENCH] resident register/syscall checks PASS
+
+
+nonresident raw cycles (256 switches each): 2348 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345 2345
+
+
+nonresident cycles/switch x100 min/median/max: 916/916/917
+
+
+nonresident minus resident median cycles/switch x100: 405
+
+
+[BP-LINUX-BENCH] PASS: all timed rings, register and syscall checks
+
+
+~ # echo PROBE_EXIT=$?
+echo PROBE_EXIT=$?
+
+
+PROBE_EXIT=0
+
+
+~ # poweroff -f
+poweroff -f
+
+
+[    7.285476] reboot: Power down
+
+
+INFO:    CORE[0] PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
+INFO:    ps.cpp: minstret (instructions retired):      373,812,029 (        1647eb3d)
+INFO:    ps.cpp: minstret delta:                       373,812,029 (        1647eb3d)
+INFO:    ps.cpp: MTIME start:                          372,798,419 (        163873d3)
+INFO:    ps.cpp: MTIME stop:                           446,323,863 (        1a9a5c97)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):          73,525,444 (         461e8c4)
+INFO:    ps.cpp: IPC        :                             0.635515
+INFO:    ps.cpp: minstret (instructions retired):      373,812,115 (        1647eb93)
+INFO:    ps.cpp: wall clock time                :  104,583,464,944 (      1859a907f0) ns
+INFO:    ps.cpp: sim/emul speed                 :   337,454,999.59 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000255
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb2afc000
+bsg_zynq_pl: done() called, exiting
+Connection to 192.168.4.35 closed.
