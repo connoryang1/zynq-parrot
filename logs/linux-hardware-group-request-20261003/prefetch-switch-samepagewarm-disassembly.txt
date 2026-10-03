@@ -1,0 +1,294 @@
+
+logs/linux-hardware-group-request-20261003/prefetch_switch_samepagewarm_probe:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000010120 <put>:
+   10120:	85aa                	mv	a1,a0
+   10122:	4601                	li	a2,0
+   10124:	00c587b3          	add	a5,a1,a2
+   10128:	0007c783          	lbu	a5,0(a5)
+   1012c:	e799                	bnez	a5,1013a <put+0x1a>
+   1012e:	4505                	li	a0,1
+   10130:	04000893          	li	a7,64
+   10134:	00000073          	ecall
+   10138:	8082                	ret
+   1013a:	0605                	add	a2,a2,1
+   1013c:	b7e5                	j	10124 <put+0x4>
+
+000000000001013e <number>:
+   1013e:	7179                	add	sp,sp,-48
+   10140:	f406                	sd	ra,40(sp)
+   10142:	00010ea3          	sb	zero,29(sp)
+   10146:	4655                	li	a2,21
+   10148:	46a9                	li	a3,10
+   1014a:	45a5                	li	a1,9
+   1014c:	fff6079b          	addw	a5,a2,-1
+   10150:	0007861b          	sext.w	a2,a5
+   10154:	1782                	sll	a5,a5,0x20
+   10156:	9381                	srl	a5,a5,0x20
+   10158:	02078713          	add	a4,a5,32
+   1015c:	00270833          	add	a6,a4,sp
+   10160:	02d57733          	remu	a4,a0,a3
+   10164:	0307071b          	addw	a4,a4,48
+   10168:	fee80423          	sb	a4,-24(a6)
+   1016c:	872a                	mv	a4,a0
+   1016e:	02d55533          	divu	a0,a0,a3
+   10172:	fce5ede3          	bltu	a1,a4,1014c <number+0xe>
+   10176:	0038                	add	a4,sp,8
+   10178:	00f70533          	add	a0,a4,a5
+   1017c:	00000097          	auipc	ra,0x0
+   10180:	fa4080e7          	jalr	-92(ra) # 10120 <put>
+   10184:	70a2                	ld	ra,40(sp)
+   10186:	6145                	add	sp,sp,48
+   10188:	8082                	ret
+   1018a:	0001                	nop
+   1018c:	00000013          	nop
+
+0000000000010190 <peer>:
+   10190:	00003517          	auipc	a0,0x3
+   10194:	e7050513          	add	a0,a0,-400 # 13000 <peer_data>
+   10198:	00001617          	auipc	a2,0x1
+   1019c:	e7060613          	add	a2,a2,-400 # 11008 <probe_iterations>
+   101a0:	00063603          	ld	a2,0(a2)
+   101a4:	00002717          	auipc	a4,0x2
+   101a8:	edc70713          	add	a4,a4,-292 # 12080 <expected_address>
+   101ac:	00002797          	auipc	a5,0x2
+   101b0:	e9478793          	add	a5,a5,-364 # 12040 <observed_address>
+   101b4:	00002817          	auipc	a6,0x2
+   101b8:	e4c80813          	add	a6,a6,-436 # 12000 <mismatch_iteration>
+   101bc:	00870713          	add	a4,a4,8
+   101c0:	00878793          	add	a5,a5,8
+   101c4:	00880813          	add	a6,a6,8
+   101c8:	fff60e13          	add	t3,a2,-1
+   101cc:	006e1293          	sll	t0,t3,0x6
+   101d0:	005502b3          	add	t0,a0,t0
+   101d4:	00573023          	sd	t0,0(a4)
+   101d8:	0012e013          	or	zero,t0,1
+   101dc:	80005073          	csrw	0x800,0
+   101e0:	00073303          	ld	t1,0(a4)
+   101e4:	00628c63          	beq	t0,t1,101fc <peer+0x6c>
+   101e8:	0057b023          	sd	t0,0(a5)
+   101ec:	00c83023          	sd	a2,0(a6)
+   101f0:	0330000f          	fence	rw,rw
+   101f4:	80005073          	csrw	0x800,0
+   101f8:	0000006f          	j	101f8 <peer+0x68>
+   101fc:	0002b383          	ld	t2,0(t0)
+   10200:	fff60613          	add	a2,a2,-1
+   10204:	fc0612e3          	bnez	a2,101c8 <peer+0x38>
+   10208:	00001297          	auipc	t0,0x1
+   1020c:	e0828293          	add	t0,t0,-504 # 11010 <peer_done>
+   10210:	50415337          	lui	t1,0x50415
+   10214:	3533031b          	addw	t1,t1,851 # 50415353 <__BSS_END__+0x50382353>
+   10218:	0062b023          	sd	t1,0(t0)
+   1021c:	0330000f          	fence	rw,rw
+   10220:	80005073          	csrw	0x800,0
+   10224:	0000006f          	j	10224 <peer+0x94>
+
+0000000000010228 <source>:
+   10228:	00043517          	auipc	a0,0x43
+   1022c:	dd850513          	add	a0,a0,-552 # 53000 <source_data>
+   10230:	00001617          	auipc	a2,0x1
+   10234:	dd860613          	add	a2,a2,-552 # 11008 <probe_iterations>
+   10238:	00063603          	ld	a2,0(a2)
+   1023c:	00002717          	auipc	a4,0x2
+   10240:	e4470713          	add	a4,a4,-444 # 12080 <expected_address>
+   10244:	00002797          	auipc	a5,0x2
+   10248:	dfc78793          	add	a5,a5,-516 # 12040 <observed_address>
+   1024c:	00002817          	auipc	a6,0x2
+   10250:	db480813          	add	a6,a6,-588 # 12000 <mismatch_iteration>
+   10254:	00070713          	mv	a4,a4
+   10258:	00078793          	mv	a5,a5
+   1025c:	00080813          	mv	a6,a6
+   10260:	fff60e13          	add	t3,a2,-1
+   10264:	006e1293          	sll	t0,t3,0x6
+   10268:	005502b3          	add	t0,a0,t0
+   1026c:	00573023          	sd	t0,0(a4)
+   10270:	0012e013          	or	zero,t0,1
+   10274:	8000d073          	csrw	0x800,1
+   10278:	00002e97          	auipc	t4,0x2
+   1027c:	d88e8e93          	add	t4,t4,-632 # 12000 <mismatch_iteration>
+   10280:	008ebe83          	ld	t4,8(t4)
+   10284:	000e8463          	beqz	t4,1028c <source+0x64>
+   10288:	00008067          	ret
+   1028c:	00073303          	ld	t1,0(a4)
+   10290:	00628863          	beq	t0,t1,102a0 <source+0x78>
+   10294:	0057b023          	sd	t0,0(a5)
+   10298:	00c83023          	sd	a2,0(a6)
+   1029c:	00008067          	ret
+   102a0:	0002b383          	ld	t2,0(t0)
+   102a4:	fff60613          	add	a2,a2,-1
+   102a8:	fa061ce3          	bnez	a2,10260 <source+0x38>
+   102ac:	00008067          	ret
+
+00000000000102b0 <_start>:
+   102b0:	7179                	add	sp,sp,-48
+   102b2:	00000517          	auipc	a0,0x0
+   102b6:	29650513          	add	a0,a0,662 # 10548 <_start+0x298>
+   102ba:	f406                	sd	ra,40(sp)
+   102bc:	f022                	sd	s0,32(sp)
+   102be:	ec26                	sd	s1,24(sp)
+   102c0:	e84a                	sd	s2,16(sp)
+   102c2:	e44e                	sd	s3,8(sp)
+   102c4:	00000097          	auipc	ra,0x0
+   102c8:	e5c080e7          	jalr	-420(ra) # 10120 <put>
+   102cc:	00043697          	auipc	a3,0x43
+   102d0:	d3468693          	add	a3,a3,-716 # 53000 <source_data>
+   102d4:	00003717          	auipc	a4,0x3
+   102d8:	d2c70713          	add	a4,a4,-724 # 13000 <peer_data>
+   102dc:	4781                	li	a5,0
+   102de:	85b6                	mv	a1,a3
+   102e0:	853a                	mv	a0,a4
+   102e2:	6805                	lui	a6,0x1
+   102e4:	0ff7f613          	zext.b	a2,a5
+   102e8:	00c68023          	sb	a2,0(a3)
+   102ec:	2605                	addw	a2,a2,1
+   102ee:	00c70023          	sb	a2,0(a4)
+   102f2:	0785                	add	a5,a5,1
+   102f4:	04068693          	add	a3,a3,64
+   102f8:	04070713          	add	a4,a4,64
+   102fc:	ff0794e3          	bne	a5,a6,102e4 <_start+0x34>
+   10300:	10000793          	li	a5,256
+   10304:	00001917          	auipc	s2,0x1
+   10308:	d0490913          	add	s2,s2,-764 # 11008 <probe_iterations>
+   1030c:	00f93023          	sd	a5,0(s2)
+   10310:	00001797          	auipc	a5,0x1
+   10314:	d007b023          	sd	zero,-768(a5) # 11010 <peer_done>
+   10318:	00002797          	auipc	a5,0x2
+   1031c:	ce07b823          	sd	zero,-784(a5) # 12008 <mismatch_iteration+0x8>
+   10320:	00002797          	auipc	a5,0x2
+   10324:	ce07b023          	sd	zero,-800(a5) # 12000 <mismatch_iteration>
+   10328:	00002797          	auipc	a5,0x2
+   1032c:	d207b023          	sd	zero,-736(a5) # 12048 <observed_address+0x8>
+   10330:	00002797          	auipc	a5,0x2
+   10334:	d007b823          	sd	zero,-752(a5) # 12040 <observed_address>
+   10338:	4701                	li	a4,0
+   1033a:	00001697          	auipc	a3,0x1
+   1033e:	cc668693          	add	a3,a3,-826 # 11000 <translation_sink>
+   10342:	10000613          	li	a2,256
+   10346:	00e587b3          	add	a5,a1,a4
+   1034a:	00e508b3          	add	a7,a0,a4
+   1034e:	0007c783          	lbu	a5,0(a5)
+   10352:	0008c883          	lbu	a7,0(a7)
+   10356:	0006b803          	ld	a6,0(a3)
+   1035a:	04070713          	add	a4,a4,64
+   1035e:	011787bb          	addw	a5,a5,a7
+   10362:	97c2                	add	a5,a5,a6
+   10364:	e29c                	sd	a5,0(a3)
+   10366:	fec710e3          	bne	a4,a2,10346 <_start+0x96>
+   1036a:	00000517          	auipc	a0,0x0
+   1036e:	1fe50513          	add	a0,a0,510 # 10568 <_start+0x2b8>
+   10372:	00000097          	auipc	ra,0x0
+   10376:	dae080e7          	jalr	-594(ra) # 10120 <put>
+   1037a:	00093503          	ld	a0,0(s2)
+   1037e:	00000097          	auipc	ra,0x0
+   10382:	dc0080e7          	jalr	-576(ra) # 1013e <number>
+   10386:	00000517          	auipc	a0,0x0
+   1038a:	20a50513          	add	a0,a0,522 # 10590 <_start+0x2e0>
+   1038e:	00000097          	auipc	ra,0x0
+   10392:	d92080e7          	jalr	-622(ra) # 10120 <put>
+   10396:	00000797          	auipc	a5,0x0
+   1039a:	dfa78793          	add	a5,a5,-518 # 10190 <peer>
+   1039e:	07e6                	sll	a5,a5,0x19
+   103a0:	4705                	li	a4,1
+   103a2:	171e                	sll	a4,a4,0x27
+   103a4:	83e5                	srl	a5,a5,0x19
+   103a6:	8fd9                	or	a5,a5,a4
+   103a8:	80179073          	csrw	0x801,a5
+   103ac:	00002417          	auipc	s0,0x2
+   103b0:	c5440413          	add	s0,s0,-940 # 12000 <mismatch_iteration>
+   103b4:	00000097          	auipc	ra,0x0
+   103b8:	e74080e7          	jalr	-396(ra) # 10228 <source>
+   103bc:	601c                	ld	a5,0(s0)
+   103be:	e789                	bnez	a5,103c8 <_start+0x118>
+   103c0:	641c                	ld	a5,8(s0)
+   103c2:	e399                	bnez	a5,103c8 <_start+0x118>
+   103c4:	8000d073          	csrw	0x800,1
+   103c8:	00001997          	auipc	s3,0x1
+   103cc:	c4898993          	add	s3,s3,-952 # 11010 <peer_done>
+   103d0:	0009b703          	ld	a4,0(s3)
+   103d4:	504157b7          	lui	a5,0x50415
+   103d8:	35378793          	add	a5,a5,851 # 50415353 <__BSS_END__+0x50382353>
+   103dc:	4481                	li	s1,0
+   103de:	02f71d63          	bne	a4,a5,10418 <_start+0x168>
+   103e2:	601c                	ld	a5,0(s0)
+   103e4:	eb95                	bnez	a5,10418 <_start+0x168>
+   103e6:	641c                	ld	a5,8(s0)
+   103e8:	eb85                	bnez	a5,10418 <_start+0x168>
+   103ea:	00000517          	auipc	a0,0x0
+   103ee:	1ae50513          	add	a0,a0,430 # 10598 <_start+0x2e8>
+   103f2:	00000097          	auipc	ra,0x0
+   103f6:	d2e080e7          	jalr	-722(ra) # 10120 <put>
+   103fa:	00093503          	ld	a0,0(s2)
+   103fe:	4485                	li	s1,1
+   10400:	00000097          	auipc	ra,0x0
+   10404:	d3e080e7          	jalr	-706(ra) # 1013e <number>
+   10408:	00000517          	auipc	a0,0x0
+   1040c:	18850513          	add	a0,a0,392 # 10590 <_start+0x2e0>
+   10410:	00000097          	auipc	ra,0x0
+   10414:	d10080e7          	jalr	-752(ra) # 10120 <put>
+   10418:	00000517          	auipc	a0,0x0
+   1041c:	1a850513          	add	a0,a0,424 # 105c0 <_start+0x310>
+   10420:	00000097          	auipc	ra,0x0
+   10424:	d00080e7          	jalr	-768(ra) # 10120 <put>
+   10428:	6008                	ld	a0,0(s0)
+   1042a:	00000097          	auipc	ra,0x0
+   1042e:	d14080e7          	jalr	-748(ra) # 1013e <number>
+   10432:	00000517          	auipc	a0,0x0
+   10436:	1e650513          	add	a0,a0,486 # 10618 <_start+0x368>
+   1043a:	00000097          	auipc	ra,0x0
+   1043e:	ce6080e7          	jalr	-794(ra) # 10120 <put>
+   10442:	6048                	ld	a0,128(s0)
+   10444:	00000097          	auipc	ra,0x0
+   10448:	cfa080e7          	jalr	-774(ra) # 1013e <number>
+   1044c:	00000517          	auipc	a0,0x0
+   10450:	1cc50513          	add	a0,a0,460 # 10618 <_start+0x368>
+   10454:	00000097          	auipc	ra,0x0
+   10458:	ccc080e7          	jalr	-820(ra) # 10120 <put>
+   1045c:	6028                	ld	a0,64(s0)
+   1045e:	00000097          	auipc	ra,0x0
+   10462:	ce0080e7          	jalr	-800(ra) # 1013e <number>
+   10466:	00000517          	auipc	a0,0x0
+   1046a:	1b250513          	add	a0,a0,434 # 10618 <_start+0x368>
+   1046e:	00000097          	auipc	ra,0x0
+   10472:	cb2080e7          	jalr	-846(ra) # 10120 <put>
+   10476:	6408                	ld	a0,8(s0)
+   10478:	00000097          	auipc	ra,0x0
+   1047c:	cc6080e7          	jalr	-826(ra) # 1013e <number>
+   10480:	00000517          	auipc	a0,0x0
+   10484:	19850513          	add	a0,a0,408 # 10618 <_start+0x368>
+   10488:	00000097          	auipc	ra,0x0
+   1048c:	c98080e7          	jalr	-872(ra) # 10120 <put>
+   10490:	6448                	ld	a0,136(s0)
+   10492:	00000097          	auipc	ra,0x0
+   10496:	cac080e7          	jalr	-852(ra) # 1013e <number>
+   1049a:	00000517          	auipc	a0,0x0
+   1049e:	17e50513          	add	a0,a0,382 # 10618 <_start+0x368>
+   104a2:	00000097          	auipc	ra,0x0
+   104a6:	c7e080e7          	jalr	-898(ra) # 10120 <put>
+   104aa:	6428                	ld	a0,72(s0)
+   104ac:	00000097          	auipc	ra,0x0
+   104b0:	c92080e7          	jalr	-878(ra) # 1013e <number>
+   104b4:	00000517          	auipc	a0,0x0
+   104b8:	16450513          	add	a0,a0,356 # 10618 <_start+0x368>
+   104bc:	00000097          	auipc	ra,0x0
+   104c0:	c64080e7          	jalr	-924(ra) # 10120 <put>
+   104c4:	0009b503          	ld	a0,0(s3)
+   104c8:	00000097          	auipc	ra,0x0
+   104cc:	c76080e7          	jalr	-906(ra) # 1013e <number>
+   104d0:	00000517          	auipc	a0,0x0
+   104d4:	0c050513          	add	a0,a0,192 # 10590 <_start+0x2e0>
+   104d8:	00000097          	auipc	ra,0x0
+   104dc:	c48080e7          	jalr	-952(ra) # 10120 <put>
+   104e0:	00000517          	auipc	a0,0x0
+   104e4:	04850513          	add	a0,a0,72 # 10528 <_start+0x278>
+   104e8:	c489                	beqz	s1,104f2 <_start+0x242>
+   104ea:	00000517          	auipc	a0,0x0
+   104ee:	01e50513          	add	a0,a0,30 # 10508 <_start+0x258>
+   104f2:	00000097          	auipc	ra,0x0
+   104f6:	c2e080e7          	jalr	-978(ra) # 10120 <put>
+   104fa:	0014c513          	xor	a0,s1,1
+   104fe:	05d00893          	li	a7,93
+   10502:	00000073          	ecall
+   10506:	0001                	nop

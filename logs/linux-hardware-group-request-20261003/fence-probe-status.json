@@ -1,0 +1,9 @@
+{
+  "status": "MEASURED_STALL",
+  "stage": "measurement-stall",
+  "binary_sha256": "0b1aeb8d01d015c38e69c0af2a0e1924fe5a9417b178d65420d6f850a25b5a36",
+  "linux_nbf_sha256": "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3",
+  "recovery_required": true,
+  "error": "TIMEOUT(\"Timeout exceeded.\\n<pexpect.pty_spawn.spawn object at 0x7efc6a16c550>\\ncommand: /home/coyang/zynq-parrot/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh\\nargs: [b'/home/coyang/zynq-parrot/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh', b'xilinx@192.168.4.35', b'/home/coyang/zynq-parrot/linux-tests/out/linux-shell.nbf']\\nbuffer (last 100 chars): 'fetch_switch_fence_probe\\\\r\\\\r\\\\r\\\\n[PREFETCH-SWITCH-REG] start\\\\r\\\\r\\\\r\\\\n[PREFETCH-SWITCH-REG] phase begin 256\\\\r\\\\r\\\\r\\\\n'\\nbefore (last 100 chars): 'fetch_switch_fence_probe\\\\r\\\\r\\\\r\\\\n[PREFETCH-SWITCH-REG] start\\\\r\\\\r\\\\r\\\\n[PREFETCH-SWITCH-REG] phase begin 256\\\\r\\\\r\\\\r\\\\n'\\nafter: <class 'pexpect.exceptions.TIMEOUT'>\\nmatch: None\\nmatch_index: None\\nexitstatus: None\\nflag_eof: False\\npid: 1179963\\nchild_fd: 6\\nclosed: False\\ntimeout: 300\\ndelimiter: <class 'pexpect.exceptions.EOF'>\\nlogfile: None\\nlogfile_read: <_io.TextIOWrapper name='/home/coyang/zynq-parrot/logs/linux-hardware-group-request-20261003/fence-probe-board.log' mode='w' encoding='UTF-8'>\\nlogfile_send: None\\nmaxread: 2000\\nignorecase: False\\nsearchwindowsize: None\\ndelaybeforesend: 0.005\\ndelayafterclose: 0.1\\ndelayafterterminate: 0.1\\nsearcher: searcher_string:\\n    0: '[PREFETCH-SWITCH-REG] PASS'\\n    1: '[PREFETCH-SWITCH-REG] FAIL'\")",
+  "failure": "Matched single phase 256 with fence rw,rw but no demand-read priming did not return within 120 seconds."
+}

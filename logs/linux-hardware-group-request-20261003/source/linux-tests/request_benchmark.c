@@ -61,12 +61,9 @@ static inline void request_prefetch(const volatile void *p)
 #define MAX_WORKERS 64u
 #define LINE_BYTES 64u
 #define MAX_ALLOCATION (UINT64_C(512) * 1024 * 1024)
-struct options {
-  unsigned workers, requests, samples, data_kib, mode_mask, hardware_prime_lines;
-  int cpu, hardware;
-};
+struct options { unsigned workers, requests, samples, data_kib; int cpu, hardware; };
 struct worker { unsigned id; uint64_t sum; };
-static struct options opt = {2, 4096, 5, 2048, 0, 0, -1, 0};
+static struct options opt = {2, 4096, 5, 2048, -1, 0};
 static unsigned char *data, *eviction;
 static uint32_t *requests;
 static size_t data_bytes, line_count;
@@ -153,11 +150,9 @@ static void usage(FILE *f)
 {
   fprintf(f, "usage: request_benchmark [--workers 1..64] [--requests 1..1048576]\n"
              "       [--samples 1..1000] [--data-kib power-of-two: 1..262144]\n"
-             "       [--mode-mask 1..15] [--hardware-prime-lines 0..64]\n"
              "       [--cpu CPU] [--hardware] [--help]\n"
              "Defaults: workers=2 requests=4096 samples=5 data-kib=2048;\n"
-             "CPU defaults to the first allowed CPU. Requests are per worker.\n"
-             "Mode bits: Linux=1, batch=2, hardware-demand=4, hardware-prefetch=8.\n");
+             "CPU defaults to the first allowed CPU. Requests are per worker.\n");
 }
 static void parse(int argc, char **argv)
 {
@@ -171,22 +166,12 @@ static void parse(int argc, char **argv)
     else if (!strcmp(name, "--requests")) opt.requests = number(value, 1048576);
     else if (!strcmp(name, "--samples")) opt.samples = number(value, 1000);
     else if (!strcmp(name, "--data-kib")) opt.data_kib = number(value, 262144);
-    else if (!strcmp(name, "--mode-mask")) opt.mode_mask = number(value, 15);
-    else if (!strcmp(name, "--hardware-prime-lines"))
-      opt.hardware_prime_lines = number(value, 64);
     else if (!strcmp(name, "--cpu")) opt.cpu = (int)number(value, CPU_SETSIZE - 1);
     else { usage(stderr); exit(EXIT_FAILURE); }
   }
   if (!opt.workers || !opt.requests || !opt.samples || !opt.data_kib ||
       (opt.data_kib & (opt.data_kib - 1))) {
     usage(stderr); exit(EXIT_FAILURE);
-  }
-  if (!opt.mode_mask) opt.mode_mask = opt.hardware ? 15 : 3;
-  if (!opt.hardware && (opt.mode_mask & ~3u)) {
-    fprintf(stderr, "hardware mode bits require --hardware\n"); exit(EXIT_FAILURE);
-  }
-  if (!opt.hardware && opt.hardware_prime_lines) {
-    fprintf(stderr, "hardware priming requires --hardware\n"); exit(EXIT_FAILURE);
   }
   if (opt.hardware) {
 #if !defined(__riscv) || __riscv_xlen != 64
@@ -374,16 +359,6 @@ static struct timing run_hardware(unsigned ahead, uint64_t *sums)
   if (current_context() != 0) {
     fprintf(stderr, "hardware mode requires source context zero\n"); exit(EXIT_FAILURE);
   }
-  /* Optional launch preparation for the cold-handoff diagnostic. This is
-   * outside timing and reported explicitly; zero preserves the original path. */
-  uint64_t prime_sum = 0;
-  for (unsigned w = 0; w < 2; ++w)
-    for (unsigned r = 0; r < opt.hardware_prime_lines; ++r) {
-      uint32_t index = requests[(size_t)w * opt.requests + r];
-      prime_sum += *(volatile uint64_t *)(data + (size_t)index * LINE_BYTES);
-    }
-  eviction_sink += prime_sum;
-  __asm__ volatile ("fence rw, rw" : : : "memory");
   seed_reg(1, 10, (uintptr_t)data);
   seed_reg(1, 11, (uintptr_t)(requests + opt.requests));
   seed_reg(1, 12, opt.requests);
@@ -422,32 +397,23 @@ int main(int argc, char **argv)
     check(pthread_create(&threads[w], NULL, worker_main, &workers[w]), "create worker");
   }
   barrier_wait();
+  const unsigned modes = opt.hardware ? 4 : 2;
   const char *mode_names[] = {"linux-threads-demand", BATCH_MODE,
                              "resident-demand-handoff", RESIDENT_AHEAD_MODE};
-  unsigned enabled[4], modes = 0;
-  for (unsigned mode = 0; mode < (opt.hardware ? 4u : 2u); ++mode)
-    if (opt.mode_mask & (1u << mode)) enabled[modes++] = mode;
-  if (!modes) {
-    fprintf(stderr, "mode mask selects no enabled mode\n"); return EXIT_FAILURE;
-  }
   printf("REQUEST_BENCH backend=%s cpu=%d workers=%u hardware=%d requests_per_worker=%u "
-         "data_bytes=%zu samples=%u mode_mask=%u hardware_prime_lines=%u "
-         "seed=xorshift32-9e3779b9 checksum=%" PRIu64 "\n",
-         BACKEND, opt.cpu, opt.workers, opt.hardware, opt.requests, data_bytes,
-         opt.samples, opt.mode_mask, opt.hardware_prime_lines, total_expected);
+         "data_bytes=%zu samples=%u seed=xorshift32-9e3779b9 checksum=%" PRIu64 "\n",
+         BACKEND, opt.cpu, opt.workers, opt.hardware, opt.requests, data_bytes, opt.samples, total_expected);
   printf("TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included "
          "cache=2x-data-displacement-no-flush\n");
   fflush(stdout);
   /* Trial zero warms and checks every path. Measured order rotates. */
   for (unsigned trial = 0; trial <= opt.samples; ++trial) {
     for (unsigned order = 0; order < modes; ++order) {
-      unsigned mode = enabled[(order + trial) % modes];
+      unsigned mode = (order + trial) % modes;
       if (!trial) {
         printf("WARMUP_BEGIN mode=%s\n", mode_names[mode]);
-      } else
-        printf("SAMPLE_BEGIN sample=%u order=%u mode=%s\n",
-               trial, order, mode_names[mode]);
-      fflush(stdout);
+        fflush(stdout);
+      }
       displace_cache();
       struct timing duration;
       if (mode == 0) duration = run_threads(workers, sums);

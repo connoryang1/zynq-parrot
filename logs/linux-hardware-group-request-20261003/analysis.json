@@ -1,0 +1,149 @@
+{
+  "accepted_integrated_result": false,
+  "artifact_sha256": {
+    "prefetch_switch_fence_probe": "0b1aeb8d01d015c38e69c0af2a0e1924fe5a9417b178d65420d6f850a25b5a36",
+    "prefetch_switch_register_probe": "5795af20ae88994240cd0fac6bd540fac9e7d2e0ea38a06d2fb68bca2be0cabe",
+    "prefetch_switch_samepagewarm_probe": "de61910cb068b962c5aec19e4ee85306d736201e8d702d19a122a53750b7d24a",
+    "prefetch_switch_translation_probe": "475f183aa33bfc78c1f39ff55e01285f61fff4986b26bd0a6f6e47c9fd61cc9c",
+    "prefetch_switch_unprimed256_probe": "3f335d9c86db3225bdab949d54e2599e7340e088fa76d4c42cbe7a66f87c8e1f",
+    "request_benchmark_dynamic": "5225ced8d09d7ebb43fa84ba7e967e249edb601d730e51563dd0816fb2f94340",
+    "request_benchmark_dynamic_diagnostic": "b7717a5d4fa3baef8ed24568cafdc3f0f99cf2f6cdd53d5a0bbe5e24fdc35556",
+    "request_benchmark_dynamic_primed": "e14f3f28e704b83761a5d1d136a0a7f8f7fa5fabfee63c0f63e86286e1f0684d"
+  },
+  "endpoint": {
+    "bit_sha256": "9704dd6e0265654adbca272a08a3aae0830bef1893716c6ce25ed80bf2f55ccf",
+    "clock_mhz": 18,
+    "linux_nbf_sha256": "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3"
+  },
+  "four_lines_per_context_full_run": {
+    "accepted": false,
+    "complete_prefetch_measured_samples": 3,
+    "complete_result_rows": 15,
+    "failure": "warmup and samples 1-3 completed all modes; sample 4 resident-prefetch-yield-load did not return",
+    "hardware_primed_lines_per_context": 4,
+    "partial_linux_over_hardware_demand_ratio": 1.1203403469449735,
+    "partial_linux_over_hardware_prefetch_ratio": 1.1037094027019703,
+    "partial_mode_summary": {
+      "batched-prefetch-load": {
+        "cycles": [
+          810636,
+          870710,
+          842575,
+          806640
+        ],
+        "median_cycles": 826605.5,
+        "median_cycles_per_request": 100.90399169921875,
+        "samples": 4
+      },
+      "linux-threads-demand": {
+        "cycles": [
+          658051,
+          678984,
+          689598,
+          689754
+        ],
+        "median_cycles": 684291.0,
+        "median_cycles_per_request": 83.5316162109375,
+        "samples": 4
+      },
+      "resident-demand-handoff": {
+        "cycles": [
+          610516,
+          646209,
+          611055,
+          610522
+        ],
+        "median_cycles": 610788.5,
+        "median_cycles_per_request": 74.55914306640625,
+        "samples": 4
+      },
+      "resident-prefetch-yield-load": {
+        "cycles": [
+          619943,
+          620507,
+          619992
+        ],
+        "median_cycles": 619992,
+        "median_cycles_per_request": 75.6826171875,
+        "samples": 3
+      }
+    },
+    "primed_fraction_of_8192_requests": 0.0009765625,
+    "summaries_are_incomplete_diagnostics": true
+  },
+  "interpretation": [
+    "Direct hardware handoff and hardware demand controls complete; the sustained failure is specific to the prefetch-plus-handoff path.",
+    "A full fence alone does not repair the matched 256-line failure.",
+    "Eight demand reads repair one 256-line run whether spread across pages or confined to one page, rejecting translation coverage as the sole explanation.",
+    "Eight launch reads are not a sustained fix: the full workload completes four prefetch invocations including warmup, then stalls on the fifth.",
+    "The repeat count is consistent with finite cache/prefetch state accumulating across launches, but occupancy was not directly observed and two leaked entries per launch remains a hypothesis.",
+    "Partial timing rows are not an accepted speedup because the benchmark does not complete all seven samples."
+  ],
+  "matched_256_controls": {
+    "eight_one_per_page_demand_reads": {
+      "outcome": "PASS",
+      "status": "PASS"
+    },
+    "eight_same_page_demand_reads": {
+      "outcome": "PASS",
+      "status": "PASS"
+    },
+    "fence_only": {
+      "outcome": "STALL",
+      "status": "MEASURED_STALL"
+    },
+    "unprimed": {
+      "outcome": "STALL",
+      "status": "MEASURED_STALL"
+    }
+  },
+  "unprimed_full": {
+    "complete_result_rows": 2,
+    "failure": "sample 1 resident-prefetch-yield-load did not return before the 600-second watchdog",
+    "last_result_mode": "resident-demand-handoff",
+    "rows": [
+      {
+        "checksum": 133130652,
+        "cycles": 884697,
+        "mode": "batched-prefetch-load",
+        "ns": 5543000,
+        "order": 0,
+        "requests": 8192,
+        "sample": 1
+      },
+      {
+        "checksum": 133130652,
+        "cycles": 611739,
+        "mode": "resident-demand-handoff",
+        "ns": 3836600,
+        "order": 1,
+        "requests": 8192,
+        "sample": 1
+      }
+    ],
+    "status": "MEASURED_STALL"
+  },
+  "unprimed_phased_probe": {
+    "begun_phases": [
+      1,
+      2,
+      4,
+      8,
+      9,
+      16,
+      64,
+      256
+    ],
+    "first_nonreturning_phase": 256,
+    "passed_phases": [
+      1,
+      2,
+      4,
+      8,
+      9,
+      16,
+      64
+    ],
+    "status": "MEASURED_STALL"
+  }
+}

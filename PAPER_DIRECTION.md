@@ -68,6 +68,19 @@ closest 22.03-cycle fixed-priority result and 1.59 cycles above the projected
 measured Linux handoff. A fused instruction is optional for a practical first
 prototype but compelling if fairness must remain below 25 cycles.
 
+The first integrated Linux-process request run does not yet support an
+end-to-end speedup claim. Direct hardware-demand handoffs complete, but the
+unprimed `prefetch.r; switch; load` mode stalls on its first measured run after
+all warmups pass. Reduced physical controls pass through 64 iterations and
+stall at 256; a full fence does not repair the matched case, while eight demand
+reads before launch make one 256-iteration run pass. Four launch reads per
+context allow four full prefetch invocations including warmup, but the fifth
+stalls. The completed subset is about 1.10x faster than the Linux-thread
+median, but sample counts differ and no speedup is accepted. This localizes the
+next gate to sustained cold hint/cache lifecycle across hardware handoffs, not
+ready-context selection or Linux ABI width
+(`logs/linux-hardware-group-request-20261003/`).
+
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled
 hardware-thread states; `monitor`/`mwait` wakeup from memory or device writes;

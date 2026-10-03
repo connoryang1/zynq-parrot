@@ -269,6 +269,16 @@ make -s -C linux-tests emit-request-transfer \
 sha256sum linux-tests/out/request_benchmark
 ```
 
+For an endpoint with more than four logical hardware contexts, set the context
+count at build time. The current two-resident/ten-logical image uses
+`REQUEST_NUM_CONTEXTS=10`; the default remains four for the older endpoint.
+
+The diagnostic options `--mode-mask 1..15` and
+`--hardware-prime-lines 0..64` can isolate a subset of modes and perform a
+reported number of untimed demand reads before a hardware launch. Omitting both
+preserves the original all-mode, unprimed benchmark. Mode-mask bits are Linux
+threads = 1, batching = 2, hardware demand = 4, and hardware prefetch = 8.
+
 The default BlackParrot backend is `blackparrot-zicbop-prefetch-r-l2`.
 Both C batching and resident assembly use [`bp_prefetch.h`](../software/include/bp_prefetch.h),
 which emits the standard Zicbop read hint (`ori zero, base, 1`). On the implemented
