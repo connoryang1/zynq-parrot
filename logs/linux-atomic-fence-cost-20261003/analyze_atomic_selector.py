@@ -70,6 +70,34 @@ def analyze_multiready(name, physical, peer):
     }
 
 
+def analyze_roundrobin(name, physical):
+    text = (HERE / name).read_text(errors='replace').replace('\r', '')
+    row_pattern = re.compile(
+        r'Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/'
+        r'source/sc0/sc1/sc3: ' + ' '.join([r'(0x[0-9a-f]+)'] * 10))
+    rows = [[int(value, 16) for value in match.groups()]
+            for match in row_pattern.finditer(text)]
+    steady = [row for row in rows if row[0] > 0]
+    per_op = [row[2] / 100 for row in steady]
+    aggregate = [row[1] for row in steady]
+    return {
+        'parseable_rows': len(rows),
+        'steady_samples': len(steady),
+        'median_cycles_per_operation': statistics.median(per_op),
+        'range_cycles_per_operation': [min(per_op), max(per_op)],
+        'median_aggregate_cycles': statistics.median(aggregate),
+        'range_aggregate_cycles': [min(aggregate), max(aggregate)],
+        'all_rows_correct': all(
+            row[3:] == [1, 0xa, 0xa, 0, 0, 0, 0] for row in rows),
+        'all_three_contexts_completed': all(
+            row[5] == 0xa and row[6] == 0 for row in rows),
+        'total_sc_failures': sum(row[7] + row[8] + row[9]
+                                 for row in rows),
+        'custom_pass': '[BSG-PASS] atomic roundrobin selector' in text,
+        'core_pass': ('CORE[0] PASS' if physical else 'CORE PASS') in text,
+    }
+
+
 nonresident = {
     'simulator': analyze('sim-run-accepted.log', False, 'fence',
                          (1, 2, 1, 4, 0),
@@ -111,10 +139,16 @@ multiready_resident = multiready['resident']['fpga'][
     'median_cycles_per_operation']
 multiready_nonresident = multiready['nonresident']['fpga'][
     'median_cycles_per_operation']
+roundrobin = {
+    'simulator': analyze_roundrobin('roundrobin-sim-run.log', False),
+    'fpga': analyze_roundrobin('roundrobin-physical.log', True),
+}
+roundrobin_fpga = roundrobin['fpga']['median_cycles_per_operation']
 report = {
     'nonresident': nonresident,
     'resident': resident,
     'multiready': multiready,
+    'roundrobin_three_context': roundrobin,
     'expected_fpga_rows': 32,
     'derived_fpga_cycles': {
         'atomic_residency_penalty': round(
@@ -135,6 +169,13 @@ report = {
             multiready_nonresident - direct['register_nonresident'], 2),
         'multiready_residency_penalty': round(
             multiready_nonresident - multiready_resident, 2),
+        'roundrobin_over_fixed_priority_nonresident': round(
+            roundrobin_fpga - multiready_nonresident, 2),
+        'roundrobin_time_us_at_18mhz': round(roundrobin_fpga / 18, 3),
+        'linux_handoff_to_roundrobin_speedup_range': [
+            round(5496 / roundrobin_fpga, 1),
+            round(5595 / roundrobin_fpga, 1),
+        ],
     },
 }
 for kind in ('resident', 'nonresident'):
@@ -147,4 +188,10 @@ for kind in ('resident', 'nonresident'):
     assert multi['custom_pass'] and multi['core_pass']
     assert multi['all_rows_correct'] and multi['spectator_bit_preserved']
     assert multi['total_sc_failures'] == 0
+for platform in ('simulator', 'fpga'):
+    fair = report['roundrobin_three_context'][platform]
+    assert fair['custom_pass'] and fair['core_pass']
+    assert fair['all_rows_correct'] and fair['all_three_contexts_completed']
+    assert fair['total_sc_failures'] == 0
+assert report['roundrobin_three_context']['fpga']['parseable_rows'] == 16
 print(json.dumps(report, indent=2, sort_keys=True))

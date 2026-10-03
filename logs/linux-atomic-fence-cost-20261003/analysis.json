@@ -2,13 +2,19 @@
   "derived_fpga_cycles": {
     "atomic_residency_penalty": 3.98,
     "direct_register_residency_penalty": 4.04,
+    "linux_handoff_to_roundrobin_speedup_range": [
+      206.7,
+      210.4
+    ],
     "multiready_over_direct_nonresident": 12.87,
     "multiready_over_direct_resident": 11.91,
     "multiready_over_mailbox_nonresident": 3.99,
     "multiready_over_mailbox_resident": 2.97,
     "multiready_residency_penalty": 5.0,
     "ready_selection_over_direct_nonresident": 8.88,
-    "ready_selection_over_direct_resident": 8.94
+    "ready_selection_over_direct_resident": 8.94,
+    "roundrobin_over_fixed_priority_nonresident": 4.56,
+    "roundrobin_time_us_at_18mhz": 1.477
   },
   "expected_fpga_rows": 32,
   "multiready": {
@@ -239,6 +245,46 @@
         }
       },
       "parseable_rows": 26
+    }
+  },
+  "roundrobin_three_context": {
+    "fpga": {
+      "all_rows_correct": true,
+      "all_three_contexts_completed": true,
+      "core_pass": true,
+      "custom_pass": true,
+      "median_aggregate_cycles": 10267,
+      "median_cycles_per_operation": 26.59,
+      "parseable_rows": 16,
+      "range_aggregate_cycles": [
+        10260,
+        10286
+      ],
+      "range_cycles_per_operation": [
+        26.58,
+        26.64
+      ],
+      "steady_samples": 15,
+      "total_sc_failures": 0
+    },
+    "simulator": {
+      "all_rows_correct": true,
+      "all_three_contexts_completed": true,
+      "core_pass": true,
+      "custom_pass": true,
+      "median_aggregate_cycles": 10268,
+      "median_cycles_per_operation": 26.6,
+      "parseable_rows": 12,
+      "range_aggregate_cycles": [
+        10260,
+        10296
+      ],
+      "range_cycles_per_operation": [
+        26.58,
+        26.67
+      ],
+      "steady_samples": 11,
+      "total_sc_failures": 0
     }
   }
 }

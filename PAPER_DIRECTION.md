@@ -58,6 +58,16 @@ the opportunity for a fused select-and-switch instruction; its five-cycle
 resident/nonresident gap is the opportunity for another resident register bank
 (`logs/linux-atomic-fence-cost-20261003/`).
 
+Lowest-bit selection can starve a repeatedly runnable higher-numbered context,
+so a fair three-context variant rotates the bitmap past the source before
+`ctz`. The exact physical `0 -> 1 -> 3 -> 0` schedule measures 26.59 cycles per
+handoff versus 26.60 in simulation, completes 128 turns in each peer per
+sample, and has zero SC retries. Fair policy is therefore 4.56 cycles above the
+closest 22.03-cycle fixed-priority result and 1.59 cycles above the projected
+25-cycle budget. At 18 MHz it is still 206.7--210.4 times smaller than the
+measured Linux handoff. A fused instruction is optional for a practical first
+prototype but compelling if fairness must remain below 25 cycles.
+
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled
 hardware-thread states; `monitor`/`mwait` wakeup from memory or device writes;

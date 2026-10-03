@@ -1,0 +1,151 @@
+CONTROL_PROGRAM_SHA256=be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e
+NBF_SHA256=a075e9440ff17e2c8783a0c8579707fe63bb55aa9b10e1533daa73def478bdc5
+LOG=/home/xilinx/bp-logs/mt_atomic_round_robin_selector_benchmark_fpga-interactive-20261003T205836Z-2465.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0x492ab8 40000004 16 1
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 67108864
+bsg_zynq_pl: allocate_dram() called with size 67108864 bytes --> virtual ptr=0xb2b0e000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb2b0e000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1918195
+DEBUG-PS: ps.cpp: 1-1919068
+DEBUG-PS: ps.cpp: 2-1920038
+DEBUG-PS: ps.cpp: 3-1920878
+DEBUG-PS: ps.cpp: 4-1921670
+DEBUG-PS: ps.cpp: 5-1922844
+DEBUG-PS: ps.cpp: 6-1923828
+DEBUG-PS: ps.cpp: 7-1924884
+DEBUG-PS: ps.cpp: 8-1925684
+DEBUG-PS: ps.cpp: 9-1926463
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: Zero-ing DRAM (67108864 bytes)
+INFO:    ps.cpp: zero-d 0 MB
+INFO:    ps.cpp: zero-d 1 MB
+INFO:    ps.cpp: zero-d 2 MB
+INFO:    ps.cpp: zero-d 3 MB
+INFO:    ps.cpp: zero-d 4 MB
+INFO:    ps.cpp: zero-d 5 MB
+INFO:    ps.cpp: zero-d 6 MB
+INFO:    ps.cpp: zero-d 7 MB
+INFO:    ps.cpp: zero-d 8 MB
+INFO:    ps.cpp: zero-d 9 MB
+INFO:    ps.cpp: zero-d 10 MB
+INFO:    ps.cpp: zero-d 11 MB
+INFO:    ps.cpp: zero-d 12 MB
+INFO:    ps.cpp: zero-d 13 MB
+INFO:    ps.cpp: zero-d 14 MB
+INFO:    ps.cpp: zero-d 15 MB
+INFO:    ps.cpp: zero-d 16 MB
+INFO:    ps.cpp: zero-d 17 MB
+INFO:    ps.cpp: zero-d 18 MB
+INFO:    ps.cpp: zero-d 19 MB
+INFO:    ps.cpp: zero-d 20 MB
+INFO:    ps.cpp: zero-d 21 MB
+INFO:    ps.cpp: zero-d 22 MB
+INFO:    ps.cpp: zero-d 23 MB
+INFO:    ps.cpp: zero-d 24 MB
+INFO:    ps.cpp: zero-d 25 MB
+INFO:    ps.cpp: zero-d 26 MB
+INFO:    ps.cpp: zero-d 27 MB
+INFO:    ps.cpp: zero-d 28 MB
+INFO:    ps.cpp: zero-d 29 MB
+INFO:    ps.cpp: zero-d 30 MB
+INFO:    ps.cpp: zero-d 31 MB
+INFO:    ps.cpp: zero-d 32 MB
+INFO:    ps.cpp: zero-d 33 MB
+INFO:    ps.cpp: zero-d 34 MB
+INFO:    ps.cpp: zero-d 35 MB
+INFO:    ps.cpp: zero-d 36 MB
+INFO:    ps.cpp: zero-d 37 MB
+INFO:    ps.cpp: zero-d 38 MB
+INFO:    ps.cpp: zero-d 39 MB
+INFO:    ps.cpp: zero-d 40 MB
+INFO:    ps.cpp: zero-d 41 MB
+INFO:    ps.cpp: zero-d 42 MB
+INFO:    ps.cpp: zero-d 43 MB
+INFO:    ps.cpp: zero-d 44 MB
+INFO:    ps.cpp: zero-d 45 MB
+INFO:    ps.cpp: zero-d 46 MB
+INFO:    ps.cpp: zero-d 47 MB
+INFO:    ps.cpp: zero-d 48 MB
+INFO:    ps.cpp: zero-d 49 MB
+INFO:    ps.cpp: zero-d 50 MB
+INFO:    ps.cpp: zero-d 51 MB
+INFO:    ps.cpp: zero-d 52 MB
+INFO:    ps.cpp: zero-d 53 MB
+INFO:    ps.cpp: zero-d 54 MB
+INFO:    ps.cpp: zero-d 55 MB
+INFO:    ps.cpp: zero-d 56 MB
+INFO:    ps.cpp: zero-d 57 MB
+INFO:    ps.cpp: zero-d 58 MB
+INFO:    ps.cpp: zero-d 59 MB
+INFO:    ps.cpp: zero-d 60 MB
+INFO:    ps.cpp: zero-d 61 MB
+INFO:    ps.cpp: zero-d 62 MB
+INFO:    ps.cpp: zero-d 63 MB
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 3334
+DEBUG-PS: ps.cpp: finished loading 3334 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+INFO:    ps.cpp: Starting scan thread
+INFO:    ps.cpp: Starting i/o polling thread
+ABAtomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000000 0x000000000000293c 0x0000000000000aae 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000001 0x000000000000282e 0x0000000000000a68 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000002 0x000000000000282c 0x0000000000000a68 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000003 0x000000000000282b 0x0000000000000a67 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000004 0x0000000000002814 0x0000000000000a62 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000005 0x000000000000281b 0x0000000000000a63 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000006 0x000000000000281c 0x0000000000000a64 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000007 0x000000000000281b 0x0000000000000a63 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000008 0x0000000000002814 0x0000000000000a62 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x0000000000000009 0x000000000000281b 0x0000000000000a63 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x000000000000000a 0x0000000000002814 0x0000000000000a62 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x000000000000000b 0x000000000000281b 0x0000000000000a63 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x000000000000000c 0x0000000000002814 0x0000000000000a62 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x000000000000000d 0x000000000000281b 0x0000000000000a63 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x000000000000000e 0x0000000000002814 0x0000000000000a62 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+Atomic roundrobin sample/cycles/x100-per-op/ok/ready/complete/source/sc0/sc1/sc3: 0x000000000000000f 0x000000000000281b 0x0000000000000a63 0x0000000000000001 0x000000000000000a 0x000000000000000a 0x0000000000000000 0x0000000000000000 0x0000000000000000 0x0000000000000000
+[BSG-PASS] atomic roundrobin selector
+INFO:    CORE[0] PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
+INFO:    ps.cpp: minstret (instructions retired):          236,640 (           39c60)
+INFO:    ps.cpp: minstret delta:                           236,640 (           39c60)
+INFO:    ps.cpp: MTIME start:                          361,859,859 (        15918b13)
+INFO:    ps.cpp: MTIME stop:                           361,915,740 (        1592655c)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):              55,881 (            da49)
+INFO:    ps.cpp: IPC        :                             0.529339
+INFO:    ps.cpp: minstret (instructions retired):          236,724 (           39cb4)
+INFO:    ps.cpp: wall clock time                :       79,502,098 (         4bd1b12) ns
+INFO:    ps.cpp: sim/emul speed                 :   337,385,813.39 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000255
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb2b0e000
+bsg_zynq_pl: done() called, exiting
+Connection to 192.168.4.35 closed.

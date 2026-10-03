@@ -128,6 +128,42 @@ A fused select-and-switch instruction could target the measured 11.9--12.9
 cycles above direct dispatch, while a third resident register bank would remove
 about five cycles from the general nonresident path.
 
+## Fair three-context round robin
+
+Selecting the lowest ready bit is correct but is not fair: a repeatedly
+runnable low-numbered context can starve a higher-numbered one. A third
+benchmark therefore rotates the ready bitmap past the current context before
+`ctz`, then uses the same LR/SC update to claim the selected context and return
+the source bit. With ready contexts 1 and 3, it must repeatedly execute the
+order `0 -> 1 -> 3 -> 0`. Each timed sample contains 386 handoffs; contexts 1
+and 3 each complete 128 scheduler iterations and set their completion bits.
+
+```text
+lr.d.aq -> read source -> rotate ready word -> ctz -> clear target
+        -> add source -> sc.d.rl -> CSR 0x800
+```
+
+| Platform | Parseable steady samples | Median cycles/handoff | Range |
+| --- | ---: | ---: | ---: |
+| Simulator | 11 | 26.60 | 26.58--26.67 |
+| FPGA | 15 | 26.59 | 26.58--26.64 |
+
+All 16 physical samples have the expected `0xa` ready and completion words,
+return to context 0, record zero SC retries in contexts 0, 1, and 3, and finish
+with the custom pass marker, `CORE[0] PASS`, and runner exit zero. Four simulator
+rows were split by heartbeat text; every complete row passes the same checks,
+and the simulator and FPGA medians differ by 0.01 cycle.
+
+Fair round-robin policy costs 4.56 cycles beyond the closest fixed-priority
+nonresident result of 22.03 cycles. It is 1.59 cycles above the projected
+25-cycle group-decision budget, or 1.477 microseconds at 18 MHz, while remaining
+206.7--210.4 times smaller than the measured Linux handoff. Thus general
+selection is already practical in software, but a fused fair-select-and-switch
+instruction is justified if 25 cycles is a hard architectural target. This
+comparison combines changed selection policy with a continuously rotating
+three-context schedule; it is not an instruction-by-instruction attribution of
+the 4.56-cycle difference.
+
 For an ordinary coherent ready word, the AMO's acquire/release ordering is the
 relevant publication and claim primitive.  This result does not justify
 removing fences needed for unrelated MMIO or device ordering.
@@ -174,8 +210,18 @@ dd30d203b8c7d85506265e751b6a77f8b231bd1e24b4210622c2098e4d8c8b36  mt_atomic_mult
 1dd073113f4671d22435450e20a2732897156903264a71e41c1f8cceff10c3fd  mt_atomic_multiready_nonresident_benchmark_fpga.nbf
 84c824187fd19ad7fc947137ab2fc6529cc745f56cb22677c47d9668283fbdd7  multiready-resident-physical.log
 f6c3e37e79b7e364e67a475afcdde00f7319ce581f4fb1854ef076b287d4f2db  multiready-nonresident-physical.log
-2dbe40ff79756e8d9322c91e70f8cb9e6e4c2655c423e9e659f60767f0516d32  analyze_atomic_selector.py
-ba5f320f421796e6d53a3f9e4d69459b3b0ec568d89dc44f0d82b05f9aa74551  analysis.json
+0ca4e607f6c3682f2da3a949e9f1039e22eb7e3d082a58e6cda85bcb0509280c  analyze_atomic_selector.py
+139be42351bf81f5d6f75a9e6fd824fb187021f318605e718c058c0da02319c3  analysis.json
 ee40d2b976beb6f63c3c2b10c4051d577a7e4fd3828468240277d5126bd2c9a1  atomic_fence_cost
 bbd804800b68125cb7abf1996cfd4a217f5528cc26ecad3930bb255b9719061c  atomic_fence_cost.c
+b0b5ae35d3d4741c6855a58cb238457a80798482a35f9f0463640625cf781100  mt_atomic_round_robin_selector_benchmark.c
+fcc2902fcc915cd4512980e654ac7256ac31e42bd4450ebdc83f8ec915e63b00  mt_atomic_round_robin_selector_benchmark.riscv
+be5f15bba4262026b9fa54da65d3a2ce484a0dc54caa16ff5eba64c1ab79cc7d  mt_atomic_round_robin_selector_benchmark_fpga.riscv
+a075e9440ff17e2c8783a0c8579707fe63bb55aa9b10e1533daa73def478bdc5  mt_atomic_round_robin_selector_benchmark_fpga.nbf
+b83e6dfe393eb47f13d43159c4e9bf470f33101d0bb693194707e0158e60bd0e  roundrobin-sim-run.log
+5d23b4425782cd31ace842288c55abc4eb3965898a8cc98c15dcac63d9ab8304  roundrobin-physical.log
+d350ee6692dfde8810254860a053b5b21bff83809916caccadb41b277de6eb11  roundrobin-sim-disassembly.txt
+f6aa8d655166fa830d9dd0732575f8d8382387625a28d3d7a463fbf6b6e11fa7  roundrobin-physical-disassembly.txt
+e1f54f97499479b35f33293847c08b364c6401119d4d6068a9d8f8b7f6b83918  roundrobin-physical-status.json
+e55b612fb71f4c8dc86f10de3bb8195b78a0705ceb8eecb70e85649be995f1a1  run_physical_roundrobin.py
 ```
