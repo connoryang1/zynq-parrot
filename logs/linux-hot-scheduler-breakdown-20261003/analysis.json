@@ -1,0 +1,36 @@
+{
+  "samples_per_metric": 512,
+  "medians_physical_cycles": {
+    "cycle_read_pair": 1.0,
+    "gettid_syscall": 623.0,
+    "sched_yield_no_user_peer": 3357.0,
+    "handoff_to_main": 5595.0,
+    "handoff_to_worker": 5496.0
+  },
+  "derived_physical_cycles": {
+    "gettid_minus_counter": 622.0,
+    "no_peer_yield_minus_counter": 3356.0,
+    "yield_scheduler_path_beyond_gettid": 2734.0,
+    "handoff_to_main_beyond_no_peer_yield": 2238.0,
+    "handoff_to_worker_beyond_no_peer_yield": 2139.0
+  },
+  "independent_bootstrap_difference_of_medians": {
+    "main_handoff_minus_no_peer_yield": {
+      "draws": 100000,
+      "median": 2238.0,
+      "ci95": [
+        2237.0,
+        2239.0
+      ]
+    },
+    "worker_handoff_minus_no_peer_yield": {
+      "draws": 100000,
+      "median": 2139.0,
+      "ci95": [
+        2139.0,
+        2139.0
+      ]
+    }
+  },
+  "interpretation_limit": "Differences are matched-path bounds, not instruction-level kernel attribution. The handoff delta includes task selection, switch_to, and return through the alternate thread."
+}
