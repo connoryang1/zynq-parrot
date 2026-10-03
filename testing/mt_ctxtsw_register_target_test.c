@@ -43,6 +43,33 @@ SWITCH(mul0, "mul t0, a0, a2", 0)
 SWITCH(div0, "divu t0, a0, a2", 0)
 SWITCH(csr0, "csrr t0, mscratch", 0)
 
+/* CTZ selects a runnable context from a one-hot ready bitmap. This is also a
+ * dependency test: the register-form switch must consume CTZ's result. */
+static void __attribute__((naked, noinline)) ctz0(uint64_t bitmap __attribute__((unused)))
+{
+  __asm__ volatile (
+    ".option push\n.option norvc\n.option arch, +zbb\n"
+    "ctz t0, a0\ncsrw 0x800, t0\nret\n.option pop\n" ::: "memory");
+}
+
+static uint64_t clz_value(uint64_t value)
+{
+  uint64_t result;
+  __asm__ volatile (
+    ".option push\n.option arch, +zbb\nclz %0, %1\n.option pop"
+    : "=r"(result) : "r"(value));
+  return result;
+}
+
+static uint64_t ctz_value(uint64_t value)
+{
+  uint64_t result;
+  __asm__ volatile (
+    ".option push\n.option arch, +zbb\nctz %0, %1\n.option pop"
+    : "=r"(result) : "r"(value));
+  return result;
+}
+
 static void __attribute__((naked, noinline, noreturn)) peer_immediate(void)
 {
   __asm__ volatile (
@@ -73,6 +100,14 @@ int main(void)
   const switch_fn cases[] = {alu0, alu1, alu2, alu3, alu4, alu5,
                             load0, mul0, div0, csr0};
   unsigned stage = 0;
+  stage = 1;
+  if (clz_value(0) != 64 || clz_value(1) != 63
+      || clz_value(UINT64_C(1) << 63) != 0)
+    goto fail;
+  stage = 2;
+  if (ctz_value(0) != 64 || ctz_value(1) != 0 || ctz_value(2) != 1
+      || ctz_value(UINT64_C(1) << 63) != 63)
+    goto fail;
   for (unsigned peer = 1; peer <= 2; ++peer) {
     for (unsigned i = 0; i < sizeof(cases)/sizeof(cases[0]); ++i) {
       stage = peer * 100 + i;
@@ -104,6 +139,11 @@ int main(void)
     seed(peer, (uint64_t)peer_immediate);
     load0(0, &cold_lines[16 + (peer - 1) * 8], 1, peer);
     if (observed) goto fail;
+
+    stage = peer * 100 + 43;
+    seed(peer, (uint64_t)peer_immediate);
+    ctz0(UINT64_C(1) << peer);
+    if (observed != peer) goto fail;
   }
   bp_print_string("[BSG-PASS] register targets and computed returns\n");
   bp_finish(0);
