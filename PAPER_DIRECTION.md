@@ -44,15 +44,16 @@ debugging, and scheduling between protection groups still enter Linux. The
 first software experiment can implement this as hardware fibers inside one
 Linux process, with a futex fallback only when no local context is runnable.
 
-The ready-bitmap step now has a measured mechanism cost rather than only a
-projection. In the current simulator, an atomic claim and dynamic handoff
-(`amoswap.d.aqrl; ctz; csrw`) has a steady median of 18.06 cycles per operation.
-A conservative full `fence rw,rw` raises it to 19.07 cycles. All 32 samples
-validate the selected context and ready-word transition before the custom and
-core pass markers. This supports the 15--25-cycle local group-decision budget;
-physical confirmation is still pending because the two Linux attempts failed
-in repeated context reseeding or before benchmark entry rather than producing
-accepted timing (`logs/linux-atomic-fence-cost-20261003/`).
+The ready-bitmap step now has a measured physical mechanism cost rather than
+only a projection. On the exact routed FPGA image, an atomic claim and dynamic
+handoff (`amoswap.d.aqrl; ctz; csrw`) has a steady median of 18.04 cycles per
+operation, versus 18.06 in simulation. A full `fence rw,rw` raises the physical
+median to 19.06 cycles. All 32 samples validate the selected context,
+completion, ready-word transition, and return source before the custom/core
+pass markers and runner exit zero. This supports the 15--25-cycle local
+group-decision budget on hardware. It also separates 8.88 cycles of atomic
+ready selection and loop work from the separately measured 9.16-cycle direct
+nonresident handoff (`logs/linux-atomic-fence-cost-20261003/`).
 
 This first experiment implements only the local scheduling slice of the HotOS
 proposal. The proposal additionally defines runnable, waiting, and disabled

@@ -3,8 +3,8 @@
 #include "bp_utils.h"
 #include "mt_seed.h"
 
-#if BP_NUM_THREADS != 2 || BP_NUM_CONTEXTS < 3
-#error "Use two resident banks and at least three logical contexts"
+#if BP_NUM_THREADS != 2 || BP_NUM_CONTEXTS != 4
+#error "Use two resident banks and four logical contexts"
 #endif
 
 #define TURNS 128
