@@ -218,13 +218,18 @@ below.
   worker's current request, then consumes those `n` loads. This is the batching
   reference; batching independent requests in an application may be impractical.
 
-On BlackParrot, `--hardware --workers 2` additionally enables two matched modes
-on the accepted two-resident/four-logical configuration:
+On BlackParrot, `--hardware --workers 2` makes four additional matched modes
+available on compatible two-resident configurations:
 
 - `resident-prefetch-yield-load`: each hardware context computes its own request
   address, issues `prefetch.r`, yields to its peer, then consumes its load when resumed.
 - `resident-demand-handoff`: the same address/yield/load sequence, without the
   hint. This measures the handoff schedule's cost without prefetching.
+- `assembly-sequential-demand`: one stackless leaf executes the first request
+  stream and then the second, without context switches or prefetches.
+- `assembly-interleaved-demand`: one stackless leaf alternates the two request
+  streams, without context switches or prefetches. Together with the sequential
+  control, this separates code generation and stream order from handoff cost.
 
 The hardware source and peer are leaf assembly with no padding computation.
 Both resident modes time the final drain handoff, so the last response from each context
@@ -273,11 +278,13 @@ For an endpoint with more than four logical hardware contexts, set the context
 count at build time. The current two-resident/ten-logical image uses
 `REQUEST_NUM_CONTEXTS=10`; the default remains four for the older endpoint.
 
-The diagnostic options `--mode-mask 1..15` and
+The diagnostic options `--mode-mask 1..63` and
 `--hardware-prime-lines 0..64` can isolate a subset of modes and perform a
 reported number of untimed demand reads before a hardware launch. Omitting both
 preserves the original all-mode, unprimed benchmark. Mode-mask bits are Linux
-threads = 1, batching = 2, hardware demand = 4, and hardware prefetch = 8.
+threads = 1, batching = 2, hardware demand = 4, hardware prefetch = 8,
+sequential leaf assembly = 16, and interleaved leaf assembly = 32. The default
+hardware mask remains 15, so the assembly controls run only when requested.
 
 The default BlackParrot backend is `blackparrot-zicbop-prefetch-r-l2`.
 Both C batching and resident assembly use [`bp_prefetch.h`](../software/include/bp_prefetch.h),

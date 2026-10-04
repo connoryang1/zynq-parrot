@@ -1,0 +1,110 @@
+/tmp/request_benchmark_dynamic --workers 2 --hardware --requests 4096 --samples 12 --data-kib 2048 --mode-mask 53
+/tmp/request_benchmark_dynamic --workers 2 --hardware --requests 4096 --samp
+les 12 --data-kib 2048 --mode-mask 53
+REQUEST_BENCH backend=blackparrot-zicbop-prefetch-r-l2 cpu=0 workers=2 hardware=1 requests_per_worker=4096 data_bytes=2097152 samples=12 mode_mask=53 hardware_prime_lines=0 seed=xorshift32-9e3779b9 checksum=133130652
+TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included cache=2x-data-displacement-no-flush
+WARMUP_BEGIN mode=linux-threads-demand
+WARMUP_PASS mode=linux-threads-demand
+WARMUP_BEGIN mode=resident-demand-handoff
+WARMUP_PASS mode=resident-demand-handoff
+WARMUP_BEGIN mode=assembly-sequential-demand
+WARMUP_PASS mode=assembly-sequential-demand
+WARMUP_BEGIN mode=assembly-interleaved-demand
+WARMUP_PASS mode=assembly-interleaved-demand
+SAMPLE_BEGIN sample=1 order=0 mode=resident-demand-handoff
+RESULT sample=1 order=0 mode=resident-demand-handoff ns=3865400 requests=8192 checksum=133130652 cycles=616232
+SAMPLE_BEGIN sample=1 order=1 mode=assembly-sequential-demand
+RESULT sample=1 order=1 mode=assembly-sequential-demand ns=3612000 requests=8192 checksum=133130652 cycles=575661
+SAMPLE_BEGIN sample=1 order=2 mode=assembly-interleaved-demand
+RESULT sample=1 order=2 mode=assembly-interleaved-demand ns=3560600 requests=8192 checksum=133130652 cycles=567506
+SAMPLE_BEGIN sample=1 order=3 mode=linux-threads-demand
+RESULT sample=1 order=3 mode=linux-threads-demand ns=4183900 requests=8192 checksum=133130652 cycles=667396
+SAMPLE_BEGIN sample=2 order=0 mode=assembly-sequential-demand
+RESULT sample=2 order=0 mode=assembly-sequential-demand ns=3831800 requests=8192 checksum=133130652 cycles=610700
+SAMPLE_BEGIN sample=2 order=1 mode=assembly-interleaved-demand
+RESULT sample=2 order=1 mode=assembly-interleaved-demand ns=3560100 requests=8192 checksum=133130652 cycles=567356
+SAMPLE_BEGIN sample=2 order=2 mode=linux-threads-demand
+RESULT sample=2 order=2 mode=linux-threads-demand ns=4292800 requests=8192 checksum=133130652 cycles=684848
+SAMPLE_BEGIN sample=2 order=3 mode=resident-demand-handoff
+RESULT sample=2 order=3 mode=resident-demand-handoff ns=4082300 requests=8192 checksum=133130652 cycles=650850
+SAMPLE_BEGIN sample=3 order=0 mode=assembly-interleaved-demand
+RESULT sample=3 order=0 mode=assembly-interleaved-demand ns=3560900 requests=8192 checksum=133130652 cycles=567577
+SAMPLE_BEGIN sample=3 order=1 mode=linux-threads-demand
+RESULT sample=3 order=1 mode=linux-threads-demand ns=4055500 requests=8192 checksum=133130652 cycles=646929
+SAMPLE_BEGIN sample=3 order=2 mode=resident-demand-handoff
+RESULT sample=3 order=2 mode=resident-demand-handoff ns=3835600 requests=8192 checksum=133130652 cycles=611552
+SAMPLE_BEGIN sample=3 order=3 mode=assembly-sequential-demand
+RESULT sample=3 order=3 mode=assembly-sequential-demand ns=3464100 requests=8192 checksum=133130652 cycles=552038
+SAMPLE_BEGIN sample=4 order=0 mode=linux-threads-demand
+RESULT sample=4 order=0 mode=linux-threads-demand ns=4374400 requests=8192 checksum=133130652 cycles=697896
+SAMPLE_BEGIN sample=4 order=1 mode=resident-demand-handoff
+RESULT sample=4 order=1 mode=resident-demand-handoff ns=3821900 requests=8192 checksum=133130652 cycles=609909
+SAMPLE_BEGIN sample=4 order=2 mode=assembly-sequential-demand
+RESULT sample=4 order=2 mode=assembly-sequential-demand ns=3475200 requests=8192 checksum=133130652 cycles=553917
+SAMPLE_BEGIN sample=4 order=3 mode=assembly-interleaved-demand
+RESULT sample=4 order=3 mode=assembly-interleaved-demand ns=3561600 requests=8192 checksum=133130652 cycles=567675
+SAMPLE_BEGIN sample=5 order=0 mode=resident-demand-handoff
+RESULT sample=5 order=0 mode=resident-demand-handoff ns=3841900 requests=8192 checksum=133130652 cycles=612464
+SAMPLE_BEGIN sample=5 order=1 mode=assembly-sequential-demand
+RESULT sample=5 order=1 mode=assembly-sequential-demand ns=3612000 requests=8192 checksum=133130652 cycles=575637
+SAMPLE_BEGIN sample=5 order=2 mode=assembly-interleaved-demand
+RESULT sample=5 order=2 mode=assembly-interleaved-demand ns=3560200 requests=8192 checksum=133130652 cycles=567432
+SAMPLE_BEGIN sample=5 order=3 mode=linux-threads-demand
+RESULT sample=5 order=3 mode=linux-threads-demand ns=4460600 requests=8192 checksum=133130652 cycles=711622
+SAMPLE_BEGIN sample=6 order=0 mode=assembly-sequential-demand
+RESULT sample=6 order=0 mode=assembly-sequential-demand ns=3630700 requests=8192 checksum=133130652 cycles=578630
+SAMPLE_BEGIN sample=6 order=1 mode=assembly-interleaved-demand
+RESULT sample=6 order=1 mode=assembly-interleaved-demand ns=3586300 requests=8192 checksum=133130652 cycles=571549
+SAMPLE_BEGIN sample=6 order=2 mode=linux-threads-demand
+RESULT sample=6 order=2 mode=linux-threads-demand ns=4441100 requests=8192 checksum=133130652 cycles=708600
+SAMPLE_BEGIN sample=6 order=3 mode=resident-demand-handoff
+RESULT sample=6 order=3 mode=resident-demand-handoff ns=3838100 requests=8192 checksum=133130652 cycles=611852
+SAMPLE_BEGIN sample=7 order=0 mode=assembly-interleaved-demand
+RESULT sample=7 order=0 mode=assembly-interleaved-demand ns=3543600 requests=8192 checksum=133130652 cycles=565283
+SAMPLE_BEGIN sample=7 order=1 mode=linux-threads-demand
+RESULT sample=7 order=1 mode=linux-threads-demand ns=4036000 requests=8192 checksum=133130652 cycles=643731
+SAMPLE_BEGIN sample=7 order=2 mode=resident-demand-handoff
+RESULT sample=7 order=2 mode=resident-demand-handoff ns=3701200 requests=8192 checksum=133130652 cycles=590094
+SAMPLE_BEGIN sample=7 order=3 mode=assembly-sequential-demand
+RESULT sample=7 order=3 mode=assembly-sequential-demand ns=3631700 requests=8192 checksum=133130652 cycles=578768
+SAMPLE_BEGIN sample=8 order=0 mode=linux-threads-demand
+RESULT sample=8 order=0 mode=linux-threads-demand ns=4239000 requests=8192 checksum=133130652 cycles=676311
+SAMPLE_BEGIN sample=8 order=1 mode=resident-demand-handoff
+RESULT sample=8 order=1 mode=resident-demand-handoff ns=3864000 requests=8192 checksum=133130652 cycles=615965
+SAMPLE_BEGIN sample=8 order=2 mode=assembly-sequential-demand
+RESULT sample=8 order=2 mode=assembly-sequential-demand ns=3611600 requests=8192 checksum=133130652 cycles=575620
+SAMPLE_BEGIN sample=8 order=3 mode=assembly-interleaved-demand
+RESULT sample=8 order=3 mode=assembly-interleaved-demand ns=3587000 requests=8192 checksum=133130652 cycles=571721
+SAMPLE_BEGIN sample=9 order=0 mode=resident-demand-handoff
+RESULT sample=9 order=0 mode=resident-demand-handoff ns=3840700 requests=8192 checksum=133130652 cycles=612262
+SAMPLE_BEGIN sample=9 order=1 mode=assembly-sequential-demand
+RESULT sample=9 order=1 mode=assembly-sequential-demand ns=3838000 requests=8192 checksum=133130652 cycles=611729
+SAMPLE_BEGIN sample=9 order=2 mode=assembly-interleaved-demand
+RESULT sample=9 order=2 mode=assembly-interleaved-demand ns=3583100 requests=8192 checksum=133130652 cycles=571077
+SAMPLE_BEGIN sample=9 order=3 mode=linux-threads-demand
+RESULT sample=9 order=3 mode=linux-threads-demand ns=4243500 requests=8192 checksum=133130652 cycles=676991
+SAMPLE_BEGIN sample=10 order=0 mode=assembly-sequential-demand
+RESULT sample=10 order=0 mode=assembly-sequential-demand ns=3611000 requests=8192 checksum=133130652 cycles=575522
+SAMPLE_BEGIN sample=10 order=1 mode=assembly-interleaved-demand
+RESULT sample=10 order=1 mode=assembly-interleaved-demand ns=3413000 requests=8192 checksum=133130652 cycles=543920
+SAMPLE_BEGIN sample=10 order=2 mode=linux-threads-demand
+RESULT sample=10 order=2 mode=linux-threads-demand ns=4529200 requests=8192 checksum=133130652 cycles=723018
+SAMPLE_BEGIN sample=10 order=3 mode=resident-demand-handoff
+RESULT sample=10 order=3 mode=resident-demand-handoff ns=3834600 requests=8192 checksum=133130652 cycles=611435
+SAMPLE_BEGIN sample=11 order=0 mode=assembly-interleaved-demand
+RESULT sample=11 order=0 mode=assembly-interleaved-demand ns=3412900 requests=8192 checksum=133130652 cycles=543906
+SAMPLE_BEGIN sample=11 order=1 mode=linux-threads-demand
+RESULT sample=11 order=1 mode=linux-threads-demand ns=4193700 requests=8192 checksum=133130652 cycles=669033
+SAMPLE_BEGIN sample=11 order=2 mode=resident-demand-handoff
+RESULT sample=11 order=2 mode=resident-demand-handoff ns=3838900 requests=8192 checksum=133130652 cycles=611920
+SAMPLE_BEGIN sample=11 order=3 mode=assembly-sequential-demand
+RESULT sample=11 order=3 mode=assembly-sequential-demand ns=3612400 requests=8192 checksum=133130652 cycles=575705
+SAMPLE_BEGIN sample=12 order=0 mode=linux-threads-demand
+RESULT sample=12 order=0 mode=linux-threads-demand ns=4352300 requests=8192 checksum=133130652 cycles=694377
+SAMPLE_BEGIN sample=12 order=1 mode=resident-demand-handoff
+RESULT sample=12 order=1 mode=resident-demand-handoff ns=3835700 requests=8192 checksum=133130652 cycles=611497
+SAMPLE_BEGIN sample=12 order=2 mode=assembly-sequential-demand
+RESULT sample=12 order=2 mode=assembly-sequential-demand ns=3612300 requests=8192 checksum=133130652 cycles=575681
+SAMPLE_BEGIN sample=12 order=3 mode=assembly-interleaved-demand
+RESULT sample=12 order=3 mode=assembly-interleaved-demand ns=3586600 requests=8192 checksum=133130652 cycles=571643
+[REQUEST-BENCH] PASS

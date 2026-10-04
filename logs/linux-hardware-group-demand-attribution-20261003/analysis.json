@@ -1,0 +1,264 @@
+{
+  "accepted_bounded_result": true,
+  "artifact_identity": {
+    "elf_sha256": "8d95f0cfbf91686836ab72b2fe3029bdee1f338a2658774ca1034debf5b1d643",
+    "bitstream_sha256": "9704dd6e0265654adbca272a08a3aae0830bef1893716c6ce25ed80bf2f55ccf",
+    "linux_shell_nbf_sha256": "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3"
+  },
+  "configuration": {
+    "accepted_samples_per_mode": 12,
+    "requested_stalled_samples_per_mode": 32,
+    "workers": 2,
+    "requests_per_worker": 4096,
+    "total_requests_per_sample": 8192,
+    "data_bytes": 2097152,
+    "cache_displacement_bytes": 4194304,
+    "mode_mask": 53,
+    "hardware_prime_lines": 0
+  },
+  "accepted_mode_summary": {
+    "linux-threads-demand": {
+      "samples": 12,
+      "min_cycles": 643731,
+      "median_cycles": 680919.5,
+      "max_cycles": 723018,
+      "median_cycles_per_request": 83.12005615234375,
+      "population_coefficient_of_variation": 0.03481117097858782,
+      "cycles": [
+        667396,
+        684848,
+        646929,
+        697896,
+        711622,
+        708600,
+        643731,
+        676311,
+        676991,
+        723018,
+        669033,
+        694377
+      ]
+    },
+    "resident-demand-handoff": {
+      "samples": 12,
+      "min_cycles": 590094,
+      "median_cycles": 611886.0,
+      "max_cycles": 650850,
+      "median_cycles_per_request": 74.693115234375,
+      "population_coefficient_of_variation": 0.02096751586607969,
+      "cycles": [
+        616232,
+        650850,
+        611552,
+        609909,
+        612464,
+        611852,
+        590094,
+        615965,
+        612262,
+        611435,
+        611920,
+        611497
+      ]
+    },
+    "assembly-sequential-demand": {
+      "samples": 12,
+      "min_cycles": 552038,
+      "median_cycles": 575671.0,
+      "max_cycles": 611729,
+      "median_cycles_per_request": 70.2723388671875,
+      "population_coefficient_of_variation": 0.029507973561968083,
+      "cycles": [
+        575661,
+        610700,
+        552038,
+        553917,
+        575637,
+        578630,
+        578768,
+        575620,
+        611729,
+        575522,
+        575705,
+        575681
+      ]
+    },
+    "assembly-interleaved-demand": {
+      "samples": 12,
+      "min_cycles": 543906,
+      "median_cycles": 567541.5,
+      "max_cycles": 571721,
+      "median_cycles_per_request": 69.27996826171875,
+      "population_coefficient_of_variation": 0.016870009531225808,
+      "cycles": [
+        567506,
+        567356,
+        567577,
+        567675,
+        567432,
+        571549,
+        565283,
+        571721,
+        571077,
+        543920,
+        543906,
+        571643
+      ]
+    }
+  },
+  "comparisons": {
+    "linux_over_hardware_median_ratio": 1.1128208522502558,
+    "hardware_over_sequential_assembly_median_ratio": 1.0629091963986375,
+    "hardware_over_interleaved_assembly_median_ratio": 1.0781343743144773,
+    "sequential_over_interleaved_assembly_median_ratio": 1.0143240626456391,
+    "hardware_minus_interleaved_cycles": 44344.5,
+    "hardware_minus_interleaved_cycles_per_request": 5.41314697265625,
+    "hardware_minus_sequential_cycles_per_request": 4.4207763671875,
+    "paired_bootstrap_hardware_over_interleaved_ratio": {
+      "low_95": 1.071110263511965,
+      "bootstrap_median": 1.0780669406970331,
+      "high_95": 1.0825020388018036
+    },
+    "paired_bootstrap_hardware_over_sequential_ratio": {
+      "low_95": 1.05734760212131,
+      "bootstrap_median": 1.0628332560188056,
+      "high_95": 1.0670328171728816
+    },
+    "paired_bootstrap_hardware_minus_interleaved_cycles_per_request": {
+      "low_95": 4.9591064453125,
+      "bootstrap_median": 5.408538818359375,
+      "high_95": 5.70770263671875
+    },
+    "paired_bootstrap_linux_over_hardware_ratio": {
+      "low_95": 1.091691431502832,
+      "bootstrap_median": 1.112782661417503,
+      "high_95": 1.1493759928871687
+    },
+    "independent_resident_switch_reference_cycles": 5.125
+  },
+  "excluded_32_sample_run": {
+    "status": "MEASURED_STALL",
+    "complete_samples_per_mode": 16,
+    "complete_result_rows": 64,
+    "last_marker": "SAMPLE_BEGIN sample=17 order=0 mode=resident-demand-handoff",
+    "prefix_summary": {
+      "linux-threads-demand": {
+        "samples": 16,
+        "min_cycles": 652687,
+        "median_cycles": 678199.0,
+        "max_cycles": 735608,
+        "median_cycles_per_request": 82.7879638671875,
+        "population_coefficient_of_variation": 0.03483713365499092,
+        "cycles": [
+          652687,
+          679686,
+          725199,
+          659301,
+          658571,
+          678716,
+          735608,
+          657725,
+          671697,
+          679202,
+          703147,
+          664527,
+          659310,
+          689777,
+          699160,
+          677682
+        ]
+      },
+      "resident-demand-handoff": {
+        "samples": 16,
+        "min_cycles": 611204,
+        "median_cycles": 611879.0,
+        "max_cycles": 647738,
+        "median_cycles_per_request": 74.6922607421875,
+        "population_coefficient_of_variation": 0.02200583724914693,
+        "cycles": [
+          646968,
+          611874,
+          611741,
+          611573,
+          611962,
+          647738,
+          611764,
+          646591,
+          619112,
+          611722,
+          611611,
+          611697,
+          611884,
+          611204,
+          614689,
+          612064
+        ]
+      },
+      "assembly-sequential-demand": {
+        "samples": 16,
+        "min_cycles": 551834,
+        "median_cycles": 575531.0,
+        "max_cycles": 655360,
+        "median_cycles_per_request": 70.2552490234375,
+        "population_coefficient_of_variation": 0.039794382083719965,
+        "cycles": [
+          655360,
+          575333,
+          575182,
+          579399,
+          575235,
+          574372,
+          612183,
+          575968,
+          551834,
+          574755,
+          575409,
+          575653,
+          552111,
+          579161,
+          575988,
+          589372
+        ]
+      },
+      "assembly-interleaved-demand": {
+        "samples": 16,
+        "min_cycles": 544043,
+        "median_cycles": 567243.5,
+        "max_cycles": 602501,
+        "median_cycles_per_request": 69.24359130859375,
+        "population_coefficient_of_variation": 0.01865638888422088,
+        "cycles": [
+          567011,
+          567253,
+          567245,
+          567271,
+          544043,
+          567153,
+          567178,
+          602501,
+          565642,
+          570116,
+          571291,
+          571385,
+          566760,
+          567309,
+          566939,
+          567242
+        ]
+      }
+    },
+    "prefix_medians_reproduce_bounded_ordering": true
+  },
+  "interpretation": [
+    "The hardware path's 5.41-cycle median excess per request over matched interleaved assembly is close to the independent 5.125-cycle resident-switch reference.",
+    "The blocking demand is issued only after the context returns, so the measured switching path does not create multiple outstanding demand loads.",
+    "The hardware path remains faster than the Linux pthread implementation but is slower than both optimized one-context assembly controls.",
+    "The 12-sample timing result is accepted only as a bounded comparison; the separate 32-sample attempt stalled entering resident-demand sample 17."
+  ],
+  "limits": [
+    "Cache displacement is best effort and random request streams can revisit lines; every request is not proven to miss.",
+    "The accepted distribution has only 12 samples per mode because the longer mixed-mode lifecycle did not complete.",
+    "The exact cause of the mixed-run sample-17 nonreturn is not established; an earlier demand-only binary completed 32 hardware samples on the same bitstream.",
+    "CLOCK_MONOTONIC values are retained as reported, but conclusions use the core cycle counter."
+  ]
+}

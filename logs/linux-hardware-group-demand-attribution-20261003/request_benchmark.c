@@ -157,8 +157,7 @@ static void usage(FILE *f)
              "       [--cpu CPU] [--hardware] [--help]\n"
              "Defaults: workers=2 requests=4096 samples=5 data-kib=2048;\n"
              "CPU defaults to the first allowed CPU. Requests are per worker.\n"
-             "Mode bits: Linux=1, batch=2, hardware-demand=4, hardware-prefetch=8,\n"
-             "           assembly-sequential=16, assembly-interleaved=32.\n");
+             "Mode bits: Linux=1, batch=2, hardware-demand=4, hardware-prefetch=8.\n");
 }
 static void parse(int argc, char **argv)
 {

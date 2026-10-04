@@ -74,6 +74,7 @@ class RequestBenchmarkTests(unittest.TestCase):
                  ("--requests", "0"), ("--requests", "1048577"), ("--requests", "1junk"),
                  ("--samples", "0"), ("--samples", "1001"), ("--data-kib", "3"),
                  ("--data-kib", "0"), ("--data-kib", "262144"),
+                 ("--mode-mask", "64"),
                  ("--cpu", "1024"), ("--cpu", "9999999999999999999999"),
                  ("--unknown", "1"), ("--workers",)]
         for args in cases:
@@ -106,6 +107,12 @@ class RequestBenchmarkTests(unittest.TestCase):
         run = self.run_benchmark("--hardware")
         self.assertNotEqual(run.returncode, 0)
         self.assertIn("--hardware requires BlackParrot RV64", run.stderr)
+        self.assertNotIn("RESULT ", run.stdout)
+
+    def test_hardware_control_modes_require_hardware_flag(self):
+        run = self.run_benchmark("--mode-mask", 16)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("hardware mode bits require --hardware", run.stderr)
         self.assertNotIn("RESULT ", run.stdout)
 
     def test_host_cannot_mislabel_prefetch_as_faulting_load(self):
