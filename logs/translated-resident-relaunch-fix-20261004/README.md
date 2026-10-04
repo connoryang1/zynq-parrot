@@ -73,8 +73,25 @@ ordinary fast redirect path. The guest and host both passed before the known
 post-finish DPI teardown assertion; the maintained checker classified the run
 as valid. Exact artifact hashes are in `switch-cost-control/SHA256SUMS`.
 
-Routed job `20261004T152200Z-510b853e` is building the two-resident/ten-logical
-`e_bp_unicore_zynqparrot_prefetch10_cfg` image containing `332ada47b`. The exact
-formerly failing and stable Linux workload placements remain the physical
-acceptance test. Until they pass, this fix is proven for the simulation failure
-but is only a candidate explanation for the intermittent FPGA lifecycle failure.
+## Physical FPGA acceptance
+
+Routed job `20261004T152200Z-510b853e` built the two-resident/ten-logical
+`e_bp_unicore_zynqparrot_prefetch10_cfg` image containing `332ada47b`. Full
+timing signoff passes at WNS/TNS `+1.462/0 ns` and WHS/THS `+0.022/0 ns`.
+The design uses 50,700 LUTs, 28,385 registers, 83.5 BRAM tiles, and 11 DSPs.
+The verified package and bitstream SHA-256 values are
+`9a3e4b8e9bacfa2a323633759246d513519b2e438c563abc219c7350b6472237`
+and `2ab6ec08860d07fe627ef079090a76c0604e1d6b40d4003fa9f5dd3a1fc8488b`.
+
+Fresh-boot physical runs used the exact Linux NBF and ELF identities recorded
+under `fpga/`. The `0x11e80`/`0x11ec0` placement that previously hung in its
+first warmup now passes warmup, all 128 samples, native request exit zero,
+`CORE[0] PASS`, and runner exit zero. Its median is 611,716 cycles for 8,192
+requests, or 74.672 cycles/request. The independently booted stable
+`0x11f00`/`0x11f40` control also passes 128/128 at a 611,074.5-cycle median,
+or 74.594 cycles/request. The formerly failing placement is only 0.105% slower
+by difference of medians, while the control is 0.131% faster than its prior
+611,878-cycle median. Thus the state-reset thread-tag correction resolves the
+physical lifecycle failure without a measurable switch-path or workload-level
+performance regression. Exact distributions and log hashes are preserved in
+`fpga/board-analysis.json`.

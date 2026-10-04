@@ -53,15 +53,54 @@
       "run_log_sha256": "1754ac9ed87fa33e9f407d8f08d7fb0d6cda18a00bd90381a58622a36f00e29e",
       "fst_sha256": "71f5ab4900c891531c62b58cbc85f67c74b553cb93c3a95a90e229b4e00155c0",
       "interpretation": "Exactly matches the prior accepted result; the relaunch fallback correction adds no measurable ordinary fast-path latency."
+    },
+    "physical_fpga_acceptance": {
+      "result": "PASS",
+      "formerly_failing_placement": {
+        "binary_sha256": "90411570eaf29908cd5d94d1d6eac449f9fde0d36261234860f445cc2ffe22d8",
+        "switch_loop_pcs": [
+          "0x11e80",
+          "0x11ec0"
+        ],
+        "samples": 128,
+        "median_cycles": 611716.0,
+        "median_cycles_per_request": 74.67236328125,
+        "warmup_passed": true,
+        "core_pass": true
+      },
+      "stable_control_placement": {
+        "binary_sha256": "e62165fadea93925860848bb7642ec2a83c1d10ff38ab6404ec26b48480dcd72",
+        "switch_loop_pcs": [
+          "0x11f00",
+          "0x11f40"
+        ],
+        "samples": 128,
+        "median_cycles": 611074.5,
+        "median_cycles_per_request": 74.59405517578125,
+        "warmup_passed": true,
+        "core_pass": true
+      },
+      "median_difference_percent": 0.10497901647017471,
+      "interpretation": "The exact formerly failing placement and the stable control both pass on fresh boots; the independent distributions differ by only 0.105% in median cycles."
     }
   },
-  "remaining_validation": "Route the two-resident/ten-logical FPGA image and rerun the exact formerly failing and stable Linux placements.",
+  "remaining_validation": "No remaining acceptance gate for this relaunch fix; broader workload and architecture measurements remain independent follow-up work.",
   "routed_fpga_job": {
     "job": "20261004T152200Z-510b853e",
     "top_commit": "510b853e0c675e0ce13e7c392dbe2be1a15dc68f",
     "blackparrot_commit": "332ada47b10ace0afc75ffe4b75cb0efa8eacdad",
     "configuration": "e_bp_unicore_zynqparrot_prefetch10_cfg",
-    "status_at_record": "RUNNING"
+    "status_at_record": "PASS",
+    "package_sha256": "9a3e4b8e9bacfa2a323633759246d513519b2e438c563abc219c7350b6472237",
+    "bitstream_sha256": "2ab6ec08860d07fe627ef079090a76c0604e1d6b40d4003fa9f5dd3a1fc8488b",
+    "wns_ns": 1.462,
+    "tns_ns": 0.0,
+    "whs_ns": 0.022,
+    "ths_ns": 0.0,
+    "slice_luts": 50700,
+    "slice_registers": 28385,
+    "bram_tiles": 83.5,
+    "dsps": 11
   },
   "waveform_ab": {
     "time_units_per_cycle": 50000,

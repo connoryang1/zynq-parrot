@@ -1,0 +1,79 @@
+{
+  "fpga_job": "20261004T152200Z-510b853e",
+  "top_commit": "510b853e0c675e0ce13e7c392dbe2be1a15dc68f",
+  "blackparrot_commit": "332ada47b10ace0afc75ffe4b75cb0efa8eacdad",
+  "configuration": "e_bp_unicore_zynqparrot_prefetch10_cfg",
+  "package_sha256": "9a3e4b8e9bacfa2a323633759246d513519b2e438c563abc219c7350b6472237",
+  "bitstream_sha256": "2ab6ec08860d07fe627ef079090a76c0604e1d6b40d4003fa9f5dd3a1fc8488b",
+  "linux_nbf_sha256": "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3",
+  "timing_signoff": {
+    "wns_ns": 1.462,
+    "tns_ns": 0.0,
+    "whs_ns": 0.022,
+    "ths_ns": 0.0
+  },
+  "utilization": {
+    "slice_luts": 50700,
+    "slice_registers": 28385,
+    "bram_tiles": 83.5,
+    "dsps": 11
+  },
+  "percentile_method": "nearest index round((n-1)*p) over sorted cycles",
+  "formerly_failing_placement": {
+    "binary_sha256": "90411570eaf29908cd5d94d1d6eac449f9fde0d36261234860f445cc2ffe22d8",
+    "switch_loop_pcs": [
+      "0x11e80",
+      "0x11ec0"
+    ],
+    "terminal_status": "PASS",
+    "samples": 128,
+    "requests_per_sample": 8192,
+    "minimum_cycles": 588513,
+    "p05_cycles": 589600,
+    "p25_cycles": 611481,
+    "median_cycles": 611716.0,
+    "mean_cycles": 615085.90625,
+    "p75_cycles": 612399,
+    "p95_cycles": 647379,
+    "maximum_cycles": 653367,
+    "median_absolute_deviation_cycles": 300.0,
+    "median_cycles_per_request": 74.67236328125,
+    "mean_cycles_per_request": 75.0837287902832,
+    "log_sha256": "380eccfc26c00157a293cc2f402702bafbd554504651b85b3d076a653cfb1bd4",
+    "status_sha256": "6c75fe8a39f64a8dfefba857c8cae617789d56974eaff101935937eec4ea3ab4"
+  },
+  "stable_control_placement": {
+    "binary_sha256": "e62165fadea93925860848bb7642ec2a83c1d10ff38ab6404ec26b48480dcd72",
+    "switch_loop_pcs": [
+      "0x11f00",
+      "0x11f40"
+    ],
+    "terminal_status": "PASS",
+    "samples": 128,
+    "requests_per_sample": 8192,
+    "minimum_cycles": 587872,
+    "p05_cycles": 589152,
+    "p25_cycles": 610824,
+    "median_cycles": 611074.5,
+    "mean_cycles": 613862.890625,
+    "p75_cycles": 611463,
+    "p95_cycles": 646905,
+    "maximum_cycles": 648166,
+    "median_absolute_deviation_cycles": 279.5,
+    "median_cycles_per_request": 74.59405517578125,
+    "mean_cycles_per_request": 74.93443489074707,
+    "log_sha256": "ba54281be7d2e305dca0ba610653e4164d500cc5a18a477a69e83571efa579f9",
+    "status_sha256": "a6c59cb68638091afe2ae206f3bc8631b0985dfc34864b6960e9041c00f3ebd5"
+  },
+  "independent_distribution_comparison": {
+    "median_delta_cycles_formerly_failing_minus_control": 641.5,
+    "median_delta_percent_of_control": 0.10497901647017471,
+    "interpretation": "The runs are independent fresh boots, so this is a difference of medians rather than a paired estimate."
+  },
+  "prior_control_comparison": {
+    "prior_median_cycles": 611878,
+    "prior_median_cycles_per_request": 74.692,
+    "new_minus_prior_cycles": -803.5,
+    "new_minus_prior_percent": -0.13131702725053263
+  }
+}
