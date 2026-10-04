@@ -387,8 +387,12 @@ Each process passed two warmups and 62 measured rows; all 124 rows reported
 8,192 requests and checksum 133130652, both exits were zero, and shutdown
 reached `CORE[0] PASS`. Demand medians were 863,436 and 859,356 cycles;
 prefetch medians were 872,929 and 867,016. Process 2 differed by -0.473% and
--0.677%, within prior run variation. The evidence and independent raw-log
-analysis are retained in `logs/process-rebind-20261004/`.
+-0.677%, within prior run variation. Including warmups, the run completed 128
+hardware launches, 1,048,576 dependent requests, and approximately 1,048,832
+hardware handoffs. Late-half medians were 0.2%--2.2% faster than early-half
+medians in every process/mode combination, with no accumulated slowdown. The
+evidence and independent raw-log analysis are retained in
+`logs/process-rebind-20261004/`.
 
 The earlier discarded-load candidate completed its first resident mode but
 hung on its second resident mode. Changing the helper preserves the resident

@@ -20,9 +20,11 @@ and 31 prefetch samples, two warmups, checksums, native exit zero, and final
 `CORE[0] PASS`. Process-1/process-2 medians were 863,436/859,356 demand cycles
 and 872,929/867,016 prefetch cycles. The second process was 0.473% and 0.677%
 faster by median, within historical independent-run variation. This physically
-qualifies explicit address-space rebind and controlled same-boot reuse; it does
-not qualify general task allocation or isolation. Exact raw and independently
-parsed evidence is in `logs/process-rebind-20261004/`.
+qualifies explicit address-space rebind and controlled same-boot reuse across
+128 hardware launches, 1,048,576 dependent requests, and approximately
+1,048,832 handoffs without late-run degradation. It does not qualify general
+task allocation or isolation. Exact raw and independently parsed evidence is
+in `logs/process-rebind-20261004/`.
 
 # Supported checkout
 
