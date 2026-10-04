@@ -18,6 +18,7 @@ Disabling conditional prediction increased the six reported cycles-per-operation
 | bitmap / 2 | 17.05 | 21.44 | 25.7% |
 
 Across the six phases, the summed cycles-per-operation figures rose 30.8%.
+The absolute increment is much steadier than the percentages: 3.38--4.39 cycles per operation, averaging 4.03. The Linux demand workload has one loop-closing conditional branch per request, so a rough pre-run sanity projection is about 644,919 cycles, or 78.73 cycles/request, compared with the stable predictor-enabled median of 611,878 cycles and 74.69 cycles/request. This 5.4% projection is not a measurement; it separates the branch-resolution penalty from the memory-dominated request time and provides a check on the eventual physical result.
 
 ## Waveform confirmation
 
