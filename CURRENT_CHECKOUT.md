@@ -26,6 +26,14 @@ qualifies explicit address-space rebind and controlled same-boot reuse across
 task allocation or isolation. Exact raw and independently parsed evidence is
 in `logs/process-rebind-20261004/`.
 
+A separate same-boot stress run then passed ten sequential processes on the
+same exact artifacts. It validates ten ABI headers, rebind warmups, result rows,
+checksums, and exits across nine successive process boundaries, followed by
+clean `CORE[0] PASS`. Its 20 launches contain 163,840 dependent requests and
+approximately 163,880 handoffs. Median demand time was 894,668 cycles with
+4.45% CV and no monotonic process-index slowdown; the cycle/time ratio inferred
+17.959 MHz, consistent with the routed 18 MHz target.
+
 # Supported checkout
 
 The accepted dirty-victim baseline is on `perf/dependent-streams-20260923`, pinning

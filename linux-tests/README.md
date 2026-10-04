@@ -394,6 +394,14 @@ medians in every process/mode combination, with no accumulated slowdown. The
 evidence and independent raw-log analysis are retained in
 `logs/process-rebind-20261004/`.
 
+A follow-up lifecycle run invoked the same binary as ten sequential processes
+in one boot. All ten rebinds, warmups, measured rows, checksums, exits, and final
+core shutdown passed. The run covers nine additional process boundaries, 20
+hardware launches, 163,840 dependent requests, and approximately 163,880
+handoffs. Its median was 894,668 cycles with 4.45% CV; first-five versus
+last-five medians changed by +1.72%, while the fitted per-process slope was
+slightly negative, providing no evidence of accumulated rebind latency.
+
 The earlier discarded-load candidate completed its first resident mode but
 hung on its second resident mode. Changing the helper preserves the resident
 seeding and handoff protocol; it does not resolve or diagnose that failure.
