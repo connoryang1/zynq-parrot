@@ -1,0 +1,204 @@
+/tmp/request_benchmark_dynamic --workers 2 --hardware --requests 4096 --samples 32 --data-kib 2048 --mode-mask 7
+/tmp/request_benchmark_dynamic --workers 2 --hardware --requests 4096 --samp
+les 32 --data-kib 2048 --mode-mask 7
+REQUEST_BENCH backend=blackparrot-zicbop-prefetch-r-l2 cpu=0 workers=2 hardware=1 requests_per_worker=4096 data_bytes=2097152 samples=32 mode_mask=7 hardware_prime_lines=0 seed=xorshift32-9e3779b9 checksum=133130652
+TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included cache=2x-data-displacement-no-flush
+WARMUP_BEGIN mode=linux-threads-demand
+WARMUP_PASS mode=linux-threads-demand
+WARMUP_BEGIN mode=batched-prefetch-load
+WARMUP_PASS mode=batched-prefetch-load
+WARMUP_BEGIN mode=resident-demand-handoff
+WARMUP_PASS mode=resident-demand-handoff
+SAMPLE_BEGIN sample=1 order=0 mode=batched-prefetch-load
+RESULT sample=1 order=0 mode=batched-prefetch-load ns=4947100 requests=8192 checksum=133130652 cycles=789459
+SAMPLE_BEGIN sample=1 order=1 mode=resident-demand-handoff
+RESULT sample=1 order=1 mode=resident-demand-handoff ns=3860700 requests=8192 checksum=133130652 cycles=615479
+SAMPLE_BEGIN sample=1 order=2 mode=linux-threads-demand
+RESULT sample=1 order=2 mode=linux-threads-demand ns=4010900 requests=8192 checksum=133130652 cycles=639634
+SAMPLE_BEGIN sample=2 order=0 mode=resident-demand-handoff
+RESULT sample=2 order=0 mode=resident-demand-handoff ns=3838900 requests=8192 checksum=133130652 cycles=612011
+SAMPLE_BEGIN sample=2 order=1 mode=linux-threads-demand
+RESULT sample=2 order=1 mode=linux-threads-demand ns=4148400 requests=8192 checksum=133130652 cycles=661565
+SAMPLE_BEGIN sample=2 order=2 mode=batched-prefetch-load
+RESULT sample=2 order=2 mode=batched-prefetch-load ns=5149600 requests=8192 checksum=133130652 cycles=821767
+SAMPLE_BEGIN sample=3 order=0 mode=linux-threads-demand
+RESULT sample=3 order=0 mode=linux-threads-demand ns=4206700 requests=8192 checksum=133130652 cycles=671026
+SAMPLE_BEGIN sample=3 order=1 mode=batched-prefetch-load
+RESULT sample=3 order=1 mode=batched-prefetch-load ns=5397800 requests=8192 checksum=133130652 cycles=861472
+SAMPLE_BEGIN sample=3 order=2 mode=resident-demand-handoff
+RESULT sample=3 order=2 mode=resident-demand-handoff ns=3879400 requests=8192 checksum=133130652 cycles=618426
+SAMPLE_BEGIN sample=4 order=0 mode=batched-prefetch-load
+RESULT sample=4 order=0 mode=batched-prefetch-load ns=4952000 requests=8192 checksum=133130652 cycles=790226
+SAMPLE_BEGIN sample=4 order=1 mode=resident-demand-handoff
+RESULT sample=4 order=1 mode=resident-demand-handoff ns=3836600 requests=8192 checksum=133130652 cycles=611635
+SAMPLE_BEGIN sample=4 order=2 mode=linux-threads-demand
+RESULT sample=4 order=2 mode=linux-threads-demand ns=4267700 requests=8192 checksum=133130652 cycles=680758
+SAMPLE_BEGIN sample=5 order=0 mode=resident-demand-handoff
+RESULT sample=5 order=0 mode=resident-demand-handoff ns=3838500 requests=8192 checksum=133130652 cycles=611868
+SAMPLE_BEGIN sample=5 order=1 mode=linux-threads-demand
+RESULT sample=5 order=1 mode=linux-threads-demand ns=4215400 requests=8192 checksum=133130652 cycles=672327
+SAMPLE_BEGIN sample=5 order=2 mode=batched-prefetch-load
+RESULT sample=5 order=2 mode=batched-prefetch-load ns=4946100 requests=8192 checksum=133130652 cycles=789276
+SAMPLE_BEGIN sample=6 order=0 mode=linux-threads-demand
+RESULT sample=6 order=0 mode=linux-threads-demand ns=4085500 requests=8192 checksum=133130652 cycles=651581
+SAMPLE_BEGIN sample=6 order=1 mode=batched-prefetch-load
+RESULT sample=6 order=1 mode=batched-prefetch-load ns=5178800 requests=8192 checksum=133130652 cycles=826418
+SAMPLE_BEGIN sample=6 order=2 mode=resident-demand-handoff
+RESULT sample=6 order=2 mode=resident-demand-handoff ns=3840200 requests=8192 checksum=133130652 cycles=612142
+SAMPLE_BEGIN sample=7 order=0 mode=batched-prefetch-load
+RESULT sample=7 order=0 mode=batched-prefetch-load ns=5107700 requests=8192 checksum=133130652 cycles=815416
+SAMPLE_BEGIN sample=7 order=1 mode=resident-demand-handoff
+RESULT sample=7 order=1 mode=resident-demand-handoff ns=3834000 requests=8192 checksum=133130652 cycles=611153
+SAMPLE_BEGIN sample=7 order=2 mode=linux-threads-demand
+RESULT sample=7 order=2 mode=linux-threads-demand ns=4004900 requests=8192 checksum=133130652 cycles=638649
+SAMPLE_BEGIN sample=8 order=0 mode=resident-demand-handoff
+RESULT sample=8 order=0 mode=resident-demand-handoff ns=3836100 requests=8192 checksum=133130652 cycles=611509
+SAMPLE_BEGIN sample=8 order=1 mode=linux-threads-demand
+RESULT sample=8 order=1 mode=linux-threads-demand ns=4179800 requests=8192 checksum=133130652 cycles=666616
+SAMPLE_BEGIN sample=8 order=2 mode=batched-prefetch-load
+RESULT sample=8 order=2 mode=batched-prefetch-load ns=5079000 requests=8192 checksum=133130652 cycles=810523
+SAMPLE_BEGIN sample=9 order=0 mode=linux-threads-demand
+RESULT sample=9 order=0 mode=linux-threads-demand ns=4238400 requests=8192 checksum=133130652 cycles=676083
+SAMPLE_BEGIN sample=9 order=1 mode=batched-prefetch-load
+RESULT sample=9 order=1 mode=batched-prefetch-load ns=4946200 requests=8192 checksum=133130652 cycles=789257
+SAMPLE_BEGIN sample=9 order=2 mode=resident-demand-handoff
+RESULT sample=9 order=2 mode=resident-demand-handoff ns=3879200 requests=8192 checksum=133130652 cycles=618324
+SAMPLE_BEGIN sample=10 order=0 mode=batched-prefetch-load
+RESULT sample=10 order=0 mode=batched-prefetch-load ns=4948400 requests=8192 checksum=133130652 cycles=789688
+SAMPLE_BEGIN sample=10 order=1 mode=resident-demand-handoff
+RESULT sample=10 order=1 mode=resident-demand-handoff ns=3838500 requests=8192 checksum=133130652 cycles=611911
+SAMPLE_BEGIN sample=10 order=2 mode=linux-threads-demand
+RESULT sample=10 order=2 mode=linux-threads-demand ns=4011300 requests=8192 checksum=133130652 cycles=639739
+SAMPLE_BEGIN sample=11 order=0 mode=resident-demand-handoff
+RESULT sample=11 order=0 mode=resident-demand-handoff ns=3839900 requests=8192 checksum=133130652 cycles=612099
+SAMPLE_BEGIN sample=11 order=1 mode=linux-threads-demand
+RESULT sample=11 order=1 mode=linux-threads-demand ns=4013500 requests=8192 checksum=133130652 cycles=640054
+SAMPLE_BEGIN sample=11 order=2 mode=batched-prefetch-load
+RESULT sample=11 order=2 mode=batched-prefetch-load ns=4944600 requests=8192 checksum=133130652 cycles=789006
+SAMPLE_BEGIN sample=12 order=0 mode=linux-threads-demand
+RESULT sample=12 order=0 mode=linux-threads-demand ns=4221300 requests=8192 checksum=133130652 cycles=673306
+SAMPLE_BEGIN sample=12 order=1 mode=batched-prefetch-load
+RESULT sample=12 order=1 mode=batched-prefetch-load ns=5080600 requests=8192 checksum=133130652 cycles=811021
+SAMPLE_BEGIN sample=12 order=2 mode=resident-demand-handoff
+RESULT sample=12 order=2 mode=resident-demand-handoff ns=3832200 requests=8192 checksum=133130652 cycles=610831
+SAMPLE_BEGIN sample=13 order=0 mode=batched-prefetch-load
+RESULT sample=13 order=0 mode=batched-prefetch-load ns=5083900 requests=8192 checksum=133130652 cycles=811388
+SAMPLE_BEGIN sample=13 order=1 mode=resident-demand-handoff
+RESULT sample=13 order=1 mode=resident-demand-handoff ns=3839800 requests=8192 checksum=133130652 cycles=612152
+SAMPLE_BEGIN sample=13 order=2 mode=linux-threads-demand
+RESULT sample=13 order=2 mode=linux-threads-demand ns=3980600 requests=8192 checksum=133130652 cycles=635745
+SAMPLE_BEGIN sample=14 order=0 mode=resident-demand-handoff
+RESULT sample=14 order=0 mode=resident-demand-handoff ns=3828400 requests=8192 checksum=133130652 cycles=611002
+SAMPLE_BEGIN sample=14 order=1 mode=linux-threads-demand
+RESULT sample=14 order=1 mode=linux-threads-demand ns=4553000 requests=8192 checksum=133130652 cycles=726963
+SAMPLE_BEGIN sample=14 order=2 mode=batched-prefetch-load
+RESULT sample=14 order=2 mode=batched-prefetch-load ns=4963500 requests=8192 checksum=133130652 cycles=792040
+SAMPLE_BEGIN sample=15 order=0 mode=linux-threads-demand
+RESULT sample=15 order=0 mode=linux-threads-demand ns=4191600 requests=8192 checksum=133130652 cycles=668554
+SAMPLE_BEGIN sample=15 order=1 mode=batched-prefetch-load
+RESULT sample=15 order=1 mode=batched-prefetch-load ns=4947900 requests=8192 checksum=133130652 cycles=789545
+SAMPLE_BEGIN sample=15 order=2 mode=resident-demand-handoff
+RESULT sample=15 order=2 mode=resident-demand-handoff ns=3841200 requests=8192 checksum=133130652 cycles=612286
+SAMPLE_BEGIN sample=16 order=0 mode=batched-prefetch-load
+RESULT sample=16 order=0 mode=batched-prefetch-load ns=4941100 requests=8192 checksum=133130652 cycles=788469
+SAMPLE_BEGIN sample=16 order=1 mode=resident-demand-handoff
+RESULT sample=16 order=1 mode=resident-demand-handoff ns=3842100 requests=8192 checksum=133130652 cycles=612477
+SAMPLE_BEGIN sample=16 order=2 mode=linux-threads-demand
+RESULT sample=16 order=2 mode=linux-threads-demand ns=4335700 requests=8192 checksum=133130652 cycles=691625
+SAMPLE_BEGIN sample=17 order=0 mode=resident-demand-handoff
+RESULT sample=17 order=0 mode=resident-demand-handoff ns=3865400 requests=8192 checksum=133130652 cycles=616193
+SAMPLE_BEGIN sample=17 order=1 mode=linux-threads-demand
+RESULT sample=17 order=1 mode=linux-threads-demand ns=4087100 requests=8192 checksum=133130652 cycles=651853
+SAMPLE_BEGIN sample=17 order=2 mode=batched-prefetch-load
+RESULT sample=17 order=2 mode=batched-prefetch-load ns=4945300 requests=8192 checksum=133130652 cycles=789157
+SAMPLE_BEGIN sample=18 order=0 mode=linux-threads-demand
+RESULT sample=18 order=0 mode=linux-threads-demand ns=4195900 requests=8192 checksum=133130652 cycles=669251
+SAMPLE_BEGIN sample=18 order=1 mode=batched-prefetch-load
+RESULT sample=18 order=1 mode=batched-prefetch-load ns=4947700 requests=8192 checksum=133130652 cycles=789766
+SAMPLE_BEGIN sample=18 order=2 mode=resident-demand-handoff
+RESULT sample=18 order=2 mode=resident-demand-handoff ns=3840600 requests=8192 checksum=133130652 cycles=612181
+SAMPLE_BEGIN sample=19 order=0 mode=batched-prefetch-load
+RESULT sample=19 order=0 mode=batched-prefetch-load ns=5171300 requests=8192 checksum=133130652 cycles=825251
+SAMPLE_BEGIN sample=19 order=1 mode=resident-demand-handoff
+RESULT sample=19 order=1 mode=resident-demand-handoff ns=3842900 requests=8192 checksum=133130652 cycles=612594
+SAMPLE_BEGIN sample=19 order=2 mode=linux-threads-demand
+RESULT sample=19 order=2 mode=linux-threads-demand ns=4239800 requests=8192 checksum=133130652 cycles=676323
+SAMPLE_BEGIN sample=20 order=0 mode=resident-demand-handoff
+RESULT sample=20 order=0 mode=resident-demand-handoff ns=3838200 requests=8192 checksum=133130652 cycles=611801
+SAMPLE_BEGIN sample=20 order=1 mode=linux-threads-demand
+RESULT sample=20 order=1 mode=linux-threads-demand ns=4255200 requests=8192 checksum=133130652 cycles=678758
+SAMPLE_BEGIN sample=20 order=2 mode=batched-prefetch-load
+RESULT sample=20 order=2 mode=batched-prefetch-load ns=5179400 requests=8192 checksum=133130652 cycles=826483
+SAMPLE_BEGIN sample=21 order=0 mode=linux-threads-demand
+RESULT sample=21 order=0 mode=linux-threads-demand ns=4003800 requests=8192 checksum=133130652 cycles=638517
+SAMPLE_BEGIN sample=21 order=1 mode=batched-prefetch-load
+RESULT sample=21 order=1 mode=batched-prefetch-load ns=4945900 requests=8192 checksum=133130652 cycles=789247
+SAMPLE_BEGIN sample=21 order=2 mode=resident-demand-handoff
+RESULT sample=21 order=2 mode=resident-demand-handoff ns=3839300 requests=8192 checksum=133130652 cycles=612001
+SAMPLE_BEGIN sample=22 order=0 mode=batched-prefetch-load
+RESULT sample=22 order=0 mode=batched-prefetch-load ns=4946100 requests=8192 checksum=133130652 cycles=789241
+SAMPLE_BEGIN sample=22 order=1 mode=resident-demand-handoff
+RESULT sample=22 order=1 mode=resident-demand-handoff ns=3840500 requests=8192 checksum=133130652 cycles=612178
+SAMPLE_BEGIN sample=22 order=2 mode=linux-threads-demand
+RESULT sample=22 order=2 mode=linux-threads-demand ns=4223500 requests=8192 checksum=133130652 cycles=673650
+SAMPLE_BEGIN sample=23 order=0 mode=resident-demand-handoff
+RESULT sample=23 order=0 mode=resident-demand-handoff ns=3842300 requests=8192 checksum=133130652 cycles=612491
+SAMPLE_BEGIN sample=23 order=1 mode=linux-threads-demand
+RESULT sample=23 order=1 mode=linux-threads-demand ns=4459100 requests=8192 checksum=133130652 cycles=711328
+SAMPLE_BEGIN sample=23 order=2 mode=batched-prefetch-load
+RESULT sample=23 order=2 mode=batched-prefetch-load ns=5077200 requests=8192 checksum=133130652 cycles=810881
+SAMPLE_BEGIN sample=24 order=0 mode=linux-threads-demand
+RESULT sample=24 order=0 mode=linux-threads-demand ns=4271600 requests=8192 checksum=133130652 cycles=681375
+SAMPLE_BEGIN sample=24 order=1 mode=batched-prefetch-load
+RESULT sample=24 order=1 mode=batched-prefetch-load ns=4949500 requests=8192 checksum=133130652 cycles=789832
+SAMPLE_BEGIN sample=24 order=2 mode=resident-demand-handoff
+RESULT sample=24 order=2 mode=resident-demand-handoff ns=3839300 requests=8192 checksum=133130652 cycles=611994
+SAMPLE_BEGIN sample=25 order=0 mode=batched-prefetch-load
+RESULT sample=25 order=0 mode=batched-prefetch-load ns=4947000 requests=8192 checksum=133130652 cycles=789433
+SAMPLE_BEGIN sample=25 order=1 mode=resident-demand-handoff
+RESULT sample=25 order=1 mode=resident-demand-handoff ns=3837600 requests=8192 checksum=133130652 cycles=611770
+SAMPLE_BEGIN sample=25 order=2 mode=linux-threads-demand
+RESULT sample=25 order=2 mode=linux-threads-demand ns=4172600 requests=8192 checksum=133130652 cycles=665529
+SAMPLE_BEGIN sample=26 order=0 mode=resident-demand-handoff
+RESULT sample=26 order=0 mode=resident-demand-handoff ns=3840500 requests=8192 checksum=133130652 cycles=612158
+SAMPLE_BEGIN sample=26 order=1 mode=linux-threads-demand
+RESULT sample=26 order=1 mode=linux-threads-demand ns=4216000 requests=8192 checksum=133130652 cycles=672491
+SAMPLE_BEGIN sample=26 order=2 mode=batched-prefetch-load
+RESULT sample=26 order=2 mode=batched-prefetch-load ns=4948600 requests=8192 checksum=133130652 cycles=789644
+SAMPLE_BEGIN sample=27 order=0 mode=linux-threads-demand
+RESULT sample=27 order=0 mode=linux-threads-demand ns=4251200 requests=8192 checksum=133130652 cycles=678781
+SAMPLE_BEGIN sample=27 order=1 mode=batched-prefetch-load
+RESULT sample=27 order=1 mode=batched-prefetch-load ns=4945700 requests=8192 checksum=133130652 cycles=789193
+SAMPLE_BEGIN sample=27 order=2 mode=resident-demand-handoff
+RESULT sample=27 order=2 mode=resident-demand-handoff ns=3843200 requests=8192 checksum=133130652 cycles=612594
+SAMPLE_BEGIN sample=28 order=0 mode=batched-prefetch-load
+RESULT sample=28 order=0 mode=batched-prefetch-load ns=4966400 requests=8192 checksum=133130652 cycles=792498
+SAMPLE_BEGIN sample=28 order=1 mode=resident-demand-handoff
+RESULT sample=28 order=1 mode=resident-demand-handoff ns=3842100 requests=8192 checksum=133130652 cycles=612483
+SAMPLE_BEGIN sample=28 order=2 mode=linux-threads-demand
+RESULT sample=28 order=2 mode=linux-threads-demand ns=4090400 requests=8192 checksum=133130652 cycles=652357
+SAMPLE_BEGIN sample=29 order=0 mode=resident-demand-handoff
+RESULT sample=29 order=0 mode=resident-demand-handoff ns=3862600 requests=8192 checksum=133130652 cycles=615745
+SAMPLE_BEGIN sample=29 order=1 mode=linux-threads-demand
+RESULT sample=29 order=1 mode=linux-threads-demand ns=4089000 requests=8192 checksum=133130652 cycles=652157
+SAMPLE_BEGIN sample=29 order=2 mode=batched-prefetch-load
+RESULT sample=29 order=2 mode=batched-prefetch-load ns=5127500 requests=8192 checksum=133130652 cycles=818487
+SAMPLE_BEGIN sample=30 order=0 mode=linux-threads-demand
+RESULT sample=30 order=0 mode=linux-threads-demand ns=4121900 requests=8192 checksum=133130652 cycles=657439
+SAMPLE_BEGIN sample=30 order=1 mode=batched-prefetch-load
+RESULT sample=30 order=1 mode=batched-prefetch-load ns=4944600 requests=8192 checksum=133130652 cycles=789108
+SAMPLE_BEGIN sample=30 order=2 mode=resident-demand-handoff
+RESULT sample=30 order=2 mode=resident-demand-handoff ns=3838600 requests=8192 checksum=133130652 cycles=611910
+SAMPLE_BEGIN sample=31 order=0 mode=batched-prefetch-load
+RESULT sample=31 order=0 mode=batched-prefetch-load ns=5033100 requests=8192 checksum=133130652 cycles=803129
+SAMPLE_BEGIN sample=31 order=1 mode=resident-demand-handoff
+RESULT sample=31 order=1 mode=resident-demand-handoff ns=3840900 requests=8192 checksum=133130652 cycles=612231
+SAMPLE_BEGIN sample=31 order=2 mode=linux-threads-demand
+RESULT sample=31 order=2 mode=linux-threads-demand ns=4250100 requests=8192 checksum=133130652 cycles=677913
+SAMPLE_BEGIN sample=32 order=0 mode=resident-demand-handoff
+RESULT sample=32 order=0 mode=resident-demand-handoff ns=3839100 requests=8192 checksum=133130652 cycles=611967
+SAMPLE_BEGIN sample=32 order=1 mode=linux-threads-demand
+RESULT sample=32 order=1 mode=linux-threads-demand ns=4014000 requests=8192 checksum=133130652 cycles=640140
+SAMPLE_BEGIN sample=32 order=2 mode=batched-prefetch-load
+RESULT sample=32 order=2 mode=batched-prefetch-load ns=4942000 requests=8192 checksum=133130652 cycles=788623
+[REQUEST-BENCH] PASS
