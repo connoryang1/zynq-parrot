@@ -88,6 +88,14 @@ class LinuxHarnessTests(unittest.TestCase):
             self.assertIn("-DBP_NUM_CONTEXTS=" + str(contexts),
                           self.read_app("benchmark")["args"])
 
+    def test_request_context_count_round_trip(self):
+        for contexts in (10, 4, 10):
+            result = self.make("request-benchmark-dynamic",
+                               "REQUEST_NUM_CONTEXTS=" + str(contexts))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("-DBP_NUM_CONTEXTS=" + str(contexts),
+                          self.read_app("request-benchmark-dynamic")["args"])
+
     def test_compiler_change_for_every_app(self):
         for target in APPS:
             for compiler in ("first-gcc", "second-gcc", "first-gcc"):
@@ -108,7 +116,7 @@ class LinuxHarnessTests(unittest.TestCase):
             for flag in flags.split():
                 if flag != "-static":
                     self.assertIn(flag, args)
-            for flag in ("-pthread", "-DBP_NUM_THREADS=2", "-DBP_NUM_CONTEXTS=4"):
+            for flag in ("-pthread", "-DBP_NUM_THREADS=2", "-DBP_NUM_CONTEXTS=10"):
                 self.assertIn(flag, args)
 
     def test_transfer_is_only_shell_commands_and_current_base64(self):

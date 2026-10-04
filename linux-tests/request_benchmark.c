@@ -37,11 +37,15 @@ static inline void request_prefetch(const volatile void *p) { bp_load_ahead(p); 
 #define REQUEST_AHEAD_ASM(base) BP_PREFETCH_R_ASM(base)
 static inline void request_prefetch(const volatile void *p) { bp_prefetch_r(p); }
 #endif
+#define HARDWARE_CONTEXTS BP_NUM_CONTEXTS
+#define HARDWARE_TID_BITS BP_TID_BITS
 #elif defined(__x86_64__) || defined(__i386__)
 #if BP_REQUEST_LOAD_AHEAD
 #error "The faulting-load control requires BlackParrot RV64"
 #endif
 #define BACKEND "x86-prefetcht0"
+#define HARDWARE_CONTEXTS 0
+#define HARDWARE_TID_BITS 0
 static inline void request_prefetch(const volatile void *p)
 {
   __asm__ volatile ("prefetcht0 (%0)" : : "r"(p) : "memory");
@@ -493,10 +497,12 @@ int main(int argc, char **argv)
   if (!modes) {
     fprintf(stderr, "mode mask selects no enabled mode\n"); return EXIT_FAILURE;
   }
-  printf("REQUEST_BENCH backend=%s cpu=%d workers=%u hardware=%d requests_per_worker=%u "
+  printf("REQUEST_BENCH backend=%s cpu=%d workers=%u hardware=%d logical_contexts=%u "
+         "seed_tid_bits=%u requests_per_worker=%u "
          "data_bytes=%zu samples=%u mode_mask=%u hardware_prime_lines=%u "
          "seed=xorshift32-9e3779b9 checksum=%" PRIu64 "\n",
-         BACKEND, opt.cpu, opt.workers, opt.hardware, opt.requests, data_bytes,
+         BACKEND, opt.cpu, opt.workers, opt.hardware, HARDWARE_CONTEXTS,
+         HARDWARE_TID_BITS, opt.requests, data_bytes,
          opt.samples, opt.mode_mask, opt.hardware_prime_lines, total_expected);
   printf("TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included "
          "cache=2x-data-displacement-no-flush\n");

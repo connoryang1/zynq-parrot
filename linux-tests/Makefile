@@ -42,7 +42,10 @@ OPENSBI_PAYLOAD := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/fi
 TINY_BOOTARGS := console=hvc0 loglevel=8 rdinit=/ctxtsw_user_tiny
 TINY_TARGET_SYSCALL ?= 1
 BENCH_NUM_CONTEXTS ?= 4
-REQUEST_NUM_CONTEXTS ?= 4
+# The checked-in FPGA acceptance configuration has ten logical contexts.  The
+# CSR 0x802 register-seed ABI places its register field immediately above the
+# elaborated context-ID field, so this value must match the bitstream.
+REQUEST_NUM_CONTEXTS ?= 10
 
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany

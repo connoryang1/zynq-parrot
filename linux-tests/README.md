@@ -291,9 +291,11 @@ make -s -C linux-tests emit-request-transfer \
 sha256sum linux-tests/out/request_benchmark
 ```
 
-For an endpoint with more than four logical hardware contexts, set the context
-count at build time. The current two-resident/ten-logical image uses
-`REQUEST_NUM_CONTEXTS=10`; the default remains four for the older endpoint.
+The request benchmark defaults to the current two-resident/ten-logical image,
+so `REQUEST_NUM_CONTEXTS=10`. Set the value explicitly when targeting another
+endpoint. It controls the CSR `0x802` register-field position and must match the
+bitstream's logical-context count; the executable reports both
+`logical_contexts` and `seed_tid_bits` before running hardware modes.
 
 The diagnostic options `--mode-mask 1..63` and
 `--hardware-prime-lines 0..64` can isolate a subset of modes and perform a
@@ -368,13 +370,25 @@ run `/tmp/request_benchmark --workers 2 --hardware`, followed immediately by
 `--workers 10` without `--hardware` for the original baseline and batching width.
 The prefetch experiment requires an overlay containing the implemented hint
 path and its L2-controller changes; the earlier resident-fix overlay alone does
-not implement hints. The hardware option requires
-**one hardware-enabled invocation per fresh overlay/Linux boot**. Linux does
-not reclaim the extra context when the process exits. Do not run another
-context-switch demo in the same boot. Without the option, the program allocates
+not implement hints. The hardware option explicitly rebinds context 1's
+privilege and translation CSR image to the calling process on its first
+hardware trial, then uses ordinary NPC reseeding within that process. This
+permits repeated request-benchmark processes in one Linux boot on RTL with the
+rebind extension. It does not provide general Linux context allocation,
+teardown, isolation, or automatic register ownership. Do not mix unrelated
+context-switch demos in the same boot. Without the option, the program allocates
 only ordinary Linux threads and can be repeated normally. Host hardware mode
 and hardware runs with a worker count other than two fail instead of being
 silently skipped.
+
+The October 4, 2026 physical acceptance ran the dynamic executable twice as
+separate processes in one boot on the exact two-resident/ten-logical image.
+Each process passed two warmups and 62 measured rows; all 124 rows reported
+8,192 requests and checksum 133130652, both exits were zero, and shutdown
+reached `CORE[0] PASS`. Demand medians were 863,436 and 859,356 cycles;
+prefetch medians were 872,929 and 867,016. Process 2 differed by -0.473% and
+-0.677%, within prior run variation. The evidence and independent raw-log
+analysis are retained in `logs/process-rebind-20261004/`.
 
 The earlier discarded-load candidate completed its first resident mode but
 hung on its second resident mode. Changing the helper preserves the resident

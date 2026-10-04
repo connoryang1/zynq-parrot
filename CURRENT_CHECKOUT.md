@@ -1,5 +1,29 @@
 This file identifies the accepted BlackParrot context-switch and prefetch sources and their verified FPGA image. It records reproducible checks, remaining production limits, and historical artifact identities.
 
+## Current same-boot process-rebind endpoint
+
+Top commit `b7cf9953c6e5f2134536c3c0ecf0e8ee19bee573` pins BlackParrot
+`c50b85719863443ba69de1bc2fd6575ca0b9e0a7` and adds explicit CSR-image
+rebinding for reuse of a persistent resident context by another Linux process.
+It also cancels younger frontend context redirects when an older trap or redirect
+wins. Job `20261004T200130Z-b7cf9953` routes the static
+`e_bp_unicore_zynqparrot_prefetch10_cfg` endpoint at WNS/TNS `+1.280/0 ns` and
+WHS/THS `+0.024/0 ns`, with 50,380 LUTs, 28,480 registers, 83.5 BRAM tiles, and
+11 DSPs. The package SHA-256 is
+`e9c4c01e639ae4558b84065a73043a9432a2fdc8edd657638144801d8a840e39` and the
+bitstream SHA-256 is
+`f234819855ee79028ccf6387a356fe297962b9e30e36420f4da224150384a7b8`.
+
+On that exact image, one corrected-timer Linux boot launched the hardware
+request benchmark twice as separate processes. Both processes passed 31 demand
+and 31 prefetch samples, two warmups, checksums, native exit zero, and final
+`CORE[0] PASS`. Process-1/process-2 medians were 863,436/859,356 demand cycles
+and 872,929/867,016 prefetch cycles. The second process was 0.473% and 0.677%
+faster by median, within historical independent-run variation. This physically
+qualifies explicit address-space rebind and controlled same-boot reuse; it does
+not qualify general task allocation or isolation. Exact raw and independently
+parsed evidence is in `logs/process-rebind-20261004/`.
+
 # Supported checkout
 
 The accepted dirty-victim baseline is on `perf/dependent-streams-20260923`, pinning
@@ -228,24 +252,24 @@ logical identity, register restoration, and Linux shutdown. A separately
 transferred shell executable also passed on `6c97bcc0a`. The underlying RTL
 retains simulator verification of resident 0↔1 initialization, repeated
 handoffs/reseeding, and syscalls;
-see the
-[Linux guide](linux-tests/README.md) for that evidence and its one-run-per-boot
-restriction.
+see the [Linux guide](linux-tests/README.md) for that evidence. The current
+request benchmark has explicit same-boot rebind qualification; older demos
+retain their documented one-run-per-boot restrictions.
 
 This is a cooperative integer-context prototype. Production readiness still
 requires:
 
 - A defined ABI and complete FP-state policy; ordinary FP and resident FP tests
   do not establish nonresident FP preservation.
-- Context allocation, teardown, and reuse across Linux process exit, traps,
-  timer preemption, and scheduling. Hardware contexts currently are not
-  independently scheduled Linux tasks.
+- General context allocation, teardown, preemption, and scheduler integration.
+  Explicit request-benchmark rebind now qualifies controlled reuse across two
+  process exits, but hardware contexts are not independently scheduled Linux
+  tasks.
 - Permission enforcement and address-space isolation for untrusted contexts.
-- Broader fault/stress qualification, including NPC reseeding from a context
-  with different privilege/SATP/ASID. Static review found that `bp_be_top.sv`
-  updates target fetch metadata from the caller on reseed while retaining the
-  initialized target CSR image; a differing-environment regression is needed
-  before changing that protocol or claiming it safe.
+- Broader fault/stress qualification beyond the translated two-process rebind
+  test. Ordinary NPC reseeding deliberately retains a target's private CSR
+  image; explicit rebind clones the caller's privilege/SATP state while
+  preserving the target GPR bank.
 
 See [architecture](CONTEXT_SWITCH_ARCHITECTURE.md), [tests](testing/README.md),
 and [research direction](PAPER_DIRECTION.md). SQLite remains at
