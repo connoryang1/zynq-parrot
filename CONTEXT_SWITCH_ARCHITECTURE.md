@@ -23,7 +23,10 @@ Inline comments and the RTL are authoritative for protocol details. Do not treat
 
 The prototype uses custom CSRs: `0x800` switches/reads logical context ID,
 `0x801` seeds a target PC, `0x802` seeds remote register state, and read-only
-`0xCC0` supplies a core-wide cycle counter. Encoding examples live in
+`0xCC0` supplies a core-wide cycle counter. Bit 63 of a `0x801` write explicitly
+rebinds an initialized resident context's privilege and translation CSR image
+to the caller while preserving its private GPRs; ordinary NPC seeds retain the
+target's CSR image. Encoding examples live in
 [the Linux demonstration](linux-tests/ctxtsw_user_tiny.c) and the test helpers;
 these are not standard RISC-V threading instructions.
 
@@ -32,9 +35,9 @@ does **not** provide complete nonresident FP context preservation. It also does
 not make hardware contexts independently scheduled Linux tasks, implement a
 permission-protected thread API, or establish isolation between mutually
 untrusted contexts. The Linux proof uses cooperating contexts in one process.
-NPC reseeding has only been qualified with matching caller/target execution
-environments. Cross-privilege or differing-translation reseeds need the focused
-regression described in the checkout guide before relying on retained CSR state.
+Software must request rebind before reusing a persistent hardware context for a
+different process or address space. The interface still has no protected kernel
+allocator or automatic ownership tracking.
 
 ## Cache overlap is a separate capability
 

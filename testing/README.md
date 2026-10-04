@@ -36,6 +36,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_regfile_test` | Integer-context execution, private stack, and return-state isolation |
 | `mt_csr_isolation_test` | First-seed CSR inheritance, independent `mscratch`, and NPC reseed preservation |
 | `mt_resident_reseed_fetch_test` | Adjacent NPC seeds and immediate/register switches into cold Sv39 code, with private CSR/GPR preservation and refreshed arguments |
+| `mt_context_csr_rebind_test` | Ordinary reseed preserves private CSRs, while explicit rebind replaces privilege/translation CSRs without disturbing target GPRs |
 | `mt_resident_reseed_irq_test` | Pending CLINT software interrupt before a reseeded resident target retires: trap PC, private CSR/GPR state, arguments, and return to the new entry |
 | `mt_remote_seed_order_test` | Source and target writeback ordering across ALU, cold load, divide, FP, consecutive remote seeds and nonzero CSR destinations |
 | `mt_frf_isolation_test` | Resident floating-point register isolation; not nonresident FP preservation |

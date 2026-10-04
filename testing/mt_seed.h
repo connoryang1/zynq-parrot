@@ -9,6 +9,7 @@
  * CSR 0x801 (CTXT_NPC): seed the NPC for a target thread
  *   bits [38:0]                    = NPC (vaddr_width_p = 39)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
+ *   bit  [63]                       = rebind target CSR image to caller
  * CSR 0x802 (CTXT_REG): seed an integer or FP register for a target thread
  *   bits [38:0]                    = value (zero-extended by hardware)
  *   bits [38+BP_TID_BITS : 39]     = thread ID
@@ -53,6 +54,13 @@
 
 static inline void seed_npc(uint64_t tid, uint64_t npc) {
   uint64_t v = ((tid & BP_TID_MASK) << BP_TID_SHIFT) | (npc & BP_NPC_MASK);
+  __asm__ volatile("csrw 0x801, %0" : : "r"(v) : "memory");
+}
+
+static inline void seed_npc_rebind(uint64_t tid, uint64_t npc) {
+  uint64_t v = (1ULL << 63)
+             | ((tid & BP_TID_MASK) << BP_TID_SHIFT)
+             | (npc & BP_NPC_MASK);
   __asm__ volatile("csrw 0x801, %0" : : "r"(v) : "memory");
 }
 

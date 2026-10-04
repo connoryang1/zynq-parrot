@@ -61,6 +61,7 @@ SMOKE_TESTS := \
 CORRECTNESS_TESTS := \
     mt_remote_seed_order_test \
     mt_resident_reseed_fetch_test \
+    mt_context_csr_rebind_test \
     mt_resident_relaunch_register_test \
     mt_resident_relaunch_prefetch_test \
     mt_resident_reseed_irq_test \
@@ -177,6 +178,7 @@ check-ten-logical-config:
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
+run-mt_context_csr_rebind_test: check-nonresident-config
 run-mt_resident_relaunch_register_test: check-nonresident-config
 run-mt_resident_relaunch_prefetch_test: check-nonresident-config
 run-mt_resident_relaunch_prefetch_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS

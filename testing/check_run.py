@@ -33,6 +33,7 @@ TEST_MARKERS = {
     "mt_ddr_latency_benchmark": "[BSG-PASS] DDR dependent-load latency and prefetch lead sweep",
     "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",
     "mt_resident_reseed_fetch_test": "[BSG-PASS] resident reseed cold-fetch and CSR preservation",
+    "mt_context_csr_rebind_test": "[BSG-PASS] resident context CSR rebind preserved target GPR state",
     "mt_resident_relaunch_register_test": "[BSG-PASS] resident relaunch register preservation",
     "mt_resident_relaunch_prefetch_test": "[BSG-PASS] resident relaunch prefetch register preservation",
     "mt_resident_reseed_irq_test": "[BSG-PASS] resident reseed interrupt PC and CSR preservation",

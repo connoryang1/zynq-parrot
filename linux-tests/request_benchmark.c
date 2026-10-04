@@ -1,6 +1,6 @@
 /* Compare independent Linux request threads with a single batched load loop.
  * The same deterministic request streams and checksums are used in both modes.
- * Hardware-context modes require an explicit --hardware and a fresh Linux boot.
+ * Hardware-context modes require an explicit --hardware.
  */
 #define _GNU_SOURCE
 #include <errno.h>
@@ -415,6 +415,11 @@ static uint64_t current_context(void)
   __asm__ volatile ("csrr %0, 0x800" : "=r"(id) : : "memory");
   return id;
 }
+/* Each exec starts with no software ownership of the persistent hardware
+ * context. Rebind once so a context left valid by an earlier process inherits
+ * this process's privilege and translation state. Later trials use ordinary
+ * reseeding to preserve the peer's private CSR state and measured behavior. */
+static int hardware_context_bound;
 static struct timing run_hardware(unsigned ahead, uint64_t *sums)
 {
   volatile uint64_t result[3] = {0, 0, 0};
@@ -445,7 +450,12 @@ static struct timing run_hardware(unsigned ahead, uint64_t *sums)
    */
   struct timing start;
   start.ns = now_ns();
-  seed_npc(1, (uintptr_t)peer);
+  if (!hardware_context_bound) {
+    seed_npc_rebind(1, (uintptr_t)peer);
+    hardware_context_bound = 1;
+  } else {
+    seed_npc(1, (uintptr_t)peer);
+  }
   start.cycles = core_cycles();
   sums[0] = source(data, requests, opt.requests, dependency_zero);
   struct timing duration = elapsed(start, timer_end());
