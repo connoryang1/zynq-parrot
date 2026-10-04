@@ -22,6 +22,11 @@ PROTOCOL_CASE ?= 1
 DDR_LATENCY_VERBOSE ?= 1
 STREAMS ?= 4
 STREAM_NODES ?= 32
+TARGET_BYPASS_TURNS ?= 128
+LIFECYCLE_EPOCHS ?= 6
+LIFECYCLE_EVICTION_LINES ?= 1024
+LIFECYCLE_SV39 ?= 1
+LIFECYCLE_ITERATIONS ?= 256
 SIM_DEFINES ?=
 
 ifeq ($(PREFETCH_FULL_LINE),1)
@@ -56,6 +61,8 @@ SMOKE_TESTS := \
 CORRECTNESS_TESTS := \
     mt_remote_seed_order_test \
     mt_resident_reseed_fetch_test \
+    mt_resident_relaunch_register_test \
+    mt_resident_relaunch_prefetch_test \
     mt_resident_reseed_irq_test \
     mt_umode_prefetch_test \
     mt_prefetch_hint_test \
@@ -133,6 +140,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/te
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
+$(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_target_bypass_stress_test.riscv: CFLAGS += -DCTXTSW_TARGET_BYPASS_TURNS=$(TARGET_BYPASS_TURNS)
+$(ZP_RISCV_DIR)/bp-tests/mt_resident_relaunch_prefetch_test.riscv: $(TOP)/testing/mt_resident_relaunch_register_test.c $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_interleave_benchmark.riscv: $(TOP)/testing/mt_request_interleave_benchmark.c $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp_prefetch.h
@@ -144,6 +153,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/testing/dep
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: CFLAGS += -DBP_LIFECYCLE_EPOCHS=$(LIFECYCLE_EPOCHS) -DBP_LIFECYCLE_EVICTION_LINES=$(LIFECYCLE_EVICTION_LINES) -DBP_LIFECYCLE_SV39=$(LIFECYCLE_SV39) -DBP_LIFECYCLE_ITERATIONS=$(LIFECYCLE_ITERATIONS)
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
 
 .PHONY: check-nonresident-config
@@ -167,6 +177,9 @@ check-ten-logical-config:
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
+run-mt_resident_relaunch_register_test: check-nonresident-config
+run-mt_resident_relaunch_prefetch_test: check-nonresident-config
+run-mt_resident_relaunch_prefetch_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
 run-mt_resident_reseed_irq_test: check-nonresident-config
 run-mt_remote_seed_order_test: check-nonresident-config
 run-mt_ctxtsw_target_bypass_stress_test: check-nonresident-config

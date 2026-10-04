@@ -1,0 +1,64 @@
+{
+  "job": "20261004T094435Z-984a2727",
+  "top_commit": "984a2727c0b7781adb1732f5210daf484758b241",
+  "black_parrot_commit": "d1186c793fd8f642e90777b9dc418d2bf335285e",
+  "config": "e_bp_unicore_zynqparrot_prefetch10_cfg",
+  "package_sha256": "3e023f0dd0c6bbd18154d1328221d33b44a980c40fc7ac12e229709207bee622",
+  "bitstream_sha256": "f89badd0db6b789f33c2358df9134817478395be9020e142f27a4cef3d01e73a",
+  "timing": {
+    "wns_ns": 1.9,
+    "tns_ns": 0.0,
+    "whs_ns": 0.023,
+    "ths_ns": 0.0,
+    "drc_errors": 0
+  },
+  "placed_utilization": {
+    "slice_luts": 50710,
+    "slice_registers": 28385,
+    "bram_tiles": 83.5,
+    "dsps": 11
+  },
+  "predictor_enabled_control_delta": {
+    "slice_luts": -20,
+    "slice_registers": 0,
+    "bram_tiles": 0.0,
+    "dsps": 0,
+    "wns_ns": 0.372,
+    "whs_ns": -0.007
+  },
+  "physical_runs": [
+    {
+      "name": "formerly_failing_placement",
+      "binary_sha256": "90411570eaf29908cd5d94d1d6eac449f9fde0d36261234860f445cc2ffe22d8",
+      "loop_pcs": ["0x11e80", "0x11ec0"],
+      "requests_per_worker": 4096,
+      "requested_samples": 128,
+      "completed_samples": 0,
+      "warmup_passed": false,
+      "outcome": "CONTROLLER_TIMEOUT",
+      "watchdog_ms": 300000,
+      "retired_instructions": 593360848,
+      "mtime_delta": 210910019,
+      "ipc": 0.351667
+    },
+    {
+      "name": "formerly_stable_placement",
+      "binary_sha256": "e62165fadea93925860848bb7642ec2a83c1d10ff38ab6404ec26b48480dcd72",
+      "loop_pcs": ["0x11f00", "0x11f40"],
+      "requests_per_worker": 4096,
+      "requested_samples": 128,
+      "completed_samples": 0,
+      "warmup_passed": false,
+      "outcome": "CONTROLLER_TIMEOUT",
+      "watchdog_ms": 300000,
+      "retired_instructions": 591441047,
+      "mtime_delta": 210910450,
+      "ipc": 0.350529
+    }
+  ],
+  "verdict": [
+    "Speculative conditional predicted-taken redirection is not necessary for a continuing-execution hang.",
+    "The prediction-off image introduces a placement-independent failure, so it does not identify the root cause of the original placement-sensitive failure.",
+    "Later simulation found the same repeated translated-relaunch failure with prediction enabled and disabled, caused by a commit-time state-reset fallback that did not update the frontend thread tag; the physical prediction-off result is confounded until that fix is routed."
+  ]
+}

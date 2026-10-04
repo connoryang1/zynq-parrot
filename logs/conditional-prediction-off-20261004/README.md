@@ -24,4 +24,29 @@ The absolute increment is much steadier than the percentages: 3.38--4.39 cycles 
 
 `analyze_prediction_decisions.py` checks the combinational BTB decision on every sampled core cycle in paired predictor-enabled and prediction-disabled traces. The enabled control had 15,533 valid conditional predicted-taken candidates and drove `btb_taken` for all of them, in addition to 2,534 unconditional jump hits. The diagnostic trace encountered 5,927 such conditional candidates and suppressed every one, while all 3,279 unconditional jump hits still drove `btb_taken`. There were zero decision-equation mismatches across 385,960 enabled and 397,726 diagnostic cycles after predictor initialization.
 
-The simulation establishes architectural viability and gives a cost bound for the diagnostic image. The decisive result remains the routed ten-context image running the exact formerly failing and passing Linux ELFs. If the failing placement becomes stable, conditional predicted-taken behavior remains implicated; if it still fails, speculative conditional direction is not necessary, although predictor metadata and training remain active and would require a separate isolation if later evidence points there.
+The simulation establishes architectural viability and gives a cost bound for the diagnostic image. Predictor reads, metadata, and training remain active, so this experiment isolates only use of the conditional direction for speculative frontend redirection.
+
+## Routed implementation
+
+Job `20261004T094435Z-984a2727` built the correct two-resident, ten-logical-context endpoint at top-level commit `984a2727` and BlackParrot commit `d1186c793`. The package SHA-256 is `3e023f0dd0c6bbd18154d1328221d33b44a980c40fc7ac12e229709207bee622`; its bitstream SHA-256 is `f89badd0db6b789f33c2358df9134817478395be9020e142f27a4cef3d01e73a`.
+
+The image passes routing and all DRCs with WNS `+1.900 ns`, TNS `0`, WHS `+0.023 ns`, and THS `0`. It uses 50,710 placed LUTs, 28,385 registers, 83.5 BRAM tiles, and 11 DSPs. Relative to the predictor-enabled control, this is 20 fewer LUTs, identical registers/BRAM/DSP, 0.372 ns more setup slack, and 0.007 ns less but still positive hold slack. The diagnostic therefore has effectively identical physical size and comfortably meets the same clock.
+
+## Physical result
+
+Both exact Linux placements hang in their first resident-demand warmup with zero completed samples:
+
+| ELF | Loop PCs | Retired instructions | MTIME delta | Reported IPC |
+|---|---|---:|---:|---:|
+| formerly failing `90411570...` | `0x11e80` / `0x11ec0` | 593,360,848 | 210,910,019 | 0.351667 |
+| formerly stable `e62165fa...` | `0x11f00` / `0x11f40` | 591,441,047 | 210,910,450 | 0.350529 |
+
+Each run used a fresh board boot, the exact diagnostic bitstream, 4,096 requests per worker, a 300-second target watchdog, and a verified Linux NBF. The MTIME deltas differ by only 431 counts (0.0002%), and retired instructions differ by 0.32%, showing that both placements enter nearly the same continuing execution state rather than a global core or DDR deadlock.
+
+This result rules out speculative conditional predicted-taken redirection as a necessary trigger for a hang, but it does **not** isolate the original placement-sensitive failure.
+
+## Superseding simulation result
+
+Later repeated-handoff simulation reproduced the failure with conditional prediction both enabled and disabled. The required boundary was a resident Sv39 relaunch whose speculative frontend context redirect was not accepted before the switch committed. The commit-time state-reset fallback carried the target PC, privilege, translation state, ASID, and hardware-thread ID in its operand payload, but the frontend did not mark that fallback as a thread-ID change. It therefore fetched the correct target PC with the previous physical register-bank tag.
+
+BlackParrot commit `332ada47b` fixes that fallback tag and passes minimized, exact A/B, full-pressure, and independent switching regressions. The prediction-disabled FPGA failures are now confounded by this pre-existing bug and no longer establish that extra resolved-branch redirects caused the hang. A routed build with the fallback fix is the next physical discriminator. Detailed evidence is under `logs/translated-resident-relaunch-fix-20261004/`.

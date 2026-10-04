@@ -1,0 +1,49 @@
+{
+  "blackparrot_fix_commit": "332ada47b",
+  "root_cause": "A resident context switch committed while the frontend had not accepted its speculative redirect. The commit-time state-reset fallback carried the target hardware-thread ID but did not assert redirect_thread_id_v, so target instructions after the scheduler's one-instruction override used the previous physical register bank.",
+  "pre_fix": {
+    "predictor_enabled_reduced": {
+      "blackparrot_commit": "3c8c16aca",
+      "epochs": 2,
+      "iterations_per_context_per_epoch": 256,
+      "eviction_lines": 0,
+      "result": "FAIL",
+      "retired_instructions": 65048,
+      "run_log_sha256": "062816a0ed81d19d6fa93b4b6db7dfcb150cfce36afffa23999f5cdb66856a03",
+      "fst_sha256": "8180f2423ba83cb85bb25007bc5a0a1ec344c56eac467274031ef2f069ae254b"
+    },
+    "prediction_off_minimal": {
+      "blackparrot_commit": "d1186c793",
+      "epochs": 2,
+      "iterations_per_context_per_epoch": 1,
+      "eviction_lines": 0,
+      "result": "FAIL",
+      "retired_instructions": 60965,
+      "run_log_sha256": "a2ada6673491ed50cf06d57d304d73742865d6ae8e06991a8d1a716ac225a92b",
+      "fst_sha256": "c94d7385c1128a6a1cad8b4abc22754feb1ecd21b0ff16463f07f651f435a529"
+    }
+  },
+  "post_fix": {
+    "prediction_off_minimal": {
+      "result": "PASS",
+      "retired_instructions": 51750,
+      "run_log_sha256": "89f9ae8ee71c155f5fe6a0398e08d903a3ebc4ead1dada672080eee3f2d89fd1"
+    },
+    "predictor_enabled_reduced": {
+      "result": "PASS",
+      "retired_instructions": 59910,
+      "run_log_sha256": "4683c3c7992305ac377fe6cd770927441c63bf015cda350112f985597c70a40d"
+    },
+    "predictor_enabled_full_pressure": {
+      "result": "PASS",
+      "retired_instructions": 101124,
+      "run_log_sha256": "571499d19eee4802116b8392e78163033b19b6208702139bbce0e21b122d06f2"
+    },
+    "target_bypass_regression": {
+      "result": "PASS",
+      "retired_instructions": 34737,
+      "run_log_sha256": "1a2d3f17c77830bac09014eaaf68dbb3d358f6622cc415220fd0b9adc1d6f024"
+    }
+  },
+  "remaining_validation": "Route the two-resident/ten-logical FPGA image and rerun the exact formerly failing and stable Linux placements."
+}

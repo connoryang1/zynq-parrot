@@ -117,8 +117,15 @@ the corrected and previous bitstreams returned context zero with the peer
 completion and terminal records still zero. This is a separate pre-existing
 short-stream lifecycle edge case, so it does not implicate the predictor patch.
 
-The next discriminating FPGA experiment disables conditional BTB/BHT prediction
-while retaining architectural branch resolution and context redirects. A pass
-at `0x11e80`/`0x11ec0` would keep the remaining predictor behavior in scope; a
-failure would move the investigation toward instruction-fetch and redirect
-state outside prediction. Machine-readable results are in `fpga-analysis.json`.
+The follow-up FPGA experiment disabled conditional predicted-taken decisions
+while retaining predictor reads/training, architectural branch resolution, and
+context redirects. Both the failing and formerly stable placements then hung in
+their first warmup with nearly identical retirement and MTIME signatures. A
+later simulation reproduced a resident Sv39 relaunch failure with prediction
+enabled and disabled: a commit-time state-reset fallback fetched the correct PC
+without changing the frontend register-bank tag. BlackParrot `332ada47b` fixes
+that independent path. The prediction-off board result is therefore confounded,
+and a routed image containing the fallback fix is the next physical test.
+Machine-readable results are in `fpga-analysis.json`; follow-up evidence is
+under `logs/conditional-prediction-off-20261004/` and
+`logs/translated-resident-relaunch-fix-20261004/`.

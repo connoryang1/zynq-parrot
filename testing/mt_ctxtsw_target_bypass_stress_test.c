@@ -12,7 +12,13 @@
 #error "Use two resident banks and four logical contexts"
 #endif
 
-#define TURNS 128
+#ifndef CTXTSW_TARGET_BYPASS_TURNS
+#define CTXTSW_TARGET_BYPASS_TURNS 128
+#endif
+
+#define STRINGIFY_INNER(value) #value
+#define STRINGIFY(value) STRINGIFY_INNER(value)
+#define TURNS CTXTSW_TARGET_BYPASS_TURNS
 #define STACK_WORDS 256
 
 static uint64_t peer_stack[BP_NUM_CONTEXTS][STACK_WORDS];
@@ -34,7 +40,7 @@ name(void)                                                               \
 {                                                                        \
   __asm__ volatile(                                                      \
     ".option push\n.option norvc\n" setup                              \
-    "li t0, 128\n1:\n" sequence                                      \
+    "li t0, " STRINGIFY(TURNS) "\n1:\n" sequence                     \
     "addi t0, t0, -1\nbnez t0, 1b\n"                                  \
     "la t1, observed\ncsrr t3, 0x800\nsd t3, 0(t1)\n"               \
     "la t1, complete\nli t3, 1\nsd t3, 0(t1)\n"                       \
@@ -47,7 +53,7 @@ static void __attribute__((noinline, aligned(8))) name(void)             \
 {                                                                        \
   __asm__ volatile(                                                      \
     ".option push\n.option norvc\n" setup                              \
-    "li t0, 128\n1:\n" sequence                                      \
+    "li t0, " STRINGIFY(TURNS) "\n1:\n" sequence                     \
     "addi t0, t0, -1\nbnez t0, 1b\n.option pop\n"                     \
     ::: "t0", "t1", "t2", "t3", "t4", "memory");                    \
 }

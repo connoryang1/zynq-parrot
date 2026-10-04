@@ -72,5 +72,16 @@
     "Stable-placement performance is unchanged within noise.",
     "The timeout retires instructions, excluding a global core or DDR-controller deadlock."
   ],
-  "next_experiment": "Disable conditional BTB/BHT prediction while retaining context redirects and rerun both placements."
+  "conditional_prediction_off_follow_up": {
+    "evidence": "logs/conditional-prediction-off-20261004/fpga-analysis.json",
+    "failing_placement": "first-warmup controller timeout",
+    "formerly_stable_placement": "first-warmup controller timeout",
+    "interpretation": "Speculative conditional predicted-taken redirection is unnecessary for a hang. Later predictor-enabled and prediction-disabled simulation found a shared commit-fallback thread-tag bug, so this physical result cannot attribute the hang to the added resolved-branch redirects."
+  },
+  "translated_relaunch_follow_up": {
+    "evidence": "logs/translated-resident-relaunch-fix-20261004/analysis.json",
+    "blackparrot_fix_commit": "332ada47b",
+    "simulation_result": "Minimized, exact A/B, full-pressure, and independent resident-switch regressions pass after propagating the target thread ID on commit-time state-reset fallback."
+  },
+  "next_experiment": "Route a two-resident/ten-logical image containing BlackParrot 332ada47b and rerun both exact Linux placements."
 }

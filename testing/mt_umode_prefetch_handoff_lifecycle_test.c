@@ -15,18 +15,53 @@
 #define SOURCE_VA UINT64_C(0x40000000)
 #define PEER_VA UINT64_C(0x40004000)
 #define EVICTION_VA UINT64_C(0x40008000)
-#define EPOCHS 6
+#ifndef BP_LIFECYCLE_EPOCHS
+#define BP_LIFECYCLE_EPOCHS 6
+#endif
+#ifndef BP_LIFECYCLE_EVICTION_LINES
+#define BP_LIFECYCLE_EVICTION_LINES 1024
+#endif
+#ifndef BP_LIFECYCLE_SV39
+#define BP_LIFECYCLE_SV39 1
+#endif
+#ifndef BP_LIFECYCLE_ITERATIONS
+#define BP_LIFECYCLE_ITERATIONS 256
+#endif
+#define EPOCHS BP_LIFECYCLE_EPOCHS
 #define LINES 256
+#define ITERATIONS BP_LIFECYCLE_ITERATIONS
 #define LINE_BYTES 64
-#define EVICTION_LINES 1024
+#define EVICTION_LINES BP_LIFECYCLE_EVICTION_LINES
+#define EVICTION_CAPACITY_LINES 1024
+#if EVICTION_LINES > EVICTION_CAPACITY_LINES
+#error "Eviction sweep exceeds the mapped backing array"
+#endif
 #define PEER_DONE UINT64_C(0x50415353)
-#define EXPECTED_SUM UINT64_C(32640)
+#if ITERATIONS < 1 || ITERATIONS > LINES
+#error "Lifecycle iterations must be in [1, 256]"
+#endif
+#define SOURCE_EXPECTED_SUM \
+  ((uint64_t)ITERATIONS * (ITERATIONS + 1) / 2 \
+   - (ITERATIONS == 256 ? 256 : 0))
+#define PEER_EXPECTED_SUM \
+  ((uint64_t)ITERATIONS * (ITERATIONS + 3) / 2 \
+   - (ITERATIONS >= 255 ? 256 * (ITERATIONS - 254) : 0))
+#define STRINGIFY_(value) #value
+#define STRINGIFY(value) STRINGIFY_(value)
+
+#if BP_LIFECYCLE_SV39
+#define SOURCE_BASE_SETUP "li a0, 0x40000000\n"
+#define PEER_BASE_SETUP "li a0, 0x40004000\n"
+#else
+#define SOURCE_BASE_SETUP "lla a0, source_data\n"
+#define PEER_BASE_SETUP "lla a0, peer_data\n"
+#endif
 
 static volatile unsigned char source_data[LINES * LINE_BYTES]
   __attribute__((aligned(4096), used));
 static volatile unsigned char peer_data[LINES * LINE_BYTES]
   __attribute__((aligned(4096), used));
-static volatile unsigned char eviction[EVICTION_LINES * LINE_BYTES]
+static volatile unsigned char eviction[EVICTION_CAPACITY_LINES * LINE_BYTES]
   __attribute__((aligned(4096), used));
 static uint64_t root[512] __attribute__((aligned(4096)));
 static uint64_t middle[512] __attribute__((aligned(4096)));
@@ -38,15 +73,18 @@ static volatile uint64_t result_sum[2] __attribute__((aligned(64), used));
 static volatile uint64_t peer_done, eviction_sink, completed_epochs;
 static volatile uint64_t unexpected_cause, unexpected_pc, unexpected_value;
 
-#define WORKER_BODY(id, target, base, after_return, mismatch, done) \
-  ".option push\n.option norvc\nli a0, " base "\nli a2, 256\nli t5, 0\n" \
+#define WORKER_BODY(id, target, base_setup, after_return, mismatch, done) \
+  ".option push\n.option norvc\n.option norelax\n" base_setup \
+  "li a2, " STRINGIFY(BP_LIFECYCLE_ITERATIONS) "\nli t5, 0\n" \
   "la a4, expected_address\nla a5, observed_address\n" \
   "la a6, mismatch_iteration\naddi a4, a4, " #id "*8\n" \
   "addi a5, a5, " #id "*8\naddi a6, a6, " #id "*8\n" \
   "1: addi t3, a2, -1\nslli t0, t3, 6\nadd t0, a0, t0\n" \
   "sd t0, 0(a4)\n" BP_PREFETCH_R_ASM("t0") \
   "csrw 0x800, " #target "\n" after_return \
-  "ld t1, 0(a4)\nbeq t0, t1, 2f\nsd t0, 0(a5)\nsd a2, 0(a6)\n" \
+  "ld t1, 0(a4)\nbeq t0, t1, 2f\nsd t0, 0(a5)\n" \
+  /* Count+1 keeps a corrupted zero loop count from looking like no error. */ \
+  "addi t1, a2, 1\nsd t1, 0(a6)\n" \
   mismatch \
   "2: ld t2, 0(t0)\nadd t5, t5, t2\naddi a2, a2, -1\n" \
   "bnez a2, 1b\nla t0, result_sum\nsd t5, " #id "*8(t0)\n" done \
@@ -55,7 +93,7 @@ static volatile uint64_t unexpected_cause, unexpected_pc, unexpected_value;
 static __attribute__((naked, noinline, noreturn, used, aligned(4096)))
 void peer(void)
 {
-  __asm__ volatile(WORKER_BODY(1, 0, "0x40004000", "",
+  __asm__ volatile(WORKER_BODY(1, 0, PEER_BASE_SETUP, "",
     "fence rw,rw\ncsrwi 0x800, 0\n3: j 3b\n",
     "la t0, peer_done\nli t1, 0x50415353\nsd t1, 0(t0)\n"
     "fence rw,rw\ncsrwi 0x800, 0\n3: j 3b\n"));
@@ -64,7 +102,7 @@ void peer(void)
 static __attribute__((naked, noinline, used, aligned(4096)))
 void source(void)
 {
-  __asm__ volatile(WORKER_BODY(0, 1, "0x40000000",
+  __asm__ volatile(WORKER_BODY(0, 1, SOURCE_BASE_SETUP,
     "la t4, mismatch_iteration\nld t4, 8(t4)\nbnez t4, 8f\n",
     "ret\n", "8: ret\n"));
 }
@@ -73,8 +111,8 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 {
   if (!unexpected_cause && completed_epochs == EPOCHS
       && peer_done == PEER_DONE && !mismatch_iteration[0]
-      && !mismatch_iteration[1] && result_sum[0] == EXPECTED_SUM
-      && result_sum[1] == EXPECTED_SUM) {
+      && !mismatch_iteration[1] && result_sum[0] == SOURCE_EXPECTED_SUM
+      && result_sum[1] == PEER_EXPECTED_SUM) {
     bp_print_string("[BSG-PASS] translated repeated prefetch handoff lifecycle\n");
     bp_finish(0);
   } else {
@@ -139,8 +177,8 @@ static void __attribute__((noinline, noreturn, aligned(4096))) user_entry(void)
     if (!mismatch_iteration[0] && !mismatch_iteration[1])
       __asm__ volatile("csrwi 0x800, 1" : : : "memory");
     if (peer_done != PEER_DONE || mismatch_iteration[0]
-        || mismatch_iteration[1] || result_sum[0] != EXPECTED_SUM
-        || result_sum[1] != EXPECTED_SUM)
+        || mismatch_iteration[1] || result_sum[0] != SOURCE_EXPECTED_SUM
+        || result_sum[1] != PEER_EXPECTED_SUM)
       break;
     completed_epochs = epoch + 1;
   }
@@ -183,12 +221,14 @@ int main(void)
     leaves[8 + page] = leaf_for(eviction + page * 4096);
 
   __asm__ volatile("csrw medeleg, zero\ncsrw mideleg, zero" : : : "memory");
-  const uint64_t satp = (8ULL << 60)
-    | (((uint64_t)root & UINT64_C(0xffffffff)) >> 12);
+  const uint64_t satp = BP_LIFECYCLE_SV39
+    ? ((8ULL << 60) | (((uint64_t)root & UINT64_C(0xffffffff)) >> 12))
+    : 0;
   __asm__ volatile("fence rw, rw\ncsrw satp, %0\nsfence.vma"
     : : "r"(satp) : "memory");
   volatile uint64_t user_pc = (uint64_t)user_entry;
-  user_pc = (user_pc & UINT64_C(0xffffffff)) - DRAM_BASE;
+  if (BP_LIFECYCLE_SV39)
+    user_pc = (user_pc & UINT64_C(0xffffffff)) - DRAM_BASE;
   __asm__ volatile("csrw mtvec, %0" : : "r"((uint64_t)trap_entry) : "memory");
   __asm__ volatile("csrw mepc, %0" : : "r"(user_pc) : "memory");
   uint64_t status;
