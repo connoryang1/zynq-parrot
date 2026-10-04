@@ -1,0 +1,127 @@
+{
+  "artifact_identity": {
+    "bitstream_sha256": "9704dd6e0265654adbca272a08a3aae0830bef1893716c6ce25ed80bf2f55ccf",
+    "linux_shell_nbf_sha256": "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3",
+    "control_program_sha256": "be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e"
+  },
+  "demand_only_runs": [
+    {
+      "name": "exact-new-demand-run-a",
+      "elf_sha256": "8d95f0cfbf91686836ab72b2fe3029bdee1f338a2658774ca1034debf5b1d643",
+      "complete_samples": 26,
+      "last_started_sample": 27,
+      "outcome": "post-run verification failure",
+      "demand_functions": {
+        "source_demand": {
+          "address_hex": "0x11e58",
+          "offset_in_64_byte_line": 24,
+          "functional_opcodes_identical": true
+        },
+        "peer_demand": {
+          "address_hex": "0x11e98",
+          "offset_in_64_byte_line": 24,
+          "functional_opcodes_identical": true
+        }
+      }
+    },
+    {
+      "name": "exact-new-demand-run-b",
+      "elf_sha256": "8d95f0cfbf91686836ab72b2fe3029bdee1f338a2658774ca1034debf5b1d643",
+      "complete_samples": 2,
+      "last_started_sample": 3,
+      "outcome": "in-loop nonreturn",
+      "demand_functions": {
+        "source_demand": {
+          "address_hex": "0x11e58",
+          "offset_in_64_byte_line": 24,
+          "functional_opcodes_identical": true
+        },
+        "peer_demand": {
+          "address_hex": "0x11e98",
+          "offset_in_64_byte_line": 24,
+          "functional_opcodes_identical": true
+        }
+      }
+    },
+    {
+      "name": "diagnostic-plus-32-bytes",
+      "elf_sha256": "e2f48758d80f1dab791f112ba1cf3778594a2ad573dd2add664888ee069272cf",
+      "complete_samples": 64,
+      "last_started_sample": 64,
+      "outcome": "pass",
+      "demand_functions": {
+        "source_demand": {
+          "address_hex": "0x11e78",
+          "offset_in_64_byte_line": 56,
+          "functional_opcodes_identical": true
+        },
+        "peer_demand": {
+          "address_hex": "0x11eb8",
+          "offset_in_64_byte_line": 56,
+          "functional_opcodes_identical": true
+        }
+      }
+    },
+    {
+      "name": "hardware-loops-aligned-64",
+      "elf_sha256": "90411570eaf29908cd5d94d1d6eac449f9fde0d36261234860f445cc2ffe22d8",
+      "complete_samples": 50,
+      "last_started_sample": 51,
+      "outcome": "in-loop nonreturn",
+      "demand_functions": {
+        "source_demand": {
+          "address_hex": "0x11e80",
+          "offset_in_64_byte_line": 0,
+          "functional_opcodes_identical": true
+        },
+        "peer_demand": {
+          "address_hex": "0x11ec0",
+          "offset_in_64_byte_line": 0,
+          "functional_opcodes_identical": true
+        }
+      }
+    }
+  ],
+  "same_exact_new_elf_mixed_run": {
+    "complete_hardware_samples": 16,
+    "failure_sample": 17,
+    "outcome": "post-run verification failure"
+  },
+  "older_elf_control": {
+    "complete_hardware_samples": 32,
+    "outcome": "pass",
+    "elf_sha256": "de53ce7c669c469630367b4b93e512a2f85ea5a8b6337c787ad7eb4b5971d2ee",
+    "demand_functions": {
+      "source_demand": {
+        "address_hex": "0x11d50",
+        "offset_in_64_byte_line": 16,
+        "functional_opcodes_identical": true
+      },
+      "peer_demand": {
+        "address_hex": "0x11d90",
+        "offset_in_64_byte_line": 16,
+        "functional_opcodes_identical": true
+      }
+    }
+  },
+  "observed_conclusions": [
+    "The exact newer ELF fails in all three physical attempts, but at variable samples 17, 27, and 3.",
+    "Moving the functional demand bodies and aligning them to 64-byte boundaries does not eliminate the failure: the aligned control stalls in sample 51.",
+    "The diagnostic ELF's 64-sample pass therefore does not establish a placement fix.",
+    "Both post-run verification failures and in-loop nonreturns occur, indicating at least two visible terminal states of the same unresolved lifecycle class."
+  ],
+  "exploratory_constant_hazard_model": {
+    "scope": "four demand-only new-family runs",
+    "completed_samples": 142,
+    "observed_failed_launches": 3,
+    "total_launches_including_failures": 145,
+    "maximum_likelihood_failure_probability_per_launch": 0.020689655172413793,
+    "wilson_95_interval": {
+      "low": 0.007060912231321711,
+      "high": 0.05905950138643182
+    },
+    "model_probability_of_64_consecutive_successes": 0.26236258271617313,
+    "warning": "This model assumes independent launches with one constant hazard despite ELF/layout differences; use it only to show that one 64-sample pass is statistically compatible with the observed intermittent failures."
+  },
+  "next_step": "Add bounded progress records inside both demand loops so a failing run identifies the context and iteration where handoff progress stops; code alignment alone is not a fix."
+}

@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+import hashlib
+import json
+import os
+import re
+from pathlib import Path
+
+import pexpect
+
+root = Path("/home/coyang/zynq-parrot")
+evidence = Path(__file__).resolve().parent
+binary = evidence / "request_benchmark_dynamic"
+expected = hashlib.sha256(binary.read_bytes()).hexdigest()
+linux_nbf = root / "linux-tests/out/linux-shell.nbf"
+expected_nbf = "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3"
+if hashlib.sha256(linux_nbf.read_bytes()).hexdigest() != expected_nbf:
+    raise RuntimeError("Linux NBF identity mismatch")
+commands = (evidence / "transfer.txt").read_text().splitlines()
+status = {
+    "status": "running", "stage": "boot", "binary_sha256": expected,
+    "linux_nbf_sha256": expected_nbf, "recovery_required": True,
+}
+env = os.environ.copy()
+env["PYNQ_CONTROL_PROGRAM_SHA256"] = \
+    "be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e"
+env["PYNQ_CONTROL_PROGRAM_TIMEOUT_MS"] = "600000"
+child = None
+try:
+    with (evidence / "board.log").open("w") as log:
+        child = pexpect.spawn(
+            str(root / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"),
+            ["xilinx@192.168.4.35", str(linux_nbf)], env=env,
+            encoding="utf-8", timeout=600)
+        child.logfile_read = log
+        child.setwinsize(50, 210)
+        child.delaybeforesend = 0.005
+        child.expect_exact("Run /bin/sh as init process")
+        child.expect(r"~ # ")
+        status["stage"] = "transfer"
+        for index, command in enumerate(commands):
+            child.sendline(command)
+            child.expect(r"~ # ", timeout=60)
+            if index % 100 == 0:
+                print(f"Transfer {index + 1}/{len(commands)} commands", flush=True)
+        child.sendline("sha256sum /tmp/request_benchmark_dynamic")
+        child.expect(expected + r"\s+/tmp/request_benchmark_dynamic[\r\n]")
+        child.expect(r"~ # ")
+        print("Guest ELF verified; executing 64 hardware-demand samples.",
+              flush=True)
+        status["stage"] = "measurement"
+        command = ("/tmp/request_benchmark_dynamic --workers 2 --hardware "
+                   "--requests 4096 --samples 64 --data-kib 2048 "
+                   "--mode-mask 4")
+        child.sendline(command)
+        child.expect(r"\[REQUEST-BENCH\] PASS[\r\n]", timeout=600)
+        output = (child.before + child.after).replace("\r", "")
+        (evidence / "benchmark.stdout.txt").write_text(output)
+        rows = re.findall(
+            r"^RESULT sample=(\d+) order=(\d+) mode=([^ ]+) ns=(\d+) "
+            r"requests=(\d+) checksum=(\d+) cycles=(\d+)$", output, re.M)
+        if len(rows) != 64:
+            raise RuntimeError(f"expected 64 result rows, got {len(rows)}")
+        if {(int(sample), mode) for sample, _, mode, *_ in rows} != {
+                (sample, "resident-demand-handoff")
+                for sample in range(1, 65)}:
+            raise RuntimeError("sample/mode coverage mismatch")
+        if any(int(order) != 0 for _, order, *_ in rows):
+            raise RuntimeError("single-mode order mismatch")
+        if any(int(requests) != 8192 for _, _, _, _, requests, _, _ in rows):
+            raise RuntimeError("request-count mismatch")
+        if len({int(checksum) for *_, checksum, _ in rows}) != 1:
+            raise RuntimeError("checksum mismatch")
+        child.expect(r"~ # ")
+        child.sendline("echo REQUEST_EXIT=$?")
+        child.expect(r"REQUEST_EXIT=0[\r\n]")
+        child.expect(r"~ # ")
+        status.update(stage="poweroff", request_exit=0, result_rows=64)
+        child.sendline("poweroff -f")
+        child.expect_exact("CORE[0] PASS")
+        child.expect(pexpect.EOF, timeout=120)
+        child.close()
+        if child.exitstatus != 0 or child.signalstatus is not None:
+            raise RuntimeError(
+                f"runner exit={child.exitstatus} signal={child.signalstatus}")
+        status.update(status="PASS", stage="complete", runner_exit=0,
+                      core_pass=True, recovery_required=False)
+        print("Hardware-demand lifecycle isolation PASS; guest powered off.",
+              flush=True)
+except Exception as exc:
+    status.update(status="FAIL", error=repr(exc))
+    raise
+finally:
+    if child is not None and child.isalive():
+        child.close(force=True)
+    (evidence / "board-status.json").write_text(
+        json.dumps(status, indent=2) + "\n")

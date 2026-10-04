@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "logs/linux-hardware-demand-exact-repeat-20261003/run_board.py", line 55, in <module>
+    outcome = child.expect([
+  File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 340, in expect
+    return self.expect_list(compiled_pattern_list,
+  File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 369, in expect_list
+    return exp.expect_loop(timeout)
+  File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 111, in expect_loop
+    incoming = spawn.read_nonblocking(spawn.maxread, timeout)
+  File "/usr/lib/python3/dist-packages/pexpect/pty_spawn.py", line 470, in read_nonblocking
+    r, w, e = select_ignore_interrupts(
+  File "/usr/lib/python3/dist-packages/pexpect/utils.py", line 143, in select_ignore_interrupts
+    return select.select(iwtd, owtd, ewtd, timeout)
+KeyboardInterrupt

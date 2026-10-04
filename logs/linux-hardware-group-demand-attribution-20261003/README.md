@@ -60,6 +60,17 @@ failure is not yet a general 16-launch limit: the preceding demand-only binary
 completed 32 hardware samples on the same bitstream. Code layout, mixed-mode
 state, and asynchronous physical behavior remain possible causes.
 
+A subsequent demand-only run of this exact ELF completed samples 1--26, then
+reported a hardware context/completion verification failure in sample 27 and
+did not return. Mixed modes are therefore not required, and 16 is not a fixed
+launch limit. The demand routines are opcode-identical to the older
+32-sample-passing ELF but moved by 264 bytes; the controlled placement and
+failure-value experiments subsequently show variable outcomes. An exact repeat
+stops in sample 3, a shifted diagnostic completes 64, and a controlled
+64-byte-aligned build stops in sample 51. Alignment is therefore not a fix;
+the aggregate evidence identifies an intermittent lifecycle hazard. See
+`logs/linux-hardware-demand-lifecycle-repeats-20261003/`.
+
 Cache displacement is best effort rather than an architectural flush, and
 random streams can revisit lines. Every request is not proven to miss.
 `CLOCK_MONOTONIC` values are retained but conclusions use the core cycle
