@@ -48,6 +48,21 @@ All runs used clean trace-enabled builds.
 
 The medium predictor-enabled run is an exact A/B against the pre-fix 65,048-instruction failure. The full run restores the original translated cache/DTLB pressure, and the independent bypass test checks ordinary resident switching on the two-resident/four-logical topology.
 
+Selected-signal FST decoding confirms that the exact failing mechanism, rather
+than an incidental timing change, was repaired:
+
+| Trace | Workload fallback time | Thread-tag valid | Selected physical thread |
+|---|---:|---:|---:|
+| Prediction off, minimal, before fix | 34,108,925,000 | 0 | 1 carried but ignored |
+| Prediction off, minimal, after fix | 34,108,925,000 | 1 | 1 |
+| Predictor enabled, 256 operations, before fix | 34,249,275,000 | 0 | 0 |
+| Predictor enabled, 256 operations, after fix | 34,249,275,000 | 1 | 1 |
+
+The event times are identical within each A/B pair. The fixed reduced run has
+one workload state-reset fallback and tags it correctly; the larger full-pressure
+run passes but takes no workload fallback after boot, so it is broad regression
+coverage rather than direct coverage of this path.
+
 Harness validation passed all 15 `check_run` unit tests and compiled the complete maintained test-program set. The unit suite must be invoked from `testing/`; an initial repository-root invocation failed during Python import discovery and ran no tests.
 
 The clean trace-enabled switch-overhead control also exactly preserves the

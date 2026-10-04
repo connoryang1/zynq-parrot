@@ -62,5 +62,37 @@
     "blackparrot_commit": "332ada47b10ace0afc75ffe4b75cb0efa8eacdad",
     "configuration": "e_bp_unicore_zynqparrot_prefetch10_cfg",
     "status_at_record": "RUNNING"
+  },
+  "waveform_ab": {
+    "time_units_per_cycle": 50000,
+    "prediction_off_minimal": {
+      "pre_fix": {
+        "workload_fallback_time": 34108925000,
+        "redirect_thread_id_valid": 0,
+        "redirect_thread_id": 1
+      },
+      "post_fix": {
+        "workload_fallback_time": 34108925000,
+        "redirect_thread_id_valid": 1,
+        "redirect_thread_id": 1
+      }
+    },
+    "predictor_enabled_256_operations": {
+      "pre_fix": {
+        "workload_fallback_time": 34249275000,
+        "redirect_thread_id_valid": 0,
+        "redirect_thread_id": 0
+      },
+      "post_fix": {
+        "workload_fallback_time": 34249275000,
+        "redirect_thread_id_valid": 1,
+        "redirect_thread_id": 1
+      }
+    },
+    "full_pressure_post_fix": {
+      "workload_state_reset_fallbacks_after_time_30000000000": 0,
+      "interpretation": "Broad passing regression; it does not directly exercise the repaired delayed fallback after boot."
+    },
+    "interpretation": "Each exact A/B reaches the fallback at the same trace time. The fix changes the frontend tag validity and destination bank on that event."
   }
 }
