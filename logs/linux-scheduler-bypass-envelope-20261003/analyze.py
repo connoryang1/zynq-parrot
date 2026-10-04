@@ -12,6 +12,7 @@ SOURCE_PATHS = {
     "linux_scheduler": "logs/linux-hot-scheduler-breakdown-20261003/analysis.json",
     "dynamic_dispatch": "logs/linux-dynamic-context-target-20261003/analysis.json",
     "ready_selection": "logs/linux-atomic-fence-cost-20261003/analysis.json",
+    "hosted_context_group": "logs/linux-context-group-fastpath-20261003/analysis.json",
 }
 
 
@@ -22,6 +23,7 @@ def load(relative):
 scheduler = load(SOURCE_PATHS["linux_scheduler"])
 dynamic = load(SOURCE_PATHS["dynamic_dispatch"])
 selector = load(SOURCE_PATHS["ready_selection"])
+hosted = load(SOURCE_PATHS["hosted_context_group"])
 
 linux = scheduler["medians_physical_cycles"]
 derived = scheduler["derived_physical_cycles"]
@@ -40,10 +42,10 @@ costs = {
     ),
     "direct_register_resident": direct["register_resident"],
     "direct_register_nonresident": direct["register_nonresident"],
-    "general_ready_selector_resident": selector["multiready"]["resident"]["fpga"]
-        ["median_cycles_per_operation"],
-    "general_ready_selector_nonresident": selector["multiready"]["nonresident"]["fpga"]
-        ["median_cycles_per_operation"],
+    "general_ready_selector_resident": hosted["comparison"]["resident"]
+        ["linux_hosted_cycles_per_handoff"],
+    "general_ready_selector_nonresident": hosted["comparison"]["nonresident"]
+        ["linux_hosted_cycles_per_handoff"],
     "fair_three_context_round_robin": selector["roundrobin_three_context"]["fpga"]
         ["median_cycles_per_operation"],
 }
@@ -94,10 +96,12 @@ assert abs(sum(components.values()) - linux_handoff) < 1e-9
 for state in ("resident", "nonresident"):
     accepted = selector["multiready"][state]["fpga"]
     assert accepted["all_rows_correct"] and accepted["custom_pass"]
-    assert accepted["core_pass"] and accepted["total_sc_failures"] == 0
+    assert accepted["core_pass"]
+    assert accepted["final_operation_sc_failures_sum"] == 0
 fair = selector["roundrobin_three_context"]["fpga"]
 assert fair["all_rows_correct"] and fair["all_three_contexts_completed"]
-assert fair["custom_pass"] and fair["core_pass"] and fair["total_sc_failures"] == 0
+assert fair["custom_pass"] and fair["core_pass"]
+assert fair["final_operation_sc_failures_sum"] == 0
 
 result = {
     "source_measurements": {
@@ -126,6 +130,7 @@ result = {
         "The kernel-only floor assumes the entire measured alternate-task delta can be removed, which is optimistic.",
         "The syscall-plus-direct floor adds a minimal gettid syscall to direct dispatch; a real context ABI can only cost more.",
         "Workload rows model one handoff after a fixed amount of useful work and exclude cache, I/O, fault, and interrupt effects.",
+        "The bare-metal selector's retry counters cover only each context's final operation; hosted aggregate retry evidence is recorded separately.",
     ],
 }
 

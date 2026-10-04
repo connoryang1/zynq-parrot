@@ -102,8 +102,10 @@ A second benchmark uses an LR/SC update that selects the lowest runnable
 context, clears only that target bit, adds the source context, and preserves all
 other runnable bits before switching. Context 3 remains ready as a spectator
 through every handoff, so the final word must be `0xa` for resident peer 1 or
-`0xc` for nonresident peer 2. Each sample also counts SC retries independently
-in the source and peer contexts.
+`0xc` for nonresident peer 2. Each sample reports the retry counter from the
+final selector operation in the source and peer contexts. The assembly resets
+that counter at every operation, so it does not count retries across the whole
+sample.
 
 ```text
 lr.d.aq -> ctz -> clear selected bit -> add source bit -> sc.d.rl -> CSR 0x800
@@ -115,15 +117,19 @@ lr.d.aq -> ctz -> clear selected bit -> add source bit -> sc.d.rl -> CSR 0x800
 | Nonresident | 22.03 | 22.03--22.06 | 22.05 | 3.99 | 12.87 |
 
 Both physical NBFs produce all 16 rows, preserve the spectator bit in every
-row, observe the requested peer and return source, record zero SC retries, and
-finish with the custom pass marker, `CORE[0] PASS`, and runner exit zero. This
+row, observe the requested peer and return source, report zero retries in each
+context's final operation, and finish with the custom pass marker,
+`CORE[0] PASS`, and runner exit zero. This
 is the paper-safe general-group result. It stays within the projected 25-cycle
 budget without new scheduler hardware. At 18 MHz it takes about 0.946
 microseconds resident or 1.224 microseconds nonresident. The latter is still
 249--254 times smaller than the measured Linux same-address-space handoff.
 
-The zero-retry result covers the intended uncontended single-pipeline handoff.
-It does not measure interference from another core writing the same ready word.
+The final-operation counters cover the intended uncontended single-pipeline
+handoff but do not prove zero retries across all operations. The later
+Linux-hosted persistent-group measurement accumulates every failure and
+observes one recovered failure across two runs. Neither experiment measures
+interference from another core writing the same ready word.
 A fused select-and-switch instruction could target the measured 11.9--12.9
 cycles above direct dispatch, while a third resident register bank would remove
 about five cycles from the general nonresident path.
@@ -149,8 +155,9 @@ lr.d.aq -> read source -> rotate ready word -> ctz -> clear target
 | FPGA | 15 | 26.59 | 26.58--26.64 |
 
 All 16 physical samples have the expected `0xa` ready and completion words,
-return to context 0, record zero SC retries in contexts 0, 1, and 3, and finish
-with the custom pass marker, `CORE[0] PASS`, and runner exit zero. Four simulator
+return to context 0, report zero retries in each participating context's final
+operation, and finish with the custom pass marker, `CORE[0] PASS`, and runner
+exit zero. Four simulator
 rows were split by heartbeat text; every complete row passes the same checks,
 and the simulator and FPGA medians differ by 0.01 cycle.
 
@@ -210,8 +217,8 @@ dd30d203b8c7d85506265e751b6a77f8b231bd1e24b4210622c2098e4d8c8b36  mt_atomic_mult
 1dd073113f4671d22435450e20a2732897156903264a71e41c1f8cceff10c3fd  mt_atomic_multiready_nonresident_benchmark_fpga.nbf
 84c824187fd19ad7fc947137ab2fc6529cc745f56cb22677c47d9668283fbdd7  multiready-resident-physical.log
 f6c3e37e79b7e364e67a475afcdde00f7319ce581f4fb1854ef076b287d4f2db  multiready-nonresident-physical.log
-0ca4e607f6c3682f2da3a949e9f1039e22eb7e3d082a58e6cda85bcb0509280c  analyze_atomic_selector.py
-139be42351bf81f5d6f75a9e6fd824fb187021f318605e718c058c0da02319c3  analysis.json
+a1a2dd8357f4dc18a13ce7106345e703f93309cab917d7314771447219875d86  analyze_atomic_selector.py
+b40544a1f516a7113b0467fde67a8655007681f2f2609dbf0f8e4925d8485402  analysis.json
 ee40d2b976beb6f63c3c2b10c4051d577a7e4fd3828468240277d5126bd2c9a1  atomic_fence_cost
 bbd804800b68125cb7abf1996cfd4a217f5528cc26ecad3930bb255b9719061c  atomic_fence_cost.c
 b0b5ae35d3d4741c6855a58cb238457a80798482a35f9f0463640625cf781100  mt_atomic_round_robin_selector_benchmark.c

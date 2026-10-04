@@ -64,7 +64,8 @@ def analyze_multiready(name, physical, peer):
             and row[4:] == [1, peer, 1, expected_word, 0, 0, 0]
             for row in rows),
         'spectator_bit_preserved': all(row[7] & 8 for row in rows),
-        'total_sc_failures': sum(row[9] + row[10] for row in rows),
+        'final_operation_sc_failures_sum': sum(
+            row[9] + row[10] for row in rows),
         'custom_pass': '[BSG-PASS] atomic multiready selector' in text,
         'core_pass': ('CORE[0] PASS' if physical else 'CORE PASS') in text,
     }
@@ -91,8 +92,8 @@ def analyze_roundrobin(name, physical):
             row[3:] == [1, 0xa, 0xa, 0, 0, 0, 0] for row in rows),
         'all_three_contexts_completed': all(
             row[5] == 0xa and row[6] == 0 for row in rows),
-        'total_sc_failures': sum(row[7] + row[8] + row[9]
-                                 for row in rows),
+        'final_operation_sc_failures_sum': sum(
+            row[7] + row[8] + row[9] for row in rows),
         'custom_pass': '[BSG-PASS] atomic roundrobin selector' in text,
         'core_pass': ('CORE[0] PASS' if physical else 'CORE PASS') in text,
     }
@@ -187,11 +188,13 @@ for kind in ('resident', 'nonresident'):
     assert multi['parseable_rows'] == 16
     assert multi['custom_pass'] and multi['core_pass']
     assert multi['all_rows_correct'] and multi['spectator_bit_preserved']
-    assert multi['total_sc_failures'] == 0
+    assert multi['final_operation_sc_failures_sum'] == 0
 for platform in ('simulator', 'fpga'):
     fair = report['roundrobin_three_context'][platform]
     assert fair['custom_pass'] and fair['core_pass']
     assert fair['all_rows_correct'] and fair['all_three_contexts_completed']
-    assert fair['total_sc_failures'] == 0
+    assert fair['final_operation_sc_failures_sum'] == 0
 assert report['roundrobin_three_context']['fpga']['parseable_rows'] == 16
-print(json.dumps(report, indent=2, sort_keys=True))
+output = json.dumps(report, indent=2, sort_keys=True) + '\n'
+(HERE / 'analysis.json').write_text(output)
+print(output, end='')

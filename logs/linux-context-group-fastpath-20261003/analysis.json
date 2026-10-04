@@ -1,0 +1,105 @@
+{
+  "configuration": {
+    "samples_per_mode_per_run": 128,
+    "handoffs_per_sample": 256,
+    "timed_handoffs_per_run": 65536,
+    "spectator_context_ready_bit_preserved": true
+  },
+  "accepted_run": {
+    "sha256": "f4c5eb2945883a86f4f147f03f334c9aed1d8185a0896dd53aadb58f700f313d",
+    "marker_present": true,
+    "core_pass": true,
+    "probe_exit": 0,
+    "modes": {
+      "resident": {
+        "minimum": 4371,
+        "median": 4371,
+        "p95": 4371,
+        "maximum": 61221,
+        "display_x100": 1707,
+        "source_sc_failures": 0,
+        "peer_sc_failures": 0,
+        "samples": 128,
+        "median_cycles_per_handoff": 17.07421875,
+        "p95_cycles_per_handoff_window": 17.07421875,
+        "aggregate_windows_over_2x_median": 1
+      },
+      "nonresident": {
+        "minimum": 5655,
+        "median": 5655,
+        "p95": 5664,
+        "maximum": 23116,
+        "display_x100": 2208,
+        "source_sc_failures": 0,
+        "peer_sc_failures": 0,
+        "samples": 128,
+        "median_cycles_per_handoff": 22.08984375,
+        "p95_cycles_per_handoff_window": 22.125,
+        "aggregate_windows_over_2x_median": 1
+      }
+    }
+  },
+  "zero_retry_policy_rejection": {
+    "sha256": "7f970683999d1ada684342a2d1d8384d7d3a806c9dfa934a427dbedc189f8efd",
+    "marker_present": true,
+    "core_pass": true,
+    "probe_exit": 1,
+    "modes": {
+      "resident": {
+        "minimum": 4371,
+        "median": 4371,
+        "p95": 4371,
+        "maximum": 60558,
+        "display_x100": 1707,
+        "source_sc_failures": 0,
+        "peer_sc_failures": 0,
+        "samples": 128,
+        "median_cycles_per_handoff": 17.07421875,
+        "p95_cycles_per_handoff_window": 17.07421875,
+        "aggregate_windows_over_2x_median": 1
+      },
+      "nonresident": {
+        "minimum": 5655,
+        "median": 5655,
+        "p95": 5664,
+        "maximum": 23273,
+        "display_x100": 2208,
+        "source_sc_failures": 1,
+        "peer_sc_failures": 0,
+        "samples": 128,
+        "median_cycles_per_handoff": 22.08984375,
+        "p95_cycles_per_handoff_window": 22.125,
+        "aggregate_windows_over_2x_median": 1
+      }
+    }
+  },
+  "retry_observation_across_two_runs": {
+    "nominal_selector_operations": 131072,
+    "observed_sc_failures": 1,
+    "failures_per_million_nominal_operations": 7.62939453125
+  },
+  "comparison": {
+    "resident": {
+      "linux_hosted_cycles_per_handoff": 17.07421875,
+      "baremetal_cycles_per_handoff": 17.03488372093023,
+      "linux_hosted_minus_baremetal_cycles": 0.03933502906976827,
+      "linux_hosted_percent_over_baremetal": 0.230908703071675,
+      "linux_scheduler_over_linux_hosted_ratio": 324.7879203843514,
+      "microseconds_per_handoff_at_18mhz": 0.9485677083333334
+    },
+    "nonresident": {
+      "linux_hosted_cycles_per_handoff": 22.08984375,
+      "baremetal_cycles_per_handoff": 22.03488372093023,
+      "linux_hosted_minus_baremetal_cycles": 0.05496002906976827,
+      "linux_hosted_percent_over_baremetal": 0.24942282321900322,
+      "linux_scheduler_over_linux_hosted_ratio": 251.04297082228118,
+      "microseconds_per_handoff_at_18mhz": 1.2272135416666667
+    }
+  },
+  "limits": [
+    "The accepted PASS proves its context, register, syscall, ready-word, spectator-bit, exit, and core checks.",
+    "The rejected transcript reports one recovered SC failure but does not print each hidden state predicate separately.",
+    "The two runs retain normal Linux interrupts but do not identify which asynchronous event caused timing outliers or the one reservation failure.",
+    "This is a userspace prototype inside one Linux process; Linux does not yet allocate, protect, reclaim, or account for the context group."
+  ]
+}

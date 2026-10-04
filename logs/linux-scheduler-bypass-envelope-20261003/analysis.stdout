@@ -10,7 +10,11 @@
     },
     "ready_selection": {
       "path": "logs/linux-atomic-fence-cost-20261003/analysis.json",
-      "sha256": "139be42351bf81f5d6f75a9e6fd824fb187021f318605e718c058c0da02319c3"
+      "sha256": "b40544a1f516a7113b0467fde67a8655007681f2f2609dbf0f8e4925d8485402"
+    },
+    "hosted_context_group": {
+      "path": "logs/linux-context-group-fastpath-20261003/analysis.json",
+      "sha256": "ca13428d890334e70b8557e486932f7d615c046aadd28d28579f977c417e667d"
     }
   },
   "linux_handoff_component_cycles": {
@@ -31,8 +35,8 @@
     "optimistic_syscall_plus_direct_resident_floor": 628.125,
     "direct_register_resident": 5.125,
     "direct_register_nonresident": 9.1640625,
-    "general_ready_selector_resident": 17.03,
-    "general_ready_selector_nonresident": 22.03,
+    "general_ready_selector_resident": 17.07421875,
+    "general_ready_selector_nonresident": 22.08984375,
     "fair_three_context_round_robin": 26.59
   },
   "switch_only_linux_over_replacement_ratio": {
@@ -40,8 +44,8 @@
     "optimistic_syscall_plus_direct_resident_floor": 8.82865671641791,
     "direct_register_resident": 1082.0487804878048,
     "direct_register_nonresident": 605.1355498721227,
-    "general_ready_selector_resident": 325.6312389900176,
-    "general_ready_selector_nonresident": 251.7249205628688,
+    "general_ready_selector_resident": 324.7879203843514,
+    "general_ready_selector_nonresident": 251.04297082228118,
     "fair_three_context_round_robin": 208.55584806318166
   },
   "workload_speedup_over_linux": [
@@ -49,77 +53,77 @@
       "useful_work_cycles_between_handoffs": 0,
       "optimistic_kernel_only_floor": 1.6519213583556747,
       "optimistic_syscall_plus_direct_resident_floor": 8.82865671641791,
-      "general_ready_selector_resident": 325.6312389900176,
-      "general_ready_selector_nonresident": 251.7249205628688,
+      "general_ready_selector_resident": 324.7879203843514,
+      "general_ready_selector_nonresident": 251.04297082228118,
       "fair_three_context_round_robin": 208.55584806318166
     },
     {
       "useful_work_cycles_between_handoffs": 100,
       "optimistic_kernel_only_floor": 1.6330633497251952,
       "optimistic_syscall_plus_direct_resident_floor": 7.753476394849786,
-      "general_ready_selector_resident": 48.239767580962145,
-      "general_ready_selector_nonresident": 46.2632139637794,
+      "general_ready_selector_resident": 48.221547495912716,
+      "general_ready_selector_nonresident": 46.24053751399776,
       "fair_three_context_round_robin": 44.59672959949443
     },
     {
       "useful_work_cycles_between_handoffs": 500,
       "optimistic_kernel_only_floor": 1.5674099040705212,
       "optimistic_syscall_plus_direct_resident_floor": 5.3588919667590025,
-      "general_ready_selector_resident": 11.692745101831616,
-      "general_ready_selector_nonresident": 11.580752064057622,
+      "general_ready_selector_resident": 11.691745170770032,
+      "general_ready_selector_nonresident": 11.57942463806068,
       "fair_three_context_round_robin": 11.480468675819898
     },
     {
       "useful_work_cycles_between_handoffs": 1000,
       "optimistic_kernel_only_floor": 1.5022951572182695,
       "optimistic_syscall_plus_direct_resident_floor": 4.020268714011516,
-      "general_ready_selector_resident": 6.43589667954731,
-      "general_ready_selector_nonresident": 6.404410829427707,
+      "general_ready_selector_resident": 6.435616869774283,
+      "general_ready_selector_nonresident": 6.404035848732109,
       "fair_three_context_round_robin": 6.375963140104619
     },
     {
       "useful_work_cycles_between_handoffs": 5000,
       "optimistic_kernel_only_floor": 1.2618762713892546,
       "optimistic_syscall_plus_direct_resident_floor": 1.8737146029983343,
-      "general_ready_selector_resident": 2.101940789670383,
-      "general_ready_selector_nonresident": 2.0998480694061965,
+      "general_ready_selector_resident": 2.101922263894155,
+      "general_ready_selector_nonresident": 2.0998230473960744,
       "fair_three_context_round_robin": 2.0979431383900415
     },
     {
       "useful_work_cycles_between_handoffs": 10000,
       "optimistic_kernel_only_floor": 1.1638466721569214,
       "optimistic_syscall_plus_direct_resident_floor": 1.462675683622464,
-      "general_ready_selector_resident": 1.5519071022049449,
-      "general_ready_selector_nonresident": 1.5511328543219287,
+      "general_ready_selector_resident": 1.5519002515626639,
+      "general_ready_selector_nonresident": 1.5511235922210898,
       "fair_three_context_round_robin": 1.5504274135074836
     },
     {
       "useful_work_cycles_between_handoffs": 50000,
       "optimistic_kernel_only_floor": 1.0410161740727553,
       "optimistic_syscall_plus_direct_resident_floor": 1.0971273378186532,
-      "general_ready_selector_resident": 1.1105317528849674,
-      "general_ready_selector_nonresident": 1.1104207486181588,
+      "general_ready_selector_resident": 1.110530771093715,
+      "general_ready_selector_nonresident": 1.1104194201702295,
       "fair_three_context_round_robin": 1.1103195320728438
     },
     {
       "useful_work_cycles_between_handoffs": 100000,
       "optimistic_kernel_only_floor": 1.021174182687191,
       "optimistic_syscall_plus_direct_resident_floor": 1.048866805378715,
-      "general_ready_selector_resident": 1.0552752866186887,
-      "general_ready_selector_nonresident": 1.055222534475655,
+      "general_ready_selector_resident": 1.0552748200688078,
+      "general_ready_selector_nonresident": 1.0552219031303827,
       "fair_three_context_round_robin": 1.0551744291192973
     }
   ],
   "useful_work_thresholds": {
     "general_ready_selector_resident": {
-      "maximum_work_cycles_for_at_least_2x": 5511.44,
-      "maximum_work_cycles_for_at_least_1.5x": 11039.91,
-      "maximum_work_cycles_for_at_least_1.1x": 55267.66999999995
+      "maximum_work_cycles_for_at_least_2x": 5511.3515625,
+      "maximum_work_cycles_for_at_least_1.5x": 11039.77734375,
+      "maximum_work_cycles_for_at_least_1.1x": 55267.18359374995
     },
     "general_ready_selector_nonresident": {
-      "maximum_work_cycles_for_at_least_2x": 5501.44,
-      "maximum_work_cycles_for_at_least_1.5x": 11024.91,
-      "maximum_work_cycles_for_at_least_1.1x": 55212.66999999995
+      "maximum_work_cycles_for_at_least_2x": 5501.3203125,
+      "maximum_work_cycles_for_at_least_1.5x": 11024.73046875,
+      "maximum_work_cycles_for_at_least_1.1x": 55212.01171874995
     },
     "fair_three_context_round_robin": {
       "maximum_work_cycles_for_at_least_2x": 5492.32,
@@ -133,14 +137,15 @@
     "optimistic_syscall_plus_direct_resident_floor": 34.895833333333336,
     "direct_register_resident": 0.2847222222222222,
     "direct_register_nonresident": 0.5091145833333334,
-    "general_ready_selector_resident": 0.9461111111111111,
-    "general_ready_selector_nonresident": 1.223888888888889,
+    "general_ready_selector_resident": 0.9485677083333334,
+    "general_ready_selector_nonresident": 1.2272135416666667,
     "fair_three_context_round_robin": 1.4772222222222222
   },
   "limits": [
     "All values are derived from separately accepted physical FPGA medians; this is not a new board run.",
     "The kernel-only floor assumes the entire measured alternate-task delta can be removed, which is optimistic.",
     "The syscall-plus-direct floor adds a minimal gettid syscall to direct dispatch; a real context ABI can only cost more.",
-    "Workload rows model one handoff after a fixed amount of useful work and exclude cache, I/O, fault, and interrupt effects."
+    "Workload rows model one handoff after a fixed amount of useful work and exclude cache, I/O, fault, and interrupt effects.",
+    "The bare-metal selector's retry counters cover only each context's final operation; hosted aggregate retry evidence is recorded separately."
   ]
 }
