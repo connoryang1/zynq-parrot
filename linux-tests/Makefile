@@ -13,7 +13,9 @@ BP_DTS_PYTHON ?= python3
 BP_CPIO ?= cpio
 NBF_TOOL ?= $(TOP)/import/black-parrot/bp_common/software/py/nbf.py
 NBF_CSR_CHECK ?= $(TOP)/codex-skills/bp-fpga-synthesis/scripts/check_nbf_csr_collisions.sh
+NBF_TIMER_PATCH ?= $(TOP)/tools/patch_linux_nbf_timer.py
 BASELINE_LINUX_NBF ?= $(TOP)/riscv/linux/linux-6.6-jhumphri-20250125.nbf
+TIMEBASE_FREQUENCY ?= 8000000
 
 OUT ?= $(CURDIR)/out
 APP := $(OUT)/ctxtsw_user_smoke
@@ -181,8 +183,11 @@ check-image-toolchain: check-linux-cc
 	  echo "missing BP_CPIO=$(BP_CPIO)" >&2; exit 2; \
 	}
 	@command -v dtc >/dev/null || { echo "missing dtc" >&2; exit 2; }
+	@command -v fdtget >/dev/null || { echo "missing fdtget" >&2; exit 2; }
 	@command -v gzip >/dev/null || { echo "missing gzip" >&2; exit 2; }
+	@command -v fdtput >/dev/null || { echo "missing fdtput" >&2; exit 2; }
 	@test -x $(NBF_CSR_CHECK)
+	@test -x $(NBF_TIMER_PATCH)
 	@test -f $(BASELINE_LINUX_NBF) || { \
 	  echo "missing BASELINE_LINUX_NBF=$(BASELINE_LINUX_NBF)" >&2; exit 2; \
 	}
@@ -223,6 +228,9 @@ linux-image: check-image-toolchain stage-opensbi-platform
 	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-user-smoke.mem
 	python3 $(NBF_TOOL) --skip_zeros --config --debug \
 	  --mem $(OUT)/linux-ctxtsw-user-smoke.mem --ncpus 1 > $(APP_NBF)
+	python3 $(NBF_TIMER_PATCH) --frequency $(TIMEBASE_FREQUENCY) \
+	  $(APP_NBF) $(APP_NBF).timer
+	mv $(APP_NBF).timer $(APP_NBF)
 	@echo "NBF=$(APP_NBF)"
 	@sha256sum $(APP_NBF)
 
@@ -239,6 +247,7 @@ tiny-init-linux-image: check-image-toolchain tiny stage-opensbi-platform
 	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
 	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
 	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
+	BP_DEMO_TIMEBASE_FREQUENCY='$(TIMEBASE_FREQUENCY)' \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
 	  LINUX_TARGET=$(BP_LINUX_TARGET) \
 	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS)
@@ -255,6 +264,7 @@ tiny-init-linux-image-resume: check-image-toolchain tiny stage-opensbi-platform
 	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
 	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
 	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
+	BP_DEMO_TIMEBASE_FREQUENCY='$(TIMEBASE_FREQUENCY)' \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
 	  LINUX_TARGET=$(BP_LINUX_TARGET) \
 	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS)
@@ -266,6 +276,9 @@ validate-tiny-init-image: check-image-toolchain tiny
 	@test -f $(GENERATED_DTS) || { echo "missing generated DTS $(GENERATED_DTS)" >&2; exit 2; }
 	@grep -Fqx '        bootargs = "$(TINY_BOOTARGS)";' $(GENERATED_DTS) || { \
 	  echo "generated DTS does not contain the exact tiny-init bootargs" >&2; exit 2; \
+	}
+	@grep -Fqx '        timebase-frequency = <$(TIMEBASE_FREQUENCY)>;' $(GENERATED_DTS) || { \
+	  echo "generated DTS does not contain the exact timer frequency" >&2; exit 2; \
 	}
 	@test -f $(ROOTFS_CPIO) || { echo "missing initramfs $(ROOTFS_CPIO)" >&2; exit 2; }
 	@tmpdir=$$(mktemp -d); trap 'rm -rf "$$tmpdir"' EXIT HUP INT TERM; \
@@ -280,6 +293,10 @@ validate-tiny-init-image: check-image-toolchain tiny
 	  | sed -n 's/^[[:space:]]*bootargs = "\(.*\)";[[:space:]]*$$/\1/p'); \
 	  test "$$bootargs" = '$(TINY_BOOTARGS)' || { \
 	    echo "generated DTB does not contain the exact tiny-init bootargs" >&2; exit 2; \
+	  }
+	@timebase=$$(fdtget -t i $(GENERATED_DTB) /cpus timebase-frequency); \
+	  test "$$timebase" = '$(TIMEBASE_FREQUENCY)' || { \
+	    echo "generated DTB does not contain the exact timer frequency" >&2; exit 2; \
 	  }
 	@test -f $(KERNEL_INITRAMFS) || { echo "missing kernel initramfs input $(KERNEL_INITRAMFS)" >&2; exit 2; }
 	@tmpdir=$$(mktemp -d); trap 'rm -rf "$$tmpdir"' EXIT HUP INT TERM; \
@@ -307,6 +324,9 @@ package-tiny-init-nbf: validate-tiny-init-image
 	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-tiny-init.mem
 	python3 $(NBF_TOOL) --skip_zeros --config --debug \
 	  --mem $(OUT)/linux-ctxtsw-tiny-init.mem --ncpus 1 > $(TINY_INIT_NBF)
+	python3 $(NBF_TIMER_PATCH) --frequency $(TIMEBASE_FREQUENCY) \
+	  $(TINY_INIT_NBF) $(TINY_INIT_NBF).timer
+	mv $(TINY_INIT_NBF).timer $(TINY_INIT_NBF)
 	@echo "NBF=$(TINY_INIT_NBF)"
 	@sha256sum $(TINY_APP) $(TINY_INIT_NBF)
 
@@ -314,4 +334,4 @@ clean:
 	rm -rf $(OUT)
 
 check-harness:
-	@python3 -m unittest discover -s $(CURDIR) -p test_makefile.py
+	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py

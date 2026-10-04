@@ -40,8 +40,8 @@ make -C linux-tests tiny-init-linux-image \
 ```
 
 This deliberately recreates the SDK work tree and embedded initramfs, installs
-the no-libc ELF as `/ctxtsw_user_tiny`, changes only the DTS bootargs to select
-that ELF as `rdinit`, and produces
+the no-libc ELF as `/ctxtsw_user_tiny`, changes the DTS bootargs to select that
+ELF as `rdinit`, corrects the FPGA timebase, and produces
 `linux-tests/out/linux-ctxtsw-tiny-init.nbf`.  The build first verifies the
 baseline Linux NBF has no collisions with custom CSRs `0x800`--`0x804`; the
 demo image itself intentionally uses `0x800`--`0x802`.  Before packaging, it
@@ -51,6 +51,11 @@ decompiled DTB, the kernel's compressed initramfs input, and the final OpenSBI
 payload identity/freshness before creating the NBF.  A successful program
 prints PASS and invokes Linux's poweroff syscall, which should end the board
 run in `CORE[0] PASS`.
+
+The generated DTS, OpenSBI platform frequency, and final NBF timer selector are
+also kept consistent at 8 MHz. Packaging fails closed if the generated DTS or
+DTB has another timebase, then applies the same final-NBF selector check used
+for historical images.
 
 The target also materializes `opensbi-platform/blackparrot` into the pinned
 OpenSBI source tree.  The SDK selects this platform but does not track those
@@ -83,9 +88,21 @@ make -s -C linux-tests emit-shell-transfer \
 sha256sum linux-tests/out/ctxtsw_user_shell
 python3 codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py \
   riscv/linux/linux-6.6-jhumphri-20250125.nbf linux-tests/out/linux-shell.nbf
-scp linux-tests/out/linux-shell.nbf linux-tests/out/ctxtsw_user_shell.transfer \
+python3 tools/patch_linux_nbf_timer.py \
+  linux-tests/out/linux-shell.nbf linux-tests/out/linux-shell-timer8.nbf
+scp linux-tests/out/linux-shell-timer8.nbf linux-tests/out/ctxtsw_user_shell.transfer \
   xilinx@192.168.4.35:~/zynq-parrot/cosim/black-parrot-example/zynq/
 ```
+
+Use `linux-shell-timer8.nbf` for measurements that include Linux time or may
+span scheduler ticks. The historical NBF selects a core-derived `mtime` at
+approximately 1.125 MHz but declares 10 MHz, making monotonic time about 8.9
+times too short and suppressing ordinary timer interrupts. The correction
+selects the routed 8 MHz real-time clock and patches the embedded DTB to match.
+Direct hardware-cycle deltas from the historical image remain valid, but its
+long Linux workloads represent an abnormally quiet timer environment. Physical
+calibration and the inferred 20,485.5-cycle tick cost are retained in
+`logs/linux-timer-calibration-20261004/`.
 
 On the board's ARM Linux shell, with the accepted context-switch overlay and
 reviewed `control-program` already staged:
@@ -100,7 +117,7 @@ Copy the printed commands for later, then boot the RISC-V guest:
 ```sh
 make -o control-program load_bitstream run \
   BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch \
-  NBF_FILE=linux-shell.nbf
+  NBF_FILE=linux-shell-timer8.nbf
 ```
 
 `-o control-program` preserves the reviewed host executable; the old board

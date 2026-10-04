@@ -1,0 +1,233 @@
+{
+  "identities": {
+    "bitstream_sha256": "2ab6ec08860d07fe627ef079090a76c0604e1d6b40d4003fa9f5dd3a1fc8488b",
+    "guest_elf_sha256": "e62165fadea93925860848bb7642ec2a83c1d10ff38ab6404ec26b48480dcd72",
+    "historical_shell_nbf_sha256": "af22d24ff969cac6d639f98542ff3a48778e19c4f0ba8f3c4218bf7e023f2bd3",
+    "corrected_shell_nbf_sha256": "feb2ea6a9c25e06809b1d6f38c95276c2b5640df75d013bae9ca7059da930cb4"
+  },
+  "clocks_hz": {
+    "routed_core": 17998000,
+    "routed_rt_clock_reported": 7999000,
+    "corrected_linux_timebase": 8000000,
+    "historical_linux_timebase_declared": 10000000,
+    "historical_mtime_derived": 1124875.0,
+    "opensbi_reported": 50000000,
+    "kernel_hz": 250
+  },
+  "fresh_boot_4096": {
+    "cycles": {
+      "count": 64,
+      "median": 860962.0,
+      "mean": 874965.953125,
+      "min": 831593,
+      "max": 955733,
+      "p05": 833827,
+      "p95": 922941
+    },
+    "ns": {
+      "count": 64,
+      "median": 47934250.0,
+      "mean": 48735166.015625,
+      "min": 46309250,
+      "max": 53212000,
+      "p05": 46433625,
+      "p95": 51385125
+    },
+    "cycles_per_request_median": 105.097900390625,
+    "apparent_core_mhz": {
+      "count": 64,
+      "median": 17.958143311349133,
+      "mean": 17.95332354827337,
+      "min": 17.524139084617474,
+      "max": 17.97145911920092,
+      "p05": 17.953941564374215,
+      "p95": 17.967667918231122
+    }
+  },
+  "fresh_boot_256_clusters": {
+    "zero_tick": {
+      "cycles": {
+        "count": 13,
+        "median": 40368,
+        "mean": 40370.846153846156,
+        "min": 40230,
+        "max": 40528,
+        "p05": 40230,
+        "p95": 40506
+      },
+      "ns": {
+        "count": 13,
+        "median": 2335750,
+        "mean": 2336682.6923076925,
+        "min": 2331875,
+        "max": 2346500,
+        "p05": 2331875,
+        "p95": 2344000
+      }
+    },
+    "one_tick": {
+      "cycles": {
+        "count": 48,
+        "median": 60853.5,
+        "mean": 61377.604166666664,
+        "min": 60281,
+        "max": 67281,
+        "p05": 60521,
+        "p95": 64194
+      },
+      "ns": {
+        "count": 48,
+        "median": 3481312.5,
+        "mean": 3509361.9791666665,
+        "min": 3446625,
+        "max": 3845500,
+        "p05": 3456750,
+        "p95": 3656375
+      }
+    },
+    "tick_cost_cycles": 20485.5,
+    "tick_cost_ms_at_routed_core": 1.1382098010890098,
+    "tick_cycle_duty": 0.28455245027225246,
+    "predicted_steady_state_inflation": 1.3977265005387671,
+    "classification": "inferred tick counts from cycle clusters and CONFIG_HZ=250; no interrupt counter was instrumented"
+  },
+  "historical_comparison": {
+    "historical_median_cycles": 611074.5,
+    "corrected_median_cycles": 860962.0,
+    "observed_inflation": 1.408931316885257,
+    "predicted_vs_observed_relative_error": 0.008016458400245563
+  },
+  "completed_six_mode_prefix": {
+    "assembly-interleaved-demand": {
+      "count": 24,
+      "cycles": {
+        "count": 24,
+        "median": 801847.5,
+        "mean": 811847.25,
+        "min": 790936,
+        "max": 860102,
+        "p05": 791378,
+        "p95": 856395
+      },
+      "ns": {
+        "count": 24,
+        "median": 44861062.5,
+        "mean": 45349812.5,
+        "min": 44024125,
+        "max": 47904875,
+        "p05": 44083875,
+        "p95": 47692125
+      }
+    },
+    "assembly-sequential-demand": {
+      "count": 24,
+      "cycles": {
+        "count": 24,
+        "median": 809619.0,
+        "mean": 817543.9583333334,
+        "min": 799360,
+        "max": 874606,
+        "p05": 800531,
+        "p95": 856343
+      },
+      "ns": {
+        "count": 24,
+        "median": 45097812.5,
+        "mean": 45577187.5,
+        "min": 44513000,
+        "max": 49862625,
+        "p05": 44587500,
+        "p95": 47698250
+      }
+    },
+    "batched-prefetch-load": {
+      "count": 24,
+      "cycles": {
+        "count": 24,
+        "median": 1092115.5,
+        "mean": 1108531.75,
+        "min": 1080310,
+        "max": 1150079,
+        "p05": 1081407,
+        "p95": 1147919
+      },
+      "ns": {
+        "count": 24,
+        "median": 60976125.0,
+        "mean": 61720145.833333336,
+        "min": 60090125,
+        "max": 63964125,
+        "p05": 60143125,
+        "p95": 63866625
+      }
+    },
+    "linux-threads-demand": {
+      "count": 24,
+      "cycles": {
+        "count": 24,
+        "median": 1161444.5,
+        "mean": 1159718.75,
+        "min": 1092203,
+        "max": 1228387,
+        "p05": 1105179,
+        "p95": 1219416
+      },
+      "ns": {
+        "count": 24,
+        "median": 64610750.0,
+        "mean": 64566380.208333336,
+        "min": 60742875,
+        "max": 68333875,
+        "p05": 61472500,
+        "p95": 67852000
+      }
+    },
+    "resident-demand-handoff": {
+      "count": 24,
+      "cycles": {
+        "count": 24,
+        "median": 891949.5,
+        "mean": 890920.0833333334,
+        "min": 833320,
+        "max": 977317,
+        "p05": 833586,
+        "p95": 958094
+      },
+      "ns": {
+        "count": 24,
+        "median": 49710875.0,
+        "mean": 49694463.541666664,
+        "min": 46405625,
+        "max": 54398875,
+        "p05": 46451125,
+        "p95": 53344750
+      }
+    },
+    "resident-prefetch-yield-load": {
+      "count": 24,
+      "cycles": {
+        "count": 24,
+        "median": 868273.0,
+        "mean": 889088.125,
+        "min": 859369,
+        "max": 965378,
+        "p05": 862015,
+        "p95": 929221
+      },
+      "ns": {
+        "count": 24,
+        "median": 48388000.0,
+        "mean": 49544973.958333336,
+        "min": 47861500,
+        "max": 53740250,
+        "p05": 47966750,
+        "p95": 51728625
+      }
+    }
+  },
+  "raw_log_sha256": {
+    "corrected-256.log": "2e8f677be25434e8127212a43e1418117f7a0de7748acf9c486b74b28a7c8eac",
+    "corrected-4096.log": "ea80f72da959191b30eb03a7ea14a4ed6775b202171ae9622144021b98b428ee",
+    "all-modes-then-relaunch-stall.log": "03c93dde962ae02058496433bfccea406fb5a31054c5f82838879fb1bda7c511"
+  }
+}
