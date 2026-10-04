@@ -43,7 +43,24 @@
       "result": "PASS",
       "retired_instructions": 34737,
       "run_log_sha256": "1a2d3f17c77830bac09014eaaf68dbb3d358f6622cc415220fd0b9adc1d6f024"
+    },
+    "switch_cost_control": {
+      "result": "PASS",
+      "switches_per_context": 128,
+      "resident_cycles_per_switch": 5.13,
+      "nonresident_cycles_per_switch": 9.26,
+      "nonresident_incremental_cycles_per_switch": 4.13,
+      "run_log_sha256": "1754ac9ed87fa33e9f407d8f08d7fb0d6cda18a00bd90381a58622a36f00e29e",
+      "fst_sha256": "71f5ab4900c891531c62b58cbc85f67c74b553cb93c3a95a90e229b4e00155c0",
+      "interpretation": "Exactly matches the prior accepted result; the relaunch fallback correction adds no measurable ordinary fast-path latency."
     }
   },
-  "remaining_validation": "Route the two-resident/ten-logical FPGA image and rerun the exact formerly failing and stable Linux placements."
+  "remaining_validation": "Route the two-resident/ten-logical FPGA image and rerun the exact formerly failing and stable Linux placements.",
+  "routed_fpga_job": {
+    "job": "20261004T152200Z-510b853e",
+    "top_commit": "510b853e0c675e0ce13e7c392dbe2be1a15dc68f",
+    "blackparrot_commit": "332ada47b10ace0afc75ffe4b75cb0efa8eacdad",
+    "configuration": "e_bp_unicore_zynqparrot_prefetch10_cfg",
+    "status_at_record": "RUNNING"
+  }
 }

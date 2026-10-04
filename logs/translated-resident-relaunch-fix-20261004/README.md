@@ -50,4 +50,16 @@ The medium predictor-enabled run is an exact A/B against the pre-fix 65,048-inst
 
 Harness validation passed all 15 `check_run` unit tests and compiled the complete maintained test-program set. The unit suite must be invoked from `testing/`; an initial repository-root invocation failed during Python import discovery and ran no tests.
 
-The next required validation is a routed two-resident/ten-logical FPGA image containing `332ada47b`, followed by the exact formerly failing and stable Linux workload placements. Until that physical test passes, this fix is proven for the simulation failure but is only a candidate explanation for the intermittent FPGA lifecycle failure.
+The clean trace-enabled switch-overhead control also exactly preserves the
+previous accepted result: 5.13 cycles per resident switch, 9.26 cycles per
+nonresident switch, and 4.13 incremental cycles for a nonresident handoff.
+This shows that tagging the commit-time fallback does not add latency to the
+ordinary fast redirect path. The guest and host both passed before the known
+post-finish DPI teardown assertion; the maintained checker classified the run
+as valid. Exact artifact hashes are in `switch-cost-control/SHA256SUMS`.
+
+Routed job `20261004T152200Z-510b853e` is building the two-resident/ten-logical
+`e_bp_unicore_zynqparrot_prefetch10_cfg` image containing `332ada47b`. The exact
+formerly failing and stable Linux workload placements remain the physical
+acceptance test. Until they pass, this fix is proven for the simulation failure
+but is only a candidate explanation for the intermittent FPGA lifecycle failure.
