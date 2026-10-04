@@ -1,0 +1,146 @@
+{
+  "source_measurements": {
+    "linux_scheduler": {
+      "path": "logs/linux-hot-scheduler-breakdown-20261003/analysis.json",
+      "sha256": "7792718814fda9da4a888c1a335c48d8a1ed74dd40f73a04bd5843b9fd77e5b4"
+    },
+    "dynamic_dispatch": {
+      "path": "logs/linux-dynamic-context-target-20261003/analysis.json",
+      "sha256": "9100fb434b52721a244360a221632dbd2865975ccafae8ef6bab34c86cb218e6"
+    },
+    "ready_selection": {
+      "path": "logs/linux-atomic-fence-cost-20261003/analysis.json",
+      "sha256": "139be42351bf81f5d6f75a9e6fd824fb187021f318605e718c058c0da02319c3"
+    }
+  },
+  "linux_handoff_component_cycles": {
+    "counter_pair": 1.0,
+    "minimal_syscall_beyond_counter": 622.0,
+    "yield_scheduler_path_beyond_minimal_syscall": 2734.0,
+    "alternate_task_selection_switch_and_return": 2188.5
+  },
+  "linux_handoff_component_fraction": {
+    "counter_pair": 0.0001803263907672888,
+    "minimal_syscall_beyond_counter": 0.11216301505725362,
+    "yield_scheduler_path_beyond_minimal_syscall": 0.4930123523577676,
+    "alternate_task_selection_switch_and_return": 0.39464430619421154
+  },
+  "mode_cost_cycles": {
+    "linux_same_mm_handoff_average": 5545.5,
+    "optimistic_kernel_only_floor": 3357.0,
+    "optimistic_syscall_plus_direct_resident_floor": 628.125,
+    "direct_register_resident": 5.125,
+    "direct_register_nonresident": 9.1640625,
+    "general_ready_selector_resident": 17.03,
+    "general_ready_selector_nonresident": 22.03,
+    "fair_three_context_round_robin": 26.59
+  },
+  "switch_only_linux_over_replacement_ratio": {
+    "optimistic_kernel_only_floor": 1.6519213583556747,
+    "optimistic_syscall_plus_direct_resident_floor": 8.82865671641791,
+    "direct_register_resident": 1082.0487804878048,
+    "direct_register_nonresident": 605.1355498721227,
+    "general_ready_selector_resident": 325.6312389900176,
+    "general_ready_selector_nonresident": 251.7249205628688,
+    "fair_three_context_round_robin": 208.55584806318166
+  },
+  "workload_speedup_over_linux": [
+    {
+      "useful_work_cycles_between_handoffs": 0,
+      "optimistic_kernel_only_floor": 1.6519213583556747,
+      "optimistic_syscall_plus_direct_resident_floor": 8.82865671641791,
+      "general_ready_selector_resident": 325.6312389900176,
+      "general_ready_selector_nonresident": 251.7249205628688,
+      "fair_three_context_round_robin": 208.55584806318166
+    },
+    {
+      "useful_work_cycles_between_handoffs": 100,
+      "optimistic_kernel_only_floor": 1.6330633497251952,
+      "optimistic_syscall_plus_direct_resident_floor": 7.753476394849786,
+      "general_ready_selector_resident": 48.239767580962145,
+      "general_ready_selector_nonresident": 46.2632139637794,
+      "fair_three_context_round_robin": 44.59672959949443
+    },
+    {
+      "useful_work_cycles_between_handoffs": 500,
+      "optimistic_kernel_only_floor": 1.5674099040705212,
+      "optimistic_syscall_plus_direct_resident_floor": 5.3588919667590025,
+      "general_ready_selector_resident": 11.692745101831616,
+      "general_ready_selector_nonresident": 11.580752064057622,
+      "fair_three_context_round_robin": 11.480468675819898
+    },
+    {
+      "useful_work_cycles_between_handoffs": 1000,
+      "optimistic_kernel_only_floor": 1.5022951572182695,
+      "optimistic_syscall_plus_direct_resident_floor": 4.020268714011516,
+      "general_ready_selector_resident": 6.43589667954731,
+      "general_ready_selector_nonresident": 6.404410829427707,
+      "fair_three_context_round_robin": 6.375963140104619
+    },
+    {
+      "useful_work_cycles_between_handoffs": 5000,
+      "optimistic_kernel_only_floor": 1.2618762713892546,
+      "optimistic_syscall_plus_direct_resident_floor": 1.8737146029983343,
+      "general_ready_selector_resident": 2.101940789670383,
+      "general_ready_selector_nonresident": 2.0998480694061965,
+      "fair_three_context_round_robin": 2.0979431383900415
+    },
+    {
+      "useful_work_cycles_between_handoffs": 10000,
+      "optimistic_kernel_only_floor": 1.1638466721569214,
+      "optimistic_syscall_plus_direct_resident_floor": 1.462675683622464,
+      "general_ready_selector_resident": 1.5519071022049449,
+      "general_ready_selector_nonresident": 1.5511328543219287,
+      "fair_three_context_round_robin": 1.5504274135074836
+    },
+    {
+      "useful_work_cycles_between_handoffs": 50000,
+      "optimistic_kernel_only_floor": 1.0410161740727553,
+      "optimistic_syscall_plus_direct_resident_floor": 1.0971273378186532,
+      "general_ready_selector_resident": 1.1105317528849674,
+      "general_ready_selector_nonresident": 1.1104207486181588,
+      "fair_three_context_round_robin": 1.1103195320728438
+    },
+    {
+      "useful_work_cycles_between_handoffs": 100000,
+      "optimistic_kernel_only_floor": 1.021174182687191,
+      "optimistic_syscall_plus_direct_resident_floor": 1.048866805378715,
+      "general_ready_selector_resident": 1.0552752866186887,
+      "general_ready_selector_nonresident": 1.055222534475655,
+      "fair_three_context_round_robin": 1.0551744291192973
+    }
+  ],
+  "useful_work_thresholds": {
+    "general_ready_selector_resident": {
+      "maximum_work_cycles_for_at_least_2x": 5511.44,
+      "maximum_work_cycles_for_at_least_1.5x": 11039.91,
+      "maximum_work_cycles_for_at_least_1.1x": 55267.66999999995
+    },
+    "general_ready_selector_nonresident": {
+      "maximum_work_cycles_for_at_least_2x": 5501.44,
+      "maximum_work_cycles_for_at_least_1.5x": 11024.91,
+      "maximum_work_cycles_for_at_least_1.1x": 55212.66999999995
+    },
+    "fair_three_context_round_robin": {
+      "maximum_work_cycles_for_at_least_2x": 5492.32,
+      "maximum_work_cycles_for_at_least_1.5x": 11011.23,
+      "maximum_work_cycles_for_at_least_1.1x": 55162.50999999995
+    }
+  },
+  "wall_time_microseconds_at_18mhz": {
+    "linux_same_mm_handoff_average": 308.0833333333333,
+    "optimistic_kernel_only_floor": 186.5,
+    "optimistic_syscall_plus_direct_resident_floor": 34.895833333333336,
+    "direct_register_resident": 0.2847222222222222,
+    "direct_register_nonresident": 0.5091145833333334,
+    "general_ready_selector_resident": 0.9461111111111111,
+    "general_ready_selector_nonresident": 1.223888888888889,
+    "fair_three_context_round_robin": 1.4772222222222222
+  },
+  "limits": [
+    "All values are derived from separately accepted physical FPGA medians; this is not a new board run.",
+    "The kernel-only floor assumes the entire measured alternate-task delta can be removed, which is optimistic.",
+    "The syscall-plus-direct floor adds a minimal gettid syscall to direct dispatch; a real context ABI can only cost more.",
+    "Workload rows model one handoff after a fixed amount of useful work and exclude cache, I/O, fault, and interrupt effects."
+  ]
+}
