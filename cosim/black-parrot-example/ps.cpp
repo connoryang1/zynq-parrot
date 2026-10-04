@@ -267,7 +267,16 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         if (host->get_next_packet(&spack)) {
             host->process_spack(&spack);
         } else {
-            for (int i = 0; i < 10; i++) zpl->tick();
+            for (int i = 0; i < 10; i++) {
+#ifdef SIMULATION
+                // Keep asynchronous host AXI transactions moving while the
+                // guest runs.  Advancing only RTL clocks can let a short
+                // response pulse pass while its coroutine is suspended.
+                zpl->service();
+#else
+                zpl->tick();
+#endif
+            }
         }
         empty_poll_count++;
         if (max_runtime_ms && ((empty_poll_count & 0x3ff) == 0)) {

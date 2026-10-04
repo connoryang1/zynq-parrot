@@ -406,6 +406,24 @@ traps through M-mode. Its waveform distinguishes the fixed logical hint count
 from translation/cache replay attempts and must show all detached state empty
 at every launch boundary.
 
+The qualified full-hierarchy run uses the two-bank L2 wrapper and pipelined
+40-cycle AXI memory model:
+
+```sh
+env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' \
+  BSG_TRACE_TIMEOUT_S=1200 VERILATOR_BUILD_JOBS=12 \
+  make -C testing run-mt_umode_prefetch_handoff_lifecycle_test \
+  SIM_DIR="$PWD/cosim/black-parrot-example/verilator" \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 TRACE=1
+```
+
+Across six epochs it records 3,072 logical hints, 3,018 detached requests, and
+3,018 useful later side-buffer hits, or 98.24% useful coverage. Request to
+side-buffer arrival is exactly 45 cycles and demand normally follows 17 cycles
+later, directly establishing latency overlap. Every epoch drains side-buffer
+and UCE state to zero. Reproduction commands and compact results are in
+[`logs/full-l2-umode-prefetch-lifecycle-20261003/accepted`](../logs/full-l2-umode-prefetch-lifecycle-20261003/accepted/README.md).
+
 The directed victim regressions use one architectural context and register-only
 critical sections. They require the qualified 2/10 topology, detached-prefetch
 path, and the default 64-set, eight-way, 64-byte-line D-cache. The protocol test
@@ -481,8 +499,6 @@ physical FPGA gates. The Linux request comparison also completes on the latest
 lifecycle candidate; see [the checkout guide](../CURRENT_CHECKOUT.md) for exact
 identities and [the Linux guide](../linux-tests/README.md#independent-random-request-comparisons)
 for measured results. A passing program alone does not establish prefetch benefit.
-
-For a closed full-simulator waveform:
 
 The detached-prefetch transaction table has a standalone regression that checks
 out-of-order issue and retirement before it is connected to the live cache:

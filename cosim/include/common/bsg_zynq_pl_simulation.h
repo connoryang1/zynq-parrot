@@ -44,6 +44,10 @@ class bsg_zynq_pl_simulation : public bsg_zynq_pl_base {
     virtual void start(void) { create_peripherals(); }
     virtual void stop(void) { destroy_peripherals(); }
     virtual void tick(void) = 0;
+    // Advance one simulated cycle while also resuming outstanding host-side
+    // AXI coroutines.  Raw tick() is still used internally by next() to avoid
+    // recursively polling the same coroutine list.
+    void service(void) { next(); }
     virtual int done(void) = 0;
     virtual void *allocate_dram(unsigned long len_in_bytes,
                                 unsigned long *physical_ptr) = 0;
