@@ -1,0 +1,76 @@
+{
+  "build": {
+    "job": "20261004T060922Z-2bcf8b5e",
+    "status": "PASS",
+    "package_sha256": "8fba9bfc79cc919dd8c7fdfb2e285784abb90dec478228f7cce316537e856f5e",
+    "bitstream_sha256": "7994ad2f6cb2ee108452b9f89e600b2e74cab2e6f64077604c5d4fb49e0eb5dd",
+    "timing": {
+      "wns_ns": 1.528,
+      "tns_ns": 0.0,
+      "whs_ns": 0.03,
+      "ths_ns": 0.0
+    },
+    "utilization": {
+      "slice_luts": 50730,
+      "slice_registers": 28385,
+      "slices": 13294,
+      "slices_available": 13300,
+      "bram_tiles": 83.5,
+      "dsps": 11
+    }
+  },
+  "failing_placement": {
+    "elf_sha256": "90411570eaf29908cd5d94d1d6eac449f9fde0d36261234860f445cc2ffe22d8",
+    "source_pc": "0x11e80",
+    "peer_pc": "0x11ec0",
+    "outcome": "warmup controller timeout",
+    "completed_samples": 0,
+    "watchdog_ms": 600000,
+    "minstret_delta": 766980248,
+    "mtime_delta_units_one_eighth_cycle": 421818276,
+    "reported_ipc": 0.227284,
+    "raw_log_sha256": "6762d5341d46196dfee37f6b2f593810ab015a5fbff8a9b1dfae1bc96fbb3abf"
+  },
+  "passing_placement": {
+    "elf_sha256": "e62165fadea93925860848bb7642ec2a83c1d10ff38ab6404ec26b48480dcd72",
+    "source_pc": "0x11f00",
+    "peer_pc": "0x11f40",
+    "outcome": "PASS",
+    "new_image": {
+      "samples": 128,
+      "min_cycles": 589487,
+      "median_cycles": 611878.0,
+      "mean_cycles": 613066.3984375,
+      "max_cycles": 649069,
+      "median_cycles_per_request": 74.692138671875,
+      "population_cv": 0.013109148837686185
+    },
+    "old_image": {
+      "samples": 512,
+      "min_cycles": 588915,
+      "median_cycles": 612178.0,
+      "mean_cycles": 613741.96875,
+      "max_cycles": 651217,
+      "median_cycles_per_request": 74.728759765625,
+      "population_cv": 0.015114657299725302
+    },
+    "median_delta_cycles": -300.0,
+    "median_delta_percent": -0.049005354651754374,
+    "raw_log_sha256": "8578258b4af7b6437e254ec8a7d7239ceb8c599ddbe3b5452904bfbd99b3d5bf"
+  },
+  "one_request_control": {
+    "diagnostic_elf_sha256": "d3c6b7426a4ec063026f3f256522a2592fc0e1101ec672d371732c71440f4a46",
+    "loop_opcodes_and_addresses_match_failing_elf": true,
+    "new_bit_zero_code": 6,
+    "old_bit_zero_code": 6,
+    "decode": "context 0 returned; peer completion and terminal records both remained zero",
+    "interpretation": "pre-existing short-stream lifecycle edge case; not evidence of predictor-fix regression"
+  },
+  "conclusion": [
+    "The predictor provenance defect fixed in simulation was real but was not the physical placement-dependent root cause.",
+    "The corrected image preserves placement sensitivity: 0x11e80/0x11ec0 hangs while 0x11f00/0x11f40 passes 128 samples.",
+    "Stable-placement performance is unchanged within noise.",
+    "The timeout retires instructions, excluding a global core or DDR-controller deadlock."
+  ],
+  "next_experiment": "Disable conditional BTB/BHT prediction while retaining context redirects and rerun both placements."
+}

@@ -57,3 +57,68 @@ Each test directory contains its exact executable, closed waveform, run log, and
 hashable immutable copies. The next acceptance step is a routed PYNQ-Z2 image
 followed by repeated execution of the previously failing-address binary; the
 current physical board evidence still uses the pre-fix bitstream.
+
+## FPGA acceptance status
+
+The first routed candidate, job `20261004T050934Z-2bcf8b5e`, used
+`e_bp_unicore_zynqparrot_prefetch_cfg` and passed timing at WNS `+1.953 ns`
+and WHS `+0.023 ns`. It cannot qualify the retained failing-placement ELF:
+that ELF was compiled with `BP_NUM_CONTEXTS=10`, while this endpoint has two
+logical contexts. CSR `0x802` places the five-bit register address immediately
+above the context ID, so the binary encodes it at bit 43 while the two-context
+hardware decodes it at bit 40. The attempted peer launch therefore reached its
+correct seeded NPC but did not seed `a0` through `a4`; it faulted at `0x11ed4`
+on address zero. This is recorded as an excluded configuration mismatch, not
+an RTL failure.
+
+Corrected job `20261004T060922Z-2bcf8b5e` uses the same two-resident,
+ten-logical-context endpoint as the failing baseline. It routes cleanly at WNS
+`+1.528 ns` and WHS `+0.030 ns`, with 50,730 LUTs, 28,385 registers, 83.5
+BRAM tiles, and 11 DSPs. Relative to the last qualified image, this is +77 LUTs
+and +1 register; BRAM and DSP use are unchanged. The package SHA-256 is
+`8fba9bfc79cc919dd8c7fdfb2e285784abb90dec478228f7cce316537e856f5e`, and
+the contained bitstream SHA-256 is
+`7994ad2f6cb2ee108452b9f89e600b2e74cab2e6f64077604c5d4fb49e0eb5dd`.
+
+The last physically qualified 10-context image used top `7a38ae96` and
+BlackParrot `57302ca5b`. The current synthesized hardware configuration files,
+top-level RTL, BaseJump revision, and subsystem revision are unchanged from
+that image. Across BlackParrot, the only source change from `57302ca5b` to
+`3c8c16aca` is `bp_fe/src/v/bp_fe_pc_gen.sv` (31 insertions and 15 deletions).
+This makes the corrected FPGA run a controlled hardware comparison of the
+predictor-bank change; intervening top-level commits add benchmarks, evidence,
+and simulator-side instrumentation rather than synthesized design changes.
+
+## Physical verdict
+
+The predictor provenance defect is real and the RTL correction passes its
+targeted simulations, but it is **not** the root cause of the physical
+placement-dependent failure:
+
+| Exact program | Loop PCs | Corrected-image result |
+|---|---|---:|
+| formerly failing aligned ELF `90411570...` | `0x11e80` / `0x11ec0` | Hung in the first warmup; zero samples completed; the 600-second controller watchdog stopped the run. |
+| previously passing placement ELF `e62165fa...` | `0x11f00` / `0x11f40` | PASS, 128/128 samples, clean request and core exit. |
+
+The timed-out run retired 766,980,248 instructions at reported IPC 0.227. The
+processor and DDR path therefore continued making progress while the two-context
+handoff failed to complete; this is not a global core or memory-controller
+deadlock.
+
+At the passing placement, the corrected image's median is 611,878 cycles for
+8,192 requests (74.692 cycles/request). The previous image's 512-sample median
+was 612,178 cycles (74.729 cycles/request). The -300-cycle, -0.049% difference
+is noise-level: the correction has no measurable steady-state cost in the
+stable case.
+
+A one-request diagnostic retained the exact failing loop addresses and
+byte-identical loop bodies while reporting which terminal checks failed. Both
+the corrected and previous bitstreams returned context zero with the peer
+completion and terminal records still zero. This is a separate pre-existing
+short-stream lifecycle edge case, so it does not implicate the predictor patch.
+
+The next discriminating FPGA experiment disables conditional BTB/BHT prediction
+while retaining architectural branch resolution and context redirects. A pass
+at `0x11e80`/`0x11ec0` would keep the remaining predictor behavior in scope; a
+failure would move the investigation toward instruction-fetch and redirect
+state outside prediction. Machine-readable results are in `fpga-analysis.json`.

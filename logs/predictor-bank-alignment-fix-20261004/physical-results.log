@@ -1,0 +1,288 @@
+=== corrected image, failing placement 0x11e80/0x11ec0 ===
+REQUEST_BENCH backend=blackparrot-zicbop-prefetch-r-l2 cpu=0 workers=2 hardware=1 requests_per_worker=4096 data_bytes=2097152 samples=512 mode_mask=4 hardware_prime_lines=0 seed=xorshift32-9e3779b9 checksum=133130652
+TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included cache=2x-data-displacement-no-flush
+WARMUP_BEGIN mode=resident-demand-handoff
+WARNING: ps.cpp: target runtime limit reached after 600000 ms
+INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
+INFO:    ps.cpp: minstret (instructions retired):      766,980,248 (        2db73098)
+INFO:    ps.cpp: minstret delta:                       766,980,248 (        2db73098)
+INFO:    ps.cpp: MTIME start:                          372,640,102 (        16360966)
+INFO:    ps.cpp: MTIME stop:                           794,458,378 (        2f5a790a)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):         421,818,276 (        19246fa4)
+INFO:    ps.cpp: IPC        :                             0.227284
+INFO:    ps.cpp: minstret (instructions retired):      766,980,248 (        2db73098)
+
+=== corrected image, passing placement 0x11f00/0x11f40 ===
+REQUEST_BENCH backend=blackparrot-zicbop-prefetch-r-l2 cpu=0 workers=2 hardware=1 requests_per_worker=4096 data_bytes=2097152 samples=128 mode_mask=4 hardware_prime_lines=0 seed=xorshift32-9e3779b9 checksum=133130652
+TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included cache=2x-data-displacement-no-flush
+WARMUP_BEGIN mode=resident-demand-handoff
+WARMUP_PASS mode=resident-demand-handoff
+SAMPLE_BEGIN sample=1 order=0 mode=resident-demand-handoff
+RESULT sample=1 order=0 mode=resident-demand-handoff ns=3861700 requests=8192 checksum=133130652 cycles=615698
+SAMPLE_BEGIN sample=2 order=0 mode=resident-demand-handoff
+RESULT sample=2 order=0 mode=resident-demand-handoff ns=3835900 requests=8192 checksum=133130652 cycles=611615
+SAMPLE_BEGIN sample=3 order=0 mode=resident-demand-handoff
+RESULT sample=3 order=0 mode=resident-demand-handoff ns=3824400 requests=8192 checksum=133130652 cycles=610271
+SAMPLE_BEGIN sample=4 order=0 mode=resident-demand-handoff
+RESULT sample=4 order=0 mode=resident-demand-handoff ns=4062100 requests=8192 checksum=133130652 cycles=647573
+SAMPLE_BEGIN sample=5 order=0 mode=resident-demand-handoff
+RESULT sample=5 order=0 mode=resident-demand-handoff ns=3837500 requests=8192 checksum=133130652 cycles=611744
+SAMPLE_BEGIN sample=6 order=0 mode=resident-demand-handoff
+RESULT sample=6 order=0 mode=resident-demand-handoff ns=3838400 requests=8192 checksum=133130652 cycles=611915
+SAMPLE_BEGIN sample=7 order=0 mode=resident-demand-handoff
+RESULT sample=7 order=0 mode=resident-demand-handoff ns=3836400 requests=8192 checksum=133130652 cycles=611600
+SAMPLE_BEGIN sample=8 order=0 mode=resident-demand-handoff
+RESULT sample=8 order=0 mode=resident-demand-handoff ns=3840200 requests=8192 checksum=133130652 cycles=612243
+SAMPLE_BEGIN sample=9 order=0 mode=resident-demand-handoff
+RESULT sample=9 order=0 mode=resident-demand-handoff ns=3838600 requests=8192 checksum=133130652 cycles=611940
+SAMPLE_BEGIN sample=10 order=0 mode=resident-demand-handoff
+RESULT sample=10 order=0 mode=resident-demand-handoff ns=3836100 requests=8192 checksum=133130652 cycles=611551
+SAMPLE_BEGIN sample=11 order=0 mode=resident-demand-handoff
+RESULT sample=11 order=0 mode=resident-demand-handoff ns=3837900 requests=8192 checksum=133130652 cycles=611856
+SAMPLE_BEGIN sample=12 order=0 mode=resident-demand-handoff
+RESULT sample=12 order=0 mode=resident-demand-handoff ns=3835700 requests=8192 checksum=133130652 cycles=611505
+SAMPLE_BEGIN sample=13 order=0 mode=resident-demand-handoff
+RESULT sample=13 order=0 mode=resident-demand-handoff ns=3869500 requests=8192 checksum=133130652 cycles=616921
+SAMPLE_BEGIN sample=14 order=0 mode=resident-demand-handoff
+RESULT sample=14 order=0 mode=resident-demand-handoff ns=3838600 requests=8192 checksum=133130652 cycles=611929
+SAMPLE_BEGIN sample=15 order=0 mode=resident-demand-handoff
+RESULT sample=15 order=0 mode=resident-demand-handoff ns=3832500 requests=8192 checksum=133130652 cycles=610979
+SAMPLE_BEGIN sample=16 order=0 mode=resident-demand-handoff
+RESULT sample=16 order=0 mode=resident-demand-handoff ns=3831700 requests=8192 checksum=133130652 cycles=610828
+SAMPLE_BEGIN sample=17 order=0 mode=resident-demand-handoff
+RESULT sample=17 order=0 mode=resident-demand-handoff ns=3836200 requests=8192 checksum=133130652 cycles=611551
+SAMPLE_BEGIN sample=18 order=0 mode=resident-demand-handoff
+RESULT sample=18 order=0 mode=resident-demand-handoff ns=4011900 requests=8192 checksum=133130652 cycles=639497
+SAMPLE_BEGIN sample=19 order=0 mode=resident-demand-handoff
+RESULT sample=19 order=0 mode=resident-demand-handoff ns=3838600 requests=8192 checksum=133130652 cycles=611933
+SAMPLE_BEGIN sample=20 order=0 mode=resident-demand-handoff
+RESULT sample=20 order=0 mode=resident-demand-handoff ns=3839200 requests=8192 checksum=133130652 cycles=612067
+SAMPLE_BEGIN sample=21 order=0 mode=resident-demand-handoff
+RESULT sample=21 order=0 mode=resident-demand-handoff ns=3840000 requests=8192 checksum=133130652 cycles=612179
+SAMPLE_BEGIN sample=22 order=0 mode=resident-demand-handoff
+RESULT sample=22 order=0 mode=resident-demand-handoff ns=3841600 requests=8192 checksum=133130652 cycles=612451
+SAMPLE_BEGIN sample=23 order=0 mode=resident-demand-handoff
+RESULT sample=23 order=0 mode=resident-demand-handoff ns=3836600 requests=8192 checksum=133130652 cycles=611620
+SAMPLE_BEGIN sample=24 order=0 mode=resident-demand-handoff
+RESULT sample=24 order=0 mode=resident-demand-handoff ns=3854500 requests=8192 checksum=133130652 cycles=614500
+SAMPLE_BEGIN sample=25 order=0 mode=resident-demand-handoff
+RESULT sample=25 order=0 mode=resident-demand-handoff ns=3838800 requests=8192 checksum=133130652 cycles=612028
+SAMPLE_BEGIN sample=26 order=0 mode=resident-demand-handoff
+RESULT sample=26 order=0 mode=resident-demand-handoff ns=3836400 requests=8192 checksum=133130652 cycles=611590
+SAMPLE_BEGIN sample=27 order=0 mode=resident-demand-handoff
+RESULT sample=27 order=0 mode=resident-demand-handoff ns=4062000 requests=8192 checksum=133130652 cycles=647612
+SAMPLE_BEGIN sample=28 order=0 mode=resident-demand-handoff
+RESULT sample=28 order=0 mode=resident-demand-handoff ns=3824100 requests=8192 checksum=133130652 cycles=610213
+SAMPLE_BEGIN sample=29 order=0 mode=resident-demand-handoff
+RESULT sample=29 order=0 mode=resident-demand-handoff ns=3836700 requests=8192 checksum=133130652 cycles=611638
+SAMPLE_BEGIN sample=30 order=0 mode=resident-demand-handoff
+RESULT sample=30 order=0 mode=resident-demand-handoff ns=3838300 requests=8192 checksum=133130652 cycles=611896
+SAMPLE_BEGIN sample=31 order=0 mode=resident-demand-handoff
+RESULT sample=31 order=0 mode=resident-demand-handoff ns=3834500 requests=8192 checksum=133130652 cycles=611253
+SAMPLE_BEGIN sample=32 order=0 mode=resident-demand-handoff
+RESULT sample=32 order=0 mode=resident-demand-handoff ns=3839000 requests=8192 checksum=133130652 cycles=612052
+SAMPLE_BEGIN sample=33 order=0 mode=resident-demand-handoff
+RESULT sample=33 order=0 mode=resident-demand-handoff ns=3839000 requests=8192 checksum=133130652 cycles=612009
+SAMPLE_BEGIN sample=34 order=0 mode=resident-demand-handoff
+RESULT sample=34 order=0 mode=resident-demand-handoff ns=3836400 requests=8192 checksum=133130652 cycles=611609
+SAMPLE_BEGIN sample=35 order=0 mode=resident-demand-handoff
+RESULT sample=35 order=0 mode=resident-demand-handoff ns=3883400 requests=8192 checksum=133130652 cycles=619098
+SAMPLE_BEGIN sample=36 order=0 mode=resident-demand-handoff
+RESULT sample=36 order=0 mode=resident-demand-handoff ns=3835300 requests=8192 checksum=133130652 cycles=611439
+SAMPLE_BEGIN sample=37 order=0 mode=resident-demand-handoff
+RESULT sample=37 order=0 mode=resident-demand-handoff ns=3838600 requests=8192 checksum=133130652 cycles=611943
+SAMPLE_BEGIN sample=38 order=0 mode=resident-demand-handoff
+RESULT sample=38 order=0 mode=resident-demand-handoff ns=3836800 requests=8192 checksum=133130652 cycles=611649
+SAMPLE_BEGIN sample=39 order=0 mode=resident-demand-handoff
+RESULT sample=39 order=0 mode=resident-demand-handoff ns=3699600 requests=8192 checksum=133130652 cycles=589936
+SAMPLE_BEGIN sample=40 order=0 mode=resident-demand-handoff
+RESULT sample=40 order=0 mode=resident-demand-handoff ns=3830800 requests=8192 checksum=133130652 cycles=610699
+SAMPLE_BEGIN sample=41 order=0 mode=resident-demand-handoff
+RESULT sample=41 order=0 mode=resident-demand-handoff ns=3857400 requests=8192 checksum=133130652 cycles=614938
+SAMPLE_BEGIN sample=42 order=0 mode=resident-demand-handoff
+RESULT sample=42 order=0 mode=resident-demand-handoff ns=3861500 requests=8192 checksum=133130652 cycles=615586
+SAMPLE_BEGIN sample=43 order=0 mode=resident-demand-handoff
+RESULT sample=43 order=0 mode=resident-demand-handoff ns=3839800 requests=8192 checksum=133130652 cycles=612149
+SAMPLE_BEGIN sample=44 order=0 mode=resident-demand-handoff
+RESULT sample=44 order=0 mode=resident-demand-handoff ns=4063100 requests=8192 checksum=133130652 cycles=647794
+SAMPLE_BEGIN sample=45 order=0 mode=resident-demand-handoff
+RESULT sample=45 order=0 mode=resident-demand-handoff ns=3836200 requests=8192 checksum=133130652 cycles=611546
+SAMPLE_BEGIN sample=46 order=0 mode=resident-demand-handoff
+RESULT sample=46 order=0 mode=resident-demand-handoff ns=3838700 requests=8192 checksum=133130652 cycles=611958
+SAMPLE_BEGIN sample=47 order=0 mode=resident-demand-handoff
+RESULT sample=47 order=0 mode=resident-demand-handoff ns=3836400 requests=8192 checksum=133130652 cycles=611592
+SAMPLE_BEGIN sample=48 order=0 mode=resident-demand-handoff
+RESULT sample=48 order=0 mode=resident-demand-handoff ns=3839200 requests=8192 checksum=133130652 cycles=612031
+SAMPLE_BEGIN sample=49 order=0 mode=resident-demand-handoff
+RESULT sample=49 order=0 mode=resident-demand-handoff ns=3837600 requests=8192 checksum=133130652 cycles=611827
+SAMPLE_BEGIN sample=50 order=0 mode=resident-demand-handoff
+RESULT sample=50 order=0 mode=resident-demand-handoff ns=3838500 requests=8192 checksum=133130652 cycles=611873
+SAMPLE_BEGIN sample=51 order=0 mode=resident-demand-handoff
+RESULT sample=51 order=0 mode=resident-demand-handoff ns=3699600 requests=8192 checksum=133130652 cycles=589983
+SAMPLE_BEGIN sample=52 order=0 mode=resident-demand-handoff
+RESULT sample=52 order=0 mode=resident-demand-handoff ns=3833000 requests=8192 checksum=133130652 cycles=611031
+SAMPLE_BEGIN sample=53 order=0 mode=resident-demand-handoff
+RESULT sample=53 order=0 mode=resident-demand-handoff ns=3836000 requests=8192 checksum=133130652 cycles=611500
+SAMPLE_BEGIN sample=54 order=0 mode=resident-demand-handoff
+RESULT sample=54 order=0 mode=resident-demand-handoff ns=3837800 requests=8192 checksum=133130652 cycles=611806
+SAMPLE_BEGIN sample=55 order=0 mode=resident-demand-handoff
+RESULT sample=55 order=0 mode=resident-demand-handoff ns=3838000 requests=8192 checksum=133130652 cycles=611845
+SAMPLE_BEGIN sample=56 order=0 mode=resident-demand-handoff
+RESULT sample=56 order=0 mode=resident-demand-handoff ns=4071200 requests=8192 checksum=133130652 cycles=649069
+SAMPLE_BEGIN sample=57 order=0 mode=resident-demand-handoff
+RESULT sample=57 order=0 mode=resident-demand-handoff ns=3884500 requests=8192 checksum=133130652 cycles=619273
+SAMPLE_BEGIN sample=58 order=0 mode=resident-demand-handoff
+RESULT sample=58 order=0 mode=resident-demand-handoff ns=3840600 requests=8192 checksum=133130652 cycles=612300
+SAMPLE_BEGIN sample=59 order=0 mode=resident-demand-handoff
+RESULT sample=59 order=0 mode=resident-demand-handoff ns=3838700 requests=8192 checksum=133130652 cycles=611957
+SAMPLE_BEGIN sample=60 order=0 mode=resident-demand-handoff
+RESULT sample=60 order=0 mode=resident-demand-handoff ns=3839300 requests=8192 checksum=133130652 cycles=612084
+SAMPLE_BEGIN sample=61 order=0 mode=resident-demand-handoff
+RESULT sample=61 order=0 mode=resident-demand-handoff ns=3891600 requests=8192 checksum=133130652 cycles=621056
+SAMPLE_BEGIN sample=62 order=0 mode=resident-demand-handoff
+RESULT sample=62 order=0 mode=resident-demand-handoff ns=3830100 requests=8192 checksum=133130652 cycles=610579
+SAMPLE_BEGIN sample=63 order=0 mode=resident-demand-handoff
+RESULT sample=63 order=0 mode=resident-demand-handoff ns=3838600 requests=8192 checksum=133130652 cycles=611936
+SAMPLE_BEGIN sample=64 order=0 mode=resident-demand-handoff
+RESULT sample=64 order=0 mode=resident-demand-handoff ns=3863300 requests=8192 checksum=133130652 cycles=615932
+SAMPLE_BEGIN sample=65 order=0 mode=resident-demand-handoff
+RESULT sample=65 order=0 mode=resident-demand-handoff ns=3838800 requests=8192 checksum=133130652 cycles=612027
+SAMPLE_BEGIN sample=66 order=0 mode=resident-demand-handoff
+RESULT sample=66 order=0 mode=resident-demand-handoff ns=3859100 requests=8192 checksum=133130652 cycles=615247
+SAMPLE_BEGIN sample=67 order=0 mode=resident-demand-handoff
+RESULT sample=67 order=0 mode=resident-demand-handoff ns=3837400 requests=8192 checksum=133130652 cycles=611766
+SAMPLE_BEGIN sample=68 order=0 mode=resident-demand-handoff
+RESULT sample=68 order=0 mode=resident-demand-handoff ns=3838500 requests=8192 checksum=133130652 cycles=611968
+SAMPLE_BEGIN sample=69 order=0 mode=resident-demand-handoff
+RESULT sample=69 order=0 mode=resident-demand-handoff ns=3838000 requests=8192 checksum=133130652 cycles=611883
+SAMPLE_BEGIN sample=70 order=0 mode=resident-demand-handoff
+RESULT sample=70 order=0 mode=resident-demand-handoff ns=3836100 requests=8192 checksum=133130652 cycles=611559
+SAMPLE_BEGIN sample=71 order=0 mode=resident-demand-handoff
+RESULT sample=71 order=0 mode=resident-demand-handoff ns=3836800 requests=8192 checksum=133130652 cycles=611694
+SAMPLE_BEGIN sample=72 order=0 mode=resident-demand-handoff
+RESULT sample=72 order=0 mode=resident-demand-handoff ns=3862300 requests=8192 checksum=133130652 cycles=616559
+SAMPLE_BEGIN sample=73 order=0 mode=resident-demand-handoff
+RESULT sample=73 order=0 mode=resident-demand-handoff ns=3835100 requests=8192 checksum=133130652 cycles=611437
+SAMPLE_BEGIN sample=74 order=0 mode=resident-demand-handoff
+RESULT sample=74 order=0 mode=resident-demand-handoff ns=3836700 requests=8192 checksum=133130652 cycles=611677
+SAMPLE_BEGIN sample=75 order=0 mode=resident-demand-handoff
+RESULT sample=75 order=0 mode=resident-demand-handoff ns=3838500 requests=8192 checksum=133130652 cycles=611937
+SAMPLE_BEGIN sample=76 order=0 mode=resident-demand-handoff
+RESULT sample=76 order=0 mode=resident-demand-handoff ns=3839100 requests=8192 checksum=133130652 cycles=612054
+SAMPLE_BEGIN sample=77 order=0 mode=resident-demand-handoff
+RESULT sample=77 order=0 mode=resident-demand-handoff ns=3837900 requests=8192 checksum=133130652 cycles=611865
+SAMPLE_BEGIN sample=78 order=0 mode=resident-demand-handoff
+RESULT sample=78 order=0 mode=resident-demand-handoff ns=3836300 requests=8192 checksum=133130652 cycles=611577
+SAMPLE_BEGIN sample=79 order=0 mode=resident-demand-handoff
+RESULT sample=79 order=0 mode=resident-demand-handoff ns=3895500 requests=8192 checksum=133130652 cycles=621030
+SAMPLE_BEGIN sample=80 order=0 mode=resident-demand-handoff
+RESULT sample=80 order=0 mode=resident-demand-handoff ns=3838000 requests=8192 checksum=133130652 cycles=611890
+SAMPLE_BEGIN sample=81 order=0 mode=resident-demand-handoff
+RESULT sample=81 order=0 mode=resident-demand-handoff ns=3836100 requests=8192 checksum=133130652 cycles=611570
+SAMPLE_BEGIN sample=82 order=0 mode=resident-demand-handoff
+RESULT sample=82 order=0 mode=resident-demand-handoff ns=3700100 requests=8192 checksum=133130652 cycles=590012
+SAMPLE_BEGIN sample=83 order=0 mode=resident-demand-handoff
+RESULT sample=83 order=0 mode=resident-demand-handoff ns=3839800 requests=8192 checksum=133130652 cycles=612166
+SAMPLE_BEGIN sample=84 order=0 mode=resident-demand-handoff
+RESULT sample=84 order=0 mode=resident-demand-handoff ns=3833300 requests=8192 checksum=133130652 cycles=611105
+SAMPLE_BEGIN sample=85 order=0 mode=resident-demand-handoff
+RESULT sample=85 order=0 mode=resident-demand-handoff ns=3838900 requests=8192 checksum=133130652 cycles=611989
+SAMPLE_BEGIN sample=86 order=0 mode=resident-demand-handoff
+RESULT sample=86 order=0 mode=resident-demand-handoff ns=3836700 requests=8192 checksum=133130652 cycles=611628
+SAMPLE_BEGIN sample=87 order=0 mode=resident-demand-handoff
+RESULT sample=87 order=0 mode=resident-demand-handoff ns=3837900 requests=8192 checksum=133130652 cycles=611840
+SAMPLE_BEGIN sample=88 order=0 mode=resident-demand-handoff
+RESULT sample=88 order=0 mode=resident-demand-handoff ns=3842600 requests=8192 checksum=133130652 cycles=612602
+SAMPLE_BEGIN sample=89 order=0 mode=resident-demand-handoff
+RESULT sample=89 order=0 mode=resident-demand-handoff ns=3838300 requests=8192 checksum=133130652 cycles=611912
+SAMPLE_BEGIN sample=90 order=0 mode=resident-demand-handoff
+RESULT sample=90 order=0 mode=resident-demand-handoff ns=3836700 requests=8192 checksum=133130652 cycles=611654
+SAMPLE_BEGIN sample=91 order=0 mode=resident-demand-handoff
+RESULT sample=91 order=0 mode=resident-demand-handoff ns=3839100 requests=8192 checksum=133130652 cycles=612028
+SAMPLE_BEGIN sample=92 order=0 mode=resident-demand-handoff
+RESULT sample=92 order=0 mode=resident-demand-handoff ns=3840200 requests=8192 checksum=133130652 cycles=612215
+SAMPLE_BEGIN sample=93 order=0 mode=resident-demand-handoff
+RESULT sample=93 order=0 mode=resident-demand-handoff ns=3829900 requests=8192 checksum=133130652 cycles=610733
+SAMPLE_BEGIN sample=94 order=0 mode=resident-demand-handoff
+RESULT sample=94 order=0 mode=resident-demand-handoff ns=3835000 requests=8192 checksum=133130652 cycles=611377
+SAMPLE_BEGIN sample=95 order=0 mode=resident-demand-handoff
+RESULT sample=95 order=0 mode=resident-demand-handoff ns=3839500 requests=8192 checksum=133130652 cycles=612067
+SAMPLE_BEGIN sample=96 order=0 mode=resident-demand-handoff
+RESULT sample=96 order=0 mode=resident-demand-handoff ns=3853600 requests=8192 checksum=133130652 cycles=614348
+SAMPLE_BEGIN sample=97 order=0 mode=resident-demand-handoff
+RESULT sample=97 order=0 mode=resident-demand-handoff ns=3838000 requests=8192 checksum=133130652 cycles=611854
+SAMPLE_BEGIN sample=98 order=0 mode=resident-demand-handoff
+RESULT sample=98 order=0 mode=resident-demand-handoff ns=3838900 requests=8192 checksum=133130652 cycles=611987
+SAMPLE_BEGIN sample=99 order=0 mode=resident-demand-handoff
+RESULT sample=99 order=0 mode=resident-demand-handoff ns=3837500 requests=8192 checksum=133130652 cycles=611784
+SAMPLE_BEGIN sample=100 order=0 mode=resident-demand-handoff
+RESULT sample=100 order=0 mode=resident-demand-handoff ns=3837200 requests=8192 checksum=133130652 cycles=611735
+SAMPLE_BEGIN sample=101 order=0 mode=resident-demand-handoff
+RESULT sample=101 order=0 mode=resident-demand-handoff ns=3875900 requests=8192 checksum=133130652 cycles=617983
+SAMPLE_BEGIN sample=102 order=0 mode=resident-demand-handoff
+RESULT sample=102 order=0 mode=resident-demand-handoff ns=3837400 requests=8192 checksum=133130652 cycles=611755
+SAMPLE_BEGIN sample=103 order=0 mode=resident-demand-handoff
+RESULT sample=103 order=0 mode=resident-demand-handoff ns=3697100 requests=8192 checksum=133130652 cycles=589487
+SAMPLE_BEGIN sample=104 order=0 mode=resident-demand-handoff
+RESULT sample=104 order=0 mode=resident-demand-handoff ns=3839200 requests=8192 checksum=133130652 cycles=612027
+SAMPLE_BEGIN sample=105 order=0 mode=resident-demand-handoff
+RESULT sample=105 order=0 mode=resident-demand-handoff ns=3862000 requests=8192 checksum=133130652 cycles=615706
+SAMPLE_BEGIN sample=106 order=0 mode=resident-demand-handoff
+RESULT sample=106 order=0 mode=resident-demand-handoff ns=3835000 requests=8192 checksum=133130652 cycles=611374
+SAMPLE_BEGIN sample=107 order=0 mode=resident-demand-handoff
+RESULT sample=107 order=0 mode=resident-demand-handoff ns=3838100 requests=8192 checksum=133130652 cycles=611899
+SAMPLE_BEGIN sample=108 order=0 mode=resident-demand-handoff
+RESULT sample=108 order=0 mode=resident-demand-handoff ns=3837600 requests=8192 checksum=133130652 cycles=611831
+SAMPLE_BEGIN sample=109 order=0 mode=resident-demand-handoff
+RESULT sample=109 order=0 mode=resident-demand-handoff ns=3835800 requests=8192 checksum=133130652 cycles=611495
+SAMPLE_BEGIN sample=110 order=0 mode=resident-demand-handoff
+RESULT sample=110 order=0 mode=resident-demand-handoff ns=3841200 requests=8192 checksum=133130652 cycles=612335
+SAMPLE_BEGIN sample=111 order=0 mode=resident-demand-handoff
+RESULT sample=111 order=0 mode=resident-demand-handoff ns=3839000 requests=8192 checksum=133130652 cycles=611997
+SAMPLE_BEGIN sample=112 order=0 mode=resident-demand-handoff
+RESULT sample=112 order=0 mode=resident-demand-handoff ns=3862200 requests=8192 checksum=133130652 cycles=615656
+SAMPLE_BEGIN sample=113 order=0 mode=resident-demand-handoff
+RESULT sample=113 order=0 mode=resident-demand-handoff ns=3839500 requests=8192 checksum=133130652 cycles=612271
+SAMPLE_BEGIN sample=114 order=0 mode=resident-demand-handoff
+RESULT sample=114 order=0 mode=resident-demand-handoff ns=3828700 requests=8192 checksum=133130652 cycles=610410
+SAMPLE_BEGIN sample=115 order=0 mode=resident-demand-handoff
+RESULT sample=115 order=0 mode=resident-demand-handoff ns=3836700 requests=8192 checksum=133130652 cycles=611665
+SAMPLE_BEGIN sample=116 order=0 mode=resident-demand-handoff
+RESULT sample=116 order=0 mode=resident-demand-handoff ns=3839800 requests=8192 checksum=133130652 cycles=612144
+SAMPLE_BEGIN sample=117 order=0 mode=resident-demand-handoff
+RESULT sample=117 order=0 mode=resident-demand-handoff ns=3837300 requests=8192 checksum=133130652 cycles=611771
+SAMPLE_BEGIN sample=118 order=0 mode=resident-demand-handoff
+RESULT sample=118 order=0 mode=resident-demand-handoff ns=3836700 requests=8192 checksum=133130652 cycles=611642
+SAMPLE_BEGIN sample=119 order=0 mode=resident-demand-handoff
+RESULT sample=119 order=0 mode=resident-demand-handoff ns=3838200 requests=8192 checksum=133130652 cycles=611884
+SAMPLE_BEGIN sample=120 order=0 mode=resident-demand-handoff
+RESULT sample=120 order=0 mode=resident-demand-handoff ns=3837900 requests=8192 checksum=133130652 cycles=611829
+SAMPLE_BEGIN sample=121 order=0 mode=resident-demand-handoff
+RESULT sample=121 order=0 mode=resident-demand-handoff ns=3836900 requests=8192 checksum=133130652 cycles=611676
+SAMPLE_BEGIN sample=122 order=0 mode=resident-demand-handoff
+RESULT sample=122 order=0 mode=resident-demand-handoff ns=3839200 requests=8192 checksum=133130652 cycles=612043
+SAMPLE_BEGIN sample=123 order=0 mode=resident-demand-handoff
+RESULT sample=123 order=0 mode=resident-demand-handoff ns=3873100 requests=8192 checksum=133130652 cycles=617457
+SAMPLE_BEGIN sample=124 order=0 mode=resident-demand-handoff
+RESULT sample=124 order=0 mode=resident-demand-handoff ns=3837500 requests=8192 checksum=133130652 cycles=611823
+SAMPLE_BEGIN sample=125 order=0 mode=resident-demand-handoff
+RESULT sample=125 order=0 mode=resident-demand-handoff ns=3829300 requests=8192 checksum=133130652 cycles=610534
+SAMPLE_BEGIN sample=126 order=0 mode=resident-demand-handoff
+RESULT sample=126 order=0 mode=resident-demand-handoff ns=3836300 requests=8192 checksum=133130652 cycles=611539
+SAMPLE_BEGIN sample=127 order=0 mode=resident-demand-handoff
+RESULT sample=127 order=0 mode=resident-demand-handoff ns=3838100 requests=8192 checksum=133130652 cycles=611865
+SAMPLE_BEGIN sample=128 order=0 mode=resident-demand-handoff
+RESULT sample=128 order=0 mode=resident-demand-handoff ns=3834900 requests=8192 checksum=133130652 cycles=611350
+[REQUEST-BENCH] PASS
+
+=== corrected image, one-request zero diagnostic ===
+REQUEST_BENCH backend=blackparrot-zicbop-prefetch-r-l2 cpu=0 workers=2 hardware=1 requests_per_worker=1 data_bytes=2097152 samples=1 mode_mask=4 hardware_prime_lines=0 seed=xorshift32-9e3779b9 checksum=27797
+TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included cache=2x-data-displacement-no-flush
+WARMUP_BEGIN mode=resident-demand-handoff
+HARDWARE_VERIFY_FAIL zero_code=6
+
+=== previous image, one-request zero diagnostic ===
+REQUEST_BENCH backend=blackparrot-zicbop-prefetch-r-l2 cpu=0 workers=2 hardware=1 requests_per_worker=1 data_bytes=2097152 samples=64 mode_mask=4 hardware_prime_lines=0 seed=xorshift32-9e3779b9 checksum=27797
+TIMING clock=monotonic unit=ns setup=excluded thread_release_and_drain=included cache=2x-data-displacement-no-flush
+WARMUP_BEGIN mode=resident-demand-handoff
+HARDWARE_VERIFY_FAIL zero_code=6
