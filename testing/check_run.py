@@ -29,6 +29,7 @@ GPIO_STOP = re.compile(
 # Match the selected program's completed checks, not just the common CRT exit.
 # The benchmark banner is emitted only after both measured rings return.
 TEST_MARKERS = {
+    "mt_satp_asid_warl_test": "[BSG-PASS] satp ASID WARL width matches one-bit TLB tag",
     "mt_dependent_stream_benchmark": "[BSG-PASS] dependent streams, checksums and completion",
     "mt_ddr_latency_benchmark": "[BSG-PASS] DDR dependent-load latency and prefetch lead sweep",
     "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",

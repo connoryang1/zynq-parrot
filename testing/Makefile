@@ -59,6 +59,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_satp_asid_warl_test \
     mt_remote_seed_order_test \
     mt_resident_reseed_fetch_test \
     mt_context_csr_rebind_test \

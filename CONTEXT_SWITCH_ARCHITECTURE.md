@@ -46,6 +46,12 @@ parent then terminates during cleanup, and inherited/register and pipe-command
 diagnostics remain stale after prior custom context use. Thus the rebind
 translation sub-gate passes, but assigning one persistent context across
 simultaneously live processes remains unsupported as a complete lifecycle.
+The deployed image also advertises all 16 `satp.ASID` bits to software while
+its TLB tags retain only one. Linux consequently reuses aliased hardware tags
+without the required flushes. The current RTL masks unsupported ASID bits on
+`satp` write/restore so Linux detects the one-bit implementation and selects
+its flush-on-switch path; this correction is simulation-qualified but not yet
+routed or accepted on the FPGA.
 
 ## Cache overlap is a separate capability
 

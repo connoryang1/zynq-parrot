@@ -65,6 +65,19 @@ use therefore still requires a fix for ordinary process-state preservation and
 cleanup plus an OS-visible protected allocation/release contract; successful
 translation alone does not qualify simultaneous ownership.
 
+The state-loss pattern is now localized to a pre-existing Linux/MMU contract
+violation. The deployed configuration stores and reads back all 16 architectural
+`satp.ASID` bits but tags TLB entries with only one bit. Linux's boot probe
+therefore enables a 16-bit ASID allocator, while the hardware aliases every
+even or odd address space. Frozen live-process runs reproduce the predicted
+alternation: stale clone returns, zeroed saved PID words, and partially replayed
+child records. They also show that a shared-pipe EOF release can exit and reap
+all eight unique children with status zero without consulting corrupted PID
+arrays. BlackParrot `db5a52da5` masks unsupported `satp.ASID` bits as WARL, so
+Linux will detect one bit and flush on every address-space switch. The new ASID
+probe, resident rebind, and translated U-mode data-handoff simulations pass;
+the correction still needs routed FPGA and live-process qualification.
+
 # Supported checkout
 
 The accepted dirty-victim baseline is on `perf/dependent-streams-20260923`, pinning
