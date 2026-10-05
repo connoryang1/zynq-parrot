@@ -52,11 +52,24 @@ fork boundary or its interaction with this platform. Exact accepted and
 rejected transcripts and pre-result plans are retained in
 `logs/process-rebind-20261004/`.
 
+A subsequent no-libc hardware harness removes that runtime boundary and gives
+every child distinct data at the same virtual addresses. Seven simultaneously
+live children pass 14 rebind/reseed launches and seven distinct translation
+checksums in the longest run, but later children intermittently inherit stale
+process state after prior hardware-context use. Frozen diagnostics reproduce a
+previous child ID in a pre-clone register snapshot, an explicitly stored and
+fenced COW-memory token, and a post-clone pipe-command experiment. The
+process-only raw-clone control passes the corresponding eight-child lifecycle,
+so the stale state requires prior custom hardware-context activity. This is now
+a checked simultaneous-live lifecycle failure rather than merely an invalid
+libc harness.
+
 No simultaneous ownership, page-table-root non-reuse, or protected allocation
 claim follows from these experiments. A production Linux integration needs an
 OS-visible context allocation/release contract and a live-owner harness built
-on the qualified raw-syscall boundary before that stronger lifecycle property
-can be tested.
+on the qualified raw-syscall boundary, plus a correction for process-state
+preservation while a persistent hardware context remains live, before that
+stronger lifecycle property can be accepted.
 
 # Supported checkout
 

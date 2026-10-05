@@ -40,6 +40,9 @@ different process or address space. The interface still has no protected kernel
 allocator, release operation, or automatic ownership tracking. Current FPGA
 evidence qualifies reuse only after the preceding process exits; assigning one
 persistent context across simultaneously live address spaces is unsupported.
+The no-libc live-owner stress reaches seven checked address spaces and 14
+hardware launches, then exposes stale later-process state after prior custom
+context use; this is an observed lifecycle failure, not only a missing API.
 
 ## Cache overlap is a separate capability
 
