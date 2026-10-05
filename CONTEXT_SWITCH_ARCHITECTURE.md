@@ -37,7 +37,9 @@ permission-protected thread API, or establish isolation between mutually
 untrusted contexts. The Linux proof uses cooperating contexts in one process.
 Software must request rebind before reusing a persistent hardware context for a
 different process or address space. The interface still has no protected kernel
-allocator or automatic ownership tracking.
+allocator, release operation, or automatic ownership tracking. Current FPGA
+evidence qualifies reuse only after the preceding process exits; assigning one
+persistent context across simultaneously live address spaces is unsupported.
 
 ## Cache overlap is a separate capability
 

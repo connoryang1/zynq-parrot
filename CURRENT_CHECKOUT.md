@@ -34,6 +34,24 @@ approximately 163,880 handoffs. Median demand time was 894,668 cycles with
 4.45% CV and no monotonic process-index slowdown; the cycle/time ratio inferred
 17.959 MHz, consistent with the routed 18 MHz target.
 
+These results qualify **sequential** process reuse after the preceding process
+has exited. A stronger attempt to keep old address spaces alive while later
+processes reused the hardware peer is rejected as an acceptance test. With 256
+requests, the first hardware child passed and lingered before the supervisor or
+next child faulted; reducing to 32 requests allowed seven checked children, but
+the supervisor eventually jumped into read-only data. Normal timer ticks are
+not required: the historical suppressed-tick image still failed after one
+28,309-cycle child. Crucially, controls containing no custom CSR also fail at
+the second live fork child, both with and without pthreads. The minimal Linux
+image therefore lacks a trustworthy simultaneous-live-process baseline for
+attributing this failure to context rebinding. Exact rejected transcripts and
+pre-result plans are retained in `logs/process-rebind-20261004/`.
+
+No simultaneous ownership, page-table-root non-reuse, or protected allocation
+claim follows from these experiments. A production Linux integration needs an
+OS-visible context allocation/release contract and a stable concurrent-process
+baseline before that stronger lifecycle property can be tested.
+
 # Supported checkout
 
 The accepted dirty-victim baseline is on `perf/dependent-streams-20260923`, pinning
