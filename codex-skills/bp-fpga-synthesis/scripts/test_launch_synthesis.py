@@ -20,7 +20,8 @@ import uuid
 
 
 KEYS = ('ZP_REPO_DIR', 'ZP_FPGA_SEED_REPO_DIR', 'ZP_FPGA_LOG_ROOT', 'FPGA_CFG',
-        'FPGA_VIVADO_THREADS', 'FPGA_NUM_THREADS', 'FPGA_NUM_CONTEXTS')
+        'FPGA_VIVADO_THREADS', 'FPGA_NUM_THREADS', 'FPGA_NUM_CONTEXTS',
+        'FPGA_ACLK_MHZ')
 SOURCE = Path(__file__).with_name('launch_synthesis.sh')
 
 
@@ -71,7 +72,8 @@ class LauncherTests(unittest.TestCase):
     def prepare_worker(self, custom=True):
         if custom:
             self.env.update(FPGA_CFG="cfg space 'quote' \"double\" $(false) `false`\nnext line",
-                            FPGA_NUM_THREADS='2', FPGA_NUM_CONTEXTS='4')
+                            FPGA_NUM_THREADS='2', FPGA_NUM_CONTEXTS='4',
+                            FPGA_ACLK_MHZ='15.5')
         self.run_command([str(self.launcher), 'start'])
         captured = json.loads(self.capture.read_text())
         self.assertEqual(captured[:3], ['new-session', '-d', '-s'])
