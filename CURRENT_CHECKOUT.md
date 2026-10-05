@@ -41,16 +41,22 @@ requests, the first hardware child passed and lingered before the supervisor or
 next child faulted; reducing to 32 requests allowed seven checked children, but
 the supervisor eventually jumped into read-only data. Normal timer ticks are
 not required: the historical suppressed-tick image still failed after one
-28,309-cycle child. Crucially, controls containing no custom CSR also fail at
-the second live fork child, both with and without pthreads. The minimal Linux
-image therefore lacks a trustworthy simultaneous-live-process baseline for
-attributing this failure to context rebinding. Exact rejected transcripts and
-pre-result plans are retained in `logs/process-rebind-20261004/`.
+28,309-cycle child. A no-libc control using only raw Linux syscalls then passed
+eight simultaneously live address spaces, private COW-page checks, liveness,
+termination, reap, exit zero, and `CORE[0] PASS`. This establishes a usable
+kernel/core baseline. It does not validate the original harness: minimal
+dynamic-libc `fork()` controls with no custom CSR, pthreads, stdio, or allocation
+produce duplicated parent-ready records and parent termination. The unusable
+baseline is therefore localized above raw `clone`, at the dynamic-loader/libc
+fork boundary or its interaction with this platform. Exact accepted and
+rejected transcripts and pre-result plans are retained in
+`logs/process-rebind-20261004/`.
 
 No simultaneous ownership, page-table-root non-reuse, or protected allocation
 claim follows from these experiments. A production Linux integration needs an
-OS-visible context allocation/release contract and a stable concurrent-process
-baseline before that stronger lifecycle property can be tested.
+OS-visible context allocation/release contract and a live-owner harness built
+on the qualified raw-syscall boundary before that stronger lifecycle property
+can be tested.
 
 # Supported checkout
 
