@@ -28,6 +28,16 @@
 #endif
 #define DRAM_ALLOCATE_SIZE (DRAM_ALLOCATE_SIZE_MB * 1024 * 1024)
 
+// Hardware builds provide these through Makefile.design. Keep zero-valued
+// fallbacks so the shared host source still compiles in environments that do
+// not describe the two clock domains.
+#ifndef ACLK_MHZ
+#define ACLK_MHZ 0
+#endif
+#ifndef RTCLK_MHZ
+#define RTCLK_MHZ 0
+#endif
+
 // Helper functions
 void nbf_load(bsg_zynq_pl *zpl, char *filename);
 
@@ -64,6 +74,57 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         bsg_pr_info("ps.cpp: limiting target runtime to %llu ms\n",
                     max_runtime_ms);
     }
+
+    // Counter sampling is opt-in because GP reads perturb host-side polling
+    // throughput. It is intended for localizing boot stalls, not timed runs.
+    unsigned long long liveness_interval_ms = 0;
+    const char *liveness_env = getenv("BSG_LIVENESS_INTERVAL_MS");
+    if (liveness_env && *liveness_env) {
+        char *end = nullptr;
+        errno = 0;
+        liveness_interval_ms = strtoull(liveness_env, &end, 0);
+        if (errno || end == liveness_env || *end != '\0'
+            || liveness_interval_ms == 0) {
+            bsg_pr_err(
+                "ps.cpp: invalid BSG_LIVENESS_INTERVAL_MS value: %s\n",
+                liveness_env);
+            return -1;
+        }
+        bsg_pr_info("ps.cpp: liveness sampling every %llu host ms\n",
+                    liveness_interval_ms);
+    }
+
+    double aclk_hz = ((double)ACLK_MHZ) * 1000000.0;
+    double rtclk_hz = ((double)RTCLK_MHZ) * 1000000.0;
+    const char *aclk_env = getenv("BSG_ACLK_HZ");
+    const char *rtclk_env = getenv("BSG_RTCLK_HZ");
+    if (aclk_env && *aclk_env) {
+        char *end = nullptr;
+        errno = 0;
+        double value = strtod(aclk_env, &end);
+        if (errno || end == aclk_env || *end != '\0' || value <= 0.0) {
+            bsg_pr_err("ps.cpp: invalid BSG_ACLK_HZ value: %s\n", aclk_env);
+            return -1;
+        }
+        aclk_hz = value;
+    }
+    if (rtclk_env && *rtclk_env) {
+        char *end = nullptr;
+        errno = 0;
+        double value = strtod(rtclk_env, &end);
+        if (errno || end == rtclk_env || *end != '\0' || value <= 0.0) {
+            bsg_pr_err("ps.cpp: invalid BSG_RTCLK_HZ value: %s\n", rtclk_env);
+            return -1;
+        }
+        rtclk_hz = value;
+    }
+    if (aclk_hz > 0.0 && rtclk_hz > 0.0)
+        bsg_pr_info("ps.cpp: counter clocks ACLK=%.0f Hz RTCLK=%.0f Hz\n",
+                    aclk_hz, rtclk_hz);
+    else
+        bsg_pr_warn(
+            "ps.cpp: counter clock normalization unavailable; set "
+            "BSG_ACLK_HZ and BSG_RTCLK_HZ\n");
 
     long data;
     long val1 = 0x1;
@@ -263,6 +324,9 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     bsg_spack_t spack;
     bool runtime_limit_reached = false;
     unsigned long long empty_poll_count = 0;
+    unsigned long long next_liveness_ms = liveness_interval_ms;
+    unsigned long long last_liveness_minstret = minstret_start;
+    unsigned long long last_liveness_mtime = mtime_start;
     do {
         if (host->get_next_packet(&spack)) {
             host->process_spack(&spack);
@@ -279,14 +343,37 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
             }
         }
         empty_poll_count++;
-        if (max_runtime_ms && ((empty_poll_count & 0x3ff) == 0)) {
+        if ((max_runtime_ms || liveness_interval_ms)
+            && ((empty_poll_count & 0x3ff) == 0)) {
             struct timespec now;
             clock_gettime(CLOCK_MONOTONIC, &now);
             long long elapsed_ns =
                 1000000000LL * (now.tv_sec - start.tv_sec)
                 + (now.tv_nsec - start.tv_nsec);
             unsigned long long elapsed_ms = elapsed_ns / 1000000LL;
-            if (elapsed_ms >= max_runtime_ms) {
+            if (liveness_interval_ms && elapsed_ms >= next_liveness_ms) {
+                unsigned long long current_minstret =
+                    get_counter_64(zpl, GP0_RD_MINSTRET);
+                unsigned long long current_mtime =
+                    get_counter_64(zpl, GP1_CSR_BASE_ADDR + 0x30bff8);
+                bsg_pr_info(
+                    "ps.cpp: liveness host_ms=%llu minstret=%llu "
+                    "retired_delta=%llu retired_since_last=%llu mtime=%llu "
+                    "mtime_delta=%llu mtime_since_last=%llu\n",
+                    elapsed_ms, current_minstret,
+                    current_minstret - minstret_start,
+                    current_minstret - last_liveness_minstret, current_mtime,
+                    current_mtime - mtime_start,
+                    current_mtime - last_liveness_mtime);
+                fflush(stdout);
+                fflush(stderr);
+                last_liveness_minstret = current_minstret;
+                last_liveness_mtime = current_mtime;
+                next_liveness_ms =
+                    (elapsed_ms / liveness_interval_ms + 1)
+                    * liveness_interval_ms;
+            }
+            if (max_runtime_ms && elapsed_ms >= max_runtime_ms) {
                 bsg_pr_warn(
                     "ps.cpp: target runtime limit reached after %llu ms\n",
                     elapsed_ms);
@@ -323,10 +410,22 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     bsg_pr_info("ps.cpp: MTIME stop:                      %'16llu (%16llx)\n",
                 mtime_stop, mtime_stop);
     unsigned long long mtime_delta = mtime_stop - mtime_start;
-    bsg_pr_info("ps.cpp: MTIME delta (=1/8 BP cycles):    %'16llu (%16llx)\n",
+    bsg_pr_info("ps.cpp: MTIME delta (RTCLK ticks):       %'16llu (%16llx)\n",
                 mtime_delta, mtime_delta);
-    bsg_pr_info("ps.cpp: IPC        :                     %'16f\n",
-                ((double)minstret_delta) / ((double)(mtime_delta)) / 8.0);
+    double target_cycles = 0.0;
+    if (aclk_hz > 0.0 && rtclk_hz > 0.0) {
+        target_cycles = ((double)mtime_delta) * aclk_hz / rtclk_hz;
+        bsg_pr_info("ps.cpp: target time (seconds):          %'16.6f\n",
+                    ((double)mtime_delta) / rtclk_hz);
+        bsg_pr_info("ps.cpp: normalized BP cycles:           %'16.3f\n",
+                    target_cycles);
+        bsg_pr_info("ps.cpp: IPC        :                     %'16f\n",
+                    target_cycles > 0.0
+                        ? ((double)minstret_delta) / target_cycles
+                        : 0.0);
+    } else {
+        bsg_pr_info("ps.cpp: IPC        :                     unavailable\n");
+    }
     bsg_pr_info("ps.cpp: minstret (instructions retired): %'16llu (%16llx)\n",
                 counter_data, counter_data);
     unsigned long long diff_ns =
@@ -336,10 +435,13 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     bsg_pr_info(
         "ps.cpp: wall clock time                : %'16llu (%16llx) ns\n",
         diff_ns, diff_ns);
-    bsg_pr_info("ps.cpp: sim/emul speed                 : %'16.2f BP cycles "
-                "per minute\n",
-                mtime_delta * 8 /
-                    ((double)(diff_ns) / (60.0 * 1000.0 * 1000.0 * 1000.0)));
+    if (target_cycles > 0.0)
+        bsg_pr_info(
+            "ps.cpp: sim/emul speed                 : %'16.2f BP cycles "
+            "per minute\n",
+            target_cycles
+                / ((double)(diff_ns)
+                   / (60.0 * 1000.0 * 1000.0 * 1000.0)));
 
     bsg_pr_info(
         "ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): "
