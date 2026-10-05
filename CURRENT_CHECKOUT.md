@@ -34,42 +34,36 @@ approximately 163,880 handoffs. Median demand time was 894,668 cycles with
 4.45% CV and no monotonic process-index slowdown; the cycle/time ratio inferred
 17.959 MHz, consistent with the routed 18 MHz target.
 
-These results qualify **sequential** process reuse after the preceding process
-has exited. A stronger attempt to keep old address spaces alive while later
-processes reused the hardware peer is rejected as an acceptance test. With 256
-requests, the first hardware child passed and lingered before the supervisor or
-next child faulted; reducing to 32 requests allowed seven checked children, but
-the supervisor eventually jumped into read-only data. Normal timer ticks are
-not required: the historical suppressed-tick image still failed after one
-28,309-cycle child. A no-libc control using only raw Linux syscalls then passed
-eight simultaneously live address spaces, private COW-page checks, liveness,
-termination, reap, exit zero, and `CORE[0] PASS`. This establishes a usable
-kernel/core baseline. It does not validate the original harness: minimal
-dynamic-libc `fork()` controls with no custom CSR, pthreads, stdio, or allocation
-produce duplicated parent-ready records and parent termination. The unusable
-baseline is therefore localized above raw `clone`, at the dynamic-loader/libc
-fork boundary or its interaction with this platform. Exact accepted and
-rejected transcripts and pre-result plans are retained in
+These results first qualified **sequential** process reuse after the preceding
+process exited. A no-libc control using only raw Linux syscalls then passed eight
+simultaneously live address spaces, private COW-page checks, liveness,
+termination, reap, exit zero, and `CORE[0] PASS`, establishing a usable
+kernel/core baseline. Minimal dynamic-libc `fork()` controls with no custom CSR,
+pthreads, stdio, or allocation instead produce duplicated parent-ready records
+and parent termination, so live-owner hardware tests use the qualified raw
+syscall boundary. Exact transcripts and frozen pre-result plans are retained in
 `logs/process-rebind-20261004/`.
 
-A subsequent no-libc hardware harness removes that runtime boundary and gives
-every child distinct data at the same virtual addresses. Seven simultaneously
-live children pass 14 rebind/reseed launches and seven distinct translation
-checksums in the longest run, but later children intermittently inherit stale
-process state after prior hardware-context use. Frozen diagnostics reproduce a
-previous child ID in a pre-clone register snapshot, an explicitly stored and
-fenced COW-memory token, and a post-clone pipe-command experiment. The
-process-only raw-clone control passes the corresponding eight-child lifecycle,
-so the stale state requires prior custom hardware-context activity. This is now
-a checked simultaneous-live lifecycle failure rather than merely an invalid
-libc harness.
+The latest no-libc hardware run now passes the rebind/translation sub-gate for
+**eight simultaneously live Linux PIDs**. Every child obtains its identity from
+raw `getpid`, executes an explicit rebind and an ordinary reseed, and reads a
+PID-specific 64 KiB image through the same virtual addresses. All eight distinct
+checksum formulas pass while all children remain live: 16 launches and 1,024
+dependent requests. Rebind intervals are 3,538--3,835 cycles (median 3,723),
+and all reseed intervals are 1,291 cycles. This physically qualifies selection
+of distinct live address spaces by the persistent context; it supersedes the
+earlier broad rejection of simultaneous-live translation.
 
-No simultaneous ownership, page-table-root non-reuse, or protected allocation
-claim follows from these experiments. A production Linux integration needs an
-OS-visible context allocation/release contract and a live-owner harness built
-on the qualified raw-syscall boundary, plus a correction for process-state
-preservation while a persistent hardware context remains live, before that
-stronger lifecycle property can be accepted.
+The **complete simultaneous-live lifecycle still fails**. The same run records
+stale inherited indices `1,2,2,4,4,6,6,8` and stale pipe-command indices
+`1,1,3,4,5,6,7,8`, then the parent terminates during cleanup before the final
+control-pass marker. Earlier frozen diagnostics independently reproduced stale
+pre-clone register state, an explicitly stored and fenced COW-memory token, and
+a post-clone pipe command after prior custom hardware-context activity. The
+process-only raw-clone control passes the corresponding lifecycle. Production
+use therefore still requires a fix for ordinary process-state preservation and
+cleanup plus an OS-visible protected allocation/release contract; successful
+translation alone does not qualify simultaneous ownership.
 
 # Supported checkout
 

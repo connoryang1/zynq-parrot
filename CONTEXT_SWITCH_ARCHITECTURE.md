@@ -38,11 +38,14 @@ untrusted contexts. The Linux proof uses cooperating contexts in one process.
 Software must request rebind before reusing a persistent hardware context for a
 different process or address space. The interface still has no protected kernel
 allocator, release operation, or automatic ownership tracking. Current FPGA
-evidence qualifies reuse only after the preceding process exits; assigning one
-persistent context across simultaneously live address spaces is unsupported.
-The no-libc live-owner stress reaches seven checked address spaces and 14
-hardware launches, then exposes stale later-process state after prior custom
-context use; this is an observed lifecycle failure, not only a missing API.
+evidence qualifies sequential exited-process reuse and the narrower translation
+operation across eight simultaneously live Linux PIDs. In the live test, raw
+`getpid` identities, distinct same-VA data images, 16 hardware launches, and
+1,024 dependent requests all check while all eight children remain alive. The
+parent then terminates during cleanup, and inherited/register and pipe-command
+diagnostics remain stale after prior custom context use. Thus the rebind
+translation sub-gate passes, but assigning one persistent context across
+simultaneously live processes remains unsupported as a complete lifecycle.
 
 ## Cache overlap is a separate capability
 
