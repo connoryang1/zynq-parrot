@@ -183,6 +183,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** resident contexts need retention for immediate hot state because a 5–11-cycle handoff cannot hide large replay. Nonresident or normally scheduled contexts can use background replay during the long Linux interval. A hybrid design matches both regimes.
 - **Limits:** concurrent replay throughput, cache installation contention, retention pollution, and useful-before-demand behavior remain unmeasured. The 160-line retention point is not a uniform integer-way partition.
 
+### RL-019 — Two-way resident retention is the safer capacity point
+
+- **Status:** trace-driven cache-policy model
+- **Scope:** warm data traces in a 64-set/eight-way LRU model with contexts 1 and 2 protected and context 0 sharing the remainder
+- **Claim:** reserving two ways per resident leaves four shared ways and adds zero scan misses and three trie misses in the repeated warm traces. Three ways leaves only two shared and adds 340 scan plus 74 trie misses. In pointer-plus-compute, one/two protected ways raise context-0 misses from 907 to 1,127/1,163, an absolute miss-rate increase of 0.97/1.13 points; two-way protection adds an estimated 9,984 cold-increment cycles across 22,666 accesses.
+- **Evidence:** `logs/cache-retention-trace-model-20261006/README.md` and reproducible `model.py`/`results.json`.
+- **Meaning:** two ways (128 lines/context) are the lower-risk retention prototype. Static protection still taxes an unprotected cache-sensitive workload, so inactive or low-confidence ownership should be releasable.
+- **Limits:** the workers are already warm and see no misses, so these traces measure capacity cost rather than retention benefit. The model omits instruction accesses, dirty state, and exact BlackParrot replacement behavior.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -235,8 +244,8 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot.
-- **Missing:** achieved concurrent replay/install rate and interference, plus measured workload loss from leaving only two to four ways shared under retention.
-- **Decisive experiment:** prototype the mechanisms separately in simulation: a 160-line combined background replay with scheduler traffic, and two-context 2/3-way retention under scan/trie plus a cache-capacity stress control. Compare useful-before-demand fraction and total cycles before choosing the physical RTL.
+- **Missing:** achieved concurrent replay/install rate and interference, plus retention benefit under forced displacement. RL-019 now bounds warm-trace capacity loss and rejects three static ways as the first prototype.
+- **Decisive experiment:** simulate 160-line combined background replay with scheduler traffic, then compare it against two-way retention under a forced-displacement trace. Measure useful-before-demand fraction, install stalls, shared-context misses, and total cycles.
 
 ## Next experiment
 
@@ -249,3 +258,4 @@ The immediate next experiment is OQ-001 because the diagnostic is complete and a
 - **2026-10-06 — Automatic-signature value bounded:** combining trace precision with physical application-work savings projects only 0.2–2.5% phase reduction for realistic depth-two/four signatures, versus a 7.84% reduction for eight exact hints. This prompted an audit of whether larger cold-resume components had already been measured.
 - **2026-10-06 — Existing cold-resume decomposition recovered:** instruction-only, data-only, translation, combined-pollution, ideal 128–192-line replay, and replay-cost experiments were already complete. The ledger now treats background replay versus cache-state retention as the unresolved architectural choice instead of proposing another component measurement.
 - **2026-10-06 — Replay-versus-retention regimes separated:** the measured middle point needs only 1.24x serial replay throughput to hide combined I+D replay under Linux, whereas a five-cycle hardware handoff needs retained state. Two resident contexts can retain the measured 128–192-line range using 4–6 of eight ways; the remaining question is measured contention and capacity loss.
+- **2026-10-06 — Retention capacity loss modeled:** two protected ways per resident are nearly free in warm scan/trie traces but add 1.13 percentage points of misses to pointer-plus-compute's shared context; three ways also harms scan/trie. Two-way, releasable retention is the safer first design point.
