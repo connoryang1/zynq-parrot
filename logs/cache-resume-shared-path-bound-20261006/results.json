@@ -1,0 +1,238 @@
+{
+  "method": "Aggregate feasibility bound. Convert measured Linux instruction/data penalties to conservative ceiling line-equivalents, add the measured 160-line application point, then bound a shared 64-bit AXI response channel and separate I/D cache installers.",
+  "inputs": {
+    "scheduler_results": "logs/linux-scheduler-resume-20261002/results.json",
+    "installer_audit": "logs/prefetch-sustained-coverage-20260924/final-trace/k10-m2/final-installer-audit.json",
+    "hot_combined_resume_deadline_cycles": 5551.0,
+    "instruction_line_equivalents": 174.47368421052633,
+    "data_line_equivalents": 143.16666666666666,
+    "kernel_instruction_lines_ceiling": 175,
+    "kernel_data_lines_ceiling": 144,
+    "application_data_lines": 160,
+    "max_data_install_cycles_per_line": 17,
+    "line_bytes": 64,
+    "axi_bytes_per_beat": 8,
+    "clock_hz": 18000000
+  },
+  "scenarios": {
+    "kernel_only": {
+      "i_lines": 175,
+      "d_lines": 144,
+      "total_lines": 319,
+      "separate_install_completion_cycles": {
+        "21": 2996,
+        "41": 3016
+      },
+      "shared_install_completion_cycles": {
+        "21": 5444,
+        "41": 5464
+      },
+      "slot_sweep": {
+        "21": {
+          "1": {
+            "transport_lower_bound_cycles": 6707.0,
+            "separate_install_bound_cycles": 2996,
+            "aggregate_completion_bound_cycles": 6707.0,
+            "margin_to_hot_resume_cycles": -1156.0,
+            "fits_hot_resume": false
+          },
+          "2": {
+            "transport_lower_bound_cycles": 3368.0,
+            "separate_install_bound_cycles": 2996,
+            "aggregate_completion_bound_cycles": 3368.0,
+            "margin_to_hot_resume_cycles": 2183.0,
+            "fits_hot_resume": true
+          },
+          "3": {
+            "transport_lower_bound_cycles": 2573.0,
+            "separate_install_bound_cycles": 2996,
+            "aggregate_completion_bound_cycles": 2996,
+            "margin_to_hot_resume_cycles": 2555.0,
+            "fits_hot_resume": true
+          },
+          "4": {
+            "transport_lower_bound_cycles": 2573.0,
+            "separate_install_bound_cycles": 2996,
+            "aggregate_completion_bound_cycles": 2996,
+            "margin_to_hot_resume_cycles": 2555.0,
+            "fits_hot_resume": true
+          },
+          "5": {
+            "transport_lower_bound_cycles": 2573.0,
+            "separate_install_bound_cycles": 2996,
+            "aggregate_completion_bound_cycles": 2996,
+            "margin_to_hot_resume_cycles": 2555.0,
+            "fits_hot_resume": true
+          },
+          "10": {
+            "transport_lower_bound_cycles": 2573.0,
+            "separate_install_bound_cycles": 2996,
+            "aggregate_completion_bound_cycles": 2996,
+            "margin_to_hot_resume_cycles": 2555.0,
+            "fits_hot_resume": true
+          }
+        },
+        "41": {
+          "1": {
+            "transport_lower_bound_cycles": 13087.0,
+            "separate_install_bound_cycles": 3016,
+            "aggregate_completion_bound_cycles": 13087.0,
+            "margin_to_hot_resume_cycles": -7536.0,
+            "fits_hot_resume": false
+          },
+          "2": {
+            "transport_lower_bound_cycles": 6568.0,
+            "separate_install_bound_cycles": 3016,
+            "aggregate_completion_bound_cycles": 6568.0,
+            "margin_to_hot_resume_cycles": -1017.0,
+            "fits_hot_resume": false
+          },
+          "3": {
+            "transport_lower_bound_cycles": 4395.0,
+            "separate_install_bound_cycles": 3016,
+            "aggregate_completion_bound_cycles": 4395.0,
+            "margin_to_hot_resume_cycles": 1156.0,
+            "fits_hot_resume": true
+          },
+          "4": {
+            "transport_lower_bound_cycles": 3308.5,
+            "separate_install_bound_cycles": 3016,
+            "aggregate_completion_bound_cycles": 3308.5,
+            "margin_to_hot_resume_cycles": 2242.5,
+            "fits_hot_resume": true
+          },
+          "5": {
+            "transport_lower_bound_cycles": 2656.6,
+            "separate_install_bound_cycles": 3016,
+            "aggregate_completion_bound_cycles": 3016,
+            "margin_to_hot_resume_cycles": 2535.0,
+            "fits_hot_resume": true
+          },
+          "10": {
+            "transport_lower_bound_cycles": 2593.0,
+            "separate_install_bound_cycles": 3016,
+            "aggregate_completion_bound_cycles": 3016,
+            "margin_to_hot_resume_cycles": 2535.0,
+            "fits_hot_resume": true
+          }
+        }
+      }
+    },
+    "kernel_plus_application": {
+      "i_lines": 175,
+      "d_lines": 304,
+      "total_lines": 479,
+      "separate_install_completion_cycles": {
+        "21": 5189,
+        "41": 5209
+      },
+      "shared_install_completion_cycles": {
+        "21": 8164,
+        "41": 8184
+      },
+      "slot_sweep": {
+        "21": {
+          "1": {
+            "transport_lower_bound_cycles": 10067.0,
+            "separate_install_bound_cycles": 5189,
+            "aggregate_completion_bound_cycles": 10067.0,
+            "margin_to_hot_resume_cycles": -4516.0,
+            "fits_hot_resume": false
+          },
+          "2": {
+            "transport_lower_bound_cycles": 5048.0,
+            "separate_install_bound_cycles": 5189,
+            "aggregate_completion_bound_cycles": 5189,
+            "margin_to_hot_resume_cycles": 362.0,
+            "fits_hot_resume": true
+          },
+          "3": {
+            "transport_lower_bound_cycles": 3853.0,
+            "separate_install_bound_cycles": 5189,
+            "aggregate_completion_bound_cycles": 5189,
+            "margin_to_hot_resume_cycles": 362.0,
+            "fits_hot_resume": true
+          },
+          "4": {
+            "transport_lower_bound_cycles": 3853.0,
+            "separate_install_bound_cycles": 5189,
+            "aggregate_completion_bound_cycles": 5189,
+            "margin_to_hot_resume_cycles": 362.0,
+            "fits_hot_resume": true
+          },
+          "5": {
+            "transport_lower_bound_cycles": 3853.0,
+            "separate_install_bound_cycles": 5189,
+            "aggregate_completion_bound_cycles": 5189,
+            "margin_to_hot_resume_cycles": 362.0,
+            "fits_hot_resume": true
+          },
+          "10": {
+            "transport_lower_bound_cycles": 3853.0,
+            "separate_install_bound_cycles": 5189,
+            "aggregate_completion_bound_cycles": 5189,
+            "margin_to_hot_resume_cycles": 362.0,
+            "fits_hot_resume": true
+          }
+        },
+        "41": {
+          "1": {
+            "transport_lower_bound_cycles": 19647.0,
+            "separate_install_bound_cycles": 5209,
+            "aggregate_completion_bound_cycles": 19647.0,
+            "margin_to_hot_resume_cycles": -14096.0,
+            "fits_hot_resume": false
+          },
+          "2": {
+            "transport_lower_bound_cycles": 9848.0,
+            "separate_install_bound_cycles": 5209,
+            "aggregate_completion_bound_cycles": 9848.0,
+            "margin_to_hot_resume_cycles": -4297.0,
+            "fits_hot_resume": false
+          },
+          "3": {
+            "transport_lower_bound_cycles": 6581.666666666666,
+            "separate_install_bound_cycles": 5209,
+            "aggregate_completion_bound_cycles": 6581.666666666666,
+            "margin_to_hot_resume_cycles": -1030.666666666666,
+            "fits_hot_resume": false
+          },
+          "4": {
+            "transport_lower_bound_cycles": 4948.5,
+            "separate_install_bound_cycles": 5209,
+            "aggregate_completion_bound_cycles": 5209,
+            "margin_to_hot_resume_cycles": 342.0,
+            "fits_hot_resume": true
+          },
+          "5": {
+            "transport_lower_bound_cycles": 3968.5999999999995,
+            "separate_install_bound_cycles": 5209,
+            "aggregate_completion_bound_cycles": 5209,
+            "margin_to_hot_resume_cycles": 342.0,
+            "fits_hot_resume": true
+          },
+          "10": {
+            "transport_lower_bound_cycles": 3873.0,
+            "separate_install_bound_cycles": 5209,
+            "aggregate_completion_bound_cycles": 5209,
+            "margin_to_hot_resume_cycles": 342.0,
+            "fits_hot_resume": true
+          }
+        }
+      }
+    }
+  },
+  "derived": {
+    "kernel_plus_application_required_rate_MBps": 99.40695370203566,
+    "raw_64bit_axi_rate_MBps": 144.0,
+    "four_slot_41cycle_projected_rate_MBps": 105.93357650220771,
+    "minimum_slots_at_41cycle_latency": 4
+  },
+  "limits": [
+    "The instruction/data line values are refill-latency equivalents, not measured miss addresses or exact counts.",
+    "The AXI calculation is a work-conserving lower bound and does not model DDR scheduling, arbitration bubbles, or useful-line ordering.",
+    "Seventeen cycles is measured for the data-cache installer; an equivalent instruction-cache replay installer does not exist yet.",
+    "All lines are required by first user dispatch in this deliberately strict bound; real deadlines are per-line and order dependent.",
+    "Translation replay, dirty writebacks, capacity replacement, and scheduler-generated traffic are excluded."
+  ]
+}

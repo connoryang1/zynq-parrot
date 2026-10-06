@@ -1,0 +1,407 @@
+{
+  "method": "64-set, 8-way line-LRU trace model. Contexts 1 and 2 receive 1/2/3 protected ways per set; residents fill protected invalid ways, then use shared ways for overflow. Context 0 uses only shared ways. Replay each trace once to warm model state, then report a second identical pass including context-0 interference.",
+  "inputs": {
+    "logs/context-resume-footprint-20261002/scan.json": "9b5c486fb2008c1ec1cb4d2fcc327498a07a63e1325d11c46ac57bd2c3184ac0",
+    "logs/context-resume-footprint-20261002/trie-stream.json": "b11235affb3102101a15e620028dbf8093e96631a3942a5fbc24023809d28762",
+    "logs/context-resume-footprint-20261002/pointer-compute.json": "fd5818dfe185ee76011b7defbfe9ab7e1c327086070077bb9de4add50b2e1e32"
+  },
+  "traces": {
+    "scan": {
+      "shared8": {
+        "by_context": {
+          "0": {
+            "accesses": 54713,
+            "hits": 54713,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "1": {
+            "accesses": 3021,
+            "hits": 3021,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "2": {
+            "accesses": 3021,
+            "hits": 3021,
+            "misses": 0,
+            "miss_rate": 0.0
+          }
+        },
+        "resident": {
+          "accesses": 6042,
+          "misses": 0,
+          "miss_rate": 0.0
+        },
+        "context0": {
+          "accesses": 54713,
+          "misses": 0,
+          "miss_rate": 0.0
+        }
+      },
+      "protected": {
+        "1": {
+          "reserved_ways_each": 1,
+          "shared_ways": 6,
+          "by_context": {
+            "0": {
+              "accesses": 54713,
+              "hits": 54713,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "1": {
+              "accesses": 3021,
+              "hits": 3021,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "2": {
+              "accesses": 3021,
+              "hits": 3021,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 6042,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 54713,
+            "misses": 0,
+            "miss_rate": 0.0
+          }
+        },
+        "2": {
+          "reserved_ways_each": 2,
+          "shared_ways": 4,
+          "by_context": {
+            "0": {
+              "accesses": 54713,
+              "hits": 54713,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "1": {
+              "accesses": 3021,
+              "hits": 3021,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "2": {
+              "accesses": 3021,
+              "hits": 3021,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 6042,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 54713,
+            "misses": 0,
+            "miss_rate": 0.0
+          }
+        },
+        "3": {
+          "reserved_ways_each": 3,
+          "shared_ways": 2,
+          "by_context": {
+            "0": {
+              "accesses": 54713,
+              "hits": 54373,
+              "misses": 340,
+              "miss_rate": 0.00621424524336081
+            },
+            "1": {
+              "accesses": 3021,
+              "hits": 3021,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "2": {
+              "accesses": 3021,
+              "hits": 3021,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 6042,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 54713,
+            "misses": 340,
+            "miss_rate": 0.00621424524336081
+          }
+        }
+      }
+    },
+    "trie-stream": {
+      "shared8": {
+        "by_context": {
+          "0": {
+            "accesses": 48790,
+            "hits": 48790,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "1": {
+            "accesses": 11652,
+            "hits": 11652,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "2": {
+            "accesses": 11652,
+            "hits": 11652,
+            "misses": 0,
+            "miss_rate": 0.0
+          }
+        },
+        "resident": {
+          "accesses": 23304,
+          "misses": 0,
+          "miss_rate": 0.0
+        },
+        "context0": {
+          "accesses": 48790,
+          "misses": 0,
+          "miss_rate": 0.0
+        }
+      },
+      "protected": {
+        "1": {
+          "reserved_ways_each": 1,
+          "shared_ways": 6,
+          "by_context": {
+            "0": {
+              "accesses": 48790,
+              "hits": 48790,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "1": {
+              "accesses": 11652,
+              "hits": 11652,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "2": {
+              "accesses": 11652,
+              "hits": 11652,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 23304,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 48790,
+            "misses": 0,
+            "miss_rate": 0.0
+          }
+        },
+        "2": {
+          "reserved_ways_each": 2,
+          "shared_ways": 4,
+          "by_context": {
+            "0": {
+              "accesses": 48790,
+              "hits": 48787,
+              "misses": 3,
+              "miss_rate": 6.148800983808158e-05
+            },
+            "1": {
+              "accesses": 11652,
+              "hits": 11652,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "2": {
+              "accesses": 11652,
+              "hits": 11652,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 23304,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 48790,
+            "misses": 3,
+            "miss_rate": 6.148800983808158e-05
+          }
+        },
+        "3": {
+          "reserved_ways_each": 3,
+          "shared_ways": 2,
+          "by_context": {
+            "0": {
+              "accesses": 48790,
+              "hits": 48716,
+              "misses": 74,
+              "miss_rate": 0.0015167042426726788
+            },
+            "1": {
+              "accesses": 11652,
+              "hits": 11652,
+              "misses": 0,
+              "miss_rate": 0.0
+            },
+            "2": {
+              "accesses": 11652,
+              "hits": 11652,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 23304,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 48790,
+            "misses": 74,
+            "miss_rate": 0.0015167042426726788
+          }
+        }
+      }
+    },
+    "pointer-compute": {
+      "shared8": {
+        "by_context": {
+          "0": {
+            "accesses": 22666,
+            "hits": 21759,
+            "misses": 907,
+            "miss_rate": 0.04001588282008294
+          },
+          "1": {
+            "accesses": 128,
+            "hits": 128,
+            "misses": 0,
+            "miss_rate": 0.0
+          }
+        },
+        "resident": {
+          "accesses": 128,
+          "misses": 0,
+          "miss_rate": 0.0
+        },
+        "context0": {
+          "accesses": 22666,
+          "misses": 907,
+          "miss_rate": 0.04001588282008294
+        }
+      },
+      "protected": {
+        "1": {
+          "reserved_ways_each": 1,
+          "shared_ways": 6,
+          "by_context": {
+            "0": {
+              "accesses": 22666,
+              "hits": 21539,
+              "misses": 1127,
+              "miss_rate": 0.04972205064854849
+            },
+            "1": {
+              "accesses": 128,
+              "hits": 128,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 128,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 22666,
+            "misses": 1127,
+            "miss_rate": 0.04972205064854849
+          }
+        },
+        "2": {
+          "reserved_ways_each": 2,
+          "shared_ways": 4,
+          "by_context": {
+            "0": {
+              "accesses": 22666,
+              "hits": 21503,
+              "misses": 1163,
+              "miss_rate": 0.05131033265684285
+            },
+            "1": {
+              "accesses": 128,
+              "hits": 128,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 128,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 22666,
+            "misses": 1163,
+            "miss_rate": 0.05131033265684285
+          }
+        },
+        "3": {
+          "reserved_ways_each": 3,
+          "shared_ways": 2,
+          "by_context": {
+            "0": {
+              "accesses": 22666,
+              "hits": 21503,
+              "misses": 1163,
+              "miss_rate": 0.05131033265684285
+            },
+            "1": {
+              "accesses": 128,
+              "hits": 128,
+              "misses": 0,
+              "miss_rate": 0.0
+            }
+          },
+          "resident": {
+            "accesses": 128,
+            "misses": 0,
+            "miss_rate": 0.0
+          },
+          "context0": {
+            "accesses": 22666,
+            "misses": 1163,
+            "miss_rate": 0.05131033265684285
+          }
+        }
+      }
+    }
+  },
+  "limits": [
+    "Data-access traces do not model instruction-cache accesses.",
+    "The simple LRU model does not reproduce every BlackParrot replacement, write, refill, or initial-state detail.",
+    "Protected-way ownership is a proposed policy, not implemented RTL.",
+    "Contexts 1 and 2 are the paired workers in scan/trie; pointer-compute has only context 1 activity in the captured data trace.",
+    "Repeating the complete trace removes cold initialization but assumes the captured access sequence is representative of a following interval."
+  ]
+}

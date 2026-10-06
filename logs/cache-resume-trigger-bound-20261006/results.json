@@ -1,0 +1,75 @@
+{
+  "method": "Apply the four-slot, 41-cycle shared-transport and separate 17-cycle I/D install bound to measured trigger windows. The Linux late-trigger window is deliberately generous: the whole alternate-thread delta is credited even though it includes task selection.",
+  "inputs": {
+    "shared_path_results": "logs/cache-resume-shared-path-bound-20261006/results.json",
+    "scheduler_breakdown": "logs/linux-hot-scheduler-breakdown-20261003/analysis.json",
+    "latency_cycles": 41,
+    "outstanding_slots": 4,
+    "beats_per_line": 8,
+    "install_cycles_per_line": 17,
+    "full_target_lines": 479,
+    "kernel_target_lines": 319,
+    "hot_dispatch_deadline_cycles": 5551.0,
+    "full_target_completion_cycles": 5209,
+    "kernel_target_completion_cycles": 3308.5
+  },
+  "derived": {
+    "latest_full_target_trigger_after_yield_entry_cycles": 342.0,
+    "latest_kernel_target_trigger_after_yield_entry_cycles": 2242.5,
+    "late_trigger_max_lines": 214,
+    "late_trigger_full_target_shortfall_lines": 265
+  },
+  "coverage": {
+    "yield_entry_to_hot_dispatch": {
+      "window_cycles": 5551.0,
+      "transport_line_capacity": 537,
+      "per_cache_install_line_capacity": 324,
+      "two_cache_install_line_capacity": 648,
+      "aggregate_mixed_line_capacity": 537,
+      "fraction_of_479_line_target": 1.1210855949895615,
+      "fraction_of_319_line_kernel_target": 1.683385579937304
+    },
+    "generous_selection_switch_return_delta": {
+      "window_cycles": 2238.0,
+      "transport_line_capacity": 214,
+      "per_cache_install_line_capacity": 129,
+      "two_cache_install_line_capacity": 258,
+      "aggregate_mixed_line_capacity": 214,
+      "fraction_of_479_line_target": 0.44676409185803756,
+      "fraction_of_319_line_kernel_target": 0.670846394984326
+    },
+    "worker_selection_switch_return_delta": {
+      "window_cycles": 2139.0,
+      "transport_line_capacity": 204,
+      "per_cache_install_line_capacity": 123,
+      "two_cache_install_line_capacity": 246,
+      "aggregate_mixed_line_capacity": 204,
+      "fraction_of_479_line_target": 0.42588726513569936,
+      "fraction_of_319_line_kernel_target": 0.6394984326018809
+    },
+    "resident_handoff_5_13": {
+      "window_cycles": 5.13,
+      "transport_line_capacity": 0,
+      "per_cache_install_line_capacity": 0,
+      "two_cache_install_line_capacity": 0,
+      "aggregate_mixed_line_capacity": 0,
+      "fraction_of_479_line_target": 0.0,
+      "fraction_of_319_line_kernel_target": 0.0
+    },
+    "nonresident_handoff_9_26": {
+      "window_cycles": 9.26,
+      "transport_line_capacity": 0,
+      "per_cache_install_line_capacity": 0,
+      "two_cache_install_line_capacity": 0,
+      "aggregate_mixed_line_capacity": 0,
+      "fraction_of_479_line_target": 0.0,
+      "fraction_of_319_line_kernel_target": 0.0
+    }
+  },
+  "limits": [
+    "The alternate-thread delta is not a measured timestamp of task selection; treating all of it as post-selection replay time is an optimistic upper bound.",
+    "Line capacities do not imply usefulness because actual miss addresses, order, and deadlines are unknown.",
+    "The input line targets are refill-latency equivalents, not exact miss counts.",
+    "The model excludes translation, dirty victims, capacity replacement, and arbitration bubbles."
+  ]
+}
