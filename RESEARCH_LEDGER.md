@@ -147,6 +147,42 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** useful cache restoration is physically real, but confidence filtering and hardware-side issue/training are necessary; software issue and general Linux scheduling overhead can consume the gain.
 - **Limits:** this supplies controlled correct/stale hints rather than automatically learning and replaying a per-context signature. The same-mm setup controls translation and does not establish separate-process behavior.
 
+### RL-015 — The realistic automatic D-resume opportunity is tens, not hundreds, of cycles
+
+- **Status:** evidence-linked projection, not a measured implementation
+- **Scope:** previous-first trace precision combined with translation-primed physical application-work savings
+- **Claim:** eight exact correct hints save an average 255.25 cycles in a 3,254.5-cycle phase, a 7.84% reduction or 1.085x phase speedup. A realistic previous-first signature projects only 10.0–45.5 cycles for scan at depth two and 33.4–81.3 at depth four; trie projects 6.4–22.8 and 14.4–46.1 cycles. These are 0.2–2.5% phase reductions. Pointer-plus-compute and dependent-chain controls project zero.
+- **Evidence:** `logs/automatic-resume-signature-projection-20261006/README.md` and reproducible `analyze.py`/`results.json` in that directory, combining the exact inputs from RL-013 and RL-014.
+- **Meaning:** an automatic D-cache signature can remove tens of cycles from recurring resumes, but D-cache history alone is unlikely to produce a large end-to-end result on these 3.2k-cycle phases. Depth two is the low-risk starting point; depth four needs positive consumption feedback.
+- **Limits:** the ready-only floor ignores useful partial progress, while the full-hit-value cap assumes the trace predictor realizes the value of controlled physical hints. Hardware training/replay costs and cache pollution are not modeled.
+
+### RL-016 — Cold Linux resume instruction and data penalties were already decomposed
+
+- **Status:** confirmed physical measurement
+- **Scope:** same-mm `sched_yield` on the FPGA with independent and combined cache/TLB displacement controls
+- **Claim:** the hot resume median is 5,551 cycles. A 32-KiB instruction footprint raises it to 12,160 (+6,609), a 128-KiB clean-data footprint to 11,136.5 (+5,585.5), and both to 17,335–17,421.5. Only 2.7–3.4% of the two penalties overlaps. The instruction sweep is equivalent to about 175 serialized line refills and the data sweep to about 143, suggesting 128–192 remembered lines on each side as useful design points.
+- **Evidence:** `logs/linux-scheduler-resume-20261002/README.md` and `results.json`; component controls in `logs/cold-resume-components-20261002/README.md`.
+- **Meaning:** the large ordinary-Linux cold-resume opportunity is kernel/task instruction and data recovery, with an ideal combined hot-floor opportunity around 3.12–3.14x. A few application data hints cannot recover this interval.
+- **Limits:** refill-equivalent counts are sizing guides rather than measured unique misses. The experiment includes syscall, scheduler, and return work and is not the five-cycle hardware handoff.
+
+### RL-017 — Large application-state replay was already bounded physically
+
+- **Status:** confirmed physical upper bound and replay-cost measurement
+- **Scope:** ideal completed replay of private 128/160/192-line working sets before same-mm Linux dispatch
+- **Claim:** replay reduces post-resume application work by 6.23x, 6.59x, and 6.08x for 128, 160, and 192 lines. Scheduler-inclusive measured speedups are 1.39x, 1.49x, and 1.56x because Linux resume remains about 11.37k cycles. Combining replay work with the separately measured hot-kernel floor projects 2.63x, 2.78x, and 2.85x. Serial software replay costs 5.6k–8.5k cycles: it fits inside Linux resume slack but is far too long for a 5–11-cycle hardware handoff.
+- **Evidence:** `logs/linux-post-resume-replay-20261002/README.md`, `results.json`, and `cost-results.json`.
+- **Meaning:** a substantial design must either begin replay while the task is off CPU or entering the Linux scheduler, exploit much more replay parallelism, or preserve/partition cache state. Switch-time replay alone cannot rebuild hundreds of lines.
+- **Limits:** completed replay is an oracle upper bound using exact lines and ordinary loads. The projected combined result is composed from measured components rather than an end-to-end hardware replay implementation.
+
+### RL-018 — Replay and retention serve different scheduling regimes
+
+- **Status:** evidence-linked architectural accounting model
+- **Scope:** measured 128/160/192-line replay costs, 11.35k-cycle Linux resume slack, and two 32-KiB eight-way resident caches
+- **Claim:** combined I+D replay at 128 lines each already fits the measured Linux resume interval at the serial software rate; 160 and 192 lines need only 1.24x and 1.48x that rate, or 32.5 and 38.7 MB/s. Retaining the same state for two resident contexts consumes 4, 5, or 6 of eight ways in each cache, leaving 4, 3, or 2 ways shared. Address histories for ten logical contexts require a raw minimum of about 5–7 BRAM18 blocks.
+- **Evidence:** `logs/cache-resume-replay-vs-retention-20261006/README.md` and reproducible `model.py`/`results.json`, derived from the accepted RL-016/RL-017 inputs.
+- **Meaning:** resident contexts need retention for immediate hot state because a 5–11-cycle handoff cannot hide large replay. Nonresident or normally scheduled contexts can use background replay during the long Linux interval. A hybrid design matches both regimes.
+- **Limits:** concurrent replay throughput, cache installation contention, retention pollution, and useful-before-demand behavior remain unmeasured. The 160-line retention point is not a uniform integer-way partition.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -196,11 +232,20 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 - **Missing:** hardware training and replay tied to context selection, forced-cold separate-context execution, and a comparison of automatic signature against explicit hints and no hints.
 - **Decisive experiment:** implement the already proposed two-first/adaptive-four signature with consumption confidence, context generation tags, L1 lookup, and counters for issued, consumed, late, unused, and dropped entries. Run scan and trie as positive cases and dependent chains as the no-regression control.
 
+### OQ-005 — Should the large design use background replay or cache-state retention?
+
+- **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot.
+- **Missing:** achieved concurrent replay/install rate and interference, plus measured workload loss from leaving only two to four ways shared under retention.
+- **Decisive experiment:** prototype the mechanisms separately in simulation: a 160-line combined background replay with scheduler traffic, and two-context 2/3-way retention under scan/trie plus a cache-capacity stress control. Compare useful-before-demand fraction and total cycles before choosing the physical RTL.
+
 ## Next experiment
 
-The immediate next experiment is OQ-001 because the diagnostic is complete and a physical capture can resolve a current correctness uncertainty. It requires a confirmed recovery cycle and exact overlay reload; no simulator result substitutes for the board observation. Once reliability is closed, the main new architectural step is OQ-004: implement the automatic signature already justified by the completed trace model and physical correct/stale-hint controls. OQ-002 remains the smallest control for separating exposed physical memory waiting from control dominance in the older matched microbenchmark.
+The immediate next experiment is OQ-001 because the diagnostic is complete and a physical capture can resolve a current correctness uncertainty. It requires a confirmed recovery cycle and exact overlay reload; no simulator result substitutes for the board observation. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, or first-order replay/retention modeling: RL-013 through RL-018 cover them. The next new measurement is OQ-005's targeted simulation of achieved replay/install overlap versus retention capacity loss; OQ-004's small automatic signature is a complementary low-cost path rather than the main speedup mechanism.
 
 ## Delta log
 
 - **2026-10-06 — Ledger created after a demonstrated synthesis regression:** a later summary incorrectly promoted the intermediate 418/396 result over the accepted 398/396 result. The ledger now distinguishes baseline expectations, final synthetic evidence, physical-DDR evidence, sustained Linux/FPGA results, and superseded interpretations.
 - **2026-10-06 — Resume-footprint omission corrected:** the initial ledger incorrectly listed bounded-history modeling as future work. The repository already contains the completed predictor-depth/timeliness study and a 448-sample physical Linux precision sweep after side-buffer fixes; RL-013/RL-014 now capture them, and OQ-004 is narrowed to the unimplemented automatic training/replay mechanism.
+- **2026-10-06 — Automatic-signature value bounded:** combining trace precision with physical application-work savings projects only 0.2–2.5% phase reduction for realistic depth-two/four signatures, versus a 7.84% reduction for eight exact hints. This prompted an audit of whether larger cold-resume components had already been measured.
+- **2026-10-06 — Existing cold-resume decomposition recovered:** instruction-only, data-only, translation, combined-pollution, ideal 128–192-line replay, and replay-cost experiments were already complete. The ledger now treats background replay versus cache-state retention as the unresolved architectural choice instead of proposing another component measurement.
+- **2026-10-06 — Replay-versus-retention regimes separated:** the measured middle point needs only 1.24x serial replay throughput to hide combined I+D replay under Linux, whereas a five-cycle hardware handoff needs retained state. Two resident contexts can retain the measured 128–192-line range using 4–6 of eight ways; the remaining question is measured contention and capacity loss.
