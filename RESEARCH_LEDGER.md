@@ -127,7 +127,25 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Claim:** sequence-numbered pre-read markers and post-read counter/timing lines distinguish advancing retirement, a target counter plateau, and a blocked GP/MMIO read. In the simulator, all 15 markers pair and the two reads take a 41.228-ms median host time.
 - **Evidence:** `logs/process-rebind-20261004/control-liveness-instrumentation-status.json`; `WORK_LOG.md` entry **Boot-stall liveness instrumentation validated**.
 - **Meaning:** the next physical nonreturn can be localized without guessing from an absent final line.
-- **Limits:** no recovery-qualified physical stall has yet been captured because board power/network access is unavailable.
+- **Limits:** no recovery-qualified physical stall has yet been captured. Board SSH is reachable again, but the external power controller still rejects both recovery requests, so the required physical power cycle cannot be confirmed.
+
+### RL-013 — Resume-footprint prediction was already modeled
+
+- **Status:** confirmed trace analysis
+- **Scope:** retained scan, trie/irregular-stream, pointer-plus-compute, and ten-dependent-chain traces using 16-byte sectors
+- **Claim:** retaining the ordered first unique sectors from a context's previous epoch is the strongest tested small predictor. At depth two, next-resume precision is 91.5% for scan and 45.7% for trie, supplying about 1.87 and 1.21 useful sectors per resume; pointer-plus-compute and dependent-chain controls are effectively 0%. Prior MRU order performs much worse. Two entries are the conservative starting point, with adaptive expansion toward four when consumption feedback is positive.
+- **Evidence:** `logs/context-resume-footprint-20261002/README.md` and `model-results.json` in the same directory.
+- **Meaning:** the address-recurrence opportunity, predictor family, useful depth, timeliness model, negative controls, and sub-1-KiB ten-context storage estimate have already been investigated. This is not future preliminary work.
+- **Limits:** the source traces are synthetic and mostly warm-cache. They estimate recurrence and timeliness rather than forced-cold Linux end-to-end speedup.
+
+### RL-014 — Correct resume hints were tested physically under Linux
+
+- **Status:** confirmed physical measurement
+- **Scope:** same-mm Linux precision sweep with eight explicit hints, corrected whole-entry reclaim, and round-robin stale-entry replacement
+- **Claim:** after the buffer fixes, eight correct hints save 271.5 application cycles toward main and 239 toward worker beyond translation priming. Hints seven and eight alone save 69 application cycles in each direction. Observed total medians finish 80/73.5 cycles faster than cold demand, but independent-bootstrap intervals include zero; repeatable scheduler-inclusive break-even is not established. Eight stale hints remain 240/189 cycles slower than cold.
+- **Evidence:** `logs/linux-prefetch-precision-sweep-rotate-20261003/README.md`, `logs/linux-prefetch-retention-controls-rotate-20261003/README.md`, and the `WORK_LOG.md` entry **Stale side-buffer replacement recovers late hints on real DDR**.
+- **Meaning:** useful cache restoration is physically real, but confidence filtering and hardware-side issue/training are necessary; software issue and general Linux scheduling overhead can consume the gain.
+- **Limits:** this supplies controlled correct/stale hints rather than automatically learning and replaying a per-context signature. The same-mm setup controls translation and does not establish separate-process behavior.
 
 ## Superseded or rejected findings
 
@@ -157,7 +175,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 - **Known:** the staged liveness runner can distinguish retirement plateau, timer plateau, and blocked MMIO reads.
 - **Missing:** one clean, recovery-qualified physical capture.
-- **Blocker:** the power controller is unreachable and the current execution environment denies the board SSH socket.
+- **Blocker:** board SSH is reachable, but the external power controller is still unreachable; the 23-hour uptime proves that no new recovery cycle occurred before the latest status check.
 - **Decisive experiment:** power-cycle, wait for PYNQ readiness, reload the exact overlay, verify hashes, then run the staged diagnostic until completion or bounded failure.
 
 ### OQ-002 — How much physical worker time is exposed memory waiting?
@@ -172,16 +190,17 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 - **Missing:** a detailed memory model or physical platform with a realistic higher core-to-memory frequency ratio and matched request capacity.
 - **Decisive experiment:** sweep latency, bandwidth, return pacing, slot count, resident count, and switch cost independently using the final RTL and one common benchmark binary.
 
-### OQ-004 — Can context-associated cache restoration improve real applications?
+### OQ-004 — Does an automatic per-context signature retain the modeled and explicit-hint benefit?
 
-- **Known:** exact prior cache contents can be stale and expensive to retain; a bounded recent-line or miss-PC predictor is more plausible.
-- **Missing:** implementation and Linux application measurements.
-- **Decisive experiment:** first model bounded per-context line histories against retained resume-footprint traces, then implement only if precision, timeliness, and storage estimates justify hardware.
+- **Known:** the previous-first predictor, depths 1/2/4/10, timeliness, negative controls, storage estimate, and physical correct/stale-hint value have already been measured in RL-013 and RL-014.
+- **Missing:** hardware training and replay tied to context selection, forced-cold separate-context execution, and a comparison of automatic signature against explicit hints and no hints.
+- **Decisive experiment:** implement the already proposed two-first/adaptive-four signature with consumption confidence, context generation tags, L1 lookup, and counters for issued, consumed, late, unused, and dropped entries. Run scan and trie as positive cases and dependent chains as the no-regression control.
 
 ## Next experiment
 
-The immediate next experiment is OQ-001 because the diagnostic is complete and a physical capture can resolve a current correctness uncertainty. It requires restored external power and SSH access; no simulator result substitutes for the recovery-qualified board observation. Once board access is stable, OQ-002 is the smallest new performance experiment that can separate exposed physical memory waiting from control dominance.
+The immediate next experiment is OQ-001 because the diagnostic is complete and a physical capture can resolve a current correctness uncertainty. It requires a confirmed recovery cycle and exact overlay reload; no simulator result substitutes for the board observation. Once reliability is closed, the main new architectural step is OQ-004: implement the automatic signature already justified by the completed trace model and physical correct/stale-hint controls. OQ-002 remains the smallest control for separating exposed physical memory waiting from control dominance in the older matched microbenchmark.
 
 ## Delta log
 
 - **2026-10-06 — Ledger created after a demonstrated synthesis regression:** a later summary incorrectly promoted the intermediate 418/396 result over the accepted 398/396 result. The ledger now distinguishes baseline expectations, final synthetic evidence, physical-DDR evidence, sustained Linux/FPGA results, and superseded interpretations.
+- **2026-10-06 — Resume-footprint omission corrected:** the initial ledger incorrectly listed bounded-history modeling as future work. The repository already contains the completed predictor-depth/timeliness study and a 448-sample physical Linux precision sweep after side-buffer fixes; RL-013/RL-014 now capture them, and OQ-004 is narrowed to the unimplemented automatic training/replay mechanism.
