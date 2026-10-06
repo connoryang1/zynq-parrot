@@ -1,0 +1,21 @@
+Script started on 2026-10-06 19:17:13+0000
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: counter clocks ACLK=15000000 Hz RTCLK=7998853 Hz
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe89a680 40000004 16 1
+INFO:    Creating host: 0xbe89a680 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 67108864
+control-program: /home/xilinx/zynq-parrot/cosim/include/zynq/bsg_zynq_pl.h:87: virtual void* bsg_zynq_pl::allocate_dram(long unsigned int, long unsigned int*): Assertion `virtual_ptr != NULL' failed.
