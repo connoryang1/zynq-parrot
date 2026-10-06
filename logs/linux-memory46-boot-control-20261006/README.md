@@ -150,8 +150,12 @@ not OpenSBI's machine-mode trap path.  Repeating the test after the same debug
 exit used by the maintained privilege tests passes, ruling out a general
 M-mode exception defect in this RTL.
 
-Routed job `20261006T212207Z-5c8475df` remains useful as a direct-zero-WARL
-compatibility candidate.  The original recorder image has already passed
-OpenSBI, direct PID 1 Linux boot, and the hardware handoff after the packaging
-fix.  Cache-miss trace readout and the intended Linux performance workload
-remain separate measurement gates.
+Routed job `20261006T212207Z-5c8475df` completed PASS as a direct-zero-WARL
+compatibility candidate. It closed timing at +0.885 ns WNS and used 50,518
+slice LUTs (94.96%), 21,581 registers (20.28%), 82 block-RAM tiles (58.57%),
+and 11 DSPs (5.00%). Its bitstream SHA-256 is
+`7c6becdda90ff2dd2c2ce48abeb8611eda603e105277af2ed6c0e4ee3c4c5ad9`.
+The original recorder image has already passed OpenSBI, direct PID 1 Linux
+boot, the hardware handoff, and sliced Linux cache-miss capture after the
+packaging fix. The compatibility image still requires its own physical boot
+gate before replacing the recorder image.

@@ -552,3 +552,13 @@ OpenSBI `.text`, rejecting instructions that use any custom CSR from `0x800`
 through `0x807`. This executable-section check avoids false positives from
 arbitrary initramfs/data words; the older whole-NBF guard remains on the
 historical `0x800` through `0x804` contract.
+
+The optional `--window to-peer` and `--window from-peer` arguments arm only one
+handoff leg, allowing each half of a cold scheduler round trip to fit in the
+256-entry I/D histories. With no argument, the original full interval remains
+the default. If either history fills, the tool still prints every retained
+record, reports `TRACE_TRUNCATED`, and exits nonzero; only a no-overflow
+`TRACE_PASS` is a complete capture. `peer_block` is sampled after `FUTEX_WAKE`
+returns and can be later than source resume when Linux dispatches the source
+inside the wake syscall. The peer-entry and resumed-source window endpoints do
+not have that ordering ambiguity.

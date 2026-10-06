@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -20,9 +21,18 @@
 static _Atomic uint32_t phase;
 static _Atomic uint32_t peer_ready;
 static uint64_t peer_begin_cycle;
+static uint64_t peer_wake_cycle;
 static uint64_t peer_block_cycle;
+static uint64_t trace_start_cycle;
 static uint64_t icache_records[TRACE_DEPTH];
 static uint64_t dcache_records[TRACE_DEPTH];
+
+enum trace_window {
+  TRACE_WINDOW_FULL,
+  TRACE_WINDOW_TO_PEER,
+  TRACE_WINDOW_FROM_PEER,
+};
+static enum trace_window trace_window;
 
 static void fail(const char *what)
 {
@@ -131,8 +141,18 @@ static void *peer_main(void *unused)
   futex_wake_one(&peer_ready);
 
   wait_until(&phase, 1);
-  peer_begin_cycle = global_cycle();
+  if (trace_window == TRACE_WINDOW_FROM_PEER) {
+    trace_control(2);
+    trace_start_cycle = global_cycle();
+    peer_begin_cycle = trace_start_cycle;
+    trace_control(3);
+  } else {
+    peer_begin_cycle = global_cycle();
+    if (trace_window == TRACE_WINDOW_TO_PEER)
+      trace_control(0);
+  }
   atomic_store_explicit(&phase, 2, memory_order_release);
+  peer_wake_cycle = global_cycle();
   futex_wake_one(&phase);
   peer_block_cycle = global_cycle();
 
@@ -159,8 +179,26 @@ static void print_record(unsigned sequence, char side, unsigned index,
          sequence, side, index, cycle, relative, message, line << 6, record);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+  if (argc == 3 && !strcmp(argv[1], "--window")) {
+    if (!strcmp(argv[2], "full"))
+      trace_window = TRACE_WINDOW_FULL;
+    else if (!strcmp(argv[2], "to-peer"))
+      trace_window = TRACE_WINDOW_TO_PEER;
+    else if (!strcmp(argv[2], "from-peer"))
+      trace_window = TRACE_WINDOW_FROM_PEER;
+    else {
+      fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]\n",
+            stderr);
+      return EXIT_FAILURE;
+    }
+  } else if (argc != 1) {
+    fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]\n",
+          stderr);
+    return EXIT_FAILURE;
+  }
+
   const int cpu = pin_to_first_allowed_cpu();
   pthread_t peer;
   check_pthread(pthread_create(&peer, NULL, peer_main, NULL), "pthread_create");
@@ -168,8 +206,10 @@ int main(void)
 
   /* Clear while disarmed first, keeping setup and stale records out of scope. */
   trace_control(2);
-  const uint64_t start_cycle = global_cycle();
-  trace_control(3);
+  if (trace_window != TRACE_WINDOW_FROM_PEER) {
+    trace_start_cycle = global_cycle();
+    trace_control(3);
+  }
 
   atomic_store_explicit(&phase, 1, memory_order_release);
   futex_wake_one(&phase);
@@ -189,16 +229,20 @@ int main(void)
   const unsigned ioverflow = (unsigned)((status >> 18) & 1);
   const unsigned doverflow = (unsigned)((status >> 19) & 1);
   const unsigned armed = (unsigned)((status >> 20) & 1);
-  printf("TRACE_HEADER cpu=%d start=%" PRIu64 " peer_begin=%" PRIu64
-         " peer_block=%" PRIu64 " resume=%" PRIu64
+  const uint64_t stop_cycle = trace_window == TRACE_WINDOW_TO_PEER
+    ? peer_begin_cycle : resume_cycle;
+  printf("TRACE_HEADER cpu=%d window=%u start=%" PRIu64 " peer_begin=%" PRIu64
+         " peer_wake=%" PRIu64 " peer_block=%" PRIu64 " resume=%" PRIu64
          " elapsed=%" PRIu64 " i_count=%u d_count=%u"
          " i_overflow=%u d_overflow=%u armed=%u status=0x%016" PRIx64 "\n",
-         cpu, start_cycle, peer_begin_cycle, peer_block_cycle, resume_cycle,
-         resume_cycle - start_cycle, icount, dcount, ioverflow, doverflow,
+         cpu, (unsigned)trace_window, trace_start_cycle, peer_begin_cycle,
+         peer_wake_cycle, peer_block_cycle, resume_cycle,
+         stop_cycle - trace_start_cycle,
+         icount, dcount, ioverflow, doverflow,
          armed, status);
 
-  if (armed || ioverflow || doverflow || icount > TRACE_DEPTH ||
-      dcount > TRACE_DEPTH || icount + dcount == 0) {
+  if (armed || icount > TRACE_DEPTH || dcount > TRACE_DEPTH ||
+      icount + dcount == 0) {
     fputs("TRACE_FAIL invalid recorder status\n", stderr);
     return EXIT_FAILURE;
   }
@@ -209,7 +253,7 @@ int main(void)
     dcache_records[i] = trace_record(1, i);
 
   unsigned ii = 0, di = 0, sequence = 0;
-  const uint32_t start32 = (uint32_t)start_cycle;
+  const uint32_t start32 = (uint32_t)trace_start_cycle;
   while (ii < icount || di < dcount) {
     const uint32_t irelative = ii < icount
       ? record_cycle(icache_records[ii]) - start32 : UINT32_MAX;
@@ -223,7 +267,14 @@ int main(void)
       ++di;
     }
   }
+  if (ioverflow || doverflow) {
+    printf("TRACE_TRUNCATED records=%u elapsed=%" PRIu64
+           " i_overflow=%u d_overflow=%u\n",
+           icount + dcount, stop_cycle - trace_start_cycle,
+           ioverflow, doverflow);
+    return EXIT_FAILURE;
+  }
   printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
-         icount + dcount, resume_cycle - start_cycle);
+         icount + dcount, stop_cycle - trace_start_cycle);
   return EXIT_SUCCESS;
 }
