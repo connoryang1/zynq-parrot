@@ -59,6 +59,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_machine_trap_test \
     mt_opensbi_csr_probe_test \
     mt_satp_asid_warl_test \
     mt_cache_miss_trace_test \

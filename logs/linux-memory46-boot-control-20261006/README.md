@@ -87,9 +87,19 @@ the fragile temporary-trap probe path.
 
 The clean Verilator model passes both:
 
+- `mt_machine_trap_test`: after leaving the simulator CRT's reset/debug mode,
+  a cold M-mode ECALL records cause 11 and the exact fault PC, redirects through
+  `mtvec`, and returns through `mret`
 - `mt_opensbi_csr_probe_test`: every recovered probe reads zero and completes
 - `mt_umode_resident_sv39_data_handoff_test`: translated resident handoff,
   ECALL trap state, and return remain correct
+
+An initial version of the cold-trap regression omitted the simulator-only
+`dret` transition.  Its waveform correctly showed cause 11 redirecting to the
+debug exception slot at `0x80000008`; that result exercised reset/debug state,
+not OpenSBI's machine-mode trap path.  Repeating the test after the same debug
+exit used by the maintained privilege tests passes, ruling out a general
+M-mode exception defect in this RTL.
 
 Routed job `20261006T212207Z-5c8475df` is the pending physical gate.  Physical
 acceptance requires OpenSBI progress, direct PID 1 Linux boot, cache-miss trace
