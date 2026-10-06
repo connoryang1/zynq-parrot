@@ -52,6 +52,13 @@ payload identity/freshness before creating the NBF.  A successful program
 prints PASS and invokes Linux's poweroff syscall, which should end the board
 run in `CORE[0] PASS`.
 
+Linux NBF packaging deliberately omits `nbf.py --debug`.  That option pulses
+the BlackParrot debug interrupt before releasing the core, while OpenSBI has no
+`dret` startup stub.  Starting such an image in debug mode redirects its first
+synchronous probe to the debug exception slot instead of `mtvec`.  Normal
+packaging releases OpenSBI directly in M-mode so PMP and other discovery traps
+follow the architectural handler.
+
 The generated DTS, OpenSBI platform frequency, and final NBF timer selector are
 also kept consistent at 8 MHz. Packaging fails closed if the generated DTS or
 DTB has another timebase, then applies the same final-NBF selector check used

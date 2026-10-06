@@ -1,9 +1,10 @@
 # Linux boot localization on the cache-miss recorder image
 
-This directory records why the routed cache-miss recorder image did not reach
-Linux and the compatibility fix selected for the next route.  The failure is
-independent of the Linux userspace payload, DRAM allocation size, and timer
-source: execution stops in OpenSBI's early machine-mode hart initialization.
+This directory records why the routed cache-miss recorder image initially did
+not reach Linux and the packaging correction that produced a complete physical
+boot.  The original failure was independent of the Linux userspace payload,
+DRAM allocation size, and timer source: execution stopped in OpenSBI's early
+machine-mode hart initialization because the NBF loader had entered debug mode.
 
 ## Exact deployed hardware
 
@@ -69,7 +70,53 @@ so this is not a one-cycle CSR dependency.  A separate board probe reads
 `mtvec`, compares its low 32 bits with `0x8000ed60`, and reports `V0Mr`/PASS;
 the temporary handler address is present in the active CSR bank.
 
-## Recovered fix
+## Root cause: the NBF requested debug entry
+
+Both Linux packaging recipes invoked `nbf.py --debug`.  That option prepends a
+debug-interrupt pulse while the core is frozen:
+
+```text
+02_0000000000200008_0000000000000001  # freeze = 1
+02_000000000030c000_0000000000000001  # debug interrupt = 1
+fe_0000000000000000_0000000000000000  # fence
+02_000000000030c000_0000000000000000  # debug interrupt = 0
+```
+
+Clearing the interrupt does not leave architectural debug mode; software must
+execute `dret`.  OpenSBI has no debug-resume startup stub.  Its synchronous PMP
+probe therefore redirects to the debug exception PC at `0x80000008` instead of
+the programmed `mtvec`.  That address is the third instruction of OpenSBI's
+reset path, explaining both the failed temporary handler and continuing high
+retirement count.
+
+A standalone board test made the path visible with bytes `A/B` at reset,
+`C` at main, `E` before ECALL, `H` at `mtvec`, and `R` after `mret`:
+
+| NBF start and payload | Marker/result | Retired delta | MTIME delta |
+| --- | --- | ---: | ---: |
+| `--debug`, no `dret` | repeating `ABCE`, timeout | 117,684,716 | 7,813,048 |
+| `--debug`, explicit `dret` | `ABCEHR`, PASS | 3,152 | 361 |
+| no `--debug`, no `dret` | `ABCEHR`, PASS | 3,193 | 349 |
+
+The unchanged OpenSBI-only prefix, with only the three debug-pulse commands
+removed, prints the full OpenSBI v1.4 platform/HART report and reaches its
+S-mode handoff.  Its SHA-256 changes from
+`2ed63a1c8ad7df1198c3926dcaa43793b6913a3ef92534f4fd096ba20c4bcce6`
+to `07d9675b53796f557d36dc71ed6a0d7a6226839d84bf93ff6d05e86690890dbd`.
+The bounded prefix then runs into its intentionally absent payload.
+
+The full direct-PID-1 image was transformed the same way, changing SHA-256
+from `552d3cd768c4699f0e3991f26547cd98d6804d08216a8db489895a1261c3d053`
+to `1a7a733546ea9f0de897cea0ed6267b2e746a9b5df925f8acc7c3db2121df82d`.
+On the original recorder bitstream it booted Linux, ran `/ctxtsw_user_tiny`,
+completed the hardware `0 -> 2 -> 0` user-mode handoff, printed PASS, and
+powered down cleanly at Linux time 29.274616 s.  The host measured 304,368,284
+retired instructions and 296,503,987 MTIME ticks for the target run.
+
+The maintained `linux-tests/Makefile` now omits `--debug` for both Linux NBF
+packaging paths and has a host regression preventing its reintroduction.
+
+## Additional CSR compatibility route
 
 Git history contained three earlier commits on a divergent branch that made
 the exact OpenSBI probe classes legal hardwired-zero WARL state:
@@ -82,8 +129,10 @@ the exact OpenSBI probe classes legal hardwired-zero WARL state:
 Those commits were not ancestors of the recorder/ASID branch.  Their combined
 behavior is restored in BlackParrot `6a8f319891141b45d5011681a47603f71b8aecd6`,
 pinned by top-level `5c8475dfdf403cdbf3762fb187b8a48536561d62`.
-This accurately advertises no PMP or optional capability instead of relying on
-the fragile temporary-trap probe path.
+This accurately advertises no PMP or optional capability directly.  The
+physical no-debug run proves these RTL changes are not required to recover boot:
+the older recorder image's architectural illegal-instruction handler also
+completes OpenSBI discovery once it starts outside debug mode.
 
 The clean Verilator model passes both:
 
@@ -101,6 +150,8 @@ not OpenSBI's machine-mode trap path.  Repeating the test after the same debug
 exit used by the maintained privilege tests passes, ruling out a general
 M-mode exception defect in this RTL.
 
-Routed job `20261006T212207Z-5c8475df` is the pending physical gate.  Physical
-acceptance requires OpenSBI progress, direct PID 1 Linux boot, cache-miss trace
-readout, and the intended Linux workload on that exact bitstream.
+Routed job `20261006T212207Z-5c8475df` remains useful as a direct-zero-WARL
+compatibility candidate.  The original recorder image has already passed
+OpenSBI, direct PID 1 Linux boot, and the hardware handoff after the packaging
+fix.  Cache-miss trace readout and the intended Linux performance workload
+remain separate measurement gates.

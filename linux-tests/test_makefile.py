@@ -68,6 +68,21 @@ class LinuxHarnessTests(unittest.TestCase):
     def read_app(self, target):
         return json.loads((self.out / APPS[target]).read_bytes())
 
+    def test_linux_nbf_packaging_starts_in_machine_mode(self):
+        lines = (HERE / "Makefile").read_text().splitlines()
+        commands = []
+        for index, line in enumerate(lines):
+            if "python3 $(NBF_TOOL)" not in line:
+                continue
+            command = [line]
+            while command[-1].rstrip().endswith("\\"):
+                command.append(lines[index + len(command)])
+            commands.append("\n".join(command))
+        self.assertEqual(len(commands), 2)
+        for command in commands:
+            self.assertIn("--config", command)
+            self.assertNotIn("--debug", command)
+
     def test_target_syscall_round_trip(self):
         for target in ("tiny", "shell-app"):
             for flag in (1, 0, 1):

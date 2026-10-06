@@ -255,7 +255,10 @@ linux-image: check-image-toolchain stage-opensbi-platform
 	@mkdir -p $(OUT)
 	$(BP_OBJCOPY) -O verilog $(LINUX_RISCV) $(OUT)/linux-ctxtsw-user-smoke.mem
 	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-user-smoke.mem
-	python3 $(NBF_TOOL) --skip_zeros --config --debug \
+	# OpenSBI expects ordinary M-mode entry.  --debug raises BlackParrot's
+	# debug interrupt before release, causing synchronous traps to branch to the
+	# debug exception slot instead of mtvec until software executes dret.
+	python3 $(NBF_TOOL) --skip_zeros --config \
 	  --mem $(OUT)/linux-ctxtsw-user-smoke.mem --ncpus 1 > $(APP_NBF)
 	python3 $(NBF_TIMER_PATCH) --frequency $(TIMEBASE_FREQUENCY) \
 	  $(APP_NBF) $(APP_NBF).timer
@@ -361,7 +364,8 @@ package-tiny-init-nbf: validate-tiny-init-image
 	@mkdir -p $(OUT)
 	$(BP_OBJCOPY) -O verilog $(LINUX_RISCV) $(OUT)/linux-ctxtsw-tiny-init.mem
 	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-tiny-init.mem
-	python3 $(NBF_TOOL) --skip_zeros --config --debug \
+	# OpenSBI contains no debug-mode resume stub; start it directly in M-mode.
+	python3 $(NBF_TOOL) --skip_zeros --config \
 	  --mem $(OUT)/linux-ctxtsw-tiny-init.mem --ncpus 1 > $(TINY_INIT_NBF)
 	python3 $(NBF_TIMER_PATCH) --frequency $(TIMEBASE_FREQUENCY) \
 	  $(TINY_INIT_NBF) $(TINY_INIT_NBF).timer

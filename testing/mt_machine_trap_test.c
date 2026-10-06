@@ -7,9 +7,29 @@ static volatile uint64_t trap_seen;
 static volatile uint64_t trap_cause;
 static volatile uint64_t trap_pc;
 
+#ifdef BP_MACHINE_TRAP_TRACE
+#define MACHINE_TRAP_ENTRY_TRACE_ASM \
+  "li t2, 0x00101000\n" \
+  "li t3, 'H'\n" \
+  "sb t3, 0(t2)\n"
+#define MACHINE_TRAP_ECALL_TRACE_ASM \
+  "li t2, 0x00101000\n" \
+  "li t3, 'E'\n" \
+  "sb t3, 0(t2)\n"
+#define MACHINE_TRAP_RETURN_TRACE_ASM \
+  "li t2, 0x00101000\n" \
+  "li t3, 'R'\n" \
+  "sb t3, 0(t2)\n"
+#else
+#define MACHINE_TRAP_ENTRY_TRACE_ASM ""
+#define MACHINE_TRAP_ECALL_TRACE_ASM ""
+#define MACHINE_TRAP_RETURN_TRACE_ASM ""
+#endif
+
 static void __attribute__((used, naked, aligned(4))) machine_trap(void)
 {
   __asm__ volatile(
+    MACHINE_TRAP_ENTRY_TRACE_ASM
     "csrr t0, mcause\n"
     "la t1, trap_cause\n"
     "sd t0, 0(t1)\n"
@@ -27,6 +47,9 @@ static void __attribute__((used, naked, aligned(4))) machine_trap(void)
 int main(void)
 {
   uintptr_t expected_pc;
+#ifdef BP_MACHINE_TRAP_TRACE
+  *(volatile unsigned char *)(uintptr_t)0x00101000 = 'C';
+#endif
 #ifndef BP_FPGA_PROGRAM
   /* The minimal simulator CRT enters through debug mode.  Leave it before
    * provoking the exception so ECALL follows the architectural mtvec path,
@@ -44,9 +67,11 @@ int main(void)
   __asm__ volatile(
     "la t0, machine_trap\n"
     "csrw mtvec, t0\n"
+    MACHINE_TRAP_ECALL_TRACE_ASM
     "la %0, 1f\n"
     "1: ecall\n"
-    : "=r"(expected_pc) : : "t0", "memory");
+    MACHINE_TRAP_RETURN_TRACE_ASM
+    : "=r"(expected_pc) : : "t0", "t2", "t3", "memory");
 
   if (trap_seen == 1 && trap_cause == 11 && trap_pc == expected_pc) {
     bp_print_string("[BSG-PASS] cold M-mode ECALL trap and return\n");
