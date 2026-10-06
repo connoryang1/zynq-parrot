@@ -709,6 +709,7 @@ module top_zynq
       ,.axi_core_clk_async_p(0)
       ,.prefetch_bypass_p(prefetch_axi_bypass_lp)
       ,.prefetch_outstanding_p(10)
+      ,.cache_miss_trace_p(1'b1)
       )
    blackparrot
      (.axi_clk_i(aclk)

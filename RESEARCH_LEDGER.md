@@ -246,6 +246,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the exact evidence required by OQ-005 can be gathered on the FPGA without building the replay engine or perturbing the cache datapaths. Capture accepted non-prefetch BedRock reads separately at the existing I/D UCE boundaries and merge by global timestamp.
 - **Limits:** refill-equivalents are not literal event counts, so overflow flags are required. BRAM inference and the small control/readout logic still require synthesis and placement; LUT headroom alone does not prove fit. Request time gives the replay deadline but not response completion.
 
+### RL-026 — The ordered I/D miss recorder works end to end in simulation
+
+- **Status:** accepted clean simulation; routed fit and Linux/FPGA capture pending
+- **Scope:** separately armed 256x64 I/D histories at the accepted physical cache-request interfaces, demand misses only, custom CSR control/readout, and the maintained two-resident/four-logical Zynq model
+- **Claim:** a clean trace-enabled build captures the intended cold function and data lines, reports two accepted I misses and one accepted D miss with zero overflow, and reads every record back after disarm. The selected cold instruction line is timestamped at `0x623be` and the data line at `0x623fd`. The existing context-switch smoke test remains accepted with the recorder compiled in and disarmed.
+- **Evidence:** `logs/cache-miss-trace-sim-20261006/README.md`, exact transcript/ELF/NBF/FST and hashes in that directory, and the directed `testing/mt_cache_miss_trace_test.c` gate. The full 607-module `bp_axi_top` hierarchy also compiles with the recorder explicitly enabled.
+- **Meaning:** RL-025's proposed measurement interface is now real rather than a sizing sketch. It observes accepted post-translation physical demand misses, excludes detached prefetch requests, preserves simultaneous I/D capture, and can be compiled out of unrelated BlackParrot configurations.
+- **Limits:** the 63-cycle I-to-D timestamp difference includes instruction sequencing and cold-function execution and is not a DRAM-latency result. Physical BRAM inference, placement, timing, Linux interval control, and a board trace remain unproved.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -298,8 +307,8 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot. RL-021 shows that data-line request issue already overlaps the single-port installer at up to four outstanding reads and bounds full-line installation at 17 cycles. RL-022 identifies four slots plus separate I/D installers as the first aggregate-feasible replay point. RL-023 shows that complete replay needs a target within 342 cycles, while a generous late trigger covers at most 214 lines. RL-024 places the observed eight-hint median target-confidence floor at 75%. RL-019/RL-020 select conditional two-way retention over three static ways.
-- **Missing:** exact instruction/kernel data line identities and order, target-prediction accuracy on broader scheduler workloads, an instruction-cache replay path, coexistence with real scheduler traffic, useful-before-demand coverage, and an implementation that fits the FPGA. RL-025 now specifies a one-BRAM-tile diagnostic to obtain the first item.
-- **Decisive experiment:** implement RL-025's two-bank miss recorder, capture accepted ordinary I/D reads from a pre-yield marker through first user dispatch, then replay that exact sequence through four shared transport slots and separate cache installers. Measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles.
+- **Missing:** physical Linux instruction/kernel data line identities and order, target-prediction accuracy on broader scheduler workloads, an instruction-cache replay path, coexistence with real scheduler traffic, useful-before-demand coverage, and an implementation that fits the FPGA. RL-026 validates the recorder in simulation but does not supply the Linux trace.
+- **Decisive experiment:** route and deploy RL-026's recorder, capture accepted ordinary I/D reads from a pre-yield marker through first user dispatch, then replay that exact sequence through four shared transport slots and separate cache installers. Measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles.
 
 ## Next experiment
 
@@ -319,3 +328,4 @@ The immediate next experiment is OQ-001 because the diagnostic is complete and a
 - **2026-10-06 — Replay trigger deadline bounded:** whole-footprint replay must start within 342 cycles of the pre-yield timestamp. A deliberately generous 2,238-cycle late-selection window completes at most 214/479 lines, so a switch-time hook alone cannot realize the aggregate opportunity; early prediction, an explicit hint, or off-CPU replay is required.
 - **2026-10-06 — Early target confidence bounded:** eight correct physical hints save 80/73.5 total cycles while eight stale hints cost 240/189, putting median break-even target accuracy at 75%/72%. This supports confidence-scaled replay rather than unconditional whole-history launch.
 - **2026-10-06 — Exact miss recorder sized:** separate 256x64 I/D timestamp buffers cover the conservative kernel refill-equivalents with 81/112-entry margins and add one BRAM tile, projecting the routed endpoint to 60.36% BRAM use. This is the direct path to ordered useful-before-demand evidence.
+- **2026-10-06 — Exact miss recorder validated in simulation:** custom CSRs now arm, clear, stop, and synchronously read independent I/D accepted-demand histories. A clean directed run finds the intended cold code/data lines with counts 2/1 and no overflow, the disarmed context-switch smoke remains accepted, and the complete FPGA hierarchy compiles; routed fit and physical Linux capture remain pending.

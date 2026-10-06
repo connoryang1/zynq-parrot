@@ -49,7 +49,7 @@ CFLAGS = -O2 \
           -DBENCH_BARRIER=$(BARRIER)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|MISS-TRACE|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -60,6 +60,7 @@ SMOKE_TESTS := \
 
 CORRECTNESS_TESTS := \
     mt_satp_asid_warl_test \
+    mt_cache_miss_trace_test \
     mt_remote_seed_order_test \
     mt_resident_reseed_fetch_test \
     mt_context_csr_rebind_test \

@@ -493,7 +493,9 @@ module top_zynq
       };
 
   bp_unicore_lite
-   #(.bp_params_p(bp_params_p))
+   #(.bp_params_p(bp_params_p)
+     ,.cache_miss_trace_p(1'b1)
+     )
    blackparrot
     (.clk_i(aclk)
      ,.reset_i(~sys_resetn)
