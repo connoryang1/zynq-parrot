@@ -1,0 +1,54 @@
+{
+  "record": {
+    "physical_address_bits": 34,
+    "line_offset_bits": 6,
+    "line_address_bits": 28,
+    "timestamp_bits": 32,
+    "metadata_bits_remaining": 4,
+    "record_bits": 64,
+    "timestamp_wrap_cycles": 4294967296,
+    "timestamp_wrap_seconds_at_18MHz": 238.60929422222222
+  },
+  "buffers": {
+    "organization": "independent I and D 256x64 simple dual-port memories",
+    "depth_per_cache": 256,
+    "bits_per_cache": 16384,
+    "ramb18_per_cache": 1,
+    "added_ramb18": 2,
+    "simultaneous_i_d_capture": true
+  },
+  "coverage": {
+    "instruction_refill_equivalents": 174.47368421052633,
+    "data_refill_equivalents": 143.16666666666666,
+    "instruction_depth_margin": 81,
+    "data_depth_margin": 112,
+    "instruction_depth_margin_percent": 46.285714285714285,
+    "data_depth_margin_percent": 77.77777777777777
+  },
+  "fpga": {
+    "current_slice_luts": 50016,
+    "available_slice_luts": 53200,
+    "current_lut_headroom": 3184,
+    "current_ramb36": 82,
+    "current_ramb18": 3,
+    "current_bram_tiles": 83.5,
+    "projected_ramb18": 5,
+    "projected_bram_tiles": 84.5,
+    "available_bram_tiles": 140,
+    "projected_bram_utilization_percent": 60.357142857142854,
+    "current_routed_wns_ns": 4.827
+  },
+  "capture_point": {
+    "module": "import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+    "i_event": "mem_fwd_v_o[0] && mem_fwd_ready_and_i[0]",
+    "d_event": "mem_fwd_v_o[1] && mem_fwd_ready_and_i[1]",
+    "filter": "BedRock memory read with payload.prefetch == 0",
+    "stored_address": "mem_fwd_header_o[source].addr[33:6]"
+  },
+  "limits": [
+    "Refill-equivalent counts are not literal miss counts; overflow bits remain mandatory.",
+    "The BRAM estimate assumes each independent 256x64 simple dual-port array maps to one RAMB18.",
+    "LUT and placement impact require synthesis; 3,184 LUTs of arithmetic headroom do not guarantee slice fit.",
+    "Request timestamps establish replay deadlines but do not directly report response completion or cache hits."
+  ]
+}

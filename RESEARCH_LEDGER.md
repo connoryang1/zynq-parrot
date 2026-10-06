@@ -237,6 +237,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** early replay should scale with two distinct confidence signals: confidence in the next context and confidence in each line. Full replay is appropriate only for deterministic/high-confidence pairings; moderate confidence should issue a short high-value prefix, and low confidence should wait or use releasable retention.
 - **Limits:** the correct-hint scheduler-inclusive bootstrap intervals cross zero, so this is a median planning bound rather than repeatable end-to-end proof. An eight-hint same-mm result is optimistic for hundreds of wrong full-line requests, whose pollution can be nonlinear.
 
+### RL-025 — An exact ordered Linux miss trace fits in one additional BRAM tile
+
+- **Status:** RTL-topology and routed-resource sizing; implementation pending
+- **Scope:** accepted 34-bit physical-address endpoint, 64-byte lines, separate I/D UCE request streams, 256 timestamped 64-bit records per cache, and the routed 18-MHz FPGA utilization
+- **Claim:** a 64-bit record holds a 32-bit cycle, 28-bit physical line address, and four metadata bits. Independent 256x64 I/D buffers require one RAMB18 each, permit simultaneous capture, and leave 81/112 entries above the conservative 175/144 refill-equivalents. The routed endpoint would move from 83.5 to 84.5 of 140 BRAM tiles (60.36%); it currently has 3,184 LUTs of arithmetic headroom and +4.827 ns WNS.
+- **Evidence:** `logs/cache-resume-miss-tracer-design-20261006/README.md` and reproducible `size.py`/`results.json`; capture interfaces in `import/black-parrot/bp_top/src/v/bp_unicore_lite.sv`; accepted utilization in `logs/fpga/20261005T190255Z-51d98b91/summary.txt`.
+- **Meaning:** the exact evidence required by OQ-005 can be gathered on the FPGA without building the replay engine or perturbing the cache datapaths. Capture accepted non-prefetch BedRock reads separately at the existing I/D UCE boundaries and merge by global timestamp.
+- **Limits:** refill-equivalents are not literal event counts, so overflow flags are required. BRAM inference and the small control/readout logic still require synthesis and placement; LUT headroom alone does not prove fit. Request time gives the replay deadline but not response completion.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -289,8 +298,8 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot. RL-021 shows that data-line request issue already overlaps the single-port installer at up to four outstanding reads and bounds full-line installation at 17 cycles. RL-022 identifies four slots plus separate I/D installers as the first aggregate-feasible replay point. RL-023 shows that complete replay needs a target within 342 cycles, while a generous late trigger covers at most 214 lines. RL-024 places the observed eight-hint median target-confidence floor at 75%. RL-019/RL-020 select conditional two-way retention over three static ways.
-- **Missing:** exact instruction/kernel data line identities and order, target-prediction accuracy on broader scheduler workloads, an instruction-cache replay path, coexistence with real scheduler traffic, useful-before-demand coverage, and an implementation that fits the FPGA.
-- **Decisive experiment:** capture the ordered I-cache and D-cache misses from yield entry through first user dispatch, replay that exact sequence through four shared transport slots and separate cache installers, and measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles. This tests the narrow uncertainty that aggregate rate alone cannot resolve.
+- **Missing:** exact instruction/kernel data line identities and order, target-prediction accuracy on broader scheduler workloads, an instruction-cache replay path, coexistence with real scheduler traffic, useful-before-demand coverage, and an implementation that fits the FPGA. RL-025 now specifies a one-BRAM-tile diagnostic to obtain the first item.
+- **Decisive experiment:** implement RL-025's two-bank miss recorder, capture accepted ordinary I/D reads from a pre-yield marker through first user dispatch, then replay that exact sequence through four shared transport slots and separate cache installers. Measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles.
 
 ## Next experiment
 
@@ -309,3 +318,4 @@ The immediate next experiment is OQ-001 because the diagnostic is complete and a
 - **2026-10-06 — Shared-path replay feasibility bounded:** conservative physical refill-equivalents plus the measured application point require 479 lines and 99.4 MB/s before hot dispatch. Four slots with separate I/D installers bound at 5,209 cycles inside the 5,551-cycle window; three slots or one shared installer fail. The unresolved issue is ordered useful-before-demand coverage.
 - **2026-10-06 — Replay trigger deadline bounded:** whole-footprint replay must start within 342 cycles of the pre-yield timestamp. A deliberately generous 2,238-cycle late-selection window completes at most 214/479 lines, so a switch-time hook alone cannot realize the aggregate opportunity; early prediction, an explicit hint, or off-CPU replay is required.
 - **2026-10-06 — Early target confidence bounded:** eight correct physical hints save 80/73.5 total cycles while eight stale hints cost 240/189, putting median break-even target accuracy at 75%/72%. This supports confidence-scaled replay rather than unconditional whole-history launch.
+- **2026-10-06 — Exact miss recorder sized:** separate 256x64 I/D timestamp buffers cover the conservative kernel refill-equivalents with 81/112-entry margins and add one BRAM tile, projecting the routed endpoint to 60.36% BRAM use. This is the direct path to ordered useful-before-demand evidence.
