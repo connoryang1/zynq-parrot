@@ -2,7 +2,12 @@
 
 The aggregate transport and installer rates are sufficient only if replay begins early. This model combines the four-slot shared-path bound with the physically measured hot Linux scheduler breakdown.
 
-The complete conservative target—175 kernel instruction, 144 kernel data, and 160 application data line-equivalents—takes at least **5,209 cycles** under the four-slot/41-cycle model. The measured hot combined resume window is 5,551 cycles. To have the entire target ready at first user dispatch, the incoming context must therefore be identified and replay started within roughly **342 cycles of yield entry**.
+The complete conservative target—175 kernel instruction, 144 kernel data, and 160 application data line-equivalents—takes at least **5,217 cycles** under the conditional four-slot/41-cycle model. The measured hot combined resume window is 5,551 cycles. To have the entire target ready at first user dispatch, the incoming context must therefore be identified and replay started within roughly **334 cycles of yield entry**.
+
+Here 41 cycles is a scenario input, not measured detached full-line latency. The
+physical result is critical load-to-use. This trigger calculation becomes a
+physical prediction only after request-to-final-beat and installation timing
+is measured for the 64-byte replay path.
 
 That is much earlier than ordinary Linux task selection. The measured alternate-thread increment beyond a no-peer `sched_yield` is 2,139–2,238 cycles. Even granting the replay engine the larger 2,238-cycle interval in full—an optimistic assumption because the interval itself includes selection—the transport can complete at most **214 mixed lines**, only 44.7% of the 479-line target and 67.1% of the 319-line kernel-only target. The full kernel-only target needs 3,308.5 cycles, so it must start within 2,242.5 cycles of yield entry, before the late switch/return interval.
 

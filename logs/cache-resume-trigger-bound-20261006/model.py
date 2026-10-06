@@ -47,7 +47,9 @@ def main():
     coverage = {}
     for name, window in windows.items():
         transport = max_transport_lines(window, slots, latency, beats_per_line)
-        per_cache_install = max(0, math.floor((window - latency) / install_cycles))
+        per_cache_install = max(
+            0, math.floor((window - latency - beats_per_line) / install_cycles)
+        )
         two_cache_install = 2 * per_cache_install
         maximum = min(transport, two_cache_install)
         coverage[name] = {
@@ -62,7 +64,7 @@ def main():
 
     result = {
         "method": (
-            "Apply the four-slot, 41-cycle shared-transport and separate 17-cycle I/D install bound "
+            "Apply the conditional four-slot, 41-cycle shared-transport and separate 17-cycle I/D install bound "
             "to measured trigger windows. The Linux late-trigger window is deliberately generous: "
             "the whole alternate-thread delta is credited even though it includes task selection."
         ),
@@ -91,6 +93,7 @@ def main():
             "Line capacities do not imply usefulness because actual miss addresses, order, and deadlines are unknown.",
             "The input line targets are refill-latency equivalents, not exact miss counts.",
             "The model excludes translation, dirty victims, capacity replacement, and arbitration bubbles.",
+            "The 41-cycle scenario is not a measured detached full-line endpoint; physical demand load-to-use only supplies a proxy.",
         ],
     }
     out = Path(__file__).with_name("results.json")

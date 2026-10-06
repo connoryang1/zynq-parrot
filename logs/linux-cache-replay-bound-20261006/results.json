@@ -1,10 +1,20 @@
 {
   "assumptions": {
-    "memory_service_cycles": 41,
-    "installer_cycles_per_line": 17,
-    "cache_lines_are_64_bytes": true,
+    "request_to_first_response_beat_cycles": [
+      21,
+      41,
+      57,
+      65,
+      82,
+      164,
+      200
+    ],
+    "axi_beats_per_64_byte_line": 8,
+    "installer_cycles_per_line_after_complete_response": 17,
     "separate_i_d_installers": true,
-    "transport_slots_are_shared": true
+    "transport_slots_are_shared": true,
+    "physical_full_line_response_latency_is_unmeasured": true,
+    "physical_41_cycle_value_is_load_to_use_not_full_line": true
   },
   "windows": [
     {
@@ -17,42 +27,269 @@
       "last_i": 11422,
       "last_d": 7080,
       "unique_lines": 51,
-      "earliest_one_line_ready": 58,
-      "first_i_slack": 948,
-      "first_d_slack": 2862,
-      "ideal_i_bulk_ready": 857,
-      "ideal_d_bulk_ready": 92,
-      "i_bulk_slack_at_first_i": 149,
-      "d_bulk_slack_at_first_d": 2828,
-      "max_i_installs_before_first_i": 56,
-      "max_d_installs_before_first_d": 169,
-      "four_slot_bulk_headroom": 10522,
-      "slot_sweep": {
-        "1": {
-          "transport_lower_bound_cycles": 2091.0,
-          "separate_installer_lower_bound_cycles": 857,
-          "aggregate_lower_bound_cycles": 2091.0,
-          "fits_elapsed": true
+      "maximum_response_start_for_first_i": 981,
+      "installer_only_maximum_response_start_for_all_i_before_first_i": 182,
+      "maximum_response_start_for_all_i_before_first_i_by_slots": {
+        "1": 20,
+        "2": 40,
+        "3": 59,
+        "4": 78
+      },
+      "maximum_response_start_for_first_d": 2895,
+      "latency_sweep": [
+        {
+          "assumed_request_to_first_response_beat_cycles": 21,
+          "earliest_one_line_ready": 46,
+          "first_i_slack": 960,
+          "first_d_slack": 2874,
+          "max_i_installs_before_first_i": 57,
+          "max_d_installs_before_first_d": 170,
+          "ideal_i_bulk_ready": 845,
+          "ideal_d_bulk_ready": 80,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 1079.0,
+              "separate_installer_lower_bound_cycles": 845,
+              "aggregate_lower_bound_cycles": 1079.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 554.0,
+              "separate_installer_lower_bound_cycles": 845,
+              "aggregate_lower_bound_cycles": 845,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 429.0,
+              "separate_installer_lower_bound_cycles": 845,
+              "aggregate_lower_bound_cycles": 845,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 429.0,
+              "separate_installer_lower_bound_cycles": 845,
+              "aggregate_lower_bound_cycles": 845,
+              "fits_elapsed": true
+            }
+          }
         },
-        "2": {
-          "transport_lower_bound_cycles": 1066.0,
-          "separate_installer_lower_bound_cycles": 857,
-          "aggregate_lower_bound_cycles": 1066.0,
-          "fits_elapsed": true
+        {
+          "assumed_request_to_first_response_beat_cycles": 41,
+          "earliest_one_line_ready": 66,
+          "first_i_slack": 940,
+          "first_d_slack": 2854,
+          "max_i_installs_before_first_i": 56,
+          "max_d_installs_before_first_d": 168,
+          "ideal_i_bulk_ready": 865,
+          "ideal_d_bulk_ready": 100,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 2099.0,
+              "separate_installer_lower_bound_cycles": 865,
+              "aggregate_lower_bound_cycles": 2099.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 1074.0,
+              "separate_installer_lower_bound_cycles": 865,
+              "aggregate_lower_bound_cycles": 1074.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 732.3333333333333,
+              "separate_installer_lower_bound_cycles": 865,
+              "aggregate_lower_bound_cycles": 865,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 561.5,
+              "separate_installer_lower_bound_cycles": 865,
+              "aggregate_lower_bound_cycles": 865,
+              "fits_elapsed": true
+            }
+          }
         },
-        "3": {
-          "transport_lower_bound_cycles": 724.3333333333334,
-          "separate_installer_lower_bound_cycles": 857,
-          "aggregate_lower_bound_cycles": 857,
-          "fits_elapsed": true
+        {
+          "assumed_request_to_first_response_beat_cycles": 57,
+          "earliest_one_line_ready": 82,
+          "first_i_slack": 924,
+          "first_d_slack": 2838,
+          "max_i_installs_before_first_i": 55,
+          "max_d_installs_before_first_d": 167,
+          "ideal_i_bulk_ready": 881,
+          "ideal_d_bulk_ready": 116,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 2915.0,
+              "separate_installer_lower_bound_cycles": 881,
+              "aggregate_lower_bound_cycles": 2915.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 1490.0,
+              "separate_installer_lower_bound_cycles": 881,
+              "aggregate_lower_bound_cycles": 1490.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 1015.0,
+              "separate_installer_lower_bound_cycles": 881,
+              "aggregate_lower_bound_cycles": 1015.0,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 777.5,
+              "separate_installer_lower_bound_cycles": 881,
+              "aggregate_lower_bound_cycles": 881,
+              "fits_elapsed": true
+            }
+          }
         },
-        "4": {
-          "transport_lower_bound_cycles": 553.5,
-          "separate_installer_lower_bound_cycles": 857,
-          "aggregate_lower_bound_cycles": 857,
-          "fits_elapsed": true
+        {
+          "assumed_request_to_first_response_beat_cycles": 65,
+          "earliest_one_line_ready": 90,
+          "first_i_slack": 916,
+          "first_d_slack": 2830,
+          "max_i_installs_before_first_i": 54,
+          "max_d_installs_before_first_d": 167,
+          "ideal_i_bulk_ready": 889,
+          "ideal_d_bulk_ready": 124,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 3323.0,
+              "separate_installer_lower_bound_cycles": 889,
+              "aggregate_lower_bound_cycles": 3323.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 1698.0,
+              "separate_installer_lower_bound_cycles": 889,
+              "aggregate_lower_bound_cycles": 1698.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 1156.3333333333335,
+              "separate_installer_lower_bound_cycles": 889,
+              "aggregate_lower_bound_cycles": 1156.3333333333335,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 885.5,
+              "separate_installer_lower_bound_cycles": 889,
+              "aggregate_lower_bound_cycles": 889,
+              "fits_elapsed": true
+            }
+          }
+        },
+        {
+          "assumed_request_to_first_response_beat_cycles": 82,
+          "earliest_one_line_ready": 107,
+          "first_i_slack": 899,
+          "first_d_slack": 2813,
+          "max_i_installs_before_first_i": 53,
+          "max_d_installs_before_first_d": 166,
+          "ideal_i_bulk_ready": 906,
+          "ideal_d_bulk_ready": 141,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 4190.0,
+              "separate_installer_lower_bound_cycles": 906,
+              "aggregate_lower_bound_cycles": 4190.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 2140.0,
+              "separate_installer_lower_bound_cycles": 906,
+              "aggregate_lower_bound_cycles": 2140.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 1456.6666666666665,
+              "separate_installer_lower_bound_cycles": 906,
+              "aggregate_lower_bound_cycles": 1456.6666666666665,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 1115.0,
+              "separate_installer_lower_bound_cycles": 906,
+              "aggregate_lower_bound_cycles": 1115.0,
+              "fits_elapsed": true
+            }
+          }
+        },
+        {
+          "assumed_request_to_first_response_beat_cycles": 164,
+          "earliest_one_line_ready": 189,
+          "first_i_slack": 817,
+          "first_d_slack": 2731,
+          "max_i_installs_before_first_i": 49,
+          "max_d_installs_before_first_d": 161,
+          "ideal_i_bulk_ready": 988,
+          "ideal_d_bulk_ready": 223,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 8372.0,
+              "separate_installer_lower_bound_cycles": 988,
+              "aggregate_lower_bound_cycles": 8372.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 4272.0,
+              "separate_installer_lower_bound_cycles": 988,
+              "aggregate_lower_bound_cycles": 4272.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 2905.333333333333,
+              "separate_installer_lower_bound_cycles": 988,
+              "aggregate_lower_bound_cycles": 2905.333333333333,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 2222.0,
+              "separate_installer_lower_bound_cycles": 988,
+              "aggregate_lower_bound_cycles": 2222.0,
+              "fits_elapsed": true
+            }
+          }
+        },
+        {
+          "assumed_request_to_first_response_beat_cycles": 200,
+          "earliest_one_line_ready": 225,
+          "first_i_slack": 781,
+          "first_d_slack": 2695,
+          "max_i_installs_before_first_i": 46,
+          "max_d_installs_before_first_d": 159,
+          "ideal_i_bulk_ready": 1024,
+          "ideal_d_bulk_ready": 259,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 10208.0,
+              "separate_installer_lower_bound_cycles": 1024,
+              "aggregate_lower_bound_cycles": 10208.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 5208.0,
+              "separate_installer_lower_bound_cycles": 1024,
+              "aggregate_lower_bound_cycles": 5208.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 3541.3333333333335,
+              "separate_installer_lower_bound_cycles": 1024,
+              "aggregate_lower_bound_cycles": 3541.3333333333335,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 2708.0,
+              "separate_installer_lower_bound_cycles": 1024,
+              "aggregate_lower_bound_cycles": 2708.0,
+              "fits_elapsed": true
+            }
+          }
         }
-      }
+      ]
     },
     {
       "window": "peer_to_source",
@@ -64,42 +301,269 @@
       "last_i": 28879,
       "last_d": 28546,
       "unique_lines": 225,
-      "earliest_one_line_ready": 58,
-      "first_i_slack": 24,
-      "first_d_slack": 1049,
-      "ideal_i_bulk_ready": 3696,
-      "ideal_d_bulk_ready": 211,
-      "i_bulk_slack_at_first_i": -3614,
-      "d_bulk_slack_at_first_d": 896,
-      "max_i_installs_before_first_i": 2,
-      "max_d_installs_before_first_d": 62,
-      "four_slot_bulk_headroom": 25187,
-      "slot_sweep": {
-        "1": {
-          "transport_lower_bound_cycles": 9225.0,
-          "separate_installer_lower_bound_cycles": 3696,
-          "aggregate_lower_bound_cycles": 9225.0,
-          "fits_elapsed": true
+      "maximum_response_start_for_first_i": 57,
+      "installer_only_maximum_response_start_for_all_i_before_first_i": -3581,
+      "maximum_response_start_for_all_i_before_first_i_by_slots": {
+        "1": null,
+        "2": null,
+        "3": null,
+        "4": null
+      },
+      "maximum_response_start_for_first_d": 1082,
+      "latency_sweep": [
+        {
+          "assumed_request_to_first_response_beat_cycles": 21,
+          "earliest_one_line_ready": 46,
+          "first_i_slack": 36,
+          "first_d_slack": 1061,
+          "max_i_installs_before_first_i": 3,
+          "max_d_installs_before_first_d": 63,
+          "ideal_i_bulk_ready": 3684,
+          "ideal_d_bulk_ready": 199,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 4733.0,
+              "separate_installer_lower_bound_cycles": 3684,
+              "aggregate_lower_bound_cycles": 4733.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 2381.0,
+              "separate_installer_lower_bound_cycles": 3684,
+              "aggregate_lower_bound_cycles": 3684,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 1821.0,
+              "separate_installer_lower_bound_cycles": 3684,
+              "aggregate_lower_bound_cycles": 3684,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 1821.0,
+              "separate_installer_lower_bound_cycles": 3684,
+              "aggregate_lower_bound_cycles": 3684,
+              "fits_elapsed": true
+            }
+          }
         },
-        "2": {
-          "transport_lower_bound_cycles": 4633.0,
-          "separate_installer_lower_bound_cycles": 3696,
-          "aggregate_lower_bound_cycles": 4633.0,
-          "fits_elapsed": true
+        {
+          "assumed_request_to_first_response_beat_cycles": 41,
+          "earliest_one_line_ready": 66,
+          "first_i_slack": 16,
+          "first_d_slack": 1041,
+          "max_i_installs_before_first_i": 1,
+          "max_d_installs_before_first_d": 62,
+          "ideal_i_bulk_ready": 3704,
+          "ideal_d_bulk_ready": 219,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 9233.0,
+              "separate_installer_lower_bound_cycles": 3704,
+              "aggregate_lower_bound_cycles": 9233.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 4641.0,
+              "separate_installer_lower_bound_cycles": 3704,
+              "aggregate_lower_bound_cycles": 4641.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 3110.333333333333,
+              "separate_installer_lower_bound_cycles": 3704,
+              "aggregate_lower_bound_cycles": 3704,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 2345.0,
+              "separate_installer_lower_bound_cycles": 3704,
+              "aggregate_lower_bound_cycles": 3704,
+              "fits_elapsed": true
+            }
+          }
         },
-        "3": {
-          "transport_lower_bound_cycles": 3102.3333333333335,
-          "separate_installer_lower_bound_cycles": 3696,
-          "aggregate_lower_bound_cycles": 3696,
-          "fits_elapsed": true
+        {
+          "assumed_request_to_first_response_beat_cycles": 57,
+          "earliest_one_line_ready": 82,
+          "first_i_slack": 0,
+          "first_d_slack": 1025,
+          "max_i_installs_before_first_i": 1,
+          "max_d_installs_before_first_d": 61,
+          "ideal_i_bulk_ready": 3720,
+          "ideal_d_bulk_ready": 235,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 12833.0,
+              "separate_installer_lower_bound_cycles": 3720,
+              "aggregate_lower_bound_cycles": 12833.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 6449.0,
+              "separate_installer_lower_bound_cycles": 3720,
+              "aggregate_lower_bound_cycles": 6449.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 4321.0,
+              "separate_installer_lower_bound_cycles": 3720,
+              "aggregate_lower_bound_cycles": 4321.0,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 3257.0,
+              "separate_installer_lower_bound_cycles": 3720,
+              "aggregate_lower_bound_cycles": 3720,
+              "fits_elapsed": true
+            }
+          }
         },
-        "4": {
-          "transport_lower_bound_cycles": 2337.0,
-          "separate_installer_lower_bound_cycles": 3696,
-          "aggregate_lower_bound_cycles": 3696,
-          "fits_elapsed": true
+        {
+          "assumed_request_to_first_response_beat_cycles": 65,
+          "earliest_one_line_ready": 90,
+          "first_i_slack": -8,
+          "first_d_slack": 1017,
+          "max_i_installs_before_first_i": 0,
+          "max_d_installs_before_first_d": 60,
+          "ideal_i_bulk_ready": 3728,
+          "ideal_d_bulk_ready": 243,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 14633.0,
+              "separate_installer_lower_bound_cycles": 3728,
+              "aggregate_lower_bound_cycles": 14633.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 7353.0,
+              "separate_installer_lower_bound_cycles": 3728,
+              "aggregate_lower_bound_cycles": 7353.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 4926.333333333334,
+              "separate_installer_lower_bound_cycles": 3728,
+              "aggregate_lower_bound_cycles": 4926.333333333334,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 3713.0,
+              "separate_installer_lower_bound_cycles": 3728,
+              "aggregate_lower_bound_cycles": 3728,
+              "fits_elapsed": true
+            }
+          }
+        },
+        {
+          "assumed_request_to_first_response_beat_cycles": 82,
+          "earliest_one_line_ready": 107,
+          "first_i_slack": -25,
+          "first_d_slack": 1000,
+          "max_i_installs_before_first_i": 0,
+          "max_d_installs_before_first_d": 59,
+          "ideal_i_bulk_ready": 3745,
+          "ideal_d_bulk_ready": 260,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 18458.0,
+              "separate_installer_lower_bound_cycles": 3745,
+              "aggregate_lower_bound_cycles": 18458.0,
+              "fits_elapsed": true
+            },
+            "2": {
+              "transport_lower_bound_cycles": 9274.0,
+              "separate_installer_lower_bound_cycles": 3745,
+              "aggregate_lower_bound_cycles": 9274.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 6212.666666666666,
+              "separate_installer_lower_bound_cycles": 3745,
+              "aggregate_lower_bound_cycles": 6212.666666666666,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 4682.0,
+              "separate_installer_lower_bound_cycles": 3745,
+              "aggregate_lower_bound_cycles": 4682.0,
+              "fits_elapsed": true
+            }
+          }
+        },
+        {
+          "assumed_request_to_first_response_beat_cycles": 164,
+          "earliest_one_line_ready": 189,
+          "first_i_slack": -107,
+          "first_d_slack": 918,
+          "max_i_installs_before_first_i": 0,
+          "max_d_installs_before_first_d": 55,
+          "ideal_i_bulk_ready": 3827,
+          "ideal_d_bulk_ready": 342,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 36908.0,
+              "separate_installer_lower_bound_cycles": 3827,
+              "aggregate_lower_bound_cycles": 36908.0,
+              "fits_elapsed": false
+            },
+            "2": {
+              "transport_lower_bound_cycles": 18540.0,
+              "separate_installer_lower_bound_cycles": 3827,
+              "aggregate_lower_bound_cycles": 18540.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 12417.333333333332,
+              "separate_installer_lower_bound_cycles": 3827,
+              "aggregate_lower_bound_cycles": 12417.333333333332,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 9356.0,
+              "separate_installer_lower_bound_cycles": 3827,
+              "aggregate_lower_bound_cycles": 9356.0,
+              "fits_elapsed": true
+            }
+          }
+        },
+        {
+          "assumed_request_to_first_response_beat_cycles": 200,
+          "earliest_one_line_ready": 225,
+          "first_i_slack": -143,
+          "first_d_slack": 882,
+          "max_i_installs_before_first_i": 0,
+          "max_d_installs_before_first_d": 52,
+          "ideal_i_bulk_ready": 3863,
+          "ideal_d_bulk_ready": 378,
+          "slot_sweep": {
+            "1": {
+              "transport_lower_bound_cycles": 45008.0,
+              "separate_installer_lower_bound_cycles": 3863,
+              "aggregate_lower_bound_cycles": 45008.0,
+              "fits_elapsed": false
+            },
+            "2": {
+              "transport_lower_bound_cycles": 22608.0,
+              "separate_installer_lower_bound_cycles": 3863,
+              "aggregate_lower_bound_cycles": 22608.0,
+              "fits_elapsed": true
+            },
+            "3": {
+              "transport_lower_bound_cycles": 15141.333333333334,
+              "separate_installer_lower_bound_cycles": 3863,
+              "aggregate_lower_bound_cycles": 15141.333333333334,
+              "fits_elapsed": true
+            },
+            "4": {
+              "transport_lower_bound_cycles": 11408.0,
+              "separate_installer_lower_bound_cycles": 3863,
+              "aggregate_lower_bound_cycles": 11408.0,
+              "fits_elapsed": true
+            }
+          }
         }
-      }
+      ]
     }
   ]
 }

@@ -51,11 +51,12 @@ def main():
         total = scenario["i_lines"] + scenario["d_lines"]
         scenario["total_lines"] = total
         scenario["separate_install_completion_cycles"] = {
-            str(latency): latency + max(scenario["i_lines"], scenario["d_lines"]) * install_cycles
+            str(latency): latency + beats_per_line
+            + max(scenario["i_lines"], scenario["d_lines"]) * install_cycles
             for latency in (21, 41)
         }
         scenario["shared_install_completion_cycles"] = {
-            str(latency): latency + total * install_cycles
+            str(latency): latency + beats_per_line + total * install_cycles
             for latency in (21, 41)
         }
         scenario["slot_sweep"] = {}
@@ -63,7 +64,8 @@ def main():
             rows = {}
             for slots in (1, 2, 3, 4, 5, 10):
                 transport = transport_cycles(total, slots, latency, beats_per_line)
-                separate_install = latency + max(scenario["i_lines"], scenario["d_lines"]) * install_cycles
+                separate_install = latency + beats_per_line \
+                    + max(scenario["i_lines"], scenario["d_lines"]) * install_cycles
                 completion = max(transport, separate_install)
                 rows[str(slots)] = {
                     "transport_lower_bound_cycles": transport,
@@ -94,6 +96,10 @@ def main():
             "line_bytes": line_bytes,
             "axi_bytes_per_beat": axi_bytes_per_beat,
             "clock_hz": clock_hz,
+            "latency_endpoint": (
+                "conditional request-to-first-response-beat scenario; the physical "
+                "41-cycle measurement is critical load-to-use, not a measured full-line endpoint"
+            ),
         },
         "scenarios": scenarios,
         "derived": {
@@ -116,6 +122,7 @@ def main():
             "Seventeen cycles is measured for the data-cache installer; an equivalent instruction-cache replay installer does not exist yet.",
             "All lines are required by first user dispatch in this deliberately strict bound; real deadlines are per-line and order dependent.",
             "Translation replay, dirty writebacks, capacity replacement, and scheduler-generated traffic are excluded.",
+            "The 21/41-cycle latency scenarios are not physical measurements of detached 64-byte request-to-first-beat service.",
         ],
     }
     out = Path(__file__).with_name("results.json")
