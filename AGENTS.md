@@ -12,6 +12,8 @@ This file describes how to develop and verify the BlackParrot FPGA checkout safe
 - Use `bp-parallel-safe-runs` before launching concurrent or background jobs.
 - Use `bp-synthesis-farm` to distribute independent routed candidates across the configured build
   VMs. Keep one Vivado job per VM and keep all live FPGA-board operations serialized.
+- Use `research-ledger` for long-running empirical work so prior expectations, accepted evidence,
+  superseded interpretations, and unresolved questions remain distinct across sessions.
 
 ## Development Philosophy
 
