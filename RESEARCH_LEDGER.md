@@ -237,23 +237,32 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** early replay should scale with two distinct confidence signals: confidence in the next context and confidence in each line. Full replay is appropriate only for deterministic/high-confidence pairings; moderate confidence should issue a short high-value prefix, and low confidence should wait or use releasable retention.
 - **Limits:** the correct-hint scheduler-inclusive bootstrap intervals cross zero, so this is a median planning bound rather than repeatable end-to-end proof. An eight-hint same-mm result is optimistic for hundreds of wrong full-line requests, whose pollution can be nonlinear.
 
-### RL-025 — An exact ordered Linux miss trace fits in one additional BRAM tile
+### RL-025 — An exact ordered Linux miss trace fits in two additional BRAM tiles
 
-- **Status:** RTL-topology and routed-resource sizing; implementation pending
+- **Status:** corrected RTL-topology sizing, confirmed by RL-027
 - **Scope:** accepted 34-bit physical-address endpoint, 64-byte lines, separate I/D UCE request streams, 256 timestamped 64-bit records per cache, and the routed 18-MHz FPGA utilization
-- **Claim:** a 64-bit record holds a 32-bit cycle, 28-bit physical line address, and four metadata bits. Independent 256x64 I/D buffers require one RAMB18 each, permit simultaneous capture, and leave 81/112 entries above the conservative 175/144 refill-equivalents. The routed endpoint would move from 83.5 to 84.5 of 140 BRAM tiles (60.36%); it currently has 3,184 LUTs of arithmetic headroom and +4.827 ns WNS.
-- **Evidence:** `logs/cache-resume-miss-tracer-design-20261006/README.md` and reproducible `size.py`/`results.json`; capture interfaces in `import/black-parrot/bp_top/src/v/bp_unicore_lite.sv`; accepted utilization in `logs/fpga/20261005T190255Z-51d98b91/summary.txt`.
+- **Claim:** a 64-bit record holds a 32-bit cycle, 28-bit physical line address, and four metadata bits. Independent 256x64 I/D buffers permit simultaneous capture and leave 81/112 entries above the conservative 175/144 refill-equivalents. A 256x64 history requires one RAMB36, so the pair consumes two BRAM tiles rather than the originally projected single tile.
+- **Evidence:** planning artifact `logs/cache-resume-miss-tracer-design-20261006/README.md`, corrected implementation evidence in `logs/cache-miss-trace-route-20261006/`, and final RAM mapping in routed job `logs/fpga/20261006T182248Z-e860ceea/`.
 - **Meaning:** the exact evidence required by OQ-005 can be gathered on the FPGA without building the replay engine or perturbing the cache datapaths. Capture accepted non-prefetch BedRock reads separately at the existing I/D UCE boundaries and merge by global timestamp.
-- **Limits:** refill-equivalents are not literal event counts, so overflow flags are required. BRAM inference and the small control/readout logic still require synthesis and placement; LUT headroom alone does not prove fit. Request time gives the replay deadline but not response completion.
+- **Limits:** refill-equivalents are not literal event counts, so overflow flags are required. Request time gives the replay deadline but not response completion. The earlier one-tile estimate was incorrect because RAMB18 cannot hold 256x64; RL-027 is authoritative for fitted resources.
 
 ### RL-026 — The ordered I/D miss recorder works end to end in simulation
 
-- **Status:** accepted clean simulation; routed fit and Linux/FPGA capture pending
+- **Status:** accepted clean simulation and routed implementation; Linux/FPGA capture pending
 - **Scope:** separately armed 256x64 I/D histories at the accepted physical cache-request interfaces, demand misses only, custom CSR control/readout, and the maintained two-resident/four-logical Zynq model
 - **Claim:** a clean trace-enabled build captures the intended cold function and data lines, reports two accepted I misses and one accepted D miss with zero overflow, and reads every record back after disarm. The selected cold instruction line is timestamped at `0x623be` and the data line at `0x623fd`. The existing context-switch smoke test remains accepted with the recorder compiled in and disarmed.
-- **Evidence:** `logs/cache-miss-trace-sim-20261006/README.md`, exact transcript/ELF/NBF/FST and hashes in that directory, and the directed `testing/mt_cache_miss_trace_test.c` gate. The full 607-module `bp_axi_top` hierarchy also compiles with the recorder explicitly enabled.
+- **Evidence:** `logs/cache-miss-trace-sim-20261006/README.md`, exact transcript/ELF/NBF/FST and hashes in that directory, the directed `testing/mt_cache_miss_trace_test.c` gate, and routed acceptance in RL-027. The full 607-module `bp_axi_top` hierarchy also compiles with the recorder explicitly enabled.
 - **Meaning:** RL-025's proposed measurement interface is now real rather than a sizing sketch. It observes accepted post-translation physical demand misses, excludes detached prefetch requests, preserves simultaneous I/D capture, and can be compiled out of unrelated BlackParrot configurations.
-- **Limits:** the 63-cycle I-to-D timestamp difference includes instruction sequencing and cold-function execution and is not a DRAM-latency result. Physical BRAM inference, placement, timing, Linux interval control, and a board trace remain unproved.
+- **Limits:** the 63-cycle I-to-D timestamp difference includes instruction sequencing and cold-function execution and is not a DRAM-latency result. Linux interval control and a board trace remain unproved.
+
+### RL-027 — The miss recorder routes with block RAM and recovers 787 LUTs
+
+- **Status:** accepted routed before/after comparison; physical execution pending
+- **Scope:** default 20-MHz `e_bp_unicore_zynqparrot_cfg`, identical dependencies except for the recorder read shape, complete synthesis/place/route/bitstream, and the clean two-resident/four-context simulation gates
+- **Claim:** the original ternary registered read made Vivado reject both `ram_style="block"` attributes and use 173 total `RAM64M` primitives. Independent registered I/D read outputs map the histories to two `RAMB36` blocks. Placed use falls from 50,941 to 50,154 LUTs (95.75% to 94.27%), registers fall from 21,640 to 21,577, and BRAM rises from 80 to 82 tiles. Signoff WNS improves from +1.777 to +3.390 ns; both builds have zero setup/hold failing endpoints and complete bitstreams. The directed recorder result remains exactly two I misses, one D miss, and timestamps `0x623be`/`0x623fd`; the disarmed context-switch smoke and all 15 harness checks pass.
+- **Evidence:** reproducible comparison and source job identifiers in `logs/cache-miss-trace-route-20261006/`; routed summaries in `logs/fpga/20261006T173322Z-6da84fc6/` and `logs/fpga/20261006T182248Z-e860ceea/`; corrected top/BlackParrot revisions `e860ceea`/`52c5dde70`.
+- **Meaning:** the measurement hardware fits with 3,046 LUTs and 58 BRAM tiles still unused, and the BRAM-compatible structure improves timing margin while preserving behavior. The board can run OQ-005 as soon as recovery and overlay loading are available.
+- **Limits:** this proves FPGA implementation, not physical recorder readout or Linux scheduler-line coverage. The WNS improvement includes placement randomness from the changed netlist, so the resource delta is the stronger causal result.
 
 ## Superseded or rejected findings
 
@@ -307,12 +316,12 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot. RL-021 shows that data-line request issue already overlaps the single-port installer at up to four outstanding reads and bounds full-line installation at 17 cycles. RL-022 identifies four slots plus separate I/D installers as the first aggregate-feasible replay point. RL-023 shows that complete replay needs a target within 342 cycles, while a generous late trigger covers at most 214 lines. RL-024 places the observed eight-hint median target-confidence floor at 75%. RL-019/RL-020 select conditional two-way retention over three static ways.
-- **Missing:** physical Linux instruction/kernel data line identities and order, target-prediction accuracy on broader scheduler workloads, an instruction-cache replay path, coexistence with real scheduler traffic, useful-before-demand coverage, and an implementation that fits the FPGA. RL-026 validates the recorder in simulation but does not supply the Linux trace.
-- **Decisive experiment:** route and deploy RL-026's recorder, capture accepted ordinary I/D reads from a pre-yield marker through first user dispatch, then replay that exact sequence through four shared transport slots and separate cache installers. Measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles.
+- **Missing:** physical Linux instruction/kernel data line identities and order, target-prediction accuracy on broader scheduler workloads, an instruction-cache replay path, coexistence with real scheduler traffic, and useful-before-demand coverage. RL-027 proves that the recorder fits but does not supply the Linux trace.
+- **Decisive experiment:** deploy RL-027's recorder, capture accepted ordinary I/D reads from a pre-yield marker through first user dispatch, then replay that exact sequence through four shared transport slots and separate cache installers. Measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles.
 
 ## Next experiment
 
-The immediate next experiment is OQ-001 because the diagnostic is complete and a physical capture can resolve a current correctness uncertainty. It requires a confirmed recovery cycle and exact overlay reload; no simulator result substitutes for the board observation. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, installer-throughput, or aggregate-bandwidth modeling: RL-013 through RL-022 cover them. The next new measurement is OQ-005's ordered scheduler miss trace and useful-before-demand replay; OQ-004's small automatic signature is a complementary low-cost path rather than the main speedup mechanism.
+The immediate next experiment is OQ-001 because the diagnostic is complete and a physical capture can resolve a current correctness uncertainty. It requires a confirmed recovery cycle and exact overlay reload; no simulator result substitutes for the board observation. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, installer-throughput, aggregate-bandwidth, or recorder-fit work: RL-013 through RL-027 cover them. The next new measurement is deploying RL-027 for OQ-005's ordered scheduler miss trace and useful-before-demand replay; OQ-004's small automatic signature is a complementary low-cost path rather than the main speedup mechanism.
 
 ## Delta log
 
