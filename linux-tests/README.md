@@ -505,3 +505,34 @@ C while hardware loops are leaf assembly, so their bookkeeping costs differ;
 compare complete implementations rather than attributing the entire difference
 to switching or cache behavior. Bare-metal results from a
 different request stream or cache state are not a matched speedup comparison.
+
+## Ordered Linux handoff miss capture
+
+`cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder
+from ordinary Linux U-mode. Two pthreads inherit one verified CPU affinity.
+The source arms and clears the recorder, wakes its peer, and blocks on a futex;
+the peer wakes the source and then blocks, forcing a scheduler handoff in both
+directions. The source disarms immediately after its futex returns. Recorder
+readout, history merging, and output all happen after disarm, so observation
+does not add records to the measured interval.
+
+Build a static executable and shell transfer commands with:
+
+```sh
+make -s -C linux-tests emit-cache-miss-trace-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/cache_miss_trace_capture.transfer
+```
+
+After transferring and hash-checking the ELF in a Linux shell on the exact
+trace-enabled overlay, run `/tmp/cache_miss_trace_capture`. A valid run prints
+one `TRACE_HEADER`, the independent I/D histories merged by their 32-bit global
+cycle timestamps, and `TRACE_PASS`. The header exposes start, peer-entry,
+peer-block, and resumed-source cycle markers along with counts and overflow
+bits. Physical line addresses are core-global and the interval includes both
+tasks plus kernel execution; this first capture does not assign every line to
+a task. The image build scans the generated kernel's executable sections and
+OpenSBI `.text`, rejecting instructions that use any custom CSR from `0x800`
+through `0x807`. This executable-section check avoids false positives from
+arbitrary initramfs/data words; the older whole-NBF guard remains on the
+historical `0x800` through `0x804` contract.

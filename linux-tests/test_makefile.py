@@ -21,7 +21,8 @@ APPS = {"app": "ctxtsw_user_smoke", "tiny": "ctxtsw_user_tiny",
         "request-benchmark": "request_benchmark",
         "request-benchmark-dynamic": "request_benchmark_dynamic",
         "request-benchmark-load-ahead": "request_benchmark_load_ahead",
-        "request-benchmark-load-ahead-dynamic": "request_benchmark_load_ahead_dynamic"}
+        "request-benchmark-load-ahead-dynamic": "request_benchmark_load_ahead_dynamic",
+        "cache-miss-trace-capture": "cache_miss_trace_capture"}
 FAKE_COMPILER = """#!/usr/bin/env python3
 import json, os, pathlib, sys
 args = sys.argv[1:]
@@ -126,7 +127,8 @@ class LinuxHarnessTests(unittest.TestCase):
                             ("emit-request-transfer", "request_benchmark"),
                             ("emit-request-dynamic-transfer", "request_benchmark_dynamic"),
                             ("emit-request-load-ahead-transfer", "request_benchmark_load_ahead"),
-                            ("emit-request-load-ahead-dynamic-transfer", "request_benchmark_load_ahead_dynamic")):
+                            ("emit-request-load-ahead-dynamic-transfer", "request_benchmark_load_ahead_dynamic"),
+                            ("emit-cache-miss-trace-transfer", "cache_miss_trace_capture")):
             for flag in (1, 0, 1):
                 with self.subTest(target=target, flag=flag):
                     result = self.make(target, "TINY_TARGET_SYSCALL=" + str(flag))
@@ -153,7 +155,8 @@ class LinuxHarnessTests(unittest.TestCase):
                             ("emit-request-transfer", "request_benchmark"),
                             ("emit-request-dynamic-transfer", "request_benchmark_dynamic"),
                             ("emit-request-load-ahead-transfer", "request_benchmark_load_ahead"),
-                            ("emit-request-load-ahead-dynamic-transfer", "request_benchmark_load_ahead_dynamic")):
+                            ("emit-request-load-ahead-dynamic-transfer", "request_benchmark_load_ahead_dynamic"),
+                            ("emit-cache-miss-trace-transfer", "cache_miss_trace_capture")):
             with self.subTest(target=target):
                 good = self.make(target)
                 self.assertEqual(good.returncode, 0, good.stderr)
