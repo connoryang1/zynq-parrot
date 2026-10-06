@@ -1,0 +1,46 @@
+Script started on 2026-10-06 20:05:30+0000
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=432013312
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe96e670 40000004 16 1
+INFO:    Creating host: 0xbe96e670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d29000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d29000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1726721
+DEBUG-PS: ps.cpp: 1-1726948
+DEBUG-PS: ps.cpp: 2-1727141
+DEBUG-PS: ps.cpp: 3-1727329
+DEBUG-PS: ps.cpp: 4-1727506
+DEBUG-PS: ps.cpp: 5-1727679
+DEBUG-PS: ps.cpp: 6-1727857
+DEBUG-PS: ps.cpp: 7-1728030
+DEBUG-PS: ps.cpp: 8-1728203
+DEBUG-PS: ps.cpp: 9-1728378
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878640
+DEBUG-PS: ps.cpp: finished loading 1878640 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
