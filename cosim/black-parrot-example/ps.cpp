@@ -343,15 +343,18 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
             }
         }
         empty_poll_count++;
-        if ((max_runtime_ms || liveness_interval_ms)
-            && ((empty_poll_count & 0x3ff) == 0)) {
+        bool runtime_check_due =
+            max_runtime_ms && ((empty_poll_count & 0x3ff) == 0);
+        bool liveness_check_due =
+            liveness_interval_ms && ((empty_poll_count & 0x3f) == 0);
+        if (runtime_check_due || liveness_check_due) {
             struct timespec now;
             clock_gettime(CLOCK_MONOTONIC, &now);
             long long elapsed_ns =
                 1000000000LL * (now.tv_sec - start.tv_sec)
                 + (now.tv_nsec - start.tv_nsec);
             unsigned long long elapsed_ms = elapsed_ns / 1000000LL;
-            if (liveness_interval_ms && elapsed_ms >= next_liveness_ms) {
+            if (liveness_check_due && elapsed_ms >= next_liveness_ms) {
                 unsigned long long current_minstret =
                     get_counter_64(zpl, GP0_RD_MINSTRET);
                 unsigned long long current_mtime =
@@ -373,7 +376,7 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
                     (elapsed_ms / liveness_interval_ms + 1)
                     * liveness_interval_ms;
             }
-            if (max_runtime_ms && elapsed_ms >= max_runtime_ms) {
+            if (runtime_check_due && elapsed_ms >= max_runtime_ms) {
                 bsg_pr_warn(
                     "ps.cpp: target runtime limit reached after %llu ms\n",
                     elapsed_ms);
