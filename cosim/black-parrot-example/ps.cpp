@@ -327,6 +327,7 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     unsigned long long next_liveness_ms = liveness_interval_ms;
     unsigned long long last_liveness_minstret = minstret_start;
     unsigned long long last_liveness_mtime = mtime_start;
+    unsigned long long liveness_sample_count = 0;
     do {
         if (host->get_next_packet(&spack)) {
             host->process_spack(&spack);
@@ -355,19 +356,32 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
                 + (now.tv_nsec - start.tv_nsec);
             unsigned long long elapsed_ms = elapsed_ns / 1000000LL;
             if (liveness_check_due && elapsed_ms >= next_liveness_ms) {
+                struct timespec read_start, read_stop;
+                liveness_sample_count++;
+                clock_gettime(CLOCK_MONOTONIC, &read_start);
+                bsg_pr_info("ps.cpp: liveness_begin host_ms=%llu sample=%llu\n",
+                            elapsed_ms, liveness_sample_count);
+                fflush(stdout);
+                fflush(stderr);
                 unsigned long long current_minstret =
                     get_counter_64(zpl, GP0_RD_MINSTRET);
                 unsigned long long current_mtime =
                     get_counter_64(zpl, GP1_CSR_BASE_ADDR + 0x30bff8);
+                clock_gettime(CLOCK_MONOTONIC, &read_stop);
+                long long read_ns =
+                    1000000000LL * (read_stop.tv_sec - read_start.tv_sec)
+                    + (read_stop.tv_nsec - read_start.tv_nsec);
                 bsg_pr_info(
                     "ps.cpp: liveness host_ms=%llu minstret=%llu "
                     "retired_delta=%llu retired_since_last=%llu mtime=%llu "
-                    "mtime_delta=%llu mtime_since_last=%llu\n",
+                    "mtime_delta=%llu mtime_since_last=%llu sample=%llu "
+                    "read_ns=%lld\n",
                     elapsed_ms, current_minstret,
                     current_minstret - minstret_start,
                     current_minstret - last_liveness_minstret, current_mtime,
                     current_mtime - mtime_start,
-                    current_mtime - last_liveness_mtime);
+                    current_mtime - last_liveness_mtime,
+                    liveness_sample_count, read_ns);
                 fflush(stdout);
                 fflush(stderr);
                 last_liveness_minstret = current_minstret;
