@@ -31,10 +31,16 @@ class TimerPatchTests(unittest.TestCase):
         self.dtb = self.root / "input.dtb"
         dts.write_text("""/dts-v1/;
 / {
+  #address-cells = <2>;
+  #size-cells = <2>;
   cpus {
     #address-cells = <1>;
     #size-cells = <0>;
     timebase-frequency = <10000000>;
+  };
+  memory@80000000 {
+    device_type = "memory";
+    reg = <0x0 0x80000000 0x0 0x04000000>;
   };
 };
 """)
@@ -92,6 +98,22 @@ class TimerPatchTests(unittest.TestCase):
         self.assertIn("device-tree patch writes: 0", result.stdout)
         selectors, _ = self.reconstruct(output)
         self.assertEqual(selectors, [2])
+
+    def test_memory_bound_changes_reg_without_changing_blob_size(self):
+        output = self.root / "output.nbf"
+        result = subprocess.run(
+            [str(PATCHER), "--memory-mib", "46",
+             str(self.source), str(output)], check=True, text=True,
+            capture_output=True)
+        self.assertIn("memory size: 46 MiB", result.stdout)
+        selectors, blob = self.reconstruct(output)
+        patched = self.root / "patched.dtb"
+        patched.write_bytes(blob)
+        value = subprocess.check_output(
+            ["fdtget", "-t", "x", str(patched), "/memory@80000000",
+             "reg"], text=True).strip()
+        self.assertEqual(selectors, [2])
+        self.assertEqual(value, "0 80000000 0 2e00000")
 
 
 if __name__ == "__main__":

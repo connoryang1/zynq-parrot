@@ -17,6 +17,7 @@ ELF_CSR_CHECK ?= $(TOP)/tools/check_elf_csr_collisions.py
 NBF_TIMER_PATCH ?= $(TOP)/tools/patch_linux_nbf_timer.py
 BASELINE_LINUX_NBF ?= $(TOP)/riscv/linux/linux-6.6-jhumphri-20250125.nbf
 TIMEBASE_FREQUENCY ?= 8000000
+MEM_SIZE ?= 64
 
 OUT ?= $(CURDIR)/out
 APP := $(OUT)/ctxtsw_user_smoke
@@ -29,6 +30,7 @@ REQUEST_LOAD_AHEAD_APP := $(OUT)/request_benchmark_load_ahead
 REQUEST_LOAD_AHEAD_DYNAMIC_APP := $(OUT)/request_benchmark_load_ahead_dynamic
 REQUEST_HOST_APP := $(OUT)/request_benchmark_host
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
+TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 BP_HOST_CC ?= cc
 APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
 TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
@@ -101,13 +103,14 @@ emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
 
 # These pthread comparisons are independent of the custom-CSR shell demo.
-.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture emit-cache-miss-trace-transfer
+.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer
 request-benchmark: $(REQUEST_APP)
 request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
 request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
 request-benchmark-load-ahead-dynamic: $(REQUEST_LOAD_AHEAD_DYNAMIC_APP)
 request-benchmark-host: $(REQUEST_HOST_APP)
 cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
+cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 
 # Separate output names retain the historical faulting-load control. The default
 # emits the implemented Zicbop hint in both C batching and resident assembly.
@@ -131,6 +134,10 @@ $(REQUEST_HOST_APP): request_benchmark.c Makefile FORCE
 $(TRACE_CAPTURE_APP): cache_miss_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
+
+$(TRACE_CAPTURE_DYNAMIC_APP): cache_miss_trace_capture.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
 
 emit-request-transfer: check-linux-cc request-benchmark
 	@printf '%s\n' ': > /tmp/request_benchmark.b64'
@@ -156,6 +163,11 @@ emit-cache-miss-trace-transfer: check-linux-cc cache-miss-trace-capture
 	@printf '%s\n' ': > /tmp/cache_miss_trace_capture.b64'
 	@base64 -w 76 $(TRACE_CAPTURE_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture.b64|"
 	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture.b64 > /tmp/cache_miss_trace_capture' 'chmod +x /tmp/cache_miss_trace_capture'
+
+emit-cache-miss-trace-dynamic-transfer: check-linux-cc cache-miss-trace-capture-dynamic
+	@printf '%s\n' ': > /tmp/cache_miss_trace_capture_dynamic.b64'
+	@base64 -w 76 $(TRACE_CAPTURE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_capture_dynamic' 'chmod +x /tmp/cache_miss_trace_capture_dynamic'
 
 check-request-benchmark:
 	@BP_HOST_CC='$(BP_HOST_CC)' python3 -m unittest discover -s $(CURDIR) -p test_request_benchmark.py
@@ -267,7 +279,7 @@ tiny-init-linux-image: check-image-toolchain tiny stage-opensbi-platform
 	BP_DEMO_TIMEBASE_FREQUENCY='$(TIMEBASE_FREQUENCY)' \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
 	  LINUX_TARGET=$(BP_LINUX_TARGET) \
-	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS)
+	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS) MEM_SIZE=$(MEM_SIZE)
 	$(MAKE) package-tiny-init-nbf
 
 # Resume only after a full tiny-init build reached a later packaging/toolchain
@@ -284,7 +296,7 @@ tiny-init-linux-image-resume: check-image-toolchain tiny stage-opensbi-platform
 	BP_DEMO_TIMEBASE_FREQUENCY='$(TIMEBASE_FREQUENCY)' \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
 	  LINUX_TARGET=$(BP_LINUX_TARGET) \
-	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS)
+	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS) MEM_SIZE=$(MEM_SIZE)
 	$(MAKE) package-tiny-init-nbf
 
 # Fail closed if either the DTS or initramfs is stale.  An NBF built from a
@@ -314,6 +326,12 @@ validate-tiny-init-image: check-image-toolchain tiny
 	@timebase=$$(fdtget -t i $(GENERATED_DTB) /cpus timebase-frequency); \
 	  test "$$timebase" = '$(TIMEBASE_FREQUENCY)' || { \
 	    echo "generated DTB does not contain the exact timer frequency" >&2; exit 2; \
+	  }
+	@memory_reg=$$(fdtget -t x $(GENERATED_DTB) /memory@80000000 reg); \
+	  expected_size=$$(( $(MEM_SIZE) * 1024 * 1024 )); \
+	  expected_reg=$$(printf '0 80000000 %x %x' $$((expected_size >> 32)) $$((expected_size & 0xffffffff))); \
+	  test "$$memory_reg" = "$$expected_reg" || { \
+	    echo "generated DTB memory is '$$memory_reg', expected '$$expected_reg' for MEM_SIZE=$(MEM_SIZE)" >&2; exit 2; \
 	  }
 	@test -f $(KERNEL_INITRAMFS) || { echo "missing kernel initramfs input $(KERNEL_INITRAMFS)" >&2; exit 2; }
 	@tmpdir=$$(mktemp -d); trap 'rm -rf "$$tmpdir"' EXIT HUP INT TERM; \

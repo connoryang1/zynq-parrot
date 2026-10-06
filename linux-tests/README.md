@@ -524,6 +524,15 @@ make -s -C linux-tests emit-cache-miss-trace-transfer \
   > linux-tests/out/cache_miss_trace_capture.transfer
 ```
 
+For the maintained shell image, which has the matching dynamic loader, use the
+smaller transfer target when console bandwidth or guest memory is constrained:
+
+```sh
+make -s -C linux-tests emit-cache-miss-trace-dynamic-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/cache_miss_trace_capture_dynamic.transfer
+```
+
 After transferring and hash-checking the ELF in a Linux shell on the exact
 trace-enabled overlay, run `/tmp/cache_miss_trace_capture`. A valid run prints
 one `TRACE_HEADER`, the independent I/D histories merged by their 32-bit global

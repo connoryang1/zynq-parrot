@@ -36,11 +36,15 @@ def main() -> None:
     parser.add_argument("--frequency", type=int, default=8_000_000)
     parser.add_argument("--selector", type=int, default=2,
                         help="mtime source: 0=core, 1=core/16, 2=rt_clk")
+    parser.add_argument("--memory-mib", type=int,
+                        help="also bound /memory@80000000 to this many MiB")
     args = parser.parse_args()
     if not 1 <= args.frequency <= 0xFFFFFFFF:
         parser.error("frequency must fit a nonzero 32-bit device-tree cell")
     if not 0 <= args.selector <= 3:
         parser.error("selector must be in 0..3")
+    if args.memory_mib is not None and not 1 <= args.memory_mib <= 2048:
+        parser.error("memory-mib must be in 1..2048")
 
     lines = args.source.read_text(encoding="ascii").splitlines(keepends=True)
     memory: dict[int, int] = {}
@@ -73,6 +77,13 @@ def main() -> None:
         dtb.write_bytes(original)
         subprocess.run(["fdtput", "-t", "i", str(dtb), "/cpus",
                         "timebase-frequency", str(args.frequency)], check=True)
+        if args.memory_mib is not None:
+            memory_bytes = args.memory_mib * 1024 * 1024
+            subprocess.run(
+                ["fdtput", "-t", "x", str(dtb), "/memory@80000000", "reg",
+                 "0", "80000000", f"{memory_bytes >> 32:x}",
+                 f"{memory_bytes & 0xffffffff:x}"],
+                check=True)
         updated = dtb.read_bytes()
     if len(updated) != len(original):
         parser.error("device-tree patch changed blob size")
@@ -99,6 +110,8 @@ def main() -> None:
         encoding="ascii")
     print(f"mtime selector: {args.selector}")
     print(f"timebase frequency: {args.frequency}")
+    if args.memory_mib is not None:
+        print(f"memory size: {args.memory_mib} MiB")
     print(f"embedded DTB: 0x{fdt_address:x} ({total_size} bytes)")
     print(f"device-tree patch writes: {len(changed_blocks)}")
 

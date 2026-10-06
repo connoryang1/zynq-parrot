@@ -31,6 +31,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 
 | Test | What it checks |
 | --- | --- |
+| `mt_opensbi_csr_probe_test` | Early OpenSBI PMP, absent HPM, and optional privileged CSR probes are legal hardwired-zero WARL state |
 | `mt_ctxtsw_smoke_test` | Resident 0→1→0 handoff |
 | `mt_ctxtsw_logical_csr_readback_test` | Committed logical ID and side-effect-free reads of CSR `0x800` |
 | `mt_regfile_test` | Integer-context execution, private stack, and return-state isolation |
