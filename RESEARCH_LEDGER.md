@@ -192,6 +192,24 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** two ways (128 lines/context) are the lower-risk retention prototype. Static protection still taxes an unprotected cache-sensitive workload, so inactive or low-confidence ownership should be releasable.
 - **Limits:** the workers are already warm and see no misses, so these traces measure capacity cost rather than retention benefit. The model omits instruction accesses, dirty state, and exact BlackParrot replacement behavior.
 
+### RL-020 — Two-way retention captures the modeled forced-cold application benefit
+
+- **Status:** trace-driven forced-displacement upper bound
+- **Scope:** previous-epoch first-use lines, 64-byte granularity, two lines per set, and a 39-cycle cold-data increment
+- **Claim:** across 616 scan resumes, retention preserves a median four useful lines and saves an upper-bound 156 cycles, for a 3.85x median forced-cold resume-window projection. Across 280 trie resumes it retains ten lines, seven useful, and saves 273 cycles, for 1.71x. Pointer-plus-compute retains one line but gets zero reuse and zero benefit. The 128-line/two-way and 192-line/three-way policies have identical benefit because these application epochs never need the extra capacity.
+- **Evidence:** `logs/cache-retention-forced-displacement-20261006/README.md` and reproducible `model.py`/`results.json`.
+- **Meaning:** conditional two-way retention has a material payoff when recurring state would actually be displaced, while three ways add no application benefit here. Consumption feedback can distinguish the positive scan/trie cases from pointer chasing.
+- **Limits:** every evaluated resume is hypothetically fully cold and each useful line receives the full serialized 39-cycle credit. Real below-L1 hits, overlap, and instruction state can reduce or change the result.
+
+### RL-021 — Concurrent data-cache replay installation was already demonstrated
+
+- **Status:** accepted simulator evidence; FPGA placement failed
+- **Scope:** detached 64-byte data-line prefetches, three resident contexts, synthetic 40-cycle memory, and the existing single-port L1 installation path
+- **Claim:** per-request response buffering lets later hints issue while an earlier line installs. The closed 33-node trace admits and completes all 33 hints, reaches four outstanding UCE/AXI reads, records 27 hint allocations and issues during a prior fill, and has zero ordinary fallbacks. Concurrent installation reduces the 120-node run from 4,455 to 2,542 cycles; banked storage further reduces it to 2,512, only 9.6% above the 2,292-cycle narrow-buffer result. A separate installer audit bounds one full-line installation at 17 cycles.
+- **Evidence:** `logs/clock-pipeline-20260929/full-line-lat40-sweep-120/RESULTS.md`, `logs/clock-pipeline-20260929/full-line-lat40-sweep-120/fill-buffer-concurrent/trace-k3-m3-n33/analysis/installer-overlap.json`, and `logs/prefetch-sustained-coverage-20260924/final-trace/k10-m2/final-installer-audit.json`.
+- **Meaning:** the replay question is no longer whether data-line installation can overlap request issue. At the measured 17-cycle installation bound, 320 combined instruction-plus-data lines would nominally require 5,440 cycles, leaving 5,911 cycles inside the measured 11,351-cycle Linux resume slack if both cache paths could sustain that cadence.
+- **Limits:** the implemented and traced path installs data lines only; the 5,440-cycle projection assumes an equivalent instruction path and no scheduler interference. The corrected ten-slot BRAM implementation synthesized but failed PYNQ-Z2 placement by 172 slices, and the four-slot physical endpoint was not qualified.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -243,9 +261,9 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
-- **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot.
-- **Missing:** achieved concurrent replay/install rate and interference, plus retention benefit under forced displacement. RL-019 now bounds warm-trace capacity loss and rejects three static ways as the first prototype.
-- **Decisive experiment:** simulate 160-line combined background replay with scheduler traffic, then compare it against two-way retention under a forced-displacement trace. Measure useful-before-demand fraction, install stalls, shared-context misses, and total cycles.
+- **Known:** RL-018 shows that replay fits the Linux regime with only 1.0–1.5x serial throughput, while two-context retention fits in 4–6 ways and is the only option that can make a five-cycle handoff immediately hot. RL-021 shows that data-line request issue already overlaps the single-port installer at up to four outstanding reads and bounds full-line installation at 17 cycles. RL-019/RL-020 select conditional two-way retention over three static ways.
+- **Missing:** an instruction-cache replay path, coexistence with real scheduler traffic, useful-before-demand coverage, and an implementation that fits the FPGA.
+- **Decisive experiment:** connect the existing concurrent data-line mechanism to a Linux resume trace and add the smallest equivalent instruction-line path. Measure useful-before-demand fraction, cache-port stalls, scheduler interference, and total cycles; compare against RL-018's required 1.24x serial rate and the 5,440-cycle no-interference projection from RL-021.
 
 ## Next experiment
 
@@ -259,3 +277,5 @@ The immediate next experiment is OQ-001 because the diagnostic is complete and a
 - **2026-10-06 — Existing cold-resume decomposition recovered:** instruction-only, data-only, translation, combined-pollution, ideal 128–192-line replay, and replay-cost experiments were already complete. The ledger now treats background replay versus cache-state retention as the unresolved architectural choice instead of proposing another component measurement.
 - **2026-10-06 — Replay-versus-retention regimes separated:** the measured middle point needs only 1.24x serial replay throughput to hide combined I+D replay under Linux, whereas a five-cycle hardware handoff needs retained state. Two resident contexts can retain the measured 128–192-line range using 4–6 of eight ways; the remaining question is measured contention and capacity loss.
 - **2026-10-06 — Retention capacity loss modeled:** two protected ways per resident are nearly free in warm scan/trie traces but add 1.13 percentage points of misses to pointer-plus-compute's shared context; three ways also harms scan/trie. Two-way, releasable retention is the safer first design point.
+- **2026-10-06 — Forced-displacement retention benefit bounded:** conditional two-way retention preserves median four/seven recurring scan/trie lines, worth upper bounds of 156/273 cycles and 3.85x/1.71x cold resume-window speedups; pointer chasing remains at zero. Three ways captures no additional application benefit.
+- **2026-10-06 — Existing concurrent installer result recovered:** the full-line experiments had already established four outstanding data reads, 27/33 hint issues during prior installation, a 17-cycle maximum install, and a 2,512-cycle endpoint. The remaining replay work is Linux/I-cache integration and FPGA fit, not another generic installer-throughput experiment.
