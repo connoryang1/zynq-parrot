@@ -1,0 +1,38 @@
+{
+  "method": "For an early target prediction, a correct prediction receives the observed correct8 median total saving and a wrong prediction receives the observed correct0 median total penalty. Solve p*save-(1-p)*penalty > 0.",
+  "source": "logs/linux-prefetch-precision-sweep-rotate-20261003/results.json",
+  "rows": {
+    "to_main": {
+      "correct8_total_saving_cycles": 80.0,
+      "stale8_total_penalty_cycles": 240.0,
+      "median_break_even_target_accuracy": 0.75,
+      "expected_saving_at_accuracy": {
+        "0.5": -80.0,
+        "0.75": 0.0,
+        "0.8": 16.000000000000014,
+        "0.9": 48.00000000000001,
+        "0.95": 63.999999999999986,
+        "0.99": 76.8
+      }
+    },
+    "to_worker": {
+      "correct8_total_saving_cycles": 73.5,
+      "stale8_total_penalty_cycles": 189.0,
+      "median_break_even_target_accuracy": 0.72,
+      "expected_saving_at_accuracy": {
+        "0.5": -57.75,
+        "0.75": 7.875,
+        "0.8": 21.000000000000014,
+        "0.9": 47.250000000000014,
+        "0.95": 60.37499999999999,
+        "0.99": 70.875
+      }
+    }
+  },
+  "conservative_planning_threshold": 0.75,
+  "limits": [
+    "The correct8 scheduler-inclusive saving has a bootstrap interval crossing zero, so the median threshold is a planning bound rather than repeatable end-to-end proof.",
+    "This is an eight-hint same-mm experiment; hundreds of wrong full-line replays can have nonlinear cache-pollution and bandwidth cost.",
+    "Line accuracy within the predicted context is separate from target-context prediction accuracy."
+  ]
+}
