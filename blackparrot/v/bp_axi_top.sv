@@ -16,6 +16,7 @@ module bp_axi_top
    , parameter axi_core_clk_async_p = 0
    , parameter prefetch_bypass_p = 0
    , parameter prefetch_outstanding_p = 10
+   , parameter bit cache_miss_trace_p = 1'b0
    , localparam lg_async_fifo_size_lp = 3
 
    // AXI4-LITE PARAMS
@@ -188,6 +189,7 @@ module bp_axi_top
   bp_processor
    #(.bp_params_p(bp_params_p)
      ,.prefetch_bypass_p(prefetch_bypass_p)
+     ,.cache_miss_trace_p(cache_miss_trace_p)
      )
    processor
     (.clk_i(core_clk_i)
