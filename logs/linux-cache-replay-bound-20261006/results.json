@@ -1,0 +1,105 @@
+{
+  "assumptions": {
+    "memory_service_cycles": 41,
+    "installer_cycles_per_line": 17,
+    "cache_lines_are_64_bytes": true,
+    "separate_i_d_installers": true,
+    "transport_slots_are_shared": true
+  },
+  "windows": [
+    {
+      "window": "source_to_peer",
+      "elapsed": 11379,
+      "unique_i": 48,
+      "unique_d": 3,
+      "first_i": 1006,
+      "first_d": 2920,
+      "last_i": 11422,
+      "last_d": 7080,
+      "unique_lines": 51,
+      "earliest_one_line_ready": 58,
+      "first_i_slack": 948,
+      "first_d_slack": 2862,
+      "ideal_i_bulk_ready": 857,
+      "ideal_d_bulk_ready": 92,
+      "i_bulk_slack_at_first_i": 149,
+      "d_bulk_slack_at_first_d": 2828,
+      "max_i_installs_before_first_i": 56,
+      "max_d_installs_before_first_d": 169,
+      "four_slot_bulk_headroom": 10522,
+      "slot_sweep": {
+        "1": {
+          "transport_lower_bound_cycles": 2091.0,
+          "separate_installer_lower_bound_cycles": 857,
+          "aggregate_lower_bound_cycles": 2091.0,
+          "fits_elapsed": true
+        },
+        "2": {
+          "transport_lower_bound_cycles": 1066.0,
+          "separate_installer_lower_bound_cycles": 857,
+          "aggregate_lower_bound_cycles": 1066.0,
+          "fits_elapsed": true
+        },
+        "3": {
+          "transport_lower_bound_cycles": 724.3333333333334,
+          "separate_installer_lower_bound_cycles": 857,
+          "aggregate_lower_bound_cycles": 857,
+          "fits_elapsed": true
+        },
+        "4": {
+          "transport_lower_bound_cycles": 553.5,
+          "separate_installer_lower_bound_cycles": 857,
+          "aggregate_lower_bound_cycles": 857,
+          "fits_elapsed": true
+        }
+      }
+    },
+    {
+      "window": "peer_to_source",
+      "elapsed": 28883,
+      "unique_i": 215,
+      "unique_d": 10,
+      "first_i": 82,
+      "first_d": 1107,
+      "last_i": 28879,
+      "last_d": 28546,
+      "unique_lines": 225,
+      "earliest_one_line_ready": 58,
+      "first_i_slack": 24,
+      "first_d_slack": 1049,
+      "ideal_i_bulk_ready": 3696,
+      "ideal_d_bulk_ready": 211,
+      "i_bulk_slack_at_first_i": -3614,
+      "d_bulk_slack_at_first_d": 896,
+      "max_i_installs_before_first_i": 2,
+      "max_d_installs_before_first_d": 62,
+      "four_slot_bulk_headroom": 25187,
+      "slot_sweep": {
+        "1": {
+          "transport_lower_bound_cycles": 9225.0,
+          "separate_installer_lower_bound_cycles": 3696,
+          "aggregate_lower_bound_cycles": 9225.0,
+          "fits_elapsed": true
+        },
+        "2": {
+          "transport_lower_bound_cycles": 4633.0,
+          "separate_installer_lower_bound_cycles": 3696,
+          "aggregate_lower_bound_cycles": 4633.0,
+          "fits_elapsed": true
+        },
+        "3": {
+          "transport_lower_bound_cycles": 3102.3333333333335,
+          "separate_installer_lower_bound_cycles": 3696,
+          "aggregate_lower_bound_cycles": 3696,
+          "fits_elapsed": true
+        },
+        "4": {
+          "transport_lower_bound_cycles": 2337.0,
+          "separate_installer_lower_bound_cycles": 3696,
+          "aggregate_lower_bound_cycles": 3696,
+          "fits_elapsed": true
+        }
+      }
+    }
+  ]
+}
