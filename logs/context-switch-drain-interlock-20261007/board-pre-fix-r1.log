@@ -1,0 +1,82 @@
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbef44650 40000004 16 1
+INFO:    Creating host: 0xbef44650 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d0e000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d0e000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1534355
+DEBUG-PS: ps.cpp: 1-1534501
+DEBUG-PS: ps.cpp: 2-1534636
+DEBUG-PS: ps.cpp: 3-1534765
+DEBUG-PS: ps.cpp: 4-1534896
+DEBUG-PS: ps.cpp: 5-1535022
+DEBUG-PS: ps.cpp: 6-1535147
+DEBUG-PS: ps.cpp: 7-1535273
+DEBUG-PS: ps.cpp: 8-1535398
+DEBUG-PS: ps.cpp: 9-1535524
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 3912
+DEBUG-PS: ps.cpp: finished loading 3912 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+AB[BSG-PASS] matched store-before-switch handoff benchmark
+=== Store-before-switch Handoff Benchmark ===
+Resident pure cycles/switch x100:       0x00000000000001fe
+Resident store cycles/switch x100:      0x0000000000000267
+Resident store overhead/switch x100:    0x0000000000000068
+Resident four-store cycles/switch x100: 0x0000000000000392
+Resident four-store overhead x100:      0x0000000000000193
+Nonresident pure cycles/switch x100:    0x0000000000000392
+Nonresident store cycles/switch x100:   0x000000000000045b
+Nonresident store overhead/switch x100: 0x00000000000000c9
+Nonresident four-store cycles/switch x100: 0x0000000000000586
+Nonresident four-store overhead x100:      0x00000000000001f4
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              613 (             265)
+INFO:    ps.cpp: minstret (instructions retired):           32,278 (            7e16)
+INFO:    ps.cpp: minstret delta:                            31,665 (            7bb1)
+INFO:    ps.cpp: MTIME start:                            1,564,999 (          17e147)
+INFO:    ps.cpp: MTIME stop:                             1,569,347 (          17f243)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,348 (            10fc)
+INFO:    ps.cpp: IPC        :                             0.910332
+INFO:    ps.cpp: minstret (instructions retired):           32,359 (            7e67)
+INFO:    ps.cpp: wall clock time                :        5,578,278 (          551e26) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,136,964.85 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d0e000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
