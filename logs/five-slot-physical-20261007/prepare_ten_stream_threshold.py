@@ -24,7 +24,12 @@ address = int(source_manifest["config_patch_address"], 0)
 patcher = repo / "codex-skills/bp-fpga-synthesis/scripts/patch_nbf_bytes.py"
 
 rows = []
-for steps in (4, 8, 16, 32, 64, 96, 112, 128):
+# The first ascending sweep located a 96/97 transition, but fresh-overlay
+# controls showed that preceding short runs prime state which a target reset
+# does not clear. Generate the whole 64--112 interval so cold and primed
+# boundaries can be measured from identical program images.
+step_counts = (4, 8, 16, 32, *range(64, 113), 128)
+for steps in step_counts:
     nodes = steps * 10
     value = 3 | (10 << 8) | (nodes << 16)
     config = out / f"config-k10-m3-steps{steps}.bin"

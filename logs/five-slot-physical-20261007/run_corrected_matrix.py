@@ -40,12 +40,30 @@ env = dict(os.environ, PYNQ_CONTROL_PROGRAM_FOREGROUND="1",
 
 def invoke(nbf, log):
     started = time.time()
-    with log.open("w") as stream:
-        run = subprocess.run([str(runner), "xilinx@192.168.4.35", str(nbf)],
-                             env=env, stdout=stream, stderr=subprocess.STDOUT)
+    attempts = []
+    command = [str(runner), "xilinx@192.168.4.35", str(nbf)]
+    for attempt in range(5):
+        run = subprocess.run(command, env=env, stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT, text=True)
+        attempts.append({"attempt": attempt, "exit_code": run.returncode,
+                         "output": run.stdout})
+        # The managed local environment occasionally refuses a socket before
+        # SSH connects. Retry only when no board runner was launched; after a
+        # RUNNER_STARTED_PID marker, retrying could duplicate a target run.
+        transient = (
+            run.returncode != 0 and "RUNNER_STARTED_PID=" not in run.stdout and
+            re.search(r"socket: Operation not permitted|connect to host .* failure",
+                      run.stdout))
+        if not transient:
+            break
+    log.write_text("".join(
+        "ATTEMPT={} EXIT={}\n{}".format(
+            item["attempt"], item["exit_code"], item["output"])
+        for item in attempts))
     text = log.read_text(errors="replace")
     common = {
         "exit_code": run.returncode,
+        "ssh_attempts": len(attempts),
         "nbf": str(nbf.relative_to(repo)),
         "nbf_sha256": digest(nbf),
         "log": log.name,
