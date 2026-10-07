@@ -181,6 +181,14 @@ sharing as a route for a side-buffer write to modify the stack BRAM. The exact
 checkpoint query, primitive inventory, locations, transcript, and hashes are
 retained in `stack-slot-diagnostics/routed-storage/`.
 
+Storage-boundary timing is not marginal on that route. The worst selected
+side-buffer paths have `+14.783/+0.262 ns` setup/hold slack into the distributed
+RAM and `+12.285/+1.232 ns` out. The L1 data BRAM has `+2.491/+0.196 ns` into
+storage and `+36.273/+0.630 ns` out. All directions close, and none is the
+design's global setup or hold critical path. A deterministic context-4 step
+threshold is therefore unlikely to come from marginal timing at either memory
+boundary.
+
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus
 97,237 for the current interlock, but the simulator already passed the physical
