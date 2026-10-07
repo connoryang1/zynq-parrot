@@ -22,3 +22,5 @@ resident/nonresident, 6.15/11.15 after one hot store, and 9.14/14.14 after four
 hot stores. Every run passes benchmark state, core, host, cleanup, and bounded
 runtime checks. This closely reproduces the pre-fix simulator and supplies the
 physical half of the pending matched-image A/B.
+
+Across the six pre-fix pure, single-store, and four-store resident/nonresident rows, simulation matches the FPGA exactly in five rows and differs by only 0.04 cycle in the sixth. The empirical maximum error is therefore 0.04 cycle for this benchmark. Subject to the fixed route preserving the same implementation behavior, the simulator predicts 12.11 resident and 16.11 nonresident cycles for four-store handoffs on the fixed FPGA image. This narrow empirical error is a benchmark-specific prediction interval, not a general simulator-accuracy claim.

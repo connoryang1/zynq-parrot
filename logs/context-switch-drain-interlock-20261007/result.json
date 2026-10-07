@@ -96,5 +96,47 @@
     ],
     "all_three_cycle_rows_identical": true,
     "all_guest_core_host_pass": true
+  },
+  "simulation_to_fpga_pre_fix_agreement": {
+    "rows": {
+      "resident_pure": {
+        "simulation": 5.14,
+        "fpga": 5.1,
+        "fpga_minus_simulation": -0.04
+      },
+      "resident_single_store": {
+        "simulation": 6.15,
+        "fpga": 6.15,
+        "fpga_minus_simulation": 0.0
+      },
+      "resident_four_store": {
+        "simulation": 9.14,
+        "fpga": 9.14,
+        "fpga_minus_simulation": 0.0
+      },
+      "nonresident_pure": {
+        "simulation": 9.14,
+        "fpga": 9.14,
+        "fpga_minus_simulation": 0.0
+      },
+      "nonresident_single_store": {
+        "simulation": 11.15,
+        "fpga": 11.15,
+        "fpga_minus_simulation": 0.0
+      },
+      "nonresident_four_store": {
+        "simulation": 14.14,
+        "fpga": 14.14,
+        "fpga_minus_simulation": 0.0
+      }
+    },
+    "exact_rows": 5,
+    "total_rows": 6,
+    "maximum_absolute_error_cycles": 0.040000000000000036,
+    "fixed_fpga_prediction": {
+      "resident_four_store_cycles_per_switch": 12.11,
+      "nonresident_four_store_cycles_per_switch": 16.11,
+      "empirical_pre_fix_max_error_cycles": 0.040000000000000036
+    }
   }
 }
