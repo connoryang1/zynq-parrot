@@ -1,5 +1,10 @@
 # Five-slot physical acceptance and adjacent-word regression
 
+"Slot" throughout this record means one detached-prefetch transaction entry.
+Both the five- and ten-slot images retain two resident architectural register
+banks and ten logical contexts; slot count does not name the resident-thread
+count.
+
 The routed five-slot image at top commit `4e527cad1` and BlackParrot commit
 `d4c20786d` was loaded on the PYNQ-Z2 with bitstream SHA-256
 `933777e636853c0a6e9c6cb6d068778b4a49209510d16e49226c63bcbb6793ea`.
