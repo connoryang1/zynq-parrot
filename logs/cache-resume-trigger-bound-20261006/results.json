@@ -1,21 +1,21 @@
 {
-  "method": "Apply the conditional four-slot, 41-cycle shared-transport and separate 17-cycle I/D install bound to measured trigger windows. The Linux late-trigger window is deliberately generous: the whole alternate-thread delta is credited even though it includes task selection.",
+  "method": "Apply the conditional four-slot, 41-cycle shared-transport and separate measured-median 19-cycle I/D install bound to measured trigger windows. The Linux late-trigger window is deliberately generous: the whole alternate-thread delta is credited even though it includes task selection.",
   "inputs": {
     "shared_path_results": "logs/cache-resume-shared-path-bound-20261006/results.json",
     "scheduler_breakdown": "logs/linux-hot-scheduler-breakdown-20261003/analysis.json",
     "latency_cycles": 41,
     "outstanding_slots": 4,
     "beats_per_line": 8,
-    "install_cycles_per_line": 17,
+    "install_cycles_per_line": 19.0,
     "full_target_lines": 479,
     "kernel_target_lines": 319,
     "hot_dispatch_deadline_cycles": 5551.0,
-    "full_target_completion_cycles": 5217,
-    "kernel_target_completion_cycles": 3308.5
+    "full_target_completion_cycles": 5825.0,
+    "kernel_target_completion_cycles": 3374.0
   },
   "derived": {
-    "latest_full_target_trigger_after_yield_entry_cycles": 334.0,
-    "latest_kernel_target_trigger_after_yield_entry_cycles": 2242.5,
+    "latest_full_target_trigger_after_yield_entry_cycles": -274.0,
+    "latest_kernel_target_trigger_after_yield_entry_cycles": 2177.0,
     "late_trigger_max_lines": 214,
     "late_trigger_full_target_shortfall_lines": 265
   },
@@ -23,8 +23,8 @@
     "yield_entry_to_hot_dispatch": {
       "window_cycles": 5551.0,
       "transport_line_capacity": 537,
-      "per_cache_install_line_capacity": 323,
-      "two_cache_install_line_capacity": 646,
+      "per_cache_install_line_capacity": 289,
+      "two_cache_install_line_capacity": 578,
       "aggregate_mixed_line_capacity": 537,
       "fraction_of_479_line_target": 1.1210855949895615,
       "fraction_of_319_line_kernel_target": 1.683385579937304
@@ -32,8 +32,8 @@
     "generous_selection_switch_return_delta": {
       "window_cycles": 2238.0,
       "transport_line_capacity": 214,
-      "per_cache_install_line_capacity": 128,
-      "two_cache_install_line_capacity": 256,
+      "per_cache_install_line_capacity": 115,
+      "two_cache_install_line_capacity": 230,
       "aggregate_mixed_line_capacity": 214,
       "fraction_of_479_line_target": 0.44676409185803756,
       "fraction_of_319_line_kernel_target": 0.670846394984326
@@ -41,8 +41,8 @@
     "worker_selection_switch_return_delta": {
       "window_cycles": 2139.0,
       "transport_line_capacity": 204,
-      "per_cache_install_line_capacity": 122,
-      "two_cache_install_line_capacity": 244,
+      "per_cache_install_line_capacity": 110,
+      "two_cache_install_line_capacity": 220,
       "aggregate_mixed_line_capacity": 204,
       "fraction_of_479_line_target": 0.42588726513569936,
       "fraction_of_319_line_kernel_target": 0.6394984326018809
@@ -71,6 +71,8 @@
     "Line capacities do not imply usefulness because actual miss addresses, order, and deadlines are unknown.",
     "The input line targets are refill-latency equivalents, not exact miss counts.",
     "The model excludes translation, dirty victims, capacity replacement, and arbitration bubbles.",
-    "The 41-cycle scenario is not a measured detached full-line endpoint; physical demand load-to-use only supplies a proxy."
+    "The 41-cycle scenario is not a measured detached full-line endpoint; physical demand load-to-use only supplies a proxy.",
+    "The 17-cycle input is a direct-path sensitivity point; the primary banked FPGA-facing result uses its measured 19-cycle median and observes a 25-cycle maximum.",
+    "The primary capacity rows use the FPGA-facing banked path's 19-cycle median; its observed 25-cycle maximum would be slower."
   ]
 }

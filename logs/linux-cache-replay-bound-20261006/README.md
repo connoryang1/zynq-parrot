@@ -1,7 +1,7 @@
 # Measured Linux trace replay-latency thresholds
 
 This model combines the complete physical Linux handoff counts in RL-029 with
-the eight-beat 64-byte response shape and the 17-cycle data-installer bound
+the eight-beat 64-byte response shape and measured 17--25-cycle data-installer range
 from RL-021/RL-022. It identifies how quickly a full-line response must begin
 for replay to beat the first observed demand. Run `python3 model.py` to
 regenerate `results.json`.
@@ -25,6 +25,14 @@ value were representative of a full-line response start, completion would be
 cycle 865, leaving 141 cycles. The forward path therefore has useful margin,
 but much less than an installer-only calculation suggests.
 
+That result also depends on installer rate. At the conditional 41-cycle
+response input, 17 and 19 cycles per line finish the 48-line instruction bulk
+at cycles 865 and 961, leaving 141 and 45 cycles. A 21-cycle installer finishes
+at cycle 1,057 and misses the first demand by 51 cycles. The FPGA-facing
+banked path's 25-cycle maximum finishes at cycle 1,249 and misses by 243
+cycles. Its median remains 19 cycles; only the serialized direct installer is
+exactly 17 cycles.
+
 The peer-to-source window is much tighter. Its first instruction demand occurs
 at cycle 82, so the first response beat must arrive no later than cycle 57:
 `57 + 8 + 17 = 82`. Under a conditional 41-cycle response-start assumption,
@@ -32,6 +40,10 @@ only one complete line fits by cycle 82 and it has 16 cycles of slack. At 65
 cycles no replayed full line can be installed before the first demand. The
 reverse path therefore needs an actual full-line timing measurement before any
 claim that replay covers even its first miss.
+
+For the first reverse line, 17/19/21/25-cycle installation requires the first
+response beat by cycles 57/55/53/49. Under the conditional 41-cycle response
+input those cases leave only 16/14/12/8 cycles of slack.
 
 Bulk capacity remains less sensitive. At the conditional 41-cycle point,
 four shared slots and separate I/D installers bound the forward and reverse
@@ -54,7 +66,9 @@ The result supports a hybrid design:
 This remains an optimistic capacity model. It assumes perfect addresses and
 ordering, consecutive response beats, no dirty victims, no scheduler traffic,
 and independent serial I/D installers. The 17-cycle value is measured for the
-data installer; an equivalent instruction replay installer does not yet exist.
+direct data installer; the FPGA-facing banked data path measures a 19-cycle
+median and 25-cycle maximum, and an equivalent instruction replay installer
+does not yet exist.
 The Linux recorder timestamps accepted demand requests rather than completion
 or saved stall cycles. Exact per-line early/late coverage still requires the
 full ordered record list and a physically timed instruction replay path.

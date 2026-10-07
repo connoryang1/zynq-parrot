@@ -40,24 +40,24 @@ def transport_bound(lines, slots, response_start):
     return response_start + (lines - 1) * interval + BEATS_PER_LINE
 
 
-def installer_bound(i_lines, d_lines, response_start):
+def installer_bound(i_lines, d_lines, response_start, install_cycles=INSTALL_CYCLES):
     """Separate serial I/D installers after the first complete response."""
-    return response_start + BEATS_PER_LINE + INSTALL_CYCLES * max(i_lines, d_lines)
+    return response_start + BEATS_PER_LINE + install_cycles * max(i_lines, d_lines)
 
 
-def installed_by(deadline, response_start):
+def installed_by(deadline, response_start, install_cycles=INSTALL_CYCLES):
     available = deadline - response_start - BEATS_PER_LINE
-    return max(0, math.floor(available / INSTALL_CYCLES))
+    return max(0, math.floor(available / install_cycles))
 
 
-def maximum_response_start_for_bulk(deadline, lines, slots):
+def maximum_response_start_for_bulk(deadline, lines, slots, install_cycles=INSTALL_CYCLES):
     """Largest integer latency whose transport and installer both meet deadline."""
     valid = [
         latency
         for latency in range(deadline + 1)
         if max(
             transport_bound(lines, slots, latency),
-            latency + BEATS_PER_LINE + INSTALL_CYCLES * lines,
+            latency + BEATS_PER_LINE + install_cycles * lines,
         ) <= deadline
     ]
     return max(valid) if valid else None
@@ -93,6 +93,21 @@ def latency_row(values, response_start):
 
 
 def analyze(name, values):
+    installer_sensitivity = {}
+    for cycles in (17, 19, 21, 25):
+        bulk_ready = 41 + BEATS_PER_LINE + cycles * values["unique_i"]
+        installer_sensitivity[str(cycles)] = {
+            "maximum_response_start_for_first_i": values["first_i"]
+            - BEATS_PER_LINE - cycles,
+            "maximum_response_start_for_all_i_before_first_i_four_slots":
+            maximum_response_start_for_bulk(
+                values["first_i"], values["unique_i"], 4, cycles
+            ),
+            "conditional_41cycle_i_bulk_ready": bulk_ready,
+            "conditional_41cycle_i_bulk_slack": values["first_i"] - bulk_ready,
+            "conditional_41cycle_max_i_installs_before_first_i":
+            installed_by(values["first_i"], 41, cycles),
+        }
     return {
         "window": name,
         **values,
@@ -109,6 +124,7 @@ def analyze(name, values):
         },
         "maximum_response_start_for_first_d": values["first_d"]
         - BEATS_PER_LINE - INSTALL_CYCLES,
+        "installer_sensitivity": installer_sensitivity,
         "latency_sweep": [latency_row(values, latency) for latency in LATENCY_SWEEP],
     }
 
@@ -119,6 +135,7 @@ def main():
             "request_to_first_response_beat_cycles": list(LATENCY_SWEEP),
             "axi_beats_per_64_byte_line": BEATS_PER_LINE,
             "installer_cycles_per_line_after_complete_response": INSTALL_CYCLES,
+            "installer_cycle_sensitivity": [17, 19, 21, 25],
             "separate_i_d_installers": True,
             "transport_slots_are_shared": True,
             "physical_full_line_response_latency_is_unmeasured": True,

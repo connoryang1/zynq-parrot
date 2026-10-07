@@ -1,0 +1,1118 @@
+{
+  "method": "Sample retained accepted VCD evidence on rising core/UCE clocks within the fifth run_window PC interval; pair each accepted hint, AXI burst, UCE response, installer, and accepted tag publication by request order and slot lifecycle.",
+  "provenance": {
+    "top_commit": "03955af94db78af86c271b560052f74f66879a88",
+    "black_parrot_commit": "259b88587afe31a15db521f672d7626c26119642",
+    "subsystem_commit": "f9762c5b41f193173d134ac8a20b9e126ceac1e9",
+    "test_elf_sha256": "0770ad121dfd1dcc6e7a56822a7dd2b12f3c25f7feadb2cdff073d1243a25e9b",
+    "test_nbf_sha256": "0af4a7a93375fd14537a55cbe63ca421382c7eae3857f976d61ebb2afb41639c",
+    "filtered_vcd_xz_sha256": "76a4e81e0ef51b34cb64b57330e4d3b0803b164c14939afddb207c849f4d59a4",
+    "trace_model_sha256": "c87db985ffe9699e889c419cdaa80ed608c6e640585057d41cd303156fad56fb"
+  },
+  "configuration": {
+    "resident_threads": 3,
+    "logical_contexts": 10,
+    "prefetch_slots": 10,
+    "synthetic_request_to_first_beat_nominal_cycles": 40,
+    "physical_axi_data_width_bits": 32,
+    "line_bytes": 64,
+    "axi_beats_per_line": 16,
+    "uce_response_width_bits": 64,
+    "uce_responses_per_line": 8
+  },
+  "window": {
+    "begin_timestamp": 74999175000,
+    "end_timestamp": 75039275000,
+    "cycles": 802
+  },
+  "accounting": {
+    "accepted_hints": 33,
+    "issued_hints": 33,
+    "axi_bursts": 33,
+    "axi_32bit_beats": 528,
+    "uce_64bit_responses": 264,
+    "accepted_tag_publications": 33,
+    "physical_address_offset_low32": 330162176
+  },
+  "latency_cycles": {
+    "allocation_to_axi_address": {
+      "count": 33,
+      "minimum_cycles": 3.5,
+      "median_cycles": 3.5,
+      "mean_cycles": 3.590909090909091,
+      "maximum_cycles": 4.5,
+      "distribution": {
+        "3.5": 30,
+        "4.5": 3
+      }
+    },
+    "axi_address_to_first_32bit_beat": {
+      "count": 33,
+      "minimum_cycles": 40.0,
+      "median_cycles": 40.0,
+      "mean_cycles": 40.515151515151516,
+      "maximum_cycles": 52.0,
+      "distribution": {
+        "40.0": 30,
+        "41.0": 1,
+        "44.0": 1,
+        "52.0": 1
+      }
+    },
+    "first_to_final_32bit_beat": {
+      "count": 33,
+      "minimum_cycles": 15.0,
+      "median_cycles": 15.0,
+      "mean_cycles": 15.0,
+      "maximum_cycles": 15.0,
+      "distribution": {
+        "15.0": 33
+      }
+    },
+    "allocation_to_first_32bit_beat": {
+      "count": 33,
+      "minimum_cycles": 43.5,
+      "median_cycles": 43.5,
+      "mean_cycles": 44.10606060606061,
+      "maximum_cycles": 55.5,
+      "distribution": {
+        "43.5": 28,
+        "44.5": 2,
+        "45.5": 1,
+        "47.5": 1,
+        "55.5": 1
+      }
+    },
+    "allocation_to_final_32bit_beat": {
+      "count": 33,
+      "minimum_cycles": 58.5,
+      "median_cycles": 58.5,
+      "mean_cycles": 59.10606060606061,
+      "maximum_cycles": 70.5,
+      "distribution": {
+        "58.5": 28,
+        "59.5": 2,
+        "60.5": 1,
+        "62.5": 1,
+        "70.5": 1
+      }
+    },
+    "allocation_to_first_64bit_uce_response": {
+      "count": 33,
+      "minimum_cycles": 47.0,
+      "median_cycles": 47.0,
+      "mean_cycles": 47.60606060606061,
+      "maximum_cycles": 59.0,
+      "distribution": {
+        "47.0": 28,
+        "48.0": 2,
+        "49.0": 1,
+        "51.0": 1,
+        "59.0": 1
+      }
+    },
+    "allocation_to_final_64bit_uce_response": {
+      "count": 33,
+      "minimum_cycles": 61.0,
+      "median_cycles": 61.0,
+      "mean_cycles": 61.60606060606061,
+      "maximum_cycles": 73.0,
+      "distribution": {
+        "61.0": 28,
+        "62.0": 2,
+        "63.0": 1,
+        "65.0": 1,
+        "73.0": 1
+      }
+    },
+    "final_32bit_beat_to_tag_publication": {
+      "count": 33,
+      "minimum_cycles": 20.5,
+      "median_cycles": 24.5,
+      "mean_cycles": 24.46969696969697,
+      "maximum_cycles": 32.5,
+      "distribution": {
+        "20.5": 3,
+        "21.5": 3,
+        "22.5": 2,
+        "23.5": 2,
+        "24.5": 16,
+        "26.5": 3,
+        "28.5": 3,
+        "32.5": 1
+      }
+    },
+    "allocation_to_tag_publication": {
+      "count": 33,
+      "minimum_cycles": 79.0,
+      "median_cycles": 83.0,
+      "mean_cycles": 83.57575757575758,
+      "maximum_cycles": 103.0,
+      "distribution": {
+        "79.0": 2,
+        "80.0": 4,
+        "81.0": 2,
+        "82.0": 2,
+        "83.0": 16,
+        "85.0": 2,
+        "87.0": 2,
+        "88.0": 1,
+        "91.0": 1,
+        "103.0": 1
+      }
+    },
+    "installer_active": {
+      "count": 33,
+      "minimum_cycles": 16.0,
+      "median_cycles": 19.0,
+      "mean_cycles": 18.696969696969695,
+      "maximum_cycles": 21.0,
+      "distribution": {
+        "16.0": 1,
+        "17.0": 3,
+        "18.0": 3,
+        "19.0": 25,
+        "21.0": 1
+      }
+    }
+  },
+  "queue_depth_control": {
+    "four_slot_cycles": 2241,
+    "ten_slot_cycles": 802,
+    "four_slot_slowdown": 2.79426433915212,
+    "recorded_claimed_banked_cycles": 771,
+    "ten_slot_reproduction_difference_from_claim": 31
+  },
+  "lines": [
+    {
+      "line": 0,
+      "slot": 0,
+      "cpu_address": 2147606080,
+      "axi_address": 2477768256,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75000450000,
+        "axi_address": 75000625000,
+        "axi_first_32bit_beat": 75002625000,
+        "axi_final_32bit_beat": 75003375000,
+        "uce_first_64bit_response": 75002800000,
+        "uce_final_64bit_response": 75003500000,
+        "installer_start": 75003600000,
+        "tag_publication": 75004600000,
+        "installer_idle": 75004650000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 63.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 1,
+      "slot": 1,
+      "cpu_address": 2147550464,
+      "axi_address": 2477712640,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75001050000,
+        "axi_address": 75001225000,
+        "axi_first_32bit_beat": 75003425000,
+        "axi_final_32bit_beat": 75004175000,
+        "uce_first_64bit_response": 75003600000,
+        "uce_final_64bit_response": 75004300000,
+        "installer_start": 75004700000,
+        "tag_publication": 75005600000,
+        "installer_idle": 75005650000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 47.5,
+        "axi_final_32bit_beat": 62.5,
+        "uce_first_64bit_response": 51.0,
+        "uce_final_64bit_response": 65.0,
+        "installer_start": 73.0,
+        "tag_publication": 91.0,
+        "installer_idle": 92.0
+      }
+    },
+    {
+      "line": 2,
+      "slot": 2,
+      "cpu_address": 2147562176,
+      "axi_address": 2477724352,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75001450000,
+        "axi_address": 75001625000,
+        "axi_first_32bit_beat": 75004225000,
+        "axi_final_32bit_beat": 75004975000,
+        "uce_first_64bit_response": 75004400000,
+        "uce_final_64bit_response": 75005100000,
+        "installer_start": 75005700000,
+        "tag_publication": 75006600000,
+        "installer_idle": 75006650000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 55.5,
+        "axi_final_32bit_beat": 70.5,
+        "uce_first_64bit_response": 59.0,
+        "uce_final_64bit_response": 73.0,
+        "installer_start": 85.0,
+        "tag_publication": 103.0,
+        "installer_idle": 104.0
+      }
+    },
+    {
+      "line": 3,
+      "slot": 3,
+      "cpu_address": 2147575616,
+      "axi_address": 2477737792,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75003200000,
+        "axi_address": 75003425000,
+        "axi_first_32bit_beat": 75005425000,
+        "axi_final_32bit_beat": 75006175000,
+        "uce_first_64bit_response": 75005600000,
+        "uce_final_64bit_response": 75006300000,
+        "installer_start": 75006700000,
+        "tag_publication": 75007600000,
+        "installer_idle": 75007650000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 4.5,
+        "axi_first_32bit_beat": 44.5,
+        "axi_final_32bit_beat": 59.5,
+        "uce_first_64bit_response": 48.0,
+        "uce_final_64bit_response": 62.0,
+        "installer_start": 70.0,
+        "tag_publication": 88.0,
+        "installer_idle": 89.0
+      }
+    },
+    {
+      "line": 4,
+      "slot": 4,
+      "cpu_address": 2147541248,
+      "axi_address": 2477703424,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75004350000,
+        "axi_address": 75004525000,
+        "axi_first_32bit_beat": 75006525000,
+        "axi_final_32bit_beat": 75007275000,
+        "uce_first_64bit_response": 75006700000,
+        "uce_final_64bit_response": 75007400000,
+        "installer_start": 75007700000,
+        "tag_publication": 75008600000,
+        "installer_idle": 75008650000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 67.0,
+        "tag_publication": 85.0,
+        "installer_idle": 86.0
+      }
+    },
+    {
+      "line": 5,
+      "slot": 0,
+      "cpu_address": 2147591104,
+      "axi_address": 2477753280,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75005450000,
+        "axi_address": 75005625000,
+        "axi_first_32bit_beat": 75007625000,
+        "axi_final_32bit_beat": 75008375000,
+        "uce_first_64bit_response": 75007800000,
+        "uce_final_64bit_response": 75008500000,
+        "installer_start": 75008700000,
+        "tag_publication": 75009550000,
+        "installer_idle": 75009650000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 82.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 6,
+      "slot": 1,
+      "cpu_address": 2147578368,
+      "axi_address": 2477740544,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75006450000,
+        "axi_address": 75006625000,
+        "axi_first_32bit_beat": 75008625000,
+        "axi_final_32bit_beat": 75009375000,
+        "uce_first_64bit_response": 75008800000,
+        "uce_final_64bit_response": 75009500000,
+        "installer_start": 75009700000,
+        "tag_publication": 75010500000,
+        "installer_idle": 75010550000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 81.0,
+        "installer_idle": 82.0
+      }
+    },
+    {
+      "line": 7,
+      "slot": 2,
+      "cpu_address": 2147539904,
+      "axi_address": 2477702080,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75007450000,
+        "axi_address": 75007625000,
+        "axi_first_32bit_beat": 75009625000,
+        "axi_final_32bit_beat": 75010375000,
+        "uce_first_64bit_response": 75009800000,
+        "uce_final_64bit_response": 75010500000,
+        "installer_start": 75010600000,
+        "tag_publication": 75011450000,
+        "installer_idle": 75011550000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 63.0,
+        "tag_publication": 80.0,
+        "installer_idle": 82.0
+      }
+    },
+    {
+      "line": 8,
+      "slot": 3,
+      "cpu_address": 2147602432,
+      "axi_address": 2477764608,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75008450000,
+        "axi_address": 75008625000,
+        "axi_first_32bit_beat": 75010625000,
+        "axi_final_32bit_beat": 75011375000,
+        "uce_first_64bit_response": 75010800000,
+        "uce_final_64bit_response": 75011500000,
+        "installer_start": 75011600000,
+        "tag_publication": 75012400000,
+        "installer_idle": 75012450000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 63.0,
+        "tag_publication": 79.0,
+        "installer_idle": 80.0
+      }
+    },
+    {
+      "line": 9,
+      "slot": 0,
+      "cpu_address": 2147598208,
+      "axi_address": 2477760384,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75010200000,
+        "axi_address": 75010425000,
+        "axi_first_32bit_beat": 75012425000,
+        "axi_final_32bit_beat": 75013175000,
+        "uce_first_64bit_response": 75012600000,
+        "uce_final_64bit_response": 75013300000,
+        "installer_start": 75013400000,
+        "tag_publication": 75014200000,
+        "installer_idle": 75014250000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 4.5,
+        "axi_first_32bit_beat": 44.5,
+        "axi_final_32bit_beat": 59.5,
+        "uce_first_64bit_response": 48.0,
+        "uce_final_64bit_response": 62.0,
+        "installer_start": 64.0,
+        "tag_publication": 80.0,
+        "installer_idle": 81.0
+      }
+    },
+    {
+      "line": 10,
+      "slot": 1,
+      "cpu_address": 2147549760,
+      "axi_address": 2477711936,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75012100000,
+        "axi_address": 75012275000,
+        "axi_first_32bit_beat": 75014275000,
+        "axi_final_32bit_beat": 75015025000,
+        "uce_first_64bit_response": 75014450000,
+        "uce_final_64bit_response": 75015150000,
+        "installer_start": 75015250000,
+        "tag_publication": 75016150000,
+        "installer_idle": 75016200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 63.0,
+        "tag_publication": 81.0,
+        "installer_idle": 82.0
+      }
+    },
+    {
+      "line": 11,
+      "slot": 2,
+      "cpu_address": 2147555136,
+      "axi_address": 2477717312,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75012800000,
+        "axi_address": 75013025000,
+        "axi_first_32bit_beat": 75015075000,
+        "axi_final_32bit_beat": 75015825000,
+        "uce_first_64bit_response": 75015250000,
+        "uce_final_64bit_response": 75015950000,
+        "installer_start": 75016250000,
+        "tag_publication": 75017150000,
+        "installer_idle": 75017200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 4.5,
+        "axi_first_32bit_beat": 45.5,
+        "axi_final_32bit_beat": 60.5,
+        "uce_first_64bit_response": 49.0,
+        "uce_final_64bit_response": 63.0,
+        "installer_start": 69.0,
+        "tag_publication": 87.0,
+        "installer_idle": 88.0
+      }
+    },
+    {
+      "line": 12,
+      "slot": 3,
+      "cpu_address": 2147617216,
+      "axi_address": 2477779392,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75013900000,
+        "axi_address": 75014075000,
+        "axi_first_32bit_beat": 75016075000,
+        "axi_final_32bit_beat": 75016825000,
+        "uce_first_64bit_response": 75016250000,
+        "uce_final_64bit_response": 75016950000,
+        "installer_start": 75017250000,
+        "tag_publication": 75018150000,
+        "installer_idle": 75018200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 67.0,
+        "tag_publication": 85.0,
+        "installer_idle": 86.0
+      }
+    },
+    {
+      "line": 13,
+      "slot": 0,
+      "cpu_address": 2147567040,
+      "axi_address": 2477729216,
+      "axi_id": 4,
+      "timestamps": {
+        "allocation": 75014800000,
+        "axi_address": 75014975000,
+        "axi_first_32bit_beat": 75016975000,
+        "axi_final_32bit_beat": 75017725000,
+        "uce_first_64bit_response": 75017150000,
+        "uce_final_64bit_response": 75017850000,
+        "installer_start": 75018250000,
+        "tag_publication": 75019150000,
+        "installer_idle": 75019200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 69.0,
+        "tag_publication": 87.0,
+        "installer_idle": 88.0
+      }
+    },
+    {
+      "line": 14,
+      "slot": 4,
+      "cpu_address": 2147545920,
+      "axi_address": 2477708096,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75016000000,
+        "axi_address": 75016175000,
+        "axi_first_32bit_beat": 75018175000,
+        "axi_final_32bit_beat": 75018925000,
+        "uce_first_64bit_response": 75018350000,
+        "uce_final_64bit_response": 75019050000,
+        "installer_start": 75019250000,
+        "tag_publication": 75020150000,
+        "installer_idle": 75020200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 15,
+      "slot": 1,
+      "cpu_address": 2147587392,
+      "axi_address": 2477749568,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75017000000,
+        "axi_address": 75017175000,
+        "axi_first_32bit_beat": 75019175000,
+        "axi_final_32bit_beat": 75019925000,
+        "uce_first_64bit_response": 75019350000,
+        "uce_final_64bit_response": 75020050000,
+        "installer_start": 75020250000,
+        "tag_publication": 75021150000,
+        "installer_idle": 75021200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 16,
+      "slot": 2,
+      "cpu_address": 2147591744,
+      "axi_address": 2477753920,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75018000000,
+        "axi_address": 75018175000,
+        "axi_first_32bit_beat": 75020175000,
+        "axi_final_32bit_beat": 75020925000,
+        "uce_first_64bit_response": 75020350000,
+        "uce_final_64bit_response": 75021050000,
+        "installer_start": 75021250000,
+        "tag_publication": 75022150000,
+        "installer_idle": 75022200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 17,
+      "slot": 3,
+      "cpu_address": 2147540736,
+      "axi_address": 2477702912,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75019000000,
+        "axi_address": 75019175000,
+        "axi_first_32bit_beat": 75021175000,
+        "axi_final_32bit_beat": 75021925000,
+        "uce_first_64bit_response": 75021350000,
+        "uce_final_64bit_response": 75022050000,
+        "installer_start": 75022250000,
+        "tag_publication": 75023150000,
+        "installer_idle": 75023200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 18,
+      "slot": 0,
+      "cpu_address": 2147585792,
+      "axi_address": 2477747968,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75020000000,
+        "axi_address": 75020175000,
+        "axi_first_32bit_beat": 75022175000,
+        "axi_final_32bit_beat": 75022925000,
+        "uce_first_64bit_response": 75022350000,
+        "uce_final_64bit_response": 75023050000,
+        "installer_start": 75023250000,
+        "tag_publication": 75024150000,
+        "installer_idle": 75024200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 19,
+      "slot": 4,
+      "cpu_address": 2147545536,
+      "axi_address": 2477707712,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75021000000,
+        "axi_address": 75021175000,
+        "axi_first_32bit_beat": 75023175000,
+        "axi_final_32bit_beat": 75023925000,
+        "uce_first_64bit_response": 75023350000,
+        "uce_final_64bit_response": 75024050000,
+        "installer_start": 75024250000,
+        "tag_publication": 75025150000,
+        "installer_idle": 75025200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 20,
+      "slot": 1,
+      "cpu_address": 2147582720,
+      "axi_address": 2477744896,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75022000000,
+        "axi_address": 75022175000,
+        "axi_first_32bit_beat": 75024175000,
+        "axi_final_32bit_beat": 75024925000,
+        "uce_first_64bit_response": 75024350000,
+        "uce_final_64bit_response": 75025050000,
+        "installer_start": 75025250000,
+        "tag_publication": 75026150000,
+        "installer_idle": 75026200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 21,
+      "slot": 2,
+      "cpu_address": 2147568512,
+      "axi_address": 2477730688,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75023000000,
+        "axi_address": 75023175000,
+        "axi_first_32bit_beat": 75025175000,
+        "axi_final_32bit_beat": 75025925000,
+        "uce_first_64bit_response": 75025350000,
+        "uce_final_64bit_response": 75026050000,
+        "installer_start": 75026250000,
+        "tag_publication": 75027150000,
+        "installer_idle": 75027200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 22,
+      "slot": 3,
+      "cpu_address": 2147549824,
+      "axi_address": 2477712000,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75024000000,
+        "axi_address": 75024175000,
+        "axi_first_32bit_beat": 75026175000,
+        "axi_final_32bit_beat": 75026925000,
+        "uce_first_64bit_response": 75026350000,
+        "uce_final_64bit_response": 75027050000,
+        "installer_start": 75027250000,
+        "tag_publication": 75028150000,
+        "installer_idle": 75028200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 23,
+      "slot": 0,
+      "cpu_address": 2147542784,
+      "axi_address": 2477704960,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75025000000,
+        "axi_address": 75025175000,
+        "axi_first_32bit_beat": 75027175000,
+        "axi_final_32bit_beat": 75027925000,
+        "uce_first_64bit_response": 75027350000,
+        "uce_final_64bit_response": 75028050000,
+        "installer_start": 75028250000,
+        "tag_publication": 75029150000,
+        "installer_idle": 75029200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 24,
+      "slot": 4,
+      "cpu_address": 2147585472,
+      "axi_address": 2477747648,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75026000000,
+        "axi_address": 75026175000,
+        "axi_first_32bit_beat": 75028175000,
+        "axi_final_32bit_beat": 75028925000,
+        "uce_first_64bit_response": 75028350000,
+        "uce_final_64bit_response": 75029050000,
+        "installer_start": 75029250000,
+        "tag_publication": 75030150000,
+        "installer_idle": 75030200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 25,
+      "slot": 1,
+      "cpu_address": 2147592000,
+      "axi_address": 2477754176,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75027000000,
+        "axi_address": 75027175000,
+        "axi_first_32bit_beat": 75029175000,
+        "axi_final_32bit_beat": 75029925000,
+        "uce_first_64bit_response": 75029350000,
+        "uce_final_64bit_response": 75030050000,
+        "installer_start": 75030250000,
+        "tag_publication": 75031150000,
+        "installer_idle": 75031200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 26,
+      "slot": 2,
+      "cpu_address": 2147539648,
+      "axi_address": 2477701824,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75028000000,
+        "axi_address": 75028175000,
+        "axi_first_32bit_beat": 75030175000,
+        "axi_final_32bit_beat": 75030925000,
+        "uce_first_64bit_response": 75030350000,
+        "uce_final_64bit_response": 75031050000,
+        "installer_start": 75031250000,
+        "tag_publication": 75032150000,
+        "installer_idle": 75032200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 27,
+      "slot": 3,
+      "cpu_address": 2147548736,
+      "axi_address": 2477710912,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75029000000,
+        "axi_address": 75029175000,
+        "axi_first_32bit_beat": 75031175000,
+        "axi_final_32bit_beat": 75031925000,
+        "uce_first_64bit_response": 75031350000,
+        "uce_final_64bit_response": 75032050000,
+        "installer_start": 75032250000,
+        "tag_publication": 75033150000,
+        "installer_idle": 75033200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 28,
+      "slot": 0,
+      "cpu_address": 2147573376,
+      "axi_address": 2477735552,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75030000000,
+        "axi_address": 75030175000,
+        "axi_first_32bit_beat": 75032175000,
+        "axi_final_32bit_beat": 75032925000,
+        "uce_first_64bit_response": 75032350000,
+        "uce_final_64bit_response": 75033050000,
+        "installer_start": 75033250000,
+        "tag_publication": 75034150000,
+        "installer_idle": 75034200000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 83.0,
+        "installer_idle": 84.0
+      }
+    },
+    {
+      "line": 29,
+      "slot": 4,
+      "cpu_address": 2147550720,
+      "axi_address": 2477712896,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75031000000,
+        "axi_address": 75031175000,
+        "axi_first_32bit_beat": 75033175000,
+        "axi_final_32bit_beat": 75033925000,
+        "uce_first_64bit_response": 75033350000,
+        "uce_final_64bit_response": 75034050000,
+        "installer_start": 75034250000,
+        "tag_publication": 75035100000,
+        "installer_idle": 75035150000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 65.0,
+        "tag_publication": 82.0,
+        "installer_idle": 83.0
+      }
+    },
+    {
+      "line": 30,
+      "slot": 1,
+      "cpu_address": 2147574784,
+      "axi_address": 2477736960,
+      "axi_id": 1,
+      "timestamps": {
+        "allocation": 75032000000,
+        "axi_address": 75032175000,
+        "axi_first_32bit_beat": 75034175000,
+        "axi_final_32bit_beat": 75034925000,
+        "uce_first_64bit_response": 75034350000,
+        "uce_final_64bit_response": 75035050000,
+        "installer_start": 75035200000,
+        "tag_publication": 75035950000,
+        "installer_idle": 75036000000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 64.0,
+        "tag_publication": 79.0,
+        "installer_idle": 80.0
+      }
+    },
+    {
+      "line": 31,
+      "slot": 2,
+      "cpu_address": 2147553792,
+      "axi_address": 2477715968,
+      "axi_id": 3,
+      "timestamps": {
+        "allocation": 75033000000,
+        "axi_address": 75033175000,
+        "axi_first_32bit_beat": 75035175000,
+        "axi_final_32bit_beat": 75035925000,
+        "uce_first_64bit_response": 75035350000,
+        "uce_final_64bit_response": 75036050000,
+        "installer_start": 75036150000,
+        "tag_publication": 75037000000,
+        "installer_idle": 75037050000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 63.0,
+        "tag_publication": 80.0,
+        "installer_idle": 81.0
+      }
+    },
+    {
+      "line": 32,
+      "slot": 3,
+      "cpu_address": 2147583104,
+      "axi_address": 2477745280,
+      "axi_id": 2,
+      "timestamps": {
+        "allocation": 75034000000,
+        "axi_address": 75034175000,
+        "axi_first_32bit_beat": 75036175000,
+        "axi_final_32bit_beat": 75036925000,
+        "uce_first_64bit_response": 75036350000,
+        "uce_final_64bit_response": 75037050000,
+        "installer_start": 75037150000,
+        "tag_publication": 75038000000,
+        "installer_idle": 75038050000
+      },
+      "cycles_from_allocation": {
+        "axi_address": 3.5,
+        "axi_first_32bit_beat": 43.5,
+        "axi_final_32bit_beat": 58.5,
+        "uce_first_64bit_response": 47.0,
+        "uce_final_64bit_response": 61.0,
+        "installer_start": 63.0,
+        "tag_publication": 80.0,
+        "installer_idle": 81.0
+      }
+    }
+  ],
+  "limits": [
+    "The latency trace uses the synthetic 40-cycle memory model, not physical DDR.",
+    "The delayed waveform gate changes only testbench instrumentation and is excluded from the DUT.",
+    "The 32-bit AXI width belongs to black-parrot-minimal-example, not the 64-bit FPGA wrapper; the UCE receives paired 64-bit responses.",
+    "The four-slot control has checked guest/host output but no retained per-transaction waveform."
+  ]
+}

@@ -27,15 +27,21 @@ def main():
     latency = 41
     slots = 4
     beats_per_line = inputs["line_bytes"] // inputs["axi_bytes_per_beat"]
-    install_cycles = inputs["max_data_install_cycles_per_line"]
+    install_cycles = inputs["banked_full64_installer_median_cycles"]
     hot_deadline = inputs["hot_combined_resume_deadline_cycles"]
     late_windows = sched["derived_physical_cycles"]
     generous_late_window = max(
         late_windows["handoff_to_main_beyond_no_peer_yield"],
         late_windows["handoff_to_worker_beyond_no_peer_yield"],
     )
-    full_completion = full["slot_sweep"][str(latency)][str(slots)]["aggregate_completion_bound_cycles"]
-    kernel_completion = kernel["slot_sweep"][str(latency)][str(slots)]["aggregate_completion_bound_cycles"]
+    full_completion = max(
+        full["slot_sweep"][str(latency)][str(slots)]["transport_lower_bound_cycles"],
+        latency + beats_per_line + max(full["i_lines"], full["d_lines"]) * install_cycles,
+    )
+    kernel_completion = max(
+        kernel["slot_sweep"][str(latency)][str(slots)]["transport_lower_bound_cycles"],
+        latency + beats_per_line + max(kernel["i_lines"], kernel["d_lines"]) * install_cycles,
+    )
 
     windows = {
         "yield_entry_to_hot_dispatch": hot_deadline,
@@ -64,7 +70,7 @@ def main():
 
     result = {
         "method": (
-            "Apply the conditional four-slot, 41-cycle shared-transport and separate 17-cycle I/D install bound "
+            "Apply the conditional four-slot, 41-cycle shared-transport and separate measured-median 19-cycle I/D install bound "
             "to measured trigger windows. The Linux late-trigger window is deliberately generous: "
             "the whole alternate-thread delta is credited even though it includes task selection."
         ),
@@ -94,6 +100,8 @@ def main():
             "The input line targets are refill-latency equivalents, not exact miss counts.",
             "The model excludes translation, dirty victims, capacity replacement, and arbitration bubbles.",
             "The 41-cycle scenario is not a measured detached full-line endpoint; physical demand load-to-use only supplies a proxy.",
+            "The 17-cycle input is a direct-path sensitivity point; the primary banked FPGA-facing result uses its measured 19-cycle median and observes a 25-cycle maximum.",
+            "The primary capacity rows use the FPGA-facing banked path's 19-cycle median; its observed 25-cycle maximum would be slower.",
         ],
     }
     out = Path(__file__).with_name("results.json")

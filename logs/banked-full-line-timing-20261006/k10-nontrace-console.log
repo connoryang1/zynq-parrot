@@ -1,0 +1,62 @@
+make: Entering directory '/home/coyang/zp-banked-trace-20261006/testing'
+  [CC]    Compiling mt_dependent_stream_benchmark.riscv (Threads: 3)...
+  [CLEAN] Refreshing mt_dependent_stream_benchmark environment...
+  [RUN]   Executing mt_dependent_stream_benchmark in simulator...
+/bin/bash: line 1:   503 Aborted                 (core dumped) BSG_RUNTIME_PATCH_ADDR='0x00000000800210f8' BSG_RUNTIME_PATCH_VALUE='2163459' ./obj_dir/Vbsg_nonsynth_zynq_testbench +c_args=prog.nbf 2>&1
+       504 Done                    | tee -i run.log
+make[1]: *** [/home/coyang/zp-banked-trace-20261006/cosim/mk/Makefile.verilator:40: run] Error 134
+BSG-INFO:    ps.cpp: reading three base registers
+BSG-INFO:    ps.cpp: reset(lo)=0, dram_init=0, dram_base=0
+BSG-INFO:    ps.cpp: attempting to write and read register 0x8
+BSG-INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+BSG-INFO:    Creating host: 0x7ffd3e48f770 40000030 40000028
+BSG-INFO:    Setting non-blocking terminal mode
+BSG-INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 134217728
+BSG-INFO:      bsg_zynq_pl: Allocated dummy DRAM
+BSG-INFO:    ps.cpp: received 0x7f4b8008e000 (phys = 7f4b8008e000)
+BSG-INFO:    ps.cpp: wrote and verified base register
+BSG-INFO:    ps.cpp: beginning config
+BSG-INFO:    ps.cpp: beginning nbf load
+BSG-INFO:    ps.cpp: NBF file has 16997 lines. Starting load...
+BSG-INFO:    ps.cpp: NBF Load Progress: 0%
+BSG-INFO:    ps.cpp: NBF Load Progress: 5%
+BSG-INFO:    ps.cpp: NBF Load Progress: 10%
+BSG-INFO:    ps.cpp: NBF Load Progress: 15%
+BSG-INFO:    ps.cpp: NBF Load Progress: 20%
+BSG-INFO:    ps.cpp: NBF Load Progress: 25%
+BSG-INFO:    ps.cpp: NBF Load Progress: 30%
+BSG-INFO:    ps.cpp: NBF Load Progress: 35%
+BSG-INFO:    ps.cpp: NBF Load Progress: 40%
+BSG-INFO:    ps.cpp: NBF Load Progress: 45%
+BSG-INFO:    ps.cpp: NBF Load Progress: 50%
+BSG-INFO:    ps.cpp: NBF Load Progress: 55%
+BSG-INFO:    ps.cpp: NBF Load Progress: 60%
+BSG-INFO:    ps.cpp: NBF Load Progress: 65%
+BSG-INFO:    ps.cpp: NBF Load Progress: 70%
+BSG-INFO:    ps.cpp: NBF Load Progress: 75%
+BSG-INFO:    ps.cpp: NBF Load Progress: 80%
+BSG-INFO:    ps.cpp: NBF Load Progress: 85%
+BSG-INFO:    ps.cpp: NBF Load Progress: 90%
+BSG-INFO:    ps.cpp: NBF Load Progress: 95%
+BSG-INFO:    ps.cpp: NBF Load Progress: 100%
+BSG-INFO:    ps.cpp: runtime patch address=0x800210f8 value=0x210303
+BSG-INFO:    ps.cpp: NBF load took 154.202019 seconds
+BSG-INFO:    ps.cpp: trace timeout armed for 1200 seconds
+ps.cpp: Heartbeat - Retired 3356 instructions...
+Benchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000003 nodes=0x0000000000000021 cycles=0x0000000000000322
+[BSG-PASS] dependent streams, checksums and completion
+BSG-INFO:    CORE PASS
+BSG-INFO:    ps.cpp: end polling i/o
+BSG-INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
+BSG-INFO:    ps.cpp: minstret (instructions retired):             9806 (            264e)
+BSG-INFO:    ps.cpp: minstret delta:                              9806 (            264e)
+BSG-INFO:    ps.cpp: wall clock time                :      17740576853 (       4216bb855) ns
+BSG-INFO:      bsg_zynq_pl: done() called, exiting
+BSG-INFO:    Restoring terminal settings
+BSG-INFO:    Returning from ps_main with RC: 0
+BSG-INFO:    BSG PASS
+[76167550000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
+%Error: /home/coyang/zp-banked-trace-20261006/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
+Aborting...
+VALID RUN: guest and host PASS
+make: Leaving directory '/home/coyang/zp-banked-trace-20261006/testing'

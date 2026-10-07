@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SCHED = ROOT / "logs/linux-scheduler-resume-20261002/results.json"
 INSTALL = ROOT / "logs/prefetch-sustained-coverage-20260924/final-trace/k10-m2/final-installer-audit.json"
+INSTALL_TIMING = ROOT / "logs/full-line-installer-timing-20261006/results.json"
 
 
 def transport_cycles(lines, slots, latency, beats_per_line):
@@ -20,6 +21,7 @@ def transport_cycles(lines, slots, latency, beats_per_line):
 def main():
     sched = json.loads(SCHED.read_text())
     install = json.loads(INSTALL.read_text())
+    install_timing = json.loads(INSTALL_TIMING.read_text())
     derived = sched["derived_pooled_medians"]
     i_eq = sched["ifetch_sweep_refill_equivalents"]["by_footprint"]["32k"]["line_equivalents"]
     d_eq = sched["clean_data_sweep_refill_equivalents"]["by_footprint"]["128k"]["line_equivalents"]
@@ -75,6 +77,18 @@ def main():
                     "fits_hot_resume": completion <= deadline,
                 }
             scenario["slot_sweep"][str(latency)] = rows
+        scenario["installer_sensitivity_at_41cycle_four_slots"] = {}
+        transport = transport_cycles(total, 4, 41, beats_per_line)
+        for cycles in (17, 19, 21, 25):
+            separate_install = 41 + beats_per_line \
+                + max(scenario["i_lines"], scenario["d_lines"]) * cycles
+            completion = max(transport, separate_install)
+            scenario["installer_sensitivity_at_41cycle_four_slots"][str(cycles)] = {
+                "separate_install_bound_cycles": separate_install,
+                "aggregate_completion_bound_cycles": completion,
+                "margin_to_hot_resume_cycles": deadline - completion,
+                "fits_hot_resume": completion <= deadline,
+            }
 
     total_lines = scenarios["kernel_plus_application"]["total_lines"]
     result = {
@@ -86,6 +100,7 @@ def main():
         "inputs": {
             "scheduler_results": str(SCHED.relative_to(ROOT)),
             "installer_audit": str(INSTALL.relative_to(ROOT)),
+            "installer_timing_audit": str(INSTALL_TIMING.relative_to(ROOT)),
             "hot_combined_resume_deadline_cycles": deadline,
             "instruction_line_equivalents": i_eq,
             "data_line_equivalents": d_eq,
@@ -93,6 +108,12 @@ def main():
             "kernel_data_lines_ceiling": kernel_d_lines,
             "application_data_lines": application_d_lines,
             "max_data_install_cycles_per_line": install_cycles,
+            "concurrent_installer_median_cycles": install_timing["implementations"]["concurrent_response_buffer"]["median_cycles"],
+            "concurrent_installer_maximum_cycles": install_timing["implementations"]["concurrent_response_buffer"]["maximum_cycles"],
+            "banked_minimal_installer_median_cycles": install_timing["implementations"]["banked_minimal_32bit"]["median_cycles"],
+            "banked_minimal_installer_maximum_cycles": install_timing["implementations"]["banked_minimal_32bit"]["maximum_cycles"],
+            "banked_full64_installer_median_cycles": install_timing["implementations"]["banked_full_64bit"]["median_cycles"],
+            "banked_full64_installer_maximum_cycles": install_timing["implementations"]["banked_full_64bit"]["maximum_cycles"],
             "line_bytes": line_bytes,
             "axi_bytes_per_beat": axi_bytes_per_beat,
             "clock_hz": clock_hz,
@@ -110,10 +131,29 @@ def main():
                 / scenarios["kernel_plus_application"]["slot_sweep"]["41"]["4"]["aggregate_completion_bound_cycles"]
                 / 1e6
             ),
-            "minimum_slots_at_41cycle_latency": next(
+            "minimum_slots_at_41cycle_latency_direct17": next(
                 slots
                 for slots in (1, 2, 3, 4, 5, 10)
                 if scenarios["kernel_plus_application"]["slot_sweep"]["41"][str(slots)]["fits_hot_resume"]
+            ),
+            "minimum_slots_at_41cycle_latency_banked64_median19": next((
+                slots
+                for slots in (1, 2, 3, 4, 5, 10)
+                if max(
+                    transport_cycles(total_lines, slots, 41, beats_per_line),
+                    41 + beats_per_line
+                    + max(
+                        scenarios["kernel_plus_application"]["i_lines"],
+                        scenarios["kernel_plus_application"]["d_lines"],
+                    ) * install_timing["implementations"]["banked_full_64bit"]["median_cycles"],
+                ) <= deadline
+            ), None),
+            "maximum_installer_cycles_for_479_lines_at_41cycle_latency": math.floor(
+                (deadline - 41 - beats_per_line)
+                / max(
+                    scenarios["kernel_plus_application"]["i_lines"],
+                    scenarios["kernel_plus_application"]["d_lines"],
+                )
             ),
         },
         "limits": [
@@ -123,6 +163,7 @@ def main():
             "All lines are required by first user dispatch in this deliberately strict bound; real deadlines are per-line and order dependent.",
             "Translation replay, dirty writebacks, capacity replacement, and scheduler-generated traffic are excluded.",
             "The 21/41-cycle latency scenarios are not physical measurements of detached 64-byte request-to-first-beat service.",
+            "The 17-cycle installer is the serialized direct-path result; the FPGA-facing banked wrapper measures a 19-cycle median and 25-cycle maximum.",
         ],
     }
     out = Path(__file__).with_name("results.json")

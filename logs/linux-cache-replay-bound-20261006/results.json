@@ -11,6 +11,12 @@
     ],
     "axi_beats_per_64_byte_line": 8,
     "installer_cycles_per_line_after_complete_response": 17,
+    "installer_cycle_sensitivity": [
+      17,
+      19,
+      21,
+      25
+    ],
     "separate_i_d_installers": true,
     "transport_slots_are_shared": true,
     "physical_full_line_response_latency_is_unmeasured": true,
@@ -36,6 +42,36 @@
         "4": 78
       },
       "maximum_response_start_for_first_d": 2895,
+      "installer_sensitivity": {
+        "17": {
+          "maximum_response_start_for_first_i": 981,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": 78,
+          "conditional_41cycle_i_bulk_ready": 865,
+          "conditional_41cycle_i_bulk_slack": 141,
+          "conditional_41cycle_max_i_installs_before_first_i": 56
+        },
+        "19": {
+          "maximum_response_start_for_first_i": 979,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": 78,
+          "conditional_41cycle_i_bulk_ready": 961,
+          "conditional_41cycle_i_bulk_slack": 45,
+          "conditional_41cycle_max_i_installs_before_first_i": 50
+        },
+        "21": {
+          "maximum_response_start_for_first_i": 977,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": null,
+          "conditional_41cycle_i_bulk_ready": 1057,
+          "conditional_41cycle_i_bulk_slack": -51,
+          "conditional_41cycle_max_i_installs_before_first_i": 45
+        },
+        "25": {
+          "maximum_response_start_for_first_i": 973,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": null,
+          "conditional_41cycle_i_bulk_ready": 1249,
+          "conditional_41cycle_i_bulk_slack": -243,
+          "conditional_41cycle_max_i_installs_before_first_i": 38
+        }
+      },
       "latency_sweep": [
         {
           "assumed_request_to_first_response_beat_cycles": 21,
@@ -310,6 +346,36 @@
         "4": null
       },
       "maximum_response_start_for_first_d": 1082,
+      "installer_sensitivity": {
+        "17": {
+          "maximum_response_start_for_first_i": 57,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": null,
+          "conditional_41cycle_i_bulk_ready": 3704,
+          "conditional_41cycle_i_bulk_slack": -3622,
+          "conditional_41cycle_max_i_installs_before_first_i": 1
+        },
+        "19": {
+          "maximum_response_start_for_first_i": 55,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": null,
+          "conditional_41cycle_i_bulk_ready": 4134,
+          "conditional_41cycle_i_bulk_slack": -4052,
+          "conditional_41cycle_max_i_installs_before_first_i": 1
+        },
+        "21": {
+          "maximum_response_start_for_first_i": 53,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": null,
+          "conditional_41cycle_i_bulk_ready": 4564,
+          "conditional_41cycle_i_bulk_slack": -4482,
+          "conditional_41cycle_max_i_installs_before_first_i": 1
+        },
+        "25": {
+          "maximum_response_start_for_first_i": 49,
+          "maximum_response_start_for_all_i_before_first_i_four_slots": null,
+          "conditional_41cycle_i_bulk_ready": 5424,
+          "conditional_41cycle_i_bulk_slack": -5342,
+          "conditional_41cycle_max_i_installs_before_first_i": 1
+        }
+      },
       "latency_sweep": [
         {
           "assumed_request_to_first_response_beat_cycles": 21,
