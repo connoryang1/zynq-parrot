@@ -1,0 +1,66 @@
+{
+  "method": "Sample the retained fixed four-slot VCD on rising core/UCE clocks inside the exact measured run_window; require all 33 hints to allocate, all 33 AXI requests to carry nonzero prefetch IDs, and no UCE or installer drop.",
+  "provenance": {
+    "historical_top_commit": "03955af94db78af86c271b560052f74f66879a88",
+    "historical_black_parrot_commit": "259b88587afe31a15db521f672d7626c26119642",
+    "tested_fix_black_parrot_commit": "d4c20786dd98f5fdbc285adb43f0fe38631dbbe0",
+    "test_elf_sha256": "0770ad121dfd1dcc6e7a56822a7dd2b12f3c25f7feadb2cdff073d1243a25e9b",
+    "filtered_vcd_xz_sha256": "8ebe0beaa32fbe1f0abbb32f457c8c0f02f0198a5d015223ae86d9a6cece3472",
+    "run_log_sha256": "f590e197a6ac7df8adbb5c878a8b0cb059d861466e63c380e459653a1c0428be"
+  },
+  "fix": {
+    "file": "bp_be/src/v/bp_be_calculator/bp_be_pipe_mem.sv",
+    "cause": "A hint dispatched while the D-cache was idle could reach the memory pipe after dcache_busy asserted. dcache_pkt_v suppressed that hint, but only a hint that entered the D-cache could assert the old replay signal, so the unissued hint retired.",
+    "change": "Pipeline the late dcache_busy suppression alongside the hint identity and include it in cache_replay_v_o."
+  },
+  "window": {
+    "begin_timestamp": 74999200000,
+    "end_timestamp": 75044200000,
+    "clock_period_ps": 50000,
+    "cycles": 900
+  },
+  "accounting": {
+    "visible_uce_hint_request_cycles": 51,
+    "accepted_hints": 33,
+    "allocated_hints": 33,
+    "uce_accepted_drop_pulses": 0,
+    "memory_pipe_replay_cycles": 41,
+    "axi_prefetch_line_requests": 33,
+    "axi_ordinary_requests": 0,
+    "axi_id_distribution": {
+      "1": 12,
+      "2": 11,
+      "3": 10
+    },
+    "installer_drop_state_entries": 0
+  },
+  "queue_behavior": {
+    "slot_occupancy_samples": {
+      "0": 52,
+      "1": 35,
+      "2": 31,
+      "3": 471,
+      "4": 312
+    },
+    "all_slots_full_samples": 312,
+    "all_slots_full_fraction": 0.3462819089900111
+  },
+  "comparison": {
+    "broken_four_slot_cycles": 2241,
+    "fixed_four_slot_cycles": 900,
+    "ten_slot_cycles": 802,
+    "cycles_recovered": 1341,
+    "broken_excess_over_ten_slots": 1439,
+    "fixed_excess_over_ten_slots": 98,
+    "fraction_of_broken_excess_recovered": 0.9318971507991661,
+    "broken_four_slot_slowdown": 2.79426433915212,
+    "fixed_four_slot_slowdown": 1.1221945137157108,
+    "ordinary_fallbacks_before": 2,
+    "ordinary_fallbacks_after": 0
+  },
+  "limits": [
+    "The result uses the synthetic 40-cycle memory model and 32-bit minimal wrapper, not physical DDR.",
+    "The run reached checked guest, core, and host pass markers before the pre-existing DPI finalization assertion made the process exit nonzero.",
+    "The 98-cycle residual relative to ten slots is measured queue-pressure overhead; this trace does not establish the physical FPGA endpoint."
+  ]
+}

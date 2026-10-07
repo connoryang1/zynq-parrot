@@ -30,7 +30,8 @@ transport and remain on the critical path. The banked storage also does not
 shorten the installer state sequence: its 32-bit distribution is exactly the
 same as the earlier concurrent flat-buffer trace. The previously recorded
 771-cycle result and claim that four slots preserve throughput do not reproduce:
-ten slots take 802 cycles in the minimal wrapper, while four slots take 2,241.
+ten slots take 802 cycles in the minimal wrapper, while the broken four-slot
+path takes 2,241.
 
 The retained four-slot waveform now explains that slowdown. All 33 intended
 hint addresses reach the UCE, but only 31 allocate a slot. The hints for CPU
@@ -60,6 +61,27 @@ full-line miss into sixteen serialized word requests. Fixing either mechanism
 is likely much more valuable than adding slots, although the 19-cycle installer
 still limits whole-footprint Linux replay independently.
 
+The replay/retirement bug is fixed at BlackParrot commit `d4c20786d`. The
+memory pipe now carries a bit recording that a hint was suppressed because the
+D-cache became busy after dispatch and turns that condition into the same
+architectural replay used for a rejected cache request. The exact four-slot
+workload then falls from 2,241 to 900 cycles:
+
+| Configuration | Cycles | Accepted hints | Ordinary AXI requests | Installer drops |
+| --- | ---: | ---: | ---: | ---: |
+| Broken four slots | 2,241 | 31/33 | 32 (two serialized lines) | 4 |
+| Fixed four slots | 900 | 33/33 | 0 | 0 |
+| Ten-slot control | 802 | 33/33 | 0 | 0 |
+
+The fix recovers 1,341 cycles, or 93.2% of the broken path's 1,439-cycle
+excess over ten slots. The remaining 98 cycles make fixed four slots 12.2%
+slower than ten slots. This is genuine queue pressure: the four slots are full
+for 312 of 901 sampled cycles (34.6%), and the memory pipe records 41 replay
+cycles, but every hint eventually allocates and no demand fallback occurs.
+Four slots are therefore a viable small synthetic endpoint after correct
+backpressure, while the larger Linux design remains limited by installation
+rate and useful-before-demand timing.
+
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
 filtered VCDs contain only the request, response, publication, commit, and
@@ -72,3 +94,6 @@ Run `python3 analyze_queue_depth.py` to regenerate
 occupancy, installer drops, and ten-slot comparison. The four-slot trace also
 reaches checked guest, core, and host pass markers before the same finalization
 assertion.
+Run `python3 analyze_queue_fix.py` to regenerate `results-queue-fix.json` from
+the fixed waveform and require 33 accepted/allocated hints, 33 nonzero-ID AXI
+prefetch requests, zero ordinary requests, and zero installer drops.
