@@ -198,9 +198,186 @@
       "package_verified": true
     },
     "physical_board_validation": {
-      "status": "pending_transfer",
-      "reason": "managed environment rejected local-file SSH/SCP sockets before connection",
-      "board_remains_on_pre_fix_bit_sha256": "e041ad3bcc0b2619c348e4bf19ea209a628586fe8bc5b839e95535d01215512b"
+      "status": "store_handoff_accepted_ten_stream_correctness_rejected",
+      "bit_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
+      "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "store_handoff": {
+        "nbf_sha256": "98ac179bf4dfabf11533ed639dbad010b3d8703682b1ee088067f96b3f4a5ee9",
+        "all_three_rows_identical": true,
+        "values": {
+          "resident_pure": 5.1,
+          "resident_single": 6.15,
+          "resident_four": 12.11,
+          "nonresident_pure": 9.14,
+          "nonresident_single": 11.15,
+          "nonresident_four": 16.11
+        },
+        "remote_logs": [
+          {
+            "path": "/home/xilinx/bp-logs/mt_ctxtsw_store_handoff_benchmark_fpga-interactive-20261007T134703Z-5711.log",
+            "sha256": "64a5917241140f1c838bebc9aacbbabc6bcb52bde33c64adc61070513793a942"
+          },
+          {
+            "path": "/home/xilinx/bp-logs/mt_ctxtsw_store_handoff_benchmark_fpga-interactive-20261007T134716Z-5776.log",
+            "sha256": "00299be3ded4c6e121177f27e15ce6ab35a556b6f3504c481f63b95394341ff6"
+          },
+          {
+            "path": "/home/xilinx/bp-logs/mt_ctxtsw_store_handoff_benchmark_fpga-interactive-20261007T134726Z-5841.log",
+            "sha256": "d07074ca7a8066805e37ebddc6088279f0d107d409e98343e700a1058786e5fe"
+          }
+        ]
+      },
+      "working_stream_performance": {
+        "samples_per_point": 1,
+        "demand_reference_cycles": {
+          "2": 60077,
+          "3": 60001,
+          "4": 60070
+        },
+        "hardware_cycles": {
+          "2": 19262,
+          "3": 21823,
+          "4": 22723
+        },
+        "speedup_vs_demand": {
+          "2": 3.1189,
+          "3": 2.7494,
+          "4": 2.6436
+        },
+        "previous_hardware_cycles": {
+          "2": 17978,
+          "3": 21178,
+          "4": 22288
+        },
+        "fixed_minus_previous_cycles": {
+          "2": 1284,
+          "3": 645,
+          "4": 435
+        },
+        "interpretation": "The delta matches approximately one new drain cycle per resident handoff: every handoff for two streams, about half for three, and about one third for four.",
+        "remote_logs": [
+          {
+            "streams": 2,
+            "path": "/home/xilinx/bp-logs/dep-candidate-k3-k2-m3-interactive-20261007T140128Z-7253.log",
+            "sha256": "01c1afdbe5fbcc5348b7d66c8fac5e53e0379188ed9672b33aecc94f02d3853a"
+          },
+          {
+            "streams": 3,
+            "path": "/home/xilinx/bp-logs/dep-candidate-k3-k3-m3-interactive-20261007T140155Z-7319.log",
+            "sha256": "2a5d1f1ccb184b98c8c72590234ba4f5b16908ad69443f6e513130c7a54f2401"
+          },
+          {
+            "streams": 4,
+            "path": "/home/xilinx/bp-logs/dep-candidate-k3-k4-m3-interactive-20261007T140216Z-7384.log",
+            "sha256": "8349cf3e848ce5825b2acb8a6644a7b1327fe71eb58bf3da296adc77c0617147"
+          }
+        ]
+      },
+      "ten_stream_correctness": {
+        "zero_gap_status": "fail",
+        "zero_gap_nbf_sha256": "9c6e2df1ee6b33c19c4c03561a78684a8683d2d0692d160699945187e9e10e64",
+        "zero_gap_log": {
+          "path": "/home/xilinx/bp-logs/dep-candidate-k3-k10-m3-interactive-20261007T135126Z-6368.log",
+          "sha256": "c6b0f26db9040992a5f198d9b756287b676c254160f7afbade7e62991ea855c3"
+        },
+        "trap_signature": {
+          "epc": 0,
+          "cause": 2,
+          "tval": 0,
+          "ra": 0,
+          "sp": "0x80082fb0",
+          "a0": "0x12978",
+          "a3": 1,
+          "a4": 0,
+          "log_sha256": "b86070d4839f3af23fee36de474326236ec48dc35b9507d889cacbcc4f2591f1"
+        },
+        "controls": [
+          {
+            "name": "no_successor_prefetch",
+            "status": "pass",
+            "cycles": 74925,
+            "log_sha256": "5fdaf18e7a66aebebcd9a3fe5c99fca1576ae5bc735b17688311cedbd78c6e46"
+          },
+          {
+            "name": "prime_only",
+            "status": "pass",
+            "cycles": 74718,
+            "log_sha256": "0011d6c7c7f9d4eb4757d05502456a9949a529f1bf33505d794f8d454d5a50f2"
+          },
+          {
+            "name": "only_context4_hints",
+            "status": "fail",
+            "log_sha256": "49f3627fcb95568a095c299f541a06c507b8052728d81c15f298fa3c680f43f3"
+          },
+          {
+            "name": "all_tested_except_context4_hints",
+            "status": "pass",
+            "cycles": 58232,
+            "log_sha256": "689ee138d73a118481716f467313188abc8a942064a639348393cec2d8ea6c3e"
+          },
+          {
+            "name": "fresh_terminal_gap7",
+            "status": "fail",
+            "log_sha256": "6c69c19c8c36bcebe32f741088dfb42e34a9d8240e2481938e44b71d99b788a8"
+          },
+          {
+            "name": "fresh_terminal_gap8",
+            "status": "fail",
+            "log_sha256": "6e773c8ba9485ea10620e39f0f6b7e23388bf73419799cdb6deda16e3426dc3e"
+          }
+        ],
+        "only_context4_step_sweep": [
+          {
+            "steps_per_stream": 64,
+            "status": "pass",
+            "cycles": 30317,
+            "log_sha256": "6b785882e4fe7dbac661a41a77d6e4799d888d992611e6b496a31c4ee37c436d"
+          },
+          {
+            "steps_per_stream": 96,
+            "status": "pass",
+            "cycles": 55151,
+            "log_sha256": "1ea25b864f1b9061d6cf36d9524787573c3f3505b369ddeec1ebae92426e4fdb"
+          },
+          {
+            "steps_per_stream": 112,
+            "status": "pass",
+            "cycles": 64023,
+            "log_sha256": "eb14cf572217da49d124b7937ef9fc0884b7bb8fac2b8b2bd9bdd7772535415f"
+          },
+          {
+            "steps_per_stream": 120,
+            "status": "pass",
+            "cycles": 68647,
+            "log_sha256": "24c451a0385f5eb32ffe1dc75a848c26c87b280905202851b1cdeb9372d43f7a"
+          },
+          {
+            "steps_per_stream": 124,
+            "status": "fail",
+            "log_sha256": "57ba13a9c120d9b96845d7c90fe17e74c6d1c18be1c02e6a939f465a573a31d4"
+          }
+        ],
+        "current_bound": "The failure begins between 120 and 124 nodes per stream when only logical context 4 issues hints. This excludes a general five-slot capacity or aggregate hint-count explanation.",
+        "rtl_gap_found": "Resident switch admission waits for mem_busy/mem_ordered but, unlike the nonresident drain state, does not explicitly wait for late_wb_v_lo, current iwb_pkt writeback, or dispatch_pkt.v. A side-buffer hit may expose this tail; this is a hypothesis pending a directed trace or rebuilt image.",
+        "rejected_complete_calculator_drain_experiment": {
+          "change": "Replace the resident-switch mem_busy/mem_ordered gate with the existing full register_seed_ready calculator-drain contract.",
+          "store_handoff_cycles_per_switch": {
+            "resident_pure": 5.28,
+            "resident_single": 11.12,
+            "resident_four": 14.16,
+            "nonresident_pure": 9.28,
+            "nonresident_single": 15.13,
+            "nonresident_four": 18.16
+          },
+          "ten_stream_cycles": 102239,
+          "current_fix_ten_stream_cycles": 97237,
+          "added_cycles": 5002,
+          "added_percent": 5.144,
+          "guest_host_valid": true,
+          "decision": "reverted",
+          "reason": "The simulator already passed the physical failure before this change, while the full drain adds large store-handoff and sustained-workload penalties. It is a timing control, not root-cause evidence."
+        }
+      }
     }
   }
 }

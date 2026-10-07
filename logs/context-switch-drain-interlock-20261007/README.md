@@ -61,7 +61,68 @@ its bitstream SHA-256 is
 Exact reports and artifacts are retained in
 `logs/fpga/20261007T131845Z-c43549d3-aggressive-route/`.
 
-Physical A/B validation remains pending. The managed execution environment
-allows board-status SSH but rejected each local-file SSH/SCP connection before
-it opened, so the board still contains the explicitly verified pre-fix image;
-no partial fixed package was installed.
+## Fixed-image physical validation
+
+The preferred timing-clean image was staged, hash-verified, loaded, and run
+against real DDR. Three store-handoff repetitions are identical. Resident
+pure/single-store/four-store handoffs measure 5.10/6.15/12.11 cycles and the
+nonresident cases measure 9.14/11.15/16.11 cycles. The four-store values match
+the simulator prediction exactly; the only simulation-to-board difference in
+the six rows is the already observed 0.04-cycle pure-resident control. This
+accepts the drain interlock for the store-bearing failure it was designed to
+prevent.
+
+The interlock has a measurable sustained cost when a detached prefetch is
+immediately followed by a resident switch. Fixed-image two-, three-, and
+four-stream runs take 19,262, 21,823, and 22,723 cycles, versus 17,978, 21,178,
+and 22,288 before the interlock. The +1,284/+645/+435-cycle pattern is
+consistent with one added drain cycle per resident handoff: every handoff for
+two streams, roughly half for three, and roughly one third for four. Against
+the matched demand references, the fixed image still achieves 3.119x, 2.749x,
+and 2.644x speedups. These are one physical sample per point; the earlier
+matrix was cycle-stable, but the result is not presented as a new variance
+study.
+
+## Remaining ten-stream correctness failure
+
+The fixed image does not pass the full zero-gap ten-stream workload. A fresh
+load fails with context 0 restored at illegal PC 0 and `ra=0`; the diagnostic
+trap state is `epc=0`, `cause=2`, `tval=0`, `sp=0x80082fb0`, `a0=0x12978`,
+`a3=1`, and `a4=0`. Fresh seven- and eight-instruction terminal-gap controls
+also fail, so the interlock did not merely shift the old timing boundary by
+one cycle.
+
+The physical controls sharply localize the trigger:
+
+- no successor hints passes in 74,925 cycles;
+- prime-only hints pass in 74,718 cycles;
+- hints from logical context 4 alone fail;
+- hints from five tested contexts excluding context 4 pass in 58,232 cycles.
+
+The last pair rejects a general five-slot capacity or aggregate request-count
+explanation. With only context 4 issuing hints, 64, 96, 112, and 120 nodes per
+stream pass at 30,317, 55,151, 64,023, and 68,647 cycles, while 124 nodes per
+stream fail. Thus the current physical boundary is between 120 and 124
+context-4 iterations.
+
+RTL review exposes one remaining candidate window. Nonresident context-cache
+handoffs explicitly wait for `late_wb_v_lo`, the current integer writeback,
+dispatch, `mem_busy`, and `mem_ordered`. Resident admission currently checks
+only `mem_busy` and `mem_ordered`. A detached side-buffer hit may deassert the
+memory-busy indication before its final architectural writeback, allowing a
+resident ownership change in that tail. This is a bounded hypothesis, not an
+accepted root cause. A diagnostic that independently suppresses each of the
+four context-4 hints newly introduced between 120 and 124 iterations has been
+built; board transfer and the corresponding directed trace remain pending.
+
+A complete-calculator-drain control reused `register_seed_ready_i` for every
+context switch. It passes the ten-stream simulator at 102,239 cycles versus
+97,237 for the current interlock, but the simulator already passed the physical
+failure. More importantly, resident single-store handoffs rise from 6.15 to
+11.12 cycles and the four-store case rises from 12.11 to 14.16; nonresident
+single/four-store cases rise to 15.13/18.16. The experiment was reverted. It
+shows that a blanket drain is expensive and supplies no new root-cause evidence.
+
+Exact remote log paths, hashes, NBF identities, cycle values, and the step
+sweep are recorded in `result.json`. The store-handoff fix is physically
+accepted, while full ten-stream correctness remains rejected.
