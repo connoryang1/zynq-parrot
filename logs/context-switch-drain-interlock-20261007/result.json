@@ -376,7 +376,7 @@
             "log_sha256": "57ba13a9c120d9b96845d7c90fe17e74c6d1c18be1c02e6a939f465a573a31d4"
           }
         ],
-        "current_bound": "The failure begins between 120 and 124 nodes per stream when only logical context 4 issues hints. The four added iterations execute 40 demand nodes across all contexts; two map to the saved stack line's set 62. This supplies a direct cache-pressure mechanism while excluding a general five-slot, aggregate-hint-count, or probabilistic-latency explanation.",
+        "current_bound": "The failure begins deterministically between 120 and 124 nodes per stream when only logical context 4 issues hints, excluding a general five-slot, aggregate-hint-count, or probabilistic-latency explanation. The four added iterations execute 40 demand nodes across all contexts and two map to the saved stack line's set 62, but both the simple and 40-cycle/four-outstanding simulator models evict the stack line earlier on request 0x80014f80. The late same-set accesses are therefore a correlation, not a demonstrated mechanism.",
         "superseded_resident_admission_hypothesis": {
           "hypothesis": "Resident switch admission waits for mem_busy/mem_ordered but, unlike the nonresident drain state, does not explicitly wait for late_wb_v_lo, current iwb_pkt writeback, or dispatch_pkt.v.",
           "status": "superseded as the explanation for the observed PC-zero failure",
@@ -803,7 +803,49 @@
             }
           ],
           "axi_ordering_check": "The ordinary AXI-lite path is single-outstanding: it does not accept the next request until the prior B/R response can enter its one-entry return FIFO. The detached prefetch bypass shares only AR and uses distinct nonzero IDs.",
-          "interpretation": "The four extra iterations add two ordinary demand nodes in the saved stack line's D-cache set 62. Both exact simulations keep prefetch-side-buffer writes disjoint from the write buffer, then miss and refill the saved stack line correctly at the epilogue. The physical 124-step zero reload can therefore be explained by a late same-set eviction combined with a board-only dirty-status, eviction-data, or backing-memory persistence failure; the four context-4 hint destination sets alone were an incomplete account of the boundary."
+          "interpretation": "The four extra iterations add two ordinary demand nodes in the saved stack line's D-cache set 62, but the saved line is already evicted by request 0x80014f80 in both exact simple-memory traces. Both simulations keep prefetch-side-buffer writes disjoint from the write buffer, write back all eight correct stack words, and refill the correct line at the epilogue. The late same-set accesses correlate with the physical boundary but do not cause the simulated eviction."
+        },
+        "latency40_replacement_check": {
+          "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/context4-axi-latency",
+          "model": {
+            "pipelined_axi_memory": true,
+            "read_latency_cycles": 40,
+            "read_queue_depth": 4
+          },
+          "steps_per_stream": 124,
+          "workload_passed": true,
+          "simulation_cycles": 788788,
+          "minstret": 2552,
+          "accepted_prefetch_words": 248,
+          "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+          "run_log_sha256": "f138a42cae536b99b94dbe9b8f6fdb58e7efcd14b718cca9f0fd3702a26999b6",
+          "full_fst_sha256": "e264bd91bc508e5aedb121a79e574026305767660abd3380a529a9fefc933048",
+          "saved_stack_writeback": {
+            "evict_time": 50701950000,
+            "request_causing_eviction": "0x80014f80",
+            "victim_address": "0x80082f80",
+            "replacement_way": 1,
+            "metadata_dirty": 1,
+            "captured_words_address_order": [
+              0,
+              0,
+              738665,
+              2147486808,
+              2147484406,
+              10,
+              1240,
+              1240
+            ],
+            "writeback_start": 50735800000,
+            "writeback_done": 50736700000,
+            "accepted_writeback_beats": 8
+          },
+          "epilogue_first_ra_miss_time": 76375950000,
+          "epilogue_refilled_ra_hit_time": 76380500000,
+          "epilogue_refill_way": 7,
+          "refilled_ra": "0x800002f6",
+          "refilled_s0": "0xa",
+          "interpretation": "Adding 40-cycle read latency and four-request overlap does not delay the stack victim to iterations 121 or 123: the same earlier 0x80014f80 request evicts it, every dirty beat is accepted, and the epilogue refills correct data. The model is an ordering and concurrency stress test, not a board-runtime calibration; its 788788 cycles greatly exceed the physical passing runtime."
         },
         "isolated_dirty_eviction_integrity": {
           "source_commit": "d087c34c",

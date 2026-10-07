@@ -126,9 +126,10 @@ four context-4 hint destinations still map to sets 22, 28, 32, and 12, but the
 four additional iterations also execute 40 ordinary demand nodes from all ten
 contexts. Two newly admitted demand nodes map directly to the saved stack
 line's set 62: context 9 iteration 121 at `0x8000df80` and context 8 iteration
-123 at `0x80020f80`. Both miss in the 124-step simulator. Thus the 120/124
-boundary does introduce direct same-set demand pressure even though the four
-new hints themselves do not collide with the stack set.
+123 at `0x80020f80`. Both miss in the 124-step simulator. They correlate with
+the physical boundary, but they do not cause the stack eviction in either
+tested simulator model: the stack line has already been evicted by the earlier
+`0x80014f80` request before iterations 121 and 123 execute.
 
 The exact board NBFs pass the current simulator in 86,468 and 89,284 cycles.
 They accept exactly 240 and 248 detached prefetch words, with zero cycles in
@@ -137,12 +138,23 @@ input, or write-buffer snoop match. In both traces, the saved stack line is
 marked dirty, evicted once through way 1, captured with the correct saved
 `ra=0x800002f6` and `s0=0xa`, and sent as an eight-word writeback. Both final
 saved-`ra` loads then miss L1 and refill the correct line from backing memory;
-the 120-step refill hits way 5 and the 124-step refill hits way 7. The FPGA's
-124-step zero result is therefore consistent with a late set-62 eviction plus
-a board-only loss of dirty status, eviction data, or backing-memory
-persistence. The trace does not yet distinguish those three stages. Full
-traces, selected events, source, and analysis are retained under
+the 120-step refill hits way 5 and the 124-step refill hits way 7. Full traces,
+selected events, source, and analysis are retained under
 `stack-slot-diagnostics/context4-sim-120-124/`.
+
+A second exact 124-step run uses the pipelined AXI memory model with a fixed
+40-cycle read latency and four outstanding reads. It also passes, accepts all
+248 prefetch words, and evicts the saved stack line through way 1 on the same
+`0x80014f80` request. Its eight accepted writeback beats are
+`0, 0, 0xb4569, 0x80000c58, 0x800002f6, 0xa, 0x4d8, 0x4d8`; the epilogue then
+misses and refills `ra=0x800002f6` in way 7. Memory latency and request overlap
+therefore do not move the victim event to the two late set-62 demands. This
+corrects the late-eviction explanation: the physical transition remains tied
+to the four added iterations, but no tested simulation reproduces the stage
+that loses the saved word. The latency model takes 788,788 cycles, so it is a
+timing/order stress model rather than a calibrated model of the board's total
+runtime. The waveform and extracted UCE events are under
+`stack-slot-diagnostics/context4-axi-latency/`.
 
 The ordinary AXI-lite adapter is single-outstanding: it cannot accept another
 ordinary request until the prior read or write response can enter its
@@ -180,10 +192,11 @@ physical 16-byte sector address, so a simple truncated-tag alias is excluded by
 RTL inspection. A diagnostic that independently suppresses each of the four
 context-4 hints newly introduced between 120 and 124 iterations has been built;
 board transfer remains pending. Those four successor addresses map to D-cache
-sets 22, 28, 32, and 12, while the failing stack line maps to set 62. The later
-exact comparison above shows that two ordinary demand nodes from the same four
-iterations do map to set 62; only a direct collision from the four hints is
-excluded.
+sets 22, 28, 32, and 12, while the failing stack line maps to set 62. Two
+ordinary demand nodes from the same four iterations do map to set 62, but the
+simple and 40-cycle simulations both evict the stack line much earlier. A
+physical replacement-order difference remains possible; the available traces
+do not establish it.
 
 A matched stack reporter and address matrix are also built and hash-pinned in
 `stack-slot-diagnostics/`. The preferred `recover` image preserves the original
