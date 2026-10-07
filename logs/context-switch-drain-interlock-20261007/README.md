@@ -160,6 +160,17 @@ commands. `prefetch_install_begin` remains zero and the install state remains
 idle throughout the window. The filtered VCD, analyzer, transcript, and their
 hashes are retained beside the reporter waveform.
 
+The prologue write path is equally specific. The saved `ra` store to
+`0x80082fa0` and saved `s0` store to `0x80082fa8` both hit one-hot L1 way
+`0x2` (way 1). Each is accepted by the write buffer and written to its SRAM
+bank in the same cycle with mask `0xff`, carrying `0x800003c4` and `0xa`.
+Across the complete measured window, 44 write-buffer entries drain. Four touch
+other words of this stack line, but the two saved-word addresses are each
+written exactly once and never after the initial pair. The passing simulator
+therefore neither leaves these prologue stores pending nor overwrites them
+during traversal. A physical failure still could diverge in this path; the
+recovery reporter is the decisive board observation.
+
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus
 97,237 for the current interlock, but the simulator already passed the physical
