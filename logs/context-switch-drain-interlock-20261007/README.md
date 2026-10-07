@@ -167,13 +167,13 @@ A new isolated dirty-eviction sweep now covers every one of the 64 D-cache
 sets. For each set it dirties all eight words of one line, applies sixteen
 same-set misses, and reloads the target. All 64 reloads take more than ten
 cycles, confirming displacement rather than a surviving cache hit, and all
-512 words compare correctly in the simulator. The matching FPGA-CRT NBF also
-passes simulation. This establishes that the logical ordinary writeback and
-refill path works across every set without context switches or hints; a board
-pass would narrow the ten-stream fault to its concurrent replacement schedule,
-while a board failure would expose a general routed writeback defect. The NBF,
-source, hashes, and result are under `dirty-eviction-integrity/`. A standard
-board-runner attempt was denied locally before SSH launch.
+512 words compare correctly in the simulator. The matching FPGA-CRT NBF passes
+both simulation and the physical FPGA. On the board, `set_mask=0`,
+`set62_word_mask=0`, and `slow_reload_mask=0xffffffffffffffff`: all 64 targets
+were displaced and all 512 words survived. This establishes that the ordinary
+routed writeback/refill path, including set 62, works without context switches
+or sustained hints. The NBF, source, hashes, and result are under
+`dirty-eviction-integrity/`.
 
 Three fresh controls locate the failure after the worker and final handoff.
 Successor-only hints fail while prime-only hints pass. A memory fence before
@@ -198,7 +198,7 @@ simple and 40-cycle simulations both evict the stack line much earlier. A
 physical replacement-order difference remains possible; the available traces
 do not establish it.
 
-A matched stack reporter and address matrix are also built and hash-pinned in
+A matched stack reporter and address matrix are hash-pinned in
 `stack-slot-diagnostics/`. The preferred `recover` image preserves the original
 main layout, wrapper address, stores, and execution through the first failing
 load. If that load returns zero, it moves the reporting stack by 4 KiB and
@@ -214,15 +214,28 @@ cycle 688,261 is an ordinary L1 hit in one-hot way `0x2`: `cache_load_hit=1`,
 adjacent saved and caller words hit the same line on the following cycles. Thus
 the correct path does not consult the side buffer or DDR at the epilogue; the
 physical image must diverge by losing the line, corrupting it, or selecting the
-wrong L1 data/way. A focused RTL audit also excludes the dormant full-line
+wrong L1 data/way.
+
+The physical matrix now proves that the corruption follows D-cache set 62.
+The recovery reporter reads zero for all four known words in the original
+line: saved `ra`, saved `s0`, and both caller configuration words. Moving the
+saved pair by 16 bytes within the line still traps at PC zero. Moving it by 4
+KiB to a different tag in the same set fails twice at `minstret=2,348`, in
+76,128 and 76,135 cycles. Moving it by 64 bytes into set 61 passes twice in
+76,122 and 76,123 cycles. In those passing runs, `main`'s original set-62
+`nodes` local still prints zero, independently confirming loss of the original
+line while the relocated return-critical words survive. The set-61/set-62
+split is independent of run order and changes only the wrapper's matched stack
+displacement/restoration. Exact transcripts and hashes are under
+`stack-slot-diagnostics/physical-matrix/`.
+
+A focused RTL audit also excludes the dormant full-line
 prefetch installer as the eviction source: `prefetch_install_begin` is tied to
 zero, and the active `e_cache_data_mem_prefetch` operation is acknowledged by
 the side buffer before the ordinary data-SRAM request path. It asserts no L1
 data, tag, or status SRAM write. The residual fault must therefore involve the
 ordinary L1/write-buffer path or FPGA-specific state corruption, rather than
-prefetch replacement metadata invalidating the stack line. Managed networking
-accepted a fresh overlay reload and verified the preferred bitstream, but then
-rejected the normal SCP path, so the address matrix has no board result yet. An
+prefetch replacement metadata invalidating the stack line. An
 uncached or external readback remains useful if the reporter shows that the
 cacheable words are zero.
 

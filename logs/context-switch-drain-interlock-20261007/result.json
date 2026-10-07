@@ -868,10 +868,56 @@
             "log_sha256": "d738fc26c6847e367a3d98c5b7a8d3e96fc324a2cff2cda3503c9cf3087d8743"
           },
           "physical": {
-            "status": "not_run",
-            "last_attempt": "socket: Operation not permitted; SSH launch never began"
+            "status": "pass",
+            "set_mask": "0x0000000000000000",
+            "set62_word_mask": "0x0000000000000000",
+            "slow_reload_mask": "0xffffffffffffffff",
+            "all_targets_displaced": true,
+            "checked_words": 512,
+            "log_sha256": "ca12afaf45840956d33e36cdbab4435ad25429de225e50a1d15859450b1b794f"
           },
-          "interpretation": "The logical ordinary dirty-writeback/refill path preserves all 512 checked words across every cache set in isolation. A physical pass would narrow the context-4 failure to its concurrent replacement schedule; a physical failure would establish a general routed cache-to-DDR writeback defect."
+          "interpretation": "The ordinary dirty-writeback/refill path physically preserves all 512 checked words across every cache set, including set 62. The ten-stream context-4 failure therefore requires its concurrent replacement/hint/switch schedule rather than a general routed L1-to-DDR defect."
+        },
+        "physical_stack_set_matrix": {
+          "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/physical-matrix",
+          "bitstream_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
+          "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+          "fresh_overlay_before_each_run": true,
+          "recovery_reporter": {
+            "cycles": 76098,
+            "saved_ra": "0x0",
+            "saved_s0": "0x0",
+            "caller0": "0x0",
+            "caller1": "0x0",
+            "log_sha256": "5966f8e1b3cf1c6384da4ba911d7a005d418fd68f48f52353fd8ecbb9e1e2b20"
+          },
+          "shift16_same_line_set62": {
+            "status": "pc_zero_fail",
+            "cycles": [76147],
+            "minstret": [2348],
+            "log_sha256": "a3fefa757f2ec443babe6e55212ef321071047b459e0cdda695805e86e4f367a"
+          },
+          "shift64_adjacent_line_set61": {
+            "status": "pass",
+            "cycles": [76122, 76123],
+            "minstret": [2348, 2348],
+            "original_set62_nodes_word": [0, 0],
+            "log_sha256": [
+              "46e54c244a6dfc0416a67df48de17e9cd80591c5a4b4da79dd57ce9bed9535b0",
+              "521d3a54bc9fe734c49dc1ba94e0edc5c6251529ed2605fcc6f5b806977fe1e8"
+            ]
+          },
+          "shift4096_different_tag_set62": {
+            "status": "pc_zero_fail",
+            "cycles": [76128, 76135],
+            "minstret": [2348, 2348],
+            "log_sha256": [
+              "2b5b5664a87114dcebc619ca4ea69723b72ed16da752472ef42b3241fcf77c62",
+              "779538723627f187d0baa5e364ac10279d52f175d1590a42ba0b608bc72e21d2"
+            ]
+          },
+          "source_delta": "The placement variants differ only in run_window's stack displacement and matching restoration.",
+          "interpretation": "The ten-stream corruption follows D-cache set 62 rather than the original address, tag, or 16-byte sector. Set 62 works under isolated dirty eviction, so the defect requires the concurrent ten-stream schedule."
         }
       }
     }
