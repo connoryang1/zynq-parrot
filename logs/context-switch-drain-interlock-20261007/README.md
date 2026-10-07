@@ -86,11 +86,10 @@ study.
 ## Remaining ten-stream correctness failure
 
 The fixed image does not pass the full zero-gap ten-stream workload. A fresh
-load fails with context 0 restored at illegal PC 0 and `ra=0`; the diagnostic
-trap state is `epc=0`, `cause=2`, `tval=0`, `sp=0x80082fb0`, `a0=0x12978`,
-`a3=1`, and `a4=0`. Fresh seven- and eight-instruction terminal-gap controls
-also fail, so the interlock did not merely shift the old timing boundary by
-one cycle.
+load traps at illegal PC 0 with `ra=0`; the diagnostic state is `epc=0`,
+`cause=2`, `tval=0`, `sp=0x80082fb0`, `a0=0x12978`, `a3=1`, and `a4=0`.
+Fresh seven- and eight-instruction terminal-gap controls also fail, so the
+interlock did not merely shift the old timing boundary by one cycle.
 
 The physical controls sharply localize the trigger:
 
@@ -105,15 +104,26 @@ stream pass at 30,317, 55,151, 64,023, and 68,647 cycles, while 124 nodes per
 stream fail. Thus the current physical boundary is between 120 and 124
 context-4 iterations.
 
-RTL review exposes one remaining candidate window. Nonresident context-cache
-handoffs explicitly wait for `late_wb_v_lo`, the current integer writeback,
-dispatch, `mem_busy`, and `mem_ordered`. Resident admission currently checks
-only `mem_busy` and `mem_ordered`. A detached side-buffer hit may deassert the
-memory-busy indication before its final architectural writeback, allowing a
-resident ownership change in that tail. This is a bounded hypothesis, not an
-accepted root cause. A diagnostic that independently suppresses each of the
-four context-4 hints newly introduced between 120 and 124 iterations has been
-built; board transfer and the corresponding directed trace remain pending.
+Three fresh controls locate the failure after the worker and final handoff.
+Successor-only hints fail while prime-only hints pass. A memory fence before
+the final switch still fails. Loading `ra` from the saved stack slot twice also
+returns zero twice. At the trap, `a0` already contains the measured physical
+cycle delta, an operation performed only after `hardware_worker` returns; `sp`
+is `0x80082fb0`, after the epilogue has reloaded the saved words and incremented
+the stack pointer. The saved `ra` slot was at `0x80082fa0`. Thus the worker and
+context-0 return completed, and the later `ld ra,0(sp)` supplied zero before the
+final `ret`. This corrects the earlier interpretation that context 0 itself was
+restored with a zero architectural `ra`.
+
+The remaining fault is therefore a corrupted or mis-serviced stack reload
+after sustained successor prefetching. The side buffer compares the complete
+physical 16-byte sector address, so a simple truncated-tag alias is excluded by
+RTL inspection. A diagnostic that independently suppresses each of the four
+context-4 hints newly introduced between 120 and 124 iterations has been built;
+board transfer remains pending. A matched no-stack return control and an
+uncached readback of `0x80082fa0` are the next decisive tests: together they
+separate dirty cache-line/data corruption from a wrong-address or wrong-response
+load.
 
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus

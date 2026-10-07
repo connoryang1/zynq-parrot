@@ -324,6 +324,25 @@
             "name": "fresh_terminal_gap8",
             "status": "fail",
             "log_sha256": "6e773c8ba9485ea10620e39f0f6b7e23388bf73419799cdb6deda16e3426dc3e"
+          },
+          {
+            "name": "successor_only",
+            "status": "fail",
+            "nbf_sha256": "dd0fdbe1c79653c59840861d5fce5e9d2ddaae43fc19a5d65cb44c9dd5be9b9f",
+            "log_sha256": "66049810bdee22ce5a0772ed046227bcc78f94dfb9b01f332007fa3931a0505b"
+          },
+          {
+            "name": "terminal_fence_128_steps",
+            "status": "fail",
+            "nbf_sha256": "a86254c80e8d698b9083608a42a5cff60964b72c7b420fd8a0443533287a3012",
+            "log_sha256": "f6915f814ee3db4f41f81c3b7507722620de35c1f738e5a9f22c81a22b9fdf0c"
+          },
+          {
+            "name": "double_stack_ra_reload",
+            "status": "fail",
+            "nbf_sha256": "d4da0902a6bf99630950d79bcbfb6f35484c9b1dbfceae0f1364aaaa8b5250d3",
+            "log_sha256": "2ae4e115f54de2d7463cca1efc4cf9d767868f3613b2ce7e0b45545090bbef53",
+            "trap_a0": "0x1295e"
           }
         ],
         "only_context4_step_sweep": [
@@ -376,6 +395,14 @@
           "guest_host_valid": true,
           "decision": "reverted",
           "reason": "The simulator already passed the physical failure before this change, while the full drain adds large store-handoff and sustained-workload penalties. It is a timing control, not root-cause evidence."
+        },
+        "failure_stage_correction": {
+          "saved_ra_virtual_address": "0x80082fa0",
+          "evidence": "Trap SP is 0x80082fb0 after the epilogue increments SP. A0 already contains the physical-cycle delta, which is computed only after hardware_worker returns. Therefore the worker and final context handoff completed; the subsequent ld ra,0(sp) supplied zero before the final ret trapped at PC 0.",
+          "double_reload_result": "A second consecutive ld ra,0(sp) also supplies zero, excluding a one-cycle load-use transient.",
+          "terminal_fence_result": "A fence before the final handoff still fails, excluding undrained result stores as the residual cause.",
+          "hint_split_result": "Successor-only hints fail while prime-only hints pass, making repeated traversal-time successor responses necessary in the tested image.",
+          "current_interpretation": "The saved stack word is corrupted in memory/cache or the epilogue load is mis-serviced after sustained successor prefetching. Context-register restoration is no longer the leading interpretation."
         }
       }
     }
