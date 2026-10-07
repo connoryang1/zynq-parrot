@@ -129,6 +129,25 @@ D-cache prefetch-replay cycle. The five-slot wrapper delta is the same three
 cycles as the ten-slot wrapper delta (802 to 805), confirming that the smaller
 table preserves the ten-slot schedule through the FPGA-facing interface.
 
+The exact five-slot design was subsequently routed for the PYNQ-Z2 at top
+commit `4e527cad1` and BlackParrot commit `d4c20786d`. The ordinary synthesis
+strategy could not fit: after optimization it required 53,448 logic LUTs on a
+53,200-LUT device. Reusing the established `Flow_AreaOptimized_high` synthesis
+and `Area_Explore` implementation strategies reduced the placed design to
+46,349 logic LUTs (87.12%) and 49,303 total slice LUTs (92.67%). The routed
+design has zero failed, unrouted, or partially routed nets and zero node
+overlaps. Timing signs off with 0.263 ns setup slack and 0.021 ns hold slack,
+with no failing setup or hold endpoints. Bitstream generation and local package
+verification both pass; the package SHA-256 is
+`07de6afb133990998135da3fc26ae70e26386cb99564a964d5b34506f67c6e5c` and
+the bitstream SHA-256 is
+`933777e636853c0a6e9c6cb6d068778b4a49209510d16e49226c63bcbb6793ea`.
+
+This establishes that the simulated five-slot knee is physically implementable
+at the selected 20 MHz AXI clock without deleting the late-busy replay fix. It
+does not yet establish physical-DDR performance: the verified package still
+needs to be loaded and the matched 2/3/4/10-stream benchmark rerun on the board.
+
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
 filtered VCDs contain only the request, response, publication, commit, and
