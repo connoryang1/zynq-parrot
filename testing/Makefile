@@ -93,7 +93,8 @@ BENCHMARKS := \
     mt_prefetch_nonresident_interleave_benchmark \
     mt_request_interleave_benchmark \
     mt_load_ahead_benchmark \
-    mt_ctxtsw_nonresident_overhead_benchmark
+    mt_ctxtsw_nonresident_overhead_benchmark \
+    mt_ctxtsw_store_handoff_benchmark
 
 NONRESIDENT_TESTS := \
     mt_umode_nonresident_handoff_test \
