@@ -75,6 +75,7 @@ workload then falls from 2,241 to 900 cycles:
 | Fixed five slots, minimal 32-bit | 802 | 33/33 | 0 | 0 |
 | Ten-slot control, minimal 32-bit | 802 | 33/33 | 0 | 0 |
 | Fixed four slots, FPGA-facing 64-bit | 905 | 33/33 | 0 | 0 |
+| Fixed five slots, FPGA-facing 64-bit | 805 | 33/33 | 0 | 0 |
 | Ten-slot control, FPGA-facing 64-bit | 805 | 33/33 | 0 | 0 |
 
 The fix recovers 1,341 cycles, or 93.2% of the broken path's 1,439-cycle
@@ -119,6 +120,15 @@ frequently saturated, four retain a 98-cycle retry penalty, and slots six
 through ten cannot improve the measured total. This is a workload-specific
 queue result rather than a physical-DDR sizing rule.
 
+The FPGA-facing 64-bit wrapper independently reproduces the five-slot knee:
+four/five/ten slots take 905/805/805 cycles. Its five-slot trace accepts and
+allocates all 33 hints, issues 33 nonzero-ID prefetch lines, and has no ordinary
+request or installer drop. The table is full for 73 of 806 samples (9.1%),
+with 34 visible hint-request cycles, 28 memory-pipe replay cycles, and one
+D-cache prefetch-replay cycle. The five-slot wrapper delta is the same three
+cycles as the ten-slot wrapper delta (802 to 805), confirming that the smaller
+table preserves the ten-slot schedule through the FPGA-facing interface.
+
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
 filtered VCDs contain only the request, response, publication, commit, and
@@ -141,3 +151,5 @@ verifies the three-slot point, including retry counts, occupancy, and the
 three/four/ten-slot comparison.
 `python3 analyze_queue_fix_k5.py` applies the same complete-accounting gates to
 the five-slot point and verifies its cycle equality with the ten-slot control.
+`python3 analyze_queue_fix_k5_main64.py` verifies the corresponding five-slot
+equality and complete accounting through the FPGA-facing 64-bit wrapper.
