@@ -72,6 +72,7 @@ workload then falls from 2,241 to 900 cycles:
 | Broken four slots, minimal 32-bit | 2,241 | 31/33 | 32 (two serialized lines) | 4 |
 | Fixed three slots, minimal 32-bit | 1,106 | 33/33 | 0 | 0 |
 | Fixed four slots, minimal 32-bit | 900 | 33/33 | 0 | 0 |
+| Fixed five slots, minimal 32-bit | 802 | 33/33 | 0 | 0 |
 | Ten-slot control, minimal 32-bit | 802 | 33/33 | 0 | 0 |
 | Fixed four slots, FPGA-facing 64-bit | 905 | 33/33 | 0 | 0 |
 | Ten-slot control, FPGA-facing 64-bit | 805 | 33/33 | 0 | 0 |
@@ -104,11 +105,18 @@ the other three await response or installation instead of merely adding one
 more simultaneous stream.
 
 Adding that fourth slot saves 206 cycles, an 18.6% reduction from the
-three-slot runtime and 67.8% of its excess over ten slots. Adding all six
-remaining slots saves only another 98 cycles, or 10.9% of the four-slot
-runtime. For this exact three-stream, 40-cycle synthetic workload, four slots
-are the small practical knee: three are correct but frequently saturated,
-while five through ten have diminishing returns. This is a workload-specific
+three-slot runtime and 67.8% of its excess over ten slots. The fifth slot saves
+the remaining 98 cycles, or 10.9% of the four-slot runtime: five and ten slots
+both take exactly 802 cycles. The equality survives full accounting. Five
+slots accept and allocate all 33 hints, issue 33 nonzero-ID line requests, and
+have no ordinary fallback or installer drop. They are full for only 74 of 803
+samples (9.2%), with 35 visible hint-request cycles, 19 memory-pipe replay
+cycles, and two D-cache prefetch-replay cycles.
+
+For this exact three-stream, 40-cycle synthetic workload, five slots are the
+minimum measured depth that reproduces ten-slot runtime. Three are correct but
+frequently saturated, four retain a 98-cycle retry penalty, and slots six
+through ten cannot improve the measured total. This is a workload-specific
 queue result rather than a physical-DDR sizing rule.
 
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
@@ -131,3 +139,5 @@ trace and regenerates `results-queue-fix-main64.json`.
 `python3 analyze_queue_fix_k3.py` regenerates `results-queue-fix-k3.json` and
 verifies the three-slot point, including retry counts, occupancy, and the
 three/four/ten-slot comparison.
+`python3 analyze_queue_fix_k5.py` applies the same complete-accounting gates to
+the five-slot point and verifies its cycle equality with the ten-slot control.
