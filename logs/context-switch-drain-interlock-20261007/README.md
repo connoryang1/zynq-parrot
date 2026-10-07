@@ -316,6 +316,16 @@ set-7 demand evict set 62. Source, disassembly, exact FPGA logs, NBF hashes,
 and the re-extracted simulator trace are retained under
 `stack-slot-diagnostics/{stack-sentinel,final-lap-sentinel,context2-event-sentinel,matched-event-sentinel}/`.
 
+A post-switch delay control is now board-ready without the recompilation
+confound. Recompiled 0/1/2/4/8-NOP variants pass simulation in
+89,284/90,480/91,691/94,103/98,924 cycles, but linker relaxation changes many
+unrelated instruction words. The preferred one-bubble image instead patches
+the exact failing NBF's four-byte hot-loop jump into a same-size `c.nop; c.j`
+sequence. Its complete NBF diff is one 64-bit record at `0x80000580`; it passes
+simulation in 90,476 cycles, a 1,192-cycle or 1.34% increase. A fresh-overlay
+physical A/B against the original hash is still required to determine whether
+one post-switch cycle suppresses the board-only race.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.
