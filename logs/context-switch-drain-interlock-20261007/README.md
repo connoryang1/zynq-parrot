@@ -342,6 +342,12 @@ therefore 20,540 cycles, 6.64% slower than current hardware while retaining a
 state-conditional interlock if the physical causal matrix identifies a safe
 condition narrower than every handoff.
 
+A same-record compressed-branch control orders the two halfwords as `c.j;
+c.nop`, making the NOP unreachable. It exactly reproduces the original 89,284
+diagnostic and 19,258 fast-path simulator cycles. Physical comparison of this
+control with `c.nop; c.j` can therefore attribute any recovery to the executed
+cycle rather than compressed-jump encoding.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.

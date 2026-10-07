@@ -1168,7 +1168,17 @@
       "projected_physical_cycles": 20540,
       "demand_reference_cycles": 60077,
       "projected_speedup_vs_demand": 2.9248782862706912,
-      "interpretation": "The unmodified simulator is four cycles below physical and the patch charges exactly one cycle per non-final handoff."
+      "interpretation": "The unmodified simulator is four cycles below physical and the patch charges exactly one cycle per non-final handoff.",
+      "branch_encoding_control_nbf_sha256": "b0d538e5e2c805b6eabd42ad2b9333d5c73bace1f8371aba9962f081071af02e",
+      "branch_encoding_control_simulator_cycles": 19258,
+      "branch_encoding_control_matches_original_cycles": true
+    },
+    "compressed_branch_encoding_control": {
+      "replacement": "32-bit j -> 16-bit c.j followed by unreachable 16-bit c.nop",
+      "nbf_sha256": "0eead35c3cc5476d021796701fd6f09fca8b3df5f5fbeebe367808d1dda4ce65",
+      "simulator_cycles": 89284,
+      "matches_original_cycles": true,
+      "interpretation": "Controls compressed jump encoding independently of executing a one-cycle NOP."
     }
   }
 }
