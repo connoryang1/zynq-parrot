@@ -145,9 +145,23 @@ package bp_common_pkg;
                         ,bp_unicore_zynqparrot_prefetch_cfg_p
                         );
 
+  // Small routed endpoint for the corrected queue-depth knee. It retains the
+  // ten logical contexts of the sustained workload while reducing only the
+  // detached full-line transaction table from ten entries to five.
+  localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch5_cfg_override_p =
+    '{num_contexts: 10
+      ,dcache_prefetch_els: 5
+      ,default: "inv"
+      };
+  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch5_cfg_p
+                        ,bp_unicore_zynqparrot_prefetch5_cfg_override_p
+                        ,bp_unicore_zynqparrot_prefetch_cfg_p
+                        );
+
   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =
   {
-    bp_unicore_zynqparrot_prefetch10_cfg_p
+    bp_unicore_zynqparrot_prefetch5_cfg_p
+    ,bp_unicore_zynqparrot_prefetch10_cfg_p
     ,bp_unicore_zynqparrot_prefetch_cfg_p
     ,bp_multicore_zynqparrot_cfg_p
     ,bp_unicore_zynqparrot_cfg_p
@@ -161,7 +175,8 @@ package bp_common_pkg;
   // This enum MUST be kept up to date with the parameter array above
   typedef enum bit [lg_max_cfgs-1:0]
   {
-    e_bp_unicore_zynqparrot_prefetch10_cfg          = 5
+    e_bp_unicore_zynqparrot_prefetch5_cfg           = 6
+    ,e_bp_unicore_zynqparrot_prefetch10_cfg          = 5
     ,e_bp_unicore_zynqparrot_prefetch_cfg           = 4
     ,e_bp_multicore_zynqparrot_cfg                  = 3
     ,e_bp_unicore_zynqparrot_cfg                    = 2
