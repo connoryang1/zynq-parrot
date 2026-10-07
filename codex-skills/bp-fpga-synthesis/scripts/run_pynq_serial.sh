@@ -40,6 +40,13 @@ extra_arg=${PYNQ_CONTROL_PROGRAM_EXTRA_ARG:-}
   echo "FAIL: PYNQ_CONTROL_PROGRAM_EXTRA_ARG supports only --state-dump=0xOFFSET:WORDS" >&2
   exit 2
 }
+if [[ -n "$extra_arg" ]]; then
+  state_dump_words=${extra_arg##*:}
+  (( 10#$state_dump_words <= 32 )) || {
+    echo "FAIL: control-program supports at most 32 state-dump words per run" >&2
+    exit 2
+  }
+fi
 foreground=${PYNQ_CONTROL_PROGRAM_FOREGROUND:-0}
 [[ "$foreground" == 0 || "$foreground" == 1 ]] || {
   echo "FAIL: PYNQ_CONTROL_PROGRAM_FOREGROUND must be 0 or 1" >&2
