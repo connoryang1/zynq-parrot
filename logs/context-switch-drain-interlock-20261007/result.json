@@ -538,6 +538,67 @@
             "loaded_bit_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
             "diagnostic_transfer": "pending after normal SCP socket denial"
           }
+        },
+        "fresh_overlay_repeatability": {
+          "bit_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
+          "zero_gap": {
+            "nbf_sha256": "9c6e2df1ee6b33c19c4c03561a78684a8683d2d0692d160699945187e9e10e64",
+            "repetitions": 3,
+            "all_core_fail": true,
+            "final_minstret": [
+              2348,
+              2348,
+              2348
+            ],
+            "mtime_delta_eighth_cycles": [
+              6161,
+              6048,
+              6072
+            ],
+            "logs": [
+              {
+                "path": "/home/xilinx/bp-logs/dep-candidate-k3-k10-m3-interactive-20261007T151634Z-9522.log",
+                "sha256": "7017b994be916499ffdd5e706bd0ce53035a140bb2385494a77e66480faa29c4"
+              },
+              {
+                "path": "/home/xilinx/bp-logs/dep-candidate-k3-k10-m3-interactive-20261007T151648Z-9601.log",
+                "sha256": "c31f907b68bdfedc19cc51ecce8af5a674a0da58fbe02876b3d15292bd5f05bc"
+              },
+              {
+                "path": "/home/xilinx/bp-logs/dep-candidate-k3-k10-m3-interactive-20261007T151702Z-9679.log",
+                "sha256": "4486cef528fc15ec9b3785c6e0719fe4b1abca5ff12fa4bf9dd68df80c3d7de0"
+              }
+            ]
+          },
+          "trap_reporter": {
+            "nbf_sha256": "d8fbe700633df1b396d0e3e3203fb47b056988f3a25a44c31079e2228f5099ac",
+            "repetitions": 2,
+            "common": {
+              "epc": 0,
+              "cause": 2,
+              "tval": 0,
+              "ra": 0,
+              "sp": "0x80082fb0",
+              "a3": 1,
+              "a4": 0,
+              "final_minstret": 2362
+            },
+            "a0": [
+              "0x1297d",
+              "0x12979"
+            ],
+            "logs": [
+              {
+                "path": "/home/xilinx/bp-logs/trap-regs-gap7-k10-interactive-20261007T151732Z-9856.log",
+                "sha256": "cd2b672753adfa562ed4d6a88a99b41ed3ffc810dbfa26172496ba5a98080f3e"
+              },
+              {
+                "path": "/home/xilinx/bp-logs/trap-regs-gap7-k10-interactive-20261007T151745Z-9934.log",
+                "sha256": "f6efd2a4b771eda7c1424629e9186605944074be355e3dc70e160d5c55031d16"
+              }
+            ]
+          },
+          "interpretation": "The architectural failure endpoint is deterministic across fresh FPGA overlay loads and DRAM allocations; asynchronous host sampling and a four-cycle measured interval spread do not change the trap state."
         }
       }
     }

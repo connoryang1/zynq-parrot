@@ -91,6 +91,16 @@ load traps at illegal PC 0 with `ra=0`; the diagnostic state is `epc=0`,
 Fresh seven- and eight-instruction terminal-gap controls also fail, so the
 interlock did not merely shift the old timing boundary by one cycle.
 
+Three additional runs each reload and hash-verify the preferred overlay before
+executing the exact zero-gap image. All three reach `CORE FAIL` at precisely
+`minstret=2,348`; only the host's asynchronous starting sample varies. Two
+fresh trap-reporting runs likewise reproduce `epc=0`, `cause=2`, `tval=0`,
+`ra=0`, `sp=0x80082fb0`, `a3=1`, and `a4=0`, and both stop at
+`minstret=2,362`. Their measured-cycle value `a0` differs by only four cycles
+(`0x12979` versus `0x1297d`). The architectural endpoint is therefore
+deterministic across fresh FPGA configuration and DRAM allocation, rather than
+an intermittent warm-state or marginal-timing failure.
+
 The physical controls sharply localize the trigger:
 
 - no successor hints passes in 74,925 cycles;
