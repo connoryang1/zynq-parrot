@@ -171,6 +171,16 @@ therefore neither leaves these prologue stores pending nor overwrites them
 during traversal. A physical failure still could diverge in this path; the
 recovery reporter is the decisive board observation.
 
+The preferred routed checkpoint also keeps advisory and authoritative storage
+physically separate. Vivado maps the side-buffer data to 55 distributed
+`RAM32M` roots in 55 distinct SLICEM locations. The D-cache maps its eight data
+banks to eight `RAMB36E1` blocks, its tag array to three `RAMB36E1` blocks, and
+its status array to one `RAMB18E1` block. No side-buffer storage location is
+shared with an L1 primitive. This excludes synthesis merging or physical RAM
+sharing as a route for a side-buffer write to modify the stack BRAM. The exact
+checkpoint query, primitive inventory, locations, transcript, and hashes are
+retained in `stack-slot-diagnostics/routed-storage/`.
+
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus
 97,237 for the current interlock, but the simulator already passed the physical
