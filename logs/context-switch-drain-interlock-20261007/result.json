@@ -15,16 +15,28 @@
   "store_handoff_control": {
     "command": "BSG_TRACE_TIMEOUT_S=1200 VERILATOR_BUILD_JOBS=4 make -C testing run-mt_ctxtsw_store_handoff_benchmark NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=0",
     "log": "mt_ctxtsw_store_handoff_benchmark.log",
-    "log_sha256": "880abab0043560657654397992e7b4e3cafc9a0a3866a3ce760463442d39687c",
+    "log_sha256": "986c90c57a4ce5203dbaa94acd7e493a5bb39d641b161953609e383cfdbd0d03",
     "resident_pure_cycles_per_switch": 5.14,
     "resident_store_cycles_per_switch": 6.15,
     "resident_store_total_overhead_cycles": 1.0,
     "nonresident_pure_cycles_per_switch": 9.14,
     "nonresident_store_cycles_per_switch": 11.15,
     "nonresident_store_total_overhead_cycles": 2.01,
-    "interpretation": "Delta includes the store instruction and any interlock wait; it is an upper bound on drain-interlock-only cost.",
+    "interpretation": "One hot store is unchanged across RTL. With four consecutive hot stores, the interlock adds 2.97 resident and 1.97 nonresident cycles; fixed total overhead versus pure switching is 6.97 cycles in both cases.",
     "guest_core_pass": true,
     "host_pass": true,
-    "maintained_harness_valid": true
+    "maintained_harness_valid": true,
+    "resident_four_store_cycles_per_switch": 12.11,
+    "resident_four_store_total_overhead_cycles": 6.97,
+    "nonresident_four_store_cycles_per_switch": 16.11,
+    "nonresident_four_store_total_overhead_cycles": 6.97,
+    "pre_fix_top_commit": "643c92cc4cb5241966a89c49604abd8dd1ca75e8",
+    "pre_fix_black_parrot_commit": "4f56fba7d29f4202b5d3a2adc6a2942fe08cb888",
+    "pre_fix_log": "mt_ctxtsw_store_handoff_benchmark-pre-fix.log",
+    "pre_fix_log_sha256": "0a177d47e06c5f4ffdf2a51ada87c278bbdb8ff1e46b519f2a713de836af4926",
+    "pre_fix_resident_four_store_cycles_per_switch": 9.14,
+    "pre_fix_nonresident_four_store_cycles_per_switch": 14.14,
+    "interlock_added_resident_four_store_cycles": 2.97,
+    "interlock_added_nonresident_four_store_cycles": 1.97
   }
 }

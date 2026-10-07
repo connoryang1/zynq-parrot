@@ -24,7 +24,7 @@
 
 static uint64_t t1_stack[STACK_WORDS];
 static uint64_t t2_stack[STACK_WORDS];
-static volatile uint64_t peer_contexts[4] __attribute__((used, aligned(8)));
+static volatile uint64_t peer_contexts[6] __attribute__((used, aligned(8)));
 static volatile uint64_t store_sinks[3] __attribute__((used, aligned(64)));
 
 #define RECORD_COMPLETION(offset) \
@@ -80,6 +80,14 @@ SOURCE_RING(t0_cold_store, 2, "sd t0, 0(t1)\n",
 PEER_RING(t2_cold_store, 0, "sd t0, 0(t1)\n",
           "la t1, store_sinks\naddi t1, t1, 16\n", "24")
 
+#define STORE4 "sd t0, 0(t1)\nsd t0, 8(t1)\nsd t0, 16(t1)\nsd t0, 24(t1)\n"
+SOURCE_RING(t0_warm_store4, 1, STORE4, "la t1, store_sinks\n")
+PEER_RING(t1_warm_store4, 0, STORE4,
+          "la t1, store_sinks\n", "32")
+SOURCE_RING(t0_cold_store4, 2, STORE4, "la t1, store_sinks\n")
+PEER_RING(t2_cold_store4, 0, STORE4,
+          "la t1, store_sinks\n", "40")
+
 static uint64_t run_ring(unsigned context, uint64_t *stack,
                          void (*source)(void), void (*peer)(void))
 {
@@ -109,9 +117,12 @@ int main(void)
   uint64_t cold_pure = run_ring(2, t2_stack, t0_cold_pure, t2_cold_pure);
   uint64_t warm_store = run_ring(1, t1_stack, t0_warm_store, t1_warm_store);
   uint64_t cold_store = run_ring(2, t2_stack, t0_cold_store, t2_cold_store);
+  uint64_t warm_store4 = run_ring(1, t1_stack, t0_warm_store4, t1_warm_store4);
+  uint64_t cold_store4 = run_ring(2, t2_stack, t0_cold_store4, t2_cold_store4);
 
   if (peer_contexts[0] != 1 || peer_contexts[1] != 2
       || peer_contexts[2] != 1 || peer_contexts[3] != 2
+      || peer_contexts[4] != 1 || peer_contexts[5] != 2
       || store_sinks[0] == 0 || store_sinks[1] == 0 || store_sinks[2] == 0) {
     bp_print_string("[BSG-FAIL] store-handoff completion missing\n");
     bp_finish(1);
@@ -123,9 +134,13 @@ int main(void)
   print_x100("Resident pure cycles/switch x100:       ", warm_pure);
   print_x100("Resident store cycles/switch x100:      ", warm_store);
   print_x100("Resident store overhead/switch x100:    ", warm_store - warm_pure);
+  print_x100("Resident four-store cycles/switch x100: ", warm_store4);
+  print_x100("Resident four-store overhead x100:      ", warm_store4 - warm_pure);
   print_x100("Nonresident pure cycles/switch x100:    ", cold_pure);
   print_x100("Nonresident store cycles/switch x100:   ", cold_store);
   print_x100("Nonresident store overhead/switch x100: ", cold_store - cold_pure);
+  print_x100("Nonresident four-store cycles/switch x100: ", cold_store4);
+  print_x100("Nonresident four-store overhead x100:      ", cold_store4 - cold_pure);
   bp_finish(0);
   return 0;
 }

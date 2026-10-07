@@ -408,15 +408,15 @@ BSG-INFO:    ps.cpp: reading three base registers
 BSG-INFO:    ps.cpp: reset(lo)=0, dram_init=0, dram_base=0
 BSG-INFO:    ps.cpp: attempting to write and read register 0x8
 BSG-INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
-BSG-INFO:    Creating host: 0x7fff3848b440 40000030 40000028
+BSG-INFO:    Creating host: 0x7ffd3b838880 40000030 40000028
 BSG-INFO:    Setting non-blocking terminal mode
 BSG-INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 134217728
 BSG-INFO:      bsg_zynq_pl: Allocated dummy DRAM
-BSG-INFO:    ps.cpp: received 0x7f916d1f1000 (phys = 7f916d1f1000)
+BSG-INFO:    ps.cpp: received 0x7f4766208000 (phys = 7f4766208000)
 BSG-INFO:    ps.cpp: wrote and verified base register
 BSG-INFO:    ps.cpp: beginning config
 BSG-INFO:    ps.cpp: beginning nbf load
-BSG-INFO:    ps.cpp: NBF file has 3657 lines. Starting load...
+BSG-INFO:    ps.cpp: NBF file has 4035 lines. Starting load...
 BSG-INFO:    ps.cpp: NBF Load Progress: 0%
 BSG-INFO:    ps.cpp: NBF Load Progress: 5%
 BSG-INFO:    ps.cpp: NBF Load Progress: 10%
@@ -438,27 +438,31 @@ BSG-INFO:    ps.cpp: NBF Load Progress: 85%
 BSG-INFO:    ps.cpp: NBF Load Progress: 90%
 BSG-INFO:    ps.cpp: NBF Load Progress: 95%
 BSG-INFO:    ps.cpp: NBF Load Progress: 100%
-BSG-INFO:    ps.cpp: NBF load took 90.893242 seconds
+BSG-INFO:    ps.cpp: NBF load took 153.435924 seconds
 BSG-INFO:    ps.cpp: trace timeout armed for 1200 seconds
-ps.cpp: Heartbeat - Retired 5499 instructions...
+ps.cpp: Heartbeat - Retired 8016 instructions...
 [BSG-PASS] matched store-before-switch handoff benchmark
 === Store-before-switch Handoff Benchmark ===
 Resident pure cycles/switch x100:       0x0000000000000202
 Resident store cycles/switch x100:      0x0000000000000267
 Resident store overhead/switch x100:    0x0000000000000064
+Resident four-store cycles/switch x100: 0x00000000000004bb
+Resident four-store overhead x100:      0x00000000000002b9
 Nonresident pure cycles/switch x100:    0x0000000000000392
 Nonresident store cycles/switch x100:   0x000000000000045b
 Nonresident store overhead/switch x100: 0x00000000000000c9
+Nonresident four-store cycles/switch x100: 0x000000000000064b
+Nonresident four-store overhead x100:      0x00000000000002b9
 BSG-INFO:    CORE PASS
 BSG-INFO:    ps.cpp: end polling i/o
 BSG-INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
-BSG-INFO:    ps.cpp: minstret (instructions retired):            20360 (            4f88)
-BSG-INFO:    ps.cpp: minstret delta:                             20360 (            4f88)
-BSG-INFO:    ps.cpp: wall clock time                :      55091478335 (       cd3b53f3f) ns
+BSG-INFO:    ps.cpp: minstret (instructions retired):            31102 (            797e)
+BSG-INFO:    ps.cpp: minstret delta:                             31102 (            797e)
+BSG-INFO:    ps.cpp: wall clock time                :     134668422847 (      1f5add0ebf) ns
 BSG-INFO:      bsg_zynq_pl: done() called, exiting
 BSG-INFO:    Restoring terminal settings
 BSG-INFO:    Returning from ps_main with RC: 0
 BSG-INFO:    BSG PASS
-[18938950000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
+[22388350000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
 %Error: /home/coyang/zynq-parrot/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
 Aborting...
