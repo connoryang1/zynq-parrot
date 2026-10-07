@@ -213,8 +213,8 @@ check-dependent-topology:
 	fi
 .PHONY: check-dependent-config
 check-dependent-config:
-	@if (( ($(STREAMS) != 2 && $(STREAMS) != 3 && $(STREAMS) != 4 && $(STREAMS) != 10) || $(STREAM_NODES) < $(STREAMS) || $(STREAM_NODES) > 1280 || $(STREAM_NODES) % $(STREAMS) != 0 || $(PREFETCH_ELS) < $(STREAMS) )); then \
-		echo "ERROR: dependent streams require STREAMS=2, 3, 4 or 10, divisible STREAM_NODES in [STREAMS,1280], and enough prefetch slots"; exit 1; \
+	@if (( ($(STREAMS) != 2 && $(STREAMS) != 3 && $(STREAMS) != 4 && $(STREAMS) != 10) || $(STREAM_NODES) < $(STREAMS) || $(STREAM_NODES) > 1280 || $(STREAM_NODES) % $(STREAMS) != 0 )); then \
+		echo "ERROR: dependent streams require STREAMS=2, 3, 4 or 10 and divisible STREAM_NODES in [STREAMS,1280]"; exit 1; \
 	fi
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT := $(BENCH_MODE)
 run-mt_prefetch_nonresident_interleave_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')

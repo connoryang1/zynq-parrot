@@ -144,9 +144,13 @@ the bitstream SHA-256 is
 `933777e636853c0a6e9c6cb6d068778b4a49209510d16e49226c63bcbb6793ea`.
 
 This establishes that the simulated five-slot knee is physically implementable
-at the selected 20 MHz AXI clock without deleting the late-busy replay fix. It
-does not yet establish physical-DDR performance: the verified package still
-needs to be loaded and the matched 2/3/4/10-stream benchmark rerun on the board.
+at the selected 20 MHz AXI clock without deleting the late-busy replay fix. Its
+first physical acceptance run subsequently exposed a separate narrow-side-
+buffer regression: consuming the next-pointer word discarded the adjacent
+payload word, forcing one demand miss per node. `logs/five-slot-physical-20261007/`
+records the physical matrix, root cause, and corrected simulation. A rebuilt
+image with the fix still needs physical acceptance; the routed result in this
+section remains evidence for fit and timing only.
 
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
