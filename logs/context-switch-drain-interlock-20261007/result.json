@@ -377,7 +377,11 @@
           }
         ],
         "current_bound": "The failure begins between 120 and 124 nodes per stream when only logical context 4 issues hints. This excludes a general five-slot capacity or aggregate hint-count explanation.",
-        "rtl_gap_found": "Resident switch admission waits for mem_busy/mem_ordered but, unlike the nonresident drain state, does not explicitly wait for late_wb_v_lo, current iwb_pkt writeback, or dispatch_pkt.v. A side-buffer hit may expose this tail; this is a hypothesis pending a directed trace or rebuilt image.",
+        "superseded_resident_admission_hypothesis": {
+          "hypothesis": "Resident switch admission waits for mem_busy/mem_ordered but, unlike the nonresident drain state, does not explicitly wait for late_wb_v_lo, current iwb_pkt writeback, or dispatch_pkt.v.",
+          "status": "superseded as the explanation for the observed PC-zero failure",
+          "reason": "The physical cycle delta proves hardware_worker and the final context handoff returned before the later stack reload supplied zero. A terminal fence and complete-calculator-drain control also fail to establish this admission gap as the cause."
+        },
         "rejected_complete_calculator_drain_experiment": {
           "change": "Replace the resident-switch mem_busy/mem_ordered gate with the existing full register_seed_ready calculator-drain contract.",
           "store_handoff_cycles_per_switch": {
@@ -403,6 +407,27 @@
           "terminal_fence_result": "A fence before the final handoff still fails, excluding undrained result stores as the residual cause.",
           "hint_split_result": "Successor-only hints fail while prime-only hints pass, making repeated traversal-time successor responses necessary in the tested image.",
           "current_interpretation": "The saved stack word is corrupted in memory/cache or the epilogue load is mis-serviced after sustained successor prefetching. Context-register restoration is no longer the leading interpretation."
+        },
+        "pending_stack_address_matrix": {
+          "status": "built and simulator-validated; physical transfer pending after managed SSH/SCP denial",
+          "recover_nbf_sha256": "b50c2b5b00a315653cf040f7ae2b5a56cb10b58f793ee3a711469081a1af8fa0",
+          "shift16_nbf_sha256": "51ef759d9f41400002ede01bf70c178bea20b8628e6c6f7bd3ed8008e99cf96b",
+          "shift64_nbf_sha256": "3b7506c8d241ed3b861d22c16abb49ff4bac1b35e4fe3080e3240af63c23782f",
+          "shift4096_nbf_sha256": "91e31c4de79dd0947c02c90ed8141a144a662c4eceb8e8e7a267e17a71abcf49",
+          "address_meaning": "The original saved pair is at 0x80082fa0 in D-cache set 62. Shifting by 16 bytes retains the line and set but changes sector; shifting by 64 bytes selects set 61; shifting by 4096 bytes retains set 62 with a different line and tag.",
+          "reporter_simulator_control": {
+            "status": "pass with known nonfatal post-PASS teardown assertion",
+            "cycles": 23972,
+            "saved_ra": "0x800003c4",
+            "saved_s0": "0xa",
+            "caller_slot0": "0x500",
+            "caller_slot1": "0x500",
+            "run_log_sha256": "5257433fc4da9332658c7ef6387becd49be591960dc51e5020b4c196a03aecdd",
+            "fst_sha256": "64e9e75423a07572bac8dd5ebd53794bf4a954575bdb6f2c8eaa61f619b1f78f"
+          },
+          "new_context4_successor_hint_sets": [22, 28, 32, 12],
+          "stack_set": 62,
+          "direct_same_set_collision": false
         }
       }
     }

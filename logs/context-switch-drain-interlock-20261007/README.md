@@ -120,10 +120,23 @@ after sustained successor prefetching. The side buffer compares the complete
 physical 16-byte sector address, so a simple truncated-tag alias is excluded by
 RTL inspection. A diagnostic that independently suppresses each of the four
 context-4 hints newly introduced between 120 and 124 iterations has been built;
-board transfer remains pending. A matched no-stack return control and an
-uncached readback of `0x80082fa0` are the next decisive tests: together they
-separate dirty cache-line/data corruption from a wrong-address or wrong-response
-load.
+board transfer remains pending. Those four successor addresses map to D-cache
+sets 22, 28, 32, and 12, while the failing stack line maps to set 62, excluding
+a direct same-set collision with the four newly introduced hints.
+
+A matched stack reporter and address matrix are also built and hash-pinned in
+`stack-slot-diagnostics/`. The preferred `recover` image preserves the original
+main layout, wrapper address, stores, and execution through the first failing
+load. If that load returns zero, it moves the reporting stack by 4 KiB and
+prints the saved `ra`, adjacent saved `s0`, and two known caller words from the
+same line. Three conventional-return variants move the saved pair by 16 bytes,
+64 bytes, or 4 KiB, distinguishing sector, set, and tag dependence. A clean
+simulator rebuild validates the reporter: all results pass in 23,972 cycles and
+the four words are exactly `0x800003c4`, `0xa`, `0x500`, and `0x500`. This is an
+instrumentation control only; the simulator still does not reproduce the
+physical fault. Managed networking rejected the normal SSH/SCP path, so the
+address matrix has no board result yet. An uncached or external readback remains
+useful if the reporter shows that the cacheable words are zero.
 
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus
