@@ -1154,6 +1154,21 @@
         "increment_cycles": 1202
       }
     ],
-    "causal_matrix_interpretation": "Post-switch-only physical recovery implicates the incoming demand boundary; pre-switch-only recovery implicates outgoing hint settling; all placements recovering indicates broader loop-period sensitivity."
+    "causal_matrix_interpretation": "Post-switch-only physical recovery implicates the incoming demand boundary; pre-switch-only recovery implicates outgoing hint settling; all placements recovering indicates broader loop-period sensitivity.",
+    "fast_two_stream_exact_control": {
+      "original_nbf_sha256": "92b0bdbe635486053a23ca9fc86074678a8f28b11e07626d43a23a11af6a5b0c",
+      "post_switch_n1_nbf_sha256": "94ca62c38298d13538c4109a4c2cd2039c8aa9acaa553328b8758dc8a3939f89",
+      "changed_records": 1,
+      "nonfinal_handoffs": 1278,
+      "original_simulator_cycles": 19258,
+      "original_physical_cycles": 19262,
+      "post_switch_n1_simulator_cycles": 20536,
+      "increment_cycles": 1278,
+      "overhead_percent": 6.636203136358915,
+      "projected_physical_cycles": 20540,
+      "demand_reference_cycles": 60077,
+      "projected_speedup_vs_demand": 2.9248782862706912,
+      "interpretation": "The unmodified simulator is four cycles below physical and the patch charges exactly one cycle per non-final handoff."
+    }
   }
 }

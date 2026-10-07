@@ -333,6 +333,15 @@ recovery would identify an incoming-demand boundary, pre-switch-only recovery
 would identify outgoing-hint settling, and recovery at all three placements
 would show broader loop-period sensitivity.
 
+The same exact patch on the accepted two-stream performance NBF measures
+19,258 unmodified and 20,536 patched simulator cycles. The former is only four
+cycles below its 19,262-cycle FPGA result; the 1,278-cycle increment equals
+the exact number of non-final handoffs. A full-cost physical projection is
+therefore 20,540 cycles, 6.64% slower than current hardware while retaining a
+2.925x speedup over the 60,077-cycle demand baseline. This argues for a
+state-conditional interlock if the physical causal matrix identifies a safe
+condition narrower than every handoff.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.
