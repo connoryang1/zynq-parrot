@@ -70,6 +70,7 @@ workload then falls from 2,241 to 900 cycles:
 | Configuration | Cycles | Accepted hints | Ordinary AXI requests | Installer drops |
 | --- | ---: | ---: | ---: | ---: |
 | Broken four slots, minimal 32-bit | 2,241 | 31/33 | 32 (two serialized lines) | 4 |
+| Fixed three slots, minimal 32-bit | 1,106 | 33/33 | 0 | 0 |
 | Fixed four slots, minimal 32-bit | 900 | 33/33 | 0 | 0 |
 | Ten-slot control, minimal 32-bit | 802 | 33/33 | 0 | 0 |
 | Fixed four slots, FPGA-facing 64-bit | 905 | 33/33 | 0 | 0 |
@@ -92,6 +93,24 @@ Both fixed wrappers accept 33/33 hints and issue 33 prefetch AXI requests with
 no ordinary fallback. The approximately 100-cycle residual is therefore
 queue/replay scheduling overhead rather than external beat width.
 
+The fixed three-slot run locates the queue-depth knee. It completes in 1,106
+cycles with all 33 hints accepted and allocated, 33 nonzero-ID prefetch line
+requests, and no ordinary fallback or installer drop. The three entries are
+occupied for 724 of 1,107 sampled cycles (65.4%); the memory pipe spends 90
+cycles replaying hints and the D-cache contributes 74 prefetch-replay cycles.
+By comparison, four slots are full for 312 of 901 samples (34.6%) and record
+41 memory-pipe replay cycles. The fourth slot therefore absorbs requests while
+the other three await response or installation instead of merely adding one
+more simultaneous stream.
+
+Adding that fourth slot saves 206 cycles, an 18.6% reduction from the
+three-slot runtime and 67.8% of its excess over ten slots. Adding all six
+remaining slots saves only another 98 cycles, or 10.9% of the four-slot
+runtime. For this exact three-stream, 40-cycle synthetic workload, four slots
+are the small practical knee: three are correct but frequently saturated,
+while five through ten have diminishing returns. This is a workload-specific
+queue result rather than a physical-DDR sizing rule.
+
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
 filtered VCDs contain only the request, response, publication, commit, and
@@ -109,3 +128,6 @@ the fixed waveform and require 33 accepted/allocated hints, 33 nonzero-ID AXI
 prefetch requests, zero ordinary requests, and zero installer drops.
 `python3 analyze_queue_fix_main64.py` applies the same gates to the FPGA-facing
 trace and regenerates `results-queue-fix-main64.json`.
+`python3 analyze_queue_fix_k3.py` regenerates `results-queue-fix-k3.json` and
+verifies the three-slot point, including retry counts, occupancy, and the
+three/four/ten-slot comparison.
