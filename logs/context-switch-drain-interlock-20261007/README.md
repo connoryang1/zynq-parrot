@@ -14,4 +14,11 @@ With four consecutive hot stores immediately before every handoff, the fixed RTL
 
 ## Pre-fix FPGA control
 
-The exact 20 MHz pre-fix image (`a16a9532` / `4f56fba7d`, bitstream `e041ad3b...`) ran the reviewed FPGA NBF three times after an explicit overlay reload and remote hash verification. All three cycle rows are identical: 5.10/9.14 pure resident/nonresident, 6.15/11.15 after one hot store, and 9.14/14.14 after four hot stores. Every run passes benchmark state, core, host, cleanup, and bounded-runtime checks. This closely reproduces the pre-fix simulator and supplies the physical half of the pending matched-image A/B.
+The exact 20 MHz pre-fix image (`a16a9532` / `4f56fba7d`, bitstream
+`e041ad3bcc0b2619c348e4bf19ea209a628586fe8bc5b839e95535d01215512b`)
+ran the reviewed FPGA NBF three times after an explicit overlay reload and
+remote hash verification. All three cycle rows are identical: 5.10/9.14 pure
+resident/nonresident, 6.15/11.15 after one hot store, and 9.14/14.14 after four
+hot stores. Every run passes benchmark state, core, host, cleanup, and bounded
+runtime checks. This closely reproduces the pre-fix simulator and supplies the
+physical half of the pending matched-image A/B.
