@@ -1,0 +1,235 @@
+{
+  "method": "Sample the retained four-slot VCD on rising core/UCE clocks inside the exact fifth run_window; compare all expected graph-line hints with UCE allocation handshakes, then map ordinary AXI reads back to CPU lines with the measured fixed address offset.",
+  "provenance": {
+    "top_commit": "03955af94db78af86c271b560052f74f66879a88",
+    "black_parrot_commit": "259b88587afe31a15db521f672d7626c26119642",
+    "subsystem_commit": "f9762c5b41f193173d134ac8a20b9e126ceac1e9",
+    "test_elf_sha256": "0770ad121dfd1dcc6e7a56822a7dd2b12f3c25f7feadb2cdff073d1243a25e9b",
+    "filtered_vcd_xz_sha256": "f42821bdc0321c4910fc7a661d1c70bddea275f083b92991d17d7cd3edbff53d",
+    "trace_run_log_sha256": "c803e3475479959fd5f0dcc5fb3f2bf9a1fd845a698c2bb823820b4bc4536427"
+  },
+  "configuration": {
+    "resident_threads": 3,
+    "logical_contexts": 10,
+    "prefetch_slots": 4,
+    "streams": 3,
+    "nodes_per_stream": 11,
+    "total_nodes": 33,
+    "synthetic_request_to_first_beat_nominal_cycles": 40,
+    "physical_axi_data_width_bits": 32,
+    "line_bytes": 64
+  },
+  "window": {
+    "begin_timestamp": 74999175000,
+    "end_timestamp": 75111225000,
+    "clock_period_ps": 50000,
+    "cycles": 2241
+  },
+  "accounting": {
+    "expected_hints": 33,
+    "observed_hint_request_cycles": 48,
+    "unique_hint_addresses": 33,
+    "accepted_hints": 31,
+    "issued_prefetches": 31,
+    "uce_accepted_drop_pulses": 0,
+    "prefetch_axi_lines": 31,
+    "ordinary_axi_word_requests": 32,
+    "tag_publications": 27,
+    "installer_drop_state_entries": 4,
+    "installer_drop_entry_cycles": [
+      302.5,
+      328.5,
+      1323.5,
+      1343.5
+    ],
+    "valid_slots_at_measured_end": 0,
+    "physical_address_offset_low32": 2236506112
+  },
+  "missing_hint_allocations": [
+    {
+      "stream": 2,
+      "position": 2,
+      "node_index": 1024,
+      "cpu_address": 2147602432,
+      "request_attempt_cycles": [
+        200.5,
+        204.5
+      ],
+      "attempts_all_four_slots_full": true,
+      "uce_accept_count": 0,
+      "uce_drop_count": 0,
+      "hint_retire_cycle": 209.0,
+      "last_attempt_to_retirement_cycles": 4.5
+    },
+    {
+      "stream": 2,
+      "position": 7,
+      "node_index": 92,
+      "cpu_address": 2147542784,
+      "request_attempt_cycles": [
+        1237.5,
+        1241.5
+      ],
+      "attempts_all_four_slots_full": true,
+      "uce_accept_count": 0,
+      "uce_drop_count": 0,
+      "hint_retire_cycle": 1246.0,
+      "last_attempt_to_retirement_cycles": 4.5
+    }
+  ],
+  "ordinary_fallback_line_fills": [
+    {
+      "cpu_address": 2147602432,
+      "axi_address": 89141248,
+      "first_address_cycle": 279.0,
+      "final_address_cycle": 915.0,
+      "final_response_cycle": 955.0,
+      "word_requests": 16,
+      "request_spacing_cycles": [
+        48.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0
+      ],
+      "address_to_response_cycles": [
+        46.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0
+      ],
+      "first_address_to_final_response_cycles": 676.0
+    },
+    {
+      "cpu_address": 2147542784,
+      "axi_address": 89081600,
+      "first_address_cycle": 1316.0,
+      "final_address_cycle": 1946.0,
+      "final_response_cycle": 1986.0,
+      "word_requests": 16,
+      "request_spacing_cycles": [
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0,
+        42.0
+      ],
+      "address_to_response_cycles": [
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0
+      ],
+      "first_address_to_final_response_cycles": 670.0
+    }
+  ],
+  "queue_behavior": {
+    "slot_occupancy_samples": {
+      "0": 1341,
+      "1": 110,
+      "2": 141,
+      "3": 426,
+      "4": 223
+    },
+    "all_slots_full_samples": 223,
+    "all_slots_full_fraction": 0.0995091477019188,
+    "complete_slot_backlog_samples": {
+      "0": 1685,
+      "1": 473,
+      "2": 83
+    },
+    "installer_busy_cycles": 525,
+    "installer_busy_fraction": 0.23427041499330656,
+    "allocation_gap_cycles": {
+      "count": 30,
+      "minimum": 8.0,
+      "median": 22.0,
+      "mean": 70.36666666666666,
+      "maximum": 716.0,
+      "distribution": {
+        "8.0": 1,
+        "12.0": 1,
+        "14.0": 3,
+        "15.0": 4,
+        "20.0": 3,
+        "21.0": 2,
+        "22.0": 2,
+        "23.0": 2,
+        "26.0": 2,
+        "27.0": 1,
+        "35.0": 1,
+        "39.0": 1,
+        "42.0": 3,
+        "44.0": 1,
+        "58.0": 1,
+        "700.0": 1,
+        "716.0": 1
+      }
+    },
+    "maximum_axi_transactions_in_flight": 3
+  },
+  "ten_slot_comparison": {
+    "four_slot_cycles": 2241,
+    "ten_slot_cycles": 802,
+    "extra_cycles": 1439,
+    "four_slot_slowdown": 2.79426433915212,
+    "sum_of_two_serial_fallback_spans_cycles": 1346.0,
+    "fallback_span_fraction_of_extra_cycles": 0.935371785962474,
+    "extra_cycles_not_inside_fallback_spans": 93.0
+  },
+  "interpretation": [
+    "All 33 intended addresses reached the UCE, but two hint instructions retired after capacity-backpressured attempts without an allocation handshake.",
+    "The same two CPU lines are the only ordinary fills; each becomes sixteen serialized 32-bit reads in the minimal wrapper.",
+    "The two serialized fill spans account for 93.5% of the four-slot runtime increase over the ten-slot control.",
+    "Four accepted full-line prefetches enter the installer drop state while ordinary fallback credits are outstanding; this is a secondary consequence of the two missed allocations."
+  ],
+  "limits": [
+    "The trace uses the synthetic 40-cycle memory model and the 32-bit minimal wrapper, not physical DDR or the 64-bit FPGA wrapper.",
+    "The run reached checked guest, core, and host pass markers before a pre-existing DPI finalization assertion made the process exit nonzero.",
+    "Summed fallback spans are an explanatory timeline attribution, not a counterfactual rerun with only those two events removed."
+  ]
+}

@@ -32,6 +32,34 @@ same as the earlier concurrent flat-buffer trace. The previously recorded
 771-cycle result and claim that four slots preserve throughput do not reproduce:
 ten slots take 802 cycles in the minimal wrapper, while four slots take 2,241.
 
+The retained four-slot waveform now explains that slowdown. All 33 intended
+hint addresses reach the UCE, but only 31 allocate a slot. The hints for CPU
+lines `0x8001d000` and `0x8000e700`, both issued by stream/thread 2, each make
+two attempts while all four slots are occupied. Neither attempt is accepted
+or counted by `prefetch_drop`; nevertheless, the hint instructions retire 4.5
+cycles after their final visible attempt. The same two lines are the only
+ordinary demand fills in the trace.
+
+The minimal wrapper services each missed 64-byte line as sixteen serialized
+32-bit reads. The first fallback spans 676 cycles from its first address to its
+final response, and the second spans 670. Their 1,346-cycle sum accounts for
+93.5% of the 1,439-cycle gap between four and ten slots. The allocation stream
+has corresponding 700- and 716-cycle holes. Four slots are occupied for only
+223 of 2,241 cycles (10.0%), so average saturation is not the problem: two
+short capacity conflicts escape the intended replay path and trigger very
+expensive serialized fallbacks. Those ordinary credits also cause four
+otherwise accepted completed prefetches to enter the installer drop state;
+27 of 31 accepted hints publish tags.
+
+This changes the interpretation of the four-slot result. It demonstrates a
+broken end-to-end hint-backpressure path, not that four slots are inherently
+too shallow. A correct implementation must keep the hint architectural
+operation from retiring until the UCE accepts it, or hold rejected hints in a
+pending queue. It should also prevent a demand fallback from converting a
+full-line miss into sixteen serialized word requests. Fixing either mechanism
+is likely much more valuable than adding slots, although the 19-cycle installer
+still limits whole-footprint Linux replay independently.
+
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
 filtered VCDs contain only the request, response, publication, commit, and
@@ -39,3 +67,8 @@ clock signals used by the analyzers. Both traces use synthetic memory rather
 than physical DDR. The 64-bit run printed guest and host pass markers before a
 pre-existing Verilator DPI finalization assertion made the process exit
 nonzero; the measured guest result and waveform precede that assertion.
+Run `python3 analyze_queue_depth.py` to regenerate
+`results-queue-depth.json` and verify the exact missing hints, fallbacks, queue
+occupancy, installer drops, and ten-slot comparison. The four-slot trace also
+reaches checked guest, core, and host pass markers before the same finalization
+assertion.
