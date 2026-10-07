@@ -435,9 +435,27 @@
               "meaning": "The correct simulator serves the epilogue from the resident L1 line without consulting the side buffer or DDR. The board must diverge by losing or corrupting that line, or by selecting the wrong L1 data or way."
             }
           },
-          "new_context4_successor_hint_sets": [22, 28, 32, 12],
+          "new_context4_successor_hint_sets": [
+            22,
+            28,
+            32,
+            12
+          ],
           "stack_set": 62,
-          "direct_same_set_collision": false
+          "direct_same_set_collision": false,
+          "rtl_path_exclusion": {
+            "full_line_prefetch_installer_enabled": false,
+            "evidence": "prefetch_install_begin is tied to 1'b0; detached e_cache_data_mem_prefetch replies are acknowledged directly by the side buffer and do not assert L1 data/tag/status SRAM writes",
+            "remaining_candidates": [
+              "ordinary L1 or write-buffer path",
+              "FPGA-specific state or way/data selection corruption"
+            ]
+          },
+          "board_retry": {
+            "overlay_reload": "pass",
+            "loaded_bit_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
+            "diagnostic_transfer": "pending after normal SCP socket denial"
+          }
         }
       }
     }

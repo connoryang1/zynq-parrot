@@ -140,9 +140,17 @@ cycle 688,261 is an ordinary L1 hit in one-hot way `0x2`: `cache_load_hit=1`,
 adjacent saved and caller words hit the same line on the following cycles. Thus
 the correct path does not consult the side buffer or DDR at the epilogue; the
 physical image must diverge by losing the line, corrupting it, or selecting the
-wrong L1 data/way. Managed networking rejected the normal SSH/SCP path, so the
-address matrix has no board result yet. An uncached or external readback remains
-useful if the reporter shows that the cacheable words are zero.
+wrong L1 data/way. A focused RTL audit also excludes the dormant full-line
+prefetch installer as the eviction source: `prefetch_install_begin` is tied to
+zero, and the active `e_cache_data_mem_prefetch` operation is acknowledged by
+the side buffer before the ordinary data-SRAM request path. It asserts no L1
+data, tag, or status SRAM write. The residual fault must therefore involve the
+ordinary L1/write-buffer path or FPGA-specific state corruption, rather than
+prefetch replacement metadata invalidating the stack line. Managed networking
+accepted a fresh overlay reload and verified the preferred bitstream, but then
+rejected the normal SCP path, so the address matrix has no board result yet. An
+uncached or external readback remains useful if the reporter shows that the
+cacheable words are zero.
 
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus
