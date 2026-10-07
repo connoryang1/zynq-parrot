@@ -253,6 +253,10 @@ case ${1:-} in
         exit 1
       fi
     done
+    # Vivado writes a bitstream and exits successfully even when routed setup
+    # timing is violated.  A package with negative WNS is not an accepted FPGA
+    # image, so reject it before the job can acquire a PASS status.
+    "$script_dir/check_vivado_timing.sh" "$timing"
 
     packed=$(find "$example_dir" -maxdepth 1 -name '*.tar.xz.b64' -print -quit)
     if [[ -z "$packed" || ! -s "$packed" ]]; then
