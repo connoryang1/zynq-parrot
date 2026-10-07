@@ -1,0 +1,272 @@
+BOARD_REP=0
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe9d8660 40000004 16 1
+INFO:    Creating host: 0xbe9d8660 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cc5000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cc5000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1367037
+DEBUG-PS: ps.cpp: 1-1367173
+DEBUG-PS: ps.cpp: 2-1367299
+DEBUG-PS: ps.cpp: 3-1367418
+DEBUG-PS: ps.cpp: 4-1367536
+DEBUG-PS: ps.cpp: 5-1367651
+DEBUG-PS: ps.cpp: 6-1367765
+DEBUG-PS: ps.cpp: 7-1367878
+DEBUG-PS: ps.cpp: 8-1367991
+DEBUG-PS: ps.cpp: 9-1368105
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 3846
+DEBUG-PS: ps.cpp: finished loading 3846 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+AB[BSG-PASS] DDR dependent-load latency and prefetch lead sweep
+DDR_SECTOR_SUMMARY samples=0x0000000000000010 first_min=0x0000000000000003 first_max=0x0000000000000003 adjacent_min=0x000000000000002a adjacent_max=0x000000000000002b
+Benchmark: DDR processor-visible latency; physical cycles; hex fields
+DDR raw sample output disabled; inspect the closed trace
+DDR_SECTOR sample=0x0000000000000000 address=0x000000008000a000 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000001 address=0x000000008000a040 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000002 address=0x000000008000a080 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000003 address=0x000000008000a0c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000004 address=0x000000008000a100 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000005 address=0x000000008000a140 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000006 address=0x000000008000a180 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000007 address=0x000000008000a1c0 first=0x0000000000000003 adjacent=0x000000000000002b
+DDR_SECTOR sample=0x0000000000000008 address=0x000000008000a200 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000009 address=0x000000008000a240 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000a address=0x000000008000a280 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000b address=0x000000008000a2c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000c address=0x000000008000a300 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000d address=0x000000008000a340 first=0x0000000000000003 adjacent=0x000000000000002b
+DDR_SECTOR sample=0x000000000000000e address=0x000000008000a380 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000f address=0x000000008000a3c0 first=0x0000000000000003 adjacent=0x000000000000002a
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              529 (             211)
+INFO:    ps.cpp: minstret (instructions retired):          113,827 (           1bca3)
+INFO:    ps.cpp: minstret delta:                           113,298 (           1ba92)
+INFO:    ps.cpp: MTIME start:                            1,395,109 (          1549a5)
+INFO:    ps.cpp: MTIME stop:                             1,403,057 (          1568b1)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               7,948 (            1f0c)
+INFO:    ps.cpp: IPC        :                             1.781863
+INFO:    ps.cpp: minstret (instructions retired):          113,907 (           1bcf3)
+INFO:    ps.cpp: wall clock time                :       11,318,876 (          acb65c) ns
+INFO:    ps.cpp: sim/emul speed                 :   337,051,134.76 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cc5000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+BOARD_REP=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbec66660 40000004 16 1
+INFO:    Creating host: 0xbec66660 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cc4000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cc4000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1376790
+DEBUG-PS: ps.cpp: 1-1376930
+DEBUG-PS: ps.cpp: 2-1377116
+DEBUG-PS: ps.cpp: 3-1377253
+DEBUG-PS: ps.cpp: 4-1377375
+DEBUG-PS: ps.cpp: 5-1377498
+DEBUG-PS: ps.cpp: 6-1377617
+DEBUG-PS: ps.cpp: 7-1377733
+DEBUG-PS: ps.cpp: 8-1377851
+DEBUG-PS: ps.cpp: 9-1377966
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 3846
+DEBUG-PS: ps.cpp: finished loading 3846 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+AB[BSG-PASS] DDR dependent-load latency and prefetch lead sweep
+DDR_SECTOR_SUMMARY samples=0x0000000000000010 first_min=0x0000000000000003 first_max=0x0000000000000003 adjacent_min=0x000000000000002a adjacent_max=0x000000000000002a
+Benchmark: DDR processor-visible latency; physical cycles; hex fields
+DDR raw sample output disabled; inspect the closed trace
+DDR_SECTOR sample=0x0000000000000000 address=0x000000008000a000 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000001 address=0x000000008000a040 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000002 address=0x000000008000a080 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000003 address=0x000000008000a0c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000004 address=0x000000008000a100 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000005 address=0x000000008000a140 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000006 address=0x000000008000a180 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000007 address=0x000000008000a1c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000008 address=0x000000008000a200 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000009 address=0x000000008000a240 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000a address=0x000000008000a280 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000b address=0x000000008000a2c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000c address=0x000000008000a300 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000d address=0x000000008000a340 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000e address=0x000000008000a380 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000f address=0x000000008000a3c0 first=0x0000000000000003 adjacent=0x000000000000002a
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              682 (             2aa)
+INFO:    ps.cpp: minstret (instructions retired):          113,845 (           1bcb5)
+INFO:    ps.cpp: minstret delta:                           113,163 (           1ba0b)
+INFO:    ps.cpp: MTIME start:                            1,404,889 (          156fd9)
+INFO:    ps.cpp: MTIME stop:                             1,412,790 (          158eb6)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               7,901 (            1edd)
+INFO:    ps.cpp: IPC        :                             1.790327
+INFO:    ps.cpp: minstret (instructions retired):          113,926 (           1bd06)
+INFO:    ps.cpp: wall clock time                :       11,251,403 (          abaecb) ns
+INFO:    ps.cpp: sim/emul speed                 :   337,067,297.30 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cc4000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+BOARD_REP=2
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbecfc660 40000004 16 1
+INFO:    Creating host: 0xbecfc660 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cba000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cba000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1381972
+DEBUG-PS: ps.cpp: 1-1382113
+DEBUG-PS: ps.cpp: 2-1382241
+DEBUG-PS: ps.cpp: 3-1382365
+DEBUG-PS: ps.cpp: 4-1382484
+DEBUG-PS: ps.cpp: 5-1382605
+DEBUG-PS: ps.cpp: 6-1382721
+DEBUG-PS: ps.cpp: 7-1382836
+DEBUG-PS: ps.cpp: 8-1382949
+DEBUG-PS: ps.cpp: 9-1383064
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 3846
+DEBUG-PS: ps.cpp: finished loading 3846 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+AB[BSG-PASS] DDR dependent-load latency and prefetch lead sweep
+DDR_SECTOR_SUMMARY samples=0x0000000000000010 first_min=0x0000000000000003 first_max=0x0000000000000003 adjacent_min=0x000000000000002a adjacent_max=0x000000000000002a
+Benchmark: DDR processor-visible latency; physical cycles; hex fields
+DDR raw sample output disabled; inspect the closed trace
+DDR_SECTOR sample=0x0000000000000000 address=0x000000008000a000 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000001 address=0x000000008000a040 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000002 address=0x000000008000a080 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000003 address=0x000000008000a0c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000004 address=0x000000008000a100 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000005 address=0x000000008000a140 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000006 address=0x000000008000a180 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000007 address=0x000000008000a1c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000008 address=0x000000008000a200 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x0000000000000009 address=0x000000008000a240 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000a address=0x000000008000a280 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000b address=0x000000008000a2c0 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000c address=0x000000008000a300 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000d address=0x000000008000a340 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000e address=0x000000008000a380 first=0x0000000000000003 adjacent=0x000000000000002a
+DDR_SECTOR sample=0x000000000000000f address=0x000000008000a3c0 first=0x0000000000000003 adjacent=0x000000000000002a
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              524 (             20c)
+INFO:    ps.cpp: minstret (instructions retired):          113,848 (           1bcb8)
+INFO:    ps.cpp: minstret delta:                           113,324 (           1baac)
+INFO:    ps.cpp: MTIME start:                            1,410,512 (          1585d0)
+INFO:    ps.cpp: MTIME stop:                             1,418,459 (          15a4db)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               7,947 (            1f0b)
+INFO:    ps.cpp: IPC        :                             1.782497
+INFO:    ps.cpp: minstret (instructions retired):          113,929 (           1bd09)
+INFO:    ps.cpp: wall clock time                :       11,317,384 (          acb088) ns
+INFO:    ps.cpp: sim/emul speed                 :   337,053,156.45 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cba000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS

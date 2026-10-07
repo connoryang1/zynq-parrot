@@ -56,3 +56,44 @@ The simulator result establishes the RTL cause and fix but is not a replacement
 for physical acceptance. A new five-slot route containing `4f56fba7d` must be
 loaded and the complete physical matrix repeated before reporting recovered
 FPGA speedup or resolving the ten-stream board failure.
+
+The focused sector diagnostic now isolates that causal step directly. It
+issues one narrow hint, waits beyond the response interval, then independently
+times the first word at offset 0 and its adjacent word at offset 8. On the
+corrected five-slot simulator, all 16 first-word and all 16 adjacent-word
+intervals are 3 cycles. On the physically loaded buggy ten-slot control, three
+complete repetitions (48 sectors) retain a 3-cycle first word but take a
+42-cycle median for the adjacent word, with a 42--43-cycle range. Three more
+repetitions on the exact prior five-slot, 20 MHz image reproduce the 3/42-cycle
+medians across another 48 sectors, with a 42--45-cycle adjacent range. Every
+run passes its guest value checks plus core and host completion checks. This is
+a 39-cycle median penalty per node and directly observes the ordinary-memory
+fallback inferred from the pointer benchmark; it is not merely a correlation
+with total runtime. The five-slot control also gives the pending corrected
+image a matched slot-count and clock-frequency A/B baseline.
+
+The direct penalty also predicts the end-to-end regression. At 1,280 nodes,
+39 extra cycles per adjacent load is 49,920 cycles. Comparing the accepted fast
+medians with the newer broken sweep gives:
+
+| Mode | Streams | Fast | Broken | Increase | 49,920 / increase |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Serial prefetch | 2 | 30,821 | 82,600 | 51,779 | 96.4% |
+| Serial prefetch | 4 | 30,891 | 82,580 | 51,689 | 96.6% |
+| Serial prefetch | 10 | 31,005 | 82,152 | 51,147 | 97.6% |
+| Software interleaved | 2 | 14,167 | 62,237 | 48,070 | 103.8% |
+| Software interleaved | 4 | 8,413 | 60,729 | 52,316 | 95.4% |
+| Software interleaved | 10 | 8,077 | 62,843 | 54,766 | 91.2% |
+
+The corresponding demand totals differ by only 7--46 cycles, bounding broad
+image-to-image cycle drift. The single measured adjacent-word penalty therefore
+accounts for essentially the entire 48,070--54,766-cycle prefetch regression;
+the residual varies with scheduling overhead and the older image's different
+clock configuration.
+
+The exact board NBF SHA-256 is
+`817dfa78b1516ef70458a71cfc2a7cca590dd5b911dee2dd0bcc2ebf49a7d966`.
+Build inputs, disassembly, manifests, raw simulator and physical transcripts,
+and the reproducible parser are retained under `sector-diagnostic/`. The same
+NBF is staged on the board for the corrected-image comparison. That comparison
+still remains pending the live `a16a9532`/`4f56fba7d` FPGA implementation.

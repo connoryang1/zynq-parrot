@@ -24,11 +24,25 @@ static const volatile struct line cold_data[1 + LEADS][SAMPLES]
 static const volatile struct line warm_data[SAMPLES]
   __attribute__((aligned(4096), used)) = ROW;
 
+struct sector_line { uint64_t first, second, pad[6]; };
+#define SECTOR(n) { VALUE_BASE + 2*(n) + 1, VALUE_BASE + 2*(n) + 2, {0} }
+#define SECTOR_ROW { \
+  SECTOR(0), SECTOR(1), SECTOR(2), SECTOR(3), \
+  SECTOR(4), SECTOR(5), SECTOR(6), SECTOR(7), \
+  SECTOR(8), SECTOR(9), SECTOR(10), SECTOR(11), \
+  SECTOR(12), SECTOR(13), SECTOR(14), SECTOR(15) \
+}
+static const volatile struct sector_line cold_sector[SAMPLES]
+  __attribute__((aligned(4096), used)) = SECTOR_ROW;
+static const volatile struct sector_line warm_sector[SAMPLES]
+  __attribute__((aligned(4096), used)) = SECTOR_ROW;
+
 struct result {
   uint64_t first_cycles, second_cycles, first_value, second_value;
 };
 static struct result empty_results[SAMPLES], pair_results[SAMPLES];
 static struct result lead_results[LEADS][SAMPLES];
+static struct result sector_results[SAMPLES];
 static struct result dummy;
 
 /* BlackParrot issues in order: the dependent ADDI blocks the following CSR
@@ -92,6 +106,24 @@ DEFINE_LEAD(16)
 DEFINE_LEAD(32)
 DEFINE_LEAD(64)
 
+/* A narrow hint returns the 16-byte sector containing both words. Wait longer
+ * than the 200-cycle synthetic response before timing the two consecutive
+ * loads independently. The pointer-stream workload consumes them in this
+ * order; both intervals should therefore be cached-side-buffer hits. */
+static __attribute__((naked, noinline, aligned(64))) void measure_sector_pair
+  (const volatile struct sector_line *data, struct result *out)
+{
+  __asm__ volatile(
+    ".option push\n.option norvc\nli t6, 0\nfence rw, rw\n"
+    BP_PREFETCH_R_ASM("a0")
+    ".rept 256\naddi t6, t6, 1\n.endr\n"
+    "csrr t0, 0xcc0\nld t1, 0(a0)\naddi t1, t1, 1\ncsrr t2, 0xcc0\n"
+    "csrr t3, 0xcc0\nld t4, 8(a0)\naddi t4, t4, 1\ncsrr t5, 0xcc0\n"
+    "sub t2, t2, t0\nsub t5, t5, t3\n"
+    "sd t2, 0(a1)\nsd t5, 8(a1)\nsd t1, 16(a1)\nsd t4, 24(a1)\n"
+    "ret\n.option pop\n");
+}
+
 typedef void (*measure_fn)(const volatile struct line *, struct result *);
 static const measure_fn lead_functions[LEADS] = {
   measure_lead_0, measure_lead_4, measure_lead_8,
@@ -125,6 +157,10 @@ int main(void)
     for (unsigned i = 0; i < SAMPLES; ++i)
       lead_functions[mode](&cold_data[mode + 1][i], &lead_results[mode][i]);
   }
+  for (unsigned i = 0; i < SAMPLES; ++i)
+    measure_sector_pair(&warm_sector[i], &dummy);
+  for (unsigned i = 0; i < SAMPLES; ++i)
+    measure_sector_pair(&cold_sector[i], &sector_results[i]);
 
   unsigned failures = 0;
   for (unsigned i = 0; i < SAMPLES; ++i) {
@@ -137,7 +173,37 @@ int main(void)
       failures += lead_results[mode][i].first_value != expected;
       failures += lead_results[mode][i].second_value != lead_adds[mode];
     }
+    failures += sector_results[i].first_value != VALUE_BASE + 2*i + 2;
+    failures += sector_results[i].second_value != VALUE_BASE + 2*i + 3;
   }
+  uint64_t sector_first_min = sector_results[0].first_cycles;
+  uint64_t sector_first_max = sector_results[0].first_cycles;
+  uint64_t sector_adjacent_min = sector_results[0].second_cycles;
+  uint64_t sector_adjacent_max = sector_results[0].second_cycles;
+  for (unsigned i = 1; i < SAMPLES; ++i) {
+    if (sector_results[i].first_cycles < sector_first_min)
+      sector_first_min = sector_results[i].first_cycles;
+    if (sector_results[i].first_cycles > sector_first_max)
+      sector_first_max = sector_results[i].first_cycles;
+    if (sector_results[i].second_cycles < sector_adjacent_min)
+      sector_adjacent_min = sector_results[i].second_cycles;
+    if (sector_results[i].second_cycles > sector_adjacent_max)
+      sector_adjacent_max = sector_results[i].second_cycles;
+  }
+  if (failures) {
+    field("[BSG-FAIL] DDR latency value mismatches=", failures);
+    bp_print_string("\n");
+    bp_finish(1);
+  }
+  /* Emit the checked completion marker before the deliberately slow UART
+   * sample table, where simulator heartbeats may otherwise split the line. */
+  bp_print_string("[BSG-PASS] DDR dependent-load latency and prefetch lead sweep\n");
+  field("DDR_SECTOR_SUMMARY samples=", SAMPLES);
+  field(" first_min=", sector_first_min);
+  field(" first_max=", sector_first_max);
+  field(" adjacent_min=", sector_adjacent_min);
+  field(" adjacent_max=", sector_adjacent_max);
+  bp_print_string("\n");
   bp_print_string("Benchmark: DDR processor-visible latency; physical cycles; hex fields\n");
 #if DDR_LATENCY_VERBOSE
   for (unsigned i = 0; i < SAMPLES; ++i) {
@@ -163,12 +229,14 @@ int main(void)
    * and value checks. Closed waveforms retain every physical timer window. */
   bp_print_string("DDR raw sample output disabled; inspect the closed trace\n");
 #endif
-  if (failures) {
-    field("[BSG-FAIL] DDR latency value mismatches=", failures);
+  /* Keep this focused diagnostic visible on both the simulator and FPGA. */
+  for (unsigned i = 0; i < SAMPLES; ++i) {
+    field("DDR_SECTOR sample=", i);
+    field(" address=", (uint64_t)&cold_sector[i]);
+    field(" first=", sector_results[i].first_cycles);
+    field(" adjacent=", sector_results[i].second_cycles);
     bp_print_string("\n");
-    bp_finish(1);
   }
-  bp_print_string("[BSG-PASS] DDR dependent-load latency and prefetch lead sweep\n");
   bp_finish(0);
   return 0;
 }
