@@ -345,6 +345,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the recent poor FPGA numbers did not disprove latency overlap and were not caused by reducing ten request slots to five. The benchmark needs both words returned by each narrow hint; discarding the neighbor adds a directly measured 39-cycle median demand penalty to every node. Rotating replacement handles unused neighbors without sacrificing useful spatial data. The corrected simulator recovers the expected prefetch advantage.
 - **Limits:** the fix is not yet in a routed board image. The five-slot ten-stream physical failure may disappear when adjacent demand misses are removed, but that is unproven; it must remain a separate correctness gate in the rebuilt matrix.
 
+### RL-037 — The switch-drain fix is timing-clean and area-neutral
+
+- **Status:** accepted routed implementation and verified package; physical A/B pending transfer
+- **Scope:** the exact five-slot, two-resident/ten-logical-context, 20 MHz corrected narrow-prefetch design at top commit `c43549d3` and BlackParrot `ee522c10c`, including the local-memory drain interlock before CSR `0x800` handoffs
+- **Claim:** matched synthesis uses 52,144 slice LUTs, 20 fewer than the pre-fix design, with identical 27,967 registers, 85.5 BRAM tiles, and 11 DSPs. The first complete `Area_Explore` route was legal but failed signoff at WNS/TNS `-0.377/-24.827 ns`; the limiting 68-level dispatch-to-I-cache path was unrelated to the new interlock. Aggressive post-route physical optimization changed eight cells or nets, added and removed none, and recovered 0.397 ns. Final signoff is WNS/TNS `+0.020/0 ns` and WHS/THS `+0.023/0 ns`, with 85,104/85,104 routable nets complete and zero routing errors. DRC, bitgen, and package verification pass. Package/bitstream SHA-256 values are `a198efa2d65547a48fe620f921383ce37c43931f2e14f071c094d67a11effcbe` and `4106c05355a356413bdb8dbdfe3aa65dc7d6c25ca7224189cab156fc55310ba0`.
+- **Evidence:** `logs/context-switch-drain-interlock-20261007/` and exact build artifacts and reports in `logs/fpga/20261007T085800Z-c43549d3-postroute-physopt/`; launcher timing gate commit `aed30e72`
+- **Meaning:** the correctness interlock does not consume measurable state or reduce the selected 20 MHz clock. The route also exposed and fixed an infrastructure error: Vivado can write a bitstream and exit zero with negative WNS, so artifact existence alone cannot establish an acceptable image.
+- **Limits:** the board remains on the verified pre-fix image because the managed environment rejected local-file SSH/SCP sockets before connection. The predicted 12.11/16.11-cycle four-store handoffs, zero-NOP ten-stream correctness, and full physical matrix are not yet physical results.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

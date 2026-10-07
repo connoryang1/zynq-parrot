@@ -138,5 +138,52 @@
       "nonresident_four_store_cycles_per_switch": 16.11,
       "empirical_pre_fix_max_error_cycles": 0.040000000000000036
     }
+  },
+  "fixed_fpga_build": {
+    "top_commit": "c43549d3e5c4cd54c31f1041479409ea018b8c3a",
+    "black_parrot_commit": "ee522c10c365ee26b6d2576c06ec1f5cb9a58634",
+    "cfg": "e_bp_unicore_zynqparrot_prefetch5_cfg",
+    "aclk_mhz": 20,
+    "synthesis": {
+      "pre_fix_slice_luts": 52164,
+      "fixed_slice_luts": 52144,
+      "delta_slice_luts": -20,
+      "pre_fix_slice_registers": 27967,
+      "fixed_slice_registers": 27967,
+      "block_ram_tiles": 85.5,
+      "dsps": 11
+    },
+    "initial_route": {
+      "job": "20261007T101800Z-c43549d3",
+      "status": "rejected_negative_wns",
+      "wns_ns": -0.377,
+      "tns_ns": -24.827,
+      "failing_endpoints": 166,
+      "placed_slice_luts": 49831,
+      "package_sha256": "2a40d3b139eaad87308d95da436c398db940345e81f358ad165abacb685f076a"
+    },
+    "postroute_physical_optimization": {
+      "directive": "AggressiveExplore",
+      "wns_gain_ns": 0.397,
+      "wns_ns": 0.02,
+      "tns_ns": 0.0,
+      "whs_ns": 0.023,
+      "ths_ns": 0.0,
+      "failing_setup_endpoints": 0,
+      "routable_nets": 85104,
+      "fully_routed_nets": 85104,
+      "routing_errors": 0,
+      "added_cells": 0,
+      "removed_cells": 0,
+      "optimized_cells_or_nets": 8,
+      "bit_sha256": "4106c05355a356413bdb8dbdfe3aa65dc7d6c25ca7224189cab156fc55310ba0",
+      "package_sha256": "a198efa2d65547a48fe620f921383ce37c43931f2e14f071c094d67a11effcbe",
+      "package_verified": true
+    },
+    "physical_board_validation": {
+      "status": "pending_transfer",
+      "reason": "managed environment rejected local-file SSH/SCP sockets before connection",
+      "board_remains_on_pre_fix_bit_sha256": "e041ad3bcc0b2619c348e4bf19ea209a628586fe8bc5b839e95535d01215512b"
+    }
   }
 }

@@ -24,3 +24,30 @@ runtime checks. This closely reproduces the pre-fix simulator and supplies the
 physical half of the pending matched-image A/B.
 
 Across the six pre-fix pure, single-store, and four-store resident/nonresident rows, simulation matches the FPGA exactly in five rows and differs by only 0.04 cycle in the sixth. The empirical maximum error is therefore 0.04 cycle for this benchmark. Subject to the fixed route preserving the same implementation behavior, the simulator predicts 12.11 resident and 16.11 nonresident cycles for four-store handoffs on the fixed FPGA image. This narrow empirical error is a benchmark-specific prediction interval, not a general simulator-accuracy claim.
+
+## Fixed routed image
+
+The exact fixed design (`c43549d3` / `ee522c10c`) synthesizes to 52,144
+slice LUTs, 20 fewer than the matched pre-fix design, with unchanged counts of
+27,967 registers, 85.5 BRAM tiles, and 11 DSPs. The drain interlock therefore
+has no measurable storage or memory cost. Its first `Area_Explore` route was
+fully routed but failed signoff at WNS/TNS `-0.377/-24.827 ns` across 166
+endpoints. This exposed an artifact-only launcher bug that marked a build PASS
+without checking WNS; commit `aed30e72` adds an explicit nonnegative-WNS gate,
+and the job's retained status was corrected to FAIL.
+
+Aggressive post-route physical optimization changed eight cells or nets without
+adding or removing cells and recovered 0.397 ns. The final signoff is WNS/TNS
+`+0.020/0 ns` and WHS/THS `+0.023/0 ns`, with all 85,104 routable nets fully
+routed and zero routing errors. DRC and bit generation pass. The verified
+package SHA-256 is
+`a198efa2d65547a48fe620f921383ce37c43931f2e14f071c094d67a11effcbe`;
+its bitstream SHA-256 is
+`4106c05355a356413bdb8dbdfe3aa65dc7d6c25ca7224189cab156fc55310ba0`.
+Exact reports and artifacts are retained in
+`logs/fpga/20261007T085800Z-c43549d3-postroute-physopt/`.
+
+Physical A/B validation remains pending. The managed execution environment
+allows board-status SSH but rejected each local-file SSH/SCP connection before
+it opened, so the board still contains the explicitly verified pre-fix image;
+no partial fixed package was installed.
