@@ -357,6 +357,14 @@ based solely on active transport would not fire around contexts 0–2 in the
 traced schedule; retained side-buffer state or a narrower request/context
 transition would be required if a bubble proves corrective physically.
 
+All final pointer demands were also classified: nine are ordinary L1 misses
+and every one replay-hits after exactly 13 cycles. Contexts 0 and 1 have this
+same pattern before the physical stack checkpoint remains correct; context 2
+is the third such miss, and context 3 repeats it afterward. Context 4 alone
+hits the side buffer. The context-2 load is therefore neither the first miss
+nor latency-distinct, and a generic post-switch-miss interlock would be both
+broad and poorly tied to the observed boundary.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.

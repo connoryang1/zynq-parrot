@@ -1196,7 +1196,121 @@
       "remaining_entry_consumers": [
         4
       ],
-      "interpretation": "Active detached transport is idle long before the lightweight context-2 boundary. A transport-active-only interlock would not fire in this simulator schedule."
+      "interpretation": "Active detached transport is idle long before the lightweight context-2 boundary. A transport-active-only interlock would not fire in this simulator schedule.",
+      "ordinary_pointer_misses": 9,
+      "final_pointer_demands": [
+        {
+          "context": 0,
+          "address": "0x800208c0",
+          "set": 35,
+          "first_time": 37230500000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37231150000,
+          "replay_l1_hit_vector": 16,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 1,
+          "address": "0x80015c00",
+          "set": 48,
+          "first_time": 37237800000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37238450000,
+          "replay_l1_hit_vector": 1,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 2,
+          "address": "0x8001d1c0",
+          "set": 7,
+          "first_time": 37242250000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37242900000,
+          "replay_l1_hit_vector": 64,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 3,
+          "address": "0x80014780",
+          "set": 30,
+          "first_time": 37249150000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37249800000,
+          "replay_l1_hit_vector": 128,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 4,
+          "address": "0x80015300",
+          "set": 12,
+          "first_time": 37253200000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": true,
+          "replay_time": null,
+          "replay_l1_hit_vector": null,
+          "miss_to_replay_cycles": null
+        },
+        {
+          "context": 5,
+          "address": "0x8001cd80",
+          "set": 54,
+          "first_time": 37257300000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37257950000,
+          "replay_l1_hit_vector": 64,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 6,
+          "address": "0x80020e00",
+          "set": 56,
+          "first_time": 37261350000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37262000000,
+          "replay_l1_hit_vector": 128,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 7,
+          "address": "0x8001e340",
+          "set": 13,
+          "first_time": 37268050000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37268700000,
+          "replay_l1_hit_vector": 4,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 8,
+          "address": "0x80020f80",
+          "set": 62,
+          "first_time": 37272500000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37273150000,
+          "replay_l1_hit_vector": 8,
+          "miss_to_replay_cycles": 13
+        },
+        {
+          "context": 9,
+          "address": "0x8001cd00",
+          "set": 52,
+          "first_time": 37279800000,
+          "initial_l1_hit_vector": 0,
+          "side_buffer_hit": false,
+          "replay_time": 37280450000,
+          "replay_l1_hit_vector": 64,
+          "miss_to_replay_cycles": 13
+        }
+      ],
+      "pointer_demand_interpretation": "Nine contexts have identical 13-cycle ordinary miss/replay behavior. Context 2 is the third, not the first or a latency outlier; context 4 alone side-buffer hits."
     }
   }
 }
