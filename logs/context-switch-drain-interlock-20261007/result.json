@@ -1179,6 +1179,24 @@
       "simulator_cycles": 89284,
       "matches_original_cycles": true,
       "interpretation": "Controls compressed jump encoding independently of executing a one-cycle NOP."
+    },
+    "final_lap_prefetch_state": {
+      "trace_cycles": 3800,
+      "final_switch_dispatches": 10,
+      "all_final_switches_mem_busy_zero": true,
+      "all_final_switches_mem_ordered_one": true,
+      "all_final_switches_order_hazard_zero": true,
+      "final_lap_request_accepts": 0,
+      "final_lap_response_accepts": 0,
+      "final_lap_completed_fills": 0,
+      "final_lap_side_buffer_writes": 0,
+      "last_fill_to_context2_demand_cycles": 616,
+      "last_side_buffer_write_to_context2_demand_cycles": 614,
+      "remaining_side_buffer_entry_owner": "context 4 prior-lap successor",
+      "remaining_entry_consumers": [
+        4
+      ],
+      "interpretation": "Active detached transport is idle long before the lightweight context-2 boundary. A transport-active-only interlock would not fire in this simulator schedule."
     }
   }
 }

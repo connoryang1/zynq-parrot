@@ -373,6 +373,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Performance bound:** the exact passing two-stream NBF takes 19,258 simulator cycles versus 19,262 physically. Its same-size post-switch patch takes 20,536 simulator cycles, charging exactly one cycle for all 1,278 non-final handoffs, while its `c.j; c.nop` encoding control remains exactly 19,258. Applying the measured increment to the FPGA result predicts 20,540 cycles, 6.64% slower than current hardware but still 2.925x faster than the 60,077-cycle demand baseline.
 - **Limits:** the simulator passes both original and patched images and therefore measures construction and overhead only. The fast-path projection is unusually well calibrated but remains a projection until its patched NBF runs physically. The FPGA placement A/B is decisive for correctness.
 
+### RL-040 — Active detached transport is already idle before the final corruption boundary
+
+- **Status:** accepted simulator temporal constraint; physical mechanism unproved
+- **Scope:** the retained exact 124-step FST and the final 3,800-cycle interval containing the lightweight context-2 boundary
+- **Claim:** all ten final switch dispatches have `mem_busy=0`, `mem_ordered=1`, and `ctxtsw_order_haz_v=0`. The final lap has zero detached request accepts, response accepts, completed fills, or side-buffer writes. The last fill and last side-buffer write precede the context-2 demand by 616 and 614 cycles. One valid prior-lap context-4 entry remains; only context 4 consumes its two words, later than the context-2 boundary.
+- **Evidence:** retained extractor source, exact TSV, and machine-readable analysis under `logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/post-switch-bubble/`
+- **Meaning:** an interlock conditioned only on in-flight AXI/prefetch transport would not activate around contexts 0–2 in this schedule. If a placement bubble fixes the FPGA, retained side-buffer state or a narrower request/context transition is a more plausible condition than waiting for detached responses to drain.
+- **Limits:** the simulator preserves the stack line and may not reproduce physical response timing. This excludes candidate conditions in the traced schedule; it does not prove the FPGA's corrupting signal.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

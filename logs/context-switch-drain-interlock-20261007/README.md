@@ -348,6 +348,15 @@ diagnostic and 19,258 fast-path simulator cycles. Physical comparison of this
 control with `c.nop; c.j` can therefore attribute any recovery to the executed
 cycle rather than compressed-jump encoding.
 
+The exact retained FST also constrains a conditional repair. Across the final
+lap, every switch dispatch sees memory idle and ordered, with no detached
+request, response, fill, or side-buffer write. The last fill and buffer write
+are 616/614 cycles before the context-2 demand boundary. A prior-lap context-4
+entry remains valid and is consumed only later by context 4. Thus a condition
+based solely on active transport would not fire around contexts 0–2 in the
+traced schedule; retained side-buffer state or a narrower request/context
+transition would be required if a bubble proves corrective physically.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.
