@@ -423,7 +423,17 @@
             "caller_slot0": "0x500",
             "caller_slot1": "0x500",
             "run_log_sha256": "5257433fc4da9332658c7ef6387becd49be591960dc51e5020b4c196a03aecdd",
-            "fst_sha256": "64e9e75423a07572bac8dd5ebd53794bf4a954575bdb6f2c8eaa61f619b1f78f"
+            "fst_sha256": "64e9e75423a07572bac8dd5ebd53794bf4a954575bdb6f2c8eaa61f619b1f78f",
+            "final_saved_ra_load": {
+              "commit_cycle": 688261,
+              "physical_address": "0x80082fa0",
+              "load_hit_ways_one_hot": "0x2",
+              "cache_load_hit": true,
+              "prefetch_buffer_hit": false,
+              "ordinary_load_request": false,
+              "returned_data": "0x800003c4",
+              "meaning": "The correct simulator serves the epilogue from the resident L1 line without consulting the side buffer or DDR. The board must diverge by losing or corrupting that line, or by selecting the wrong L1 data or way."
+            }
           },
           "new_context4_successor_hint_sets": [22, 28, 32, 12],
           "stack_set": 62,

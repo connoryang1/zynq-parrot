@@ -134,7 +134,13 @@ same line. Three conventional-return variants move the saved pair by 16 bytes,
 simulator rebuild validates the reporter: all results pass in 23,972 cycles and
 the four words are exactly `0x800003c4`, `0xa`, `0x500`, and `0x500`. This is an
 instrumentation control only; the simulator still does not reproduce the
-physical fault. Managed networking rejected the normal SSH/SCP path, so the
+physical fault. The retained waveform further shows that the final `ra` load at
+cycle 688,261 is an ordinary L1 hit in one-hot way `0x2`: `cache_load_hit=1`,
+`prefetch_buffer_hit=0`, `load_req=0`, and returned data `0x800003c4`. The
+adjacent saved and caller words hit the same line on the following cycles. Thus
+the correct path does not consult the side buffer or DDR at the epilogue; the
+physical image must diverge by losing the line, corrupting it, or selecting the
+wrong L1 data/way. Managed networking rejected the normal SSH/SCP path, so the
 address matrix has no board result yet. An uncached or external readback remains
 useful if the reporter shows that the cacheable words are zero.
 
