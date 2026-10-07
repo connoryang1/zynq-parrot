@@ -326,6 +326,13 @@ simulation in 90,476 cycles, a 1,192-cycle or 1.34% increase. A fresh-overlay
 physical A/B against the original hash is still required to determine whether
 one post-switch cycle suppresses the board-only race.
 
+Two further single-record controls place the cycle after hint generation but
+before the switch, or after the payload load but before hint generation. They
+pass simulation in 90,485 and 90,486 cycles. On the FPGA, post-switch-only
+recovery would identify an incoming-demand boundary, pre-switch-only recovery
+would identify outgoing-hint settling, and recovery at all three placements
+would show broader loop-period sensitivity.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.

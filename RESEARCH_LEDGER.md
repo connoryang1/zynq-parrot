@@ -367,9 +367,9 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 
 - **Status:** accepted simulator construction and cost control; physical pass/fail pending
 - **Scope:** the exact physical-failing ten-stream, 124-node-per-stream, context-4-successor-hint NBF
-- **Claim:** replacing the four-byte hot-loop jump with the same-size compressed `c.nop; c.j` sequence changes exactly one 64-bit NBF record and no address or data. The patched image passes simulation in 90,476 cycles versus 89,284 for the original, adding 1,192 cycles or 1.34%. Recompiled 0/1/2/4/8-bubble images measure an approximately linear 0/1,196/2,407/4,819/9,640-cycle cost, but are secondary because linker relaxation changes unrelated instructions.
+- **Claim:** replacing the four-byte hot-loop jump with the same-size compressed `c.nop; c.j` sequence changes exactly one 64-bit NBF record and no address or data. The patched image passes simulation in 90,476 cycles versus 89,284 for the original, adding 1,192 cycles or 1.34%. Two matched single-record controls put the bubble after hint logic but before the switch, or after the payload load but before hint logic; they pass at 90,485 and 90,486 cycles. Recompiled 0/1/2/4/8-bubble images measure an approximately linear 0/1,196/2,407/4,819/9,640-cycle cost, but are secondary because linker relaxation changes unrelated instructions.
 - **Evidence:** exact single-record diff, reproducible patch builder, hashes, simulator logs, and machine-readable results in `logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/post-switch-bubble/`
-- **Meaning:** if the exact one-bubble image passes physically, a one-cycle post-switch interlock is a plausible low-cost repair. The exact in-place image removes code layout as an alternative explanation.
+- **Meaning:** the three exact controls form a causal FPGA matrix. Post-switch-only recovery implicates the incoming demand boundary; pre-switch-only recovery implicates settling the outgoing hint; recovery at all three placements indicates broader loop-period sensitivity. Exact in-place patching removes code layout as an alternative explanation.
 - **Limits:** the simulator passes both original and patched images and therefore measures construction and overhead only. The FPGA A/B is decisive for correctness.
 
 ## Superseded or rejected findings

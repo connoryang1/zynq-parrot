@@ -1127,6 +1127,33 @@
     "overhead_percent": 1.3350656332601587,
     "original_simulator_pass": true,
     "one_bubble_simulator_pass": true,
-    "interpretation": "Construction and cost control only; simulator does not reproduce the physical fault."
+    "interpretation": "Construction and cost control only; simulator does not reproduce the physical fault.",
+    "exact_single_record_controls": [
+      {
+        "name": "post_switch",
+        "placement": "after switch, before backward jump",
+        "nbf_sha256": "da075999c56bd29d82b8a0bd50dcb7dc55b8315a2676bc3cee94087cf4502e55",
+        "changed_record_address": "0x80000580",
+        "simulator_cycles": 90476,
+        "increment_cycles": 1192
+      },
+      {
+        "name": "pre_switch",
+        "placement": "after hint logic, before switch",
+        "nbf_sha256": "1903ba3a932910915ab66dc16872d525e9c1a35c84ac04346753c929c82b13d3",
+        "changed_record_address": "0x80000578",
+        "simulator_cycles": 90485,
+        "increment_cycles": 1201
+      },
+      {
+        "name": "body",
+        "placement": "after payload load, before hint logic",
+        "nbf_sha256": "0f08524e1da95aec53da57d8976d5ed101ed65a042d2a188a594dd24ed1e1afd",
+        "changed_record_address": "0x80000560",
+        "simulator_cycles": 90486,
+        "increment_cycles": 1202
+      }
+    ],
+    "causal_matrix_interpretation": "Post-switch-only physical recovery implicates the incoming demand boundary; pre-switch-only recovery implicates outgoing hint settling; all placements recovering indicates broader loop-period sensitivity."
   }
 }
