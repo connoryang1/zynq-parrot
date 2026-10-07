@@ -47,6 +47,20 @@ its bitstream SHA-256 is
 Exact reports and artifacts are retained in
 `logs/fpga/20261007T085800Z-c43549d3-postroute-physopt/`.
 
+A repeated post-route physical-optimization pass is a documented no-op once
+WNS and WHS are nonnegative: Vivado skipped every optimization and reproduced
+`+0.020/+0.023 ns`. An independent `AggressiveExplore` route from the identical
+placed checkpoint instead reaches WNS/TNS `+0.198/0 ns` and WHS/THS
+`+0.023/0 ns`, with all 85,098 routable nets complete and zero routing errors.
+This raises the setup margin by 0.178 ns (9.9x) and the timing-derived ceiling
+from 20.008 to 20.080 MHz without changing RTL or placement. DRC and bitgen
+pass. The preferred verified package SHA-256 is
+`e541d1e8994c3e3deac89c4617b313bd3dfdf5b49056e50645560c148368e3b6`;
+its bitstream SHA-256 is
+`9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b`.
+Exact reports and artifacts are retained in
+`logs/fpga/20261007T131845Z-c43549d3-aggressive-route/`.
+
 Physical A/B validation remains pending. The managed execution environment
 allows board-status SSH but rejected each local-file SSH/SCP connection before
 it opened, so the board still contains the explicitly verified pre-fix image;
