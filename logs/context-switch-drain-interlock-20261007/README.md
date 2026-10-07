@@ -114,6 +114,13 @@ stream pass at 30,317, 55,151, 64,023, and 68,647 cycles, while 124 nodes per
 stream fail. Thus the current physical boundary is between 120 and 124
 context-4 iterations.
 
+An alternating fresh-overlay repeat confirms that boundary. Two additional
+120-step runs pass at 68,592 and 68,620 cycles, giving a three-sample range of
+55 cycles or 0.080% with the original 68,647-cycle sample. The interleaved two
+124-step runs both fail at exactly `minstret=2,552`. Pass/fail therefore follows
+the four added context-4 successors independently of test order and modest DDR
+runtime variation; the boundary is not a probabilistic latency threshold.
+
 Three fresh controls locate the failure after the worker and final handoff.
 Successor-only hints fail while prime-only hints pass. A memory fence before
 the final switch still fails. Loading `ra` from the saved stack slot twice also

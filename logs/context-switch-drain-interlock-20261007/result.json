@@ -599,6 +599,64 @@
             ]
           },
           "interpretation": "The architectural failure endpoint is deterministic across fresh FPGA overlay loads and DRAM allocations; asynchronous host sampling and a four-cycle measured interval spread do not change the trap state."
+        },
+        "context4_boundary_repeatability": {
+          "order": [
+            120,
+            124,
+            120,
+            124
+          ],
+          "steps120": {
+            "nbf_sha256": "f69501f0e5a0999a8fad9e1a64610db8218fb3f4614c4b35c18def6baf2bf068",
+            "new_statuses": [
+              "pass",
+              "pass"
+            ],
+            "new_cycles": [
+              68592,
+              68620
+            ],
+            "all_cycles_including_prior": [
+              68647,
+              68592,
+              68620
+            ],
+            "range_cycles": 55,
+            "range_percent": 0.0802,
+            "logs": [
+              {
+                "path": "/home/xilinx/bp-logs/only4-steps120-interactive-20261007T151906Z-10094.log",
+                "sha256": "8bc3eb86dd3b41c85e86f0bcacdcfca2d78d65d1b880fa176666963964b70dcb"
+              },
+              {
+                "path": "/home/xilinx/bp-logs/only4-steps120-interactive-20261007T151932Z-10251.log",
+                "sha256": "05947d1a447a17b5e1434bc82e75124febdd1bea37be73cbd49d7a9caa3353fe"
+              }
+            ]
+          },
+          "steps124": {
+            "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+            "new_statuses": [
+              "fail",
+              "fail"
+            ],
+            "final_minstret": [
+              2552,
+              2552
+            ],
+            "logs": [
+              {
+                "path": "/home/xilinx/bp-logs/only4-steps124-interactive-20261007T151919Z-10173.log",
+                "sha256": "dfdf6127a4eef357890355df49faf10f67c08f5075ea3219f82b3a7f50f35cc6"
+              },
+              {
+                "path": "/home/xilinx/bp-logs/only4-steps124-interactive-20261007T151949Z-10329.log",
+                "sha256": "6ecfee9000d7967b3bfb37827ac45293db6cf8ab7e366119f89c0d91d96b76d6"
+              }
+            ]
+          },
+          "interpretation": "The 120/124 transition follows the added context-4 successors independently of alternating test order and normal DDR cycle variation."
         }
       }
     }
