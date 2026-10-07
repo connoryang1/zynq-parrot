@@ -94,10 +94,16 @@ def run_sector_phase(phase):
 
 run_sector_phase("before")
 
-base = [(streams, mode) for streams in (2, 3, 4, 10) for mode in range(4)]
+gate = (10, 3)
+base = [(streams, mode) for streams in (2, 3, 4, 10) for mode in range(4)
+        if (streams, mode) != gate]
 orders = [base, list(reversed(base)), base[8:] + base[:8]]
 plan = [(rep, streams, mode) for rep, order in enumerate(orders)
         for streams, mode in order]
+# The prior five-slot image fails this cell before printing a benchmark result.
+# Preserve three repetitions of every independent comparison before enforcing
+# the corrected image's mandatory ten-stream hardware correctness gate.
+plan.extend((rep, *gate) for rep in range(3))
 rows = []
 for index, (rep, streams, mode) in enumerate(plan):
     nbf = source / f"dep-candidate-k3-k{streams}-m{mode}.nbf"
