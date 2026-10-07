@@ -1,0 +1,3355 @@
+RUN index=0 rep=0 streams=2 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe880670 40000004 16 1
+INFO:    Creating host: 0xbe880670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c6a000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c6a000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1536586
+DEBUG-PS: ps.cpp: 1-1536736
+DEBUG-PS: ps.cpp: 2-1536878
+DEBUG-PS: ps.cpp: 3-1537010
+DEBUG-PS: ps.cpp: 4-1537138
+DEBUG-PS: ps.cpp: 5-1537273
+DEBUG-PS: ps.cpp: 6-1537397
+DEBUG-PS: ps.cpp: 7-1537523
+DEBUG-PS: ps.cpp: 8-1537648
+DEBUG-PS: ps.cpp: 9-1537771
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x000000000000ea96
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           18,329 (            4799)
+INFO:    ps.cpp: minstret delta:                            17,668 (            4504)
+INFO:    ps.cpp: MTIME start:                            1,588,415 (          183cbf)
+INFO:    ps.cpp: MTIME stop:                             1,593,093 (          184f05)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,678 (            1246)
+INFO:    ps.cpp: IPC        :                             0.472103
+INFO:    ps.cpp: minstret (instructions retired):           18,410 (            47ea)
+INFO:    ps.cpp: wall clock time                :        6,000,912 (          5b9110) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,183,124.17 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c6a000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=1 rep=0 streams=2 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe8a3670 40000004 16 1
+INFO:    Creating host: 0xbe8a3670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c9d000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c9d000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1538576
+DEBUG-PS: ps.cpp: 1-1538724
+DEBUG-PS: ps.cpp: 2-1538918
+DEBUG-PS: ps.cpp: 3-1539055
+DEBUG-PS: ps.cpp: 4-1539187
+DEBUG-PS: ps.cpp: 5-1539315
+DEBUG-PS: ps.cpp: 6-1539440
+DEBUG-PS: ps.cpp: 7-1539562
+DEBUG-PS: ps.cpp: 8-1539686
+DEBUG-PS: ps.cpp: 9-1539807
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x00000000000142b0
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              665 (             299)
+INFO:    ps.cpp: minstret (instructions retired):           20,886 (            5196)
+INFO:    ps.cpp: minstret delta:                            20,221 (            4efd)
+INFO:    ps.cpp: MTIME start:                            1,590,343 (          184447)
+INFO:    ps.cpp: MTIME stop:                             1,596,433 (          185c11)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,090 (            17ca)
+INFO:    ps.cpp: IPC        :                             0.415045
+INFO:    ps.cpp: minstret (instructions retired):           20,967 (            51e7)
+INFO:    ps.cpp: wall clock time                :        7,807,177 (          7720c9) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,424,712.03 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c9d000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=2 rep=0 streams=2 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeed9670 40000004 16 1
+INFO:    Creating host: 0xbeed9670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d44000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d44000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1535215
+DEBUG-PS: ps.cpp: 1-1535357
+DEBUG-PS: ps.cpp: 2-1535563
+DEBUG-PS: ps.cpp: 3-1535705
+DEBUG-PS: ps.cpp: 4-1535837
+DEBUG-PS: ps.cpp: 5-1535966
+DEBUG-PS: ps.cpp: 6-1536092
+DEBUG-PS: ps.cpp: 7-1536215
+DEBUG-PS: ps.cpp: 8-1536337
+DEBUG-PS: ps.cpp: 9-1536460
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x000000000000f337
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           19,775 (            4d3f)
+INFO:    ps.cpp: minstret delta:                            19,114 (            4aaa)
+INFO:    ps.cpp: MTIME start:                            1,587,544 (          183958)
+INFO:    ps.cpp: MTIME stop:                             1,592,380 (          184c3c)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,836 (            12e4)
+INFO:    ps.cpp: IPC        :                             0.494055
+INFO:    ps.cpp: minstret (instructions retired):           19,856 (            4d90)
+INFO:    ps.cpp: wall clock time                :        6,201,897 (          5ea229) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,285,480.72 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d44000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=3 rep=0 streams=2 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbece2670 40000004 16 1
+INFO:    Creating host: 0xbece2670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ca6000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ca6000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1541262
+DEBUG-PS: ps.cpp: 1-1541417
+DEBUG-PS: ps.cpp: 2-1541553
+DEBUG-PS: ps.cpp: 3-1541683
+DEBUG-PS: ps.cpp: 4-1541813
+DEBUG-PS: ps.cpp: 5-1541936
+DEBUG-PS: ps.cpp: 6-1542057
+DEBUG-PS: ps.cpp: 7-1542180
+DEBUG-PS: ps.cpp: 8-1542303
+DEBUG-PS: ps.cpp: 9-1542428
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x0000000000011105
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           17,019 (            427b)
+INFO:    ps.cpp: minstret delta:                            16,358 (            3fe6)
+INFO:    ps.cpp: MTIME start:                            1,592,960 (          184e80)
+INFO:    ps.cpp: MTIME stop:                             1,598,261 (          186335)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,301 (            14b5)
+INFO:    ps.cpp: IPC        :                             0.385729
+INFO:    ps.cpp: minstret (instructions retired):           17,100 (            42cc)
+INFO:    ps.cpp: wall clock time                :        6,798,713 (          67bd79) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,259,069.33 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3ca6000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=4 rep=0 streams=3 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbec0d670 40000004 16 1
+INFO:    Creating host: 0xbec0d670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ced000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ced000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533694
+DEBUG-PS: ps.cpp: 1-1533843
+DEBUG-PS: ps.cpp: 2-1534031
+DEBUG-PS: ps.cpp: 3-1534185
+DEBUG-PS: ps.cpp: 4-1534317
+DEBUG-PS: ps.cpp: 5-1534442
+DEBUG-PS: ps.cpp: 6-1534567
+DEBUG-PS: ps.cpp: 7-1534689
+DEBUG-PS: ps.cpp: 8-1534811
+DEBUG-PS: ps.cpp: 9-1534933
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000000ea79
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              689 (             2b1)
+INFO:    ps.cpp: minstret (instructions retired):           18,739 (            4933)
+INFO:    ps.cpp: minstret delta:                            18,050 (            4682)
+INFO:    ps.cpp: MTIME start:                            1,585,416 (          183108)
+INFO:    ps.cpp: MTIME stop:                             1,590,201 (          1843b9)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,785 (            12b1)
+INFO:    ps.cpp: IPC        :                             0.471526
+INFO:    ps.cpp: minstret (instructions retired):           18,820 (            4984)
+INFO:    ps.cpp: wall clock time                :        6,136,411 (          5da25b) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,290,444.37 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3ced000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=5 rep=0 streams=3 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbea84670 40000004 16 1
+INFO:    Creating host: 0xbea84670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d07000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d07000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533164
+DEBUG-PS: ps.cpp: 1-1533311
+DEBUG-PS: ps.cpp: 2-1533446
+DEBUG-PS: ps.cpp: 3-1533574
+DEBUG-PS: ps.cpp: 4-1533701
+DEBUG-PS: ps.cpp: 5-1533822
+DEBUG-PS: ps.cpp: 6-1533946
+DEBUG-PS: ps.cpp: 7-1534069
+DEBUG-PS: ps.cpp: 8-1534194
+DEBUG-PS: ps.cpp: 9-1534316
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000001423f
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              643 (             283)
+INFO:    ps.cpp: minstret (instructions retired):           21,492 (            53f4)
+INFO:    ps.cpp: minstret delta:                            20,849 (            5171)
+INFO:    ps.cpp: MTIME start:                            1,585,396 (          1830f4)
+INFO:    ps.cpp: MTIME stop:                             1,591,609 (          184939)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,213 (            1845)
+INFO:    ps.cpp: IPC        :                             0.419463
+INFO:    ps.cpp: minstret (instructions retired):           21,575 (            5447)
+INFO:    ps.cpp: wall clock time                :        7,964,099 (          7985c3) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,460,438.02 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d07000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=6 rep=0 streams=3 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbea6a670 40000004 16 1
+INFO:    Creating host: 0xbea6a670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d59000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d59000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1535879
+DEBUG-PS: ps.cpp: 1-1536025
+DEBUG-PS: ps.cpp: 2-1536159
+DEBUG-PS: ps.cpp: 3-1536287
+DEBUG-PS: ps.cpp: 4-1536412
+DEBUG-PS: ps.cpp: 5-1536535
+DEBUG-PS: ps.cpp: 6-1536655
+DEBUG-PS: ps.cpp: 7-1536777
+DEBUG-PS: ps.cpp: 8-1536898
+DEBUG-PS: ps.cpp: 9-1537019
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000000edb4
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              674 (             2a2)
+INFO:    ps.cpp: minstret (instructions retired):           19,594 (            4c8a)
+INFO:    ps.cpp: minstret delta:                            18,920 (            49e8)
+INFO:    ps.cpp: MTIME start:                            1,587,561 (          183969)
+INFO:    ps.cpp: MTIME stop:                             1,592,411 (          184c5b)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,850 (            12f2)
+INFO:    ps.cpp: IPC        :                             0.487629
+INFO:    ps.cpp: minstret (instructions retired):           19,675 (            4cdb)
+INFO:    ps.cpp: wall clock time                :        6,219,978 (          5ee8ca) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,277,851.14 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d59000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=7 rep=0 streams=3 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbebaa670 40000004 16 1
+INFO:    Creating host: 0xbebaa670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cfa000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cfa000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1536479
+DEBUG-PS: ps.cpp: 1-1536631
+DEBUG-PS: ps.cpp: 2-1536767
+DEBUG-PS: ps.cpp: 3-1536897
+DEBUG-PS: ps.cpp: 4-1537025
+DEBUG-PS: ps.cpp: 5-1537154
+DEBUG-PS: ps.cpp: 6-1537277
+DEBUG-PS: ps.cpp: 7-1537400
+DEBUG-PS: ps.cpp: 8-1537522
+DEBUG-PS: ps.cpp: 9-1537643
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x0000000000011db8
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              677 (             2a5)
+INFO:    ps.cpp: minstret (instructions retired):           15,080 (            3ae8)
+INFO:    ps.cpp: minstret delta:                            14,403 (            3843)
+INFO:    ps.cpp: MTIME start:                            1,587,952 (          183af0)
+INFO:    ps.cpp: MTIME stop:                             1,593,570 (          1850e2)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,618 (            15f2)
+INFO:    ps.cpp: IPC        :                             0.320465
+INFO:    ps.cpp: minstret (instructions retired):           15,161 (            3b39)
+INFO:    ps.cpp: wall clock time                :        7,202,831 (          6de80f) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,386,126.79 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cfa000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=8 rep=0 streams=4 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbecc7670 40000004 16 1
+INFO:    Creating host: 0xbecc7670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d29000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d29000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1539433
+DEBUG-PS: ps.cpp: 1-1539578
+DEBUG-PS: ps.cpp: 2-1539715
+DEBUG-PS: ps.cpp: 3-1539850
+DEBUG-PS: ps.cpp: 4-1539981
+DEBUG-PS: ps.cpp: 5-1540109
+DEBUG-PS: ps.cpp: 6-1540232
+DEBUG-PS: ps.cpp: 7-1540357
+DEBUG-PS: ps.cpp: 8-1540477
+DEBUG-PS: ps.cpp: 9-1540600
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000000ea9c
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              635 (             27b)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               541 (             21d)
+INFO:    ps.cpp: MTIME start:                            1,591,046 (          184706)
+INFO:    ps.cpp: MTIME stop:                             1,595,957 (          185a35)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,911 (            132f)
+INFO:    ps.cpp: IPC        :                             0.013770
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        6,297,224 (          601688) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,336,374.25 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d29000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=9 rep=0 streams=4 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbebb4670 40000004 16 1
+INFO:    Creating host: 0xbebb4670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c6f000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c6f000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1525136
+DEBUG-PS: ps.cpp: 1-1525277
+DEBUG-PS: ps.cpp: 2-1525419
+DEBUG-PS: ps.cpp: 3-1525554
+DEBUG-PS: ps.cpp: 4-1525681
+DEBUG-PS: ps.cpp: 5-1525810
+DEBUG-PS: ps.cpp: 6-1525933
+DEBUG-PS: ps.cpp: 7-1526055
+DEBUG-PS: ps.cpp: 8-1526177
+DEBUG-PS: ps.cpp: 9-1526300
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x0000000000014229
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              681 (             2a9)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               495 (             1ef)
+INFO:    ps.cpp: MTIME start:                            1,576,790 (          180f56)
+INFO:    ps.cpp: MTIME stop:                             1,583,095 (          1827f7)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,305 (            18a1)
+INFO:    ps.cpp: IPC        :                             0.009814
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        8,082,235 (          7b533b) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,450,879.00 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c6f000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=10 rep=0 streams=4 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbec74670 40000004 16 1
+INFO:    Creating host: 0xbec74670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cb4000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cb4000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1539798
+DEBUG-PS: ps.cpp: 1-1539945
+DEBUG-PS: ps.cpp: 2-1540137
+DEBUG-PS: ps.cpp: 3-1540281
+DEBUG-PS: ps.cpp: 4-1540416
+DEBUG-PS: ps.cpp: 5-1540546
+DEBUG-PS: ps.cpp: 6-1540676
+DEBUG-PS: ps.cpp: 7-1540800
+DEBUG-PS: ps.cpp: 8-1540925
+DEBUG-PS: ps.cpp: 9-1541047
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000000ed4c
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               515 (             203)
+INFO:    ps.cpp: MTIME start:                            1,591,337 (          184829)
+INFO:    ps.cpp: MTIME stop:                             1,596,284 (          185b7c)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,947 (            1353)
+INFO:    ps.cpp: IPC        :                             0.013013
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        6,344,827 (          60d07b) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,251,338.93 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cb4000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=11 rep=0 streams=4 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe981670 40000004 16 1
+INFO:    Creating host: 0xbe981670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cd4000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cd4000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1527642
+DEBUG-PS: ps.cpp: 1-1527789
+DEBUG-PS: ps.cpp: 2-1527923
+DEBUG-PS: ps.cpp: 3-1528051
+DEBUG-PS: ps.cpp: 4-1528178
+DEBUG-PS: ps.cpp: 5-1528298
+DEBUG-PS: ps.cpp: 6-1528423
+DEBUG-PS: ps.cpp: 7-1528545
+DEBUG-PS: ps.cpp: 8-1528667
+DEBUG-PS: ps.cpp: 9-1528788
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000001228b
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              637 (             27d)
+INFO:    ps.cpp: minstret (instructions retired):            4,169 (            1049)
+INFO:    ps.cpp: minstret delta:                             3,532 (             dcc)
+INFO:    ps.cpp: MTIME start:                            1,579,786 (          181b0a)
+INFO:    ps.cpp: MTIME stop:                             1,585,605 (          1831c5)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,819 (            16bb)
+INFO:    ps.cpp: IPC        :                             0.075872
+INFO:    ps.cpp: minstret (instructions retired):            4,169 (            1049)
+INFO:    ps.cpp: wall clock time                :        7,461,235 (          71d973) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,350,894.99 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cd4000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=12 rep=0 streams=10 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbedf3670 40000004 16 1
+INFO:    Creating host: 0xbedf3670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cff000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cff000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533739
+DEBUG-PS: ps.cpp: 1-1533882
+DEBUG-PS: ps.cpp: 2-1534063
+DEBUG-PS: ps.cpp: 3-1534195
+DEBUG-PS: ps.cpp: 4-1534324
+DEBUG-PS: ps.cpp: 5-1534450
+DEBUG-PS: ps.cpp: 6-1534574
+DEBUG-PS: ps.cpp: 7-1534696
+DEBUG-PS: ps.cpp: 8-1534820
+DEBUG-PS: ps.cpp: 9-1534946
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000000ebd7
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           21,947 (            55bb)
+INFO:    ps.cpp: minstret delta:                            21,286 (            5326)
+INFO:    ps.cpp: MTIME start:                            1,585,966 (          18332e)
+INFO:    ps.cpp: MTIME stop:                             1,591,571 (          184913)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,605 (            15e5)
+INFO:    ps.cpp: IPC        :                             0.474710
+INFO:    ps.cpp: minstret (instructions retired):           22,028 (            560c)
+INFO:    ps.cpp: wall clock time                :        7,186,619 (          6da8bb) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,362,408.80 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cff000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=13 rep=0 streams=10 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbec6d670 40000004 16 1
+INFO:    Creating host: 0xbec6d670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c8a000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c8a000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1699339
+DEBUG-PS: ps.cpp: 1-1699486
+DEBUG-PS: ps.cpp: 2-1699623
+DEBUG-PS: ps.cpp: 3-1699758
+DEBUG-PS: ps.cpp: 4-1699887
+DEBUG-PS: ps.cpp: 5-1700014
+DEBUG-PS: ps.cpp: 6-1700136
+DEBUG-PS: ps.cpp: 7-1700255
+DEBUG-PS: ps.cpp: 8-1700377
+DEBUG-PS: ps.cpp: 9-1700498
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000001418a
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              684 (             2ac)
+INFO:    ps.cpp: minstret (instructions retired):           24,525 (            5fcd)
+INFO:    ps.cpp: minstret delta:                            23,841 (            5d21)
+INFO:    ps.cpp: MTIME start:                            1,755,447 (          1ac937)
+INFO:    ps.cpp: MTIME stop:                             1,762,430 (          1ae47e)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,983 (            1b47)
+INFO:    ps.cpp: IPC        :                             0.426769
+INFO:    ps.cpp: minstret (instructions retired):           24,607 (            601f)
+INFO:    ps.cpp: wall clock time                :        8,952,151 (          889957) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,417,276.92 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c8a000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=14 rep=0 streams=10 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbefb1670 40000004 16 1
+INFO:    Creating host: 0xbefb1670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d28000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d28000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1524754
+DEBUG-PS: ps.cpp: 1-1524901
+DEBUG-PS: ps.cpp: 2-1525108
+DEBUG-PS: ps.cpp: 3-1525244
+DEBUG-PS: ps.cpp: 4-1525375
+DEBUG-PS: ps.cpp: 5-1525509
+DEBUG-PS: ps.cpp: 6-1525637
+DEBUG-PS: ps.cpp: 7-1525760
+DEBUG-PS: ps.cpp: 8-1525883
+DEBUG-PS: ps.cpp: 9-1526007
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000000f569
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              637 (             27d)
+INFO:    ps.cpp: minstret (instructions retired):           21,944 (            55b8)
+INFO:    ps.cpp: minstret delta:                            21,307 (            533b)
+INFO:    ps.cpp: MTIME start:                            1,576,369 (          180db1)
+INFO:    ps.cpp: MTIME stop:                             1,582,110 (          18241e)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,741 (            166d)
+INFO:    ps.cpp: IPC        :                             0.463922
+INFO:    ps.cpp: minstret (instructions retired):           22,025 (            5609)
+INFO:    ps.cpp: wall clock time                :        7,360,094 (          704e5e) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,408,261.63 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d28000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=15 rep=1 streams=10 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeb70670 40000004 16 1
+INFO:    Creating host: 0xbeb70670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d0d000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d0d000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1538975
+DEBUG-PS: ps.cpp: 1-1539113
+DEBUG-PS: ps.cpp: 2-1539300
+DEBUG-PS: ps.cpp: 3-1539437
+DEBUG-PS: ps.cpp: 4-1539564
+DEBUG-PS: ps.cpp: 5-1539688
+DEBUG-PS: ps.cpp: 6-1539809
+DEBUG-PS: ps.cpp: 7-1539933
+DEBUG-PS: ps.cpp: 8-1540057
+DEBUG-PS: ps.cpp: 9-1540179
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000000f58f
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           22,239 (            56df)
+INFO:    ps.cpp: minstret delta:                            21,578 (            544a)
+INFO:    ps.cpp: MTIME start:                            1,591,236 (          1847c4)
+INFO:    ps.cpp: MTIME stop:                             1,596,995 (          185e43)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,759 (            167f)
+INFO:    ps.cpp: IPC        :                             0.468354
+INFO:    ps.cpp: minstret (instructions retired):           22,320 (            5730)
+INFO:    ps.cpp: wall clock time                :        7,384,170 (          70ac6a) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,357,578.44 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d0d000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=16 rep=1 streams=10 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed86670 40000004 16 1
+INFO:    Creating host: 0xbed86670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cf1000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cf1000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1529515
+DEBUG-PS: ps.cpp: 1-1529657
+DEBUG-PS: ps.cpp: 2-1529807
+DEBUG-PS: ps.cpp: 3-1529938
+DEBUG-PS: ps.cpp: 4-1530065
+DEBUG-PS: ps.cpp: 5-1530193
+DEBUG-PS: ps.cpp: 6-1530318
+DEBUG-PS: ps.cpp: 7-1530441
+DEBUG-PS: ps.cpp: 8-1530563
+DEBUG-PS: ps.cpp: 9-1530689
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x00000000000141eb
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              651 (             28b)
+INFO:    ps.cpp: minstret (instructions retired):           24,499 (            5fb3)
+INFO:    ps.cpp: minstret delta:                            23,848 (            5d28)
+INFO:    ps.cpp: MTIME start:                            1,581,626 (          18223a)
+INFO:    ps.cpp: MTIME stop:                             1,588,609 (          183d81)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,983 (            1b47)
+INFO:    ps.cpp: IPC        :                             0.426894
+INFO:    ps.cpp: minstret (instructions retired):           24,581 (            6005)
+INFO:    ps.cpp: wall clock time                :        8,950,856 (          889448) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,471,447.20 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cf1000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=17 rep=1 streams=10 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbef46670 40000004 16 1
+INFO:    Creating host: 0xbef46670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cba000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cba000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1528739
+DEBUG-PS: ps.cpp: 1-1528882
+DEBUG-PS: ps.cpp: 2-1529081
+DEBUG-PS: ps.cpp: 3-1529215
+DEBUG-PS: ps.cpp: 4-1529345
+DEBUG-PS: ps.cpp: 5-1529470
+DEBUG-PS: ps.cpp: 6-1529593
+DEBUG-PS: ps.cpp: 7-1529717
+DEBUG-PS: ps.cpp: 8-1529839
+DEBUG-PS: ps.cpp: 9-1529962
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000000ebed
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           21,753 (            54f9)
+INFO:    ps.cpp: minstret delta:                            21,092 (            5264)
+INFO:    ps.cpp: MTIME start:                            1,580,494 (          181dce)
+INFO:    ps.cpp: MTIME stop:                             1,586,086 (          1833a6)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,592 (            15d8)
+INFO:    ps.cpp: IPC        :                             0.471477
+INFO:    ps.cpp: minstret (instructions retired):           21,834 (            554a)
+INFO:    ps.cpp: wall clock time                :        7,171,828 (          6d6ef4) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,264,413.48 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cba000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=18 rep=1 streams=4 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbecc4670 40000004 16 1
+INFO:    Creating host: 0xbecc4670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cdd000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cdd000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1540301
+DEBUG-PS: ps.cpp: 1-1540449
+DEBUG-PS: ps.cpp: 2-1540648
+DEBUG-PS: ps.cpp: 3-1540790
+DEBUG-PS: ps.cpp: 4-1540921
+DEBUG-PS: ps.cpp: 5-1541046
+DEBUG-PS: ps.cpp: 6-1541172
+DEBUG-PS: ps.cpp: 7-1541296
+DEBUG-PS: ps.cpp: 8-1541421
+DEBUG-PS: ps.cpp: 9-1541548
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x0000000000012289
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              694 (             2b6)
+INFO:    ps.cpp: minstret (instructions retired):            4,169 (            1049)
+INFO:    ps.cpp: minstret delta:                             3,475 (             d93)
+INFO:    ps.cpp: MTIME start:                            1,592,918 (          184e56)
+INFO:    ps.cpp: MTIME stop:                             1,598,727 (          186507)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,809 (            16b1)
+INFO:    ps.cpp: IPC        :                             0.074776
+INFO:    ps.cpp: minstret (instructions retired):            4,169 (            1049)
+INFO:    ps.cpp: wall clock time                :        7,448,697 (          71a879) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,336,612.16 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cdd000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=19 rep=1 streams=4 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe8be670 40000004 16 1
+INFO:    Creating host: 0xbe8be670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cd0000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cd0000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1526043
+DEBUG-PS: ps.cpp: 1-1526190
+DEBUG-PS: ps.cpp: 2-1526334
+DEBUG-PS: ps.cpp: 3-1526462
+DEBUG-PS: ps.cpp: 4-1526593
+DEBUG-PS: ps.cpp: 5-1526719
+DEBUG-PS: ps.cpp: 6-1526844
+DEBUG-PS: ps.cpp: 7-1526965
+DEBUG-PS: ps.cpp: 8-1527088
+DEBUG-PS: ps.cpp: 9-1527211
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000000ed06
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               515 (             203)
+INFO:    ps.cpp: MTIME start:                            1,577,669 (          1812c5)
+INFO:    ps.cpp: MTIME stop:                             1,582,619 (          18261b)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,950 (            1356)
+INFO:    ps.cpp: IPC        :                             0.013005
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        6,348,086 (          60dd36) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,286,044.64 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cd0000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=20 rep=1 streams=4 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbefd5670 40000004 16 1
+INFO:    Creating host: 0xbefd5670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d2d000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d2d000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1516829
+DEBUG-PS: ps.cpp: 1-1516972
+DEBUG-PS: ps.cpp: 2-1517121
+DEBUG-PS: ps.cpp: 3-1517253
+DEBUG-PS: ps.cpp: 4-1517383
+DEBUG-PS: ps.cpp: 5-1517511
+DEBUG-PS: ps.cpp: 6-1517633
+DEBUG-PS: ps.cpp: 7-1517754
+DEBUG-PS: ps.cpp: 8-1517877
+DEBUG-PS: ps.cpp: 9-1517998
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000001424e
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              707 (             2c3)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               469 (             1d5)
+INFO:    ps.cpp: MTIME start:                            1,569,114 (          17f15a)
+INFO:    ps.cpp: MTIME stop:                             1,575,431 (          180a07)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,317 (            18ad)
+INFO:    ps.cpp: IPC        :                             0.009281
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        8,098,342 (          7b9226) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,417,380.74 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d2d000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=21 rep=1 streams=4 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeb2f670 40000004 16 1
+INFO:    Creating host: 0xbeb2f670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d53000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d53000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1529355
+DEBUG-PS: ps.cpp: 1-1529510
+DEBUG-PS: ps.cpp: 2-1529692
+DEBUG-PS: ps.cpp: 3-1529836
+DEBUG-PS: ps.cpp: 4-1529968
+DEBUG-PS: ps.cpp: 5-1530093
+DEBUG-PS: ps.cpp: 6-1530217
+DEBUG-PS: ps.cpp: 7-1530341
+DEBUG-PS: ps.cpp: 8-1530464
+DEBUG-PS: ps.cpp: 9-1530586
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000000ea94
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              674 (             2a2)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               502 (             1f6)
+INFO:    ps.cpp: MTIME start:                            1,581,651 (          182253)
+INFO:    ps.cpp: MTIME stop:                             1,586,576 (          183590)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,925 (            133d)
+INFO:    ps.cpp: IPC        :                             0.012741
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        6,315,809 (          605f21) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,298,842.79 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d53000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=22 rep=1 streams=3 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe9e4670 40000004 16 1
+INFO:    Creating host: 0xbe9e4670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cc5000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cc5000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533321
+DEBUG-PS: ps.cpp: 1-1533473
+DEBUG-PS: ps.cpp: 2-1533609
+DEBUG-PS: ps.cpp: 3-1533738
+DEBUG-PS: ps.cpp: 4-1533870
+DEBUG-PS: ps.cpp: 5-1533996
+DEBUG-PS: ps.cpp: 6-1534121
+DEBUG-PS: ps.cpp: 7-1534244
+DEBUG-PS: ps.cpp: 8-1534365
+DEBUG-PS: ps.cpp: 9-1534485
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x0000000000011db1
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              638 (             27e)
+INFO:    ps.cpp: minstret (instructions retired):           15,289 (            3bb9)
+INFO:    ps.cpp: minstret delta:                            14,651 (            393b)
+INFO:    ps.cpp: MTIME start:                            1,585,692 (          18321c)
+INFO:    ps.cpp: MTIME stop:                             1,591,325 (          18481d)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,633 (            1601)
+INFO:    ps.cpp: IPC        :                             0.325115
+INFO:    ps.cpp: minstret (instructions retired):           15,372 (            3c0c)
+INFO:    ps.cpp: wall clock time                :        7,222,893 (          6e366d) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,343,078.32 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cc5000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=23 rep=1 streams=3 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeaf9670 40000004 16 1
+INFO:    Creating host: 0xbeaf9670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d32000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d32000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1536989
+DEBUG-PS: ps.cpp: 1-1537130
+DEBUG-PS: ps.cpp: 2-1537265
+DEBUG-PS: ps.cpp: 3-1537403
+DEBUG-PS: ps.cpp: 4-1537532
+DEBUG-PS: ps.cpp: 5-1537666
+DEBUG-PS: ps.cpp: 6-1537790
+DEBUG-PS: ps.cpp: 7-1537914
+DEBUG-PS: ps.cpp: 8-1538036
+DEBUG-PS: ps.cpp: 9-1538159
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000000ee0f
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              685 (             2ad)
+INFO:    ps.cpp: minstret (instructions retired):           20,496 (            5010)
+INFO:    ps.cpp: minstret delta:                            19,811 (            4d63)
+INFO:    ps.cpp: MTIME start:                            1,589,252 (          184004)
+INFO:    ps.cpp: MTIME stop:                             1,594,161 (          185331)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,909 (            132d)
+INFO:    ps.cpp: IPC        :                             0.504456
+INFO:    ps.cpp: minstret (instructions retired):           20,577 (            5061)
+INFO:    ps.cpp: wall clock time                :        6,296,821 (          6014f5) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,207,874.10 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d32000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=24 rep=1 streams=3 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbef87670 40000004 16 1
+INFO:    Creating host: 0xbef87670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c85000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c85000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1519100
+DEBUG-PS: ps.cpp: 1-1519244
+DEBUG-PS: ps.cpp: 2-1519440
+DEBUG-PS: ps.cpp: 3-1519581
+DEBUG-PS: ps.cpp: 4-1519714
+DEBUG-PS: ps.cpp: 5-1519853
+DEBUG-PS: ps.cpp: 6-1519979
+DEBUG-PS: ps.cpp: 7-1520104
+DEBUG-PS: ps.cpp: 8-1520229
+DEBUG-PS: ps.cpp: 9-1520354
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x0000000000014238
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              685 (             2ad)
+INFO:    ps.cpp: minstret (instructions retired):           21,288 (            5328)
+INFO:    ps.cpp: minstret delta:                            20,603 (            507b)
+INFO:    ps.cpp: MTIME start:                            1,570,749 (          17f7bd)
+INFO:    ps.cpp: MTIME stop:                             1,576,939 (          180feb)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,190 (            182e)
+INFO:    ps.cpp: IPC        :                             0.416054
+INFO:    ps.cpp: minstret (instructions retired):           21,372 (            537c)
+INFO:    ps.cpp: wall clock time                :        7,936,139 (          79188b) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,388,603.83 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c85000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=25 rep=1 streams=3 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbee9f670 40000004 16 1
+INFO:    Creating host: 0xbee9f670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d09000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d09000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1521653
+DEBUG-PS: ps.cpp: 1-1521802
+DEBUG-PS: ps.cpp: 2-1521991
+DEBUG-PS: ps.cpp: 3-1522128
+DEBUG-PS: ps.cpp: 4-1522259
+DEBUG-PS: ps.cpp: 5-1522390
+DEBUG-PS: ps.cpp: 6-1522514
+DEBUG-PS: ps.cpp: 7-1522638
+DEBUG-PS: ps.cpp: 8-1522759
+DEBUG-PS: ps.cpp: 9-1522883
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000000ea79
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              685 (             2ad)
+INFO:    ps.cpp: minstret (instructions retired):           18,755 (            4943)
+INFO:    ps.cpp: minstret delta:                            18,070 (            4696)
+INFO:    ps.cpp: MTIME start:                            1,573,282 (          1801a2)
+INFO:    ps.cpp: MTIME stop:                             1,578,073 (          181459)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,791 (            12b7)
+INFO:    ps.cpp: IPC        :                             0.471457
+INFO:    ps.cpp: minstret (instructions retired):           18,837 (            4995)
+INFO:    ps.cpp: wall clock time                :        6,144,412 (          5dc19c) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,271,777.35 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d09000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=26 rep=1 streams=2 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed0d670 40000004 16 1
+INFO:    Creating host: 0xbed0d670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cf2000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cf2000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1542082
+DEBUG-PS: ps.cpp: 1-1542227
+DEBUG-PS: ps.cpp: 2-1542422
+DEBUG-PS: ps.cpp: 3-1542557
+DEBUG-PS: ps.cpp: 4-1542686
+DEBUG-PS: ps.cpp: 5-1542815
+DEBUG-PS: ps.cpp: 6-1542941
+DEBUG-PS: ps.cpp: 7-1543064
+DEBUG-PS: ps.cpp: 8-1543189
+DEBUG-PS: ps.cpp: 9-1543313
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x0000000000011102
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           17,197 (            432d)
+INFO:    ps.cpp: minstret delta:                            16,536 (            4098)
+INFO:    ps.cpp: MTIME start:                            1,594,429 (          18543d)
+INFO:    ps.cpp: MTIME stop:                             1,599,740 (          1868fc)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,311 (            14bf)
+INFO:    ps.cpp: IPC        :                             0.389192
+INFO:    ps.cpp: minstret (instructions retired):           17,281 (            4381)
+INFO:    ps.cpp: wall clock time                :        6,811,104 (          67ede0) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,282,935.63 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cf2000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=27 rep=1 streams=2 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed5e670 40000004 16 1
+INFO:    Creating host: 0xbed5e670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cd2000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cd2000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1530475
+DEBUG-PS: ps.cpp: 1-1530627
+DEBUG-PS: ps.cpp: 2-1530822
+DEBUG-PS: ps.cpp: 3-1530958
+DEBUG-PS: ps.cpp: 4-1531089
+DEBUG-PS: ps.cpp: 5-1531214
+DEBUG-PS: ps.cpp: 6-1531336
+DEBUG-PS: ps.cpp: 7-1531461
+DEBUG-PS: ps.cpp: 8-1531584
+DEBUG-PS: ps.cpp: 9-1531705
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x000000000000f324
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              663 (             297)
+INFO:    ps.cpp: minstret (instructions retired):           19,586 (            4c82)
+INFO:    ps.cpp: minstret delta:                            18,923 (            49eb)
+INFO:    ps.cpp: MTIME start:                            1,582,155 (          18244b)
+INFO:    ps.cpp: MTIME stop:                             1,586,976 (          183720)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,821 (            12d5)
+INFO:    ps.cpp: IPC        :                             0.490640
+INFO:    ps.cpp: minstret (instructions retired):           19,669 (            4cd5)
+INFO:    ps.cpp: wall clock time                :        6,183,511 (          5e5a57) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,233,991.01 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cd2000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=28 rep=1 streams=2 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeab9670 40000004 16 1
+INFO:    Creating host: 0xbeab9670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c69000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c69000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1676426
+DEBUG-PS: ps.cpp: 1-1676576
+DEBUG-PS: ps.cpp: 2-1676710
+DEBUG-PS: ps.cpp: 3-1676844
+DEBUG-PS: ps.cpp: 4-1676970
+DEBUG-PS: ps.cpp: 5-1677097
+DEBUG-PS: ps.cpp: 6-1677225
+DEBUG-PS: ps.cpp: 7-1677351
+DEBUG-PS: ps.cpp: 8-1677473
+DEBUG-PS: ps.cpp: 9-1677595
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x0000000000014326
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              672 (             2a0)
+INFO:    ps.cpp: minstret (instructions retired):           21,123 (            5283)
+INFO:    ps.cpp: minstret delta:                            20,451 (            4fe3)
+INFO:    ps.cpp: MTIME start:                            1,732,545 (          1a6fc1)
+INFO:    ps.cpp: MTIME stop:                             1,738,695 (          1a87c7)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,150 (            1806)
+INFO:    ps.cpp: IPC        :                             0.415671
+INFO:    ps.cpp: minstret (instructions retired):           21,204 (            52d4)
+INFO:    ps.cpp: wall clock time                :        7,885,446 (          785286) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,360,562.48 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c69000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=29 rep=1 streams=2 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbefea670 40000004 16 1
+INFO:    Creating host: 0xbefea670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cc4000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cc4000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1532641
+DEBUG-PS: ps.cpp: 1-1532796
+DEBUG-PS: ps.cpp: 2-1532953
+DEBUG-PS: ps.cpp: 3-1533087
+DEBUG-PS: ps.cpp: 4-1533214
+DEBUG-PS: ps.cpp: 5-1533338
+DEBUG-PS: ps.cpp: 6-1533464
+DEBUG-PS: ps.cpp: 7-1533587
+DEBUG-PS: ps.cpp: 8-1533711
+DEBUG-PS: ps.cpp: 9-1533836
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x000000000000eab3
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           18,329 (            4799)
+INFO:    ps.cpp: minstret delta:                            17,668 (            4504)
+INFO:    ps.cpp: MTIME start:                            1,584,302 (          182cae)
+INFO:    ps.cpp: MTIME stop:                             1,588,986 (          183efa)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,684 (            124c)
+INFO:    ps.cpp: IPC        :                             0.471499
+INFO:    ps.cpp: minstret (instructions retired):           18,410 (            47ea)
+INFO:    ps.cpp: wall clock time                :        6,008,064 (          5bad00) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,217,052.28 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cc4000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=30 rep=2 streams=3 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe9ce670 40000004 16 1
+INFO:    Creating host: 0xbe9ce670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cdf000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cdf000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533716
+DEBUG-PS: ps.cpp: 1-1533861
+DEBUG-PS: ps.cpp: 2-1533997
+DEBUG-PS: ps.cpp: 3-1534127
+DEBUG-PS: ps.cpp: 4-1534252
+DEBUG-PS: ps.cpp: 5-1534376
+DEBUG-PS: ps.cpp: 6-1534498
+DEBUG-PS: ps.cpp: 7-1534620
+DEBUG-PS: ps.cpp: 8-1534742
+DEBUG-PS: ps.cpp: 9-1534863
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x0000000000011dad
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              665 (             299)
+INFO:    ps.cpp: minstret (instructions retired):           15,078 (            3ae6)
+INFO:    ps.cpp: minstret delta:                            14,413 (            384d)
+INFO:    ps.cpp: MTIME start:                            1,585,296 (          183090)
+INFO:    ps.cpp: MTIME stop:                             1,590,912 (          184680)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,616 (            15f0)
+INFO:    ps.cpp: IPC        :                             0.320802
+INFO:    ps.cpp: minstret (instructions retired):           15,160 (            3b38)
+INFO:    ps.cpp: wall clock time                :        7,201,364 (          6de254) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,329,085.43 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cdf000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=31 rep=2 streams=4 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe807670 40000004 16 1
+INFO:    Creating host: 0xbe807670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cc5000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cc5000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1530989
+DEBUG-PS: ps.cpp: 1-1531142
+DEBUG-PS: ps.cpp: 2-1531279
+DEBUG-PS: ps.cpp: 3-1531408
+DEBUG-PS: ps.cpp: 4-1531537
+DEBUG-PS: ps.cpp: 5-1531659
+DEBUG-PS: ps.cpp: 6-1531782
+DEBUG-PS: ps.cpp: 7-1531904
+DEBUG-PS: ps.cpp: 8-1532025
+DEBUG-PS: ps.cpp: 9-1532145
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000000ead4
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              668 (             29c)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               508 (             1fc)
+INFO:    ps.cpp: MTIME start:                            1,582,626 (          182622)
+INFO:    ps.cpp: MTIME stop:                             1,587,535 (          18394f)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,909 (            132d)
+INFO:    ps.cpp: IPC        :                             0.012935
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        6,296,339 (          601313) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,236,520.62 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cc5000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=32 rep=2 streams=4 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbefaa670 40000004 16 1
+INFO:    Creating host: 0xbefaa670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d1a000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d1a000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1539281
+DEBUG-PS: ps.cpp: 1-1539432
+DEBUG-PS: ps.cpp: 2-1539621
+DEBUG-PS: ps.cpp: 3-1539760
+DEBUG-PS: ps.cpp: 4-1539889
+DEBUG-PS: ps.cpp: 5-1540018
+DEBUG-PS: ps.cpp: 6-1540142
+DEBUG-PS: ps.cpp: 7-1540265
+DEBUG-PS: ps.cpp: 8-1540385
+DEBUG-PS: ps.cpp: 9-1540508
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x0000000000014276
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              681 (             2a9)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               495 (             1ef)
+INFO:    ps.cpp: MTIME start:                            1,591,634 (          184952)
+INFO:    ps.cpp: MTIME stop:                             1,597,954 (          186202)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,320 (            18b0)
+INFO:    ps.cpp: IPC        :                             0.009790
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        8,100,675 (          7b9b43) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,487,311.24 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d1a000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=33 rep=2 streams=4 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbee4e670 40000004 16 1
+INFO:    Creating host: 0xbee4e670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d53000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d53000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1576132
+DEBUG-PS: ps.cpp: 1-1576272
+DEBUG-PS: ps.cpp: 2-1576496
+DEBUG-PS: ps.cpp: 3-1576636
+DEBUG-PS: ps.cpp: 4-1577310
+DEBUG-PS: ps.cpp: 5-1577486
+DEBUG-PS: ps.cpp: 6-1577620
+DEBUG-PS: ps.cpp: 7-1577746
+DEBUG-PS: ps.cpp: 8-1577870
+DEBUG-PS: ps.cpp: 9-1577992
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000000ecf8
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              685 (             2ad)
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: minstret delta:                               491 (             1eb)
+INFO:    ps.cpp: MTIME start:                            1,631,975 (          18e6e7)
+INFO:    ps.cpp: MTIME stop:                             1,636,930 (          18fa42)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,955 (            135b)
+INFO:    ps.cpp: IPC        :                             0.012386
+INFO:    ps.cpp: minstret (instructions retired):            1,176 (             498)
+INFO:    ps.cpp: wall clock time                :        6,354,539 (          60f66b) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,283,641.98 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d53000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=34 rep=2 streams=4 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbee8a670 40000004 16 1
+INFO:    Creating host: 0xbee8a670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d11000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d11000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1530670
+DEBUG-PS: ps.cpp: 1-1530814
+DEBUG-PS: ps.cpp: 2-1531005
+DEBUG-PS: ps.cpp: 3-1531145
+DEBUG-PS: ps.cpp: 4-1531271
+DEBUG-PS: ps.cpp: 5-1531397
+DEBUG-PS: ps.cpp: 6-1531525
+DEBUG-PS: ps.cpp: 7-1531649
+DEBUG-PS: ps.cpp: 8-1531771
+DEBUG-PS: ps.cpp: 9-1531895
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000004 nodes=0x0000000000000500 cycles=0x000000000001227d
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              637 (             27d)
+INFO:    ps.cpp: minstret (instructions retired):            4,169 (            1049)
+INFO:    ps.cpp: minstret delta:                             3,532 (             dcc)
+INFO:    ps.cpp: MTIME start:                            1,582,274 (          1824c2)
+INFO:    ps.cpp: MTIME stop:                             1,588,084 (          183b74)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,810 (            16b2)
+INFO:    ps.cpp: IPC        :                             0.075990
+INFO:    ps.cpp: minstret (instructions retired):            4,169 (            1049)
+INFO:    ps.cpp: wall clock time                :        7,448,328 (          71a708) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,419,601.29 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d11000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=35 rep=2 streams=10 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeaef670 40000004 16 1
+INFO:    Creating host: 0xbeaef670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d44000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d44000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1529732
+DEBUG-PS: ps.cpp: 1-1529871
+DEBUG-PS: ps.cpp: 2-1530065
+DEBUG-PS: ps.cpp: 3-1530216
+DEBUG-PS: ps.cpp: 4-1530351
+DEBUG-PS: ps.cpp: 5-1530481
+DEBUG-PS: ps.cpp: 6-1530607
+DEBUG-PS: ps.cpp: 7-1530731
+DEBUG-PS: ps.cpp: 8-1530853
+DEBUG-PS: ps.cpp: 9-1530981
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000000ebd6
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           21,757 (            54fd)
+INFO:    ps.cpp: minstret delta:                            21,096 (            5268)
+INFO:    ps.cpp: MTIME start:                            1,581,440 (          182180)
+INFO:    ps.cpp: MTIME stop:                             1,587,029 (          183755)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,589 (            15d5)
+INFO:    ps.cpp: IPC        :                             0.471820
+INFO:    ps.cpp: minstret (instructions retired):           21,838 (            554e)
+INFO:    ps.cpp: wall clock time                :        7,166,358 (          6d5996) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,349,146.39 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d44000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=36 rep=2 streams=10 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed1d670 40000004 16 1
+INFO:    Creating host: 0xbed1d670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c6e000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c6e000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533822
+DEBUG-PS: ps.cpp: 1-1533969
+DEBUG-PS: ps.cpp: 2-1534102
+DEBUG-PS: ps.cpp: 3-1534231
+DEBUG-PS: ps.cpp: 4-1534359
+DEBUG-PS: ps.cpp: 5-1534484
+DEBUG-PS: ps.cpp: 6-1534607
+DEBUG-PS: ps.cpp: 7-1534729
+DEBUG-PS: ps.cpp: 8-1534853
+DEBUG-PS: ps.cpp: 9-1534976
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x00000000000141eb
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           24,499 (            5fb3)
+INFO:    ps.cpp: minstret delta:                            23,838 (            5d1e)
+INFO:    ps.cpp: MTIME start:                            1,585,922 (          183302)
+INFO:    ps.cpp: MTIME stop:                             1,592,902 (          184e46)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,980 (            1b44)
+INFO:    ps.cpp: IPC        :                             0.426898
+INFO:    ps.cpp: minstret (instructions retired):           24,582 (            6006)
+INFO:    ps.cpp: wall clock time                :        8,947,242 (          88862a) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,461,761.51 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c6e000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=37 rep=2 streams=10 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe9f8670 40000004 16 1
+INFO:    Creating host: 0xbe9f8670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ce6000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ce6000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1532414
+DEBUG-PS: ps.cpp: 1-1532560
+DEBUG-PS: ps.cpp: 2-1532708
+DEBUG-PS: ps.cpp: 3-1532843
+DEBUG-PS: ps.cpp: 4-1532970
+DEBUG-PS: ps.cpp: 5-1533096
+DEBUG-PS: ps.cpp: 6-1533222
+DEBUG-PS: ps.cpp: 7-1533344
+DEBUG-PS: ps.cpp: 8-1533466
+DEBUG-PS: ps.cpp: 9-1533594
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x000000000000000a nodes=0x0000000000000500 cycles=0x000000000000f583
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              659 (             293)
+INFO:    ps.cpp: minstret (instructions retired):           22,049 (            5621)
+INFO:    ps.cpp: minstret delta:                            21,390 (            538e)
+INFO:    ps.cpp: MTIME start:                            1,584,050 (          182bb2)
+INFO:    ps.cpp: MTIME stop:                             1,589,837 (          18424d)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,787 (            169b)
+INFO:    ps.cpp: IPC        :                             0.462027
+INFO:    ps.cpp: minstret (instructions retired):           22,130 (            5672)
+INFO:    ps.cpp: wall clock time                :        7,419,747 (          713763) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,373,951.03 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3ce6000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=38 rep=2 streams=2 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeea7670 40000004 16 1
+INFO:    Creating host: 0xbeea7670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d50000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d50000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1529403
+DEBUG-PS: ps.cpp: 1-1529550
+DEBUG-PS: ps.cpp: 2-1529687
+DEBUG-PS: ps.cpp: 3-1529813
+DEBUG-PS: ps.cpp: 4-1529945
+DEBUG-PS: ps.cpp: 5-1530068
+DEBUG-PS: ps.cpp: 6-1530195
+DEBUG-PS: ps.cpp: 7-1530319
+DEBUG-PS: ps.cpp: 8-1530441
+DEBUG-PS: ps.cpp: 9-1530565
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x000000000000eab3
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              685 (             2ad)
+INFO:    ps.cpp: minstret (instructions retired):           18,337 (            47a1)
+INFO:    ps.cpp: minstret delta:                            17,652 (            44f4)
+INFO:    ps.cpp: MTIME start:                            1,580,955 (          181f9b)
+INFO:    ps.cpp: MTIME stop:                             1,585,635 (          1831e3)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,680 (            1248)
+INFO:    ps.cpp: IPC        :                             0.471474
+INFO:    ps.cpp: minstret (instructions retired):           18,418 (            47f2)
+INFO:    ps.cpp: wall clock time                :        6,003,187 (          5b99f3) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,201,236.78 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d50000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=39 rep=2 streams=2 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe878670 40000004 16 1
+INFO:    Creating host: 0xbe878670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c88000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c88000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1540435
+DEBUG-PS: ps.cpp: 1-1540585
+DEBUG-PS: ps.cpp: 2-1540721
+DEBUG-PS: ps.cpp: 3-1540849
+DEBUG-PS: ps.cpp: 4-1540977
+DEBUG-PS: ps.cpp: 5-1541100
+DEBUG-PS: ps.cpp: 6-1541222
+DEBUG-PS: ps.cpp: 7-1541345
+DEBUG-PS: ps.cpp: 8-1541464
+DEBUG-PS: ps.cpp: 9-1541585
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x00000000000142ac
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              685 (             2ad)
+INFO:    ps.cpp: minstret (instructions retired):           20,894 (            519e)
+INFO:    ps.cpp: minstret delta:                            20,209 (            4ef1)
+INFO:    ps.cpp: MTIME start:                            1,592,087 (          184b17)
+INFO:    ps.cpp: MTIME stop:                             1,598,176 (          1862e0)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,089 (            17c9)
+INFO:    ps.cpp: IPC        :                             0.414867
+INFO:    ps.cpp: minstret (instructions retired):           20,975 (            51ef)
+INFO:    ps.cpp: wall clock time                :        7,806,299 (          771d5b) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,405,336.00 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c88000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=40 rep=2 streams=2 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbea61670 40000004 16 1
+INFO:    Creating host: 0xbea61670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d37000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d37000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1533301
+DEBUG-PS: ps.cpp: 1-1533449
+DEBUG-PS: ps.cpp: 2-1533633
+DEBUG-PS: ps.cpp: 3-1533765
+DEBUG-PS: ps.cpp: 4-1533899
+DEBUG-PS: ps.cpp: 5-1534026
+DEBUG-PS: ps.cpp: 6-1534152
+DEBUG-PS: ps.cpp: 7-1534275
+DEBUG-PS: ps.cpp: 8-1534396
+DEBUG-PS: ps.cpp: 9-1534520
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x000000000000f324
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              637 (             27d)
+INFO:    ps.cpp: minstret (instructions retired):           19,782 (            4d46)
+INFO:    ps.cpp: minstret delta:                            19,145 (            4ac9)
+INFO:    ps.cpp: MTIME start:                            1,585,571 (          1831a3)
+INFO:    ps.cpp: MTIME stop:                             1,590,411 (          18448b)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,840 (            12e8)
+INFO:    ps.cpp: IPC        :                             0.494447
+INFO:    ps.cpp: minstret (instructions retired):           19,863 (            4d97)
+INFO:    ps.cpp: wall clock time                :        6,206,690 (          5eb4e2) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,305,789.40 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d37000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=41 rep=2 streams=2 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe88a670 40000004 16 1
+INFO:    Creating host: 0xbe88a670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ceb000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ceb000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1537574
+DEBUG-PS: ps.cpp: 1-1537722
+DEBUG-PS: ps.cpp: 2-1537900
+DEBUG-PS: ps.cpp: 3-1538036
+DEBUG-PS: ps.cpp: 4-1538163
+DEBUG-PS: ps.cpp: 5-1538287
+DEBUG-PS: ps.cpp: 6-1538415
+DEBUG-PS: ps.cpp: 7-1538537
+DEBUG-PS: ps.cpp: 8-1538659
+DEBUG-PS: ps.cpp: 9-1538782
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000003 streams=0x0000000000000002 nodes=0x0000000000000500 cycles=0x0000000000011106
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              656 (             290)
+INFO:    ps.cpp: minstret (instructions retired):           17,206 (            4336)
+INFO:    ps.cpp: minstret delta:                            16,550 (            40a6)
+INFO:    ps.cpp: MTIME start:                            1,589,906 (          184292)
+INFO:    ps.cpp: MTIME stop:                             1,595,218 (          185752)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               5,312 (            14c0)
+INFO:    ps.cpp: IPC        :                             0.389448
+INFO:    ps.cpp: minstret (instructions retired):           17,289 (            4389)
+INFO:    ps.cpp: wall clock time                :        6,812,473 (          67f339) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,278,180.63 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3ceb000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=42 rep=2 streams=3 mode=0 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbecf3670 40000004 16 1
+INFO:    Creating host: 0xbecf3670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ce9000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ce9000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1686270
+DEBUG-PS: ps.cpp: 1-1686423
+DEBUG-PS: ps.cpp: 2-1686564
+DEBUG-PS: ps.cpp: 3-1686697
+DEBUG-PS: ps.cpp: 4-1686830
+DEBUG-PS: ps.cpp: 5-1686960
+DEBUG-PS: ps.cpp: 6-1687084
+DEBUG-PS: ps.cpp: 7-1687207
+DEBUG-PS: ps.cpp: 8-1687330
+DEBUG-PS: ps.cpp: 9-1687452
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000000 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000000ea62
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           18,755 (            4943)
+INFO:    ps.cpp: minstret delta:                            18,094 (            46ae)
+INFO:    ps.cpp: MTIME start:                            1,738,195 (          1a85d3)
+INFO:    ps.cpp: MTIME stop:                             1,742,988 (          1a988c)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,793 (            12b9)
+INFO:    ps.cpp: IPC        :                             0.471886
+INFO:    ps.cpp: minstret (instructions retired):           18,837 (            4995)
+INFO:    ps.cpp: wall clock time                :        6,146,286 (          5dc8ee) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,313,853.93 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3ce9000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=43 rep=2 streams=3 mode=1 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed0d670 40000004 16 1
+INFO:    Creating host: 0xbed0d670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c6d000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c6d000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1779760
+DEBUG-PS: ps.cpp: 1-1779901
+DEBUG-PS: ps.cpp: 2-1780124
+DEBUG-PS: ps.cpp: 3-1780266
+DEBUG-PS: ps.cpp: 4-1780394
+DEBUG-PS: ps.cpp: 5-1780519
+DEBUG-PS: ps.cpp: 6-1780644
+DEBUG-PS: ps.cpp: 7-1780765
+DEBUG-PS: ps.cpp: 8-1780887
+DEBUG-PS: ps.cpp: 9-1781011
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000001 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000001421b
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              709 (             2c5)
+INFO:    ps.cpp: minstret (instructions retired):           22,809 (            5919)
+INFO:    ps.cpp: minstret delta:                            22,100 (            5654)
+INFO:    ps.cpp: MTIME start:                            1,836,911 (          1c076f)
+INFO:    ps.cpp: MTIME stop:                             1,843,218 (          1c2012)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,307 (            18a3)
+INFO:    ps.cpp: IPC        :                             0.438005
+INFO:    ps.cpp: minstret (instructions retired):           22,890 (            596a)
+INFO:    ps.cpp: wall clock time                :        8,085,921 (          7b61a1) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,398,908.92 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c6d000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+RUN index=44 rep=2 streams=3 mode=2 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed80670 40000004 16 1
+INFO:    Creating host: 0xbed80670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cc8000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cc8000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1530206
+DEBUG-PS: ps.cpp: 1-1530355
+DEBUG-PS: ps.cpp: 2-1530536
+DEBUG-PS: ps.cpp: 3-1530679
+DEBUG-PS: ps.cpp: 4-1530809
+DEBUG-PS: ps.cpp: 5-1530939
+DEBUG-PS: ps.cpp: 6-1531065
+DEBUG-PS: ps.cpp: 7-1531189
+DEBUG-PS: ps.cpp: 8-1531312
+DEBUG-PS: ps.cpp: 9-1531437
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABBenchmark: DEPENDENT mode=0x0000000000000002 streams=0x0000000000000003 nodes=0x00000000000004fe cycles=0x000000000000ee0f
+[BSG-PASS] dependent streams, checksums and completion
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              661 (             295)
+INFO:    ps.cpp: minstret (instructions retired):           19,763 (            4d33)
+INFO:    ps.cpp: minstret delta:                            19,102 (            4a9e)
+INFO:    ps.cpp: MTIME start:                            1,582,619 (          18261b)
+INFO:    ps.cpp: MTIME stop:                             1,587,487 (          18391f)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               4,868 (            1304)
+INFO:    ps.cpp: IPC        :                             0.490499
+INFO:    ps.cpp: minstret (instructions retired):           19,844 (            4d84)
+INFO:    ps.cpp: wall clock time                :        6,243,490 (          5f44a2) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,252,221.11 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cc8000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+GATE streams=10 mode=3 exit=0 ssh_attempts=1
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 15000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe913670 40000004 16 1
+INFO:    Creating host: 0xbe913670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3caf000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3caf000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1531098
+DEBUG-PS: ps.cpp: 1-1531246
+DEBUG-PS: ps.cpp: 2-1531429
+DEBUG-PS: ps.cpp: 3-1531563
+DEBUG-PS: ps.cpp: 4-1531691
+DEBUG-PS: ps.cpp: 5-1531816
+DEBUG-PS: ps.cpp: 6-1531940
+DEBUG-PS: ps.cpp: 7-1532060
+DEBUG-PS: ps.cpp: 8-1532181
+DEBUG-PS: ps.cpp: 9-1532302
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 7546
+DEBUG-PS: ps.cpp: finished loading 7546 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABINFO:    CORE FAIL
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              683 (             2ab)
+INFO:    ps.cpp: minstret (instructions retired):            2,348 (             92c)
+INFO:    ps.cpp: minstret delta:                             1,665 (             681)
+INFO:    ps.cpp: MTIME start:                            1,582,716 (          18267c)
+INFO:    ps.cpp: MTIME stop:                             1,588,772 (          183e24)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,056 (            17a8)
+INFO:    ps.cpp: IPC        :                             0.034367
+INFO:    ps.cpp: minstret (instructions retired):            2,348 (             92c)
+INFO:    ps.cpp: wall clock time                :        7,764,087 (          767877) ns
+INFO:    ps.cpp: sim/emul speed                 :   374,400,750.53 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3caf000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS

@@ -35,7 +35,7 @@ runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_serial.sh"
 env = dict(os.environ, PYNQ_CONTROL_PROGRAM_FOREGROUND="1",
            PYNQ_CONTROL_PROGRAM_TIMEOUT_MS="15000",
            PYNQ_CONTROL_PROGRAM_SHA256=
-           "be771785b8eb343fbaac2f5c5610437a764c7ff92413f20b26235969aab3616e")
+           "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30")
 
 
 def invoke(nbf, log):
@@ -138,10 +138,11 @@ for streams in (2, 3, 4, 10):
     medians[str(streams)]["hardware_speedup"] = (
         demand / medians[str(streams)]["3"]["median"])
 
-# Compare against the accepted fast image and the ordered buggy five-slot
-# sweep. The focused physical probe measures a 39-cycle adjacent-word penalty,
-# so this predicts the portion of each prefetch-mode total that the RTL fix
-# alone should recover. These are interpretation fields, not pass thresholds.
+# Compare against the accepted fast image and the three-repetition buggy
+# five-slot medians. The focused physical probe measures a 39-cycle
+# adjacent-word penalty, so this predicts the portion of each prefetch-mode
+# total that the RTL fix alone should recover. These are interpretation fields,
+# not pass thresholds.
 fast = {
     2: {0: 60071, 1: 30821, 2: 14167, 3: 18621},
     3: {0: 59997, 1: 30790, 2: 9525, 3: 21825},
@@ -149,10 +150,10 @@ fast = {
     10: {0: 60345, 1: 31005, 2: 8077, 3: 23820},
 }
 buggy = {
-    2: {0: 60090, 1: 82600, 2: 62237, 3: 69902},
-    3: {0: 60019, 1: 82457, 2: 60906, 3: 73144},
-    4: {0: 60099, 1: 82580, 2: 60729, 3: 74377},
-    10: {0: 60352, 1: 82152, 2: 62843, 3: None},
+    2: {0: 60083, 1: 82608, 2: 62244, 3: 69893},
+    3: {0: 60025, 1: 82488, 2: 60943, 3: 73137},
+    4: {0: 60060, 1: 82510, 2: 60678, 3: 74377},
+    10: {0: 60375, 1: 82411, 2: 62851, 3: None},
 }
 recovery = {}
 for streams in (2, 3, 4, 10):
@@ -164,7 +165,7 @@ for streams in (2, 3, 4, 10):
         broken = buggy[streams][mode]
         row = {
             "accepted_fast_cycles": fast[streams][mode],
-            "buggy_ordered_sample_cycles": broken,
+            "buggy_five_slot_median_cycles": broken,
             "corrected_median_cycles": observed,
             "corrected_minus_accepted_fast": observed - fast[streams][mode],
         }

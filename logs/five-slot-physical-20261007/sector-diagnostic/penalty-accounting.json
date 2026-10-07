@@ -1,98 +1,278 @@
 {
-  "nodes": 1280,
   "measured_adjacent_penalty_per_node": 39,
-  "predicted_total_penalty_cycles": 49920,
-  "note": "Fast medians are from the accepted 18 MHz image; broken values are the newer five-slot ordered sweep. Similar demand totals bound unrelated image-to-image cycle drift.",
+  "buggy_bit_sha256": "933777e636853c0a6e9c6cb6d068778b4a49209510d16e49226c63bcbb6793ea",
+  "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "note": "Accepted fast medians are from the original 18 MHz image. Buggy values are three-repetition alternating-order medians on the exact prior five-slot 20 MHz image. Demand differences bound unrelated cycle drift.",
   "rows": [
     {
-      "mode": "serial_prefetch",
+      "mode": 0,
       "streams": 2,
-      "fast_cycles": 30821,
-      "broken_cycles": 82600,
-      "delta_cycles": 51779,
-      "delta_cycles_per_node": 40.45234375,
-      "predicted_adjacent_penalty_cycles": 49920,
-      "predicted_share_of_delta": 0.9640974140095405
-    },
-    {
-      "mode": "serial_prefetch",
-      "streams": 4,
-      "fast_cycles": 30891,
-      "broken_cycles": 82580,
-      "delta_cycles": 51689,
-      "delta_cycles_per_node": 40.38203125,
-      "predicted_adjacent_penalty_cycles": 49920,
-      "predicted_share_of_delta": 0.9657760838863201
-    },
-    {
-      "mode": "serial_prefetch",
-      "streams": 10,
-      "fast_cycles": 31005,
-      "broken_cycles": 82152,
-      "delta_cycles": 51147,
-      "delta_cycles_per_node": 39.95859375,
-      "predicted_adjacent_penalty_cycles": 49920,
-      "predicted_share_of_delta": 0.9760103231861106
-    },
-    {
-      "mode": "software_interleaved",
-      "streams": 2,
-      "fast_cycles": 14167,
-      "broken_cycles": 62237,
-      "delta_cycles": 48070,
-      "delta_cycles_per_node": 37.5546875,
-      "predicted_adjacent_penalty_cycles": 49920,
-      "predicted_share_of_delta": 1.038485541918036
-    },
-    {
-      "mode": "software_interleaved",
-      "streams": 4,
-      "fast_cycles": 8413,
-      "broken_cycles": 60729,
-      "delta_cycles": 52316,
-      "delta_cycles_per_node": 40.871875,
-      "predicted_adjacent_penalty_cycles": 49920,
-      "predicted_share_of_delta": 0.954201391543696
-    },
-    {
-      "mode": "software_interleaved",
-      "streams": 10,
-      "fast_cycles": 8077,
-      "broken_cycles": 62843,
-      "delta_cycles": 54766,
-      "delta_cycles_per_node": 42.7859375,
-      "predicted_adjacent_penalty_cycles": 49920,
-      "predicted_share_of_delta": 0.9115144432677208
-    },
-    {
-      "mode": "serial_demand",
-      "streams": 2,
-      "fast_cycles": 60071,
-      "broken_cycles": 60090,
-      "delta_cycles": 19,
-      "delta_cycles_per_node": 0.01484375,
+      "nodes": 1280,
+      "accepted_fast_cycles": 60071,
+      "buggy_five_slot_samples": [
+        60054,
+        60083,
+        60083
+      ],
+      "buggy_five_slot_median": 60083,
+      "buggy_five_slot_min": 60054,
+      "buggy_five_slot_max": 60083,
+      "delta_cycles": 12,
+      "delta_cycles_per_node": 0.009375,
       "predicted_adjacent_penalty_cycles": null,
       "predicted_share_of_delta": null
     },
     {
-      "mode": "serial_demand",
-      "streams": 4,
-      "fast_cycles": 60053,
-      "broken_cycles": 60099,
-      "delta_cycles": 46,
-      "delta_cycles_per_node": 0.0359375,
+      "mode": 1,
+      "streams": 2,
+      "nodes": 1280,
+      "accepted_fast_cycles": 30821,
+      "buggy_five_slot_samples": [
+        82608,
+        82726,
+        82604
+      ],
+      "buggy_five_slot_median": 82608,
+      "buggy_five_slot_min": 82604,
+      "buggy_five_slot_max": 82726,
+      "delta_cycles": 51787,
+      "delta_cycles_per_node": 40.45859375,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.9639484812790855
+    },
+    {
+      "mode": 2,
+      "streams": 2,
+      "nodes": 1280,
+      "accepted_fast_cycles": 14167,
+      "buggy_five_slot_samples": [
+        62263,
+        62244,
+        62244
+      ],
+      "buggy_five_slot_median": 62244,
+      "buggy_five_slot_min": 62244,
+      "buggy_five_slot_max": 62263,
+      "delta_cycles": 48077,
+      "delta_cycles_per_node": 37.56015625,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 1.038334338665058
+    },
+    {
+      "mode": 3,
+      "streams": 2,
+      "nodes": 1280,
+      "accepted_fast_cycles": 18621,
+      "buggy_five_slot_samples": [
+        69893,
+        69890,
+        69894
+      ],
+      "buggy_five_slot_median": 69893,
+      "buggy_five_slot_min": 69890,
+      "buggy_five_slot_max": 69894,
+      "delta_cycles": 51272,
+      "delta_cycles_per_node": 40.05625,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.973630831643002
+    },
+    {
+      "mode": 0,
+      "streams": 3,
+      "nodes": 1278,
+      "accepted_fast_cycles": 59997,
+      "buggy_five_slot_samples": [
+        60025,
+        60025,
+        60002
+      ],
+      "buggy_five_slot_median": 60025,
+      "buggy_five_slot_min": 60002,
+      "buggy_five_slot_max": 60025,
+      "delta_cycles": 28,
+      "delta_cycles_per_node": 0.02190923317683881,
       "predicted_adjacent_penalty_cycles": null,
       "predicted_share_of_delta": null
     },
     {
-      "mode": "serial_demand",
-      "streams": 10,
-      "fast_cycles": 60345,
-      "broken_cycles": 60352,
+      "mode": 1,
+      "streams": 3,
+      "nodes": 1278,
+      "accepted_fast_cycles": 30790,
+      "buggy_five_slot_samples": [
+        82495,
+        82488,
+        82459
+      ],
+      "buggy_five_slot_median": 82488,
+      "buggy_five_slot_min": 82459,
+      "buggy_five_slot_max": 82495,
+      "delta_cycles": 51698,
+      "delta_cycles_per_node": 40.45226917057903,
+      "predicted_adjacent_penalty_cycles": 49842,
+      "predicted_share_of_delta": 0.9640991914580835
+    },
+    {
+      "mode": 2,
+      "streams": 3,
+      "nodes": 1278,
+      "accepted_fast_cycles": 9525,
+      "buggy_five_slot_samples": [
+        60852,
+        60943,
+        60943
+      ],
+      "buggy_five_slot_median": 60943,
+      "buggy_five_slot_min": 60852,
+      "buggy_five_slot_max": 60943,
+      "delta_cycles": 51418,
+      "delta_cycles_per_node": 40.23317683881064,
+      "predicted_adjacent_penalty_cycles": 49842,
+      "predicted_share_of_delta": 0.9693492551246645
+    },
+    {
+      "mode": 3,
+      "streams": 3,
+      "nodes": 1278,
+      "accepted_fast_cycles": 21825,
+      "buggy_five_slot_samples": [
+        73144,
+        73137,
+        73133
+      ],
+      "buggy_five_slot_median": 73137,
+      "buggy_five_slot_min": 73133,
+      "buggy_five_slot_max": 73144,
+      "delta_cycles": 51312,
+      "delta_cycles_per_node": 40.15023474178404,
+      "predicted_adjacent_penalty_cycles": 49842,
+      "predicted_share_of_delta": 0.9713517305893359
+    },
+    {
+      "mode": 0,
+      "streams": 4,
+      "nodes": 1280,
+      "accepted_fast_cycles": 60053,
+      "buggy_five_slot_samples": [
+        60060,
+        60052,
+        60116
+      ],
+      "buggy_five_slot_median": 60060,
+      "buggy_five_slot_min": 60052,
+      "buggy_five_slot_max": 60116,
       "delta_cycles": 7,
       "delta_cycles_per_node": 0.00546875,
       "predicted_adjacent_penalty_cycles": null,
       "predicted_share_of_delta": null
+    },
+    {
+      "mode": 1,
+      "streams": 4,
+      "nodes": 1280,
+      "accepted_fast_cycles": 30891,
+      "buggy_five_slot_samples": [
+        82473,
+        82510,
+        82550
+      ],
+      "buggy_five_slot_median": 82510,
+      "buggy_five_slot_min": 82473,
+      "buggy_five_slot_max": 82550,
+      "delta_cycles": 51619,
+      "delta_cycles_per_node": 40.32734375,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.9670857629942463
+    },
+    {
+      "mode": 2,
+      "streams": 4,
+      "nodes": 1280,
+      "accepted_fast_cycles": 8413,
+      "buggy_five_slot_samples": [
+        60748,
+        60678,
+        60664
+      ],
+      "buggy_five_slot_median": 60678,
+      "buggy_five_slot_min": 60664,
+      "buggy_five_slot_max": 60748,
+      "delta_cycles": 52265,
+      "delta_cycles_per_node": 40.83203125,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.9551324978475079
+    },
+    {
+      "mode": 3,
+      "streams": 4,
+      "nodes": 1280,
+      "accepted_fast_cycles": 22298,
+      "buggy_five_slot_samples": [
+        74379,
+        74377,
+        74365
+      ],
+      "buggy_five_slot_median": 74377,
+      "buggy_five_slot_min": 74365,
+      "buggy_five_slot_max": 74379,
+      "delta_cycles": 52079,
+      "delta_cycles_per_node": 40.68671875,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.9585437508400699
+    },
+    {
+      "mode": 0,
+      "streams": 10,
+      "nodes": 1280,
+      "accepted_fast_cycles": 60345,
+      "buggy_five_slot_samples": [
+        60375,
+        60397,
+        60374
+      ],
+      "buggy_five_slot_median": 60375,
+      "buggy_five_slot_min": 60374,
+      "buggy_five_slot_max": 60397,
+      "delta_cycles": 30,
+      "delta_cycles_per_node": 0.0234375,
+      "predicted_adjacent_penalty_cycles": null,
+      "predicted_share_of_delta": null
+    },
+    {
+      "mode": 1,
+      "streams": 10,
+      "nodes": 1280,
+      "accepted_fast_cycles": 31005,
+      "buggy_five_slot_samples": [
+        82314,
+        82411,
+        82411
+      ],
+      "buggy_five_slot_median": 82411,
+      "buggy_five_slot_min": 82314,
+      "buggy_five_slot_max": 82411,
+      "delta_cycles": 51406,
+      "delta_cycles_per_node": 40.1609375,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.9710928685367467
+    },
+    {
+      "mode": 2,
+      "streams": 10,
+      "nodes": 1280,
+      "accepted_fast_cycles": 8077,
+      "buggy_five_slot_samples": [
+        62825,
+        62863,
+        62851
+      ],
+      "buggy_five_slot_median": 62851,
+      "buggy_five_slot_min": 62825,
+      "buggy_five_slot_max": 62863,
+      "delta_cycles": 54774,
+      "delta_cycles_per_node": 42.7921875,
+      "predicted_adjacent_penalty_cycles": 49920,
+      "predicted_share_of_delta": 0.9113813123014569
     }
   ]
 }

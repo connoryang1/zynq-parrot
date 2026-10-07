@@ -23,6 +23,21 @@ same early `CORE FAIL`, before a benchmark result. Thus the failure is not
 residual board state. These are diagnostic samples rather than accepted
 performance medians.
 
+A later alternating-order rerun establishes the matched buggy-image medians:
+
+| Streams | Serial demand | Serial prefetch | Software interleaved | Hardware switching |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 60,083 | 82,608 | 62,244 | 69,893 |
+| 3 | 60,025 | 82,488 | 60,943 | 73,137 |
+| 4 | 60,060 | 82,510 | 60,678 | 74,377 |
+| 10 | 60,375 | 82,411 | 62,851 | CORE FAIL |
+
+All 45 accepted runs pass guest, core, and host checks. Each passing cell has
+three samples; the largest range is 122 cycles, or 0.15%, and the separate
+ten-stream hardware gate reproduces `CORE FAIL`. The exact bitstream and
+46 MB CMA control program are pinned by SHA-256 in
+`buggy-five-slot-matrix/analysis.json`.
+
 The ten-slot image at top commit `a69fad73`, BlackParrot commit `db5a52da5`,
 and bitstream SHA-256
 `c74495d7acb596934492be70d9b76f20b7672cdd36871afc656eee85b0dce520`
@@ -74,20 +89,20 @@ image a matched slot-count and clock-frequency A/B baseline.
 
 The direct penalty also predicts the end-to-end regression. At 1,280 nodes,
 39 extra cycles per adjacent load is 49,920 cycles. Comparing the accepted fast
-medians with the newer broken sweep gives:
+medians with the repeated buggy five-slot medians gives:
 
 | Mode | Streams | Fast | Broken | Increase | 49,920 / increase |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Serial prefetch | 2 | 30,821 | 82,600 | 51,779 | 96.4% |
-| Serial prefetch | 4 | 30,891 | 82,580 | 51,689 | 96.6% |
-| Serial prefetch | 10 | 31,005 | 82,152 | 51,147 | 97.6% |
-| Software interleaved | 2 | 14,167 | 62,237 | 48,070 | 103.8% |
-| Software interleaved | 4 | 8,413 | 60,729 | 52,316 | 95.4% |
-| Software interleaved | 10 | 8,077 | 62,843 | 54,766 | 91.2% |
+| Serial prefetch | 2 | 30,821 | 82,608 | 51,787 | 96.4% |
+| Serial prefetch | 4 | 30,891 | 82,510 | 51,619 | 96.7% |
+| Serial prefetch | 10 | 31,005 | 82,411 | 51,406 | 97.1% |
+| Software interleaved | 2 | 14,167 | 62,244 | 48,077 | 103.8% |
+| Software interleaved | 4 | 8,413 | 60,678 | 52,265 | 95.5% |
+| Software interleaved | 10 | 8,077 | 62,851 | 54,774 | 91.1% |
 
-The corresponding demand totals differ by only 7--46 cycles, bounding broad
+The corresponding demand medians differ by only 7--30 cycles, bounding broad
 image-to-image cycle drift. The single measured adjacent-word penalty therefore
-accounts for essentially the entire 48,070--54,766-cycle prefetch regression;
+accounts for essentially the entire 48,077--54,774-cycle prefetch regression;
 the residual varies with scheduling overhead and the older image's different
 clock configuration.
 
