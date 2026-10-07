@@ -1,0 +1,64 @@
+{
+  "method": "Sample the fixed four-slot trace through black-parrot-example's FPGA-facing 64-bit HP0 path and require complete hint/AXI accounting with no ordinary fallback.",
+  "provenance": {
+    "historical_top_commit": "03955af94db78af86c271b560052f74f66879a88",
+    "tested_fix_black_parrot_commit": "d4c20786dd98f5fdbc285adb43f0fe38631dbbe0",
+    "test_elf_sha256": "0770ad121dfd1dcc6e7a56822a7dd2b12f3c25f7feadb2cdff073d1243a25e9b",
+    "filtered_vcd_xz_sha256": "3accdf4a4714a94b24a7c53858a81fb2c0cee0bde3492ec75564f6fafb0808e1",
+    "run_log_sha256": "32e36dbf9bbf926a611f9015cbdb02ae96286b490645e1c97d08047bfa4f9113"
+  },
+  "configuration": {
+    "wrapper": "black-parrot-example",
+    "physical_axi_data_width_bits": 64,
+    "prefetch_slots": 4,
+    "streams": 3,
+    "nodes": 33,
+    "synthetic_request_to_first_beat_nominal_cycles": 40
+  },
+  "window": {
+    "begin_timestamp": 14847950000,
+    "end_timestamp": 14893200000,
+    "clock_period_ps": 50000,
+    "cycles": 905
+  },
+  "accounting": {
+    "visible_uce_hint_request_cycles": 42,
+    "accepted_hints": 33,
+    "allocated_hints": 33,
+    "uce_accepted_drop_pulses": 0,
+    "memory_pipe_replay_cycles": 51,
+    "axi_prefetch_line_requests": 33,
+    "axi_ordinary_requests": 0,
+    "axi_id_distribution": {
+      "1": 13,
+      "2": 13,
+      "3": 7
+    },
+    "installer_drop_state_entries": 0
+  },
+  "queue_behavior": {
+    "slot_occupancy_samples": {
+      "0": 52,
+      "1": 33,
+      "2": 45,
+      "3": 560,
+      "4": 216
+    },
+    "all_slots_full_samples": 216,
+    "all_slots_full_fraction": 0.23841059602649006
+  },
+  "wrapper_comparison": {
+    "fixed_four_slot_minimal32_cycles": 900,
+    "fixed_four_slot_main64_cycles": 905,
+    "fixed_main64_minus_minimal32_cycles": 5,
+    "ten_slot_minimal32_cycles": 802,
+    "ten_slot_main64_cycles": 805,
+    "ten_slot_main64_minus_minimal32_cycles": 3,
+    "fixed_four_slot_excess_over_same_wrapper_ten_slots": 100,
+    "fixed_four_slot_slowdown_over_same_wrapper_ten_slots": 1.124223602484472
+  },
+  "limits": [
+    "The wrapper matches the FPGA interface width but still uses synthetic memory rather than physical DDR.",
+    "The run reached guest/core/host pass markers before the pre-existing DPI finalization assertion."
+  ]
+}

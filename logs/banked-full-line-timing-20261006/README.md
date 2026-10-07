@@ -69,9 +69,11 @@ workload then falls from 2,241 to 900 cycles:
 
 | Configuration | Cycles | Accepted hints | Ordinary AXI requests | Installer drops |
 | --- | ---: | ---: | ---: | ---: |
-| Broken four slots | 2,241 | 31/33 | 32 (two serialized lines) | 4 |
-| Fixed four slots | 900 | 33/33 | 0 | 0 |
-| Ten-slot control | 802 | 33/33 | 0 | 0 |
+| Broken four slots, minimal 32-bit | 2,241 | 31/33 | 32 (two serialized lines) | 4 |
+| Fixed four slots, minimal 32-bit | 900 | 33/33 | 0 | 0 |
+| Ten-slot control, minimal 32-bit | 802 | 33/33 | 0 | 0 |
+| Fixed four slots, FPGA-facing 64-bit | 905 | 33/33 | 0 | 0 |
+| Ten-slot control, FPGA-facing 64-bit | 805 | 33/33 | 0 | 0 |
 
 The fix recovers 1,341 cycles, or 93.2% of the broken path's 1,439-cycle
 excess over ten slots. The remaining 98 cycles make fixed four slots 12.2%
@@ -81,6 +83,14 @@ cycles, but every hint eventually allocates and no demand fallback occurs.
 Four slots are therefore a viable small synthetic endpoint after correct
 backpressure, while the larger Linux design remains limited by installation
 rate and useful-before-demand timing.
+
+The FPGA-facing wrapper independently confirms the residual's source. Fixed
+four-slot execution is 905 cycles there, 100 above its 805-cycle ten-slot
+control. Changing from the minimal 32-bit path to the FPGA-facing 64-bit path
+changes the fixed result by only five cycles and the ten-slot result by three.
+Both fixed wrappers accept 33/33 hints and issue 33 prefetch AXI requests with
+no ordinary fallback. The approximately 100-cycle residual is therefore
+queue/replay scheduling overhead rather than external beat width.
 
 Run `python3 analyze.py` to regenerate the minimal-wrapper `results.json`, and
 `python3 analyze_main64.py` to regenerate `results-main64.json`. The retained
@@ -97,3 +107,5 @@ assertion.
 Run `python3 analyze_queue_fix.py` to regenerate `results-queue-fix.json` from
 the fixed waveform and require 33 accepted/allocated hints, 33 nonzero-ID AXI
 prefetch requests, zero ordinary requests, and zero installer drops.
+`python3 analyze_queue_fix_main64.py` applies the same gates to the FPGA-facing
+trace and regenerates `results-queue-fix-main64.json`.
