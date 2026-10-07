@@ -893,15 +893,28 @@
           },
           "shift16_same_line_set62": {
             "status": "pc_zero_fail",
-            "cycles": [76147],
-            "minstret": [2348],
+            "cycles": [
+              76147
+            ],
+            "minstret": [
+              2348
+            ],
             "log_sha256": "a3fefa757f2ec443babe6e55212ef321071047b459e0cdda695805e86e4f367a"
           },
           "shift64_adjacent_line_set61": {
             "status": "pass",
-            "cycles": [76122, 76123],
-            "minstret": [2348, 2348],
-            "original_set62_nodes_word": [0, 0],
+            "cycles": [
+              76122,
+              76123
+            ],
+            "minstret": [
+              2348,
+              2348
+            ],
+            "original_set62_nodes_word": [
+              0,
+              0
+            ],
             "log_sha256": [
               "46e54c244a6dfc0416a67df48de17e9cd80591c5a4b4da79dd57ce9bed9535b0",
               "521d3a54bc9fe734c49dc1ba94e0edc5c6251529ed2605fcc6f5b806977fe1e8"
@@ -909,8 +922,14 @@
           },
           "shift4096_different_tag_set62": {
             "status": "pc_zero_fail",
-            "cycles": [76128, 76135],
-            "minstret": [2348, 2348],
+            "cycles": [
+              76128,
+              76135
+            ],
+            "minstret": [
+              2348,
+              2348
+            ],
             "log_sha256": [
               "2b5b5664a87114dcebc619ca4ea69723b72ed16da752472ef42b3241fcf77c62",
               "779538723627f187d0baa5e364ac10279d52f175d1590a42ba0b608bc72e21d2"
@@ -918,6 +937,179 @@
           },
           "source_delta": "The placement variants differ only in run_window's stack displacement and matching restoration.",
           "interpretation": "The ten-stream corruption follows D-cache set 62 rather than the original address, tag, or 16-byte sector. Set 62 works under isolated dirty eviction, so the defect requires the concurrent ten-stream schedule."
+        },
+        "physical_mode_controls": {
+          "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/physical-mode-controls",
+          "software_interleaved_ten_stream_steps124": {
+            "status": "pass",
+            "mode": 2,
+            "streams": 10,
+            "nodes": 1240,
+            "cycles": [
+              60714,
+              60754
+            ],
+            "nbf_sha256": "bbd81487b17e9e1659a4aa8e7e3cabf8531eef43251f2a3394c04fe203435ae4",
+            "log_sha256": [
+              "8362488830757ecdb47a062f8ded9034f6b35aaee461e0433b47ff4f66954989",
+              "ddffb1c6e7c7bbbbef7e8ee79b999564355c43bf44e9cb407b8f2f81ce6d8721"
+            ]
+          },
+          "single_hint_eight_dirty_victims": {
+            "status": "pass",
+            "mismatch_mask": "0x0",
+            "nbf_sha256": "4077ef076f2a24a50bc4a4c135d656190b010ff4e2bbdec11c9acbcce73b2c0d",
+            "log_sha256": "d8011d00bd9eda99b8440b3d576c968985f686fa8a276a1efe17963b7cacd09e"
+          },
+          "interpretation": "The exact workload passes with successor hints but software interleaving, while the existing hardware-switching/no-successor-hint control also passes. Neither ingredient alone is sufficient; their interaction under the ten-stream schedule is required."
+        },
+        "instruction_level_corruption_window": {
+          "bitstream_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
+          "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+          "fresh_overlay_before_each_run": true,
+          "early_context0_checkpoints": {
+            "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/stack-sentinel",
+            "remaining_nodes": [
+              124,
+              96,
+              80,
+              64,
+              32,
+              8,
+              1
+            ],
+            "observed_saved_ra": [
+              "0x80000300",
+              "0x80000300",
+              "0x80000300",
+              "0x80000300",
+              "0x80000300",
+              "0x80000300",
+              "0x80000300"
+            ],
+            "all_passed": true,
+            "cycles": [
+              72903,
+              72898,
+              72914,
+              72927,
+              72959,
+              72973,
+              72972
+            ],
+            "interpretation": "The saved return address remains correct through context zero entering its final node. A single checkpoint load refreshes the line and prevents the failure."
+          },
+          "final_lap_context_boundary": {
+            "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/final-lap-sentinel",
+            "after_context_0": {
+              "saved_ra": "0x80000300",
+              "status": "pass",
+              "log_sha256": "51bc80221779843f8af5a714056d9d03488879dd0dd76d68e152847707a4faa3"
+            },
+            "after_context_1": {
+              "saved_ra": "0x80000300",
+              "status": "pass",
+              "log_sha256": "2e027699d7c8f2d6f90cf9d4fdfad3622c43029a071547271513b4c0c3557afc"
+            },
+            "after_context_2": {
+              "saved_ra": "0x0",
+              "status": "pc_zero_fail",
+              "log_sha256": "80a4e7fe0df3d0cc9ce2d7bada64a0aa7ab1c4a20861ba690403c7dfea6b172b"
+            },
+            "after_context_4": {
+              "saved_ra": "0x0",
+              "status": "pc_zero_fail",
+              "log_sha256": "aec6b64e150b4cc53695a99308328f59dd388e6ceaf031ca57c944701be0ca91"
+            }
+          },
+          "simulator_context": {
+            "trace": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/context4-sim-120-124/steps124/full.fst",
+            "extract": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/context2-event-sentinel/simulator-set7.tsv",
+            "extract_sha256": "a9d04be15ed04a559ecee09847acb8bd6ef6f41a151be7c6d08f5364a1dd1762",
+            "demand_first_time": 37242250000,
+            "first_load_hit_vector": 0,
+            "first_way_vector": 255,
+            "replay_time": 37242900000,
+            "replay_load_hit_vector": 64,
+            "replay_way_vector": 64,
+            "miss_to_replay_cycles": 13,
+            "workload_passed": true
+          },
+          "interpretation": "Lightweight probes place their first zero observation in the final context-2 interval and show that a stack read rescues the line. Matched byte-identical controls all pass, so the precise load boundary is schedule-dependent. The robust diagnosis is a narrow instruction-spacing-sensitive cross-request or response/context-transition race, not ordinary same-set replacement.",
+          "lightweight_context2_boundary": {
+            "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/context2-event-sentinel",
+            "entry_before_final_node": {
+              "saved_ra": "0x80000300",
+              "status": "pass",
+              "log_sha256": "03d266106556be2f14ab281151ef78bb2dcc3c3e054eec0d5807771e56c96c09"
+            },
+            "after_successor_pointer_load": {
+              "saved_ra": "0x0",
+              "status": "pc_zero_fail",
+              "log_sha256": "8c962c2cc77a3d584b6ad759c539f5a41f12ec42850b9c33f0a32f985af2563b"
+            },
+            "after_both_node_loads": {
+              "saved_ra": "0x0",
+              "status": "pc_zero_fail",
+              "log_sha256": "4b00ef28479386ee82f4a91cf934839c558034d381f2c2e47ad94277658410d6"
+            },
+            "demand_address": "0x8001d1c0",
+            "node": 1031,
+            "dcache_set": 7,
+            "loaded_successor": "0x80018b00",
+            "successor_hint_issued": false,
+            "interpretation": "In the lightweight probe schedule, the first zero observation is immediately after the context-2 pointer load. The matched-code control shows this is a timing landmark rather than a proven direct cause.",
+            "timing_landmark_instruction": "ld t0, 0(a0)"
+          },
+          "matched_code_control": {
+            "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/matched-event-sentinel",
+            "text_sha256": "55d37c08ffdc440e20a2187336232325c8ed86bf347dd2185386d54b4b64d5ce",
+            "nbf_maps_differ_only_at": {
+              "address": "0x800210e0",
+              "symbol": "stack_probe_stage",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            },
+            "stages": {
+              "0": {
+                "point": "context 2 entry",
+                "saved_ra": "0x80000300",
+                "status": "pass",
+                "cycles": 77193,
+                "nbf_sha256": "b8ee343e7bbc634ed68a5f3888ba7a1f5f8ec7a7a6f2eba142b3af06bae92237",
+                "log_sha256": "8786ef3efe755da13bb21c3f540e9fb42bdcedc5fec80eae9a6b2ed6a585c0fa"
+              },
+              "1": {
+                "point": "after successor-pointer load",
+                "saved_ra": "0x80000300",
+                "status": "pass",
+                "cycles": 77127,
+                "nbf_sha256": "33c5b037a11967e06388185f580712d75476acae2302474a39200df096784373",
+                "log_sha256": "5229d8b3e37238a8c73bcb3e54de1c5f88910a9fd9d36e1612ee8c04103018c1"
+              },
+              "2": {
+                "point": "after payload load",
+                "saved_ra": "0x80000300",
+                "status": "pass",
+                "cycles": 77132,
+                "nbf_sha256": "1e8bd20ec0cc30c4e7d5a426d3e2531586c3b1437407d594f4d6ffc06988d02b",
+                "log_sha256": "bdc3e2751f7d012f5aae8d01c2957ee3ca360f951e896985d55d2c3944e7b975"
+              },
+              "3": {
+                "point": "after result publication",
+                "saved_ra": "0x80000300",
+                "status": "pass",
+                "cycles": 77170,
+                "nbf_sha256": "d71ca9bf43ddf492f85009543da1b1ff6c454d2603b204508521d73f3a003f87",
+                "log_sha256": "4ac41e7087967f1dd213007bb3dd72b8440a667454692de0fd41246e503da906"
+              }
+            },
+            "interpretation": "Byte-identical code with common stage-selection instructions suppresses the physical failure at every observation point. This proves strong instruction-spacing sensitivity and prevents assigning direct causality to the set-7 demand."
+          }
         }
       }
     }

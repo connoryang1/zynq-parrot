@@ -284,6 +284,38 @@ failure. More importantly, resident single-store handoffs rise from 6.15 to
 single/four-store cases rise to 15.13/18.16. The experiment was reverted. It
 shows that a blanket drain is expensive and supplies no new root-cause evidence.
 
+Matched physical mode controls now show that the failure requires the
+interaction of hardware context switching and successor-prefetch traffic. The
+exact ten-stream, 124-node graph passes twice in software-interleaved mode at
+60,714 and 60,754 cycles, even though it retains the same graph and successor
+hints. The previously measured hardware-switching/no-successor-hint control
+also passes, and the one-hint/eight-dirty-victim directed test passes physically
+with a zero mismatch mask. Exact NBF and transcript hashes are retained under
+`stack-slot-diagnostics/physical-mode-controls/`.
+
+Lightweight physical checkpoints narrow the race to the final context-2
+interval in their schedule. Reading the set-62 saved return address at any
+context-zero checkpoint from 124 through one remaining node returns
+`0x80000300` and makes the run pass, proving that one recency update rescues
+the line. With no earlier stack touch, the value is still correct after
+contexts 0 and 1 finish their final nodes but is zero after context 2. A finer
+lightweight probe first observes zero after context 2's set-7 demand to
+`0x8001d1c0`; the simulator sees that demand miss and replay-hit 13 cycles
+later while preserving the stack.
+
+A matched control prevents overinterpreting that boundary. Four variants have
+byte-identical `.text` and NBF memory maps differing only in a volatile stage
+word. They observe at context-2 entry, after the pointer load, after the payload
+load, and after publication. All four read `0x80000300` and pass in
+77,127--77,193 cycles. The common stage-selection instructions suppress the
+failure even when the first stack read is delayed until after publication.
+Thus the set-7 load is a timing landmark, not a proven direct corruptor. The
+robust result is a narrow, instruction-spacing-sensitive cross-request or
+response/context-transition race; ordinary set replacement still cannot make a
+set-7 demand evict set 62. Source, disassembly, exact FPGA logs, NBF hashes,
+and the re-extracted simulator trace are retained under
+`stack-slot-diagnostics/{stack-sentinel,final-lap-sentinel,context2-event-sentinel,matched-event-sentinel}/`.
+
 Exact remote log paths, hashes, NBF identities, cycle values, and the step
 sweep are recorded in `result.json`. The store-handoff fix is physically
 accepted, while full ten-stream correctness remains rejected.
