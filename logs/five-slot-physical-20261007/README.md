@@ -117,3 +117,51 @@ Build inputs, disassembly, manifests, raw simulator and physical transcripts,
 and the reproducible parser are retained under `sector-diagnostic/`. The same
 NBF is staged on the board for the corrected-image comparison. That comparison
 still remains pending the live `a16a9532`/`4f56fba7d` FPGA implementation.
+
+## Corrected five-slot physical result and terminal-switch race
+
+The routed 20 MHz image at top `a16a9532` / BlackParrot `4f56fba7d`, with
+bitstream SHA-256
+`e041ad3bcc0b2619c348e4bf19ea209a628586fe8bc5b839e95535d01215512b`,
+physically confirms the adjacent-word repair. Three checked
+samples per cell give these medians:
+
+| Streams | Serial demand | Serial prefetch | Software interleaved | Hardware switching |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 60,077 | 31,018 | 14,195 | 17,978 |
+| 3 | 60,001 | 30,974 | 9,713 | 21,178 |
+| 4 | 60,070 | 31,023 | 8,415 | 22,288 |
+| 10 | 60,384 | 31,030 | 62,642 | `CORE FAIL` |
+
+Thus software interleaving reaches 4.23x, 6.18x, and 7.14x demand speedup at
+two, three, and four streams. Ten streams exceed the five-entry detached-hint
+capacity and thrash, so software interleaving falls back slightly below demand.
+Hardware switching is best at two streams (3.34x demand speedup); additional
+nonresident register movement outweighs the extra overlap at three and four
+streams. All 45 non-gate samples pass guest, core, and host checks. The three
+ten-stream hardware repetitions fail before printing a benchmark result.
+
+The ten-stream failure is independent of the adjacent-word repair. A no-hint
+ten-stream hardware program passes, as does an initial-hint-only control;
+repeated successor hints expose the failure. Adding instructions between the
+final result publication stores and the final context switch gives an exact
+physical threshold: seven NOPs fail and eight pass. Moving the eight NOPs
+before the stores or after the switch does not help, and reloading `ra` twice
+after the switch does not help. A diagnostic trap handler on the seven-NOP
+case reports illegal instruction at PC zero with restored context zero's
+`ra = 0`, after the benchmark result has already been computed.
+
+The backend detector allowed CSR `0x800` context switches to issue while
+`mem_busy_i` was asserted. The resident fast path has no context-cache drain
+state, so a switch immediately following ordinary stores could hand off before
+their local pipeline effects were safe. This is an ordering bug, rather than a
+detached-prefetch response delay: only the placement after ordinary result
+stores matters, and detached hint credits are intentionally excluded from the
+local ordered condition.
+
+BlackParrot `ee522c10c` now interlocks context switches on
+`mem_busy_i || !mem_ordered_i`; top commit `c43549d3` records the submodule
+update. It also makes the existing fence hazard cover `mem_busy_i`. The exact
+zero-NOP ten-stream simulator passes at 97,237 cycles. A matching 20 MHz FPGA
+route is in progress; physical correctness and the post-fix 2/3/4-stream cost
+remain acceptance gates.
