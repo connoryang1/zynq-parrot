@@ -121,6 +121,36 @@ An alternating fresh-overlay repeat confirms that boundary. Two additional
 the four added context-4 successors independently of test order and modest DDR
 runtime variation; the boundary is not a probabilistic latency threshold.
 
+An exact retained-waveform comparison corrects the initial set analysis. The
+four context-4 hint destinations still map to sets 22, 28, 32, and 12, but the
+four additional iterations also execute 40 ordinary demand nodes from all ten
+contexts. Two newly admitted demand nodes map directly to the saved stack
+line's set 62: context 9 iteration 121 at `0x8000df80` and context 8 iteration
+123 at `0x80020f80`. Both miss in the 124-step simulator. Thus the 120/124
+boundary does introduce direct same-set demand pressure even though the four
+new hints themselves do not collide with the stack set.
+
+The exact board NBFs pass the current simulator in 86,468 and 89,284 cycles.
+They accept exactly 240 and 248 detached prefetch words, with zero cycles in
+which a side-buffer write overlaps a live write-buffer entry, write-buffer
+input, or write-buffer snoop match. In both traces, the saved stack line is
+marked dirty, evicted once through way 1, captured with the correct saved
+`ra=0x800002f6` and `s0=0xa`, and sent as an eight-word writeback. Both final
+saved-`ra` loads then miss L1 and refill the correct line from backing memory;
+the 120-step refill hits way 5 and the 124-step refill hits way 7. The FPGA's
+124-step zero result is therefore consistent with a late set-62 eviction plus
+a board-only loss of dirty status, eviction data, or backing-memory
+persistence. The trace does not yet distinguish those three stages. Full
+traces, selected events, source, and analysis are retained under
+`stack-slot-diagnostics/context4-sim-120-124/`.
+
+The ordinary AXI-lite adapter is single-outstanding: it cannot accept another
+ordinary request until the prior read or write response can enter its
+one-entry return FIFO. The prefetch bypass shares only the read-address
+channel and uses distinct nonzero IDs. A deliberate ordinary write/read
+reordering hole is therefore not present in this path, although a physical
+status, victim-data, or memory-persistence fault remains possible.
+
 Three fresh controls locate the failure after the worker and final handoff.
 Successor-only hints fail while prime-only hints pass. A memory fence before
 the final switch still fails. Loading `ra` from the saved stack slot twice also
@@ -138,8 +168,10 @@ physical 16-byte sector address, so a simple truncated-tag alias is excluded by
 RTL inspection. A diagnostic that independently suppresses each of the four
 context-4 hints newly introduced between 120 and 124 iterations has been built;
 board transfer remains pending. Those four successor addresses map to D-cache
-sets 22, 28, 32, and 12, while the failing stack line maps to set 62, excluding
-a direct same-set collision with the four newly introduced hints.
+sets 22, 28, 32, and 12, while the failing stack line maps to set 62. The later
+exact comparison above shows that two ordinary demand nodes from the same four
+iterations do map to set 62; only a direct collision from the four hints is
+excluded.
 
 A matched stack reporter and address matrix are also built and hash-pinned in
 `stack-slot-diagnostics/`. The preferred `recover` image preserves the original

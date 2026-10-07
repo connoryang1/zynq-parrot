@@ -376,7 +376,7 @@
             "log_sha256": "57ba13a9c120d9b96845d7c90fe17e74c6d1c18be1c02e6a939f465a573a31d4"
           }
         ],
-        "current_bound": "The failure begins between 120 and 124 nodes per stream when only logical context 4 issues hints. This excludes a general five-slot capacity or aggregate hint-count explanation.",
+        "current_bound": "The failure begins between 120 and 124 nodes per stream when only logical context 4 issues hints. The four added iterations execute 40 demand nodes across all contexts; two map to the saved stack line's set 62. This supplies a direct cache-pressure mechanism while excluding a general five-slot, aggregate-hint-count, or probabilistic-latency explanation.",
         "superseded_resident_admission_hypothesis": {
           "hypothesis": "Resident switch admission waits for mem_busy/mem_ordered but, unlike the nonresident drain state, does not explicitly wait for late_wb_v_lo, current iwb_pkt writeback, or dispatch_pkt.v.",
           "status": "superseded as the explanation for the observed PC-zero failure",
@@ -657,6 +657,153 @@
             ]
           },
           "interpretation": "The 120/124 transition follows the added context-4 successors independently of alternating test order and normal DDR cycle variation."
+        },
+        "exact_120_124_simulator_comparison": {
+          "artifact": "logs/context-switch-drain-interlock-20261007/stack-slot-diagnostics/context4-sim-120-124",
+          "comparison": {
+            "120": {
+              "nbf_sha256": "f69501f0e5a0999a8fad9e1a64610db8218fb3f4614c4b35c18def6baf2bf068",
+              "simulation_cycles": 86468,
+              "workload_passed": true,
+              "shutdown_only_dpi_assertion": true,
+              "accepted_prefetch_words": 240,
+              "expected_prefetch_words": 240,
+              "prefetch_with_live_write_buffer": 0,
+              "prefetch_with_write_buffer_input": 0,
+              "prefetch_with_write_buffer_snoop": 0,
+              "epilogue_first_ra_access": {
+                "time": 37143550000,
+                "l1_hit_vector": 0,
+                "way_vector": 255
+              },
+              "epilogue_refilled_ra_access": {
+                "time": 37144200000,
+                "l1_hit_vector": 32,
+                "way_vector": 32
+              },
+              "refill_words_critical_first": [
+                2147484406,
+                10,
+                1200,
+                1200,
+                0,
+                0,
+                656337,
+                2147486808
+              ],
+              "saved_stack_writeback": {
+                "evict_time": 34386350000,
+                "request_causing_eviction": "0x80014f80",
+                "victim_address": "0x80082f80",
+                "replacement_way": 1,
+                "metadata_dirty": 1,
+                "captured_words_address_order": [
+                  0,
+                  0,
+                  656337,
+                  2147486808,
+                  2147484406,
+                  10,
+                  1200,
+                  1200
+                ],
+                "writeback_start": 34389000000,
+                "writeback_done": 34389950000
+              }
+            },
+            "124": {
+              "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+              "simulation_cycles": 89284,
+              "workload_passed": true,
+              "shutdown_only_dpi_assertion": true,
+              "accepted_prefetch_words": 248,
+              "expected_prefetch_words": 248,
+              "prefetch_with_live_write_buffer": 0,
+              "prefetch_with_write_buffer_input": 0,
+              "prefetch_with_write_buffer_snoop": 0,
+              "epilogue_first_ra_access": {
+                "time": 37284350000,
+                "l1_hit_vector": 0,
+                "way_vector": 255
+              },
+              "epilogue_refilled_ra_access": {
+                "time": 37285000000,
+                "l1_hit_vector": 128,
+                "way_vector": 128
+              },
+              "refill_words_critical_first": [
+                2147484406,
+                10,
+                1240,
+                1240,
+                0,
+                0,
+                656337,
+                2147486808
+              ],
+              "saved_stack_writeback": {
+                "evict_time": 34386350000,
+                "request_causing_eviction": "0x80014f80",
+                "victim_address": "0x80082f80",
+                "replacement_way": 1,
+                "metadata_dirty": 1,
+                "captured_words_address_order": [
+                  0,
+                  0,
+                  656337,
+                  2147486808,
+                  2147484406,
+                  10,
+                  1240,
+                  1240
+                ],
+                "writeback_start": 34389000000,
+                "writeback_done": 34389950000
+              }
+            }
+          },
+          "new_set62_demand_nodes": [
+            {
+              "iteration": 121,
+              "context": 9,
+              "node": 62,
+              "address": "0x8000df80",
+              "dcache_set": 62,
+              "simulator_accesses": [
+                {
+                  "time": 37191500000,
+                  "l1_hit_vector": 0,
+                  "way_vector": 255
+                },
+                {
+                  "time": 37192150000,
+                  "l1_hit_vector": 2,
+                  "way_vector": 2
+                }
+              ]
+            },
+            {
+              "iteration": 123,
+              "context": 8,
+              "node": 1278,
+              "address": "0x80020f80",
+              "dcache_set": 62,
+              "simulator_accesses": [
+                {
+                  "time": 37272500000,
+                  "l1_hit_vector": 0,
+                  "way_vector": 255
+                },
+                {
+                  "time": 37273150000,
+                  "l1_hit_vector": 8,
+                  "way_vector": 8
+                }
+              ]
+            }
+          ],
+          "axi_ordering_check": "The ordinary AXI-lite path is single-outstanding: it does not accept the next request until the prior B/R response can enter its one-entry return FIFO. The detached prefetch bypass shares only AR and uses distinct nonzero IDs.",
+          "interpretation": "The four extra iterations add two ordinary demand nodes in the saved stack line's D-cache set 62. Both exact simulations keep prefetch-side-buffer writes disjoint from the write buffer, then miss and refill the saved stack line correctly at the epilogue. The physical 124-step zero reload can therefore be explained by a late same-set eviction combined with a board-only dirty-status, eviction-data, or backing-memory persistence failure; the four context-4 hint destination sets alone were an incomplete account of the boundary."
         }
       }
     }
