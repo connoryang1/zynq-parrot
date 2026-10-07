@@ -151,6 +151,18 @@ channel and uses distinct nonzero IDs. A deliberate ordinary write/read
 reordering hole is therefore not present in this path, although a physical
 status, victim-data, or memory-persistence fault remains possible.
 
+A new isolated dirty-eviction sweep now covers every one of the 64 D-cache
+sets. For each set it dirties all eight words of one line, applies sixteen
+same-set misses, and reloads the target. All 64 reloads take more than ten
+cycles, confirming displacement rather than a surviving cache hit, and all
+512 words compare correctly in the simulator. The matching FPGA-CRT NBF also
+passes simulation. This establishes that the logical ordinary writeback and
+refill path works across every set without context switches or hints; a board
+pass would narrow the ten-stream fault to its concurrent replacement schedule,
+while a board failure would expose a general routed writeback defect. The NBF,
+source, hashes, and result are under `dirty-eviction-integrity/`. A standard
+board-runner attempt was denied locally before SSH launch.
+
 Three fresh controls locate the failure after the worker and final handoff.
 Successor-only hints fail while prime-only hints pass. A memory fence before
 the final switch still fails. Loading `ra` from the saved stack slot twice also

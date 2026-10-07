@@ -804,6 +804,32 @@
           ],
           "axi_ordering_check": "The ordinary AXI-lite path is single-outstanding: it does not accept the next request until the prior B/R response can enter its one-entry return FIFO. The detached prefetch bypass shares only AR and uses distinct nonzero IDs.",
           "interpretation": "The four extra iterations add two ordinary demand nodes in the saved stack line's D-cache set 62. Both exact simulations keep prefetch-side-buffer writes disjoint from the write buffer, then miss and refill the saved stack line correctly at the epilogue. The physical 124-step zero reload can therefore be explained by a late same-set eviction combined with a board-only dirty-status, eviction-data, or backing-memory persistence failure; the four context-4 hint destination sets alone were an incomplete account of the boundary."
+        },
+        "isolated_dirty_eviction_integrity": {
+          "source_commit": "d087c34c",
+          "artifact": "logs/context-switch-drain-interlock-20261007/dirty-eviction-integrity",
+          "coverage": {
+            "dcache_sets": 64,
+            "dirty_words_per_set": 8,
+            "same_set_conflicts_per_target": 16,
+            "checked_words": 512
+          },
+          "simulator": {
+            "status": "pass",
+            "set_mask": "0x0000000000000000",
+            "set62_word_mask": "0x0000000000000000",
+            "slow_reload_mask": "0xffffffffffffffff",
+            "all_targets_displaced": true,
+            "fpga_nbf_also_passed_simulation": true,
+            "nbf_sha256": "bc8b1a7939ced18bfd9e743e046545e5b8b5f33d64193e3cb0a25c0d890e4edd",
+            "elf_sha256": "23a9b6ed74bcb8ce772f3ec126c38e48b6d218ef5ebb09851c43791d64342a1f",
+            "log_sha256": "d738fc26c6847e367a3d98c5b7a8d3e96fc324a2cff2cda3503c9cf3087d8743"
+          },
+          "physical": {
+            "status": "not_run",
+            "last_attempt": "socket: Operation not permitted; SSH launch never began"
+          },
+          "interpretation": "The logical ordinary dirty-writeback/refill path preserves all 512 checked words across every cache set in isolation. A physical pass would narrow the context-4 failure to its concurrent replacement schedule; a physical failure would establish a general routed cache-to-DDR writeback defect."
         }
       }
     }
