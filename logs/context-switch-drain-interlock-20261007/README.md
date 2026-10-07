@@ -152,6 +152,14 @@ rejected the normal SCP path, so the address matrix has no board result yet. An
 uncached or external readback remains useful if the reporter shows that the
 cacheable words are zero.
 
+The retained waveform independently checks this invariant over the measured
+ten-stream traversal. The D-cache accepts exactly 2,560 detached data commands,
+equal to ten streams times 128 nodes times two returned words. All 2,560 use
+`e_cache_data_mem_prefetch`; it accepts zero tag commands and zero status
+commands. `prefetch_install_begin` remains zero and the install state remains
+idle throughout the window. The filtered VCD, analyzer, transcript, and their
+hashes are retained beside the reporter waveform.
+
 A complete-calculator-drain control reused `register_seed_ready_i` for every
 context switch. It passes the ten-stream simulator at 102,239 cycles versus
 97,237 for the current interlock, but the simulator already passed the physical
