@@ -1312,5 +1312,29 @@
       ],
       "pointer_demand_interpretation": "Nine contexts have identical 13-cycle ordinary miss/replay behavior. Context 2 is the third, not the first or a latency outlier; context 4 alone side-buffer hits."
     }
+  },
+  "physical_switch_boundary_bubble_matrix": {
+    "status": "accepted",
+    "date": "2026-10-12",
+    "evidence": "stack-slot-diagnostics/post-switch-bubble/physical-matrix-20261012-r2/results.json",
+    "original_k10": [
+      "fail",
+      "fail"
+    ],
+    "branch_encoding_control_k10": "fail",
+    "post_switch_k10_cycles": [
+      72038,
+      72033
+    ],
+    "pre_switch_k10_cycles": 71992,
+    "body_k10": "fail",
+    "original_k2_cycles": 19262,
+    "branch_encoding_control_k2_cycles": 19262,
+    "post_switch_k2_cycles": 20540,
+    "post_switch_k2_increment_cycles": 1278,
+    "post_switch_k2_overhead_percent": 6.634825044128336,
+    "demand_baseline_cycles": 60077,
+    "post_switch_k2_speedup_vs_demand": 2.9248782862706912,
+    "interpretation": "An executed cycle immediately adjacent to either side of the context switch repairs the deterministic physical fault. The body bubble and unreachable-NOP encoding control fail, excluding general loop-period and compressed-encoding explanations. The internal corrupting signal remains unidentified."
   }
 }

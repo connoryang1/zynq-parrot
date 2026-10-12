@@ -55,11 +55,10 @@ Two additional same-size, single-record controls separate bubble placement:
 
 The pre-switch image replaces `mv a0,t0` with the same-size `c.mv a0,t0;
 c.nop`; the body image similarly replaces `add a6,a6,t1` with `c.add a6,t1;
-c.nop`. Each complete NBF differs from the original at one record. Their FPGA
-outcomes distinguish mechanisms: post-switch-only recovery implicates the
-incoming demand boundary; pre-switch-only recovery implicates settling the
-outgoing hint before the handoff; all three recovering would indicate broader
-loop-period sensitivity rather than a uniquely placed interlock.
+c.nop`. Each complete NBF differs from the original at one record. The physical
+matrix passes both pre-switch and post-switch controls, while the body control
+and original image fail. One cycle directly adjacent to either side of the
+handoff is therefore sufficient; merely lengthening the loop earlier is not.
 
 ## Fast two-stream cost control
 
@@ -67,8 +66,9 @@ The exact physical two-stream performance NBF was patched with the same
 single-record `c.nop; c.j` method. Its unmodified simulator result is 19,258
 cycles, only four cycles below the measured FPGA result of 19,262. The patched
 simulator result is 20,536 cycles: exactly 1,278 additional cycles for its
-1,278 non-final handoffs, or 6.64% of hardware runtime. Applying that measured
-increment to the physical result predicts 20,540 cycles and a 2.925x speedup
+1,278 non-final handoffs, or 6.64% of hardware runtime. The physical A/B now
+measures exactly 19,262 cycles for both the original and encoding control and
+20,540 for the executed bubble. Hardware therefore retains a 2.925x speedup
 over the 60,077-cycle demand baseline, down from 3.119x.
 
 This is the cost of an unconditional software-visible bubble in the most
@@ -85,11 +85,10 @@ linear but slightly below `1,240 * bubbles`, because some added instructions
 occupy cycles that were already frontend or memory stalls. One bubble costs
 1.34%, two cost 2.70%, four cost 5.40%, and eight cost 10.80% in this
 switch-intensive workload.
-The simulator already passed the original workload, so these runs validate
-the generated binaries and quantify cost; they cannot decide whether the
-bubble fixes the physical-only race. Fresh-overlay FPGA runs of the exact
-original and three exact single-record images are the next decisive
-measurements. The recompiled larger-delay images are secondary diagnostics.
+The simulator already passed the original workload, so it could validate only
+construction and cost. The completed fresh-overlay FPGA matrix establishes the
+physical pass/fail behavior. The recompiled larger-delay images remain
+secondary diagnostics.
 
 ## Final-lap prefetch-state trace
 
@@ -147,6 +146,8 @@ matrix below with a fresh overlay before every target invocation:
 The repeated original and post-switch runs detect board-state carryover. The
 k2 tail directly measures the physical performance cost. The script writes
 every overlay and target transcript plus an incrementally updated JSON result.
-Its offline `--dry-run` validates every local hash and prints the exact plan;
-that validation passes. Execution remains pending because this environment
-currently denies the SSH socket before the board can be contacted.
+Its offline `--dry-run` validates every local hash and prints the exact plan.
+The sandbox later allowed direct serialized SSH but continued rejecting SSH
+spawned by the Python orchestrator, so the identical matrix was executed as
+direct commands. Exact results and downloaded board transcripts are retained
+under `physical-matrix-20261012-r2/`.

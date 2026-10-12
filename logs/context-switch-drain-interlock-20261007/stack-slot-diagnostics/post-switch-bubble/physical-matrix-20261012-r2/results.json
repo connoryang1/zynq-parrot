@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-12",
+  "top_commit": "e9071592ef73f2ef70ae3ebe1d060d30181b348f",
+  "black_parrot_commit": "ee522c10c365ee26b6d2576c06ec1f5cb9a58634",
+  "bitstream_sha256": "9d6c4eb5e90f85ddc225c08d6fd930b1e405cf45cd15ae59e17c1356e052c29b",
+  "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "interactive_helper_sha256": "744f2bd7f547fe757df462a45101129b7e4df8c36461f42f75e7b50b72355191",
+  "fresh_overlay_before_every_run": true,
+  "overlay_load_marker_each_run": "LOADING_BIT_SHA256 matched and FPGA state operating",
+  "runs": [
+    {
+      "label": "00-original-k10-a",
+      "classification": "fail",
+      "cycles": null,
+      "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+      "log": "00-original-k10-a.log",
+      "log_sha256": "378dd1ee2b85fbf76981a048246e8c8d0dad3e028f9400ff888e618228e4a46a"
+    },
+    {
+      "label": "01-branch-control-k10",
+      "classification": "fail",
+      "cycles": null,
+      "nbf_sha256": "0eead35c3cc5476d021796701fd6f09fca8b3df5f5fbeebe367808d1dda4ce65",
+      "log": "01-branch-control-k10.log",
+      "log_sha256": "b73915b87ff95f86eb61683670c08a27987782d57a140f4e741d703014bd38b8"
+    },
+    {
+      "label": "02-post-switch-k10-a",
+      "classification": "pass",
+      "cycles": 72038,
+      "nbf_sha256": "da075999c56bd29d82b8a0bd50dcb7dc55b8315a2676bc3cee94087cf4502e55",
+      "log": "02-post-switch-k10-a.log",
+      "log_sha256": "647577f588f195a7b1d9600774d128d500af5706aa5c906170208f04f1de1687"
+    },
+    {
+      "label": "03-original-k10-b",
+      "classification": "fail",
+      "cycles": null,
+      "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+      "log": "03-original-k10-b.log",
+      "log_sha256": "267f3a930bd12aa439ac312666358f8390a5ad298f09acfcc49988dd702b625a"
+    },
+    {
+      "label": "04-pre-switch-k10",
+      "classification": "pass",
+      "cycles": 71992,
+      "nbf_sha256": "1903ba3a932910915ab66dc16872d525e9c1a35c84ac04346753c929c82b13d3",
+      "log": "04-pre-switch-k10.log",
+      "log_sha256": "30d0e2d3532e9448862f35e19280f81f2f0210e33d1dac1c020ae527bba34dcf"
+    },
+    {
+      "label": "05-body-k10",
+      "classification": "fail",
+      "cycles": null,
+      "nbf_sha256": "0f08524e1da95aec53da57d8976d5ed101ed65a042d2a188a594dd24ed1e1afd",
+      "log": "05-body-k10.log",
+      "log_sha256": "8df91208416d11955b70f7962dcbadd606802d046a750c613f91ec20d6eb1ac0"
+    },
+    {
+      "label": "06-post-switch-k10-b",
+      "classification": "pass",
+      "cycles": 72033,
+      "nbf_sha256": "da075999c56bd29d82b8a0bd50dcb7dc55b8315a2676bc3cee94087cf4502e55",
+      "log": "06-post-switch-k10-b.log",
+      "log_sha256": "caf04642fbad0ec828fad9b5717da5abac121985aebf3efd481dc251134f8f16"
+    },
+    {
+      "label": "07-original-k2",
+      "classification": "pass",
+      "cycles": 19262,
+      "nbf_sha256": "92b0bdbe635486053a23ca9fc86074678a8f28b11e07626d43a23a11af6a5b0c",
+      "log": "07-original-k2.log",
+      "log_sha256": "b44b8e852bf82e4f50f0874233d156383146106c2bdb05fa4efe1db4970af165"
+    },
+    {
+      "label": "08-branch-control-k2",
+      "classification": "pass",
+      "cycles": 19262,
+      "nbf_sha256": "b0d538e5e2c805b6eabd42ad2b9333d5c73bace1f8371aba9962f081071af02e",
+      "log": "08-branch-control-k2.log",
+      "log_sha256": "09ca0768c6fb39b12a7e155ddf0dbaa6250994bfc7de18f3f5c6148a0ec5ca00"
+    },
+    {
+      "label": "09-post-switch-k2",
+      "classification": "pass",
+      "cycles": 20540,
+      "nbf_sha256": "94ca62c38298d13538c4109a4c2cd2039c8aa9acaa553328b8758dc8a3939f89",
+      "log": "09-post-switch-k2.log",
+      "log_sha256": "00dea2bd708c0da510c2a3909bc4a81db9aa33c8280c114d501e6d8c7c9c6d37"
+    }
+  ],
+  "accepted_conclusions": [
+    "Original and branch-encoding-control k10 images fail in both fresh-overlay original repetitions/control.",
+    "Both post-switch bubble repetitions and the pre-switch bubble pass; the body bubble fails.",
+    "An executed cycle immediately adjacent to the switch boundary is causal; compressed encoding and general loop-period changes are excluded.",
+    "The k2 branch control exactly matches the 19262-cycle original; the post-switch bubble is 20540 cycles, +1278 or +6.6359 percent."
+  ],
+  "demand_baseline_cycles": 60077,
+  "original_k2_speedup": 3.1189388433184506,
+  "post_switch_k2_speedup": 2.9248782862706912
+}
