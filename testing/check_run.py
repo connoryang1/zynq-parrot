@@ -30,6 +30,7 @@ GPIO_STOP = re.compile(
 # The benchmark banner is emitted only after both measured rings return.
 TEST_MARKERS = {
     "mt_machine_trap_test": "[BSG-PASS] cold M-mode ECALL trap and return",
+    "mt_protected_rpc_reference_test": "[BSG-PASS] protected RPC capability, isolation and return",
     "mt_opensbi_csr_probe_test": "[BSG-PASS] OpenSBI absent CSR probes read zero",
     "mt_cache_miss_trace_test": "[BSG-PASS] accepted cache-miss trace",
     "mt_satp_asid_warl_test": "[BSG-PASS] satp ASID WARL width matches one-bit TLB tag",

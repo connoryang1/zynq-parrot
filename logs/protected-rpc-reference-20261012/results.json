@@ -1,0 +1,34 @@
+{
+  "contract": {
+    "domains": 2,
+    "capabilities": 1,
+    "arguments": 4,
+    "results": 1,
+    "return_depth": 1,
+    "address_spaces": "distinct Sv39 roots and ASIDs",
+    "shared_memory": "one explicit page"
+  },
+  "cycles": {
+    "ordinary_call": 76,
+    "flush_first": 824,
+    "flush_repeat": 450,
+    "asid_first": 773,
+    "asid_repeat": 287
+  },
+  "asid_repeat_dispatch_breakdown": {
+    "caller_ecall_to_monitor": 57,
+    "pcall_monitor": 109,
+    "server_body_through_preturn_ecall": 25,
+    "server_ecall_to_monitor": 6,
+    "preturn_monitor_to_caller": 83,
+    "total_ecall_dispatch_to_caller_resume": 280
+  },
+  "identities": {
+    "flush_nbf_sha256": "8f6ad57cd20a9d7391d56a1b0ed8f48a0ab822ee5092a51b63bb29014adfa110",
+    "asid_nbf_sha256": "9bc17c3df3cbc31a4a90a3f610a60b907973724cd8481c43e192059e9b385ec5",
+    "asid_elf_sha256": "919724927f922c9b93cfa75441866f1b8c455e5e16252621bfc8015511d90752",
+    "asid_fst_sha256": "a6619059f7ea0c29be3fc73b9a71e6434c22970fc47ee779f521a9c400fb30ee"
+  },
+  "result": "pass",
+  "hardware_rpc_status": "not implemented"
+}

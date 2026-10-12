@@ -391,6 +391,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the smallest measured-bound implementation is a one-bit scheduler interlock rather than a permanent software bubble. It supplies the causal switch-adjacent separation while preserving the exact k2 simulator runtime.
 - **Limits:** the simulator did not reproduce the original physical corruption. Only routing followed by the exact failing ten-stream board control can establish that the RTL interlock repairs the FPGA failure; timing and area are also unmeasured until that route completes.
 
+### RL-042 — The protected-RPC software contract costs 287 cycles warm versus 76 for a function call
+
+- **Status:** accepted clean traced simulator baseline; hardware fast path not implemented
+- **Scope:** two U-mode Sv39 domains, one monitor-held depth-one return, one caller/capability pair, fixed server entry, four register arguments, one result, distinct private code/data/stack pages, and one explicitly shared page
+- **Claim:** the test rejects an invalid capability without entering the server, maps the same private VA to distinct physical pages, preserves the caller private value and ABI state, prevents user control of the return continuation, transfers the shared payload, and completes with its specific PASS marker plus guest/host PASS. A matched ordinary call doing the same useful loads, arithmetic, and stores takes 76 cycles. Flush-on-every-switch protected calls take 824 cycles first and 450 repeated; retaining safe entries under the implementation's two distinct ASIDs reduces them to 773 and 287. The repeat trace attributes 109/83 cycles to the entry/return monitor instruction streams, 57/6 cycles to reaching those handlers, and 25 cycles to the server body through its return ECALL.
+- **Evidence:** source/harness gate, accepted logs, disassembly, FST extractor, dispatch timeline, hashes, and machine-readable result in `logs/protected-rpc-reference-20261012/`
+- **Meaning:** the first hardware opportunity is now measured rather than estimated. Removing the two software monitor streams addresses 192 of the 211 cycles separating the repeated protected path from the matched function call; accelerating the protected transition can plausibly approach tens of cycles without changing application semantics.
+- **Limits:** this is a bare-metal M-mode reference with one immutable capability and no interrupts or nested calls. It does not yet prove Linux integration, revocation, multi-client scheduling, or a hardware `pcall`/`preturn` implementation.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

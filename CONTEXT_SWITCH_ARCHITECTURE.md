@@ -53,6 +53,46 @@ without the required flushes. The current RTL masks unsupported ASID bits on
 its flush-on-switch path; this correction is simulation-qualified but not yet
 routed or accepted on the FPGA.
 
+## Protected RPC reference contract
+
+The first protected-RPC reference is implemented in
+`testing/mt_protected_rpc_reference_test.c`; it is a software contract and
+baseline, not a new instruction or hardware claim. Two U-mode domains have
+distinct Sv39 roots, ASIDs, stacks, code pages, and same-address private pages.
+One explicitly shared page carries larger data. An M-mode monitor implements a
+depth-one call/return protocol:
+
+- `pcall`: `a7=0x71`, capability in `a6`, and four arguments in `a0`--`a3`.
+  The monitor validates the caller and capability, selects a fixed server
+  entry, saves the caller's ABI-preserved state and continuation in M-only
+  memory, switches `satp`, clears all non-argument state, and enters U-mode.
+- `preturn`: `a7=0x72`, result in `a0`. Only the active server may consume the
+  monitor-owned continuation. The monitor restores the caller address space,
+  PC, stack, and callee-saved state, clears remaining server-controlled
+  registers, and returns to the instruction after `pcall`.
+
+The separate return operation is required because an ordinary `ret` uses a
+server-controlled register and cannot atomically recover the caller's hidden
+address space and continuation. Keeping the continuation out of both domains
+prevents the server from forging a return target or resuming a different
+caller.
+
+With matched useful work, simulation measures 76 cycles for an ordinary
+same-domain function call. The conservative monitor that flushes translation
+on both transitions takes 824 cycles on the first protected call and 450 on a
+repeat. Using the implementation's two supported ASIDs with immutable page
+tables reduces those to 773 and 287 cycles. The repeated 287-cycle path spends
+192 cycles executing monitor instructions and 63 more reaching the two handler
+entries; the server body itself spans 25 cycles. Exact logs and waveform
+boundaries are in `logs/protected-rpc-reference-20261012/`.
+
+The initial hardware target should preserve this contract while replacing the
+two monitor instruction streams with atomic descriptor transitions. A domain
+descriptor needs a register-context identity, `satp`/ASID, fixed entry PC,
+authorized caller/capability, active/waiting state, and protected return state.
+Nested calls, revocation during a call, multiple servers, interrupts, and Linux
+allocation/release remain later gates.
+
 ## Cache overlap is a separate capability
 
 Integer backing RAM holds register state; it does not warm the instruction or
