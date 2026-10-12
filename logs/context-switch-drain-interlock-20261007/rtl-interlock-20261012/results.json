@@ -1,0 +1,57 @@
+{
+  "black_parrot_commit": "6c79a42107a3857e63b6f47bc2468fe4599c5bff",
+  "change": "one-cycle backend issue hold after committed context switch",
+  "tests": [
+    {
+      "name": "mt_umode_nonresident_handoff_test",
+      "threads": 2,
+      "contexts": 4,
+      "trace": true,
+      "result": "pass"
+    },
+    {
+      "name": "mt_dependent_stream_benchmark",
+      "threads": 2,
+      "contexts": 10,
+      "streams": 10,
+      "nodes": 1280,
+      "mode": 3,
+      "trace": true,
+      "cycles": 23972,
+      "result": "pass"
+    },
+    {
+      "name": "mt_dependent_stream_benchmark",
+      "threads": 2,
+      "contexts": 10,
+      "streams": 2,
+      "nodes": 1280,
+      "mode": 3,
+      "trace": true,
+      "cycles": 19270,
+      "nbf_sha256": "0af4a7a93375fd14537a55cbe63ca421382c7eae3857f976d61ebb2afb41639c",
+      "result": "pass",
+      "comparison_limit": "newly compiled NBF is not byte-identical to the archived baseline"
+    },
+    {
+      "name": "archived_exact_k2_control",
+      "threads": 2,
+      "contexts": 10,
+      "streams": 2,
+      "nodes": 1280,
+      "cycles_before": 19258,
+      "cycles_after": 19258,
+      "delta_cycles": 0,
+      "nbf_sha256": "92b0bdbe635486053a23ca9fc86074678a8f28b11e07626d43a23a11af6a5b0c",
+      "result": "pass"
+    }
+  ],
+  "waveform": {
+    "sha256": "693f82b9b45c347c70682a0b7b51d2bfce46ffd473d6b3d585aeb877a3c6f4a6",
+    "commit_pulses": 1292,
+    "settle_pulses": 1292,
+    "settle_cycles_with_other_issue_conditions_ready": 0
+  },
+  "physical_status": "pending routed implementation and board acceptance"
+}
+

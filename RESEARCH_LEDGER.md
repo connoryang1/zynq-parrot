@@ -382,6 +382,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** an interlock conditioned only on in-flight AXI/prefetch transport would not activate around contexts 0–2 in this schedule. Context 2 is neither the first ordinary miss nor latency-distinct, so a generic first-demand-miss condition is also broad and non-discriminating. Retained side-buffer state covers the boundary but is only moderately selective: it would avoid 10/48 traced bubbles, about 20.8% of unconditional overhead if cost scales directly. A narrower request/context transition remains preferable if the physical placement matrix shows that a bubble repairs the failure.
 - **Limits:** the simulator preserves the stack line and may not reproduce physical response timing. This excludes candidate conditions in the traced schedule; it does not prove the FPGA's corrupting signal.
 
+### RL-041 — The hardware boundary interlock is active and free in the exact k2 simulation
+
+- **Status:** accepted simulation checkpoint; routed and physical acceptance pending
+- **Scope:** BlackParrot `6c79a4210`, which blocks backend issue for the one cycle after every committed context switch while allowing the frontend issue queue to fill
+- **Claim:** the clean traced nonresident U-mode handoff and the 1,280-node two- and ten-stream hardware-context workloads pass. The retained k2 waveform contains 1,292 committed switch pulses and 1,292 settle pulses after reset, proving the interlock activates for every switch in the complete run. The issue queue is empty in every protected cycle. The archived byte-identical k2 NBF still measures exactly 19,258 cycles before and after the RTL change, so its one-cycle temporal separation is fully overlapped by the existing frontend gap; unlike the software NOP, it does not inherently add one retired cycle per handoff.
+- **Evidence:** commands, exact identities, retained transcripts, waveform extractor, pulse counts, and machine-readable results in `logs/context-switch-drain-interlock-20261007/rtl-interlock-20261012/`
+- **Meaning:** the smallest measured-bound implementation is a one-bit scheduler interlock rather than a permanent software bubble. It supplies the causal switch-adjacent separation while preserving the exact k2 simulator runtime.
+- **Limits:** the simulator did not reproduce the original physical corruption. Only routing followed by the exact failing ten-stream board control can establish that the RTL interlock repairs the FPGA failure; timing and area are also unmeasured until that route completes.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
