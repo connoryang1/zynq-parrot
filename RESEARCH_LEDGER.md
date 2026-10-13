@@ -420,6 +420,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the 287-cycle warm software-protected reference is not a switch-mechanism floor. Most avoidable raw cost is four separately serialized argument writes and a separate result write. An atomic `pcall`/`preturn` using the existing switch machinery has a measured first target around 45--50 warm cycles, subject to RTL validation.
 - **Limits:** the raw interface is intentionally unsafe: the caller chooses target registers and execution state. The 45--50-cycle figure is a design estimate from measured boundaries, not a protected-hardware result.
 
+### RL-045 — Atomic protected RPC reaches 71 cycles warm but exposes a repeat-entry frontend epoch bug
+
+- **Status:** accepted traced simulator checkpoint with an explicit correctness limitation; route and FPGA validation pending
+- **Scope:** CSR `0x808` `pcall` and CSR `0x809` `preturn`, one M-installed capability from resident U-mode context 0 to resident U-mode context 1, fixed server entry, hardware-held depth-one continuation, atomic `a0`--`a3` argument transfer, atomic `a0` result transfer, two distinct Sv39 address spaces, and a hostile U-mode descriptor overwrite attempt
+- **Claim:** invalid call and return operands retire locally, U-mode cannot replace the M-installed protected entry, both calls produce the expected results, private mappings remain distinct, and the run reaches its specific marker plus guest/host PASS. The matched direct helper measures 220/31 cycles first/repeated and protected hardware RPC measures 43/71. Relative to RL-044's 109-cycle warm raw transport, the protected path is 1.535x faster and reduces the warm transport premium over direct from 78 to 40 cycles, removing 48.7% of that premium.
+- **Evidence:** exact source, accepted transcript, FST, ELF/NBF, disassembly, selected-PC stream, extractor, hashes, and machine-readable result in `logs/protected-rpc-hardware-20261013/`
+- **Meaning:** atomic register transport and hardware-held authorization remove a substantial fraction of the serialized raw-interface cost while enforcing the initial capability contract. The result is already far below RL-042's 287-cycle warm software reference, although that comparison is not workload matched.
+- **Limits:** the 71-cycle repeat includes a 22-cycle recovery through a server-side backward branch. Replacing unreachable post-`preturn` code with NOPs and a self-loop proves that a stale `0x200ac` frontend stream can survive into the second entry and hang. Commit reset, commit-gated launch, metadata bypass, and PC-only filtering experiments were rejected or removed; a correct repair needs a redirect epoch or purge acknowledgment spanning I-cache responses, realignment, and the FE-to-BE queue. The legacy unsafe CSR interfaces also remain enabled, endpoints must be resident, nesting/revocation/interrupt behavior is not implemented, and routed/physical acceptance remains pending.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

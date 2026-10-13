@@ -62,6 +62,7 @@ SMOKE_TESTS := \
 CORRECTNESS_TESTS := \
     mt_machine_trap_test \
     mt_protected_rpc_reference_test \
+    mt_protected_rpc_hardware_test \
     mt_opensbi_csr_probe_test \
     mt_satp_asid_warl_test \
     mt_cache_miss_trace_test \
@@ -188,6 +189,7 @@ check-ten-logical-config:
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_rpc_context_transport_benchmark: check-nonresident-config
+run-mt_protected_rpc_hardware_test: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
 run-mt_context_csr_rebind_test: check-nonresident-config
 run-mt_resident_relaunch_register_test: check-nonresident-config
