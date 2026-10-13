@@ -4,7 +4,7 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 The working tree contains a repaired resident hardware-protected RPC checkpoint. CSR `0x808` performs an M-authorized fixed-entry call with atomic `a0`--`a3` transfer, and CSR `0x809` returns through a hardware-held continuation with atomic `a0` transfer. Protected-call commit also rebinds the target resident/logical NPC and inactive CSR-bank APC to the authorized entry, so ITLB/I-cache replay cannot resume the stale post-return PC. The adversarial two-domain Sv39 test rejects a U-mode descriptor overwrite, leaves a fatal self-loop after `preturn`, and measures 220/31 cycles for direct service versus 90/66 for protected RPC. The trace has zero dispatches at the unreachable `0x200ac` and `0x200cc` PCs. Exact repair evidence is under `logs/protected-rpc-hardware-fixed-20261013/`; the earlier recovery-based checkpoint remains under `logs/protected-rpc-hardware-20261013/`.
 
-This checkpoint is undergoing routed timing validation with
+This checkpoint is undergoing a second routed timing validation with
 `e_bp_unicore_zynqparrot_prefetch5_cfg`, the same configuration as the accepted
 context-switch image and RPC NBFs. Two earlier timing-clean routes used the
 stock `e_bp_unicore_zynqparrot_cfg`; their board timeouts and k2 failure are
@@ -13,7 +13,18 @@ switch/seed CSRs remain enabled, protected endpoints are resident-only, and
 nesting, revocation, interrupts, multi-capability policy, and Linux integration
 remain outside the prototype.
 
-The active development branch pins BlackParrot `30479f1a2`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock.
+The first matched prefetch5 route proved the raw control after correcting its
+four-context CSR `0x802` headers for the routed ten-context field width: direct
+service measured 174/31 cycles and raw RPC 163/109. Protected `pcall` reached
+the server but captured stale `a2/a3` values from the synchronous wide BRAM
+tap; `preturn` correctly returned the resulting `0xef2c`. An eight-NOP physical
+settling control passed at 80/72 cycles. BlackParrot `683cc87d1` replaces that
+ambiguous tap for `a0`--`a3` with a 512-bit two-slot write-through shadow and
+passes clean traced four- and ten-context simulation at the unchanged 90/66
+cycles. Exact job `20261013T181619Z-2e0ce866-prefetch5-direct-worker` is routing
+top `2e0ce866` for physical acceptance.
+
+The active development branch pins BlackParrot `683cc87d1`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock.
 
 The exact routed top `9990e673b0b3ec4194eb62494f3d1bdd6b06a201` / BlackParrot `30479f1a2c5e5c88aed71f1e79c6efe26ffcec85` image meets WNS/WHS `+0.150/+0.035 ns` with 50,099 LUTs, 27,995 registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is `b6b04c3bb3bba44ffb47d7e949488c0df39534e9ccd7f10b86edbd830f879aba`; bitstream SHA-256 is `347d328124b419afd3586d5c3f8251eed5b41e8f46c750b4ced5addc3c302e3a`. The formerly failing exact k10 image passes twice at 72,038/72,042 cycles after fresh overlays, and exact k2 passes at 20,547 cycles, matching simulation. The earlier top `65f30750` / BlackParrot `6c79a4210` commit-cycle pulse remains rejected.
 
