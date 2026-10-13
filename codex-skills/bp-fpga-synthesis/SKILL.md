@@ -36,6 +36,11 @@ acceptable timing as the fit gate; elaboration or synthesis alone is not enough.
    resident slots and four architectural contexts. The nonblocking-prefetch
    candidate uses static `CFG=e_bp_unicore_zynqparrot_prefetch_cfg`: the same
    context counts, two L2 banks with 16 sets each, and 50-bit branch metadata.
+   The accepted detached-prefetch/context-switch experiments use
+   `CFG=e_bp_unicore_zynqparrot_prefetch5_cfg`; select it explicitly for their
+   NBFs. Before a physical control run, compare the candidate route's recorded
+   `cfg=` value with the accepted route that produced the control result. A
+   timing-clean stock-config route is not a valid control for a prefetch5 NBF.
    Require routed fit and board acceptance before deployment; consult
    [CURRENT_CHECKOUT.md](../../CURRENT_CHECKOUT.md) for current status and identities.
    Do not use the dynamic `e_bp_custom_cfg` FPGA path: its macro expansion can
