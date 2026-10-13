@@ -403,12 +403,22 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 
 ### RL-043 — A pending interlock holds exactly the first issue-ready target cycle
 
-- **Status:** accepted clean traced simulation checkpoint; routing and physical acceptance pending
+- **Status:** accepted routed and physical FPGA repair
 - **Scope:** BlackParrot `30479f1a2`, which latches a committed switch across the empty redirect gap and consumes the latch only when the first target queue head would otherwise issue
 - **Claim:** the nonresident U-mode handoff and 1,280-node ten- and two-stream tests reach their specific guest markers plus guest/host PASS. The nonresident trace has two switches and exactly two issue-ready interlock edges. The ten-stream trace has 1,340 switches and 1,340 such edges; its measured interval rises from 23,972 to 25,264 cycles, exactly one cycle for each of 1,292 timed handoffs. The byte-identical archived k2 NBF rises from 19,258 to 20,547 simulator cycles, 1,289 cycles or 6.69%, while retaining 2.924x speedup over the 60,077-cycle demand baseline.
-- **Evidence:** source identity, waveform counts, exact-NBF transcript, hashes, and machine-readable results in `logs/context-switch-drain-interlock-20261007/rtl-interlock-20261012/pending-interlock-20261013/`
+- **Physical result:** top `9990e673` / BlackParrot `30479f1a2` routes with WNS/WHS `+0.150/+0.035 ns`, 50,099 LUTs, 27,995 registers, 85.5 BRAM tiles, and 11 DSPs. On the exact bitstream SHA `347d3281...2e3a`, the formerly failing original k10 NBF passes twice at 72,038/72,042 cycles after fresh overlays. The byte-identical k2 control passes at 20,547 cycles, exactly matching corrected simulation.
+- **Evidence:** source identity, waveform counts, exact-NBF transcripts, route/package hashes, and machine-readable results in `logs/context-switch-drain-interlock-20261007/rtl-interlock-20261012/pending-interlock-20261013/`; route job `logs/fpga/20261013T071833Z-9990e673-direct-worker/`
 - **Meaning:** the hardware now implements the occupied target-boundary delay physically bounded by RL-039. Unlike the rejected commit-cycle pulse, it cannot be hidden inside the empty frontend redirect gap. Its cost is consequently close to the explicit software bubble and is deterministic at one issue opportunity per switch.
-- **Limits:** simulation does not reproduce the corruption. A fresh routed image must pass the exact original ten-stream NBF twice and the k2 timing control before this becomes the accepted FPGA repair.
+- **Limits:** the simulator still does not reproduce the physical corruption, so the interlock is a physically validated conservative repair rather than an internally observed corruption mechanism. Its deterministic one-cycle-per-handoff cost remains.
+
+### RL-044 — Existing unprotected two-context RPC costs 109 cycles warm versus 31 direct
+
+- **Status:** accepted clean traced simulator transport bound; protected hardware path not implemented
+- **Scope:** two resident U-mode contexts with distinct Sv39 roots/ASIDs and private pages, one explicit shared page, four integer arguments, one result, and the existing CSR `0x802` register-seed plus CSR `0x800` switch interface
+- **Claim:** same-address timed helpers measure 224/31 cycles for first/warm matched direct service and 179/109 cycles for first/warm raw context RPC. The meaningful warm transport premium is 78 cycles. The raw waveform partitions 109 cycles into 53 from timer read through four argument writes and call-switch dispatch, 6 for the call handoff, 44 from parked-server resume through result seed and return-switch dispatch, and 6 for the return handoff. Both domains retain their private values and two distinct argument tuples return the expected results.
+- **Evidence:** test/harness source, accepted transcript, disassembly, complete selected-PC dispatch stream, boundary summary, FST/ELF/NBF hashes, and machine-readable result in `logs/rpc-context-transport-20261013/`
+- **Meaning:** the 287-cycle warm software-protected reference is not a switch-mechanism floor. Most avoidable raw cost is four separately serialized argument writes and a separate result write. An atomic `pcall`/`preturn` using the existing switch machinery has a measured first target around 45--50 warm cycles, subject to RTL validation.
+- **Limits:** the raw interface is intentionally unsafe: the caller chooses target registers and execution state. The 45--50-cycle figure is a design estimate from measured boundaries, not a protected-hardware result.
 
 ## Superseded or rejected findings
 

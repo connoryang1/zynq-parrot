@@ -90,6 +90,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_rpc_context_transport_benchmark \
     mt_dependent_stream_benchmark \
     mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
@@ -186,6 +187,7 @@ check-ten-logical-config:
 	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
+run-mt_rpc_context_transport_benchmark: check-nonresident-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
 run-mt_context_csr_rebind_test: check-nonresident-config
 run-mt_resident_relaunch_register_test: check-nonresident-config

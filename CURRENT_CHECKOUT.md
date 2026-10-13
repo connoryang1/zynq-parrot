@@ -2,7 +2,9 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 ## Current boundary-interlock checkpoint
 
-The active development branch now pins BlackParrot `30479f1a2`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock. A replacement routed build and exact physical ten-stream acceptance are still required; the prior routed top `65f30750` / BlackParrot `6c79a4210` image is explicitly rejected because its commit-cycle pulse expired before target dispatch and the original physical failure remained.
+The active development branch pins BlackParrot `30479f1a2`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock.
+
+The exact routed top `9990e673b0b3ec4194eb62494f3d1bdd6b06a201` / BlackParrot `30479f1a2c5e5c88aed71f1e79c6efe26ffcec85` image meets WNS/WHS `+0.150/+0.035 ns` with 50,099 LUTs, 27,995 registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is `b6b04c3bb3bba44ffb47d7e949488c0df39534e9ccd7f10b86edbd830f879aba`; bitstream SHA-256 is `347d328124b419afd3586d5c3f8251eed5b41e8f46c750b4ced5addc3c302e3a`. The formerly failing exact k10 image passes twice at 72,038/72,042 cycles after fresh overlays, and exact k2 passes at 20,547 cycles, matching simulation. The earlier top `65f30750` / BlackParrot `6c79a4210` commit-cycle pulse remains rejected.
 
 ## Current same-boot process-rebind endpoint
 
