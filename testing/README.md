@@ -33,6 +33,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | --- | --- |
 | `mt_machine_trap_test` | Cold M-mode ECALL records `mcause`/`mepc`, redirects through `mtvec`, and returns through `mret` before any context handoff |
 | `mt_protected_rpc_reference_test` | Software `pcall`/`preturn` reference: capability validation, fixed entry, distinct Sv39 domains, protected continuation, four arguments, one result, and full call/reply timing |
+| `mt_rpc_context_transport_benchmark` | Unprotected transport upper bound: two resident U-mode Sv39 domains exchange four arguments and one result through remote register seeds and a context-switch round trip, compared with matched direct calls |
 | `mt_opensbi_csr_probe_test` | Early OpenSBI PMP, absent HPM, and optional privileged CSR probes are legal hardwired-zero WARL state |
 | `mt_ctxtsw_smoke_test` | Resident 0→1→0 handoff |
 | `mt_ctxtsw_logical_csr_readback_test` | Committed logical ID and side-effect-free reads of CSR `0x800` |
