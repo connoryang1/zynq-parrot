@@ -17,6 +17,47 @@ The current project implements a subset: cooperative contexts sharing one
 pipeline, with inactive integer state in private SRAM. The paper's broader
 permission, lifecycle, and notification interface remains separate work.
 
+## Protected local RPC extension
+
+The next paper extension tests whether the same handoff machinery can remove
+the usual performance penalty for isolating a frequently called library or
+service in a separate address space. A caller uses a hardware-authorized
+`pcall` to enter one fixed server entry with four register arguments; the
+server uses `preturn` to return one register result through a continuation that
+userspace cannot forge. The server's private mappings must remain inaccessible
+to the caller, and the caller must not be able to select an internal server PC.
+
+The work is staged so each result supports a distinct claim:
+
+1. The bare-metal primitive must pass on the routed FPGA with two independent
+   Sv39 roots, distinct private pages, an explicit shared page, invalid-call
+   rejection, fixed entry, protected return, and two different argument sets.
+   Matched direct and unsafe raw-context calls remain the timing controls.
+2. Linux registers a caller/server pair through a privileged path. Because the
+   current capability descriptor is M-mode-only, the smallest integration is a
+   Linux syscall or experimental driver calling a BlackParrot SBI extension.
+   OpenSBI installs the fixed descriptor and initializes the parked server
+   context with the server process's SATP, ASID, U-mode entry, and stack. Linux
+   must keep that server task out of its ordinary runnable set while the
+   hardware context owns it, and must revoke the binding before either address
+   space is destroyed or remapped.
+3. The end-to-end workload compares the same service body as an in-process
+   function, protected hardware RPC, and ordinary local IPC. Initial controls
+   should include a pipe or Unix-domain socket round trip and a minimal shared
+   memory/event notification path. Report warm median and tail cycles, useful
+   service cycles, first-call cost, and calls per second; do not use the
+   bare-metal transition interval as the Linux end-to-end result.
+4. Security checks deliberately try an invalid capability, a caller-selected
+   server PC, a forged return, and direct reads of server-private data. Process
+   exit, signal, page fault, preemption, and descriptor revocation must either
+   work or fail closed before claiming a general Linux facility.
+
+The first useful paper claim is narrower than a microkernel: one pinned local
+caller/server pair can cross real page-table protection with latency near a
+small function call and far below conventional local IPC. General scheduling,
+multiple clients, nested calls, interruption, and capability delegation are
+follow-on work rather than prerequisites for that measurement.
+
 ## Linux scheduling decomposition and hardware groups
 
 The October 3 physical measurements separate three costs that must not be
