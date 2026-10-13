@@ -1,5 +1,9 @@
 This file identifies the accepted BlackParrot context-switch and prefetch sources and their verified FPGA image. It records reproducible checks, remaining production limits, and historical artifact identities.
 
+## Current boundary-interlock checkpoint
+
+The active development branch now pins BlackParrot `30479f1a2`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock. A replacement routed build and exact physical ten-stream acceptance are still required; the prior routed top `65f30750` / BlackParrot `6c79a4210` image is explicitly rejected because its commit-cycle pulse expired before target dispatch and the original physical failure remained.
+
 ## Current same-boot process-rebind endpoint
 
 Top commit `b7cf9953c6e5f2134536c3c0ecf0e8ee19bee573` pins BlackParrot

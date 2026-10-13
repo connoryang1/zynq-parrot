@@ -382,14 +382,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** an interlock conditioned only on in-flight AXI/prefetch transport would not activate around contexts 0–2 in this schedule. Context 2 is neither the first ordinary miss nor latency-distinct, so a generic first-demand-miss condition is also broad and non-discriminating. Retained side-buffer state covers the boundary but is only moderately selective: it would avoid 10/48 traced bubbles, about 20.8% of unconditional overhead if cost scales directly. A narrower request/context transition remains preferable if the physical placement matrix shows that a bubble repairs the failure.
 - **Limits:** the simulator preserves the stack line and may not reproduce physical response timing. This excludes candidate conditions in the traced schedule; it does not prove the FPGA's corrupting signal.
 
-### RL-041 — The hardware boundary interlock is active and free in the exact k2 simulation
+### RL-041 — The commit-cycle boundary pulse expired before target dispatch
 
-- **Status:** accepted simulation checkpoint; routed and physical acceptance pending
+- **Status:** rejected by exact physical acceptance
 - **Scope:** BlackParrot `6c79a4210`, which blocks backend issue for the one cycle after every committed context switch while allowing the frontend issue queue to fill
 - **Claim:** the clean traced nonresident U-mode handoff and the 1,280-node two- and ten-stream hardware-context workloads pass. The retained k2 waveform contains 1,292 committed switch pulses and 1,292 settle pulses after reset, proving the interlock activates for every switch in the complete run. The issue queue is empty in every protected cycle. The archived byte-identical k2 NBF still measures exactly 19,258 cycles before and after the RTL change, so its one-cycle temporal separation is fully overlapped by the existing frontend gap; unlike the software NOP, it does not inherently add one retired cycle per handoff.
 - **Evidence:** commands, exact identities, retained transcripts, waveform extractor, pulse counts, and machine-readable results in `logs/context-switch-drain-interlock-20261007/rtl-interlock-20261012/`
-- **Meaning:** the smallest measured-bound implementation is a one-bit scheduler interlock rather than a permanent software bubble. It supplies the causal switch-adjacent separation while preserving the exact k2 simulator runtime.
-- **Limits:** the simulator did not reproduce the original physical corruption. Only routing followed by the exact failing ten-stream board control can establish that the RTL interlock repairs the FPGA failure; timing and area are also unmeasured until that route completes.
+- **Physical result:** the routed image at top `65f30750` / BlackParrot `6c79a4210` meets timing at WNS/WHS `+0.431/+0.025 ns`. On fresh overlays, the exact original ten-stream NBF again produces `CORE FAIL` twice, while the exact k2 control passes at the unchanged 19,262 physical cycles. The implementation is therefore physically rejected without evidence of a generally bad image.
+- **Meaning:** the simulation's zero cost was the defect. The pulse asserted only during the already empty redirect gap and cleared before the first target queue head arrived, so it never changed occupied pipeline sequencing and did not supply the executed cycle demonstrated by RL-039.
+- **Evidence:** routed artifacts in `logs/fpga/20261012T162001Z-65f30750-direct-worker/` and hash-pinned physical transcripts in `logs/context-switch-drain-interlock-20261007/rtl-interlock-20261012/physical-board-r1/`
 
 ### RL-042 — The protected-RPC software contract costs 287 cycles warm versus 76 for a function call
 
@@ -399,6 +400,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Evidence:** source/harness gate, accepted logs, disassembly, FST extractor, dispatch timeline, hashes, and machine-readable result in `logs/protected-rpc-reference-20261012/`
 - **Meaning:** the first hardware opportunity is now measured rather than estimated. Removing the two software monitor streams addresses 192 of the 211 cycles separating the repeated protected path from the matched function call; accelerating the protected transition can plausibly approach tens of cycles without changing application semantics.
 - **Limits:** this is a bare-metal M-mode reference with one immutable capability and no interrupts or nested calls. It does not yet prove Linux integration, revocation, multi-client scheduling, or a hardware `pcall`/`preturn` implementation.
+
+### RL-043 — A pending interlock holds exactly the first issue-ready target cycle
+
+- **Status:** accepted clean traced simulation checkpoint; routing and physical acceptance pending
+- **Scope:** BlackParrot `30479f1a2`, which latches a committed switch across the empty redirect gap and consumes the latch only when the first target queue head would otherwise issue
+- **Claim:** the nonresident U-mode handoff and 1,280-node ten- and two-stream tests reach their specific guest markers plus guest/host PASS. The nonresident trace has two switches and exactly two issue-ready interlock edges. The ten-stream trace has 1,340 switches and 1,340 such edges; its measured interval rises from 23,972 to 25,264 cycles, exactly one cycle for each of 1,292 timed handoffs. The byte-identical archived k2 NBF rises from 19,258 to 20,547 simulator cycles, 1,289 cycles or 6.69%, while retaining 2.924x speedup over the 60,077-cycle demand baseline.
+- **Evidence:** source identity, waveform counts, exact-NBF transcript, hashes, and machine-readable results in `logs/context-switch-drain-interlock-20261007/rtl-interlock-20261012/pending-interlock-20261013/`
+- **Meaning:** the hardware now implements the occupied target-boundary delay physically bounded by RL-039. Unlike the rejected commit-cycle pulse, it cannot be hidden inside the empty frontend redirect gap. Its cost is consequently close to the explicit software bubble and is deterministic at one issue opportunity per switch.
+- **Limits:** simulation does not reproduce the corruption. A fresh routed image must pass the exact original ten-stream NBF twice and the k2 timing control before this becomes the accepted FPGA repair.
 
 ## Superseded or rejected findings
 

@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-13",
+  "tested_top_commit": "65f30750705c94aba27125ba764c0aa3cc4ddc98",
+  "tested_black_parrot_commit": "6c79a42107a3857e63b6f47bc2468fe4599c5bff",
+  "package_sha256": "3cd8592cbfd53baa9824c720e8a71fe0668ca0f176a0d0498a998e62194d71b9",
+  "bitstream_sha256": "8f703740dd235940ed09f15bf13e33032b7a54ceb79d2ade5a880c169b91cc13",
+  "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "fresh_overlay_before_every_run": true,
+  "runs": [
+    {
+      "label": "original-k10-a",
+      "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+      "guest_result": "CORE FAIL",
+      "log": "00-original-k10-a.log",
+      "log_sha256": "198e32eeb5c60f139984a6fd83659b3f8c14ce8acfa332259bf26aff1641fccb"
+    },
+    {
+      "label": "original-k10-b",
+      "nbf_sha256": "cfa9ededb6cc73c65acb0d7b5cc61100031e08908237db5af0c9c44f912cc7df",
+      "guest_result": "CORE FAIL",
+      "log": "01-original-k10-b.log",
+      "log_sha256": "f9227d222c76c877dd84cb5f760ea25add86b93100341d352458369b44513641"
+    },
+    {
+      "label": "original-k2",
+      "nbf_sha256": "92b0bdbe635486053a23ca9fc86074678a8f28b11e07626d43a23a11af6a5b0c",
+      "guest_result": "CORE PASS",
+      "cycles": 19262,
+      "log": "02-original-k2.log",
+      "log_sha256": "4067ad025743bbb18a1530e38ecd3a7179ee0e1c7eaa53eae4adf2e267de2dda"
+    }
+  ],
+  "conclusion": "The commit-cycle pulse expired during the empty redirect gap, so it did not delay the first target dispatch. The image is otherwise healthy: exact k2 behavior and timing match the prior board result."
+}
