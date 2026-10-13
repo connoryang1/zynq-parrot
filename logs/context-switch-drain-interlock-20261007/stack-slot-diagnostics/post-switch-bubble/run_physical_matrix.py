@@ -103,20 +103,43 @@ def upload(path, expected):
 
 
 def classify(text, returncode):
-    if re.search(r"\bBSG PASS\b|\[BSG-PASS\]", text):
-        return "pass"
     if re.search(r"BSG-FAIL|\bBSG FAIL\b|CORE(?:\[0\])? FAIL", text, re.I):
         return "fail"
     if returncode == 124 or re.search(r"runtime limit|timed out|timeout", text, re.I):
         return "timeout"
+    # The control program prints BSG PASS when it exits cleanly even if the
+    # guest reported CORE FAIL. Require both guest and host success, and only
+    # evaluate this after all guest failure markers above.
+    if (re.search(r"CORE(?:\[\d+\])?\s+PASS", text)
+            and re.search(r"\bBSG PASS\b", text)):
+        return "pass"
     return "unknown"
+
+
+def self_test_classify():
+    cases = (
+        ("INFO: CORE FAIL\nINFO: BSG PASS\n", 0, "fail"),
+        ("[BSG-PASS] workload\nINFO: CORE PASS\nINFO: BSG PASS\n", 0, "pass"),
+        ("INFO: BSG PASS\n", 0, "unknown"),
+        ("INFO: target runtime limit reached\n", 124, "timeout"),
+    )
+    for text, returncode, expected in cases:
+        actual = classify(text, returncode)
+        if actual != expected:
+            raise AssertionError(f"classify returned {actual}, expected {expected}: {text!r}")
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=Path, nargs="?")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
+
+    if args.self_test:
+        self_test_classify()
+        print("classification self-test passed")
+        return
 
     local = {}
     for label, (path, expected) in IMAGES.items():
