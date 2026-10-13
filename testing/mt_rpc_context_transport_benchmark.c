@@ -9,8 +9,28 @@
 
 #include "bp_utils.h"
 
-#if BP_NUM_THREADS != 2 || BP_NUM_CONTEXTS != 4
-#error "The RPC transport control requires two resident slots and four logical contexts"
+#if BP_NUM_THREADS != 2 || (BP_NUM_CONTEXTS != 4 && BP_NUM_CONTEXTS != 10)
+#error "The RPC transport control requires two resident slots and four or ten logical contexts"
+#endif
+
+#define STRINGIFY_IMPL(x) #x
+#define STRINGIFY(x) STRINGIFY_IMPL(x)
+
+/* CSR 0x802 packs the register number above the configuration-dependent
+ * context-id field. Keep the simulator's four-context encoding and the
+ * prefetch5 FPGA's ten-context encoding explicit. */
+#if BP_NUM_CONTEXTS == 4
+#define RPUSH_A0_HEADER 0x148000000000
+#define RPUSH_A1_HEADER 0x168000000000
+#define RPUSH_A2_HEADER 0x188000000000
+#define RPUSH_A3_HEADER 0x1a8000000000
+#define RPUSH_RESULT_HEADER 0x140000000000
+#else
+#define RPUSH_A0_HEADER 0x508000000000
+#define RPUSH_A1_HEADER 0x588000000000
+#define RPUSH_A2_HEADER 0x608000000000
+#define RPUSH_A3_HEADER 0x688000000000
+#define RPUSH_RESULT_HEADER 0x500000000000
 #endif
 
 #define MSTATUS_MPP_MASK (UINT64_C(3) << 11)
@@ -89,8 +109,10 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "bne t1, t2, 7f\n"
 
     /* Precompute the remote-register headers outside every timed interval. */
-    "li s2, 0x148000000000\nli s3, 0x168000000000\n"
-    "li s4, 0x188000000000\nli s5, 0x1a8000000000\n"
+    "li s2, " STRINGIFY(RPUSH_A0_HEADER) "\n"
+    "li s3, " STRINGIFY(RPUSH_A1_HEADER) "\n"
+    "li s4, " STRINGIFY(RPUSH_A2_HEADER) "\n"
+    "li s5, " STRINGIFY(RPUSH_A3_HEADER) "\n"
 
     /* Call the same timed direct helper twice so the repeat is truly warm. */
     "li a0, 7\nli a1, 9\nli a2, 0x123\nli a3, 0x456\n"
@@ -127,7 +149,8 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "5: li t1, 0x105\nsd t1, 24(t0)\nj 8f\n"
     "6: li t1, 0x106\nsd t1, 24(t0)\nj 8f\n"
     "7: li t0, 0x50000\nli t1, 0x107\nsd t1, 24(t0)\n"
-    "8: ecall\n9: j 9b\n"
+    /* Context 2 is preseeded as an untimed M-mode reporting context. */
+    "8: csrwi 0x800, 2\n9: j 9b\n"
 
     /* Timed helpers use s7 as their caller link; the direct helper uses s6
      * for its internal service link so no stack traffic distorts the match. */
@@ -172,7 +195,8 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     "add a0, a0, a1\nadd a0, a0, a2\nadd a0, a0, a3\nadd a0, a0, t1\n"
     "li t1, 0x5555666677778888\nsd t1, 16(t0)\n"
     /* Seed only the result register in the inactive caller context. */
-    "li t2, 0x140000000000\nor t2, t2, a0\ncsrw 0x802, t2\n"
+    "li t2, " STRINGIFY(RPUSH_RESULT_HEADER) "\n"
+    "or t2, t2, a0\ncsrw 0x802, t2\n"
     "csrwi 0x800, 0\nj 1b\n"
     ".option pop\n"
   );
@@ -226,6 +250,14 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   bp_finish(1);
   for (;;)
     ;
+}
+
+static void __attribute__((naked, noinline, used, noreturn)) machine_finish_bootstrap(void)
+{
+  __asm__ volatile(
+    "la t0, monitor_sp\nld sp, 0(t0)\n"
+    "la t0, machine_finish\njalr zero, 0(t0)\n"
+  );
 }
 
 static void __attribute__((naked, aligned(4))) machine_trap_entry(void)
@@ -288,6 +320,9 @@ int main(void)
     const uint64_t server_bootstrap_seed =
       (UINT64_C(1) << 39) | physical_address(server_machine_bootstrap);
     __asm__ volatile("csrw 0x801, %0" : : "r"(server_bootstrap_seed) : "memory");
+    const uint64_t finisher_seed =
+      (UINT64_C(2) << 39) | physical_address(machine_finish_bootstrap);
+    __asm__ volatile("csrw 0x801, %0" : : "r"(finisher_seed) : "memory");
   }
   __asm__ volatile("csrw satp, %0\nsfence.vma" : : "r"(caller_satp) : "memory");
   __asm__ volatile("csrw mepc, %0" : : "r"(CALLER_ENTRY_VA) : "memory");
