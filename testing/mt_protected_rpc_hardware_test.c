@@ -8,8 +8,8 @@
 
 #include "bp_utils.h"
 
-#if BP_NUM_THREADS != 2 || BP_NUM_CONTEXTS != 4
-#error "The RPC transport control requires two resident slots and four logical contexts"
+#if BP_NUM_THREADS != 2 || (BP_NUM_CONTEXTS != 4 && BP_NUM_CONTEXTS != 10)
+#error "The protected RPC test requires two resident slots and four or ten logical contexts"
 #endif
 
 #define MSTATUS_MPP_MASK (UINT64_C(3) << 11)
@@ -134,7 +134,8 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "5: li t1, 0x105\nsd t1, 24(t0)\nj 8f\n"
     "6: li t1, 0x106\nsd t1, 24(t0)\nj 8f\n"
     "7: li t0, 0x50000\nli t1, 0x107\nsd t1, 24(t0)\n"
-    "8: ecall\n9: j 9b\n"
+    /* Context 2 is preseeded as an untimed M-mode reporting context. */
+    "8: csrwi 0x800, 2\n9: j 9b\n"
 
     /* Timed helpers use s7 as their caller link; the direct helper uses s6
      * for its internal service link so no stack traffic distorts the match. */
@@ -234,6 +235,14 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
     ;
 }
 
+static void __attribute__((naked, noinline, used, noreturn)) machine_finish_bootstrap(void)
+{
+  __asm__ volatile(
+    "la t0, monitor_sp\nld sp, 0(t0)\n"
+    "la t0, machine_finish\njalr zero, 0(t0)\n"
+  );
+}
+
 static void __attribute__((naked, aligned(4))) machine_trap_entry(void)
 {
   __asm__ volatile(
@@ -300,6 +309,9 @@ int main(void)
       (UINT64_C(1) << 39) | physical_address(server_machine_bootstrap);
     __asm__ volatile("csrw 0x801, %0" : : "r"(rpc_descriptor_seed) : "memory");
     __asm__ volatile("csrw 0x801, %0" : : "r"(server_bootstrap_seed) : "memory");
+    const uint64_t finisher_seed =
+      (UINT64_C(2) << 39) | physical_address(machine_finish_bootstrap);
+    __asm__ volatile("csrw 0x801, %0" : : "r"(finisher_seed) : "memory");
   }
   __asm__ volatile("csrw satp, %0\nsfence.vma" : : "r"(caller_satp) : "memory");
   __asm__ volatile("csrw mepc, %0" : : "r"(CALLER_ENTRY_VA) : "memory");

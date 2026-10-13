@@ -186,10 +186,17 @@ check-ten-logical-config:
 	@if (( $(BENCH_MODE) < 0 || $(BENCH_MODE) > 3 )); then \
 		echo "ERROR: ten-logical-context benchmarks BENCH_MODE must be in [0,3]"; exit 1; \
 	fi
+
+.PHONY: check-rpc-config
+check-rpc-config:
+	@if (( $(NUM_THREADS) != 2 || ($(NUM_CONTEXTS) != 4 && $(NUM_CONTEXTS) != 10) )); then \
+		echo "ERROR: RPC tests require NUM_THREADS=2 and NUM_CONTEXTS=4 or 10"; \
+		exit 1; \
+	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
-run-mt_rpc_context_transport_benchmark: check-nonresident-config
-run-mt_protected_rpc_hardware_test: check-nonresident-config
+run-mt_rpc_context_transport_benchmark: check-rpc-config
+run-mt_protected_rpc_hardware_test: check-rpc-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
 run-mt_context_csr_rebind_test: check-nonresident-config
 run-mt_resident_relaunch_register_test: check-nonresident-config
