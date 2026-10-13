@@ -1,0 +1,51 @@
+{
+  "status": "accepted_repeat_entry_repair_simulation",
+  "configuration": {
+    "threads": 2,
+    "contexts": 4,
+    "trace": true,
+    "caller_virtual_context": 0,
+    "server_virtual_context": 1,
+    "capability": 1,
+    "post_preturn_code": "eight NOPs followed by a fatal self-loop"
+  },
+  "cycles": {
+    "direct_first": 220,
+    "direct_repeat": 31,
+    "protected_first": 90,
+    "protected_repeat": 66,
+    "raw_repeat_reference_rl044": 109
+  },
+  "derived": {
+    "protected_vs_raw_repeat_speedup": 1.6515151515,
+    "raw_repeat_overhead_over_direct": 78,
+    "protected_repeat_overhead_over_direct": 35,
+    "raw_transport_overhead_removed_fraction": 0.5512820513
+  },
+  "root_cause": {
+    "stale_pc": "0x200ac",
+    "mechanism": "A fixed-entry call redirected the frontend but did not rebind the resident target context NPC and per-thread CSR APC. A legitimate target-entry miss replayed through the stale APC.",
+    "repair": "On protected-call commit, rebind the target resident/logical NPC and remotely write the inactive target CSR bank APC to the capability entry."
+  },
+  "checks": {
+    "invalid_capability_retires_locally": true,
+    "invalid_return_retires_locally": true,
+    "user_descriptor_overwrite_rejected": true,
+    "fixed_server_entry_observed": true,
+    "four_arguments_transferred": true,
+    "one_result_transferred": true,
+    "private_address_spaces_preserved": true,
+    "post_preturn_0x200ac_dispatch_count": 0,
+    "fatal_loop_0x200cc_dispatch_count": 0,
+    "raw_transport_regression_exact": true,
+    "harness_tests_passed": 15,
+    "guest_pass": true,
+    "host_pass": true
+  },
+  "pending": [
+    "routed timing and utilization",
+    "FPGA execution",
+    "multi-capability and nonresident endpoints",
+    "nesting, revocation, interrupts, and Linux integration"
+  ]
+}
