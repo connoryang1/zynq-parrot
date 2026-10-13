@@ -177,7 +177,9 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     "li t1, 0x5555666677778888\nsd t1, 16(t0)\n"
     /* Hardware copies a0 and consumes the protected continuation. */
     "csrw 0x809, a0\n"
-    "j 1b\n"
+    /* Sequential instructions are unreachable architecturally. A self-loop
+     * makes any stale post-return frontend packet fail instead of recovering. */
+    ".rept 8\nnop\n.endr\n2: j 2b\n"
     ".option pop\n"
   );
 }
