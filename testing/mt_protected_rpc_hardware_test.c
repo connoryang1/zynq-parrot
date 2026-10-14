@@ -46,6 +46,8 @@ static uint64_t server_stack[512] __attribute__((aligned(4096)));
 static uint64_t server_satp_value __attribute__((used));
 static uint64_t monitor_sp __attribute__((used));
 static volatile uint64_t unexpected_mcause;
+static volatile uint64_t unexpected_mepc;
+static volatile uint64_t unexpected_mtval;
 extern void server_service(void);
 
 static inline uint64_t physical_address(const void *ptr)
@@ -81,8 +83,7 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "li t1, 0x33\n"
     "sd t1, 0(t0)\n"
 
-    /* Context 1 was seeded from M/Bare before entering this U/Sv39 caller. */
-    "csrwi 0x800, 1\n"
+    /* Context 1 was initialized from M/Bare before entering this U/Sv39 caller. */
     "li t0, 0x50000\n"
     "ld t1, 64(t0)\n"
     "li t2, 1\n"
@@ -92,6 +93,14 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
      * the M-installed protected entry. Point the parked PC elsewhere, then
      * require both protected calls to enter server_service anyway. */
     "li t0, 0x4000008000020100\ncsrw 0x801, t0\n"
+    /* Descriptor installation locks the legacy U-mode handoff path. */
+    "csrwi 0x800, 1\ncsrr t0, 0x800\nbnez t0, 7f\n"
+    /* M-mode seeded nonzero cache-service and miss-trace state before the
+     * descriptor was installed. Locked U mode must observe only zero. */
+    "csrr t0, 0x803\nbnez t0, 7f\n"
+    "csrr t0, 0x804\nbnez t0, 7f\n"
+    "csrr t0, 0x805\nbnez t0, 7f\n"
+    "csrr t0, 0x807\nbnez t0, 7f\n"
     /* Invalid call and return operands must retire locally. */
     "li a4, 2\ncsrw 0x808, a4\n"
     "li a0, 0x55\ncsrw 0x809, a0\n"
@@ -134,8 +143,9 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "5: li t1, 0x105\nsd t1, 24(t0)\nj 8f\n"
     "6: li t1, 0x106\nsd t1, 24(t0)\nj 8f\n"
     "7: li t0, 0x50000\nli t1, 0x107\nsd t1, 24(t0)\n"
-    /* Context 2 is preseeded as an untimed M-mode reporting context. */
-    "8: csrwi 0x800, 2\n9: j 9b\n"
+    /* Report through the architectural U-to-M trap path.  The protected
+     * descriptor intentionally leaves no legacy U-mode switch available. */
+    "8: ecall\n9: j 9b\n"
 
     /* Timed helpers use s7 as their caller link; the direct helper uses s6
      * for its internal service link so no stack traffic distorts the match. */
@@ -229,18 +239,13 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   bp_hprint_uint64(server_private[0]);
   bp_print_string("\nunexpected mcause: ");
   bp_hprint_uint64(unexpected_mcause);
+  bp_print_string(" mepc/mtval: ");
+  bp_hprint_uint64(unexpected_mepc);
+  bp_hprint_uint64(unexpected_mtval);
   bp_print_string("\n");
   bp_finish(1);
   for (;;)
     ;
-}
-
-static void __attribute__((naked, noinline, used, noreturn)) machine_finish_bootstrap(void)
-{
-  __asm__ volatile(
-    "la t0, monitor_sp\nld sp, 0(t0)\n"
-    "la t0, machine_finish\njalr zero, 0(t0)\n"
-  );
 }
 
 static void __attribute__((naked, aligned(4))) machine_trap_entry(void)
@@ -252,6 +257,8 @@ static void __attribute__((naked, aligned(4))) machine_trap_entry(void)
     "la t0, monitor_sp\nld sp, 0(t0)\n"
     "la t0, machine_finish\ncsrw mepc, t0\nmret\n"
     "1: la t1, unexpected_mcause\nsd t0, 0(t1)\n"
+    "csrr t0, mepc\nla t1, unexpected_mepc\nsd t0, 0(t1)\n"
+    "csrr t0, mtval\nla t1, unexpected_mtval\nsd t0, 0(t1)\n"
     "csrr t0, mstatus\nli t1, 0x1800\nor t0, t0, t1\ncsrw mstatus, t0\n"
     "la t0, monitor_sp\nld sp, 0(t0)\n"
     "la t0, machine_finish\ncsrw mepc, t0\nmret\n"
@@ -292,26 +299,30 @@ int main(void)
   for (int i = 0; i < 9; ++i)
     shared_page[i] = 0;
   unexpected_mcause = 0;
+  unexpected_mepc = 0;
+  unexpected_mtval = 0;
   __asm__ volatile("mv %0, sp" : "=r"(monitor_sp));
 
   __asm__ volatile("csrw medeleg, zero\ncsrw mideleg, zero" ::: "memory");
   __asm__ volatile("csrw mtvec, %0" : : "r"((uint64_t)machine_trap_entry) : "memory");
-  /* CSR 0x801 snapshots the writer's privilege/translation state alongside
-   * the target NPC. Seed context 1 here in M/Bare so its bootstrap can install
-   * the server's independent U/Sv39 address space before the first RPC. */
+  /* Initialize context 1 before installing the descriptor. Its U-mode
+   * trampoline uses the still-unlocked legacy handoff to return here; the
+   * subsequent protected descriptor then locks that path for both domains. */
   {
     const uint64_t server_service_va =
       SERVER_ENTRY_VA + physical_address(server_service)
       - physical_address(server_entry);
-    const uint64_t rpc_descriptor_seed =
-      (UINT64_C(1) << 62) | (UINT64_C(1) << 39) | server_service_va;
     const uint64_t server_bootstrap_seed =
       (UINT64_C(1) << 39) | physical_address(server_machine_bootstrap);
-    __asm__ volatile("csrw 0x801, %0" : : "r"(rpc_descriptor_seed) : "memory");
     __asm__ volatile("csrw 0x801, %0" : : "r"(server_bootstrap_seed) : "memory");
-    const uint64_t finisher_seed =
-      (UINT64_C(2) << 39) | physical_address(machine_finish_bootstrap);
-    __asm__ volatile("csrw 0x801, %0" : : "r"(finisher_seed) : "memory");
+    __asm__ volatile("csrwi 0x800, 1" ::: "memory");
+    /* Seed observably nonzero legacy diagnostic state while M-mode access is
+     * still authorized. The caller verifies the post-install read lock. */
+    __asm__ volatile("li t0, 0x5a5a\ncsrw 0x803, t0\ncsrwi 0x805, 1"
+                     : : : "t0", "memory");
+    const uint64_t rpc_descriptor_seed =
+      (UINT64_C(1) << 62) | (UINT64_C(1) << 39) | server_service_va;
+    __asm__ volatile("csrw 0x801, %0" : : "r"(rpc_descriptor_seed) : "memory");
   }
   __asm__ volatile("csrw satp, %0\nsfence.vma" : : "r"(caller_satp) : "memory");
   __asm__ volatile("csrw mepc, %0" : : "r"(CALLER_ENTRY_VA) : "memory");

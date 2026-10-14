@@ -2,16 +2,20 @@ This file identifies the accepted BlackParrot context-switch and prefetch source
 
 ## Current boundary-interlock checkpoint
 
-The working tree contains a repaired resident hardware-protected RPC checkpoint. CSR `0x808` performs an M-authorized fixed-entry call with atomic `a0`--`a3` transfer, and CSR `0x809` returns through a hardware-held continuation with atomic `a0` transfer. Protected-call commit also rebinds the target resident/logical NPC and inactive CSR-bank APC to the authorized entry, so ITLB/I-cache replay cannot resume the stale post-return PC. The adversarial two-domain Sv39 test rejects a U-mode descriptor overwrite, leaves a fatal self-loop after `preturn`, and measures 220/31 cycles for direct service versus 90/66 for protected RPC. The trace has zero dispatches at the unreachable `0x200ac` and `0x200cc` PCs. Exact repair evidence is under `logs/protected-rpc-hardware-fixed-20261013/`; the earlier recovery-based checkpoint remains under `logs/protected-rpc-hardware-20261013/`.
+The working tree contains a privilege-boundary increment for the repaired resident hardware-protected RPC checkpoint. CSR `0x808` performs an M-authorized fixed-entry call with atomic `a0`--`a3` transfer, and CSR `0x809` returns through a hardware-held continuation with atomic `a0` transfer. Installing the protected descriptor now preserves an already bootstrapped target's U/Sv39 privilege, translation, and ASID metadata, then locks legacy context-switch, seed, cache-service, and miss-trace writes and diagnostic reads against U/S access while retaining M-mode setup access. The adversarial ten-context test seeds nonzero diagnostic state in M mode, observes zero in U mode, preserves distinct address spaces, and reaches guest/host PASS at 193/31 direct and 114/43 protected cycles; the unlocked smoke and exact 224/31 versus 179/109 raw regression also pass. Exact evidence is under `logs/protected-rpc-legacy-lock-20261014/`, with the preceding replay repair under `logs/protected-rpc-hardware-fixed-20261013/`.
 
-This checkpoint is undergoing a second routed timing validation with
+The operand-shadow checkpoint completed routed timing with
 `e_bp_unicore_zynqparrot_prefetch5_cfg`, the same configuration as the accepted
-context-switch image and RPC NBFs. Two earlier timing-clean routes used the
-stock `e_bp_unicore_zynqparrot_cfg`; their board timeouts and k2 failure are
-invalid cross-configuration results rather than RPC regressions. Legacy unsafe
-switch/seed CSRs remain enabled, protected endpoints are resident-only, and
-nesting, revocation, interrupts, multi-capability policy, and Linux integration
-remain outside the prototype.
+context-switch image and RPC NBFs. Exact top `2e0ce866` / BlackParrot
+`683cc87d1` meets WNS/WHS `+0.197/+0.023 ns` with 49,998 LUTs, 29,046
+registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is
+`075b6da4f83221e4d977096f746a980e61f7eebee46335542dfb27b7915b90e6` and
+bitstream SHA-256 is
+`7741071186afca6dee94d4cf8a91239b2040728a0b2a283ee8c518cc360360ae`.
+Physical operand-capture acceptance and a new route of the legacy-interface
+lock remain pending. Protected endpoints are resident-only, and nesting,
+revocation, interrupts, multi-capability policy, and Linux integration remain
+outside the prototype.
 
 The first matched prefetch5 route proved the raw control after correcting its
 four-context CSR `0x802` headers for the routed ten-context field width: direct
@@ -21,8 +25,8 @@ tap; `preturn` correctly returned the resulting `0xef2c`. An eight-NOP physical
 settling control passed at 80/72 cycles. BlackParrot `683cc87d1` replaces that
 ambiguous tap for `a0`--`a3` with a 512-bit two-slot write-through shadow and
 passes clean traced four- and ten-context simulation at the unchanged 90/66
-cycles. Exact job `20261013T181619Z-2e0ce866-prefetch5-direct-worker` is routing
-top `2e0ce866` for physical acceptance.
+cycles. Exact job `20261013T181619Z-2e0ce866-prefetch5-direct-worker` completed
+route and package verification; physical acceptance is next.
 
 The active development branch pins BlackParrot `683cc87d1`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock.
 
