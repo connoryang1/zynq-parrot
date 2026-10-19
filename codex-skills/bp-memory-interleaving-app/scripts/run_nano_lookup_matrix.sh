@@ -66,7 +66,7 @@ for mode in $modes; do
   fi
 
   measured_addr=$($toolchain/bin/riscv64-unknown-elf-nm -n "$elf" |
-    awk '$3 == "nano_measured_index" {print "0x" $1; exit}')
+    awk '$3 == "nano_measured_indexes" {print "0x" $1; exit}')
   case "$mode" in
     0) consume_symbol=nano_serial_consume_load ;;
     1|2) consume_symbol=nano_worker_consume_load ;;
