@@ -78,4 +78,4 @@ FPGA implementation is intentionally deferred. If simulation supports the worklo
 
 ## Pull request
 
-The branch is independent of protected RPC and is based on `review/protected-rpc-base`. Add the PR URL, exact base/head, benchmark table, accepted commands, and unresolved gates here immediately after the PR is opened, and keep the PR body synchronized with material benchmark changes.
+Draft [PR #6](https://github.com/connoryang1/zynq-parrot/pull/6) is independent of protected RPC. Its exact base is `review/protected-rpc-base` at `1f86c605e8c415ad69f284ebaf577977a2803598`; its head is `bench/nano-lookup-interleaving`, initially opened at `ffdd6ba96ed71fc9cebd0ab92dcfe25727069352`. Keep the benchmark table, accepted commands, trace results, and unresolved gates synchronized between this document and the PR body.
