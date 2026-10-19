@@ -2,7 +2,7 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
-- **Protected-RPC review history prepared — 2026-10-19:** reworded the recent top-level and BlackParrot RPC commits with contract, mechanism, validation, and limitation bodies while preserving byte-identical source trees; retained local pre-rewrite archive refs and mapped historical routed identities to their review equivalents. The proposed review split keeps the protected-RPC implementation and its asynchronous simulation tooling separate, while the future database/index benchmark remains outside both changes.
+- **Protected-RPC review history published — 2026-10-19:** reworded the recent top-level and BlackParrot RPC commits with contract, mechanism, validation, and limitation bodies while preserving byte-identical source trees; pushed recoverable pre-rewrite archive refs, a protected-RPC review branch, and a separate asynchronous-verification branch. Historical routed identities remain mapped to their review equivalents, while the future database/index benchmark stays outside both review scopes.
 
 - **Isolated background verification tooling — 2026-10-18:** added a low-priority detached simulation ladder with immutable worktrees, topology-specific model/program/trace storage, serialization, free-space and timeout guardrails, and retained revision/result manifests. Launcher control-plane tests and skill validation pass; no long simulation or FPGA job was needed to validate the launcher itself.
 
