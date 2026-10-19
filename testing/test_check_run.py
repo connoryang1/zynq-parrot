@@ -99,7 +99,8 @@ class HarnessTests(unittest.TestCase):
             env.pop(key, None)
         for mode, threads, contexts, slots, expected in (
                 (0, 2, 10, 10, True), (4, 2, 10, 10, True),
-                (5, 2, 10, 10, False), (2, 2, 4, 10, False),
+                (5, 2, 10, 10, True), (6, 2, 10, 10, False),
+                (2, 2, 4, 10, False),
                 (2, 2, 10, 9, False)):
             with self.subTest(mode=mode, threads=threads, contexts=contexts, slots=slots):
                 result = subprocess.run(

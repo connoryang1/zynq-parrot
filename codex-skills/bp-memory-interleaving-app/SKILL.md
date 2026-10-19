@@ -17,6 +17,7 @@ Use this workflow to determine whether hardware contexts expose useful independe
 Include the controls needed for the claim:
 
 - serial demand;
+- serial prefetch-then-load, to isolate the detached-hint transport path from context scheduling;
 - software state-machine or coroutine interleaving;
 - hardware worker `prefetch; switch; consume` scheduling;
 - matched ideal batching subject to the same request capacity and arbitration;
@@ -43,9 +44,11 @@ codex-skills/bp-memory-interleaving-app/scripts/launch_nano_lookup_matrix.sh \
 ```
 
 The launcher returns immediately. Its worker holds a simulator-directory lock,
-requires a clean worktree and local boot ROM, runs modes 0 through 4 serially,
+requires a clean worktree and local boot ROM, runs modes 0 through 5 serially,
 copies each closed waveform before the next mode, hashes the artifacts, and
-performs marker-scoped trace analysis. Run it only in an isolated worktree; do
+performs instruction-boundary-scoped trace analysis. Set `NANO_ANALYZE=0` to
+archive the simulation rows first and analyze their closed waveforms later.
+Run it only in an isolated worktree; do
 not edit that worktree or start an unwrapped simulator run while it is active.
 
 ## PR and evidence record

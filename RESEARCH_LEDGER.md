@@ -413,6 +413,10 @@ Ordinary associativity was not the complete explanation. Accepted evidence separ
 
 The predictor-bank provenance fix is correct RTL, but the exact failing placement still hung afterward. The translated resident-relaunch fix in RL-009 is the physically confirmed lifecycle root cause.
 
+### RS-006 — The first Nano-style lookup ratio mixes hint width with overlap
+
+The matched five-mode pilot passed serial demand (358,994 cycles), demand ring (361,980), worker prefetch (217,970), batch (187,721), and switch-only (4,746) at 200-cycle synthetic read latency, giving a nominal 1.66× worker/demand ratio and 16.1% worker/batch gap. Trace windows start with no outstanding traffic, but a detached hint fetches only 16 bytes while the 64-bit-key node's second branch link begins at byte 16. The worker and batch then cause 1,040 and 902 ordinary AXI reads respectively, so neither ratio isolates context overlap. A 32-bit-key compact-node smoke still caused 60 ordinary UCE fills (960 AXI reads) because the side buffer consumes the shared key/less-link 8-byte word on the key load. A second packed-link smoke was fast but failed correctness because the side-buffer hit path does not shift an upper-half 32-bit load; it is rejected. The batch can reach ten outstanding hints before its first response; the pilot worker reaches eight. Retain these under `logs/nano-lookup-interleaving-20261019/` as mechanism evidence and use the aligned 64-bit-key/aligned-packed-links six-mode rerun for the application claim.
+
 ## Open questions
 
 ### OQ-001 — What stops during the next physical nonreturn?
@@ -448,9 +452,9 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ### OQ-006 — Does the overlap benefit survive a real multi-lookup index algorithm?
 
-- **Known:** RL-003/RL-004 establish the matched single-load worker/batch gap, and RL-005 establishes a sustained dependent-pointer benefit at ten streams. Gor Nishanov's Nano-coroutine benchmark supplies a recognizable software comparison based on multiple independent binary searches.
-- **Missing:** one-binary results for serial demand, demand ring, worker prefetch, matched software batch, and switch-only over identical cold index queries, plus trace-level request/response/consumption timing.
-- **Decisive experiment:** run the 2,047-entry, ten-query, eleven-level `mt_nano_lookup_benchmark` in all five modes under a common synthetic-latency model; validate its exact shape and disassembly, compare issue capacity with the existing trace analyzer, and preserve the dependent-stream regression before considering a full database integration.
+- **Known:** RL-003/RL-004 establish the matched single-load worker/batch gap, and RL-005 establishes a sustained dependent-pointer benefit at ten streams. Gor Nishanov's Nano-coroutine benchmark supplies a recognizable software comparison based on multiple independent binary searches. The aligned packed-link worker now passes in 6,609 cycles with 110 hints, 110 consuming loads, zero ordinary UCE/AXI data reads, and nine maximum outstanding hints; its first ten requests are not all accepted before the first response.
+- **Missing:** the other five corrected one-binary modes—serial demand, demand ring, matched software batch, switch-only, and serial prefetch—plus their common trace-level timing, so the accepted worker row is not yet a speedup claim.
+- **Decisive experiment:** run the compact-node 2,047-entry, ten-query, eleven-level `mt_nano_lookup_benchmark` in all six modes under one synthetic-latency model; verify request capacity and ordinary-fallback counts against the pilot, then preserve the dependent-stream regression before considering full SQLite integration.
 
 ## Next experiment
 

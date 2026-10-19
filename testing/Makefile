@@ -217,8 +217,8 @@ run-mt_nano_lookup_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/
 run-mt_nano_lookup_benchmark: check-nano-lookup-config
 .PHONY: check-nano-lookup-config
 check-nano-lookup-config:
-	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 4 )); then \
-		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 and NANO_MODE in [0,4]"; exit 1; \
+	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 5 )); then \
+		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 and NANO_MODE in [0,5]"; exit 1; \
 	fi
 .PHONY: check-dependent-topology
 check-dependent-topology:

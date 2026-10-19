@@ -4,6 +4,7 @@
  * unpredictable midpoint, yield, and consume it after other searches issue.
  */
 #include <stdint.h>
+#include <stddef.h>
 #include "bp_utils.h"
 #include "mt_seed.h"
 #include "bp_prefetch.h"
@@ -17,13 +18,17 @@
 #define END_MARKER_BASE   0x70
 #define STACK_WORDS 256
 
+/* A detached hint supplies two one-shot 8-byte side-buffer words. Read the
+ * packed links with one aligned 64-bit load, then select the branch half in
+ * registers; the advisory hit path does not shift unaligned subword loads. */
 struct index_line {
   uint64_t key;
-  uint64_t next_if_value_less;
-  uint64_t next_if_value_ge;
-  uint64_t pad[5];
+  uint64_t packed_links;
+  uint64_t pad[6];
 };
 _Static_assert(sizeof(struct index_line) == 64, "one index key per cache line");
+_Static_assert(offsetof(struct index_line, packed_links) + sizeof(uint64_t) == 16,
+               "key and branch links must occupy separate hinted 8-byte words");
 #include "nano_lookup_data.h"
 
 enum benchmark_mode {
@@ -32,6 +37,7 @@ enum benchmark_mode {
   MODE_WORKER_PREFETCH = 2,
   MODE_MATCHED_BATCH = 3,
   MODE_SWITCH_ONLY = 4,
+  MODE_SERIAL_PREFETCH = 5,
   MODE_COUNT
 };
 
@@ -97,14 +103,15 @@ static __attribute__((noinline, aligned(64))) void lookup_worker(
         ".global nano_worker_consume_load\n"
         "nano_worker_consume_load:\n"
         "ld %0, 0(%1)\n" : "=r"(value) : "r"(line) : "memory");
+      uint64_t links = line->packed_links;
       checksum += value;
       ++steps;
       if (value < key) {
-        node = line->next_if_value_less;
+        node = (uint32_t)links;
         lower = middle + 1;
         length -= half + 1;
       } else {
-        node = line->next_if_value_ge;
+        node = links >> 32;
         length = half;
       }
     }
@@ -117,9 +124,9 @@ static __attribute__((noinline, aligned(64))) void lookup_worker(
   if (park) for (;;) __asm__ volatile("" ::: "memory");
 }
 
-static __attribute__((noinline)) void serial_demand(
+static __attribute__((noinline)) void serial_lookup(
   const volatile struct index_line *const *tables, uint64_t entries,
-  const uint64_t *queries)
+  const uint64_t *queries, unsigned prefetch)
 {
   for (unsigned worker = 0; worker < NANO_LOOKUP_WORKERS; ++worker) {
     uint64_t lower = 0, length = entries, checksum = 0, steps = 0, node = 0;
@@ -127,19 +134,21 @@ static __attribute__((noinline)) void serial_demand(
       uint64_t half = length >> 1;
       uint64_t middle = lower + half;
       const volatile struct index_line *line = &tables[worker][node];
+      if (prefetch) bp_prefetch_r(line);
       uint64_t value;
       __asm__ volatile(
         ".global nano_serial_consume_load\n"
         "nano_serial_consume_load:\n"
         "ld %0, 0(%1)\n" : "=r"(value) : "r"(line) : "memory");
+      uint64_t links = line->packed_links;
       checksum += value;
       ++steps;
       if (value < queries[worker]) {
-        node = line->next_if_value_less;
+        node = (uint32_t)links;
         lower = middle + 1;
         length -= half + 1;
       } else {
-        node = line->next_if_value_ge;
+        node = links >> 32;
         length = half;
       }
     }
@@ -172,15 +181,16 @@ static __attribute__((noinline)) void matched_batch(
         ".global nano_batch_consume_load\n"
         "nano_batch_consume_load:\n"
         "ld %0, 0(%1)\n" : "=r"(value) : "r"(lines[i]) : "memory");
+      uint64_t links = lines[i]->packed_links;
       uint64_t half = length[i] >> 1;
       uint64_t middle = lower[i] + half;
       checksum[i] += value;
       if (value < queries[i]) {
-        node[i] = lines[i]->next_if_value_less;
+        node[i] = (uint32_t)links;
         lower[i] = middle + 1;
         length[i] -= half + 1;
       } else {
-        node[i] = lines[i]->next_if_value_ge;
+        node[i] = links >> 32;
         length[i] = half;
       }
     }
@@ -230,8 +240,8 @@ static __attribute__((noinline)) void run_operation(
   unsigned mode, const volatile struct index_line *const *tables, uint64_t entries,
   const uint64_t *queries, uint64_t levels)
 {
-  if (mode == MODE_SERIAL_DEMAND)
-    serial_demand(tables, entries, queries);
+  if (mode == MODE_SERIAL_DEMAND || mode == MODE_SERIAL_PREFETCH)
+    serial_lookup(tables, entries, queries, mode == MODE_SERIAL_PREFETCH);
   else if (mode == MODE_MATCHED_BATCH)
     matched_batch(tables, entries, queries, levels);
   else
@@ -344,7 +354,7 @@ static const char *mode_name(unsigned mode)
 {
   static const char *const names[MODE_COUNT] = {
     "serial demand", "demand ring", "worker prefetch",
-    "matched batch", "switch-only"
+    "matched batch", "switch-only", "serial prefetch"
   };
   return names[mode];
 }
@@ -353,7 +363,7 @@ int main(void)
 {
   unsigned mode = benchmark_mode;
   if (mode >= MODE_COUNT) {
-    bp_print_string("[BSG-FAIL] nano lookup mode must be 0 through 4\n");
+    bp_print_string("[BSG-FAIL] nano lookup mode must be 0 through 5\n");
     bp_finish(1);
   }
 

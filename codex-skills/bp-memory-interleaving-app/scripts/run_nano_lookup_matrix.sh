@@ -6,7 +6,7 @@ artifact_root=${1:?usage: run_nano_lookup_matrix.sh ARTIFACT_DIR}
 sim_dir="$repo_root/cosim/black-parrot-minimal-example/verilator"
 elf="$repo_root/riscv/bp-tests/mt_nano_lookup_benchmark.riscv"
 toolchain=${ZP_INSTALL_DIR:-/home/coyang/zynq-parrot/install}
-modes=${NANO_MODES:-"0 1 2 3 4"}
+modes=${NANO_MODES:-"0 1 2 3 4 5"}
 sim_defines=${NANO_SIM_DEFINES:-"BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10"}
 
 mkdir -p "$artifact_root"
@@ -73,8 +73,22 @@ for mode in $modes; do
 
   measured_addr=$($toolchain/bin/riscv64-unknown-elf-nm -n "$elf" |
     awk '$3 == "nano_measured_indexes" {print "0x" $1; exit}')
+  mapfile -t cycle_pcs < <($toolchain/bin/riscv64-unknown-elf-objdump -dr "$elf" |
+    awk '/<run_window>:/ {in_window=1; next}
+         in_window && /^[[:space:]]*$/ {exit}
+         in_window && /csrr.*0xcc0/ {gsub(":", "", $1); print "0x" $1}')
+  if [[ -z "$measured_addr" || ${#cycle_pcs[@]} -ne 2 ]]; then
+    echo "missing measured data or run_window cycle-counter symbols" >&2
+    exit 2
+  fi
+  axi_phys=$(sed -n 's/.*phys = \([[:xdigit:]]\+\)).*/\1/p' "$mode_dir/run.log" | tail -1)
+  if [[ -z "$axi_phys" ]]; then
+    echo "missing simulator AXI DRAM base" >&2
+    exit 2
+  fi
+  axi_base=$(printf '0x%x' "$((16#$axi_phys & 0xffffffff))")
   case "$mode" in
-    0) consume_symbol=nano_serial_consume_load ;;
+    0|5) consume_symbol=nano_serial_consume_load ;;
     1|2) consume_symbol=nano_worker_consume_load ;;
     3) consume_symbol=nano_batch_consume_load ;;
     4) consume_symbol= ;;
@@ -86,14 +100,15 @@ for mode in $modes; do
     extra=()
     [[ "$mode" == 0 || "$mode" == 1 ]] && extra+=(--allow-no-prefetch)
     set +e
-    fst2vcd "$mode_dir/dump.fst" |
+    python3 -B "$repo_root/tools/select_overlap_vcd.py" "$mode_dir/dump.fst" |
       python3 -B "$repo_root/tools/prefetch_overlap_vcd.py" \
         --uce-prefix dcache_uce --axi-prefix axi_mem --fill-bytes 8 \
         --prefetch-slots 10 --address "$measured_addr" --span-bytes "$((10 * 11 * 64))" \
-        --consume-pc "$consume_pc" --run-log "$mode_dir/run.log" \
-        --begin-marker "$((0x60 + mode))" --end-marker "$((0x70 + mode))" \
+        --axi-address-offset "$axi_base" --axi-address-xor 0x80000000 \
+        --consume-pc "$consume_pc" --begin-pc "${cycle_pcs[0]}" \
+        --end-pc "${cycle_pcs[1]}" --expected-windows 7 \
         --matched-only "${extra[@]}" > "$mode_dir/trace-summary.txt" 2>&1
-    trace_rc=${PIPESTATUS[1]}
+    trace_rc=$?
     set -e
     echo "$trace_rc" > "$mode_dir/trace.exit-code"
     if [[ $trace_rc -ne 0 ]]; then
