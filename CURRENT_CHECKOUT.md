@@ -6,8 +6,9 @@ The working tree contains a privilege-boundary increment for the repaired reside
 
 The operand-shadow checkpoint completed routed timing with
 `e_bp_unicore_zynqparrot_prefetch5_cfg`, the same configuration as the accepted
-context-switch image and RPC NBFs. Exact top `2e0ce866` / BlackParrot
-`683cc87d1` meets WNS/WHS `+0.197/+0.023 ns` with 49,998 LUTs, 29,046
+context-switch image and RPC NBFs. Historical build identities top `2e0ce866` /
+BlackParrot `683cc87d1` (history-only reworded equivalents `05840020` /
+`10f922f70`) meet WNS/WHS `+0.197/+0.023 ns` with 49,998 LUTs, 29,046
 registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is
 `075b6da4f83221e4d977096f746a980e61f7eebee46335542dfb27b7915b90e6` and
 bitstream SHA-256 is
@@ -28,7 +29,15 @@ passes clean traced four- and ten-context simulation at the unchanged 90/66
 cycles. Exact job `20261013T181619Z-2e0ce866-prefetch5-direct-worker` completed
 route and package verification; physical acceptance is next.
 
-The active development branch pins BlackParrot `683cc87d1`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock.
+The active protected-RPC review branch pins BlackParrot `f2f5f246a`, which adds
+the U/S legacy-interface lock to the routed operand-shadow tree. This security
+increment is accepted in traced four- and ten-context simulation but remains
+unrouted and physically unqualified. Its inherited context-switch interlock
+stays pending across the ordinary empty frontend redirect gap and blocks exactly
+the first target queue head that would otherwise issue. Clean traced nonresident
+and sustained two/ten-stream simulations pass, and the byte-identical k2
+performance control measures 20,547 cycles versus 19,258 before the effective
+interlock.
 
 The exact routed top `9990e673b0b3ec4194eb62494f3d1bdd6b06a201` / BlackParrot `30479f1a2c5e5c88aed71f1e79c6efe26ffcec85` image meets WNS/WHS `+0.150/+0.035 ns` with 50,099 LUTs, 27,995 registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is `b6b04c3bb3bba44ffb47d7e949488c0df39534e9ccd7f10b86edbd830f879aba`; bitstream SHA-256 is `347d328124b419afd3586d5c3f8251eed5b41e8f46c750b4ced5addc3c302e3a`. The formerly failing exact k10 image passes twice at 72,038/72,042 cycles after fresh overlays, and exact k2 passes at 20,547 cycles, matching simulation. The earlier top `65f30750` / BlackParrot `6c79a4210` commit-cycle pulse remains rejected.
 

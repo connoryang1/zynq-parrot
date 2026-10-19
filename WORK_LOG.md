@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Protected-RPC review history prepared — 2026-10-19:** reworded the recent top-level and BlackParrot RPC commits with contract, mechanism, validation, and limitation bodies while preserving byte-identical source trees; retained local pre-rewrite archive refs and mapped historical routed identities to their review equivalents. The proposed review split keeps the protected-RPC implementation and its asynchronous simulation tooling separate, while the future database/index benchmark remains outside both changes.
+
 - **Isolated background verification tooling — 2026-10-18:** added a low-priority detached simulation ladder with immutable worktrees, topology-specific model/program/trace storage, serialization, free-space and timeout guardrails, and retained revision/result manifests. Launcher control-plane tests and skill validation pass; no long simulation or FPGA job was needed to validate the launcher itself.
 
 - **Protected-RPC legacy privilege boundary accepted in simulation — 2026-10-14:** installing the M-authorized descriptor now preserves the bootstrapped target's U/Sv39 domain metadata and locks legacy switch, seed, cache-service, and miss-trace control and observation against U/S access while retaining M-mode setup. An adversarial traced ten-context run seeds nonzero diagnostic state in M, observes zero in U, preserves address-space isolation, and passes at 193/31 direct versus 114/43 protected cycles; the unlocked smoke and exact 224/31 versus 179/109 raw regression also pass. Evidence is in `logs/protected-rpc-legacy-lock-20261014/`; routed timing and physical execution of this increment remain pending.
