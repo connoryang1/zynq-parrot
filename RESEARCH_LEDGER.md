@@ -446,9 +446,15 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 - **Missing:** physical-DDR detached full-line endpoint timing; useful-before-demand coverage and completion time for an ordered shared privileged-instruction prefix; target-prediction accuracy on broader scheduler workloads; an instruction-cache replay path; and coexistence with real scheduler traffic.
 - **Decisive experiment:** replay RL-029's stable shared privileged-instruction prefix through a separate I-cache installer starting at syscall entry, counting issued, completed-before-demand, late, consumed, unused, and dropped lines against recorder-only and replay-disabled controls. Pair it with a physical detached full-line probe so the simulation's conditional 41-cycle input can be replaced with measured request-to-first-beat and final-beat timing.
 
+### OQ-006 — Does the overlap benefit survive a real multi-lookup index algorithm?
+
+- **Known:** RL-003/RL-004 establish the matched single-load worker/batch gap, and RL-005 establishes a sustained dependent-pointer benefit at ten streams. Gor Nishanov's Nano-coroutine benchmark supplies a recognizable software comparison based on multiple independent binary searches.
+- **Missing:** one-binary results for serial demand, demand ring, worker prefetch, matched software batch, and switch-only over identical cold index queries, plus trace-level request/response/consumption timing.
+- **Decisive experiment:** run the 2,047-entry, ten-query, eleven-level `mt_nano_lookup_benchmark` in all five modes under a common synthetic-latency model; validate its exact shape and disassembly, compare issue capacity with the existing trace analyzer, and preserve the dependent-stream regression before considering a full database integration.
+
 ## Next experiment
 
-The immediate next correctness experiment remains OQ-001 when board recovery is available. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, recorder-fit, directed recorder validation, Linux miss-capture, or banked-pipeline tracing. The next architectural experiment is ordered useful-before-demand replay of RL-029's shared privileged-instruction prefix, starting at syscall entry and measuring how many lines publish before their actual demands. A physical detached full-line probe should run alongside it when the board is available, replacing the conditional 41-cycle input without blocking the useful-prefix implementation.
+The immediate next physical correctness experiment remains OQ-001 when board recovery is available. Independently, OQ-006 proceeds in simulation as the next application workload and must not trigger a new FPGA implementation until its matched controls justify one. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, recorder-fit, directed recorder validation, Linux miss-capture, or banked-pipeline tracing. The next architectural experiment is ordered useful-before-demand replay of RL-029's shared privileged-instruction prefix, starting at syscall entry and measuring how many lines publish before their actual demands. A physical detached full-line probe should run alongside it when the board is available, replacing the conditional 41-cycle input without blocking the useful-prefix implementation.
 
 ## Delta log
 
