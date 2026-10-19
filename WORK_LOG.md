@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Isolated background verification tooling — 2026-10-18:** added a low-priority detached simulation ladder with immutable worktrees, topology-specific model/program/trace storage, serialization, free-space and timeout guardrails, and retained revision/result manifests. Launcher control-plane tests and skill validation pass; no long simulation or FPGA job was needed to validate the launcher itself.
+
 - **Protected-RPC legacy privilege boundary accepted in simulation — 2026-10-14:** installing the M-authorized descriptor now preserves the bootstrapped target's U/Sv39 domain metadata and locks legacy switch, seed, cache-service, and miss-trace control and observation against U/S access while retaining M-mode setup. An adversarial traced ten-context run seeds nonzero diagnostic state in M, observes zero in U, preserves address-space isolation, and passes at 193/31 direct versus 114/43 protected cycles; the unlocked smoke and exact 224/31 versus 179/109 raw regression also pass. Evidence is in `logs/protected-rpc-legacy-lock-20261014/`; routed timing and physical execution of this increment remain pending.
 
 - **Protected-RPC operand shadow routes cleanly — 2026-10-14:** exact prefetch5 top `2e0ce866` / BlackParrot `683cc87d1` meets WNS/WHS `+0.197/+0.023 ns` with 49,998 LUTs, 29,046 registers, 85.5 BRAM tiles, and 11 DSPs. The verified package/bitstream SHA-256 values are `075b6da4...90e6` and `77410711...0ae`; physical execution remains the acceptance gate.
