@@ -11,7 +11,8 @@ sim_defines=${NANO_SIM_DEFINES:-"BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=20
 
 mkdir -p "$artifact_root"
 artifact_root=$(realpath "$artifact_root")
-exec 9>"$sim_dir/.nano-lookup-matrix.lock"
+lock_file=$(git -C "$repo_root" rev-parse --git-path nano-lookup-matrix.lock)
+exec 9>"$lock_file"
 if ! flock -n 9; then
   echo "another Nano lookup matrix owns $sim_dir" >&2
   exit 2
