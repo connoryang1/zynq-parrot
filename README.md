@@ -29,6 +29,7 @@ source, exact revisions, and verification commands. Start with:
 - [Tests](testing/README.md) and [Linux demonstration](linux-tests/README.md): reproducible entry points.
 - [Checkout guide](CURRENT_CHECKOUT.md): exact FPGA acceptance, test commands, and recovery.
 - [Research direction](PAPER_DIRECTION.md): the next application-level question, not promised features.
+- [Protected-RPC review stack](PROTECTED_RPC_REVIEW_STACK.md): cross-repository PR dependencies, review order, and integration choices.
 
 Keep implementation rationale near the code and explain verified changes in
 commit messages. Use [WORK_LOG.md](WORK_LOG.md) only for major acceptance milestones,
