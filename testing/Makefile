@@ -22,6 +22,7 @@ PROTOCOL_CASE ?= 1
 DDR_LATENCY_VERBOSE ?= 1
 STREAMS ?= 4
 STREAM_NODES ?= 32
+NANO_MODE ?= 2
 TARGET_BYPASS_TURNS ?= 128
 LIFECYCLE_EPOCHS ?= 6
 LIFECYCLE_EVICTION_LINES ?= 1024
@@ -89,6 +90,7 @@ CORRECTNESS_TESTS := \
 
 BENCHMARKS := \
     mt_dependent_stream_benchmark \
+    mt_nano_lookup_benchmark \
     mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
     mt_prefetch_nonresident_interleave_benchmark \
@@ -103,7 +105,7 @@ NONRESIDENT_TESTS := \
     mt_umode_nonresident_sv39_data_handoff_test
 
 TESTS := $(SMOKE_TESTS) $(CORRECTNESS_TESTS) $(BENCHMARKS) $(NONRESIDENT_TESTS)
-DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_dependent_stream_benchmark mt_prefetch_handoff_lifecycle_test mt_umode_prefetch_handoff_lifecycle_test mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
+DEFAULT_TOPOLOGY_TESTS := $(filter-out mt_prefetch_nonresident_interleave_benchmark mt_dependent_stream_benchmark mt_nano_lookup_benchmark mt_prefetch_handoff_lifecycle_test mt_umode_prefetch_handoff_lifecycle_test mt_prefetch_dirty_victim_test mt_prefetch_protocol_test,$(TESTS))
 
 .PHONY: all clean build-sim rebuild-sim help check-harness FORCE $(addprefix run-, $(TESTS))
 
@@ -114,6 +116,7 @@ FORCE:
 all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(DEFAULT_TOPOLOGY_TESTS)))
 	@$(MAKE) $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv \
+		$(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv \
 		$(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv \
@@ -138,7 +141,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) $$(if $$(RUN_INPUT),RUN_INPUT="$$(RUN_INPUT)" RUN_INPUT_ADDR="$$(RUN_INPUT_ADDR)",) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
-	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),)
+	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),) $$(if $$(RUN_EXPECT_NANO),--nano-mode=$$(RUN_EXPECT_NANO),)
 endef
 
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
@@ -157,6 +160,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: $(TOP)/software/include
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: CFLAGS += -DDDR_LATENCY_VERBOSE=$(DDR_LATENCY_VERBOSE)
 $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/testing/dependent_stream_data.h
+$(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/testing/nano_lookup_data.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
@@ -205,6 +210,16 @@ run-mt_dependent_stream_benchmark: RUN_INPUT = $(shell echo $$(( $(BENCH_MODE) |
 run-mt_dependent_stream_benchmark: RUN_EXPECT_DEPENDENT = $(RUN_INPUT)
 run-mt_dependent_stream_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_config" { print "0x" $$1; exit }')
 run-mt_dependent_stream_benchmark: check-dependent-topology check-dependent-config
+run-mt_nano_lookup_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
+run-mt_nano_lookup_benchmark: RUN_INPUT := $(NANO_MODE)
+run-mt_nano_lookup_benchmark: RUN_EXPECT_NANO := $(NANO_MODE)
+run-mt_nano_lookup_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
+run-mt_nano_lookup_benchmark: check-nano-lookup-config
+.PHONY: check-nano-lookup-config
+check-nano-lookup-config:
+	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 4 )); then \
+		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 and NANO_MODE in [0,4]"; exit 1; \
+	fi
 .PHONY: check-dependent-topology
 check-dependent-topology:
 	@if (( $(NUM_THREADS) < 2 || $(NUM_THREADS) > 4 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 1 || $(PREFETCH_ELS) > 10 )); then \

@@ -92,6 +92,39 @@ class TranscriptTests(unittest.TestCase):
 
 
 class HarnessTests(unittest.TestCase):
+    def test_nano_lookup_selector_and_topology_are_checked(self):
+        root = Path(__file__).resolve().parents[1]
+        env = os.environ.copy()
+        for key in ("MAKEFLAGS", "MFLAGS", "MAKEOVERRIDES"):
+            env.pop(key, None)
+        for mode, threads, contexts, slots, expected in (
+                (0, 2, 10, 10, True), (4, 2, 10, 10, True),
+                (5, 2, 10, 10, False), (2, 2, 4, 10, False),
+                (2, 2, 10, 9, False)):
+            with self.subTest(mode=mode, threads=threads, contexts=contexts, slots=slots):
+                result = subprocess.run(
+                    ["make", "-C", str(root / "testing"), "TOP=" + str(root),
+                     f"NANO_MODE={mode}", f"NUM_THREADS={threads}",
+                     f"NUM_CONTEXTS={contexts}", f"PREFETCH_ELS={slots}",
+                     "check-nano-lookup-config"],
+                    env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    timeout=10)
+                self.assertEqual(result.returncode == 0, expected, result.stdout)
+
+    def test_nano_lookup_transcript_requires_requested_mode_and_shape(self):
+        marker = TEST_MARKERS["mt_nano_lookup_benchmark"]
+        good = ("Benchmark: NANO_LOOKUP mode=0x2 queries=0xa levels=0xb "
+                "cycles=0x123 checksum=0x456\n")
+        check_transcript(good + marker + "\n" + PASS,
+                         test="mt_nano_lookup_benchmark", nano_mode=2)
+        for row in (good.replace("mode=0x2", "mode=0x1"),
+                    good.replace("queries=0xa", "queries=0x8"),
+                    good.replace("levels=0xb", "levels=0xa"),
+                    "", good + good):
+            with self.subTest(row=row), self.assertRaises(ValueError):
+                check_transcript(row + marker + "\n" + PASS,
+                                 test="mt_nano_lookup_benchmark", nano_mode=2)
+
     def test_dependent_stream_counts_require_divisible_work_and_enough_slots(self):
         root = Path(__file__).resolve().parents[1]
         env = os.environ.copy()
