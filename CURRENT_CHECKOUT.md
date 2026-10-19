@@ -1,5 +1,37 @@
 This file identifies the accepted BlackParrot context-switch and prefetch sources and their verified FPGA image. It records reproducible checks, remaining production limits, and historical artifact identities.
 
+## Current boundary-interlock checkpoint
+
+The working tree contains a privilege-boundary increment for the repaired resident hardware-protected RPC checkpoint. CSR `0x808` performs an M-authorized fixed-entry call with atomic `a0`--`a3` transfer, and CSR `0x809` returns through a hardware-held continuation with atomic `a0` transfer. Installing the protected descriptor now preserves an already bootstrapped target's U/Sv39 privilege, translation, and ASID metadata, then locks legacy context-switch, seed, cache-service, and miss-trace writes and diagnostic reads against U/S access while retaining M-mode setup access. The adversarial ten-context test seeds nonzero diagnostic state in M mode, observes zero in U mode, preserves distinct address spaces, and reaches guest/host PASS at 193/31 direct and 114/43 protected cycles; the unlocked smoke and exact 224/31 versus 179/109 raw regression also pass. Exact evidence is under `logs/protected-rpc-legacy-lock-20261014/`, with the preceding replay repair under `logs/protected-rpc-hardware-fixed-20261013/`.
+
+The operand-shadow checkpoint completed routed timing with
+`e_bp_unicore_zynqparrot_prefetch5_cfg`, the same configuration as the accepted
+context-switch image and RPC NBFs. Exact top `2e0ce866` / BlackParrot
+`683cc87d1` meets WNS/WHS `+0.197/+0.023 ns` with 49,998 LUTs, 29,046
+registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is
+`075b6da4f83221e4d977096f746a980e61f7eebee46335542dfb27b7915b90e6` and
+bitstream SHA-256 is
+`7741071186afca6dee94d4cf8a91239b2040728a0b2a283ee8c518cc360360ae`.
+Physical operand-capture acceptance and a new route of the legacy-interface
+lock remain pending. Protected endpoints are resident-only, and nesting,
+revocation, interrupts, multi-capability policy, and Linux integration remain
+outside the prototype.
+
+The first matched prefetch5 route proved the raw control after correcting its
+four-context CSR `0x802` headers for the routed ten-context field width: direct
+service measured 174/31 cycles and raw RPC 163/109. Protected `pcall` reached
+the server but captured stale `a2/a3` values from the synchronous wide BRAM
+tap; `preturn` correctly returned the resulting `0xef2c`. An eight-NOP physical
+settling control passed at 80/72 cycles. BlackParrot `683cc87d1` replaces that
+ambiguous tap for `a0`--`a3` with a 512-bit two-slot write-through shadow and
+passes clean traced four- and ten-context simulation at the unchanged 90/66
+cycles. Exact job `20261013T181619Z-2e0ce866-prefetch5-direct-worker` completed
+route and package verification; physical acceptance is next.
+
+The active development branch pins BlackParrot `683cc87d1`. Its context-switch interlock remains pending across the ordinary empty frontend redirect gap and blocks exactly the first target queue head that would otherwise issue. Clean traced nonresident and sustained two/ten-stream simulations pass, and the byte-identical k2 performance control measures 20,547 cycles versus 19,258 before the effective interlock.
+
+The exact routed top `9990e673b0b3ec4194eb62494f3d1bdd6b06a201` / BlackParrot `30479f1a2c5e5c88aed71f1e79c6efe26ffcec85` image meets WNS/WHS `+0.150/+0.035 ns` with 50,099 LUTs, 27,995 registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is `b6b04c3bb3bba44ffb47d7e949488c0df39534e9ccd7f10b86edbd830f879aba`; bitstream SHA-256 is `347d328124b419afd3586d5c3f8251eed5b41e8f46c750b4ced5addc3c302e3a`. The formerly failing exact k10 image passes twice at 72,038/72,042 cycles after fresh overlays, and exact k2 passes at 20,547 cycles, matching simulation. The earlier top `65f30750` / BlackParrot `6c79a4210` commit-cycle pulse remains rejected.
+
 ## Current same-boot process-rebind endpoint
 
 Top commit `b7cf9953c6e5f2134536c3c0ecf0e8ee19bee573` pins BlackParrot

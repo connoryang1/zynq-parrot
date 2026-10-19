@@ -1,0 +1,41 @@
+{
+  "status": "accepted_with_repeat_entry_frontend_limitation",
+  "configuration": {
+    "threads": 2,
+    "contexts": 4,
+    "trace": true,
+    "caller_virtual_context": 0,
+    "server_virtual_context": 1,
+    "capability": 1
+  },
+  "cycles": {
+    "direct_first": 220,
+    "direct_repeat": 31,
+    "protected_first": 43,
+    "protected_repeat": 71,
+    "raw_repeat_reference_rl044": 109
+  },
+  "derived": {
+    "protected_vs_raw_repeat_speedup": 1.5352112676,
+    "raw_repeat_overhead_over_direct": 78,
+    "protected_repeat_overhead_over_direct": 40,
+    "raw_transport_overhead_removed_fraction": 0.4871794872
+  },
+  "checks": {
+    "invalid_capability_retires_locally": true,
+    "invalid_return_retires_locally": true,
+    "user_descriptor_overwrite_rejected": true,
+    "fixed_server_entry_observed": true,
+    "four_arguments_transferred": true,
+    "one_result_transferred": true,
+    "private_address_spaces_preserved": true,
+    "guest_pass": true,
+    "host_pass": true
+  },
+  "limitation": {
+    "repeat_recovery_cycles": 22,
+    "stale_server_pc": "0x200ac",
+    "effect": "A stale post-preturn frontend stream is recovered by the server's backward branch; replacing it with an unreachable self-loop hangs the second call.",
+    "required_followup": "Add a redirect epoch or explicit frontend purge acknowledgment across I-cache responses, realignment, and the FE-to-BE queue."
+  }
+}

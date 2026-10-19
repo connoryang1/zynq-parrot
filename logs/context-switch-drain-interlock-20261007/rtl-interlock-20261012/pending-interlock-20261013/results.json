@@ -1,0 +1,45 @@
+{
+  "black_parrot_commit": "30479f1a2",
+  "change": "keep switch interlock pending through empty redirect gap; consume it on first otherwise issue-ready target queue head",
+  "tests": [
+    {
+      "name": "mt_umode_nonresident_handoff_test",
+      "result": "pass",
+      "switches": 2,
+      "issue_ready_interlock_edges": 2
+    },
+    {
+      "name": "mt_dependent_stream_benchmark",
+      "streams": 10,
+      "nodes": 1280,
+      "result": "pass",
+      "cycles_before": 23972,
+      "cycles_after": 25264,
+      "delta": 1292,
+      "timed_handoffs": 1292
+    },
+    {
+      "name": "mt_dependent_stream_benchmark",
+      "streams": 2,
+      "nodes": 1280,
+      "result": "pass",
+      "cycles_before": 19270,
+      "cycles_after": 20551,
+      "delta": 1281,
+      "nbf_sha256": "0af4a7a93375fd14537a55cbe63ca421382c7eae3857f976d61ebb2afb41639c"
+    },
+    {
+      "name": "archived_exact_k2_control",
+      "result": "pass",
+      "cycles_before": 19258,
+      "cycles_after": 20547,
+      "delta": 1289,
+      "overhead_percent": 6.6933,
+      "speedup_vs_60077_demand": 2.9239,
+      "nbf_sha256": "92b0bdbe635486053a23ca9fc86074678a8f28b11e07626d43a23a11af6a5b0c"
+    }
+  ],
+  "exact_k2_fst_sha256": "01a3c167a577a32ebca5e6016ceca5bc480d55d75e5512b4fed561e6f800f2a2",
+  "workflow_note": "A lower-level make invocation omitted the prefetch-depth define and started rebuilding a mismatched model. It was interrupted before execution; the maintained testing target then rebuilt the correct nt2/nc10/pfels10 model, and only results from that model are accepted.",
+  "physical_status": "new routed build required"
+}

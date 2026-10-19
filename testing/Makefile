@@ -27,6 +27,7 @@ LIFECYCLE_EPOCHS ?= 6
 LIFECYCLE_EVICTION_LINES ?= 1024
 LIFECYCLE_SV39 ?= 1
 LIFECYCLE_ITERATIONS ?= 256
+RPC_FLUSH_ON_SWITCH ?= 0
 SIM_DEFINES ?=
 
 ifeq ($(PREFETCH_FULL_LINE),1)
@@ -60,6 +61,8 @@ SMOKE_TESTS := \
 
 CORRECTNESS_TESTS := \
     mt_machine_trap_test \
+    mt_protected_rpc_reference_test \
+    mt_protected_rpc_hardware_test \
     mt_opensbi_csr_probe_test \
     mt_satp_asid_warl_test \
     mt_cache_miss_trace_test \
@@ -88,6 +91,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_rpc_context_transport_benchmark \
     mt_dependent_stream_benchmark \
     mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
@@ -145,6 +149,7 @@ $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
+$(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_reference_test.riscv: CFLAGS += -DRPC_FLUSH_ON_SWITCH=$(RPC_FLUSH_ON_SWITCH)
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_target_bypass_stress_test.riscv: CFLAGS += -DCTXTSW_TARGET_BYPASS_TURNS=$(TARGET_BYPASS_TURNS)
@@ -181,8 +186,17 @@ check-ten-logical-config:
 	@if (( $(BENCH_MODE) < 0 || $(BENCH_MODE) > 3 )); then \
 		echo "ERROR: ten-logical-context benchmarks BENCH_MODE must be in [0,3]"; exit 1; \
 	fi
+
+.PHONY: check-rpc-config
+check-rpc-config:
+	@if (( $(NUM_THREADS) != 2 || ($(NUM_CONTEXTS) != 4 && $(NUM_CONTEXTS) != 10) )); then \
+		echo "ERROR: RPC tests require NUM_THREADS=2 and NUM_CONTEXTS=4 or 10"; \
+		exit 1; \
+	fi
 run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
+run-mt_rpc_context_transport_benchmark: check-rpc-config
+run-mt_protected_rpc_hardware_test: check-rpc-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
 run-mt_context_csr_rebind_test: check-nonresident-config
 run-mt_resident_relaunch_register_test: check-nonresident-config
