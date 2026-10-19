@@ -33,6 +33,7 @@ fi
   echo "toolchain=$toolchain"
   echo "modes=$modes"
   echo "sim_defines=$sim_defines"
+  echo "analyze=${NANO_ANALYZE:-1}"
   echo "started_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 } > "$artifact_root/RUN_METADATA"
 
@@ -63,6 +64,11 @@ for mode in $modes; do
   if [[ $run_rc -ne 0 ]]; then
     echo "mode $mode failed; see $mode_dir/driver.log" >&2
     exit "$run_rc"
+  fi
+
+  if [[ ${NANO_ANALYZE:-1} == 0 ]]; then
+    echo "mode $mode archived; trace analysis deferred"
+    continue
   fi
 
   measured_addr=$($toolchain/bin/riscv64-unknown-elf-nm -n "$elf" |
