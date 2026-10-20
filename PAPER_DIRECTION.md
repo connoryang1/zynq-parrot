@@ -286,6 +286,23 @@ Keep FPGA area/timing cost and exact binary/RTL identities with the results.
 A speedup must survive these matched controls; the existing 5.10/11.12 FPGA
 cycles/switch are a mechanism measurement, not an application-speedup claim.
 
+### Nano-style index lookup extension
+
+The first application-shaped follow-up uses the multi-lookup binary-search
+structure from Gor Nishanov's Nano-coroutines benchmark. Ten independent
+queries repeatedly calculate an unpredictable midpoint, optionally prefetch
+its cache line, yield, and consume the key after the other queries issue. This
+is a real index-search algorithm and a closer published-software comparison
+than a single-load ring, but it is not presented as a complete database.
+
+One runtime-selected executable contains serial demand, demand-ring,
+worker-prefetch, matched software-batch, and switch-only schedules. The first
+version uses 2,047 sorted cache-line-sized entries and absent odd keys so all
+ten queries execute exactly eleven dependent levels. This fixed shape makes
+request, response, consumption, and handoff counts comparable before expanding
+to mixed hit/miss queries or a database engine. See
+[the experiment contract](NANO_LOOKUP_EXPERIMENT.md).
+
 ## Independent-request mechanism result
 
 The September 8 two-resident test passes on the accepted FPGA RTL and a clean

@@ -34,6 +34,7 @@ TEST_MARKERS = {
     "mt_cache_miss_trace_test": "[BSG-PASS] accepted cache-miss trace",
     "mt_satp_asid_warl_test": "[BSG-PASS] satp ASID WARL width matches one-bit TLB tag",
     "mt_dependent_stream_benchmark": "[BSG-PASS] dependent streams, checksums and completion",
+    "mt_nano_lookup_benchmark": "[BSG-PASS] Nano-style binary index lookups",
     "mt_ddr_latency_benchmark": "[BSG-PASS] DDR dependent-load latency and prefetch lead sweep",
     "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",
     "mt_resident_reseed_fetch_test": "[BSG-PASS] resident reseed cold-fetch and CSR preservation",
@@ -75,7 +76,8 @@ TEST_MARKERS = {
 }
 
 
-def check_transcript(transcript, exit_code=0, test=None, dependent_config=None):
+def check_transcript(transcript, exit_code=0, test=None, dependent_config=None,
+                     nano_mode=None):
     """Raise ValueError unless both guest and host succeeded without other errors."""
     lines = transcript.splitlines()
     core = [i for i, line in enumerate(lines) if CORE_PASS.search(line)]
@@ -99,6 +101,17 @@ def check_transcript(transcript, exit_code=0, test=None, dependent_config=None):
                     (dependent_config >> 16) & 65535)
         if len(rows) != 1 or tuple(int(v, 16) for v in rows[0][:3]) != expected:
             raise ValueError("dependent-stream result does not match requested mode/streams/nodes")
+    if nano_mode is not None:
+        if test != "mt_nano_lookup_benchmark":
+            raise ValueError("Nano mode requires the Nano lookup test")
+        rows = re.findall(
+            r"^Benchmark: NANO_LOOKUP mode=(0x[0-9a-fA-F]+) "
+            r"queries=(0x[0-9a-fA-F]+) levels=(0x[0-9a-fA-F]+) "
+            r"cycles=(0x[0-9a-fA-F]+) checksum=(0x[0-9a-fA-F]+)$",
+            "\n".join(lines[:core[0]]), re.M)
+        if (len(rows) != 1 or int(rows[0][0], 16) != nano_mode
+                or int(rows[0][1], 16) != 10 or int(rows[0][2], 16) != 11):
+            raise ValueError("Nano lookup result does not match requested mode/shape")
     if any(FAIL.search(line) or TIMEOUT.search(line) for line in lines):
         raise ValueError("guest failure or runtime timeout")
 
@@ -125,10 +138,12 @@ def main():
     parser.add_argument("--test", choices=sorted(TEST_MARKERS))
     parser.add_argument("--dependent-config", type=lambda value: int(value, 0),
                         help="expected packed mode/stream/node selector")
+    parser.add_argument("--nano-mode", type=lambda value: int(value, 0),
+                        help="expected Nano lookup runtime mode")
     args = parser.parse_args()
     try:
         check_transcript(args.log.read_text(), args.exit_code, args.test,
-                         args.dependent_config)
+                         args.dependent_config, args.nano_mode)
     except (OSError, UnicodeError, ValueError) as error:
         print("INVALID RUN: {}".format(error), file=sys.stderr)
         return 1
