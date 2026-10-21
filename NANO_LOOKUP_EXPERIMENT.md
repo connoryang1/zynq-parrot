@@ -6,7 +6,9 @@ This document defines and records the Nano-coroutine-style index-lookup experime
 
 Can ten hardware contexts hide the dependent cold-memory latency of independent binary index lookups, and how closely can they approach a software state machine that batches the same requests?
 
-This is the algorithmic workload from Gor Nishanov's CppCon 2018 “Nano-coroutines to the Rescue” benchmark: multiple independent binary searches over a sorted index. It is not a full database engine. A database integration is justified only if this controlled index workload establishes a useful mechanism and identifies which overhead remains.
+This is the algorithmic workload from Gor Nishanov's CppCon 2018 “Nano-coroutines to the Rescue” benchmark: multiple independent binary searches over a sorted index. In the original [`2018_CppCon/src`](https://github.com/GorNishanov/await/tree/master/2018_CppCon/src), `naive.h` performs one binary search, `sm.h` keeps several search frames and rotates among them while prefetching the next midpoint, and `coro.h` expresses the same multi-lookup schedule as one coroutine per search. Our matched batch is the corresponding explicit-state-machine control, and the worker mode tests the same idea with BlackParrot context handoffs rather than C++ coroutine handles. We reimplemented the kernel in bare-metal RISC-V C because the original source depends on C++ iterators, `std::vector`, x86 `_mm_prefetch`, and the C++ coroutine runtime; direct source reuse would not preserve the target's timing or memory contract.
+
+The BlackParrot adaptation intentionally changes the data and measurement shape: it uses ten deterministic absent-key searches, separate linked 64-byte nodes per shard, aligned 64-bit key/link words that fit the 16-byte hint, explicit cold-data/warm-instruction preparation, and trace-visible BEGIN/END markers. It therefore preserves the lookup/interleaving algorithm, not Gor's exact container layout, compiler output, or reported numbers. It is not a full database engine. A database integration is justified only if this controlled index workload establishes a useful mechanism and identifies which overhead remains.
 
 ## Workload
 
