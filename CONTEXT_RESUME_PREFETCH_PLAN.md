@@ -75,6 +75,38 @@ the prefix body leaves a 97-cycle switch-only floor. The next experiment must
 replace the warmup with a real permission-checked instruction request while
 keeping these mode boundaries and the same target code layout.
 
+### RTL seam and minimum safe interface
+
+The frontend currently has one I-cache request stream driven by
+`bp_fe_controller`, and the MMU address input is always `next_pc` from the
+active context. The backend already knows the pending target NPC, privilege,
+translation-enable bit, and ASID, but the saved translation bundle does not
+reach the frontend with the target request's base PPN or SUM/MXR permissions.
+Consequently, simply reusing the existing data-prefetch path would either use
+the wrong address space or turn a speculative target request into an
+architectural fetch or fault.
+
+The minimum safe implementation should therefore be staged as follows:
+
+1. Add a one-entry target-request bundle from the backend context handoff to
+   the frontend: virtual context ID, NPC, physical slot, privilege,
+   translation state, ASID, base PPN, SUM/MXR, and a short-prefix count.
+2. Let the FE controller hold that bundle when a switch is captured and issue
+   one speculative I-cache request before accepting the redirect. Its hit or
+   fill response must be consumed as advisory state, never entered into the
+   active context's FE queue.
+3. Preserve the existing redirect pending/flush rules and cancel the bundle
+   on a younger redirect, trap, or context-switch cancellation.
+4. Start with direct-mode simulation only, where the target physical address
+   is unambiguous. Add translated permission checks only after the request,
+   fill, and cancellation state machine is stable.
+
+This should not mutate `bp_fe_icache_pkt_s` in place: that packet has no
+address-space identity, and doing so would risk mixing a target fill with the
+active context. The first RTL change should add an explicit sideband/arbiter
+and a traced request marker so acceptance, response, and cancellation can be
+measured independently.
+
 ## Existing benchmarks and controls
 
 Use these in order:
