@@ -48,6 +48,30 @@ expected first hardware result. For a five-to-eleven-cycle resident handoff,
 the expected speedup is zero unless fetch begins before the switch and the
 target is already known with high confidence.
 
+### First matched simulation checkpoint
+
+The new `mt_context_resume_prefix_benchmark` selects its mode through the
+same post-load runtime patch mechanism used by the other benchmark programs.
+It places a 96-operation target prefix in an aligned text region, seeds the
+same nonresident target, and times only the switch-to-completion interval.
+Mode 0 leaves the target context cold. Mode 1 runs that exact entry and prefix
+on the target context, switches back, reseeds it, and then measures the same
+handoff; the oracle warmup is outside the timed interval.
+
+With `NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1`, the matched runs measured:
+
+| Mode | Resume cycles | Result |
+| --- | ---: | --- |
+| Cold target prefix | 490 | pass |
+| Target-context oracle warm | 172 | pass |
+
+This is a 2.85x oracle warm-start speedup (318 cycles, 64.9% fewer), not a
+prefetcher result. It demonstrates that the selected target instruction state
+is materially on the resume path and gives the future RTL a useful upper-bound
+control. The next experiment must replace the warmup with a real
+permission-checked instruction request while keeping these mode boundaries and
+the same target code layout.
+
 ## Existing benchmarks and controls
 
 Use these in order:

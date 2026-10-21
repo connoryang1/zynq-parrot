@@ -74,6 +74,7 @@ TEST_MARKERS = {
     "mt_umode_nonresident_sv39_handoff_test": "[BSG-PASS] U-mode nonresident Sv39 instruction handoff redirected before sequential issue",
     "mt_umode_nonresident_sv39_data_handoff_test": "[BSG-PASS] U-mode nonresident Sv39 instruction/data handoff redirected before sequential issue",
     "mt_ctxtsw_nonresident_overhead_benchmark": "=== Nonresident Context Switch Overhead Benchmark ===",
+    "mt_context_resume_prefix_benchmark": "[BSG-PASS] matched context-resume prefix benchmark",
     "mt_ctxtsw_store_handoff_benchmark": "[BSG-PASS] matched store-before-switch handoff benchmark",
 }
 

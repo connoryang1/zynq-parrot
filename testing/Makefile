@@ -50,7 +50,7 @@ CFLAGS = -O2 \
           -DBENCH_BARRIER=$(BARRIER)
 
 SIM_DIR := $(TOP)/cosim/black-parrot-minimal-example/verilator
-RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|MISS-TRACE|DIRTY-EVICTION|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
+RUN_LOG_FILTER := ps.cpp:|BSG-INFO:|BSG-PASS|BSG-FAIL|ALL TESTS PASSED|Benchmark|Mode:|Prefix|Resume cycles:|MISS-TRACE|DIRTY-EVICTION|cycles:|Switches/context:|cycles/switch|Fatal:|%Error:|Aborting|CORE PASS|CORE FAIL|BSG PASS|BSG FAIL
 
 SMOKE_TESTS := \
     mt_csr_isolation_test \
@@ -99,6 +99,7 @@ BENCHMARKS := \
     mt_request_interleave_benchmark \
     mt_load_ahead_benchmark \
     mt_ctxtsw_nonresident_overhead_benchmark \
+    mt_context_resume_prefix_benchmark \
     mt_ctxtsw_store_handoff_benchmark
 
 NONRESIDENT_TESTS := \
@@ -257,6 +258,9 @@ run-mt_prefetch_protocol_test: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config
+run-mt_context_resume_prefix_benchmark: check-nonresident-config
+run-mt_context_resume_prefix_benchmark: RUN_INPUT = $(BENCH_MODE)
+run-mt_context_resume_prefix_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_context_resume_prefix_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
 
 clean::
 	@echo "  [RM] Cleaning build artifacts..."
