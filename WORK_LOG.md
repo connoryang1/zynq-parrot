@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Context-resume prefetch experiment scoped — 2026-10-21:** created the dedicated `experiment/context-resume-prefetch` worktree and recorded the existing Linux cold-resume bounds, oracle replay limits, candidate speedup range, benchmark controls, and simulator-first acceptance gates in `CONTEXT_RESUME_PREFETCH_PLAN.md`. No RTL or FPGA claim is made yet; the next checkpoint is a matched instruction-prefix simulation benchmark.
+
 - **Protected-RPC review history published — 2026-10-19:** reworded the recent top-level and BlackParrot RPC commits with contract, mechanism, validation, and limitation bodies while preserving byte-identical source trees; pushed recoverable pre-rewrite archive refs, a protected-RPC review branch, and a separate asynchronous-verification branch. The permanent review-stack map records the three cross-repository PRs, dependency and integration order, and recovery refs; historical routed identities remain mapped to their review equivalents, while the future database/index benchmark stays outside both review scopes.
 
 - **Isolated background verification tooling — 2026-10-18:** added a low-priority detached simulation ladder with immutable worktrees, topology-specific model/program/trace storage, serialization, free-space and timeout guardrails, and retained revision/result manifests. Launcher control-plane tests and skill validation pass; no long simulation or FPGA job was needed to validate the launcher itself.
