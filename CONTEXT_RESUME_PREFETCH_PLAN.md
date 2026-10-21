@@ -94,7 +94,8 @@ prefetch workload must not be used as an instruction-resume result.
 
 ### Stage A — baseline and directed oracle
 
-Add a matched 2-resident/4-context benchmark with a runtime-selected mode:
+Use the matched `mt_context_resume_prefix_benchmark` as the 2-resident/4-context
+baseline, then extend its runtime-selected modes to:
 
 - cold target, no resume prefetch;
 - exact target instruction prefix requested before the switch;
