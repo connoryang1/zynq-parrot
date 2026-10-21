@@ -107,6 +107,27 @@ active context. The first RTL change should add an explicit sideband/arbiter
 and a traced request marker so acceptance, response, and cancellation can be
 measured independently.
 
+### Rejected first slice and revised cache seam
+
+The first direct-mode prototype reused the architectural I-cache request
+stream, substituted the saved target NPC, and waited for that request to be
+accepted before redirecting. It passed the directed correctness checks but
+regressed every matched mode (cold 490 to 554 cycles, target-warm 172 to 184,
+source-warm 226 to 227, and switch-only 97 to 99), so it was reverted. The
+regression shows that a target request cannot be made advisory merely by
+holding the normal frontend stream: it adds a pipeline/redirect dependency and
+does not provide a useful overlap point.
+
+The cache hierarchy already defines `e_cache_prefetch` and the UCE can service
+that best-effort request without an architectural response. The next minimal
+implementation should therefore add an explicit `prefetch` bit to the
+frontend I-cache packet and carry it through the TL/TV stages to select
+`e_cache_prefetch`; `spec` must remain reserved for the existing
+permission/translation semantics. The target request still needs a separate
+context/translation sideband and an acceptance/cancellation handshake, but it
+can then reuse the existing UCE capacity and response-drain rules instead of
+creating a second memory path.
+
 ## Existing benchmarks and controls
 
 Use these in order:
