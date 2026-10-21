@@ -30,6 +30,13 @@
 #define RPC_RESULT_FIRST     UINT64_C(0x2788)
 #define RPC_RESULT_SECOND    UINT64_C(0x2278)
 
+/* The benchmark wrapper enables a fixed repeated-call loop.  The ordinary
+ * correctness target leaves this disabled so its existing first/warm checks
+ * remain unchanged. */
+#ifndef RPC_BENCHMARK_LOOPS
+#define RPC_BENCHMARK_LOOPS 0
+#endif
+
 static uint64_t caller_root[512] __attribute__((aligned(4096)));
 static uint64_t caller_middle[512] __attribute__((aligned(4096)));
 static uint64_t caller_leaf[512] __attribute__((aligned(4096)));
@@ -135,7 +142,24 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "li t1, 0x40000\nld t2, 0(t1)\n"
     "li t3, 0x1111222233334444\n"
     "bne t2, t3, 6f\n"
-    "li t1, 1\nsd t1, 24(t0)\nj 8f\n"
+    "li t1, 1\nsd t1, 24(t0)\n"
+#if RPC_BENCHMARK_LOOPS
+    /* Matched steady-state loops.  Both paths execute the same service body,
+     * arguments, and result checks; only the boundary differs. */
+    "li s2, 64\nli s3, 0\nli s4, 0\n"
+    "10: li a0, 7\nli a1, 9\nli a2, 0x123\nli a3, 0x456\n"
+    "jal s7, direct_measure\nadd s3, s3, a4\nadd s4, s4, a0\n"
+    "li t1, 0x2788\nbne a0, t1, 12f\n"
+    "addi s2, s2, -1\nbnez s2, 10b\n"
+    "li t0, 0x50000\nsd s3, 72(t0)\nsd s4, 80(t0)\n"
+    "li s2, 64\nli s3, 0\nli s4, 0\n"
+    "11: li a0, 7\nli a1, 9\nli a2, 0x123\nli a3, 0x456\nli a4, 1\n"
+    "jal s7, protected_measure\nadd s3, s3, a4\nadd s4, s4, a0\n"
+    "li t1, 0x2788\nbne a0, t1, 12f\n"
+    "addi s2, s2, -1\nbnez s2, 11b\n"
+    "li t0, 0x50000\nsd s3, 88(t0)\nsd s4, 96(t0)\n"
+#endif
+    "j 8f\n"
     "1: li t1, 0x101\nsd t1, 24(t0)\nj 8f\n"
     "2: li t1, 0x102\nsd t1, 24(t0)\nj 8f\n"
     "3: li t1, 0x103\nsd t1, 24(t0)\nj 8f\n"
@@ -143,6 +167,9 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "5: li t1, 0x105\nsd t1, 24(t0)\nj 8f\n"
     "6: li t1, 0x106\nsd t1, 24(t0)\nj 8f\n"
     "7: li t0, 0x50000\nli t1, 0x107\nsd t1, 24(t0)\n"
+#if RPC_BENCHMARK_LOOPS
+    "12: li t0, 0x50000\nli t1, 0x108\nsd t1, 24(t0)\nj 8f\n"
+#endif
     /* Report through the architectural U-to-M trap path.  The protected
      * descriptor intentionally leaves no legacy U-mode switch available. */
     "8: ecall\n9: j 9b\n"
@@ -216,6 +243,12 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
                    && caller_private[0] == CALLER_PRIVATE_VALUE
                    && server_private[0] == SERVER_PRIVATE_VALUE
                    && unexpected_mcause == 0;
+#if RPC_BENCHMARK_LOOPS
+  const int benchmark_pass = pass
+                             && shared_page[9] != 0
+                             && shared_page[11] != 0
+                             && shared_page[10] == shared_page[12];
+#endif
   if (pass) {
     bp_print_string("Direct call first/repeat cycles: ");
     bp_hprint_uint64(shared_page[4]);
@@ -225,6 +258,24 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
     bp_hprint_uint64(shared_page[6]);
     bp_print_string(" / ");
     bp_hprint_uint64(shared_page[7]);
+#if RPC_BENCHMARK_LOOPS
+    bp_print_string("\nBenchmark direct/protected total cycles (64 calls): ");
+    bp_hprint_uint64(shared_page[9]);
+    bp_print_string(" / ");
+    bp_hprint_uint64(shared_page[11]);
+    bp_print_string("\nBenchmark result sums: ");
+    bp_hprint_uint64(shared_page[10]);
+    bp_print_string(" / ");
+    bp_hprint_uint64(shared_page[12]);
+#endif
+    if (!pass
+#if RPC_BENCHMARK_LOOPS
+        || !benchmark_pass
+#endif
+       ) {
+      bp_print_string("\n[BSG-FAIL] protected RPC benchmark checks\n");
+      bp_finish(1);
+    }
     bp_print_string("\n[BSG-PASS] atomic protected RPC capability, fixed entry and return\n");
     bp_finish(0);
   }
@@ -296,7 +347,7 @@ int main(void)
   caller_satp = SV39_MODE | (physical_address(caller_root) >> 12);
   server_satp_value = SV39_MODE | (UINT64_C(1) << SATP_ASID_SHIFT)
                       | (physical_address(server_root) >> 12);
-  for (int i = 0; i < 9; ++i)
+  for (int i = 0; i < 13; ++i)
     shared_page[i] = 0;
   unexpected_mcause = 0;
   unexpected_mepc = 0;
