@@ -10,11 +10,19 @@ The benchmark is a protected-procedure-call microbenchmark, analogous in purpose
 
 ## Matched modes
 
-One runtime-selected image will execute the same service body through four paths:
+The first implementation is intentionally staged around the existing validated
+RPC images.  The new `mt_protected_rpc_call_benchmark` target executes a matched
+64-call direct/protected loop in one image; the existing software-monitor and
+raw-transport programs remain separate controls until their call loops are
+ported to the same harness.  This keeps the first result small and reviewable
+without pretending that separate front-end histories are a fully matched
+four-mode experiment.
+
+The intended comparison matrix is:
 
 | Mode | Boundary | Purpose |
 | --- | --- | --- |
-| Direct | ordinary in-domain function call | lower bound for useful work plus call/return | 
+| Direct | ordinary in-domain function call | lower bound for useful work plus call/return |
 | Software protected | software monitor/context handoff | software isolation baseline | 
 | Raw transport | existing CSR argument transport and context switch | unsafe hardware transport bound | 
 | Protected hardware | installed capability with `pcall`/`preturn` | proposed mechanism | 
@@ -42,6 +50,25 @@ For each service size, report:
 - exact argument/result and private/shared-memory checks.
 
 The primary boundary metric is the warm protected-call premium over the matched direct call. The useful-work sweep shows when that fixed premium becomes negligible. The existing protected test's 43-cycle warm RPC versus 31-cycle warm direct result is retained as the initial reference, not silently replaced.
+
+## Initial simulator result
+
+The first implementation passes the 2-resident/4-logical-context Verilator gate
+with 64 identical calls in each loop:
+
+| Path | First call | Warm call | 64-call total | Result sum |
+| --- | ---: | ---: | ---: | ---: |
+| Direct | 0xc2 (194) | 0x1f (31) | 0x7c0 (1,984) | 0x9e200 |
+| Protected hardware | 0x72 (114) | 0x2b (43) | 0xac0 (2,752) | 0x9e200 |
+
+The protected boundary is therefore 12 cycles, or 38.7%, above the warm
+direct-call baseline for this service body. Both loops produce the same summed
+result and preserve the existing private-page checks. This is a simulator
+result, not an FPGA result; the final routed/physical check remains an
+end-of-line gate.
+
+The software-monitor and raw-transport rows are not claimed yet. They require
+the same repeated-loop treatment before they can be compared fairly.
 
 ## Scope and gates
 

@@ -91,6 +91,7 @@ CORRECTNESS_TESTS := \
     mt_ctxtsw_pure_ring_stress_test
 
 BENCHMARKS := \
+    mt_protected_rpc_call_benchmark \
     mt_rpc_context_transport_benchmark \
     mt_dependent_stream_benchmark \
     mt_ddr_latency_benchmark \
@@ -197,6 +198,7 @@ run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_rpc_context_transport_benchmark: check-rpc-config
 run-mt_protected_rpc_hardware_test: check-rpc-config
+run-mt_protected_rpc_call_benchmark: check-rpc-config
 run-mt_resident_reseed_fetch_test: check-nonresident-config
 run-mt_context_csr_rebind_test: check-nonresident-config
 run-mt_resident_relaunch_register_test: check-nonresident-config
