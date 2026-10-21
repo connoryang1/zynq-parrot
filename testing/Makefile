@@ -258,9 +258,15 @@ run-mt_prefetch_protocol_test: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)
 run-mt_umode_nonresident_sv39_handoff_test: check-nonresident-config
 run-mt_umode_nonresident_sv39_data_handoff_test: check-nonresident-config
 run-mt_ctxtsw_nonresident_overhead_benchmark: check-nonresident-config
-run-mt_context_resume_prefix_benchmark: check-nonresident-config
+run-mt_context_resume_prefix_benchmark: check-nonresident-config check-context-resume-config
 run-mt_context_resume_prefix_benchmark: RUN_INPUT = $(BENCH_MODE)
 run-mt_context_resume_prefix_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_context_resume_prefix_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
+
+.PHONY: check-context-resume-config
+check-context-resume-config:
+	@if (( $(BENCH_MODE) < 0 || $(BENCH_MODE) > 3 )); then \
+		echo "ERROR: context-resume BENCH_MODE must be in [0,3]"; exit 1; \
+	fi
 
 clean::
 	@echo "  [RM] Cleaning build artifacts..."

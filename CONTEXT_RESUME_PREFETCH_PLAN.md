@@ -64,13 +64,16 @@ With `NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1`, the matched runs measured:
 | --- | ---: | --- |
 | Cold target prefix | 490 | pass |
 | Target-context oracle warm | 172 | pass |
+| Source-context warm | 226 | pass |
+| Switch-only control | 97 | pass |
 
 This is a 2.85x oracle warm-start speedup (318 cycles, 64.9% fewer), not a
 prefetcher result. It demonstrates that the selected target instruction state
 is materially on the resume path and gives the future RTL a useful upper-bound
-control. The next experiment must replace the warmup with a real
-permission-checked instruction request while keeping these mode boundaries and
-the same target code layout.
+control. Warming only the source context is 2.17x (226 cycles), while removing
+the prefix body leaves a 97-cycle switch-only floor. The next experiment must
+replace the warmup with a real permission-checked instruction request while
+keeping these mode boundaries and the same target code layout.
 
 ## Existing benchmarks and controls
 

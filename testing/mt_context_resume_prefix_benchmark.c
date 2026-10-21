@@ -52,11 +52,17 @@ resume_prefix(void)
 
 void __attribute__((noinline, aligned(8))) target_entry(void)
 {
-  resume_prefix();
+  if (benchmark_mode != 3)
+    resume_prefix();
+  else
+    prefix_sink = PREFIX_OPS;
   if (warmup_gate) {
     peer_done = 0xfeed;
-    __asm__ volatile("fence rw, rw\ncsrwi 0x800, 0\n" : : : "memory");
-    for (;;) { }
+    if (warmup_gate == 1) {
+      __asm__ volatile("fence rw, rw\ncsrwi 0x800, 0\n" : : : "memory");
+      for (;;) { }
+    }
+    return;
   }
 
   peer_done = 2;
@@ -75,6 +81,12 @@ static void __attribute__((noinline, aligned(8))) source_entry(void)
   if (mode == 1) {
     warmup_gate = 1;
     __asm__ volatile("csrwi 0x800, 2\n" : : : "memory");
+    warmup_gate = 0;
+    peer_done = 0;
+    seed_thread(2, &target_stack[STACK_WORDS], (uint64_t)target_entry);
+  } else if (mode == 2) {
+    warmup_gate = 2;
+    target_entry();
     warmup_gate = 0;
     peer_done = 0;
     seed_thread(2, &target_stack[STACK_WORDS], (uint64_t)target_entry);
