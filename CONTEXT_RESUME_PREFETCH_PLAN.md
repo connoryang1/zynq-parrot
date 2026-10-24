@@ -307,3 +307,13 @@ reuse. Use an exact-address descriptor first and count completion and target
 consumption before adding a learned address set. The live producer also makes
 a routed fit check meaningful; it does not by itself demonstrate a Linux
 one-way benefit.
+
+The next isolated adapter checkpoint makes the hint instruction retire even
+when the UCE queue cannot admit it. A forced queue-unavailable full-core run
+retired and dropped 30 hints without stalling, kept 91 ordinary
+request/metadata pairs aligned, and passed the guest; the diagnostic force
+was removed before a clean normal-model smoke. This bounds the queue-refusal
+part of a future scheduler hook, while D-cache occupancy, target-mm
+translation, and task/mm lifetime still need explicit treatment. Evidence
+and the reproducible diagnostic patch are in
+`logs/target-data-preview-bounded-hint-20261024/README.md`.

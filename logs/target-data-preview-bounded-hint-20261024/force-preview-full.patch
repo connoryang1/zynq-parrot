@@ -1,0 +1,13 @@
+diff --git a/cosim/v/bsg_nonsynth_zynq_testbench.sv b/cosim/v/bsg_nonsynth_zynq_testbench.sv
+--- a/cosim/v/bsg_nonsynth_zynq_testbench.sv
++++ b/cosim/v/bsg_nonsynth_zynq_testbench.sv
+@@ -597,1 +597,9 @@ module bsg_nonsynth_zynq_testbench;
++`ifdef BP_TEST_PREVIEW_FULL
++  // Diagnostic only: hold preview admission unavailable to check that
++  // best-effort hint retirement does not wait for queue capacity.
++  always @(posedge aclk)
++    if (aresetn)
++      force dut.top_fpga_inst.blackparrot.dcache_uce.preview_ready_o = 1'b0;
++`endif
++
+   wire waveform_en_li = 1'b1;
