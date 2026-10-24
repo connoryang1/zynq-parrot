@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -45,12 +46,14 @@ struct peer_result {
   uint64_t sum;
   uint64_t entry_cycle;
   uint64_t load_cycles;
+  uint64_t line_cycles[4];
   uint64_t context;
 };
 static struct peer_result peer_results[trials];
 static _Atomic uint32_t phase;
 static _Atomic uint32_t done;
 static _Atomic uint32_t ready;
+static int per_load_mode;
 
 /* a0=target lines, a1=completion flag, a2=mode, a3=stale lines. */
 static __attribute__((naked, noinline, noreturn, used, aligned(64)))
@@ -143,12 +146,25 @@ static void *peer_main(void *unused)
   for (unsigned trial = 1; trial <= trials; ++trial) {
     futex_wait_until(&phase, trial);
     peer_results[trial - 1].context = current_context();
-    uint64_t begin = global_cycle();
-    peer_results[trial - 1].entry_cycle = begin;
     uint64_t sum = 0;
-    for (unsigned i = 0; i < 4; ++i)
-      sum += target_lines[i].word[0];
-    peer_results[trial - 1].load_cycles = global_cycle() - begin;
+    if (per_load_mode) {
+      uint64_t marks[5];
+      marks[0] = global_cycle();
+      for (unsigned i = 0; i < 4; ++i) {
+        sum += target_lines[i].word[0];
+        marks[i + 1] = global_cycle();
+      }
+      peer_results[trial - 1].entry_cycle = marks[0];
+      peer_results[trial - 1].load_cycles = marks[4] - marks[0];
+      for (unsigned i = 0; i < 4; ++i)
+        peer_results[trial - 1].line_cycles[i] = marks[i + 1] - marks[i];
+    } else {
+      uint64_t begin = global_cycle();
+      peer_results[trial - 1].entry_cycle = begin;
+      for (unsigned i = 0; i < 4; ++i)
+        sum += target_lines[i].word[0];
+      peer_results[trial - 1].load_cycles = global_cycle() - begin;
+    }
     peer_results[trial - 1].sum = sum;
     atomic_store_explicit(&done, trial, memory_order_release);
     futex_wake(&done);
@@ -174,8 +190,14 @@ static void source_work(void)
                    : : : "t0", "memory");
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+  if (argc == 2 && !strcmp(argv[1], "--per-load"))
+    per_load_mode = 1;
+  else if (argc != 1) {
+    fputs("usage: context_preview_oracle [--per-load]\n", stderr);
+    return EXIT_FAILURE;
+  }
   /* Give each eviction page a distinct backing page without storing 40 KiB
    * of zeros in the serial-transfer ELF. */
   for (unsigned page = 0; page < 10; ++page)
@@ -243,6 +265,13 @@ int main(void)
              (unsigned long long)(wake_end - begin),
              (unsigned long long)(peer_results[trial - 1].entry_cycle - begin),
              (unsigned long long)peer_results[trial - 1].load_cycles, cpu);
+      if (per_load_mode)
+        printf("PREVIEW_LOADS mode=%u repeat=%u l0=%llu l1=%llu l2=%llu l3=%llu\n",
+               mode, repeat,
+               (unsigned long long)peer_results[trial - 1].line_cycles[0],
+               (unsigned long long)peer_results[trial - 1].line_cycles[1],
+               (unsigned long long)peer_results[trial - 1].line_cycles[2],
+               (unsigned long long)peer_results[trial - 1].line_cycles[3]);
     }
   }
   check_pthread(pthread_join(peer, NULL), "join peer");

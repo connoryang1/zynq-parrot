@@ -1,0 +1,7 @@
+This directory records a rejected physical Linux demand-trace attempt on the target-data preview image. The exact routed bitstream does not implement the requested miss-recorder CSR, so the guest failed before any preview trial and this attempt supplies no performance evidence.
+
+# Recorder capability mismatch, 2026-10-24
+
+The routed preview bitstream SHA-256 was `f234819855ee79028ccf6387a356fe297962b9e30e36420f4da224150384a7b8`, built from BlackParrot `c50b857`; the diagnostic ELF SHA-256 was `b468357a49289df40647bf97b07ae88db7576f1a0effb76901c0f5459f9cc878`. The guest trapped with illegal-instruction cause 2 at instruction word `0x80571073`, the first `csrw 0x805`. `git show c50b857:bp_be/src/v/bp_be_calculator/bp_be_csr.sv` contains no `0x805` recorder implementation; the separate recorder bitstream `f4a183d8...` was built from a different RTL/configuration and cannot be treated as this preview image. The original board transcript SHA-256 is `5d6d2683b0908bcd6060a1b89e77104b8c99647bd02504d4e138e0e4ddc4bd87` and remains local as `board.log`.
+
+The interrupted runner left the board untrusted. It was power cycled, passed `wait_pynq_ready.sh` at 94 seconds of uptime, and reloaded the verified `f2348198...` overlay before another run. Future diagnostic ELFs must be checked against the *exact routed RTL's* CSR implementation, not the current checkout or another image, before physical execution. The subsequent per-load timing run uses no recorder CSRs and is documented in `logs/context-preview-linux-per-load-20261024/`.

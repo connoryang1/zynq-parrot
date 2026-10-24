@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Per-load Linux preview localization — 2026-10-24:** the six-mode FPGA/Linux diagnostic passed 48 trials and showed correct hints make target lines 0, 2, and 3 fast almost always, while line 1 was slow in three of eight helper and two of eight inline trials. A preceding recorder attempt was invalid because the exact preview bitstream lacks CSR `0x805`; the board was recovered, and the next control will reverse hint order to distinguish address from issue position (`logs/context-preview-linux-per-load-20261024/`, `logs/context-preview-linux-demand-trace-20261024/`).
+
 - **Inline Linux preview control — 2026-10-24:** a fresh-boot six-mode FPGA/Linux run passed 48 trials with direct, helper, and inline correct/stale controls. Inline issue cut the median source hint phase to 19 cycles from 141 for helper-correct, but reached the eight-cycle four-load floor in only two of eight correct trials and established no one-way speedup; request acceptance, completion, and side-buffer survival now need attribution (`logs/context-preview-linux-inline-20261024/`).
 
 - **Physical Linux preview timing corrected — 2026-10-24:** phase timestamps on the same routed image pass 32 trials and confirm an 8-cycle median for correctly hinted peer loads versus 188 direct, while the explicit preview helper takes about 166 cycles. The earlier reported total was source-to-source round-trip time, not target startup; the corrected peer-completion medians (23,476.5 direct, 32,704 correct) are too variable to establish a whole-handoff effect (`logs/context-preview-linux-phases-20261024/`).

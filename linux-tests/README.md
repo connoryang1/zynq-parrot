@@ -520,8 +520,8 @@ returns to context 0 before waking an ordinary pthread and blocking on a
 futex. The peer runs after a real Linux scheduler handoff and loads four target
 words. Direct, empty-helper, correct-helper, stale-helper, inline-correct, and
 inline-stale trials rotate order over eight repetitions; each trial verifies
-the peer checksum and reports the
-core-wide source-to-source round trip, preview duration, peer entry, and peer's
+the peer checksum and reports the core-wide source-to-source round trip,
+preview duration, peer entry, and peer's
 four-load interval separately. Peer entry plus peer loads is the one-way
 source-start to peer-completion endpoint; wake return and peer entry need not
 occur in that order.
@@ -560,9 +560,17 @@ the source work and futex wake. Its inline-correct hint phase had a 19-cycle
 median versus 141 for helper-correct, but only two of eight trials in each
 correct-hint mode reached the eight-cycle four-load floor. The exact same-run
 controls and all 48 rows are in `logs/context-preview-linux-inline-20261024/`.
-The next diagnostic is per-line accepted/completed hint and demand-miss timing;
-an aggregate four-load interval cannot distinguish late, dropped, and displaced
-prefetches.
+Run the same ELF with `--per-load` to sample the global cycle counter after
+each of the peer's four volatile loads. A physical run of this mode found the
+intermittent delay concentrated on target line 1: three of eight correct-helper
+and two of eight correct-inline trials had a slow line-1 load, while lines 2
+and 3 were fast in all 16 correct trials. See
+`logs/context-preview-linux-per-load-20261024/` for the matched controls.
+This per-load diagnostic changes the four-load timing shape and still cannot
+distinguish a late, dropped, or displaced hint. The exact `f2348198...`
+preview bitstream does not implement miss-recorder CSR `0x805`; the rejected
+recorder attempt and image-capability guardrail are documented in
+`logs/context-preview-linux-demand-trace-20261024/`.
 
 ## Ordered Linux handoff miss capture
 
