@@ -457,6 +457,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the prototype now has an enforceable privilege boundary around its single protected capability instead of merely adding a safe fast path alongside mutable U/S control and observation interfaces. Preserving domain metadata also makes descriptor installation composable with an M-mode bootstrap sequence.
 - **Limits:** this remains one immutable resident capability with a depth-one continuation. Nonresident endpoints, nesting, revocation/teardown, interrupt semantics during service, multi-capability policy, Linux/OpenSBI integration, routed timing, and physical FPGA execution remain unimplemented or unqualified.
 
+### RL-049 — An oracle target preview reduces a controlled cold-data handoff window
+
+- **Status:** accepted directed simulation; Linux and physical validation pending
+- **Scope:** two resident slots, four logical contexts, four 64-byte-spaced target words, 128-iteration source work between a preview and final target handoff, 16-byte detached hints with five request slots
+- **Claim:** direct, empty-preview, correct-hint, and stale-hint modes pass target checksum and context checks in three repetitions. Their median measured windows are 517, 540, 337, and 548 cycles respectively, so correct hints save 203 cycles (37.6%) against an empty preview including its extra handoffs. The FST records 21 accepted and issued hints, 42 response beats, and 14 assertions of the D-cache side-buffer hit signal across the complete test.
+- **Evidence:** `testing/mt_context_preview_oracle_test.c`, the clean `make -C testing run-mt_context_preview_oracle_test NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=8` run, and `logs/context-preview-oracle-20261023/accepted-summary.log`; full `accepted-run.log` and `accepted-dump.fst` remain local with hashes recorded in that directory's README. The known-good resident-prefetch handoff also passes in the same worktree and simulator configuration.
+- **Meaning:** a short, scheduled target-context preview can issue useful data requests before the target's actual demand, and this controlled benefit exceeds the preview control cost. The current hardware uses a narrow D-cache side buffer rather than full-line L1 installation.
+- **Limits:** this is an oracle-address, bare-metal, synthetic cold-data window; the aggregate waveform counts are not yet attributed per mode. It does not implement a kernel hint, general per-task context ownership, learned addresses, or a measured whole-Linux-switch speedup.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -512,9 +521,17 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 - **Missing:** physical-DDR detached full-line endpoint timing; useful-before-demand coverage and completion time for an ordered shared privileged-instruction prefix; target-prediction accuracy on broader scheduler workloads; an instruction-cache replay path; and coexistence with real scheduler traffic.
 - **Decisive experiment:** replay RL-029's stable shared privileged-instruction prefix through a separate I-cache installer starting at syscall entry, counting issued, completed-before-demand, late, consumed, unused, and dropped lines against recorder-only and replay-disabled controls. Pair it with a physical detached full-line probe so the simulation's conditional 41-cycle input can be replaced with measured request-to-first-beat and final-beat timing.
 
+### OQ-006 — Can a kernel-scheduled target preview pay off on real tasks?
+
+- **Known:** RL-049 establishes a useful four-address oracle preview in a controlled simulator window. The current hint transfers 16 bytes to a D-cache side buffer, and existing Linux cooperative context demos do not allocate hardware contexts to arbitrary scheduler tasks.
+- **Missing:** mode-attributed useful-before-demand hits, a safe target preview stub with bounded execution and return, per-task context ownership and teardown, an accurate target-address source, and whole Linux switch/throughput results.
+- **Decisive experiment:** first run the same oracle schedule with a Linux-hosted pair and traced first-use addresses, with direct, empty, correct, and stale controls. Once its benefit exceeds preview cost, add a kernel-owned task/context binding and a bounded preview request at the earliest point where `next` is known; compare a small per-task learned address set to the oracle, and test both a controlled cold-data handoff and a natural futex/request workload.
+
 ## Next experiment
 
 The immediate next correctness experiment remains OQ-001 when board recovery is available. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, recorder-fit, directed recorder validation, Linux miss-capture, or banked-pipeline tracing. The next architectural experiment is ordered useful-before-demand replay of RL-029's shared privileged-instruction prefix, starting at syscall entry and measuring how many lines publish before their actual demands. A physical detached full-line probe should run alongside it when the board is available, replacing the conditional 41-cycle input without blocking the useful-prefix implementation.
+
+For the target-context data-preview branch, OQ-006 now begins with a Linux-hosted oracle control and mode-attributed trace accounting. Do not infer a kernel scheduler benefit from RL-049's bare-metal 203-cycle gap.
 
 ## Delta log
 

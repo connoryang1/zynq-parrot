@@ -43,6 +43,7 @@ TEST_MARKERS = {
     "mt_context_csr_rebind_test": "[BSG-PASS] resident context CSR rebind preserved target GPR state",
     "mt_resident_relaunch_register_test": "[BSG-PASS] resident relaunch register preservation",
     "mt_resident_relaunch_prefetch_test": "[BSG-PASS] resident relaunch prefetch register preservation",
+    "mt_context_preview_oracle_test": "[BSG-PASS] context preview oracle handoff and data",
     "mt_resident_reseed_irq_test": "[BSG-PASS] resident reseed interrupt PC and CSR preservation",
     "mt_ctxtsw_smoke_test": "[BSG-PASS] ctxtsw smoke test completed",
     "mt_ctxtsw_logical_csr_readback_test": "[BSG-PASS] logical context CSR reported 0 -> 1 -> 0",

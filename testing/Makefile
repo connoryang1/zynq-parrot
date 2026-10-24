@@ -71,6 +71,7 @@ CORRECTNESS_TESTS := \
     mt_context_csr_rebind_test \
     mt_resident_relaunch_register_test \
     mt_resident_relaunch_prefetch_test \
+    mt_context_preview_oracle_test \
     mt_resident_reseed_irq_test \
     mt_umode_prefetch_test \
     mt_prefetch_hint_test \
@@ -158,6 +159,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_resident_relaunch_prefetch_test.riscv: $(TOP)/testin
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_interleave_benchmark.riscv: $(TOP)/testing/mt_request_interleave_benchmark.c $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_nonresident_interleave_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_context_preview_oracle_test.riscv: $(TOP)/software/include/bp_prefetch.h
+run-mt_context_preview_oracle_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5 BP_PREFETCH_AXI_BYPASS
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_dirty_victim_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_protocol_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ddr_latency_benchmark.riscv: CFLAGS += -DDDR_LATENCY_VERBOSE=$(DDR_LATENCY_VERBOSE)
