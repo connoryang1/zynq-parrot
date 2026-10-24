@@ -285,3 +285,25 @@ to this physical port. Instrument enqueue, table admission, forward issue,
 response, side-buffer publication, and target first use before interpreting
 whole-handoff timing. Route the design once that producer is live so synthesis
 does not optimize the tied-off queue away.
+
+### Live translated-hint adapter
+
+The isolated `experiment/target-data-preview-producer` branch now routes an
+existing D-cache `prefetch.r` request to that queue after the D-cache has
+formed its physical address and applied its normal translation/permission
+checks. A small wrapper separates the hint's delayed metadata from ordinary
+UCE request metadata. Clean traced oracle, context-switch smoke, and U-mode
+permission runs pass. The oracle trace counts 21 accepted and issued previews;
+its 12 cycle rows exactly match the prior tied-off-queue checkpoint. The
+permission trace has one permitted queued hint, but the following demand
+overtakes it before issue. Exact commands and hashes are in
+`logs/target-data-preview-producer-20261024/README.md`.
+
+This establishes a same-mm request transport path, not a scheduler interface.
+The next kernel-facing design must specify where a target physical descriptor
+is prepared without sleeping under the runqueue lock, how that descriptor is
+bound to a task/mm generation, and how cancellation prevents stale work at
+reuse. Use an exact-address descriptor first and count completion and target
+consumption before adding a learned address set. The live producer also makes
+a routed fit check meaningful; it does not by itself demonstrate a Linux
+one-way benefit.
