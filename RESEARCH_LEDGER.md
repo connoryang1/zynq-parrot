@@ -466,6 +466,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** a short, scheduled target-context preview can issue useful data requests before the target's actual demand, and this controlled benefit exceeds the preview control cost. The current hardware uses a narrow D-cache side buffer rather than full-line L1 installation.
 - **Limits:** this is an oracle-address, bare-metal, synthetic cold-data window; the aggregate waveform counts are not yet attributed per mode. It does not implement a kernel hint, general per-task context ownership, learned addresses, or a measured whole-Linux-switch speedup.
 
+### RL-050 — Correct data hints shorten first use after a physical Linux handoff, not the full handoff
+
+- **Status:** accepted physical FPGA/Linux oracle control; no whole-handoff speedup observed
+- **Scope:** ten-context routed `f2348198...` image, one Linux process with two pthreads pinned to CPU 0, a source-owned hardware preview helper, four 64-byte-spaced data words, and eight rotated trials per direct/empty/correct/stale mode
+- **Claim:** all 32 trials pass checksum, context, guest exit, and host completion checks. The peer's four-load median is 200.5/139/7/180.5 cycles for direct/empty/correct/stale respectively. The complete source-to-peer-completion median is 31,151/36,319.5/49,586.5/51,586 cycles, with substantial trial variation. Correct hints therefore demonstrably reach useful data across the Linux handoff, but this application-controlled preview does not improve its complete interval.
+- **Evidence:** `linux-tests/context_preview_oracle.c`; the line-ending-normalized `logs/context-preview-linux-20261024/board.log`, `validated-status.json`, and `audit_run.py`; matching guest ELF SHA-256 `eb48c980c0a4926a4b15df180e08d2c9d015d79fa8cd16f82d04a576091cb6df`. The post-hoc audit corrects only the original runner's `CORE[0] PASS` versus actual `CORE PASS` marker mismatch; it verifies all rows, guest SHA, exit, poweroff, and runner status.
+- **Meaning:** the mechanism can make a known imminent data use fast after real Linux scheduling. This result does not bound a kernel-owned, nonblocking preview, because this oracle pays for extra explicit hardware handoffs and records no mode-attributed issue/completion latency.
+- **Limits:** same-address-space oracle addresses and ordinary peer pthread; the helper is not the peer's Linux task. Neither per-task learning nor a Linux scheduler hint exists, and the noisy total interval does not isolate the preview cost.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -523,15 +532,15 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ### OQ-006 — Can a kernel-scheduled target preview pay off on real tasks?
 
-- **Known:** RL-049 establishes a useful four-address oracle preview in a controlled simulator window. The current hint transfers 16 bytes to a D-cache side buffer, and existing Linux cooperative context demos do not allocate hardware contexts to arbitrary scheduler tasks.
-- **Missing:** mode-attributed useful-before-demand hits, a safe target preview stub with bounded execution and return, per-task context ownership and teardown, an accurate target-address source, and whole Linux switch/throughput results.
-- **Decisive experiment:** first run the same oracle schedule with a Linux-hosted pair and traced first-use addresses, with direct, empty, correct, and stale controls. Once its benefit exceeds preview cost, add a kernel-owned task/context binding and a bounded preview request at the earliest point where `next` is known; compare a small per-task learned address set to the oracle, and test both a controlled cold-data handoff and a natural futex/request workload.
+- **Known:** RL-049 establishes a useful four-address oracle preview in a controlled simulator window; RL-050 shows the hinted words are useful after a real Linux futex handoff, while the application-controlled preview has no measured whole-handoff benefit. The current hint transfers 16 bytes to a D-cache side buffer, and existing Linux cooperative context demos do not allocate hardware contexts to arbitrary scheduler tasks. In this repository's Linux 6.6 source, `__schedule()` selects `next` with local interrupts disabled and the runqueue lock held; `context_switch()` calls `switch_mm_irqs_off()` only afterward. Executing a target U-mode helper at that point would require separate address-space and locking proof; a bounded nonblocking request handoff is the plausible first scheduler hook.
+- **Missing:** mode-attributed useful-before-demand hits, a kernel-safe bounded request interface, per-task context ownership and teardown, a learned target-address source, and a matched whole-switch/throughput result.
+- **Decisive experiment:** measure request issue/completion and useful-before-demand timing during the existing Linux oracle, then prototype a kernel-owned nonblocking descriptor after `next` is known. Compare correct and stale oracle addresses before substituting a small per-task learned set, with both controlled cold-data and natural futex/request workloads.
 
 ## Next experiment
 
 The immediate next correctness experiment remains OQ-001 when board recovery is available. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, recorder-fit, directed recorder validation, Linux miss-capture, or banked-pipeline tracing. The next architectural experiment is ordered useful-before-demand replay of RL-029's shared privileged-instruction prefix, starting at syscall entry and measuring how many lines publish before their actual demands. A physical detached full-line probe should run alongside it when the board is available, replacing the conditional 41-cycle input without blocking the useful-prefix implementation.
 
-For the target-context data-preview branch, OQ-006 now begins with a Linux-hosted oracle control and mode-attributed trace accounting. Do not infer a kernel scheduler benefit from RL-049's bare-metal 203-cycle gap.
+For the target-context data-preview branch, OQ-006 now needs mode-attributed issue/completion timing and a kernel-owned nonblocking request. Do not infer a kernel scheduler speedup from RL-049's bare-metal 203-cycle gap or RL-050's seven-cycle peer load interval.
 
 ## Delta log
 

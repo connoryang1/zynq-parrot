@@ -513,6 +513,41 @@ compare complete implementations rather than attributing the entire difference
 to switching or cache behavior. Bare-metal results from a
 different request stream or cache state are not a matched speedup comparison.
 
+## Oracle data preview before a Linux futex handoff
+
+`context_preview_oracle.c` uses context 1 as a short U-mode hint helper, then
+returns to context 0 before waking an ordinary pthread and blocking on a
+futex. The peer runs after a real Linux scheduler handoff and loads four target
+words. Direct, empty-preview, correct-hint, and stale-hint trials rotate order
+over eight repetitions; each trial verifies the peer checksum and reports the
+core-wide total interval and the peer's four-load interval separately.
+
+```sh
+make -C linux-tests context-preview-oracle-dynamic \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  REQUEST_NUM_CONTEXTS=10
+make -s -C linux-tests emit-context-preview-dynamic-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  REQUEST_NUM_CONTEXTS=10 > linux-tests/out/context_preview_oracle_dynamic.transfer
+```
+
+The dynamic ELF uses the same RISC-V loader and glibc requirements as the
+request benchmark. `REQUEST_NUM_CONTEXTS` must match the routed image because
+the CSR `0x802` register field moves with the context-ID width. This is an
+application-controlled oracle for same-address-space data: the helper is not
+the peer's Linux task, and the experiment does not implement a kernel hint or
+per-task hardware-context allocation. Compare mode medians from one invocation
+and retain the direct/empty/stale controls before interpreting any savings.
+
+The first physical Linux run on the verified ten-context `f2348198...` image
+passed 32 trials, guest exit zero, `CORE PASS`, `BSG PASS`, and runner exit zero.
+Correct hints reduced the peer's four-load median to 7 cycles from 200.5 direct,
+139 empty-preview, and 180.5 stale-hint cycles. The complete source-to-peer
+median was 49,586.5 cycles with correct hints versus 31,151 direct, with large
+trial variation; there is no observed whole-handoff speedup in this control.
+The exact hashes, raw rows, and post-hoc terminal-marker audit are retained in
+`logs/context-preview-linux-20261024/`.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder

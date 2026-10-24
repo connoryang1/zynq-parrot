@@ -29,6 +29,8 @@ REQUEST_DYNAMIC_APP := $(OUT)/request_benchmark_dynamic
 REQUEST_LOAD_AHEAD_APP := $(OUT)/request_benchmark_load_ahead
 REQUEST_LOAD_AHEAD_DYNAMIC_APP := $(OUT)/request_benchmark_load_ahead_dynamic
 REQUEST_HOST_APP := $(OUT)/request_benchmark_host
+PREVIEW_APP := $(OUT)/context_preview_oracle
+PREVIEW_DYNAMIC_APP := $(OUT)/context_preview_oracle_dynamic
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -109,6 +111,9 @@ request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
 request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
 request-benchmark-load-ahead-dynamic: $(REQUEST_LOAD_AHEAD_DYNAMIC_APP)
 request-benchmark-host: $(REQUEST_HOST_APP)
+.PHONY: context-preview-oracle context-preview-oracle-dynamic emit-context-preview-transfer emit-context-preview-dynamic-transfer
+context-preview-oracle: $(PREVIEW_APP)
+context-preview-oracle-dynamic: $(PREVIEW_DYNAMIC_APP)
 cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
 cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 
@@ -130,6 +135,27 @@ $(REQUEST_DYNAMIC_APP) $(REQUEST_LOAD_AHEAD_DYNAMIC_APP): request_benchmark.c ..
 $(REQUEST_HOST_APP): request_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_HOST_CC) -std=c11 -O2 -Wall -Wextra -Werror -pthread -o $@ $< >&2
+
+$(PREVIEW_APP): context_preview_oracle.c ../software/include/bp_prefetch.h ../testing/mt_seed.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -DBP_NUM_THREADS=2 \
+	  -DBP_NUM_CONTEXTS=$(REQUEST_NUM_CONTEXTS) -o $@ $< >&2
+
+$(PREVIEW_DYNAMIC_APP): context_preview_oracle.c ../software/include/bp_prefetch.h ../testing/mt_seed.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread \
+	  -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=$(REQUEST_NUM_CONTEXTS) -o $@ $< >&2
+	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+emit-context-preview-transfer: check-linux-cc context-preview-oracle
+	@printf '%s\n' ': > /tmp/context_preview_oracle.b64'
+	@base64 -w 76 $(PREVIEW_APP) | sed "s|.*|echo '&' >> /tmp/context_preview_oracle.b64|"
+	@printf '%s\n' 'base64 -d /tmp/context_preview_oracle.b64 > /tmp/context_preview_oracle' 'chmod +x /tmp/context_preview_oracle'
+
+emit-context-preview-dynamic-transfer: check-linux-cc context-preview-oracle-dynamic
+	@printf '%s\n' ': > /tmp/context_preview_oracle_dynamic.b64'
+	@base64 -w 76 $(PREVIEW_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/context_preview_oracle_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/context_preview_oracle_dynamic.b64 > /tmp/context_preview_oracle_dynamic' 'chmod +x /tmp/context_preview_oracle_dynamic'
 
 $(TRACE_CAPTURE_APP): cache_miss_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
