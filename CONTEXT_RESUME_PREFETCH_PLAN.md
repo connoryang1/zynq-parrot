@@ -262,3 +262,26 @@ path has separate request accounting. The early target user-data loads can be
 fast while kernel scheduling and first instruction/translation startup still
 dominate the one-way handoff; the physical oracle has already shown this
 distinction.
+
+### Isolated RTL checkpoint and next interface
+
+BlackParrot `007fadc6e0fcec13777a3421b385483907651768` now has a four-entry
+physical data-preview enqueue port at the D-cache UCE. The port bypasses the
+architectural request/metadata pair, drains into the existing detached hint
+slots on idle input cycles, drops a queued hint when the same address already
+has an accepted demand, and drains canceled replies without publishing their
+data. A standalone gate exercises those rules; a clean traced full-core oracle
+and known-good context-switch smoke pass with the port tied low. This is the
+storage and arbitration slice of milestone 2, with exact evidence in
+`logs/target-data-preview-lane-sim-20261024/`.
+
+The next connection must provide a verified physical address and explicit
+task/mm generation before asserting `preview_v_i`. The initial same-mm oracle
+can translate the exact target words while that mapping is current and then
+enqueue them before `futex_wake`; a cancellation pulse must accompany task/mm
+reuse or prediction withdrawal. A cross-mm Linux hook needs a safe target-mm
+translation or pinning path and cannot pass an unchecked user virtual address
+to this physical port. Instrument enqueue, table admission, forward issue,
+response, side-buffer publication, and target first use before interpreting
+whole-handoff timing. Route the design once that producer is live so synthesis
+does not optimize the tied-off queue away.

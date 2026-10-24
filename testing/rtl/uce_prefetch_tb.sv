@@ -13,6 +13,11 @@ module uce_prefetch_tb
    input [63:0] req_addr_i,
    input metadata_v_i,
    input [2:0] metadata_way_i,
+   input preview_v_i,
+   input preview_cancel_i,
+   input [63:0] preview_addr_i,
+   output preview_ready_o,
+   output [2:0] preview_count_o,
    input arrays_accept_i,
    output req_yumi_o, req_lock_o, critical_o, last_o, credits_full_o, credits_empty_o,
    output [3:0] prefetch_count_o,
@@ -87,6 +92,7 @@ module uce_prefetch_tb
   assign fwd_state_o = fwd.payload.state;
   assign fwd_prefetch_o = fwd.payload.prefetch;
   assign prefetch_count_o = 4'($countones(dut.prefetch_valid_r));
+  assign preview_count_o = dut.preview_count_r;
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(1), .assoc_p(assoc_lp),
            .prefetch_els_p(10),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
@@ -95,6 +101,9 @@ module uce_prefetch_tb
          .cache_req_i(req), .cache_req_v_i(req_v_i), .cache_req_yumi_o(req_yumi_o),
          .cache_req_lock_o(req_lock_o), .cache_req_metadata_i(metadata),
          .cache_req_metadata_v_i(metadata_v_i), .cache_req_id_o(req_id_o),
+         .preview_paddr_i(paddr_width_p'(preview_addr_i)),
+         .preview_v_i(preview_v_i), .preview_cancel_i(preview_cancel_i),
+         .preview_ready_o(preview_ready_o),
          .cache_req_critical_o(critical_o), .cache_req_last_o(last_o),
          .cache_req_credits_full_o(credits_full_o), .cache_req_credits_empty_o(credits_empty_o),
          .tag_mem_pkt_o(tag_pkt), .tag_mem_pkt_v_o(tag_v_o),

@@ -13,7 +13,7 @@ namespace {
 constexpr unsigned hint = 9, demand = 0, memory_read = 0;
 constexpr uint64_t seed = UINT64_C(0x1234567800000000);
 struct Header { unsigned type, size, way, state; uint64_t addr; bool prefetch; };
-struct Handshake { bool req, rev; };
+struct Handshake { bool req, rev, preview; };
 void require(bool condition, const char *message) {
   if (!condition) throw std::runtime_error(message);
 }
@@ -39,7 +39,8 @@ class Test {
       release_arrays_at = 0;
     }
     dut.clk_i = 0; dut.eval(); context.timeInc(5); trace.dump(context.time());
-    Handshake accepted{bool(dut.req_yumi_o), bool(dut.rev_ready_o)};
+    Handshake accepted{bool(dut.req_yumi_o), bool(dut.rev_ready_o),
+                       bool(dut.preview_ready_o)};
     if (!dut.reset_i && dut.fwd_v_o && dut.fwd_ready_i) {
       Header h{dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o, dut.fwd_state_o,
                dut.fwd_addr_o, bool(dut.fwd_prefetch_o)};
@@ -97,6 +98,13 @@ class Test {
     }
     throw std::runtime_error("memory request timeout");
   }
+  void wait_sent_at_least(unsigned count) {
+    for (unsigned n = 0; n < 200; ++n) {
+      if (sent.size() >= count) return;
+      step();
+    }
+    throw std::runtime_error("queued preview memory request timeout");
+  }
   void wait_empty() {
     for (unsigned n = 0; n < 200; ++n) {
       step();
@@ -151,12 +159,19 @@ class Test {
     }
     throw std::runtime_error("normal demand never completed");
   }
+  void enqueue_preview(uint64_t addr) {
+    dut.preview_addr_i = addr; dut.preview_v_i = 1;
+    require(step().preview, "preview queue refused an available entry");
+    dut.preview_v_i = 0; step();
+  }
 public:
   Test() {
     context.traceEverOn(true);
     dut.trace(&trace, 99); trace.open("uce-prefetch.fst");
     dut.reset_i = 1; dut.arrays_accept_i = 1;
-    dut.req_v_i = 0; dut.metadata_v_i = 0; dut.rev_v_i = 0; dut.rev_state_i = 0;
+    dut.req_v_i = 0; dut.metadata_v_i = 0;
+    dut.preview_v_i = 0; dut.preview_cancel_i = 0;
+    dut.preview_addr_i = 0; dut.rev_v_i = 0; dut.rev_state_i = 0;
     dut.fwd_ready_i = 0;
   }
   ~Test() { dut.final(); trace.close(); }
@@ -238,8 +253,106 @@ public:
     cycles(8);
     require(sent.size() == 16 && demand_writes == 8 && completions == 2,
             "final request/response accounting mismatch");
-    std::cout << "[UCE-PREFETCH] PASS: ten slots, duplicate coverage/full-table stall, wrapped tags, "
-                 "reordered 16-byte hint replies, demand routing, final-beat backpressure, credits\n";
+
+    // The new physical preview lane buffers four addresses even when all
+    // ordinary hint slots are held. It must not consume the demand port.
+    constexpr uint64_t preview_base = UINT64_C(0x83000003);
+    const unsigned start = sent.size();
+    dut.fwd_ready_i = 0;
+    for (unsigned i = 0; i < 10; ++i)
+      request(hint, 0x81010003 + uint64_t(i)*0x1040);
+    require(dut.prefetch_count_o == 10, "preview setup did not fill hint slots");
+    for (unsigned i = 0; i < 4; ++i)
+      enqueue_preview(preview_base + uint64_t(i)*0x1040);
+    require(dut.preview_count_o == 4 && !dut.preview_ready_o,
+            "preview queue capacity was not bounded at four");
+    dut.preview_addr_i = 0x83010000; dut.preview_v_i = 1;
+    for (unsigned i = 0; i < 4; ++i)
+      require(!step().preview, "full preview queue acknowledged a fifth address");
+    dut.preview_v_i = 0;
+
+    demand_active = true; fills = 0;
+    old_writes = demand_writes; old_completions = completions;
+    request(demand, 0x84000000);
+    require(dut.preview_count_o == 4,
+            "architectural demand consumed a preview queue entry");
+    dut.fwd_ready_i = 1;
+    wait_sent_at_least(start+3);
+    unsigned demand_offset = 3;
+    for (unsigned i = 0; i < 3; ++i)
+      if (!sent[start+i].prefetch && sent[start+i].addr == 0x84000000)
+        demand_offset = i;
+    require(demand_offset < 3,
+            "more than two already-staged hints passed architectural demand");
+    response(sent[start+demand_offset]); normal_done(old_writes, old_completions);
+
+    unsigned old_seen = 0, preview_seen = 0, next = start;
+    while (old_seen + preview_seen < 14) {
+      wait_sent_at_least(next+1);
+      if (next == start+demand_offset) { ++next; continue; }
+      Header h = sent[next++];
+      require(h.prefetch, "non-prefetch reply passed the preview drain");
+      if (h.addr >= 0x81010000 && h.addr < 0x81020000) {
+        ++old_seen;
+      } else {
+        require(preview_seen < 4
+                && h.addr == ((preview_base + uint64_t(preview_seen)*0x1040) & ~UINT64_C(15)),
+                "preview queue lost address order or physical alignment");
+        ++preview_seen;
+      }
+      response(h);
+    }
+    wait_empty();
+    require(old_seen == 10 && preview_seen == 4 && sent.size() == start+15
+            && dut.preview_count_o == 0 && dut.prefetch_count_o == 0,
+            "preview queue or hint table leaked entries");
+
+    // A demand that already owns the same physical segment supersedes a
+    // queued preview; it must not create a duplicate detached read.
+    const unsigned before_match = sent.size();
+    dut.fwd_ready_i = 0;
+    demand_active = true; fills = 0;
+    old_writes = demand_writes; old_completions = completions;
+    request(demand, 0x85000000);
+    enqueue_preview(0x85000008);
+    cycles(4);
+    require(dut.preview_count_o == 0 && dut.prefetch_count_o == 0,
+            "same-line demand did not discard queued preview");
+    dut.fwd_ready_i = 1;
+    wait_sent_at_least(before_match+1);
+    require(!sent[before_match].prefetch && sent[before_match].addr == 0x85000000,
+            "same-line preview preceded its accepted demand");
+    response(sent[before_match]); normal_done(old_writes, old_completions);
+    cycles(8);
+    require(sent.size() == before_match+1,
+            "discarded same-line preview issued a detached read");
+    wait_empty();
+
+    // Cancel after one preview request is sent. Its response still returns
+    // memory credit, but must not publish a word into the D-cache side buffer.
+    const unsigned before_cancel = sent.size();
+    const unsigned old_prefetch_writes = prefetch_writes;
+    enqueue_preview(0x86000003);
+    wait_sent_at_least(before_cancel+1);
+    dut.fwd_ready_i = 0;
+    enqueue_preview(0x86001043);
+    cycles(4);
+    dut.preview_cancel_i = 1;
+    require(!step().preview, "cancel cycle admitted a new preview");
+    dut.preview_cancel_i = 0;
+    require(dut.preview_count_o == 0, "cancel left a queued preview");
+    dut.fwd_ready_i = 1; cycles(8);
+    require(sent.size() <= before_cancel+2,
+            "cancel issued more previews than had entered the forward pump");
+    for (unsigned i = before_cancel; i < sent.size(); ++i) {
+      require(sent[i].prefetch, "cancel sequence changed request type");
+      response(sent[i]);
+    }
+    wait_empty();
+    require(prefetch_writes == old_prefetch_writes && dut.prefetch_count_o == 0,
+            "canceled preview published data or leaked a hint slot");
+    std::cout << "[UCE-PREFETCH] PASS: ten hint slots, four preview queue entries, demand priority, "
+                 "same-line demand, cancel drain, 16-byte replies, backpressure, wrapped tags\n";
   }
 };
 }
