@@ -26,7 +26,7 @@
 #error "The preview oracle requires two resident slots and a peer context"
 #endif
 
-enum { modes = 7, repetitions = 16, trials = modes * repetitions };
+enum { modes = 9, repetitions = 16, trials = modes * repetitions };
 
 struct line { uint64_t word[8]; };
 static const volatile struct line target_lines[4]
@@ -50,6 +50,7 @@ struct peer_result {
   uint64_t context;
 };
 static struct peer_result peer_results[trials];
+static unsigned trial_mode[trials];
 static _Atomic uint32_t phase;
 static _Atomic uint32_t done;
 static _Atomic uint32_t ready;
@@ -145,24 +146,32 @@ static void *peer_main(void *unused)
   futex_wake(&ready);
   for (unsigned trial = 1; trial <= trials; ++trial) {
     futex_wait_until(&phase, trial);
+    const unsigned mode = trial_mode[trial - 1];
+    const int reverse_demand = mode == 7 || mode == 8;
     peer_results[trial - 1].context = current_context();
     uint64_t sum = 0;
     if (per_load_mode) {
       uint64_t marks[5];
       marks[0] = global_cycle();
-      for (unsigned i = 0; i < 4; ++i) {
+      for (unsigned step = 0; step < 4; ++step) {
+        unsigned i = reverse_demand ? 3 - step : step;
         sum += target_lines[i].word[0];
-        marks[i + 1] = global_cycle();
+        marks[step + 1] = global_cycle();
       }
       peer_results[trial - 1].entry_cycle = marks[0];
       peer_results[trial - 1].load_cycles = marks[4] - marks[0];
-      for (unsigned i = 0; i < 4; ++i)
-        peer_results[trial - 1].line_cycles[i] = marks[i + 1] - marks[i];
+      for (unsigned step = 0; step < 4; ++step) {
+        unsigned i = reverse_demand ? 3 - step : step;
+        peer_results[trial - 1].line_cycles[i]
+          = marks[step + 1] - marks[step];
+      }
     } else {
       uint64_t begin = global_cycle();
       peer_results[trial - 1].entry_cycle = begin;
-      for (unsigned i = 0; i < 4; ++i)
+      for (unsigned step = 0; step < 4; ++step) {
+        unsigned i = reverse_demand ? 3 - step : step;
         sum += target_lines[i].word[0];
+      }
       peer_results[trial - 1].load_cycles = global_cycle() - begin;
     }
     peer_results[trial - 1].sum = sum;
@@ -239,8 +248,8 @@ int main(int argc, char **argv)
           return EXIT_FAILURE;
         }
       }
-      if (mode == 4 || mode == 5) {
-        const volatile struct line *lines = mode == 4 ? target_lines : stale_lines;
+      if (mode == 4 || mode == 5 || mode == 8) {
+        const volatile struct line *lines = mode == 5 ? stale_lines : target_lines;
         for (unsigned i = 0; i < 4; ++i)
           bp_prefetch_r(&lines[i].word[0]);
       }
@@ -250,6 +259,7 @@ int main(int argc, char **argv)
       uint64_t preview_end = global_cycle();
       source_work();
       uint64_t work_end = global_cycle();
+      trial_mode[trial - 1] = mode;
       atomic_store_explicit(&phase, trial, memory_order_release);
       futex_wake(&phase);
       uint64_t wake_end = global_cycle();

@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Preview demand-order control — 2026-10-24:** a nine-mode, 144-trial FPGA/Linux run reversed the peer's data-load order while holding forward exact hints fixed. The long first-load interval moved from line 0 to line 3 in both direct and hinted controls (hinted medians 67 versus 64 cycles), weakening the earlier line-1-address explanation; aggregate load timing cannot identify request fate or establish a whole-handoff gain (`logs/context-preview-linux-demand-order-20261024/`).
+
 - **Preview issue-order control — 2026-10-24:** a seven-mode, 112-trial FPGA/Linux run reversed exact inline hint issue order while preserving target demand order. Line 1 was intermittently slow in 6/16 forward and 3/16 reverse trials while line 2 remained fast in every reverse trial, so a simple second-hint issue-position explanation is weakened; demand position versus physical address remains unresolved (`logs/context-preview-linux-reverse-20261024/`).
 
 - **Per-load Linux preview localization — 2026-10-24:** the six-mode FPGA/Linux diagnostic passed 48 trials and showed correct hints make target lines 0, 2, and 3 fast almost always, while line 1 was slow in three of eight helper and two of eight inline trials. A preceding recorder attempt was invalid because the exact preview bitstream lacks CSR `0x805`; the board was recovered, and the next control will reverse hint order to distinguish address from issue position (`logs/context-preview-linux-per-load-20261024/`, `logs/context-preview-linux-demand-trace-20261024/`).

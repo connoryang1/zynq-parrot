@@ -519,7 +519,8 @@ different request stream or cache state are not a matched speedup comparison.
 returns to context 0 before waking an ordinary pthread and blocking on a
 futex. The peer runs after a real Linux scheduler handoff and loads four target
 words. Direct, empty-helper, correct-helper, stale-helper, inline-correct,
-inline-stale, and reverse-inline-correct trials rotate order over 16
+inline-stale, reverse-inline-correct, reverse-demand-direct, and
+reverse-demand-inline-correct trials rotate order over 16
 repetitions; each trial verifies
 the peer checksum and reports the core-wide source-to-source round trip,
 preview duration, peer entry, and peer's
@@ -578,8 +579,11 @@ The reverse-inline mode issues the exact four target hints in order 3, 2, 1,
 the intermittent slow load remained on line 1 in both inline orders (6/16
 forward, 3/16 reverse), while line 2 was fast in all 16 reverse trials. See
 `logs/context-preview-linux-reverse-20261024/`. This rejects a simple
-second-issued-hint explanation; a reverse-demand control is still needed to
-distinguish address or cache set from second-load position.
+second-issued-hint explanation. The subsequent 144-trial reverse-demand
+control moved the long first-load interval from line 0 to line 3 in both
+direct and hinted modes; see `logs/context-preview-linux-demand-order-20261024/`.
+Per-load latency includes startup effects and cannot identify accepted,
+completed, or displaced prefetch requests on this image.
 
 ## Ordered Linux handoff miss capture
 
