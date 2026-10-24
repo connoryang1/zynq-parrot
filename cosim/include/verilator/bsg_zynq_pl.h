@@ -59,6 +59,22 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
     }
 
     ~bsg_zynq_pl(void) {
+        // The AXI wrappers own DPI GPIO objects. Their destructors must call
+        // bsg_dpi_fini() while the Verilated module still exists and before
+        // final blocks check that every exported DPI endpoint was released.
+        co_list.clear();
+        axi_gp0.reset();
+        axi_gp1.reset();
+        axi_gp2.reset();
+        axi_hp0.reset();
+        axi_hp1.reset();
+        axi_hp2.reset();
+        axi_sp0.reset();
+        axi_sp1.reset();
+        axi_sp2.reset();
+        axi_mp0.reset();
+        axi_mp1.reset();
+        axi_mp2.reset();
         tb->final();
         contextp->statsPrintSummary();
     }
