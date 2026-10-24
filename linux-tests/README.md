@@ -518,8 +518,9 @@ different request stream or cache state are not a matched speedup comparison.
 `context_preview_oracle.c` uses context 1 as a short U-mode hint helper, then
 returns to context 0 before waking an ordinary pthread and blocking on a
 futex. The peer runs after a real Linux scheduler handoff and loads four target
-words. Direct, empty-preview, correct-hint, and stale-hint trials rotate order
-over eight repetitions; each trial verifies the peer checksum and reports the
+words. Direct, empty-helper, correct-helper, stale-helper, inline-correct, and
+inline-stale trials rotate order over eight repetitions; each trial verifies
+the peer checksum and reports the
 core-wide source-to-source round trip, preview duration, peer entry, and peer's
 four-load interval separately. Peer entry plus peer loads is the one-way
 source-start to peer-completion endpoint; wake return and peer entry need not
@@ -542,7 +543,7 @@ the peer's Linux task, and the experiment does not implement a kernel hint or
 per-task hardware-context allocation. Compare mode medians from one invocation
 and retain the direct/empty/stale controls before interpreting any savings.
 
-The first physical Linux run on the verified ten-context `f2348198...` image
+The first four-mode physical Linux run on the verified ten-context `f2348198...` image
 passed 32 trials, guest exit zero, `CORE PASS`, `BSG PASS`, and runner exit zero.
 Correct hints reduced the peer's four-load median to 7 cycles from 200.5 direct,
 139 empty-preview, and 180.5 stale-hint cycles. Its initial total was a
@@ -553,6 +554,15 @@ medians were 32,704 correct versus 23,476.5 direct, with large trial variation;
 no whole-handoff benefit is established. Exact hashes, rows, and audits are in
 `logs/context-preview-linux-20261024/` and
 `logs/context-preview-linux-phases-20261024/`.
+
+A six-mode fresh-boot run added direct source-thread hints immediately before
+the source work and futex wake. Its inline-correct hint phase had a 19-cycle
+median versus 141 for helper-correct, but only two of eight trials in each
+correct-hint mode reached the eight-cycle four-load floor. The exact same-run
+controls and all 48 rows are in `logs/context-preview-linux-inline-20261024/`.
+The next diagnostic is per-line accepted/completed hint and demand-miss timing;
+an aggregate four-load interval cannot distinguish late, dropped, and displaced
+prefetches.
 
 ## Ordered Linux handoff miss capture
 

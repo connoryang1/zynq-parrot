@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Inline Linux preview control — 2026-10-24:** a fresh-boot six-mode FPGA/Linux run passed 48 trials with direct, helper, and inline correct/stale controls. Inline issue cut the median source hint phase to 19 cycles from 141 for helper-correct, but reached the eight-cycle four-load floor in only two of eight correct trials and established no one-way speedup; request acceptance, completion, and side-buffer survival now need attribution (`logs/context-preview-linux-inline-20261024/`).
+
 - **Physical Linux preview timing corrected — 2026-10-24:** phase timestamps on the same routed image pass 32 trials and confirm an 8-cycle median for correctly hinted peer loads versus 188 direct, while the explicit preview helper takes about 166 cycles. The earlier reported total was source-to-source round-trip time, not target startup; the corrected peer-completion medians (23,476.5 direct, 32,704 correct) are too variable to establish a whole-handoff effect (`logs/context-preview-linux-phases-20261024/`).
 
 - **Physical Linux data-preview oracle — 2026-10-24:** a verified ten-context FPGA/Linux run completed 32 rotated direct/empty/correct/stale trials with guest and host pass markers. Correct hints reduced the peer's four-load median to 7 cycles from 200.5 direct; its 49,586.5 versus 31,151 total medians are source-to-source round trips, as clarified by the later phase run. The transcript and corrected terminal-marker audit are in `logs/context-preview-linux-20261024/`.

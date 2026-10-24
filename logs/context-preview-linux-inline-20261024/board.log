@@ -1,0 +1,986 @@
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=892b19f7a9d697bfc84adc2853e2fe9165a92ced7305a4971d2bb7577c8b1438
+LOG=/home/xilinx/bp-logs/linux-shell-timer8-memory46-nodebug-interactive-20261024T213312Z-1364.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 900000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe931690 40000004 16 1
+INFO:    Creating host: 0xbe931690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cb7000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cb7000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1380648
+DEBUG-PS: ps.cpp: 1-1380836
+DEBUG-PS: ps.cpp: 2-1381008
+DEBUG-PS: ps.cpp: 3-1381179
+DEBUG-PS: ps.cpp: 4-1381340
+DEBUG-PS: ps.cpp: 5-1381502
+DEBUG-PS: ps.cpp: 6-1381670
+DEBUG-PS: ps.cpp: 7-1381829
+DEBUG-PS: ps.cpp: 8-1381989
+DEBUG-PS: ps.cpp: 9-1382172
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878497
+DEBUG-PS: ps.cpp: finished loading 1878497 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 50000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (jhumphri@blackparrot) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #2 SMP Sat Jan 25 13:38:02 EST 2025
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000082dfffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000082dfffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000082dfffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 11615
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd802e00000   (  46 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 21332K/47104K available (8287K kernel code, 4031K rwdata, 4096K rodata, 5103K init, 388K bss, 25772K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000120] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.010457] Console: colour dummy device 80x25
+[    0.012508] printk: console [hvc0] enabled
+[    0.168671] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.175100] pid_max: default: 32768 minimum: 301
+[    0.193784] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.199218] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.472943] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.493893] riscv: ELF compat mode unsupported
+[    0.499451] ASID allocator using 16 bits (65536 entries)
+[    0.525713] rcu: Hierarchical SRCU implementation.
+[    0.529724] rcu: 	Max phase no-delay instances is 1000.
+[    0.575332] EFI services will not be available.
+[    0.598525] smp: Bringing up secondary CPUs ...
+[    0.603028] smp: Brought up 1 node, 1 CPU
+[    0.653795] devtmpfs: initialized
+[    0.796187] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.803388] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.907297] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.958169] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.966523] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.299398] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.572516] SCSI subsystem initialized
+[    1.599638] libata version 3.00 loaded.
+[    1.627982] usbcore: registered new interface driver usbfs
+[    1.635563] usbcore: registered new interface driver hub
+[    1.643972] usbcore: registered new device driver usb
+[    1.774921] vgaarb: loaded
+[    1.788405] clocksource: Switched to clocksource riscv_clocksource
+[    3.345126] NET: Registered PF_INET protocol family
+[    3.371822] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.447821] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.455540] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.461284] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.468047] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.480613] TCP: Hash tables configured (established 512 bind 512)
+[    3.497282] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.508780] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.535917] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.629154] RPC: Registered named UNIX socket transport module.
+[    3.633674] RPC: Registered udp transport module.
+[    3.637231] RPC: Registered tcp transport module.
+[    3.640767] RPC: Registered tcp-with-tls transport module.
+[    3.644571] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.649030] PCI: CLS 0 bytes, default 64
+[    3.842059] workingset: timestamp_bits=62 max_order=13 bucket_order=0
+[    3.950051] NFS: Registering the id_resolver key type
+[    3.957423] Key type id_resolver registered
+[    3.961243] Key type id_legacy registered
+[    3.968949] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.973823] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    4.021924] 9p: Installing v9fs 9p2000 file system support
+[    4.056052] NET: Registered PF_ALG protocol family
+[    4.065960] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    4.072908] io scheduler mq-deadline registered
+[    4.076794] io scheduler kyber registered
+[   27.119986] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   27.569262] [drm] radeon kernel modesetting enabled.
+[   29.440294] loop: module loaded
+[   29.703727] e1000e: Intel(R) PRO/1000 Network Driver
+[   29.707595] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   29.967741] usbcore: registered new interface driver uas
+[   29.977335] usbcore: registered new interface driver usb-storage
+[   30.042131] mousedev: PS/2 mouse device common for all mice
+[   30.096412] sdhci: Secure Digital Host Controller Interface driver
+[   30.100953] sdhci: Copyright(c) Pierre Ossman
+[   30.108332] sdhci-pltfm: SDHCI platform and OF driver helper
+[   30.138430] usbcore: registered new interface driver usbhid
+[   30.143719] usbhid: USB HID core driver
+[   30.180713] NET: Registered PF_INET6 protocol family
+[   30.442167] Segment Routing with IPv6
+[   30.455622] In-situ OAM (IOAM) with IPv6
+[   30.468386] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   30.556561] NET: Registered PF_PACKET protocol family
+[   30.572223] 9pnet: Installing 9P2000 support
+[   30.587879] Key type dns_resolver registered
+[   30.599991] start plist test
+[   30.961665] end plist test
+[   33.710127] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   34.472035] clk: Disabling unused clocks
+[   44.493625] Freeing unused kernel image (initmem) memory: 5100K
+[   44.500924] Run /bin/sh as init process
+[   44.504523]   with arguments:
+[   44.506341]     /bin/sh
+[   44.508996]   with environment:
+[   44.511780]     HOME=/
+[   44.513418]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # : > /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAnAwBAAAAAABAAAAAAAAAABBCAAAAAAAABQAAAE
+AAOAAK' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AEAAHAAbAAYAAAAEAAAAQAAAAAAAAABAAAEAAAAAAEAAAQAAAAAAMAIAAAAAAAAwAgAAAA
+AAAAgA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAwAAAAQAAABwAgAAAAAAAHACAQAAAAAAcAIBAAAAAAAhAAAAAAAAACEAAAAAAA
+AAAQAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAADAABwBAAAAKNAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEAAAAAAAAAAAAAAAAAAA
+ABAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAEAAAAFAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAaDMAAAAAAABoMwAAAAAAAA
+AQAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAQAAAAYAAADwPQAAAAAAAPBNAQAAAAAA8E0BAAAAAACAAgAAAAAAABDSAAAAAAAAAB
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAACAAAABgAAAAg+AAAAAAAACE4BAAAAAAAITgEAAAAAAOABAAAAAAAA4AEAAAAAAAAIAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAQAAAAEAAAAlAIAAAAAAACUAgEAAAAAAJQCAQAAAAAAIAAAAAAAAAAgAAAAAAAAAAQAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'UOV0ZAQAAAAAMQAAAAAAAAAxAQAAAAAAADEBAAAAAABkAAAAAAAAAGQAAAAAAAAABAAAAA
+AAAABR' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '5XRkBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA
+AAAFLl' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'dGQEAAAA8D0AAAAAAADwTQEAAAAAAPBNAQAAAAAAEAIAAAAAAAAQAgAAAAAAAAEAAAAAAA
+AAL2xp' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'Yi9sZC1saW51eC1yaXNjdjY0LWxwNjRkLnNvLjEAAAAABAAAABAAAAABAAAAR05VAAAAAA
+AEAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'DwAAAAAAAAAAAAAAAwAAABAAAAAFAAAACQAAAAoAAAAAAAAAAAAAAAYAAAACAAAADQAAAA
+8AAAAB' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAwAAAAcAAAAEAAAADgAAAAgAAAAAAAAADAAAAAAAAAALAAAAAAAAAAMAAAABAAAAAg
+AAAAcA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AABiQNIRMUBRkwAAAAIBAAiAAQAAAAYAAAAMAAAAoBLCugTbjTcQWuZ3EHucfDG4gg0W6n
+b+GH4K' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'h/7shBQ+fpZ8uCtrFTnyixwuTj32ACP5pOCZ0ro9B9QFAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'fwAAABIAAACgBwEAAAAAAAAAAAAAAAAAhwAAABIAAADQBwEAAAAAAAAAAAAAAAAAEgAAAB
+IAAADg' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'BwEAAAAAAAAAAAAAAAAAAQAAABIAAADwBwEAAAAAAAAAAAAAAAAAWQAAABIAAABQCAEAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAZwAAABIAAACwBwEAAAAAAAAAAAAAAAAAuQAAABAA8f9oWAEAAAAAAAAAAAAAAA
+AABgAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'ABIAAAAACAEAAAAAAAAAAAAAAAAADQAAABIAAAAgCAEAAAAAAAAAAAAAAAAAYAAAABIAAA
+AwCAEA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAUgAAABEAGAAAYAEAAAAAAAgAAAAAAAAAQAAAABIAAACQBwEAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAbgAAABIAAADABwEAAAAAAAAAAAAAAAAAMQAAABIAAAAQCAEAAAAAAAAAAAAAAAAAJA
+AAABIA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AABACAEAAAAAAAAAAAAAAAAAAHB1dHMAcGVycm9yAGV4aXQAc2NoZWRfc2V0YWZmaW5pdH
+kAcHRo' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cmVhZF9qb2luAHB0aHJlYWRfY3JlYXRlAF9fbGliY19zdGFydF9tYWluAHN0ZGVycgBtZW
+1zZXQA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cHJpbnRmAGZ3cml0ZQBfX2Vycm5vX2xvY2F0aW9uAHN5c2NhbGwAc2NoZWRfZ2V0YWZmaW
+5pdHkA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'bGliYy5zby42AEdMSUJDXzIuMjcAR0xJQkNfMi4zNABfX2dsb2JhbF9wb2ludGVyJAAAAA
+ADAAMA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AwADAAMAAwABAAMAAwADAAMAAgADAAIAAgAAAAAAAQACAJkAAAAQAAAAAAAAAIeRlgYAAA
+MAowAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'ABAAAAC0kZYGAAACAK4AAAAAAAAAAGABAAAAAAAEAAAACwAAAAAAAAAAAAAAAFABAAAAAA
+AFAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'DAAAAAAAAAAAAAAACFABAAAAAAAFAAAAAQAAAAAAAAAAAAAAEFABAAAAAAAFAAAABgAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAGFABAAAAAAAFAAAADQAAAAAAAAAAAAAAIFABAAAAAAAFAAAAAgAAAAAAAAAAAAAAKF
+ABAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAFAAAAAwAAAAAAAAAAAAAAMFABAAAAAAAFAAAABAAAAAAAAAAAAAAAOFABAAAAAAAFAA
+AACAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAQFABAAAAAAAFAAAADgAAAAAAAAAAAAAASFABAAAAAAAFAAAACQAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'UFABAAAAAAAFAAAACgAAAAAAAAAAAAAAWFABAAAAAAAFAAAADwAAAAAAAAAAAAAAYFABAA
+AAAAAF' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAABQAAAAAAAAAAAAAAAAAAAAAAAACXUwAAMwPDQQO+A4gTA0P9k4IDiBNTEwCDsoIAZw
+AOABde' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAADPg6HZwMOABMAAAAXXgAAAz6OhmcDDgATAAAAF14AAAM+DoZnAw4AEwAAABdeAAADPo
+6FZwMO' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'ABMAAAAXXgAAAz4OhWcDDgATAAAAF14AAAM+joRnAw4AEwAAABdeAAADPg6EZwMOABMAAA
+AXXgAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'Az6Og2cDDgATAAAAF14AAAM+DoNnAw4AEwAAABdeAAADPo6CZwMOABMAAAAXXgAAAz4Ogm
+cDDgAT' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAF14AAAM+joFnAw4AEwAAABdeAAADPg6BZwMOABMAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAEERBuTv8N/3BUXv8H/5VXGG5VbtYuGFR5d6AACTiop2I4D6AIlHF4cAAC
+MN93SN' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'RxeXAAAjCPd0kUcXpwAAIwP3dJVHF7cAACMO93KZRxfHAAAjCfdynUcX1wAAIwT3cqFHF+
+cAACMP' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '93ClRxf3AAAjCvdwqUcXBwEAIwX3cO8AoEiqh4FGFwYAABMGBlmBRagIPvDv8N/vouEqjG
+MUBTSF' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'RRdFAAATBeV07wCgUPMnAIBjmQcu/VeT1ZcBEwcQDYVHlyYAAJOG5msXBgAAEwZmP22O7Y
+4eF54X' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'VY/Rj0r5Jv1O9VLxWule5eb86vju9C70suABSRcUAAATBKRoOvy+5CJ3kwcQCpsZKQBhj5
+4Xu4kp' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AdmPSo2bjBkAPvi3t6oqk4e3qrMH/QIbV/1BFGAwYIGTmZ8blRcAPZ1YYBsVFQCyljsFrU
+C6lnxg' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'GwcFALuIrAE66BuHCAC7hKkBOuy+lhMGABCBRYVuEwgAKJuXZQATlwcCAZNWlwNHBwCbhw
+cEupbj' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'F/b+m4UFBDuGzgDjnwX9l0cAAJOHR2eU4w8AMAOXRwAAI78HZJsH9f8JR2Nw9xQPADAD8y
+4AzIVH' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cTX2jWPspwLCZhFHlycAAJOHZ1tjluYAlxcAAJOHp1oT4BcAE4cHBBNgFwAThwcIE2AXAJ
+OHBwwT' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '4BcAcysAzJMCAAj9EuOfAv7zKwDMl0UAAJOFxV4PAFAPL6AVCQFIgUcBR4VGEwYQCBMFIA
+bv8F/P' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'Y0QFGnMqAMziZRdFAAATBaVb7wAgN/MmAMyTlwQCk9S3AZdnAACTh+dSppeQYxMHYECzhr
+ZBYxfm' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'EJhvYxQHEHMnAIBjEAcQg7iHAAJ3nGvCZTrkPuCziLhBs4e7QTMIukEzB7tBSoYXBQAAEw
+UFXO/w' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'H9EFLZsHaQDjmqfnBSmhR+MY+eRmZYFF7/B/0CqEYxUFFBcFAAATBcVh7/Bfyup0SnmqeQ
+p6Smuq' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'a+Z8Rn2mfa5gIoUOZOpqCmxpYYKAwndzkCeAonYTBxALl0cAAJOHR1D1jx4X2Y9zkCeAEw
+cQDJMX' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'BQIeF4GT2Y9zkCeA4ndzkCeAYx4MArcHAP8GZ4UHnhfZj3OQF4APADAD8y4AzPaNc9AAgJ
+dHAACT' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'h4dLmGOFR2MX9wbzJwCAveMFTGm9pmdzkBeADwAwA/MuAMz2jcm/l1YAAIO2xkATBgAChU
+UXBQAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'EwXlSu/wf7oFROp0SnmqeQp6Smuqa+Z8Rn2mfYG3l1YAAIO2xj0TBiAChUUXBQAAEwXlQ+
+/wf7cF' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'RA23l1YAAIO25jtZRoVFFwUAABMFpURVvxcFAAATBYU/7/Afwib9SvlO9VLxWule5eb86v
+ju9O/w' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'v7QjIIUBFwUAABMFJT7v8L+/7/B/swDBFwUAABMFBUzv8J++7wBAAqqHFwUAABMFxQGCZT
+AAE3EB' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '/4FGAUcKiO/wn60CkMG+l1EAAJOBgbqCgAAAF0UAABMFxTmXRwAAk4dHOWOGpwCTBwAAkc
+OCh4KA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'F0UAABMF5TeXRQAAk4VlN4mNk9c1QP2RvpWFhYnFkwcAAJHDgoeCgEERIuAXVAAAEwQkL4
+NHBAAG' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '5JHn7/B/+oVHIwD0AKJgAmRBAYKATb8AAAAAAACTAxAAYwh2ApMCBQCTAzAAYxR2AJOCBg
+AT4BIA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'k4ICBBPgEgCTggIEE+ASAJOCAgQT4BIAkwMQACOwdQAPADADc1AAgG8AAAAtcQqGkwUACA
+FFBu4i' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '6ibm7/CfozXpgmcqhIWLgUSd5wVHkwYAQBsEBwBjC9cGk1dnAI4Hk4cHEIqXg7cH8JN09A
+Oz15cA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'hYsFB/HfEwYACIFFCAHv8F+nk1dkABgBjge6l5hjhUazlpYAVY8QAZMFAAgBRZjj7/A/ng
+nt8mAi' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'hVJksmQVYYKAFwUAABMFhR/v8J+mFwUAABMFRSDv8N+lFwUAABMFhSDv8B+leXEi8CbsSu
+hO5Ab0' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'KoSuhC1JkUkcQA8A8A+bhgcAY/uXAgFIgUcBRxMGAAiihRMFIAbv8L+T418F/O/wP5UcQe
+OKJ/3j' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'iDf9FwUAABMFRRzv8N+fonACdOJkQmmiaUVhgoA5cQb8Ivgm9ErwTuxS6Fbkl0UAAJOFpR
+yFRw8A' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'UA8voPUIAUiBRwFHhUYTBhAIEwUgBu/wn41jTwUIF2QAABMEBBOFRBcZAAATCWkSl0kAAJ
+OJKRmX' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'SgAAk4rqGBMKEAOmhVaF7/C/8/MnAIAc7PMmAMyDNwkAAzYJBAM3CQiylxTkAzYJDLqXcy
+cAzBWP' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'spcY6BzgDwBQDy+gmQgBSIFHAUeFRhMGEAjOhRMFIAbv8N+FY0EFAoUkEwQEAuOSRPvicE
+J0onQC' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'eeJpQmqiagFFIWGCgBcFAAATBWUO7/D/kAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAg
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'Z2V0IGFmZmluaXR5AAAAAAAAAAAAAAAAc2V0IGFmZmluaXR5AAAAAGVtcHR5IGFmZmluaX
+R5AABm' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'dXRleCB3YWl0AAAAAAAAZnV0ZXggd2FrZQAAAAAAAGNyZWF0ZSBwZWVyAAAAAABzb3VyY2
+UgZGlk' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'IG5vdCBzdGFydCBpbiBjb250ZXh0IDAKAAAAAAAAcHJldmlldyBoZWxwZXIgZmFpbGVkCg
+AAcGVl' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'ciBjaGVja3N1bSBvciBjb250ZXh0IGZhaWxlZAoAAAAAAAAAAENPTlRFWFRfUFJFVklFVy
+Btb2Rl' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'PSV1IHJlcGVhdD0ldSB0b3RhbD0lbGx1IHByZXZpZXc9JWxsdSB3b3JrPSVsbHUgd2FrZT
+0lbGx1' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'IHBlZXJfZW50cnk9JWxsdSBwZWVyX2xvYWQ9JWxsdSBjcHU9JWQKAAAAAGpvaW4gcGVlcg
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AABDT05URVhUX1BSRVZJRVcgUEFTUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAIB' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAADAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAECAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAwIA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAEbAztkAAAACwAAAIDX//8EAQAAjtf//7ABAACc2///fAAAAMzb//+QAAAA6tv//6
+QAAAAS' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '3P//uAAAADjc///cAAAAQNz///AAAACI3P//HAEAADTd//9IAQAAlt3//3gBAAAAAAAAEA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAADelIAAXwBARsMAgAQAAAAGAAAABjb//8iAAAAAAcBABAAAAAsAAAANNv//x4AAAAAAA
+AAEAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AEAAAAA+2///KAAAAAAAAAAgAAAAVAAAAFLb//8mAAAAAEIOEEKIBE6BAk7BQshCDgAAAA
+AQAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'eAAAAFTb//8CAAAAAAAAABAAAACMAAAASNv//0gAAAAAAAAAFAAAAKAAAAB01v//DgAAAA
+BCDhBC' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'gQIAKAAAALgAAABk2///rAAAAABCDqACToECiASJBgJuCsFEyELJQg4AQgsAAAAsAAAA5A
+AAAOTb' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '//9iAAAAAEIOMEqIBIkGkgiTCoECAkrBQshCyULSQtNCDgAAAAA0AAAAFAEAABbc///gAA
+AAAEIO' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'QE6BAogEiQaSCJMKlAyVDgKyCsFCyELJQtJC00LUQtVEDgBCC7AAAABMAQAA1tX//w4EAA
+AAQg7Q' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AUiBApUOmBQChIgEAliSCIkGkwqUDJYQlxKZFpoYmxoD3gHJQtJC00LUQtZC10LZQtpC20
+LBRMhC' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo '1ULYQg4AQg7QAYECiASJBpIIkwqUDJUOlhCXEpgUmRaaGJsaAqLJQtJC00LUQtZC10LZQt
+pC22CJ' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'BpIIkwqUDJYQlxKZFpoYmxpiydLT1NbX2drbUokGkgiTCpQMlhCXEpkWmhibGgAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAMAMAQAAAAAAOA0BAAAAAAASDQEAAAAAAAEAAAAAAAAAmQAAAAAAAAAgAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'APBNAQAAAAAAIQAAAAAAAAAIAAAAAAAAABkAAAAAAAAA+E0BAAAAAAAbAAAAAAAAAAgAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'GgAAAAAAAAAATgEAAAAAABwAAAAAAAAACAAAAAAAAAAEAAAAAAAAALgCAQAAAAAA9f7/bw
+AAAAAQ' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AwEAAAAAAAUAAAAAAAAA+AQBAAAAAAAGAAAAAAAAAHgDAQAAAAAACgAAAAAAAADLAAAAAA
+AAAAsA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAGAAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAwAAAAAAAADwTwEAAAAAAAIAAAAAAA
+AAOAEA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAUAAAAAAAAAAcAAAAAAAAAFwAAAAAAAAAwBgEAAAAAAAcAAAAAAAAAGAYBAAAAAA
+AIAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAFABAAAAAAAACQAAAAAAAAAYAAAAAAAAAP7//28AAAAA6AUBAAAAAAD///9vAAAAAA
+EAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAA8P//bwAAAADEBQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAhOAQAAAAAA//////////8AAAAAAAAAAHAHAQAAAAAAcAcBAAAAAABwBwEAAAAAAHAHAQ
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cAcBAAAAAABwBwEAAAAAAHAHAQAAAAAAcAcBAAAAAABwBwEAAAAAAHAHAQAAAAAAcAcBAA
+AAAABw' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'BwEAAAAAAHAHAQAAAAAAAAAAAAAAAABHQ0M6IChHTlUpIDEzLjIuMABHQ0M6IChnYzg5MW
+Q4ZGMy' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'M2UtZGlydHkpIDEzLjIuMABBcAAAAHJpc2N2AAFmAAAABBAFcnY2NGkycDBfbTJwMF9hMn
+AwX2Yy' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cDBfZDJwMF9jMnAwX2IxcDBfem1tdWwxcDBfemFhbW8xcDBfemFscnNjMXAwX3piYTFwMF
+96YmIx' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cDBfemJzMXAwAAYBCAEKCwAuc2hzdHJ0YWIALmludGVycAAubm90ZS5BQkktdGFnAC5nbn
+UuaGFz' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'aAAuZHluc3ltAC5keW5zdHIALmdudS52ZXJzaW9uAC5nbnUudmVyc2lvbl9yAC5yZWxhLm
+R5bgAu' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cmVsYS5wbHQALnRleHQALnJvZGF0YQAuZWhfZnJhbWVfaGRyAC5laF9mcmFtZQAucHJlaW
+5pdF9h' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'cnJheQAuaW5pdF9hcnJheQAuZmluaV9hcnJheQAuZHluYW1pYwAuZ290AC5nb3QucGx0AC
+5zZGF0' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'YQAuc2JzcwAuYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAAAAAQ
+AAAAIA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAcAIBAAAAAABwAgAAAAAAACEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAA
+AAEwAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAcAAAACAAAAAAAAAJQCAQAAAAAAlAIAAAAAAAAgAAAAAAAAAAAAAAAAAAAABAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAACUAAAAFAAAAAgAAAAAAAAC4AgEAAAAAALgCAAAAAAAAVAAAAAAAAAAFAAAAAAAAAA
+gAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAABAAAAAAAAAAhAAAA9v//bwIAAAAAAAAAEAMBAAAAAAAQAwAAAAAAAGgAAAAAAAAABQ
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAIAAAAAAAAAAAAAAAAAAAAKwAAAAsAAAACAAAAAAAAAHgDAQAAAAAAeAMAAAAAAACAAQ
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAYAAAABAAAACAAAAAAAAAAYAAAAAAAAADMAAAADAAAAAgAAAAAAAAD4BAEAAAAAAPgEAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'ywAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA7AAAA////bwIAAAAAAAAAxAUBAA
+AAAADE' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'BQAAAAAAACAAAAAAAAAABQAAAAAAAAACAAAAAAAAAAIAAAAAAAAASAAAAP7//28CAAAAAA
+AAAOgF' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AQAAAAAA6AUAAAAAAAAwAAAAAAAAAAYAAAABAAAACAAAAAAAAAAAAAAAAAAAAFcAAAAEAA
+AAAgAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAYBgEAAAAAABgGAAAAAAAAGAAAAAAAAAAFAAAAAAAAAAgAAAAAAAAAGAAAAAAAAA
+BhAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'BAAAAEIAAAAAAAAAMAYBAAAAAAAwBgAAAAAAADgBAAAAAAAABQAAABUAAAAIAAAAAAAAAB
+gAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAZgAAAAEAAAAGAAAAAAAAAHAHAQAAAAAAcAcAAAAAAADwAAAAAAAAAAAAAAAAAAAAEA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAQAAAAAAAAAGsAAAABAAAABgAAAAAAAACACAEAAAAAAIAIAAAAAAAADgcAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AEAAAAAAAAAAAAAAAAAAAABxAAAAAQAAAAIAAAAAAAAAABABAAAAAAAAEAAAAAAAAAAhAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAeQAAAAEAAAACAAAAAAAAAAAxAQAAAAAAADEAAA
+AAAABk' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAIcAAAABAAAAAgAAAAAAAABoMQEAAA
+AAAGgx' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAACRAAAAEAAAAAMAAAAAAA
+AA8E0B' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAADwPQAAAAAAAAgAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAgAAAAAAAAAoAAAAA4AAA
+ADAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAPhNAQAAAAAA+D0AAAAAAAAIAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAK
+wAAAAP' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAwAAAAAAAAAATgEAAAAAAAA+AAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAC4AAAABgAAAAMAAAAAAAAACE4BAAAAAAAIPgAAAAAAAOABAAAAAAAABgAAAAAAAAAIAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'ABAAAAAAAAAAwQAAAAEAAAADAAAAAAAAAOhPAQAAAAAA6D8AAAAAAAAIAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'CAAAAAAAAAAIAAAAAAAAAMYAAAABAAAAAwAAAAAAAADwTwEAAAAAAPA/AAAAAAAAeAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAgAAAAAAAAACAAAAAAAAADPAAAAAQAAAAMAAAAAAAAAaFABAAAAAABoQAAAAA
+AAAAgA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA1gAAAAgAAAADAAAAAAAAAHBQAQAAAA
+AAcEAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAgAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAANwAAAAIAAAAAwAAAAAAAA
+AAYAEA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAHBAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAADhAAAAAQAAAD
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAABwQAAAAAAAADMAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAA6g
+AAAAMA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AHAAAAAAAAAAAAAAAAAAAAAAo0AAAAAAAABxAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAEAAAADAAAAAAAAAAAAAAAAAAAAAAAAABRBAAAAAAAA/AAAAAAAAAAAAAAAAAAAAAEAAA
+AAAAAA' >> /tmp/context_preview_oracle_dynamic.b64
+~ # echo 'AAAAAAAAAAA=' >> /tmp/context_preview_oracle_dynamic.b64
+~ # base64 -d /tmp/context_preview_oracle_dynamic.b64 > /tmp/context_preview_ora
+cle_dynamic
+~ # chmod +x /tmp/context_preview_oracle_dynamic
+~ # sha256sum /tmp/context_preview_oracle_dynamic
+677379a38b8896e65cc340263a875db8a5dd6e5c8501c41f6edfb3cb14159a52  /tmp/context_preview_oracle_dynamic
+~ # /tmp/context_preview_oracle_dynamic
+CONTEXT_PREVIEW mode=0 repeat=0 total=65808 preview=31 work=834 wake=65605 peer_entry=51463 peer_load=213 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=0 total=73017 preview=168 work=967 wake=47498 peer_entry=59253 peer_load=191 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=0 total=29195 preview=141 work=940 wake=29129 peer_entry=17979 peer_load=41 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=0 total=83602 preview=142 work=942 wake=83532 peer_entry=20364 peer_load=33190 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=0 total=49541 preview=19 work=330 wake=49471 peer_entry=37394 peer_load=224 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=0 total=51518 preview=22 work=332 wake=51415 peer_entry=19612 peer_load=178 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=1 total=36633 preview=135 work=401 wake=12258 peer_entry=24713 peer_load=183 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=1 total=50288 preview=141 work=450 wake=50218 peer_entry=38324 peer_load=41 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=1 total=49479 preview=142 work=452 wake=49372 peer_entry=20130 peer_load=183 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=1 total=46199 preview=19 work=320 wake=46133 peer_entry=15678 peer_load=183 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=1 total=30964 preview=22 work=332 wake=30894 peer_entry=18992 peer_load=176 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=1 total=28895 preview=9 work=281 wake=28734 peer_entry=17780 peer_load=149 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=2 total=47873 preview=141 work=451 wake=47803 peer_entry=35750 peer_load=41 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=2 total=51348 preview=142 work=452 wake=51245 peer_entry=19511 peer_load=150 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=2 total=30508 preview=19 work=315 wake=30438 peer_entry=18853 peer_load=41 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=2 total=28561 preview=22 work=332 wake=28491 peer_entry=17516 peer_load=150 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=2 total=48951 preview=9 work=276 wake=48881 peer_entry=36354 peer_load=208 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=2 total=60474 preview=135 work=401 wake=12879 peer_entry=45917 peer_load=173 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=3 total=51208 preview=136 work=445 wake=51101 peer_entry=39261 peer_load=233 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=3 total=29738 preview=19 work=323 wake=29668 peer_entry=18279 peer_load=8 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=3 total=55431 preview=22 work=294 wake=55361 peer_entry=19313 peer_load=199 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=3 total=30584 preview=9 work=276 wake=30514 peer_entry=19050 peer_load=143 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=3 total=50761 preview=167 work=477 wake=50691 peer_entry=38381 peer_load=224 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=3 total=30395 preview=141 work=450 wake=30325 peer_entry=18929 peer_load=8 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=4 total=64880 preview=19 work=320 wake=12673 peer_entry=45456 peer_load=8 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=4 total=64174 preview=58 work=368 wake=12840 peer_entry=44762 peer_load=159 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=4 total=80776 preview=9 work=322 wake=13186 peer_entry=24713 peer_load=162 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=4 total=52097 preview=215 work=485 wake=52027 peer_entry=40027 peer_load=191 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=4 total=48717 preview=141 work=945 wake=48610 peer_entry=20219 peer_load=57 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=4 total=46191 preview=142 work=945 wake=46125 peer_entry=16215 peer_load=150 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=5 total=30601 preview=22 work=332 wake=30531 peer_entry=18750 peer_load=192 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=5 total=28588 preview=9 work=323 wake=28485 peer_entry=17552 peer_load=143 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=5 total=51354 preview=172 work=976 wake=51284 peer_entry=39066 peer_load=180 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=5 total=30948 preview=141 work=453 wake=30878 peer_entry=19406 peer_load=8 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=5 total=30869 preview=142 work=451 wake=30796 peer_entry=19066 peer_load=199 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=5 total=52974 preview=19 work=320 wake=52904 peer_entry=40652 peer_load=158 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=6 total=51664 preview=9 work=281 wake=51487 peer_entry=19472 peer_load=176 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=6 total=37095 preview=135 work=444 wake=12167 peer_entry=24299 peer_load=132 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=6 total=28566 preview=141 work=450 wake=28500 peer_entry=17375 peer_load=41 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=6 total=83063 preview=142 work=452 wake=82993 peer_entry=53298 peer_load=199 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=6 total=51028 preview=19 work=323 wake=50958 peer_entry=38781 peer_load=41 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=6 total=52368 preview=22 work=332 wake=52262 peer_entry=19425 peer_load=153 cpu=0
+CONTEXT_PREVIEW mode=1 repeat=7 total=31529 preview=135 work=444 wake=31459 peer_entry=19553 peer_load=199 cpu=0
+CONTEXT_PREVIEW mode=2 repeat=7 total=37456 preview=141 work=450 wake=14129 peer_entry=25578 peer_load=150 cpu=0
+CONTEXT_PREVIEW mode=3 repeat=7 total=66779 preview=142 work=451 wake=44188 peer_entry=54561 peer_load=217 cpu=0
+CONTEXT_PREVIEW mode=4 repeat=7 total=28294 preview=19 work=320 wake=28224 peer_entry=17096 peer_load=150 cpu=0
+CONTEXT_PREVIEW mode=5 repeat=7 total=51252 preview=22 work=294 wake=51084 peer_entry=19168 peer_load=209 cpu=0
+CONTEXT_PREVIEW mode=0 repeat=7 total=406455 preview=9 work=322 wake=406225 peer_entry=41585 peer_load=199 cpu=0
+CONTEXT_PREVIEW PASS
+~ # echo CONTEXT_PREVIEW_EXIT=$?
+CONTEXT_PREVIEW_EXIT=0
+~ # poweroff -f
+[  163.473734] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):            1,392 (             570)
+INFO:    ps.cpp: minstret (instructions retired):      956,198,282 (        38fe6d8a)
+INFO:    ps.cpp: minstret delta:                       956,196,890 (        38fe681a)
+INFO:    ps.cpp: MTIME start:                           77,806,631 (         4a33c27)
+INFO:    ps.cpp: MTIME stop:                         1,389,744,636 (        52d5d1fc)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):       1,311,938,005 (        4e3295d5)
+INFO:    ps.cpp: IPC        :                             0.091105
+INFO:    ps.cpp: minstret (instructions retired):      956,198,366 (        38fe6dde)
+INFO:    ps.cpp: wall clock time                :  262,429,025,710 (      3d19fd25ae) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,621,157.36 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000063
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cb7000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+Connection to 192.168.4.35 closed.

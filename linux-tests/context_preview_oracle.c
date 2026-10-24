@@ -25,7 +25,7 @@
 #error "The preview oracle requires two resident slots and a peer context"
 #endif
 
-enum { modes = 4, repetitions = 8, trials = modes * repetitions };
+enum { modes = 6, repetitions = 8, trials = modes * repetitions };
 
 struct line { uint64_t word[8]; };
 static const volatile struct line target_lines[4]
@@ -196,7 +196,7 @@ int main(void)
       const unsigned trial = repeat * modes + slot + 1;
       prepare_cold_lines();
       preview_done = 0;
-      if (mode != 0) {
+      if (mode >= 1 && mode <= 3) {
         seed_reg(1, 10, (uintptr_t)target_lines);
         seed_reg(1, 11, (uintptr_t)&preview_done);
         seed_reg(1, 12, mode);
@@ -210,12 +210,17 @@ int main(void)
       }
       __asm__ volatile("fence rw, rw" : : : "memory");
       uint64_t begin = global_cycle();
-      if (mode != 0) {
+      if (mode >= 1 && mode <= 3) {
         __asm__ volatile("csrwi 0x800, 1" : : : "memory");
         if (preview_done != 1 || current_context() != 0) {
           fputs("preview helper failed\n", stderr);
           return EXIT_FAILURE;
         }
+      }
+      if (mode == 4 || mode == 5) {
+        const volatile struct line *lines = mode == 4 ? target_lines : stale_lines;
+        for (unsigned i = 0; i < 4; ++i)
+          bp_prefetch_r(&lines[i].word[0]);
       }
       uint64_t preview_end = global_cycle();
       source_work();
