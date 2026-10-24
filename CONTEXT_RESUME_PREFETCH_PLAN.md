@@ -1,6 +1,6 @@
-This document defines the context-resume instruction-prefetch experiment. It records the existing evidence, the speedup bounds, the staged implementation, and the simulator-first acceptance gates so that a new cache-resume result is not confused with the older data-prefetch results.
+This document defines the instruction and data preview experiments for a Linux context resume. It records the staged hardware and software interfaces, matched controls, and acceptance gates so a first-use cache result is not mistaken for a full context-switch speedup.
 
-# Context-resume instruction prefetch
+# Context-resume preview
 
 ## Question
 
@@ -195,3 +195,70 @@ The first claim we should seek is modest:
 > resume and reduce time to first useful target execution.
 
 Only a later Linux experiment can support a stronger end-to-end speedup claim.
+
+## Linux target-data preview implementation track
+
+The data track targets an incoming Linux task's first user-data accesses. The
+accepted oracle results and open questions are maintained as RL-049 through
+RL-055 and OQ-006 in `RESEARCH_LEDGER.md`; this section defines the work that
+would turn that controlled mechanism into a scheduler-owned feature. The
+oracle's fast four-load interval does not establish a whole-handoff speedup.
+
+### Interface and scheduling contract
+
+1. Give each runnable task a stable preview identity independent of the
+   per-CPU PCID pool. Store a bounded address list and confidence with that
+   task, then invalidate it when the address space or task identity changes.
+2. Let the kernel enqueue a nonblocking target descriptor after it knows the
+   likely next task. An earlier wakeup hint may speculate, but the scheduler
+   must be able to confirm or cancel it when `next` is chosen. The enqueue
+   operation must not execute a target U-mode helper under the runqueue lock.
+3. Define the descriptor's address-space contract explicitly: target task tag,
+   virtual address, address-space generation, privilege/translation metadata,
+   and whether the request is instruction or data. The first same-mm slice can
+   use the current translation as a verification step; cross-mm target
+   translation, stale mappings, and teardown remain required before a general
+   Linux feature is accepted. A failed or denied translation must drop the
+   advisory request without raising an architectural fault.
+4. Add a bounded request queue and arbiter that gives architectural demand
+   priority. The queue holds descriptors while the D-cache and UCE are busy,
+   retries until a request handshake is observed, and may drop low-confidence
+   work on overflow. The existing UCE's outstanding prefetch slots handle
+   accepted memory requests; they do not replace the pre-acceptance queue.
+   Responses may use the existing physically addressed D-cache side buffer,
+   with explicit cancellation and domain-reuse rules.
+
+The queue is needed because a kernel hint must finish quickly even when the
+shared cache request port cannot accept it that cycle. Without that decoupling,
+the source or scheduler can replay on a busy cache path and consume the lead
+time the hint was meant to create. Queue depth and issue priority should be
+measured, not inferred from the UCE's five outstanding slots.
+
+### Milestones and evidence
+
+1. Build an exact preview-plus-recorder simulator configuration. Record
+   enqueue, cache acceptance, memory issue, response arrival, side-buffer
+   installation, first demand, hit, displacement, and drop with target address
+   and task tag. The current physical preview bitstream lacks recorder CSR
+   `0x805`, so it cannot supply this evidence; use the routed RTL identity in
+   every capability preflight.
+2. Implement one same-mm, oracle-address descriptor and the independent queue
+   without changing architectural demand timing. Verify direct, empty, exact,
+   and stale controls in a clean traced simulation, including full queue,
+   redirect, permission denial, and task/mm invalidation cases.
+3. Connect a Linux hook at the earliest safe point where `next` is known,
+   first with exact addresses and then with a small per-task learned set. Keep
+   the scheduler operation bounded and nonblocking; measure from source hint
+   or wake to the peer's first useful load and to peer completion, separately
+   from any source-to-source round trip.
+4. Compare controlled cold-data handoffs and a natural futex/request workload
+   with identical work and four matched modes. Report useful-before-demand
+   coverage, dropped and stale traffic, one-way latency, throughput, and
+   variance. Accept a claimed application gain only after a routed PYNQ-Z2
+   implementation meets fit/timing and the exact physical Linux controls pass.
+
+Data preview and instruction-prefix replay can be combined only after each
+path has separate request accounting. The early target user-data loads can be
+fast while kernel scheduling and first instruction/translation startup still
+dominate the one-way handoff; the physical oracle has already shown this
+distinction.
