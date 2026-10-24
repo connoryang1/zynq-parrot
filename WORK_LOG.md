@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Preview issue-order control — 2026-10-24:** a seven-mode, 112-trial FPGA/Linux run reversed exact inline hint issue order while preserving target demand order. Line 1 was intermittently slow in 6/16 forward and 3/16 reverse trials while line 2 remained fast in every reverse trial, so a simple second-hint issue-position explanation is weakened; demand position versus physical address remains unresolved (`logs/context-preview-linux-reverse-20261024/`).
+
 - **Per-load Linux preview localization — 2026-10-24:** the six-mode FPGA/Linux diagnostic passed 48 trials and showed correct hints make target lines 0, 2, and 3 fast almost always, while line 1 was slow in three of eight helper and two of eight inline trials. A preceding recorder attempt was invalid because the exact preview bitstream lacks CSR `0x805`; the board was recovered, and the next control will reverse hint order to distinguish address from issue position (`logs/context-preview-linux-per-load-20261024/`, `logs/context-preview-linux-demand-trace-20261024/`).
 
 - **Inline Linux preview control — 2026-10-24:** a fresh-boot six-mode FPGA/Linux run passed 48 trials with direct, helper, and inline correct/stale controls. Inline issue cut the median source hint phase to 19 cycles from 141 for helper-correct, but reached the eight-cycle four-load floor in only two of eight correct trials and established no one-way speedup; request acceptance, completion, and side-buffer survival now need attribution (`logs/context-preview-linux-inline-20261024/`).

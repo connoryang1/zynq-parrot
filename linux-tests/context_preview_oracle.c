@@ -26,7 +26,7 @@
 #error "The preview oracle requires two resident slots and a peer context"
 #endif
 
-enum { modes = 6, repetitions = 8, trials = modes * repetitions };
+enum { modes = 7, repetitions = 16, trials = modes * repetitions };
 
 struct line { uint64_t word[8]; };
 static const volatile struct line target_lines[4]
@@ -244,6 +244,9 @@ int main(int argc, char **argv)
         for (unsigned i = 0; i < 4; ++i)
           bp_prefetch_r(&lines[i].word[0]);
       }
+      if (mode == 6)
+        for (int i = 3; i >= 0; --i)
+          bp_prefetch_r(&target_lines[i].word[0]);
       uint64_t preview_end = global_cycle();
       source_work();
       uint64_t work_end = global_cycle();

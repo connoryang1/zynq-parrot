@@ -518,8 +518,9 @@ different request stream or cache state are not a matched speedup comparison.
 `context_preview_oracle.c` uses context 1 as a short U-mode hint helper, then
 returns to context 0 before waking an ordinary pthread and blocking on a
 futex. The peer runs after a real Linux scheduler handoff and loads four target
-words. Direct, empty-helper, correct-helper, stale-helper, inline-correct, and
-inline-stale trials rotate order over eight repetitions; each trial verifies
+words. Direct, empty-helper, correct-helper, stale-helper, inline-correct,
+inline-stale, and reverse-inline-correct trials rotate order over 16
+repetitions; each trial verifies
 the peer checksum and reports the core-wide source-to-source round trip,
 preview duration, peer entry, and peer's
 four-load interval separately. Peer entry plus peer loads is the one-way
@@ -571,6 +572,14 @@ distinguish a late, dropped, or displaced hint. The exact `f2348198...`
 preview bitstream does not implement miss-recorder CSR `0x805`; the rejected
 recorder attempt and image-capability guardrail are documented in
 `logs/context-preview-linux-demand-trace-20261024/`.
+
+The reverse-inline mode issues the exact four target hints in order 3, 2, 1,
+0 while leaving peer loads in order 0, 1, 2, 3. In a 112-trial fresh-boot run,
+the intermittent slow load remained on line 1 in both inline orders (6/16
+forward, 3/16 reverse), while line 2 was fast in all 16 reverse trials. See
+`logs/context-preview-linux-reverse-20261024/`. This rejects a simple
+second-issued-hint explanation; a reverse-demand control is still needed to
+distinguish address or cache set from second-load position.
 
 ## Ordered Linux handoff miss capture
 
