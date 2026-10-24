@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **UCE prefetch harness requalified — 2026-10-24:** repaired the standalone driver for current 16-byte, one-beat side-buffer hints and ten live slots spread across cache sets; a fresh UCE test passes demand coexistence, backpressure, wrapped tags, reordered replies, and the malformed-response negative assertion. The worktree's external Verilator path required an explicit runner argument and provenance-path fix; exact hashes and the full procedure are in `logs/target-data-preview-uce-harness-20261024/`. No new lane RTL or Linux speedup is claimed.
+
 - **Isolated target-data RTL worktree ready — 2026-10-24:** created `experiment/target-data-preview-lane` from verified checkpoint `7ace32e5` and materialized BlackParrot `474dbb8ac` plus all three exact nested source gitlinks. Local-file transport and unadvertised-object setup failures were resolved with command-scoped fetches from the verified oracle worktree; no RTL build was attempted before the source identities were checked (`logs/target-data-preview-lane-setup-20261024/`).
 
 - **Linux data-preview implementation scoped — 2026-10-24:** the maintained context-resume plan now specifies a kernel-owned nonblocking descriptor, independent pre-acceptance queue/arbiter, target address-space and task-lifecycle contract, request-level observability, and matched one-way Linux acceptance gates. It preserves the same-mm oracle as an initial verification slice while retaining cross-mm translation and learned per-task addresses as requirements for the general feature (`CONTEXT_RESUME_PREFETCH_PLAN.md`).

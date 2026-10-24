@@ -66,7 +66,10 @@ def main():
     for line in (out / "obj/Vuce_prefetch__verFiles.dat").read_text().splitlines():
         if line.startswith("S "):
             dependencies.add(Path(shlex.split(line)[-1]))
-    hashes = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+    # An isolated worktree may use the canonical checkout's Verilator install.
+    # Keep absolute provenance for generated-file dependencies outside root.
+    hashes = {str(path.relative_to(root) if root in path.parents else path):
+              hashlib.sha256(path.read_bytes()).hexdigest()
               for path in sorted(dependencies)}
     artifact_hashes = {str(path.relative_to(out)): hashlib.sha256(path.read_bytes()).hexdigest()
                       for path in (out / "run.log", out / "uce-prefetch.fst",

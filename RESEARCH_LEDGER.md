@@ -520,6 +520,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** demand position and code layout contribute strongly to the early load intervals. This weakens the address-specific interpretation suggested by RL-053/RL-054; the first-load residual of roughly 64–67 cycles with correct hints includes pipeline or translation startup that a four-line data preview alone does not hide.
 - **Limits:** per-load CSR reads and the changed nine-mode ELF layout affect absolute timing, and no prefetch issue/completion/hit counter exists on this routed image. The individual interval cannot be equated directly with a D-cache miss. One-way scheduler benefit remains unmeasured.
 
+### RL-056 — Current UCE prefetch protocol has a passing standalone gate
+
+- **Status:** accepted harness baseline; no preview-lane RTL change
+- **Scope:** ten-entry UCE table with 16-byte one-beat detached hints, side-buffer write opcode, four-beat ordinary demand refill, backpressure, wrapped response tags, and malformed-address rejection
+- **Claim:** a fresh standalone Verilator run passes the functional and exact negative-assertion gates with complete source and artifact hashes. The old driver was stale in three ways: it expected 64-byte hints, expected full-table hints to be acknowledged and dropped, and packed ten same-set requests into only eight reservable victim ways. The corrected addresses rotate sets, and the test verifies ten live slots before checking the full-table stall.
+- **Evidence:** `testing/rtl/uce_prefetch_driver.cpp`, `testing/rtl/uce_prefetch_tb.sv`, `testing/rtl/run_uce_prefetch.py`, and `logs/target-data-preview-uce-harness-20261024/verification.json` with the exact invocation and failure history in that directory's README.
+- **Meaning:** this gate can now detect regressions in the existing accepted hint/response path while an independent preview admission lane is added.
+- **Limits:** the standalone gate does not exercise a new pre-acceptance queue, Linux task selection, address-space translation, or whole-handoff timing.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

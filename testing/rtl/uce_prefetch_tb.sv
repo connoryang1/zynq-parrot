@@ -15,6 +15,7 @@ module uce_prefetch_tb
    input [2:0] metadata_way_i,
    input arrays_accept_i,
    output req_yumi_o, req_lock_o, critical_o, last_o, credits_full_o, credits_empty_o,
+   output [3:0] prefetch_count_o,
    output [3:0] req_id_o,
    output tag_v_o, data_v_o,
    output [2:0] tag_opcode_o, data_way_o,
@@ -85,6 +86,7 @@ module uce_prefetch_tb
   assign fwd_way_o = 8'(fwd.payload.way_id);
   assign fwd_state_o = fwd.payload.state;
   assign fwd_prefetch_o = fwd.payload.prefetch;
+  assign prefetch_count_o = 4'($countones(dut.prefetch_valid_r));
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(1), .assoc_p(assoc_lp),
            .prefetch_els_p(10),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
