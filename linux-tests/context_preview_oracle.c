@@ -43,6 +43,7 @@ static volatile uint64_t preview_done;
 
 struct peer_result {
   uint64_t sum;
+  uint64_t entry_cycle;
   uint64_t load_cycles;
   uint64_t context;
 };
@@ -143,6 +144,7 @@ static void *peer_main(void *unused)
     futex_wait_until(&phase, trial);
     peer_results[trial - 1].context = current_context();
     uint64_t begin = global_cycle();
+    peer_results[trial - 1].entry_cycle = begin;
     uint64_t sum = 0;
     for (unsigned i = 0; i < 4; ++i)
       sum += target_lines[i].word[0];
@@ -215,9 +217,12 @@ int main(void)
           return EXIT_FAILURE;
         }
       }
+      uint64_t preview_end = global_cycle();
       source_work();
+      uint64_t work_end = global_cycle();
       atomic_store_explicit(&phase, trial, memory_order_release);
       futex_wake(&phase);
+      uint64_t wake_end = global_cycle();
       futex_wait_until(&done, trial);
       uint64_t total_cycles = global_cycle() - begin;
       if (peer_results[trial - 1].sum != 0x406
@@ -226,8 +231,12 @@ int main(void)
         fputs("peer checksum or context failed\n", stderr);
         return EXIT_FAILURE;
       }
-      printf("CONTEXT_PREVIEW mode=%u repeat=%u total=%llu peer_load=%llu cpu=%d\n",
+      printf("CONTEXT_PREVIEW mode=%u repeat=%u total=%llu preview=%llu work=%llu wake=%llu peer_entry=%llu peer_load=%llu cpu=%d\n",
              mode, repeat, (unsigned long long)total_cycles,
+             (unsigned long long)(preview_end - begin),
+             (unsigned long long)(work_end - begin),
+             (unsigned long long)(wake_end - begin),
+             (unsigned long long)(peer_results[trial - 1].entry_cycle - begin),
              (unsigned long long)peer_results[trial - 1].load_cycles, cpu);
     }
   }

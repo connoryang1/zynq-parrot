@@ -520,7 +520,10 @@ returns to context 0 before waking an ordinary pthread and blocking on a
 futex. The peer runs after a real Linux scheduler handoff and loads four target
 words. Direct, empty-preview, correct-hint, and stale-hint trials rotate order
 over eight repetitions; each trial verifies the peer checksum and reports the
-core-wide total interval and the peer's four-load interval separately.
+core-wide source-to-source round trip, preview duration, peer entry, and peer's
+four-load interval separately. Peer entry plus peer loads is the one-way
+source-start to peer-completion endpoint; wake return and peer entry need not
+occur in that order.
 
 ```sh
 make -C linux-tests context-preview-oracle-dynamic \
@@ -542,11 +545,14 @@ and retain the direct/empty/stale controls before interpreting any savings.
 The first physical Linux run on the verified ten-context `f2348198...` image
 passed 32 trials, guest exit zero, `CORE PASS`, `BSG PASS`, and runner exit zero.
 Correct hints reduced the peer's four-load median to 7 cycles from 200.5 direct,
-139 empty-preview, and 180.5 stale-hint cycles. The complete source-to-peer
-median was 49,586.5 cycles with correct hints versus 31,151 direct, with large
-trial variation; there is no observed whole-handoff speedup in this control.
-The exact hashes, raw rows, and post-hoc terminal-marker audit are retained in
-`logs/context-preview-linux-20261024/`.
+139 empty-preview, and 180.5 stale-hint cycles. Its initial total was a
+source-to-source round trip, not one-way target startup. A second phase-timed
+run on the same image found 8 versus 188 cycles for correct versus direct peer
+loads and an approximately 166-cycle preview helper. Its one-way peer-completion
+medians were 32,704 correct versus 23,476.5 direct, with large trial variation;
+no whole-handoff benefit is established. Exact hashes, rows, and audits are in
+`logs/context-preview-linux-20261024/` and
+`logs/context-preview-linux-phases-20261024/`.
 
 ## Ordered Linux handoff miss capture
 
