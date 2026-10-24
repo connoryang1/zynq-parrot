@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Isolated target-data RTL worktree ready — 2026-10-24:** created `experiment/target-data-preview-lane` from verified checkpoint `7ace32e5` and materialized BlackParrot `474dbb8ac` plus all three exact nested source gitlinks. Local-file transport and unadvertised-object setup failures were resolved with command-scoped fetches from the verified oracle worktree; no RTL build was attempted before the source identities were checked (`logs/target-data-preview-lane-setup-20261024/`).
+
 - **Linux data-preview implementation scoped — 2026-10-24:** the maintained context-resume plan now specifies a kernel-owned nonblocking descriptor, independent pre-acceptance queue/arbiter, target address-space and task-lifecycle contract, request-level observability, and matched one-way Linux acceptance gates. It preserves the same-mm oracle as an initial verification slice while retaining cross-mm translation and learned per-task addresses as requirements for the general feature (`CONTEXT_RESUME_PREFETCH_PLAN.md`).
 
 - **Preview demand-order control — 2026-10-24:** a nine-mode, 144-trial FPGA/Linux run reversed the peer's data-load order while holding forward exact hints fixed. The long first-load interval moved from line 0 to line 3 in both direct and hinted controls (hinted medians 67 versus 64 cycles), weakening the earlier line-1-address explanation; aggregate load timing cannot identify request fate or establish a whole-handoff gain (`logs/context-preview-linux-demand-order-20261024/`).
