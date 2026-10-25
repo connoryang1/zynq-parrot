@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Linux boot regression isolated to BlackParrot `6a8f31989` — 2026-10-25:** the matched prefetch5, recorder-off `6a`-only candidate routed with WNS/WHS `+1.500/+0.024 ns`, and its verified bitstream ran the identical control Linux NBF. It advertised `sstc` in OpenSBI but printed no Linux banner by the native 90 s limit, whereas its immediate parent `52c5dde70` boots to a shell; the selective CSR revert and one-address fix board controls remain necessary to establish the mechanism (`logs/target-data-preview-linux-hook-20261024/board-probe/known-linux-6a-prefetch5-traceoff-physical-run-command.log`).
+
 - **Sstc probe fix validated in simulation — 2026-10-25:** removed unsupported `stimecmp` from zero-valued optional CSR handling so OpenSBI's presence read traps; a clean traced `mt_opensbi_csr_probe_test` confirms illegal-instruction cause 2 and the existing `mt_machine_trap_test` control still passes. This is a simulator-validated fix candidate only; routed fit and Linux boot remain pending (`logs/stimecmp-probe-fix-20261025/`).
 
 - **Linux boot bisect narrowed to two BlackParrot commits — 2026-10-25:** midpoint BP `52c5dde70` booted the identical control Linux NBF to an interactive shell at guest time 38.8 s after post-route optimization repaired initial WNS `-0.198` to `+0.174 ns`. The first failing revision is now `6a8f31989` or `d4c20786d` (or their interaction); the next controlled build targets `6a8f31989` (`logs/target-data-preview-linux-hook-20261024/README.md`).
