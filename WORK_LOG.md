@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Optional CSR candidate misses FPGA fit — 2026-10-25:** the simulation-qualified actual preview RTL top `5261fce4` / BP `3b2cf06f` failed PYNQ-Z2 detail placement by 22 slices (11,246 required, 11,224 available). `Explore` placement from the same optimized checkpoint failed identically, and area resynthesis worsened packing to 11,480 required slices; no bitstream or Linux result exists for this candidate (`logs/optional-csr-probe-20261025/`).
+
 - **Optional CSR trap candidate passes clean simulation — 2026-10-25:** on the actual preview RTL, five remaining unsupported optional CSR reads now trap while PMP/HPM zero readback stays intact. A clean traced two-resident/four-context build passed exact-PC illegal-instruction checks for all six optional probes and the known-good machine-trap smoke; Linux boot and routed fit remain unverified (`logs/optional-csr-probe-20261025/`).
 
 - **One-address Sstc fix does not restore preview Linux boot — 2026-10-25:** the actual preview RTL with only unsupported `stimecmp` trapping reached a timing-clean post-route bitstream (WNS/WHS `+0.068/+0.017 ns`) and passed exact package/overlay checks, but the same control Linux NBF printed OpenSBI without `sstc` and no Linux banner by the native 90 s limit. The full CSR-file revert boots on the earlier d4 replay RTL, so the remaining discriminator is other false optional CSR detection versus a separate later preview-RTL interaction (`logs/target-data-preview-linux-hook-20261024/board-probe/known-linux-preview-stimecmp-fix-physopt-physical-run-command.log`).

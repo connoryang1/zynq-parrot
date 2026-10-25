@@ -682,14 +682,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** false Sstc detection is not sufficient to explain the whole preview-Linux boot stall. The earlier d4 RTL boots when its full 6a CSR file is reverted (RL-071), but this actual preview route still differs in other CSR behavior and in later preview RTL. The next board discriminator must hold the actual preview RTL fixed while trapping the other unsupported optional CSR reads.
 - **Limits:** this result does not show whether the remaining cause is another optional CSR, the preview lane/recorder, or their interaction. A control that fixes all optional CSR probes on the actual preview RTL is needed before attributing the stall. The terminal timeout requires full board recovery before another run.
 
-### RL-074 — Trapping the remaining optional CSR reads passes a local preview-RTL gate
+### RL-074 — Remaining optional CSR traps pass simulation but miss FPGA fit
 
-- **Status:** clean traced simulator acceptance; routed timing and physical Linux result pending
+- **Status:** clean traced simulator acceptance; confirmed PYNQ-Z2 placement failure; no physical Linux result
 - **Scope:** actual target-data preview RTL with BlackParrot `3b2cf06f647df234c3956cae79618fe01edf83d7`, changing only the five remaining optional CSR zero-read exceptions and their ignored-write list relative to RL-073.
 - **Claim:** a clean two-resident/four-context traced build passed the directed CSR probe test, which requires cause 2 and the exact fault PC for reads of `0x14d`, `0x30a`, `0x30c`, `0x321`, `0xda0`, and `0xfb0`, while PMP/HPM probes still read zero. The known-good cold M-mode ECALL trap test passed on the same model. Both runs had guest-specific PASS, `CORE PASS`, and host `BSG PASS`.
-- **Evidence:** retained transcripts, NBFs, closed FSTs, and model build log at `logs/optional-csr-probe-20261025/`; directed NBF/FST SHA-256 `401e3db591fc601865e75c8bcb63108b7a53e6c5c150d08340afc21ac818b734`/`ffc066516cc3907c73573e5a7909be0ea5b2836563127bc7dd5da9a2caf26f34`.
-- **Meaning:** the next FPGA candidate isolates remaining optional CSR presence detection while preserving the preview lane and recorder. It directly tests the boot question left open by RL-073.
-- **Limits:** simulator traps alone do not prove physical Linux boot, a correct ISA extension report, accepted preview requests, or speedup. A timing-clean route and same-NBF board comparison are required.
+- **Evidence:** retained transcripts, NBFs, closed FSTs, and model build log at `logs/optional-csr-probe-20261025/`; directed NBF/FST SHA-256 `401e3db591fc601865e75c8bcb63108b7a53e6c5c150d08340afc21ac818b734`/`ffc066516cc3907c73573e5a7909be0ea5b2836563127bc7dd5da9a2caf26f34`. Farm job `20261025T102311Z-5261fce4` on bp2 ended FAIL at `Place 30-487`: 11,246 slices needed versus 11,224 available. A separate `Explore` place from its exact optimized DCP repeated 11,246; `opt_design -directive ExploreArea` reduced the synthesis LUT report to 53,199 but its subsequent placement worsened to 11,480 slices. The remote logs/checkpoints are under `/home/coyang/fpga-logs-linux-optional-csr-preview*` on bp2.
+- **Meaning:** the six-trap CSR behavior is locally correct, but this source pair has no board-valid package. A different source-isolated candidate or a demonstrated fit repair is required before the physical boot discriminator can run.
+- **Limits:** placement failure says nothing about Linux boot, accepted preview requests, or speedup. The 34-LUT difference between this and RL-073 at synthesis is small, while packing changes are decisive at this device margin; do not infer a general RTL area cost from one netlist.
 
 ## Superseded or rejected findings
 
