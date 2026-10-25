@@ -574,6 +574,24 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** Linux can express a selected incoming same-mm task's exact target address as a bounded hint without running a target U-mode helper under the runqueue lock. This is a software construction and link result, not evidence that the hint is timely or useful on a Linux handoff.
 - **Limits:** the hardware hint drops DTLB misses; no task/mm generation or pending-request cancellation protects unmapped/reused physical pages; cross-mm translation and learned addresses are absent. The first full-build attempt lacked `BR_BINARIES_DIR` and failed before link, then passed with a hash-matched isolated rootfs. The raw NBF CSR scanner sees seven instruction-shaped values in nonexecutable kernel data, so only the executable-section scans qualify the code. Booted request/consume traces and matched one-way timing are still required.
 
+### RL-062 — Full-system simulation reaches OpenSBI but not Linux in a bounded run
+
+- **Status:** accepted simulator-loader diagnosis and OpenSBI-start observation; no Linux scheduler or benchmark result
+- **Scope:** traced prefetch5 full-system Verilator model, automatic-run Linux 6.6 payload, and a temporary direct AXI RAM preload diagnostic
+- **Claim:** the normal 71 MB NBF path advanced roughly 0.52 MB in 2 minutes 39 seconds because the host applies DRAM records through simulated GP writes; it was stopped before target start. A clean rebuilt diagnostic model loaded the exact OpenSBI payload into simulator RAM, skipped only NBF DRAM writes, and verified OpenSBI, DTB, and kernel words through the ordinary GP/AXI read path before unfreeze. It printed `OpenSBI v1.4`, then reached its native target-runtime limit after 132,124 host milliseconds and about 6,528 normalized core cycles, before Linux printed a banner.
+- **Evidence:** `logs/target-data-preview-linux-hook-20261024/README.md`, `fast-auto-sim-run-command.log`, the temporary diagnostic patch, exact image/model hashes, and the closed runtime-limit result.
+- **Meaning:** the image loads correctly enough to start OpenSBI, and the old NBF ingestion delay is tooling rather than evidence about the scheduler hint. At the observed traced-model rate, full Linux boot is not a useful short iteration gate; a routed physical run is the next practical whole-kernel gate once the exact RTL route qualifies.
+- **Limits:** OpenSBI output is not proof that Linux, `prctl`, the scheduler hook, or the benchmark runs. No runtime-limited FST is promoted, and no application speedup is claimed.
+
+### RL-063 — Same-mm Linux scheduler hook executes in a booted software model
+
+- **Status:** accepted software-control result; BlackParrot hardware benefit and Linux timing remain unmeasured
+- **Scope:** isolated patched Linux 6.6 kernel under RV64 QEMU, static 48-handoff futex benchmark, and temporary scheduler-issued-hint counter
+- **Claim:** the uninstrumented patched kernel booted, completed all 48 mixed off/exact/stale handoffs, printed `PASS`, and powered down. A diagnostic kernel counted 33 executions of the scheduler hint path across the same 48 mixed handoffs. With registration disabled for all 48 handoffs, the diagnostic count was zero; that guest also printed `PASS` and powered down. The diagnostic counter was confined to the isolated build tree and removed after these controls.
+- **Evidence:** `logs/target-data-preview-linux-hook-20261024/README.md`, `qemu-software-boot.log`, `qemu-count-boot.log`, and `qemu-off-boot.log`; each run has 48 trial rows and exit status zero.
+- **Meaning:** Linux reaches the patched registration and selected-incoming-task path during actual same-mm scheduling, and disabled registration does not issue hints. This resolves software reachability before physical testing.
+- **Limits:** QEMU executes the encoded hint as an architectural no-op and has no BlackParrot data-preview hardware. Its nanosecond intervals cannot estimate prefetch benefit. The diagnostic counter counts executed hint paths, not accepted or useful memory requests. The hardware DTLB-hit rate, target arrival time, demand collision rate, and whole-handoff speedup remain unknown.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

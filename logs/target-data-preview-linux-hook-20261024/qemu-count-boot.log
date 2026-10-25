@@ -1,0 +1,230 @@
+
+OpenSBI v0.9
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : riscv-virtio,qemu
+Platform Features         : timer,mfdeleg
+Platform HART Count       : 1
+Firmware Base             : 0x80000000
+Firmware Size             : 100 KB
+Runtime SBI Version       : 0.2
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080000000-0x000000008001ffff ()
+Domain0 Region01          : 0x0000000000000000-0xffffffffffffffff (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART ISA             : rv64imafdcsu
+Boot HART Features        : scounteren,mcounteren
+Boot HART PMP Count       : 16
+Boot HART PMP Granularity : 4
+Boot HART PMP Address Bits: 54
+Boot HART MHPM Count      : 0
+Boot HART MHPM Count      : 0
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #8 SMP Sat Oct 24 20:43:29 EDT 2026
+[    0.000000] Machine model: riscv-virtio,qemu
+[    0.000000] SBI specification v0.2 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x9
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008001ffff (128 KiB) map non-reusable mmode_resv0@80000000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000087ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x0000000087ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000087ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] Kernel command line: console=ttyS0 rdinit=/init loglevel=7
+[    0.000000] Dentry cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 32320
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd808000000   ( 128 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 104268K/131072K available (8287K kernel code, 3367K rwdata, 4096K rodata, 5767K init, 388K bss, 26804K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] plic: interrupt-controller@c000000: mapped 53 interrupts with 1 handlers for 2 contexts.
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x24e6a1710, max_idle_ns: 440795202120 ns
+[    0.000443] sched_clock: 64 bits at 10MHz, resolution 100ns, wraps every 4398046511100ns
+[    0.005426] Console: colour dummy device 80x25
+[    0.011316] Calibrating delay loop (skipped), value calculated using timer frequency.. 20.00 BogoMIPS (lpj=40000)
+[    0.011961] pid_max: default: 32768 minimum: 301
+[    0.015822] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.015976] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.078467] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.080504] riscv: ELF compat mode unsupported
+[    0.081263] ASID allocator using 16 bits (65536 entries)
+[    0.087560] rcu: Hierarchical SRCU implementation.
+[    0.087696] rcu: 	Max phase no-delay instances is 1000.
+[    0.096679] EFI services will not be available.
+[    0.105035] smp: Bringing up secondary CPUs ...
+[    0.105781] smp: Brought up 1 node, 1 CPU
+[    0.122634] devtmpfs: initialized
+[    0.138825] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.139430] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.163300] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.169668] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.170168] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.217320] cpu0: Ratio of byte access time to unaligned word access is 1.23, unaligned accesses are fast
+[    0.267662] SCSI subsystem initialized
+[    0.274026] usbcore: registered new interface driver usbfs
+[    0.274497] usbcore: registered new interface driver hub
+[    0.274857] usbcore: registered new device driver usb
+[    0.297372] vgaarb: loaded
+[    0.299765] clocksource: Switched to clocksource riscv_clocksource
+[    0.456639] NET: Registered PF_INET protocol family
+[    0.460399] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    0.469989] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    0.470230] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.470434] TCP established hash table entries: 1024 (order: 1, 8192 bytes, linear)
+[    0.470755] TCP bind hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.471110] TCP: Hash tables configured (established 1024 bind 1024)
+[    0.474269] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.474771] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    0.478272] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.491593] RPC: Registered named UNIX socket transport module.
+[    0.491752] RPC: Registered udp transport module.
+[    0.491871] RPC: Registered tcp transport module.
+[    0.492361] RPC: Registered tcp-with-tls transport module.
+[    0.492688] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.494001] PCI: CLS 0 bytes, default 64
+[    0.518666] workingset: timestamp_bits=62 max_order=15 bucket_order=0
+[    0.539652] NFS: Registering the id_resolver key type
+[    0.541088] Key type id_resolver registered
+[    0.541235] Key type id_legacy registered
+[    0.544028] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    0.545327] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    0.558596] 9p: Installing v9fs 9p2000 file system support
+[    0.563138] NET: Registered PF_ALG protocol family
+[    0.564230] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    0.565677] io scheduler mq-deadline registered
+[    0.565981] io scheduler kyber registered
+[    0.588459] pci-host-generic 30000000.pci: host bridge /soc/pci@30000000 ranges:
+[    0.590877] pci-host-generic 30000000.pci:       IO 0x0003000000..0x000300ffff -> 0x0000000000
+[    0.591525] pci-host-generic 30000000.pci:      MEM 0x0040000000..0x007fffffff -> 0x0040000000
+[    0.594217] pci-host-generic 30000000.pci: ECAM at [mem 0x30000000-0x3fffffff] for [bus 00-ff]
+[    0.596287] pci-host-generic 30000000.pci: PCI host bridge to bus 0000:00
+[    0.596662] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.596876] pci_bus 0000:00: root bus resource [io  0x0000-0xffff]
+[    0.597637] pci_bus 0000:00: root bus resource [mem 0x40000000-0x7fffffff]
+[    0.599924] pci 0000:00:00.0: [1b36:0008] type 00 class 0x060000
+[    2.578520] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    2.637893] printk: console [ttyS0] disabled
+[    2.649046] 10000000.uart: ttyS0 at MMIO 0x10000000 (irq = 12, base_baud = 230400) is a 16550A
+[    2.650751] printk: console [ttyS0] enabled
+[    3.036623] [drm] radeon kernel modesetting enabled.
+[    3.097504] loop: module loaded
+[    3.112842] e1000e: Intel(R) PRO/1000 Network Driver
+[    3.115534] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    3.127333] usbcore: registered new interface driver uas
+[    3.130648] usbcore: registered new interface driver usb-storage
+[    3.136249] mousedev: PS/2 mouse device common for all mice
+[    3.143383] sdhci: Secure Digital Host Controller Interface driver
+[    3.145750] sdhci: Copyright(c) Pierre Ossman
+[    3.150121] sdhci-pltfm: SDHCI platform and OF driver helper
+[    3.154927] usbcore: registered new interface driver usbhid
+[    3.158391] usbhid: USB HID core driver
+[    3.164398] NET: Registered PF_INET6 protocol family
+[    3.190216] Segment Routing with IPv6
+[    3.192215] In-situ OAM (IOAM) with IPv6
+[    3.195530] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[    3.206013] NET: Registered PF_PACKET protocol family
+[    3.210450] 9pnet: Installing 9P2000 support
+[    3.214841] Key type dns_resolver registered
+[    3.322993] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[    3.347470] clk: Disabling unused clocks
+[    3.446362] Freeing unused kernel image (initmem) memory: 5764K
+[    3.450039] Run /init as init process
+SCHED_PREVIEW_INIT_START
+SCHED_PREVIEW_SOFT mode=0 trial=1 cpu=0 wake=3113000 entry=597000 load=3499900 roundtrip=4738900
+SCHED_PREVIEW_SOFT mode=1 trial=2 cpu=0 wake=2252000 entry=295900 load=371800 roundtrip=2404000
+SCHED_PREVIEW_SOFT mode=2 trial=3 cpu=0 wake=650900 entry=293900 load=369000 roundtrip=726100
+SCHED_PREVIEW_SOFT mode=1 trial=4 cpu=0 wake=227100 entry=541900 load=617100 roundtrip=866000
+SCHED_PREVIEW_SOFT mode=2 trial=5 cpu=0 wake=645100 entry=290000 load=366000 roundtrip=721100
+SCHED_PREVIEW_SOFT mode=0 trial=6 cpu=0 wake=613700 entry=254700 load=329900 roundtrip=690000
+SCHED_PREVIEW_SOFT mode=2 trial=7 cpu=0 wake=645100 entry=291100 load=366000 roundtrip=720000
+SCHED_PREVIEW_SOFT mode=0 trial=8 cpu=0 wake=609000 entry=250900 load=326000 roundtrip=1070000
+SCHED_PREVIEW_SOFT mode=1 trial=9 cpu=0 wake=647000 entry=291900 load=366800 roundtrip=723000
+SCHED_PREVIEW_SOFT mode=0 trial=10 cpu=0 wake=605900 entry=248100 load=324100 roundtrip=681100
+SCHED_PREVIEW_SOFT mode=1 trial=11 cpu=0 wake=666000 entry=312100 load=386100 roundtrip=740900
+SCHED_PREVIEW_SOFT mode=2 trial=12 cpu=0 wake=692000 entry=332100 load=408100 roundtrip=767900
+SCHED_PREVIEW_SOFT mode=1 trial=13 cpu=0 wake=650100 entry=293000 load=368200 roundtrip=724100
+SCHED_PREVIEW_SOFT mode=2 trial=14 cpu=0 wake=676100 entry=314000 load=389100 roundtrip=752100
+SCHED_PREVIEW_SOFT mode=0 trial=15 cpu=0 wake=648900 entry=270100 load=348100 roundtrip=724100
+SCHED_PREVIEW_SOFT mode=2 trial=16 cpu=0 wake=1026100 entry=349200 load=487200 roundtrip=1138900
+SCHED_PREVIEW_SOFT mode=0 trial=17 cpu=0 wake=607000 entry=249200 load=325100 roundtrip=682200
+SCHED_PREVIEW_SOFT mode=1 trial=18 cpu=0 wake=228800 entry=547000 load=623000 roundtrip=2293100
+SCHED_PREVIEW_SOFT mode=0 trial=19 cpu=0 wake=602000 entry=246900 load=322900 roundtrip=676900
+SCHED_PREVIEW_SOFT mode=1 trial=20 cpu=0 wake=674900 entry=302800 load=379900 roundtrip=749800
+SCHED_PREVIEW_SOFT mode=2 trial=21 cpu=0 wake=2204000 entry=288000 load=787000 roundtrip=2280000
+SCHED_PREVIEW_SOFT mode=1 trial=22 cpu=0 wake=648100 entry=294200 load=369000 roundtrip=723000
+SCHED_PREVIEW_SOFT mode=2 trial=23 cpu=0 wake=2394200 entry=2029100 load=2106200 roundtrip=2470200
+SCHED_PREVIEW_SOFT mode=0 trial=24 cpu=0 wake=612100 entry=256200 load=331000 roundtrip=686900
+SCHED_PREVIEW_SOFT mode=2 trial=25 cpu=0 wake=224100 entry=2184200 load=2259000 roundtrip=2668000
+SCHED_PREVIEW_SOFT mode=0 trial=26 cpu=0 wake=604000 entry=248100 load=323300 roundtrip=680000
+SCHED_PREVIEW_SOFT mode=1 trial=27 cpu=0 wake=5084000 entry=2253200 load=2423000 roundtrip=5168100
+SCHED_PREVIEW_SOFT mode=0 trial=28 cpu=0 wake=605900 entry=248900 load=324100 roundtrip=680000
+SCHED_PREVIEW_SOFT mode=1 trial=29 cpu=0 wake=648100 entry=291900 load=367100 roundtrip=723000
+SCHED_PREVIEW_SOFT mode=2 trial=30 cpu=0 wake=2586100 entry=655900 load=2296100 roundtrip=2661000
+SCHED_PREVIEW_SOFT mode=1 trial=31 cpu=0 wake=645900 entry=290900 load=366900 roundtrip=721100
+SCHED_PREVIEW_SOFT mode=2 trial=32 cpu=0 wake=1063900 entry=287000 load=361800 roundtrip=1180100
+SCHED_PREVIEW_SOFT mode=0 trial=33 cpu=0 wake=607900 entry=250000 load=324900 roundtrip=683000
+SCHED_PREVIEW_SOFT mode=2 trial=34 cpu=0 wake=228000 entry=542800 load=618000 roundtrip=1030900
+SCHED_PREVIEW_SOFT mode=0 trial=35 cpu=0 wake=3989200 entry=3593300 load=3674300 roundtrip=4065100
+SCHED_PREVIEW_SOFT mode=1 trial=36 cpu=0 wake=661000 entry=309000 load=384100 roundtrip=1159100
+SCHED_PREVIEW_SOFT mode=0 trial=37 cpu=0 wake=602800 entry=247800 load=322900 roundtrip=678000
+SCHED_PREVIEW_SOFT mode=1 trial=38 cpu=0 wake=654000 entry=298100 load=374100 roundtrip=729200
+SCHED_PREVIEW_SOFT mode=2 trial=39 cpu=0 wake=2167100 entry=288000 load=363100 roundtrip=2252000
+SCHED_PREVIEW_SOFT mode=1 trial=40 cpu=0 wake=227200 entry=539200 load=614100 roundtrip=863300
+SCHED_PREVIEW_SOFT mode=2 trial=41 cpu=0 wake=1871800 entry=1499900 load=1579800 roundtrip=1947800
+SCHED_PREVIEW_SOFT mode=0 trial=42 cpu=0 wake=604000 entry=247000 load=323000 roundtrip=678900
+SCHED_PREVIEW_SOFT mode=2 trial=43 cpu=0 wake=840100 entry=474100 load=550100 roundtrip=944000
+SCHED_PREVIEW_SOFT mode=0 trial=44 cpu=0 wake=605100 entry=248100 load=324100 roundtrip=680000
+SCHED_PREVIEW_SOFT mode=1 trial=45 cpu=0 wake=646200 entry=292200 load=367100 roundtrip=721100
+SCHED_PREVIEW_SOFT mode=0 trial=46 cpu=0 wake=603100 entry=248000 load=323200 roundtrip=678000
+SCHED_PREVIEW_SOFT mode=1 trial=47 cpu=0 wake=656200 entry=297000 load=373200 roundtrip=731100
+SCHED_PREVIEW_SOFT mode=2 trial=48 cpu=0 wake=2721100 entry=313200 load=389100 roundtrip=2797100
+SCHED_PREVIEW_ISSUED count=33
+SCHED_PREVIEW_SOFT PASS
+SCHED_PREVIEW_INIT_RESULT=0
+[    4.207436] reboot: Power down
