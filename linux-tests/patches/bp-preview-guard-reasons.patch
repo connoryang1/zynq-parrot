@@ -1,0 +1,93 @@
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -86,6 +86,8 @@
+ 	unsigned long bp_preview_addr[BP_PREVIEW_ADDRS];
+ 	struct mm_struct *bp_preview_mm;
+ 	unsigned long bp_preview_hook_count;
++	/* Diagnostic counts for each incoming context-switch guard outcome. */
++	unsigned long bp_preview_guard_count[5];
+ 	unsigned long vstate_ctrl;
+ 	struct __riscv_v_ext_state vstate;
+ };
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -94,15 +94,30 @@
+ 	unsigned long addr0, addr1, addr2, addr3;
+ 	unsigned long status;
+ 
+-	if (!prev->mm || prev->mm != next->mm ||
+-	    READ_ONCE(next->thread.bp_preview_mm) != next->mm)
++	/* Count selection before any early return so a skipped same-mm hint can
++	 * be separated from a handoff through idle or a different address space.
++	 */
++	next->thread.bp_preview_guard_count[0]++;
++	if (!prev->mm) {
++		next->thread.bp_preview_guard_count[1]++;
+ 		return;
++	}
++	if (prev->mm != next->mm) {
++		next->thread.bp_preview_guard_count[2]++;
++		return;
++	}
++	if (READ_ONCE(next->thread.bp_preview_mm) != next->mm) {
++		next->thread.bp_preview_guard_count[3]++;
++		return;
++	}
+ 	addr0 = READ_ONCE(next->thread.bp_preview_addr[0]);
+ 	addr1 = READ_ONCE(next->thread.bp_preview_addr[1]);
+ 	addr2 = READ_ONCE(next->thread.bp_preview_addr[2]);
+ 	addr3 = READ_ONCE(next->thread.bp_preview_addr[3]);
+-	if (!(addr0 | addr1 | addr2 | addr3))
++	if (!(addr0 | addr1 | addr2 | addr3)) {
++		next->thread.bp_preview_guard_count[4]++;
+ 		return;
++	}
+ 
+ 	status = csr_read(CSR_STATUS);
+ 	if (!(status & SR_SUM))
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -142,6 +142,8 @@
+ 	       sizeof(current->thread.bp_preview_addr));
+ 	current->thread.bp_preview_mm = NULL;
+ 	current->thread.bp_preview_hook_count = 0;
++	memset(current->thread.bp_preview_guard_count, 0,
++	       sizeof(current->thread.bp_preview_guard_count));
+ #ifdef CONFIG_FPU
+ 	/*
+ 	 * Reset FPU state and context
+@@ -188,6 +190,8 @@
+ 	       sizeof(p->thread.bp_preview_addr));
+ 	p->thread.bp_preview_mm = NULL;
+ 	p->thread.bp_preview_hook_count = 0;
++	memset(p->thread.bp_preview_guard_count, 0,
++	       sizeof(p->thread.bp_preview_guard_count));
+ 	memset(&p->thread.s, 0, sizeof(p->thread.s));
+ 
+ 	/* p->thread holds context to be restored by __switch_to() */
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -308,5 +308,6 @@
+ /* BlackParrot experimental per-task same-mm user-data preview address. */
+ #define PR_BP_PREVIEW_SET		0x42505056
+ #define PR_BP_PREVIEW_GET_COUNT	0x42505057
++#define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2751,6 +2751,14 @@
+ 		}
+ 		error = READ_ONCE(me->thread.bp_preview_hook_count);
+ 		break;
++	case PR_BP_PREVIEW_GET_GUARD:
++		if (arg2 >= ARRAY_SIZE(me->thread.bp_preview_guard_count) ||
++		    arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		error = READ_ONCE(me->thread.bp_preview_guard_count[arg2]);
++		break;
+ #endif
+ 	default:
+ 		error = -EINVAL;

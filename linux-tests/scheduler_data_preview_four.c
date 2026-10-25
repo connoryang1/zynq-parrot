@@ -23,9 +23,11 @@
 
 #define PR_BP_PREVIEW_SET 0x42505056
 #define PR_BP_PREVIEW_GET_COUNT 0x42505057
+#define PR_BP_PREVIEW_GET_GUARD 0x42505058
 
 enum { modes = 3, repetitions = 16, trials = modes * repetitions,
-       preview_lines = 4, line_groups = 16, page_lines = 64 };
+       preview_lines = 4, line_groups = 16, page_lines = 64,
+       guard_outcomes = 5 };
 enum { preview_off, preview_exact, preview_stale };
 
 struct line { uint64_t word[8]; };
@@ -43,6 +45,7 @@ static uint64_t value[trials][preview_lines];
 static uint64_t miss_status[trials][preview_lines + 1];
 static uint64_t preview_status_entry[trials], preview_status_post[trials];
 static unsigned long hook_count[trials];
+static unsigned long guard_count[trials][guard_outcomes];
 
 static unsigned line_index(unsigned trial, unsigned lane)
 {
@@ -200,6 +203,11 @@ static void *peer_main(void *unused)
     int count = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
     if (count < 0) fail("preview hook count prctl");
     hook_count[index] = (unsigned long)count;
+    for (unsigned reason = 0; reason < guard_outcomes; ++reason) {
+      count = prctl(PR_BP_PREVIEW_GET_GUARD, reason, 0UL, 0UL, 0UL);
+      if (count < 0) fail("preview guard count prctl");
+      guard_count[index][reason] = (unsigned long)count;
+    }
     preview_status_post[index] = preview_trace_status();
     register_next(trial);
     atomic_store_explicit(&done, trial, memory_order_release);
@@ -283,6 +291,10 @@ int main(void)
            misses[0] + misses[1] + misses[2] + misses[3], armed, overflow);
     printf("SCHED_PREVIEW_HOOK mode=%u trial=%u count=%lu\n",
            trial_mode[index], trial, hook_count[index]);
+    printf("SCHED_PREVIEW_GUARD mode=%u trial=%u selected=%lu idle=%lu different_mm=%lu descriptor=%lu empty=%lu\n",
+           trial_mode[index], trial, guard_count[index][0],
+           guard_count[index][1], guard_count[index][2],
+           guard_count[index][3], guard_count[index][4]);
     const uint64_t entry_status = preview_status_entry[index];
     const uint64_t demand_status = miss_status[index][0];
     const uint64_t load_status = miss_status[index][preview_lines];
