@@ -33,6 +33,7 @@ PREVIEW_APP := $(OUT)/context_preview_oracle
 PREVIEW_DYNAMIC_APP := $(OUT)/context_preview_oracle_dynamic
 SCHED_PREVIEW_APP := $(OUT)/scheduler_data_preview
 SCHED_PREVIEW_DYNAMIC_APP := $(OUT)/scheduler_data_preview_dynamic
+SCHED_PREVIEW_UNIQUE_APP := $(OUT)/scheduler_data_preview_unique
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -119,6 +120,8 @@ context-preview-oracle-dynamic: $(PREVIEW_DYNAMIC_APP)
 .PHONY: scheduler-data-preview scheduler-data-preview-dynamic emit-scheduler-data-preview-transfer emit-scheduler-data-preview-dynamic-transfer
 scheduler-data-preview: $(SCHED_PREVIEW_APP)
 scheduler-data-preview-dynamic: $(SCHED_PREVIEW_DYNAMIC_APP)
+.PHONY: scheduler-data-preview-unique
+scheduler-data-preview-unique: $(SCHED_PREVIEW_UNIQUE_APP)
 cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
 cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 
@@ -160,6 +163,10 @@ $(SCHED_PREVIEW_DYNAMIC_APP): scheduler_data_preview.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
 	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+$(SCHED_PREVIEW_UNIQUE_APP): scheduler_data_preview_unique.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
 
 emit-scheduler-data-preview-transfer: check-linux-cc scheduler-data-preview
 	@printf '%s\n' ': > /tmp/scheduler_data_preview.b64'
