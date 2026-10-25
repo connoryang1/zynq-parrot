@@ -2,7 +2,7 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
-- **Legacy CSR behavior retained with preview RTL — 2026-10-25:** isolated BlackParrot `dbe9c46a3` removes the remaining `6a8f31989` PMP/HPM zero-read behavior while preserving later preview and miss-trace CSRs. Clean traced two-resident/four-context simulation passed exact absent-CSR traps, M-mode trap, accepted miss trace, and context preview oracle; routed fit and Linux boot remain pending (`logs/legacy-csr-preview-control-20261025/`).
+- **Preview RTL boots Linux with legacy CSR probes — 2026-10-25:** isolated top `285bfac2` / BlackParrot `dbe9c46a3` preserves the preview lane and recorder while restoring pre-`6a8f31989` absent-CSR behavior. Four clean traced simulator gates passed; the prefetch5 FPGA route needed post-route physical optimization and then met WNS/WHS `+0.046/+0.029 ns` with zero routing errors and 51,108 LUTs. The unchanged Linux NBF reached `/bin/sh` at 38.68 s, and the patched Linux benchmark passed all 48 trials and runner exit zero; its paired exact-hint median roundtrip was +1,928.5 cycles versus off, so no switch speedup is claimed (`logs/legacy-csr-preview-control-20261025/`, RL-075).
 
 - **Optional CSR candidate misses FPGA fit — 2026-10-25:** the simulation-qualified actual preview RTL top `5261fce4` / BP `3b2cf06f` failed PYNQ-Z2 detail placement by 22 slices (11,246 required, 11,224 available). `Explore` placement from the same optimized checkpoint failed identically, and area resynthesis worsened packing to 11,480 required slices; no bitstream or Linux result exists for this candidate (`logs/optional-csr-probe-20261025/`).
 
