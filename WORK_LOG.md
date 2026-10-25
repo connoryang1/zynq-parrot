@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Linux hook count separates issue from delivery — 2026-10-25:** a per-task diagnostic counter on the four-address same-mm hook booted on the unchanged FPGA image and completed two 48-trial board runs. Off/stale each had 64/64 target misses; exact had 0/64 and 4/64, and the failed exact trial had a hook increment, proving that executing the Linux hint instructions does not guarantee useful delivery. Trial 40 warmed all four lines with a hook increment in both new runs, leaving queue admission/response timing as the next discriminator (`logs/four-address-preview-20261025/`, RL-080).
+
 - **Four-line Linux preview exposes translation gate — 2026-10-25:** an isolated four-address same-mm kernel descriptor booted on the unchanged timing-clean preview FPGA image. With eight eviction pages and a non-target read that refreshed only the target page translation, two recovered board runs each showed off/stale 64/64 target demand misses versus exact 4/64, and paired four-load intervals of -189.5/-197 cycles; whole-roundtrip medians were +415.5/+2,308.5 cycles, so no switch speedup is claimed (`logs/four-address-preview-20261025/`, RL-079).
 
 - **Exact Linux hints suppress target demand misses — 2026-10-25:** a new unique-line workload read the D-cache demand-miss CSR around each target load on the timing-clean preview FPGA image. Two independently recovered physical runs completed all 48 balanced trials; off/exact/stale target demand-miss totals were 16/8/16 and 16/5/18, but paired whole-roundtrip deltas reversed from -10,105.5 to +44.5 cycles, so only useful line warming, not a switch speedup, is established (`logs/preview-demand-miss-20261025/`, RL-077).
