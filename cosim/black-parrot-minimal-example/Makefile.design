@@ -16,7 +16,7 @@ BP_NCPUS ?= 1
 PROG ?= hello_world
 NBF_FILE ?= prog.nbf
 
-RUN_ARGS += +c_args=$(NBF_FILE)
+RUN_ARGS += +c_args="$(NBF_FILE)$(if $(TARGET_RUNTIME_MS), $(TARGET_RUNTIME_MS))"
 
 #############################
 # Design Defines

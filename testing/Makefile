@@ -29,6 +29,7 @@ LIFECYCLE_SV39 ?= 1
 LIFECYCLE_ITERATIONS ?= 256
 RPC_FLUSH_ON_SWITCH ?= 0
 SIM_DEFINES ?=
+TARGET_RUNTIME_MS ?=
 
 ifeq ($(PREFETCH_FULL_LINE),1)
 override SIM_DEFINES += BP_DCACHE_PREFETCH_FULL_LINE=1
@@ -75,6 +76,7 @@ CORRECTNESS_TESTS := \
     mt_resident_reseed_irq_test \
     mt_umode_prefetch_test \
     mt_smode_prefetch_sum_test \
+    mt_preview_side_buffer_pressure_test \
     mt_prefetch_hint_test \
     mt_prefetch_queue_depth_test \
     mt_prefetch_handoff_lifecycle_test \
@@ -142,7 +144,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 		{ echo "ERROR: model build failed; no previous runtime result is valid"; exit 1; }
 	@echo "  [RUN]   Executing $(1) in simulator..."
 	@set +e; \
-	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) $$(if $$(RUN_INPUT),RUN_INPUT="$$(RUN_INPUT)" RUN_INPUT_ADDR="$$(RUN_INPUT_ADDR)",) | grep -E "$$(RUN_LOG_FILTER)"; \
+	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) $$(if $$(TARGET_RUNTIME_MS),TARGET_RUNTIME_MS=$$(TARGET_RUNTIME_MS),) $$(if $$(RUN_INPUT),RUN_INPUT="$$(RUN_INPUT)" RUN_INPUT_ADDR="$$(RUN_INPUT_ADDR)",) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
 	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),)
@@ -173,6 +175,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: $(TOP)/
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: CFLAGS += -DBP_LIFECYCLE_EPOCHS=$(LIFECYCLE_EPOCHS) -DBP_LIFECYCLE_EVICTION_LINES=$(LIFECYCLE_EVICTION_LINES) -DBP_LIFECYCLE_SV39=$(LIFECYCLE_SV39) -DBP_LIFECYCLE_ITERATIONS=$(LIFECYCLE_ITERATIONS)
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_smode_prefetch_sum_test.riscv: $(TOP)/software/include/bp_prefetch.h
+$(ZP_RISCV_DIR)/bp-tests/mt_preview_side_buffer_pressure_test.riscv: $(TOP)/software/include/bp_prefetch.h
+run-mt_preview_side_buffer_pressure_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5
 
 .PHONY: check-nonresident-config
 check-nonresident-config:

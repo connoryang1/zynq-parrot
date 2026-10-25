@@ -11,6 +11,8 @@ Each selected test ELF is rebuilt to match the requested topology/compiler flags
 The runner clears old transcripts before building and requires fresh guest and
 host PASS markers and the selected program's completion marker before CORE PASS,
 rejecting timeouts and unrelated assertions even after PASS.
+Set `TARGET_RUNTIME_MS` to pass a native simulator target-runtime limit to the
+minimal-example runner when diagnosing an expected guest stall.
 
 Run from the repository root. First preserve any logs and waveforms you need;
 then finish each cleanup command before launching the consuming build.
@@ -55,6 +57,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_pure_ring_stress_test` | Eight consecutive switches per context, followed by a lap verifying every peer completed |
 | `mt_umode_resident_sv39_data_handoff_test` | First resident initialization, cold translated fetch/data, U-mode traps, and private GPR state |
 | `mt_prefetch_hint_test` | Nonfaulting invalid hints, signed offsets, ordinary ORI behavior, all word offsets, and dirty-line/store data preservation |
+| `mt_preview_side_buffer_pressure_test` | Four older published hints followed by four target hints under a five-slot buffer; target demand hits and separate cold-control misses |
 | `mt_prefetch_queue_depth_test` | Two batches of ten hints followed by ten demand loads, with distinct cold lines and verified sums |
 | `mt_prefetch_handoff_lifecycle_test` | Six cold-displaced 256-request-per-context launches drain detached state across repeated resident handoffs |
 | `mt_umode_prefetch_handoff_lifecycle_test` | The same repeated resident lifecycle under U-mode with 4 KiB Sv39 request and displacement mappings |
