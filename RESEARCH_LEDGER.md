@@ -610,6 +610,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** five detached prefetch entries and the corresponding top decode can coexist with a Linux boot. The earlier prefetch5 failures require a later source or recorder-enable difference; queue depth alone is not sufficient.
 - **Limits:** this is a boot control, not a preview-lane run or performance measurement. It does not yet distinguish the five BlackParrot commits through `d4c20786` from the later recorder-enable/subsystem change in the failing image.
 
+### RL-066 — The failing timer call receives the correct live frequency
+
+- **Status:** validated physical architectural-input capture
+- **Scope:** patched 46 MiB Linux image on the failing preview bitstream at physical `0x8085ce62`, immediately before `clockevents_config_and_register`
+- **Claim:** a guarded same-PC reporter branched on its captured source before the first SBI call. Its `x0` control printed `Z0000000000000000` with `CORE PASS`, and its live `a1` variant printed `V00000000007a1200` with `CORE PASS`, showing a frequency argument of 8,000,000 Hz.
+- **Evidence:** guarded NBF builder and exact physical transcripts `logs/target-data-preview-linux-hook-20261024/board-probe/clockevents-freq-*-physical-run-command.log`.
+- **Meaning:** the timer registration stall is not explained by a wrong frequency operand at that call boundary. A later hardware or recorder integration issue remains possible.
+- **Limits:** this capture does not prove the clock-event device pointer, min/max tick operands, or which instruction inside the call loops. It is a terminal probe, not a successful Linux boot or speedup.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
