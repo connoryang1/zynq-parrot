@@ -1,0 +1,116 @@
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -73,6 +73,8 @@
+ struct pt_regs;
+ struct mm_struct;
+ 
++#define BP_PREVIEW_ADDRS 4
++
+ /* CPU-specific state of a task */
+ struct thread_struct {
+ 	/* Callee-saved registers */
+@@ -81,7 +83,7 @@
+ 	unsigned long s[12];	/* s[0]: frame pointer */
+ 	struct __riscv_d_ext_state fstate;
+ 	unsigned long bad_cause;
+-	unsigned long bp_preview_addr;
++	unsigned long bp_preview_addr[BP_PREVIEW_ADDRS];
+ 	struct mm_struct *bp_preview_mm;
+ 	unsigned long vstate_ctrl;
+ 	struct __riscv_v_ext_state vstate;
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -138,7 +138,8 @@
+ 
+ void flush_thread(void)
+ {
+-	current->thread.bp_preview_addr = 0;
++	memset(current->thread.bp_preview_addr, 0,
++	       sizeof(current->thread.bp_preview_addr));
+ 	current->thread.bp_preview_mm = NULL;
+ #ifdef CONFIG_FPU
+ 	/*
+@@ -182,7 +183,8 @@
+ 	unsigned long tls = args->tls;
+ 	struct pt_regs *childregs = task_pt_regs(p);
+ 
+-	p->thread.bp_preview_addr = 0;
++	memset(p->thread.bp_preview_addr, 0,
++	       sizeof(p->thread.bp_preview_addr));
+ 	p->thread.bp_preview_mm = NULL;
+ 	memset(&p->thread.s, 0, sizeof(p->thread.s));
+ 
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2721,15 +2721,29 @@
+ 		error = RISCV_V_GET_CONTROL();
+ 		break;
+ #ifdef CONFIG_RISCV
+-	case PR_BP_PREVIEW_SET:
+-		if (arg3 || arg4 || arg5 || !me->mm ||
+-		    (arg2 && !access_ok((void __user *)arg2, 1))) {
++	case PR_BP_PREVIEW_SET: {
++		unsigned long addr[BP_PREVIEW_ADDRS] = { arg2, arg3, arg4, arg5 };
++		unsigned int i;
++		bool any = false;
++
++		if (!me->mm) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+-		WRITE_ONCE(me->thread.bp_preview_mm, arg2 ? me->mm : NULL);
+-		WRITE_ONCE(me->thread.bp_preview_addr, arg2);
+-		break;
++		for (i = 0; i < BP_PREVIEW_ADDRS; i++) {
++			if (addr[i] && !access_ok((void __user *)addr[i], 1)) {
++				error = -EINVAL;
++				break;
++			}
++			any |= !!addr[i];
++		}
++		if (error)
++			break;
++		for (i = 0; i < BP_PREVIEW_ADDRS; i++)
++			WRITE_ONCE(me->thread.bp_preview_addr[i], addr[i]);
++		WRITE_ONCE(me->thread.bp_preview_mm, any ? me->mm : NULL);
++		break;
++	}
+ #endif
+ 	default:
+ 		error = -EINVAL;
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -91,17 +91,30 @@
+ static __always_inline void riscv_bp_preview_next(struct task_struct *prev,
+ 						  struct task_struct *next)
+ {
+-	unsigned long addr = READ_ONCE(next->thread.bp_preview_addr);
++	unsigned long addr0, addr1, addr2, addr3;
+ 	unsigned long status;
+ 
+-	if (!addr || !prev->mm || prev->mm != next->mm ||
++	if (!prev->mm || prev->mm != next->mm ||
+ 	    READ_ONCE(next->thread.bp_preview_mm) != next->mm)
++		return;
++	addr0 = READ_ONCE(next->thread.bp_preview_addr[0]);
++	addr1 = READ_ONCE(next->thread.bp_preview_addr[1]);
++	addr2 = READ_ONCE(next->thread.bp_preview_addr[2]);
++	addr3 = READ_ONCE(next->thread.bp_preview_addr[3]);
++	if (!(addr0 | addr1 | addr2 | addr3))
+ 		return;
+ 
+ 	status = csr_read(CSR_STATUS);
+ 	if (!(status & SR_SUM))
+ 		csr_set(CSR_STATUS, SR_SUM);
+-	asm volatile("ori zero, %0, 1" : : "r"(addr) : "memory");
++	if (addr0)
++		asm volatile("ori zero, %0, 1" : : "r"(addr0) : "memory");
++	if (addr1)
++		asm volatile("ori zero, %0, 1" : : "r"(addr1) : "memory");
++	if (addr2)
++		asm volatile("ori zero, %0, 1" : : "r"(addr2) : "memory");
++	if (addr3)
++		asm volatile("ori zero, %0, 1" : : "r"(addr3) : "memory");
+ 	if (!(status & SR_SUM))
+ 		csr_clear(CSR_STATUS, SR_SUM);
+ }
