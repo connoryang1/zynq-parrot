@@ -193,6 +193,11 @@ static void prepare_cold_line(unsigned index)
   for (unsigned page = 0; page < 8; ++page)
     for (unsigned set = 0; set < page_lines; ++set)
       total += eviction[page * 4096 + set * 64];
+  /* Refresh only the target page's DTLB entry after eviction. This probe
+   * line is outside the four demand lines; the off control must still miss
+   * on all four for the comparison to be valid. */
+  unsigned probe = (line_index(index, 0) + preview_lines) % page_lines;
+  total += target_lines[probe].word[0];
   atomic_store_explicit(&sink, total, memory_order_relaxed);
   __asm__ volatile("fence rw, rw" : : : "memory");
 }
