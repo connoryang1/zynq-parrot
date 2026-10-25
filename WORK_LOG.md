@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Linux boot restored by reverting the `6a` CSR file — 2026-10-25:** top `c65e0ac6` retained the later `d4c20786` prefetch RTL but restored the pre-`6a` `bp_be_csr.sv` file; it routed with WNS/WHS `+0.309/+0.013 ns` and booted the identical control Linux NBF to `/bin/sh` at guest time 38.83 s. OpenSBI reported no ISA extensions, while the `6a`-only control advertised `sstc` and stalled; the precise one-address `stimecmp` fix is still routing and must pass a separate Linux board run (`logs/target-data-preview-linux-hook-20261024/board-probe/known-linux-d4-revert-6a-prefetch5-traceoff-physical-run-command.log`).
+
 - **Linux boot regression isolated to BlackParrot `6a8f31989` — 2026-10-25:** the matched prefetch5, recorder-off `6a`-only candidate routed with WNS/WHS `+1.500/+0.024 ns`, and its verified bitstream ran the identical control Linux NBF. It advertised `sstc` in OpenSBI but printed no Linux banner by the native 90 s limit, whereas its immediate parent `52c5dde70` boots to a shell; the selective CSR revert and one-address fix board controls remain necessary to establish the mechanism (`logs/target-data-preview-linux-hook-20261024/board-probe/known-linux-6a-prefetch5-traceoff-physical-run-command.log`).
 
 - **Sstc probe fix validated in simulation — 2026-10-25:** removed unsupported `stimecmp` from zero-valued optional CSR handling so OpenSBI's presence read traps; a clean traced `mt_opensbi_csr_probe_test` confirms illegal-instruction cause 2 and the existing `mt_machine_trap_test` control still passes. This is a simulator-validated fix candidate only; routed fit and Linux boot remain pending (`logs/stimecmp-probe-fix-20261025/`).
