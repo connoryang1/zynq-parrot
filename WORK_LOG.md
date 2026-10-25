@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Physical preview delivery localized — 2026-10-25:** a timing-clean post-route FPGA package booted the matched Linux NBF in two recovered board runs, with guest/host PASS and 48 balanced trials each. All 116 exact physical hints were admitted, issued, and published before peer entry; 29/32 exact trials avoided all four target misses, while the three failed trials had no scheduler-hook increment or physical request, leaving scheduler guard coverage and occasional pre-physical hint loss to classify (`logs/preview-hardware-events-20261025/`, RL-082).
+
 - **Hardware-event route and Linux image prepared — 2026-10-25:** the exact simulator-qualified counter RTL was admitted to bp2 as matched prefetch5 job `20261025T141900Z-f8ff206e` after publishing the already-pinned subsystem dependency commit. A newly built static benchmark, embedded kernel, OpenSBI payload, and timer-corrected NBF passed content and instruction-collision checks; the routed result and physical event measurement remain pending (`logs/preview-hardware-events-20261025/`).
 
 - **Preview delivery counters validated in simulation — 2026-10-25:** BlackParrot `6336f2b5b` extends diagnostic CSR `0x805` with translated physical-hint, UCE admission, memory-issue, and complete side-buffer publication counts. A clean traced miss-recorder control passed, and the SUM-gated S-mode test counted `1/1/1/1` for one permitted hint with no event for the denied hint; the Linux four-line workload now snapshots these stages across wakeup, but routed FPGA and physical Linux results remain pending (`logs/preview-hardware-events-20261025/`).
