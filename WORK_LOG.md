@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Hardware-event route and Linux image prepared — 2026-10-25:** the exact simulator-qualified counter RTL was admitted to bp2 as matched prefetch5 job `20261025T141900Z-f8ff206e` after publishing the already-pinned subsystem dependency commit. A newly built static benchmark, embedded kernel, OpenSBI payload, and timer-corrected NBF passed content and instruction-collision checks; the routed result and physical event measurement remain pending (`logs/preview-hardware-events-20261025/`).
+
 - **Preview delivery counters validated in simulation — 2026-10-25:** BlackParrot `6336f2b5b` extends diagnostic CSR `0x805` with translated physical-hint, UCE admission, memory-issue, and complete side-buffer publication counts. A clean traced miss-recorder control passed, and the SUM-gated S-mode test counted `1/1/1/1` for one permitted hint with no event for the denied hint; the Linux four-line workload now snapshots these stages across wakeup, but routed FPGA and physical Linux results remain pending (`logs/preview-hardware-events-20261025/`).
 
 - **Linux hook count separates issue from delivery — 2026-10-25:** a per-task diagnostic counter on the four-address same-mm hook booted on the unchanged FPGA image and completed two 48-trial board runs. Off/stale each had 64/64 target misses; exact had 0/64 and 4/64, and the failed exact trial had a hook increment, proving that executing the Linux hint instructions does not guarantee useful delivery. Trial 40 warmed all four lines with a hook increment in both new runs, leaving queue admission/response timing as the next discriminator (`logs/four-address-preview-20261025/`, RL-080).
