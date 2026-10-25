@@ -1,9 +1,9 @@
 #define _GNU_SOURCE
 
 /* Measure four scheduler hints against four first-use target loads.
- * CSR 0x805 counts demand misses, excluding preview requests. Every target
- * line has a separate 64-byte index and the peer snapshots the counter
- * immediately after each load.
+ * CSR 0x805 records demand misses separately from physical preview delivery
+ * events. Every target line has a separate 64-byte index, and the peer
+ * snapshots the recorder after each load.
  */
 #include <errno.h>
 #include <linux/futex.h>
@@ -41,6 +41,7 @@ static unsigned trial_mode[trials];
 static uint64_t entry_cycle[trials], load_done_cycle[trials];
 static uint64_t value[trials][preview_lines];
 static uint64_t miss_status[trials][preview_lines + 1];
+static uint64_t preview_status_entry[trials], preview_status_post[trials];
 static unsigned long hook_count[trials];
 
 static unsigned line_index(unsigned trial, unsigned lane)
@@ -51,6 +52,25 @@ static unsigned line_index(unsigned trial, unsigned lane)
 static inline void miss_trace_disarm(void)
 {
   __asm__ volatile("csrw 0x805, zero" : : : "memory");
+}
+
+static inline void preview_trace_clear(void)
+{
+  // Clear preview delivery counters before the wakeup. The peer arms demand
+  // recording later without erasing the scheduler-to-entry hint history.
+  __asm__ volatile("csrw 0x805, %0" : : "r"(2ULL) : "memory");
+}
+
+static inline uint64_t preview_trace_status(void)
+{
+  uint64_t status;
+  __asm__ volatile("csrr %0, 0x805" : "=r"(status) : : "memory");
+  return status;
+}
+
+static inline unsigned preview_event_count(uint64_t status, unsigned shift)
+{
+  return (unsigned)((status >> shift) & 0xff);
 }
 
 static inline uint64_t miss_trace_record(unsigned index)
@@ -147,11 +167,12 @@ static void *peer_main(void *unused)
     futex_wait_until(&phase, trial);
     const unsigned index = trial - 1;
     entry_cycle[index] = global_cycle();
+    preview_status_entry[index] = preview_trace_status();
     unsigned i0 = line_index(index, 0), i1 = line_index(index, 1);
     unsigned i2 = line_index(index, 2), i3 = line_index(index, 3);
     uint64_t s0, s1, s2, s3, s4, v0, v1, v2, v3;
     __asm__ volatile(
-      "li t2, 3\n"
+      "li t2, 1\n"
       "csrw 0x805, t2\n"
       "nop\n"
       "nop\n"
@@ -179,6 +200,7 @@ static void *peer_main(void *unused)
     int count = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
     if (count < 0) fail("preview hook count prctl");
     hook_count[index] = (unsigned long)count;
+    preview_status_post[index] = preview_trace_status();
     register_next(trial);
     atomic_store_explicit(&done, trial, memory_order_release);
     futex_wake(&done);
@@ -224,6 +246,7 @@ int main(void)
   futex_wait_until(&ready, 1);
   for (unsigned trial = 1; trial <= trials; ++trial) {
     prepare_cold_line(trial - 1);
+    preview_trace_clear();
     uint64_t begin = global_cycle();
     atomic_store_explicit(&phase, trial, memory_order_release);
     futex_wake(&phase);
@@ -260,6 +283,20 @@ int main(void)
            misses[0] + misses[1] + misses[2] + misses[3], armed, overflow);
     printf("SCHED_PREVIEW_HOOK mode=%u trial=%u count=%lu\n",
            trial_mode[index], trial, hook_count[index]);
+    const uint64_t entry_status = preview_status_entry[index];
+    const uint64_t demand_status = miss_status[index][0];
+    const uint64_t load_status = miss_status[index][preview_lines];
+    const uint64_t post_status = preview_status_post[index];
+    printf("SCHED_PREVIEW_EVENTS mode=%u trial=%u entry=%u,%u,%u,%u demand=%u,%u,%u,%u load=%u,%u,%u,%u post=%u,%u,%u,%u\n",
+           trial_mode[index], trial,
+           preview_event_count(entry_status, 21), preview_event_count(entry_status, 29),
+           preview_event_count(entry_status, 37), preview_event_count(entry_status, 45),
+           preview_event_count(demand_status, 21), preview_event_count(demand_status, 29),
+           preview_event_count(demand_status, 37), preview_event_count(demand_status, 45),
+           preview_event_count(load_status, 21), preview_event_count(load_status, 29),
+           preview_event_count(load_status, 37), preview_event_count(load_status, 45),
+           preview_event_count(post_status, 21), preview_event_count(post_status, 29),
+           preview_event_count(post_status, 37), preview_event_count(post_status, 45));
     if (!overflow) {
       for (unsigned lane = 0; lane < preview_lines; ++lane) {
         unsigned first = (unsigned)((miss_status[index][lane] >> 9) & 0x1ff);
