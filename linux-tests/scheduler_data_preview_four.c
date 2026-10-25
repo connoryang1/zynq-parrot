@@ -22,6 +22,7 @@
 #endif
 
 #define PR_BP_PREVIEW_SET 0x42505056
+#define PR_BP_PREVIEW_GET_COUNT 0x42505057
 
 enum { modes = 3, repetitions = 16, trials = modes * repetitions,
        preview_lines = 4, line_groups = 16, page_lines = 64 };
@@ -40,6 +41,7 @@ static unsigned trial_mode[trials];
 static uint64_t entry_cycle[trials], load_done_cycle[trials];
 static uint64_t value[trials][preview_lines];
 static uint64_t miss_status[trials][preview_lines + 1];
+static unsigned long hook_count[trials];
 
 static unsigned line_index(unsigned trial, unsigned lane)
 {
@@ -174,6 +176,9 @@ static void *peer_main(void *unused)
     miss_status[index][0] = s0; miss_status[index][1] = s1;
     miss_status[index][2] = s2; miss_status[index][3] = s3;
     miss_status[index][4] = s4;
+    int count = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
+    if (count < 0) fail("preview hook count prctl");
+    hook_count[index] = (unsigned long)count;
     register_next(trial);
     atomic_store_explicit(&done, trial, memory_order_release);
     futex_wake(&done);
@@ -253,6 +258,8 @@ int main(void)
     printf("SCHED_PREVIEW_MISS4 mode=%u trial=%u d0=%u d1=%u d2=%u d3=%u total=%u armed=%u overflow=%u\n",
            trial_mode[index], trial, misses[0], misses[1], misses[2], misses[3],
            misses[0] + misses[1] + misses[2] + misses[3], armed, overflow);
+    printf("SCHED_PREVIEW_HOOK mode=%u trial=%u count=%lu\n",
+           trial_mode[index], trial, hook_count[index]);
     if (!overflow) {
       for (unsigned lane = 0; lane < preview_lines; ++lane) {
         unsigned first = (unsigned)((miss_status[index][lane] >> 9) & 0x1ff);
