@@ -48,7 +48,9 @@ static inline uint64_t trace_status(void)
 static uint64_t trace_record(unsigned index)
 {
   uint64_t value;
-  const uint64_t selector = 0x100 + index;
+  // In address-preview mode publication slots live in the I history;
+  // removals and demand misses remain in the D history.
+  const uint64_t selector = (index >= 248 ? 0 : 0x100) + index;
   __asm__ volatile(
     "csrw 0x806, %1\n"
     "nop\nnop\nnop\n"

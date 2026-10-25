@@ -81,7 +81,9 @@ static inline unsigned preview_event_count(uint64_t status, unsigned shift)
 
 static inline uint64_t miss_trace_record(unsigned index)
 {
-  const uint64_t selector = 0x100U | index;
+  // The optional preview trace places publications in I history while D
+  // history retains demand misses and removal records.
+  const uint64_t selector = (index >= 248 ? 0U : 0x100U) | index;
   uint64_t value;
   __asm__ volatile(
     "csrw 0x806, %1\n"
