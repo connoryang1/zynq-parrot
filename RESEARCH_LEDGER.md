@@ -857,7 +857,7 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Scope:** a separate request-PC sideband follows ordinary loads through D-cache TL/TV, and preview trace I-history slots 232–247 mirror the existing D-history removal indices. The tested configuration has two physical slots and a 39-bit virtual PC.
 - **Claim:** the clean traced five-slot directed test matches all four consume metadata PCs to distinct assembly labels on the corresponding target loads, preserves four published target words with no target demand miss, and reaches guest/host PASS. A clean mode-off miss-history control still records 2 instruction and 1 data accepted misses with guest/host PASS. Same-cycle I-publication/removal marks preview overflow, preserving strict rejection of ambiguous records.
 - **Evidence:** source, commands, NBF/log/FST SHA-256 values, and bp3 artifact path are in logs/preview-consumer-pc-20261025/README.md.
-- **Limits:** this proves PC pipeline alignment for the directed control, not the identity or retirement of the pre-entry Linux consumer. The changed RTL has not routed or booted Linux, and the benchmark's new consumer rows have not run physically.
+- **Limits:** this proves PC pipeline alignment for the directed control, not the identity or retirement of the pre-entry Linux consumer. The exact RTL is routing on bp2 under job 20261025T233835Z-2b7e4f62; a matching Linux NBF has been built and hash-verified but has not run physically. The benchmark's new consumer rows and strict paired controls remain unmeasured on hardware.
 
 ## Superseded or rejected findings
 
