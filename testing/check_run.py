@@ -68,6 +68,7 @@ TEST_MARKERS = {
     "mt_prefetch_dirty_victim_test": "[BSG-PASS] detached prefetch dirty victim",
     "mt_prefetch_protocol_test": "[BSG-PASS] detached prefetch protocol",
     "mt_umode_prefetch_test": "[BSG-PASS] U-mode Sv39 nonfaulting prefetch permissions",
+    "mt_smode_prefetch_sum_test": "[BSG-PASS] S-mode SUM-gated user-data prefetch",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
     "mt_ctxtsw_pure_ring_stress_test": "[BSG-PASS] pure ctxtsw ring stress completed",
     "mt_umode_resident_sv39_data_handoff_test": "[BSG-PASS] resident U-mode Sv39 instruction/data handoff and ECALL preserved state",

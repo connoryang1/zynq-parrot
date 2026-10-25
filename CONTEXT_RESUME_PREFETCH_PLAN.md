@@ -317,3 +317,24 @@ part of a future scheduler hook, while D-cache occupancy, target-mm
 translation, and task/mm lifetime still need explicit treatment. Evidence
 and the reproducible diagnostic patch are in
 `logs/target-data-preview-bounded-hint-20261024/README.md`.
+
+### Same-mm supervisor instruction option
+
+A traced S-mode Sv39 probe now supplies the first direct permission and
+consumption check for a kernel-issued `prefetch.r`. With an ordinary demand
+having primed a U-readable target page's DTLB entry, a short sequence that
+sets `SUM`, issues the hint, and clears `SUM` in the next instruction enqueues
+and issues its physical `0x8000a040` line; a later demand consumes that line
+from the D-cache side buffer. A hint to a second line with `SUM` clear produces
+no preview request. The clean test and exact waveforms are in
+`logs/target-data-preview-smode-probe-20261024/README.md`.
+
+This makes a registered virtual-address list viable for the first same-mm
+Linux proof without a new CSR, provided the target translation is resident.
+The hardware does not walk pages for prefetches, so the hook must measure
+DTLB-hit coverage rather than assume it. The software experiment should
+register an exact target address with its task before descheduling, issue at
+most a few hints only when `prev->mm == next->mm`, and count actual queue
+admission, issue, response, and target consumption. Registration and cleanup
+must not sleep while the runqueue lock is held. Cross-mm preview still needs
+the physical descriptor and task/mm generation contract above.
