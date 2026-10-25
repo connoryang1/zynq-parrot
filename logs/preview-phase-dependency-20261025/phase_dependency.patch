@@ -1,0 +1,30 @@
+diff --git a/linux-tests/scheduler_data_preview_four.c b/linux-tests/scheduler_data_preview_four.c
+index 78ecbfa0..f1765a0d 100644
+--- a/linux-tests/scheduler_data_preview_four.c
++++ b/linux-tests/scheduler_data_preview_four.c
+@@ -108,11 +108,11 @@ static void fail(const char *what)
+   exit(EXIT_FAILURE);
+ }
+ 
+-static void futex_wait_until(_Atomic uint32_t *word, uint32_t wanted)
++static uint32_t futex_wait_until(_Atomic uint32_t *word, uint32_t wanted)
+ {
+   for (;;) {
+     uint32_t observed = atomic_load_explicit(word, memory_order_acquire);
+-    if (observed >= wanted) return;
++    if (observed >= wanted) return observed;
+     if (syscall(SYS_futex, (uint32_t *)word, FUTEX_WAIT_PRIVATE,
+                 observed, NULL, NULL, 0) < 0 && errno != EAGAIN && errno != EINTR)
+       fail("futex wait");
+@@ -172,8 +172,9 @@ static void *peer_main(void *unused)
+   atomic_store_explicit(&ready, 1, memory_order_release);
+   futex_wake(&ready);
+   for (unsigned trial = 1; trial <= trials; ++trial) {
+-    futex_wait_until(&phase, trial);
+-    const unsigned index = trial - 1;
++    // Keep the target-load addresses dependent on the phase value actually
++    // observed after wakeup. This isolates any wrong-path pre-entry loads.
++    const unsigned index = futex_wait_until(&phase, trial) - 1;
+     entry_cycle[index] = global_cycle();
+     preview_status_entry[index] = preview_trace_status();
+     unsigned i0 = line_index(index, 0), i1 = line_index(index, 1);
