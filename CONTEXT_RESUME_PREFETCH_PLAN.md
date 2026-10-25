@@ -338,3 +338,14 @@ most a few hints only when `prev->mm == next->mm`, and count actual queue
 admission, issue, response, and target consumption. Registration and cleanup
 must not sleep while the runqueue lock is held. Cross-mm preview still needs
 the physical descriptor and task/mm generation contract above.
+
+The exact bounded-hint route now in progress uses top `a11d8f07` and
+BlackParrot `31d6d461`. Its top-level enables `cache_miss_trace_p`, and that
+RTL implements the accepted-demand-miss recorder at CSRs `0x805`–`0x807`.
+Once the route and package pass, a same-mm diagnostic can use the existing
+Linux capture tool's CSR readout pattern to check whether the target still
+generates an accepted demand miss in off, exact, and stale controls. The
+recorder excludes preview requests, so demand-miss
+suppression is indirect evidence of useful warming; it cannot by itself count
+preview queue admission, issue, response, or DTLB-drop events. Keep those
+request-level claims pending a separately instrumented trace or counter.
