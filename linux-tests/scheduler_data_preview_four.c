@@ -291,6 +291,12 @@ int main(void)
            (unsigned long long)(entry_cycle[index] - begin),
            (unsigned long long)(load_done_cycle[index] - begin),
            (unsigned long long)(global_cycle() - begin));
+    // Correlate D-cache removal cycles with the peer's measured first-use
+    // window without changing the existing paired-timing output format.
+    printf("SCHED_PREVIEW_CLOCK mode=%u trial=%u entry=%llu load=%llu\n",
+           trial_mode[index], trial,
+           (unsigned long long)entry_cycle[index],
+           (unsigned long long)load_done_cycle[index]);
     unsigned misses[preview_lines], armed = 1, overflow = 0;
     for (unsigned lane = 0; lane < preview_lines; ++lane) {
       unsigned before = (unsigned)((miss_status[index][lane] >> 9) & 0x1ff);
