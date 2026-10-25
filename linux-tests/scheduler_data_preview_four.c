@@ -32,7 +32,7 @@ static volatile struct line target_lines[page_lines]
   __attribute__((aligned(4096)));
 static volatile struct line stale_lines[page_lines]
   __attribute__((aligned(4096)));
-static volatile unsigned char eviction[10 * 4096]
+static volatile unsigned char eviction[8 * 4096]
   __attribute__((aligned(4096)));
 static _Atomic uint64_t sink;
 static _Atomic uint32_t phase, done, ready;
@@ -188,8 +188,9 @@ static void prepare_cold_line(unsigned index)
     unsigned line = line_index(index, lane);
     total += target_lines[line].word[0] + stale_lines[line].word[0];
   }
-  /* Ten 4 KiB-spaced eviction pages cover all 64 sets. */
-  for (unsigned page = 0; page < 10; ++page)
+  /* Eight 4 KiB-spaced eviction pages exceed L1 associativity when combined
+   * with target and stale pages, while using two fewer DTLB entries. */
+  for (unsigned page = 0; page < 8; ++page)
     for (unsigned set = 0; set < page_lines; ++set)
       total += eviction[page * 4096 + set * 64];
   atomic_store_explicit(&sink, total, memory_order_relaxed);
@@ -204,7 +205,7 @@ int main(void)
     target_lines[trial].word[0] = 0x123456789abcdef0ULL + trial;
     stale_lines[trial].word[0] = 0xfedcba9876543210ULL + trial;
   }
-  for (unsigned page = 0; page < 10; ++page)
+  for (unsigned page = 0; page < 8; ++page)
     eviction[page * 4096] = (unsigned char)(page + 1);
   int cpu = pin_first_cpu();
   pthread_t peer;
