@@ -72,4 +72,25 @@ The QEMU command used `-machine virt -cpu rv64 -smp 1 -m 128M -nographic -monito
 
 For the pending exact RTL route, `top_zynq.sv` enables the accepted-demand-miss recorder and BlackParrot `31d6d461` implements its `0x805`–`0x807` CSRs. The existing `cache_miss_trace_capture_dynamic` tool built with the same Buildroot compiler as the Linux hook; its ELF SHA-256 is `5d8d8e9dc9d2d1ec3e0514a1b55bbb6a386f6b7b09ef5a8f0ffbd0f9794817d4`. Its `/lib/ld-linux-riscv64-lp64d.so.1` interpreter and `libc.so.6` dependency are present in the shell payload's rootfs. This is a build/loader preflight only. The tool captures ordinary demand misses and does not by itself identify preview requests or compare off/exact/stale target lines; such a diagnostic still needs a routed, verified image and a matched capture window.
 
+A small physical gate was packaged separately from the Linux image. `testing/mt_smode_prefetch_sum_test.c` was compiled with `BP_FPGA_PROGRAM`, two resident threads, and ten logical contexts using the checkout's ELF toolchain and CRT specs; source/ELF/NBF SHA-256 values are `b06b97a15333463445f9b9f396bbaa12b0a0b4284ac1352405c5f977af727046` / `0f53f66593dbb38ffa493933759707ae7af682d1012eeea8383718674156e316` / `8f828cbdf2b2bcda2a773734714d9e97bac556452d82f059c4f9e0bb82738bc2`. The disassembly has adjacent `ori zero,a1,1` and `csrc sstatus,t0` at `supervisor_permitted_hint`; the exact 4,283-line NBF passes the raw `0x800`–`0x807` CSR scan. Files are retained locally under `board-probe/`. This is build and collision evidence, not a physical S-mode or side-buffer result; the already accepted traced simulator result used the normal simulator build variant.
+
+The board-probe commands, run from this checkout's root, are:
+
+```sh
+install/bin/riscv64-unknown-elf-gcc -O2 -Isoftware/include \
+  -Iinstall/riscv64-unknown-elf/include \
+  --specs=install/riscv64-unknown-elf/lib/dramfs.specs \
+  --specs=install/riscv64-unknown-elf/lib/perch.specs \
+  -DNUM_THREADS=2 -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=10 -DBP_FPGA_PROGRAM \
+  -o logs/target-data-preview-linux-hook-20261024/board-probe/mt_smode_prefetch_sum_test_fpga.riscv \
+  testing/mt_smode_prefetch_sum_test.c
+install/bin/riscv64-unknown-elf-objcopy -O verilog \
+  logs/target-data-preview-linux-hook-20261024/board-probe/mt_smode_prefetch_sum_test_fpga.riscv \
+  logs/target-data-preview-linux-hook-20261024/board-probe/mt_smode_prefetch_sum_test_fpga.mem
+sed -i 's/@8/@0/g' logs/target-data-preview-linux-hook-20261024/board-probe/mt_smode_prefetch_sum_test_fpga.mem
+python3 import/black-parrot/bp_common/software/py/nbf.py --skip_zeros --config --debug \
+  --mem logs/target-data-preview-linux-hook-20261024/board-probe/mt_smode_prefetch_sum_test_fpga.mem \
+  --ncpus 1 > logs/target-data-preview-linux-hook-20261024/board-probe/mt_smode_prefetch_sum_test_fpga.nbf
+```
+
 The first restore command asked Make for both `vmlinux` and the literal `arch/riscv/boot/Image` path in one invocation. It relinked `vmlinux` but reported the path target was already done, leaving the old diagnostic Image in place. The guardrail is to invoke the kernel's `Image` target separately after `vmlinux` and hash the resulting file. That follow-up ran `OBJCOPY arch/riscv/boot/Image` successfully; the restored Image SHA-256 is `465a6c80b61de491a1d665f7ea0f927c11b79697d9a020224c97dbd87214cecd`. A reverse dry-run of the exact six-file patch against the restored source succeeded. This restored Image was not the one used in the QEMU controls above.
