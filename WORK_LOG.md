@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Linux boot regression narrowed to five BlackParrot commits — 2026-10-25:** routed top `21c3d804` (BP `d4c20786`) with prefetch5, the previously booting subsystem, and recorder activation off; the identical control Linux NBF printed only OpenSBI by the 90 s bound. The matched BP `c50b8571` image boots to shell, so the next controlled build will bisect the five intervening BP commits (`logs/target-data-preview-linux-hook-20261024/README.md`).
+
 - **Live Linux timer operand captured — 2026-10-25:** a guarded terminal reporter at the failing clock-event call PC first printed sixteen zeros from `x0` with `CORE PASS`, then printed live `a1=0x7a1200` (8,000,000 Hz) with `CORE PASS` on the same preview bitstream. This validates the frequency passed to `clockevents_config_and_register`; the internal stall remains unresolved (`logs/target-data-preview-linux-hook-20261024/README.md`).
 
 - **Source-only Linux boot bisect launched — 2026-10-25:** top `21c3d804` advances BlackParrot from the booting `c50b8571` to `d4c20786` while retaining the same prefetch5 configuration, `f9762c5b` subsystem, and disabled recorder activation. The immutable bp2 job `20261025T063213Z-21c3d804` passed readiness and is routing; the exact Linux NBF board comparison is pending.

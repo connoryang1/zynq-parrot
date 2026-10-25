@@ -619,6 +619,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the timer registration stall is not explained by a wrong frequency operand at that call boundary. A later hardware or recorder integration issue remains possible.
 - **Limits:** this capture does not prove the clock-event device pointer, min/max tick operands, or which instruction inside the call loops. It is a terminal probe, not a successful Linux boot or speedup.
 
+### RL-067 — The Linux boot regression lies in the five-commit BlackParrot range
+
+- **Status:** confirmed routed source isolation and physical boot failure; exact commit remains unresolved
+- **Scope:** top `21c3d80476d063d005d93b8f436123a3277a7a3a`, BlackParrot `d4c20786dd98f5fdbc285adb43f0fe38631dbbe0`, subsystem `f9762c5b41f193173d134ac8a20b9e126ceac1e9`, static prefetch5 configuration, recorder activation off, and the RL-065 Linux NBF
+- **Claim:** the candidate routed with setup/hold slack `+0.222/+0.037 ns`, 49,171 LUTs, and a verified package/bitstream SHA-256 of `6aa1fda6...`/`1d5a1a8b...`. The board loaded those exact artifacts; the same Linux NBF printed OpenSBI but no Linux banner before the native 90 s limit. The board was power-cycled and passed the PYNQ readiness gate afterward.
+- **Evidence:** `logs/fpga-farm/bp2/20261025T063213Z-21c3d804/` and `logs/target-data-preview-linux-hook-20261024/board-probe/known-linux-d4-prefetch5-traceoff-physical-run-command.log` (SHA-256 `446ffa3743475edbeb44d7ae94e71f20545f9e66d477565174820bc6f1192de3`).
+- **Meaning:** changing the BlackParrot revision from booting `c50b8571` to `d4c20786` is sufficient to reproduce the boot failure with queue depth, subsystem, recorder activation, and Linux image fixed. Bisect `db5a52da5`, `fac30fe09`, `52c5dde70`, `6a8f31989`, and `d4c20786d` under the same controls.
+- **Limits:** this does not identify one faulty commit or prove an internal timer-call mechanism. A combination of commits or a configuration-dependent interaction remains possible; the midpoint `52c5dde70` requires a routed board test.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -684,7 +693,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 The immediate next correctness experiment remains OQ-001 when board recovery is available. For the cache-resume architecture, do not repeat footprint, component, oracle-replay, retention-capacity, recorder-fit, directed recorder validation, Linux miss-capture, or banked-pipeline tracing. The next architectural experiment is ordered useful-before-demand replay of RL-029's shared privileged-instruction prefix, starting at syscall entry and measuring how many lines publish before their actual demands. A physical detached full-line probe should run alongside it when the board is available, replacing the conditional 41-cycle input without blocking the useful-prefix implementation.
 
-For the target-context data-preview branch, RL-058 supplies a translated same-mm instruction producer and request-level issue evidence, RL-064 qualifies routed fit and localizes the new Linux stall to the clock-event registration call, and RL-065 proves that prefetch5 alone boots the exact control Linux image. The next boot discriminator is the running source-only `d4c20786`/prefetch5/recorder-off route: run the identical Linux NBF after route acceptance, then bisect BlackParrot commits or isolate recorder activation according to that result. A complete new Linux preview boot must precede performance measurement. OQ-006 still needs a kernel-owned bounded descriptor, task/mm lifetime handling, and mode-attributed completion and consumption timing. Do not infer a kernel scheduler speedup from RL-049's bare-metal 203-cycle gap, RL-050/RL-051's fast peer loads, or RL-058's unchanged oracle rows.
+For the target-context data-preview branch, RL-058 supplies a translated same-mm instruction producer and request-level issue evidence, RL-064 qualifies routed fit and localizes the new Linux stall to the clock-event registration call, RL-065 proves that prefetch5 alone boots the exact control Linux image, and RL-067 shows that advancing the BlackParrot revision while holding the subsystem and recorder activation fixed reproduces the stall. The next boot discriminator is midpoint BlackParrot commit `52c5dde70` under the same prefetch5, subsystem, recorder-off, and Linux-image controls. A complete new Linux preview boot must precede performance measurement. OQ-006 still needs a kernel-owned bounded descriptor, task/mm lifetime handling, and mode-attributed completion and consumption timing. Do not infer a kernel scheduler speedup from RL-049's bare-metal 203-cycle gap, RL-050/RL-051's fast peer loads, or RL-058's unchanged oracle rows.
 
 ## Delta log
 
