@@ -281,12 +281,10 @@ subsystem_seed=$main/import/black-parrot-subsystems
 subsystem_gitlink=$(git -C "$main" ls-tree "$top_commit" import/black-parrot-subsystems | awk '{print $3}')
 subsystem_url=$(git -C "$main" show "$top_commit:.gitmodules" \
   | git config --file /dev/stdin --get submodule.import/black-parrot-subsystems.url)
-subsystem_branch=$(git -C "$main" show "$top_commit:.gitmodules" \
-  | git config --file /dev/stdin --get submodule.import/black-parrot-subsystems.branch)
-git -C "$subsystem_seed" fetch --no-tags "$subsystem_url" \
-  "refs/heads/$subsystem_branch:refs/remotes/candidate/$subsystem_branch"
-if [[ $(git -C "$subsystem_seed" rev-parse "refs/remotes/candidate/$subsystem_branch") != "$subsystem_gitlink" ]]; then
-  echo "Top subsystem gitlink $subsystem_gitlink does not match $subsystem_branch." >&2
+git -C "$subsystem_seed" fetch --no-tags "$subsystem_url" "$subsystem_gitlink"
+if [[ $(git -C "$subsystem_seed" rev-parse FETCH_HEAD) != "$subsystem_gitlink" ]] \
+   || [[ $(git -C "$subsystem_seed" cat-file -t "$subsystem_gitlink") != commit ]]; then
+  echo "Could not fetch the exact top subsystem gitlink $subsystem_gitlink." >&2
   exit 1
 fi
 

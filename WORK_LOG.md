@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Exact bounded-hint FPGA route launched — 2026-10-24:** the farm now fetches the subsystem's exact recorded gitlink instead of requiring a moving branch head to match it; the pinned `2e7588d` commit was published under an immutable experiment ref after the stale branch-head check stopped the first launch before Vivado. An isolated `bp2` route is running as `20261025T004952Z-a11d8f07` for top `a11d8f07`, BlackParrot `31d6d461`, and `e_bp_unicore_zynqparrot_prefetch5_cfg`; its routed fit and board behavior are pending.
+
 - **Linux scheduler path booted — 2026-10-24:** an isolated RV64 QEMU boot of the patched kernel completed all 48 same-mm futex handoffs and powered down. A temporary scheduler counter observed 33 emitted hints in the mixed run and zero in a 48-handoff disabled-registration control; the diagnostic source was removed afterward. This verifies software reachability only, with no BlackParrot prefetch or speedup measurement (`logs/target-data-preview-linux-hook-20261024/`).
 
 - **Linux simulator staging localized — 2026-10-24:** the normal full-system host loader moved only 0.52 MB through a 71 MB NBF in 2 minutes 39 seconds, so a temporary direct AXI RAM preload was rebuilt and verified against three payload words before target start. The traced simulator reached `OpenSBI v1.4` but hit its native runtime limit after about 6,528 normalized core cycles without a Linux banner; the automatic-run NBF and diagnostic transcript are retained for a routed physical gate, and no scheduler or speedup result is claimed (`logs/target-data-preview-linux-hook-20261024/`).
