@@ -1,0 +1,64 @@
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -307,5 +307,6 @@
+ 
+ /* BlackParrot experimental per-task same-mm user-data preview address. */
+ #define PR_BP_PREVIEW_SET		0x42505056
++#define PR_BP_PREVIEW_GET_COUNT	0x42505057
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -85,6 +85,7 @@
+ 	unsigned long bad_cause;
+ 	unsigned long bp_preview_addr[BP_PREVIEW_ADDRS];
+ 	struct mm_struct *bp_preview_mm;
++	unsigned long bp_preview_hook_count;
+ 	unsigned long vstate_ctrl;
+ 	struct __riscv_v_ext_state vstate;
+ };
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -141,6 +141,7 @@
+ 	memset(current->thread.bp_preview_addr, 0,
+ 	       sizeof(current->thread.bp_preview_addr));
+ 	current->thread.bp_preview_mm = NULL;
++	current->thread.bp_preview_hook_count = 0;
+ #ifdef CONFIG_FPU
+ 	/*
+ 	 * Reset FPU state and context
+@@ -186,6 +187,7 @@
+ 	memset(p->thread.bp_preview_addr, 0,
+ 	       sizeof(p->thread.bp_preview_addr));
+ 	p->thread.bp_preview_mm = NULL;
++	p->thread.bp_preview_hook_count = 0;
+ 	memset(&p->thread.s, 0, sizeof(p->thread.s));
+ 
+ 	/* p->thread holds context to be restored by __switch_to() */
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -117,6 +117,8 @@
+ 		asm volatile("ori zero, %0, 1" : : "r"(addr3) : "memory");
+ 	if (!(status & SR_SUM))
+ 		csr_clear(CSR_STATUS, SR_SUM);
++	WRITE_ONCE(next->thread.bp_preview_hook_count,
++		   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
+ }
+ 
+ #endif /* _ASM_RISCV_SWITCH_TO_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2744,6 +2744,13 @@
+ 		WRITE_ONCE(me->thread.bp_preview_mm, any ? me->mm : NULL);
+ 		break;
+ 	}
++	case PR_BP_PREVIEW_GET_COUNT:
++		if (arg2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		error = READ_ONCE(me->thread.bp_preview_hook_count);
++		break;
+ #endif
+ 	default:
+ 		error = -EINVAL;
