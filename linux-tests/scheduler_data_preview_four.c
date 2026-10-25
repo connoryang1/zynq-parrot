@@ -44,6 +44,8 @@ static uint64_t entry_cycle[trials], load_done_cycle[trials];
 static uint64_t value[trials][preview_lines];
 static uint64_t miss_status[trials][preview_lines + 1];
 static uint64_t preview_status_entry[trials], preview_status_post[trials];
+static uint64_t publication_records[trials][8];
+static unsigned publication_count[trials], publication_overflow[trials];
 static unsigned long hook_count[trials];
 static unsigned long guard_count[trials][guard_outcomes];
 
@@ -59,9 +61,8 @@ static inline void miss_trace_disarm(void)
 
 static inline void preview_trace_clear(void)
 {
-  // Clear preview delivery counters before the wakeup. The peer arms demand
-  // recording later without erasing the scheduler-to-entry hint history.
-  __asm__ volatile("csrw 0x805, %0" : : "r"(2ULL) : "memory");
+  // Retain publication addresses before the peer arms demand recording.
+  __asm__ volatile("csrw 0x805, %0" : : "r"(6ULL) : "memory");
 }
 
 static inline uint64_t preview_trace_status(void)
@@ -175,7 +176,7 @@ static void *peer_main(void *unused)
     unsigned i2 = line_index(index, 2), i3 = line_index(index, 3);
     uint64_t s0, s1, s2, s3, s4, v0, v1, v2, v3;
     __asm__ volatile(
-      "li t2, 1\n"
+      "li t2, 5\n"
       "csrw 0x805, t2\n"
       "nop\n"
       "nop\n"
@@ -200,6 +201,11 @@ static void *peer_main(void *unused)
     miss_status[index][0] = s0; miss_status[index][1] = s1;
     miss_status[index][2] = s2; miss_status[index][3] = s3;
     miss_status[index][4] = s4;
+    publication_count[index] = (unsigned)((s4 >> 53) & 0xf);
+    publication_overflow[index] = (unsigned)((s4 >> 57) & 1);
+    for (unsigned record = 0;
+         record < publication_count[index] && record < 8; ++record)
+      publication_records[index][record] = miss_trace_record(248 + record);
     int count = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
     if (count < 0) fail("preview hook count prctl");
     hook_count[index] = (unsigned long)count;
@@ -309,6 +315,17 @@ int main(void)
            preview_event_count(load_status, 37), preview_event_count(load_status, 45),
            preview_event_count(post_status, 21), preview_event_count(post_status, 29),
            preview_event_count(post_status, 37), preview_event_count(post_status, 45));
+    printf("SCHED_PREVIEW_PUBLICATIONS mode=%u trial=%u count=%u overflow=%u records=%016llx,%016llx,%016llx,%016llx,%016llx,%016llx,%016llx,%016llx\n",
+           trial_mode[index], trial, publication_count[index],
+           publication_overflow[index],
+           (unsigned long long)publication_records[index][0],
+           (unsigned long long)publication_records[index][1],
+           (unsigned long long)publication_records[index][2],
+           (unsigned long long)publication_records[index][3],
+           (unsigned long long)publication_records[index][4],
+           (unsigned long long)publication_records[index][5],
+           (unsigned long long)publication_records[index][6],
+           (unsigned long long)publication_records[index][7]);
     if (!overflow) {
       for (unsigned lane = 0; lane < preview_lines; ++lane) {
         unsigned first = (unsigned)((miss_status[index][lane] >> 9) & 0x1ff);

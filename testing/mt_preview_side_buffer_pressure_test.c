@@ -45,6 +45,18 @@ static inline uint64_t trace_status(void)
   return value;
 }
 
+static uint64_t publication_record(unsigned index)
+{
+  uint64_t value;
+  const uint64_t selector = 0x100 + 248 + index;
+  __asm__ volatile(
+    "csrw 0x806, %1\n"
+    "nop\nnop\nnop\n"
+    "csrr %0, 0x807\n"
+    : "=r"(value) : "r"(selector) : "memory");
+  return value;
+}
+
 static uint64_t wait_four_published(void)
 {
   for (unsigned i = 0; i < 4096; ++i) {
@@ -100,20 +112,30 @@ int main(void)
   bp_print_string("PREVIEW-SIDEBUF older batch published\n");
 
   // A complete older batch occupies four of the five slots. Do not load it.
-  trace_control(2);
+  trace_control(6); // Clear and trace publications before demand recording.
   hint_four(target);
   require_four_stages(wait_four_published());
-  bp_print_string("PREVIEW-SIDEBUF target batch published\n");
 
   uint64_t values[4];
-  trace_control(1); // Arm only after all four target responses arrive.
+  trace_control(5); // Arm demand misses without clearing publication records.
   uint64_t target_status = load_four(target, values);
   trace_control(0);
+  bp_print_string("PREVIEW-SIDEBUF target batch published\n");
   for (unsigned i = 0; i < 4; ++i)
     if (values[i] != 0x710 + i) fail("target data");
   if (((target_status >> 9) & 0x1ff) != 0)
     fail("published target word became a demand miss");
   if ((target_status >> 19) & 1) fail("target recorder overflow");
+  if (((target_status >> 53) & 0xf) != 4 || ((target_status >> 57) & 1)
+      || !((target_status >> 58) & 1))
+    fail("publication trace count, mode, or overflow");
+  for (unsigned i = 0; i < 4; ++i) {
+    uint64_t record = publication_record(i);
+    if (((record >> 30) & 3) != 3
+        || ((record & 0x3fffffff) << 4)
+           != (uint64_t)(uintptr_t)&target[i].word[0])
+      fail("publication address record");
+  }
 
   // Separate cold lines demonstrate that the no-miss result was useful data,
   // rather than a recorder that never sees accepted D-cache demand misses.

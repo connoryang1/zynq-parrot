@@ -13,6 +13,12 @@ host PASS markers and the selected program's completion marker before CORE PASS,
 rejecting timeouts and unrelated assertions even after PASS.
 Set `TARGET_RUNTIME_MS` to pass a native simulator target-runtime limit to the
 minimal-example runner when diagnosing an expected guest stall.
+The preview buffer pressure test also checks optional CSR `0x805` bit 2:
+writing `6` records final preview addresses before demand recording, and
+writing `5` later arms demand misses without erasing those records. It rejects
+publication collision or overflow and compares all four physical segments
+through CSR `0x806`/`0x807`. The mode-off miss-trace test retains the original
+I/D history check.
 
 Run from the repository root. First preserve any logs and waveforms you need;
 then finish each cleanup command before launching the consuming build.
