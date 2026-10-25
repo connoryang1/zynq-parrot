@@ -1,0 +1,111 @@
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -305,4 +305,7 @@
+ # define PR_RISCV_V_VSTATE_CTRL_NEXT_MASK	0xc
+ # define PR_RISCV_V_VSTATE_CTRL_MASK		0x1f
+ 
++/* BlackParrot experimental per-task same-mm user-data preview address. */
++#define PR_BP_PREVIEW_SET		0x42505056
++
+ #endif /* _LINUX_PRCTL_H */
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -71,6 +71,7 @@
+ 
+ struct task_struct;
+ struct pt_regs;
++struct mm_struct;
+ 
+ /* CPU-specific state of a task */
+ struct thread_struct {
+@@ -80,6 +81,8 @@
+ 	unsigned long s[12];	/* s[0]: frame pointer */
+ 	struct __riscv_d_ext_state fstate;
+ 	unsigned long bad_cause;
++	unsigned long bp_preview_addr;
++	struct mm_struct *bp_preview_mm;
+ 	unsigned long vstate_ctrl;
+ 	struct __riscv_v_ext_state vstate;
+ };
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -138,6 +138,8 @@
+ 
+ void flush_thread(void)
+ {
++	current->thread.bp_preview_addr = 0;
++	current->thread.bp_preview_mm = NULL;
+ #ifdef CONFIG_FPU
+ 	/*
+ 	 * Reset FPU state and context
+@@ -180,6 +182,8 @@
+ 	unsigned long tls = args->tls;
+ 	struct pt_regs *childregs = task_pt_regs(p);
+ 
++	p->thread.bp_preview_addr = 0;
++	p->thread.bp_preview_mm = NULL;
+ 	memset(&p->thread.s, 0, sizeof(p->thread.s));
+ 
+ 	/* p->thread holds context to be restored by __switch_to() */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2720,6 +2720,17 @@
+ 	case PR_RISCV_V_GET_CONTROL:
+ 		error = RISCV_V_GET_CONTROL();
+ 		break;
++#ifdef CONFIG_RISCV
++	case PR_BP_PREVIEW_SET:
++		if (arg3 || arg4 || arg5 || !me->mm ||
++		    (arg2 && !access_ok((void __user *)arg2, 1))) {
++			error = -EINVAL;
++			break;
++		}
++		WRITE_ONCE(me->thread.bp_preview_mm, arg2 ? me->mm : NULL);
++		WRITE_ONCE(me->thread.bp_preview_addr, arg2);
++		break;
++#endif
+ 	default:
+ 		error = -EINVAL;
+ 		break;
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -84,4 +84,26 @@
+ 	((last) = __switch_to(__prev, __next));		\
+ } while (0)
+ 
++/* Only a same-mm target can use the current satp translation here. The
++ * advisory hint is allowed to drop on a DTLB miss or a full hardware queue.
++ * Keep the SUM window as short as the instruction stream permits.
++ */
++static __always_inline void riscv_bp_preview_next(struct task_struct *prev,
++						  struct task_struct *next)
++{
++	unsigned long addr = READ_ONCE(next->thread.bp_preview_addr);
++	unsigned long status;
++
++	if (!addr || !prev->mm || prev->mm != next->mm ||
++	    READ_ONCE(next->thread.bp_preview_mm) != next->mm)
++		return;
++
++	status = csr_read(CSR_STATUS);
++	if (!(status & SR_SUM))
++		csr_set(CSR_STATUS, SR_SUM);
++	asm volatile("ori zero, %0, 1" : : "r"(addr) : "memory");
++	if (!(status & SR_SUM))
++		csr_clear(CSR_STATUS, SR_SUM);
++}
++
+ #endif /* _ASM_RISCV_SWITCH_TO_H */
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -5325,6 +5325,10 @@
+ 	       struct task_struct *next, struct rq_flags *rf)
+ {
+ 	prepare_task_switch(rq, prev, next);
++	/* The incoming task is known and the same-mm translation is still active. */
++#ifdef CONFIG_RISCV
++	riscv_bp_preview_next(prev, next);
++#endif
+ 
+ 	/*
+ 	 * For paravirt, this is coupled with an exit in switch_to to

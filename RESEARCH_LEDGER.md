@@ -565,6 +565,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** an existing instruction can serve as a bounded, permission-checked same-mm Linux hint when the target user translation is already resident, even with a one-instruction `SUM` bracket. This avoids adding a physical-address CSR for that initial proof.
 - **Limits:** the instruction drops a DTLB miss without a page walk; this probe primes the translation deliberately and does not show scheduler-time hit rate, safe kernel registration, target-task lifetime handling, cross-mm access, or end-to-end latency improvement.
 
+### RL-061 — A same-mm Linux scheduler hint builds into the kernel
+
+- **Status:** isolated software build checkpoint; no booted kernel or Linux speedup result
+- **Scope:** Linux 6.6 experimental `prctl` registration of one exact user-data address per task, fork/exec clearing, and a best-effort `prefetch.r` in `context_switch()` after `next` is selected but before address-space switching
+- **Claim:** the six-file patch applies cleanly to the checked-in Buildroot Linux source; the three changed objects, full `vmlinux`, and RISC-V `Image` build with the current rootfs. Linked `__schedule` contains a short `SUM` set/hint/clear sequence, and the reserved CSR collision gate passes. A same-mm futex benchmark with disabled, exact, and stale controls builds in static and dynamic forms.
+- **Evidence:** `linux-tests/patches/bp-same-mm-preview.patch`, `linux-tests/scheduler_data_preview.c`, and exact image/binary hashes and commands in `logs/target-data-preview-linux-hook-20261024/README.md`.
+- **Meaning:** Linux can express a selected incoming same-mm task's exact target address as a bounded hint without running a target U-mode helper under the runqueue lock. This is a software construction and link result, not evidence that the hint is timely or useful on a Linux handoff.
+- **Limits:** the hardware hint drops DTLB misses; no task/mm generation or pending-request cancellation protects unmapped/reused physical pages; cross-mm translation and learned addresses are absent. The first full-build attempt lacked `BR_BINARIES_DIR` and failed before link, then passed with a hash-matched isolated rootfs. Booted request/consume traces and matched one-way timing are still required.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

@@ -31,6 +31,8 @@ REQUEST_LOAD_AHEAD_DYNAMIC_APP := $(OUT)/request_benchmark_load_ahead_dynamic
 REQUEST_HOST_APP := $(OUT)/request_benchmark_host
 PREVIEW_APP := $(OUT)/context_preview_oracle
 PREVIEW_DYNAMIC_APP := $(OUT)/context_preview_oracle_dynamic
+SCHED_PREVIEW_APP := $(OUT)/scheduler_data_preview
+SCHED_PREVIEW_DYNAMIC_APP := $(OUT)/scheduler_data_preview_dynamic
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -114,6 +116,9 @@ request-benchmark-host: $(REQUEST_HOST_APP)
 .PHONY: context-preview-oracle context-preview-oracle-dynamic emit-context-preview-transfer emit-context-preview-dynamic-transfer
 context-preview-oracle: $(PREVIEW_APP)
 context-preview-oracle-dynamic: $(PREVIEW_DYNAMIC_APP)
+.PHONY: scheduler-data-preview scheduler-data-preview-dynamic emit-scheduler-data-preview-transfer emit-scheduler-data-preview-dynamic-transfer
+scheduler-data-preview: $(SCHED_PREVIEW_APP)
+scheduler-data-preview-dynamic: $(SCHED_PREVIEW_DYNAMIC_APP)
 cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
 cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 
@@ -146,6 +151,25 @@ $(PREVIEW_DYNAMIC_APP): context_preview_oracle.c ../software/include/bp_prefetch
 	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread \
 	  -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=$(REQUEST_NUM_CONTEXTS) -o $@ $< >&2
 	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+$(SCHED_PREVIEW_APP): scheduler_data_preview.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
+
+$(SCHED_PREVIEW_DYNAMIC_APP): scheduler_data_preview.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
+	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+emit-scheduler-data-preview-transfer: check-linux-cc scheduler-data-preview
+	@printf '%s\n' ': > /tmp/scheduler_data_preview.b64'
+	@base64 -w 76 $(SCHED_PREVIEW_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_data_preview.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_data_preview.b64 > /tmp/scheduler_data_preview' 'chmod +x /tmp/scheduler_data_preview'
+
+emit-scheduler-data-preview-dynamic-transfer: check-linux-cc scheduler-data-preview-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_data_preview_dynamic.b64'
+	@base64 -w 76 $(SCHED_PREVIEW_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_data_preview_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_data_preview_dynamic.b64 > /tmp/scheduler_data_preview_dynamic' 'chmod +x /tmp/scheduler_data_preview_dynamic'
 
 emit-context-preview-transfer: check-linux-cc context-preview-oracle
 	@printf '%s\n' ': > /tmp/context_preview_oracle.b64'
