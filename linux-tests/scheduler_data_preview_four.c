@@ -47,6 +47,7 @@ static uint64_t preview_status_entry[trials], preview_status_post[trials];
 static uint64_t publication_records[trials][8];
 static unsigned publication_count[trials], publication_overflow[trials];
 static uint64_t removal_records[trials][16];
+static uint64_t removal_meta_records[trials][16];
 static unsigned removal_count[trials];
 static unsigned long hook_count[trials];
 static unsigned long guard_count[trials][guard_outcomes];
@@ -84,6 +85,21 @@ static inline uint64_t miss_trace_record(unsigned index)
   // The optional preview trace places publications in I history while D
   // history retains demand misses and removal records.
   const uint64_t selector = (index >= 248 ? 0U : 0x100U) | index;
+  uint64_t value;
+  __asm__ volatile(
+    "csrw 0x806, %1\n"
+    "nop\n"
+    "nop\n"
+    "nop\n"
+    "csrr %0, 0x807\n"
+    : "=r"(value) : "r"(selector) : "memory");
+  return value;
+}
+
+static inline uint64_t miss_trace_remove_meta(unsigned index)
+{
+  // I-history slots 232..247 mirror D-history removal indices.
+  const uint64_t selector = index;
   uint64_t value;
   __asm__ volatile(
     "csrw 0x806, %1\n"
@@ -213,6 +229,9 @@ static void *peer_main(void *unused)
     for (unsigned record = 0;
          record < removal_count[index] && record < 16; ++record)
       removal_records[index][record] = miss_trace_record(232 + record);
+    for (unsigned record = 0;
+         record < removal_count[index] && record < 16; ++record)
+      removal_meta_records[index][record] = miss_trace_remove_meta(232 + record);
     for (unsigned record = 0;
          record < publication_count[index] && record < 8; ++record)
       publication_records[index][record] = miss_trace_record(248 + record);
@@ -352,6 +371,14 @@ int main(void)
              trial_mode[index], trial, record, (unsigned)(event >> 32),
              (unsigned)((event >> 30) & 3),
              (unsigned long long)((event & UINT64_C(0x3fffffff)) << 4));
+      // The prefetch5 image has a 39-bit virtual PC and two physical slots.
+      // A zero valid bit marks replacement, snoop, or another untracked event.
+      uint64_t meta = removal_meta_records[index][record];
+      printf("SCHED_PREVIEW_CONSUMER mode=%u trial=%u index=%u valid=%u thread=%u pc=0x%llx raw=0x%llx\n",
+             trial_mode[index], trial, record,
+             (unsigned)((meta >> 40) & 1), (unsigned)((meta >> 39) & 1),
+             (unsigned long long)(meta & ((UINT64_C(1) << 39) - 1)),
+             (unsigned long long)meta);
     }
     if (!overflow) {
       for (unsigned lane = 0; lane < preview_lines; ++lane) {

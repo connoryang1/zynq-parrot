@@ -59,6 +59,18 @@ static uint64_t trace_record(unsigned index)
   return value;
 }
 
+static uint64_t trace_remove_meta(unsigned index)
+{
+  uint64_t value;
+  const uint64_t selector = index; // I history mirrors D removal indices.
+  __asm__ volatile(
+    "csrw 0x806, %1\n"
+    "nop\nnop\nnop\n"
+    "csrr %0, 0x807\n"
+    : "=r"(value) : "r"(selector) : "memory");
+  return value;
+}
+
 static uint64_t wait_four_published(void)
 {
   for (unsigned i = 0; i < 4096; ++i) {
@@ -84,18 +96,24 @@ static void hint_four(const volatile struct line *lines)
   bp_prefetch_r(&lines[3].word[0]);
 }
 
-static uint64_t load_four(const volatile struct line *lines, uint64_t values[4])
+static uint64_t load_four(const volatile struct line *lines, uint64_t values[4],
+                          uint64_t load_pc[4])
 {
   uint64_t status;
   __asm__ volatile(
-    "ld %0, 0(%5)\n"
-    "ld %1, 64(%5)\n"
-    "ld %2, 128(%5)\n"
-    "ld %3, 192(%5)\n"
+    "la %5, 1f\n"
+    "la %6, 2f\n"
+    "la %7, 3f\n"
+    "la %8, 4f\n"
+    "1: ld %0, 0(%9)\n"
+    "2: ld %1, 64(%9)\n"
+    "3: ld %2, 128(%9)\n"
+    "4: ld %3, 192(%9)\n"
     "nop\nnop\nnop\nnop\nnop\nnop\n"
     "csrr %4, 0x805\n"
     : "=&r"(values[0]), "=&r"(values[1]), "=&r"(values[2]),
-      "=&r"(values[3]), "=&r"(status)
+      "=&r"(values[3]), "=&r"(status), "=&r"(load_pc[0]),
+      "=&r"(load_pc[1]), "=&r"(load_pc[2]), "=&r"(load_pc[3])
     : "r"(lines) : "memory");
   return status;
 }
@@ -120,8 +138,9 @@ int main(void)
   require_four_stages(wait_four_published());
 
   uint64_t values[4];
+  uint64_t target_pc[4];
   trace_control(5); // Arm demand misses without clearing publication records.
-  uint64_t target_status = load_four(target, values);
+  uint64_t target_status = load_four(target, values, target_pc);
   trace_control(0);
   bp_print_string("PREVIEW-SIDEBUF target batch published\n");
   for (unsigned i = 0; i < 4; ++i)
@@ -142,14 +161,26 @@ int main(void)
   unsigned removal_count = (unsigned)((target_status >> 59) & 0x1f);
   if (removal_count < 4 || removal_count > 16)
     fail("side-buffer removal count");
+  uint64_t seen_pc[4] = {0, 0, 0, 0};
   for (unsigned i = 0; i < 4; ++i) {
     unsigned found = 0;
     for (unsigned j = 0; j < removal_count; ++j) {
       uint64_t record = trace_record(232 + j);
       if (((record >> 30) & 3) == 0
           && ((record & 0x3fffffff) << 4)
-             == (uint64_t)(uintptr_t)&target[i].word[0])
+             == (uint64_t)(uintptr_t)&target[i].word[0]) {
+        uint64_t meta = trace_remove_meta(232 + j);
+        uint64_t pc = meta & ((UINT64_C(1) << 39) - 1);
+        if (!((meta >> 40) & 1) || !pc)
+          fail("target consume lacks a request PC");
+        if (pc != (target_pc[i] & ((UINT64_C(1) << 39) - 1)))
+          fail("target consume PC differs from its load instruction");
+        for (unsigned prior = 0; prior < i; ++prior)
+          if (pc == seen_pc[prior])
+            fail("distinct target loads share a request PC");
+        seen_pc[i] = pc;
         ++found;
+      }
     }
     if (found != 1) fail("target consume address record");
   }
@@ -157,7 +188,7 @@ int main(void)
   // Separate cold lines demonstrate that the no-miss result was useful data,
   // rather than a recorder that never sees accepted D-cache demand misses.
   trace_control(3);
-  uint64_t off_status = load_four(off, values);
+  uint64_t off_status = load_four(off, values, target_pc);
   trace_control(0);
   for (unsigned i = 0; i < 4; ++i)
     if (values[i] != 0x910 + i) fail("off data");
