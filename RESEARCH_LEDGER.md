@@ -791,11 +791,11 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 
 ### RL-086 — Dual D-history write sites caused the publication trace to lose BRAM inference
 
-- **Status:** failed route localized; focused repair passes traced simulator gates; repeat FPGA fit pending
+- **Status:** failed route localized; focused repair passes traced simulator gates and placement; final routing/timing pending
 - **Scope:** immutable bp2 prefetch5 route `20261025T170120Z-ebf53610` on top `ebf53610` / BlackParrot `da2b44781`, followed by one-port BlackParrot repair `f876f7c7e`.
-- **Claim:** Vivado 2024.2 explicitly rejected `ram_style="block"` for the D history and implemented its 256 × 64 array as LUTRAM. Synthesis used 55,275 LUTs; placement failed with 65,341 total LUTs versus 53,200 available and 11,329 required slices versus 10,921 available. The repair multiplexes demand and publication address/data before one array write, preserving demand priority and overflow. A clean `TRACE=1` five-slot exact-address control and the mode-off miss-history regression both passed on the repaired simulator.
+- **Claim:** Vivado 2024.2 explicitly rejected `ram_style="block"` for the D history and implemented its 256 × 64 array as LUTRAM. Synthesis used 55,275 LUTs; placement failed with 65,341 total LUTs versus 53,200 available and 11,329 required slices versus 10,921 available. The repair multiplexes demand and publication address/data before one array write, preserving demand priority and overflow. A clean `TRACE=1` five-slot exact-address control and the mode-off miss-history regression both passed on the repaired simulator. Its new Vivado synthesis infers the D history as block RAM, and placement succeeded at 51,362 LUTs and 13,299 of 13,300 slices; routing remains active.
 - **Evidence:** failed-route log and synthesis utilization, repair code, and regression commands and hashes at `logs/preview-publish-bram-fix-20261025/README.md`.
-- **Meaning:** the first route is a real FPGA fit failure of diagnostic storage inference, not evidence that the scheduler preview datapath itself is too large. The one-write repair has functional simulator evidence, but BRAM inference and routed fit require a new Vivado run.
+- **Meaning:** the first route is a real FPGA fit failure of diagnostic storage inference, not evidence that the scheduler preview datapath itself is too large. The one-write repair restores block-RAM inference and passes placement, but the densely filled device must still route and meet timing.
 - **Limits:** no FPGA package or board run exists for the failed revision. The repaired revision has not yet passed a routed timing or Linux board gate.
 
 ## Superseded or rejected findings
