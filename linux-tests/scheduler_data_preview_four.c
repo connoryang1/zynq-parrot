@@ -46,6 +46,8 @@ static uint64_t miss_status[trials][preview_lines + 1];
 static uint64_t preview_status_entry[trials], preview_status_post[trials];
 static uint64_t publication_records[trials][8];
 static unsigned publication_count[trials], publication_overflow[trials];
+static uint64_t removal_records[trials][16];
+static unsigned removal_count[trials];
 static unsigned long hook_count[trials];
 static unsigned long guard_count[trials][guard_outcomes];
 
@@ -189,6 +191,8 @@ static void *peer_main(void *unused)
       "ld %5, 0(%11)\n"
       "csrr %6, 0x805\n"
       "ld %7, 0(%12)\n"
+      /* The D-cache removal event crosses a half-cycle before CSR capture. */
+      "nop\nnop\nnop\nnop\nnop\nnop\n"
       "csrr %8, 0x805\n"
       : "=&r"(s0), "=&r"(v0), "=&r"(s1), "=&r"(v1), "=&r"(s2),
         "=&r"(v2), "=&r"(s3), "=&r"(v3), "=&r"(s4)
@@ -203,6 +207,10 @@ static void *peer_main(void *unused)
     miss_status[index][4] = s4;
     publication_count[index] = (unsigned)((s4 >> 53) & 0xf);
     publication_overflow[index] = (unsigned)((s4 >> 57) & 1);
+    removal_count[index] = (unsigned)((s4 >> 59) & 0x1f);
+    for (unsigned record = 0;
+         record < removal_count[index] && record < 16; ++record)
+      removal_records[index][record] = miss_trace_record(232 + record);
     for (unsigned record = 0;
          record < publication_count[index] && record < 8; ++record)
       publication_records[index][record] = miss_trace_record(248 + record);
@@ -326,6 +334,17 @@ int main(void)
            (unsigned long long)publication_records[index][5],
            (unsigned long long)publication_records[index][6],
            (unsigned long long)publication_records[index][7]);
+    printf("SCHED_PREVIEW_REMOVALS mode=%u trial=%u count=%u overflow=%u\n",
+           trial_mode[index], trial, removal_count[index],
+           publication_overflow[index]);
+    for (unsigned record = 0;
+         record < removal_count[index] && record < 16; ++record) {
+      uint64_t event = removal_records[index][record];
+      printf("SCHED_PREVIEW_REMOVAL mode=%u trial=%u index=%u cycle=%u reason=%u paddr=0x%llx\n",
+             trial_mode[index], trial, record, (unsigned)(event >> 32),
+             (unsigned)((event >> 30) & 3),
+             (unsigned long long)((event & UINT64_C(0x3fffffff)) << 4));
+    }
     if (!overflow) {
       for (unsigned lane = 0; lane < preview_lines; ++lane) {
         unsigned first = (unsigned)((miss_status[index][lane] >> 9) & 0x1ff);

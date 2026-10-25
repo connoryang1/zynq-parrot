@@ -807,7 +807,17 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** wrong-address publication and missing hardware delivery cannot explain run 1 trial 45. The next direct measurement must identify whether those four side-buffer words were consumed, invalidated by a matching store or L1 hit, or replaced between publication and timed loads.
 - **Limits:** the address trace does not observe side-buffer removal. Scheduler delay and extra hook executions are correlated clues, not confirmed causes. Local target-load savings under this controlled benchmark do not establish a general context-switch speedup or a learned-address policy.
 
+### RL-088 — Address-tagged side-buffer removal trace passes simulator controls
+
+- **Status:** clean traced five-slot bare-metal and mode-off controls pass; FPGA fit and Linux board result pending
+- **Scope:** isolated `experiment/preview-side-buffer-trace` diagnostic on the RL-087 preview RTL, two resident slots and four logical contexts.
+- **Claim:** the opt-in D-history trace now reserves 16 records for side-buffer word consumption, matching-store invalidation, ordinary-L1-hit invalidation, or full-buffer replacement, with physical 16-byte segment and cycle. It retains one D-history memory write site and flags event collisions or overflow. The bare-metal pressure control observed three older replacements and all four exact target consumes; a first assertion failed because a status CSR sampled before the final two events had crossed from the negative-edge D-cache to the core recorder. Six `nop` instructions before that read yielded seven records, and the cleaned final test plus mode-off miss-trace control both passed with guest and host PASS.
+- **Evidence:** clean commands, raw transcripts, closed FSTs, NBFs, and hashes at `logs/preview-side-buffer-trace-20261025/README.md`.
+- **Meaning:** the new trace can distinguish removal reasons for a known control, and the benchmark must sample its final status after the event pipeline settles.
+- **Limits:** this does not classify the physical Linux trial-45 loss. The added diagnostic may fail FPGA capacity or timing and has not run on the board.
+
 ## Superseded or rejected findings
+
 
 ### RS-001 — The 418/396 result is an intermediate configuration
 

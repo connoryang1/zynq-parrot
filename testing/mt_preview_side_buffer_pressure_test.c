@@ -45,10 +45,10 @@ static inline uint64_t trace_status(void)
   return value;
 }
 
-static uint64_t publication_record(unsigned index)
+static uint64_t trace_record(unsigned index)
 {
   uint64_t value;
-  const uint64_t selector = 0x100 + 248 + index;
+  const uint64_t selector = 0x100 + index;
   __asm__ volatile(
     "csrw 0x806, %1\n"
     "nop\nnop\nnop\n"
@@ -90,6 +90,7 @@ static uint64_t load_four(const volatile struct line *lines, uint64_t values[4])
     "ld %1, 64(%5)\n"
     "ld %2, 128(%5)\n"
     "ld %3, 192(%5)\n"
+    "nop\nnop\nnop\nnop\nnop\nnop\n"
     "csrr %4, 0x805\n"
     : "=&r"(values[0]), "=&r"(values[1]), "=&r"(values[2]),
       "=&r"(values[3]), "=&r"(status)
@@ -130,11 +131,25 @@ int main(void)
       || !((target_status >> 58) & 1))
     fail("publication trace count, mode, or overflow");
   for (unsigned i = 0; i < 4; ++i) {
-    uint64_t record = publication_record(i);
+    uint64_t record = trace_record(248 + i);
     if (((record >> 30) & 3) != 3
         || ((record & 0x3fffffff) << 4)
            != (uint64_t)(uintptr_t)&target[i].word[0])
       fail("publication address record");
+  }
+  unsigned removal_count = (unsigned)((target_status >> 59) & 0x1f);
+  if (removal_count < 4 || removal_count > 16)
+    fail("side-buffer removal count");
+  for (unsigned i = 0; i < 4; ++i) {
+    unsigned found = 0;
+    for (unsigned j = 0; j < removal_count; ++j) {
+      uint64_t record = trace_record(232 + j);
+      if (((record >> 30) & 3) == 0
+          && ((record & 0x3fffffff) << 4)
+             == (uint64_t)(uintptr_t)&target[i].word[0])
+        ++found;
+    }
+    if (found != 1) fail("target consume address record");
   }
 
   // Separate cold lines demonstrate that the no-miss result was useful data,
