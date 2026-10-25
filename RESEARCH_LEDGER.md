@@ -664,6 +664,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the 6a CSR-file change is sufficient for the regression in this source lineage; the later prefetch RTL does not prevent Linux boot when the earlier CSR file is restored. False Sstc detection is consistent with these results and OpenSBI source behavior.
 - **Limits:** the full-file revert also changes other optional CSR behavior, so this board comparison does not isolate `stimecmp` alone. The actual preview one-address-fix route and Linux boot are the decisive next test. The timed run requires full board recovery before another physical test.
 
+### RL-072 — Patched scheduler benchmark image completes on the booting control bitstream
+
+- **Status:** confirmed physical patched-Linux boot and complete benchmark-harness run; preview benefit unverified
+- **Scope:** the exact 46 MiB automatic NBF `linux-preview-auto-46m-exact.nbf` (SHA-256 `82a01bb07f9627a7fa5e263a53dd1b47e049b1a5b076e7de35f4c0f389b960dd`) on the RL-071 CSR-revert bitstream, with a native 300,000 ms target limit.
+- **Claim:** the board loaded matching hashes, booted patched Linux 6.6.0, completed all 48 off/exact/stale futex handoffs, printed `SCHED_PREVIEW PASS` and `SCHED_PREVIEW_INIT_RESULT=0`, and powered off with `RUNNER_EXIT=0`/`BSG PASS` at 71.45 s target runtime. The strict analyzer accepted one CPU and 16 balanced three-mode blocks in the single raw guest log. Its roundtrip medians were off/exact/stale `31,448/52,164/51,024.5` guest cycles, with paired exact-minus-off and stale-minus-off median deltas `+5,609.5/+5,371`; these are control-image observations, not hardware preview gains.
+- **Evidence:** `logs/target-data-preview-linux-hook-20261024/board-probe/linux-preview-auto-46m-csr-revert-guest.log` (SHA-256 `782dceee7fc940b7bf34c66c559862b780cd40a94994f6d67bf6795663e254c6`) and `linux-preview-auto-46m-csr-revert-analysis.json`; the serialized runner transcript has SHA-256 `f809732bf0e4366d7f4f48f081735569da7dd0f7c7f396d27f807a2bd6fe9d11`.
+- **Meaning:** the patched kernel, 46 MiB DTB, initramfs, benchmark executable, and analyzer work together on physical BlackParrot when the CSR boot regression is removed. The actual preview fix bitstream can now be tested against an already booted and parsed software image.
+- **Limits:** the runner transcript repeats guest output after the remote run, so analyzing that combined file directly reports duplicate trial 1; fetch and analyze the remote single raw log instead. The control run does not show that preview requests were accepted or useful, and the mode timings are not an A/B result against a verified preview-enabled route. Recover the board after the SBI poweroff before another physical run.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
