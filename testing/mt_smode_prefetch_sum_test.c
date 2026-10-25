@@ -25,8 +25,21 @@ static volatile uint64_t unexpected_trap, trap_cause, trap_pc, trap_value;
 
 static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 {
+  uint64_t preview_status;
+  __asm__ volatile("csrr %0, 0x805" : "=r"(preview_status) : : "memory");
+  const unsigned physical = (preview_status >> 21) & 0xff;
+  const unsigned admitted = (preview_status >> 29) & 0xff;
+  const unsigned issued = (preview_status >> 37) & 0xff;
+  const unsigned published = (preview_status >> 45) & 0xff;
+  bp_print_string("PREVIEW-EVENTS physical/admitted/issued/published: ");
+  bp_hprint_uint64(physical);
+  bp_hprint_uint64(admitted);
+  bp_hprint_uint64(issued);
+  bp_hprint_uint64(published);
+  bp_print_string("\n");
   if (!unexpected_trap && first_value == FIRST_VALUE
-      && hinted_value == HINT_VALUE && denied_value == DENIED_VALUE) {
+      && hinted_value == HINT_VALUE && denied_value == DENIED_VALUE
+      && physical == 1 && admitted == 1 && issued == 1 && published == 1) {
     bp_print_string("[BSG-PASS] S-mode SUM-gated user-data prefetch\n");
     bp_finish(0);
   } else {
@@ -113,6 +126,9 @@ int main(void)
   __asm__ volatile("csrr %0, mstatus" : "=r"(status));
   status &= ~((3ULL << 11) | (1ULL << 19) | (1ULL << 18));
   status |= 1ULL << 11;  /* MPP=S; start with SUM=0. */
+  // Count the single permitted hint after translation, queue admission,
+  // memory issue, and complete detached response publication.
+  __asm__ volatile("csrw 0x805, %0" : : "r"(2ULL) : "memory");
   __asm__ volatile("csrw mstatus, %0\nmret" : : "r"(status) : "memory");
   __builtin_unreachable();
 }
