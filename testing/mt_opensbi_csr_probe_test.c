@@ -1,9 +1,31 @@
 /* Exercise the absent-feature CSR probes used by OpenSBI before Linux entry.
- * Unsupported facilities are reported as legal hardwired-zero WARL state.
+ * Unimplemented stimecmp must trap so OpenSBI does not falsely detect Sstc.
  */
 
 #include <stdint.h>
 #include "bp_utils.h"
+
+static volatile uint64_t trap_seen;
+static volatile uint64_t trap_cause;
+static volatile uint64_t trap_pc;
+static volatile uint64_t expected_trap_pc;
+
+static void __attribute__((used, naked, aligned(4))) machine_trap(void)
+{
+  __asm__ volatile(
+    "csrr t0, mcause\n"
+    "la t1, trap_cause\n"
+    "sd t0, 0(t1)\n"
+    "csrr t0, mepc\n"
+    "la t1, trap_pc\n"
+    "sd t0, 0(t1)\n"
+    "addi t0, t0, 4\n"
+    "csrw mepc, t0\n"
+    "li t0, 1\n"
+    "la t1, trap_seen\n"
+    "sd t0, 0(t1)\n"
+    "mret\n");
+}
 
 #define DEFINE_RW_PROBE(name, csr)                                      \
   static uint64_t probe_##name(void)                                    \
@@ -38,25 +60,55 @@ DEFINE_RW_PROBE(mstateen0,    0x30c)
 DEFINE_RW_PROBE(mcyclecfg,    0x321)
 DEFINE_RO_PROBE(scountovf,    0xda0)
 DEFINE_RO_PROBE(mtopi,        0xfb0)
-DEFINE_RW_PROBE(stimecmp,     0x14d)
 
 int main(void)
 {
+#ifndef BP_FPGA_PROGRAM
+  /* The simulator CRT enters through debug mode; OpenSBI probes in M-mode. */
+  __asm__ volatile(
+    "csrr t0, dcsr\n"
+    "ori t0, t0, 3\n"
+    "csrw dcsr, t0\n"
+    "la t0, 1f\n"
+    "csrw dpc, t0\n"
+    "dret\n"
+    "1:"
+    : : : "t0", "memory");
+#endif
   const uint64_t unexpected =
     probe_pmpcfg0() | probe_pmpcfg2()
     | probe_pmpaddr0() | probe_pmpaddr1()
     | probe_pmpaddr2() | probe_pmpaddr3()
     | probe_mhpmcounter3() | probe_mhpmevent3()
     | probe_menvcfg() | probe_mstateen0() | probe_mcyclecfg()
-    | probe_scountovf() | probe_mtopi() | probe_stimecmp();
+    | probe_scountovf() | probe_mtopi();
 
-  if (unexpected == 0) {
-    bp_print_string("[BSG-PASS] OpenSBI absent CSR probes read zero\n");
+  if (unexpected != 0) {
+    bp_print_string("[BSG-FAIL] OpenSBI absent CSR probe read nonzero\n");
+    bp_hprint_uint64(unexpected);
+    bp_finish(1);
+    return 1;
+  }
+
+  __asm__ volatile(
+    "la t0, machine_trap\n"
+    "csrw mtvec, t0\n"
+    "la t0, 1f\n"
+    "la t1, expected_trap_pc\n"
+    "sd t0, 0(t1)\n"
+    "1: csrr t0, 0x14d\n"
+    : : : "t0", "t1", "memory");
+
+  if (trap_seen == 1 && trap_cause == 2 && trap_pc == expected_trap_pc) {
+    bp_print_string("[BSG-PASS] OpenSBI absent CSR probes and illegal stimecmp\n");
     bp_finish(0);
   }
 
-  bp_print_string("[BSG-FAIL] OpenSBI absent CSR probe read nonzero\n");
-  bp_hprint_uint64(unexpected);
+  bp_print_string("[BSG-FAIL] stimecmp did not trap as an illegal instruction\n");
+  bp_hprint_uint64(trap_seen);
+  bp_hprint_uint64(trap_cause);
+  bp_hprint_uint64(trap_pc);
+  bp_hprint_uint64(expected_trap_pc);
   bp_finish(1);
   return 1;
 }

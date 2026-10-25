@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Sstc probe fix validated in simulation — 2026-10-25:** removed unsupported `stimecmp` from zero-valued optional CSR handling so OpenSBI's presence read traps; a clean traced `mt_opensbi_csr_probe_test` confirms illegal-instruction cause 2 and the existing `mt_machine_trap_test` control still passes. This is a simulator-validated fix candidate only; routed fit and Linux boot remain pending (`logs/stimecmp-probe-fix-20261025/`).
+
 - **Linux boot bisect narrowed to two BlackParrot commits — 2026-10-25:** midpoint BP `52c5dde70` booted the identical control Linux NBF to an interactive shell at guest time 38.8 s after post-route optimization repaired initial WNS `-0.198` to `+0.174 ns`. The first failing revision is now `6a8f31989` or `d4c20786d` (or their interaction); the next controlled build targets `6a8f31989` (`logs/target-data-preview-linux-hook-20261024/README.md`).
 
 - **Linux boot regression narrowed to five BlackParrot commits — 2026-10-25:** routed top `21c3d804` (BP `d4c20786`) with prefetch5, the previously booting subsystem, and recorder activation off; the identical control Linux NBF printed only OpenSBI by the 90 s bound. The matched BP `c50b8571` image boots to shell, so the next controlled build will bisect the five intervening BP commits (`logs/target-data-preview-linux-hook-20261024/README.md`).

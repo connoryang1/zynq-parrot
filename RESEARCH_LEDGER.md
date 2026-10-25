@@ -637,6 +637,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** with top, subsystem, recorder activation, queue depth, and Linux image fixed, `52c5dde70` boots and `d4c20786` stalls. The first failing commit lies in `6a8f31989` or `d4c20786d`, or a dependency between them. The next discriminating route is `6a8f31989` under the same controls.
 - **Limits:** the midpoint boot does not identify the internal timer failure or prove the CSR change is responsible. The first board recovery attempt after the timed run did not restore SSH within 120 seconds; a second cycle with a 15 s off interval restored the board and passed PYNQ readiness at 91 s uptime. The cause of the first recovery failure is unproven. A new overlay load and hash check are still required before the next run.
 
+### RL-069 — Unsupported `stimecmp` now traps in the preview RTL prototype
+
+- **Status:** clean traced simulator acceptance; FPGA/Linux validation pending
+- **Scope:** actual preview BlackParrot RTL derived from `31d6d461`, changing only the unsupported `0x14d` CSR read/write treatment, plus its directed probe test and marker
+- **Claim:** a clean `make -C testing clean` followed by traced `run-mt_opensbi_csr_probe_test` passed with an illegal-instruction trap cause 2 at the exact `stimecmp` CSR instruction, test-specific PASS, and `CORE PASS`. The previously known-good `run-mt_machine_trap_test` passed on the same rebuilt model. OpenSBI's source uses a legal `stimecmp` read to detect Sstc and redirects SBI timer programming to that CSR when detected; this RTL prototype removes the false presence result.
+- **Evidence:** retained NBF, run transcript, model build log, and closed FST at `/home/coyang/zynq-parrot/logs/stimecmp-probe-fix-20261025/`; directed NBF SHA-256 `16a803bf867de10537e9927734b705e3aebcb49923a3dc9`, FST SHA-256 `7471c622db6e5ded1f0f9e19fedab08e7b6f27f39cc406f37f5b48f38a3e333e`.
+- **Meaning:** the specific CSR behavior required to avoid false Sstc detection is implemented and verified in the actual preview RTL simulator. This narrows the implementation risk but does not establish that this is the complete physical Linux boot fix.
+- **Limits:** the 6a-only and d4 selective-revert FPGA jobs remain live, and this prototype has not been routed or run with Linux on the PYNQ board. Other optional CSRs from `6a8f31989` still read zero and may advertise unsupported extensions; their behavior requires separate evaluation.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
