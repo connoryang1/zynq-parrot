@@ -691,6 +691,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the six-trap CSR behavior is locally correct, but this source pair has no board-valid package. A different source-isolated candidate or a demonstrated fit repair is required before the physical boot discriminator can run.
 - **Limits:** placement failure says nothing about Linux boot, accepted preview requests, or speedup. The 34-LUT difference between this and RL-073 at synthesis is small, while packing changes are decisive at this device margin; do not infer a general RTL area cost from one netlist.
 
+### RL-075 — Pre-6a CSR behavior passes preview and recorder simulation gates
+
+- **Status:** clean traced simulator acceptance; FPGA fit and physical Linux result pending
+- **Scope:** actual target-data preview RTL BlackParrot `dbe9c46a3b460d391e8fc536f8894f40c6714ead`, derived from RL-074 by removing the remaining `6a8f31989` PMP/HPM zero-valued read cases and ignored-write cases, while retaining later preview and `0x805`–`0x807` miss-trace CSRs.
+- **Claim:** a clean two-resident/four-context traced build passed the directed OpenSBI CSR probe test with cause 2 and exact fault PC for selected absent PMP, HPM, and optional addresses. On the same source, the known-good cold M-mode ECALL trap test and accepted I/D miss-trace test passed. The preview oracle test rebuilt for prefetch5 simulator defines and passed handoff/data checks. Each had its specific guest PASS, `CORE PASS`, and host `BSG PASS`.
+- **Evidence:** NBFs, closed FSTs, build log, and transcripts at `logs/legacy-csr-preview-control-20261025/`; directed NBF/FST SHA-256 `8bbe2fd6f5b3ac51ab2a46fb48fd5924d725f3a0fd5639c16013050bada16f74`/`ba6e42342c658b51c7049b47152c9864286c8f98e08e4416198eb7efee099898`; preview oracle NBF/FST `6c0e6655671b1c07553787fecf6e8c3dcbf473395f7bd34fd47c848db58f3eda`/`5f3fdbd71b0fb64842ec62b5d6d398fe8387b77b6888e2040b3145ed87a0b11c`.
+- **Meaning:** this source-isolated control can test whether the complete `6a` CSR behavior, rather than later preview RTL, explains the silent Linux boot on the actual preview architecture. It also avoids conflating the control with a disabled recorder.
+- **Limits:** the local gates do not prove PYNQ-Z2 fit, Linux boot, accepted scheduler preview requests, or speedup. The exact prefetch5 route and same-NBF board test are required.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

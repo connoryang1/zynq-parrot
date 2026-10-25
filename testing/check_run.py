@@ -33,7 +33,7 @@ TEST_MARKERS = {
     "mt_protected_rpc_reference_test": "[BSG-PASS] protected RPC capability, isolation and return",
     "mt_protected_rpc_hardware_test": "[BSG-PASS] atomic protected RPC capability, fixed entry and return",
     "mt_rpc_context_transport_benchmark": "[BSG-PASS] unprotected two-context RPC transport and isolation",
-    "mt_opensbi_csr_probe_test": "[BSG-PASS] OpenSBI absent CSR probes trap",
+    "mt_opensbi_csr_probe_test": "[BSG-PASS] OpenSBI legacy absent CSR probes trap",
     "mt_cache_miss_trace_test": "[BSG-PASS] accepted cache-miss trace",
     "mt_satp_asid_warl_test": "[BSG-PASS] satp ASID WARL width matches one-bit TLB tag",
     "mt_dependent_stream_benchmark": "[BSG-PASS] dependent streams, checksums and completion",
