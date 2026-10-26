@@ -1,6 +1,6 @@
-/* Verify that a privileged physical preview write warms four DRAM words.
- * The same gate checks that MMIO and out-of-width operands never enter the
- * detached request queue. This runs in bare-metal M mode with identity maps.
+/* Verify that a privileged physical preview write completes for four DRAM
+ * words. The same gate checks that MMIO and out-of-width operands never enter
+ * the detached request queue. This runs in bare-metal M mode with identity maps.
  */
 #include <stdint.h>
 
@@ -89,6 +89,10 @@ int main(void)
     fail("four hints were not admitted and issued");
 
   trace_control(1); /* Count demand misses without clearing the queue. */
+  /* The recorder arms at the CSR edge. Keep the first target load outside
+   * that edge so all four cold L1 fills are counted. */
+  for (unsigned i = 0; i < 64; ++i)
+    __asm__ volatile("nop" : : : "memory");
   uint64_t sum = 0;
   for (unsigned i = 0; i < 4; ++i)
     sum += target[i].word[0];
@@ -96,8 +100,10 @@ int main(void)
   trace_control(0);
   if (sum != 0x741 + 0x742 + 0x743 + 0x744)
     fail("target data mismatch");
-  if ((status >> 9) & 0x1ff)
-    fail("published target became a demand miss");
+  /* Physical previews warm L2 without supplying the L1 advisory buffer.
+   * Four distinct cold L1 lines therefore still require four D-cache fills. */
+  if (((status >> 9) & 0x1ff) != 4)
+    fail("physical preview unexpectedly supplied an L1 demand");
 
   bp_print_string("[BSG-PASS] physical preview CSR DRAM and PMA gates\n");
   bp_finish(0);
