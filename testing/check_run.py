@@ -71,6 +71,7 @@ TEST_MARKERS = {
     "mt_smode_prefetch_sum_test": "[BSG-PASS] S-mode SUM-gated user-data prefetch",
     "mt_preview_side_buffer_pressure_test": "[BSG-PASS] preview side-buffer pressure preserves four target words",
     "mt_physical_preview_csr_test": "[BSG-PASS] physical preview CSR DRAM and PMA gates",
+    "mt_preview_quiesce_test": "[BSG-PASS] preview cancel drain and advisory invalidation",
     "mt_physical_preview_dirty_line_test": "[BSG-PASS] physical preview dirty line coherency",
     "mt_translated_preview_dirty_l2_test": "[BSG-PASS] translated preview dirty L2 coherency",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
