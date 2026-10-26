@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **FPGA launch prerequisite repaired — 2026-10-26:** the first physical-producer route stopped before Vivado because the isolated seed lacked the pinned nested `riscv-dbg` checkout. It is now initialized at the exact gitlink, and build readiness checks the subsystems and `riscv-dbg` revisions before a job starts. The launcher also supports a spacious scratch root for its immutable worktree because `/tmp` has only megabytes free; no routed result is claimed from the failed job (`logs/fpga/20261026T045813Z-ef859fc0/`).
+
 - **Physical producer transport corrected in simulation — 2026-10-26:** an exact-ELF/NBF cold control localized the prototype's stall to a prefetch AXI response blocked behind the packet-locked BedRock reverse merge. An experimental per-slot complete-response buffer makes that formerly failing four-hint test pass, and the previously known-good translated-preview oracle still passes under a clean traced rebuild. The new bridge and physical producer have not yet been routed or booted with Linux (`logs/preview-physical-producer-20261026/`, RL-098).
 
 - **Cross-mm preview path constrained — 2026-10-25:** physical Linux reports the ASID allocator disabled, and source inspection confirms that a different-mm switch flushes the DTLB while the current nonfaulting virtual hint never walks page tables. Moving that hint after the mm switch alone cannot provide reliable cold cross-process preview; the next producer must supply protected physical addresses or a real target-translation path (RL-097).

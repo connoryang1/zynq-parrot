@@ -30,6 +30,8 @@ else
   fail=1
 fi
 check_path "$repo_dir/import/black-parrot/.git" "BlackParrot submodule"
+check_path "$repo_dir/import/black-parrot-subsystems/.git" "BlackParrot subsystems submodule"
+check_path "$repo_dir/import/black-parrot-subsystems/import/riscv-dbg/.git" "BlackParrot subsystems nested riscv-dbg submodule"
 check_path "$repo_dir/import/basejump_stl/.git" "BaseJump submodule"
 check_path "$repo_dir/import/black-parrot/external/basejump_stl/.git" "BlackParrot nested BaseJump submodule"
 check_path "$repo_dir/import/black-parrot/external/HardFloat/.git" "BlackParrot nested HardFloat submodule"
@@ -53,6 +55,27 @@ if [[ -e "$repo_dir/import/black-parrot/.git" ]]; then
   if [[ "$expected" != "$actual" ]]; then
     echo "FAIL: BlackParrot checkout does not match the top-level gitlink"
     fail=1
+  fi
+fi
+
+if [[ -e "$repo_dir/import/black-parrot-subsystems/.git" ]]; then
+  expected=$(git -C "$repo_dir" ls-tree HEAD import/black-parrot-subsystems | awk '{print $3}')
+  actual=$(git -C "$repo_dir/import/black-parrot-subsystems" rev-parse HEAD 2>/dev/null || true)
+  printf 'BP subsystems pinned:   %.12s\n' "$expected"
+  printf 'BP subsystems checkout: %.12s\n' "$actual"
+  if [[ "$expected" != "$actual" ]]; then
+    echo "FAIL: BlackParrot subsystems checkout does not match the top-level gitlink"
+    fail=1
+  fi
+  if [[ -e "$repo_dir/import/black-parrot-subsystems/import/riscv-dbg/.git" ]]; then
+    expected=$(git -C "$repo_dir/import/black-parrot-subsystems" ls-tree HEAD import/riscv-dbg | awk '{print $3}')
+    actual=$(git -C "$repo_dir/import/black-parrot-subsystems/import/riscv-dbg" rev-parse HEAD 2>/dev/null || true)
+    printf 'BP riscv-dbg pinned:   %.12s\n' "$expected"
+    printf 'BP riscv-dbg checkout: %.12s\n' "$actual"
+    if [[ -z "$expected" || "$expected" != "$actual" ]]; then
+      echo "FAIL: BlackParrot subsystems nested riscv-dbg checkout does not match its gitlink"
+      fail=1
+    fi
   fi
 fi
 
