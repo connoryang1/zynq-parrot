@@ -1,3 +1,13 @@
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -110,6 +110,7 @@
+ 	select HAVE_CONTEXT_TRACKING_USER
+ 	select HAVE_DEBUG_KMEMLEAK
+ 	select HAVE_DMA_CONTIGUOUS if MMU
++	select HAVE_EXIT_THREAD
+ 	select HAVE_DYNAMIC_FTRACE if !XIP_KERNEL && MMU && (CLANG_SUPPORTS_DYNAMIC_FTRACE || GCC_SUPPORTS_DYNAMIC_FTRACE)
+ 	select HAVE_DYNAMIC_FTRACE_WITH_REGS if HAVE_DYNAMIC_FTRACE
+ 	select HAVE_FTRACE_MCOUNT_RECORD if !XIP_KERNEL
 --- a/arch/riscv/include/asm/processor.h
 +++ b/arch/riscv/include/asm/processor.h
 @@ -72,6 +72,7 @@
@@ -166,15 +176,24 @@
  	memset(current->thread.bp_preview_addr, 0,
  	       sizeof(current->thread.bp_preview_addr));
  	current->thread.bp_preview_mm = NULL;
-@@ -164,6 +229,7 @@
+@@ -162,8 +227,16 @@
+ #endif
+ }
  
++void exit_thread(struct task_struct *tsk)
++{
++	/* Drain in the exiting task before it can remain an unreaped zombie. */
++	WARN_ON_ONCE(riscv_bp_preview_release(tsk));
++}
++
  void arch_release_task_struct(struct task_struct *tsk)
  {
++	/* Also covers a failed fork, or a drain that timed out at task exit. */
 +	WARN_ON_ONCE(riscv_bp_preview_release(tsk));
  	/* Free the vector context of datap. */
  	if (has_vector())
  		kfree(tsk->thread.vstate.datap);
-@@ -173,6 +239,12 @@
+@@ -173,6 +246,12 @@
  {
  	fstate_save(src, task_pt_regs(src));
  	*dst = *src;
@@ -187,7 +206,7 @@
  	/* clear entire V context, including datap for a new task */
  	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
  
-@@ -189,6 +261,11 @@
+@@ -189,6 +268,11 @@
  	memset(p->thread.bp_preview_addr, 0,
  	       sizeof(p->thread.bp_preview_addr));
  	p->thread.bp_preview_mm = NULL;

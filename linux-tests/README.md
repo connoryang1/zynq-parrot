@@ -585,6 +585,28 @@ direct and hinted modes; see `logs/context-preview-linux-demand-order-20261024/`
 Per-load latency includes startup effects and cannot identify accepted,
 completed, or displaced prefetch requests on this image.
 
+## Cross-process physical preview smoke
+
+`scheduler_physical_preview_smoke.c` exercises a later experimental Linux
+hook that sends four pinned physical-page hints before switching address
+spaces. Apply `patches/bp-physical-page-preview.patch` on top of the existing
+four-address scheduler-preview kernel patches and use the matching quiesce
+RTL. The registration requires one possible CPU; the kernel must cancel and
+drain outstanding hints before a pinned page is released.
+
+```sh
+make -C linux-tests scheduler-physical-preview-smoke-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+```
+
+Run the dynamic executable from the Linux shell with `0` for no registration,
+`1` for explicit registration and release, or `2` to leave the child's pins
+for the task-exit hook. The two processes alternate through 32 pipe handoffs
+and check four data lines after each wakeup. The hook counts show scheduler
+execution; they do not prove hardware admission or measure a speedup. This
+smoke has compiled and passed its host pipe control, but its enabled modes
+still require a boot of the matching FPGA image.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder

@@ -1,8 +1,8 @@
 #define _GNU_SOURCE
 
 /* Exercise pinned physical hints across a real process address-space switch.
- * Each process registers its own page, alternates on pipes, checks its data,
- * and releases the registration after the last handoff.
+ * Each process registers its own page, alternates on pipes, and checks its
+ * data. Mode 2 leaves the child's pins to the task-exit drain hook.
  */
 #include <errno.h>
 #include <stdint.h>
@@ -32,12 +32,13 @@ static void transfer(int fd, void *data, size_t count, int send)
 		fail(send ? "write pipe" : "read pipe");
 }
 
-static void participant(int recv_fd, int send_fd, int child, int enabled)
+static void participant(int recv_fd, int send_fd, int child, int mode)
 {
 	volatile uint64_t *page;
 	unsigned long addr[lines] = {};
 	unsigned long before = 0, after = 0;
 	unsigned int round, lane;
+	int enabled = mode != 0;
 	char token = 'x';
 
 	page = mmap(NULL, page_bytes, PROT_READ | PROT_WRITE,
@@ -87,10 +88,12 @@ static void participant(int recv_fd, int send_fd, int child, int enabled)
 			child, before, after);
 		exit(1);
 	}
-	if (enabled && prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
+	/* Mode 2 leaves the child's pins for the task-exit drain path. */
+	if (enabled && !(mode == 2 && child)
+	    && prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
 		fail("release preview page");
-	printf("PHYSICAL_PREVIEW child=%d enabled=%d hooks=%lu rounds=%d PASS\n",
-	       child, enabled, after - before, rounds);
+	printf("PHYSICAL_PREVIEW child=%d mode=%d hooks=%lu rounds=%d PASS\n",
+	       child, mode, after - before, rounds);
 	if (munmap((void *)page, page_bytes))
 		fail("munmap target");
 }
@@ -98,11 +101,12 @@ static void participant(int recv_fd, int send_fd, int child, int enabled)
 int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
-	int enabled = argc == 2 && argv[1][0] == '1' && !argv[1][1];
+	int mode = argc == 2 && argv[1][0] && !argv[1][1]
+		? argv[1][0] - '0' : -1;
 	pid_t child;
 
-	if (argc != 2 || (argv[1][0] != '0' && argv[1][0] != '1') || argv[1][1]) {
-		fprintf(stderr, "usage: %s 0|1\n", argv[0]);
+	if (mode < 0 || mode > 2) {
+		fprintf(stderr, "usage: %s 0|1|2\n", argv[0]);
 		return 2;
 	}
 	if (pipe(to_child) || pipe(to_parent))
@@ -113,12 +117,12 @@ int main(int argc, char **argv)
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		participant(to_child[0], to_parent[1], 1, enabled);
+		participant(to_child[0], to_parent[1], 1, mode);
 		return 0;
 	}
 	close(to_child[0]);
 	close(to_parent[1]);
-	participant(to_parent[0], to_child[1], 0, enabled);
+	participant(to_parent[0], to_child[1], 0, mode);
 	if (waitpid(child, &status, 0) != child)
 		fail("waitpid");
 	if (!WIFEXITED(status) || WEXITSTATUS(status)) {

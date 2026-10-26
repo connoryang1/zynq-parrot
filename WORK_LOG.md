@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Exit-time pin release and revised Linux bundle — 2026-10-26:** the physical-preview kernel now selects RISC-V `HAVE_EXIT_THREAD` and drains/unpins a task's registered pages in `exit_thread()` before zombie notification, with final task-free cleanup retained as a fallback. The six-file patch applies cleanly; targeted objects, full `vmlinux`, `Image`, and matching OpenSBI/NBF builds pass, while the exact revised shell NBF and enabled smoke modes still await a board run (`logs/linux-physical-pin-20261026/`, RL-105).
+
 - **Supervisor CSR preflight — 2026-10-26:** the exact five-slot/two-bank traced full model passes a rebuilt S-mode test that writes zero to `0x9c0`, reads idle bit zero, then performs the existing SUM-gated translated hint; guest/core/host and the independent checker pass. A too-short native host-runtime bound ended an earlier run without a guest verdict and was superseded by the clean 300,000 ms-bound rerun (`logs/preview-page-quiesce-20261026/`, RL-104).
 
 - **Quiesce timing recovery and Linux image preparation — 2026-10-26:** isolated post-route optimization of exact top `c7ad9eb5` / BlackParrot `be1967914` recovered WNS/TNS from `−1.237/−69.537 ns` to `+0.029/0 ns`, with 87,087/87,087 nets routed and a verified package. The compile-verified physical-pin Linux `Image` was embedded once in a fresh OpenSBI payload and packaged into a timer-corrected NBF; neither image has been run on the board (`logs/preview-page-quiesce-20261026/`, `logs/linux-physical-pin-20261026/`, RL-104).
