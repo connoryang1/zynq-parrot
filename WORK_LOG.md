@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Physical producer transport corrected in simulation — 2026-10-26:** an exact-ELF/NBF cold control localized the prototype's stall to a prefetch AXI response blocked behind the packet-locked BedRock reverse merge. An experimental per-slot complete-response buffer makes that formerly failing four-hint test pass, and the previously known-good translated-preview oracle still passes under a clean traced rebuild. The new bridge and physical producer have not yet been routed or booted with Linux (`logs/preview-physical-producer-20261026/`, RL-098).
+
 - **Cross-mm preview path constrained — 2026-10-25:** physical Linux reports the ASID allocator disabled, and source inspection confirms that a different-mm switch flushes the DTLB while the current nonfaulting virtual hint never walks page tables. Moving that hint after the mm switch alone cannot provide reliable cold cross-process preview; the next producer must supply protected physical addresses or a real target-translation path (RL-097).
 
 - **Scheduler-path coverage measured — 2026-10-25:** a newly built static Linux diagnostic booted on the already qualified preview FPGA bitstream and classified 8/8 direct same-mm, 6/8 idle, and 7/8 different-mm handoffs with stable one-selection snapshots; the same-mm path executed the hook, while the idle and different-mm paths skipped it. The guest, core, and serialized runner passed, and the independent analyzer accepted all 24 rows while excluding two mixed and one unstable sample (`logs/preview-scheduler-path-20261025/`, RL-096).

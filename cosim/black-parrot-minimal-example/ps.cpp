@@ -5,18 +5,24 @@
 // communication plumbing differences.
 
 #include <bitset>
+#include <errno.h>
 #include <locale.h>
 #include <queue>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 
 // Set by SIGALRM/SIGTERM/SIGINT to gracefully terminate and flush the FST.
 static volatile sig_atomic_t g_trace_timed_out = 0;
-static void handle_trace_signal(int) { g_trace_timed_out = 1; }
+static volatile sig_atomic_t g_trace_signal = 0;
+static void handle_trace_signal(int signo) {
+    g_trace_signal = signo;
+    g_trace_timed_out = 1;
+}
 
 #include "ps.hpp"
 
@@ -126,6 +132,19 @@ inline int64_t send_bp_read(bsg_zynq_pl *zpl, uint64_t addr) {
 }
 
 int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
+
+    unsigned long long max_runtime_ms = 0;
+    if (argc >= 3) {
+        char *end = nullptr;
+        errno = 0;
+        max_runtime_ms = strtoull(argv[2], &end, 0);
+        if (errno || end == argv[2] || *end != '\0') {
+            bsg_pr_err("ps.cpp: invalid max runtime in milliseconds: %s\n", argv[2]);
+            return -1;
+        }
+        bsg_pr_info("ps.cpp: limiting post-unfreeze runtime to %llu ms\n",
+                    max_runtime_ms);
+    }
 
     long data;
     long val1 = 0x1;
@@ -311,7 +330,14 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     signal(SIGINT, handle_trace_signal);
     signal(SIGALRM, handle_trace_signal);
     const char *timeout_env = getenv("BSG_TRACE_TIMEOUT_S");
-    if (timeout_env && atoi(timeout_env) > 0) {
+    if (max_runtime_ms) {
+        struct itimerval timer = {};
+        timer.it_value.tv_sec = max_runtime_ms / 1000;
+        timer.it_value.tv_usec = (max_runtime_ms % 1000) * 1000;
+        setitimer(ITIMER_REAL, &timer, nullptr);
+        bsg_pr_info("ps.cpp: runtime limit armed for %llu ms after unfreeze\n",
+                    max_runtime_ms);
+    } else if (timeout_env && atoi(timeout_env) > 0) {
         alarm(atoi(timeout_env));
         bsg_pr_info("ps.cpp: trace timeout armed for %s seconds\n", timeout_env);
     }
@@ -325,7 +351,12 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     do {
         recv_bp_fwd_packet(zpl, &fwd_packet);
         if (g_trace_timed_out) {
-            bsg_pr_info("ps.cpp: trace timeout reached, flushing FST and exiting\n");
+            if (g_trace_signal == SIGALRM && max_runtime_ms)
+                bsg_pr_info("ps.cpp: target runtime limit reached, flushing FST and exiting\n");
+            else if (g_trace_signal == SIGALRM)
+                bsg_pr_info("ps.cpp: trace timeout reached, flushing FST and exiting\n");
+            else
+                bsg_pr_info("ps.cpp: trace interrupted, flushing FST and exiting\n");
             break;
         }
 

@@ -11,8 +11,19 @@ Each selected test ELF is rebuilt to match the requested topology/compiler flags
 The runner clears old transcripts before building and requires fresh guest and
 host PASS markers and the selected program's completion marker before CORE PASS,
 rejecting timeouts and unrelated assertions even after PASS.
-Set `TARGET_RUNTIME_MS` to pass a native simulator target-runtime limit to the
-minimal-example runner when diagnosing an expected guest stall.
+Set `TARGET_RUNTIME_MS` to pass a native, post-unfreeze wall-clock limit in
+milliseconds to the minimal-example runner when diagnosing an expected guest
+stall. The runner handles expiry inside `ps.cpp` and closes the FST before
+exiting; the harness rejects its timeout marker as a test failure. Verify the
+run log says the limit was armed before treating a bounded run as such.
+
+On 2026-10-26, the first physical-preview CSR probe passed `TARGET_RUNTIME_MS=100`
+through the Makefile, but the then-current minimal `ps.cpp` ignored its second
+argument. The simulator kept running with no guest verdict until SIGALRM used
+its existing trace-flush handler; the closed trace recorded 1,058 retired
+instructions, and that attempt is excluded from functional evidence. The
+runner now parses the argument and arms a post-unfreeze timer; a run without
+the explicit armed-limit log remains unbounded regardless of the command line.
 The preview buffer pressure test also checks optional CSR `0x805` bit 2:
 writing `6` records final preview addresses before demand recording, and
 writing `5` later arms demand misses without erasing those records. It rejects
@@ -208,13 +219,12 @@ repeat either definition in `SIM_DEFINES`. Use
 endpoint. The slot count is part of the Verilator model stamp, so a model built
 for another capacity cannot be reused for this experiment.
 
-Set `PREFETCH_FULL_LINE=1` to keep the same nonblocking hint and scheduling
-code while fetching and safely installing a complete cache line in L1 instead
-of returning a 16-byte pointer/value prefix through the specialized D-cache
-side buffer. This is the generic-prefetch ablation for dependent-stream
-measurements; leave it at the default zero for the optimized critical-data
-path. The selector changes the Verilator model and requires a clean rebuild
-when comparing the two configurations.
+`PREFETCH_FULL_LINE=1` is not an active full-line selector at the current
+BlackParrot revision: the D UCE fixes `prefetch_msg_size_lp` to 16 bytes and
+the RTL does not read `BP_DCACHE_PREFETCH_FULL_LINE`. Do not interpret a run
+with that Makefile flag as a 64-byte prefetch result. A full-line comparison
+requires restoring and verifying the selector in RTL, then rebuilding the
+model and checking the emitted BedRock header size in its waveform.
 For full-top simulation and FPGA implementation, the named
 `e_bp_unicore_zynqparrot_prefetch10_t3_cfg`,
 `e_bp_unicore_zynqparrot_prefetch10_t3_full_line_cfg` and
