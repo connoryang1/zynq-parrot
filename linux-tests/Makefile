@@ -36,6 +36,7 @@ SCHED_PREVIEW_DYNAMIC_APP := $(OUT)/scheduler_data_preview_dynamic
 SCHED_PREVIEW_UNIQUE_APP := $(OUT)/scheduler_data_preview_unique
 SCHED_PREVIEW_MISS_APP := $(OUT)/scheduler_data_preview_miss
 SCHED_PREVIEW_FOUR_APP := $(OUT)/scheduler_data_preview_four
+SCHED_PREVIEW_PATH_APP := $(OUT)/scheduler_preview_path
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -179,6 +180,13 @@ $(SCHED_PREVIEW_MISS_APP): scheduler_data_preview_miss.c Makefile FORCE
 	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
 
 $(SCHED_PREVIEW_FOUR_APP): scheduler_data_preview_four.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
+
+.PHONY: scheduler-preview-path
+scheduler-preview-path: check-linux-cc $(SCHED_PREVIEW_PATH_APP)
+
+$(SCHED_PREVIEW_PATH_APP): scheduler_preview_path.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
 
