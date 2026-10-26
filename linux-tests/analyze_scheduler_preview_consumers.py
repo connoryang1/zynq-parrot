@@ -73,6 +73,8 @@ def analyze(path: Path) -> dict:
             key = (trial, index)
             if removals[key][0] != mode or consumers[key][0] != mode:
                 raise ValueError(f"consumer/removal mode mismatch {key}")
+            if removals[key][2] != 0 and consumers[key][1:] != (0, 0, 0):
+                raise ValueError(f"non-consume removal has PC metadata {key}")
 
     exact = {}
     target_base = int(strict["target_physical_base"], 16)
