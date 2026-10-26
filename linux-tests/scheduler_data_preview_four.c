@@ -231,7 +231,11 @@ static void *peer_main(void *unused)
       removal_records[index][record] = miss_trace_record(232 + record);
     for (unsigned record = 0;
          record < removal_count[index] && record < 16; ++record)
-      removal_meta_records[index][record] = miss_trace_remove_meta(232 + record);
+      /* Only a TV consume has a PC. Other removal reasons have no metadata
+       * write and must not inherit an older I-history value at this index. */
+      removal_meta_records[index][record] =
+        ((removal_records[index][record] >> 30) & 3) == 0
+          ? miss_trace_remove_meta(232 + record) : 0;
     for (unsigned record = 0;
          record < publication_count[index] && record < 8; ++record)
       publication_records[index][record] = miss_trace_record(248 + record);
