@@ -25,6 +25,8 @@ module bp_prefetch_axi_master
    , localparam beat_count_width_lp = `BSG_SAFE_CLOG2(block_beats_lp)
    , localparam beats_per_bedrock_lp = bedrock_fill_width_p / axi_data_width_p
    , localparam subbeat_count_width_lp = `BSG_SAFE_CLOG2(beats_per_bedrock_lp)
+   , localparam words_per_block_lp = dcache_block_width_p / bedrock_fill_width_p
+   , localparam word_count_width_lp = `BSG_SAFE_CLOG2(words_per_block_lp)
    )
   (input                                         clk_i
    , input                                       reset_i
@@ -65,6 +67,12 @@ module bp_prefetch_axi_master
   logic [outstanding_p-1:0][beat_count_width_lp-1:0] slot_last_beat_r;
   logic [outstanding_p-1:0][subbeat_count_width_lp-1:0] slot_subbeat_r;
   logic [outstanding_p-1:0][bedrock_fill_width_p-1:0] slot_fill_data_r;
+  logic [outstanding_p-1:0][words_per_block_lp-1:0][bedrock_fill_width_p-1:0] slot_word_data_r;
+  logic [outstanding_p-1:0][word_count_width_lp-1:0] slot_rx_word_r, slot_last_word_r;
+  logic [outstanding_p-1:0] slot_rx_done_r;
+  logic tx_active_r;
+  logic [slot_width_lp-1:0] tx_slot_r;
+  logic [word_count_width_lp-1:0] tx_word_r;
 
   logic free_v;
   logic [slot_width_lp-1:0] free_slot;
@@ -77,6 +85,27 @@ module bp_prefetch_axi_master
         free_slot = slot_width_lp'(i);
       end
   end
+
+  // The downstream BedRock merge holds a source until its whole packet has
+  // passed. Keep every AXI response locally until complete: otherwise a
+  // prefetch beat can block a demand beat needed to unlock that merge.
+  logic tx_select_v;
+  logic [slot_width_lp-1:0] tx_select_slot;
+  always_comb begin
+    tx_select_v = tx_active_r;
+    tx_select_slot = tx_slot_r;
+    if (!tx_active_r)
+      for (int i = outstanding_p-1; i >= 0; i--)
+        if (slot_rx_done_r[i]) begin
+          tx_select_v = 1'b1;
+          tx_select_slot = slot_width_lp'(i);
+        end
+  end
+  assign mem_rev_v_o = tx_select_v;
+  assign mem_rev_header_o = tx_select_v ? slot_header_r[tx_select_slot] : '0;
+  assign mem_rev_data_o = tx_select_v ? slot_word_data_r[tx_select_slot][tx_word_r] : '0;
+  wire tx_accept = mem_rev_v_o & mem_rev_ready_and_i;
+  wire tx_last = tx_word_r == slot_last_word_r[tx_select_slot];
 
   assign axi_araddr_o = mem_fwd_header_cast_i.addr[0+:axi_addr_width_p];
   assign axi_arid_o = axi_id_width_p'(free_slot + 1'b1);
@@ -92,29 +121,22 @@ module bp_prefetch_axi_master
   wire response_id_valid = (axi_rid_i > 0) && (axi_rid_i <= outstanding_p);
   wire [slot_width_lp-1:0] response_slot = slot_width_lp'(axi_rid_i - 1'b1);
   logic response_slot_valid;
-  bp_bedrock_mem_rev_header_s response_header;
   logic [subbeat_count_width_lp-1:0] response_subbeat;
   logic [bedrock_fill_width_p-1:0] response_fill_data;
   always_comb begin
     response_slot_valid = 1'b0;
-    response_header = '0;
     response_subbeat = '0;
     response_fill_data = '0;
     if (response_id_valid) begin
       response_slot_valid = slot_v_r[response_slot];
-      response_header = slot_header_r[response_slot];
       response_subbeat = slot_subbeat_r[response_slot];
       response_fill_data = slot_fill_data_r[response_slot];
     end
     response_fill_data[response_subbeat*axi_data_width_p +: axi_data_width_p] = axi_rdata_i;
   end
 
-  assign mem_rev_header_o = response_header;
-  assign mem_rev_data_o = response_fill_data;
   wire response_fill_complete = response_subbeat == beats_per_bedrock_lp-1;
-  assign mem_rev_v_o = axi_rvalid_i & response_slot_valid & response_fill_complete;
-  assign axi_rready_o = response_slot_valid
-    & (!response_fill_complete | mem_rev_ready_and_i);
+  assign axi_rready_o = response_slot_valid & ~slot_rx_done_r[response_slot];
   wire response_accept = axi_rvalid_i & axi_rready_o;
 
   always_ff @(posedge clk_i) begin
@@ -124,6 +146,12 @@ module bp_prefetch_axi_master
       slot_last_beat_r <= '0;
       slot_subbeat_r <= '0;
       slot_fill_data_r <= '0;
+      slot_rx_word_r <= '0;
+      slot_last_word_r <= '0;
+      slot_rx_done_r <= '0;
+      tx_active_r <= 1'b0;
+      tx_slot_r <= '0;
+      tx_word_r <= '0;
     end else begin
       if (request_accept) begin
         slot_v_r[free_slot] <= 1'b1;
@@ -131,8 +159,12 @@ module bp_prefetch_axi_master
         slot_beat_r[free_slot] <= '0;
         slot_last_beat_r[free_slot]
           <= beat_count_width_lp'(request_axi_beats - 1'b1);
+        slot_last_word_r[free_slot]
+          <= word_count_width_lp'(request_axi_beats / beats_per_bedrock_lp - 1'b1);
         slot_subbeat_r[free_slot] <= '0;
         slot_fill_data_r[free_slot] <= '0;
+        slot_rx_word_r[free_slot] <= '0;
+        slot_rx_done_r[free_slot] <= 1'b0;
       end
 
       if (response_accept) begin
@@ -142,12 +174,26 @@ module bp_prefetch_axi_master
           slot_subbeat_r[response_slot] <= response_subbeat + 1'b1;
         end else begin
           slot_subbeat_r[response_slot] <= '0;
-          if (axi_rlast_i) begin
-            slot_v_r[response_slot] <= 1'b0;
-            slot_beat_r[response_slot] <= '0;
-            slot_last_beat_r[response_slot] <= '0;
-            slot_fill_data_r[response_slot] <= '0;
-          end
+          slot_word_data_r[response_slot][slot_rx_word_r[response_slot]]
+            <= response_fill_data;
+          slot_rx_word_r[response_slot] <= slot_rx_word_r[response_slot] + 1'b1;
+        end
+        if (axi_rlast_i)
+          slot_rx_done_r[response_slot] <= 1'b1;
+      end
+
+      if (!tx_active_r && tx_select_v) begin
+        tx_active_r <= 1'b1;
+        tx_slot_r <= tx_select_slot;
+      end
+      if (tx_accept) begin
+        if (tx_last) begin
+          slot_v_r[tx_select_slot] <= 1'b0;
+          slot_rx_done_r[tx_select_slot] <= 1'b0;
+          tx_active_r <= 1'b0;
+          tx_word_r <= '0;
+        end else begin
+          tx_word_r <= tx_word_r + 1'b1;
         end
       end
     end
@@ -172,7 +218,7 @@ module bp_prefetch_axi_master
                   {e_bedrock_msg_size_16, e_bedrock_msg_size_64}))
         else $error("Prefetch AXI bridge accepted a malformed BedRock request");
     if (axi_rvalid_i)
-      assert (response_slot_valid)
+      assert (response_slot_valid && !slot_rx_done_r[response_slot])
         else $error("Prefetch AXI bridge received an invalid AXI response ID");
     if (response_accept) begin
       assert (axi_rresp_i == 2'b00)
