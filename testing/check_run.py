@@ -72,6 +72,7 @@ TEST_MARKERS = {
     "mt_preview_side_buffer_pressure_test": "[BSG-PASS] preview side-buffer pressure preserves four target words",
     "mt_physical_preview_csr_test": "[BSG-PASS] physical preview CSR DRAM and PMA gates",
     "mt_physical_preview_dirty_line_test": "[BSG-PASS] physical preview dirty line coherency",
+    "mt_translated_preview_dirty_l2_test": "[BSG-PASS] translated preview dirty L2 coherency",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
     "mt_ctxtsw_pure_ring_stress_test": "[BSG-PASS] pure ctxtsw ring stress completed",
     "mt_umode_resident_sv39_data_handoff_test": "[BSG-PASS] resident U-mode Sv39 instruction/data handoff and ECALL preserved state",

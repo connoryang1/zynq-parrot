@@ -174,9 +174,12 @@ module top_zynq
 `ifdef BP_PREFETCH_AXI_BYPASS
    localparam prefetch_axi_bypass_lp = 1'b1;
 `else
-   localparam prefetch_axi_bypass_lp =
-     (bp_params_p == e_bp_unicore_zynqparrot_prefetch10_cfg)
-     || (bp_params_p == e_bp_unicore_zynqparrot_prefetch5_cfg);
+   // Route both translated and physical preview requests through L2. The
+   // detached UCE queue remains independent of architectural cache requests,
+   // but an L2 reply observes dirty data that the direct AXI port can miss.
+   // Leaving the extra AXI port absent also removes its bridge and merge from
+   // the area-constrained PYNQ-Z2 implementation.
+   localparam prefetch_axi_bypass_lp = 1'b0;
 `endif
    localparam num_regs_ps_to_pl_lp  = 5;
    localparam num_regs_pl_to_ps_lp  = 8;
