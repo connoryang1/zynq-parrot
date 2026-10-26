@@ -37,6 +37,7 @@ SCHED_PREVIEW_UNIQUE_APP := $(OUT)/scheduler_data_preview_unique
 SCHED_PREVIEW_MISS_APP := $(OUT)/scheduler_data_preview_miss
 SCHED_PREVIEW_FOUR_APP := $(OUT)/scheduler_data_preview_four
 SCHED_PHYSICAL_PREVIEW_APP := $(OUT)/scheduler_physical_preview_smoke
+SCHED_PHYSICAL_PREVIEW_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_smoke_dynamic
 SCHED_PREVIEW_PATH_APP := $(OUT)/scheduler_preview_path
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
@@ -190,6 +191,14 @@ scheduler-physical-preview-smoke: $(SCHED_PHYSICAL_PREVIEW_APP)
 $(SCHED_PHYSICAL_PREVIEW_APP): scheduler_physical_preview_smoke.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -o $@ $< >&2
+
+.PHONY: scheduler-physical-preview-smoke-dynamic
+scheduler-physical-preview-smoke-dynamic: $(SCHED_PHYSICAL_PREVIEW_DYNAMIC_APP)
+
+$(SCHED_PHYSICAL_PREVIEW_DYNAMIC_APP): scheduler_physical_preview_smoke.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
 
 .PHONY: scheduler-preview-path
 scheduler-preview-path: check-linux-cc $(SCHED_PREVIEW_PATH_APP)
