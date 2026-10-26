@@ -47,12 +47,13 @@ def analyze(path: Path, prefix: str) -> dict:
             if row["load"] < row["entry"] or row["roundtrip"] < row["load"]:
                 raise ValueError(f"trial {trial} has nonmonotonic target/roundtrip timestamps")
             row["load_after_entry"] = row["load"] - row["entry"]
+            row["return_after_load"] = row["roundtrip"] - row["load"]
             block[row["mode"]] = row
         if set(block) != set(MODES):
             raise ValueError(f"block beginning at trial {first} lacks a control")
         blocks.append(block)
 
-    metrics = (*FIELDS, "load_after_entry")
+    metrics = (*FIELDS, "load_after_entry", "return_after_load")
     by_mode = {
         name: {
             metric: statistics.median(block[mode][metric] for block in blocks)
@@ -63,7 +64,7 @@ def analyze(path: Path, prefix: str) -> dict:
     paired = {}
     for mode in (1, 2):
         paired[MODES[mode]] = {}
-        for metric in ("entry", "load_after_entry", "roundtrip"):
+        for metric in ("entry", "load_after_entry", "return_after_load", "roundtrip"):
             differences = [block[mode][metric] - block[0][metric] for block in blocks]
             paired[MODES[mode]][metric] = {
                 "median_delta_vs_off": statistics.median(differences),
@@ -80,6 +81,12 @@ def analyze(path: Path, prefix: str) -> dict:
         "cpu": next(iter(cpus)),
         "mode_medians": by_mode,
         "paired_blocks": paired,
+        # The waker can return from futex_wake after the peer enters, so wake
+        # time is not always an interval before the measured peer work.
+        "peer_entry_before_wake_return": {
+            name: sum(block[mode]["entry"] < block[mode]["wake"] for block in blocks)
+            for mode, name in MODES.items()
+        },
     }
 
 
