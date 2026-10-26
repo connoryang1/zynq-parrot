@@ -1,0 +1,270 @@
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -72,6 +72,7 @@
+ struct task_struct;
+ struct pt_regs;
+ struct mm_struct;
++struct page;
+ 
+ #define BP_PREVIEW_ADDRS 4
+ 
+@@ -85,12 +86,20 @@
+ 	unsigned long bad_cause;
+ 	unsigned long bp_preview_addr[BP_PREVIEW_ADDRS];
+ 	struct mm_struct *bp_preview_mm;
++	struct page *bp_preview_pin[BP_PREVIEW_ADDRS];
++	unsigned long bp_preview_paddr[BP_PREVIEW_ADDRS];
++	struct mm_struct *bp_preview_phys_mm;
+ 	unsigned long bp_preview_hook_count;
+ 	/* Diagnostic counts for each incoming context-switch guard outcome. */
+ 	unsigned long bp_preview_guard_count[5];
+ 	unsigned long vstate_ctrl;
+ 	struct __riscv_v_ext_state vstate;
+ };
++
++int riscv_bp_preview_replace(struct task_struct *task,
++			     struct page *pages[BP_PREVIEW_ADDRS],
++			     unsigned long paddr[BP_PREVIEW_ADDRS]);
++int riscv_bp_preview_release(struct task_struct *task);
+ 
+ /* Whitelist the fstate from the task_struct for hardened usercopy */
+ static inline void arch_thread_struct_whitelist(unsigned long *offset,
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -84,20 +84,43 @@
+ 	((last) = __switch_to(__prev, __next));		\
+ } while (0)
+ 
+-/* Only a same-mm target can use the current satp translation here. The
+- * advisory hint is allowed to drop on a DTLB miss or a full hardware queue.
+- * Keep the SUM window as short as the instruction stream permits.
++/* Pinned physical hints can run before an address-space switch. Only the
++ * translated fallback requires the current satp to match the target mm.
++ * Advisory hints may drop when the hardware queue is full.
+  */
+ static __always_inline void riscv_bp_preview_next(struct task_struct *prev,
+ 						  struct task_struct *next)
+ {
+ 	unsigned long addr0, addr1, addr2, addr3;
++	unsigned long paddr0, paddr1, paddr2, paddr3;
+ 	unsigned long status;
+ 
+ 	/* Count selection before any early return so a skipped same-mm hint can
+ 	 * be separated from a handoff through idle or a different address space.
+ 	 */
+ 	next->thread.bp_preview_guard_count[0]++;
++	/* Pinned pages remain valid across an address-space switch. The custom
++	 * supervisor CSR queues an L2-only physical read without the target DTLB.
++	 */
++	if (READ_ONCE(next->thread.bp_preview_phys_mm) == next->mm && next->mm) {
++		paddr0 = READ_ONCE(next->thread.bp_preview_paddr[0]);
++		paddr1 = READ_ONCE(next->thread.bp_preview_paddr[1]);
++		paddr2 = READ_ONCE(next->thread.bp_preview_paddr[2]);
++		paddr3 = READ_ONCE(next->thread.bp_preview_paddr[3]);
++		if (paddr0 | paddr1 | paddr2 | paddr3) {
++			if (paddr0)
++				asm volatile("csrw 0x9c0, %0" : : "r"(paddr0) : "memory");
++			if (paddr1)
++				asm volatile("csrw 0x9c0, %0" : : "r"(paddr1) : "memory");
++			if (paddr2)
++				asm volatile("csrw 0x9c0, %0" : : "r"(paddr2) : "memory");
++			if (paddr3)
++				asm volatile("csrw 0x9c0, %0" : : "r"(paddr3) : "memory");
++			WRITE_ONCE(next->thread.bp_preview_hook_count,
++				   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
++			return;
++		}
++	}
+ 	if (!prev->mm) {
+ 		next->thread.bp_preview_guard_count[1]++;
+ 		return;
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -9,6 +9,8 @@
+ 
+ #include <linux/cpu.h>
+ #include <linux/kernel.h>
++#include <linux/mm.h>
++#include <linux/preempt.h>
+ #include <linux/sched.h>
+ #include <linux/sched/debug.h>
+ #include <linux/sched/task_stack.h>
+@@ -83,6 +85,68 @@
+ 		dump_backtrace(regs, NULL, KERN_DEFAULT);
+ }
+ 
++/* All physical hints are L2-only, but their reads may outlive a switch.
++ * Stop publication before canceling the shared queue. A timeout keeps page
++ * references pinned; releasing an in-flight physical address would be unsafe.
++ * Registration is limited to one possible CPU, so this local fence covers all
++ * producers of the task's hints.
++ */
++int riscv_bp_preview_release(struct task_struct *task)
++{
++	bool pinned = false;
++	unsigned int i;
++
++	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
++		pinned |= !!task->thread.bp_preview_pin[i];
++	WRITE_ONCE(task->thread.bp_preview_phys_mm, NULL);
++	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
++		WRITE_ONCE(task->thread.bp_preview_paddr[i], 0);
++	if (!pinned)
++		return 0;
++
++	preempt_disable();
++	asm volatile("csrw 0x9c0, zero" : : : "memory");
++	for (i = 0; i < 65536; i++) {
++		unsigned long status;
++
++		asm volatile("csrr %0, 0x9c0" : "=r"(status) : : "memory");
++		if (status & 1)
++			break;
++	}
++	preempt_enable();
++	if (WARN_ON_ONCE(i == 65536))
++		return -ETIMEDOUT;
++
++	for (i = 0; i < BP_PREVIEW_ADDRS; i++) {
++		struct page *page = task->thread.bp_preview_pin[i];
++
++		task->thread.bp_preview_pin[i] = NULL;
++		if (page)
++			unpin_user_page(page);
++	}
++	return 0;
++}
++
++int riscv_bp_preview_replace(struct task_struct *task,
++			     struct page *pages[BP_PREVIEW_ADDRS],
++			     unsigned long paddr[BP_PREVIEW_ADDRS])
++{
++	bool any = false;
++	unsigned int i;
++	int error;
++
++	error = riscv_bp_preview_release(task);
++	if (error)
++		return error;
++	for (i = 0; i < BP_PREVIEW_ADDRS; i++) {
++		task->thread.bp_preview_pin[i] = pages[i];
++		WRITE_ONCE(task->thread.bp_preview_paddr[i], paddr[i]);
++		any |= !!pages[i];
++	}
++	WRITE_ONCE(task->thread.bp_preview_phys_mm, any ? task->mm : NULL);
++	return 0;
++}
++
+ #ifdef CONFIG_COMPAT
+ static bool compat_mode_supported __read_mostly;
+ 
+@@ -138,6 +202,7 @@
+ 
+ void flush_thread(void)
+ {
++	WARN_ON_ONCE(riscv_bp_preview_release(current));
+ 	memset(current->thread.bp_preview_addr, 0,
+ 	       sizeof(current->thread.bp_preview_addr));
+ 	current->thread.bp_preview_mm = NULL;
+@@ -164,6 +229,7 @@
+ 
+ void arch_release_task_struct(struct task_struct *tsk)
+ {
++	WARN_ON_ONCE(riscv_bp_preview_release(tsk));
+ 	/* Free the vector context of datap. */
+ 	if (has_vector())
+ 		kfree(tsk->thread.vstate.datap);
+@@ -173,6 +239,12 @@
+ {
+ 	fstate_save(src, task_pt_regs(src));
+ 	*dst = *src;
++	/* The new task must never inherit pin ownership before copy_thread(). */
++	memset(dst->thread.bp_preview_pin, 0,
++	       sizeof(dst->thread.bp_preview_pin));
++	memset(dst->thread.bp_preview_paddr, 0,
++	       sizeof(dst->thread.bp_preview_paddr));
++	dst->thread.bp_preview_phys_mm = NULL;
+ 	/* clear entire V context, including datap for a new task */
+ 	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
+ 
+@@ -189,6 +261,11 @@
+ 	memset(p->thread.bp_preview_addr, 0,
+ 	       sizeof(p->thread.bp_preview_addr));
+ 	p->thread.bp_preview_mm = NULL;
++	memset(p->thread.bp_preview_pin, 0,
++	       sizeof(p->thread.bp_preview_pin));
++	memset(p->thread.bp_preview_paddr, 0,
++	       sizeof(p->thread.bp_preview_paddr));
++	p->thread.bp_preview_phys_mm = NULL;
+ 	p->thread.bp_preview_hook_count = 0;
+ 	memset(p->thread.bp_preview_guard_count, 0,
+ 	       sizeof(p->thread.bp_preview_guard_count));
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -309,5 +309,7 @@
+ #define PR_BP_PREVIEW_SET		0x42505056
+ #define PR_BP_PREVIEW_GET_COUNT	0x42505057
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
++/* Pin up to four target user pages for cross-mm physical L2 preview. */
++#define PR_BP_PREVIEW_PIN_SET	0x42505059
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -74,6 +74,9 @@
+ #include <linux/uaccess.h>
+ #include <asm/io.h>
+ #include <asm/unistd.h>
++#ifdef CONFIG_RISCV
++#include <asm/processor.h>
++#endif
+ 
+ #include "uid16.h"
+ 
+@@ -2744,6 +2747,46 @@
+ 		WRITE_ONCE(me->thread.bp_preview_mm, any ? me->mm : NULL);
+ 		break;
+ 	}
++	case PR_BP_PREVIEW_PIN_SET: {
++		unsigned long addr[BP_PREVIEW_ADDRS] = { arg2, arg3, arg4, arg5 };
++		unsigned long paddr[BP_PREVIEW_ADDRS] = {};
++		struct page *pages[BP_PREVIEW_ADDRS] = {};
++		unsigned int i;
++		int pinned;
++
++		/* A local CSR drain cannot cover hints issued on a second CPU. */
++		if (!me->mm || num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		for (i = 0; i < BP_PREVIEW_ADDRS; i++) {
++			if (!addr[i])
++				continue;
++			if (!access_ok((void __user *)addr[i], 1)) {
++				error = -EINVAL;
++				goto preview_unpin_new;
++			}
++			pinned = pin_user_pages_fast(addr[i], 1, FOLL_LONGTERM,
++						    &pages[i]);
++			if (pinned != 1) {
++				error = pinned < 0 ? pinned : -EFAULT;
++				goto preview_unpin_new;
++			}
++			paddr[i] = page_to_phys(pages[i]) + offset_in_page(addr[i]);
++			if (paddr[i] >> 34) {
++				error = -ERANGE;
++				goto preview_unpin_new;
++			}
++		}
++		error = riscv_bp_preview_replace(me, pages, paddr);
++		if (!error)
++			break;
++preview_unpin_new:
++		for (i = 0; i < BP_PREVIEW_ADDRS; i++)
++			if (pages[i])
++				unpin_user_page(pages[i]);
++		break;
++	}
+ 	case PR_BP_PREVIEW_GET_COUNT:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
