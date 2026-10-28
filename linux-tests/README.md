@@ -616,6 +616,32 @@ transcripts and exact artifact hashes are in
 `logs/linux-physical-pin-20261026/board-probe/` and RL-106. Useful overlap
 and speedup remain unmeasured.
 
+## Cross-process first-use physical preview diagnostic
+
+`scheduler_physical_preview_miss.c` alternates disabled and enabled physical
+registration for a child's four target lines over 16 pipe handoffs. It evicts
+those lines from L1 before each handoff, snapshots preview event counters when
+the child wakes, and arms the D-cache demand recorder only around the four
+loads. Use the same patched Linux and timing-qualified quiesce RTL as the smoke
+above; the recorder is core-wide and the test is a local first-use diagnostic.
+
+```sh
+make -C linux-tests scheduler-physical-preview-miss-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+make -C linux-tests scheduler-physical-preview-trace-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+```
+
+The trace build also records physical preview completion addresses, side-buffer
+removals, and demand addresses for the first three trials. On PYNQ-Z2, enabled
+previews completed before the target loads and matched their physical lines.
+The RTL drains physical preview replies without writing the D-cache side buffer,
+so equal L1 demand-miss counts across enabled and disabled trials are expected.
+The status field named `published` means response completion for physical hints.
+The 16-trial local load times overlapped; L2 residency and whole-switch benefit
+remain unmeasured. Exact ELFs, closed transcripts, and limitations are recorded
+in `logs/linux-physical-pin-20261026/` and RL-107.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder
