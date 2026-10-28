@@ -16,7 +16,27 @@
 #define PR_BP_PREVIEW_GET_COUNT 0x42505057
 #define PR_BP_PREVIEW_PIN_SET 0x42505059
 
-enum { lines = 4, rounds = 32, line_bytes = 64, page_bytes = 4096 };
+enum { lines = 4, default_rounds = 32, line_bytes = 64, page_bytes = 4096 };
+
+#ifdef __riscv
+/* The FPGA recorder is core-wide; its four preview counters saturate at 255.
+ * Control bit 1 clears them without arming the demand-miss trace.
+ */
+static void clear_preview_counters(void)
+{
+	const unsigned long clear = 2;
+
+	__asm__ volatile("csrw 0x805, %0" : : "r"(clear) : "memory");
+}
+
+static unsigned long read_preview_counters(void)
+{
+	unsigned long value;
+
+	__asm__ volatile("csrr %0, 0x805" : "=r"(value) : : "memory");
+	return value;
+}
+#endif
 
 static void fail(const char *what)
 {
@@ -32,7 +52,8 @@ static void transfer(int fd, void *data, size_t count, int send)
 		fail(send ? "write pipe" : "read pipe");
 }
 
-static void participant(int recv_fd, int send_fd, int child, int mode)
+static void participant(int recv_fd, int send_fd, int child, int mode,
+			unsigned int rounds)
 {
 	volatile uint64_t *page;
 	unsigned long addr[lines] = {};
@@ -92,7 +113,7 @@ static void participant(int recv_fd, int send_fd, int child, int mode)
 	if (enabled && !(mode == 2 && child)
 	    && prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
 		fail("release preview page");
-	printf("PHYSICAL_PREVIEW child=%d mode=%d hooks=%lu rounds=%d PASS\n",
+	printf("PHYSICAL_PREVIEW child=%d mode=%d hooks=%lu rounds=%u PASS\n",
 	       child, mode, after - before, rounds);
 	if (munmap((void *)page, page_bytes))
 		fail("munmap target");
@@ -101,34 +122,66 @@ static void participant(int recv_fd, int send_fd, int child, int mode)
 int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
-	int mode = argc == 2 && argv[1][0] && !argv[1][1]
+	int mode = argc >= 2 && argc <= 3 && argv[1][0] && !argv[1][1]
 		? argv[1][0] - '0' : -1;
+	unsigned int rounds = default_rounds;
 	pid_t child;
 
 	if (mode < 0 || mode > 2) {
-		fprintf(stderr, "usage: %s 0|1|2\n", argv[0]);
+		fprintf(stderr, "usage: %s 0|1|2 [rounds: 1..32]\n", argv[0]);
 		return 2;
+	}
+	if (argc == 3) {
+		const char *digit = argv[2];
+		unsigned int value = 0;
+
+		while (*digit >= '0' && *digit <= '9' && value <= default_rounds)
+			value = value * 10 + *digit++ - '0';
+		if (digit == argv[2] || *digit || !value || value > default_rounds) {
+			fprintf(stderr, "rounds must be 1..32\n");
+			return 2;
+		}
+		rounds = value;
 	}
 	if (pipe(to_child) || pipe(to_parent))
 		fail("pipe");
+#ifdef __riscv
+	clear_preview_counters();
+#endif
 	child = fork();
 	if (child < 0)
 		fail("fork");
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		participant(to_child[0], to_parent[1], 1, mode);
+		participant(to_child[0], to_parent[1], 1, mode, rounds);
 		return 0;
 	}
 	close(to_child[0]);
 	close(to_parent[1]);
-	participant(to_parent[0], to_child[1], 0, mode);
+	participant(to_parent[0], to_child[1], 0, mode, rounds);
 	if (waitpid(child, &status, 0) != child)
 		fail("waitpid");
 	if (!WIFEXITED(status) || WEXITSTATUS(status)) {
 		fprintf(stderr, "child failed: status=%d\n", status);
 		return 1;
 	}
+#ifdef __riscv
+	{
+		unsigned long counters = read_preview_counters();
+		unsigned dcache_hint = (counters >> 21) & 255;
+		unsigned admitted = (counters >> 29) & 255;
+		unsigned issued = (counters >> 37) & 255;
+		unsigned published = (counters >> 45) & 255;
+
+		printf("PHYSICAL_PREVIEW_HW mode=%d dcache_hint=%u admitted=%u issued=%u published=%u\n",
+		       mode, dcache_hint, admitted, issued, published);
+		if (mode && (!admitted || !issued)) {
+			fprintf(stderr, "no preview reached L2: mode=%d\n", mode);
+			return 1;
+		}
+	}
+#endif
 	puts("PHYSICAL_PREVIEW_SMOKE PASS");
 	return 0;
 }

@@ -601,11 +601,20 @@ make -C linux-tests scheduler-physical-preview-smoke-dynamic \
 
 Run the dynamic executable from the Linux shell with `0` for no registration,
 `1` for explicit registration and release, or `2` to leave the child's pins
-for the task-exit hook. The two processes alternate through 32 pipe handoffs
-and check four data lines after each wakeup. The hook counts show scheduler
-execution; they do not prove hardware admission or measure a speedup. This
-smoke has compiled and passed its host pipe control, but its enabled modes
-still require a boot of the matching FPGA image.
+for the task-exit hook. An optional second argument selects 1–32 rounds;
+the default is 32. The two processes alternate on pipes and check four data
+lines after each wakeup. On RV64, the program clears and reads the core-wide
+preview recorder, printing D-cache hint, UCE admission, L2 issue, and
+publication counts. These 8-bit counters saturate at 255 and are not a
+per-process admission rate.
+
+On the timing-qualified quiesce PYNQ-Z2 image, all three default 32-round
+modes passed with exit zero. A separate 8-round run showed 0/0/0
+admission/issue/publication in disabled mode and 92/92/92 and 132/132/132 in
+enabled modes, proving hardware preview activity under Linux. The closed
+transcripts and exact artifact hashes are in
+`logs/linux-physical-pin-20261026/board-probe/` and RL-106. Useful overlap
+and speedup remain unmeasured.
 
 ## Ordered Linux handoff miss capture
 
