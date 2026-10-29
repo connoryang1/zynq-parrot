@@ -6,6 +6,10 @@
 
 #include "bp_utils.h"
 
+#ifndef BP_NO_TARGET_PHYSICAL_PREVIEW
+#define BP_NO_TARGET_PHYSICAL_PREVIEW 0
+#endif
+
 struct line { uint64_t word[8]; };
 static const volatile struct line target[4]
   __attribute__((aligned(4096), used)) = {
@@ -82,11 +86,16 @@ int main(void)
   }
 
   trace_control(2);
+#if !BP_NO_TARGET_PHYSICAL_PREVIEW
   for (unsigned i = 0; i < 4; ++i)
     physical_hint((uint64_t)(uintptr_t)&target[i].word[0]);
   status = wait_published(4);
   if (((status >> 29) & 0xff) != 4 || ((status >> 37) & 0xff) != 4)
     fail("four hints were not admitted and issued");
+#else
+  /* The waveform, rather than a CSR read adjacent to the clear edge,
+   * verifies that no target-address preview entered the L2 controller. */
+#endif
 
   trace_control(1); /* Count demand misses without clearing the queue. */
   /* The recorder arms at the CSR edge. Keep the first target load outside
@@ -105,7 +114,11 @@ int main(void)
   if (((status >> 9) & 0x1ff) != 4)
     fail("physical preview unexpectedly supplied an L1 demand");
 
+#if BP_NO_TARGET_PHYSICAL_PREVIEW
+  bp_print_string("[BSG-PASS] physical preview L2 no-target-hint control\n");
+#else
   bp_print_string("[BSG-PASS] physical preview CSR DRAM and PMA gates\n");
+#endif
   bp_finish(0);
   return 0;
 }

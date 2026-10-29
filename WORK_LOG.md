@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Physical-preview L2 fill control — 2026-10-28:** a traced full two-bank simulation paired the physical-hint CSR gate with a same-address no-target-hint control: hints caused four target L2 DMA fills before demand and the later four demands caused none, while the control's four demands each caused a target DMA fill. Both guest/host gates passed; this confirms the directed L2 warming mechanism but leaves Linux L2 residency and speedup unmeasured (`logs/l2-physical-preview-20261028/`, RL-108).
+
 - **Physical-preview first-use mechanism — 2026-10-28:** a guest-verified 16-trial cross-process diagnostic found four physical preview responses complete before the child's target loads, while enabled and disabled L1 D-cache miss counts were alike. A separate address trace matched all four completed preview addresses to later target demand lines roughly 7.9–9.8 thousand cycles ahead; RTL review confirms physical replies bypass the L1 side buffer, so these L1 counts cannot establish or reject L2 benefit (`logs/linux-physical-pin-20261026/board-probe/`, RL-107).
 
 - **Same-image Linux boot stall — 2026-10-28:** one hash-verified quiesce package/NBF run stopped after `debug_vm_pgtable` before the new user diagnostic could run, despite earlier successful boots; a full power cycle and exact overlay reload restored normal boot for the matched retry. The cause remains unconfirmed, and the pre-shell stop is retained separately from the accepted diagnostic transcript (`logs/linux-physical-pin-20261026/board-probe/preload-instrument-boot-stall.log`, RL-107).

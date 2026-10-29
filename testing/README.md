@@ -609,6 +609,34 @@ old shared-FIFO delay and requires the ordinary regression to reject it.
 The named FPGA configuration matches the complete parameter struct of the
 macro-selected two-bank simulator configuration, including metadata width 50.
 
+### Physical-preview L2 fill control
+
+The CSR physical-preview gate and `mt_physical_preview_l2_control_test` use the
+same four 64-byte target lines. The control includes the same source with only
+the four target-address hint writes disabled. In the full two-bank model, trace
+accepted target requests at the L2 controller and target DMA reads at both
+cache banks; the minimal core model has no L2 and cannot answer this question.
+
+```sh
+make -C testing clean
+env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' \
+  make -C testing run-mt_physical_preview_csr_test \
+  SIM_DIR="$PWD/cosim/black-parrot-example/verilator" \
+  NUM_THREADS=2 NUM_CONTEXTS=10 TRACE=1 TARGET_RUNTIME_MS=100
+# Archive the closed dump.fst and run.log before the next test.
+make -C testing clean
+env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' \
+  make -C testing run-mt_physical_preview_l2_control_test \
+  SIM_DIR="$PWD/cosim/black-parrot-example/verilator" \
+  NUM_THREADS=2 NUM_CONTEXTS=10 TRACE=1 TARGET_RUNTIME_MS=100
+```
+
+The accepted paired waveform showed four hint-time target DMA fills and no
+later target-demand DMA reads, versus four demand-time target DMA reads in the
+control. The exact ELFs, traces, parser, and limitations are in
+`logs/l2-physical-preview-20261028/` and RL-108. This proves a directed L2
+mechanism; Linux L2 residency and speedup still need measurement.
+
 ## Other context-switch limits
 
 The 46-case register-target regression fails on RTL `1b9e611d4` and passes on
