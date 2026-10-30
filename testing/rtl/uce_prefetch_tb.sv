@@ -15,6 +15,7 @@ module uce_prefetch_tb
    input [2:0] metadata_way_i,
    input arrays_accept_i,
    output req_yumi_o, req_lock_o, critical_o, last_o, credits_full_o, credits_empty_o,
+   output [3:0] prefetch_count_o,
    output [3:0] req_id_o,
    output tag_v_o, data_v_o,
    output [2:0] tag_opcode_o, data_way_o,
@@ -85,6 +86,7 @@ module uce_prefetch_tb
   assign fwd_way_o = 8'(fwd.payload.way_id);
   assign fwd_state_o = fwd.payload.state;
   assign fwd_prefetch_o = fwd.payload.prefetch;
+  assign prefetch_count_o = 4'($countones(dut.prefetch_valid_r));
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(1), .assoc_p(assoc_lp),
            .prefetch_els_p(10),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
@@ -95,6 +97,8 @@ module uce_prefetch_tb
          .cache_req_metadata_v_i(metadata_v_i), .cache_req_id_o(req_id_o),
          .cache_req_critical_o(critical_o), .cache_req_last_o(last_o),
          .cache_req_credits_full_o(credits_full_o), .cache_req_credits_empty_o(credits_empty_o),
+         .detached_prefetch_addr_i('0), .detached_prefetch_v_i(1'b0),
+         .detached_prefetch_ready_and_o(),
          .tag_mem_pkt_o(tag_pkt), .tag_mem_pkt_v_o(tag_v_o),
          .tag_mem_pkt_yumi_i(tag_v_o & arrays_accept_i), .tag_mem_i('0),
          .data_mem_pkt_o(data_pkt), .data_mem_pkt_v_o(data_v_o),

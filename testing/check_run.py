@@ -66,6 +66,7 @@ TEST_MARKERS = {
     "mt_dirty_eviction_integrity_test": "[BSG-PASS] dirty eviction integrity",
     "mt_prefetch_dirty_victim_test": "[BSG-PASS] detached prefetch dirty victim",
     "mt_prefetch_protocol_test": "[BSG-PASS] detached prefetch protocol",
+    "mt_icache_replay_test": "[BSG-PASS] physical I-cache replay and fence cancellation",
     "mt_umode_prefetch_test": "[BSG-PASS] U-mode Sv39 nonfaulting prefetch permissions",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
     "mt_ctxtsw_pure_ring_stress_test": "[BSG-PASS] pure ctxtsw ring stress completed",

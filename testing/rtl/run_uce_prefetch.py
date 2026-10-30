@@ -13,6 +13,13 @@ import shlex
 import subprocess
 
 
+def dependency_name(path, root):
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
+
+
 def main():
     root = Path(__file__).resolve().parents[2]
     parser = argparse.ArgumentParser(description=__doc__)
@@ -66,7 +73,7 @@ def main():
     for line in (out / "obj/Vuce_prefetch__verFiles.dat").read_text().splitlines():
         if line.startswith("S "):
             dependencies.add(Path(shlex.split(line)[-1]))
-    hashes = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+    hashes = {dependency_name(path, root): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in sorted(dependencies)}
     artifact_hashes = {str(path.relative_to(out)): hashlib.sha256(path.read_bytes()).hexdigest()
                       for path in (out / "run.log", out / "uce-prefetch.fst",

@@ -80,6 +80,7 @@ CORRECTNESS_TESTS := \
     mt_dirty_eviction_integrity_test \
     mt_prefetch_dirty_victim_test \
     mt_prefetch_protocol_test \
+    mt_icache_replay_test \
     mt_umode_resident_sv39_data_handoff_test \
     mt_ctxtsw_register_target_test \
     mt_ctxtsw_target_bypass_stress_test \
