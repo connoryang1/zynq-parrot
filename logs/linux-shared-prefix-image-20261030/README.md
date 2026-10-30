@@ -26,3 +26,11 @@ not copied here. The committed 197-line table was trained on the prior kernel
 image. This checkpoint therefore proves binary integration, not performance;
 the patched kernel must be traced with replay disabled and the table regenerated
 before an enabled/disabled comparison with a byte-identical kernel.
+
+The first forced disabled rebuild caught a build-control defect:
+`platform-cppflags-y` affected linker-script preprocessing but not the C
+compilation of `platform.c`. The switch now uses `platform-cflags-y`. The
+corrected disabled payload has SHA-256
+`a29cc6b86e7e5983e45ef2df753bb6f89d986aa44be550077b455d48203583a8`;
+its `platform_early_init` contains no `0x7c1` writes and writes `(1 << 63)` to
+`0x7c2`, configuring zero entries while clearing counters.

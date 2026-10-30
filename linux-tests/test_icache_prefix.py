@@ -34,6 +34,16 @@ class IcachePrefixTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "not line aligned"):
             EMITTER.render(malformed)
 
+    def test_enable_switch_reaches_platform_c_compilation(self):
+        objects = (
+            HERE / "opensbi-platform/blackparrot/objects.mk"
+        ).read_text()
+        self.assertIn(
+            "platform-cflags-y += "
+            "-DBP_ICACHE_PREFIX_ENABLE=$(BP_ICACHE_PREFIX_ENABLE)",
+            objects,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
