@@ -8,12 +8,15 @@ seed_repo_dir=${ZP_FPGA_SEED_REPO_DIR:-$repo_dir}
 seed_repo_dir=$(cd "$seed_repo_dir" && pwd)
 run_root=${ZP_FPGA_LOG_ROOT:-"$repo_dir/logs/fpga"}
 run_root=$(mkdir -p "$run_root" && cd "$run_root" && pwd)
+work_root=${ZP_FPGA_WORK_ROOT:-/tmp}
+work_root=$(mkdir -p "$work_root" && cd "$work_root" && pwd)
 # Allow a clean detached source snapshot to drive the build while retaining
 # logs in the active checkout.  This avoids mixing unrelated development edits
 # into an otherwise immutable routed implementation.
 export ZP_REPO_DIR="$repo_dir"
 export ZP_FPGA_SEED_REPO_DIR="$seed_repo_dir"
 export ZP_FPGA_LOG_ROOT="$run_root"
+export ZP_FPGA_WORK_ROOT="$work_root"
 
 # Keep the immutable worker and its recorded configuration in lock-step.  The
 # historical full-system flow defaults to the stock aviary configuration, but
@@ -55,7 +58,7 @@ shell_quote() {
 
 usage() {
   echo "usage: $0 start | list | status <job-id> | worker <job-id> <commit>"
-  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, ZP_FPGA_SEED_REPO_DIR"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
 }
 
 case ${1:-} in
@@ -96,6 +99,7 @@ case ${1:-} in
       "ZP_REPO_DIR=$repo_dir"
       "ZP_FPGA_SEED_REPO_DIR=$seed_repo_dir"
       "ZP_FPGA_LOG_ROOT=$run_root"
+      "ZP_FPGA_WORK_ROOT=$work_root"
       "FPGA_CFG=$fpga_cfg"
       "FPGA_VIVADO_THREADS=$fpga_threads"
       "FPGA_NUM_THREADS=$fpga_num_threads"
@@ -122,7 +126,7 @@ case ${1:-} in
     job_id=$2
     commit=$3
     job_dir="$run_root/$job_id"
-    worktree="/tmp/zynq-parrot-fpga-$job_id"
+    worktree="$work_root/zynq-parrot-fpga-$job_id"
     # A shell exit code alone is not enough: interrupted Vivado child runs have
     # previously made GNU make print "No child processes" while the worker's
     # EXIT trap still observed zero.  Keep the pessimistic marker until every
