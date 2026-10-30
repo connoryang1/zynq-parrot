@@ -19,7 +19,7 @@ class Test {
   VerilatedContext context;
   Vuce_icache_replay dut{&context};
   VerilatedFstC trace;
-  unsigned cycles = 0, data_writes = 0, publishes = 0;
+  unsigned cycles = 0, data_writes = 0, side_writes = 0, publishes = 0;
   std::vector<Header> sent;
 
   Handshake step() {
@@ -29,7 +29,8 @@ class Test {
     // the physical I-cache.  Victim selection and invalidation still require
     // exclusive cache-array ownership; frontend hits do not appear as UCE
     // demand requests and therefore cannot provide their own exclusion.
-    if (!dut.reset_i && dut.install_state_o >= 1 && dut.install_state_o <= 8)
+    if (!dut.reset_i && !dut.side_buffer_o
+        && dut.install_state_o >= 1 && dut.install_state_o <= 8)
       require(dut.req_lock_o,
               "demand-priority replay failed to lock cache arrays");
     Handshake accepted{bool(dut.req_yumi_o), bool(dut.replay_ready_o),
@@ -38,14 +39,15 @@ class Test {
       sent.push_back({dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o,
                       dut.fwd_state_o, dut.fwd_addr_o, bool(dut.fwd_prefetch_o)});
     if (!dut.reset_i && dut.data_v_o && dut.arrays_accept_i
-        && dut.data_opcode_o == 0) {
+        && dut.data_opcode_o == (dut.side_buffer_o ? 3 : 0)) {
       unsigned beat = 0, mask = dut.data_fill_o;
       require(mask && !(mask & (mask-1)), "installer emitted invalid fill mask");
       while ((1u << beat) != mask) ++beat;
       require(dut.data_word0_o == seed + beat*2
               && dut.data_word1_o == seed + beat*2 + 1,
               "installer corrupted a replay beat");
-      ++data_writes;
+      if (dut.side_buffer_o) ++side_writes;
+      else ++data_writes;
     }
     if (!dut.reset_i && dut.tag_v_o && dut.arrays_accept_i
         && dut.tag_opcode_o == 1)
@@ -136,8 +138,48 @@ public:
     require(sent[0].prefetch && sent[0].size == 6
             && sent[0].addr == 0x80010000, "full-line request malformed");
     response(sent[0]); wait_idle_empty();
-    require(data_writes == 4 && publishes == 1,
-            "complete replay did not install exactly one full line");
+    if (dut.side_buffer_o)
+      require(side_writes == 4 && data_writes == 0 && publishes == 0,
+              "complete replay did not retire exactly one detached line");
+    else
+      require(data_writes == 4 && publishes == 1,
+              "complete replay did not install exactly one full line");
+
+    if (dut.side_buffer_o) {
+      // Reproduce the physical race in the actual detached-buffer mode: the
+      // demand is already resident when a same-line replay is admitted. The
+      // completed advisory response must retire its slot and release the
+      // ordinary miss instead of waiting for an L1 tag publication that this
+      // mode intentionally never performs.
+      dut.fwd_ready_i = 0;
+      enqueue(0x80015000);
+      enqueue(0x80016000);
+      tick(10);
+      request(miss_load, 0x80014000);
+      enqueue(0x80014000);
+      dut.fwd_ready_i = 1;
+      wait_sent(4);
+      require(sent[1].prefetch && sent[2].prefetch && sent[3].prefetch
+              && sent[3].addr == 0x80014000,
+              "side-buffer same-line replay did not issue ahead of demand");
+      unsigned old_side_writes = side_writes;
+      response(sent[3]);
+      wait_sent(5);
+      require(!sent[4].prefetch && sent[4].addr == 0x80014000,
+              "side-buffer same-line demand remained blocked");
+      require(side_writes == old_side_writes + 4,
+              "resident same-line replay did not stream one complete line");
+      response(sent[4]);
+      for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
+      response(sent[1]);
+      response(sent[2]);
+      wait_idle_empty();
+      require(dut.replay_valid_o == 0,
+              "side-buffer same-line replay slot was not retired");
+      std::cout << "[UCE-ICACHE-REPLAY] PASS: detached retirement and "
+                   "resident same-line demand progress\n";
+      return;
+    }
 
     // Direct physical replay bypasses the ordinary cache lookup. A line that
     // is already resident in any way must be dropped instead of being

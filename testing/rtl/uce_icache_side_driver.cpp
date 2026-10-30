@@ -62,8 +62,7 @@ class Test {
     }
     throw std::runtime_error("detached request issue timeout");
   }
-  void respond(const Header &h) {
-    for (unsigned beat = 0; beat < 4; ++beat) {
+  void respond_beat(const Header &h, unsigned beat) {
       dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
       dut.rev_way_i = h.way; dut.rev_state_i = h.state;
       dut.rev_prefetch_i = h.prefetch;
@@ -77,6 +76,10 @@ class Test {
       }
       require(accepted, "detached response timeout");
       dut.rev_v_i = 0; step();
+  }
+  void respond(const Header &h, unsigned first = 0) {
+    for (unsigned beat = first; beat < 4; ++beat) {
+      respond_beat(h, beat);
     }
   }
   void invalidate() {
@@ -113,21 +116,17 @@ public:
             "completed line did not retire as four advisory beats");
 
     // If fence.i arrives after a partial side-buffer publication, it must
-    // cancel the remaining beats and retire the UCE slot rather than strand
-    // the fill state after the cache-local buffer has been cleared.
+    // cancel and drain the remaining memory beats without forwarding them.
+    // The cache-local buffer independently clears its partial entry at the
+    // same invalidation boundary.
     Header cancelled = enqueue_and_issue(line + 0x1000);
-    dut.arrays_accept_i = 0;
-    respond(cancelled);
-    for (unsigned n = 0; n < 50 && dut.install_state_o != 7; ++n) step();
-    require(dut.install_state_o == 7 && dut.data_v_o,
-            "cancel test did not reach held side-buffer fill");
-    dut.arrays_accept_i = 1; step();
-    require(masks.size() == 5, "cancel test did not publish exactly one beat");
+    respond_beat(cancelled, 0);
+    require(masks.size() == 5, "cancel test did not forward its first beat");
     invalidate();
+    respond(cancelled, 1);
     for (unsigned n = 0; n < 50 && dut.replay_valid_o; ++n) step();
-    require(!dut.replay_valid_o && dut.install_state_o != 7
-            && masks.size() == 5,
-            "fence failed to cancel partial side-buffer retirement");
+    require(!dut.replay_valid_o && masks.size() == 5,
+            "fence failed to drain cancelled side-buffer beats");
     std::cout << "[UCE-ICACHE-SIDE] PASS: four-beat detached retirement, "
                  "zero live-array lock/tag/data/stat writes, fence cancellation\n";
   }

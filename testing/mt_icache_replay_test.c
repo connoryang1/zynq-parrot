@@ -18,6 +18,20 @@ REPLAY_TARGET(replay_target_c, 41)
 REPLAY_TARGET(replay_target_d, 53)
 REPLAY_TARGET(replay_target_cancel, 61)
 
+/* A detached reply must not leave the UCE or memory link in a state that only
+ * fails on a later architectural miss.  This body is deliberately larger
+ * than L1-I and is executed after replay retirement to force ordinary refill
+ * traffic instead of ending the test while the replayed prefix is still hot. */
+static void __attribute__((naked, noinline, aligned(64), used))
+post_replay_demand_stream(void)
+{
+  __asm__ volatile(
+    ".rept 16384\n"
+    "nop\n"
+    ".endr\n"
+    "ret\n");
+}
+
 static volatile uint64_t observed_status, observed_cause, observed_phase;
 
 static void replay_enqueue(const void *paddr)
@@ -148,6 +162,8 @@ int main(void)
   if (replay_target_a(100) != 117 || replay_target_b(100) != 129
       || replay_target_c(100) != 141 || replay_target_d(100) != 153)
     fail();
+
+  post_replay_demand_stream();
 
   /* fence.i must cancel the old replay epoch. An already-issued response may
    * return, but it must drain without publishing and ordinary demand must

@@ -21,6 +21,8 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--verilator", type=Path,
                         default=Path("/home/coyang/zynq-parrot/install/bin/verilator"))
+    parser.add_argument("--side-buffer", action="store_true",
+                        help="exercise the FPGA detached instruction buffer mode")
     args = parser.parse_args()
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -39,6 +41,8 @@ def main():
     command = [str(args.verilator.resolve()), "--cc", "--exe", "--build", "--assert",
                "--trace-fst", "--top-module", "uce_icache_replay_tb", "--prefix",
                "Vuce_icache_replay", "--Mdir", str(out / "obj"), "-j", "2", "-Wno-fatal"]
+    if args.side_buffer:
+        command += ["-Gside_buffer_p=1"]
     command += [f"+incdir+{path}" for path in includes]
     for path in libraries:
         command += ["-y", str(path)]
@@ -59,7 +63,8 @@ def main():
         if line.startswith("S "):
             dependencies.add(Path(shlex.split(line)[-1]))
     verification = {
-        "scope": "Standalone UCE physical I-cache replay protocol; no core/FPGA acceptance",
+        "scope": ("Standalone UCE physical I-cache replay protocol; "
+                  f"side_buffer={int(args.side_buffer)}; no core/FPGA acceptance"),
         "source_sha256": {
             dependency_name(path, root): hashlib.sha256(path.read_bytes()).hexdigest()
             for path in sorted(dependencies)

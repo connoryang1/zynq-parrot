@@ -30,6 +30,7 @@ module uce_icache_replay_tb
    output [63:0] data_word0_o, data_word1_o,
    output [3:0] install_state_o,
    output [3:0] replay_valid_o, replay_sent_o, replay_complete_o, replay_cancel_o,
+   output side_buffer_o,
    output fwd_v_o,
    input fwd_ready_i,
    output [3:0] fwd_type_o,
@@ -129,6 +130,7 @@ module uce_icache_replay_tb
          .mem_rev_ready_and_o(rev_ready_o));
 
   assign install_state_o = dut.prefetch_install_state_r;
+  assign side_buffer_o = side_buffer_p;
   assign replay_valid_o = dut.prefetch_valid_r;
   assign replay_sent_o = dut.prefetch_sent_r;
   assign replay_complete_o = dut.prefetch_complete_r;
