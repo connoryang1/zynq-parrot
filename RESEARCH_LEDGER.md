@@ -531,12 +531,21 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 
 ### RL-057 — Live I-cache replay installation must remain atomic through publication
 
-- **Status:** accepted integrated-simulation fix; route and physical Linux acceptance pending
+- **Status:** physically rejected as a sufficient architecture; retained only as a live-array invariant
 - **Scope:** RL-056's timing-clean one-line FPGA image, the replay installer's drain/tag/stat/invalidate/fill/publish sequence, the demand-priority I-cache configuration, and the focused, broad-UCE, and full-core replay tests
-- **Claim:** the exported-lock image moves the physical failure from direct instruction tearing to a later NULL dereference at `rest_init+0x50`, but still does not boot Linux. The installer lock ended after victim invalidation, allowing live frontend accesses during the four-beat data fill and final tag publication. Per-port SRAM handshakes avoid an individual read/write collision, but do not make a multi-beat replacement atomic with respect to the frontend's banked data and tag pipeline. The conservative fix therefore retains cache-array ownership through `e_pf_fill` and `e_pf_publish`. The focused driver now requires lock assertion for every installer state from drain through publication; focused replay, broad UCE prefetch, and a clean integrated two-thread/four-context full-core replay all reach guest/core/host PASS.
-- **Evidence:** prior physical failure `logs/linux-replay-ab-20261030/prefix-1/board-demandlock-panic.log` (SHA-256 `1a84291fc8413bf91a7f40cc56f49e25684f6db8e59527ccdf2e6f921ec945d2`); focused run `/dev/shm/uce-icache-replay-full-lock-r1/`; broad run `/dev/shm/uce-prefetch-full-lock-r1/`; integrated current-source replay run in `testing/logs/`
-- **Meaning:** array exclusion is a transaction boundary, not merely protection for victim selection and invalidation. A live instruction cache must not resume until every data beat is installed and the replacement tag is published as one coherent transition.
-- **Limits:** simulation does not prove Linux liveness or performance. The exact next gate is a timing-clean route and fresh-boot one-line FPGA run; only after that reaches a shell may the 63-line enabled/disabled cycle pair be interpreted.
+- **Claim:** the exported-lock image moves the physical failure from direct instruction tearing to a later NULL dereference at `rest_init+0x50`, but still does not boot Linux. Extending the lock through the four-beat fill and tag publication passes focused, broad-UCE, and full-core simulation and routes at +0.807/+0.023 ns setup/hold, yet the fresh-board one-line Linux gate still produces the same later corruption. A count-zero binary with identical firmware/table layout reaches a shell. Repointing the one active replay from scheduler line `0x8023d480` to valid unrelated kernel-entry line `0x80200000` still corrupts execution in `__schedule`.
+- **Evidence:** routed job `logs/fpga-farm/bp2/20261030T180351Z-02fe1b8e/`; physical atomic, count-zero, and unrelated-line transcripts in `logs/linux-icache-side-buffer-20261030/`.
+- **Meaning:** atomic exclusion is necessary for any live-array slow path but is not sufficient for this banked frontend. The matched controls show that active asynchronous installation itself, rather than the selected line or table configuration, is unsafe under Linux execution. Further lock refinements are no longer the selected path.
+- **Limits:** this does not prove that every conceivable live-L1 injection design is impossible. It proves the implemented UCE slow-port replacement architecture physically unsafe and supplies no performance result.
+
+### RL-058 — Detached instruction replay avoids every live L1 array mutation
+
+- **Status:** accepted focused and full-core simulation checkpoint; FPGA/Linux performance pending
+- **Scope:** sixteen fully tagged 64-byte advisory instruction lines, four 128-bit completion beats per line, ordinary physical-address/MMU authorization, `fence.i` invalidation, the four-slot detached UCE transport, and the maintained two-resident/four-logical full core
+- **Claim:** a completed UCE line retires as four advisory packets with zero cache-array lock and zero tag/data/stat write. The I-cache keeps a partial line invisible, returns all eight 64-bit words correctly after the fourth beat, and clears the detached copy on accepted invalidation; a fence arriving after the first transferred beat cancels the remaining transfer and releases the UCE slot. Word-banked storage avoids a 512-bit-wide associative read. The clean full-core replay program enqueues and executes four replayed functions, exercises duplicate and invalidation cases, reaches its exact guest marker, `CORE PASS`, and host `BSG PASS`; the disarmed context-switch smoke and ten-slot D-cache UCE regression also pass.
+- **Evidence:** commands, transcript hashes, physical discriminator logs, and implementation scope in `logs/linux-icache-side-buffer-20261030/`; focused artifacts under `/dev/shm/icache-replay-buffer-r4/` and `/dev/shm/uce-icache-side-r4/` for the current run.
+- **Meaning:** instruction replay no longer depends on replacement-way choice, LRU/tag publication, live data SRAM writes, or frontend slow-path exclusion. This directly removes the mechanism isolated by RL-054 through RL-057 while preserving translation, executable permission, cacheability, and `fence.i` safety.
+- **Limits:** there is not yet a routed result or FPGA execution for this implementation. Sixteen entries cannot retain all 63 trained lines simultaneously, and no Linux replay-enabled/disabled cycle comparison has been measured.
 
 ## Superseded or rejected findings
 
@@ -608,7 +617,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, route and physically validate RL-056's demand-priority array lock first with the one-line reproducer and then the exact 63-line table. Keep the exact kernel, executable, FPGA configuration, and fresh-boot discipline fixed; only after both enabled cases boot should the disabled control and trace timing be interpreted. Once all complete, add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
+For the cache-resume architecture, route RL-058's detached 16-line instruction buffer and require clean timing/fit. Then use the exact one-line Linux image as the first fresh-board shell gate, followed by a bounded high-value prefix that fits the buffer and the byte-identical replay-disabled control. Interpret cycles only from matched fresh boots after both enabled cases reach the shell; then add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
 
 ## Delta log
 

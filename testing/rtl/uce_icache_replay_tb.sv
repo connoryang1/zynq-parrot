@@ -5,6 +5,7 @@ module uce_icache_replay_tb
   import bp_common_pkg::*;
   import bp_me_pkg::*;
   #(parameter bp_params_e bp_params_p = e_bp_unicore_cfg
+    , parameter bit side_buffer_p = 1'b0
     `declare_bp_proc_params(bp_params_p)
     )
   (input clk_i, reset_i,
@@ -104,6 +105,7 @@ module uce_icache_replay_tb
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(0), .assoc_p(assoc_lp),
            .prefetch_p(1), .prefetch_els_p(4), .prefetch_full_line_p(1),
            .prefetch_demand_priority_p(1), .prefetch_critical_forward_p(0),
+           .prefetch_side_buffer_p(side_buffer_p),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
            .data_width_p(dcache_data_width_p), .tag_width_p(tag_lp), .id_width_p(id_lp))
     dut (.clk_i(clk_i), .reset_i(reset_i), .did_i('0), .lce_id_i('0),
