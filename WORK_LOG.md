@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Two-bank L2 index alias found — 2026-10-30:** source tracing of the routed prefetch5 configuration shows bank selection and each bank's cache set index both consume physical bit 6, making only 2 KiB of the instantiated 4 KiB L2 reachable. The prior directed L2-hit control spans only 548.5 cycles from last completed target reply to demand versus 7,877–9,795 cycles in the Linux first-use trace; a behavioral alias control and Linux demand-residency measurement remain required before attributing the null speedup to eviction (RL-111).
+
 - **Linux physical-preview performance — 2026-10-30:** a guest-verified 128-trial balanced cross-process board benchmark passed on the exact timing-qualified quiesce image. The four-load paired saving was -9 cycles (bootstrap 95% interval -34 to +7.25), while whole-handoff intervals crossed zero, so no Linux speedup is established; a rejected short timeout and a wrong fixed-path overlay were caught before measurement and recovered by power cycle, exact restaging, and hash verification (`logs/physical-preview-performance-20261030/`, RL-109).
 
 - **Physical-preview L2 fill control — 2026-10-28:** a traced full two-bank simulation paired the physical-hint CSR gate with a same-address no-target-hint control: hints caused four target L2 DMA fills before demand and the later four demands caused none, while the control's four demands each caused a target DMA fill. Both guest/host gates passed; this confirms the directed L2 warming mechanism but leaves Linux L2 residency and speedup unmeasured (`logs/l2-physical-preview-20261028/`, RL-108).
