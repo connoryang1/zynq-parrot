@@ -33,7 +33,8 @@ static void handle_trace_signal(int) { g_trace_timed_out = 1; }
 #define DRAM_ALLOCATE_SIZE (DRAM_ALLOCATE_SIZE_MB * 1024 * 1024)
 
 // Helper functions
-void nbf_load(bsg_zynq_pl *zpl, char *filename);
+void nbf_load(bsg_zynq_pl *zpl, char *filename, unsigned long physical_base,
+              size_t dram_size);
 
 inline void send_bp_fwd_packet(bsg_zynq_pl *zpl, bp_bedrock_packet *packet) {
     int axil_len = sizeof(bp_bedrock_packet) / 4;
@@ -162,13 +163,16 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     // system
     zpl->shell_write(GP0_RD_CSR_SYS_RESETN, 0x1, 0xF);
 
-    // Put processor into debug mode
-    zpl->shell_write(GP0_WR_CSR_DEBUG_IRQ, 0x1, 0xF);
-    for (int i = 0; i < 10; i++)
-        zpl->tick();
-    zpl->shell_write(GP0_WR_CSR_DEBUG_IRQ, 0x0, 0xF);
+    // Historical bare-metal payloads rely on the host's debug entry. OpenSBI
+    // has no debug-ROM dret resume stub, so Linux runs explicitly opt out.
+    if (!getenv("BSG_SKIP_DEBUG_ENTRY")) {
+        zpl->shell_write(GP0_WR_CSR_DEBUG_IRQ, 0x1, 0xF);
+        for (int i = 0; i < 10; i++)
+            zpl->tick();
+        zpl->shell_write(GP0_WR_CSR_DEBUG_IRQ, 0x0, 0xF);
+    }
 
-    unsigned long phys_ptr;
+    unsigned long phys_ptr = 0;
     volatile int32_t *buf;
     data = zpl->shell_read(GP0_RD_CSR_DRAM_INITED);
     if (data == 0) {
@@ -183,9 +187,20 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         bsg_pr_info("ps.cpp: wrote and verified base register\n");
         zpl->shell_write(GP0_RD_CSR_DRAM_INITED, 1, mask1);
         assert(zpl->shell_read(GP0_RD_CSR_DRAM_INITED) == 1);
-    } else
+    } else {
+        phys_ptr = static_cast<uint32_t>(
+            zpl->shell_read(GP0_RD_CSR_DRAM_BASE));
         bsg_pr_info("ps.cpp: reusing dram base pointer %x\n",
                     zpl->shell_read(GP0_RD_CSR_DRAM_BASE));
+    }
+
+#ifdef SIMULATION
+    // Sparse NBFs omit zero words. Match the clean DRAM contract used by the
+    // Linux image instead of inheriting Verilator's randomized RAM contents.
+    zpl->zero_dram(phys_ptr, allocated_dram);
+    bsg_pr_info("ps.cpp: zeroed %ld bytes of simulated AXI RAM\n",
+                allocated_dram);
+#endif
 
     int outer = 1024 / 4;
 
@@ -273,7 +288,7 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     struct timespec nbf_start_wall, nbf_end_wall; // New timers
     clock_gettime(CLOCK_MONOTONIC, &nbf_start_wall); // Start NBF Timer
 
-    nbf_load(zpl, argv[1]);
+    nbf_load(zpl, argv[1], phys_ptr, allocated_dram);
 
     const char *patch_addr_text = getenv("BSG_RUNTIME_PATCH_ADDR");
     const char *patch_value_text = getenv("BSG_RUNTIME_PATCH_VALUE");
@@ -345,6 +360,9 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         host->process_spack(&spack);
     } while (!host->is_finished());
 
+    if (g_trace_timed_out)
+        zpl->print_processor_state();
+
     unsigned long long minstret_stop = get_counter_64(zpl, GP0_RD_MINSTRET);
     // test delay for reading counter
     unsigned long long counter_data = get_counter_64(zpl, GP0_RD_MINSTRET);
@@ -381,7 +399,8 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
     return zpl->done();
 }
 
-void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
+void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename,
+              unsigned long physical_base, size_t dram_size) {
     std::string nbf_command;
     std::string tmp;
     std::string delimiter = "_";
@@ -412,6 +431,7 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
     int line_count = 0;
     int last_percent = -1;
     int credit_count = 0;
+    size_t direct_dram_writes = 0;
 
     while (getline(nbf_file, nbf_command)) {
         line_count++;
@@ -434,6 +454,19 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
         nbf[i] = std::stoull(nbf_command, nullptr, 16);
 
         if (nbf[0] == 0x3 || nbf[0] == 0x2 || nbf[0] == 0x1 || nbf[0] == 0x0) {
+#ifdef SIMULATION
+            const uint64_t addr = static_cast<uint64_t>(nbf[1]);
+            const unsigned bytes = (nbf[0] == 0x3) ? 8U : 4U;
+            if ((nbf[0] == 0x3 || nbf[0] == 0x2) && physical_base != 0
+                && addr >= DRAM_BASE_ADDR
+                && addr - DRAM_BASE_ADDR <= dram_size
+                && bytes <= dram_size - (addr - DRAM_BASE_ADDR)) {
+                zpl->initialize_dram_word(addr, static_cast<uint64_t>(nbf[2]),
+                                          bytes, physical_base);
+                direct_dram_writes++;
+                continue;
+            }
+#endif
             if (nbf[0] == 0x3) {
                 send_bp_write(zpl, nbf[1], nbf[2], 0xff);
             } else if (nbf[0] == 0x2) {
@@ -450,5 +483,9 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename) {
             return;
         }
     }
+#ifdef SIMULATION
+    bsg_pr_info("ps.cpp: initialized %zu AXI RAM writes directly\n",
+                direct_dram_writes);
+#endif
     bsg_pr_dbg_ps("ps.cpp: finished loading %d lines of nbf.\n", line_count);
 }

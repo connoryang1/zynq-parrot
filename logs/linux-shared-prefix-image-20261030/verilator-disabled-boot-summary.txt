@@ -1,0 +1,32 @@
+command:
+  BSG_SKIP_DEBUG_ENTRY=1 BSG_TRACE_TIMEOUT_S=600 make run \
+    NUM_THREADS=2 NUM_CONTEXTS=4 \
+    NBF_FILE=linux-tests/out/linux-ctxtsw-tiny-init.nbf
+
+image:
+  nbf sha256=f17554cc3d04b2ac4dcccb46b705f99ab59bb07e3ed8a366917f381c6d545cd6
+  direct AXI RAM writes=1878595
+  NBF load wall time=1.116086 seconds
+
+observed OpenSBI handoff:
+  Domain0 Next Address      : 0x0000000080200000
+  Domain0 Next Arg1         : 0x0000000082200000
+  Domain0 Next Mode         : S-mode
+  Boot HART ID              : 0
+
+bounded final state:
+  target wall time=600.023448824 seconds
+  instructions retired=920381
+  frontend next_pc=0x810f0f90
+  backend expected_npc=0x810f11f2
+  debug=0
+  privilege=1
+
+symbol mapping:
+  physical 0x810f0f90 -> virtual 0xffffffff80ef0f90 -> __pi_fdt_ro_probe_
+  physical 0x810f11f2 -> virtual 0xffffffff80ef11f2 -> __pi_fdt_offset_ptr
+
+interpretation:
+  The exact replay-disabled image crossed OpenSBI into Linux and was executing
+  early FDT code when the bounded simulator run ended. Linux had not initialized
+  its console or reached PID 1, so this is a boot-reachability checkpoint only.
