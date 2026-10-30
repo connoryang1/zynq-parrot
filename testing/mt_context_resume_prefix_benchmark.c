@@ -1,9 +1,8 @@
 /*
  * Measure the instruction-cache cold-start component of a nonresident resume.
- * Mode 0 leaves the target prefix cold; mode 1 executes the exact target entry
- * and prefix before reseeding and timing the same context handoff. This is an
- * oracle/warm-cache bound for future context-aware instruction prefetching,
- * not evidence that the current data-prefetch path fetches instructions.
+ * Modes 0-3 are cold, target-warmup, source-warm, and switch-only controls.
+ * The target warmup runs outside the timed interval; it does not guarantee
+ * that the target lines remain in the I-cache through source-side setup.
  */
 
 #include <stdint.h>
