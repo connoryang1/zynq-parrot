@@ -83,6 +83,19 @@ class LinuxHarnessTests(unittest.TestCase):
             self.assertIn("--config", command)
             self.assertNotIn("--debug", command)
 
+    def test_resume_invalidates_generated_device_tree(self):
+        makefile = (HERE / "Makefile").read_text()
+        recipe = makefile.split("tiny-init-linux-image-resume:", 1)[1]
+        recipe = recipe.split("\n# Fail closed", 1)[0]
+        self.assertIn("$(RM) $(GENERATED_DTS) $(GENERATED_DTB)", recipe)
+
+    def test_linux_simulation_skips_legacy_debug_entry(self):
+        makefile = (HERE / "Makefile").read_text()
+        recipe = makefile.split("simulate-tiny-init:", 1)[1]
+        recipe = recipe.split("\nclean:", 1)[0]
+        self.assertIn("BSG_SKIP_DEBUG_ENTRY=1", recipe)
+        self.assertIn("NBF_FILE=$(abspath $(TINY_INIT_NBF))", recipe)
+
     def test_target_syscall_round_trip(self):
         for target in ("tiny", "shell-app"):
             for flag in (1, 0, 1):

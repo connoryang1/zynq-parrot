@@ -54,7 +54,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_protected_rpc_reference_test` | Software `pcall`/`preturn` reference: capability validation, fixed entry, distinct Sv39 domains, protected continuation, four arguments, one result, and full call/reply timing |
 | `mt_protected_rpc_hardware_test` | Atomic hardware `pcall`/`preturn`: capability 1 binds resident context 0 to context 1, copies four arguments and one result at switch commit, forces a fixed server entry, and consumes a protected return continuation |
 | `mt_rpc_context_transport_benchmark` | Unprotected transport upper bound: two resident U-mode Sv39 domains exchange four arguments and one result through remote register seeds and a context-switch round trip, compared with matched direct calls |
-| `mt_opensbi_csr_probe_test` | Exact-PC illegal-instruction traps for PMP, HPM, and optional CSR probes on the pre-6a behavior control |
+| `mt_opensbi_csr_probe_test` | Early OpenSBI PMP, absent HPM, and optional privileged CSR probes take exact-PC illegal-instruction traps, matching the physically Linux-booting behavior |
 | `mt_ctxtsw_smoke_test` | Resident 0→1→0 handoff |
 | `mt_ctxtsw_logical_csr_readback_test` | Committed logical ID and side-effect-free reads of CSR `0x800` |
 | `mt_regfile_test` | Integer-context execution, private stack, and return-state isolation |
@@ -80,6 +80,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_prefetch_handoff_lifecycle_test` | The same repeated resident lifecycle under U-mode with 4 KiB Sv39 request and displacement mappings |
 | `mt_prefetch_dirty_victim_test` | Eight dirty same-set cache lines survive a ninth-line detached prefetch; all 64 dirty words are checked |
 | `mt_prefetch_protocol_test` | Runtime cases cover a victim dirtied after a hint, two same-set hints with a conflicting miss, and prefetch response ahead of an ordinary response |
+| `mt_icache_replay_test` | M-mode shared-prefix configuration, one-write S-mode launch, controller counters, four replayed function lines, duplicate admission, and `fence.i` cancellation |
 | `mt_umode_prefetch_test` | Sv39 readable and denied mappings, expected demand fault, nonfaulting hints, and permitted demand data without context switching |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |

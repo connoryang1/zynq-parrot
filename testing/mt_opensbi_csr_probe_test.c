@@ -1,5 +1,6 @@
 /* Exercise the absent-feature CSR probes used by OpenSBI before Linux entry.
- * This control restores the pre-6a illegal-read behavior for every probe.
+ * The physically qualified behavior is an illegal-instruction trap for every
+ * facility that this core does not implement.
  */
 
 #include <stdint.h>
@@ -27,24 +28,24 @@ static void __attribute__((used, naked, aligned(4))) machine_trap(void)
     "mret\n");
 }
 
-#define EXPECT_ILLEGAL_CSR(csr)                                              \
-  do {                                                                       \
-    trap_seen = trap_cause = trap_pc = expected_trap_pc = 0;                  \
-    __asm__ volatile(                                                         \
-      "la t0, 1f\n"                                                          \
-      "la t1, expected_trap_pc\n"                                            \
-      "sd t0, 0(t1)\n"                                                        \
-      "1: csrr t0, " #csr "\n"                                                \
-      : : : "t0", "t1", "memory");                                           \
-    if (trap_seen != 1 || trap_cause != 2 || trap_pc != expected_trap_pc) {  \
-      bp_print_string("[BSG-FAIL] optional CSR did not trap: " #csr "\n");   \
-      bp_hprint_uint64(trap_seen);                                            \
-      bp_hprint_uint64(trap_cause);                                           \
-      bp_hprint_uint64(trap_pc);                                              \
-      bp_hprint_uint64(expected_trap_pc);                                     \
-      bp_finish(1);                                                           \
-      return 1;                                                               \
-    }                                                                        \
+#define EXPECT_ILLEGAL_CSR(csr)                                             \
+  do {                                                                      \
+    trap_seen = trap_cause = trap_pc = expected_trap_pc = 0;                \
+    __asm__ volatile(                                                       \
+      "la t0, 1f\n"                                                       \
+      "la t1, expected_trap_pc\n"                                         \
+      "sd t0, 0(t1)\n"                                                     \
+      "1: csrr t0, " #csr "\n"                                            \
+      : : : "t0", "t1", "memory");                                       \
+    if (trap_seen != 1 || trap_cause != 2 || trap_pc != expected_trap_pc) { \
+      bp_print_string("[BSG-FAIL] absent CSR did not trap: " #csr "\n");    \
+      bp_hprint_uint64(trap_seen);                                           \
+      bp_hprint_uint64(trap_cause);                                          \
+      bp_hprint_uint64(trap_pc);                                             \
+      bp_hprint_uint64(expected_trap_pc);                                    \
+      bp_finish(1);                                                          \
+      return 1;                                                              \
+    }                                                                       \
   } while (0)
 
 int main(void)
@@ -78,7 +79,7 @@ int main(void)
   EXPECT_ILLEGAL_CSR(0xda0);
   EXPECT_ILLEGAL_CSR(0xfb0);
 
-  bp_print_string("[BSG-PASS] OpenSBI legacy absent CSR probes trap\n");
+  bp_print_string("[BSG-PASS] OpenSBI absent CSR probes trap\n");
   bp_finish(0);
   return 0;
 }

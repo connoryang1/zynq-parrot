@@ -107,6 +107,8 @@ module uce_prefetch_tb
          .preview_ready_o(preview_ready_o),
          .cache_req_critical_o(critical_o), .cache_req_last_o(last_o),
          .cache_req_credits_full_o(credits_full_o), .cache_req_credits_empty_o(credits_empty_o),
+         .detached_prefetch_addr_i('0), .detached_prefetch_v_i(1'b0),
+         .detached_prefetch_ready_and_o(),
          .tag_mem_pkt_o(tag_pkt), .tag_mem_pkt_v_o(tag_v_o),
          .tag_mem_pkt_yumi_i(tag_v_o & arrays_accept_i), .tag_mem_i('0),
          .data_mem_pkt_o(data_pkt), .data_mem_pkt_v_o(data_v_o),

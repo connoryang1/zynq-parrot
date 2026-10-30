@@ -69,6 +69,42 @@ OpenSBI source tree.  The SDK selects this platform but does not track those
 four files, so keeping the known-working copy here makes a clean image build
 independent of another user's home directory.
 
+## Shared I-cache prefix experiment
+
+`emit_icache_prefix_header.py` converts the trace model's selected fixed table
+into `opensbi-platform/blackparrot/icache_prefix.h`. It rejects more than 256
+entries, duplicates, misalignment, addresses wider than the CSR payload, and
+more than eight lines in one I-cache set. During cold boot, the platform writes
+those physical addresses through M-only CSRs `0x7c1`/`0x7c2`; setting
+`BP_ICACHE_PREFIX_ENABLE=0` when building OpenSBI produces the matched
+empty-table control without changing the kernel trigger binary.
+
+The pinned Linux 6.6 scheduler hook is retained as
+`kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch`. It adds
+one address-free `csrw 0x5c0, zero` at entry to `__schedule()`. Apply it only to
+an SDK work tree prepared for the replay-capable RTL:
+
+```sh
+make -C linux-tests stage-linux-prefix-trigger \
+  SDK_LINUX_DIR=/path/to/black-parrot-sdk/linux
+
+make -C /path/to/black-parrot-sdk/linux/buildroot \
+  O=/path/to/black-parrot-sdk/linux/work/buildroot
+
+make -C /path/to/black-parrot-sdk/linux opensbi \
+  BP_SDK_DIR=/path/to/black-parrot-sdk \
+  BP_LINUX_DIR=/path/to/black-parrot-sdk/linux \
+  LINUX_TARGET=/path/to/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux
+```
+
+The target is idempotent and checks the exact patch directly against the
+materialized source tree; Buildroot's Linux directory need not have its own
+`.git`. The current committed table came from the earlier physical trace and is
+suitable for integration testing. A performance image must first build the
+patched kernel, record a fresh replay-disabled trace from that exact binary,
+regenerate the table, and then rebuild only OpenSBI so kernel addresses do not
+move between training and measurement.
+
 If that full build finishes the kernel but stops later because of a packaging
 or host-tool problem, `tiny-init-linux-image-resume` continues from the
 prepared work tree. It re-stages the current tiny ELF before rebuilding the

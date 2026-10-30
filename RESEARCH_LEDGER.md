@@ -999,6 +999,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Limits:** only four lines in one page and one board run; no direct L2 hit observation at subsequent Linux demand and no application throughput result. The benchmark completed before a later PID-1 shell exit/panic and runner interruption. An initial 180-second transfer-only attempt reached the correct guest hash but timed out before measurement; board recovery and exact overlay restaging preceded the accepted run.
 - **Next action:** compare a larger, demonstrably cold task footprint and a complete throughput metric before claiming a general context-switch benefit. This negative narrow result is sufficient to stop treating the physical data-preview seam as a demonstrated performance win and to integrate the independent instruction-prefetch branch for joint testing.
 
+### RL-110 — Physical data preview and detached instruction replay combine in simulation
+
+- **Status:** source integration and focused/full-core simulation accepted; routed fit and joint Linux benefit unmeasured
+- **Scope:** top parents `a1bb92cb` (data) and `d14baa56` (instruction), merged BlackParrot `1556ce4a53852129ae8fa45741dde2edd92c0029`, separate narrow physical D-preview queue and full-line instruction replay slot, both CSR paths, and the detached instruction side buffer. The instruction branch's first detached route fit but missed setup by 0.284 ns; its registered allocation repair has only simulation evidence.
+- **Claim:** standalone narrow D-UCE, full-line I-UCE, replay buffer, and replay controller gates pass. A clean two-resident/four-context full-core instruction test reaches its exact guest marker and host PASS; clean two-bank, two-resident/ten-context full-core physical-preview and no-target-hint control runs also reach their exact guest markers and host PASS. The instruction scheduler patch dry-runs on the already data-patched Linux 6.6 source. This demonstrates that the merged source paths elaborate and function in these directed tests, not that they improve a Linux handoff together.
+- **Evidence:** separate source/ELF/NBF/log/waveform hashes and commands in `logs/linux-data-instruction-integration-20261030/README.md`; 17 Linux build-harness and 15 testing-harness unit checks pass. The final full-system host guard rebuild and data test pass after the initial fresh-worktree boot ROM and minimal-hierarchy reporter setup failures were cleaned and retried.
+- **Limits:** the merged design has not been routed or booted on FPGA. No merged Linux image or joint performance comparison exists; the earlier data-only RL-109 result remains a narrow null result. The physical-data and instruction-replay features may contend for the same UCE and L2 resources under real scheduler traffic.
+- **Next action:** obtain routed area/timing signoff on an immutable combined revision, then build the jointly patched Linux image and compare replay enabled/disabled under a matched task workload.
+
 ## Superseded or rejected findings
 
 

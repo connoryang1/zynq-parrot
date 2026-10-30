@@ -18,6 +18,10 @@ NBF_TIMER_PATCH ?= $(TOP)/tools/patch_linux_nbf_timer.py
 BASELINE_LINUX_NBF ?= $(TOP)/riscv/linux/linux-6.6-jhumphri-20250125.nbf
 TIMEBASE_FREQUENCY ?= 8000000
 MEM_SIZE ?= 64
+SIM_DIR ?= $(TOP)/cosim/black-parrot-minimal-example/verilator
+SIM_NUM_THREADS ?= 2
+SIM_NUM_CONTEXTS ?= 4
+SIM_TIMEOUT_S ?= 600
 
 OUT ?= $(CURDIR)/out
 APP := $(OUT)/ctxtsw_user_smoke
@@ -50,6 +54,11 @@ TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
 DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
 INIT_SCRIPT := $(CURDIR)/rootfs-overlay/etc/init.d/S200ctxtsw_user_smoke.sh
 OPENSBI_PLATFORM_OVERLAY := $(CURDIR)/opensbi-platform/blackparrot
+ICACHE_PREFIX_RESULTS ?= $(TOP)/logs/cache-resume-trace-model-20261030/results.json
+ICACHE_PREFIX_HEADER := $(OPENSBI_PLATFORM_OVERLAY)/icache_prefix.h
+ICACHE_PREFIX_GENERATOR := $(CURDIR)/emit_icache_prefix_header.py
+LINUX_PREFIX_PATCH := $(CURDIR)/kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch
+LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
 ROOTFS_CPIO := $(SDK_LINUX_DIR)/work/buildroot/images/rootfs.cpio
@@ -68,7 +77,7 @@ REQUEST_NUM_CONTEXTS ?= 10
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
 
-.PHONY: app tiny check-linux-cc check-image-toolchain stage-opensbi-platform stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf emit-tiny-transfer clean
+.PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
 
 app: $(APP)
 
@@ -349,12 +358,29 @@ check-image-toolchain: check-linux-cc
 # though the SDK Makefile selects it.  Materialize the known-working platform
 # overlay explicitly so a clean checkout does not depend on Jack's old home
 # directory or an untracked nested-submodule file.
-stage-opensbi-platform:
+icache-prefix-header:
+	python3 $(ICACHE_PREFIX_GENERATOR) --results $(ICACHE_PREFIX_RESULTS) --output $(ICACHE_PREFIX_HEADER)
+
+stage-opensbi-platform: icache-prefix-header
 	@test -f $(OPENSBI_PLATFORM_OVERLAY)/platform.c
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/Kconfig $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/Kconfig
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/objects.mk $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/objects.mk
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/platform.c $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/platform.c
+	install -D -m 0644 $(ICACHE_PREFIX_HEADER) $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/icache_prefix.h
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/configs/defconfig $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/configs/defconfig
+
+# Apply the scheduler launch hook only after Buildroot has materialized the
+# pinned Linux 6.6 source tree. The reverse check makes this target idempotent.
+stage-linux-prefix-trigger:
+	@test -f $(LINUX_BUILD_DIR)/kernel/sched/core.c || { \
+	  echo "missing Linux build tree $(LINUX_BUILD_DIR); prepare the SDK work tree first" >&2; exit 2; \
+	}
+	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
+	  echo "shared I-cache prefix trigger already applied"; \
+	else \
+	  patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward < $(LINUX_PREFIX_PATCH); \
+	  patch -d $(LINUX_BUILD_DIR) -p1 --forward < $(LINUX_PREFIX_PATCH); \
+	fi
 
 # Build only the application and install it into an already-created SDK
 # sysroot.  This makes application-only edits cheap once a Linux work tree is
@@ -416,6 +442,10 @@ tiny-init-linux-image-resume: check-image-toolchain tiny stage-opensbi-platform
 	  echo "missing prepared Buildroot work tree; run tiny-init-linux-image" >&2; exit 2; \
 	}
 	install -D -m 0755 $(TINY_APP) $(SDK_LINUX_DIR)/work/sysroot/ctxtsw_user_tiny
+	# The SDK target name does not encode generator, bootargs, timer, or memory
+	# inputs. Regenerate only these derived files so resume cannot reuse a DTB
+	# from another experiment while preserving the expensive kernel work tree.
+	$(RM) $(GENERATED_DTS) $(GENERATED_DTB)
 	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
 	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
 	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
@@ -496,8 +526,17 @@ package-tiny-init-nbf: validate-tiny-init-image
 	@echo "NBF=$(TINY_INIT_NBF)"
 	@sha256sum $(TINY_APP) $(TINY_INIT_NBF)
 
+# The generic cosim host enters debug mode for legacy bare-metal payloads.
+# OpenSBI has no debug-ROM resume stub and must start directly in M mode.
+simulate-tiny-init:
+	@test -f $(TINY_INIT_NBF) || { echo "missing $(TINY_INIT_NBF); run package-tiny-init-nbf" >&2; exit 2; }
+	@test -x $(SIM_DIR)/obj_dir/Vbsg_nonsynth_zynq_testbench || { echo "missing Verilator model in $(SIM_DIR)" >&2; exit 2; }
+	BSG_SKIP_DEBUG_ENTRY=1 BSG_TRACE_TIMEOUT_S=$(SIM_TIMEOUT_S) \
+	  $(MAKE) -C $(SIM_DIR) run NUM_THREADS=$(SIM_NUM_THREADS) \
+	  NUM_CONTEXTS=$(SIM_NUM_CONTEXTS) NBF_FILE=$(abspath $(TINY_INIT_NBF))
+
 clean:
 	rm -rf $(OUT)
 
 check-harness:
-	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py
+	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py test_icache_prefix.py
