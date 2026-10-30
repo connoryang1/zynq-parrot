@@ -44,12 +44,29 @@ class ModelTest(unittest.TestCase):
             {
                 "dispatch_replay_oracle_order",
                 "syscall_shared_prefix",
+                "syscall_fixed_shared_prefix",
                 "trained_retention_1",
                 "trained_retention_2",
                 "trained_retention_4",
                 "hybrid_shared_plus_oracle_retention_4",
             },
         )
+        fixed = next(
+            row for row in result["primary_table"]
+            if row["mechanism"] == "syscall_fixed_shared_prefix"
+        )
+        self.assertEqual(result["measured_inputs"]["fixed_shared_prefix_lines"], 197)
+        self.assertEqual(result["fixed_shared_prefix"]["line_count"], 197)
+        self.assertLessEqual(
+            max(
+                sum(1 for line in result["fixed_shared_prefix"]["lines"]
+                    if line["cache_set"] == cache_set)
+                for cache_set in range(MODEL.SETS)
+            ),
+            MODEL.WAYS,
+        )
+        self.assertEqual(fixed["ready_demand_records"], 173)
+        self.assertEqual(fixed["ready_before_demand_unique"], 171)
 
 
 if __name__ == "__main__":

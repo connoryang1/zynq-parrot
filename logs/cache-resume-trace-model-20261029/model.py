@@ -251,6 +251,7 @@ def mechanism_rows(
     demand: list[Record],
     training: list[Record],
     timing: Timing,
+    fixed_shared_prefix: list[int] | None = None,
     dispatch_lead: int = 6,
     shared_trigger: int = 0,
 ) -> list[dict]:
@@ -283,6 +284,20 @@ def mechanism_rows(
             ),
         ),
     ]
+    if fixed_shared_prefix is not None:
+        rows.append(
+            evaluate(
+                "syscall_fixed_shared_prefix",
+                demand,
+                fixed_shared_prefix,
+                shared_trigger,
+                timing,
+                notes=(
+                    "Prediction is one eight-MRU-lines-per-set table trained on the complete preceding run.",
+                    "The same immutable table and replay order are used for both handoff directions.",
+                ),
+            )
+        )
     for count in (1, 2, 4):
         rows.append(
             evaluate(
@@ -379,6 +394,9 @@ def build_result(raw_dir: Path) -> dict:
         "peer_to_source": instruction_records(traces["peer_to_source"]),
     }
     training = split_training_trace(traces["training"])
+    fixed_shared_prefix = per_set_recent_prefix(
+        instruction_records(traces["training"])
+    )
     if sum(
         1
         for records in demand.values()
@@ -389,7 +407,13 @@ def build_result(raw_dir: Path) -> dict:
 
     primary_timing = Timing()
     primary = {
-        window: mechanism_rows(window, demand[window], training[window], primary_timing)
+        window: mechanism_rows(
+            window,
+            demand[window],
+            training[window],
+            primary_timing,
+            fixed_shared_prefix=fixed_shared_prefix,
+        )
         for window in demand
     }
 
@@ -403,7 +427,13 @@ def build_result(raw_dir: Path) -> dict:
                     install_cycles=install,
                 )
                 rows = {
-                    window: mechanism_rows(window, demand[window], training[window], timing)
+                    window: mechanism_rows(
+                        window,
+                        demand[window],
+                        training[window],
+                        timing,
+                        fixed_shared_prefix=fixed_shared_prefix,
+                    )
                     for window in demand
                 }
                 for aggregate in aggregate_rows(rows):
@@ -424,6 +454,7 @@ def build_result(raw_dir: Path) -> dict:
                 demand[window],
                 training[window],
                 primary_timing,
+                fixed_shared_prefix=fixed_shared_prefix,
                 shared_trigger=trigger,
             )
             for window in demand
@@ -439,7 +470,13 @@ def build_result(raw_dir: Path) -> dict:
     for translation in (0, 41, 82, 164):
         timing = dataclasses.replace(primary_timing, translation_cycles=translation)
         rows = {
-            window: mechanism_rows(window, demand[window], training[window], timing)
+            window: mechanism_rows(
+                window,
+                demand[window],
+                training[window],
+                timing,
+                fixed_shared_prefix=fixed_shared_prefix,
+            )
             for window in demand
         }
         for mechanism in ("syscall_shared_prefix", "dispatch_replay_oracle_order"):
@@ -458,6 +495,7 @@ def build_result(raw_dir: Path) -> dict:
                 demand[window],
                 training[window],
                 primary_timing,
+                fixed_shared_prefix=fixed_shared_prefix,
                 dispatch_lead=lead,
             )
             for window in demand
@@ -487,9 +525,23 @@ def build_result(raw_dir: Path) -> dict:
             "cache_line_bytes": LINE_BYTES,
             "cache_sets": SETS,
             "cache_ways": WAYS,
+            "fixed_shared_prefix_lines": len(fixed_shared_prefix),
             "fpga_facing_installer_median_cycles": 19,
             "fpga_facing_installer_observed_max_cycles": 25,
             "cold_instruction_penalty_cycles": COLD_INSTRUCTION_PENALTY_CYCLES,
+        },
+        "fixed_shared_prefix": {
+            "policy": "eight MRU privileged instruction lines per cache set from the complete preceding run, replayed in prior first-use order",
+            "line_count": len(fixed_shared_prefix),
+            "lines": [
+                {
+                    "rank": rank,
+                    "paddr": address,
+                    "paddr_hex": f"0x{address:016x}",
+                    "cache_set": (address // LINE_BYTES) % SETS,
+                }
+                for rank, address in enumerate(fixed_shared_prefix)
+            ],
         },
         "primary_assumptions": {
             **dataclasses.asdict(primary_timing),
