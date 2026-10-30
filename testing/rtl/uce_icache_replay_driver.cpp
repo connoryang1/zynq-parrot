@@ -29,7 +29,7 @@ class Test {
     // the physical I-cache.  Victim selection and invalidation still require
     // exclusive cache-array ownership; frontend hits do not appear as UCE
     // demand requests and therefore cannot provide their own exclusion.
-    if (!dut.reset_i && dut.install_state_o >= 1 && dut.install_state_o <= 6)
+    if (!dut.reset_i && dut.install_state_o >= 1 && dut.install_state_o <= 8)
       require(dut.req_lock_o,
               "demand-priority replay failed to lock cache arrays");
     Handshake accepted{bool(dut.req_yumi_o), bool(dut.replay_ready_o),
