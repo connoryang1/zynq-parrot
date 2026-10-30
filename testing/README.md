@@ -60,6 +60,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_umode_prefetch_handoff_lifecycle_test` | The same repeated resident lifecycle under U-mode with 4 KiB Sv39 request and displacement mappings |
 | `mt_prefetch_dirty_victim_test` | Eight dirty same-set cache lines survive a ninth-line detached prefetch; all 64 dirty words are checked |
 | `mt_prefetch_protocol_test` | Runtime cases cover a victim dirtied after a hint, two same-set hints with a conflicting miss, and prefetch response ahead of an ordinary response |
+| `mt_icache_replay_test` | M-mode shared-prefix configuration, one-write S-mode launch, controller counters, four replayed function lines, duplicate admission, and `fence.i` cancellation |
 | `mt_umode_prefetch_test` | Sv39 readable and denied mappings, expected demand fault, nonfaulting hints, and permitted demand data without context switching |
 | `mt_umode_nonresident_handoff_test` | U-mode SRAM-backed handoff without translated fetch |
 | `mt_umode_nonresident_sv39_handoff_test` | U-mode handoff with translated instructions |

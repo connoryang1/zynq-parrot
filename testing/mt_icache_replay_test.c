@@ -18,6 +18,8 @@ REPLAY_TARGET(replay_target_c, 41)
 REPLAY_TARGET(replay_target_d, 53)
 REPLAY_TARGET(replay_target_cancel, 61)
 
+static volatile uint64_t observed_status, observed_cause, observed_phase;
+
 static void replay_enqueue(const void *paddr)
 {
   uint64_t ready;
@@ -27,9 +29,80 @@ static void replay_enqueue(const void *paddr)
   __asm__ volatile("csrw 0x7c0, %0" : : "r"((uintptr_t)paddr) : "memory");
 }
 
+static void prefix_set(unsigned index, const void *paddr)
+{
+  uint64_t payload = ((uint64_t)index << 56) | (uintptr_t)paddr;
+  __asm__ volatile("csrw 0x7c1, %0" : : "r"(payload) : "memory");
+}
+
+static uint64_t prefix_status(void)
+{
+  uint64_t status;
+  __asm__ volatile("csrr %0, 0x5c0" : "=r"(status));
+  return status;
+}
+
+static void fail(void);
+
+static void __attribute__((naked, noinline, used)) supervisor_prefix_trigger(void)
+{
+  __asm__ volatile(
+    "li t0, 1\n"
+    "csrw 0x5c0, t0\n"
+    "ecall\n"
+    "ret\n");
+}
+
+static void __attribute__((naked, aligned(4), used)) supervisor_trap(void)
+{
+  __asm__ volatile(
+    "csrr t0, mcause\n"
+    "la t2, observed_cause\n"
+    "sd t0, 0(t2)\n"
+    "li t1, 9\n"
+    "bne t0, t1, 1f\n"
+    "csrr t0, mepc\n"
+    "addi t0, t0, 4\n"
+    "csrw mepc, t0\n"
+    /* Return from the S-mode ECALL in M mode. */
+    "csrr t0, mstatus\n"
+    "li t1, 0x1800\n"
+    "not t1, t1\n"
+    "and t0, t0, t1\n"
+    "li t1, 0x1800\n"
+    "or t0, t0, t1\n"
+    "csrw mstatus, t0\n"
+    "mret\n"
+    "1: j fail\n");
+}
+
+static void __attribute__((naked, noinline)) enter_supervisor_trigger(void)
+{
+  __asm__ volatile(
+    "csrw medeleg, zero\n"
+    "la t0, supervisor_trap\n"
+    "csrw mtvec, t0\n"
+    "la t0, supervisor_prefix_trigger\n"
+    "csrw mepc, t0\n"
+    /* Select S mode as mret's destination. */
+    "csrr t0, mstatus\n"
+    "li t1, 0x1800\n"
+    "not t1, t1\n"
+    "and t0, t0, t1\n"
+    "li t1, 0x800\n"
+    "or t0, t0, t1\n"
+    "csrw mstatus, t0\n"
+    "mret\n");
+}
+
 static void fail(void)
 {
-  bp_print_string("[BSG-FAIL] physical I-cache replay\n");
+  bp_print_string("[BSG-FAIL] shared-prefix I-cache replay\n");
+  bp_print_string("phase/cause/status: ");
+  bp_hprint_uint64(observed_phase);
+  bp_hprint_uint64(observed_cause);
+  bp_hprint_uint64(observed_status);
+  bp_print_string("\n");
   bp_finish(1);
   for (;;) ;
 }
@@ -43,12 +116,32 @@ int main(void)
     : : : "t0", "memory");
 #endif
 
-  /* Fill all four replay slots before executing any target. This exercises
-   * queue backpressure as well as independent full-line response buffering. */
-  replay_enqueue(replay_target_a);
-  replay_enqueue(replay_target_b);
-  replay_enqueue(replay_target_c);
-  replay_enqueue(replay_target_d);
+  /* Machine mode configures physical addresses once. A single trigger then
+   * feeds the four-slot replay lane without exposing those addresses through
+   * the supervisor trigger interface. A second trigger while active must be
+   * counted and dropped, not restart or corrupt the running sequence. */
+  prefix_set(0, replay_target_a);
+  prefix_set(1, replay_target_b);
+  prefix_set(2, replay_target_c);
+  prefix_set(3, replay_target_d);
+  __asm__ volatile("csrw 0x7c2, %0" : : "r"(4UL) : "memory");
+  observed_phase = 1;
+  enter_supervisor_trigger();
+  observed_phase = 2;
+
+  uint64_t status;
+  unsigned waits = 0;
+  do {
+    status = prefix_status();
+    observed_status = status;
+  } while ((status & (1UL << 1)) && ++waits < 10000);
+  observed_phase = 3;
+  if (((status >> 4) & 0x1ff) != 4
+      || ((status >> 22) & 0xffff) != 4
+      || ((status >> 38) & 0xff) != 1
+      || ((status >> 46) & 0xff) != 0)
+    fail();
+
   for (volatile unsigned i = 0; i < 256; ++i)
     __asm__ volatile("nop");
 
@@ -70,7 +163,7 @@ int main(void)
   if (replay_target_a(7) != 24)
     fail();
 
-  bp_print_string("[BSG-PASS] physical I-cache replay and fence cancellation\n");
+  bp_print_string("[BSG-PASS] shared-prefix and physical I-cache replay\n");
   bp_finish(0);
   return 0;
 }
