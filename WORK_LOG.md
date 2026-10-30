@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Joint-topology verification — 2026-10-30:** the merged instruction-replay program passed again on the full two-bank/two-thread/ten-context model used for the data controls, and an isolated Linux scheduler object compiled with both `0x5c0` instruction and `0x9c0` data hooks. Immutable combined FPGA job `20261030T213415Z-c457ec92` passed readiness and entered synthesis; routed fit and Linux execution remain pending (`logs/linux-data-instruction-integration-20261030/`, RL-110).
+
 - **Data/instruction preview integration — 2026-10-30:** merged the measured physical data-preview branch with the detached shared-prefix instruction-replay branch into BlackParrot `1556ce4a5`; standalone UCE/buffer/controller gates, a clean instruction full-core run, and two clean two-bank physical-data/control runs pass with exact guest and host markers. The instruction scheduler patch dry-runs on the data-patched Linux source; combined routed timing, FPGA boot, and performance remain unmeasured (`logs/linux-data-instruction-integration-20261030/`, RL-110).
 
 - **Linux physical-preview performance — 2026-10-30:** a guest-verified 128-trial balanced cross-process board benchmark passed on the exact timing-qualified quiesce image. The four-load paired saving was -9 cycles (bootstrap 95% interval -34 to +7.25), while whole-handoff intervals crossed zero, so no Linux speedup is established; a rejected short timeout and a wrong fixed-path overlay were caught before measurement and recovered by power cycle, exact restaging, and hash verification (`logs/physical-preview-performance-20261030/`, RL-109).
