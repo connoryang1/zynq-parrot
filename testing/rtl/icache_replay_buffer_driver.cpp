@@ -41,6 +41,21 @@ class Test {
     require(dut.replay_yumi_o, "replay-buffer write was not accepted");
     dut.replay_v_i = 0; step();
   }
+  void write_line_burst() {
+    dut.replay_addr_i = line;
+    dut.replay_v_i = 1;
+    for (unsigned beat = 0; beat < 4; ++beat) {
+      dut.replay_fill_i = 1u << beat;
+      dut.replay_word0_i = seed + beat*2;
+      dut.replay_word1_i = seed + beat*2 + 1;
+      step();
+      require(dut.replay_yumi_o,
+              "consecutive replay-buffer write was not accepted");
+    }
+    dut.replay_v_i = 0;
+    // Drain the registered final beat before attempting a lookup.
+    step();
+  }
   uint64_t fetch(uint64_t addr, bool expect_hit) {
     dut.fetch_addr_i = addr; dut.fence_i = 0; dut.fetch_v_i = 1;
     bool accepted = false;
@@ -93,7 +108,7 @@ public:
 
     // Reset the held miss, then publish all four beats and verify every word.
     dut.reset_i = 1; step(); step(); dut.reset_i = 0; step(); initialize();
-    for (unsigned beat = 0; beat < 4; ++beat) write_beat(beat);
+    write_line_burst();
     for (unsigned word = 0; word < 8; ++word)
       require(fetch(line + word*8, true) == seed + word,
               "replay-buffer word selection mismatch");
@@ -102,7 +117,8 @@ public:
     fence();
     fetch(line, false);
     std::cout << "[ICACHE-REPLAY-BUFFER] PASS: partial-line exclusion, "
-                 "eight-word execution data, fence invalidation\n";
+                 "consecutive four-beat fill, eight-word execution data, "
+                 "fence invalidation\n";
   }
 };
 }

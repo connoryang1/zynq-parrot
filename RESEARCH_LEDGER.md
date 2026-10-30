@@ -547,6 +547,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** instruction replay no longer depends on replacement-way choice, LRU/tag publication, live data SRAM writes, or frontend slow-path exclusion. This directly removes the mechanism isolated by RL-054 through RL-057 while preserving translation, executable permission, cacheability, and `fence.i` safety.
 - **Limits:** there is not yet a routed result or FPGA execution for this implementation. Sixteen entries cannot retain all 63 trained lines simultaneously, and no Linux replay-enabled/disabled cycle comparison has been measured.
 
+### RL-059 — Registering replay allocation removes the identified route fanout without reducing beat rate
+
+- **Status:** accepted simulation repair; reroute pending
+- **Scope:** first immutable route `20261030T192527Z-4a0d49c2`, the 16-entry detached replay allocation path, four consecutive UCE response beats, focused buffer/UCE tests, the ten-slot D-cache regression, and a clean two-thread/four-context full-core replay run
+- **Claim:** the first detached-buffer route fits at 50,113 LUTs (94.20%) but is not timing legal: setup WNS/TNS are -0.284/-0.879 ns over seven endpoints. The critical path ends in replay beat-valid state and crosses a selected-slot net with 744 loads. A one-entry registered advisory-packet stage now breaks incoming UCE control from associative allocation while preserving one accepted and one retired beat per cycle. A consecutive four-beat focused test, both UCE gates, and the clean full-core execution all pass after the change.
+- **Evidence:** route timing/utilization summaries and post-repair transcript hashes are recorded in `logs/linux-icache-side-buffer-20261030/`; focused run `e605c4d9...f1fea`, UCE side `a6bbaadc...34f6`, D-cache regression `e0881960...aec2`, full-core run/build `6f244f03...43ecd` / `48655e85...b385`.
+- **Meaning:** the failed route identified a concrete combinational timing defect rather than a capacity failure. Registering only the advisory stream preserves full response throughput and isolates the associative side-buffer bookkeeping from the existing cross-core path.
+- **Limits:** simulation does not prove that the new placement closes timing. The first route must not be deployed despite its wrapper PASS label; independent signoff WNS/WHS checks remain mandatory. No FPGA Linux result is claimed.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
