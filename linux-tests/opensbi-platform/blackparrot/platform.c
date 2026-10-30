@@ -22,7 +22,31 @@
 #include <sbi_utils/ipi/aclint_mswi.h>
 #include <sbi_utils/timer/aclint_mtimer.h>
 
+#include "icache_prefix.h"
+
 #define PLATFORM_FIRST_HARTID 0
+
+#define CSR_BP_ICACHE_PREFIX_ENTRY 0x7c1
+#define CSR_BP_ICACHE_PREFIX_COUNT 0x7c2
+
+#ifndef BP_ICACHE_PREFIX_ENABLE
+#define BP_ICACHE_PREFIX_ENABLE 1
+#endif
+
+static void bp_icache_prefix_init(void)
+{
+#if BP_ICACHE_PREFIX_ENABLE
+    for (unsigned long i = 0; i < BP_ICACHE_PREFIX_COUNT; i++) {
+        unsigned long payload = (i << 56) | bp_icache_prefix[i];
+        csr_write(CSR_BP_ICACHE_PREFIX_ENTRY, payload);
+    }
+    /* Setting bit 63 clears the trigger/admission counters at boot. */
+    csr_write(CSR_BP_ICACHE_PREFIX_COUNT,
+              (1UL << 63) | BP_ICACHE_PREFIX_COUNT);
+#else
+    csr_write(CSR_BP_ICACHE_PREFIX_COUNT, (1UL << 63));
+#endif
+}
 
 #define PLATFORM_HOST_BASE   (0x100000)
 #define PLATFORM_CFG_BASE    (0x200000)
@@ -163,6 +187,7 @@ static int platform_early_init(bool cold_boot)
     if (!cold_boot)
         return 0;
 
+    bp_icache_prefix_init();
     sbi_system_reset_add_device(&bp_reset);
 
     return 0;

@@ -5,7 +5,9 @@
 #
 
 # Compiler pre-processor flags
+BP_ICACHE_PREFIX_ENABLE ?= 1
 platform-cppflags-y = $(PLATFORM_ADDITIONAL_CPPFLAGS)
+platform-cppflags-y += -DBP_ICACHE_PREFIX_ENABLE=$(BP_ICACHE_PREFIX_ENABLE)
 
 # C Compiler and assembler flags.
 platform-cflags-y = $(PLATFORM_ADDITIONAL_CFLAGS)

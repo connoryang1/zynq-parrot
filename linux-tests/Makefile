@@ -37,6 +37,11 @@ TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
 DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
 INIT_SCRIPT := $(CURDIR)/rootfs-overlay/etc/init.d/S200ctxtsw_user_smoke.sh
 OPENSBI_PLATFORM_OVERLAY := $(CURDIR)/opensbi-platform/blackparrot
+ICACHE_PREFIX_RESULTS ?= $(TOP)/logs/cache-resume-trace-model-20261029/results.json
+ICACHE_PREFIX_HEADER := $(OPENSBI_PLATFORM_OVERLAY)/icache_prefix.h
+ICACHE_PREFIX_GENERATOR := $(CURDIR)/emit_icache_prefix_header.py
+LINUX_PREFIX_PATCH := $(CURDIR)/kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch
+LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
 ROOTFS_CPIO := $(SDK_LINUX_DIR)/work/buildroot/images/rootfs.cpio
@@ -55,7 +60,7 @@ REQUEST_NUM_CONTEXTS ?= 10
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
 
-.PHONY: app tiny check-linux-cc check-image-toolchain stage-opensbi-platform stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf emit-tiny-transfer clean
+.PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf emit-tiny-transfer clean
 
 app: $(APP)
 
@@ -226,12 +231,29 @@ check-image-toolchain: check-linux-cc
 # though the SDK Makefile selects it.  Materialize the known-working platform
 # overlay explicitly so a clean checkout does not depend on Jack's old home
 # directory or an untracked nested-submodule file.
-stage-opensbi-platform:
+icache-prefix-header:
+	python3 $(ICACHE_PREFIX_GENERATOR) --results $(ICACHE_PREFIX_RESULTS) --output $(ICACHE_PREFIX_HEADER)
+
+stage-opensbi-platform: icache-prefix-header
 	@test -f $(OPENSBI_PLATFORM_OVERLAY)/platform.c
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/Kconfig $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/Kconfig
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/objects.mk $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/objects.mk
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/platform.c $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/platform.c
+	install -D -m 0644 $(ICACHE_PREFIX_HEADER) $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/icache_prefix.h
 	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/configs/defconfig $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/configs/defconfig
+
+# Apply the scheduler launch hook only after Buildroot has materialized the
+# pinned Linux 6.6 source tree. The reverse check makes this target idempotent.
+stage-linux-prefix-trigger:
+	@test -d $(LINUX_BUILD_DIR)/.git || { \
+	  echo "missing Linux build tree $(LINUX_BUILD_DIR); prepare the SDK work tree first" >&2; exit 2; \
+	}
+	@if git -C $(LINUX_BUILD_DIR) apply --reverse --check $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
+	  echo "shared I-cache prefix trigger already applied"; \
+	else \
+	  git -C $(LINUX_BUILD_DIR) apply --check $(LINUX_PREFIX_PATCH); \
+	  git -C $(LINUX_BUILD_DIR) apply $(LINUX_PREFIX_PATCH); \
+	fi
 
 # Build only the application and install it into an already-created SDK
 # sysroot.  This makes application-only edits cheap once a Linux work tree is
@@ -377,4 +399,4 @@ clean:
 	rm -rf $(OUT)
 
 check-harness:
-	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py
+	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py test_icache_prefix.py
