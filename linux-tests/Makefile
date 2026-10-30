@@ -245,14 +245,14 @@ stage-opensbi-platform: icache-prefix-header
 # Apply the scheduler launch hook only after Buildroot has materialized the
 # pinned Linux 6.6 source tree. The reverse check makes this target idempotent.
 stage-linux-prefix-trigger:
-	@test -d $(LINUX_BUILD_DIR)/.git || { \
+	@test -f $(LINUX_BUILD_DIR)/kernel/sched/core.c || { \
 	  echo "missing Linux build tree $(LINUX_BUILD_DIR); prepare the SDK work tree first" >&2; exit 2; \
 	}
-	@if git -C $(LINUX_BUILD_DIR) apply --reverse --check $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
+	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
 	  echo "shared I-cache prefix trigger already applied"; \
 	else \
-	  git -C $(LINUX_BUILD_DIR) apply --check $(LINUX_PREFIX_PATCH); \
-	  git -C $(LINUX_BUILD_DIR) apply $(LINUX_PREFIX_PATCH); \
+	  patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward < $(LINUX_PREFIX_PATCH); \
+	  patch -d $(LINUX_BUILD_DIR) -p1 --forward < $(LINUX_PREFIX_PATCH); \
 	fi
 
 # Build only the application and install it into an already-created SDK

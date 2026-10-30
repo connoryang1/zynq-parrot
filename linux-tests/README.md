@@ -87,10 +87,19 @@ an SDK work tree prepared for the replay-capable RTL:
 ```sh
 make -C linux-tests stage-linux-prefix-trigger \
   SDK_LINUX_DIR=/path/to/black-parrot-sdk/linux
+
+make -C /path/to/black-parrot-sdk/linux/buildroot \
+  O=/path/to/black-parrot-sdk/linux/work/buildroot
+
+make -C /path/to/black-parrot-sdk/linux opensbi \
+  BP_SDK_DIR=/path/to/black-parrot-sdk \
+  BP_LINUX_DIR=/path/to/black-parrot-sdk/linux \
+  LINUX_TARGET=/path/to/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux
 ```
 
-The target is idempotent and first checks the exact patch against the work
-tree. The current committed table came from the earlier physical trace and is
+The target is idempotent and checks the exact patch directly against the
+materialized source tree; Buildroot's Linux directory need not have its own
+`.git`. The current committed table came from the earlier physical trace and is
 suitable for integration testing. A performance image must first build the
 patched kernel, record a fresh replay-disabled trace from that exact binary,
 regenerate the table, and then rebuild only OpenSBI so kernel addresses do not
