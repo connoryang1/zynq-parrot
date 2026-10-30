@@ -1,0 +1,196 @@
+Script started on 2026-10-30 14:54:17+0000
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeade6a0 40000004 16 1
+INFO:    Creating host: 0xbeade6a0 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d47000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d47000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1545352
+DEBUG-PS: ps.cpp: 1-1545562
+DEBUG-PS: ps.cpp: 2-1545750
+DEBUG-PS: ps.cpp: 3-1545933
+DEBUG-PS: ps.cpp: 4-1546104
+DEBUG-PS: ps.cpp: 5-1546276
+DEBUG-PS: ps.cpp: 6-1546449
+DEBUG-PS: ps.cpp: 7-1546624
+DEBUG-PS: ps.cpp: 8-1546802
+DEBUG-PS: ps.cpp: 9-1547013
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878614
+DEBUG-PS: ps.cpp: finished loading 1878614 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #7 SMP Fri Oct 30 01:55:12 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh          
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000104] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009379] Console: colour dummy device 80x25
+[    0.011202] printk: console [hvc0] enabled
+[    0.160863] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166962] pid_max: default: 32768 minimum: 301
+[    0.183216] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.188511] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.313015] Oops - illegal instruction [#1]
+[    0.313499] Modules linked in:
+[    0.313956] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.6.0 #7
+[    0.314600] Hardware name: blackparrot,riscv64 (DT)
+[    0.314916] epc : __schedule+0x7e/0x72c
+[    0.315875]  ra : schedule+0x48/0xd2
+[    0.316597] epc : ffffffff80813328 ra : ffffffff80813a1e sp : ffffffc80000bb60
+[    0.317076]  gp : ffffffff816eb330 tp : ffffffd801c80000 t0 : 000000000000a6f2
+[    0.317529]  t1 : 0000000000000003 t2 : 0000000035011737 s0 : ffffffc80000bbe0
+[    0.317972]  s1 : 0000000000000000 a0 : 0000000000000000 a1 : ffffffc80000bd48
+[    0.318400]  a2 : ffffffc80000bd48 a3 : 0000000000000000 a4 : 0000000057ac6e9d
+[    0.318843]  a5 : 0000000000000001 a6 : ffffffc80000bc88 a7 : ffffffd803f0ce80
+[    0.319290]  s2 : 0000000000000001 s3 : ffffffd803f0ce00 s4 : ffffffd801c80000
+[    0.319732]  s5 : ffffffff81720e90 s6 : 0000000000000000 s7 : 0000000000000100
+[    0.320169]  s8 : ffffffff808141fa s9 : 0000000000001000 s10: 0000000000000102
+[    0.320613]  s11: 0000000000000000 t3 : 0000000000000000 t4 : 00000000000003ff
+[    0.321029]  t5 : 00000000efe4b99a t6 : 00000000016ce6de
+[    0.321390] status: 0000000200000120 badaddr: 0000000084aa6af7 cause: 0000000000000002
+[    0.321853] [<ffffffff80813328>] __schedule+0x7e/0x72c
+[    0.322721] [<ffffffff80813a1e>] schedule+0x48/0xd2
+[    0.323539] [<ffffffff80818c70>] schedule_timeout+0xa2/0xda
+[    0.324243] [<ffffffff80814210>] __wait_for_common+0xd6/0x1ea
+[    0.325115] [<ffffffff808143d4>] wait_for_completion_killable+0x1c/0x34
+[    0.326015] [<ffffffff8002e934>] __kthread_create_on_node+0xfc/0x15e
+[    0.326714] [<ffffffff8002e9be>] kthread_create_on_node+0x28/0x46
+[    0.327369] [<ffffffff8002609a>] init_rescuer+0x80/0xe6
+[    0.328116] [<ffffffff80a07e9c>] workqueue_init+0x120/0x276
+[    0.328809] [<ffffffff80a00e1e>] kernel_init_freeable+0x78/0x220
+[    0.329621] [<ffffffff80812622>] kernel_init+0x1e/0x10a
+[    0.330466] [<ffffffff800034de>] ret_from_fork+0xa/0x1c
+[    0.331774] Code: 9e63 6806 2783 0082 4905 9563 4927 0001 0013 0000 (0013) 0000 
+[    0.332216] ---[ end trace 0000000000000000 ]---
+[    0.332546] Kernel panic - not syncing: Fatal exception in interrupt
+[    0.408126] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
