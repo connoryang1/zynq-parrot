@@ -69,11 +69,12 @@ DEFINES += BP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)
 endif
 
-# The dense prefetch endpoints are at or above the xc7z020's default-flow
-# packing limit. Keep the accepted four-entry build on the validated defaults
-# and select the tool's named area strategies only for the explicit five- and
-# ten-entry fit experiments.
-ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg),)
+# The prefetch endpoints are at or above the xc7z020's default-flow packing
+# limit once the instruction-prefix replay lane is present. Select the tool's
+# named area strategies for every static prefetch endpoint; the four-entry
+# endpoint previously fit with the defaults, but no longer does with the
+# replay lane enabled.
+ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch_cfg e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg),)
 SYNTH_STRATEGY ?= Flow_AreaOptimized_high
 IMPL_STRATEGY ?= Area_Explore
 endif
