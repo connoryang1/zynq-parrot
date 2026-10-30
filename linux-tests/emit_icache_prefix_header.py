@@ -53,7 +53,7 @@ def main():
     parser.add_argument(
         "--results",
         type=Path,
-        default=root / "logs/cache-resume-trace-model-20261029/results.json",
+        default=root / "logs/cache-resume-trace-model-20261030/results.json",
     )
     parser.add_argument(
         "--output",

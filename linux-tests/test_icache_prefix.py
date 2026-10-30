@@ -17,7 +17,7 @@ SPEC.loader.exec_module(EMITTER)
 class IcachePrefixTest(unittest.TestCase):
     def setUp(self):
         self.result = json.loads(
-            (ROOT / "logs/cache-resume-trace-model-20261029/results.json").read_text()
+            (ROOT / "logs/cache-resume-trace-model-20261030/results.json").read_text()
         )
 
     def test_committed_header_matches_model(self):
@@ -26,7 +26,7 @@ class IcachePrefixTest(unittest.TestCase):
             HERE / "opensbi-platform/blackparrot/icache_prefix.h"
         ).read_text()
         self.assertEqual(generated, committed)
-        self.assertEqual(generated.count("UL,"), 197)
+        self.assertEqual(generated.count("UL,"), 63)
 
     def test_rejects_misaligned_line(self):
         malformed = copy.deepcopy(self.result)

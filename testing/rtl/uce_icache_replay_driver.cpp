@@ -154,8 +154,37 @@ public:
     for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
     require(dut.replay_valid_o == 0, "preempted replay slot was not retired");
 
+    // A demand may already be resident in e_send_critical when a detached
+    // replay for the same line arrives. Once that replay completes, it must be
+    // dropped: the resident demand cannot withdraw to observe an L1 install,
+    // and retaining both creates a circular wait between demand and installer.
+    // Fill the two-entry forward pump first so the ordinary miss remains in
+    // the UCE rather than merely waiting on the external memory link.
+    dut.fwd_ready_i = 0;
+    enqueue(0x80015000);
+    enqueue(0x80016000);
+    tick(10);
+    request(miss_load, 0x80014000);
+    enqueue(0x80014000);
+    dut.fwd_ready_i = 1;
+    wait_sent(7);
+    require(sent[4].prefetch && sent[5].prefetch && sent[6].prefetch
+            && sent[6].addr == 0x80014000,
+            "same-line replay did not issue ahead of resident demand");
+    response(sent[6]);
+    wait_sent(8);
+    require(!sent[7].prefetch && sent[7].addr == 0x80014000,
+            "resident same-line demand remained blocked after replay completion");
+    response(sent[7]);
+    for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
+    response(sent[4]);
+    response(sent[5]);
+    wait_idle_empty();
+    require(dut.replay_valid_o == 0,
+            "same-line replay slot was not dropped for resident demand");
+
     std::cout << "[UCE-ICACHE-REPLAY] PASS: full-line install, fence drain-without-publish, "
-                 "demand-priority abort\n";
+                 "demand-priority abort, resident same-line demand progress\n";
   }
 };
 }

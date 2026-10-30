@@ -1,0 +1,9 @@
+This directory records the first physical replay-enabled versus replay-disabled Linux comparison using an identical retrained kernel image. The comparison exposed a correctness/liveness defect before a speedup could be measured, and the retained transcripts distinguish that result from the subsequent RTL fix validation.
+
+# Physical Linux replay A/B
+
+Both OpenSBI variants embed the identical kernel payload, SHA-256 `bde7b74470c3c809b725c55f5b3bad3539f452930439e6821725d6e244a3ac2b`. The enabled firmware payload is `56290a07a3322736334c8aef9566001cbdcc8fd4487c1351dbc80daed8e98bb9`; the disabled payload is `f8207264659a45578acf6ef60e5516103b072b53bae3e0e2c4d84c8e732002b7`. The disabled shell NBF reproduces the trace-training image exactly at `a8830ba31641efb5ef00c77d294de85858ad813a18785aa330c0555b50bea4e3`.
+
+On the timing-clean FPGA bitstream `6faf1586300482967222577f6b75b25e88d03e5bd83a4b9cfb6a0e59dc29fe38`, the enabled 63-line image stopped making console progress immediately after the early mount-cache scheduler point for more than five minutes. A fresh-power-cycle disabled control passed that point, reached `/bin/sh` at 38.7 guest seconds, verified the trace executable hash, and completed the full handoff in 27,068 cycles with 132 I-cache and 8 D-cache accepted misses and no overflow.
+
+RTL inspection then identified a circular wait: a demand already resident in the UCE waits for a same-line detached replay, while a completed replay cannot install until the resident demand retires. The fix drops the completed advisory line in that state so the architectural demand can issue. The directed real-UCE regression and the broader UCE prefetch regression pass; `mt_icache_replay_test` reaches guest, core, and host PASS. A new routed FPGA image is still required before repeating this A/B and claiming any performance result.
