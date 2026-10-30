@@ -25,6 +25,13 @@ class Test {
   Handshake step() {
     require(++cycles < 4000, "global I-cache replay cycle limit");
     dut.clk_i = 0; dut.eval(); context.timeInc(5); trace.dump(context.time());
+    // The wrapper deliberately instantiates demand-priority mode, matching
+    // the physical I-cache.  Victim selection and invalidation still require
+    // exclusive cache-array ownership; frontend hits do not appear as UCE
+    // demand requests and therefore cannot provide their own exclusion.
+    if (!dut.reset_i && dut.install_state_o >= 1 && dut.install_state_o <= 6)
+      require(dut.req_lock_o,
+              "demand-priority replay failed to lock cache arrays");
     Handshake accepted{bool(dut.req_yumi_o), bool(dut.replay_ready_o),
                        bool(dut.rev_ready_o)};
     if (!dut.reset_i && dut.fwd_v_o && dut.fwd_ready_i)

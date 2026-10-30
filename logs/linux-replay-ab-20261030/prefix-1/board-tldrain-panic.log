@@ -1,0 +1,242 @@
+Script started on 2026-10-30 16:42:44+0000
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 300000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe8666a0 40000004 16 1
+INFO:    Creating host: 0xbe8666a0 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ca0000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ca0000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1526641
+DEBUG-PS: ps.cpp: 1-1526862
+DEBUG-PS: ps.cpp: 2-1527049
+DEBUG-PS: ps.cpp: 3-1527225
+DEBUG-PS: ps.cpp: 4-1527401
+DEBUG-PS: ps.cpp: 5-1527568
+DEBUG-PS: ps.cpp: 6-1527748
+DEBUG-PS: ps.cpp: 7-1527919
+DEBUG-PS: ps.cpp: 8-1528085
+DEBUG-PS: ps.cpp: 9-1528252
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878614
+DEBUG-PS: ps.cpp: finished loading 1878614 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #7 SMP Fri Oct 30 01:55:12 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh          
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000104] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009378] Console: colour dummy device 80x25
+[    0.011196] printk: console [hvc0] enabled
+[    0.160861] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166957] pid_max: default: 32768 minimum: 301
+[    0.183221] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.188517] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.300625] Unable to handle kernel paging request at virtual address ffffffff80ffe702
+[    0.305709] Oops [#1]
+[    0.307305] Modules linked in:
+[    0.309370] CPU: 0 PID: 3 Comm: pool_workqueue_ Not tainted 6.6.0 #7
+[    0.312574] Hardware name: blackparrot,riscv64 (DT)
+[    0.314934] epc : _sdata+0x1019da/0x1032d8
+[    0.317521]  ra : __schedule+0x88/0x72c
+[    0.320069] epc : ffffffff80ffe702 ra : ffffffff80813332 sp : ffffffc80001bd90
+[    0.323422]  gp : ffffffff816eb330 tp : ffffffd801c81680 t0 : 00000000000091b4
+[    0.326754]  t1 : 00000000000000c0 t2 : ffffffff82cc9e69 s0 : ffffffc80001be10
+[    0.330080]  s1 : 0000000200000022 a0 : 0000000000000000 a1 : 0000000200000022
+[    0.333396]  a2 : ffffffd803f0d878 a3 : ffffffd801c81bd8 a4 : 0000000000000001
+[    0.336718]  a5 : 0000000000000001 a6 : ffffffd801c81778 a7 : 0000000000000002
+[    0.340022]  s2 : 0000000000000001 s3 : 0000000000000000 s4 : ffffffd801c81680
+[    0.343328]  s5 : ffffffff81720e90 s6 : 0000000000000000 s7 : ffffffff811fd1c8
+[    0.346652]  s8 : ffffffff811fc458 s9 : ffffffd801c58140 s10: ffffffff8002ef9e
+[    0.350003]  s11: 0000000000000000 t3 : 0000000000000000 t4 : 0000000000000000
+[    0.353282]  t5 : 00000000fa83b2da t6 : 0000000001698062
+[    0.355843] status: 0000000200000120 badaddr: ffffffff80ffe702 cause: 000000000000000c
+[    0.360049] Code: 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 (0000) 0000 
+[    0.364418] ---[ end trace 0000000000000000 ]---
+[    0.366804] note: pool_workqueue_[3] exited with preempt_count 1
+[    0.370567] ------------[ cut here ]------------
+[    0.372833] do not call blocking ops when !TASK_RUNNING; state=1 set at [<(____ptrval____)>] kthread_worker_fn+0xd8/0x1a2
+[    0.379033] WARNING: CPU: 0 PID: 3 at kernel/sched/core.c:10117 __might_sleep+0x5e/0x62
+[    0.380079] Modules linked in:
+[    0.380533] CPU: 0 PID: 3 Comm: pool_workqueue_ Tainted: G      D            6.6.0 #7
+[    0.381176] Hardware name: blackparrot,riscv64 (DT)
+[    0.381468] epc : __might_sleep+0x5e/0x62
+[    0.382066]  ra : __might_sleep+0x5e/0x62
+[    0.382681] epc : ffffffff800359c2 ra : ffffffff800359c2 sp : ffffffc80001ba20
+[    0.383155]  gp : ffffffff816eb330 tp : ffffffd801c81680 t0 : 6320746f6e206f64
+[    0.383622]  t1 : 0000000000000064 t2 : 616320746f6e206f s0 : ffffffc80001ba40
+[    0.384074]  s1 : ffffffff811fb3b8 a0 : 000000000000006d a1 : ffffffff81685a78
+[    0.384526]  a2 : 0000000000000000 a3 : 0000000000000001 a4 : 0000000000000000
+[    0.384935]  a5 : 0000000000000000 a6 : 0000000000000000 a7 : 0000000000000001
+[    0.385339]  s2 : 0000000000000031 s3 : ffffffd801c90d00 s4 : 0000000000000000
+[    0.385770]  s5 : 000000000000000b s6 : ffffffc80001bc70 s7 : ffffffff811faa48
+[    0.386223]  s8 : 0000000200000022 s9 : ffffffd801c58140 s10: ffffffff8002ef9e
+[    0.386683]  s11: 0000000000000000 t3 : ffffffff816fcfd7 t4 : ffffffff816fcfd7
+[    0.387125]  t5 : ffffffff816fcfd8 t6 : ffffffc80001b838
+[    0.387503] status: 0000000200000120 badaddr: 0000000000000000 cause: 0000000000000003
+[    0.387954] [<ffffffff800359c2>] __might_sleep+0x5e/0x62
+[    0.388689] [<ffffffff8001e9fe>] exit_signals+0x20/0x22c
+[    0.389578] [<ffffffff8001408c>] do_exit+0x13e/0x76e
+[    0.390449] [<ffffffff80014732>] make_task_dead+0x76/0x140
+[    0.391269] [<ffffffff8000580a>] die+0x1e8/0x218
+[    0.391990] [<ffffffff8000a25a>] die_kernel_fault+0x4a/0x50
+[    0.392920] [<ffffffff8000a284>] handle_page_fault+0x0/0x3b2
+[    0.393793] [<ffffffff8000a61a>] handle_page_fault+0x396/0x3b2
+[    0.394667] [<ffffffff80811dd0>] do_page_fault+0x1e/0x36
+[    0.395549] [<ffffffff80003398>] ret_from_exception+0x0/0x64
+[    0.396262] ---[ end trace 0000000000000000 ]---
+[    0.478600] Oops - illegal instruction [#2]
+[    0.479089] Modules linked in:
+[    0.479556] CPU: 0 PID: 4 Comm: kworker/R-rcu_g Tainted: G      D W          6.6.0 #7
+[    0.480232] Hardware name: blackparrot,riscv64 (DT)
+[    0.480759] epc : __schedule+0x7c/0x72c
+[    0.481708]  ra : 0xf80813a1e0000000
+[    0.482116] epc : ffffffff80813326 ra : f80813a1e0000000 sp : ffffffc80001bd70
+[    0.482590]  gp : ffffffff816eb330 tp : ffffffd801c821c0 t0 : 000000000000b23b
+[    0.483044]  t1 : 0000000000000003 t2 : 000000000000040c s0 : ffffffc80001bdf0
+[    0.483481]  s1 : 0000000000000000 a0 : ffffffd801c82928 a1 : 000000000000011b
+[    0.483912]  a2 : 0000000000000000 a3 : 0000000000000000 a4 : 0000000000000002
+[    0.484313]  a5 : ffffffffa8539163 a6 : 0000000000000002 a7 : 0000000000000002
+[    0.484750]  s2 : ffffffd801c499c0 s3 : ffffffd803f0ce00 s4 : ffffffd801c821c0
+[    0.485214]  s5 : ffffffff81720e90 s6 : 0000000000000000 s7 : ffffffd801c50e00
+[    0.485663]  s8 : ffffffff81613168 s9 : 61c8864680b583eb s10: ffffffd801c50e98
+[    0.486130]  s11: 0000000000000000 t3 : 0000000000000001 t4 : 00000000000003ff
+[    0.486542]  t5 : 00000000fa83b2da t6 : 0000000001552209
+[    0.486899] status: 0000000200000120 badaddr: 00000000e9019513 cause: 0000000000000002
+[    0.487368] [<ffffffff80813326>] __schedule+0x7c/0x72c
+[    0.488221] [<ffffffff80813a1e>] schedule+0x48/0xd2
+[    0.489044] [<ffffffff80029b34>] rescuer_thread+0x23e/0x354
+[    0.489894] [<ffffffff8002f700>] kthread+0xc2/0xd6
+[    0.490574] [<ffffffff800034de>] ret_from_fork+0xa/0x1c
+[    0.491871] Code: 7b0a 9e63 6806 2783 0082 4905 9563 4927 0001 0013 (0000) 0013 
+[    0.492310] ---[ end trace 0000000000000000 ]---
+[    0.492642] Kernel panic - not syncing: Fatal exception in interrupt
+[    0.552867] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---

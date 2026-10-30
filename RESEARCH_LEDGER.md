@@ -513,12 +513,21 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 
 ### RL-055 — Locked replay SRAM access must drain without accepting a new fetch
 
-- **Status:** accepted byte-level physical diagnosis and simulation fix; reroute/FPGA acceptance pending
+- **Status:** accepted byte-level diagnosis and frontend invariant; physically insufficient because the exact I-cache mode suppressed the lock
 - **Scope:** RL-054's one-line exact-kernel reproducer, the routed tag-scan image, the I-cache TL/TV frontend pipeline, and replay installer slow tag/data SRAM accesses
 - **Claim:** the tag-scan image routes cleanly but still panics on the one-line gate. The second panic reports PC `__schedule+0x7e` with illegal-instruction value `0x84aa6af7`, exactly the four bytes at offset zero of that same 64-byte line; the expected instruction at the PC is a NOP. This proves PC-to-bank misalignment rather than merely an unsafe replay address. The I-cache's TL write enable was reused as upstream ready: when the TL stage was occupied, `cache_req_lock_i` allowed it to drain while `yumi_o` simultaneously acknowledged and loaded a new fetch. Normal frontend SRAM reads could therefore interleave with replay's supposedly exclusive tag/data operations. The fix preserves the internal drain enable but gates upstream acceptance for the entire lock, so an occupied TL stage becomes empty and cannot refill until replay releases the SRAM path. A new assertion enforces zero locked accepts. Focused replay, broad UCE, and clean full-core replay gates pass.
 - **Evidence:** exact second physical panic in `logs/linux-replay-ab-20261030/prefix-1/board-tagscan-panic.log`; byte comparison against the exact `vmlinux`; focused runs under `/dev/shm/uce-icache-replay-tl-lock-fix/` and `/dev/shm/uce-prefetch-tl-lock-regression/`; clean full-core transcript in `testing/logs/`
 - **Meaning:** the installer itself need not target the currently executing set to corrupt execution; violating the cache's slow-path exclusion contract can desynchronize frontend PC/bank state globally. The one-line physical gate made this visible while the bare-metal test's completion polling did not stress the same live scheduler fetch pattern.
-- **Limits:** the handshake fix has not yet been routed or physically exercised. The exact one-line image must boot before expanding to the 63-line table or interpreting performance.
+- **Limits:** the handshake fix routes cleanly with the timing-focused implementation flow, but its one-line FPGA gate still corrupts the scheduler line. RL-056 shows that `prefetch_demand_priority_p=1` masked `cache_req_lock_o`, so the corrected frontend gate never activated in the physical I-cache configuration.
+
+### RL-056 — Demand priority must not suppress I-cache array exclusion
+
+- **Status:** accepted exact-configuration root cause and simulation fix; routed FPGA acceptance pending
+- **Scope:** RL-055's timing-clean image, the exact one-line Linux reproducer, the `bp_unicore_lite` I-cache UCE parameters, and the focused demand-priority replay wrapper
+- **Claim:** the timing-focused immutable image routes at +0.303/+0.015 ns setup/hold but still corrupts the one replayed scheduler line. The new fault enters `__schedule+0x7c` at the second halfword of a 32-bit NOP and separately jumps to an invalid kernel PC, again proving instruction-stream tearing. RTL tracing then found that the I-cache UCE is instantiated with `prefetch_demand_priority_p=1`, while `cache_req_lock_o` explicitly masked off every installer lock in that mode. Consequently RL-055's frontend `yumi_o` lock gate was never asserted on FPGA. Demand priority can abort replay when a miss reaches the UCE, but ordinary I-cache hits never appear as `cache_req_v_i` and can still interleave with slow tag/stat/invalidate accesses. The fix always exports installer array exclusion while retaining demand-priority abort semantics. The focused wrapper already uses demand-priority mode and now asserts the lock throughout drain/tag/stat/invalidate; focused replay, broad UCE prefetch, and clean full-core replay gates pass.
+- **Evidence:** physical transcript `logs/linux-replay-ab-20261030/prefix-1/board-tldrain-panic.log`; routed package under `logs/fpga-farm/bp3/20261030T155955Z-0436a531/`; focused runs under `/dev/shm/uce-icache-replay-demand-lock-r1/` and `/dev/shm/uce-prefetch-demand-lock-r1/`; clean full-core transcript in `testing/logs/`
+- **Meaning:** the prior physical negative result did not falsify frontend exclusion; it showed that the exclusion signal was configuration-disabled. A demand-priority policy and an SRAM ownership lock solve different problems and must not share the same enable.
+- **Limits:** the corrected exported lock still requires a routed one-line Linux boot before the 63-line enabled/control timing pair can be interpreted.
 
 ## Superseded or rejected findings
 
@@ -572,8 +581,8 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-049 resolves mechanism priority for the recorded Linux handoff: direction-specific early shared replay makes 175 unique lines timely under the primary case, while the single fixed table matching RL-051 still makes 171 unique lines and 173/266 records timely; trained four-line retention contributes only six timely unique lines. RL-050 implements the conservative four-slot physical I-cache lane and proves full-line installation, demand-priority abort, and `fence.i` drain-without-publication. RL-051 adds a 256-entry M-configured table and proves an address-free one-write S-mode trigger through the full core. Retention remains appropriate for five-cycle hardware handoffs and as a small immediate-line complement. RL-018 through RL-034 retain the capacity, pollution, queue-correctness, and installer evidence behind that choice.
-- **Missing:** RL-055 uses the exact fault bytes to identify and fix locked frontend acceptance after RL-054's physically insufficient tag scan. That handshake correction now needs route/FPGA acceptance, followed by issued/timely/consumed/unused/dropped/demand-delay counters, physical full-line timing, and broader target/prefix stability.
-- **Decisive experiment:** route the RL-055 TL-drain fix, require the one-line image to reach the shell, then require the exact 63-line enabled image to reach the shell and complete the trace. Only then repeat the byte-identical disabled fresh-boot trace and interpret cycles.
+- **Missing:** RL-056 identifies why RL-055's lock never reached the physical frontend and corrects the exact demand-priority configuration. That exported-lock fix now needs route/FPGA acceptance, followed by issued/timely/consumed/unused/dropped/demand-delay counters, physical full-line timing, and broader target/prefix stability.
+- **Decisive experiment:** route the RL-056 demand-priority lock fix, require the one-line image to reach the shell, then require the exact 63-line enabled image to reach the shell and complete the trace. Only then repeat the byte-identical disabled fresh-boot trace and interpret cycles.
 
 ### OQ-006 — Can target instruction prefetch overlap context restore without delaying demand fetch?
 
@@ -590,7 +599,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, route and physically validate RL-055's locked-drain handshake first with the one-line reproducer and then the exact 63-line table. Keep the exact kernel, executable, FPGA configuration, and fresh-boot discipline fixed; only after both enabled cases boot should the disabled control and trace timing be interpreted. Once all complete, add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
+For the cache-resume architecture, route and physically validate RL-056's demand-priority array lock first with the one-line reproducer and then the exact 63-line table. Keep the exact kernel, executable, FPGA configuration, and fresh-boot discipline fixed; only after both enabled cases boot should the disabled control and trace timing be interpreted. Once all complete, add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
 
 ## Delta log
 
