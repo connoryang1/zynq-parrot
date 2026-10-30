@@ -614,7 +614,8 @@ admission/issue/publication in disabled mode and 92/92/92 and 132/132/132 in
 enabled modes, proving hardware preview activity under Linux. The closed
 transcripts and exact artifact hashes are in
 `logs/linux-physical-pin-20261026/board-probe/` and RL-106. Useful overlap
-and speedup remain unmeasured.
+was established separately in RL-107/108; the later matched timing result is
+in RL-109.
 
 ## Cross-process first-use physical preview diagnostic
 
@@ -638,9 +639,31 @@ previews completed before the target loads and matched their physical lines.
 The RTL drains physical preview replies without writing the D-cache side buffer,
 so equal L1 demand-miss counts across enabled and disabled trials are expected.
 The status field named `published` means response completion for physical hints.
-The 16-trial local load times overlapped; L2 residency and whole-switch benefit
-remain unmeasured. Exact ELFs, closed transcripts, and limitations are recorded
+The 16-trial local load times overlapped; this diagnostic did not measure L2
+residency or whole-switch benefit. Exact ELFs, closed transcripts, and limitations are recorded
 in `logs/linux-physical-pin-20261026/` and RL-107.
+
+## Matched physical-preview Linux timing
+
+`scheduler_physical_preview_benchmark.c` measures a cross-process pipe handoff
+and the first four child data loads using the core-wide physical-cycle CSR
+`0xCC0`. It performs eight warmups and 128 measured trials in balanced
+`[off,on,on,off]` blocks, walking 40 KiB of other data before the child sleeps.
+Run it on the Linux shell image and timing-qualified quiesce RTL used above:
+
+```sh
+make -C linux-tests scheduler-physical-preview-benchmark-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+python3 linux-tests/analyze_scheduler_physical_preview_benchmark.py \
+  logs/physical-preview-performance-20261030/board-run.txt
+```
+
+The board run passed 128/128 trials and all hook checks. Off/on four-load
+medians were 316.5/329.0 cycles; the block-paired off-minus-on effect was
+-9.0 cycles with a bootstrap 95% interval of [-34.0,+7.25]. Whole-handoff
+paired intervals also crossed zero. This narrow Linux workload therefore does
+not establish a speedup. The exact image identities, transcript, and limits
+are in `logs/physical-preview-performance-20261030/` and RL-109.
 
 ## Ordered Linux handoff miss capture
 

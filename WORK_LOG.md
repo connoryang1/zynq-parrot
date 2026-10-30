@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Linux physical-preview performance — 2026-10-30:** a guest-verified 128-trial balanced cross-process board benchmark passed on the exact timing-qualified quiesce image. The four-load paired saving was -9 cycles (bootstrap 95% interval -34 to +7.25), while whole-handoff intervals crossed zero, so no Linux speedup is established; a rejected short timeout and a wrong fixed-path overlay were caught before measurement and recovered by power cycle, exact restaging, and hash verification (`logs/physical-preview-performance-20261030/`, RL-109).
+
 - **Physical-preview L2 fill control — 2026-10-28:** a traced full two-bank simulation paired the physical-hint CSR gate with a same-address no-target-hint control: hints caused four target L2 DMA fills before demand and the later four demands caused none, while the control's four demands each caused a target DMA fill. Both guest/host gates passed; this confirms the directed L2 warming mechanism but leaves Linux L2 residency and speedup unmeasured (`logs/l2-physical-preview-20261028/`, RL-108).
 
 - **Physical-preview first-use mechanism — 2026-10-28:** a guest-verified 16-trial cross-process diagnostic found four physical preview responses complete before the child's target loads, while enabled and disabled L1 D-cache miss counts were alike. A separate address trace matched all four completed preview addresses to later target demand lines roughly 7.9–9.8 thousand cycles ahead; RTL review confirms physical replies bypass the L1 side buffer, so these L1 counts cannot establish or reject L2 benefit (`logs/linux-physical-pin-20261026/board-probe/`, RL-107).
