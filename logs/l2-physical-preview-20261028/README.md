@@ -1,0 +1,26 @@
+This directory records a directed check of whether physical previews fill and retain target lines in L2. It separates simulator configuration and waveform evidence from the earlier Linux board trace, which measured only L1 demand misses. The full-model pair confirms four target fills moved ahead of demand in simulation; Linux L2 residency and speedup remain unmeasured.
+
+# Physical-preview L2 validation
+
+The first attempt invoked `make -C testing run-mt_physical_preview_csr_test TRACE=1 TARGET_RUNTIME_MS=100 NUM_THREADS=2 NUM_CONTEXTS=10` after a completed `make -C testing clean`. The command began building `cosim/black-parrot-minimal-example/verilator`, then was interrupted before any run result because `testing/Makefile` defaults `SIM_DIR` to the minimal core topology; `testing/README.md` explicitly states that topology has no L2. No L2 behavior is inferred from this interrupted build. Specify `SIM_DIR="$PWD/cosim/black-parrot-example/verilator"` and the two-bank full-model defines before rebuilding the test; preserve closed traces before any later run.
+
+The first no-target-hint control failed its new assertion that CSR preview counters were zero immediately after a `trace_control(2)` clear. It printed `[BSG-FAIL] physical preview CSR: no-target-hint control issued a preview` before the target loads, so its trace cannot answer the L2 demand question. The cause of the nonzero immediate readback is not isolated; a prior probe hint and the adjacent clear/read timing are possible. The rejected run is retained as `rejected-control.{log,fst,riscv}`; the control now relies on address-qualified L2 waveform events to verify absence of target hints, rather than an immediate core-wide counter read.
+
+## Accepted full-model pair
+
+The full-model clean build used `env DEFINES='BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED' make -C testing run-mt_physical_preview_csr_test SIM_DIR="$PWD/cosim/black-parrot-example/verilator" NUM_THREADS=2 NUM_CONTEXTS=10 TRACE=1 VERILATOR_BUILD_JOBS=12 TARGET_RUNTIME_MS=100`. The guest and host passed, and `hinted-full.{log,fst}` and `hinted-guest.riscv` were archived before another run. After a completed `make -C testing clean`, the same command with target `run-mt_physical_preview_l2_control_test` also passed and was archived as `control-full.{log,fst}` and `control-guest.riscv`. Both linked the target at physical `0x80008000` with four 64-byte lines.
+
+A later read-only pass over the same accepted `hinted-full.fst` with `python3 logs/l2-physical-preview-20261028/extract_active_sets.py logs/l2-physical-preview-20261028/hinted-full.fst` sampled each bank's accepted DRAM-address cache operations. Bank 0 reached only sets `[0,2,4,6,8,10,12,14]`; bank 1 reached only `[1,3,5,7,9,11,13,15]`. This corroborates the source mapping in RL-111: the two-bank configuration instantiates 4 KiB but only 2 KiB is reachable for ordinary DRAM lines. Reset and cache-management operations are excluded from this set count. The waveform does not measure target eviction during a Linux switch.
+
+| Accepted artifact | SHA-256 |
+| --- | --- |
+| Hinted waveform | `ce2f2f89231f32bd1f183f5f334fc2c7794809124ac216e528edb50f07cdaf27` |
+| Hinted raw log | `209cab1732ce6fee87dbe8f7bb9e7af23b46517c2205b897c838a1a0421266c5` |
+| Hinted guest ELF | `f004b04e6d8fdad84414359974c084da7cfb114e2d30b1fff5d2420db2523f2d` |
+| Control waveform | `061c61354fc15115475698ac81c4fcb16d38d6f0a879806968a53bcd8c4e0c70` |
+| Control raw log | `ab80a04266f67e9fff1edd57af935e6dc1235530eab9814fae058c3ab2b20b02` |
+| Control guest ELF | `428d3de77195fca5e2dbacfeb5a6d0eecdc2ca0bd5827e308ef1352b4e7c20cd` |
+
+`extract_target_l2.py` filters the closed FST by L2 controller accept handshakes and each bank's accepted read DMA packet (`v && yumi`), retaining the target physical lines in `hinted-target-events.txt` and `control-target-events.txt`. The hinted trace has four target requests with the prefetch bit set, each followed by a target DMA read, then four ordinary target requests with no further target DMA read. The control has no target prefetch requests; its four ordinary target requests each cause a target DMA read. This is exact address-qualified evidence that the physical hint moves lower-memory reads ahead of the later demands in the directed simulator. The model's synthetic AXI timing and bare-metal program do not establish a Linux or FPGA speedup.
+
+After adding the compile-time no-target-hint branch, the original default CSR gate was rebuilt through `make -C testing clean` and rerun on the same full model with `TRACE=1`; it again produced guest/core/host PASS. Its ELF SHA-256 remained `f004b04e6d8fdad84414359974c084da7cfb114e2d30b1fff5d2420db2523f2d`, and the closed `hinted-postchange.fst` and `.log` hash to `79ce32d8c27d91bef0c2b32bd9a36192c7332f92c329d067cbf3f07e9583c254` and `70f6c4c464f7ee168388f910d07331d88082fbed214c4dfe090c5ebf1e159f49`. The shared `make -C testing check-harness` gate passed 15 tests. The extractor and accepted filtered event files hash to `ed63f77c8bdae4b26d3d164c86e63775b759ed310433eaa0b6247fea92cd3f01`, `5b1429b9f33017dc0e0292a564b2ce233ad89f31745c0827735a30457081dda0`, and `8494977f1160b5d805cff716a1a0c3b985f2d65f19d34db725dd3c003ae8e462` respectively.

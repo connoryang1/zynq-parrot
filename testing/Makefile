@@ -78,6 +78,8 @@ CORRECTNESS_TESTS := \
     mt_smode_prefetch_sum_test \
     mt_preview_side_buffer_pressure_test \
     mt_physical_preview_csr_test \
+    mt_physical_preview_l2_control_test \
+    mt_preview_quiesce_test \
     mt_physical_preview_dirty_line_test \
     mt_translated_preview_dirty_l2_test \
     mt_prefetch_hint_test \
@@ -168,6 +170,9 @@ $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_hint_test.riscv: $(TOP)/software/include/bp
 $(ZP_RISCV_DIR)/bp-tests/mt_context_preview_oracle_test.riscv: $(TOP)/software/include/bp_prefetch.h
 run-mt_context_preview_oracle_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5 BP_PREFETCH_AXI_BYPASS
 run-mt_physical_preview_csr_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5 BP_PREFETCH_AXI_BYPASS
+run-mt_physical_preview_l2_control_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5 BP_PREFETCH_AXI_BYPASS
+$(ZP_RISCV_DIR)/bp-tests/mt_preview_quiesce_test.riscv: $(TOP)/software/include/bp_prefetch.h
+run-mt_preview_quiesce_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5
 run-mt_physical_preview_dirty_line_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5 BP_PREFETCH_AXI_BYPASS
 $(ZP_RISCV_DIR)/bp-tests/mt_translated_preview_dirty_l2_test.riscv: $(TOP)/software/include/bp_prefetch.h
 run-mt_translated_preview_dirty_l2_test: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=5 BP_PREFETCH_AXI_BYPASS
