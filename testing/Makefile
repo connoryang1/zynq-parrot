@@ -63,6 +63,7 @@ CORRECTNESS_TESTS := \
     mt_machine_trap_test \
     mt_protected_rpc_reference_test \
     mt_protected_rpc_hardware_test \
+    mt_protected_rpc_library_test \
     mt_opensbi_csr_probe_test \
     mt_satp_asid_warl_test \
     mt_cache_miss_trace_test \
@@ -129,10 +130,12 @@ all: $(addprefix $(ZP_RISCV_DIR)/bp-tests/, $(addsuffix .riscv, $(DEFAULT_TOPOLO
 $(LOG_DIR):
 	@mkdir -p $@
 
+TEST_EXTRA_SOURCES_mt_protected_rpc_library_test := $(TOP)/testing/protected_rpc_demo_service.S
+
 define TEST_RULES
 $(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h FORCE | $(LOG_DIR)
 	@echo "  [CC]    Compiling $(1).riscv (Threads: $(NUM_THREADS))..."
-	@$$(CC) -o $$@ $$< $$(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
+	@$$(CC) -o $$@ $$< $$(TEST_EXTRA_SOURCES_$(1)) $$(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
 
 run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	@echo "  [CLEAN] Refreshing $(1) environment..."
@@ -152,6 +155,7 @@ $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_reference_test.riscv: CFLAGS += -DRPC_FLUSH_ON_SWITCH=$(RPC_FLUSH_ON_SWITCH)
+$(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_library_test.riscv: $(TOP)/software/include/bp_protected_rpc.h $(TOP)/testing/protected_rpc_demo_service.S
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_target_bypass_stress_test.riscv: CFLAGS += -DCTXTSW_TARGET_BYPASS_TURNS=$(TARGET_BYPASS_TURNS)

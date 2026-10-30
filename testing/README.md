@@ -34,6 +34,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_machine_trap_test` | Cold M-mode ECALL records `mcause`/`mepc`, redirects through `mtvec`, and returns through `mret` before any context handoff |
 | `mt_protected_rpc_reference_test` | Software `pcall`/`preturn` reference: capability validation, fixed entry, distinct Sv39 domains, protected continuation, four arguments, one result, and full call/reply timing |
 | `mt_protected_rpc_hardware_test` | Atomic hardware `pcall`/`preturn`: capability 1 binds resident context 0 to context 1, copies four arguments and one result at switch commit, forces a fixed server entry, and consumes a protected return continuation |
+| `mt_protected_rpc_library_test` | Reusable four-argument client wrapper plus a separately linked service page: two Sv39 domains call the fixed service, preserve different private pages at the same VA, map one shared page at different VAs, exchange only bounds-checked buffer offsets, reject an invalid range, and return two checked results |
 | `mt_rpc_context_transport_benchmark` | Unprotected transport upper bound: two resident U-mode Sv39 domains exchange four arguments and one result through remote register seeds and a context-switch round trip, compared with matched direct calls |
 | `mt_opensbi_csr_probe_test` | Early OpenSBI PMP, absent HPM, and optional privileged CSR probes take exact-PC illegal-instruction traps, matching the physically Linux-booting behavior |
 | `mt_ctxtsw_smoke_test` | Resident 0→1→0 handoff |

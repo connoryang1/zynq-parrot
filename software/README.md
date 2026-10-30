@@ -1,5 +1,29 @@
 This directory contains build support for ZynqParrot host environments and small target-side helpers. The helpers below distinguish the implemented nonblocking prefetch hint from the ordinary discarded-load baseline used in earlier experiments.
 
+## Protected RPC helper
+
+Include `bp_protected_rpc.h` with `-Isoftware/include` to invoke a
+monitor-installed protected service. `bp_protected_rpc_call4()` carries four
+64-bit arguments to the service and returns one 64-bit result. The current
+prototype implements capability 1 and enters the service at the address fixed
+by its privileged descriptor; service code returns with `preturn` rather than
+choosing a caller address.
+
+Raw pointers must not cross this ABI. Caller and service have distinct page
+tables, so the same virtual address may name different storage and a caller
+address may be entirely unmapped in the service. For explicitly shared memory,
+pass a `bp_rpc_offset_t` plus a byte length. Each side calls
+`bp_rpc_shared_ptr()` with its own local mapping base; the helper checks the
+whole range without an overflow-prone `offset + length` expression. Server
+objects should similarly be represented by validated opaque handles, not by
+server virtual addresses. Pointer graphs that are not placed in a shared arena
+must be serialized or copied.
+
+The current helper is a bare-metal target ABI, not yet a Linux library. A Linux
+version will also need the kernel to authorize, pin, and prefault shared pages
+before the fast call, because the protected service path cannot safely handle a
+page fault, syscall, or blocking operation yet.
+
 ## BlackParrot prefetch helper
 
 Include `bp_prefetch.h` with `-Isoftware/include` to request a line before other
