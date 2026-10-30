@@ -6,11 +6,15 @@ import json
 from pathlib import Path
 
 
-def render(result):
+def render(result, limit=None):
     table = result["fixed_shared_prefix"]
     lines = table["lines"]
     if table["line_count"] != len(lines) or not 0 < len(lines) <= 256:
         raise ValueError("fixed prefix must contain 1--256 self-consistent lines")
+    if limit is not None:
+        if not 0 < limit <= len(lines):
+            raise ValueError("prefix limit must select at least one available line")
+        lines = lines[:limit]
     addresses = []
     sets = collections.Counter()
     for rank, line in enumerate(lines):
@@ -61,8 +65,13 @@ def main():
         default=Path(__file__).resolve().parent
         / "opensbi-platform/blackparrot/icache_prefix.h",
     )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help="emit only the first N ranked lines (for replay-table bisection)",
+    )
     args = parser.parse_args()
-    text = render(json.loads(args.results.read_text()))
+    text = render(json.loads(args.results.read_text()), args.limit)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(text)
     print(f"wrote {args.output} with {text.count('UL,')} cache lines")

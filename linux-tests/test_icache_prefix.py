@@ -28,6 +28,14 @@ class IcachePrefixTest(unittest.TestCase):
         self.assertEqual(generated, committed)
         self.assertEqual(generated.count("UL,"), 63)
 
+    def test_limit_emits_ranked_prefix(self):
+        generated = EMITTER.render(self.result, 3)
+        self.assertIn("#define BP_ICACHE_PREFIX_COUNT 3U", generated)
+        for line in self.result["fixed_shared_prefix"]["lines"][:3]:
+            self.assertIn(f"0x{int(line['paddr']):016x}UL", generated)
+        fourth = self.result["fixed_shared_prefix"]["lines"][3]
+        self.assertNotIn(f"0x{int(fourth['paddr']):016x}UL", generated)
+
     def test_rejects_misaligned_line(self):
         malformed = copy.deepcopy(self.result)
         malformed["fixed_shared_prefix"]["lines"][0]["paddr"] += 1

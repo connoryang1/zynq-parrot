@@ -502,6 +502,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the first exact-image experiment was essential even though it produced no speedup: the earlier tests covered demand arriving during active installation, not a demand already resident before same-line replay admission. Replay performance is not interpretable until this liveness fix is routed and the matched A/B is repeated.
 - **Limits:** the physical enabled run validates the failure but not yet the fix. The model still lacks issue/install/consumption/demand-delay counters and its 2,104.8-cycle figure is proportional coverage only. No Linux replay speedup is claimed.
 
+### RL-054 — One-line physical replay exposes duplicate-tag instruction corruption
+
+- **Status:** accepted minimal physical diagnosis and simulation fix; reroute/FPGA acceptance pending
+- **Scope:** RL-053's exact kernel, the first ranked replay line only (`0x8023d480`), the timing-clean routed liveness-fix image, direct physical I-cache replay, and the four-slot full-line installer
+- **Claim:** the routed liveness fix reaches the former scheduler boundary but the 63-line image still stops. Reducing the table to one scheduler-code line produces an immediate NULL dereference after `schedule()`, then an illegal instruction and kernel panic. A single line rules out queue capacity, aggregate bandwidth, and multi-line set contention. The direct replay lane bypasses normal I-cache tag lookup, and the installer previously validated only that its selected victim was clean; if the replay target was already resident, it could publish the same physical tag in another way and violate the I-cache's one-hot hit/data-select invariant. The corrected installer scans every tag way under its existing lock and drops an already-resident advisory line. It also rejects installer acquisition in a cycle where demand priority admits an architectural request, closing the remaining resident-demand race. The focused regression now explicitly supplies a valid matching tag and observes no data write or publication; the broader UCE regression and clean full-core replay test pass.
+- **Evidence:** one-line image hash and physical panic transcript in `logs/linux-replay-ab-20261030/prefix-1/`; directed waveform under `/dev/shm/uce-icache-replay-duplicate-fix-r2/`; clean full-core transcript in `testing/logs/` for the current run
+- **Meaning:** Linux found a cache invariant absent from the cold-function bare-metal test: replay targets can already be hot. Correct replay must be idempotent with respect to cache residency, not merely safe with respect to victim dirtiness and same-line demand ordering.
+- **Limits:** the duplicate-tag explanation is strongly supported by the minimal physical failure and RTL invariant, but the corrected tag scan has not yet been routed or run on FPGA. The one-line and 63-line corrected images must both boot before the disabled timing control and performance trace are interpreted.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -554,8 +563,8 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-049 resolves mechanism priority for the recorded Linux handoff: direction-specific early shared replay makes 175 unique lines timely under the primary case, while the single fixed table matching RL-051 still makes 171 unique lines and 173/266 records timely; trained four-line retention contributes only six timely unique lines. RL-050 implements the conservative four-slot physical I-cache lane and proves full-line installation, demand-priority abort, and `fence.i` drain-without-publication. RL-051 adds a 256-entry M-configured table and proves an address-free one-write S-mode trigger through the full core. Retention remains appropriate for five-cycle hardware handoffs and as a small immediate-line complement. RL-018 through RL-034 retain the capacity, pollution, queue-correctness, and installer evidence behind that choice.
-- **Missing:** RL-053 completes exact-image retraining and the first matched physical A/B, but that run exposes a same-line liveness bug before performance can be measured. The directed fix now needs route/FPGA acceptance, followed by issued/timely/consumed/unused/dropped/demand-delay counters, physical full-line timing, and broader target/prefix stability.
-- **Decisive experiment:** route the RL-053 advisory-drop fix, repeat the same byte-identical enabled/disabled fresh-boot A/B, and require both variants to reach the shell and complete the trace workload before interpreting cycles. Then add the required counters and demand-delay control; retention remains a later extension unless corrected replay shows inadequate first-line coverage.
+- **Missing:** RL-054 reduces the routed failure to one already-hot scheduler line and adds duplicate-tag suppression plus the remaining acquisition-race guard. That correction now needs route/FPGA acceptance, followed by issued/timely/consumed/unused/dropped/demand-delay counters, physical full-line timing, and broader target/prefix stability.
+- **Decisive experiment:** route the RL-054 tag-scan fix, require both the one-line and 63-line enabled images to reach the shell, then repeat the byte-identical disabled fresh-boot trace before interpreting cycles. Add the required counters and demand-delay control afterward; retention remains a later extension unless corrected replay shows inadequate first-line coverage.
 
 ### OQ-006 — Can target instruction prefetch overlap context restore without delaying demand fetch?
 
@@ -572,7 +581,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, route and physically repeat RL-053's same-line liveness fix before any performance interpretation. Keep the exact kernel, 63-line table, executable, FPGA configuration, and fresh-boot discipline fixed across enabled and disabled runs. Once both complete, add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
+For the cache-resume architecture, route and physically validate RL-054's duplicate-tag suppression first with the one-line reproducer and then the exact 63-line table. Keep the exact kernel, executable, FPGA configuration, and fresh-boot discipline fixed; only after both enabled cases boot should the disabled control and trace timing be interpreted. Once all complete, add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
 
 ## Delta log
 

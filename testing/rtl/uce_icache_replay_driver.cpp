@@ -117,6 +117,7 @@ public:
     dut.reset_i = 1; dut.replay_v_i = 0; dut.req_v_i = 0;
     dut.metadata_v_i = 0; dut.arrays_accept_i = 1; dut.fwd_ready_i = 1;
     dut.rev_v_i = 0; dut.rev_state_i = 0;
+    dut.tag_state_i = 0; dut.tag_value_i = 0;
   }
   ~Test() { dut.final(); trace.close(); }
   void run() {
@@ -131,26 +132,38 @@ public:
     require(data_writes == 4 && publishes == 1,
             "complete replay did not install exactly one full line");
 
-    // Once a fence is accepted, an issued reply may drain but may not install.
-    enqueue(0x80011000); wait_sent(2); one_response_beat(sent[1]);
+    // Direct physical replay bypasses the ordinary cache lookup. A line that
+    // is already resident in any way must be dropped instead of being
+    // published into a second way and creating a non-one-hot hit vector.
     unsigned old_writes = data_writes, old_publishes = publishes;
+    enqueue(0x80017000); wait_sent(2);
+    dut.tag_state_i = 1;
+    dut.tag_value_i = 0x80017000 >> 8; // 64-byte line, four-set test cache
+    response(sent[1]); wait_idle_empty();
+    require(data_writes == old_writes && publishes == old_publishes,
+            "already-resident replay created a duplicate cache line");
+    dut.tag_state_i = 0; dut.tag_value_i = 0;
+
+    // Once a fence is accepted, an issued reply may drain but may not install.
+    enqueue(0x80011000); wait_sent(3); one_response_beat(sent[2]);
+    old_writes = data_writes; old_publishes = publishes;
     request(cache_inval, 0);
-    response(sent[1], 1); wait_idle_empty();
+    response(sent[2], 1); wait_idle_empty();
     require(data_writes == old_writes && publishes == old_publishes,
             "fence-cancelled replay modified or published L1 state");
 
     // Architectural demand arriving during installation must abort advisory
     // work and enter the ordinary UCE path without waiting for publication.
-    enqueue(0x80012000); wait_sent(3); response(sent[2]);
-    for (unsigned n = 0; n < 100 && dut.install_state_o != 5; ++n) step();
-    require(dut.install_state_o == 5, "test failed to reach replay fill state");
+    enqueue(0x80012000); wait_sent(4); response(sent[3]);
+    for (unsigned n = 0; n < 100 && dut.install_state_o != 7; ++n) step();
+    require(dut.install_state_o == 7, "test failed to reach replay fill state");
     old_publishes = publishes;
-    request(miss_load, 0x80013000); wait_sent(4);
-    require(!sent[3].prefetch && sent[3].addr == 0x80013000,
+    request(miss_load, 0x80013000); wait_sent(5);
+    require(!sent[4].prefetch && sent[4].addr == 0x80013000,
             "demand did not preempt replay installation");
     require(publishes == old_publishes,
             "preempted replay published before demand was accepted");
-    response(sent[3]);
+    response(sent[4]);
     for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
     require(dut.replay_valid_o == 0, "preempted replay slot was not retired");
 
@@ -167,24 +180,25 @@ public:
     request(miss_load, 0x80014000);
     enqueue(0x80014000);
     dut.fwd_ready_i = 1;
-    wait_sent(7);
-    require(sent[4].prefetch && sent[5].prefetch && sent[6].prefetch
-            && sent[6].addr == 0x80014000,
-            "same-line replay did not issue ahead of resident demand");
-    response(sent[6]);
     wait_sent(8);
-    require(!sent[7].prefetch && sent[7].addr == 0x80014000,
-            "resident same-line demand remained blocked after replay completion");
+    require(sent[5].prefetch && sent[6].prefetch && sent[7].prefetch
+            && sent[7].addr == 0x80014000,
+            "same-line replay did not issue ahead of resident demand");
     response(sent[7]);
+    wait_sent(9);
+    require(!sent[8].prefetch && sent[8].addr == 0x80014000,
+            "resident same-line demand remained blocked after replay completion");
+    response(sent[8]);
     for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
-    response(sent[4]);
     response(sent[5]);
+    response(sent[6]);
     wait_idle_empty();
     require(dut.replay_valid_o == 0,
             "same-line replay slot was not dropped for resident demand");
 
-    std::cout << "[UCE-ICACHE-REPLAY] PASS: full-line install, fence drain-without-publish, "
-                 "demand-priority abort, resident same-line demand progress\n";
+    std::cout << "[UCE-ICACHE-REPLAY] PASS: full-line install, resident-line drop, "
+                 "fence drain-without-publish, demand-priority abort, "
+                 "resident same-line demand progress\n";
   }
 };
 }

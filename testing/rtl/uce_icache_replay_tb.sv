@@ -16,6 +16,8 @@ module uce_icache_replay_tb
    input [63:0] req_addr_i,
    input metadata_v_i,
    input [2:0] metadata_way_i,
+   input [2:0] tag_state_i,
+   input [63:0] tag_value_i,
    input arrays_accept_i,
    output req_yumi_o, req_lock_o, critical_o, last_o,
    output credits_full_o, credits_empty_o,
@@ -25,7 +27,7 @@ module uce_icache_replay_tb
    output [1:0] data_opcode_o, stat_opcode_o,
    output [3:0] data_fill_o,
    output [63:0] data_word0_o, data_word1_o,
-   output [2:0] install_state_o,
+   output [3:0] install_state_o,
    output [3:0] replay_valid_o, replay_sent_o, replay_complete_o, replay_cancel_o,
    output fwd_v_o,
    input fwd_ready_i,
@@ -59,6 +61,7 @@ module uce_icache_replay_tb
   bp_cache_req_s req;
   bp_cache_req_metadata_s metadata;
   bp_cache_tag_mem_pkt_s tag_pkt;
+  bp_cache_tag_info_s tag_info;
   bp_cache_data_mem_pkt_s data_pkt;
   bp_cache_stat_mem_pkt_s stat_pkt;
   bp_bedrock_mem_fwd_header_s fwd;
@@ -73,6 +76,9 @@ module uce_icache_replay_tb
     req.id = 4'h9;
     metadata = '0;
     metadata.hit_or_repl_way = metadata_way_i;
+    tag_info = '0;
+    tag_info.state = bp_coh_states_e'(tag_state_i);
+    tag_info.tag = tag_lp'(tag_value_i);
     rev = '0;
     rev.msg_type = bp_bedrock_msg_u'(rev_type_i);
     rev.size = bp_bedrock_msg_size_e'(rev_size_i);
@@ -110,7 +116,7 @@ module uce_icache_replay_tb
          .detached_prefetch_v_i(replay_v_i),
          .detached_prefetch_ready_and_o(replay_ready_o),
          .tag_mem_pkt_o(tag_pkt), .tag_mem_pkt_v_o(tag_v_o),
-         .tag_mem_pkt_yumi_i(tag_v_o & arrays_accept_i), .tag_mem_i('0),
+         .tag_mem_pkt_yumi_i(tag_v_o & arrays_accept_i), .tag_mem_i(tag_info),
          .data_mem_pkt_o(data_pkt), .data_mem_pkt_v_o(data_v_o),
          .data_mem_pkt_yumi_i(data_v_o & arrays_accept_i), .data_mem_i('0),
          .stat_mem_pkt_o(stat_pkt), .stat_mem_pkt_v_o(stat_v_o),
