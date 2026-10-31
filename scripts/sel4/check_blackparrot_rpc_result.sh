@@ -20,6 +20,8 @@ hardware_count=0
 software_count=0
 
 while IFS= read -r line; do
+    # A UART or PTY may preserve CRLF even though the evidence text is exact.
+    line=${line%$'\r'}
     if [[ $line == "$marker" ]]; then
         marker_count=$((marker_count + 1))
     elif [[ $line =~ $hardware_re ]]; then
