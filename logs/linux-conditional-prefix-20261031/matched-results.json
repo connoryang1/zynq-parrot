@@ -1,33 +1,90 @@
 {
-  "purpose": "Record the accepted matched FPGA source-to-peer batches for conditional four-line Linux instruction replay. Overflowing captures are retained but excluded from the primary median.",
+  "purpose": "Record exact-image FPGA timing batches for the conditional Linux instruction-prefix sweep, using every completed timing endpoint and reporting trace overflow separately.",
   "hardware": {
     "top_commit": "3a08584daff9d070c4e1429eda81b6da63929ff5",
     "blackparrot_commit": "b1a06528161ca5ac08835268698320086e6fd4dd",
-    "bitstream_sha256": "e1e66020ef2cf1a286077229ecd8a62d8ef56ca68bd3497afe0dfc91a7492338"
+    "bitstream_sha256": "e1e66020ef2cf1a286077229ecd8a62d8ef56ca68bd3497afe0dfc91a7492338",
+    "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30"
   },
   "protocol": {
     "measurement_elf_sha256": "14bf2ab9c232d5c71c21a6204c3dfaa6ee42e3e949d63d994168b1a84da1bf4d",
     "window": "to-peer",
-    "fresh_boot_per_arm": true,
+    "elapsed_definition": "peer_begin - start",
+    "fresh_power_cycle_per_primary_arm": true,
     "warmups_per_arm": 1,
-    "recorded_samples_per_arm": 7,
-    "acceptance": "i_overflow=0 and d_overflow=0"
+    "timing_acceptance": "all completed TRACE_HEADER endpoints; overflow affects trace completeness, not elapsed validity",
+    "bootstrap": "100000 independent within-arm resamples, deterministic seed 0xC0D3"
   },
-  "disabled": {
-    "nbf_sha256": "eee6fa9ff26307f7b8f0edf3cf3e2718f2a6ad2a073a11fa87aa6c27235fe716",
-    "accepted_elapsed_cycles": [12779, 14707, 12631, 11115, 12672],
-    "overflow_elapsed_cycles": [49845, 40430],
-    "median_accepted_cycles": 12672
+  "arms": {
+    "disabled": {
+      "active_lines": 0,
+      "nbf_sha256": "eee6fa9ff26307f7b8f0edf3cf3e2718f2a6ad2a073a11fa87aa6c27235fe716",
+      "samples": 50,
+      "instruction_trace_overflows": 11,
+      "median_cycles": 14463.5,
+      "mean_cycles": 21237.7,
+      "q1_cycles": 12259.5,
+      "q3_cycles": 17947.5,
+      "transcript": "raw/disabled-summary50-local.log",
+      "transcript_sha256": "31885d204708731c4690921bbac3d6986c567eb33f9ec7ede6215c809f61eaf6"
+    },
+    "target1": {
+      "active_lines": 1,
+      "nbf_sha256": "066f02cdd52536c00cadbdef60c9fce2cff1cd08d9819419e25e2cee0e5b93d4",
+      "samples": 14,
+      "instruction_trace_overflows": 6,
+      "median_cycles": 17026.5,
+      "mean_cycles": 28201.071,
+      "q1_cycles": 12303.5,
+      "q3_cycles": 42119.75,
+      "transcript": "raw/target1-exact-summary14-local.log",
+      "transcript_sha256": "83511b9b293c6760aad68b2c450d1cbc3df76f140460a38ac1f9551587f72e9c"
+    },
+    "target2": {
+      "active_lines": 2,
+      "nbf_sha256": "b9b9e93ee931c579e2f20ef958077f5f0cbe942bbb6b16de9cabc879c14e8c6a",
+      "samples": 50,
+      "instruction_trace_overflows": 16,
+      "median_cycles": 17003,
+      "mean_cycles": 23715.2,
+      "q1_cycles": 12196.75,
+      "q3_cycles": 37583,
+      "median_change_percent": 17.558,
+      "bootstrap_median_difference_95_percent_cycles": [-2097.5, 16911],
+      "transcript": "raw/target2-exact-summary50-local.log",
+      "transcript_sha256": "2edd7b71407a2863c5fa1db1fc761c1c853d5e935fe4cff0018b1d465ccd9035"
+    },
+    "target3": {
+      "active_lines": 3,
+      "nbf_sha256": "3a8ae8538caff5329b8591806d416c2f009bfd8aca857c3a1efbfccd8aa8bc48",
+      "samples": 50,
+      "instruction_trace_overflows": 11,
+      "median_cycles": 14028,
+      "mean_cycles": 20920.82,
+      "q1_cycles": 11532,
+      "q3_cycles": 20019.25,
+      "median_change_percent": -3.011,
+      "bootstrap_median_difference_95_percent_cycles": [-2349, 1872],
+      "bootstrap_probability_faster": 0.71012,
+      "transcript": "raw/target3-exact-summary50-local.log",
+      "transcript_sha256": "6d3adc0b58ac33bbbf21eaa104c15386f5d5919e289f1ae7b5f957b0298578b4"
+    },
+    "target4": {
+      "active_lines": 4,
+      "nbf_sha256": "05f77de44c26096d73a47e916a59128c3eb01206e9609a07aef64f7ebb1423d9",
+      "samples": 50,
+      "instruction_trace_overflows": 14,
+      "median_cycles": 14519,
+      "mean_cycles": 22487.78,
+      "q1_cycles": 11355.5,
+      "q3_cycles": 37606,
+      "median_change_percent": 0.384,
+      "bootstrap_median_difference_95_percent_cycles": [-2347.5, 3389.5],
+      "bootstrap_probability_faster": 0.44241,
+      "transcript": "raw/target4-summary50-local.log",
+      "transcript_sha256": "06758a5ab425ffbb20bc579e409df82563ea31924fc676a739590dd3012e9e06"
+    }
   },
-  "target4": {
-    "nbf_sha256": "05f77de44c26096d73a47e916a59128c3eb01206e9609a07aef64f7ebb1423d9",
-    "accepted_elapsed_cycles": [18332, 13705, 13162, 11348, 38613, 11110],
-    "overflow_elapsed_cycles": [45877],
-    "median_accepted_cycles": 13433.5
-  },
-  "comparison": {
-    "enabled_minus_disabled_cycles": 761.5,
-    "enabled_change_percent": 6.009
-  },
-  "conclusion": "The targeted four-line replay does not demonstrate a speedup in this matched handoff interval."
+  "supersedes": "The seven-sample result that excluded instruction-trace overflows; overflow filtering censors slow timing intervals.",
+  "conclusion": "No tested one-to-four-line prefix demonstrates an end-to-end speedup. Three lines has the best point estimate, but its confidence interval includes both meaningful improvement and regression."
 }

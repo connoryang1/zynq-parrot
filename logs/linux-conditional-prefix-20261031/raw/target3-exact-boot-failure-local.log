@@ -1,0 +1,279 @@
+Script started on 2026-10-31 02:14:44-04:00 [TERM="dumb" TTY="/dev/pts/2" COLUMNS="80" LINES="24"]
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=3a8ae8538caff5329b8591806d416c2f009bfd8aca857c3a1efbfccd8aa8bc48
+LOG=/home/xilinx/bp-logs/linux-cond-target3-exact-shell-interactive-20261031T061454Z-1646.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 360000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe880690 40000004 16 1
+INFO:    Creating host: 0xbe880690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cb9000, physical ptr=0x19300000
+INFO:    ps.cpp: received 0xb3cb9000 (phys = 19300000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-3492667
+DEBUG-PS: ps.cpp: 1-3492893
+DEBUG-PS: ps.cpp: 2-3493087
+DEBUG-PS: ps.cpp: 3-3493275
+DEBUG-PS: ps.cpp: 4-3493450
+DEBUG-PS: ps.cpp: 5-3493634
+DEBUG-PS: ps.cpp: 6-3493819
+DEBUG-PS: ps.cpp: 7-3493995
+DEBUG-PS: ps.cpp: 8-3494168
+DEBUG-PS: ps.cpp: 9-3494341
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878622
+DEBUG-PS: ps.cpp: finished loading 1878622 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+...
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #8 SMP Sat Oct 31 00:13:22 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000102] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009382] Console: colour dummy device 80x25
+[    0.011218] printk: console [hvc0] enabled
+[    0.160141] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166223] pid_max: default: 32768 minimum: 301
+[    0.182499] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.187777] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.428452] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.447561] riscv: ELF compat mode unsupported
+[    0.448328] ASID allocator disabled (1 bits)
+[    0.470329] rcu: Hierarchical SRCU implementation.
+[    0.474020] rcu: 	Max phase no-delay instances is 1000.
+[    0.514133] EFI services will not be available.
+[    0.535298] smp: Bringing up secondary CPUs ...
+[    0.539436] smp: Brought up 1 node, 1 CPU
+[    0.584149] devtmpfs: initialized
+[    0.710832] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.717713] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.809410] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.854147] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.861041] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.163386] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.405450] SCSI subsystem initialized
+[    1.430087] libata version 3.00 loaded.
+[    1.454580] usbcore: registered new interface driver usbfs
+[    1.461589] usbcore: registered new interface driver hub
+[    1.469224] usbcore: registered new device driver usb
+[    1.585158] vgaarb: loaded
+[    1.597514] clocksource: Switched to clocksource riscv_clocksource
+[    2.949962] NET: Registered PF_INET protocol family
+[    2.973298] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.040946] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.047252] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.053489] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.059060] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.070594] TCP: Hash tables configured (established 512 bind 512)
+[    3.085973] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.095544] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.119268] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.203279] RPC: Registered named UNIX socket transport module.
+[    3.207529] RPC: Registered udp transport module.
+[    3.210852] RPC: Registered tcp transport module.
+[    3.214060] RPC: Registered tcp-with-tls transport module.
+[    3.217621] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.221801] PCI: CLS 0 bytes, default 64
+[    3.389501] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.485286] NFS: Registering the id_resolver key type
+[    3.490979] Key type id_resolver registered
+[    3.494556] Key type id_legacy registered
+[    3.501276] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.505631] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.558500] 9p: Installing v9fs 9p2000 file system support
+[    3.587065] NET: Registered PF_ALG protocol family
+[    3.597485] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.602476] io scheduler mq-deadline registered
+[    3.606089] io scheduler kyber registered
+[   10.524553] BUG: spinlock bad magic on CPU#0, kworker/u2:0/11
+[   10.527823]  lock: 0xffffffd803f0ce00, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+[   10.531805] CPU: 0 PID: 11 Comm: kworker/u2:0 Not tainted 6.6.0 #8
+[   10.534944] Hardware name: blackparrot,riscv64 (DT)
+[   10.537359] Workqueue: events_unbound async_run_entry_fn
+[   10.540474] Call Trace:
+[   10.541975] [<ffffffff80005c34>] dump_backtrace+0x1c/0x24
+[   10.545043] [<ffffffff80803548>] show_stack+0x2c/0x38
+[   10.547962] [<ffffffff80811338>] dump_stack_lvl+0x3c/0x54
+[   10.551050] [<ffffffff80811364>] dump_stack+0x14/0x1c
+[   10.553950] [<ffffffff808040b2>] spin_dump+0x62/0x6e
+[   10.556795] [<ffffffff8005b82e>] do_raw_spin_lock+0xae/0xec
+[   10.559974] [<ffffffff80819594>] _raw_spin_lock+0x1a/0x22
+[   10.562954] [<ffffffff8003dba8>] scheduler_tick+0x62/0x240
+[   10.566195] [<ffffffff80085eea>] update_process_times+0x78/0x8e
+[   10.569502] [<ffffffff80094956>] tick_sched_timer+0x5c/0xb8
+[   10.572486] [<ffffffff80086558>] __hrtimer_run_queues+0x126/0x188
+[   10.575806] [<ffffffff80087246>] hrtimer_interrupt+0xce/0x1d8
+[   10.579018] [<ffffffff8065cd34>] riscv_timer_interrupt+0x30/0x3a
+[   10.582251] [<ffffffff80067fda>] handle_percpu_devid_irq+0x80/0x112
+[   10.585796] [<ffffffff80062a48>] generic_handle_domain_irq+0x1c/0x2a
+[   10.589126] [<ffffffff8034e40e>] riscv_intc_irq+0x2c/0x44
+[   10.592233] [<ffffffff808113b6>] handle_riscv_irq+0x4a/0x74
+[   10.595395] [<ffffffff80811e3e>] do_irq+0x56/0x7e
+[   10.598410] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000044
+[   10.602240] Oops [#1]
+[   10.603681] Modules linked in:
+[   10.605641] CPU: 0 PID: 11 Comm: kworker/u2:0 Not tainted 6.6.0 #8
+[   10.608763] Hardware name: blackparrot,riscv64 (DT)
+[   10.611155] Workqueue: events_unbound async_run_entry_fn
+[   10.614173] epc : update_rq_clock+0x54/0x196
+[   10.616699]  ra : update_rq_clock+0x36/0x196
+[   10.619180] epc : ffffffff80037bd6 ra : ffffffff80037bb8 sp : ffffffc800003db0
+[   10.622511]  gp : ffffffff816eb330 tp : ffffffd801c87080 t0 : 6600000000000000
+[   10.625844]  t1 : 000000000000005b t2 : 666666666666663c s0 : ffffffc800003de0
+[   10.629154]  s1 : ffffffd803f0de00 a0 : 0000000277b3e876 a1 : ffffffffffffffff
+[   10.632474]  a2 : 0000000000000016 a3 : 0000000000000000 a4 : 0000000277b3e876
+[   10.635760]  a5 : 0000000277b3e876 a6 : 0000000004e5fda7 a7 : 0000000000000001
+[   10.639050]  s2 : ffffffd803f0ce00 s3 : 0000000000000000 s4 : ffffffff81720e90
+[   10.642355]  s5 : 0000000000000000 s6 : 0000000000000000 s7 : 0000000200000120
+[   10.645638]  s8 : 0000000000000000 s9 : 0000000000000001 s10: 0000000000000001
+[   10.648903]  s11: ffffffff800948fa t3 : ffffffff816fcfd7 t4 : ffffffff816fcfd7
+[   10.652231]  t5 : ffffffff816fcfd8 t6 : ffffffc800003ae8
+[   10.654797] status: 0000000200000100 badaddr: 0000000000000044 cause: 000000000000000d
+[   10.658348] [<ffffffff80037bd6>] update_rq_clock+0x54/0x196
+[   10.661426] [<ffffffff8003dbe8>] scheduler_tick+0xa2/0x240
+[   10.664608] [<ffffffff80085eea>] update_process_times+0x78/0x8e
+[   10.667898] [<ffffffff80094956>] tick_sched_timer+0x5c/0xb8
+[   10.670873] [<ffffffff80086558>] __hrtimer_run_queues+0x126/0x188
+[   10.674179] [<ffffffff80087246>] hrtimer_interrupt+0xce/0x1d8
+[   10.677385] [<ffffffff8065cd34>] riscv_timer_interrupt+0x30/0x3a
+[   10.680591] [<ffffffff80067fda>] handle_percpu_devid_irq+0x80/0x112
+[   10.684122] [<ffffffff80062a48>] generic_handle_domain_irq+0x1c/0x2a
+[   10.687441] [<ffffffff8034e40e>] riscv_intc_irq+0x2c/0x44
+[   10.690516] [<ffffffff808113b6>] handle_riscv_irq+0x4a/0x74
+[   10.693668] [<ffffffff80811e3e>] do_irq+0x56/0x7e
+[   10.697061] Code: 0407 b703 9c04 b683 9784 b423 9aa4 973e b023 9ce4 (42f4) 8a89 
+[   10.700388] ---[ end trace 0000000000000000 ]---
+[   10.702677] Kernel panic - not syncing: Fatal exception in interrupt
+[   10.705655] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+Connection to 192.168.4.35 closed.
+
+Script done on 2026-10-31 02:16:27-04:00 [COMMAND_EXIT_CODE="255"]

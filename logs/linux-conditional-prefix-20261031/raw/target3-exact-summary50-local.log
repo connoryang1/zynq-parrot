@@ -1,0 +1,534 @@
+Script started on 2026-10-31 02:24:07-04:00 [TERM="dumb" TTY="/dev/pts/3" COLUMNS="80" LINES="24"]
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=3a8ae8538caff5329b8591806d416c2f009bfd8aca857c3a1efbfccd8aa8bc48
+LOG=/home/xilinx/bp-logs/linux-cond-target3-exact-shell-interactive-20261031T062417Z-1353.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 360000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbebcb690 40000004 16 1
+INFO:    Creating host: 0xbebcb690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d16000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d16000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1522317
+DEBUG-PS: ps.cpp: 1-1522530
+DEBUG-PS: ps.cpp: 2-1522715
+DEBUG-PS: ps.cpp: 3-1522892
+DEBUG-PS: ps.cpp: 4-1523070
+DEBUG-PS: ps.cpp: 5-1523240
+DEBUG-PS: ps.cpp: 6-1523415
+DEBUG-PS: ps.cpp: 7-1523585
+DEBUG-PS: ps.cpp: 8-1523753
+DEBUG-PS: ps.cpp: 9-1523922
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878622
+DEBUG-PS: ps.cpp: finished loading 1878622 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #8 SMP Sat Oct 31 00:13:22 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000102] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009380] Console: colour dummy device 80x25
+[    0.011215] printk: console [hvc0] enabled
+[    0.160144] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166224] pid_max: default: 32768 minimum: 301
+[    0.182488] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.187768] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.428472] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.447596] riscv: ELF compat mode unsupported
+[    0.448364] ASID allocator disabled (1 bits)
+[    0.470364] rcu: Hierarchical SRCU implementation.
+[    0.474065] rcu: 	Max phase no-delay instances is 1000.
+[    0.514228] EFI services will not be available.
+[    0.535382] smp: Bringing up secondary CPUs ...
+[    0.539521] smp: Brought up 1 node, 1 CPU
+[    0.584257] devtmpfs: initialized
+[    0.710881] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.717121] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.808850] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.853574] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.860475] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.162964] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.404932] SCSI subsystem initialized
+[    1.429548] libata version 3.00 loaded.
+[    1.454017] usbcore: registered new interface driver usbfs
+[    1.461022] usbcore: registered new interface driver hub
+[    1.468657] usbcore: registered new device driver usb
+[    1.584675] vgaarb: loaded
+[    1.597038] clocksource: Switched to clocksource riscv_clocksource
+[    2.947210] NET: Registered PF_INET protocol family
+[    2.970201] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.037754] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.045011] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.050433] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.056808] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.068360] TCP: Hash tables configured (established 512 bind 512)
+[    3.082550] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.093285] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.117301] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.201844] RPC: Registered named UNIX socket transport module.
+[    3.206098] RPC: Registered udp transport module.
+[    3.209428] RPC: Registered tcp transport module.
+[    3.212731] RPC: Registered tcp-with-tls transport module.
+[    3.216300] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.220492] PCI: CLS 0 bytes, default 64
+[    3.388660] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.479170] NFS: Registering the id_resolver key type
+[    3.486048] Key type id_resolver registered
+[    3.489639] Key type id_legacy registered
+[    3.495204] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.500716] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.553855] 9p: Installing v9fs 9p2000 file system support
+[    3.582826] NET: Registered PF_ALG protocol family
+[    3.593181] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.598193] io scheduler mq-deadline registered
+[    3.601809] io scheduler kyber registered
+[   23.475120] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   23.870919] [drm] radeon kernel modesetting enabled.
+[   25.501970] loop: module loaded
+[   25.729370] e1000e: Intel(R) PRO/1000 Network Driver
+[   25.732976] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   25.958256] usbcore: registered new interface driver uas
+[   25.967044] usbcore: registered new interface driver usb-storage
+[   26.034255] mousedev: PS/2 mouse device common for all mice
+[   26.080704] sdhci: Secure Digital Host Controller Interface driver
+[   26.084721] sdhci: Copyright(c) Pierre Ossman
+[   26.090476] sdhci-pltfm: SDHCI platform and OF driver helper
+[   26.117987] usbcore: registered new interface driver usbhid
+[   26.122028] usbhid: USB HID core driver
+[   26.154643] NET: Registered PF_INET6 protocol family
+[   26.397016] Segment Routing with IPv6
+[   26.406859] In-situ OAM (IOAM) with IPv6
+[   26.418759] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   26.494429] NET: Registered PF_PACKET protocol family
+[   26.508212] 9pnet: Installing 9P2000 support
+[   26.518061] Key type dns_resolver registered
+[   26.528862] start plist test
+[   26.880052] end plist test
+[   29.249578] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   29.897538] clk: Disabling unused clocks
+[   38.668344] Freeing unused kernel image (initmem) memory: 5104K
+[   38.673893] Run /bin/sh as init process
+[   38.677181]   with arguments:
+[   38.678848]     /bin/sh
+[   38.681233]   with environment:
+[   38.682945]     HOME=/
+[   38.685309]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # rm -f /tmp/cache.summary.b64
+~ # printf '%s' 'H4sICPt45WoAA2NhY2hlX21pc3NfdHJhY2VfY2FwdHVyZV9keW5hbWljAO1be3h
+TVbbfJ4+mLVBSAm2BMkTKS4bWFHmJF23TpmlrKViKoDPe0/TkNA2kTUhSaBG0oU0foAwaxqLiHWQc5TI
+zXhRGGF/IvaLMlTvDOCr4uMNTREUpLxVFMmufs3dyzm6qft/97v3nsvula6/fXmvttZ85Z++V+2wVJRq
+OQzRp0AWEuZODZKyA4AUWmeolbCZKhf8/QaNQEvA6pRziVNSiQSqaTOS0RM9HcJ+GU9HriBylXFzPh/X
++bEYJ00KG5xRU328JQh9mIBVFxngpbuPBUTJ/MJdTU+K/0aTW0xC9XqLXS+QpNVI9pl905LOB4BtIf1B
+qJnJmhTxO8z4KOnH+d0Nl/ndDORX1EDkPo3c76CWhH59I81AVqa+/fmHHnfb2DR537Q0eZ67H3djUnOt
+3B4Rl06fmenzTpzrzAt68fOqbkejYKxfE/B2s8CMdPripBvik' >> /tmp/cache.summary.b64
+~ # printf '%s' 'oHj/0ZSK5PEeSGylExy3VZOgXXQ+DlHUM4iRoUM8gMHTFO1T+seRurCP/oK30vM
+Lbo8AYOWGdr2m7BNaNyI+0zYp2zKA+JNGbGM/F9/36Mr83asHffviin+59d6HV+ZVzv5y+L2pnSjn8pM
+3nV+bfeyRt17gH45k6z54YMZsw9v6P91UMHrzkH9/wXjXqeXRM+1D//jTJcMyPl129bpapyFBl0hpsVT
+XQFSQKnu7RSvjy4gPllR1yysI3pqixocTvJfB7yb4PAYfwOFxOxfdOFONP0Tk1zPyXqlfstBBi4zT+TC
+byB9l5NcS3Mz4/1uCb2fkLQQ3MvLJBN/MyP+a4DUM/hOCv8rgHMEPMvgqgiOm3naC+xj5lxHuBxM6nav
+uB+QT/X6vH/F8IOgQlvBC/RK+zuH2ILHZHUQBoV508gEx6Kircze6gy3IF6z3iw4nv9jrbowxAvwPiti
+GJC/4mgRvU2MQAFjVArbsD/INDtAIBJ1QH2oQG8Ao8vndjcE6' >> /tmp/cache.summary.b64
+~ # printf '%s' 'VLfc7wb1QNAvNPhACSQavbzHKziCbi/otAQEh8dDnHEpnFE67Wpy+J0I14f3i+n
+o+/YSe0WZtYifkjdlRix741Sw5vJ4ax0e3gdtC4r+sXL/a6U/DclpFP/pn06S49B7SN5TzPDpfPDhJLx
+6L8XGUYP+guL7pFyulcoxtlPiNbHFv57MVw1S7yF0/HCdJgVO57cOqfc8I8H1SP09l6XA0xS4WYEPUeA
+TFbhWgVsUuHKzmKnAlftlgQJX7pelCly5n89T4EYFvkiBK/fEGgWuU+D1CjxdgfsU+EAF3qzAUxV4qwJ
+Xfl/05CB0o/Y/CrWvaBtM2qLvIquBzjehtudWIxf0cGYe9NstaR6XNk0aN5lft0TNpzH8usVMOcOvczP
+lDL+uniln+HUuppzh19Ux5Qy/TmTKY/yCpZkTYIYaXLO+uNjx0ZZj478rv1x5qercHZ/f9ck/f1R77NS
+VT7/OFl45E7KH5whHfp88qfuZ7swRoJFa3tYzEqHI2jfbMrOB' >> /tmp/cache.summary.b64
+~ # printf '%s' 'H1jRbnpgb2sP5CP3D2zX39YzCXJrFtfkb87ZvJgL5woHcw2mDbNR5QZdzVvh8eG
+zvfd9ueqvf5dyRy4J2fpskHkvdxRyHg+PAexXF4VU/YhTUv7IBSFZP6IHBjMS3ncvRvacF0z6ESn2HPP
+nKJx74rXcb8+imlsnrQ2VZML6NCXV/Txk60o+23vrmUntYHti2GYKc21nUevt3fbA+oWtkfa9rRsLhJS
+v0IUJ6EDO7nOtD0i4qb2wLWwfjOYNvsF8MRlqQq3V3TZMj865MBEdCNlfP4nlOGknCUyeB3pK6c23l4g
+hG/j38VP127qFLP0Y08LJXGThP3HrC0bqDMi0IhON7DSgSPUmZLqzgnvhZLjEtOrK6MjFi6MjVzKRqWU
+40u4KrRaS3h3y+trIGi7U9nwq0u4OhWq/3tH5QcEtR8sv1vVWnRl/evHJtl3c6vfDmdArJv1HTdCfR4T
+RKQMjBmQUPnt6kPBJz8Adgx5HQnjQwKdcd9+v7xKydBk9MNpt' >> /tmp/cache.summary.b64
+~ # printf '%s' 'Txvsxz7LvBn0Biz5z7s6h28NrHeRFl0Y72sdeiJsuM7wWIcBnTj5VLRnMh7RM/Z
+THZxdSOlJjbgMxtWZoYhCZ4KvddNx/YQnkvbt4qQRefkPeok+/oe250NtpiSLPmwjfgpne6NvhsuwH5F
+Og6nOtUn44y/A8kZD2jM1ac5Pg+UtqSs+XVy+ZNuSVM+plSWrnlpVGd7W4nasbiW2NNTWOD+M7xsL9ry
+w9tjLWuilL0hf/Gb5jR1vFkB//Nm9R1+m3ZaKuIqR+stRQXhSf2LlpiurFkYyBmoih97lTvVsECKHkjQ
+vdtoLhaMf60yZOk1k4SHufcDHdFR1RvTrdWeReZh+rP56bOHE0ie/O3HvpitxOe3HdnSzwV64aletJF+
+A5YfoJ+uv37sH+1TX+VYH9ob6Jrqh/a9xu2B+v3K2l38Z7SX9shBm2hBoz0s55mkcaQdgBbAJnoUlGzH
+oUeY4yEyzTWqbxsEMDyHTUi4awbMdNnRTMofA3s4A7L498BQe' >> /tmp/cache.summary.b64
+~ # printf '%s' 'CRVudbUiNANkd80AedCH/kbCmo8RzBAkwOia9HrkajUgLIdlsGwkDHMTZHeELxV
+E3plWEDGY0Y59lzTCGn1CPRPHRXMsIdT2BteeMzUdwTiCH0e+jhiMKKf1XHsblGmncliOw/Le3l9dDpd
+O71qTxaU/1/FCpymjHpkWJlsjXclXrEd3NGdwIxft5/I6XjR8VbCN9Nm43KQz0F/PHq/RwywoTE86Cev
+r93pYZfy/zVla/k3m9SCVUvaFBUX0KJmztc1IQbecCtk7Tm05Pv5q5ZdV5+/4AvS3tny+xRnu2ndGbzc
+lIWk1Cro30iILXWidAfomfU1P267Os5FlF7V6w45Dh1B47bkjkTudaF3KTC5cfGPqDO6xNUlox4a3ofd
+Rcsg2C/ahW3/bNiMVTerANe/7BWfLsXyD27+l7Jjszdne0U/c+clkaAXO84+H7cKQS7pIZ0r6ju4JqG1
+X99kdhxZy4bWPvzHFhf3Ga+FfTzxfMyac4TwfrGp5rmXIivOL' >> /tmp/cache.summary.b64
+~ # printf '%s' 'l0K7Z3KT2kPls9aEyspg9ux55D17Npk7vxkHNX5B5pEZaoTW7tlI5tt1wH8O/MN
+x+XFjQf4zhfxnLUvH9I4/U3668mTSxUntz7Tnlj1Yll0wGPUOxruAsLZHw5WG7Bzut+QtYZPenAT9uY4
+bt/S/QfvB7MITayZ8d6JrxnfEn9Fg/6MtPk3wuNPq3uK2SaO2LSzbgP0uyZiMbeBxvHWNYNOjLTWF3Op
+WWXtfNqyQY3iUxxyF8uMR2LfJjrz5UjJrA+rvEMr1yXh/L2wDry5EOmFnL+ouEbSHki6MRwc2FuXs/Ot
+q6HfDVzq8u3fH9mu8nyvtyS3L2Z4Odva0CnP1Gvzd8ADs/jkvnWuFNn2+pUbj5GzY15D0bWHbEzAubKX
+fIDk7z62Wv0Uce+S26I3QgnfwcwdHnkKqqwqLbHyVrWhuVbE5IC6dPa7JHHA7xdnjBLO70Sk2Y0BoETw
+izvhFDzxbL5PyDWIg4HCJsy3N45rNPofT6cdZy02eZrPfsVzK' >> /tmp/cache.summary.b64
+~ # printf '%s' '50/3NJOHoL4P4Uo80AdfJvrddS3mGBpwN7o8YtDbaC6atyAOI7HBF2xhMJzqmoJ
+is3m5A15GVPwSUeZzcwNNDQ0Of0uut9HTgvnl0FzvcvpcVtfkkY42gt5cnyj6UZ3f2yDn5NSE2z7LLDj
+Af77BHQjwQb9DEHnB4Qs2+UXzz6hBM7a0kphZGTNzN5ZQunC33FHMq5H6vSk2XqW2wmJblRlemGaPc5r
+liqSRw29Ms8d5msy4Dr5WdLkb4yxuvaIQXpSWSKxfBEfkEhhfX0B0Snk3L72NYbvOeNbNe2Fs6jxyhU4
+V5/A3YF3Jj2BTQDkHZL9LCssqYFotc3jcTqhW8PrhtY5IpyrmY3XVgsqiwmpbMREKYKNq3/r1QmlnXuH
+8+f2YADFupPbmevL8vuFSNHoYHtFnXo5GW/G4A90AdBPQrUDfBvoSUN030ehRoMlALwItAWoEvWqgE4E
+++m006gR6BegGoJOvRKM7ufg7iHZFFeJWctzIQRoJy4LP9q+j' >> /tmp/cache.summary.b64
+~ # printf '%s' 'Uek41MBJGDzgoMOATSQ6GCuAzxnAZhLMjNuIyy4T3eI0Y3GXrjSkqd5bvL84jeo
+1wycbZOg7Da7vftxmwG7BQGma2RPSlOy1pknnX7iteVAmGbCmGa0hDcJ1vgqfsYCXcBJ+UGN9KNkZ0nT
+pupMiqRsG/jJNsz0VKrb+yfqW9W/Wt63vgD3rALktV7BN6J9a2aalHGs9lBxJDWk05XutVEmqMhu3H+q
+o+Ya0C3yoDmnKU/fKBnG7K6DcB+UHSHkx9kPzEIjghlsHzMPrCGR2XohGpfMl8JerfWyE7C6uGDv8sLF
+nyMahj2Q8mqVdrEmlbmDP37Uesh62vmd93/pB8d9IO66la+laupaupWvp/1MamiafW24ntDWt7z0DTn9
+h+PcINRNK7/Ho/Ss9ax5O6GFSPpIpH0HoUVKezZTT55rd5D7z0tUovrpBi7Tx81acTutlnt5NJutknp7
+RjiKO06/6LEKHIXWKnWErztlxqif65Lo0dqadSeh+A6fCWw3q' >> /tmp/cache.summary.b64
+~ # printf '%s' '+5TtRJ+eSWcxlCZ4rJTaR/v5KuEtxF6U8NSvXsInGdgbxf+dFCWJ8hZyn/R/Tem
+9OJvsRUWzzBOtTW6P0+/1Bs1TLFPy8/Lzc2dOmzoj1zVDnD7Nke+43px/Y96UPAsqvANUpIsgxOGbSJ1
+R7182fap7ii+fb5jis/AOnKub4pvCO/E/AWMr3ELAL2fqxEZBdEv5hoYmT77PgpK51B96nNTC6NK4BTW
+uid3bq3FtbP6rcV1sHahxfWz+q/Gk2DpR44aE80cLs9eSEE+JzW81nhpbB2p8QGzc1Hj8nliND0Jb0xP
+habH4BDU+GGUNS4QbY/uSGk+P7UdqfEhsH1Lj8ftRNT404TzU4l3FkgjPQBsT4ploc0I8fj+txof3wWR
+8RB8Ma+vQuSiLD0TyGREbJ5LRj/xPiBaN86HpZwQfynxvCP3YWdwP3tIPjt/RNWB/J7F/C8GfIPXuZOo
+9ROTPE5zeYX5IcDRYxkuI2iWClxhloJYa4mR8K8FJOJOkjvHD' >> /tmp/cache.summary.b64
+~ # printf '%s' 'BD9A8OEcVslE+xX3rTiNJfgBBp9E8CcZfAbBX2XiEkoJvpvBFxF8O4O7Cb6VwWm
+/sevuHiK/mfGnS8Kz0FEaV0EM9VDcosaf4hKP47Ok38zMeNF5xeI7iHwpg79OcPY55UPiz2HiDy09LeF
+91/VgjWxnO2NnpHTV3nd/6K9dsyT5wehwRt91mki+VJLvux/WSnjf/WSJ9EXfd9+7V5IfhrqY/QHHgSW
+Kj3lWkzi+5B4tXvt996vXNInjRd7VJI7XOa/B51EwHwrU+FUJz+izv+m1Ms7uh8MkvK8/Y7WJ43gKtIn
+jaX6uTRyX09KP/Q5t4jiYX2sTx9+8iuU1ff3/L8lO/PuLrqMPtYn75z6tHC9F91W6zxzTJo5nuiDhfb8
+v8PRIFHcV1SaOE0rXJY5z+qkucdzVzbrEcUVzdInjqHiMa/r28xJd4rioNl3i+Kpf6hLHjSFHrTu30Rs
+U8wTE88DwQYcLSefjeV40tvl7H+O+/wnO43U4eZcP4dsGsI5P' >> /tmp/cache.summary.b64
+~ # printf '%s' 'r91Crl/0eAVg+7sRgCIpbImXj6N/yAXmSZLWLYVY+dyNfNDL17n9gSDv8Hi8y+X
+gKYSvO/imxiDISPcd0ok/720UkXTiL0VSSTl8pdCCfPWOgIhkL8ntR/zagJcufVDs4kDJS1cHBJDV5VA
+tGSG3Grx0seKW+4OcwSOnmhX8wUCwqa4OOscp+qHaQBDMBxt4wQNeB2DknF4aXeUMev0B3tHUjARvg88
+jBkUnPKEnlODxTRDv8PsdLbzYGPS3oDq/o0HkneAZjv5ScDweRZUoz5dUFc6x8bbKYp5H/LyquUW24gV
+VNr6irPK2QruNry60VtigpPjOysI5ZUWgYK9cwNtKiV5pcRXi7RVzrYUV/NySkvm26pgGG9ZWoIgiI9F
+qBYoYMzm+TYmwkXLqMuv8+dRr0ekIOgCaX1xYXchbbfaySgzzDKuOmGNqUsX1Kcv63OWpFXHVciP7Btr
+1NRPo10zAy9c7Gp0wo/iyuWDICZOyKSA6oXWNzgRRdzxfC4tO' >> /tmp/cache.summary.b64
+~ # printf '%s' 'rliOTlQaVF+sKXseRyyqJKXoQpWnUvSh2r3qOUWks5VXdKoRleISlVpy+KISQXm
+BloagoxZo0C/TepqTmuVDedIuVmgty8U7WJ6rsSkP1m09ynO2NIKyTIN+uWSZ6A/g2Eclw0MZvrjFgiT
+n8wRRHmwQ8N/vlaZKnlhPlkW90x/nUJ7PL8aXCHYqno+vMnACjGDbYE/yyNHgFsALL9QQkCsIwOigPOk
+fLOAGWGxQOX61znMEg353LWxYAfQ/Tvj8CH8T0POP+O8AZP46Rp59KstB8hkN1Y/Hy8u8mZHXMfw0pI7
+xo+/luwmwieD0XIo9x8IB619Go16qT9/fF5Hv6+396NN0M5LPsKg+fc9PJhUcJQ3G52CcQp+eMxUh+Yy
+L6tPzgNOkwlFMh7H9dxuSz6CoPj03SCIHX/ROk/qvYegiJJ9pUZ6eL1iI/jxql+iw7XchuS+pPj2HaCX
+6pUz9bPuXEn0r4el5xX6iT8/5sP6wBPo4jp1D8XPG+LmUzBuZ' >> /tmp/cache.summary.b64
+~ # printf '%s' 'DjMy9B5Gnz6vFZCDSjaynp1/IaSe//Q5cysJXtVq1fJs/3Uz+vHffci8h5Fn6+9
+h9Om5SxY5SH2NaT9bP37/xH1B3Yz9DmRUYnlqLnaOiuR3eqpP39MO96OfzFB8xz9YoU/fC4/+SP39xCe
+qT98XTv+APk04OCdJoR/7nQ/Rp7/viZ1jE0rnz9+Z+mPP12aZbPwB/08w+vT9ZaP5x/n/KcGoPn0P2Uz
+0LYw8q9/L6B9k9I1GtTyrf4n4z9ZD9fMYnGPoVbluHyMW+31Yf78HU/KJfg80kXzx1JB9AN9j2FDf/SM
+FqePkaeqaJNOnmQXH1p/ej/4NN8iU3X/YU4l/AB34XdvANwAA' >> /tmp/cache.summary.b64
+~ # base64 -d /tmp/cache.summary.b64 | gunzip > /tmp/cache_miss_trace_capture_dy
+namic
+~ # chmod +x /tmp/cache_miss_trace_capture_dynamic
+~ # sha256sum /tmp/cache_miss_trace_capture_dynamic
+14bf2ab9c232d5c71c21a6204c3dfaa6ee42e3e949d63d994168b1a84da1bf4d  /tmp/cache_miss_trace_capture_dynamic
+~ # /tmp/cache_miss_trace_capture_dynamic --window to-peer --summary-only >/dev/
+null
+~ # echo TARGET3_50_BATCH_BEGIN
+TARGET3_50_BATCH_BEGIN
+~ # i=1; while [ $i -le 50 ]; do echo SAMPLE=$i; /tmp/cache_miss_trace_capture_d
+ynamic --window to-peer --summary-only || true; i=$((i+1)); done
+SAMPLE=1
+TRACE_HEADER cpu=0 window=1 start=1931701275 peer_begin=1931715045 peer_wake=1931715097 peer_block=1931716182 resume=1931746614 elapsed=13770 i_count=78 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000064e
+TRACE_PASS records=81 elapsed=13770
+SAMPLE=2
+TRACE_HEADER cpu=0 window=1 start=1940886961 peer_begin=1940899188 peer_wake=1940899240 peer_block=1940900251 resume=1940907526 elapsed=12227 i_count=37 d_count=4 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000825
+TRACE_PASS records=41 elapsed=12227
+SAMPLE=3
+TRACE_HEADER cpu=0 window=1 start=1949957010 peer_begin=1950000388 peer_wake=1950000440 peer_block=1950001653 resume=1950010871 elapsed=43378 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=43378 i_overflow=1 d_overflow=0
+SAMPLE=4
+TRACE_HEADER cpu=0 window=1 start=1959297570 peer_begin=1959308872 peer_wake=1959308924 peer_block=1959310038 resume=1959339639 elapsed=11302 i_count=42 d_count=4 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000082a
+TRACE_PASS records=46 elapsed=11302
+SAMPLE=5
+TRACE_HEADER cpu=0 window=1 start=1968433068 peer_begin=1968476140 peer_wake=1968476192 peer_block=1968477706 resume=1968487761 elapsed=43072 i_count=256 d_count=38 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044d00
+TRACE_TRUNCATED records=294 elapsed=43072 i_overflow=1 d_overflow=0
+SAMPLE=6
+TRACE_HEADER cpu=0 window=1 start=1977455681 peer_begin=1977467066 peer_wake=1977467118 peer_block=1977468266 resume=1977476556 elapsed=11385 i_count=44 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000062c
+TRACE_PASS records=47 elapsed=11385
+SAMPLE=7
+TRACE_HEADER cpu=0 window=1 start=1986401469 peer_begin=1986413659 peer_wake=1986413711 peer_block=1986414824 resume=1986422052 elapsed=12190 i_count=37 d_count=2 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000425
+TRACE_PASS records=39 elapsed=12190
+SAMPLE=8
+TRACE_HEADER cpu=0 window=1 start=1995067625 peer_begin=1995117534 peer_wake=1995117586 peer_block=1995149949 resume=1995129282 elapsed=49909 i_count=256 d_count=28 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043900
+TRACE_TRUNCATED records=284 elapsed=49909 i_overflow=1 d_overflow=0
+SAMPLE=9
+TRACE_HEADER cpu=0 window=1 start=2004024792 peer_begin=2004035985 peer_wake=2004036037 peer_block=2004037155 resume=2004064400 elapsed=11193 i_count=42 d_count=1 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000022a
+TRACE_PASS records=43 elapsed=11193
+SAMPLE=10
+TRACE_HEADER cpu=0 window=1 start=2012981414 peer_begin=2012992626 peer_wake=2012992678 peer_block=2012993821 resume=2013023335 elapsed=11212 i_count=39 d_count=4 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000827
+TRACE_PASS records=43 elapsed=11212
+SAMPLE=11
+TRACE_HEADER cpu=0 window=1 start=2021953828 peer_begin=2021996998 peer_wake=2021997050 peer_block=2021998594 resume=2022008590 elapsed=43170 i_count=256 d_count=41 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045300
+TRACE_TRUNCATED records=297 elapsed=43170 i_overflow=1 d_overflow=0
+SAMPLE=12
+TRACE_HEADER cpu=0 window=1 start=2030813188 peer_begin=2030825451 peer_wake=2030825503 peer_block=2030826616 resume=2030833889 elapsed=12263 i_count=38 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000626
+TRACE_PASS records=41 elapsed=12263
+SAMPLE=13
+TRACE_HEADER cpu=0 window=1 start=2039626300 peer_begin=2039691526 peer_wake=2039691601 peer_block=2039693485 resume=2039702791 elapsed=65226 i_count=256 d_count=43 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045700
+TRACE_TRUNCATED records=299 elapsed=65226 i_overflow=1 d_overflow=0
+SAMPLE=14
+TRACE_HEADER cpu=0 window=1 start=2048643949 peer_begin=2048658278 peer_wake=2048658330 peer_block=2048659350 resume=2048667635 elapsed=14329 i_count=89 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000659
+TRACE_PASS records=92 elapsed=14329
+SAMPLE=15
+TRACE_HEADER cpu=0 window=1 start=2057781830 peer_begin=2057794270 peer_wake=2057794322 peer_block=2057795469 resume=2057825845 elapsed=12440 i_count=40 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000628
+TRACE_PASS records=43 elapsed=12440
+SAMPLE=16
+TRACE_HEADER cpu=0 window=1 start=2066626197 peer_begin=2066646283 peer_wake=2066646335 peer_block=2066653026 resume=2066661592 elapsed=20086 i_count=136 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001a88
+TRACE_PASS records=149 elapsed=20086
+SAMPLE=17
+TRACE_HEADER cpu=0 window=1 start=2075618891 peer_begin=2075633177 peer_wake=2075633229 peer_block=2075634236 resume=2075664310 elapsed=14286 i_count=87 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a57
+TRACE_PASS records=92 elapsed=14286
+SAMPLE=18
+TRACE_HEADER cpu=0 window=1 start=2084310175 peer_begin=2084326647 peer_wake=2084326699 peer_block=2084327819 resume=2084335954 elapsed=16472 i_count=140 d_count=8 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000108c
+TRACE_PASS records=148 elapsed=16472
+SAMPLE=19
+TRACE_HEADER cpu=0 window=1 start=2093289322 peer_begin=2093304054 peer_wake=2093304106 peer_block=2093305143 resume=2093312367 elapsed=14732 i_count=95 d_count=4 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000085f
+TRACE_PASS records=99 elapsed=14732
+SAMPLE=20
+TRACE_HEADER cpu=0 window=1 start=2102108991 peer_begin=2102145947 peer_wake=2102145999 peer_block=2102147553 resume=2102157121 elapsed=36956 i_count=256 d_count=22 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042d00
+TRACE_TRUNCATED records=278 elapsed=36956 i_overflow=1 d_overflow=0
+SAMPLE=21
+TRACE_HEADER cpu=0 window=1 start=2111033687 peer_begin=2111045360 peer_wake=2111045414 peer_block=2111052841 resume=2111061460 elapsed=11673 i_count=64 d_count=7 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000e40
+TRACE_PASS records=71 elapsed=11673
+SAMPLE=22
+TRACE_HEADER cpu=0 window=1 start=2120017925 peer_begin=2120032316 peer_wake=2120032368 peer_block=2120033371 resume=2120063056 elapsed=14391 i_count=87 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a57
+TRACE_PASS records=92 elapsed=14391
+SAMPLE=23
+TRACE_HEADER cpu=0 window=1 start=2129131837 peer_begin=2129146486 peer_wake=2129146538 peer_block=2129147580 resume=2129154821 elapsed=14649 i_count=97 d_count=6 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000c61
+TRACE_PASS records=103 elapsed=14649
+SAMPLE=24
+TRACE_HEADER cpu=0 window=1 start=2138169782 peer_begin=2138182045 peer_wake=2138182097 peer_block=2138183214 resume=2138190519 elapsed=12263 i_count=38 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000626
+TRACE_PASS records=41 elapsed=12263
+SAMPLE=25
+TRACE_HEADER cpu=0 window=1 start=2146979163 peer_begin=2146991369 peer_wake=2146991421 peer_block=2146992572 resume=2147020415 elapsed=12206 i_count=38 d_count=2 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000426
+TRACE_PASS records=40 elapsed=12206
+SAMPLE=26
+TRACE_HEADER cpu=0 window=1 start=2155953859 peer_begin=2155987570 peer_wake=2155987622 peer_block=2155988973 resume=2155998368 elapsed=33711 i_count=240 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020f0
+TRACE_PASS records=256 elapsed=33711
+SAMPLE=27
+TRACE_HEADER cpu=0 window=1 start=2164949628 peer_begin=2164961113 peer_wake=2164961167 peer_block=2164968510 resume=2164977002 elapsed=11485 i_count=62 d_count=6 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000c3e
+TRACE_PASS records=68 elapsed=11485
+SAMPLE=28
+TRACE_HEADER cpu=0 window=1 start=2173774466 peer_begin=2173785761 peer_wake=2173785813 peer_block=2173786960 resume=2173795179 elapsed=11295 i_count=45 d_count=1 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000022d
+TRACE_PASS records=46 elapsed=11295
+SAMPLE=29
+TRACE_HEADER cpu=0 window=1 start=2182584717 peer_begin=2182636296 peer_wake=2182636350 peer_block=2182644128 resume=2182651722 elapsed=51579 i_count=256 d_count=23 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042f00
+TRACE_TRUNCATED records=279 elapsed=51579 i_overflow=1 d_overflow=0
+SAMPLE=30
+TRACE_HEADER cpu=0 window=1 start=2191429945 peer_begin=2191440227 peer_wake=2191440281 peer_block=2191448439 resume=2191456315 elapsed=10282 i_count=61 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a3d
+TRACE_PASS records=66 elapsed=10282
+SAMPLE=31
+TRACE_HEADER cpu=0 window=1 start=2200344307 peer_begin=2200355633 peer_wake=2200355685 peer_block=2200356802 resume=2200387923 elapsed=11326 i_count=42 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000062a
+TRACE_PASS records=45 elapsed=11326
+SAMPLE=32
+TRACE_HEADER cpu=0 window=1 start=2209132710 peer_begin=2209143875 peer_wake=2209143927 peer_block=2209145075 resume=2209153241 elapsed=11165 i_count=42 d_count=1 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000022a
+TRACE_PASS records=43 elapsed=11165
+SAMPLE=33
+TRACE_HEADER cpu=0 window=1 start=2218225953 peer_begin=2218243505 peer_wake=2218243557 peer_block=2218244752 resume=2218253992 elapsed=17552 i_count=167 d_count=9 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000012a7
+TRACE_PASS records=176 elapsed=17552
+SAMPLE=34
+TRACE_HEADER cpu=0 window=1 start=2227129764 peer_begin=2227141968 peer_wake=2227142020 peer_block=2227143168 resume=2227150275 elapsed=12204 i_count=39 d_count=1 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000227
+TRACE_PASS records=40 elapsed=12204
+SAMPLE=35
+TRACE_HEADER cpu=0 window=1 start=2235788485 peer_begin=2235826049 peer_wake=2235826101 peer_block=2235827617 resume=2235835899 elapsed=37564 i_count=256 d_count=17 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042300
+TRACE_TRUNCATED records=273 elapsed=37564 i_overflow=1 d_overflow=0
+SAMPLE=36
+TRACE_HEADER cpu=0 window=1 start=2244707727 peer_begin=2244719591 peer_wake=2244719645 peer_block=2244752036 resume=2244731090 elapsed=11864 i_count=68 d_count=8 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001044
+TRACE_PASS records=76 elapsed=11864
+SAMPLE=37
+TRACE_HEADER cpu=0 window=1 start=2253523139 peer_begin=2253534371 peer_wake=2253534423 peer_block=2253535532 resume=2253543796 elapsed=11232 i_count=38 d_count=2 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000426
+TRACE_PASS records=40 elapsed=11232
+SAMPLE=38
+TRACE_HEADER cpu=0 window=1 start=2262416223 peer_begin=2262427447 peer_wake=2262427499 peer_block=2262428646 resume=2262436976 elapsed=11224 i_count=39 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a27
+TRACE_PASS records=44 elapsed=11224
+SAMPLE=39
+TRACE_HEADER cpu=0 window=1 start=2271061706 peer_begin=2271073006 peer_wake=2271073058 peer_block=2271074172 resume=2271103475 elapsed=11300 i_count=39 d_count=2 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000427
+TRACE_PASS records=41 elapsed=11300
+SAMPLE=40
+TRACE_HEADER cpu=0 window=1 start=2279904978 peer_begin=2279919371 peer_wake=2279919423 peer_block=2279920545 resume=2279929276 elapsed=14393 i_count=109 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a6d
+TRACE_PASS records=114 elapsed=14393
+SAMPLE=41
+TRACE_HEADER cpu=0 window=1 start=2288860171 peer_begin=2288879990 peer_wake=2288880042 peer_block=2288886777 resume=2288894349 elapsed=19819 i_count=131 d_count=8 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001083
+TRACE_PASS records=139 elapsed=19819
+SAMPLE=42
+TRACE_HEADER cpu=0 window=1 start=2297704290 peer_begin=2297743219 peer_wake=2297743271 peer_block=2297752579 resume=2297762325 elapsed=38929 i_count=256 d_count=20 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042900
+TRACE_TRUNCATED records=276 elapsed=38929 i_overflow=1 d_overflow=0
+SAMPLE=43
+TRACE_HEADER cpu=0 window=1 start=2306654213 peer_begin=2306666465 peer_wake=2306666517 peer_block=2306667660 resume=2306674907 elapsed=12252 i_count=38 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a26
+TRACE_PASS records=43 elapsed=12252
+SAMPLE=44
+TRACE_HEADER cpu=0 window=1 start=2315358416 peer_begin=2315378107 peer_wake=2315378159 peer_block=2315426429 resume=2315390210 elapsed=19691 i_count=128 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001e80
+TRACE_PASS records=143 elapsed=19691
+SAMPLE=45
+TRACE_HEADER cpu=0 window=1 start=2324413361 peer_begin=2324424545 peer_wake=2324424597 peer_block=2324425747 resume=2324434003 elapsed=11184 i_count=41 d_count=1 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000229
+TRACE_PASS records=42 elapsed=11184
+SAMPLE=46
+TRACE_HEADER cpu=0 window=1 start=2333109348 peer_begin=2333127009 peer_wake=2333127061 peer_block=2333128229 resume=2333137388 elapsed=17661 i_count=169 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ca9
+TRACE_PASS records=183 elapsed=17661
+SAMPLE=47
+TRACE_HEADER cpu=0 window=1 start=2342026694 peer_begin=2342074342 peer_wake=2342074394 peer_block=2342108442 resume=2342087233 elapsed=47648 i_count=256 d_count=25 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043300
+TRACE_TRUNCATED records=281 elapsed=47648 i_overflow=1 d_overflow=0
+SAMPLE=48
+TRACE_HEADER cpu=0 window=1 start=2350821384 peer_begin=2350833828 peer_wake=2350833880 peer_block=2350835027 resume=2350863330 elapsed=12444 i_count=42 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a2a
+TRACE_PASS records=47 elapsed=12444
+SAMPLE=49
+TRACE_HEADER cpu=0 window=1 start=2359786450 peer_begin=2359834557 peer_wake=2359834609 peer_block=2359868037 resume=2359847245 elapsed=48107 i_count=256 d_count=27 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043700
+TRACE_TRUNCATED records=283 elapsed=48107 i_overflow=1 d_overflow=0
+SAMPLE=50
+TRACE_HEADER cpu=0 window=1 start=2368622908 peer_begin=2368638258 peer_wake=2368638310 peer_block=2368639399 resume=2368647197 elapsed=15350 i_count=109 d_count=9 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000126d
+TRACE_PASS records=118 elapsed=15350
+~ # echo TARGET3_50_BATCH_END
+TARGET3_50_BATCH_END
+~ # poweroff -f
+[  125.877855] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              719 (             2cf)
+INFO:    ps.cpp: minstret (instructions retired):      624,000,701 (        25317ebd)
+INFO:    ps.cpp: minstret delta:                       623,999,982 (        25317bee)
+INFO:    ps.cpp: MTIME start:                           73,748,959 (         46551df)
+INFO:    ps.cpp: MTIME stop:                         1,084,954,573 (        40ab17cd)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):       1,011,205,614 (        3c45c5ee)
+INFO:    ps.cpp: IPC        :                             0.077136
+INFO:    ps.cpp: minstret (instructions retired):      624,000,787 (        25317f13)
+INFO:    ps.cpp: wall clock time                :  202,241,957,142 (      2f168f5d16) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,990,098.89 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000191
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d16000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+Connection to 192.168.4.35 closed.
+
+Script done on 2026-10-31 02:27:54-04:00 [COMMAND_EXIT_CODE="0"]
