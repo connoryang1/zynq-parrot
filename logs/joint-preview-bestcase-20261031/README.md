@@ -12,6 +12,25 @@ exact revision and acceptance boundary are known; no Linux speedup is claimed ye
   `e_bp_unicore_zynqparrot_prefetch5_cfg`.
 - The later Linux collateral commits do not alter the immutable routed RTL.
 
+## First route result and corrected fit gate
+
+The first route is rejected as the Linux fit gate, although its placement
+failure is valid for the selected endpoint. Synthesis completed with zero
+errors at 55,687 slice LUTs versus 53,200 available. Physical synthesis
+combined 1,034 LUTs, but detail placement still required 11,531 slices while
+only 10,940 were available and exited with `Place 30-487`.
+
+The endpoint was not a one-variable comparison with the accepted instruction
+image: `e_bp_unicore_zynqparrot_prefetch5_cfg` selects five D-UCE request slots
+and also changes `num_contexts` from four to ten. The one-hart Linux scheduler
+benchmark does not use the historical ten-context hardware workload, and the
+accepted full-core feature regression already runs with two resident/four
+logical contexts. The controlled reroute therefore keeps exact top
+`009b4de2` and BlackParrot `1b4126d6` RTL but selects
+`e_bp_unicore_zynqparrot_prefetch_cfg`, which retains four request slots and
+four logical contexts. No RTL reduction or performance compromise is implied
+by that correction.
+
 ## Accepted pre-route gates
 
 - The focused UCE run at `/dev/shm/zp-joint-bestcase-uce-physical` passes a

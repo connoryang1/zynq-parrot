@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Joint route exposes a configuration area confound — 2026-10-31:** Exact job `20261031T135833Z-009b4de2` completed synthesis with 55,687 LUTs and failed detail placement because 11,531 slices were required while 10,940 were available. The selected `prefetch5` endpoint also changes `num_contexts` from four to ten, although the one-hart Linux data-preview benchmark does not use the ten-context hardware workload; the next controlled fit gate keeps the same `009b4de2`/`1b4126d6` RTL and uses the accepted four-context/four-slot `prefetch` endpoint (`logs/joint-preview-bestcase-20261031/`, RL-064).
+
 - **Joint instruction/data preview checkpoint — 2026-10-31:** Integrated a four-entry independently scheduled physical data-preview queue with the accepted detached instruction replay, and retained exact guest/core/host PASS at 20,608 retired instructions after a clean traced rebuild. A fair persistent-pin Linux best-case benchmark and idempotent patch stack compile with the pinned RV64 toolchain; routed PYNQ-Z2 fit job `20261031T135833Z-009b4de2` is running, so no Linux performance gain is claimed.
 
 - **Data-only best-case image prepared — 2026-10-31:** Rebuilt the full instruction-trigger-plus-data-preview Linux image in an isolated tree, packaged a one-hart OpenSBI payload with instruction replay disabled, and generated a range-checked 8 MHz NBF (`77e13709...2aa3`). The kernel/OpenSBI executable-section CSR guards and dynamic benchmark ABI checks pass; board execution remains gated on the still-running immutable route.
