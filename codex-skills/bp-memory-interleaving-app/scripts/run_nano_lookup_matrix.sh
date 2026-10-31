@@ -46,10 +46,12 @@ fi
 for mode in $modes; do
   mode_dir="$artifact_root/mode-$mode"
   mkdir -p "$mode_dir"
+  trace_file="$mode_dir/dump.fst"
   set +e
   make -C "$repo_root/testing" run-mt_nano_lookup_benchmark \
     NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE="$mode" \
     NANO_WORKERS="$workers" \
+    DUMP_FILE="$trace_file" \
     TRACE=1 VERILATOR_BUILD_JOBS="${VERILATOR_BUILD_JOBS:-8}" \
     ZP_INSTALL_DIR="$toolchain" SIM_DEFINES="$sim_defines" \
     > "$mode_dir/driver.log" 2>&1
@@ -57,7 +59,7 @@ for mode in $modes; do
   set -e
 
   for path in \
-    "$sim_dir/run.log" "$sim_dir/dump.fst" "$sim_dir/prog.nbf" \
+    "$sim_dir/run.log" "$sim_dir/prog.nbf" \
     "$elf" "$repo_root/testing/logs/verilator_build.log"; do
     [[ -f "$path" ]] && cp -p "$path" "$mode_dir/"
   done
