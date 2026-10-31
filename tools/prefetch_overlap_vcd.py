@@ -394,7 +394,11 @@ class Transactions:
                                first, last))
                     expected = max(1, (1 << size) // self.fill_bytes)
                     if first != (record['beats'] == 0) or last != (record['beats'] + 1 == expected):
-                        raise EvidenceError('normal read response boundary/count mismatch')
+                        raise EvidenceError(
+                            'normal read response boundary/count mismatch '
+                            'address=%s size=%d beats=%d expected=%d first=%d last=%d'
+                            % (hex(record['address']), size, record['beats'], expected,
+                               first, last))
                     record['beats'] += 1
                     if first:
                         record['first_response'] = event

@@ -247,8 +247,15 @@ static __attribute__((noinline, aligned(64))) void lookup_worker(
 
   /* Context zero returns only after the other nine workers publish and pass
    * control around the terminal lap. Other workers are never resumed. */
+  /* Keep a parked worker's post-switch path unconditional.  Testing park
+   * after the CSR lets the frontend predict through the following return and
+   * start an irrelevant blocking I-cache refill before redirect acceptance. */
+  if (park) {
+    __asm__ volatile(
+      "csrw 0x800, %0\n"
+      "1: j 1b\n" : : "r"(next) : "memory");
+  }
   switch_to(next);
-  if (park) for (;;) __asm__ volatile("" ::: "memory");
 }
 
 static __attribute__((noinline)) void serial_lookup(

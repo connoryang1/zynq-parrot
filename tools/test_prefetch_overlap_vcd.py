@@ -177,6 +177,15 @@ class PrefetchTests(unittest.TestCase):
                                     'normal read response identity mismatch'):
             self.analyze(samples)
 
+    def test_normal_response_boundary_error_reports_transaction_details(self):
+        samples = case()
+        samples[19]['rev_last'] = 0
+        with self.assertRaisesRegex(
+                analyzer.EvidenceError,
+                r'normal read response boundary/count mismatch '
+                r'address=0x80008000 size=6 beats=7 expected=8 first=0 last=0'):
+            self.analyze(samples)
+
     def test_different_clock_phases_sample_their_own_edges(self):
         report = self.analyze(axi=True)
         self.assertEqual(report['prefetches'][0]['issue'], dict(cycle=1, timestamp=25))
