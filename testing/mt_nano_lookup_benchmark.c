@@ -5,6 +5,7 @@
  */
 #include <stdint.h>
 #include <stddef.h>
+#include <coroutine>
 #include "bp_utils.h"
 #include "mt_seed.h"
 #include "bp_prefetch.h"
@@ -26,10 +27,12 @@ struct index_line {
   uint64_t packed_links;
   uint64_t pad[6];
 };
-_Static_assert(sizeof(struct index_line) == 64, "one index key per cache line");
-_Static_assert(offsetof(struct index_line, packed_links) + sizeof(uint64_t) == 16,
-               "key and branch links must occupy separate hinted 8-byte words");
+static_assert(sizeof(struct index_line) == 64, "one index key per cache line");
+static_assert(offsetof(struct index_line, packed_links) + sizeof(uint64_t) == 16,
+              "key and branch links must occupy separate hinted 8-byte words");
+extern "C" {
 #include "nano_lookup_data.h"
+}
 
 enum benchmark_mode {
   MODE_SERIAL_DEMAND = 0,
@@ -38,6 +41,7 @@ enum benchmark_mode {
   MODE_MATCHED_BATCH = 3,
   MODE_SWITCH_ONLY = 4,
   MODE_SERIAL_PREFETCH = 5,
+  MODE_CPP_COROUTINE = 6,
   MODE_COUNT
 };
 
@@ -54,6 +58,129 @@ static uint64_t stacks[NANO_LOOKUP_WORKERS][STACK_WORDS]
   __attribute__((aligned(64)));
 static const volatile struct index_line *measured_tables[NANO_LOOKUP_WORKERS];
 static const volatile struct index_line *warm_tables[NANO_LOOKUP_WORKERS];
+static unsigned active_workers = NANO_LOOKUP_WORKERS;
+
+/* The coroutine scheduler uses the same ten-worker round-robin order as the
+ * hardware ring. Frames are created before the measured window and destroyed
+ * afterward, so the timed interval charges only useful lookup work and actual
+ * C++ coroutine suspend/resume scheduling. */
+struct coroutine_scheduler {
+  std::coroutine_handle<> queue[NANO_LOOKUP_WORKERS];
+  unsigned head = 0;
+  unsigned tail = 0;
+  unsigned count = 0;
+
+  void reset()
+  {
+    head = tail = count = 0;
+  }
+
+  void push(std::coroutine_handle<> handle)
+  {
+    if (count >= NANO_LOOKUP_WORKERS) {
+      bp_print_string((char *)"[BSG-FAIL] nano coroutine queue overflow\n");
+      bp_finish(1);
+    }
+    queue[head] = handle;
+    head = (head + 1) % NANO_LOOKUP_WORKERS;
+    ++count;
+  }
+
+  std::coroutine_handle<> pop()
+  {
+    if (!count) {
+      bp_print_string((char *)"[BSG-FAIL] nano coroutine queue underflow\n");
+      bp_finish(1);
+    }
+    std::coroutine_handle<> handle = queue[tail];
+    tail = (tail + 1) % NANO_LOOKUP_WORKERS;
+    --count;
+    return handle;
+  }
+
+  void run()
+  {
+    while (count) pop().resume();
+  }
+};
+
+static coroutine_scheduler cpp_scheduler;
+
+/* Avoid pulling the hosted C++ allocator and exception runtime into this
+ * freestanding benchmark. All ten frames coexist, are created outside the
+ * timed window, and are reclaimed together after the scheduler drains. */
+#define CPP_COROUTINE_FRAME_BYTES 512
+alignas(16) static uint8_t cpp_frame_storage[NANO_LOOKUP_WORKERS]
+  [CPP_COROUTINE_FRAME_BYTES];
+static unsigned cpp_frame_next;
+
+struct nano_task {
+  struct promise_type;
+  using handle_type = std::coroutine_handle<promise_type>;
+
+  struct promise_type {
+    static void *operator new(size_t size)
+    {
+      if (size > CPP_COROUTINE_FRAME_BYTES || cpp_frame_next >= NANO_LOOKUP_WORKERS) {
+        bp_print_string((char *)"[BSG-FAIL] nano coroutine frame pool exhausted\n");
+        bp_finish(1);
+      }
+      return cpp_frame_storage[cpp_frame_next++];
+    }
+    static void operator delete(void *, size_t) noexcept {}
+
+    nano_task get_return_object()
+    {
+      return nano_task{handle_type::from_promise(*this)};
+    }
+    std::suspend_always initial_suspend() noexcept { return {}; }
+    std::suspend_always final_suspend() noexcept { return {}; }
+    void return_void() noexcept {}
+    void unhandled_exception() noexcept
+    {
+      bp_print_string((char *)"[BSG-FAIL] nano coroutine exception\n");
+      bp_finish(1);
+    }
+  };
+
+  handle_type handle = nullptr;
+
+  nano_task() = default;
+  explicit nano_task(handle_type value) : handle(value) {}
+  nano_task(const nano_task &) = delete;
+  nano_task &operator=(const nano_task &) = delete;
+  nano_task(nano_task &&other) noexcept : handle(other.handle)
+  {
+    other.handle = nullptr;
+  }
+  nano_task &operator=(nano_task &&other) noexcept
+  {
+    if (handle) handle.destroy();
+    handle = other.handle;
+    other.handle = nullptr;
+    return *this;
+  }
+  void destroy()
+  {
+    if (handle) handle.destroy();
+    handle = nullptr;
+  }
+};
+
+static nano_task cpp_tasks[NANO_LOOKUP_WORKERS];
+
+struct prefetch_and_yield {
+  const volatile struct index_line *line;
+
+  bool await_ready() const noexcept { return false; }
+  void await_resume() const noexcept {}
+  std::coroutine_handle<> await_suspend(std::coroutine_handle<> current) const
+  {
+    bp_prefetch_r(line);
+    cpp_scheduler.push(current);
+    return cpp_scheduler.pop();
+  }
+};
 
 /* Patched in the unchanged ELF/NBF before the processor is released. */
 volatile uint64_t benchmark_mode __attribute__((section(".data"))) = UINT64_MAX;
@@ -128,7 +255,7 @@ static __attribute__((noinline)) void serial_lookup(
   const volatile struct index_line *const *tables, uint64_t entries,
   const uint64_t *queries, unsigned prefetch)
 {
-  for (unsigned worker = 0; worker < NANO_LOOKUP_WORKERS; ++worker) {
+  for (unsigned worker = 0; worker < active_workers; ++worker) {
     uint64_t lower = 0, length = entries, checksum = 0, steps = 0, node = 0;
     while (length) {
       uint64_t half = length >> 1;
@@ -156,6 +283,39 @@ static __attribute__((noinline)) void serial_lookup(
   }
 }
 
+/* This is a compiler-generated C++20 coroutine frame, not a hand-written
+ * state machine. Symmetric transfer selects the next queued search directly
+ * at every prefetch suspension, matching Nishanov's Nano-coroutine schedule. */
+static nano_task coroutine_lookup(
+  const volatile struct index_line *table, uint64_t entries, uint64_t key,
+  volatile struct lookup_result *out)
+{
+  uint64_t lower = 0, length = entries, checksum = 0, steps = 0, node = 0;
+  while (length) {
+    uint64_t half = length >> 1;
+    uint64_t middle = lower + half;
+    const volatile struct index_line *line = &table[node];
+    co_await prefetch_and_yield{line};
+    uint64_t value;
+    __asm__ volatile(
+      ".global nano_coroutine_consume_load\n"
+      "nano_coroutine_consume_load:\n"
+      "ld %0, 0(%1)\n" : "=r"(value) : "r"(line) : "memory");
+    uint64_t links = line->packed_links;
+    checksum += value;
+    ++steps;
+    if (value < key) {
+      node = (uint32_t)links;
+      lower = middle + 1;
+      length -= half + 1;
+    } else {
+      node = links >> 32;
+      length = half;
+    }
+  }
+  publish(out, lower, checksum, steps);
+}
+
 /* This is both the explicit-state-machine baseline and the ideal matched
  * batch: issue one hint for each live search, then consume the same ten
  * midpoints under the processor's actual request-capacity/arbitration rules. */
@@ -169,13 +329,13 @@ static __attribute__((noinline)) void matched_batch(
   uint64_t node[NANO_LOOKUP_WORKERS] = {0};
   const volatile struct index_line *lines[NANO_LOOKUP_WORKERS];
 
-  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) length[i] = entries;
+  for (unsigned i = 0; i < active_workers; ++i) length[i] = entries;
   for (uint64_t step = 0; step < levels; ++step) {
-    for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) {
+    for (unsigned i = 0; i < active_workers; ++i) {
       lines[i] = &tables[i][node[i]];
       bp_prefetch_r(lines[i]);
     }
-    for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) {
+    for (unsigned i = 0; i < active_workers; ++i) {
       uint64_t value;
       __asm__ volatile(
         ".global nano_batch_consume_load\n"
@@ -195,14 +355,25 @@ static __attribute__((noinline)) void matched_batch(
       }
     }
   }
-  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i)
+  for (unsigned i = 0; i < active_workers; ++i)
     publish(&results[i], lower[i], checksum[i], levels);
 }
 
 static void clear_results(void)
 {
-  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i)
-    results[i] = (struct lookup_result){0};
+  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) {
+    results[i].lower_bound = 0;
+    results[i].checksum = 0;
+    results[i].steps = 0;
+    results[i].done = 0;
+  }
+}
+
+static void destroy_coroutines(void)
+{
+  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) cpp_tasks[i].destroy();
+  cpp_scheduler.reset();
+  cpp_frame_next = 0;
 }
 
 /* Seed identical context state for every mode. Serial and batch modes do not
@@ -210,8 +381,9 @@ static void clear_results(void)
 static void prepare(const volatile struct index_line *const *tables, uint64_t entries,
                     const uint64_t *queries, unsigned mode, uint64_t levels)
 {
+  destroy_coroutines();
   clear_results();
-  for (unsigned i = 1; i < NANO_LOOKUP_WORKERS; ++i) {
+  for (unsigned i = 1; i < active_workers; ++i) {
     uint64_t gp_value;
     __asm__ volatile("mv %0, gp" : "=r"(gp_value));
     seed_reg(i, 3, gp_value);
@@ -221,11 +393,17 @@ static void prepare(const volatile struct index_line *const *tables, uint64_t en
     seed_reg(i, 12, queries[i]);
     seed_reg(i, 13, (uint64_t)&results[i]);
     seed_reg(i, 14, mode);
-    seed_reg(i, 15, (i + 1) % NANO_LOOKUP_WORKERS);
+    seed_reg(i, 15, (i + 1) % active_workers);
     seed_reg(i, 16, 1);
     seed_reg(i, 17, levels);
     seed_npc(i, (uint64_t)lookup_worker);
     __asm__ volatile("fence rw, rw" ::: "memory");
+  }
+  if (mode == MODE_CPP_COROUTINE) {
+    for (unsigned i = 0; i < active_workers; ++i) {
+      cpp_tasks[i] = coroutine_lookup(tables[i], entries, queries[i], &results[i]);
+      cpp_scheduler.push(cpp_tasks[i].handle);
+    }
   }
 }
 
@@ -233,7 +411,8 @@ static __attribute__((noinline)) void ring(
   const volatile struct index_line *const *tables, uint64_t entries,
   const uint64_t *queries, unsigned mode, uint64_t levels)
 {
-  lookup_worker(tables[0], entries, queries[0], &results[0], mode, 1, 0, levels);
+  lookup_worker(tables[0], entries, queries[0], &results[0], mode,
+                active_workers > 1 ? 1 : 0, 0, levels);
 }
 
 static __attribute__((noinline)) void run_operation(
@@ -244,6 +423,8 @@ static __attribute__((noinline)) void run_operation(
     serial_lookup(tables, entries, queries, mode == MODE_SERIAL_PREFETCH);
   else if (mode == MODE_MATCHED_BATCH)
     matched_batch(tables, entries, queries, levels);
+  else if (mode == MODE_CPP_COROUTINE)
+    cpp_scheduler.run();
   else
     ring(tables, entries, queries, mode, levels);
 }
@@ -275,7 +456,7 @@ static void expected_result(uint64_t entries, uint64_t key,
 static void check_results(unsigned mode, uint64_t entries,
                           const uint64_t *queries, uint64_t levels)
 {
-  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) {
+  for (unsigned i = 0; i < active_workers; ++i) {
     uint64_t lower = 0, checksum = 0, steps = levels;
     if (mode != MODE_SWITCH_ONLY)
       expected_result(entries, queries[i], &lower, &checksum, &steps);
@@ -306,7 +487,7 @@ static void emit_marker(unsigned id)
   __asm__ volatile("fence ow, ow" ::: "memory");
 }
 
-static __attribute__((noinline, noclone, aligned(64))) uint64_t run_window(
+extern "C" __attribute__((noinline, noclone, aligned(64))) uint64_t run_window(
   unsigned mode, const volatile struct index_line *const *tables, uint64_t entries,
   const uint64_t *queries, uint64_t levels,
   unsigned begin_marker, unsigned end_marker)
@@ -345,6 +526,7 @@ static void warm_instruction_paths(void)
                nano_warm_queries, NANO_LOOKUP_WARM_LEVELS,
                0x90 + mode, 0x80 + mode);
     drain_traffic();
+    destroy_coroutines();
     check_results(mode, NANO_LOOKUP_WARM_ENTRIES, nano_warm_queries,
                   NANO_LOOKUP_WARM_LEVELS);
   }
@@ -354,16 +536,20 @@ static const char *mode_name(unsigned mode)
 {
   static const char *const names[MODE_COUNT] = {
     "serial demand", "demand ring", "worker prefetch",
-    "matched batch", "switch-only", "serial prefetch"
+    "matched batch", "switch-only", "serial prefetch", "C++20 coroutines"
   };
   return names[mode];
 }
 
 int main(void)
 {
-  unsigned mode = benchmark_mode;
-  if (mode >= MODE_COUNT) {
-    bp_print_string("[BSG-FAIL] nano lookup mode must be 0 through 5\n");
+  uint64_t config = benchmark_mode;
+  unsigned mode = config & 0xff;
+  active_workers = (config >> 8) & 0xff;
+  if (!active_workers) active_workers = NANO_LOOKUP_WORKERS;
+  if (mode >= MODE_COUNT || active_workers < 2
+      || active_workers > NANO_LOOKUP_WORKERS) {
+    bp_print_string((char *)"[BSG-FAIL] nano lookup mode/workers invalid\n");
     bp_finish(1);
   }
 
@@ -379,14 +565,15 @@ int main(void)
     nano_measured_queries, NANO_LOOKUP_MEASURED_LEVELS,
     BEGIN_MARKER_BASE + mode, END_MARKER_BASE + mode);
 
+  destroy_coroutines();
   check_results(mode, NANO_LOOKUP_MEASURED_ENTRIES,
                 nano_measured_queries, NANO_LOOKUP_MEASURED_LEVELS);
   uint64_t checksum = 0;
-  for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i)
+  for (unsigned i = 0; i < active_workers; ++i)
     checksum += results[i].checksum;
 
   bp_print_string("Benchmark: NANO_LOOKUP mode="); bp_hprint_uint64(mode);
-  bp_print_string(" queries="); bp_hprint_uint64(NANO_LOOKUP_WORKERS);
+  bp_print_string(" queries="); bp_hprint_uint64(active_workers);
   bp_print_string(" levels="); bp_hprint_uint64(NANO_LOOKUP_MEASURED_LEVELS);
   bp_print_string(" cycles="); bp_hprint_uint64(cycles);
   bp_print_string(" checksum="); bp_hprint_uint64(checksum);

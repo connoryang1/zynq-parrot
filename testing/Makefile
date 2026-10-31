@@ -23,6 +23,7 @@ DDR_LATENCY_VERBOSE ?= 1
 STREAMS ?= 4
 STREAM_NODES ?= 32
 NANO_MODE ?= 2
+NANO_WORKERS ?= 10
 TARGET_BYPASS_TURNS ?= 128
 LIFECYCLE_EPOCHS ?= 6
 LIFECYCLE_EVICTION_LINES ?= 1024
@@ -37,6 +38,7 @@ $(error PREFETCH_FULL_LINE must be 0 or 1)
 endif
 
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
+CXX    := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-g++
 NM     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-nm
 CFLAGS = -O2 \
           -I$(TOP)/software/include \
@@ -141,7 +143,7 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	$$(MAKE) -C $$(SIM_DIR) run PROG=$(1) NUM_THREADS=$$(NUM_THREADS) NUM_CONTEXTS=$$(NUM_CONTEXTS) EXTRA_DEFINES="$$(SIM_DEFINES)" $$(if $$(TRACE),TRACE=$$(TRACE),) $$(if $$(RUN_INPUT),RUN_INPUT="$$(RUN_INPUT)" RUN_INPUT_ADDR="$$(RUN_INPUT_ADDR)",) | grep -E "$$(RUN_LOG_FILTER)"; \
 	sim_rc=$$$${PIPESTATUS[0]}; \
 	set -e; \
-	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),) $$(if $$(RUN_EXPECT_NANO),--nano-mode=$$(RUN_EXPECT_NANO),)
+	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),) $$(if $$(RUN_EXPECT_NANO),--nano-mode=$$(RUN_EXPECT_NANO),) $$(if $$(RUN_EXPECT_NANO_WORKERS),--nano-workers=$$(RUN_EXPECT_NANO_WORKERS),)
 endef
 
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
@@ -162,6 +164,8 @@ $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/software/in
 $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/testing/dependent_stream_data.h
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/testing/nano_lookup_data.h
+$(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: CC := $(CXX)
+$(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: CFLAGS += -std=gnu++20 -fno-exceptions -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -nodefaultlibs -lgcc -Wl,--start-group -lc -lgloss_dramfs -Wl,--end-group -Wl,--start-group,--whole-archive -lperch -Wl,--no-whole-archive,--end-group -lgcc
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
@@ -211,14 +215,15 @@ run-mt_dependent_stream_benchmark: RUN_EXPECT_DEPENDENT = $(RUN_INPUT)
 run-mt_dependent_stream_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_config" { print "0x" $$1; exit }')
 run-mt_dependent_stream_benchmark: check-dependent-topology check-dependent-config
 run-mt_nano_lookup_benchmark: override SIM_DEFINES += BP_DCACHE_PREFETCH_ELS=$(PREFETCH_ELS) BP_PREFETCH_AXI_BYPASS
-run-mt_nano_lookup_benchmark: RUN_INPUT := $(NANO_MODE)
+run-mt_nano_lookup_benchmark: RUN_INPUT := $(shell echo $$(( $(NANO_MODE) | ($(NANO_WORKERS) << 8) )))
 run-mt_nano_lookup_benchmark: RUN_EXPECT_NANO := $(NANO_MODE)
+run-mt_nano_lookup_benchmark: RUN_EXPECT_NANO_WORKERS := $(NANO_WORKERS)
 run-mt_nano_lookup_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv 2>/dev/null | awk '$$3 == "benchmark_mode" { print "0x" $$1; exit }')
 run-mt_nano_lookup_benchmark: check-nano-lookup-config
 .PHONY: check-nano-lookup-config
 check-nano-lookup-config:
-	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 5 )); then \
-		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 and NANO_MODE in [0,5]"; exit 1; \
+	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 6 || $(NANO_WORKERS) < 2 || $(NANO_WORKERS) > 10 )); then \
+		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10, NANO_MODE in [0,6], and NANO_WORKERS in [2,10]"; exit 1; \
 	fi
 .PHONY: check-dependent-topology
 check-dependent-topology:

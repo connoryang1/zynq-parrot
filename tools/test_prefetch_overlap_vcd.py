@@ -99,10 +99,13 @@ class PrefetchTests(unittest.TestCase):
     def analyze(self, samples=None, axi=False, **kwargs):
         prefetch_slots = kwargs.pop('prefetch_slots', 2)
         consume_pcs = kwargs.pop('consume_pcs', ())
+        stop_pc = kwargs.pop('stop_pc', None)
+        stop_count = kwargs.pop('stop_count', None)
         return analyzer.analyze(io.StringIO(trace(case(axi) if samples is None else samples,
                                                   axi=axi, consumers=bool(consume_pcs), **kwargs)),
                                 axi_prefix='axi_mem' if axi else None,
-                                prefetch_slots=prefetch_slots, consume_pcs=consume_pcs)
+                                prefetch_slots=prefetch_slots, consume_pcs=consume_pcs,
+                                stop_pc=stop_pc, stop_count=stop_count)
 
     def test_slots_dropped_hint_and_normal_fill_are_distinct(self):
         report = self.analyze()
@@ -187,6 +190,22 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual([event['pc'] for event in report['consuming_loads']],
                          [0x80000518, 0x80000560])
         self.assertEqual(report['cycles'], dict(clock=23, be_clock=23))
+
+    def test_final_end_commit_stops_before_teardown_timestamp_rollback(self):
+        samples = case()
+        samples[21].update(commit_v=1, commit_pc=0x100, commit_thread=0)
+        samples[22].update(commit_v=1, commit_pc=0x104, commit_thread=0)
+        malformed_teardown = trace(samples, consumers=True) + '#1\n'
+        report = analyzer.analyze(io.StringIO(malformed_teardown),
+                                  consume_pcs=(0x100, 0x104),
+                                  stop_pc=0x104, stop_count=1)
+        self.assertEqual([event['pc'] for event in report['consuming_loads']],
+                         [0x100, 0x104])
+        with self.assertRaisesRegex(analyzer.EvidenceError,
+                                    'expected 2 stop-PC commits, observed 1'):
+            analyzer.analyze(io.StringIO(trace(samples, consumers=True)),
+                             consume_pcs=(0x100, 0x104),
+                             stop_pc=0x104, stop_count=2)
 
     def test_marker_window_and_matched_summary_are_strict(self):
         window = analyzer.marker_window(io.StringIO(

@@ -99,7 +99,8 @@ class HarnessTests(unittest.TestCase):
             env.pop(key, None)
         for mode, threads, contexts, slots, expected in (
                 (0, 2, 10, 10, True), (4, 2, 10, 10, True),
-                (5, 2, 10, 10, True), (6, 2, 10, 10, False),
+                (5, 2, 10, 10, True), (6, 2, 10, 10, True),
+                (7, 2, 10, 10, False),
                 (2, 2, 4, 10, False),
                 (2, 2, 10, 9, False)):
             with self.subTest(mode=mode, threads=threads, contexts=contexts, slots=slots):
@@ -118,6 +119,10 @@ class HarnessTests(unittest.TestCase):
                 "cycles=0x123 checksum=0x456\n")
         check_transcript(good + marker + "\n" + PASS,
                          test="mt_nano_lookup_benchmark", nano_mode=2)
+        eight = good.replace("queries=0xa", "queries=0x8")
+        check_transcript(eight + marker + "\n" + PASS,
+                         test="mt_nano_lookup_benchmark", nano_mode=2,
+                         nano_workers=8)
         for row in (good.replace("mode=0x2", "mode=0x1"),
                     good.replace("queries=0xa", "queries=0x8"),
                     good.replace("levels=0xb", "levels=0xa"),

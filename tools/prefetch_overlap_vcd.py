@@ -411,11 +411,13 @@ class Transactions:
         if commit_v not in (0, 1):
             raise EvidenceError('nonbinary control commit_v')
         if commit_v != 1:
-            return
+            return None
         pc = known(v, 'commit_pc')
         if pc in self.consume_pcs:
             self.consuming_loads.append(dict(cycle=cycle, timestamp=timestamp, pc=pc,
                                              thread=known(v, 'commit_thread')))
+            return pc
+        return None
 
     def finish(self, allow_no_prefetch=False):
         if self.slots or self.normal_pending or self.axi_pending:
@@ -436,7 +438,12 @@ class Transactions:
 
 
 def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fill_bytes=8,
-            prefetch_slots=2, allow_no_prefetch=False, consume_pcs=()):
+            prefetch_slots=2, allow_no_prefetch=False, consume_pcs=(),
+            stop_pc=None, stop_count=None):
+    if (stop_pc is None) != (stop_count is None) or (stop_count is not None and stop_count <= 0):
+        raise EvidenceError('stop PC and positive count must be supplied together')
+    if stop_pc is not None and stop_pc not in consume_pcs:
+        raise EvidenceError('stop PC must be included in tracked consuming PCs')
     selected, timescale = read_header(stream, signal_names(uce_prefix, axi_prefix, consume_pcs),
                                       optional=OPTIONAL_UCE_SIGNALS)
     admission_modes = [label for label in OPTIONAL_UCE_SIGNALS if label in selected]
@@ -450,6 +457,8 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
     if consume_pcs:
         clocks.append('be_clock')
     clocks = tuple(clocks)
+    stops_seen = 0
+    stop = False
     for _, timestamp, values in rising_edges(stream, selected, clocks):
         for clock in values.get('_rising_clocks', ['clock']):
             cycle = tracker.cycles[clock]
@@ -460,9 +469,17 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
                 elif clock == 'axi_clock':
                     tracker.axi_edge(values, cycle, timestamp)
                 else:
-                    tracker.be_edge(values, cycle, timestamp)
+                    committed_pc = tracker.be_edge(values, cycle, timestamp)
+                    if committed_pc == stop_pc:
+                        stops_seen += 1
+                        stop = stops_seen == stop_count
             except EvidenceError as error:
                 raise EvidenceError('%s cycle %d timestamp %d: %s' % (clock, cycle, timestamp, error)) from error
+        if stop:
+            break
+    if stop_count is not None and stops_seen != stop_count:
+        raise EvidenceError('expected %d stop-PC commits, observed %d'
+                            % (stop_count, stops_seen))
     for clock in clocks:
         if tracker.cycles[clock] == 0:
             raise EvidenceError('no observed rising edges for ' + clock)
@@ -732,7 +749,7 @@ def main():
             tracked_pcs.extend(pc_args)
         report = analyze(sys.stdin, args.uce_prefix, args.axi_prefix, args.line_bytes,
                          args.fill_bytes, args.prefetch_slots, args.allow_no_prefetch,
-                         tracked_pcs)
+                         tracked_pcs, args.end_pc, args.expected_windows)
         if args.address is not None and not args.matched_only:
             report['region'] = region_summary(report, args.address, args.span_bytes,
                                               args.axi_address_xor, args.axi_address_offset)
