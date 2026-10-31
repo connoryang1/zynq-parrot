@@ -1,0 +1,46 @@
+This directory records the independently scheduled instruction-plus-data preview
+candidate and its best-case Linux validation. Results are added only after their
+exact revision and acceptance boundary are known; no Linux speedup is claimed yet.
+
+# Joint preview best-case validation
+
+## Source checkpoint
+
+- Routed RTL source: top `009b4de22131bafa0f5f07df830cc487425e8278`,
+  BlackParrot `1b4126d60208a990f49b06997e61424476238079`.
+- Route job: `20261031T135833Z-009b4de2`, configuration
+  `e_bp_unicore_zynqparrot_prefetch5_cfg`.
+- The later Linux collateral commits do not alter the immutable routed RTL.
+
+## Accepted pre-route gates
+
+- The focused UCE run at `/dev/shm/zp-joint-bestcase-uce-physical` passes a
+  four-entry physical queue beside ten occupied ordinary hint slots, architectural
+  demand priority, same-line discard, cancellation/drain, and L2-only replies.
+- A clean `TRACE=1` two-thread/four-context full-core instruction replay run
+  reaches its exact guest marker, `CORE PASS`, host `BSG PASS`, and `VALID RUN`
+  at 20,608 retired instructions. The known post-PASS DPI finalization assertion
+  does not invalidate the harness result.
+- The Linux patch stack through `0007-blackparrot-select-preview-timing.patch`
+  applies cleanly from the instruction-only kernel, applies idempotently, and
+  compiles `arch/riscv/kernel/process.o`, `kernel/sys.o`, and
+  `kernel/sched/core.o` with the pinned RV64 toolchain.
+- The first object-build attempt stopped before these objects because host GCC
+  used the full root `/tmp`. Repeating the exact build with a `/dev/shm` `TMPDIR`
+  compiled all three objects. Future isolated kernel builds must set `TMPDIR`
+  explicitly; the failed attempt is infrastructure evidence, not a source result.
+
+## Best-case measurement shape
+
+Both timing arms retain the same four page pins and 40 KiB eviction walk. The
+measured target is exactly four dependent loads. Mode one emits physical hints
+at exact scheduler selection; mode two emits immediately before `__switch_to`
+to test whether later issue prevents tiny-L2 displacement. Groups zero through
+seven cover both banks of all 16 L2 sets, and the complete analyzer requires all
+16 timing/group cells plus final board PASS markers.
+
+The completed-state oracle on the historical data-capable image bounds the
+opportunity: 32 dependent data lines save 1,265.25 local cycles but only 2.66%
+of wake-to-load, while combined instruction/data warming saves 2,044 local
+cycles, about 4% of the full interval. The four-line hardware result is therefore
+a timing/retention gate, not the final footprint-size recommendation.
