@@ -44,3 +44,23 @@ opportunity: 32 dependent data lines save 1,265.25 local cycles but only 2.66%
 of wake-to-load, while combined instruction/data warming saves 2,044 local
 cycles, about 4% of the full interval. The four-line hardware result is therefore
 a timing/retention gate, not the final footprint-size recommendation.
+
+## Data-only image preparation
+
+- The instruction-only Linux tree was copied into `/dev/shm`, the complete data
+  patch stack was applied there, and a full `Image` rebuild passed after the
+  three directly changed objects had compiled. The resulting kernel SHA-256 is
+  `2a9a2e15db3a80736e1ef1fb724c9d14d7edfaf6cd75d1df23d713f67b3ff18c`.
+- The isolated OpenSBI build uses one hart and `BP_ICACHE_PREFIX_ENABLE=0`, so
+  the first board sweep attributes any change to data preview rather than the
+  shared instruction prefix. The payload contains exactly one copy of both the
+  rebuilt kernel and the 64 MiB shell DTB. Executable-section CSR scans pass for
+  Linux and OpenSBI.
+- The generated Verilog memory had 14 sparse address directives. Every directive
+  was checked inside `0x80000000`--`0x83ffffff` before rebasing, and the final
+  8 MHz NBF SHA-256 is
+  `77e13709ecc5a2880b4ad4d1be3d6b399a58032d29a7b31494a3198de5532aa3`.
+- A whole-NBF CSR scan reported apparent uses of `0x802`--`0x807` in embedded
+  data and initramfs words. This probe is rejected because it does not distinguish
+  executable sections; the section-aware ELF scans above are the acceptance
+  guard and prevent these data-word false positives from being treated as code.
