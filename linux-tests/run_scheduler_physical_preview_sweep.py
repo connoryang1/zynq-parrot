@@ -27,6 +27,13 @@ def cell_plan():
     return cells
 
 
+def cell_exit_pattern(group, timing):
+    """Match board markers despite the UART bridge's repeated CR bytes."""
+    return re.compile(
+        rf"PHYSICAL_CELL_EXIT group={group} timing={timing} rc=([0-9]+)\r*\n"
+    )
+
+
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -94,10 +101,7 @@ def run(args):
                     f"rc=$?; echo PHYSICAL_CELL_EXIT group={group} "
                     f"timing={timing} rc=$rc"
                 )
-                child.expect(
-                    rf"PHYSICAL_CELL_EXIT group={group} timing={timing} rc=([0-9]+)\r?\n",
-                    timeout=900,
-                )
+                child.expect(cell_exit_pattern(group, timing), timeout=900)
                 rc = int(child.match.group(1))
                 if rc:
                     raise RuntimeError(

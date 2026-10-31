@@ -127,8 +127,13 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		/* One measured handoff must produce exactly one preview hook. A
 		 * timer preemption and second selection would issue another hint
 		 * batch and no longer be a matched one-switch comparison. */
-		if (samples[trial].hooks != enabled)
-			fail("unexpected scheduler hook count");
+		if (samples[trial].hooks != enabled) {
+			fprintf(stderr,
+				"unexpected scheduler hook count: trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u\n",
+				trial, enabled, enable_mode, before_hook, after_hook,
+				samples[trial].hooks);
+			exit(1);
+		}
 		transfer(out, &token, 1); /* done */
 	}
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
