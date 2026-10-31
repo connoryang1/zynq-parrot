@@ -156,6 +156,33 @@ configured lines among its first 256 I-side demands in either sample. This
 confirms line coverage but does not make the diagnostic elapsed values a
 performance comparison.
 
+## Retrained-table negative result
+
+The old table leaves five slots unused in the complete disabled fast-path
+trace, so a bounded follow-up replaced only those entries with the next five
+first-use instruction lines. Capacity, trigger, RTL, routed hardware, benchmark
+shape, and kernel payload remained unchanged. Two fresh-boot 201-sample runs
+of that retrained table produced medians of 19,024 and 21,224 cycles. Its pooled
+median is 19,186 cycles, compared with 18,975.5 for old-16 and 19,613 for
+disabled.
+
+The mean of the two retrained-minus-old fresh-boot median differences is
++1,137.5 cycles. A deterministic 100,000-resample replicate-stratified
+bootstrap gives `[-69.25, +2,367.25]` cycles and favors the retrained candidate
+in only 5.73% of resamples. Retrained versus disabled is inconclusive at
++451.25 cycles with interval `[-897.25, +1,744]`. The candidate is therefore
+rejected: covering additional observed misses did not identify additional
+latency-critical lines. The accepted old-16 table and its 3.25% best-case
+result remain unchanged. Exact definitions, logs, hashes, and analysis are in
+`persistent-retrained-prefix.json`, the two
+`fpga/retrained16-persistent201*.log` files,
+`analyze_retrained_prefix.py`, and `retrained-prefix-results.json`.
+
+The first attempt to start the second candidate run lost SSH readiness before
+any target session began. The board was power-cycled, allowed to complete the
+PYNQ readiness gate, and reloaded with the exact accepted overlay before the
+successful run. No timing sample from the failed setup exists or is used.
+
 ## Harness failures excluded from RTL evidence
 
 Three setup attempts preceded the accepted physical discriminator. One ran
@@ -178,9 +205,10 @@ completed both full-trace arms with clean terminal markers.
 The mechanism now passes focused simulation, clean full-core simulation,
 routed timing/fit, a physical repeated-trigger discriminator, sustained
 replay-enabled Linux, and a replicated persistent-pair best-case speedup. The
-general process-per-sample result remains unresolved. Five of the old table's
-16 entries are unused in the complete persistent fast-path trace, so the next
-bounded optimization is to retrain the same 16-entry capacity from this exact
-workload and compare it against the accepted old-16 and disabled controls. Do
-not infer application throughput or increase hardware capacity from this
-best-case result alone.
+general process-per-sample result remains unresolved. Same-capacity membership
+retraining is now exhausted: filling the old table's five unused slots made the
+paired point estimate worse and did not beat disabled conclusively. The next
+useful step must change target class or attribution—most directly joint data
+and instruction preview or consumed/late/unused telemetry—rather than further
+fixed-table membership tuning. Do not infer application throughput or increase
+hardware capacity from this best-case result alone.
