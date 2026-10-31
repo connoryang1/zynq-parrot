@@ -227,3 +227,12 @@ because the low BlackParrot unfreeze address aliases guest DRAM through the
 model's 32-bit HP0 transform. Physical loading is unchanged. The ordinary RPC
 test's exact `Test SEL4IPCRPC0002 passed` line remains the Stage 3 acceptance
 gate; OpenSBI or ELF-loader output alone is not counted as a pass.
+
+The bounded runner stops the slow model immediately after that exact gate:
+
+```sh
+scripts/sel4/run_blackparrot_rpc_sim.sh sel4-rpc.nbf run.log
+```
+
+`BLACKPARROT_SIM`, `ZP_INSTALL_DIR`, and `BSG_TRACE_TIMEOUT_S` override its
+model, runtime-library root, and default 90-minute guard respectively.

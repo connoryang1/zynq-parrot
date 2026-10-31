@@ -17,12 +17,14 @@ project_root=$(realpath "$script_dir/../..")
 opensbi_revision=7830e987856eb1319c82664702892b6d50a93e7a
 sel4_cross_prefix=${SEL4_CROSS_PREFIX:-$project_root/install/bin/riscv64-unknown-elf-}
 opensbi_cross_prefix=${OPENSBI_CROSS_PREFIX:-riscv64-unknown-linux-gnu-}
+opensbi_fw_options=${OPENSBI_FW_OPTIONS:-0x1}
 nbf_tool=${NBF_TOOL:-$project_root/import/black-parrot/bp_common/software/py/nbf.py}
 overlay="$project_root/linux-tests/opensbi-platform/blackparrot"
 elfloader="$sel4_build/elfloader/elfloader"
 dtb="$sel4_build/kernel/kernel.dtb"
 
 test -x "${sel4_cross_prefix}objcopy" || { echo "missing ${sel4_cross_prefix}objcopy" >&2; exit 1; }
+test -x "${sel4_cross_prefix}readelf" || { echo "missing ${sel4_cross_prefix}readelf" >&2; exit 1; }
 test -x "${opensbi_cross_prefix}gcc" || { echo "missing ${opensbi_cross_prefix}gcc" >&2; exit 1; }
 test -f "$nbf_tool" || { echo "missing NBF tool: $nbf_tool" >&2; exit 1; }
 test -f "$elfloader" || { echo "missing seL4 elfloader: $elfloader" >&2; exit 1; }
@@ -36,6 +38,18 @@ opensbi_build="$work_dir/opensbi-build"
 payload="$work_dir/elfloader.bin"
 mem="$work_dir/sel4-rpc.mem"
 raw_nbf="$work_dir/sel4-rpc.raw.nbf"
+firmware_base=0x80000000
+payload_entry=$("${sel4_cross_prefix}readelf" -h "$elfloader" | awk '/Entry point address:/ { print $4 }')
+case "$payload_entry" in
+    0x*) ;;
+    *) echo "could not read elfloader entry address" >&2; exit 1 ;;
+esac
+payload_offset=$((payload_entry - firmware_base))
+if [ "$payload_offset" -lt 0 ] || [ $((payload_offset % 4096)) -ne 0 ]; then
+    echo "elfloader entry is not a page-aligned OpenSBI payload address: $payload_entry" >&2
+    exit 1
+fi
+payload_offset_hex=$(printf '0x%x' "$payload_offset")
 
 if [ ! -d "$opensbi_source/.git" ] && [ ! -f "$opensbi_source/.git" ]; then
     git -C "$opensbi_repo" worktree add --detach "$opensbi_source" "$opensbi_revision"
@@ -63,6 +77,8 @@ make -C "$opensbi_source" -j4 \
     PLATFORM_RISCV_ABI=lp64d \
     PLATFORM_FDT_PATH="$dtb" \
     PAYLOAD_PATH="$payload" \
+    FW_PAYLOAD_OFFSET="$payload_offset_hex" \
+    FW_OPTIONS="$opensbi_fw_options" \
     PLATFORM_ADDITIONAL_CFLAGS=-DPLATFORM_HART_COUNT=1 \
     BP_ICACHE_PREFIX_ENABLE=0 \
     FW_PAYLOAD=y
@@ -82,4 +98,5 @@ mkdir -p "$(dirname -- "$output")"
 cp "$raw_nbf" "$output"
 
 echo "NBF=$output"
+echo "PAYLOAD_ENTRY=$payload_entry FW_PAYLOAD_OFFSET=$payload_offset_hex FW_OPTIONS=$opensbi_fw_options"
 sha256sum "$elfloader" "$firmware" "$output"

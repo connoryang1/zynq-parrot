@@ -11,12 +11,23 @@ fi
 checkout=$(realpath "$1")
 build_dir=$2
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+project_root=$(realpath "$script_dir/../..")
+validation_patch="$project_root/sel4/patches/sel4test-blackparrot-rpc-validation.patch"
 
 command -v cmake >/dev/null || { echo "cmake is not on PATH" >&2; exit 1; }
 command -v ninja >/dev/null || { echo "ninja is not on PATH" >&2; exit 1; }
 
 "$script_dir/materialize_sel4test_ipc_baseline.sh" "$checkout"
 "$script_dir/materialize_blackparrot_platform.sh" "$checkout"
+
+if git -C "$checkout/projects/sel4test" apply --reverse --check "$validation_patch" 2>/dev/null; then
+    : # already applied
+elif git -C "$checkout/projects/sel4test" apply --check "$validation_patch"; then
+    git -C "$checkout/projects/sel4test" apply "$validation_patch"
+else
+    echo "cannot apply BlackParrot RPC validation patch" >&2
+    exit 1
+fi
 
 mkdir -p "$build_dir"
 build_dir=$(realpath "$build_dir")
@@ -28,6 +39,9 @@ build_dir=$(realpath "$build_dir")
         -DSIMULATION=ON \
         -DRELEASE=ON \
         -DKernelFastpath=ON \
+        -DSel4testRpcOnly=ON \
+        -DSel4testRpcPrinting=ON \
+        -DLibSel4MuslcSysMorecoreBytes=65536 \
         -DLibSel4TestPrinterRegex='^SEL4IPCRPC0002$'
 )
 

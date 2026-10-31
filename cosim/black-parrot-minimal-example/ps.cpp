@@ -7,6 +7,9 @@
 #include <bitset>
 #include <locale.h>
 #include <queue>
+#ifdef SIMULATION
+#include <vector>
+#endif
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -290,6 +293,21 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
 
     nbf_load(zpl, argv[1], phys_ptr, allocated_dram);
 
+    const char *inspect_addr_text = getenv("BSG_INSPECT_DRAM_ADDR");
+    uint64_t inspect_addr = 0;
+    if (inspect_addr_text) {
+        char *inspect_end = nullptr;
+        inspect_addr = strtoull(inspect_addr_text, &inspect_end, 0);
+        if (!*inspect_addr_text || !inspect_end || *inspect_end) {
+            bsg_pr_err("ps.cpp: invalid BSG_INSPECT_DRAM_ADDR\n");
+            return 1;
+        }
+        bsg_pr_info("ps.cpp: DRAM[0x%llx] after load = 0x%016llx\n",
+                    (unsigned long long)inspect_addr,
+                    (unsigned long long)zpl->read_dram_word(inspect_addr, 8,
+                                                           phys_ptr));
+    }
+
     const char *patch_addr_text = getenv("BSG_RUNTIME_PATCH_ADDR");
     const char *patch_value_text = getenv("BSG_RUNTIME_PATCH_VALUE");
     if (patch_addr_text && patch_value_text) {
@@ -313,7 +331,9 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
                      (nbf_end_wall.tv_nsec - nbf_start_wall.tv_nsec) / 1e9;
     bsg_pr_info("ps.cpp: NBF load took %f seconds\n", nbf_time);
 
-    send_bp_write(zpl, 0x200008, 0, 0xff); // unfreeze 
+#ifndef SIMULATION
+    send_bp_write(zpl, 0x200008, 0, 0xff); // unfreeze
+#endif
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
     unsigned long long minstret_start = get_counter_64(zpl, GP0_RD_MINSTRET);
@@ -360,8 +380,14 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         host->process_spack(&spack);
     } while (!host->is_finished());
 
-    if (g_trace_timed_out)
+    if (g_trace_timed_out) {
         zpl->print_processor_state();
+        if (inspect_addr_text)
+            bsg_pr_info("ps.cpp: DRAM[0x%llx] at timeout = 0x%016llx\n",
+                        (unsigned long long)inspect_addr,
+                        (unsigned long long)zpl->read_dram_word(inspect_addr, 8,
+                                                               phys_ptr));
+    }
 
     unsigned long long minstret_stop = get_counter_64(zpl, GP0_RD_MINSTRET);
     // test delay for reading counter
@@ -431,7 +457,15 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename,
     int line_count = 0;
     int last_percent = -1;
     int credit_count = 0;
+#ifdef SIMULATION
     size_t direct_dram_writes = 0;
+    struct direct_dram_write {
+        uint64_t addr;
+        uint64_t data;
+        unsigned bytes;
+    };
+    std::vector<direct_dram_write> direct_dram_image;
+#endif
 
     while (getline(nbf_file, nbf_command)) {
         line_count++;
@@ -463,6 +497,8 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename,
                 && bytes <= dram_size - (addr - DRAM_BASE_ADDR)) {
                 zpl->initialize_dram_word(addr, static_cast<uint64_t>(nbf[2]),
                                           bytes, physical_base);
+                direct_dram_image.push_back(
+                    {addr, static_cast<uint64_t>(nbf[2]), bytes});
                 direct_dram_writes++;
                 continue;
             }
@@ -484,6 +520,12 @@ void nbf_load(bsg_zynq_pl *zpl, char *nbf_filename,
         }
     }
 #ifdef SIMULATION
+    // Low BlackParrot configuration addresses alias simulated AXI RAM after
+    // the 32-bit HP0 address transform.  The shell still holds the processor
+    // frozen here, so restore the staged image after all NBF config commands.
+    for (const auto &write : direct_dram_image)
+        zpl->initialize_dram_word(write.addr, write.data, write.bytes,
+                                  physical_base);
     bsg_pr_info("ps.cpp: initialized %zu AXI RAM writes directly\n",
                 direct_dram_writes);
 #endif

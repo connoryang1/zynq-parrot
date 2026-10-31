@@ -1,0 +1,62 @@
+diff --git a/apps/sel4test-tests/CMakeLists.txt b/apps/sel4test-tests/CMakeLists.txt
+index cb3b677..7cddc37 100644
+--- a/apps/sel4test-tests/CMakeLists.txt
++++ b/apps/sel4test-tests/CMakeLists.txt
+@@ -14,18 +14,31 @@ if(KernelArchRiscV)
+     set(arch arm)
+ endif()
+ 
+-file(
+-    GLOB
++if(Sel4testRpcOnly)
++    set(
+         deps
+-        src/*.c
+-        src/tests/*.c
+-        src/tests/*.S
+-        src/arch/${arch}/*.c
+-        src/arch/${KernelArch}/tests/*.c
+-        src/*.cxx
+-        src/tests/*.cxx
+-        src/arch/${KernelArch}/tests/*.S
+-)
++        src/main.c
++        src/helpers.c
++        src/tests/sel4_rpc_adapter_test.c
++        src/tests/protected_rpc.c
++        src/tests/protected_rpc_sel4.c
++        src/tests/protected_rpc_hardware_stub.c
++        src/arch/${arch}/arch.c
++    )
++else()
++    file(
++        GLOB
++            deps
++            src/*.c
++            src/tests/*.c
++            src/tests/*.S
++            src/arch/${arch}/*.c
++            src/arch/${KernelArch}/tests/*.c
++            src/*.cxx
++            src/tests/*.cxx
++            src/arch/${KernelArch}/tests/*.S
++    )
++endif()
+ 
+ add_executable(sel4test-tests EXCLUDE_FROM_ALL ${deps})
+ # special handling for "arm_hyp", it's really "aarch32"
+diff --git a/settings.cmake b/settings.cmake
+index 522a147..8145e0b 100644
+--- a/settings.cmake
++++ b/settings.cmake
+@@ -87,6 +87,10 @@ if(NOT Sel4testAllowSettingsOverride)
+ 
+   ApplyCommonReleaseVerificationSettings(${RELEASE} ${VERIFICATION})
+ 
++  if(Sel4testRpcPrinting)
++    set(KernelPrinting ON CACHE BOOL "" FORCE)
++  endif()
++
+   if(BAMBOO)
+     set(LibSel4TestPrintXML ON CACHE BOOL "" FORCE)
+   else()
