@@ -35,6 +35,7 @@ REQUEST_LOAD_AHEAD_DYNAMIC_APP := $(OUT)/request_benchmark_load_ahead_dynamic
 REQUEST_HOST_APP := $(OUT)/request_benchmark_host
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
+PHYSICAL_PREVIEW_BENCH_APP := $(OUT)/scheduler_physical_preview_benchmark
 BP_HOST_CC ?= cc
 APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
 TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
@@ -46,6 +47,12 @@ ICACHE_PREFIX_LIMIT ?=
 ICACHE_PREFIX_HEADER := $(OPENSBI_PLATFORM_OVERLAY)/icache_prefix.h
 ICACHE_PREFIX_GENERATOR := $(CURDIR)/emit_icache_prefix_header.py
 LINUX_PREFIX_PATCH := $(CURDIR)/kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch
+LINUX_DATA_PATCHES := \
+	$(CURDIR)/kernel-patches/0002-blackparrot-same-mm-preview.patch \
+	$(CURDIR)/kernel-patches/0004-blackparrot-four-address-preview.patch \
+	$(CURDIR)/kernel-patches/0003-blackparrot-preview-hook-count.patch \
+	$(CURDIR)/kernel-patches/0005-blackparrot-preview-guard-reasons.patch \
+	$(CURDIR)/kernel-patches/0006-blackparrot-physical-data-preview.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -65,7 +72,7 @@ REQUEST_NUM_CONTEXTS ?= 10
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
 
-.PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
+.PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-linux-data-preview stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
 
 app: $(APP)
 
@@ -113,7 +120,7 @@ emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
 
 # These pthread comparisons are independent of the custom-CSR shell demo.
-.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer
+.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer physical-preview-benchmark emit-physical-preview-benchmark-transfer
 request-benchmark: $(REQUEST_APP)
 request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
 request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
@@ -121,6 +128,7 @@ request-benchmark-load-ahead-dynamic: $(REQUEST_LOAD_AHEAD_DYNAMIC_APP)
 request-benchmark-host: $(REQUEST_HOST_APP)
 cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
 cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
+physical-preview-benchmark: $(PHYSICAL_PREVIEW_BENCH_APP)
 
 # Separate output names retain the historical faulting-load control. The default
 # emits the implemented Zicbop hint in both C batching and resident assembly.
@@ -148,6 +156,10 @@ $(TRACE_CAPTURE_APP): cache_miss_trace_capture.c Makefile FORCE
 $(TRACE_CAPTURE_DYNAMIC_APP): cache_miss_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
+
+$(PHYSICAL_PREVIEW_BENCH_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -o $@ $< >&2
 
 emit-request-transfer: check-linux-cc request-benchmark
 	@printf '%s\n' ': > /tmp/request_benchmark.b64'
@@ -178,6 +190,11 @@ emit-cache-miss-trace-dynamic-transfer: check-linux-cc cache-miss-trace-capture-
 	@printf '%s\n' ': > /tmp/cache_miss_trace_capture_dynamic.b64'
 	@base64 -w 76 $(TRACE_CAPTURE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_capture_dynamic' 'chmod +x /tmp/cache_miss_trace_capture_dynamic'
+
+emit-physical-preview-benchmark-transfer: check-linux-cc physical-preview-benchmark
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark.b64'
+	@base64 -w 76 $(PHYSICAL_PREVIEW_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark.b64 > /tmp/scheduler_physical_preview_benchmark' 'chmod +x /tmp/scheduler_physical_preview_benchmark'
 
 check-request-benchmark:
 	@BP_HOST_CC='$(BP_HOST_CC)' python3 -m unittest discover -s $(CURDIR) -p test_request_benchmark.py
@@ -260,6 +277,19 @@ stage-linux-prefix-trigger:
 	else \
 	  patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward < $(LINUX_PREFIX_PATCH); \
 	  patch -d $(LINUX_BUILD_DIR) -p1 --forward < $(LINUX_PREFIX_PATCH); \
+	fi
+
+# Apply the measured data-preview stack after the independent instruction
+# trigger. Reverse dry-runs keep repeated image builds idempotent while a failed
+# forward dry-run stops before partially changing the materialized kernel tree.
+stage-linux-data-preview: stage-linux-prefix-trigger
+	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+		echo "physical data-preview stack already applied"; \
+	else \
+		set -e; for patch_file in $(LINUX_DATA_PATCHES); do \
+			patch -d $(LINUX_BUILD_DIR) -p1 --dry-run < $$patch_file >/dev/null; \
+			patch -d $(LINUX_BUILD_DIR) -p1 < $$patch_file; \
+		done; \
 	fi
 
 # Build only the application and install it into an already-created SDK
