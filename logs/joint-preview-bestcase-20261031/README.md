@@ -1,16 +1,24 @@
 This directory records the independently scheduled instruction-plus-data preview
 candidate and its best-case Linux validation. Results are added only after their
-exact revision and acceptance boundary are known; no Linux speedup is claimed yet.
+exact revision and acceptance boundary are known. The accepted data-only result
+shows a small local load-body gain but no resolved wake-to-load speedup.
 
 # Joint preview best-case validation
 
 ## Source checkpoint
 
-- Routed RTL source: top `009b4de22131bafa0f5f07df830cc487425e8278`,
+- Initial confounded routed RTL source: top `009b4de22131bafa0f5f07df830cc487425e8278`,
   BlackParrot `1b4126d60208a990f49b06997e61424476238079`.
 - Route job: `20261031T135833Z-009b4de2`, configuration
   `e_bp_unicore_zynqparrot_prefetch5_cfg`.
 - The later Linux collateral commits do not alter the immutable routed RTL.
+
+The controlled accepted implementation is exact job
+`20261031T160854Z-f79221bc`, top
+`f79221bcf4d7a5bdd42ec0b315a3edc957d8f3bf`, BlackParrot
+`1b4126d60208a990f49b06997e61424476238079`, and configuration
+`e_bp_unicore_zynqparrot_prefetch_cfg`. It uses the same four logical contexts
+and four D-UCE request slots as the instruction checkpoint.
 
 ## First route result and corrected fit gate
 
@@ -30,6 +38,15 @@ logical contexts. The controlled reroute therefore keeps exact top
 `e_bp_unicore_zynqparrot_prefetch_cfg`, which retains four request slots and
 four logical contexts. No RTL reduction or performance compromise is implied
 by that correction.
+
+The controlled image places at 50,308/53,200 LUTs (94.56%), 24,959
+registers, 94 BRAM tiles, and 11 DSPs. Automatic post-route physical
+optimization improves setup from `-0.257 ns` to final WNS/TNS `+0.241/0 ns`;
+WHS/THS is `+0.037/0 ns`, routing is complete, and bitstream generation passes.
+The verified package/bitstream SHA-256 values are `9912f313...b629` and
+`e97e0517...2381`. The launcher's original FAIL was a report-selection bug: it
+read the stale pre-physopt timing report. The fixed, revision-checked recheck
+path and exact route metadata are retained under `route/`.
 
 ## Accepted pre-route gates
 
@@ -59,13 +76,15 @@ seven cover both banks of all 16 L2 sets, and the complete analyzer requires all
 16 timing/group cells plus final board PASS markers.
 
 Each enabled trial must observe exactly one scheduler hook, and each disabled
-trial must observe zero. This rejects a timer-preempted child that is selected a
-second time and could otherwise receive a second four-hint batch. The three
-initial analyzer regressions pass. The rebuilt dynamic ELF SHA-256 is
-`b29a8617920f2c62263c61d0827d9ab399424a01bea7cc72258f1270a9b95c8c`; its
-bounded-chunk transfer SHA-256 is
-`dc159f56f7d24a72a52a73b9c30027f6d974699f1374b58a2beacfab117e83f7`, and
-host reconstruction matches the ELF byte-for-byte.
+trial must observe zero. The initial exact ELF exposed that arming before the
+40 KiB eviction walk lets a timer preemption issue an unintended hint batch.
+Arming after eviction still cannot prevent a later timer preemption inside the
+irreducible handoff, so this best-case benchmark reports and retries
+contaminated attempts. Only clean attempts enter the 512 rows. The accepted
+clean-handoff ELF SHA-256 is
+`5033ffdbb1bb5b96bebd8d2003d5b6bf2eb7f20ea2e8edaccf60a6da21cedeb8`; its
+transfer SHA-256 is
+`a7e858107c132508da071d2c56c44b55cae4d1b5557b600f3aa1d60920a5dc1c`.
 
 A cell is accepted only with all 512 ordered timing rows. The fourth analyzer
 regression rejects a truncated 128-row transcript even when its synthetic PASS
@@ -75,7 +94,9 @@ markers remain present.
 serialized interactive runner, verifies the guest ELF hash, executes every one
 of the 16 cells exactly once, alternates early/late order by group, and powers
 off for final core/host markers. Its two plan tests plus the five analyzer tests
-pass, and a dry run prints the expected 16 unique cells.
+originally passed; the final suite has six runner/plan and five analyzer tests,
+including dual prompts, repeated UART carriage returns, and disjoint suffix
+recovery.
 
 The completed-state oracle on the historical data-capable image bounds the
 opportunity: 32 dependent data lines save 1,265.25 local cycles but only 2.66%
@@ -102,3 +123,43 @@ a timing/retention gate, not the final footprint-size recommendation.
   data and initramfs words. This probe is rejected because it does not distinguish
   executable sections; the section-aware ELF scans above are the acceptance
   guard and prevent these data-word false positives from being treated as code.
+
+## Accepted physical data-only result
+
+The full matrix was completed across two recovered boots because the first
+long run lost timer/preemption progress after ten accepted cells. Its next cell
+required zero retries versus 45--67 in every preceding cell, printed `rc=0`,
+and then never returned a shell prompt; that abnormal cell and everything after
+it were rejected. The immutable raw log is retained. A derived prefix contains
+exactly the first ten normal-liveness cells (5,120 rows, SHA-256
+`ad9bd0b4...897f0`), and a fresh suffix reran cells 10--15 with 48--60 retries
+each before clean final `CORE PASS` and `BSG PASS` (SHA-256
+`cc453e48...7fa1e`). Across the 16 accepted cells, 857 preempted attempts were
+reported and excluded, 45--67 per cell.
+
+The strict set-stratified result is:
+
+- Early issue saves 8.5 cycles in the four-dependent-load body, with 95%
+  bootstrap interval `[5.5, 10.5]` cycles.
+- Late issue saves 11 cycles in that body, interval `[11, 12]` cycles. Across
+  cell medians this is roughly 6.1% of the 185-cycle disabled load body.
+- Wake-to-load does not improve: early saved cycles are `-842` with interval
+  `[-1517.25, 56]`; late is `-62.25` with `[-770.5, 942]`. Negative means the
+  enabled arm was slower. The median disabled wake-to-load cell is about
+  32,103 cycles for late issue, so the resolved 11-cycle local benefit is only
+  about 0.034% of that interval before scheduler noise.
+- Late versus early load-body effects vary by L2 set group; no timing mode wins
+  every group. Late is the better pooled candidate, but the result does not
+  justify choosing a single exploratory group.
+
+This image deliberately sets `BP_ICACHE_PREFIX_ENABLE=0`; it tests the data
+lane on joint-capable hardware, not combined instruction-plus-data replay. The
+result proves useful data arrives by first use and that later issue retains
+slightly more benefit, but four 16-byte hints are too small a target to move the
+full Linux handoff measurably. The strict analyzer output and compressed raw
+transcripts are under `physical-sweep/`.
+
+One recovered boot also failed before userspace with an OpenSBI nested illegal
+CSR `0x34b` report, while the preceding three and following recovered boots
+reached a shell. That nondeterministic fault and the later timer-loss run are
+retained as stability limitations; neither contributes timing samples.
