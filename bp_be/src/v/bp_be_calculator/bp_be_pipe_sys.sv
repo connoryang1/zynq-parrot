@@ -121,6 +121,18 @@ module bp_be_pipe_sys
    , output logic [8:0]                      icache_prefix_count_o
    , output logic                            icache_prefix_trigger_v_o
    , output logic                            icache_prefix_clear_v_o
+
+   , input                                   rpc_active_i
+   , output logic                            rpc_descriptor_valid_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_token_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_caller_satp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_satp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_entry_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_sp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_gp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_tp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_caller_badge_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_config_o
    );
 
   `declare_bp_be_if(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p, fetch_ptr_p, issue_ptr_p);
@@ -232,6 +244,17 @@ module bp_be_pipe_sys
      ,.icache_prefix_count_o(icache_prefix_count_o)
      ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_o)
      ,.icache_prefix_clear_v_o(icache_prefix_clear_v_o)
+     ,.rpc_active_i(rpc_active_i)
+     ,.rpc_descriptor_valid_o(rpc_descriptor_valid_o)
+     ,.rpc_descriptor_token_o(rpc_descriptor_token_o)
+     ,.rpc_descriptor_caller_satp_o(rpc_descriptor_caller_satp_o)
+     ,.rpc_descriptor_server_satp_o(rpc_descriptor_server_satp_o)
+     ,.rpc_descriptor_server_entry_o(rpc_descriptor_server_entry_o)
+     ,.rpc_descriptor_server_sp_o(rpc_descriptor_server_sp_o)
+     ,.rpc_descriptor_server_gp_o(rpc_descriptor_server_gp_o)
+     ,.rpc_descriptor_server_tp_o(rpc_descriptor_server_tp_o)
+     ,.rpc_descriptor_caller_badge_o(rpc_descriptor_caller_badge_o)
+     ,.rpc_descriptor_config_o(rpc_descriptor_config_o)
      );
 
   logic [vaddr_width_p-1:0] retire_npc_r;

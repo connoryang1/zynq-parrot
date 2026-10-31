@@ -317,7 +317,8 @@ module bp_be_detector
                            & (issue_pkt_cast_i.instr.t.itype.imm12 inside {12'h800, 12'h808, 12'h809})
                            & (mem_busy_i | ~mem_ordered_i);
 
-      // pcall implicitly reads a0-a3 and preturn implicitly reads a0. The
+      // pcall implicitly reads a0-a5: a0-a3 payload, a4 opaque token, and a5
+      // request metadata. Preturn reads a0-a3 plus a5 reply metadata. The
       // line-bank tap is outside the calculator bypass network, so wait until
       // every implicit source has reached architectural writeback.
       rpc_args_haz_v = 1'b0;
@@ -325,9 +326,11 @@ module bp_be_detector
         rpc_args_haz_v |= dep_irf_w_r[i]
                           & (check_thread_id_li == dep_thread_id_r[i])
                           & (((issue_pkt_cast_i.instr.t.itype.imm12 == 12'h808)
-                              & (dep_status_r[i].rd_addr inside {5'd10, 5'd11, 5'd12, 5'd13}))
+                              & (dep_status_r[i].rd_addr inside
+                                 {5'd10, 5'd11, 5'd12, 5'd13, 5'd14, 5'd15}))
                              | ((issue_pkt_cast_i.instr.t.itype.imm12 == 12'h809)
-                                & (dep_status_r[i].rd_addr == 5'd10)));
+                                & (dep_status_r[i].rd_addr inside
+                                   {5'd10, 5'd11, 5'd12, 5'd13, 5'd15})));
       end
       rpc_args_haz_v &= issue_pkt_cast_i.csrw;
 

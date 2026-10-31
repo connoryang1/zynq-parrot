@@ -117,6 +117,12 @@ module bp_be_csr
    , output logic [8:0]                      icache_prefix_count_o
    , output logic                            icache_prefix_trigger_v_o
    , output logic                            icache_prefix_clear_v_o
+
+   // Core-wide M-mode protected-RPC descriptor control. The multi-threaded
+   // CSR wrapper owns the storage; every physical CSR bank observes the same
+   // data/status readback.
+   , input [dword_width_gp-1:0]              rpc_m_data_i
+   , input [dword_width_gp-1:0]              rpc_m_control_status_i
    );
 
   // Declare parameterizable structs
@@ -558,7 +564,9 @@ module bp_be_csr
         12'h807:  // Selected trace record
           csr_data_lo = legacy_context_access_li ? miss_trace_data_i : '0;
         12'h808:  // Protected call capability operand / status
-          csr_data_lo = '0;
+          // An accepted call overwrites a4 with COMPLETED on protected return.
+          // A call that does not commit retires normally with NOT_STARTED.
+          csr_data_lo = dword_width_gp'(1);
         12'h809:  // Protected return result operand / status
           csr_data_lo = '0;
         12'h7c0:  // M-mode physical I-cache replay enqueue/status
@@ -567,6 +575,10 @@ module bp_be_csr
           csr_data_lo = '0;
         12'h7c2:  // M-mode shared-prefix length/control
           csr_data_lo = is_m_mode ? icache_prefix_status_i : '0;
+        12'h7c3:  // M-mode protected-RPC staging data
+          csr_data_lo = is_m_mode ? rpc_m_data_i : '0;
+        12'h7c4:  // M-mode protected-RPC control status
+          csr_data_lo = is_m_mode ? rpc_m_control_status_i : '0;
         12'h5c0:  // S-mode shared-prefix trigger/status
           csr_data_lo = icache_prefix_status_i;
         {`CSR_ADDR_GLOBAL_CYCLE}:  // Read-only, core-wide physical cycle counter

@@ -66,11 +66,15 @@ module bp_be_scheduler
    , input                                    legacy_context_user_enable_i
    , input                                    rpc_call_ready_i
    , input                                    rpc_return_ready_i
+   , input [dpath_width_gp-1:0]               rpc_token_i
+   , input [context_id_width_p-1:0]           rpc_caller_context_i
+   , input [context_id_width_p-1:0]           rpc_server_context_i
+   , input [7:0]                              rpc_request_words_i
    , input                                    rpc_install_v_i
    , input [thread_id_width_p-1:0]            rpc_install_thread_id_i
    , input [15:0]                             rpc_install_w_mask_i
    , input [15:0][dpath_width_gp-1:0]         rpc_install_w_data_i
-   , output logic [3:0][dpath_width_gp-1:0]   rpc_args_o
+   , output logic [5:0][dpath_width_gp-1:0]   rpc_args_o
 
    // CSR 0x802 remote register write into another hardware thread context
    , input                                    rpush_w_v_i
@@ -301,7 +305,7 @@ module bp_be_scheduler
 `endif
   assign context_cache_scan_r_data_o = {irf_rs2, irf_rs1};
   logic [15:0][dpath_width_gp-1:0] rpc_line_r_data_lo;
-  logic [3:0][dpath_width_gp-1:0] rpc_args_r;
+  logic [5:0][dpath_width_gp-1:0] rpc_args_r;
   assign rpc_args_o = rpc_args_r;
 
   bp_be_regfile_mt
@@ -472,7 +476,9 @@ module bp_be_scheduler
     & (issue_pkt_cast_o.instr.t.itype.imm12 == 12'h809);
   wire issue_rpc_call_v = issue_rpc_call_candidate_v
                           & rpc_call_ready_i
-                          & (irf_rs1 == dpath_width_gp'(1));
+                          & (irf_rs1 == rpc_token_i)
+                          & (rpc_line_r_data_lo[15][dpath_width_gp-1:8] == '0)
+                          & (rpc_line_r_data_lo[15][7:0] <= rpc_request_words_i);
   wire issue_rpc_return_v = issue_rpc_return_candidate_v & rpc_return_ready_i;
   wire issue_ctxtsw_v = issue_regular_ctxtsw_v | issue_rpc_call_v | issue_rpc_return_v;
 
@@ -498,8 +504,8 @@ module bp_be_scheduler
       : irf_rs1[0 +: context_id_width_p];
 
   wire [context_id_width_p-1:0] issue_ctxtsw_target_tid =
-    issue_rpc_call_v ? context_id_width_p'(1)
-    : issue_rpc_return_v ? context_id_width_p'(0)
+    issue_rpc_call_v ? rpc_server_context_i
+    : issue_rpc_return_v ? rpc_caller_context_i
     : issue_ctxtsw_imm_v
       ? context_id_width_p'(issue_pkt_cast_o.instr.t.fmatype.rs1_addr)
       : issue_ctxtsw_register_target_tid;
@@ -534,7 +540,7 @@ module bp_be_scheduler
       ctxtsw_issue_hold_r <= 1'b1;
 
   // Keep implicit operands beside the scheduler instead of widening every
-  // dispatch and reservation stage by four data words. A pending switch token
+  // dispatch and reservation stage by six data words. A pending switch token
   // prevents another switch from replacing them before top-level capture.
   always_ff @(posedge clk_i)
     if (reset_i)
@@ -544,6 +550,8 @@ module bp_be_scheduler
       rpc_args_r[1] <= rpc_line_r_data_lo[11];
       rpc_args_r[2] <= rpc_line_r_data_lo[12];
       rpc_args_r[3] <= rpc_line_r_data_lo[13];
+      rpc_args_r[4] <= rpc_line_r_data_lo[14];
+      rpc_args_r[5] <= rpc_line_r_data_lo[15];
     end
 
   always_ff @(posedge clk_i)

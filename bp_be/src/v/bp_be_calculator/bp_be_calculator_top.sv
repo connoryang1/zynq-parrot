@@ -156,6 +156,18 @@ module bp_be_calculator_top
    , output logic                                    icache_prefix_trigger_v_o
    , output logic                                    icache_prefix_clear_v_o
 
+   , input                                           rpc_active_i
+   , output logic                                    rpc_descriptor_valid_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_token_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_caller_satp_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_server_satp_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_server_entry_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_server_sp_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_server_gp_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_server_tp_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_caller_badge_o
+   , output logic [dword_width_gp-1:0]               rpc_descriptor_config_o
+
    // Early classified ctxtsw event. Observable only until BE context state
    // consumes it as an architectural mini-commit.
    , output logic                                    fast_ctxtsw_v_o
@@ -404,6 +416,17 @@ module bp_be_calculator_top
      ,.icache_prefix_count_o(icache_prefix_count_o)
      ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_o)
      ,.icache_prefix_clear_v_o(icache_prefix_clear_v_o)
+     ,.rpc_active_i(rpc_active_i)
+     ,.rpc_descriptor_valid_o(rpc_descriptor_valid_o)
+     ,.rpc_descriptor_token_o(rpc_descriptor_token_o)
+     ,.rpc_descriptor_caller_satp_o(rpc_descriptor_caller_satp_o)
+     ,.rpc_descriptor_server_satp_o(rpc_descriptor_server_satp_o)
+     ,.rpc_descriptor_server_entry_o(rpc_descriptor_server_entry_o)
+     ,.rpc_descriptor_server_sp_o(rpc_descriptor_server_sp_o)
+     ,.rpc_descriptor_server_gp_o(rpc_descriptor_server_gp_o)
+     ,.rpc_descriptor_server_tp_o(rpc_descriptor_server_tp_o)
+     ,.rpc_descriptor_caller_badge_o(rpc_descriptor_caller_badge_o)
+     ,.rpc_descriptor_config_o(rpc_descriptor_config_o)
      );
 
   // Integer pipe: 1 cycle latency

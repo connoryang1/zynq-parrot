@@ -127,7 +127,24 @@ module bp_be_csr_wrapper_mt
    , output logic [8:0]                      icache_prefix_count_o
    , output logic                            icache_prefix_trigger_v_o
    , output logic                            icache_prefix_clear_v_o
+
+   // Core-wide protected-RPC descriptor. Only M-mode CSR 0x7c3/0x7c4
+   // accesses mutate this state; publication is atomic at COMMIT.
+   , input                                   rpc_active_i
+   , output logic                            rpc_descriptor_valid_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_token_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_caller_satp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_satp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_entry_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_sp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_gp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_server_tp_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_caller_badge_o
+   , output logic [dword_width_gp-1:0]       rpc_descriptor_config_o
    );
+
+  `declare_bp_be_if(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p, fetch_ptr_p, issue_ptr_p);
+  `bp_cast_i(bp_be_retire_pkt_s, retire_pkt);
 
   // Per-thread output arrays
   logic [num_threads_p-1:0][dword_width_gp-1:0]       csr_r_data_co;
@@ -179,6 +196,144 @@ module bp_be_csr_wrapper_mt
       global_cycle_r <= '0;
     else
       global_cycle_r <= global_cycle_r + 1'b1;
+
+  // Version-1 descriptor controller. CSR 0x7c3 holds the staging operand;
+  // writing CSR 0x7c4 executes one command. A complete nine-field staging
+  // image is copied to the live slot in a single edge, so a caller can never
+  // observe a partially installed descriptor.
+  localparam logic [7:0] rpc_control_stage_lp = 8'd0;
+  localparam logic [7:0] rpc_control_commit_lp = 8'd1;
+  localparam logic [7:0] rpc_control_revoke_lp = 8'd2;
+  localparam logic [7:0] rpc_control_read_status_lp = 8'd3;
+  localparam logic [dword_width_gp-1:0] rpc_status_ok_lp = 64'd0;
+  localparam logic [dword_width_gp-1:0] rpc_status_stale_lp = 64'd1;
+  localparam logic [dword_width_gp-1:0] rpc_status_busy_lp = 64'd2;
+  localparam logic [dword_width_gp-1:0] rpc_status_unsupported_lp = 64'd3;
+  localparam logic [dword_width_gp-1:0] rpc_status_invalid_lp = 64'd4;
+
+  logic [dword_width_gp-1:0] rpc_m_data_r, rpc_control_status_r;
+  logic [8:0][dword_width_gp-1:0] rpc_staged_field_r;
+  logic [8:0] rpc_staged_valid_r;
+  logic [8:0][dword_width_gp-1:0] rpc_live_field_r;
+  logic rpc_descriptor_valid_r;
+  bp_be_decode_info_s rpc_retire_decode_info;
+  assign rpc_retire_decode_info = decode_info_co[retire_thread_id_i];
+
+  wire rpc_machine_csr_write_v = retire_pkt_cast_i.instret
+                                 & retire_pkt_cast_i.special.csrw
+                                 & rpc_retire_decode_info.m_mode;
+  wire [11:0] rpc_csr_addr = retire_pkt_cast_i.instr.t.itype.imm12;
+  wire [dword_width_gp-1:0] rpc_csr_data =
+    retire_pkt_cast_i.data[0 +: dword_width_gp];
+  wire rpc_data_write_v = rpc_machine_csr_write_v & (rpc_csr_addr == 12'h7c3);
+  wire rpc_control_write_v = rpc_machine_csr_write_v & (rpc_csr_addr == 12'h7c4);
+  wire [7:0] rpc_control_command = rpc_csr_data[63:56];
+  wire [7:0] rpc_control_field = rpc_csr_data[55:48];
+  wire [31:0] rpc_control_slot = rpc_csr_data[31:0];
+  wire rpc_control_reserved_zero = (rpc_csr_data[47:32] == '0);
+  wire rpc_control_slot_supported = (rpc_control_slot == 32'd0);
+
+  wire [dword_width_gp-1:0] rpc_staged_config = rpc_staged_field_r[8];
+  wire rpc_staged_user_addresses_valid =
+    (rpc_staged_field_r[3] != '0)
+    & ~rpc_staged_field_r[3][0]
+    & (rpc_staged_field_r[3][63:38] == '0)
+    & (rpc_staged_field_r[4] != '0)
+    & (rpc_staged_field_r[4][3:0] == '0)
+    & (rpc_staged_field_r[4][63:38] == '0)
+    & (rpc_staged_field_r[5][63:38] == '0)
+    & (rpc_staged_field_r[6][63:38] == '0);
+  wire rpc_staged_config_valid =
+    (rpc_staged_config[63:48] == '0)
+    & (rpc_staged_config[7:0] <= 8'd4)
+    & (rpc_staged_config[15:8] <= 8'd4)
+    & (rpc_staged_config[31:16] == 16'd0)
+    & (rpc_staged_config[47:32] == 16'd1);
+  wire rpc_staged_descriptor_valid = &rpc_staged_valid_r
+    & (rpc_staged_field_r[0] != '0)
+    & (rpc_staged_field_r[1][63:60] == 4'd8)
+    & (rpc_staged_field_r[2][63:60] == 4'd8)
+    & (rpc_staged_field_r[1] != rpc_staged_field_r[2])
+    & rpc_staged_user_addresses_valid
+    & rpc_staged_config_valid;
+
+  always_ff @(posedge clk_i) begin
+    if (reset_i) begin
+      rpc_m_data_r <= '0;
+      rpc_control_status_r <= rpc_status_unsupported_lp;
+      rpc_staged_field_r <= '0;
+      rpc_staged_valid_r <= '0;
+      rpc_live_field_r <= '0;
+      rpc_descriptor_valid_r <= 1'b0;
+    end else begin
+      if (rpc_data_write_v)
+        rpc_m_data_r <= rpc_csr_data;
+
+      if (rpc_control_write_v) begin
+        if (!rpc_control_reserved_zero || !rpc_control_slot_supported) begin
+          rpc_control_status_r <= rpc_control_slot_supported
+                                  ? rpc_status_invalid_lp
+                                  : rpc_status_unsupported_lp;
+        end else begin
+          unique case (rpc_control_command)
+            rpc_control_stage_lp: begin
+              if (rpc_control_field <= 8'd8) begin
+                rpc_staged_field_r[rpc_control_field[3:0]] <= rpc_m_data_r;
+                rpc_staged_valid_r[rpc_control_field[3:0]] <= 1'b1;
+                rpc_control_status_r <= rpc_status_ok_lp;
+              end else begin
+                rpc_control_status_r <= rpc_status_invalid_lp;
+              end
+            end
+            rpc_control_commit_lp: begin
+              rpc_staged_valid_r <= '0;
+              if (rpc_active_i) begin
+                rpc_control_status_r <= rpc_status_busy_lp;
+              end else if (!rpc_staged_descriptor_valid) begin
+                rpc_control_status_r <= rpc_status_invalid_lp;
+              end else begin
+                rpc_live_field_r <= rpc_staged_field_r;
+                rpc_descriptor_valid_r <= 1'b1;
+                rpc_control_status_r <= rpc_status_ok_lp;
+              end
+            end
+            rpc_control_revoke_lp: begin
+              if (!rpc_descriptor_valid_r
+                  || (rpc_m_data_r != rpc_live_field_r[0])) begin
+                rpc_control_status_r <= rpc_status_stale_lp;
+              end else if (rpc_active_i) begin
+                rpc_control_status_r <= rpc_status_busy_lp;
+              end else begin
+                rpc_descriptor_valid_r <= 1'b0;
+                rpc_control_status_r <= rpc_status_ok_lp;
+              end
+            end
+            rpc_control_read_status_lp: begin
+              if (!rpc_descriptor_valid_r
+                  || (rpc_m_data_r != rpc_live_field_r[0]))
+                rpc_control_status_r <= rpc_status_stale_lp;
+              else if (rpc_active_i)
+                rpc_control_status_r <= rpc_status_busy_lp;
+              else
+                rpc_control_status_r <= rpc_status_ok_lp;
+            end
+            default: rpc_control_status_r <= rpc_status_unsupported_lp;
+          endcase
+        end
+      end
+    end
+  end
+
+  assign rpc_descriptor_valid_o = rpc_descriptor_valid_r;
+  assign rpc_descriptor_token_o = rpc_live_field_r[0];
+  assign rpc_descriptor_caller_satp_o = rpc_live_field_r[1];
+  assign rpc_descriptor_server_satp_o = rpc_live_field_r[2];
+  assign rpc_descriptor_server_entry_o = rpc_live_field_r[3];
+  assign rpc_descriptor_server_sp_o = rpc_live_field_r[4];
+  assign rpc_descriptor_server_gp_o = rpc_live_field_r[5];
+  assign rpc_descriptor_server_tp_o = rpc_live_field_r[6];
+  assign rpc_descriptor_caller_badge_o = rpc_live_field_r[7];
+  assign rpc_descriptor_config_o = rpc_live_field_r[8];
 
   // Per-thread gated inputs
   logic [num_threads_p-1:0]                          csr_r_v_gated;
@@ -276,6 +431,8 @@ module bp_be_csr_wrapper_mt
        ,.icache_prefix_count_o(icache_prefix_count_co[i])
        ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_co[i])
        ,.icache_prefix_clear_v_o(icache_prefix_clear_v_co[i])
+       ,.rpc_m_data_i(rpc_m_data_r)
+       ,.rpc_m_control_status_i(rpc_control_status_r)
        );
   end
 
