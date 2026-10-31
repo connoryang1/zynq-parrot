@@ -187,6 +187,11 @@ module bp_be_top
   logic context_cache_miss_pending_r;
   logic rpc_active_r;
   logic [vaddr_width_p-1:0] rpc_return_npc_r;
+  logic rpc_prepare_v_lo;
+  logic [1:0] rpc_prepare_component_lo;
+  logic [context_id_width_p-1:0] rpc_prepare_server_context_lo;
+  logic [dword_width_gp-1:0] rpc_prepare_server_satp_lo;
+  logic [dword_width_gp-1:0] rpc_prepare_server_entry_lo;
   logic rpc_descriptor_valid_lo;
   logic [dword_width_gp-1:0] rpc_descriptor_token_lo;
   logic [dword_width_gp-1:0] rpc_descriptor_caller_satp_lo;
@@ -642,6 +647,30 @@ module bp_be_top
   wire [7:0] rpc_reply_words_li = rpc_descriptor_config_lo[15:8];
   wire [vaddr_width_p-1:0] rpc_entry_li =
     rpc_descriptor_server_entry_lo[0 +: vaddr_width_p];
+  logic rpc_prepare_target_resident_v_li;
+  logic [thread_id_width_p-1:0] rpc_prepare_target_physical_thread_id_li;
+  always_comb begin
+    rpc_prepare_target_resident_v_li = 1'b0;
+    rpc_prepare_target_physical_thread_id_li = '0;
+    if (rpc_prepare_server_context_lo < num_contexts_p) begin
+      rpc_prepare_target_resident_v_li =
+        virtual_context_resident_v_r[rpc_prepare_server_context_lo];
+      rpc_prepare_target_physical_thread_id_li =
+        virtual_context_slot_r[rpc_prepare_server_context_lo];
+    end
+  end
+  // Preparation is a privileged mutation of an inactive resident bank. A
+  // context-cache transfer or pending switch owns the same metadata/write
+  // paths, so the controller reports BUSY instead of racing either operation.
+  wire rpc_prepare_ready_li = rpc_prepare_target_resident_v_li
+    & (rpc_prepare_target_physical_thread_id_li < num_threads_p)
+    & (rpc_prepare_target_physical_thread_id_li != current_physical_thread_id_lo)
+    & ~context_cache_active_li
+    & ~pending_ctxtsw_v_r;
+  wire rpc_prepare_gpr_v_li = rpc_prepare_v_lo
+    & (rpc_prepare_component_lo < 2);
+  wire rpc_prepare_csr_v_li = rpc_prepare_v_lo
+    & (rpc_prepare_component_lo == 2);
   logic [dword_width_gp-1:0] rpc_current_satp_li;
   always_comb begin
     rpc_current_satp_li = '0;
@@ -699,6 +728,16 @@ module bp_be_top
                                    ? pending_rpc_args_r[5] : '0;
     end
   end
+  wire rpc_regfile_install_v_li = rpc_prepare_gpr_v_li | rpc_install_v_li;
+  wire [thread_id_width_p-1:0] rpc_regfile_install_thread_id_li =
+    rpc_prepare_gpr_v_li
+    ? rpc_prepare_target_physical_thread_id_li : rpc_install_thread_id_li;
+  wire [0:0] rpc_regfile_install_line_index_li =
+    rpc_prepare_gpr_v_li ? rpc_prepare_component_lo[0] : 1'b0;
+  wire [15:0] rpc_regfile_install_w_mask_li =
+    rpc_prepare_gpr_v_li ? '1 : rpc_install_w_mask_li;
+  wire [15:0][dpath_width_gp-1:0] rpc_regfile_install_w_data_li =
+    rpc_prepare_gpr_v_li ? '0 : rpc_install_w_data_li;
 
   assign fe_ctxtsw_v_o = context_cache_launch_v_li | fast_ctxtsw_launch_v_li | ctxtsw_launch_lo;
   // A younger speculative context switch may already be buffered in the FE
@@ -861,6 +900,27 @@ module bp_be_top
         virtual_context_csr_state_r[i] <= '0;
       end
     end else begin
+      if (rpc_prepare_csr_v_li) begin
+        context_npc_r[rpc_prepare_target_physical_thread_id_li]
+          <= rpc_prepare_server_entry_lo[0 +: vaddr_width_p];
+        context_priv_mode_r[rpc_prepare_target_physical_thread_id_li]
+          <= `PRIV_MODE_U;
+        context_translation_en_r[rpc_prepare_target_physical_thread_id_li]
+          <= 1'b1;
+        context_asid_r[rpc_prepare_target_physical_thread_id_li]
+          <= rpc_prepare_server_satp_lo[44 +: asid_width_p];
+
+        virtual_context_npc_r[rpc_prepare_server_context_lo]
+          <= rpc_prepare_server_entry_lo[0 +: vaddr_width_p];
+        virtual_context_priv_mode_r[rpc_prepare_server_context_lo]
+          <= `PRIV_MODE_U;
+        virtual_context_translation_en_r[rpc_prepare_server_context_lo]
+          <= 1'b1;
+        virtual_context_asid_r[rpc_prepare_server_context_lo]
+          <= rpc_prepare_server_satp_lo[44 +: asid_width_p];
+        virtual_context_csr_valid_r[rpc_prepare_server_context_lo] <= 1'b1;
+      end
+
       if (commit_pkt.ctxtsw) begin
         logic [thread_id_width_p-1:0] save_physical_thread_id_li;
         logic [context_id_width_p-1:0] save_virtual_context_id_li;
@@ -1123,10 +1183,20 @@ module bp_be_top
           virtual_context_int_dirty_r[physical_thread_context_id_r[iwb_pkt.thread_id]][iwb_pkt.rd_addr] <= 1'b1;
       end
       if (rpc_install_v_li) begin
-        for (int i = 10; i <= 15; i++) begin
+        for (int i = 1; i < 16; i++) begin
           if (rpc_install_w_mask_li[i]) begin
             physical_thread_int_dirty_r[rpc_install_thread_id_li][i] <= 1'b1;
             virtual_context_int_dirty_r[pending_ctxtsw_virtual_context_id_r][i] <= 1'b1;
+          end
+        end
+      end
+      if (rpc_prepare_gpr_v_li) begin
+        for (int i = 0; i < 16; i++) begin
+          if ((rpc_prepare_component_lo != 0) || (i != 0)) begin
+            physical_thread_int_dirty_r[rpc_prepare_target_physical_thread_id_li]
+              [16*rpc_prepare_component_lo[0]+i] <= 1'b1;
+            virtual_context_int_dirty_r[rpc_prepare_server_context_lo]
+              [16*rpc_prepare_component_lo[0]+i] <= 1'b1;
           end
         end
       end
@@ -1488,10 +1558,11 @@ module bp_be_top
      ,.rpc_caller_context_i(rpc_caller_context_li)
      ,.rpc_server_context_i(rpc_server_context_li)
      ,.rpc_request_words_i(rpc_request_words_li)
-     ,.rpc_install_v_i(rpc_install_v_li)
-     ,.rpc_install_thread_id_i(rpc_install_thread_id_li)
-     ,.rpc_install_w_mask_i(rpc_install_w_mask_li)
-     ,.rpc_install_w_data_i(rpc_install_w_data_li)
+     ,.rpc_install_v_i(rpc_regfile_install_v_li)
+     ,.rpc_install_thread_id_i(rpc_regfile_install_thread_id_li)
+     ,.rpc_install_line_index_i(rpc_regfile_install_line_index_li)
+     ,.rpc_install_w_mask_i(rpc_regfile_install_w_mask_li)
+     ,.rpc_install_w_data_i(rpc_regfile_install_w_data_li)
      ,.rpc_args_o(fast_rpc_args_lo)
 
      ,.rpush_w_v_i(scheduler_rpush_v_li)
@@ -1596,6 +1667,10 @@ module bp_be_top
      ,.csr_context_restore_physical_thread_id_i(csr_context_restore_physical_thread_id_li)
      ,.csr_context_restore_data_i(csr_context_restore_data_li)
      ,.csr_context_restore_npc_i(csr_context_restore_npc_li)
+     ,.rpc_context_prepare_v_i(rpc_prepare_csr_v_li)
+     ,.rpc_context_prepare_physical_thread_id_i(rpc_prepare_target_physical_thread_id_li)
+     ,.rpc_context_prepare_satp_i(rpc_prepare_server_satp_lo)
+     ,.rpc_context_prepare_entry_i(rpc_prepare_server_entry_lo[0 +: vaddr_width_p])
      ,.csr_context_save_physical_thread_id_i(csr_context_save_physical_thread_id_li)
      ,.csr_context_save_data_o(csr_context_save_data_lo)
      ,.ctx_npc_write_v_o(ctx_npc_write_v_lo)
@@ -1638,6 +1713,12 @@ module bp_be_top
      ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_o)
      ,.icache_prefix_clear_v_o(icache_prefix_clear_v_o)
      ,.rpc_active_i(rpc_active_r)
+     ,.rpc_prepare_ready_i(rpc_prepare_ready_li)
+     ,.rpc_prepare_v_o(rpc_prepare_v_lo)
+     ,.rpc_prepare_component_o(rpc_prepare_component_lo)
+     ,.rpc_prepare_server_context_o(rpc_prepare_server_context_lo)
+     ,.rpc_prepare_server_satp_o(rpc_prepare_server_satp_lo)
+     ,.rpc_prepare_server_entry_o(rpc_prepare_server_entry_lo)
      ,.rpc_descriptor_valid_o(rpc_descriptor_valid_lo)
      ,.rpc_descriptor_token_o(rpc_descriptor_token_lo)
      ,.rpc_descriptor_caller_satp_o(rpc_descriptor_caller_satp_lo)

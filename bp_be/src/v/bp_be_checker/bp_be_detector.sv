@@ -334,14 +334,15 @@ module bp_be_detector
       end
       rpc_args_haz_v &= issue_pkt_cast_i.csrw;
 
-      // CSR802 shares each scalar register-file write port with ordinary WB.
-      // Drain older work before admitting a seed, then hold younger issue until
-      // the seed's own rd writeback has drained. Injected completions remain
-      // enabled by the scheduler while FE issue is held. No seed means no hold
-      // on the steady-state context-switch path.
+      // CSR802 shares each scalar register-file write port with ordinary WB;
+      // protected-RPC control may perform a wide inactive-bank preparation.
+      // Drain older work before admitting either privileged mutation, then
+      // hold younger issue until its own pipeline state has drained. Injected
+      // completions remain enabled by the scheduler while FE issue is held.
       register_seed_haz_v = register_seed_active_r
                            | (issue_pkt_cast_i.csrw
-                              & (issue_pkt_cast_i.instr.t.itype.imm12 == 12'h802)
+                              & (issue_pkt_cast_i.instr.t.itype.imm12
+                                 inside {12'h802, 12'h7c4})
                               & ~register_seed_ready_i);
 
 	      /*
@@ -415,13 +416,14 @@ module bp_be_detector
 	      dep_status_n.rd_addr     = dispatch_pkt_cast_i.instr.t.rtype.rd_addr;
 	    end
 
-  // Set on actual dispatch, not the issue candidate. A squashed seed releases
-  // the hold when the pipeline empties, without performing a remote write.
+  // Set on actual dispatch, not the issue candidate. A squashed mutation
+  // releases the hold when the pipeline empties, without changing remote state.
   always_ff @(posedge clk_i)
     if (reset_i)
       register_seed_active_r <= 1'b0;
     else if (dispatch_pkt_cast_i.v & dispatch_pkt_cast_i.special.csrw
-             & (dispatch_pkt_cast_i.instr.t.itype.imm12 == 12'h802))
+             & (dispatch_pkt_cast_i.instr.t.itype.imm12
+                inside {12'h802, 12'h7c4}))
       register_seed_active_r <= 1'b1;
     else if (register_seed_ready_i)
       register_seed_active_r <= 1'b0;

@@ -92,6 +92,7 @@ module bp_be_regfile_mt
    // transition. Each register is already a separate line-bank lane.
    , input                                              rpc_w_v_i
    , input [thread_id_width_p-1:0]                     rpc_thread_id_i
+   , input [context_line_index_width_p-1:0]             rpc_line_index_i
    , input [context_regs_per_line_p-1:0]               rpc_w_mask_i
    , input [context_regs_per_line_p-1:0][data_width_p-1:0] rpc_w_data_i
    );
@@ -156,7 +157,7 @@ module bp_be_regfile_mt
           for (int i = 0; i < 6; i++)
             rpc_arg_shadow_r[context_line_thread_id_i][i]
               <= context_line_data_i[10+i];
-        end else if (rpc_w_v_i) begin
+        end else if (rpc_w_v_i && (rpc_line_index_i == '0)) begin
           for (int i = 0; i < 6; i++)
             if (rpc_w_mask_i[10+i])
               rpc_arg_shadow_r[rpc_thread_id_i][i] <= rpc_w_data_i[10+i];
@@ -186,7 +187,7 @@ module bp_be_regfile_mt
         wire bank_w_v = context_line_w_v_i | (rpc_w_v_i & rpc_w_mask_i[bank]) | normal_w_v;
         wire [bank_addr_width_lp-1:0] bank_w_addr = context_line_w_v_i
           ? {context_line_thread_id_i, context_line_index_i}
-          : rpc_w_v_i ? {rpc_thread_id_i, context_line_index_width_p'(0)}
+          : rpc_w_v_i ? {rpc_thread_id_i, rpc_line_index_i}
           : {w_thread_id_mux, w_reg_addr_mux[bank_select_width_lp+:context_line_index_width_p]};
         wire [data_width_p-1:0] bank_w_data = context_line_w_v_i
           ? context_line_data_i[bank]

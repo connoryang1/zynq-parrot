@@ -105,6 +105,10 @@ module bp_be_calculator_top
    , input [thread_id_width_p-1:0]                   csr_context_restore_physical_thread_id_i
    , input [csr_context_width_lp-1:0]                csr_context_restore_data_i
    , input [vaddr_width_p-1:0]                       csr_context_restore_npc_i
+   , input                                           rpc_context_prepare_v_i
+   , input [thread_id_width_p-1:0]                   rpc_context_prepare_physical_thread_id_i
+   , input [dword_width_gp-1:0]                      rpc_context_prepare_satp_i
+   , input [vaddr_width_p-1:0]                       rpc_context_prepare_entry_i
    , input [thread_id_width_p-1:0]                   csr_context_save_physical_thread_id_i
    , output logic [csr_context_width_lp-1:0]         csr_context_save_data_o
 
@@ -157,6 +161,12 @@ module bp_be_calculator_top
    , output logic                                    icache_prefix_clear_v_o
 
    , input                                           rpc_active_i
+   , input                                           rpc_prepare_ready_i
+   , output logic                                    rpc_prepare_v_o
+   , output logic [1:0]                              rpc_prepare_component_o
+   , output logic [context_id_width_p-1:0]           rpc_prepare_server_context_o
+   , output logic [dword_width_gp-1:0]               rpc_prepare_server_satp_o
+   , output logic [dword_width_gp-1:0]               rpc_prepare_server_entry_o
    , output logic                                    rpc_descriptor_valid_o
    , output logic [dword_width_gp-1:0]               rpc_descriptor_token_o
    , output logic [dword_width_gp-1:0]               rpc_descriptor_caller_satp_o
@@ -378,6 +388,10 @@ module bp_be_calculator_top
      ,.csr_context_restore_physical_thread_id_i(csr_context_restore_physical_thread_id_i)
      ,.csr_context_restore_data_i(csr_context_restore_data_i)
      ,.csr_context_restore_npc_i(csr_context_restore_npc_i)
+     ,.rpc_context_prepare_v_i(rpc_context_prepare_v_i)
+     ,.rpc_context_prepare_physical_thread_id_i(rpc_context_prepare_physical_thread_id_i)
+     ,.rpc_context_prepare_satp_i(rpc_context_prepare_satp_i)
+     ,.rpc_context_prepare_entry_i(rpc_context_prepare_entry_i)
      ,.csr_context_save_physical_thread_id_i(csr_context_save_physical_thread_id_i)
      ,.csr_context_save_data_o(csr_context_save_data_o)
      ,.ctx_npc_write_v_o(ctx_npc_write_v_o)
@@ -417,6 +431,12 @@ module bp_be_calculator_top
      ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_o)
      ,.icache_prefix_clear_v_o(icache_prefix_clear_v_o)
      ,.rpc_active_i(rpc_active_i)
+     ,.rpc_prepare_ready_i(rpc_prepare_ready_i)
+     ,.rpc_prepare_v_o(rpc_prepare_v_o)
+     ,.rpc_prepare_component_o(rpc_prepare_component_o)
+     ,.rpc_prepare_server_context_o(rpc_prepare_server_context_o)
+     ,.rpc_prepare_server_satp_o(rpc_prepare_server_satp_o)
+     ,.rpc_prepare_server_entry_o(rpc_prepare_server_entry_o)
      ,.rpc_descriptor_valid_o(rpc_descriptor_valid_o)
      ,.rpc_descriptor_token_o(rpc_descriptor_token_o)
      ,.rpc_descriptor_caller_satp_o(rpc_descriptor_caller_satp_o)

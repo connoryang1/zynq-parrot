@@ -72,6 +72,7 @@ module bp_be_scheduler
    , input [7:0]                              rpc_request_words_i
    , input                                    rpc_install_v_i
    , input [thread_id_width_p-1:0]            rpc_install_thread_id_i
+   , input [0:0]                              rpc_install_line_index_i
    , input [15:0]                             rpc_install_w_mask_i
    , input [15:0][dpath_width_gp-1:0]         rpc_install_w_data_i
    , output logic [5:0][dpath_width_gp-1:0]   rpc_args_o
@@ -301,6 +302,10 @@ module bp_be_scheduler
         $error("%m: CSR802 integer remote write collides with ordinary writeback");
       if (rpush_fp_w_v_i && fwb_pkt_cast_i.frd_w_v)
         $error("%m: CSR802 FP remote write collides with ordinary writeback");
+      if (rpc_install_v_i
+          && (iwb_pkt_cast_i.ird_w_v | rpush_w_v_i
+              | context_cache_line_w_v_i))
+        $error("%m: protected-RPC line write collides with another integer register write");
     end
 `endif
   assign context_cache_scan_r_data_o = {irf_rs2, irf_rs1};
@@ -349,6 +354,7 @@ module bp_be_scheduler
      ,.context_line_r_data_o(rpc_line_r_data_lo)
      ,.rpc_w_v_i(rpc_install_v_i)
      ,.rpc_thread_id_i(rpc_install_thread_id_i)
+     ,.rpc_line_index_i(rpc_install_line_index_i)
      ,.rpc_w_mask_i(rpc_install_w_mask_i)
      ,.rpc_w_data_i(rpc_install_w_data_i)
 
@@ -430,6 +436,7 @@ module bp_be_scheduler
      ,.context_line_r_data_o()
      ,.rpc_w_v_i(1'b0)
      ,.rpc_thread_id_i('0)
+     ,.rpc_line_index_i('0)
      ,.rpc_w_mask_i('0)
      ,.rpc_w_data_i('0)
 

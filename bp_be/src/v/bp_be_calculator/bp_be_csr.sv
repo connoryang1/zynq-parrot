@@ -60,6 +60,10 @@ module bp_be_csr
    , input                                   csr_context_restore_reset_i
    , input [csr_context_width_lp-1:0]        csr_context_restore_data_i
    , input [vaddr_width_p-1:0]               csr_context_restore_npc_i
+   // Privileged protected-RPC construction of an inactive server bank.
+   , input                                   rpc_context_prepare_i
+   , input [dword_width_gp-1:0]              rpc_context_prepare_satp_i
+   , input [vaddr_width_p-1:0]               rpc_context_prepare_entry_i
    , output logic [csr_context_width_lp-1:0] csr_context_save_data_o
 
    // Bootstrap: write a target NPC for a virtual context (CSR 0x801)
@@ -452,6 +456,7 @@ module bp_be_csr
   // so a newly installed virtual context cannot inherit its victim's PC.
   assign apc_n = (enter_debug | cfg_bus_cast_i.freeze)
                  ? debug_halt_pc
+                 : rpc_context_prepare_i ? rpc_context_prepare_entry_i
                  : csr_context_restore_v_i ? csr_context_restore_npc_i : core_npc;
 
   // An inactive resident NPC reseed changes only stored bookkeeping. Keep it
@@ -895,6 +900,43 @@ module bp_be_csr
           dscratch0_li = csr_context_restore.dscratch0;
           dscratch1_li = csr_context_restore.dscratch1;
         end
+      end
+
+      // A protected server is constructed from a known-clean architectural
+      // image rather than cloned from the M-mode installer. Keep interrupts
+      // disabled; version 1 admits only bounded, prefaulted services and does
+      // not yet define an interrupt or synchronous-fault continuation path.
+      if (rpc_context_prepare_i) begin
+        priv_mode_n = `PRIV_MODE_U;
+        fcsr_li = '0;
+
+        stvec_li = '0;
+        scounteren_li = '0;
+        sscratch_li = '0;
+        sepc_li = '0;
+        scause_li = '0;
+        stval_li = '0;
+        satp_li = rpc_context_prepare_satp_i;
+
+        mstatus_li = '0;
+        medeleg_li = '0;
+        mideleg_li = '0;
+        mie_li = '0;
+        mtvec_li = '0;
+        mcounteren_li = '0;
+        mscratch_li = '0;
+        mepc_li = '0;
+        mcause_li = '0;
+        mtval_li = '0;
+        mip_li = '0;
+        mcycle_li = '0;
+        minstret_li = '0;
+        mcountinhibit_li = '0;
+
+        dcsr_li = '0;
+        dpc_li = '0;
+        dscratch0_li = '0;
+        dscratch1_li = '0;
       end
 
       satp_li.asid = satp_li.asid & satp_asid_mask_lp;

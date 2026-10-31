@@ -81,6 +81,10 @@ module bp_be_csr_wrapper_mt
    , input [thread_id_width_p-1:0]           csr_context_restore_physical_thread_id_i
    , input [csr_context_width_lp-1:0]        csr_context_restore_data_i
    , input [vaddr_width_p-1:0]               csr_context_restore_npc_i
+   , input                                   rpc_context_prepare_v_i
+   , input [thread_id_width_p-1:0]           rpc_context_prepare_physical_thread_id_i
+   , input [dword_width_gp-1:0]              rpc_context_prepare_satp_i
+   , input [vaddr_width_p-1:0]               rpc_context_prepare_entry_i
    , input [thread_id_width_p-1:0]           csr_context_save_physical_thread_id_i
    , output logic [csr_context_width_lp-1:0] csr_context_save_data_o
 
@@ -131,6 +135,12 @@ module bp_be_csr_wrapper_mt
    // Core-wide protected-RPC descriptor. Only M-mode CSR 0x7c3/0x7c4
    // accesses mutate this state; publication is atomic at COMMIT.
    , input                                   rpc_active_i
+   , input                                   rpc_prepare_ready_i
+   , output logic                            rpc_prepare_v_o
+   , output logic [1:0]                      rpc_prepare_component_o
+   , output logic [context_id_width_p-1:0]   rpc_prepare_server_context_o
+   , output logic [dword_width_gp-1:0]       rpc_prepare_server_satp_o
+   , output logic [dword_width_gp-1:0]       rpc_prepare_server_entry_o
    , output logic                            rpc_descriptor_valid_o
    , output logic [dword_width_gp-1:0]       rpc_descriptor_token_o
    , output logic [dword_width_gp-1:0]       rpc_descriptor_caller_satp_o
@@ -205,6 +215,7 @@ module bp_be_csr_wrapper_mt
   localparam logic [7:0] rpc_control_commit_lp = 8'd1;
   localparam logic [7:0] rpc_control_revoke_lp = 8'd2;
   localparam logic [7:0] rpc_control_read_status_lp = 8'd3;
+  localparam logic [7:0] rpc_control_prepare_lp = 8'd4;
   localparam logic [dword_width_gp-1:0] rpc_status_ok_lp = 64'd0;
   localparam logic [dword_width_gp-1:0] rpc_status_stale_lp = 64'd1;
   localparam logic [dword_width_gp-1:0] rpc_status_busy_lp = 64'd2;
@@ -216,6 +227,7 @@ module bp_be_csr_wrapper_mt
   logic [8:0] rpc_staged_valid_r;
   logic [8:0][dword_width_gp-1:0] rpc_live_field_r;
   logic rpc_descriptor_valid_r;
+  logic [2:0] rpc_prepared_component_r;
   bp_be_decode_info_s rpc_retire_decode_info;
   assign rpc_retire_decode_info = decode_info_co[retire_thread_id_i];
 
@@ -256,6 +268,16 @@ module bp_be_csr_wrapper_mt
     & (rpc_staged_field_r[1] != rpc_staged_field_r[2])
     & rpc_staged_user_addresses_valid
     & rpc_staged_config_valid;
+  wire rpc_prepare_component_valid = (rpc_control_field <= 8'd2);
+  wire rpc_prepare_accept = rpc_control_write_v
+    & rpc_control_reserved_zero
+    & rpc_control_slot_supported
+    & (rpc_control_command == rpc_control_prepare_lp)
+    & rpc_prepare_component_valid
+    & rpc_staged_descriptor_valid
+    & ~rpc_descriptor_valid_r
+    & ~rpc_active_i
+    & rpc_prepare_ready_i;
 
   always_ff @(posedge clk_i) begin
     if (reset_i) begin
@@ -265,6 +287,7 @@ module bp_be_csr_wrapper_mt
       rpc_staged_valid_r <= '0;
       rpc_live_field_r <= '0;
       rpc_descriptor_valid_r <= 1'b0;
+      rpc_prepared_component_r <= '0;
     end else begin
       if (rpc_data_write_v)
         rpc_m_data_r <= rpc_csr_data;
@@ -277,6 +300,10 @@ module bp_be_csr_wrapper_mt
         end else begin
           unique case (rpc_control_command)
             rpc_control_stage_lp: begin
+              // Any mutation invalidates preparation derived from the old
+              // staged image. The installer must prepare all three pieces
+              // after the final field has been staged.
+              rpc_prepared_component_r <= '0;
               if (rpc_control_field <= 8'd8) begin
                 rpc_staged_field_r[rpc_control_field[3:0]] <= rpc_m_data_r;
                 rpc_staged_valid_r[rpc_control_field[3:0]] <= 1'b1;
@@ -287,9 +314,13 @@ module bp_be_csr_wrapper_mt
             end
             rpc_control_commit_lp: begin
               rpc_staged_valid_r <= '0;
+              rpc_prepared_component_r <= '0;
               if (rpc_active_i) begin
                 rpc_control_status_r <= rpc_status_busy_lp;
-              end else if (!rpc_staged_descriptor_valid) begin
+              end else if (rpc_descriptor_valid_r) begin
+                rpc_control_status_r <= rpc_status_busy_lp;
+              end else if (!rpc_staged_descriptor_valid
+                           || !(&rpc_prepared_component_r)) begin
                 rpc_control_status_r <= rpc_status_invalid_lp;
               end else begin
                 rpc_live_field_r <= rpc_staged_field_r;
@@ -317,6 +348,18 @@ module bp_be_csr_wrapper_mt
               else
                 rpc_control_status_r <= rpc_status_ok_lp;
             end
+            rpc_control_prepare_lp: begin
+              if (!rpc_staged_descriptor_valid
+                  || !rpc_prepare_component_valid) begin
+                rpc_control_status_r <= rpc_status_invalid_lp;
+              end else if (rpc_descriptor_valid_r || rpc_active_i
+                           || !rpc_prepare_ready_i) begin
+                rpc_control_status_r <= rpc_status_busy_lp;
+              end else begin
+                rpc_prepared_component_r[rpc_control_field[1:0]] <= 1'b1;
+                rpc_control_status_r <= rpc_status_ok_lp;
+              end
+            end
             default: rpc_control_status_r <= rpc_status_unsupported_lp;
           endcase
         end
@@ -324,6 +367,12 @@ module bp_be_csr_wrapper_mt
     end
   end
 
+  assign rpc_prepare_v_o = rpc_prepare_accept;
+  assign rpc_prepare_component_o = rpc_control_field[1:0];
+  assign rpc_prepare_server_context_o =
+    context_id_width_p'(rpc_staged_config[47:32]);
+  assign rpc_prepare_server_satp_o = rpc_staged_field_r[2];
+  assign rpc_prepare_server_entry_o = rpc_staged_field_r[3];
   assign rpc_descriptor_valid_o = rpc_descriptor_valid_r;
   assign rpc_descriptor_token_o = rpc_live_field_r[0];
   assign rpc_descriptor_caller_satp_o = rpc_live_field_r[1];
@@ -393,6 +442,11 @@ module bp_be_csr_wrapper_mt
        ,.csr_context_restore_reset_i(csr_context_restore_reset_i)
        ,.csr_context_restore_data_i(csr_context_restore_data_i)
        ,.csr_context_restore_npc_i(csr_context_restore_npc_i)
+       ,.rpc_context_prepare_i(rpc_context_prepare_v_i
+                               & (rpc_context_prepare_physical_thread_id_i
+                                  == thread_id_width_p'(i)))
+       ,.rpc_context_prepare_satp_i(rpc_context_prepare_satp_i)
+       ,.rpc_context_prepare_entry_i(rpc_context_prepare_entry_i)
        ,.csr_context_save_data_o(csr_context_save_data_co[i])
        ,.ctx_npc_write_v_o(ctx_npc_write_v_co[i])
        ,.ctx_npc_write_rebind_o(ctx_npc_write_rebind_co[i])
