@@ -639,6 +639,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** instruction replay does not interfere with the independent data lane, and late data issue remains the better incremental choice. This matrix does not reproduce a measurable total instruction benefit because instruction replay is not toggled within its paired arms; the prior 3.25% instruction-only result comes from a different futex benchmark and cannot simply be added.
 - **Limits:** the total joint speedup remains unresolved. A decisive next measurement must alternate instruction-enabled and instruction-disabled images with identical data modes, or add a safe runtime instruction toggle, while keeping the exact clean-handoff benchmark and recovering before the repeatable index-10 liveness boundary.
 
+### RL-068 — Runtime gating makes total joint warming a same-boot paired experiment
+
+- **Status:** locally validated FPGA candidate; physical Linux boot and timing pending
+- **Scope:** one final Linux patch gates CSR `0x5c0` on the incoming task's existing `bp_preview_phys_mode`, exact old 16-line instruction table, unchanged four-line physical data preview, unchanged routed RTL/bitstream, and the existing strict clean-one-switch benchmark
+- **Claim:** mode zero now disables both instruction and data warming, while modes one and two enable instruction replay plus early or late data hints. The Linux image builds, disassembly proves one conditional scheduler trigger, the old table matches accepted donor NBF `d7a2964c...e235` entry-for-entry, and executable CSR guards plus 14 analyzer/runner/splice tests pass. Candidate NBF SHA-256 is `86789f0a...e855`.
+- **Workflow corrections:** patch 0008 rewrites patch 0001's scheduler hunk, invalidating the former reverse-patch idempotency test; exact trigger recognition now makes repeated full-stack staging pass. A direct kernel build also requires Buildroot's `BR_BINARIES_DIR` so `${BR_BINARIES_DIR}/rootfs.cpio` does not collapse to `/rootfs.cpio`. The first firmware candidate used the unpatched canonical OpenSBI base and was rejected before board use after byte comparison exposed missing donor `fw_base.S` and `sbi_hart.c` changes.
+- **Meaning:** this removes the cross-boot and always-on-instruction confounds from RL-067 without changing hardware. It does not yet establish Linux boot stability or a total joint speedup.
+- **Decisive experiment:** recover and reload the accepted routed board image, boot exact NBF `86789f0a...e855`, then run the fixed 16-cell matrix with the established index-10 recovery boundary. Analyze late joint versus fully disabled as primary and early as secondary; retain local load-body and full wake-to-load effects separately.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

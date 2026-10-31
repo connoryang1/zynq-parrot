@@ -559,6 +559,13 @@ immediately before the architectural register/stack switch. The latter is the
 retention-oriented candidate because the 4 KiB L2 can displace a completed
 early hint during the remaining kernel return path.
 
+The final patch also gates the machine-configured instruction-prefix trigger on
+that same per-task mode. Thus mode zero disables both instruction replay and
+data hints, while modes one and two enable instruction replay plus the selected
+data timing. This is the matched total-joint comparison; images built before
+that patch keep instruction replay active in both arms and measure only the
+incremental data effect.
+
 Build the compact shell-transfer executable with the matching SDK toolchain:
 
 ```sh

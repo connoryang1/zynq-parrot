@@ -197,3 +197,34 @@ pair and cannot be added numerically to this result. A direct instruction
 on/off comparison needs alternating matched images or a runtime instruction
 toggle in this exact benchmark. The complete combined analysis and provenance
 manifest are retained under `physical-sweep/`.
+
+## Runtime-gated total-joint candidate
+
+The next kernel candidate gates the shared instruction trigger on the same
+incoming-task `bp_preview_phys_mode` byte that controls physical data preview.
+Mode zero is therefore a matched instruction-and-data-disabled arm; modes one
+and two enable the exact old 16-line instruction table plus early or late data
+preview. This changes no RTL and preserves page registration, pins, eviction
+traffic, task pair, and benchmark binary across the comparison.
+
+The isolated Linux 6.6 build passes and disassembly proves a byte load and
+zero-test branch around the sole `csrw 0x5c0, zero` in `__schedule()`. The
+kernel `Image` and `vmlinux.bin` SHA-256 are both
+`df583fd5...e1055`; the reused 64 MiB DTB remains exact at
+`bfa8247a...906f`. The old 16 table was recovered directly from accepted donor
+NBF `d7a2964c...e235` and compares entry-for-entry with the generated header.
+The donor-derived OpenSBI payload is `a8008f8e...d902`, and the resulting 8 MHz
+candidate NBF is `86789f0a...e855`. Executable-section CSR collision scans,
+five strict analyzer tests, six board-runner tests, and three NBF-splice tests
+pass. These are build-readiness results only; Linux boot and timing remain the
+FPGA acceptance gates.
+
+Two build guardrails were exposed before board staging. A direct kernel make
+without Buildroot's `BR_BINARIES_DIR` expanded the configured initramfs path to
+missing `/rootfs.cpio`; rerunning with the retained exact rootfs succeeded.
+Also, patch 0008 changes the scheduler hunk introduced by patch 0001, so the
+old reverse-patch idempotency probe no longer recognized a completed stack.
+Staging now recognizes the exact trigger in `core.c`; two consecutive complete
+stack staging calls pass. An initial firmware candidate built from the old
+canonical SDK's unpatched OpenSBI source was rejected before FPGA use because
+it lacked the donor's `fw_base.S` and `sbi_hart.c` changes.

@@ -1,0 +1,22 @@
+This patch gates the shared instruction-prefix launch with the incoming task's
+existing preview mode. It turns the physical benchmark's mode-zero arm into a
+true instruction-and-data-disabled control while modes one and two enable both.
+
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -6649,10 +6649,12 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 
+ 	if (likely(prev != next)) {
+ #ifdef CONFIG_RISCV
+-		/* Physical prefix contents are machine-owned. Launch only for an
+-		 * actual task change so failed selections do not replay the table.
++		/* Physical prefix contents are machine-owned. The per-task preview
++		 * mode makes mode zero a matched instruction/data-disabled control.
++		 * Launch only for an actual task change and an enabled incoming task.
+ 		 */
+-		asm volatile("csrw 0x5c0, zero" ::: "memory");
++		if (READ_ONCE(next->thread.bp_preview_phys_mode))
++			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ #endif
+ 
+ 		rq->nr_switches++;

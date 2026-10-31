@@ -54,7 +54,8 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0003-blackparrot-preview-hook-count.patch \
 	$(CURDIR)/kernel-patches/0005-blackparrot-preview-guard-reasons.patch \
 	$(CURDIR)/kernel-patches/0006-blackparrot-physical-data-preview.patch \
-	$(CURDIR)/kernel-patches/0007-blackparrot-select-preview-timing.patch
+	$(CURDIR)/kernel-patches/0007-blackparrot-select-preview-timing.patch \
+	$(CURDIR)/kernel-patches/0008-blackparrot-gate-instruction-replay.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -284,7 +285,9 @@ stage-linux-prefix-trigger:
 	@test -f $(LINUX_BUILD_DIR)/kernel/sched/core.c || { \
 	  echo "missing Linux build tree $(LINUX_BUILD_DIR); prepare the SDK work tree first" >&2; exit 2; \
 	}
-	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
+	@if grep -Fq 'asm volatile("csrw 0x5c0, zero"' $(LINUX_BUILD_DIR)/kernel/sched/core.c; then \
+	  echo "shared I-cache prefix trigger already present"; \
+	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
 	  echo "shared I-cache prefix trigger already applied"; \
 	else \
 	  patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward < $(LINUX_PREFIX_PATCH); \
