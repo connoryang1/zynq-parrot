@@ -27,6 +27,14 @@ def cell_plan():
     return cells
 
 
+def selected_cells(start_cell):
+    """Return a disjoint suffix for recovery after a preserved partial run."""
+    cells = cell_plan()
+    if start_cell < 0 or start_cell >= len(cells):
+        raise ValueError(f"start cell must be in 0..{len(cells) - 1}")
+    return cells[start_cell:]
+
+
 def cell_exit_pattern(group, timing):
     """Match board markers despite the UART bridge's repeated CR bytes."""
     return re.compile(
@@ -47,6 +55,8 @@ def parse_args(argv=None):
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
+    parser.add_argument("--start-cell", type=int, default=0,
+                        help="zero-based cell-plan index for a recovered suffix run")
     parser.add_argument("--print-plan", action="store_true")
     return parser.parse_args(argv)
 
@@ -58,6 +68,7 @@ def validate_args(args):
             raise ValueError(f"{label} SHA-256 must be 64 lowercase hex digits")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
+    selected_cells(args.start_cell)
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
 
@@ -74,7 +85,8 @@ def run(args):
         "nbf_sha256": sha256(args.nbf),
         "transfer_sha256": sha256(args.transfer),
         "elf_sha256": args.elf_sha256,
-        "cells": [f"{group}:{timing}" for group, timing in cell_plan()],
+        "cells": [f"{group}:{timing}"
+                  for group, timing in selected_cells(args.start_cell)],
     }
     child = None
     try:
@@ -95,7 +107,7 @@ def run(args):
             child.sendline(f"sha256sum {GUEST_ELF}")
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
             child.expect(SHELL_PROMPT)
-            for group, timing in cell_plan():
+            for group, timing in selected_cells(args.start_cell):
                 child.sendline(
                     f"{GUEST_ELF} {group} {timing}; "
                     f"rc=$?; echo PHYSICAL_CELL_EXIT group={group} "
@@ -143,7 +155,7 @@ def main(argv=None):
     except ValueError as error:
         raise SystemExit(str(error)) from error
     if args.print_plan:
-        for group, timing in cell_plan():
+        for group, timing in selected_cells(args.start_cell):
             print(group, timing)
         return 0
     run(args)

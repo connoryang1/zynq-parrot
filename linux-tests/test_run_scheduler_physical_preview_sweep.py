@@ -6,6 +6,7 @@ from run_scheduler_physical_preview_sweep import (
     SHELL_PROMPT,
     cell_exit_pattern,
     cell_plan,
+    selected_cells,
 )
 
 
@@ -36,6 +37,16 @@ class CellPlanTest(unittest.TestCase):
                        if cell_group == group]
             expected = ["early", "late"] if group % 2 == 0 else ["late", "early"]
             self.assertEqual(timings, expected)
+
+    def test_recovery_suffix_has_no_duplicate_prefix_cells(self):
+        plan = cell_plan()
+        self.assertEqual(selected_cells(10), plan[10:])
+        self.assertFalse(set(plan[:10]) & set(selected_cells(10)))
+
+    def test_invalid_recovery_boundary_is_rejected(self):
+        for start in (-1, 16):
+            with self.assertRaisesRegex(ValueError, "start cell"):
+                selected_cells(start)
 
 
 if __name__ == "__main__":

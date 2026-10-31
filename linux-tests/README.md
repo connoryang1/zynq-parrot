@@ -592,6 +592,13 @@ python3 linux-tests/run_scheduler_physical_preview_sweep.py \
   IMAGE.nbf TRANSFER ELF_SHA256 BOARD.log
 ```
 
+If a preserved partial run ends in a board liveness failure, reject the
+affected cell and recover the board before using `--start-cell INDEX` to run a
+disjoint suffix of the fixed plan. Keep the raw failed transcript unchanged;
+derive and hash a prefix containing only cells completed before the liveness
+change, and analyze that prefix together with a suffix that reaches final
+`CORE PASS` and `BSG PASS`. Report the multi-boot composition explicitly.
+
 The runner writes `BOARD.log.status.json`. Any failed or interrupted run still
 requires a full board power cycle, PYNQ readiness wait, and verified overlay
 reload before retrying.
