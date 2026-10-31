@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Combined preview matrix completed — 2026-10-31:** A fail-closed NBF splice combines instruction-replay OpenSBI with all 1,861,846 exact accepted data-kernel/DTB records and boots Linux. With instruction replay present in both arms, late data preview saves 12.5 `[11,15]` local load cycles but wake-to-load remains unresolved at `-88.5 [-814.5,542.75]`; the run confirms coexistence, not total joint speedup (`logs/joint-preview-bestcase-20261031/`, RL-067).
+
 - **Best-case physical data result accepted — 2026-10-31:** On the controlled routed image, a strict eight-set-group early/late sweep finds 8.5 `[5.5,10.5]` and 11 `[11,12]` cycles saved in the four-dependent-load body, but no resolved wake-to-load benefit; late's 11-cycle local gain is about 6.1% of the 185-cycle load body and only 0.034% of the roughly 32,103-cycle handoff interval. The clean one-switch benchmark rejected 857 timer-preempted attempts, and the complete matrix uses a hashed first-ten-cell prefix plus a recovered six-cell suffix with final CORE/BSG PASS (`logs/joint-preview-bestcase-20261031/`, RL-066).
 
 - **Controlled joint FPGA route accepted — 2026-10-31:** Exact four-context job `20261031T160854Z-f79221bc` fits at 50,308 LUTs (94.56%) and final post-route-physopt WNS/WHS `+0.241/+0.037 ns`; its verified package and bitstream hashes are `9912f313...b629` and `e97e0517...2381`. Fixed the launcher to select the authoritative final timing report and placed utilization deterministically, added a revision-checked recheck path, and passed all 11 script regressions (`RESEARCH_LEDGER.md` RL-065).

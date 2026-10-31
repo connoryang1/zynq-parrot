@@ -163,3 +163,37 @@ One recovered boot also failed before userspace with an OpenSBI nested illegal
 CSR `0x34b` report, while the preceding three and following recovered boots
 reached a shell. That nondeterministic fault and the later timer-loss run are
 retained as stability limitations; neither contributes timing samples.
+
+## Combined instruction-plus-data follow-up
+
+`splice_opensbi_nbf.py` constructs a fail-closed combined image at the natural
+`0x80200000` payload boundary. It takes 17,024 OpenSBI records from instruction
+donor NBF SHA-256 `d7a2964c...e235` and proves all 1,861,846 kernel/DTB records
+come unchanged from the accepted data NBF. Boot-control preambles must match,
+selected addresses must be unique, and the base timer/control tail is retained.
+Three unit tests pass, the exact partitions compare byte-for-byte, and combined
+NBF SHA-256 is `8cb1261a...3592`. The image booted Linux to a root shell.
+
+The long-run prompt loss recurred after plan index 10, so the same conservative
+recovery boundary was used: the abnormal cell was rejected, the first ten
+normal cells were derived at SHA-256 `5e4ebd69...15ed`, and a fresh six-cell
+suffix with SHA-256 `a2e21457...5bfe` reached final CORE/BSG PASS. All accepted
+cells had 43--62 retries, 826 total.
+
+Instruction replay is active in both data-enabled and data-disabled arms of
+this matrix. The paired result therefore estimates the incremental data effect
+while instruction replay is present, not instruction replay's total effect:
+
+- Late data preview saves 12.5 load-body cycles, 95% interval `[11, 15]`.
+- Early data preview saves 3 cycles, interval `[1.25, 5.5]`.
+- Late wake-to-load saved cycles are `-88.5`, interval `[-814.5, 542.75]`;
+  early is `-635.75`, interval `[-1350.75, 65.5]`. Neither resolves a gain.
+- The median disabled wake-to-load cell is 32,107.75 cycles for combined late
+  versus 32,103 for data-only late. This near-equality is only a cross-boot
+  observation, not a paired proof that instruction replay has zero effect.
+
+The earlier 3.25% instruction-only result used a different persistent futex
+pair and cannot be added numerically to this result. A direct instruction
+on/off comparison needs alternating matched images or a runtime instruction
+toggle in this exact benchmark. The complete combined analysis and provenance
+manifest are retained under `physical-sweep/`.
