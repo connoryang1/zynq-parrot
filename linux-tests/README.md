@@ -575,6 +575,9 @@ page pins and eviction traffic in both arms and emits 512 measured trials in
 balanced `[off,on,on,off]` blocks. Analyze each complete transcript with
 `analyze_scheduler_physical_preview_benchmark.py`; do not select a set group
 from noisy whole-handoff timing without also reporting the full sweep.
+After all 16 early/late cells finish with final board PASS markers, pass their
+transcripts to `analyze_scheduler_physical_preview_sweep.py`; it requires the
+complete matrix and reports per-cell plus set-stratified pooled intervals.
 
 The benchmark is intentionally a four-line mechanism ceiling. Prior completed-
 state oracle evidence measured about 1,265 local cycles from 32 dependent data
