@@ -665,6 +665,39 @@ paired intervals also crossed zero. This narrow Linux workload therefore does
 not establish a speedup. The exact image identities, transcript, and limits
 are in `logs/physical-preview-performance-20261030/` and RL-109.
 
+## Completed-data best-case oracle
+
+`scheduler_data_oracle_best_case.c` measures the cross-process upper bound
+before expanding the physical-preview hardware. The child displaces its target
+footprint and blocks; the parent then touches either an equal-sized decoy or
+the exact shared physical target lines before starting the handoff timer. The
+oracle preparation is intentionally excluded from the timed handoff, modeling
+perfect prediction, completed requests, and complete overlap rather than the
+current four-address hook.
+
+The four conditions cover 16 and 32 lines with independent reads and serialized
+dependent chains. Target and decoy pages are equally resident, modes use
+balanced `[cold,oracle,oracle,cold]` blocks, and every result and target mapping
+is prefaulted in the child. The analyzer rejects missing guest/board PASS
+markers, nonzero measured minor faults, unbalanced blocks, or inconsistent
+timestamps.
+
+```sh
+make -C linux-tests scheduler-data-oracle-best-case-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+python3 linux-tests/analyze_scheduler_data_oracle_best_case.py \
+  logs/data-oracle-best-case-20261031/board-run.log
+```
+
+On the exact timing-qualified data-preview PYNQ-Z2 image, the strongest local
+condition was the 32-line dependent chain: the cold/oracle load medians were
+2,830.5/1,582.5 cycles, or 1.79x, with a paired median saving of 1,265.25 cycles
+and bootstrap 95% interval `[1,245,1,294]`. That robust local saving is only
+2.66% of the 47,616.5-cycle cold wake-to-load median. Scheduler-inclusive
+intervals are much noisier and are not attributed to warming. The exact
+transcript, summary, executable, hashes, and the rejected prefault diagnostic
+are in `logs/data-oracle-best-case-20261031/` and RL-117.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder

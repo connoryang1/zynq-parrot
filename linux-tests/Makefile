@@ -41,6 +41,7 @@ SCHED_PHYSICAL_PREVIEW_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_smoke_dy
 SCHED_PHYSICAL_MISS_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_miss_dynamic
 SCHED_PHYSICAL_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_dynamic
 SCHED_PHYSICAL_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
+SCHED_DATA_ORACLE_DYNAMIC_APP := $(OUT)/scheduler_data_oracle_best_case_dynamic
 SCHED_PREVIEW_PATH_APP := $(OUT)/scheduler_preview_path
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
@@ -226,6 +227,19 @@ $(SCHED_PHYSICAL_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Make
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+.PHONY: scheduler-data-oracle-best-case-dynamic emit-scheduler-data-oracle-best-case-transfer
+scheduler-data-oracle-best-case-dynamic: $(SCHED_DATA_ORACLE_DYNAMIC_APP)
+
+$(SCHED_DATA_ORACLE_DYNAMIC_APP): scheduler_data_oracle_best_case.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+emit-scheduler-data-oracle-best-case-transfer: check-linux-cc scheduler-data-oracle-best-case-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_data_oracle_best_case_dynamic.b64'
+	@base64 -w 76 $(SCHED_DATA_ORACLE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_data_oracle_best_case_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_data_oracle_best_case_dynamic.b64 > /tmp/scheduler_data_oracle_best_case_dynamic' 'chmod +x /tmp/scheduler_data_oracle_best_case_dynamic'
 
 .PHONY: scheduler-preview-path
 scheduler-preview-path: check-linux-cc $(SCHED_PREVIEW_PATH_APP)
@@ -500,4 +514,5 @@ clean:
 	rm -rf $(OUT)
 
 check-harness:
-	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py
+	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py \
+	  test_scheduler_data_oracle_best_case.py
