@@ -556,6 +556,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the failed route identified a concrete combinational timing defect rather than a capacity failure. Registering only the advisory stream preserves full response throughput and isolates the associative side-buffer bookkeeping from the existing cross-core path.
 - **Limits:** simulation does not prove that the new placement closes timing. The first route must not be deployed despite its wrapper PASS label; independent signoff WNS/WHS checks remain mandatory. No FPGA Linux result is claimed.
 
+### RL-060 — Unmodified RV64 seL4 establishes the software IPC reference
+
+- **Status:** confirmed functional baseline; hardware integration pending
+- **Scope:** pinned non-MCS `qemu-riscv-virt` seL4, a client/server in distinct CSpace/VSpace instances, four request and two reply words, and the upstream hot-cache IPC benchmark
+- **Claim:** unmodified seL4 completes 117 enabled sel4tests including the project-specific 256-call protected-RPC workload, and upstream sel4bench completes all nine IPC cases. Generated code uses the ordinary RV64 `ecall` path, with Call and ReplyRecv transferring the expected four fast message registers. The backend-neutral interface now makes endpoint/region authority opaque and permits software fallback only when a hardware attempt proves that service execution never began.
+- **Evidence:** `sel4/README.md`, `sel4/sel4test/sel4_ipc_baseline.c`, `sel4/include/protected_rpc*.h`, and normalized transcripts under `sel4/results/`; the full sel4test transcript SHA-256 is `c546bf3686dfd355565a12980f8e7c525cab019dfd9e08dedb65240bc4768926`.
+- **Meaning:** Stage 1 supplies a matched software service and a precise exactly-once boundary before seL4 or BlackParrot is modified. The same handler can now be targeted by an ordinary ReplyRecv backend and a later `pcall`/`preturn` backend without exposing hardware identities to applications.
+- **Limits:** QEMU `rdcycle` values are host/emulator diagnostics with unstable overhead, not seL4 hardware or BlackParrot performance. No seL4 kernel adapter, BlackParrot platform port, descriptor generalization, revocation path, or hardware speedup exists yet.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

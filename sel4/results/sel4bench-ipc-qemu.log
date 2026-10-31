@@ -1,0 +1,79 @@
+/dev/shm/sel4bench-rv64/build-qemu-rv64-ipc/simulate: QEMU command: qemu-system-riscv64 -machine virt -cpu rv64 -nographic  -m size=3072 -bios none -kernel images/sel4benchapp-image-riscv-qemu-riscv-virt
+OpenSBI v0.8
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name       : riscv-virtio,qemu
+Platform Features   : timer,mfdeleg
+Platform HART Count : 1
+Boot HART ID        : 0
+Boot HART ISA       : rv64imafdcsuh
+BOOT HART Features  : pmp,scounteren,mcounteren,time
+BOOT HART PMP Count : 16
+Firmware Base       : 0x80000000
+Firmware Size       : 96 KB
+Runtime SBI Version : 0.2
+
+MIDELEG : 0x0000000000001666
+MEDELEG : 0x0000000000f0b509
+PMP0    : 0x0000000080000000-0x000000008001ffff (A)
+PMP1    : 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+ELF-loader started on (HART 0) (NODES 1)
+  paddr=[81000000..8108efff]
+Looking for DTB in CPIO archive...found at 810116b0.
+Loaded DTB from 810116b0.
+   paddr=[80211000..80212fff]
+ELF-loading image 'kernel' to 80200000
+  paddr=[80200000..80210fff]
+  vaddr=[ffffffff80200000..ffffffff80210fff]
+  virt_entry=ffffffff80200000
+ELF-loading image 'rootserver' to 80213000
+  paddr=[80213000..8030bfff]
+  vaddr=[10000..108fff]
+  virt_entry=29fa4
+Enabling MMU and paging
+Jumping to kernel-image entry point...
+
+
+seL4 Benchmark
+==============
+
+Switching to a safer, bigger stack...
+Setting up global fault handler...
+Failed to allocate object of size 274877906944, error 1
+Failed to allocate object of size 137438953472, error 1
+Failed to allocate object of size 68719476736, error 1
+Failed to allocate object of size 34359738368, error 1
+Failed to allocate object of size 17179869184, error 1
+Failed to allocate object of size 8589934592, error 1
+Failed to allocate object of size 4294967296, error 1
+Failed to allocate object of size 2147483648, error 1
+
+ipc Benchmarks (iteration 0)
+============================
+
+Range for vaddr 0x10001000 with 1 4k pages not reserved!
+Mapping new pages to extend brk region failed
+
+Range for vaddr 0x10001000 with 1 4k pages not reserved!
+Mapping new pages to extend brk region failed
+
+Range for vaddr 0x10001000 with 1 4k pages not reserved!
+Mapping new pages to extend brk region failed
+
+Range for vaddr 0x10001000 with 1 4k pages not reserved!
+Mapping new pages to extend brk region failed
+
+JSON OUTPUT
+[{"Benchmark": "One way IPC microbenchmarks", "Results": [{"Function": "seL4_Call", "Direction": "client->server", "Client Prio": 254, "Server Prio": 254, "Same vspace?": true, "IPC length": 0, "Min": 80737, "Max": 338535, "Mean": 129053.0, "Stddev": 86436.552, "Variance": 7004322647.0, "Mode": 80737.0, "Median": 85169.0, "1st quantile": 81819.5, "3rd quantile": 131669.25, "Samples": 16}, {"Function": "seL4_ReplyRecv", "Direction": "server->client", "Client Prio": 254, "Server Prio": 254, "Same vspace?": true, "IPC length": 0, "Min": 81039, "Max": 151466, "Mean": 95446.0, "Stddev": 22659.79, "Variance": 481374472.0, "Mode": 81039.0, "Median": 87273.0, "1st quantile": 81665.0, "3rd quantile": 90159.5, "Samples": 16}, {"Function": "seL4_Call", "Direction": "client->server", "Client Prio": 254, "Server Prio": 254, "Same vspace?": false, "IPC length": 0, "Min": 130613, "Max": 542442, "Mean": 182972.0, "Stddev": 114340.762, "Variance": 12256696814.0, "Mode": 130613.0, "Median": 132865.5, "1st quantile": 131762.0, "3rd quantile": 179318.75, "Samples": 16}, {"Function": "seL4_Call (FPU)", "Direction": "client->server", "Client Prio": 254, "Server Prio": 254, "Same vspace?": false, "IPC length": 0, "Min": 138482, "Max": 194673, "Mean": 150395.0, "Stddev": 16379.513, "Variance": 251520408.0, "Mode": 138482.0, "Median": 147369.5, "1st quantile": 139394.5, "3rd quantile": 149563.25, "Samples": 16}, {"Function": "seL4_ReplyRecv", "Direction": "server->client", "Client Prio": 254, "Server Prio": 254, "Same vspace?": false, "IPC length": 0, "Min": 131440, "Max": 1816803, "Mean": 257631.0, "Stddev": 418843.775, "Variance": 164465726023.0, "Mode": 131440.0, "Median": 136406.5, "1st quantile": 133187.5, "3rd quantile": 149584.5, "Samples": 16}, {"Function": "seL4_ReplyRecv (FPU)", "Direction": "server->client", "Client Prio": 254, "Server Prio": 254, "Same vspace?": false, "IPC length": 0, "Min": 139673, "Max": 176255, "Mean": 150513.0, "Stddev": 12183.529, "Variance": 139160971.0, "Mode": 139673.0, "Median": 145389.0, "1st quantile": 141422.75, "3rd quantile": 156449.0, "Samples": 16}, {"Function": "seL4_Send", "Direction": "client->server", "Client Prio": 253, "Server Prio": 254, "Same vspace?": false, "IPC length": 0, "Min": 211761, "Max": 576321, "Mean": 265195.0, "Stddev": 113951.766, "Variance": 12173442184.0, "Mode": 211761.0, "Median": 214774.0, "1st quantile": 212893.0, "3rd quantile": 237723.5, "Samples": 16}, {"Function": "seL4_Call", "Direction": "client->server", "Client Prio": 254, "Server Prio": 254, "Same vspace?": false, "IPC length": 10, "Min": 217532, "Max": 480133, "Mean": 264232.0, "Stddev": 78982.33500000001, "Variance": 5848321146.0, "Mode": 217532.0, "Median": 225213.5, "1st quantile": 218439.0, "3rd quantile": 272064.0, "Samples": 16}, {"Function": "seL4_ReplyRecv", "Direction": "server->client", "Client Prio": 254, "Server Prio": 254, "Same vspace?": false, "IPC length": 10, "Min": 201570, "Max": 598233, "Mean": 270666.0, "Stddev": 118311.892, "Variance": 13122847311.0, "Mode": 201570.0, "Median": 205233.5, "1st quantile": 203144.75, "3rd quantile": 309752.25, "Samples": 16}], "Iteration": 0}]END JSON OUTPUT
+All is well in the universe.
+
+
+Fin
+QEMU: Terminated

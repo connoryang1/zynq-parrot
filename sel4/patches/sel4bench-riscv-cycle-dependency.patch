@@ -1,0 +1,12 @@
+diff --git a/apps/sel4bench/CMakeLists.txt b/apps/sel4bench/CMakeLists.txt
+index 247713f..99baa15 100644
+--- a/apps/sel4bench/CMakeLists.txt
++++ b/apps/sel4bench/CMakeLists.txt
+@@ -30,6 +30,7 @@ config_string(
+ # all the benchmark applications can use it
+ if((KernelArchX86 AND KernelExportPMCUser AND KernelX86DangerousMSR) OR (KernelArchARM
+                                                                          AND KernelArmExportPMUUser)
++   OR KernelArchRiscV
+    OR (KernelArchArmCortexA8 AND KernelDangerousCodeInjection))
+   set(DefaultBenchDeps TRUE)
+ else()
