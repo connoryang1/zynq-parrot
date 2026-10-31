@@ -71,6 +71,12 @@ install -D -m 0644 "$overlay/configs/defconfig" \
     "$opensbi_source/platform/generic/blackparrot/configs/defconfig"
 
 "${sel4_cross_prefix}objcopy" -O binary "$elfloader" "$payload"
+# OpenSBI's generated linker script does not depend on command-line make
+# variables, and its clean target leaves that script behind.  Reusing an output
+# directory after the elfloader entry moves can therefore silently retain an
+# old FW_PAYLOAD_OFFSET and make the elfloader self-relocation overlap.  Rebuild
+# the script-owned output directory from scratch.
+rm -rf -- "$opensbi_build"
 make -C "$opensbi_source" -j4 \
     O="$opensbi_build" \
     PLATFORM=generic/blackparrot \
@@ -88,6 +94,13 @@ make -C "$opensbi_source" -j4 \
     FW_PAYLOAD=y
 
 firmware="$opensbi_build/platform/generic/blackparrot/firmware/fw_payload.elf"
+embedded_payload_entry=$("${sel4_cross_prefix}readelf" -SW "$firmware" |
+    awk '$2 == ".payload" { print "0x" $4 }')
+if [ -z "$embedded_payload_entry" ] ||
+    [ "$((embedded_payload_entry))" -ne "$((payload_entry))" ]; then
+    echo "OpenSBI embedded payload at $embedded_payload_entry, expected $payload_entry" >&2
+    exit 1
+fi
 "${sel4_cross_prefix}objcopy" -O verilog "$firmware" "$mem"
 sed -i 's/@8/@0/g' "$mem"
 python3 "$nbf_tool" --skip_zeros --config --mem "$mem" --ncpus 1 > "$raw_nbf"
