@@ -165,3 +165,37 @@ and both forced routes:
 ```sh
 scripts/sel4/test_protected_rpc_interface.sh
 ```
+
+## BlackParrot platform bring-up
+
+Stage 3 uses the same pinned sel4test tree and adds only the platform boundary:
+one RV64 hart, 64 MiB at `0x80000000`, a 2 MiB OpenSBI reservation, the
+BlackParrot CLINT at `0x300000`, an 8 MHz timebase, SBI console calls, and the
+dummy PLIC used by seL4's Spike platform. The platform sources live under
+[`platform/blackparrot`](platform/blackparrot); materialize and configure them
+with:
+
+```sh
+scripts/sel4/configure_blackparrot_rpc.sh \
+  /path/to/sel4test-checkout /path/to/build
+ninja -C /path/to/build elfloader
+```
+
+The host must provide the pinned checkout's Python packages plus CMake, Ninja,
+and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
+the qualified BlackParrot OpenSBI platform with:
+
+```sh
+SEL4_CROSS_PREFIX=/path/to/riscv64-unknown-elf- \
+OPENSBI_CROSS_PREFIX=/path/to/riscv64-unknown-linux-gnu- \
+scripts/sel4/package_blackparrot_rpc_nbf.sh \
+  /path/to/build /path/to/opensbi-repo /path/to/work sel4-rpc.nbf
+```
+
+The packager pins OpenSBI commit `7830e987856eb1319c82664702892b6d50a93e7a`,
+disables the unrelated I-cache replay table, embeds the exact seL4 DTB, and
+selects the routed 8 MHz timer. Its output is deterministic for fixed inputs.
+A traced full-core run has reached the OpenSBI platform summary, proving image
+placement, M-mode entry, console, and platform discovery. The ordinary RPC
+test pass on BlackParrot remains the Stage 3 acceptance gate; OpenSBI output
+alone is not counted as that pass.

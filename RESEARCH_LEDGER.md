@@ -565,6 +565,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** Stages 1 and the ordinary-backend portion of Stage 2 now provide a matched service and precise exactly-once boundary before seL4 or BlackParrot hardware is modified. The same handler can be targeted by the current ReplyRecv runtime and a later `pcall`/`preturn` runtime without exposing hardware identities or reply authority to applications.
 - **Limits:** QEMU `rdcycle` values are host/emulator diagnostics with unstable overhead, not seL4 hardware or BlackParrot performance. No seL4 kernel adapter, BlackParrot platform port, descriptor generalization, revocation path, or hardware speedup exists yet.
 
+### RL-061 — BlackParrot seL4 platform image reaches OpenSBI
+
+- **Status:** Stage 3 bring-up in progress; platform build and boot boundary confirmed, RPC pass pending
+- **Scope:** the pinned RL-060 sel4test RPC image, one BlackParrot RV64 hart, 64 MiB DRAM, CLINT/timer/SBI console glue, OpenSBI `7830e987`, and the existing two-thread/four-context full-core model
+- **Claim:** the exact protected-RPC sel4test image builds as a BlackParrot elfloader, packages deterministically as NBF, and reaches the OpenSBI platform summary in a traced full-core run. This proves M-mode entry, payload placement, console output, DTB discovery, and the platform boundary before any seL4 IPC hardware change.
+- **Evidence:** `sel4/platform/blackparrot/`, `scripts/sel4/configure_blackparrot_rpc.sh`, `scripts/sel4/package_blackparrot_rpc_nbf.sh`, and normalized `sel4/results/sel4-blackparrot-opensbi-sim.log`; NBF SHA-256 `dfa0b5e234105b90dfd236f2bdbd00c494bf1a7d423c51d53e9c37868efa9b3b`
+- **Meaning:** the remaining bring-up gate is execution through seL4 and ordinary Call/ReplyRecv, not image construction. The same platform/image will become the control for the later hardware backend.
+- **Limits:** the traced simulator timed out while printing OpenSBI because full-system throughput is low; no BlackParrot seL4 test pass or cycle result is claimed yet. FPGA execution must wait for exclusive board ownership.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
