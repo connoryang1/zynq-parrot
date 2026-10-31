@@ -34,8 +34,15 @@ BUILD_COLLATERAL += bsg_bootrom.sv
 # Run Collateral
 #############################
 
+PROG_RISCV ?=
+
 prog.riscv:
-	@$(FIND) -L $(ZP_RISCV_DIR) -name $(PROG).riscv -exec $(CP) {} $@ \;
+	@if [ -n "$(PROG_RISCV)" ]; then \
+		test -f "$(PROG_RISCV)" || { echo "ERROR: program ELF not found: $(PROG_RISCV)"; exit 1; }; \
+		$(CP) "$(PROG_RISCV)" $@; \
+	else \
+		$(FIND) -L $(ZP_RISCV_DIR) -name $(PROG).riscv -exec $(CP) {} $@ \; ; \
+	fi
 
 %.mem: %.riscv
 	@$(RISCV_OBJCOPY) -O verilog $< $@

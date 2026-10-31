@@ -56,6 +56,17 @@ static uint64_t prefix_status(void)
   return status;
 }
 
+static uint64_t wait_prefix_idle(void)
+{
+  uint64_t status;
+  unsigned waits = 0;
+  do {
+    status = prefix_status();
+    observed_status = status;
+  } while ((status & (1UL << 1)) && ++waits < 10000);
+  return status;
+}
+
 static void fail(void);
 
 static void __attribute__((naked, noinline, used)) supervisor_prefix_trigger(void)
@@ -143,12 +154,7 @@ int main(void)
   enter_supervisor_trigger();
   observed_phase = 2;
 
-  uint64_t status;
-  unsigned waits = 0;
-  do {
-    status = prefix_status();
-    observed_status = status;
-  } while ((status & (1UL << 1)) && ++waits < 10000);
+  uint64_t status = wait_prefix_idle();
   observed_phase = 3;
   if (((status >> 4) & 0x1ff) != 4
       || ((status >> 22) & 0xffff) != 4
@@ -161,6 +167,32 @@ int main(void)
 
   if (replay_target_a(100) != 117 || replay_target_b(100) != 129
       || replay_target_c(100) != 141 || replay_target_d(100) != 153)
+    fail();
+
+  /* Replaying the same prefix while all four completed lines remain in the
+   * advisory buffer must query and drop them rather than withdrawing and
+   * refetching them through the UCE. */
+  observed_phase = 4;
+  enter_supervisor_trigger();
+  status = wait_prefix_idle();
+  if (((status >> 22) & 0xffff) != 4
+      || ((status >> 38) & 0xff) != 2
+      || ((status >> 55) & 0x1ff) != 4)
+    fail();
+
+  /* fence.i invalidates completed advisory-buffer lines. The next trigger
+   * must therefore admit the same four addresses again instead of reporting
+   * stale residency. */
+  observed_phase = 5;
+  __asm__ volatile("fence.i" : : : "memory");
+  enter_supervisor_trigger();
+  status = wait_prefix_idle();
+  if (((status >> 22) & 0xffff) != 8
+      || ((status >> 38) & 0xff) != 3
+      || ((status >> 55) & 0x1ff) != 4)
+    fail();
+  if (replay_target_a(200) != 217 || replay_target_b(200) != 229
+      || replay_target_c(200) != 241 || replay_target_d(200) != 253)
     fail();
 
   post_replay_demand_stream();

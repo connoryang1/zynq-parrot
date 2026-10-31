@@ -19,6 +19,9 @@ module icache_replay_buffer_tb
    input fetch_v_i,
    input fence_i,
    input [63:0] fetch_addr_i,
+   input query_v_i,
+   input [63:0] query_addr_i,
+   output query_hit_o,
    output fetch_yumi_o,
    output hit_v_o,
    output miss_req_v_o,
@@ -99,6 +102,9 @@ module icache_replay_buffer_tb
      ,.ptag_dram_i(1'b1), .tv_flush_i(1'b0), .tv_we_o()
      ,.data_o(fetch_data), .hit_v_o(hit_v_o), .miss_v_o(miss_v)
      ,.fence_v_o(fence_v), .yumi_i(hit_v_o | fence_v)
+     ,.replay_query_v_i(query_v_i)
+     ,.replay_query_paddr_i(paddr_width_p'(query_addr_i))
+     ,.replay_query_hit_o(query_hit_o)
      ,.cache_req_o(cache_req), .cache_req_v_o(cache_req_v)
      ,.cache_req_yumi_i(cache_req_yumi), .cache_req_lock_i(1'b0)
      ,.cache_req_metadata_o(cache_metadata)

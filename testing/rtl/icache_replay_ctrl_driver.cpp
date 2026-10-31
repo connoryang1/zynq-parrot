@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
     dut.count_write_v_i = 0;
     dut.clear_counters_i = 0;
     dut.trigger_v_i = 0;
+    dut.resident_i = 0;
     dut.replay_ready_i = 1;
     tick(); tick();
     dut.reset_i = 0;
@@ -61,10 +62,21 @@ int main(int argc, char **argv) {
     tick();
     pulse(dut.trigger_v_i);
 
+    const std::array<uint64_t, 2> expected_accepted{
+      expected[0], expected[2]
+    };
+    std::vector<uint64_t> queried;
     std::vector<uint64_t> accepted;
     bool direct_tested = false;
-    for (unsigned cycle = 0; cycle < 100 && accepted.size() < expected.size(); ++cycle) {
+    for (unsigned cycle = 0; cycle < 120; ++cycle) {
       dut.eval();
+      dut.resident_i = dut.resident_query_v_o
+        && (dut.resident_query_paddr_o == expected[1]
+            || dut.resident_query_paddr_o == expected[3]);
+      dut.eval();
+      if (dut.resident_query_v_o)
+        queried.push_back(dut.resident_query_paddr_o);
+
       if (dut.replay_v_o && !direct_tested) {
         dut.replay_ready_i = 0;
         tick(); tick();
@@ -89,30 +101,43 @@ int main(int argc, char **argv) {
       if (dut.replay_v_o && dut.replay_ready_i && !dut.direct_v_i)
         accepted.push_back(dut.replay_paddr_o);
       tick();
+      if (!(dut.status_o & (1ULL << 1)) && queried.size() == expected.size() - 1)
+        break;
     }
 
     require(direct_tested, "prefix sequencer never produced an entry");
-    require(accepted.size() == expected.size(), "prefix sequence did not drain");
-    for (unsigned i = 0; i < expected.size(); ++i)
-      require(accepted[i] == expected[i], "prefix table order/data mismatch");
+    // Entry zero is queried while the deliberate retrigger pulse is being
+    // driven above; resident_i is intentionally low then. Observe the three
+    // subsequent queries explicitly here.
+    require(queried.size() == expected.size() - 1,
+            "resident query sequence did not drain");
+    for (unsigned i = 0; i < queried.size(); ++i)
+      require(queried[i] == expected[i + 1], "resident query order/data mismatch");
+    require(accepted.size() == expected_accepted.size(),
+            "resident entries were not suppressed from replay");
+    for (unsigned i = 0; i < expected_accepted.size(); ++i)
+      require(accepted[i] == expected_accepted[i], "prefix table order/data mismatch");
 
     dut.eval();
     const uint64_t status = dut.status_o;
     require(!(status & (1ULL << 1)), "controller remained busy after final admission");
     require(((status >> 4) & 0x1ff) == 4, "configured count status mismatch");
-    require(((status >> 22) & 0xffff) == 4, "accepted counter mismatch");
+    require(((status >> 22) & 0xffff) == 2, "accepted counter mismatch");
     require(((status >> 38) & 0xff) == 1, "trigger counter mismatch");
     require(((status >> 46) & 0xff) == 1, "dropped-trigger counter mismatch");
+    require(((status >> 55) & 0x1ff) == 2, "resident-drop counter mismatch");
 
     pulse(dut.clear_counters_i);
     const uint64_t cleared = dut.status_o;
     require(((cleared >> 22) & 0xffffffffULL) == 0,
             "counter clear did not clear accepted/trigger/drop fields");
+    require(((cleared >> 55) & 0x1ff) == 0,
+            "counter clear did not clear resident-drop field");
     require(((cleared >> 4) & 0x1ff) == 4,
             "counter clear modified configured prefix length");
 
-    std::cout << "[ICACHE-REPLAY-CTRL] PASS: ordered table replay, backpressure, "
-                 "direct priority, retrigger drop, counters\n";
+    std::cout << "[ICACHE-REPLAY-CTRL] PASS: ordered table replay, resident "
+                 "suppression, backpressure, direct priority, retrigger drop, counters\n";
     trace.close();
     return 0;
   } catch (const std::exception &error) {

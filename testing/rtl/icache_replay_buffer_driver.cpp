@@ -79,6 +79,15 @@ class Test {
     }
     throw std::runtime_error("fetch produced neither replay hit nor demand miss");
   }
+  bool query(uint64_t addr) {
+    dut.query_addr_i = addr;
+    dut.query_v_i = 1;
+    dut.eval();
+    const bool hit = dut.query_hit_o;
+    dut.query_v_i = 0;
+    dut.eval();
+    return hit;
+  }
   void fence() {
     dut.fetch_addr_i = 0; dut.fence_i = 1; dut.fetch_v_i = 1;
     bool accepted = false;
@@ -96,7 +105,7 @@ public:
     context.traceEverOn(true);
     dut.trace(&trace, 99); trace.open("icache-replay-buffer.fst");
     dut.reset_i = 1; dut.init_v_i = 0; dut.replay_v_i = 0;
-    dut.fetch_v_i = 0; dut.fence_i = 0;
+    dut.fetch_v_i = 0; dut.fence_i = 0; dut.query_v_i = 0;
   }
   ~Test() { dut.final(); trace.close(); }
   void run() {
@@ -104,21 +113,24 @@ public:
 
     // A partial line must remain architecturally invisible.
     write_beat(0); write_beat(1); write_beat(2);
+    require(!query(line), "partial replay line reported resident");
     fetch(line, false);
 
     // Reset the held miss, then publish all four beats and verify every word.
     dut.reset_i = 1; step(); step(); dut.reset_i = 0; step(); initialize();
     write_line_burst();
+    require(query(line), "complete replay line not reported resident");
     for (unsigned word = 0; word < 8; ++word)
       require(fetch(line + word*8, true) == seed + word,
               "replay-buffer word selection mismatch");
 
     // fence.i must invalidate the detached copy without touching cache tags.
     fence();
+    require(!query(line), "invalidated replay line reported resident");
     fetch(line, false);
     std::cout << "[ICACHE-REPLAY-BUFFER] PASS: partial-line exclusion, "
-                 "consecutive four-beat fill, eight-word execution data, "
-                 "fence invalidation\n";
+                 "completed-residency query, consecutive four-beat fill, "
+                 "eight-word execution data, fence invalidation\n";
   }
 };
 }
