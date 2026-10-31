@@ -35,3 +35,11 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
     "$project_root/sel4/tests/protected_rpc_blackparrot_backend_test.c" \
     -o "$build_dir/protected_rpc_blackparrot_backend_test"
 "$build_dir/protected_rpc_blackparrot_backend_test"
+
+${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    -I"$project_root/sel4/tests/mock_sel4" \
+    -I"$project_root/sel4/include" \
+    "$project_root/sel4/src/protected_rpc_blackparrot_sel4.c" \
+    "$project_root/sel4/tests/protected_rpc_blackparrot_binding_test.c" \
+    -o "$build_dir/protected_rpc_blackparrot_binding_test"
+"$build_dir/protected_rpc_blackparrot_binding_test"
