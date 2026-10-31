@@ -40,6 +40,8 @@ IPC:
 - shared regions were authorized, pinned, and prefaulted before the call;
 - the service does not block, fault, transfer capabilities, or invoke the
   scheduler on the hardware path;
+- the version-1 service is integer-only; `mstatus.FS` remains off and any
+  service needing floating point selects ordinary IPC;
 - the kernel can revoke the binding and always retains a software IPC fallback.
 
 Asynchronous notifications, arbitrary endpoint queues, multiple waiting

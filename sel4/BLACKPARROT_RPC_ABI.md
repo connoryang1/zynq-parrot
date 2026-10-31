@@ -10,9 +10,12 @@ BlackParrot CSRs and hardware-context numbers.
 
 Version 1 has one descriptor slot, one caller, one resident passive server,
 four 64-bit request words, and up to four 64-bit reply words.  The service must
-be prefaulted and nonblocking.  General endpoint queues, capability transfer,
-multiple callers, nested calls, migration, and server faults use ordinary seL4
-IPC until separately implemented.
+be prefaulted, nonblocking, and integer-only. Preparation leaves
+`mstatus.FS=Off`; floating-point registers are not scrubbed because the service
+cannot access them, and any service requiring FP must use ordinary seL4 IPC.
+General endpoint queues, capability transfer, multiple callers, nested calls,
+migration, and server faults use ordinary seL4 IPC until separately
+implemented.
 
 The application continues to name an seL4 endpoint.  A kernel-authorized
 runtime binding privately associates that endpoint with an opaque hardware
@@ -192,11 +195,11 @@ The privileged installer constructs reserved logical context 1 before
 publication; it does not execute untrusted server code as part of binding. Two
 line writes clear the complete integer register image, and one CSR preparation
 write clears machine/supervisor/debug state, disables interrupts, installs the
-staged server SATP, selects U mode, and records the fixed entry PC. The call
-transition later installs only the declared stack/global/thread pointers,
-badge, request registers, and metadata. This removes the legacy bootstrap
-handoff and prevents a newly bound service from inheriting registers or
-privileged state from an earlier occupant.
+staged server SATP, selects U mode with floating point disabled, and records
+the fixed entry PC. The call transition later installs only the declared
+stack/global/thread pointers, badge, request registers, and metadata. This
+removes the legacy bootstrap handoff and prevents a newly bound service from
+inheriting observable registers or privileged state from an earlier occupant.
 
 After commit, context 1 is owned by the binding and the ordinary scheduler must
 not place another TCB there. Version 1 also defers maskable interrupts from an
