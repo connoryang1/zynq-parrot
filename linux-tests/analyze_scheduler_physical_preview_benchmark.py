@@ -12,6 +12,7 @@ from pathlib import Path
 ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_entry=(\d+) load_cycles=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
+CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) lines=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
 
 
@@ -20,7 +21,7 @@ def percentile(values, fraction):
     return ordered[round(fraction * (len(ordered) - 1))]
 
 
-def summarize(rows):
+def summarize(rows, group):
     trials = len(rows)
     if trials < 128 or trials % 4 or [row["trial"] for row in rows] != list(range(trials)):
         raise ValueError("expected at least 128 ordered trials in complete four-trial blocks")
@@ -40,7 +41,8 @@ def summarize(rows):
 
     rng = random.Random(0xB50)
     paired_blocks = trials // 4
-    result = {"trials": trials, "trials_per_mode": trials // 2,
+    result = {"l2_set_group": group, "trials": trials,
+              "trials_per_mode": trials // 2,
               "paired_blocks": paired_blocks, "metrics": {}}
     for metric in METRICS:
         off = [row[metric] for row in rows if row["mode"] == 0]
@@ -73,11 +75,17 @@ def main():
     text = args.transcript.read_text(errors="replace")
     if "PHYSICAL_BENCH_CHILD PASS" not in text or "PHYSICAL_BENCH_PARENT PASS" not in text:
         raise SystemExit("missing guest PASS markers")
+    configs = CONFIG.findall(text)
+    if len(configs) != 1:
+        raise SystemExit("expected exactly one benchmark configuration marker")
+    group, first_offset, lines = map(int, configs[0])
+    if group > 7 or first_offset != group * 256 or lines != 4:
+        raise SystemExit("invalid benchmark configuration marker")
     rows = []
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
         rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
-    print(json.dumps(summarize(rows), indent=2))
+    print(json.dumps(summarize(rows, group), indent=2))
 
 
 if __name__ == "__main__":

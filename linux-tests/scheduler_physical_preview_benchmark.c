@@ -3,7 +3,9 @@
 /* Measure the best-case Linux benefit of four physical L2 preview hints.
  * Target pages remain pinned in both arms. Before every handoff the child
  * pushes the four first-use lines out of the 4 KiB L2, and only scheduler hint
- * emission changes. The target's serial volatile loads expose all cold misses.
+ * emission changes. A dependent pointer ring exposes all four cold misses.
+ * An optional group 0--7 selects two adjacent L2 sets in both banks so a full
+ * sweep can distinguish useful preview timing from post-hint set conflicts.
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -56,22 +58,27 @@ static unsigned mode_for(unsigned trial)
 	return (trial ^ (trial >> 1)) & 1;
 }
 
-static void child_run(int in, int out, volatile struct sample *samples)
+static void child_run(int in, int out, volatile struct sample *samples,
+		      unsigned group)
 {
-	volatile uint64_t *target = mmap(NULL, page_bytes, PROT_READ | PROT_WRITE,
+	volatile unsigned char *target = mmap(NULL, page_bytes,
+					       PROT_READ | PROT_WRITE,
 					MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	volatile unsigned char *eviction = mmap(NULL, eviction_pages * page_bytes,
 						PROT_READ | PROT_WRITE,
 						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	unsigned long target_addr[lines];
+	unsigned target_offset = group * 4 * line_bytes;
 	char token = 'x';
 
 	if (target == MAP_FAILED || eviction == MAP_FAILED)
 		fail("mmap child pages");
-	for (unsigned line = 0; line < lines; line++) {
-		target_addr[line] = (unsigned long)&target[line * line_bytes / 8];
-		*(volatile uint64_t *)target_addr[line] = 0x12340000UL + line;
-	}
+	for (unsigned line = 0; line < lines; line++)
+		target_addr[line] = (unsigned long)&target[target_offset
+							     + line * line_bytes];
+	for (unsigned line = 0; line < lines; line++)
+		*(volatile unsigned long *)target_addr[line]
+			= target_addr[(line + 1) % lines];
 	for (unsigned page = 0; page < eviction_pages; page++)
 		for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
 			eviction[page * page_bytes + offset] = page + offset;
@@ -83,7 +90,8 @@ static void child_run(int in, int out, volatile struct sample *samples)
 	for (unsigned trial = 0; trial < trials; trial++) {
 		unsigned enabled = mode_for(trial);
 		unsigned long before_hook, after_hook;
-		uint64_t checksum = 0, sum = 0, entry, after_load;
+		uint64_t checksum = 0, entry, after_load;
+		unsigned long node;
 
 		if (prctl(PR_BP_PREVIEW_ENABLE, enabled, 0UL, 0UL, 0UL))
 			fail("toggle preview emission");
@@ -100,12 +108,13 @@ static void child_run(int in, int out, volatile struct sample *samples)
 		transfer(out, &token, 1); /* ready */
 		transfer(in, &token, 0);  /* parent blocks; scheduler selects child */
 		entry = cycle();
+		node = target_addr[0];
 		for (unsigned line = 0; line < lines; line++)
-			sum += *(volatile uint64_t *)target_addr[line];
+			node = *(volatile unsigned long *)node;
 		after_load = cycle();
 		samples[trial].entry = entry;
 		samples[trial].after_load = after_load;
-		if (sum != 4 * 0x12340000UL + 6)
+		if (node != target_addr[0])
 			fail("target checksum");
 		after_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
 		if (after_hook == (unsigned long)-1)
@@ -123,14 +132,32 @@ static void child_run(int in, int out, volatile struct sample *samples)
 	puts("PHYSICAL_BENCH_CHILD PASS");
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
+	unsigned group = 0;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
+	char *end = NULL;
+
+	if (argc > 2) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7]\n", argv[0]);
+		return 2;
+	}
+	if (argc == 2) {
+		unsigned long parsed = strtoul(argv[1], &end, 0);
+
+		if (!argv[1][0] || *end || parsed > 7) {
+			fprintf(stderr, "invalid L2 set group: %s\n", argv[1]);
+			return 2;
+		}
+		group = parsed;
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u\n",
+	       group, group * 4 * line_bytes, lines);
 
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
@@ -140,7 +167,7 @@ int main(void)
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		child_run(to_child[0], to_parent[1], samples);
+		child_run(to_child[0], to_parent[1], samples, group);
 		return 0;
 	}
 	close(to_child[0]);
