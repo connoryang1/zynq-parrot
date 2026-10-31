@@ -385,6 +385,38 @@ target work, but it produces a resolved two-switch roundtrip effect. That
 secondary effect needs instruction-only isolation and replication before it
 can be treated as a feature gain.
 
+## Exact-kernel count-zero isolation
+
+The matched data-only image changes only OpenSBI prefix initialization. It
+writes no prefix entries and one count-clear command; all `1,865,933` emitted
+Linux memory records at or above `0x80200000` and every non-memory boot/control
+command compare exactly with the pipe-prefix-12 image. The final NBF SHA-256 is
+`5fe0d96f...969f`; kernel and OpenSBI executable-section CSR scans pass.
+
+The first boot completed ten cells with 39--72 rejected preemptions per cell,
+then hit the established missing-prompt boundary. After full board recovery,
+the disjoint suffix at plan index 10 completed six cells with 43--62 retries,
+runner PASS, and final CORE/BSG PASS. The complete matrix rejects 874
+timer-contaminated attempts. Compressed first-ten and suffix logs hash to
+`a4cf5b50...355e` and `6925ef38...5c8e`; their status records hash to
+`1db69804...3863` and `c4e3c9ef...472e`.
+
+Strict count-zero analysis SHA-256 `5c96fd32...e16` gives:
+
+- early: 2 `[1,5]` local-load cycles saved, 523.25 `[-233.5,1263]`
+  wake-to-load cycles, and 874.5 `[-2267,2850.75]` roundtrip cycles;
+- late: 8.5 `[6,10]` local cycles, 548.75 `[-152.75,1212.75]`
+  wake-to-load cycles, and 19.25 `[-2612.75,2751.25]` roundtrip cycles.
+
+The deterministic independent-bootstrap comparison against pipe-prefix-12
+hashes to `5f4e3938...a89c`. Prefix replay adds `1932.75
+[-960.75,5507.25]` early and `3171.5 [-631,6016.25]` late roundtrip cycles,
+so the instruction contribution itself remains unresolved. It changes
+wake-to-load by `-985.25 [-2017.5,-0.75]` early and `-748 [-1963,351.75]`
+late; the early contrast is resolved harm at the target-resume boundary. This
+keeps instruction replay as the leading explanation for the joint roundtrip
+result but does not establish an instruction or context-switch speedup.
+
 ## Pipe experiment workflow corrections
 
 The first trace build used the Makefile's unavailable default cross compiler

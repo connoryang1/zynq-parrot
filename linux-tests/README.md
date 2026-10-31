@@ -588,6 +588,12 @@ from noisy whole-handoff timing without also reporting the full sweep.
 After all 16 early/late cells finish with final board PASS markers, pass their
 transcripts to `analyze_scheduler_physical_preview_sweep.py`; it requires the
 complete matrix and reports per-cell plus set-stratified pooled intervals.
+When comparing two complete image-level matrices, use
+`compare_scheduler_physical_preview_sweeps.py --control ... --candidate ...`.
+It accepts plain or gzip-compressed transcripts, independently resamples the
+paired blocks within every cache-set stratum, and reports candidate-minus-
+control effect intervals. A resolved effect in one matrix and an unresolved
+effect in another is not by itself evidence that their effects differ.
 
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
