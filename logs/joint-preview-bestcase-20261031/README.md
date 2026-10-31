@@ -210,14 +210,13 @@ traffic, task pair, and benchmark binary across the comparison.
 The isolated Linux 6.6 build passes and disassembly proves a byte load and
 zero-test branch around the sole `csrw 0x5c0, zero` in `__schedule()`. The
 kernel `Image` and `vmlinux.bin` SHA-256 are both
-`df583fd5...e1055`; the reused 64 MiB DTB remains exact at
+`e9496891...c7cb5`; the reused 64 MiB DTB remains exact at
 `bfa8247a...906f`. The old 16 table was recovered directly from accepted donor
 NBF `d7a2964c...e235` and compares entry-for-entry with the generated header.
-The donor-derived OpenSBI payload is `a8008f8e...d902`, and the resulting 8 MHz
-candidate NBF is `86789f0a...e855`. Executable-section CSR collision scans,
+The donor-derived OpenSBI payload is `57b2acd9...a232`, and the resulting 8 MHz
+candidate NBF is `9b94fee3...9a4d`. Executable-section CSR collision scans,
 five strict analyzer tests, six board-runner tests, and three NBF-splice tests
-pass. These are build-readiness results only; Linux boot and timing remain the
-FPGA acceptance gates.
+pass. FPGA boot and timing results are recorded below.
 
 Two build guardrails were exposed before board staging. A direct kernel make
 without Buildroot's `BR_BINARIES_DIR` expanded the configured initramfs path to
@@ -228,3 +227,52 @@ Staging now recognizes the exact trigger in `core.c`; two consecutive complete
 stack staging calls pass. An initial firmware candidate built from the old
 canonical SDK's unpatched OpenSBI source was rejected before FPGA use because
 it lacked the donor's `fw_base.S` and `sbi_hart.c` changes.
+
+The first donor-correct candidate booted Linux, but its baseline SDK rootfs
+contained `test_shutdown.sh` and powered off cleanly before a shell benchmark
+could run, so it is not performance evidence. The replacement begins from the
+exact accepted data-kernel build (`2a9a2e15...f18c`) and preserves its
+decompressed embedded initramfs byte-for-byte at SHA-256
+`0aab5597...e1c1`; only patch 0008 is added. A timestamp-only attempt was
+rejected because changing `BR_BINARIES_DIR` invalidates Kbuild's recorded
+command and regenerates `usr/initramfs_inc_data`.
+
+The first board-stage sequence copied and hash-verified the now-rejected
+baseline-rootfs candidate and then immediately power-cycled for mandatory recovery.
+After boot and overlay load the same pathname hashed as `832239fd...0bd7`, so
+the image was rejected before any guest execution. A not-yet-durable filesystem
+write is the suspected cause, but the hash transition alone does not prove it.
+Future board image staging occurs after power recovery and requires an explicit
+remote `sync` plus a second hash check before the serialized runner starts.
+
+## Runtime-gated total-joint FPGA result
+
+The corrected image booted Linux on the accepted routed bitstream
+`e97e0517...2381`. The strict matrix completed all 16 planned cells with 512
+accepted trials per cell. As in the two prior matrices, the console lost its
+prompt after the tenth completed cell; that unstarted cell was rejected, the
+first-ten log was preserved at raw SHA-256 `65b7dc6b...9505`, and a mandatory
+power-cycle, readiness wait, overlay reload, and NBF re-hash preceded the
+disjoint six-cell suffix. The suffix raw log is `65e7bdb1...9594`, rejects no
+overlapping cells, and ends in CORE/BSG PASS. The benchmark rejected 776
+timer-preempted attempts across both boots.
+
+The stratified paired results are:
+
+- early joint warming: 4.25 `[1,5.75]` cycles saved in the four-load body and
+  536.75 `[-267,1169.75]` cycles saved from wake to the end of those loads;
+- late joint warming: 4.75 `[2.5,7]` local cycles and
+  159.5 `[-760,912.5]` wake-to-load cycles saved.
+
+The early and late full-handoff intervals both cross zero. Using the median of
+the eight disabled cell medians only as a representative denominator, their
+point estimates are about 1.15% and 0.35%, respectively. The accepted claim is
+therefore a small local demand-load improvement, not a Linux context-switch
+speedup. Exact compressed logs, status records, and strict analysis SHA-256
+`2718dbfc...e6a6` are retained in `physical-sweep/`; the compressed first-ten
+and suffix logs hash to `b6b84e2b...c4e9` and `ec426b41...5096`.
+
+A post-run unit-test command invoked the three test files from the repository
+root and failed import collection because `linux-tests/` was not on the Python
+module path. This was a command-location error, not a test failure; invoke the
+same modules with `linux-tests/` as the working directory.

@@ -2,7 +2,7 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
-- **Matched total-joint Linux image prepared — 2026-10-31:** gated the shared instruction-prefix trigger with the incoming task's existing data-preview mode, making mode zero a true instruction/data-off control and modes one/two joint early/late controls in one boot. The isolated kernel and donor-derived old-16 OpenSBI image build, disassembly/CSR guards and 14 benchmark/package regressions pass; NBF `86789f0a...e855` awaits FPGA Linux boot and paired timing (`logs/joint-preview-bestcase-20261031/`).
+- **Total-joint Linux result accepted — 2026-10-31:** a same-boot runtime gate compares instruction/data warming fully off with the exact old-16 instruction replay plus early or late four-line data preview. Across eight cache-set groups, early saves 536.75 `[-267,1169.75]` wake-to-load cycles and late saves 159.5 `[-760,912.5]`, so neither full-handoff effect is resolved; the local four-load body improves by 4.25 `[1,5.75]` and 4.75 `[2.5,7]` cycles. The complete 16-cell matrix uses a hashed first-ten-cell prefix plus recovered six-cell suffix with final CORE/BSG PASS (`logs/joint-preview-bestcase-20261031/`, RL-068).
 
 - **Combined preview matrix completed — 2026-10-31:** A fail-closed NBF splice combines instruction-replay OpenSBI with all 1,861,846 exact accepted data-kernel/DTB records and boots Linux. With instruction replay present in both arms, late data preview saves 12.5 `[11,15]` local load cycles but wake-to-load remains unresolved at `-88.5 [-814.5,542.75]`; the run confirms coexistence, not total joint speedup (`logs/joint-preview-bestcase-20261031/`, RL-067).
 
