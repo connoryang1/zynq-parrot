@@ -166,6 +166,16 @@ and both forced routes:
 scripts/sel4/test_protected_rpc_interface.sh
 ```
 
+`src/protected_rpc_hardware_blackparrot.c` is the version-1 hardware backend
+behind the same boundary. The trusted runtime associates the ordinary endpoint
+with the opaque token returned by a kernel binding operation; one atomic CSR
+attempt then maps completed, non-started, revoked, and committed-failure
+outcomes into the existing fallback state machine. Its host-injected
+architecture test covers reply decoding and proves that only a definitely
+non-started attempt can reach the software backend. The sel4test build still
+selects the hardware stub until the Stage 4 kernel binding and RTL descriptor
+are present.
+
 ## BlackParrot platform bring-up
 
 Stage 3 uses the same pinned sel4test tree and adds only the platform boundary:
@@ -181,6 +191,17 @@ scripts/sel4/configure_blackparrot_rpc.sh \
 ninja -C /path/to/build elfloader
 ```
 
+The configure helper applies one pinned validation-only sel4test patch. It
+links only the protected-RPC test into the child image, reduces the generic
+libc heap from 1 MiB to 64 KiB, and keeps kernel printing enabled in the
+otherwise optimized build. This removes unrelated full-suite load/zero work
+from the cycle-accurate boot while preserving the same RPC test and makes its
+exact pass marker observable.
+
+The same reduced configuration passes under QEMU before the slow full-core
+run; its concise transcript is retained as
+[`results/sel4test-rpc-only-qemu.log`](results/sel4test-rpc-only-qemu.log).
+
 The host must provide the pinned checkout's Python packages plus CMake, Ninja,
 and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
 the qualified BlackParrot OpenSBI platform with:
@@ -194,8 +215,15 @@ scripts/sel4/package_blackparrot_rpc_nbf.sh \
 
 The packager pins OpenSBI commit `7830e987856eb1319c82664702892b6d50a93e7a`,
 disables the unrelated I-cache replay table, embeds the exact seL4 DTB, and
-selects the routed 8 MHz timer. Its output is deterministic for fixed inputs.
-A traced full-core run has reached the OpenSBI platform summary, proving image
-placement, M-mode entry, console, and platform discovery. The ordinary RPC
-test pass on BlackParrot remains the Stage 3 acceptance gate; OpenSBI output
-alone is not counted as that pass.
+selects the routed 8 MHz timer. It places the payload at the elfloader's linked
+entry instead of OpenSBI's default address, avoiding an otherwise redundant
+self-relocation in the slow core model. It also defaults to OpenSBI's
+no-boot-prints option because character-at-a-time firmware diagnostics consume
+several model minutes; set `OPENSBI_FW_OPTIONS=0` when those diagnostics are
+needed. Its output is deterministic for fixed inputs.
+
+The simulation NBF loader stages guest DRAM again after configuration writes
+because the low BlackParrot unfreeze address aliases guest DRAM through the
+model's 32-bit HP0 transform. Physical loading is unchanged. The ordinary RPC
+test's exact `Test SEL4IPCRPC0002 passed` line remains the Stage 3 acceptance
+gate; OpenSBI or ELF-loader output alone is not counted as a pass.
