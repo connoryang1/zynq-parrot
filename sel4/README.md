@@ -26,6 +26,10 @@ After adding the project-specific test, the full regression completed with
 the smaller targeted transcript is retained as
 [`results/sel4test-ipc-baseline-qemu.log`](results/sel4test-ipc-baseline-qemu.log).
 
+With the ordinary protected-RPC adapter included, the full regression
+completed with 118 passing and 51 disabled tests. The full transcript SHA-256
+is `5ba5ac5ebf0182f2bbf2dbc53dde8627620cf9a8142a90c3e74a6a046dbec6b6`.
+
 ## Project-specific test
 
 `sel4_ipc_baseline.c` adds one matched synchronous IPC workload to sel4test. A
@@ -34,6 +38,14 @@ message registers, receives a two-word reply, and verifies that server-private
 state is not shared with the caller. The measured loop uses ordinary
 `seL4_Call` and `seL4_ReplyRecv`; it is the software backend that the future
 `pcall`/`preturn` backend must match.
+
+`sel4_rpc_adapter_test.c` exercises the same lifecycle through the public
+protected-RPC API. It maps one page into the separate server VSpace, resolves
+region/offset/length references using the server's local address, mutates the
+shared words, and verifies private state remains isolated. It also proves that
+an overflowing range and unknown region fail closed, forced hardware reports
+`UNSUPPORTED` without contacting the server, and forced software reports the
+software path.
 
 Materialize the test into a pinned sel4test checkout:
 
@@ -45,10 +57,16 @@ Then configure the checkout normally with the test filter
 `^SEL4IPCRPC0001$`. The helper only creates a source symlink; it does not patch
 or commit upstream repositories.
 
-The test passed 256 measured calls after eight warmups. Its reported QEMU
-value was 592,524 host/emulator ticks per call. This number is retained only to
-make the run auditable: it is neither a target cycle count nor comparable to a
-BlackParrot result.
+The raw reference test passed 256 measured calls after eight warmups. Its
+reported QEMU value was 592,524 host/emulator ticks per call. This number is
+retained only to make the run auditable: it is neither a target cycle count nor
+comparable to a BlackParrot result.
+
+The adapter test passed the same 256-call shape at 585,897 QEMU ticks per call;
+its normalized transcript is
+[`results/sel4test-rpc-adapter-qemu.log`](results/sel4test-rpc-adapter-qemu.log).
+The difference is dominated by QEMU noise plus adapter validation and must not
+be interpreted as a hardware overhead measurement.
 
 ## Official IPC benchmark
 
@@ -127,3 +145,23 @@ The current BlackParrot primitive can carry four request words but only one
 reply word and one fixed descriptor. Supporting the complete interface
 therefore requires hardware generalization; the adapter must reject or use
 ordinary seL4 IPC for unsupported reply shapes rather than truncate them.
+
+## Ordinary seL4 backend
+
+`src/protected_rpc.c` implements route selection and the exactly-once fallback
+state machine. `src/protected_rpc_sel4.c` implements the initial software
+backend with ordinary `seL4_Call`, `seL4_Recv`, and `seL4_ReplyRecv`; seL4
+message labels carry the transport/service status, while up to four fast
+message registers carry the payload. `src/protected_rpc_hardware_stub.c`
+currently reports a precise non-executed result, allowing `AUTO` to fall back
+once and forced-hardware tests to remain observable.
+
+The server runtime owns ReplyRecv authority and invokes an application handler
+with a caller badge and registered local-region table. The handler never sees
+the seL4 reply capability or future hardware continuation. A host-side mock
+test covers hardware completion, safe fallback, rejection, committed failure,
+and both forced routes:
+
+```sh
+scripts/sel4/test_protected_rpc_interface.sh
+```

@@ -12,6 +12,7 @@ checkout=$(realpath "$1")
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_root=$(realpath "$script_dir/../..")
 source_file="$project_root/sel4/sel4test/sel4_ipc_baseline.c"
+adapter_test="$project_root/sel4/sel4test/sel4_rpc_adapter_test.c"
 test_dir="$checkout/projects/sel4test/apps/sel4test-tests/src/tests"
 
 if [ ! -d "$test_dir" ]; then
@@ -26,4 +27,12 @@ if [ "$manifest_revision" != "ae4780bcdc221959949a0ec0aeb559337ea503d0" ]; then
 fi
 
 ln -sfn "$source_file" "$test_dir/sel4_ipc_baseline.c"
-echo "linked $test_dir/sel4_ipc_baseline.c"
+ln -sfn "$adapter_test" "$test_dir/sel4_rpc_adapter_test.c"
+ln -sfn "$project_root/sel4/src/protected_rpc.c" "$test_dir/protected_rpc.c"
+ln -sfn "$project_root/sel4/src/protected_rpc_sel4.c" "$test_dir/protected_rpc_sel4.c"
+ln -sfn "$project_root/sel4/src/protected_rpc_hardware_stub.c" \
+    "$test_dir/protected_rpc_hardware_stub.c"
+ln -sfn "$project_root/sel4/include/protected_rpc.h" "$test_dir/protected_rpc.h"
+ln -sfn "$project_root/sel4/include/protected_rpc_backend.h" \
+    "$test_dir/protected_rpc_backend.h"
+echo "linked protected-RPC tests and sources into $test_dir"

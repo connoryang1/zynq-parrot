@@ -556,13 +556,13 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the failed route identified a concrete combinational timing defect rather than a capacity failure. Registering only the advisory stream preserves full response throughput and isolates the associative side-buffer bookkeeping from the existing cross-core path.
 - **Limits:** simulation does not prove that the new placement closes timing. The first route must not be deployed despite its wrapper PASS label; independent signoff WNS/WHS checks remain mandatory. No FPGA Linux result is claimed.
 
-### RL-060 — Unmodified RV64 seL4 establishes the software IPC reference
+### RL-060 — RV64 seL4 establishes the protected-RPC software backend
 
-- **Status:** confirmed functional baseline; hardware integration pending
+- **Status:** confirmed software-backend checkpoint; hardware integration pending
 - **Scope:** pinned non-MCS `qemu-riscv-virt` seL4, a client/server in distinct CSpace/VSpace instances, four request and two reply words, and the upstream hot-cache IPC benchmark
-- **Claim:** unmodified seL4 completes 117 enabled sel4tests including the project-specific 256-call protected-RPC workload, and upstream sel4bench completes all nine IPC cases. Generated code uses the ordinary RV64 `ecall` path, with Call and ReplyRecv transferring the expected four fast message registers. The backend-neutral interface now makes endpoint/region authority opaque and permits software fallback only when a hardware attempt proves that service execution never began.
-- **Evidence:** `sel4/README.md`, `sel4/sel4test/sel4_ipc_baseline.c`, `sel4/include/protected_rpc*.h`, and normalized transcripts under `sel4/results/`; the full sel4test transcript SHA-256 is `c546bf3686dfd355565a12980f8e7c525cab019dfd9e08dedb65240bc4768926`.
-- **Meaning:** Stage 1 supplies a matched software service and a precise exactly-once boundary before seL4 or BlackParrot is modified. The same handler can now be targeted by an ordinary ReplyRecv backend and a later `pcall`/`preturn` backend without exposing hardware identities to applications.
+- **Claim:** seL4 completes 118 enabled sel4tests including a raw 256-call IPC control and a backend-neutral protected-RPC service over ordinary Call/ReplyRecv; upstream sel4bench completes all nine IPC cases. The adapter resolves a shared region in the server's distinct VSpace, rejects overflowing and unknown references, exposes forced route selection, and preserves private server state. Host tests prove that only a precise non-executed hardware result can fall back to software; rejection and post-commit failure never retry.
+- **Evidence:** `sel4/README.md`, sources under `sel4/src/`, tests under `sel4/sel4test/` and `sel4/tests/`, and normalized transcripts under `sel4/results/`; the 118-test full transcript SHA-256 is `5ba5ac5ebf0182f2bbf2dbc53dde8627620cf9a8142a90c3e74a6a046dbec6b6`.
+- **Meaning:** Stages 1 and the ordinary-backend portion of Stage 2 now provide a matched service and precise exactly-once boundary before seL4 or BlackParrot hardware is modified. The same handler can be targeted by the current ReplyRecv runtime and a later `pcall`/`preturn` runtime without exposing hardware identities or reply authority to applications.
 - **Limits:** QEMU `rdcycle` values are host/emulator diagnostics with unstable overhead, not seL4 hardware or BlackParrot performance. No seL4 kernel adapter, BlackParrot platform port, descriptor generalization, revocation path, or hardware speedup exists yet.
 
 ## Superseded or rejected findings

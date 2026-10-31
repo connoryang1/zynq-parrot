@@ -38,4 +38,7 @@ typedef struct {
     protected_rpc_try_call_fn try_call;
 } protected_rpc_backend_t;
 
+extern const protected_rpc_backend_t protected_rpc_software_backend;
+extern const protected_rpc_backend_t protected_rpc_hardware_backend;
+
 #endif

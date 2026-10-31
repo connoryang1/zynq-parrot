@@ -115,6 +115,23 @@ typedef protected_rpc_status_t (*protected_rpc_handler_t)(
     protected_rpc_message_t *reply,
     void *cookie);
 
+typedef struct {
+    protected_rpc_region_t region;
+    void *local_base;
+    uint64_t size;
+    uint32_t access;
+} protected_rpc_region_binding_t;
+
+typedef struct {
+    protected_rpc_handler_t handler;
+    void *cookie;
+    const protected_rpc_region_binding_t *regions;
+    size_t region_count;
+
+    /* Zero serves forever; a finite count is useful for tests and teardown. */
+    uint64_t max_requests;
+} protected_rpc_server_config_t;
+
 /*
  * Run the same handler body behind either a seL4 ReplyRecv loop or a protected
  * hardware entry/return stub.  The runtime, not the handler, owns reply
@@ -122,8 +139,7 @@ typedef protected_rpc_status_t (*protected_rpc_handler_t)(
  */
 protected_rpc_status_t protected_rpc_serve(
     protected_rpc_endpoint_t endpoint,
-    protected_rpc_handler_t handler,
-    void *cookie);
+    const protected_rpc_server_config_t *config);
 
 static inline int protected_rpc_message_valid(
     const protected_rpc_message_t *message)
