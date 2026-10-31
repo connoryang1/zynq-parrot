@@ -10,28 +10,16 @@
   .option norvc
   .balign 4096
 
-  .globl bp_rpc_demo_server_bootstrap
-  .type bp_rpc_demo_server_bootstrap, @function
-bp_rpc_demo_server_bootstrap:
-  /* Establish server-private state and tell the monitor that context 1 ran. */
-  li t0, 0x40000
-  li t1, 0x1000
-  sd t1, 0(t0)
-  li t0, 0x70000
-  li t1, 1
-  sd t1, 64(t0)
-
-  /* This setup-time raw return is disabled after M mode installs the
-   * protected descriptor. */
-  csrwi 0x800, 0
-1:
-  j 1b
-  .size bp_rpc_demo_server_bootstrap, .-bp_rpc_demo_server_bootstrap
+  .globl bp_rpc_demo_service_page
+bp_rpc_demo_service_page:
 
   .balign 64
   .globl bp_rpc_demo_service_entry
   .type bp_rpc_demo_service_entry, @function
 bp_rpc_demo_service_entry:
+  /* Both GPR lines were dirtied before privileged preparation. */
+  bnez s0, 3f
+  bnez s2, 3f
   /* Reject an invalid caller-provided range before touching private state. */
   li t2, 8
   bne a1, t2, 3f

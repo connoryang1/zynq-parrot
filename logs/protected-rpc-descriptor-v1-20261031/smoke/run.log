@@ -408,11 +408,11 @@ BSG-INFO:    ps.cpp: reading three base registers
 BSG-INFO:    ps.cpp: reset(lo)=0, dram_init=0, dram_base=0
 BSG-INFO:    ps.cpp: attempting to write and read register 0x8
 BSG-INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
-BSG-INFO:    Creating host: 0x7ffd95735850 40000030 40000028
+BSG-INFO:    Creating host: 0x7ffc60488f90 40000030 40000028
 BSG-INFO:    Setting non-blocking terminal mode
 BSG-INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 134217728
 BSG-INFO:      bsg_zynq_pl: Allocated dummy DRAM
-BSG-INFO:    ps.cpp: received 0x7f5b9c1b1000 (phys = 7f5b9c1b1000)
+BSG-INFO:    ps.cpp: received 0x7f53a0e6c000 (phys = 7f53a0e6c000)
 BSG-INFO:    ps.cpp: wrote and verified base register
 BSG-INFO:    ps.cpp: zeroed 134217728 bytes of simulated AXI RAM
 BSG-INFO:    ps.cpp: beginning config
@@ -440,8 +440,7 @@ BSG-INFO:    ps.cpp: NBF Load Progress: 90%
 BSG-INFO:    ps.cpp: NBF Load Progress: 95%
 BSG-INFO:    ps.cpp: NBF Load Progress: 100%
 BSG-INFO:    ps.cpp: initialized 3328 AXI RAM writes directly
-BSG-INFO:    ps.cpp: NBF load took 0.098996 seconds
-BSG-INFO:    ps.cpp: trace timeout armed for 1200 seconds
+BSG-INFO:    ps.cpp: NBF load took 0.097506 seconds
 ps.cpp: Heartbeat - Retired 1739 instructions...
 === ctxtsw smoke test ===
 [BSG-PASS] ctxtsw smoke test completed
@@ -450,11 +449,11 @@ BSG-INFO:    ps.cpp: end polling i/o
 BSG-INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
 BSG-INFO:    ps.cpp: minstret (instructions retired):             3518 (             dbe)
 BSG-INFO:    ps.cpp: minstret delta:                              3518 (             dbe)
-BSG-INFO:    ps.cpp: wall clock time                :       9263130348 (       2282026ec) ns
+BSG-INFO:    ps.cpp: wall clock time                :       8670434210 (       204cc53a2) ns
 BSG-INFO:      bsg_zynq_pl: done() called, exiting
 BSG-INFO:    Restoring terminal settings
 BSG-INFO:    Returning from ps_main with RC: 0
 BSG-INFO:    BSG PASS
 [648550000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
-%Error: /dev/shm/zp-rpc-transport-build/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
+%Error: /dev/shm/zp-rpc-library/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
 Aborting...

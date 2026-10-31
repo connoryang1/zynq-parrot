@@ -58,12 +58,29 @@ static inline void rpc_data_write(uint64_t value)
   __asm__ volatile("csrw 0x7c3, %0" : : "r"(value) : "memory");
 }
 
+static void seed_server_register(unsigned reg, uint64_t value)
+{
+  const unsigned context_width = BP_NUM_CONTEXTS <= 4 ? 2 : 4;
+  const uint64_t encoded = (value & ((UINT64_C(1) << 39) - 1))
+                           | (UINT64_C(1) << 39)
+                           | ((uint64_t)reg << (39 + context_width));
+  __asm__ volatile("csrw 0x802, %0" : : "r"(encoded) : "memory");
+}
+
 static uint64_t rpc_stage(bp_rpc_descriptor_field_t field, uint64_t value)
 {
   uint64_t status;
   rpc_data_write(value);
   const uint64_t control =
     bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, 0);
+  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
+                   : "=r"(status) : "r"(control) : "memory");
+  return status;
+}
+
+static uint64_t rpc_control(uint64_t control)
+{
+  uint64_t status;
   __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
                    : "=r"(status) : "r"(control) : "memory");
   return status;
@@ -85,11 +102,15 @@ static uint64_t rpc_install_descriptor(uint64_t caller_satp,
   status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word(4, 4, 0, 1));
   if (status != BP_RPC_CONTROL_OK)
     return status;
-  const uint64_t control =
-    bp_rpc_control_word(BP_RPC_CONTROL_COMMIT, BP_RPC_FIELD_TOKEN, 0);
-  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
-                   : "=r"(status) : "r"(control) : "memory");
-  return status;
+  for (unsigned component = 0; component < BP_RPC_PREPARE_COMPONENTS;
+       component++) {
+    status = rpc_control(bp_rpc_prepare_word(
+      (bp_rpc_prepare_component_t)component, 0));
+    if (status != BP_RPC_CONTROL_OK)
+      return status;
+  }
+  return rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                                          BP_RPC_FIELD_TOKEN, 0));
 }
 
 static inline uint64_t physical_address(const void *ptr)
@@ -124,12 +145,6 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "li t0, 0x50000\n"
     "li t1, 0x33\n"
     "sd t1, 0(t0)\n"
-
-    /* Context 1 was initialized from M/Bare before entering this U/Sv39 caller. */
-    "li t0, 0x50000\n"
-    "ld t1, 64(t0)\n"
-    "li t2, 1\n"
-    "bne t1, t2, 7f\n"
 
     /* Descriptor publication locks the legacy NPC/switch interface. Point at
      * an unauthorized PC and require both calls to enter the fixed entry. */
@@ -223,14 +238,12 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
 {
   __asm__ volatile(
     ".option push\n.option norvc\n"
-    /* Untimed initialization handshake. */
-    "li t0, 0x40000\nli t1, 0x5555666677778888\nsd t1, 0(t0)\n"
-    "li t0, 0x50000\nli t1, 1\nsd t1, 64(t0)\n"
-    "csrwi 0x800, 0\n"
     /* Every protected entry carries the fixed badge and four atomically
-     * installed arguments. */
+     * installed arguments. s0 and s2 were deliberately dirtied before
+     * preparation and must have been scrubbed across both GPR lines. */
     ".global server_service\nserver_service:\n"
-    "1: li t2, 0x99\nbne s1, t2, 2f\n"
+    "1: bnez s0, 2f\nbnez s2, 2f\n"
+    "li t2, 0x99\nbne s1, t2, 2f\n"
     "li t2, 4\nbeq a5, t2, 3f\n"
     "2: "
     "li a0, -2\nli a1, 0\nli a2, 0\nli a3, 0\nli a5, 4\n"
@@ -252,24 +265,11 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
   );
 }
 
-static void __attribute__((naked, noinline, used)) server_machine_bootstrap(void)
-{
-  __asm__ volatile(
-    ".option push\n.option norvc\n"
-    "la t0, server_satp_value\nld t1, 0(t0)\ncsrw satp, t1\nsfence.vma\n"
-    "li t0, 0x20000\ncsrw mepc, t0\n"
-    "csrr t0, mstatus\nli t1, 0x1800\nnot t1, t1\nand t0, t0, t1\ncsrw mstatus, t0\n"
-    "li sp, 0x60ff0\nmret\n"
-    ".option pop\n"
-  );
-}
-
 static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 {
   const int pass = shared_page[3] == 1
                    && shared_page[1] == CALLER_PRIVATE_VALUE
                    && shared_page[2] == SERVER_PRIVATE_VALUE
-                   && shared_page[8] == 1
                    && caller_private[0] == CALLER_PRIVATE_VALUE
                    && server_private[0] == SERVER_PRIVATE_VALUE
                    && unexpected_mcause == 0;
@@ -288,9 +288,8 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 
   bp_print_string("[BSG-FAIL] atomic protected RPC hardware\nverdict: ");
   bp_hprint_uint64(shared_page[3]);
-  bp_print_string("\nshared result/bootstrap: ");
+  bp_print_string("\nshared result: ");
   bp_hprint_uint64(shared_page[2]);
-  bp_hprint_uint64(shared_page[8]);
   bp_print_string("\ncaller/server private: ");
   bp_hprint_uint64(caller_private[0]);
   bp_hprint_uint64(server_private[0]);
@@ -362,17 +361,14 @@ int main(void)
 
   __asm__ volatile("csrw medeleg, zero\ncsrw mideleg, zero" ::: "memory");
   __asm__ volatile("csrw mtvec, %0" : : "r"((uint64_t)machine_trap_entry) : "memory");
-  /* Initialize context 1 before installing the descriptor. Its U-mode
-   * trampoline uses the still-unlocked legacy handoff to return here; the
-   * subsequent protected descriptor then locks that path for both domains. */
+  seed_server_register(8, UINT64_C(0x11111));
+  seed_server_register(18, UINT64_C(0x22222));
+  /* The descriptor controller constructs context 1 directly from the staged
+   * U/Sv39 image; no legacy execution or bootstrap handoff is required. */
   {
     const uint64_t server_service_va =
       SERVER_ENTRY_VA + physical_address(server_service)
       - physical_address(server_entry);
-    const uint64_t server_bootstrap_seed =
-      (UINT64_C(1) << 39) | physical_address(server_machine_bootstrap);
-    __asm__ volatile("csrw 0x801, %0" : : "r"(server_bootstrap_seed) : "memory");
-    __asm__ volatile("csrwi 0x800, 1" ::: "memory");
     /* Seed observably nonzero legacy diagnostic state while M-mode access is
      * still authorized. The caller verifies the post-install read lock. */
     __asm__ volatile("li t0, 0x5a5a\ncsrw 0x803, t0\ncsrwi 0x805, 1"

@@ -408,16 +408,16 @@ BSG-INFO:    ps.cpp: reading three base registers
 BSG-INFO:    ps.cpp: reset(lo)=0, dram_init=0, dram_base=0
 BSG-INFO:    ps.cpp: attempting to write and read register 0x8
 BSG-INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
-BSG-INFO:    Creating host: 0x7ffcaf3e56d0 40000030 40000028
+BSG-INFO:    Creating host: 0x7ffe6923ae90 40000030 40000028
 BSG-INFO:    Setting non-blocking terminal mode
 BSG-INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 134217728
 BSG-INFO:      bsg_zynq_pl: Allocated dummy DRAM
-BSG-INFO:    ps.cpp: received 0x7fdea41a3000 (phys = 7fdea41a3000)
+BSG-INFO:    ps.cpp: received 0x7f7c11fd7000 (phys = 7f7c11fd7000)
 BSG-INFO:    ps.cpp: wrote and verified base register
 BSG-INFO:    ps.cpp: zeroed 134217728 bytes of simulated AXI RAM
 BSG-INFO:    ps.cpp: beginning config
 BSG-INFO:    ps.cpp: beginning nbf load
-BSG-INFO:    ps.cpp: NBF file has 3464 lines. Starting load...
+BSG-INFO:    ps.cpp: NBF file has 3562 lines. Starting load...
 BSG-INFO:    ps.cpp: NBF Load Progress: 0%
 BSG-INFO:    ps.cpp: NBF Load Progress: 5%
 BSG-INFO:    ps.cpp: NBF Load Progress: 10%
@@ -439,21 +439,20 @@ BSG-INFO:    ps.cpp: NBF Load Progress: 85%
 BSG-INFO:    ps.cpp: NBF Load Progress: 90%
 BSG-INFO:    ps.cpp: NBF Load Progress: 95%
 BSG-INFO:    ps.cpp: NBF Load Progress: 100%
-BSG-INFO:    ps.cpp: initialized 3456 AXI RAM writes directly
-BSG-INFO:    ps.cpp: NBF load took 0.100086 seconds
-BSG-INFO:    ps.cpp: trace timeout armed for 1200 seconds
-ps.cpp: Heartbeat - Retired 1163 instructions...
+BSG-INFO:    ps.cpp: initialized 3554 AXI RAM writes directly
+BSG-INFO:    ps.cpp: NBF load took 0.097785 seconds
+ps.cpp: Heartbeat - Retired 1316 instructions...
 [BSG-PASS] atomic protected RPC descriptor control
 BSG-INFO:    CORE PASS
 BSG-INFO:    ps.cpp: end polling i/o
 BSG-INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
-BSG-INFO:    ps.cpp: minstret (instructions retired):             2564 (             a04)
-BSG-INFO:    ps.cpp: minstret delta:                              2564 (             a04)
-BSG-INFO:    ps.cpp: wall clock time                :       7079056362 (       1a5f1d3ea) ns
+BSG-INFO:    ps.cpp: minstret (instructions retired):             2762 (             aca)
+BSG-INFO:    ps.cpp: minstret delta:                              2762 (             aca)
+BSG-INFO:    ps.cpp: wall clock time                :       7518430122 (       1c02223aa) ns
 BSG-INFO:      bsg_zynq_pl: done() called, exiting
 BSG-INFO:    Restoring terminal settings
 BSG-INFO:    Returning from ps_main with RC: 0
 BSG-INFO:    BSG PASS
-[536050000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
-%Error: /dev/shm/zp-rpc-transport-build/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
+[574450000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
+%Error: /dev/shm/zp-rpc-library/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
 Aborting...

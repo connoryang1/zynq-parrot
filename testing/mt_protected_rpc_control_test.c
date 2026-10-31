@@ -31,6 +31,11 @@ static uint64_t rpc_token_command(bp_rpc_control_command_t command,
   return rpc_control(bp_rpc_control_word(command, BP_RPC_FIELD_TOKEN, slot));
 }
 
+static uint64_t rpc_prepare(bp_rpc_prepare_component_t component)
+{
+  return rpc_control(bp_rpc_prepare_word(component, 0));
+}
+
 static uint64_t rpc_stage_descriptor(uint64_t token, uint64_t caller_satp,
                                      uint64_t server_satp)
 {
@@ -107,6 +112,37 @@ int main(void)
   EXPECT("stage valid descriptor",
          rpc_stage_descriptor(token, caller_satp, server_satp),
          BP_RPC_CONTROL_OK);
+  EXPECT("reject unprepared commit",
+         rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                                         BP_RPC_FIELD_TOKEN, 0)),
+         BP_RPC_CONTROL_INVALID);
+  EXPECT("restage valid descriptor",
+         rpc_stage_descriptor(token, caller_satp, server_satp),
+         BP_RPC_CONTROL_OK);
+  EXPECT("reject unknown preparation component",
+         rpc_prepare((bp_rpc_prepare_component_t)BP_RPC_PREPARE_COMPONENTS),
+         BP_RPC_CONTROL_INVALID);
+  EXPECT("prepare lower GPR line",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE0), BP_RPC_CONTROL_OK);
+  EXPECT("prepare upper GPR line",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE1), BP_RPC_CONTROL_OK);
+  EXPECT("prepare CSR bank",
+         rpc_prepare(BP_RPC_PREPARE_CSR), BP_RPC_CONTROL_OK);
+  EXPECT("restaging invalidates preparation",
+         rpc_stage(BP_RPC_FIELD_TOKEN, token), BP_RPC_CONTROL_OK);
+  EXPECT("reject commit after restaging",
+         rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                                         BP_RPC_FIELD_TOKEN, 0)),
+         BP_RPC_CONTROL_INVALID);
+  EXPECT("restage descriptor after invalidated preparation",
+         rpc_stage_descriptor(token, caller_satp, server_satp),
+         BP_RPC_CONTROL_OK);
+  EXPECT("reprepare lower GPR line",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE0), BP_RPC_CONTROL_OK);
+  EXPECT("reprepare upper GPR line",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE1), BP_RPC_CONTROL_OK);
+  EXPECT("reprepare CSR bank",
+         rpc_prepare(BP_RPC_PREPARE_CSR), BP_RPC_CONTROL_OK);
   EXPECT("atomic commit",
          rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
                                          BP_RPC_FIELD_TOKEN, 0)),

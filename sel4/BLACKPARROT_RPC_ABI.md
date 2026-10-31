@@ -135,12 +135,20 @@ validation so supervisor memory cannot change underneath the check.
 
 OpenSBI drives two M-mode-only custom CSRs defined in
 `blackparrot_rpc_abi.h`. It writes one 64-bit value to `M_DATA`, then writes a
-`STAGE(field, slot)` control word; `COMMIT` publishes all staged fields in one
-architectural step. `REVOKE` compares the token most recently written to
-`M_DATA` before clearing `valid`, and refuses an active slot. Reading
-`M_CONTROL` returns the last control status. This data/control pair keeps the
-RTL boundary fixed while the versioned memory image evolves, and prevents a
-partially staged descriptor from authorizing a call.
+`STAGE(field, slot)` control word. After the final stage, `INSTALL` issues
+`PREPARE(GPR_LINE0)`, `PREPARE(GPR_LINE1)`, and `PREPARE(CSR)`. These commands
+zero all 31 writable server GPRs and construct an inactive U/Sv39 CSR bank from
+the staged server SATP and entry PC. Any subsequent `STAGE` invalidates all
+three preparation acknowledgements. `COMMIT` succeeds only after the complete
+staged image and all preparation components are valid, then publishes the
+descriptor in one architectural step.
+
+`REVOKE` compares the token most recently written to `M_DATA` before clearing
+`valid`, and refuses an active slot. Reading `M_CONTROL` returns the last
+control status. This data/control pair keeps the RTL boundary fixed while the
+versioned memory image evolves, prevents a partially staged descriptor from
+authorizing a call, and ensures that descriptor visibility cannot precede
+construction of its protection domain.
 
 The staged `CONFIG` value packs request words in bits 7:0, reply words in
 15:8, caller context in 31:16, and server context in 47:32; bits 63:48 are
@@ -153,14 +161,17 @@ revoke and observe `OK`, remove mappings or capabilities, then release the
 binding.  The kernel must not destroy or reuse an object while revocation is
 `BUSY`.
 
-## Resident-server bootstrap
+## Resident-server construction
 
-Before publication, the kernel runs the server once in reserved logical
-context 1, enters its Sv39 user image, and has it block in a dedicated bind-wait
-operation. The kernel then returns to the authorized caller in context 0 while
-legacy privileged handoff is still available. This leaves a genuine server
-SATP/privilege snapshot in the resident bank; descriptor commit does not clone
-the caller's kernel CSR image into the server.
+The privileged installer constructs reserved logical context 1 before
+publication; it does not execute untrusted server code as part of binding. Two
+line writes clear the complete integer register image, and one CSR preparation
+write clears machine/supervisor/debug state, disables interrupts, installs the
+staged server SATP, selects U mode, and records the fixed entry PC. The call
+transition later installs only the declared stack/global/thread pointers,
+badge, request registers, and metadata. This removes the legacy bootstrap
+handoff and prevents a newly bound service from inheriting registers or
+privileged state from an earlier occupant.
 
 After commit, context 1 is owned by the binding and the ordinary scheduler must
 not place another TCB there. Version 1 also defers maskable interrupts from an
@@ -182,6 +193,9 @@ outside the version-1 fast path and must never cause an automatic retry.
 5. The server cannot forge a caller, return PC, or second return.
 6. Logs identify the selected path, and counters distinguish rejected,
    committed, completed, and software-fallback calls.
+7. Commit before complete preparation fails, staging after preparation clears
+   the preparation state, and a prepared server begins with zero in every GPR
+   not explicitly installed by the call transition.
 
 Any server fault/cancellation path not yet capable of producing an explicit
 `COMMITTED_FAILED` result is outside the hardware fast path and must be ruled

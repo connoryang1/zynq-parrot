@@ -34,17 +34,23 @@ static int bp_rpc_copy_descriptor(bp_rpc_descriptor_v1_t *destination,
     return 0;
 }
 
-static void bp_rpc_stage(uint32_t slot, bp_rpc_descriptor_field_t field,
-                         uint64_t value)
-{
-    csr_write(BP_RPC_CSR_M_DATA, value);
-    csr_write(BP_RPC_CSR_M_CONTROL,
-              bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, slot));
-}
-
 static bp_rpc_control_status_t bp_rpc_status(void)
 {
     return (bp_rpc_control_status_t)csr_read(BP_RPC_CSR_M_CONTROL);
+}
+
+static bp_rpc_control_status_t bp_rpc_control(uint64_t control)
+{
+    csr_write(BP_RPC_CSR_M_CONTROL, control);
+    return bp_rpc_status();
+}
+
+static bp_rpc_control_status_t
+bp_rpc_stage(uint32_t slot, bp_rpc_descriptor_field_t field, uint64_t value)
+{
+    csr_write(BP_RPC_CSR_M_DATA, value);
+    return bp_rpc_control(
+        bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, slot));
 }
 
 static int
@@ -53,6 +59,7 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
 {
     bp_rpc_descriptor_v1_t descriptor;
     int error = bp_rpc_copy_descriptor(&descriptor, supervisor_descriptor);
+    bp_rpc_control_status_t control_status;
 
     if (error) {
         *token = 0;
@@ -65,31 +72,60 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
         return SBI_EINVAL;
     }
 
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_TOKEN, descriptor.token);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CALLER_SATP,
-                 descriptor.caller_satp);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_SATP,
-                 descriptor.server_satp);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_ENTRY,
-                 descriptor.server_entry);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_SP,
-                 descriptor.server_sp);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_GP,
-                 descriptor.server_gp);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_TP,
-                 descriptor.server_tp);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CALLER_BADGE,
-                 descriptor.caller_badge);
-    bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CONFIG,
-                 bp_rpc_config_word(descriptor.request_words,
-                                    descriptor.reply_words,
-                                    descriptor.caller_context,
-                                    descriptor.server_context));
-    csr_write(BP_RPC_CSR_M_CONTROL,
-              bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
-                                  BP_RPC_FIELD_TOKEN, descriptor.slot));
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_TOKEN,
+                                  descriptor.token);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CALLER_SATP,
+                                  descriptor.caller_satp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_SATP,
+                                  descriptor.server_satp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_ENTRY,
+                                  descriptor.server_entry);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_SP,
+                                  descriptor.server_sp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_GP,
+                                  descriptor.server_gp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_TP,
+                                  descriptor.server_tp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CALLER_BADGE,
+                                  descriptor.caller_badge);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(
+        descriptor.slot, BP_RPC_FIELD_CONFIG,
+        bp_rpc_config_word(descriptor.request_words, descriptor.reply_words,
+                           descriptor.caller_context,
+                           descriptor.server_context));
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
 
-    *status = bp_rpc_status();
+    for (unsigned int component = 0;
+         component < BP_RPC_PREPARE_COMPONENTS; component++) {
+        control_status = bp_rpc_control(bp_rpc_prepare_word(
+            (bp_rpc_prepare_component_t)component, descriptor.slot));
+        if (control_status != BP_RPC_CONTROL_OK)
+            goto control_failure;
+    }
+
+    control_status = bp_rpc_control(
+        bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                            BP_RPC_FIELD_TOKEN, descriptor.slot));
+
+control_failure:
+    *status = control_status;
     *token = *status == BP_RPC_CONTROL_OK ? descriptor.token : 0;
     return *status == BP_RPC_CONTROL_INVALID ? SBI_EINVAL : 0;
 }
@@ -97,19 +133,15 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
 static bp_rpc_control_status_t bp_rpc_revoke(uint32_t slot, uint64_t token)
 {
     csr_write(BP_RPC_CSR_M_DATA, token);
-    csr_write(BP_RPC_CSR_M_CONTROL,
-              bp_rpc_control_word(BP_RPC_CONTROL_REVOKE,
-                                  BP_RPC_FIELD_TOKEN, slot));
-    return bp_rpc_status();
+    return bp_rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_REVOKE,
+                                               BP_RPC_FIELD_TOKEN, slot));
 }
 
 static bp_rpc_control_status_t bp_rpc_query(uint32_t slot, uint64_t token)
 {
     csr_write(BP_RPC_CSR_M_DATA, token);
-    csr_write(BP_RPC_CSR_M_CONTROL,
-              bp_rpc_control_word(BP_RPC_CONTROL_READ_STATUS,
-                                  BP_RPC_FIELD_TOKEN, slot));
-    return bp_rpc_status();
+    return bp_rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_READ_STATUS,
+                                               BP_RPC_FIELD_TOKEN, slot));
 }
 
 bool bp_rpc_vendor_ext_check(void)

@@ -175,7 +175,7 @@ architecture test covers reply decoding and proves that only a definitely
 non-started attempt can reach the software backend. The atomically published
 RTL descriptor and bare-metal call/return transport are now implemented and
 tested, but sel4test still selects the hardware stub until the Stage 4 kernel
-binding authorizes, bootstraps, installs, and revokes a resident server.
+binding authorizes, constructs, installs, and revokes a resident server.
 
 ## BlackParrot platform bring-up
 

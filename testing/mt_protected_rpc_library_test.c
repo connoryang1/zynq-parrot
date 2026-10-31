@@ -54,12 +54,21 @@ static volatile uint64_t unexpected_mcause;
 static volatile uint64_t unexpected_mepc;
 static volatile uint64_t unexpected_mtval;
 
-extern void bp_rpc_demo_server_bootstrap(void);
+extern void bp_rpc_demo_service_page(void);
 extern void bp_rpc_demo_service_entry(void);
 
 static inline void rpc_data_write(uint64_t value)
 {
   __asm__ volatile("csrw 0x7c3, %0" : : "r"(value) : "memory");
+}
+
+static void seed_server_register(unsigned reg, uint64_t value)
+{
+  const unsigned context_width = BP_NUM_CONTEXTS <= 4 ? 2 : 4;
+  const uint64_t encoded = (value & ((UINT64_C(1) << 39) - 1))
+                           | (UINT64_C(1) << 39)
+                           | ((uint64_t)reg << (39 + context_width));
+  __asm__ volatile("csrw 0x802, %0" : : "r"(encoded) : "memory");
 }
 
 static uint64_t rpc_stage(bp_rpc_descriptor_field_t field, uint64_t value)
@@ -68,6 +77,14 @@ static uint64_t rpc_stage(bp_rpc_descriptor_field_t field, uint64_t value)
   rpc_data_write(value);
   const uint64_t control =
     bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, 0);
+  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
+                   : "=r"(status) : "r"(control) : "memory");
+  return status;
+}
+
+static uint64_t rpc_control(uint64_t control)
+{
+  uint64_t status;
   __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
                    : "=r"(status) : "r"(control) : "memory");
   return status;
@@ -89,11 +106,15 @@ static uint64_t rpc_install_descriptor(uint64_t caller_satp,
   status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word(4, 1, 0, 1));
   if (status != BP_RPC_CONTROL_OK)
     return status;
-  const uint64_t control =
-    bp_rpc_control_word(BP_RPC_CONTROL_COMMIT, BP_RPC_FIELD_TOKEN, 0);
-  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
-                   : "=r"(status) : "r"(control) : "memory");
-  return status;
+  for (unsigned component = 0; component < BP_RPC_PREPARE_COMPONENTS;
+       component++) {
+    status = rpc_control(bp_rpc_prepare_word(
+      (bp_rpc_prepare_component_t)component, 0));
+    if (status != BP_RPC_CONTROL_OK)
+      return status;
+  }
+  return rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                                          BP_RPC_FIELD_TOKEN, 0));
 }
 
 static inline uint64_t physical_address(const void *ptr)
@@ -153,19 +174,6 @@ caller_entry(void)
   __builtin_unreachable();
 }
 
-static void __attribute__((naked, noinline, used)) server_machine_bootstrap(void)
-{
-  __asm__ volatile(
-    ".option push\n.option norvc\n"
-    "la t0, server_satp_value\nld t1, 0(t0)\n"
-    "csrw satp, t1\nsfence.vma\n"
-    "li t0, 0x20000\ncsrw mepc, t0\n"
-    "csrr t0, mstatus\nli t1, 0x1800\nnot t1, t1\n"
-    "and t0, t0, t1\ncsrw mstatus, t0\n"
-    "li sp, 0x60ff0\nmret\n"
-    ".option pop\n");
-}
-
 static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 {
   const unsigned caller_entry_index = (CALLER_ENTRY_VA >> 12) & 0x1ff;
@@ -183,7 +191,6 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
                    && shared_page[2] == SERVER_COUNTER_FINAL
                    && shared_page[3] == 1
                    && shared_page[4] == UINT64_MAX
-                   && shared_page[8] == 1
                    && caller_private[0] == CALLER_PRIVATE_SENTINEL
                    && server_private[0] == SERVER_COUNTER_FINAL
                    && page_tables_are_distinct
@@ -249,7 +256,7 @@ int main(void)
     : : : "t0", "memory");
 #endif
 
-  const uint64_t service_page = physical_address(bp_rpc_demo_server_bootstrap);
+  const uint64_t service_page = physical_address(bp_rpc_demo_service_page);
   const uint64_t service_offset = physical_address(bp_rpc_demo_service_entry)
                                   - service_page;
   if (service_offset >= 4096)
@@ -264,7 +271,7 @@ int main(void)
   map_low_page(caller_leaf, CALLER_SHARED_VA, shared_page, rw);
   map_low_page(caller_leaf, STACK_VA, caller_stack, rw);
   map_low_page(server_leaf, SERVER_ENTRY_VA,
-               bp_rpc_demo_server_bootstrap, rx);
+               bp_rpc_demo_service_page, rx);
   map_low_page(server_leaf, PRIVATE_VA, server_private, rw);
   map_low_page(server_leaf, SERVER_SHARED_VA, shared_page, rw);
   map_low_page(server_leaf, STACK_VA, server_stack, rw);
@@ -276,7 +283,7 @@ int main(void)
   for (int i = 0; i < 9; ++i)
     shared_page[i] = 0;
   caller_private[0] = 0;
-  server_private[0] = 0;
+  server_private[0] = SERVER_COUNTER_INITIAL;
   unexpected_mcause = 0;
   unexpected_mepc = 0;
   unexpected_mtval = 0;
@@ -285,14 +292,8 @@ int main(void)
   __asm__ volatile("csrw medeleg, zero\ncsrw mideleg, zero" ::: "memory");
   __asm__ volatile("csrw mtvec, %0" : : "r"((uint64_t)machine_trap_entry)
                    : "memory");
-
-  /* Start the server once with the raw M-mode seed so it can install its SATP
-   * and private state, then return to this monitor before the descriptor locks
-   * the legacy entry points. */
-  const uint64_t bootstrap_seed = (UINT64_C(1) << 39)
-                                  | physical_address(server_machine_bootstrap);
-  __asm__ volatile("csrw 0x801, %0" : : "r"(bootstrap_seed) : "memory");
-  __asm__ volatile("csrwi 0x800, 1" ::: "memory");
+  seed_server_register(8, UINT64_C(0x11111));
+  seed_server_register(18, UINT64_C(0x22222));
 
   const uint64_t service_va = SERVER_ENTRY_VA + service_offset;
   if (rpc_install_descriptor(caller_satp, server_satp_value, service_va)

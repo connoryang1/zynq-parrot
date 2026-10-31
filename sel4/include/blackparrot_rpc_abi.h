@@ -50,7 +50,15 @@ typedef enum {
     BP_RPC_CONTROL_COMMIT = 1,
     BP_RPC_CONTROL_REVOKE = 2,
     BP_RPC_CONTROL_READ_STATUS = 3,
+    BP_RPC_CONTROL_PREPARE = 4,
 } bp_rpc_control_command_t;
+
+typedef enum {
+    BP_RPC_PREPARE_GPR_LINE0 = 0,
+    BP_RPC_PREPARE_GPR_LINE1 = 1,
+    BP_RPC_PREPARE_CSR = 2,
+    BP_RPC_PREPARE_COMPONENTS = 3,
+} bp_rpc_prepare_component_t;
 
 typedef enum {
     BP_RPC_FIELD_TOKEN = 0,
@@ -78,6 +86,14 @@ static inline uint64_t bp_rpc_control_word(
 {
     return ((uint64_t)command << BP_RPC_CONTROL_COMMAND_SHIFT)
            | ((uint64_t)field << BP_RPC_CONTROL_FIELD_SHIFT)
+           | (uint64_t)slot;
+}
+
+static inline uint64_t bp_rpc_prepare_word(
+    bp_rpc_prepare_component_t component, uint32_t slot)
+{
+    return ((uint64_t)BP_RPC_CONTROL_PREPARE << BP_RPC_CONTROL_COMMAND_SHIFT)
+           | ((uint64_t)component << BP_RPC_CONTROL_FIELD_SHIFT)
            | (uint64_t)slot;
 }
 

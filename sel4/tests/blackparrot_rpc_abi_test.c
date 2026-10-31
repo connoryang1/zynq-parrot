@@ -53,6 +53,8 @@ int main(void)
     assert(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
                                BP_RPC_FIELD_TOKEN, 0)
            == UINT64_C(0x0100000000000000));
+    assert(bp_rpc_prepare_word(BP_RPC_PREPARE_CSR, 0)
+           == UINT64_C(0x0402000000000000));
     assert(bp_rpc_config_word(4, 4, 0, 1)
            == UINT64_C(0x0000000100000404));
     assert(bp_rpc_sbi_extension_id(0) == UINT64_C(0x09000000));
