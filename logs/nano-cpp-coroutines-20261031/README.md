@@ -27,6 +27,24 @@ coroutine control and has the lowest worker cycles per useful load. The sharp
 four-query regression makes this an empirical selection, not an inference from
 the ten-slot queue capacity.
 
+The remaining matched N=5 controls quantify what that headline includes:
+
+| N=5 schedule | Cycles | Relative to hardware |
+| --- | ---: | ---: |
+| Serial demand, no hint | 181,548 | 66.992x |
+| Serial prefetch | 12,708 | 4.689x |
+| C++20 coroutine | 5,372 | 1.982x |
+| Explicit software batch | 4,458 | 1.645x |
+| Hardware worker | 2,710 | 1.000x |
+
+The 66.992x demand ratio combines two changes: ordinary demand fetches full
+cache lines serially, while hardware uses narrow detached hints and overlaps
+five searches. Serial prefetch uses the same hint transport without
+interleaving, so its 4.689x ratio is the cleaner estimate of scheduling overlap.
+At this count hardware is also 39.2% faster than the hand-written batch, showing
+that the selected point benefits from request/response phase alignment rather
+than merely avoiding coroutine machinery.
+
 The committed N=10 trace diagnostic used top `f4db758c99433a2567baccf7090ab8f9274a1575`
 and BlackParrot `6c79a42107a3857e63b6f47bc2468fe4599c5bff`. Its exact ELF and NBF are under
 `rejected-trace-mode6/`; their SHA-256 values are
