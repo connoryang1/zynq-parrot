@@ -29,13 +29,13 @@ the ten-slot queue capacity.
 
 The remaining matched N=5 controls quantify what that headline includes:
 
-| N=5 schedule | Cycles | Relative to hardware |
-| --- | ---: | ---: |
-| Serial demand, no hint | 181,548 | 66.992x |
-| Serial prefetch | 12,708 | 4.689x |
-| C++20 coroutine | 5,372 | 1.982x |
-| Explicit software batch | 4,458 | 1.645x |
-| Hardware worker | 2,710 | 1.000x |
+| N=5 schedule | Cycles | Cycles/useful node | Relative to hardware |
+| --- | ---: | ---: | ---: |
+| Serial demand, no hint | 181,548 | 3,300.873 | 66.992x |
+| Serial prefetch | 12,708 | 231.055 | 4.689x |
+| C++20 coroutine | 5,372 | 97.673 | 1.982x |
+| Explicit software batch | 4,458 | 81.055 | 1.645x |
+| Hardware worker | 2,710 | 49.273 | 1.000x |
 
 The 66.992x demand ratio combines two changes: ordinary demand fetches full
 cache lines serially, while hardware uses narrow detached hints and overlaps
@@ -44,6 +44,20 @@ interleaving, so its 4.689x ratio is the cleaner estimate of scheduling overlap.
 At this count hardware is also 39.2% faster than the hand-written batch, showing
 that the selected point benefits from request/response phase alignment rather
 than merely avoiding coroutine machinery.
+
+The N=5 switch-only control is 816 cycles, or 14.836 cycles per scheduled node
+when normalized by the same 55 steps.  It performs no useful loads, and its
+terminal ring lap is included, so it is a control rather than a quantity to
+subtract mechanically from the data modes.
+
+The trace analyzer now reports exact time-weighted outstanding occupancy as
+the sum of transaction lifetimes divided by either the complete measured
+window or the first-issue-to-last-completion active interval.  Reanalysis of
+the accepted corrected N=10 worker waveform gives 3.445 average UCE hints over
+the entire 6,609-cycle window, 7.063 while the request pipeline is active, and
+a peak of nine.  The current-build N=5 sweep is transcript-qualified; its
+trace teardown issue means it does not yet have an accepted average-outstanding
+measurement.
 
 The committed N=10 trace diagnostic used top `f4db758c99433a2567baccf7090ab8f9274a1575`
 and BlackParrot `6c79a42107a3857e63b6f47bc2468fe4599c5bff`. Its exact ELF and NBF are under

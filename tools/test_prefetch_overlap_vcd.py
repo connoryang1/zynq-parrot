@@ -96,6 +96,20 @@ def trace(samples, axi=False, missing=None, duplicate_signal=None, edge_updates=
 
 
 class PrefetchTests(unittest.TestCase):
+    def test_time_weighted_outstanding_occupancy(self):
+        records = [
+            dict(id=0, issue=analyzer.boundary(0, 0),
+                 first_response=analyzer.boundary(5, 5),
+                 complete=analyzer.boundary(10, 10), _prior=[]),
+            dict(id=1, issue=analyzer.boundary(5, 5),
+                 first_response=analyzer.boundary(10, 10),
+                 complete=analyzer.boundary(15, 15), _prior=[]),
+        ]
+        summary = analyzer.overlap_summary(records, window=(2, 12))
+        self.assertEqual(summary['max_outstanding'], 2)
+        self.assertAlmostEqual(summary['average_outstanding_active'], 20 / 15)
+        self.assertAlmostEqual(summary['average_outstanding_window'], 15 / 10)
+
     def analyze(self, samples=None, axi=False, **kwargs):
         prefetch_slots = kwargs.pop('prefetch_slots', 2)
         consume_pcs = kwargs.pop('consume_pcs', ())
@@ -110,6 +124,8 @@ class PrefetchTests(unittest.TestCase):
     def test_slots_dropped_hint_and_normal_fill_are_distinct(self):
         report = self.analyze()
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 2)
+        self.assertAlmostEqual(report['prefetch_summary']['average_outstanding_active'],
+                               10 / 7)
         self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 2)
         self.assertTrue(report['prefetch_summary']['issue_before_prior_first_response'])
         self.assertTrue(report['prefetch_summary']['all_issued_before_first_response'])

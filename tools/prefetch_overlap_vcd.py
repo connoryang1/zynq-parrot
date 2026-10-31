@@ -124,8 +124,14 @@ def boundary(cycle, timestamp):
     return dict(cycle=cycle, timestamp=timestamp)
 
 
-def overlap_summary(records):
-    """Strict open intervals exclude a response and new issue on one edge."""
+def overlap_summary(records, window=None):
+    """Summarize overlap, including time-weighted outstanding occupancy.
+
+    ``average_outstanding_active`` covers the interval from the first issue to
+    the last completion.  When ``window`` is supplied as ``(begin, end)``,
+    ``average_outstanding_window`` covers the complete measured interval and
+    clips transaction lifetimes at its boundaries.
+    """
     before_first, before_complete = [], []
     events = []
     for record in records:
@@ -152,7 +158,27 @@ def overlap_summary(records):
                       if first_responses else None)
     last_response = (max(completions, key=lambda event: event['timestamp'])
                      if completions else None)
+    active_begin = min((record['issue']['timestamp'] for record in records),
+                       default=None)
+    active_end = max((record['complete']['timestamp'] for record in records),
+                     default=None)
+    active_area = sum(max(0, record['complete']['timestamp']
+                          - record['issue']['timestamp']) for record in records)
+    average_active = (active_area / (active_end - active_begin)
+                      if active_begin is not None and active_end > active_begin
+                      else 0.0)
+    average_window = None
+    if window is not None:
+        window_begin, window_end = window
+        if window_end <= window_begin:
+            raise EvidenceError('outstanding-occupancy window must be positive')
+        window_area = sum(max(0, min(record['complete']['timestamp'], window_end)
+                              - max(record['issue']['timestamp'], window_begin))
+                          for record in records)
+        average_window = window_area / (window_end - window_begin)
     return dict(transactions=len(records), max_outstanding=maximum,
+                average_outstanding_active=average_active,
+                average_outstanding_window=average_window,
                 first_issue=first_issue, last_issue=last_issue,
                 issue_span=(last_issue['timestamp'] - first_issue['timestamp']) if issues else None,
                 first_response=first_response, last_response=last_response,
@@ -627,7 +653,7 @@ def matched_window_summary(report, window, address, span_bytes, axi_address_xor=
             record['_prior'] = list(pending)
             copies.append(record)
             pending.append(record)
-        return overlap_summary(copies)
+        return overlap_summary(copies, window=(begin, end))
 
     crossing_uce = crossing_begin(report['prefetches'] + report['normal_reads'])
     crossing_axi = crossing_begin(report['axi_reads'] or [])
