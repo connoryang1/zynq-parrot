@@ -95,6 +95,12 @@ int main(void)
            == PROTECTED_RPC_UNSUPPORTED);
     assert(hardware_calls == 1 && software_calls == 0);
 
+    reset(PROTECTED_RPC_ATTEMPT_FALLBACK_SAFE, PROTECTED_RPC_REVOKED);
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_REVOKED);
+    assert(hardware_calls == 1 && software_calls == 0);
+    assert(result.path == PROTECTED_RPC_PATH_HARDWARE);
+
     options.route = PROTECTED_RPC_ROUTE_SOFTWARE;
     reset(PROTECTED_RPC_ATTEMPT_COMPLETED, PROTECTED_RPC_OK);
     assert(protected_rpc_call(endpoint, &request, &options, &result)

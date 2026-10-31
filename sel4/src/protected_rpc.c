@@ -64,9 +64,7 @@ protected_rpc_status_t protected_rpc_call(
     }
 
     if (route == PROTECTED_RPC_ROUTE_HARDWARE) {
-        result->status = PROTECTED_RPC_UNSUPPORTED;
-        result->path = PROTECTED_RPC_PATH_HARDWARE;
-        return result->status;
+        return finish_attempt(&attempt, result);
     }
 
     run_backend(&protected_rpc_software_backend, endpoint, request, &attempt);

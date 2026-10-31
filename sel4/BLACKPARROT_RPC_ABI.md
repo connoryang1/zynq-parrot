@@ -62,9 +62,9 @@ The call instruction is a read/write CSR operation, not a separate eligibility
 probe:
 
 ```asm
-# a0-a3 = request, a4 = opaque token
+# a0-a3 = request, a4 = opaque token, a5 = request length metadata
 csrrw a4, 0x808, a4
-# a4 = outcome; a0-a3 = reply only when outcome is COMPLETED
+# a4 = outcome; a0-a3/a5 = reply and metadata only when COMPLETED
 ```
 
 Hardware performs token, caller-SATP, context, residency, descriptor-valid,
@@ -84,8 +84,9 @@ a precise non-started outcome from the same instruction.  A separate
 change between the query and the call.
 
 On acceptance, hardware saves the caller continuation outside both untrusted
-contexts, transfers the requested subset of `a0`--`a3`, installs the fixed
-server PC/address space, and marks the descriptor active.  The server returns
+contexts, transfers the requested subset of `a0`--`a3` and the validated
+request-length metadata in `a5`, installs the fixed server PC/address space,
+and marks the descriptor active. The server returns
 with CSR `0x809`; `a0`--`a3` carry reply words and `a5` carries reply metadata:
 an 8-bit length, an 8-bit service status, and zero reserved bits. Hardware
 transfers the configured reply words and metadata, writes
@@ -95,6 +96,13 @@ only the recorded caller. The server cannot select a return PC or caller.
 The existing prototype's silent rejection and one-word reply are therefore
 not the seL4 ABI.  They remain mechanism evidence until this outcome and reply
 contract is implemented and tested.
+
+The binding itself is a kernel object/capability derived from authority over
+the endpoint and both TCBs. Its finalization invokes synchronous revocation;
+the token is merely the runtime encoding of that authority, not an independent
+application-created capability. Deleting an endpoint CPtr alone need not tear
+down a deliberately retained binding cap, but deleting the last binding cap
+must make the descriptor unusable before any referenced object is recycled.
 
 ## Privileged control operations
 

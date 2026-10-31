@@ -30,6 +30,11 @@ int main(void)
     assert(descriptor.request_words <= BP_RPC_MAX_WORDS);
     assert(descriptor.reply_words <= BP_RPC_MAX_WORDS);
     assert(BP_RPC_OUTCOME_NOT_STARTED != BP_RPC_OUTCOME_COMPLETED);
+    const uint64_t request_meta = bp_rpc_request_meta(3);
+    assert(bp_rpc_request_meta_valid(request_meta));
+    assert(bp_rpc_request_length(request_meta) == 3);
+    assert(!bp_rpc_request_meta_valid(bp_rpc_request_meta(5)));
+    assert(!bp_rpc_request_meta_valid(UINT64_C(1) << 8));
     const uint64_t meta = bp_rpc_reply_meta(4, 7);
     assert(bp_rpc_reply_meta_valid(meta));
     assert(bp_rpc_reply_length(meta) == 4);

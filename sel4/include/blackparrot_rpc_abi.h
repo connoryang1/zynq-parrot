@@ -8,6 +8,7 @@
 #define BP_RPC_ABI_VERSION 1u
 #define BP_RPC_DESCRIPTOR_V1_SIZE 112u
 #define BP_RPC_MAX_WORDS 4u
+#define BP_RPC_REQUEST_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_STATUS_SHIFT 8u
 #define BP_RPC_REPLY_META_STATUS_MASK (UINT64_C(0xff) << BP_RPC_REPLY_META_STATUS_SHIFT)
@@ -60,6 +61,22 @@ typedef struct {
     uint32_t server_context;
     uint64_t reserved1[3];
 } bp_rpc_descriptor_v1_t;
+
+static inline uint64_t bp_rpc_request_meta(uint8_t length)
+{
+    return (uint64_t)length;
+}
+
+static inline uint8_t bp_rpc_request_length(uint64_t meta)
+{
+    return (uint8_t)(meta & BP_RPC_REQUEST_META_LENGTH_MASK);
+}
+
+static inline int bp_rpc_request_meta_valid(uint64_t meta)
+{
+    return (meta & ~BP_RPC_REQUEST_META_LENGTH_MASK) == 0
+           && bp_rpc_request_length(meta) <= BP_RPC_MAX_WORDS;
+}
 
 static inline uint64_t bp_rpc_reply_meta(uint8_t length, uint8_t status)
 {
