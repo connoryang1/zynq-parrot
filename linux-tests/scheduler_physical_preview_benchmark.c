@@ -146,21 +146,18 @@ int main(int argc, char **argv)
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
-	char *end = NULL;
 
 	if (argc > 3) {
 		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late]\n",
 			argv[0]);
 		return 2;
 	}
-	if (argc == 2) {
-		unsigned long parsed = strtoul(argv[1], &end, 0);
-
-		if (!argv[1][0] || *end || parsed > 7) {
+	if (argc >= 2) {
+		if (argv[1][0] < '0' || argv[1][0] > '7' || argv[1][1]) {
 			fprintf(stderr, "invalid L2 set group: %s\n", argv[1]);
 			return 2;
 		}
-		group = parsed;
+		group = argv[1][0] - '0';
 	}
 	if (argc == 3) {
 		if (!strcmp(argv[2], "early"))
