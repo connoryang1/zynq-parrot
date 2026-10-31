@@ -598,3 +598,8 @@ record, reports `TRACE_TRUNCATED`, and exits nonzero; only a no-overflow
 returns and can be later than source resume when Linux dispatches the source
 inside the wake syscall. The peer-entry and resumed-source window endpoints do
 not have that ordering ambiguity.
+
+Add `--summary-only` for repeated timing batches. It prints the same header,
+overflow decision, and terminal `TRACE_PASS` or `TRACE_TRUNCATED`, but skips
+record CSR readout and per-record output after disarm. The option changes only
+post-interval observation; it can appear before or after `--window`.

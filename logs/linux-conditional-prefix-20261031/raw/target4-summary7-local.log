@@ -1,0 +1,306 @@
+Script started on 2026-10-31 01:16:03-04:00 [TERM="dumb" TTY="/dev/pts/0" COLUMNS="80" LINES="24"]
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=05f77de44c26096d73a47e916a59128c3eb01206e9609a07aef64f7ebb1423d9
+LOG=/home/xilinx/bp-logs/linux-cond-target4-enabled-shell-interactive-20261031T051613Z-1444.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 360000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeb1b690 40000004 16 1
+INFO:    Creating host: 0xbeb1b690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d55000, physical ptr=0x18a00000
+INFO:    ps.cpp: received 0xb3d55000 (phys = 18a00000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-3465461
+DEBUG-PS: ps.cpp: 1-3465779
+DEBUG-PS: ps.cpp: 2-3466081
+DEBUG-PS: ps.cpp: 3-3466368
+DEBUG-PS: ps.cpp: 4-3466654
+DEBUG-PS: ps.cpp: 5-3466942
+DEBUG-PS: ps.cpp: 6-3467235
+DEBUG-PS: ps.cpp: 7-3467544
+DEBUG-PS: ps.cpp: 8-3467837
+DEBUG-PS: ps.cpp: 9-3468126
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878621
+DEBUG-PS: ps.cpp: finished loading 1878621 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #8 SMP Sat Oct 31 00:13:22 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000102] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009384] Console: colour dummy device 80x25
+[    0.011217] printk: console [hvc0] enabled
+[    0.160140] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166220] pid_max: default: 32768 minimum: 301
+[    0.182487] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.187766] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.429876] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.447980] riscv: ELF compat mode unsupported
+[    0.449805] ASID allocator disabled (1 bits)
+[    0.471807] rcu: Hierarchical SRCU implementation.
+[    0.475547] rcu: 	Max phase no-delay instances is 1000.
+[    0.514992] EFI services will not be available.
+[    0.537206] smp: Bringing up secondary CPUs ...
+[    0.541374] smp: Brought up 1 node, 1 CPU
+[    0.586132] devtmpfs: initialized
+[    0.712779] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.719017] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.810653] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.855402] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.862303] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.164630] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.406670] SCSI subsystem initialized
+[    1.431230] libata version 3.00 loaded.
+[    1.455720] usbcore: registered new interface driver usbfs
+[    1.462717] usbcore: registered new interface driver hub
+[    1.470343] usbcore: registered new device driver usb
+[    1.586221] vgaarb: loaded
+[    1.598575] clocksource: Switched to clocksource riscv_clocksource
+[    2.948486] NET: Registered PF_INET protocol family
+[    2.971560] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.039192] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.046457] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.051862] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.058193] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.069768] TCP: Hash tables configured (established 512 bind 512)
+[    3.083954] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.094674] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.118766] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.202840] RPC: Registered named UNIX socket transport module.
+[    3.207022] RPC: Registered udp transport module.
+[    3.210334] RPC: Registered tcp transport module.
+[    3.212725] RPC: Registered tcp-with-tls transport module.
+[    3.216278] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.220396] PCI: CLS 0 bytes, default 64
+[    3.387625] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.482539] NFS: Registering the id_resolver key type
+[    3.490350] Key type id_resolver registered
+[    3.492789] Key type id_legacy registered
+[    3.499489] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.504070] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.556373] 9p: Installing v9fs 9p2000 file system support
+[    3.587093] NET: Registered PF_ALG protocol family
+[    3.596339] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.602428] io scheduler mq-deadline registered
+[    3.606049] io scheduler kyber registered
+[   23.447613] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   23.835446] [drm] radeon kernel modesetting enabled.
+[   25.514962] loop: module loaded
+[   25.743126] e1000e: Intel(R) PRO/1000 Network Driver
+[   25.746754] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   25.991933] usbcore: registered new interface driver uas
+[   26.000659] usbcore: registered new interface driver usb-storage
+[   26.054939] mousedev: PS/2 mouse device common for all mice
+[   26.100555] sdhci: Secure Digital Host Controller Interface driver
+[   26.104803] sdhci: Copyright(c) Pierre Ossman
+[   26.111594] sdhci-pltfm: SDHCI platform and OF driver helper
+[   26.139878] usbcore: registered new interface driver usbhid
+[   26.143917] usbhid: USB HID core driver
+[   26.175580] NET: Registered PF_INET6 protocol family
+[   26.411683] Segment Routing with IPv6
+[   26.422951] In-situ OAM (IOAM) with IPv6
+[   26.434614] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   26.508801] NET: Registered PF_PACKET protocol family
+[   26.522558] 9pnet: Installing 9P2000 support
+[   26.532213] Key type dns_resolver registered
+[   26.543660] start plist test
+[   27.000611] end plist test
+[   29.384714] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   30.088350] clk: Disabling unused clocks
+[   38.751019] Freeing unused kernel image (initmem) memory: 5104K
+[   38.756749] Run /bin/sh as init process
+[   38.760027]   with arguments:
+[   38.762509]     /bin/sh
+[   38.764058]   with environment:
+[   38.766597]     HOME=/
+[   38.768091]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # stty -echo
+~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # ~ # sha256sum /tmp/cache_miss_trace_capture_dynamic
+14bf2ab9c232d5c71c21a6204c3dfaa6ee42e3e949d63d994168b1a84da1bf4d  /tmp/cache_miss_trace_capture_dynamic
+~ # /tmp/cache_miss_trace_capture_dynamic --window to-peer --summary-only >/dev/
+null 2>&1 || true
+~ # echo TARGET4_BATCH_BEGIN
+TARGET4_BATCH_BEGIN
+~ # i=1; while [ $i -le 7 ]; do echo SAMPLE=$i; /tmp/cache_miss_trace_capture_dy
+namic --window to-peer --summary-only || true; i=$((i+1)); done
+SAMPLE=1
+TRACE_HEADER cpu=0 window=1 start=1280566626 peer_begin=1280612503 peer_wake=1280612555 peer_block=1280621631 resume=1280638450 elapsed=45877 i_count=256 d_count=45 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045b00
+TRACE_TRUNCATED records=301 elapsed=45877 i_overflow=1 d_overflow=0
+SAMPLE=2
+TRACE_HEADER cpu=0 window=1 start=1290317311 peer_begin=1290335643 peer_wake=1290335695 peer_block=1290391480 resume=1290369519 elapsed=18332 i_count=99 d_count=7 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000e63
+TRACE_PASS records=106 elapsed=18332
+SAMPLE=3
+TRACE_HEADER cpu=0 window=1 start=1299364615 peer_begin=1299378320 peer_wake=1299378372 peer_block=1299379420 resume=1299409872 elapsed=13705 i_count=72 d_count=4 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000848
+TRACE_PASS records=76 elapsed=13705
+SAMPLE=4
+TRACE_HEADER cpu=0 window=1 start=1308479212 peer_begin=1308492374 peer_wake=1308492426 peer_block=1308493503 resume=1308523166 elapsed=13162 i_count=86 d_count=5 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000a56
+TRACE_PASS records=91 elapsed=13162
+SAMPLE=5
+TRACE_HEADER cpu=0 window=1 start=1317604078 peer_begin=1317615426 peer_wake=1317615478 peer_block=1317616629 resume=1317645791 elapsed=11348 i_count=40 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000628
+TRACE_PASS records=43 elapsed=11348
+SAMPLE=6
+TRACE_HEADER cpu=0 window=1 start=1326485786 peer_begin=1326524399 peer_wake=1326524451 peer_block=1326533640 resume=1326543292 elapsed=38613 i_count=256 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002d00
+TRACE_PASS records=278 elapsed=38613
+SAMPLE=7
+TRACE_HEADER cpu=0 window=1 start=1335342191 peer_begin=1335353301 peer_wake=1335353353 peer_block=1335354448 resume=1335362597 elapsed=11110 i_count=37 d_count=3 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000000625
+TRACE_PASS records=40 elapsed=11110
+~ # echo TARGET4_BATCH_END
+TARGET4_BATCH_END
+~ # poweroff -f
+[   67.356628] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):            3,313 (             cf1)
+INFO:    ps.cpp: minstret (instructions retired):      400,509,866 (        17df4baa)
+INFO:    ps.cpp: minstret delta:                       400,506,553 (        17df3eb9)
+INFO:    ps.cpp: MTIME start:                           77,962,955 (         4a59ecb)
+INFO:    ps.cpp: MTIME stop:                           621,033,671 (        250438c7)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):         543,070,716 (        205e99fc)
+INFO:    ps.cpp: IPC        :                             0.092186
+INFO:    ps.cpp: minstret (instructions retired):      400,509,950 (        17df4bfe)
+INFO:    ps.cpp: wall clock time                :  108,614,546,560 (      1949ee7480) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,991,087.16 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000191
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d55000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+Connection to 192.168.4.35 closed.
+
+Script done on 2026-10-31 01:18:17-04:00 [COMMAND_EXIT_CODE="0"]

@@ -33,6 +33,13 @@ enum trace_window {
   TRACE_WINDOW_FROM_PEER,
 };
 static enum trace_window trace_window;
+static int summary_only;
+
+static void usage(FILE *stream)
+{
+  fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]"
+        " [--summary-only]\n", stream);
+}
 
 static void fail(const char *what)
 {
@@ -181,22 +188,25 @@ static void print_record(unsigned sequence, char side, unsigned index,
 
 int main(int argc, char **argv)
 {
-  if (argc == 3 && !strcmp(argv[1], "--window")) {
-    if (!strcmp(argv[2], "full"))
-      trace_window = TRACE_WINDOW_FULL;
-    else if (!strcmp(argv[2], "to-peer"))
-      trace_window = TRACE_WINDOW_TO_PEER;
-    else if (!strcmp(argv[2], "from-peer"))
-      trace_window = TRACE_WINDOW_FROM_PEER;
-    else {
-      fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]\n",
-            stderr);
+  for (int arg = 1; arg < argc; ++arg) {
+    if (!strcmp(argv[arg], "--summary-only")) {
+      summary_only = 1;
+    } else if (!strcmp(argv[arg], "--window") && arg + 1 < argc) {
+      const char *window = argv[++arg];
+      if (!strcmp(window, "full"))
+        trace_window = TRACE_WINDOW_FULL;
+      else if (!strcmp(window, "to-peer"))
+        trace_window = TRACE_WINDOW_TO_PEER;
+      else if (!strcmp(window, "from-peer"))
+        trace_window = TRACE_WINDOW_FROM_PEER;
+      else {
+        usage(stderr);
+        return EXIT_FAILURE;
+      }
+    } else {
+      usage(stderr);
       return EXIT_FAILURE;
     }
-  } else if (argc != 1) {
-    fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]\n",
-          stderr);
-    return EXIT_FAILURE;
   }
 
   const int cpu = pin_to_first_allowed_cpu();
@@ -245,6 +255,19 @@ int main(int argc, char **argv)
       icount + dcount == 0) {
     fputs("TRACE_FAIL invalid recorder status\n", stderr);
     return EXIT_FAILURE;
+  }
+
+  if (summary_only) {
+    if (ioverflow || doverflow) {
+      printf("TRACE_TRUNCATED records=%u elapsed=%" PRIu64
+             " i_overflow=%u d_overflow=%u\n",
+             icount + dcount, stop_cycle - trace_start_cycle,
+             ioverflow, doverflow);
+      return EXIT_FAILURE;
+    }
+    printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
+           icount + dcount, stop_cycle - trace_start_cycle);
+    return EXIT_SUCCESS;
   }
 
   for (unsigned i = 0; i < icount; ++i)

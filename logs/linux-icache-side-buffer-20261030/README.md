@@ -34,3 +34,17 @@ The repair registers advisory packets for one cycle before associative allocatio
 - clean full-core replay reaches the exact guest marker, core PASS, and host PASS (`6f244f03...43ecd`; build `48655e85...b385`).
 
 These tests validate throughput and function, but the registered repair still needs a fresh timing-clean route before board use.
+
+## Real-DDR residual retirement defect
+
+The registered detached-buffer route `20261030T203821Z-d14baa56` meets setup/hold timing at +0.217/+0.020 ns, but a stronger no-delay M-mode discriminator reproducibly stops at 18,816 retired instructions. Its raw-byte variant prints `ABJLLBZB`: all four replay targets and the complete 32 KiB cold post-replay instruction stream return before the later print/finish path stops. A variant placing `fence.i` immediately before PASS retires exactly one more instruction and then stops at the fence. Conversely, serial phase prints give outstanding replay state enough time to drain and the program reaches guest/core/runner PASS. These controls identify an overlap-sensitive residual UCE replay slot rather than bad target contents or an ordinary cold-stream failure.
+
+Retained transcripts and SHA-256 values are:
+
+- `mt_icache_replay_machine_fpga-20261030T221427Z-166654.log`: `e9bf4854...525f`;
+- independent no-marker repeat `mt_icache_replay_machine_fpga-20261030T221836Z-167963.log`: `92079312...7a8`;
+- passing delayed control `mt_icache_replay_machine_phase_fpga-20261030T221545Z-166824.log`: `43e6c48c...4f32`;
+- raw completion markers `mt_icache_replay_machine_raw_fpga-20261030T222003Z-168393.log`: `6eb70abd...92c0`;
+- terminal-fence localization `mt_icache_replay_machine_fence_fpga-20261030T222115Z-168573.log`: `57e8f6a6...c013`.
+
+The detached mode was still storing every four-beat response in a per-slot UCE full-line copy, marking that copy complete, and draining it through the generic installer before releasing the slot. The cache-local advisory store already supplies complete-line assembly, partial-line invisibility, full physical tags, and invalidation. BlackParrot `b1a065281` therefore streams each response beat directly to that store and releases the UCE slot on the accepted final beat. Focused live-cache and detached-I-cache tests, fence cancellation, resident same-line demand progress, the independent replay-buffer test, the ten-slot D-cache regression, and a clean trace-enabled full-core run all pass. Top `3a08584d` / BlackParrot `b1a065281` is routing as farm job `20261030T223234Z-3a08584d`; physical and Linux acceptance remain pending.

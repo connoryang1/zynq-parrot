@@ -3,9 +3,10 @@ From: BlackParrot Context Resume Experiment <noreply@example.com>
 Date: Fri, 30 Oct 2026 00:00:00 -0400
 Subject: [PATCH] sched: trigger BlackParrot shared instruction replay
 
-Start the machine-configured, address-free shared instruction prefix at the
-earliest common scheduler entry. The custom supervisor CSR is specific to the
-experimental BlackParrot platform; other architectures compile no instruction.
+Start the machine-configured, address-free shared instruction prefix only after
+the scheduler selects a different task. The custom supervisor CSR is specific
+to the experimental BlackParrot platform; other architectures compile no
+instruction.
 ---
  kernel/sched/core.c | 7 +++++++
  1 file changed, 7 insertions(+)
@@ -14,19 +15,19 @@ diff --git a/kernel/sched/core.c b/kernel/sched/core.c
 index 802551e00000..802551e00001 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -6576,6 +6576,13 @@ static void __sched notrace __schedule(unsigned int sched_mode)
- 	struct rq *rq;
- 	int cpu;
+@@ -6648,6 +6648,13 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ #endif
  
+ 	if (likely(prev != next)) {
 +#ifdef CONFIG_RISCV
-+	/* Physical prefix contents are machine-owned. Supervisor software can
-+	 * only launch the configured table and therefore supplies no address.
-+	 */
-+	asm volatile("csrw 0x5c0, zero" ::: "memory");
++		/* Physical prefix contents are machine-owned. Launch only for an
++		 * actual task change so failed selections do not replay the table.
++		 */
++		asm volatile("csrw 0x5c0, zero" ::: "memory");
 +#endif
 +
- 	cpu = smp_processor_id();
- 	rq = cpu_rq(cpu);
- 	prev = rq->curr;
+ 		rq->nr_switches++;
+ 		/*
+ 		 * RCU users of rcu_dereference(rq->curr) may not see
 -- 
 2.34.1

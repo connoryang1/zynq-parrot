@@ -42,6 +42,7 @@ DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
 INIT_SCRIPT := $(CURDIR)/rootfs-overlay/etc/init.d/S200ctxtsw_user_smoke.sh
 OPENSBI_PLATFORM_OVERLAY := $(CURDIR)/opensbi-platform/blackparrot
 ICACHE_PREFIX_RESULTS ?= $(TOP)/logs/cache-resume-trace-model-20261030/results.json
+ICACHE_PREFIX_LIMIT ?=
 ICACHE_PREFIX_HEADER := $(OPENSBI_PLATFORM_OVERLAY)/icache_prefix.h
 ICACHE_PREFIX_GENERATOR := $(CURDIR)/emit_icache_prefix_header.py
 LINUX_PREFIX_PATCH := $(CURDIR)/kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch
@@ -236,7 +237,9 @@ check-image-toolchain: check-linux-cc
 # overlay explicitly so a clean checkout does not depend on Jack's old home
 # directory or an untracked nested-submodule file.
 icache-prefix-header:
-	python3 $(ICACHE_PREFIX_GENERATOR) --results $(ICACHE_PREFIX_RESULTS) --output $(ICACHE_PREFIX_HEADER)
+	python3 $(ICACHE_PREFIX_GENERATOR) --results $(ICACHE_PREFIX_RESULTS) \
+	  $(if $(ICACHE_PREFIX_LIMIT),--limit $(ICACHE_PREFIX_LIMIT)) \
+	  --output $(ICACHE_PREFIX_HEADER)
 
 stage-opensbi-platform: icache-prefix-header
 	@test -f $(OPENSBI_PLATFORM_OVERLAY)/platform.c
