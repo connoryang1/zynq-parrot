@@ -226,6 +226,46 @@ Acceptance: the matched service passes through both backends; logs prove which
 path ran; invalid, stale, and revoked descriptors fail closed; fallback neither
 loses nor duplicates a request.
 
+#### Initial kernel binding shape
+
+The first implementation uses an experimental endpoint invocation rather than
+a userspace SBI call or an application-created token. `BIND` invokes the
+ordinary endpoint capability and supplies one extra server-TCB capability.
+The invoking TCB is the sole hardware caller. Its message provides the fixed
+server entry, stack, global pointer, thread pointer, and bounded request/reply
+word counts. The kernel must:
+
+1. require a send-capable endpoint cap and authority over the server TCB;
+2. require a fresh, single-core, non-MCS binding with distinct mapped caller
+   and server VSpaces;
+3. derive both SATPs and the endpoint badge itself, validate the fixed user
+   addresses, and generate a nonzero generation token;
+4. install the complete descriptor through OpenSBI and return only the opaque
+   token to the invoking TCB; and
+5. retain a kernel binding record until an authorized `UNBIND` completes
+   synchronous OpenSBI revocation.
+
+Logical context 1 is a hardware execution shadow of the server protection
+domain, not the normal scheduler's copy of the server TCB. The ordinary server
+TCB remains blocked in `ReplyRecv` and may run on context 0 only after a
+`NOT_STARTED` hardware attempt safely falls back. On the single-core prototype,
+the hardware service and fallback server therefore cannot execute
+concurrently. Both entries call the same service handler and share its private
+memory; only their transport wrappers differ.
+
+The binding record must be revoked before the endpoint, either TCB, either
+VSpace root, or any pinned service mapping is destroyed, replaced, or unmapped.
+Final-cap deletion and TCB/VSpace reconfiguration paths therefore need hooks;
+an explicit `UNBIND` alone is not a sufficient lifetime guarantee. Revocation
+is expected to be non-busy while the kernel is executing because version 1
+defers interrupts during an accepted protected call. A surprising `BUSY`
+result is a kernel invariant failure, not permission to recycle an object.
+
+This shape intentionally avoids a new public kernel object in the one-slot
+prototype. A generalized implementation should promote the global binding
+record into a first-class capability object before supporting multiple pairs,
+SMP, or MCS scheduling contexts.
+
 ### Stage 5 — Evaluation
 
 Compare on the same BlackParrot configuration:

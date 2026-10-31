@@ -99,12 +99,29 @@ reply contract. Its bare-metal descriptor-control, protected-transition, and
 distinct-address-space library tests are mechanism evidence; they do not by
 themselves prove the seL4 kernel binding or end-to-end accelerated IPC.
 
-The binding itself is a kernel object/capability derived from authority over
-the endpoint and both TCBs. Its finalization invokes synchronous revocation;
+The durable design makes the binding a kernel object/capability derived from
+authority over the endpoint and both TCBs. Its finalization invokes synchronous
+revocation;
 the token is merely the runtime encoding of that authority, not an independent
 application-created capability. Deleting an endpoint CPtr alone need not tear
 down a deliberately retained binding cap, but deleting the last binding cap
 must make the descriptor unusable before any referenced object is recycled.
+
+For the single-slot experimental adapter, binding is requested by invoking a
+send-capable endpoint cap while supplying a server-TCB cap. The current TCB is
+the authorized caller. Userspace supplies the proposed fixed server entry and
+initial SP/GP/TP plus the bounded word counts; the kernel derives both SATPs and
+the endpoint badge, validates all addresses, generates the token, and asks
+OpenSBI to install the descriptor. Userspace never supplies either context ID
+or either SATP. The returned token is handed only to the trusted caller-side
+adapter.
+
+Resident context 1 is a clean hardware shadow of the server's VSpace, not a
+TCB scheduled independently by seL4. The ordinary server TCB remains blocked
+on the endpoint so a precisely `NOT_STARTED` call can use normal seL4 IPC on
+context 0. Since version 1 is single-core and depth one, the shadow service and
+the fallback server never execute concurrently. They use different transport
+entries around the same handler and memory-backed private state.
 
 ## Privileged control operations
 
@@ -160,6 +177,14 @@ references that keep the descriptor valid.  Teardown order is: stop both TCBs,
 revoke and observe `OK`, remove mappings or capabilities, then release the
 binding.  The kernel must not destroy or reuse an object while revocation is
 `BUSY`.
+
+The prototype's global one-slot binding record still needs the same lifetime
+semantics: endpoint finalization, caller/server TCB deletion or VSpace
+replacement, root-page-table deletion, and unmapping any pinned service page
+must synchronously revoke before the mutation completes. An explicit unbind
+operation is not a substitute for those hooks. Multiple bindings should move
+this state into a real kernel capability object rather than extending the
+global record.
 
 ## Resident-server construction
 
