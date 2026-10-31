@@ -114,6 +114,12 @@ REVOKE(slot, token)                  -> OK, STALE, or BUSY
 QUERY(slot, token)                   -> LIVE, STALE, ACTIVE, or UNSUPPORTED
 ```
 
+It uses the standard SBI vendor-extension ID derived from `mvendorid`; the
+shared `bp_rpc_sbi_extension_id()` helper prevents the kernel and monitor from
+disagreeing about that ID. `INSTALL` takes an aligned supervisor virtual
+pointer in `a0`; OpenSBI copies it with fault-checked MPRV loads before it
+validates or touches descriptor CSRs.
+
 `INSTALL` consumes a fixed-layout image supplied by the seL4 kernel and copies
 it before publication.  The monitor validates version, reserved bits, canonical
 PCs, word counts, distinct caller/server identities, and supported fixed

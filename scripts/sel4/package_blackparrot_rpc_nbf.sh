@@ -63,6 +63,10 @@ install -D -m 0644 "$overlay/Kconfig" "$opensbi_source/platform/generic/blackpar
 install -D -m 0644 "$overlay/objects.mk" "$opensbi_source/platform/generic/blackparrot/objects.mk"
 install -D -m 0644 "$overlay/platform.c" "$opensbi_source/platform/generic/blackparrot/platform.c"
 install -D -m 0644 "$overlay/icache_prefix.h" "$opensbi_source/platform/generic/blackparrot/icache_prefix.h"
+install -D -m 0644 "$overlay/rpc.c" "$opensbi_source/platform/generic/blackparrot/rpc.c"
+install -D -m 0644 "$overlay/rpc.h" "$opensbi_source/platform/generic/blackparrot/rpc.h"
+install -D -m 0644 "$project_root/sel4/include/blackparrot_rpc_abi.h" \
+    "$opensbi_source/platform/generic/blackparrot/blackparrot_rpc_abi.h"
 install -D -m 0644 "$overlay/configs/defconfig" \
     "$opensbi_source/platform/generic/blackparrot/configs/defconfig"
 

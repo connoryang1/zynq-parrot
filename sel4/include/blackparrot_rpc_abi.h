@@ -8,10 +8,12 @@
 #define BP_RPC_ABI_VERSION 1u
 #define BP_RPC_DESCRIPTOR_V1_SIZE 112u
 #define BP_RPC_MAX_WORDS 4u
-#define BP_RPC_CSR_CALL 0x808u
-#define BP_RPC_CSR_RETURN 0x809u
-#define BP_RPC_CSR_M_DATA 0x7c3u
-#define BP_RPC_CSR_M_CONTROL 0x7c4u
+#define BP_RPC_CSR_CALL 0x808
+#define BP_RPC_CSR_RETURN 0x809
+#define BP_RPC_CSR_M_DATA 0x7c3
+#define BP_RPC_CSR_M_CONTROL 0x7c4
+#define BP_RPC_SBI_VENDOR_BASE UINT64_C(0x09000000)
+#define BP_RPC_SBI_VENDOR_MASK UINT64_C(0x00ffffff)
 #define BP_RPC_REQUEST_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_STATUS_SHIFT 8u
@@ -29,6 +31,11 @@ typedef enum {
     BP_RPC_SBI_REVOKE = 1,
     BP_RPC_SBI_QUERY = 2,
 } bp_rpc_sbi_operation_t;
+
+static inline uint64_t bp_rpc_sbi_extension_id(uint64_t mvendorid)
+{
+    return BP_RPC_SBI_VENDOR_BASE | (mvendorid & BP_RPC_SBI_VENDOR_MASK);
+}
 
 typedef enum {
     BP_RPC_CONTROL_OK = 0,

@@ -55,6 +55,9 @@ int main(void)
            == UINT64_C(0x0100000000000000));
     assert(bp_rpc_config_word(4, 4, 0, 1)
            == UINT64_C(0x0000000100000404));
+    assert(bp_rpc_sbi_extension_id(0) == UINT64_C(0x09000000));
+    assert(bp_rpc_sbi_extension_id(UINT64_C(0x12345678))
+           == UINT64_C(0x09345678));
     const uint64_t request_meta = bp_rpc_request_meta(3);
     assert(bp_rpc_request_meta_valid(request_meta));
     assert(bp_rpc_request_length(request_meta) == 3);
