@@ -31,10 +31,11 @@ def summarize(rows, group, timing):
         if modes != [0, 1, 1, 0]:
             raise ValueError(f"unbalanced trial block at {start}: {modes}")
     for row in rows:
-        if row["mode"] == 1 and row["hooks"] == 0:
-            raise ValueError(f"enabled trial {row['trial']} had no hook")
-        if row["mode"] == 0 and row["hooks"] != 0:
-            raise ValueError(f"disabled trial {row['trial']} had a hook")
+        if row["hooks"] != row["mode"]:
+            raise ValueError(
+                f"trial {row['trial']} had mode={row['mode']} hooks={row['hooks']}; "
+                "expected exactly one hook only when enabled"
+            )
         if row["wake_to_entry"] + row["load_cycles"] != row["wake_to_load"]:
             raise ValueError(f"inconsistent timing at trial {row['trial']}")
         if row["wake_to_load"] > row["roundtrip"]:

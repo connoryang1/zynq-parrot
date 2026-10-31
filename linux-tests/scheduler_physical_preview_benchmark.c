@@ -124,8 +124,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		if ((enabled && !samples[trial].hooks)
-		    || (!enabled && samples[trial].hooks))
+		/* One measured handoff must produce exactly one preview hook. A
+		 * timer preemption and second selection would issue another hint
+		 * batch and no longer be a matched one-switch comparison. */
+		if (samples[trial].hooks != enabled)
 			fail("unexpected scheduler hook count");
 		transfer(out, &token, 1); /* done */
 	}

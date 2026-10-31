@@ -7,7 +7,7 @@ from pathlib import Path
 from analyze_scheduler_physical_preview_sweep import analyze
 
 
-def transcript(group=0, timing="late", trials=128):
+def transcript(group=0, timing="late", trials=128, extra_enabled_hook=False):
     mode_value = 2 if timing == "late" else 1
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
@@ -18,8 +18,9 @@ def transcript(group=0, timing="late", trials=128):
         mode = 1 if trial % 4 in (1, 2) else 0
         entry = 100 + mode
         load = 300 - 20 * mode
+        hooks = mode + (1 if extra_enabled_hook and mode and trial == 1 else 0)
         lines.append(
-            f"PHYSICAL_BENCH trial={trial} mode={mode} hooks={mode} "
+            f"PHYSICAL_BENCH trial={trial} mode={mode} hooks={hooks} "
             f"wake_to_entry={entry} load_cycles={load} "
             f"wake_to_load={entry + load} roundtrip={entry + load + 50}"
         )
@@ -44,6 +45,13 @@ class SweepAnalyzerTest(unittest.TestCase):
             path.write_text(transcript())
             with self.assertRaisesRegex(ValueError, "incomplete sweep"):
                 analyze([path])
+
+    def test_second_enabled_hook_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "run.log"
+            path.write_text(transcript(extra_enabled_hook=True))
+            with self.assertRaisesRegex(ValueError, "expected exactly one hook"):
+                analyze([path], allow_partial=True)
 
 
 if __name__ == "__main__":
