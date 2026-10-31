@@ -61,11 +61,15 @@ seven cover both banks of all 16 L2 sets, and the complete analyzer requires all
 Each enabled trial must observe exactly one scheduler hook, and each disabled
 trial must observe zero. This rejects a timer-preempted child that is selected a
 second time and could otherwise receive a second four-hint batch. The three
-analyzer regressions pass. The rebuilt dynamic ELF SHA-256 is
+initial analyzer regressions pass. The rebuilt dynamic ELF SHA-256 is
 `b29a8617920f2c62263c61d0827d9ab399424a01bea7cc72258f1270a9b95c8c`; its
 bounded-chunk transfer SHA-256 is
 `dc159f56f7d24a72a52a73b9c30027f6d974699f1374b58a2beacfab117e83f7`, and
 host reconstruction matches the ELF byte-for-byte.
+
+A cell is accepted only with all 512 ordered timing rows. The fourth analyzer
+regression rejects a truncated 128-row transcript even when its synthetic PASS
+markers remain present.
 
 The completed-state oracle on the historical data-capable image bounds the
 opportunity: 32 dependent data lines save 1,265.25 local cycles but only 2.66%

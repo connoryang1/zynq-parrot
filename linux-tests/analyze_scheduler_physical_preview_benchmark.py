@@ -24,8 +24,8 @@ def percentile(values, fraction):
 
 def summarize(rows, group, timing):
     trials = len(rows)
-    if trials < 128 or trials % 4 or [row["trial"] for row in rows] != list(range(trials)):
-        raise ValueError("expected at least 128 ordered trials in complete four-trial blocks")
+    if trials != 512 or [row["trial"] for row in rows] != list(range(trials)):
+        raise ValueError("expected exactly 512 ordered trials")
     for start in range(0, trials, 4):
         modes = [row["mode"] for row in rows[start:start + 4]]
         if modes != [0, 1, 1, 0]:

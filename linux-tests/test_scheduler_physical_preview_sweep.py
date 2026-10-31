@@ -7,7 +7,7 @@ from pathlib import Path
 from analyze_scheduler_physical_preview_sweep import analyze
 
 
-def transcript(group=0, timing="late", trials=128, extra_enabled_hook=False):
+def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False):
     mode_value = 2 if timing == "late" else 1
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
@@ -51,6 +51,13 @@ class SweepAnalyzerTest(unittest.TestCase):
             path = Path(directory) / "run.log"
             path.write_text(transcript(extra_enabled_hook=True))
             with self.assertRaisesRegex(ValueError, "expected exactly one hook"):
+                analyze([path], allow_partial=True)
+
+    def test_truncated_cell_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "run.log"
+            path.write_text(transcript(trials=128))
+            with self.assertRaisesRegex(ValueError, "expected exactly 512"):
                 analyze([path], allow_partial=True)
 
 
