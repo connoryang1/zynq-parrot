@@ -196,7 +196,10 @@ links only the protected-RPC test into the child image, reduces the generic
 libc heap from 1 MiB to 64 KiB, and keeps kernel printing enabled in the
 otherwise optimized build. This removes unrelated full-suite load/zero work
 from the cycle-accurate boot while preserving the same RPC test and makes its
-exact pass marker observable.
+exact pass marker observable. The RPC-only driver also reserves one 16 MiB
+untyped object and delegates one 16 MiB object directly, instead of exhaustively
+probing every object size. That bounded pool is ample for the single test and
+avoids spending model hours on intentional allocation failures.
 
 The same reduced configuration passes under QEMU before the slow full-core
 run; its concise transcript is retained as

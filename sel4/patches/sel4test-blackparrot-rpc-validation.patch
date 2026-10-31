@@ -45,6 +45,65 @@ index cb3b677..7cddc37 100644
  
  add_executable(sel4test-tests EXCLUDE_FROM_ALL ${deps})
  # special handling for "arm_hyp", it's really "aarch32"
+diff --git a/apps/sel4test-driver/CMakeLists.txt b/apps/sel4test-driver/CMakeLists.txt
+index 89bbf7a..f91bb44 100644
+--- a/apps/sel4test-driver/CMakeLists.txt
++++ b/apps/sel4test-driver/CMakeLists.txt
+@@ -50,6 +50,8 @@ endif()
+-
++
+ config_option(Sel4testHaveTimer HAVE_TIMER "Enable tests that require a timer driver" DEFAULT ON)
+-
++
++config_option(Sel4testRpcOnly RPC_ONLY "Build only the bounded protected-RPC validation" DEFAULT OFF)
++
+ config_option(Sel4testSimulation SIMULATION "Disable tests not suitable for simulation" DEFAULT OFF)
+-
++
+ config_option(
+diff --git a/apps/sel4test-driver/src/main.c b/apps/sel4test-driver/src/main.c
+index da703f3..821fdac 100644
+--- a/apps/sel4test-driver/src/main.c
++++ b/apps/sel4test-driver/src/main.c
+@@ -132,8 +132,13 @@ static unsigned int allocate_untypeds(vka_object_t *untypeds, size_t bytes, uns
+     unsigned int num_untypeds = 0;
+     size_t allocated = 0;
+-
++
++    /* The reduced RPC test needs a bounded pool, not sel4test's exhaustive
++     * allocator inventory. Starting at 16 MiB avoids dozens of deliberately
++     * failing searches in the cycle-accurate BlackParrot model. */
++    uint8_t first_size_bits = config_set(CONFIG_RPC_ONLY) ? 24 : seL4_WordBits - 1;
++
+     /* try to allocate as many of each possible untyped size as possible */
+-    for (uint8_t size_bits = seL4_WordBits - 1; size_bits > PAGE_BITS_4K; size_bits--) {
++    for (uint8_t size_bits = first_size_bits; size_bits > PAGE_BITS_4K; size_bits--) {
+         /* keep allocating until we run out, or if allocating would
+          * cause us to allocate too much memory*/
+         while (num_untypeds < max_untypeds &&
+@@ -150,11 +155,19 @@ static unsigned int allocate_untypeds(vka_object_t *untypeds, size_t bytes, uns
+ static unsigned int populate_untypeds(vka_object_t *untypeds)
+ {
+     /* First reserve some memory for the driver */
+     vka_object_t reserve[DRIVER_NUM_UNTYPEDS];
+-    unsigned int reserve_num = allocate_untypeds(reserve, DRIVER_UNTYPED_MEMORY, DRIVER_NUM_UNTYPEDS);
++    size_t driver_bytes = config_set(CONFIG_RPC_ONLY) ? BIT(24) : DRIVER_UNTYPED_MEMORY;
++    unsigned int reserve_num = allocate_untypeds(reserve, driver_bytes, DRIVER_NUM_UNTYPEDS);
+-
++
+     /* Now allocate everything else for the tests */
+-    unsigned int num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
++    unsigned int num_untypeds;
++    if (config_set(CONFIG_RPC_ONLY)) {
++        /* One 16 MiB object is ample for the single RPC process and makes the
++         * slow-core path deterministic. The reserved peer is returned below. */
++        num_untypeds = allocate_untypeds(untypeds, BIT(24), 1);
++    } else {
++        num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
++    }
+     /* Fill out the size_bits list */
+     for (unsigned int i = 0; i < num_untypeds; i++) {
+         untyped_size_bits_list[i] = untypeds[i].size_bits;
 diff --git a/settings.cmake b/settings.cmake
 index 522a147..8145e0b 100644
 --- a/settings.cmake
