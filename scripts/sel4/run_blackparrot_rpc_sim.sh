@@ -19,8 +19,8 @@ test -f "$image" || { echo "missing NBF: $image" >&2; exit 1; }
 test -x "$model" || { echo "missing simulator: $model" >&2; exit 1; }
 mkdir -p "$(dirname -- "$output")"
 
-if pgrep -f "^${model//./\\.}( |$)" >/dev/null; then
-    echo "a BlackParrot simulator is already running: $model" >&2
+if pgrep -f '[/]Vbsg_nonsynth_zynq_testbench([[:space:]]|$)' >/dev/null; then
+    echo "a BlackParrot simulator is already running; serialize simulator use" >&2
     exit 1
 fi
 

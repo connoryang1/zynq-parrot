@@ -238,4 +238,6 @@ scripts/sel4/run_blackparrot_rpc_sim.sh sel4-rpc.nbf run.log
 ```
 
 `BLACKPARROT_SIM`, `ZP_INSTALL_DIR`, and `BSG_TRACE_TIMEOUT_S` override its
-model, runtime-library root, and default 90-minute guard respectively.
+model, runtime-library root, and default 90-minute guard respectively. The
+runner refuses to start while any BlackParrot testbench process is live, even
+when it comes from another worktree.
