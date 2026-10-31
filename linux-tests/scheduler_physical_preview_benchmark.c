@@ -96,18 +96,22 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
 
-		if (prctl(PR_BP_PREVIEW_ENABLE,
-			  enabled ? enable_mode : 0UL, 0UL, 0UL, 0UL))
-			fail("toggle preview emission");
-		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
-		if (before_hook == (unsigned long)-1)
-			fail("hook count before");
 		for (unsigned page = 0; page < eviction_pages; page++)
 			for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
 				checksum += eviction[page * page_bytes + offset];
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		if (checksum == UINT64_MAX)
 			fail("eviction checksum");
+		/* Arm only after cache preparation. On the slow FPGA, enabling before
+		 * this 40 KiB loop allowed a timer preemption to issue one hint batch,
+		 * followed by the intended pipe-wakeup batch. Besides violating the
+		 * one-hook invariant, that gave the first batch excessive lead time. */
+		if (prctl(PR_BP_PREVIEW_ENABLE,
+			  enabled ? enable_mode : 0UL, 0UL, 0UL, 0UL))
+			fail("toggle preview emission");
+		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
+		if (before_hook == (unsigned long)-1)
+			fail("hook count before");
 		samples[trial].mode = enabled;
 		transfer(out, &token, 1); /* ready */
 		transfer(in, &token, 0);  /* parent blocks; scheduler selects child */
