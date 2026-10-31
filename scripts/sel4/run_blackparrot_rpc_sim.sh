@@ -11,6 +11,7 @@ fi
 image=$(realpath "$1")
 output=$2
 project_root=$(realpath "$(dirname -- "$0")/../..")
+result_checker=$project_root/scripts/sel4/check_blackparrot_rpc_result.sh
 model=${BLACKPARROT_SIM:-$project_root/cosim/black-parrot-minimal-example/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench}
 timeout_s=${BSG_TRACE_TIMEOUT_S:-5400}
 marker='Test SEL4IPCRPC0002 passed'
@@ -63,6 +64,7 @@ wait "$runner" || runner_status=$?
 trap - INT TERM EXIT
 
 if grep -Fq "$marker" "$output"; then
+    "$result_checker" "$output"
     exit 0
 fi
 echo "simulator ended without exact RPC marker (status $runner_status)" >&2
