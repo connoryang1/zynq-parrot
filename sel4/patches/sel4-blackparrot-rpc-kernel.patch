@@ -1,5 +1,5 @@
 diff --git a/src/arch/riscv/kernel/vspace.c b/src/arch/riscv/kernel/vspace.c
-index 1bbb40364..888522468 100644
+index 1bbb40364..0695e37cf 100644
 --- a/src/arch/riscv/kernel/vspace.c
 +++ b/src/arch/riscv/kernel/vspace.c
 @@ -26,6 +26,9 @@
@@ -53,6 +53,16 @@ index 1bbb40364..888522468 100644
      findVSpaceForASID_ret_t find_ret;
      lookupPTSlot_ret_t  lu_ret;
 
+@@ -903,6 +919,9 @@ static exception_t decodeRISCVFrameInvocation(word_t label, word_t length,
+
+         bool_t executable = !vm_attributes_get_riscvExecuteNever(attr);
+         pte_t pte = makeUserPTE(frame_paddr, executable, vmRights);
++#ifdef CONFIG_PLAT_BLACKPARROT
++        bp_rpc_revoke_asid(asid);
++#endif
+         setThreadState(NODE_STATE(ksCurThread), ThreadState_Restart);
+         return performPageInvocationMapPTE(cap, cte, pte, lu_ret.ptSlot);
+     }
 diff --git a/src/object/objecttype.c b/src/object/objecttype.c
 index e6c603623..aa9295ee9 100644
 --- a/src/object/objecttype.c

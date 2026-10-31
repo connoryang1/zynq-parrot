@@ -197,8 +197,8 @@ token into the backend-private association used by `protected_rpc_call()`.
 Applications still name only their ordinary endpoint; SATPs, hardware context
 IDs, slots, and tokens are not application inputs. Endpoint/TCB finalization,
 TCB VSpace replacement, ASID and ASID-pool deletion, and page/page-table
-unmapping synchronously revoke the descriptor before referenced state can be
-recycled. This one-slot global binding is intentionally an experimental
+mapping mutation synchronously revoke the descriptor before referenced state
+can change or be recycled. This one-slot global binding is intentionally an experimental
 non-MCS implementation; a general facility should use a first-class binding
 capability.
 

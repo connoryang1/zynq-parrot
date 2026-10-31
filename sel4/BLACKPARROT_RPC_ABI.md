@@ -183,8 +183,8 @@ binding.  The kernel must not destroy or reuse an object while revocation is
 
 The experimental seL4 adapter implements these lifetime semantics for its
 global one-slot record: endpoint and caller/server TCB finalization, TCB VSpace
-replacement, ASID or ASID-pool deletion, and any page/page-table unmap in a
-bound address space synchronously revoke before mutation completes. Explicit
+replacement, ASID or ASID-pool deletion, and any page remap or page/page-table
+unmap in a bound address space synchronously revoke before mutation completes. Explicit
 unbind uses the same revocation path. This conservative implementation may
 revoke for an unrelated mapping in either VSpace; multiple or selectively
 pinned bindings should move state into a real kernel capability object rather
