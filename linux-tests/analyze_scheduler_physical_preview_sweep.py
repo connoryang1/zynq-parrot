@@ -4,6 +4,7 @@
 import argparse
 import json
 import random
+import re
 import statistics
 from pathlib import Path
 
@@ -77,7 +78,9 @@ def analyze(paths, allow_partial=False):
         missing = sorted(expected - set(cells))
         extra = sorted(set(cells) - expected)
         raise ValueError(f"incomplete sweep; missing={missing}, extra={extra}")
-    if "CORE PASS" not in board_text or "BSG PASS" not in board_text:
+    core_pass = re.search(r"\bCORE(?:\[0\])? PASS\b", board_text)
+    host_pass = re.search(r"\bBSG PASS\b", board_text)
+    if not core_pass or not host_pass:
         raise ValueError("missing final board CORE/BSG PASS markers")
 
     rng = random.Random(0xB50_5E7)

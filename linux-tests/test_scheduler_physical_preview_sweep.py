@@ -7,7 +7,8 @@ from pathlib import Path
 from analyze_scheduler_physical_preview_sweep import analyze
 
 
-def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False):
+def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
+               core_marker="CORE PASS"):
     mode_value = 2 if timing == "late" else 1
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
@@ -24,7 +25,7 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False):
             f"wake_to_entry={entry} load_cycles={load} "
             f"wake_to_load={entry + load} roundtrip={entry + load + 50}"
         )
-    lines.extend(("PHYSICAL_BENCH_PARENT PASS", "CORE PASS", "BSG PASS"))
+    lines.extend(("PHYSICAL_BENCH_PARENT PASS", core_marker, "BSG PASS"))
     return "\n".join(lines)
 
 
@@ -59,6 +60,13 @@ class SweepAnalyzerTest(unittest.TestCase):
             path.write_text(transcript(trials=128))
             with self.assertRaisesRegex(ValueError, "expected exactly 512"):
                 analyze([path], allow_partial=True)
+
+    def test_indexed_core_pass_is_accepted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "run.log"
+            path.write_text(transcript(core_marker="CORE[0] PASS"))
+            result = analyze([path], allow_partial=True)
+        self.assertEqual(result["cells"]["late_0"]["trials"], 512)
 
 
 if __name__ == "__main__":

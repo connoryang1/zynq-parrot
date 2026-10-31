@@ -579,6 +579,20 @@ After all 16 early/late cells finish with final board PASS markers, pass their
 transcripts to `analyze_scheduler_physical_preview_sweep.py`; it requires the
 complete matrix and reports per-cell plus set-stratified pooled intervals.
 
+After the verified overlay and NBF have been staged, the serialized board
+runner transfers and hash-checks the ELF once, executes every cell exactly once
+with alternating early/late order by group, and powers off for final
+`CORE PASS`/`CORE[0] PASS` and `BSG PASS` markers:
+
+```sh
+python3 linux-tests/run_scheduler_physical_preview_sweep.py \
+  IMAGE.nbf TRANSFER ELF_SHA256 BOARD.log
+```
+
+The runner writes `BOARD.log.status.json`. Any failed or interrupted run still
+requires a full board power cycle, PYNQ readiness wait, and verified overlay
+reload before retrying.
+
 The benchmark is intentionally a four-line mechanism ceiling. Prior completed-
 state oracle evidence measured about 1,265 local cycles from 32 dependent data
 lines but only 2.66% of wake-to-load, while combined instruction/data warming

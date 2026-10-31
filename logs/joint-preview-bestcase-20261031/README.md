@@ -71,6 +71,12 @@ A cell is accepted only with all 512 ordered timing rows. The fourth analyzer
 regression rejects a truncated 128-row transcript even when its synthetic PASS
 markers remain present.
 
+`linux-tests/run_scheduler_physical_preview_sweep.py` uses the reviewed
+serialized interactive runner, verifies the guest ELF hash, executes every one
+of the 16 cells exactly once, alternates early/late order by group, and powers
+off for final core/host markers. Its two plan tests plus the five analyzer tests
+pass, and a dry run prints the expected 16 unique cells.
+
 The completed-state oracle on the historical data-capable image bounds the
 opportunity: 32 dependent data lines save 1,265.25 local cycles but only 2.66%
 of wake-to-load, while combined instruction/data warming saves 2,044 local
