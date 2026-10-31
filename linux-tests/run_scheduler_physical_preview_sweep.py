@@ -15,6 +15,7 @@ import pexpect
 DEFAULT_HOST = "xilinx@192.168.4.35"
 DEFAULT_CONTROL_SHA = "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30"
 GUEST_ELF = "/tmp/scheduler_physical_preview_benchmark_dynamic"
+SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 
 
 def cell_plan():
@@ -80,13 +81,13 @@ def run(args):
         child.setwinsize(50, 180)
         with args.log.open("w") as log:
             child.logfile_read = log
-            child.expect_exact("~ # ")
+            child.expect(SHELL_PROMPT)
             for command in args.transfer.read_text().splitlines():
                 child.sendline(command)
-                child.expect_exact("~ # ", timeout=60)
+                child.expect(SHELL_PROMPT, timeout=60)
             child.sendline(f"sha256sum {GUEST_ELF}")
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
-            child.expect_exact("~ # ")
+            child.expect(SHELL_PROMPT)
             for group, timing in cell_plan():
                 child.sendline(
                     f"{GUEST_ELF} {group} {timing}; "
@@ -102,7 +103,7 @@ def run(args):
                     raise RuntimeError(
                         f"benchmark cell group={group} timing={timing} exited {rc}"
                     )
-                child.expect_exact("~ # ")
+                child.expect(SHELL_PROMPT)
             child.sendline("poweroff -f")
             child.expect(re.compile(r"CORE(?:\[0\])? PASS"), timeout=180)
             child.expect(pexpect.EOF, timeout=180)
@@ -115,7 +116,7 @@ def run(args):
         if "BSG PASS" not in text:
             raise RuntimeError("host BSG PASS marker missing")
         status.update(status="PASS", runner_exit=0)
-    except Exception as error:
+    except (Exception, KeyboardInterrupt) as error:
         status.update(
             status="FAIL",
             error=repr(error),

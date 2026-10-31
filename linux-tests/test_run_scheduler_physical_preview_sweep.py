@@ -2,10 +2,15 @@
 
 import unittest
 
-from run_scheduler_physical_preview_sweep import cell_plan
+from run_scheduler_physical_preview_sweep import SHELL_PROMPT, cell_plan
 
 
 class CellPlanTest(unittest.TestCase):
+    def test_accepts_both_established_root_prompts(self):
+        self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
+        self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))
+        self.assertIsNone(SHELL_PROMPT.search("\r\n$ "))
+
     def test_plan_covers_each_cell_once(self):
         plan = cell_plan()
         expected = {(group, timing) for group in range(8)
