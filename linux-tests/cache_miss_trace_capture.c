@@ -34,11 +34,12 @@ enum trace_window {
 };
 static enum trace_window trace_window;
 static int summary_only;
+static unsigned samples = 1;
 
 static void usage(FILE *stream)
 {
   fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]"
-        " [--summary-only]\n", stream);
+        " [--summary-only] [--samples 1..10000]\n", stream);
 }
 
 static void fail(const char *what)
@@ -147,25 +148,52 @@ static void *peer_main(void *unused)
   atomic_store_explicit(&peer_ready, 1, memory_order_release);
   futex_wake_one(&peer_ready);
 
-  wait_until(&phase, 1);
-  if (trace_window == TRACE_WINDOW_FROM_PEER) {
-    trace_control(2);
-    trace_start_cycle = global_cycle();
-    peer_begin_cycle = trace_start_cycle;
-    trace_control(3);
-  } else {
-    peer_begin_cycle = global_cycle();
-    if (trace_window == TRACE_WINDOW_TO_PEER)
-      trace_control(0);
-  }
-  atomic_store_explicit(&phase, 2, memory_order_release);
-  peer_wake_cycle = global_cycle();
-  futex_wake_one(&phase);
-  peer_block_cycle = global_cycle();
+  for (unsigned sample = 0; sample < samples; ++sample) {
+    wait_until(&phase, 1);
+    if (trace_window == TRACE_WINDOW_FROM_PEER) {
+      trace_control(2);
+      trace_start_cycle = global_cycle();
+      peer_begin_cycle = trace_start_cycle;
+      trace_control(3);
+    } else {
+      peer_begin_cycle = global_cycle();
+      if (trace_window == TRACE_WINDOW_TO_PEER)
+        trace_control(0);
+    }
+    atomic_store_explicit(&phase, 2, memory_order_release);
+    peer_wake_cycle = global_cycle();
+    futex_wake_one(&phase);
+    peer_block_cycle = global_cycle();
 
-  /* Block after waking the source, forcing the source task to be dispatched. */
-  wait_until(&phase, 3);
+    /* Block after waking the source, forcing the source task to be dispatched. */
+    wait_until(&phase, 3);
+  }
   return NULL;
+}
+
+static unsigned parse_samples(const char *text)
+{
+  unsigned value = 0;
+  if (!text[0]) {
+    usage(stderr);
+    exit(EXIT_FAILURE);
+  }
+  for (const char *p = text; *p; ++p) {
+    if (*p < '0' || *p > '9' || value > 10000U / 10U) {
+      usage(stderr);
+      exit(EXIT_FAILURE);
+    }
+    value = value * 10U + (unsigned)(*p - '0');
+    if (value > 10000U) {
+      usage(stderr);
+      exit(EXIT_FAILURE);
+    }
+  }
+  if (!value) {
+    usage(stderr);
+    exit(EXIT_FAILURE);
+  }
+  return value;
 }
 
 static uint32_t record_cycle(uint64_t record)
@@ -191,6 +219,8 @@ int main(int argc, char **argv)
   for (int arg = 1; arg < argc; ++arg) {
     if (!strcmp(argv[arg], "--summary-only")) {
       summary_only = 1;
+    } else if (!strcmp(argv[arg], "--samples") && arg + 1 < argc) {
+      samples = parse_samples(argv[++arg]);
     } else if (!strcmp(argv[arg], "--window") && arg + 1 < argc) {
       const char *window = argv[++arg];
       if (!strcmp(window, "full"))
@@ -214,90 +244,98 @@ int main(int argc, char **argv)
   check_pthread(pthread_create(&peer, NULL, peer_main, NULL), "pthread_create");
   wait_until(&peer_ready, 1);
 
-  /* Clear while disarmed first, keeping setup and stale records out of scope. */
-  trace_control(2);
-  if (trace_window != TRACE_WINDOW_FROM_PEER) {
-    trace_start_cycle = global_cycle();
-    trace_control(3);
-  }
+  int any_failure = 0;
+  for (unsigned sample = 1; sample <= samples; ++sample) {
+    /* Clear while disarmed first, keeping setup and stale records out of scope. */
+    trace_control(2);
+    if (trace_window != TRACE_WINDOW_FROM_PEER) {
+      trace_start_cycle = global_cycle();
+      trace_control(3);
+    }
 
-  atomic_store_explicit(&phase, 1, memory_order_release);
-  futex_wake_one(&phase);
-  wait_until(&phase, 2);
+    atomic_store_explicit(&phase, 1, memory_order_release);
+    futex_wake_one(&phase);
+    wait_until(&phase, 2);
 
-  const uint64_t resume_cycle = global_cycle();
-  trace_control(0);
-  __asm__ volatile("nop\nnop\nnop" : : : "memory");
-  const uint64_t status = trace_status();
+    const uint64_t resume_cycle = global_cycle();
+    trace_control(0);
+    __asm__ volatile("nop\nnop\nnop" : : : "memory");
+    const uint64_t status = trace_status();
 
-  atomic_store_explicit(&phase, 3, memory_order_release);
-  futex_wake_one(&phase);
-  check_pthread(pthread_join(peer, NULL), "pthread_join");
+    atomic_store_explicit(&phase, 3, memory_order_release);
+    futex_wake_one(&phase);
 
-  const unsigned icount = (unsigned)(status & UINT64_C(0x1ff));
-  const unsigned dcount = (unsigned)((status >> 9) & UINT64_C(0x1ff));
-  const unsigned ioverflow = (unsigned)((status >> 18) & 1);
-  const unsigned doverflow = (unsigned)((status >> 19) & 1);
-  const unsigned armed = (unsigned)((status >> 20) & 1);
-  const uint64_t stop_cycle = trace_window == TRACE_WINDOW_TO_PEER
-    ? peer_begin_cycle : resume_cycle;
-  printf("TRACE_HEADER cpu=%d window=%u start=%" PRIu64 " peer_begin=%" PRIu64
-         " peer_wake=%" PRIu64 " peer_block=%" PRIu64 " resume=%" PRIu64
-         " elapsed=%" PRIu64 " i_count=%u d_count=%u"
-         " i_overflow=%u d_overflow=%u armed=%u status=0x%016" PRIx64 "\n",
-         cpu, (unsigned)trace_window, trace_start_cycle, peer_begin_cycle,
-         peer_wake_cycle, peer_block_cycle, resume_cycle,
-         stop_cycle - trace_start_cycle,
-         icount, dcount, ioverflow, doverflow,
-         armed, status);
+    const unsigned icount = (unsigned)(status & UINT64_C(0x1ff));
+    const unsigned dcount = (unsigned)((status >> 9) & UINT64_C(0x1ff));
+    const unsigned ioverflow = (unsigned)((status >> 18) & 1);
+    const unsigned doverflow = (unsigned)((status >> 19) & 1);
+    const unsigned armed = (unsigned)((status >> 20) & 1);
+    const uint64_t stop_cycle = trace_window == TRACE_WINDOW_TO_PEER
+      ? peer_begin_cycle : resume_cycle;
+    if (samples > 1)
+      printf("SAMPLE=%u\n", sample);
+    printf("TRACE_HEADER cpu=%d window=%u start=%" PRIu64 " peer_begin=%" PRIu64
+           " peer_wake=%" PRIu64 " peer_block=%" PRIu64 " resume=%" PRIu64
+           " elapsed=%" PRIu64 " i_count=%u d_count=%u"
+           " i_overflow=%u d_overflow=%u armed=%u status=0x%016" PRIx64 "\n",
+           cpu, (unsigned)trace_window, trace_start_cycle, peer_begin_cycle,
+           peer_wake_cycle, peer_block_cycle, resume_cycle,
+           stop_cycle - trace_start_cycle,
+           icount, dcount, ioverflow, doverflow,
+           armed, status);
 
-  if (armed || icount > TRACE_DEPTH || dcount > TRACE_DEPTH ||
-      icount + dcount == 0) {
-    fputs("TRACE_FAIL invalid recorder status\n", stderr);
-    return EXIT_FAILURE;
-  }
+    if (armed || icount > TRACE_DEPTH || dcount > TRACE_DEPTH ||
+        icount + dcount == 0) {
+      fputs("TRACE_FAIL invalid recorder status\n", stderr);
+      any_failure = 1;
+      continue;
+    }
 
-  if (summary_only) {
+    if (summary_only) {
+      if (ioverflow || doverflow) {
+        printf("TRACE_TRUNCATED records=%u elapsed=%" PRIu64
+               " i_overflow=%u d_overflow=%u\n",
+               icount + dcount, stop_cycle - trace_start_cycle,
+               ioverflow, doverflow);
+        any_failure = 1;
+      } else {
+        printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
+               icount + dcount, stop_cycle - trace_start_cycle);
+      }
+      continue;
+    }
+
+    for (unsigned i = 0; i < icount; ++i)
+      icache_records[i] = trace_record(0, i);
+    for (unsigned i = 0; i < dcount; ++i)
+      dcache_records[i] = trace_record(1, i);
+
+    unsigned ii = 0, di = 0, sequence = 0;
+    const uint32_t start32 = (uint32_t)trace_start_cycle;
+    while (ii < icount || di < dcount) {
+      const uint32_t irelative = ii < icount
+        ? record_cycle(icache_records[ii]) - start32 : UINT32_MAX;
+      const uint32_t drelative = di < dcount
+        ? record_cycle(dcache_records[di]) - start32 : UINT32_MAX;
+      if (irelative <= drelative) {
+        print_record(sequence++, 'I', ii, icache_records[ii], start32);
+        ++ii;
+      } else {
+        print_record(sequence++, 'D', di, dcache_records[di], start32);
+        ++di;
+      }
+    }
     if (ioverflow || doverflow) {
       printf("TRACE_TRUNCATED records=%u elapsed=%" PRIu64
              " i_overflow=%u d_overflow=%u\n",
              icount + dcount, stop_cycle - trace_start_cycle,
              ioverflow, doverflow);
-      return EXIT_FAILURE;
-    }
-    printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
-           icount + dcount, stop_cycle - trace_start_cycle);
-    return EXIT_SUCCESS;
-  }
-
-  for (unsigned i = 0; i < icount; ++i)
-    icache_records[i] = trace_record(0, i);
-  for (unsigned i = 0; i < dcount; ++i)
-    dcache_records[i] = trace_record(1, i);
-
-  unsigned ii = 0, di = 0, sequence = 0;
-  const uint32_t start32 = (uint32_t)trace_start_cycle;
-  while (ii < icount || di < dcount) {
-    const uint32_t irelative = ii < icount
-      ? record_cycle(icache_records[ii]) - start32 : UINT32_MAX;
-    const uint32_t drelative = di < dcount
-      ? record_cycle(dcache_records[di]) - start32 : UINT32_MAX;
-    if (irelative <= drelative) {
-      print_record(sequence++, 'I', ii, icache_records[ii], start32);
-      ++ii;
+      any_failure = 1;
     } else {
-      print_record(sequence++, 'D', di, dcache_records[di], start32);
-      ++di;
+      printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
+             icount + dcount, stop_cycle - trace_start_cycle);
     }
   }
-  if (ioverflow || doverflow) {
-    printf("TRACE_TRUNCATED records=%u elapsed=%" PRIu64
-           " i_overflow=%u d_overflow=%u\n",
-           icount + dcount, stop_cycle - trace_start_cycle,
-           ioverflow, doverflow);
-    return EXIT_FAILURE;
-  }
-  printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
-         icount + dcount, stop_cycle - trace_start_cycle);
-  return EXIT_SUCCESS;
+  check_pthread(pthread_join(peer, NULL), "pthread_join");
+  return any_failure ? EXIT_FAILURE : EXIT_SUCCESS;
 }

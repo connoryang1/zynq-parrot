@@ -1,0 +1,1644 @@
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=d7a2964c018f260cba7695607e0f7d86eced474e65dd57bb4ec967af16fae235
+LOG=/home/xilinx/bp-logs/linux-cond-prefix16-shell-final-interactive-20261031T124642Z-3854.log
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 300000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeb1b690 40000004 16 1
+INFO:    Creating host: 0xbeb1b690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cee000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cee000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1652001
+DEBUG-PS: ps.cpp: 1-1652211
+DEBUG-PS: ps.cpp: 2-1652395
+DEBUG-PS: ps.cpp: 3-1652574
+DEBUG-PS: ps.cpp: 4-1652749
+DEBUG-PS: ps.cpp: 5-1652924
+DEBUG-PS: ps.cpp: 6-1653105
+DEBUG-PS: ps.cpp: 7-1653277
+DEBUG-PS: ps.cpp: 8-1653450
+DEBUG-PS: ps.cpp: 9-1653621
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878632
+DEBUG-PS: ps.cpp: finished loading 1878632 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #8 SMP Sat Oct 31 00:13:22 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8287K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000107] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009406] Console: colour dummy device 80x25
+[    0.011222] printk: console [hvc0] enabled
+[    0.159665] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.165737] pid_max: default: 32768 minimum: 301
+[    0.181986] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.187275] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.428398] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.446434] riscv: ELF compat mode unsupported
+[    0.448256] ASID allocator disabled (1 bits)
+[    0.470072] rcu: Hierarchical SRCU implementation.
+[    0.473790] rcu: 	Max phase no-delay instances is 1000.
+[    0.513063] EFI services will not be available.
+[    0.534951] smp: Bringing up secondary CPUs ...
+[    0.539135] smp: Brought up 1 node, 1 CPU
+[    0.583671] devtmpfs: initialized
+[    0.710156] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.716375] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.808009] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.852668] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.859517] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.161722] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.403552] SCSI subsystem initialized
+[    1.428197] libata version 3.00 loaded.
+[    1.452718] usbcore: registered new interface driver usbfs
+[    1.459859] usbcore: registered new interface driver hub
+[    1.467660] usbcore: registered new device driver usb
+[    1.583603] vgaarb: loaded
+[    1.595930] clocksource: Switched to clocksource riscv_clocksource
+[    2.940348] NET: Registered PF_INET protocol family
+[    2.963666] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.030077] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.037425] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.043675] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.049252] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.060756] TCP: Hash tables configured (established 512 bind 512)
+[    3.075988] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.085541] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.109418] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.194018] RPC: Registered named UNIX socket transport module.
+[    3.199106] RPC: Registered udp transport module.
+[    3.201560] RPC: Registered tcp transport module.
+[    3.204777] RPC: Registered tcp-with-tls transport module.
+[    3.208348] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.212543] PCI: CLS 0 bytes, default 64
+[    3.381981] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.481010] NFS: Registering the id_resolver key type
+[    3.489125] Key type id_resolver registered
+[    3.492704] Key type id_legacy registered
+[    3.499442] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.503788] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.557892] 9p: Installing v9fs 9p2000 file system support
+[    3.588284] NET: Registered PF_ALG protocol family
+[    3.597509] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.603544] io scheduler mq-deadline registered
+[    3.606128] io scheduler kyber registered
+[   23.396315] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   23.801594] [drm] radeon kernel modesetting enabled.
+[   25.429066] loop: module loaded
+[   25.655632] e1000e: Intel(R) PRO/1000 Network Driver
+[   25.659226] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   25.864279] usbcore: registered new interface driver uas
+[   25.873149] usbcore: registered new interface driver usb-storage
+[   25.941189] mousedev: PS/2 mouse device common for all mice
+[   25.986134] sdhci: Secure Digital Host Controller Interface driver
+[   25.991233] sdhci: Copyright(c) Pierre Ossman
+[   25.997127] sdhci-pltfm: SDHCI platform and OF driver helper
+[   26.024945] usbcore: registered new interface driver usbhid
+[   26.028988] usbhid: USB HID core driver
+[   26.060722] NET: Registered PF_INET6 protocol family
+[   26.297952] Segment Routing with IPv6
+[   26.309238] In-situ OAM (IOAM) with IPv6
+[   26.321134] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   26.396816] NET: Registered PF_PACKET protocol family
+[   26.409893] 9pnet: Installing 9P2000 support
+[   26.420645] Key type dns_resolver registered
+[   26.431905] start plist test
+[   26.866083] end plist test
+[   29.223924] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   29.909717] clk: Disabling unused clocks
+[   38.714079] Freeing unused kernel image (initmem) memory: 5104K
+[   38.720650] Run /bin/sh as init process
+[   38.723959]   with arguments:
+[   38.725648]     /bin/sh
+[   38.728019]   with environment:
+[   38.729767]     HOME=/
+[   38.732110]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # : > /tmp/cache_miss_trace_capture_dynamic.b64
+: > /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAArA0BAAAAAABAAAAAAAAAAAgwAAAAAAAABQAAAEAAOAAK' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAArA0BAAAAAABAAAAAAAAAAAgwAAAAAAAABQAAAE
+AAOAAK' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AEAAHgAdAAYAAAAEAAAAQAAAAAAAAABAAAEAAAAAAEAAAQAAAAAAMAIAAAAAAAAwAgAAAAAAAAgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AEAAHgAdAAYAAAAEAAAAQAAAAAAAAABAAAEAAAAAAEAAAQAAAAAAMAIAAAAAAAAwAgAAAA
+AAAAgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAwAAAAQAAABwAgAAAAAAAHACAQAAAAAAcAIBAAAAAAAhAAAAAAAAACEAAAAAAAAAAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAwAAAAQAAABwAgAAAAAAAHACAQAAAAAAcAIBAAAAAAAhAAAAAAAAACEAAAAAAA
+AAAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAADAABwBAAAAK8gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEAAAAAAAAAAAAAAAAAAAABAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAADAABwBAAAAK8gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEAAAAAAAAAAAAAAAAAAA
+ABAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAEAAAAFAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAeBYAAAAAAAB4FgAAAAAAAAAQAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAEAAAAFAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAeBYAAAAAAAB4FgAAAAAAAA
+AQAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAQAAAAYAAADwHQAAAAAAAPAtAQAAAAAA8C0BAAAAAACMAgAAAAAAANASAAAAAAAAABAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAQAAAAYAAADwHQAAAAAAAPAtAQAAAAAA8C0BAAAAAACMAgAAAAAAANASAAAAAAAAAB
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAACAAAABgAAAAgeAAAAAAAACC4BAAAAAAAILgEAAAAAAOABAAAAAAAA4AEAAAAAAAAIAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAACAAAABgAAAAgeAAAAAAAACC4BAAAAAAAILgEAAAAAAOABAAAAAAAA4AEAAAAAAAAIAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAQAAAAEAAAAlAIAAAAAAACUAgEAAAAAAJQCAQAAAAAAIAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAQAAAAEAAAAlAIAAAAAAACUAgEAAAAAAJQCAQAAAAAAIAAAAAAAAAAgAAAAAAAAAAQAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'UOV0ZAQAAABIFAAAAAAAAEgUAQAAAAAASBQBAAAAAABcAAAAAAAAAFwAAAAAAAAABAAAAAAAAABR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'UOV0ZAQAAABIFAAAAAAAAEgUAQAAAAAASBQBAAAAAABcAAAAAAAAAFwAAAAAAAAABAAAAA
+AAAABR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '5XRkBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAFLl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '5XRkBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA
+AAAFLl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'dGQEAAAA8B0AAAAAAADwLQEAAAAAAPAtAQAAAAAAEAIAAAAAAAAQAgAAAAAAAAEAAAAAAAAAL2xp' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'dGQEAAAA8B0AAAAAAADwLQEAAAAAAPAtAQAAAAAAEAIAAAAAAAAQAgAAAAAAAAEAAAAAAA
+AAL2xp' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'Yi9sZC1saW51eC1yaXNjdjY0LWxwNjRkLnNvLjEAAAAABAAAABAAAAABAAAAR05VAAAAAAAEAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'Yi9sZC1saW51eC1yaXNjdjY0LWxwNjRkLnNvLjEAAAAABAAAABAAAAABAAAAR05VAAAAAA
+AEAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'DwAAAAAAAAAAAAAAAwAAABEAAAAFAAAACQAAABAAAAAAAAAAAAAAAAYAAAACAAAAAwAAAA8AAAAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'DwAAAAAAAAAAAAAAAwAAABEAAAAFAAAACQAAABAAAAAAAAAAAAAAAAYAAAACAAAAAwAAAA
+8AAAAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAABAAAAAcAAAANAAAADgAAAAgAAAAAAAAADAAAAAAAAAALAAAACgAAAAMAAAABAAAAAgAAAAcA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAABAAAAAcAAAANAAAADgAAAAgAAAAAAAAADAAAAAAAAAALAAAACgAAAAMAAAABAAAAAg
+AAAAcA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AABiQNIRMUBRkwAAAEIBEIiEAQAAAAYAAAAMAAAAoBLCuvq7ep4E2403EFrmdzG4gg0W6nb+GH4K' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AABiQNIRMUBRkwAAAEIBEIiEAQAAAAYAAAAMAAAAoBLCuvq7ep4E2403EFrmdzG4gg0W6n
+b+GH4K' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'h/7shBQ+fpZ8uCtrFTnyixwuTj32ACP5pOCZ0ro8B9QFX5aTHAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'h/7shBQ+fpZ8uCtrFTnyixwuTj32ACP5pOCZ0ro8B9QFX5aTHAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAACSAAAAEgAAAOAHAQAAAAAAAAAAAAAAAAA7AAAAEgAAAAAIAQAAAAAAAAAAAAAAAACa' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAACSAAAAEgAAAOAHAQAAAAAAAAAAAAAAAAA7AAAAEgAAAAAIAQAAAAAAAAAAAA
+AAAACa' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAEgAAACAIAQAAAAAAAAAAAAAAAAANAAAAEgAAADAIAQAAAAAAAAAAAAAAAABlAAAAEgAAAKAI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAEgAAACAIAQAAAAAAAAAAAAAAAAANAAAAEgAAADAIAQAAAAAAAAAAAAAAAABlAAAAEg
+AAAKAI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAABzAAAAEgAAAPAHAQAAAAAAAAAAAAAAAADMAAAAEADx/3A4AQAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAABzAAAAEgAAAPAHAQAAAAAAAAAAAAAAAADMAAAAEADx/3A4AQAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAABAAAAEgAAAEAIAQAAAAAAAAAAAAAAAAAIAAAAEgAAAGAIAQAAAAAAAAAAAAAAAABsAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAABAAAAEgAAAEAIAQAAAAAAAAAAAAAAAAAIAAAAEgAAAGAIAQAAAAAAAAAAAAAAAA
+BsAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'EgAAAHAIAQAAAAAAAAAAAAAAAABeAAAAEQAYALAwAQAAAAAACAAAAAAAAABMAAAAEgAAANAHAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'EgAAAHAIAQAAAAAAAAAAAAAAAABeAAAAEQAYALAwAQAAAAAACAAAAAAAAABMAAAAEgAAAN
+AHAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAACBAAAAEgAAABAIAQAAAAAAAAAAAAAAAAAsAAAAEgAAAFAIAQAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAACBAAAAEgAAABAIAQAAAAAAAAAAAAAAAAAsAAAAEgAAAFAIAQAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAfAAAAEgAAAIAIAQAAAAAAAAAAAAAAAAB6AAAAEgAAAJAIAQAAAAAAAAAAAAAAAAAAcGVycm9y' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAfAAAAEgAAAIAIAQAAAAAAAAAAAAAAAAB6AAAAEgAAAJAIAQAAAAAAAAAAAAAAAAAAcG
+Vycm9y' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AGV4aXQAc2NoZWRfc2V0YWZmaW5pdHkAcHRocmVhZF9qb2luAHB0aHJlYWRfY3JlYXRlAF9fc2No' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AGV4aXQAc2NoZWRfc2V0YWZmaW5pdHkAcHRocmVhZF9qb2luAHB0aHJlYWRfY3JlYXRlAF
+9fc2No' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ZWRfY3B1Y291bnQAX19saWJjX3N0YXJ0X21haW4Ac3RkZXJyAG1lbXNldABwcmludGYAZndyaXRl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ZWRfY3B1Y291bnQAX19saWJjX3N0YXJ0X21haW4Ac3RkZXJyAG1lbXNldABwcmludGYAZn
+dyaXRl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AHN0cmNtcABfX2Vycm5vX2xvY2F0aW9uAHN5c2NhbGwAc2NoZWRfZ2V0YWZmaW5pdHkAbGliYy5z' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AHN0cmNtcABfX2Vycm5vX2xvY2F0aW9uAHN5c2NhbGwAc2NoZWRfZ2V0YWZmaW5pdHkAbG
+liYy5z' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'by42AEdMSUJDXzIuMjcAR0xJQkNfMi4zNABfX2dsb2JhbF9wb2ludGVyJAAAAAMAAwADAAMAAwAD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'by42AEdMSUJDXzIuMjcAR0xJQkNfMi4zNABfX2dsb2JhbF9wb2ludGVyJAAAAAMAAwADAA
+MAAwAD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAEAAwADAAMAAwACAAMAAgACAAMAAQACAKwAAAAQAAAAAAAAAIeRlgYAAAMAtgAAABAAAAC0kZYG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAEAAwADAAMAAwACAAMAAgACAAMAAQACAKwAAAAQAAAAAAAAAIeRlgYAAAMAtgAAABAAAA
+C0kZYG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAACAMEAAAAAAAAAsDABAAAAAAAEAAAACwAAAAAAAAAAAAAAADABAAAAAAAFAAAADAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAACAMEAAAAAAAAAsDABAAAAAAAEAAAACwAAAAAAAAAAAAAAADABAAAAAAAFAAAADAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAACDABAAAAAAAFAAAAAQAAAAAAAAAAAAAAEDABAAAAAAAFAAAABgAAAAAAAAAAAAAAGDABAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAACDABAAAAAAAFAAAAAQAAAAAAAAAAAAAAEDABAAAAAAAFAAAABgAAAAAAAAAAAAAAGD
+ABAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAFAAAAAgAAAAAAAAAAAAAAIDABAAAAAAAFAAAADQAAAAAAAAAAAAAAKDABAAAAAAAFAAAAAwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAFAAAAAgAAAAAAAAAAAAAAIDABAAAAAAAFAAAADQAAAAAAAAAAAAAAKDABAAAAAAAFAA
+AAAwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAMDABAAAAAAAFAAAABAAAAAAAAAAAAAAAODABAAAAAAAFAAAACAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAMDABAAAAAAAFAAAABAAAAAAAAAAAAAAAODABAAAAAAAFAAAACAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'QDABAAAAAAAFAAAADgAAAAAAAAAAAAAASDABAAAAAAAFAAAACQAAAAAAAAAAAAAAUDABAAAAAAAF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'QDABAAAAAAAFAAAADgAAAAAAAAAAAAAASDABAAAAAAAFAAAACQAAAAAAAAAAAAAAUDABAA
+AAAAAF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAACgAAAAAAAAAAAAAAWDABAAAAAAAFAAAADwAAAAAAAAAAAAAAYDABAAAAAAAFAAAAEAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAACgAAAAAAAAAAAAAAWDABAAAAAAAFAAAADwAAAAAAAAAAAAAAYDABAAAAAAAFAAAAEA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAaDABAAAAAAAFAAAABQAAAAAAAAAAAAAAlzMAADMDw0EDvgOEEwND/ZOCA4QTUxMAg7KC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAaDABAAAAAAAFAAAABQAAAAAAAAAAAAAAlzMAADMDw0EDvgOEEwND/ZOCA4QTUx
+MAg7KC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AGcADgAXPgAAAz4Og2cDDgATAAAAFz4AAAM+joJnAw4AEwAAABc+AAADPg6CZwMOABMAAAAXPgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AGcADgAXPgAAAz4Og2cDDgATAAAAFz4AAAM+joJnAw4AEwAAABc+AAADPg6CZwMOABMAAA
+AXPgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'Az6OgWcDDgATAAAAFz4AAAM+DoFnAw4AEwAAABc+AAADPo6AZwMOABMAAAAXPgAAAz4OgGcDDgAT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'Az6OgWcDDgATAAAAFz4AAAM+DoFnAw4AEwAAABc+AAADPo6AZwMOABMAAAAXPgAAAz4OgG
+cDDgAT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAFy4AAAM+jn9nAw4AEwAAABcuAAADPg5/ZwMOABMAAAAXLgAAAz6OfmcDDgATAAAAFy4AAAM+' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAFy4AAAM+jn9nAw4AEwAAABcuAAADPg5/ZwMOABMAAAAXLgAAAz6OfmcDDgATAAAAFy
+4AAAM+' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'Dn5nAw4AEwAAABcuAAADPo59ZwMOABMAAAAXLgAAAz4OfWcDDgATAAAAFy4AAAM+jnxnAw4AEwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'Dn5nAw4AEwAAABcuAAADPo59ZwMOABMAAAAXLgAAAz4OfWcDDgATAAAAFy4AAAM+jnxnAw
+4AEwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AEERBuTv8N/4BUXv8H/6UXFe9Yb1ovGm7crpzuXS4Vb9Wvli8Wbtaulu5YVLY9qrDolkqoouixON' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AEERBuTv8N/4BUXv8H/6UXFe9Yb1ovGm7crpzuXS4Vb9Wvli8Wbtaulu5YVLY9qrDolkqo
+ouixON' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'QYGFTKVJEwmAPpOEBHGXLQAAk40teBOMAYExoCMgnAGFK2PTWw0TlDsAWpQDOgQAlxUAAJOFhYhS' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'QYGFTKVJEwmAPpOEBHGXLQAAk40teBOMAYExoCMgnAGFK2PTWw0TlDsAWpQDOgQAlxUAAJ
+OFhYhS' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'he/w//Z53ZcVAACThYWIUoXv8P/1KeGFK2PKWymDtgGEEwaABoVFFxUAABMFhYfv8B/qhUe+8K5w' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'he/w//Z53ZcVAACThYWIUoXv8P/1KeGFK2PKWymDtgGEEwaABoVFFxUAABMFhYfv8B/qhU
+e+8K5w' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'DnQGde5kTmmuaQ5q6npKe6p7CnzqbEptqm1tYYKAlxUAAJOFhYtShe/w//BF/YUr49pb+wBklxUA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'DnQGde5kTmmuaQ5q6npKe6p7CnzqbEptqm1tYYKAlxUAAJOFhYtShe/w//BF/YUr49pb+w
+BklxUA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AJOFBYsihe/wf+9jAAUilxUAAJOFZYoihe/wX+5jCwUglxUAAJOFxYkihe/wP+01/YlHIyD9AIUr' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AJOFBYsihe/wf+9jAAUilxUAAJOFZYoihe/wX+5jCwUglxUAAJOFxYkihe/wP+01/YlHIy
+D9AIUr' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '48Fb9e8AYEeqh4FGFwYAABMGJl+BRagYvuzv8L/mqvBjHwU4hUUThYGD7wAgV5csAACTjOxng6cM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '48Fb9e8AYEeqh4FGFwYAABMGJl+BRagYvuzv8L/mqvBjHwU4hUUThYGD7wAgV5csAACTjO
+xng6cM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AGOFByAFSpOLQYETjYGBiahj54cYs4eJAL7oY4IHGJOHAYGz6poAE/caAJxDuvRjhgcggzcNADMG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AGOFByAFSpOLQYETjYGBiahj54cYs4eJAL7oY4IHGJOHAYGz6poAE/caAJxDuvRjhgcggz
+cNADMG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '+0Cmd2OHBx4mZ4ZmxmUXFQAAEwVFke/w3+GFR77wg6cMAAUqY+dHGwlHcxBXgIOnCwBjiecA8ycA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '+0Cmd2OHBx4mZ4ZmxmUXFQAAEwVFke/w3+GFR77wg6cMAAUqY+dHGwlHcxBXgIOnCwBjie
+cA8ycA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'zCMw/QCNR3OQV4CFRxOHwYMPAFAPLyD3CAFIgUcBR4VGEwYQCJOFwYMTBSAG7/Df02NLBS6JRROF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'zCMw/QCNR3OQV4CFRxOHwYMPAFAPLyD3CAFIgUcBR4VGEwYQCJOFwYMTBSAG7/Df02NLBS
+6JRROF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'wYPvAGBL8ygAzIFHxuhzkFeAAQABAAEAcyxQgI1HE4fBgw8AUA8vIPcIAUiBRwFHhUYTBhAIk4XB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'wYPvAGBL8ygAzIFHxuhzkFeAAQABAAEAcyxQgI1HE4fBgw8AUA8vIPcIAUiBRwFHhUYTBh
+AIk4XB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'gxMFIAbv8D/PY0YFKpNULAET9xQAE1k8AcZouuADpgsAE3cZABNUnAATU0wBhUe65JuKBACTefwf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'gxMFIAbv8D/PY0YFKpNULAET9xQAE1k8AcZouuADpgsAE3cZABNUnAATU0wBhUe65JuKBA
+CTefwf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'E3T0H5sECQCTfRMARotjFvYAk4cBgwO7BwADpwwAhUdj/ecA0oUXBQAAEwWFcsbo7/D/0QOmCwDG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'E3T0H5sECQCTfRMARotjFvYAk4cBgwO7BwADpwwAhUdj/ecA0oUXBQAAEwWFcsbo7/D/0Q
+OmCwDG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'aIM2DQAmZZOHAYIDuAcAE4cBg5OHgYKcYxhjswXbQCrwBmUu4OZlKuxi+G70IuhO5BcFAAATBUVv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'aIM2DQAmZZOHAYIDuAcAE4cBg5OHgYKcYxhjswXbQCrwBmUu4OZlKuxi+G70IuhO5BcFAA
+ATBUVv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '7/DfzWOWDQCTBwAQ4/s355OHAYSUYxMGMAKFRRcFAAATBYV47/Cfw3G9gUcjIP0AGbWFRyMg/QD9' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '7/DfzWOWDQCTBwAQ4/s355OHAYSUYxMGMAKFRRcFAAATBYV47/Cfw3G9gUcjIP0AGbWFRy
+Mg/QD9' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'uxBkg0YGAGONBhgBR5uHBv2T9/cPY+b5GGNk6RibFycAuZ+blxcAtZ8bhwf9Y+rkFoNGFgAFBvn6' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'uxBkg0YGAGONBhgBR5uHBv2T9/cPY+b5GGNk6RibFycAuZ+blxcAtZ8bhwf9Y+rkFoNGFg
+AFBvn6' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YwQHFiOg7QDtuWZ1gUXv8N/GKoTjDwXS7/A/vwDBFxUAABMFRYHv8F/IxmUXBQAAEwVld+/wf8M5' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YwQHFiOg7QDtuWZ1gUXv8N/GKoTjDwXS7/A/vwDBFxUAABMFRYHv8F/IxmUXBQAAEwVld+
+/wf8M5' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'vWOGCQITlgkCFzcAABMHh8cBkoFHc5BngAEAAQABAPMmcIAU44UHIQfjFvb+lyYAAJOGRkUBRw3A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'vWOGCQITlgkCFzcAABMHh8cBkoFHc5BngAEAAQABAPMmcIAU44UHIQfjFvb+lyYAAJOGRk
+UBRw3A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'k2cHEIIXgZNzkGeAAQABAAEA8ydwgJziBSehBuMS5P4FTAochUSDKg0AAUkTDAz8m4X0/2PrPQfj' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'k2cHEIIXgZNzkGeAAQABAAEA8ydwgJziBSehBuMS5P4FTAochUSDKg0AAUkTDAz8m4X0/2
+PrPQfj' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'dInY/VeTFgkCE9fWAZcmAACThiZANpcDOAcAE1cIQrsGV0Fj6fYGE5cNApNX1wEXNwAAEwcHvrqX' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'dInY/VeTFgkCE9fWAZcmAACThiZANpcDOAcAE1cIQrsGV0Fj6fYGE5cNApNX1wEXNwAAEw
+cHvrqX' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'A7gHABNXCEK7B1dBkxhoAELg7oaz+IgBG1jIARMGkAQXBQAAEwVlbO/w/7WFLYUkm4X0/+P5PfkT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'A7gHABNXCEK7B1dBkxhoAELg7oaz+IgBG1jIARMGkAQXBQAAEwVlbO/w/7WFLYUkm4X0/+
+P5PfkT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'lw0Ck1fXARc3AAATB2e5upcDuAcAE1cIQrsHV0Hje4n6jb+TGGgAQuC2h7P4iAHKhhtYyAETBkAE' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'lw0Ck1fXARc3AAATB2e5upcDuAcAE1cIQrsHV0Hje4n6jb+TGGgAQuC2h7P4iAHKhhtYyA
+ETBkAE' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'FwUAABMFRWfv8N+wBSmFJH23g7YBhBMGgAaFRRcFAAATBYVE7/AfpwVF7/C/re/wf6iGdxzBFwUA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'FwUAABMFRWfv8N+wBSmFJH23g7YBhBMGgAaFRRcFAAATBYVE7/AfpwVF7/C/re/wf6iGdx
+zBFwUA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ABMF5Uzv8H+xFwUAABMFJT/v8L+wAADvAEACqocXBQAAEwXFAYJlMAATcQH/gUYBRwqI7/CfoAKQ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ABMF5Uzv8H+xFwUAABMFJT/v8L+wAADvAEACqocXBQAAEwXFAYJlMAATcQH/gUYBRwqI7/
+CfoAKQ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'xbyXMQAAk4EBqoKAAAAXJQAAEwVFKZcnAACTh8coY4anAJMHAACRw4KHgoAXJQAAEwVlJ5clAACT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'xbyXMQAAk4EBqoKAAAAXJQAAEwVFKZcnAACTh8coY4anAJMHAACRw4KHgoAXJQAAEwVlJ5
+clAACT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'heUmiY2T1zVA/ZG+lYWFicWTBwAAkcOCh4KAQREi4BOEgYSDRwQABuSR5+/wv/qFRyMA9ACiYAJk' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'heUmiY2T1zVA/ZG+lYWFicWTBwAAkcOCh4KAQREi4BOEgYSDRwQABuSR5+/wv/qFRyMA9A
+CiYAJk' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'QQGCgF2/aXEKhpMFAAgBRQb2IvIm7krqTuZS4u/wX5xh6YJkhYjN5AVHEwYAQBsEBwBjBccKk1dn' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'QQGCgF2/aXEKhpMFAAgBRQb2IvIm7krqTuZS4u/wX5xh6YJkhYjN5AVHEwYAQBsEBwBjBc
+cKk1dn' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AI4Hk4cHEIqXg7cH8JN29AOz19cAhYsFB/HfE1lkAA4JGAGFRLMJJwEbigYAs5TUABMGAAiBRTqF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AI4Hk4cHEIqXg7cH8JN29AOz19cAhYsFB/HfE1lkAA4JGAGFRLMJJwEbigYAs5TUABMGAA
+iBRTqF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '7/D/noO3CQAqhsWPkwUACAFFI7D5AO/wn5ZB6QqGkwUACO/w35Ql7YqFEwUACO/wH5KFR2Mb9QST' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '7/D/noO3CQAqhsWPkwUACAFFI7D5AO/wn5ZB6QqGkwUACO/w35Ql7YqFEwUACO/wH5KFR2
+Mb9QST' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'BwkQM4knAIM3CfCz10cBhYuhw7JwIoUSdPJkUmmyaRJqVWGCgBgBKoQBSrqJAUlBv+/wX4/ZRxzB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'BwkQM4knAIM3CfCz10cBhYuhw7JwIoUSdPJkUmmyaRJqVWGCgBgBKoQBSrqJAUlBv+/wX4
+/ZRxzB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'FwUAABMFRSTv8F+YFwUAABMFBR7v8J+X7/BfjdlHHMEXBQAAEwXFIO/wX5YXBQAAEwUFH+/wn5UX' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'FwUAABMFRSTv8F+YFwUAABMFBR7v8J+X7/BfjdlHHMEXBQAAEwXFIO/wX5YXBQAAEwUFH+
+/wn5UX' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'BQAAEwXFHO/w35R5cSLwJuxK6E7kBvQqhK6ELUmRSRxADwDwD5uGBwBji5cCAUiBRwFHEwYACKKF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'BQAAEwXFHO/w35R5cSLwJuxK6E7kBvQqhK6ELUmRSRxADwDwD5uGBwBji5cCAUiBRwFHEw
+YACKKF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'EwUgBu/wf4QBJXHd7/D/hhxB44on/eOIN/0XBQAAEwUFHe/wn4+icAJ04mRCaaJpRWGCgFlxhvTv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'EwUgBu/wf4QBJXHd7/D/hhxB44on/eOIN/0XBQAAEwUFHe/wn4+icAJ04mRCaaJpRWGCgF
+lxhvTv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '8J/nk4WBg4VHDwBQDy+g9QgBSIFHAUeFRhMGEAgTBSAG7/AP/2NHBQ7S4BcqAAATCuoHgycKAOnL' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '8J/nk4WBg4VHDwBQDy+g9QgBSIFHAUeFRhMGEAgTBSAG7/AP/2NHBQ7S4BcqAAATCuoHgy
+cKAOnL' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ovCm7MrozuRW/Fr4XvRi8Gbsauhu5IFEE4lBgROMAYMThMGDk4uBgolJgU0TjYGBjUwJS5OKAYKx' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ovCm7MrozuRW/Fr4XvRi8Gbsauhu5IFEE4lBgROMAYMThMGDk4uBgolJgU0TjYGBjUwJS5
+OKAYKx' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'qPMnAMwDJwkAIzD8AIVHYxT3AHOQXYAPAFAPLyBkCfMoAMwBSIFHAUeFRhMGEAiihRMFIAYjsBsB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'qPMnAMwDJwkAIzD8AIVHYxT3AHOQXYAPAFAPLyBkCfMoAMwBSIFHAUeFRhMGEAiihRMFIA
+YjsBsB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '7/Bv9mNOBQbzJwDMjUUihSOw+gDv8L/tgycKAIUkY/X0AoVFIoXv8J/sgycJAOOdN/lzkFmA8ycA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '7/Bv9mNOBQbzJwDMjUUihSOw+gDv8L/tgycKAIUkY/X0AoVFIoXv8J/sgycJAOOdN/lzkF
+mA8ycA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'zCMw/QAjMPwAc5BcgGG/BnTmZEZppmniekJ7onsCfOJsQm2ibaZwBmoBRWVhgoCi8KbsyujO5NLg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'zCMw/QAjMPwAc5BcgGG/BnTmZEZppmniekJ7onsCfOJsQm2ibaZwBmoBRWVhgoCi8Kbsyu
+jO5NLg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'Vvxa+F70YvBm7GrobuQXBQAAEwVlCe/w7/oAAAEAAgAAAAAAc2NoZWRfZ2V0YWZmaW5pdHkAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'Vvxa+F70YvBm7GrobuQXBQAAEwVlCe/w7/oAAAEAAgAAAAAAc2NoZWRfZ2V0YWZmaW5pdH
+kAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAc2NoZWRfc2V0YWZmaW5pdHkAAAAAAAAAdmVyaWZ5IGFmZmluaXR5AHNpbmdsZXRvbiBDUFUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAc2NoZWRfc2V0YWZmaW5pdHkAAAAAAAAAdmVyaWZ5IGFmZmluaXR5AHNpbmdsZXRvbi
+BDUFUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YWZmaW5pdHkAAGVtcHR5IENQVSBhZmZpbml0eQAAAAAAAGZ1dGV4IHdhaXQAAAAAAABmdXRleCB3' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YWZmaW5pdHkAAGVtcHR5IENQVSBhZmZpbml0eQAAAAAAAGZ1dGV4IHdhaXQAAAAAAABmdX
+RleCB3' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YWtlAAAAAAAALS1zdW1tYXJ5LW9ubHkAAC0tc2FtcGxlcwAAAAAAAAB1c2FnZTogY2FjaGVfbWlz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YWtlAAAAAAAALS1zdW1tYXJ5LW9ubHkAAC0tc2FtcGxlcwAAAAAAAAB1c2FnZTogY2FjaG
+VfbWlz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'c190cmFjZV9jYXB0dXJlIFstLXdpbmRvdyBmdWxsfHRvLXBlZXJ8ZnJvbS1wZWVyXSBbLS1zdW1t' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'c190cmFjZV9jYXB0dXJlIFstLXdpbmRvdyBmdWxsfHRvLXBlZXJ8ZnJvbS1wZWVyXSBbLS
+1zdW1t' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YXJ5LW9ubHldIFstLXNhbXBsZXMgMS4uMTAwMDBdCgAAAAAAAAAALS13aW5kb3cAAAAAAAAAAGZ1' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YXJ5LW9ubHldIFstLXNhbXBsZXMgMS4uMTAwMDBdCgAAAAAAAAAALS13aW5kb3cAAAAAAA
+AAAGZ1' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'bGwAAAAAdG8tcGVlcgBmcm9tLXBlZXIAAAAAAAAAcHRocmVhZF9jcmVhdGUAAFNBTVBMRT0ldQoA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'bGwAAAAAdG8tcGVlcgBmcm9tLXBlZXIAAAAAAAAAcHRocmVhZF9jcmVhdGUAAFNBTVBMRT
+0ldQoA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAABUUkFDRV9IRUFERVIgY3B1PSVkIHdpbmRvdz0ldSBzdGFydD0lbHUgcGVlcl9iZWdpbj0l' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAABUUkFDRV9IRUFERVIgY3B1PSVkIHdpbmRvdz0ldSBzdGFydD0lbHUgcGVlcl9iZW
+dpbj0l' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'bHUgcGVlcl93YWtlPSVsdSBwZWVyX2Jsb2NrPSVsdSByZXN1bWU9JWx1IGVsYXBzZWQ9JWx1IGlf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'bHUgcGVlcl93YWtlPSVsdSBwZWVyX2Jsb2NrPSVsdSByZXN1bWU9JWx1IGVsYXBzZWQ9JW
+x1IGlf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'Y291bnQ9JXUgZF9jb3VudD0ldSBpX292ZXJmbG93PSV1IGRfb3ZlcmZsb3c9JXUgYXJtZWQ9JXUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'Y291bnQ9JXUgZF9jb3VudD0ldSBpX292ZXJmbG93PSV1IGRfb3ZlcmZsb3c9JXUgYXJtZW
+Q9JXUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'c3RhdHVzPTB4JTAxNmx4CgAAVFJBQ0VfRkFJTCBpbnZhbGlkIHJlY29yZGVyIHN0YXR1cwoAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'c3RhdHVzPTB4JTAxNmx4CgAAVFJBQ0VfRkFJTCBpbnZhbGlkIHJlY29yZGVyIHN0YXR1cw
+oAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AFRSQUNFX1RSVU5DQVRFRCByZWNvcmRzPSV1IGVsYXBzZWQ9JWx1IGlfb3ZlcmZsb3c9JXUgZF9v' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AFRSQUNFX1RSVU5DQVRFRCByZWNvcmRzPSV1IGVsYXBzZWQ9JWx1IGlfb3ZlcmZsb3c9JX
+UgZF9v' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'dmVyZmxvdz0ldQoAAAAAAFRSQUNFX1BBU1MgcmVjb3Jkcz0ldSBlbGFwc2VkPSVsdQoAAAAAAABU' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'dmVyZmxvdz0ldQoAAAAAAFRSQUNFX1BBU1MgcmVjb3Jkcz0ldSBlbGFwc2VkPSVsdQoAAA
+AAAABU' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'UkFDRV9SRUNPUkQgc2VxPSV1IHNpZGU9JWMgaW5kZXg9JXUgY3ljbGU9JXUgcmVsYXRpdmU9JXUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'UkFDRV9SRUNPUkQgc2VxPSV1IHNpZGU9JWMgaW5kZXg9JXUgY3ljbGU9JXUgcmVsYXRpdm
+U9JXUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'bWVzc2FnZT0weCV4IHBhZGRyPTB4JTA5bHggcmF3PTB4JTAxNmx4CgAAAAAAAHB0aHJlYWRfam9p' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'bWVzc2FnZT0weCV4IHBhZGRyPTB4JTA5bHggcmF3PTB4JTAxNmx4CgAAAAAAAHB0aHJlYW
+Rfam9p' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'bgAAAAABGwM7XAAAAAoAAABo9P//6AAAAHb0///YAQAAZPn//3QAAACU+f//iAAAALL5//+cAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'bgAAAAABGwM7XAAAAAoAAABo9P//6AAAAHb0///YAQAAZPn//3QAAACU+f//iAAAALL5//
++cAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '2vn//7AAAAD8+f//1AAAAP75//8AAQAAIPv//zgBAACC+///aAEAAAAAAAAQAAAAAAAAAAN6UgAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '2vn//7AAAAD8+f//1AAAAP75//8AAQAAIPv//zgBAACC+///aAEAAAAAAAAQAAAAAAAAAA
+N6UgAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'fAEBGwwCABAAAAAYAAAA6Pj//yIAAAAABwEAEAAAACwAAAAE+f//HgAAAAAAAAAQAAAAQAAAAA75' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'fAEBGwwCABAAAAAYAAAA6Pj//yIAAAAABwEAEAAAACwAAAAE+f//HgAAAAAAAAAQAAAAQA
+AAAA75' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '//8oAAAAAAAAACAAAABUAAAAIvn//yIAAAAAQg4QQogESoECTsFCyEIOAAAAABAAAAB4AAAAIPn/' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '//8oAAAAAAAAACAAAABUAAAAIvn//yIAAAAAQg4QQogESoECTsFCyEIOAAAAABAAAAB4AA
+AAIPn/' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '/wIAAAAAAAAAFAAAAIwAAAB48///DgAAAABCDhBCgQIANAAAAKQAAAD2+P//IgEAAABCDrACVIEC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '/wIAAAAAAAAAFAAAAIwAAAB48///DgAAAABCDhBCgQIANAAAAKQAAAD2+P//IgEAAABCDr
+ACVIEC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'iASJBpIIkwqUDAKkCsFEyELJQtJC00LUQg4AQgsAAAAsAAAA3AAAAOD5//9iAAAAAEIOMEqIBIkG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'iASJBpIIkwqUDAKkCsFEyELJQtJC00LUQg4AQgsAAAAsAAAA3AAAAOD5//9iAAAAAEIOME
+qIBIkG' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'kgiTCoECAkrBQshCyULSQtNCDgAAAABsAAAADAEAABL6//88AQAAAEIOcEKBAmyUDGSIBIkGkgiT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'kgiTCoECAkrBQshCyULSQtNCDgAAAABsAAAADAEAABL6//88AQAAAEIOcEKBAmyUDGSIBI
+kGkgiT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'CpUOlhCXEpgUmRaaGJsaAqbIQslC0kLTQtVC1kLXQthC2ULaQttCwULURA4AQg5wgQJYiASJBpII' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'CpUOlhCXEpgUmRaaGJsaAqbIQslC0kLTQtVC1kLXQthC2ULaQttCwULURA4AQg5wgQJYiA
+SJBpII' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'kwqUDJUOlhCXEpgUmRaaGJsaAAAAUAAAAHwBAACW8v//7AQAAABCDvABWpcSgQKIBIkGkgiTCpQM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'kwqUDJUOlhCXEpgUmRaaGJsaAAAAUAAAAHwBAACW8v//7AQAAABCDvABWpcSgQKIBIkGkg
+iTCpQM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'lQ6WEJgUmRaaGJsaAoAKwULIRMlC0kLTQtRC1ULWQtdC2ELZQtpC20IOAEILAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'lQ6WEJgUmRaaGJsaAoAKwULIRMlC0kLTQtRC1ULWQtdC2ELZQtpC20IOAEILAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQDQEAAAAAAEQOAQAAAAAAIg4BAAAAAAABAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQDQEAAAAAAEQOAQAAAAAAIg4BAAAAAAABAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AKwAAAAAAAAAIAAAAAAAAADwLQEAAAAAACEAAAAAAAAACAAAAAAAAAAZAAAAAAAAAPgtAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AKwAAAAAAAAAIAAAAAAAAADwLQEAAAAAACEAAAAAAAAACAAAAAAAAAAZAAAAAAAAAPgtAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'GwAAAAAAAAAIAAAAAAAAABoAAAAAAAAAAC4BAAAAAAAcAAAAAAAAAAgAAAAAAAAABAAAAAAAAAC4' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'GwAAAAAAAAAIAAAAAAAAABoAAAAAAAAAAC4BAAAAAAAcAAAAAAAAAAgAAAAAAAAABAAAAA
+AAAAC4' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AgEAAAAAAPX+/28AAAAAEAMBAAAAAAAFAAAAAAAAABgFAQAAAAAABgAAAAAAAACAAwEAAAAAAAoA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AgEAAAAAAPX+/28AAAAAEAMBAAAAAAAFAAAAAAAAABgFAQAAAAAABgAAAAAAAACAAwEAAA
+AAAAoA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAA3gAAAAAAAAALAAAAAAAAABgAAAAAAAAAFQAAAAAAAAAAAAAAAAAAAAMAAAAAAAAA8C8B' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAA3gAAAAAAAAALAAAAAAAAABgAAAAAAAAAFQAAAAAAAAAAAAAAAAAAAAMAAAAAAA
+AA8C8B' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAACAAAAAAAAAFABAAAAAAAAFAAAAAAAAAAHAAAAAAAAABcAAAAAAAAAYAYBAAAAAAAHAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAACAAAAAAAAAFABAAAAAAAAFAAAAAAAAAAHAAAAAAAAABcAAAAAAAAAYAYBAAAAAA
+AHAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAEgGAQAAAAAACAAAAAAAAABoAQAAAAAAAAkAAAAAAAAAGAAAAAAAAAD+//9vAAAAABgGAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAEgGAQAAAAAACAAAAAAAAABoAQAAAAAAAAkAAAAAAAAAGAAAAAAAAAD+//9vAAAAAB
+gGAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAA////bwAAAAABAAAAAAAAAPD//28AAAAA9gUBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAA////bwAAAAABAAAAAAAAAPD//28AAAAA9gUBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAILgEAAAAAAP//////////AAAAAAAAAACwBwEAAAAAALAHAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAILgEAAAAAAP//////////AAAAAAAAAACwBwEAAAAAALAHAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'sAcBAAAAAACwBwEAAAAAALAHAQAAAAAAsAcBAAAAAACwBwEAAAAAALAHAQAAAAAAsAcBAAAAAACw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'sAcBAAAAAACwBwEAAAAAALAHAQAAAAAAsAcBAAAAAACwBwEAAAAAALAHAQAAAAAAsAcBAA
+AAAACw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'BwEAAAAAALAHAQAAAAAAsAcBAAAAAACwBwEAAAAAALAHAQAAAAAAAAAAAAAAAAABAAAAR0NDOiAo' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'BwEAAAAAALAHAQAAAAAAsAcBAAAAAACwBwEAAAAAALAHAQAAAAAAAAAAAAAAAAABAAAAR0
+NDOiAo' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'R05VKSAxMy4yLjAAR0NDOiAoZ2M4OTFkOGRjMjNlLWRpcnR5KSAxMy4yLjAAQXAAAAByaXNjdgAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'R05VKSAxMy4yLjAAR0NDOiAoZ2M4OTFkOGRjMjNlLWRpcnR5KSAxMy4yLjAAQXAAAAByaX
+NjdgAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ZgAAAAQQBXJ2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF9iMXAwX3ptbXVsMXAwX3ph' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ZgAAAAQQBXJ2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF9iMXAwX3ptbXVsMX
+AwX3ph' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YW1vMXAwX3phbHJzYzFwMF96YmExcDBfemJiMXAwX3piczFwMAAGAQgBCgsAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YW1vMXAwX3phbHJzYzFwMF96YmExcDBfemJiMXAwX3piczFwMAAGAQgBCgsAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAwABAHACAQAAAAAAAAAAAAAAAAAAAAAAAwACAJQCAQAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAwABAHACAQAAAAAAAAAAAAAAAAAAAAAAAwACAJQCAQAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAwADALgCAQAAAAAAAAAAAAAAAAAAAAAAAwAEABADAQAAAAAAAAAAAAAAAAAAAAAAAwAF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAwADALgCAQAAAAAAAAAAAAAAAAAAAAAAAwAEABADAQAAAAAAAAAAAAAAAAAAAA
+AAAwAF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AIADAQAAAAAAAAAAAAAAAAAAAAAAAwAGABgFAQAAAAAAAAAAAAAAAAAAAAAAAwAHAPYFAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AIADAQAAAAAAAAAAAAAAAAAAAAAAAwAGABgFAQAAAAAAAAAAAAAAAAAAAAAAAwAHAPYFAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAwAIABgGAQAAAAAAAAAAAAAAAAAAAAAAAwAJAEgGAQAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAwAIABgGAQAAAAAAAAAAAAAAAAAAAAAAAwAJAEgGAQAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAwAKAGAGAQAAAAAAAAAAAAAAAAAAAAAAAwALALAHAQAAAAAAAAAAAAAAAAAAAAAAAwAMALAI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAwAKAGAGAQAAAAAAAAAAAAAAAAAAAAAAAwALALAHAQAAAAAAAAAAAAAAAAAAAAAAAw
+AMALAI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAAAAAAAAAwANAAgRAQAAAAAAAAAAAAAAAAAAAAAAAwAOAEgUAQAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAAAAAAAAAwANAAgRAQAAAAAAAAAAAAAAAAAAAAAAAwAOAEgUAQAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAwAPAKgUAQAAAAAAAAAAAAAAAAAAAAAAAwAQAPAtAQAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAwAPAKgUAQAAAAAAAAAAAAAAAAAAAAAAAwAQAPAtAQAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AwARAPgtAQAAAAAAAAAAAAAAAAAAAAAAAwASAAAuAQAAAAAAAAAAAAAAAAAAAAAAAwATAAguAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AwARAPgtAQAAAAAAAAAAAAAAAAAAAAAAAwASAAAuAQAAAAAAAAAAAAAAAAAAAAAAAwATAA
+guAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAwAUAOgvAQAAAAAAAAAAAAAAAAAAAAAAAwAVAPAvAQAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAwAUAOgvAQAAAAAAAAAAAAAAAAAAAAAAAwAVAPAvAQAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAwAWAHAwAQAAAAAAAAAAAAAAAAAAAAAAAwAXAIAwAQAAAAAAAAAAAAAAAAAAAAAAAwAY' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAwAWAHAwAQAAAAAAAAAAAAAAAAAAAAAAAwAXAIAwAQAAAAAAAAAAAAAAAAAAAA
+AAAwAY' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ALAwAQAAAAAAAAAAAAAAAAAAAAAAAwAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAaAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ALAwAQAAAAAAAAAAAAAAAAAAAAAAAwAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAaAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAABAAAABADx/wAAAAAAAAAAAAAAAAAAAAAMAAAAAQACAJQCAQAAAAAAIAAAAAAAAAAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAABAAAABADx/wAAAAAAAAAAAAAAAAAAAAAMAAAAAQACAJQCAQAAAAAAIAAAAA
+AAAAAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAABADx/wAAAAAAAAAAAAAAAAAAAAAeAAAAAAAMAKwNAQAAAAAAAAAAAAAAAAB4AAAAAAAMANAN' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAABADx/wAAAAAAAAAAAAAAAAAAAAAeAAAAAAAMAKwNAQAAAAAAAAAAAAAAAAB4AAAAAA
+AMANAN' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAACAAAAAAAAMAM4NAQAAAAAAAAAAAAAAAACMAAAABADx/wAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAACAAAAAAAAMAM4NAQAAAAAAAAAAAAAAAACMAAAABADx/wAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAACTAAAABADx/wAAAAAAAAAAAAAAAAAAAACiAAAABADx/wAAAAAAAAAAAAAAAAAAAAC9AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAACTAAAABADx/wAAAAAAAAAAAAAAAAAAAACiAAAABADx/wAAAAAAAAAAAAAAAAAAAA
+C9AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AgAMALAIAQAAAAAADgAAAAAAAADCAAAAAAAMALAIAQAAAAAAAAAAAAAAAAACAQAAAgAMAEYOAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AgAMALAIAQAAAAAADgAAAAAAAADCAAAAAAAMALAIAQAAAAAAAAAAAAAAAAACAQAAAgAMAE
+YOAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAIgEAAAAAAADCAAAAAAAMAEYOAQAAAAAAAAAAAAAAAAAbAQAAAgAMAGgPAQAAAAAAYgAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAIgEAAAAAAADCAAAAAAAMAEYOAQAAAAAAAAAAAAAAAAAbAQAAAgAMAGgPAQAAAAAAYg
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAmAQAAAgAMAMoPAQAAAAAAPAEAAAAAAAAwAQAAAQAXAKgwAQAAAAAABAAAAAAAAAA7AQAAAQAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAmAQAAAgAMAMoPAQAAAAAAPAEAAAAAAAAwAQAAAQAXAKgwAQAAAAAABAAAAAAAAAA7AQ
+AAAQAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AHgwAQAAAAAABAAAAAAAAABDAQAAAQAXAIQwAQAAAAAABAAAAAAAAABQAQAAAQAXAKAwAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AHgwAQAAAAAABAAAAAAAAABDAQAAAQAXAIQwAQAAAAAABAAAAAAAAABQAQAAAQAXAKAwAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'CAAAAAAAAABhAQAAAQAXAKwwAQAAAAAABAAAAAAAAABnAQAAAQAXAJgwAQAAAAAACAAAAAAAAAB3' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'CAAAAAAAAABhAQAAAQAXAKwwAQAAAAAABAAAAAAAAABnAQAAAQAXAJgwAQAAAAAACAAAAA
+AAAAB3' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAQAXAIgwAQAAAAAACAAAAAAAAACJAQAAAQAXAJAwAQAAAAAACAAAAAAAAADCAAAAAAAMAL4I' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAQAXAIgwAQAAAAAACAAAAAAAAACJAQAAAQAXAJAwAQAAAAAACAAAAAAAAADCAAAAAA
+AMAL4I' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAACaAQAAAQAXAIAwAQAAAAAABAAAAAAAAACnAQAAAQAYAMA4AQAAAAAAAAgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAACaAQAAAQAXAIAwAQAAAAAABAAAAAAAAACnAQAAAQAYAMA4AQAAAA
+AAAAgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAC2AQAAAQAYAMAwAQAAAAAAAAgAAAAAAADFAQAABADx/wAAAAAAAAAAAAAAAAAAAADQAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAC2AQAAAQAYAMAwAQAAAAAAAAgAAAAAAADFAQAABADx/wAAAAAAAAAAAAAAAAAAAA
+DQAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AgAMANwNAQAAAAAAAAAAAAAAAAAeAAAAAAAMANwNAQAAAAAAAAAAAAAAAADSAQAAAgAMAPoNAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AgAMANwNAQAAAAAAAAAAAAAAAAAeAAAAAAAMANwNAQAAAAAAAAAAAAAAAADSAQAAAgAMAP
+oNAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAADlAQAAAgAMACIOAQAAAAAAAAAAAAAAAAD7AQAAAQAYALgwAQAAAAAAAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAADlAQAAAgAMACIOAQAAAAAAAAAAAAAAAAD7AQAAAQAYALgwAQAAAAAAAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAHAgAAAQASAAAuAQAAAAAAAAAAAAAAAAAuAgAAAgAMAEQOAQAAAAAAAAAAAAAAAAA6AgAAAQAR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAHAgAAAQASAAAuAQAAAAAAAAAAAAAAAAAuAgAAAgAMAEQOAQAAAAAAAAAAAAAAAAA6Ag
+AAAQAR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'APgtAQAAAAAAAAAAAAAAAADFAQAABADx/wAAAAAAAAAAAAAAAAAAAABZAgAAAQAPAHQWAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'APgtAQAAAAAAAAAAAAAAAADFAQAABADx/wAAAAAAAAAAAAAAAAAAAABZAgAAAQAPAHQWAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAABADx/wAAAAAAAAAAAAAAAAAAAABnAgAAAQALALAHAQAAAAAAAAAAAAAAAACB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAABADx/wAAAAAAAAAAAAAAAAAAAABnAgAAAQALALAHAQAAAAAAAAAAAA
+AAAACB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AgAAAQATAAguAQAAAAAAAAAAAAAAAACKAgAAAAAOAEgUAQAAAAAAAAAAAAAAAACdAgAAAQAUAOgv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AgAAAQATAAguAQAAAAAAAAAAAAAAAACKAgAAAAAOAEgUAQAAAAAAAAAAAAAAAACdAgAAAQ
+AUAOgv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAACzAgAAEgAAANAHAQAAAAAAAAAAAAAAAADQAgAAEgAAAOAHAQAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAACzAgAAEgAAANAHAQAAAAAAAAAAAAAAAADQAgAAEgAAAOAHAQAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAB+AwAAIAAWAHAwAQAAAAAAAAAAAAAAAADjAgAAEgAAAPAHAQAAAAAAAAAAAAAAAAD1AgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAB+AwAAIAAWAHAwAQAAAAAAAAAAAAAAAADjAgAAEgAAAPAHAQAAAAAAAAAAAAAAAA
+D1AgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'EgAAAAAIAQAAAAAAAAAAAAAAAAARAwAAEAAYAMBAAQAAAAAAAAAAAAAAAAAdAwAAEAAWAHwwAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'EgAAAAAIAQAAAAAAAAAAAAAAAAARAwAAEAAYAMBAAQAAAAAAAAAAAAAAAAAdAwAAEAAWAH
+wwAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAkAwAAEAAWAHAwAQAAAAAAAAAAAAAAAAA0AwAAEAAWAHAwAQAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAkAwAAEAAWAHAwAQAAAAAAAAAAAAAAAAA0AwAAEAAWAHAwAQAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AABDAwAAEgAAABAIAQAAAAAAAAAAAAAAAABfAwAAEgAAACAIAQAAAAAAAAAAAAAAAAB8AwAAEAAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AABDAwAAEgAAABAIAQAAAAAAAAAAAAAAAABfAwAAEgAAACAIAQAAAAAAAAAAAAAAAAB8Aw
+AAEAAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AHAwAQAAAAAAAAAAAAAAAACJAwAAEgAAADAIAQAAAAAAAAAAAAAAAACmAwAAEQIWAHAwAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AHAwAQAAAAAAAAAAAAAAAACJAwAAEgAAADAIAQAAAAAAAAAAAAAAAACmAwAAEQIWAHAwAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAACzAwAAEQANAAgRAQAAAAAABAAAAAAAAADCAwAAEAAYAMBAAQAAAAAAAAAAAAAAAACC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAACzAwAAEQANAAgRAQAAAAAABAAAAAAAAADCAwAAEAAYAMBAAQAAAAAAAAAAAA
+AAAACC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AwAAEgAMAKwNAQAAAAAAIgAAAAAAAADHAwAAEADx/3A4AQAAAAAAAAAAAAAAAADZAwAAEAAXAIAw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AwAAEgAMAKwNAQAAAAAAIgAAAAAAAADHAwAAEADx/3A4AQAAAAAAAAAAAAAAAADZAwAAEA
+AXAIAw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAACHAAAAEgAMAL4IAQAAAAAA7AQAAAAAAADlAwAAEgAAAEAIAQAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAACHAAAAEgAMAL4IAQAAAAAA7AQAAAAAAADlAwAAEgAAAEAIAQAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAD3AwAAEgAAAFAIAQAAAAAAAAAAAAAAAAARBAAAEgAAAGAIAQAAAAAAAAAAAAAAAAAhBAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAD3AwAAEgAAAFAIAQAAAAAAAAAAAAAAAAARBAAAEgAAAGAIAQAAAAAAAAAAAAAAAA
+AhBAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'EgAAAHAIAQAAAAAAAAAAAAAAAAAzBAAAEQAYALAwAQAAAAAACAAAAAAAAABFBAAAEQIWAHAwAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'EgAAAHAIAQAAAAAAAAAAAAAAAAAzBAAAEQAYALAwAQAAAAAACAAAAAAAAABFBAAAEQIWAH
+AwAQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAABRBAAAEgAAAIAIAQAAAAAAAAAAAAAAAABpBAAAEgAAAJAIAQAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAABRBAAAEgAAAIAIAQAAAAAAAAAAAAAAAABpBAAAEgAAAJAIAQAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAB7BAAAEgAAAKAIAQAAAAAAAAAAAAAAAAAAYWJpLW5vdGUuYwBfX2FiaV90YWcAc3RhcnQubwAk' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAB7BAAAEgAAAKAIAQAAAAAAAAAAAAAAAAAAYWJpLW5vdGUuYwBfX2FiaV90YWcAc3Rhcn
+QubwAk' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'eHJ2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF9iMXAwX3ptbXVsMXAwX3phYW1vMXAw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'eHJ2NjRpMnAwX20ycDBfYTJwMF9mMnAwX2QycDBfYzJwMF9iMXAwX3ptbXVsMXAwX3phYW
+1vMXAw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'X3phbHJzYzFwMF96YmExcDBfemJiMXAwX3piczFwMABsb2FkX2dwAF9fd3JhcF9tYWluAGluaXQu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'X3phbHJzYzFwMF96YmExcDBfemJiMXAwX3piczFwMABsb2FkX2dwAF9fd3JhcF9tYWluAG
+luaXQu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YwBzdGF0aWMtcmVsb2MuYwBjYWNoZV9taXNzX3RyYWNlX2NhcHR1cmUuYwBmYWlsACR4cnY2NGky' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YwBzdGF0aWMtcmVsb2MuYwBjYWNoZV9taXNzX3RyYWNlX2NhcHR1cmUuYwBmYWlsACR4cn
+Y2NGky' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'cDBfbTJwMF9hMnAwX2YycDBfZDJwMF9jMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYzFwMABw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'cDBfbTJwMF9hMnAwX2YycDBfZDJwMF9jMnAwX3ptbXVsMXAwX3phYW1vMXAwX3phbHJzYz
+FwMABw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'aW5fdG9fZmlyc3RfYWxsb3dlZF9jcHUAd2FpdF91bnRpbABwZWVyX21haW4AcGVlcl9yZWFkeQBz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'aW5fdG9fZmlyc3RfYWxsb3dlZF9jcHUAd2FpdF91bnRpbABwZWVyX21haW4AcGVlcl9yZW
+FkeQBz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YW1wbGVzAHRyYWNlX3dpbmRvdwBwZWVyX2JlZ2luX2N5Y2xlAHBoYXNlAHBlZXJfd2FrZV9jeWNs' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YW1wbGVzAHRyYWNlX3dpbmRvdwBwZWVyX2JlZ2luX2N5Y2xlAHBoYXNlAHBlZXJfd2FrZV
+9jeWNs' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ZQB0cmFjZV9zdGFydF9jeWNsZQBwZWVyX2Jsb2NrX2N5Y2xlAHN1bW1hcnlfb25seQBpY2FjaGVf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ZQB0cmFjZV9zdGFydF9jeWNsZQBwZWVyX2Jsb2NrX2N5Y2xlAHN1bW1hcnlfb25seQBpY2
+FjaGVf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'cmVjb3JkcwBkY2FjaGVfcmVjb3JkcwBjcnRzdHVmZi5jAGRlcmVnaXN0ZXJfdG1fY2xvbmVzAF9f' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'cmVjb3JkcwBkY2FjaGVfcmVjb3JkcwBjcnRzdHVmZi5jAGRlcmVnaXN0ZXJfdG1fY2xvbm
+VzAF9f' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ZG9fZ2xvYmFsX2R0b3JzX2F1eABjb21wbGV0ZWQuMABfX2RvX2dsb2JhbF9kdG9yc19hdXhfZmlu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ZG9fZ2xvYmFsX2R0b3JzX2F1eABjb21wbGV0ZWQuMABfX2RvX2dsb2JhbF9kdG9yc19hdX
+hfZmlu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'aV9hcnJheV9lbnRyeQBmcmFtZV9kdW1teQBfX2ZyYW1lX2R1bW15X2luaXRfYXJyYXlfZW50cnkA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'aV9hcnJheV9lbnRyeQBmcmFtZV9kdW1teQBfX2ZyYW1lX2R1bW15X2luaXRfYXJyYXlfZW
+50cnkA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'X19GUkFNRV9FTkRfXwBfUFJPQ0VEVVJFX0xJTktBR0VfVEFCTEVfAF9EWU5BTUlDAF9fR05VX0VI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'X19GUkFNRV9FTkRfXwBfUFJPQ0VEVVJFX0xJTktBR0VfVEFCTEVfAF9EWU5BTUlDAF9fR0
+5VX0VI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'X0ZSQU1FX0hEUgBfR0xPQkFMX09GRlNFVF9UQUJMRV8AX19saWJjX3N0YXJ0X21haW5AR0xJQkNf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'X0ZSQU1FX0hEUgBfR0xPQkFMX09GRlNFVF9UQUJMRV8AX19saWJjX3N0YXJ0X21haW5AR0
+xJQkNf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'Mi4zNABzeXNjYWxsQEdMSUJDXzIuMjcAZndyaXRlQEdMSUJDXzIuMjcAX19zY2hlZF9jcHVjb3Vu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'Mi4zNABzeXNjYWxsQEdMSUJDXzIuMjcAZndyaXRlQEdMSUJDXzIuMjcAX19zY2hlZF9jcH
+Vjb3Vu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'dEBHTElCQ18yLjI3AF9fQlNTX0VORF9fAF9lZGF0YQBfX1NEQVRBX0JFR0lOX18AX19EQVRBX0JF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'dEBHTElCQ18yLjI3AF9fQlNTX0VORF9fAF9lZGF0YQBfX1NEQVRBX0JFR0lOX18AX19EQV
+RBX0JF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'R0lOX18AX19lcnJub19sb2NhdGlvbkBHTElCQ18yLjI3AHNjaGVkX2dldGFmZmluaXR5QEdMSUJD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'R0lOX18AX19lcnJub19sb2NhdGlvbkBHTElCQ18yLjI3AHNjaGVkX2dldGFmZmluaXR5QE
+dMSUJD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'XzIuMjcAX19kYXRhX3N0YXJ0AHNjaGVkX3NldGFmZmluaXR5QEdMSUJDXzIuMjcAX19kc29faGFu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'XzIuMjcAX19kYXRhX3N0YXJ0AHNjaGVkX3NldGFmZmluaXR5QEdMSUJDXzIuMjcAX19kc2
+9faGFu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ZGxlAF9JT19zdGRpbl91c2VkAF9lbmQAX19nbG9iYWxfcG9pbnRlciQAX19ic3Nfc3RhcnQAcGVy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ZGxlAF9JT19zdGRpbl91c2VkAF9lbmQAX19nbG9iYWxfcG9pbnRlciQAX19ic3Nfc3Rhcn
+QAcGVy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'cm9yQEdMSUJDXzIuMjcAcHRocmVhZF9jcmVhdGVAR0xJQkNfMi4zNABleGl0QEdMSUJDXzIuMjcA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'cm9yQEdMSUJDXzIuMjcAcHRocmVhZF9jcmVhdGVAR0xJQkNfMi4zNABleGl0QEdMSUJDXz
+IuMjcA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'cHJpbnRmQEdMSUJDXzIuMjcAc3RkZXJyQEdMSUJDXzIuMjcAX19UTUNfRU5EX18AcHRocmVhZF9q' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'cHJpbnRmQEdMSUJDXzIuMjcAc3RkZXJyQEdMSUJDXzIuMjcAX19UTUNfRU5EX18AcHRocm
+VhZF9q' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'b2luQEdMSUJDXzIuMzQAc3RyY21wQEdMSUJDXzIuMjcAbWVtc2V0QEdMSUJDXzIuMjcAAC5zeW10' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'b2luQEdMSUJDXzIuMzQAc3RyY21wQEdMSUJDXzIuMjcAbWVtc2V0QEdMSUJDXzIuMjcAAC
+5zeW10' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'YWIALnN0cnRhYgAuc2hzdHJ0YWIALmludGVycAAubm90ZS5BQkktdGFnAC5nbnUuaGFzaAAuZHlu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'YWIALnN0cnRhYgAuc2hzdHJ0YWIALmludGVycAAubm90ZS5BQkktdGFnAC5nbnUuaGFzaA
+AuZHlu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'c3ltAC5keW5zdHIALmdudS52ZXJzaW9uAC5nbnUudmVyc2lvbl9yAC5yZWxhLmR5bgAucmVsYS5w' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'c3ltAC5keW5zdHIALmdudS52ZXJzaW9uAC5nbnUudmVyc2lvbl9yAC5yZWxhLmR5bgAucm
+VsYS5w' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'bHQALnRleHQALnJvZGF0YQAuZWhfZnJhbWVfaGRyAC5laF9mcmFtZQAucHJlaW5pdF9hcnJheQAu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'bHQALnRleHQALnJvZGF0YQAuZWhfZnJhbWVfaGRyAC5laF9mcmFtZQAucHJlaW5pdF9hcn
+JheQAu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'aW5pdF9hcnJheQAuZmluaV9hcnJheQAuZHluYW1pYwAuZ290AC5nb3QucGx0AC5zZGF0YQAuc2Jz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'aW5pdF9hcnJheQAuZmluaV9hcnJheQAuZHluYW1pYwAuZ290AC5nb3QucGx0AC5zZGF0YQ
+Auc2Jz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'cwAuYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'cwAuYnNzAC5jb21tZW50AC5yaXNjdi5hdHRyaWJ1dGVzAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGwAAAAEAAAAC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGwAAAA
+EAAAAC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAHACAQAAAAAAcAIAAAAAAAAhAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAACMA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAHACAQAAAAAAcAIAAAAAAAAhAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA
+AAACMA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAHAAAAAgAAAAAAAACUAgEAAAAAAJQCAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAHAAAAAgAAAAAAAACUAgEAAAAAAJQCAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAQAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAA1AAAABQAAAAIAAAAAAAAAuAIBAAAAAAC4AgAAAAAAAFgAAAAAAAAABQAAAAAAAAAIAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAA1AAAABQAAAAIAAAAAAAAAuAIBAAAAAAC4AgAAAAAAAFgAAAAAAAAABQAAAAAAAA
+AIAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAQAAAAAAAAAMQAAAPb//28CAAAAAAAAABADAQAAAAAAEAMAAAAAAABsAAAAAAAAAAUAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAQAAAAAAAAAMQAAAPb//28CAAAAAAAAABADAQAAAAAAEAMAAAAAAABsAAAAAAAAAA
+UAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAACAAAAAAAAAAAAAAAAAAAADsAAAALAAAAAgAAAAAAAACAAwEAAAAAAIADAAAAAAAAmAEAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAACAAAAAAAAAAAAAAAAAAAADsAAAALAAAAAgAAAAAAAACAAwEAAAAAAIADAAAAAAAAmA
+EAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAGAAAAAQAAAAgAAAAAAAAAGAAAAAAAAABDAAAAAwAAAAIAAAAAAAAAGAUBAAAAAAAYBQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAGAAAAAQAAAAgAAAAAAAAAGAAAAAAAAABDAAAAAwAAAAIAAAAAAAAAGAUBAAAAAAAYBQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AN4AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAASwAAAP///28CAAAAAAAAAPYFAQAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AN4AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAASwAAAP///28CAAAAAAAAAPYFAQ
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo '9gUAAAAAAAAiAAAAAAAAAAUAAAAAAAAAAgAAAAAAAAACAAAAAAAAAFgAAAD+//9vAgAAAAAAAAAY' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo '9gUAAAAAAAAiAAAAAAAAAAUAAAAAAAAAAgAAAAAAAAACAAAAAAAAAFgAAAD+//9vAgAAAA
+AAAAAY' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'BgEAAAAAABgGAAAAAAAAMAAAAAAAAAAGAAAAAQAAAAgAAAAAAAAAAAAAAAAAAABnAAAABAAAAAIA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'BgEAAAAAABgGAAAAAAAAMAAAAAAAAAAGAAAAAQAAAAgAAAAAAAAAAAAAAAAAAABnAAAABA
+AAAAIA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAASAYBAAAAAABIBgAAAAAAABgAAAAAAAAABQAAAAAAAAAIAAAAAAAAABgAAAAAAAAAcQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAASAYBAAAAAABIBgAAAAAAABgAAAAAAAAABQAAAAAAAAAIAAAAAAAAABgAAAAAAA
+AAcQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAQAAABCAAAAAAAAAGAGAQAAAAAAYAYAAAAAAABQAQAAAAAAAAUAAAAVAAAACAAAAAAAAAAYAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAQAAABCAAAAAAAAAGAGAQAAAAAAYAYAAAAAAABQAQAAAAAAAAUAAAAVAAAACAAAAAAAAA
+AYAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAHYAAAABAAAABgAAAAAAAACwBwEAAAAAALAHAAAAAAAAAAEAAAAAAAAAAAAAAAAAABAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAHYAAAABAAAABgAAAAAAAACwBwEAAAAAALAHAAAAAAAAAAEAAAAAAAAAAAAAAAAAAB
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAEAAAAAAAAAB7AAAAAQAAAAYAAAAAAAAAsAgBAAAAAACwCAAAAAAAAFYIAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAEAAAAAAAAAB7AAAAAQAAAAYAAAAAAAAAsAgBAAAAAACwCAAAAAAAAFYIAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAEAAAAAAAAAAAAAAAAAAAAgQAAAAEAAAACAAAAAAAAAAgRAQAAAAAACBEAAAAAAAA9AwAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAEAAAAAAAAAAAAAAAAAAAAgQAAAAEAAAACAAAAAAAAAAgRAQAAAAAACBEAAAAAAAA9Aw
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAIkAAAABAAAAAgAAAAAAAABIFAEAAAAAAEgUAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAIkAAAABAAAAAgAAAAAAAABIFAEAAAAAAEgUAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'XAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAACXAAAAAQAAAAIAAAAAAAAAqBQBAAAAAACo' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'XAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAACXAAAAAQAAAAIAAAAAAAAAqBQBAA
+AAAACo' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'FAAAAAAAANABAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAoQAAABAAAAADAAAAAAAAAPAt' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'FAAAAAAAANABAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAoQAAABAAAAADAAAAAA
+AAAPAt' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAA8B0AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAIAAAAAAAAALAAAAAOAAAAAwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAA8B0AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAIAAAAAAAAALAAAAAOAA
+AAAwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAD4LQEAAAAAAPgdAAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAAAAAAAC8AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAD4LQEAAAAAAPgdAAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAAAAAAA
+C8AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'DwAAAAMAAAAAAAAAAC4BAAAAAAAAHgAAAAAAAAgAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAgAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'DwAAAAMAAAAAAAAAAC4BAAAAAAAAHgAAAAAAAAgAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA
+gAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAyAAAAAYAAAADAAAAAAAAAAguAQAAAAAACB4AAAAAAADgAQAAAAAAAAYAAAAAAAAACAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAyAAAAAYAAAADAAAAAAAAAAguAQAAAAAACB4AAAAAAADgAQAAAAAAAAYAAAAAAAAACA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAQAAAAAAAAANEAAAABAAAAAwAAAAAAAADoLwEAAAAAAOgfAAAAAAAACAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAQAAAAAAAAANEAAAABAAAAAwAAAAAAAADoLwEAAAAAAOgfAAAAAAAACAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAgAAAAAAAAACAAAAAAAAADWAAAAAQAAAAMAAAAAAAAA8C8BAAAAAADwHwAAAAAAAIAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAgAAAAAAAAACAAAAAAAAADWAAAAAQAAAAMAAAAAAAAA8C8BAAAAAADwHwAAAAAAAIAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAA3wAAAAEAAAADAAAAAAAAAHAwAQAAAAAAcCAAAAAAAAAM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAA3wAAAAEAAAADAAAAAAAAAHAwAQAAAAAAcCAAAA
+AAAAAM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAOYAAAAIAAAAAwAAAAAAAACAMAEAAAAAAHwg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAOYAAAAIAAAAAwAAAAAAAACAMAEAAA
+AAAHwg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAMAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAADsAAAACAAAAAMAAAAAAAAAsDAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAMAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAADsAAAACAAAAAMAAAAAAA
+AAsDAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAB8IAAAAAAAABAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA8QAAAAEAAAAwAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAB8IAAAAAAAABAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA8QAAAAEAAA
+AwAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAAAAAAAfCAAAAAAAAAzAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAPoAAAAD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAAAAAAAfCAAAAAAAAAzAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAP
+oAAAAD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AABwAAAAAAAAAAAAAAAAAAAAAK8gAAAAAAAAcQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AABwAAAAAAAAAAAAAAAAAAAAAK8gAAAAAAAAcQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAABAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgIQAAAAAAAEgJAAAAAAAAHAAAAEYAAAAIAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAABAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAgIQAAAAAAAEgJAAAAAAAAHAAAAEYAAAAIAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'ABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAaCoAAAAAAACNBAAAAAAAAAAAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'ABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAaCoAAAAAAACNBAAAAAAAAAAAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAAAAAAAAAAAAAAAAAPUuAAAAAAAADAEAAAAAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAAAAAAAAAAAAAAAAAPUuAAAAAAAADAEAAA
+AAAAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+~ # echo 'AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/cache_miss_trace_capture_dynamic.b64
+echo 'AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/cache_miss_trace_capture_dyn
+amic.b64
+~ # base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_capture_dynamic
+base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_
+capture_dynamic
+~ # chmod +x /tmp/cache_miss_trace_capture_dynamic
+chmod +x /tmp/cache_miss_trace_capture_dynamic
+~ # sha256sum /tmp/cache_miss_trace_capture_dynamic
+sha256sum /tmp/cache_miss_trace_capture_dynamic
+9ba97d82db9cbd07b03e04577ca36c298c38c11dced597bc37a28aa24c3375e9  /tmp/cache_miss_trace_capture_dynamic
+~ # echo PERSISTENT_BEGIN
+echo PERSISTENT_BEGIN
+PERSISTENT_BEGIN
+~ # /tmp/cache_miss_trace_capture_dynamic --window to-peer --summary-only --samples 201 || true
+/tmp/cache_miss_trace_capture_dynamic --window to-peer --summary-only --samp
+les 201 || true
+SAMPLE=1
+TRACE_HEADER cpu=0 window=1 start=2706459680 peer_begin=2706495696 peer_wake=2706495704 peer_block=2706497093 resume=2706506532 elapsed=36016 i_count=217 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022d9
+TRACE_PASS records=234 elapsed=36016
+SAMPLE=2
+TRACE_HEADER cpu=0 window=1 start=2707091600 peer_begin=2707136513 peer_wake=2707136521 peer_block=2707138150 resume=2707149066 elapsed=44913 i_count=256 d_count=66 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000048500
+TRACE_TRUNCATED records=322 elapsed=44913 i_overflow=1 d_overflow=0
+SAMPLE=3
+TRACE_HEADER cpu=0 window=1 start=2707548669 peer_begin=2707572113 peer_wake=2707572121 peer_block=2707579408 resume=2707587384 elapsed=23444 i_count=228 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ae4
+TRACE_PASS records=249 elapsed=23444
+SAMPLE=4
+TRACE_HEADER cpu=0 window=1 start=2708027337 peer_begin=2708046552 peer_wake=2708046560 peer_block=2708047723 resume=2708057721 elapsed=19215 i_count=197 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036c5
+TRACE_PASS records=224 elapsed=19215
+SAMPLE=5
+TRACE_HEADER cpu=0 window=1 start=2708458996 peer_begin=2708525324 peer_wake=2708525332 peer_block=2708527121 resume=2708536262 elapsed=66328 i_count=256 d_count=55 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046f00
+TRACE_TRUNCATED records=311 elapsed=66328 i_overflow=1 d_overflow=0
+SAMPLE=6
+TRACE_HEADER cpu=0 window=1 start=2708936528 peer_begin=2708990998 peer_wake=2708991006 peer_block=2708527121 resume=2709002479 elapsed=54470 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=54470 i_overflow=1 d_overflow=0
+SAMPLE=7
+TRACE_HEADER cpu=0 window=1 start=2709463051 peer_begin=2709481971 peer_wake=2709481979 peer_block=2709483153 resume=2709493294 elapsed=18920 i_count=189 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002abd
+TRACE_PASS records=210 elapsed=18920
+SAMPLE=8
+TRACE_HEADER cpu=0 window=1 start=2709861348 peer_begin=2709879645 peer_wake=2709879653 peer_block=2709880783 resume=2709890930 elapsed=18297 i_count=189 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001abd
+TRACE_PASS records=202 elapsed=18297
+SAMPLE=9
+TRACE_HEADER cpu=0 window=1 start=2710365035 peer_begin=2710384846 peer_wake=2710384854 peer_block=2710385987 resume=2710416544 elapsed=19811 i_count=195 d_count=36 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000048c3
+TRACE_PASS records=231 elapsed=19811
+SAMPLE=10
+TRACE_HEADER cpu=0 window=1 start=2710783873 peer_begin=2710824642 peer_wake=2710824650 peer_block=2710826185 resume=2710836519 elapsed=40769 i_count=256 d_count=26 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043500
+TRACE_TRUNCATED records=282 elapsed=40769 i_overflow=1 d_overflow=0
+SAMPLE=11
+TRACE_HEADER cpu=0 window=1 start=2711296099 peer_begin=2711315183 peer_wake=2711315191 peer_block=2711316367 resume=2711326479 elapsed=19084 i_count=189 d_count=29 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003abd
+TRACE_PASS records=218 elapsed=19084
+SAMPLE=12
+TRACE_HEADER cpu=0 window=1 start=2711715531 peer_begin=2711734207 peer_wake=2711734215 peer_block=2711735348 resume=2711745208 elapsed=18676 i_count=200 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac8
+TRACE_PASS records=213 elapsed=18676
+SAMPLE=13
+TRACE_HEADER cpu=0 window=1 start=2712186324 peer_begin=2712205574 peer_wake=2712205582 peer_block=2712206749 resume=2712216646 elapsed=19250 i_count=189 d_count=30 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003cbd
+TRACE_PASS records=219 elapsed=19250
+SAMPLE=14
+TRACE_HEADER cpu=0 window=1 start=2712615557 peer_begin=2712671587 peer_wake=2712671595 peer_block=2712740176 resume=2712683908 elapsed=56030 i_count=256 d_count=40 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045100
+TRACE_TRUNCATED records=296 elapsed=56030 i_overflow=1 d_overflow=0
+SAMPLE=15
+TRACE_HEADER cpu=0 window=1 start=2713147052 peer_begin=2713166275 peer_wake=2713166283 peer_block=2713167457 resume=2713177464 elapsed=19223 i_count=192 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036c0
+TRACE_PASS records=219 elapsed=19223
+SAMPLE=16
+TRACE_HEADER cpu=0 window=1 start=2713550637 peer_begin=2713573605 peer_wake=2713573613 peer_block=2713580827 resume=2713588878 elapsed=22968 i_count=222 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020de
+TRACE_PASS records=238 elapsed=22968
+SAMPLE=17
+TRACE_HEADER cpu=0 window=1 start=2714028236 peer_begin=2714047094 peer_wake=2714047102 peer_block=2714048235 resume=2714056979 elapsed=18858 i_count=187 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030bb
+TRACE_PASS records=211 elapsed=18858
+SAMPLE=18
+TRACE_HEADER cpu=0 window=1 start=2714431033 peer_begin=2714449657 peer_wake=2714449665 peer_block=2714450798 resume=2714460838 elapsed=18624 i_count=193 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020c1
+TRACE_PASS records=209 elapsed=18624
+SAMPLE=19
+TRACE_HEADER cpu=0 window=1 start=2714918612 peer_begin=2714937473 peer_wake=2714937481 peer_block=2714938684 resume=2714948631 elapsed=18861 i_count=193 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ec1
+TRACE_PASS records=216 elapsed=18861
+SAMPLE=20
+TRACE_HEADER cpu=0 window=1 start=2715330038 peer_begin=2715349193 peer_wake=2715349201 peer_block=2715375383 resume=2715386597 elapsed=19155 i_count=209 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024d1
+TRACE_PASS records=227 elapsed=19155
+SAMPLE=21
+TRACE_HEADER cpu=0 window=1 start=2715741450 peer_begin=2715808134 peer_wake=2715808142 peer_block=2715809957 resume=2715819809 elapsed=66684 i_count=256 d_count=51 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046700
+TRACE_TRUNCATED records=307 elapsed=66684 i_overflow=1 d_overflow=0
+SAMPLE=22
+TRACE_HEADER cpu=0 window=1 start=2716225492 peer_begin=2716262800 peer_wake=2716262808 peer_block=2716264207 resume=2716274922 elapsed=37308 i_count=256 d_count=24 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043100
+TRACE_TRUNCATED records=280 elapsed=37308 i_overflow=1 d_overflow=0
+SAMPLE=23
+TRACE_HEADER cpu=0 window=1 start=2716788588 peer_begin=2716826845 peer_wake=2716826853 peer_block=2716828184 resume=2716838034 elapsed=38257 i_count=256 d_count=42 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045500
+TRACE_TRUNCATED records=298 elapsed=38257 i_overflow=1 d_overflow=0
+SAMPLE=24
+TRACE_HEADER cpu=0 window=1 start=2717235011 peer_begin=2717253650 peer_wake=2717253658 peer_block=2717254791 resume=2717263822 elapsed=18639 i_count=192 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026c0
+TRACE_PASS records=211 elapsed=18639
+SAMPLE=25
+TRACE_HEADER cpu=0 window=1 start=2717642556 peer_begin=2717661198 peer_wake=2717661206 peer_block=2717662371 resume=2717724606 elapsed=18642 i_count=196 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c4
+TRACE_PASS records=213 elapsed=18642
+SAMPLE=26
+TRACE_HEADER cpu=0 window=1 start=2718117464 peer_begin=2718136260 peer_wake=2718136268 peer_block=2718137372 resume=2718146276 elapsed=18796 i_count=203 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ecb
+TRACE_PASS records=218 elapsed=18796
+SAMPLE=27
+TRACE_HEADER cpu=0 window=1 start=2718527165 peer_begin=2718545879 peer_wake=2718545887 peer_block=2718547052 resume=2718577769 elapsed=18714 i_count=200 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c8
+TRACE_PASS records=217 elapsed=18714
+SAMPLE=28
+TRACE_HEADER cpu=0 window=1 start=2719000679 peer_begin=2719019314 peer_wake=2719019322 peer_block=2719020490 resume=2719049734 elapsed=18635 i_count=195 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c3
+TRACE_PASS records=212 elapsed=18635
+SAMPLE=29
+TRACE_HEADER cpu=0 window=1 start=2719410172 peer_begin=2719429230 peer_wake=2719429238 peer_block=2719455387 resume=2719465702 elapsed=19058 i_count=209 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ed1
+TRACE_PASS records=224 elapsed=19058
+SAMPLE=30
+TRACE_HEADER cpu=0 window=1 start=2719821033 peer_begin=2719860305 peer_wake=2719860313 peer_block=2719861771 resume=2719872289 elapsed=39272 i_count=256 d_count=28 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043900
+TRACE_TRUNCATED records=284 elapsed=39272 i_overflow=1 d_overflow=0
+SAMPLE=31
+TRACE_HEADER cpu=0 window=1 start=2720309538 peer_begin=2720346790 peer_wake=2720346798 peer_block=2720347978 resume=2720358191 elapsed=37252 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=37252 i_overflow=1 d_overflow=0
+SAMPLE=32
+TRACE_HEADER cpu=0 window=1 start=2720812589 peer_begin=2720831754 peer_wake=2720831762 peer_block=2720832936 resume=2720843223 elapsed=19165 i_count=190 d_count=30 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003cbe
+TRACE_PASS records=220 elapsed=19165
+SAMPLE=33
+TRACE_HEADER cpu=0 window=1 start=2721293998 peer_begin=2721312772 peer_wake=2721312780 peer_block=2721313980 resume=2721324006 elapsed=18774 i_count=182 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038b6
+TRACE_PASS records=210 elapsed=18774
+SAMPLE=34
+TRACE_HEADER cpu=0 window=1 start=2721710228 peer_begin=2721728948 peer_wake=2721728956 peer_block=2721730115 resume=2721740149 elapsed=18720 i_count=197 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c5
+TRACE_PASS records=214 elapsed=18720
+SAMPLE=35
+TRACE_HEADER cpu=0 window=1 start=2722133573 peer_begin=2722176122 peer_wake=2722176130 peer_block=2722177697 resume=2722188508 elapsed=42549 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=42549 i_overflow=1 d_overflow=0
+SAMPLE=36
+TRACE_HEADER cpu=0 window=1 start=2722628369 peer_begin=2722665392 peer_wake=2722665400 peer_block=2722666898 resume=2722675835 elapsed=37023 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=37023 i_overflow=1 d_overflow=0
+SAMPLE=37
+TRACE_HEADER cpu=0 window=1 start=2723085125 peer_begin=2723104346 peer_wake=2723104354 peer_block=2723105487 resume=2723134720 elapsed=19221 i_count=202 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002aca
+TRACE_PASS records=223 elapsed=19221
+SAMPLE=38
+TRACE_HEADER cpu=0 window=1 start=2723557521 peer_begin=2723576724 peer_wake=2723576732 peer_block=2723577938 resume=2723587810 elapsed=19203 i_count=198 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c6
+TRACE_PASS records=224 elapsed=19203
+SAMPLE=39
+TRACE_HEADER cpu=0 window=1 start=2724034044 peer_begin=2724053612 peer_wake=2724053620 peer_block=2724054753 resume=2724064684 elapsed=19568 i_count=197 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038c5
+TRACE_PASS records=225 elapsed=19568
+SAMPLE=40
+TRACE_HEADER cpu=0 window=1 start=2724444247 peer_begin=2724462848 peer_wake=2724462856 peer_block=2724464021 resume=2724494031 elapsed=18601 i_count=196 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec4
+TRACE_PASS records=211 elapsed=18601
+SAMPLE=41
+TRACE_HEADER cpu=0 window=1 start=2724912777 peer_begin=2724936486 peer_wake=2724936494 peer_block=2724943961 resume=2724975114 elapsed=23709 i_count=225 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036e1
+TRACE_PASS records=252 elapsed=23709
+SAMPLE=42
+TRACE_HEADER cpu=0 window=1 start=2725374564 peer_begin=2725392737 peer_wake=2725392745 peer_block=2725393916 resume=2725402586 elapsed=18173 i_count=179 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022b3
+TRACE_PASS records=196 elapsed=18173
+SAMPLE=43
+TRACE_HEADER cpu=0 window=1 start=2725816161 peer_begin=2725859558 peer_wake=2725859566 peer_block=2725861164 resume=2725871973 elapsed=43397 i_count=256 d_count=47 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045f00
+TRACE_TRUNCATED records=303 elapsed=43397 i_overflow=1 d_overflow=0
+SAMPLE=44
+TRACE_HEADER cpu=0 window=1 start=2726269261 peer_begin=2726287891 peer_wake=2726287899 peer_block=2726289064 resume=2726299074 elapsed=18630 i_count=194 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c2
+TRACE_PASS records=211 elapsed=18630
+SAMPLE=45
+TRACE_HEADER cpu=0 window=1 start=2726678133 peer_begin=2726696696 peer_wake=2726696704 peer_block=2726697834 resume=2726707764 elapsed=18563 i_count=192 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020c0
+TRACE_PASS records=208 elapsed=18563
+SAMPLE=46
+TRACE_HEADER cpu=0 window=1 start=2727156008 peer_begin=2727180354 peer_wake=2727180362 peer_block=2727187692 resume=2727216749 elapsed=24346 i_count=240 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036f0
+TRACE_PASS records=267 elapsed=24346
+SAMPLE=47
+TRACE_HEADER cpu=0 window=1 start=2727574706 peer_begin=2727619475 peer_wake=2727619483 peer_block=2727628386 resume=2727638095 elapsed=44769 i_count=256 d_count=32 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044100
+TRACE_TRUNCATED records=288 elapsed=44769 i_overflow=1 d_overflow=0
+SAMPLE=48
+TRACE_HEADER cpu=0 window=1 start=2728104911 peer_begin=2728123915 peer_wake=2728123923 peer_block=2728125129 resume=2728135088 elapsed=19004 i_count=192 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030c0
+TRACE_PASS records=216 elapsed=19004
+SAMPLE=49
+TRACE_HEADER cpu=0 window=1 start=2728503298 peer_begin=2728521947 peer_wake=2728521955 peer_block=2728523085 resume=2728533069 elapsed=18649 i_count=193 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026c1
+TRACE_PASS records=212 elapsed=18649
+SAMPLE=50
+TRACE_HEADER cpu=0 window=1 start=2728917785 peer_begin=2728936565 peer_wake=2728936573 peer_block=2728937677 resume=2728946554 elapsed=18780 i_count=200 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c8
+TRACE_PASS records=217 elapsed=18780
+SAMPLE=51
+TRACE_HEADER cpu=0 window=1 start=2729392944 peer_begin=2729411980 peer_wake=2729411988 peer_block=2729413153 resume=2729423033 elapsed=19036 i_count=192 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c0
+TRACE_PASS records=218 elapsed=19036
+SAMPLE=52
+TRACE_HEADER cpu=0 window=1 start=2729800434 peer_begin=2729823433 peer_wake=2729823441 peer_block=2729413153 resume=2729858142 elapsed=22999 i_count=226 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022e2
+TRACE_PASS records=243 elapsed=22999
+SAMPLE=53
+TRACE_HEADER cpu=0 window=1 start=2730215079 peer_begin=2730257701 peer_wake=2730257709 peer_block=2730259127 resume=2730269043 elapsed=42622 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=42622 i_overflow=1 d_overflow=0
+SAMPLE=54
+TRACE_HEADER cpu=0 window=1 start=2730762762 peer_begin=2730779240 peer_wake=2730779248 peer_block=2730780363 resume=2730788627 elapsed=16478 i_count=108 d_count=36 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000486c
+TRACE_PASS records=144 elapsed=16478
+SAMPLE=55
+TRACE_HEADER cpu=0 window=1 start=2731170678 peer_begin=2731214397 peer_wake=2731214405 peer_block=2731215830 resume=2731226981 elapsed=43719 i_count=256 d_count=40 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045100
+TRACE_TRUNCATED records=296 elapsed=43719 i_overflow=1 d_overflow=0
+SAMPLE=56
+TRACE_HEADER cpu=0 window=1 start=2731636017 peer_begin=2731654818 peer_wake=2731654826 peer_block=2731655993 resume=2731666043 elapsed=18801 i_count=200 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024c8
+TRACE_PASS records=218 elapsed=18801
+SAMPLE=57
+TRACE_HEADER cpu=0 window=1 start=2732105355 peer_begin=2732129315 peer_wake=2732129323 peer_block=2732136646 resume=2732144872 elapsed=23960 i_count=228 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038e4
+TRACE_PASS records=256 elapsed=23960
+SAMPLE=58
+TRACE_HEADER cpu=0 window=1 start=2732525267 peer_begin=2732548358 peer_wake=2732548366 peer_block=2732576909 resume=2732587410 elapsed=23091 i_count=227 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022e3
+TRACE_PASS records=244 elapsed=23091
+SAMPLE=59
+TRACE_HEADER cpu=0 window=1 start=2733008712 peer_begin=2733024049 peer_wake=2733024057 peer_block=2733025155 resume=2733054249 elapsed=15337 i_count=94 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002c5e
+TRACE_PASS records=116 elapsed=15337
+SAMPLE=60
+TRACE_HEADER cpu=0 window=1 start=2733423044 peer_begin=2733463725 peer_wake=2733463733 peer_block=2733465249 resume=2733476032 elapsed=40681 i_count=256 d_count=29 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043b00
+TRACE_TRUNCATED records=285 elapsed=40681 i_overflow=1 d_overflow=0
+SAMPLE=61
+TRACE_HEADER cpu=0 window=1 start=2733871582 peer_begin=2733890239 peer_wake=2733890247 peer_block=2733891412 resume=2733901477 elapsed=18657 i_count=196 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec4
+TRACE_PASS records=211 elapsed=18657
+SAMPLE=62
+TRACE_HEADER cpu=0 window=1 start=2734334621 peer_begin=2734352081 peer_wake=2734352089 peer_block=2734353310 resume=2734363032 elapsed=17460 i_count=149 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002e95
+TRACE_PASS records=172 elapsed=17460
+SAMPLE=63
+TRACE_HEADER cpu=0 window=1 start=2734749844 peer_begin=2734768475 peer_wake=2734768483 peer_block=2734769616 resume=2734779418 elapsed=18631 i_count=198 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec6
+TRACE_PASS records=213 elapsed=18631
+SAMPLE=64
+TRACE_HEADER cpu=0 window=1 start=2735171612 peer_begin=2735213601 peer_wake=2735213609 peer_block=2735215059 resume=2735225784 elapsed=41989 i_count=256 d_count=28 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043900
+TRACE_TRUNCATED records=284 elapsed=41989 i_overflow=1 d_overflow=0
+SAMPLE=65
+TRACE_HEADER cpu=0 window=1 start=2735692458 peer_begin=2735711389 peer_wake=2735711397 peer_block=2735712644 resume=2735722601 elapsed=18931 i_count=189 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036bd
+TRACE_PASS records=216 elapsed=18931
+SAMPLE=66
+TRACE_HEADER cpu=0 window=1 start=2736094279 peer_begin=2736112564 peer_wake=2736112572 peer_block=2736113743 resume=2736123777 elapsed=18285 i_count=187 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020bb
+TRACE_PASS records=203 elapsed=18285
+SAMPLE=67
+TRACE_HEADER cpu=0 window=1 start=2736493506 peer_begin=2736511632 peer_wake=2736511640 peer_block=2736512775 resume=2736522725 elapsed=18126 i_count=182 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020b6
+TRACE_PASS records=198 elapsed=18126
+SAMPLE=68
+TRACE_HEADER cpu=0 window=1 start=2736936061 peer_begin=2736992425 peer_wake=2736992433 peer_block=2737076035 resume=2737005052 elapsed=56364 i_count=256 d_count=53 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046b00
+TRACE_TRUNCATED records=309 elapsed=56364 i_overflow=1 d_overflow=0
+SAMPLE=69
+TRACE_HEADER cpu=0 window=1 start=2737467322 peer_begin=2737486742 peer_wake=2737486750 peer_block=2737487883 resume=2737497973 elapsed=19420 i_count=200 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c8
+TRACE_PASS records=226 elapsed=19420
+SAMPLE=70
+TRACE_HEADER cpu=0 window=1 start=2737894642 peer_begin=2737938060 peer_wake=2737938068 peer_block=2737939616 resume=2737950426 elapsed=43418 i_count=256 d_count=29 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043b00
+TRACE_TRUNCATED records=285 elapsed=43418 i_overflow=1 d_overflow=0
+SAMPLE=71
+TRACE_HEADER cpu=0 window=1 start=2738422179 peer_begin=2738441481 peer_wake=2738441489 peer_block=2738442664 resume=2738452765 elapsed=19302 i_count=196 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c4
+TRACE_PASS records=222 elapsed=19302
+SAMPLE=72
+TRACE_HEADER cpu=0 window=1 start=2738821359 peer_begin=2738840020 peer_wake=2738840028 peer_block=2738841159 resume=2738851196 elapsed=18661 i_count=192 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c0
+TRACE_PASS records=209 elapsed=18661
+SAMPLE=73
+TRACE_HEADER cpu=0 window=1 start=2739236609 peer_begin=2739255296 peer_wake=2739255304 peer_block=2739256437 resume=2739266388 elapsed=18687 i_count=202 d_count=12 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000018ca
+TRACE_PASS records=214 elapsed=18687
+SAMPLE=74
+TRACE_HEADER cpu=0 window=1 start=2739710606 peer_begin=2739729382 peer_wake=2739729390 peer_block=2739730564 resume=2739740511 elapsed=18776 i_count=184 d_count=25 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000032b8
+TRACE_PASS records=209 elapsed=18776
+SAMPLE=75
+TRACE_HEADER cpu=0 window=1 start=2740119403 peer_begin=2740137814 peer_wake=2740137822 peer_block=2740138952 resume=2740148967 elapsed=18411 i_count=195 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac3
+TRACE_PASS records=208 elapsed=18411
+SAMPLE=76
+TRACE_HEADER cpu=0 window=1 start=2740533844 peer_begin=2740576255 peer_wake=2740576263 peer_block=2740577826 resume=2740588685 elapsed=42411 i_count=256 d_count=26 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043500
+TRACE_TRUNCATED records=282 elapsed=42411 i_overflow=1 d_overflow=0
+SAMPLE=77
+TRACE_HEADER cpu=0 window=1 start=2741081045 peer_begin=2741097434 peer_wake=2741097442 peer_block=2741098543 resume=2741106804 elapsed=16389 i_count=111 d_count=34 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000446f
+TRACE_PASS records=145 elapsed=16389
+SAMPLE=78
+TRACE_HEADER cpu=0 window=1 start=2741488899 peer_begin=2741507970 peer_wake=2741507978 peer_block=2741509112 resume=2741542245 elapsed=19071 i_count=205 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020cd
+TRACE_PASS records=221 elapsed=19071
+SAMPLE=79
+TRACE_HEADER cpu=0 window=1 start=2741909749 peer_begin=2741946371 peer_wake=2741946379 peer_block=2741947518 resume=2741957702 elapsed=36622 i_count=256 d_count=21 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042b00
+TRACE_TRUNCATED records=277 elapsed=36622 i_overflow=1 d_overflow=0
+SAMPLE=80
+TRACE_HEADER cpu=0 window=1 start=2742353325 peer_begin=2742371650 peer_wake=2742371658 peer_block=2742372791 resume=2742382756 elapsed=18325 i_count=192 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac0
+TRACE_PASS records=205 elapsed=18325
+SAMPLE=81
+TRACE_HEADER cpu=0 window=1 start=2742788974 peer_begin=2742826013 peer_wake=2742826021 peer_block=2742827303 resume=2742837458 elapsed=37039 i_count=256 d_count=18 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042500
+TRACE_TRUNCATED records=274 elapsed=37039 i_overflow=1 d_overflow=0
+SAMPLE=82
+TRACE_HEADER cpu=0 window=1 start=2743245116 peer_begin=2743263589 peer_wake=2743263597 peer_block=2743264730 resume=2743294167 elapsed=18473 i_count=197 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac5
+TRACE_PASS records=210 elapsed=18473
+SAMPLE=83
+TRACE_HEADER cpu=0 window=1 start=2743655996 peer_begin=2743700900 peer_wake=2743700908 peer_block=2743708533 resume=2743717562 elapsed=44904 i_count=256 d_count=19 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042700
+TRACE_TRUNCATED records=275 elapsed=44904 i_overflow=1 d_overflow=0
+SAMPLE=84
+TRACE_HEADER cpu=0 window=1 start=2744178115 peer_begin=2744197228 peer_wake=2744197236 peer_block=2744198369 resume=2744208445 elapsed=19113 i_count=195 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030c3
+TRACE_PASS records=219 elapsed=19113
+SAMPLE=85
+TRACE_HEADER cpu=0 window=1 start=2744597032 peer_begin=2744615652 peer_wake=2744615660 peer_block=2744616793 resume=2744626696 elapsed=18620 i_count=199 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cc7
+TRACE_PASS records=213 elapsed=18620
+SAMPLE=86
+TRACE_HEADER cpu=0 window=1 start=2745006675 peer_begin=2745025659 peer_wake=2745025667 peer_block=2745026831 resume=2745057215 elapsed=18984 i_count=209 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ed1
+TRACE_PASS records=224 elapsed=18984
+SAMPLE=87
+TRACE_HEADER cpu=0 window=1 start=2745481574 peer_begin=2745499938 peer_wake=2745499946 peer_block=2745501077 resume=2745530790 elapsed=18364 i_count=190 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ebe
+TRACE_PASS records=205 elapsed=18364
+SAMPLE=88
+TRACE_HEADER cpu=0 window=1 start=2745899701 peer_begin=2745939305 peer_wake=2745939313 peer_block=2745940813 resume=2745951392 elapsed=39604 i_count=256 d_count=25 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043300
+TRACE_TRUNCATED records=281 elapsed=39604 i_overflow=1 d_overflow=0
+SAMPLE=89
+TRACE_HEADER cpu=0 window=1 start=2746346447 peer_begin=2746364926 peer_wake=2746364934 peer_block=2746366098 resume=2746376071 elapsed=18479 i_count=196 d_count=12 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000018c4
+TRACE_PASS records=208 elapsed=18479
+SAMPLE=90
+TRACE_HEADER cpu=0 window=1 start=2746742699 peer_begin=2746761117 peer_wake=2746761125 peer_block=2746762257 resume=2746771123 elapsed=18418 i_count=195 d_count=12 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000018c3
+TRACE_PASS records=207 elapsed=18418
+SAMPLE=91
+TRACE_HEADER cpu=0 window=1 start=2747177516 peer_begin=2747218432 peer_wake=2747218440 peer_block=2747219877 resume=2747236561 elapsed=40916 i_count=256 d_count=30 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043d00
+TRACE_TRUNCATED records=286 elapsed=40916 i_overflow=1 d_overflow=0
+SAMPLE=92
+TRACE_HEADER cpu=0 window=1 start=2747640465 peer_begin=2747664724 peer_wake=2747664732 peer_block=2747219877 resume=2747699813 elapsed=24259 i_count=230 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ce6
+TRACE_PASS records=252 elapsed=24259
+SAMPLE=93
+TRACE_HEADER cpu=0 window=1 start=2748068904 peer_begin=2748108281 peer_wake=2748108289 peer_block=2748109676 resume=2748119599 elapsed=39377 i_count=256 d_count=21 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042b00
+TRACE_TRUNCATED records=277 elapsed=39377 i_overflow=1 d_overflow=0
+SAMPLE=94
+TRACE_HEADER cpu=0 window=1 start=2748578246 peer_begin=2748597602 peer_wake=2748597610 peer_block=2748598810 resume=2748608720 elapsed=19356 i_count=198 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c6
+TRACE_PASS records=224 elapsed=19356
+SAMPLE=95
+TRACE_HEADER cpu=0 window=1 start=2748979028 peer_begin=2748997818 peer_wake=2748997826 peer_block=2748999014 resume=2749008969 elapsed=18790 i_count=194 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024c2
+TRACE_PASS records=212 elapsed=18790
+SAMPLE=96
+TRACE_HEADER cpu=0 window=1 start=2749378809 peer_begin=2749397591 peer_wake=2749397599 peer_block=2749398787 resume=2749408730 elapsed=18782 i_count=194 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024c2
+TRACE_PASS records=212 elapsed=18782
+SAMPLE=97
+TRACE_HEADER cpu=0 window=1 start=2749782914 peer_begin=2749801537 peer_wake=2749801545 peer_block=2749802701 resume=2749811542 elapsed=18623 i_count=191 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024bf
+TRACE_PASS records=209 elapsed=18623
+SAMPLE=98
+TRACE_HEADER cpu=0 window=1 start=2750226326 peer_begin=2750266314 peer_wake=2750266322 peer_block=2750267832 resume=2750278558 elapsed=39988 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=39988 i_overflow=1 d_overflow=0
+SAMPLE=99
+TRACE_HEADER cpu=0 window=1 start=2750675309 peer_begin=2750699167 peer_wake=2750699175 peer_block=2750705844 resume=2750734003 elapsed=23858 i_count=223 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024df
+TRACE_PASS records=241 elapsed=23858
+SAMPLE=100
+TRACE_HEADER cpu=0 window=1 start=2751093536 peer_begin=2751168891 peer_wake=2751168899 peer_block=2751240793 resume=2751182361 elapsed=75355 i_count=256 d_count=86 i_overflow=1 d_overflow=0 armed=0 status=0x000000000004ad00
+TRACE_TRUNCATED records=342 elapsed=75355 i_overflow=1 d_overflow=0
+SAMPLE=101
+TRACE_HEADER cpu=0 window=1 start=2751651130 peer_begin=2751695988 peer_wake=2751695996 peer_block=2751697823 resume=2751708848 elapsed=44858 i_count=256 d_count=40 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045100
+TRACE_TRUNCATED records=296 elapsed=44858 i_overflow=1 d_overflow=0
+SAMPLE=102
+TRACE_HEADER cpu=0 window=1 start=2752114840 peer_begin=2752138485 peer_wake=2752138493 peer_block=2752145797 resume=2752174580 elapsed=23645 i_count=237 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ed
+TRACE_PASS records=253 elapsed=23645
+SAMPLE=103
+TRACE_HEADER cpu=0 window=1 start=2752541744 peer_begin=2752581086 peer_wake=2752581094 peer_block=2752582566 resume=2752592912 elapsed=39342 i_count=256 d_count=17 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042300
+TRACE_TRUNCATED records=273 elapsed=39342 i_overflow=1 d_overflow=0
+SAMPLE=104
+TRACE_HEADER cpu=0 window=1 start=2752988907 peer_begin=2753007733 peer_wake=2753007741 peer_block=2753008905 resume=2753018807 elapsed=18826 i_count=202 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001aca
+TRACE_PASS records=215 elapsed=18826
+SAMPLE=105
+TRACE_HEADER cpu=0 window=1 start=2753451286 peer_begin=2753468924 peer_wake=2753468932 peer_block=2753470064 resume=2753480103 elapsed=17638 i_count=184 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022b8
+TRACE_PASS records=201 elapsed=17638
+SAMPLE=106
+TRACE_HEADER cpu=0 window=1 start=2753857264 peer_begin=2753875842 peer_wake=2753875850 peer_block=2753876982 resume=2753887027 elapsed=18578 i_count=194 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec2
+TRACE_PASS records=209 elapsed=18578
+SAMPLE=107
+TRACE_HEADER cpu=0 window=1 start=2754266330 peer_begin=2754285226 peer_wake=2754285234 peer_block=2754286407 resume=2754296548 elapsed=18896 i_count=198 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026c6
+TRACE_PASS records=217 elapsed=18896
+SAMPLE=108
+TRACE_HEADER cpu=0 window=1 start=2754769864 peer_begin=2754814638 peer_wake=2754814646 peer_block=2754286407 resume=2754828547 elapsed=44774 i_count=256 d_count=44 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045900
+TRACE_TRUNCATED records=300 elapsed=44774 i_overflow=1 d_overflow=0
+SAMPLE=109
+TRACE_HEADER cpu=0 window=1 start=2755233634 peer_begin=2755252249 peer_wake=2755252257 peer_block=2755253389 resume=2755263318 elapsed=18615 i_count=193 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c1
+TRACE_PASS records=210 elapsed=18615
+SAMPLE=110
+TRACE_HEADER cpu=0 window=1 start=2755643380 peer_begin=2755662106 peer_wake=2755662114 peer_block=2755663278 resume=2755693130 elapsed=18726 i_count=201 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec9
+TRACE_PASS records=216 elapsed=18726
+SAMPLE=111
+TRACE_HEADER cpu=0 window=1 start=2756061764 peer_begin=2756101281 peer_wake=2756101289 peer_block=2756102764 resume=2756113279 elapsed=39517 i_count=256 d_count=19 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042700
+TRACE_TRUNCATED records=275 elapsed=39517 i_overflow=1 d_overflow=0
+SAMPLE=112
+TRACE_HEADER cpu=0 window=1 start=2756577701 peer_begin=2756596855 peer_wake=2756596863 peer_block=2756598038 resume=2756607124 elapsed=19154 i_count=193 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036c1
+TRACE_PASS records=220 elapsed=19154
+SAMPLE=113
+TRACE_HEADER cpu=0 window=1 start=2757025616 peer_begin=2757064334 peer_wake=2757064342 peer_block=2757065802 resume=2757076186 elapsed=38718 i_count=256 d_count=40 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045100
+TRACE_TRUNCATED records=296 elapsed=38718 i_overflow=1 d_overflow=0
+SAMPLE=114
+TRACE_HEADER cpu=0 window=1 start=2757474194 peer_begin=2757493187 peer_wake=2757493195 peer_block=2757494327 resume=2757504336 elapsed=18993 i_count=197 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024c5
+TRACE_PASS records=215 elapsed=18993
+SAMPLE=115
+TRACE_HEADER cpu=0 window=1 start=2757884850 peer_begin=2757903592 peer_wake=2757903600 peer_block=2757904732 resume=2757934828 elapsed=18742 i_count=195 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024c3
+TRACE_PASS records=213 elapsed=18742
+SAMPLE=116
+TRACE_HEADER cpu=0 window=1 start=2758368823 peer_begin=2758388671 peer_wake=2758388679 peer_block=2758389881 resume=2758422367 elapsed=19848 i_count=211 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036d3
+TRACE_PASS records=238 elapsed=19848
+SAMPLE=117
+TRACE_HEADER cpu=0 window=1 start=2758777943 peer_begin=2758818134 peer_wake=2758818142 peer_block=2758819707 resume=2758828791 elapsed=40191 i_count=256 d_count=26 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043500
+TRACE_TRUNCATED records=282 elapsed=40191 i_overflow=1 d_overflow=0
+SAMPLE=118
+TRACE_HEADER cpu=0 window=1 start=2759226403 peer_begin=2759249457 peer_wake=2759249465 peer_block=2759256639 resume=2759264713 elapsed=23054 i_count=225 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020e1
+TRACE_PASS records=241 elapsed=23054
+SAMPLE=119
+TRACE_HEADER cpu=0 window=1 start=2759710308 peer_begin=2759734262 peer_wake=2759734270 peer_block=2759741440 resume=2759749648 elapsed=23954 i_count=223 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038df
+TRACE_PASS records=251 elapsed=23954
+SAMPLE=120
+TRACE_HEADER cpu=0 window=1 start=2760195014 peer_begin=2760219617 peer_wake=2760219625 peer_block=2760257016 resume=2760266982 elapsed=24603 i_count=225 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038e1
+TRACE_PASS records=253 elapsed=24603
+SAMPLE=121
+TRACE_HEADER cpu=0 window=1 start=2760650844 peer_begin=2760669292 peer_wake=2760669300 peer_block=2760670464 resume=2760680529 elapsed=18448 i_count=186 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ba
+TRACE_PASS records=205 elapsed=18448
+SAMPLE=122
+TRACE_HEADER cpu=0 window=1 start=2761066361 peer_begin=2761085033 peer_wake=2761085041 peer_block=2761086173 resume=2761095107 elapsed=18672 i_count=198 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec6
+TRACE_PASS records=213 elapsed=18672
+SAMPLE=123
+TRACE_HEADER cpu=0 window=1 start=2761502821 peer_begin=2761544978 peer_wake=2761544986 peer_block=2761546528 resume=2761555674 elapsed=42157 i_count=256 d_count=41 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045300
+TRACE_TRUNCATED records=297 elapsed=42157 i_overflow=1 d_overflow=0
+SAMPLE=124
+TRACE_HEADER cpu=0 window=1 start=2762013770 peer_begin=2762032826 peer_wake=2762032834 peer_block=2762034077 resume=2762044138 elapsed=19056 i_count=184 d_count=30 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003cb8
+TRACE_PASS records=214 elapsed=19056
+SAMPLE=125
+TRACE_HEADER cpu=0 window=1 start=2762434505 peer_begin=2762453101 peer_wake=2762453109 peer_block=2762454241 resume=2762464070 elapsed=18596 i_count=199 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec7
+TRACE_PASS records=214 elapsed=18596
+SAMPLE=126
+TRACE_HEADER cpu=0 window=1 start=2762850536 peer_begin=2762895996 peer_wake=2762896004 peer_block=2762905081 resume=2762915040 elapsed=45460 i_count=256 d_count=28 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043900
+TRACE_TRUNCATED records=284 elapsed=45460 i_overflow=1 d_overflow=0
+SAMPLE=127
+TRACE_HEADER cpu=0 window=1 start=2763322749 peer_begin=2763341268 peer_wake=2763341276 peer_block=2763342408 resume=2763372217 elapsed=18519 i_count=195 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec3
+TRACE_PASS records=210 elapsed=18519
+SAMPLE=128
+TRACE_HEADER cpu=0 window=1 start=2763794433 peer_begin=2763813837 peer_wake=2763813845 peer_block=2763815054 resume=2763824958 elapsed=19404 i_count=199 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036c7
+TRACE_PASS records=226 elapsed=19404
+SAMPLE=129
+TRACE_HEADER cpu=0 window=1 start=2764208326 peer_begin=2764226993 peer_wake=2764227001 peer_block=2764228165 resume=2764259717 elapsed=18667 i_count=204 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ecc
+TRACE_PASS records=219 elapsed=18667
+SAMPLE=130
+TRACE_HEADER cpu=0 window=1 start=2764693665 peer_begin=2764750372 peer_wake=2764750380 peer_block=2764228165 resume=2764761774 elapsed=56707 i_count=256 d_count=54 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046d00
+TRACE_TRUNCATED records=310 elapsed=56707 i_overflow=1 d_overflow=0
+SAMPLE=131
+TRACE_HEADER cpu=0 window=1 start=2765165575 peer_begin=2765184077 peer_wake=2765184085 peer_block=2765185217 resume=2765215349 elapsed=18502 i_count=191 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022bf
+TRACE_PASS records=208 elapsed=18502
+SAMPLE=132
+TRACE_HEADER cpu=0 window=1 start=2765637445 peer_begin=2765656546 peer_wake=2765656554 peer_block=2765657727 resume=2765666569 elapsed=19101 i_count=194 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c2
+TRACE_PASS records=220 elapsed=19101
+SAMPLE=133
+TRACE_HEADER cpu=0 window=1 start=2766047009 peer_begin=2766065553 peer_wake=2766065561 peer_block=2766066725 resume=2766100137 elapsed=18544 i_count=198 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020c6
+TRACE_PASS records=214 elapsed=18544
+SAMPLE=134
+TRACE_HEADER cpu=0 window=1 start=2766468416 peer_begin=2766504800 peer_wake=2766504808 peer_block=2766506258 resume=2766516227 elapsed=36384 i_count=256 d_count=20 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042900
+TRACE_TRUNCATED records=276 elapsed=36384 i_overflow=1 d_overflow=0
+SAMPLE=135
+TRACE_HEADER cpu=0 window=1 start=2766920423 peer_begin=2766939156 peer_wake=2766939164 peer_block=2766940297 resume=2766969856 elapsed=18733 i_count=198 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c6
+TRACE_PASS records=215 elapsed=18733
+SAMPLE=136
+TRACE_HEADER cpu=0 window=1 start=2767330086 peer_begin=2767408683 peer_wake=2767408691 peer_block=2767480093 resume=2767422144 elapsed=78597 i_count=256 d_count=69 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000048b00
+TRACE_TRUNCATED records=325 elapsed=78597 i_overflow=1 d_overflow=0
+SAMPLE=137
+TRACE_HEADER cpu=0 window=1 start=2767827550 peer_begin=2767863881 peer_wake=2767863889 peer_block=2767865399 resume=2767875190 elapsed=36331 i_count=256 d_count=15 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000041f00
+TRACE_TRUNCATED records=271 elapsed=36331 i_overflow=1 d_overflow=0
+SAMPLE=138
+TRACE_HEADER cpu=0 window=1 start=2768327930 peer_begin=2768346487 peer_wake=2768346495 peer_block=2768347602 resume=2768357754 elapsed=18557 i_count=180 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036b4
+TRACE_PASS records=207 elapsed=18557
+SAMPLE=139
+TRACE_HEADER cpu=0 window=1 start=2768737796 peer_begin=2768761764 peer_wake=2768761772 peer_block=2768768416 resume=2768777252 elapsed=23968 i_count=230 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020e6
+TRACE_PASS records=246 elapsed=23968
+SAMPLE=140
+TRACE_HEADER cpu=0 window=1 start=2769165313 peer_begin=2769183979 peer_wake=2769183987 peer_block=2769185116 resume=2769214385 elapsed=18666 i_count=199 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cc7
+TRACE_PASS records=213 elapsed=18666
+SAMPLE=141
+TRACE_HEADER cpu=0 window=1 start=2769635722 peer_begin=2769654939 peer_wake=2769654947 peer_block=2769656076 resume=2769666096 elapsed=19217 i_count=197 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036c5
+TRACE_PASS records=224 elapsed=19217
+SAMPLE=142
+TRACE_HEADER cpu=0 window=1 start=2770046966 peer_begin=2770090354 peer_wake=2770090362 peer_block=2770098982 resume=2770109008 elapsed=43388 i_count=256 d_count=27 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043700
+TRACE_TRUNCATED records=283 elapsed=43388 i_overflow=1 d_overflow=0
+SAMPLE=143
+TRACE_HEADER cpu=0 window=1 start=2770520311 peer_begin=2770538709 peer_wake=2770538717 peer_block=2770539849 resume=2770549736 elapsed=18398 i_count=195 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cc3
+TRACE_PASS records=209 elapsed=18398
+SAMPLE=144
+TRACE_HEADER cpu=0 window=1 start=2770934895 peer_begin=2770991254 peer_wake=2770991262 peer_block=2771059732 resume=2771003626 elapsed=56359 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=56359 i_overflow=1 d_overflow=0
+SAMPLE=145
+TRACE_HEADER cpu=0 window=1 start=2771465693 peer_begin=2771484621 peer_wake=2771484629 peer_block=2771485799 resume=2771495711 elapsed=18928 i_count=190 d_count=25 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000032be
+TRACE_PASS records=215 elapsed=18928
+SAMPLE=146
+TRACE_HEADER cpu=0 window=1 start=2771907086 peer_begin=2771947580 peer_wake=2771947588 peer_block=2771949060 resume=2771958301 elapsed=40494 i_count=256 d_count=44 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045900
+TRACE_TRUNCATED records=300 elapsed=40494 i_overflow=1 d_overflow=0
+SAMPLE=147
+TRACE_HEADER cpu=0 window=1 start=2772371849 peer_begin=2772426144 peer_wake=2772426152 peer_block=2772433933 resume=2772442627 elapsed=54295 i_count=256 d_count=32 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044100
+TRACE_TRUNCATED records=288 elapsed=54295 i_overflow=1 d_overflow=0
+SAMPLE=148
+TRACE_HEADER cpu=0 window=1 start=2772852165 peer_begin=2772914664 peer_wake=2772914672 peer_block=2772922282 resume=2772931191 elapsed=62499 i_count=256 d_count=43 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045700
+TRACE_TRUNCATED records=299 elapsed=62499 i_overflow=1 d_overflow=0
+SAMPLE=149
+TRACE_HEADER cpu=0 window=1 start=2773377867 peer_begin=2773399700 peer_wake=2773399708 peer_block=2773407074 resume=2773415228 elapsed=21833 i_count=172 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036ac
+TRACE_PASS records=199 elapsed=21833
+SAMPLE=150
+TRACE_HEADER cpu=0 window=1 start=2773805167 peer_begin=2773823794 peer_wake=2773823802 peer_block=2773824960 resume=2773855065 elapsed=18627 i_count=196 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c4
+TRACE_PASS records=213 elapsed=18627
+SAMPLE=151
+TRACE_HEADER cpu=0 window=1 start=2774213987 peer_begin=2774273778 peer_wake=2774273786 peer_block=2774342929 resume=2774285245 elapsed=59791 i_count=256 d_count=39 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044f00
+TRACE_TRUNCATED records=295 elapsed=59791 i_overflow=1 d_overflow=0
+SAMPLE=152
+TRACE_HEADER cpu=0 window=1 start=2774690518 peer_begin=2774708970 peer_wake=2774708978 peer_block=2774342929 resume=2774736981 elapsed=18452 i_count=194 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec2
+TRACE_PASS records=209 elapsed=18452
+SAMPLE=153
+TRACE_HEADER cpu=0 window=1 start=2775101971 peer_begin=2775141521 peer_wake=2775141529 peer_block=2775143004 resume=2775153387 elapsed=39550 i_count=256 d_count=22 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042d00
+TRACE_TRUNCATED records=278 elapsed=39550 i_overflow=1 d_overflow=0
+SAMPLE=154
+TRACE_HEADER cpu=0 window=1 start=2775611819 peer_begin=2775630662 peer_wake=2775630670 peer_block=2775631884 resume=2775641843 elapsed=18843 i_count=187 d_count=25 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000032bb
+TRACE_PASS records=212 elapsed=18843
+SAMPLE=155
+TRACE_HEADER cpu=0 window=1 start=2776015133 peer_begin=2776033332 peer_wake=2776033340 peer_block=2776034469 resume=2776044492 elapsed=18199 i_count=188 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cbc
+TRACE_PASS records=202 elapsed=18199
+SAMPLE=156
+TRACE_HEADER cpu=0 window=1 start=2776419596 peer_begin=2776437760 peer_wake=2776437768 peer_block=2776438861 resume=2776448890 elapsed=18164 i_count=185 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cb9
+TRACE_PASS records=199 elapsed=18164
+SAMPLE=157
+TRACE_HEADER cpu=0 window=1 start=2776865320 peer_begin=2776905670 peer_wake=2776905678 peer_block=2776907242 resume=2776917989 elapsed=40350 i_count=256 d_count=41 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045300
+TRACE_TRUNCATED records=297 elapsed=40350 i_overflow=1 d_overflow=0
+SAMPLE=158
+TRACE_HEADER cpu=0 window=1 start=2777322845 peer_begin=2777341533 peer_wake=2777341541 peer_block=2777342673 resume=2777372122 elapsed=18688 i_count=193 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c1
+TRACE_PASS records=210 elapsed=18688
+SAMPLE=159
+TRACE_HEADER cpu=0 window=1 start=2777796528 peer_begin=2777815329 peer_wake=2777815337 peer_block=2777816543 resume=2777826334 elapsed=18801 i_count=189 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ebd
+TRACE_PASS records=212 elapsed=18801
+SAMPLE=160
+TRACE_HEADER cpu=0 window=1 start=2778206686 peer_begin=2778225163 peer_wake=2778225171 peer_block=2778226336 resume=2778257222 elapsed=18477 i_count=195 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cc3
+TRACE_PASS records=209 elapsed=18477
+SAMPLE=161
+TRACE_HEADER cpu=0 window=1 start=2778626830 peer_begin=2778667455 peer_wake=2778667463 peer_block=2778669076 resume=2778679050 elapsed=40625 i_count=256 d_count=21 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042b00
+TRACE_TRUNCATED records=277 elapsed=40625 i_overflow=1 d_overflow=0
+SAMPLE=162
+TRACE_HEADER cpu=0 window=1 start=2779074983 peer_begin=2779093393 peer_wake=2779093401 peer_block=2779094533 resume=2779104469 elapsed=18410 i_count=191 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cbf
+TRACE_PASS records=205 elapsed=18410
+SAMPLE=163
+TRACE_HEADER cpu=0 window=1 start=2779491224 peer_begin=2779534475 peer_wake=2779534483 peer_block=2779535920 resume=2779546734 elapsed=43251 i_count=256 d_count=27 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043700
+TRACE_TRUNCATED records=283 elapsed=43251 i_overflow=1 d_overflow=0
+SAMPLE=164
+TRACE_HEADER cpu=0 window=1 start=2780046455 peer_begin=2780062501 peer_wake=2780062509 peer_block=2780063623 resume=2780093919 elapsed=16046 i_count=106 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x000000000000346a
+TRACE_PASS records=132 elapsed=16046
+SAMPLE=165
+TRACE_HEADER cpu=0 window=1 start=2780454046 peer_begin=2780510619 peer_wake=2780510627 peer_block=2780579539 resume=2780523133 elapsed=56573 i_count=256 d_count=42 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045500
+TRACE_TRUNCATED records=298 elapsed=56573 i_overflow=1 d_overflow=0
+SAMPLE=166
+TRACE_HEADER cpu=0 window=1 start=2780928178 peer_begin=2780946738 peer_wake=2780946746 peer_block=2780947910 resume=2780978793 elapsed=18560 i_count=195 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec3
+TRACE_PASS records=210 elapsed=18560
+SAMPLE=167
+TRACE_HEADER cpu=0 window=1 start=2781345504 peer_begin=2781386134 peer_wake=2781386142 peer_block=2781387772 resume=2781398090 elapsed=40630 i_count=256 d_count=25 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043300
+TRACE_TRUNCATED records=281 elapsed=40630 i_overflow=1 d_overflow=0
+SAMPLE=168
+TRACE_HEADER cpu=0 window=1 start=2781792729 peer_begin=2781815542 peer_wake=2781815550 peer_block=2781822774 resume=2781879362 elapsed=22813 i_count=221 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001edd
+TRACE_PASS records=236 elapsed=22813
+SAMPLE=169
+TRACE_HEADER cpu=0 window=1 start=2782340265 peer_begin=2782359319 peer_wake=2782359327 peer_block=2782360467 resume=2782370368 elapsed=19054 i_count=193 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c1
+TRACE_PASS records=219 elapsed=19054
+SAMPLE=170
+TRACE_HEADER cpu=0 window=1 start=2782744362 peer_begin=2782762515 peer_wake=2782762523 peer_block=2782763653 resume=2782773675 elapsed=18153 i_count=188 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cbc
+TRACE_PASS records=202 elapsed=18153
+SAMPLE=171
+TRACE_HEADER cpu=0 window=1 start=2783160884 peer_begin=2783179372 peer_wake=2783179380 peer_block=2783180510 resume=2783210205 elapsed=18488 i_count=200 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac8
+TRACE_PASS records=213 elapsed=18488
+SAMPLE=172
+TRACE_HEADER cpu=0 window=1 start=2783578174 peer_begin=2783617272 peer_wake=2783617280 peer_block=2783618844 resume=2783629416 elapsed=39098 i_count=256 d_count=25 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043300
+TRACE_TRUNCATED records=281 elapsed=39098 i_overflow=1 d_overflow=0
+SAMPLE=173
+TRACE_HEADER cpu=0 window=1 start=2784038247 peer_begin=2784056528 peer_wake=2784056536 peer_block=2784057703 resume=2784067608 elapsed=18281 i_count=193 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac1
+TRACE_PASS records=206 elapsed=18281
+SAMPLE=174
+TRACE_HEADER cpu=0 window=1 start=2784509362 peer_begin=2784528226 peer_wake=2784528234 peer_block=2784529408 resume=2784539234 elapsed=18864 i_count=188 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030bc
+TRACE_PASS records=212 elapsed=18864
+SAMPLE=175
+TRACE_HEADER cpu=0 window=1 start=2784936222 peer_begin=2784978862 peer_wake=2784978870 peer_block=2784980555 resume=2784991261 elapsed=42640 i_count=256 d_count=28 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043900
+TRACE_TRUNCATED records=284 elapsed=42640 i_overflow=1 d_overflow=0
+SAMPLE=176
+TRACE_HEADER cpu=0 window=1 start=2785396118 peer_begin=2785415100 peer_wake=2785415108 peer_block=2785416273 resume=2785426324 elapsed=18982 i_count=205 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022cd
+TRACE_PASS records=222 elapsed=18982
+SAMPLE=177
+TRACE_HEADER cpu=0 window=1 start=2785806811 peer_begin=2785825421 peer_wake=2785825429 peer_block=2785826597 resume=2785857344 elapsed=18610 i_count=199 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec7
+TRACE_PASS records=214 elapsed=18610
+SAMPLE=178
+TRACE_HEADER cpu=0 window=1 start=2786214105 peer_begin=2786257113 peer_wake=2786257121 peer_block=2786258814 resume=2786269599 elapsed=43008 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=43008 i_overflow=1 d_overflow=0
+SAMPLE=179
+TRACE_HEADER cpu=0 window=1 start=2786702212 peer_begin=2786741005 peer_wake=2786741013 peer_block=2786742465 resume=2786752288 elapsed=38793 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=38793 i_overflow=1 d_overflow=0
+SAMPLE=180
+TRACE_HEADER cpu=0 window=1 start=2787153333 peer_begin=2787171816 peer_wake=2787171824 peer_block=2787172959 resume=2787183098 elapsed=18483 i_count=192 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020c0
+TRACE_PASS records=208 elapsed=18483
+SAMPLE=181
+TRACE_HEADER cpu=0 window=1 start=2787569879 peer_begin=2787588884 peer_wake=2787588892 peer_block=2787172959 resume=2787617138 elapsed=19005 i_count=205 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022cd
+TRACE_PASS records=222 elapsed=19005
+SAMPLE=182
+TRACE_HEADER cpu=0 window=1 start=2787975171 peer_begin=2788017983 peer_wake=2788017991 peer_block=2788019454 resume=2788030184 elapsed=42812 i_count=256 d_count=26 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043500
+TRACE_TRUNCATED records=282 elapsed=42812 i_overflow=1 d_overflow=0
+SAMPLE=183
+TRACE_HEADER cpu=0 window=1 start=2788427186 peer_begin=2788445368 peer_wake=2788445376 peer_block=2788446535 resume=2788456544 elapsed=18182 i_count=188 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cbc
+TRACE_PASS records=202 elapsed=18182
+SAMPLE=184
+TRACE_HEADER cpu=0 window=1 start=2788833715 peer_begin=2788852064 peer_wake=2788852072 peer_block=2788853205 resume=2788862107 elapsed=18349 i_count=193 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cc1
+TRACE_PASS records=207 elapsed=18349
+SAMPLE=185
+TRACE_HEADER cpu=0 window=1 start=2789292641 peer_begin=2789315680 peer_wake=2789315688 peer_block=2789322215 resume=2789331236 elapsed=23039 i_count=221 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022dd
+TRACE_PASS records=238 elapsed=23039
+SAMPLE=186
+TRACE_HEADER cpu=0 window=1 start=2789727202 peer_begin=2789745934 peer_wake=2789745942 peer_block=2789747051 resume=2789777731 elapsed=18732 i_count=202 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ca
+TRACE_PASS records=218 elapsed=18732
+SAMPLE=187
+TRACE_HEADER cpu=0 window=1 start=2790135506 peer_begin=2790192183 peer_wake=2790192191 peer_block=2790258899 resume=2790203475 elapsed=56677 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=56677 i_overflow=1 d_overflow=0
+SAMPLE=188
+TRACE_HEADER cpu=0 window=1 start=2790606294 peer_begin=2790624680 peer_wake=2790624688 peer_block=2790625853 resume=2790655702 elapsed=18386 i_count=195 d_count=14 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001cc3
+TRACE_PASS records=209 elapsed=18386
+SAMPLE=189
+TRACE_HEADER cpu=0 window=1 start=2791016922 peer_begin=2791060934 peer_wake=2791060942 peer_block=2791069223 resume=2791077311 elapsed=44012 i_count=256 d_count=23 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042f00
+TRACE_TRUNCATED records=279 elapsed=44012 i_overflow=1 d_overflow=0
+SAMPLE=190
+TRACE_HEADER cpu=0 window=1 start=2791532274 peer_begin=2791550990 peer_wake=2791550998 peer_block=2791552213 resume=2791562335 elapsed=18716 i_count=187 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ebb
+TRACE_PASS records=210 elapsed=18716
+SAMPLE=191
+TRACE_HEADER cpu=0 window=1 start=2791959483 peer_begin=2791978101 peer_wake=2791978109 peer_block=2791979209 resume=2791989212 elapsed=18618 i_count=199 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ac7
+TRACE_PASS records=212 elapsed=18618
+SAMPLE=192
+TRACE_HEADER cpu=0 window=1 start=2792427750 peer_begin=2792447153 peer_wake=2792447161 peer_block=2792448329 resume=2792458379 elapsed=19403 i_count=193 d_count=31 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003ec1
+TRACE_PASS records=224 elapsed=19403
+SAMPLE=193
+TRACE_HEADER cpu=0 window=1 start=2792845940 peer_begin=2792864778 peer_wake=2792864786 peer_block=2792865916 resume=2792895847 elapsed=18838 i_count=206 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ace
+TRACE_PASS records=219 elapsed=18838
+SAMPLE=194
+TRACE_HEADER cpu=0 window=1 start=2793257306 peer_begin=2793301463 peer_wake=2793301471 peer_block=2793309768 resume=2793317937 elapsed=44157 i_count=256 d_count=20 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042900
+TRACE_TRUNCATED records=276 elapsed=44157 i_overflow=1 d_overflow=0
+SAMPLE=195
+TRACE_HEADER cpu=0 window=1 start=2793772827 peer_begin=2793790467 peer_wake=2793790475 peer_block=2793791623 resume=2793801320 elapsed=17640 i_count=147 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003893
+TRACE_PASS records=175 elapsed=17640
+SAMPLE=196
+TRACE_HEADER cpu=0 window=1 start=2794189900 peer_begin=2794208278 peer_wake=2794208286 peer_block=2794209419 resume=2794219317 elapsed=18378 i_count=196 d_count=12 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000018c4
+TRACE_PASS records=208 elapsed=18378
+SAMPLE=197
+TRACE_HEADER cpu=0 window=1 start=2794593642 peer_begin=2794617294 peer_wake=2794617302 peer_block=2794656879 resume=2794628054 elapsed=23652 i_count=227 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ae3
+TRACE_PASS records=240 elapsed=23652
+SAMPLE=198
+TRACE_HEADER cpu=0 window=1 start=2795001710 peer_begin=2795020177 peer_wake=2795020185 peer_block=2795021315 resume=2795050833 elapsed=18467 i_count=197 d_count=12 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000018c5
+TRACE_PASS records=209 elapsed=18467
+SAMPLE=199
+TRACE_HEADER cpu=0 window=1 start=2795416562 peer_begin=2795459823 peer_wake=2795459831 peer_block=2795461399 resume=2795472150 elapsed=43261 i_count=256 d_count=28 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043900
+TRACE_TRUNCATED records=284 elapsed=43261 i_overflow=1 d_overflow=0
+SAMPLE=200
+TRACE_HEADER cpu=0 window=1 start=2795877275 peer_begin=2795895788 peer_wake=2795895796 peer_block=2795896955 resume=2795906994 elapsed=18513 i_count=195 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ec3
+TRACE_PASS records=210 elapsed=18513
+SAMPLE=201
+TRACE_HEADER cpu=0 window=1 start=2796349398 peer_begin=2796368599 peer_wake=2796368607 peer_block=2796369813 resume=2796379886 elapsed=19201 i_count=194 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038c2
+TRACE_PASS records=222 elapsed=19201
+~ # echo PERSISTENT_END
+echo PERSISTENT_END
+PERSISTENT_END
+~ # poweroff -f
+poweroff -f
+[  131.167502] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              754 (             2f2)
+INFO:    ps.cpp: minstret (instructions retired):      836,153,534 (        31d6b0be)
+INFO:    ps.cpp: minstret delta:                       836,152,780 (        31d6adcc)
+INFO:    ps.cpp: MTIME start:                           74,428,060 (         46fae9c)
+INFO:    ps.cpp: MTIME stop:                         1,127,934,833 (        433aeb71)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):       1,053,506,773 (        3ecb3cd5)
+INFO:    ps.cpp: IPC        :                             0.099211
+INFO:    ps.cpp: minstret (instructions retired):      836,153,619 (        31d6b113)
+INFO:    ps.cpp: wall clock time                :  210,702,324,980 (      310ed654f4) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,988,946.91 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000191
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cee000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+Connection to 192.168.4.35 closed.

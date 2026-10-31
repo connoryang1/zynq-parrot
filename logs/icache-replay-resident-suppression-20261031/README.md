@@ -117,6 +117,45 @@ performance acceptance result. Exact samples, terminal-marker validation,
 hashes, and analysis are in `fpga-ab-results.json` and
 `analyze_fpga_ab.py`.
 
+## Persistent-pair best-case result
+
+The process-per-sample shape above mixes shell launches, new pthreads, and
+different scheduler paths. `cache_miss_trace_capture_dynamic` therefore gained
+`--samples`: one pinned process creates its peer once and repeats the same
+source-to-peer futex handoff without moving thread creation or console work
+inside the measured interval. Each physical run requested 201 handoffs from
+that persistent pair; sample one is an explicit warmup and the remaining 200
+are analyzed. The benchmark ELF SHA-256 is
+`9ba97d82db9cbd07b03e04577ca36c298c38c11dced597bc37a28aa24c3375e9`.
+
+Two fresh-boot pairs were run in opposite order. Enabled-then-disabled medians
+are 19,092.5 and 19,591.5 cycles, favoring replay by 499 cycles (2.55%). The
+reverse-order pair measures 18,880.5 and 19,754 cycles, favoring replay by
+873.5 cycles (4.42%). Pooled arm medians over 400 samples each are 18,975.5
+enabled and 19,613 disabled, a 637.5-cycle or **3.25%** reduction. The
+replicate-stratified 100,000-resample interval for the mean pairwise median
+difference is `[-1,718, -409.5]` cycles. A circular moving-block bootstrap that
+preserves ten-handoff sequence dependence gives `[-937.75, -456.25]` cycles;
+both intervals favor replay.
+
+This is an accepted best-case result for repeated handoffs between one pinned
+task pair, not a general Linux or application speedup. It deliberately retains
+all elapsed endpoints when the finite miss recorder overflows. Each run ends
+through `CORE PASS`, runner RC 0, and `BSG PASS`, and each 50-sample quarter has
+a stable median. Raw logs and deterministic analysis are in the four
+`fpga/*persistent201*.log` files, `persistent-ab-results.json`, and
+`analyze_persistent_ab.py`.
+
+The timing batches also support mechanism attribution: enabled-minus-disabled
+median I-request counts are -16.5 and -21 across the two pairs, while the table
+contains 16 lines. Separate full-address diagnostics are excluded from timing
+because recorder readout perturbs the next handoff. In those diagnostics, the
+disabled arm demands 11 configured lines in its complete fast-path sample and
+14 in its longer truncated sample; the enabled arm records none of the 16
+configured lines among its first 256 I-side demands in either sample. This
+confirms line coverage but does not make the diagnostic elapsed values a
+performance comparison.
+
 ## Harness failures excluded from RTL evidence
 
 Three setup attempts preceded the accepted physical discriminator. One ran
@@ -128,12 +167,20 @@ PYNQ power cycle, readiness wait, and overlay reload before the foreground
 PASS. These are harness outcomes, not RTL failures; the runner fixes are kept
 separate from the feature checkpoint.
 
+The first optional full-trace launch also stopped locally before board
+execution because the new runner parsed the optional mode as part of its
+five-field tuple. Only the overlay had been loaded. The runner now slices the
+five fixed arguments explicitly, was syntax checked, and subsequently
+completed both full-trace arms with clean terminal markers.
+
 ## Remaining boundary
 
 The mechanism now passes focused simulation, clean full-core simulation,
-routed timing/fit, a physical repeated-trigger discriminator, and sustained
-replay-enabled Linux. The fresh performance point favors replay but is not
-statistically closed. A stronger next performance experiment should reduce
-scheduler-mode mixture or collect enough independently booted batches to
-narrow the interval; prefix-size tuning should not be inferred from this one
-noisy 50-sample pair.
+routed timing/fit, a physical repeated-trigger discriminator, sustained
+replay-enabled Linux, and a replicated persistent-pair best-case speedup. The
+general process-per-sample result remains unresolved. Five of the old table's
+16 entries are unused in the complete persistent fast-path trace, so the next
+bounded optimization is to retrain the same 16-entry capacity from this exact
+workload and compare it against the accepted old-16 and disabled controls. Do
+not infer application throughput or increase hardware capacity from this
+best-case result alone.
