@@ -104,6 +104,19 @@ index da703f3..821fdac 100644
      /* Fill out the size_bits list */
      for (unsigned int i = 0; i < num_untypeds; i++) {
          untyped_size_bits_list[i] = untypeds[i].size_bits;
+@@ -658,7 +670,9 @@ int main(void)
+     /* Restore the IRQ interface's register function */
+     env.ops.irq_ops.irq_register_fn = irq_register_fn_copy;
+-
++
+-    simple_print(&env.simple);
++    if (!config_set(CONFIG_RPC_ONLY)) {
++        simple_print(&env.simple);
++    }
+-
++
+     /* switch to a bigger, safer stack with a guard page
+      * before starting the tests */
 diff --git a/settings.cmake b/settings.cmake
 index 522a147..8145e0b 100644
 --- a/settings.cmake

@@ -199,7 +199,9 @@ from the cycle-accurate boot while preserving the same RPC test and makes its
 exact pass marker observable. The RPC-only driver also reserves one 16 MiB
 untyped object and delegates one 16 MiB object directly, instead of exhaustively
 probing every object size. That bounded pool is ample for the single test and
-avoids spending model hours on intentional allocation failures.
+avoids spending model hours on intentional allocation failures. The same mode
+suppresses the generic bootinfo/untyped inventory; the exact test verdict stays
+enabled, while character-at-a-time diagnostic output no longer dominates boot.
 
 The same reduced configuration passes under QEMU before the slow full-core
 run; its concise transcript is retained as
