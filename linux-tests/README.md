@@ -549,6 +549,40 @@ compare complete implementations rather than attributing the entire difference
 to switching or cache behavior. Bare-metal results from a
 different request stream or cache state are not a matched speedup comparison.
 
+## Physical data-preview best-case benchmark
+
+`stage-linux-data-preview` applies the scheduler-preview patch stack after the
+shared instruction trigger. `PR_BP_PREVIEW_PIN_SET` registers and pins four
+target lines once; `PR_BP_PREVIEW_ENABLE` then changes only emission mode: zero
+disables hints, one issues when the scheduler selects the target, and two issues
+immediately before the architectural register/stack switch. The latter is the
+retention-oriented candidate because the 4 KiB L2 can displace a completed
+early hint during the remaining kernel return path.
+
+Build the compact shell-transfer executable with the matching SDK toolchain:
+
+```sh
+make -s -C linux-tests emit-physical-preview-benchmark-dynamic-transfer \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  > linux-tests/out/scheduler_physical_preview_benchmark_dynamic.transfer
+```
+
+Run `/tmp/scheduler_physical_preview_benchmark_dynamic GROUP TIMING`, where
+`GROUP` is 0--7 and `TIMING` is `early` or `late`. Each group places the four
+dependent target loads in both banks of two adjacent L2 sets; all eight groups
+cover the complete 16-set-per-bank index range. Every run retains identical
+page pins and eviction traffic in both arms and emits 512 measured trials in
+balanced `[off,on,on,off]` blocks. Analyze each complete transcript with
+`analyze_scheduler_physical_preview_benchmark.py`; do not select a set group
+from noisy whole-handoff timing without also reporting the full sweep.
+
+The benchmark is intentionally a four-line mechanism ceiling. Prior completed-
+state oracle evidence measured about 1,265 local cycles from 32 dependent data
+lines but only 2.66% of wake-to-load, while combined instruction/data warming
+saved about 2,044 local cycles, roughly 4% of its full interval. A positive
+four-line result therefore validates timing and retention; it does not imply
+that four entries are the best eventual footprint size.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder
