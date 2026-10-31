@@ -8,6 +8,10 @@
 #define BP_RPC_ABI_VERSION 1u
 #define BP_RPC_DESCRIPTOR_V1_SIZE 112u
 #define BP_RPC_MAX_WORDS 4u
+#define BP_RPC_CSR_CALL 0x808u
+#define BP_RPC_CSR_RETURN 0x809u
+#define BP_RPC_CSR_M_DATA 0x7c3u
+#define BP_RPC_CSR_M_CONTROL 0x7c4u
 #define BP_RPC_REQUEST_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_STATUS_SHIFT 8u
@@ -21,10 +25,10 @@ typedef enum {
 } bp_rpc_outcome_t;
 
 typedef enum {
-    BP_RPC_CONTROL_INSTALL = 0,
-    BP_RPC_CONTROL_REVOKE = 1,
-    BP_RPC_CONTROL_QUERY = 2,
-} bp_rpc_control_operation_t;
+    BP_RPC_SBI_INSTALL = 0,
+    BP_RPC_SBI_REVOKE = 1,
+    BP_RPC_SBI_QUERY = 2,
+} bp_rpc_sbi_operation_t;
 
 typedef enum {
     BP_RPC_CONTROL_OK = 0,
@@ -33,6 +37,52 @@ typedef enum {
     BP_RPC_CONTROL_UNSUPPORTED = 3,
     BP_RPC_CONTROL_INVALID = 4,
 } bp_rpc_control_status_t;
+
+typedef enum {
+    BP_RPC_CONTROL_STAGE = 0,
+    BP_RPC_CONTROL_COMMIT = 1,
+    BP_RPC_CONTROL_REVOKE = 2,
+    BP_RPC_CONTROL_READ_STATUS = 3,
+} bp_rpc_control_command_t;
+
+typedef enum {
+    BP_RPC_FIELD_TOKEN = 0,
+    BP_RPC_FIELD_CALLER_SATP = 1,
+    BP_RPC_FIELD_SERVER_SATP = 2,
+    BP_RPC_FIELD_SERVER_ENTRY = 3,
+    BP_RPC_FIELD_SERVER_SP = 4,
+    BP_RPC_FIELD_SERVER_GP = 5,
+    BP_RPC_FIELD_SERVER_TP = 6,
+    BP_RPC_FIELD_CALLER_BADGE = 7,
+    BP_RPC_FIELD_CONFIG = 8,
+} bp_rpc_descriptor_field_t;
+
+#define BP_RPC_CONTROL_COMMAND_SHIFT 56u
+#define BP_RPC_CONTROL_FIELD_SHIFT 48u
+#define BP_RPC_CONTROL_SLOT_MASK UINT64_C(0xffffffff)
+#define BP_RPC_CONFIG_REQUEST_WORDS_SHIFT 0u
+#define BP_RPC_CONFIG_REPLY_WORDS_SHIFT 8u
+#define BP_RPC_CONFIG_CALLER_CONTEXT_SHIFT 16u
+#define BP_RPC_CONFIG_SERVER_CONTEXT_SHIFT 32u
+
+static inline uint64_t bp_rpc_control_word(
+    bp_rpc_control_command_t command, bp_rpc_descriptor_field_t field,
+    uint32_t slot)
+{
+    return ((uint64_t)command << BP_RPC_CONTROL_COMMAND_SHIFT)
+           | ((uint64_t)field << BP_RPC_CONTROL_FIELD_SHIFT)
+           | (uint64_t)slot;
+}
+
+static inline uint64_t bp_rpc_config_word(
+    uint8_t request_words, uint8_t reply_words, uint16_t caller_context,
+    uint16_t server_context)
+{
+    return ((uint64_t)request_words << BP_RPC_CONFIG_REQUEST_WORDS_SHIFT)
+           | ((uint64_t)reply_words << BP_RPC_CONFIG_REPLY_WORDS_SHIFT)
+           | ((uint64_t)caller_context << BP_RPC_CONFIG_CALLER_CONTEXT_SHIFT)
+           | ((uint64_t)server_context << BP_RPC_CONFIG_SERVER_CONTEXT_SHIFT);
+}
 
 /*
  * Fixed little-endian RV64 image copied by the M-mode installer before the
@@ -61,6 +111,45 @@ typedef struct {
     uint32_t server_context;
     uint64_t reserved1[3];
 } bp_rpc_descriptor_v1_t;
+
+static inline int bp_rpc_user_address_valid(uint64_t address)
+{
+    /* Version 1 admits only the positive Sv39 user half. */
+    return address < (UINT64_C(1) << 38);
+}
+
+static inline int bp_rpc_descriptor_v1_valid(
+    const bp_rpc_descriptor_v1_t *descriptor)
+{
+    if (descriptor == NULL
+        || descriptor->version != BP_RPC_ABI_VERSION
+        || descriptor->size != BP_RPC_DESCRIPTOR_V1_SIZE
+        || descriptor->flags != 0 || descriptor->slot != 0
+        || descriptor->request_words > BP_RPC_MAX_WORDS
+        || descriptor->reply_words > BP_RPC_MAX_WORDS
+        || descriptor->reserved0 != 0 || descriptor->token == 0
+        || descriptor->caller_context != 0
+        || descriptor->server_context != 1
+        || descriptor->caller_satp == descriptor->server_satp
+        || descriptor->caller_satp >> 60 != 8
+        || descriptor->server_satp >> 60 != 8
+        || descriptor->server_entry == 0
+        || !bp_rpc_user_address_valid(descriptor->server_entry)
+        || (descriptor->server_entry & 1) != 0
+        || descriptor->server_sp == 0
+        || !bp_rpc_user_address_valid(descriptor->server_sp)
+        || (descriptor->server_sp & 15) != 0
+        || !bp_rpc_user_address_valid(descriptor->server_gp)
+        || !bp_rpc_user_address_valid(descriptor->server_tp)) {
+        return 0;
+    }
+    for (size_t index = 0; index < 3; index++) {
+        if (descriptor->reserved1[index] != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 static inline uint64_t bp_rpc_request_meta(uint8_t length)
 {

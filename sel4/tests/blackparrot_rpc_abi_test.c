@@ -29,7 +29,32 @@ int main(void)
     assert(descriptor.caller_satp != descriptor.server_satp);
     assert(descriptor.request_words <= BP_RPC_MAX_WORDS);
     assert(descriptor.reply_words <= BP_RPC_MAX_WORDS);
+    assert(bp_rpc_descriptor_v1_valid(&descriptor));
+
+    bp_rpc_descriptor_v1_t invalid = descriptor;
+    invalid.token = 0;
+    assert(!bp_rpc_descriptor_v1_valid(&invalid));
+    invalid = descriptor;
+    invalid.server_satp = invalid.caller_satp;
+    assert(!bp_rpc_descriptor_v1_valid(&invalid));
+    invalid = descriptor;
+    invalid.server_entry |= 1;
+    assert(!bp_rpc_descriptor_v1_valid(&invalid));
+    invalid = descriptor;
+    invalid.server_sp += 8;
+    assert(!bp_rpc_descriptor_v1_valid(&invalid));
+    invalid = descriptor;
+    invalid.reserved1[2] = 1;
+    assert(!bp_rpc_descriptor_v1_valid(&invalid));
     assert(BP_RPC_OUTCOME_NOT_STARTED != BP_RPC_OUTCOME_COMPLETED);
+    assert(bp_rpc_control_word(BP_RPC_CONTROL_STAGE,
+                               BP_RPC_FIELD_SERVER_ENTRY, 2)
+           == UINT64_C(0x0003000000000002));
+    assert(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                               BP_RPC_FIELD_TOKEN, 0)
+           == UINT64_C(0x0100000000000000));
+    assert(bp_rpc_config_word(4, 4, 0, 1)
+           == UINT64_C(0x0000000100000404));
     const uint64_t request_meta = bp_rpc_request_meta(3);
     assert(bp_rpc_request_meta_valid(request_meta));
     assert(bp_rpc_request_length(request_meta) == 3);

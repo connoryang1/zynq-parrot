@@ -1,10 +1,10 @@
-# BlackParrot protected-RPC kernel ABI
-
 This document fixes the first seL4/BlackParrot hardware boundary before RTL or
 kernel integration.  It refines Stage 4 of
 [`SEL4_HARDWARE_IPC_PLAN.md`](../SEL4_HARDWARE_IPC_PLAN.md); the public API in
 [`include/protected_rpc.h`](include/protected_rpc.h) remains independent of
 BlackParrot CSRs and hardware-context numbers.
+
+# BlackParrot protected-RPC kernel ABI
 
 ## First implementation scope
 
@@ -119,6 +119,25 @@ it before publication.  The monitor validates version, reserved bits, canonical
 PCs, word counts, distinct caller/server identities, and supported fixed
 contexts.  User mode cannot invoke descriptor control.  `QUERY` is diagnostic;
 it is never used as the call eligibility decision.
+
+`bp_rpc_descriptor_v1_valid()` is the shared fail-closed validator: it also
+requires nonzero token, Sv39 SATPs, an aligned positive-canonical user entry
+and stack, and zero reserved fields. OpenSBI still copies the image before
+validation so supervisor memory cannot change underneath the check.
+
+OpenSBI drives two M-mode-only custom CSRs defined in
+`blackparrot_rpc_abi.h`. It writes one 64-bit value to `M_DATA`, then writes a
+`STAGE(field, slot)` control word; `COMMIT` publishes all staged fields in one
+architectural step. `REVOKE` compares the token most recently written to
+`M_DATA` before clearing `valid`, and refuses an active slot. Reading
+`M_CONTROL` returns the last control status. This data/control pair keeps the
+RTL boundary fixed while the versioned memory image evolves, and prevents a
+partially staged descriptor from authorizing a call.
+
+The staged `CONFIG` value packs request words in bits 7:0, reply words in
+15:8, caller context in 31:16, and server context in 47:32; bits 63:48 are
+reserved zero. Version 1 accepts only slot 0, contexts 0/1, and word counts up
+to four, but rejecting other values at `COMMIT` leaves room for later tables.
 
 The seL4 binding object owns the returned slot/token and the TCB/VSpace/endpoint
 references that keep the descriptor valid.  Teardown order is: stop both TCBs,
