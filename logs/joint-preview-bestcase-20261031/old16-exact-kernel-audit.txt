@@ -1,0 +1,59 @@
+Purpose: test whether the accepted old-16 replay table covers instruction
+misses in the exact runtime-gated joint kernel. This combines corrected
+physical-to-virtual address resolution with a replay-disabled FPGA trace.
+
+Inputs
+old-16 header SHA-256 d089860fa9078389b474587d2b4a3124c4daf12b6b9a0c98a12dc7afcfa1be55
+joint vmlinux SHA-256 e725b1a9b0e9bd5fe4a546a0f358b1e5fac8d6f90f0db3b00f97c8d5ec425f42
+joint Image SHA-256 e94968913ea6371d15f4a7d38432535a03f0587a2c611207c60d54ad6b5c7cb5
+joint NBF SHA-256 9b94fee372ffd2f3ff0bad67a0d4e732bbf014532f53aba75c25580b8d879a4d
+replay-disabled raw trace SHA-256 fa78f561c3339012cd9f09b9862db40b90c11c1ef6ec18e4bb891f5b1cb32b4c
+
+Correct address mapping
+Linux is loaded physically at 0x80200000 and linked virtually at
+0xffffffff80000000. For a kernel-table physical address P, resolve virtual
+address 0xffffffff80000000 + (P - 0x80200000). The trace itself validates this
+offset: the scheduler trigger at virtual 0xffffffff8081babe maps to physical
+address 0x80a1babe (cache line 0x80a1ba80), adjacent to the recorded
+post-trigger scheduler-path line 0x80a1bac0.
+
+old physical line  exact joint-kernel location
+0x8023d480         migration_cpu_stop+0x70
+0x8023d4c0         migration_cpu_stop+0xb0
+0x8023d540         migration_cpu_stop+0x130
+0x80236280         cpu_cfs_stat_show+0x3c
+0x80236340         cpu_weight_nice_write_s64+0x30
+0x80236300         cpu_shares_write_u64+0x14
+0x8000b4c0         below the Linux load base; machine-firmware address
+0x8023d1c0         sched_setaffinity+0xe8
+0x802424c0         fair.c local text+0xdc
+0x80242480         fair.c local text+0x9c
+0x8052a3c0         mpih_sqr_n+0xac
+0x8023eb00         hrtick_start_fair+0x52
+0x8023eb40         hrtick_start_fair+0x92
+0x802431c0         fair.c local text+0xcc
+0x8023f3c0         find_idlest_group+0x2a
+0x80243200         fair.c local text+0x14
+
+Exact replay-disabled trace
+The accepted one-leg FPGA capture used the same persistent-futex capture ELF
+as the earlier instruction experiment, but the exact joint kernel. It records
+222 I-side and 15 D-side accepted misses over 23,386 physical cycles, with no
+overflow, TRACE_PASS, runner exit zero, CORE PASS, and BSG PASS. None of the
+16 old-table physical lines appears in the 222-entry I-side history. The old
+experiment observed 11 of its 16 configured lines in a complete disabled
+fast-path sample, so the zero overlap is a direct exact-binary coverage loss.
+
+Correction to discarded first pass
+An initial local audit incorrectly treated physical kernel addresses as if
+their low bits were linked virtual addresses, omitting the 2 MiB load offset.
+That produced false filesystem symbol names. The trace's known scheduler CSR
+location exposed the mistake before commit; those mappings and conclusions
+are rejected and replaced by this file.
+
+Conclusion
+The old-16 table is not useful for the exact joint-kernel capture path: zero of
+its entries are demanded. RL-068 therefore does not test a trained instruction
+best case, even though its data controls and timing remain valid. Train a new
+table from an exact-kernel replay-disabled trace and resolve every candidate
+with the corrected load offset before FPGA use.

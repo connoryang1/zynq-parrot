@@ -276,3 +276,66 @@ A post-run unit-test command invoked the three test files from the repository
 root and failed import collection because `linux-tests/` was not on the Python
 module path. This was a command-location error, not a test failure; invoke the
 same modules with `linux-tests/` as the working directory.
+
+A later combined verification command made the inverse location mistake: it
+ran from `linux-tests/` but named the CSR checker as root-relative `tools/...`.
+Both scans failed to start, then the newline-separated shell continued to 28
+passing unit tests and returned zero. That aggregate exit is not CSR evidence;
+run each collision scan separately from the repository root (or use `../tools`)
+and require its own zero exit.
+
+## Old-16 exact-kernel coverage audit
+
+The total-joint run used the accepted old-16 table from the earlier
+instruction experiment. A replay-disabled `to-peer` capture on the exact joint
+kernel records 222 I-side and 15 D-side accepted misses over 23,386 cycles with
+no overflow, but none of the old 16 physical lines appears. The earlier
+instruction experiment observed 11 configured lines on this same persistent
+futex capture shape. The raw run ends in TRACE_PASS, runner exit zero, CORE
+PASS, and BSG PASS.
+
+An initial local audit omitted Linux's 2 MiB physical load offset and produced
+false filesystem symbol mappings. The hardware trace's known scheduler CSR
+location exposed the error before commit. The corrected mapping, rejected
+interpretation, and exact hashes are in `old16-exact-kernel-audit.txt`.
+
+This narrows the accepted result: the data side and all same-boot controls are
+valid, but the run did not exercise a covered instruction best case. The next
+joint image must train from a replay-disabled trace of this exact kernel and
+rebuild OpenSBI without relinking the kernel. Every candidate table must prove
+exact-trace coverage and use the recorded physical load offset during symbol
+resolution.
+
+## Exact-kernel post-trigger prefix result
+
+`select_icache_prefix_from_trace.py` fail-closed on overflow, missing PASS,
+record-count mismatch, absent start line, and short suffixes, then selected the
+first 16 unique I-side misses beginning with observed post-trigger physical
+line `0x80a1bac0`. The resulting table JSON is
+`exact-kernel-post-trigger-prefix16.json` with SHA-256 `796f17bc...6ce3`; no
+I-cache set receives more than two entries.
+
+The OpenSBI-only rebuild was validated against the old table first. Its binary
+payload and packaged NBF reproduce accepted hashes `5dea920a...204c` and
+`9b94fee3...9a4d` exactly; ELF-only differences are build-path debug strings.
+The candidate changes 44 firmware bytes before the 2 MiB payload boundary and
+compares equal thereafter, so the kernel and DTB remain exact. Candidate NBF
+SHA-256 is `07b9fed7...f9b`. Separate kernel and OpenSBI executable-section CSR
+scans pass. The whole-NBF scan repeats known embedded-data false positives and
+is not executable-code evidence.
+
+The strict 16-cell FPGA matrix rejected 798 timer-preempted attempts and used a
+hashed first-ten-cell prefix plus a recovered disjoint suffix ending in
+CORE/BSG PASS. Results are:
+
+- early: 5.5 `[3,7]` local load cycles saved, but `-220.25
+  [-1071,442.25]` wake-to-load cycles saved;
+- late: 6.5 `[3.5,8]` local cycles, but `-288.5
+  [-1564.5,292.25]` wake-to-load cycles saved.
+
+The candidate is rejected: its full-handoff point estimates are harmful and
+unresolved. It was trained on the exact kernel but on the persistent-futex
+capture path, so one useful instruction experiment remains—capture and train
+the exact pipe/clean-handoff path. Exact analysis SHA-256 is
+`3435510b...9266`; compressed first-ten and suffix log hashes are
+`cd15d07a...dd31` and `e34cc521...b640`.
