@@ -27,7 +27,8 @@
 #define PR_BP_PREVIEW_ENABLE 0x4250505a
 
 enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
-       lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10 };
+       lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10,
+       max_retries = 4096 };
 
 struct sample {
 	uint64_t launch, entry, after_load, returned;
@@ -72,6 +73,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	unsigned long target_addr[lines];
 	unsigned target_offset = group * 4 * line_bytes;
+	unsigned retries = 0;
 	char token = 'x';
 
 	if (target == MAP_FAILED || eviction == MAP_FAILED)
@@ -90,7 +92,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 	if (prctl(PR_BP_PREVIEW_PIN_SET, target_addr[0], target_addr[1],
 		  target_addr[2], target_addr[3]))
 		fail("register preview lines");
-	for (unsigned trial = 0; trial < trials; trial++) {
+	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = mode_for(trial);
 		unsigned long before_hook, after_hook;
 		uint64_t checksum = 0, entry, after_load;
@@ -128,23 +130,27 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		/* One measured handoff must produce exactly one preview hook. A
-		 * timer preemption and second selection would issue another hint
-		 * batch and no longer be a matched one-switch comparison. */
+		/* Retain only one-switch handoffs. A timer preemption and second
+		 * selection issues another hint batch, so retry that trial rather
+		 * than mixing a two-selection case into this best-case ceiling. */
 		if (samples[trial].hooks != enabled) {
 			fprintf(stderr,
-				"unexpected scheduler hook count: trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u\n",
+				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u\n",
 				trial, enabled, enable_mode, before_hook, after_hook,
 				samples[trial].hooks);
-			exit(1);
+			transfer(out, &token, 1); /* contaminated attempt done */
+			if (++retries > max_retries)
+				fail("too many scheduler hook retries");
+			continue;
 		}
 		transfer(out, &token, 1); /* done */
+		trial++;
 	}
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
 		fail("disable preview");
 	if (prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
 		fail("release preview");
-	puts("PHYSICAL_BENCH_CHILD PASS");
+	printf("PHYSICAL_BENCH_CHILD PASS retries=%u\n", retries);
 }
 
 int main(int argc, char **argv)
@@ -197,13 +203,15 @@ int main(int argc, char **argv)
 	}
 	close(to_child[0]);
 	close(to_parent[1]);
-	for (unsigned trial = 0; trial < trials; trial++) {
+	for (unsigned trial = 0; trial < trials;) {
 		transfer(to_parent[0], &token, 0);
 		samples[trial].launch = cycle();
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 		samples[trial].returned = cycle();
+		if (samples[trial].hooks == samples[trial].mode)
+			trial++;
 	}
 	if (waitpid(child, &status, 0) != child)
 		fail("waitpid");

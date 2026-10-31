@@ -572,7 +572,10 @@ Run `/tmp/scheduler_physical_preview_benchmark_dynamic GROUP TIMING`, where
 dependent target loads in both banks of two adjacent L2 sets; all eight groups
 cover the complete 16-set-per-bank index range. Every run retains identical
 page pins and eviction traffic in both arms and emits 512 measured trials in
-balanced `[off,on,on,off]` blocks. Analyze each complete transcript with
+balanced `[off,on,on,off]` blocks. Since this is a one-switch best-case ceiling,
+an attempt with an extra scheduler selection is reported as
+`PHYSICAL_BENCH_RETRY` and repeated; only rows with exactly one enabled hook or
+zero disabled hooks enter the 512 samples. Analyze each complete transcript with
 `analyze_scheduler_physical_preview_benchmark.py`; do not select a set group
 from noisy whole-handoff timing without also reporting the full sweep.
 After all 16 early/late cells finish with final board PASS markers, pass their
