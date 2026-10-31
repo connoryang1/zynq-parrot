@@ -69,7 +69,10 @@ remote_timeout_arg=${runtime_limit_ms:--}
 # remote command.  Encode the optional argument explicitly so foreground is
 # never shifted out of the remote script's argument vector.
 remote_extra_arg=${extra_arg:--}
-launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$expected_runner_sha" <<'REMOTE'
+# The expected runner hash is the final argument and therefore needs the same
+# explicit empty encoding; otherwise bash -u fails at remote positional $8.
+remote_expected_runner_sha=${expected_runner_sha:--}
+launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$remote_expected_runner_sha" <<'REMOTE'
 set -euo pipefail
 remote_dir=$1
 image=$2
@@ -81,6 +84,7 @@ foreground=$7
 expected_runner_sha=$8
 [[ "$runtime_limit_ms" == '-' ]] && runtime_limit_ms=
 [[ "$extra_arg" == '-' ]] && extra_arg=
+[[ "$expected_runner_sha" == '-' ]] && expected_runner_sha=
 eval "cd $remote_dir"
 mkdir -p "$HOME/bp-logs"
 lock="$HOME/bp-logs/.control-program.lock"

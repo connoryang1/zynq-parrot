@@ -78,7 +78,7 @@ for test_name in "${tests[@]}"; do
   # privileged worker.  Passing the limit through control-program preserves
   # its clean shutdown semantics without leaving an orphan behind.
   PYNQ_CONTROL_PROGRAM_TIMEOUT_MS="$runtime_limit_ms" \
-    "$serial_runner" "$ssh_host" "$image" "$remote_dir" >"$log" 2>&1
+    "$serial_runner" "$ssh_host" "$local_image" "$remote_dir" >"$log" 2>&1
   run_rc=$?
   set -e
   if (( run_rc != 0 )) || grep -Eq 'CORE(\[0\])? FAIL|BSG-FAIL' "$log" || ! grep -Eq 'CORE\[0\] PASS|CORE PASS' "$log"; then
