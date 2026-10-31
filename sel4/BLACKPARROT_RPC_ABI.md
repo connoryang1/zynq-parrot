@@ -109,9 +109,9 @@ must make the descriptor unusable before any referenced object is recycled.
 The private OpenSBI extension exposes three operations:
 
 ```text
-INSTALL(versioned descriptor image) -> slot/token or error
+INSTALL(versioned descriptor image) -> token or error (slot 0 in version 1)
 REVOKE(slot, token)                  -> OK, STALE, or BUSY
-QUERY(slot, token)                   -> LIVE, STALE, ACTIVE, or UNSUPPORTED
+QUERY(slot, token)                   -> OK, STALE, BUSY, or UNSUPPORTED
 ```
 
 It uses the standard SBI vendor-extension ID derived from `mvendorid`; the
@@ -150,6 +150,22 @@ references that keep the descriptor valid.  Teardown order is: stop both TCBs,
 revoke and observe `OK`, remove mappings or capabilities, then release the
 binding.  The kernel must not destroy or reuse an object while revocation is
 `BUSY`.
+
+## Resident-server bootstrap
+
+Before publication, the kernel runs the server once in reserved logical
+context 1, enters its Sv39 user image, and has it block in a dedicated bind-wait
+operation. The kernel then returns to the authorized caller in context 0 while
+legacy privileged handoff is still available. This leaves a genuine server
+SATP/privilege snapshot in the resident bank; descriptor commit does not clone
+the caller's kernel CSR image into the server.
+
+After commit, context 1 is owned by the binding and the ordinary scheduler must
+not place another TCB there. Version 1 also defers maskable interrupts from an
+accepted `pcall` until its matching `preturn`; the service is bounded,
+prefaulted, and nonblocking. An interrupt already selected before the atomic
+acceptance prevents the call from starting. Synchronous server faults remain
+outside the version-1 fast path and must never cause an automatic retry.
 
 ## Required acceptance tests
 
