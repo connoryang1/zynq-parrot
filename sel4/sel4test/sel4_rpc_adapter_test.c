@@ -19,6 +19,7 @@
 
 #define ADAPTER_WARMUP_CALLS 8
 #define ADAPTER_MEASURED_CALLS 256
+#define ADAPTER_BP_SOFTWARE_CALLS 8
 #define ADAPTER_VALID_CALLS (ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS)
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
 #define ADAPTER_REGION_TOKEN UINT64_C(0xa11ce001)
@@ -128,7 +129,7 @@ static int sum_server(seL4_Word endpoint, seL4_Word unused1,
     (void)unused3;
     const protected_rpc_server_config_t config = {
         .handler = sum_service,
-        .max_requests = 1,
+        .max_requests = ADAPTER_BP_SOFTWARE_CALLS,
     };
     return protected_rpc_serve(
         (protected_rpc_endpoint_t){.opaque = endpoint}, &config);
@@ -191,11 +192,15 @@ static int test_blackparrot_hardware_binding(env_t env)
     const protected_rpc_call_options_t software = {
         .route = PROTECTED_RPC_ROUTE_SOFTWARE,
     };
-    test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
-            PROTECTED_RPC_OK);
-    test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-    test_eq(result.reply.length, 1);
-    test_eq(result.reply.words[0], 60);
+    const uint64_t software_start = read_cycles();
+    for (seL4_Word call = 0; call < ADAPTER_BP_SOFTWARE_CALLS; call++) {
+        test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
+                PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
+        test_eq(result.reply.length, 1);
+        test_eq(result.reply.words[0], 60);
+    }
+    const uint64_t software_elapsed = read_cycles() - software_start;
     test_eq(wait_for_helper(&server), PROTECTED_RPC_OK);
 
     vspace_unmap_pages(&server.process.vspace, shadow_stack, 1,
@@ -205,12 +210,23 @@ static int test_blackparrot_hardware_binding(env_t env)
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_MEASURED_CALLS, elapsed,
            elapsed / ADAPTER_MEASURED_CALLS);
+    printf("SEL4_RPC_ADAPTER path=software-fallback calls=%u total_cycles=%" PRIu64
+           " cycles_per_call=%" PRIu64 "\n",
+           ADAPTER_BP_SOFTWARE_CALLS, software_elapsed,
+           software_elapsed / ADAPTER_BP_SOFTWARE_CALLS);
     return 0;
 }
 #endif
 
 static int test_sel4_rpc_adapter(env_t env)
 {
+#ifdef CONFIG_PLAT_BLACKPARROT
+    /* The cycle-accurate model runs the focused hardware/fallback gate; QEMU
+     * retains the larger shared-buffer software regression below. */
+    test_eq(test_blackparrot_hardware_binding(env), 0);
+    return sel4test_get_result();
+#endif
+
     helper_thread_t server;
     cspacepath_t endpoint_path;
     seL4_CPtr endpoint = vka_alloc_endpoint_leaky(&env->vka);
@@ -310,9 +326,6 @@ static int test_sel4_rpc_adapter(env_t env)
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_MEASURED_CALLS, elapsed,
            elapsed / ADAPTER_MEASURED_CALLS);
-#ifdef CONFIG_PLAT_BLACKPARROT
-    test_eq(test_blackparrot_hardware_binding(env), 0);
-#endif
     return sel4test_get_result();
 }
 

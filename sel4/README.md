@@ -47,7 +47,9 @@ an overflowing range and unknown region fail closed, forced hardware reports
 `UNSUPPORTED` without contacting the server, and forced software reports the
 software path. On BlackParrot, the same test additionally binds a second
 blocked server through the kernel, executes 256 forced hardware calls, unbinds
-it, and invokes the same sum service once through ordinary endpoint IPC. This
+it, and invokes the same sum service eight times through ordinary endpoint
+IPC. The focused BlackParrot build skips the much slower 256-call software
+buffer workload, which remains unchanged in the generic/QEMU regression. This
 last path is built but remains runtime evidence pending the cycle-accurate
 full-system acceptance run.
 
