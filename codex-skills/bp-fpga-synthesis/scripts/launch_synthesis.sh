@@ -57,7 +57,7 @@ shell_quote() {
 }
 
 usage() {
-  echo "usage: $0 start | list | status <job-id> | worker <job-id> <commit>"
+  echo "usage: $0 start | list | status <job-id> | recheck <job-id> | worker <job-id> <commit>"
   echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
 }
 
@@ -241,33 +241,7 @@ case ${1:-} in
       "${build_args[@]}"
     vivado_dir="$worktree/cosim/black-parrot-example/vivado"
     example_dir="$worktree/cosim/black-parrot-example"
-    "$script_dir/summarize_vivado.sh" "$vivado_dir" >"$job_dir/summary.txt"
-
-    timing=$(find "$vivado_dir" -type f -name '*timing_summary_routed.rpt' -print -quit)
-    util=$(find "$vivado_dir" -type f \
-      \( -name '*utilization*placed*.rpt' -o -name '*utilization*routed*.rpt' \) \
-      -print -quit)
-    for required in \
-      "$vivado_dir/black_parrot_bd_1.bit" \
-      "$vivado_dir/black_parrot_bd_1.hwh" \
-      "$vivado_dir/black_parrot_bd_1.map" \
-      "$timing" "$util"; do
-      if [[ -z "$required" || ! -s "$required" ]]; then
-        echo "Missing routed acceptance artifact: ${required:-<report not found>}" >&2
-        exit 1
-      fi
-    done
-    # Vivado writes a bitstream and exits successfully even when routed setup
-    # timing is violated.  A package with negative WNS is not an accepted FPGA
-    # image, so reject it before the job can acquire a PASS status.
-    "$script_dir/check_vivado_timing.sh" "$timing"
-
-    packed=$(find "$example_dir" -maxdepth 1 -name '*.tar.xz.b64' -print -quit)
-    if [[ -z "$packed" || ! -s "$packed" ]]; then
-      echo "Missing packed bitstream artifact." >&2
-      exit 1
-    fi
-    cp -p "$packed" "$job_dir/"
+    "$script_dir/accept_vivado_build.sh" "$vivado_dir" "$example_dir" "$job_dir"
     worker_ok=1
     ;;
   list)
@@ -284,6 +258,37 @@ case ${1:-} in
     [[ ! -e "$job_dir/revisions.txt" ]] || cat "$job_dir/revisions.txt"
     [[ ! -e "$job_dir/summary.txt" ]] || cat "$job_dir/summary.txt"
     echo "log=$job_dir/console.log"
+    ;;
+  recheck)
+    job_id=${2:?job id required}
+    job_dir="$run_root/$job_id"
+    worktree="$work_root/zynq-parrot-fpga-$job_id"
+    [[ -d "$job_dir" && -d "$worktree" ]] || {
+      echo "Missing completed job or implementation worktree: $job_id" >&2
+      exit 1
+    }
+    [[ "$(cat "$job_dir/status" 2>/dev/null || true)" != RUNNING ]] || {
+      echo "Refusing to recheck a running job: $job_id" >&2
+      exit 1
+    }
+    recorded_top=$(sed -n 's/^top_commit=//p' "$job_dir/revisions.txt")
+    actual_top=$(git -C "$worktree" rev-parse HEAD)
+    [[ -n "$recorded_top" && "$actual_top" == "$recorded_top" ]] || {
+      echo "Implementation worktree does not match recorded top-level revision." >&2
+      exit 1
+    }
+    recorded_bp=$(sed -n 's/^black_parrot_commit=//p' "$job_dir/revisions.txt")
+    actual_bp=$(git -C "$worktree/import/black-parrot" rev-parse HEAD)
+    [[ -n "$recorded_bp" && "$actual_bp" == "$recorded_bp" ]] || {
+      echo "Implementation worktree does not match recorded BlackParrot revision." >&2
+      exit 1
+    }
+    vivado_dir="$worktree/cosim/black-parrot-example/vivado"
+    example_dir="$worktree/cosim/black-parrot-example"
+    "$script_dir/accept_vivado_build.sh" "$vivado_dir" "$example_dir" "$job_dir"
+    printf 'PASS\n' >"$job_dir/status"
+    printf 'rechecked_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$job_dir/recheck.txt"
+    cat "$job_dir/status"
     ;;
   *)
     usage

@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Controlled joint FPGA route accepted — 2026-10-31:** Exact four-context job `20261031T160854Z-f79221bc` fits at 50,308 LUTs (94.56%) and final post-route-physopt WNS/WHS `+0.241/+0.037 ns`; its verified package and bitstream hashes are `9912f313...b629` and `e97e0517...2381`. Fixed the launcher to select the authoritative final timing report and placed utilization deterministically, added a revision-checked recheck path, and passed all 11 script regressions (`RESEARCH_LEDGER.md` RL-065).
+
 - **Best-case preview benchmark fails closed — 2026-10-31:** Tightened the physical data-preview benchmark and analyzer to require one enabled hook, zero disabled hooks, and exactly 512 ordered rows per cell. A serialized hash-verifying board runner covers all 16 cells once with alternating timing order and accepts both established core PASS spellings; all seven analyzer/runner regressions pass, and the transfer reconstructs byte-for-byte to ELF SHA-256 `b29a8617...b95c8c` (`logs/joint-preview-bestcase-20261031/`, RL-064).
 
 - **Joint route exposes a configuration area confound — 2026-10-31:** Exact job `20261031T135833Z-009b4de2` completed synthesis with 55,687 LUTs and failed detail placement because 11,531 slices were required while 10,940 were available. The selected `prefetch5` endpoint also changes `num_contexts` from four to ten, although the one-hart Linux data-preview benchmark does not use the ten-context hardware workload; the next controlled fit gate keeps the same `009b4de2`/`1b4126d6` RTL and uses the accepted four-context/four-slot `prefetch` endpoint (`logs/joint-preview-bestcase-20261031/`, RL-064).
