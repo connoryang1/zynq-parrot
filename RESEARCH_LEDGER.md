@@ -574,6 +574,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the remaining bring-up gate is execution through seL4 and ordinary Call/ReplyRecv, not image construction. The same platform/image will become the control for the later hardware backend.
 - **Limits:** the traced simulator timed out while printing OpenSBI because full-system throughput is low; no BlackParrot seL4 test pass or cycle result is claimed yet. FPGA execution must wait for exclusive board ownership.
 
+### RL-062 — Version-1 descriptor and four-word protected transport pass full-core simulation
+
+- **Status:** accepted clean full-core simulation checkpoint; seL4 binding, route, and FPGA pending
+- **Scope:** one atomically published machine-mode descriptor, fixed resident contexts 0/1, distinct U-mode Sv39 caller/server address spaces, opaque token and caller identity checks, fixed entry/SP/GP/TP/badge installation, four request and reply words with metadata, explicit call outcomes, and a hardware-held depth-one continuation
+- **Claim:** the descriptor-control test rejects incomplete, malformed, equal-address-space, and unsupported operations; commits, queries, and revokes a valid token; and passes guest/core/host gates. The protected transport rejects an invalid token without starting, completes two fixed-entry calls with four-word request/reply transfer and private-memory isolation, and measures 191/31 matched local cycles versus 186/56 protected cycles first/repeated. Thus the stable warm protected-transition premium is 25 cycles. The migrated reusable library passes two cross-address-space calls plus invalid shared-range rejection through the same descriptor/outcome/metadata ABI, and the ordinary context-switch smoke remains green.
+- **Evidence:** exact ELF/NBF/transcripts and hashes in `logs/protected-rpc-descriptor-v1-20261031/`; closed FSTs in `/dev/shm/rpc-transport-evidence`; clean model SHA-256 `4b3a869506867eab37abc2204bce04163f7df6fb6b1d3f7c24be5751ae62d1e3`
+- **Meaning:** Stage 0's mechanism gate and the hardware half of the fixed kernel ABI now agree on atomic publication, precise outcomes, metadata, and four-word transport. The next correctness boundary is no longer descriptor semantics; it is seL4 authorization/bootstrap/revocation and end-to-end path selection.
+- **Limits:** no seL4 binding object invokes the OpenSBI controller, sel4test still selects the hardware stub, interrupt deferral and server-fault conversion are not implemented, and no routed or FPGA result is claimed.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

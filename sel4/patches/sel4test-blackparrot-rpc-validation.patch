@@ -71,9 +71,9 @@ index da703f3..821fdac 100644
 -
 +
 +    /* The reduced RPC test needs a bounded pool, not sel4test's exhaustive
-+     * allocator inventory. Starting at 16 MiB avoids dozens of deliberately
++     * allocator inventory. Starting at 8 MiB avoids dozens of deliberately
 +     * failing searches in the cycle-accurate BlackParrot model. */
-+    uint8_t first_size_bits = config_set(CONFIG_RPC_ONLY) ? 24 : seL4_WordBits - 1;
++    uint8_t first_size_bits = config_set(CONFIG_RPC_ONLY) ? 23 : seL4_WordBits - 1;
 +
      /* try to allocate as many of each possible untyped size as possible */
 -    for (uint8_t size_bits = seL4_WordBits - 1; size_bits > PAGE_BITS_4K; size_bits--) {
@@ -87,7 +87,7 @@ index da703f3..821fdac 100644
      /* First reserve some memory for the driver */
      vka_object_t reserve[DRIVER_NUM_UNTYPEDS];
 -    unsigned int reserve_num = allocate_untypeds(reserve, DRIVER_UNTYPED_MEMORY, DRIVER_NUM_UNTYPEDS);
-+    size_t driver_bytes = config_set(CONFIG_RPC_ONLY) ? BIT(24) : DRIVER_UNTYPED_MEMORY;
++    size_t driver_bytes = config_set(CONFIG_RPC_ONLY) ? BIT(20) : DRIVER_UNTYPED_MEMORY;
 +    unsigned int reserve_num = allocate_untypeds(reserve, driver_bytes, DRIVER_NUM_UNTYPEDS);
 -
 +
@@ -95,9 +95,9 @@ index da703f3..821fdac 100644
 -    unsigned int num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
 +    unsigned int num_untypeds;
 +    if (config_set(CONFIG_RPC_ONLY)) {
-+        /* One 16 MiB object is ample for the single RPC process and makes the
-+         * slow-core path deterministic. The reserved peer is returned below. */
-+        num_untypeds = allocate_untypeds(untypeds, BIT(24), 1);
++        /* A bounded 5 MiB pool is ample for the single RPC process and makes
++         * the slow-core path deterministic. The reserve is returned below. */
++        num_untypeds = allocate_untypeds(untypeds, BIT(22) + BIT(20), 2);
 +    } else {
 +        num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
 +    }

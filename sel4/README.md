@@ -172,9 +172,10 @@ with the opaque token returned by a kernel binding operation; one atomic CSR
 attempt then maps completed, non-started, revoked, and committed-failure
 outcomes into the existing fallback state machine. Its host-injected
 architecture test covers reply decoding and proves that only a definitely
-non-started attempt can reach the software backend. The sel4test build still
-selects the hardware stub until the Stage 4 kernel binding and RTL descriptor
-are present.
+non-started attempt can reach the software backend. The atomically published
+RTL descriptor and bare-metal call/return transport are now implemented and
+tested, but sel4test still selects the hardware stub until the Stage 4 kernel
+binding authorizes, bootstraps, installs, and revokes a resident server.
 
 ## BlackParrot platform bring-up
 
@@ -196,10 +197,12 @@ links only the protected-RPC test into the child image, reduces the generic
 libc heap from 1 MiB to 64 KiB, and keeps kernel printing enabled in the
 otherwise optimized build. This removes unrelated full-suite load/zero work
 from the cycle-accurate boot while preserving the same RPC test and makes its
-exact pass marker observable. The RPC-only driver also reserves one 16 MiB
-untyped object and delegates one 16 MiB object directly, instead of exhaustively
-probing every object size. That bounded pool is ample for the single test and
-avoids spending model hours on intentional allocation failures. The same mode
+exact pass marker observable. The RPC-only driver reserves a 1 MiB object and
+delegates a bounded 5 MiB pool (4 MiB plus 1 MiB), instead of exhaustively
+probing every object size. QEMU sweeps showed that 1, 2, 4, and 4.5 MiB child
+pools fail during CSpace or VSpace construction, while 5 MiB passes the full
+256-call test. This reduces retype/zero work from 32 MiB to 6 MiB without
+changing the test. The same mode
 suppresses the generic bootinfo/untyped inventory; the exact test verdict stays
 enabled, while character-at-a-time diagnostic output no longer dominates boot.
 

@@ -57,9 +57,12 @@ bp_rpc_demo_service_entry:
 
   li t0, 0x70000
   sd t1, 16(t0)
+  /* One result word, successful service status. */
+  li a5, 1
   csrw 0x809, a0
 3:
   li a0, -1
+  li a5, 1
   csrw 0x809, a0
 2:
   j 2b

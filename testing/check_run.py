@@ -31,6 +31,7 @@ GPIO_STOP = re.compile(
 TEST_MARKERS = {
     "mt_machine_trap_test": "[BSG-PASS] cold M-mode ECALL trap and return",
     "mt_protected_rpc_reference_test": "[BSG-PASS] protected RPC capability, isolation and return",
+    "mt_protected_rpc_control_test": "[BSG-PASS] atomic protected RPC descriptor control",
     "mt_protected_rpc_hardware_test": "[BSG-PASS] atomic protected RPC capability, fixed entry and return",
     "mt_protected_rpc_library_test": "[BSG-PASS] protected RPC library address-space isolation",
     "mt_rpc_context_transport_benchmark": "[BSG-PASS] unprotected two-context RPC transport and isolation",

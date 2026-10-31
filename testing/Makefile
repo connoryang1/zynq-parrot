@@ -62,6 +62,7 @@ SMOKE_TESTS := \
 CORRECTNESS_TESTS := \
     mt_machine_trap_test \
     mt_protected_rpc_reference_test \
+    mt_protected_rpc_control_test \
     mt_protected_rpc_hardware_test \
     mt_protected_rpc_library_test \
     mt_opensbi_csr_probe_test \
@@ -156,6 +157,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/te
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_reference_test.riscv: CFLAGS += -DRPC_FLUSH_ON_SWITCH=$(RPC_FLUSH_ON_SWITCH)
 $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_library_test.riscv: $(TOP)/software/include/bp_protected_rpc.h $(TOP)/testing/protected_rpc_demo_service.S
+$(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_control_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_hardware_test.riscv: $(TOP)/sel4/include/blackparrot_rpc_abi.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_target_bypass_stress_test.riscv: CFLAGS += -DCTXTSW_TARGET_BYPASS_TURNS=$(TARGET_BYPASS_TURNS)

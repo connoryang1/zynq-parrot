@@ -1,12 +1,15 @@
 /*
  * Validate and measure the atomic hardware-protected RPC transition. Two resident U-mode contexts use distinct Sv39
- * address spaces; pcall carries four implicit argument registers and preturn carries one result;
- * hardware binds capability 1 to the fixed context-0/context-1 transition.
+ * address spaces; pcall carries four arguments plus request metadata and
+ * preturn carries four replies plus outcome metadata;
+ * an atomically published M-mode descriptor binds token 1 to the fixed
+ * context-0/context-1 transition.
  */
 
 #include <stdint.h>
 
 #include "bp_utils.h"
+#include "../sel4/include/blackparrot_rpc_abi.h"
 
 #if BP_NUM_THREADS != 2 || (BP_NUM_CONTEXTS != 4 && BP_NUM_CONTEXTS != 10)
 #error "The protected RPC test requires two resident slots and four or ten logical contexts"
@@ -50,6 +53,45 @@ static volatile uint64_t unexpected_mepc;
 static volatile uint64_t unexpected_mtval;
 extern void server_service(void);
 
+static inline void rpc_data_write(uint64_t value)
+{
+  __asm__ volatile("csrw 0x7c3, %0" : : "r"(value) : "memory");
+}
+
+static uint64_t rpc_stage(bp_rpc_descriptor_field_t field, uint64_t value)
+{
+  uint64_t status;
+  rpc_data_write(value);
+  const uint64_t control =
+    bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, 0);
+  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
+                   : "=r"(status) : "r"(control) : "memory");
+  return status;
+}
+
+static uint64_t rpc_install_descriptor(uint64_t caller_satp,
+                                       uint64_t server_satp,
+                                       uint64_t server_entry)
+{
+  uint64_t status = 0;
+  status |= rpc_stage(BP_RPC_FIELD_TOKEN, 1);
+  status |= rpc_stage(BP_RPC_FIELD_CALLER_SATP, caller_satp);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_SATP, server_satp);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_ENTRY, server_entry);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_SP, STACK_TOP_VA);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_GP, 0);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_TP, 0);
+  status |= rpc_stage(BP_RPC_FIELD_CALLER_BADGE, UINT64_C(0x99));
+  status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word(4, 4, 0, 1));
+  if (status != BP_RPC_CONTROL_OK)
+    return status;
+  const uint64_t control =
+    bp_rpc_control_word(BP_RPC_CONTROL_COMMIT, BP_RPC_FIELD_TOKEN, 0);
+  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
+                   : "=r"(status) : "r"(control) : "memory");
+  return status;
+}
+
 static inline uint64_t physical_address(const void *ptr)
 {
   return (uint64_t)ptr & UINT64_C(0xffffffff);
@@ -89,9 +131,8 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "li t2, 1\n"
     "bne t1, t2, 7f\n"
 
-    /* U-mode may still use the legacy NPC seed, but bit 62 must not replace
-     * the M-installed protected entry. Point the parked PC elsewhere, then
-     * require both protected calls to enter server_service anyway. */
+    /* Descriptor publication locks the legacy NPC/switch interface. Point at
+     * an unauthorized PC and require both calls to enter the fixed entry. */
     "li t0, 0x4000008000020100\ncsrw 0x801, t0\n"
     /* Descriptor installation locks the legacy U-mode handoff path. */
     "csrwi 0x800, 1\ncsrr t0, 0x800\nbnez t0, 7f\n"
@@ -102,8 +143,11 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "csrr t0, 0x805\nbnez t0, 7f\n"
     "csrr t0, 0x807\nbnez t0, 7f\n"
     /* Invalid call and return operands must retire locally. */
-    "li a4, 2\ncsrw 0x808, a4\n"
-    "li a0, 0x55\ncsrw 0x809, a0\n"
+    "li a0, 0x55\nli a5, 3\nli a4, 2\ncsrrw a4, 0x808, a4\n"
+    "li t0, 1\nbne a4, t0, 7f\n"
+    "li t0, 0x55\nbne a0, t0, 7f\n"
+    "li t0, 3\nbne a5, t0, 7f\n"
+    "csrw 0x809, a0\n"
     "csrr t0, 0x800\nbnez t0, 7f\n"
 
     /* Call the same timed direct helper twice so the repeat is truly warm. */
@@ -122,6 +166,10 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "jal s7, protected_measure\n"
     "li t0, 0x50000\nsd a4, 48(t0)\n"
     "li t1, 0x2788\nbne a0, t1, 3f\n"
+    "li t1, 18\nbne a1, t1, 3f\n"
+    "li t1, 0x48c\nbne a2, t1, 3f\n"
+    "li t1, 0x22b0\nbne a3, t1, 3f\n"
+    "li t1, 4\nbne a5, t1, 3f\n"
 
     /* Repeat through the same helper and already initialized domains. */
     "li a0, 11\nli a1, 13\nli a2, 0x222\nli a3, 0x333\n"
@@ -155,8 +203,9 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
 
     "protected_measure:\n"
     "csrr s0, 0xcc0\n"
-    "csrw 0x808, a4\n"
+    "li a5, 4\ncsrrw a4, 0x808, a4\nbnez a4, 1f\n"
     "csrr s1, 0xcc0\nsub a4, s1, s0\njalr zero, 0(s7)\n"
+    "1: li a0, -1\njalr zero, 0(s7)\n"
 
     /* Same memory operations and arithmetic as the server body. */
     "local_service:\n"
@@ -178,19 +227,27 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     "li t0, 0x40000\nli t1, 0x5555666677778888\nsd t1, 0(t0)\n"
     "li t0, 0x50000\nli t1, 1\nsd t1, 64(t0)\n"
     "csrwi 0x800, 0\n"
-    /* Every protected entry carries four atomically installed arguments. */
+    /* Every protected entry carries the fixed badge and four atomically
+     * installed arguments. */
     ".global server_service\nserver_service:\n"
-    "1: li t0, 0x40000\n"
+    "1: li t2, 0x99\nbne s1, t2, 2f\n"
+    "li t2, 4\nbeq a5, t2, 3f\n"
+    "2: "
+    "li a0, -2\nli a1, 0\nli a2, 0\nli a3, 0\nli a5, 4\n"
+    "csrw 0x809, a0\n2: j 2b\n"
+    "3: li t0, 0x40000\n"
     "li t1, 0x5555666677778888\nsd t1, 0(t0)\n"
     "li t0, 0x50000\nld t1, 0(t0)\n"
     "slli a1, a1, 1\nslli a2, a2, 2\nslli a3, a3, 3\n"
     "add a0, a0, a1\nadd a0, a0, a2\nadd a0, a0, a3\nadd a0, a0, t1\n"
     "li t1, 0x5555666677778888\nsd t1, 16(t0)\n"
-    /* Hardware copies a0 and consumes the protected continuation. */
+    /* Hardware copies a0-a3 plus the reply length/status metadata in a5 and
+     * consumes the protected continuation. */
+    "li a5, 4\n"
     "csrw 0x809, a0\n"
     /* Sequential instructions are unreachable architecturally. A self-loop
      * makes any stale post-return frontend packet fail instead of recovering. */
-    ".rept 8\nnop\n.endr\n2: j 2b\n"
+    ".rept 8\nnop\n.endr\n4: j 4b\n"
     ".option pop\n"
   );
 }
@@ -320,9 +377,13 @@ int main(void)
      * still authorized. The caller verifies the post-install read lock. */
     __asm__ volatile("li t0, 0x5a5a\ncsrw 0x803, t0\ncsrwi 0x805, 1"
                      : : : "t0", "memory");
-    const uint64_t rpc_descriptor_seed =
-      (UINT64_C(1) << 62) | (UINT64_C(1) << 39) | server_service_va;
-    __asm__ volatile("csrw 0x801, %0" : : "r"(rpc_descriptor_seed) : "memory");
+    const uint64_t install_status =
+      rpc_install_descriptor(caller_satp, server_satp_value, server_service_va);
+    if (install_status != BP_RPC_CONTROL_OK) {
+      bp_print_string("[BSG-FAIL] protected RPC descriptor installation\n");
+      bp_hprint_uint64(install_status);
+      bp_finish(1);
+    }
   }
   __asm__ volatile("csrw satp, %0\nsfence.vma" : : "r"(caller_satp) : "memory");
   __asm__ volatile("csrw mepc, %0" : : "r"(CALLER_ENTRY_VA) : "memory");

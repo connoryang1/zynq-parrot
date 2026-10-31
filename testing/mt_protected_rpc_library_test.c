@@ -8,6 +8,7 @@
 
 #include "bp_protected_rpc.h"
 #include "bp_utils.h"
+#include "../sel4/include/blackparrot_rpc_abi.h"
 
 #if BP_NUM_THREADS != 2 || (BP_NUM_CONTEXTS != 4 && BP_NUM_CONTEXTS != 10)
 #error "The protected RPC library test requires two resident hardware slots"
@@ -55,6 +56,45 @@ static volatile uint64_t unexpected_mtval;
 
 extern void bp_rpc_demo_server_bootstrap(void);
 extern void bp_rpc_demo_service_entry(void);
+
+static inline void rpc_data_write(uint64_t value)
+{
+  __asm__ volatile("csrw 0x7c3, %0" : : "r"(value) : "memory");
+}
+
+static uint64_t rpc_stage(bp_rpc_descriptor_field_t field, uint64_t value)
+{
+  uint64_t status;
+  rpc_data_write(value);
+  const uint64_t control =
+    bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, 0);
+  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
+                   : "=r"(status) : "r"(control) : "memory");
+  return status;
+}
+
+static uint64_t rpc_install_descriptor(uint64_t caller_satp,
+                                       uint64_t server_satp,
+                                       uint64_t server_entry)
+{
+  uint64_t status = 0;
+  status |= rpc_stage(BP_RPC_FIELD_TOKEN, RPC_CAPABILITY);
+  status |= rpc_stage(BP_RPC_FIELD_CALLER_SATP, caller_satp);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_SATP, server_satp);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_ENTRY, server_entry);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_SP, STACK_TOP_VA);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_GP, 0);
+  status |= rpc_stage(BP_RPC_FIELD_SERVER_TP, 0);
+  status |= rpc_stage(BP_RPC_FIELD_CALLER_BADGE, UINT64_C(0x42));
+  status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word(4, 1, 0, 1));
+  if (status != BP_RPC_CONTROL_OK)
+    return status;
+  const uint64_t control =
+    bp_rpc_control_word(BP_RPC_CONTROL_COMMIT, BP_RPC_FIELD_TOKEN, 0);
+  __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
+                   : "=r"(status) : "r"(control) : "memory");
+  return status;
+}
 
 static inline uint64_t physical_address(const void *ptr)
 {
@@ -255,9 +295,9 @@ int main(void)
   __asm__ volatile("csrwi 0x800, 1" ::: "memory");
 
   const uint64_t service_va = SERVER_ENTRY_VA + service_offset;
-  const uint64_t descriptor = (UINT64_C(1) << 62)
-                              | (UINT64_C(1) << 39) | service_va;
-  __asm__ volatile("csrw 0x801, %0" : : "r"(descriptor) : "memory");
+  if (rpc_install_descriptor(caller_satp, server_satp_value, service_va)
+      != BP_RPC_CONTROL_OK)
+    machine_finish();
 
   __asm__ volatile("csrw satp, %0\nsfence.vma"
                    : : "r"(caller_satp) : "memory");
