@@ -1,0 +1,39 @@
+configuration: NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2
+memory: BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10
+top: b9aa118177c8993c316ae9f463a669fb67e315fe
+rtl: 6c79a42107a3857e63b6f47bc2468fe4599c5bff
+elf_sha256: 24c6463c32da402fa28b7058acaea75e91d65492e56a31a598ef73852ffe8ce7
+
+N=4
+window_cycles: 5904
+detached_hints: 44
+consuming_loads: 44
+ordinary_dcache_uce_transactions: 0
+peak_outstanding: 4
+average_outstanding_window: 1.5426829268292683
+average_outstanding_active: 3.5274980635166537
+hint_issue_offsets: +49.5..+2424.5
+hint_response_offsets: +254.5..+2631.5
+consuming_load_offsets: +259..+2633
+last_consuming_load_to_timer_end: 3271
+checks: result checksum guest core host pass
+
+N=5
+window_cycles: 2710
+checks: result checksum guest core host pass
+qualification: general transaction analysis rejected before measured window
+error: normal read response boundary/count mismatch after 0 of 8 stop-PC commits
+
+N=6
+window_cycles: 5962
+detached_hints: 66
+consuming_loads: 66
+ordinary_dcache_uce_transactions: 0
+peak_outstanding: 6
+average_outstanding_window: 2.291512915129151
+average_outstanding_active: 5.159365558912387
+hint_issue_offsets: +45.5..+2486.5
+hint_response_offsets: +250.5..+2693.5
+consuming_load_offsets: +252..+5912
+last_consuming_load_to_timer_end: 50
+checks: result checksum guest core host pass
