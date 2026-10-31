@@ -6,10 +6,13 @@
  * emission changes. A dependent pointer ring exposes all four cold misses.
  * An optional group 0--7 selects two adjacent L2 sets in both banks so a full
  * sweep can distinguish useful preview timing from post-hint set conflicts.
+ * The second optional argument selects the historical early hook or the late
+ * pre-register-switch hook in the same kernel image.
  */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
 #include <sys/wait.h>
@@ -59,7 +62,7 @@ static unsigned mode_for(unsigned trial)
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
-		      unsigned group)
+		      unsigned group, unsigned enable_mode)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -93,7 +96,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
 
-		if (prctl(PR_BP_PREVIEW_ENABLE, enabled, 0UL, 0UL, 0UL))
+		if (prctl(PR_BP_PREVIEW_ENABLE,
+			  enabled ? enable_mode : 0UL, 0UL, 0UL, 0UL))
 			fail("toggle preview emission");
 		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
 		if (before_hook == (unsigned long)-1)
@@ -136,6 +140,7 @@ int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
 	unsigned group = 0;
+	unsigned enable_mode = 2;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -143,8 +148,9 @@ int main(int argc, char **argv)
 	pid_t child;
 	char *end = NULL;
 
-	if (argc > 2) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7]\n", argv[0]);
+	if (argc > 3) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late]\n",
+			argv[0]);
 		return 2;
 	}
 	if (argc == 2) {
@@ -156,8 +162,19 @@ int main(int argc, char **argv)
 		}
 		group = parsed;
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u\n",
-	       group, group * 4 * line_bytes, lines);
+	if (argc == 3) {
+		if (!strcmp(argv[2], "early"))
+			enable_mode = 1;
+		else if (!strcmp(argv[2], "late"))
+			enable_mode = 2;
+		else {
+			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
+			return 2;
+		}
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u\n",
+	       group, group * 4 * line_bytes, lines,
+	       enable_mode == 1 ? "early" : "late", enable_mode);
 
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
@@ -167,7 +184,7 @@ int main(int argc, char **argv)
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		child_run(to_child[0], to_parent[1], samples, group);
+		child_run(to_child[0], to_parent[1], samples, group, enable_mode);
 		return 0;
 	}
 	close(to_child[0]);

@@ -12,7 +12,8 @@ from pathlib import Path
 ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_entry=(\d+) load_cycles=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
-CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) lines=(\d+)")
+CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
+                    r"lines=(\d+) timing=(early|late) mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
 
 
@@ -21,7 +22,7 @@ def percentile(values, fraction):
     return ordered[round(fraction * (len(ordered) - 1))]
 
 
-def summarize(rows, group):
+def summarize(rows, group, timing):
     trials = len(rows)
     if trials < 128 or trials % 4 or [row["trial"] for row in rows] != list(range(trials)):
         raise ValueError("expected at least 128 ordered trials in complete four-trial blocks")
@@ -41,7 +42,8 @@ def summarize(rows, group):
 
     rng = random.Random(0xB50)
     paired_blocks = trials // 4
-    result = {"l2_set_group": group, "trials": trials,
+    result = {"l2_set_group": group, "preview_timing": timing,
+              "trials": trials,
               "trials_per_mode": trials // 2,
               "paired_blocks": paired_blocks, "metrics": {}}
     for metric in METRICS:
@@ -78,14 +80,19 @@ def main():
     configs = CONFIG.findall(text)
     if len(configs) != 1:
         raise SystemExit("expected exactly one benchmark configuration marker")
-    group, first_offset, lines = map(int, configs[0])
-    if group > 7 or first_offset != group * 256 or lines != 4:
+    group = int(configs[0][0])
+    first_offset = int(configs[0][1])
+    lines = int(configs[0][2])
+    timing = configs[0][3]
+    mode = int(configs[0][4])
+    if (group > 7 or first_offset != group * 256 or lines != 4
+            or mode != {"early": 1, "late": 2}[timing]):
         raise SystemExit("invalid benchmark configuration marker")
     rows = []
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
         rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
-    print(json.dumps(summarize(rows, group), indent=2))
+    print(json.dumps(summarize(rows, group, timing), indent=2))
 
 
 if __name__ == "__main__":

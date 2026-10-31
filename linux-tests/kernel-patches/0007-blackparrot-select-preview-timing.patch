@@ -1,0 +1,138 @@
+This patch makes physical data-preview timing selectable without rebuilding the
+kernel. Mode one issues at exact scheduler selection; mode two issues immediately
+before the architectural register/stack switch to reduce tiny-L2 displacement.
+
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -89,7 +89,7 @@
+ 	struct page *bp_preview_pin[BP_PREVIEW_ADDRS];
+ 	unsigned long bp_preview_paddr[BP_PREVIEW_ADDRS];
+ 	struct mm_struct *bp_preview_phys_mm;
+-	bool bp_preview_phys_enabled;
++	unsigned char bp_preview_phys_mode;
+ 	unsigned long bp_preview_hook_count;
+ 	/* Diagnostic counts for each incoming context-switch guard outcome. */
+ 	unsigned long bp_preview_guard_count[5];
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -81,6 +81,7 @@
+ 		__switch_to_fpu(__prev, __next);	\
+ 	if (has_vector())					\
+ 		__switch_to_vector(__prev, __next);	\
++	riscv_bp_preview_late(__next);			\
+ 	((last) = __switch_to(__prev, __next));		\
+ } while (0)
+ 
+@@ -102,7 +103,7 @@
+ 	/* Pinned pages remain valid across an address-space switch. The custom
+ 	 * supervisor CSR queues an L2-only physical read without the target DTLB.
+ 	 */
+-	if (READ_ONCE(next->thread.bp_preview_phys_enabled)
++	if (READ_ONCE(next->thread.bp_preview_phys_mode) == 1
+ 	    && READ_ONCE(next->thread.bp_preview_phys_mm) == next->mm
+ 	    && next->mm) {
+ 		paddr0 = READ_ONCE(next->thread.bp_preview_paddr[0]);
+@@ -160,5 +161,34 @@
+ 	WRITE_ONCE(next->thread.bp_preview_hook_count,
+ 		   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
+ }
++
++/* Mode two deliberately issues after MM/FPU/vector switch preparation and
++ * immediately before the architectural register/stack switch. This retains
++ * enough memory lead while minimizing tiny-L2 displacement before first use. */
++static __always_inline void riscv_bp_preview_late(struct task_struct *next)
++{
++	unsigned long paddr0, paddr1, paddr2, paddr3;
++
++	if (READ_ONCE(next->thread.bp_preview_phys_mode) != 2
++	    || READ_ONCE(next->thread.bp_preview_phys_mm) != next->mm
++	    || !next->mm)
++		return;
++	paddr0 = READ_ONCE(next->thread.bp_preview_paddr[0]);
++	paddr1 = READ_ONCE(next->thread.bp_preview_paddr[1]);
++	paddr2 = READ_ONCE(next->thread.bp_preview_paddr[2]);
++	paddr3 = READ_ONCE(next->thread.bp_preview_paddr[3]);
++	if (!(paddr0 | paddr1 | paddr2 | paddr3))
++		return;
++	if (paddr0)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr0) : "memory");
++	if (paddr1)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr1) : "memory");
++	if (paddr2)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr2) : "memory");
++	if (paddr3)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr3) : "memory");
++	WRITE_ONCE(next->thread.bp_preview_hook_count,
++		   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
++}
+ 
+ #endif /* _ASM_RISCV_SWITCH_TO_H */
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -98,7 +98,7 @@
+ 
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		pinned |= !!task->thread.bp_preview_pin[i];
+-	WRITE_ONCE(task->thread.bp_preview_phys_enabled, false);
++	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, NULL);
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		WRITE_ONCE(task->thread.bp_preview_paddr[i], 0);
+@@ -145,7 +145,7 @@
+ 		any |= !!pages[i];
+ 	}
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, any ? task->mm : NULL);
+-	WRITE_ONCE(task->thread.bp_preview_phys_enabled, false);
++	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
+ 	return 0;
+ }
+ 
+@@ -254,7 +254,7 @@
+ 	memset(dst->thread.bp_preview_paddr, 0,
+ 	       sizeof(dst->thread.bp_preview_paddr));
+ 	dst->thread.bp_preview_phys_mm = NULL;
+-	dst->thread.bp_preview_phys_enabled = false;
++	dst->thread.bp_preview_phys_mode = 0;
+ 	/* clear entire V context, including datap for a new task */
+ 	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
+ 
+@@ -276,7 +276,7 @@
+ 	memset(p->thread.bp_preview_paddr, 0,
+ 	       sizeof(p->thread.bp_preview_paddr));
+ 	p->thread.bp_preview_phys_mm = NULL;
+-	p->thread.bp_preview_phys_enabled = false;
++	p->thread.bp_preview_phys_mode = 0;
+ 	p->thread.bp_preview_hook_count = 0;
+ 	memset(p->thread.bp_preview_guard_count, 0,
+ 	       sizeof(p->thread.bp_preview_guard_count));
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,7 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* Toggle hint emission without changing registration or page pinning. */
++/* 0 disables; 1 issues at selection; 2 issues immediately before switch. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 1 || arg3 || arg4 || arg5) {
++		if (arg2 > 2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+@@ -2796,7 +2796,7 @@
+ 			error = -ENOENT;
+ 			break;
+ 		}
+-		WRITE_ONCE(me->thread.bp_preview_phys_enabled, !!arg2);
++		WRITE_ONCE(me->thread.bp_preview_phys_mode, (unsigned char)arg2);
+ 		error = 0;
+ 		break;
+ 	case PR_BP_PREVIEW_GET_COUNT:

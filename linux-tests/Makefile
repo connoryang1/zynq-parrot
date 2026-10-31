@@ -52,7 +52,8 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0004-blackparrot-four-address-preview.patch \
 	$(CURDIR)/kernel-patches/0003-blackparrot-preview-hook-count.patch \
 	$(CURDIR)/kernel-patches/0005-blackparrot-preview-guard-reasons.patch \
-	$(CURDIR)/kernel-patches/0006-blackparrot-physical-data-preview.patch
+	$(CURDIR)/kernel-patches/0006-blackparrot-physical-data-preview.patch \
+	$(CURDIR)/kernel-patches/0007-blackparrot-select-preview-timing.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
