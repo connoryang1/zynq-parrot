@@ -1,12 +1,16 @@
 """Validate complete, balanced board-run ordering for physical preview sweeps."""
 
+import argparse
+import tempfile
 import unittest
+from pathlib import Path
 
 from run_scheduler_physical_preview_sweep import (
     SHELL_PROMPT,
     cell_exit_pattern,
     cell_plan,
     selected_cells,
+    validate_args,
 )
 
 
@@ -47,6 +51,25 @@ class CellPlanTest(unittest.TestCase):
         for start in (-1, 16):
             with self.assertRaisesRegex(ValueError, "start cell"):
                 selected_cells(start)
+
+    def test_missing_log_parent_fails_before_board_launch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nbf = root / "image.nbf"
+            transfer = root / "transfer.sh"
+            nbf.write_text("nbf")
+            transfer.write_text("command\n")
+            args = argparse.Namespace(
+                nbf=nbf,
+                transfer=transfer,
+                elf_sha256="1" * 64,
+                control_sha256="2" * 64,
+                runtime_ms=100,
+                start_cell=0,
+                log=root / "missing" / "run.log",
+            )
+            with self.assertRaisesRegex(ValueError, "log parent"):
+                validate_args(args)
 
 
 if __name__ == "__main__":

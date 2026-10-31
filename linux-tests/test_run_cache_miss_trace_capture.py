@@ -5,7 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from run_cache_miss_trace_capture import capture_command, validate_args
+from run_cache_miss_trace_capture import (
+    PIPE_GUEST_ELF,
+    capture_command,
+    guest_command,
+    guest_elf,
+    validate_args,
+)
 
 
 class TraceRunnerTest(unittest.TestCase):
@@ -20,6 +26,9 @@ class TraceRunnerTest(unittest.TestCase):
             "elf_sha256": "1" * 64,
             "control_sha256": "2" * 64,
             "samples": 1,
+            "window": "full",
+            "program": "cache-miss",
+            "group": 0,
             "runtime_ms": 100,
         }
         values.update(updates)
@@ -34,6 +43,29 @@ class TraceRunnerTest(unittest.TestCase):
 
     def test_multisample_command_is_explicit(self):
         self.assertIn("--samples 7", capture_command("to-peer", 7))
+
+    def test_pipe_command_is_fixed_and_group_bounded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, program="physical-preview-pipe",
+                             group=7)
+            self.assertEqual(
+                guest_command(args),
+                f"{PIPE_GUEST_ELF} 7; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc",
+            )
+            self.assertEqual(guest_elf(args), PIPE_GUEST_ELF)
+
+    def test_pipe_rejects_multiple_samples(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, program="physical-preview-pipe",
+                             samples=2)
+            with self.assertRaisesRegex(ValueError, "exactly one sample"):
+                validate_args(args)
+
+    def test_group_bounds_fail_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "group"):
+                validate_args(self.args(directory, group=8))
 
     def test_sample_bounds_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:

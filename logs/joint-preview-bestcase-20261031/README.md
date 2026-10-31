@@ -339,3 +339,74 @@ capture path, so one useful instruction experiment remains—capture and train
 the exact pipe/clean-handoff path. Exact analysis SHA-256 is
 `3435510b...9266`; compressed first-ten and suffix log hashes are
 `cd15d07a...dd31` and `e34cc521...b640`.
+
+## Exact pipe-trained 12-line result
+
+`scheduler_physical_preview_trace_capture.c` reproduces the benchmark's 16
+warmups, 40 KiB eviction loop, disabled preview bookkeeping, pipe wake, and
+four dependent target loads. The parent clears and arms the physical miss
+recorder immediately before the final wake; the child disarms immediately
+after the loads. The exact FPGA run records 144 I-side and 65 D-side misses in
+25,984 cycles without overflow and ends in TRACE/CORE/BSG PASS. Raw compressed
+trace SHA-256 is `c02c30ff...ad1`; status is `03220a5a...fead7`.
+
+The first 12 unique I-side misses beginning at observed post-trigger line
+`0x80a1bac0` cover context-switch core code, `switch_mm`, `mm_cid_get`, FPU
+save, and `finish_task_switch`. Records after this point begin mixing
+syscall-return/user or speculative-looking paths, so the experiment stops at
+12 instead of filling all 16 hardware slots. Table JSON SHA-256 is
+`ac0168ac...82f5`.
+
+Candidate NBF SHA-256 is `f3a026b6...31a7`. All 1,865,933 memory records at or
+above the `0x80200000` Linux load boundary compare exactly with the accepted
+control; boot controls and the final 8 MHz timer write also match. Separate
+kernel and OpenSBI executable-section CSR scans pass. The shorter table shifts
+the OpenSBI link layout, so broad byte-difference counts below the payload
+boundary are not meaningful.
+
+The first run completed ten cells and reproduced the known missing-prompt
+boundary after a valid `group=4 late` exit. Its raw SHA-256 is
+`0b6c3006...f71e`; the FAIL status `78667570...dd0` preserves the recovery
+requirement. After a full power cycle, readiness wait, overlay/NBF reverify,
+the disjoint six-cell suffix completed with runner, CORE, and BSG PASS. Its raw
+SHA-256 is `855cb750...52ba`, status `1d5a45bd...5654`. The two logs contain
+exactly 16 distinct cells and reject 830 timer-preempted attempts.
+
+Strict analysis SHA-256 `bc65f94d...a087` gives:
+
+- early wake-to-load: `-462 [-1218.25,183.5]` cycles saved; late:
+  `-199.25 [-1101.75,539.5]`;
+- early local loads: `9.5 [7,11]` cycles saved; late: `11 [9.5,11.5]`;
+- early roundtrip: `2807.25 [416.5,4471.5]` cycles saved, about 2.26%; late:
+  `3190.75 [123,4863.25]`, about 2.51%.
+
+Thus the exact pipe-trained prefix still does not accelerate first useful
+target work, but it produces a resolved two-switch roundtrip effect. That
+secondary effect needs instruction-only isolation and replication before it
+can be treated as a feature gain.
+
+## Pipe experiment workflow corrections
+
+The first trace build used the Makefile's unavailable default cross compiler
+after a clean, so no stale executable was accepted. It was rebuilt with the
+explicit project toolchain; one subsequent hash command used a root-relative
+path from `linux-tests/` and was rerun with the correct path.
+
+OpenSBI reconstruction initially failed in three distinguishable ways: a new
+linker lacked its runtime library path, GCC 15 treated `bool` as a C23 keyword,
+and a Buildroot GCC 13 invocation omitted `PLATFORM_HART_COUNT`. Each failed
+before producing a candidate. The accepted build uses the SDK's GCC 13.2,
+`-std=gnu17`, and the DTB-confirmed single hart.
+
+Splicing after timer patching failed closed because the patch inserts a
+non-memory record. Regenerating the old unpatched NBF still exposed an
+unaligned low-OpenSBI record that the strict splicer intentionally rejects.
+The accepted full candidate instead proves exact equality for every Linux/DTB
+record at or above `0x80200000`, plus matching boot controls and final timer
+override.
+
+The first performance invocation omitted its log parent directory. Because
+the old runner spawned the board process before opening the log, that attempt
+was treated as board contamination and followed by a full recovery. The
+runner now validates the log parent before board launch, with a regression
+test; no measurement from the failed invocation is retained.

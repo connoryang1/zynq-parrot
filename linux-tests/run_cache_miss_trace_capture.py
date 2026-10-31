@@ -15,6 +15,7 @@ import pexpect
 DEFAULT_HOST = "xilinx@192.168.4.35"
 DEFAULT_CONTROL_SHA = "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30"
 GUEST_ELF = "/tmp/cache_miss_trace_capture_dynamic"
+PIPE_GUEST_ELF = "/tmp/scheduler_physical_preview_trace_capture_dynamic"
 SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 EXIT_MARKER = re.compile(r"TRACE_CAPTURE_EXIT rc=([0-9]+)\r*\n")
 
@@ -32,6 +33,21 @@ def capture_command(window, samples):
     return command + "; rc=$?; echo TRACE_CAPTURE_EXIT rc=$rc"
 
 
+def guest_elf(args):
+    """Return the fixed guest path for the selected bounded capture."""
+    if args.program == "physical-preview-pipe":
+        return PIPE_GUEST_ELF
+    return GUEST_ELF
+
+
+def guest_command(args):
+    """Build the selected guest command without accepting shell text."""
+    if args.program == "physical-preview-pipe":
+        return (f"{PIPE_GUEST_ELF} {args.group}; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc")
+    return capture_command(args.window, args.samples)
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("nbf", type=Path)
@@ -41,6 +57,10 @@ def parse_args(argv=None):
     parser.add_argument("--window", choices=("full", "to-peer", "from-peer"),
                         default="full")
     parser.add_argument("--samples", type=int, default=1)
+    parser.add_argument("--program",
+                        choices=("cache-miss", "physical-preview-pipe"),
+                        default="cache-miss")
+    parser.add_argument("--group", type=int, default=0)
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--runtime-ms", type=int, default=600_000)
@@ -56,6 +76,10 @@ def validate_args(args):
         raise ValueError("NBF and transfer files must exist")
     if not 1 <= args.samples <= 10_000:
         raise ValueError("samples must be in 1..10000")
+    if not 0 <= args.group <= 7:
+        raise ValueError("group must be in 0..7")
+    if args.program == "physical-preview-pipe" and args.samples != 1:
+        raise ValueError("physical-preview-pipe supports exactly one sample")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
 
@@ -74,7 +98,10 @@ def run(args):
         "elf_sha256": args.elf_sha256,
         "window": args.window,
         "samples": args.samples,
+        "program": args.program,
+        "group": args.group,
     }
+    program = guest_elf(args)
     child = None
     try:
         child = pexpect.spawn(
@@ -91,10 +118,10 @@ def run(args):
             for command in args.transfer.read_text().splitlines():
                 child.sendline(command)
                 child.expect(SHELL_PROMPT, timeout=60)
-            child.sendline(f"sha256sum {GUEST_ELF}")
-            child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
+            child.sendline(f"sha256sum {program}")
+            child.expect_exact(f"{args.elf_sha256}  {program}")
             child.expect(SHELL_PROMPT)
-            child.sendline(capture_command(args.window, args.samples))
+            child.sendline(guest_command(args))
             child.expect(EXIT_MARKER, timeout=300)
             rc = int(child.match.group(1))
             if rc:

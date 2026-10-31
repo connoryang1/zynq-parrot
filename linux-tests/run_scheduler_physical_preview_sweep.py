@@ -71,6 +71,8 @@ def validate_args(args):
     selected_cells(args.start_cell)
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
+    if not args.log.parent.is_dir():
+        raise ValueError("log parent directory must exist before board launch")
 
 
 def run(args):

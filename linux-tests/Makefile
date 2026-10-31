@@ -37,6 +37,8 @@ TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 PHYSICAL_PREVIEW_BENCH_APP := $(OUT)/scheduler_physical_preview_benchmark
 PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
+PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
+PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
 APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
 TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
@@ -123,7 +125,7 @@ emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
 
 # These pthread comparisons are independent of the custom-CSR shell demo.
-.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer physical-preview-benchmark physical-preview-benchmark-dynamic emit-physical-preview-benchmark-transfer emit-physical-preview-benchmark-dynamic-transfer
+.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer physical-preview-benchmark physical-preview-benchmark-dynamic emit-physical-preview-benchmark-transfer emit-physical-preview-benchmark-dynamic-transfer physical-preview-trace physical-preview-trace-dynamic emit-physical-preview-trace-transfer emit-physical-preview-trace-dynamic-transfer
 request-benchmark: $(REQUEST_APP)
 request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
 request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
@@ -133,6 +135,8 @@ cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
 cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 physical-preview-benchmark: $(PHYSICAL_PREVIEW_BENCH_APP)
 physical-preview-benchmark-dynamic: $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP)
+physical-preview-trace: $(PHYSICAL_PREVIEW_TRACE_APP)
+physical-preview-trace-dynamic: $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP)
 
 # Separate output names retain the historical faulting-load control. The default
 # emits the implemented Zicbop hint in both C batching and resident assembly.
@@ -166,6 +170,14 @@ $(PHYSICAL_PREVIEW_BENCH_APP): scheduler_physical_preview_benchmark.c Makefile F
 	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+$(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -o $@ $< >&2
+
+$(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
@@ -208,6 +220,16 @@ emit-physical-preview-benchmark-dynamic-transfer: check-linux-cc physical-previe
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark_dynamic.b64'
 	@base64 -w 76 $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark_dynamic.b64 > /tmp/scheduler_physical_preview_benchmark_dynamic' 'chmod +x /tmp/scheduler_physical_preview_benchmark_dynamic'
+
+emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture.b64'
+	@base64 -w 76 $(PHYSICAL_PREVIEW_TRACE_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture.b64 > /tmp/scheduler_physical_preview_trace_capture' 'chmod +x /tmp/scheduler_physical_preview_trace_capture'
+
+emit-physical-preview-trace-dynamic-transfer: check-linux-cc physical-preview-trace-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture_dynamic.b64'
+	@base64 -w 76 $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture_dynamic.b64 > /tmp/scheduler_physical_preview_trace_capture_dynamic' 'chmod +x /tmp/scheduler_physical_preview_trace_capture_dynamic'
 
 check-request-benchmark:
 	@BP_HOST_CC='$(BP_HOST_CC)' python3 -m unittest discover -s $(CURDIR) -p test_request_benchmark.py
