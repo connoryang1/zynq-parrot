@@ -10,6 +10,27 @@ combined benchmark source. Every retained transcript reports the requested
 mode/count, eleven levels, the count-specific matched checksum, benchmark PASS,
 `CORE PASS`, `BSG PASS`, and `VALID RUN`.
 
+Corrected terminal-path sweep:
+
+| Queries | Worker mode 2 | Coroutine mode 6 | Coroutine / worker | Worker cycles/node |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 2,621 | 2,916 | 1.113x | 119.136 |
+| 3 | 2,645 | 3,231 | 1.222x | 80.152 |
+| 4 | 2,679 | 4,336 | 1.619x | 60.886 |
+| 5 | 2,694 | 5,393 | 2.002x | 48.982 |
+| 6 | 2,734 | 6,470 | 2.366x | 41.424 |
+| 7 | 2,769 | 7,523 | 2.717x | 35.961 |
+| 8 | 2,800 | 8,596 | 3.070x | 31.818 |
+| **9** | **3,060** | **9,645** | **3.152x** | **30.909** |
+| 10 | 3,414 | 10,734 | 3.144x | 31.036 |
+
+N=2 has the lowest absolute batch latency. N=9 has the best useful-node
+throughput and the largest hardware/coroutine ratio, so it is the selected
+“most advantageous” point. N=10 is a useful full-capacity stress case but is
+slightly past the throughput optimum.
+
+Original rejected sweep:
+
 | Queries | Worker mode 2 | Coroutine mode 6 | Coroutine / worker |
 | ---: | ---: | ---: | ---: |
 | 2 | 2,624 | 2,929 | 1.116x |
@@ -22,32 +43,32 @@ mode/count, eleven levels, the count-specific matched checksum, benchmark PASS,
 | 9 | 6,274 | 9,644 | 1.537x |
 | 10 | 6,624 | 10,717 | 1.618x |
 
-Five is the selected measured default: hardware uses 49.6% fewer cycles than
-the C++20 coroutine control and has the lowest worker cycles per useful load.
-The adjacent-count trace proves this is not an optimum inferred from the
-ten-slot queue capacity. N=4 and N=6 each encounter one 3,239-cycle off-path
-I-cache request episode; N=5 avoids it in this exact executable/cache state.
+This original table is retained as rejected tuning evidence. N=4 and N=6 each
+contain one artificial 3,239-cycle off-path I-cache refill. The corrected
+terminal path and same-model A/B reduce N=4 from 5,904 to 2,679 cycles and N=6
+from 5,962 to 2,734, while N=5 changes only from 2,710 to 2,694. The corrected
+complete sweep below supersedes the old selection of five.
 
 The remaining matched N=5 controls quantify what that headline includes:
 
 | N=5 schedule | Cycles | Cycles/useful node | Relative to hardware |
 | --- | ---: | ---: | ---: |
-| Serial demand, no hint | 181,548 | 3,300.873 | 66.992x |
-| Serial prefetch | 12,708 | 231.055 | 4.689x |
-| C++20 coroutine | 5,372 | 97.673 | 1.982x |
-| Explicit software batch | 4,458 | 81.055 | 1.645x |
-| Hardware worker | 2,710 | 49.273 | 1.000x |
+| Serial demand, no hint | 181,546 | 3,300.836 | 67.389x |
+| Serial prefetch | 12,725 | 231.364 | 4.723x |
+| C++20 coroutine | 5,393 | 98.055 | 2.002x |
+| Explicit software batch | 4,454 | 80.982 | 1.653x |
+| Hardware worker | 2,694 | 48.982 | 1.000x |
 
-The 66.992x demand ratio combines two changes: ordinary demand fetches full
+The 67.389x demand ratio combines two changes: ordinary demand fetches full
 cache lines serially, while hardware uses narrow detached hints and overlaps
 five searches. Serial prefetch uses the same hint transport without
-interleaving, so its 4.689x ratio is the cleaner estimate of scheduling overlap.
-At this count hardware is also 39.2% faster than the hand-written batch. The
-focused trace shows that this comparison benefits from N=5 avoiding an
-instruction-front-end artifact found at adjacent worker counts; it is not a
-general claim that hardware scheduling intrinsically beats optimized batching.
+interleaving, so its 4.723x ratio is the cleaner estimate of scheduling overlap.
+At this count hardware is also 39.5% faster than the hand-written batch. The
+terminal-path artifact has been removed at every count, so the result no longer
+depends on N=5 uniquely avoiding that refill. It remains a result for this
+bare-metal implementation, not a universal claim about optimized batching.
 
-The N=5 switch-only control is 816 cycles, or 14.836 cycles per scheduled node
+The N=5 switch-only control is 766 cycles, or 13.927 cycles per scheduled node
 when normalized by the same 55 steps.  It performs no useful loads, and its
 terminal ring lap is included, so it is a control rather than a quantity to
 subtract mechanically from the data modes.
@@ -59,12 +80,16 @@ the accepted corrected N=10 worker waveform gives 3.445 average UCE hints over
 the entire 6,609-cycle window, 7.063 while the request pipeline is active, and
 a peak of nine.  The current-build N=5 sweep is transcript-qualified; its
 trace teardown issue means it does not yet have an accepted average-outstanding
-measurement. Focused valid N=4/N=6 traces accept and consume all 44/66 hints
+measurement. Focused N=4/N=6 traces accept and consume all 44/66 hints
 with zero ordinary D-cache reads. Their full-window/active averages and peaks
-are 1.543/3.527/4 and 2.292/5.159/6. Both slow rows accept two consecutive
-I-cache requests for raw word address `0x800003c0` (byte line `0x80000f00`),
-then resume retirement seven or eight cycles after the final response. The
-first-request-to-final-response interval is 3,239 cycles in both cases. See
+are 1.543/3.527/4 and 2.292/5.159/6. Both slow rows issue one blocking I-cache
+refill at byte address `0x800003c0` in `main`'s checksum loop after a parked
+worker speculates through its conditional park and following `ret`. The
+frontend cannot cancel the refill when the context redirect arrives; retirement
+resumes seven or eight cycles after its final response. The request-to-final-
+response interval is 3,239 cycles in both cases. The prior word-address mapping,
+coroutine-scheduler attribution, and two-request count were trace-reading
+errors. See
 `trace-n456-diagnostics/` for event cycles, hashes, and qualification limits.
 
 The committed N=10 trace diagnostic used top `f4db758c99433a2567baccf7090ab8f9274a1575`

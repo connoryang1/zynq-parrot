@@ -19,23 +19,26 @@ Their peak detached-hint occupancies are four and six. Time-weighted occupancy
 is 1.543/3.527 for N=4 and 2.292/5.159 for N=6 over the complete/active
 intervals.
 
-Both slow rows instead launch two consecutive accepted I-cache requests for raw
-word address `0x800003c0`, corresponding to byte line `0x80000f00`, while the
-terminal worker is retiring PCs `0x8000061a` and `0x8000061e`. That fetched line
-contains the C++ coroutine scheduler and is not on worker mode's architectural
-path. The request stream blocks the redirected worker fetch until its final
-response; retirement resumes seven or eight cycles later.
+Both slow rows instead launch one blocking 64-byte I-cache refill at byte
+address `0x800003c0` while the terminal worker is retiring PCs `0x8000061a` and
+`0x8000061e`. This address is already byte-addressed; the earlier conversion to
+`0x80000f00` was wrong. Disassembly places `0x800003c0` in `main`'s
+post-measurement checksum loop, not in the coroutine scheduler. The parked
+worker speculates through its conditional park and following `ret` before the
+context redirect is accepted. The frontend cannot cancel an in-flight refill,
+so the redirected fetch waits for all 16 32-bit memory beats; retirement resumes
+seven or eight cycles after the final response.
 
 | Event | N=4 cycle | N=6 cycle |
 | --- | ---: | ---: |
 | Terminal worker result store, PC `0x8000061a` | 2,501,859 | 2,548,619 |
-| First/second accepted I-cache request | 2,501,859 / 2,501,860 | 2,548,619 / 2,548,620 |
+| Blocking I-cache request | 2,501,859 | 2,548,619 |
 | Context-cache target launch | 2,501,867 | 2,548,627 |
 | Critical I-cache response | 2,502,270 | 2,549,030 |
 | Final I-cache response | 2,505,098 | 2,551,858 |
 | First target-context retirement | 2,505,106 | 2,551,865 |
 
-The first request-to-final-response interval is 3,239 cycles in both runs.
+The request-to-final-response interval is 3,239 cycles in both runs.
 Context-cache launch itself completes in three cycles, so register save/restore
 does not explain the gap. N=4 has 3,271 cycles between its final useful data load
 and timer end. In N=6 the same front-end stall occurs before contexts four and
@@ -43,11 +46,12 @@ five finish, leaving only 50 cycles after the final useful load. N=5's complete
 2,710-cycle interval is shorter than this single refill episode, so it avoids
 the event in this executable/cache state.
 
-The practical conclusion is that N=5 is the best measured point but not a
-capacity-derived optimum. Its 1.982x worker/coroutine result is sensitive to
-instruction-cache state, off-path fetch, and layout. It should
-not be generalized as “five shards is optimal” without controlling or removing
-this front-end artifact.
+The benchmark fix makes a parked worker's post-switch path unconditional, as
+required by the contract that it is never resumed. Exact-model A/B checks remove
+3,225 cycles at N=4 (5,904 to 2,679) and 3,228 at N=6 (5,962 to 2,734), while
+N=5 changes only 16 cycles (2,710 to 2,694). Thus the discontinuity was not a
+capacity optimum; it was an artificial terminal-path interaction with a real
+frontend limitation.
 
 ## Evidence qualification
 
@@ -66,7 +70,10 @@ filesystem had only about 189 MiB free. They remain in tmpfs for this session at
 - N=6: `c1a5260b8e1d8c5cbf32be7ec7a89de299b5502f9ee5314821a94c68e95208aa`
 
 The I-cache scan used the real `icache_req_v_lo && icache_req_yumi_li`
-handshake plus `icache_req_critical_li` and `icache_req_last_li`. The optional
+handshake plus `icache_req_critical_li` and `icache_req_last_li`. A first
+event extractor incorrectly emitted at both ends of one asserted handshake
+interval and called them two requests; clock-edge sampling establishes one.
+The optional
 cache-miss recorder was disabled (`cache_miss_trace_p=0`) and its empty output
 was not treated as evidence. Setup also required propagating `TOP` into the
 isolated harness and installing the generated hardware makefile before the
