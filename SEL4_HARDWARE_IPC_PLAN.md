@@ -211,6 +211,10 @@ comparison.
 
 ### Stage 4 — Kernel-authorized hardware endpoint
 
+The concrete version-1 descriptor, atomic outcome, privileged control, and
+revocation contract is fixed in
+[`sel4/BLACKPARROT_RPC_ABI.md`](sel4/BLACKPARROT_RPC_ABI.md).
+
 - Add privileged descriptor installation, revocation, and generation checking.
 - Bind one caller/server endpoint with a resident passive server.
 - Implement hardware call/reply in the adapter and retain automatic software

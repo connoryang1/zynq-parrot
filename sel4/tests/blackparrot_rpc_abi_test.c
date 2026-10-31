@@ -1,0 +1,40 @@
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include "blackparrot_rpc_abi.h"
+
+int main(void)
+{
+    bp_rpc_descriptor_v1_t descriptor = {
+        .version = BP_RPC_ABI_VERSION,
+        .size = BP_RPC_DESCRIPTOR_V1_SIZE,
+        .slot = 0,
+        .request_words = BP_RPC_MAX_WORDS,
+        .reply_words = BP_RPC_MAX_WORDS,
+        .token = UINT64_C(0x123456789abcdef0),
+        .caller_satp = UINT64_C(0x8000000000080200),
+        .server_satp = UINT64_C(0x8000000000080300),
+        .server_entry = UINT64_C(0x10000),
+        .server_sp = UINT64_C(0x20000),
+        .caller_context = 0,
+        .server_context = 1,
+    };
+
+    assert(sizeof(descriptor) == 112);
+    assert(offsetof(bp_rpc_descriptor_v1_t, token) == 16);
+    assert(offsetof(bp_rpc_descriptor_v1_t, caller_satp) == 24);
+    assert(offsetof(bp_rpc_descriptor_v1_t, server_entry) == 40);
+    assert(offsetof(bp_rpc_descriptor_v1_t, caller_badge) == 72);
+    assert(descriptor.caller_satp != descriptor.server_satp);
+    assert(descriptor.request_words <= BP_RPC_MAX_WORDS);
+    assert(descriptor.reply_words <= BP_RPC_MAX_WORDS);
+    assert(BP_RPC_OUTCOME_NOT_STARTED != BP_RPC_OUTCOME_COMPLETED);
+    const uint64_t meta = bp_rpc_reply_meta(4, 7);
+    assert(bp_rpc_reply_meta_valid(meta));
+    assert(bp_rpc_reply_length(meta) == 4);
+    assert(bp_rpc_reply_status(meta) == 7);
+    assert(!bp_rpc_reply_meta_valid(bp_rpc_reply_meta(5, 0)));
+    assert(!bp_rpc_reply_meta_valid(UINT64_C(1) << 16));
+    return 0;
+}

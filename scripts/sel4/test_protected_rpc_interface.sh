@@ -20,3 +20,9 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
     "$project_root/sel4/tests/protected_rpc_dispatch_test.c" \
     -o "$build_dir/protected_rpc_dispatch_test"
 "$build_dir/protected_rpc_dispatch_test"
+
+${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    -I"$project_root/sel4/include" \
+    "$project_root/sel4/tests/blackparrot_rpc_abi_test.c" \
+    -o "$build_dir/blackparrot_rpc_abi_test"
+"$build_dir/blackparrot_rpc_abi_test"
