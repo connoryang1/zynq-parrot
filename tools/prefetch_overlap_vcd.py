@@ -350,8 +350,22 @@ class Transactions:
                     if not self.normal_pending:
                         raise EvidenceError('unmatched normal read response')
                     record = self.normal_pending[0]
-                    if (address, size, wire_tag, msg_type) != tuple(record[key] for key in ('address', 'size', 'slot', 'msg_type')):
-                        raise EvidenceError('normal read response identity mismatch')
+                    # The traced BedRock header can advance to the next
+                    # upstream message while the stream pump is still
+                    # presenting later beats of the current FSM transaction.
+                    # Its address is authoritative on fsm_rev_new only; tag,
+                    # size, and type must remain the current identity on every
+                    # beat.
+                    expected_tail = tuple(record[key]
+                                          for key in ('size', 'slot', 'msg_type'))
+                    observed_tail = (size, wire_tag, msg_type)
+                    if observed_tail != expected_tail or (first and address != record['address']):
+                        raise EvidenceError(
+                            'normal read response identity mismatch observed=%s expected=%s '
+                            'beats=%d first=%d last=%d'
+                            % ((address,) + observed_tail,
+                               (record['address'],) + expected_tail, record['beats'],
+                               first, last))
                     expected = max(1, (1 << size) // self.fill_bytes)
                     if first != (record['beats'] == 0) or last != (record['beats'] + 1 == expected):
                         raise EvidenceError('normal read response boundary/count mismatch')
@@ -459,24 +473,31 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
     clocks = tuple(clocks)
     stops_seen = 0
     stop = False
-    for _, timestamp, values in rising_edges(stream, selected, clocks):
-        for clock in values.get('_rising_clocks', ['clock']):
-            cycle = tracker.cycles[clock]
-            tracker.cycles[clock] += 1
-            try:
-                if clock == 'clock':
-                    tracker.uce(values, cycle, timestamp)
-                elif clock == 'axi_clock':
-                    tracker.axi_edge(values, cycle, timestamp)
-                else:
-                    committed_pc = tracker.be_edge(values, cycle, timestamp)
-                    if committed_pc == stop_pc:
-                        stops_seen += 1
-                        stop = stops_seen == stop_count
-            except EvidenceError as error:
-                raise EvidenceError('%s cycle %d timestamp %d: %s' % (clock, cycle, timestamp, error)) from error
-        if stop:
-            break
+    try:
+        for _, timestamp, values in rising_edges(stream, selected, clocks):
+            for clock in values.get('_rising_clocks', ['clock']):
+                cycle = tracker.cycles[clock]
+                tracker.cycles[clock] += 1
+                try:
+                    if clock == 'clock':
+                        tracker.uce(values, cycle, timestamp)
+                    elif clock == 'axi_clock':
+                        tracker.axi_edge(values, cycle, timestamp)
+                    else:
+                        committed_pc = tracker.be_edge(values, cycle, timestamp)
+                        if committed_pc == stop_pc:
+                            stops_seen += 1
+                            stop = stops_seen == stop_count
+                except EvidenceError as error:
+                    raise EvidenceError('%s cycle %d timestamp %d: %s'
+                                        % (clock, cycle, timestamp, error)) from error
+            if stop:
+                break
+    except EvidenceError as error:
+        if stop_count is not None:
+            raise EvidenceError('%s after %d of %d stop-PC commits'
+                                % (error, stops_seen, stop_count)) from error
+        raise
     if stop_count is not None and stops_seen != stop_count:
         raise EvidenceError('expected %d stop-PC commits, observed %d'
                             % (stop_count, stops_seen))

@@ -8,12 +8,12 @@ Can hardware contexts hide the dependent cold-memory latency of independent bina
 
 This is the algorithmic workload from Gor Nishanov's CppCon 2018 “Nano-coroutines to the Rescue” benchmark: multiple independent binary searches over a sorted index. In the original [`2018_CppCon/src`](https://github.com/GorNishanov/await/tree/master/2018_CppCon/src), `naive.h` performs one binary search, `sm.h` keeps several search frames and rotates among them while prefetching the next midpoint, and `coro.h` expresses the same multi-lookup schedule as one coroutine per search. Our matched batch is the corresponding explicit-state-machine control, the worker mode tests the same idea with BlackParrot context handoffs, and mode 6 now provides a real compiler-generated C++20 coroutine control. The benchmark remains a bare-metal RISC-V adaptation because the original source depends on C++ iterators, `std::vector`, x86 `_mm_prefetch`, and a hosted runtime; direct source reuse would not preserve the target's data, timing, or memory contract.
 
-The BlackParrot adaptation intentionally changes the data and measurement shape: it uses ten deterministic absent-key searches, separate linked 64-byte nodes per shard, aligned 64-bit key/link words that fit the 16-byte hint, explicit cold-data/warm-instruction preparation, and trace-visible BEGIN/END markers. It therefore preserves the lookup/interleaving algorithm, not Gor's exact container layout, compiler output, or reported numbers. It is not a full database engine. A database integration is justified only if this controlled index workload establishes a useful mechanism and identifies which overhead remains.
+The BlackParrot adaptation intentionally changes the data and measurement shape: it provides ten deterministic absent-key searches and selects two through ten at runtime, with separate linked 64-byte nodes per shard, aligned 64-bit key/link words that fit the 16-byte hint, explicit cold-data/warm-instruction preparation, and trace-visible BEGIN/END markers. It therefore preserves the lookup/interleaving algorithm, not Gor's exact container layout, compiler output, or reported numbers. It is not a full database engine. A database integration is justified only if this controlled index workload establishes a useful mechanism and identifies which overhead remains.
 
 ## Workload
 
-- Two through ten absent-key lower-bound queries fan out across the corresponding number of independent sorted index shards. Ten remains the full-capacity case. This preserves Nishanov's multi-lookup decision algorithm while modeling a database/search tier querying independent partitions rather than manufacturing concurrency from one shared root line.
-- Each logical shard has 2,047 entries and an immutable eleven-node search path. Every 64-byte node places the 64-bit midpoint key in one hinted 8-byte word and both 32-bit branch-selected next-node links, packed into one aligned 64-bit load, in the other. This yields eleven dependent cold lines per query and 110 useful key loads in every data mode. The D-cache side buffer consumes each prefetched word once and does not shift subword hits; the benchmark unpacks the selected link in registers.
+- Two through ten absent-key lower-bound queries fan out across the corresponding number of independent sorted index shards. Ten remains the full-capacity case; five is the default selected by the complete simulator sweep below. This preserves Nishanov's multi-lookup decision algorithm while modeling a database/search tier querying independent partitions rather than manufacturing concurrency from one shared root line.
+- Each logical shard has 2,047 entries and an immutable eleven-node search path. Every 64-byte node places the 64-bit midpoint key in one hinted 8-byte word and both 32-bit branch-selected next-node links, packed into one aligned 64-bit load, in the other. This yields eleven dependent cold lines per query, or 22 through 110 useful key loads per data mode. The D-cache side buffer consumes each prefetched word once and does not shift subword hits; the benchmark unpacks the selected link in registers.
 - Even stored keys and odd query keys prevent early equality termination while retaining real data-dependent branch direction.
 - Separate 31-entry shards run every mode before measurement to warm all instruction bodies without consuming measured data.
 - The generated image contains only the 110 measured nodes and 50 warm nodes, rather than a sparse 1.25-MiB array. This avoids simulator-only initialization and cache-scrub work while retaining real data-dependent branch and address selection.
@@ -28,14 +28,14 @@ One ELF/NBF contains every mode. The host patches only `benchmark_mode` before r
 | Mode | Schedule | Purpose |
 | ---: | --- | --- |
 | 0 | Serial demand | Ordinary binary-search baseline with no explicit handoff or prefetch. |
-| 1 | Demand ring | Ten workers calculate a midpoint, switch, then perform the cold load. |
+| 1 | Demand ring | Selected workers calculate a midpoint, switch, then perform the cold load. |
 | 2 | Worker prefetch | Each worker prefetches its midpoint, switches, then consumes it when resumed. |
-| 3 | Matched batch | One explicit state machine issues the same ten midpoint prefetches, then consumes the same ten values. |
-| 4 | Switch-only | The same ten-worker ring and eleven rounds without index accesses. |
+| 3 | Matched batch | One explicit state machine issues one midpoint prefetch per selected query, then consumes the same values. |
+| 4 | Switch-only | The same selected-worker ring and eleven rounds without index accesses. |
 | 5 | Serial prefetch | One context hints and immediately consumes every node, isolating the detached hint path from scheduling overlap. |
 | 6 | C++20 coroutines | One compiler-generated coroutine frame per query; each hints its next node, suspends, and resumes through a round-robin symmetric-transfer scheduler. |
 
-`NANO_WORKERS=2..10` selects the query/shard count without rebuilding the executable. The primary quantities for the extension are `C++ coroutine cycles / worker-prefetch cycles`, `serial-prefetch cycles / worker-prefetch cycles`, and `(worker-prefetch cycles - matched-batch cycles) / matched-batch cycles`. Switch-only is reported as a decomposition control and is not subtracted from another mode.
+`NANO_WORKERS=2..10` selects the query/shard count without rebuilding the executable; the maintained default is five. The primary quantities for the extension are `C++ coroutine cycles / worker-prefetch cycles`, `serial-prefetch cycles / worker-prefetch cycles`, and `(worker-prefetch cycles - matched-batch cycles) / matched-batch cycles`. Switch-only is reported as a decomposition control and is not subtracted from another mode.
 
 ## Matched-state and timing contract
 
@@ -43,9 +43,9 @@ Every mode seeds the same selected inactive contexts, clears the same result rec
 
 Coroutine frames are allocated from a fixed ten-frame pool during `prepare`, before BEGIN, and destroyed after END. The measured coroutine interval therefore includes compiler-generated suspend/resume and scheduling work but excludes frame construction/destruction. It uses the same aligned loads, prefetch primitive, result records, queries, and correctness oracle as the hardware and explicit-state-machine modes; no hosted allocator or exception runtime is linked.
 
-Every data mode publishes and checks each query's lower bound, path checksum, step count, and completion flag. Switch-only publishes through the same result storage with zero data results. A transcript is accepted only when its runtime mode, ten-query count, eleven-level count, program-specific PASS marker, `CORE PASS`, and host `BSG PASS` agree.
+Every data mode publishes and checks each query's lower bound, path checksum, step count, and completion flag. Switch-only publishes through the same result storage with zero data results. A transcript is accepted only when its runtime mode, selected query count, eleven-level count, program-specific PASS marker, `CORE PASS`, and host `BSG PASS` agree.
 
-Trace analysis must report first/last accepted hint, first/last AXI request, first/last response, and first/last consuming load for the measured window. It must also state whether all ten requests in a level were accepted before the first response and compare worker versus batch issue spans under the same capacity and arbitration.
+Trace analysis must report first/last accepted hint, first/last AXI request, first/last response, and first/last consuming load for the measured window. It must also state whether every selected request in a level was accepted before the first response and compare worker versus batch issue spans under the same capacity and arbitration.
 
 ## Commands
 
@@ -56,28 +56,36 @@ make -C testing "$(pwd)/riscv/bp-tests/mt_nano_lookup_benchmark.riscv" \
   NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10
 
 make -C testing run-mt_nano_lookup_benchmark \
-  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=10 TRACE=1 \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=5 TRACE=1 \
   SIM_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10'
 
 codex-skills/bp-memory-interleaving-app/scripts/launch_nano_lookup_matrix.sh \
   logs/nano-lookup-$(date -u +%Y%m%dT%H%M%SZ)
 ```
 
-Run modes serially because they share simulator program, log, and waveform artifacts. Preserve and hash each completed waveform before starting the next mode. The launcher returns immediately, refuses a dirty worktree, holds a simulator lock, and performs the six runs plus trace analysis in the background. `NANO_ANALYZE=0` archives all rows first when faster simulator turnaround matters; trace analysis can then operate on the closed waveforms.
+Run modes serially because they share simulator program and log artifacts. Waveforms are written directly into each artifact directory and hashed before starting the next mode. The launcher returns immediately, refuses a dirty worktree, holds a simulator lock, and performs the seven runs plus trace analysis in the background. `NANO_ANALYZE=0` archives all rows first when faster simulator turnaround matters; trace analysis can then operate on the closed waveforms.
 
 ## Results and status
 
-The C++20 extension's untraced simulator screening used the same combined executable and synthetic 200-cycle AXI configuration at 2, 6, 8, 9, and 10 active queries. These rows are tuning diagnostics, not the final trace-qualified result:
+The C++20 extension's untraced simulator screening used the same combined executable and synthetic 200-cycle AXI configuration across every supported active-query count. These rows are tuning diagnostics, not a final trace-qualified result; validated transcripts and hashes are under `logs/nano-cpp-coroutines-20261031/`:
 
-| Queries | Worker prefetch | Serial prefetch | C++20 coroutine | Coroutine / worker | Serial / worker |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 2 | 2,624 | 5,104 | 2,929 | 1.116x | 1.945x |
-| 6 | 5,962 | 15,244 | 6,429 | 1.078x | 2.557x |
-| 8 | 6,050 | 20,327 | 8,579 | 1.418x | 3.360x |
-| 9 | 6,274 | 22,852 | 9,644 | 1.537x | 3.643x |
-| 10 | 6,624 | 25,396 | 11,171 | 1.686x | 3.834x |
+| Queries | Worker prefetch | C++20 coroutine | Coroutine / worker | Worker cycles / useful load |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 2,624 | 2,929 | 1.116x | 119.3 |
+| 3 | 2,644 | 3,247 | 1.228x | 80.1 |
+| 4 | 5,904 | 4,307 | 0.729x | 134.2 |
+| **5** | **2,710** | **5,372** | **1.982x** | **49.3** |
+| 6 | 5,962 | 6,429 | 1.078x | 90.3 |
+| 7 | 6,014 | 7,486 | 1.245x | 78.1 |
+| 8 | 6,050 | 8,579 | 1.418x | 68.8 |
+| 9 | 6,274 | 9,644 | 1.537x | 63.4 |
+| 10 | 6,624 | 10,717 | 1.618x | 60.2 |
 
-Ten is the best tested setting for the intended throughput comparison: worker cost per useful load falls from 119.3 cycles at two queries to 60.2 at ten, and ten gives the largest measured advantage over both controls. The non-monotonic ratio at six queries is why the selected count is based on an explicit sweep rather than assumed from queue capacity. The final N=10 hardware/coroutine/batch controls still require a clean trace-qualified matrix from the committed extension before these diagnostic numbers become an accepted result.
+Five is the best setting for the intended hardware-versus-coroutine comparison: the worker uses 49.6% fewer cycles, a 1.982x speedup, and also has the lowest cost per useful load. Ten is still useful as the full-capacity case, but its current-build advantage is only 1.618x. The sharp four-query regression and recovery at five show that request/response phase alignment matters; queue capacity alone does not predict the optimum.
+
+A committed N=10 trace-enabled diagnostic independently passed result, checksum, guest, core, and host checks at 6,624 worker cycles and 10,717 coroutine cycles (1.618x). Its FST is deliberately rejected as trace-qualified evidence: the known post-PASS GPIO shutdown assertion left the converted waveform with a nonmonotonic timestamp before backend commit signals were emitted, so the analyzer could not prove all eight committed windows or the 110 consuming loads. A separate earlier coroutine diagnostic did observe 110 accepted hints and 110 consuming loads, but used a superseded executable and is not substituted for the rejected final trace. The performance sweep therefore remains transcript-qualified simulation evidence, not a new accepted waveform claim.
+
+Separate address spaces are not expected to make this kernel faster by themselves. They add `satp`/ASID state, TLB pressure, and possible page walks; their value is isolation and demonstrating that hardware contexts preserve overlap across independent translations. A matched extension should compare one address space against per-worker Sv39 page tables in two forms: shared physical index pages to isolate translation cost, and private physical copies to include cache effects. Each needs warm-DTLB and cold-DTLB variants. Running ordinary OS processes would additionally measure kernel scheduling and IPC and is therefore a different benchmark from the current bare-metal coroutine comparison.
 
 The first sharded five-mode pilot used a 64-bit key and two 64-bit links. Its detached hint fetched only 16 bytes, leaving the `next_if_value_ge` link outside the hinted region. The worker consequently made 110 hint requests plus 1,040 ordinary AXI reads, while the batch made 110 hints plus 902 ordinary reads. A first compact-node smoke then used a 32-bit key followed by two 32-bit links; it passed correctness in 198,996 cycles but still made 60 ordinary UCE fills (960 AXI reads). The key and `next_if_value_less` shared one 8-byte side-buffer word, which is consumed by the first key load. A second layout packed the links as two 32-bit fields in the second word and finished the measured interval in about 3,800 cycles, but failed the result oracle: the side-buffer hit path does not shift the second half of a subword load. None of these is an accepted latency-overlap result.
 

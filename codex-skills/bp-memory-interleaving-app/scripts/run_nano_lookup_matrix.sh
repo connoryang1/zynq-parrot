@@ -7,7 +7,7 @@ sim_dir="$repo_root/cosim/black-parrot-minimal-example/verilator"
 elf="$repo_root/riscv/bp-tests/mt_nano_lookup_benchmark.riscv"
 toolchain=${ZP_INSTALL_DIR:-/home/coyang/zynq-parrot/install}
 modes=${NANO_MODES:-"0 1 2 3 4 5 6"}
-workers=${NANO_WORKERS:-10}
+workers=${NANO_WORKERS:-5}
 sim_defines=${NANO_SIM_DEFINES:-"BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10"}
 
 mkdir -p "$artifact_root"

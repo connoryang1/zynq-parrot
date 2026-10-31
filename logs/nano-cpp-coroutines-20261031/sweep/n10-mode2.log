@@ -1,0 +1,79 @@
+make: Entering directory '/home/coyang/zynq-parrot-nano-lookup/testing'
+  [CC]    Compiling mt_nano_lookup_benchmark.riscv (Threads: 2)...
+  [CLEAN] Refreshing mt_nano_lookup_benchmark environment...
+  [RUN]   Executing mt_nano_lookup_benchmark in simulator...
+BSG-INFO:    ps.cpp: reading three base registers
+BSG-INFO:    ps.cpp: reset(lo)=0, dram_init=0, dram_base=0
+BSG-INFO:    ps.cpp: attempting to write and read register 0x8
+BSG-INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+BSG-INFO:    Creating host: 0x7fff5761efd0 40000030 40000028
+BSG-INFO:    Setting non-blocking terminal mode
+BSG-INFO:    ps.cpp: CSRs do not contain a DRAM base pointer; calling allocate dram with size 134217728
+BSG-INFO:      bsg_zynq_pl: Allocated dummy DRAM
+BSG-INFO:    ps.cpp: received 0x7fec006aa000 (phys = 7fec006aa000)
+BSG-INFO:    ps.cpp: wrote and verified base register
+BSG-INFO:    ps.cpp: beginning config
+BSG-INFO:    ps.cpp: beginning nbf load
+BSG-INFO:    ps.cpp: NBF file has 6139 lines. Starting load...
+BSG-INFO:    ps.cpp: NBF Load Progress: 0%
+BSG-INFO:    ps.cpp: NBF Load Progress: 5%
+BSG-INFO:    ps.cpp: NBF Load Progress: 10%
+BSG-INFO:    ps.cpp: NBF Load Progress: 15%
+BSG-INFO:    ps.cpp: NBF Load Progress: 20%
+BSG-INFO:    ps.cpp: NBF Load Progress: 25%
+BSG-INFO:    ps.cpp: NBF Load Progress: 30%
+BSG-INFO:    ps.cpp: NBF Load Progress: 35%
+BSG-INFO:    ps.cpp: NBF Load Progress: 40%
+BSG-INFO:    ps.cpp: NBF Load Progress: 45%
+BSG-INFO:    ps.cpp: NBF Load Progress: 50%
+BSG-INFO:    ps.cpp: NBF Load Progress: 55%
+BSG-INFO:    ps.cpp: NBF Load Progress: 60%
+BSG-INFO:    ps.cpp: NBF Load Progress: 65%
+BSG-INFO:    ps.cpp: NBF Load Progress: 70%
+BSG-INFO:    ps.cpp: NBF Load Progress: 75%
+BSG-INFO:    ps.cpp: NBF Load Progress: 80%
+BSG-INFO:    ps.cpp: NBF Load Progress: 85%
+BSG-INFO:    ps.cpp: NBF Load Progress: 90%
+BSG-INFO:    ps.cpp: NBF Load Progress: 95%
+BSG-INFO:    ps.cpp: NBF Load Progress: 100%
+BSG-INFO:    ps.cpp: runtime patch address=0x8000bc78 value=0xa02
+BSG-INFO:    ps.cpp: NBF load took 58.707806 seconds
+ps.cpp: Heartbeat - Retired 12298 instructions...
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=143 time_ps=112427050000 cycle=2248541
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=144 time_ps=115114450000 cycle=2302289
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=128 time_ps=124180150000 cycle=2483603
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=145 time_ps=124984150000 cycle=2499683
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=129 time_ps=125879050000 cycle=2517581
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=146 time_ps=126038050000 cycle=2520761
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=130 time_ps=126128350000 cycle=2522567
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=147 time_ps=126284050000 cycle=2525681
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=131 time_ps=128362150000 cycle=2567243
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=148 time_ps=128517550000 cycle=2570351
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=132 time_ps=128561050000 cycle=2571221
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=149 time_ps=128686150000 cycle=2573723
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=133 time_ps=128754250000 cycle=2575085
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=150 time_ps=129921250000 cycle=2598425
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=134 time_ps=130991950000 cycle=2619839
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=98 time_ps=131479450000 cycle=2629589
+BSG-INFO:    CTXTSW_GLOBAL_MARKER id=114 time_ps=131811250000 cycle=2636225
+Benchmark: NANO_LOOKUP mode=0x0000000000000002 queries=0x000000000000000a levels=0x000000000000000b cycles=0x00000000000019e0 checksum=0x0000000000036f24
+Mode: worker prefetch; checks: pass
+[BSG-PASS] Nano-style binary index lookups
+BSG-INFO:    CORE PASS
+BSG-INFO:    ps.cpp: end polling i/o
+BSG-INFO:    ps.cpp: minstret (instructions retired):                0 (               0)
+BSG-INFO:    ps.cpp: minstret (instructions retired):            44571 (            ae1b)
+BSG-INFO:    ps.cpp: minstret delta:                             44571 (            ae1b)
+BSG-INFO:    ps.cpp: wall clock time                :     276802607625 (      4072b89a09) ns
+BSG-INFO:      bsg_zynq_pl: done() called, exiting
+BSG-INFO:    Restoring terminal settings
+BSG-INFO:    Returning from ps_main with RC: 0
+BSG-INFO:    BSG PASS
+[134694850000] %Fatal: bsg_nonsynth_dpi_gpio.sv:64: Assertion failed in TOP.bsg_nonsynth_zynq/bin/bash: line 1: 395875 Aborted                 (core dumped) BSG_RUNTIME_PATCH_ADDR='0x000000008000bc78' BSG_RUNTIME_PATCH_VALUE='2562' ./obj_dir/Vbsg_nonsynth_zynq_testbench +c_args=prog.nbf 2>&1
+     395876 Done                    | tee -i run.log
+make[1]: *** [/home/coyang/zynq-parrot-nano-lookup/cosim/mk/Makefile.verilator:40: run] Error 134
+_testbench.axil0.aclk_gpio: BSG ERROR (TOP.bsg_nonsynth_zynq_testbench.axil0.aclk_gpio): final block executed before fini() was called
+%Error: /home/coyang/zynq-parrot-nano-lookup/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv:64: Verilog $stop
+Aborting...
+VALID RUN: guest and host PASS
+make: Leaving directory '/home/coyang/zynq-parrot-nano-lookup/testing'

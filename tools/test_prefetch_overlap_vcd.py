@@ -149,6 +149,18 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(report['normal_request_summary']['count'], 1)
         self.assertEqual(report['normal_request_summary']['by_msg_type'], {'0': 1})
 
+    def test_later_normal_response_beats_ignore_advanced_header_address(self):
+        samples = case()
+        samples[16]['rev_address'] = 0x80008040
+        report = self.analyze(samples)
+        self.assertEqual(report['normal_reads'][0]['beats'], 8)
+
+        samples = case()
+        samples[12]['rev_address'] = 0x80008040
+        with self.assertRaisesRegex(analyzer.EvidenceError,
+                                    'normal read response identity mismatch'):
+            self.analyze(samples)
+
     def test_different_clock_phases_sample_their_own_edges(self):
         report = self.analyze(axi=True)
         self.assertEqual(report['prefetches'][0]['issue'], dict(cycle=1, timestamp=25))
