@@ -1,0 +1,199 @@
+{
+  "purpose": "Extend the accepted disabled/16-line comparison with an 8-line size point, a causally post-trigger 14-line table, and explicit rejected-run outcomes.",
+  "pooled_controls": {
+    "disabled_samples": 100,
+    "disabled_median": 18007.0,
+    "old_prefix16_samples": 100,
+    "old_prefix16_median": 15661.5
+  },
+  "prefix8": {
+    "path": "prefix8-summary50.log",
+    "sha256": "d74af967b2f354ab7da31528ad5f02432d7276b300026f40e13fd1994a070515",
+    "samples": 50,
+    "elapsed": [
+      20878,
+      11221,
+      14534,
+      12216,
+      11299,
+      12438,
+      38360,
+      11379,
+      14172,
+      12519,
+      14536,
+      33840,
+      59917,
+      11014,
+      38331,
+      12508,
+      12321,
+      41087,
+      17724,
+      49368,
+      48002,
+      12359,
+      37236,
+      38372,
+      67993,
+      17573,
+      12171,
+      12489,
+      12426,
+      56458,
+      11276,
+      17308,
+      39008,
+      12525,
+      16372,
+      12443,
+      59249,
+      37723,
+      18170,
+      39434,
+      11098,
+      37958,
+      17387,
+      12400,
+      42002,
+      36117,
+      39522,
+      17506,
+      38480,
+      36308
+    ],
+    "median": 17539.5,
+    "mean": 26340.54,
+    "q1": 12439.25,
+    "q3": 38369.0,
+    "minimum": 11014,
+    "maximum": 67993,
+    "i_count_median": 155.0,
+    "i_count_mean": 147.3,
+    "d_count_median": 12.5,
+    "d_count_mean": 16.64,
+    "i_overflows": 19,
+    "versus_disabled": {
+      "median_difference": -467.5,
+      "median_ratio": 0.9740378741600488,
+      "bootstrap": {
+        "resamples": 100000,
+        "difference_ci95": [
+          -19571.0,
+          18922.0
+        ],
+        "fraction_first_faster": 0.61563
+      }
+    },
+    "versus_old_prefix16": {
+      "median_difference": 1878.0,
+      "median_ratio": 1.1199118858346901,
+      "bootstrap": {
+        "resamples": 100000,
+        "difference_ci95": [
+          -2194.5,
+          21927.0
+        ],
+        "fraction_first_faster": 0.11487
+      }
+    }
+  },
+  "post_trigger_tail14": {
+    "path": "prefix14-tail-summary50.log",
+    "sha256": "67eec57805fd5908c7b1c3c07240f6297e67354d98bdb5a899c8345708214e20",
+    "samples": 50,
+    "elapsed": [
+      21419,
+      38252,
+      48982,
+      11809,
+      36959,
+      37914,
+      38248,
+      11129,
+      34483,
+      10219,
+      18609,
+      48149,
+      19984,
+      37537,
+      12211,
+      36713,
+      39462,
+      11207,
+      10863,
+      37001,
+      36635,
+      12055,
+      10012,
+      12315,
+      14339,
+      69955,
+      38203,
+      12263,
+      37539,
+      14410,
+      36576,
+      10208,
+      66103,
+      51794,
+      40142,
+      37684,
+      13285,
+      38173,
+      10914,
+      66068,
+      12411,
+      10986,
+      11151,
+      11141,
+      10021,
+      11059,
+      10786,
+      19173,
+      11121,
+      42556
+    ],
+    "median": 19578.5,
+    "mean": 26804.56,
+    "q1": 11165.0,
+    "q3": 38108.25,
+    "minimum": 10012,
+    "maximum": 69955,
+    "i_count_median": 141.5,
+    "i_count_mean": 148.28,
+    "d_count_median": 17.5,
+    "d_count_mean": 21.06,
+    "i_overflows": 22,
+    "versus_disabled": {
+      "median_difference": 1571.5,
+      "median_ratio": 1.087271616593547,
+      "bootstrap": {
+        "resamples": 100000,
+        "difference_ci95": [
+          -19206.0,
+          20115.0
+        ],
+        "fraction_first_faster": 0.38446
+      }
+    },
+    "versus_old_prefix16": {
+      "median_difference": 3917.0,
+      "median_ratio": 1.2501037576221945,
+      "bootstrap": {
+        "resamples": 100000,
+        "difference_ci95": [
+          -3846.5,
+          23489.0
+        ],
+        "fraction_first_faster": 0.20958
+      }
+    }
+  },
+  "rejected_runs": {
+    "prefix12": "target-runtime limit during guest ELF transfer; no timing samples",
+    "prefix20": "errant physical write 0x17bea8 after four valid samples",
+    "prefix32_first": "kernel init executables failed with error -80 before benchmark",
+    "prefix32_retry": "guest prompt loss during ELF transfer; no timing samples"
+  }
+}

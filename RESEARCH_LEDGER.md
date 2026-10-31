@@ -574,6 +574,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** replay correctness, timeliness, and demand-miss elimination are not enough at this trigger point; this four-address instruction target contributes too little relative to a noisy roughly 14.5k-cycle handoff. Exact prefix-size tuning is exhausted. The next performance experiment should change lead time or target class rather than add more points to this sweep.
 - **Limits:** `i_overflow` means only that the miss record is incomplete; elapsed endpoints remain valid. The previous seven-sample non-overflow median was selection-biased because overflow is correlated with long intervals and is superseded. The workload remains a synthetic futex handoff, not an application benchmark, and the result does not reject data replay, a pre-switch software hint, or per-task application footprints.
 
+### RL-062 — Larger detached prefixes expose unsafe refresh behavior without closing a speedup
+
+- **Status:** accepted physical negative performance result plus correctness rejection
+- **Scope:** routed top `3a08584d` / BlackParrot `b1a065281`, exact kernel build #8 and benchmark ELF, pooled replicated disabled/old-16-line batches, accepted 8-line and post-trigger-tail 14-line batches, rejected 12/20/32-line runs, and a new complete replay-disabled kernel-#8 trace
+- **Claim:** the old 16-line table retains the best pooled point estimate at 15,661.5 versus 18,007 disabled cycles (-13.0%), but its 95% bootstrap interval remains `[-21,576.5, +1,401.5]`. Eight lines is effectively neutral at 17,539.5 cycles, and a 14-line table containing only privileged lines observed after the actual scheduler trigger is slower at 19,578.5 cycles. The 12-line run stalls during guest transfer, the 20-line run issues an errant physical write to `0x17bea8` after four samples, and two 32-line attempts respectively panic at init and lose guest progress during transfer. No rejected run contributes timing data.
+- **Evidence:** exact hashes, complete accepted/rejected transcripts, deterministic analyzers, and build guardrails in `logs/linux-prefix16-best-case-20261031/`.
+- **Meaning:** count/address tuning is exhausted for the current trigger and refresh policy. The UCE deduplicates only live request slots; after a response retires, the frontend retains the completed line but the next switch refetches it. Repeated refresh both wastes bandwidth and temporarily withdraws the entry while new beats assemble, providing a concrete next correctness/performance target.
+- **Limits:** the physical failures are not a monotonic prefix-count threshold and have not been reproduced in simulation. Resident-refresh suppression is an architectural diagnosis from the implemented lifetime rules, not yet a confirmed root cause for the errant write. The futex handoff remains noisy and does not bound an earlier software hint or data-footprint replay.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -626,8 +635,8 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 ### OQ-005 — Should the large design use background replay or cache-state retention?
 
 - **Known:** RL-049 resolves mechanism priority for the recorded Linux handoff: direction-specific early shared replay makes 175 unique lines timely under the primary case, while the single fixed table matching RL-051 still makes 171 unique lines and 173/266 records timely; trained four-line retention contributes only six timely unique lines. RL-050 implements the conservative four-slot physical I-cache lane and proves full-line installation, demand-priority abort, and `fence.i` drain-without-publication. RL-051 adds a 256-entry M-configured table and proves an address-free one-write S-mode trigger through the full core. Retention remains appropriate for five-cycle hardware handoffs and as a small immediate-line complement. RL-018 through RL-034 retain the capacity, pollution, queue-correctness, and installer evidence behind that choice.
-- **Missing:** RL-056 identifies why RL-055's lock never reached the physical frontend and corrects the exact demand-priority configuration. That exported-lock fix now needs route/FPGA acceptance, followed by issued/timely/consumed/unused/dropped/demand-delay counters, physical full-line timing, and broader target/prefix stability.
-- **Decisive experiment:** route the RL-056 demand-priority lock fix, require the one-line image to reach the shell, then require the exact 63-line enabled image to reach the shell and complete the trace. Only then repeat the byte-identical disabled fresh-boot trace and interpret cycles.
+- **Missing:** RL-062 shows that the detached-buffer implementation can complete matched Linux batches but is not stable under the broader 12/20/32-line sweep. It also refetches lines already complete in the frontend buffer because completed residency is not visible to UCE admission. Resident-drop/refresh/completed-hit/demand-delay counters and a repeated-trigger simulation discriminator are still absent.
+- **Decisive experiment:** add completed-buffer residency feedback or an equivalent epoch-safe refresh policy, then require a focused repeated-trigger test to preserve completed lines, suppress redundant memory requests, invalidate on `fence.i`, and execute concurrent demand fetches without corruption. Only after clean full-core and sustained Linux correctness should the matched disabled/16-line timing comparison be repeated.
 
 ### OQ-006 — Can target instruction prefetch overlap context restore without delaying demand fetch?
 
@@ -644,7 +653,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, route RL-058's detached 16-line instruction buffer and require clean timing/fit. Then use the exact one-line Linux image as the first fresh-board shell gate, followed by a bounded high-value prefix that fits the buffer and the byte-identical replay-disabled control. Interpret cycles only from matched fresh boots after both enabled cases reach the shell; then add timely/late/consumed/unused/drop and demand-delay counters rather than returning to another abstract replay model.
+For the cache-resume architecture, stop prefix-size tuning and make completed-buffer residency part of replay admission. First add a focused repeated-trigger test and counters for resident drops, refreshes, completed hits, and demand delay; require `fence.i` to clear the residency epoch and require concurrent demand execution to remain correct. Rerun sustained Linux only after those simulation gates pass, using the exact disabled and old-16-line images as controls.
 
 ## Delta log
 
