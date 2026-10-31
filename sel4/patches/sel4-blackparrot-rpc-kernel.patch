@@ -1,0 +1,131 @@
+diff --git a/src/arch/riscv/kernel/vspace.c b/src/arch/riscv/kernel/vspace.c
+index 1bbb40364..888522468 100644
+--- a/src/arch/riscv/kernel/vspace.c
++++ b/src/arch/riscv/kernel/vspace.c
+@@ -26,6 +26,9 @@
+ #include <plat/machine/hardware.h>
+ #include <kernel/stack.h>
+ #include <util.h>
++#ifdef CONFIG_PLAT_BLACKPARROT
++#include <plat/machine/rpc.h>
++#endif
+
+ struct resolve_ret {
+     paddr_t frameBase;
+@@ -444,6 +447,10 @@ void deleteASIDPool(asid_t asid_base, asid_pool_t *pool)
+     /* Haskell error: "ASID pool's base must be aligned" */
+     assert(IS_ALIGNED(asid_base, asidLowBits));
+
++#ifdef CONFIG_PLAT_BLACKPARROT
++    bp_rpc_revoke_asid_pool(asid_base);
++#endif
++
+     if (riscvKSASIDTable[ASID_HIGH(asid_base)] == pool) {
+         riscvKSASIDTable[ASID_HIGH(asid_base)] = NULL;
+         setVMRoot(NODE_STATE(ksCurThread));
+@@ -493,6 +500,9 @@ static exception_t performASIDPoolInvocation(asid_t asid, asid_pool_t *poolPtr,
+
+ void deleteASID(asid_t asid, pte_t *vspace)
+ {
++#ifdef CONFIG_PLAT_BLACKPARROT
++    bp_rpc_revoke_asid(asid);
++#endif
+     asid_pool_t *poolPtr;
+
+     poolPtr = riscvKSASIDTable[ASID_HIGH(asid)];
+@@ -505,6 +515,9 @@ void deleteASID(asid_t asid, pte_t *vspace)
+
+ void unmapPageTable(asid_t asid, vptr_t vptr, pte_t *target_pt)
+ {
++#ifdef CONFIG_PLAT_BLACKPARROT
++    bp_rpc_revoke_asid(asid);
++#endif
+     findVSpaceForASID_ret_t find_ret = findVSpaceForASID(asid);
+     if (unlikely(find_ret.status != EXCEPTION_NONE)) {
+         /* nothing to do */
+@@ -554,6 +567,9 @@ static pte_t pte_pte_invalid_new(void)
+
+ void unmapPage(vm_page_size_t page_size, asid_t asid, vptr_t vptr, pptr_t pptr)
+ {
++#ifdef CONFIG_PLAT_BLACKPARROT
++    bp_rpc_revoke_asid(asid);
++#endif
+     findVSpaceForASID_ret_t find_ret;
+     lookupPTSlot_ret_t  lu_ret;
+
+diff --git a/src/object/objecttype.c b/src/object/objecttype.c
+index e6c603623..aa9295ee9 100644
+--- a/src/object/objecttype.c
++++ b/src/object/objecttype.c
+@@ -29,6 +29,9 @@
+ #include <machine.h>
+ #include <util.h>
+ #include <string.h>
++#ifdef CONFIG_PLAT_BLACKPARROT
++#include <plat/machine/rpc.h>
++#endif
+
+ word_t getObjectSize(word_t t, word_t userObjSize)
+ {
+@@ -112,6 +115,10 @@ finaliseCap_ret_t finaliseCap(cap_t cap, bool_t final, bool_t exposed)
+     switch (cap_get_capType(cap)) {
+     case cap_endpoint_cap:
+         if (final) {
++#ifdef CONFIG_PLAT_BLACKPARROT
++            bp_rpc_finalise_endpoint(
++                EP_PTR(cap_endpoint_cap_get_capEPPtr(cap)));
++#endif
+             cancelAllIPC(EP_PTR(cap_endpoint_cap_get_capEPPtr(cap)));
+         }
+
+@@ -186,6 +193,9 @@ finaliseCap_ret_t finaliseCap(cap_t cap, bool_t final, bool_t exposed)
+             cte_t *cte_ptr;
+
+             tcb = TCB_PTR(cap_thread_cap_get_capTCBPtr(cap));
++#ifdef CONFIG_PLAT_BLACKPARROT
++            bp_rpc_finalise_tcb(tcb);
++#endif
+             SMP_COND_STATEMENT(remoteTCBStall(tcb);)
+             cte_ptr = TCB_PTR_CTE_PTR(tcb, tcbCTable);
+             unbindNotification(tcb);
+@@ -660,6 +670,13 @@ exception_t decodeInvocation(word_t invLabel, word_t length,
+             return EXCEPTION_SYSCALL_ERROR;
+         }
+
++#ifdef CONFIG_PLAT_BLACKPARROT
++        if (bp_rpc_is_endpoint_invocation(invLabel)) {
++            return bp_rpc_decode_endpoint_invocation(invLabel, length, cap,
++                                                      call, buffer);
++        }
++#endif
++
+         setThreadState(NODE_STATE(ksCurThread), ThreadState_Restart);
+ #ifdef CONFIG_KERNEL_MCS
+         return performInvocation_Endpoint(
+diff --git a/src/object/tcb.c b/src/object/tcb.c
+index 6bfcdd7fa..e071e1a64 100644
+--- a/src/object/tcb.c
++++ b/src/object/tcb.c
+@@ -26,6 +26,9 @@
+ #include <string.h>
+ #include <stdint.h>
+ #include <arch/smp/ipi_inline.h>
++#ifdef CONFIG_PLAT_BLACKPARROT
++#include <plat/machine/rpc.h>
++#endif
+
+ #define NULL_PRIO 0
+
+@@ -1797,6 +1800,12 @@ exception_t invokeTCB_ThreadControl(tcb_t *target, cte_t *slot,
+     exception_t e;
+     cap_t tCap = cap_thread_cap_new((word_t)target);
+
++#ifdef CONFIG_PLAT_BLACKPARROT
++    if (updateFlags & thread_control_update_space) {
++        bp_rpc_tcb_vspace_change(target);
++    }
++#endif
++
+     if (updateFlags & thread_control_update_space) {
+         target->tcbFaultHandler = faultep;
+     }

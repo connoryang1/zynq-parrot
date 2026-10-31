@@ -1,8 +1,12 @@
 #ifndef BLACKPARROT_RPC_ABI_H
 #define BLACKPARROT_RPC_ABI_H
 
-#include <stddef.h>
 #include <stdint.h>
+
+/* seL4's freestanding stdint.h provides the types but not this C99 macro. */
+#ifndef UINT64_C
+#define UINT64_C(value) value##ULL
+#endif
 
 /* Private seL4/OpenSBI/BlackParrot boundary; not an application API. */
 #define BP_RPC_ABI_VERSION 1u
@@ -18,6 +22,9 @@
 #define BP_RPC_REPLY_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_STATUS_SHIFT 8u
 #define BP_RPC_REPLY_META_STATUS_MASK (UINT64_C(0xff) << BP_RPC_REPLY_META_STATUS_SHIFT)
+#define BP_RPC_SEL4_BIND_LABEL UINT64_C(0x42505201)
+#define BP_RPC_SEL4_UNBIND_LABEL UINT64_C(0x42505202)
+#define BP_RPC_SEL4_BIND_ARGUMENTS 5u
 
 typedef enum {
     BP_RPC_OUTCOME_COMPLETED = 0,
@@ -107,6 +114,12 @@ static inline uint64_t bp_rpc_config_word(
            | ((uint64_t)server_context << BP_RPC_CONFIG_SERVER_CONTEXT_SHIFT);
 }
 
+static inline uint64_t bp_rpc_sel4_counts(uint8_t request_words,
+                                          uint8_t reply_words)
+{
+    return (uint64_t)request_words | ((uint64_t)reply_words << 8);
+}
+
 /*
  * Fixed little-endian RV64 image copied by the M-mode installer before the
  * descriptor becomes visible. Reserved fields and flags must be zero.
@@ -144,7 +157,7 @@ static inline int bp_rpc_user_address_valid(uint64_t address)
 static inline int bp_rpc_descriptor_v1_valid(
     const bp_rpc_descriptor_v1_t *descriptor)
 {
-    if (descriptor == NULL
+    if (descriptor == (void *)0
         || descriptor->version != BP_RPC_ABI_VERSION
         || descriptor->size != BP_RPC_DESCRIPTOR_V1_SIZE
         || descriptor->flags != 0 || descriptor->slot != 0
@@ -166,7 +179,7 @@ static inline int bp_rpc_descriptor_v1_valid(
         || !bp_rpc_user_address_valid(descriptor->server_tp)) {
         return 0;
     }
-    for (size_t index = 0; index < 3; index++) {
+    for (unsigned int index = 0; index < 3; index++) {
         if (descriptor->reserved1[index] != 0) {
             return 0;
         }
@@ -215,6 +228,7 @@ static inline int bp_rpc_reply_meta_valid(uint64_t meta)
 }
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#include <stddef.h>
 _Static_assert(sizeof(bp_rpc_descriptor_v1_t) == BP_RPC_DESCRIPTOR_V1_SIZE,
                "protected-RPC descriptor ABI size changed");
 _Static_assert(offsetof(bp_rpc_descriptor_v1_t, token) == 16,

@@ -13,6 +13,7 @@ build_dir=$2
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_root=$(realpath "$script_dir/../..")
 validation_patch="$project_root/sel4/patches/sel4test-blackparrot-rpc-validation.patch"
+kernel_patch="$project_root/sel4/patches/sel4-blackparrot-rpc-kernel.patch"
 
 command -v cmake >/dev/null || { echo "cmake is not on PATH" >&2; exit 1; }
 command -v ninja >/dev/null || { echo "ninja is not on PATH" >&2; exit 1; }
@@ -20,14 +21,26 @@ command -v ninja >/dev/null || { echo "ninja is not on PATH" >&2; exit 1; }
 "$script_dir/materialize_sel4test_ipc_baseline.sh" "$checkout"
 "$script_dir/materialize_blackparrot_platform.sh" "$checkout"
 
-if git -C "$checkout/projects/sel4test" apply --reverse --check "$validation_patch" 2>/dev/null; then
-    : # already applied
-elif git -C "$checkout/projects/sel4test" apply --check "$validation_patch"; then
-    git -C "$checkout/projects/sel4test" apply "$validation_patch"
-else
-    echo "cannot apply BlackParrot RPC validation patch" >&2
+apply_patch_once()
+{
+    repository=$1
+    patch=$2
+    description=$3
+    if git -C "$repository" apply --reverse --check "$patch" 2>/dev/null; then
+        return
+    fi
+    if git -C "$repository" apply --check "$patch"; then
+        git -C "$repository" apply "$patch"
+        return
+    fi
+    echo "cannot apply $description" >&2
     exit 1
-fi
+}
+
+apply_patch_once "$checkout/kernel" "$kernel_patch" \
+    "BlackParrot protected-RPC kernel patch"
+apply_patch_once "$checkout/projects/sel4test" "$validation_patch" \
+    "BlackParrot RPC validation patch"
 
 mkdir -p "$build_dir"
 build_dir=$(realpath "$build_dir")

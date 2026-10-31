@@ -45,7 +45,11 @@ region/offset/length references using the server's local address, mutates the
 shared words, and verifies private state remains isolated. It also proves that
 an overflowing range and unknown region fail closed, forced hardware reports
 `UNSUPPORTED` without contacting the server, and forced software reports the
-software path.
+software path. On BlackParrot, the same test additionally binds a second
+blocked server through the kernel, executes 256 forced hardware calls, unbinds
+it, and invokes the same sum service once through ordinary endpoint IPC. This
+last path is built but remains runtime evidence pending the cycle-accurate
+full-system acceptance run.
 
 Materialize the test into a pinned sel4test checkout:
 
@@ -141,10 +145,10 @@ the safe-to-fallback state may invoke the software backend. A separate
 "eligible?" probe is intentionally excluded because endpoint state,
 revocation, or scheduling eligibility could change between a probe and a call.
 
-The current BlackParrot primitive can carry four request words but only one
-reply word and one fixed descriptor. Supporting the complete interface
-therefore requires hardware generalization; the adapter must reject or use
-ordinary seL4 IPC for unsupported reply shapes rather than truncate them.
+The current BlackParrot primitive carries up to four request and four reply
+words in one fixed descriptor. General endpoint queues, capability transfer,
+multiple simultaneous bindings, blocking services, and server faults remain
+outside version 1 and must take ordinary seL4 IPC before execution begins.
 
 ## Ordinary seL4 backend
 
@@ -173,9 +177,35 @@ attempt then maps completed, non-started, revoked, and committed-failure
 outcomes into the existing fallback state machine. Its host-injected
 architecture test covers reply decoding and proves that only a definitely
 non-started attempt can reach the software backend. The atomically published
-RTL descriptor and bare-metal call/return transport are now implemented and
-tested, but sel4test still selects the hardware stub until the Stage 4 kernel
-binding authorizes, constructs, installs, and revokes a resident server.
+RTL descriptor and bare-metal call/return transport are implemented and
+tested. Generic/QEMU builds select the non-executed hardware stub;
+BlackParrot builds select the real CSR backend and the kernel binding wrapper.
+
+## Experimental seL4 kernel binding
+
+The pinned kernel patch in
+[`patches/sel4-blackparrot-rpc-kernel.patch`](patches/sel4-blackparrot-rpc-kernel.patch)
+adds two private endpoint invocation labels. `BIND` requires the endpoint's
+send authority plus one server-TCB extra cap. The kernel requires that TCB to
+be the endpoint's sole blocked receiver, derives both SATPs and the endpoint
+badge, validates a fixed entry/SP/GP/TP and bounded word counts, generates a
+fresh token, and installs the descriptor through OpenSBI. `UNBIND` is accepted
+only from the recorded caller through the recorded endpoint.
+
+The trusted wrapper in `src/protected_rpc_blackparrot_sel4.c` converts that
+token into the backend-private association used by `protected_rpc_call()`.
+Applications still name only their ordinary endpoint; SATPs, hardware context
+IDs, slots, and tokens are not application inputs. Endpoint/TCB finalization,
+TCB VSpace replacement, ASID and ASID-pool deletion, and page/page-table
+unmapping synchronously revoke the descriptor before referenced state can be
+recycled. This one-slot global binding is intentionally an experimental
+non-MCS implementation; a general facility should use a first-class binding
+capability.
+
+The kernel, real backend, wrapper, and end-to-end test compile and link in a
+fresh pinned BlackParrot image. That is build evidence only: a passing hardware
+test marker and measured software/hardware rows are still required before the
+kernel binding is considered accepted.
 
 ## BlackParrot platform bring-up
 

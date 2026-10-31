@@ -2,7 +2,7 @@ diff --git a/apps/sel4test-tests/CMakeLists.txt b/apps/sel4test-tests/CMakeLists
 index cb3b677..7cddc37 100644
 --- a/apps/sel4test-tests/CMakeLists.txt
 +++ b/apps/sel4test-tests/CMakeLists.txt
-@@ -14,18 +14,31 @@ if(KernelArchRiscV)
+@@ -14,18 +14,32 @@ if(KernelArchRiscV)
      set(arch arm)
  endif()
  
@@ -25,7 +25,8 @@ index cb3b677..7cddc37 100644
 +        src/tests/sel4_rpc_adapter_test.c
 +        src/tests/protected_rpc.c
 +        src/tests/protected_rpc_sel4.c
-+        src/tests/protected_rpc_hardware_stub.c
++        src/tests/protected_rpc_hardware_blackparrot.c
++        src/tests/protected_rpc_blackparrot_sel4.c
 +        src/arch/${arch}/arch.c
 +    )
 +else()

@@ -17,3 +17,8 @@ if(KernelPlatformBlackParrot)
 else()
     unset(KernelPlatformFirstHartID CACHE)
 endif()
+
+add_sources(
+    DEP "KernelPlatformBlackParrot"
+    CFILES src/plat/blackparrot/machine/rpc.c
+)

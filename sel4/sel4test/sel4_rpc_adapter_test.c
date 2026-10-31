@@ -12,6 +12,9 @@
 #include <vspace/vspace.h>
 
 #include "protected_rpc.h"
+#ifdef CONFIG_PLAT_BLACKPARROT
+#include "protected_rpc_blackparrot.h"
+#endif
 #include "../helpers.h"
 
 #define ADAPTER_WARMUP_CALLS 8
@@ -21,6 +24,22 @@
 #define ADAPTER_REGION_TOKEN UINT64_C(0xa11ce001)
 
 static volatile seL4_Word adapter_server_private_counter;
+
+#ifdef CONFIG_PLAT_BLACKPARROT
+static void __attribute__((naked, noinline, used, aligned(64)))
+hardware_sum_entry(void)
+{
+    __asm__ volatile(
+        ".option push\n.option norvc\n"
+        "add a0, a0, a1\n"
+        "add a0, a0, a2\n"
+        "add a0, a0, a3\n"
+        /* One reply word and PROTECTED_RPC_OK status. */
+        "li a5, 1\n"
+        "csrw 0x809, a0\n"
+        "1: j 1b\n"
+        ".option pop\n");
+}
 
 static inline uint64_t read_cycles(void)
 {
@@ -83,6 +102,112 @@ static int adapter_server(seL4_Word endpoint, seL4_Word shared_base,
     return protected_rpc_serve(
         (protected_rpc_endpoint_t){.opaque = endpoint}, &config);
 }
+
+static protected_rpc_status_t sum_service(
+    const protected_rpc_call_context_t *context,
+    const protected_rpc_message_t *request,
+    protected_rpc_message_t *reply,
+    void *cookie)
+{
+    (void)context;
+    (void)cookie;
+    if (request->length != 4) {
+        return PROTECTED_RPC_INVALID_ARGUMENT;
+    }
+    reply->length = 1;
+    reply->words[0] = request->words[0] + request->words[1]
+                      + request->words[2] + request->words[3];
+    return PROTECTED_RPC_OK;
+}
+
+static int sum_server(seL4_Word endpoint, seL4_Word unused1,
+                      seL4_Word unused2, seL4_Word unused3)
+{
+    (void)unused1;
+    (void)unused2;
+    (void)unused3;
+    const protected_rpc_server_config_t config = {
+        .handler = sum_service,
+        .max_requests = 1,
+    };
+    return protected_rpc_serve(
+        (protected_rpc_endpoint_t){.opaque = endpoint}, &config);
+}
+
+static int test_blackparrot_hardware_binding(env_t env)
+{
+    helper_thread_t server;
+    cspacepath_t endpoint_path;
+    seL4_CPtr endpoint = vka_alloc_endpoint_leaky(&env->vka);
+    test_assert(endpoint != 0);
+
+    create_helper_process(env, &server);
+    set_helper_priority(env, &server, OUR_PRIO);
+    void *shadow_stack = vspace_new_pages(
+        &server.process.vspace, seL4_AllRights, 1, seL4_PageBits);
+    test_assert(shadow_stack != NULL);
+
+    vka_cspace_make_path(&env->vka, endpoint, &endpoint_path);
+    const seL4_CPtr remote_endpoint =
+        sel4utils_copy_path_to_process(&server.process, endpoint_path);
+    test_assert(remote_endpoint != (seL4_CPtr)-1);
+    start_helper(env, &server, (helper_fn_t)sum_server,
+                 remote_endpoint, 0, 0, 0);
+    /* Let the ordinary fallback server reach its endpoint receive queue. */
+    seL4_Yield();
+
+    const protected_rpc_endpoint_t rpc_endpoint = {.opaque = endpoint};
+    const protected_rpc_blackparrot_binding_t binding = {
+        .server_tcb = get_helper_tcb(&server),
+        .server_entry = (uintptr_t)hardware_sum_entry,
+        .server_sp = (uintptr_t)shadow_stack + BIT(seL4_PageBits),
+        .request_words = 4,
+        .reply_words = 1,
+    };
+    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &binding),
+            PROTECTED_RPC_OK);
+
+    const protected_rpc_call_options_t hardware = {
+        .route = PROTECTED_RPC_ROUTE_HARDWARE,
+    };
+    protected_rpc_message_t request = {
+        .length = 4,
+        .words = {11, 13, 17, 19},
+    };
+    protected_rpc_call_result_t result;
+    uint64_t start = read_cycles();
+    for (seL4_Word call = 0; call < ADAPTER_MEASURED_CALLS; call++) {
+        test_eq(protected_rpc_call(rpc_endpoint, &request, &hardware, &result),
+                PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+        test_eq(result.reply.length, 1);
+        test_eq(result.reply.words[0], 60);
+    }
+    const uint64_t elapsed = read_cycles() - start;
+
+    test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
+
+    /* The same service remains reachable through ordinary endpoint IPC. */
+    const protected_rpc_call_options_t software = {
+        .route = PROTECTED_RPC_ROUTE_SOFTWARE,
+    };
+    test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
+            PROTECTED_RPC_OK);
+    test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
+    test_eq(result.reply.length, 1);
+    test_eq(result.reply.words[0], 60);
+    test_eq(wait_for_helper(&server), PROTECTED_RPC_OK);
+
+    vspace_unmap_pages(&server.process.vspace, shadow_stack, 1,
+                       seL4_PageBits, VSPACE_FREE);
+    cleanup_helper(env, &server);
+    printf("SEL4_RPC_ADAPTER path=hardware calls=%u total_cycles=%" PRIu64
+           " cycles_per_call=%" PRIu64 "\n",
+           ADAPTER_MEASURED_CALLS, elapsed,
+           elapsed / ADAPTER_MEASURED_CALLS);
+    return 0;
+}
+#endif
 
 static int test_sel4_rpc_adapter(env_t env)
 {
@@ -185,6 +310,9 @@ static int test_sel4_rpc_adapter(env_t env)
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_MEASURED_CALLS, elapsed,
            elapsed / ADAPTER_MEASURED_CALLS);
+#ifdef CONFIG_PLAT_BLACKPARROT
+    test_eq(test_blackparrot_hardware_binding(env), 0);
+#endif
     return sel4test_get_result();
 }
 

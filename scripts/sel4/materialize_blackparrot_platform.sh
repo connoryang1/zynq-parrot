@@ -14,6 +14,9 @@ project_root=$(realpath "$script_dir/../..")
 platform="$project_root/sel4/platform/blackparrot"
 kernel="$checkout/kernel"
 utils="$checkout/projects/util_libs"
+test_dir="$checkout/projects/sel4test/apps/sel4test-tests/src/tests"
+
+rm -f "$test_dir/protected_rpc_hardware_stub.c"
 
 if [ ! -d "$checkout/.repo/manifests" ] || [ ! -d "$kernel/libsel4" ]; then
     echo "not a sel4test manifest checkout: $checkout" >&2
@@ -50,6 +53,12 @@ link_file "$platform/kernel/blackparrot.dts" \
     "$kernel/tools/dts/blackparrot.dts"
 link_file "$platform/kernel/overlay-blackparrot.dts" \
     "$kernel/src/plat/blackparrot/overlay-blackparrot.dts"
+link_file "$platform/kernel/rpc.c" \
+    "$kernel/src/plat/blackparrot/machine/rpc.c"
+link_file "$platform/kernel/rpc.h" \
+    "$kernel/include/plat/blackparrot/plat/machine/rpc.h"
+link_file "$project_root/sel4/include/blackparrot_rpc_abi.h" \
+    "$kernel/include/plat/blackparrot/plat/machine/blackparrot_rpc_abi.h"
 link_file "$platform/kernel/constants.h" \
     "$kernel/libsel4/sel4_plat_include/blackparrot/sel4/plat/api/constants.h"
 link_file "$platform/libplatsupport/serial.h" \
@@ -60,5 +69,13 @@ link_file "$platform/libplatsupport/clock.h" \
     "$utils/libplatsupport/plat_include/blackparrot/platsupport/plat/clock.h"
 link_file "$platform/libplatsupport/chardev.c" \
     "$utils/libplatsupport/src/plat/blackparrot/chardev.c"
+link_file "$project_root/sel4/src/protected_rpc_hardware_blackparrot.c" \
+    "$test_dir/protected_rpc_hardware_blackparrot.c"
+link_file "$project_root/sel4/src/protected_rpc_blackparrot_sel4.c" \
+    "$test_dir/protected_rpc_blackparrot_sel4.c"
+link_file "$project_root/sel4/include/protected_rpc_blackparrot.h" \
+    "$test_dir/protected_rpc_blackparrot.h"
+link_file "$project_root/sel4/include/blackparrot_rpc_abi.h" \
+    "$test_dir/blackparrot_rpc_abi.h"
 
 echo "linked BlackParrot seL4 platform glue into $checkout"

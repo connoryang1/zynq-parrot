@@ -57,6 +57,8 @@ int main(void)
            == UINT64_C(0x0402000000000000));
     assert(bp_rpc_config_word(4, 4, 0, 1)
            == UINT64_C(0x0000000100000404));
+    assert(bp_rpc_sel4_counts(4, 2) == UINT64_C(0x204));
+    assert(BP_RPC_SEL4_BIND_LABEL != BP_RPC_SEL4_UNBIND_LABEL);
     assert(bp_rpc_sbi_extension_id(0) == UINT64_C(0x09000000));
     assert(bp_rpc_sbi_extension_id(UINT64_C(0x12345678))
            == UINT64_C(0x09345678));

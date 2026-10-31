@@ -181,13 +181,14 @@ revoke and observe `OK`, remove mappings or capabilities, then release the
 binding.  The kernel must not destroy or reuse an object while revocation is
 `BUSY`.
 
-The prototype's global one-slot binding record still needs the same lifetime
-semantics: endpoint finalization, caller/server TCB deletion or VSpace
-replacement, root-page-table deletion, and unmapping any pinned service page
-must synchronously revoke before the mutation completes. An explicit unbind
-operation is not a substitute for those hooks. Multiple bindings should move
-this state into a real kernel capability object rather than extending the
-global record.
+The experimental seL4 adapter implements these lifetime semantics for its
+global one-slot record: endpoint and caller/server TCB finalization, TCB VSpace
+replacement, ASID or ASID-pool deletion, and any page/page-table unmap in a
+bound address space synchronously revoke before mutation completes. Explicit
+unbind uses the same revocation path. This conservative implementation may
+revoke for an unrelated mapping in either VSpace; multiple or selectively
+pinned bindings should move state into a real kernel capability object rather
+than extending the global record.
 
 ## Resident-server construction
 

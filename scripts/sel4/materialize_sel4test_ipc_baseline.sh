@@ -15,6 +15,13 @@ source_file="$project_root/sel4/sel4test/sel4_ipc_baseline.c"
 adapter_test="$project_root/sel4/sel4test/sel4_rpc_adapter_test.c"
 test_dir="$checkout/projects/sel4test/apps/sel4test-tests/src/tests"
 
+# A checkout may be reused after a BlackParrot build; keep backend selection
+# exclusive so the normal source glob cannot link both implementations.
+rm -f "$test_dir/protected_rpc_hardware_blackparrot.c" \
+    "$test_dir/protected_rpc_blackparrot_sel4.c" \
+    "$test_dir/protected_rpc_blackparrot.h" \
+    "$test_dir/blackparrot_rpc_abi.h"
+
 if [ ! -d "$test_dir" ]; then
     echo "not a sel4test manifest checkout: $checkout" >&2
     exit 1
