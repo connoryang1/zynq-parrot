@@ -1,0 +1,208 @@
+{
+  "purpose": "Completed-cache-state upper bound; all instruction/data preparation cost is excluded from handoff timing.",
+  "schedule": "rotated",
+  "trials": 256,
+  "trials_per_mode": 64,
+  "paired_blocks": 32,
+  "prep_cost_median_cycles_by_mode": {
+    "cold": 4554.5,
+    "instruction": 4517.5,
+    "data": 4491.0,
+    "combined": 4452.0
+  },
+  "metrics": {
+    "wake_to_entry": {
+      "median_cycles_by_mode": {
+        "cold": 28301.0,
+        "instruction": 35183.5,
+        "data": 33555.5,
+        "combined": 34605.0
+      },
+      "cold_minus_mode": {
+        "instruction": {
+          "paired_median_saved_cycles": -2964.75,
+          "paired_95pct_ci_saved_cycles": [
+            -9871.5,
+            1377.5
+          ]
+        },
+        "data": {
+          "paired_median_saved_cycles": -1260.25,
+          "paired_95pct_ci_saved_cycles": [
+            -11086.5,
+            5633.5
+          ]
+        },
+        "combined": {
+          "paired_median_saved_cycles": -5107.5,
+          "paired_95pct_ci_saved_cycles": [
+            -11219.75,
+            7395.25
+          ],
+          "median_ratio_cold_over_combined": 0.8178297933824592
+        }
+      }
+    },
+    "code_cycles": {
+      "median_cycles_by_mode": {
+        "cold": 1657.5,
+        "instruction": 1371.0,
+        "data": 1656.0,
+        "combined": 1138.5
+      },
+      "cold_minus_mode": {
+        "instruction": {
+          "paired_median_saved_cycles": 599.0,
+          "paired_95pct_ci_saved_cycles": [
+            448.25,
+            733.0
+          ]
+        },
+        "data": {
+          "paired_median_saved_cycles": 1.75,
+          "paired_95pct_ci_saved_cycles": [
+            -15.0,
+            16.0
+          ]
+        },
+        "combined": {
+          "paired_median_saved_cycles": 584.5,
+          "paired_95pct_ci_saved_cycles": [
+            451.0,
+            740.25
+          ],
+          "median_ratio_cold_over_combined": 1.4558629776021081
+        }
+      }
+    },
+    "data_cycles": {
+      "median_cycles_by_mode": {
+        "cold": 2721.0,
+        "instruction": 2725.5,
+        "data": 1454.5,
+        "combined": 1426.5
+      },
+      "cold_minus_mode": {
+        "instruction": {
+          "paired_median_saved_cycles": 9.0,
+          "paired_95pct_ci_saved_cycles": [
+            -9.75,
+            22.0
+          ]
+        },
+        "data": {
+          "paired_median_saved_cycles": 1302.0,
+          "paired_95pct_ci_saved_cycles": [
+            1235.5,
+            1403.0
+          ]
+        },
+        "combined": {
+          "paired_median_saved_cycles": 1309.75,
+          "paired_95pct_ci_saved_cycles": [
+            1250.0,
+            1337.5
+          ],
+          "median_ratio_cold_over_combined": 1.907465825446898
+        }
+      }
+    },
+    "useful_cycles": {
+      "median_cycles_by_mode": {
+        "cold": 4409.0,
+        "instruction": 4098.0,
+        "data": 3111.0,
+        "combined": 2839.5
+      },
+      "cold_minus_mode": {
+        "instruction": {
+          "paired_median_saved_cycles": 620.0,
+          "paired_95pct_ci_saved_cycles": [
+            338.5,
+            10880.25
+          ]
+        },
+        "data": {
+          "paired_median_saved_cycles": 1400.5,
+          "paired_95pct_ci_saved_cycles": [
+            1221.25,
+            11804.75
+          ]
+        },
+        "combined": {
+          "paired_median_saved_cycles": 2044.0,
+          "paired_95pct_ci_saved_cycles": [
+            1713.25,
+            12444.5
+          ],
+          "median_ratio_cold_over_combined": 1.5527381581264308
+        }
+      }
+    },
+    "wake_to_useful": {
+      "median_cycles_by_mode": {
+        "cold": 51149.5,
+        "instruction": 51161.5,
+        "data": 49770.5,
+        "combined": 49317.5
+      },
+      "cold_minus_mode": {
+        "instruction": {
+          "paired_median_saved_cycles": 1487.25,
+          "paired_95pct_ci_saved_cycles": [
+            -3120.0,
+            6842.75
+          ]
+        },
+        "data": {
+          "paired_median_saved_cycles": 4150.0,
+          "paired_95pct_ci_saved_cycles": [
+            -3228.0,
+            11649.5
+          ]
+        },
+        "combined": {
+          "paired_median_saved_cycles": 9300.0,
+          "paired_95pct_ci_saved_cycles": [
+            -5638.25,
+            15388.5
+          ],
+          "median_ratio_cold_over_combined": 1.0371470573325898
+        }
+      }
+    },
+    "roundtrip": {
+      "median_cycles_by_mode": {
+        "cold": 128764.0,
+        "instruction": 115980.5,
+        "data": 126997.5,
+        "combined": 96374.5
+      },
+      "cold_minus_mode": {
+        "instruction": {
+          "paired_median_saved_cycles": 1553.75,
+          "paired_95pct_ci_saved_cycles": [
+            -7911.0,
+            8567.5
+          ]
+        },
+        "data": {
+          "paired_median_saved_cycles": 4996.5,
+          "paired_95pct_ci_saved_cycles": [
+            -10534.75,
+            14851.0
+          ]
+        },
+        "combined": {
+          "paired_median_saved_cycles": 10255.0,
+          "paired_95pct_ci_saved_cycles": [
+            -19186.25,
+            28416.5
+          ],
+          "median_ratio_cold_over_combined": 1.3360795646151211
+        }
+      }
+    }
+  },
+  "minor_faults": 0
+}

@@ -6,6 +6,7 @@ these checks never build a kernel or touch the SDK root filesystem.
 """
 
 import base64
+import gzip
 import json
 import os
 from pathlib import Path
@@ -25,7 +26,9 @@ APPS = {"app": "ctxtsw_user_smoke", "tiny": "ctxtsw_user_tiny",
         "cache-miss-trace-capture": "cache_miss_trace_capture",
         "cache-miss-trace-capture-dynamic": "cache_miss_trace_capture_dynamic",
         "scheduler-data-oracle-best-case-dynamic":
-            "scheduler_data_oracle_best_case_dynamic"}
+            "scheduler_data_oracle_best_case_dynamic",
+        "scheduler-combined-oracle-best-case-dynamic":
+            "scheduler_combined_oracle_best_case_dynamic"}
 FAKE_COMPILER = """#!/usr/bin/env python3
 import json, os, pathlib, sys
 args = sys.argv[1:]
@@ -180,7 +183,9 @@ class LinuxHarnessTests(unittest.TestCase):
                             ("emit-cache-miss-trace-transfer", "cache_miss_trace_capture"),
                             ("emit-cache-miss-trace-dynamic-transfer", "cache_miss_trace_capture_dynamic"),
                             ("emit-scheduler-data-oracle-best-case-transfer",
-                             "scheduler_data_oracle_best_case_dynamic")):
+                             "scheduler_data_oracle_best_case_dynamic"),
+                            ("emit-scheduler-combined-oracle-best-case-transfer",
+                             "scheduler_combined_oracle_best_case_dynamic")):
             with self.subTest(target=target):
                 good = self.make(target)
                 self.assertEqual(good.returncode, 0, good.stderr)
@@ -188,6 +193,28 @@ class LinuxHarnessTests(unittest.TestCase):
                 self.assertNotEqual(failed.returncode, 0)
                 self.assertEqual(failed.stdout, b"")
                 self.assertFalse((self.out / app).exists(), "partial ELF must be deleted")
+
+    def test_compressed_combined_oracle_transfer(self):
+        target = "emit-scheduler-combined-oracle-best-case-transfer"
+        app = "scheduler_combined_oracle_best_case_dynamic"
+        result = self.make(target)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        lines = result.stdout.decode().splitlines()
+        b64_path = "/tmp/" + app + ".gz.b64"
+        self.assertEqual(lines[0], ": > " + b64_path)
+        self.assertEqual(lines[-3:], [
+            "base64 -d " + b64_path + " > /tmp/" + app + ".gz",
+            "gzip -dc /tmp/" + app + ".gz > /tmp/" + app,
+            "chmod +x /tmp/" + app])
+        payload = []
+        for line in lines[1:-3]:
+            match = re.fullmatch(r"echo '([A-Za-z0-9+/=]+)' >> "
+                                 + re.escape(b64_path), line)
+            self.assertIsNotNone(match, line)
+            payload.append(match[1])
+        compressed = base64.b64decode("".join(payload), validate=True)
+        self.assertEqual(gzip.decompress(compressed),
+                         (self.out / app).read_bytes())
 
 
 if __name__ == "__main__":

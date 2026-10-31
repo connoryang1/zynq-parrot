@@ -698,6 +698,37 @@ intervals are much noisier and are not attributed to warming. The exact
 transcript, summary, executable, hashes, and the rejected prefault diagnostic
 are in `logs/data-oracle-best-case-20261031/` and RL-117.
 
+## Completed instruction-plus-data best-case oracle
+
+`scheduler_combined_oracle_best_case.c` extends the completed-state oracle to
+four modes: cold, instruction only, data only, and combined. The child executes
+a 36 KiB straight-line code sweep and reads a 256 KiB data buffer before each
+handoff. The parent then executes either a matched decoy or the exact 2 KiB
+target instruction body and reads either decoy data or the exact 32-line
+dependent target chain before starting the wakeup timer. The straight-line
+instruction bodies avoid crediting branch-predictor training.
+
+```sh
+make -C linux-tests scheduler-combined-oracle-best-case-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+make -s -C linux-tests emit-scheduler-combined-oracle-best-case-transfer \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+python3 linux-tests/analyze_scheduler_combined_oracle_best_case.py \
+  /tmp/combined-board-run.log
+```
+
+The accepted run rotates mode labels across balanced eight-trial blocks so a
+periodic scheduler event cannot stay attached to one cache-state mode. With 64
+trials per mode and zero measured minor faults, instruction warming saves a
+paired 599 code cycles, data warming saves 1,302 data cycles, and combined
+warming reduces the target phase median from 4,409 to 2,839.5 cycles (1.55x).
+The paired combined saving is 2,044 cycles. A fixed-order predecessor gives
+consistent local results but a contradictory scheduler-inclusive result, so
+neither run establishes a wake-to-useful or round-trip speedup. The software
+oracle warms user text, not the shared privileged kernel prefix targeted by
+the separate instruction-replay branch. Exact evidence and limitations are in
+`logs/combined-oracle-best-case-20261031/` and RL-118.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder

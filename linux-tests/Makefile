@@ -42,6 +42,7 @@ SCHED_PHYSICAL_MISS_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_miss_dynami
 SCHED_PHYSICAL_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_dynamic
 SCHED_PHYSICAL_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
 SCHED_DATA_ORACLE_DYNAMIC_APP := $(OUT)/scheduler_data_oracle_best_case_dynamic
+SCHED_COMBINED_ORACLE_DYNAMIC_APP := $(OUT)/scheduler_combined_oracle_best_case_dynamic
 SCHED_PREVIEW_PATH_APP := $(OUT)/scheduler_preview_path
 TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
@@ -240,6 +241,19 @@ emit-scheduler-data-oracle-best-case-transfer: check-linux-cc scheduler-data-ora
 	@printf '%s\n' ': > /tmp/scheduler_data_oracle_best_case_dynamic.b64'
 	@base64 -w 76 $(SCHED_DATA_ORACLE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_data_oracle_best_case_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_data_oracle_best_case_dynamic.b64 > /tmp/scheduler_data_oracle_best_case_dynamic' 'chmod +x /tmp/scheduler_data_oracle_best_case_dynamic'
+
+.PHONY: scheduler-combined-oracle-best-case-dynamic emit-scheduler-combined-oracle-best-case-transfer
+scheduler-combined-oracle-best-case-dynamic: $(SCHED_COMBINED_ORACLE_DYNAMIC_APP)
+
+$(SCHED_COMBINED_ORACLE_DYNAMIC_APP): scheduler_combined_oracle_best_case.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_PREFIX)strip --strip-unneeded $@
+
+emit-scheduler-combined-oracle-best-case-transfer: check-linux-cc scheduler-combined-oracle-best-case-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_combined_oracle_best_case_dynamic.gz.b64'
+	@gzip -9c $(SCHED_COMBINED_ORACLE_DYNAMIC_APP) | base64 -w 76 | sed "s|.*|echo '&' >> /tmp/scheduler_combined_oracle_best_case_dynamic.gz.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_combined_oracle_best_case_dynamic.gz.b64 > /tmp/scheduler_combined_oracle_best_case_dynamic.gz' 'gzip -dc /tmp/scheduler_combined_oracle_best_case_dynamic.gz > /tmp/scheduler_combined_oracle_best_case_dynamic' 'chmod +x /tmp/scheduler_combined_oracle_best_case_dynamic'
 
 .PHONY: scheduler-preview-path
 scheduler-preview-path: check-linux-cc $(SCHED_PREVIEW_PATH_APP)
@@ -515,4 +529,5 @@ clean:
 
 check-harness:
 	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py \
-	  test_scheduler_data_oracle_best_case.py
+	  test_scheduler_data_oracle_best_case.py \
+	  test_scheduler_combined_oracle_best_case.py
