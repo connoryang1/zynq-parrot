@@ -23,7 +23,7 @@ enum {
     seL4_NotEnoughMemory,
 };
 
-extern seL4_Word mock_sel4_mrs[8];
+extern seL4_Word mock_sel4_mrs[16];
 extern seL4_CPtr mock_sel4_caps[4];
 
 static inline seL4_MessageInfo_t seL4_MessageInfo_new(

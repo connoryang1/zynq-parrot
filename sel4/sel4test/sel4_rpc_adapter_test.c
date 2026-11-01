@@ -5,6 +5,7 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+#include <string.h>
 #include <sel4/sel4.h>
 #include <sel4utils/process.h>
 #include <vka/capops.h>
@@ -24,7 +25,9 @@
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
 #define ADAPTER_REGION_TOKEN UINT64_C(0xa11ce001)
 #define ADAPTER_BP_SERVER_IMAGE "sel4-rpc-server"
-#define ADAPTER_BP_SERVER_ARGS 2
+#define ADAPTER_BP_SERVER_ARGS 4
+#define ADAPTER_SEARCH_BYTES 1024u
+#define ADAPTER_SEARCH_NEEDLE ((seL4_Word)'z')
 
 static volatile seL4_Word adapter_server_private_counter;
 
@@ -90,8 +93,8 @@ static int adapter_server(seL4_Word endpoint, seL4_Word shared_base,
         (protected_rpc_endpoint_t){.opaque = endpoint}, &config);
 }
 
-static void destroy_sum_server(env_t env, sel4utils_process_t *server,
-                               void *shadow_stack,
+static void destroy_rpc_server(env_t env, sel4utils_process_t *server,
+                               void *shadow_stack, void *caller_shared,
                                vka_object_t *control_endpoint)
 {
     if (shadow_stack != NULL) {
@@ -102,6 +105,10 @@ static void destroy_sum_server(env_t env, sel4utils_process_t *server,
     /* The process borrows the test's fault endpoint; it does not own it. */
     server->fault_endpoint.cptr = 0;
     sel4utils_destroy_process(server, &env->vka);
+    if (caller_shared != NULL) {
+        vspace_unmap_pages(&env->vspace, caller_shared, 1,
+                           seL4_PageBits, VSPACE_FREE);
+    }
     vka_free_object(&env->vka, control_endpoint);
 }
 
@@ -177,7 +184,28 @@ static int test_blackparrot_hardware_binding(env_t env)
         &server.vspace, seL4_AllRights, 1, seL4_PageBits);
     test_assert(shadow_stack != NULL);
     if (shadow_stack == NULL) {
-        destroy_sum_server(env, &server, NULL, &control_endpoint);
+        destroy_rpc_server(env, &server, NULL, NULL, &control_endpoint);
+        return sel4test_get_result();
+    }
+
+    void *shared_base = vspace_new_pages(
+        &env->vspace, seL4_AllRights, 1, seL4_PageBits);
+    test_assert(shared_base != NULL);
+    if (shared_base == NULL) {
+        destroy_rpc_server(env, &server, shadow_stack, NULL,
+                           &control_endpoint);
+        return sel4test_get_result();
+    }
+    memset(shared_base, 'a', ADAPTER_SEARCH_BYTES);
+    ((unsigned char *)shared_base)[ADAPTER_SEARCH_BYTES - 1] =
+        (unsigned char)ADAPTER_SEARCH_NEEDLE;
+    void *server_shared_base = vspace_share_mem(
+        &env->vspace, &server.vspace, shared_base, 1, seL4_PageBits,
+        seL4_CapRights_new(false, false, true, false), true);
+    test_assert(server_shared_base != NULL);
+    if (server_shared_base == NULL) {
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           &control_endpoint);
         return sel4test_get_result();
     }
 
@@ -192,28 +220,36 @@ static int test_blackparrot_hardware_binding(env_t env)
     test_assert(remote_control != (seL4_CPtr)-1);
     if (remote_endpoint == (seL4_CPtr)-1
         || remote_control == (seL4_CPtr)-1) {
-        destroy_sum_server(env, &server, shadow_stack, &control_endpoint);
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           &control_endpoint);
         return sel4test_get_result();
     }
 
     char arg_strings[ADAPTER_BP_SERVER_ARGS][WORD_STRING_SIZE];
     char *args[ADAPTER_BP_SERVER_ARGS];
     sel4utils_create_word_args(arg_strings, args, ADAPTER_BP_SERVER_ARGS,
-                               remote_endpoint, remote_control);
+                               remote_endpoint, remote_control,
+                               (seL4_Word)server_shared_base,
+                               ADAPTER_REGION_TOKEN);
     error = sel4utils_spawn_process_v(&server, &env->vka, &env->vspace,
                                       ADAPTER_BP_SERVER_ARGS, args, 1);
     test_eq(error, 0);
     if (error != 0) {
-        destroy_sum_server(env, &server, shadow_stack, &control_endpoint);
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           &control_endpoint);
         return sel4test_get_result();
     }
 
     seL4_Word badge = 0;
     seL4_MessageInfo_t ready = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(ready), 0);
-    test_eq(seL4_MessageInfo_get_length(ready), 1);
+    test_eq(seL4_MessageInfo_get_length(ready), 3);
     const seL4_Word hardware_entry = seL4_GetMR(0);
+    const seL4_Word hardware_gp = seL4_GetMR(1);
+    const seL4_Word hardware_state = seL4_GetMR(2);
     test_assert(hardware_entry != 0);
+    test_assert(hardware_gp != 0);
+    test_assert(hardware_state != 0);
     /* Let the ordinary fallback server reach its endpoint receive queue. */
     seL4_Yield();
 
@@ -222,25 +258,59 @@ static int test_blackparrot_hardware_binding(env_t env)
         .server_tcb = server.thread.tcb.cptr,
         .server_entry = hardware_entry,
         .server_sp = (uintptr_t)shadow_stack + BIT(seL4_PageBits),
+        .server_gp = hardware_gp,
+        .server_tp = hardware_state,
         .request_words = 4,
-        .reply_words = 1,
+        .reply_words = 2,
+        .region = {
+            .region = {.opaque = ADAPTER_REGION_TOKEN},
+            .caller_base = (uintptr_t)shared_base,
+            .server_base = (uintptr_t)server_shared_base,
+            .size = BIT(seL4_PageBits),
+            .access = PROTECTED_RPC_ACCESS_READ,
+        },
     };
+
+    /* The region name alone grants nothing. The kernel must reject both a
+     * different physical page and a permission wider than the server map. */
+    protected_rpc_blackparrot_binding_t invalid_binding = binding;
+    invalid_binding.region.server_base = (uintptr_t)shadow_stack;
+    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &invalid_binding),
+            PROTECTED_RPC_DENIED);
+    invalid_binding = binding;
+    invalid_binding.region.access = PROTECTED_RPC_ACCESS_READ
+                                    | PROTECTED_RPC_ACCESS_WRITE;
+    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &invalid_binding),
+            PROTECTED_RPC_DENIED);
+    invalid_binding = binding;
+    invalid_binding.server_tp = BIT(37);
+    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &invalid_binding),
+            PROTECTED_RPC_DENIED);
+    printf("SEL4_RPC_REGION_GUARD physical-mismatch=denied "
+           "write-escalation=denied runtime-state=denied\n");
+
     protected_rpc_status_t bind_status = protected_rpc_blackparrot_bind(
         rpc_endpoint, &binding);
     test_eq(bind_status, PROTECTED_RPC_OK);
     if (bind_status != PROTECTED_RPC_OK) {
         /* A rejected bind cannot produce meaningful forced-hardware results. */
-        destroy_sum_server(env, &server, shadow_stack, &control_endpoint);
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           &control_endpoint);
         return sel4test_get_result();
     }
 
     const protected_rpc_call_options_t hardware = {
         .route = PROTECTED_RPC_ROUTE_HARDWARE,
     };
-    protected_rpc_message_t request = {
-        .length = 4,
-        .words = {11, 13, 17, 19},
+    protected_rpc_message_t request = {0};
+    const protected_rpc_buffer_ref_t search_ref = {
+        .region = {.opaque = ADAPTER_REGION_TOKEN},
+        .offset = 0,
+        .length = ADAPTER_SEARCH_BYTES,
     };
+    test_assert(protected_rpc_encode_buffer(&request, 0, search_ref));
+    request.words[3] = ADAPTER_SEARCH_NEEDLE;
+    request.length = 4;
     protected_rpc_call_result_t result;
     uint64_t start = read_cycles();
     for (seL4_Word call = 0; call < ADAPTER_MEASURED_CALLS; call++) {
@@ -252,13 +322,14 @@ static int test_blackparrot_hardware_binding(env_t env)
              * a transport failure into hundreds of slow serial assertions. */
             test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint),
                     PROTECTED_RPC_OK);
-            destroy_sum_server(env, &server, shadow_stack,
+            destroy_rpc_server(env, &server, shadow_stack, shared_base,
                                &control_endpoint);
             return sel4test_get_result();
         }
         test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-        test_eq(result.reply.length, 1);
-        test_eq(result.reply.words[0], 60);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
     const uint64_t elapsed = read_cycles() - start;
 
@@ -274,15 +345,19 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(protected_rpc_call(rpc_endpoint, &request, &fallback, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 1);
-        test_eq(result.reply.words[0], 60);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
     const uint64_t software_elapsed = read_cycles() - software_start;
     seL4_MessageInfo_t finished = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(finished), PROTECTED_RPC_OK);
     test_eq(seL4_MessageInfo_get_length(finished), 0);
 
-    destroy_sum_server(env, &server, shadow_stack, &control_endpoint);
+    destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                       &control_endpoint);
+    printf("SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=%u\n",
+           ADAPTER_SEARCH_BYTES);
     printf("SEL4_RPC_ADAPTER path=hardware calls=%u total_cycles=%" PRIu64
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_MEASURED_CALLS, elapsed,
@@ -298,7 +373,7 @@ static int test_blackparrot_hardware_binding(env_t env)
 #if defined(SEL4TEST_RPC_ONLY) && !defined(CONFIG_PLAT_BLACKPARROT)
 /* Qualify the dedicated server image and control handshake under fast QEMU.
  * BlackParrot runs the same image through the hardware/fallback gate above. */
-static int test_dedicated_sum_server_software(env_t env)
+static int test_dedicated_search_server_software(env_t env)
 {
     sel4utils_process_t server = {0};
     seL4_CPtr endpoint = vka_alloc_endpoint_leaky(&env->vka);
@@ -324,6 +399,26 @@ static int test_dedicated_sum_server_software(env_t env)
         return sel4test_get_result();
     }
 
+    void *shared_base = vspace_new_pages(
+        &env->vspace, seL4_AllRights, 1, seL4_PageBits);
+    test_assert(shared_base != NULL);
+    if (shared_base == NULL) {
+        destroy_rpc_server(env, &server, NULL, NULL, &control_endpoint);
+        return sel4test_get_result();
+    }
+    memset(shared_base, 'a', ADAPTER_SEARCH_BYTES);
+    ((unsigned char *)shared_base)[ADAPTER_SEARCH_BYTES - 1] =
+        (unsigned char)ADAPTER_SEARCH_NEEDLE;
+    void *server_shared_base = vspace_share_mem(
+        &env->vspace, &server.vspace, shared_base, 1, seL4_PageBits,
+        seL4_CapRights_new(false, false, true, false), true);
+    test_assert(server_shared_base != NULL);
+    if (server_shared_base == NULL) {
+        destroy_rpc_server(env, &server, NULL, shared_base,
+                           &control_endpoint);
+        return sel4test_get_result();
+    }
+
     cspacepath_t endpoint_path;
     vka_cspace_make_path(&env->vka, endpoint, &endpoint_path);
     const seL4_CPtr remote_endpoint =
@@ -336,52 +431,66 @@ static int test_dedicated_sum_server_software(env_t env)
     test_assert(remote_control != (seL4_CPtr)-1);
     if (remote_endpoint == (seL4_CPtr)-1
         || remote_control == (seL4_CPtr)-1) {
-        destroy_sum_server(env, &server, NULL, &control_endpoint);
+        destroy_rpc_server(env, &server, NULL, shared_base,
+                           &control_endpoint);
         return sel4test_get_result();
     }
 
     char arg_strings[ADAPTER_BP_SERVER_ARGS][WORD_STRING_SIZE];
     char *args[ADAPTER_BP_SERVER_ARGS];
     sel4utils_create_word_args(arg_strings, args, ADAPTER_BP_SERVER_ARGS,
-                               remote_endpoint, remote_control);
+                               remote_endpoint, remote_control,
+                               (seL4_Word)server_shared_base,
+                               ADAPTER_REGION_TOKEN);
     error = sel4utils_spawn_process_v(&server, &env->vka, &env->vspace,
                                       ADAPTER_BP_SERVER_ARGS, args, 1);
     test_eq(error, 0);
     if (error != 0) {
-        destroy_sum_server(env, &server, NULL, &control_endpoint);
+        destroy_rpc_server(env, &server, NULL, shared_base,
+                           &control_endpoint);
         return sel4test_get_result();
     }
 
     seL4_Word badge = 0;
     seL4_MessageInfo_t ready = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(ready), 0);
-    test_eq(seL4_MessageInfo_get_length(ready), 1);
+    test_eq(seL4_MessageInfo_get_length(ready), 3);
     test_assert(seL4_GetMR(0) != 0);
+    test_assert(seL4_GetMR(1) != 0);
+    test_assert(seL4_GetMR(2) != 0);
 
     const protected_rpc_endpoint_t rpc_endpoint = {.opaque = endpoint};
     const protected_rpc_call_options_t software = {
         .route = PROTECTED_RPC_ROUTE_SOFTWARE,
     };
-    const protected_rpc_message_t request = {
-        .length = 4,
-        .words = {11, 13, 17, 19},
+    protected_rpc_message_t request = {0};
+    const protected_rpc_buffer_ref_t search_ref = {
+        .region = {.opaque = ADAPTER_REGION_TOKEN},
+        .offset = 0,
+        .length = ADAPTER_SEARCH_BYTES,
     };
+    test_assert(protected_rpc_encode_buffer(&request, 0, search_ref));
+    request.words[3] = ADAPTER_SEARCH_NEEDLE;
+    request.length = 4;
     protected_rpc_call_result_t result;
     const uint64_t start = read_cycles();
     for (seL4_Word call = 0; call < ADAPTER_BP_SOFTWARE_CALLS; call++) {
         test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 1);
-        test_eq(result.reply.words[0], 60);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
     const uint64_t elapsed = read_cycles() - start;
 
     seL4_MessageInfo_t finished = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(finished), PROTECTED_RPC_OK);
     test_eq(seL4_MessageInfo_get_length(finished), 0);
-    destroy_sum_server(env, &server, NULL, &control_endpoint);
+    destroy_rpc_server(env, &server, NULL, shared_base, &control_endpoint);
 
+    printf("SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=%u\n",
+           ADAPTER_SEARCH_BYTES);
     printf("SEL4_RPC_ADAPTER path=software-dedicated calls=%u total_cycles=%"
            PRIu64 " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_BP_SOFTWARE_CALLS, elapsed,
@@ -398,7 +507,7 @@ static int test_sel4_rpc_adapter(env_t env)
     test_eq(test_blackparrot_hardware_binding(env), 0);
     return sel4test_get_result();
 #elif defined(SEL4TEST_RPC_ONLY)
-    return test_dedicated_sum_server_software(env);
+    return test_dedicated_search_server_software(env);
 #else
 
     helper_thread_t server;

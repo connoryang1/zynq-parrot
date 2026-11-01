@@ -28,10 +28,11 @@ typedef struct {
 } protected_rpc_message_t;
 
 /*
- * A shared buffer is identified by a registered region plus a byte range.
- * It consumes three message words when encoded.  Region permissions and
- * direction are fixed when the kernel creates the binding; a caller cannot
- * widen them by changing message data.
+ * A shared buffer is identified by a binding-scoped region name plus a byte
+ * range. It consumes three message words when encoded. The opaque value is a
+ * name, not a pointer or independent authority: endpoint authority, validated
+ * mappings, and the server-side region table establish access. Permissions
+ * and direction are fixed at binding time, so message data cannot widen them.
  */
 typedef struct {
     protected_rpc_region_t region;

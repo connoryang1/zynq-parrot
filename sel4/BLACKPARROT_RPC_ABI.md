@@ -21,6 +21,27 @@ The application continues to name an seL4 endpoint.  A kernel-authorized
 runtime binding privately associates that endpoint with an opaque hardware
 token; applications never supply a context ID, SATP, entry PC, or stack.
 
+The kernel checks the proposed entry is executable, the stack is writable,
+and every nonzero GP/TP is readable in the live server VSpace. TP may name
+trusted server-runtime state, but it is never sourced from request data.
+
+Version 1 may additionally bind one 4 KiB shared region. The trusted runtime
+supplies a binding-scoped opaque name plus page-aligned caller and server
+virtual addresses. The kernel walks both live VSpaces, requires user-readable
+4 KiB leaves, requires caller write access and the requested server write
+access, and proves both leaves name the same physical page before publishing
+the hardware descriptor. The name is not a pointer or capability; endpoint
+authority and the validated mappings authorize access. Any later map, unmap,
+VSpace replacement, or ASID teardown follows the existing synchronous whole-
+binding revocation path before the mapping can be reused.
+
+The server's region table performs the per-call name, offset, length, and
+direction check for both hardware and software transport. The hardware shadow
+receives only a trusted runtime-state pointer in its initial TP; callers never
+provide a server virtual address in a request. Zero region size retains the
+scalar-only binding. Larger regions, multiple regions, read-only caller maps,
+and selective rather than whole-binding revocation remain later ABI versions.
+
 ## Descriptor
 
 The single hardware slot contains:

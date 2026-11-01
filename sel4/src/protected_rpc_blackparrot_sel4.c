@@ -14,6 +14,7 @@ static protected_rpc_status_t sel4_error_status(seL4_Word error)
         return PROTECTED_RPC_INVALID_ARGUMENT;
     case seL4_InvalidCapability:
     case seL4_IllegalOperation:
+    case seL4_FailedLookup:
     case seL4_DeleteFirst:
     case seL4_RevokeFirst:
         return PROTECTED_RPC_DENIED;
@@ -35,8 +36,17 @@ static seL4_MessageInfo_t invoke_binding(
         seL4_SetMR(3, binding->server_tp);
         seL4_SetMR(4, bp_rpc_sel4_counts(binding->request_words,
                                          binding->reply_words));
+        if (binding->region.size != 0) {
+            seL4_SetMR(5, binding->region.region.opaque);
+            seL4_SetMR(6, binding->region.caller_base);
+            seL4_SetMR(7, binding->region.server_base);
+            seL4_SetMR(8, binding->region.size);
+            seL4_SetMR(9, binding->region.access);
+            length = BP_RPC_SEL4_BIND_REGION_ARGUMENTS;
+        } else {
+            length = BP_RPC_SEL4_BIND_ARGUMENTS;
+        }
         seL4_SetCap(0, (seL4_CPtr)binding->server_tcb);
-        length = BP_RPC_SEL4_BIND_ARGUMENTS;
         extra_caps = 1;
     }
     return seL4_Call((seL4_CPtr)endpoint.opaque,
@@ -50,7 +60,20 @@ protected_rpc_status_t protected_rpc_blackparrot_bind(
     if (endpoint.opaque == 0 || binding == NULL || binding->server_tcb == 0
         || binding->server_entry == 0 || binding->server_sp == 0
         || binding->request_words > BP_RPC_MAX_WORDS
-        || binding->reply_words > BP_RPC_MAX_WORDS) {
+        || binding->reply_words > BP_RPC_MAX_WORDS
+        || (binding->region.size == 0
+            && (binding->region.region.opaque != 0
+                || binding->region.caller_base != 0
+                || binding->region.server_base != 0
+                || binding->region.access != 0))
+        || (binding->region.size != 0
+            && (binding->region.region.opaque == 0
+                || binding->region.caller_base == 0
+                || binding->region.server_base == 0
+                || binding->region.access == 0
+                || (binding->region.access
+                    & ~(PROTECTED_RPC_ACCESS_READ
+                        | PROTECTED_RPC_ACCESS_WRITE)) != 0))) {
         return PROTECTED_RPC_INVALID_ARGUMENT;
     }
 

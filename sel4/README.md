@@ -297,6 +297,27 @@ SHA-256 is `00f32b95...03b4a3`; routed bitstream SHA-256 is
 test configurator; it is not part of the protected-RPC ABI or a production
 userspace shutdown interface.
 
+The next gate replaces the four-word arithmetic stub with a bounded library
+service over a shared page. The caller fills 1 KiB with `a`, places `z` in the
+last byte, and passes only `{region, offset, length, needle}`. A distinct
+server VSpace maps that physical page read-only. Both transports invoke the
+same handler, which makes two non-inlined musl `memchr` calls and returns the
+match and NUL offsets. Before the valid bind, the FPGA test proves that the
+kernel rejects a different physical page, a write-permission escalation, and
+an unmapped runtime-state pointer.
+
+On the PYNQ-Z2, 256 hardware calls take 856,789 cycles (3,346/call), while
+eight automatic software fallbacks take 52,886 cycles (6,610/call): a 1.98x
+end-to-end advantage and about 3,264 cycles saved per call. The smaller ratio
+than the scalar gate is expected because roughly 3,000 cycles of page scanning
+are common service work, not IPC overhead. The routed bitstream is unchanged;
+the final NBF SHA-256 is `b7d5b486...ac0ae`. QEMU separately validates the
+dedicated server, shared mapping, handler, and software transport. Normalized
+evidence is retained in
+[`results/sel4test-rpc-shared-search-fpga.log`](results/sel4test-rpc-shared-search-fpga.log)
+and
+[`results/sel4test-rpc-shared-search-qemu.log`](results/sel4test-rpc-shared-search-qemu.log).
+
 The host must provide the pinned checkout's Python packages plus CMake, Ninja,
 and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
 the qualified BlackParrot OpenSBI platform with:

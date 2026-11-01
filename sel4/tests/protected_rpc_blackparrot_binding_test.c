@@ -7,7 +7,7 @@
 #include "blackparrot_rpc_abi.h"
 #include "protected_rpc_blackparrot.h"
 
-seL4_Word mock_sel4_mrs[8];
+seL4_Word mock_sel4_mrs[16];
 seL4_CPtr mock_sel4_caps[4];
 
 static seL4_CPtr called_endpoint;
@@ -112,8 +112,35 @@ int main(void)
     assert(kernel_calls == 2 && attach_calls == 1 && detach_calls == 1);
 
     reset();
+    protected_rpc_blackparrot_binding_t region_binding = binding;
+    region_binding.region = (protected_rpc_blackparrot_region_binding_t) {
+        .region = {.opaque = UINT64_C(0xa11ce001)},
+        .caller_base = UINT64_C(0x50000),
+        .server_base = UINT64_C(0x60000),
+        .size = UINT64_C(0x1000),
+        .access = PROTECTED_RPC_ACCESS_READ | PROTECTED_RPC_ACCESS_WRITE,
+    };
+    assert(protected_rpc_blackparrot_bind(endpoint, &region_binding)
+           == PROTECTED_RPC_OK);
+    assert((called_info.words[0] & UINT64_C(0xff))
+           == BP_RPC_SEL4_BIND_REGION_ARGUMENTS);
+    assert(mock_sel4_mrs[5] == region_binding.region.region.opaque);
+    assert(mock_sel4_mrs[6] == region_binding.region.caller_base);
+    assert(mock_sel4_mrs[7] == region_binding.region.server_base);
+    assert(mock_sel4_mrs[8] == region_binding.region.size);
+    assert(mock_sel4_mrs[9] == region_binding.region.access);
+    assert(protected_rpc_blackparrot_unbind(endpoint) == PROTECTED_RPC_OK);
+
+    reset();
     call_error = seL4_IllegalOperation;
     assert(protected_rpc_blackparrot_bind(endpoint, &binding)
+           == PROTECTED_RPC_DENIED);
+    assert(attached_token == 0);
+    assert(kernel_calls == 1 && attach_calls == 0 && detach_calls == 0);
+
+    reset();
+    call_error = seL4_FailedLookup;
+    assert(protected_rpc_blackparrot_bind(endpoint, &region_binding)
            == PROTECTED_RPC_DENIED);
     assert(attached_token == 0);
     assert(kernel_calls == 1 && attach_calls == 0 && detach_calls == 0);
@@ -140,6 +167,12 @@ int main(void)
 
     reset();
     assert(protected_rpc_blackparrot_bind(endpoint, NULL)
+           == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(called_endpoint == 0);
+
+    reset();
+    region_binding.region.access = 0;
+    assert(protected_rpc_blackparrot_bind(endpoint, &region_binding)
            == PROTECTED_RPC_INVALID_ARGUMENT);
     assert(called_endpoint == 0);
     return 0;

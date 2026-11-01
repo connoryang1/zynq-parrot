@@ -126,7 +126,7 @@ diff --git a/apps/sel4test-tests/CMakeLists.txt b/apps/sel4test-tests/CMakeLists
 index cb3b677..705d60e 100644
 --- a/apps/sel4test-tests/CMakeLists.txt
 +++ b/apps/sel4test-tests/CMakeLists.txt
-@@ -14,20 +14,55 @@ if(KernelArchRiscV)
+@@ -14,20 +14,56 @@ if(KernelArchRiscV)
      set(arch arm)
  endif()
 -
@@ -163,7 +163,8 @@ index cb3b677..705d60e 100644
 +        src/tests/protected_rpc_sel4.c
 +    )
 +    target_include_directories(sel4-rpc-server PRIVATE include)
-+    target_compile_options(sel4-rpc-server PRIVATE -ffunction-sections -fdata-sections)
++    target_compile_options(sel4-rpc-server PRIVATE
++        -ffunction-sections -fdata-sections -fno-builtin-memchr)
 +    target_link_options(sel4-rpc-server PRIVATE -Wl,--gc-sections -Wl,-s)
 +    target_link_libraries(
 +        sel4-rpc-server

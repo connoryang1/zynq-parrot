@@ -24,6 +24,12 @@ typedef struct bp_rpc_binding {
     asid_t caller_asid;
     asid_t server_asid;
     word_t token;
+    word_t region_token;
+    word_t region_ppn;
+    word_t region_caller_base;
+    word_t region_server_base;
+    word_t region_size;
+    word_t region_access;
 } bp_rpc_binding_t;
 
 static bp_rpc_binding_t bp_rpc_binding;
@@ -78,15 +84,33 @@ static bool_t bp_rpc_tcb_satp(tcb_t *tcb, word_t *satp_value,
 }
 
 static bool_t bp_rpc_user_mapping(pte_t *root, word_t address,
-                                  bool_t executable, bool_t writable)
+                                  bool_t readable, bool_t executable,
+                                  bool_t writable)
 {
     lookupPTSlot_ret_t lookup = lookupPTSlot(root, address);
     pte_t *pte = lookup.ptSlot;
     bool_t leaf = pte_ptr_get_read(pte) || pte_ptr_get_write(pte)
                   || pte_ptr_get_execute(pte);
     return pte_ptr_get_valid(pte) && leaf && pte_ptr_get_user(pte)
+           && (!readable || pte_ptr_get_read(pte))
            && (!executable || pte_ptr_get_execute(pte))
            && (!writable || pte_ptr_get_write(pte));
+}
+
+static bool_t bp_rpc_user_4k_mapping(pte_t *root, word_t address,
+                                     bool_t writable, word_t *ppn)
+{
+    lookupPTSlot_ret_t lookup = lookupPTSlot(root, address);
+    pte_t *pte = lookup.ptSlot;
+    bool_t leaf = pte_ptr_get_read(pte) || pte_ptr_get_write(pte)
+                  || pte_ptr_get_execute(pte);
+    if (lookup.ptBitsLeft != seL4_PageBits || !pte_ptr_get_valid(pte)
+        || !leaf || !pte_ptr_get_user(pte) || !pte_ptr_get_read(pte)
+        || (writable && !pte_ptr_get_write(pte))) {
+        return false;
+    }
+    *ppn = pte_ptr_get_ppn(pte);
+    return true;
 }
 
 static void bp_rpc_reply_word(word_t value)
@@ -122,7 +146,8 @@ static void bp_rpc_revoke(void)
 static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
                                word_t *buffer)
 {
-    if (length < BP_RPC_SEL4_BIND_ARGUMENTS
+    if ((length != BP_RPC_SEL4_BIND_ARGUMENTS
+         && length != BP_RPC_SEL4_BIND_REGION_ARGUMENTS)
         || current_extra_caps.excaprefs[0] == NULL) {
         return bp_rpc_error(seL4_TruncatedMessage);
     }
@@ -207,10 +232,50 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
         return bp_rpc_error(seL4_InvalidArgument);
     }
     if (!bp_rpc_user_mapping(server_root, descriptor.server_entry,
-                             true, false)
+                             false, true, false)
         || !bp_rpc_user_mapping(server_root, descriptor.server_sp - 1,
-                                false, true)) {
+                                true, false, true)
+        || (descriptor.server_gp != 0
+            && !bp_rpc_user_mapping(server_root, descriptor.server_gp,
+                                    true, false, false))
+        || (descriptor.server_tp != 0
+            && !bp_rpc_user_mapping(server_root, descriptor.server_tp,
+                                    true, false, false))) {
         return bp_rpc_error(seL4_FailedLookup);
+    }
+
+    word_t region_token = 0;
+    word_t region_ppn = 0;
+    word_t region_caller_base = 0;
+    word_t region_server_base = 0;
+    word_t region_size = 0;
+    word_t region_access = 0;
+    if (length == BP_RPC_SEL4_BIND_REGION_ARGUMENTS) {
+        region_token = getSyscallArg(5, buffer);
+        region_caller_base = getSyscallArg(6, buffer);
+        region_server_base = getSyscallArg(7, buffer);
+        region_size = getSyscallArg(8, buffer);
+        region_access = getSyscallArg(9, buffer);
+        if (region_token == 0 || region_size != BIT(seL4_PageBits)
+            || !IS_ALIGNED(region_caller_base, seL4_PageBits)
+            || !IS_ALIGNED(region_server_base, seL4_PageBits)
+            || region_access == 0
+            || (region_access & ~(BP_RPC_REGION_ACCESS_READ
+                                  | BP_RPC_REGION_ACCESS_WRITE)) != 0) {
+            current_syscall_error.invalidArgumentNumber = 5;
+            return bp_rpc_error(seL4_InvalidArgument);
+        }
+
+        word_t caller_ppn, server_ppn;
+        bool_t server_writable = region_access & BP_RPC_REGION_ACCESS_WRITE;
+        if (!bp_rpc_user_4k_mapping(caller_root, region_caller_base,
+                                    true, &caller_ppn)
+            || !bp_rpc_user_4k_mapping(server_root, region_server_base,
+                                       server_writable, &server_ppn)
+            || caller_ppn != server_ppn) {
+            return bp_rpc_error(seL4_FailedLookup);
+        }
+        region_ppn = caller_ppn;
     }
 
     bp_rpc_sbi_ret_t result = bp_rpc_sbi_call(
@@ -229,6 +294,12 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
         .caller_asid = caller_asid,
         .server_asid = server_asid,
         .token = descriptor.token,
+        .region_token = region_token,
+        .region_ppn = region_ppn,
+        .region_caller_base = region_caller_base,
+        .region_server_base = region_server_base,
+        .region_size = region_size,
+        .region_access = region_access,
     };
     bp_rpc_reply_word(descriptor.token);
     return EXCEPTION_NONE;

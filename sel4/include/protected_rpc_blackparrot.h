@@ -25,6 +25,14 @@ protected_rpc_status_t protected_rpc_blackparrot_detach(
  * only the fixed server entry state inside the server's own VSpace.
  */
 typedef struct {
+    protected_rpc_region_t region;
+    uint64_t caller_base;
+    uint64_t server_base;
+    uint64_t size;
+    uint32_t access;
+} protected_rpc_blackparrot_region_binding_t;
+
+typedef struct {
     uint64_t server_tcb;
     uint64_t server_entry;
     uint64_t server_sp;
@@ -32,6 +40,8 @@ typedef struct {
     uint64_t server_tp;
     uint8_t request_words;
     uint8_t reply_words;
+    /* Version 1 supports zero or one page-sized, physically shared region. */
+    protected_rpc_blackparrot_region_binding_t region;
 } protected_rpc_blackparrot_binding_t;
 
 /* Atomically create/remove the kernel binding and update the caller adapter. */

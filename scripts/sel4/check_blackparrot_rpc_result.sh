@@ -4,12 +4,17 @@
 set -euo pipefail
 
 physical=0
-if (($# == 2)) && [[ $1 == --physical ]]; then
-    physical=1
+shared_buffer=0
+while (($# > 1)); do
+    case $1 in
+        --physical) physical=1 ;;
+        --shared-buffer) shared_buffer=1 ;;
+        *) break ;;
+    esac
     shift
-fi
+done
 if (($# != 1)); then
-    echo "usage: $0 [--physical] OUTPUT.log" >&2
+    echo "usage: $0 [--physical] [--shared-buffer] OUTPUT.log" >&2
     exit 2
 fi
 
@@ -26,6 +31,8 @@ software_count=0
 core_pass_count=0
 bsg_pass_count=0
 bsg_fail_count=0
+workload_count=0
+guard_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -49,6 +56,10 @@ while IFS= read -r line; do
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
     [[ $line == *"BSG FAIL"* ]] && bsg_fail_count=$((bsg_fail_count + 1))
+    [[ $line == "SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024" ]] \
+        && workload_count=$((workload_count + 1))
+    [[ $line == "SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied" ]] \
+        && guard_count=$((guard_count + 1))
 done < "$log"
 
 if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
@@ -61,8 +72,13 @@ if ((hardware_calls != 256 || software_calls != 8)); then
 fi
 if ((hardware_total == 0 || software_total == 0
       || hardware_per_call != hardware_total / hardware_calls
-      || software_per_call != software_total / software_calls)); then
+      || software_per_call != software_total / software_calls
+      || hardware_per_call >= software_per_call)); then
     echo "invalid RPC cycle accounting" >&2
+    exit 1
+fi
+if ((shared_buffer)) && ((workload_count != 1 || guard_count != 1)); then
+    echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count" >&2
     exit 1
 fi
 if ((physical)) && ((core_pass_count != 1 || bsg_pass_count != 1 || bsg_fail_count != 0)); then
