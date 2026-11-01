@@ -24,9 +24,10 @@ hardware_re='^SEL4_RPC_ADAPTER path=hardware calls=([0-9]+) total_cycles=([0-9]+
 software_re='^SEL4_RPC_ADAPTER path=software-fallback calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 direct_re='^SEL4_RPC_ADAPTER path=in-process calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 ipc_re='^SEL4_RPC_ADAPTER path=software calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
-distribution_re='^SEL4_RPC_DISTRIBUTION path=(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
-cold_distribution_re='^SEL4_RPC_DISTRIBUTION path=l1d-cold/(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
-hierarchy_distribution_re='^SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
+notification_re='^SEL4_RPC_ADAPTER path=notification calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
+distribution_re='^SEL4_RPC_DISTRIBUTION path=(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
+cold_distribution_re='^SEL4_RPC_DISTRIBUTION path=l1d-cold/(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
+hierarchy_distribution_re='^SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 
 test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 
@@ -40,17 +41,22 @@ workload_count=0
 guard_count=0
 direct_count=0
 ipc_count=0
+notification_count=0
+notification_semantics_count=0
 direct_distribution_count=0
 hardware_distribution_count=0
 software_distribution_count=0
+notification_distribution_count=0
 cold_state_count=0
 direct_cold_distribution_count=0
 hardware_cold_distribution_count=0
 software_cold_distribution_count=0
+notification_cold_distribution_count=0
 hierarchy_state_count=0
 direct_hierarchy_distribution_count=0
 hardware_hierarchy_distribution_count=0
 software_hierarchy_distribution_count=0
+notification_hierarchy_distribution_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -80,6 +86,11 @@ while IFS= read -r line; do
         ipc_calls=${BASH_REMATCH[1]}
         ipc_total=${BASH_REMATCH[2]}
         ipc_per_call=${BASH_REMATCH[3]}
+    elif [[ $line =~ $notification_re ]]; then
+        notification_count=$((notification_count + 1))
+        notification_calls=${BASH_REMATCH[1]}
+        notification_total=${BASH_REMATCH[2]}
+        notification_per_call=${BASH_REMATCH[3]}
     elif [[ $line =~ $distribution_re ]]; then
         distribution_path=${BASH_REMATCH[1]}
         distribution_samples=${BASH_REMATCH[2]}
@@ -111,6 +122,14 @@ while IFS= read -r line; do
                 software_median=$distribution_median
                 software_p95=$distribution_p95
                 software_max=$distribution_max
+                ;;
+            notification)
+                notification_distribution_count=$((notification_distribution_count + 1))
+                notification_distribution_samples=$distribution_samples
+                notification_min=$distribution_min
+                notification_median=$distribution_median
+                notification_p95=$distribution_p95
+                notification_max=$distribution_max
                 ;;
         esac
     elif [[ $line =~ $cold_distribution_re ]]; then
@@ -145,6 +164,14 @@ while IFS= read -r line; do
                 software_cold_p95=$distribution_p95
                 software_cold_max=$distribution_max
                 ;;
+            notification)
+                notification_cold_distribution_count=$((notification_cold_distribution_count + 1))
+                notification_cold_samples=$distribution_samples
+                notification_cold_min=$distribution_min
+                notification_cold_median=$distribution_median
+                notification_cold_p95=$distribution_p95
+                notification_cold_max=$distribution_max
+                ;;
         esac
     elif [[ $line =~ $hierarchy_distribution_re ]]; then
         distribution_path=${BASH_REMATCH[1]}
@@ -178,6 +205,14 @@ while IFS= read -r line; do
                 software_hierarchy_p95=$distribution_p95
                 software_hierarchy_max=$distribution_max
                 ;;
+            notification)
+                notification_hierarchy_distribution_count=$((notification_hierarchy_distribution_count + 1))
+                notification_hierarchy_samples=$distribution_samples
+                notification_hierarchy_min=$distribution_min
+                notification_hierarchy_median=$distribution_median
+                notification_hierarchy_p95=$distribution_p95
+                notification_hierarchy_max=$distribution_max
+                ;;
         esac
     fi
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
@@ -187,6 +222,8 @@ while IFS= read -r line; do
         && workload_count=$((workload_count + 1))
     [[ $line == "SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied" ]] \
         && guard_count=$((guard_count + 1))
+    [[ $line == "SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw data-region=server-ro request-signal=notification reply-signal=notification" ]] \
+        && notification_semantics_count=$((notification_semantics_count + 1))
     [[ $line == "SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64" ]] \
         && cold_state_count=$((cold_state_count + 1))
     [[ $line == "SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64" ]] \
@@ -211,24 +248,29 @@ fi
 if ((shared_buffer)); then
     if ((workload_count != 1 || guard_count != 1
          || direct_count != 1 || ipc_count != 1
+         || notification_count != 1 || notification_semantics_count != 1
          || direct_distribution_count != 1
          || hardware_distribution_count != 1
          || software_distribution_count != 1
+         || notification_distribution_count != 1
          || cold_state_count != 1
          || direct_cold_distribution_count != 1
          || hardware_cold_distribution_count != 1
          || software_cold_distribution_count != 1
+         || notification_cold_distribution_count != 1
          || hierarchy_state_count != 1
          || direct_hierarchy_distribution_count != 1
          || hardware_hierarchy_distribution_count != 1
-         || software_hierarchy_distribution_count != 1)); then
-        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count cold=$cold_state_count:$direct_cold_distribution_count/$hardware_cold_distribution_count/$software_cold_distribution_count hierarchy=$hierarchy_state_count:$direct_hierarchy_distribution_count/$hardware_hierarchy_distribution_count/$software_hierarchy_distribution_count" >&2
+         || software_hierarchy_distribution_count != 1
+         || notification_hierarchy_distribution_count != 1)); then
+        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count notification=$notification_count/$notification_semantics_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count/$notification_distribution_count cold=$cold_state_count:$direct_cold_distribution_count/$hardware_cold_distribution_count/$software_cold_distribution_count/$notification_cold_distribution_count hierarchy=$hierarchy_state_count:$direct_hierarchy_distribution_count/$hardware_hierarchy_distribution_count/$software_hierarchy_distribution_count/$notification_hierarchy_distribution_count" >&2
         exit 1
     fi
-    if ((direct_calls != 256 || ipc_calls != 256
-         || direct_total == 0 || ipc_total == 0
+    if ((direct_calls != 256 || ipc_calls != 256 || notification_calls != 256
+         || direct_total == 0 || ipc_total == 0 || notification_total == 0
          || direct_per_call != direct_total / direct_calls
          || ipc_per_call != ipc_total / ipc_calls
+         || notification_per_call != notification_total / notification_calls
          || direct_per_call >= hardware_per_call
          || hardware_per_call >= ipc_per_call)); then
         echo "invalid matched-path cycle accounting" >&2
@@ -237,12 +279,16 @@ if ((shared_buffer)); then
     if ((direct_distribution_samples != 64
          || hardware_distribution_samples != 64
          || software_distribution_samples != 64
+         || notification_distribution_samples != 64
          || direct_min > direct_median || direct_median > direct_p95
          || direct_p95 > direct_max
          || hardware_min > hardware_median || hardware_median > hardware_p95
          || hardware_p95 > hardware_max
          || software_min > software_median || software_median > software_p95
          || software_p95 > software_max
+         || notification_min > notification_median
+         || notification_median > notification_p95
+         || notification_p95 > notification_max
          || direct_median >= hardware_median
          || hardware_median >= software_median)); then
         echo "invalid matched-path distribution" >&2
@@ -251,6 +297,7 @@ if ((shared_buffer)); then
     if ((direct_cold_samples != 64
          || hardware_cold_samples != 64
          || software_cold_samples != 64
+         || notification_cold_samples != 64
          || direct_cold_min > direct_cold_median
          || direct_cold_median > direct_cold_p95
          || direct_cold_p95 > direct_cold_max
@@ -259,13 +306,17 @@ if ((shared_buffer)); then
          || hardware_cold_p95 > hardware_cold_max
          || software_cold_min > software_cold_median
          || software_cold_median > software_cold_p95
-         || software_cold_p95 > software_cold_max)); then
+         || software_cold_p95 > software_cold_max
+         || notification_cold_min > notification_cold_median
+         || notification_cold_median > notification_cold_p95
+         || notification_cold_p95 > notification_cold_max)); then
         echo "invalid L1D-cold distribution" >&2
         exit 1
     fi
     if ((direct_hierarchy_samples != 64
          || hardware_hierarchy_samples != 64
          || software_hierarchy_samples != 64
+         || notification_hierarchy_samples != 64
          || direct_hierarchy_min > direct_hierarchy_median
          || direct_hierarchy_median > direct_hierarchy_p95
          || direct_hierarchy_p95 > direct_hierarchy_max
@@ -274,7 +325,10 @@ if ((shared_buffer)); then
          || hardware_hierarchy_p95 > hardware_hierarchy_max
          || software_hierarchy_min > software_hierarchy_median
          || software_hierarchy_median > software_hierarchy_p95
-         || software_hierarchy_p95 > software_hierarchy_max)); then
+         || software_hierarchy_p95 > software_hierarchy_max
+         || notification_hierarchy_min > notification_hierarchy_median
+         || notification_hierarchy_median > notification_hierarchy_p95
+         || notification_hierarchy_p95 > notification_hierarchy_max)); then
         echo "invalid data-hierarchy-cold distribution" >&2
         exit 1
     fi
@@ -287,12 +341,12 @@ fi
 printf 'accepted seL4 RPC gate: hardware=%s cycles/call software-fallback=%s cycles/call\n' \
     "$hardware_per_call" "$software_per_call"
 if ((shared_buffer)); then
-    printf 'matched warm paths: in-process=%s hardware=%s software=%s cycles/call\n' \
-        "$direct_per_call" "$hardware_per_call" "$ipc_per_call"
-    printf 'matched medians: in-process=%s hardware=%s software=%s cycles/call\n' \
-        "$direct_median" "$hardware_median" "$software_median"
-    printf 'L1D-cold medians: in-process=%s hardware=%s software=%s cycles/call\n' \
-        "$direct_cold_median" "$hardware_cold_median" "$software_cold_median"
-    printf 'data-hierarchy-cold medians: in-process=%s hardware=%s software=%s cycles/call\n' \
-        "$direct_hierarchy_median" "$hardware_hierarchy_median" "$software_hierarchy_median"
+    printf 'matched warm paths: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
+        "$direct_per_call" "$hardware_per_call" "$ipc_per_call" "$notification_per_call"
+    printf 'matched medians: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
+        "$direct_median" "$hardware_median" "$software_median" "$notification_median"
+    printf 'L1D-cold medians: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
+        "$direct_cold_median" "$hardware_cold_median" "$software_cold_median" "$notification_cold_median"
+    printf 'data-hierarchy-cold medians: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
+        "$direct_hierarchy_median" "$hardware_hierarchy_median" "$software_hierarchy_median" "$notification_hierarchy_median"
 fi

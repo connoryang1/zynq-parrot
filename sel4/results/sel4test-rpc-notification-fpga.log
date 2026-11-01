@@ -1,0 +1,36 @@
+SEL4_RPC_EVIDENCE platform=pynq-z2 workload=libc-bounded-search date=2026-11-01
+SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied
+SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024
+SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=760932 cycles_per_call=2972
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=865425 cycles_per_call=3380
+SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1415657 cycles_per_call=5529
+SEL4_RPC_ADAPTER path=notification calls=256 total_cycles=2762107 cycles_per_call=10789
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=51486 cycles_per_call=6435
+SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2782 median=2786 p95=4948 max=5864
+SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3150 median=3150 p95=5308 max=6235
+SEL4_RPC_DISTRIBUTION path=software samples=64 min=5180 median=5189 p95=7391 max=8449
+SEL4_RPC_DISTRIBUTION path=notification samples=64 min=9855 median=10226 p95=12437 max=13384
+SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw data-region=server-ro request-signal=notification reply-signal=notification
+SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64
+SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=3700 median=3700 p95=7339 max=14821
+SEL4_RPC_DISTRIBUTION path=l1d-cold/hardware samples=64 min=4334 median=4335 p95=7966 max=9774
+SEL4_RPC_DISTRIBUTION path=l1d-cold/software samples=64 min=9162 median=9937 p95=12665 max=13668
+SEL4_RPC_DISTRIBUTION path=l1d-cold/notification samples=64 min=14238 median=15042 p95=18816 max=19137
+SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/in-process samples=64 min=4156 median=4163 p95=8138 max=9752
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/hardware samples=64 min=4860 median=4867 p95=8845 max=10826
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/software samples=64 min=9093 median=9431 p95=13605 max=13744
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/notification samples=64 min=13759 median=14472 p95=17716 max=18669
+Test SEL4IPCRPC0002 passed
+Test suite passed. 3 tests passed. 0 tests disabled.
+All is well in the universe
+INFO: CORE PASS
+INFO: BSG PASS
+SEL4_RPC_ARTIFACT bitstream_sha256=ca4a6cbd9afd8a4f10064eeb6142dba514dec1c766b595836be099a135331040
+SEL4_RPC_ARTIFACT nbf_sha256=0d90d7bff6d9cfe68cf91154b3fba45c747c4f241f76d985bb4b1a891b71e99b
+SEL4_RPC_ARTIFACT elfloader_sha256=0ab257282459403eb511178bf39dd1aeaa640ddf79da6dd15cb8e74d47685ae1
+SEL4_RPC_ARTIFACT kernel_sha256=ee9d2164e89a735c9ea7f153a3d331bc46dd55053dea7c652bc255e2f7300723
+SEL4_RPC_ARTIFACT raw_uart_sha256=6805711bbcd44778036ce8c45aa88040d33189b6b9aefee774a0fdfd2f75f437
+SEL4_RPC_ARTIFACT control_program_sha256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-stage5-notification-20261101T204519Z-1705799.log
+RUNNER_EXIT=0

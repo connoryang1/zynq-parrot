@@ -345,6 +345,23 @@ evidence is retained in
 and
 [`results/sel4test-rpc-shared-search-qemu.log`](results/sel4test-rpc-shared-search-qemu.log).
 
+A subsequent physical run adds the remaining shared-memory notification
+control without changing the handler, protected data page, routed bitstream,
+or timing boundaries. Its mailbox is shared read/write—strictly weaker than
+the protected RPC contract—and two one-way notifications carry only wakeups.
+Warm medians are 2,786/3,150/5,189/10,226 cycles for
+in-process/hardware/software/notification. L1D-cold medians are
+3,700/4,335/9,937/15,042, and L1D+L2-cold medians are
+4,163/4,867/9,431/14,472. Thus the notification design is 1.97x slower than
+ordinary endpoint IPC and 3.25x slower than hardware RPC at warm median. This
+is expected from the mechanism: endpoint `Call` plus server `ReplyRecv`
+provides a direct request/reply handoff, while the notification protocol needs
+separate caller `Signal`/`Wait` and server `Wait`/`Signal` operations plus
+mailbox publication. It is therefore a useful negative baseline, not a better
+software implementation to optimize against. The accepted NBF is
+`0d90d7bf...1e99b`; normalized evidence is in
+[`results/sel4test-rpc-notification-fpga.log`](results/sel4test-rpc-notification-fpga.log).
+
 The host must provide the pinned checkout's Python packages plus CMake, Ninja,
 and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
 the qualified BlackParrot OpenSBI platform with:

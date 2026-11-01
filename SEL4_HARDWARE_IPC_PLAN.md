@@ -233,8 +233,8 @@ on the routed PYNQ-Z2 endpoint. The focused physical run measures 374 cycles
 per hardware call versus 3,217 cycles per automatic post-unbind fallback and
 passes the complete three-test suite plus clean host termination. See RL-063 and
 `sel4/results/sel4test-rpc-only-blackparrot-fpga.log`. RL-064 now completes
-Stage 5's matched warm, L1D-cold, and L1D+L2-cold real-service gates; a
-notification comparison remains.
+Stage 5's matched warm, L1D-cold, and L1D+L2-cold real-service gates, including
+the shared-mailbox/two-notification comparison.
 
 #### Initial kernel binding shape
 
@@ -297,15 +297,17 @@ the software and hardware IPC paths use matched inputs, outputs, mappings, and
 timing boundaries.
 
 Current checkpoint (2026-11-01): one shared-page musl service passes QEMU and
-the PYNQ-Z2. Matched warm averages are 2,963 cycles in-process, 3,347 through
-hardware RPC, and 5,649 through forced ordinary seL4 IPC. Per-call warm
-medians are 2,782/3,138/5,283. A whole-L1D writeback/invalidate produces
-L1D-cold/L2-warm medians of 3,708/4,319/10,045. A four-times-capacity L2
-eviction followed by another L1D flush produces L1D+L2-cold medians of
-4,190/4,880/9,585; hardware adds 690 cycles over direct work versus 5,395 for
-ordinary IPC and is 1.96x faster end to end. The next evaluation step is the
-shared-memory notification comparison; the eight-call AUTO fallback remains
-separate because its failed hardware probe is intentional extra work.
+the PYNQ-Z2. The latest matched warm medians are 2,786 cycles in-process, 3,150
+through hardware RPC, 5,189 through forced ordinary seL4 IPC, and 10,226
+through a shared read/write mailbox with separate request/reply notifications.
+L1D-cold/L2-warm medians are 3,700/4,335/9,937/15,042; L1D+L2-cold medians are
+4,163/4,867/9,431/14,472 in the same order. Hardware RPC is 1.65x faster than
+ordinary IPC and 3.25x faster than the notification baseline at warm median.
+The notification baseline deliberately has weaker semantics than the protected
+paths, yet remains slower because it splits each direction into Signal/Wait
+operations instead of using seL4's endpoint Call/ReplyRecv handoff. The
+eight-call AUTO fallback remains separate because its failed hardware probe is
+intentional extra work.
 
 ### Stage 6 — Generalization
 

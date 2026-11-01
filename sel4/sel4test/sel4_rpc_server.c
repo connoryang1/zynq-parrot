@@ -9,9 +9,49 @@
 #include "sel4_rpc_search_service.h"
 
 #define SERVER_SOFTWARE_CALLS SEL4_RPC_SEARCH_SOFTWARE_REQUESTS
+#define SERVER_NOTIFICATION_CALLS SEL4_RPC_SEARCH_NOTIFICATION_REQUESTS
 
 static protected_rpc_region_binding_t server_region;
 static protected_rpc_server_config_t server_config;
+
+static protected_rpc_status_t serve_notifications(
+    seL4_CPtr request_notification, seL4_CPtr reply_notification,
+    volatile sel4_rpc_notification_mailbox_t *mailbox)
+{
+    const protected_rpc_call_context_t context = {
+        .runtime_private = &server_config,
+    };
+    for (uint64_t expected = 1; expected <= SERVER_NOTIFICATION_CALLS;
+         expected++) {
+        seL4_Wait(request_notification, NULL);
+        const uint64_t sequence = __atomic_load_n(
+            &mailbox->request_sequence, __ATOMIC_ACQUIRE);
+        protected_rpc_message_t request = {0};
+        protected_rpc_message_t reply = {0};
+        protected_rpc_status_t status = PROTECTED_RPC_BACKEND_ERROR;
+        if (sequence == expected
+            && mailbox->request_length <= PROTECTED_RPC_MAX_WORDS) {
+            request.length = (uint8_t)mailbox->request_length;
+            for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
+                request.words[word] = mailbox->request_words[word];
+            }
+            status = server_config.handler(
+                &context, &request, &reply, server_config.cookie);
+            if (!protected_rpc_message_valid(&reply)) {
+                reply = (protected_rpc_message_t) {0};
+                status = PROTECTED_RPC_BACKEND_ERROR;
+            }
+        }
+        mailbox->reply_length = reply.length;
+        for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
+            mailbox->reply_words[word] = reply.words[word];
+        }
+        mailbox->status = status;
+        __atomic_store_n(&mailbox->reply_sequence, expected, __ATOMIC_RELEASE);
+        seL4_Signal(reply_notification);
+    }
+    return PROTECTED_RPC_OK;
+}
 
 static void __attribute__((noreturn, noinline, used, aligned(64)))
 hardware_search_entry(uint64_t word0, uint64_t word1, uint64_t word2,
@@ -52,7 +92,7 @@ hardware_search_entry(uint64_t word0, uint64_t word1, uint64_t word2,
 
 int main(int argc, char **argv)
 {
-    if (argc != 4) {
+    if (argc != 4 && argc != 7) {
         return PROTECTED_RPC_INVALID_ARGUMENT;
     }
 
@@ -86,6 +126,21 @@ int main(int argc, char **argv)
     seL4_SetMR(1, global_pointer);
     seL4_SetMR(2, (seL4_Word)(uintptr_t)&server_config);
     seL4_Send(control, seL4_MessageInfo_new(0, 0, 0, 3));
+
+    if (argc == 7) {
+        const seL4_CPtr request_notification =
+            (seL4_CPtr)strtoull(argv[4], NULL, 0);
+        const seL4_CPtr reply_notification =
+            (seL4_CPtr)strtoull(argv[5], NULL, 0);
+        volatile sel4_rpc_notification_mailbox_t *mailbox =
+            (void *)(uintptr_t)strtoull(argv[6], NULL, 0);
+        if (request_notification == 0 || reply_notification == 0
+            || mailbox == NULL
+            || serve_notifications(request_notification, reply_notification,
+                                   mailbox) != PROTECTED_RPC_OK) {
+            return PROTECTED_RPC_BACKEND_ERROR;
+        }
+    }
 
     const protected_rpc_status_t status = protected_rpc_serve(
         (protected_rpc_endpoint_t){.opaque = endpoint}, &server_config);

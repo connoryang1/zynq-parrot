@@ -54,18 +54,23 @@ printf '%s\r\r\n' \
     'SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=760832 cycles_per_call=2972' \
     'SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=856576 cycles_per_call=3346' \
     'SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1664000 cycles_per_call=6500' \
+    'SEL4_RPC_ADAPTER path=notification calls=256 total_cycles=1536000 cycles_per_call=6000' \
     'SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=52880 cycles_per_call=6610' \
     'SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2960 median=2970 p95=2990 max=3010' \
     'SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3330 median=3340 p95=3370 max=3400' \
     'SEL4_RPC_DISTRIBUTION path=software samples=64 min=6450 median=6500 p95=6600 max=6700' \
+    'SEL4_RPC_DISTRIBUTION path=notification samples=64 min=5900 median=6000 p95=6100 max=6200' \
+    'SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw data-region=server-ro request-signal=notification reply-signal=notification' \
     'SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=4000 median=4100 p95=4300 max=4500' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/hardware samples=64 min=4400 median=4500 p95=4800 max=5000' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/software samples=64 min=7000 median=7200 p95=7600 max=8000' \
+    'SEL4_RPC_DISTRIBUTION path=l1d-cold/notification samples=64 min=6500 median=6700 p95=7100 max=7500' \
     'SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64' \
     'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/in-process samples=64 min=5000 median=5200 p95=5700 max=6100' \
     'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/hardware samples=64 min=5700 median=5900 p95=6400 max=6900' \
     'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/software samples=64 min=9000 median=9400 p95=10100 max=11000' \
+    'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/notification samples=64 min=8200 median=8600 p95=9300 max=10000' \
     'Test SEL4IPCRPC0002 passed' \
     'halting...INFO:    CORE PASS' \
     'INFO:    BSG PASS' > "$uart_log"

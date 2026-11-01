@@ -26,11 +26,13 @@
 #define ADAPTER_L1D_COLD_CALLS SEL4_RPC_SEARCH_L1D_COLD_CALLS
 #define ADAPTER_HIERARCHY_COLD_CALLS SEL4_RPC_SEARCH_HIERARCHY_COLD_CALLS
 #define ADAPTER_BP_FALLBACK_CALLS SEL4_RPC_SEARCH_FALLBACK_CALLS
+#define ADAPTER_NOTIFICATION_CALLS SEL4_RPC_SEARCH_MEASURED_CALLS
 #define ADAPTER_VALID_CALLS (ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS)
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
 #define ADAPTER_REGION_TOKEN UINT64_C(0xa11ce001)
 #define ADAPTER_BP_SERVER_IMAGE "sel4-rpc-server"
-#define ADAPTER_BP_SERVER_ARGS 4
+#define ADAPTER_BP_SERVER_ARGS 7
+#define ADAPTER_SOFTWARE_SERVER_ARGS 4
 #define ADAPTER_SEARCH_BYTES SEL4_RPC_SEARCH_BYTES
 #define ADAPTER_SEARCH_NEEDLE ((seL4_Word)SEL4_RPC_SEARCH_NEEDLE)
 #define ADAPTER_CACHE_LINE_BYTES 64u
@@ -73,6 +75,35 @@ static void evict_data_cache_hierarchy(void)
     }
     adapter_l2_eviction_sink = sum;
     flush_l1_data_cache();
+}
+
+static protected_rpc_status_t notification_call(
+    seL4_CPtr request_notification, seL4_CPtr reply_notification,
+    volatile sel4_rpc_notification_mailbox_t *mailbox, uint64_t sequence,
+    const protected_rpc_message_t *request, protected_rpc_message_t *reply)
+{
+    if (!protected_rpc_message_valid(request) || reply == NULL
+        || sequence == 0) {
+        return PROTECTED_RPC_INVALID_ARGUMENT;
+    }
+    mailbox->request_length = request->length;
+    for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
+        mailbox->request_words[word] = request->words[word];
+    }
+    __atomic_store_n(&mailbox->request_sequence, sequence, __ATOMIC_RELEASE);
+    seL4_Signal(request_notification);
+    seL4_Wait(reply_notification, NULL);
+    if (__atomic_load_n(&mailbox->reply_sequence, __ATOMIC_ACQUIRE)
+        != sequence
+        || mailbox->reply_length > PROTECTED_RPC_MAX_WORDS
+        || mailbox->status > PROTECTED_RPC_BACKEND_ERROR) {
+        return PROTECTED_RPC_BACKEND_ERROR;
+    }
+    reply->length = (uint8_t)mailbox->reply_length;
+    for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
+        reply->words[word] = mailbox->reply_words[word];
+    }
+    return (protected_rpc_status_t)mailbox->status;
 }
 #endif
 
@@ -153,6 +184,7 @@ static int adapter_server(seL4_Word endpoint, seL4_Word shared_base,
 
 static void destroy_rpc_server(env_t env, sel4utils_process_t *server,
                                void *shadow_stack, void *caller_shared,
+                               void *caller_mailbox,
                                vka_object_t *control_endpoint)
 {
     if (shadow_stack != NULL) {
@@ -165,6 +197,10 @@ static void destroy_rpc_server(env_t env, sel4utils_process_t *server,
     sel4utils_destroy_process(server, &env->vka);
     if (caller_shared != NULL) {
         vspace_unmap_pages(&env->vspace, caller_shared, 1,
+                           seL4_PageBits, VSPACE_FREE);
+    }
+    if (caller_mailbox != NULL) {
+        vspace_unmap_pages(&env->vspace, caller_mailbox, 1,
                            seL4_PageBits, VSPACE_FREE);
     }
     vka_free_object(&env->vka, control_endpoint);
@@ -242,7 +278,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         &server.vspace, seL4_AllRights, 1, seL4_PageBits);
     test_assert(shadow_stack != NULL);
     if (shadow_stack == NULL) {
-        destroy_rpc_server(env, &server, NULL, NULL, &control_endpoint);
+        destroy_rpc_server(env, &server, NULL, NULL, NULL, &control_endpoint);
         return sel4test_get_result();
     }
 
@@ -250,7 +286,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         &env->vspace, seL4_AllRights, 1, seL4_PageBits);
     test_assert(shared_base != NULL);
     if (shared_base == NULL) {
-        destroy_rpc_server(env, &server, shadow_stack, NULL,
+        destroy_rpc_server(env, &server, shadow_stack, NULL, NULL,
                            &control_endpoint);
         return sel4test_get_result();
     }
@@ -263,7 +299,39 @@ static int test_blackparrot_hardware_binding(env_t env)
     test_assert(server_shared_base != NULL);
     if (server_shared_base == NULL) {
         destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           NULL,
                            &control_endpoint);
+        return sel4test_get_result();
+    }
+
+    void *mailbox_base = vspace_new_pages(
+        &env->vspace, seL4_AllRights, 1, seL4_PageBits);
+    test_assert(mailbox_base != NULL);
+    if (mailbox_base == NULL) {
+        destroy_rpc_server(env, &server, shadow_stack, shared_base, NULL,
+                           &control_endpoint);
+        return sel4test_get_result();
+    }
+    memset(mailbox_base, 0, BIT(seL4_PageBits));
+    void *server_mailbox_base = vspace_share_mem(
+        &env->vspace, &server.vspace, mailbox_base, 1, seL4_PageBits,
+        seL4_CapRights_new(false, false, true, true), true);
+    test_assert(server_mailbox_base != NULL);
+    if (server_mailbox_base == NULL) {
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base, &control_endpoint);
+        return sel4test_get_result();
+    }
+
+    const seL4_CPtr request_notification =
+        vka_alloc_notification_leaky(&env->vka);
+    const seL4_CPtr reply_notification =
+        vka_alloc_notification_leaky(&env->vka);
+    test_assert(request_notification != 0);
+    test_assert(reply_notification != 0);
+    if (request_notification == 0 || reply_notification == 0) {
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base, &control_endpoint);
         return sel4test_get_result();
     }
 
@@ -275,10 +343,25 @@ static int test_blackparrot_hardware_binding(env_t env)
     vka_cspace_make_path(&env->vka, control_endpoint.cptr, &control_path);
     const seL4_CPtr remote_control =
         sel4utils_copy_path_to_process(&server, control_path);
+    cspacepath_t request_notification_path;
+    vka_cspace_make_path(&env->vka, request_notification,
+                         &request_notification_path);
+    const seL4_CPtr remote_request_notification =
+        sel4utils_copy_path_to_process(&server, request_notification_path);
+    cspacepath_t reply_notification_path;
+    vka_cspace_make_path(&env->vka, reply_notification,
+                         &reply_notification_path);
+    const seL4_CPtr remote_reply_notification =
+        sel4utils_copy_path_to_process(&server, reply_notification_path);
     test_assert(remote_control != (seL4_CPtr)-1);
+    test_assert(remote_request_notification != (seL4_CPtr)-1);
+    test_assert(remote_reply_notification != (seL4_CPtr)-1);
     if (remote_endpoint == (seL4_CPtr)-1
-        || remote_control == (seL4_CPtr)-1) {
+        || remote_control == (seL4_CPtr)-1
+        || remote_request_notification == (seL4_CPtr)-1
+        || remote_reply_notification == (seL4_CPtr)-1) {
         destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base,
                            &control_endpoint);
         return sel4test_get_result();
     }
@@ -288,12 +371,16 @@ static int test_blackparrot_hardware_binding(env_t env)
     sel4utils_create_word_args(arg_strings, args, ADAPTER_BP_SERVER_ARGS,
                                remote_endpoint, remote_control,
                                (seL4_Word)server_shared_base,
-                               ADAPTER_REGION_TOKEN);
+                               ADAPTER_REGION_TOKEN,
+                               remote_request_notification,
+                               remote_reply_notification,
+                               (seL4_Word)server_mailbox_base);
     error = sel4utils_spawn_process_v(&server, &env->vka, &env->vspace,
                                       ADAPTER_BP_SERVER_ARGS, args, 1);
     test_eq(error, 0);
     if (error != 0) {
         destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base,
                            &control_endpoint);
         return sel4test_get_result();
     }
@@ -308,8 +395,8 @@ static int test_blackparrot_hardware_binding(env_t env)
     test_assert(hardware_entry != 0);
     test_assert(hardware_gp != 0);
     test_assert(hardware_state != 0);
-    /* Let the ordinary fallback server reach its endpoint receive queue. */
-    seL4_Yield();
+    /* The server first waits on the request notification. After the matched
+     * notification calls below it enters the ordinary endpoint receive loop. */
 
     const protected_rpc_endpoint_t rpc_endpoint = {.opaque = endpoint};
     protected_rpc_message_t request = {0};
@@ -340,12 +427,16 @@ static int test_blackparrot_hardware_binding(env_t env)
     uint64_t direct_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t hardware_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t software_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t notification_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t direct_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t hardware_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t software_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
+    uint64_t notification_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t direct_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
     uint64_t hardware_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
     uint64_t software_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
+    uint64_t notification_hierarchy_cold_samples[
+        ADAPTER_HIERARCHY_COLD_CALLS];
     uint64_t direct_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
@@ -392,6 +483,72 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
+
+    volatile sel4_rpc_notification_mailbox_t *notification_mailbox =
+        mailbox_base;
+    protected_rpc_message_t notification_reply = {0};
+    uint64_t notification_sequence = 0;
+    uint64_t notification_start = 0;
+    for (seL4_Word call = 0;
+         call < ADAPTER_WARMUP_CALLS + ADAPTER_NOTIFICATION_CALLS; call++) {
+        if (call == ADAPTER_WARMUP_CALLS) {
+            notification_start = read_cycles();
+        }
+        notification_sequence++;
+        test_eq(notification_call(
+                    request_notification, reply_notification,
+                    notification_mailbox, notification_sequence, &request,
+                    &notification_reply),
+                PROTECTED_RPC_OK);
+        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    const uint64_t notification_elapsed =
+        read_cycles() - notification_start;
+    for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
+        notification_sequence++;
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = notification_call(
+            request_notification, reply_notification, notification_mailbox,
+            notification_sequence, &request, &notification_reply);
+        notification_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    for (size_t sample = 0; sample < ADAPTER_L1D_COLD_CALLS; sample++) {
+        flush_l1_data_cache();
+        notification_sequence++;
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = notification_call(
+            request_notification, reply_notification, notification_mailbox,
+            notification_sequence, &request, &notification_reply);
+        notification_l1d_cold_samples[sample] =
+            read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    for (size_t sample = 0; sample < ADAPTER_HIERARCHY_COLD_CALLS; sample++) {
+        evict_data_cache_hierarchy();
+        notification_sequence++;
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = notification_call(
+            request_notification, reply_notification, notification_mailbox,
+            notification_sequence, &request, &notification_reply);
+        notification_hierarchy_cold_samples[sample] =
+            read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    test_eq(notification_sequence, SEL4_RPC_SEARCH_NOTIFICATION_REQUESTS);
+    /* Let the server leave its notification loop and block on the endpoint. */
+    seL4_Yield();
 
     const protected_rpc_call_options_t software = {
         .route = PROTECTED_RPC_ROUTE_SOFTWARE,
@@ -488,6 +645,7 @@ static int test_blackparrot_hardware_binding(env_t env)
     if (bind_status != PROTECTED_RPC_OK) {
         /* A rejected bind cannot produce meaningful forced-hardware results. */
         destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base,
                            &control_endpoint);
         return sel4test_get_result();
     }
@@ -510,6 +668,7 @@ static int test_blackparrot_hardware_binding(env_t env)
             test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint),
                     PROTECTED_RPC_OK);
             destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                               mailbox_base,
                                &control_endpoint);
             return sel4test_get_result();
         }
@@ -576,7 +735,7 @@ static int test_blackparrot_hardware_binding(env_t env)
     test_eq(seL4_MessageInfo_get_label(finished), PROTECTED_RPC_OK);
     test_eq(seL4_MessageInfo_get_length(finished), 0);
 
-    destroy_rpc_server(env, &server, shadow_stack, shared_base,
+    destroy_rpc_server(env, &server, shadow_stack, shared_base, mailbox_base,
                        &control_endpoint);
     printf("SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=%u\n",
            ADAPTER_SEARCH_BYTES);
@@ -592,6 +751,10 @@ static int test_blackparrot_hardware_binding(env_t env)
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_BP_SOFTWARE_CALLS, software_elapsed,
            software_elapsed / ADAPTER_BP_SOFTWARE_CALLS);
+    printf("SEL4_RPC_ADAPTER path=notification calls=%u total_cycles=%" PRIu64
+           " cycles_per_call=%" PRIu64 "\n",
+           ADAPTER_NOTIFICATION_CALLS, notification_elapsed,
+           notification_elapsed / ADAPTER_NOTIFICATION_CALLS);
     printf("SEL4_RPC_ADAPTER path=software-fallback calls=%u total_cycles=%" PRIu64
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_BP_FALLBACK_CALLS, fallback_elapsed,
@@ -602,6 +765,11 @@ static int test_blackparrot_hardware_binding(env_t env)
                              ADAPTER_DISTRIBUTION_CALLS);
     print_cycle_distribution("software", software_samples,
                              ADAPTER_DISTRIBUTION_CALLS);
+    print_cycle_distribution("notification", notification_samples,
+                             ADAPTER_DISTRIBUTION_CALLS);
+    printf("SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw "
+           "data-region=server-ro request-signal=notification "
+           "reply-signal=notification\n");
     printf("SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm "
            "method=blackparrot-flush-all samples=%u\n",
            ADAPTER_L1D_COLD_CALLS);
@@ -610,6 +778,9 @@ static int test_blackparrot_hardware_binding(env_t env)
     print_cycle_distribution("l1d-cold/hardware", hardware_l1d_cold_samples,
                              ADAPTER_L1D_COLD_CALLS);
     print_cycle_distribution("l1d-cold/software", software_l1d_cold_samples,
+                             ADAPTER_L1D_COLD_CALLS);
+    print_cycle_distribution("l1d-cold/notification",
+                             notification_l1d_cold_samples,
                              ADAPTER_L1D_COLD_CALLS);
     printf("SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold "
            "l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=%u\n",
@@ -622,6 +793,9 @@ static int test_blackparrot_hardware_binding(env_t env)
                              ADAPTER_HIERARCHY_COLD_CALLS);
     print_cycle_distribution("data-hierarchy-cold/software",
                              software_hierarchy_cold_samples,
+                             ADAPTER_HIERARCHY_COLD_CALLS);
+    print_cycle_distribution("data-hierarchy-cold/notification",
+                             notification_hierarchy_cold_samples,
                              ADAPTER_HIERARCHY_COLD_CALLS);
     return 0;
 }
@@ -660,7 +834,7 @@ static int test_dedicated_search_server_software(env_t env)
         &env->vspace, seL4_AllRights, 1, seL4_PageBits);
     test_assert(shared_base != NULL);
     if (shared_base == NULL) {
-        destroy_rpc_server(env, &server, NULL, NULL, &control_endpoint);
+        destroy_rpc_server(env, &server, NULL, NULL, NULL, &control_endpoint);
         return sel4test_get_result();
     }
     memset(shared_base, 'a', ADAPTER_SEARCH_BYTES);
@@ -671,7 +845,7 @@ static int test_dedicated_search_server_software(env_t env)
         seL4_CapRights_new(false, false, true, false), true);
     test_assert(server_shared_base != NULL);
     if (server_shared_base == NULL) {
-        destroy_rpc_server(env, &server, NULL, shared_base,
+        destroy_rpc_server(env, &server, NULL, shared_base, NULL,
                            &control_endpoint);
         return sel4test_get_result();
     }
@@ -688,22 +862,22 @@ static int test_dedicated_search_server_software(env_t env)
     test_assert(remote_control != (seL4_CPtr)-1);
     if (remote_endpoint == (seL4_CPtr)-1
         || remote_control == (seL4_CPtr)-1) {
-        destroy_rpc_server(env, &server, NULL, shared_base,
+        destroy_rpc_server(env, &server, NULL, shared_base, NULL,
                            &control_endpoint);
         return sel4test_get_result();
     }
 
-    char arg_strings[ADAPTER_BP_SERVER_ARGS][WORD_STRING_SIZE];
-    char *args[ADAPTER_BP_SERVER_ARGS];
-    sel4utils_create_word_args(arg_strings, args, ADAPTER_BP_SERVER_ARGS,
+    char arg_strings[ADAPTER_SOFTWARE_SERVER_ARGS][WORD_STRING_SIZE];
+    char *args[ADAPTER_SOFTWARE_SERVER_ARGS];
+    sel4utils_create_word_args(arg_strings, args, ADAPTER_SOFTWARE_SERVER_ARGS,
                                remote_endpoint, remote_control,
                                (seL4_Word)server_shared_base,
                                ADAPTER_REGION_TOKEN);
     error = sel4utils_spawn_process_v(&server, &env->vka, &env->vspace,
-                                      ADAPTER_BP_SERVER_ARGS, args, 1);
+                                      ADAPTER_SOFTWARE_SERVER_ARGS, args, 1);
     test_eq(error, 0);
     if (error != 0) {
-        destroy_rpc_server(env, &server, NULL, shared_base,
+        destroy_rpc_server(env, &server, NULL, shared_base, NULL,
                            &control_endpoint);
         return sel4test_get_result();
     }
@@ -751,7 +925,8 @@ static int test_dedicated_search_server_software(env_t env)
     seL4_MessageInfo_t finished = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(finished), PROTECTED_RPC_OK);
     test_eq(seL4_MessageInfo_get_length(finished), 0);
-    destroy_rpc_server(env, &server, NULL, shared_base, &control_endpoint);
+    destroy_rpc_server(env, &server, NULL, shared_base, NULL,
+                       &control_endpoint);
 
     printf("SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=%u\n",
            ADAPTER_SEARCH_BYTES);
