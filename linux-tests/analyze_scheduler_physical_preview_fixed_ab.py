@@ -41,7 +41,7 @@ def status_path(path):
 
 
 def load_run(path, arm, identity, group, timing="wake-trigger", mode=6,
-             footprint="hot-proxy"):
+             footprint="hot-proxy", lines=4):
     """Validate one fixed-arm run and return its 512 timing rows."""
     text = read_text(path).replace("\x00", "").replace("\r", "")
     status_file = status_path(path)
@@ -62,9 +62,16 @@ def load_run(path, arm, identity, group, timing="wake-trigger", mode=6,
             raise ValueError(
                 f"{path}: status {key}={status.get(key)!r}, expected {expected!r}"
             )
+    if "lines" in status and status["lines"] != lines:
+        raise ValueError(
+            f"{path}: status lines={status['lines']!r}, expected {lines!r}"
+        )
+    if lines != 4 and "lines" not in status:
+        raise ValueError(f"{path}: status lacks nondefault line count")
     configs = CONFIG.findall(text)
     expected_config = [(
-        str(group), str(group * 256), "4", timing, str(mode), footprint, arm
+        str(group), str(group * 256), str(lines), timing, str(mode), footprint,
+        arm
     )]
     if configs != expected_config:
         raise ValueError(f"{path}: missing or invalid fixed-arm configuration")
@@ -191,6 +198,7 @@ def parse_args(argv=None):
     parser.add_argument("--mode", type=int, choices=range(1, 7), default=6)
     parser.add_argument("--footprint", choices=("target", "hot-proxy"),
                         default="hot-proxy")
+    parser.add_argument("--lines", type=int, choices=range(1, 5), default=4)
     parser.add_argument("--replicate", action="append", nargs=3, required=True,
                         metavar=("ORDER", "ENABLED_LOG", "DISABLED_LOG"))
     parser.add_argument("--iid-resamples", type=int, default=100_000)
@@ -221,15 +229,16 @@ def analyze(args):
         raise ValueError("bootstrap resample counts must be positive")
     replicates = []
     for order, enabled_path, disabled_path in args.replicate:
+        lines = getattr(args, "lines", 4)
         replicate = {
             "order": order,
             "enabled": load_run(
                 Path(enabled_path), "enabled", identity, args.group,
-                args.timing, args.mode, args.footprint
+                args.timing, args.mode, args.footprint, lines
             ),
             "disabled": load_run(
                 Path(disabled_path), "disabled", identity, args.group,
-                args.timing, args.mode, args.footprint
+                args.timing, args.mode, args.footprint, lines
             ),
         }
         replicate["median_difference_enabled_minus_disabled"] = {
@@ -249,6 +258,7 @@ def analyze(args):
         "timing": args.timing,
         "mode": args.mode,
         "footprint": args.footprint,
+        "lines": getattr(args, "lines", 4),
         "replicates": replicates,
         "metrics": {},
         "interpretation_limit": (

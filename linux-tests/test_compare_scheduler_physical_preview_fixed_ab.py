@@ -39,6 +39,7 @@ def analysis(timing, enabled_value, disabled_value):
         "timing": timing,
         "mode": 6,
         "footprint": "target",
+        "lines": 4,
         "replicates": replicates,
     }
 
@@ -74,6 +75,13 @@ class FixedAbComparisonTests(unittest.TestCase):
             compare(control, wrong, 2, 2)
         candidate["replicates"][0]["enabled"]["values"]["load_cycles"].pop()
         with self.assertRaisesRegex(ValueError, "512 load_cycles"):
+            compare(control, candidate, 2, 2)
+
+    def test_rejects_different_line_counts(self):
+        control = analysis("wake-trigger", 105, 100)
+        candidate = analysis("wake-data", 97, 100)
+        candidate["lines"] = 1
+        with self.assertRaisesRegex(ValueError, "active line counts"):
             compare(control, candidate, 2, 2)
 
 

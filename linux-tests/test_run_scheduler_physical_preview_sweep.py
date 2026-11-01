@@ -82,6 +82,14 @@ class CellPlanTest(unittest.TestCase):
             disabled,
         )
 
+    def test_nondefault_line_count_materializes_all_arguments(self):
+        command = benchmark_command(
+            7, "wake-data", "target", "fifo", "persistent", "enabled", 1
+        )
+        self.assertIn(
+            " 7 wake-data target fifo persistent enabled 1; rc=$?", command
+        )
+
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))

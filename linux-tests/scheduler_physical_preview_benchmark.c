@@ -45,7 +45,7 @@
 #define PR_BP_PREVIEW_ENABLE 0x4250505a
 
 enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
-       lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10,
+       max_lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10,
        max_retries = 4096 };
 
 enum arm_mode { arm_alternating, arm_disabled, arm_enabled };
@@ -93,7 +93,8 @@ static int uncounted_mode(unsigned mode, int wake_data)
 
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned group, unsigned enable_mode, int hot_proxy,
-		      int isolate_replay, int wake_data, enum arm_mode arm)
+		      int isolate_replay, int wake_data, unsigned active_lines,
+		      enum arm_mode arm)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -101,31 +102,34 @@ static void child_run(int in, int out, volatile struct sample *samples,
 	volatile unsigned char *eviction = mmap(NULL, eviction_pages * page_bytes,
 						PROT_READ | PROT_WRITE,
 						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	unsigned long target_addr[lines];
-	unsigned long preview_addr[lines];
-	unsigned target_offset = group * 4 * line_bytes;
+	unsigned long target_addr[max_lines];
+	unsigned long preview_addr[max_lines];
+	unsigned target_offset = group * max_lines * line_bytes;
 	unsigned retries = 0;
 	char token = 'x';
 
 	if (target == MAP_FAILED || eviction == MAP_FAILED)
 		fail("mmap child pages");
-	for (unsigned line = 0; line < lines; line++)
+	for (unsigned line = 0; line < active_lines; line++)
 		target_addr[line] = (unsigned long)&target[target_offset
 							     + line * line_bytes];
-	for (unsigned line = 0; line < lines; line++)
+	for (unsigned line = 0; line < active_lines; line++)
 		preview_addr[line] = hot_proxy
 			? (unsigned long)&eviction[target_offset + line * line_bytes]
 			: target_addr[line];
-	for (unsigned line = 0; line < lines; line++)
+	for (unsigned line = 0; line < active_lines; line++)
 		*(volatile unsigned long *)target_addr[line]
-			= target_addr[(line + 1) % lines];
+			= target_addr[(line + 1) % active_lines];
 	for (unsigned page = 0; page < eviction_pages; page++)
 		for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
 			eviction[page * page_bytes + offset] = page + offset;
 	/* Registration is intentionally outside the trial loop: both arms retain
 	 * exactly the same long-term pins and physical-address bookkeeping. */
-	if (prctl(PR_BP_PREVIEW_PIN_SET, preview_addr[0], preview_addr[1],
-		  preview_addr[2], preview_addr[3]))
+	if (prctl(PR_BP_PREVIEW_PIN_SET,
+		  active_lines > 0 ? preview_addr[0] : 0UL,
+		  active_lines > 1 ? preview_addr[1] : 0UL,
+		  active_lines > 2 ? preview_addr[2] : 0UL,
+		  active_lines > 3 ? preview_addr[3] : 0UL))
 		fail("register preview lines");
 	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = mode_for(trial, arm);
@@ -142,7 +146,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		 * This traffic is identical in the enabled and disabled arms until the
 		 * scheduler trigger itself. */
 		if (hot_proxy)
-			for (unsigned line = 0; line < lines; line++)
+			for (unsigned line = 0; line < active_lines; line++)
 				checksum += *(volatile unsigned char *)preview_addr[line];
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		if (checksum == UINT64_MAX)
@@ -173,7 +177,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		transfer(in, &token, 0);  /* parent blocks; scheduler selects child */
 		entry = cycle();
 		node = target_addr[0];
-		for (unsigned line = 0; line < lines; line++)
+		for (unsigned line = 0; line < active_lines; line++)
 			node = *(volatile unsigned long *)node;
 		after_load = cycle();
 		samples[trial].entry = entry;
@@ -228,6 +232,7 @@ int main(int argc, char **argv)
 	int fifo = 0;
 	int isolate_replay = 0;
 	int wake_data = 0;
+	unsigned active_lines = max_lines;
 	enum arm_mode arm = arm_alternating;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
@@ -235,8 +240,8 @@ int main(int argc, char **argv)
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 7) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled]\n",
+	if (argc > 8) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled] [active-lines-1..4]\n",
 			argv[0]);
 		return 2;
 	}
@@ -301,8 +306,18 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	if (argc >= 8) {
+		char *end;
+		unsigned long parsed = strtoul(argv[7], &end, 10);
+
+		if (*end || parsed < 1 || parsed > max_lines) {
+			fprintf(stderr, "invalid active line count: %s\n", argv[7]);
+			return 2;
+		}
+		active_lines = parsed;
+	}
 	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s\n",
-	       group, group * 4 * line_bytes, lines,
+	       group, group * max_lines * line_bytes, active_lines,
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
 	       enable_mode == 3 ? "instruction" :
@@ -333,7 +348,7 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, group, enable_mode,
-			  hot_proxy, isolate_replay, wake_data, arm);
+			  hot_proxy, isolate_replay, wake_data, active_lines, arm);
 		return 0;
 	}
 	close(to_child[0]);

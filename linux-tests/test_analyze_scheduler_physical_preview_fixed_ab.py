@@ -18,12 +18,12 @@ IDENTITY = {
 
 
 def write_run(root, name, arm, base, group=7, timing="wake-trigger", mode=6,
-              footprint="hot-proxy", bitstream_sha256=None):
+              footprint="hot-proxy", bitstream_sha256=None, lines_count=4):
     """Write one complete synthetic runner transcript and status."""
     path = root / f"{name}.log"
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
-        f"lines=4 timing={timing} mode={mode} footprint={footprint} policy=fifo "
+        f"lines={lines_count} timing={timing} mode={mode} footprint={footprint} policy=fifo "
         f"replay_state=persistent arm={arm}",
         "PHYSICAL_BENCH_CHILD PASS retries=0",
     ]
@@ -61,6 +61,8 @@ def write_run(root, name, arm, base, group=7, timing="wake-trigger", mode=6,
     }
     if bitstream_sha256 is not None:
         status["bitstream_sha256"] = bitstream_sha256
+    if lines_count != 4:
+        status["lines"] = lines_count
     path.with_suffix(".log.status.json").write_text(
         json.dumps(status) + "\n"
     )
@@ -180,6 +182,24 @@ class FixedArmAnalyzerTest(unittest.TestCase):
             run = load_run(path, "enabled", IDENTITY, 7,
                            "wake-data", 6, "target")
             self.assertEqual(run["trials"], 512)
+
+    def test_nondefault_line_count_is_bound_in_status_and_config(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = write_run(root, "enabled", "enabled", 90,
+                             timing="wake-data", mode=6,
+                             footprint="target", lines_count=1)
+            from analyze_scheduler_physical_preview_fixed_ab import load_run
+            run = load_run(path, "enabled", IDENTITY, 7,
+                           "wake-data", 6, "target", 1)
+            self.assertEqual(run["trials"], 512)
+            status_path = path.with_suffix(".log.status.json")
+            status = json.loads(status_path.read_text())
+            status["lines"] = 2
+            status_path.write_text(json.dumps(status) + "\n")
+            with self.assertRaisesRegex(ValueError, "status lines"):
+                load_run(path, "enabled", IDENTITY, 7,
+                         "wake-data", 6, "target", 1)
 
 
 if __name__ == "__main__":

@@ -666,6 +666,14 @@ same wakeup replay and issue four late data hints, so the benchmark requires
 exactly one counted hook. Analyze fixed-arm runs with the matching timing name
 and do not relabel one image as the other after seeing results.
 
+An optional final benchmark argument selects one through four active target
+lines; the runner exposes it as `--lines`. Nonselected registration arguments
+are zero, so the unchanged kernel skips their CSR writes and the dependent load
+ring contains exactly the selected number of lines. The default remains four
+for historical evidence. Treat each line count as a predeclared workload shape
+and bind it through the runner status plus analyzer `--lines`; do not choose a
+favorable count after inspecting several unreported runs.
+
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
 with alternating early/late order by group, and powers off for final

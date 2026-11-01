@@ -109,6 +109,8 @@ def compare(control, candidate, iid_resamples=20000, block_resamples=20000):
     validate_analysis(candidate, "candidate", "wake-data")
     if control.get("group") != candidate.get("group"):
         raise ValueError("control and candidate use different cache-set groups")
+    if control.get("lines", 4) != candidate.get("lines", 4):
+        raise ValueError("control and candidate use different active line counts")
     for key in ("bitstream_sha256", "control_program_sha256"):
         control_value = control.get("identity", {}).get(key)
         candidate_value = candidate.get("identity", {}).get(key)
@@ -139,6 +141,7 @@ def compare(control, candidate, iid_resamples=20000, block_resamples=20000):
             "analysis_sha256": candidate.get("_analysis_sha256"),
         },
         "group": control["group"],
+        "lines": control.get("lines", 4),
         "metrics": {},
         "interpretation_limit": (
             "Only endpoints ending at first use are compared. The ordinary "
