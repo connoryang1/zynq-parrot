@@ -25,9 +25,9 @@ index 7bf2911..6559800 100644
 +
 +/* The focused RPC image needs only a small, fixed set of capabilities. Avoid
 + * constructing and scrubbing sel4test's generic 4 MiB, 17-bit CNode in the
-+ * cycle-accurate model; 4,096 slots leave ample headroom for the test process. */
++ * cycle-accurate model; 1,024 slots leave ample headroom for the test process. */
 +#if CONFIG_RPC_ONLY
-+#define TEST_PROCESS_CSPACE_SIZE_BITS 12
++#define TEST_PROCESS_CSPACE_SIZE_BITS 10
 +#else
  #define TEST_PROCESS_CSPACE_SIZE_BITS 17
 +#endif
@@ -67,11 +67,11 @@ index b540758..47a77fb 100644
 -    unsigned int num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
 +    unsigned int num_untypeds;
 +    if (config_set(CONFIG_RPC_ONLY)) {
-+        /* The focused test uses a 12-bit CSpace instead of sel4test's generic
-+         * 17-bit CSpace. A single 4 MiB untyped leaves enough contiguous
-+         * allocator headroom for the isolated BlackParrot server process;
++        /* The focused test uses a 10-bit CSpace instead of sel4test's generic
++         * 17-bit CSpace. A 64 KiB untyped retains eight times the QEMU-tested
++         * lower bound for the isolated BlackParrot server process;
 +         * the cap itself is not scrubbed. The reserve is returned below. */
-+        num_untypeds = allocate_untypeds(untypeds, BIT(22), 1);
++        num_untypeds = allocate_untypeds(untypeds, BIT(16), 1);
 +    } else {
 +        num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
 +    }

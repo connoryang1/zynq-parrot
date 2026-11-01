@@ -229,19 +229,19 @@ links only the protected-RPC test into the child image, reduces the generic
 libc heap from 1 MiB to 64 KiB, and keeps kernel printing enabled in the
 otherwise optimized build. This removes unrelated full-suite load/zero work
 from the cycle-accurate boot while preserving the same RPC test and makes its
-exact pass marker observable. The RPC-only driver uses a 12-bit test-process
-CSpace (4,096 slots), a 10-bit private helper CSpace (1,024 slots), reserves
-512 KiB for itself, and delegates one bounded 4 MiB untyped, instead of using
+exact pass marker observable. The RPC-only driver uses 10-bit test-process and
+private-helper CSpaces (1,024 slots each), reserves 512 KiB for itself, and
+delegates one bounded 64 KiB untyped, instead of using
 sel4test's generic 17-bit CSpaces and exhaustively probing every object size.
 A 17-bit seL4 CNode occupies 4 MiB because each capability slot is 32 bytes;
 the focused client/server test needs only a small, fixed set of capabilities.
-Keeping the helper CNode at 32 KiB also avoids requiring a second contiguous
-128 KiB allocation after the test process has fragmented its bounded pool. The
-previous 5 MiB child pool passed
-QEMU but still made the cycle-accurate model securely clear multiple
-multi-megabyte objects. The reduced configuration passes the unchanged
-256-call focused control under QEMU and cuts roughly 40 minutes from
-BlackParrot setup before test selection. The same mode
+Both CNodes are therefore 32 KiB. QEMU boundary sweeps pass the unchanged
+256-call control with an 8 KiB delegated untyped; 64 KiB retains eightfold
+headroom. The untyped cap itself is not scrubbed, so the direct model saving
+comes from reducing the CNodes rather than merely narrowing that cap. The
+preceding 12-bit/4 MiB configuration had already cut roughly 40 minutes from
+BlackParrot setup relative to the generic configuration; the 10-bit result is
+QEMU-qualified pending its next full-core image. The same mode
 suppresses the generic bootinfo/untyped inventory; the exact test verdict stays
 enabled, while character-at-a-time diagnostic output no longer dominates boot.
 
