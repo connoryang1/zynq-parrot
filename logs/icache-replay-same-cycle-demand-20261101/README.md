@@ -68,6 +68,15 @@ Streaming the exact FST through `fst2vcd` counts zero rising assertions of `icac
 
 A new routed implementation is still required before accepting the candidate for FPGA/Linux use. Prefetch5 routes `20261101T125426Z-0fb3da28` and `20261101T132904Z-e4861a8f` use ten contexts/five slots, while the accepted 2.68% futex-v1 control bitstream used four contexts/four slots; those jobs can provide endpoint-stress and comparator data but cannot validate the physical performance rerun. The exact matched candidate route is synthesis-farm job `20261101T134139Z-24d10370`, pinned to top `24d103705dd3fd9af28ef5c0fedc0c2f1cc1f7c0`, BlackParrot `174f2787a05ca48a6e4362fc59dc462d3d95572c`, and `e_bp_unicore_zynqparrot_prefetch_cfg`; it must finish with a verified timing-clean package before board use.
 
+The final prefetch5 endpoint-stress route is now terminal `FAIL`, not a pending performance gate. Synthesis uses 55,700/53,200 LUTs (104.70%), 30,152 registers, 94 BRAM tiles, and 11 DSPs; detail placement reports 11,535 required slices with only 10,934 available. The failure is scoped to the ten-context/five-slot configuration and does not classify the matched four-context route. Retained artifacts and SHA-256 values are:
+
+```text
+14e10e5c818d16949bb0bbdad81a8f5d12aa164773dc75f03783c6b6891def05  prefetch5-route-failure-artifacts.tar.xz
+d79677f104d65fc558a6ee019f29e886478072abf044055e8c77c24d8bccc427  prefetch5-route-console.log
+ee5112ff3b3fa0a7b54b036a1a668c9f887184367eda7220c0c45c908b6f95c5  prefetch5-route-revisions.txt
+1238dd4051605ecb971bc003326e7b95c09ce45d874692c92d7962efe614ede6  prefetch5-route-utilization-synth.rpt
+```
+
 ## Predeclared FPGA/Linux gate
 
 If the exact candidate route passes, rerun the accepted futex-v1 best-case comparison without changing the table or benchmark. Recover the board before every arm, wait for complete PYNQ readiness, stage and hash-check the new package plus the exact NBF, reload and verify the overlay, and run four fresh boots in these two opposite orders:

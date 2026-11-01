@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Five-slot stress route exceeds PYNQ capacity — 2026-11-01:** exact final route `20261101T132904Z-e4861a8f` synthesizes at 55,700/53,200 LUTs (104.70%) and fails detail placement at 11,535 required versus 10,934 available slices. This rejects only the ten-context/five-slot stress endpoint; the matched four-context/four-slot route remains live and is still the decisive FPGA gate (`logs/icache-replay-same-cycle-demand-20261101/`, RL-098).
+
 - **Exact futex board artifacts recovered — 2026-11-01:** the later pipe build had overwritten the mutable ELF used by the accepted 2.68% futex run, but its complete retained board transcript contains all 255 transfer chunks. Decoding them reconstructs the exact 14,528-byte ELF and regenerates the original 258-line transfer with accepted SHA-256 values `91f0db11...c0cf` and `b5103c89...5518`, removing compiler reproducibility from the next FPGA comparison (`logs/mode6-persistent-pair-protocol-20261101/recovered-board-artifacts/`, RL-099).
 
 - **Futex table membership interpretation corrected — 2026-11-01:** exact trace re-audit shows the 14 retained v1 lines occur in both complete disabled traces, while `0x8023f780` and `0x802034c0` occur only in replicate 2—not in neither trace as previously documented. The 2.68% FPGA result is unchanged, but v2 and the prepared 14-line shrink replace/remove trace-variable lines rather than unused lines; v1 on the corrected RTL is therefore the first post-route performance gate (`logs/mode6-persistent-pair-protocol-20261101/`, RL-099).
