@@ -576,6 +576,48 @@ edit initially changed the partial-cell call site instead of the new full
 instruction matrix; diff audit caught it, the invalid in-flight suite was
 interrupted, and the corrected complete suite passed all 13 tests.
 
+## Counter-only runtime isolation
+
+Runtime mode 4 increments the incoming task's existing hook counter but writes
+neither the instruction trigger nor any physical data hint. Mode 3 and mode 4
+join at the identical counter update in kernel disassembly; only mode 3 executes
+`csrw 0x5c0`. The clean kernel embeds the exact accepted rootfs and produces
+`vmlinux.bin` SHA-256 `16dcb292...ad54`. Its executable-section CSR scan passes.
+The count-zero OpenSBI `.text` scan also passes; its 17,003 low memory records
+match the accepted count-zero image exactly, and all 1,861,853 high records
+reconstruct the new kernel byte-for-byte. The final NBF is
+`88ea24cd...999e`; benchmark and transfer hashes are `03aadeea...d33` and
+`f7e13c2e...a01e`.
+
+The full equal-priority FIFO matrix completed all eight groups in one boot with
+4,096 balanced base and tail rows, one rejected asynchronous attempt, runner
+PASS, and final CORE/BSG PASS. Counter-only mode costs 410 wake-to-entry cycles
+with interval `[88.5,614.5]` and 420.25 wake-to-load cycles with
+`[101.5,619.25]`; target loads remain exactly neutral at `0 [0,0]`. This is
+about 0.90% of the representative 46,711.5-cycle disabled wake-to-load interval.
+The independent instruction-minus-counter contrast is unresolved at
+`+219.5 [-175.5,495]` wake-to-load cycles. Thus the empty hardware trigger has
+no demonstrated incremental cost or gain; the resolved common-path cost belongs
+to the measurement counter path. The next control must issue the trigger with
+no hook increment in either arm and detect extra scheduling separately.
+
+Preparation exposed three additional fail-closed workflow issues. The first
+OpenSBI invocation used the bare-metal compiler whose linker lacks required PIE
+support; the next omitted the SDK's `PLATFORM_HART_COUNT` definition. Both
+stopped before firmware linking, and a clean rebuild with the SDK's exact Linux
+toolchain, FDT, and platform flags succeeded. Unscoped payload-ELF and NBF CSR
+scans reported embedded Linux/data words as false instructions; separate Linux
+all-executable and OpenSBI `.text` scans are the valid gates. An inline Python
+validation command was initially shell-escaped as literal newlines and failed
+before reading evidence; the corrected read-only validation proved exact NBF
+reconstruction. The old remote count-zero NBF was unlinked only after its hash
+matched the retained local copy, and remains recoverable locally.
+Two long comparison/test invocations outlived their initial observation without
+retained session identifiers; their exact PIDs were verified live and were not
+restarted. After they terminated, the final focused test and deterministic
+comparison were rerun with captured results; comparison output remained
+byte-identical while unused per-cell summaries were removed from that path.
+
 ## Pipe experiment workflow corrections
 
 During the later hot-proxy preparation, a combined build-and-test command ran

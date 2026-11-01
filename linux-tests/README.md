@@ -597,6 +597,9 @@ effect in another is not by itself evidence that their effects differ.
 Use `--timing early|late` only for a predeclared complete eight-group
 single-timing matrix; without it the comparison continues to require all 16
 early/late cells.
+For controls whose runtime names differ, pass both `--control-timing` and
+`--candidate-timing`; the tool then requires the complete eight-group matrix
+for each named mode and preserves the candidate-minus-control sign convention.
 
 An optional third argument, `hot-proxy`, registers four eviction-buffer lines
 instead of the measured target ring and rereads them immediately before every
@@ -616,6 +619,12 @@ all physical data-hint CSR writes. Run its eight-group plan with
 `--only-timing instruction`; its recovery `--start-cell` index is then a group
 number in `0..7`, unlike the 16-cell early/late plan index.
 
+The timing value `counter` selects kernel mode four: the scheduler increments
+the same one-switch counter but writes neither the instruction-prefix trigger
+nor any physical data hint. Run it with `--only-timing counter`. Comparing this
+matched eight-group control against `instruction` isolates the empty-table
+hardware-trigger cost from the software counter and benchmark filtering cost.
+
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
 with alternating early/late order by group, and powers off for final
@@ -633,8 +642,9 @@ derive and hash a prefix containing only cells completed before the liveness
 change, and analyze that prefix together with a suffix that reaches final
 `CORE PASS` and `BSG PASS`. Report the multi-boot composition explicitly.
 For a predeclared single-timing replication, `--only-timing early|late`
-filters the fixed plan after the recovery boundary. A fresh late-only run has
-eight cells and normally completes before the observed nine-to-ten-cell board
+filters the fixed plan after the recovery boundary. The `instruction` and
+`counter` modes instead use their own fixed eight-cell plans. A fresh
+single-timing run normally completes before the observed nine-to-ten-cell board
 liveness boundary; do not use the filter after inspecting individual set
 results to select a favorable timing.
 Pool compatible, predeclared repeats with

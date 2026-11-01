@@ -13,9 +13,9 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_entry=(\d+) load_cycles=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
-                    r"lines=(\d+) timing=(early|late|instruction) mode=(\d+)")
+                    r"lines=(\d+) timing=(early|late|instruction|counter) mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
-TIMING_MODES = {"early": 1, "late": 2, "instruction": 3}
+TIMING_MODES = {"early": 1, "late": 2, "instruction": 3, "counter": 4}
 
 
 def percentile(values, fraction):

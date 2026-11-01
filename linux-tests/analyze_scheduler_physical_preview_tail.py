@@ -74,7 +74,7 @@ def load_cells(paths, timing, label="tail sweep"):
         text = read_transcript(path)
         board_text += text
         configs = list(CONFIG.finditer(text))
-        parsed = parse_segments(text, path)
+        parsed = parse_segments(text, path, summarize_cells=False)
         if len(configs) != len(parsed):
             raise ValueError(f"{path}: configuration parse mismatch")
         for index, ((key, base_rows, _base_result), match) in enumerate(
@@ -173,7 +173,7 @@ def pool_tail(replicate_paths, timing, samples=20000):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--timing", choices=("early", "late", "instruction"),
+    parser.add_argument("--timing", choices=("early", "late", "instruction", "counter"),
                         required=True)
     parser.add_argument(
         "--replicate", nargs="+", action="append", type=Path,

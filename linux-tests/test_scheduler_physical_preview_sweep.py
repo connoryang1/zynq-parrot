@@ -7,7 +7,7 @@ from pathlib import Path
 
 from analyze_scheduler_physical_preview_sweep import analyze
 from analyze_scheduler_physical_preview_benchmark import TIMING_MODES
-from compare_scheduler_physical_preview_sweeps import compare
+from compare_scheduler_physical_preview_sweeps import compare, compare_timing_pairs
 from pool_scheduler_physical_preview_replicates import pool
 from analyze_scheduler_physical_preview_tail import (
     analyze as analyze_tail,
@@ -18,7 +18,7 @@ from analyze_scheduler_physical_preview_tail import (
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
                core_marker="CORE PASS", saved_load_cycles=20,
                saved_return_cycles=0, include_tail=False):
-    mode_value = {"early": 1, "late": 2, "instruction": 3}[timing]
+    mode_value = TIMING_MODES[timing]
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
         f"lines=4 timing={timing} mode={mode_value}",
@@ -50,6 +50,9 @@ class SweepAnalyzerTest(unittest.TestCase):
     def test_single_cell_analyzer_accepts_instruction_mode(self):
         self.assertEqual(TIMING_MODES["instruction"], 3)
 
+    def test_single_cell_analyzer_accepts_counter_mode(self):
+        self.assertEqual(TIMING_MODES["counter"], 4)
+
     def test_partial_cell_reports_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
@@ -70,6 +73,20 @@ class SweepAnalyzerTest(unittest.TestCase):
             result = analyze([path])
         self.assertEqual(
             result["pooled"]["instruction"]["load_cycles"]
+            ["stratified_median_saved_cycles"],
+            20.0,
+        )
+
+    def test_counter_only_matrix_is_analyzable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "counter.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="counter")
+                for group in range(8)
+            ))
+            result = analyze([path])
+        self.assertEqual(
+            result["pooled"]["counter"]["load_cycles"]
             ["stratified_median_saved_cycles"],
             20.0,
         )
@@ -156,6 +173,32 @@ class SweepAnalyzerTest(unittest.TestCase):
             )
         self.assertEqual(set(result["timings"]), {"late"})
         metric = result["timings"]["late"]["load_cycles"]
+        self.assertEqual(metric["candidate_minus_control_saved_cycles"], 20.0)
+        self.assertEqual(metric["candidate_minus_control_95pct_ci"], [20.0, 20.0])
+
+    def test_cross_mode_comparison_accepts_two_complete_matrices(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            control = root / "counter.log"
+            candidate = root / "instruction.log"
+            control.write_text("\n".join(
+                transcript(group=group, timing="counter", saved_load_cycles=10)
+                for group in range(8)
+            ))
+            candidate.write_text("\n".join(
+                transcript(group=group, timing="instruction", saved_load_cycles=30)
+                for group in range(8)
+            ))
+            result = compare_timing_pairs(
+                [control], [candidate], (("counter", "instruction"),),
+                samples=100,
+            )
+        label = "instruction_minus_counter"
+        self.assertEqual(
+            result["timing_pairs"][label],
+            {"control": "counter", "candidate": "instruction"},
+        )
+        metric = result["timings"][label]["load_cycles"]
         self.assertEqual(metric["candidate_minus_control_saved_cycles"], 20.0)
         self.assertEqual(metric["candidate_minus_control_95pct_ci"], [20.0, 20.0])
 

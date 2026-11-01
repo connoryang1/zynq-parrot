@@ -9,7 +9,11 @@ import re
 import statistics
 from pathlib import Path
 
-from analyze_scheduler_physical_preview_benchmark import METRICS, percentile
+from analyze_scheduler_physical_preview_benchmark import (
+    METRICS,
+    TIMING_MODES,
+    percentile,
+)
 from analyze_scheduler_physical_preview_sweep import block_differences, parse_segments
 
 
@@ -35,7 +39,8 @@ def load_cells(paths, label, expected_cells=EXPECTED_CELLS):
     for path in paths:
         text = read_transcript(path)
         board_text += text
-        for key, rows, _result in parse_segments(text, path):
+        for key, rows, _result in parse_segments(
+                text, path, summarize_cells=False):
             if key in cells:
                 raise ValueError(f"{label}: duplicate timing/group cell: {key}")
             cells[key] = rows
@@ -60,23 +65,42 @@ def resampled_median(blocks_by_group, rng):
     return statistics.median(values)
 
 
-def compare(control_paths, candidate_paths, samples=20000,
-            timings=("early", "late")):
-    """Return candidate-minus-control differences between same-boot effects."""
-    expected = {(timing, group) for timing in timings for group in range(8)}
-    control = load_cells(control_paths, "control", expected)
-    candidate = load_cells(candidate_paths, "candidate", expected)
+def compare_timing_pairs(control_paths, candidate_paths, timing_pairs,
+                         samples=20000):
+    """Compare predeclared control/candidate timing effects across boots."""
+    control_expected = {
+        (control_timing, group)
+        for control_timing, _candidate_timing in timing_pairs
+        for group in range(8)
+    }
+    candidate_expected = {
+        (candidate_timing, group)
+        for _control_timing, candidate_timing in timing_pairs
+        for group in range(8)
+    }
+    control = load_cells(control_paths, "control", control_expected)
+    candidate = load_cells(candidate_paths, "candidate", candidate_expected)
     rng = random.Random(0x1_CA_C4_E)
-    output = {"bootstrap_samples": samples, "timings": {}}
-    for timing in timings:
-        output["timings"][timing] = {}
+    output = {"bootstrap_samples": samples, "timings": {}, "timing_pairs": {}}
+    for control_timing, candidate_timing in timing_pairs:
+        label = (candidate_timing if candidate_timing == control_timing else
+                 f"{candidate_timing}_minus_{control_timing}")
+        output["timings"][label] = {}
+        output["timing_pairs"][label] = {
+            "control": control_timing,
+            "candidate": candidate_timing,
+        }
         for metric in METRICS:
             control_blocks = {
-                group: block_differences(control[(timing, group)], metric)
+                group: block_differences(
+                    control[(control_timing, group)], metric
+                )
                 for group in range(8)
             }
             candidate_blocks = {
-                group: block_differences(candidate[(timing, group)], metric)
+                group: block_differences(
+                    candidate[(candidate_timing, group)], metric
+                )
                 for group in range(8)
             }
             control_point = statistics.median(
@@ -90,7 +114,7 @@ def compare(control_paths, candidate_paths, samples=20000,
                 - resampled_median(control_blocks, rng)
                 for _ in range(samples)
             ]
-            output["timings"][timing][metric] = {
+            output["timings"][label][metric] = {
                 "control_saved_cycles": control_point,
                 "candidate_saved_cycles": candidate_point,
                 "candidate_minus_control_saved_cycles": (
@@ -104,19 +128,52 @@ def compare(control_paths, candidate_paths, samples=20000,
     return output
 
 
+def compare(control_paths, candidate_paths, samples=20000,
+            timings=("early", "late")):
+    """Return candidate-minus-control differences between matching timings."""
+    return compare_timing_pairs(
+        control_paths,
+        candidate_paths,
+        tuple((timing, timing) for timing in timings),
+        samples,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--control", nargs="+", required=True, type=Path)
     parser.add_argument("--candidate", nargs="+", required=True, type=Path)
-    parser.add_argument("--timing", choices=("early", "late", "instruction"),
+    parser.add_argument("--timing", choices=tuple(TIMING_MODES),
                         help="compare one predeclared timing instead of both")
+    parser.add_argument("--control-timing", choices=tuple(TIMING_MODES),
+                        help="control timing for a cross-mode comparison")
+    parser.add_argument("--candidate-timing", choices=tuple(TIMING_MODES),
+                        help="candidate timing for a cross-mode comparison")
     parser.add_argument("--samples", type=int, default=20000)
     args = parser.parse_args()
     if args.samples <= 0:
         parser.error("bootstrap samples must be positive")
     try:
-        timings = (args.timing,) if args.timing else ("early", "late")
-        result = compare(args.control, args.candidate, args.samples, timings)
+        cross_mode = (
+            args.control_timing is not None
+            or args.candidate_timing is not None
+        )
+        if cross_mode:
+            if (args.timing is not None or args.control_timing is None
+                    or args.candidate_timing is None):
+                parser.error(
+                    "cross-mode comparison requires both --control-timing and "
+                    "--candidate-timing, without --timing"
+                )
+            result = compare_timing_pairs(
+                args.control,
+                args.candidate,
+                ((args.control_timing, args.candidate_timing),),
+                args.samples,
+            )
+        else:
+            timings = (args.timing,) if args.timing else ("early", "late")
+            result = compare(args.control, args.candidate, args.samples, timings)
     except ValueError as error:
         raise SystemExit(str(error)) from error
     print(json.dumps(result, indent=2))

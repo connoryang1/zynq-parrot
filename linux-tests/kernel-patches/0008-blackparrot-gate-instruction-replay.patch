@@ -3,6 +3,8 @@ existing preview mode. It turns the physical benchmark's mode-zero arm into a
 true instruction-and-data-disabled control while modes one and two enable both.
 Mode three triggers instruction replay alone and accounts for that selection in
 the existing hook counter so the benchmark can retain its one-switch filter.
+Mode four increments only that counter, isolating software accounting overhead
+from the empty instruction-prefix hardware trigger.
 
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
@@ -20,14 +22,14 @@ the existing hook counter so the benchmark can retain its one-switch filter.
 +		unsigned char bp_preview_mode =
 +			READ_ONCE(next->thread.bp_preview_phys_mode);
 +
-+		if (bp_preview_mode) {
++		if (bp_preview_mode && bp_preview_mode != 4) {
 +			asm volatile("csrw 0x5c0, zero" ::: "memory");
-+			/* Mode three isolates instruction replay: count this selection
-+			 * without issuing any physical data-hint CSR writes. */
-+			if (bp_preview_mode == 3)
-+				WRITE_ONCE(next->thread.bp_preview_hook_count,
-+					   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
 +		}
++		/* Modes three and four skip physical data-hint CSR writes. Count
++		 * the selection here; mode four also skips the hardware trigger. */
++		if (bp_preview_mode == 3 || bp_preview_mode == 4)
++			WRITE_ONCE(next->thread.bp_preview_hook_count,
++				   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
  #endif
  
  		rq->nr_switches++;

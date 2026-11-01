@@ -10,7 +10,8 @@
  * pre-register-switch hook in the same kernel image. An optional hot-proxy
  * footprint redirects hints to freshly reread eviction-buffer lines while
  * leaving the measured dependent target ring cold. This approximates an
- * instruction-only A/B without changing the kernel or losing hook counting.
+ * instruction-only and counter-only A/B without changing the kernel or losing
+ * one-switch filtering.
  */
 #include <stdint.h>
 #include <sched.h>
@@ -183,7 +184,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 5) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction] [target|hot-proxy] [normal|fifo]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter] [target|hot-proxy] [normal|fifo]\n",
 			argv[0]);
 		return 2;
 	}
@@ -201,6 +202,8 @@ int main(int argc, char **argv)
 			enable_mode = 2;
 		else if (!strcmp(argv[2], "instruction"))
 			enable_mode = 3;
+		else if (!strcmp(argv[2], "counter"))
+			enable_mode = 4;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -225,7 +228,8 @@ int main(int argc, char **argv)
 	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s\n",
 	       group, group * 4 * line_bytes, lines,
 	       enable_mode == 1 ? "early" :
-	       enable_mode == 2 ? "late" : "instruction", enable_mode,
+	       enable_mode == 2 ? "late" :
+	       enable_mode == 3 ? "instruction" : "counter", enable_mode,
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal");
 
 	if (fifo) {

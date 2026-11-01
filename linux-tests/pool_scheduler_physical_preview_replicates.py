@@ -24,7 +24,8 @@ def load_replicate(paths, timing, label):
     for path in paths:
         text = read_transcript(path)
         board_text += text
-        for key, rows, _result in parse_segments(text, path):
+        for key, rows, _result in parse_segments(
+                text, path, summarize_cells=False):
             if key[0] != timing:
                 continue
             if key in cells:
@@ -87,7 +88,7 @@ def pool(replicate_paths, timing, samples=20000):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--timing", choices=("early", "late", "instruction"),
+    parser.add_argument("--timing", choices=("early", "late", "instruction", "counter"),
                         required=True)
     parser.add_argument(
         "--replicate", nargs="+", action="append", required=True, type=Path,
