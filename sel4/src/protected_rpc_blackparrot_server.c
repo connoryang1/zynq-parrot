@@ -18,17 +18,18 @@ static protected_rpc_status_t dispatch_protected_call(
     protected_rpc_status_t status = PROTECTED_RPC_INVALID_ARGUMENT;
     if (bp_rpc_request_meta_valid(request_meta)) {
         request.length = bp_rpc_request_length(request_meta);
-        for (size_t word = 0; word < request.length; word++) {
-            request.words[word] = words[word];
-        }
+        request.words[0] = request.length >= 1 ? words[0] : 0;
+        request.words[1] = request.length >= 2 ? words[1] : 0;
+        request.words[2] = request.length >= 3 ? words[2] : 0;
+        request.words[3] = request.length >= 4 ? words[3] : 0;
         status = protected_rpc_dispatch(
             config, caller_badge, &request, &reply);
     }
 
-    memset(words, 0, sizeof(uint64_t) * PROTECTED_RPC_MAX_WORDS);
-    for (size_t word = 0; word < reply.length; word++) {
-        words[word] = reply.words[word];
-    }
+    words[0] = reply.length >= 1 ? reply.words[0] : 0;
+    words[1] = reply.length >= 2 ? reply.words[1] : 0;
+    words[2] = reply.length >= 3 ? reply.words[2] : 0;
+    words[3] = reply.length >= 4 ? reply.words[3] : 0;
     *reply_meta = bp_rpc_reply_meta(reply.length, (uint8_t)status);
     return status;
 }
@@ -47,6 +48,25 @@ protected_rpc_status_t protected_rpc_blackparrot_server_test_dispatch(
         config, caller_badge, request_meta, words, reply_meta);
 }
 #elif defined(__riscv) && __riscv_xlen == 64
+static void __attribute__((noreturn, noinline)) protected_return(
+    const uint64_t words[PROTECTED_RPC_MAX_WORDS], uint64_t reply_meta)
+{
+    register uint64_t a0 __asm__("a0") = words[0];
+    register uint64_t a1 __asm__("a1") = words[1];
+    register uint64_t a2 __asm__("a2") = words[2];
+    register uint64_t a3 __asm__("a3") = words[3];
+    register uint64_t a5 __asm__("a5") = reply_meta;
+    __asm__ volatile(
+        "csrw 0x809, a0"
+        : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a5)
+        :
+        : "memory");
+
+    for (;;) {
+        __asm__ volatile("wfi");
+    }
+}
+
 static void __attribute__((noreturn, noinline, used, aligned(64)))
 protected_rpc_blackparrot_server_entry(
     uint64_t word0, uint64_t word1, uint64_t word2, uint64_t word3)
@@ -64,21 +84,7 @@ protected_rpc_blackparrot_server_entry(
     uint64_t reply_meta;
     (void)dispatch_protected_call(
         config, caller_badge, request_meta, words, &reply_meta);
-
-    register uint64_t a0 __asm__("a0") = words[0];
-    register uint64_t a1 __asm__("a1") = words[1];
-    register uint64_t a2 __asm__("a2") = words[2];
-    register uint64_t a3 __asm__("a3") = words[3];
-    register uint64_t a5 __asm__("a5") = reply_meta;
-    __asm__ volatile(
-        "csrw 0x809, a0"
-        : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a5)
-        :
-        : "memory");
-
-    for (;;) {
-        __asm__ volatile("wfi");
-    }
+    protected_return(words, reply_meta);
 }
 #else
 #error "BlackParrot protected-RPC server runtime requires RV64 or its test hook"
