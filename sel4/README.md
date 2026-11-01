@@ -60,9 +60,17 @@ Materialize the test into a pinned sel4test checkout:
 scripts/sel4/materialize_sel4test_ipc_baseline.sh /path/to/sel4test-checkout
 ```
 
-Then configure the checkout normally with the test filter
-`^SEL4IPCRPC0001$`. The helper only creates a source symlink; it does not patch
-or commit upstream repositories.
+For the complete protected-RPC QEMU case, use a fresh build directory:
+
+```sh
+scripts/sel4/configure_qemu_rpc.sh /path/to/sel4test-checkout /path/to/build
+```
+
+This materializes only the software hardware-stub backend before configuring
+the `SEL4IPCRPC0002` test. The BlackParrot configuration helper replaces that
+stub with the real CSR backend. Keeping backend selection platform-specific
+prevents a shared sel4test checkout from silently contaminating one build with
+the other platform's sources.
 
 The raw reference test passed 256 measured calls after eight warmups. Its
 reported QEMU value was 592,524 host/emulator ticks per call. This number is

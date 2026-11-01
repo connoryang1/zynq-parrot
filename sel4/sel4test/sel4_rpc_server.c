@@ -1,10 +1,13 @@
-/* Minimal server image for the focused BlackParrot protected-RPC test. */
+/* Minimal server image for the focused protected-RPC integration test. */
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <sel4/config.h>
 #include <sel4/sel4.h>
 
+#ifdef CONFIG_PLAT_BLACKPARROT
 #include "blackparrot_rpc_abi.h"
+#endif
 #include "protected_rpc.h"
 #include "sel4_rpc_search_service.h"
 
@@ -57,6 +60,7 @@ static void __attribute__((noreturn, noinline, used, aligned(64)))
 hardware_search_entry(uint64_t word0, uint64_t word1, uint64_t word2,
                       uint64_t word3)
 {
+#ifdef CONFIG_PLAT_BLACKPARROT
     protected_rpc_server_config_t *config;
     __asm__ volatile("mv %0, tp" : "=r"(config));
     protected_rpc_message_t request = {
@@ -85,8 +89,18 @@ hardware_search_entry(uint64_t word0, uint64_t word1, uint64_t word2,
         : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a5)
         :
         : "memory");
+#else
+    (void)word0;
+    (void)word1;
+    (void)word2;
+    (void)word3;
+#endif
     for (;;) {
+#ifdef CONFIG_PLAT_BLACKPARROT
         __asm__ volatile("wfi");
+#else
+        seL4_Yield();
+#endif
     }
 }
 
