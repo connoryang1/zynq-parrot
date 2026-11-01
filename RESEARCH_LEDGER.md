@@ -887,6 +887,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Intervals and decision:** the mean replicate v2-minus-v1 median difference is +85.5 cycles. IID `[-136.5,355.25]` and circular-block `[-125.75,328]` intervals cross zero; only 21.862% and 21.505% of resamples favor v2. V2 fails the predeclared gate, v1 remains accepted, and additional manual demand-coverage substitutions are not justified.
 - **Workflow evidence:** a post-power-cycle hash gate caught remote v2 NBF corruption before launch. After deleting only the corrupt destination and failed partial upload, atomic restaging and a second exact hash check passed. No result used the corrupt file. Exact policy/build artifacts, deterministic transcripts, statuses, and `futex-v2-table-ab-results.json` are retained under `logs/mode6-persistent-pair-protocol-20261101/`; analysis SHA-256 is `9b2965b8...a477e`.
 
+### RL-092 — Persistent pipe fixed-arm protocol is prepared
+
+- **Status:** accepted software protocol and clean build; FPGA measurement pending mandatory recovery
+- **Question:** determine whether persistent mode-6 replay transfers from the futex pair to the existing pipe handoff without RL-081's retained-state leakage or RL-086's forced-cold `fence.i` policy.
+- **Protocol:** the physical pipe benchmark now supports all-enabled and all-disabled arms. Each fresh boot runs 16 warmups and 512 measured equal-priority FIFO handoffs with hot proxy data hints, persistent replay state, mode 6 timing, and group 7. Two pairs must use opposite boot order and one exact pipe-trained NBF. The strict analyzer validates artifact identities, status fields, configuration, ordered base/tail rows, arithmetic identities, and terminal PASS markers before calculating IID and circular-block intervals at every timing boundary.
+- **Validation:** all 100 discovered Linux Python tests and the 60-test focused Makefile harness pass. A clean explicit-Buildroot-GCC rebuild produces ELF `16eb7b7b...dcba` and transfer `855fb849...60cc`; the runner dry plan contains only `7 wake-trigger`, and the ELF contains the new fixed-arm configuration and validation strings.
+- **Next gate:** recover the board before every arm and run pipe-trained enabled/disabled arms in opposite order. Only if the fixed-arm result shows useful signal should the futex-specific v1 table be compared on this pipe path or the test be expanded to all eight data-set groups. Exact commands and limits are retained under `logs/pipe-persistent-fixed-ab-20261101/`.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -957,7 +965,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures accepted v1 at a resolved 509.5-cycle/2.68% pooled reduction versus disabled. RL-091 proves that replacing its final two unused entries with stable early common demand lines does not improve latency, so manual fixed-table membership tuning is exhausted. The next productive direction is a workload-independent training/ranking policy evaluated across different handoff paths or applications; do not increase capacity or alter trigger timing until that policy shows transfer beyond the synthetic futex pair.
+For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures accepted v1 at a resolved 509.5-cycle/2.68% pooled reduction versus disabled. RL-091 proves that replacing its final two unused entries with stable early common demand lines does not improve latency, so manual fixed-table membership tuning is exhausted. RL-092 prepares a fresh-boot fixed-arm pipe test of the retained policy; run that transfer gate before increasing capacity or changing trigger timing.
 
 ## Delta log
 

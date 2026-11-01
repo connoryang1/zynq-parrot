@@ -47,6 +47,22 @@ class CellPlanTest(unittest.TestCase):
             " 2 wake-trigger hot-proxy fifo isolated; rc=$?", proxy
         )
 
+    def test_fixed_arm_materializes_all_positional_arguments(self):
+        enabled = benchmark_command(
+            2, "wake-trigger", "hot-proxy", "normal", "persistent", "enabled"
+        )
+        disabled = benchmark_command(
+            2, "wake-trigger", "hot-proxy", "normal", "persistent", "disabled"
+        )
+        self.assertIn(
+            " 2 wake-trigger hot-proxy normal persistent enabled; rc=$?",
+            enabled,
+        )
+        self.assertIn(
+            " 2 wake-trigger hot-proxy normal persistent disabled; rc=$?",
+            disabled,
+        )
+
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))
@@ -117,6 +133,12 @@ class CellPlanTest(unittest.TestCase):
         )
         self.assertEqual(selected_cells(6, "wake-trigger"), trigger[6:])
 
+    def test_single_group_filter_selects_one_wakeup_cell(self):
+        self.assertEqual(
+            selected_cells(0, "wake-trigger", 3),
+            [(3, "wake-trigger")],
+        )
+
     def test_invalid_recovery_boundary_is_rejected(self):
         for start in (-1, 16):
             with self.assertRaisesRegex(ValueError, "start cell"):
@@ -138,7 +160,9 @@ class CellPlanTest(unittest.TestCase):
                 footprint="target",
                 policy="normal",
                 replay_state="persistent",
+                arm="enabled",
                 only_timing=None,
+                only_group=None,
                 start_cell=0,
                 log=root / "missing" / "run.log",
             )

@@ -18,6 +18,8 @@
  * handoff so completed advisory lines cannot leak from an enabled trial into
  * a later disabled trial. The historical persistent state remains available
  * only to reproduce measurements made before that contamination was found.
+ * Fixed enabled or disabled arms support clean persistent-state comparisons
+ * across fresh boots without sharing retained replay lines between A/B arms.
  */
 #include <stdint.h>
 #include <sched.h>
@@ -41,6 +43,8 @@
 enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
        lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10,
        max_retries = 4096 };
+
+enum arm_mode { arm_alternating, arm_disabled, arm_enabled };
 
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
@@ -69,8 +73,12 @@ static void transfer(int fd, char *token, int send)
 		fail(send ? "write pipe" : "read pipe");
 }
 
-static unsigned mode_for(unsigned trial)
+static unsigned mode_for(unsigned trial, enum arm_mode arm)
 {
+	if (arm == arm_disabled)
+		return 0;
+	if (arm == arm_enabled)
+		return 1;
 	return (trial ^ (trial >> 1)) & 1;
 }
 
@@ -81,7 +89,7 @@ static int uncounted_mode(unsigned mode)
 
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned group, unsigned enable_mode, int hot_proxy,
-		      int isolate_replay)
+		      int isolate_replay, enum arm_mode arm)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -116,7 +124,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		  preview_addr[2], preview_addr[3]))
 		fail("register preview lines");
 	for (unsigned trial = 0; trial < trials;) {
-		unsigned enabled = mode_for(trial);
+		unsigned enabled = mode_for(trial, arm);
 		unsigned long before_hook, after_hook;
 		struct rusage before_usage, after_usage;
 		uint64_t checksum = 0, entry, after_load;
@@ -214,14 +222,15 @@ int main(int argc, char **argv)
 	int hot_proxy = 0;
 	int fifo = 0;
 	int isolate_replay = 0;
+	enum arm_mode arm = arm_alternating;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 6) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger] [target|hot-proxy] [normal|fifo] [persistent|isolated]\n",
+	if (argc > 7) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled]\n",
 			argv[0]);
 		return 2;
 	}
@@ -274,7 +283,17 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s\n",
+	if (argc >= 7) {
+		if (!strcmp(argv[6], "disabled"))
+			arm = arm_disabled;
+		else if (!strcmp(argv[6], "enabled"))
+			arm = arm_enabled;
+		else if (strcmp(argv[6], "alternating")) {
+			fprintf(stderr, "invalid trial arm: %s\n", argv[6]);
+			return 2;
+		}
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s\n",
 	       group, group * 4 * line_bytes, lines,
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
@@ -282,7 +301,9 @@ int main(int argc, char **argv)
 	       enable_mode == 4 ? "counter" :
 	       enable_mode == 5 ? "trigger" : "wake-trigger", enable_mode,
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal",
-	       isolate_replay ? "isolated" : "persistent");
+	       isolate_replay ? "isolated" : "persistent",
+	       arm == arm_disabled ? "disabled" :
+	       arm == arm_enabled ? "enabled" : "alternating");
 
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
@@ -303,7 +324,7 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, group, enable_mode,
-			  hot_proxy, isolate_replay);
+			  hot_proxy, isolate_replay, arm);
 		return 0;
 	}
 	close(to_child[0]);

@@ -27,7 +27,7 @@ def cell_plan():
     return cells
 
 
-def selected_cells(start_cell, only_timing=None):
+def selected_cells(start_cell, only_timing=None, only_group=None):
     """Return a disjoint suffix, optionally filtered to one timing."""
     if only_timing in ("instruction", "counter", "trigger", "wake-trigger"):
         cells = [(group, only_timing) for group in range(8)]
@@ -35,13 +35,20 @@ def selected_cells(start_cell, only_timing=None):
             raise ValueError(
                 f"start cell must be in 0..{len(cells) - 1} for {only_timing}"
             )
-        return cells[start_cell:]
+        cells = cells[start_cell:]
+        if only_group is not None:
+            cells = [cell for cell in cells if cell[0] == only_group]
+        if not cells:
+            raise ValueError("cell selection is empty")
+        return cells
     cells = cell_plan()
     if start_cell < 0 or start_cell >= len(cells):
         raise ValueError(f"start cell must be in 0..{len(cells) - 1}")
     cells = cells[start_cell:]
     if only_timing is not None:
         cells = [cell for cell in cells if cell[1] == only_timing]
+    if only_group is not None:
+        cells = [cell for cell in cells if cell[0] == only_group]
     if not cells:
         raise ValueError("cell selection is empty")
     return cells
@@ -55,16 +62,21 @@ def cell_exit_pattern(group, timing):
 
 
 def benchmark_command(group, timing, footprint, policy="normal",
-                      replay_state="persistent"):
+                      replay_state="persistent", arm="alternating"):
     """Build the guest command while preserving the historical default CLI."""
     guest_args = f"{group} {timing}"
     if (footprint != "target" or policy != "normal"
-            or replay_state != "persistent"):
+            or replay_state != "persistent" or arm != "alternating"):
         guest_args += f" {footprint}"
-    if policy != "normal" or replay_state != "persistent":
+    if (policy != "normal" or replay_state != "persistent"
+            or arm != "alternating"):
         guest_args += f" {policy}"
     if replay_state != "persistent":
         guest_args += f" {replay_state}"
+    elif arm != "alternating":
+        guest_args += " persistent"
+    if arm != "alternating":
+        guest_args += f" {arm}"
     return (
         f"{GUEST_ELF} {guest_args}; "
         f"rc=$?; echo PHYSICAL_CELL_EXIT group={group} "
@@ -91,11 +103,14 @@ def parse_args(argv=None):
                         default="normal")
     parser.add_argument("--replay-state", choices=("persistent", "isolated"),
                         default="isolated")
+    parser.add_argument("--arm", choices=("alternating", "disabled", "enabled"),
+                        default="alternating")
     parser.add_argument("--only-timing",
                         choices=("early", "late", "instruction", "counter",
                                  "trigger", "wake-trigger"))
     parser.add_argument("--start-cell", type=int, default=0,
                         help="zero-based cell-plan index for a recovered suffix run")
+    parser.add_argument("--only-group", type=int, choices=range(8))
     parser.add_argument("--print-plan", action="store_true")
     return parser.parse_args(argv)
 
@@ -107,7 +122,7 @@ def validate_args(args):
             raise ValueError(f"{label} SHA-256 must be 64 lowercase hex digits")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
-    selected_cells(args.start_cell, args.only_timing)
+    selected_cells(args.start_cell, args.only_timing, args.only_group)
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     if not args.log.parent.is_dir():
@@ -126,12 +141,14 @@ def run(args):
         "nbf_sha256": sha256(args.nbf),
         "transfer_sha256": sha256(args.transfer),
         "elf_sha256": args.elf_sha256,
+        "control_program_sha256": args.control_sha256,
         "footprint": args.footprint,
         "policy": args.policy,
         "replay_state": args.replay_state,
+        "arm": args.arm,
         "cells": [f"{group}:{timing}"
                   for group, timing in selected_cells(
-                      args.start_cell, args.only_timing)],
+                      args.start_cell, args.only_timing, args.only_group)],
     }
     child = None
     try:
@@ -153,10 +170,10 @@ def run(args):
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
             child.expect(SHELL_PROMPT)
             for group, timing in selected_cells(
-                    args.start_cell, args.only_timing):
+                    args.start_cell, args.only_timing, args.only_group):
                 child.sendline(benchmark_command(
                     group, timing, args.footprint, args.policy,
-                    args.replay_state
+                    args.replay_state, args.arm
                 ))
                 child.expect(cell_exit_pattern(group, timing), timeout=900)
                 rc = int(child.match.group(1))
@@ -201,7 +218,7 @@ def main(argv=None):
         raise SystemExit(str(error)) from error
     if args.print_plan:
         for group, timing in selected_cells(
-                args.start_cell, args.only_timing):
+                args.start_cell, args.only_timing, args.only_group):
             print(group, timing)
         return 0
     run(args)
