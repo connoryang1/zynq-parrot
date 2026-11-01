@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "blackparrot_rpc_abi.h"
+#include "protected_rpc_backend.h"
 #include "protected_rpc_blackparrot.h"
 
 static protected_rpc_status_t sel4_error_status(seL4_Word error)

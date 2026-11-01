@@ -41,4 +41,16 @@ typedef struct {
 extern const protected_rpc_backend_t protected_rpc_software_backend;
 extern const protected_rpc_backend_t protected_rpc_hardware_backend;
 
+/*
+ * Internal BlackParrot adapter lifecycle. The trusted seL4 binding wrapper is
+ * the only production caller: attach follows successful kernel installation,
+ * and detach follows completed kernel revocation while calls are stopped.
+ * Tokens are backend-private and must not enter the application API.
+ */
+protected_rpc_status_t protected_rpc_blackparrot_attach(
+    protected_rpc_endpoint_t endpoint, uint64_t token);
+
+protected_rpc_status_t protected_rpc_blackparrot_detach(
+    protected_rpc_endpoint_t endpoint);
+
 #endif

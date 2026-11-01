@@ -6,20 +6,6 @@
 #include "protected_rpc.h"
 
 /*
- * Trusted-runtime boundary for the initial one-slot implementation. The token
- * is returned by the kernel binding operation; application code continues to
- * call protected_rpc_call() with its ordinary opaque endpoint.
- *
- * Attach/detach run while application calls are stopped. Kernel descriptor
- * revocation must complete before detach returns a token to the allocator.
- */
-protected_rpc_status_t protected_rpc_blackparrot_attach(
-    protected_rpc_endpoint_t endpoint, uint64_t token);
-
-protected_rpc_status_t protected_rpc_blackparrot_detach(
-    protected_rpc_endpoint_t endpoint);
-
-/*
  * Trusted seL4 runtime input. The kernel derives both address spaces, the
  * endpoint badge, slot, token, and hardware context IDs. These values name
  * only the fixed server entry state inside the server's own VSpace.
@@ -44,7 +30,11 @@ typedef struct {
     protected_rpc_blackparrot_region_binding_t region;
 } protected_rpc_blackparrot_binding_t;
 
-/* Atomically create/remove the kernel binding and update the caller adapter. */
+/*
+ * Atomically create/remove the kernel binding and update the caller adapter.
+ * The returned kernel token never crosses this trusted-runtime boundary;
+ * application code continues to call protected_rpc_call() with its endpoint.
+ */
 protected_rpc_status_t protected_rpc_blackparrot_bind(
     protected_rpc_endpoint_t endpoint,
     const protected_rpc_blackparrot_binding_t *binding);

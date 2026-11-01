@@ -5,6 +5,7 @@
 #include <sel4/sel4.h>
 
 #include "blackparrot_rpc_abi.h"
+#include "protected_rpc_backend.h"
 #include "protected_rpc_blackparrot.h"
 
 seL4_Word mock_sel4_mrs[16];
