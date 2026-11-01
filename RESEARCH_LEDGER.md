@@ -910,6 +910,13 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Repeatability:** the last two rejected v1 boots fault at the same `wakeup_flusher_threads+0x5e/0xba` location with identical instruction bytes and different corrupted-looking bad addresses, then return to the shell with `Segmentation fault` instead of CORE/BSG PASS. A strict loader update rejects kernel BUG, panic, Oops, scheduling-while-atomic, and segmentation markers even if normal PASS text exists. All 104 Linux tests and 63 focused harness checks pass after this guardrail.
 - **Interpretation:** the failures occur after the measured rows, but three-of-four terminal instability makes selection of the one clean v1 timing invalid. V1 remains accepted for the four-boot futex-specific result in RL-090; it is rejected as a workload-independent/global table until the fault is isolated. The next bounded discriminator is a v2 pipe stability run, because v2 retains 14 v1 entries and removes only unused `0x8023f780`/`0x802034c0`. Full accepted/rejected evidence is under `logs/pipe-persistent-fixed-ab-20261101/`.
 
+### RL-095 — V2 passes pipe stability and narrows the unsafe pair
+
+- **Status:** accepted two-boot functional isolation; no performance claim
+- **Scope and result:** exact v2 NBF `0068529a...a817`, which retains 14 v1 entries and replaces only `0x8023f780`/`0x802034c0`, completes two independent recovery-qualified 512-handoff pipe runs. Both have exact identities, no strict kernel-failure marker, 1/2 filtered asynchronous attempts, and terminal runner/child/parent/CORE/BSG PASS. Roundtrip medians are 163,158 and 161,984 cycles but are not a matched performance contrast.
+- **Exact delta:** v1 and v2 differ in only two 64-bit OpenSBI NBF records while all Linux/DTB records match: table word `0x80017e60` changes scheduler line `0x8023f780` (`update_load_avg`) to `0x80a12500`; word `0x80017e90` changes exception-entry line `0x802034c0` (`restore_caller_reg`/bad-stack path) to `0x802980c0`.
+- **Interpretation and next gate:** v1 passes 1/4 pipe launches while v2 passes 2/2, implicating the two v1-only entries as a pair without proving which entry or causality. Create exact one-record hybrids on v2 and run the same stability gate, beginning with retained `update_load_avg` because it executes in the scheduler path. V2 remains rejected for futex performance by RL-091; this is functional diagnosis only. Evidence is under `logs/pipe-persistent-fixed-ab-20261101/`.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -980,7 +987,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-090 measures futex-v1 at a resolved 2.68% futex reduction, and RL-093 shows that the pipe-trained table transfers as a resolved 1.30% two-handoff pipe throughput effect while first resume remains unresolved. RL-094 rejects v1 as a workload-independent table because three of four 512-handoff pipe launches fault at terminal poweroff. The next bounded functional gate is a v2 pipe stability run to test the two v1-only entries; do not use it to reopen v2's rejected futex performance or change capacity/timing yet.
+For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-090 measures futex-v1 at a resolved 2.68% futex reduction, and RL-093 shows that the pipe-trained table transfers as a resolved 1.30% two-handoff pipe throughput effect while first resume remains unresolved. RL-094 rejects v1 as a workload-independent table because three of four 512-handoff pipe launches fault at terminal poweroff, while RL-095's v2 passes two of two after replacing exactly two entries. The next bounded functional gate is one-record v2/v1 hybrid stability, starting with retained `update_load_avg`; do not use it to reopen v2 performance or change capacity/timing.
 
 ## Delta log
 

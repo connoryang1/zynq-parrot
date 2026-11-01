@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **V2 isolates the unsafe table pair — 2026-11-01:** two recovery-qualified v2 pipe boots pass all 512 rows, strict fault scanning, and terminal CORE/BSG PASS, versus only one of four passing v1 launches. Exact NBF comparison changes only the `update_load_avg` line `0x8023f780` and exception-entry line `0x802034c0`; one-record hybrids are now the bounded discriminator, with no v2 performance claim (`logs/pipe-persistent-fixed-ab-20261101/`, RL-095).
+
 - **Futex table rejected as workload-independent — 2026-11-01:** a fixed-arm pipe comparison cannot complete: three of four recovery-qualified futex-v1 launches finish all 512 benchmark rows but fault during terminal poweroff, with the last two failing at identical `wakeup_flusher_threads+0x5e` bytes and different corrupted addresses; current-table arms pass. No performance contrast is accepted, v1 remains valid only for its futex result, and strict analysis now rejects kernel fault text despite ordinary PASS markers (`logs/pipe-persistent-fixed-ab-20261101/`, RL-094).
 
 - **Persistent replay transfers to pipe throughput — 2026-11-01:** four fresh fixed-arm FPGA boots resolve a 2,076.75-cycle replicate-stratified two-handoff reduction with IID `[-2480.25,-1683]` and block `[-2473.75,-1668.75]`; pooled roundtrip falls 2,141.5 cycles or 1.30%, and all eight quarter differences favor replay. Incoming wake-to-load remains unresolved because one disabled quarter enters a slow phase, so this is pipe-pair throughput evidence rather than a first-resume claim (`logs/pipe-persistent-fixed-ab-20261101/`, RL-093).

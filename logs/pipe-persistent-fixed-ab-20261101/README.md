@@ -81,3 +81,16 @@ The unchanged recovery-qualified retry passed cleanly. However, the first futex-
 The final recovery-qualified futex-v1 retry failed in the same way and is retained as `rejected-table-rep2-futex-v1-final-poweroff.log.gz`. The last two failures reach `wakeup_flusher_threads+0x5e/0xba` after cell PASS, execute the same faulting instruction bytes, and report different corrupted-looking bad addresses before `poweroff` segfaults. In total, three of four futex-v1 pipe launches fail terminal acceptance; only one is clean. The current-table comparison arm passes, as do all four current-table arms in the preceding enabled/disabled experiment.
 
 The current-versus-v1 performance comparison is therefore rejected as unstable and no timing from the single clean pair is promoted. This does not revoke v1's accepted futex-specific 2.68% result, whose four measured boots pass, but it prevents treating v1 as a workload-independent/global table. The next bounded discriminator is the already-built v2 table: it retains 14 v1 entries and replaces only otherwise-unused `0x8023f780` and `0x802034c0`. A 512-handoff pipe stability run can test whether those two entries are necessary for the cross-workload fault; it is a functional isolation experiment, not an attempt to revive v2's rejected futex performance.
+
+Two independent v2 stability boots both pass all 512 rows, strict kernel-failure scanning, and terminal CORE/BSG PASS. Their roundtrip medians are 163,158 and 161,984 cycles; these are not compared as a performance result because there is no opposite-order table protocol. V2 passes 2/2 pipe launches, while v1 passes only 1/4 under the same benchmark/transfer/bitstream. The evidence narrows the instability to the two v1-only entries as a pair, but sample count and simultaneous replacement prevent assigning either entry individually.
+
+Exact v1-versus-v2 NBF comparison changes only two 64-bit OpenSBI records below the untouched Linux payload: table storage `0x80017e60` changes `0x8023f780` (`update_load_avg`) to `0x80a12500`, and `0x80017e90` changes `0x802034c0` (`restore_caller_reg`/bad-stack line) to `0x802980c0`. This makes one-record hybrid NBFs exact and avoids a source rebuild. The next productive discriminator restores each v1 entry separately on the clean v2 base and runs the same stability gate; it must preserve all other NBF records exactly and remains functional diagnosis, not performance tuning.
+
+V2 deterministic evidence hashes are:
+
+```text
+rep1 gzip/status: 6340a5400397504e4eec47110a5bf0e48eb5e9f6a3c51a71b8760654be3a5125 / 44fbd7657a450413267597945640dca2f5cd0c73e48837bdf7e117fbc11bc55d
+rep2 gzip/status: 42a80f28c1a08665d1319b36d751ac0468de07c02a30e6e05e6ffc989c94c0b3 / 44fbd7657a450413267597945640dca2f5cd0c73e48837bdf7e117fbc11bc55d
+```
+
+The board is left in the untrusted post-shutdown state after v2 replicate 2. The remotely staged futex-v1 image was removed to make space for v2; its exact local copy remains recoverable. Any hybrid run must begin with full physical recovery and post-cycle NBF rehash.
