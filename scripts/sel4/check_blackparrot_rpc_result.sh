@@ -6,17 +6,29 @@ set -euo pipefail
 physical=0
 shared_buffer=0
 components=0
+caller_badge_expected=
 while (($# > 1)); do
     case $1 in
         --physical) physical=1 ;;
         --shared-buffer) shared_buffer=1 ;;
         --components) components=1 ;;
+        --caller-badge)
+            (($# >= 3)) || break
+            caller_badge_expected=$2
+            shift
+            ;;
         *) break ;;
     esac
     shift
 done
 if (($# != 1)); then
-    echo "usage: $0 [--physical] [--shared-buffer] [--components] OUTPUT.log" >&2
+    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--caller-badge DECIMAL] OUTPUT.log" >&2
+    exit 2
+fi
+if [[ -n $caller_badge_expected ]] \
+   && { [[ ! $caller_badge_expected =~ ^[0-9]+$ ]] \
+        || ((caller_badge_expected == 0)); }; then
+    echo "caller badge must be a nonzero decimal integer" >&2
     exit 2
 fi
 
@@ -31,6 +43,7 @@ distribution_re='^SEL4_RPC_DISTRIBUTION path=(in-process|hardware|software|notif
 cold_distribution_re='^SEL4_RPC_DISTRIBUTION path=l1d-cold/(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 hierarchy_distribution_re='^SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 components_re='^SEL4_RPC_COMPONENTS path=(in-process|hardware|software|notification) samples=([0-9]+) pre_median=([0-9]+) service_median=([0-9]+) post_median=([0-9]+)$'
+caller_badge_re='^SEL4_RPC_CALLER_BADGE value=([0-9]+) software=verified hardware=verified$'
 
 test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 
@@ -65,6 +78,7 @@ hardware_components_count=0
 software_components_count=0
 notification_components_count=0
 timebase_count=0
+caller_badge_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -258,6 +272,9 @@ while IFS= read -r line; do
                 notification_post_median=$component_post
                 ;;
         esac
+    elif [[ $line =~ $caller_badge_re ]]; then
+        caller_badge_count=$((caller_badge_count + 1))
+        caller_badge_actual=${BASH_REMATCH[1]}
     fi
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
@@ -407,9 +424,18 @@ if ((physical)) && ((core_pass_count != 1 || bsg_pass_count != 1 || bsg_fail_cou
     echo "invalid physical completion: core_pass=$core_pass_count bsg_pass=$bsg_pass_count bsg_fail=$bsg_fail_count" >&2
     exit 1
 fi
+if [[ -n $caller_badge_expected ]] \
+   && ((caller_badge_count != 1 || caller_badge_actual != caller_badge_expected)); then
+    echo "invalid caller-badge evidence: rows=$caller_badge_count expected=$caller_badge_expected actual=${caller_badge_actual:-missing}" >&2
+    exit 1
+fi
 
 printf 'accepted seL4 RPC gate: hardware=%s cycles/call software-fallback=%s cycles/call\n' \
     "$hardware_per_call" "$software_per_call"
+if [[ -n $caller_badge_expected ]]; then
+    printf 'authenticated caller badge: %s through software and hardware paths\n' \
+        "$caller_badge_actual"
+fi
 if ((shared_buffer)); then
     printf 'matched warm paths: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
         "$direct_per_call" "$hardware_per_call" "$ipc_per_call" "$notification_per_call"

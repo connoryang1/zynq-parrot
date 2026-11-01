@@ -16,6 +16,7 @@
 
 static protected_rpc_region_binding_t server_region;
 static protected_rpc_server_config_t server_config;
+static uint64_t server_expected_badge;
 
 static protected_rpc_status_t serve_notifications(
     seL4_CPtr request_notification, seL4_CPtr reply_notification,
@@ -120,6 +121,7 @@ int main(int argc, char **argv)
         .regions = &server_region,
         .region_count = 1,
         .max_requests = SERVER_SOFTWARE_CALLS,
+        .cookie = &server_expected_badge,
     };
 
     uintptr_t global_pointer;
@@ -145,6 +147,13 @@ int main(int argc, char **argv)
             return PROTECTED_RPC_BACKEND_ERROR;
         }
     }
+
+#ifdef CONFIG_PLAT_BLACKPARROT
+    /* The server receives on an unbadged cap, while the caller binds and
+     * invokes through its minted cap. Both the ordinary and protected paths
+     * must authenticate the same kernel-derived nonzero badge. */
+    server_expected_badge = SEL4_RPC_SEARCH_CALLER_BADGE;
+#endif
 
     const protected_rpc_status_t status = protected_rpc_serve(
         (protected_rpc_endpoint_t){.opaque = endpoint}, &server_config);

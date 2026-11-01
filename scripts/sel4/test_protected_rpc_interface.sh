@@ -66,6 +66,7 @@ grep -Fq 'RPC server has wrong cycle-counter instructions' \
 uart_log="$build_dir/physical-uart.log"
 printf '%s\r\r\n' \
     'SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied' \
+    'SEL4_RPC_CALLER_BADGE value=24090 software=verified hardware=verified' \
     'SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024' \
     'SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=760832 cycles_per_call=2972' \
     'SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=856576 cycles_per_call=3346' \
@@ -98,4 +99,4 @@ printf '%s\r\r\n' \
 "$script_dir/check_blackparrot_rpc_result.sh" --physical "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
-    --components "$uart_log"
+    --components --caller-badge 24090 "$uart_log"

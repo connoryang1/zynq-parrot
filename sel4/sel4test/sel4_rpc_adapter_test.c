@@ -446,7 +446,23 @@ static int test_blackparrot_hardware_binding(env_t env)
     /* The server first waits on the request notification. After the matched
      * notification calls below it enters the ordinary endpoint receive loop. */
 
-    const protected_rpc_endpoint_t rpc_endpoint = {.opaque = endpoint};
+    cspacepath_t caller_endpoint_path;
+    error = vka_cspace_alloc_path(&env->vka, &caller_endpoint_path);
+    test_eq(error, 0);
+    if (error == 0) {
+        error = vka_cnode_mint(&caller_endpoint_path, &endpoint_path,
+                               seL4_AllRights,
+                               SEL4_RPC_SEARCH_CALLER_BADGE);
+        test_eq(error, 0);
+    }
+    if (error != 0) {
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base, &control_endpoint);
+        return sel4test_get_result();
+    }
+    const protected_rpc_endpoint_t rpc_endpoint = {
+        .opaque = caller_endpoint_path.capPtr,
+    };
     protected_rpc_message_t request = {0};
     const protected_rpc_buffer_ref_t search_ref = {
         .region = {.opaque = ADAPTER_REGION_TOKEN},
@@ -818,6 +834,9 @@ static int test_blackparrot_hardware_binding(env_t env)
 
     destroy_rpc_server(env, &server, shadow_stack, shared_base, mailbox_base,
                        &control_endpoint);
+    printf("SEL4_RPC_CALLER_BADGE value=%" PRIu64
+           " software=verified hardware=verified\n",
+           (uint64_t)SEL4_RPC_SEARCH_CALLER_BADGE);
     printf("SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=%u\n",
            ADAPTER_SEARCH_BYTES);
     printf("SEL4_RPC_ADAPTER path=in-process calls=%u total_cycles=%" PRIu64
