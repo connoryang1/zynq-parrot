@@ -22,6 +22,12 @@ package bp_common_pkg;
       // This historical schema has no separate logical-context count. Keep
       // the resident register banks at the validated PYNQ-Z2 fit dimension.
       ,num_threads: 2
+      // The metadata carries a resident-thread ID. The default configuration
+      // has four slots (two ID bits); this endpoint has two (one ID bit).
+      // Match the accepted 2-thread/4-context full-core simulation exactly.
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+                                  - $clog2(bp_default_cfg_p.num_threads)
+                                  + $clog2(2)
 
       ,icache_fill_width: 64
 

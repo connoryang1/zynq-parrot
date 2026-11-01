@@ -299,6 +299,13 @@ The default image matches the direct-reset full-core simulator. Set
 `NBF_DEBUG=1` when packaging the otherwise identical image for the physical
 `control-program` path; this adds the required debug-module reset preamble.
 
+For FPGA qualification, use `e_bp_unicore_zynqparrot_cfg`. Its two resident
+threads, four logical contexts, 50-bit branch metadata, and one L2 bank match
+the accepted full-core model. Do not use the historical `prefetch5` endpoint
+for this test: its ten contexts, detached data-prefetch hardware, and second L2
+bank are not exercised by the fixed contexts 0/1 RPC path and exceed the
+XC7Z020 placement capacity in the current source tree.
+
 The packager pins OpenSBI commit `7830e987856eb1319c82664702892b6d50a93e7a`,
 disables the unrelated I-cache replay table, embeds the exact seL4 DTB, and
 selects the routed 8 MHz timer. It places the payload at the elfloader's linked
