@@ -113,6 +113,12 @@ generation permanently unusable, and a later bind must be able to install a
 fresh generation. `NOT_STARTED` is potentially transient and must not clear a
 still-live association.
 
+The one-slot prototype learns an implicit revocation lazily on that next
+hardware attempt. A rejected zero-argument `UNBIND` is not equivalent proof:
+it can also mean that a different TCB attempted the operation, so the adapter
+must not discard a possibly live token on that error. A durable binding object
+should synchronize kernel finalization and caller-runtime state directly.
+
 An invalid, busy, nonresident, wrong-SATP, or otherwise ineligible call returns
 a precise non-started outcome from the same instruction.  A separate
 "eligible?" CSR is forbidden because revocation or scheduling state could
