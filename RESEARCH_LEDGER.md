@@ -895,6 +895,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Validation and transfer correction:** all 100 discovered Linux Python tests and the 60-test focused Makefile harness pass. A clean explicit-Buildroot-GCC rebuild produces ELF `16eb7b7b...dcba`. One enabled slow-transfer feasibility arm passes all 512 rows, but two disabled launches die before sampling with host `Errant write`: one during Buildroot startup and one near the end of the roughly 240-command 76-column upload. Both are rejected and recovery-qualified. The Makefile now accepts an explicit 512-column transfer width; `make --no-print-directory` produces 39-line transfer `b6d9f373...dd09e`, whose local execution reconstructs the exact ELF byte for byte. Final matched arms restart with that identity.
 - **Next gate:** recover the board before every arm and run pipe-trained enabled/disabled arms in opposite order. Only if the fixed-arm result shows useful signal should the futex-specific v1 table be compared on this pipe path or the test be expanded to all eight data-set groups. Exact commands and limits are retained under `logs/pipe-persistent-fixed-ab-20261101/`.
 
+### RL-093 — Persistent replay transfers to pipe throughput, not resolved first resume
+
+- **Status:** accepted replicated FPGA result; pipe roundtrip transfer passes, incoming first-use remains unresolved
+- **Scope and correctness:** four fresh boots form opposite-order fixed enabled/disabled pairs on exact pipe-trained NBF `5e42c2f6...5d2bd`, fast transfer `b6d9f373...dd09e`, ELF `16eb7b7b...dcba`, control program `2dd9c411...7c30`, routed bitstream `e97e0517...2381`, group 7, equal-priority FIFO tasks, hot proxy data hints, and persistent mode-6 replay. Every arm has 512 ordered rows/tails and terminal runner/child/parent/CORE/BSG PASS.
+- **First-use result:** enabled wake-to-load medians are 29,260/29,981.5 cycles versus disabled 46,824.5/30,184.5. One disabled quarter enters a slow phase. The replicate-stratified enabled-minus-disabled point is -8,883.75 cycles, but IID `[-17264.75,7186.5]` and block `[-16900.5,6503]` intervals cross zero; quarter differences favor enabled in six of eight. Wake-to-entry is also unresolved. No first-resume speedup is claimed.
+- **Roundtrip result:** enabled roundtrip medians are 162,065/162,255 versus disabled 164,782/163,691.5. The stratified difference is **-2,076.75 cycles**, with IID `[-2480.25,-1683]` and block `[-2473.75,-1668.75]`; all eight quarter differences favor enabled. Pooled medians are 162,152 versus 164,293.5, a **2,141.5-cycle or 1.30% reduction**.
+- **Interpretation and next gate:** retained replay now transfers beyond the futex harness as a two-handoff steady-state throughput effect, but shared warmed scheduler code can help the later return path and does not prove faster target entry. Compare current pipe-trained and accepted futex-v1 tables in fresh opposite order on this exact fixed-arm protocol before changing capacity or timing. Strict result SHA-256 is `56547ceb...11c`; full evidence and rejected slow-transfer boots are under `logs/pipe-persistent-fixed-ab-20261101/`.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -965,7 +973,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures accepted v1 at a resolved 509.5-cycle/2.68% pooled reduction versus disabled. RL-091 proves that replacing its final two unused entries with stable early common demand lines does not improve latency, so manual fixed-table membership tuning is exhausted. RL-092 prepares a fresh-boot fixed-arm pipe test of the retained policy; run that transfer gate before increasing capacity or changing trigger timing.
+For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures accepted v1 at a resolved 509.5-cycle/2.68% pooled futex reduction versus disabled. RL-091 closes manual fixed-table membership tuning, and RL-093 shows that the pipe-trained table transfers as a resolved 1.30% two-handoff pipe throughput effect while first resume remains unresolved. The next gate is a fresh current-table versus futex-v1 pipe comparison to quantify specialization before changing capacity or trigger timing.
 
 ## Delta log
 
