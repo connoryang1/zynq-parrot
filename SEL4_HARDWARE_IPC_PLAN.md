@@ -233,8 +233,8 @@ on the routed PYNQ-Z2 endpoint. The focused physical run measures 374 cycles
 per hardware call versus 3,217 cycles per automatic post-unbind fallback and
 passes the complete three-test suite plus clean host termination. See RL-063 and
 `sel4/results/sel4test-rpc-only-blackparrot-fpga.log`. RL-064 now completes
-Stage 5's first matched real-service gate; cold-cache and notification
-comparisons remain.
+Stage 5's matched warm and L1D-cold real-service gates; a lower-cache/DRAM-cold
+test and notification comparison remain.
 
 #### Initial kernel binding shape
 
@@ -297,11 +297,14 @@ the software and hardware IPC paths use matched inputs, outputs, mappings, and
 timing boundaries.
 
 Current checkpoint (2026-11-01): one shared-page musl service passes QEMU and
-the PYNQ-Z2. Matched warm averages are 2,983 cycles in-process, 3,339 through
-hardware RPC, and 5,546 through forced ordinary seL4 IPC. Per-call medians are
-2,801/3,142/5,168 and p95 values are 4,964/5,299/7,347. The next evaluation
-step is a defensible cold-cache experiment; the eight-call AUTO fallback
-remains separate because its failed hardware probe is intentional extra work.
+the PYNQ-Z2. Matched warm averages are 2,965 cycles in-process, 3,340 through
+hardware RPC, and 5,508 through forced ordinary seL4 IPC. Per-call warm
+medians are 2,776/3,140/5,158. A whole-L1D writeback/invalidate before every
+sample produces L1D-cold/L2-warm medians of 3,703/4,269/9,735: hardware adds
+566 cycles over the direct handler versus 6,032 for ordinary IPC and is 2.28x
+faster end to end. The next evaluation step is lower-cache/DRAM-cold behavior;
+the eight-call AUTO fallback remains separate because its failed hardware
+probe is intentional extra work.
 
 ### Stage 6 — Generalization
 

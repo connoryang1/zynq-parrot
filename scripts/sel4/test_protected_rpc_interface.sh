@@ -58,6 +58,10 @@ printf '%s\r\r\n' \
     'SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2960 median=2970 p95=2990 max=3010' \
     'SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3330 median=3340 p95=3370 max=3400' \
     'SEL4_RPC_DISTRIBUTION path=software samples=64 min=6450 median=6500 p95=6600 max=6700' \
+    'SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64' \
+    'SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=4000 median=4100 p95=4300 max=4500' \
+    'SEL4_RPC_DISTRIBUTION path=l1d-cold/hardware samples=64 min=4400 median=4500 p95=4800 max=5000' \
+    'SEL4_RPC_DISTRIBUTION path=l1d-cold/software samples=64 min=7000 median=7200 p95=7600 max=8000' \
     'Test SEL4IPCRPC0002 passed' \
     'halting...INFO:    CORE PASS' \
     'INFO:    BSG PASS' > "$uart_log"

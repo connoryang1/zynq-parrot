@@ -23,6 +23,7 @@
 #define ADAPTER_MEASURED_CALLS 256
 #define ADAPTER_BP_SOFTWARE_CALLS SEL4_RPC_SEARCH_MEASURED_CALLS
 #define ADAPTER_DISTRIBUTION_CALLS SEL4_RPC_SEARCH_DISTRIBUTION_CALLS
+#define ADAPTER_L1D_COLD_CALLS SEL4_RPC_SEARCH_L1D_COLD_CALLS
 #define ADAPTER_BP_FALLBACK_CALLS SEL4_RPC_SEARCH_FALLBACK_CALLS
 #define ADAPTER_VALID_CALLS (ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS)
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
@@ -37,9 +38,19 @@ static volatile seL4_Word adapter_server_private_counter;
 static inline uint64_t read_cycles(void)
 {
     uint64_t value;
-    __asm__ volatile("rdcycle %0" : "=r"(value));
+    __asm__ volatile("rdcycle %0" : "=r"(value) : : "memory");
     return value;
 }
+
+#ifdef CONFIG_PLAT_BLACKPARROT
+static inline void flush_l1_data_cache(void)
+{
+    /* BlackParrot's custom whole-cache flush: write back dirty L1D lines and
+     * invalidate every L1D tag. The instruction does not invalidate L1I or
+     * the shared lower cache, so results are explicitly L1D-cold/L2-warm. */
+    __asm__ volatile(".word 0x0020700f" : : : "memory");
+}
+#endif
 
 static void print_cycle_distribution(const char *path, uint64_t *samples,
                                      size_t count)
@@ -305,6 +316,9 @@ static int test_blackparrot_hardware_binding(env_t env)
     uint64_t direct_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t hardware_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t software_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t direct_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
+    uint64_t hardware_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
+    uint64_t software_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t direct_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
@@ -324,6 +338,17 @@ static int test_blackparrot_hardware_binding(env_t env)
         protected_rpc_status_t status = sel4_rpc_bounded_search_service(
             &local_context, &request, &local_reply, NULL);
         direct_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(local_reply.length, 2);
+        test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    for (size_t sample = 0; sample < ADAPTER_L1D_COLD_CALLS; sample++) {
+        flush_l1_data_cache();
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = sel4_rpc_bounded_search_service(
+            &local_context, &request, &local_reply, NULL);
+        direct_l1d_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(local_reply.length, 2);
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
@@ -353,6 +378,18 @@ static int test_blackparrot_hardware_binding(env_t env)
         protected_rpc_status_t status = protected_rpc_call(
             rpc_endpoint, &request, &software, &result);
         software_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    for (size_t sample = 0; sample < ADAPTER_L1D_COLD_CALLS; sample++) {
+        flush_l1_data_cache();
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = protected_rpc_call(
+            rpc_endpoint, &request, &software, &result);
+        software_l1d_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
         test_eq(result.reply.length, 2);
@@ -443,6 +480,18 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
+    for (size_t sample = 0; sample < ADAPTER_L1D_COLD_CALLS; sample++) {
+        flush_l1_data_cache();
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = protected_rpc_call(
+            rpc_endpoint, &request, &hardware, &result);
+        hardware_l1d_cold_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
 
     test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
 
@@ -491,6 +540,15 @@ static int test_blackparrot_hardware_binding(env_t env)
                              ADAPTER_DISTRIBUTION_CALLS);
     print_cycle_distribution("software", software_samples,
                              ADAPTER_DISTRIBUTION_CALLS);
+    printf("SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm "
+           "method=blackparrot-flush-all samples=%u\n",
+           ADAPTER_L1D_COLD_CALLS);
+    print_cycle_distribution("l1d-cold/in-process", direct_l1d_cold_samples,
+                             ADAPTER_L1D_COLD_CALLS);
+    print_cycle_distribution("l1d-cold/hardware", hardware_l1d_cold_samples,
+                             ADAPTER_L1D_COLD_CALLS);
+    print_cycle_distribution("l1d-cold/software", software_l1d_cold_samples,
+                             ADAPTER_L1D_COLD_CALLS);
     return 0;
 }
 #endif

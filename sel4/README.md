@@ -306,22 +306,30 @@ match and NUL offsets. Before the valid bind, the FPGA test proves that the
 kernel rejects a different physical page, a write-permission escalation, and
 an unmapped runtime-state pointer.
 
-On the PYNQ-Z2, the matched warm averages are 2,983 cycles for a direct call to
-the handler, 3,339 for hardware RPC, and 5,546 for forced ordinary seL4 IPC.
-Hardware therefore adds 356 cycles over the useful handler, versus 2,563 for
-ordinary IPC, and is 1.66x faster end to end. Eight automatic fallbacks average
-6,157 cycles in the retained run because they include the precise failed
+On the PYNQ-Z2, the matched warm averages are 2,965 cycles for a direct call to
+the handler, 3,340 for hardware RPC, and 5,508 for forced ordinary seL4 IPC.
+Hardware therefore adds 375 cycles over the useful handler, versus 2,543 for
+ordinary IPC, and is 1.65x faster end to end. Eight automatic fallbacks average
+6,782 cycles in the retained run because they include the precise failed
 hardware probe before
 ordinary IPC; that row remains a correctness gate rather than the primary
 software baseline. The smaller application ratio than the scalar gate is
 expected because nearly 3,000 cycles of page scanning are common service work.
-Separate 64-call samples report medians of 2,801/3,142/5,168 and p95 values of
-4,964/5,299/7,347 for in-process/hardware/software. Hardware's incremental
-cost is therefore 341 cycles at median and 335 at p95, while ordinary IPC adds
-2,367 and 2,383. The similar roughly 2,160-cycle p95 uplift in every path
-suggests common periodic system activity; this run does not identify its cause.
+Separate 64-call warm samples report medians of 2,776/3,140/5,158 and p95
+values of 4,974/5,294/7,357 for in-process/hardware/software. Hardware's
+incremental warm cost is therefore 364 cycles at median and 320 at p95, while
+ordinary IPC adds 2,382 and 2,383.
+
+The same physical run uses BlackParrot's whole-L1D writeback/invalidate
+instruction before every timed call. It leaves L1I and the lower cache warm,
+so this is an L1D-cold experiment rather than a DRAM-cold claim. The resulting
+medians are 3,703/4,269/9,735 cycles and p95 values are
+7,368/7,955/12,846. Hardware adds only 566 cycles over the cold direct handler
+at median, while ordinary IPC adds 6,032; the complete hardware service is
+2.28x faster. This larger advantage is evidence that ordinary IPC touches a
+substantially larger cold data working set than the hardware route.
 The routed bitstream is unchanged; the final NBF SHA-256 is
-`c1fac375...1056ba`. QEMU separately validates the
+`d7f3ad61...7011`. QEMU separately validates the
 dedicated server, shared mapping, handler, and software transport. Normalized
 evidence is retained in
 [`results/sel4test-rpc-shared-search-fpga.log`](results/sel4test-rpc-shared-search-fpga.log)

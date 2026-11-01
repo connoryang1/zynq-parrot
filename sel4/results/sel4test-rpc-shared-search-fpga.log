@@ -1,22 +1,26 @@
 SEL4_RPC_EVIDENCE platform=pynq-z2 workload=libc-bounded-search date=2026-11-01
 SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied
 SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024
-SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=763826 cycles_per_call=2983
-SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=854854 cycles_per_call=3339
-SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1419780 cycles_per_call=5546
-SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=49263 cycles_per_call=6157
-SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2796 median=2801 p95=4964 max=5898
-SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3142 median=3142 p95=5299 max=6180
-SEL4_RPC_DISTRIBUTION path=software samples=64 min=5163 median=5168 p95=7347 max=8379
+SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=759189 cycles_per_call=2965
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=855050 cycles_per_call=3340
+SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1410143 cycles_per_call=5508
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=54258 cycles_per_call=6782
+SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2771 median=2776 p95=4974 max=5913
+SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3136 median=3140 p95=5294 max=6361
+SEL4_RPC_DISTRIBUTION path=software samples=64 min=5154 median=5158 p95=7357 max=8390
+SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64
+SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=3689 median=3703 p95=7368 max=14554
+SEL4_RPC_DISTRIBUTION path=l1d-cold/hardware samples=64 min=4265 median=4269 p95=7955 max=10502
+SEL4_RPC_DISTRIBUTION path=l1d-cold/software samples=64 min=9249 median=9735 p95=12846 max=13957
 Test SEL4IPCRPC0002 passed
 Test suite passed. 3 tests passed. 0 tests disabled.
 INFO: CORE PASS
 INFO: BSG PASS
 SEL4_RPC_ARTIFACT bitstream_sha256=ca4a6cbd9afd8a4f10064eeb6142dba514dec1c766b595836be099a135331040
-SEL4_RPC_ARTIFACT nbf_sha256=c1fac3755115f0eaabe63c2d009ecc5a62c09ac1b9d7154d2fca595e201056ba
-SEL4_RPC_ARTIFACT elfloader_sha256=1ee978b2fd26b432655a4c30a644bf453ac253856a83fb596506d8c94a679f0c
+SEL4_RPC_ARTIFACT nbf_sha256=d7f3ad615afd3140bebf05834495da66ba68aa1c001e10e842611dc681277011
+SEL4_RPC_ARTIFACT elfloader_sha256=b5770d193441443f41f2b701f330845357486e34f2089e7b25799bdf30951c09
 SEL4_RPC_ARTIFACT kernel_sha256=ee9d2164e89a735c9ea7f153a3d331bc46dd55053dea7c652bc255e2f7300723
-SEL4_RPC_ARTIFACT raw_uart_sha256=8da6e416db0945ae7f57e2200c2b36b96fbe731238e20dfe49c977e146bcf073
+SEL4_RPC_ARTIFACT raw_uart_sha256=7d253204057cb6f64aacd402d6ba7cc064648f9b2a485f4f0bed327a02556a9e
 SEL4_RPC_ARTIFACT control_program_sha256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
-SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-stage5-tail-20261101T203003Z-1702550.log
+SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-stage5-l1d-cold-20261101T203513Z-1703778.log
 RUNNER_EXIT=0
