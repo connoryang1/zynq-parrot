@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <sel4/sel4.h>
 
@@ -9,6 +10,9 @@ seL4_Word mock_sel4_mrs[16];
 seL4_CPtr mock_sel4_caps[4];
 
 static unsigned receive_calls;
+static unsigned handler_calls;
+static uint64_t seen_badge;
+static unsigned handler_mode;
 
 seL4_MessageInfo_t seL4_Call(seL4_CPtr endpoint, seL4_MessageInfo_t info)
 {
@@ -43,10 +47,17 @@ static protected_rpc_status_t handler(
     protected_rpc_message_t *reply,
     void *cookie)
 {
-    (void)context;
     (void)request;
-    (void)reply;
     (void)cookie;
+    handler_calls++;
+    seen_badge = context->caller_badge;
+    reply->length = 1;
+    reply->words[0] = UINT64_C(0x7265706c79);
+    if (handler_mode == 1) {
+        reply->length = PROTECTED_RPC_MAX_WORDS + 1;
+    } else if (handler_mode == 2) {
+        return (protected_rpc_status_t)(PROTECTED_RPC_BACKEND_ERROR + 1);
+    }
     return PROTECTED_RPC_OK;
 }
 
@@ -76,12 +87,22 @@ static void assert_bad_region(protected_rpc_region_binding_t region)
         .region = region.region,
     };
     protected_rpc_buffer_view_t view;
+    protected_rpc_message_t request = {0};
+    protected_rpc_message_t reply;
 
     poison_view(&view);
     assert(protected_rpc_resolve_buffer(
                &context, ref, PROTECTED_RPC_ACCESS_READ, &view)
            == PROTECTED_RPC_BACKEND_ERROR);
     assert_view_cleared(&view);
+
+    memset(&reply, 0xa5, sizeof(reply));
+    handler_calls = 0;
+    assert(protected_rpc_dispatch(&config, 9, &request, &reply)
+           == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(handler_calls == 0);
+    assert(reply.length == 0);
+    assert(reply.words[0] == 0);
 
     receive_calls = 0;
     assert(protected_rpc_serve(
@@ -113,6 +134,50 @@ int main(void)
         .offset = 4,
         .length = 5,
     };
+    protected_rpc_message_t request = {0};
+    protected_rpc_message_t reply;
+
+    handler_mode = 0;
+    handler_calls = 0;
+    memset(&reply, 0xa5, sizeof(reply));
+    assert(protected_rpc_dispatch(
+               &config, UINT64_C(0x1234), &request, &reply)
+           == PROTECTED_RPC_OK);
+    assert(handler_calls == 1);
+    assert(seen_badge == UINT64_C(0x1234));
+    assert(reply.length == 1);
+    assert(reply.words[0] == UINT64_C(0x7265706c79));
+    assert(reply.words[1] == 0);
+
+    request.length = PROTECTED_RPC_MAX_WORDS + 1;
+    handler_calls = 0;
+    memset(&reply, 0xa5, sizeof(reply));
+    assert(protected_rpc_dispatch(&config, 0, &request, &reply)
+           == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(handler_calls == 0);
+    assert(reply.length == 0);
+    assert(reply.words[0] == 0);
+    request.length = 0;
+
+    handler_mode = 1;
+    memset(&reply, 0xa5, sizeof(reply));
+    assert(protected_rpc_dispatch(&config, 0, &request, &reply)
+           == PROTECTED_RPC_BACKEND_ERROR);
+    assert(reply.length == 0);
+    assert(reply.words[0] == 0);
+
+    handler_mode = 2;
+    memset(&reply, 0xa5, sizeof(reply));
+    assert(protected_rpc_dispatch(&config, 0, &request, &reply)
+           == PROTECTED_RPC_BACKEND_ERROR);
+    assert(reply.length == 0);
+    assert(reply.words[0] == 0);
+    handler_mode = 0;
+
+    handler_calls = 0;
+    assert(protected_rpc_dispatch(&config, 0, &request, NULL)
+           == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(handler_calls == 0);
 
     assert(protected_rpc_resolve_buffer(
                &context, ref, PROTECTED_RPC_ACCESS_WRITE, &view)

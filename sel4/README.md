@@ -181,7 +181,10 @@ The server runtime owns ReplyRecv authority and invokes an application handler
 with a caller badge and registered local-region table. The handler never sees
 the seL4 reply capability or future hardware continuation. A host-side mock
 test covers hardware completion, safe fallback, rejection, committed failure,
-and both forced routes:
+both forced routes, and the common server dispatcher. Software IPC, protected
+hardware entry, and the notification control all enter that dispatcher, which
+authenticates transport-provided context, clears replies, validates the trusted
+region table, and canonicalizes malformed handler output.
 
 ```sh
 scripts/sel4/test_protected_rpc_interface.sh

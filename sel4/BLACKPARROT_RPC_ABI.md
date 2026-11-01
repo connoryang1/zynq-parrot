@@ -60,7 +60,8 @@ request_words / reply_words   each 0..4
 The byte-exact versioned installation image and outcome/control values are in
 [`include/blackparrot_rpc_abi.h`](include/blackparrot_rpc_abi.h).  It also
 supplies the initial server stack/global/thread pointers and caller badge; the
-hardware installs the badge in a fixed non-message register for the runtime.
+hardware installs the badge in `s1` (a fixed, non-message register) for the
+trusted runtime, which passes it to the common server dispatcher.
 
 The server context's general-register image, including its private stack, is
 prepared by the privileged installer.  A token match alone is insufficient:

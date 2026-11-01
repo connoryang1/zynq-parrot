@@ -138,6 +138,19 @@ typedef struct {
 } protected_rpc_server_config_t;
 
 /*
+ * Dispatch one already-received request through the common server boundary.
+ * Transport runtimes supply the authenticated caller badge; applications do
+ * not construct the call context themselves. The reply is cleared on entry,
+ * malformed server state or requests fail before the handler runs, and an
+ * invalid handler status or reply is converted to BACKEND_ERROR.
+ */
+protected_rpc_status_t protected_rpc_dispatch(
+    const protected_rpc_server_config_t *config,
+    uint64_t caller_badge,
+    const protected_rpc_message_t *request,
+    protected_rpc_message_t *reply);
+
+/*
  * Run the same handler body behind either a seL4 ReplyRecv loop or a protected
  * hardware entry/return stub.  The runtime, not the handler, owns reply
  * authority and continuation state. Region names must be nonzero and unique;

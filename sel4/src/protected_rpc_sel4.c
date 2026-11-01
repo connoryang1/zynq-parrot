@@ -82,6 +82,34 @@ static int server_config_valid(const protected_rpc_server_config_t *config)
     return 1;
 }
 
+protected_rpc_status_t protected_rpc_dispatch(
+    const protected_rpc_server_config_t *config,
+    uint64_t caller_badge,
+    const protected_rpc_message_t *request,
+    protected_rpc_message_t *reply)
+{
+    if (reply == NULL) {
+        return PROTECTED_RPC_INVALID_ARGUMENT;
+    }
+    memset(reply, 0, sizeof(*reply));
+    if (!server_config_valid(config) || !protected_rpc_message_valid(request)) {
+        return PROTECTED_RPC_INVALID_ARGUMENT;
+    }
+
+    const protected_rpc_call_context_t context = {
+        .caller_badge = caller_badge,
+        .runtime_private = (void *)config,
+    };
+    const protected_rpc_status_t status = config->handler(
+        &context, request, reply, config->cookie);
+    if ((unsigned)status > PROTECTED_RPC_BACKEND_ERROR
+        || !protected_rpc_message_valid(reply)) {
+        memset(reply, 0, sizeof(*reply));
+        return PROTECTED_RPC_BACKEND_ERROR;
+    }
+    return status;
+}
+
 protected_rpc_status_t protected_rpc_resolve_buffer(
     const protected_rpc_call_context_t *context,
     protected_rpc_buffer_ref_t ref,
@@ -147,16 +175,8 @@ protected_rpc_status_t protected_rpc_serve(
                 request.words[word] = seL4_GetMR((int)word);
             }
 
-            const protected_rpc_call_context_t context = {
-                .caller_badge = badge,
-                .runtime_private = (void *)config,
-            };
-            status = config->handler(&context, &request, &reply,
-                                     config->cookie);
-            if (!protected_rpc_message_valid(&reply)) {
-                memset(&reply, 0, sizeof(reply));
-                status = PROTECTED_RPC_BACKEND_ERROR;
-            }
+            status = protected_rpc_dispatch(
+                config, badge, &request, &reply);
         }
 
         for (size_t word = 0; word < reply.length; word++) {
