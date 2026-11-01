@@ -103,7 +103,7 @@ one of these outcomes:
 | --- | --- | --- |
 | `COMPLETED` | yes, and returned | consume reply; never retry |
 | `NOT_STARTED` | no | `AUTO` may invoke ordinary seL4 IPC once |
-| `REVOKED` | no | report stale binding or refresh, never treat as success |
+| `REVOKED` | no | forced hardware reports stale binding; `AUTO` may invoke ordinary seL4 IPC once |
 | `COMMITTED_FAILED` | possibly | report failure; never retry |
 
 An invalid, busy, nonresident, wrong-SATP, or otherwise ineligible call returns

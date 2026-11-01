@@ -77,6 +77,8 @@ typedef struct {
  * Execute one synchronous request.  AUTO may use software only when a
  * hardware attempt reports that the service has definitely not begun.
  * HARDWARE never silently falls back, which makes matched tests auditable.
+ * When result is non-NULL it is initialized on every return; validation
+ * failures set INVALID_ARGUMENT, PATH_NONE, and an empty reply.
  */
 protected_rpc_status_t protected_rpc_call(
     protected_rpc_endpoint_t endpoint,
@@ -102,7 +104,9 @@ typedef struct {
 /*
  * Resolve a reference using the service's local mapping.  The runtime checks
  * the region generation, complete byte range, and binding-time permissions;
- * service code must never cast the opaque region value into a pointer.
+ * service code must never cast the opaque region value into a pointer.  A
+ * non-NULL view is cleared on every failure. A malformed or ambiguous trusted
+ * region table returns BACKEND_ERROR rather than selecting an arbitrary map.
  */
 protected_rpc_status_t protected_rpc_resolve_buffer(
     const protected_rpc_call_context_t *context,
@@ -136,7 +140,9 @@ typedef struct {
 /*
  * Run the same handler body behind either a seL4 ReplyRecv loop or a protected
  * hardware entry/return stub.  The runtime, not the handler, owns reply
- * authority and continuation state.
+ * authority and continuation state. Region names must be nonzero and unique;
+ * every region must have a non-NULL, nonempty, non-wrapping local range and a
+ * nonempty subset of PROTECTED_RPC_ACCESS_READ/WRITE permissions.
  */
 protected_rpc_status_t protected_rpc_serve(
     protected_rpc_endpoint_t endpoint,
@@ -177,6 +183,9 @@ static inline int protected_rpc_decode_buffer(
     const protected_rpc_message_t *message, size_t first_word,
     protected_rpc_buffer_ref_t *ref)
 {
+    if (ref != NULL) {
+        *ref = (protected_rpc_buffer_ref_t){0};
+    }
     if (!protected_rpc_message_valid(message) || ref == NULL
         || first_word > message->length
         || message->length - first_word < PROTECTED_RPC_BUFFER_WORDS) {

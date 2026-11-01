@@ -46,12 +46,51 @@ const protected_rpc_backend_t protected_rpc_software_backend = {
     .try_call = sel4_try_call,
 };
 
+static int region_binding_valid(
+    const protected_rpc_region_binding_t *binding)
+{
+    const uint32_t known_access = PROTECTED_RPC_ACCESS_READ
+                                  | PROTECTED_RPC_ACCESS_WRITE;
+    if (binding->region.opaque == 0 || binding->local_base == NULL
+        || binding->size == 0 || binding->access == 0
+        || (binding->access & ~known_access) != 0) {
+        return 0;
+    }
+
+    const uintptr_t base = (uintptr_t)binding->local_base;
+    return binding->size <= (uint64_t)(UINTPTR_MAX - base);
+}
+
+static int server_config_valid(const protected_rpc_server_config_t *config)
+{
+    if (config == NULL || config->handler == NULL
+        || (config->region_count != 0 && config->regions == NULL)) {
+        return 0;
+    }
+
+    for (size_t index = 0; index < config->region_count; index++) {
+        if (!region_binding_valid(&config->regions[index])) {
+            return 0;
+        }
+        for (size_t previous = 0; previous < index; previous++) {
+            if (config->regions[previous].region.opaque
+                == config->regions[index].region.opaque) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 protected_rpc_status_t protected_rpc_resolve_buffer(
     const protected_rpc_call_context_t *context,
     protected_rpc_buffer_ref_t ref,
     protected_rpc_access_t required_access,
     protected_rpc_buffer_view_t *view)
 {
+    if (view != NULL) {
+        memset(view, 0, sizeof(*view));
+    }
     if (context == NULL || context->runtime_private == NULL || view == NULL
         || required_access == 0
         || (required_access & ~(PROTECTED_RPC_ACCESS_READ
@@ -60,6 +99,9 @@ protected_rpc_status_t protected_rpc_resolve_buffer(
     }
 
     const protected_rpc_server_config_t *config = context->runtime_private;
+    if (!server_config_valid(config)) {
+        return PROTECTED_RPC_BACKEND_ERROR;
+    }
     for (size_t index = 0; index < config->region_count; index++) {
         const protected_rpc_region_binding_t *binding = &config->regions[index];
         if (binding->region.opaque != ref.region.opaque) {
@@ -83,8 +125,7 @@ protected_rpc_status_t protected_rpc_serve(
     protected_rpc_endpoint_t endpoint,
     const protected_rpc_server_config_t *config)
 {
-    if (endpoint.opaque == 0 || config == NULL || config->handler == NULL
-        || (config->region_count != 0 && config->regions == NULL)) {
+    if (endpoint.opaque == 0 || !server_config_valid(config)) {
         return PROTECTED_RPC_INVALID_ARGUMENT;
     }
 

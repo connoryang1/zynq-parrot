@@ -32,7 +32,11 @@ int main(void)
 
     assert(!protected_rpc_encode_buffer(&message, 2, input));
     message.length = 3;
+    memset(&output, 0xa5, sizeof(output));
     assert(!protected_rpc_decode_buffer(&message, 1, &output));
+    assert(output.region.opaque == 0);
+    assert(output.offset == 0);
+    assert(output.length == 0);
     message.length = PROTECTED_RPC_MAX_WORDS + 1;
     assert(!protected_rpc_message_valid(&message));
     return 0;

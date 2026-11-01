@@ -33,11 +33,16 @@ protected_rpc_status_t protected_rpc_call(
     const protected_rpc_call_options_t *options,
     protected_rpc_call_result_t *result)
 {
-    if (!protected_rpc_message_valid(request) || result == NULL) {
+    if (result == NULL) {
         return PROTECTED_RPC_INVALID_ARGUMENT;
     }
 
     memset(result, 0, sizeof(*result));
+    result->status = PROTECTED_RPC_INVALID_ARGUMENT;
+    if (!protected_rpc_message_valid(request)) {
+        return result->status;
+    }
+
     protected_rpc_route_t route = options == NULL
                                   ? PROTECTED_RPC_ROUTE_AUTO
                                   : options->route;

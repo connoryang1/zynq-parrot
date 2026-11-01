@@ -147,6 +147,10 @@ started, rejected without execution, or failed after its commit point. Only
 the safe-to-fallback state may invoke the software backend. A separate
 "eligible?" probe is intentionally excluded because endpoint state,
 revocation, or scheduling eligibility could change between a probe and a call.
+`AUTO` therefore may retry an unsupported, temporarily ineligible, or revoked
+hardware binding through ordinary IPC only when the atomic hardware outcome
+proves that service execution never began. Forced hardware reports that
+outcome directly.
 
 The current BlackParrot primitive carries up to four request and four reply
 words in one fixed descriptor. General endpoint queues, capability transfer,

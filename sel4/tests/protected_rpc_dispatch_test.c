@@ -110,9 +110,25 @@ int main(void)
     protected_rpc_message_t invalid = request;
     invalid.length = PROTECTED_RPC_MAX_WORDS + 1;
     reset(PROTECTED_RPC_ATTEMPT_COMPLETED, PROTECTED_RPC_OK);
+    memset(&result, 0xa5, sizeof(result));
     assert(protected_rpc_call(endpoint, &invalid, &options, &result)
            == PROTECTED_RPC_INVALID_ARGUMENT);
     assert(hardware_calls == 0 && software_calls == 0);
+    assert(result.status == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(result.path == PROTECTED_RPC_PATH_NONE);
+    assert(result.reply.length == 0);
+    for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
+        assert(result.reply.words[word] == 0);
+    }
+
+    options.route = (protected_rpc_route_t)(PROTECTED_RPC_ROUTE_HARDWARE + 1);
+    memset(&result, 0xa5, sizeof(result));
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(hardware_calls == 0 && software_calls == 0);
+    assert(result.status == PROTECTED_RPC_INVALID_ARGUMENT);
+    assert(result.path == PROTECTED_RPC_PATH_NONE);
+    assert(result.reply.length == 0);
 
     return 0;
 }

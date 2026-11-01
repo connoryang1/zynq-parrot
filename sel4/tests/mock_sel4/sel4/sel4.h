@@ -41,6 +41,11 @@ static inline seL4_Word seL4_MessageInfo_get_label(seL4_MessageInfo_t info)
     return info.words[0] >> 16;
 }
 
+static inline seL4_Word seL4_MessageInfo_get_length(seL4_MessageInfo_t info)
+{
+    return info.words[0] & UINT64_C(0xff);
+}
+
 static inline void seL4_SetMR(int index, seL4_Word value)
 {
     mock_sel4_mrs[index] = value;
@@ -57,5 +62,9 @@ static inline void seL4_SetCap(int index, seL4_CPtr value)
 }
 
 seL4_MessageInfo_t seL4_Call(seL4_CPtr endpoint, seL4_MessageInfo_t info);
+seL4_MessageInfo_t seL4_Recv(seL4_CPtr endpoint, seL4_Word *badge);
+void seL4_Reply(seL4_MessageInfo_t info);
+seL4_MessageInfo_t seL4_ReplyRecv(
+    seL4_CPtr endpoint, seL4_MessageInfo_t info, seL4_Word *badge);
 
 #endif
