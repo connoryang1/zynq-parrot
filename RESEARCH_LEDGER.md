@@ -820,6 +820,16 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Next discriminator:** after another mandatory physical recovery, run the complete eight-group isolated mode-6 matrix. If its stratified interval and position-neutral chronology pass, run the isolated mode-5 control and independent mode-6 replication before changing RTL.
 - **Guardrail:** the feasibility run ended through guest shutdown and contaminated subsequent board state. Do not launch another run without a physical power cycle, readiness wait, and verified overlay reload.
 
+### RL-085 — Current mode-6 persistent-pair A/B is prepared without arm leakage
+
+- **Status:** accepted benchmark/runner protocol; FPGA measurement pending mandatory recovery
+- **Question:** RL-084 measures a deliberately cold trigger by clearing detached replay state before every trial, while production hardware retains completed lines. Determine whether the current early-wakeup table has a steady-state persistent-pair benefit without leaking retained state between A/B arms.
+- **Table identity:** the exact mode-6 NBF still contains 16 entries, but they are the current-kernel post-wakeup table beginning at `0x80a13840`, not RL-063's old-16 table beginning at `0x8023d480`. RL-063's 3.25% result is therefore motivation and a historical checkpoint, not the answer for this image.
+- **Protocol:** use the same exact prefix-16 NBF in all arms, set both persistent futex tasks to runtime mode zero or mode six, and give every arm its own fresh boot. Both arms register the same harmless shared page to satisfy the kernel's preview-registration invariant; instruction-only modes never issue that data address. Discard the first of 201 handoffs and analyze the remaining 200, with two replicate pairs in opposite boot order.
+- **Harness correction:** timing mode now makes summary-only overflow acceptance explicit and emits a final success marker. Invalid recorder state remains fatal, replacing the historical `|| true` command. The serialized runner records cache mode, overflow policy, summary policy, control hash, and exact artifact identities. A dedicated analyzer fails closed unless all four logs have matching status, consecutive samples, terminal markers, the same NBF/ELF/control identities, and opposite boot order.
+- **Validation:** all 91 discovered `linux-tests` Python checks pass. The Buildroot-GCC dynamic ELF and transfer hash to `ae599809...972a` and `5783e4ca...65d5`; disassembly shows configuration in both tasks and cleanup after join. Exact rationale, commands, identities, and limitations are retained in `logs/mode6-persistent-pair-protocol-20261101/`.
+- **Board gate:** the PYNQ remains on the same OS boot as the prior guest shutdown and no power-control endpoint is available in this shell. No run was launched. Physical power cycle, readiness wait, and verified overlay reload remain mandatory.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -890,7 +900,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint. RL-083 supersedes RL-079--081's nonempty interleaved matrices as feature A/B evidence because completed advisory lines leaked across trial arms. RL-084 now proves the symmetric isolation mode runs on FPGA and removes the prior disabled-position signature in one group; its `2424.25 [-1032.5,6734]` wake-to-load point remains unresolved. After mandatory board recovery, the next experiment is the complete eight-group isolated mode-6 matrix, followed by the isolated same-image mode-5 control and independent mode-6 replication. Only after a resolved, position-neutral matrix should residual telemetry, capacity, ordering, retention, footprint, or workload change.
+For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint. RL-083 supersedes RL-079--081's nonempty interleaved matrices as feature A/B evidence because completed advisory lines leaked across trial arms. RL-084 now proves the symmetric isolation mode runs on FPGA and removes the prior disabled-position signature in one group; its `2424.25 [-1032.5,6734]` wake-to-load point remains unresolved. RL-085 separately prepares a fresh-boot persistent-pair A/B for the current table, because clearing replay state each trial and retaining it across production switches answer different questions. After mandatory board recovery, first run the complete eight-group isolated mode-6 matrix, followed by its mode-5 control and replication; then execute the two opposite-order persistent-pair boot pairs. Only after those cold and steady-state results resolve should residual telemetry, capacity, ordering, retention, footprint, or workload change.
 
 ## Delta log
 

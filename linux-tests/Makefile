@@ -493,4 +493,5 @@ clean:
 
 check-harness:
 	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py test_icache_prefix.py \
-	  test_scheduler_physical_preview_sweep.py
+	  test_scheduler_physical_preview_sweep.py \
+	  test_run_cache_miss_trace_capture.py test_analyze_persistent_preview_ab.py

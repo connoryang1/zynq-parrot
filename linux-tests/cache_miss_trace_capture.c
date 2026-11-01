@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/prctl.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -17,6 +18,8 @@
 #define TRACE_CONTROL 0x805
 #define TRACE_SELECT  0x806
 #define TRACE_DATA    0x807
+#define PR_BP_PREVIEW_PIN_SET 0x42505059
+#define PR_BP_PREVIEW_ENABLE  0x4250505a
 
 static _Atomic uint32_t phase;
 static _Atomic uint32_t peer_ready;
@@ -34,12 +37,17 @@ enum trace_window {
 };
 static enum trace_window trace_window;
 static int summary_only;
+static int allow_overflow;
 static unsigned samples = 1;
+static unsigned preview_mode;
+static int preview_control;
 
 static void usage(FILE *stream)
 {
   fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]"
-        " [--summary-only] [--samples 1..10000]\n", stream);
+        " [--summary-only] [--samples 1..10000]"
+        " [--allow-overflow]"
+        " [--preview-mode disabled|trigger|wake-trigger]\n", stream);
 }
 
 static void fail(const char *what)
@@ -141,10 +149,36 @@ static void wait_until(_Atomic uint32_t *word, uint32_t wanted)
   }
 }
 
+static void configure_preview(void)
+{
+  if (!preview_control)
+    return;
+  /* The kernel requires a registered physical page before any nonzero mode,
+   * including instruction-only modes. Register the same harmless shared page
+   * in both A/B arms; modes five and six never issue its data hint. */
+  if (prctl(PR_BP_PREVIEW_PIN_SET, (unsigned long)&phase,
+            0UL, 0UL, 0UL))
+    fail("register preview page");
+  if (prctl(PR_BP_PREVIEW_ENABLE, (unsigned long)preview_mode,
+            0UL, 0UL, 0UL))
+    fail("set preview mode");
+}
+
+static void release_preview(void)
+{
+  if (!preview_control)
+    return;
+  if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
+    fail("disable preview mode");
+  if (prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
+    fail("release preview page");
+}
+
 static void *peer_main(void *unused)
 {
   (void)unused;
   (void)pin_to_first_allowed_cpu();
+  configure_preview();
   atomic_store_explicit(&peer_ready, 1, memory_order_release);
   futex_wake_one(&peer_ready);
 
@@ -168,6 +202,7 @@ static void *peer_main(void *unused)
     /* Block after waking the source, forcing the source task to be dispatched. */
     wait_until(&phase, 3);
   }
+  release_preview();
   return NULL;
 }
 
@@ -219,8 +254,23 @@ int main(int argc, char **argv)
   for (int arg = 1; arg < argc; ++arg) {
     if (!strcmp(argv[arg], "--summary-only")) {
       summary_only = 1;
+    } else if (!strcmp(argv[arg], "--allow-overflow")) {
+      allow_overflow = 1;
     } else if (!strcmp(argv[arg], "--samples") && arg + 1 < argc) {
       samples = parse_samples(argv[++arg]);
+    } else if (!strcmp(argv[arg], "--preview-mode") && arg + 1 < argc) {
+      const char *mode = argv[++arg];
+      preview_control = 1;
+      if (!strcmp(mode, "disabled"))
+        preview_mode = 0;
+      else if (!strcmp(mode, "trigger"))
+        preview_mode = 5;
+      else if (!strcmp(mode, "wake-trigger"))
+        preview_mode = 6;
+      else {
+        usage(stderr);
+        return EXIT_FAILURE;
+      }
     } else if (!strcmp(argv[arg], "--window") && arg + 1 < argc) {
       const char *window = argv[++arg];
       if (!strcmp(window, "full"))
@@ -238,11 +288,22 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
   }
+  if (allow_overflow && !summary_only) {
+    usage(stderr);
+    return EXIT_FAILURE;
+  }
 
   const int cpu = pin_to_first_allowed_cpu();
   pthread_t peer;
   check_pthread(pthread_create(&peer, NULL, peer_main, NULL), "pthread_create");
+  configure_preview();
   wait_until(&peer_ready, 1);
+
+  printf("TRACE_PREVIEW mode=%s value=%u\n",
+         !preview_control ? "legacy" :
+         preview_mode == 0 ? "disabled" :
+         preview_mode == 5 ? "trigger" : "wake-trigger",
+         preview_mode);
 
   int any_failure = 0;
   for (unsigned sample = 1; sample <= samples; ++sample) {
@@ -297,7 +358,8 @@ int main(int argc, char **argv)
                " i_overflow=%u d_overflow=%u\n",
                icount + dcount, stop_cycle - trace_start_cycle,
                ioverflow, doverflow);
-        any_failure = 1;
+        if (!allow_overflow)
+          any_failure = 1;
       } else {
         printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
                icount + dcount, stop_cycle - trace_start_cycle);
@@ -337,5 +399,9 @@ int main(int argc, char **argv)
     }
   }
   check_pthread(pthread_join(peer, NULL), "pthread_join");
+  release_preview();
+  if (!any_failure)
+    printf("TRACE_CAPTURE_PASS samples=%u allow_overflow=%u\n",
+           samples, allow_overflow);
   return any_failure ? EXIT_FAILURE : EXIT_SUCCESS;
 }

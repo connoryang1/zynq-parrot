@@ -30,6 +30,9 @@ class TraceRunnerTest(unittest.TestCase):
             "program": "cache-miss",
             "group": 0,
             "preview_mode": "disabled",
+            "cache_preview_mode": "legacy",
+            "cache_summary_only": False,
+            "cache_allow_overflow": False,
             "runtime_ms": 100,
         }
         values.update(updates)
@@ -44,6 +47,41 @@ class TraceRunnerTest(unittest.TestCase):
 
     def test_multisample_command_is_explicit(self):
         self.assertIn("--samples 7", capture_command("to-peer", 7))
+
+    def test_cache_wakeup_trigger_command_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, samples=201,
+                             cache_preview_mode="wake-trigger")
+            self.assertEqual(
+                guest_command(args),
+                "/tmp/cache_miss_trace_capture_dynamic --window full "
+                "--samples 201 --preview-mode wake-trigger; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc",
+            )
+
+    def test_cache_disabled_registration_command_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, cache_preview_mode="disabled")
+            self.assertIn("--preview-mode disabled", guest_command(args))
+
+    def test_persistent_timing_command_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(
+                directory, samples=201, window="to-peer",
+                cache_preview_mode="wake-trigger", cache_summary_only=True,
+                cache_allow_overflow=True,
+            )
+            self.assertEqual(
+                guest_command(args),
+                "/tmp/cache_miss_trace_capture_dynamic --window to-peer "
+                "--samples 201 --preview-mode wake-trigger --summary-only "
+                "--allow-overflow; rc=$?; echo TRACE_CAPTURE_EXIT rc=$rc",
+            )
+
+    def test_overflow_requires_summary_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "summary-only"):
+                validate_args(self.args(directory, cache_allow_overflow=True))
 
     def test_pipe_command_is_fixed_and_group_bounded(self):
         with tempfile.TemporaryDirectory() as directory:

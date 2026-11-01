@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Current mode-6 steady-state protocol prepared — 2026-11-01:** extended the persistent futex-pair benchmark to set runtime replay mode symmetrically on both tasks, made summary-only overflow acceptance explicit, and added a strict opposite-order fresh-boot analyzer. All 91 Linux-test Python checks pass and the Buildroot-GCC ELF/transfer hash to `ae599809...972a`/`5783e4ca...65d5`; no FPGA run was launched because the board still requires physical recovery (`logs/mode6-persistent-pair-protocol-20261101/`, RL-085).
+
 - **Isolated instruction replay passes FPGA feasibility — 2026-11-01:** after verified recovery and overlay reload, one group-7 mode-6 FIFO cell completed 512 accepted handoffs with zero retries and final runner/CORE/BSG PASS. Wake-to-load saves an unresolved `2424.25 [-1032.5,6734]` cycles, while trailing-versus-leading disabled position is neutral at `39 [-81,107.5]`, confirming that per-trial `fence.i` removed the historical carryover signature; a full eight-group matrix remains required (`logs/replay-arm-isolation-20261101/`, RL-084).
 
 - **Replay benchmark arm contamination found and corrected — 2026-11-01:** completed advisory instruction lines persist across the `[off,on,on,off]` trial pattern because mode zero gates triggers but not buffer hits, so RL-079--081's nonempty matrices are not clean feature-versus-disabled A/Bs. Added a symmetric per-trial `fence.i` isolation mode, runner provenance, and a chronology analyzer; the exact GCC13 ELF contains the conditional invalidation and 38 focused tests pass, but an isolated FPGA matrix remains required (`logs/replay-arm-isolation-20261101/`, RL-083).

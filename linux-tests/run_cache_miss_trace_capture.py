@@ -25,11 +25,18 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def capture_command(window, samples):
+def capture_command(window, samples, preview_mode="legacy", summary_only=False,
+                    allow_overflow=False):
     """Build the bounded guest command from validated arguments."""
     command = f"{GUEST_ELF} --window {window}"
     if samples != 1:
         command += f" --samples {samples}"
+    if preview_mode != "legacy":
+        command += f" --preview-mode {preview_mode}"
+    if summary_only:
+        command += " --summary-only"
+    if allow_overflow:
+        command += " --allow-overflow"
     return command + "; rc=$?; echo TRACE_CAPTURE_EXIT rc=$rc"
 
 
@@ -45,7 +52,9 @@ def guest_command(args):
     if args.program == "physical-preview-pipe":
         return (f"{PIPE_GUEST_ELF} {args.group} {args.preview_mode}; rc=$?; "
                 "echo TRACE_CAPTURE_EXIT rc=$rc")
-    return capture_command(args.window, args.samples)
+    return capture_command(args.window, args.samples, args.cache_preview_mode,
+                           args.cache_summary_only,
+                           args.cache_allow_overflow)
 
 
 def parse_args(argv=None):
@@ -64,6 +73,12 @@ def parse_args(argv=None):
     parser.add_argument("--preview-mode",
                         choices=("disabled", "trigger", "wake-trigger"),
                         default="disabled")
+    parser.add_argument("--cache-preview-mode",
+                        choices=("legacy", "disabled", "trigger",
+                                 "wake-trigger"),
+                        default="legacy")
+    parser.add_argument("--cache-summary-only", action="store_true")
+    parser.add_argument("--cache-allow-overflow", action="store_true")
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--runtime-ms", type=int, default=600_000)
@@ -83,6 +98,12 @@ def validate_args(args):
         raise ValueError("group must be in 0..7")
     if args.program == "physical-preview-pipe" and args.samples != 1:
         raise ValueError("physical-preview-pipe supports exactly one sample")
+    if args.cache_allow_overflow and not args.cache_summary_only:
+        raise ValueError("cache overflow is valid only with summary-only timing")
+    if args.program != "cache-miss" and (
+            args.cache_preview_mode != "legacy" or args.cache_summary_only
+            or args.cache_allow_overflow):
+        raise ValueError("cache options require the cache-miss program")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
 
@@ -99,11 +120,15 @@ def run(args):
         "nbf_sha256": sha256(args.nbf),
         "transfer_sha256": sha256(args.transfer),
         "elf_sha256": args.elf_sha256,
+        "control_program_sha256": args.control_sha256,
         "window": args.window,
         "samples": args.samples,
         "program": args.program,
         "group": args.group,
         "preview_mode": args.preview_mode,
+        "cache_preview_mode": args.cache_preview_mode,
+        "cache_summary_only": args.cache_summary_only,
+        "cache_allow_overflow": args.cache_allow_overflow,
     }
     program = guest_elf(args)
     child = None
@@ -140,8 +165,10 @@ def run(args):
                 f"interactive runner exit={child.exitstatus} signal={child.signalstatus}"
             )
         text = args.log.read_text(errors="replace")
-        if "TRACE_PASS" not in text:
-            raise RuntimeError("guest TRACE_PASS marker missing")
+        guest_marker = ("TRACE_PASS" if args.program == "physical-preview-pipe"
+                        else "TRACE_CAPTURE_PASS")
+        if guest_marker not in text:
+            raise RuntimeError(f"guest {guest_marker} marker missing")
         if "BSG PASS" not in text:
             raise RuntimeError("host BSG PASS marker missing")
         status.update(status="PASS", runner_exit=0)
