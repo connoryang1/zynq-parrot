@@ -2,7 +2,9 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
-- **Five-slot stress route exceeds PYNQ capacity — 2026-11-01:** exact final route `20261101T132904Z-e4861a8f` synthesizes at 55,700/53,200 LUTs (104.70%) and fails detail placement at 11,535 required versus 10,934 available slices. This rejects only the ten-context/five-slot stress endpoint; the matched four-context/four-slot route remains live and is still the decisive FPGA gate (`logs/icache-replay-same-cycle-demand-20261101/`, RL-098).
+- **Matched replay fix routes timing-clean — 2026-11-01:** exact four-context job `20261101T134139Z-24d10370` places at 50,282 LUTs, 24,956 registers, 94 BRAM tiles, and 11 DSPs, then post-route optimization recovers setup from WNS/TNS `-0.332/-0.969 ns` to `+0.006/0 ns` with hold `+0.019/0 ns`. An outdated builder launcher had summarized the negative pre-optimization report and did not enforce timing, so acceptance comes from the independently fetched final report and current checker; verified package/bitstream hashes are `8077e33c...6b82` / `a070df7f...a3ce9` (`logs/fpga-farm/bp3/20261101T134139Z-24d10370/`, RL-098).
+
+- **Five-slot stress route exceeds PYNQ capacity — 2026-11-01:** exact final route `20261101T132904Z-e4861a8f` synthesizes at 55,700/53,200 LUTs (104.70%) and fails detail placement at 11,535 required versus 10,934 available slices. This rejects only the ten-context/five-slot stress endpoint; the independently routed four-context/four-slot result above is the physical target (`logs/icache-replay-same-cycle-demand-20261101/`, RL-098).
 
 - **Exact futex board artifacts recovered — 2026-11-01:** the later pipe build had overwritten the mutable ELF used by the accepted 2.68% futex run, but its complete retained board transcript contains all 255 transfer chunks. Decoding them reconstructs the exact 14,528-byte ELF and regenerates the original 258-line transfer with accepted SHA-256 values `91f0db11...c0cf` and `b5103c89...5518`, removing compiler reproducibility from the next FPGA comparison (`logs/mode6-persistent-pair-protocol-20261101/recovered-board-artifacts/`, RL-099).
 
