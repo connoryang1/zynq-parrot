@@ -67,12 +67,31 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
     -o "$build_dir/protected_rpc_blackparrot_binding_test"
 "$build_dir/protected_rpc_blackparrot_binding_test"
 
+${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    -DPROTECTED_RPC_BLACKPARROT_SERVER_TEST_HOOK \
+    "$internal_include" \
+    -I"$project_root/sel4/tests/mock_sel4" \
+    -I"$project_root/sel4/include" \
+    "$project_root/sel4/src/protected_rpc_sel4.c" \
+    "$project_root/sel4/src/protected_rpc_blackparrot_server.c" \
+    "$project_root/sel4/tests/protected_rpc_blackparrot_server_test.c" \
+    -o "$build_dir/protected_rpc_blackparrot_server_test"
+"$build_dir/protected_rpc_blackparrot_server_test"
+
+# The application server selects a handler and publishes runtime state; only
+# the trusted transport runtime may touch installed registers or preturn.
+if grep -Eq '0x809|mv %0, (s1|tp)' \
+    "$project_root/sel4/sel4test/sel4_rpc_server.c"; then
+    echo "application server contains BlackParrot transport instructions" >&2
+    exit 1
+fi
+
 # The shared service source must see seL4's generated platform macro even when
 # compiled into the separate stripped server executable. The package gate then
 # checks the resulting instructions rather than trusting this source guard.
 grep -Fq '#include <sel4/config.h>' \
     "$project_root/sel4/sel4test/sel4_rpc_search_service.c"
-grep -Fq 'RPC server has wrong cycle-counter instructions' \
+grep -Fq 'RPC server has wrong privileged instructions' \
     "$project_root/scripts/sel4/package_blackparrot_rpc_nbf.sh"
 
 # Physical UART capture is nested under script(1) and arrives as CRCRLF.  Keep

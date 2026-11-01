@@ -1001,9 +1001,11 @@ static int test_dedicated_search_server_software(env_t env)
     seL4_MessageInfo_t ready = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(ready), 0);
     test_eq(seL4_MessageInfo_get_length(ready), 3);
+#if defined(CONFIG_PLAT_BLACKPARROT)
     test_assert(seL4_GetMR(0) != 0);
     test_assert(seL4_GetMR(1) != 0);
     test_assert(seL4_GetMR(2) != 0);
+#endif
 
     const protected_rpc_endpoint_t rpc_endpoint = {.opaque = endpoint};
     const protected_rpc_call_options_t software = {

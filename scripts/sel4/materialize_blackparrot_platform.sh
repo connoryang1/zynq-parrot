@@ -73,6 +73,8 @@ link_file "$project_root/sel4/src/protected_rpc_hardware_blackparrot.c" \
     "$test_dir/protected_rpc_hardware_blackparrot.c"
 link_file "$project_root/sel4/src/protected_rpc_blackparrot_sel4.c" \
     "$test_dir/protected_rpc_blackparrot_sel4.c"
+link_file "$project_root/sel4/src/protected_rpc_blackparrot_server.c" \
+    "$test_dir/protected_rpc_blackparrot_server.c"
 link_file "$project_root/sel4/internal/protected_rpc_blackparrot.h" \
     "$test_dir/protected_rpc_blackparrot.h"
 link_file "$project_root/sel4/internal/blackparrot_rpc_abi.h" \

@@ -126,7 +126,7 @@ diff --git a/apps/sel4test-tests/CMakeLists.txt b/apps/sel4test-tests/CMakeLists
 index cb3b677..31dc939 100644
 --- a/apps/sel4test-tests/CMakeLists.txt
 +++ b/apps/sel4test-tests/CMakeLists.txt
-@@ -14,20 +14,68 @@ if(KernelArchRiscV)
+@@ -14,20 +14,74 @@ if(KernelArchRiscV)
      set(arch arm)
  endif()
 -
@@ -171,6 +171,12 @@ index cb3b677..31dc939 100644
 +        src/tests/sel4_rpc_search_service.c
 +        src/tests/protected_rpc_sel4.c
 +    )
++    if(KernelPlatformBlackParrot)
++        target_sources(
++            sel4-rpc-server PRIVATE
++            src/tests/protected_rpc_blackparrot_server.c
++        )
++    endif()
 +    target_include_directories(sel4-rpc-server PRIVATE include)
 +    target_compile_options(
 +        sel4-rpc-server PRIVATE

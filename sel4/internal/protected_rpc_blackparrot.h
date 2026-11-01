@@ -31,6 +31,28 @@ typedef struct {
 } protected_rpc_blackparrot_binding_t;
 
 /*
+ * Fixed protected-entry state exported by the trusted server runtime. Service
+ * code supplies only its transport-neutral dispatcher configuration; it never
+ * reads hardware-installed registers or emits the protected-return CSR.
+ */
+typedef struct {
+    uint64_t server_entry;
+    uint64_t server_gp;
+    uint64_t server_tp;
+} protected_rpc_blackparrot_server_runtime_t;
+
+protected_rpc_status_t protected_rpc_blackparrot_server_prepare(
+    const protected_rpc_server_config_t *config,
+    protected_rpc_blackparrot_server_runtime_t *runtime);
+
+#ifdef PROTECTED_RPC_BLACKPARROT_SERVER_TEST_HOOK
+protected_rpc_status_t protected_rpc_blackparrot_server_test_dispatch(
+    const protected_rpc_server_config_t *config, uint64_t caller_badge,
+    uint64_t request_meta, uint64_t words[PROTECTED_RPC_MAX_WORDS],
+    uint64_t *reply_meta);
+#endif
+
+/*
  * Atomically create/remove the kernel binding and update the caller adapter.
  * The returned kernel token never crosses this trusted-runtime boundary;
  * application code continues to call protected_rpc_call() with its endpoint.

@@ -22,6 +22,7 @@ test_dir="$checkout/projects/sel4test/apps/sel4test-tests/src/tests"
 # exclusive so the normal source glob cannot link both implementations.
 rm -f "$test_dir/protected_rpc_hardware_blackparrot.c" \
     "$test_dir/protected_rpc_blackparrot_sel4.c" \
+    "$test_dir/protected_rpc_blackparrot_server.c" \
     "$test_dir/protected_rpc_blackparrot.h" \
     "$test_dir/blackparrot_rpc_abi.h"
 

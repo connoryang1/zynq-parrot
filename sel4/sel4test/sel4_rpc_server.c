@@ -5,10 +5,10 @@
 #include <sel4/config.h>
 #include <sel4/sel4.h>
 
-#ifdef CONFIG_PLAT_BLACKPARROT
-#include "blackparrot_rpc_abi.h"
-#endif
 #include "protected_rpc.h"
+#ifdef CONFIG_PLAT_BLACKPARROT
+#include "protected_rpc_blackparrot.h"
+#endif
 #include "sel4_rpc_search_service.h"
 
 #define SERVER_SOFTWARE_CALLS SEL4_RPC_SEARCH_SOFTWARE_REQUESTS
@@ -52,49 +52,6 @@ static protected_rpc_status_t serve_notifications(
     return PROTECTED_RPC_OK;
 }
 
-static void __attribute__((noreturn, noinline, used, aligned(64)))
-hardware_search_entry(uint64_t word0, uint64_t word1, uint64_t word2,
-                      uint64_t word3)
-{
-#ifdef CONFIG_PLAT_BLACKPARROT
-    protected_rpc_server_config_t *config;
-    uint64_t caller_badge;
-    __asm__ volatile("mv %0, tp" : "=r"(config));
-    __asm__ volatile("mv %0, s1" : "=r"(caller_badge));
-    protected_rpc_message_t request = {
-        .length = 4,
-        .words = {word0, word1, word2, word3},
-    };
-    protected_rpc_message_t reply;
-    protected_rpc_status_t status = protected_rpc_dispatch(
-        config, caller_badge, &request, &reply);
-
-    register uint64_t a0 __asm__("a0") = reply.words[0];
-    register uint64_t a1 __asm__("a1") = reply.words[1];
-    register uint64_t a2 __asm__("a2") = reply.words[2];
-    register uint64_t a3 __asm__("a3") = reply.words[3];
-    register uint64_t a5 __asm__("a5") = bp_rpc_reply_meta(
-        reply.length, (uint8_t)status);
-    __asm__ volatile(
-        "csrw 0x809, a0"
-        : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a5)
-        :
-        : "memory");
-#else
-    (void)word0;
-    (void)word1;
-    (void)word2;
-    (void)word3;
-#endif
-    for (;;) {
-#ifdef CONFIG_PLAT_BLACKPARROT
-        __asm__ volatile("wfi");
-#else
-        seL4_Yield();
-#endif
-    }
-}
-
 int main(int argc, char **argv)
 {
     if (argc != 4 && argc != 7) {
@@ -124,13 +81,22 @@ int main(int argc, char **argv)
         .cookie = &server_expected_badge,
     };
 
-    uintptr_t global_pointer;
-    __asm__ volatile("mv %0, gp" : "=r"(global_pointer));
     /* Publish the hardware entry and its trusted C runtime state before the
      * ordinary server blocks on the endpoint. */
-    seL4_SetMR(0, (seL4_Word)(uintptr_t)hardware_search_entry);
-    seL4_SetMR(1, global_pointer);
-    seL4_SetMR(2, (seL4_Word)(uintptr_t)&server_config);
+#ifdef CONFIG_PLAT_BLACKPARROT
+    protected_rpc_blackparrot_server_runtime_t runtime;
+    if (protected_rpc_blackparrot_server_prepare(&server_config, &runtime)
+        != PROTECTED_RPC_OK) {
+        return PROTECTED_RPC_BACKEND_ERROR;
+    }
+    seL4_SetMR(0, runtime.server_entry);
+    seL4_SetMR(1, runtime.server_gp);
+    seL4_SetMR(2, runtime.server_tp);
+#else
+    seL4_SetMR(0, 0);
+    seL4_SetMR(1, 0);
+    seL4_SetMR(2, 0);
+#endif
     seL4_Send(control, seL4_MessageInfo_new(0, 0, 0, 3));
 
     if (argc == 7) {

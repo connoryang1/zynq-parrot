@@ -54,8 +54,11 @@ rpc_global_cycle_reads=$(printf '%s\n' "$rpc_server_disassembly" |
     grep -c '0xcc0' || true)
 rpc_arch_cycle_reads=$(printf '%s\n' "$rpc_server_disassembly" |
     grep -c '[[:space:]]rdcycle[[:space:]]' || true)
-if [ "$rpc_global_cycle_reads" -lt 2 ] || [ "$rpc_arch_cycle_reads" -ne 0 ]; then
-    echo "RPC server has wrong cycle-counter instructions: global=$rpc_global_cycle_reads architectural=$rpc_arch_cycle_reads" >&2
+rpc_protected_returns=$(printf '%s\n' "$rpc_server_disassembly" |
+    grep -c '0x809' || true)
+if [ "$rpc_global_cycle_reads" -lt 2 ] || [ "$rpc_arch_cycle_reads" -ne 0 ] \
+    || [ "$rpc_protected_returns" -ne 1 ]; then
+    echo "RPC server has wrong privileged instructions: global-cycle=$rpc_global_cycle_reads architectural-cycle=$rpc_arch_cycle_reads protected-return=$rpc_protected_returns" >&2
     exit 1
 fi
 

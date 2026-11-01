@@ -34,7 +34,8 @@ fi
 
 if [ ! -L "$test_dir/protected_rpc_hardware_stub.c" ] \
     || [ -e "$test_dir/protected_rpc_hardware_blackparrot.c" ] \
-    || [ -e "$test_dir/protected_rpc_blackparrot_sel4.c" ]; then
+    || [ -e "$test_dir/protected_rpc_blackparrot_sel4.c" ] \
+    || [ -e "$test_dir/protected_rpc_blackparrot_server.c" ]; then
     echo "QEMU protected-RPC backend materialization is not exclusive" >&2
     exit 1
 fi

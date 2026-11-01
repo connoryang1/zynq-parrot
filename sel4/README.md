@@ -204,6 +204,10 @@ non-started attempt can reach the software backend. The atomically published
 RTL descriptor and bare-metal call/return transport are implemented and
 tested. Generic/QEMU builds select the non-executed hardware stub;
 BlackParrot builds select the real CSR backend and the kernel binding wrapper.
+`src/protected_rpc_blackparrot_server.c` owns the matching fixed entry: it
+decodes hardware request metadata, invokes the common dispatcher, and consumes
+the protected continuation. Service code supplies only its ordinary server
+configuration and never reads transport registers or emits `preturn`.
 
 ## Experimental seL4 kernel binding
 
