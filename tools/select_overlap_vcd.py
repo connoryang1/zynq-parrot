@@ -52,6 +52,13 @@ def main():
     select = subprocess.run(['rg', '--no-line-number', '--no-filename',
                              '-e', pattern], stdin=source.stdout,
                             stdout=output, check=False)
+    # A matched-window analyzer may intentionally stop after the final
+    # architectural END boundary. Treat ripgrep's resulting SIGPIPE as a clean
+    # truncation and terminate fst2vcd instead of decoding teardown activity.
+    if select.returncode in (-13, 141):
+        source.terminate()
+        source.wait()
+        return
     source_rc = source.wait()
     if source_rc or select.returncode:
         raise RuntimeError('VCD conversion/filter failed: fst2vcd=%d rg=%d'

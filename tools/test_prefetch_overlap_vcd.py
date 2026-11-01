@@ -96,17 +96,36 @@ def trace(samples, axi=False, missing=None, duplicate_signal=None, edge_updates=
 
 
 class PrefetchTests(unittest.TestCase):
+    def test_time_weighted_outstanding_occupancy(self):
+        records = [
+            dict(id=0, issue=analyzer.boundary(0, 0),
+                 first_response=analyzer.boundary(5, 5),
+                 complete=analyzer.boundary(10, 10), _prior=[]),
+            dict(id=1, issue=analyzer.boundary(5, 5),
+                 first_response=analyzer.boundary(10, 10),
+                 complete=analyzer.boundary(15, 15), _prior=[]),
+        ]
+        summary = analyzer.overlap_summary(records, window=(2, 12))
+        self.assertEqual(summary['max_outstanding'], 2)
+        self.assertAlmostEqual(summary['average_outstanding_active'], 20 / 15)
+        self.assertAlmostEqual(summary['average_outstanding_window'], 15 / 10)
+
     def analyze(self, samples=None, axi=False, **kwargs):
         prefetch_slots = kwargs.pop('prefetch_slots', 2)
         consume_pcs = kwargs.pop('consume_pcs', ())
+        stop_pc = kwargs.pop('stop_pc', None)
+        stop_count = kwargs.pop('stop_count', None)
         return analyzer.analyze(io.StringIO(trace(case(axi) if samples is None else samples,
                                                   axi=axi, consumers=bool(consume_pcs), **kwargs)),
                                 axi_prefix='axi_mem' if axi else None,
-                                prefetch_slots=prefetch_slots, consume_pcs=consume_pcs)
+                                prefetch_slots=prefetch_slots, consume_pcs=consume_pcs,
+                                stop_pc=stop_pc, stop_count=stop_count)
 
     def test_slots_dropped_hint_and_normal_fill_are_distinct(self):
         report = self.analyze()
         self.assertEqual(report['prefetch_summary']['max_outstanding'], 2)
+        self.assertAlmostEqual(report['prefetch_summary']['average_outstanding_active'],
+                               10 / 7)
         self.assertEqual(report['prefetch_summary']['max_reserved_slots'], 2)
         self.assertTrue(report['prefetch_summary']['issue_before_prior_first_response'])
         self.assertTrue(report['prefetch_summary']['all_issued_before_first_response'])
@@ -145,6 +164,27 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(report['prefetch_summary']['transactions'], 0)
         self.assertEqual(report['normal_request_summary']['count'], 1)
         self.assertEqual(report['normal_request_summary']['by_msg_type'], {'0': 1})
+
+    def test_later_normal_response_beats_ignore_advanced_header_address(self):
+        samples = case()
+        samples[16]['rev_address'] = 0x80008040
+        report = self.analyze(samples)
+        self.assertEqual(report['normal_reads'][0]['beats'], 8)
+
+        samples = case()
+        samples[12]['rev_address'] = 0x80008040
+        with self.assertRaisesRegex(analyzer.EvidenceError,
+                                    'normal read response identity mismatch'):
+            self.analyze(samples)
+
+    def test_normal_response_boundary_error_reports_transaction_details(self):
+        samples = case()
+        samples[19]['rev_last'] = 0
+        with self.assertRaisesRegex(
+                analyzer.EvidenceError,
+                r'normal read response boundary/count mismatch '
+                r'address=0x80008000 size=6 beats=7 expected=8 first=0 last=0'):
+            self.analyze(samples)
 
     def test_different_clock_phases_sample_their_own_edges(self):
         report = self.analyze(axi=True)
@@ -187,6 +227,22 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual([event['pc'] for event in report['consuming_loads']],
                          [0x80000518, 0x80000560])
         self.assertEqual(report['cycles'], dict(clock=23, be_clock=23))
+
+    def test_final_end_commit_stops_before_teardown_timestamp_rollback(self):
+        samples = case()
+        samples[21].update(commit_v=1, commit_pc=0x100, commit_thread=0)
+        samples[22].update(commit_v=1, commit_pc=0x104, commit_thread=0)
+        malformed_teardown = trace(samples, consumers=True) + '#1\n'
+        report = analyzer.analyze(io.StringIO(malformed_teardown),
+                                  consume_pcs=(0x100, 0x104),
+                                  stop_pc=0x104, stop_count=1)
+        self.assertEqual([event['pc'] for event in report['consuming_loads']],
+                         [0x100, 0x104])
+        with self.assertRaisesRegex(analyzer.EvidenceError,
+                                    'expected 2 stop-PC commits, observed 1'):
+            analyzer.analyze(io.StringIO(trace(samples, consumers=True)),
+                             consume_pcs=(0x100, 0x104),
+                             stop_pc=0x104, stop_count=2)
 
     def test_marker_window_and_matched_summary_are_strict(self):
         window = analyzer.marker_window(io.StringIO(

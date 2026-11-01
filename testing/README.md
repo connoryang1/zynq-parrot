@@ -64,7 +64,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
 | `mt_ctxtsw_store_handoff_benchmark` | Matched pure and hot-store-before-switch rings for resident and nonresident handoffs |
 | `mt_dependent_stream_benchmark` | Shuffled dependent pointer chains; serial demand/prefetch, register-held software interleaving, and hardware context interleaving on the same graph |
-| `mt_nano_lookup_benchmark` | Ten Nano-coroutine-style binary index lookups; serial demand, demand ring, worker prefetch, matched batch, switch-only, and serial prefetch from one runtime-selected executable |
+| `mt_nano_lookup_benchmark` | Two through ten Nano-coroutine-style binary index lookups; serial demand, demand ring, worker prefetch, matched batch, switch-only, serial prefetch, and real C++20 coroutines from one runtime-selected executable |
 | `mt_ddr_latency_benchmark` | First-touch and immediately cached dependent loads, matched timer controls, and six prefetch lead times on disjoint lines; processor-visible physical cycles |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
@@ -163,24 +163,26 @@ are slower than optimized software interleaving in both tested stream counts;
 see [the accepted results and scope](../logs/dependent-streams-20260923/RESULTS.md).
 
 `mt_nano_lookup_benchmark` is an application-shaped extension of the matched
-ten-request experiment. Ten independent absent-key queries each perform eleven
+multi-request experiment. Each of two through ten independent absent-key queries performs eleven
 dependent binary-search levels over its own logical 2,047-entry index shard.
 Each immutable cache-line node places its 64-bit midpoint key in the first
 hinted word and both 32-bit branch links, packed into one aligned 64-bit load,
 in the second. The detached side buffer consumes each word once and does not
 shift subword hits, so the benchmark unpacks the selected link in registers.
 This models database/search fan-out while ensuring that one shard's shared
-upper tree does not collapse ten intended requests into one.
-Runtime `NANO_MODE=0..5` selects serial demand, demand ring, worker prefetch,
-matched software batch, switch-only, or serial prefetch without changing the ELF/NBF. Every
-invocation warms all six instruction bodies on separate 31-entry shards, seeds
+upper tree does not collapse the selected independent requests into one.
+Runtime `NANO_MODE=0..6` selects serial demand, demand ring, worker prefetch,
+matched software batch, switch-only, serial prefetch, or compiler-generated C++20 coroutines
+without changing the ELF/NBF. `NANO_WORKERS=2..10` selects the matched query/shard count;
+five is the maintained default selected by the complete speedup sweep. Every
+invocation warms all seven instruction bodies on separate 31-entry shards, seeds
 and clears common state, fences traffic, emits explicit
 BEGIN/END markers around `0xCC0` timing, and checks all lower bounds, path
 checksums, step counts, and completions afterward. Run one mode at a time:
 
 ```sh
 make -C testing run-mt_nano_lookup_benchmark \
-  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 TRACE=1 \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=5 TRACE=1 \
   SIM_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10'
 ```
 

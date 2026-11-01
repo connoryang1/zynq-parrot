@@ -77,7 +77,7 @@ TEST_MARKERS = {
 
 
 def check_transcript(transcript, exit_code=0, test=None, dependent_config=None,
-                     nano_mode=None):
+                     nano_mode=None, nano_workers=10):
     """Raise ValueError unless both guest and host succeeded without other errors."""
     lines = transcript.splitlines()
     core = [i for i, line in enumerate(lines) if CORE_PASS.search(line)]
@@ -110,7 +110,8 @@ def check_transcript(transcript, exit_code=0, test=None, dependent_config=None,
             r"cycles=(0x[0-9a-fA-F]+) checksum=(0x[0-9a-fA-F]+)$",
             "\n".join(lines[:core[0]]), re.M)
         if (len(rows) != 1 or int(rows[0][0], 16) != nano_mode
-                or int(rows[0][1], 16) != 10 or int(rows[0][2], 16) != 11):
+                or int(rows[0][1], 16) != nano_workers
+                or int(rows[0][2], 16) != 11):
             raise ValueError("Nano lookup result does not match requested mode/shape")
     if any(FAIL.search(line) or TIMEOUT.search(line) for line in lines):
         raise ValueError("guest failure or runtime timeout")
@@ -140,10 +141,12 @@ def main():
                         help="expected packed mode/stream/node selector")
     parser.add_argument("--nano-mode", type=lambda value: int(value, 0),
                         help="expected Nano lookup runtime mode")
+    parser.add_argument("--nano-workers", type=lambda value: int(value, 0), default=10,
+                        help="expected Nano lookup worker/query count")
     args = parser.parse_args()
     try:
         check_transcript(args.log.read_text(), args.exit_code, args.test,
-                         args.dependent_config, args.nano_mode)
+                         args.dependent_config, args.nano_mode, args.nano_workers)
     except (OSError, UnicodeError, ValueError) as error:
         print("INVALID RUN: {}".format(error), file=sys.stderr)
         return 1

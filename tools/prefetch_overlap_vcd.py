@@ -124,8 +124,14 @@ def boundary(cycle, timestamp):
     return dict(cycle=cycle, timestamp=timestamp)
 
 
-def overlap_summary(records):
-    """Strict open intervals exclude a response and new issue on one edge."""
+def overlap_summary(records, window=None):
+    """Summarize overlap, including time-weighted outstanding occupancy.
+
+    ``average_outstanding_active`` covers the interval from the first issue to
+    the last completion.  When ``window`` is supplied as ``(begin, end)``,
+    ``average_outstanding_window`` covers the complete measured interval and
+    clips transaction lifetimes at its boundaries.
+    """
     before_first, before_complete = [], []
     events = []
     for record in records:
@@ -152,7 +158,27 @@ def overlap_summary(records):
                       if first_responses else None)
     last_response = (max(completions, key=lambda event: event['timestamp'])
                      if completions else None)
+    active_begin = min((record['issue']['timestamp'] for record in records),
+                       default=None)
+    active_end = max((record['complete']['timestamp'] for record in records),
+                     default=None)
+    active_area = sum(max(0, record['complete']['timestamp']
+                          - record['issue']['timestamp']) for record in records)
+    average_active = (active_area / (active_end - active_begin)
+                      if active_begin is not None and active_end > active_begin
+                      else 0.0)
+    average_window = None
+    if window is not None:
+        window_begin, window_end = window
+        if window_end <= window_begin:
+            raise EvidenceError('outstanding-occupancy window must be positive')
+        window_area = sum(max(0, min(record['complete']['timestamp'], window_end)
+                              - max(record['issue']['timestamp'], window_begin))
+                          for record in records)
+        average_window = window_area / (window_end - window_begin)
     return dict(transactions=len(records), max_outstanding=maximum,
+                average_outstanding_active=average_active,
+                average_outstanding_window=average_window,
                 first_issue=first_issue, last_issue=last_issue,
                 issue_span=(last_issue['timestamp'] - first_issue['timestamp']) if issues else None,
                 first_response=first_response, last_response=last_response,
@@ -350,11 +376,29 @@ class Transactions:
                     if not self.normal_pending:
                         raise EvidenceError('unmatched normal read response')
                     record = self.normal_pending[0]
-                    if (address, size, wire_tag, msg_type) != tuple(record[key] for key in ('address', 'size', 'slot', 'msg_type')):
-                        raise EvidenceError('normal read response identity mismatch')
+                    # The traced BedRock header can advance to the next
+                    # upstream message while the stream pump is still
+                    # presenting later beats of the current FSM transaction.
+                    # Its address is authoritative on fsm_rev_new only; tag,
+                    # size, and type must remain the current identity on every
+                    # beat.
+                    expected_tail = tuple(record[key]
+                                          for key in ('size', 'slot', 'msg_type'))
+                    observed_tail = (size, wire_tag, msg_type)
+                    if observed_tail != expected_tail or (first and address != record['address']):
+                        raise EvidenceError(
+                            'normal read response identity mismatch observed=%s expected=%s '
+                            'beats=%d first=%d last=%d'
+                            % ((address,) + observed_tail,
+                               (record['address'],) + expected_tail, record['beats'],
+                               first, last))
                     expected = max(1, (1 << size) // self.fill_bytes)
                     if first != (record['beats'] == 0) or last != (record['beats'] + 1 == expected):
-                        raise EvidenceError('normal read response boundary/count mismatch')
+                        raise EvidenceError(
+                            'normal read response boundary/count mismatch '
+                            'address=%s size=%d beats=%d expected=%d first=%d last=%d'
+                            % (hex(record['address']), size, record['beats'], expected,
+                               first, last))
                     record['beats'] += 1
                     if first:
                         record['first_response'] = event
@@ -411,11 +455,13 @@ class Transactions:
         if commit_v not in (0, 1):
             raise EvidenceError('nonbinary control commit_v')
         if commit_v != 1:
-            return
+            return None
         pc = known(v, 'commit_pc')
         if pc in self.consume_pcs:
             self.consuming_loads.append(dict(cycle=cycle, timestamp=timestamp, pc=pc,
                                              thread=known(v, 'commit_thread')))
+            return pc
+        return None
 
     def finish(self, allow_no_prefetch=False):
         if self.slots or self.normal_pending or self.axi_pending:
@@ -436,7 +482,12 @@ class Transactions:
 
 
 def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fill_bytes=8,
-            prefetch_slots=2, allow_no_prefetch=False, consume_pcs=()):
+            prefetch_slots=2, allow_no_prefetch=False, consume_pcs=(),
+            stop_pc=None, stop_count=None):
+    if (stop_pc is None) != (stop_count is None) or (stop_count is not None and stop_count <= 0):
+        raise EvidenceError('stop PC and positive count must be supplied together')
+    if stop_pc is not None and stop_pc not in consume_pcs:
+        raise EvidenceError('stop PC must be included in tracked consuming PCs')
     selected, timescale = read_header(stream, signal_names(uce_prefix, axi_prefix, consume_pcs),
                                       optional=OPTIONAL_UCE_SIGNALS)
     admission_modes = [label for label in OPTIONAL_UCE_SIGNALS if label in selected]
@@ -450,19 +501,36 @@ def analyze(stream, uce_prefix='dcache_uce', axi_prefix=None, line_bytes=64, fil
     if consume_pcs:
         clocks.append('be_clock')
     clocks = tuple(clocks)
-    for _, timestamp, values in rising_edges(stream, selected, clocks):
-        for clock in values.get('_rising_clocks', ['clock']):
-            cycle = tracker.cycles[clock]
-            tracker.cycles[clock] += 1
-            try:
-                if clock == 'clock':
-                    tracker.uce(values, cycle, timestamp)
-                elif clock == 'axi_clock':
-                    tracker.axi_edge(values, cycle, timestamp)
-                else:
-                    tracker.be_edge(values, cycle, timestamp)
-            except EvidenceError as error:
-                raise EvidenceError('%s cycle %d timestamp %d: %s' % (clock, cycle, timestamp, error)) from error
+    stops_seen = 0
+    stop = False
+    try:
+        for _, timestamp, values in rising_edges(stream, selected, clocks):
+            for clock in values.get('_rising_clocks', ['clock']):
+                cycle = tracker.cycles[clock]
+                tracker.cycles[clock] += 1
+                try:
+                    if clock == 'clock':
+                        tracker.uce(values, cycle, timestamp)
+                    elif clock == 'axi_clock':
+                        tracker.axi_edge(values, cycle, timestamp)
+                    else:
+                        committed_pc = tracker.be_edge(values, cycle, timestamp)
+                        if committed_pc == stop_pc:
+                            stops_seen += 1
+                            stop = stops_seen == stop_count
+                except EvidenceError as error:
+                    raise EvidenceError('%s cycle %d timestamp %d: %s'
+                                        % (clock, cycle, timestamp, error)) from error
+            if stop:
+                break
+    except EvidenceError as error:
+        if stop_count is not None:
+            raise EvidenceError('%s after %d of %d stop-PC commits'
+                                % (error, stops_seen, stop_count)) from error
+        raise
+    if stop_count is not None and stops_seen != stop_count:
+        raise EvidenceError('expected %d stop-PC commits, observed %d'
+                            % (stop_count, stops_seen))
     for clock in clocks:
         if tracker.cycles[clock] == 0:
             raise EvidenceError('no observed rising edges for ' + clock)
@@ -589,7 +657,7 @@ def matched_window_summary(report, window, address, span_bytes, axi_address_xor=
             record['_prior'] = list(pending)
             copies.append(record)
             pending.append(record)
-        return overlap_summary(copies)
+        return overlap_summary(copies, window=(begin, end))
 
     crossing_uce = crossing_begin(report['prefetches'] + report['normal_reads'])
     crossing_axi = crossing_begin(report['axi_reads'] or [])
@@ -732,7 +800,7 @@ def main():
             tracked_pcs.extend(pc_args)
         report = analyze(sys.stdin, args.uce_prefix, args.axi_prefix, args.line_bytes,
                          args.fill_bytes, args.prefetch_slots, args.allow_no_prefetch,
-                         tracked_pcs)
+                         tracked_pcs, args.end_pc, args.expected_windows)
         if args.address is not None and not args.matched_only:
             report['region'] = region_summary(report, args.address, args.span_bytes,
                                               args.axi_address_xor, args.axi_address_offset)
