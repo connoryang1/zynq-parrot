@@ -53,8 +53,25 @@ python3 -m unittest test_run_scheduler_physical_preview_sweep.py \
 Ran 38 tests ... OK
 ```
 
+## FPGA feasibility
+
+After an externally completed power cycle, the board passed the PYNQ readiness gate at 5,429 seconds uptime, loaded exact bitstream `e97e0517...2381`, and reported the FPGA operating. Exact mode-6 NBF `5e42c2f6...5d2bd`, control program `2dd9c411...7c30`, benchmark ELF `e4dd1fcc...a4e8`, and transfer `b2a8aa36...0566` all matched before launch. No board lock or competing control process was present.
+
+One predeclared group-7 `wake-trigger target fifo isolated` cell completed 512 accepted trials with zero retries, runner exit zero, and final parent/child/CORE/BSG PASS. Its paired results are:
+
+- wake-to-entry: `1897.75 [-1614.25,6734.5]` cycles saved;
+- four dependent loads: `-1.25 [-4,0]` cycles saved;
+- wake-to-load: `2424.25 [-1032.5,6734]` cycles saved;
+- roundtrip: `-1427.25 [-7767.75,5356]` cycles saved.
+
+The isolated wake-to-load point estimate is about 7.8 times the contaminated persistent-matrix point estimate, but every whole-handoff interval crosses zero in this one noisy cache-set group. It is feasibility and evidence of upside, not a speedup claim.
+
+The isolation-specific position check is more decisive. Leading-versus-trailing disabled wake-to-load differs by only `39 [-81,107.5]` cycles, compared with the historical persistent matrix's `-888`-cycle pooled median. The sign counts are also balanced at 67 positive, 60 negative, and one zero block. This verifies that symmetric `fence.i` removed the systematic disabled-position carryover in the feasibility cell.
+
+Exact compressed raw/status, 20,000-sample partial-cell analysis, and 5,000-sample position analysis are retained under `physical-sweep/` with SHA-256 values `93f52385...6417`, `4eba9ac0...872e`, `b82bbef9...87f2f`, and `3146b082...5198`. The decompressed raw transcript hashes to `a1df868a...f5b1`.
+
 ## Acceptance plan and limits
 
-No FPGA result exists for isolated mode yet. Once the board is recovery-qualified, first run one isolated mode-6 feasibility cell, then the complete eight-group isolated mode-6 matrix, the isolated mode-5 selection-time control, and an independent isolated mode-6 replication. A valid result must retain exact ELF/NBF/bitstream hashes, final runner/CORE/BSG PASS, and show that the chronology analyzer no longer has a systematic arm-position effect.
+The complete eight-group isolated mode-6 matrix, isolated mode-5 selection-time control, and independent isolated mode-6 replication remain pending. A valid result must retain exact ELF/NBF/bitstream hashes, final runner/CORE/BSG PASS, and show that the full chronology analyzer remains free of a systematic arm-position effect. The feasibility run ended through guest shutdown, so the board must be physically power-cycled and the overlay reloaded before another launch; the current shell still lacks the private power-controller URL.
 
 `fence.i` deliberately creates a cold-instruction best case and clears the ordinary local I-cache as well as the advisory buffer. It is a mechanism ceiling, not a claim about the natural temperature of general Linux context switches. A later representative workload must use a production clear/generation policy rather than issuing `fence.i` on every handoff.

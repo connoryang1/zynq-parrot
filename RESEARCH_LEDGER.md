@@ -809,6 +809,17 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Next discriminator:** after mandatory board recovery, run isolated mode-6 feasibility and a complete eight-group matrix, followed by isolated mode 5 and an independent mode-6 replication. Reject any aggregate result whose isolated chronology retains a systematic position effect.
 - **Guardrail:** per-trial `fence.i` is a deliberately cold mechanism ceiling that also clears ordinary L1-I. It fixes causal arm isolation but is not a representative production policy; subsequent workloads need a generation/clear protocol that prevents cross-context stale replay without globally cold-starting every switch.
 
+### RL-084 — Isolated replay passes FPGA feasibility and removes the arm-position signature
+
+- **Status:** accepted one-cell FPGA feasibility and isolation validation; performance unresolved pending full matrix
+- **Scope:** exact routed bitstream `e97e0517...2381`, mode-6 prefix-16 NBF `5e42c2f6...5d2bd`, control program `2dd9c411...7c30`, corrected GCC13 benchmark ELF `e4dd1fcc...a4e8`, group 7, FIFO pipe handoff, target footprint, per-trial symmetric `fence.i`, 512 balanced trials, and the independent one-voluntary/zero-involuntary-switch filter.
+- **Recovery and correctness:** board uptime proved an external power cycle, PYNQ readiness passed at 5,429 seconds, the exact overlay loaded and reported operating, all launch hashes matched, and no lock or competing process existed. The cell completed with zero retries, exact isolated configuration marker, runner exit zero, and child/parent/CORE/BSG PASS.
+- **Timing:** wake-to-entry is `1897.75 [-1614.25,6734.5]`, local loads `-1.25 [-4,0]`, wake-to-load `2424.25 [-1032.5,6734]`, and roundtrip `-1427.25 [-7767.75,5356]` saved cycles. The roughly 2.4k wake-to-load point estimate is encouraging and much larger than the contaminated 325-cycle historical point, but the one-group interval crosses zero and is not a performance claim.
+- **Isolation check:** trailing-disabled minus leading-disabled wake-to-load is `39 [-81,107.5]` cycles with 67 positive, 60 negative, and one zero block. The historical persistent matrix had a pooled median of `-888` cycles. The corrected feasibility cell therefore removes the systematic arm-position signature that motivated RL-083.
+- **Evidence:** compressed raw log, PASS status, partial-cell analysis, and position analysis hash to `93f52385...6417`, `4eba9ac0...872e`, `b82bbef9...87f2f`, and `3146b082...5198` under `logs/replay-arm-isolation-20261101/physical-sweep/`; decompressed raw SHA-256 is `a1df868a...f5b1`.
+- **Next discriminator:** after another mandatory physical recovery, run the complete eight-group isolated mode-6 matrix. If its stratified interval and position-neutral chronology pass, run the isolated mode-5 control and independent mode-6 replication before changing RTL.
+- **Guardrail:** the feasibility run ended through guest shutdown and contaminated subsequent board state. Do not launch another run without a physical power cycle, readiness wait, and verified overlay reload.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -879,7 +890,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint. RL-083 supersedes RL-079--081's nonempty interleaved matrices as feature A/B evidence because completed advisory lines leaked across trial arms. RL-081 still proves one-shot successful-wakeup replay removes 13/16 exact selected demand misses; RL-082 still bounds a four-to-eight-slot expansion at only 84--164 optimistic UCE cycles for short modeled latency. The next experiment is a per-trial-isolated mode-6 FPGA matrix, followed by an isolated same-image mode-5 selection-time control and independent mode-6 replication. Only after the chronology is position-neutral should residual-line telemetry, capacity, ordering, retention, footprint, or workload change.
+For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint. RL-083 supersedes RL-079--081's nonempty interleaved matrices as feature A/B evidence because completed advisory lines leaked across trial arms. RL-084 now proves the symmetric isolation mode runs on FPGA and removes the prior disabled-position signature in one group; its `2424.25 [-1032.5,6734]` wake-to-load point remains unresolved. After mandatory board recovery, the next experiment is the complete eight-group isolated mode-6 matrix, followed by the isolated same-image mode-5 control and independent mode-6 replication. Only after a resolved, position-neutral matrix should residual telemetry, capacity, ordering, retention, footprint, or workload change.
 
 ## Delta log
 
