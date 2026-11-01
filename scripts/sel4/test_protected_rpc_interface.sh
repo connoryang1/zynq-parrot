@@ -17,7 +17,7 @@ if [ "$public_headers" != "protected_rpc.h" ]; then
     echo "unexpected protected-RPC public headers: $public_headers" >&2
     exit 1
 fi
-if grep -Eq 'runtime_private|struct protected_rpc_call_context[[:space:]]*\{' \
+if grep -Eq 'runtime_private|protected_rpc_dispatch|struct protected_rpc_call_context[[:space:]]*\{' \
     "$project_root/sel4/include/protected_rpc.h"; then
     echo "public RPC header exposes trusted call-context layout" >&2
     exit 1

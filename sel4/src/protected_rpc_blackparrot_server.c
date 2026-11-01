@@ -3,6 +3,7 @@
 
 #include "blackparrot_rpc_abi.h"
 #include "protected_rpc_blackparrot.h"
+#include "protected_rpc_runtime.h"
 
 static protected_rpc_status_t dispatch_protected_call(
     const protected_rpc_server_config_t *config, uint64_t caller_badge,

@@ -192,7 +192,9 @@ test covers hardware completion, safe fallback, rejection, committed failure,
 both forced routes, and the common server dispatcher. Software IPC, protected
 hardware entry, and the notification control all enter that dispatcher, which
 authenticates transport-provided context, clears replies, validates the trusted
-region table, and canonicalizes malformed handler output.
+region table, and canonicalizes malformed handler output. The dispatcher is an
+internal runtime operation rather than a public function that could accept an
+application-supplied badge.
 
 ```sh
 scripts/sel4/test_protected_rpc_interface.sh

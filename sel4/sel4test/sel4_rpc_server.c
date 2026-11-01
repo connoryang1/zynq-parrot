@@ -6,6 +6,7 @@
 #include <sel4/sel4.h>
 
 #include "protected_rpc.h"
+#include "protected_rpc_runtime.h"
 #ifdef CONFIG_PLAT_BLACKPARROT
 #include "protected_rpc_blackparrot.h"
 #endif
