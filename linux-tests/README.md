@@ -595,6 +595,14 @@ paired blocks within every cache-set stratum, and reports candidate-minus-
 control effect intervals. A resolved effect in one matrix and an unresolved
 effect in another is not by itself evidence that their effects differ.
 
+An optional third argument, `hot-proxy`, registers four eviction-buffer lines
+instead of the measured target ring and rereads them immediately before every
+arm operation. The target ring remains cold, while enabled trials still issue
+the scheduler hook and instruction-prefix trigger. Use the runner's matching
+`--footprint hot-proxy` option. This is an instruction-isolation proxy, not a
+literal instruction-only mode: the four physical hint commands still execute,
+so report and, where needed, trace their residual tag or miss traffic.
+
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
 with alternating early/late order by group, and powers off for final
@@ -611,6 +619,17 @@ disjoint suffix of the fixed plan. Keep the raw failed transcript unchanged;
 derive and hash a prefix containing only cells completed before the liveness
 change, and analyze that prefix together with a suffix that reaches final
 `CORE PASS` and `BSG PASS`. Report the multi-boot composition explicitly.
+For a predeclared single-timing replication, `--only-timing early|late`
+filters the fixed plan after the recovery boundary. A fresh late-only run has
+eight cells and normally completes before the observed nine-to-ten-cell board
+liveness boundary; do not use the filter after inspecting individual set
+results to select a favorable timing.
+Pool compatible, predeclared repeats with
+`pool_scheduler_physical_preview_replicates.py --timing TIMING --replicate
+LOG... --replicate LOG...`. The tool requires all eight groups and final board
+PASS markers in every replication, then resamples paired trial blocks within
+each boot/group stratum. Do not pool a post-hoc timing choice or incompatible
+benchmark binaries, footprints, kernels, or FPGA images.
 
 The runner writes `BOARD.log.status.json`. Any failed or interrupted run still
 requires a full board power cycle, PYNQ readiness wait, and verified overlay

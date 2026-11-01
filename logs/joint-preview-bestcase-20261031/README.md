@@ -417,7 +417,57 @@ late; the early contrast is resolved harm at the target-resume boundary. This
 keeps instruction replay as the leading explanation for the joint roundtrip
 result but does not establish an instruction or context-switch speedup.
 
+## Hot-data instruction proxy and late replication
+
+The opt-in `hot-proxy` footprint registers four eviction-buffer lines and
+rereads them immediately before arming, while the measured four-line dependent
+ring remains cold. This preserves mode gating, the instruction trigger, and
+exact hook counting without useful target-data hints. The proxy ELF SHA-256 is
+`fb0cc7b5...172d`; its transfer is `6ff8122a...1d7`. The exact NBF and
+bitstream remain `f3a026b6...31a7` and `e97e0517...2381`.
+
+The first full run completed nine cells, then stalled inside the partial tenth
+cell at trial 322. After interruption and mandatory recovery, a disjoint
+suffix from plan index 9 completed seven cells with final runner/CORE/BSG PASS.
+The accepted cells reject 891 contaminated attempts. Strict analysis SHA-256
+`eedaae0d...f18` gives:
+
+- early: `0 [0,0.5]` target-load cycles, `-217.75 [-1216.25,630]`
+  wake-to-load cycles, and `-1101.5 [-2571,766.5]` roundtrip cycles;
+- late: `0 [-1,0]` target-load cycles, `-164 [-918,615]` wake-to-load
+  cycles, and `1768.25 [-129.5,3175.5]` roundtrip cycles.
+
+The zero local-load effect validates the intended proxy behavior. A direct
+target-minus-proxy comparison resolves the expected 9.5--11 target-load cycles
+but cannot purely attribute broader differences because the benchmark binary
+and footprint differ.
+
+A predeclared late-only replication used all eight groups in one boot. Its
+first attempt ended during ELF transfer on host `Errant read from 1e3c74`,
+before any configuration marker; that transcript is retained as rejected
+infrastructure evidence. After full recovery, the unchanged retry completed
+all cells with 417 rejected attempts and final PASS markers. It independently
+finds 0 local-load cycles, `-513.5 [-1241,157.5]` wake-to-load cycles, and
+`1568.25 [-383.75,3599.5]` roundtrip cycles.
+
+Boot/set-stratified pooling SHA-256 `fcc873a2...694` resolves `1740.75
+[226.75,2883]` late roundtrip cycles, about 1.4%, while local loads remain `0
+[0,0]` and wake-to-load remains harmful and unresolved at `-318.75
+[-890.25,135.75]`. This is evidence for a later two-switch tail benefit, not
+faster target resume. The next measurement partitions child post-load work
+from the return handoff.
+
 ## Pipe experiment workflow corrections
+
+During the later hot-proxy preparation, a combined build-and-test command ran
+the focused unit tests from the repository root and repeated the already-known
+sibling-import failure. The benchmark build itself completed and was retained;
+the import errors are not test evidence. Rerunning the two modules from
+`linux-tests/` passed all 14 tests.
+One later mode-setting command also prefixed a path with `linux-tests/` while
+already inside that directory; only `chmod` failed, and the concurrently
+invoked tests still passed. The corrected root-relative mode command and the
+expanded 17-test suite then passed before analysis.
 
 The first trace build used the Makefile's unavailable default cross compiler
 after a clean, so no stale executable was accepted. It was rebuilt with the

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from analyze_scheduler_physical_preview_sweep import analyze
 from compare_scheduler_physical_preview_sweeps import compare
+from pool_scheduler_physical_preview_replicates import pool
 
 
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
@@ -105,6 +106,28 @@ class SweepAnalyzerTest(unittest.TestCase):
             ))
             with self.assertRaisesRegex(ValueError, "control: incomplete sweep"):
                 compare([control], [candidate], samples=10)
+
+    def test_replication_pool_preserves_boot_and_group_strata(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = root / "first.log"
+            second = root / "second.log"
+            first.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=10)
+                for group in range(8)
+            ))
+            second.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=30)
+                for group in range(8)
+            ))
+            result = pool([[first], [second]], "late", samples=100)
+        metric = result["metrics"]["load_cycles"]
+        self.assertEqual(
+            [item["saved_cycles"] for item in metric["replicates"]],
+            [10.0, 30.0],
+        )
+        self.assertEqual(metric["pooled_saved_cycles"], 20.0)
+        self.assertEqual(metric["pooled_95pct_ci_saved_cycles"], [20.0, 20.0])
 
 
 if __name__ == "__main__":

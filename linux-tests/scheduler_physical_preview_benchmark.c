@@ -7,7 +7,10 @@
  * An optional group 0--7 selects two adjacent L2 sets in both banks so a full
  * sweep can distinguish useful preview timing from post-hint set conflicts.
  * The second optional argument selects the historical early hook or the late
- * pre-register-switch hook in the same kernel image.
+ * pre-register-switch hook in the same kernel image. An optional hot-proxy
+ * footprint redirects hints to freshly reread eviction-buffer lines while
+ * leaving the measured dependent target ring cold. This approximates an
+ * instruction-only A/B without changing the kernel or losing hook counting.
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -63,7 +66,7 @@ static unsigned mode_for(unsigned trial)
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
-		      unsigned group, unsigned enable_mode)
+		      unsigned group, unsigned enable_mode, int hot_proxy)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -72,6 +75,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 						PROT_READ | PROT_WRITE,
 						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	unsigned long target_addr[lines];
+	unsigned long preview_addr[lines];
 	unsigned target_offset = group * 4 * line_bytes;
 	unsigned retries = 0;
 	char token = 'x';
@@ -82,6 +86,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		target_addr[line] = (unsigned long)&target[target_offset
 							     + line * line_bytes];
 	for (unsigned line = 0; line < lines; line++)
+		preview_addr[line] = hot_proxy
+			? (unsigned long)&eviction[target_offset + line * line_bytes]
+			: target_addr[line];
+	for (unsigned line = 0; line < lines; line++)
 		*(volatile unsigned long *)target_addr[line]
 			= target_addr[(line + 1) % lines];
 	for (unsigned page = 0; page < eviction_pages; page++)
@@ -89,8 +97,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			eviction[page * page_bytes + offset] = page + offset;
 	/* Registration is intentionally outside the trial loop: both arms retain
 	 * exactly the same long-term pins and physical-address bookkeeping. */
-	if (prctl(PR_BP_PREVIEW_PIN_SET, target_addr[0], target_addr[1],
-		  target_addr[2], target_addr[3]))
+	if (prctl(PR_BP_PREVIEW_PIN_SET, preview_addr[0], preview_addr[1],
+		  preview_addr[2], preview_addr[3]))
 		fail("register preview lines");
 	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = mode_for(trial);
@@ -101,6 +109,12 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		for (unsigned page = 0; page < eviction_pages; page++)
 			for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
 				checksum += eviction[page * page_bytes + offset];
+		/* Keep proxy hints as cache hits without touching the cold target ring.
+		 * This traffic is identical in the enabled and disabled arms until the
+		 * scheduler trigger itself. */
+		if (hot_proxy)
+			for (unsigned line = 0; line < lines; line++)
+				checksum += *(volatile unsigned char *)preview_addr[line];
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		if (checksum == UINT64_MAX)
 			fail("eviction checksum");
@@ -158,14 +172,15 @@ int main(int argc, char **argv)
 	int to_child[2], to_parent[2], status;
 	unsigned group = 0;
 	unsigned enable_mode = 2;
+	int hot_proxy = 0;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 3) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late]\n",
+	if (argc > 4) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late] [target|hot-proxy]\n",
 			argv[0]);
 		return 2;
 	}
@@ -176,7 +191,7 @@ int main(int argc, char **argv)
 		}
 		group = argv[1][0] - '0';
 	}
-	if (argc == 3) {
+	if (argc >= 3) {
 		if (!strcmp(argv[2], "early"))
 			enable_mode = 1;
 		else if (!strcmp(argv[2], "late"))
@@ -186,9 +201,18 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u\n",
+	if (argc == 4) {
+		if (!strcmp(argv[3], "hot-proxy"))
+			hot_proxy = 1;
+		else if (strcmp(argv[3], "target")) {
+			fprintf(stderr, "invalid preview footprint: %s\n", argv[3]);
+			return 2;
+		}
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s\n",
 	       group, group * 4 * line_bytes, lines,
-	       enable_mode == 1 ? "early" : "late", enable_mode);
+	       enable_mode == 1 ? "early" : "late", enable_mode,
+	       hot_proxy ? "hot-proxy" : "target");
 
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
@@ -198,7 +222,8 @@ int main(int argc, char **argv)
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		child_run(to_child[0], to_parent[1], samples, group, enable_mode);
+		child_run(to_child[0], to_parent[1], samples, group, enable_mode,
+			  hot_proxy);
 		return 0;
 	}
 	close(to_child[0]);

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from run_scheduler_physical_preview_sweep import (
     SHELL_PROMPT,
+    benchmark_command,
     cell_exit_pattern,
     cell_plan,
     selected_cells,
@@ -15,6 +16,12 @@ from run_scheduler_physical_preview_sweep import (
 
 
 class CellPlanTest(unittest.TestCase):
+    def test_hot_proxy_is_the_only_extra_guest_argument(self):
+        target = benchmark_command(2, "early", "target")
+        proxy = benchmark_command(2, "early", "hot-proxy")
+        self.assertIn(" 2 early; rc=$?", target)
+        self.assertIn(" 2 early hot-proxy; rc=$?", proxy)
+
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))
@@ -47,6 +54,12 @@ class CellPlanTest(unittest.TestCase):
         self.assertEqual(selected_cells(10), plan[10:])
         self.assertFalse(set(plan[:10]) & set(selected_cells(10)))
 
+    def test_late_only_plan_fits_one_pre_boundary_boot(self):
+        late = selected_cells(0, "late")
+        self.assertEqual(len(late), 8)
+        self.assertEqual({group for group, _timing in late}, set(range(8)))
+        self.assertTrue(all(timing == "late" for _group, timing in late))
+
     def test_invalid_recovery_boundary_is_rejected(self):
         for start in (-1, 16):
             with self.assertRaisesRegex(ValueError, "start cell"):
@@ -65,6 +78,8 @@ class CellPlanTest(unittest.TestCase):
                 elf_sha256="1" * 64,
                 control_sha256="2" * 64,
                 runtime_ms=100,
+                footprint="target",
+                only_timing=None,
                 start_cell=0,
                 log=root / "missing" / "run.log",
             )
