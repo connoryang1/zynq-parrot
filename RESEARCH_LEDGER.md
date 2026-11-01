@@ -980,6 +980,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Evidence:** every arm passes exact identities, 512 ordered rows/tails, expected zero or one hooks, kernel-failure scanning, and terminal child/parent/cell/core/host gates. Analysis SHA-256 is `115ed509...5815`; exact artifacts are under `logs/data-joint-corrected-route-20261101/`.
 - **Meaning:** early instruction replay plus late data is a viable steady-state throughput combination and data is demonstrably useful at the local loads. It is not a demonstrated incoming-context resume-latency speedup, and the resolved roundtrip gain cannot be assigned specifically to data while instruction replay is also active. The next discriminator is an exact current-route instruction-only control or a size-neutral data-timing/line-count variant, not a broader RTL change.
 
+### RL-103 — Instruction-only control attributes local data benefit, not resume latency
+
+- **Status:** accepted corrected-route FPGA/Linux mechanism attribution; first-use benefit remains unresolved
+- **Scope:** exact futex-v1 mode-six instruction-only NBF `93b2e29d...8629`, the same `a070df7f...a3ce9` routed bitstream, group-seven target footprint, FIFO policy, persistent state, four fresh opposite-order fixed-arm boots, and 512 accepted trials per arm
+- **Control result:** instruction-only enabled-minus-disabled wake-to-load is +181 cycles with circular-block interval `[-3507,8597]`; local-load effect is exactly zero with `[0,0.5]`. Every arm passes exact identities, zero hook deltas, row/tail counts, kernel-failure screening, and terminal child/parent/core/host gates. Strict analysis SHA-256 is `499d436d...0636`.
+- **Attribution:** an independent bootstrap against RL-102's joint wake/data analysis gives a joint-minus-instruction local-load effect of -33.75 cycles with block interval `[-37.5,-19]`, proving that the locally useful lines come from data hints rather than instruction replay. Incremental wake-to-load is +7,267.75 cycles with `[-9363,15621.5]`, unresolved with a harmful point estimate. Comparison SHA-256 is `ad026cf0...781f`; exact evidence is under `logs/instruction-control-corrected-route-20261101/`.
+- **Limit:** the ordinary instruction-only benchmark calls `getrusage()` after first use while the joint image uses its counted late hook, so the strict comparison excludes post-load and roundtrip. RL-102's within-image roundtrip gain remains valid but is not specifically attributable to data. The next useful gate is a lower-cost data-hint count or a size-neutral earlier timing, evaluated first for wake-to-load rather than tail throughput.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

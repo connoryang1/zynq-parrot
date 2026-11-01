@@ -697,6 +697,17 @@ PASS markers in every replication, then resamples paired trial blocks within
 each boot/group stratum. Do not pool a post-hoc timing choice or incompatible
 benchmark binaries, footprints, kernels, or FPGA images.
 
+For opposite-order fixed-arm experiments, first run
+`analyze_scheduler_physical_preview_fixed_ab.py` independently on each image.
+When the control is ordinary mode-six `wake-trigger` and the candidate is the
+size-neutral mode-six `wake-data` image on the same bitstream and group, use
+`compare_scheduler_physical_preview_fixed_ab.py --control CONTROL.json
+--candidate CANDIDATE.json`. It independently bootstraps the two enabled-minus-
+disabled effects and reports joint-minus-instruction-only for wake-to-entry,
+local loads, and wake-to-load. It intentionally omits post-load and roundtrip
+effects because `wake-trigger` uses a post-first-use `getrusage()` filter while
+`wake-data` uses the counted late hook.
+
 Tail-instrumented benchmark builds also emit `PHYSICAL_BENCH_TAIL` rows. The
 child takes one core-wide physical-cycle timestamp after hook validation and
 immediately before its accepted pipe write. Run

@@ -1,0 +1,101 @@
+{
+  "purpose": "Measure the incremental effect of adding four late data hints to mode-six wakeup instruction replay on the same routed FPGA.",
+  "sign_convention": "candidate-minus-control enabled effect; negative means late data improves the endpoint beyond instruction replay alone",
+  "control": {
+    "timing": "wake-trigger",
+    "identity": {
+      "nbf_sha256": "93b2e29de83be627631a6cb6e78b2a5529f9a42c89cb365894cfe7138a028629",
+      "transfer_sha256": "b6d9f3731ebcbd6b2717a1e0d8987c7b6a3ee58364ce7d04ce19801f0d2dd09e",
+      "elf_sha256": "16eb7b7b89c25383aaef23ce98d8206352e713e60e3ff72bc5c95ad60d25dcba",
+      "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "bitstream_sha256": "a070df7f2d69b86e745a9b915798e704ac4ee2255e97d3c50e3aa1a4f4ba3ce9"
+    },
+    "analysis_path": "logs/instruction-control-corrected-route-20261101/fixed-ab-analysis.json",
+    "analysis_sha256": "499d436dd9bf6f9795b1de48c128a0350b372eba799d8001d9f49b96e6380636"
+  },
+  "candidate": {
+    "timing": "wake-data",
+    "identity": {
+      "nbf_sha256": "8cee44733ed80439541168fb2c610b00af1f37a7108e4c2ae8eb52b5d728d64c",
+      "transfer_sha256": "bd2135969325df1e3c9d1ff8b1b59b756c681792d03ff5d44144af2f5e3c59eb",
+      "elf_sha256": "232413aa5dbcd86914c89c0b7209322afb4f1680bf8f07da0c3e4602d79dbf54",
+      "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "bitstream_sha256": "a070df7f2d69b86e745a9b915798e704ac4ee2255e97d3c50e3aa1a4f4ba3ce9"
+    },
+    "analysis_path": "logs/data-joint-corrected-route-20261101/wake-data-fixed-ab-analysis.json",
+    "analysis_sha256": "115ed5097fded94b31e05ebfefe351dd449254356bff3313b02587e46bcf5815"
+  },
+  "group": 7,
+  "metrics": {
+    "wake_to_entry": {
+      "instruction_only_enabled_minus_disabled": 160.5,
+      "joint_enabled_minus_disabled": 6807.75,
+      "joint_minus_instruction_only": 6647.25,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -15148.25,
+          16659.25
+        ],
+        "fraction_candidate_effect_faster": 0.39905
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -8690.5,
+          16012.0
+        ],
+        "fraction_candidate_effect_faster": 0.28915
+      }
+    },
+    "load_cycles": {
+      "instruction_only_enabled_minus_disabled": 0.0,
+      "joint_enabled_minus_disabled": -33.75,
+      "joint_minus_instruction_only": -33.75,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -35.5,
+          -19.25
+        ],
+        "fraction_candidate_effect_faster": 1.0
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -37.5,
+          -19.0
+        ],
+        "fraction_candidate_effect_faster": 1.0
+      }
+    },
+    "wake_to_load": {
+      "instruction_only_enabled_minus_disabled": 181.0,
+      "joint_enabled_minus_disabled": 7448.75,
+      "joint_minus_instruction_only": 7267.75,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -15881.75,
+          16373.25
+        ],
+        "fraction_candidate_effect_faster": 0.43165
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -9363.0,
+          15621.5
+        ],
+        "fraction_candidate_effect_faster": 0.32995
+      }
+    }
+  },
+  "interpretation_limit": "Only endpoints ending at first use are compared. The ordinary wake-trigger benchmark calls getrusage after first use, while wake-data uses a counted hook, so post-load and roundtrip effects are intentionally excluded."
+}
