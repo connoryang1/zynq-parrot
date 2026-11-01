@@ -65,6 +65,17 @@ def write_run(root, name, arm, base, group=7):
 
 
 class FixedArmAnalyzerTest(unittest.TestCase):
+    def test_kernel_failure_marker_is_rejected_despite_pass_markers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = write_run(root, "bad", "enabled", 90)
+            path.write_text(
+                path.read_text().replace("BSG PASS", "BUG: synthetic\nBSG PASS")
+            )
+            with self.assertRaisesRegex(ValueError, "kernel failure marker"):
+                from analyze_scheduler_physical_preview_fixed_ab import load_run
+                load_run(path, "enabled", IDENTITY, 7)
+
     def test_opposite_order_replicates_report_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

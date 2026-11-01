@@ -78,6 +78,10 @@ def load_run(path, arm, identity, group):
             raise ValueError(f"{path}: missing marker {marker!r}")
     if not re.search(r"\bCORE(?:\[0\])? PASS\b", text):
         raise ValueError(f"{path}: missing CORE PASS")
+    for marker in ("BUG:", "Kernel panic", "Oops:",
+                   "scheduling while atomic", "Segmentation fault"):
+        if marker in text:
+            raise ValueError(f"{path}: contains kernel failure marker {marker!r}")
     retry_markers = len(re.findall(r"^PHYSICAL_BENCH_RETRY ", text, re.MULTILINE))
     retry_pass = re.findall(r"PHYSICAL_BENCH_CHILD PASS retries=(\d+)", text)
     if retry_pass != [str(retry_markers)]:
