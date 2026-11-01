@@ -150,6 +150,17 @@ if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
     exit 1
 fi
 
+failure_contaminated_log="$build_dir/physical-uart-failure-contaminated.log"
+cp "$uart_log" "$failure_contaminated_log"
+printf '%s\r\n' 'Test SEL4IPCRPC0002 failed' \
+    '*** FAILURES DETECTED ***' >> "$failure_contaminated_log"
+if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components --lifecycle --caller-badge 24090 \
+    "$failure_contaminated_log" >/dev/null 2>&1; then
+    echo "physical checker accepted seL4 failure markers" >&2
+    exit 1
+fi
+
 badge_missing_log="$build_dir/physical-uart-badge-missing.log"
 grep -v '^SEL4_RPC_CALLER_BADGE ' "$uart_log" > "$badge_missing_log"
 if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \

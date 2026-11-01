@@ -55,6 +55,7 @@ software_count=0
 core_pass_count=0
 bsg_pass_count=0
 bsg_fail_count=0
+sel4_failure_count=0
 workload_count=0
 guard_count=0
 direct_count=0
@@ -282,6 +283,9 @@ while IFS= read -r line; do
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
     [[ $line == *"BSG FAIL"* ]] && bsg_fail_count=$((bsg_fail_count + 1))
+    { [[ $line == "Test SEL4IPCRPC0002 failed" ]] \
+      || [[ $line == "*** FAILURES DETECTED ***" ]]; } \
+        && sel4_failure_count=$((sel4_failure_count + 1))
     [[ $line == "SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024" ]] \
         && workload_count=$((workload_count + 1))
     [[ $line == "SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied" ]] \
@@ -298,6 +302,10 @@ while IFS= read -r line; do
         && lifecycle_count=$((lifecycle_count + 1))
 done < "$log"
 
+if ((sel4_failure_count != 0)); then
+    echo "seL4 failure marker present: rows=$sel4_failure_count" >&2
+    exit 1
+fi
 if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
     echo "invalid RPC evidence: markers=$marker_count hardware_rows=$hardware_count software_rows=$software_count" >&2
     exit 1
