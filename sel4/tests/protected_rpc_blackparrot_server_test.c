@@ -67,28 +67,34 @@ int main(void)
     assert(runtime.server_gp == UINT64_C(0x4750));
     assert(runtime.server_tp == (uint64_t)(uintptr_t)&config);
 
-    uint64_t words[PROTECTED_RPC_MAX_WORDS] = {10, 20, 30, 40};
-    uint64_t reply_meta = UINT64_MAX;
-    assert(protected_rpc_blackparrot_server_test_dispatch(
-               &config, UINT64_C(0x5e1a), bp_rpc_request_meta(2), words,
-               &reply_meta)
-           == PROTECTED_RPC_OK);
-    assert(handler_calls == 1);
-    assert(seen_badge == UINT64_C(0x5e1a));
-    assert(seen_request.length == 2);
-    assert(seen_request.words[0] == 10 && seen_request.words[1] == 20);
-    assert(words[0] == 11 && words[1] == 22);
-    assert(words[2] == 0 && words[3] == 0);
-    assert(bp_rpc_reply_meta_valid(reply_meta));
-    assert(bp_rpc_reply_length(reply_meta) == 2);
-    assert(bp_rpc_reply_status(reply_meta) == PROTECTED_RPC_OK);
+    uint64_t words[PROTECTED_RPC_MAX_WORDS];
+    uint64_t reply_meta;
+    for (uint8_t length = 0; length <= PROTECTED_RPC_MAX_WORDS; length++) {
+        for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
+            words[word] = 10 * (word + 1);
+        }
+        reply_meta = UINT64_MAX;
+        assert(protected_rpc_blackparrot_server_test_dispatch(
+                   &config, UINT64_C(0x5e1a), bp_rpc_request_meta(length),
+                   words, &reply_meta)
+               == PROTECTED_RPC_OK);
+        assert(handler_calls == (unsigned)length + 1);
+        assert(seen_badge == UINT64_C(0x5e1a));
+        assert(seen_request.length == length);
+        assert(words[0] == (length >= 1 ? 11 : 1));
+        assert(words[1] == (length >= 2 ? 22 : 2));
+        assert(words[2] == 0 && words[3] == 0);
+        assert(bp_rpc_reply_meta_valid(reply_meta));
+        assert(bp_rpc_reply_length(reply_meta) == 2);
+        assert(bp_rpc_reply_status(reply_meta) == PROTECTED_RPC_OK);
+    }
 
     words[0] = words[1] = words[2] = words[3] = UINT64_MAX;
     reply_meta = UINT64_MAX;
     assert(protected_rpc_blackparrot_server_test_dispatch(
                &config, 7, UINT64_C(1) << 8, words, &reply_meta)
            == PROTECTED_RPC_INVALID_ARGUMENT);
-    assert(handler_calls == 1);
+    assert(handler_calls == PROTECTED_RPC_MAX_WORDS + 1);
     for (size_t word = 0; word < PROTECTED_RPC_MAX_WORDS; word++) {
         assert(words[word] == 0);
     }
