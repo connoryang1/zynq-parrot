@@ -29,6 +29,14 @@ throughput and the largest hardware/coroutine ratio, so it is the selected
 “most advantageous” point. N=10 is a useful full-capacity stress case but is
 slightly past the throughput optimum.
 
+A later same-model scheduler diagnostic shows that the roughly 98-cycle
+coroutine floor belongs primarily to this control's checked ten-entry circular
+queue, not to coroutine suspension itself. Power-of-two head/tail scheduling
+reaches 76.5 cycles/node and direct symmetric transfer reaches 63.8; at N=5
+both restore the original coroutine-over-batch ordering. These diagnostic
+variants are retained under `coroutine-scheduler-diagnostic/` and do not replace
+the complete accepted table above until one receives a full sweep and trace.
+
 Original rejected sweep:
 
 | Queries | Worker mode 2 | Coroutine mode 6 | Coroutine / worker |
