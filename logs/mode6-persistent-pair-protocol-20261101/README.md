@@ -150,3 +150,38 @@ statuses are under `futex-total-physical/`. This is the direct performance
 number for the current best candidate on the synthetic persistent futex pair.
 It remains neither a general Linux context-switch claim nor application
 throughput evidence.
+
+## Final manual table iteration
+
+The two v1 entries absent from both RL-090 disabled traces were replaced by
+common early lines `0x80a12500` (`irqentry_nmi_exit`) and `0x802980c0`
+(`__riscv_sys_futex`). The earlier common `0x80203280` line was deliberately
+excluded because it lies in freed-init or alias-prone space. V2 retains 14 of
+16 v1 entries, keeps capacity and trigger timing unchanged, and reduces rather
+than increases duplicate cache-set occupancy.
+
+V2 NBF `0068529a...a817` passes the same 17,024-record OpenSBI splice,
+1,861,857-record exact Linux/DTB payload check, CSR scan, and six focused
+packaging tests. Four fresh boots form opposite-order v1/v2 pairs with exact
+identities and complete terminal gates. The first pair favors v2 by 115.5
+cycles: 18,635 versus 18,750.5. The reverse pair regresses by 286.5 cycles:
+18,784 versus 18,497.5. Pooled v2 is 73 cycles slower at 18,683.5 versus
+18,610.5, a 0.39% regression.
+
+The mean replicate v2-minus-v1 median difference is +85.5 cycles. Its IID
+interval is `[-136.5,355.25]`, with only 21.862% of resamples favoring v2; its
+circular ten-handoff block interval is `[-125.75,328]`, with 21.505% favoring
+v2. The result fails the predeclared replacement gate. V1 remains accepted,
+and manual fixed-table membership tuning is closed: covering two more stable
+demand lines did not improve latency.
+
+One prelaunch post-power-cycle check found that the remotely staged v2 NBF had
+changed hash without a local change. No control process was launched. The
+known-bad remote file and failed partial upload were deleted, the exact local
+image was atomically restaged and checked twice, and only then did the v2 arm
+run. The older remote current-table image removed for staging remains
+recoverable from exact local and committed evidence.
+
+V2 policy, header, build summaries, deterministic logs/statuses, and strict
+analysis are retained beside v1 evidence as `futex-prefix16-v2-*`,
+`futex-v2-physical/`, and `futex-v2-table-ab-results.json`.

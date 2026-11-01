@@ -1,0 +1,39 @@
+{
+  "purpose": "Replace the final two v1 entries absent from both exact-candidate disabled traces with stable early common privileged lines, without changing table capacity.",
+  "fixed_shared_prefix": {
+    "policy": "retain all 14 v1 entries demanded by both candidate-NBF disabled traces; replace only the two entries absent from both traces, excluding the earlier freed-init alias",
+    "line_count": 16,
+    "lines": [
+      {"rank": 0, "paddr": 2158049344, "cache_set": 33, "source": "retained v1"},
+      {"rank": 1, "paddr": 2149869568, "cache_set": 32, "source": "retained v1"},
+      {"rank": 2, "paddr": 2149869632, "cache_set": 33, "source": "retained v1"},
+      {"rank": 3, "paddr": 2158043648, "cache_set": 8, "source": "retained v1"},
+      {"rank": 4, "paddr": 2158043776, "cache_set": 10, "source": "retained v1"},
+      {"rank": 5, "paddr": 2150203392, "cache_set": 0, "source": "retained v1"},
+      {"rank": 6, "paddr": 2150203456, "cache_set": 1, "source": "retained v1"},
+      {"rank": 7, "paddr": 2158044416, "cache_set": 20, "source": "irqentry_nmi_exit line, common at relative cycles 483 and 470"},
+      {"rank": 8, "paddr": 2149840960, "cache_set": 33, "source": "retained v1"},
+      {"rank": 9, "paddr": 2158049856, "cache_set": 41, "source": "retained v1"},
+      {"rank": 10, "paddr": 2158049920, "cache_set": 42, "source": "retained v1"},
+      {"rank": 11, "paddr": 2158050368, "cache_set": 49, "source": "retained v1"},
+      {"rank": 12, "paddr": 2158049984, "cache_set": 43, "source": "retained v1"},
+      {"rank": 13, "paddr": 2150203584, "cache_set": 3, "source": "__riscv_sys_futex line, common at relative cycles 721 and 708"},
+      {"rank": 14, "paddr": 2149803904, "cache_set": 30, "source": "retained v1"},
+      {"rank": 15, "paddr": 2150203648, "cache_set": 4, "source": "retained v1"}
+    ]
+  },
+  "replaced_lines": [
+    2149840768,
+    2149594304
+  ],
+  "excluded_earlier_common_line": {
+    "paddr": 2149593728,
+    "reason": "0x80203280 lies in freed-init or alias-prone space and is not a robust privileged replay target"
+  },
+  "guardrails": {
+    "capacity_unchanged": true,
+    "trigger_unchanged": true,
+    "required_comparison": "opposite-order fresh-boot persistent-pair A/B against accepted futex v1",
+    "rejection_rule": "reject unless the replicate-level improvement over v1 resolves"
+  }
+}

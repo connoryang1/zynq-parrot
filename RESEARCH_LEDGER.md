@@ -878,6 +878,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Interpretation:** 2.68% is a direct matched A/B and supersedes any attempt to add RL-088's 1.76% to RL-089's 1.63%. It applies only to a pinned persistent futex pair and does not establish general context-switch or application throughput benefit.
 - **Evidence and guardrails:** `futex-total-ab-results.json`, deterministic gzip logs, statuses, and hashes are under `logs/mode6-persistent-pair-protocol-20261101/`. The analysis hashes to `5650efa8...e8c3`. The enabled/disabled analyzer now fails closed on transfer identity as well as NBF/ELF/control identity; all 96 Linux Python tests pass.
 
+### RL-091 — Final fixed-table coverage expansion is rejected
+
+- **Status:** accepted replicated FPGA negative result; manual fixed-membership tuning closed
+- **Candidate:** v2 retains the 14 v1 lines demanded by both RL-090 disabled traces and replaces only unused `0x8023f780`/`0x802034c0` with common early `0x80a12500` (`irqentry_nmi_exit`) and `0x802980c0` (`__riscv_sys_futex`). It excludes freed-init/alias-prone `0x80203280`, keeps 16 entries and mode-6 timing, and does not add cache-set duplication.
+- **Image correctness:** NBF `0068529a...a817` changes 17,024 OpenSBI records and preserves all 1,861,857 Linux/DTB records from v1 byte-for-byte. Firmware CSR scan, exact payload comparison, and six splice/timer tests pass.
+- **Physical result:** four fresh boots form opposite-order v1/v2 pairs with exact identities and full PASS gates. V1-then-v2 medians are 18,750.5/18,635, favoring v2 by 115.5 cycles. V2-then-v1 medians are 18,784/18,497.5, regressing v2 by 286.5. Pooled v2 is 18,683.5 versus v1 at 18,610.5, a +73-cycle or 0.39% regression.
+- **Intervals and decision:** the mean replicate v2-minus-v1 median difference is +85.5 cycles. IID `[-136.5,355.25]` and circular-block `[-125.75,328]` intervals cross zero; only 21.862% and 21.505% of resamples favor v2. V2 fails the predeclared gate, v1 remains accepted, and additional manual demand-coverage substitutions are not justified.
+- **Workflow evidence:** a post-power-cycle hash gate caught remote v2 NBF corruption before launch. After deleting only the corrupt destination and failed partial upload, atomic restaging and a second exact hash check passed. No result used the corrupt file. Exact policy/build artifacts, deterministic transcripts, statuses, and `futex-v2-table-ab-results.json` are retained under `logs/mode6-persistent-pair-protocol-20261101/`; analysis SHA-256 is `9b2965b8...a477e`.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -948,7 +957,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures the accepted candidate at a resolved 509.5-cycle/2.68% pooled reduction versus disabled. Two of 16 candidate entries remain unused in both new disabled traces. Perform one final same-capacity replacement using stable early common lines, rejecting it unless an opposite-order table comparison improves the replicate-level estimand; then stop manual fixed-table tuning and derive a workload-independent training/ranking policy before changing capacity or trigger timing.
+For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures accepted v1 at a resolved 509.5-cycle/2.68% pooled reduction versus disabled. RL-091 proves that replacing its final two unused entries with stable early common demand lines does not improve latency, so manual fixed-table membership tuning is exhausted. The next productive direction is a workload-independent training/ranking policy evaluated across different handoff paths or applications; do not increase capacity or alter trigger timing until that policy shows transfer beyond the synthetic futex pair.
 
 ## Delta log
 
