@@ -84,6 +84,11 @@ def benchmark_command(group, timing, footprint, policy="normal",
     )
 
 
+def elf_hash_command():
+    """Use BusyBox directly so an absent applet symlink cannot skip the gate."""
+    return f"/bin/busybox sha256sum {GUEST_ELF}"
+
+
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -166,7 +171,10 @@ def run(args):
             for command in args.transfer.read_text().splitlines():
                 child.sendline(command)
                 child.expect(SHELL_PROMPT, timeout=60)
-            child.sendline(f"sha256sum {GUEST_ELF}")
+            # Invoke the applet through the required BusyBox binary. One
+            # otherwise healthy boot lacked the optional /usr/bin symlink,
+            # and waiting for a hash that could never print wasted the arm.
+            child.sendline(elf_hash_command())
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
             child.expect(SHELL_PROMPT)
             for group, timing in selected_cells(

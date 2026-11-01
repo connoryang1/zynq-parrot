@@ -10,6 +10,7 @@ from run_scheduler_physical_preview_sweep import (
     benchmark_command,
     cell_exit_pattern,
     cell_plan,
+    elf_hash_command,
     parse_args,
     selected_cells,
     validate_args,
@@ -17,6 +18,13 @@ from run_scheduler_physical_preview_sweep import (
 
 
 class CellPlanTest(unittest.TestCase):
+    def test_elf_identity_gate_uses_required_busybox_binary(self):
+        self.assertEqual(
+            elf_hash_command(),
+            "/bin/busybox sha256sum "
+            "/tmp/scheduler_physical_preview_benchmark_dynamic",
+        )
+
     def test_board_runner_defaults_to_isolated_replay_arms(self):
         args = parse_args(["image.nbf", "transfer.sh", "1" * 64, "run.log"])
         self.assertEqual(args.replay_state, "isolated")

@@ -67,3 +67,9 @@ rep2 disabled: 6cf358ff2125e9865eb576447d638b79d1ea9b623a80a8e8bba5d88754fa36b6 
 ```
 
 The board was left in the untrusted post-guest-shutdown state after the final arm. Any follow-up must begin with physical recovery. The next useful discriminator is a fresh opposite-order current-table versus futex-v1 comparison on this exact pipe protocol: it tests whether manual futex specialization sacrifices the now-resolved pipe throughput effect.
+
+## Table-comparison preparation failure
+
+The first fresh current-table arm for the follow-up reached a guest shell, reconstructed the exact ELF, and then reported `sha256sum: not found`; the benchmark never launched and no sample exists. The same NBF normally exposes `/usr/bin/sha256sum`, and the rootfs archive contains both that link and `/bin/busybox`. The exact cause of the missing link in this boot is unconfirmed. The rejected transcript/status are retained as `rejected-table-rep1-current-missing-sha-link.log.gz`; after the runner's bounded 300-second identity wait, the session was closed and the board requires full recovery.
+
+The identity gate now invokes `/bin/busybox sha256sum` directly. This preserves the expected digest/output while depending only on the BusyBox binary that provides the running guest shell, not the optional applet link. Focused and complete runner tests must pass before the unchanged table arm is retried.
