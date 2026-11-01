@@ -362,6 +362,26 @@ software implementation to optimize against. The accepted NBF is
 `0d90d7bf...1e99b`; normalized evidence is in
 [`results/sel4test-rpc-notification-fpga.log`](results/sel4test-rpc-notification-fpga.log).
 
+A timestamped physical run separates transport from useful work using
+BlackParrot's core-wide `0xCC0` counter at handler entry and exit. Warm median
+pre/service/post costs are 13/2,779/8 cycles in-process, 232/2,766/159 through
+hardware RPC, 1,363/2,847/1,317 through ordinary endpoint IPC, and
+3,708/2,847/3,718 through notifications. Thus hardware's two transitions and
+wrappers cost 391 cycles around a 2,766-cycle service, versus 2,680 cycles
+around the ordinary-IPC service. Relative to the direct 21-cycle wrapper, the
+hardware path removes 86.1% of ordinary IPC's transport premium and completes
+the whole call only 1.13x slower than direct execution. Component arrays are
+sorted independently, so their medians need not sum exactly to the separately
+sorted total median. Normalized evidence is in
+[`results/sel4test-rpc-components-fpga.log`](results/sel4test-rpc-components-fpga.log).
+
+The initial component image hung because the separately compiled stripped
+server did not include seL4's generated platform configuration and emitted
+`rdcycle`; the clean hardware server intentionally has no permission for that
+architectural counter. The service now includes `<sel4/config.h>` explicitly,
+and the NBF packager rejects a BlackParrot server containing `rdcycle` or fewer
+than two `0xCC0` reads.
+
 The host must provide the pinned checkout's Python packages plus CMake, Ninja,
 and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
 the qualified BlackParrot OpenSBI platform with:

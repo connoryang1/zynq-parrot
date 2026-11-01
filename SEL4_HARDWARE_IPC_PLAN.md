@@ -309,20 +309,23 @@ operations instead of using seL4's endpoint Call/ReplyRecv handoff. The
 eight-call AUTO fallback remains separate because its failed hardware probe is
 intentional extra work.
 
-Component decomposition is in progress. The instrumented handler returns
-entry/exit timestamps in the two previously unused reply words, and the
-focused full-core regression passes four-word return plus a protected-server
-read of BlackParrot's core-wide physical cycle CSR `0xCC0`. Do not use
-architectural `rdcycle` inside the clean hardware server: descriptor
-construction deliberately clears `scounteren`, so that instruction traps and
-version 1 has no server-fault continuation. The first physical attempt proved
-that failure mode. A later attempt is also rejected because another board user
-replaced the staged bitstream before launch, producing an expected missing-CSR
-signature. Deployment now shares one board lock across staging, overlay load,
-and launch and pins the bitstream hash again at the launch boundary; that final
-check caught a second external replacement before any target ran. A clean
-physical component run on the pinned `ca4a6c...31040` bitstream remains
-required before component numbers are reported.
+Component decomposition is accepted on the pinned `ca4a6c...31040` FPGA
+bitstream. Warm median pre/service/post costs are 13/2,779/8 cycles in-process,
+232/2,766/159 through hardware RPC, 1,363/2,847/1,317 through ordinary seL4
+IPC, and 3,708/2,847/3,718 through notifications. Hardware reduces ordinary
+IPC's transport premium over direct execution by 86.1%; its complete 3,157
+cycle median is 1.13x direct, 1.75x faster than ordinary IPC, and 3.26x faster
+than notifications in this run. See RL-066 and
+`sel4/results/sel4test-rpc-components-fpga.log`.
+
+The first image trapped because the standalone server did not include seL4's
+generated platform configuration and emitted `rdcycle`; clean descriptor
+construction deliberately clears `scounteren`, and version 1 has no
+server-fault continuation. The service now includes the configuration
+explicitly, and packaging rejects any BlackParrot server containing `rdcycle`
+or fewer than two `0xCC0` reads. Deployment also shares one board lock across
+staging, overlay load, and launch and pins the bitstream hash again at launch;
+this caught an external replacement before target execution.
 
 ### Stage 6 — Generalization
 

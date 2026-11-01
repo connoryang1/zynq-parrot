@@ -611,6 +611,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** shared memory does not remove the scheduling cost. The notification protocol decomposes each RPC into separate `Signal` and `Wait` operations on both sides, while ordinary endpoint IPC uses the optimized `Call`/`ReplyRecv` request/reply handoff. Notification IPC is therefore retained as a negative baseline, not selected as the software transport.
 - **Limits:** the measurement does not decompose individual syscall, scheduling, mailbox, or cache costs, so the mechanism explanation is architectural rather than cycle-attributed. It tests a synchronous single-client protocol; notifications may remain appropriate for asynchronous event coalescing, which is outside this RPC comparison.
 
+### RL-066 — Physical timestamps isolate seL4 RPC transport cost
+
+- **Status:** accepted exact-topology FPGA component decomposition
+- **Scope:** the RL-065 bounded-search workload and four transports, 64 warm samples per path, four-word replies carrying handler-entry/exit timestamps, and BlackParrot's core-wide `0xCC0` counter across contexts
+- **Claim:** warm median pre/service/post costs are 13/2,779/8 cycles in-process, 232/2,766/159 for hardware RPC, 1,363/2,847/1,317 for ordinary seL4 IPC, and 3,708/2,847/3,718 for notifications. Hardware's 391-cycle wrapper/transition cost is 2,289 cycles below ordinary IPC's 2,680 and removes 86.1% of ordinary IPC's premium over the direct 21-cycle wrapper. Complete-call medians are 2,800/3,157/5,527/10,280 cycles, so hardware is 1.13x direct, 1.75x faster than ordinary IPC, and 3.26x faster than notifications in this run.
+- **Evidence:** `sel4/results/sel4test-rpc-components-fpga.log`; physical UART SHA-256 `048cae1949473e35f4a13da108613f03f3b76dbefe5f7aba679300f159030ede`; corrected NBF `529293a0f285ed8e5114c5cdaf9e393f3f3802216bc61728c2a9f4ae56e8efd4`; server ELF `a70e9f8666345fb66aa067160ab60f2ce2c1a6d28830971e1d759fd28d7a2c0b`; unchanged bitstream `ca4a6cbd9afd8a4f10064eeb6142dba514dec1c766b595836be099a135331040`. The strict checker accepts all component rows plus the original correctness/cache gates.
+- **Meaning:** the hardware path is near direct execution because useful service work is identical and dominates its total; the remaining hardware premium is two protected transitions and thin wrappers, not a hidden multi-thousand-cycle service change. Ordinary endpoint IPC spends nearly as many cycles entering and returning as it does in the handler, while the weaker notification protocol spends more than twice the handler time outside it.
+- **Limits:** entry/exit timestamps bracket the handler, so pre/post combine wrappers with transitions rather than identifying individual microarchitectural stages. Component arrays and total arrays are sorted independently and their medians need not sum exactly. This is a warm single-client resident-server workload; cold component attribution, queues, faults, preemption, and multiple clients remain outside the result.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

@@ -23,6 +23,7 @@ base_firmware=${OPENSBI_BASE_FIRMWARE:-}
 nbf_tool=${NBF_TOOL:-$project_root/import/black-parrot/bp_common/software/py/nbf.py}
 overlay="$project_root/linux-tests/opensbi-platform/blackparrot"
 elfloader="$sel4_build/elfloader/elfloader"
+rpc_server="$sel4_build/apps/sel4test-driver/sel4test-tests/sel4-rpc-server"
 dtb="$sel4_build/kernel/kernel.dtb"
 
 if [ "${NBF_DEBUG:-0}" != 0 ]; then
@@ -31,6 +32,7 @@ if [ "${NBF_DEBUG:-0}" != 0 ]; then
 fi
 test -x "${sel4_cross_prefix}objcopy" || { echo "missing ${sel4_cross_prefix}objcopy" >&2; exit 1; }
 test -x "${sel4_cross_prefix}readelf" || { echo "missing ${sel4_cross_prefix}readelf" >&2; exit 1; }
+test -x "${sel4_cross_prefix}objdump" || { echo "missing ${sel4_cross_prefix}objdump" >&2; exit 1; }
 if [ -z "$base_firmware" ]; then
     test -x "${opensbi_cross_prefix}gcc" || { echo "missing ${opensbi_cross_prefix}gcc" >&2; exit 1; }
 else
@@ -39,8 +41,23 @@ else
 fi
 test -f "$nbf_tool" || { echo "missing NBF tool: $nbf_tool" >&2; exit 1; }
 test -f "$elfloader" || { echo "missing seL4 elfloader: $elfloader" >&2; exit 1; }
+test -f "$rpc_server" || { echo "missing seL4 RPC server: $rpc_server" >&2; exit 1; }
 test -f "$dtb" || { echo "missing seL4 DTB: $dtb" >&2; exit 1; }
 test "$(git -C "$opensbi_repo" rev-parse "$opensbi_revision^{commit}")" = "$opensbi_revision"
+
+# The dedicated server is a separate translation unit from the driver. If it
+# misses seL4's generated platform configuration, its timestamp helper silently
+# compiles to rdcycle; the clean protected-server CSR image then traps with no
+# version-1 fault continuation. Reject that image before it can be packaged.
+rpc_server_disassembly=$("${sel4_cross_prefix}objdump" -d "$rpc_server")
+rpc_global_cycle_reads=$(printf '%s\n' "$rpc_server_disassembly" |
+    grep -c '0xcc0' || true)
+rpc_arch_cycle_reads=$(printf '%s\n' "$rpc_server_disassembly" |
+    grep -c '[[:space:]]rdcycle[[:space:]]' || true)
+if [ "$rpc_global_cycle_reads" -lt 2 ] || [ "$rpc_arch_cycle_reads" -ne 0 ]; then
+    echo "RPC server has wrong cycle-counter instructions: global=$rpc_global_cycle_reads architectural=$rpc_arch_cycle_reads" >&2
+    exit 1
+fi
 
 mkdir -p "$work_dir"
 work_dir=$(realpath "$work_dir")

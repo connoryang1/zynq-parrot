@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <string.h>
+#include <sel4/config.h>
 
 #include "sel4_rpc_search_service.h"
 
