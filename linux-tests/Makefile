@@ -499,4 +499,5 @@ check-harness:
 	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py test_icache_prefix.py \
 	  test_scheduler_physical_preview_sweep.py \
 	  test_analyze_scheduler_physical_preview_fixed_ab.py \
+	  test_analyze_scheduler_physical_preview_table_ab.py \
 	  test_run_cache_miss_trace_capture.py test_analyze_persistent_preview_ab.py
