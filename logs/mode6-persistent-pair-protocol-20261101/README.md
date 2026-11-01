@@ -67,3 +67,56 @@ rep2 disabled gzip/status: b39a8b885739f7caace18389367ee4f9d9bdfe9a7cb2d809de1d6
 rep2 enabled gzip/status:  abc97ed020334ea4aab1ae27cf82899d898cc2bb5612799c4bb1ad2998371391 / 0ee579af5b506b9127bb851d77fc277e37f4cdf338c0c4f56743d65c26414636
 analysis:                   d5a80284cf392a4461fd6dc2d02caad52d58ab0648a3473d18b5fdce0681d049
 ```
+
+## Same-capacity futex-specific table
+
+The bounded follow-up kept the 16-entry capacity, mode-6 wake trigger, routed
+RTL, Linux payload, benchmark, and control program unchanged. It retained all
+11 current-table entries demanded by either replay-disabled futex trace and
+replaced only the five entries absent from both traces with common early
+trap/futex lines. The exact policy is in `futex-prefix16-candidate.json` and the
+generated header is in `futex-prefix16-header.h`.
+
+The candidate NBF is SHA-256 `93b2e29d...8629`. Its strict splice uses 17,024
+candidate OpenSBI records below `0x80200000` and preserves all 1,861,857
+Linux/DTB records byte-for-byte from accepted mode-6 NBF `5e42c2f6...5d2bd`.
+The firmware forbidden-CSR scan passes, the timer patch reports one exact DTB
+write, and all six focused splice/timer tests pass. The complete Linux test
+suite passes all 96 discovered tests.
+
+Four independent fresh boots form opposite-order current/candidate pairs.
+Every accepted arm has the exact NBF, transfer, ELF, control-program, and
+bitstream hashes; 201 consecutively numbered samples; wake-trigger mode on
+both tasks; final capture; runner exit zero; and CORE/BSG PASS. Sample one is
+discarded, leaving 400 samples per table. The first current-table boot stalled
+at Linux guest time 1.591 seconds before a shell and is rejected; a complete
+power-cycle/readiness/overlay recovery preceded its unchanged accepted retry.
+
+The current-then-candidate pair measures 18,735 versus 18,727.5 cycles, a
+7.5-cycle candidate improvement. The reverse pair measures 18,997 versus
+18,397.5 cycles, a 599.5-cycle improvement. Pooled medians are 18,908.5
+current and 18,600 candidate, a **308.5-cycle or 1.63% reduction**. The
+replicate-stratified candidate-minus-current estimate is -303.5 cycles; its
+100,000-sample IID interval is `[-577.75,-53.75]`, and its circular ten-handoff
+block interval is `[-554.75,-71.75]`. Both resolve below zero, so the candidate
+passes the predeclared replacement gate. Pooled median I requests fall from
+188 to 183; neither enabled table's configured lines appear as demand in its
+final capture.
+
+Several failed preparation attempts changed no accepted artifact. The first
+source tree came from the similarly named `/home/jhumphri` SDK and the strict
+splicer rejected a noncontiguous donor. Copying the exact `/home/coyang` source
+but compiling it with the other GCC still produced a larger, differently
+aligned `.text`; using the Buildroot-wrapped compiler recorded by the accepted
+ELF restored `.text` size `0x15368` and the valid 17,024-record partition. One
+missing compiler path, one repository-root Python import-path invocation, and
+one diagnostic Python 3.8 f-string failed before acceptance. Remote staging
+also filled the board filesystem; only the failed partial upload and an old
+debug NBF with two local copies were removed. A wrong local transfer path was
+rejected before board launch.
+
+The retained strict analysis is `futex-candidate-table-ab-results.json`; the
+deterministic gzip transcripts and adjacent statuses are under
+`futex-candidate-physical/`. This comparison establishes a better table, not
+its total speedup versus replay disabled. A fresh opposite-order candidate
+enabled/disabled comparison is the next measurement.

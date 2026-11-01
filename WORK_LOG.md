@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Futex-specific replay table improves the FPGA best case — 2026-11-01:** replacing only five unused entries in the 16-line mode-6 table reduces pooled persistent-handoff medians from 18,908.5 to 18,600 cycles, a further 308.5-cycle or 1.63% gain; IID `[-577.75,-53.75]` and circular-block `[-554.75,-71.75]` intervals both favor the candidate. Exact NBF splicing preserves all 1,861,857 Linux/DTB records, median I requests fall from 188 to 183, and all 96 Linux tests pass (`logs/mode6-persistent-pair-protocol-20261101/`, RL-089).
+
 - **Current mode-6 persistent replay yields a resolved FPGA gain — 2026-11-01:** four fresh-boot arms in opposite order measure pooled medians of 18,955 enabled and 19,295.5 disabled, a 340.5-cycle or 1.76% reduction; IID `[-851,-58]` and circular-block `[-525.5,-85]` intervals both favor replay. Enabled final traces demand none of the configured lines while disabled traces demand 9/11, proving the persistent-buffer mechanism and identifying five unused pipe-specific slots (`logs/mode6-persistent-pair-protocol-20261101/`, RL-088).
 
 - **Selection-time control assigns regression to cold replay epoch — 2026-11-01:** the exact isolated mode-5 FPGA matrix also completes 4,096 trials and measures `-942.5 [-1746.75,913]` wake-to-load plus `-7514.5 [-9101.5,-4552.5]` roundtrip saved cycles. Direct mode 6 minus mode 5 is unresolved at every endpoint, so earlier wake timing is not the cause; forced clear/refill is the shared failing policy (`logs/replay-arm-isolation-20261101/`, RL-087).

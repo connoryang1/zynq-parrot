@@ -1,0 +1,38 @@
+{
+  "purpose": "Replace five pipe-trained lines absent from both persistent futex diagnostics with stable early trap and futex lines, without changing table capacity.",
+  "fixed_shared_prefix": {
+    "policy": "retain all current entries demanded by either disabled futex trace; replace only the five never-demanded entries with the first five stable privileged lines present in both traces after excluding freed-init/user aliases",
+    "line_count": 16,
+    "lines": [
+      {"rank": 0, "paddr": 2158049344, "cache_set": 33, "source": "retained"},
+      {"rank": 1, "paddr": 2149869568, "cache_set": 32, "source": "retained"},
+      {"rank": 2, "paddr": 2149869632, "cache_set": 33, "source": "retained"},
+      {"rank": 3, "paddr": 2158043648, "cache_set": 8, "source": "do_trap_break line, common"},
+      {"rank": 4, "paddr": 2158043776, "cache_set": 10, "source": "do_trap_ecall_u line, common"},
+      {"rank": 5, "paddr": 2150203392, "cache_set": 0, "source": "do_futex line, common"},
+      {"rank": 6, "paddr": 2150203456, "cache_set": 1, "source": "__riscv_sys_futex line zero, common"},
+      {"rank": 7, "paddr": 2149840768, "cache_set": 30, "source": "retained"},
+      {"rank": 8, "paddr": 2149840960, "cache_set": 33, "source": "retained"},
+      {"rank": 9, "paddr": 2158049856, "cache_set": 41, "source": "retained"},
+      {"rank": 10, "paddr": 2158049920, "cache_set": 42, "source": "retained"},
+      {"rank": 11, "paddr": 2158050368, "cache_set": 49, "source": "retained"},
+      {"rank": 12, "paddr": 2158049984, "cache_set": 43, "source": "retained"},
+      {"rank": 13, "paddr": 2149594304, "cache_set": 19, "source": "retained"},
+      {"rank": 14, "paddr": 2149803904, "cache_set": 30, "source": "retained"},
+      {"rank": 15, "paddr": 2150203648, "cache_set": 4, "source": "__riscv_sys_futex line one, common"}
+    ]
+  },
+  "replaced_lines": [
+    2149870016,
+    2149870272,
+    2149870336,
+    2149870400,
+    2149926400
+  ],
+  "guardrails": {
+    "capacity_unchanged": true,
+    "trigger_unchanged": true,
+    "required_comparison": "opposite-order fresh-boot persistent-pair A/B against the accepted current table",
+    "rejection_rule": "reject unless the replicate-level improvement over the accepted current-table estimand resolves"
+  }
+}
