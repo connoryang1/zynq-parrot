@@ -310,13 +310,16 @@ eight-call AUTO fallback remains separate because its failed hardware probe is
 intentional extra work.
 
 Component decomposition is accepted on the pinned `ca4a6c...31040` FPGA
-bitstream. Warm median pre/service/post costs are 13/2,779/8 cycles in-process,
-232/2,766/159 through hardware RPC, 1,363/2,847/1,317 through ordinary seL4
-IPC, and 3,708/2,847/3,718 through notifications. Hardware reduces ordinary
-IPC's transport premium over direct execution by 86.1%; its complete 3,157
-cycle median is 1.13x direct, 1.75x faster than ordinary IPC, and 3.26x faster
-than notifications in this run. See RL-066 and
-`sel4/results/sel4test-rpc-components-fpga.log`.
+bitstream. The current common-dispatch image has warm median pre/service/post
+costs of 13/2,884/8 cycles in-process, 342/2,874/171 through hardware RPC,
+1,412/2,977/1,304 through ordinary seL4 IPC, and 3,848/2,954/3,729 through
+notifications. Hardware reduces ordinary IPC's transport premium over direct
+execution by 81.7%; its complete 3,387-cycle median is 1.17x direct, 1.68x
+faster than ordinary IPC, and 3.11x faster than notifications. See RL-067 and
+`sel4/results/sel4test-rpc-common-dispatch-fpga.log`. RL-066 and
+`sel4/results/sel4test-rpc-components-fpga.log` retain the historical
+pre-dispatch 3,157-cycle hardware result rather than representing the current
+public interface.
 
 The first image trapped because the standalone server did not include seL4's
 generated platform configuration and emitted `rdcycle`; clean descriptor

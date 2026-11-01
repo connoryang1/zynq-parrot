@@ -224,9 +224,9 @@ non-MCS implementation; a general facility should use a first-class binding
 capability.
 
 The kernel, real backend, wrapper, and end-to-end test compile and link in a
-fresh pinned BlackParrot image. That is build evidence only: a passing hardware
-test marker and measured software/hardware rows are still required before the
-kernel binding is considered accepted.
+fresh pinned BlackParrot image. The focused route, shared-page service, and
+common-dispatch variants also pass on the routed PYNQ-Z2; the exact normalized
+evidence and limitations are recorded below.
 
 ## BlackParrot platform bring-up
 
@@ -391,6 +391,22 @@ the whole call only 1.13x slower than direct execution. Component arrays are
 sorted independently, so their medians need not sum exactly to the separately
 sorted total median. Normalized evidence is in
 [`results/sel4test-rpc-components-fpga.log`](results/sel4test-rpc-components-fpga.log).
+
+Those numbers predate the final common server boundary. In the current image,
+ordinary endpoint IPC, protected hardware entry, and notifications all invoke
+`protected_rpc_dispatch()`, which validates the trusted server configuration
+and request, supplies the authenticated caller badge, clears the reply, and
+canonicalizes malformed handler output. The current warm total medians are
+2,905/3,387/5,696/10,541 cycles for
+in-process/hardware/software/notification, and pre/service/post medians are
+13/2,884/8, 342/2,874/171, 1,412/2,977/1,304, and 3,848/2,954/3,729.
+Hardware therefore remains 1.68x faster than ordinary IPC and removes 81.7%
+of its transport premium over direct execution. The validation cost is
+visible: hardware pre/post increased from 232/159 to 342/171 cycles rather
+than being attributed to useful service work. Current-interface evidence is
+in
+[`results/sel4test-rpc-common-dispatch-fpga.log`](results/sel4test-rpc-common-dispatch-fpga.log);
+the preceding component file remains the historical pre-dispatch result.
 
 The initial component image hung because the separately compiled stripped
 server did not include seL4's generated platform configuration and emitted
