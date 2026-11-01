@@ -267,7 +267,11 @@ entry instead of OpenSBI's default address, avoiding an otherwise redundant
 self-relocation in the slow core model. It also defaults to OpenSBI's
 no-boot-prints option because character-at-a-time firmware diagnostics consume
 several model minutes; set `OPENSBI_FW_OPTIONS=0` when those diagnostics are
-needed. Its output is deterministic for fixed inputs.
+needed. Its output is deterministic for fixed inputs. If the OpenSBI cross
+compiler is unavailable, `OPENSBI_BASE_FIRMWARE=/path/to/fw_payload.elf` reuses
+a previously qualified firmware container whose `.payload` address matches the
+new elfloader. The packager replaces only that section, extracts it again, and
+requires byte equality before generating the NBF.
 
 The simulation NBF loader stages guest DRAM again after configuration writes
 because the low BlackParrot unfreeze address aliases guest DRAM through the
