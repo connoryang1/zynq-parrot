@@ -2,48 +2,16 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sel4/sel4.h>
 
 #include "blackparrot_rpc_abi.h"
 #include "protected_rpc.h"
+#include "sel4_rpc_search_service.h"
 
-#define SERVER_SOFTWARE_CALLS 8
+#define SERVER_SOFTWARE_CALLS SEL4_RPC_SEARCH_SOFTWARE_REQUESTS
 
 static protected_rpc_region_binding_t server_region;
 static protected_rpc_server_config_t server_config;
-
-static protected_rpc_status_t bounded_search_service(
-    const protected_rpc_call_context_t *context,
-    const protected_rpc_message_t *request,
-    protected_rpc_message_t *reply,
-    void *cookie)
-{
-    (void)cookie;
-    protected_rpc_buffer_ref_t ref;
-    protected_rpc_buffer_view_t view;
-    if (request->length != 4
-        || !protected_rpc_decode_buffer(request, 0, &ref)
-        || request->words[3] > UINT8_MAX) {
-        return PROTECTED_RPC_INVALID_ARGUMENT;
-    }
-    protected_rpc_status_t status = protected_rpc_resolve_buffer(
-        context, ref, PROTECTED_RPC_ACCESS_READ, &view);
-    if (status != PROTECTED_RPC_OK) {
-        return status;
-    }
-
-    const unsigned char *bytes = view.data;
-    const unsigned char *match = memchr(
-        bytes, (int)request->words[3], (size_t)view.length);
-    const unsigned char *terminator = memchr(bytes, 0, (size_t)view.length);
-    reply->length = 2;
-    reply->words[0] = match == NULL ? view.length
-                                    : (uint64_t)(match - bytes);
-    reply->words[1] = terminator == NULL ? view.length
-                                         : (uint64_t)(terminator - bytes);
-    return PROTECTED_RPC_OK;
-}
 
 static void __attribute__((noreturn, noinline, used, aligned(64)))
 hardware_search_entry(uint64_t word0, uint64_t word1, uint64_t word2,
@@ -104,7 +72,7 @@ int main(int argc, char **argv)
         .access = PROTECTED_RPC_ACCESS_READ,
     };
     server_config = (protected_rpc_server_config_t) {
-        .handler = bounded_search_service,
+        .handler = sel4_rpc_bounded_search_service,
         .regions = &server_region,
         .region_count = 1,
         .max_requests = SERVER_SOFTWARE_CALLS,

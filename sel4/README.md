@@ -306,12 +306,16 @@ match and NUL offsets. Before the valid bind, the FPGA test proves that the
 kernel rejects a different physical page, a write-permission escalation, and
 an unmapped runtime-state pointer.
 
-On the PYNQ-Z2, 256 hardware calls take 856,789 cycles (3,346/call), while
-eight automatic software fallbacks take 52,886 cycles (6,610/call): a 1.98x
-end-to-end advantage and about 3,264 cycles saved per call. The smaller ratio
-than the scalar gate is expected because roughly 3,000 cycles of page scanning
-are common service work, not IPC overhead. The routed bitstream is unchanged;
-the final NBF SHA-256 is `b7d5b486...ac0ae`. QEMU separately validates the
+On the PYNQ-Z2, the matched warm averages are 2,953 cycles for a direct call to
+the handler, 3,339 for hardware RPC, and 5,530 for forced ordinary seL4 IPC.
+Hardware therefore adds 386 cycles over the useful handler, versus 2,577 for
+ordinary IPC, and is 1.66x faster end to end. Eight automatic fallbacks average
+6,607 cycles because they include the precise failed hardware probe before
+ordinary IPC; that row remains a correctness gate rather than the primary
+software baseline. The smaller application ratio than the scalar gate is
+expected because nearly 3,000 cycles of page scanning are common service work.
+The routed bitstream is unchanged; the final NBF SHA-256 is
+`fcacce5d...c784a`. QEMU separately validates the
 dedicated server, shared mapping, handler, and software transport. Normalized
 evidence is retained in
 [`results/sel4test-rpc-shared-search-fpga.log`](results/sel4test-rpc-shared-search-fpga.log)

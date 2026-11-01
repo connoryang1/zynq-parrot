@@ -22,6 +22,8 @@ log=$1
 marker='Test SEL4IPCRPC0002 passed'
 hardware_re='^SEL4_RPC_ADAPTER path=hardware calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 software_re='^SEL4_RPC_ADAPTER path=software-fallback calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
+direct_re='^SEL4_RPC_ADAPTER path=in-process calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
+ipc_re='^SEL4_RPC_ADAPTER path=software calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 
 test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 
@@ -33,6 +35,8 @@ bsg_pass_count=0
 bsg_fail_count=0
 workload_count=0
 guard_count=0
+direct_count=0
+ipc_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -52,6 +56,16 @@ while IFS= read -r line; do
         software_calls=${BASH_REMATCH[1]}
         software_total=${BASH_REMATCH[2]}
         software_per_call=${BASH_REMATCH[3]}
+    elif [[ $line =~ $direct_re ]]; then
+        direct_count=$((direct_count + 1))
+        direct_calls=${BASH_REMATCH[1]}
+        direct_total=${BASH_REMATCH[2]}
+        direct_per_call=${BASH_REMATCH[3]}
+    elif [[ $line =~ $ipc_re ]]; then
+        ipc_count=$((ipc_count + 1))
+        ipc_calls=${BASH_REMATCH[1]}
+        ipc_total=${BASH_REMATCH[2]}
+        ipc_per_call=${BASH_REMATCH[3]}
     fi
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
@@ -77,9 +91,21 @@ if ((hardware_total == 0 || software_total == 0
     echo "invalid RPC cycle accounting" >&2
     exit 1
 fi
-if ((shared_buffer)) && ((workload_count != 1 || guard_count != 1)); then
-    echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count" >&2
-    exit 1
+if ((shared_buffer)); then
+    if ((workload_count != 1 || guard_count != 1
+         || direct_count != 1 || ipc_count != 1)); then
+        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count" >&2
+        exit 1
+    fi
+    if ((direct_calls != 256 || ipc_calls != 256
+         || direct_total == 0 || ipc_total == 0
+         || direct_per_call != direct_total / direct_calls
+         || ipc_per_call != ipc_total / ipc_calls
+         || direct_per_call >= hardware_per_call
+         || hardware_per_call >= ipc_per_call)); then
+        echo "invalid matched-path cycle accounting" >&2
+        exit 1
+    fi
 fi
 if ((physical)) && ((core_pass_count != 1 || bsg_pass_count != 1 || bsg_fail_count != 0)); then
     echo "invalid physical completion: core_pass=$core_pass_count bsg_pass=$bsg_pass_count bsg_fail=$bsg_fail_count" >&2
@@ -88,3 +114,7 @@ fi
 
 printf 'accepted seL4 RPC gate: hardware=%s cycles/call software-fallback=%s cycles/call\n' \
     "$hardware_per_call" "$software_per_call"
+if ((shared_buffer)); then
+    printf 'matched warm paths: in-process=%s hardware=%s software=%s cycles/call\n' \
+        "$direct_per_call" "$hardware_per_call" "$ipc_per_call"
+fi

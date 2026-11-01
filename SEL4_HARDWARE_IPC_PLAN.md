@@ -232,8 +232,9 @@ Current checkpoint (2026-11-01): this gate passes in full-core simulation and
 on the routed PYNQ-Z2 endpoint. The focused physical run measures 374 cycles
 per hardware call versus 3,217 cycles per automatic post-unbind fallback and
 passes the complete three-test suite plus clean host termination. See RL-063 and
-`sel4/results/sel4test-rpc-only-blackparrot-fpga.log`. Stage 5's matched real
-service workload remains the next paper-facing gate.
+`sel4/results/sel4test-rpc-only-blackparrot-fpga.log`. RL-064 now completes
+Stage 5's first matched real-service gate; cold/tail distributions and a
+notification comparison remain.
 
 #### Initial kernel binding shape
 
@@ -294,6 +295,13 @@ were measured on the same processor.
 Acceptance: correctness and security gates pass before performance is reported;
 the software and hardware IPC paths use matched inputs, outputs, mappings, and
 timing boundaries.
+
+Current checkpoint (2026-11-01): one shared-page musl service passes QEMU and
+the PYNQ-Z2. Matched warm averages are 2,953 cycles in-process, 3,339 through
+hardware RPC, and 5,530 through forced ordinary seL4 IPC. The next evaluation
+step is per-call cold/warm distribution and tail measurement; the eight-call
+AUTO fallback remains separate because its failed hardware probe is intentional
+extra work.
 
 ### Stage 6 — Generalization
 

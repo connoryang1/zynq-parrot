@@ -51,8 +51,10 @@ uart_log="$build_dir/physical-uart.log"
 printf '%s\r\r\n' \
     'SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied' \
     'SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024' \
-    'SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=95978 cycles_per_call=374' \
-    'SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=25493 cycles_per_call=3186' \
+    'SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=760832 cycles_per_call=2972' \
+    'SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=856576 cycles_per_call=3346' \
+    'SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1664000 cycles_per_call=6500' \
+    'SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=52880 cycles_per_call=6610' \
     'Test SEL4IPCRPC0002 passed' \
     'halting...INFO:    CORE PASS' \
     'INFO:    BSG PASS' > "$uart_log"

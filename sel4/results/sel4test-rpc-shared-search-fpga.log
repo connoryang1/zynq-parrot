@@ -1,17 +1,19 @@
 SEL4_RPC_EVIDENCE platform=pynq-z2 workload=libc-bounded-search date=2026-11-01
 SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied
 SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024
-SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=856789 cycles_per_call=3346
-SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=52886 cycles_per_call=6610
+SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=756136 cycles_per_call=2953
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=854979 cycles_per_call=3339
+SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1415740 cycles_per_call=5530
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=52860 cycles_per_call=6607
 Test SEL4IPCRPC0002 passed
 Test suite passed. 3 tests passed. 0 tests disabled.
 INFO: CORE PASS
 INFO: BSG PASS
 SEL4_RPC_ARTIFACT bitstream_sha256=ca4a6cbd9afd8a4f10064eeb6142dba514dec1c766b595836be099a135331040
-SEL4_RPC_ARTIFACT nbf_sha256=b7d5b4866589cedfd12f769c59a9f90e071038830fb247c1a6597187395ac0ae
-SEL4_RPC_ARTIFACT elfloader_sha256=c221352526188ceec57bd85b0b0d9210c2650022b23173a20e64699132cc9c8a
+SEL4_RPC_ARTIFACT nbf_sha256=fcacce5d2545a4a0000f6aa2730072f37ec1f3b9c6eada7cc735c587bedc784a
+SEL4_RPC_ARTIFACT elfloader_sha256=57b94f6265e533f7ff14ee3682599f9416f2acded7921ca1ca7f3df07a6d37cc
 SEL4_RPC_ARTIFACT kernel_sha256=ee9d2164e89a735c9ea7f153a3d331bc46dd55053dea7c652bc255e2f7300723
-SEL4_RPC_ARTIFACT raw_uart_sha256=c6ffb44228c7a4983dba9303c232598250618ce9765ca3720a2e363d3d2cc5d1
+SEL4_RPC_ARTIFACT raw_uart_sha256=1415c7e9f89c72d8cdd99c6efb9ba590d34c7c20e17eae38672f037fd4751867
 SEL4_RPC_ARTIFACT control_program_sha256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
-SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-shared-search-final-20261101T202307Z-1695187.log
+SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-stage5-matched-20261101T202749Z-1700171.log
 RUNNER_EXIT=0

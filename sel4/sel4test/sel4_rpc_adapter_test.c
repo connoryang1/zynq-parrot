@@ -13,6 +13,7 @@
 #include <vspace/vspace.h>
 
 #include "protected_rpc.h"
+#include "sel4_rpc_search_service.h"
 #ifdef CONFIG_PLAT_BLACKPARROT
 #include "protected_rpc_blackparrot.h"
 #endif
@@ -20,14 +21,15 @@
 
 #define ADAPTER_WARMUP_CALLS 8
 #define ADAPTER_MEASURED_CALLS 256
-#define ADAPTER_BP_SOFTWARE_CALLS 8
+#define ADAPTER_BP_SOFTWARE_CALLS SEL4_RPC_SEARCH_MEASURED_CALLS
+#define ADAPTER_BP_FALLBACK_CALLS SEL4_RPC_SEARCH_FALLBACK_CALLS
 #define ADAPTER_VALID_CALLS (ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS)
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
 #define ADAPTER_REGION_TOKEN UINT64_C(0xa11ce001)
 #define ADAPTER_BP_SERVER_IMAGE "sel4-rpc-server"
 #define ADAPTER_BP_SERVER_ARGS 4
-#define ADAPTER_SEARCH_BYTES 1024u
-#define ADAPTER_SEARCH_NEEDLE ((seL4_Word)'z')
+#define ADAPTER_SEARCH_BYTES SEL4_RPC_SEARCH_BYTES
+#define ADAPTER_SEARCH_NEEDLE ((seL4_Word)SEL4_RPC_SEARCH_NEEDLE)
 
 static volatile seL4_Word adapter_server_private_counter;
 
@@ -254,6 +256,65 @@ static int test_blackparrot_hardware_binding(env_t env)
     seL4_Yield();
 
     const protected_rpc_endpoint_t rpc_endpoint = {.opaque = endpoint};
+    protected_rpc_message_t request = {0};
+    const protected_rpc_buffer_ref_t search_ref = {
+        .region = {.opaque = ADAPTER_REGION_TOKEN},
+        .offset = 0,
+        .length = ADAPTER_SEARCH_BYTES,
+    };
+    test_assert(protected_rpc_encode_buffer(&request, 0, search_ref));
+    request.words[3] = ADAPTER_SEARCH_NEEDLE;
+    request.length = 4;
+
+    const protected_rpc_region_binding_t local_region = {
+        .region = {.opaque = ADAPTER_REGION_TOKEN},
+        .local_base = shared_base,
+        .size = BIT(seL4_PageBits),
+        .access = PROTECTED_RPC_ACCESS_READ,
+    };
+    const protected_rpc_server_config_t local_config = {
+        .handler = sel4_rpc_bounded_search_service,
+        .regions = &local_region,
+        .region_count = 1,
+    };
+    const protected_rpc_call_context_t local_context = {
+        .runtime_private = (void *)&local_config,
+    };
+    protected_rpc_message_t local_reply = {0};
+    uint64_t direct_start = 0;
+    for (seL4_Word call = 0;
+         call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
+        if (call == ADAPTER_WARMUP_CALLS) {
+            direct_start = read_cycles();
+        }
+        test_eq(sel4_rpc_bounded_search_service(
+                    &local_context, &request, &local_reply, NULL),
+                PROTECTED_RPC_OK);
+        test_eq(local_reply.length, 2);
+        test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    const uint64_t direct_elapsed = read_cycles() - direct_start;
+
+    const protected_rpc_call_options_t software = {
+        .route = PROTECTED_RPC_ROUTE_SOFTWARE,
+    };
+    protected_rpc_call_result_t result;
+    uint64_t software_start = 0;
+    for (seL4_Word call = 0;
+         call < ADAPTER_WARMUP_CALLS + ADAPTER_BP_SOFTWARE_CALLS; call++) {
+        if (call == ADAPTER_WARMUP_CALLS) {
+            software_start = read_cycles();
+        }
+        test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
+                PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    const uint64_t software_elapsed = read_cycles() - software_start;
+
     const protected_rpc_blackparrot_binding_t binding = {
         .server_tcb = server.thread.tcb.cptr,
         .server_entry = hardware_entry,
@@ -302,18 +363,12 @@ static int test_blackparrot_hardware_binding(env_t env)
     const protected_rpc_call_options_t hardware = {
         .route = PROTECTED_RPC_ROUTE_HARDWARE,
     };
-    protected_rpc_message_t request = {0};
-    const protected_rpc_buffer_ref_t search_ref = {
-        .region = {.opaque = ADAPTER_REGION_TOKEN},
-        .offset = 0,
-        .length = ADAPTER_SEARCH_BYTES,
-    };
-    test_assert(protected_rpc_encode_buffer(&request, 0, search_ref));
-    request.words[3] = ADAPTER_SEARCH_NEEDLE;
-    request.length = 4;
-    protected_rpc_call_result_t result;
-    uint64_t start = read_cycles();
-    for (seL4_Word call = 0; call < ADAPTER_MEASURED_CALLS; call++) {
+    uint64_t hardware_start = 0;
+    for (seL4_Word call = 0;
+         call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
+        if (call == ADAPTER_WARMUP_CALLS) {
+            hardware_start = read_cycles();
+        }
         protected_rpc_status_t call_status = protected_rpc_call(
             rpc_endpoint, &request, &hardware, &result);
         test_eq(call_status, PROTECTED_RPC_OK);
@@ -331,7 +386,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-    const uint64_t elapsed = read_cycles() - start;
+    const uint64_t hardware_elapsed = read_cycles() - hardware_start;
 
     test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
 
@@ -340,8 +395,8 @@ static int test_blackparrot_hardware_binding(env_t env)
     const protected_rpc_call_options_t fallback = {
         .route = PROTECTED_RPC_ROUTE_AUTO,
     };
-    const uint64_t software_start = read_cycles();
-    for (seL4_Word call = 0; call < ADAPTER_BP_SOFTWARE_CALLS; call++) {
+    const uint64_t fallback_start = read_cycles();
+    for (seL4_Word call = 0; call < ADAPTER_BP_FALLBACK_CALLS; call++) {
         test_eq(protected_rpc_call(rpc_endpoint, &request, &fallback, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
@@ -349,7 +404,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-    const uint64_t software_elapsed = read_cycles() - software_start;
+    const uint64_t fallback_elapsed = read_cycles() - fallback_start;
     seL4_MessageInfo_t finished = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(finished), PROTECTED_RPC_OK);
     test_eq(seL4_MessageInfo_get_length(finished), 0);
@@ -358,14 +413,22 @@ static int test_blackparrot_hardware_binding(env_t env)
                        &control_endpoint);
     printf("SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=%u\n",
            ADAPTER_SEARCH_BYTES);
+    printf("SEL4_RPC_ADAPTER path=in-process calls=%u total_cycles=%" PRIu64
+           " cycles_per_call=%" PRIu64 "\n",
+           ADAPTER_MEASURED_CALLS, direct_elapsed,
+           direct_elapsed / ADAPTER_MEASURED_CALLS);
     printf("SEL4_RPC_ADAPTER path=hardware calls=%u total_cycles=%" PRIu64
            " cycles_per_call=%" PRIu64 "\n",
-           ADAPTER_MEASURED_CALLS, elapsed,
-           elapsed / ADAPTER_MEASURED_CALLS);
-    printf("SEL4_RPC_ADAPTER path=software-fallback calls=%u total_cycles=%" PRIu64
+           ADAPTER_MEASURED_CALLS, hardware_elapsed,
+           hardware_elapsed / ADAPTER_MEASURED_CALLS);
+    printf("SEL4_RPC_ADAPTER path=software calls=%u total_cycles=%" PRIu64
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_BP_SOFTWARE_CALLS, software_elapsed,
            software_elapsed / ADAPTER_BP_SOFTWARE_CALLS);
+    printf("SEL4_RPC_ADAPTER path=software-fallback calls=%u total_cycles=%" PRIu64
+           " cycles_per_call=%" PRIu64 "\n",
+           ADAPTER_BP_FALLBACK_CALLS, fallback_elapsed,
+           fallback_elapsed / ADAPTER_BP_FALLBACK_CALLS);
     return 0;
 }
 #endif
@@ -473,8 +536,16 @@ static int test_dedicated_search_server_software(env_t env)
     request.words[3] = ADAPTER_SEARCH_NEEDLE;
     request.length = 4;
     protected_rpc_call_result_t result;
-    const uint64_t start = read_cycles();
-    for (seL4_Word call = 0; call < ADAPTER_BP_SOFTWARE_CALLS; call++) {
+    uint64_t start = 0;
+    uint64_t elapsed = 0;
+    for (seL4_Word call = 0;
+         call < SEL4_RPC_SEARCH_SOFTWARE_REQUESTS; call++) {
+        if (call == ADAPTER_WARMUP_CALLS) {
+            start = read_cycles();
+        } else if (call == ADAPTER_WARMUP_CALLS
+                           + ADAPTER_BP_SOFTWARE_CALLS) {
+            elapsed = read_cycles() - start;
+        }
         test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
@@ -482,7 +553,6 @@ static int test_dedicated_search_server_software(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-    const uint64_t elapsed = read_cycles() - start;
 
     seL4_MessageInfo_t finished = seL4_Recv(control_endpoint.cptr, &badge);
     test_eq(seL4_MessageInfo_get_label(finished), PROTECTED_RPC_OK);
