@@ -321,6 +321,15 @@ faster than ordinary IPC, and 3.11x faster than notifications. See RL-067 and
 pre-dispatch 3,157-cycle hardware result rather than representing the current
 public interface.
 
+The subsequent trusted-runtime checkpoint physically verifies that the
+application no longer owns BlackParrot request decoding, installed-register
+access, or protected return. With nonzero caller badge 24090 authenticated on
+both transports, warm medians are 2,925/3,448/5,479/10,612 cycles for
+direct/hardware/software/notification. Hardware remains 1.59x faster than
+ordinary IPC and removes 78.7% of its transport premium over the direct
+wrapper. See RL-068 and
+`sel4/results/sel4test-rpc-trusted-runtime-fpga.log`.
+
 The first image trapped because the standalone server did not include seL4's
 generated platform configuration and emitted `rdcycle`; clean descriptor
 construction deliberately clears `scounteren`, and version 1 has no

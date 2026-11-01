@@ -400,7 +400,8 @@ sorted independently, so their medians need not sum exactly to the separately
 sorted total median. Normalized evidence is in
 [`results/sel4test-rpc-components-fpga.log`](results/sel4test-rpc-components-fpga.log).
 
-Those numbers predate the final common server boundary. In the current image,
+Those numbers predate the final common server boundary. In the first
+common-dispatch image,
 ordinary endpoint IPC, protected hardware entry, and notifications all invoke
 `protected_rpc_dispatch()`, which validates the trusted server configuration
 and request, supplies the authenticated caller badge, clears the reply, and
@@ -415,6 +416,21 @@ than being attributed to useful service work. Current-interface evidence is
 in
 [`results/sel4test-rpc-common-dispatch-fpga.log`](results/sel4test-rpc-common-dispatch-fpga.log);
 the preceding component file remains the historical pre-dispatch result.
+
+The current trusted-runtime image additionally moves BlackParrot request
+metadata decoding, installed `s1`/`tp` state, reply metadata, and the sole
+`preturn` instruction out of the service executable. The application supplies
+only the same transport-neutral handler and region configuration used by the
+ordinary seL4 path. Its physical run verifies kernel-derived caller badge
+24090 through both software and hardware paths and reports warm medians of
+2,925/3,448/5,479/10,612 cycles for
+in-process/hardware/software/notification. The corresponding pre/service/post
+medians are 15/2,901/9, 363/2,902/183, 1,302/3,002/1,176, and
+3,864/3,000/3,737. Hardware is 1.59x faster than ordinary IPC and removes
+78.7% of its transport premium over the direct wrapper. L1D-cold and
+L1D+L2-cold hardware medians are 4,884 and 5,748 cycles, versus 10,106 and
+9,792 for ordinary IPC. The retained evidence is
+[`results/sel4test-rpc-trusted-runtime-fpga.log`](results/sel4test-rpc-trusted-runtime-fpga.log).
 
 The initial component image hung because the separately compiled stripped
 server did not include seL4's generated platform configuration and emitted
