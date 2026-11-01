@@ -120,6 +120,27 @@ class SweepAnalyzerTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "control: incomplete sweep"):
                 compare([control], [candidate], samples=10)
 
+    def test_late_only_comparison_accepts_complete_late_matrix(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            control = root / "control-late.log"
+            candidate = root / "candidate-late.log"
+            control.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=10)
+                for group in range(8)
+            ))
+            candidate.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=30)
+                for group in range(8)
+            ))
+            result = compare(
+                [control], [candidate], samples=100, timings=("late",)
+            )
+        self.assertEqual(set(result["timings"]), {"late"})
+        metric = result["timings"]["late"]["load_cycles"]
+        self.assertEqual(metric["candidate_minus_control_saved_cycles"], 20.0)
+        self.assertEqual(metric["candidate_minus_control_95pct_ci"], [20.0, 20.0])
+
     def test_replication_pool_preserves_boot_and_group_strata(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

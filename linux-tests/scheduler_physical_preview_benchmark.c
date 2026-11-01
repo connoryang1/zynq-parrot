@@ -13,6 +13,7 @@
  * instruction-only A/B without changing the kernel or losing hook counting.
  */
 #include <stdint.h>
+#include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -174,14 +175,15 @@ int main(int argc, char **argv)
 	unsigned group = 0;
 	unsigned enable_mode = 2;
 	int hot_proxy = 0;
+	int fifo = 0;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 4) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late] [target|hot-proxy]\n",
+	if (argc > 5) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late] [target|hot-proxy] [normal|fifo]\n",
 			argv[0]);
 		return 2;
 	}
@@ -202,7 +204,7 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	if (argc == 4) {
+	if (argc >= 4) {
 		if (!strcmp(argv[3], "hot-proxy"))
 			hot_proxy = 1;
 		else if (strcmp(argv[3], "target")) {
@@ -210,10 +212,28 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s\n",
+	if (argc >= 5) {
+		if (!strcmp(argv[4], "fifo"))
+			fifo = 1;
+		else if (strcmp(argv[4], "normal")) {
+			fprintf(stderr, "invalid scheduling policy: %s\n", argv[4]);
+			return 2;
+		}
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s\n",
 	       group, group * 4 * line_bytes, lines,
 	       enable_mode == 1 ? "early" : "late", enable_mode,
-	       hot_proxy ? "hot-proxy" : "target");
+	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal");
+
+	if (fifo) {
+		const struct sched_param parameter = {.sched_priority = 1};
+
+		/* Both processes inherit equal-priority FIFO policy across fork. They
+		 * alternate only at blocking pipe operations, removing normal-policy
+		 * timeslice phase from this best-case mechanism experiment. */
+		if (sched_setscheduler(0, SCHED_FIFO, &parameter))
+			fail("sched_setscheduler FIFO");
+	}
 
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");

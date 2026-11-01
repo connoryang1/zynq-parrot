@@ -28,7 +28,7 @@ def read_transcript(path):
     return path.read_text(errors="replace")
 
 
-def load_cells(paths, label):
+def load_cells(paths, label, expected_cells=EXPECTED_CELLS):
     """Require one complete, board-passing matrix and retain its raw rows."""
     cells = {}
     board_text = ""
@@ -39,9 +39,9 @@ def load_cells(paths, label):
             if key in cells:
                 raise ValueError(f"{label}: duplicate timing/group cell: {key}")
             cells[key] = rows
-    if set(cells) != EXPECTED_CELLS:
-        missing = sorted(EXPECTED_CELLS - set(cells))
-        extra = sorted(set(cells) - EXPECTED_CELLS)
+    if set(cells) != expected_cells:
+        missing = sorted(expected_cells - set(cells))
+        extra = sorted(set(cells) - expected_cells)
         raise ValueError(
             f"{label}: incomplete sweep; missing={missing}, extra={extra}"
         )
@@ -60,13 +60,15 @@ def resampled_median(blocks_by_group, rng):
     return statistics.median(values)
 
 
-def compare(control_paths, candidate_paths, samples=20000):
+def compare(control_paths, candidate_paths, samples=20000,
+            timings=("early", "late")):
     """Return candidate-minus-control differences between same-boot effects."""
-    control = load_cells(control_paths, "control")
-    candidate = load_cells(candidate_paths, "candidate")
+    expected = {(timing, group) for timing in timings for group in range(8)}
+    control = load_cells(control_paths, "control", expected)
+    candidate = load_cells(candidate_paths, "candidate", expected)
     rng = random.Random(0x1_CA_C4_E)
     output = {"bootstrap_samples": samples, "timings": {}}
-    for timing in ("early", "late"):
+    for timing in timings:
         output["timings"][timing] = {}
         for metric in METRICS:
             control_blocks = {
@@ -106,12 +108,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--control", nargs="+", required=True, type=Path)
     parser.add_argument("--candidate", nargs="+", required=True, type=Path)
+    parser.add_argument("--timing", choices=("early", "late"),
+                        help="compare one predeclared timing instead of both")
     parser.add_argument("--samples", type=int, default=20000)
     args = parser.parse_args()
     if args.samples <= 0:
         parser.error("bootstrap samples must be positive")
     try:
-        result = compare(args.control, args.candidate, args.samples)
+        timings = (args.timing,) if args.timing else ("early", "late")
+        result = compare(args.control, args.candidate, args.samples, timings)
     except ValueError as error:
         raise SystemExit(str(error)) from error
     print(json.dumps(result, indent=2))

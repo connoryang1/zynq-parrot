@@ -47,11 +47,15 @@ def cell_exit_pattern(group, timing):
     )
 
 
-def benchmark_command(group, timing, footprint):
+def benchmark_command(group, timing, footprint, policy="normal"):
     """Build the guest command while preserving the historical default CLI."""
-    footprint_arg = "" if footprint == "target" else f" {footprint}"
+    guest_args = f"{group} {timing}"
+    if footprint != "target" or policy != "normal":
+        guest_args += f" {footprint}"
+    if policy != "normal":
+        guest_args += f" {policy}"
     return (
-        f"{GUEST_ELF} {group} {timing}{footprint_arg}; "
+        f"{GUEST_ELF} {guest_args}; "
         f"rc=$?; echo PHYSICAL_CELL_EXIT group={group} "
         f"timing={timing} rc=$rc"
     )
@@ -72,6 +76,8 @@ def parse_args(argv=None):
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
     parser.add_argument("--footprint", choices=("target", "hot-proxy"),
                         default="target")
+    parser.add_argument("--policy", choices=("normal", "fifo"),
+                        default="normal")
     parser.add_argument("--only-timing", choices=("early", "late"))
     parser.add_argument("--start-cell", type=int, default=0,
                         help="zero-based cell-plan index for a recovered suffix run")
@@ -106,6 +112,7 @@ def run(args):
         "transfer_sha256": sha256(args.transfer),
         "elf_sha256": args.elf_sha256,
         "footprint": args.footprint,
+        "policy": args.policy,
         "cells": [f"{group}:{timing}"
                   for group, timing in selected_cells(
                       args.start_cell, args.only_timing)],
@@ -131,7 +138,9 @@ def run(args):
             child.expect(SHELL_PROMPT)
             for group, timing in selected_cells(
                     args.start_cell, args.only_timing):
-                child.sendline(benchmark_command(group, timing, args.footprint))
+                child.sendline(benchmark_command(
+                    group, timing, args.footprint, args.policy
+                ))
                 child.expect(cell_exit_pattern(group, timing), timeout=900)
                 rc = int(child.match.group(1))
                 if rc:

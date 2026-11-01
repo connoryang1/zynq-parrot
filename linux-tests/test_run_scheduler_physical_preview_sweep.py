@@ -22,6 +22,12 @@ class CellPlanTest(unittest.TestCase):
         self.assertIn(" 2 early; rc=$?", target)
         self.assertIn(" 2 early hot-proxy; rc=$?", proxy)
 
+    def test_fifo_policy_materializes_footprint_argument(self):
+        target = benchmark_command(2, "early", "target", "fifo")
+        proxy = benchmark_command(2, "early", "hot-proxy", "fifo")
+        self.assertIn(" 2 early target fifo; rc=$?", target)
+        self.assertIn(" 2 early hot-proxy fifo; rc=$?", proxy)
+
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))
@@ -79,6 +85,7 @@ class CellPlanTest(unittest.TestCase):
                 control_sha256="2" * 64,
                 runtime_ms=100,
                 footprint="target",
+                policy="normal",
                 only_timing=None,
                 start_cell=0,
                 log=root / "missing" / "run.log",

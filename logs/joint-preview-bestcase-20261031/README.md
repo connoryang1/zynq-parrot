@@ -494,6 +494,47 @@ A lower-noise scheduling protocol or return-window miss trace is required.
 Raw failed boots, derived prefixes, recovered suffixes, status records, and
 all four analysis JSON files are retained under `physical-sweep/`.
 
+## Equal-priority FIFO mechanism control
+
+An optional `fifo` benchmark argument calls `sched_setscheduler(...,
+SCHED_FIFO, priority 1)` before `fork`, so the parent and child inherit equal
+real-time priority and alternate through blocking pipe operations. This is a
+best-case noise-control workload, not a representative Linux scheduling
+policy. The matching runner option is `--policy fifo`. The rebuilt ELF is
+`7fdf6c6b...a423`; its transfer is `c1efef0a...7dcc` and reconstructs exactly.
+
+A one-cell group-7 feasibility run completed with zero rejected attempts and
+final runner/CORE/BSG PASS. Two predeclared prefix-12 eight-group replications
+then completed in one boot each with three and zero rejected preemptions,
+respectively. Both include 4,096 ordered base rows, 4,096 exact tail rows, and
+final PASS markers. Prefix pooling SHA-256 `eb70b642...a789` gives:
+
+- wake-to-entry: `-490 [-581.25,-336]` cycles saved;
+- target loads: `0 [-0.5,0]`;
+- wake-to-load: `-482.25 [-585.5,-331]`;
+- roundtrip: `-393 [-694.5,-45.5]`.
+
+Negative saved cycles mean the enabled arm is slower. Tail pooling SHA-256
+`3f45840b...3c07` leaves the exact combined post-load interval unresolved at
+`-8 [-291,181.25]`, while child bookkeeping is 10 `[7.5,12.5]` cycles slower.
+The resolved cost therefore appears before the child's first-use boundary.
+
+The exact count-zero image then completed all eight FIFO cells with zero
+retries. Its analysis SHA-256 `6a99b5c2...32e8` resolves `-439.75 [-514,-321]`
+wake-to-load and `-540.5 [-742.5,-219]` roundtrip cycles with zero target-load
+effect. Independent prefix-minus-count-zero comparisons hash to
+`6296aff3...9f49` and `560f2795...4d6`; their wake-to-load differences are
+`+6.25 [-222,314]` and `-61.25 [-238.25,121]`. Thus the approximately
+440--480-cycle first-resume cost is already present when the instruction table
+is empty. It belongs to the shared enabled path—the four hot dummy physical
+hints and scheduler hook—not to a resolved prefix-replay effect.
+
+The first count-zero invocation stopped before `control-program`: the serialized
+runner's remote SHA check found that the historical NBF had been removed. No
+guest launched. The failed prelaunch log/status are retained; the exact
+`5fe0d96f...969f` image was copied back, followed by remote `sync` and two
+matching SHA checks, before the accepted run.
+
 ## Pipe experiment workflow corrections
 
 During the later hot-proxy preparation, a combined build-and-test command ran

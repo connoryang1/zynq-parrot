@@ -594,6 +594,9 @@ It accepts plain or gzip-compressed transcripts, independently resamples the
 paired blocks within every cache-set stratum, and reports candidate-minus-
 control effect intervals. A resolved effect in one matrix and an unresolved
 effect in another is not by itself evidence that their effects differ.
+Use `--timing early|late` only for a predeclared complete eight-group
+single-timing matrix; without it the comparison continues to require all 16
+early/late cells.
 
 An optional third argument, `hot-proxy`, registers four eviction-buffer lines
 instead of the measured target ring and rereads them immediately before every
@@ -602,6 +605,11 @@ the scheduler hook and instruction-prefix trigger. Use the runner's matching
 `--footprint hot-proxy` option. This is an instruction-isolation proxy, not a
 literal instruction-only mode: the four physical hint commands still execute,
 so report and, where needed, trace their residual tag or miss traffic.
+An optional fourth argument, `fifo`, places the parent and child at equal
+`SCHED_FIFO` priority before `fork`; both then alternate only through blocking
+pipe operations. Use the runner's matching `--policy fifo` option only as a
+best-case noise-control experiment, and report it separately from the default
+normal Linux scheduling policy.
 
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
