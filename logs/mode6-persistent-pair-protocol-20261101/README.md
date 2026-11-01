@@ -185,3 +185,15 @@ recoverable from exact local and committed evidence.
 V2 policy, header, build summaries, deterministic logs/statuses, and strict
 analysis are retained beside v1 evidence as `futex-prefix16-v2-*`,
 `futex-v2-physical/`, and `futex-v2-table-ab-results.json`.
+
+## Prefix-14 shrink candidate
+
+The next bounded candidate removes v1 entries `0x8023f780` and `0x802034c0`,
+which were absent from both disabled futex traces, and compacts the 14 retained
+entries without adding v2's replacement traffic. This exact membership is in
+`futex-prefix14-shrink-candidate.json` and its generated source form is
+`futex-prefix14-shrink-header.h`. It is prepared but not built or measured; it
+has no performance or stability claim. Its gate is a strict opposite-order
+enabled/disabled comparison, with any terminal fault rejecting the candidate.
+The generator reproduced the retained header byte-for-byte. Candidate JSON and
+header SHA-256 values are `03a7ea38...e5b8e` and `af97662f...5b0d`.

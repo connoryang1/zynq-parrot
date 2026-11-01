@@ -1,0 +1,30 @@
+{
+  "purpose": "Test the accepted futex-v1 membership without the two lines absent from both disabled traces, avoiding v2's two unhelpful replacement requests.",
+  "fixed_shared_prefix": {
+    "policy": "retain the 14 futex-v1 entries demanded by both disabled traces; shrink capacity instead of replacing the two unused entries",
+    "line_count": 14,
+    "lines": [
+      {"rank": 0, "paddr": 2158049344, "cache_set": 33, "source": "futex-v1 retained"},
+      {"rank": 1, "paddr": 2149869568, "cache_set": 32, "source": "futex-v1 retained"},
+      {"rank": 2, "paddr": 2149869632, "cache_set": 33, "source": "futex-v1 retained"},
+      {"rank": 3, "paddr": 2158043648, "cache_set": 8, "source": "futex-v1 retained"},
+      {"rank": 4, "paddr": 2158043776, "cache_set": 10, "source": "futex-v1 retained"},
+      {"rank": 5, "paddr": 2150203392, "cache_set": 0, "source": "futex-v1 retained"},
+      {"rank": 6, "paddr": 2150203456, "cache_set": 1, "source": "futex-v1 retained"},
+      {"rank": 7, "paddr": 2149840960, "cache_set": 33, "source": "futex-v1 retained"},
+      {"rank": 8, "paddr": 2158049856, "cache_set": 41, "source": "futex-v1 retained"},
+      {"rank": 9, "paddr": 2158049920, "cache_set": 42, "source": "futex-v1 retained"},
+      {"rank": 10, "paddr": 2158050368, "cache_set": 49, "source": "futex-v1 retained"},
+      {"rank": 11, "paddr": 2158049984, "cache_set": 43, "source": "futex-v1 retained"},
+      {"rank": 12, "paddr": 2149803904, "cache_set": 30, "source": "futex-v1 retained"},
+      {"rank": 13, "paddr": 2150203648, "cache_set": 4, "source": "futex-v1 retained"}
+    ]
+  },
+  "removed_lines": [2149840768, 2149594304],
+  "guardrails": {
+    "capacity_reduced_from": 16,
+    "trigger_unchanged": true,
+    "required_comparison": "opposite-order fresh-boot prefix14 versus disabled, followed by prefix14 versus futex-v1 only if both are stable",
+    "rejection_rule": "reject on any strict terminal failure; do not infer improvement from unpaired medians"
+  }
+}
