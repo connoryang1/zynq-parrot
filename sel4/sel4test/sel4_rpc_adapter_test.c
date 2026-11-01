@@ -41,6 +41,7 @@ hardware_sum_entry(void)
         "1: j 1b\n"
         ".option pop\n");
 }
+#endif
 
 static inline uint64_t read_cycles(void)
 {
@@ -104,6 +105,7 @@ static int adapter_server(seL4_Word endpoint, seL4_Word shared_base,
         (protected_rpc_endpoint_t){.opaque = endpoint}, &config);
 }
 
+#ifdef CONFIG_PLAT_BLACKPARROT
 static protected_rpc_status_t sum_service(
     const protected_rpc_call_context_t *context,
     const protected_rpc_message_t *request,
@@ -165,8 +167,13 @@ static int test_blackparrot_hardware_binding(env_t env)
         .request_words = 4,
         .reply_words = 1,
     };
-    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &binding),
-            PROTECTED_RPC_OK);
+    protected_rpc_status_t bind_status = protected_rpc_blackparrot_bind(
+        rpc_endpoint, &binding);
+    test_eq(bind_status, PROTECTED_RPC_OK);
+    if (bind_status != PROTECTED_RPC_OK) {
+        /* A rejected bind cannot produce meaningful forced-hardware results. */
+        return sel4test_get_result();
+    }
 
     const protected_rpc_call_options_t hardware = {
         .route = PROTECTED_RPC_ROUTE_HARDWARE,

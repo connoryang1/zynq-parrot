@@ -133,21 +133,38 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
     tcb_t *caller = NODE_STATE(ksCurThread);
     tcb_t *server = TCB_PTR(cap_thread_cap_get_capTCBPtr(server_cap));
     tcb_queue_t queue = ep_ptr_get_queue(endpoint);
-    if (endpoint_ptr_get_state(endpoint) != EPState_Recv
-        || queue.head != server || queue.end != server
-        || thread_state_get_tsType(server->tcbState)
-           != ThreadState_BlockedOnReceive
-        || EP_PTR(thread_state_get_blockingObject(server->tcbState))
-           != endpoint) {
+    if (endpoint_ptr_get_state(endpoint) != EPState_Recv) {
+        userError("BlackParrot RPC bind: endpoint is not in receive state");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (queue.head != server || queue.end != server) {
+        userError("BlackParrot RPC bind: server is not the endpoint's sole receiver");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (thread_state_get_tsType(server->tcbState)
+        != ThreadState_BlockedOnReceive) {
+        userError("BlackParrot RPC bind: server is not blocked on receive");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (EP_PTR(thread_state_get_blockingObject(server->tcbState))
+        != endpoint) {
+        userError("BlackParrot RPC bind: server is blocked on another endpoint");
         return bp_rpc_error(seL4_IllegalOperation);
     }
 
     word_t caller_satp, server_satp;
     asid_t caller_asid, server_asid;
     pte_t *server_root;
-    if (!bp_rpc_tcb_satp(caller, &caller_satp, &caller_asid, NULL)
-        || !bp_rpc_tcb_satp(server, &server_satp, &server_asid, &server_root)
-        || caller_satp == server_satp) {
+    if (!bp_rpc_tcb_satp(caller, &caller_satp, &caller_asid, NULL)) {
+        userError("BlackParrot RPC bind: caller address space is invalid");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (!bp_rpc_tcb_satp(server, &server_satp, &server_asid, &server_root)) {
+        userError("BlackParrot RPC bind: server address space is invalid");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (caller_satp == server_satp) {
+        userError("BlackParrot RPC bind: caller and server address spaces are not distinct");
         return bp_rpc_error(seL4_IllegalOperation);
     }
 
@@ -193,6 +210,9 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
     bp_rpc_sbi_ret_t result = bp_rpc_sbi_call(
         BP_RPC_SBI_INSTALL, (word_t)&descriptor, 0);
     if (result.error != 0 || (word_t)result.value != descriptor.token) {
+        userError("BlackParrot RPC bind: firmware descriptor installation failed (error %ld, value %ld, token %llu)",
+                  result.error, result.value,
+                  (unsigned long long)descriptor.token);
         return bp_rpc_error(seL4_IllegalOperation);
     }
 

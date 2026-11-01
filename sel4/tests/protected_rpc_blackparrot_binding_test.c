@@ -16,9 +16,15 @@ static seL4_Word call_error;
 static uint64_t kernel_token;
 static uint64_t attached_token;
 static protected_rpc_endpoint_t attached_endpoint;
+static protected_rpc_status_t attach_status;
+static protected_rpc_status_t detach_status;
+static unsigned kernel_calls;
+static unsigned attach_calls;
+static unsigned detach_calls;
 
 seL4_MessageInfo_t seL4_Call(seL4_CPtr endpoint, seL4_MessageInfo_t info)
 {
+    kernel_calls++;
     called_endpoint = endpoint;
     called_info = info;
     if (seL4_MessageInfo_get_label(info) == BP_RPC_SEL4_BIND_LABEL
@@ -31,6 +37,10 @@ seL4_MessageInfo_t seL4_Call(seL4_CPtr endpoint, seL4_MessageInfo_t info)
 protected_rpc_status_t protected_rpc_blackparrot_attach(
     protected_rpc_endpoint_t endpoint, uint64_t token)
 {
+    attach_calls++;
+    if (attach_status != PROTECTED_RPC_OK) {
+        return attach_status;
+    }
     attached_endpoint = endpoint;
     attached_token = token;
     return PROTECTED_RPC_OK;
@@ -39,6 +49,10 @@ protected_rpc_status_t protected_rpc_blackparrot_attach(
 protected_rpc_status_t protected_rpc_blackparrot_detach(
     protected_rpc_endpoint_t endpoint)
 {
+    detach_calls++;
+    if (detach_status != PROTECTED_RPC_OK) {
+        return detach_status;
+    }
     assert(endpoint.opaque == attached_endpoint.opaque);
     attached_token = 0;
     return PROTECTED_RPC_OK;
@@ -52,6 +66,11 @@ static void reset(void)
     called_info.words[0] = 0;
     call_error = seL4_NoError;
     kernel_token = UINT64_C(0x123456789abcdef0);
+    attach_status = PROTECTED_RPC_OK;
+    detach_status = PROTECTED_RPC_OK;
+    kernel_calls = 0;
+    attach_calls = 0;
+    detach_calls = 0;
     attached_token = 0;
     attached_endpoint.opaque = 0;
 }
@@ -84,17 +103,40 @@ int main(void)
     assert(mock_sel4_mrs[4] == bp_rpc_sel4_counts(4, 2));
     assert(attached_endpoint.opaque == endpoint.opaque);
     assert(attached_token == kernel_token);
+    assert(kernel_calls == 1 && attach_calls == 1 && detach_calls == 0);
 
     assert(protected_rpc_blackparrot_unbind(endpoint) == PROTECTED_RPC_OK);
     assert(seL4_MessageInfo_get_label(called_info)
            == BP_RPC_SEL4_UNBIND_LABEL);
     assert(attached_token == 0);
+    assert(kernel_calls == 2 && attach_calls == 1 && detach_calls == 1);
 
     reset();
     call_error = seL4_IllegalOperation;
     assert(protected_rpc_blackparrot_bind(endpoint, &binding)
            == PROTECTED_RPC_DENIED);
     assert(attached_token == 0);
+    assert(kernel_calls == 1 && attach_calls == 0 && detach_calls == 0);
+
+    /* A local attach failure must revoke the descriptor just installed. */
+    reset();
+    attach_status = PROTECTED_RPC_BACKEND_ERROR;
+    assert(protected_rpc_blackparrot_bind(endpoint, &binding)
+           == PROTECTED_RPC_BACKEND_ERROR);
+    assert(seL4_MessageInfo_get_label(called_info)
+           == BP_RPC_SEL4_UNBIND_LABEL);
+    assert(kernel_calls == 2 && attach_calls == 1 && detach_calls == 0);
+    assert(attached_token == 0);
+
+    /* A rejected kernel unbind must leave the local association intact. */
+    reset();
+    assert(protected_rpc_blackparrot_bind(endpoint, &binding)
+           == PROTECTED_RPC_OK);
+    call_error = seL4_IllegalOperation;
+    assert(protected_rpc_blackparrot_unbind(endpoint)
+           == PROTECTED_RPC_DENIED);
+    assert(kernel_calls == 2 && attach_calls == 1 && detach_calls == 0);
+    assert(attached_token == kernel_token);
 
     reset();
     assert(protected_rpc_blackparrot_bind(endpoint, NULL)

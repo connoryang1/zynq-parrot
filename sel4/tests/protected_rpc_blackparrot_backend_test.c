@@ -88,6 +88,12 @@ int main(void)
     assert(arch_calls == 1 && software_calls == 0);
 
     options.route = PROTECTED_RPC_ROUTE_AUTO;
+    reset_arch(BP_RPC_OUTCOME_REVOKED, 0);
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_OK);
+    assert(arch_calls == 1 && software_calls == 1);
+    assert(result.path == PROTECTED_RPC_PATH_SOFTWARE);
+
     reset_arch(BP_RPC_OUTCOME_NOT_STARTED, 0);
     assert(protected_rpc_call(endpoint, &request, &options, &result)
            == PROTECTED_RPC_OK);

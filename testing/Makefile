@@ -312,4 +312,4 @@ help:
 	@$(foreach t,$(NONRESIDENT_TESTS),echo "  $(t)";)
 
 check-harness:
-	@python3 -m unittest discover -s $(TOP)/testing -p test_check_run.py
+	@python3 -m unittest discover -s $(TOP)/testing -p 'test_*.py'

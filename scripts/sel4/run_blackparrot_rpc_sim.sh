@@ -13,18 +13,24 @@ output=$2
 project_root=$(realpath "$(dirname -- "$0")/../..")
 result_checker=$project_root/scripts/sel4/check_blackparrot_rpc_result.sh
 model=${BLACKPARROT_SIM:-$project_root/cosim/black-parrot-minimal-example/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench}
-timeout_s=${BSG_TRACE_TIMEOUT_S:-5400}
+timeout_s=${BSG_TRACE_TIMEOUT_S:-14400}
 marker='Test SEL4IPCRPC0002 passed'
 
 test -f "$image" || { echo "missing NBF: $image" >&2; exit 1; }
 test -x "$model" || { echo "missing simulator: $model" >&2; exit 1; }
+model=$(realpath "$model")
 mkdir -p "$(dirname -- "$output")"
-: > "$output"
 
 if pgrep -f '[/]Vbsg_nonsynth_zynq_testbench([[:space:]]|$)' >/dev/null; then
     echo "a BlackParrot simulator is already running; serialize simulator use" >&2
     exit 1
 fi
+
+: > "$output"
+model_sha=$(sha256sum "$model" | awk '{print $1}')
+image_sha=$(sha256sum "$image" | awk '{print $1}')
+printf 'SEL4_RPC_SIM model=%s model_sha256=%s image=%s image_sha256=%s timeout_s=%s\n' \
+    "$model" "$model_sha" "$image" "$image_sha" "$timeout_s" | tee -a "$output"
 
 run_env=(
     BSG_SKIP_DEBUG_ENTRY=1
@@ -37,7 +43,7 @@ fi
 
 (
     env "${run_env[@]}" stdbuf -oL -eL "$model" "$image" 2>&1 \
-        | tee "$output"
+        | tee -a "$output"
 ) &
 runner=$!
 

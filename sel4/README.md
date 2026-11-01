@@ -229,12 +229,19 @@ links only the protected-RPC test into the child image, reduces the generic
 libc heap from 1 MiB to 64 KiB, and keeps kernel printing enabled in the
 otherwise optimized build. This removes unrelated full-suite load/zero work
 from the cycle-accurate boot while preserving the same RPC test and makes its
-exact pass marker observable. The RPC-only driver reserves a 1 MiB object and
-delegates a bounded 5 MiB pool (4 MiB plus 1 MiB), instead of exhaustively
-probing every object size. QEMU sweeps showed that 1, 2, 4, and 4.5 MiB child
-pools fail during CSpace or VSpace construction, while 5 MiB passes the full
-256-call test. This reduces retype/zero work from 32 MiB to 6 MiB without
-changing the test. The same mode
+exact pass marker observable. The RPC-only driver uses a 12-bit test-process
+CSpace (4,096 slots), a 10-bit private helper CSpace (1,024 slots), reserves
+512 KiB for itself, and delegates one bounded 4 MiB untyped, instead of using
+sel4test's generic 17-bit CSpaces and exhaustively probing every object size.
+A 17-bit seL4 CNode occupies 4 MiB because each capability slot is 32 bytes;
+the focused client/server test needs only a small, fixed set of capabilities.
+Keeping the helper CNode at 32 KiB also avoids requiring a second contiguous
+128 KiB allocation after the test process has fragmented its bounded pool. The
+previous 5 MiB child pool passed
+QEMU but still made the cycle-accurate model securely clear multiple
+multi-megabyte objects. The reduced configuration passes the unchanged
+256-call focused control under QEMU and cuts roughly 40 minutes from
+BlackParrot setup before test selection. The same mode
 suppresses the generic bootinfo/untyped inventory; the exact test verdict stays
 enabled, while character-at-a-time diagnostic output no longer dominates boot.
 
@@ -275,6 +282,12 @@ scripts/sel4/run_blackparrot_rpc_sim.sh sel4-rpc.nbf run.log
 ```
 
 `BLACKPARROT_SIM`, `ZP_INSTALL_DIR`, and `BSG_TRACE_TIMEOUT_S` override its
-model, runtime-library root, and default 90-minute guard respectively. The
+model, runtime-library root, and default four-hour guard respectively. The
 runner refuses to start while any BlackParrot testbench process is live, even
-when it comes from another worktree.
+when it comes from another worktree. It records the model and NBF paths and
+SHA-256 values before launch. A model override must implement the same
+descriptor-control ABI as the packaged OpenSBI: an older model can boot the
+entire seL4 image but reject installation with control status `UNSUPPORTED`,
+which is artifact-mismatch evidence rather than a kernel binding failure. The
+descriptor-v1 directed regressions currently qualify model SHA-256
+`5925788e632135b9cc1b705d1c8e5fb3d07be2b77a15c7176bcd5ebecb3456bc`.
