@@ -1,0 +1,1740 @@
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=93b2e29de83be627631a6cb6e78b2a5529f9a42c89cb365894cfe7138a028629
+LOG=/home/xilinx/bp-logs/linux-mode6-wakeup-futex-prefix16-interactive-20261101T143652Z-2905.log
+BITSTREAM_SHA256=a070df7f2d69b86e745a9b915798e704ac4ee2255e97d3c50e3aa1a4f4ba3ce9
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe90f690 40000004 16 1
+INFO:    Creating host: 0xbe90f690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3cef000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3cef000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1592217
+DEBUG-PS: ps.cpp: 1-1592440
+DEBUG-PS: ps.cpp: 2-1592631
+DEBUG-PS: ps.cpp: 3-1592809
+DEBUG-PS: ps.cpp: 4-1592987
+DEBUG-PS: ps.cpp: 5-1593162
+DEBUG-PS: ps.cpp: 6-1593337
+DEBUG-PS: ps.cpp: 7-1593511
+DEBUG-PS: ps.cpp: 8-1593680
+DEBUG-PS: ps.cpp: 9-1593850
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878893
+DEBUG-PS: ps.cpp: finished loading 1878893 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #14 SMP Sun Nov  1 01:37:24 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 root=/dev/ram0
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8289K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000102] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009490] Console: colour dummy device 80x25
+[    0.011332] printk: console [hvc0] enabled
+[    0.159885] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166011] pid_max: default: 32768 minimum: 301
+[    0.182402] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.187766] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.427388] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.445657] riscv: ELF compat mode unsupported
+[    0.447465] ASID allocator disabled (1 bits)
+[    0.469462] rcu: Hierarchical SRCU implementation.
+[    0.473150] rcu: 	Max phase no-delay instances is 1000.
+[    0.512964] EFI services will not be available.
+[    0.535223] smp: Bringing up secondary CPUs ...
+[    0.539407] smp: Brought up 1 node, 1 CPU
+[    0.584321] devtmpfs: initialized
+[    0.710115] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.716309] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.807868] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.852827] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.860688] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.162938] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.404132] SCSI subsystem initialized
+[    1.429048] libata version 3.00 loaded.
+[    1.453726] usbcore: registered new interface driver usbfs
+[    1.460838] usbcore: registered new interface driver hub
+[    1.468528] usbcore: registered new device driver usb
+[    1.580611] vgaarb: loaded
+[    1.592738] clocksource: Switched to clocksource riscv_clocksource
+[    2.950696] NET: Registered PF_INET protocol family
+[    2.974397] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.045485] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.052783] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.058177] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.063779] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.075278] TCP: Hash tables configured (established 512 bind 512)
+[    3.090769] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.101426] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.125427] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.209927] RPC: Registered named UNIX socket transport module.
+[    3.214161] RPC: Registered udp transport module.
+[    3.217494] RPC: Registered tcp transport module.
+[    3.220779] RPC: Registered tcp-with-tls transport module.
+[    3.223468] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.227645] PCI: CLS 0 bytes, default 64
+[    3.335449] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.478868] NFS: Registering the id_resolver key type
+[    3.485772] Key type id_resolver registered
+[    3.489861] Key type id_legacy registered
+[    3.495640] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.501151] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.547362] 9p: Installing v9fs 9p2000 file system support
+[    3.577022] NET: Registered PF_ALG protocol family
+[    3.586328] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.591500] io scheduler mq-deadline registered
+[    3.595113] io scheduler kyber registered
+[   23.951124] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   24.322426] [drm] radeon kernel modesetting enabled.
+[   25.966798] loop: module loaded
+[   26.198391] e1000e: Intel(R) PRO/1000 Network Driver
+[   26.202149] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   26.423657] usbcore: registered new interface driver uas
+[   26.431764] usbcore: registered new interface driver usb-storage
+[   26.515496] mousedev: PS/2 mouse device common for all mice
+[   26.562198] sdhci: Secure Digital Host Controller Interface driver
+[   26.566452] sdhci: Copyright(c) Pierre Ossman
+[   26.573202] sdhci-pltfm: SDHCI platform and OF driver helper
+[   26.599585] usbcore: registered new interface driver usbhid
+[   26.603639] usbhid: USB HID core driver
+[   26.635305] NET: Registered PF_INET6 protocol family
+[   26.857287] Segment Routing with IPv6
+[   26.867362] In-situ OAM (IOAM) with IPv6
+[   26.879219] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   26.954724] NET: Registered PF_PACKET protocol family
+[   26.971225] 9pnet: Installing 9P2000 support
+[   26.983298] Key type dns_resolver registered
+[   26.994240] start plist test
+[   27.313741] end plist test
+[   29.713697] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   30.359544] clk: Disabling unused clocks
+[   37.214928] Freeing unused kernel image (initmem) memory: 5104K
+[   37.221741] Run /init as init process
+[   37.225001]   with arguments:
+[   37.226705]     /init
+[   37.229030]   with environment:
+[   37.230797]     HOME=/
+[   37.233159]     TERM=linux
+[bsg] Hello from rootFS!
+Saving 256 bits of non-creditable seed for next boot
+Starting syslogd: OK
+Starting klogd: OK
+Running sysctl: OK
+[bsg] Running test_info.sh with argument start
+[bsg] Getting /proc/cpuinfo
+processor	: 0
+hart		: 0
+isa		: rv64imafdc_zicntr_zicsr_zifencei_zihpm
+mmu		: sv39
+mvendorid	: 0x0
+marchid		: 0xd
+mimpid		: 0x3
+
+[bsg] Getting /proc/meminfo
+MemTotal:          44644 kB
+MemFree:           26140 kB
+MemAvailable:      25536 kB
+Buffers:               0 kB
+Cached:             8696 kB
+SwapCached:            0 kB
+Active:               32 kB
+Inactive:            516 kB
+Active(anon):         32 kB
+Inactive(anon):      516 kB
+Active(file):          0 kB
+Inactive(file):        0 kB
+Unevictable:        8672 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                 0 kB
+Writeback:             0 kB
+AnonPages:           576 kB
+Mapped:             1948 kB
+Shmem:                24 kB
+KReclaimable:       1156 kB
+Slab:               6140 kB
+SReclaimable:       1156 kB
+SUnreclaim:         4984 kB
+KernelStack:         656 kB
+PageTables:          440 kB
+SecPageTables:         0 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:       22320 kB
+Committed_AS:       2244 kB
+VmallocTotal:   67108864 kB
+VmallocUsed:         692 kB
+VmallocChunk:          0 kB
+Percpu:               76 kB
+Starting network: OK
+# : > /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAVBEBAAAAAABAAAAAAAAAAEAxAAAAAAAABQAAAEAA
+OAAK' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AEAAHgAdAAYAAAAEAAAAQAAAAAAAAABAAAEAAAAAAEAAAQAAAAAAMAIAAAAAAAAwAgAAAAAA
+AAgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAwAAAAQAAABwAgAAAAAAAHACAQAAAAAAcAIBAAAAAAAhAAAAAAAAACEAAAAAAAAA
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAADAABwBAAAANogAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFcAAAAAAAAAAAAAAAAAAAAB
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAEAAAAFAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAQB0AAAAAAABAHQAAAAAAAAAQ
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAQAAAAYAAADQHQAAAAAAANAtAQAAAAAA0C0BAAAAAADcAgAAAAAAADATAAAAAAAAABAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAACAAAABgAAAPAdAAAAAAAA8C0BAAAAAADwLQEAAAAAABACAAAAAAAAEAIAAAAAAAAIAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAQAAAAEAAAAlAIAAAAAAACUAgEAAAAAAJQCAQAAAAAAIAAAAAAAAAAgAAAAAAAAAAQAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'UOV0ZAQAAADEGgAAAAAAAMQaAQAAAAAAxBoBAAAAAABsAAAAAAAAAGwAAAAAAAAABAAAAAAA
+AABR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '5XRkBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA
+AFLl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'dGQEAAAA0B0AAAAAAADQLQEAAAAAANAtAQAAAAAAMAIAAAAAAAAwAgAAAAAAAAEAAAAAAAAA
+L2xp' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Yi9sZC1saW51eC1yaXNjdjY0LWxwNjRkLnNvLjEAAAAABAAAABAAAAABAAAAR05VAAAAAAAE
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'DwAAAAAAAAAAAAAAEQAAABUAAAAHAAAACQAAAAgAAAAAAAAADwAAAAAAAAAKAAAABQAAAAwA
+AAAR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAEgAAAAAAAAAGAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAADAAAABAAAABMAAAAQAAAAAAAA
+AA0A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAUAAAAAAAAAAsAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAEAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ABEAAAABAAAAAgAAAAcAAAByQNIRMUBRkwAGAEIBFIjEAAAAAAEAAAAAAAAAAwAAAAQAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BQAAAAcAAAAJAAAAAAAAAAAAAAAKAAAACwAAAA0AAAAOAAAAEgAAABMAAABqf5p8MbiCDfu7
+ep4/' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'fpZ8Lk499hl+CocAI/mkOfKLHOGZ0rpflpMcBNuNNz0H1AXJOUAfoBLCukrwKRAQWuZ3/+yE
+FLkr' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'axUW6nb+IWJkBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAEgAMAJAKAQAAAAAA
+xAYA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAB8AAAAEgAAAIAKAQAAAAAAAAAAAAAAAABSAAAAEgAAAMAJAQAAAAAAAAAAAAAAAAAf
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'EgAAAEAKAQAAAAAAAAAAAAAAAABjAAAAEgAAAJAJAQAAAAAAAAAAAAAAAAARAQAAEADx/6A4
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAACYAAAAEgAAANAJAQAAAAAAAAAAAAAAAAB1AAAAEQAYAPAwAQAAAAAACAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AABDAAAAEgAAADAKAQAAAAAAAAAAAAAAAACRAAAAEgAAAHAKAQAAAAAAAAAAAAAAAACxAAAA
+EgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAKAQAAAAAAAAAAAAAAAAA2AAAAEgAAAGAKAQAAAAAAAAAAAAAAAAAOAAAAEgAAAPAJAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAACpAAAAEgAAAKAJAQAAAAAAAAAAAAAAAAABAAAAEgAAAOAJAQAAAAAAAAAAAAAA
+AAAk' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAEgAAABAKAQAAAAAAAAAAAAAAAAAHAAAAEgAAACAKAQAAAAAAAAAAAAAAAACDAAAAEgAA
+AFAK' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAAAAAAAACKAAAAEgAAALAJAQAAAAAAAAAAAAAAAADDAAAAEQATAOgtAQAAAAAA
+CAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAcHJjdGwAcGVycm9yAF9fc3RhY2tfY2hrX2ZhaWwAZXhpdABzY2hlZF9zZXRhZmZp
+bml0' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'eQBwdGhyZWFkX2pvaW4AcHRocmVhZF9jcmVhdGUAX19zY2hlZF9jcHVjb3VudABfX2xpYmNf
+c3Rh' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'cnRfbWFpbgBzdGRlcnIAbWVtc2V0AHByaW50ZgBmd3JpdGUAc3RyY21wAF9fZXJybm9fbG9j
+YXRp' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'b24Ac3lzY2FsbABzY2hlZF9nZXRhZmZpbml0eQBfX3N0YWNrX2Noa19ndWFyZABsaWJjLnNv
+LjYA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'bGQtbGludXgtcmlzY3Y2NC1scDY0ZC5zby4xAEdMSUJDXzIuMjcAR0xJQkNfMi4zNABfX2ds
+b2Jh' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'bF9wb2ludGVyJAAAAAABAAMAAwADAAIAAQADAAMAAgADAAMAAgADAAMAAwADAAMAAwADAAQA
+AAAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAEA3wAAABAAAAAgAAAAh5GWBgAABAD7AAAAAAAAAAEAAgDVAAAAEAAAAAAAAACHkZYGAAAD
+APsA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAQAAAAtJGWBgAAAgAGAQAAAAAAAJgwAQAAAAAAAgAAAAEAAAAAAAAAAAAAAOgtAQAAAAAA
+BAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ABQAAAAAAAAAAAAAAPAwAQAAAAAABAAAAAgAAAAAAAAAAAAAABAwAQAAAAAABQAAAAUAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAABgwAQAAAAAABQAAAA4AAAAAAAAAAAAAACAwAQAAAAAABQAAABMAAAAAAAAAAAAAACgw
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAABQAAAAMAAAAAAAAAAAAAADAwAQAAAAAABQAAAAcAAAAAAAAAAAAAADgwAQAAAAAABQAA
+AA8A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAEAwAQAAAAAABQAAAA0AAAAAAAAAAAAAAEgwAQAAAAAABQAAAAsAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AFAwAQAAAAAABQAAABAAAAAAAAAAAAAAAFgwAQAAAAAABQAAABEAAAAAAAAAAAAAAGAwAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BQAAAAkAAAAAAAAAAAAAAGgwAQAAAAAABQAAAAQAAAAAAAAAAAAAAHAwAQAAAAAABQAAABIA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAHgwAQAAAAAABQAAAAwAAAAAAAAAAAAAAIAwAQAAAAAABQAAAAoAAAAAAAAAAAAA
+AIgw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAABQAAAAIAAAAAAAAAAAAAAJcjAAAzA8NBA74DaRMDQ/2TggNpE1MTAIOyggBnAA4A
+Fy4A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAM+DmhnAw4AEwAAABcuAAADPo5nZwMOABMAAAAXLgAAAz4OZ2cDDgATAAAAFy4AAAM+jmZn
+Aw4A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'EwAAABcuAAADPg5mZwMOABMAAAAXLgAAAz6OZWcDDgATAAAAFy4AAAM+DmVnAw4AEwAAABcu
+AAAD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Po5kZwMOABMAAAAXLgAAAz4OZGcDDgATAAAAFy4AAAM+jmNnAw4AEwAAABcuAAADPg5jZwMO
+ABMA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAXLgAAAz6OYmcDDgATAAAAFy4AAAM+DmJnAw4AEwAAABcuAAADPo5hZwMOABMAAAAXLgAA
+Az4O' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'YWcDDgATAAAAFy4AAAM+jmBnAw4AEwAAABFxFycAABMHZzVu7Yb9ovmm9crxzu3S6dbl2uFe
+/WL5' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZvVq8RxjPuWBR4VNY9GtBiqNLomXGQAAk4lJwxcbAAATC8vDFxwAABMMzMSTjIGBBUqTi8GB
+k4oB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'gjGgI6BKAYUtY9atAxOUPQBKlARgzoUmhe/w//Z90dqFJoXv8F/2YxIFJCOgSwGFLePOrf2T
+h8GB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'E4eBgZxDGEPZj2OVBzLvACBwqoeBRhcWAAATBiaVgUUIAb7w7/C/7qqJYxEFXu8AkAKFRROF
+gYTv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'APAMg6cBgQOmQYGXFQAAk4Ult2OXB04XFQAAEwVlzu/wf+2XJwAAk4enUpxDY4wHToL0BUmT
+ikGC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'E4uBgs74CUdzEFeAg6cKAGOJ5wDzJwDMIzD7AI1Hc5BXgIVHE4fBhA8AUA8vIPcIAUiBRwFH
+hUYT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BhAIk4XBhBMFIAbv8J/cY0EFVIlFE4XBhO8AMATzKQDMgUdzkFeAAQABAAEA8ytQgI1HE4fB
+hA8A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'UA8vIPcIAUiBRwFHhUYTBhAIk4XBhBMFIAbv8B/YY00FThPUKwEbBwQAk9Q7AbroA6YKABN3
+FAC6' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '5BuHBAAT3psAE9NLAYVHuuyT/PsfE33+H4WIk30TAE6KYxb2AJOHAYQDugcAlycAAJOHx0OY
+Q4VH' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Y/vnAMqFFxUAABMFpb/v8L/cA6YKAIM2CwCThwGDA7gHACZlswXaQJOHgYMThwGEnGMYYy7g
+hnUq' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '7F74bvQm8GroZuTOiBcVAAATBaW87/C/2GObDRiTBwAQY+eXGWPlpxmzhawBY4EFGJOHAYKc
+Q2OI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Bx7GZ2ZnAzYLANmPhYszBspAY54HMhcVAAATBQXLrvzv8H/U5nWTh4GBnEOBy5cnAACThwc5
+nENj' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'iycblycAAJOHJzicQwUp4/Qn5wplgUXGee/wX9IqhGMQBUDvAMBopndjggc0hUmpruKFJoXv
+8J/R' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AeUjoEwBebOXFQAAk4VFnSaF7/A/0BXpm4gdAGPDqBGXFQAAk4XFqCaF7/C/zj3pg7YBhRMG
+4AuF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'RRcVAAATBSWb7/A/wYVJIaaXFQAAk4UlpiaF7/AfzDHlhS3j2q39AGSFR5cVAACThYWQIoUj
+qPGA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '7/A/yoFHHcGXFQAAk4WlkSKF7/AfyWMNBS6XFQAAk4WFjyKF7/D/x1n5mUcjqvGAzbmXFQAA
+k4WF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'oSaF7/B/xj39hS3j3a33AGSXFQAAk4UFoSKF7/D/xBXFlxUAAJOFhaAihe/w/8NZzZcVAACT
+hQWg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'IoXv8P/COfGJRxOHQYIcw0WxgUfdv4OnAYLjmwfMPbeThwGFlGMTBjAChUUXFQAAEwVFre/w
+37OF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'R770bbUQZINGBgBjjwYmiWUBRyVFEwiAPpOFBXGbhwb9k/f3D2Ni9SZjYOgmmxcnALmfm5cX
+ALWf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'G4cH/bqHY+XlJINGFgAFBvH6Yw8HIhcnAAAjIPcexo05uYVHlb9jhgwCE5YMAhc3AAATBwei
+AZKB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'R3OQZ4ABAAEAAQDzJnCAFOOFByEH45bH/pcmAACThsYfAUdjAg0Ck2cHEIIXgZNzkGeAAQAB
+AAEA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '8ydwgJziBSehBuMS7f6FS4obBUyu/IMpCwABRJOLC/ybBfz/Y+udB2N/pAv9V5MWBAIT19YB
+lyYA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AJOGZho2lwM4BwATVwhCuwY3QWPp9gYTlw0Ck1fXARc3AAATB0eYupcDuAcAE1cIQrsHN0GT
+GGgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'QuDuhrP4eAEbWMgBEwaQBBcVAAATBSWj7/A/qoUtBSybBfz/4/md+ROXDQKTV9cBFzcAABMH
+p5O6' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'lwO4BwATVwhCuwc3QeN7pPuNv5MYaABC4LaHs/h4AaKGG1jIARMGQAQXFQAAEwUFnu/wH6UF
+JAUs' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'fbeThwGCnEPmdeHrxmfmZgM3CwDVj4WLMwbqQOHLpmYmhxcVAAATBeWT7/D/oYm1pmYmhxcV
+AAAT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BcWSrvzv8L+gk4fBgZxD5nXjnwfKhUe+9F25lwUAAJOFxWbjBwawlUeXBQAAk4VlZ+MQ9rCX
+BQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'k4WlZ9W8CmWBRe/w350qhEXt7wBgNJOHwYGQQ5cnAACThycBjEMXFQAAEwUFn+/wn5qXJwAA
+k4fH' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '0ypnnGO5jwFHvefucE50rnQOeU5qrmoOa+p7SnyqfAp96m1Ohe5pEWGCgJVHKbsmZqaGFxUA
+ABMF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'pZXv8D+WFbkXFQAAEwXFi+/wX5UdsYO2AYUTBuALhUUXBQAAEwXFY+/w34kFRe/wf5IXBQAA
+EwWl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'We8A4A/v8H+M7/A/iiMgNQEXBQAAEwUlce8AYA7v8P+IAMEXFQAAEwWFk+8AQA3vAAADkwcF
+ABcl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAADNcXzgzUBABMGgQATcQH/kwYAABMHAAATCAEA7/BfgXMAEACXIQAAk4HBcWeAAAA3NQEA
+tzcB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ABMHBQCThwcAY4rnAJMHAABjhgcAEwUFAGeABwBngAAAtzcBADc1AQCThQcAkwcFALOF9UCT
+1TVA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'kwcgALPF9QJjigUAkwcAAGOGBwATBQUAZ4AHAGeAAAATAQH/IzCBAIPHgYUjNBEAY5gHAO/w
+3/iT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BxAAI4zxhIMwgQADNAEAEwEBAWeAAABv8J/5QREG5O/wj/8FRe/wP4FNcUr6FykAABMJKbsw
+AJMF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAgBRYM3CQA+5oFHhuai4ib+TvZS8lbu7/Bv+nntomSFiMXsBUcTBgBAGwQHAGMExw6TV2cA
+jgeT' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'hwcRipeDt4fvk3b0AwUHs9fXAIWL8d+TWWQAjgk4AYVEMwo3AZuKBgCzlNQAEwYACIFFOoXv
+8A/9' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'gzcKACqGkwUACMWPAUUjMPoA7/Cv9EnhMACTBQAI7/Dv8lnpLAATBQAI7/Av7oVHYxL1BJOH
+CRGz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'iScAg7eJ77PXVwGFi53HMmeDNwkAuY8BR6njtmAihRZk8nRSebJ5EnryanFhgoA4ASqEgUo6
+ioFJ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Sbfv8I/q2UccwRcFAAATBYUu7/Df7hcFAAATBcUp7/Af7u/wj+oXBQAAEwVFKu/wH+3v8I/n
+2Ucc' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'wRcFAAATBQUt7/Df6xcFAAATBcUp7/Af64OnAYGR44KAN1VQQkERAUeBRgFGk4XBhBMFlQUG
+5O/w' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'r+QF4TdVUEIBR4FGAUaD5UGBEwWlBe/wL+MR6aJgQQGCgBcFAAATBeUo7/A/5hcFAAATBaUp
+7/B/' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '5YOnAYGR44KAN1VQQkERAUeBRgFGgUUTBaUFBuTv8C/fGe03VVBCAUeBRgFGgUUTBZUF7/DP
+3RHp' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'omBBAYKAFwUAABMFhSbv8N/gFwUAABMFRSfv8B/geXEi8CbsSuhO5Ab0KoSuhC1JkUkcQA8A
+8A+b' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'hgcAY4uXAgFIgUcBRxMGAAiihRMFIAbv8G/UASVx3e/w79YcQeOKJ/3jiDf9FwUAABMFhSPv
+8N/a' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'onACdOJkQmmiaUVhgoBZcYb00uDv8D/a7/Bf7pOFgYSFRw8AUA8voPUIAUiBRwFHhUYTBhAI
+EwUg' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Bu/wr85jSAUOFyoAABMKqr6DJwoA6cui8KbsyujO5Fb8Wvhe9GLwZuxq6G7kgUQTiUGCE4wB
+hBOE' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'wYQTi4GDiUmBTRONgYKNTIlKk4sBg7Go8ycAzAMnCQAjMPwAhUdjFPcAc5BdgA8AUA8vIFQJ
+8ygA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'zAFIgUcBR4VGEwYQCKKFEwUgBiMwGwHv8C/GY08FBvMnAMyNRSKFI7D7AO/wf+2DJwoAhSRj
+9fQC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'hUUihe/wX+yDJwkA4503+XOQWYDzJwDMIzD9ACMw/ABzkFyAYb8GdOZkRmmmaeJ6QnuiewJ8
+4mxC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'baJt7/B/46ZwBmoBRWVhgoCi8KbsyujO5Fb8Wvhe9GLwZuxq6G7kFwUAABMFhQ/v8N/FAAAA
+AAEA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AgAAAAAAc2NoZWRfZ2V0YWZmaW5pdHkAAAAAAAAAc2NoZWRfc2V0YWZmaW5pdHkAAAAAAAAA
+dmVy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'aWZ5IGFmZmluaXR5AHNpbmdsZXRvbiBDUFUgYWZmaW5pdHkAAGVtcHR5IENQVSBhZmZpbml0
+eQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAHJlZ2lzdGVyIHByZXZpZXcgcGFnZQAAAHNldCBwcmV2aWV3IG1vZGUAAAAAAAAAAGRp
+c2Fi' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'bGUgcHJldmlldyBtb2RlAAAAAHJlbGVhc2UgcHJldmlldyBwYWdlAAAAAGZ1dGV4IHdhaXQA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AABmdXRleCB3YWtlAAAAAAAAZGlzYWJsZWQAAAAAAAAAAGxlZ2FjeQAAd2FrZS10cmlnZ2Vy
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AHRyaWdnZXIALS1zdW1tYXJ5LW9ubHkAAC0tYWxsb3ctb3ZlcmZsb3cAAAAAAAAAAC0tZmlu
+YWwt' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'YWRkcmVzc2VzAAAAAAAAAC0tc2FtcGxlcwAAAAAAAAB1c2FnZTogY2FjaGVfbWlzc190cmFj
+ZV9j' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'YXB0dXJlIFstLXdpbmRvdyBmdWxsfHRvLXBlZXJ8ZnJvbS1wZWVyXSBbLS1zdW1tYXJ5LW9u
+bHld' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'IFstLXNhbXBsZXMgMS4uMTAwMDBdIFstLWFsbG93LW92ZXJmbG93XSBbLS1maW5hbC1hZGRy
+ZXNz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZXNdIFstLXByZXZpZXctbW9kZSBkaXNhYmxlZHx0cmlnZ2VyfHdha2UtdHJpZ2dlcl0KAAAt
+LXBy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZXZpZXctbW9kZQAALS13aW5kb3cAAAAAAAAAAGZ1bGwAAAAAdG8tcGVlcgBmcm9tLXBlZXIA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAcHRocmVhZF9jcmVhdGUAAFRSQUNFX1BSRVZJRVcgbW9kZT0lcyB2YWx1ZT0ldQoAU0FN
+UExF' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'PSV1CgAAAAAAAFRSQUNFX0hFQURFUiBjcHU9JWQgd2luZG93PSV1IHN0YXJ0PSVsdSBwZWVy
+X2Jl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Z2luPSVsdSBwZWVyX3dha2U9JWx1IHBlZXJfYmxvY2s9JWx1IHJlc3VtZT0lbHUgZWxhcHNl
+ZD0l' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'bHUgaV9jb3VudD0ldSBkX2NvdW50PSV1IGlfb3ZlcmZsb3c9JXUgZF9vdmVyZmxvdz0ldSBh
+cm1l' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZD0ldSBzdGF0dXM9MHglMDE2bHgKAABUUkFDRV9GQUlMIGludmFsaWQgcmVjb3JkZXIgc3Rh
+dHVz' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'CgAAAAAAVFJBQ0VfVFJVTkNBVEVEIHJlY29yZHM9JXUgZWxhcHNlZD0lbHUgaV9vdmVyZmxv
+dz0l' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'dSBkX292ZXJmbG93PSV1CgAAAAAAVFJBQ0VfUEFTUyByZWNvcmRzPSV1IGVsYXBzZWQ9JWx1
+CgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAFRSQUNFX1JFQ09SRCBzZXE9JXUgc2lkZT0lYyBpbmRleD0ldSBjeWNsZT0ldSByZWxh
+dGl2' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZT0ldSBtZXNzYWdlPTB4JXggcGFkZHI9MHglMDlseCByYXc9MHglMDE2bHgKAAAAAAAAVFJB
+Q0Vf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'RklOQUxfQUREUkVTU0VTIHJlY29yZHM9JXUgaV9vdmVyZmxvdz0ldSBkX292ZXJmbG93PSV1
+CgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AHB0aHJlYWRfam9pbgAAAABUUkFDRV9DQVBUVVJFX1BBU1Mgc2FtcGxlcz0ldSBhbGxvd19v
+dmVy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Zmxvdz0ldQoAAAAAARsDO2gAAAAMAAAAzO///yQCAACQ9v//gAAAAMz2//+UAAAA9Pb//6gA
+AAAs' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '9///vAAAAFz3///gAAAAYPf///QAAABu9///DAEAALT4//9IAQAADvn//2gBAABk+f//iAEA
+AMb5' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '//+4AQAAEAAAAAAAAAADelIAAXwBARsNAgAQAAAAGAAAAAj2//8wAAAAAAcBABAAAAAsAAAA
+MPb/' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '/ygAAAAAAAAAEAAAAEAAAABE9v//OAAAAAAAAAAgAAAAVAAAAGj2//8wAAAAAEQOEESIBEiB
+AlTB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'RMhEDgAAAAAQAAAAeAAAAHT2//8EAAAAAAAAABQAAACMAAAAZPb//w4AAAAAQg4QQoECADgA
+AACk' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAWvb//0YBAAAAQg7QAkKSCGSBAogEiQaTCpQMlQ4CsArBRMhCyULSQtNC1ELVQg4AQgsA
+ABwA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AADgAAAAZPf//1oAAAAATg4QUIECYArBQg4AQgsAHAAAAAABAACe9///VgAAAABODhBOgQJe
+CsFC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'DgBCCwAsAAAAIAEAANT3//9iAAAAAEIOMEqIBIkGkgiTCoECAkrBQshCyULSQtNCDgAAAABo
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'UAEAAAb4//9CAQAAAEIOcESBApQMAlKIBIkGkgiTCpUOlhCXEpgUmRaaGJsaAqbIQslC0kLT
+QtVC' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '1kLXQthC2ULaQttGCsFC1EQOAEILVogEiQaSCJMKlQ6WEJcSmBSZFpoYmxoAAABQAAAAvAEA
+AKDt' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '///EBgAAAEIOgAJimxqBAogEiQaSCJMKlAyVDpYQlxKYFJkWmhgDDAYKwULIQslC0kLUQtVC
+1kLX' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'QthC2ULaQttE00IOAEILAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhBEB
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAgEgEAAAAAAPARAQAAAAAAAAAAAAAAAAABAAAAAAAAANUAAAAAAAAAAQAAAAAAAADfAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ACAAAAAAAAAA0C0BAAAAAAAhAAAAAAAAAAgAAAAAAAAAGQAAAAAAAADYLQEAAAAAABsAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'CAAAAAAAAAAaAAAAAAAAAOAtAQAAAAAAHAAAAAAAAAAIAAAAAAAAAAQAAAAAAAAAuAIBAAAA
+AAD1' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo '/v9vAAAAAFgDAQAAAAAABQAAAAAAAAAIBgEAAAAAAAYAAAAAAAAAEAQBAAAAAAAKAAAAAAAA
+ACMB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAACwAAAAAAAAAYAAAAAAAAABUAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAwAQAAAAAA
+AgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAACAAQAAAAAAABQAAAAAAAAABwAAAAAAAAAXAAAAAAAAAPAHAQAAAAAABwAAAAAAAACo
+BwEA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAgAAAAAAAAAyAEAAAAAAAAJAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAPv/
+/28A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAQAAAAAAAAD+//9vAAAAAFgHAQAAAAAA////bwAAAAACAAAAAAAAAPD//28AAAAALAcB
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'cAkBAAAAAABwCQEAAAAAAHAJAQAAAAAAcAkBAAAAAABwCQEAAAAAAHAJAQAAAAAAcAkBAAAA
+AABw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'CQEAAAAAAHAJAQAAAAAAcAkBAAAAAABwCQEAAAAAAHAJAQAAAAAAcAkBAAAAAABwCQEAAAAA
+AHAJ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAcAkBAAAAAADwLQEAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAR0NDOiAoQnVpbGRy
+b290' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'IDIwMjEuMTEtODU0Ny1nN2U2NWExYSkgMTMuMi4wAEFWAAAAcmlzY3YAAUwAAAAEEAVydjY0
+aTJw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'MV9tMnAwX2EycDFfZjJwMl9kMnAyX2MycDBfemljc3IycDBfemlmZW5jZWkycDBfem1tdWwx
+cDAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'CAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwABAHACAQAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAwACAJQCAQAAAAAAAAAAAAAAAAAAAAAAAwADALgCAQAAAAAAAAAAAAAAAAAAAAAA
+AwAE' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AFgDAQAAAAAAAAAAAAAAAAAAAAAAAwAFABAEAQAAAAAAAAAAAAAAAAAAAAAAAwAGAAgGAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAwAHACwHAQAAAAAAAAAAAAAAAAAAAAAAAwAIAFgHAQAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAwAJAKgHAQAAAAAAAAAAAAAAAAAAAAAAAwAKAPAHAQAAAAAAAAAAAAAAAAAAAAAAAwAL
+AHAJ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAAAAAAAAAAAAAAAwAMAJAKAQAAAAAAAAAAAAAAAAAAAAAAAwANANAVAQAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAwAOAMQaAQAAAAAAAAAAAAAAAAAAAAAAAwAPADAbAQAAAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AwAQANAtAQAAAAAAAAAAAAAAAAAAAAAAAwARANgtAQAAAAAAAAAAAAAAAAAAAAAAAwASAOAt
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAAAwATAOgtAQAAAAAAAAAAAAAAAAAAAAAAAwAUAPAtAQAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAwAVAAAwAQAAAAAAAAAAAAAAAAAAAAAAAwAWAKAwAQAAAAAAAAAAAAAAAAAAAAAA
+AwAX' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ALAwAQAAAAAAAAAAAAAAAAAAAAAAAwAYAPAwAQAAAAAAAAAAAAAAAAAAAAAAAwAZAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAwAaAAAAAAAAAAAAAAAAAAAAAAABAAAABADx/wAAAAAAAAAAAAAAAAAA
+AAAM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAQACAJQCAQAAAAAAIAAAAAAAAAAWAAAABADx/wAAAAAAAAAAAAAAAAAAAAAeAAAAAAAM
+AFQR' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAAAAAAAABbAAAAAAAMAIQRAQAAAAAAAAAAAAAAAABjAAAABADx/wAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAABqAAAABADx/wAAAAAAAAAAAAAAAAAAAAB5AAAABADx/wAAAAAAAAAAAAAAAAAAAACU
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AgAMACQSAQAAAAAADgAAAAAAAACZAAAAAAAMACQSAQAAAAAAAAAAAAAAAADPAAAAAgAMADIS
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAARgEAAAAAAADoAAAAAgAMAHgTAQAAAAAAWgAAAAAAAAD6AAAAAQAXALAwAQAAAAAABAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAKAQAAAQAXAOwwAQAAAAAABAAAAAAAAAAQAQAAAQAXALQwAQAAAAAABAAAAAAAAAAdAQAA
+AgAM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ANITAQAAAAAAVgAAAAAAAAAtAQAAAgAMACgUAQAAAAAAYgAAAAAAAAA4AQAAAgAMAIoUAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'QgEAAAAAAABCAQAAAQAXAOgwAQAAAAAABAAAAAAAAABNAQAAAQAWAKgwAQAAAAAABAAAAAAA
+AABV' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAQAXAMQwAQAAAAAABAAAAAAAAABiAQAAAQAXAOAwAQAAAAAACAAAAAAAAABzAQAAAQAX
+ANgw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAACAAAAAAAAACDAQAAAQAXAMgwAQAAAAAACAAAAAAAAACVAQAAAQAXANAwAQAAAAAA
+CAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAACZAAAAAAAMAJAKAQAAAAAAAAAAAAAAAACmAQAAAQAXALgwAQAAAAAABAAAAAAAAAC2
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAXALwwAQAAAAAABAAAAAAAAADFAQAAAQAXAMAwAQAAAAAABAAAAAAAAADSAQAAAQAYAAA5
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAgAAAAAAADhAQAAAQAYAAAxAQAAAAAAAAgAAAAAAADwAQAABADx/wAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAD7AQAAAgAMAJARAQAAAAAAAAAAAAAAAAAeAAAAAAAMAJARAQAAAAAAAAAAAAAAAAD9AQAA
+AgAM' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ALgRAQAAAAAAAAAAAAAAAAAQAgAAAgAMAPARAQAAAAAAAAAAAAAAAAAmAgAAAQAYAPgwAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAyAgAAAQASAOAtAQAAAAAAAAAAAAAAAABZAgAAAgAMACASAQAAAAAAAAAAAAAA
+AABl' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AgAAAQARANgtAQAAAAAAAAAAAAAAAADwAQAABADx/wAAAAAAAAAAAAAAAAAAAACEAgAAAQAP
+ADwd' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAAAAAAAAAAAAAABADx/wAAAAAAAAAAAAAAAAAAAACSAgAAAQALAHAJAQAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAACsAgAAAQAUAPAtAQAAAAAAAAAAAAAAAAC1AgAAAAAOAMQaAQAAAAAAAAAAAAAAAADI
+AgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAVAJAwAQAAAAAAAAAAAAAAAADeAgAAEgAAAJAJAQAAAAAAAAAAAAAAAAD7AgAAEgAAAKAJ
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAADWAwAAIAAVAAAwAQAAAAAAAAAAAAAAAAAOAwAAEgAAALAJAQAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAgAwAAEgAAAMAJAQAAAAAAAAAAAAAAAAA8AwAAEAAYAABBAQAAAAAAAAAAAAAAAABIAwAA
+EAAW' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AKwwAQAAAAAAAAAAAAAAAABPAwAAEAAWAKAwAQAAAAAAAAAAAAAAAABfAwAAEAAVAAAwAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAABuAwAAEgAAANAJAQAAAAAAAAAAAAAAAACKAwAAEgAAAOAJAQAAAAAAAAAAAAAA
+AACb' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AwAAEgAAAPAJAQAAAAAAAAAAAAAAAAC3AwAAEgAAAAAKAQAAAAAAAAAAAAAAAADUAwAAEAAV
+AAAw' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAAAAAAAADhAwAAEQATAOgtAQAAAAAACAAAAAAAAAD+AwAAEgAAABAKAQAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAbBAAAEQIWAKAwAQAAAAAAAAAAAAAAAAAoBAAAEQANANAVAQAAAAAABAAAAAAAAAA3
+BAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'EAAYAABBAQAAAAAAAAAAAAAAAADaAwAAEgAMAFQRAQAAAAAAMAAAAAAAAAA8BAAAEADx/6A4
+AQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAABOBAAAEAAXAKwwAQAAAAAAAAAAAAAAAAA9AQAAEgAMAJAKAQAAAAAAxAYA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AABaBAAAEgAAACAKAQAAAAAAAAAAAAAAAABsBAAAEgAAADAKAQAAAAAAAAAAAAAAAACGBAAA
+EgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AEAKAQAAAAAAAAAAAAAAAACWBAAAEgAAAFAKAQAAAAAAAAAAAAAAAACoBAAAEQAYAPAwAQAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'CAAAAAAAAAC6BAAAEQIVAAAwAQAAAAAAAAAAAAAAAADGBAAAEgAAAGAKAQAAAAAAAAAAAAAA
+AADe' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BAAAEgAAAHAKAQAAAAAAAAAAAAAAAADwBAAAEgAAAIAKAQAAAAAAAAAAAAAAAAAAYWJpLW5v
+dGUu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'YwBfX2FiaV90YWcAc3RhcnQubwAkeHJ2NjRpMnAxX20ycDBfYTJwMV9mMnAyX2QycDJfemlj
+c3Iy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'cDBfemlmZW5jZWkycDBfem1tdWwxcDAAbG9hZF9ncABpbml0LmMAc3RhdGljLXJlbG9jLmMA
+Y2Fj' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'aGVfbWlzc190cmFjZV9jYXB0dXJlLmMAZmFpbAAkeHJ2NjRpMnAxX20ycDBfYTJwMV9mMnAy
+X2Qy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'cDJfYzJwMF96aWNzcjJwMF96bW11bDFwMABwaW5fdG9fZmlyc3RfYWxsb3dlZF9jcHUAY29u
+Zmln' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'dXJlX3ByZXZpZXcAcHJldmlld19jb250cm9sAHBoYXNlAHByZXZpZXdfbW9kZQByZWxlYXNl
+X3By' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZXZpZXcAd2FpdF91bnRpbABwZWVyX21haW4AcGVlcl9yZWFkeQBzYW1wbGVzAHRyYWNlX3dp
+bmRv' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'dwBwZWVyX2JlZ2luX2N5Y2xlAHBlZXJfd2FrZV9jeWNsZQB0cmFjZV9zdGFydF9jeWNsZQBw
+ZWVy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'X2Jsb2NrX2N5Y2xlAGZpbmFsX2FkZHJlc3NlcwBhbGxvd19vdmVyZmxvdwBzdW1tYXJ5X29u
+bHkA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'aWNhY2hlX3JlY29yZHMAZGNhY2hlX3JlY29yZHMAY3J0c3R1ZmYuYwBkZXJlZ2lzdGVyX3Rt
+X2Ns' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'b25lcwBfX2RvX2dsb2JhbF9kdG9yc19hdXgAY29tcGxldGVkLjAAX19kb19nbG9iYWxfZHRv
+cnNf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'YXV4X2ZpbmlfYXJyYXlfZW50cnkAZnJhbWVfZHVtbXkAX19mcmFtZV9kdW1teV9pbml0X2Fy
+cmF5' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'X2VudHJ5AF9fRlJBTUVfRU5EX18AX1BST0NFRFVSRV9MSU5LQUdFX1RBQkxFXwBfRFlOQU1J
+QwBf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'X0dOVV9FSF9GUkFNRV9IRFIAX0dMT0JBTF9PRkZTRVRfVEFCTEVfAF9fbGliY19zdGFydF9t
+YWlu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'QEdMSUJDXzIuMzQAc3lzY2FsbEBHTElCQ18yLjI3AGZ3cml0ZUBHTElCQ18yLjI3AF9fc2No
+ZWRf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'Y3B1Y291bnRAR0xJQkNfMi4yNwBfX0JTU19FTkRfXwBfZWRhdGEAX19TREFUQV9CRUdJTl9f
+AF9f' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'REFUQV9CRUdJTl9fAF9fZXJybm9fbG9jYXRpb25AR0xJQkNfMi4yNwBwcmN0bEBHTElCQ18y
+LjI3' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AF9fc3RhY2tfY2hrX2ZhaWxAR0xJQkNfMi4yNwBzY2hlZF9nZXRhZmZpbml0eUBHTElCQ18y
+LjI3' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AF9fZGF0YV9zdGFydABfX3N0YWNrX2Noa19ndWFyZEBHTElCQ18yLjI3AHNjaGVkX3NldGFm
+Zmlu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'aXR5QEdMSUJDXzIuMjcAX19kc29faGFuZGxlAF9JT19zdGRpbl91c2VkAF9lbmQAX19nbG9i
+YWxf' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'cG9pbnRlciQAX19ic3Nfc3RhcnQAcGVycm9yQEdMSUJDXzIuMjcAcHRocmVhZF9jcmVhdGVA
+R0xJ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'QkNfMi4zNABleGl0QEdMSUJDXzIuMjcAcHJpbnRmQEdMSUJDXzIuMjcAc3RkZXJyQEdMSUJD
+XzIu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'MjcAX19UTUNfRU5EX18AcHRocmVhZF9qb2luQEdMSUJDXzIuMzQAc3RyY21wQEdMSUJDXzIu
+MjcA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'bWVtc2V0QEdMSUJDXzIuMjcAAC5zeW10YWIALnN0cnRhYgAuc2hzdHJ0YWIALmludGVycAAu
+bm90' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'ZS5BQkktdGFnAC5nbnUuaGFzaAAuZHluc3ltAC5keW5zdHIALmdudS52ZXJzaW9uAC5nbnUu
+dmVy' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'c2lvbl9yAC5yZWxhLmR5bgAucmVsYS5wbHQALnRleHQALnJvZGF0YQAuZWhfZnJhbWVfaGRy
+AC5l' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'aF9mcmFtZQAucHJlaW5pdF9hcnJheQAuaW5pdF9hcnJheQAuZmluaV9hcnJheQAuZGF0YS5y
+ZWwu' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'cm8ALmR5bmFtaWMALmdvdAAuc2RhdGEALnNic3MALmJzcwAuY29tbWVudAAucmlzY3YuYXR0
+cmli' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'dXRlcwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAAAAAAGwAAAAEAAAACAAAAAAAAAHACAQAAAAAAcAIAAAAAAAAhAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAACMAAAAHAAAAAgAAAAAAAACUAgEAAAAAAJQCAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'IAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA1AAAABQAAAAIAAAAAAAAAuAIBAAAA
+AAC4' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AgAAAAAAAKAAAAAAAAAABQAAAAAAAAAIAAAAAAAAAAQAAAAAAAAAMQAAAPb//28CAAAAAAAA
+AFgD' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAWAMAAAAAAAC0AAAAAAAAAAUAAAAAAAAACAAAAAAAAAAAAAAAAAAAADsAAAALAAAA
+AgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAQBAEAAAAAABAEAAAAAAAA+AEAAAAAAAAGAAAAAQAAAAgAAAAAAAAAGAAAAAAAAABD
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AwAAAAIAAAAAAAAACAYBAAAAAAAIBgAAAAAAACMBAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAASwAAAP///28CAAAAAAAAACwHAQAAAAAALAcAAAAAAAAqAAAAAAAAAAUAAAAAAAAAAgAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAACAAAAAAAAAFgAAAD+//9vAgAAAAAAAABYBwEAAAAAAFgHAAAAAAAAUAAAAAAAAAAGAAAA
+AgAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAgAAAAAAAAAAAAAAAAAAABnAAAABAAAAAIAAAAAAAAAqAcBAAAAAACoBwAAAAAAAEgAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'BQAAAAAAAAAIAAAAAAAAABgAAAAAAAAAcQAAAAQAAABCAAAAAAAAAPAHAQAAAAAA8AcAAAAA
+AACA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAUAAAAVAAAACAAAAAAAAAAYAAAAAAAAAHYAAAABAAAABgAAAAAAAABwCQEAAAAA
+AHAJ' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAIAEAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAB7AAAAAQAAAAYAAAAAAAAA
+kAoB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAACQCgAAAAAAADwLAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAgQAAAAEAAAAC
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAANAVAQAAAAAA0BUAAAAAAADxBAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAIkA
+AAAB' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAgAAAAAAAADEGgEAAAAAAMQaAAAAAAAAbAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AACXAAAAAQAAAAIAAAAAAAAAMBsBAAAAAAAwGwAAAAAAABACAAAAAAAAAAAAAAAAAAAIAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAoQAAABAAAAADAAAAAAAAANAtAQAAAAAA0B0AAAAAAAAIAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AQAAAAAAAAAIAAAAAAAAALAAAAAOAAAAAwAAAAAAAADYLQEAAAAAANgdAAAAAAAACAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAgAAAAAAAAACAAAAAAAAAC8AAAADwAAAAMAAAAAAAAA4C0BAAAAAADgHQAAAAAA
+AAgA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAAyAAAAAEAAAADAAAAAAAAAOgtAQAAAAAA
+6B0A' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAIAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAANUAAAAGAAAAAwAAAAAAAADw
+LQEA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAPAdAAAAAAAAEAIAAAAAAAAGAAAAAAAAAAgAAAAAAAAAEAAAAAAAAADeAAAAAQAAAAMA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAADABAAAAAAAAIAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAA4wAA
+AAEA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAADAAAAAAAAAKAwAQAAAAAAoCAAAAAAAAAMAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AOoAAAAIAAAAAwAAAAAAAACwMAEAAAAAAKwgAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAgAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAADwAAAACAAAAAMAAAAAAAAA8DABAAAAAACsIAAAAAAAABAQAAAAAAAAAAAAAAAA
+AAAI' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAAA9QAAAAEAAAAwAAAAAAAAAAAAAAAAAAAArCAAAAAAAAAuAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAQAAAAAAAAABAAAAAAAAAP4AAAADAABwAAAAAAAAAAAAAAAAAAAAANogAAAAAAAA
+VwAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA4
+IQAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAPAJAAAAAAAAHAAAAEoAAAAIAAAAAAAAABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAKCsAAAAAAAACBQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAA
+AAAA' >> /tmp/cache_miss_trace_capture_dynamic.b64
+# echo 'AAAAAAAAAAAAACowAAAAAAAAEAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >>
+ /tmp/cache_miss_trace_capture_dynamic.b64
+# base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_ca
+pture_dynamic
+# chmod +x /tmp/cache_miss_trace_capture_dynamic
+# sha256sum /tmp/cache_miss_trace_capture_dynamic
+91f0db111470e9f3fd1a53bfd9b8d7b4404ffe8e20a792e4caa99171bbc1c0cf  /tmp/cache_miss_trace_capture_dynamic
+# /tmp/cache_miss_trace_capture_dynamic --window to-peer --samples 201 --preview
+-mode wake-trigger --summary-only --allow-overflow --final-addresses; rc=$?; ech
+o TRACE_CAPTURE_EXIT rc=$rc
+TRACE_PREVIEW mode=wake-trigger value=6
+SAMPLE=1
+TRACE_HEADER cpu=0 window=1 start=3294771810 peer_begin=3294819344 peer_wake=3294819352 peer_block=0 resume=3294834185 elapsed=47534 i_count=256 d_count=72 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000049100
+TRACE_TRUNCATED records=328 elapsed=47534 i_overflow=1 d_overflow=0
+SAMPLE=2
+TRACE_HEADER cpu=0 window=1 start=3295235322 peer_begin=3295253667 peer_wake=3295253675 peer_block=3295254800 resume=3295264541 elapsed=18345 i_count=180 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001eb4
+TRACE_PASS records=195 elapsed=18345
+SAMPLE=3
+TRACE_HEADER cpu=0 window=1 start=3295696731 peer_begin=3295715320 peer_wake=3295715328 peer_block=3295716448 resume=3295726015 elapsed=18589 i_count=178 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002eb2
+TRACE_PASS records=201 elapsed=18589
+SAMPLE=4
+TRACE_HEADER cpu=0 window=1 start=3296101561 peer_begin=3296119918 peer_wake=3296119926 peer_block=3296121050 resume=3296130670 elapsed=18357 i_count=176 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b0
+TRACE_PASS records=195 elapsed=18357
+SAMPLE=5
+TRACE_HEADER cpu=0 window=1 start=3296550330 peer_begin=3296593532 peer_wake=3296593540 peer_block=3296601024 resume=3296609007 elapsed=43202 i_count=256 d_count=38 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044d00
+TRACE_TRUNCATED records=294 elapsed=43202 i_overflow=1 d_overflow=0
+SAMPLE=6
+TRACE_HEADER cpu=0 window=1 start=3297030528 peer_begin=3297076261 peer_wake=3297076269 peer_block=3297077666 resume=3297103614 elapsed=45733 i_count=256 d_count=34 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044500
+TRACE_TRUNCATED records=290 elapsed=45733 i_overflow=1 d_overflow=0
+SAMPLE=7
+TRACE_HEADER cpu=0 window=1 start=3297510116 peer_begin=3297545511 peer_wake=3297545519 peer_block=3297546932 resume=3297556893 elapsed=35395 i_count=256 d_count=23 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042f00
+TRACE_TRUNCATED records=279 elapsed=35395 i_overflow=1 d_overflow=0
+SAMPLE=8
+TRACE_HEADER cpu=0 window=1 start=3298022635 peer_begin=3298039197 peer_wake=3298039205 peer_block=3298040261 resume=3298049875 elapsed=16562 i_count=113 d_count=25 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003271
+TRACE_PASS records=138 elapsed=16562
+SAMPLE=9
+TRACE_HEADER cpu=0 window=1 start=3298451470 peer_begin=3298470821 peer_wake=3298470829 peer_block=3298040261 resume=3298499632 elapsed=19351 i_count=207 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ccf
+TRACE_PASS records=229 elapsed=19351
+SAMPLE=10
+TRACE_HEADER cpu=0 window=1 start=3298935645 peer_begin=3298978700 peer_wake=3298978708 peer_block=3298980027 resume=3298990296 elapsed=43055 i_count=256 d_count=48 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046100
+TRACE_TRUNCATED records=304 elapsed=43055 i_overflow=1 d_overflow=0
+SAMPLE=11
+TRACE_HEADER cpu=0 window=1 start=3299499255 peer_begin=3299541549 peer_wake=3299541557 peer_block=3299542972 resume=3299552619 elapsed=42294 i_count=256 d_count=57 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000047300
+TRACE_TRUNCATED records=313 elapsed=42294 i_overflow=1 d_overflow=0
+SAMPLE=12
+TRACE_HEADER cpu=0 window=1 start=3299955008 peer_begin=3299972933 peer_wake=3299972941 peer_block=3299974003 resume=3299983735 elapsed=17925 i_count=174 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022ae
+TRACE_PASS records=191 elapsed=17925
+SAMPLE=13
+TRACE_HEADER cpu=0 window=1 start=3300427972 peer_begin=3300451577 peer_wake=3300451585 peer_block=3300459010 resume=3300467062 elapsed=23605 i_count=217 d_count=31 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003ed9
+TRACE_PASS records=248 elapsed=23605
+SAMPLE=14
+TRACE_HEADER cpu=0 window=1 start=3300855578 peer_begin=3300911057 peer_wake=3300911065 peer_block=3300459010 resume=3300923644 elapsed=55479 i_count=256 d_count=49 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046300
+TRACE_TRUNCATED records=305 elapsed=55479 i_overflow=1 d_overflow=0
+SAMPLE=15
+TRACE_HEADER cpu=0 window=1 start=3301403584 peer_begin=3301422353 peer_wake=3301422361 peer_block=3301423419 resume=3301453941 elapsed=18769 i_count=184 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030b8
+TRACE_PASS records=208 elapsed=18769
+SAMPLE=16
+TRACE_HEADER cpu=0 window=1 start=3301816093 peer_begin=3301871621 peer_wake=3301871629 peer_block=3301423419 resume=3301883201 elapsed=55528 i_count=256 d_count=51 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046700
+TRACE_TRUNCATED records=307 elapsed=55528 i_overflow=1 d_overflow=0
+SAMPLE=17
+TRACE_HEADER cpu=0 window=1 start=3302349163 peer_begin=3302364657 peer_wake=3302364665 peer_block=3302365728 resume=3302374750 elapsed=15494 i_count=114 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002e72
+TRACE_PASS records=137 elapsed=15494
+SAMPLE=18
+TRACE_HEADER cpu=0 window=1 start=3302750658 peer_begin=3302768610 peer_wake=3302768618 peer_block=3302769680 resume=3302779415 elapsed=17952 i_count=172 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001eac
+TRACE_PASS records=187 elapsed=17952
+SAMPLE=19
+TRACE_HEADER cpu=0 window=1 start=3303179905 peer_begin=3303219555 peer_wake=3303219563 peer_block=3303221087 resume=3303231070 elapsed=39650 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=39650 i_overflow=1 d_overflow=0
+SAMPLE=20
+TRACE_HEADER cpu=0 window=1 start=3303695971 peer_begin=3303714151 peer_wake=3303714159 peer_block=3303715217 resume=3303723961 elapsed=18180 i_count=171 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cab
+TRACE_PASS records=193 elapsed=18180
+SAMPLE=21
+TRACE_HEADER cpu=0 window=1 start=3304115356 peer_begin=3304133607 peer_wake=3304133615 peer_block=3304134705 resume=3304144487 elapsed=18251 i_count=173 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ad
+TRACE_PASS records=192 elapsed=18251
+SAMPLE=22
+TRACE_HEADER cpu=0 window=1 start=3304524068 peer_begin=3304542292 peer_wake=3304542300 peer_block=3304543390 resume=3304605817 elapsed=18224 i_count=174 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028ae
+TRACE_PASS records=194 elapsed=18224
+SAMPLE=23
+TRACE_HEADER cpu=0 window=1 start=3304990574 peer_begin=3305014276 peer_wake=3305014284 peer_block=3305081818 resume=3305025501 elapsed=23702 i_count=208 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036d0
+TRACE_PASS records=235 elapsed=23702
+SAMPLE=24
+TRACE_HEADER cpu=0 window=1 start=3305415814 peer_begin=3305459257 peer_wake=3305459265 peer_block=3305460656 resume=3305470881 elapsed=43443 i_count=256 d_count=39 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044f00
+TRACE_TRUNCATED records=295 elapsed=43443 i_overflow=1 d_overflow=0
+SAMPLE=25
+TRACE_HEADER cpu=0 window=1 start=3305944441 peer_begin=3305962888 peer_wake=3305962896 peer_block=3305964018 resume=3305973757 elapsed=18447 i_count=179 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb3
+TRACE_PASS records=201 elapsed=18447
+SAMPLE=26
+TRACE_HEADER cpu=0 window=1 start=3306347934 peer_begin=3306365954 peer_wake=3306365962 peer_block=3306367052 resume=3306376693 elapsed=18020 i_count=169 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026a9
+TRACE_PASS records=188 elapsed=18020
+SAMPLE=27
+TRACE_HEADER cpu=0 window=1 start=3306750738 peer_begin=3306773702 peer_wake=3306773710 peer_block=3306780477 resume=3306788035 elapsed=22964 i_count=197 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cc5
+TRACE_PASS records=219 elapsed=22964
+SAMPLE=28
+TRACE_HEADER cpu=0 window=1 start=3307229334 peer_begin=3307248776 peer_wake=3307248784 peer_block=3307249874 resume=3307259762 elapsed=19442 i_count=196 d_count=25 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000032c4
+TRACE_PASS records=221 elapsed=19442
+SAMPLE=29
+TRACE_HEADER cpu=0 window=1 start=3307650232 peer_begin=3307668805 peer_wake=3307668813 peer_block=3307669930 resume=3307700994 elapsed=18573 i_count=182 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb6
+TRACE_PASS records=204 elapsed=18573
+SAMPLE=30
+TRACE_HEADER cpu=0 window=1 start=3308121061 peer_begin=3308139810 peer_wake=3308139818 peer_block=3308140908 resume=3308149592 elapsed=18749 i_count=180 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034b4
+TRACE_PASS records=206 elapsed=18749
+SAMPLE=31
+TRACE_HEADER cpu=0 window=1 start=3308532835 peer_begin=3308575619 peer_wake=3308575627 peer_block=3308577103 resume=3308587394 elapsed=42784 i_count=256 d_count=39 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044f00
+TRACE_TRUNCATED records=295 elapsed=42784 i_overflow=1 d_overflow=0
+SAMPLE=32
+TRACE_HEADER cpu=0 window=1 start=3308992991 peer_begin=3309011328 peer_wake=3309011336 peer_block=3309012426 resume=3309022019 elapsed=18337 i_count=179 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b3
+TRACE_PASS records=198 elapsed=18337
+SAMPLE=33
+TRACE_HEADER cpu=0 window=1 start=3309503375 peer_begin=3309541563 peer_wake=3309541571 peer_block=3309542933 resume=3309552651 elapsed=38188 i_count=256 d_count=53 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046b00
+TRACE_TRUNCATED records=309 elapsed=38188 i_overflow=1 d_overflow=0
+SAMPLE=34
+TRACE_HEADER cpu=0 window=1 start=3309957149 peer_begin=3309975336 peer_wake=3309975344 peer_block=3309976406 resume=3309985971 elapsed=18187 i_count=175 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024af
+TRACE_PASS records=193 elapsed=18187
+SAMPLE=35
+TRACE_HEADER cpu=0 window=1 start=3310367860 peer_begin=3310385961 peer_wake=3310385969 peer_block=3310387104 resume=3310416429 elapsed=18101 i_count=173 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ad
+TRACE_PASS records=192 elapsed=18101
+SAMPLE=36
+TRACE_HEADER cpu=0 window=1 start=3310835821 peer_begin=3310854188 peer_wake=3310854196 peer_block=3310855339 resume=3310865045 elapsed=18367 i_count=179 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb3
+TRACE_PASS records=201 elapsed=18367
+SAMPLE=37
+TRACE_HEADER cpu=0 window=1 start=3311249822 peer_begin=3311268312 peer_wake=3311268320 peer_block=3311269402 resume=3311300677 elapsed=18490 i_count=184 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b8
+TRACE_PASS records=203 elapsed=18490
+SAMPLE=38
+TRACE_HEADER cpu=0 window=1 start=3311667946 peer_begin=3311707842 peer_wake=3311707850 peer_block=3311709270 resume=3311719294 elapsed=39896 i_count=256 d_count=32 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044100
+TRACE_TRUNCATED records=288 elapsed=39896 i_overflow=1 d_overflow=0
+SAMPLE=39
+TRACE_HEADER cpu=0 window=1 start=3312181755 peer_begin=3312200276 peer_wake=3312200284 peer_block=3312201382 resume=3312211272 elapsed=18521 i_count=181 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002eb5
+TRACE_PASS records=204 elapsed=18521
+SAMPLE=40
+TRACE_HEADER cpu=0 window=1 start=3312584683 peer_begin=3312602855 peer_wake=3312602863 peer_block=3312603953 resume=3312613804 elapsed=18172 i_count=169 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024a9
+TRACE_PASS records=187 elapsed=18172
+SAMPLE=41
+TRACE_HEADER cpu=0 window=1 start=3312992048 peer_begin=3313010375 peer_wake=3313010383 peer_block=3313011473 resume=3313021336 elapsed=18327 i_count=176 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028b0
+TRACE_PASS records=196 elapsed=18327
+SAMPLE=42
+TRACE_HEADER cpu=0 window=1 start=3313472946 peer_begin=3313492202 peer_wake=3313492210 peer_block=3313493272 resume=3313503370 elapsed=19256 i_count=195 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034c3
+TRACE_PASS records=221 elapsed=19256
+SAMPLE=43
+TRACE_HEADER cpu=0 window=1 start=3313887783 peer_begin=3313906198 peer_wake=3313906206 peer_block=3313907367 resume=3313937729 elapsed=18415 i_count=178 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab2
+TRACE_PASS records=199 elapsed=18415
+SAMPLE=44
+TRACE_HEADER cpu=0 window=1 start=3314307561 peer_begin=3314346913 peer_wake=3314346921 peer_block=3314348256 resume=3314358108 elapsed=39352 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=39352 i_overflow=1 d_overflow=0
+SAMPLE=45
+TRACE_HEADER cpu=0 window=1 start=3314821463 peer_begin=3314840128 peer_wake=3314840136 peer_block=3314841234 resume=3314851219 elapsed=18665 i_count=184 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb8
+TRACE_PASS records=206 elapsed=18665
+SAMPLE=46
+TRACE_HEADER cpu=0 window=1 start=3315228425 peer_begin=3315246859 peer_wake=3315246867 peer_block=3315247957 resume=3315257778 elapsed=18434 i_count=180 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b4
+TRACE_PASS records=199 elapsed=18434
+SAMPLE=47
+TRACE_HEADER cpu=0 window=1 start=3315643325 peer_begin=3315661838 peer_wake=3315661846 peer_block=3315662936 resume=3315693349 elapsed=18513 i_count=182 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b6
+TRACE_PASS records=201 elapsed=18513
+SAMPLE=48
+TRACE_HEADER cpu=0 window=1 start=3316118766 peer_begin=3316137662 peer_wake=3316137670 peer_block=3316138732 resume=3316148659 elapsed=18896 i_count=183 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036b7
+TRACE_PASS records=210 elapsed=18896
+SAMPLE=49
+TRACE_HEADER cpu=0 window=1 start=3316531940 peer_begin=3316550511 peer_wake=3316550519 peer_block=3316138732 resume=3316579065 elapsed=18571 i_count=191 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028bf
+TRACE_PASS records=211 elapsed=18571
+SAMPLE=50
+TRACE_HEADER cpu=0 window=1 start=3316942037 peer_begin=3316981886 peer_wake=3316981894 peer_block=3316983272 resume=3316993216 elapsed=39849 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=39849 i_overflow=1 d_overflow=0
+SAMPLE=51
+TRACE_HEADER cpu=0 window=1 start=3317457494 peer_begin=3317476135 peer_wake=3317476143 peer_block=3317477229 resume=3317487121 elapsed=18641 i_count=179 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002eb3
+TRACE_PASS records=202 elapsed=18641
+SAMPLE=52
+TRACE_HEADER cpu=0 window=1 start=3317870175 peer_begin=3317888481 peer_wake=3317888489 peer_block=3317889579 resume=3317899423 elapsed=18306 i_count=173 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ad
+TRACE_PASS records=192 elapsed=18306
+SAMPLE=53
+TRACE_HEADER cpu=0 window=1 start=3318277207 peer_begin=3318295414 peer_wake=3318295422 peer_block=3318296512 resume=3318306275 elapsed=18207 i_count=172 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028ac
+TRACE_PASS records=192 elapsed=18207
+SAMPLE=54
+TRACE_HEADER cpu=0 window=1 start=3318788447 peer_begin=3318827522 peer_wake=3318827530 peer_block=3318828842 resume=3318839121 elapsed=39075 i_count=256 d_count=52 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046900
+TRACE_TRUNCATED records=308 elapsed=39075 i_overflow=1 d_overflow=0
+SAMPLE=55
+TRACE_HEADER cpu=0 window=1 start=3319245066 peer_begin=3319263367 peer_wake=3319263375 peer_block=3319264465 resume=3319294800 elapsed=18301 i_count=179 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b3
+TRACE_PASS records=198 elapsed=18301
+SAMPLE=56
+TRACE_HEADER cpu=0 window=1 start=3319661983 peer_begin=3319715572 peer_wake=3319715580 peer_block=3319717257 resume=3319741543 elapsed=53589 i_count=256 d_count=63 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000047f00
+TRACE_TRUNCATED records=319 elapsed=53589 i_overflow=1 d_overflow=0
+SAMPLE=57
+TRACE_HEADER cpu=0 window=1 start=3320212146 peer_begin=3320231103 peer_wake=3320231111 peer_block=3320255408 resume=3320266108 elapsed=18957 i_count=186 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036ba
+TRACE_PASS records=213 elapsed=18957
+SAMPLE=58
+TRACE_HEADER cpu=0 window=1 start=3320625020 peer_begin=3320664133 peer_wake=3320664141 peer_block=3320665572 resume=3320675533 elapsed=39113 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=39113 i_overflow=1 d_overflow=0
+SAMPLE=59
+TRACE_HEADER cpu=0 window=1 start=3321080279 peer_begin=3321103581 peer_wake=3321103589 peer_block=3321110312 resume=3321140727 elapsed=23302 i_count=207 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002acf
+TRACE_PASS records=228 elapsed=23302
+SAMPLE=60
+TRACE_HEADER cpu=0 window=1 start=3321560125 peer_begin=3321578296 peer_wake=3321578304 peer_block=3321579444 resume=3321589290 elapsed=18171 i_count=174 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028ae
+TRACE_PASS records=194 elapsed=18171
+SAMPLE=61
+TRACE_HEADER cpu=0 window=1 start=3321978040 peer_begin=3322021547 peer_wake=3322021555 peer_block=3322022855 resume=3322033261 elapsed=43507 i_count=256 d_count=41 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045300
+TRACE_TRUNCATED records=297 elapsed=43507 i_overflow=1 d_overflow=0
+SAMPLE=62
+TRACE_HEADER cpu=0 window=1 start=3322435216 peer_begin=3322453386 peer_wake=3322453394 peer_block=3322454451 resume=3322463910 elapsed=18170 i_count=175 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024af
+TRACE_PASS records=193 elapsed=18170
+SAMPLE=63
+TRACE_HEADER cpu=0 window=1 start=3322907422 peer_begin=3322925926 peer_wake=3322925934 peer_block=3322927024 resume=3322935764 elapsed=18504 i_count=175 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034af
+TRACE_PASS records=201 elapsed=18504
+SAMPLE=64
+TRACE_HEADER cpu=0 window=1 start=3323313340 peer_begin=3323331686 peer_wake=3323331694 peer_block=3323332784 resume=3323342511 elapsed=18346 i_count=175 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002aaf
+TRACE_PASS records=196 elapsed=18346
+SAMPLE=65
+TRACE_HEADER cpu=0 window=1 start=3323724602 peer_begin=3323743039 peer_wake=3323743047 peer_block=3323744141 resume=3323773509 elapsed=18437 i_count=173 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cad
+TRACE_PASS records=195 elapsed=18437
+SAMPLE=66
+TRACE_HEADER cpu=0 window=1 start=3324207458 peer_begin=3324222757 peer_wake=3324222765 peer_block=3324223847 resume=3324253065 elapsed=15299 i_count=88 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003058
+TRACE_PASS records=112 elapsed=15299
+SAMPLE=67
+TRACE_HEADER cpu=0 window=1 start=3324614640 peer_begin=3324657218 peer_wake=3324657226 peer_block=3324658541 resume=3324668985 elapsed=42578 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=42578 i_overflow=1 d_overflow=0
+SAMPLE=68
+TRACE_HEADER cpu=0 window=1 start=3325074123 peer_begin=3325092515 peer_wake=3325092523 peer_block=3325093585 resume=3325103158 elapsed=18392 i_count=179 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b3
+TRACE_PASS records=198 elapsed=18392
+SAMPLE=69
+TRACE_HEADER cpu=0 window=1 start=3325484719 peer_begin=3325503209 peer_wake=3325503217 peer_block=3325504307 resume=3325567724 elapsed=18490 i_count=178 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab2
+TRACE_PASS records=199 elapsed=18490
+SAMPLE=70
+TRACE_HEADER cpu=0 window=1 start=3325953157 peer_begin=3325976457 peer_wake=3325976465 peer_block=3325983906 resume=3326013266 elapsed=23300 i_count=212 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034d4
+TRACE_PASS records=238 elapsed=23300
+SAMPLE=71
+TRACE_HEADER cpu=0 window=1 start=3326381703 peer_begin=3326420507 peer_wake=3326420515 peer_block=3326421894 resume=3326431818 elapsed=38804 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=38804 i_overflow=1 d_overflow=0
+SAMPLE=72
+TRACE_HEADER cpu=0 window=1 start=3326833052 peer_begin=3326851120 peer_wake=3326851128 peer_block=3326852218 resume=3326861945 elapsed=18068 i_count=173 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ad
+TRACE_PASS records=189 elapsed=18068
+SAMPLE=73
+TRACE_HEADER cpu=0 window=1 start=3327299969 peer_begin=3327318777 peer_wake=3327318785 peer_block=3327319871 resume=3327329526 elapsed=18808 i_count=184 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb8
+TRACE_PASS records=206 elapsed=18808
+SAMPLE=74
+TRACE_HEADER cpu=0 window=1 start=3327704256 peer_begin=3327722488 peer_wake=3327722496 peer_block=3327723586 resume=3327733218 elapsed=18232 i_count=171 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ab
+TRACE_PASS records=190 elapsed=18232
+SAMPLE=75
+TRACE_HEADER cpu=0 window=1 start=3328115358 peer_begin=3328133889 peer_wake=3328133897 peer_block=3328134987 resume=3328144776 elapsed=18531 i_count=177 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab1
+TRACE_PASS records=198 elapsed=18531
+SAMPLE=76
+TRACE_HEADER cpu=0 window=1 start=3328586019 peer_begin=3328604849 peer_wake=3328604857 peer_block=3328605947 resume=3328615676 elapsed=18830 i_count=179 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036b3
+TRACE_PASS records=206 elapsed=18830
+SAMPLE=77
+TRACE_HEADER cpu=0 window=1 start=3329010598 peer_begin=3329029243 peer_wake=3329029251 peer_block=3329030376 resume=3329060953 elapsed=18645 i_count=183 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab7
+TRACE_PASS records=204 elapsed=18645
+SAMPLE=78
+TRACE_HEADER cpu=0 window=1 start=3329456746 peer_begin=3329474974 peer_wake=3329474982 peer_block=3329476064 resume=3329485609 elapsed=18228 i_count=172 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028ac
+TRACE_PASS records=192 elapsed=18228
+SAMPLE=79
+TRACE_HEADER cpu=0 window=1 start=3329896665 peer_begin=3329991116 peer_wake=3329991124 peer_block=3330016736 resume=3330027524 elapsed=94451 i_count=256 d_count=144 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000052100
+TRACE_TRUNCATED records=400 elapsed=94451 i_overflow=1 d_overflow=0
+SAMPLE=80
+TRACE_HEADER cpu=0 window=1 start=3330442818 peer_begin=3330461588 peer_wake=3330461596 peer_block=3330462686 resume=3330492768 elapsed=18770 i_count=184 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb8
+TRACE_PASS records=206 elapsed=18770
+SAMPLE=81
+TRACE_HEADER cpu=0 window=1 start=3330854205 peer_begin=3330910014 peer_wake=3330910022 peer_block=3330462686 resume=3330922037 elapsed=55809 i_count=256 d_count=53 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046b00
+TRACE_TRUNCATED records=309 elapsed=55809 i_overflow=1 d_overflow=0
+SAMPLE=82
+TRACE_HEADER cpu=0 window=1 start=3331332558 peer_begin=3331350957 peer_wake=3331350965 peer_block=3331463884 resume=3331405948 elapsed=18399 i_count=177 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b1
+TRACE_PASS records=196 elapsed=18399
+SAMPLE=83
+TRACE_HEADER cpu=0 window=1 start=3331792861 peer_begin=3331811005 peer_wake=3331811013 peer_block=3331812075 resume=3331821801 elapsed=18144 i_count=173 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ad
+TRACE_PASS records=192 elapsed=18144
+SAMPLE=84
+TRACE_HEADER cpu=0 window=1 start=3332224122 peer_begin=3332264687 peer_wake=3332264695 peer_block=3332266087 resume=3332275797 elapsed=40565 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=40565 i_overflow=1 d_overflow=0
+SAMPLE=85
+TRACE_HEADER cpu=0 window=1 start=3332676508 peer_begin=3332694388 peer_wake=3332694396 peer_block=3332695458 resume=3332705187 elapsed=17880 i_count=169 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020a9
+TRACE_PASS records=185 elapsed=17880
+SAMPLE=86
+TRACE_HEADER cpu=0 window=1 start=3333148453 peer_begin=3333167303 peer_wake=3333167311 peer_block=3333168401 resume=3333178194 elapsed=18850 i_count=180 d_count=29 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003ab4
+TRACE_PASS records=209 elapsed=18850
+SAMPLE=87
+TRACE_HEADER cpu=0 window=1 start=3333551570 peer_begin=3333569650 peer_wake=3333569658 peer_block=3333570720 resume=3333580412 elapsed=18080 i_count=170 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028aa
+TRACE_PASS records=190 elapsed=18080
+SAMPLE=88
+TRACE_HEADER cpu=0 window=1 start=3333956967 peer_begin=3333975249 peer_wake=3333975257 peer_block=3333976319 resume=3333985978 elapsed=18282 i_count=175 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002aaf
+TRACE_PASS records=196 elapsed=18282
+SAMPLE=89
+TRACE_HEADER cpu=0 window=1 start=3334373964 peer_begin=3334428698 peer_wake=3334428706 peer_block=3334437296 resume=3334445038 elapsed=54734 i_count=256 d_count=48 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046100
+TRACE_TRUNCATED records=304 elapsed=54734 i_overflow=1 d_overflow=0
+SAMPLE=90
+TRACE_HEADER cpu=0 window=1 start=3334906868 peer_begin=3334925136 peer_wake=3334925144 peer_block=3334926242 resume=3334936103 elapsed=18268 i_count=177 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024b1
+TRACE_PASS records=195 elapsed=18268
+SAMPLE=91
+TRACE_HEADER cpu=0 window=1 start=3335312705 peer_begin=3335331163 peer_wake=3335331171 peer_block=3335332233 resume=3335342099 elapsed=18458 i_count=180 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b4
+TRACE_PASS records=199 elapsed=18458
+SAMPLE=92
+TRACE_HEADER cpu=0 window=1 start=3335724413 peer_begin=3335742569 peer_wake=3335742577 peer_block=3335743639 resume=3335773046 elapsed=18156 i_count=173 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022ad
+TRACE_PASS records=190 elapsed=18156
+SAMPLE=93
+TRACE_HEADER cpu=0 window=1 start=3336198299 peer_begin=3336216432 peer_wake=3336216440 peer_block=3336217620 resume=3336227398 elapsed=18133 i_count=172 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028ac
+TRACE_PASS records=192 elapsed=18133
+SAMPLE=94
+TRACE_HEADER cpu=0 window=1 start=3336614404 peer_begin=3336657148 peer_wake=3336657156 peer_block=3336658583 resume=3336668858 elapsed=42744 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=42744 i_overflow=1 d_overflow=0
+SAMPLE=95
+TRACE_HEADER cpu=0 window=1 start=3337069770 peer_begin=3337087762 peer_wake=3337087770 peer_block=3337088836 resume=3337098592 elapsed=17992 i_count=174 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ae
+TRACE_PASS records=190 elapsed=17992
+SAMPLE=96
+TRACE_HEADER cpu=0 window=1 start=3337474191 peer_begin=3337492723 peer_wake=3337492731 peer_block=3337493797 resume=3337503648 elapsed=18532 i_count=180 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028b4
+TRACE_PASS records=200 elapsed=18532
+SAMPLE=97
+TRACE_HEADER cpu=0 window=1 start=3337956305 peer_begin=3337975416 peer_wake=3337975424 peer_block=3337976518 resume=3337986412 elapsed=19111 i_count=191 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030bf
+TRACE_PASS records=215 elapsed=19111
+SAMPLE=98
+TRACE_HEADER cpu=0 window=1 start=3338439324 peer_begin=3338458901 peer_wake=3338458909 peer_block=3338460008 resume=3338469968 elapsed=19577 i_count=194 d_count=36 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000048c2
+TRACE_PASS records=230 elapsed=19577
+SAMPLE=99
+TRACE_HEADER cpu=0 window=1 start=3338852905 peer_begin=3338895726 peer_wake=3338895734 peer_block=3338897174 resume=3338907604 elapsed=42821 i_count=256 d_count=34 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044500
+TRACE_TRUNCATED records=290 elapsed=42821 i_overflow=1 d_overflow=0
+SAMPLE=100
+TRACE_HEADER cpu=0 window=1 start=3339308438 peer_begin=3339326315 peer_wake=3339326323 peer_block=3339327389 resume=3339336169 elapsed=17877 i_count=171 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ab
+TRACE_PASS records=187 elapsed=17877
+SAMPLE=101
+TRACE_HEADER cpu=0 window=1 start=3339790421 peer_begin=3339809568 peer_wake=3339809576 peer_block=3339810670 resume=3339820680 elapsed=19147 i_count=185 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036b9
+TRACE_PASS records=212 elapsed=19147
+SAMPLE=102
+TRACE_HEADER cpu=0 window=1 start=3340255377 peer_begin=3340277734 peer_wake=3340277742 peer_block=3340349209 resume=3340290166 elapsed=22357 i_count=180 d_count=35 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000046b4
+TRACE_PASS records=215 elapsed=22357
+SAMPLE=103
+TRACE_HEADER cpu=0 window=1 start=3340685437 peer_begin=3340704050 peer_wake=3340704058 peer_block=3340705193 resume=3340735814 elapsed=18613 i_count=179 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cb3
+TRACE_PASS records=201 elapsed=18613
+SAMPLE=104
+TRACE_HEADER cpu=0 window=1 start=3341160164 peer_begin=3341179043 peer_wake=3341179051 peer_block=3341180117 resume=3341190019 elapsed=18879 i_count=182 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038b6
+TRACE_PASS records=210 elapsed=18879
+SAMPLE=105
+TRACE_HEADER cpu=0 window=1 start=3341580936 peer_begin=3341621293 peer_wake=3341621301 peer_block=3341622710 resume=3341632679 elapsed=40357 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=40357 i_overflow=1 d_overflow=0
+SAMPLE=106
+TRACE_HEADER cpu=0 window=1 start=3342034089 peer_begin=3342052213 peer_wake=3342052221 peer_block=3342053315 resume=3342062148 elapsed=18124 i_count=177 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020b1
+TRACE_PASS records=193 elapsed=18124
+SAMPLE=107
+TRACE_HEADER cpu=0 window=1 start=3342446961 peer_begin=3342465306 peer_wake=3342465314 peer_block=3342466453 resume=3342497171 elapsed=18345 i_count=177 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab1
+TRACE_PASS records=198 elapsed=18345
+SAMPLE=108
+TRACE_HEADER cpu=0 window=1 start=3342931553 peer_begin=3342950639 peer_wake=3342950647 peer_block=3342975016 resume=3342985182 elapsed=19086 i_count=187 d_count=28 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000038bb
+TRACE_PASS records=215 elapsed=19086
+SAMPLE=109
+TRACE_HEADER cpu=0 window=1 start=3343345335 peer_begin=3343384537 peer_wake=3343384545 peer_block=3343385980 resume=3343396029 elapsed=39202 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=39202 i_overflow=1 d_overflow=0
+SAMPLE=110
+TRACE_HEADER cpu=0 window=1 start=3343800778 peer_begin=3343823328 peer_wake=3343823336 peer_block=3343830870 resume=3343861212 elapsed=22550 i_count=206 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ce
+TRACE_PASS records=225 elapsed=22550
+SAMPLE=111
+TRACE_HEADER cpu=0 window=1 start=3344250635 peer_begin=3344267960 peer_wake=3344267968 peer_block=3344269022 resume=3344278856 elapsed=17325 i_count=172 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022ac
+TRACE_PASS records=189 elapsed=17325
+SAMPLE=112
+TRACE_HEADER cpu=0 window=1 start=3344703530 peer_begin=3344744974 peer_wake=3344744982 peer_block=3344746352 resume=3344756605 elapsed=41444 i_count=256 d_count=46 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045d00
+TRACE_TRUNCATED records=302 elapsed=41444 i_overflow=1 d_overflow=0
+SAMPLE=113
+TRACE_HEADER cpu=0 window=1 start=3345171578 peer_begin=3345189690 peer_wake=3345189698 peer_block=3345190760 resume=3345221329 elapsed=18112 i_count=176 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b0
+TRACE_PASS records=195 elapsed=18112
+SAMPLE=114
+TRACE_HEADER cpu=0 window=1 start=3345578710 peer_begin=3345622617 peer_wake=3345622625 peer_block=3345631547 resume=3345639907 elapsed=43907 i_count=256 d_count=38 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044d00
+TRACE_TRUNCATED records=294 elapsed=43907 i_overflow=1 d_overflow=0
+SAMPLE=115
+TRACE_HEADER cpu=0 window=1 start=3346044478 peer_begin=3346062666 peer_wake=3346062674 peer_block=3346063740 resume=3346094292 elapsed=18188 i_count=179 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001eb3
+TRACE_PASS records=194 elapsed=18188
+SAMPLE=116
+TRACE_HEADER cpu=0 window=1 start=3346521481 peer_begin=3346539650 peer_wake=3346539658 peer_block=3346540802 resume=3346549768 elapsed=18169 i_count=175 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028af
+TRACE_PASS records=195 elapsed=18169
+SAMPLE=117
+TRACE_HEADER cpu=0 window=1 start=3346938257 peer_begin=3346981318 peer_wake=3346981326 peer_block=3346982739 resume=3346992961 elapsed=43061 i_count=256 d_count=38 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044d00
+TRACE_TRUNCATED records=294 elapsed=43061 i_overflow=1 d_overflow=0
+SAMPLE=118
+TRACE_HEADER cpu=0 window=1 start=3347393960 peer_begin=3347412034 peer_wake=3347412042 peer_block=3347413103 resume=3347422714 elapsed=18074 i_count=176 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022b0
+TRACE_PASS records=193 elapsed=18074
+SAMPLE=119
+TRACE_HEADER cpu=0 window=1 start=3347822029 peer_begin=3347860777 peer_wake=3347860785 peer_block=3347862213 resume=3347872376 elapsed=38748 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=38748 i_overflow=1 d_overflow=0
+SAMPLE=120
+TRACE_HEADER cpu=0 window=1 start=3348334639 peer_begin=3348353125 peer_wake=3348353133 peer_block=3348354223 resume=3348364210 elapsed=18486 i_count=180 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028b4
+TRACE_PASS records=200 elapsed=18486
+SAMPLE=121
+TRACE_HEADER cpu=0 window=1 start=3348740447 peer_begin=3348758665 peer_wake=3348758673 peer_block=3348759767 resume=3348769567 elapsed=18218 i_count=174 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024ae
+TRACE_PASS records=192 elapsed=18218
+SAMPLE=122
+TRACE_HEADER cpu=0 window=1 start=3349152396 peer_begin=3349170899 peer_wake=3349170907 peer_block=3349172001 resume=3349181895 elapsed=18503 i_count=180 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b4
+TRACE_PASS records=199 elapsed=18503
+SAMPLE=123
+TRACE_HEADER cpu=0 window=1 start=3349566018 peer_begin=3349584508 peer_wake=3349584516 peer_block=3349585646 resume=3349616420 elapsed=18490 i_count=180 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab4
+TRACE_PASS records=201 elapsed=18490
+SAMPLE=124
+TRACE_HEADER cpu=0 window=1 start=3350103805 peer_begin=3350119518 peer_wake=3350119526 peer_block=3350120593 resume=3350129952 elapsed=15713 i_count=108 d_count=30 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003c6c
+TRACE_PASS records=138 elapsed=15713
+SAMPLE=125
+TRACE_HEADER cpu=0 window=1 start=3350583883 peer_begin=3350603321 peer_wake=3350603329 peer_block=3350604404 resume=3350614282 elapsed=19438 i_count=187 d_count=36 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000048bb
+TRACE_PASS records=223 elapsed=19438
+SAMPLE=126
+TRACE_HEADER cpu=0 window=1 start=3350997526 peer_begin=3351021317 peer_wake=3351021325 peer_block=3351028227 resume=3351057084 elapsed=23791 i_count=214 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030d6
+TRACE_PASS records=238 elapsed=23791
+SAMPLE=127
+TRACE_HEADER cpu=0 window=1 start=3351417523 peer_begin=3351461873 peer_wake=3351461881 peer_block=3351470099 resume=3351478065 elapsed=44350 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=44350 i_overflow=1 d_overflow=0
+SAMPLE=128
+TRACE_HEADER cpu=0 window=1 start=3351879395 peer_begin=3351902326 peer_wake=3351902334 peer_block=3351909151 resume=3351973875 elapsed=22931 i_count=204 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020cc
+TRACE_PASS records=220 elapsed=22931
+SAMPLE=129
+TRACE_HEADER cpu=0 window=1 start=3352352482 peer_begin=3352375099 peer_wake=3352375107 peer_block=3352382594 resume=3352390628 elapsed=22617 i_count=201 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ec9
+TRACE_PASS records=224 elapsed=22617
+SAMPLE=130
+TRACE_HEADER cpu=0 window=1 start=3352779215 peer_begin=3352821266 peer_wake=3352821274 peer_block=3352822639 resume=3352832859 elapsed=42051 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=42051 i_overflow=1 d_overflow=0
+SAMPLE=131
+TRACE_HEADER cpu=0 window=1 start=3353243060 peer_begin=3353261418 peer_wake=3353261426 peer_block=3353262492 resume=3353292449 elapsed=18358 i_count=180 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024b4
+TRACE_PASS records=198 elapsed=18358
+SAMPLE=132
+TRACE_HEADER cpu=0 window=1 start=3353654199 peer_begin=3353696546 peer_wake=3353696554 peer_block=3353698058 resume=3353708360 elapsed=42347 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=42347 i_overflow=1 d_overflow=0
+SAMPLE=133
+TRACE_HEADER cpu=0 window=1 start=3354175045 peer_begin=3354193762 peer_wake=3354193770 peer_block=3354194860 resume=3354203769 elapsed=18717 i_count=180 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002eb4
+TRACE_PASS records=203 elapsed=18717
+SAMPLE=134
+TRACE_HEADER cpu=0 window=1 start=3354580624 peer_begin=3354603292 peer_wake=3354603300 peer_block=3354610904 resume=3354618931 elapsed=22668 i_count=200 d_count=22 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002cc8
+TRACE_PASS records=222 elapsed=22668
+SAMPLE=135
+TRACE_HEADER cpu=0 window=1 start=3355012504 peer_begin=3355031167 peer_wake=3355031175 peer_block=3354610904 resume=3355066875 elapsed=18663 i_count=197 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022c5
+TRACE_PASS records=214 elapsed=18663
+SAMPLE=136
+TRACE_HEADER cpu=0 window=1 start=3355455092 peer_begin=3355473208 peer_wake=3355473216 peer_block=3355474302 resume=3355483146 elapsed=18116 i_count=173 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ad
+TRACE_PASS records=192 elapsed=18116
+SAMPLE=137
+TRACE_HEADER cpu=0 window=1 start=3355859198 peer_begin=3355877341 peer_wake=3355877349 peer_block=3355878439 resume=3355888187 elapsed=18143 i_count=174 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022ae
+TRACE_PASS records=191 elapsed=18143
+SAMPLE=138
+TRACE_HEADER cpu=0 window=1 start=3356306261 peer_begin=3356346093 peer_wake=3356346101 peer_block=3356347556 resume=3356357672 elapsed=39832 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=39832 i_overflow=1 d_overflow=0
+SAMPLE=139
+TRACE_HEADER cpu=0 window=1 start=3356758906 peer_begin=3356776757 peer_wake=3356776765 peer_block=3356777859 resume=3356787780 elapsed=17851 i_count=169 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ea9
+TRACE_PASS records=184 elapsed=17851
+SAMPLE=140
+TRACE_HEADER cpu=0 window=1 start=3357175699 peer_begin=3357218038 peer_wake=3357218046 peer_block=3357219389 resume=3357229850 elapsed=42339 i_count=256 d_count=37 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044b00
+TRACE_TRUNCATED records=293 elapsed=42339 i_overflow=1 d_overflow=0
+SAMPLE=141
+TRACE_HEADER cpu=0 window=1 start=3357632294 peer_begin=3357650249 peer_wake=3357650257 peer_block=3357651323 resume=3357661075 elapsed=17955 i_count=172 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ac
+TRACE_PASS records=188 elapsed=17955
+SAMPLE=142
+TRACE_HEADER cpu=0 window=1 start=3358149132 peer_begin=3358187583 peer_wake=3358187591 peer_block=3358188915 resume=3358198995 elapsed=38451 i_count=256 d_count=52 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046900
+TRACE_TRUNCATED records=308 elapsed=38451 i_overflow=1 d_overflow=0
+SAMPLE=143
+TRACE_HEADER cpu=0 window=1 start=3358613962 peer_begin=3358654979 peer_wake=3358654987 peer_block=3358656341 resume=3358666840 elapsed=41017 i_count=256 d_count=32 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044100
+TRACE_TRUNCATED records=288 elapsed=41017 i_overflow=1 d_overflow=0
+SAMPLE=144
+TRACE_HEADER cpu=0 window=1 start=3359080106 peer_begin=3359098007 peer_wake=3359098015 peer_block=3359099105 resume=3359108833 elapsed=17901 i_count=170 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001eaa
+TRACE_PASS records=185 elapsed=17901
+SAMPLE=145
+TRACE_HEADER cpu=0 window=1 start=3359497294 peer_begin=3359552321 peer_wake=3359552329 peer_block=3359560866 resume=3359568638 elapsed=55027 i_count=256 d_count=50 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046500
+TRACE_TRUNCATED records=306 elapsed=55027 i_overflow=1 d_overflow=0
+SAMPLE=146
+TRACE_HEADER cpu=0 window=1 start=3359983227 peer_begin=3360048025 peer_wake=3360048033 peer_block=3360049752 resume=3360061364 elapsed=64798 i_count=256 d_count=63 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000047f00
+TRACE_TRUNCATED records=319 elapsed=64798 i_overflow=1 d_overflow=0
+SAMPLE=147
+TRACE_HEADER cpu=0 window=1 start=3360488799 peer_begin=3360506820 peer_wake=3360506828 peer_block=3360507914 resume=3360517012 elapsed=18021 i_count=176 d_count=13 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001ab0
+TRACE_PASS records=189 elapsed=18021
+SAMPLE=148
+TRACE_HEADER cpu=0 window=1 start=3360948436 peer_begin=3360988700 peer_wake=3360988708 peer_block=3360990110 resume=3360999276 elapsed=40264 i_count=256 d_count=48 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046100
+TRACE_TRUNCATED records=304 elapsed=40264 i_overflow=1 d_overflow=0
+SAMPLE=149
+TRACE_HEADER cpu=0 window=1 start=3361409329 peer_begin=3361427677 peer_wake=3361427685 peer_block=3361428751 resume=3361459415 elapsed=18348 i_count=180 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022b4
+TRACE_PASS records=197 elapsed=18348
+SAMPLE=150
+TRACE_HEADER cpu=0 window=1 start=3361854620 peer_begin=3361872401 peer_wake=3361872409 peer_block=3361873467 resume=3361883300 elapsed=17781 i_count=166 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024a6
+TRACE_PASS records=184 elapsed=17781
+SAMPLE=151
+TRACE_HEADER cpu=0 window=1 start=3362304602 peer_begin=3362345287 peer_wake=3362345295 peer_block=3362346586 resume=3362356760 elapsed=40685 i_count=256 d_count=41 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045300
+TRACE_TRUNCATED records=297 elapsed=40685 i_overflow=1 d_overflow=0
+SAMPLE=152
+TRACE_HEADER cpu=0 window=1 start=3362758487 peer_begin=3362776438 peer_wake=3362776446 peer_block=3362777540 resume=3362787457 elapsed=17951 i_count=167 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020a7
+TRACE_PASS records=183 elapsed=17951
+SAMPLE=153
+TRACE_HEADER cpu=0 window=1 start=3363169425 peer_begin=3363188018 peer_wake=3363188026 peer_block=3363189161 resume=3363219948 elapsed=18593 i_count=185 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b9
+TRACE_PASS records=204 elapsed=18593
+SAMPLE=154
+TRACE_HEADER cpu=0 window=1 start=3363585003 peer_begin=3363624389 peer_wake=3363624397 peer_block=3363625743 resume=3363635741 elapsed=39386 i_count=256 d_count=29 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043b00
+TRACE_TRUNCATED records=285 elapsed=39386 i_overflow=1 d_overflow=0
+SAMPLE=155
+TRACE_HEADER cpu=0 window=1 start=3364036131 peer_begin=3364054241 peer_wake=3364054249 peer_block=3364055343 resume=3364065062 elapsed=18110 i_count=174 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020ae
+TRACE_PASS records=190 elapsed=18110
+SAMPLE=156
+TRACE_HEADER cpu=0 window=1 start=3364509133 peer_begin=3364528105 peer_wake=3364528113 peer_block=3364529179 resume=3364539143 elapsed=18972 i_count=181 d_count=30 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003cb5
+TRACE_PASS records=211 elapsed=18972
+SAMPLE=157
+TRACE_HEADER cpu=0 window=1 start=3364932159 peer_begin=3364950816 peer_wake=3364950824 peer_block=3364529179 resume=3364979124 elapsed=18657 i_count=194 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028c2
+TRACE_PASS records=214 elapsed=18657
+SAMPLE=158
+TRACE_HEADER cpu=0 window=1 start=3365339259 peer_begin=3365381417 peer_wake=3365381425 peer_block=3365382837 resume=3365393008 elapsed=42158 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=42158 i_overflow=1 d_overflow=0
+SAMPLE=159
+TRACE_HEADER cpu=0 window=1 start=3365802163 peer_begin=3365820576 peer_wake=3365820584 peer_block=3365821678 resume=3365851519 elapsed=18413 i_count=178 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026b2
+TRACE_PASS records=197 elapsed=18413
+SAMPLE=160
+TRACE_HEADER cpu=0 window=1 start=3366213231 peer_begin=3366256318 peer_wake=3366256326 peer_block=3366257764 resume=3366268121 elapsed=43087 i_count=256 d_count=35 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044700
+TRACE_TRUNCATED records=291 elapsed=43087 i_overflow=1 d_overflow=0
+SAMPLE=161
+TRACE_HEADER cpu=0 window=1 start=3366732568 peer_begin=3366750652 peer_wake=3366750660 peer_block=3366751722 resume=3366761598 elapsed=18084 i_count=180 d_count=25 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000032b4
+TRACE_PASS records=205 elapsed=18084
+SAMPLE=162
+TRACE_HEADER cpu=0 window=1 start=3367138209 peer_begin=3367160958 peer_wake=3367160966 peer_block=3367168478 resume=3367176507 elapsed=22749 i_count=201 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ec9
+TRACE_PASS records=224 elapsed=22749
+SAMPLE=163
+TRACE_HEADER cpu=0 window=1 start=3367573912 peer_begin=3367628968 peer_wake=3367628976 peer_block=3367637008 resume=3367644447 elapsed=55056 i_count=256 d_count=51 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046700
+TRACE_TRUNCATED records=307 elapsed=55056 i_overflow=1 d_overflow=0
+SAMPLE=164
+TRACE_HEADER cpu=0 window=1 start=3368043322 peer_begin=3368065950 peer_wake=3368065958 peer_block=3367637008 resume=3368100076 elapsed=22628 i_count=205 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022cd
+TRACE_PASS records=222 elapsed=22628
+SAMPLE=165
+TRACE_HEADER cpu=0 window=1 start=3368460868 peer_begin=3368499870 peer_wake=3368499878 peer_block=3368501301 resume=3368511427 elapsed=39002 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=39002 i_overflow=1 d_overflow=0
+SAMPLE=166
+TRACE_HEADER cpu=0 window=1 start=3368979528 peer_begin=3368998130 peer_wake=3368998138 peer_block=3368999240 resume=3369009204 elapsed=18602 i_count=178 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030b2
+TRACE_PASS records=202 elapsed=18602
+SAMPLE=167
+TRACE_HEADER cpu=0 window=1 start=3369384522 peer_begin=3369402648 peer_wake=3369402656 peer_block=3369403750 resume=3369413635 elapsed=18126 i_count=171 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ab
+TRACE_PASS records=190 elapsed=18126
+SAMPLE=168
+TRACE_HEADER cpu=0 window=1 start=3369795393 peer_begin=3369813756 peer_wake=3369813764 peer_block=3369814858 resume=3369824805 elapsed=18363 i_count=176 d_count=21 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002ab0
+TRACE_PASS records=197 elapsed=18363
+SAMPLE=169
+TRACE_HEADER cpu=0 window=1 start=3370206053 peer_begin=3370224328 peer_wake=3370224336 peer_block=3370225471 resume=3370256188 elapsed=18275 i_count=174 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ae
+TRACE_PASS records=193 elapsed=18275
+SAMPLE=170
+TRACE_HEADER cpu=0 window=1 start=3370620331 peer_begin=3370660432 peer_wake=3370660440 peer_block=3370661866 resume=3370671807 elapsed=40101 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=40101 i_overflow=1 d_overflow=0
+SAMPLE=171
+TRACE_HEADER cpu=0 window=1 start=3371170030 peer_begin=3371186393 peer_wake=3371186401 peer_block=3371187458 resume=3371218752 elapsed=16363 i_count=111 d_count=30 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003c6f
+TRACE_PASS records=141 elapsed=16363
+SAMPLE=172
+TRACE_HEADER cpu=0 window=1 start=3371579014 peer_begin=3371623464 peer_wake=3371623472 peer_block=3371631515 resume=3371640442 elapsed=44450 i_count=256 d_count=36 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044900
+TRACE_TRUNCATED records=292 elapsed=44450 i_overflow=1 d_overflow=0
+SAMPLE=173
+TRACE_HEADER cpu=0 window=1 start=3372048954 peer_begin=3372067395 peer_wake=3372067403 peer_block=3372068469 resume=3372098356 elapsed=18441 i_count=184 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020b8
+TRACE_PASS records=200 elapsed=18441
+SAMPLE=174
+TRACE_HEADER cpu=0 window=1 start=3372468328 peer_begin=3372508056 peer_wake=3372508064 peer_block=3372509407 resume=3372519352 elapsed=39728 i_count=256 d_count=30 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043d00
+TRACE_TRUNCATED records=286 elapsed=39728 i_overflow=1 d_overflow=0
+SAMPLE=175
+TRACE_HEADER cpu=0 window=1 start=3372924069 peer_begin=3372942283 peer_wake=3372942291 peer_block=3372943385 resume=3372973169 elapsed=18214 i_count=178 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020b2
+TRACE_PASS records=194 elapsed=18214
+SAMPLE=176
+TRACE_HEADER cpu=0 window=1 start=3373334509 peer_begin=3373407802 peer_wake=3373407810 peer_block=3373409723 resume=3373419074 elapsed=73293 i_count=256 d_count=69 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000048b00
+TRACE_TRUNCATED records=325 elapsed=73293 i_overflow=1 d_overflow=0
+SAMPLE=177
+TRACE_HEADER cpu=0 window=1 start=3373828570 peer_begin=3373865717 peer_wake=3373865725 peer_block=3373867178 resume=3373876411 elapsed=37147 i_count=256 d_count=23 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000042f00
+TRACE_TRUNCATED records=279 elapsed=37147 i_overflow=1 d_overflow=0
+SAMPLE=178
+TRACE_HEADER cpu=0 window=1 start=3374277528 peer_begin=3374300463 peer_wake=3374300471 peer_block=3374307137 resume=3374335789 elapsed=22935 i_count=203 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020cb
+TRACE_PASS records=219 elapsed=22935
+SAMPLE=179
+TRACE_HEADER cpu=0 window=1 start=3374698716 peer_begin=3374743079 peer_wake=3374743087 peer_block=3374751010 resume=3374760011 elapsed=44363 i_count=256 d_count=30 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043d00
+TRACE_TRUNCATED records=286 elapsed=44363 i_overflow=1 d_overflow=0
+SAMPLE=180
+TRACE_HEADER cpu=0 window=1 start=3375161546 peer_begin=3375179635 peer_wake=3375179643 peer_block=3375180709 resume=3375190423 elapsed=18089 i_count=176 d_count=15 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000001eb0
+TRACE_PASS records=191 elapsed=18089
+SAMPLE=181
+TRACE_HEADER cpu=0 window=1 start=3375639401 peer_begin=3375658438 peer_wake=3375658446 peer_block=3375659512 resume=3375669231 elapsed=19037 i_count=187 d_count=27 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000036bb
+TRACE_PASS records=214 elapsed=19037
+SAMPLE=182
+TRACE_HEADER cpu=0 window=1 start=3376108890 peer_begin=3376127600 peer_wake=3376127608 peer_block=3376128674 resume=3376138479 elapsed=18710 i_count=179 d_count=26 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000034b3
+TRACE_PASS records=205 elapsed=18710
+SAMPLE=183
+TRACE_HEADER cpu=0 window=1 start=3376516254 peer_begin=3376534465 peer_wake=3376534473 peer_block=3376535567 resume=3376545349 elapsed=18211 i_count=173 d_count=19 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000026ad
+TRACE_PASS records=192 elapsed=18211
+SAMPLE=184
+TRACE_HEADER cpu=0 window=1 start=3376929458 peer_begin=3376948097 peer_wake=3376948105 peer_block=3376949279 resume=3376980011 elapsed=18639 i_count=186 d_count=20 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000028ba
+TRACE_PASS records=206 elapsed=18639
+SAMPLE=185
+TRACE_HEADER cpu=0 window=1 start=3377340051 peer_begin=3377379245 peer_wake=3377379253 peer_block=3377380786 resume=3377390700 elapsed=39194 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=39194 i_overflow=1 d_overflow=0
+SAMPLE=186
+TRACE_HEADER cpu=0 window=1 start=3377791877 peer_begin=3377809778 peer_wake=3377809786 peer_block=3377810880 resume=3377820613 elapsed=17901 i_count=168 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022a8
+TRACE_PASS records=185 elapsed=17901
+SAMPLE=187
+TRACE_HEADER cpu=0 window=1 start=3378263630 peer_begin=3378287599 peer_wake=3378287607 peer_block=3378356034 resume=3378299032 elapsed=23969 i_count=209 d_count=33 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000042d1
+TRACE_PASS records=242 elapsed=23969
+SAMPLE=188
+TRACE_HEADER cpu=0 window=1 start=3378749084 peer_begin=3378768039 peer_wake=3378768047 peer_block=3378769109 resume=3378779007 elapsed=18955 i_count=182 d_count=31 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003eb6
+TRACE_PASS records=213 elapsed=18955
+SAMPLE=189
+TRACE_HEADER cpu=0 window=1 start=3379162305 peer_begin=3379187290 peer_wake=3379187298 peer_block=3378769109 resume=3379221108 elapsed=24985 i_count=223 d_count=24 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000030df
+TRACE_PASS records=247 elapsed=24985
+SAMPLE=190
+TRACE_HEADER cpu=0 window=1 start=3379581901 peer_begin=3379621133 peer_wake=3379621141 peer_block=3379622508 resume=3379632549 elapsed=39232 i_count=256 d_count=31 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000043f00
+TRACE_TRUNCATED records=287 elapsed=39232 i_overflow=1 d_overflow=0
+SAMPLE=191
+TRACE_HEADER cpu=0 window=1 start=3380040872 peer_begin=3380059573 peer_wake=3380059581 peer_block=3380060675 resume=3380070689 elapsed=18701 i_count=190 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020be
+TRACE_PASS records=206 elapsed=18701
+SAMPLE=192
+TRACE_HEADER cpu=0 window=1 start=3380453915 peer_begin=3380496488 peer_wake=3380496496 peer_block=3380498027 resume=3380508523 elapsed=42573 i_count=256 d_count=37 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044b00
+TRACE_TRUNCATED records=293 elapsed=42573 i_overflow=1 d_overflow=0
+SAMPLE=193
+TRACE_HEADER cpu=0 window=1 start=3380968913 peer_begin=3380986836 peer_wake=3380986844 peer_block=3380987930 resume=3380997919 elapsed=17923 i_count=181 d_count=23 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000002eb5
+TRACE_PASS records=204 elapsed=17923
+SAMPLE=194
+TRACE_HEADER cpu=0 window=1 start=3381420829 peer_begin=3381460989 peer_wake=3381460997 peer_block=3381462366 resume=3381472583 elapsed=40160 i_count=256 d_count=45 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000045b00
+TRACE_TRUNCATED records=301 elapsed=40160 i_overflow=1 d_overflow=0
+SAMPLE=195
+TRACE_HEADER cpu=0 window=1 start=3381874710 peer_begin=3381893084 peer_wake=3381893092 peer_block=3381894186 resume=3381904047 elapsed=18374 i_count=177 d_count=18 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000024b1
+TRACE_PASS records=195 elapsed=18374
+SAMPLE=196
+TRACE_HEADER cpu=0 window=1 start=3382292636 peer_begin=3382347856 peer_wake=3382347864 peer_block=3381894186 resume=3382360656 elapsed=55220 i_count=256 d_count=54 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000046d00
+TRACE_TRUNCATED records=310 elapsed=55220 i_overflow=1 d_overflow=0
+SAMPLE=197
+TRACE_HEADER cpu=0 window=1 start=3382768201 peer_begin=3382786353 peer_wake=3382786361 peer_block=3382787451 resume=3382817757 elapsed=18152 i_count=174 d_count=17 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000022ae
+TRACE_PASS records=191 elapsed=18152
+SAMPLE=198
+TRACE_HEADER cpu=0 window=1 start=3383246234 peer_begin=3383265218 peer_wake=3383265226 peer_block=3383266292 resume=3383296970 elapsed=18984 i_count=182 d_count=29 i_overflow=0 d_overflow=0 armed=0 status=0x0000000000003ab6
+TRACE_PASS records=211 elapsed=18984
+SAMPLE=199
+TRACE_HEADER cpu=0 window=1 start=3383666638 peer_begin=3383706349 peer_wake=3383706357 peer_block=3383707779 resume=3383717592 elapsed=39711 i_count=256 d_count=32 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044100
+TRACE_TRUNCATED records=288 elapsed=39711 i_overflow=1 d_overflow=0
+SAMPLE=200
+TRACE_HEADER cpu=0 window=1 start=3384118874 peer_begin=3384136987 peer_wake=3384136995 peer_block=3384138061 resume=3384147910 elapsed=18113 i_count=175 d_count=16 i_overflow=0 d_overflow=0 armed=0 status=0x00000000000020af
+TRACE_PASS records=191 elapsed=18113
+SAMPLE=201
+TRACE_HEADER cpu=0 window=1 start=3384535757 peer_begin=3384578211 peer_wake=3384578219 peer_block=3384579626 resume=3384589947 elapsed=42454 i_count=256 d_count=33 i_overflow=1 d_overflow=0 armed=0 status=0x0000000000044300
+TRACE_TRUNCATED records=289 elapsed=42454 i_overflow=1 d_overflow=0
+TRACE_RECORD seq=0 side=I index=0 cycle=3384535774 relative=17 message=0x0 paddr=0x08222c9c0 raw=0xc9bbeade02088b27
+TRACE_RECORD seq=1 side=D index=0 cycle=3384535776 relative=19 message=0x0 paddr=0x0810c3000 raw=0xc9bbeae0020430c0
+TRACE_RECORD seq=2 side=I index=1 cycle=3384535845 relative=88 message=0x0 paddr=0x082a53000 raw=0xc9bbeb25020a94c0
+TRACE_RECORD seq=3 side=I index=2 cycle=3384536125 relative=368 message=0x0 paddr=0x0802980c0 raw=0xc9bbec3d0200a603
+TRACE_RECORD seq=4 side=I index=3 cycle=3384536193 relative=436 message=0x0 paddr=0x080297f00 raw=0xc9bbec810200a5fc
+TRACE_RECORD seq=5 side=I index=4 cycle=3384536237 relative=480 message=0x0 paddr=0x080297f40 raw=0xc9bbecad0200a5fd
+TRACE_RECORD seq=6 side=I index=5 cycle=3384536288 relative=531 message=0x0 paddr=0x080297f80 raw=0xc9bbece00200a5fe
+TRACE_RECORD seq=7 side=I index=6 cycle=3384536368 relative=611 message=0x0 paddr=0x080297fc0 raw=0xc9bbed300200a5ff
+TRACE_RECORD seq=8 side=I index=7 cycle=3384536435 relative=678 message=0x0 paddr=0x080299c80 raw=0xc9bbed730200a672
+TRACE_RECORD seq=9 side=I index=8 cycle=3384536477 relative=720 message=0x0 paddr=0x080299cc0 raw=0xc9bbed9d0200a673
+TRACE_RECORD seq=10 side=I index=9 cycle=3384536526 relative=769 message=0x0 paddr=0x080299d00 raw=0xc9bbedce0200a674
+TRACE_RECORD seq=11 side=I index=10 cycle=3384536589 relative=832 message=0x0 paddr=0x080297340 raw=0xc9bbee0d0200a5cd
+TRACE_RECORD seq=12 side=I index=11 cycle=3384536639 relative=882 message=0x0 paddr=0x080297380 raw=0xc9bbee3f0200a5ce
+TRACE_RECORD seq=13 side=D index=1 cycle=3384536645 relative=888 message=0x0 paddr=0x083369b00 raw=0xc9bbee45020cda6c
+TRACE_RECORD seq=14 side=I index=12 cycle=3384536691 relative=934 message=0x0 paddr=0x080297440 raw=0xc9bbee730200a5d1
+TRACE_RECORD seq=15 side=I index=13 cycle=3384536742 relative=985 message=0x0 paddr=0x080297480 raw=0xc9bbeea60200a5d2
+TRACE_RECORD seq=16 side=I index=14 cycle=3384536804 relative=1047 message=0x0 paddr=0x080297540 raw=0xc9bbeee40200a5d5
+TRACE_RECORD seq=17 side=I index=15 cycle=3384536853 relative=1096 message=0x0 paddr=0x080297640 raw=0xc9bbef150200a5d9
+TRACE_RECORD seq=18 side=I index=16 cycle=3384536957 relative=1200 message=0x0 paddr=0x080297000 raw=0xc9bbef7d0200a5c0
+TRACE_RECORD seq=19 side=I index=17 cycle=3384537004 relative=1247 message=0x0 paddr=0x080297040 raw=0xc9bbefac0200a5c1
+TRACE_RECORD seq=20 side=I index=18 cycle=3384537090 relative=1333 message=0x0 paddr=0x080297100 raw=0xc9bbf0020200a5c4
+TRACE_RECORD seq=21 side=I index=19 cycle=3384537193 relative=1436 message=0x0 paddr=0x080299d40 raw=0xc9bbf0690200a675
+TRACE_RECORD seq=22 side=I index=20 cycle=3384537435 relative=1678 message=0x0 paddr=0x080299d80 raw=0xc9bbf15b0200a676
+TRACE_RECORD seq=23 side=I index=21 cycle=3384537488 relative=1731 message=0x0 paddr=0x080299c00 raw=0xc9bbf1900200a670
+TRACE_RECORD seq=24 side=I index=22 cycle=3384537533 relative=1776 message=0x0 paddr=0x080299c40 raw=0xc9bbf1bd0200a671
+TRACE_RECORD seq=25 side=I index=23 cycle=3384537626 relative=1869 message=0x0 paddr=0x080297840 raw=0xc9bbf21a0200a5e1
+TRACE_RECORD seq=26 side=I index=24 cycle=3384537706 relative=1949 message=0x0 paddr=0x0809f5200 raw=0xc9bbf26a02027d48
+TRACE_RECORD seq=27 side=I index=25 cycle=3384537808 relative=2051 message=0x0 paddr=0x0809f5240 raw=0xc9bbf2d002027d49
+TRACE_RECORD seq=28 side=I index=26 cycle=3384537851 relative=2094 message=0x0 paddr=0x0809f5280 raw=0xc9bbf2fb02027d4a
+TRACE_RECORD seq=29 side=I index=27 cycle=3384537936 relative=2179 message=0x0 paddr=0x08052aac0 raw=0xc9bbf35002014aab
+TRACE_RECORD seq=30 side=I index=28 cycle=3384538151 relative=2394 message=0x0 paddr=0x080239300 raw=0xc9bbf42702008e4c
+TRACE_RECORD seq=31 side=I index=29 cycle=3384538193 relative=2436 message=0x0 paddr=0x080239340 raw=0xc9bbf45102008e4d
+TRACE_RECORD seq=32 side=I index=30 cycle=3384538295 relative=2538 message=0x0 paddr=0x080299dc0 raw=0xc9bbf4b70200a677
+TRACE_RECORD seq=33 side=I index=31 cycle=3384538528 relative=2771 message=0x0 paddr=0x08023dd80 raw=0xc9bbf5a002008f76
+TRACE_RECORD seq=34 side=I index=32 cycle=3384538573 relative=2816 message=0x0 paddr=0x08023ddc0 raw=0xc9bbf5cd02008f77
+TRACE_RECORD seq=35 side=I index=33 cycle=3384538625 relative=2868 message=0x0 paddr=0x08023da00 raw=0xc9bbf60102008f68
+TRACE_RECORD seq=36 side=I index=34 cycle=3384538669 relative=2912 message=0x0 paddr=0x08023da40 raw=0xc9bbf62d02008f69
+TRACE_RECORD seq=37 side=I index=35 cycle=3384538714 relative=2957 message=0x0 paddr=0x08023dc40 raw=0xc9bbf65a02008f71
+TRACE_RECORD seq=38 side=I index=36 cycle=3384538767 relative=3010 message=0x0 paddr=0x08023da80 raw=0xc9bbf68f02008f6a
+TRACE_RECORD seq=39 side=I index=37 cycle=3384538988 relative=3231 message=0x0 paddr=0x08023dac0 raw=0xc9bbf76c02008f6b
+TRACE_RECORD seq=40 side=I index=38 cycle=3384539041 relative=3284 message=0x0 paddr=0x08023dc00 raw=0xc9bbf7a102008f70
+TRACE_RECORD seq=41 side=I index=39 cycle=3384539109 relative=3352 message=0x0 paddr=0x08023db00 raw=0xc9bbf7e502008f6c
+TRACE_RECORD seq=42 side=I index=40 cycle=3384539173 relative=3416 message=0x0 paddr=0x080237380 raw=0xc9bbf82502008dce
+TRACE_RECORD seq=43 side=I index=41 cycle=3384539219 relative=3462 message=0x0 paddr=0x0802373c0 raw=0xc9bbf85302008dcf
+TRACE_RECORD seq=44 side=I index=42 cycle=3384539285 relative=3528 message=0x0 paddr=0x080237400 raw=0xc9bbf89502008dd0
+TRACE_RECORD seq=45 side=I index=43 cycle=3384539383 relative=3626 message=0x0 paddr=0x08023db40 raw=0xc9bbf8f702008f6d
+TRACE_RECORD seq=46 side=I index=44 cycle=3384539453 relative=3696 message=0x0 paddr=0x0802367c0 raw=0xc9bbf93d02008d9f
+TRACE_RECORD seq=47 side=I index=45 cycle=3384539502 relative=3745 message=0x0 paddr=0x080236800 raw=0xc9bbf96e02008da0
+TRACE_RECORD seq=48 side=I index=46 cycle=3384539551 relative=3794 message=0x0 paddr=0x080236840 raw=0xc9bbf99f02008da1
+TRACE_RECORD seq=49 side=I index=47 cycle=3384539593 relative=3836 message=0x0 paddr=0x0802368c0 raw=0xc9bbf9c902008da3
+TRACE_RECORD seq=50 side=I index=48 cycle=3384539671 relative=3914 message=0x0 paddr=0x08023db80 raw=0xc9bbfa1702008f6e
+TRACE_RECORD seq=51 side=I index=49 cycle=3384539907 relative=4150 message=0x0 paddr=0x08023dbc0 raw=0xc9bbfb0302008f6f
+TRACE_RECORD seq=52 side=I index=50 cycle=3384539971 relative=4214 message=0x0 paddr=0x0802380c0 raw=0xc9bbfb4302008e03
+TRACE_RECORD seq=53 side=I index=51 cycle=3384540052 relative=4295 message=0x0 paddr=0x080255540 raw=0xc9bbfb9402009555
+TRACE_RECORD seq=54 side=I index=52 cycle=3384540119 relative=4362 message=0x0 paddr=0x0802947c0 raw=0xc9bbfbd70200a51f
+TRACE_RECORD seq=55 side=I index=53 cycle=3384540193 relative=4436 message=0x0 paddr=0x080a12640 raw=0xc9bbfc2102028499
+TRACE_RECORD seq=56 side=I index=54 cycle=3384540294 relative=4537 message=0x0 paddr=0x08085d240 raw=0xc9bbfc8602021749
+TRACE_RECORD seq=57 side=I index=55 cycle=3384540467 relative=4710 message=0x0 paddr=0x080002840 raw=0xc9bbfd33020000a1
+TRACE_RECORD seq=58 side=I index=56 cycle=3384540556 relative=4799 message=0x0 paddr=0x08000fe80 raw=0xc9bbfd8c020003fa
+TRACE_RECORD seq=59 side=I index=57 cycle=3384540609 relative=4852 message=0x0 paddr=0x08000f940 raw=0xc9bbfdc1020003e5
+TRACE_RECORD seq=60 side=I index=58 cycle=3384540673 relative=4916 message=0x0 paddr=0x080004fc0 raw=0xc9bbfe010200013f
+TRACE_RECORD seq=61 side=I index=59 cycle=3384540717 relative=4960 message=0x0 paddr=0x080005000 raw=0xc9bbfe2d02000140
+TRACE_RECORD seq=62 side=I index=60 cycle=3384541209 relative=5452 message=0x0 paddr=0x08023d740 raw=0xc9bc001902008f5d
+TRACE_RECORD seq=63 side=I index=61 cycle=3384541257 relative=5500 message=0x0 paddr=0x08023d780 raw=0xc9bc004902008f5e
+TRACE_RECORD seq=64 side=I index=62 cycle=3384541304 relative=5547 message=0x0 paddr=0x08023d7c0 raw=0xc9bc007802008f5f
+TRACE_RECORD seq=65 side=I index=63 cycle=3384541368 relative=5611 message=0x0 paddr=0x08023c480 raw=0xc9bc00b802008f12
+TRACE_RECORD seq=66 side=I index=64 cycle=3384541414 relative=5657 message=0x0 paddr=0x08023c4c0 raw=0xc9bc00e602008f13
+TRACE_RECORD seq=67 side=I index=65 cycle=3384541506 relative=5749 message=0x0 paddr=0x080243600 raw=0xc9bc0142020090d8
+TRACE_RECORD seq=68 side=I index=66 cycle=3384541551 relative=5794 message=0x0 paddr=0x080243640 raw=0xc9bc016f020090d9
+TRACE_RECORD seq=69 side=D index=2 cycle=3384541600 relative=5843 message=0x0 paddr=0x08336c800 raw=0xc9bc01a0020cdb20
+TRACE_RECORD seq=70 side=I index=67 cycle=3384541656 relative=5899 message=0x0 paddr=0x080243680 raw=0xc9bc01d8020090da
+TRACE_RECORD seq=71 side=I index=68 cycle=3384541699 relative=5942 message=0x0 paddr=0x0802432c0 raw=0xc9bc0203020090cb
+TRACE_RECORD seq=72 side=I index=69 cycle=3384541742 relative=5985 message=0x0 paddr=0x080243300 raw=0xc9bc022e020090cc
+TRACE_RECORD seq=73 side=I index=70 cycle=3384541816 relative=6059 message=0x0 paddr=0x080240780 raw=0xc9bc02780200901e
+TRACE_RECORD seq=74 side=I index=71 cycle=3384541868 relative=6111 message=0x0 paddr=0x0802407c0 raw=0xc9bc02ac0200901f
+TRACE_RECORD seq=75 side=I index=72 cycle=3384541937 relative=6180 message=0x0 paddr=0x08023e600 raw=0xc9bc02f102008f98
+TRACE_RECORD seq=76 side=I index=73 cycle=3384542032 relative=6275 message=0x0 paddr=0x080240840 raw=0xc9bc035002009021
+TRACE_RECORD seq=77 side=D index=3 cycle=3384542065 relative=6308 message=0x0 paddr=0x08188a000 raw=0xc9bc037102062280
+TRACE_RECORD seq=78 side=I index=74 cycle=3384542190 relative=6433 message=0x0 paddr=0x08023fa00 raw=0xc9bc03ee02008fe8
+TRACE_RECORD seq=79 side=D index=4 cycle=3384542210 relative=6453 message=0x0 paddr=0x083f0d000 raw=0xc9bc0402020fc340
+TRACE_RECORD seq=80 side=I index=75 cycle=3384542351 relative=6594 message=0x0 paddr=0x08024f540 raw=0xc9bc048f020093d5
+TRACE_RECORD seq=81 side=I index=76 cycle=3384542398 relative=6641 message=0x0 paddr=0x08024f600 raw=0xc9bc04be020093d8
+TRACE_RECORD seq=82 side=I index=77 cycle=3384542447 relative=6690 message=0x0 paddr=0x08024f640 raw=0xc9bc04ef020093d9
+TRACE_RECORD seq=83 side=I index=78 cycle=3384542831 relative=7074 message=0x0 paddr=0x08024f740 raw=0xc9bc066f020093dd
+TRACE_RECORD seq=84 side=I index=79 cycle=3384542879 relative=7122 message=0x0 paddr=0x08024f840 raw=0xc9bc069f020093e1
+TRACE_RECORD seq=85 side=I index=80 cycle=3384542944 relative=7187 message=0x0 paddr=0x08024f7c0 raw=0xc9bc06e0020093df
+TRACE_RECORD seq=86 side=I index=81 cycle=3384542990 relative=7233 message=0x0 paddr=0x08024f8c0 raw=0xc9bc070e020093e3
+TRACE_RECORD seq=87 side=I index=82 cycle=3384543043 relative=7286 message=0x0 paddr=0x08024f800 raw=0xc9bc0743020093e0
+TRACE_RECORD seq=88 side=I index=83 cycle=3384543395 relative=7638 message=0x0 paddr=0x08023fa40 raw=0xc9bc08a302008fe9
+TRACE_RECORD seq=89 side=I index=84 cycle=3384543446 relative=7689 message=0x0 paddr=0x08023fc00 raw=0xc9bc08d602008ff0
+TRACE_RECORD seq=90 side=D index=5 cycle=3384543497 relative=7740 message=0x0 paddr=0x083f0cfc0 raw=0xc9bc0909020fc33f
+TRACE_RECORD seq=91 side=I index=85 cycle=3384543601 relative=7844 message=0x0 paddr=0x080243380 raw=0xc9bc0971020090ce
+TRACE_RECORD seq=92 side=I index=86 cycle=3384543664 relative=7907 message=0x0 paddr=0x080240ac0 raw=0xc9bc09b00200902b
+TRACE_RECORD seq=93 side=I index=87 cycle=3384543755 relative=7998 message=0x0 paddr=0x0802429c0 raw=0xc9bc0a0b020090a7
+TRACE_RECORD seq=94 side=I index=88 cycle=3384543802 relative=8045 message=0x0 paddr=0x080242980 raw=0xc9bc0a3a020090a6
+TRACE_RECORD seq=95 side=I index=89 cycle=3384543856 relative=8099 message=0x0 paddr=0x080242a00 raw=0xc9bc0a70020090a8
+TRACE_RECORD seq=96 side=I index=90 cycle=3384544000 relative=8243 message=0x0 paddr=0x080242a40 raw=0xc9bc0b00020090a9
+TRACE_RECORD seq=97 side=I index=91 cycle=3384544071 relative=8314 message=0x0 paddr=0x080242a80 raw=0xc9bc0b47020090aa
+TRACE_RECORD seq=98 side=I index=92 cycle=3384544156 relative=8399 message=0x0 paddr=0x080243340 raw=0xc9bc0b9c020090cd
+TRACE_RECORD seq=99 side=I index=93 cycle=3384544200 relative=8443 message=0x0 paddr=0x080243480 raw=0xc9bc0bc8020090d2
+TRACE_RECORD seq=100 side=I index=94 cycle=3384544251 relative=8494 message=0x0 paddr=0x0802434c0 raw=0xc9bc0bfb020090d3
+TRACE_RECORD seq=101 side=I index=95 cycle=3384544418 relative=8661 message=0x0 paddr=0x08023f000 raw=0xc9bc0ca202008fc0
+TRACE_RECORD seq=102 side=I index=96 cycle=3384544461 relative=8704 message=0x0 paddr=0x08023f040 raw=0xc9bc0ccd02008fc1
+TRACE_RECORD seq=103 side=I index=97 cycle=3384544518 relative=8761 message=0x0 paddr=0x08023f080 raw=0xc9bc0d0602008fc2
+TRACE_RECORD seq=104 side=I index=98 cycle=3384544560 relative=8803 message=0x0 paddr=0x08023f100 raw=0xc9bc0d3002008fc4
+TRACE_RECORD seq=105 side=I index=99 cycle=3384544639 relative=8882 message=0x0 paddr=0x0809f7400 raw=0xc9bc0d7f02027dd0
+TRACE_RECORD seq=106 side=I index=100 cycle=3384544754 relative=8997 message=0x0 paddr=0x0802436c0 raw=0xc9bc0df2020090db
+TRACE_RECORD seq=107 side=I index=101 cycle=3384544809 relative=9052 message=0x0 paddr=0x0802437c0 raw=0xc9bc0e29020090df
+TRACE_RECORD seq=108 side=I index=102 cycle=3384544856 relative=9099 message=0x0 paddr=0x080243740 raw=0xc9bc0e58020090dd
+TRACE_RECORD seq=109 side=I index=103 cycle=3384544919 relative=9162 message=0x0 paddr=0x080243780 raw=0xc9bc0e97020090de
+TRACE_RECORD seq=110 side=I index=104 cycle=3384544982 relative=9225 message=0x0 paddr=0x08023f940 raw=0xc9bc0ed602008fe5
+TRACE_RECORD seq=111 side=I index=105 cycle=3384545142 relative=9385 message=0x0 paddr=0x080239800 raw=0xc9bc0f7602008e60
+TRACE_RECORD seq=112 side=I index=106 cycle=3384545205 relative=9448 message=0x0 paddr=0x080239840 raw=0xc9bc0fb502008e61
+TRACE_RECORD seq=113 side=I index=107 cycle=3384545291 relative=9534 message=0x0 paddr=0x080243940 raw=0xc9bc100b020090e5
+TRACE_RECORD seq=114 side=I index=108 cycle=3384545335 relative=9578 message=0x0 paddr=0x080243980 raw=0xc9bc1037020090e6
+TRACE_RECORD seq=115 side=I index=109 cycle=3384545379 relative=9622 message=0x0 paddr=0x080243a00 raw=0xc9bc1063020090e8
+TRACE_RECORD seq=116 side=I index=110 cycle=3384545421 relative=9664 message=0x0 paddr=0x080243a40 raw=0xc9bc108d020090e9
+TRACE_RECORD seq=117 side=I index=111 cycle=3384545472 relative=9715 message=0x0 paddr=0x0802439c0 raw=0xc9bc10c0020090e7
+TRACE_RECORD seq=118 side=I index=112 cycle=3384545550 relative=9793 message=0x0 paddr=0x080243a80 raw=0xc9bc110e020090ea
+TRACE_RECORD seq=119 side=I index=113 cycle=3384545597 relative=9840 message=0x0 paddr=0x080243ac0 raw=0xc9bc113d020090eb
+TRACE_RECORD seq=120 side=I index=114 cycle=3384545764 relative=10007 message=0x0 paddr=0x080243800 raw=0xc9bc11e4020090e0
+TRACE_RECORD seq=121 side=I index=115 cycle=3384545806 relative=10049 message=0x0 paddr=0x080243840 raw=0xc9bc120e020090e1
+TRACE_RECORD seq=122 side=I index=116 cycle=3384545908 relative=10151 message=0x0 paddr=0x080243900 raw=0xc9bc1274020090e4
+TRACE_RECORD seq=123 side=I index=117 cycle=3384545953 relative=10196 message=0x0 paddr=0x080243880 raw=0xc9bc12a1020090e2
+TRACE_RECORD seq=124 side=I index=118 cycle=3384546023 relative=10266 message=0x0 paddr=0x0802438c0 raw=0xc9bc12e7020090e3
+TRACE_RECORD seq=125 side=I index=119 cycle=3384546118 relative=10361 message=0x0 paddr=0x080239380 raw=0xc9bc134602008e4e
+TRACE_RECORD seq=126 side=I index=120 cycle=3384546164 relative=10407 message=0x0 paddr=0x0802393c0 raw=0xc9bc137402008e4f
+TRACE_RECORD seq=127 side=I index=121 cycle=3384546313 relative=10556 message=0x0 paddr=0x08023d800 raw=0xc9bc140902008f60
+TRACE_RECORD seq=128 side=I index=122 cycle=3384546763 relative=11006 message=0x0 paddr=0x08023dc80 raw=0xc9bc15cb02008f72
+TRACE_RECORD seq=129 side=I index=123 cycle=3384547102 relative=11345 message=0x0 paddr=0x080a14140 raw=0xc9bc171e02028505
+TRACE_RECORD seq=130 side=I index=124 cycle=3384547147 relative=11390 message=0x0 paddr=0x080a14180 raw=0xc9bc174b02028506
+TRACE_RECORD seq=131 side=I index=125 cycle=3384547221 relative=11464 message=0x0 paddr=0x080a13880 raw=0xc9bc1795020284e2
+TRACE_RECORD seq=132 side=I index=126 cycle=3384547270 relative=11513 message=0x0 paddr=0x080a138c0 raw=0xc9bc17c6020284e3
+TRACE_RECORD seq=133 side=D index=6 cycle=3384547277 relative=11520 message=0x0 paddr=0x081c03000 raw=0xc9bc17cd020700c0
+TRACE_RECORD seq=134 side=D index=7 cycle=3384547354 relative=11597 message=0x0 paddr=0x08333d000 raw=0xc9bc181a020ccf40
+TRACE_RECORD seq=135 side=I index=127 cycle=3384547470 relative=11713 message=0x0 paddr=0x080278040 raw=0xc9bc188e02009e01
+TRACE_RECORD seq=136 side=I index=128 cycle=3384547536 relative=11779 message=0x0 paddr=0x080277e80 raw=0xc9bc18d002009dfa
+TRACE_RECORD seq=137 side=I index=129 cycle=3384547578 relative=11821 message=0x0 paddr=0x080277ec0 raw=0xc9bc18fa02009dfb
+TRACE_RECORD seq=138 side=I index=130 cycle=3384547654 relative=11897 message=0x0 paddr=0x080278080 raw=0xc9bc194602009e02
+TRACE_RECORD seq=139 side=I index=131 cycle=3384547705 relative=11948 message=0x0 paddr=0x0802780c0 raw=0xc9bc197902009e03
+TRACE_RECORD seq=140 side=I index=132 cycle=3384547978 relative=12221 message=0x0 paddr=0x080a13900 raw=0xc9bc1a8a020284e4
+TRACE_RECORD seq=141 side=I index=133 cycle=3384548027 relative=12270 message=0x0 paddr=0x080a13940 raw=0xc9bc1abb020284e5
+TRACE_RECORD seq=142 side=I index=134 cycle=3384548133 relative=12376 message=0x0 paddr=0x080a13dc0 raw=0xc9bc1b25020284f7
+TRACE_RECORD seq=143 side=I index=135 cycle=3384548187 relative=12430 message=0x0 paddr=0x080a13980 raw=0xc9bc1b5b020284e6
+TRACE_RECORD seq=144 side=I index=136 cycle=3384548256 relative=12499 message=0x0 paddr=0x080246880 raw=0xc9bc1ba0020091a2
+TRACE_RECORD seq=145 side=I index=137 cycle=3384548302 relative=12545 message=0x0 paddr=0x080246980 raw=0xc9bc1bce020091a6
+TRACE_RECORD seq=146 side=I index=138 cycle=3384548395 relative=12638 message=0x0 paddr=0x080240880 raw=0xc9bc1c2b02009022
+TRACE_RECORD seq=147 side=I index=139 cycle=3384548622 relative=12865 message=0x0 paddr=0x080243b00 raw=0xc9bc1d0e020090ec
+TRACE_RECORD seq=148 side=I index=140 cycle=3384548701 relative=12944 message=0x0 paddr=0x080246900 raw=0xc9bc1d5d020091a4
+TRACE_RECORD seq=149 side=I index=141 cycle=3384548747 relative=12990 message=0x0 paddr=0x0802468c0 raw=0xc9bc1d8b020091a3
+TRACE_RECORD seq=150 side=I index=142 cycle=3384548811 relative=13054 message=0x0 paddr=0x080246b00 raw=0xc9bc1dcb020091ac
+TRACE_RECORD seq=151 side=I index=143 cycle=3384548972 relative=13215 message=0x0 paddr=0x080243240 raw=0xc9bc1e6c020090c9
+TRACE_RECORD seq=152 side=I index=144 cycle=3384549048 relative=13291 message=0x0 paddr=0x080246ac0 raw=0xc9bc1eb8020091ab
+TRACE_RECORD seq=153 side=I index=145 cycle=3384549136 relative=13379 message=0x0 paddr=0x08023f080 raw=0xc9bc1f1002008fc2
+TRACE_RECORD seq=154 side=I index=146 cycle=3384549188 relative=13431 message=0x0 paddr=0x08023f0c0 raw=0xc9bc1f4402008fc3
+TRACE_RECORD seq=155 side=I index=147 cycle=3384549280 relative=13523 message=0x0 paddr=0x0809f7340 raw=0xc9bc1fa002027dcd
+TRACE_RECORD seq=156 side=I index=148 cycle=3384549326 relative=13569 message=0x0 paddr=0x0809f7380 raw=0xc9bc1fce02027dce
+TRACE_RECORD seq=157 side=I index=149 cycle=3384549524 relative=13767 message=0x0 paddr=0x08024f680 raw=0xc9bc2094020093da
+TRACE_RECORD seq=158 side=I index=150 cycle=3384550105 relative=14348 message=0x0 paddr=0x08023fec0 raw=0xc9bc22d902008ffb
+TRACE_RECORD seq=159 side=I index=151 cycle=3384550149 relative=14392 message=0x0 paddr=0x08023ff00 raw=0xc9bc230502008ffc
+TRACE_RECORD seq=160 side=I index=152 cycle=3384550195 relative=14438 message=0x0 paddr=0x08023f740 raw=0xc9bc233302008fdd
+TRACE_RECORD seq=161 side=I index=153 cycle=3384550242 relative=14485 message=0x0 paddr=0x08023f8c0 raw=0xc9bc236202008fe3
+TRACE_RECORD seq=162 side=I index=154 cycle=3384550349 relative=14592 message=0x0 paddr=0x08023f900 raw=0xc9bc23cd02008fe4
+TRACE_RECORD seq=163 side=I index=155 cycle=3384550396 relative=14639 message=0x0 paddr=0x08023f880 raw=0xc9bc23fc02008fe2
+TRACE_RECORD seq=164 side=I index=156 cycle=3384550449 relative=14692 message=0x0 paddr=0x08023ff40 raw=0xc9bc243102008ffd
+TRACE_RECORD seq=165 side=I index=157 cycle=3384550763 relative=15006 message=0x0 paddr=0x080246940 raw=0xc9bc256b020091a5
+TRACE_RECORD seq=166 side=I index=158 cycle=3384550836 relative=15079 message=0x0 paddr=0x08052aac0 raw=0xc9bc25b402014aab
+TRACE_RECORD seq=167 side=I index=159 cycle=3384551059 relative=15302 message=0x0 paddr=0x080a13980 raw=0xc9bc2693020284e6
+TRACE_RECORD seq=168 side=I index=160 cycle=3384551083 relative=15326 message=0x0 paddr=0x080a13f80 raw=0xc9bc26ab020284fe
+TRACE_RECORD seq=169 side=I index=161 cycle=3384551125 relative=15368 message=0x0 paddr=0x080a13fc0 raw=0xc9bc26d5020284ff
+TRACE_RECORD seq=170 side=I index=162 cycle=3384551174 relative=15417 message=0x0 paddr=0x080a139c0 raw=0xc9bc2706020284e7
+TRACE_RECORD seq=171 side=I index=163 cycle=3384551216 relative=15459 message=0x0 paddr=0x080a13b40 raw=0xc9bc2730020284ed
+TRACE_RECORD seq=172 side=I index=164 cycle=3384551290 relative=15533 message=0x0 paddr=0x080a13a00 raw=0xc9bc277a020284e8
+TRACE_RECORD seq=173 side=D index=8 cycle=3384551321 relative=15564 message=0x0 paddr=0x08336a000 raw=0xc9bc2799020cda80
+TRACE_RECORD seq=174 side=I index=165 cycle=3384551339 relative=15582 message=0x0 paddr=0x080a13d00 raw=0xc9bc27ab020284f4
+TRACE_RECORD seq=175 side=I index=166 cycle=3384551486 relative=15729 message=0x0 paddr=0x080005c00 raw=0xc9bc283e02000170
+TRACE_RECORD seq=176 side=I index=167 cycle=3384551530 relative=15773 message=0x0 paddr=0x08000b980 raw=0xc9bc286a020002e6
+TRACE_RECORD seq=177 side=D index=9 cycle=3384551587 relative=15830 message=0x0 paddr=0x080044080 raw=0xc9bc28a302001102
+TRACE_RECORD seq=178 side=I index=168 cycle=3384551632 relative=15875 message=0x0 paddr=0x080005c40 raw=0xc9bc28d002000171
+TRACE_RECORD seq=179 side=I index=169 cycle=3384551710 relative=15953 message=0x0 paddr=0x080005100 raw=0xc9bc291e02000144
+TRACE_RECORD seq=180 side=I index=170 cycle=3384551934 relative=16177 message=0x0 paddr=0x080a13b80 raw=0xc9bc29fe020284ee
+TRACE_RECORD seq=181 side=I index=171 cycle=3384552010 relative=16253 message=0x0 paddr=0x08020af40 raw=0xc9bc2a4a020082bd
+TRACE_RECORD seq=182 side=I index=172 cycle=3384552073 relative=16316 message=0x0 paddr=0x08020b2c0 raw=0xc9bc2a89020082cb
+TRACE_RECORD seq=183 side=I index=173 cycle=3384552156 relative=16399 message=0x0 paddr=0x080a13c00 raw=0xc9bc2adc020284f0
+TRACE_RECORD seq=184 side=I index=174 cycle=3384552228 relative=16471 message=0x0 paddr=0x080a13c80 raw=0xc9bc2b24020284f2
+TRACE_RECORD seq=185 side=I index=175 cycle=3384552301 relative=16544 message=0x0 paddr=0x080237700 raw=0xc9bc2b6d02008ddc
+TRACE_RECORD seq=186 side=I index=176 cycle=3384552344 relative=16587 message=0x0 paddr=0x080237740 raw=0xc9bc2b9802008ddd
+TRACE_RECORD seq=187 side=I index=177 cycle=3384552394 relative=16637 message=0x0 paddr=0x080237780 raw=0xc9bc2bca02008dde
+TRACE_RECORD seq=188 side=I index=178 cycle=3384552436 relative=16679 message=0x0 paddr=0x0802377c0 raw=0xc9bc2bf402008ddf
+TRACE_RECORD seq=189 side=I index=179 cycle=3384552478 relative=16721 message=0x0 paddr=0x080237940 raw=0xc9bc2c1e02008de5
+TRACE_RECORD seq=190 side=I index=180 cycle=3384552700 relative=16943 message=0x0 paddr=0x080206d00 raw=0xc9bc2cfc020081b4
+TRACE_RECORD seq=191 side=I index=181 cycle=3384552746 relative=16989 message=0x0 paddr=0x080206d40 raw=0xc9bc2d2a020081b5
+TRACE_RECORD seq=192 side=D index=10 cycle=3384552791 relative=17034 message=0x0 paddr=0x08336d040 raw=0xc9bc2d57020cdb41
+TRACE_RECORD seq=193 side=D index=11 cycle=3384552838 relative=17081 message=0x0 paddr=0x08336d080 raw=0xc9bc2d86020cdb42
+TRACE_RECORD seq=194 side=I index=182 cycle=3384552839 relative=17082 message=0x0 paddr=0x080206d80 raw=0xc9bc2d87020081b6
+TRACE_RECORD seq=195 side=D index=12 cycle=3384552887 relative=17130 message=0x0 paddr=0x08336d0c0 raw=0xc9bc2db7020cdb43
+TRACE_RECORD seq=196 side=I index=183 cycle=3384553010 relative=17253 message=0x0 paddr=0x080a13b00 raw=0xc9bc2e32020284ec
+TRACE_RECORD seq=197 side=I index=184 cycle=3384553081 relative=17324 message=0x0 paddr=0x080203500 raw=0xc9bc2e79020080d4
+TRACE_RECORD seq=198 side=I index=185 cycle=3384553130 relative=17373 message=0x0 paddr=0x080203540 raw=0xc9bc2eaa020080d5
+TRACE_RECORD seq=199 side=D index=13 cycle=3384553166 relative=17409 message=0x0 paddr=0x08336cfc0 raw=0xc9bc2ece020cdb3f
+TRACE_RECORD seq=200 side=D index=14 cycle=3384553252 relative=17495 message=0x0 paddr=0x08336d000 raw=0xc9bc2f24020cdb40
+TRACE_RECORD seq=201 side=I index=186 cycle=3384553348 relative=17591 message=0x0 paddr=0x080236680 raw=0xc9bc2f8402008d9a
+TRACE_RECORD seq=202 side=I index=187 cycle=3384553392 relative=17635 message=0x0 paddr=0x0802366c0 raw=0xc9bc2fb002008d9b
+TRACE_RECORD seq=203 side=I index=188 cycle=3384553483 relative=17726 message=0x0 paddr=0x080236740 raw=0xc9bc300b02008d9d
+TRACE_RECORD seq=204 side=I index=189 cycle=3384553903 relative=18146 message=0x0 paddr=0x080a12380 raw=0xc9bc31af0202848e
+TRACE_RECORD seq=205 side=I index=190 cycle=3384553948 relative=18191 message=0x0 paddr=0x080a12480 raw=0xc9bc31dc02028492
+TRACE_RECORD seq=206 side=D index=15 cycle=3384554037 relative=18280 message=0x0 paddr=0x083f05040 raw=0xc9bc3235020fc141
+TRACE_RECORD seq=207 side=I index=191 cycle=3384554125 relative=18368 message=0x0 paddr=0x080a11900 raw=0xc9bc328d02028464
+TRACE_RECORD seq=208 side=I index=192 cycle=3384554174 relative=18417 message=0x0 paddr=0x080a11940 raw=0xc9bc32be02028465
+TRACE_RECORD seq=209 side=D index=16 cycle=3384554181 relative=18424 message=0x0 paddr=0x081c56000 raw=0xc9bc32c502071580
+TRACE_RECORD seq=210 side=I index=193 cycle=3384554332 relative=18575 message=0x0 paddr=0x080215740 raw=0xc9bc335c0200855d
+TRACE_RECORD seq=211 side=I index=194 cycle=3384554380 relative=18623 message=0x0 paddr=0x080215780 raw=0xc9bc338c0200855e
+TRACE_RECORD seq=212 side=I index=195 cycle=3384554504 relative=18747 message=0x0 paddr=0x08054e940 raw=0xc9bc3408020153a5
+TRACE_RECORD seq=213 side=I index=196 cycle=3384554547 relative=18790 message=0x0 paddr=0x08054e980 raw=0xc9bc3433020153a6
+TRACE_RECORD seq=214 side=I index=197 cycle=3384554639 relative=18882 message=0x0 paddr=0x080262fc0 raw=0xc9bc348f020098bf
+TRACE_RECORD seq=215 side=I index=198 cycle=3384554708 relative=18951 message=0x0 paddr=0x080269200 raw=0xc9bc34d402009a48
+TRACE_RECORD seq=216 side=I index=199 cycle=3384554757 relative=19000 message=0x0 paddr=0x080269240 raw=0xc9bc350502009a49
+TRACE_RECORD seq=217 side=I index=200 cycle=3384554872 relative=19115 message=0x0 paddr=0x0802684c0 raw=0xc9bc357802009a13
+TRACE_RECORD seq=218 side=I index=201 cycle=3384554916 relative=19159 message=0x0 paddr=0x080268500 raw=0xc9bc35a402009a14
+TRACE_RECORD seq=219 side=I index=202 cycle=3384554965 relative=19208 message=0x0 paddr=0x080268540 raw=0xc9bc35d502009a15
+TRACE_RECORD seq=220 side=I index=203 cycle=3384555102 relative=19345 message=0x0 paddr=0x08085d280 raw=0xc9bc365e0202174a
+TRACE_RECORD seq=221 side=D index=17 cycle=3384555184 relative=19427 message=0x0 paddr=0x083f0c040 raw=0xc9bc36b0020fc301
+TRACE_RECORD seq=222 side=I index=204 cycle=3384555250 relative=19493 message=0x0 paddr=0x080287740 raw=0xc9bc36f20200a1dd
+TRACE_RECORD seq=223 side=I index=205 cycle=3384555299 relative=19542 message=0x0 paddr=0x080287780 raw=0xc9bc37230200a1de
+TRACE_RECORD seq=224 side=D index=18 cycle=3384555312 relative=19555 message=0x0 paddr=0x083f090c0 raw=0xc9bc3730020fc243
+TRACE_RECORD seq=225 side=I index=206 cycle=3384555630 relative=19873 message=0x0 paddr=0x08028a640 raw=0xc9bc386e0200a299
+TRACE_RECORD seq=226 side=I index=207 cycle=3384555948 relative=20191 message=0x0 paddr=0x080005040 raw=0xc9bc39ac02000141
+TRACE_RECORD seq=227 side=I index=208 cycle=3384556372 relative=20615 message=0x0 paddr=0x0802877c0 raw=0xc9bc3b540200a1df
+TRACE_RECORD seq=228 side=I index=209 cycle=3384556438 relative=20681 message=0x0 paddr=0x0802869c0 raw=0xc9bc3b960200a1a7
+TRACE_RECORD seq=229 side=I index=210 cycle=3384556487 relative=20730 message=0x0 paddr=0x080286a00 raw=0xc9bc3bc70200a1a8
+TRACE_RECORD seq=230 side=I index=211 cycle=3384556550 relative=20793 message=0x0 paddr=0x080286a40 raw=0xc9bc3c060200a1a9
+TRACE_RECORD seq=231 side=I index=212 cycle=3384556595 relative=20838 message=0x0 paddr=0x080286a80 raw=0xc9bc3c330200a1aa
+TRACE_RECORD seq=232 side=I index=213 cycle=3384556644 relative=20887 message=0x0 paddr=0x080286ac0 raw=0xc9bc3c640200a1ab
+TRACE_RECORD seq=233 side=I index=214 cycle=3384556715 relative=20958 message=0x0 paddr=0x0809fafc0 raw=0xc9bc3cab02027ebf
+TRACE_RECORD seq=234 side=I index=215 cycle=3384556787 relative=21030 message=0x0 paddr=0x0809fb000 raw=0xc9bc3cf302027ec0
+TRACE_RECORD seq=235 side=I index=216 cycle=3384556861 relative=21104 message=0x0 paddr=0x0809f7480 raw=0xc9bc3d3d02027dd2
+TRACE_RECORD seq=236 side=I index=217 cycle=3384556954 relative=21197 message=0x0 paddr=0x0809f6ec0 raw=0xc9bc3d9a02027dbb
+TRACE_RECORD seq=237 side=I index=218 cycle=3384557005 relative=21248 message=0x0 paddr=0x0809f6fc0 raw=0xc9bc3dcd02027dbf
+TRACE_RECORD seq=238 side=I index=219 cycle=3384557071 relative=21314 message=0x0 paddr=0x0809f7000 raw=0xc9bc3e0f02027dc0
+TRACE_RECORD seq=239 side=I index=220 cycle=3384557114 relative=21357 message=0x0 paddr=0x0809f7040 raw=0xc9bc3e3a02027dc1
+TRACE_RECORD seq=240 side=I index=221 cycle=3384557181 relative=21424 message=0x0 paddr=0x0809f6f00 raw=0xc9bc3e7d02027dbc
+TRACE_RECORD seq=241 side=I index=222 cycle=3384557312 relative=21555 message=0x0 paddr=0x080a19ec0 raw=0xc9bc3f000202867b
+TRACE_RECORD seq=242 side=I index=223 cycle=3384557541 relative=21784 message=0x0 paddr=0x080294e80 raw=0xc9bc3fe50200a53a
+TRACE_RECORD seq=243 side=I index=224 cycle=3384557589 relative=21832 message=0x0 paddr=0x080294ec0 raw=0xc9bc40150200a53b
+TRACE_RECORD seq=244 side=I index=225 cycle=3384557652 relative=21895 message=0x0 paddr=0x080288ec0 raw=0xc9bc40540200a23b
+TRACE_RECORD seq=245 side=I index=226 cycle=3384557742 relative=21985 message=0x0 paddr=0x080288f40 raw=0xc9bc40ae0200a23d
+TRACE_RECORD seq=246 side=I index=227 cycle=3384558335 relative=22578 message=0x0 paddr=0x080288f80 raw=0xc9bc42ff0200a23e
+TRACE_RECORD seq=247 side=I index=228 cycle=3384558408 relative=22651 message=0x0 paddr=0x080294e00 raw=0xc9bc43480200a538
+TRACE_RECORD seq=248 side=I index=229 cycle=3384558459 relative=22702 message=0x0 paddr=0x080294d00 raw=0xc9bc437b0200a534
+TRACE_RECORD seq=249 side=I index=230 cycle=3384558510 relative=22753 message=0x0 paddr=0x080294dc0 raw=0xc9bc43ae0200a537
+TRACE_RECORD seq=250 side=I index=231 cycle=3384558740 relative=22983 message=0x0 paddr=0x080294d40 raw=0xc9bc44940200a535
+TRACE_RECORD seq=251 side=I index=232 cycle=3384558790 relative=23033 message=0x0 paddr=0x080294d80 raw=0xc9bc44c60200a536
+TRACE_RECORD seq=252 side=I index=233 cycle=3384558868 relative=23111 message=0x0 paddr=0x080257300 raw=0xc9bc4514020095cc
+TRACE_RECORD seq=253 side=I index=234 cycle=3384558916 relative=23159 message=0x0 paddr=0x080257340 raw=0xc9bc4544020095cd
+TRACE_RECORD seq=254 side=I index=235 cycle=3384558958 relative=23201 message=0x0 paddr=0x080257480 raw=0xc9bc456e020095d2
+TRACE_RECORD seq=255 side=I index=236 cycle=3384559217 relative=23460 message=0x0 paddr=0x08028a500 raw=0xc9bc46710200a294
+TRACE_RECORD seq=256 side=I index=237 cycle=3384559284 relative=23527 message=0x0 paddr=0x080289740 raw=0xc9bc46b40200a25d
+TRACE_RECORD seq=257 side=I index=238 cycle=3384559328 relative=23571 message=0x0 paddr=0x080289780 raw=0xc9bc46e00200a25e
+TRACE_RECORD seq=258 side=I index=239 cycle=3384559575 relative=23818 message=0x0 paddr=0x0802897c0 raw=0xc9bc47d70200a25f
+TRACE_RECORD seq=259 side=I index=240 cycle=3384560155 relative=24398 message=0x0 paddr=0x080289800 raw=0xc9bc4a1b0200a260
+TRACE_RECORD seq=260 side=I index=241 cycle=3384560201 relative=24444 message=0x0 paddr=0x080289840 raw=0xc9bc4a490200a261
+TRACE_RECORD seq=261 side=I index=242 cycle=3384560246 relative=24489 message=0x0 paddr=0x080289c80 raw=0xc9bc4a760200a272
+TRACE_RECORD seq=262 side=I index=243 cycle=3384560311 relative=24554 message=0x0 paddr=0x080289880 raw=0xc9bc4ab70200a262
+TRACE_RECORD seq=263 side=I index=244 cycle=3384560369 relative=24612 message=0x0 paddr=0x0802898c0 raw=0xc9bc4af10200a263
+TRACE_RECORD seq=264 side=I index=245 cycle=3384560445 relative=24688 message=0x0 paddr=0x08028ab80 raw=0xc9bc4b3d0200a2ae
+TRACE_RECORD seq=265 side=I index=246 cycle=3384560520 relative=24763 message=0x0 paddr=0x080289900 raw=0xc9bc4b880200a264
+TRACE_RECORD seq=266 side=I index=247 cycle=3384560574 relative=24817 message=0x0 paddr=0x080289940 raw=0xc9bc4bbe0200a265
+TRACE_RECORD seq=267 side=I index=248 cycle=3384560627 relative=24870 message=0x0 paddr=0x080289a40 raw=0xc9bc4bf30200a269
+TRACE_RECORD seq=268 side=I index=249 cycle=3384560676 relative=24919 message=0x0 paddr=0x080289a00 raw=0xc9bc4c240200a268
+TRACE_RECORD seq=269 side=I index=250 cycle=3384560731 relative=24974 message=0x0 paddr=0x080289980 raw=0xc9bc4c5b0200a266
+TRACE_RECORD seq=270 side=I index=251 cycle=3384560778 relative=25021 message=0x0 paddr=0x0802899c0 raw=0xc9bc4c8a0200a267
+TRACE_RECORD seq=271 side=I index=252 cycle=3384560906 relative=25149 message=0x0 paddr=0x080289a80 raw=0xc9bc4d0a0200a26a
+TRACE_RECORD seq=272 side=I index=253 cycle=3384560956 relative=25199 message=0x0 paddr=0x080289ac0 raw=0xc9bc4d3c0200a26b
+TRACE_RECORD seq=273 side=I index=254 cycle=3384561000 relative=25243 message=0x0 paddr=0x080289d00 raw=0xc9bc4d680200a274
+TRACE_RECORD seq=274 side=I index=255 cycle=3384561049 relative=25292 message=0x0 paddr=0x080289d40 raw=0xc9bc4d990200a275
+TRACE_RECORD seq=275 side=D index=19 cycle=3384561413 relative=25656 message=0x0 paddr=0x081804000 raw=0xc9bc4f0502060100
+TRACE_RECORD seq=276 side=D index=20 cycle=3384563076 relative=27319 message=0x0 paddr=0x081889040 raw=0xc9bc558402062241
+TRACE_RECORD seq=277 side=D index=21 cycle=3384563130 relative=27373 message=0x0 paddr=0x08188a000 raw=0xc9bc55ba02062280
+TRACE_RECORD seq=278 side=D index=22 cycle=3384564231 relative=28474 message=0x0 paddr=0x083f0db00 raw=0xc9bc5a07020fc36c
+TRACE_RECORD seq=279 side=D index=23 cycle=3384566687 relative=30930 message=0x0 paddr=0x083f0d000 raw=0xc9bc639f020fc340
+TRACE_RECORD seq=280 side=D index=24 cycle=3384574053 relative=38296 message=0x0 paddr=0x081c56f40 raw=0xc9bc8065020715bd
+TRACE_RECORD seq=281 side=D index=25 cycle=3384574105 relative=38348 message=0x0 paddr=0x08333e000 raw=0xc9bc8099020ccf80
+TRACE_RECORD seq=282 side=D index=26 cycle=3384576906 relative=41149 message=0x0 paddr=0x083344d00 raw=0xc9bc8b8a020cd134
+TRACE_RECORD seq=283 side=D index=27 cycle=3384577388 relative=41631 message=0x0 paddr=0x083344e80 raw=0xc9bc8d6c020cd13a
+TRACE_RECORD seq=284 side=D index=28 cycle=3384577683 relative=41926 message=0x0 paddr=0x083344f40 raw=0xc9bc8e93020cd13d
+TRACE_RECORD seq=285 side=D index=29 cycle=3384577766 relative=42009 message=0x0 paddr=0x083340000 raw=0xc9bc8ee6020cd000
+TRACE_RECORD seq=286 side=D index=30 cycle=3384577841 relative=42084 message=0x0 paddr=0x083395000 raw=0xc9bc8f31020ce540
+TRACE_RECORD seq=287 side=D index=31 cycle=3384577885 relative=42128 message=0x0 paddr=0x08334b080 raw=0xc9bc8f5d020cd2c2
+TRACE_RECORD seq=288 side=D index=32 cycle=3384577978 relative=42221 message=0x0 paddr=0x0810c30c0 raw=0xc9bc8fba020430c3
+TRACE_FINAL_ADDRESSES records=289 i_overflow=1 d_overflow=0
+TRACE_CAPTURE_PASS samples=201 allow_overflow=1
+TRACE_CAPTURE_EXIT rc=0
+# poweroff -f
+[  162.598004] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              772 (             304)
+INFO:    ps.cpp: minstret (instructions retired):    1,008,495,081 (        3c1c69e9)
+INFO:    ps.cpp: minstret delta:                     1,008,494,309 (        3c1c66e5)
+INFO:    ps.cpp: MTIME start:                           74,857,985 (         4763e01)
+INFO:    ps.cpp: MTIME stop:                         1,380,010,468 (        524149e4)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):       1,305,152,483 (        4dcb0be3)
+INFO:    ps.cpp: IPC        :                             0.096588
+INFO:    ps.cpp: minstret (instructions retired):    1,008,495,166 (        3c1c6a3e)
+INFO:    ps.cpp: wall clock time                :  261,031,819,754 (      3cc6b579ea) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,987,834.55 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000255
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3cef000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+Connection to 192.168.4.35 closed.
