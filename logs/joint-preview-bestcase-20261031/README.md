@@ -720,3 +720,43 @@ different ELF layout. ELF comments and RISC-V attributes identified the tested
 binary as a Buildroot GCC product; rebuilding through the rootfs-matched
 Buildroot compiler reproduced the physical ELF byte-for-byte at
 `ed605f46...6345`. The maintained build example now names that compiler.
+
+## Uncounted prefix-12 replay
+
+The next image changes only the instruction table behind mode 5. The strict
+NBF splicer combines 17,020 low records from accepted prefix-12 donor
+`9d089f49...e094` with all 1,861,853 records from the trigger-only count-zero
+base. Candidate NBF SHA-256 is `b3cb808755d3bc54204d33d084805a967c833ea308254aae9c6f1bbde21f08b3`.
+The three splicer tests pass, and the physical benchmark ELF and transfer stay
+byte-identical at `ed605f46...6345` and `cc9b847d...0261`.
+
+The group-7 feasibility cell passed 512 rows/tails with two rejected
+preemptions and final runner/CORE/BSG markers. After a fresh verified overlay,
+the full predeclared matrix passed all eight cells in one boot with 4,096
+accepted rows/tails, 15 rejected involuntary-preemption attempts, zero hook
+deltas, runner exit zero, and final CORE/BSG PASS.
+
+Within prefix-12, the strict result is `+260.5 [-241.25,856.5]`
+wake-to-entry, `0 [0,0]` local-load, `+177.25 [-304.5,808]` wake-to-load,
+and `+895 [581.5,1125]` roundtrip cycles saved. The decisive independent
+prefix-12-minus-count-zero contrast is `+279.5 [-596,1188]` wake-to-entry,
+exactly `0 [0,0]` local-load, `+72.25 [-732,1068.5]` wake-to-load, and
+`+28 [-507,448.25]` roundtrip cycles. Thus none of the 12-line replay effects
+resolve; the large within-image roundtrip median is already present with an
+empty table and is not replay benefit.
+
+The prefix tail partition is `+5.5 [-22,37.5]` child work,
+`+295.5 [39.5,596.5]` return handoff, and `-310.75 [-597.25,85.75]`
+combined tail cycles. As in count zero, nonlinear robust medians plus the
+post-load `getrusage()` prevent causal tail attribution.
+
+Compressed feasibility/full logs hash to `be2a8fad...842c` and
+`093463e6...51a`; full status hashes to `8f443253...616`. Base, tail,
+prefix-minus-count-zero, and uncounted-minus-counted-prefix analyses hash to
+`78bfc4b2...55b`, `29646073...0c3`, `f67ffd5a...86b`, and
+`031cbcfd...7ad`.
+
+One splicer-test invocation repeated the known repository-root sibling-import
+failure and executed no test. The corrected invocation from `linux-tests/`
+passed all three tests; the successful splice itself preceded and was
+independent of that test-command error.
