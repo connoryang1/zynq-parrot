@@ -36,6 +36,12 @@ static uint64_t rpc_prepare(bp_rpc_prepare_component_t component)
   return rpc_control(bp_rpc_prepare_word(component, 0));
 }
 
+static uint64_t rpc_call_outcome(uint64_t token)
+{
+  __asm__ volatile("csrrw %0, 0x808, %0" : "+r"(token) : : "memory");
+  return token;
+}
+
 static uint64_t rpc_stage_descriptor(uint64_t token, uint64_t caller_satp,
                                      uint64_t server_satp)
 {
@@ -101,6 +107,8 @@ int main(void)
                                          BP_RPC_FIELD_TOKEN, 0)
                      | (UINT64_C(1) << 32)),
          BP_RPC_CONTROL_INVALID);
+  EXPECT("never-installed token is revoked",
+         rpc_call_outcome(token), BP_RPC_OUTCOME_REVOKED);
 
   EXPECT("stage structurally invalid descriptor",
          rpc_stage_descriptor(token, caller_satp, caller_satp),
@@ -154,6 +162,10 @@ int main(void)
   EXPECT("query wrong token",
          rpc_token_command(BP_RPC_CONTROL_READ_STATUS, 0, token + 1),
          BP_RPC_CONTROL_STALE);
+  EXPECT("live but ineligible call is retryable",
+         rpc_call_outcome(token), BP_RPC_OUTCOME_NOT_STARTED);
+  EXPECT("wrong live token is revoked",
+         rpc_call_outcome(token + 1), BP_RPC_OUTCOME_REVOKED);
   EXPECT("revoke wrong token",
          rpc_token_command(BP_RPC_CONTROL_REVOKE, 0, token + 1),
          BP_RPC_CONTROL_STALE);
@@ -163,6 +175,8 @@ int main(void)
   EXPECT("query revoked token",
          rpc_token_command(BP_RPC_CONTROL_READ_STATUS, 0, token),
          BP_RPC_CONTROL_STALE);
+  EXPECT("revoked call is terminal",
+         rpc_call_outcome(token), BP_RPC_OUTCOME_REVOKED);
 
   bp_print_string("[BSG-PASS] atomic protected RPC descriptor control\n");
   bp_finish(0);

@@ -161,7 +161,7 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "csrr t0, 0x807\nbnez t0, 7f\n"
     /* Invalid call and return operands must retire locally. */
     "li a0, 0x55\nli a5, 3\nli a4, 2\ncsrrw a4, 0x808, a4\n"
-    "li t0, 1\nbne a4, t0, 7f\n"
+    "li t0, 2\nbne a4, t0, 7f\n"
     "li t0, 0x55\nbne a0, t0, 7f\n"
     "li t0, 3\nbne a5, t0, 7f\n"
     "csrw 0x809, a0\n"

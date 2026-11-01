@@ -119,8 +119,11 @@ it can also mean that a different TCB attempted the operation, so the adapter
 must not discard a possibly live token on that error. A durable binding object
 should synchronize kernel finalization and caller-runtime state directly.
 
-An invalid, busy, nonresident, wrong-SATP, or otherwise ineligible call returns
-a precise non-started outcome from the same instruction.  A separate
+Version 1 classifies the token atomically with the call: no live descriptor or
+a generation mismatch returns `REVOKED`; a matching live descriptor that is
+busy, nonresident, wrong-SATP, or otherwise temporarily ineligible returns
+`NOT_STARTED`. Thus only a terminal token result releases the runtime's local
+association. A separate
 "eligible?" CSR is forbidden because revocation or scheduling state could
 change between the query and the call.
 

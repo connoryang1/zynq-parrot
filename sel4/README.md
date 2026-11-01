@@ -208,7 +208,10 @@ outcomes into the existing fallback state machine. Its host-injected
 architecture test covers reply decoding and proves that only a definitely
 non-started attempt can reach the software backend. The atomically published
 RTL descriptor and bare-metal call/return transport are implemented and
-tested. Generic/QEMU builds select the non-executed hardware stub;
+tested. Rejected calls classify the supplied token in the same CSR operation:
+an absent descriptor or generation mismatch returns `REVOKED`, while a
+matching live descriptor that is temporarily ineligible returns
+`NOT_STARTED`. Generic/QEMU builds select the non-executed hardware stub;
 BlackParrot builds select the real CSR backend and the kernel binding wrapper.
 `src/protected_rpc_blackparrot_server.c` owns the matching fixed entry: it
 decodes hardware request metadata, invokes the common dispatcher, and consumes
