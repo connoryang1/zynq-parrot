@@ -64,4 +64,6 @@ VALID RUN: guest and host PASS
 
 The exact full-core build log, FST, run log, NBF, and test ELF hash to `473a2765...ad2`, `8bbce5a5...e1`, `8be593b2...e1`, `a0447edd...945`, and `ee966c43...08e`. The run terminates with the known shutdown-only `bsg_nonsynth_dpi_gpio` finalizer assertion after both guest and host PASS; the maintained checker classifies it as valid.
 
+Streaming the exact FST through `fst2vcd` counts zero rising assertions of `icache_uce.detached_prefetch_accepted_demand_match`, one resident-demand match at time 2,167,275,000, and zero matches of either kind in the D-cache UCE. `full-core/predicate-audit.json` retains those counts and the source FST hash. Therefore the full-core run is an integration regression gate; only the directed UCE red/green case causally exercises the new same-edge branch.
+
 A new routed implementation is still required before accepting the candidate for FPGA/Linux use. The already-running route `20261101T125426Z-0fb3da28` predates this candidate and therefore cannot validate it.
