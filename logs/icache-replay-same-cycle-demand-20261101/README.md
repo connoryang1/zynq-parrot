@@ -79,6 +79,21 @@ ee5112ff3b3fa0a7b54b036a1a668c9f887184367eda7220c0c45c908b6f95c5  prefetch5-rout
 1238dd4051605ecb971bc003326e7b95c09ce45d874692c92d7962efe614ede6  prefetch5-route-utilization-synth.rpt
 ```
 
+The independently launched resident-overtake-only prefetch5 comparator is also
+terminal `FAIL` at detail placement. It synthesizes at 55,684/53,200 LUTs
+(104.67%), 30,152 registers, 94 BRAM tiles, and 11 DSPs, and requires 11,524
+slices with 10,938 available. Relative to it, the final same-edge comparator
+adds only 16 synthesized LUTs and eleven required slices; both endpoints are
+already beyond XC7Z020 capacity, so neither can provide a routed prefetch5 A/B.
+The exact comparator artifacts hash to:
+
+```text
+9eedef0937d99c1a7e5755a7c268b9cf447f29634a1a1345c6cdf29fb42255e8  prefetch5-resident-only-route-console.log
+aef9ff075cb94d818b6bc1ce03bb7db666c2d524fde178f625a0caebd2c60389  prefetch5-resident-only-route-revisions.txt
+4f8e9e45f8a9e1843b81eaf3bdf52a6b778d415d23bf985774a9d34a43f69bd5  prefetch5-resident-only-route-status.txt
+c3e70fa7cf9ff6e30750397a306d2beac65e9783ba52e0c430be1ac357bc70a2  prefetch5-resident-only-route-utilization-synth.rpt
+```
+
 ## Predeclared FPGA/Linux gate
 
 Rerun the accepted futex-v1 best-case comparison without changing the table or benchmark. Recover the board before every arm, wait for complete PYNQ readiness, stage and hash-check the new package plus the exact NBF, reload and verify the overlay, and run four fresh boots in these two opposite orders:
