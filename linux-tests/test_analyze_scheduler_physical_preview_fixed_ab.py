@@ -17,13 +17,13 @@ IDENTITY = {
 }
 
 
-def write_run(root, name, arm, base, group=7):
+def write_run(root, name, arm, base, group=7, timing="wake-trigger", mode=6,
+              footprint="hot-proxy", bitstream_sha256=None):
     """Write one complete synthetic runner transcript and status."""
     path = root / f"{name}.log"
-    mode = 1 if arm == "enabled" else 0
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
-        "lines=4 timing=wake-trigger mode=6 footprint=hot-proxy policy=fifo "
+        f"lines=4 timing={timing} mode={mode} footprint={footprint} policy=fifo "
         f"replay_state=persistent arm={arm}",
         "PHYSICAL_BENCH_CHILD PASS retries=0",
     ]
@@ -33,7 +33,8 @@ def write_run(root, name, arm, base, group=7):
         child = 30
         returned = 40
         lines.append(
-            f"PHYSICAL_BENCH trial={trial} mode={mode} hooks=0 "
+            f"PHYSICAL_BENCH trial={trial} mode={1 if arm == 'enabled' else 0} "
+            f"hooks={1 if arm == 'enabled' and (mode in range(1, 5) or timing == 'wake-data') else 0} "
             f"wake_to_entry={entry} load_cycles={load} "
             f"wake_to_load={entry + load} "
             f"roundtrip={entry + load + child + returned}"
@@ -44,7 +45,7 @@ def write_run(root, name, arm, base, group=7):
         )
     lines.extend((
         "PHYSICAL_BENCH_PARENT PASS",
-        f"PHYSICAL_CELL_EXIT group={group} timing=wake-trigger rc=0",
+        f"PHYSICAL_CELL_EXIT group={group} timing={timing} rc=0",
         "CORE[0] PASS",
         "BSG PASS",
     ))
@@ -52,12 +53,14 @@ def write_run(root, name, arm, base, group=7):
     status = {
         "status": "PASS",
         **IDENTITY,
-        "footprint": "hot-proxy",
+        "footprint": footprint,
         "policy": "fifo",
         "replay_state": "persistent",
         "arm": arm,
-        "cells": [f"{group}:wake-trigger"],
+        "cells": [f"{group}:{timing}"],
     }
+    if bitstream_sha256 is not None:
+        status["bitstream_sha256"] = bitstream_sha256
     path.with_suffix(".log.status.json").write_text(
         json.dumps(status) + "\n"
     )
@@ -86,6 +89,10 @@ class FixedArmAnalyzerTest(unittest.TestCase):
             args = argparse.Namespace(
                 **IDENTITY,
                 group=7,
+                timing="wake-trigger",
+                mode=6,
+                footprint="hot-proxy",
+                bitstream_sha256=None,
                 replicate=[
                     ("enabled-disabled", str(e1), str(d1)),
                     ("disabled-enabled", str(e2), str(d2)),
@@ -113,6 +120,10 @@ class FixedArmAnalyzerTest(unittest.TestCase):
             args = argparse.Namespace(
                 **IDENTITY,
                 group=7,
+                timing="wake-trigger",
+                mode=6,
+                footprint="hot-proxy",
+                bitstream_sha256=None,
                 replicate=[
                     ("enabled-disabled", str(e1), str(d1)),
                     ("disabled-enabled", str(e2), str(d2)),
@@ -122,6 +133,53 @@ class FixedArmAnalyzerTest(unittest.TestCase):
             )
             with self.assertRaisesRegex(ValueError, "status elf_sha256"):
                 analyze(args)
+
+    def test_late_data_mode_requires_hook_and_bitstream_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            bitstream = "5" * 64
+            e1 = write_run(root, "e1", "enabled", 90, timing="late", mode=2,
+                           footprint="target", bitstream_sha256=bitstream)
+            d1 = write_run(root, "d1", "disabled", 100, timing="late", mode=2,
+                           footprint="target", bitstream_sha256=bitstream)
+            e2 = write_run(root, "e2", "enabled", 92, timing="late", mode=2,
+                           footprint="target", bitstream_sha256=bitstream)
+            d2 = write_run(root, "d2", "disabled", 102, timing="late", mode=2,
+                           footprint="target", bitstream_sha256=bitstream)
+            args = argparse.Namespace(
+                **IDENTITY,
+                bitstream_sha256=bitstream,
+                group=7,
+                timing="late",
+                mode=2,
+                footprint="target",
+                replicate=[
+                    ("enabled-disabled", str(e1), str(d1)),
+                    ("disabled-enabled", str(e2), str(d2)),
+                ],
+                iid_resamples=10,
+                block_resamples=10,
+            )
+            result = analyze(args)
+            self.assertEqual(result["identity"]["bitstream_sha256"], bitstream)
+            self.assertEqual(result["timing"], "late")
+            status_path = e1.with_suffix(".log.status.json")
+            status = json.loads(status_path.read_text())
+            del status["bitstream_sha256"]
+            status_path.write_text(json.dumps(status) + "\n")
+            with self.assertRaisesRegex(ValueError, "status bitstream_sha256"):
+                analyze(args)
+
+    def test_wakeup_replay_late_data_mode_requires_one_hook(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = write_run(root, "enabled", "enabled", 90,
+                             timing="wake-data", mode=6,
+                             footprint="target")
+            from analyze_scheduler_physical_preview_fixed_ab import load_run
+            run = load_run(path, "enabled", IDENTITY, 7,
+                           "wake-data", 6, "target")
+            self.assertEqual(run["trials"], 512)
 
 
 if __name__ == "__main__":

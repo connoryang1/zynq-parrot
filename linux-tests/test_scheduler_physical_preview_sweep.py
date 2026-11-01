@@ -83,6 +83,7 @@ class SweepAnalyzerTest(unittest.TestCase):
 
     def test_single_cell_analyzer_accepts_wakeup_trigger_mode(self):
         self.assertEqual(TIMING_MODES["wake-trigger"], 6)
+        self.assertEqual(TIMING_MODES["wake-data"], 6)
 
     def test_partial_cell_reports_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -12,8 +12,12 @@
  * leaving the measured dependent target ring cold. This approximates an
  * instruction-only and counter-only A/B without changing the kernel. Mode five
  * removes hook accounting and uses getrusage context-switch deltas as an
- * independent one-switch filter. Mode six retains that filter but launches
- * instruction replay when the target is made runnable, before selection.
+ * independent one-switch filter. Mode six normally retains that filter and
+ * launches instruction replay when the target is made runnable, before
+ * selection. The experimental wake-data kernel dedicates mode six to that
+ * early instruction trigger plus physical data hints through the late
+ * pre-register-switch hook; its counted hook distinguishes the image at run
+ * time without adding a new mode value that would shift replay-table symbols.
  * An optional isolated replay-state executes fence.i in both arms before each
  * handoff so completed advisory lines cannot leak from an enabled trial into
  * a later disabled trial. The historical persistent state remains available
@@ -82,14 +86,14 @@ static unsigned mode_for(unsigned trial, enum arm_mode arm)
 	return (trial ^ (trial >> 1)) & 1;
 }
 
-static int uncounted_mode(unsigned mode)
+static int uncounted_mode(unsigned mode, int wake_data)
 {
-	return mode == 5 || mode == 6;
+	return !wake_data && (mode == 5 || mode == 6);
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned group, unsigned enable_mode, int hot_proxy,
-		      int isolate_replay, enum arm_mode arm)
+		      int isolate_replay, int wake_data, enum arm_mode arm)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -162,7 +166,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			fail("hook count before");
 		samples[trial].mode = enabled;
 		samples[trial].accepted = 0;
-		if (uncounted_mode(enable_mode)
+		if (uncounted_mode(enable_mode, wake_data)
 		    && getrusage(RUSAGE_SELF, &before_usage))
 			fail("getrusage before handoff");
 		transfer(out, &token, 1); /* ready */
@@ -180,7 +184,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		if (uncounted_mode(enable_mode)) {
+		if (uncounted_mode(enable_mode, wake_data)) {
 			if (getrusage(RUSAGE_SELF, &after_usage))
 				fail("getrusage after handoff");
 			voluntary = after_usage.ru_nvcsw - before_usage.ru_nvcsw;
@@ -189,9 +193,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		/* Retain only one-switch handoffs. Counted modes use the scheduler
 		 * hook itself. Uncounted mode five instead requires exactly the one
 		 * voluntary pipe block and no involuntary switch in both A/B arms. */
-		if ((uncounted_mode(enable_mode) && (samples[trial].hooks != 0
+		if ((uncounted_mode(enable_mode, wake_data)
+			    && (samples[trial].hooks != 0
 					 || voluntary != 1 || involuntary != 0))
-			|| (!uncounted_mode(enable_mode)
+			|| (!uncounted_mode(enable_mode, wake_data)
 			    && samples[trial].hooks != enabled)) {
 			fprintf(stderr,
 				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u voluntary=%ld involuntary=%ld\n",
@@ -222,6 +227,7 @@ int main(int argc, char **argv)
 	int hot_proxy = 0;
 	int fifo = 0;
 	int isolate_replay = 0;
+	int wake_data = 0;
 	enum arm_mode arm = arm_alternating;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
@@ -230,7 +236,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 7) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled]\n",
 			argv[0]);
 		return 2;
 	}
@@ -254,6 +260,8 @@ int main(int argc, char **argv)
 			enable_mode = 5;
 		else if (!strcmp(argv[2], "wake-trigger"))
 			enable_mode = 6;
+		else if (!strcmp(argv[2], "wake-data"))
+			enable_mode = 6, wake_data = 1;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -299,7 +307,8 @@ int main(int argc, char **argv)
 	       enable_mode == 2 ? "late" :
 	       enable_mode == 3 ? "instruction" :
 	       enable_mode == 4 ? "counter" :
-	       enable_mode == 5 ? "trigger" : "wake-trigger", enable_mode,
+	       enable_mode == 5 ? "trigger" :
+	       wake_data ? "wake-data" : "wake-trigger", enable_mode,
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal",
 	       isolate_replay ? "isolated" : "persistent",
 	       arm == arm_disabled ? "disabled" :
@@ -324,7 +333,7 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, group, enable_mode,
-			  hot_proxy, isolate_replay, arm);
+			  hot_proxy, isolate_replay, wake_data, arm);
 		return 0;
 	}
 	close(to_child[0]);

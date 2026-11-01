@@ -566,6 +566,15 @@ data timing. This is the matched total-joint comparison; images built before
 that patch keep instruction replay active in both arms and measure only the
 incremental data effect.
 
+The optional final `0010-blackparrot-wakeup-replay-late-data.patch` is a
+size-neutral experimental image for preserving an existing absolute
+instruction-replay table. It changes the late-hook comparison from mode two to
+mode six, so mode six combines the successful-wakeup instruction trigger with
+four late physical data hints. It intentionally disables the prior mode-two
+late hook in that image. The benchmark names this combination `wake-data` and
+requires one counted hook in enabled trials; plain `wake-trigger` remains the
+uncounted instruction-only mode for an image without patch 0010.
+
 Build the compact shell-transfer executable with the matching SDK toolchain:
 
 ```sh
@@ -648,6 +657,15 @@ wake-to-load endpoint, so the primary first-resume metric excludes its cost;
 do not compare this mode's post-load tail directly with counter-filtered modes.
 Run the fixed eight-group plan with `--only-timing trigger`.
 
+The timing value `wake-trigger` selects the ordinary mode-six image: enabled
+trials launch instruction replay from the successful wakeup path, issue no data
+hints, and use the same `getrusage()` one-switch filter as `trigger`. The timing
+value `wake-data` also selects numeric mode six but is valid only with the
+size-neutral patch 0010 image described above; enabled trials then launch the
+same wakeup replay and issue four late data hints, so the benchmark requires
+exactly one counted hook. Analyze fixed-arm runs with the matching timing name
+and do not relabel one image as the other after seeing results.
+
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
 with alternating early/late order by group, and powers off for final
@@ -666,7 +684,8 @@ change, and analyze that prefix together with a suffix that reaches final
 `CORE PASS` and `BSG PASS`. Report the multi-boot composition explicitly.
 For a predeclared single-timing replication, `--only-timing early|late`
 filters the fixed plan after the recovery boundary. The `instruction`,
-`counter`, and `trigger` modes instead use their own fixed eight-cell plans. A
+`counter`, `trigger`, `wake-trigger`, and `wake-data` modes instead use their
+own fixed eight-cell plans. A
 fresh
 single-timing run normally completes before the observed nine-to-ten-cell board
 liveness boundary; do not use the filter after inspecting individual set

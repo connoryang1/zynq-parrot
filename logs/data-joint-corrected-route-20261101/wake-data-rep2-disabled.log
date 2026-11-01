@@ -1,0 +1,1649 @@
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+NBF_SHA256=8cee44733ed80439541168fb2c610b00af1f37a7108e4c2ae8eb52b5d728d64c
+LOG=/home/xilinx/bp-logs/linux-mode6-wakeup-late-data-futex-prefix16-interactive-20261101T164258Z-2078.log
+BITSTREAM_SHA256=a070df7f2d69b86e745a9b915798e704ac4ee2255e97d3c50e3aa1a4f4ba3ce9
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 3600000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbe942670 40000004 16 1
+INFO:    Creating host: 0xbe942670 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d38000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d38000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1567965
+DEBUG-PS: ps.cpp: 1-1568202
+DEBUG-PS: ps.cpp: 2-1568390
+DEBUG-PS: ps.cpp: 3-1568570
+DEBUG-PS: ps.cpp: 4-1568744
+DEBUG-PS: ps.cpp: 5-1568916
+DEBUG-PS: ps.cpp: 6-1577307
+DEBUG-PS: ps.cpp: 7-1578930
+DEBUG-PS: ps.cpp: 8-1579984
+DEBUG-PS: ps.cpp: 9-1580736
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878893
+DEBUG-PS: ps.cpp: finished loading 1878893 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #14 SMP Sun Nov  1 01:37:24 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 root=/dev/ram0
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8289K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000102] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009489] Console: colour dummy device 80x25
+[    0.011331] printk: console [hvc0] enabled
+[    0.159883] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.166008] pid_max: default: 32768 minimum: 301
+[    0.182403] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.187765] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.427426] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.445738] riscv: ELF compat mode unsupported
+[    0.447541] ASID allocator disabled (1 bits)
+[    0.469579] rcu: Hierarchical SRCU implementation.
+[    0.473272] rcu: 	Max phase no-delay instances is 1000.
+[    0.513062] EFI services will not be available.
+[    0.535285] smp: Bringing up secondary CPUs ...
+[    0.539475] smp: Brought up 1 node, 1 CPU
+[    0.584415] devtmpfs: initialized
+[    0.710277] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.716488] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.808043] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.853051] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.860906] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.162927] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.404093] SCSI subsystem initialized
+[    1.429059] libata version 3.00 loaded.
+[    1.453785] usbcore: registered new interface driver usbfs
+[    1.460907] usbcore: registered new interface driver hub
+[    1.468614] usbcore: registered new device driver usb
+[    1.580791] vgaarb: loaded
+[    1.592910] clocksource: Switched to clocksource riscv_clocksource
+[    2.951138] NET: Registered PF_INET protocol family
+[    2.974785] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.045922] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.053195] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.058631] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.065071] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.075694] TCP: Hash tables configured (established 512 bind 512)
+[    3.090991] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.101722] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.125702] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.210372] RPC: Registered named UNIX socket transport module.
+[    3.214642] RPC: Registered udp transport module.
+[    3.217988] RPC: Registered tcp transport module.
+[    3.221294] RPC: Registered tcp-with-tls transport module.
+[    3.224910] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.229153] PCI: CLS 0 bytes, default 64
+[    3.395550] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.489424] NFS: Registering the id_resolver key type
+[    3.497251] Key type id_resolver registered
+[    3.499711] Key type id_legacy registered
+[    3.506429] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.511014] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.559754] 9p: Installing v9fs 9p2000 file system support
+[    3.589475] NET: Registered PF_ALG protocol family
+[    3.598829] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.604952] io scheduler mq-deadline registered
+[    3.607559] io scheduler kyber registered
+[   23.795582] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   24.201251] [drm] radeon kernel modesetting enabled.
+[   25.855996] loop: module loaded
+[   26.087628] e1000e: Intel(R) PRO/1000 Network Driver
+[   26.091401] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   26.278805] usbcore: registered new interface driver uas
+[   26.287098] usbcore: registered new interface driver usb-storage
+[   26.358143] mousedev: PS/2 mouse device common for all mice
+[   26.405172] sdhci: Secure Digital Host Controller Interface driver
+[   26.409213] sdhci: Copyright(c) Pierre Ossman
+[   26.415032] sdhci-pltfm: SDHCI platform and OF driver helper
+[   26.442622] usbcore: registered new interface driver usbhid
+[   26.446992] usbhid: USB HID core driver
+[   26.478566] NET: Registered PF_INET6 protocol family
+[   26.714479] Segment Routing with IPv6
+[   26.725719] In-situ OAM (IOAM) with IPv6
+[   26.737477] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   26.811896] NET: Registered PF_PACKET protocol family
+[   26.827903] 9pnet: Installing 9P2000 support
+[   26.838609] Key type dns_resolver registered
+[   26.849462] start plist test
+[   27.240968] end plist test
+[   29.641558] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   30.303798] clk: Disabling unused clocks
+[   37.302902] Freeing unused kernel image (initmem) memory: 5104K
+[   37.309699] Run /init as init process
+[   37.311899]   with arguments:
+[   37.314636]     /init
+[   37.316959]   with environment:
+[   37.318734]     HOME=/
+[   37.321073]     TERM=linux
+[bsg] Hello from rootFS!
+Saving 256 bits of non-creditable seed for next boot
+Starting syslogd: OK
+Starting klogd: OK
+Running sysctl: OK
+[bsg] Running test_info.sh with argument start
+[bsg] Getting /proc/cpuinfo
+processor	: 0
+hart		: 0
+isa		: rv64imafdc_zicntr_zicsr_zifencei_zihpm
+mmu		: sv39
+mvendorid	: 0x0
+marchid		: 0xd
+mimpid		: 0x3
+
+[bsg] Getting /proc/meminfo
+MemTotal:          44644 kB
+MemFree:           26120 kB
+MemAvailable:      25516 kB
+Buffers:               0 kB
+Cached:             8696 kB
+SwapCached:            0 kB
+Active:               32 kB
+Inactive:            516 kB
+Active(anon):         32 kB
+Inactive(anon):      516 kB
+Active(file):          0 kB
+Inactive(file):        0 kB
+Unevictable:        8672 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                 0 kB
+Writeback:             0 kB
+AnonPages:           580 kB
+Mapped:             1880 kB
+Shmem:                24 kB
+KReclaimable:       1156 kB
+Slab:               6140 kB
+SReclaimable:       1156 kB
+SUnreclaim:         4984 kB
+KernelStack:         656 kB
+PageTables:          436 kB
+SecPageTables:         0 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:       22320 kB
+Committed_AS:       2244 kB
+VmallocTotal:   67108864 kB
+VmallocUsed:         692 kB
+VmallocChunk:          0 kB
+Percpu:               76 kB
+Starting network: OK
+# : > /tmp/scheduler_physical_preview_benchmark_dynamic.b64
+# echo 'f0VMRgIBAQAAAAAAAAAAAAIA8wABAAAAcBABAAAAAABAAAAAAAAAAJguAAAAAAAABQAAAEAA
+OAAKAEAAHQAcAAYAAAAEAAAAQAAAAAAAAABAAAEAAAAAAEAAAQAAAAAAMAIAAAAAAAAwAgAAAAAAAAgA
+AAAAAAAAAwAAAAQAAABwAgAAAAAAAHACAQAAAAAAcAIBAAAAAAAhAAAAAAAAACEAAAAAAAAAAQAAAAAA
+AAADAABwBAAAAOYgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFcAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEA
+AAAFAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAiB0AAAAAAACIHQAAAAAAAAAQAAAAAAAAAQAAAAYA
+AADQHQAAAAAAANAtAQAAAAAA0C0BAAAAAADoAgAAAAAAAPgCAAAAAAAAABAAAAAAAAACAAAABgAAAPAd
+AAAAAAAA8C0BAAAAAADwLQEAAAAAABACAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'EAIAAAAAAAAIAAAAAAAAAAQAAAAEAAAAlAIAAAAAAACUAgEAAAAAAJQCAQAAAAAAIAAAAAAA
+AAAgAAAAAAAAAAQAAAAAAAAAUOV0ZAQAAACAGwAAAAAAAIAbAQAAAAAAgBsBAAAAAABMAAAAAAAAAEwA
+AAAAAAAABAAAAAAAAABR5XRkBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAQAAAAAAAAAFLldGQEAAAA0B0AAAAAAADQLQEAAAAAANAtAQAAAAAAMAIAAAAAAAAwAgAAAAAAAAEA
+AAAAAAAAL2xpYi9sZC1saW51eC1yaXNjdjY0LWxwNjRkLnNvLjEAAAAABAAAABAAAAABAAAAR05VAAAA
+AAAEAAAADwAAAAAAAAAAAAAAEQAAABcAAAAAAAAAAAAAAAsAAAARAAAADwAAAAAAAAAOAAAAAQAAAAAA
+AAATAAAAAwAAAAAAAAAHAAAABAAAAAUAAAAIAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'CQAAAAAAAAAUAAAAAAAAABUAAAAKAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAMAAAADQAAAAAA
+AAAAAAAAFgAAABIAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAIAAAAAAAAAEQAAAAEAAAACAAAABwAAABAA
+ghERQETTClahTkUU2cABAAAAAgAAAAAAAAADAAAABAAAAAAAAAAFAAAACQAAAAAAAAAAAAAADAAAAA4A
+AAAPAAAAEAAAABIAAAAUAAAAFgAAAPdhnXBrf5p8UbWoED9+lnw++f+8Lk499hh+CodxsZp8ckecfFbT
+A7Y58osczIr8+XfllnxflpMcEXucfMg5QB9bmjsPSvApEP/shBRATZ18uStrFSFiZAcAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAbAAAABIAAADACgEAAAAAAAAAAAAAAAAASgAAABIADAAACwEAAAAAAHAF
+AAAAAAAAhgAAABIAAADQCgEAAAAAAAAAAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'JAAAABIAAACgCgEAAAAAAAAAAAAAAAAAVgAAABIAAADgCQEAAAAAAAAAAAAAAAAAPQAAABIA
+AADwCQEAAAAAAAAAAAAAAAAA5AAAABAA8f8AOAEAAAAAAAAAAAAAAAAAjAAAABIAAADwCgEAAAAAAAAA
+AAAAAAAAkQAAABIAAAAQCgEAAAAAAAAAAAAAAAAAZAAAABIAAABACgEAAAAAAAAAAAAAAAAATwAAABEA
+FwC4MAEAAAAAAAgAAAAAAAAALgAAABIAAAAACgEAAAAAAAAAAAAAAAAAKQAAABIAAABgCgEAAAAAAAAA
+AAAAAAAAfwAAABIAAADgCgEAAAAAAAAAAAAAAAAABwAAABIAAACACgEAAAAAAAAAAAAAAAAAEwAAABIA
+AAAwCgEAAAAAAAAAAAAAAAAAXgAAABIAAABwCgEAAAAAAAAAAAAAAAAAAQAAABIAAAAgCgEAAAAAAAAA
+AAAAAAAADAAAABIAAACQCgEAAAAAAAAAAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'OAAAABIAAABQCgEAAAAAAAAAAAAAAAAAVwAAABIAAACwCgEAAAAAAAAAAAAAAAAAlgAAABEA
+EwDoLQEAAAAAAAgAAAAAAAAAAHByY3RsAHB1dHMAcGVycm9yAF9fc3RhY2tfY2hrX2ZhaWwAZXhpdABm
+b3JrAGdldHJ1c2FnZQByZWFkAF9fbGliY19zdGFydF9tYWluAHN0ZGVycgBmcHJpbnRmAGNsb3NlAHdh
+aXRwaWQAc2NoZWRfc2V0c2NoZWR1bGVyAHN0cmNtcAB3cml0ZQBtbWFwAHBpcGUAX19zdGFja19jaGtf
+Z3VhcmQAbGliYy5zby42AGxkLWxpbnV4LXJpc2N2NjQtbHA2NGQuc28uMQBHTElCQ18yLjI3AEdMSUJD
+XzIuMzQAX19nbG9iYWxfcG9pbnRlciQAAAACAAEAAgACAAIAAwABAAIAAgACAAIAAgACAAIAAgACAAIA
+AgACAAIAAgAEAAAAAAABAAEAsgAAABAAAAAgAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'h5GWBgAABADOAAAAAAAAAAEAAgCoAAAAEAAAAAAAAAC0kZYGAAADANkAAAAQAAAAh5GWBgAA
+AgDOAAAAAAAAAKgwAQAAAAAAAgAAAAIAAAAAAAAAAAAAAOgtAQAAAAAABAAAABYAAAAAAAAAAAAAALgw
+AQAAAAAABAAAAAsAAAAAAAAAAAAAABAwAQAAAAAABQAAAAUAAAAAAAAAAAAAABgwAQAAAAAABQAAAAYA
+AAAAAAAAAAAAACAwAQAAAAAABQAAAAwAAAAAAAAAAAAAACgwAQAAAAAABQAAAAkAAAAAAAAAAAAAADAw
+AQAAAAAABQAAABIAAAAAAAAAAAAAADgwAQAAAAAABQAAABAAAAAAAAAAAAAAAEAwAQAAAAAABQAAAAoA
+AAAAAAAAAAAAAEgwAQAAAAAABQAAABQAAAAAAAAAAAAAAFAwAQAAAAAABQAAAA0AAAAAAAAAAAAAAFgw
+AQAAAAAABQAAABEAAAAAAAAAAAAAAGAwAQAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'BQAAAA8AAAAAAAAAAAAAAGgwAQAAAAAABQAAABMAAAAAAAAAAAAAAHAwAQAAAAAABQAAAAQA
+AAAAAAAAAAAAAHgwAQAAAAAABQAAABUAAAAAAAAAAAAAAIAwAQAAAAAABQAAAAEAAAAAAAAAAAAAAIgw
+AQAAAAAABQAAAAMAAAAAAAAAAAAAAJAwAQAAAAAABQAAAA4AAAAAAAAAAAAAAJgwAQAAAAAABQAAAAgA
+AAAAAAAAAAAAAAAAAAAAAAAAlyMAADMDw0EDvgNkEwND/ZOCA2QTUxMAg7KCAGcADgAXLgAAAz4OY2cD
+DgATAAAAFy4AAAM+jmJnAw4AEwAAABcuAAADPg5iZwMOABMAAAAXLgAAAz6OYWcDDgATAAAAFy4AAAM+
+DmFnAw4AEwAAABcuAAADPo5gZwMOABMAAAAXLgAAAz4OYGcDDgATAAAAFy4AAAM+jl9nAw4AEwAAABcu
+AAADPg5fZwMOABMAAAAXLgAAAz6OXmcDDgATAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'Fy4AAAM+Dl5nAw4AEwAAABcuAAADPo5dZwMOABMAAAAXLgAAAz4OXWcDDgATAAAAFy4AAAM+
+jlxnAw4AEwAAABcuAAADPg5cZwMOABMAAAAXLgAAAz6OW2cDDgATAAAAFy4AAAM+DltnAw4AEwAAABcu
+AAADPo5aZwMOABMAAABxcUrp2vguiU1rnWUm7YFHqoR9V5MGEAINRpOFBTgBRQM4i95C/AFIBvXW/O/w
+X/yTB4AHow/xAJ1HY8KXQCLxTuVS4d704vDm7Oro7uQFRyqEY1mXKgM2iQADSgYAGwoK/RN3+g9j4ec6
+g0cWAGOdBziJR5sMCgBjh/QogzkJAcllk4UFi06F7/Cf9WMTBTCFS41HgU1jgvRMgzqJAcVlk4WFdlaF
+7/C/82MABTjFZZOFhXdWhe/wv/KqiWMaBUCRR2OJ9DgDPAkCxWWThQV4YoXv8P/wYwMFOMVlk4WFeGKF
+7/D/76qKYx0FPpVHY4H0OAM8iQLFZZOFBXlihe/w' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'P+5jCgU2xWWThQV6YoXv8D/tKo1jEAU+nUcBTGOD9Dabh/v/FUcbFooAY5fnHplLY48NLkVn
+EweHdWOKCR5FaBMIiHZjigoexWiTiAh4YwoNHsVnk4cHeYVGYwjcHolGYwvcLMVmk4YGe0llNuQ+4JFG
+3ofmhRMFhZfv8H/jY5wKHv1XYwv0OCgQ7/B/2GMWBTgIGO/w39eqimMQBTjv8D/cKopjSgU4YwUFGiJV
+gUmTCwAh7/Df21JV7/B/20JVBUaTBfEB7/C/2IVHKoljHPUyk5cJAoGTk5Q3AJ2MjgSilPMnAMyc4A8A
+MAMyVQVGkwXxAe/w390qjGMbJTFCVQVGkwXxAe/wv9RjHoUv8ycAzJzwnFjF14Up45J5+wFGDBBShe/w
+39FjFEUzAlbBZ5OH9/fxj2OVByITBAQ4wUTJa0lqkwkAIZWoGGQcaGPr5wYYaBxsY+fnBhhsHHBj4+cG
+EFRUVAxkGGAIaBxkAz4EAQM4BAADMwQCgzgEABuJ' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'BP+zB/VAM4flQDMIDkGzCBNByoUThQuo7/Cf0RBsGGgUcBxsGY7KhZ2OEwUKr4Uk7/Af0BME
+hANjhDQhGGAcZOP15/gDtYGLyWUmhpOFhaXv8B/BhUoKdKppCmqmewZ85mxGbaZtYneDN4veuY8BR2Oa
+ByKqcOpkSmlGe1aF5npNYYKAgUwTlowAiUuBTYFJhUcBTIFKAU2TlgcCyWcT19YBk4eHtbqXmGPjmgng
+RWgTCIh345oK4MVok4iIeOMaDeDFZ5OHB3oBvcVmk4YGfCm9MlXv8N/BQlXv8H/B0lUiVWLg7ohqiM6H
+XofmhiKG7wDgLY23hUcQEIVFAUU+0O/wH8TjDwXeSWUTBYWf7wAgK8llk4WFi06F7/B/xGMOBQzJZZOF
+BYxOhe/wf8NjCAUMyWWThQWNToXv8H/CYwAFEsllk4WFjU6F7/B/wWMKBRLFZZOFhXROhe/wf8CqjRHJ
+xWWThYV1ToXv8H+/hU1jGQUUjUdjm/QWGxaKAIFJ' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AUyBSgFNJbMDtYGLyWWThQWJ7/D/rIlKCnSqaQpqpnsGfOZsRm2mbX29hUlRuUVnEweHdBmz
+xWaThgZ9PbMDNgkAA7WBi8Vlk4WFfe/wX6mJSlG9AU2BSgFM2bGFSnmxA7WBi8llk4WFo+/wf6edtQFN
+AUx1sQVNRbGJSxm5jUsJuYM0CQPFZZOFBXwmhe/wP7UNzcVlk4UFfSaF7/BftCHJxWWThQV7JoXv8H+z
+4wkFxsllA7WBiyaGk4UFlpG/SWUTBYWz7/C/qzG1BUyJucllA7WBi1aGk4UFkB2/kUtNvsllA7WBi2KG
+k4UFkhW3CUw9scllA7WBi2KGk4UFlAm/lUt5tkVlEwUFYu8AQBNFZRMFBWHvAKASSWUTBQWh7wAAEiLx
+TuVS4d704vDm7Oro7uTv8N+fSWUTBYWi7wAgEMllA7WBi06Gk4UFjtG1SWUTBQWj7wCgDhsWigCbh/v/
+gUkBTIFKAU19s5lLNbbvAAADkwcFABclAAADNQUD' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'gzUBABMGgQATcQH/kwYAABMHAAATCAEA7/CflXMAEACXIQAAk4EBdmeAAAA3NQEAtzcBABMH
+BQCThwcAY4rnAJMHAABjhgcAEwUFAGeABwBngAAAtzcBADc1AQCThQcAkwcFALOF9UCT1TVAkwcgALPF
+9QJjigUAkwcAAGOGBwATBQUAZ4AHAGeAAAATAQH/IzCBAIPHAYwjNBEAY5gHAO/w3/iTBxAAI4DxjIMw
+gQADNAEAEwEBAWeAAABv8J/5QREG5O/w35QFRe/wf5UTAQHdIzyRIM1kKo+ujjKOIzCBIiMwQSHi8w1G
+hWXC4DaEA7iE3kL/AUiTBiACOoo+jH1XgUcBRSM0ESLu53r4duxy/Ebwgy0BIyM4ISEjNDEh1v/a+973
+5u/q6+/wf5R9V6qEgUeTBiACDUapZQFF7/A/kxMHgAejC+EEfVdjguQyqoVjD+UwmxeEABuGBwSbhgcI
+G4cHDBuDBwACFoIXghYCF4GTAZKBkgGTppcmlqaW' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'Jpe+/jLjNuc665MIgRcTDYEbKAtjBwweExgDAhNYCAIumCMwBQEhBaEIGwMDBOMTpf+Q4xTi
+hWuY4q6buwawQC1kHOOT9vYPLpRehgVlroc7h9cAE3f3DyOA5wCThwcE4xj2/oUmKpaqlZP29g/jEMT+
+Wne6dhp2+mU3VVBCEwWVBe/w7/mBSQFLYxwFLJsHuv8FST70gURjiy0BiUeFRGOH/QCb1BkAs8SZAIWI
+XoYBR311hWWzB6YAg8YHAJOHBwQ2l+Mb9v4uluMWxP5jHQweDwAwA/1XYwD3KIZnmcMPEAAAswWQQLN1
+ugA3VVBCghUBR4FGAUaBkRMFpQXv8C/yYxYFJDdVUEIBR4FGAUaBRRMFdQXv8K/w/VeqimMD9SITlwkC
+AZOTFzcAmY9id44Hswz3AIJ3I6ScAiOoDAKB56J3Y3v5GGJlBUaTBXEF7/AP+GMTJR9CdQVGkwVxBe/w
+D+9jFiUd8yUAzHZ3GGMYYxhjGGNzJgDM9nYjtLwA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'I7jMAGOR5ho3VVBCAUeBRgFGgUUTBXUF7/CP6H1XKohjDuUWgnc7B1VBI6bsAoHnondje/kE
+A6fMAmMLlwaBRgFHg6jMAgO1gYvFZTbkOuBOhpOFBWfWh1KHpobv8E/gYmUFRpMFcQXv8I/uYxclFQUr
+hWfj8WfrRWUTBQVu7/A/1AO4CAAxvarkrBEBRe/wL98maGMfBQ7uZjZ3jnUDpswCFY/Wdo2OSf7jHCf5
+0fojqCwDcycAzGJlBUYjvOwAkwVxBe/wz+hjGSUPhSmTBwAh45L55DdVUEIBR4FGAUaBRRMFpQXv8K/b
+We03VVBCAUeBRgFGgUUTBZUF7/BP2j3tRWXahRMFBXLv8G/izWd6d4O3h965jwFHpeODMIEiAzQBIoM0
+gSEDOQEhgzmBIAM6ASD+el57vnsefP5sXm2+bRMBASOCgDwLlGOhB4PGBgA2l+Obp//tu6wIAUXv8C/S
+4wMF5kVlEwUFX+/wX8VFZRMFhVfv8L/E7/Bv00Vl' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'EwUFce/w38NFZRMFBXDv8D/DRWUTBYVl7/CfwkVlEwUFZO/w/8FFZRMFBWPv8F/BRWUTBQVi
+7/C/wEVlEwUFYe/wH8BFZRMFhV3v8H+/RWUTBQVc7/DfvkVlEwWFWu/wP75FZRMFBVnv8J+9AAAAAAEA
+AgAAAAAAbW1hcCBjaGlsZCBwYWdlcwAAAAAAAAAAcmVnaXN0ZXIgcHJldmlldyBsaW5lcwAAZXZpY3Rp
+b24gY2hlY2tzdW0AAAAAAAAAdG9nZ2xlIHByZXZpZXcgZW1pc3Npb24AaG9vayBjb3VudCBiZWZvcmUA
+AAAAAAAAZ2V0cnVzYWdlIGJlZm9yZSBoYW5kb2ZmAAAAAAAAAAB3cml0ZSBwaXBlAAAAAAAAcmVhZCBw
+aXBlAAAAAAAAAHRhcmdldCBjaGVja3N1bQBob29rIGNvdW50IGFmdGVyAAAAAAAAAABnZXRydXNhZ2Ug
+YWZ0ZXIgaGFuZG9mZgBQSFlTSUNBTF9CRU5DSF9S' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'RVRSWSB0cmlhbD0ldSBlbmFibGVkPSV1IG1vZGU9JXUgYmVmb3JlPSVsdSBhZnRlcj0lbHUg
+ZGVsdGE9JXUgdm9sdW50YXJ5PSVsZCBpbnZvbHVudGFyeT0lbGQKAAAAdG9vIG1hbnkgc2NoZWR1bGVy
+IGhvb2sgcmV0cmllcwBkaXNhYmxlIHByZXZpZXcAcmVsZWFzZSBwcmV2aWV3AFBIWVNJQ0FMX0JFTkNI
+X0NISUxEIFBBU1MgcmV0cmllcz0ldQoAAAB3YWtlLXRyaWdnZXIAAAAAd2FrZS1kYXRhAAAAAAAAAGhv
+dC1wcm94eQAAAAAAAAB0YXJnZXQAAGZpZm8AAAAAbm9ybWFsAABpc29sYXRlZAAAAAAAAAAAcGVyc2lz
+dGVudAAAAAAAAGFsdGVybmF0aW5nAAAAAABkaXNhYmxlZAAAAAAAAAAAZW5hYmxlZAB1c2FnZTogJXMg
+W2wyLXNldC1ncm91cC0wLi43XSBbZWFybHl8bGF0' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'ZXxpbnN0cnVjdGlvbnxjb3VudGVyfHRyaWdnZXJ8d2FrZS10cmlnZ2VyfHdha2UtZGF0YV0g
+W3RhcmdldHxob3QtcHJveHldIFtub3JtYWx8Zmlmb10gW3BlcnNpc3RlbnR8aXNvbGF0ZWRdIFthbHRl
+cm5hdGluZ3xkaXNhYmxlZHxlbmFibGVkXQoAAAAAaW52YWxpZCBMMiBzZXQgZ3JvdXA6ICVzCgAAAAAA
+AABlYXJseQAAAGxhdGUAAAAAaW5zdHJ1Y3Rpb24AAAAAAGNvdW50ZXIAdHJpZ2dlcgBpbnZhbGlkIHBy
+ZXZpZXcgdGltaW5nOiAlcwoAAAAAAGludmFsaWQgcHJldmlldyBmb290cHJpbnQ6ICVzCgAAaW52YWxp
+ZCBzY2hlZHVsaW5nIHBvbGljeTogJXMKAABpbnZhbGlkIHJlcGxheSBzdGF0ZTogJXMKAAAAAAAAAGlu
+dmFsaWQgdHJpYWwgYXJtOiAlcwoAAFBIWVNJQ0FM' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'X0JFTkNIX0NPTkZJRyBncm91cD0ldSBmaXJzdF9vZmZzZXQ9JXUgbGluZXM9JXUgdGltaW5n
+PSVzIG1vZGU9JXUgZm9vdHByaW50PSVzIHBvbGljeT0lcyByZXBsYXlfc3RhdGU9JXMgYXJtPSVzCgAA
+AAAAAAAAc2NoZWRfc2V0c2NoZWR1bGVyIEZJRk8Ac2hhcmVkIG1lbW9yeSBvciBwaXBlcwAAZm9yawAA
+AAB3YWl0cGlkAGNoaWxkIGZhaWxlZDogc3RhdHVzPSVkCgAAAAAAAAAAbm9ubW9ub3RvbmljIGN5Y2xl
+IHNhbXBsZTogdHJpYWw9JXUKAAAAAFBIWVNJQ0FMX0JFTkNIIHRyaWFsPSV1IG1vZGU9JXUgaG9va3M9
+JXUgd2FrZV90b19lbnRyeT0lbGx1IGxvYWRfY3ljbGVzPSVsbHUgd2FrZV90b19sb2FkPSVsbHUgcm91
+bmR0cmlwPSVsbHUKAABQSFlTSUNBTF9CRU5DSF9U' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'QUlMIHRyaWFsPSV1IGNoaWxkX3Bvc3RfbG9hZD0lbGx1IHJldHVybl9oYW5kb2ZmPSVsbHUK
+AABQSFlTSUNBTF9CRU5DSF9QQVJFTlQgUEFTUwAAAAAAALAYAQAAAAAAuBgBAAAAAADAGAEAAAAAANAY
+AQAAAAAA2BgBAAAAAAABGwM7TAAAAAgAAACA7///SAEAAPD0//9kAAAALPX//3gAAABU9f//jAAAAIz1
+//+gAAAAvPX//8QAAADA9f//2AAAAM71///wAAAAAAAAABAAAAAAAAAAA3pSAAF8AQEbDQIAEAAAABgA
+AACE9P//MAAAAAAHAQAQAAAALAAAAKz0//8oAAAAAAAAABAAAABAAAAAwPT//zgAAAAAAAAAIAAAAFQA
+AADk9P//MAAAAABEDhBEiARIgQJUwUTIRA4AAAAAEAAAAHgAAADw9P//BAAAAAAAAAAUAAAAjAAAAOD0
+//8OAAAAAEIOEEKBAgBUAAAApAAAANb0//8eBAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AEQOsAREiQZYiASUDJgUZoECmxpWkgiTCpUOlhCXEpkWmhgD9gIKwUTIRMlE0kTTRNRC1ULW
+QtdC2ELZQtpC20QOAEILAAAAuAAAAPwAAAAw7v//cAUAAABCDrABRJIIlhBKiQZcgQKVDmSIBJMKlAyX
+EpgUmRaaGJsaA4gCyELTQtRC10LYQtlC2kLbUMFCyULSQtZE1UIOAEIOsAGBAogEiQaSCJMKlAyVDpYQ
+lxKYFJkWmhibGgMWAQrIQtNC1ELXQthC2ULaQttCC1TI09TX2Nna21aIBJMKlAyXEpgUmRaaGJsaA9AA
+yNPU19jZ2ttQiASTCpQMlxKYFJkWmhibGgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoBABAAAAAAA8EQEAAAAAAAwR
+AQAAAAAAAAAAAAAAAAABAAAAAAAAAKgAAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AQAAAAAAAACyAAAAAAAAACAAAAAAAAAA0C0BAAAAAAAhAAAAAAAAAAgAAAAAAAAAGQAAAAAA
+AADYLQEAAAAAABsAAAAAAAAACAAAAAAAAAAaAAAAAAAAAOAtAQAAAAAAHAAAAAAAAAAIAAAAAAAAAAQA
+AAAAAAAAuAIBAAAAAAD1/v9vAAAAAGADAQAAAAAABQAAAAAAAABIBgEAAAAAAAYAAAAAAAAAIAQBAAAA
+AAAKAAAAAAAAAPYAAAAAAAAACwAAAAAAAAAYAAAAAAAAABUAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAw
+AQAAAAAAAgAAAAAAAACwAQAAAAAAABQAAAAAAAAABwAAAAAAAAAXAAAAAAAAAAgIAQAAAAAABwAAAAAA
+AADABwEAAAAAAAgAAAAAAAAA+AEAAAAAAAAJAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAPv/
+/28AAAAAAQAAAAAAAAD+//9vAAAAAHAHAQAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo '////bwAAAAACAAAAAAAAAPD//28AAAAAPgcBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAD//////////wAAAAAAAAAAwAkBAAAAAADACQEAAAAAAMAJAQAAAAAAwAkBAAAA
+AADACQEAAAAAAMAJAQAAAAAAwAkBAAAAAADACQEAAAAAAMAJAQAAAAAAwAkBAAAAAADACQEAAAAAAMAJ
+AQAAAAAAwAkBAAAAAADACQEAAAAAAMAJAQAAAAAAwAkBAAAAAADACQEAAAAAAMAJAQAAAAAA8C0BAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAR0NDOiAoQnVpbGRyb290IDIwMjEuMTEtODU0Ny1nN2U2NWExYSkgMTMu
+Mi4wAEFWAAAAcmlzY3YAAUwAAAAEEAVydjY0aTJw' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'MV9tMnAwX2EycDFfZjJwMl9kMnAyX2MycDBfemljc3IycDBfemlmZW5jZWkycDBfem1tdWwx
+cDAACAEKCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAEAcAIBAAAAAAAAAAAAAAAAAAAA
+AAADAAIAlAIBAAAAAAAAAAAAAAAAAAAAAAADAAMAuAIBAAAAAAAAAAAAAAAAAAAAAAADAAQAYAMBAAAA
+AAAAAAAAAAAAAAAAAAADAAUAIAQBAAAAAAAAAAAAAAAAAAAAAAADAAYASAYBAAAAAAAAAAAAAAAAAAAA
+AAADAAcAPgcBAAAAAAAAAAAAAAAAAAAAAAADAAgAcAcBAAAAAAAAAAAAAAAAAAAAAAADAAkAwAcBAAAA
+AAAAAAAAAAAAAAAAAAADAAoACAgBAAAAAAAAAAAAAAAAAAAAAAADAAsAwAkBAAAAAAAAAAAAAAAAAAAA
+AAADAAwAAAsBAAAAAAAAAAAAAAAAAAAAAAADAA0A' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'cBUBAAAAAAAAAAAAAAAAAAAAAAADAA4AgBsBAAAAAAAAAAAAAAAAAAAAAAADAA8A0BsBAAAA
+AAAAAAAAAAAAAAAAAAADABAA0C0BAAAAAAAAAAAAAAAAAAAAAAADABEA2C0BAAAAAAAAAAAAAAAAAAAA
+AAADABIA4C0BAAAAAAAAAAAAAAAAAAAAAAADABMA6C0BAAAAAAAAAAAAAAAAAAAAAAADABQA8C0BAAAA
+AAAAAAAAAAAAAAAAAAADABUAADABAAAAAAAAAAAAAAAAAAAAAAADABYAsDABAAAAAAAAAAAAAAAAAAAA
+AAADABcAuDABAAAAAAAAAAAAAAAAAAAAAAADABgAAAAAAAAAAAAAAAAAAAAAAAAAAAADABkAAAAAAAAA
+AAAAAAAAAAAAAAEAAAAEAPH/AAAAAAAAAAAAAAAAAAAAAAwAAAABAAIAlAIBAAAAAAAgAAAAAAAAABYA
+AAAEAPH/AAAAAAAAAAAAAAAAAAAAAB4AAAAAAAwA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'cBABAAAAAAAAAAAAAAAAAFsAAAAAAAwAoBABAAAAAAAAAAAAAAAAAGMAAAAEAPH/AAAAAAAA
+AAAAAAAAAAAAAGoAAAAEAPH/AAAAAAAAAAAAAAAAAAAAAHkAAAAEAPH/AAAAAAAAAAAAAAAAAAAAAKAA
+AAACAAwAQBEBAAAAAAAOAAAAAAAAAKUAAAAAAAwAQBEBAAAAAAAAAAAAAAAAAOcAAAACAAwAThEBAAAA
+AAAeBAAAAAAAAKUAAAAAAAwAAAsBAAAAAAAAAAAAAAAAAPEAAAABAA0AWBsBAAAAAAAoAAAAAAAAAPsA
+AAAEAPH/AAAAAAAAAAAAAAAAAAAAAAYBAAACAAwArBABAAAAAAAAAAAAAAAAAB4AAAAAAAwArBABAAAA
+AAAAAAAAAAAAAAgBAAACAAwA1BABAAAAAAAAAAAAAAAAABsBAAACAAwADBEBAAAAAAAAAAAAAAAAADEB
+AAABABcAwDABAAAAAAABAAAAAAAAAD0BAAABABIA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo '4C0BAAAAAAAAAAAAAAAAAGQBAAACAAwAPBEBAAAAAAAAAAAAAAAAAHABAAABABEA2C0BAAAA
+AAAAAAAAAAAAAPsAAAAEAPH/AAAAAAAAAAAAAAAAAAAAAI8BAAABAA8AhB0BAAAAAAAAAAAAAAAAAAAA
+AAAEAPH/AAAAAAAAAAAAAAAAAAAAAJ0BAAABAAsAwAkBAAAAAAAAAAAAAAAAALcBAAABABQA8C0BAAAA
+AAAAAAAAAAAAAMABAAAAAA4AgBsBAAAAAAAAAAAAAAAAANMBAAABABUAoDABAAAAAAAAAAAAAAAAAOkB
+AAASAAAA4AkBAAAAAAAAAAAAAAAAAPwBAAASAAAA8AkBAAAAAAAAAAAAAAAAAMICAAAgABUAADABAAAA
+AAAAAAAAAAAAABkCAAAQABcAyDABAAAAAAAAAAAAAAAAACUCAAAQABYAuDABAAAAAAAAAAAAAAAAACwC
+AAASAAAAAAoBAAAAAAAAAAAAAAAAAEECAAAQABYA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'sDABAAAAAAAAAAAAAAAAAFECAAAQABUAADABAAAAAAAAAAAAAAAAAGACAAASAAAAEAoBAAAA
+AAAAAAAAAAAAAHACAAASAAAAIAoBAAAAAAAAAAAAAAAAAIECAAASAAAAMAoBAAAAAAAAAAAAAAAAAJ0C
+AAASAAAAQAoBAAAAAAAAAAAAAAAAALACAAASAAAAUAoBAAAAAAAAAAAAAAAAAMACAAAQABUAADABAAAA
+AAAAAAAAAAAAAM0CAAARABMA6C0BAAAAAAAIAAAAAAAAAOoCAAARAhYAsDABAAAAAAAAAAAAAAAAAPcC
+AAARAA0AcBUBAAAAAAAEAAAAAAAAAAYDAAASAAAAYAoBAAAAAAAAAAAAAAAAABYDAAASAAAAcAoBAAAA
+AAAAAAAAAAAAACcDAAAQABcAyDABAAAAAAAAAAAAAAAAAMYCAAASAAwAcBABAAAAAAAwAAAAAAAAACwD
+AAAQAPH/ADgBAAAAAAAAAAAAAAAAAD4DAAASAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'gAoBAAAAAAAAAAAAAAAAAE4DAAAQABcAuDABAAAAAAAAAAAAAAAAAFoDAAASAAwAAAsBAAAA
+AABwBQAAAAAAAF8DAAASAAAAkAoBAAAAAAAAAAAAAAAAAHEDAAASAAAAoAoBAAAAAAAAAAAAAAAAAOoB
+AAASAAAAsAoBAAAAAAAAAAAAAAAAAIEDAAARABcAuDABAAAAAAAIAAAAAAAAAJMDAAASAAAAwAoBAAAA
+AAAAAAAAAAAAALEDAAASAAAA0AoBAAAAAAAAAAAAAAAAAMIDAAARAhUAADABAAAAAAAAAAAAAAAAAM4D
+AAASAAAA4AoBAAAAAAAAAAAAAAAAAOADAAASAAAA8AoBAAAAAAAAAAAAAAAAAABhYmktbm90ZS5jAF9f
+YWJpX3RhZwBzdGFydC5vACR4cnY2NGkycDFfbTJwMF9hMnAxX2YycDJfZDJwMl96aWNzcjJwMF96aWZl
+bmNlaTJwMF96bW11bDFwMABsb2FkX2dwAGluaXQu' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'YwBzdGF0aWMtcmVsb2MuYwBzY2hlZHVsZXJfcGh5c2ljYWxfcHJldmlld19iZW5jaG1hcmsu
+YwBmYWlsACR4cnY2NGkycDFfbTJwMF9hMnAxX2YycDJfZDJwMl9jMnAwX3ppY3NyMnAwX3ppZmVuY2Vp
+MnAwX3ptbXVsMXAwAGNoaWxkX3J1bgBDU1dUQ0guMzcAY3J0c3R1ZmYuYwBkZXJlZ2lzdGVyX3RtX2Ns
+b25lcwBfX2RvX2dsb2JhbF9kdG9yc19hdXgAY29tcGxldGVkLjAAX19kb19nbG9iYWxfZHRvcnNfYXV4
+X2ZpbmlfYXJyYXlfZW50cnkAZnJhbWVfZHVtbXkAX19mcmFtZV9kdW1teV9pbml0X2FycmF5X2VudHJ5
+AF9fRlJBTUVfRU5EX18AX1BST0NFRFVSRV9MSU5LQUdFX1RBQkxFXwBfRFlOQU1JQwBfX0dOVV9FSF9G
+UkFNRV9IRFIAX0dMT0JBTF9PRkZTRVRfVEFCTEVf' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AGZwcmludGZAR0xJQkNfMi4yNwBfX2xpYmNfc3RhcnRfbWFpbkBHTElCQ18yLjM0AF9fQlNT
+X0VORF9fAF9lZGF0YQBnZXRydXNhZ2VAR0xJQkNfMi4yNwBfX1NEQVRBX0JFR0lOX18AX19EQVRBX0JF
+R0lOX18AcGlwZUBHTElCQ18yLjI3AHByY3RsQEdMSUJDXzIuMjcAX19zdGFja19jaGtfZmFpbEBHTElC
+Q18yLjI3AHdhaXRwaWRAR0xJQkNfMi4yNwByZWFkQEdMSUJDXzIuMjcAX19kYXRhX3N0YXJ0AF9fc3Rh
+Y2tfY2hrX2d1YXJkQEdMSUJDXzIuMjcAX19kc29faGFuZGxlAF9JT19zdGRpbl91c2VkAGZvcmtAR0xJ
+QkNfMi4yNwBjbG9zZUBHTElCQ18yLjI3AF9lbmQAX19nbG9iYWxfcG9pbnRlciQAcHV0c0BHTElCQ18y
+LjI3AF9fYnNzX3N0YXJ0AG1haW4AcGVycm9yQEdM' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'SUJDXzIuMjcAZXhpdEBHTElCQ18yLjI3AHN0ZGVyckBHTElCQ18yLjI3AHNjaGVkX3NldHNj
+aGVkdWxlckBHTElCQ18yLjI3AHdyaXRlQEdMSUJDXzIuMjcAX19UTUNfRU5EX18Ac3RyY21wQEdMSUJD
+XzIuMjcAbW1hcEBHTElCQ18yLjI3AAAuc3ltdGFiAC5zdHJ0YWIALnNoc3RydGFiAC5pbnRlcnAALm5v
+dGUuQUJJLXRhZwAuZ251Lmhhc2gALmR5bnN5bQAuZHluc3RyAC5nbnUudmVyc2lvbgAuZ251LnZlcnNp
+b25fcgAucmVsYS5keW4ALnJlbGEucGx0AC50ZXh0AC5yb2RhdGEALmVoX2ZyYW1lX2hkcgAuZWhfZnJh
+bWUALnByZWluaXRfYXJyYXkALmluaXRfYXJyYXkALmZpbmlfYXJyYXkALmRhdGEucmVsLnJvAC5keW5h
+bWljAC5nb3QALnNkYXRhAC5ic3MALmNvbW1lbnQA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'LnJpc2N2LmF0dHJpYnV0ZXMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsAAAABAAAAAgAAAAAAAABwAgEAAAAAAHAC
+AAAAAAAAIQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAjAAAABwAAAAIAAAAAAAAAlAIBAAAA
+AACUAgAAAAAAACAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAANQAAAAUAAAACAAAAAAAAALgC
+AQAAAAAAuAIAAAAAAACoAAAAAAAAAAUAAAAAAAAACAAAAAAAAAAEAAAAAAAAADEAAAD2//9vAgAAAAAA
+AABgAwEAAAAAAGADAAAAAAAAvAAAAAAAAAAFAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA7AAAACwAAAAIA
+AAAAAAAAIAQBAAAAAAAgBAAAAAAAACgCAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'BgAAAAEAAAAIAAAAAAAAABgAAAAAAAAAQwAAAAMAAAACAAAAAAAAAEgGAQAAAAAASAYAAAAA
+AAD2AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAEsAAAD///9vAgAAAAAAAAA+BwEAAAAAAD4H
+AAAAAAAALgAAAAAAAAAFAAAAAAAAAAIAAAAAAAAAAgAAAAAAAABYAAAA/v//bwIAAAAAAAAAcAcBAAAA
+AABwBwAAAAAAAFAAAAAAAAAABgAAAAIAAAAIAAAAAAAAAAAAAAAAAAAAZwAAAAQAAAACAAAAAAAAAMAH
+AQAAAAAAwAcAAAAAAABIAAAAAAAAAAUAAAAAAAAACAAAAAAAAAAYAAAAAAAAAHEAAAAEAAAAQgAAAAAA
+AAAICAEAAAAAAAgIAAAAAAAAsAEAAAAAAAAFAAAAFQAAAAgAAAAAAAAAGAAAAAAAAAB2AAAAAQAAAAYA
+AAAAAAAAwAkBAAAAAADACQAAAAAAAEABAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAewAAAAEAAAAGAAAAAAAAAAALAQAAAAAAAAsAAAAA
+AABsCgAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAIEAAAABAAAAAgAAAAAAAABwFQEAAAAAAHAV
+AAAAAAAAEAYAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAACJAAAAAQAAAAIAAAAAAAAAgBsBAAAA
+AACAGwAAAAAAAEwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAlwAAAAEAAAACAAAAAAAAANAb
+AQAAAAAA0BsAAAAAAAC4AQAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAKEAAAAQAAAAAwAAAAAA
+AADQLQEAAAAAANAdAAAAAAAACAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAACAAAAAAAAACwAAAADgAAAAMA
+AAAAAAAA2C0BAAAAAADYHQAAAAAAAAgAAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAAvAAAAA8AAAADAAAAAAAAAOAtAQAAAAAA4B0AAAAA
+AAAIAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAMgAAAABAAAAAwAAAAAAAADoLQEAAAAAAOgd
+AAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAADVAAAABgAAAAMAAAAAAAAA8C0BAAAA
+AADwHQAAAAAAABACAAAAAAAABgAAAAAAAAAIAAAAAAAAABAAAAAAAAAA3gAAAAEAAAADAAAAAAAAAAAw
+AQAAAAAAACAAAAAAAACwAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAOMAAAABAAAAAwAAAAAA
+AACwMAEAAAAAALAgAAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAADqAAAACAAAAAMA
+AAAAAAAAuDABAAAAAAC4IAAAAAAAABAAAAAAAAAA' >> /tmp/scheduler_physical_preview_ben
+chmark_dynamic.b64
+# echo 'AAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA7wAAAAEAAAAwAAAAAAAAAAAAAAAAAAAAuCAAAAAA
+AAAuAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAPgAAAADAABwAAAAAAAAAAAAAAAAAAAAAOYg
+AAAAAAAAVwAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAAAAAAAAAAAAAAA
+AABAIQAAAAAAAFgIAAAAAAAAGwAAADcAAAAIAAAAAAAAABgAAAAAAAAACQAAAAMAAAAAAAAAAAAAAAAA
+AAAAAAAAmCkAAAAAAADwAwAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAAAA
+AAAAAAAAAAAAAIgtAAAAAAAACgEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=' >> /tmp/sc
+heduler_physical_preview_benchmark_dynamic.b64
+# base64 -d /tmp/scheduler_physical_preview_benchmark_dynamic.b64 > /tmp/schedul
+er_physical_preview_benchmark_dynamic
+# chmod +x /tmp/scheduler_physical_preview_benchmark_dynamic
+# /bin/busybox sha256sum /tmp/scheduler_physical_preview_benchmark_dynamic
+232413aa5dbcd86914c89c0b7209322afb4f1680bf8f07da0c3e4602d79dbf54  /tmp/scheduler_physical_preview_benchmark_dynamic
+# /tmp/scheduler_physical_preview_benchmark_dynamic 7 wake-data target fifo pers
+istent disabled; rc=$?; echo PHYSICAL_CELL_EXIT group=7 timing=wake-data rc=$rc
+PHYSICAL_BENCH_CONFIG group=7 first_offset=1792 lines=4 timing=wake-data mode=6 footprint=target policy=fifo replay_state=persistent arm=disabled
+[  106.528827] sched: RT throttling activated
+PHYSICAL_BENCH_CHILD PASS retries=0
+PHYSICAL_BENCH trial=0 mode=0 hooks=0 wake_to_entry=47684 load_cycles=241 wake_to_load=47925 roundtrip=145388
+PHYSICAL_BENCH_TAIL trial=0 child_post_load=1607 return_handoff=95856
+PHYSICAL_BENCH trial=1 mode=0 hooks=0 wake_to_entry=25648 load_cycles=325 wake_to_load=25973 roundtrip=142932
+PHYSICAL_BENCH_TAIL trial=1 child_post_load=21032 return_handoff=95927
+PHYSICAL_BENCH trial=2 mode=0 hooks=0 wake_to_entry=27784 load_cycles=325 wake_to_load=28109 roundtrip=150036
+PHYSICAL_BENCH_TAIL trial=2 child_post_load=1533 return_handoff=120394
+PHYSICAL_BENCH trial=3 mode=0 hooks=0 wake_to_entry=29005 load_cycles=296 wake_to_load=29301 roundtrip=146633
+PHYSICAL_BENCH_TAIL trial=3 child_post_load=1490 return_handoff=115842
+PHYSICAL_BENCH trial=4 mode=0 hooks=0 wake_to_entry=28073 load_cycles=293 wake_to_load=28366 roundtrip=123391
+PHYSICAL_BENCH_TAIL trial=4 child_post_load=1445 return_handoff=93580
+PHYSICAL_BENCH trial=5 mode=0 hooks=0 wake_to_entry=51129 load_cycles=325 wake_to_load=51454 roundtrip=148446
+PHYSICAL_BENCH_TAIL trial=5 child_post_load=1507 return_handoff=95485
+PHYSICAL_BENCH trial=6 mode=0 hooks=0 wake_to_entry=49555 load_cycles=317 wake_to_load=49872 roundtrip=147537
+PHYSICAL_BENCH_TAIL trial=6 child_post_load=1596 return_handoff=96069
+PHYSICAL_BENCH trial=7 mode=0 hooks=0 wake_to_entry=47116 load_cycles=285 wake_to_load=47401 roundtrip=142756
+PHYSICAL_BENCH_TAIL trial=7 child_post_load=1531 return_handoff=93824
+PHYSICAL_BENCH trial=8 mode=0 hooks=0 wake_to_entry=26339 load_cycles=325 wake_to_load=26664 roundtrip=142159
+PHYSICAL_BENCH_TAIL trial=8 child_post_load=1403 return_handoff=114092
+PHYSICAL_BENCH trial=9 mode=0 hooks=0 wake_to_entry=27994 load_cycles=325 wake_to_load=28319 roundtrip=123407
+PHYSICAL_BENCH_TAIL trial=9 child_post_load=1453 return_handoff=93635
+PHYSICAL_BENCH trial=10 mode=0 hooks=0 wake_to_entry=28581 load_cycles=319 wake_to_load=28900 roundtrip=124298
+PHYSICAL_BENCH_TAIL trial=10 child_post_load=1475 return_handoff=93923
+PHYSICAL_BENCH trial=11 mode=0 hooks=0 wake_to_entry=50860 load_cycles=341 wake_to_load=51201 roundtrip=148292
+PHYSICAL_BENCH_TAIL trial=11 child_post_load=1434 return_handoff=95657
+PHYSICAL_BENCH trial=12 mode=0 hooks=0 wake_to_entry=54376 load_cycles=317 wake_to_load=54693 roundtrip=154037
+PHYSICAL_BENCH_TAIL trial=12 child_post_load=1618 return_handoff=97726
+PHYSICAL_BENCH trial=13 mode=0 hooks=0 wake_to_entry=48311 load_cycles=241 wake_to_load=48552 roundtrip=144987
+PHYSICAL_BENCH_TAIL trial=13 child_post_load=1588 return_handoff=94847
+PHYSICAL_BENCH trial=14 mode=0 hooks=0 wake_to_entry=25528 load_cycles=325 wake_to_load=25853 roundtrip=142830
+PHYSICAL_BENCH_TAIL trial=14 child_post_load=20792 return_handoff=96185
+PHYSICAL_BENCH trial=15 mode=0 hooks=0 wake_to_entry=27703 load_cycles=325 wake_to_load=28028 roundtrip=145122
+PHYSICAL_BENCH_TAIL trial=15 child_post_load=1501 return_handoff=115593
+PHYSICAL_BENCH trial=16 mode=0 hooks=0 wake_to_entry=28581 load_cycles=295 wake_to_load=28876 roundtrip=127785
+PHYSICAL_BENCH_TAIL trial=16 child_post_load=1345 return_handoff=97564
+PHYSICAL_BENCH trial=17 mode=0 hooks=0 wake_to_entry=29131 load_cycles=319 wake_to_load=29450 roundtrip=125593
+PHYSICAL_BENCH_TAIL trial=17 child_post_load=1520 return_handoff=94623
+PHYSICAL_BENCH trial=18 mode=0 hooks=0 wake_to_entry=51902 load_cycles=349 wake_to_load=52251 roundtrip=148562
+PHYSICAL_BENCH_TAIL trial=18 child_post_load=1479 return_handoff=94832
+PHYSICAL_BENCH trial=19 mode=0 hooks=0 wake_to_entry=50479 load_cycles=320 wake_to_load=50799 roundtrip=148267
+PHYSICAL_BENCH_TAIL trial=19 child_post_load=1401 return_handoff=96067
+PHYSICAL_BENCH trial=20 mode=0 hooks=0 wake_to_entry=47681 load_cycles=244 wake_to_load=47925 roundtrip=144746
+PHYSICAL_BENCH_TAIL trial=20 child_post_load=1568 return_handoff=95253
+PHYSICAL_BENCH trial=21 mode=0 hooks=0 wake_to_entry=25476 load_cycles=325 wake_to_load=25801 roundtrip=143032
+PHYSICAL_BENCH_TAIL trial=21 child_post_load=1435 return_handoff=115796
+PHYSICAL_BENCH trial=22 mode=0 hooks=0 wake_to_entry=27805 load_cycles=329 wake_to_load=28134 roundtrip=145034
+PHYSICAL_BENCH_TAIL trial=22 child_post_load=1480 return_handoff=115420
+PHYSICAL_BENCH trial=23 mode=0 hooks=0 wake_to_entry=28334 load_cycles=294 wake_to_load=28628 roundtrip=123517
+PHYSICAL_BENCH_TAIL trial=23 child_post_load=1307 return_handoff=93582
+PHYSICAL_BENCH trial=24 mode=0 hooks=0 wake_to_entry=51636 load_cycles=349 wake_to_load=51985 roundtrip=148736
+PHYSICAL_BENCH_TAIL trial=24 child_post_load=1506 return_handoff=95245
+PHYSICAL_BENCH trial=25 mode=0 hooks=0 wake_to_entry=50271 load_cycles=317 wake_to_load=50588 roundtrip=148260
+PHYSICAL_BENCH_TAIL trial=25 child_post_load=1431 return_handoff=96241
+PHYSICAL_BENCH trial=26 mode=0 hooks=0 wake_to_entry=54032 load_cycles=317 wake_to_load=54349 roundtrip=154025
+PHYSICAL_BENCH_TAIL trial=26 child_post_load=1679 return_handoff=97997
+PHYSICAL_BENCH trial=27 mode=0 hooks=0 wake_to_entry=47777 load_cycles=287 wake_to_load=48064 roundtrip=144788
+PHYSICAL_BENCH_TAIL trial=27 child_post_load=1634 return_handoff=95090
+PHYSICAL_BENCH trial=28 mode=0 hooks=0 wake_to_entry=25550 load_cycles=297 wake_to_load=25847 roundtrip=143185
+PHYSICAL_BENCH_TAIL trial=28 child_post_load=1512 return_handoff=115826
+PHYSICAL_BENCH trial=29 mode=0 hooks=0 wake_to_entry=27530 load_cycles=325 wake_to_load=27855 roundtrip=143947
+PHYSICAL_BENCH_TAIL trial=29 child_post_load=1513 return_handoff=114579
+PHYSICAL_BENCH trial=30 mode=0 hooks=0 wake_to_entry=28063 load_cycles=293 wake_to_load=28356 roundtrip=127119
+PHYSICAL_BENCH_TAIL trial=30 child_post_load=1414 return_handoff=97349
+PHYSICAL_BENCH trial=31 mode=0 hooks=0 wake_to_entry=54863 load_cycles=325 wake_to_load=55188 roundtrip=151738
+PHYSICAL_BENCH_TAIL trial=31 child_post_load=1538 return_handoff=95012
+PHYSICAL_BENCH trial=32 mode=0 hooks=0 wake_to_entry=51002 load_cycles=349 wake_to_load=51351 roundtrip=148755
+PHYSICAL_BENCH_TAIL trial=32 child_post_load=1471 return_handoff=95933
+PHYSICAL_BENCH trial=33 mode=0 hooks=0 wake_to_entry=49592 load_cycles=325 wake_to_load=49917 roundtrip=147778
+PHYSICAL_BENCH_TAIL trial=33 child_post_load=1567 return_handoff=96294
+PHYSICAL_BENCH trial=34 mode=0 hooks=0 wake_to_entry=62049 load_cycles=242 wake_to_load=62291 roundtrip=162357
+PHYSICAL_BENCH_TAIL trial=34 child_post_load=1642 return_handoff=98424
+PHYSICAL_BENCH trial=35 mode=0 hooks=0 wake_to_entry=49370 load_cycles=289 wake_to_load=49659 roundtrip=147851
+PHYSICAL_BENCH_TAIL trial=35 child_post_load=1626 return_handoff=96566
+PHYSICAL_BENCH trial=36 mode=0 hooks=0 wake_to_entry=46835 load_cycles=320 wake_to_load=47155 roundtrip=143107
+PHYSICAL_BENCH_TAIL trial=36 child_post_load=1539 return_handoff=94413
+PHYSICAL_BENCH trial=37 mode=0 hooks=0 wake_to_entry=26400 load_cycles=328 wake_to_load=26728 roundtrip=142844
+PHYSICAL_BENCH_TAIL trial=37 child_post_load=1527 return_handoff=114589
+PHYSICAL_BENCH trial=38 mode=0 hooks=0 wake_to_entry=27925 load_cycles=325 wake_to_load=28250 roundtrip=123805
+PHYSICAL_BENCH_TAIL trial=38 child_post_load=1489 return_handoff=94066
+PHYSICAL_BENCH trial=39 mode=0 hooks=0 wake_to_entry=28508 load_cycles=295 wake_to_load=28803 roundtrip=124385
+PHYSICAL_BENCH_TAIL trial=39 child_post_load=1492 return_handoff=94090
+PHYSICAL_BENCH trial=40 mode=0 hooks=0 wake_to_entry=57963 load_cycles=319 wake_to_load=58282 roundtrip=155748
+PHYSICAL_BENCH_TAIL trial=40 child_post_load=1459 return_handoff=96007
+PHYSICAL_BENCH trial=41 mode=0 hooks=0 wake_to_entry=50904 load_cycles=317 wake_to_load=51221 roundtrip=147828
+PHYSICAL_BENCH_TAIL trial=41 child_post_load=1450 return_handoff=95157
+PHYSICAL_BENCH trial=42 mode=0 hooks=0 wake_to_entry=47849 load_cycles=317 wake_to_load=48166 roundtrip=145236
+PHYSICAL_BENCH_TAIL trial=42 child_post_load=1598 return_handoff=95472
+PHYSICAL_BENCH trial=43 mode=0 hooks=0 wake_to_entry=44438 load_cycles=285 wake_to_load=44723 roundtrip=142277
+PHYSICAL_BENCH_TAIL trial=43 child_post_load=1633 return_handoff=95921
+PHYSICAL_BENCH trial=44 mode=0 hooks=0 wake_to_entry=27661 load_cycles=297 wake_to_load=27958 roundtrip=148950
+PHYSICAL_BENCH_TAIL trial=44 child_post_load=1465 return_handoff=119527
+PHYSICAL_BENCH trial=45 mode=0 hooks=0 wake_to_entry=29137 load_cycles=295 wake_to_load=29432 roundtrip=125060
+PHYSICAL_BENCH_TAIL trial=45 child_post_load=1384 return_handoff=94244
+PHYSICAL_BENCH trial=46 mode=0 hooks=0 wake_to_entry=28251 load_cycles=293 wake_to_load=28544 roundtrip=123393
+PHYSICAL_BENCH_TAIL trial=46 child_post_load=1386 return_handoff=93463
+PHYSICAL_BENCH trial=47 mode=0 hooks=0 wake_to_entry=71459 load_cycles=325 wake_to_load=71784 roundtrip=191535
+PHYSICAL_BENCH_TAIL trial=47 child_post_load=1530 return_handoff=118221
+PHYSICAL_BENCH trial=48 mode=0 hooks=0 wake_to_entry=28183 load_cycles=293 wake_to_load=28476 roundtrip=123792
+PHYSICAL_BENCH_TAIL trial=48 child_post_load=1407 return_handoff=93909
+PHYSICAL_BENCH trial=49 mode=0 hooks=0 wake_to_entry=51235 load_cycles=317 wake_to_load=51552 roundtrip=147627
+PHYSICAL_BENCH_TAIL trial=49 child_post_load=1502 return_handoff=94573
+PHYSICAL_BENCH trial=50 mode=0 hooks=0 wake_to_entry=50232 load_cycles=344 wake_to_load=50576 roundtrip=148168
+PHYSICAL_BENCH_TAIL trial=50 child_post_load=1443 return_handoff=96149
+PHYSICAL_BENCH trial=51 mode=0 hooks=0 wake_to_entry=47744 load_cycles=241 wake_to_load=47985 roundtrip=145019
+PHYSICAL_BENCH_TAIL trial=51 child_post_load=1644 return_handoff=95390
+PHYSICAL_BENCH trial=52 mode=0 hooks=0 wake_to_entry=25514 load_cycles=298 wake_to_load=25812 roundtrip=142374
+PHYSICAL_BENCH_TAIL trial=52 child_post_load=20623 return_handoff=95939
+PHYSICAL_BENCH trial=53 mode=0 hooks=0 wake_to_entry=27453 load_cycles=325 wake_to_load=27778 roundtrip=150684
+PHYSICAL_BENCH_TAIL trial=53 child_post_load=1424 return_handoff=121482
+PHYSICAL_BENCH trial=54 mode=0 hooks=0 wake_to_entry=29696 load_cycles=326 wake_to_load=30022 roundtrip=146948
+PHYSICAL_BENCH_TAIL trial=54 child_post_load=1528 return_handoff=115398
+PHYSICAL_BENCH trial=55 mode=0 hooks=0 wake_to_entry=28147 load_cycles=325 wake_to_load=28472 roundtrip=123346
+PHYSICAL_BENCH_TAIL trial=55 child_post_load=1451 return_handoff=93423
+PHYSICAL_BENCH trial=56 mode=0 hooks=0 wake_to_entry=51331 load_cycles=317 wake_to_load=51648 roundtrip=210714
+PHYSICAL_BENCH_TAIL trial=56 child_post_load=1492 return_handoff=157574
+PHYSICAL_BENCH trial=57 mode=0 hooks=0 wake_to_entry=27437 load_cycles=319 wake_to_load=27756 roundtrip=148633
+PHYSICAL_BENCH_TAIL trial=57 child_post_load=24138 return_handoff=96739
+PHYSICAL_BENCH trial=58 mode=0 hooks=0 wake_to_entry=52987 load_cycles=285 wake_to_load=53272 roundtrip=151287
+PHYSICAL_BENCH_TAIL trial=58 child_post_load=1825 return_handoff=96190
+PHYSICAL_BENCH trial=59 mode=0 hooks=0 wake_to_entry=45640 load_cycles=286 wake_to_load=45926 roundtrip=145486
+PHYSICAL_BENCH_TAIL trial=59 child_post_load=1601 return_handoff=97959
+PHYSICAL_BENCH trial=60 mode=0 hooks=0 wake_to_entry=28336 load_cycles=231 wake_to_load=28567 roundtrip=145056
+PHYSICAL_BENCH_TAIL trial=60 child_post_load=1551 return_handoff=114938
+PHYSICAL_BENCH trial=61 mode=0 hooks=0 wake_to_entry=27593 load_cycles=329 wake_to_load=27922 roundtrip=123395
+PHYSICAL_BENCH_TAIL trial=61 child_post_load=1497 return_handoff=93976
+PHYSICAL_BENCH trial=62 mode=0 hooks=0 wake_to_entry=28560 load_cycles=293 wake_to_load=28853 roundtrip=123998
+PHYSICAL_BENCH_TAIL trial=62 child_post_load=1447 return_handoff=93698
+PHYSICAL_BENCH trial=63 mode=0 hooks=0 wake_to_entry=50902 load_cycles=352 wake_to_load=51254 roundtrip=148264
+PHYSICAL_BENCH_TAIL trial=63 child_post_load=1431 return_handoff=95579
+PHYSICAL_BENCH trial=64 mode=0 hooks=0 wake_to_entry=49145 load_cycles=288 wake_to_load=49433 roundtrip=147064
+PHYSICAL_BENCH_TAIL trial=64 child_post_load=1549 return_handoff=96082
+PHYSICAL_BENCH trial=65 mode=0 hooks=0 wake_to_entry=46892 load_cycles=317 wake_to_load=47209 roundtrip=143155
+PHYSICAL_BENCH_TAIL trial=65 child_post_load=1503 return_handoff=94443
+PHYSICAL_BENCH trial=66 mode=0 hooks=0 wake_to_entry=26467 load_cycles=325 wake_to_load=26792 roundtrip=142643
+PHYSICAL_BENCH_TAIL trial=66 child_post_load=1468 return_handoff=114383
+PHYSICAL_BENCH trial=67 mode=0 hooks=0 wake_to_entry=28165 load_cycles=317 wake_to_load=28482 roundtrip=154055
+PHYSICAL_BENCH_TAIL trial=67 child_post_load=1411 return_handoff=124162
+PHYSICAL_BENCH trial=68 mode=0 hooks=0 wake_to_entry=28297 load_cycles=293 wake_to_load=28590 roundtrip=123833
+PHYSICAL_BENCH_TAIL trial=68 child_post_load=1383 return_handoff=93860
+PHYSICAL_BENCH trial=69 mode=0 hooks=0 wake_to_entry=51511 load_cycles=293 wake_to_load=51804 roundtrip=147683
+PHYSICAL_BENCH_TAIL trial=69 child_post_load=1536 return_handoff=94343
+PHYSICAL_BENCH trial=70 mode=0 hooks=0 wake_to_entry=51194 load_cycles=317 wake_to_load=51511 roundtrip=153116
+PHYSICAL_BENCH_TAIL trial=70 child_post_load=1455 return_handoff=100150
+PHYSICAL_BENCH trial=71 mode=0 hooks=0 wake_to_entry=49665 load_cycles=321 wake_to_load=49986 roundtrip=148046
+PHYSICAL_BENCH_TAIL trial=71 child_post_load=1494 return_handoff=96566
+PHYSICAL_BENCH trial=72 mode=0 hooks=0 wake_to_entry=47548 load_cycles=243 wake_to_load=47791 roundtrip=144948
+PHYSICAL_BENCH_TAIL trial=72 child_post_load=1580 return_handoff=95577
+PHYSICAL_BENCH trial=73 mode=0 hooks=0 wake_to_entry=25513 load_cycles=325 wake_to_load=25838 roundtrip=145214
+PHYSICAL_BENCH_TAIL trial=73 child_post_load=1512 return_handoff=117864
+PHYSICAL_BENCH trial=74 mode=0 hooks=0 wake_to_entry=28121 load_cycles=325 wake_to_load=28446 roundtrip=145355
+PHYSICAL_BENCH_TAIL trial=74 child_post_load=1527 return_handoff=115382
+PHYSICAL_BENCH trial=75 mode=0 hooks=0 wake_to_entry=28566 load_cycles=293 wake_to_load=28859 roundtrip=124145
+PHYSICAL_BENCH_TAIL trial=75 child_post_load=1416 return_handoff=93870
+PHYSICAL_BENCH trial=76 mode=0 hooks=0 wake_to_entry=51646 load_cycles=321 wake_to_load=51967 roundtrip=147950
+PHYSICAL_BENCH_TAIL trial=76 child_post_load=1523 return_handoff=94460
+PHYSICAL_BENCH trial=77 mode=0 hooks=0 wake_to_entry=50139 load_cycles=309 wake_to_load=50448 roundtrip=147854
+PHYSICAL_BENCH_TAIL trial=77 child_post_load=1384 return_handoff=96022
+PHYSICAL_BENCH trial=78 mode=0 hooks=0 wake_to_entry=48037 load_cycles=317 wake_to_load=48354 roundtrip=145255
+PHYSICAL_BENCH_TAIL trial=78 child_post_load=1600 return_handoff=95301
+PHYSICAL_BENCH trial=79 mode=0 hooks=0 wake_to_entry=25595 load_cycles=325 wake_to_load=25920 roundtrip=143087
+PHYSICAL_BENCH_TAIL trial=79 child_post_load=1473 return_handoff=115694
+PHYSICAL_BENCH trial=80 mode=0 hooks=0 wake_to_entry=27472 load_cycles=325 wake_to_load=27797 roundtrip=144951
+PHYSICAL_BENCH_TAIL trial=80 child_post_load=1513 return_handoff=115641
+PHYSICAL_BENCH trial=81 mode=0 hooks=0 wake_to_entry=28431 load_cycles=293 wake_to_load=28724 roundtrip=153794
+PHYSICAL_BENCH_TAIL trial=81 child_post_load=1381 return_handoff=123689
+PHYSICAL_BENCH trial=82 mode=0 hooks=0 wake_to_entry=28518 load_cycles=249 wake_to_load=28767 roundtrip=124365
+PHYSICAL_BENCH_TAIL trial=82 child_post_load=1449 return_handoff=94149
+PHYSICAL_BENCH trial=83 mode=0 hooks=0 wake_to_entry=51813 load_cycles=325 wake_to_load=52138 roundtrip=148203
+PHYSICAL_BENCH_TAIL trial=83 child_post_load=1479 return_handoff=94586
+PHYSICAL_BENCH trial=84 mode=0 hooks=0 wake_to_entry=50194 load_cycles=317 wake_to_load=50511 roundtrip=152102
+PHYSICAL_BENCH_TAIL trial=84 child_post_load=1495 return_handoff=100096
+PHYSICAL_BENCH trial=85 mode=0 hooks=0 wake_to_entry=48194 load_cycles=320 wake_to_load=48514 roundtrip=145545
+PHYSICAL_BENCH_TAIL trial=85 child_post_load=1616 return_handoff=95415
+PHYSICAL_BENCH trial=86 mode=0 hooks=0 wake_to_entry=46345 load_cycles=317 wake_to_load=46662 roundtrip=143334
+PHYSICAL_BENCH_TAIL trial=86 child_post_load=1517 return_handoff=95155
+PHYSICAL_BENCH trial=87 mode=0 hooks=0 wake_to_entry=27512 load_cycles=325 wake_to_load=27837 roundtrip=146022
+PHYSICAL_BENCH_TAIL trial=87 child_post_load=1495 return_handoff=116690
+PHYSICAL_BENCH trial=88 mode=0 hooks=0 wake_to_entry=28981 load_cycles=293 wake_to_load=29274 roundtrip=124830
+PHYSICAL_BENCH_TAIL trial=88 child_post_load=1496 return_handoff=94060
+PHYSICAL_BENCH trial=89 mode=0 hooks=0 wake_to_entry=28464 load_cycles=293 wake_to_load=28757 roundtrip=123692
+PHYSICAL_BENCH_TAIL trial=89 child_post_load=1479 return_handoff=93456
+PHYSICAL_BENCH trial=90 mode=0 hooks=0 wake_to_entry=51035 load_cycles=375 wake_to_load=51410 roundtrip=148041
+PHYSICAL_BENCH_TAIL trial=90 child_post_load=1438 return_handoff=95193
+PHYSICAL_BENCH trial=91 mode=0 hooks=0 wake_to_entry=49817 load_cycles=321 wake_to_load=50138 roundtrip=147746
+PHYSICAL_BENCH_TAIL trial=91 child_post_load=1530 return_handoff=96078
+PHYSICAL_BENCH trial=92 mode=0 hooks=0 wake_to_entry=46813 load_cycles=343 wake_to_load=47156 roundtrip=142682
+PHYSICAL_BENCH_TAIL trial=92 child_post_load=1523 return_handoff=94003
+PHYSICAL_BENCH trial=93 mode=0 hooks=0 wake_to_entry=26047 load_cycles=325 wake_to_load=26372 roundtrip=141752
+PHYSICAL_BENCH_TAIL trial=93 child_post_load=1458 return_handoff=113922
+PHYSICAL_BENCH trial=94 mode=0 hooks=0 wake_to_entry=28205 load_cycles=293 wake_to_load=28498 roundtrip=123663
+PHYSICAL_BENCH_TAIL trial=94 child_post_load=1415 return_handoff=93750
+PHYSICAL_BENCH trial=95 mode=0 hooks=0 wake_to_entry=29008 load_cycles=317 wake_to_load=29325 roundtrip=132460
+PHYSICAL_BENCH_TAIL trial=95 child_post_load=1444 return_handoff=101691
+PHYSICAL_BENCH trial=96 mode=0 hooks=0 wake_to_entry=51757 load_cycles=343 wake_to_load=52100 roundtrip=147866
+PHYSICAL_BENCH_TAIL trial=96 child_post_load=1410 return_handoff=94356
+PHYSICAL_BENCH trial=97 mode=0 hooks=0 wake_to_entry=50331 load_cycles=341 wake_to_load=50672 roundtrip=148366
+PHYSICAL_BENCH_TAIL trial=97 child_post_load=1420 return_handoff=96274
+PHYSICAL_BENCH trial=98 mode=0 hooks=0 wake_to_entry=57452 load_cycles=249 wake_to_load=57701 roundtrip=158248
+PHYSICAL_BENCH_TAIL trial=98 child_post_load=1715 return_handoff=98832
+PHYSICAL_BENCH trial=99 mode=0 hooks=0 wake_to_entry=49075 load_cycles=285 wake_to_load=49360 roundtrip=147378
+PHYSICAL_BENCH_TAIL trial=99 child_post_load=1599 return_handoff=96419
+PHYSICAL_BENCH trial=100 mode=0 hooks=0 wake_to_entry=46678 load_cycles=360 wake_to_load=47038 roundtrip=1106889
+PHYSICAL_BENCH_TAIL trial=100 child_post_load=1558 return_handoff=1058293
+PHYSICAL_BENCH trial=101 mode=0 hooks=0 wake_to_entry=67259 load_cycles=367 wake_to_load=67626 roundtrip=170592
+PHYSICAL_BENCH_TAIL trial=101 child_post_load=1883 return_handoff=101083
+PHYSICAL_BENCH trial=102 mode=0 hooks=0 wake_to_entry=49152 load_cycles=317 wake_to_load=49469 roundtrip=154501
+PHYSICAL_BENCH_TAIL trial=102 child_post_load=1651 return_handoff=103381
+PHYSICAL_BENCH trial=103 mode=0 hooks=0 wake_to_entry=48350 load_cycles=318 wake_to_load=48668 roundtrip=146221
+PHYSICAL_BENCH_TAIL trial=103 child_post_load=1564 return_handoff=95989
+PHYSICAL_BENCH trial=104 mode=0 hooks=0 wake_to_entry=25760 load_cycles=19785 wake_to_load=45545 roundtrip=146275
+PHYSICAL_BENCH_TAIL trial=104 child_post_load=1643 return_handoff=99087
+PHYSICAL_BENCH trial=105 mode=0 hooks=0 wake_to_entry=28710 load_cycles=249 wake_to_load=28959 roundtrip=149726
+PHYSICAL_BENCH_TAIL trial=105 child_post_load=1531 return_handoff=119236
+PHYSICAL_BENCH trial=106 mode=0 hooks=0 wake_to_entry=28021 load_cycles=325 wake_to_load=28346 roundtrip=145561
+PHYSICAL_BENCH_TAIL trial=106 child_post_load=1472 return_handoff=115743
+PHYSICAL_BENCH trial=107 mode=0 hooks=0 wake_to_entry=28582 load_cycles=318 wake_to_load=28900 roundtrip=123889
+PHYSICAL_BENCH_TAIL trial=107 child_post_load=1382 return_handoff=93607
+PHYSICAL_BENCH trial=108 mode=0 hooks=0 wake_to_entry=51269 load_cycles=349 wake_to_load=51618 roundtrip=148083
+PHYSICAL_BENCH_TAIL trial=108 child_post_load=1547 return_handoff=94918
+PHYSICAL_BENCH trial=109 mode=0 hooks=0 wake_to_entry=50108 load_cycles=320 wake_to_load=50428 roundtrip=148753
+PHYSICAL_BENCH_TAIL trial=109 child_post_load=1415 return_handoff=96910
+PHYSICAL_BENCH trial=110 mode=0 hooks=0 wake_to_entry=48477 load_cycles=241 wake_to_load=48718 roundtrip=145985
+PHYSICAL_BENCH_TAIL trial=110 child_post_load=1580 return_handoff=95687
+PHYSICAL_BENCH trial=111 mode=0 hooks=0 wake_to_entry=25678 load_cycles=328 wake_to_load=26006 roundtrip=142872
+PHYSICAL_BENCH_TAIL trial=111 child_post_load=20875 return_handoff=95991
+PHYSICAL_BENCH trial=112 mode=0 hooks=0 wake_to_entry=27590 load_cycles=326 wake_to_load=27916 roundtrip=144771
+PHYSICAL_BENCH_TAIL trial=112 child_post_load=1438 return_handoff=115417
+PHYSICAL_BENCH trial=113 mode=0 hooks=0 wake_to_entry=28350 load_cycles=294 wake_to_load=28644 roundtrip=123565
+PHYSICAL_BENCH_TAIL trial=113 child_post_load=1382 return_handoff=93539
+PHYSICAL_BENCH trial=114 mode=0 hooks=0 wake_to_entry=51488 load_cycles=351 wake_to_load=51839 roundtrip=148248
+PHYSICAL_BENCH_TAIL trial=114 child_post_load=1530 return_handoff=94879
+PHYSICAL_BENCH trial=115 mode=0 hooks=0 wake_to_entry=50106 load_cycles=317 wake_to_load=50423 roundtrip=148188
+PHYSICAL_BENCH_TAIL trial=115 child_post_load=1484 return_handoff=96281
+PHYSICAL_BENCH trial=116 mode=0 hooks=0 wake_to_entry=48002 load_cycles=317 wake_to_load=48319 roundtrip=152780
+PHYSICAL_BENCH_TAIL trial=116 child_post_load=1598 return_handoff=102863
+PHYSICAL_BENCH trial=117 mode=0 hooks=0 wake_to_entry=47282 load_cycles=317 wake_to_load=47599 roundtrip=143850
+PHYSICAL_BENCH_TAIL trial=117 child_post_load=1590 return_handoff=94661
+PHYSICAL_BENCH trial=118 mode=0 hooks=0 wake_to_entry=26465 load_cycles=269 wake_to_load=26734 roundtrip=145435
+PHYSICAL_BENCH_TAIL trial=118 child_post_load=1429 return_handoff=117272
+PHYSICAL_BENCH trial=119 mode=0 hooks=0 wake_to_entry=28345 load_cycles=325 wake_to_load=28670 roundtrip=149421
+PHYSICAL_BENCH_TAIL trial=119 child_post_load=1493 return_handoff=119258
+PHYSICAL_BENCH trial=120 mode=0 hooks=0 wake_to_entry=28351 load_cycles=293 wake_to_load=28644 roundtrip=124024
+PHYSICAL_BENCH_TAIL trial=120 child_post_load=1376 return_handoff=94004
+PHYSICAL_BENCH trial=121 mode=0 hooks=0 wake_to_entry=50833 load_cycles=318 wake_to_load=51151 roundtrip=147063
+PHYSICAL_BENCH_TAIL trial=121 child_post_load=1544 return_handoff=94368
+PHYSICAL_BENCH trial=122 mode=0 hooks=0 wake_to_entry=49787 load_cycles=309 wake_to_load=50096 roundtrip=148029
+PHYSICAL_BENCH_TAIL trial=122 child_post_load=1487 return_handoff=96446
+PHYSICAL_BENCH trial=123 mode=0 hooks=0 wake_to_entry=48407 load_cycles=317 wake_to_load=48724 roundtrip=145972
+PHYSICAL_BENCH_TAIL trial=123 child_post_load=1573 return_handoff=95675
+PHYSICAL_BENCH trial=124 mode=0 hooks=0 wake_to_entry=25617 load_cycles=297 wake_to_load=25914 roundtrip=142926
+PHYSICAL_BENCH_TAIL trial=124 child_post_load=20996 return_handoff=96016
+PHYSICAL_BENCH trial=125 mode=0 hooks=0 wake_to_entry=27603 load_cycles=329 wake_to_load=27932 roundtrip=144589
+PHYSICAL_BENCH_TAIL trial=125 child_post_load=1501 return_handoff=115156
+PHYSICAL_BENCH trial=126 mode=0 hooks=0 wake_to_entry=28288 load_cycles=293 wake_to_load=28581 roundtrip=123394
+PHYSICAL_BENCH_TAIL trial=126 child_post_load=1419 return_handoff=93394
+PHYSICAL_BENCH trial=127 mode=0 hooks=0 wake_to_entry=51105 load_cycles=349 wake_to_load=51454 roundtrip=148107
+PHYSICAL_BENCH_TAIL trial=127 child_post_load=1534 return_handoff=95119
+PHYSICAL_BENCH trial=128 mode=0 hooks=0 wake_to_entry=50123 load_cycles=317 wake_to_load=50440 roundtrip=148376
+PHYSICAL_BENCH_TAIL trial=128 child_post_load=1432 return_handoff=96504
+PHYSICAL_BENCH trial=129 mode=0 hooks=0 wake_to_entry=48194 load_cycles=241 wake_to_load=48435 roundtrip=206117
+PHYSICAL_BENCH_TAIL trial=129 child_post_load=1634 return_handoff=156048
+PHYSICAL_BENCH trial=130 mode=0 hooks=0 wake_to_entry=29413 load_cycles=368 wake_to_load=29781 roundtrip=158560
+PHYSICAL_BENCH_TAIL trial=130 child_post_load=1599 return_handoff=127180
+PHYSICAL_BENCH trial=131 mode=0 hooks=0 wake_to_entry=52749 load_cycles=325 wake_to_load=53074 roundtrip=150545
+PHYSICAL_BENCH_TAIL trial=131 child_post_load=1700 return_handoff=95771
+PHYSICAL_BENCH trial=132 mode=0 hooks=0 wake_to_entry=26902 load_cycles=297 wake_to_load=27199 roundtrip=150002
+PHYSICAL_BENCH_TAIL trial=132 child_post_load=1521 return_handoff=121282
+PHYSICAL_BENCH trial=133 mode=0 hooks=0 wake_to_entry=28364 load_cycles=249 wake_to_load=28613 roundtrip=145387
+PHYSICAL_BENCH_TAIL trial=133 child_post_load=1450 return_handoff=115324
+PHYSICAL_BENCH trial=134 mode=0 hooks=0 wake_to_entry=28335 load_cycles=293 wake_to_load=28628 roundtrip=124095
+PHYSICAL_BENCH_TAIL trial=134 child_post_load=1342 return_handoff=94125
+PHYSICAL_BENCH trial=135 mode=0 hooks=0 wake_to_entry=51557 load_cycles=293 wake_to_load=51850 roundtrip=148304
+PHYSICAL_BENCH_TAIL trial=135 child_post_load=1469 return_handoff=94985
+PHYSICAL_BENCH trial=136 mode=0 hooks=0 wake_to_entry=50460 load_cycles=317 wake_to_load=50777 roundtrip=148838
+PHYSICAL_BENCH_TAIL trial=136 child_post_load=1472 return_handoff=96589
+PHYSICAL_BENCH trial=137 mode=0 hooks=0 wake_to_entry=48605 load_cycles=317 wake_to_load=48922 roundtrip=146079
+PHYSICAL_BENCH_TAIL trial=137 child_post_load=1574 return_handoff=95583
+PHYSICAL_BENCH trial=138 mode=0 hooks=0 wake_to_entry=45732 load_cycles=317 wake_to_load=46049 roundtrip=143551
+PHYSICAL_BENCH_TAIL trial=138 child_post_load=1529 return_handoff=95973
+PHYSICAL_BENCH trial=139 mode=0 hooks=0 wake_to_entry=27877 load_cycles=249 wake_to_load=28126 roundtrip=143846
+PHYSICAL_BENCH_TAIL trial=139 child_post_load=1480 return_handoff=114240
+PHYSICAL_BENCH trial=140 mode=0 hooks=0 wake_to_entry=28116 load_cycles=293 wake_to_load=28409 roundtrip=123540
+PHYSICAL_BENCH_TAIL trial=140 child_post_load=1448 return_handoff=93683
+PHYSICAL_BENCH trial=141 mode=0 hooks=0 wake_to_entry=51312 load_cycles=293 wake_to_load=51605 roundtrip=147830
+PHYSICAL_BENCH_TAIL trial=141 child_post_load=1476 return_handoff=94749
+PHYSICAL_BENCH trial=142 mode=0 hooks=0 wake_to_entry=50480 load_cycles=341 wake_to_load=50821 roundtrip=148324
+PHYSICAL_BENCH_TAIL trial=142 child_post_load=1424 return_handoff=96079
+PHYSICAL_BENCH trial=143 mode=0 hooks=0 wake_to_entry=48398 load_cycles=241 wake_to_load=48639 roundtrip=145055
+PHYSICAL_BENCH_TAIL trial=143 child_post_load=1555 return_handoff=94861
+PHYSICAL_BENCH trial=144 mode=0 hooks=0 wake_to_entry=25499 load_cycles=325 wake_to_load=25824 roundtrip=149872
+PHYSICAL_BENCH_TAIL trial=144 child_post_load=26740 return_handoff=97308
+PHYSICAL_BENCH trial=145 mode=0 hooks=0 wake_to_entry=26585 load_cycles=325 wake_to_load=26910 roundtrip=143710
+PHYSICAL_BENCH_TAIL trial=145 child_post_load=1537 return_handoff=115263
+PHYSICAL_BENCH trial=146 mode=0 hooks=0 wake_to_entry=28049 load_cycles=249 wake_to_load=28298 roundtrip=152345
+PHYSICAL_BENCH_TAIL trial=146 child_post_load=1495 return_handoff=122552
+PHYSICAL_BENCH trial=147 mode=0 hooks=0 wake_to_entry=29322 load_cycles=293 wake_to_load=29615 roundtrip=125663
+PHYSICAL_BENCH_TAIL trial=147 child_post_load=1423 return_handoff=94625
+PHYSICAL_BENCH trial=148 mode=0 hooks=0 wake_to_entry=28504 load_cycles=293 wake_to_load=28797 roundtrip=124287
+PHYSICAL_BENCH_TAIL trial=148 child_post_load=1478 return_handoff=94012
+PHYSICAL_BENCH trial=149 mode=0 hooks=0 wake_to_entry=51168 load_cycles=325 wake_to_load=51493 roundtrip=148702
+PHYSICAL_BENCH_TAIL trial=149 child_post_load=1471 return_handoff=95738
+PHYSICAL_BENCH trial=150 mode=0 hooks=0 wake_to_entry=49389 load_cycles=293 wake_to_load=49682 roundtrip=147799
+PHYSICAL_BENCH_TAIL trial=150 child_post_load=1654 return_handoff=96463
+PHYSICAL_BENCH trial=151 mode=0 hooks=0 wake_to_entry=47408 load_cycles=341 wake_to_load=47749 roundtrip=143673
+PHYSICAL_BENCH_TAIL trial=151 child_post_load=1518 return_handoff=94406
+PHYSICAL_BENCH trial=152 mode=0 hooks=0 wake_to_entry=26381 load_cycles=325 wake_to_load=26706 roundtrip=142399
+PHYSICAL_BENCH_TAIL trial=152 child_post_load=1467 return_handoff=114226
+PHYSICAL_BENCH trial=153 mode=0 hooks=0 wake_to_entry=28131 load_cycles=252 wake_to_load=28383 roundtrip=123737
+PHYSICAL_BENCH_TAIL trial=153 child_post_load=1453 return_handoff=93901
+PHYSICAL_BENCH trial=154 mode=0 hooks=0 wake_to_entry=28328 load_cycles=293 wake_to_load=28621 roundtrip=124277
+PHYSICAL_BENCH_TAIL trial=154 child_post_load=1437 return_handoff=94219
+PHYSICAL_BENCH trial=155 mode=0 hooks=0 wake_to_entry=51134 load_cycles=349 wake_to_load=51483 roundtrip=148463
+PHYSICAL_BENCH_TAIL trial=155 child_post_load=1440 return_handoff=95540
+PHYSICAL_BENCH trial=156 mode=0 hooks=0 wake_to_entry=48401 load_cycles=317 wake_to_load=48718 roundtrip=145208
+PHYSICAL_BENCH_TAIL trial=156 child_post_load=1525 return_handoff=94965
+PHYSICAL_BENCH trial=157 mode=0 hooks=0 wake_to_entry=46228 load_cycles=318 wake_to_load=46546 roundtrip=143743
+PHYSICAL_BENCH_TAIL trial=157 child_post_load=1577 return_handoff=95620
+PHYSICAL_BENCH trial=158 mode=0 hooks=0 wake_to_entry=27872 load_cycles=249 wake_to_load=28121 roundtrip=152511
+PHYSICAL_BENCH_TAIL trial=158 child_post_load=1511 return_handoff=122879
+PHYSICAL_BENCH trial=159 mode=0 hooks=0 wake_to_entry=28125 load_cycles=249 wake_to_load=28374 roundtrip=145088
+PHYSICAL_BENCH_TAIL trial=159 child_post_load=1489 return_handoff=115225
+PHYSICAL_BENCH trial=160 mode=0 hooks=0 wake_to_entry=28421 load_cycles=293 wake_to_load=28714 roundtrip=127525
+PHYSICAL_BENCH_TAIL trial=160 child_post_load=1390 return_handoff=97421
+PHYSICAL_BENCH trial=161 mode=0 hooks=0 wake_to_entry=29251 load_cycles=293 wake_to_load=29544 roundtrip=125530
+PHYSICAL_BENCH_TAIL trial=161 child_post_load=1577 return_handoff=94409
+PHYSICAL_BENCH trial=162 mode=0 hooks=0 wake_to_entry=52175 load_cycles=317 wake_to_load=52492 roundtrip=149098
+PHYSICAL_BENCH_TAIL trial=162 child_post_load=1472 return_handoff=95134
+PHYSICAL_BENCH trial=163 mode=0 hooks=0 wake_to_entry=50542 load_cycles=335 wake_to_load=50877 roundtrip=148577
+PHYSICAL_BENCH_TAIL trial=163 child_post_load=1387 return_handoff=96313
+PHYSICAL_BENCH trial=164 mode=0 hooks=0 wake_to_entry=62468 load_cycles=243 wake_to_load=62711 roundtrip=161532
+PHYSICAL_BENCH_TAIL trial=164 child_post_load=1580 return_handoff=97241
+PHYSICAL_BENCH trial=165 mode=0 hooks=0 wake_to_entry=50891 load_cycles=325 wake_to_load=51216 roundtrip=149396
+PHYSICAL_BENCH_TAIL trial=165 child_post_load=1505 return_handoff=96675
+PHYSICAL_BENCH trial=166 mode=0 hooks=0 wake_to_entry=48356 load_cycles=319 wake_to_load=48675 roundtrip=145607
+PHYSICAL_BENCH_TAIL trial=166 child_post_load=1607 return_handoff=95325
+PHYSICAL_BENCH trial=167 mode=0 hooks=0 wake_to_entry=25263 load_cycles=325 wake_to_load=25588 roundtrip=142961
+PHYSICAL_BENCH_TAIL trial=167 child_post_load=21414 return_handoff=95959
+PHYSICAL_BENCH trial=168 mode=0 hooks=0 wake_to_entry=27574 load_cycles=253 wake_to_load=27827 roundtrip=144564
+PHYSICAL_BENCH_TAIL trial=168 child_post_load=1494 return_handoff=115243
+PHYSICAL_BENCH trial=169 mode=0 hooks=0 wake_to_entry=27804 load_cycles=293 wake_to_load=28097 roundtrip=123275
+PHYSICAL_BENCH_TAIL trial=169 child_post_load=1421 return_handoff=93757
+PHYSICAL_BENCH trial=170 mode=0 hooks=0 wake_to_entry=51203 load_cycles=325 wake_to_load=51528 roundtrip=147635
+PHYSICAL_BENCH_TAIL trial=170 child_post_load=1543 return_handoff=94564
+PHYSICAL_BENCH trial=171 mode=0 hooks=0 wake_to_entry=50190 load_cycles=319 wake_to_load=50509 roundtrip=148249
+PHYSICAL_BENCH_TAIL trial=171 child_post_load=1474 return_handoff=96266
+PHYSICAL_BENCH trial=172 mode=0 hooks=0 wake_to_entry=53774 load_cycles=317 wake_to_load=54091 roundtrip=153698
+PHYSICAL_BENCH_TAIL trial=172 child_post_load=1668 return_handoff=97939
+PHYSICAL_BENCH trial=173 mode=0 hooks=0 wake_to_entry=47904 load_cycles=360 wake_to_load=48264 roundtrip=147410
+PHYSICAL_BENCH_TAIL trial=173 child_post_load=1610 return_handoff=97536
+PHYSICAL_BENCH trial=174 mode=0 hooks=0 wake_to_entry=26379 load_cycles=329 wake_to_load=26708 roundtrip=147727
+PHYSICAL_BENCH_TAIL trial=174 child_post_load=1542 return_handoff=119477
+PHYSICAL_BENCH trial=175 mode=0 hooks=0 wake_to_entry=28181 load_cycles=249 wake_to_load=28430 roundtrip=144608
+PHYSICAL_BENCH_TAIL trial=175 child_post_load=1541 return_handoff=114637
+PHYSICAL_BENCH trial=176 mode=0 hooks=0 wake_to_entry=27711 load_cycles=293 wake_to_load=28004 roundtrip=123405
+PHYSICAL_BENCH_TAIL trial=176 child_post_load=1527 return_handoff=93874
+PHYSICAL_BENCH trial=177 mode=0 hooks=0 wake_to_entry=28993 load_cycles=317 wake_to_load=29310 roundtrip=125230
+PHYSICAL_BENCH_TAIL trial=177 child_post_load=1554 return_handoff=94366
+PHYSICAL_BENCH trial=178 mode=0 hooks=0 wake_to_entry=50637 load_cycles=313 wake_to_load=50950 roundtrip=149070
+PHYSICAL_BENCH_TAIL trial=178 child_post_load=1496 return_handoff=96624
+PHYSICAL_BENCH trial=179 mode=0 hooks=0 wake_to_entry=48172 load_cycles=317 wake_to_load=48489 roundtrip=145178
+PHYSICAL_BENCH_TAIL trial=179 child_post_load=1618 return_handoff=95071
+PHYSICAL_BENCH trial=180 mode=0 hooks=0 wake_to_entry=25399 load_cycles=325 wake_to_load=25724 roundtrip=142551
+PHYSICAL_BENCH_TAIL trial=180 child_post_load=21008 return_handoff=95819
+PHYSICAL_BENCH trial=181 mode=0 hooks=0 wake_to_entry=27585 load_cycles=249 wake_to_load=27834 roundtrip=143863
+PHYSICAL_BENCH_TAIL trial=181 child_post_load=1514 return_handoff=114515
+PHYSICAL_BENCH trial=182 mode=0 hooks=0 wake_to_entry=28573 load_cycles=293 wake_to_load=28866 roundtrip=123798
+PHYSICAL_BENCH_TAIL trial=182 child_post_load=1488 return_handoff=93444
+PHYSICAL_BENCH trial=183 mode=0 hooks=0 wake_to_entry=51248 load_cycles=317 wake_to_load=51565 roundtrip=147481
+PHYSICAL_BENCH_TAIL trial=183 child_post_load=1507 return_handoff=94409
+PHYSICAL_BENCH trial=184 mode=0 hooks=0 wake_to_entry=49466 load_cycles=317 wake_to_load=49783 roundtrip=147887
+PHYSICAL_BENCH_TAIL trial=184 child_post_load=1440 return_handoff=96664
+PHYSICAL_BENCH trial=185 mode=0 hooks=0 wake_to_entry=48127 load_cycles=241 wake_to_load=48368 roundtrip=144832
+PHYSICAL_BENCH_TAIL trial=185 child_post_load=1547 return_handoff=94917
+PHYSICAL_BENCH trial=186 mode=0 hooks=0 wake_to_entry=25645 load_cycles=297 wake_to_load=25942 roundtrip=151360
+PHYSICAL_BENCH_TAIL trial=186 child_post_load=1462 return_handoff=123956
+PHYSICAL_BENCH trial=187 mode=0 hooks=0 wake_to_entry=27754 load_cycles=249 wake_to_load=28003 roundtrip=147062
+PHYSICAL_BENCH_TAIL trial=187 child_post_load=1560 return_handoff=117499
+PHYSICAL_BENCH trial=188 mode=0 hooks=0 wake_to_entry=27368 load_cycles=249 wake_to_load=27617 roundtrip=122167
+PHYSICAL_BENCH_TAIL trial=188 child_post_load=1544 return_handoff=93006
+PHYSICAL_BENCH trial=189 mode=0 hooks=0 wake_to_entry=28915 load_cycles=293 wake_to_load=29208 roundtrip=125215
+PHYSICAL_BENCH_TAIL trial=189 child_post_load=1579 return_handoff=94428
+PHYSICAL_BENCH trial=190 mode=0 hooks=0 wake_to_entry=51422 load_cycles=293 wake_to_load=51715 roundtrip=147928
+PHYSICAL_BENCH_TAIL trial=190 child_post_load=1502 return_handoff=94711
+PHYSICAL_BENCH trial=191 mode=0 hooks=0 wake_to_entry=49979 load_cycles=344 wake_to_load=50323 roundtrip=148169
+PHYSICAL_BENCH_TAIL trial=191 child_post_load=1509 return_handoff=96337
+PHYSICAL_BENCH trial=192 mode=0 hooks=0 wake_to_entry=47791 load_cycles=317 wake_to_load=48108 roundtrip=144781
+PHYSICAL_BENCH_TAIL trial=192 child_post_load=1602 return_handoff=95071
+PHYSICAL_BENCH trial=193 mode=0 hooks=0 wake_to_entry=25531 load_cycles=325 wake_to_load=25856 roundtrip=143507
+PHYSICAL_BENCH_TAIL trial=193 child_post_load=21532 return_handoff=96119
+PHYSICAL_BENCH trial=194 mode=0 hooks=0 wake_to_entry=27634 load_cycles=253 wake_to_load=27887 roundtrip=144865
+PHYSICAL_BENCH_TAIL trial=194 child_post_load=1507 return_handoff=115471
+PHYSICAL_BENCH trial=195 mode=0 hooks=0 wake_to_entry=28096 load_cycles=293 wake_to_load=28389 roundtrip=123681
+PHYSICAL_BENCH_TAIL trial=195 child_post_load=1414 return_handoff=93878
+PHYSICAL_BENCH trial=196 mode=0 hooks=0 wake_to_entry=51465 load_cycles=320 wake_to_load=51785 roundtrip=147589
+PHYSICAL_BENCH_TAIL trial=196 child_post_load=1521 return_handoff=94283
+PHYSICAL_BENCH trial=197 mode=0 hooks=0 wake_to_entry=49816 load_cycles=318 wake_to_load=50134 roundtrip=149314
+PHYSICAL_BENCH_TAIL trial=197 child_post_load=1512 return_handoff=97668
+PHYSICAL_BENCH trial=198 mode=0 hooks=0 wake_to_entry=48162 load_cycles=285 wake_to_load=48447 roundtrip=145046
+PHYSICAL_BENCH_TAIL trial=198 child_post_load=1662 return_handoff=94937
+PHYSICAL_BENCH trial=199 mode=0 hooks=0 wake_to_entry=25515 load_cycles=297 wake_to_load=25812 roundtrip=143070
+PHYSICAL_BENCH_TAIL trial=199 child_post_load=20997 return_handoff=96261
+PHYSICAL_BENCH trial=200 mode=0 hooks=0 wake_to_entry=27688 load_cycles=253 wake_to_load=27941 roundtrip=151977
+PHYSICAL_BENCH_TAIL trial=200 child_post_load=1472 return_handoff=122564
+PHYSICAL_BENCH trial=201 mode=0 hooks=0 wake_to_entry=27965 load_cycles=249 wake_to_load=28214 roundtrip=148889
+PHYSICAL_BENCH_TAIL trial=201 child_post_load=1495 return_handoff=119180
+PHYSICAL_BENCH trial=202 mode=0 hooks=0 wake_to_entry=28769 load_cycles=297 wake_to_load=29066 roundtrip=182741
+PHYSICAL_BENCH_TAIL trial=202 child_post_load=1441 return_handoff=152234
+PHYSICAL_BENCH trial=203 mode=0 hooks=0 wake_to_entry=47655 load_cycles=346 wake_to_load=48001 roundtrip=145872
+PHYSICAL_BENCH_TAIL trial=203 child_post_load=1850 return_handoff=96021
+PHYSICAL_BENCH trial=204 mode=0 hooks=0 wake_to_entry=53155 load_cycles=321 wake_to_load=53476 roundtrip=151317
+PHYSICAL_BENCH_TAIL trial=204 child_post_load=1773 return_handoff=96068
+PHYSICAL_BENCH trial=205 mode=0 hooks=0 wake_to_entry=47298 load_cycles=317 wake_to_load=47615 roundtrip=143678
+PHYSICAL_BENCH_TAIL trial=205 child_post_load=1635 return_handoff=94428
+PHYSICAL_BENCH trial=206 mode=0 hooks=0 wake_to_entry=26665 load_cycles=297 wake_to_load=26962 roundtrip=146034
+PHYSICAL_BENCH_TAIL trial=206 child_post_load=1525 return_handoff=117547
+PHYSICAL_BENCH trial=207 mode=0 hooks=0 wake_to_entry=28554 load_cycles=249 wake_to_load=28803 roundtrip=146610
+PHYSICAL_BENCH_TAIL trial=207 child_post_load=1490 return_handoff=116317
+PHYSICAL_BENCH trial=208 mode=0 hooks=0 wake_to_entry=28466 load_cycles=294 wake_to_load=28760 roundtrip=124186
+PHYSICAL_BENCH_TAIL trial=208 child_post_load=1456 return_handoff=93970
+PHYSICAL_BENCH trial=209 mode=0 hooks=0 wake_to_entry=51876 load_cycles=317 wake_to_load=52193 roundtrip=148444
+PHYSICAL_BENCH_TAIL trial=209 child_post_load=1503 return_handoff=94748
+PHYSICAL_BENCH trial=210 mode=0 hooks=0 wake_to_entry=50624 load_cycles=309 wake_to_load=50933 roundtrip=149142
+PHYSICAL_BENCH_TAIL trial=210 child_post_load=1440 return_handoff=96769
+PHYSICAL_BENCH trial=211 mode=0 hooks=0 wake_to_entry=47982 load_cycles=317 wake_to_load=48299 roundtrip=145103
+PHYSICAL_BENCH_TAIL trial=211 child_post_load=1555 return_handoff=95249
+PHYSICAL_BENCH trial=212 mode=0 hooks=0 wake_to_entry=25301 load_cycles=325 wake_to_load=25626 roundtrip=142977
+PHYSICAL_BENCH_TAIL trial=212 child_post_load=21466 return_handoff=95885
+PHYSICAL_BENCH trial=213 mode=0 hooks=0 wake_to_entry=27613 load_cycles=250 wake_to_load=27863 roundtrip=150752
+PHYSICAL_BENCH_TAIL trial=213 child_post_load=1441 return_handoff=121448
+PHYSICAL_BENCH trial=214 mode=0 hooks=0 wake_to_entry=29913 load_cycles=293 wake_to_load=30206 roundtrip=150752
+PHYSICAL_BENCH_TAIL trial=214 child_post_load=1543 return_handoff=119003
+PHYSICAL_BENCH trial=215 mode=0 hooks=0 wake_to_entry=28080 load_cycles=293 wake_to_load=28373 roundtrip=123953
+PHYSICAL_BENCH_TAIL trial=215 child_post_load=1512 return_handoff=94068
+PHYSICAL_BENCH trial=216 mode=0 hooks=0 wake_to_entry=51189 load_cycles=297 wake_to_load=51486 roundtrip=147608
+PHYSICAL_BENCH_TAIL trial=216 child_post_load=1446 return_handoff=94676
+PHYSICAL_BENCH trial=217 mode=0 hooks=0 wake_to_entry=50381 load_cycles=345 wake_to_load=50726 roundtrip=148235
+PHYSICAL_BENCH_TAIL trial=217 child_post_load=1414 return_handoff=96095
+PHYSICAL_BENCH trial=218 mode=0 hooks=0 wake_to_entry=48045 load_cycles=241 wake_to_load=48286 roundtrip=144896
+PHYSICAL_BENCH_TAIL trial=218 child_post_load=1527 return_handoff=95083
+PHYSICAL_BENCH trial=219 mode=0 hooks=0 wake_to_entry=25677 load_cycles=329 wake_to_load=26006 roundtrip=143361
+PHYSICAL_BENCH_TAIL trial=219 child_post_load=21489 return_handoff=95866
+PHYSICAL_BENCH trial=220 mode=0 hooks=0 wake_to_entry=27707 load_cycles=249 wake_to_load=27956 roundtrip=146759
+PHYSICAL_BENCH_TAIL trial=220 child_post_load=1483 return_handoff=117320
+PHYSICAL_BENCH trial=221 mode=0 hooks=0 wake_to_entry=29290 load_cycles=293 wake_to_load=29583 roundtrip=125785
+PHYSICAL_BENCH_TAIL trial=221 child_post_load=1421 return_handoff=94781
+PHYSICAL_BENCH trial=222 mode=0 hooks=0 wake_to_entry=28658 load_cycles=293 wake_to_load=28951 roundtrip=124559
+PHYSICAL_BENCH_TAIL trial=222 child_post_load=1448 return_handoff=94160
+PHYSICAL_BENCH trial=223 mode=0 hooks=0 wake_to_entry=50777 load_cycles=349 wake_to_load=51126 roundtrip=147988
+PHYSICAL_BENCH_TAIL trial=223 child_post_load=1445 return_handoff=95417
+PHYSICAL_BENCH trial=224 mode=0 hooks=0 wake_to_entry=49619 load_cycles=285 wake_to_load=49904 roundtrip=147947
+PHYSICAL_BENCH_TAIL trial=224 child_post_load=1537 return_handoff=96506
+PHYSICAL_BENCH trial=225 mode=0 hooks=0 wake_to_entry=47035 load_cycles=317 wake_to_load=47352 roundtrip=142874
+PHYSICAL_BENCH_TAIL trial=225 child_post_load=1553 return_handoff=93969
+PHYSICAL_BENCH trial=226 mode=0 hooks=0 wake_to_entry=26285 load_cycles=325 wake_to_load=26610 roundtrip=142402
+PHYSICAL_BENCH_TAIL trial=226 child_post_load=1493 return_handoff=114299
+PHYSICAL_BENCH trial=227 mode=0 hooks=0 wake_to_entry=28108 load_cycles=317 wake_to_load=28425 roundtrip=1209356
+PHYSICAL_BENCH_TAIL trial=227 child_post_load=1451 return_handoff=1179480
+PHYSICAL_BENCH trial=228 mode=0 hooks=0 wake_to_entry=29687 load_cycles=249 wake_to_load=29936 roundtrip=152374
+PHYSICAL_BENCH_TAIL trial=228 child_post_load=1536 return_handoff=120902
+PHYSICAL_BENCH trial=229 mode=0 hooks=0 wake_to_entry=27944 load_cycles=249 wake_to_load=28193 roundtrip=144573
+PHYSICAL_BENCH_TAIL trial=229 child_post_load=1463 return_handoff=114917
+PHYSICAL_BENCH trial=230 mode=0 hooks=0 wake_to_entry=28306 load_cycles=293 wake_to_load=28599 roundtrip=124584
+PHYSICAL_BENCH_TAIL trial=230 child_post_load=1493 return_handoff=94492
+PHYSICAL_BENCH trial=231 mode=0 hooks=0 wake_to_entry=29049 load_cycles=293 wake_to_load=29342 roundtrip=125414
+PHYSICAL_BENCH_TAIL trial=231 child_post_load=1475 return_handoff=94597
+PHYSICAL_BENCH trial=232 mode=0 hooks=0 wake_to_entry=66614 load_cycles=351 wake_to_load=66965 roundtrip=164962
+PHYSICAL_BENCH_TAIL trial=232 child_post_load=1561 return_handoff=96436
+PHYSICAL_BENCH trial=233 mode=0 hooks=0 wake_to_entry=28945 load_cycles=325 wake_to_load=29270 roundtrip=125098
+PHYSICAL_BENCH_TAIL trial=233 child_post_load=1582 return_handoff=94246
+PHYSICAL_BENCH trial=234 mode=0 hooks=0 wake_to_entry=51390 load_cycles=317 wake_to_load=51707 roundtrip=148410
+PHYSICAL_BENCH_TAIL trial=234 child_post_load=1493 return_handoff=95210
+PHYSICAL_BENCH trial=235 mode=0 hooks=0 wake_to_entry=49638 load_cycles=375 wake_to_load=50013 roundtrip=147968
+PHYSICAL_BENCH_TAIL trial=235 child_post_load=1623 return_handoff=96332
+PHYSICAL_BENCH trial=236 mode=0 hooks=0 wake_to_entry=47565 load_cycles=271 wake_to_load=47836 roundtrip=144722
+PHYSICAL_BENCH_TAIL trial=236 child_post_load=1552 return_handoff=95334
+PHYSICAL_BENCH trial=237 mode=0 hooks=0 wake_to_entry=25832 load_cycles=297 wake_to_load=26129 roundtrip=143233
+PHYSICAL_BENCH_TAIL trial=237 child_post_load=1466 return_handoff=115638
+PHYSICAL_BENCH trial=238 mode=0 hooks=0 wake_to_entry=27831 load_cycles=249 wake_to_load=28080 roundtrip=144151
+PHYSICAL_BENCH_TAIL trial=238 child_post_load=1445 return_handoff=114626
+PHYSICAL_BENCH trial=239 mode=0 hooks=0 wake_to_entry=28172 load_cycles=317 wake_to_load=28489 roundtrip=124043
+PHYSICAL_BENCH_TAIL trial=239 child_post_load=1476 return_handoff=94078
+PHYSICAL_BENCH trial=240 mode=0 hooks=0 wake_to_entry=58971 load_cycles=293 wake_to_load=59264 roundtrip=157139
+PHYSICAL_BENCH_TAIL trial=240 child_post_load=1469 return_handoff=96406
+PHYSICAL_BENCH trial=241 mode=0 hooks=0 wake_to_entry=55454 load_cycles=294 wake_to_load=55748 roundtrip=155354
+PHYSICAL_BENCH_TAIL trial=241 child_post_load=1494 return_handoff=98112
+PHYSICAL_BENCH trial=242 mode=0 hooks=0 wake_to_entry=51349 load_cycles=344 wake_to_load=51693 roundtrip=148686
+PHYSICAL_BENCH_TAIL trial=242 child_post_load=1445 return_handoff=95548
+PHYSICAL_BENCH trial=243 mode=0 hooks=0 wake_to_entry=50453 load_cycles=317 wake_to_load=50770 roundtrip=148725
+PHYSICAL_BENCH_TAIL trial=243 child_post_load=1398 return_handoff=96557
+PHYSICAL_BENCH trial=244 mode=0 hooks=0 wake_to_entry=47993 load_cycles=317 wake_to_load=48310 roundtrip=145273
+PHYSICAL_BENCH_TAIL trial=244 child_post_load=1521 return_handoff=95442
+PHYSICAL_BENCH trial=245 mode=0 hooks=0 wake_to_entry=25578 load_cycles=325 wake_to_load=25903 roundtrip=143545
+PHYSICAL_BENCH_TAIL trial=245 child_post_load=1507 return_handoff=116135
+PHYSICAL_BENCH trial=246 mode=0 hooks=0 wake_to_entry=27678 load_cycles=249 wake_to_load=27927 roundtrip=144712
+PHYSICAL_BENCH_TAIL trial=246 child_post_load=1445 return_handoff=115340
+PHYSICAL_BENCH trial=247 mode=0 hooks=0 wake_to_entry=28338 load_cycles=297 wake_to_load=28635 roundtrip=123894
+PHYSICAL_BENCH_TAIL trial=247 child_post_load=1420 return_handoff=93839
+PHYSICAL_BENCH trial=248 mode=0 hooks=0 wake_to_entry=51646 load_cycles=317 wake_to_load=51963 roundtrip=148374
+PHYSICAL_BENCH_TAIL trial=248 child_post_load=1505 return_handoff=94906
+PHYSICAL_BENCH trial=249 mode=0 hooks=0 wake_to_entry=50077 load_cycles=317 wake_to_load=50394 roundtrip=148056
+PHYSICAL_BENCH_TAIL trial=249 child_post_load=1439 return_handoff=96223
+PHYSICAL_BENCH trial=250 mode=0 hooks=0 wake_to_entry=47820 load_cycles=319 wake_to_load=48139 roundtrip=145338
+PHYSICAL_BENCH_TAIL trial=250 child_post_load=1608 return_handoff=95591
+PHYSICAL_BENCH trial=251 mode=0 hooks=0 wake_to_entry=25714 load_cycles=325 wake_to_load=26039 roundtrip=143374
+PHYSICAL_BENCH_TAIL trial=251 child_post_load=1406 return_handoff=115929
+PHYSICAL_BENCH trial=252 mode=0 hooks=0 wake_to_entry=27548 load_cycles=273 wake_to_load=27821 roundtrip=144536
+PHYSICAL_BENCH_TAIL trial=252 child_post_load=1487 return_handoff=115228
+PHYSICAL_BENCH trial=253 mode=0 hooks=0 wake_to_entry=28308 load_cycles=294 wake_to_load=28602 roundtrip=123515
+PHYSICAL_BENCH_TAIL trial=253 child_post_load=1451 return_handoff=93462
+PHYSICAL_BENCH trial=254 mode=0 hooks=0 wake_to_entry=58868 load_cycles=294 wake_to_load=59162 roundtrip=156963
+PHYSICAL_BENCH_TAIL trial=254 child_post_load=1560 return_handoff=96241
+PHYSICAL_BENCH trial=255 mode=0 hooks=0 wake_to_entry=55323 load_cycles=293 wake_to_load=55616 roundtrip=195725
+PHYSICAL_BENCH_TAIL trial=255 child_post_load=1463 return_handoff=138646
+PHYSICAL_BENCH trial=256 mode=0 hooks=0 wake_to_entry=28294 load_cycles=242 wake_to_load=28536 roundtrip=146400
+PHYSICAL_BENCH_TAIL trial=256 child_post_load=1464 return_handoff=116400
+PHYSICAL_BENCH trial=257 mode=0 hooks=0 wake_to_entry=28557 load_cycles=293 wake_to_load=28850 roundtrip=124049
+PHYSICAL_BENCH_TAIL trial=257 child_post_load=1455 return_handoff=93744
+PHYSICAL_BENCH trial=258 mode=0 hooks=0 wake_to_entry=51395 load_cycles=352 wake_to_load=51747 roundtrip=148309
+PHYSICAL_BENCH_TAIL trial=258 child_post_load=1479 return_handoff=95083
+PHYSICAL_BENCH trial=259 mode=0 hooks=0 wake_to_entry=49830 load_cycles=317 wake_to_load=50147 roundtrip=148091
+PHYSICAL_BENCH_TAIL trial=259 child_post_load=1474 return_handoff=96470
+PHYSICAL_BENCH trial=260 mode=0 hooks=0 wake_to_entry=47910 load_cycles=241 wake_to_load=48151 roundtrip=145333
+PHYSICAL_BENCH_TAIL trial=260 child_post_load=1576 return_handoff=95606
+PHYSICAL_BENCH trial=261 mode=0 hooks=0 wake_to_entry=25483 load_cycles=328 wake_to_load=25811 roundtrip=142770
+PHYSICAL_BENCH_TAIL trial=261 child_post_load=1421 return_handoff=115538
+PHYSICAL_BENCH trial=262 mode=0 hooks=0 wake_to_entry=27523 load_cycles=293 wake_to_load=27816 roundtrip=144356
+PHYSICAL_BENCH_TAIL trial=262 child_post_load=1456 return_handoff=115084
+PHYSICAL_BENCH trial=263 mode=0 hooks=0 wake_to_entry=28232 load_cycles=293 wake_to_load=28525 roundtrip=123535
+PHYSICAL_BENCH_TAIL trial=263 child_post_load=1442 return_handoff=93568
+PHYSICAL_BENCH trial=264 mode=0 hooks=0 wake_to_entry=51320 load_cycles=349 wake_to_load=51669 roundtrip=148298
+PHYSICAL_BENCH_TAIL trial=264 child_post_load=1563 return_handoff=95066
+PHYSICAL_BENCH trial=265 mode=0 hooks=0 wake_to_entry=49851 load_cycles=317 wake_to_load=50168 roundtrip=148045
+PHYSICAL_BENCH_TAIL trial=265 child_post_load=1468 return_handoff=96409
+PHYSICAL_BENCH trial=266 mode=0 hooks=0 wake_to_entry=48113 load_cycles=241 wake_to_load=48354 roundtrip=145162
+PHYSICAL_BENCH_TAIL trial=266 child_post_load=1668 return_handoff=95140
+PHYSICAL_BENCH trial=267 mode=0 hooks=0 wake_to_entry=25390 load_cycles=297 wake_to_load=25687 roundtrip=149131
+PHYSICAL_BENCH_TAIL trial=267 child_post_load=1520 return_handoff=121924
+PHYSICAL_BENCH trial=268 mode=0 hooks=0 wake_to_entry=28777 load_cycles=249 wake_to_load=29026 roundtrip=148802
+PHYSICAL_BENCH_TAIL trial=268 child_post_load=1579 return_handoff=118197
+PHYSICAL_BENCH trial=269 mode=0 hooks=0 wake_to_entry=28305 load_cycles=249 wake_to_load=28554 roundtrip=149017
+PHYSICAL_BENCH_TAIL trial=269 child_post_load=1514 return_handoff=118949
+PHYSICAL_BENCH trial=270 mode=0 hooks=0 wake_to_entry=28034 load_cycles=293 wake_to_load=28327 roundtrip=123833
+PHYSICAL_BENCH_TAIL trial=270 child_post_load=1440 return_handoff=94066
+PHYSICAL_BENCH trial=271 mode=0 hooks=0 wake_to_entry=51182 load_cycles=317 wake_to_load=51499 roundtrip=147704
+PHYSICAL_BENCH_TAIL trial=271 child_post_load=1546 return_handoff=94659
+PHYSICAL_BENCH trial=272 mode=0 hooks=0 wake_to_entry=50245 load_cycles=309 wake_to_load=50554 roundtrip=148666
+PHYSICAL_BENCH_TAIL trial=272 child_post_load=1444 return_handoff=96668
+PHYSICAL_BENCH trial=273 mode=0 hooks=0 wake_to_entry=48142 load_cycles=241 wake_to_load=48383 roundtrip=145117
+PHYSICAL_BENCH_TAIL trial=273 child_post_load=1606 return_handoff=95128
+PHYSICAL_BENCH trial=274 mode=0 hooks=0 wake_to_entry=25735 load_cycles=299 wake_to_load=26034 roundtrip=143404
+PHYSICAL_BENCH_TAIL trial=274 child_post_load=21383 return_handoff=95987
+PHYSICAL_BENCH trial=275 mode=0 hooks=0 wake_to_entry=27613 load_cycles=251 wake_to_load=27864 roundtrip=180736
+PHYSICAL_BENCH_TAIL trial=275 child_post_load=1529 return_handoff=151343
+PHYSICAL_BENCH trial=276 mode=0 hooks=0 wake_to_entry=49266 load_cycles=325 wake_to_load=49591 roundtrip=149811
+PHYSICAL_BENCH_TAIL trial=276 child_post_load=1815 return_handoff=98405
+PHYSICAL_BENCH trial=277 mode=0 hooks=0 wake_to_entry=54214 load_cycles=317 wake_to_load=54531 roundtrip=152462
+PHYSICAL_BENCH_TAIL trial=277 child_post_load=1624 return_handoff=96307
+PHYSICAL_BENCH trial=278 mode=0 hooks=0 wake_to_entry=51166 load_cycles=309 wake_to_load=51475 roundtrip=149416
+PHYSICAL_BENCH_TAIL trial=278 child_post_load=1528 return_handoff=96413
+PHYSICAL_BENCH trial=279 mode=0 hooks=0 wake_to_entry=48707 load_cycles=285 wake_to_load=48992 roundtrip=145832
+PHYSICAL_BENCH_TAIL trial=279 child_post_load=1609 return_handoff=95231
+PHYSICAL_BENCH trial=280 mode=0 hooks=0 wake_to_entry=46202 load_cycles=288 wake_to_load=46490 roundtrip=143226
+PHYSICAL_BENCH_TAIL trial=280 child_post_load=1586 return_handoff=95150
+PHYSICAL_BENCH trial=281 mode=0 hooks=0 wake_to_entry=27724 load_cycles=249 wake_to_load=27973 roundtrip=154969
+PHYSICAL_BENCH_TAIL trial=281 child_post_load=1558 return_handoff=125438
+PHYSICAL_BENCH trial=282 mode=0 hooks=0 wake_to_entry=28792 load_cycles=249 wake_to_load=29041 roundtrip=148999
+PHYSICAL_BENCH_TAIL trial=282 child_post_load=1534 return_handoff=118424
+PHYSICAL_BENCH trial=283 mode=0 hooks=0 wake_to_entry=27861 load_cycles=249 wake_to_load=28110 roundtrip=123338
+PHYSICAL_BENCH_TAIL trial=283 child_post_load=1494 return_handoff=93734
+PHYSICAL_BENCH trial=284 mode=0 hooks=0 wake_to_entry=28160 load_cycles=293 wake_to_load=28453 roundtrip=123733
+PHYSICAL_BENCH_TAIL trial=284 child_post_load=1534 return_handoff=93746
+PHYSICAL_BENCH trial=285 mode=0 hooks=0 wake_to_entry=50854 load_cycles=352 wake_to_load=51206 roundtrip=148036
+PHYSICAL_BENCH_TAIL trial=285 child_post_load=1487 return_handoff=95343
+PHYSICAL_BENCH trial=286 mode=0 hooks=0 wake_to_entry=49408 load_cycles=293 wake_to_load=49701 roundtrip=148018
+PHYSICAL_BENCH_TAIL trial=286 child_post_load=1637 return_handoff=96680
+PHYSICAL_BENCH trial=287 mode=0 hooks=0 wake_to_entry=47090 load_cycles=317 wake_to_load=47407 roundtrip=143377
+PHYSICAL_BENCH_TAIL trial=287 child_post_load=1539 return_handoff=94431
+PHYSICAL_BENCH trial=288 mode=0 hooks=0 wake_to_entry=26320 load_cycles=325 wake_to_load=26645 roundtrip=142459
+PHYSICAL_BENCH_TAIL trial=288 child_post_load=1520 return_handoff=114294
+PHYSICAL_BENCH trial=289 mode=0 hooks=0 wake_to_entry=27999 load_cycles=249 wake_to_load=28248 roundtrip=163438
+PHYSICAL_BENCH_TAIL trial=289 child_post_load=1466 return_handoff=133724
+PHYSICAL_BENCH trial=290 mode=0 hooks=0 wake_to_entry=28133 load_cycles=249 wake_to_load=28382 roundtrip=144925
+PHYSICAL_BENCH_TAIL trial=290 child_post_load=1489 return_handoff=115054
+PHYSICAL_BENCH trial=291 mode=0 hooks=0 wake_to_entry=27681 load_cycles=293 wake_to_load=27974 roundtrip=123109
+PHYSICAL_BENCH_TAIL trial=291 child_post_load=1397 return_handoff=93738
+PHYSICAL_BENCH trial=292 mode=0 hooks=0 wake_to_entry=51609 load_cycles=318 wake_to_load=51927 roundtrip=147945
+PHYSICAL_BENCH_TAIL trial=292 child_post_load=1518 return_handoff=94500
+PHYSICAL_BENCH trial=293 mode=0 hooks=0 wake_to_entry=49969 load_cycles=341 wake_to_load=50310 roundtrip=147959
+PHYSICAL_BENCH_TAIL trial=293 child_post_load=1492 return_handoff=96157
+PHYSICAL_BENCH trial=294 mode=0 hooks=0 wake_to_entry=47956 load_cycles=317 wake_to_load=48273 roundtrip=145340
+PHYSICAL_BENCH_TAIL trial=294 child_post_load=1589 return_handoff=95478
+PHYSICAL_BENCH trial=295 mode=0 hooks=0 wake_to_entry=25303 load_cycles=325 wake_to_load=25628 roundtrip=149797
+PHYSICAL_BENCH_TAIL trial=295 child_post_load=1443 return_handoff=122726
+PHYSICAL_BENCH trial=296 mode=0 hooks=0 wake_to_entry=28473 load_cycles=325 wake_to_load=28798 roundtrip=150697
+PHYSICAL_BENCH_TAIL trial=296 child_post_load=1669 return_handoff=120230
+PHYSICAL_BENCH trial=297 mode=0 hooks=0 wake_to_entry=27936 load_cycles=249 wake_to_load=28185 roundtrip=145014
+PHYSICAL_BENCH_TAIL trial=297 child_post_load=1493 return_handoff=115336
+PHYSICAL_BENCH trial=298 mode=0 hooks=0 wake_to_entry=27860 load_cycles=297 wake_to_load=28157 roundtrip=123735
+PHYSICAL_BENCH_TAIL trial=298 child_post_load=1401 return_handoff=94177
+PHYSICAL_BENCH trial=299 mode=0 hooks=0 wake_to_entry=50828 load_cycles=293 wake_to_load=51121 roundtrip=147295
+PHYSICAL_BENCH_TAIL trial=299 child_post_load=1483 return_handoff=94691
+PHYSICAL_BENCH trial=300 mode=0 hooks=0 wake_to_entry=50687 load_cycles=312 wake_to_load=50999 roundtrip=148446
+PHYSICAL_BENCH_TAIL trial=300 child_post_load=1421 return_handoff=96026
+PHYSICAL_BENCH trial=301 mode=0 hooks=0 wake_to_entry=48148 load_cycles=317 wake_to_load=48465 roundtrip=145007
+PHYSICAL_BENCH_TAIL trial=301 child_post_load=1539 return_handoff=95003
+PHYSICAL_BENCH trial=302 mode=0 hooks=0 wake_to_entry=25552 load_cycles=325 wake_to_load=25877 roundtrip=153874
+PHYSICAL_BENCH_TAIL trial=302 child_post_load=30459 return_handoff=97538
+PHYSICAL_BENCH trial=303 mode=0 hooks=0 wake_to_entry=25681 load_cycles=325 wake_to_load=26006 roundtrip=143823
+PHYSICAL_BENCH_TAIL trial=303 child_post_load=1506 return_handoff=116311
+PHYSICAL_BENCH trial=304 mode=0 hooks=0 wake_to_entry=27416 load_cycles=249 wake_to_load=27665 roundtrip=144699
+PHYSICAL_BENCH_TAIL trial=304 child_post_load=1530 return_handoff=115504
+PHYSICAL_BENCH trial=305 mode=0 hooks=0 wake_to_entry=28410 load_cycles=293 wake_to_load=28703 roundtrip=124248
+PHYSICAL_BENCH_TAIL trial=305 child_post_load=1450 return_handoff=94095
+PHYSICAL_BENCH trial=306 mode=0 hooks=0 wake_to_entry=51845 load_cycles=349 wake_to_load=52194 roundtrip=148676
+PHYSICAL_BENCH_TAIL trial=306 child_post_load=1569 return_handoff=94913
+PHYSICAL_BENCH trial=307 mode=0 hooks=0 wake_to_entry=50293 load_cycles=309 wake_to_load=50602 roundtrip=148267
+PHYSICAL_BENCH_TAIL trial=307 child_post_load=1435 return_handoff=96230
+PHYSICAL_BENCH trial=308 mode=0 hooks=0 wake_to_entry=48043 load_cycles=317 wake_to_load=48360 roundtrip=144922
+PHYSICAL_BENCH_TAIL trial=308 child_post_load=1653 return_handoff=94909
+PHYSICAL_BENCH trial=309 mode=0 hooks=0 wake_to_entry=25584 load_cycles=325 wake_to_load=25909 roundtrip=154164
+PHYSICAL_BENCH_TAIL trial=309 child_post_load=29339 return_handoff=98916
+PHYSICAL_BENCH trial=310 mode=0 hooks=0 wake_to_entry=26008 load_cycles=351 wake_to_load=26359 roundtrip=146893
+PHYSICAL_BENCH_TAIL trial=310 child_post_load=1511 return_handoff=119023
+PHYSICAL_BENCH trial=311 mode=0 hooks=0 wake_to_entry=28191 load_cycles=249 wake_to_load=28440 roundtrip=145386
+PHYSICAL_BENCH_TAIL trial=311 child_post_load=1542 return_handoff=115404
+PHYSICAL_BENCH trial=312 mode=0 hooks=0 wake_to_entry=27927 load_cycles=293 wake_to_load=28220 roundtrip=123397
+PHYSICAL_BENCH_TAIL trial=312 child_post_load=1472 return_handoff=93705
+PHYSICAL_BENCH trial=313 mode=0 hooks=0 wake_to_entry=50840 load_cycles=317 wake_to_load=51157 roundtrip=147237
+PHYSICAL_BENCH_TAIL trial=313 child_post_load=1481 return_handoff=94599
+PHYSICAL_BENCH trial=314 mode=0 hooks=0 wake_to_entry=50552 load_cycles=344 wake_to_load=50896 roundtrip=148548
+PHYSICAL_BENCH_TAIL trial=314 child_post_load=1510 return_handoff=96142
+PHYSICAL_BENCH trial=315 mode=0 hooks=0 wake_to_entry=48310 load_cycles=317 wake_to_load=48627 roundtrip=145389
+PHYSICAL_BENCH_TAIL trial=315 child_post_load=1574 return_handoff=95188
+PHYSICAL_BENCH trial=316 mode=0 hooks=0 wake_to_entry=25481 load_cycles=325 wake_to_load=25806 roundtrip=142804
+PHYSICAL_BENCH_TAIL trial=316 child_post_load=21290 return_handoff=95708
+PHYSICAL_BENCH trial=317 mode=0 hooks=0 wake_to_entry=27537 load_cycles=249 wake_to_load=27786 roundtrip=144111
+PHYSICAL_BENCH_TAIL trial=317 child_post_load=1514 return_handoff=114811
+PHYSICAL_BENCH trial=318 mode=0 hooks=0 wake_to_entry=28546 load_cycles=344 wake_to_load=28890 roundtrip=124284
+PHYSICAL_BENCH_TAIL trial=318 child_post_load=1423 return_handoff=93971
+PHYSICAL_BENCH trial=319 mode=0 hooks=0 wake_to_entry=51545 load_cycles=321 wake_to_load=51866 roundtrip=148250
+PHYSICAL_BENCH_TAIL trial=319 child_post_load=1544 return_handoff=94840
+PHYSICAL_BENCH trial=320 mode=0 hooks=0 wake_to_entry=50344 load_cycles=321 wake_to_load=50665 roundtrip=148587
+PHYSICAL_BENCH_TAIL trial=320 child_post_load=1431 return_handoff=96491
+PHYSICAL_BENCH trial=321 mode=0 hooks=0 wake_to_entry=47962 load_cycles=317 wake_to_load=48279 roundtrip=145537
+PHYSICAL_BENCH_TAIL trial=321 child_post_load=1631 return_handoff=95627
+PHYSICAL_BENCH trial=322 mode=0 hooks=0 wake_to_entry=25897 load_cycles=325 wake_to_load=26222 roundtrip=143321
+PHYSICAL_BENCH_TAIL trial=322 child_post_load=21297 return_handoff=95802
+PHYSICAL_BENCH trial=323 mode=0 hooks=0 wake_to_entry=27373 load_cycles=249 wake_to_load=27622 roundtrip=156293
+PHYSICAL_BENCH_TAIL trial=323 child_post_load=1513 return_handoff=127158
+PHYSICAL_BENCH trial=324 mode=0 hooks=0 wake_to_entry=27832 load_cycles=249 wake_to_load=28081 roundtrip=146291
+PHYSICAL_BENCH_TAIL trial=324 child_post_load=1523 return_handoff=116687
+PHYSICAL_BENCH trial=325 mode=0 hooks=0 wake_to_entry=29597 load_cycles=293 wake_to_load=29890 roundtrip=125867
+PHYSICAL_BENCH_TAIL trial=325 child_post_load=1544 return_handoff=94433
+PHYSICAL_BENCH trial=326 mode=0 hooks=0 wake_to_entry=28523 load_cycles=294 wake_to_load=28817 roundtrip=124292
+PHYSICAL_BENCH_TAIL trial=326 child_post_load=1592 return_handoff=93883
+PHYSICAL_BENCH trial=327 mode=0 hooks=0 wake_to_entry=51298 load_cycles=350 wake_to_load=51648 roundtrip=148369
+PHYSICAL_BENCH_TAIL trial=327 child_post_load=1473 return_handoff=95248
+PHYSICAL_BENCH trial=328 mode=0 hooks=0 wake_to_entry=48872 load_cycles=293 wake_to_load=49165 roundtrip=147008
+PHYSICAL_BENCH_TAIL trial=328 child_post_load=1663 return_handoff=96180
+PHYSICAL_BENCH trial=329 mode=0 hooks=0 wake_to_entry=46804 load_cycles=318 wake_to_load=47122 roundtrip=142722
+PHYSICAL_BENCH_TAIL trial=329 child_post_load=1567 return_handoff=94033
+PHYSICAL_BENCH trial=330 mode=0 hooks=0 wake_to_entry=26158 load_cycles=349 wake_to_load=26507 roundtrip=142534
+PHYSICAL_BENCH_TAIL trial=330 child_post_load=1569 return_handoff=114458
+PHYSICAL_BENCH trial=331 mode=0 hooks=0 wake_to_entry=28025 load_cycles=297 wake_to_load=28322 roundtrip=123585
+PHYSICAL_BENCH_TAIL trial=331 child_post_load=1485 return_handoff=93778
+PHYSICAL_BENCH trial=332 mode=0 hooks=0 wake_to_entry=28856 load_cycles=318 wake_to_load=29174 roundtrip=124990
+PHYSICAL_BENCH_TAIL trial=332 child_post_load=1476 return_handoff=94340
+PHYSICAL_BENCH trial=333 mode=0 hooks=0 wake_to_entry=50144 load_cycles=310 wake_to_load=50454 roundtrip=148048
+PHYSICAL_BENCH_TAIL trial=333 child_post_load=1403 return_handoff=96191
+PHYSICAL_BENCH trial=334 mode=0 hooks=0 wake_to_entry=47615 load_cycles=317 wake_to_load=47932 roundtrip=144694
+PHYSICAL_BENCH_TAIL trial=334 child_post_load=1562 return_handoff=95200
+PHYSICAL_BENCH trial=335 mode=0 hooks=0 wake_to_entry=25531 load_cycles=325 wake_to_load=25856 roundtrip=142845
+PHYSICAL_BENCH_TAIL trial=335 child_post_load=1438 return_handoff=115551
+PHYSICAL_BENCH trial=336 mode=0 hooks=0 wake_to_entry=27529 load_cycles=328 wake_to_load=27857 roundtrip=144384
+PHYSICAL_BENCH_TAIL trial=336 child_post_load=1513 return_handoff=115014
+PHYSICAL_BENCH trial=337 mode=0 hooks=0 wake_to_entry=28172 load_cycles=293 wake_to_load=28465 roundtrip=157328
+PHYSICAL_BENCH_TAIL trial=337 child_post_load=1512 return_handoff=127351
+PHYSICAL_BENCH trial=338 mode=0 hooks=0 wake_to_entry=28370 load_cycles=296 wake_to_load=28666 roundtrip=124375
+PHYSICAL_BENCH_TAIL trial=338 child_post_load=1488 return_handoff=94221
+PHYSICAL_BENCH trial=339 mode=0 hooks=0 wake_to_entry=29829 load_cycles=296 wake_to_load=30125 roundtrip=126527
+PHYSICAL_BENCH_TAIL trial=339 child_post_load=1521 return_handoff=94881
+PHYSICAL_BENCH trial=340 mode=0 hooks=0 wake_to_entry=50529 load_cycles=325 wake_to_load=50854 roundtrip=147400
+PHYSICAL_BENCH_TAIL trial=340 child_post_load=1493 return_handoff=95053
+PHYSICAL_BENCH trial=341 mode=0 hooks=0 wake_to_entry=48170 load_cycles=320 wake_to_load=48490 roundtrip=145284
+PHYSICAL_BENCH_TAIL trial=341 child_post_load=1620 return_handoff=95174
+PHYSICAL_BENCH trial=342 mode=0 hooks=0 wake_to_entry=45789 load_cycles=318 wake_to_load=46107 roundtrip=142671
+PHYSICAL_BENCH_TAIL trial=342 child_post_load=1605 return_handoff=94959
+PHYSICAL_BENCH trial=343 mode=0 hooks=0 wake_to_entry=27195 load_cycles=232 wake_to_load=27427 roundtrip=143207
+PHYSICAL_BENCH_TAIL trial=343 child_post_load=1515 return_handoff=114265
+PHYSICAL_BENCH trial=344 mode=0 hooks=0 wake_to_entry=28071 load_cycles=297 wake_to_load=28368 roundtrip=123655
+PHYSICAL_BENCH_TAIL trial=344 child_post_load=1460 return_handoff=93827
+PHYSICAL_BENCH trial=345 mode=0 hooks=0 wake_to_entry=51512 load_cycles=293 wake_to_load=51805 roundtrip=147693
+PHYSICAL_BENCH_TAIL trial=345 child_post_load=1545 return_handoff=94343
+PHYSICAL_BENCH trial=346 mode=0 hooks=0 wake_to_entry=49979 load_cycles=317 wake_to_load=50296 roundtrip=148317
+PHYSICAL_BENCH_TAIL trial=346 child_post_load=1538 return_handoff=96483
+PHYSICAL_BENCH trial=347 mode=0 hooks=0 wake_to_entry=47966 load_cycles=317 wake_to_load=48283 roundtrip=145288
+PHYSICAL_BENCH_TAIL trial=347 child_post_load=1590 return_handoff=95415
+PHYSICAL_BENCH trial=348 mode=0 hooks=0 wake_to_entry=25564 load_cycles=297 wake_to_load=25861 roundtrip=180247
+PHYSICAL_BENCH_TAIL trial=348 child_post_load=1523 return_handoff=152863
+PHYSICAL_BENCH trial=349 mode=0 hooks=0 wake_to_entry=51962 load_cycles=418 wake_to_load=52380 roundtrip=152186
+PHYSICAL_BENCH_TAIL trial=349 child_post_load=1698 return_handoff=98108
+PHYSICAL_BENCH trial=350 mode=0 hooks=0 wake_to_entry=35412 load_cycles=343 wake_to_load=35755 roundtrip=164867
+PHYSICAL_BENCH_TAIL trial=350 child_post_load=1700 return_handoff=127412
+PHYSICAL_BENCH trial=351 mode=0 hooks=0 wake_to_entry=29350 load_cycles=250 wake_to_load=29600 roundtrip=149496
+PHYSICAL_BENCH_TAIL trial=351 child_post_load=1615 return_handoff=118281
+PHYSICAL_BENCH trial=352 mode=0 hooks=0 wake_to_entry=28631 load_cycles=249 wake_to_load=28880 roundtrip=146397
+PHYSICAL_BENCH_TAIL trial=352 child_post_load=1493 return_handoff=116024
+PHYSICAL_BENCH trial=353 mode=0 hooks=0 wake_to_entry=29004 load_cycles=293 wake_to_load=29297 roundtrip=1137634
+PHYSICAL_BENCH_TAIL trial=353 child_post_load=1455 return_handoff=1106882
+PHYSICAL_BENCH trial=354 mode=0 hooks=0 wake_to_entry=53958 load_cycles=369 wake_to_load=54327 roundtrip=155273
+PHYSICAL_BENCH_TAIL trial=354 child_post_load=1835 return_handoff=99111
+PHYSICAL_BENCH trial=355 mode=0 hooks=0 wake_to_entry=26115 load_cycles=325 wake_to_load=26440 roundtrip=144348
+PHYSICAL_BENCH_TAIL trial=355 child_post_load=1453 return_handoff=116455
+PHYSICAL_BENCH trial=356 mode=0 hooks=0 wake_to_entry=27699 load_cycles=249 wake_to_load=27948 roundtrip=145114
+PHYSICAL_BENCH_TAIL trial=356 child_post_load=1470 return_handoff=115696
+PHYSICAL_BENCH trial=357 mode=0 hooks=0 wake_to_entry=28425 load_cycles=296 wake_to_load=28721 roundtrip=127715
+PHYSICAL_BENCH_TAIL trial=357 child_post_load=1398 return_handoff=97596
+PHYSICAL_BENCH trial=358 mode=0 hooks=0 wake_to_entry=30868 load_cycles=293 wake_to_load=31161 roundtrip=164011
+PHYSICAL_BENCH_TAIL trial=358 child_post_load=1560 return_handoff=131290
+PHYSICAL_BENCH trial=359 mode=0 hooks=0 wake_to_entry=29815 load_cycles=327 wake_to_load=30142 roundtrip=148494
+PHYSICAL_BENCH_TAIL trial=359 child_post_load=1605 return_handoff=116747
+PHYSICAL_BENCH trial=360 mode=0 hooks=0 wake_to_entry=27769 load_cycles=249 wake_to_load=28018 roundtrip=144499
+PHYSICAL_BENCH_TAIL trial=360 child_post_load=1437 return_handoff=115044
+PHYSICAL_BENCH trial=361 mode=0 hooks=0 wake_to_entry=28598 load_cycles=293 wake_to_load=28891 roundtrip=123613
+PHYSICAL_BENCH_TAIL trial=361 child_post_load=1467 return_handoff=93255
+PHYSICAL_BENCH trial=362 mode=0 hooks=0 wake_to_entry=50685 load_cycles=317 wake_to_load=51002 roundtrip=147597
+PHYSICAL_BENCH_TAIL trial=362 child_post_load=1430 return_handoff=95165
+PHYSICAL_BENCH trial=363 mode=0 hooks=0 wake_to_entry=49378 load_cycles=293 wake_to_load=49671 roundtrip=147494
+PHYSICAL_BENCH_TAIL trial=363 child_post_load=1557 return_handoff=96266
+PHYSICAL_BENCH trial=364 mode=0 hooks=0 wake_to_entry=46482 load_cycles=317 wake_to_load=46799 roundtrip=142569
+PHYSICAL_BENCH_TAIL trial=364 child_post_load=1481 return_handoff=94289
+PHYSICAL_BENCH trial=365 mode=0 hooks=0 wake_to_entry=26580 load_cycles=325 wake_to_load=26905 roundtrip=142809
+PHYSICAL_BENCH_TAIL trial=365 child_post_load=1453 return_handoff=114451
+PHYSICAL_BENCH trial=366 mode=0 hooks=0 wake_to_entry=28109 load_cycles=249 wake_to_load=28358 roundtrip=123508
+PHYSICAL_BENCH_TAIL trial=366 child_post_load=1402 return_handoff=93748
+PHYSICAL_BENCH trial=367 mode=0 hooks=0 wake_to_entry=28579 load_cycles=317 wake_to_load=28896 roundtrip=124167
+PHYSICAL_BENCH_TAIL trial=367 child_post_load=1431 return_handoff=93840
+PHYSICAL_BENCH trial=368 mode=0 hooks=0 wake_to_entry=50443 load_cycles=343 wake_to_load=50786 roundtrip=148070
+PHYSICAL_BENCH_TAIL trial=368 child_post_load=1376 return_handoff=95908
+PHYSICAL_BENCH trial=369 mode=0 hooks=0 wake_to_entry=47887 load_cycles=317 wake_to_load=48204 roundtrip=145133
+PHYSICAL_BENCH_TAIL trial=369 child_post_load=1515 return_handoff=95414
+PHYSICAL_BENCH trial=370 mode=0 hooks=0 wake_to_entry=25594 load_cycles=44276 wake_to_load=69870 roundtrip=172686
+PHYSICAL_BENCH_TAIL trial=370 child_post_load=1817 return_handoff=100999
+PHYSICAL_BENCH trial=371 mode=0 hooks=0 wake_to_entry=51011 load_cycles=293 wake_to_load=51304 roundtrip=156776
+PHYSICAL_BENCH_TAIL trial=371 child_post_load=1411 return_handoff=104061
+PHYSICAL_BENCH trial=372 mode=0 hooks=0 wake_to_entry=53893 load_cycles=286 wake_to_load=54179 roundtrip=151338
+PHYSICAL_BENCH_TAIL trial=372 child_post_load=1442 return_handoff=95717
+PHYSICAL_BENCH trial=373 mode=0 hooks=0 wake_to_entry=49990 load_cycles=293 wake_to_load=50283 roundtrip=148849
+PHYSICAL_BENCH_TAIL trial=373 child_post_load=1549 return_handoff=97017
+PHYSICAL_BENCH trial=374 mode=0 hooks=0 wake_to_entry=47545 load_cycles=241 wake_to_load=47786 roundtrip=145172
+PHYSICAL_BENCH_TAIL trial=374 child_post_load=1536 return_handoff=95850
+PHYSICAL_BENCH trial=375 mode=0 hooks=0 wake_to_entry=25553 load_cycles=329 wake_to_load=25882 roundtrip=142800
+PHYSICAL_BENCH_TAIL trial=375 child_post_load=1468 return_handoff=115450
+PHYSICAL_BENCH trial=376 mode=0 hooks=0 wake_to_entry=27531 load_cycles=249 wake_to_load=27780 roundtrip=122525
+PHYSICAL_BENCH_TAIL trial=376 child_post_load=1429 return_handoff=93316
+PHYSICAL_BENCH trial=377 mode=0 hooks=0 wake_to_entry=28346 load_cycles=293 wake_to_load=28639 roundtrip=123670
+PHYSICAL_BENCH_TAIL trial=377 child_post_load=1537 return_handoff=93494
+PHYSICAL_BENCH trial=378 mode=0 hooks=0 wake_to_entry=51313 load_cycles=352 wake_to_load=51665 roundtrip=148442
+PHYSICAL_BENCH_TAIL trial=378 child_post_load=1486 return_handoff=95291
+PHYSICAL_BENCH trial=379 mode=0 hooks=0 wake_to_entry=49910 load_cycles=293 wake_to_load=50203 roundtrip=148453
+PHYSICAL_BENCH_TAIL trial=379 child_post_load=1608 return_handoff=96642
+PHYSICAL_BENCH trial=380 mode=0 hooks=0 wake_to_entry=47402 load_cycles=241 wake_to_load=47643 roundtrip=143720
+PHYSICAL_BENCH_TAIL trial=380 child_post_load=1626 return_handoff=94451
+PHYSICAL_BENCH trial=381 mode=0 hooks=0 wake_to_entry=26251 load_cycles=325 wake_to_load=26576 roundtrip=141947
+PHYSICAL_BENCH_TAIL trial=381 child_post_load=1523 return_handoff=113848
+PHYSICAL_BENCH trial=382 mode=0 hooks=0 wake_to_entry=27850 load_cycles=249 wake_to_load=28099 roundtrip=123622
+PHYSICAL_BENCH_TAIL trial=382 child_post_load=1483 return_handoff=94040
+PHYSICAL_BENCH trial=383 mode=0 hooks=0 wake_to_entry=28511 load_cycles=293 wake_to_load=28804 roundtrip=124067
+PHYSICAL_BENCH_TAIL trial=383 child_post_load=1517 return_handoff=93746
+PHYSICAL_BENCH trial=384 mode=0 hooks=0 wake_to_entry=50791 load_cycles=349 wake_to_load=51140 roundtrip=152480
+PHYSICAL_BENCH_TAIL trial=384 child_post_load=1487 return_handoff=99853
+PHYSICAL_BENCH trial=385 mode=0 hooks=0 wake_to_entry=50123 load_cycles=293 wake_to_load=50416 roundtrip=155957
+PHYSICAL_BENCH_TAIL trial=385 child_post_load=1427 return_handoff=104114
+PHYSICAL_BENCH trial=386 mode=0 hooks=0 wake_to_entry=53677 load_cycles=285 wake_to_load=53962 roundtrip=152323
+PHYSICAL_BENCH_TAIL trial=386 child_post_load=1495 return_handoff=96866
+PHYSICAL_BENCH trial=387 mode=0 hooks=0 wake_to_entry=49158 load_cycles=285 wake_to_load=49443 roundtrip=147763
+PHYSICAL_BENCH_TAIL trial=387 child_post_load=1560 return_handoff=96760
+PHYSICAL_BENCH trial=388 mode=0 hooks=0 wake_to_entry=47164 load_cycles=317 wake_to_load=47481 roundtrip=143809
+PHYSICAL_BENCH_TAIL trial=388 child_post_load=1526 return_handoff=94802
+PHYSICAL_BENCH trial=389 mode=0 hooks=0 wake_to_entry=26456 load_cycles=325 wake_to_load=26781 roundtrip=142851
+PHYSICAL_BENCH_TAIL trial=389 child_post_load=1477 return_handoff=114593
+PHYSICAL_BENCH trial=390 mode=0 hooks=0 wake_to_entry=28058 load_cycles=252 wake_to_load=28310 roundtrip=123737
+PHYSICAL_BENCH_TAIL trial=390 child_post_load=1379 return_handoff=94048
+PHYSICAL_BENCH trial=391 mode=0 hooks=0 wake_to_entry=28614 load_cycles=297 wake_to_load=28911 roundtrip=124749
+PHYSICAL_BENCH_TAIL trial=391 child_post_load=1489 return_handoff=94349
+PHYSICAL_BENCH trial=392 mode=0 hooks=0 wake_to_entry=51105 load_cycles=368 wake_to_load=51473 roundtrip=148608
+PHYSICAL_BENCH_TAIL trial=392 child_post_load=1464 return_handoff=95671
+PHYSICAL_BENCH trial=393 mode=0 hooks=0 wake_to_entry=49693 load_cycles=325 wake_to_load=50018 roundtrip=148251
+PHYSICAL_BENCH_TAIL trial=393 child_post_load=1566 return_handoff=96667
+PHYSICAL_BENCH trial=394 mode=0 hooks=0 wake_to_entry=47336 load_cycles=241 wake_to_load=47577 roundtrip=144327
+PHYSICAL_BENCH_TAIL trial=394 child_post_load=1613 return_handoff=95137
+PHYSICAL_BENCH trial=395 mode=0 hooks=0 wake_to_entry=26302 load_cycles=327 wake_to_load=26629 roundtrip=142131
+PHYSICAL_BENCH_TAIL trial=395 child_post_load=1510 return_handoff=113992
+PHYSICAL_BENCH trial=396 mode=0 hooks=0 wake_to_entry=27975 load_cycles=249 wake_to_load=28224 roundtrip=123328
+PHYSICAL_BENCH_TAIL trial=396 child_post_load=1482 return_handoff=93622
+PHYSICAL_BENCH trial=397 mode=0 hooks=0 wake_to_entry=28601 load_cycles=293 wake_to_load=28894 roundtrip=124271
+PHYSICAL_BENCH_TAIL trial=397 child_post_load=1482 return_handoff=93895
+PHYSICAL_BENCH trial=398 mode=0 hooks=0 wake_to_entry=51095 load_cycles=325 wake_to_load=51420 roundtrip=152267
+PHYSICAL_BENCH_TAIL trial=398 child_post_load=1476 return_handoff=99371
+PHYSICAL_BENCH trial=399 mode=0 hooks=0 wake_to_entry=49801 load_cycles=293 wake_to_load=50094 roundtrip=155478
+PHYSICAL_BENCH_TAIL trial=399 child_post_load=1443 return_handoff=103941
+PHYSICAL_BENCH trial=400 mode=0 hooks=0 wake_to_entry=53339 load_cycles=317 wake_to_load=53656 roundtrip=151831
+PHYSICAL_BENCH_TAIL trial=400 child_post_load=1494 return_handoff=96681
+PHYSICAL_BENCH trial=401 mode=0 hooks=0 wake_to_entry=49046 load_cycles=285 wake_to_load=49331 roundtrip=147515
+PHYSICAL_BENCH_TAIL trial=401 child_post_load=1551 return_handoff=96633
+PHYSICAL_BENCH trial=402 mode=0 hooks=0 wake_to_entry=46876 load_cycles=317 wake_to_load=47193 roundtrip=143569
+PHYSICAL_BENCH_TAIL trial=402 child_post_load=1529 return_handoff=94847
+PHYSICAL_BENCH trial=403 mode=0 hooks=0 wake_to_entry=26762 load_cycles=325 wake_to_load=27087 roundtrip=143515
+PHYSICAL_BENCH_TAIL trial=403 child_post_load=1550 return_handoff=114878
+PHYSICAL_BENCH trial=404 mode=0 hooks=0 wake_to_entry=28068 load_cycles=252 wake_to_load=28320 roundtrip=123692
+PHYSICAL_BENCH_TAIL trial=404 child_post_load=1415 return_handoff=93957
+PHYSICAL_BENCH trial=405 mode=0 hooks=0 wake_to_entry=28406 load_cycles=293 wake_to_load=28699 roundtrip=123976
+PHYSICAL_BENCH_TAIL trial=405 child_post_load=1506 return_handoff=93771
+PHYSICAL_BENCH trial=406 mode=0 hooks=0 wake_to_entry=51049 load_cycles=325 wake_to_load=51374 roundtrip=148807
+PHYSICAL_BENCH_TAIL trial=406 child_post_load=1472 return_handoff=95961
+PHYSICAL_BENCH trial=407 mode=0 hooks=0 wake_to_entry=49085 load_cycles=285 wake_to_load=49370 roundtrip=147385
+PHYSICAL_BENCH_TAIL trial=407 child_post_load=1567 return_handoff=96448
+PHYSICAL_BENCH trial=408 mode=0 hooks=0 wake_to_entry=46861 load_cycles=317 wake_to_load=47178 roundtrip=143248
+PHYSICAL_BENCH_TAIL trial=408 child_post_load=1601 return_handoff=94469
+PHYSICAL_BENCH trial=409 mode=0 hooks=0 wake_to_entry=26725 load_cycles=231 wake_to_load=26956 roundtrip=143074
+PHYSICAL_BENCH_TAIL trial=409 child_post_load=1528 return_handoff=114590
+PHYSICAL_BENCH trial=410 mode=0 hooks=0 wake_to_entry=27907 load_cycles=249 wake_to_load=28156 roundtrip=123816
+PHYSICAL_BENCH_TAIL trial=410 child_post_load=1542 return_handoff=94118
+PHYSICAL_BENCH trial=411 mode=0 hooks=0 wake_to_entry=28494 load_cycles=294 wake_to_load=28788 roundtrip=124583
+PHYSICAL_BENCH_TAIL trial=411 child_post_load=1493 return_handoff=94302
+PHYSICAL_BENCH trial=412 mode=0 hooks=0 wake_to_entry=51158 load_cycles=325 wake_to_load=51483 roundtrip=152410
+PHYSICAL_BENCH_TAIL trial=412 child_post_load=1453 return_handoff=99474
+PHYSICAL_BENCH trial=413 mode=0 hooks=0 wake_to_entry=49840 load_cycles=317 wake_to_load=50157 roundtrip=155572
+PHYSICAL_BENCH_TAIL trial=413 child_post_load=1410 return_handoff=104005
+PHYSICAL_BENCH trial=414 mode=0 hooks=0 wake_to_entry=53563 load_cycles=317 wake_to_load=53880 roundtrip=151894
+PHYSICAL_BENCH_TAIL trial=414 child_post_load=1473 return_handoff=96541
+PHYSICAL_BENCH trial=415 mode=0 hooks=0 wake_to_entry=62354 load_cycles=317 wake_to_load=62671 roundtrip=161081
+PHYSICAL_BENCH_TAIL trial=415 child_post_load=1642 return_handoff=96768
+PHYSICAL_BENCH trial=416 mode=0 hooks=0 wake_to_entry=50572 load_cycles=318 wake_to_load=50890 roundtrip=148380
+PHYSICAL_BENCH_TAIL trial=416 child_post_load=1496 return_handoff=95994
+PHYSICAL_BENCH trial=417 mode=0 hooks=0 wake_to_entry=48127 load_cycles=320 wake_to_load=48447 roundtrip=145607
+PHYSICAL_BENCH_TAIL trial=417 child_post_load=1676 return_handoff=95484
+PHYSICAL_BENCH trial=418 mode=0 hooks=0 wake_to_entry=25643 load_cycles=19404 wake_to_load=45047 roundtrip=142828
+PHYSICAL_BENCH_TAIL trial=418 child_post_load=1616 return_handoff=96165
+PHYSICAL_BENCH trial=419 mode=0 hooks=0 wake_to_entry=27551 load_cycles=249 wake_to_load=27800 roundtrip=162322
+PHYSICAL_BENCH_TAIL trial=419 child_post_load=1534 return_handoff=132988
+PHYSICAL_BENCH trial=420 mode=0 hooks=0 wake_to_entry=26455 load_cycles=325 wake_to_load=26780 roundtrip=143114
+PHYSICAL_BENCH_TAIL trial=420 child_post_load=1502 return_handoff=114832
+PHYSICAL_BENCH trial=421 mode=0 hooks=0 wake_to_entry=27723 load_cycles=249 wake_to_load=27972 roundtrip=181699
+PHYSICAL_BENCH_TAIL trial=421 child_post_load=1507 return_handoff=152220
+PHYSICAL_BENCH trial=422 mode=0 hooks=0 wake_to_entry=48013 load_cycles=311 wake_to_load=48324 roundtrip=146541
+PHYSICAL_BENCH_TAIL trial=422 child_post_load=1798 return_handoff=96419
+PHYSICAL_BENCH trial=423 mode=0 hooks=0 wake_to_entry=57359 load_cycles=325 wake_to_load=57684 roundtrip=156307
+PHYSICAL_BENCH_TAIL trial=423 child_post_load=1634 return_handoff=96989
+PHYSICAL_BENCH trial=424 mode=0 hooks=0 wake_to_entry=49718 load_cycles=293 wake_to_load=50011 roundtrip=148882
+PHYSICAL_BENCH_TAIL trial=424 child_post_load=1598 return_handoff=97273
+PHYSICAL_BENCH trial=425 mode=0 hooks=0 wake_to_entry=50672 load_cycles=241 wake_to_load=50913 roundtrip=149629
+PHYSICAL_BENCH_TAIL trial=425 child_post_load=1749 return_handoff=96967
+PHYSICAL_BENCH trial=426 mode=0 hooks=0 wake_to_entry=45959 load_cycles=312 wake_to_load=46271 roundtrip=153511
+PHYSICAL_BENCH_TAIL trial=426 child_post_load=1592 return_handoff=105648
+PHYSICAL_BENCH trial=427 mode=0 hooks=0 wake_to_entry=50259 load_cycles=351 wake_to_load=50610 roundtrip=147016
+PHYSICAL_BENCH_TAIL trial=427 child_post_load=1689 return_handoff=94717
+PHYSICAL_BENCH trial=428 mode=0 hooks=0 wake_to_entry=26762 load_cycles=299 wake_to_load=27061 roundtrip=143261
+PHYSICAL_BENCH_TAIL trial=428 child_post_load=1508 return_handoff=114692
+PHYSICAL_BENCH trial=429 mode=0 hooks=0 wake_to_entry=27791 load_cycles=296 wake_to_load=28087 roundtrip=123429
+PHYSICAL_BENCH_TAIL trial=429 child_post_load=1489 return_handoff=93853
+PHYSICAL_BENCH trial=430 mode=0 hooks=0 wake_to_entry=28900 load_cycles=319 wake_to_load=29219 roundtrip=125162
+PHYSICAL_BENCH_TAIL trial=430 child_post_load=1452 return_handoff=94491
+PHYSICAL_BENCH trial=431 mode=0 hooks=0 wake_to_entry=50690 load_cycles=312 wake_to_load=51002 roundtrip=148502
+PHYSICAL_BENCH_TAIL trial=431 child_post_load=1383 return_handoff=96117
+PHYSICAL_BENCH trial=432 mode=0 hooks=0 wake_to_entry=47765 load_cycles=317 wake_to_load=48082 roundtrip=145156
+PHYSICAL_BENCH_TAIL trial=432 child_post_load=1566 return_handoff=95508
+PHYSICAL_BENCH trial=433 mode=0 hooks=0 wake_to_entry=44416 load_cycles=285 wake_to_load=44701 roundtrip=142127
+PHYSICAL_BENCH_TAIL trial=433 child_post_load=1584 return_handoff=95842
+PHYSICAL_BENCH trial=434 mode=0 hooks=0 wake_to_entry=27475 load_cycles=249 wake_to_load=27724 roundtrip=144461
+PHYSICAL_BENCH_TAIL trial=434 child_post_load=1511 return_handoff=115226
+PHYSICAL_BENCH trial=435 mode=0 hooks=0 wake_to_entry=28299 load_cycles=293 wake_to_load=28592 roundtrip=123783
+PHYSICAL_BENCH_TAIL trial=435 child_post_load=1345 return_handoff=93846
+PHYSICAL_BENCH trial=436 mode=0 hooks=0 wake_to_entry=51256 load_cycles=317 wake_to_load=51573 roundtrip=147618
+PHYSICAL_BENCH_TAIL trial=436 child_post_load=1510 return_handoff=94535
+PHYSICAL_BENCH trial=437 mode=0 hooks=0 wake_to_entry=49693 load_cycles=317 wake_to_load=50010 roundtrip=148049
+PHYSICAL_BENCH_TAIL trial=437 child_post_load=1463 return_handoff=96576
+PHYSICAL_BENCH trial=438 mode=0 hooks=0 wake_to_entry=47888 load_cycles=241 wake_to_load=48129 roundtrip=148197
+PHYSICAL_BENCH_TAIL trial=438 child_post_load=1605 return_handoff=98463
+PHYSICAL_BENCH trial=439 mode=0 hooks=0 wake_to_entry=25333 load_cycles=19841 wake_to_load=45174 roundtrip=142300
+PHYSICAL_BENCH_TAIL trial=439 child_post_load=1626 return_handoff=95500
+PHYSICAL_BENCH trial=440 mode=0 hooks=0 wake_to_entry=27477 load_cycles=250 wake_to_load=27727 roundtrip=153507
+PHYSICAL_BENCH_TAIL trial=440 child_post_load=1509 return_handoff=124271
+PHYSICAL_BENCH trial=441 mode=0 hooks=0 wake_to_entry=29697 load_cycles=293 wake_to_load=29990 roundtrip=146883
+PHYSICAL_BENCH_TAIL trial=441 child_post_load=1423 return_handoff=115470
+PHYSICAL_BENCH trial=442 mode=0 hooks=0 wake_to_entry=27904 load_cycles=293 wake_to_load=28197 roundtrip=123347
+PHYSICAL_BENCH_TAIL trial=442 child_post_load=1504 return_handoff=93646
+PHYSICAL_BENCH trial=443 mode=0 hooks=0 wake_to_entry=51384 load_cycles=293 wake_to_load=51677 roundtrip=147379
+PHYSICAL_BENCH_TAIL trial=443 child_post_load=1547 return_handoff=94155
+PHYSICAL_BENCH trial=444 mode=0 hooks=0 wake_to_entry=49730 load_cycles=344 wake_to_load=50074 roundtrip=147637
+PHYSICAL_BENCH_TAIL trial=444 child_post_load=1419 return_handoff=96144
+PHYSICAL_BENCH trial=445 mode=0 hooks=0 wake_to_entry=47368 load_cycles=318 wake_to_load=47686 roundtrip=144613
+PHYSICAL_BENCH_TAIL trial=445 child_post_load=1591 return_handoff=95336
+PHYSICAL_BENCH trial=446 mode=0 hooks=0 wake_to_entry=25673 load_cycles=325 wake_to_load=25998 roundtrip=143442
+PHYSICAL_BENCH_TAIL trial=446 child_post_load=1506 return_handoff=115938
+PHYSICAL_BENCH trial=447 mode=0 hooks=0 wake_to_entry=27466 load_cycles=252 wake_to_load=27718 roundtrip=144425
+PHYSICAL_BENCH_TAIL trial=447 child_post_load=1515 return_handoff=115192
+PHYSICAL_BENCH trial=448 mode=0 hooks=0 wake_to_entry=28085 load_cycles=297 wake_to_load=28382 roundtrip=123674
+PHYSICAL_BENCH_TAIL trial=448 child_post_load=1414 return_handoff=93878
+PHYSICAL_BENCH trial=449 mode=0 hooks=0 wake_to_entry=51445 load_cycles=352 wake_to_load=51797 roundtrip=148133
+PHYSICAL_BENCH_TAIL trial=449 child_post_load=1501 return_handoff=94835
+PHYSICAL_BENCH trial=450 mode=0 hooks=0 wake_to_entry=50315 load_cycles=317 wake_to_load=50632 roundtrip=149131
+PHYSICAL_BENCH_TAIL trial=450 child_post_load=1462 return_handoff=97037
+PHYSICAL_BENCH trial=451 mode=0 hooks=0 wake_to_entry=47301 load_cycles=317 wake_to_load=47618 roundtrip=144303
+PHYSICAL_BENCH_TAIL trial=451 child_post_load=1641 return_handoff=95044
+PHYSICAL_BENCH trial=452 mode=0 hooks=0 wake_to_entry=25453 load_cycles=325 wake_to_load=25778 roundtrip=146721
+PHYSICAL_BENCH_TAIL trial=452 child_post_load=1465 return_handoff=119478
+PHYSICAL_BENCH trial=453 mode=0 hooks=0 wake_to_entry=27475 load_cycles=249 wake_to_load=27724 roundtrip=143906
+PHYSICAL_BENCH_TAIL trial=453 child_post_load=1528 return_handoff=114654
+PHYSICAL_BENCH trial=454 mode=0 hooks=0 wake_to_entry=27833 load_cycles=293 wake_to_load=28126 roundtrip=122843
+PHYSICAL_BENCH_TAIL trial=454 child_post_load=1479 return_handoff=93238
+PHYSICAL_BENCH trial=455 mode=0 hooks=0 wake_to_entry=63420 load_cycles=297 wake_to_load=63717 roundtrip=160211
+PHYSICAL_BENCH_TAIL trial=455 child_post_load=1520 return_handoff=94974
+PHYSICAL_BENCH trial=456 mode=0 hooks=0 wake_to_entry=28440 load_cycles=293 wake_to_load=28733 roundtrip=124236
+PHYSICAL_BENCH_TAIL trial=456 child_post_load=1465 return_handoff=94038
+PHYSICAL_BENCH trial=457 mode=0 hooks=0 wake_to_entry=50702 load_cycles=352 wake_to_load=51054 roundtrip=147684
+PHYSICAL_BENCH_TAIL trial=457 child_post_load=1486 return_handoff=95144
+PHYSICAL_BENCH trial=458 mode=0 hooks=0 wake_to_entry=48397 load_cycles=317 wake_to_load=48714 roundtrip=145375
+PHYSICAL_BENCH_TAIL trial=458 child_post_load=1577 return_handoff=95084
+PHYSICAL_BENCH trial=459 mode=0 hooks=0 wake_to_entry=45966 load_cycles=285 wake_to_load=46251 roundtrip=142689
+PHYSICAL_BENCH_TAIL trial=459 child_post_load=1537 return_handoff=94901
+PHYSICAL_BENCH trial=460 mode=0 hooks=0 wake_to_entry=27433 load_cycles=249 wake_to_load=27682 roundtrip=143665
+PHYSICAL_BENCH_TAIL trial=460 child_post_load=1574 return_handoff=114409
+PHYSICAL_BENCH trial=461 mode=0 hooks=0 wake_to_entry=27696 load_cycles=293 wake_to_load=27989 roundtrip=123018
+PHYSICAL_BENCH_TAIL trial=461 child_post_load=1523 return_handoff=93506
+PHYSICAL_BENCH trial=462 mode=0 hooks=0 wake_to_entry=51701 load_cycles=293 wake_to_load=51994 roundtrip=147945
+PHYSICAL_BENCH_TAIL trial=462 child_post_load=1517 return_handoff=94434
+PHYSICAL_BENCH trial=463 mode=0 hooks=0 wake_to_entry=49894 load_cycles=344 wake_to_load=50238 roundtrip=147717
+PHYSICAL_BENCH_TAIL trial=463 child_post_load=1411 return_handoff=96068
+PHYSICAL_BENCH trial=464 mode=0 hooks=0 wake_to_entry=47776 load_cycles=317 wake_to_load=48093 roundtrip=145066
+PHYSICAL_BENCH_TAIL trial=464 child_post_load=1568 return_handoff=95405
+PHYSICAL_BENCH trial=465 mode=0 hooks=0 wake_to_entry=25566 load_cycles=327 wake_to_load=25893 roundtrip=143203
+PHYSICAL_BENCH_TAIL trial=465 child_post_load=1444 return_handoff=115866
+PHYSICAL_BENCH trial=466 mode=0 hooks=0 wake_to_entry=27429 load_cycles=249 wake_to_load=27678 roundtrip=147699
+PHYSICAL_BENCH_TAIL trial=466 child_post_load=1513 return_handoff=118508
+PHYSICAL_BENCH trial=467 mode=0 hooks=0 wake_to_entry=28157 load_cycles=293 wake_to_load=28450 roundtrip=123477
+PHYSICAL_BENCH_TAIL trial=467 child_post_load=1473 return_handoff=93554
+PHYSICAL_BENCH trial=468 mode=0 hooks=0 wake_to_entry=51143 load_cycles=320 wake_to_load=51463 roundtrip=147343
+PHYSICAL_BENCH_TAIL trial=468 child_post_load=1465 return_handoff=94415
+PHYSICAL_BENCH trial=469 mode=0 hooks=0 wake_to_entry=61294 load_cycles=317 wake_to_load=61611 roundtrip=159609
+PHYSICAL_BENCH_TAIL trial=469 child_post_load=1542 return_handoff=96456
+PHYSICAL_BENCH trial=470 mode=0 hooks=0 wake_to_entry=50934 load_cycles=325 wake_to_load=51259 roundtrip=148082
+PHYSICAL_BENCH_TAIL trial=470 child_post_load=1428 return_handoff=95395
+PHYSICAL_BENCH trial=471 mode=0 hooks=0 wake_to_entry=49145 load_cycles=288 wake_to_load=49433 roundtrip=147088
+PHYSICAL_BENCH_TAIL trial=471 child_post_load=1540 return_handoff=96115
+PHYSICAL_BENCH trial=472 mode=0 hooks=0 wake_to_entry=46480 load_cycles=317 wake_to_load=46797 roundtrip=142250
+PHYSICAL_BENCH_TAIL trial=472 child_post_load=1563 return_handoff=93890
+PHYSICAL_BENCH trial=473 mode=0 hooks=0 wake_to_entry=26593 load_cycles=297 wake_to_load=26890 roundtrip=142590
+PHYSICAL_BENCH_TAIL trial=473 child_post_load=1522 return_handoff=114178
+PHYSICAL_BENCH trial=474 mode=0 hooks=0 wake_to_entry=27993 load_cycles=294 wake_to_load=28287 roundtrip=123657
+PHYSICAL_BENCH_TAIL trial=474 child_post_load=1492 return_handoff=93878
+PHYSICAL_BENCH trial=475 mode=0 hooks=0 wake_to_entry=51055 load_cycles=294 wake_to_load=51349 roundtrip=147128
+PHYSICAL_BENCH_TAIL trial=475 child_post_load=1445 return_handoff=94334
+PHYSICAL_BENCH trial=476 mode=0 hooks=0 wake_to_entry=50077 load_cycles=285 wake_to_load=50362 roundtrip=147883
+PHYSICAL_BENCH_TAIL trial=476 child_post_load=1391 return_handoff=96130
+PHYSICAL_BENCH trial=477 mode=0 hooks=0 wake_to_entry=47765 load_cycles=317 wake_to_load=48082 roundtrip=145168
+PHYSICAL_BENCH_TAIL trial=477 child_post_load=1614 return_handoff=95472
+PHYSICAL_BENCH trial=478 mode=0 hooks=0 wake_to_entry=25521 load_cycles=297 wake_to_load=25818 roundtrip=142761
+PHYSICAL_BENCH_TAIL trial=478 child_post_load=1469 return_handoff=115474
+PHYSICAL_BENCH trial=479 mode=0 hooks=0 wake_to_entry=27461 load_cycles=249 wake_to_load=27710 roundtrip=144435
+PHYSICAL_BENCH_TAIL trial=479 child_post_load=1485 return_handoff=115240
+PHYSICAL_BENCH trial=480 mode=0 hooks=0 wake_to_entry=27914 load_cycles=318 wake_to_load=28232 roundtrip=126696
+PHYSICAL_BENCH_TAIL trial=480 child_post_load=1376 return_handoff=97088
+PHYSICAL_BENCH trial=481 mode=0 hooks=0 wake_to_entry=56377 load_cycles=347 wake_to_load=56724 roundtrip=157860
+PHYSICAL_BENCH_TAIL trial=481 child_post_load=1774 return_handoff=99362
+PHYSICAL_BENCH trial=482 mode=0 hooks=0 wake_to_entry=45549 load_cycles=320 wake_to_load=45869 roundtrip=146217
+PHYSICAL_BENCH_TAIL trial=482 child_post_load=1645 return_handoff=98703
+PHYSICAL_BENCH trial=483 mode=0 hooks=0 wake_to_entry=28660 load_cycles=231 wake_to_load=28891 roundtrip=145945
+PHYSICAL_BENCH_TAIL trial=483 child_post_load=1618 return_handoff=115436
+PHYSICAL_BENCH trial=484 mode=0 hooks=0 wake_to_entry=27778 load_cycles=249 wake_to_load=28027 roundtrip=123639
+PHYSICAL_BENCH_TAIL trial=484 child_post_load=1492 return_handoff=94120
+PHYSICAL_BENCH trial=485 mode=0 hooks=0 wake_to_entry=28567 load_cycles=293 wake_to_load=28860 roundtrip=124312
+PHYSICAL_BENCH_TAIL trial=485 child_post_load=1530 return_handoff=93922
+PHYSICAL_BENCH trial=486 mode=0 hooks=0 wake_to_entry=51439 load_cycles=317 wake_to_load=51756 roundtrip=148737
+PHYSICAL_BENCH_TAIL trial=486 child_post_load=1507 return_handoff=95474
+PHYSICAL_BENCH trial=487 mode=0 hooks=0 wake_to_entry=49350 load_cycles=349 wake_to_load=49699 roundtrip=151371
+PHYSICAL_BENCH_TAIL trial=487 child_post_load=1562 return_handoff=100110
+PHYSICAL_BENCH trial=488 mode=0 hooks=0 wake_to_entry=48233 load_cycles=245 wake_to_load=48478 roundtrip=145470
+PHYSICAL_BENCH_TAIL trial=488 child_post_load=1597 return_handoff=95395
+PHYSICAL_BENCH trial=489 mode=0 hooks=0 wake_to_entry=25766 load_cycles=19563 wake_to_load=45329 roundtrip=142480
+PHYSICAL_BENCH_TAIL trial=489 child_post_load=1599 return_handoff=95552
+PHYSICAL_BENCH trial=490 mode=0 hooks=0 wake_to_entry=27610 load_cycles=249 wake_to_load=27859 roundtrip=144533
+PHYSICAL_BENCH_TAIL trial=490 child_post_load=1525 return_handoff=115149
+PHYSICAL_BENCH trial=491 mode=0 hooks=0 wake_to_entry=28122 load_cycles=293 wake_to_load=28415 roundtrip=124055
+PHYSICAL_BENCH_TAIL trial=491 child_post_load=1357 return_handoff=94283
+PHYSICAL_BENCH trial=492 mode=0 hooks=0 wake_to_entry=51532 load_cycles=293 wake_to_load=51825 roundtrip=148009
+PHYSICAL_BENCH_TAIL trial=492 child_post_load=1480 return_handoff=94704
+PHYSICAL_BENCH trial=493 mode=0 hooks=0 wake_to_entry=49762 load_cycles=309 wake_to_load=50071 roundtrip=148166
+PHYSICAL_BENCH_TAIL trial=493 child_post_load=1442 return_handoff=96653
+PHYSICAL_BENCH trial=494 mode=0 hooks=0 wake_to_entry=47820 load_cycles=317 wake_to_load=48137 roundtrip=153666
+PHYSICAL_BENCH_TAIL trial=494 child_post_load=1613 return_handoff=103916
+PHYSICAL_BENCH trial=495 mode=0 hooks=0 wake_to_entry=47319 load_cycles=320 wake_to_load=47639 roundtrip=208289
+PHYSICAL_BENCH_TAIL trial=495 child_post_load=1671 return_handoff=158979
+PHYSICAL_BENCH trial=496 mode=0 hooks=0 wake_to_entry=69412 load_cycles=340 wake_to_load=69752 roundtrip=168380
+PHYSICAL_BENCH_TAIL trial=496 child_post_load=1747 return_handoff=96881
+PHYSICAL_BENCH trial=497 mode=0 hooks=0 wake_to_entry=27047 load_cycles=297 wake_to_load=27344 roundtrip=144129
+PHYSICAL_BENCH_TAIL trial=497 child_post_load=1509 return_handoff=115276
+PHYSICAL_BENCH trial=498 mode=0 hooks=0 wake_to_entry=28217 load_cycles=249 wake_to_load=28466 roundtrip=124052
+PHYSICAL_BENCH_TAIL trial=498 child_post_load=1513 return_handoff=94073
+PHYSICAL_BENCH trial=499 mode=0 hooks=0 wake_to_entry=28631 load_cycles=293 wake_to_load=28924 roundtrip=124169
+PHYSICAL_BENCH_TAIL trial=499 child_post_load=1462 return_handoff=93783
+PHYSICAL_BENCH trial=500 mode=0 hooks=0 wake_to_entry=51133 load_cycles=318 wake_to_load=51451 roundtrip=151887
+PHYSICAL_BENCH_TAIL trial=500 child_post_load=1417 return_handoff=99019
+PHYSICAL_BENCH trial=501 mode=0 hooks=0 wake_to_entry=50262 load_cycles=349 wake_to_load=50611 roundtrip=148342
+PHYSICAL_BENCH_TAIL trial=501 child_post_load=1562 return_handoff=96169
+PHYSICAL_BENCH trial=502 mode=0 hooks=0 wake_to_entry=48601 load_cycles=317 wake_to_load=48918 roundtrip=146323
+PHYSICAL_BENCH_TAIL trial=502 child_post_load=1606 return_handoff=95799
+PHYSICAL_BENCH trial=503 mode=0 hooks=0 wake_to_entry=45426 load_cycles=317 wake_to_load=45743 roundtrip=142649
+PHYSICAL_BENCH_TAIL trial=503 child_post_load=1531 return_handoff=95375
+PHYSICAL_BENCH trial=504 mode=0 hooks=0 wake_to_entry=27473 load_cycles=249 wake_to_load=27722 roundtrip=143720
+PHYSICAL_BENCH_TAIL trial=504 child_post_load=1485 return_handoff=114513
+PHYSICAL_BENCH trial=505 mode=0 hooks=0 wake_to_entry=28070 load_cycles=294 wake_to_load=28364 roundtrip=123567
+PHYSICAL_BENCH_TAIL trial=505 child_post_load=1345 return_handoff=93858
+PHYSICAL_BENCH trial=506 mode=0 hooks=0 wake_to_entry=51393 load_cycles=294 wake_to_load=51687 roundtrip=147467
+PHYSICAL_BENCH_TAIL trial=506 child_post_load=1467 return_handoff=94313
+PHYSICAL_BENCH trial=507 mode=0 hooks=0 wake_to_entry=49597 load_cycles=351 wake_to_load=49948 roundtrip=147428
+PHYSICAL_BENCH_TAIL trial=507 child_post_load=1442 return_handoff=96038
+PHYSICAL_BENCH trial=508 mode=0 hooks=0 wake_to_entry=55427 load_cycles=317 wake_to_load=55744 roundtrip=155542
+PHYSICAL_BENCH_TAIL trial=508 child_post_load=1622 return_handoff=98176
+PHYSICAL_BENCH trial=509 mode=0 hooks=0 wake_to_entry=48330 load_cycles=242 wake_to_load=48572 roundtrip=145796
+PHYSICAL_BENCH_TAIL trial=509 child_post_load=1565 return_handoff=95659
+PHYSICAL_BENCH trial=510 mode=0 hooks=0 wake_to_entry=25867 load_cycles=325 wake_to_load=26192 roundtrip=145945
+PHYSICAL_BENCH_TAIL trial=510 child_post_load=1502 return_handoff=118251
+PHYSICAL_BENCH trial=511 mode=0 hooks=0 wake_to_entry=28139 load_cycles=252 wake_to_load=28391 roundtrip=1354126
+PHYSICAL_BENCH_TAIL trial=511 child_post_load=1496 return_handoff=1324239
+PHYSICAL_BENCH_PARENT PASS
+PHYSICAL_CELL_EXIT group=7 timing=wake-data rc=0
+# poweroff -f
+[  116.523002] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              879 (             36f)
+INFO:    ps.cpp: minstret (instructions retired):      814,757,667 (        30903723)
+INFO:    ps.cpp: minstret delta:                       814,756,788 (        309033b4)
+INFO:    ps.cpp: MTIME start:                           74,745,632 (         4748720)
+INFO:    ps.cpp: MTIME stop:                         1,011,301,636 (        3c473d04)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):         936,556,004 (        37d2b5e4)
+INFO:    ps.cpp: IPC        :                             0.108744
+INFO:    ps.cpp: minstret (instructions retired):      814,757,752 (        30903778)
+INFO:    ps.cpp: wall clock time                :  187,312,255,212 (      2b9cae30ec) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,986,490.00 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000255
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d38000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+Connection to 192.168.4.35 closed.

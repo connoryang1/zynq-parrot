@@ -29,7 +29,8 @@ def cell_plan():
 
 def selected_cells(start_cell, only_timing=None, only_group=None):
     """Return a disjoint suffix, optionally filtered to one timing."""
-    if only_timing in ("instruction", "counter", "trigger", "wake-trigger"):
+    if only_timing in ("instruction", "counter", "trigger", "wake-trigger",
+                       "wake-data"):
         cells = [(group, only_timing) for group in range(8)]
         if start_cell < 0 or start_cell >= len(cells):
             raise ValueError(
@@ -113,7 +114,7 @@ def parse_args(argv=None):
                         default="alternating")
     parser.add_argument("--only-timing",
                         choices=("early", "late", "instruction", "counter",
-                                 "trigger", "wake-trigger"))
+                                 "trigger", "wake-trigger", "wake-data"))
     parser.add_argument("--start-cell", type=int, default=0,
                         help="zero-based cell-plan index for a recovered suffix run")
     parser.add_argument("--only-group", type=int, choices=range(8))

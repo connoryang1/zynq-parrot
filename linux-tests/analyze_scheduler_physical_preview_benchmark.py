@@ -14,7 +14,7 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
                     r"lines=(\d+) "
-                    r"timing=(early|late|instruction|counter|trigger|wake-trigger) "
+                    r"timing=(early|late|instruction|counter|trigger|wake-trigger|wake-data) "
                     r"mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
 TIMING_MODES = {
@@ -24,6 +24,7 @@ TIMING_MODES = {
     "counter": 4,
     "trigger": 5,
     "wake-trigger": 6,
+    "wake-data": 6,
 }
 
 

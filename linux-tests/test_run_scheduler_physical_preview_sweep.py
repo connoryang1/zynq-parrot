@@ -158,6 +158,12 @@ class CellPlanTest(unittest.TestCase):
             [(3, "wake-trigger")],
         )
 
+    def test_wake_data_uses_one_cell_per_group(self):
+        self.assertEqual(
+            selected_cells(0, "wake-data"),
+            [(group, "wake-data") for group in range(8)],
+        )
+
     def test_invalid_recovery_boundary_is_rejected(self):
         for start in (-1, 16):
             with self.assertRaisesRegex(ValueError, "start cell"):

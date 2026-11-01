@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate fresh-boot fixed-arm pipe replay A/B replicates."""
+"""Validate fresh-boot fixed-arm physical-preview A/B replicates."""
 
 import argparse
 import gzip
@@ -15,7 +15,7 @@ from analyze_scheduler_physical_preview_benchmark import METRICS, ROW, percentil
 
 CONFIG = re.compile(
     r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) lines=(\d+) "
-    r"timing=wake-trigger mode=6 footprint=hot-proxy policy=fifo "
+    r"timing=([a-z-]+) mode=(\d+) footprint=([a-z-]+) policy=fifo "
     r"replay_state=persistent arm=(enabled|disabled)"
 )
 TAIL = re.compile(
@@ -40,7 +40,8 @@ def status_path(path):
     return path.with_suffix(path.suffix + ".status.json")
 
 
-def load_run(path, arm, identity, group):
+def load_run(path, arm, identity, group, timing="wake-trigger", mode=6,
+             footprint="hot-proxy"):
     """Validate one fixed-arm run and return its 512 timing rows."""
     text = read_text(path).replace("\x00", "").replace("\r", "")
     status_file = status_path(path)
@@ -49,15 +50,12 @@ def load_run(path, arm, identity, group):
     status = json.loads(status_file.read_text())
     expected_status = {
         "status": "PASS",
-        "nbf_sha256": identity["nbf_sha256"],
-        "transfer_sha256": identity["transfer_sha256"],
-        "elf_sha256": identity["elf_sha256"],
-        "control_program_sha256": identity["control_program_sha256"],
-        "footprint": "hot-proxy",
+        **identity,
+        "footprint": footprint,
         "policy": "fifo",
         "replay_state": "persistent",
         "arm": arm,
-        "cells": [f"{group}:wake-trigger"],
+        "cells": [f"{group}:{timing}"],
     }
     for key, expected in expected_status.items():
         if status.get(key) != expected:
@@ -65,12 +63,15 @@ def load_run(path, arm, identity, group):
                 f"{path}: status {key}={status.get(key)!r}, expected {expected!r}"
             )
     configs = CONFIG.findall(text)
-    if configs != [(str(group), str(group * 256), "4", arm)]:
+    expected_config = [(
+        str(group), str(group * 256), "4", timing, str(mode), footprint, arm
+    )]
+    if configs != expected_config:
         raise ValueError(f"{path}: missing or invalid fixed-arm configuration")
     required = (
         "PHYSICAL_BENCH_CHILD PASS",
         "PHYSICAL_BENCH_PARENT PASS",
-        f"PHYSICAL_CELL_EXIT group={group} timing=wake-trigger rc=0",
+        f"PHYSICAL_CELL_EXIT group={group} timing={timing} rc=0",
         "BSG PASS",
     )
     for marker in required:
@@ -101,9 +102,11 @@ def load_run(path, arm, identity, group):
     if [row["trial"] for row in base_rows] != list(range(512)):
         raise ValueError(f"{path}: expected exactly 512 ordered trials")
     expected_mode = 1 if arm == "enabled" else 0
+    expected_hooks = (1 if arm == "enabled"
+                      and (mode in range(1, 5) or timing == "wake-data") else 0)
     for row in base_rows:
         trial = row["trial"]
-        if row["mode"] != expected_mode or row["hooks"] != 0:
+        if row["mode"] != expected_mode or row["hooks"] != expected_hooks:
             raise ValueError(f"{path}: trial {trial} has invalid mode/hooks")
         if trial not in tails:
             raise ValueError(f"{path}: trial {trial} lacks tail timing")
@@ -179,7 +182,15 @@ def parse_args(argv=None):
     parser.add_argument("--transfer-sha256", required=True)
     parser.add_argument("--elf-sha256", required=True)
     parser.add_argument("--control-program-sha256", required=True)
+    parser.add_argument("--bitstream-sha256")
     parser.add_argument("--group", type=int, choices=range(8), default=7)
+    parser.add_argument("--timing", choices=("early", "late", "instruction",
+                                              "counter", "trigger",
+                                              "wake-trigger", "wake-data"),
+                        default="wake-trigger")
+    parser.add_argument("--mode", type=int, choices=range(1, 7), default=6)
+    parser.add_argument("--footprint", choices=("target", "hot-proxy"),
+                        default="hot-proxy")
     parser.add_argument("--replicate", action="append", nargs=3, required=True,
                         metavar=("ORDER", "ENABLED_LOG", "DISABLED_LOG"))
     parser.add_argument("--iid-resamples", type=int, default=100_000)
@@ -200,6 +211,9 @@ def analyze(args):
         "elf_sha256": args.elf_sha256,
         "control_program_sha256": args.control_program_sha256,
     }
+    bitstream_sha256 = getattr(args, "bitstream_sha256", None)
+    if bitstream_sha256 is not None:
+        identity["bitstream_sha256"] = bitstream_sha256
     for digest in identity.values():
         if not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ValueError("identities must be 64 lowercase hex SHA-256 values")
@@ -209,8 +223,14 @@ def analyze(args):
     for order, enabled_path, disabled_path in args.replicate:
         replicate = {
             "order": order,
-            "enabled": load_run(Path(enabled_path), "enabled", identity, args.group),
-            "disabled": load_run(Path(disabled_path), "disabled", identity, args.group),
+            "enabled": load_run(
+                Path(enabled_path), "enabled", identity, args.group,
+                args.timing, args.mode, args.footprint
+            ),
+            "disabled": load_run(
+                Path(disabled_path), "disabled", identity, args.group,
+                args.timing, args.mode, args.footprint
+            ),
         }
         replicate["median_difference_enabled_minus_disabled"] = {
             metric: replicate["enabled"]["medians"][metric]
@@ -221,16 +241,19 @@ def analyze(args):
 
     output = {
         "purpose": (
-            "Measure persistent instruction replay on a fixed-arm Linux FIFO "
+            "Measure persistent physical preview on a fixed-arm Linux FIFO "
             "pipe handoff without retained-state leakage between A/B arms."
         ),
         "identity": identity,
         "group": args.group,
+        "timing": args.timing,
+        "mode": args.mode,
+        "footprint": args.footprint,
         "replicates": replicates,
         "metrics": {},
         "interpretation_limit": (
-            "This is one synthetic persistent pipe pair with hot proxy data "
-            "hints, not general application throughput."
+            "This is one synthetic persistent pipe pair, not general "
+            "application throughput."
         ),
     }
     for index, metric in enumerate(ALL_METRICS):

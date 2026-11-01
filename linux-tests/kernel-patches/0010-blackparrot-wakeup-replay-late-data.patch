@@ -1,0 +1,17 @@
+This patch enables the existing late physical data-preview hook for mode six.
+It changes only the mode-comparison immediate, preserving the accepted wakeup
+instruction trigger, selection suppression, code size, and replay addresses.
+The resulting image dedicates mode six to the joint wake-replay plus late-data
+experiment; it does not retain the old mode-two late-data behavior.
+
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -169,7 +169,7 @@ static __always_inline void riscv_bp_preview_late(struct task_struct *next)
+ {
+ 	unsigned long paddr0, paddr1, paddr2, paddr3;
+ 
+-	if (READ_ONCE(next->thread.bp_preview_phys_mode) != 2
++	if (READ_ONCE(next->thread.bp_preview_phys_mode) != 6
+ 	    || READ_ONCE(next->thread.bp_preview_phys_mm) != next->mm
+ 	    || !next->mm)
+ 		return;
