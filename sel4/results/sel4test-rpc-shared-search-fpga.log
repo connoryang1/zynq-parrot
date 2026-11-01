@@ -1,19 +1,22 @@
 SEL4_RPC_EVIDENCE platform=pynq-z2 workload=libc-bounded-search date=2026-11-01
 SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied
 SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024
-SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=756136 cycles_per_call=2953
-SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=854979 cycles_per_call=3339
-SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1415740 cycles_per_call=5530
-SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=52860 cycles_per_call=6607
+SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=763826 cycles_per_call=2983
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=854854 cycles_per_call=3339
+SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1419780 cycles_per_call=5546
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=49263 cycles_per_call=6157
+SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2796 median=2801 p95=4964 max=5898
+SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3142 median=3142 p95=5299 max=6180
+SEL4_RPC_DISTRIBUTION path=software samples=64 min=5163 median=5168 p95=7347 max=8379
 Test SEL4IPCRPC0002 passed
 Test suite passed. 3 tests passed. 0 tests disabled.
 INFO: CORE PASS
 INFO: BSG PASS
 SEL4_RPC_ARTIFACT bitstream_sha256=ca4a6cbd9afd8a4f10064eeb6142dba514dec1c766b595836be099a135331040
-SEL4_RPC_ARTIFACT nbf_sha256=fcacce5d2545a4a0000f6aa2730072f37ec1f3b9c6eada7cc735c587bedc784a
-SEL4_RPC_ARTIFACT elfloader_sha256=57b94f6265e533f7ff14ee3682599f9416f2acded7921ca1ca7f3df07a6d37cc
+SEL4_RPC_ARTIFACT nbf_sha256=c1fac3755115f0eaabe63c2d009ecc5a62c09ac1b9d7154d2fca595e201056ba
+SEL4_RPC_ARTIFACT elfloader_sha256=1ee978b2fd26b432655a4c30a644bf453ac253856a83fb596506d8c94a679f0c
 SEL4_RPC_ARTIFACT kernel_sha256=ee9d2164e89a735c9ea7f153a3d331bc46dd55053dea7c652bc255e2f7300723
-SEL4_RPC_ARTIFACT raw_uart_sha256=1415c7e9f89c72d8cdd99c6efb9ba590d34c7c20e17eae38672f037fd4751867
+SEL4_RPC_ARTIFACT raw_uart_sha256=8da6e416db0945ae7f57e2200c2b36b96fbe731238e20dfe49c977e146bcf073
 SEL4_RPC_ARTIFACT control_program_sha256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
-SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-stage5-matched-20261101T202749Z-1700171.log
+SEL4_RPC_RAW_LOG /home/xilinx/bp-logs/sel4-rpc-stage5-tail-20261101T203003Z-1702550.log
 RUNNER_EXIT=0

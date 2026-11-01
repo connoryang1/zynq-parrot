@@ -306,16 +306,22 @@ match and NUL offsets. Before the valid bind, the FPGA test proves that the
 kernel rejects a different physical page, a write-permission escalation, and
 an unmapped runtime-state pointer.
 
-On the PYNQ-Z2, the matched warm averages are 2,953 cycles for a direct call to
-the handler, 3,339 for hardware RPC, and 5,530 for forced ordinary seL4 IPC.
-Hardware therefore adds 386 cycles over the useful handler, versus 2,577 for
+On the PYNQ-Z2, the matched warm averages are 2,983 cycles for a direct call to
+the handler, 3,339 for hardware RPC, and 5,546 for forced ordinary seL4 IPC.
+Hardware therefore adds 356 cycles over the useful handler, versus 2,563 for
 ordinary IPC, and is 1.66x faster end to end. Eight automatic fallbacks average
-6,607 cycles because they include the precise failed hardware probe before
+6,157 cycles in the retained run because they include the precise failed
+hardware probe before
 ordinary IPC; that row remains a correctness gate rather than the primary
 software baseline. The smaller application ratio than the scalar gate is
 expected because nearly 3,000 cycles of page scanning are common service work.
+Separate 64-call samples report medians of 2,801/3,142/5,168 and p95 values of
+4,964/5,299/7,347 for in-process/hardware/software. Hardware's incremental
+cost is therefore 341 cycles at median and 335 at p95, while ordinary IPC adds
+2,367 and 2,383. The similar roughly 2,160-cycle p95 uplift in every path
+suggests common periodic system activity; this run does not identify its cause.
 The routed bitstream is unchanged; the final NBF SHA-256 is
-`fcacce5d...c784a`. QEMU separately validates the
+`c1fac375...1056ba`. QEMU separately validates the
 dedicated server, shared mapping, handler, and software transport. Normalized
 evidence is retained in
 [`results/sel4test-rpc-shared-search-fpga.log`](results/sel4test-rpc-shared-search-fpga.log)

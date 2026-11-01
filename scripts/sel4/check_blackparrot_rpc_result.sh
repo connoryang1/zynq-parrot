@@ -24,6 +24,7 @@ hardware_re='^SEL4_RPC_ADAPTER path=hardware calls=([0-9]+) total_cycles=([0-9]+
 software_re='^SEL4_RPC_ADAPTER path=software-fallback calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 direct_re='^SEL4_RPC_ADAPTER path=in-process calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 ipc_re='^SEL4_RPC_ADAPTER path=software calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
+distribution_re='^SEL4_RPC_DISTRIBUTION path=(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 
 test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 
@@ -37,6 +38,9 @@ workload_count=0
 guard_count=0
 direct_count=0
 ipc_count=0
+direct_distribution_count=0
+hardware_distribution_count=0
+software_distribution_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -66,6 +70,39 @@ while IFS= read -r line; do
         ipc_calls=${BASH_REMATCH[1]}
         ipc_total=${BASH_REMATCH[2]}
         ipc_per_call=${BASH_REMATCH[3]}
+    elif [[ $line =~ $distribution_re ]]; then
+        distribution_path=${BASH_REMATCH[1]}
+        distribution_samples=${BASH_REMATCH[2]}
+        distribution_min=${BASH_REMATCH[3]}
+        distribution_median=${BASH_REMATCH[4]}
+        distribution_p95=${BASH_REMATCH[5]}
+        distribution_max=${BASH_REMATCH[6]}
+        case $distribution_path in
+            in-process)
+                direct_distribution_count=$((direct_distribution_count + 1))
+                direct_distribution_samples=$distribution_samples
+                direct_min=$distribution_min
+                direct_median=$distribution_median
+                direct_p95=$distribution_p95
+                direct_max=$distribution_max
+                ;;
+            hardware)
+                hardware_distribution_count=$((hardware_distribution_count + 1))
+                hardware_distribution_samples=$distribution_samples
+                hardware_min=$distribution_min
+                hardware_median=$distribution_median
+                hardware_p95=$distribution_p95
+                hardware_max=$distribution_max
+                ;;
+            software)
+                software_distribution_count=$((software_distribution_count + 1))
+                software_distribution_samples=$distribution_samples
+                software_min=$distribution_min
+                software_median=$distribution_median
+                software_p95=$distribution_p95
+                software_max=$distribution_max
+                ;;
+        esac
     fi
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
@@ -93,8 +130,11 @@ if ((hardware_total == 0 || software_total == 0
 fi
 if ((shared_buffer)); then
     if ((workload_count != 1 || guard_count != 1
-         || direct_count != 1 || ipc_count != 1)); then
-        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count" >&2
+         || direct_count != 1 || ipc_count != 1
+         || direct_distribution_count != 1
+         || hardware_distribution_count != 1
+         || software_distribution_count != 1)); then
+        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count" >&2
         exit 1
     fi
     if ((direct_calls != 256 || ipc_calls != 256
@@ -104,6 +144,20 @@ if ((shared_buffer)); then
          || direct_per_call >= hardware_per_call
          || hardware_per_call >= ipc_per_call)); then
         echo "invalid matched-path cycle accounting" >&2
+        exit 1
+    fi
+    if ((direct_distribution_samples != 64
+         || hardware_distribution_samples != 64
+         || software_distribution_samples != 64
+         || direct_min > direct_median || direct_median > direct_p95
+         || direct_p95 > direct_max
+         || hardware_min > hardware_median || hardware_median > hardware_p95
+         || hardware_p95 > hardware_max
+         || software_min > software_median || software_median > software_p95
+         || software_p95 > software_max
+         || direct_median >= hardware_median
+         || hardware_median >= software_median)); then
+        echo "invalid matched-path distribution" >&2
         exit 1
     fi
 fi
@@ -117,4 +171,6 @@ printf 'accepted seL4 RPC gate: hardware=%s cycles/call software-fallback=%s cyc
 if ((shared_buffer)); then
     printf 'matched warm paths: in-process=%s hardware=%s software=%s cycles/call\n' \
         "$direct_per_call" "$hardware_per_call" "$ipc_per_call"
+    printf 'matched medians: in-process=%s hardware=%s software=%s cycles/call\n' \
+        "$direct_median" "$hardware_median" "$software_median"
 fi

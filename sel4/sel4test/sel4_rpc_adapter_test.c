@@ -22,6 +22,7 @@
 #define ADAPTER_WARMUP_CALLS 8
 #define ADAPTER_MEASURED_CALLS 256
 #define ADAPTER_BP_SOFTWARE_CALLS SEL4_RPC_SEARCH_MEASURED_CALLS
+#define ADAPTER_DISTRIBUTION_CALLS SEL4_RPC_SEARCH_DISTRIBUTION_CALLS
 #define ADAPTER_BP_FALLBACK_CALLS SEL4_RPC_SEARCH_FALLBACK_CALLS
 #define ADAPTER_VALID_CALLS (ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS)
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
@@ -38,6 +39,26 @@ static inline uint64_t read_cycles(void)
     uint64_t value;
     __asm__ volatile("rdcycle %0" : "=r"(value));
     return value;
+}
+
+static void print_cycle_distribution(const char *path, uint64_t *samples,
+                                     size_t count)
+{
+    for (size_t index = 1; index < count; index++) {
+        const uint64_t value = samples[index];
+        size_t position = index;
+        while (position != 0 && samples[position - 1] > value) {
+            samples[position] = samples[position - 1];
+            position--;
+        }
+        samples[position] = value;
+    }
+    const size_t median_index = count / 2;
+    const size_t p95_index = (count * 95 + 99) / 100 - 1;
+    printf("SEL4_RPC_DISTRIBUTION path=%s samples=%zu min=%" PRIu64
+           " median=%" PRIu64 " p95=%" PRIu64 " max=%" PRIu64 "\n",
+           path, count, samples[0], samples[median_index],
+           samples[p95_index], samples[count - 1]);
 }
 
 static protected_rpc_status_t buffer_service(
@@ -281,6 +302,9 @@ static int test_blackparrot_hardware_binding(env_t env)
         .runtime_private = (void *)&local_config,
     };
     protected_rpc_message_t local_reply = {0};
+    uint64_t direct_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t hardware_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t software_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t direct_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
@@ -295,6 +319,16 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
     const uint64_t direct_elapsed = read_cycles() - direct_start;
+    for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = sel4_rpc_bounded_search_service(
+            &local_context, &request, &local_reply, NULL);
+        direct_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(local_reply.length, 2);
+        test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
 
     const protected_rpc_call_options_t software = {
         .route = PROTECTED_RPC_ROUTE_SOFTWARE,
@@ -314,6 +348,17 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
     const uint64_t software_elapsed = read_cycles() - software_start;
+    for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = protected_rpc_call(
+            rpc_endpoint, &request, &software, &result);
+        software_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
 
     const protected_rpc_blackparrot_binding_t binding = {
         .server_tcb = server.thread.tcb.cptr,
@@ -387,6 +432,17 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
     const uint64_t hardware_elapsed = read_cycles() - hardware_start;
+    for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = protected_rpc_call(
+            rpc_endpoint, &request, &hardware, &result);
+        hardware_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
 
     test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
 
@@ -429,6 +485,12 @@ static int test_blackparrot_hardware_binding(env_t env)
            " cycles_per_call=%" PRIu64 "\n",
            ADAPTER_BP_FALLBACK_CALLS, fallback_elapsed,
            fallback_elapsed / ADAPTER_BP_FALLBACK_CALLS);
+    print_cycle_distribution("in-process", direct_samples,
+                             ADAPTER_DISTRIBUTION_CALLS);
+    print_cycle_distribution("hardware", hardware_samples,
+                             ADAPTER_DISTRIBUTION_CALLS);
+    print_cycle_distribution("software", software_samples,
+                             ADAPTER_DISTRIBUTION_CALLS);
     return 0;
 }
 #endif
