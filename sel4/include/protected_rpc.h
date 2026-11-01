@@ -86,10 +86,13 @@ protected_rpc_status_t protected_rpc_call(
     const protected_rpc_call_options_t *options,
     protected_rpc_call_result_t *result);
 
-typedef struct {
-    uint64_t caller_badge;
-    void *runtime_private;
-} protected_rpc_call_context_t;
+/* Authenticated per-call state owned by the transport runtime. Handlers may
+ * pass it to accessors and buffer resolution but cannot construct or inspect
+ * its trusted region-table representation. */
+typedef struct protected_rpc_call_context protected_rpc_call_context_t;
+
+uint64_t protected_rpc_caller_badge(
+    const protected_rpc_call_context_t *context);
 
 typedef enum {
     PROTECTED_RPC_ACCESS_READ = 1u << 0,

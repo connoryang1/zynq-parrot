@@ -24,7 +24,8 @@ rm -f "$test_dir/protected_rpc_hardware_blackparrot.c" \
     "$test_dir/protected_rpc_blackparrot_sel4.c" \
     "$test_dir/protected_rpc_blackparrot_server.c" \
     "$test_dir/protected_rpc_blackparrot.h" \
-    "$test_dir/blackparrot_rpc_abi.h"
+    "$test_dir/blackparrot_rpc_abi.h" \
+    "$test_dir/protected_rpc_runtime.h"
 
 if [ ! -d "$test_dir" ]; then
     echo "not a sel4test manifest checkout: $checkout" >&2
@@ -49,4 +50,6 @@ ln -sfn "$project_root/sel4/src/protected_rpc_hardware_stub.c" \
 ln -sfn "$project_root/sel4/include/protected_rpc.h" "$test_dir/protected_rpc.h"
 ln -sfn "$project_root/sel4/internal/protected_rpc_backend.h" \
     "$test_dir/protected_rpc_backend.h"
+ln -sfn "$project_root/sel4/internal/protected_rpc_runtime.h" \
+    "$test_dir/protected_rpc_runtime.h"
 echo "linked protected-RPC tests and sources into $test_dir"

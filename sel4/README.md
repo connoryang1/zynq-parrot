@@ -149,6 +149,9 @@ deliberately small:
 - services resolve buffer references through the runtime in their own address
   space and request the access their operation needs; they never cast the
   opaque token or a caller virtual address;
+- handler call context is opaque; services read authenticated identity through
+  `protected_rpc_caller_badge()` and cannot inspect or replace the trusted
+  runtime region-table pointer;
 - the same service handler is hosted by an ordinary `ReplyRecv` loop or by a
   hardware entry/return stub, so benchmarked service logic stays identical;
 - forced-software and forced-hardware modes make the selected path observable.
@@ -182,8 +185,9 @@ currently reports a precise non-executed result, allowing `AUTO` to fall back
 once and forced-hardware tests to remain observable.
 
 The server runtime owns ReplyRecv authority and invokes an application handler
-with a caller badge and registered local-region table. The handler never sees
-the seL4 reply capability or future hardware continuation. A host-side mock
+with an opaque authenticated context and registered local-region table. The
+handler never sees the table representation, seL4 reply capability, or future
+hardware continuation. A host-side mock
 test covers hardware completion, safe fallback, rejection, committed failure,
 both forced routes, and the common server dispatcher. Software IPC, protected
 hardware entry, and the notification control all enter that dispatcher, which

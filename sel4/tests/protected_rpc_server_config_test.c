@@ -5,6 +5,7 @@
 #include <sel4/sel4.h>
 
 #include "protected_rpc.h"
+#include "protected_rpc_runtime.h"
 
 seL4_Word mock_sel4_mrs[16];
 seL4_CPtr mock_sel4_caps[4];
@@ -50,7 +51,7 @@ static protected_rpc_status_t handler(
     (void)request;
     (void)cookie;
     handler_calls++;
-    seen_badge = context->caller_badge;
+    seen_badge = protected_rpc_caller_badge(context);
     reply->length = 1;
     reply->words[0] = UINT64_C(0x7265706c79);
     if (handler_mode == 1) {
@@ -81,7 +82,7 @@ static void assert_bad_region(protected_rpc_region_binding_t region)
         .region_count = 1,
     };
     const protected_rpc_call_context_t context = {
-        .runtime_private = (void *)&config,
+        .server_config = &config,
     };
     const protected_rpc_buffer_ref_t ref = {
         .region = region.region,
@@ -113,6 +114,7 @@ static void assert_bad_region(protected_rpc_region_binding_t region)
 
 int main(void)
 {
+    assert(protected_rpc_caller_badge(NULL) == 0);
     uint8_t data[16];
     const protected_rpc_region_binding_t region = {
         .region = {.opaque = 7},
@@ -126,7 +128,7 @@ int main(void)
         .region_count = 1,
     };
     const protected_rpc_call_context_t context = {
-        .runtime_private = (void *)&config,
+        .server_config = &config,
     };
     protected_rpc_buffer_view_t view;
     protected_rpc_buffer_ref_t ref = {
@@ -206,7 +208,7 @@ int main(void)
     protected_rpc_server_config_t read_only_config = config;
     read_only_config.regions = &read_only;
     protected_rpc_call_context_t read_only_context = context;
-    read_only_context.runtime_private = &read_only_config;
+    read_only_context.server_config = &read_only_config;
     ref.offset = 0;
     ref.length = 1;
     poison_view(&view);
@@ -240,7 +242,7 @@ int main(void)
     duplicate_config.regions = duplicates;
     duplicate_config.region_count = 2;
     protected_rpc_call_context_t duplicate_context = context;
-    duplicate_context.runtime_private = &duplicate_config;
+    duplicate_context.server_config = &duplicate_config;
     poison_view(&view);
     assert(protected_rpc_resolve_buffer(
                &duplicate_context, ref, PROTECTED_RPC_ACCESS_READ, &view)

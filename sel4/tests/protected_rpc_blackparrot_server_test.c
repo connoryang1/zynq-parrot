@@ -46,7 +46,7 @@ static protected_rpc_status_t test_handler(
 {
     (void)cookie;
     handler_calls++;
-    seen_badge = context->caller_badge;
+    seen_badge = protected_rpc_caller_badge(context);
     seen_request = *request;
     reply->length = 2;
     reply->words[0] = request->words[0] + 1;

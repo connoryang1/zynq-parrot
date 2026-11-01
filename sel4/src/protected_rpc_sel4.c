@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "protected_rpc_backend.h"
+#include "protected_rpc_runtime.h"
 
 static protected_rpc_status_t sel4_try_call(
     protected_rpc_endpoint_t endpoint,
@@ -98,7 +99,7 @@ protected_rpc_status_t protected_rpc_dispatch(
 
     const protected_rpc_call_context_t context = {
         .caller_badge = caller_badge,
-        .runtime_private = (void *)config,
+        .server_config = config,
     };
     const protected_rpc_status_t status = config->handler(
         &context, request, reply, config->cookie);
@@ -119,14 +120,14 @@ protected_rpc_status_t protected_rpc_resolve_buffer(
     if (view != NULL) {
         memset(view, 0, sizeof(*view));
     }
-    if (context == NULL || context->runtime_private == NULL || view == NULL
+    if (context == NULL || context->server_config == NULL || view == NULL
         || required_access == 0
         || (required_access & ~(PROTECTED_RPC_ACCESS_READ
                                 | PROTECTED_RPC_ACCESS_WRITE)) != 0) {
         return PROTECTED_RPC_INVALID_ARGUMENT;
     }
 
-    const protected_rpc_server_config_t *config = context->runtime_private;
+    const protected_rpc_server_config_t *config = context->server_config;
     if (!server_config_valid(config)) {
         return PROTECTED_RPC_BACKEND_ERROR;
     }
@@ -147,6 +148,12 @@ protected_rpc_status_t protected_rpc_resolve_buffer(
         return PROTECTED_RPC_OK;
     }
     return PROTECTED_RPC_REVOKED;
+}
+
+uint64_t protected_rpc_caller_badge(
+    const protected_rpc_call_context_t *context)
+{
+    return context == NULL ? 0 : context->caller_badge;
 }
 
 protected_rpc_status_t protected_rpc_serve(

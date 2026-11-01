@@ -26,7 +26,8 @@ protected_rpc_status_t sel4_rpc_bounded_search_service(
 {
     if (context == NULL
         || (cookie != NULL
-            && context->caller_badge != *(const uint64_t *)cookie)) {
+            && protected_rpc_caller_badge(context)
+                   != *(const uint64_t *)cookie)) {
         return PROTECTED_RPC_DENIED;
     }
     const uint64_t service_entry_cycles = search_read_cycles();

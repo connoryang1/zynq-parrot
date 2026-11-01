@@ -191,6 +191,8 @@ the seL4 call/reply lifecycle to the generic protected-call interface.
 
 - Define endpoint, message-register, shared-region, handle, and reply types
   without BlackParrot CSR details in the public API.
+- Keep authenticated per-call context opaque; expose identity and shared
+  regions only through narrow accessors rather than a runtime-private pointer.
 - Implement an ordinary seL4 backend first.
 - Port the dummy library or another narrow buffer service to that API.
 - Add forced-software and forced-hardware selection controls so matched

@@ -13,6 +13,7 @@
 #include <vspace/vspace.h>
 
 #include "protected_rpc.h"
+#include "protected_rpc_runtime.h"
 #include "sel4_rpc_search_service.h"
 #ifdef CONFIG_PLAT_BLACKPARROT
 #include "protected_rpc_blackparrot.h"
@@ -485,7 +486,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         .region_count = 1,
     };
     const protected_rpc_call_context_t local_context = {
-        .runtime_private = (void *)&local_config,
+        .server_config = &local_config,
     };
     protected_rpc_message_t local_reply = {0};
     uint64_t direct_samples[ADAPTER_DISTRIBUTION_CALLS];
