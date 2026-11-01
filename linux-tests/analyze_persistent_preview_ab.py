@@ -52,6 +52,7 @@ def load_run(path, arm, identity):
         "cache_preview_mode": expected_mode,
         "cache_summary_only": True,
         "cache_allow_overflow": True,
+        "cache_final_addresses": True,
     }
     for key, expected in expected_status.items():
         if status.get(key) != expected:
@@ -61,6 +62,7 @@ def load_run(path, arm, identity):
     required = (
         f"TRACE_PREVIEW mode={expected_mode} value={6 if arm == 'enabled' else 0}",
         "TRACE_CAPTURE_PASS samples=201 allow_overflow=1",
+        "TRACE_FINAL_ADDRESSES ",
         "TRACE_CAPTURE_EXIT rc=0",
         "CORE PASS",
         "BSG PASS",
@@ -77,6 +79,14 @@ def load_run(path, arm, identity):
     elapsed = [row[1] for row in rows]
     icount = [row[2] for row in rows]
     dcount = [row[3] for row in rows]
+    instruction_addresses = [
+        int(address, 16)
+        for address in re.findall(
+            r"^TRACE_RECORD .*?side=I .*?paddr=0x([0-9a-fA-F]+)",
+            text,
+            re.MULTILINE,
+        )
+    ]
     return {
         "path": str(path),
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -96,6 +106,12 @@ def load_run(path, arm, identity):
         "quarter_medians": [
             statistics.median(elapsed[start:start + 50])
             for start in range(0, 200, 50)
+        ],
+        "final_recorded_instruction_lines": len(instruction_addresses),
+        "configured_prefix_lines_seen_as_demand": [
+            f"0x{address:09x}"
+            for address in identity["prefix_lines"]
+            if address in instruction_addresses
         ],
     }
 
@@ -150,6 +166,7 @@ def parse_args(argv=None):
     parser.add_argument("--nbf-sha256", required=True)
     parser.add_argument("--elf-sha256", required=True)
     parser.add_argument("--control-program-sha256", required=True)
+    parser.add_argument("--prefix-json", type=Path, required=True)
     parser.add_argument(
         "--replicate", action="append", nargs=3, required=True,
         metavar=("ORDER", "ENABLED_LOG", "DISABLED_LOG"),
@@ -178,6 +195,19 @@ def analyze(args):
         "elf_sha256": args.elf_sha256,
         "control_program_sha256": args.control_program_sha256,
     }
+    prefix = json.loads(args.prefix_json.read_text())
+    try:
+        identity["prefix_lines"] = [
+            entry["paddr"] for entry in prefix["fixed_shared_prefix"]["lines"]
+        ]
+    except (KeyError, TypeError) as error:
+        raise ValueError("prefix JSON lacks fixed_shared_prefix lines") from error
+    if not identity["prefix_lines"]:
+        raise ValueError("prefix JSON contains no lines")
+    identity["prefix_json"] = str(args.prefix_json)
+    identity["prefix_json_sha256"] = hashlib.sha256(
+        args.prefix_json.read_bytes()
+    ).hexdigest()
     replicates = []
     for order, enabled_path, disabled_path in args.replicate:
         replicate = {

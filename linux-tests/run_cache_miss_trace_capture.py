@@ -26,7 +26,7 @@ def sha256(path):
 
 
 def capture_command(window, samples, preview_mode="legacy", summary_only=False,
-                    allow_overflow=False):
+                    allow_overflow=False, final_addresses=False):
     """Build the bounded guest command from validated arguments."""
     command = f"{GUEST_ELF} --window {window}"
     if samples != 1:
@@ -37,6 +37,8 @@ def capture_command(window, samples, preview_mode="legacy", summary_only=False,
         command += " --summary-only"
     if allow_overflow:
         command += " --allow-overflow"
+    if final_addresses:
+        command += " --final-addresses"
     return command + "; rc=$?; echo TRACE_CAPTURE_EXIT rc=$rc"
 
 
@@ -54,7 +56,8 @@ def guest_command(args):
                 "echo TRACE_CAPTURE_EXIT rc=$rc")
     return capture_command(args.window, args.samples, args.cache_preview_mode,
                            args.cache_summary_only,
-                           args.cache_allow_overflow)
+                           args.cache_allow_overflow,
+                           args.cache_final_addresses)
 
 
 def parse_args(argv=None):
@@ -79,6 +82,7 @@ def parse_args(argv=None):
                         default="legacy")
     parser.add_argument("--cache-summary-only", action="store_true")
     parser.add_argument("--cache-allow-overflow", action="store_true")
+    parser.add_argument("--cache-final-addresses", action="store_true")
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--runtime-ms", type=int, default=600_000)
@@ -98,11 +102,12 @@ def validate_args(args):
         raise ValueError("group must be in 0..7")
     if args.program == "physical-preview-pipe" and args.samples != 1:
         raise ValueError("physical-preview-pipe supports exactly one sample")
-    if args.cache_allow_overflow and not args.cache_summary_only:
-        raise ValueError("cache overflow is valid only with summary-only timing")
+    if (args.cache_allow_overflow or args.cache_final_addresses) \
+            and not args.cache_summary_only:
+        raise ValueError("cache overflow/address capture requires summary-only timing")
     if args.program != "cache-miss" and (
             args.cache_preview_mode != "legacy" or args.cache_summary_only
-            or args.cache_allow_overflow):
+            or args.cache_allow_overflow or args.cache_final_addresses):
         raise ValueError("cache options require the cache-miss program")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
@@ -129,6 +134,7 @@ def run(args):
         "cache_preview_mode": args.cache_preview_mode,
         "cache_summary_only": args.cache_summary_only,
         "cache_allow_overflow": args.cache_allow_overflow,
+        "cache_final_addresses": args.cache_final_addresses,
     }
     program = guest_elf(args)
     child = None

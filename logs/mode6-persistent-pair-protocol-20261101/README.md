@@ -19,14 +19,14 @@ The benchmark records the source-to-peer window with summary-only miss counts. R
 - Routed bitstream SHA-256: `e97e0517d08771753e2eae96c6af95380944e5a8e2aefa0115da898b7be12381`
 - Current mode-6 prefix-16 NBF SHA-256: `5e42c2f6c801d71506a3c6fc5e708aa01c0e6a46996fc72bc64236135565d2bd`
 - Control-program SHA-256: `2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30`
-- Prepared benchmark ELF SHA-256: `ae599809cb589879ae0affd7f0454cdfa10c54357272d0168772638a5487972a`
-- Prepared transfer SHA-256: `5783e4cade147822ad9c0e1374585864679774c272dc6b6227f8b588422065d5`
+- Prepared benchmark ELF SHA-256: `91f0db111470e9f3fd1a53bfd9b8d7b4404ffe8e20a792e4caa99171bbc1c0cf`
+- Prepared transfer SHA-256: `b5103c89b270f5cdcee8156de0a0a6d8b98ca32ecbba7de77e5cc11a6f0f5518`
 - Compiler: `/home/jhumphri/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc`
 
 The ELF disassembly contains `configure_preview` calls in both `main` and `peer_main`, and the main-thread release follows `pthread_join`. The generated guest command for an enabled arm is:
 
 ```text
-/tmp/cache_miss_trace_capture_dynamic --window to-peer --samples 201 --preview-mode wake-trigger --summary-only --allow-overflow
+/tmp/cache_miss_trace_capture_dynamic --window to-peer --samples 201 --preview-mode wake-trigger --summary-only --allow-overflow --final-addresses
 ```
 
 The disabled arm changes only `wake-trigger` to `disabled`.
@@ -40,8 +40,8 @@ Run two fresh-boot pairs in opposite order:
 1. enabled, then disabled;
 2. disabled, then enabled.
 
-Every run must have exact hash matches, 201 consecutively numbered samples, explicit preview-mode and final capture markers, runner exit zero, and CORE/BSG PASS. `linux-tests/analyze_persistent_preview_ab.py` verifies the adjacent runner status, discards exactly sample one, reports per-replicate and pooled medians, and calculates both IID and circular ten-handoff block intervals for the mean of the two replicate-level median differences.
+Every run must have exact hash matches, 201 consecutively numbered samples, explicit preview-mode and final capture markers, runner exit zero, and CORE/BSG PASS. Only after the final timed endpoint, the benchmark reads the frozen miss recorder and prints its addresses; this cannot perturb an analyzed successor and distinguishes table mismatch from trigger-timing failure without another boot. `linux-tests/analyze_persistent_preview_ab.py` verifies the adjacent runner status and exact prefix JSON, reports configured lines demanded in that final capture, discards exactly sample one, reports per-replicate and pooled medians, and calculates both IID and circular ten-handoff block intervals for the mean of the two replicate-level median differences.
 
 ## Validation and current board state
 
-The benchmark and serialized runner changes pass all 91 discovered `linux-tests` Python tests. The RISC-V dynamic ELF and transfer rebuild to the hashes above. The board remains on the same operating-system boot that executed the prior guest shutdown (`2026-11-01 05:09:15`, uptime 6,220 seconds at the check), and this shell has no `PYNQ_POWER_STATE_URL`; no further FPGA launch is valid until a physical power cycle, PYNQ readiness wait, and exact overlay reload.
+The benchmark and serialized runner changes pass all 93 discovered `linux-tests` Python tests, including compressed-log analysis with an adjacent uncompressed-name status file. The RISC-V dynamic ELF and transfer rebuild to the hashes above. The board remains on the same operating-system boot that executed the prior guest shutdown (`2026-11-01 05:09:15`, uptime 6,220 seconds at the check), and this shell has no `PYNQ_POWER_STATE_URL`; no further FPGA launch is valid until a physical power cycle, PYNQ readiness wait, and exact overlay reload.

@@ -1,6 +1,7 @@
 """Test strict validation for persistent preview A/B transcripts."""
 
 import argparse
+import gzip
 import json
 import tempfile
 import unittest
@@ -16,6 +17,7 @@ IDENTITY = {
     "nbf_sha256": SHA_NBF,
     "elf_sha256": SHA_ELF,
     "control_program_sha256": SHA_CONTROL,
+    "prefix_lines": [0x1000],
 }
 
 
@@ -36,6 +38,9 @@ def write_run(directory, name, mode, base):
         f"TRACE_PREVIEW mode={mode} value={value}",
         *rows,
         "TRACE_CAPTURE_PASS samples=201 allow_overflow=1",
+        "TRACE_RECORD seq=0 side=I index=0 cycle=0 relative=0 message=0x0 "
+        "paddr=0x000001000 raw=0x0",
+        "TRACE_FINAL_ADDRESSES records=20 i_overflow=0 d_overflow=0",
         "TRACE_CAPTURE_EXIT rc=0",
         "INFO: CORE PASS",
         "INFO: BSG PASS",
@@ -53,6 +58,7 @@ def write_run(directory, name, mode, base):
         "cache_preview_mode": mode,
         "cache_summary_only": True,
         "cache_allow_overflow": True,
+        "cache_final_addresses": True,
     }
     path.with_suffix(path.suffix + ".status.json").write_text(
         json.dumps(status) + "\n"
@@ -78,6 +84,16 @@ class PersistentPreviewAnalysisTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "cache_preview_mode"):
                 load_run(path, "enabled", IDENTITY)
 
+    def test_compressed_log_uses_plain_log_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(directory, "enabled.log", "wake-trigger", 100)
+            compressed = path.with_suffix(".log.gz")
+            with path.open("rb") as source, gzip.open(compressed, "wb") as target:
+                target.write(source.read())
+            path.unlink()
+            result = load_run(compressed, "enabled", IDENTITY)
+            self.assertEqual(result["analyzed_samples"], 200)
+
     def test_two_opposite_order_replicates_are_analyzed(self):
         with tempfile.TemporaryDirectory() as directory:
             enabled1 = write_run(directory, "enabled1.log", "wake-trigger", 100)
@@ -88,6 +104,7 @@ class PersistentPreviewAnalysisTest(unittest.TestCase):
                 nbf_sha256=SHA_NBF,
                 elf_sha256=SHA_ELF,
                 control_program_sha256=SHA_CONTROL,
+                prefix_json=Path(directory) / "prefix.json",
                 replicate=[
                     ("enabled-disabled", str(enabled1), str(disabled1)),
                     ("disabled-enabled", str(enabled2), str(disabled2)),
@@ -95,6 +112,9 @@ class PersistentPreviewAnalysisTest(unittest.TestCase):
                 iid_resamples=100,
                 block_resamples=100,
             )
+            args.prefix_json.write_text(json.dumps({
+                "fixed_shared_prefix": {"lines": [{"paddr": 0x1000}]}
+            }))
             result = analyze(args)
             self.assertEqual(result["pooled"]["samples_per_arm"], 400)
             self.assertEqual(

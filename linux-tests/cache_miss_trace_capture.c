@@ -38,6 +38,7 @@ enum trace_window {
 static enum trace_window trace_window;
 static int summary_only;
 static int allow_overflow;
+static int final_addresses;
 static unsigned samples = 1;
 static unsigned preview_mode;
 static int preview_control;
@@ -47,6 +48,7 @@ static void usage(FILE *stream)
   fputs("usage: cache_miss_trace_capture [--window full|to-peer|from-peer]"
         " [--summary-only] [--samples 1..10000]"
         " [--allow-overflow]"
+        " [--final-addresses]"
         " [--preview-mode disabled|trigger|wake-trigger]\n", stream);
 }
 
@@ -256,6 +258,8 @@ int main(int argc, char **argv)
       summary_only = 1;
     } else if (!strcmp(argv[arg], "--allow-overflow")) {
       allow_overflow = 1;
+    } else if (!strcmp(argv[arg], "--final-addresses")) {
+      final_addresses = 1;
     } else if (!strcmp(argv[arg], "--samples") && arg + 1 < argc) {
       samples = parse_samples(argv[++arg]);
     } else if (!strcmp(argv[arg], "--preview-mode") && arg + 1 < argc) {
@@ -288,7 +292,7 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
   }
-  if (allow_overflow && !summary_only) {
+  if ((allow_overflow || final_addresses) && !summary_only) {
     usage(stderr);
     return EXIT_FAILURE;
   }
@@ -364,7 +368,8 @@ int main(int argc, char **argv)
         printf("TRACE_PASS records=%u elapsed=%" PRIu64 "\n",
                icount + dcount, stop_cycle - trace_start_cycle);
       }
-      continue;
+      if (!final_addresses || sample != samples)
+        continue;
     }
 
     for (unsigned i = 0; i < icount; ++i)
@@ -387,7 +392,10 @@ int main(int argc, char **argv)
         ++di;
       }
     }
-    if (ioverflow || doverflow) {
+    if (summary_only) {
+      printf("TRACE_FINAL_ADDRESSES records=%u i_overflow=%u d_overflow=%u\n",
+             icount + dcount, ioverflow, doverflow);
+    } else if (ioverflow || doverflow) {
       printf("TRACE_TRUNCATED records=%u elapsed=%" PRIu64
              " i_overflow=%u d_overflow=%u\n",
              icount + dcount, stop_cycle - trace_start_cycle,

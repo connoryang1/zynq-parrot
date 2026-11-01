@@ -33,6 +33,7 @@ class TraceRunnerTest(unittest.TestCase):
             "cache_preview_mode": "legacy",
             "cache_summary_only": False,
             "cache_allow_overflow": False,
+            "cache_final_addresses": False,
             "runtime_ms": 100,
         }
         values.update(updates)
@@ -70,18 +71,25 @@ class TraceRunnerTest(unittest.TestCase):
                 directory, samples=201, window="to-peer",
                 cache_preview_mode="wake-trigger", cache_summary_only=True,
                 cache_allow_overflow=True,
+                cache_final_addresses=True,
             )
             self.assertEqual(
                 guest_command(args),
                 "/tmp/cache_miss_trace_capture_dynamic --window to-peer "
                 "--samples 201 --preview-mode wake-trigger --summary-only "
-                "--allow-overflow; rc=$?; echo TRACE_CAPTURE_EXIT rc=$rc",
+                "--allow-overflow --final-addresses; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc",
             )
 
     def test_overflow_requires_summary_only(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError, "summary-only"):
                 validate_args(self.args(directory, cache_allow_overflow=True))
+
+    def test_final_addresses_require_summary_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "summary-only"):
+                validate_args(self.args(directory, cache_final_addresses=True))
 
     def test_pipe_command_is_fixed_and_group_bounded(self):
         with tempfile.TemporaryDirectory() as directory:
