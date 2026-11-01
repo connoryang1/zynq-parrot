@@ -76,3 +76,51 @@ uses the explicit Buildroot GCC path, matching the established guardrail.
 Before FPGA launch, 79 harness tests and all 124 discovered Linux-test tests
 pass. The board remains untrusted after the prior guest shutdown and must be
 fully recovered before the first arm.
+
+The second arm's first restage stopped before overlay load because only 28 MiB
+remained and atomic replacement needed space for a second 69 MiB NBF. The
+existing candidate retained the exact expected hash and the partial incoming
+file had its private staging name. Both recoverable board copies were removed,
+the durable local archive remained verified, and restaging then passed. Later
+arms verify and remove the exact prior candidate before atomic restaging; no
+run used a partial or stale image.
+
+## FPGA result
+
+All four fresh arms pass exact NBF, ELF, transfer, control-program, and
+bitstream identities; `lines=1`; 512 ordered rows and tails; expected mode-one
+hook counts; kernel-failure screening; and child/parent/cell/core/host PASS.
+The first enabled arm filters one asynchronous double-hook attempt; all other
+arms filter zero. Strict analysis SHA-256 is
+`8b3dd59a68421ba494b7a380cc7298dadaa81e6b9e76c6265243d3eff510953c`.
+
+The replicate-stratified enabled-minus-disabled results are:
+
+| endpoint | cycles | IID 95% interval | block 95% interval |
+| --- | ---: | ---: | ---: |
+| wake to entry | +41.75 | [-13,164.5, +15,048.75] | [-8,248.5, +11,804.75] |
+| one dependent load | +4.5 | [0, +6] | [-18, +22.5] |
+| wake to first use | +2.75 | [-11,340.5, +14,083] | [-7,981.25, +8,451.75] |
+| complete roundtrip | -1,056.25 | [-2,003.5, -603.5] | [-1,792.5, -742] |
+
+Negative means enabled is faster. Pooled roundtrip medians are 144,794.5
+enabled and 145,882.5 disabled, a 1,088-cycle or 0.75% reduction; the
+replicate-stratified reduction is approximately 0.72%. Wake-to-load is neutral
+at the point estimate and unresolved. Unlike the accepted late one-line image,
+the earlier hint no longer improves the target load.
+
+An independent strict early-minus-late effect comparison has SHA-256
+`6ef427d514ea52bda0c430fa58a843f4bd4b290b382f8319d3fe07ad07b64219`.
+Moving the hint earlier worsens the local-load effect by 41.5 cycles with block
+interval `[11,58.75]`, proving the late image's useful fill is lost before
+demand. Earlier issue improves the total roundtrip effect by 756.5 cycles with
+`[-1516.75,-259.75]`, driven primarily by a 387-cycle improvement in the
+return-handoff partition (`[-640.75,-81.25]`). Its incremental wake-to-load
+shift is -7,978 cycles but unresolved at `[-20761.75,7379.25]`.
+
+This exposes a timing tradeoff: the late hint survives until first use but can
+leave work near the architectural handoff, while the earlier hint clears that
+tail at the cost of losing the line. Neither timing demonstrates faster first
+use. The next useful architecture work is direct issue/completion/first-use
+timing or a retained/midpoint data path; simply issuing still earlier is not
+supported by this evidence.

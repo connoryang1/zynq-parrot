@@ -2,7 +2,9 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
-- **Earlier-data FPGA candidate prepared — 2026-11-01:** built a size-neutral mode-one image that retains wakeup instruction replay and moves the same one-line physical hint from the late hook to scheduler selection through exactly three audited compressed-immediate changes. The durable NBF, distinct benchmark mode, fixed-arm protocol, and exact construction audit are under `logs/wake-early-data-one-line-20261101/`; 79 harness and 124 discovered Linux tests pass, with the four fresh FPGA arms pending (RL-105).
+- **Earlier-data timing measured on FPGA — 2026-11-01:** four fresh opposite-order boots show neutral, unresolved wake-to-load (+2.75 cycles) and no retained local-load benefit, while roundtrip improves by 1,056.25 cycles (about 0.72%). A strict cross-experiment comparison proves moving the hint earlier loses 41.5 cycles at the target load but improves the handoff tail by 756.5 cycles, exposing a retention-versus-contention tradeoff rather than a first-use speedup (`logs/wake-early-data-one-line-20261101/`, RL-105).
+
+- **Earlier-data FPGA candidate prepared — 2026-11-01:** built a size-neutral mode-one image that retains wakeup instruction replay and moves the same one-line physical hint from the late hook to scheduler selection through exactly three audited compressed-immediate changes. The durable NBF, distinct benchmark mode, fixed-arm protocol, and exact construction audit are under `logs/wake-early-data-one-line-20261101/`; 79 harness and 124 discovered Linux tests passed before the four-arm result recorded above (RL-105).
 
 - **Physical-preview board runs now bind the bitstream — 2026-11-01:** extended the serialized data/joint sweep runner with the same optional fail-closed loaded-BIT SHA-256 gate used by the accepted instruction A/B, and retained the verified identity in each status file. Focused tests and all 112 discovered Linux tests pass; this closes the final provenance gap before reusing the timing-clean corrected route for data-only and joint feasibility.
 

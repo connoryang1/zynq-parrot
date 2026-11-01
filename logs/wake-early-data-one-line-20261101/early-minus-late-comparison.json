@@ -1,0 +1,171 @@
+{
+  "purpose": "Measure whether issuing one physical hint at scheduler selection changes the enabled-minus-disabled effect relative to the same one-line hint at the late pre-register-switch hook.",
+  "sign_convention": "early-minus-late enabled effect; negative means earlier issue improves the endpoint relative to late issue",
+  "late": {
+    "timing": "wake-data",
+    "identity": {
+      "nbf_sha256": "8cee44733ed80439541168fb2c610b00af1f37a7108e4c2ae8eb52b5d728d64c",
+      "transfer_sha256": "6c68779caf36ca2b054a95824f5f6ac08d8b5f67fea80cc25402267ff863e395",
+      "elf_sha256": "15f44168ce075cef78cd487938210b2758c50e45393698b5d970a4c464136d15",
+      "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "bitstream_sha256": "a070df7f2d69b86e745a9b915798e704ac4ee2255e97d3c50e3aa1a4f4ba3ce9"
+    },
+    "analysis_path": "logs/wake-data-line-count-20261101/one-line-fixed-ab-analysis.json",
+    "analysis_sha256": "0a644a3b61a1d03337dce5a5670b65c8338bcff3dc56b0b9d5e24be5b0d67aec"
+  },
+  "early": {
+    "timing": "wake-early-data",
+    "identity": {
+      "nbf_sha256": "ae2924776233446e41a25e44866a41e5171efc76575216950104b0432ad9005c",
+      "transfer_sha256": "6ce18f6c76eba4ac2e17c809a63fecbb81301d37f4711861119f6771b45181ca",
+      "elf_sha256": "8333e8d1517c85734a8b580e3d61041450b1e438662d89ce74a7383fe6027c09",
+      "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "bitstream_sha256": "a070df7f2d69b86e745a9b915798e704ac4ee2255e97d3c50e3aa1a4f4ba3ce9"
+    },
+    "analysis_path": "logs/wake-early-data-one-line-20261101/fixed-ab-analysis.json",
+    "analysis_sha256": "8b3dd59a68421ba494b7a380cc7298dadaa81e6b9e76c6265243d3eff510953c"
+  },
+  "group": 7,
+  "lines": 1,
+  "metrics": {
+    "wake_to_entry": {
+      "late_enabled_minus_disabled": 8383.0,
+      "early_enabled_minus_disabled": 41.75,
+      "early_minus_late": -8341.25,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -23330.5,
+          14385.75
+        ],
+        "fraction_candidate_effect_faster": 0.71085
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -21592.5,
+          8155.0
+        ],
+        "fraction_candidate_effect_faster": 0.8066
+      }
+    },
+    "load_cycles": {
+      "late_enabled_minus_disabled": -37.0,
+      "early_enabled_minus_disabled": 4.5,
+      "early_minus_late": 41.5,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          33.5,
+          43.0
+        ],
+        "fraction_candidate_effect_faster": 0.0
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          11.0,
+          58.75
+        ],
+        "fraction_candidate_effect_faster": 0.0026
+      }
+    },
+    "wake_to_load": {
+      "late_enabled_minus_disabled": 7980.75,
+      "early_enabled_minus_disabled": 2.75,
+      "early_minus_late": -7978.0,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -23133.5,
+          13250.75
+        ],
+        "fraction_candidate_effect_faster": 0.7343
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -20761.75,
+          7379.25
+        ],
+        "fraction_candidate_effect_faster": 0.84105
+      }
+    },
+    "roundtrip": {
+      "late_enabled_minus_disabled": -299.75,
+      "early_enabled_minus_disabled": -1056.25,
+      "early_minus_late": -756.5,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -1741.5,
+          -13.0
+        ],
+        "fraction_candidate_effect_faster": 0.97665
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -1516.75,
+          -259.75
+        ],
+        "fraction_candidate_effect_faster": 0.99795
+      }
+    },
+    "child_post_load": {
+      "late_enabled_minus_disabled": -28.0,
+      "early_enabled_minus_disabled": -31.0,
+      "early_minus_late": -3.0,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -15.75,
+          9.0
+        ],
+        "fraction_candidate_effect_faster": 0.7142
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -22.0,
+          16.5
+        ],
+        "fraction_candidate_effect_faster": 0.62775
+      }
+    },
+    "return_handoff": {
+      "late_enabled_minus_disabled": -251.0,
+      "early_enabled_minus_disabled": -638.0,
+      "early_minus_late": -387.0,
+      "iid_bootstrap": {
+        "resamples": 20000,
+        "block_length": 1,
+        "difference_ci95": [
+          -700.5,
+          -12.25
+        ],
+        "fraction_candidate_effect_faster": 0.97885
+      },
+      "circular_block_bootstrap": {
+        "resamples": 20000,
+        "block_length": 16,
+        "difference_ci95": [
+          -640.75,
+          -81.25
+        ],
+        "fraction_candidate_effect_faster": 0.9946
+      }
+    }
+  },
+  "interpretation_limit": "The images use the same route and counted fixed-arm measurement shape, but independent fresh boots and different kernel mode immediates. This compares total runtime effects, not a paired within-boot timing intervention."
+}
