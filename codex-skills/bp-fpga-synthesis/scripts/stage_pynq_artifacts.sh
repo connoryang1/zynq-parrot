@@ -15,8 +15,27 @@ remote_example_dir=${PYNQ_REMOTE_EXAMPLE_DIR:-'~/zynq-parrot/cosim/black-parrot-
 remote_zynq_dir="$remote_example_dir/zynq"
 
 assert_no_active_runner() {
-  if ! ssh -o BatchMode=yes "$ssh_host" \
-    'test ! -d "$HOME/bp-logs/.control-program.lock" && ! pgrep -x control-program >/dev/null && ! pgrep -f "[s]cript .*control-program" >/dev/null'; then
+  if ! ssh -o BatchMode=yes "$ssh_host" bash -s <<'REMOTE'
+set -euo pipefail
+lock="$HOME/bp-logs/.control-program.lock"
+if [[ -d "$lock" ]]; then
+  owner=$(cat "$lock/owner" 2>/dev/null || true)
+  if [[ "$owner" =~ ^[0-9]+$ ]] && kill -0 "$owner" 2>/dev/null; then
+    exit 75
+  fi
+  if pgrep -x control-program >/dev/null \
+     || pgrep -f '[s]cript .*control-program' >/dev/null; then
+    exit 75
+  fi
+  rm -f "$lock/owner"
+  rmdir "$lock" || exit 75
+fi
+if pgrep -x control-program >/dev/null \
+   || pgrep -f '[s]cript .*control-program' >/dev/null; then
+  exit 75
+fi
+REMOTE
+  then
     echo "FAIL: refusing to replace FPGA artifacts while a runner owns the board" >&2
     return 75
   fi
