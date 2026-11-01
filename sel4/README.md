@@ -295,6 +295,10 @@ scripts/sel4/package_blackparrot_rpc_nbf.sh \
   /path/to/build /path/to/opensbi-repo /path/to/work sel4-rpc.nbf
 ```
 
+The default image matches the direct-reset full-core simulator. Set
+`NBF_DEBUG=1` when packaging the otherwise identical image for the physical
+`control-program` path; this adds the required debug-module reset preamble.
+
 The packager pins OpenSBI commit `7830e987856eb1319c82664702892b6d50a93e7a`,
 disables the unrelated I-cache replay table, embeds the exact seL4 DTB, and
 selects the routed 8 MHz timer. It places the payload at the elfloader's linked
