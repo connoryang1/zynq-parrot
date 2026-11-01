@@ -64,7 +64,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
 | `mt_ctxtsw_store_handoff_benchmark` | Matched pure and hot-store-before-switch rings for resident and nonresident handoffs |
 | `mt_dependent_stream_benchmark` | Shuffled dependent pointer chains; serial demand/prefetch, register-held software interleaving, and hardware context interleaving on the same graph |
-| `mt_nano_lookup_benchmark` | Two through ten Nano-coroutine-style binary index lookups; serial demand, demand ring, worker prefetch, matched batch, switch-only, serial prefetch, and real C++20 coroutines from one runtime-selected executable |
+| `mt_nano_lookup_benchmark` | Two through ten Nano-coroutine-style binary index lookups; transport controls, hardware workers, runtime and compile-time software batches, and three compiler-generated C++20 coroutine schedulers from one runtime-selected executable |
 | `mt_ddr_latency_benchmark` | First-touch and immediately cached dependent loads, matched timer controls, and six prefetch lead times on disjoint lines; processor-visible physical cycles |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
@@ -177,11 +177,16 @@ C++20 coroutines, two compile-time-unrolled software batches, lean-queue
 coroutines, or direct symmetric-transfer coroutines without changing the
 ELF/NBF. `NANO_WORKERS=2..10` selects the matched query/shard count;
 eight is the maintained default selected by the fair-software sweep. Every
-invocation warms its selected instruction body on separate 31-entry shards,
-then runs switch-only to establish one common final frontend state, seeds and
-clears common state, fences traffic, emits explicit
+invocation warms all eleven instruction bodies in one fixed order on separate
+31-entry shards, then runs switch-only to establish identical cache, predictor,
+and frontend history. It seeds and clears common state, fences traffic, emits explicit
 BEGIN/END markers around `0xCC0` timing, and checks all lower bounds, path
 checksums, step counts, and completions afterward. Run one mode at a time:
+
+The Nano target defaults to `NANO_OPT=-O3`; use `NANO_OPT=-O2` only for the
+documented compiler-sensitivity control. Mode and worker-count dispatch occur
+before BEGIN, and every measured implementation enters through one identical
+indirect operation call.
 
 ```sh
 make -C testing run-mt_nano_lookup_benchmark \

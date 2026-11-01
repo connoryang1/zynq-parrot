@@ -24,6 +24,7 @@ STREAMS ?= 4
 STREAM_NODES ?= 32
 NANO_MODE ?= 2
 NANO_WORKERS ?= 8
+NANO_OPT ?= -O3
 TARGET_BYPASS_TURNS ?= 128
 LIFECYCLE_EPOCHS ?= 6
 LIFECYCLE_EVICTION_LINES ?= 1024
@@ -40,7 +41,8 @@ endif
 CC     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-gcc
 CXX    := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-g++
 NM     := $(ZP_INSTALL_DIR)/bin/riscv64-unknown-elf-nm
-CFLAGS = -O2 \
+OPT_LEVEL ?= -O2
+CFLAGS = $(OPT_LEVEL) \
           -I$(TOP)/software/include \
           -I$(ZP_INSTALL_DIR)/riscv64-unknown-elf/include \
           --specs=$(ZP_INSTALL_DIR)/riscv64-unknown-elf/lib/dramfs.specs \
@@ -165,6 +167,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_dependent_stream_benchmark.riscv: $(TOP)/testing/dep
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/testing/nano_lookup_data.h
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: CC := $(CXX)
+$(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: OPT_LEVEL := $(NANO_OPT)
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: CFLAGS += -std=gnu++20 -fno-exceptions -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -nodefaultlibs -lgcc -Wl,--start-group -lc -lgloss_dramfs -Wl,--end-group -Wl,--start-group,--whole-archive -lperch -Wl,--no-whole-archive,--end-group -lgcc
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
