@@ -121,11 +121,11 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
     void print_processor_state(void) {
         auto *root = tb->rootp;
         auto *csr = root
-            ->__PVT__bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__core_minimal__DOT__be__DOT__calculator__DOT__pipe_sys__DOT__csr__DOT__gen_csr__BRA__0__KET____DOT__csr_inst;
+            ->__PVT__bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__processor__DOT__u__DOT__unicore__DOT__unicore_lite__DOT__core_minimal__DOT__be__DOT__calculator__DOT__pipe_sys__DOT__csr__DOT__gen_csr__BRA__0__KET____DOT__csr_inst;
         const unsigned long long next_pc = root
-            ->bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__core_minimal__DOT__fe__DOT__pc_gen__DOT__next_pc;
+            ->bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__processor__DOT__u__DOT__unicore__DOT__unicore_lite__DOT__core_minimal__DOT__fe__DOT__pc_gen__DOT__next_pc;
         const unsigned long long expected_npc = root
-            ->bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__core_minimal__DOT__be__DOT__expected_npc_lo;
+            ->bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__processor__DOT__u__DOT__unicore__DOT__unicore_lite__DOT__core_minimal__DOT__be__DOT__expected_npc_lo;
 
         bsg_pr_info("ps.cpp: processor state: next_pc=0x%llx expected_npc=0x%llx\n",
                     next_pc, expected_npc);

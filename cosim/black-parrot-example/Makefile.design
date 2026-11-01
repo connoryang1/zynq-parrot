@@ -74,7 +74,7 @@ endif
 # named area strategies for every static prefetch endpoint; the four-entry
 # endpoint previously fit with the defaults, but no longer does with the
 # replay lane enabled.
-ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch_cfg e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg),)
+ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch_cfg e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg e_bp_unicore_zynqparrot_prefetch16k_cfg),)
 SYNTH_STRATEGY ?= Flow_AreaOptimized_high
 # The replay-enabled endpoint remains area constrained, but Area_Explore can
 # leave the long frontend/realigner feedback path unroutable at the 50 MHz
