@@ -760,3 +760,83 @@ One splicer-test invocation repeated the known repository-root sibling-import
 failure and executed no test. The corrected invocation from `linux-tests/`
 passed all three tests; the successful splice itself preceded and was
 independent of that test-command error.
+
+## Current-kernel mode-5 trace and prefix-16 candidate
+
+The first count-zero trace attempt reached the root filesystem but failed
+before a shell or guest transfer when the host reported an errant physical
+write. It produced no trace evidence and was followed by the required full
+power cycle, PYNQ readiness wait, and exact overlay reload. The unchanged retry
+then completed on FPGA with 107 instruction and 61 data records over 23,655
+cycles, no recorder overflow, `TRACE_PASS`, and final CORE/BSG PASS. Its
+compressed transcript and status SHA-256 values are `aba6d576...38a5d` and
+`1496d46b...9437d`.
+
+Unlike the stale prefix-12 table, all first 16 unique instruction misses from
+the current kernel beginning at observed scheduler line `0x80a13e80` resolve to
+`__schedule`, CFS dequeue, and load-average code. They fill the 16-line detached
+instruction buffer without crossing into the later return/user portion of the
+trace. The selected JSON and physical-to-symbol map hash to
+`a01e0936...ea7ce` and `f67c2373...d6d5b`.
+
+An isolated OpenSBI-only build embeds those 16 addresses, and the shared SDK
+source header was restored byte-for-byte after the build. The strict NBF
+splice takes 17,024 low OpenSBI records from the donor and all 1,861,853
+Linux/DTB records from the accepted mode-5 count-zero image. Firmware and
+kernel executable-section forbidden-CSR scans pass. The resulting FPGA
+candidate is
+`/dev/shm/zp-mode5-current-prefix16-build.1O27SG/linux-trigger-only-current-prefix16.nbf`
+with SHA-256 `a9652b32...e4937`; no performance result is claimed yet.
+
+Several fail-closed workflow mistakes changed no accepted image. The selector
+test was first invoked from the repository root and repeated the known sibling
+import failure; the corrected `linux-tests/` invocation passed all five tests.
+The first donor splice omitted the established timer patch, and a follow-up
+incorrectly treated the timer selector as a CPU-count field; both preamble
+mismatches were rejected before output. Applying the 8 MHz selector patch to
+the original one-core donor made the exact preamble check pass. One whole-
+kernel CSR scan also outlived its initial observation without a retained
+session identifier; its exact PID was verified live until termination, then a
+captured rerun passed rather than accepting the lost output.
+
+The group-7 feasibility run completed all 512 rows and tails with zero retries,
+runner exit zero, and final CORE/BSG PASS. The predeclared full matrix then
+completed all eight groups in one accepted boot: 4,096 rows and tails, eight
+child/parent/cell PASS sets, zero hook deltas, runner exit zero, and final
+CORE/BSG PASS. One intervening unchanged boot stalled at Linux guest time
+3.619 seconds and timed out before a shell; its transcript remains rejected,
+and the required power cycle, readiness wait, NBF rehash, and overlay reload
+preceded the accepted retry.
+
+Within the current-prefix-16 image, instruction replay gives `+115.75
+[-284.5,800]` wake-to-entry, exactly `0 [0,0]` target-load, `+152
+[-265.25,815]` wake-to-load, and `+592.25 [321,878]` roundtrip cycles saved.
+The decisive independent prefix-16-minus-count-zero contrast is only `+134.75
+[-691.75,1098.25]` wake-to-entry, exactly `0 [0,0]` target-load, `+47
+[-744.5,1075.75]` wake-to-load, and `-274.75 [-785,170]` roundtrip cycles.
+Prefix-16-minus-prefix-12 is likewise unresolved at `-25.25
+[-793.75,795]` wake-to-load. Thus correcting the table and filling all 16
+detached-buffer slots does not demonstrate faster incoming-task first use.
+
+The trigger-only tail partition is child work `-8.5 [-41.25,27.25]`, return
+handoff `+428.5 [138,685.5]`, and combined tail `-160.5 [-550,240.25]` cycles
+saved. As for the earlier trigger-only controls, the second `getrusage()` lies
+inside this tail and robust component medians are nonlinear; no tail component
+is attributed to replay. The compressed accepted log/status, base analysis,
+tail analysis, prefix-16-minus-count-zero, and prefix-16-minus-prefix-12 hashes
+are respectively `ab93260e...926c9`, `d4219c34...15ca`,
+`508372ff...f695`, `53046ac6...fdef`, `a96575dd...7a32`, and
+`d20fcfe0...5f12`.
+
+Board staging exposed a confirmed volatile-file failure mode. The first
+feasibility invocation stopped before `control-program` because the candidate
+had not been copied remotely. After an atomic copy, `sync`, and two matching
+hashes, feasibility passed; a later prelaunch check saw the same pathname with
+unchanged byte size but a different line count and SHA. A full power cycle made
+both that candidate and the retained count-zero file return to their exact
+on-disk hashes without recopying, proving volatile page-cache/DRAM corruption
+rather than an on-disk change. The underlying corruption mechanism remains
+unattributed. The final display command used unavailable `jq` only after all
+four analyzers and 32 focused tests had passed; standard text inspection read
+the already-written JSON, and the missing display utility is not a test
+failure.
