@@ -29,6 +29,7 @@ class TraceRunnerTest(unittest.TestCase):
             "window": "full",
             "program": "cache-miss",
             "group": 0,
+            "preview_mode": "disabled",
             "runtime_ms": 100,
         }
         values.update(updates)
@@ -50,10 +51,30 @@ class TraceRunnerTest(unittest.TestCase):
                              group=7)
             self.assertEqual(
                 guest_command(args),
-                f"{PIPE_GUEST_ELF} 7; rc=$?; "
+                f"{PIPE_GUEST_ELF} 7 disabled; rc=$?; "
                 "echo TRACE_CAPTURE_EXIT rc=$rc",
             )
             self.assertEqual(guest_elf(args), PIPE_GUEST_ELF)
+
+    def test_pipe_trigger_command_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, program="physical-preview-pipe",
+                             group=3, preview_mode="trigger")
+            self.assertEqual(
+                guest_command(args),
+                f"{PIPE_GUEST_ELF} 3 trigger; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc",
+            )
+
+    def test_pipe_wakeup_trigger_command_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, program="physical-preview-pipe",
+                             group=3, preview_mode="wake-trigger")
+            self.assertEqual(
+                guest_command(args),
+                f"{PIPE_GUEST_ELF} 3 wake-trigger; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc",
+            )
 
     def test_pipe_rejects_multiple_samples(self):
         with tempfile.TemporaryDirectory() as directory:

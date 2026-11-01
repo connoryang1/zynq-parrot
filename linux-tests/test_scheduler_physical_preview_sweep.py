@@ -28,7 +28,7 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
         mode = 1 if trial % 4 in (1, 2) else 0
         entry = 100 + mode
         load = 300 - saved_load_cycles * mode
-        hooks = 0 if timing == "trigger" else mode
+        hooks = 0 if timing in ("trigger", "wake-trigger") else mode
         hooks += 1 if extra_enabled_hook and mode and trial == 1 else 0
         post_load = 20
         return_handoff = 30 - saved_return_cycles * mode
@@ -57,11 +57,14 @@ class SweepAnalyzerTest(unittest.TestCase):
     def test_single_cell_analyzer_accepts_trigger_mode(self):
         self.assertEqual(TIMING_MODES["trigger"], 5)
 
+    def test_single_cell_analyzer_accepts_wakeup_trigger_mode(self):
+        self.assertEqual(TIMING_MODES["wake-trigger"], 6)
+
     def test_partial_cell_reports_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
             path.write_text(transcript(group=3))
-            result = analyze([path], allow_partial=True)
+            result = analyze([path], allow_partial=True, bootstrap_samples=100)
         self.assertEqual(result["cells"]["late_3"]["l2_set_group"], 3)
         self.assertEqual(
             result["pooled"]["late"]["load_cycles"]
@@ -74,7 +77,7 @@ class SweepAnalyzerTest(unittest.TestCase):
                 transcript(group=group, timing="instruction")
                 for group in range(8)
             ))
-            result = analyze([path])
+            result = analyze([path], bootstrap_samples=100)
         self.assertEqual(
             result["pooled"]["instruction"]["load_cycles"]
             ["stratified_median_saved_cycles"],
@@ -88,7 +91,7 @@ class SweepAnalyzerTest(unittest.TestCase):
                 transcript(group=group, timing="counter")
                 for group in range(8)
             ))
-            result = analyze([path])
+            result = analyze([path], bootstrap_samples=100)
         self.assertEqual(
             result["pooled"]["counter"]["load_cycles"]
             ["stratified_median_saved_cycles"],
@@ -102,9 +105,23 @@ class SweepAnalyzerTest(unittest.TestCase):
                 transcript(group=group, timing="trigger")
                 for group in range(8)
             ))
-            result = analyze([path])
+            result = analyze([path], bootstrap_samples=100)
         self.assertEqual(
             result["pooled"]["trigger"]["load_cycles"]
+            ["stratified_median_saved_cycles"],
+            20.0,
+        )
+
+    def test_wakeup_trigger_matrix_requires_zero_hooks_and_is_analyzable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "wake-trigger.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="wake-trigger")
+                for group in range(8)
+            ))
+            result = analyze([path], bootstrap_samples=100)
+        self.assertEqual(
+            result["pooled"]["wake-trigger"]["load_cycles"]
             ["stratified_median_saved_cycles"],
             20.0,
         )
@@ -114,27 +131,27 @@ class SweepAnalyzerTest(unittest.TestCase):
             path = Path(directory) / "run.log"
             path.write_text(transcript())
             with self.assertRaisesRegex(ValueError, "incomplete sweep"):
-                analyze([path])
+                analyze([path], bootstrap_samples=100)
 
     def test_second_enabled_hook_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
             path.write_text(transcript(extra_enabled_hook=True))
             with self.assertRaisesRegex(ValueError, "expected hook count 1"):
-                analyze([path], allow_partial=True)
+                analyze([path], allow_partial=True, bootstrap_samples=100)
 
     def test_truncated_cell_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
             path.write_text(transcript(trials=128))
             with self.assertRaisesRegex(ValueError, "expected exactly 512"):
-                analyze([path], allow_partial=True)
+                analyze([path], allow_partial=True, bootstrap_samples=100)
 
     def test_indexed_core_pass_is_accepted(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
             path.write_text(transcript(core_marker="CORE[0] PASS"))
-            result = analyze([path], allow_partial=True)
+            result = analyze([path], allow_partial=True, bootstrap_samples=100)
         self.assertEqual(result["cells"]["late_0"]["trials"], 512)
 
     def test_independent_sweep_comparison_has_known_sign(self):
@@ -250,7 +267,7 @@ class SweepAnalyzerTest(unittest.TestCase):
                            saved_return_cycles=12, include_tail=True)
                 for group in range(8)
             ))
-            result = analyze_tail([path], "late")
+            result = analyze_tail([path], "late", bootstrap_samples=100)
         self.assertEqual(
             result["pooled"]["child_post_load"]
             ["stratified_median_saved_cycles"], 0.0,
@@ -272,7 +289,7 @@ class SweepAnalyzerTest(unittest.TestCase):
                            saved_return_cycles=12, include_tail=True)
                 for group in range(8)
             ))
-            result = analyze_tail([path], "trigger")
+            result = analyze_tail([path], "trigger", bootstrap_samples=100)
         self.assertEqual(
             result["pooled"]["return_handoff"]
             ["stratified_median_saved_cycles"], 12.0,

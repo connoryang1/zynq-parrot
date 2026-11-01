@@ -12,7 +12,8 @@
  * leaving the measured dependent target ring cold. This approximates an
  * instruction-only and counter-only A/B without changing the kernel. Mode five
  * removes hook accounting and uses getrusage context-switch deltas as an
- * independent one-switch filter.
+ * independent one-switch filter. Mode six retains that filter but launches
+ * instruction replay when the target is made runnable, before selection.
  */
 #include <stdint.h>
 #include <sched.h>
@@ -67,6 +68,11 @@ static void transfer(int fd, char *token, int send)
 static unsigned mode_for(unsigned trial)
 {
 	return (trial ^ (trial >> 1)) & 1;
+}
+
+static int uncounted_mode(unsigned mode)
+{
+	return mode == 5 || mode == 6;
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
@@ -136,7 +142,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			fail("hook count before");
 		samples[trial].mode = enabled;
 		samples[trial].accepted = 0;
-		if (enable_mode == 5 && getrusage(RUSAGE_SELF, &before_usage))
+		if (uncounted_mode(enable_mode)
+		    && getrusage(RUSAGE_SELF, &before_usage))
 			fail("getrusage before handoff");
 		transfer(out, &token, 1); /* ready */
 		transfer(in, &token, 0);  /* parent blocks; scheduler selects child */
@@ -153,7 +160,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		if (enable_mode == 5) {
+		if (uncounted_mode(enable_mode)) {
 			if (getrusage(RUSAGE_SELF, &after_usage))
 				fail("getrusage after handoff");
 			voluntary = after_usage.ru_nvcsw - before_usage.ru_nvcsw;
@@ -162,9 +169,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		/* Retain only one-switch handoffs. Counted modes use the scheduler
 		 * hook itself. Uncounted mode five instead requires exactly the one
 		 * voluntary pipe block and no involuntary switch in both A/B arms. */
-		if ((enable_mode == 5 && (samples[trial].hooks != 0
+		if ((uncounted_mode(enable_mode) && (samples[trial].hooks != 0
 					 || voluntary != 1 || involuntary != 0))
-			|| (enable_mode != 5 && samples[trial].hooks != enabled)) {
+			|| (!uncounted_mode(enable_mode)
+			    && samples[trial].hooks != enabled)) {
 			fprintf(stderr,
 				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u voluntary=%ld involuntary=%ld\n",
 				trial, enabled, enable_mode, before_hook, after_hook,
@@ -200,7 +208,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 5) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger] [target|hot-proxy] [normal|fifo]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger] [target|hot-proxy] [normal|fifo]\n",
 			argv[0]);
 		return 2;
 	}
@@ -222,6 +230,8 @@ int main(int argc, char **argv)
 			enable_mode = 4;
 		else if (!strcmp(argv[2], "trigger"))
 			enable_mode = 5;
+		else if (!strcmp(argv[2], "wake-trigger"))
+			enable_mode = 6;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -248,7 +258,8 @@ int main(int argc, char **argv)
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
 	       enable_mode == 3 ? "instruction" :
-	       enable_mode == 4 ? "counter" : "trigger", enable_mode,
+	       enable_mode == 4 ? "counter" :
+	       enable_mode == 5 ? "trigger" : "wake-trigger", enable_mode,
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal");
 
 	if (fifo) {

@@ -25,7 +25,7 @@ TAIL_FIELDS = ("child_post_load", "return_handoff")
 TAIL_METRICS = TAIL_FIELDS + ("post_load_total",)
 
 
-def summarize_tail(rows, base_rows, group, timing):
+def summarize_tail(rows, base_rows, group, timing, bootstrap_samples=20000):
     """Validate one cell and return paired-block tail estimates."""
     if len(rows) != 512 or [row["trial"] for row in rows] != list(range(512)):
         raise ValueError("expected exactly 512 ordered tail rows")
@@ -53,7 +53,7 @@ def summarize_tail(rows, base_rows, group, timing):
         blocks = block_differences(combined, metric)
         boots = [
             statistics.median(rng.choices(blocks, k=len(blocks)))
-            for _ in range(20000)
+            for _ in range(bootstrap_samples)
         ]
         result["metrics"][metric] = {
             "off_median_cycles": statistics.median(off),
@@ -66,7 +66,7 @@ def summarize_tail(rows, base_rows, group, timing):
     return combined, result
 
 
-def load_cells(paths, timing, label="tail sweep"):
+def load_cells(paths, timing, label="tail sweep", bootstrap_samples=20000):
     """Load one complete timing replication and retain paired tail rows."""
     cells = {}
     board_text = ""
@@ -90,7 +90,7 @@ def load_cells(paths, timing, label="tail sweep"):
                 for item in TAIL.finditer(segment)
             ]
             combined, result = summarize_tail(
-                tail_rows, base_rows, key[1], key[0]
+                tail_rows, base_rows, key[1], key[0], bootstrap_samples
             )
             cells[key] = {"rows": combined, "summary": result}
     expected = {(timing, group) for group in range(8)}
@@ -107,9 +107,9 @@ def load_cells(paths, timing, label="tail sweep"):
     return cells
 
 
-def analyze(paths, timing):
+def analyze(paths, timing, bootstrap_samples=20000):
     """Require all eight groups for one timing and pool their tail effects."""
-    cells = load_cells(paths, timing)
+    cells = load_cells(paths, timing, bootstrap_samples=bootstrap_samples)
 
     rng = random.Random(0x7A11_5E7)
     output = {"timing": timing, "cells": {}, "pooled": {}}
@@ -120,7 +120,9 @@ def analyze(paths, timing):
             group: block_differences(cells[(timing, group)]["rows"], metric)
             for group in range(8)
         }
-        point, interval = bootstrap_median(blocks, rng)
+        point, interval = bootstrap_median(
+            blocks, rng, samples=bootstrap_samples
+        )
         output["pooled"][metric] = {
             "stratified_median_saved_cycles": point,
             "stratified_95pct_ci_saved_cycles": interval,
@@ -131,7 +133,10 @@ def analyze(paths, timing):
 def pool_tail(replicate_paths, timing, samples=20000):
     """Pool tail effects across independent boots and cache-set groups."""
     replicates = [
-        load_cells(paths, timing, f"replicate {index}")
+        load_cells(
+            paths, timing, f"replicate {index}",
+            bootstrap_samples=samples,
+        )
         for index, paths in enumerate(replicate_paths)
     ]
     rng = random.Random(0x7A11_2)
@@ -175,7 +180,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--timing",
-        choices=("early", "late", "instruction", "counter", "trigger"),
+        choices=("early", "late", "instruction", "counter", "trigger",
+                 "wake-trigger"),
                         required=True)
     parser.add_argument(
         "--replicate", nargs="+", action="append", type=Path,

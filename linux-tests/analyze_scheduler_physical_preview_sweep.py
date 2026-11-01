@@ -28,7 +28,7 @@ def block_differences(rows, metric):
     return differences
 
 
-def parse_segments(text, source, summarize_cells=True):
+def parse_segments(text, source, summarize_cells=True, bootstrap_samples=20000):
     matches = list(CONFIG.finditer(text))
     segments = []
     for index, match in enumerate(matches):
@@ -46,7 +46,8 @@ def parse_segments(text, source, summarize_cells=True):
         for row_match in ROW.finditer(segment):
             values = [int(value) for value in row_match.groups()]
             rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
-        result = summarize(rows, group, timing) if summarize_cells else None
+        result = (summarize(rows, group, timing, bootstrap_samples)
+                  if summarize_cells else None)
         segments.append(((timing, group), rows, result))
     return segments
 
@@ -63,19 +64,22 @@ def bootstrap_median(blocks_by_group, rng, samples=20000):
     return point, [percentile(boot, 0.025), percentile(boot, 0.975)]
 
 
-def analyze(paths, allow_partial=False):
+def analyze(paths, allow_partial=False, bootstrap_samples=20000):
     cells = {}
     board_text = ""
     for path in paths:
         text = path.read_text(errors="replace")
         board_text += text
-        for key, rows, result in parse_segments(text, path):
+        for key, rows, result in parse_segments(
+                text, path, bootstrap_samples=bootstrap_samples):
             if key in cells:
                 raise ValueError(f"duplicate timing/group cell: {key}")
             cells[key] = {"rows": rows, "summary": result}
     observed_timings = {timing for timing, _group in cells}
     if (len(observed_timings) == 1
-            and observed_timings <= {"instruction", "counter", "trigger"}):
+            and observed_timings <= {
+                "instruction", "counter", "trigger", "wake-trigger"
+            }):
         timing = next(iter(observed_timings))
         expected = {(timing, group) for group in range(8)}
     else:
@@ -104,7 +108,9 @@ def analyze(paths, allow_partial=False):
         for metric in METRICS:
             blocks = {group: block_differences(cell["rows"], metric)
                       for group, cell in timing_cells.items()}
-            point, interval = bootstrap_median(blocks, rng)
+            point, interval = bootstrap_median(
+                blocks, rng, samples=bootstrap_samples
+            )
             output["pooled"][timing][metric] = {
                 "stratified_median_saved_cycles": point,
                 "stratified_95pct_ci_saved_cycles": interval,
@@ -121,7 +127,7 @@ def analyze(paths, allow_partial=False):
         point = statistics.median(late) - statistics.median(early)
         boots = [statistics.median(rng.choices(late, k=len(late)))
                  - statistics.median(rng.choices(early, k=len(early)))
-                 for _ in range(20000)]
+                 for _ in range(bootstrap_samples)]
         output["late_minus_early"][str(group)] = {
             "saved_cycle_effect_difference": point,
             "95pct_ci": [percentile(boots, 0.025), percentile(boots, 0.975)],

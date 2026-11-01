@@ -1,0 +1,52 @@
+This patch adds an uncounted instruction-replay mode at successful task wakeup.
+It gives replay useful lead time before selection while retaining mode five as
+the exact late-selection control in the same kernel.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,7 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 disables; 1/2 data; 3 instruction; 4 counter; 5 uncounted trigger. */
++/* 0 off; 1/2 data; 3 instruction; 4 counter; 5 select; 6 wake replay. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 5 || arg3 || arg4 || arg5) {
++		if (arg2 > 6 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4339,6 +4339,13 @@ out:
+ 	if (success)
+ 		ttwu_stat(p, task_cpu(p), wake_flags);
+ 
++#ifdef CONFIG_RISCV
++	/* Mode six launches only after a real wakeup. Unlike selection-time mode
++	 * five, this can overlap replay with the waker's remaining kernel work. */
++	if (success && READ_ONCE(p->thread.bp_preview_phys_mode) == 6)
++		asm volatile("csrw 0x5c0, zero" ::: "memory");
++#endif
++
+ 	return success;
+ }
+ 
+@@ -6676,7 +6683,8 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 		unsigned char bp_preview_mode =
+ 			READ_ONCE(next->thread.bp_preview_phys_mode);
+ 
+-		if (bp_preview_mode && bp_preview_mode != 4) {
++		if (bp_preview_mode && bp_preview_mode != 4
++		    && bp_preview_mode != 6) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count

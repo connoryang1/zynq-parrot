@@ -3,8 +3,9 @@
 /* Capture physical cache misses across the exact pipe handoff used by the
  * scheduler physical-preview benchmark. The first 16 handoffs warm the code
  * path with preview disabled. On the final handoff the parent arms the miss
- * recorder immediately before waking the child, and the child disarms it
- * immediately after the same four dependent first-use loads.
+ * recorder immediately before waking the child, optionally with prefix replay
+ * enabled for that child, and the child disarms it immediately after the same
+ * four dependent first-use loads.
  */
 #include <inttypes.h>
 #include <stdint.h>
@@ -32,6 +33,12 @@ enum {
 	page_bytes = 4096,
 	eviction_pages = 10,
 	trace_depth = 256,
+};
+
+enum replay_mode {
+	replay_disabled = 0,
+	replay_trigger = 5,
+	replay_wake_trigger = 6,
 };
 
 struct sample {
@@ -166,7 +173,7 @@ static int emit_trace(const volatile struct sample *sample, unsigned group)
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
-		      unsigned group)
+		      unsigned group, enum replay_mode replay)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -208,8 +215,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		if (checksum == UINT64_MAX)
 			fail("eviction checksum");
-		if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
-			fail("disable preview emission");
+		const unsigned long trial_mode = trial == warmup ? replay : 0;
+		if (prctl(PR_BP_PREVIEW_ENABLE, trial_mode, 0UL, 0UL, 0UL))
+			fail(trial_mode ? "enable prefix replay" :
+			     "disable preview emission");
 		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
 		if (before_hook == (unsigned long)-1)
 			fail("hook count before");
@@ -236,6 +245,9 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				samples[trial].hooks);
 			exit(EXIT_FAILURE);
 		}
+		if (trial_mode &&
+		    prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
+			fail("disable prefix replay after capture");
 		transfer(out, &token, 1);
 	}
 	if (prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
@@ -246,21 +258,39 @@ int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
 	unsigned group = 0;
+	enum replay_mode replay = replay_disabled;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 						 PROT_READ | PROT_WRITE,
 						 MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 2 || (argc == 2 &&
+	if (argc > 3 || (argc >= 2 &&
 	    (argv[1][0] < '0' || argv[1][0] > '7' || argv[1][1]))) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7]\n", argv[0]);
+		fprintf(stderr,
+			"usage: %s [l2-set-group-0..7] [disabled|trigger|wake-trigger]\n",
+			argv[0]);
 		return 2;
 	}
-	if (argc == 2)
+	if (argc >= 2)
 		group = (unsigned)(argv[1][0] - '0');
-	printf("TRACE_CONFIG path=pipe group=%u first_offset=%u lines=%u warmups=%u\n",
-	       group, group * 4 * line_bytes, lines, warmup);
+	if (argc == 3) {
+		if (!strcmp(argv[2], "trigger"))
+			replay = replay_trigger;
+		else if (!strcmp(argv[2], "wake-trigger"))
+			replay = replay_wake_trigger;
+		else if (strcmp(argv[2], "disabled")) {
+			fprintf(stderr,
+				"usage: %s [l2-set-group-0..7] [disabled|trigger|wake-trigger]\n",
+				argv[0]);
+			return 2;
+		}
+	}
+	printf("TRACE_CONFIG path=pipe group=%u first_offset=%u lines=%u warmups=%u replay=%s mode=%u\n",
+	       group, group * 4 * line_bytes, lines, warmup,
+	       replay == replay_trigger ? "trigger" :
+	       replay == replay_wake_trigger ? "wake-trigger" : "disabled",
+	       replay);
 	fflush(stdout);
 
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
@@ -271,7 +301,7 @@ int main(int argc, char **argv)
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		child_run(to_child[0], to_parent[1], samples, group);
+		child_run(to_child[0], to_parent[1], samples, group, replay);
 		return 0;
 	}
 	close(to_child[0]);

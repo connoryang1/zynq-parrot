@@ -14,7 +14,8 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
                     r"lines=(\d+) "
-                    r"timing=(early|late|instruction|counter|trigger) mode=(\d+)")
+                    r"timing=(early|late|instruction|counter|trigger|wake-trigger) "
+                    r"mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
 TIMING_MODES = {
     "early": 1,
@@ -22,6 +23,7 @@ TIMING_MODES = {
     "instruction": 3,
     "counter": 4,
     "trigger": 5,
+    "wake-trigger": 6,
 }
 
 
@@ -30,7 +32,7 @@ def percentile(values, fraction):
     return ordered[round(fraction * (len(ordered) - 1))]
 
 
-def summarize(rows, group, timing):
+def summarize(rows, group, timing, bootstrap_samples=20000):
     trials = len(rows)
     if trials != 512 or [row["trial"] for row in rows] != list(range(trials)):
         raise ValueError("expected exactly 512 ordered trials")
@@ -39,7 +41,7 @@ def summarize(rows, group, timing):
         if modes != [0, 1, 1, 0]:
             raise ValueError(f"unbalanced trial block at {start}: {modes}")
     for row in rows:
-        expected_hooks = 0 if timing == "trigger" else row["mode"]
+        expected_hooks = 0 if timing in ("trigger", "wake-trigger") else row["mode"]
         if row["hooks"] != expected_hooks:
             raise ValueError(
                 f"trial {row['trial']} had mode={row['mode']} hooks={row['hooks']}; "
@@ -67,7 +69,7 @@ def summarize(rows, group, timing):
             blocks.append(off_mean - on_mean)
         estimate = statistics.median(blocks)
         boots = [statistics.median(rng.choices(blocks, k=paired_blocks))
-                 for _ in range(20000)]
+                 for _ in range(bootstrap_samples)]
         result["metrics"][metric] = {
             "off_median_cycles": statistics.median(off),
             "on_median_cycles": statistics.median(on),

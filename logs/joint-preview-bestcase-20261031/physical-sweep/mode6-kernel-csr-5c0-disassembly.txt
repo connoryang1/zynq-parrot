@@ -1,0 +1,23 @@
+90198-ffffffff8003dc6e:	97a6                	add	a5,a5,s1
+90199-ffffffff8003dc70:	5098                	lw	a4,32(s1)
+90200-ffffffff8003dc72:	b507c703          	lbu	a4,-1200(a5) # b50 <section_count+0xb4e>
+90201-ffffffff8003dc76:	4799                	li	a5,6
+90202-ffffffff8003dc78:	f8f71ee3          	bne	a4,a5,ffffffff8003dc14 <try_to_wake_up+0x1e6>
+90203:ffffffff8003dc7c:	5c001073          	csrw	0x5c0,zero
+90204-ffffffff8003dc80:	4505                	li	a0,1
+90205-ffffffff8003dc82:	bd01                	j	ffffffff8003da92 <try_to_wake_up+0x64>
+90206-ffffffff8003dc84:	69a6                	ld	s3,72(sp)
+90207-ffffffff8003dc86:	6a06                	ld	s4,64(sp)
+90208-ffffffff8003dc88:	7ae2                	ld	s5,56(sp)
+--
+2990031-ffffffff80813b50:	bb85                	j	ffffffff808138c0 <__schedule+0x7e>
+2990032-ffffffff80813b52:	4791                	li	a5,4
+2990033-ffffffff80813b54:	00f70d63          	beq	a4,a5,ffffffff80813b6e <__schedule+0x32c>
+2990034-ffffffff80813b58:	4799                	li	a5,6
+2990035-ffffffff80813b5a:	e4f705e3          	beq	a4,a5,ffffffff808139a4 <__schedule+0x162>
+2990036:ffffffff80813b5e:	5c001073          	csrw	0x5c0,zero
+2990037-ffffffff80813b62:	3775                	addw	a4,a4,-3
+2990038-ffffffff80813b64:	0ff77713          	zext.b	a4,a4
+2990039-ffffffff80813b68:	4785                	li	a5,1
+2990040-ffffffff80813b6a:	e2e7ede3          	bltu	a5,a4,ffffffff808139a4 <__schedule+0x162>
+2990041-ffffffff80813b6e:	6785                	lui	a5,0x1

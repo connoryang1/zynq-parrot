@@ -840,3 +840,72 @@ unattributed. The final display command used unavailable `jq` only after all
 four analyzers and 32 focused tests had passed; standard text inspection read
 the already-written JSON, and the missing display utility is not a test
 failure.
+
+## Successful-wakeup instruction replay
+
+Mode 6 moves the uncounted instruction-prefix trigger to the successful
+`try_to_wake_up()` path and suppresses the duplicate selection-time trigger.
+This gives replay the remainder of the waking task's kernel path as lead time
+without changing the table, routed RTL, pinned data footprint, FIFO policy, or
+one-switch acceptance filter. The exact mode-6 kernel payload is embedded in
+both count-zero and prefix-16 images; the final prefix candidate SHA-256 is
+`5e42c2f6...5d2bd`.
+
+The replay-disabled trace selects 16 misses from the exact shifted kernel,
+beginning at physical `__schedule` line `0x80a13840`. All 16 appear as demand
+misses with replay disabled. In the enabled mode-6 trace, 13 disappear from the
+demand stream; only ranks 7, 11, and 12 remain at relative cycles 14,560,
+16,402, and 16,676. The table consists primarily of `pick_next_task_fair`,
+`__dequeue_entity`, `__schedule`, register-restore, and
+`finish_task_switch` lines. This is direct consumption evidence, not merely a
+configured-address check.
+
+The complete physical matrix has 4,096 accepted `[off,on,on,off]` trials across
+all eight cache-set groups, 15 rejected asynchronous attempts, eight passing
+cells, runner exit zero, and final CORE/BSG PASS. The stratified paired result
+is `301 [166,434]` wake-to-entry, exactly `0 [0,0]` local-load,
+`325.25 [177.5,446]` wake-to-load, and `428.25 [196,635]` roundtrip cycles
+saved. Wake-to-load remains positive in both chronological halves and every
+leave-one-group-out estimate. Against the median disabled group baselines,
+these are about 1.03%, 0%, 1.09%, and 0.26%. This is the first resolved
+incoming-task benefit from the current mechanism, but it remains a single-boot
+best-case FIFO microbenchmark rather than an application claim.
+
+The accepted compressed transcript/status, base analysis, tail analysis, and
+demand comparison hash to `518c09a4...3016`, `47fb1ffd...be23`,
+`eafcf24d...47a`, `eec38374...137`, and `b9f071c0...c7d4`. The next decisive
+board experiment uses the same NBF and chooses mode 5 in software, isolating
+wakeup-time from selection-time replay; an independent mode-6 replication
+follows. Board recovery cannot currently proceed because this shell lacks the
+private `PYNQ_POWER_STATE_URL`; no run may skip the required physical power
+cycle, readiness wait, and verified overlay reload.
+
+Preparation failures changed no accepted result. Early and final combined
+unit-test invocations from the repository root repeated the known
+sibling-import failure and were rerun from the owning directories. A
+hand-written kernel patch initially had
+bad hunk counts, and one dry run used the wrong working path; both stopped
+before the exact build. One scanner call omitted required arguments and was
+rerun correctly. A remote copy ran without fail-fast shell handling, filled
+the filesystem, and renamed a partial NBF; the hash guard prevented launch,
+the partial file was removed, and the exact candidate was restaged with
+pre/post-sync hashes. Finally, analysis-only regression tests accidentally
+used production 20,000-draw bootstraps at every synthetic cell; explicit test
+sample parameters now preserve the production default while reducing the full
+21-test regression to 5.8 seconds.
+
+The first clean checkpoint rebuild also omitted `BP_LINUX_CC` and stopped
+before producing an ELF. An explicit GCC 13 rebuild then exposed that the
+accepted physical-preview programs used `rv64imafdc_zicsr_zifencei` with the
+default code model, whereas the older shared test default says `medany` and
+omits explicit `zifencei`. The accepted benchmark ELF was reconstructed from
+its retained board transcript before recovery; section and compiler comparison
+identified the exact flags. Target-specific Makefile flags now reproduce the
+accepted benchmark/transfer hashes `c096ca7d...b579` / `81839567...5ada` and
+trace/transfer hashes `ac7951d7...fc90` / `8bff3a7e...f165` from a clean build.
+Two checkpoint target searches also reused top-level paths while already in
+subdirectories and returned no matches; corrected root-relative inspection and
+the actual tests succeeded. The first retained post-build source manifest was
+captured just before `.version` was restored, so it differed only in that
+generated counter; it was regenerated after checking the live tree, and the
+before/after manifests are now byte-identical.

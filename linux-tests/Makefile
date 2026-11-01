@@ -57,7 +57,8 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0005-blackparrot-preview-guard-reasons.patch \
 	$(CURDIR)/kernel-patches/0006-blackparrot-physical-data-preview.patch \
 	$(CURDIR)/kernel-patches/0007-blackparrot-select-preview-timing.patch \
-	$(CURDIR)/kernel-patches/0008-blackparrot-gate-instruction-replay.patch
+	$(CURDIR)/kernel-patches/0008-blackparrot-gate-instruction-replay.patch \
+	$(CURDIR)/kernel-patches/0009-blackparrot-wakeup-instruction-replay.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -76,6 +77,11 @@ REQUEST_NUM_CONTEXTS ?= 10
 
 CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
+# These two FPGA measurement programs were accepted with the SDK's explicit
+# fence.i ISA spelling and default code model. Keep their byte-exact build
+# provenance separate from the older medany test-program default above.
+PHYSICAL_PREVIEW_CFLAGS := -O2 -static -Wall -Wextra -Werror \
+  -march=rv64imafdc_zicsr_zifencei -mabi=lp64d
 
 .PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-linux-data-preview stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
 
@@ -167,19 +173,19 @@ $(TRACE_CAPTURE_DYNAMIC_APP): cache_miss_trace_capture.c Makefile FORCE
 
 $(PHYSICAL_PREVIEW_BENCH_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
 emit-request-transfer: check-linux-cc request-benchmark
 	@printf '%s\n' ': > /tmp/request_benchmark.b64'

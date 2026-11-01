@@ -1,0 +1,232 @@
+{
+  "purpose": "Determine whether the exact configured instruction-prefix lines remain architectural demand misses when replay is enabled.",
+  "selection": {
+    "path": "logs/joint-preview-bestcase-20261031/physical-sweep/mode6-kernel-pipe-prefix16.json",
+    "sha256": "bb3fddeb4a62920b970870ce38cda4d5f02418bed5efae590f511b35d52f0da1",
+    "line_count": 16
+  },
+  "disabled": {
+    "path": "logs/joint-preview-bestcase-20261031/physical-sweep/physical-trace-mode6-kernel-count0-disabled-20261101.log.gz",
+    "sha256": "8ed91c4ecf584bacad41406fa88306ddddc18627c12c3d0f15ae5fed4be27873",
+    "wake_to_entry": 24830,
+    "load_cycles": 341,
+    "wake_to_load": 25171,
+    "i_count": 142,
+    "d_count": 46,
+    "unique_i_lines": 140
+  },
+  "enabled": {
+    "path": "logs/joint-preview-bestcase-20261031/physical-sweep/physical-trace-mode6-kernel-prefix16-wakeup-enabled-20261101.log.gz",
+    "sha256": "8c6b90ad82a2ebf3a8de997e1842bbce2f29d3783417de32ee67145a3d57789d",
+    "wake_to_entry": 23797,
+    "load_cycles": 231,
+    "wake_to_load": 24028,
+    "i_count": 101,
+    "d_count": 71,
+    "unique_i_lines": 101
+  },
+  "selected_summary": {
+    "present_as_demand_miss_disabled": 16,
+    "present_as_demand_miss_enabled": 3,
+    "removed_from_demand_stream": 13,
+    "all_selected_present_disabled": true,
+    "all_selected_absent_enabled": false
+  },
+  "selected_lines": [
+    {
+      "rank": 0,
+      "paddr": "0x080a13840",
+      "disabled_occurrences": [
+        {
+          "sequence": 130,
+          "relative_cycle": 14517
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 1,
+      "paddr": "0x080246800",
+      "disabled_occurrences": [
+        {
+          "sequence": 133,
+          "relative_cycle": 15196
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 2,
+      "paddr": "0x080246840",
+      "disabled_occurrences": [
+        {
+          "sequence": 134,
+          "relative_cycle": 15238
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 3,
+      "paddr": "0x080246b40",
+      "disabled_occurrences": [
+        {
+          "sequence": 135,
+          "relative_cycle": 15285
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 4,
+      "paddr": "0x0802469c0",
+      "disabled_occurrences": [
+        {
+          "sequence": 136,
+          "relative_cycle": 15329
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 5,
+      "paddr": "0x080246b00",
+      "disabled_occurrences": [
+        {
+          "sequence": 137,
+          "relative_cycle": 15683
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 6,
+      "paddr": "0x080246ac0",
+      "disabled_occurrences": [
+        {
+          "sequence": 138,
+          "relative_cycle": 15879
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 7,
+      "paddr": "0x08023f780",
+      "disabled_occurrences": [
+        {
+          "sequence": 139,
+          "relative_cycle": 16822
+        }
+      ],
+      "enabled_occurrences": [
+        {
+          "sequence": 110,
+          "relative_cycle": 14560
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "paddr": "0x08023f840",
+      "disabled_occurrences": [
+        {
+          "sequence": 140,
+          "relative_cycle": 16926
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 9,
+      "paddr": "0x080a13a40",
+      "disabled_occurrences": [
+        {
+          "sequence": 141,
+          "relative_cycle": 17555
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 10,
+      "paddr": "0x080a13a80",
+      "disabled_occurrences": [
+        {
+          "sequence": 143,
+          "relative_cycle": 18015
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 11,
+      "paddr": "0x080a13c40",
+      "disabled_occurrences": [
+        {
+          "sequence": 144,
+          "relative_cycle": 18067
+        }
+      ],
+      "enabled_occurrences": [
+        {
+          "sequence": 119,
+          "relative_cycle": 16402
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "paddr": "0x080a13ac0",
+      "disabled_occurrences": [
+        {
+          "sequence": 145,
+          "relative_cycle": 18293
+        }
+      ],
+      "enabled_occurrences": [
+        {
+          "sequence": 120,
+          "relative_cycle": 16676
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "paddr": "0x0802034c0",
+      "disabled_occurrences": [
+        {
+          "sequence": 148,
+          "relative_cycle": 18672
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 14,
+      "paddr": "0x080236780",
+      "disabled_occurrences": [
+        {
+          "sequence": 55,
+          "relative_cycle": 5351
+        },
+        {
+          "sequence": 151,
+          "relative_cycle": 18890
+        }
+      ],
+      "enabled_occurrences": []
+    },
+    {
+      "rank": 15,
+      "paddr": "0x080254600",
+      "disabled_occurrences": [
+        {
+          "sequence": 152,
+          "relative_cycle": 19628
+        }
+      ],
+      "enabled_occurrences": []
+    }
+  ]
+}

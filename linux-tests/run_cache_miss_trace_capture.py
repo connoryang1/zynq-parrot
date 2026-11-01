@@ -43,7 +43,7 @@ def guest_elf(args):
 def guest_command(args):
     """Build the selected guest command without accepting shell text."""
     if args.program == "physical-preview-pipe":
-        return (f"{PIPE_GUEST_ELF} {args.group}; rc=$?; "
+        return (f"{PIPE_GUEST_ELF} {args.group} {args.preview_mode}; rc=$?; "
                 "echo TRACE_CAPTURE_EXIT rc=$rc")
     return capture_command(args.window, args.samples)
 
@@ -61,6 +61,9 @@ def parse_args(argv=None):
                         choices=("cache-miss", "physical-preview-pipe"),
                         default="cache-miss")
     parser.add_argument("--group", type=int, default=0)
+    parser.add_argument("--preview-mode",
+                        choices=("disabled", "trigger", "wake-trigger"),
+                        default="disabled")
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--runtime-ms", type=int, default=600_000)
@@ -100,6 +103,7 @@ def run(args):
         "samples": args.samples,
         "program": args.program,
         "group": args.group,
+        "preview_mode": args.preview_mode,
     }
     program = guest_elf(args)
     child = None
