@@ -265,8 +265,9 @@ outside the version-1 fast path and must never cause an automatic retry.
 
 1. Matched requests and four-word replies pass through software and hardware
    backends using the same handler.
-2. Wrong token, stale token, wrong caller SATP, wrong caller context, busy slot,
-   and nonresident server all report that execution did not begin.
+2. Wrong or stale tokens report `REVOKED`; a matching live token with a wrong
+   caller SATP/context, busy slot, or nonresident server reports
+   `NOT_STARTED`. Every case proves that execution did not begin.
 3. `AUTO` falls back exactly once for every non-started case; forced hardware
    never silently falls back.
 4. Revocation prevents the next call, token reuse cannot revive an old binding,
