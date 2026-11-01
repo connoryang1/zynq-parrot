@@ -146,11 +146,10 @@ public:
               "complete replay did not install exactly one full line");
 
     if (dut.side_buffer_o) {
-      // Reproduce the physical race in the actual detached-buffer mode: the
-      // demand is already resident when a same-line replay is admitted. The
-      // completed advisory response must retire its slot and release the
-      // ordinary miss instead of waiting for an L1 tag publication that this
-      // mode intentionally never performs.
+      // A replay arriving after its same-line demand is already resident is
+      // too late: that demand cannot withdraw and observe a later advisory
+      // publication. Acknowledge and drop the overtaken replay so the demand
+      // issues directly, without a redundant prefetch request/refill pair.
       dut.fwd_ready_i = 0;
       enqueue(0x80015000);
       enqueue(0x80016000);
@@ -159,25 +158,19 @@ public:
       enqueue(0x80014000);
       dut.fwd_ready_i = 1;
       wait_sent(4);
-      require(sent[1].prefetch && sent[2].prefetch && sent[3].prefetch
+      require(sent[1].prefetch && sent[2].prefetch && !sent[3].prefetch
               && sent[3].addr == 0x80014000,
-              "side-buffer same-line replay did not issue ahead of demand");
+              "side-buffer overtaken replay delayed or duplicated demand");
       unsigned old_side_writes = side_writes;
       response(sent[3]);
-      wait_sent(5);
-      require(!sent[4].prefetch && sent[4].addr == 0x80014000,
-              "side-buffer same-line demand remained blocked");
-      require(side_writes == old_side_writes + 4,
-              "resident same-line replay did not stream one complete line");
-      response(sent[4]);
       for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
       response(sent[1]);
       response(sent[2]);
       wait_idle_empty();
-      require(dut.replay_valid_o == 0,
-              "side-buffer same-line replay slot was not retired");
+      require(dut.replay_valid_o == 0 && side_writes == old_side_writes + 8,
+              "side-buffer overtaken replay was not dropped exactly once");
       std::cout << "[UCE-ICACHE-REPLAY] PASS: detached retirement and "
-                   "resident same-line demand progress\n";
+                   "overtaken same-line replay drop\n";
       return;
     }
 
@@ -216,12 +209,9 @@ public:
     for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
     require(dut.replay_valid_o == 0, "preempted replay slot was not retired");
 
-    // A demand may already be resident in e_send_critical when a detached
-    // replay for the same line arrives. Once that replay completes, it must be
-    // dropped: the resident demand cannot withdraw to observe an L1 install,
-    // and retaining both creates a circular wait between demand and installer.
-    // Fill the two-entry forward pump first so the ordinary miss remains in
-    // the UCE rather than merely waiting on the external memory link.
+    // The same overtaken-replay rule applies to the legacy installer mode.
+    // Fill the two-entry forward pump first so the ordinary miss is already
+    // resident in the UCE when the replay arrives.
     dut.fwd_ready_i = 0;
     enqueue(0x80015000);
     enqueue(0x80016000);
@@ -230,24 +220,20 @@ public:
     enqueue(0x80014000);
     dut.fwd_ready_i = 1;
     wait_sent(8);
-    require(sent[5].prefetch && sent[6].prefetch && sent[7].prefetch
+    require(sent[5].prefetch && sent[6].prefetch && !sent[7].prefetch
             && sent[7].addr == 0x80014000,
-            "same-line replay did not issue ahead of resident demand");
+            "overtaken replay delayed or duplicated resident demand");
     response(sent[7]);
-    wait_sent(9);
-    require(!sent[8].prefetch && sent[8].addr == 0x80014000,
-            "resident same-line demand remained blocked after replay completion");
-    response(sent[8]);
     for (unsigned n = 0; n < 300 && !dut.last_o; ++n) step();
     response(sent[5]);
     response(sent[6]);
     wait_idle_empty();
     require(dut.replay_valid_o == 0,
-            "same-line replay slot was not dropped for resident demand");
+            "overtaken replay was not dropped for resident demand");
 
     std::cout << "[UCE-ICACHE-REPLAY] PASS: full-line install, resident-line drop, "
                  "fence drain-without-publish, demand-priority abort, "
-                 "resident same-line demand progress\n";
+                 "overtaken same-line replay drop\n";
   }
 };
 }
