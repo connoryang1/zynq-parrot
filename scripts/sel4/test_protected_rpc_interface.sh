@@ -62,6 +62,10 @@ printf '%s\r\r\n' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=4000 median=4100 p95=4300 max=4500' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/hardware samples=64 min=4400 median=4500 p95=4800 max=5000' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/software samples=64 min=7000 median=7200 p95=7600 max=8000' \
+    'SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64' \
+    'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/in-process samples=64 min=5000 median=5200 p95=5700 max=6100' \
+    'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/hardware samples=64 min=5700 median=5900 p95=6400 max=6900' \
+    'SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/software samples=64 min=9000 median=9400 p95=10100 max=11000' \
     'Test SEL4IPCRPC0002 passed' \
     'halting...INFO:    CORE PASS' \
     'INFO:    BSG PASS' > "$uart_log"

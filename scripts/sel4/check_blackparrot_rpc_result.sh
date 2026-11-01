@@ -26,6 +26,7 @@ direct_re='^SEL4_RPC_ADAPTER path=in-process calls=([0-9]+) total_cycles=([0-9]+
 ipc_re='^SEL4_RPC_ADAPTER path=software calls=([0-9]+) total_cycles=([0-9]+) cycles_per_call=([0-9]+)$'
 distribution_re='^SEL4_RPC_DISTRIBUTION path=(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 cold_distribution_re='^SEL4_RPC_DISTRIBUTION path=l1d-cold/(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
+hierarchy_distribution_re='^SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/(in-process|hardware|software) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 
 test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 
@@ -46,6 +47,10 @@ cold_state_count=0
 direct_cold_distribution_count=0
 hardware_cold_distribution_count=0
 software_cold_distribution_count=0
+hierarchy_state_count=0
+direct_hierarchy_distribution_count=0
+hardware_hierarchy_distribution_count=0
+software_hierarchy_distribution_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -141,6 +146,39 @@ while IFS= read -r line; do
                 software_cold_max=$distribution_max
                 ;;
         esac
+    elif [[ $line =~ $hierarchy_distribution_re ]]; then
+        distribution_path=${BASH_REMATCH[1]}
+        distribution_samples=${BASH_REMATCH[2]}
+        distribution_min=${BASH_REMATCH[3]}
+        distribution_median=${BASH_REMATCH[4]}
+        distribution_p95=${BASH_REMATCH[5]}
+        distribution_max=${BASH_REMATCH[6]}
+        case $distribution_path in
+            in-process)
+                direct_hierarchy_distribution_count=$((direct_hierarchy_distribution_count + 1))
+                direct_hierarchy_samples=$distribution_samples
+                direct_hierarchy_min=$distribution_min
+                direct_hierarchy_median=$distribution_median
+                direct_hierarchy_p95=$distribution_p95
+                direct_hierarchy_max=$distribution_max
+                ;;
+            hardware)
+                hardware_hierarchy_distribution_count=$((hardware_hierarchy_distribution_count + 1))
+                hardware_hierarchy_samples=$distribution_samples
+                hardware_hierarchy_min=$distribution_min
+                hardware_hierarchy_median=$distribution_median
+                hardware_hierarchy_p95=$distribution_p95
+                hardware_hierarchy_max=$distribution_max
+                ;;
+            software)
+                software_hierarchy_distribution_count=$((software_hierarchy_distribution_count + 1))
+                software_hierarchy_samples=$distribution_samples
+                software_hierarchy_min=$distribution_min
+                software_hierarchy_median=$distribution_median
+                software_hierarchy_p95=$distribution_p95
+                software_hierarchy_max=$distribution_max
+                ;;
+        esac
     fi
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
@@ -151,6 +189,8 @@ while IFS= read -r line; do
         && guard_count=$((guard_count + 1))
     [[ $line == "SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64" ]] \
         && cold_state_count=$((cold_state_count + 1))
+    [[ $line == "SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64" ]] \
+        && hierarchy_state_count=$((hierarchy_state_count + 1))
 done < "$log"
 
 if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
@@ -177,8 +217,12 @@ if ((shared_buffer)); then
          || cold_state_count != 1
          || direct_cold_distribution_count != 1
          || hardware_cold_distribution_count != 1
-         || software_cold_distribution_count != 1)); then
-        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count cold=$cold_state_count:$direct_cold_distribution_count/$hardware_cold_distribution_count/$software_cold_distribution_count" >&2
+         || software_cold_distribution_count != 1
+         || hierarchy_state_count != 1
+         || direct_hierarchy_distribution_count != 1
+         || hardware_hierarchy_distribution_count != 1
+         || software_hierarchy_distribution_count != 1)); then
+        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count cold=$cold_state_count:$direct_cold_distribution_count/$hardware_cold_distribution_count/$software_cold_distribution_count hierarchy=$hierarchy_state_count:$direct_hierarchy_distribution_count/$hardware_hierarchy_distribution_count/$software_hierarchy_distribution_count" >&2
         exit 1
     fi
     if ((direct_calls != 256 || ipc_calls != 256
@@ -219,6 +263,21 @@ if ((shared_buffer)); then
         echo "invalid L1D-cold distribution" >&2
         exit 1
     fi
+    if ((direct_hierarchy_samples != 64
+         || hardware_hierarchy_samples != 64
+         || software_hierarchy_samples != 64
+         || direct_hierarchy_min > direct_hierarchy_median
+         || direct_hierarchy_median > direct_hierarchy_p95
+         || direct_hierarchy_p95 > direct_hierarchy_max
+         || hardware_hierarchy_min > hardware_hierarchy_median
+         || hardware_hierarchy_median > hardware_hierarchy_p95
+         || hardware_hierarchy_p95 > hardware_hierarchy_max
+         || software_hierarchy_min > software_hierarchy_median
+         || software_hierarchy_median > software_hierarchy_p95
+         || software_hierarchy_p95 > software_hierarchy_max)); then
+        echo "invalid data-hierarchy-cold distribution" >&2
+        exit 1
+    fi
 fi
 if ((physical)) && ((core_pass_count != 1 || bsg_pass_count != 1 || bsg_fail_count != 0)); then
     echo "invalid physical completion: core_pass=$core_pass_count bsg_pass=$bsg_pass_count bsg_fail=$bsg_fail_count" >&2
@@ -234,4 +293,6 @@ if ((shared_buffer)); then
         "$direct_median" "$hardware_median" "$software_median"
     printf 'L1D-cold medians: in-process=%s hardware=%s software=%s cycles/call\n' \
         "$direct_cold_median" "$hardware_cold_median" "$software_cold_median"
+    printf 'data-hierarchy-cold medians: in-process=%s hardware=%s software=%s cycles/call\n' \
+        "$direct_hierarchy_median" "$hardware_hierarchy_median" "$software_hierarchy_median"
 fi

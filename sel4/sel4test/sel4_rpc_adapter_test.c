@@ -24,6 +24,7 @@
 #define ADAPTER_BP_SOFTWARE_CALLS SEL4_RPC_SEARCH_MEASURED_CALLS
 #define ADAPTER_DISTRIBUTION_CALLS SEL4_RPC_SEARCH_DISTRIBUTION_CALLS
 #define ADAPTER_L1D_COLD_CALLS SEL4_RPC_SEARCH_L1D_COLD_CALLS
+#define ADAPTER_HIERARCHY_COLD_CALLS SEL4_RPC_SEARCH_HIERARCHY_COLD_CALLS
 #define ADAPTER_BP_FALLBACK_CALLS SEL4_RPC_SEARCH_FALLBACK_CALLS
 #define ADAPTER_VALID_CALLS (ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS)
 #define ADAPTER_TOTAL_SERVER_CALLS (ADAPTER_VALID_CALLS + 2)
@@ -32,8 +33,15 @@
 #define ADAPTER_BP_SERVER_ARGS 4
 #define ADAPTER_SEARCH_BYTES SEL4_RPC_SEARCH_BYTES
 #define ADAPTER_SEARCH_NEEDLE ((seL4_Word)SEL4_RPC_SEARCH_NEEDLE)
+#define ADAPTER_CACHE_LINE_BYTES 64u
+#define ADAPTER_L2_EVICTION_BYTES (4u * BIT(seL4_PageBits))
 
 static volatile seL4_Word adapter_server_private_counter;
+#ifdef CONFIG_PLAT_BLACKPARROT
+static unsigned char adapter_l2_eviction[ADAPTER_L2_EVICTION_BYTES]
+    __attribute__((aligned(BIT(seL4_PageBits))));
+static volatile uint64_t adapter_l2_eviction_sink;
+#endif
 
 static inline uint64_t read_cycles(void)
 {
@@ -49,6 +57,22 @@ static inline void flush_l1_data_cache(void)
      * invalidate every L1D tag. The instruction does not invalidate L1I or
      * the shared lower cache, so results are explicitly L1D-cold/L2-warm. */
     __asm__ volatile(".word 0x0020700f" : : : "memory");
+}
+
+static void evict_data_cache_hierarchy(void)
+{
+    /* This endpoint has a 4 KiB, 2-way, 64-byte-line L2. Four page-aligned
+     * pages cover every physical L2 set eight times. Flush before the scan so
+     * prior dirty state is below L1, then flush again so neither the workload
+     * nor eviction lines remain in L1 when timing begins. */
+    flush_l1_data_cache();
+    uint64_t sum = adapter_l2_eviction_sink;
+    for (size_t offset = 0; offset < ADAPTER_L2_EVICTION_BYTES;
+         offset += ADAPTER_CACHE_LINE_BYTES) {
+        sum += *(volatile const uint64_t *)&adapter_l2_eviction[offset];
+    }
+    adapter_l2_eviction_sink = sum;
+    flush_l1_data_cache();
 }
 #endif
 
@@ -319,6 +343,9 @@ static int test_blackparrot_hardware_binding(env_t env)
     uint64_t direct_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t hardware_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t software_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
+    uint64_t direct_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
+    uint64_t hardware_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
+    uint64_t software_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
     uint64_t direct_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
@@ -349,6 +376,17 @@ static int test_blackparrot_hardware_binding(env_t env)
         protected_rpc_status_t status = sel4_rpc_bounded_search_service(
             &local_context, &request, &local_reply, NULL);
         direct_l1d_cold_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(local_reply.length, 2);
+        test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    for (size_t sample = 0; sample < ADAPTER_HIERARCHY_COLD_CALLS; sample++) {
+        evict_data_cache_hierarchy();
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = sel4_rpc_bounded_search_service(
+            &local_context, &request, &local_reply, NULL);
+        direct_hierarchy_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(local_reply.length, 2);
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
@@ -390,6 +428,18 @@ static int test_blackparrot_hardware_binding(env_t env)
         protected_rpc_status_t status = protected_rpc_call(
             rpc_endpoint, &request, &software, &result);
         software_l1d_cold_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
+    for (size_t sample = 0; sample < ADAPTER_HIERARCHY_COLD_CALLS; sample++) {
+        evict_data_cache_hierarchy();
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = protected_rpc_call(
+            rpc_endpoint, &request, &software, &result);
+        software_hierarchy_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
         test_eq(result.reply.length, 2);
@@ -492,6 +542,18 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
+    for (size_t sample = 0; sample < ADAPTER_HIERARCHY_COLD_CALLS; sample++) {
+        evict_data_cache_hierarchy();
+        const uint64_t sample_start = read_cycles();
+        protected_rpc_status_t status = protected_rpc_call(
+            rpc_endpoint, &request, &hardware, &result);
+        hardware_hierarchy_cold_samples[sample] = read_cycles() - sample_start;
+        test_eq(status, PROTECTED_RPC_OK);
+        test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+        test_eq(result.reply.length, 2);
+        test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+        test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    }
 
     test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
 
@@ -549,6 +611,18 @@ static int test_blackparrot_hardware_binding(env_t env)
                              ADAPTER_L1D_COLD_CALLS);
     print_cycle_distribution("l1d-cold/software", software_l1d_cold_samples,
                              ADAPTER_L1D_COLD_CALLS);
+    printf("SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold "
+           "l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=%u\n",
+           ADAPTER_HIERARCHY_COLD_CALLS);
+    print_cycle_distribution("data-hierarchy-cold/in-process",
+                             direct_hierarchy_cold_samples,
+                             ADAPTER_HIERARCHY_COLD_CALLS);
+    print_cycle_distribution("data-hierarchy-cold/hardware",
+                             hardware_hierarchy_cold_samples,
+                             ADAPTER_HIERARCHY_COLD_CALLS);
+    print_cycle_distribution("data-hierarchy-cold/software",
+                             software_hierarchy_cold_samples,
+                             ADAPTER_HIERARCHY_COLD_CALLS);
     return 0;
 }
 #endif
