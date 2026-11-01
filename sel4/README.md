@@ -441,6 +441,13 @@ until its first synchronous feature probe, then redirects to the debug
 exception entry instead of OpenSBI's `mtvec` handler. The packager therefore
 rejects `NBF_DEBUG=1` rather than producing an image that can restart silently.
 
+Board staging is not a reservation: another host workflow can acquire the
+remote lock after staging and before overlay load. Recheck both local board
+orchestrators and the remote runner immediately before any power cycle and
+again immediately before loading; if a new owner appears, cancel the pending
+loader so it cannot resume after that run. The serialized overlay and program
+helpers remain authoritative at their individual launch boundaries.
+
 For FPGA qualification, use `e_bp_unicore_zynqparrot_sel4_cfg`. Its two
 resident threads, four logical contexts, 50-bit branch metadata, and one L2
 bank match the accepted full-core model. It differs from the general-purpose
