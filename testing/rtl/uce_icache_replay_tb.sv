@@ -6,6 +6,7 @@ module uce_icache_replay_tb
   import bp_me_pkg::*;
   #(parameter bp_params_e bp_params_p = e_bp_unicore_cfg
     , parameter bit side_buffer_p = 1'b0
+    , parameter int prefetch_els_p = 4
     `declare_bp_proc_params(bp_params_p)
     )
   (input clk_i, reset_i,
@@ -29,7 +30,8 @@ module uce_icache_replay_tb
    output [3:0] data_fill_o,
    output [63:0] data_word0_o, data_word1_o,
    output [3:0] install_state_o,
-   output [3:0] replay_valid_o, replay_sent_o, replay_complete_o, replay_cancel_o,
+   output [prefetch_els_p-1:0] replay_valid_o, replay_sent_o,
+                                      replay_complete_o, replay_cancel_o,
    output side_buffer_o,
    output fwd_v_o,
    input fwd_ready_i,
@@ -104,7 +106,8 @@ module uce_icache_replay_tb
   assign fwd_prefetch_o = fwd.payload.prefetch;
 
   bp_uce #(.bp_params_p(bp_params_p), .writeback_p(0), .assoc_p(assoc_lp),
-           .prefetch_p(1), .prefetch_els_p(4), .prefetch_full_line_p(1),
+           .prefetch_p(1), .prefetch_els_p(prefetch_els_p),
+           .prefetch_full_line_p(1),
            .prefetch_demand_priority_p(1), .prefetch_critical_forward_p(0),
            .prefetch_side_buffer_p(side_buffer_p),
            .sets_p(sets_lp), .block_width_p(block_lp), .fill_width_p(fill_lp),
@@ -137,6 +140,7 @@ module uce_icache_replay_tb
   assign replay_cancel_o = dut.prefetch_cancel_r;
 
   initial assert (block_lp == 512 && fill_lp == 128 && bedrock_fill_width_p == 128
-                  && assoc_lp == 8)
+                  && assoc_lp == 8 && prefetch_els_p > 0
+                  && prefetch_els_p <= 8)
     else $fatal(1, "standalone endpoint requires 512-bit lines and 128-bit fills");
 endmodule

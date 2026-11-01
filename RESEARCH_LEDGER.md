@@ -788,6 +788,17 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Next discriminator:** on the exact same kernel, table, NBF, benchmark, and bitstream, run mode 5 to isolate wakeup-time versus selection-time launch, then independently repeat mode 6. If both confirm the timing effect, use the three residual demand lines to choose between more request slots, deadline-aware ordering, and limited retention; do not change capacity before the timing control.
 - **Guardrail:** the board must be physically power-cycled, allowed to finish PYNQ startup, and reloaded with the verified overlay before the next run. The current shell lacks `PYNQ_POWER_STATE_URL`, so no follow-on board result may bypass recovery.
 
+### RL-082 — Replay-slot scaling is quantized and bounded below the trigger-timing gain
+
+- **Status:** accepted focused simulation capacity bound; no production RTL, Linux, core, or FPGA claim
+- **Scope:** a parameterized test wrapper around the production I-cache UCE, its detached side buffer, 16 distinct full-line replay requests, ordered fixed-latency four-beat replies, no architectural demand traffic, and four through eight replay slots. The fixed first-reply latency spans 40, 80, 120, 160, and 200 cycles; every configuration must accept, issue, and complete all 16 requests, empty its credits/table, and reach its configured maximum occupancy.
+- **Result:** total first-accept-to-empty cycles are `233/233/191/191/149` at latency 40, `393/393/311/311/229` at latency 80, `553/553/431/431/309` at latency 120, `713/713/551/551/389` at latency 160, and `873/873/671/671/469` at latency 200 for four/five/six/seven/eight slots. All 25 runs pass. The existing detached retirement and resident same-line demand-progress regression also passes after wrapper parameterization.
+- **Interpretation:** the 16-request burst completes in quantized waves: a fifth or seventh slot does not reduce total time, while eight slots save 84--164 cycles over four at the likely short 40--80-cycle latency range. This optimistic UCE-only ceiling is useful but smaller than RL-081's measured 325-cycle FPGA wake-to-load improvement from earlier launch. The three residual FPGA demand misses are therefore not yet evidence that capacity is the main limiter.
+- **Harness correction:** the initial driver accidentally presented traffic during its post-reset settling interval, so the four-slot initialization check failed after filling while larger tables appeared healthy because one or more entries remained free. An explicit post-initialization `active` gate was added, every pre-fix result was discarded, all five slot elaborations were rebuilt, and the full latency sweep was repeated.
+- **Evidence:** exact commands, latency-200 build/run manifests, dependency hashes, the complete 25-line result matrix, and scope limits are retained under `logs/icache-replay-slot-sweep-20261101/`. The runner and driver are `testing/rtl/run_uce_icache_replay_burst.py` and `testing/rtl/uce_icache_replay_burst_driver.cpp`.
+- **Next discriminator:** preserve four slots until the same-image mode-5 timing control and an independent mode-6 replication establish a stable physical timing effect. If those pass, determine whether residual ranks 7, 11, and 12 were unissued, incomplete, evicted, or merely not useful before selecting eight slots, deadline ordering, or retention.
+- **Guardrail:** ordered fixed-latency replies without cache/controller/demand contention are an optimistic transport bound. Do not add the simulated reduction to the FPGA result or describe it as Linux speedup.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -858,7 +869,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint and RL-080 as the exact selection-time negative result. RL-081 now proves that moving the same mechanism to successful wakeup removes 13/16 selected demand misses and advances wake-to-load by `325.25 [177.5,446]` cycles in one complete FPGA matrix. The next experiment is a same-image mode-5 selection-time matrix, followed by an independent mode-6 replication. Only after those controls should request slots, ordering, retention, a larger footprint, or an application workload change.
+For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint and RL-080 as the exact selection-time negative result. RL-081 now proves that moving the same mechanism to successful wakeup removes 13/16 selected demand misses and advances wake-to-load by `325.25 [177.5,446]` cycles in one complete FPGA matrix. RL-082 bounds a four-to-eight-slot expansion at only 84--164 optimistic UCE cycles for short modeled latency and does not show that the three residual demands are slot-limited. The next experiment remains a same-image mode-5 selection-time matrix, followed by an independent mode-6 replication; after those controls, classify each residual line as unissued, incomplete, evicted, late, or unused before changing capacity, ordering, retention, footprint, or workload.
 
 ## Delta log
 
