@@ -457,6 +457,43 @@ Boot/set-stratified pooling SHA-256 `fcc873a2...694` resolves `1740.75
 faster target resume. The next measurement partitions child post-load work
 from the return handoff.
 
+## Direct post-load tail partition
+
+The instrumented proxy records a third physical cycle timestamp after hook
+validation and immediately before the accepted child pipe write. Every trial
+must satisfy `child_post_load + return_handoff = roundtrip - wake_to_load`.
+The ELF SHA-256 is `2bf990b4...d314` and its transfer is
+`b745455e...9aa8`; the NBF and routed bitstream are unchanged.
+
+Two independent late-only matrices were completed. Each full boot emitted all
+eight cells but failed to return the final group-7 shell prompt, so group 7
+from those boots was conservatively rejected. The derived group-0-through-6
+prefixes each contain exactly 3,584 base rows, 3,584 tail rows, and seven
+child/parent/cell PASS markers. Mandatory power recovery and a fresh verified
+overlay preceded a disjoint group-7 suffix for each replication; both suffixes
+end in runner, CORE, and BSG PASS. The accepted replications reject 419 and
+421 timer-contaminated attempts.
+
+Exact-binary base pooling SHA-256 `244cafc9...5906` gives:
+
+- target loads: `0 [-0.5,0]` cycles saved;
+- wake-to-load: `165.25 [-177.5,680.5]` cycles saved;
+- roundtrip: `1769.5 [321.75,3124]` cycles saved.
+
+Component pooling SHA-256 `678a870a...30a` gives:
+
+- child post-load work: `-6.25 [-13.25,-1.5]` cycles saved;
+- return handoff: `-599.5 [-1465.5,719.25]` cycles saved;
+- exact combined post-load tail: `-376.5 [-1399.75,1086.5]` cycles saved.
+
+The roundtrip median remains resolved, but no directly measured tail component
+does. This is not an identity failure: block differences are exactly additive,
+while medians of their noisy distributions are not. The result rejects the
+simple claim that the 1.4% statistic directly measures a warmed return switch.
+A lower-noise scheduling protocol or return-window miss trace is required.
+Raw failed boots, derived prefixes, recovered suffixes, status records, and
+all four analysis JSON files are retained under `physical-sweep/`.
+
 ## Pipe experiment workflow corrections
 
 During the later hot-proxy preparation, a combined build-and-test command ran
@@ -464,6 +501,13 @@ the focused unit tests from the repository root and repeated the already-known
 sibling-import failure. The benchmark build itself completed and was retained;
 the import errors are not test evidence. Rerunning the two modules from
 `linux-tests/` passed all 14 tests.
+The tail-partition preparation repeated the same root-level import-only error;
+no test executed in that invocation. The corrected `linux-tests/` invocation
+passed 18 tests, and the later pooling extension's complete focused module
+passes all 10 tests. A synthetic pooling test initially expected a confidence
+interval spanning its two constant replicate effects, but the implemented
+stratified median correctly collapses to their common pooled median; only that
+test expectation changed, and its focused rerun passed before the full module.
 One later mode-setting command also prefixed a path with `linux-tests/` while
 already inside that directory; only `chmod` failed, and the concurrently
 invoked tests still passed. The corrected root-relative mode command and the

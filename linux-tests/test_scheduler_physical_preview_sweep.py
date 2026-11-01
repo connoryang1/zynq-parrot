@@ -8,10 +8,15 @@ from pathlib import Path
 from analyze_scheduler_physical_preview_sweep import analyze
 from compare_scheduler_physical_preview_sweeps import compare
 from pool_scheduler_physical_preview_replicates import pool
+from analyze_scheduler_physical_preview_tail import (
+    analyze as analyze_tail,
+    pool_tail,
+)
 
 
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
-               core_marker="CORE PASS", saved_load_cycles=20):
+               core_marker="CORE PASS", saved_load_cycles=20,
+               saved_return_cycles=0, include_tail=False):
     mode_value = 2 if timing == "late" else 1
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
@@ -23,11 +28,19 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
         entry = 100 + mode
         load = 300 - saved_load_cycles * mode
         hooks = mode + (1 if extra_enabled_hook and mode and trial == 1 else 0)
+        post_load = 20
+        return_handoff = 30 - saved_return_cycles * mode
         lines.append(
             f"PHYSICAL_BENCH trial={trial} mode={mode} hooks={hooks} "
             f"wake_to_entry={entry} load_cycles={load} "
-            f"wake_to_load={entry + load} roundtrip={entry + load + 50}"
+            f"wake_to_load={entry + load} "
+            f"roundtrip={entry + load + post_load + return_handoff}"
         )
+        if include_tail:
+            lines.append(
+                f"PHYSICAL_BENCH_TAIL trial={trial} "
+                f"child_post_load={post_load} return_handoff={return_handoff}"
+            )
     lines.extend(("PHYSICAL_BENCH_PARENT PASS", core_marker, "BSG PASS"))
     return "\n".join(lines)
 
@@ -128,6 +141,56 @@ class SweepAnalyzerTest(unittest.TestCase):
         )
         self.assertEqual(metric["pooled_saved_cycles"], 20.0)
         self.assertEqual(metric["pooled_95pct_ci_saved_cycles"], [20.0, 20.0])
+
+    def test_tail_partition_localizes_return_handoff_effect(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "tail.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=0,
+                           saved_return_cycles=12, include_tail=True)
+                for group in range(8)
+            ))
+            result = analyze_tail([path], "late")
+        self.assertEqual(
+            result["pooled"]["child_post_load"]
+            ["stratified_median_saved_cycles"], 0.0,
+        )
+        self.assertEqual(
+            result["pooled"]["return_handoff"]
+            ["stratified_median_saved_cycles"], 12.0,
+        )
+        self.assertEqual(
+            result["pooled"]["post_load_total"]
+            ["stratified_median_saved_cycles"], 12.0,
+        )
+
+    def test_tail_replication_pool_preserves_boot_and_group_strata(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = root / "first-tail.log"
+            second = root / "second-tail.log"
+            first.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=0,
+                           saved_return_cycles=8, include_tail=True)
+                for group in range(8)
+            ))
+            second.write_text("\n".join(
+                transcript(group=group, timing="late", saved_load_cycles=0,
+                           saved_return_cycles=16, include_tail=True)
+                for group in range(8)
+            ))
+            result = pool_tail([[first], [second]], "late", samples=100)
+        metric = result["metrics"]["return_handoff"]
+        self.assertEqual(
+            [item["saved_cycles"] for item in metric["replicates"]],
+            [8.0, 16.0],
+        )
+        self.assertEqual(metric["pooled_saved_cycles"], 12.0)
+        self.assertEqual(metric["pooled_95pct_ci_saved_cycles"], [12.0, 12.0])
+        self.assertEqual(
+            result["metrics"]["post_load_total"]["pooled_saved_cycles"],
+            12.0,
+        )
 
 
 if __name__ == "__main__":

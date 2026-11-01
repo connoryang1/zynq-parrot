@@ -34,7 +34,7 @@ enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
        max_retries = 4096 };
 
 struct sample {
-	uint64_t launch, entry, after_load, returned;
+	uint64_t launch, entry, after_load, done, returned;
 	unsigned mode, hooks;
 };
 
@@ -157,6 +157,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				fail("too many scheduler hook retries");
 			continue;
 		}
+		samples[trial].done = cycle();
 		transfer(out, &token, 1); /* done */
 		trial++;
 	}
@@ -248,7 +249,7 @@ int main(int argc, char **argv)
 		const volatile struct sample *s = &samples[trial];
 
 		if (!(s->launch <= s->entry && s->entry <= s->after_load
-		      && s->after_load <= s->returned)) {
+		      && s->after_load <= s->done && s->done <= s->returned)) {
 			fprintf(stderr, "nonmonotonic cycle sample: trial=%u\n", trial);
 			return 1;
 		}
@@ -258,6 +259,10 @@ int main(int argc, char **argv)
 		       (unsigned long long)(s->after_load - s->entry),
 		       (unsigned long long)(s->after_load - s->launch),
 		       (unsigned long long)(s->returned - s->launch));
+		printf("PHYSICAL_BENCH_TAIL trial=%u child_post_load=%llu return_handoff=%llu\n",
+		       trial - warmup,
+		       (unsigned long long)(s->done - s->after_load),
+		       (unsigned long long)(s->returned - s->done));
 	}
 	puts("PHYSICAL_BENCH_PARENT PASS");
 	return 0;

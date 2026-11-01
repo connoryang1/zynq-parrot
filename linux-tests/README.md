@@ -631,6 +631,18 @@ PASS markers in every replication, then resamples paired trial blocks within
 each boot/group stratum. Do not pool a post-hoc timing choice or incompatible
 benchmark binaries, footprints, kernels, or FPGA images.
 
+Tail-instrumented benchmark builds also emit `PHYSICAL_BENCH_TAIL` rows. The
+child takes one core-wide physical-cycle timestamp after hook validation and
+immediately before its accepted pipe write. Run
+`analyze_scheduler_physical_preview_tail.py --timing TIMING LOG...` to split
+the interval after target loads into child post-load work and the pipe-write/
+return-to-parent handoff. The analyzer requires the two pieces to sum exactly
+to `roundtrip - wake_to_load` on every trial and reports that directly measured
+combined tail as a third metric. Pool exact-binary repeats with repeated
+`--replicate LOG...` groups; this preserves independent boot and cache-set
+strata. Do not attribute a roundtrip median by subtracting independently
+estimated component medians, because medians are not additive.
+
 The runner writes `BOARD.log.status.json`. Any failed or interrupted run still
 requires a full board power cycle, PYNQ readiness wait, and verified overlay
 reload before retrying.
