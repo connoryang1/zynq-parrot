@@ -7,6 +7,7 @@ This file describes how to develop and verify the BlackParrot FPGA checkout safe
 - Read the matching `codex-skills/*/SKILL.md` before acting on BlackParrot-specific workflows.
 - Use `bp-targeted-verification` to select simulation gates.
 - Use `bp-benchmark-validation` before interpreting context-switch measurements.
+- Use `bp-memory-interleaving-app` for Nano-coroutine-style lookup, graph, or database/index application benchmarks.
 - Use `bp-fpga-synthesis` for build-readiness, background Vivado implementation, utilization,
   timing, bitstream fit, or FPGA deployment work.
 - Use `bp-parallel-safe-runs` before launching concurrent or background jobs.

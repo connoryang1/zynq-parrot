@@ -195,14 +195,24 @@ class PrefetchTests(unittest.TestCase):
         report = self.analyze(consume_pcs=(0x80000518,))
         report['consuming_loads'] = [dict(timestamp=80, cycle=4, pc=0x80000518, thread=0)]
         summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
-        self.assertEqual(summary['request_kind'], 'prefetch')
-        self.assertEqual(summary['uce']['transactions'], 2)
-        self.assertTrue(summary['uce']['all_issued_before_first_response'])
-        self.assertTrue(summary['uce']['issue_before_prior_first_response'])
-        self.assertEqual(summary['uce']['before_first_response_pairs'], [[0, 1]])
+        self.assertEqual(summary['request_kind'], 'mixed')
+        self.assertEqual(summary['uce_prefetch']['transactions'], 2)
+        self.assertTrue(summary['uce_prefetch']['all_issued_before_first_response'])
+        self.assertTrue(summary['uce_prefetch']['issue_before_prior_first_response'])
+        self.assertEqual(summary['uce_prefetch']['before_first_response_pairs'], [[0, 1]])
         self.assertEqual(summary['consuming_loads']['count'], 1)
         self.assertEqual(summary['outstanding_at_begin'],
                          dict(uce=0, axi=0, uce_transactions=[], axi_transactions=[]))
+
+    def test_mixed_window_keeps_hint_and_demand_uce_counts_separate(self):
+        report = self.analyze()
+        report['normal_reads'] = [dict(report['prefetches'][0])]
+        window = dict(begin=dict(timestamp=0), end=dict(timestamp=500))
+        summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
+        self.assertEqual(summary['request_kind'], 'mixed')
+        self.assertEqual(summary['uce']['transactions'], 3)
+        self.assertEqual(summary['uce_prefetch']['transactions'], 2)
+        self.assertEqual(summary['uce_ordinary']['transactions'], 1)
 
     def test_commit_window_selects_final_dummy_reuse(self):
         events = [dict(timestamp=10, cycle=1, pc=0x100, thread=0),
@@ -255,13 +265,13 @@ class PrefetchTests(unittest.TestCase):
         # The first request overlaps this window but was admitted in warmup.
         window['begin']['timestamp'] = 30
         summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
-        self.assertEqual(summary['uce']['transactions'], 1)
-        self.assertFalse(summary['uce']['issue_before_prior_first_response'])
-        self.assertEqual(summary['uce']['before_completion_pairs'], [])
+        self.assertEqual(summary['uce_prefetch']['transactions'], 1)
+        self.assertFalse(summary['uce_prefetch']['issue_before_prior_first_response'])
+        self.assertEqual(summary['uce_prefetch']['before_completion_pairs'], [])
         window['begin']['timestamp'] = 0
         report = self.analyze(case(second_issue=6))
         summary = analyzer.matched_window_summary(report, window, 0x80008000, 128)
-        self.assertFalse(summary['uce']['issue_before_prior_completion'])
+        self.assertFalse(summary['uce_prefetch']['issue_before_prior_completion'])
 
     def test_cli_expected_windows_validates_five_complete_pairs(self):
         samples = case()

@@ -552,7 +552,7 @@ def matched_window_summary(report, window, address, span_bytes, axi_address_xor=
                   if in_region(record['address']) and in_window(record['accept'])]
     normal_reads = [record for record in report['normal_reads']
                     if in_region(record['address']) and in_window(record['issue'])]
-    requests = prefetches if prefetches else normal_reads
+    requests = prefetches + normal_reads
     axi_reads = [record for record in report['axi_reads'] or []
                  if in_region((record['address'] - axi_address_offset) ^ axi_address_xor)
                  and in_window(record['issue'])]
@@ -600,11 +600,16 @@ def matched_window_summary(report, window, address, span_bytes, axi_address_xor=
                     uce_transactions=crossing_uce, axi_transactions=crossing_axi),
                 hint_acceptance=event_extent(hints),
                 prefetch_max_reserved_slots=max_reserved_slots(prefetches),
-                uce=summarize(requests), axi=summarize(axi_reads),
+                uce=summarize(requests),
+                uce_prefetch=summarize(prefetches),
+                uce_ordinary=summarize(normal_reads),
+                axi=summarize(axi_reads),
                 axi_prefetch=summarize(axi_prefetch_reads),
                 axi_ordinary=summarize(axi_ordinary_reads),
                 consuming_loads=event_extent(consumers),
-                request_kind='prefetch' if prefetches else 'demand' if normal_reads else 'none',
+                request_kind=('mixed' if prefetches and normal_reads else
+                              'prefetch' if prefetches else
+                              'demand' if normal_reads else 'none'),
                 timestamps='VCD timescale; compare timestamps, not independent domain cycle counters')
 
 
@@ -764,8 +769,7 @@ def main():
         print(json.dumps(report, indent=2))
     if 'matched_window' in report:
         gate = report['matched_window']
-        uce_overlap = (gate['request_kind'] == 'prefetch'
-                       and gate['uce']['issue_before_prior_first_response'])
+        uce_overlap = gate['uce_prefetch']['issue_before_prior_first_response']
         axi_overlap = gate['axi_prefetch']['issue_before_prior_first_response']
         reserved_slots = gate['prefetch_max_reserved_slots']
     else:
