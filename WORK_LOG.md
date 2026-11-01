@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Physical-preview board runs now bind the bitstream — 2026-11-01:** extended the serialized data/joint sweep runner with the same optional fail-closed loaded-BIT SHA-256 gate used by the accepted instruction A/B, and retained the verified identity in each status file. Focused tests and all 112 discovered Linux tests pass; this closes the final provenance gap before reusing the timing-clean corrected route for data-only and joint feasibility.
+
 - **Five-slot comparator also exceeds PYNQ capacity — 2026-11-01:** the older resident-overtake-only `0fb3da28` route is terminal `FAIL` at 55,684 LUTs and 11,524 required versus 10,938 available slices. The final same-edge checkpoint adds only 16 synthesized LUTs and eleven required slices, so both ten-context/five-slot endpoints are already over capacity and cannot form a routed A/B; exact comparator artifacts are preserved with the final route evidence (`logs/icache-replay-same-cycle-demand-20261101/`, RL-098).
 
 - **Corrected instruction replay improves matched FPGA futex handoffs — 2026-11-01:** the exact timing-clean `a070df7f...a3ce9` route passed four recovery-qualified Linux arms in opposite fresh-boot orders. Replicate medians improve 507 cycles (2.639%) and 934 cycles (4.819%); pooled medians are 18,594.5 enabled versus 19,250.5 disabled, a 656-cycle / 3.408% best-case reduction, and the stratified ten-sample block-bootstrap 95% interval is `[-937.5,-485.75]` cycles. One earlier fourth-arm boot stopped before userspace and is retained as rejected infrastructure evidence; the passing replacement followed full recovery (`logs/icache-replay-same-cycle-demand-20261101/physical-matched-route/`, RL-098).

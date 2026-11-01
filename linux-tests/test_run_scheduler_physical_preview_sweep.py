@@ -28,6 +28,17 @@ class CellPlanTest(unittest.TestCase):
     def test_board_runner_defaults_to_isolated_replay_arms(self):
         args = parse_args(["image.nbf", "transfer.sh", "1" * 64, "run.log"])
         self.assertEqual(args.replay_state, "isolated")
+        self.assertIsNone(args.bitstream_sha256)
+
+    def test_bitstream_identity_gate_accepts_only_sha256(self):
+        args = parse_args([
+            "--bitstream-sha256", "3" * 64,
+            "image.nbf", "transfer.sh", "1" * 64, "run.log",
+        ])
+        self.assertEqual(args.bitstream_sha256, "3" * 64)
+        args.bitstream_sha256 = "not-a-sha"
+        with self.assertRaisesRegex(ValueError, "bitstream SHA-256"):
+            validate_args(args)
 
     def test_hot_proxy_is_the_only_extra_guest_argument(self):
         target = benchmark_command(2, "early", "target")
@@ -164,6 +175,7 @@ class CellPlanTest(unittest.TestCase):
                 transfer=transfer,
                 elf_sha256="1" * 64,
                 control_sha256="2" * 64,
+                bitstream_sha256=None,
                 runtime_ms=100,
                 footprint="target",
                 policy="normal",
