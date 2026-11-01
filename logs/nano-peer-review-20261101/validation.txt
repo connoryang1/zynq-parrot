@@ -1,0 +1,28 @@
+ACCEPTED VALIDATION SUMMARY
+
+python3 logs/nano-peer-review-20261101/generate_results.py
+  wrote 34 rows; N=8 batch/hardware=1.358363x
+
+python3 testing/test_check_run.py
+  17 tests: PASS
+
+python3 tools/test_retirement_window_vcd.py
+  2 tests: PASS
+
+python3 tools/test_prefetch_overlap_vcd.py
+  43 tests: PASS
+
+testing/check_run.py over runs/o[23]-m*-n*.log
+  34/34 exact mode/worker transcripts: PASS
+
+testing/check_run.py runs/dependent-m2-s4-n32.log \
+  --test mt_dependent_stream_benchmark --exit-code 134 \
+  --dependent-config 0x200402
+  guest and host: PASS
+
+Final O3 rebuild
+  ELF SHA-256: 98c45aafc6aacd0423e9ac968cdfc38f8c0f08853a16ebdd907ad00160b1e256
+  benchmark_mode: 0x80011f18
+
+git diff --cached --check excluding immutable raw simulator/build transcripts
+  PASS

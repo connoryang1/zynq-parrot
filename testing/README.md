@@ -197,6 +197,17 @@ make -C testing run-mt_nano_lookup_benchmark \
 The workload contract, trace requirements, accepted/rejected measurements, and
 PR status are maintained in [the Nano lookup experiment](../NANO_LOOKUP_EXPERIMENT.md).
 
+The peer-review simulator matrix uses one exact O3 ELF/NBF/model for the full
+hardware/fixed-batch N=2..10 sweep. Its selected-and-disclosed N=8 result is
+2,810 hardware cycles versus 3,817 fixed-batch cycles (1.358x) and 5,567 for
+the best direct coroutine (1.981x hardware). Clean retirement traces attribute
+the 1,007-cycle batch gap to 63 fewer retired batch instructions plus 1,070
+additional no-retirement cycles. UCE traces show 88 complete hints, zero
+ordinary measured-region reads, and peak eight for both schedules; hardware
+averages 6.483 outstanding over the whole window versus batch's 4.772. Exact
+logs, generated tables, hashes, commands, and limits are under
+[`logs/nano-peer-review-20261101/`](../logs/nano-peer-review-20261101/).
+
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
 prints all samples after measuring. Each load interval is CSR `0xCC0`, load,
 dependent add, CSR `0xCC0`; a register-only control and an immediate same-line
