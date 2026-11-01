@@ -120,3 +120,33 @@ deterministic gzip transcripts and adjacent statuses are under
 `futex-candidate-physical/`. This comparison establishes a better table, not
 its total speedup versus replay disabled. A fresh opposite-order candidate
 enabled/disabled comparison is the next measurement.
+
+## Direct candidate enabled/disabled result
+
+The exact candidate NBF was then held constant while runtime mode six and mode
+zero were compared in four more independent fresh boots. The first pair ran
+enabled then disabled; the second reversed that order. All four arms pass the
+same 201-sample identity, marker, status, and terminal gates. The strict
+analyzer now also requires the exact transfer SHA-256, and the full 96-test
+Linux suite passes after that guardrail was added.
+
+Pair medians are 18,664.5 enabled versus 18,958.5 disabled, a 294-cycle or
+1.55% reduction, and 18,467.5 enabled versus 19,146 disabled, a 678.5-cycle or
+3.54% reduction. Pooled medians are 18,534.5 enabled and 19,044 disabled, a
+**509.5-cycle or 2.68% reduction**. The mean replicate enabled-minus-disabled
+median difference is -486.25 cycles. Its 100,000-sample IID interval is
+`[-741.5,-253]`, with 99.963% of resamples favoring replay; its circular
+ten-handoff block interval is `[-686,-281.75]`, with every resample favoring
+replay.
+
+Pooled median I requests fall from 198 disabled to 183 enabled. Both disabled
+final traces demand the same 14 candidate lines; neither enabled trace demands
+any candidate line. The two candidate slots absent from both disabled traces
+are `0x8023f780` and `0x802034c0`, leaving one more bounded same-capacity tuning
+question before fixed-table iteration is exhausted.
+
+The retained analysis is `futex-total-ab-results.json`; deterministic logs and
+statuses are under `futex-total-physical/`. This is the direct performance
+number for the current best candidate on the synthetic persistent futex pair.
+It remains neither a general Linux context-switch claim nor application
+throughput evidence.

@@ -44,6 +44,7 @@ def load_run(path, arm, identity):
     expected_status = {
         "status": "PASS",
         "nbf_sha256": identity["nbf_sha256"],
+        "transfer_sha256": identity["transfer_sha256"],
         "elf_sha256": identity["elf_sha256"],
         "control_program_sha256": identity["control_program_sha256"],
         "window": "to-peer",
@@ -95,6 +96,8 @@ def load_run(path, arm, identity):
         "analyzed_samples": len(rows),
         "discarded_warmups": 1,
         "elapsed": elapsed,
+        "i_count": icount,
+        "d_count": dcount,
         "median": statistics.median(elapsed),
         "mean": statistics.mean(elapsed),
         "q1": statistics.quantiles(elapsed, n=4, method="inclusive")[0],
@@ -164,6 +167,7 @@ def bootstrap(replicates, seed, resamples, block_length=1):
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--nbf-sha256", required=True)
+    parser.add_argument("--transfer-sha256", required=True)
     parser.add_argument("--elf-sha256", required=True)
     parser.add_argument("--control-program-sha256", required=True)
     parser.add_argument("--prefix-json", type=Path, required=True)
@@ -184,7 +188,7 @@ def analyze(args):
     orders = [replicate[0] for replicate in args.replicate]
     if sorted(orders) != ["disabled-enabled", "enabled-disabled"]:
         raise ValueError("replicates must contain both opposite boot orders")
-    for digest in (args.nbf_sha256, args.elf_sha256,
+    for digest in (args.nbf_sha256, args.transfer_sha256, args.elf_sha256,
                    args.control_program_sha256):
         if not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ValueError("identities must be 64 lowercase hex SHA-256 values")
@@ -192,6 +196,7 @@ def analyze(args):
         raise ValueError("bootstrap resample counts must be positive")
     identity = {
         "nbf_sha256": args.nbf_sha256,
+        "transfer_sha256": args.transfer_sha256,
         "elf_sha256": args.elf_sha256,
         "control_program_sha256": args.control_program_sha256,
     }
@@ -249,6 +254,14 @@ def analyze(args):
             ),
             "point_reduction_percent": (
                 100.0 * (disabled_median - enabled_median) / disabled_median
+            ),
+            "enabled_i_count_median": statistics.median(
+                value for replicate in replicates
+                for value in replicate["enabled"]["i_count"]
+            ),
+            "disabled_i_count_median": statistics.median(
+                value for replicate in replicates
+                for value in replicate["disabled"]["i_count"]
             ),
         },
         "replicate_stratified": {

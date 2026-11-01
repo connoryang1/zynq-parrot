@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Best futex table directly saves 2.68% on FPGA — 2026-11-01:** four fresh candidate-NBF boots in opposite enabled/disabled order measure pooled handoff medians of 18,534.5 versus 19,044 cycles, a 509.5-cycle or 2.68% reduction; IID `[-741.5,-253]` and block `[-686,-281.75]` intervals both resolve. Median I requests fall from 198 to 183, enabled final traces demand no configured lines, and the exact-identity analyzer plus all 96 Linux tests pass (`logs/mode6-persistent-pair-protocol-20261101/`, RL-090).
+
 - **Futex-specific replay table improves the FPGA best case — 2026-11-01:** replacing only five unused entries in the 16-line mode-6 table reduces pooled persistent-handoff medians from 18,908.5 to 18,600 cycles, a further 308.5-cycle or 1.63% gain; IID `[-577.75,-53.75]` and circular-block `[-554.75,-71.75]` intervals both favor the candidate. Exact NBF splicing preserves all 1,861,857 Linux/DTB records, median I requests fall from 188 to 183, and all 96 Linux tests pass (`logs/mode6-persistent-pair-protocol-20261101/`, RL-089).
 
 - **Current mode-6 persistent replay yields a resolved FPGA gain — 2026-11-01:** four fresh-boot arms in opposite order measure pooled medians of 18,955 enabled and 19,295.5 disabled, a 340.5-cycle or 1.76% reduction; IID `[-851,-58]` and circular-block `[-525.5,-85]` intervals both favor replay. Enabled final traces demand none of the configured lines while disabled traces demand 9/11, proving the persistent-buffer mechanism and identifying five unused pipe-specific slots (`logs/mode6-persistent-pair-protocol-20261101/`, RL-088).

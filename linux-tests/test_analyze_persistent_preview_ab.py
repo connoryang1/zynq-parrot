@@ -11,10 +11,12 @@ from analyze_persistent_preview_ab import analyze, load_run
 
 
 SHA_NBF = "1" * 64
-SHA_ELF = "2" * 64
-SHA_CONTROL = "3" * 64
+SHA_TRANSFER = "2" * 64
+SHA_ELF = "3" * 64
+SHA_CONTROL = "4" * 64
 IDENTITY = {
     "nbf_sha256": SHA_NBF,
+    "transfer_sha256": SHA_TRANSFER,
     "elf_sha256": SHA_ELF,
     "control_program_sha256": SHA_CONTROL,
     "prefix_lines": [0x1000],
@@ -50,6 +52,7 @@ def write_run(directory, name, mode, base):
     status = {
         "status": "PASS",
         "nbf_sha256": SHA_NBF,
+        "transfer_sha256": SHA_TRANSFER,
         "elf_sha256": SHA_ELF,
         "control_program_sha256": SHA_CONTROL,
         "window": "to-peer",
@@ -102,6 +105,7 @@ class PersistentPreviewAnalysisTest(unittest.TestCase):
             disabled2 = write_run(directory, "disabled2.log", "disabled", 210)
             args = argparse.Namespace(
                 nbf_sha256=SHA_NBF,
+                transfer_sha256=SHA_TRANSFER,
                 elf_sha256=SHA_ELF,
                 control_program_sha256=SHA_CONTROL,
                 prefix_json=Path(directory) / "prefix.json",

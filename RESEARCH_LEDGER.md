@@ -868,6 +868,16 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Interpretation and next gate:** the predeclared same-capacity replacement gate passes, so the futex table supersedes the pipe-trained table for this synthetic best case. This does not yet measure candidate versus disabled or application throughput. Run a fresh opposite-order candidate-enabled/disabled comparison before combining percentages with RL-088; then test whether a workload-independent training policy can approach the manually selected table.
 - **Evidence:** exact policy/header/build summaries, deterministic gzip logs and statuses, strict table analyzer, and `futex-candidate-table-ab-results.json` are under `logs/mode6-persistent-pair-protocol-20261101/`. The retained analysis hashes to `99a9dfc9...1adda`; all 96 discovered Linux Python tests pass.
 
+### RL-090 — Futex-specific replay directly yields a resolved 2.68% total gain
+
+- **Status:** accepted replicated FPGA enabled/disabled result; current best-case performance number
+- **Scope and correctness:** four additional fresh boots compare mode six with mode zero on the exact candidate NBF `93b2e29d...8629`, routed bitstream `e97e0517...2381`, transfer `b5103c89...5518`, ELF `91f0db11...c0cf`, and control program `2dd9c411...7c30`. Both tasks register the identical harmless page in every arm. Each run has 201 numbered samples, exact identities, expected runtime mode, final capture, runner exit zero, and CORE/BSG PASS; one warmup is discarded.
+- **Timing:** enabled-then-disabled medians are 18,664.5 and 18,958.5 cycles, a 294-cycle or 1.55% reduction. Reverse-order medians are 18,467.5 and 19,146, a 678.5-cycle or 3.54% reduction. Pooled medians are 18,534.5 enabled and 19,044 disabled, a 509.5-cycle or **2.68%** reduction.
+- **Intervals:** the mean replicate enabled-minus-disabled median difference is -486.25 cycles. The IID interval is `[-741.5,-253]` with 99.963% enabled-faster resamples; the circular ten-handoff block interval is `[-686,-281.75]` with 100% enabled-faster resamples. Both boot orders and both dependence treatments resolve.
+- **Mechanism:** pooled median I requests fall from 198 disabled to 183 enabled. Both disabled final traces demand the same 14 candidate lines; enabled demands none. Candidate entries `0x8023f780` and `0x802034c0` are absent from both disabled traces, so two of 16 slots remain available for one final same-capacity coverage test.
+- **Interpretation:** 2.68% is a direct matched A/B and supersedes any attempt to add RL-088's 1.76% to RL-089's 1.63%. It applies only to a pinned persistent futex pair and does not establish general context-switch or application throughput benefit.
+- **Evidence and guardrails:** `futex-total-ab-results.json`, deterministic gzip logs, statuses, and hashes are under `logs/mode6-persistent-pair-protocol-20261101/`. The analysis hashes to `5650efa8...e8c3`. The enabled/disabled analyzer now fails closed on transfer identity as well as NBF/ELF/control identity; all 96 Linux Python tests pass.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -938,7 +948,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089's same-capacity futex-specific table further reduces the accepted current-table handoff by 308.5 pooled cycles (1.63%) with both replicate-stratified intervals below zero. The next bounded measurement is candidate mode six versus mode zero in two fresh opposite-order pairs on the candidate NBF; do not add the separately measured RL-088 and RL-089 percentages as though they were one matched A/B. After total-gain measurement, use the disabled trace to derive a workload-independent training/ranking policy before increasing capacity or changing trigger timing.
+For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures the accepted candidate at a resolved 509.5-cycle/2.68% pooled reduction versus disabled. Two of 16 candidate entries remain unused in both new disabled traces. Perform one final same-capacity replacement using stable early common lines, rejecting it unless an opposite-order table comparison improves the replicate-level estimand; then stop manual fixed-table tuning and derive a workload-independent training/ranking policy before changing capacity or trigger timing.
 
 ## Delta log
 
