@@ -114,6 +114,12 @@ static protected_rpc_status_t blackparrot_try_call(
         return result->status;
 
     case BP_RPC_OUTCOME_REVOKED:
+        /* Kernel-side lifetime hooks can revoke without an explicit client
+         * UNBIND.  REVOKED is authoritative proof that this token can never
+         * start again, so release the local association and permit a fresh
+         * kernel binding.  Do not do this for transient NOT_STARTED. */
+        memset(&bound_endpoint, 0, sizeof(bound_endpoint));
+        bound_token = 0;
         result->disposition = PROTECTED_RPC_ATTEMPT_FALLBACK_SAFE;
         result->status = PROTECTED_RPC_REVOKED;
         return result->status;

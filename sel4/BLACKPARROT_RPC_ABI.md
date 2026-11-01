@@ -107,6 +107,12 @@ one of these outcomes:
 | `REVOKED` | no | forced hardware reports stale binding; `AUTO` may invoke ordinary seL4 IPC once |
 | `COMMITTED_FAILED` | possibly | report failure; never retry |
 
+`REVOKED` is also authoritative permission for the caller runtime to discard
+its cached endpoint/token association: kernel lifetime hooks have made that
+generation permanently unusable, and a later bind must be able to install a
+fresh generation. `NOT_STARTED` is potentially transient and must not clear a
+still-live association.
+
 An invalid, busy, nonresident, wrong-SATP, or otherwise ineligible call returns
 a precise non-started outcome from the same instruction.  A separate
 "eligible?" CSR is forbidden because revocation or scheduling state could

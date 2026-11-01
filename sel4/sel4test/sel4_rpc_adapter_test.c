@@ -811,7 +811,46 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
 
+    /* Mapping any page into a bound VSpace must synchronously revoke before
+     * the mapping becomes visible.  The first stale-token call reports that
+     * execution did not begin and clears the adapter's local association;
+     * a fresh generation can then bind and execute normally. */
+    void *revocation_probe = vspace_new_pages(
+        &env->vspace, seL4_AllRights, 1, seL4_PageBits);
+    test_assert(revocation_probe != NULL);
+    if (revocation_probe == NULL) {
+        test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint),
+                PROTECTED_RPC_OK);
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base, &control_endpoint);
+        return sel4test_get_result();
+    }
+    test_eq(protected_rpc_call(rpc_endpoint, &request, &hardware, &result),
+            PROTECTED_RPC_REVOKED);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 0);
+
+    bind_status = protected_rpc_blackparrot_bind(rpc_endpoint, &binding);
+    test_eq(bind_status, PROTECTED_RPC_OK);
+    if (bind_status != PROTECTED_RPC_OK) {
+        vspace_unmap_pages(&env->vspace, revocation_probe, 1,
+                           seL4_PageBits, VSPACE_FREE);
+        destroy_rpc_server(env, &server, shadow_stack, shared_base,
+                           mailbox_base, &control_endpoint);
+        return sel4test_get_result();
+    }
+    test_eq(protected_rpc_call(rpc_endpoint, &request, &hardware, &result),
+            PROTECTED_RPC_OK);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 4);
+    test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+    test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+
     test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
+    vspace_unmap_pages(&env->vspace, revocation_probe, 1,
+                       seL4_PageBits, VSPACE_FREE);
+    printf("SEL4_RPC_LIFECYCLE map-revoke=verified stale-token=verified "
+           "rebind=verified\n");
 
     /* With the binding revoked, AUTO must make one precise non-executed
      * hardware attempt and then reach the same service through ordinary IPC. */

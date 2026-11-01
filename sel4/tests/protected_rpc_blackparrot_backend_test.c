@@ -86,6 +86,9 @@ int main(void)
     assert(protected_rpc_call(endpoint, &request, &options, &result)
            == PROTECTED_RPC_REVOKED);
     assert(arch_calls == 1 && software_calls == 0);
+    expected_token++;
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_OK);
 
     options.route = PROTECTED_RPC_ROUTE_AUTO;
     reset_arch(BP_RPC_OUTCOME_REVOKED, 0);
@@ -93,6 +96,9 @@ int main(void)
            == PROTECTED_RPC_OK);
     assert(arch_calls == 1 && software_calls == 1);
     assert(result.path == PROTECTED_RPC_PATH_SOFTWARE);
+    expected_token++;
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_OK);
 
     reset_arch(BP_RPC_OUTCOME_NOT_STARTED, 0);
     assert(protected_rpc_call(endpoint, &request, &options, &result)

@@ -271,6 +271,13 @@ is expected to be non-busy while the kernel is executing because version 1
 defers interrupts during an accepted protected call. A surprising `BUSY`
 result is a kernel invariant failure, not permission to recycle an object.
 
+After an implicit lifetime revocation, the first stale-token hardware attempt
+returns `REVOKED` without executing the service. The caller runtime must then
+drop that local token so the same logical endpoint can acquire a fresh kernel
+generation; a transient `NOT_STARTED` attempt does not drop it. The focused
+test maps an unrelated page while bound, requires stale-token rejection,
+rebinds, and requires a new hardware call to complete.
+
 This shape intentionally avoids a new public kernel object in the one-slot
 prototype. A generalized implementation should promote the global binding
 record into a first-class capability object before supporting multiple pairs,

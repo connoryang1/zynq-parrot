@@ -100,6 +100,7 @@ grep -Fq 'RPC server has wrong privileged instructions' \
 uart_log="$build_dir/physical-uart.log"
 printf '%s\r\r\n' \
     'SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied' \
+    'SEL4_RPC_LIFECYCLE map-revoke=verified stale-token=verified rebind=verified' \
     'SEL4_RPC_CALLER_BADGE value=24090 software=verified hardware=verified' \
     'SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024' \
     'SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=760832 cycles_per_call=2972' \
@@ -133,7 +134,16 @@ printf '%s\r\r\n' \
 "$script_dir/check_blackparrot_rpc_result.sh" --physical "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
-    --components --caller-badge 24090 "$uart_log"
+    --components --lifecycle --caller-badge 24090 "$uart_log"
+
+lifecycle_missing_log="$build_dir/physical-uart-lifecycle-missing.log"
+grep -v '^SEL4_RPC_LIFECYCLE ' "$uart_log" > "$lifecycle_missing_log"
+if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components --lifecycle --caller-badge 24090 \
+    "$lifecycle_missing_log" >/dev/null 2>&1; then
+    echo "lifecycle checker accepted a missing marker" >&2
+    exit 1
+fi
 
 badge_missing_log="$build_dir/physical-uart-badge-missing.log"
 grep -v '^SEL4_RPC_CALLER_BADGE ' "$uart_log" > "$badge_missing_log"

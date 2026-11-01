@@ -6,12 +6,14 @@ set -euo pipefail
 physical=0
 shared_buffer=0
 components=0
+lifecycle=0
 caller_badge_expected=
 while (($# > 1)); do
     case $1 in
         --physical) physical=1 ;;
         --shared-buffer) shared_buffer=1 ;;
         --components) components=1 ;;
+        --lifecycle) lifecycle=1 ;;
         --caller-badge)
             (($# >= 3)) || break
             caller_badge_expected=$2
@@ -22,7 +24,7 @@ while (($# > 1)); do
     shift
 done
 if (($# != 1)); then
-    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--caller-badge DECIMAL] OUTPUT.log" >&2
+    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--lifecycle] [--caller-badge DECIMAL] OUTPUT.log" >&2
     exit 2
 fi
 if [[ -n $caller_badge_expected ]] \
@@ -79,6 +81,7 @@ software_components_count=0
 notification_components_count=0
 timebase_count=0
 caller_badge_count=0
+lifecycle_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -291,6 +294,8 @@ while IFS= read -r line; do
         && cold_state_count=$((cold_state_count + 1))
     [[ $line == "SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64" ]] \
         && hierarchy_state_count=$((hierarchy_state_count + 1))
+    [[ $line == "SEL4_RPC_LIFECYCLE map-revoke=verified stale-token=verified rebind=verified" ]] \
+        && lifecycle_count=$((lifecycle_count + 1))
 done < "$log"
 
 if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
@@ -429,12 +434,19 @@ if [[ -n $caller_badge_expected ]] \
     echo "invalid caller-badge evidence: rows=$caller_badge_count expected=$caller_badge_expected actual=${caller_badge_actual:-missing}" >&2
     exit 1
 fi
+if ((lifecycle)) && ((lifecycle_count != 1)); then
+    echo "invalid lifecycle evidence: rows=$lifecycle_count" >&2
+    exit 1
+fi
 
 printf 'accepted seL4 RPC gate: hardware=%s cycles/call software-fallback=%s cycles/call\n' \
     "$hardware_per_call" "$software_per_call"
 if [[ -n $caller_badge_expected ]]; then
     printf 'authenticated caller badge: %s through software and hardware paths\n' \
         "$caller_badge_actual"
+fi
+if ((lifecycle)); then
+    echo 'lifecycle revocation: map revoke, stale token rejection, and rebind verified'
 fi
 if ((shared_buffer)); then
     printf 'matched warm paths: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
