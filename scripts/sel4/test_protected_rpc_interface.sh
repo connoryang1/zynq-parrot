@@ -60,6 +60,11 @@ printf '%s\r\r\n' \
     'SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3330 median=3340 p95=3370 max=3400' \
     'SEL4_RPC_DISTRIBUTION path=software samples=64 min=6450 median=6500 p95=6600 max=6700' \
     'SEL4_RPC_DISTRIBUTION path=notification samples=64 min=5900 median=6000 p95=6100 max=6200' \
+    'SEL4_RPC_TIMEBASE counter=blackparrot-global-cycle-csr-0xcc0 scope=core-wide' \
+    'SEL4_RPC_COMPONENTS path=in-process samples=64 pre_median=20 service_median=2900 post_median=50' \
+    'SEL4_RPC_COMPONENTS path=hardware samples=64 pre_median=180 service_median=2900 post_median=260' \
+    'SEL4_RPC_COMPONENTS path=software samples=64 pre_median=1500 service_median=2900 post_median=2100' \
+    'SEL4_RPC_COMPONENTS path=notification samples=64 pre_median=3500 service_median=2900 post_median=3600' \
     'SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw data-region=server-ro request-signal=notification reply-signal=notification' \
     'SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64' \
     'SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=4000 median=4100 p95=4300 max=4500' \
@@ -76,3 +81,5 @@ printf '%s\r\r\n' \
     'INFO:    BSG PASS' > "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer "$uart_log"
+"$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components "$uart_log"

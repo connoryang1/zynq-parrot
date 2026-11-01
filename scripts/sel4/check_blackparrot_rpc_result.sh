@@ -5,16 +5,18 @@ set -euo pipefail
 
 physical=0
 shared_buffer=0
+components=0
 while (($# > 1)); do
     case $1 in
         --physical) physical=1 ;;
         --shared-buffer) shared_buffer=1 ;;
+        --components) components=1 ;;
         *) break ;;
     esac
     shift
 done
 if (($# != 1)); then
-    echo "usage: $0 [--physical] [--shared-buffer] OUTPUT.log" >&2
+    echo "usage: $0 [--physical] [--shared-buffer] [--components] OUTPUT.log" >&2
     exit 2
 fi
 
@@ -28,6 +30,7 @@ notification_re='^SEL4_RPC_ADAPTER path=notification calls=([0-9]+) total_cycles
 distribution_re='^SEL4_RPC_DISTRIBUTION path=(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 cold_distribution_re='^SEL4_RPC_DISTRIBUTION path=l1d-cold/(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
 hierarchy_distribution_re='^SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/(in-process|hardware|software|notification) samples=([0-9]+) min=([0-9]+) median=([0-9]+) p95=([0-9]+) max=([0-9]+)$'
+components_re='^SEL4_RPC_COMPONENTS path=(in-process|hardware|software|notification) samples=([0-9]+) pre_median=([0-9]+) service_median=([0-9]+) post_median=([0-9]+)$'
 
 test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 
@@ -57,6 +60,11 @@ direct_hierarchy_distribution_count=0
 hardware_hierarchy_distribution_count=0
 software_hierarchy_distribution_count=0
 notification_hierarchy_distribution_count=0
+direct_components_count=0
+hardware_components_count=0
+software_components_count=0
+notification_components_count=0
+timebase_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -214,6 +222,42 @@ while IFS= read -r line; do
                 notification_hierarchy_max=$distribution_max
                 ;;
         esac
+    elif [[ $line =~ $components_re ]]; then
+        component_path=${BASH_REMATCH[1]}
+        component_samples=${BASH_REMATCH[2]}
+        component_pre=${BASH_REMATCH[3]}
+        component_service=${BASH_REMATCH[4]}
+        component_post=${BASH_REMATCH[5]}
+        case $component_path in
+            in-process)
+                direct_components_count=$((direct_components_count + 1))
+                direct_component_samples=$component_samples
+                direct_pre_median=$component_pre
+                direct_service_median=$component_service
+                direct_post_median=$component_post
+                ;;
+            hardware)
+                hardware_components_count=$((hardware_components_count + 1))
+                hardware_component_samples=$component_samples
+                hardware_pre_median=$component_pre
+                hardware_service_median=$component_service
+                hardware_post_median=$component_post
+                ;;
+            software)
+                software_components_count=$((software_components_count + 1))
+                software_component_samples=$component_samples
+                software_pre_median=$component_pre
+                software_service_median=$component_service
+                software_post_median=$component_post
+                ;;
+            notification)
+                notification_components_count=$((notification_components_count + 1))
+                notification_component_samples=$component_samples
+                notification_pre_median=$component_pre
+                notification_service_median=$component_service
+                notification_post_median=$component_post
+                ;;
+        esac
     fi
     [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
     [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
@@ -224,6 +268,8 @@ while IFS= read -r line; do
         && guard_count=$((guard_count + 1))
     [[ $line == "SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw data-region=server-ro request-signal=notification reply-signal=notification" ]] \
         && notification_semantics_count=$((notification_semantics_count + 1))
+    [[ $line == "SEL4_RPC_TIMEBASE counter=blackparrot-global-cycle-csr-0xcc0 scope=core-wide" ]] \
+        && timebase_count=$((timebase_count + 1))
     [[ $line == "SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64" ]] \
         && cold_state_count=$((cold_state_count + 1))
     [[ $line == "SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64" ]] \
@@ -263,7 +309,31 @@ if ((shared_buffer)); then
          || hardware_hierarchy_distribution_count != 1
          || software_hierarchy_distribution_count != 1
          || notification_hierarchy_distribution_count != 1)); then
-        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count notification=$notification_count/$notification_semantics_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count/$notification_distribution_count cold=$cold_state_count:$direct_cold_distribution_count/$hardware_cold_distribution_count/$software_cold_distribution_count/$notification_cold_distribution_count hierarchy=$hierarchy_state_count:$direct_hierarchy_distribution_count/$hardware_hierarchy_distribution_count/$software_hierarchy_distribution_count/$notification_hierarchy_distribution_count" >&2
+        echo "invalid shared-buffer evidence: workload=$workload_count guards=$guard_count direct=$direct_count software=$ipc_count notification=$notification_count/$notification_semantics_count timebase=$timebase_count distributions=$direct_distribution_count/$hardware_distribution_count/$software_distribution_count/$notification_distribution_count cold=$cold_state_count:$direct_cold_distribution_count/$hardware_cold_distribution_count/$software_cold_distribution_count/$notification_cold_distribution_count hierarchy=$hierarchy_state_count:$direct_hierarchy_distribution_count/$hardware_hierarchy_distribution_count/$software_hierarchy_distribution_count/$notification_hierarchy_distribution_count" >&2
+        exit 1
+    fi
+    if ((components)) && ((timebase_count != 1
+         || direct_components_count != 1
+         || hardware_components_count != 1
+         || software_components_count != 1
+         || notification_components_count != 1)); then
+        echo "invalid component evidence: timebase=$timebase_count direct=$direct_components_count hardware=$hardware_components_count software=$software_components_count notification=$notification_components_count" >&2
+        exit 1
+    fi
+    if ((components)) && ((direct_component_samples != 64
+         || hardware_component_samples != 64
+         || software_component_samples != 64
+         || notification_component_samples != 64
+         || direct_pre_median == 0 || direct_service_median == 0
+         || direct_post_median == 0
+         || hardware_pre_median == 0 || hardware_service_median == 0
+         || hardware_post_median == 0
+         || software_pre_median == 0 || software_service_median == 0
+         || software_post_median == 0
+         || notification_pre_median == 0
+         || notification_service_median == 0
+         || notification_post_median == 0)); then
+        echo "invalid component accounting" >&2
         exit 1
     fi
     if ((direct_calls != 256 || ipc_calls != 256 || notification_calls != 256
@@ -349,4 +419,11 @@ if ((shared_buffer)); then
         "$direct_cold_median" "$hardware_cold_median" "$software_cold_median" "$notification_cold_median"
     printf 'data-hierarchy-cold medians: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \
         "$direct_hierarchy_median" "$hardware_hierarchy_median" "$software_hierarchy_median" "$notification_hierarchy_median"
+    if ((components)); then
+        printf 'warm components (pre/service/post): direct=%s/%s/%s hardware=%s/%s/%s software=%s/%s/%s notification=%s/%s/%s cycles\n' \
+            "$direct_pre_median" "$direct_service_median" "$direct_post_median" \
+            "$hardware_pre_median" "$hardware_service_median" "$hardware_post_median" \
+            "$software_pre_median" "$software_service_median" "$software_post_median" \
+            "$notification_pre_median" "$notification_service_median" "$notification_post_median"
+    fi
 fi

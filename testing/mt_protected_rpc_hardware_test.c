@@ -250,7 +250,10 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     "2: "
     "li a0, -2\nli a1, 0\nli a2, 0\nli a3, 0\nli a5, 4\n"
     "csrw 0x809, a0\n2: j 2b\n"
-    "3: li t0, 0x40000\n"
+    /* The clean U-mode server has no architectural rdcycle permission. Use
+     * and qualify the core-wide physical counter that benchmarks require for
+     * one timebase across the protected context transition. */
+    "3: csrr t3, 0xcc0\nbeqz t3, 2b\nli t0, 0x40000\n"
     "li t1, 0x5555666677778888\nsd t1, 0(t0)\n"
     "li t0, 0x50000\nld t1, 0(t0)\n"
     "slli a1, a1, 1\nslli a2, a2, 2\nslli a3, a3, 3\n"

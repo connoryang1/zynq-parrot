@@ -309,6 +309,18 @@ operations instead of using seL4's endpoint Call/ReplyRecv handoff. The
 eight-call AUTO fallback remains separate because its failed hardware probe is
 intentional extra work.
 
+Component decomposition is in progress. The instrumented handler returns
+entry/exit timestamps in the two previously unused reply words, and the
+focused full-core regression passes four-word return plus a protected-server
+read of BlackParrot's core-wide physical cycle CSR `0xCC0`. Do not use
+architectural `rdcycle` inside the clean hardware server: descriptor
+construction deliberately clears `scounteren`, so that instruction traps and
+version 1 has no server-fault continuation. The first physical attempt proved
+that failure mode. A later attempt is also rejected because another board user
+replaced the staged bitstream before launch, producing an expected missing-CSR
+signature. A clean physical component run on the pinned `ca4a6c...31040`
+bitstream remains required before component numbers are reported.
+
 ### Stage 6 — Generalization
 
 Only after the one-pair result, evaluate multiple clients, endpoint queues,

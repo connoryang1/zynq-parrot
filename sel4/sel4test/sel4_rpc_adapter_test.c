@@ -48,7 +48,12 @@ static volatile uint64_t adapter_l2_eviction_sink;
 static inline uint64_t read_cycles(void)
 {
     uint64_t value;
+#ifdef CONFIG_PLAT_BLACKPARROT
+    /* The physical counter is not virtualized across resident contexts. */
+    __asm__ volatile("csrr %0, 0xcc0" : "=r"(value) : : "memory");
+#else
     __asm__ volatile("rdcycle %0" : "=r"(value) : : "memory");
+#endif
     return value;
 }
 
@@ -125,6 +130,49 @@ static void print_cycle_distribution(const char *path, uint64_t *samples,
            " median=%" PRIu64 " p95=%" PRIu64 " max=%" PRIu64 "\n",
            path, count, samples[0], samples[median_index],
            samples[p95_index], samples[count - 1]);
+}
+
+static void sort_cycle_samples(uint64_t *samples, size_t count)
+{
+    for (size_t index = 1; index < count; index++) {
+        const uint64_t value = samples[index];
+        size_t position = index;
+        while (position != 0 && samples[position - 1] > value) {
+            samples[position] = samples[position - 1];
+            position--;
+        }
+        samples[position] = value;
+    }
+}
+
+static void print_cycle_components(const char *path, uint64_t *pre_samples,
+                                   uint64_t *service_samples,
+                                   uint64_t *post_samples, size_t count)
+{
+    sort_cycle_samples(pre_samples, count);
+    sort_cycle_samples(service_samples, count);
+    sort_cycle_samples(post_samples, count);
+    printf("SEL4_RPC_COMPONENTS path=%s samples=%zu pre_median=%" PRIu64
+           " service_median=%" PRIu64 " post_median=%" PRIu64 "\n",
+           path, count, pre_samples[count / 2], service_samples[count / 2],
+           post_samples[count / 2]);
+}
+
+static int record_cycle_components(
+    uint64_t call_start, uint64_t call_end,
+    const protected_rpc_message_t *reply, uint64_t *pre,
+    uint64_t *service, uint64_t *post)
+{
+    if (reply == NULL || reply->length != 4
+        || reply->words[2] < call_start
+        || reply->words[3] < reply->words[2]
+        || call_end < reply->words[3]) {
+        return 0;
+    }
+    *pre = reply->words[2] - call_start;
+    *service = reply->words[3] - reply->words[2];
+    *post = call_end - reply->words[3];
+    return 1;
 }
 
 static protected_rpc_status_t buffer_service(
@@ -428,6 +476,18 @@ static int test_blackparrot_hardware_binding(env_t env)
     uint64_t hardware_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t software_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t notification_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t direct_pre_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t direct_service_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t direct_post_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t hardware_pre_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t hardware_service_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t hardware_post_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t software_pre_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t software_service_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t software_post_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t notification_pre_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t notification_service_samples[ADAPTER_DISTRIBUTION_CALLS];
+    uint64_t notification_post_samples[ADAPTER_DISTRIBUTION_CALLS];
     uint64_t direct_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t hardware_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
     uint64_t software_l1d_cold_samples[ADAPTER_L1D_COLD_CALLS];
@@ -446,7 +506,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(sel4_rpc_bounded_search_service(
                     &local_context, &request, &local_reply, NULL),
                 PROTECTED_RPC_OK);
-        test_eq(local_reply.length, 2);
+        test_eq(local_reply.length, 4);
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -455,9 +515,14 @@ static int test_blackparrot_hardware_binding(env_t env)
         const uint64_t sample_start = read_cycles();
         protected_rpc_status_t status = sel4_rpc_bounded_search_service(
             &local_context, &request, &local_reply, NULL);
-        direct_samples[sample] = read_cycles() - sample_start;
+        const uint64_t sample_end = read_cycles();
+        direct_samples[sample] = sample_end - sample_start;
+        test_assert(record_cycle_components(
+            sample_start, sample_end, &local_reply,
+            &direct_pre_samples[sample], &direct_service_samples[sample],
+            &direct_post_samples[sample]));
         test_eq(status, PROTECTED_RPC_OK);
-        test_eq(local_reply.length, 2);
+        test_eq(local_reply.length, 4);
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -468,7 +533,7 @@ static int test_blackparrot_hardware_binding(env_t env)
             &local_context, &request, &local_reply, NULL);
         direct_l1d_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
-        test_eq(local_reply.length, 2);
+        test_eq(local_reply.length, 4);
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -479,7 +544,7 @@ static int test_blackparrot_hardware_binding(env_t env)
             &local_context, &request, &local_reply, NULL);
         direct_hierarchy_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
-        test_eq(local_reply.length, 2);
+        test_eq(local_reply.length, 4);
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -500,7 +565,7 @@ static int test_blackparrot_hardware_binding(env_t env)
                     notification_mailbox, notification_sequence, &request,
                     &notification_reply),
                 PROTECTED_RPC_OK);
-        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.length, 4);
         test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -512,9 +577,15 @@ static int test_blackparrot_hardware_binding(env_t env)
         protected_rpc_status_t status = notification_call(
             request_notification, reply_notification, notification_mailbox,
             notification_sequence, &request, &notification_reply);
-        notification_samples[sample] = read_cycles() - sample_start;
+        const uint64_t sample_end = read_cycles();
+        notification_samples[sample] = sample_end - sample_start;
+        test_assert(record_cycle_components(
+            sample_start, sample_end, &notification_reply,
+            &notification_pre_samples[sample],
+            &notification_service_samples[sample],
+            &notification_post_samples[sample]));
         test_eq(status, PROTECTED_RPC_OK);
-        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.length, 4);
         test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -528,7 +599,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         notification_l1d_cold_samples[sample] =
             read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
-        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.length, 4);
         test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -542,7 +613,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         notification_hierarchy_cold_samples[sample] =
             read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
-        test_eq(notification_reply.length, 2);
+        test_eq(notification_reply.length, 4);
         test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -563,7 +634,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -572,10 +643,15 @@ static int test_blackparrot_hardware_binding(env_t env)
         const uint64_t sample_start = read_cycles();
         protected_rpc_status_t status = protected_rpc_call(
             rpc_endpoint, &request, &software, &result);
-        software_samples[sample] = read_cycles() - sample_start;
+        const uint64_t sample_end = read_cycles();
+        software_samples[sample] = sample_end - sample_start;
+        test_assert(record_cycle_components(
+            sample_start, sample_end, &result.reply,
+            &software_pre_samples[sample], &software_service_samples[sample],
+            &software_post_samples[sample]));
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -587,7 +663,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         software_l1d_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -599,7 +675,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         software_hierarchy_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -611,7 +687,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         .server_gp = hardware_gp,
         .server_tp = hardware_state,
         .request_words = 4,
-        .reply_words = 2,
+        .reply_words = 4,
         .region = {
             .region = {.opaque = ADAPTER_REGION_TOKEN},
             .caller_base = (uintptr_t)shared_base,
@@ -673,7 +749,7 @@ static int test_blackparrot_hardware_binding(env_t env)
             return sel4test_get_result();
         }
         test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -682,10 +758,15 @@ static int test_blackparrot_hardware_binding(env_t env)
         const uint64_t sample_start = read_cycles();
         protected_rpc_status_t status = protected_rpc_call(
             rpc_endpoint, &request, &hardware, &result);
-        hardware_samples[sample] = read_cycles() - sample_start;
+        const uint64_t sample_end = read_cycles();
+        hardware_samples[sample] = sample_end - sample_start;
+        test_assert(record_cycle_components(
+            sample_start, sample_end, &result.reply,
+            &hardware_pre_samples[sample], &hardware_service_samples[sample],
+            &hardware_post_samples[sample]));
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -697,7 +778,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         hardware_l1d_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -709,7 +790,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         hardware_hierarchy_cold_samples[sample] = read_cycles() - sample_start;
         test_eq(status, PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -726,7 +807,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(protected_rpc_call(rpc_endpoint, &request, &fallback, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
@@ -767,6 +848,21 @@ static int test_blackparrot_hardware_binding(env_t env)
                              ADAPTER_DISTRIBUTION_CALLS);
     print_cycle_distribution("notification", notification_samples,
                              ADAPTER_DISTRIBUTION_CALLS);
+    printf("SEL4_RPC_TIMEBASE counter=blackparrot-global-cycle-csr-0xcc0 "
+           "scope=core-wide\n");
+    print_cycle_components("in-process", direct_pre_samples,
+                           direct_service_samples, direct_post_samples,
+                           ADAPTER_DISTRIBUTION_CALLS);
+    print_cycle_components("hardware", hardware_pre_samples,
+                           hardware_service_samples, hardware_post_samples,
+                           ADAPTER_DISTRIBUTION_CALLS);
+    print_cycle_components("software", software_pre_samples,
+                           software_service_samples, software_post_samples,
+                           ADAPTER_DISTRIBUTION_CALLS);
+    print_cycle_components("notification", notification_pre_samples,
+                           notification_service_samples,
+                           notification_post_samples,
+                           ADAPTER_DISTRIBUTION_CALLS);
     printf("SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw "
            "data-region=server-ro request-signal=notification "
            "reply-signal=notification\n");
@@ -917,7 +1013,7 @@ static int test_dedicated_search_server_software(env_t env)
         test_eq(protected_rpc_call(rpc_endpoint, &request, &software, &result),
                 PROTECTED_RPC_OK);
         test_eq(result.path, PROTECTED_RPC_PATH_SOFTWARE);
-        test_eq(result.reply.length, 2);
+        test_eq(result.reply.length, 4);
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
