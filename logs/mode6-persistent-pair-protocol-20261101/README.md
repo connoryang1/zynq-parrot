@@ -1,4 +1,4 @@
-This directory records the protocol for measuring steady-state mode-6 instruction replay with one persistent Linux task pair. It exists to keep that production-like retained-buffer question separate from the per-trial `fence.i` experiment, which measures a deliberately cold first-switch mechanism ceiling. No new FPGA performance result is claimed here.
+This directory records the protocol and accepted FPGA result for steady-state mode-6 instruction replay with one persistent Linux task pair. It keeps that production-like retained-buffer question separate from the per-trial `fence.i` experiment, which measures a deliberately cold first-switch mechanism ceiling. The current table produces a resolved 1.76% pooled median improvement in this best-case workload.
 
 # Mode-6 persistent-pair protocol
 
@@ -42,6 +42,28 @@ Run two fresh-boot pairs in opposite order:
 
 Every run must have exact hash matches, 201 consecutively numbered samples, explicit preview-mode and final capture markers, runner exit zero, and CORE/BSG PASS. Only after the final timed endpoint, the benchmark reads the frozen miss recorder and prints its addresses; this cannot perturb an analyzed successor and distinguishes table mismatch from trigger-timing failure without another boot. `linux-tests/analyze_persistent_preview_ab.py` verifies the adjacent runner status and exact prefix JSON, reports configured lines demanded in that final capture, discards exactly sample one, reports per-replicate and pooled medians, and calculates both IID and circular ten-handoff block intervals for the mean of the two replicate-level median differences.
 
-## Validation and current board state
+## Validation before launch
 
-The benchmark and serialized runner changes pass all 93 discovered `linux-tests` Python tests, including compressed-log analysis with an adjacent uncompressed-name status file. The RISC-V dynamic ELF and transfer rebuild to the hashes above. The board remains on the same operating-system boot that executed the prior guest shutdown (`2026-11-01 05:09:15`, uptime 6,220 seconds at the check), and this shell has no `PYNQ_POWER_STATE_URL`; no further FPGA launch is valid until a physical power cycle, PYNQ readiness wait, and exact overlay reload.
+The benchmark and serialized runner changes pass all 93 discovered `linux-tests` Python tests, including compressed-log analysis with an adjacent uncompressed-name status file. The RISC-V dynamic ELF and transfer rebuild to the hashes above. At protocol preparation the board was still on the prior guest-shutdown boot; later runs recovered it through the documented local outlet fallback, waited for PYNQ readiness, and reloaded the exact overlay before every arm.
+
+## Accepted persistent-pair result
+
+Two opposite-order pairs used four independent fresh boots. Every arm has exact NBF/ELF/transfer/control hashes, 201 numbered samples, the expected runtime mode, final-address and capture markers, runner RC zero, and CORE/BSG PASS. Sample one is discarded as warmup, leaving 200 samples per run and 400 per arm.
+
+The enabled-then-disabled pair measures 18,925 versus 19,033 median cycles, a 108-cycle or 0.57% reduction. The reverse-order pair measures 19,058.5 versus 19,415 cycles, a 356.5-cycle or 1.84% reduction. Pooled arm medians are 18,955 enabled and 19,295.5 disabled, a **340.5-cycle or 1.76% reduction**.
+
+The replicate-level estimand is the mean of the two enabled-minus-disabled median differences: −232.25 cycles. Its 100,000-sample IID interval is `[-851,-58]`, favoring enabled in 99.27% of resamples. The circular ten-handoff block interval is `[-525.5,-85]`, favoring enabled in 99.69%. Both boot orders and both dependence models therefore support a persistent best-case gain.
+
+Mechanism attribution also passes. Median I-request counts are 188 enabled versus 199 disabled when pooled. The final complete disabled traces demand 9 and 11 configured lines, with nine common to both; neither enabled trace demands any configured line. Five pipe-trained entries are absent from both disabled futex traces: `0x802469c0`, `0x80246ac0`, `0x80246b00`, `0x80246b40`, and `0x80254600`. This explains why the current result is smaller than RL-063's old-table 3.25% result and exposes a bounded futex-specific tuning opportunity.
+
+This remains a best case for one pinned persistent task pair, not general Linux or application throughput. It shows that retaining and reusing lines works; it does not rescue the rejected policy of invalidating and refetching all 16 on every switch.
+
+Retained artifact hashes are:
+
+```text
+rep1 enabled gzip/status:  30d010d3345357ef7de65659fca060c05ef330e09bde4108ee6ce8c6712bafd7 / 0ee579af5b506b9127bb851d77fc277e37f4cdf338c0c4f56743d65c26414636
+rep1 disabled gzip/status: f2d99c2d05515ff108564a8597793713f1edaf12cfe0ed91b57dff5cbb237f0e / 673e09cd39a9e5c303054cd14a346330c7ed68f24535d1eac9169a60c4ba08d9
+rep2 disabled gzip/status: b39a8b885739f7caace18389367ee4f9d9bdfe9a7cb2d809de1d65f345288310 / 673e09cd39a9e5c303054cd14a346330c7ed68f24535d1eac9169a60c4ba08d9
+rep2 enabled gzip/status:  abc97ed020334ea4aab1ae27cf82899d898cc2bb5612799c4bb1ad2998371391 / 0ee579af5b506b9127bb851d77fc277e37f4cdf338c0c4f56743d65c26414636
+analysis:                   d5a80284cf392a4461fd6dc2d02caad52d58ab0648a3473d18b5fdce0681d049
+```
