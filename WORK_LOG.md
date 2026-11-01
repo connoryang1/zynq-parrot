@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Replay benchmark arm contamination found and corrected — 2026-11-01:** completed advisory instruction lines persist across the `[off,on,on,off]` trial pattern because mode zero gates triggers but not buffer hits, so RL-079--081's nonempty matrices are not clean feature-versus-disabled A/Bs. Added a symmetric per-trial `fence.i` isolation mode, runner provenance, and a chronology analyzer; the exact GCC13 ELF contains the conditional invalidation and 38 focused tests pass, but an isolated FPGA matrix remains required (`logs/replay-arm-isolation-20261101/`, RL-083).
+
 - **I-cache replay capacity bounded in focused simulation — 2026-11-01:** added a parameterized 16-line detached-UCE burst gate and swept four through eight slots across 40--200-cycle fixed reply latency. All 25 configurations pass; four-to-eight slots save only 84--164 cycles at the short 40--80-cycle range, so capacity remains secondary to the same-image FPGA timing control and independent replication (`logs/icache-replay-slot-sweep-20261101/`, RL-082).
 
 - **Early wakeup replay produces a resolved FPGA gain — 2026-11-01:** added mode 6 to launch the exact 16-line scheduler prefix after successful `try_to_wake_up()`, proved 13/16 selected lines disappear from the enabled architectural demand trace, and completed all 4,096 balanced FPGA handoffs. Wake-to-load improves by `325.25 [177.5,446]` cycles (about 1.09% of the disabled first-use interval), with exactly zero effect in the four data loads; a same-image mode-5 timing control and independent mode-6 replication remain required (`logs/joint-preview-bestcase-20261031/`, RL-081).

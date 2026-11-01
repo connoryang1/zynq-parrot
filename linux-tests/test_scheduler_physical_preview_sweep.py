@@ -13,6 +13,9 @@ from analyze_scheduler_physical_preview_tail import (
     analyze as analyze_tail,
     pool_tail,
 )
+from analyze_scheduler_physical_preview_chronology import (
+    analyze as analyze_chronology,
+)
 
 
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
@@ -48,6 +51,27 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
 
 
 class SweepAnalyzerTest(unittest.TestCase):
+    def test_chronology_analyzer_preserves_known_balanced_effect(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "wake-trigger.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="wake-trigger",
+                           saved_load_cycles=20)
+                for group in range(8)
+            ))
+            result = analyze_chronology(
+                [path], "wake-trigger", samples=100
+            )
+        self.assertEqual(result["replay_state"], "historical-persistent")
+        complete = result["windows"]["complete"]["metrics"]
+        self.assertEqual(
+            complete["load_cycles"]["paired_saved"]["median_cycles"], 20
+        )
+        self.assertEqual(
+            complete["wake_to_entry"]["off3_minus_off0"]["median_cycles"],
+            0,
+        )
+
     def test_single_cell_analyzer_accepts_instruction_mode(self):
         self.assertEqual(TIMING_MODES["instruction"], 3)
 

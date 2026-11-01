@@ -10,12 +10,17 @@ from run_scheduler_physical_preview_sweep import (
     benchmark_command,
     cell_exit_pattern,
     cell_plan,
+    parse_args,
     selected_cells,
     validate_args,
 )
 
 
 class CellPlanTest(unittest.TestCase):
+    def test_board_runner_defaults_to_isolated_replay_arms(self):
+        args = parse_args(["image.nbf", "transfer.sh", "1" * 64, "run.log"])
+        self.assertEqual(args.replay_state, "isolated")
+
     def test_hot_proxy_is_the_only_extra_guest_argument(self):
         target = benchmark_command(2, "early", "target")
         proxy = benchmark_command(2, "early", "hot-proxy")
@@ -27,6 +32,20 @@ class CellPlanTest(unittest.TestCase):
         proxy = benchmark_command(2, "early", "hot-proxy", "fifo")
         self.assertIn(" 2 early target fifo; rc=$?", target)
         self.assertIn(" 2 early hot-proxy fifo; rc=$?", proxy)
+
+    def test_isolated_replay_materializes_all_positional_arguments(self):
+        target = benchmark_command(
+            2, "wake-trigger", "target", "normal", "isolated"
+        )
+        proxy = benchmark_command(
+            2, "wake-trigger", "hot-proxy", "fifo", "isolated"
+        )
+        self.assertIn(
+            " 2 wake-trigger target normal isolated; rc=$?", target
+        )
+        self.assertIn(
+            " 2 wake-trigger hot-proxy fifo isolated; rc=$?", proxy
+        )
 
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
@@ -118,6 +137,7 @@ class CellPlanTest(unittest.TestCase):
                 runtime_ms=100,
                 footprint="target",
                 policy="normal",
+                replay_state="persistent",
                 only_timing=None,
                 start_cell=0,
                 log=root / "missing" / "run.log",

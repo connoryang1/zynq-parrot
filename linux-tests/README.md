@@ -617,6 +617,16 @@ An optional fourth argument, `fifo`, places the parent and child at equal
 pipe operations. Use the runner's matching `--policy fifo` option only as a
 best-case noise-control experiment, and report it separately from the default
 normal Linux scheduling policy.
+An optional fifth argument, `isolated`, executes `fence.i` in both arms after
+cache-pressure preparation and before arming the handoff. This clears completed
+detached instruction-replay entries as well as the ordinary local I-cache, so
+an enabled trial cannot warm a later disabled trial. Use the runner's
+`--replay-state isolated` option for instruction-replay performance claims;
+the serialized board runner defaults to this safe state. The guest program's
+direct-command default remains `persistent` only to reproduce historical
+matrices. Because replay-buffer hits are not gated by the per-task trigger
+mode, an interleaved persistent matrix is not a clean replay-versus-disabled
+A/B.
 The timing value `instruction` selects kernel mode three: the scheduler writes
 the instruction-prefix trigger and increments the one-switch counter but skips
 all physical data-hint CSR writes. Run its eight-group plan with

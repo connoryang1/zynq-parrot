@@ -54,13 +54,17 @@ def cell_exit_pattern(group, timing):
     )
 
 
-def benchmark_command(group, timing, footprint, policy="normal"):
+def benchmark_command(group, timing, footprint, policy="normal",
+                      replay_state="persistent"):
     """Build the guest command while preserving the historical default CLI."""
     guest_args = f"{group} {timing}"
-    if footprint != "target" or policy != "normal":
+    if (footprint != "target" or policy != "normal"
+            or replay_state != "persistent"):
         guest_args += f" {footprint}"
-    if policy != "normal":
+    if policy != "normal" or replay_state != "persistent":
         guest_args += f" {policy}"
+    if replay_state != "persistent":
+        guest_args += f" {replay_state}"
     return (
         f"{GUEST_ELF} {guest_args}; "
         f"rc=$?; echo PHYSICAL_CELL_EXIT group={group} "
@@ -85,6 +89,8 @@ def parse_args(argv=None):
                         default="target")
     parser.add_argument("--policy", choices=("normal", "fifo"),
                         default="normal")
+    parser.add_argument("--replay-state", choices=("persistent", "isolated"),
+                        default="isolated")
     parser.add_argument("--only-timing",
                         choices=("early", "late", "instruction", "counter",
                                  "trigger", "wake-trigger"))
@@ -122,6 +128,7 @@ def run(args):
         "elf_sha256": args.elf_sha256,
         "footprint": args.footprint,
         "policy": args.policy,
+        "replay_state": args.replay_state,
         "cells": [f"{group}:{timing}"
                   for group, timing in selected_cells(
                       args.start_cell, args.only_timing)],
@@ -148,7 +155,8 @@ def run(args):
             for group, timing in selected_cells(
                     args.start_cell, args.only_timing):
                 child.sendline(benchmark_command(
-                    group, timing, args.footprint, args.policy
+                    group, timing, args.footprint, args.policy,
+                    args.replay_state
                 ))
                 child.expect(cell_exit_pattern(group, timing), timeout=900)
                 rc = int(child.match.group(1))

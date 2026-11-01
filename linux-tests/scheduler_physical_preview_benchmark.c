@@ -14,6 +14,10 @@
  * removes hook accounting and uses getrusage context-switch deltas as an
  * independent one-switch filter. Mode six retains that filter but launches
  * instruction replay when the target is made runnable, before selection.
+ * An optional isolated replay-state executes fence.i in both arms before each
+ * handoff so completed advisory lines cannot leak from an enabled trial into
+ * a later disabled trial. The historical persistent state remains available
+ * only to reproduce measurements made before that contamination was found.
  */
 #include <stdint.h>
 #include <sched.h>
@@ -76,7 +80,8 @@ static int uncounted_mode(unsigned mode)
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
-		      unsigned group, unsigned enable_mode, int hot_proxy)
+		      unsigned group, unsigned enable_mode, int hot_proxy,
+		      int isolate_replay)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -130,6 +135,13 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		if (checksum == UINT64_MAX)
 			fail("eviction checksum");
+		/* Completed detached instruction lines otherwise remain visible until
+		 * replacement or fence.i. Since the trial pattern interleaves disabled
+		 * and enabled arms, isolate both arms before mode selection so an off
+		 * trial cannot consume a line replayed by an earlier on trial. This is
+		 * outside every timestamped interval and is deliberately symmetric. */
+		if (isolate_replay)
+			__asm__ volatile("fence.i" : : : "memory");
 		/* Arm only after cache preparation. On the slow FPGA, enabling before
 		 * this 40 KiB loop allowed a timer preemption to issue one hint batch,
 		 * followed by the intended pipe-wakeup batch. Besides violating the
@@ -201,14 +213,15 @@ int main(int argc, char **argv)
 	unsigned enable_mode = 2;
 	int hot_proxy = 0;
 	int fifo = 0;
+	int isolate_replay = 0;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
 					MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 5) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger] [target|hot-proxy] [normal|fifo]\n",
+	if (argc > 6) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger] [target|hot-proxy] [normal|fifo] [persistent|isolated]\n",
 			argv[0]);
 		return 2;
 	}
@@ -253,14 +266,23 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s\n",
+	if (argc >= 6) {
+		if (!strcmp(argv[5], "isolated"))
+			isolate_replay = 1;
+		else if (strcmp(argv[5], "persistent")) {
+			fprintf(stderr, "invalid replay state: %s\n", argv[5]);
+			return 2;
+		}
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s\n",
 	       group, group * 4 * line_bytes, lines,
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
 	       enable_mode == 3 ? "instruction" :
 	       enable_mode == 4 ? "counter" :
 	       enable_mode == 5 ? "trigger" : "wake-trigger", enable_mode,
-	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal");
+	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal",
+	       isolate_replay ? "isolated" : "persistent");
 
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
@@ -281,7 +303,7 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, group, enable_mode,
-			  hot_proxy);
+			  hot_proxy, isolate_replay);
 		return 0;
 	}
 	close(to_child[0]);
