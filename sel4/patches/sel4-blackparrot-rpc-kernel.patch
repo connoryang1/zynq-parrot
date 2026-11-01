@@ -169,3 +169,26 @@ index 6bfcdd7fa..e071e1a64 100644
      if (updateFlags & thread_control_update_space) {
          target->tcbFaultHandler = faultep;
      }
+diff --git a/src/api/syscall.c b/src/api/syscall.c
+index ec8880760..03748e2a7 100644
+--- a/src/api/syscall.c
++++ b/src/api/syscall.c
+@@ -108,12 +108,16 @@ exception_t handleUnknownSyscall(word_t w)
+         return EXCEPTION_NONE;
+     }
+ #endif
+-#ifdef CONFIG_DEBUG_BUILD
++#if defined(CONFIG_DEBUG_BUILD) || defined(CONFIG_BLACKPARROT_TEST_FINISH)
+-    if (w == SysDebugHalt) {
++    if (w == (word_t)-11) { /* SysDebugHalt's stable ABI number. */
++#ifdef CONFIG_DEBUG_BUILD
+         tcb_t *UNUSED tptr = NODE_STATE(ksCurThread);
+         printf("Debug halt syscall from user thread %p \"%s\"\n", tptr, TCB_PTR_DEBUG_PTR(tptr)->tcbName);
++#endif
+         halt();
+     }
++#endif
++#ifdef CONFIG_DEBUG_BUILD
+     if (w == SysDebugSnapshot) {
+         tcb_t *UNUSED tptr = NODE_STATE(ksCurThread);
+         printf("Debug snapshot syscall from user thread %p \"%s\"\n",

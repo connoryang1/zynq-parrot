@@ -79,7 +79,22 @@ index b540758..d5ed473 100644
      /* Fill out the size_bits list */
      for (unsigned int i = 0; i < num_untypeds; i++) {
          untyped_size_bits_list[i] = untypeds[i].size_bits;
-@@ -446,6 +462,13 @@ void *main_continued(void *arg UNUSED)
+@@ -272,6 +288,14 @@ void sel4test_stop_tests(test_result_t result, int tests_done, int tests_failed,
+         printf("*** ALL tests not run ***\n");
+     } else {
+         printf("All is well in the universe\n");
++#if defined(CONFIG_PLAT_BLACKPARROT) && CONFIG_RPC_ONLY
++        /* This focused build enables a test-only kernel DebugHalt proxy to
++         * OpenSBI shutdown. Signal it only after the complete suite; otherwise
++         * control-program cannot distinguish success from the driver's
++         * intentional post-suite idle loop. */
++        register seL4_Word syscall asm("a7") = (seL4_Word)-11;
++        __asm__ volatile("ecall" :: "r"(syscall) : "memory");
++#endif
+     }
+     printf("\n\n");
+ }
+@@ -446,6 +470,13 @@ void *main_continued(void *arg UNUSED)
      /* allocate lots of untyped memory for tests to use */
      env.num_untypeds = populate_untypeds(untypeds);
      env.untypeds = untypeds;
@@ -94,7 +109,7 @@ index b540758..d5ed473 100644
 +
      /* create a frame that will act as the init data, we can then map that
       * in to target processes */
-@@ -646,7 +669,9 @@ int main(void)
+@@ -646,7 +677,9 @@ int main(void)
      /* Restore the IRQ interface's register function */
      env.ops.irq_ops.irq_register_fn = irq_register_fn_copy;
 -

@@ -69,7 +69,11 @@ remote_timeout_arg=${runtime_limit_ms:--}
 # remote command.  Encode the optional argument explicitly so foreground is
 # never shifted out of the remote script's argument vector.
 remote_extra_arg=${extra_arg:--}
-launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$expected_runner_sha" <<'REMOTE'
+# The expected runner hash is the final argument, so it needs the same sentinel
+# treatment.  Otherwise an unset hash disappears in SSH serialization and the
+# strict remote shell aborts while expanding positional parameter eight.
+remote_runner_sha_arg=${expected_runner_sha:--}
+launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$remote_runner_sha_arg" <<'REMOTE'
 set -euo pipefail
 remote_dir=$1
 image=$2
@@ -81,6 +85,7 @@ foreground=$7
 expected_runner_sha=$8
 [[ "$runtime_limit_ms" == '-' ]] && runtime_limit_ms=
 [[ "$extra_arg" == '-' ]] && extra_arg=
+[[ "$expected_runner_sha" == '-' ]] && expected_runner_sha=
 eval "cd $remote_dir"
 mkdir -p "$HOME/bp-logs"
 lock="$HOME/bp-logs/.control-program.lock"

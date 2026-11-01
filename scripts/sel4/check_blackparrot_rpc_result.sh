@@ -3,8 +3,13 @@
 
 set -euo pipefail
 
+physical=0
+if (($# == 2)) && [[ $1 == --physical ]]; then
+    physical=1
+    shift
+fi
 if (($# != 1)); then
-    echo "usage: $0 OUTPUT.log" >&2
+    echo "usage: $0 [--physical] OUTPUT.log" >&2
     exit 2
 fi
 
@@ -18,10 +23,16 @@ test -r "$log" || { echo "unreadable simulator log: $log" >&2; exit 1; }
 marker_count=0
 hardware_count=0
 software_count=0
+core_pass_count=0
+bsg_pass_count=0
+bsg_fail_count=0
 
 while IFS= read -r line; do
-    # A UART or PTY may preserve CRLF even though the evidence text is exact.
-    line=${line%$'\r'}
+    # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
+    # only trailing carriage returns; do not otherwise normalize evidence.
+    while [[ $line == *$'\r' ]]; do
+        line=${line%$'\r'}
+    done
     if [[ $line == "$marker" ]]; then
         marker_count=$((marker_count + 1))
     elif [[ $line =~ $hardware_re ]]; then
@@ -35,6 +46,9 @@ while IFS= read -r line; do
         software_total=${BASH_REMATCH[2]}
         software_per_call=${BASH_REMATCH[3]}
     fi
+    [[ $line == *"CORE PASS"* ]] && core_pass_count=$((core_pass_count + 1))
+    [[ $line == *"BSG PASS"* ]] && bsg_pass_count=$((bsg_pass_count + 1))
+    [[ $line == *"BSG FAIL"* ]] && bsg_fail_count=$((bsg_fail_count + 1))
 done < "$log"
 
 if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
@@ -49,6 +63,10 @@ if ((hardware_total == 0 || software_total == 0
       || hardware_per_call != hardware_total / hardware_calls
       || software_per_call != software_total / software_calls)); then
     echo "invalid RPC cycle accounting" >&2
+    exit 1
+fi
+if ((physical)) && ((core_pass_count != 1 || bsg_pass_count != 1 || bsg_fail_count != 0)); then
+    echo "invalid physical completion: core_pass=$core_pass_count bsg_pass=$bsg_pass_count bsg_fail=$bsg_fail_count" >&2
     exit 1
 fi
 

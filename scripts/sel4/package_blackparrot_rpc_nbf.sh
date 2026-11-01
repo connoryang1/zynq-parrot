@@ -19,13 +19,16 @@ sel4_cross_prefix=${SEL4_CROSS_PREFIX:-$project_root/install/bin/riscv64-unknown
 opensbi_cross_prefix=${OPENSBI_CROSS_PREFIX:-riscv64-unknown-linux-gnu-}
 opensbi_fw_options=${OPENSBI_FW_OPTIONS:-0x1}
 opensbi_riscv_isa=${OPENSBI_RISCV_ISA:-rv64imafdc_zicsr_zifencei}
-nbf_debug=${NBF_DEBUG:-0}
 base_firmware=${OPENSBI_BASE_FIRMWARE:-}
 nbf_tool=${NBF_TOOL:-$project_root/import/black-parrot/bp_common/software/py/nbf.py}
 overlay="$project_root/linux-tests/opensbi-platform/blackparrot"
 elfloader="$sel4_build/elfloader/elfloader"
 dtb="$sel4_build/kernel/kernel.dtb"
 
+if [ "${NBF_DEBUG:-0}" != 0 ]; then
+    echo "NBF_DEBUG is unsupported for OpenSBI: debug entry requires a dret startup stub" >&2
+    exit 2
+fi
 test -x "${sel4_cross_prefix}objcopy" || { echo "missing ${sel4_cross_prefix}objcopy" >&2; exit 1; }
 test -x "${sel4_cross_prefix}readelf" || { echo "missing ${sel4_cross_prefix}readelf" >&2; exit 1; }
 if [ -z "$base_firmware" ]; then
@@ -37,10 +40,6 @@ fi
 test -f "$nbf_tool" || { echo "missing NBF tool: $nbf_tool" >&2; exit 1; }
 test -f "$elfloader" || { echo "missing seL4 elfloader: $elfloader" >&2; exit 1; }
 test -f "$dtb" || { echo "missing seL4 DTB: $dtb" >&2; exit 1; }
-case "$nbf_debug" in
-    0|1) ;;
-    *) echo "NBF_DEBUG must be 0 or 1" >&2; exit 2 ;;
-esac
 test "$(git -C "$opensbi_repo" rev-parse "$opensbi_revision^{commit}")" = "$opensbi_revision"
 
 mkdir -p "$work_dir"
@@ -132,14 +131,18 @@ fi
 "${sel4_cross_prefix}objcopy" -O verilog "$firmware" "$mem"
 sed -i 's/@8/@0/g' "$mem"
 set -- --skip_zeros --config
-if [ "$nbf_debug" -eq 1 ]; then
-    # The physical control-program path starts through BlackParrot's debug
-    # module; full-core simulation drives reset directly and retains the
-    # historical no-debug image by default.
-    set -- "$@" --debug
-fi
 set -- "$@" --mem "$mem" --ncpus 1
 python3 "$nbf_tool" "$@" > "$raw_nbf"
+
+# OpenSBI has no debug-ROM resume stub.  Keep this invariant adjacent to the
+# generated artifact as well as the environment check above, so a replacement
+# NBF tool cannot silently reintroduce debug entry.
+debug_assert='02_000000000030c000_0000000000000001'
+debug_deassert='02_000000000030c000_0000000000000000'
+if grep -Fqx "$debug_assert" "$raw_nbf" || grep -Fqx "$debug_deassert" "$raw_nbf"; then
+    echo "generated OpenSBI NBF unexpectedly contains a debug-entry preamble" >&2
+    exit 1
+fi
 
 selector='02_0000000000308000_0000000000000001'
 if [ "$(grep -Fxc "$selector" "$raw_nbf")" -ne 1 ]; then
@@ -150,6 +153,6 @@ sed -i "s/^$selector$/02_0000000000308000_0000000000000002/" "$raw_nbf"
 mkdir -p "$(dirname -- "$output")"
 cp "$raw_nbf" "$output"
 
-echo "NBF=$output NBF_DEBUG=$nbf_debug"
+echo "NBF=$output NBF_DEBUG=0"
 echo "PAYLOAD_ENTRY=$payload_entry FW_PAYLOAD_OFFSET=$payload_offset_hex FW_OPTIONS=$opensbi_fw_options"
 sha256sum "$elfloader" "$firmware" "$output"

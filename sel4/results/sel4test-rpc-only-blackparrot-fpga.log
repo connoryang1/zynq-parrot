@@ -1,0 +1,24 @@
+SEL4_RPC_FPGA top_route_commit=b51087a1493a9143713bee45d002b5d9e53861ec blackparrot_commit=acffd05fb26fbb1801c7bce722bb53d410e84e86
+SEL4_RPC_FPGA bitstream_sha256=ca4a6cbd9afd8a4f10064eeb6142dba514dec1c766b595836be099a135331040
+SEL4_RPC_FPGA image_sha256=00f32b9553477faf119c317e57c3a28b9312e1986d67c27a257487be9003b4a3
+SEL4_RPC_FPGA kernel_sha256=ea1b379f196d1156540633444f1f9388b5772acb61def3097c3b6df28d940ca7 elfloader_sha256=00c2a15c28d908edf95b767e8e877d5cf7e2c037946f91af263ad422b846b750
+SEL4_RPC_FPGA control_program_sha256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+SEL4_RPC_FPGA raw_transcript_sha256=5c1703746f7f9e771e2e513a3c2e3dcbe490af963ebff921d7c3c2d08479745e
+SEL4_RPC_POOL count=1 size0=19
+Starting test 1: SEL4IPCRPC0002
+Running test SEL4IPCRPC0002 (Backend-neutral protected RPC over ordinary seL4 IPC)
+BlackParrot RPC bind: caller and server address spaces are not distinct
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=95975 cycles_per_call=374
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=25738 cycles_per_call=3217
+Test SEL4IPCRPC0002 passed
+Test suite passed. 3 tests passed. 0 tests disabled.
+All is well in the universe
+CORE PASS
+BSG PASS
+RUNNER_EXIT=0
+
+# The bind diagnostic is the expected negative same-physical-VSpace test.
+# Board transcript: /home/xilinx/bp-logs/sel4-hardware-rpc-fpga-clean-finish-20261101T200648Z-1685971.log
+# Routed job: /home/coyang/zynq-parrot/logs/fpga/20261101T181111Z-b51087a1
+# Route: WNS +1.037 ns, zero unrouted nets, 51,480/53,200 placed slice LUTs.
+# scripts/sel4/check_blackparrot_rpc_result.sh --physical accepted the raw transcript.

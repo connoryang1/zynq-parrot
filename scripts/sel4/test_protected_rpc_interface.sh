@@ -43,3 +43,15 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
     "$project_root/sel4/tests/protected_rpc_blackparrot_binding_test.c" \
     -o "$build_dir/protected_rpc_blackparrot_binding_test"
 "$build_dir/protected_rpc_blackparrot_binding_test"
+
+# Physical UART capture is nested under script(1) and arrives as CRCRLF.  Keep
+# the strict evidence checker compatible with that transport without relaxing
+# its exact row/count requirements.
+uart_log="$build_dir/physical-uart.log"
+printf '%s\r\r\n' \
+    'SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=95978 cycles_per_call=374' \
+    'SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=25493 cycles_per_call=3186' \
+    'Test SEL4IPCRPC0002 passed' \
+    'halting...INFO:    CORE PASS' \
+    'INFO:    BSG PASS' > "$uart_log"
+"$script_dir/check_blackparrot_rpc_result.sh" --physical "$uart_log"

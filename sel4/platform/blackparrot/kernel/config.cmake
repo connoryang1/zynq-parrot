@@ -4,6 +4,11 @@ declare_platform(blackparrot KernelPlatformBlackParrot PLAT_BLACKPARROT KernelAr
 
 if(KernelPlatformBlackParrot)
     declare_seL4_arch(riscv64)
+    config_option(
+        KernelBlackParrotTestFinish BLACKPARROT_TEST_FINISH
+        "Allow the focused seL4test driver to proxy DebugHalt to SBI shutdown"
+        DEFAULT OFF
+    )
     config_set(KernelRiscVPlatform RISCV_PLAT "blackparrot")
     config_set(KernelPlatformFirstHartID FIRST_HART_ID 0)
     config_set(KernelOpenSBIPlatform OPENSBI_PLATFORM "generic")

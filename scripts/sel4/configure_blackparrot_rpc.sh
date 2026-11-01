@@ -52,6 +52,7 @@ build_dir=$(realpath "$build_dir")
         -DSIMULATION=ON \
         -DRELEASE=ON \
         -DKernelFastpath=ON \
+        -DKernelBlackParrotTestFinish=ON \
         -DSel4testRpcOnly=ON \
         -DSel4testRpcPrinting=ON \
         -DLibSel4MuslcSysMorecoreBytes=65536 \

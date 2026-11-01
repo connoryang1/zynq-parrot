@@ -228,6 +228,13 @@ Acceptance: the matched service passes through both backends; logs prove which
 path ran; invalid, stale, and revoked descriptors fail closed; fallback neither
 loses nor duplicates a request.
 
+Current checkpoint (2026-11-01): this gate passes in full-core simulation and
+on the routed PYNQ-Z2 endpoint. The focused physical run measures 374 cycles
+per hardware call versus 3,217 cycles per automatic post-unbind fallback and
+passes the complete three-test suite plus clean host termination. See RL-063 and
+`sel4/results/sel4test-rpc-only-blackparrot-fpga.log`. Stage 5's matched real
+service workload remains the next paper-facing gate.
+
 #### Initial kernel binding shape
 
 The first implementation uses an experimental endpoint invocation rather than

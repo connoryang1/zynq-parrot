@@ -284,6 +284,19 @@ all seL4 IPC workloads. The exact model and NBF SHA-256 values are
 `4a58a55c...32f26e` and `00428b15...d04d`; normalized evidence is retained in
 [`results/sel4test-rpc-only-blackparrot.log`](results/sel4test-rpc-only-blackparrot.log).
 
+The same no-debug mechanism and routed configuration also pass on the PYNQ-Z2.
+The physical image reports 95,975 cycles for 256 hardware calls (374/call) and
+25,738 cycles for eight fallbacks (3,217/call), an 8.60x focused per-call
+advantage. The suite reports three tests passed and no disabled tests, then a
+test-only release-build syscall proxies to OpenSBI shutdown outside the timed
+region, producing `CORE PASS`, `BSG PASS`, and runner exit zero. Physical image
+SHA-256 is `00f32b95...03b4a3`; routed bitstream SHA-256 is
+`ca4a6cbd...331040`, with +1.037 ns WNS. Normalized physical evidence is retained in
+[`results/sel4test-rpc-only-blackparrot-fpga.log`](results/sel4test-rpc-only-blackparrot-fpga.log).
+`KernelBlackParrotTestFinish` defaults off and is enabled only by the focused
+test configurator; it is not part of the protected-RPC ABI or a production
+userspace shutdown interface.
+
 The host must provide the pinned checkout's Python packages plus CMake, Ninja,
 and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
 the qualified BlackParrot OpenSBI platform with:
@@ -295,9 +308,12 @@ scripts/sel4/package_blackparrot_rpc_nbf.sh \
   /path/to/build /path/to/opensbi-repo /path/to/work sel4-rpc.nbf
 ```
 
-The default image matches the direct-reset full-core simulator. Set
-`NBF_DEBUG=1` when packaging the otherwise identical image for the physical
-`control-program` path; this adds the required debug-module reset preamble.
+The same default, no-debug image is used by the full-core simulator and the
+physical `control-program` path. Do not add `nbf.py --debug`: OpenSBI expects
+ordinary M-mode entry and has no `dret` startup stub. A debug-start image runs
+until its first synchronous feature probe, then redirects to the debug
+exception entry instead of OpenSBI's `mtvec` handler. The packager therefore
+rejects `NBF_DEBUG=1` rather than producing an image that can restart silently.
 
 For FPGA qualification, use `e_bp_unicore_zynqparrot_sel4_cfg`. Its two
 resident threads, four logical contexts, 50-bit branch metadata, and one L2
