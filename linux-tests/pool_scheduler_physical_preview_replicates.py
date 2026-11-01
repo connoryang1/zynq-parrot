@@ -91,7 +91,7 @@ def main():
     parser.add_argument(
         "--timing",
         choices=("early", "late", "instruction", "counter", "trigger",
-                 "wake-trigger"),
+                 "wake-trigger", "wake-data", "wake-early-data"),
         required=True,
     )
     parser.add_argument(

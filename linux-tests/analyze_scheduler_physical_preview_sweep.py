@@ -78,7 +78,8 @@ def analyze(paths, allow_partial=False, bootstrap_samples=20000):
     observed_timings = {timing for timing, _group in cells}
     if (len(observed_timings) == 1
             and observed_timings <= {
-                "instruction", "counter", "trigger", "wake-trigger"
+                "instruction", "counter", "trigger", "wake-trigger",
+                "wake-data", "wake-early-data",
             }):
         timing = next(iter(observed_timings))
         expected = {(timing, group) for group in range(8)}

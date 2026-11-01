@@ -1,0 +1,27 @@
+This alternative experiment reuses data-preview mode one as wakeup instruction
+replay plus scheduler-selection data. It changes only existing mode constants:
+instruction replay moves from mode six to mode one and the selection trigger is
+suppressed for mode one, while the existing early physical-data hook is
+unchanged. Apply it to the mode-six base image without patch 0010.
+
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4342,7 +4342,7 @@ out:
+ #ifdef CONFIG_RISCV
+-	/* Mode six launches only after a real wakeup. Unlike selection-time mode
+-	 * five, this can overlap replay with the waker's remaining kernel work. */
+-	if (success && READ_ONCE(p->thread.bp_preview_phys_mode) == 6)
++	/* Mode one launches replay after a real wakeup and retains its existing
++	 * scheduler-selection physical-data hints for the incoming task. */
++	if (success && READ_ONCE(p->thread.bp_preview_phys_mode) == 1)
+ 		asm volatile("csrw 0x5c0, zero" ::: "memory");
+ #endif
+ 
+@@ -6684,7 +6684,7 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 
+ 		if (bp_preview_mode && bp_preview_mode != 4
+-		    && bp_preview_mode != 6) {
++		    && bp_preview_mode != 1) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count

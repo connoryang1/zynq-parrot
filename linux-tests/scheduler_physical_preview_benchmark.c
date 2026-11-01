@@ -18,6 +18,10 @@
  * early instruction trigger plus physical data hints through the late
  * pre-register-switch hook; its counted hook distinguishes the image at run
  * time without adding a new mode value that would shift replay-table symbols.
+ * The wake-early-data experiment instead reuses mode one: instruction replay
+ * starts at successful wakeup, then its existing physical hints issue at
+ * scheduler selection. The distinct CLI name keeps it separate from the
+ * historical mode-one image whose instruction replay also started at selection.
  * An optional isolated replay-state executes fence.i in both arms before each
  * handoff so completed advisory lines cannot leak from an enabled trial into
  * a later disabled trial. The historical persistent state remains available
@@ -241,7 +245,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 8) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled] [active-lines-1..4]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled] [active-lines-1..4]\n",
 			argv[0]);
 		return 2;
 	}
@@ -267,6 +271,8 @@ int main(int argc, char **argv)
 			enable_mode = 6;
 		else if (!strcmp(argv[2], "wake-data"))
 			enable_mode = 6, wake_data = 1;
+		else if (!strcmp(argv[2], "wake-early-data"))
+			enable_mode = 1, wake_data = 1;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -318,6 +324,7 @@ int main(int argc, char **argv)
 	}
 	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s\n",
 	       group, group * max_lines * line_bytes, active_lines,
+	       wake_data && enable_mode == 1 ? "wake-early-data" :
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
 	       enable_mode == 3 ? "instruction" :

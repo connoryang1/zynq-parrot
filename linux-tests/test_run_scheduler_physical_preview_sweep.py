@@ -172,6 +172,20 @@ class CellPlanTest(unittest.TestCase):
             [(group, "wake-data") for group in range(8)],
         )
 
+    def test_wake_early_data_uses_one_cell_per_group(self):
+        self.assertEqual(
+            selected_cells(0, "wake-early-data"),
+            [(group, "wake-early-data") for group in range(8)],
+        )
+        command = benchmark_command(
+            7, "wake-early-data", "target", "fifo", "persistent",
+            "enabled", 1,
+        )
+        self.assertIn(
+            " 7 wake-early-data target fifo persistent enabled 1; rc=$?",
+            command,
+        )
+
     def test_invalid_recovery_boundary_is_rejected(self):
         for start in (-1, 16):
             with self.assertRaisesRegex(ValueError, "start cell"):

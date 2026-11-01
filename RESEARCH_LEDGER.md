@@ -996,6 +996,13 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Evidence:** every arm binds `lines=1`, exact NBF/ELF/transfer/control/bitstream identities, expected hook counts, 512 ordered rows/tails, zero retries, kernel-failure screening, and terminal child/parent/core/host PASS. Analysis SHA-256 is `0a644a3b...67aec`; exact artifacts are under `logs/wake-data-line-count-20261101/`.
 - **Meaning:** one physical hint produces at least as much resolved local-load saving as the four-line case while reducing CSR issue count, yet still fails to move the noisy first-use boundary. Four CSR writes are therefore not the sole cause of the missing resume-latency gain. The next bounded candidate is the same one-line footprint issued earlier in scheduling while retaining successful-wakeup instruction replay and table/layout identity.
 
+### RL-105 — Earlier one-line data timing is prepared without moving the replay table
+
+- **Status:** exact FPGA candidate and fixed-arm protocol prepared; physical result pending
+- **Construction:** mode one now denotes successful-wakeup instruction replay plus its existing scheduler-selection physical-data hook. Three fail-closed NBF record replacements change only `li a5,6` to `li a5,1` at physical `0x8023dc0e`, `0x8023dc76`, and `0x80a13b58`. Complete-file comparison finds exactly six changed ASCII characters. A source build preserves the audited `try_to_wake_up`, `futex_wake`, `__riscv_sys_futex`, and `__schedule` addresses and is used only as a semantic locator; the deployable image retains every other accepted byte.
+- **Prepared evidence:** candidate NBF/ELF/transfer hashes are `ae292477...9005c`, `8333e8d1...7c09`, and `6ce18f6c...81ca`. Streamed decompression of durable archive `3644bb1d...949f` reproduces the NBF. The transfer reconstructs the ELF, 79 harness tests and all 124 discovered Linux tests pass, and exact construction evidence is under `logs/wake-early-data-one-line-20261101/`.
+- **Next gate:** four recovery-qualified FPGA boots in opposite fixed-arm order use group seven, one target line, FIFO scheduling, and persistent replay. Wake-to-load is primary. A useful local load without resolved first-use improvement would reject scheduler selection as sufficient data-hint lead time and justify investigating true wakeup-time data issue rather than further line-count tuning.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Earlier-data FPGA candidate prepared — 2026-11-01:** built a size-neutral mode-one image that retains wakeup instruction replay and moves the same one-line physical hint from the late hook to scheduler selection through exactly three audited compressed-immediate changes. The durable NBF, distinct benchmark mode, fixed-arm protocol, and exact construction audit are under `logs/wake-early-data-one-line-20261101/`; 79 harness and 124 discovered Linux tests pass, with the four fresh FPGA arms pending (RL-105).
+
 - **Physical-preview board runs now bind the bitstream — 2026-11-01:** extended the serialized data/joint sweep runner with the same optional fail-closed loaded-BIT SHA-256 gate used by the accepted instruction A/B, and retained the verified identity in each status file. Focused tests and all 112 discovered Linux tests pass; this closes the final provenance gap before reusing the timing-clean corrected route for data-only and joint feasibility.
 
 - **Five-slot comparator also exceeds PYNQ capacity — 2026-11-01:** the older resident-overtake-only `0fb3da28` route is terminal `FAIL` at 55,684 LUTs and 11,524 required versus 10,938 available slices. The final same-edge checkpoint adds only 16 synthesized LUTs and eleven required slices, so both ten-context/five-slot endpoints are already over capacity and cannot form a routed A/B; exact comparator artifacts are preserved with the final route evidence (`logs/icache-replay-same-cycle-demand-20261101/`, RL-098).

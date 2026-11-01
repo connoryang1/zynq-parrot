@@ -1,0 +1,61 @@
+{
+  "purpose": "Audit the size-neutral mode-one wake-replay plus early-data NBF construction before FPGA use.",
+  "top_level_source_commit": "f42c6d65cbdf1fa131b52539c031f3db4fc3b390",
+  "blackparrot_source_commit": "174f2787a05ca48a6e4362fc59dc462d3d95572c",
+  "base_nbf_sha256": "93b2e29de83be627631a6cb6e78b2a5529f9a42c89cb365894cfe7138a028629",
+  "candidate_nbf_sha256": "ae2924776233446e41a25e44866a41e5171efc76575216950104b0432ad9005c",
+  "candidate_nbf_xz_sha256": "3644bb1d547d07ea9f7b67935d9f76fd472d1683a4fa53b289dd0a2daa62949f",
+  "replacements": [
+    {
+      "address": "0x000000008023dc08",
+      "old_data": "0x4799b507c7035098",
+      "new_data": "0x4785b507c7035098",
+      "instruction_address": "0x8023dc0e",
+      "semantic_change": "li a5,6 -> li a5,1"
+    },
+    {
+      "address": "0x000000008023dc70",
+      "old_data": "0x4799b507c7035098",
+      "new_data": "0x4785b507c7035098",
+      "instruction_address": "0x8023dc76",
+      "semantic_change": "li a5,6 -> li a5,1"
+    },
+    {
+      "address": "0x0000000080a13b58",
+      "old_data": "0x1073e4f705e34799",
+      "new_data": "0x1073e4f705e34785",
+      "instruction_address": "0x80a13b58",
+      "semantic_change": "li a5,6 -> li a5,1"
+    }
+  ],
+  "one_indexed_changed_file_offsets": [
+    1782424,
+    1782425,
+    1782905,
+    1782906,
+    39783212,
+    39783213
+  ],
+  "source_semantic_locator": {
+    "vmlinux_sha256": "018a63c9a0844821caad539012f99174b974fdff431fad7138456a1d3c229668",
+    "vmlinux_bin_sha256": "4dbdf731e89616b847c3f598b20841468c8cae12188cc84cd2a61403a49c1fd7",
+    "system_map_sha256": "220fc09212e68522faf4846b122a2df7179290be236b508e0ca73146e0cf08dc",
+    "symbols": {
+      "try_to_wake_up": "0xffffffff8003da2e",
+      "__riscv_sys_futex": "0xffffffff80098036",
+      "futex_wake": "0xffffffff80099cbc",
+      "__schedule": "0xffffffff80813842"
+    },
+    "use": "Semantic and address audit only; no source-built bytes were transplanted."
+  },
+  "benchmark_elf_sha256": "8333e8d1517c85734a8b580e3d61041450b1e438662d89ce74a7383fe6027c09",
+  "benchmark_transfer_sha256": "6ce18f6c76eba4ac2e17c809a63fecbb81301d37f4711861119f6771b45181ca",
+  "transfer_chunks": 47,
+  "validation": {
+    "focused_tests": 57,
+    "harness_tests": 79,
+    "discovered_tests": 124,
+    "scratch_source_restored": true,
+    "transfer_reconstructs_elf": true
+  }
+}

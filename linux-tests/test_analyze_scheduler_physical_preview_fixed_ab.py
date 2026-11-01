@@ -183,6 +183,17 @@ class FixedArmAnalyzerTest(unittest.TestCase):
                            "wake-data", 6, "target")
             self.assertEqual(run["trials"], 512)
 
+    def test_wakeup_replay_early_data_mode_requires_one_hook(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = write_run(root, "enabled", "enabled", 90,
+                             timing="wake-early-data", mode=1,
+                             footprint="target", lines_count=1)
+            from analyze_scheduler_physical_preview_fixed_ab import load_run
+            run = load_run(path, "enabled", IDENTITY, 7,
+                           "wake-early-data", 1, "target", 1)
+            self.assertEqual(run["trials"], 512)
+
     def test_nondefault_line_count_is_bound_in_status_and_config(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

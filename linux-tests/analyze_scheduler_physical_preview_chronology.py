@@ -122,7 +122,8 @@ def main():
     parser.add_argument("transcript", nargs="+", type=Path)
     parser.add_argument("--timing", required=True,
                         choices=("early", "late", "instruction", "counter",
-                                 "trigger", "wake-trigger"))
+                                 "trigger", "wake-trigger", "wake-data",
+                                 "wake-early-data"))
     parser.add_argument(
         "--samples", type=int, default=2000,
         help=("exploratory bootstrap count; the primary pooled effect keeps "

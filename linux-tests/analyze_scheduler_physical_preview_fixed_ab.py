@@ -193,7 +193,8 @@ def parse_args(argv=None):
     parser.add_argument("--group", type=int, choices=range(8), default=7)
     parser.add_argument("--timing", choices=("early", "late", "instruction",
                                               "counter", "trigger",
-                                              "wake-trigger", "wake-data"),
+                                              "wake-trigger", "wake-data",
+                                              "wake-early-data"),
                         default="wake-trigger")
     parser.add_argument("--mode", type=int, choices=range(1, 7), default=6)
     parser.add_argument("--footprint", choices=("target", "hot-proxy"),

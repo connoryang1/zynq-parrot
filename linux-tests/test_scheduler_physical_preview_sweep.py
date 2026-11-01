@@ -84,6 +84,21 @@ class SweepAnalyzerTest(unittest.TestCase):
     def test_single_cell_analyzer_accepts_wakeup_trigger_mode(self):
         self.assertEqual(TIMING_MODES["wake-trigger"], 6)
         self.assertEqual(TIMING_MODES["wake-data"], 6)
+        self.assertEqual(TIMING_MODES["wake-early-data"], 1)
+
+    def test_wakeup_early_data_matrix_requires_counted_hooks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "wake-early-data.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="wake-early-data")
+                for group in range(8)
+            ))
+            result = analyze([path], bootstrap_samples=100)
+        self.assertEqual(
+            result["pooled"]["wake-early-data"]["load_cycles"]
+            ["stratified_median_saved_cycles"],
+            20.0,
+        )
 
     def test_partial_cell_reports_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:
