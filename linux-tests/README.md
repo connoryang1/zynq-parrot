@@ -610,6 +610,11 @@ An optional fourth argument, `fifo`, places the parent and child at equal
 pipe operations. Use the runner's matching `--policy fifo` option only as a
 best-case noise-control experiment, and report it separately from the default
 normal Linux scheduling policy.
+The timing value `instruction` selects kernel mode three: the scheduler writes
+the instruction-prefix trigger and increments the one-switch counter but skips
+all physical data-hint CSR writes. Run its eight-group plan with
+`--only-timing instruction`; its recovery `--start-cell` index is then a group
+number in `0..7`, unlike the 16-cell early/late plan index.
 
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once

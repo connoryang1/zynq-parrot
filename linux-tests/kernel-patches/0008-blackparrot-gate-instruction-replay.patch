@@ -1,10 +1,12 @@
 This patch gates the shared instruction-prefix launch with the incoming task's
 existing preview mode. It turns the physical benchmark's mode-zero arm into a
 true instruction-and-data-disabled control while modes one and two enable both.
+Mode three triggers instruction replay alone and accounts for that selection in
+the existing hook counter so the benchmark can retain its one-switch filter.
 
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -6649,10 +6649,12 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+@@ -6649,10 +6649,21 @@ static void __sched notrace __schedule(unsigned int sched_mode)
  
  	if (likely(prev != next)) {
  #ifdef CONFIG_RISCV
@@ -15,8 +17,17 @@ true instruction-and-data-disabled control while modes one and two enable both.
 +		 * Launch only for an actual task change and an enabled incoming task.
  		 */
 -		asm volatile("csrw 0x5c0, zero" ::: "memory");
-+		if (READ_ONCE(next->thread.bp_preview_phys_mode))
++		unsigned char bp_preview_mode =
++			READ_ONCE(next->thread.bp_preview_phys_mode);
++
++		if (bp_preview_mode) {
 +			asm volatile("csrw 0x5c0, zero" ::: "memory");
++			/* Mode three isolates instruction replay: count this selection
++			 * without issuing any physical data-hint CSR writes. */
++			if (bp_preview_mode == 3)
++				WRITE_ONCE(next->thread.bp_preview_hook_count,
++					   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
++		}
  #endif
  
  		rq->nr_switches++;

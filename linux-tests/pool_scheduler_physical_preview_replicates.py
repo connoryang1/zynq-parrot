@@ -87,7 +87,8 @@ def pool(replicate_paths, timing, samples=20000):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--timing", choices=("early", "late"), required=True)
+    parser.add_argument("--timing", choices=("early", "late", "instruction"),
+                        required=True)
     parser.add_argument(
         "--replicate", nargs="+", action="append", required=True, type=Path,
         help="one complete replication, potentially split across log files",

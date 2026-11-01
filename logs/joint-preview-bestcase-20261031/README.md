@@ -535,6 +535,47 @@ guest launched. The failed prelaunch log/status are retained; the exact
 `5fe0d96f...969f` image was copied back, followed by remote `sync` and two
 matching SHA checks, before the accepted run.
 
+## True instruction-only runtime isolation
+
+Runtime mode 3 triggers the shared instruction prefix and increments the
+existing one-switch hook counter without executing any of the four physical
+data-hint CSR writes. The rebuilt kernel embeds the exact accepted rootfs; its
+`vmlinux.bin` SHA-256 is `62f9058f...b6c6`. A reconstructed old-payload
+OpenSBI build and complete NBF pipeline first reproduced accepted prefix-12 and
+count-zero hashes byte-for-byte. The new exact-kernel images are
+`9d089f49...e094` and `d449ee97...717b`; their 1,861,851 Linux memory records
+and 11 boot/control records compare exactly. Linux and OpenSBI executable CSR
+collision scans pass. The dynamic benchmark and transfer hashes are
+`c54cefb7...944c` and `5a682f22...333c`.
+
+Both equal-priority FIFO matrices completed all eight set groups in one boot,
+with 4,096 balanced rows and tails, exact hook deltas, runner PASS, and final
+CORE/BSG PASS. Prefix-12 costs 280 wake-to-load cycles with interval
+`[10.5,454.25]`; count zero costs 200.75 cycles with interval
+`[-1.5,361]`. Prefix-12 minus count zero is unresolved at `-79.25
+[-324.5,236]`, so replay itself has no demonstrated first-resume effect. The
+common empty-table trigger/counter path explains most remaining overhead. The
+roundtrip contrast favors prefix-12 by `529 [-32.75,1217.75]` cycles but is
+unresolved and does not accelerate the incoming task. Strict analyses and raw
+evidence are in `physical-sweep/instruction-only-*.json` and
+`physical-sweep/physical-sweep-instruction-only-*.log.gz`.
+
+Preparation exposed several fail-closed workflow issues. An invalid root-level
+Python module name executed no tests; direct file invocations then passed. A
+rejected temporary-cleanup command and a JavaScript reserved-word error both
+stopped before mutation. OpenSBI did not notice a changed `PAYLOAD_PATH` in an
+incremental build; the embedded-payload comparison caught the stale output,
+and a separate `make clean` plus full rebuild fixed it. GNU Make directory
+banners polluted the first redirected transfer file; local execution returned
+127, and `--no-print-directory` produced a byte-exact reconstruction. A quoted
+remote `awk` check failed before deletion; `sha256sum -c` verified the exact
+board file before its corrected removal. The board's two old prefix/count-zero
+NBF duplicates were deleted only after matching retained local hashes, freeing
+space for atomic staging; both remain recoverable locally. A strictness-test
+edit initially changed the partial-cell call site instead of the new full
+instruction matrix; diff audit caught it, the invalid in-flight suite was
+interrupted, and the corrected complete suite passed all 13 tests.
+
 ## Pipe experiment workflow corrections
 
 During the later hot-proxy preparation, a combined build-and-test command ran

@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 5) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late] [target|hot-proxy] [normal|fifo]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction] [target|hot-proxy] [normal|fifo]\n",
 			argv[0]);
 		return 2;
 	}
@@ -199,6 +199,8 @@ int main(int argc, char **argv)
 			enable_mode = 1;
 		else if (!strcmp(argv[2], "late"))
 			enable_mode = 2;
+		else if (!strcmp(argv[2], "instruction"))
+			enable_mode = 3;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -222,7 +224,8 @@ int main(int argc, char **argv)
 	}
 	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s\n",
 	       group, group * 4 * line_bytes, lines,
-	       enable_mode == 1 ? "early" : "late", enable_mode,
+	       enable_mode == 1 ? "early" :
+	       enable_mode == 2 ? "late" : "instruction", enable_mode,
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal");
 
 	if (fifo) {

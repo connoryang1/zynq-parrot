@@ -108,7 +108,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--control", nargs="+", required=True, type=Path)
     parser.add_argument("--candidate", nargs="+", required=True, type=Path)
-    parser.add_argument("--timing", choices=("early", "late"),
+    parser.add_argument("--timing", choices=("early", "late", "instruction"),
                         help="compare one predeclared timing instead of both")
     parser.add_argument("--samples", type=int, default=20000)
     args = parser.parse_args()

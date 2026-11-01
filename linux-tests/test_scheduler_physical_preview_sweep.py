@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from analyze_scheduler_physical_preview_sweep import analyze
+from analyze_scheduler_physical_preview_benchmark import TIMING_MODES
 from compare_scheduler_physical_preview_sweeps import compare
 from pool_scheduler_physical_preview_replicates import pool
 from analyze_scheduler_physical_preview_tail import (
@@ -17,7 +18,7 @@ from analyze_scheduler_physical_preview_tail import (
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
                core_marker="CORE PASS", saved_load_cycles=20,
                saved_return_cycles=0, include_tail=False):
-    mode_value = 2 if timing == "late" else 1
+    mode_value = {"early": 1, "late": 2, "instruction": 3}[timing]
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
         f"lines=4 timing={timing} mode={mode_value}",
@@ -46,6 +47,9 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
 
 
 class SweepAnalyzerTest(unittest.TestCase):
+    def test_single_cell_analyzer_accepts_instruction_mode(self):
+        self.assertEqual(TIMING_MODES["instruction"], 3)
+
     def test_partial_cell_reports_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
@@ -55,6 +59,20 @@ class SweepAnalyzerTest(unittest.TestCase):
         self.assertEqual(
             result["pooled"]["late"]["load_cycles"]
             ["stratified_median_saved_cycles"], 20.0)
+
+    def test_instruction_only_matrix_is_analyzable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "instruction.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="instruction")
+                for group in range(8)
+            ))
+            result = analyze([path])
+        self.assertEqual(
+            result["pooled"]["instruction"]["load_cycles"]
+            ["stratified_median_saved_cycles"],
+            20.0,
+        )
 
     def test_incomplete_sweep_is_rejected_by_default(self):
         with tempfile.TemporaryDirectory() as directory:

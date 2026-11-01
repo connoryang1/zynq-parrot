@@ -13,8 +13,9 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_entry=(\d+) load_cycles=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
-                    r"lines=(\d+) timing=(early|late) mode=(\d+)")
+                    r"lines=(\d+) timing=(early|late|instruction) mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
+TIMING_MODES = {"early": 1, "late": 2, "instruction": 3}
 
 
 def percentile(values, fraction):
@@ -87,7 +88,7 @@ def main():
     timing = configs[0][3]
     mode = int(configs[0][4])
     if (group > 7 or first_offset != group * 256 or lines != 4
-            or mode != {"early": 1, "late": 2}[timing]):
+            or mode != TIMING_MODES[timing]):
         raise SystemExit("invalid benchmark configuration marker")
     rows = []
     for match in ROW.finditer(text):

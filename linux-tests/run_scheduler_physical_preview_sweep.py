@@ -29,6 +29,13 @@ def cell_plan():
 
 def selected_cells(start_cell, only_timing=None):
     """Return a disjoint suffix, optionally filtered to one timing."""
+    if only_timing == "instruction":
+        cells = [(group, "instruction") for group in range(8)]
+        if start_cell < 0 or start_cell >= len(cells):
+            raise ValueError(
+                f"start cell must be in 0..{len(cells) - 1} for instruction"
+            )
+        return cells[start_cell:]
     cells = cell_plan()
     if start_cell < 0 or start_cell >= len(cells):
         raise ValueError(f"start cell must be in 0..{len(cells) - 1}")
@@ -78,7 +85,8 @@ def parse_args(argv=None):
                         default="target")
     parser.add_argument("--policy", choices=("normal", "fifo"),
                         default="normal")
-    parser.add_argument("--only-timing", choices=("early", "late"))
+    parser.add_argument("--only-timing",
+                        choices=("early", "late", "instruction"))
     parser.add_argument("--start-cell", type=int, default=0,
                         help="zero-based cell-plan index for a recovered suffix run")
     parser.add_argument("--print-plan", action="store_true")

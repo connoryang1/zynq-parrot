@@ -39,7 +39,7 @@ def parse_segments(text, source):
         timing = match.group(4)
         mode = int(match.group(5))
         if (group > 7 or first_offset != group * 256 or lines != 4
-                or mode != {"early": 1, "late": 2}[timing]):
+                or mode != {"early": 1, "late": 2, "instruction": 3}[timing]):
             raise ValueError(f"{source}: invalid configuration marker {match.group(0)}")
         rows = []
         for row_match in ROW.finditer(segment):
@@ -72,8 +72,12 @@ def analyze(paths, allow_partial=False):
             if key in cells:
                 raise ValueError(f"duplicate timing/group cell: {key}")
             cells[key] = {"rows": rows, "summary": result}
-    expected = {(timing, group) for timing in ("early", "late")
-                for group in range(8)}
+    observed_timings = {timing for timing, _group in cells}
+    if observed_timings == {"instruction"}:
+        expected = {("instruction", group) for group in range(8)}
+    else:
+        expected = {(timing, group) for timing in ("early", "late")
+                    for group in range(8)}
     if not allow_partial and set(cells) != expected:
         missing = sorted(expected - set(cells))
         extra = sorted(set(cells) - expected)
@@ -88,7 +92,7 @@ def analyze(paths, allow_partial=False):
     for key in sorted(cells):
         timing, group = key
         output["cells"][f"{timing}_{group}"] = cells[key]["summary"]
-    for timing in ("early", "late"):
+    for timing in ("early", "late", "instruction"):
         timing_cells = {group: cells[(timing, group)] for group in range(8)
                         if (timing, group) in cells}
         if not timing_cells:
