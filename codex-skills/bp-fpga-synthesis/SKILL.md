@@ -93,8 +93,12 @@ It deliberately does not invoke sudo or load the overlay.
 
 For unattended overlay reloads, install the fixed-path board helper once with
 `sudo scripts/install_pynq_overlay_loader.sh` on the board. Then run
-`scripts/load_pynq_overlay.sh <ssh-host>` from the VM after every stage, interrupted run, or power
-cycle. The sudo rule grants only `/usr/local/sbin/load-blackparrot-overlay`; never grant
+`PYNQ_BITSTREAM_SHA256=<verified-sha> scripts/load_pynq_overlay.sh <ssh-host>`
+from the VM after every stage, interrupted run, or power cycle. The loader and
+serial runner share the board lock, and staging refuses to replace artifacts
+while that lock is held. Give the serial runner the same
+`PYNQ_BITSTREAM_SHA256` so it rechecks the mutable fixed-path bitstream at the
+final launch boundary. The sudo rule grants only `/usr/local/sbin/load-blackparrot-overlay`; never grant
 passwordless access to Python, a shell, `make`, or arbitrary overlay paths.
 
 If board recovery needs a power cycle, first check the environment for

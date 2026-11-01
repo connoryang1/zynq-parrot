@@ -125,10 +125,11 @@ HWH. It does not grant passwordless Python, shell, `make`, or arbitrary-path exe
 the `xilinx` user can replace the fixed-path bitstream, this deliberately grants unattended FPGA
 programming capability; do not use the rule on a shared or untrusted board account.
 
-After staging a verified package, load it from the VM with:
+After staging a verified package, load it from the VM with the verified hash:
 
 ```bash
-codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh xilinx@192.168.4.35
+PYNQ_BITSTREAM_SHA256=<BOARD_BIT_SHA256> \
+  codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh xilinx@192.168.4.35
 ```
 
 Require `LOADING_BIT_SHA256` to match the staged `BOARD_BIT_SHA256` and require both
@@ -144,9 +145,15 @@ board-side lock, rejects a legacy/manual runner, retains the transcript under `~
 waits for the exact launched PID to write its exit status before it returns:
 
 ```bash
-codex-skills/bp-fpga-synthesis/scripts/run_pynq_serial.sh \
-  xilinx@<board> <program>.nbf
+PYNQ_BITSTREAM_SHA256=<BOARD_BIT_SHA256> \
+  codex-skills/bp-fpga-synthesis/scripts/run_pynq_serial.sh \
+    xilinx@<board> <program>.nbf
 ```
+
+The loader, runner, and staging helper use the same board lock. The runner
+acquires it before hashing the NBF, control program, and fixed-path bitstream,
+so a cooperating deployment cannot replace those artifacts between validation
+and launch.
 
 Do not schedule a delayed remote launch behind a local timeout: the local caller can disappear
 while its remote command later starts, causing two runners to compete for PL DRAM and GP ports.

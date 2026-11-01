@@ -318,8 +318,11 @@ construction deliberately clears `scounteren`, so that instruction traps and
 version 1 has no server-fault continuation. The first physical attempt proved
 that failure mode. A later attempt is also rejected because another board user
 replaced the staged bitstream before launch, producing an expected missing-CSR
-signature. A clean physical component run on the pinned `ca4a6c...31040`
-bitstream remains required before component numbers are reported.
+signature. Deployment now shares one board lock across staging, overlay load,
+and launch and pins the bitstream hash again at the launch boundary; that final
+check caught a second external replacement before any target ran. A clean
+physical component run on the pinned `ca4a6c...31040` bitstream remains
+required before component numbers are reported.
 
 ### Stage 6 — Generalization
 

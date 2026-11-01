@@ -31,6 +31,14 @@ expected_runner_sha=${PYNQ_CONTROL_PROGRAM_SHA256:-}
   echo "FAIL: PYNQ_CONTROL_PROGRAM_SHA256 must be a 64-character SHA-256" >&2
   exit 2
 }
+# Pin the routed image at the final launch boundary. Staging and overlay load
+# checks occur earlier and another board user can replace the fixed-path files
+# between those operations and this runner.
+expected_bit_sha=${PYNQ_BITSTREAM_SHA256:-}
+[[ -z "$expected_bit_sha" || "$expected_bit_sha" =~ ^[0-9a-fA-F]{64}$ ]] || {
+  echo "FAIL: PYNQ_BITSTREAM_SHA256 must be a 64-character SHA-256" >&2
+  exit 2
+}
 # A full-width register-state terminal probe writes into a fixed DRAM scratch
 # area, then asks ps.cpp to dump that bounded range after the target stops.
 # Keep the sole optional control-program argument syntactically narrow: this
@@ -69,11 +77,11 @@ remote_timeout_arg=${runtime_limit_ms:--}
 # remote command.  Encode the optional argument explicitly so foreground is
 # never shifted out of the remote script's argument vector.
 remote_extra_arg=${extra_arg:--}
-# The expected runner hash is the final argument, so it needs the same sentinel
-# treatment.  Otherwise an unset hash disappears in SSH serialization and the
-# strict remote shell aborts while expanding positional parameter eight.
+# Optional hashes need sentinels because SSH command serialization can drop an
+# empty trailing argument and shift the strict remote parameter vector.
 remote_runner_sha_arg=${expected_runner_sha:--}
-launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$remote_runner_sha_arg" <<'REMOTE'
+remote_bit_sha_arg=${expected_bit_sha:--}
+launch_output=$(ssh -o BatchMode=yes "$ssh_host" bash -s -- "$remote_dir" "$image" "$run_id" "$remote_timeout_arg" "$expected_sha" "$remote_extra_arg" "$foreground" "$remote_runner_sha_arg" "$remote_bit_sha_arg" <<'REMOTE'
 set -euo pipefail
 remote_dir=$1
 image=$2
@@ -83,9 +91,11 @@ expected_sha=$5
 extra_arg=$6
 foreground=$7
 expected_runner_sha=$8
+expected_bit_sha=$9
 [[ "$runtime_limit_ms" == '-' ]] && runtime_limit_ms=
 [[ "$extra_arg" == '-' ]] && extra_arg=
 [[ "$expected_runner_sha" == '-' ]] && expected_runner_sha=
+[[ "$expected_bit_sha" == '-' ]] && expected_bit_sha=
 eval "cd $remote_dir"
 mkdir -p "$HOME/bp-logs"
 lock="$HOME/bp-logs/.control-program.lock"
@@ -116,6 +126,20 @@ if pgrep -x control-program >/dev/null || pgrep -f '[s]cript .*control-program' 
   pgrep -af 'control-program' || true
   exit 75
 fi
+
+# Acquire ownership before checking mutable artifacts. Cooperating staging and
+# overlay helpers reject this directory, closing their stage/load-to-run race.
+mkdir "$lock" || { echo "ACTIVE_RUNNER"; exit 75; }
+printf '%s\n' "$$" > "$lock/owner"
+lock_owned=1
+cleanup_lock() {
+  if [[ "$lock_owned" == 1 ]]; then
+    rm -f "$lock/owner"
+    rmdir "$lock" 2>/dev/null || true
+  fi
+}
+trap cleanup_lock EXIT HUP INT TERM
+
 [[ -f "$image" ]] || { echo "MISSING_NBF=$image"; exit 66; }
 actual_sha=$(sha256sum "$image" | awk '{print $1}')
 [[ "$actual_sha" == "$expected_sha" ]] || {
@@ -128,9 +152,20 @@ if [[ -n "$expected_runner_sha" && "$actual_runner_sha" != "$expected_runner_sha
   exit 64
 fi
 echo "CONTROL_PROGRAM_SHA256=$actual_runner_sha"
+if [[ -n "$expected_bit_sha" ]]; then
+  bitstream=blackparrot_bd_1.bit
+  [[ -f "$bitstream" ]] || {
+    echo "MISSING_BITSTREAM=$bitstream"
+    exit 63
+  }
+  actual_bit_sha=$(sha256sum "$bitstream" | awk '{print $1}')
+  [[ "$actual_bit_sha" == "$expected_bit_sha" ]] || {
+    echo "BITSTREAM_SHA_MISMATCH=$bitstream expected=$expected_bit_sha actual=$actual_bit_sha"
+    exit 62
+  }
+  echo "BITSTREAM_SHA256=$actual_bit_sha"
+fi
 
-# mkdir is atomic, closing the race between two simultaneous SSH launchers.
-mkdir "$lock" || { echo "ACTIVE_RUNNER"; exit 75; }
 rm -f "$log" "$status" "$pidfile"
 if [[ "$foreground" == 1 ]]; then
   # A foreground diagnostic is resilient to PYNQ's SSH-session child reaper.
@@ -149,7 +184,10 @@ if [[ "$foreground" == 1 ]]; then
   rc=$?
   set -e
   printf 'RUNNER_EXIT=%s\n' "$rc" > "$status"
+  rm -f "$lock/owner"
   rmdir "$lock"
+  lock_owned=0
+  trap - EXIT HUP INT TERM
   exit "$rc"
 fi
 nohup setsid --wait env RUN_LOG="$log" RUN_STATUS="$status" RUN_LOCK="$lock" \
@@ -172,6 +210,8 @@ runner_pid=$!
 printf '%s\n' "$runner_pid" > "$lock/owner"
 printf '%s\n' "$runner_pid" > "$pidfile"
 printf 'RUNNER_STARTED_PID=%s LOG=%s STATUS=%s\n' "$runner_pid" "$log" "$status"
+lock_owned=0
+trap - EXIT HUP INT TERM
 REMOTE
 )
 launch_rc=$?
