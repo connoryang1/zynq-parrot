@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a seL4 simulate script, capture its transcript, and exit QEMU on success."""
+"""Run seL4 under QEMU and stop on either its success or failure gate."""
 
 import argparse
 from pathlib import Path
@@ -27,7 +27,12 @@ def main() -> int:
             timeout=args.timeout,
         )
         child.logfile_read = transcript
-        outcome = child.expect_exact([args.marker, pexpect.EOF, pexpect.TIMEOUT])
+        failure_markers = [
+            "*** FAILURES DETECTED ***",
+            "Failed to allocate and map book keeping frames during bootstrapping",
+        ]
+        outcomes = [args.marker, *failure_markers, pexpect.EOF, pexpect.TIMEOUT]
+        outcome = child.expect_exact(outcomes)
         if outcome == 0:
             child.send("\x01x")
             child.expect(pexpect.EOF, timeout=10)
@@ -35,8 +40,20 @@ def main() -> int:
             print(args.marker)
             return 0 if child.exitstatus in (0, None) else child.exitstatus
 
+        if 1 <= outcome <= len(failure_markers):
+            marker = failure_markers[outcome - 1]
+            child.send("\x01x")
+            try:
+                child.expect(pexpect.EOF, timeout=10)
+            except pexpect.TIMEOUT:
+                child.close(force=True)
+            else:
+                child.close()
+            print(f"simulate reported failure marker: {marker}", file=sys.stderr)
+            return 1
+
         child.close(force=True)
-        if outcome == 1:
+        if outcome == len(failure_markers) + 1:
             print("simulate exited before its success marker", file=sys.stderr)
         else:
             print("simulate timed out before its success marker", file=sys.stderr)

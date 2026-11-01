@@ -61,6 +61,12 @@ static bool_t bp_rpc_tcb_satp(tcb_t *tcb, word_t *satp_value,
         return false;
     }
     pte_t *root = PTE_PTR(cap_page_table_cap_get_capPTBasePtr(root_cap));
+    findVSpaceForASID_ret_t found = findVSpaceForASID(asid);
+    if (found.status != EXCEPTION_NONE || found.vspace_root != root) {
+        /* A copied page-table cap retains its mapped fields after the ASID is
+         * deleted. Never let that stale metadata revive a retired VSpace. */
+        return false;
+    }
     satp_t satp = satp_new(SATP_MODE, asid,
                            addrFromPPtr(root) >> seL4_PageBits);
     *satp_value = satp.words[0];
@@ -154,8 +160,8 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
 
     word_t caller_satp, server_satp;
     asid_t caller_asid, server_asid;
-    pte_t *server_root;
-    if (!bp_rpc_tcb_satp(caller, &caller_satp, &caller_asid, NULL)) {
+    pte_t *caller_root, *server_root;
+    if (!bp_rpc_tcb_satp(caller, &caller_satp, &caller_asid, &caller_root)) {
         userError("BlackParrot RPC bind: caller address space is invalid");
         return bp_rpc_error(seL4_IllegalOperation);
     }
@@ -163,7 +169,7 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
         userError("BlackParrot RPC bind: server address space is invalid");
         return bp_rpc_error(seL4_IllegalOperation);
     }
-    if (caller_satp == server_satp) {
+    if (caller_root == server_root) {
         userError("BlackParrot RPC bind: caller and server address spaces are not distinct");
         return bp_rpc_error(seL4_IllegalOperation);
     }

@@ -19,6 +19,8 @@
 #define MSTATUS_MPP_M    (UINT64_C(3) << 11)
 #define SV39_MODE        (UINT64_C(8) << 60)
 #define SATP_ASID_SHIFT  44
+#define CALLER_ASID      UINT64_C(2)
+#define SERVER_ASID      UINT64_C(3)
 
 #define CALLER_ENTRY_VA  UINT64_C(0x10000)
 #define SERVER_ENTRY_VA  UINT64_C(0x20000)
@@ -349,8 +351,11 @@ int main(void)
   map_low_page(server_leaf, SHARED_VA, shared_page, rw);
   map_low_page(server_leaf, STACK_VA, server_stack, rw);
 
-  caller_satp = SV39_MODE | (physical_address(caller_root) >> 12);
-  server_satp_value = SV39_MODE | (UINT64_C(1) << SATP_ASID_SHIFT)
+  /* Exercise descriptor SATPs wider than the configured hardware ASID tag.
+   * The address-space identity still includes the distinct root PPN. */
+  caller_satp = SV39_MODE | (CALLER_ASID << SATP_ASID_SHIFT)
+                | (physical_address(caller_root) >> 12);
+  server_satp_value = SV39_MODE | (SERVER_ASID << SATP_ASID_SHIFT)
                       | (physical_address(server_root) >> 12);
   for (int i = 0; i < 9; ++i)
     shared_page[i] = 0;

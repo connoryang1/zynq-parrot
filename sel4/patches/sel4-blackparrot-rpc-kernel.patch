@@ -1,3 +1,33 @@
+diff --git a/src/fastpath/fastpath.c b/src/fastpath/fastpath.c
+index f03f19ea9..dafc74db3 100644
+--- a/src/fastpath/fastpath.c
++++ b/src/fastpath/fastpath.c
+@@ -6,6 +6,9 @@
+
+ #include <config.h>
+ #include <fastpath/fastpath.h>
++#ifdef CONFIG_PLAT_BLACKPARROT
++#include <plat/machine/rpc.h>
++#endif
+
+ #ifdef CONFIG_BENCHMARK_TRACK_KERNEL_ENTRIES
+ #include <benchmark/benchmark_track.h>
+@@ -35,6 +38,15 @@ void NORETURN fastpath_call(word_t cptr, word_t msgInfo)
+     length = seL4_MessageInfo_get_length(info);
+     fault_type = seL4_Fault_get_seL4_FaultType(NODE_STATE(ksCurThread)->tcbFault);
+
++#ifdef CONFIG_PLAT_BLACKPARROT
++    /* Reserved protected-RPC endpoint labels are kernel control operations,
++     * even when their message shape would otherwise qualify for IPC fastpath. */
++    if (unlikely(bp_rpc_is_endpoint_invocation(
++                     seL4_MessageInfo_get_label(info)))) {
++        slowpath(SysCall);
++    }
++#endif
++
+     /* Check there's no extra caps, the length is ok and there's no
+      * saved fault. */
+     if (unlikely(fastpath_mi_check(msgInfo) ||
 diff --git a/src/arch/riscv/kernel/vspace.c b/src/arch/riscv/kernel/vspace.c
 index 1bbb40364..0695e37cf 100644
 --- a/src/arch/riscv/kernel/vspace.c

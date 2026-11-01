@@ -15,7 +15,7 @@ index bb4a6a1..8b18a25 100644
 +
  config_option(
 diff --git a/apps/sel4test-driver/include/test_init_data.h b/apps/sel4test-driver/include/test_init_data.h
-index 7bf2911..6559800 100644
+index 7bf2911..22b7c19 100644
 --- a/apps/sel4test-driver/include/test_init_data.h
 +++ b/apps/sel4test-driver/include/test_init_data.h
 @@ -11,7 +11,14 @@
@@ -35,7 +35,7 @@ index 7bf2911..6559800 100644
   * sel4test-driver creates a shmem page to be shared between the driver and the
   * test child processes, and uses this struct to pass the data in the shmem
 diff --git a/apps/sel4test-driver/src/main.c b/apps/sel4test-driver/src/main.c
-index b540758..47a77fb 100644
+index b540758..d5ed473 100644
 --- a/apps/sel4test-driver/src/main.c
 +++ b/apps/sel4test-driver/src/main.c
 @@ -132,8 +132,13 @@ static unsigned int allocate_untypeds(vka_object_t *untypeds, size_t bytes, unsi
@@ -54,7 +54,7 @@ index b540758..47a77fb 100644
          /* keep allocating until we run out, or if allocating would
           * cause us to allocate too much memory*/
          while (num_untypeds < max_untypeds &&
-@@ -151,10 +156,20 @@ static unsigned int populate_untypeds(vka_object_t *untypeds)
+@@ -151,10 +156,21 @@ static unsigned int populate_untypeds(vka_object_t *untypeds)
  {
      /* First reserve some memory for the driver */
      vka_object_t reserve[DRIVER_NUM_UNTYPEDS];
@@ -68,17 +68,33 @@ index b540758..47a77fb 100644
 +    unsigned int num_untypeds;
 +    if (config_set(CONFIG_RPC_ONLY)) {
 +        /* The focused test uses a 10-bit CSpace instead of sel4test's generic
-+         * 17-bit CSpace. A 64 KiB untyped retains eight times the QEMU-tested
-+         * lower bound for the isolated BlackParrot server process;
-+         * the cap itself is not scrubbed. The reserve is returned below. */
-+        num_untypeds = allocate_untypeds(untypeds, BIT(16), 1);
++         * 17-bit CSpace. The BlackParrot-only hardware case constructs a
++         * second address space, including a 32 KiB CNode and bootstrap/page
++         * table frames. The dedicated server path fails with 256 KiB and
++         * passes with one 512 KiB untyped. The cap is not scrubbed. */
++        num_untypeds = allocate_untypeds(untypeds, BIT(19), 1);
 +    } else {
 +        num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
 +    }
      /* Fill out the size_bits list */
      for (unsigned int i = 0; i < num_untypeds; i++) {
          untyped_size_bits_list[i] = untypeds[i].size_bits;
-@@ -646,7 +661,9 @@ int main(void)
+@@ -446,6 +462,13 @@ void *main_continued(void *arg UNUSED)
+     /* allocate lots of untyped memory for tests to use */
+     env.num_untypeds = populate_untypeds(untypeds);
+     env.untypeds = untypeds;
++    if (config_set(CONFIG_RPC_ONLY)) {
++        printf("SEL4_RPC_POOL count=%u", env.num_untypeds);
++        for (unsigned int i = 0; i < env.num_untypeds; i++) {
++            printf(" size%u=%u", i, untypeds[i].size_bits);
++        }
++        printf("\n");
++    }
+-
++
+     /* create a frame that will act as the init data, we can then map that
+      * in to target processes */
+@@ -646,7 +669,9 @@ int main(void)
      /* Restore the IRQ interface's register function */
      env.ops.irq_ops.irq_register_fn = irq_register_fn_copy;
 -
@@ -92,10 +108,10 @@ index b540758..47a77fb 100644
      /* switch to a bigger, safer stack with a guard page
       * before starting the tests */
 diff --git a/apps/sel4test-tests/CMakeLists.txt b/apps/sel4test-tests/CMakeLists.txt
-index cb3b677..a4c24d6 100644
+index cb3b677..705d60e 100644
 --- a/apps/sel4test-tests/CMakeLists.txt
 +++ b/apps/sel4test-tests/CMakeLists.txt
-@@ -14,18 +14,35 @@ if(KernelArchRiscV)
+@@ -14,20 +14,55 @@ if(KernelArchRiscV)
      set(arch arm)
  endif()
 -
@@ -123,6 +139,24 @@ index cb3b677..a4c24d6 100644
 +        src/tests/protected_rpc_blackparrot_sel4.c
 +        src/arch/${arch}/arch.c
 +    )
++
++    # Keep the hardware server in a tiny, distinct ELF instead of cloning all
++    # loadable pages of sel4test-tests into its address space.
++    add_executable(
++        sel4-rpc-server EXCLUDE_FROM_ALL
++        src/tests/sel4_rpc_server.c
++        src/tests/protected_rpc_sel4.c
++    )
++    target_include_directories(sel4-rpc-server PRIVATE include)
++    target_compile_options(sel4-rpc-server PRIVATE -ffunction-sections -fdata-sections)
++    target_link_options(sel4-rpc-server PRIVATE -Wl,--gc-sections -Wl,-s)
++    target_link_libraries(
++        sel4-rpc-server
++        PUBLIC sel4_autoconf muslc sel4 sel4runtime sel4muslcsys
++    )
++    include(cpio)
++    MakeCPIO(rpc-server-archive.o "$<TARGET_FILE:sel4-rpc-server>")
++    list(APPEND deps rpc-server-archive.o)
 +else()
 +    file(
 +        GLOB
@@ -144,8 +178,10 @@ index cb3b677..a4c24d6 100644
 +    target_compile_definitions(sel4test-tests PRIVATE SEL4TEST_RPC_ONLY=1)
 +endif()
  # special handling for "arm_hyp", it's really "aarch32"
+ set(_inc_folder_KernelSel4Arch "${KernelSel4Arch}")
+ if("${KernelSel4Arch}" STREQUAL "arm_hyp")
 diff --git a/apps/sel4test-tests/src/helpers.c b/apps/sel4test-tests/src/helpers.c
-index f3a8243..0e0688d 100644
+index f3a8243..ed5c1ff 100644
 --- a/apps/sel4test-tests/src/helpers.c
 +++ b/apps/sel4test-tests/src/helpers.c
 @@ -197,7 +197,14 @@ void create_helper_process_custom_asid(env_t env, helper_thread_t *thread, seL4_
@@ -163,6 +199,29 @@ index f3a8243..0e0688d 100644
      config = process_config_create_vspace(config, env->regions, env->num_regions);
      vka_object_t fault_endpoint = { .cptr = env->endpoint };
      config = process_config_fault_endpoint(config, fault_endpoint);
+diff --git a/apps/sel4test-tests/src/main.c b/apps/sel4test-tests/src/main.c
+index a6e3cb2..8bae149 100644
+--- a/apps/sel4test-tests/src/main.c
++++ b/apps/sel4test-tests/src/main.c
+@@ -30,9 +30,15 @@
+ #include "test.h"
+ #include "init.h"
+-
++
+-/* dummy global for libsel4muslcsys */
++/* The focused RPC image embeds its tiny server ELF. Other configurations keep
++ * the dummy globals expected by libsel4muslcsys. */
++#ifdef SEL4TEST_RPC_ONLY
++extern char _cpio_archive[];
++extern char _cpio_archive_end[];
++#else
+ char _cpio_archive[1];
+ char _cpio_archive_end[1];
++#endif
+-
++
+ /* endpoint to call back to the test driver on */
+ static seL4_CPtr endpoint;
 diff --git a/settings.cmake b/settings.cmake
 index 522a147..8145e0b 100644
 --- a/settings.cmake

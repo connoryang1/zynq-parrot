@@ -13,6 +13,7 @@ script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_root=$(realpath "$script_dir/../..")
 source_file="$project_root/sel4/sel4test/sel4_ipc_baseline.c"
 adapter_test="$project_root/sel4/sel4test/sel4_rpc_adapter_test.c"
+server_test="$project_root/sel4/sel4test/sel4_rpc_server.c"
 test_dir="$checkout/projects/sel4test/apps/sel4test-tests/src/tests"
 
 # A checkout may be reused after a BlackParrot build; keep backend selection
@@ -35,6 +36,7 @@ fi
 
 ln -sfn "$source_file" "$test_dir/sel4_ipc_baseline.c"
 ln -sfn "$adapter_test" "$test_dir/sel4_rpc_adapter_test.c"
+ln -sfn "$server_test" "$test_dir/sel4_rpc_server.c"
 ln -sfn "$project_root/sel4/src/protected_rpc.c" "$test_dir/protected_rpc.c"
 ln -sfn "$project_root/sel4/src/protected_rpc_sel4.c" "$test_dir/protected_rpc_sel4.c"
 ln -sfn "$project_root/sel4/src/protected_rpc_hardware_stub.c" \

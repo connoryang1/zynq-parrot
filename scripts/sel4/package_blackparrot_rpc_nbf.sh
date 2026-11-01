@@ -18,6 +18,7 @@ opensbi_revision=7830e987856eb1319c82664702892b6d50a93e7a
 sel4_cross_prefix=${SEL4_CROSS_PREFIX:-$project_root/install/bin/riscv64-unknown-elf-}
 opensbi_cross_prefix=${OPENSBI_CROSS_PREFIX:-riscv64-unknown-linux-gnu-}
 opensbi_fw_options=${OPENSBI_FW_OPTIONS:-0x1}
+opensbi_riscv_isa=${OPENSBI_RISCV_ISA:-rv64imafdc_zicsr_zifencei}
 base_firmware=${OPENSBI_BASE_FIRMWARE:-}
 nbf_tool=${NBF_TOOL:-$project_root/import/black-parrot/bp_common/software/py/nbf.py}
 overlay="$project_root/linux-tests/opensbi-platform/blackparrot"
@@ -105,7 +106,7 @@ else
         CROSS_COMPILE="$opensbi_cross_prefix" \
         "CC=${opensbi_cross_prefix}gcc -std=gnu17" \
         PLATFORM_RISCV_XLEN=64 \
-        PLATFORM_RISCV_ISA=rv64imafdc_zicsr_zifencei \
+        PLATFORM_RISCV_ISA="$opensbi_riscv_isa" \
         PLATFORM_RISCV_ABI=lp64d \
         PLATFORM_FDT_PATH="$dtb" \
         PAYLOAD_PATH="$payload" \
