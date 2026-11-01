@@ -94,3 +94,7 @@ rep2 gzip/status: 42a80f28c1a08665d1319b36d751ac0468de07c02a30e6e05e6ffc989c94c0
 ```
 
 The board is left in the untrusted post-shutdown state after v2 replicate 2. The remotely staged futex-v1 image was removed to make space for v2; its exact local copy remains recoverable. Any hybrid run must begin with full physical recovery and post-cycle NBF rehash.
+
+Hybrid preparation uses `linux-tests/patch_nbf_memory_records.py`, which requires an exact expected old word, changes each requested address exactly once, refuses overwrite, and preserves every other line. All 108 discovered Linux tests and 67 focused harness tests pass. The keep-update hybrid SHA-256 is `6c615c32dde22177fc8629c88982ee69f3731942a7815f5a04c32100f65698c5`; it differs from v2 only at table word `0x80017e60` and from v1 only at `0x80017e90`. The keep-restore hybrid SHA-256 is `999e134ce40340864a827090dba38f36e6ff4974438839bf3488b9f0ef70d1e2`, with the inverse one-word differences. Neither changes a record at or above Linux payload address `0x80200000`.
+
+The first generic NBF CSR check was invoked without its required CSR arguments and therefore ran no scan; that attempt is discarded. Repeating it with custom CSR IDs `0x800`--`0x804` reports four known Linux data-word false positives in accepted v2 and both hybrids, with byte-identical diagnostic SHA-256 `68d66bb7...55eb`. The hybrids introduce no new whole-NBF collision, and their OpenSBI instruction bytes are otherwise exact accepted v2; the accepted v2 firmware-only ELF scan remains the relevant gate.
