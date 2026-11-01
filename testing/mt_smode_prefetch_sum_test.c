@@ -21,6 +21,7 @@ static uint64_t root[512] __attribute__((aligned(4096)));
 static uint64_t middle[512] __attribute__((aligned(4096)));
 static uint64_t leaves[512] __attribute__((aligned(4096)));
 static volatile uint64_t first_value, hinted_value, denied_value;
+static volatile uint64_t supervisor_preview_idle;
 static volatile uint64_t unexpected_trap, trap_cause, trap_pc, trap_value;
 
 static void __attribute__((used, noinline, noreturn)) machine_finish(void)
@@ -37,7 +38,7 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   bp_hprint_uint64(issued);
   bp_hprint_uint64(published);
   bp_print_string("\n");
-  if (!unexpected_trap && first_value == FIRST_VALUE
+  if (!unexpected_trap && (supervisor_preview_idle & 1) && first_value == FIRST_VALUE
       && hinted_value == HINT_VALUE && denied_value == DENIED_VALUE
       && physical == 1 && admitted == 1 && issued == 1 && published == 1) {
     bp_print_string("[BSG-PASS] S-mode SUM-gated user-data prefetch\n");
@@ -49,6 +50,7 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
     bp_hprint_uint64(trap_cause);
     bp_hprint_uint64(trap_pc);
     bp_hprint_uint64(trap_value);
+    bp_hprint_uint64(supervisor_preview_idle);
     bp_hprint_uint64(first_value);
     bp_hprint_uint64(hinted_value);
     bp_hprint_uint64(denied_value);
@@ -79,6 +81,9 @@ supervisor_entry(void)
 {
   __asm__ volatile(
     ".option push\n.option norvc\n"
+    /* Linux will use this S-mode command before releasing pinned pages. */
+    "csrw 0x9c0, zero\ncsrr t3, 0x9c0\n"
+    "la t1, supervisor_preview_idle\nsd t3, 0(t1)\n"
     "li a0, 0x40000000\nli t0, 0x40000\ncsrs sstatus, t0\n"
     /* A demand first primes the readable user leaf in the DTLB. */
     "ld t3, 0(a0)\nla t1, first_value\nsd t3, 0(t1)\n"

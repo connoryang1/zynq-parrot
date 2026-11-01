@@ -585,6 +585,150 @@ direct and hinted modes; see `logs/context-preview-linux-demand-order-20261024/`
 Per-load latency includes startup effects and cannot identify accepted,
 completed, or displaced prefetch requests on this image.
 
+## Cross-process physical preview smoke
+
+`scheduler_physical_preview_smoke.c` exercises a later experimental Linux
+hook that sends four pinned physical-page hints before switching address
+spaces. Apply `patches/bp-physical-page-preview.patch` on top of the existing
+four-address scheduler-preview kernel patches and use the matching quiesce
+RTL. The registration requires one possible CPU; the kernel must cancel and
+drain outstanding hints before a pinned page is released.
+
+```sh
+make -C linux-tests scheduler-physical-preview-smoke-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+```
+
+Run the dynamic executable from the Linux shell with `0` for no registration,
+`1` for explicit registration and release, or `2` to leave the child's pins
+for the task-exit hook. An optional second argument selects 1–32 rounds;
+the default is 32. The two processes alternate on pipes and check four data
+lines after each wakeup. On RV64, the program clears and reads the core-wide
+preview recorder, printing D-cache hint, UCE admission, L2 issue, and
+publication counts. These 8-bit counters saturate at 255 and are not a
+per-process admission rate.
+
+On the timing-qualified quiesce PYNQ-Z2 image, all three default 32-round
+modes passed with exit zero. A separate 8-round run showed 0/0/0
+admission/issue/publication in disabled mode and 92/92/92 and 132/132/132 in
+enabled modes, proving hardware preview activity under Linux. The closed
+transcripts and exact artifact hashes are in
+`logs/linux-physical-pin-20261026/board-probe/` and RL-106. Useful overlap
+was established separately in RL-107/108; the later matched timing result is
+in RL-109.
+
+## Cross-process first-use physical preview diagnostic
+
+`scheduler_physical_preview_miss.c` alternates disabled and enabled physical
+registration for a child's four target lines over 16 pipe handoffs. It evicts
+those lines from L1 before each handoff, snapshots preview event counters when
+the child wakes, and arms the D-cache demand recorder only around the four
+loads. Use the same patched Linux and timing-qualified quiesce RTL as the smoke
+above; the recorder is core-wide and the test is a local first-use diagnostic.
+
+```sh
+make -C linux-tests scheduler-physical-preview-miss-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+make -C linux-tests scheduler-physical-preview-trace-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+```
+
+The trace build also records physical preview completion addresses, side-buffer
+removals, and demand addresses for the first three trials. On PYNQ-Z2, enabled
+previews completed before the target loads and matched their physical lines.
+The RTL drains physical preview replies without writing the D-cache side buffer,
+so equal L1 demand-miss counts across enabled and disabled trials are expected.
+The status field named `published` means response completion for physical hints.
+The 16-trial local load times overlapped; this diagnostic did not measure L2
+residency or whole-switch benefit. Exact ELFs, closed transcripts, and limitations are recorded
+in `logs/linux-physical-pin-20261026/` and RL-107.
+
+## Matched physical-preview Linux timing
+
+`scheduler_physical_preview_benchmark.c` measures a cross-process pipe handoff
+and the first four child data loads using the core-wide physical-cycle CSR
+`0xCC0`. It performs eight warmups and 128 measured trials in balanced
+`[off,on,on,off]` blocks, walking 40 KiB of other data before the child sleeps.
+Run it on the Linux shell image and timing-qualified quiesce RTL used above:
+
+```sh
+make -C linux-tests scheduler-physical-preview-benchmark-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+python3 linux-tests/analyze_scheduler_physical_preview_benchmark.py \
+  logs/physical-preview-performance-20261030/board-run.txt
+```
+
+The board run passed 128/128 trials and all hook checks. Off/on four-load
+medians were 316.5/329.0 cycles; the block-paired off-minus-on effect was
+-9.0 cycles with a bootstrap 95% interval of [-34.0,+7.25]. Whole-handoff
+paired intervals also crossed zero. This narrow Linux workload therefore does
+not establish a speedup. The exact image identities, transcript, and limits
+are in `logs/physical-preview-performance-20261030/` and RL-109.
+
+## Completed-data best-case oracle
+
+`scheduler_data_oracle_best_case.c` measures the cross-process upper bound
+before expanding the physical-preview hardware. The child displaces its target
+footprint and blocks; the parent then touches either an equal-sized decoy or
+the exact shared physical target lines before starting the handoff timer. The
+oracle preparation is intentionally excluded from the timed handoff, modeling
+perfect prediction, completed requests, and complete overlap rather than the
+current four-address hook.
+
+The four conditions cover 16 and 32 lines with independent reads and serialized
+dependent chains. Target and decoy pages are equally resident, modes use
+balanced `[cold,oracle,oracle,cold]` blocks, and every result and target mapping
+is prefaulted in the child. The analyzer rejects missing guest/board PASS
+markers, nonzero measured minor faults, unbalanced blocks, or inconsistent
+timestamps.
+
+```sh
+make -C linux-tests scheduler-data-oracle-best-case-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+python3 linux-tests/analyze_scheduler_data_oracle_best_case.py \
+  logs/data-oracle-best-case-20261031/board-run.log
+```
+
+On the exact timing-qualified data-preview PYNQ-Z2 image, the strongest local
+condition was the 32-line dependent chain: the cold/oracle load medians were
+2,830.5/1,582.5 cycles, or 1.79x, with a paired median saving of 1,265.25 cycles
+and bootstrap 95% interval `[1,245,1,294]`. That robust local saving is only
+2.66% of the 47,616.5-cycle cold wake-to-load median. Scheduler-inclusive
+intervals are much noisier and are not attributed to warming. The exact
+transcript, summary, executable, hashes, and the rejected prefault diagnostic
+are in `logs/data-oracle-best-case-20261031/` and RL-117.
+
+## Completed instruction-plus-data best-case oracle
+
+`scheduler_combined_oracle_best_case.c` extends the completed-state oracle to
+four modes: cold, instruction only, data only, and combined. The child executes
+a 36 KiB straight-line code sweep and reads a 256 KiB data buffer before each
+handoff. The parent then executes either a matched decoy or the exact 2 KiB
+target instruction body and reads either decoy data or the exact 32-line
+dependent target chain before starting the wakeup timer. The straight-line
+instruction bodies avoid crediting branch-predictor training.
+
+```sh
+make -C linux-tests scheduler-combined-oracle-best-case-dynamic \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+make -s -C linux-tests emit-scheduler-combined-oracle-best-case-transfer \
+  BP_LINUX_CC=/path/to/riscv64-linux-gcc
+python3 linux-tests/analyze_scheduler_combined_oracle_best_case.py \
+  /tmp/combined-board-run.log
+```
+
+The accepted run rotates mode labels across balanced eight-trial blocks so a
+periodic scheduler event cannot stay attached to one cache-state mode. With 64
+trials per mode and zero measured minor faults, instruction warming saves a
+paired 599 code cycles, data warming saves 1,302 data cycles, and combined
+warming reduces the target phase median from 4,409 to 2,839.5 cycles (1.55x).
+The paired combined saving is 2,044 cycles. A fixed-order predecessor gives
+consistent local results but a contradictory scheduler-inclusive result, so
+neither run establishes a wake-to-useful or round-trip speedup. The software
+oracle warms user text, not the shared privileged kernel prefix targeted by
+the separate instruction-replay branch. Exact evidence and limitations are in
+`logs/combined-oracle-best-case-20261031/` and RL-118.
+
 ## Ordered Linux handoff miss capture
 
 `cache_miss_trace_capture.c` drives the routed accepted-demand-miss recorder

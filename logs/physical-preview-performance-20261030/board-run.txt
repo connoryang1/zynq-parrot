@@ -1,0 +1,513 @@
+Script started on 2026-10-30 21:02:17+0000
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 600000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed98690 40000004 16 1
+INFO:    Creating host: 0xbed98690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3ca4000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3ca4000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1543076
+DEBUG-PS: ps.cpp: 1-1547353
+DEBUG-PS: ps.cpp: 2-1551316
+DEBUG-PS: ps.cpp: 3-1555804
+DEBUG-PS: ps.cpp: 4-1560082
+DEBUG-PS: ps.cpp: 5-1564067
+DEBUG-PS: ps.cpp: 6-1568411
+DEBUG-PS: ps.cpp: 7-1572533
+DEBUG-PS: ps.cpp: 8-1580232
+DEBUG-PS: ps.cpp: 9-1580697
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1878874
+DEBUG-PS: ps.cpp: finished loading 1878874 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #23 SMP Mon Oct 26 07:43:06 EDT 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000083ffffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd804000000   (  64 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 39540K/65536K available (8289K kernel code, 4027K rwdata, 4096K rodata, 5107K init, 388K bss, 25996K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000100] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.009543] Console: colour dummy device 80x25
+[    0.011409] printk: console [hvc0] enabled
+[    0.151249] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.156981] pid_max: default: 32768 minimum: 301
+[    0.173408] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.178605] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.425053] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    0.443337] riscv: ELF compat mode unsupported
+[    0.445159] ASID allocator disabled (1 bits)
+[    0.467327] rcu: Hierarchical SRCU implementation.
+[    0.471097] rcu: 	Max phase no-delay instances is 1000.
+[    0.511315] EFI services will not be available.
+[    0.533607] smp: Bringing up secondary CPUs ...
+[    0.537830] smp: Brought up 1 node, 1 CPU
+[    0.583685] devtmpfs: initialized
+[    0.709149] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.715981] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    0.810192] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.855034] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    0.861953] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.164431] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    1.410840] SCSI subsystem initialized
+[    1.435909] libata version 3.00 loaded.
+[    1.460805] usbcore: registered new interface driver usbfs
+[    1.467896] usbcore: registered new interface driver hub
+[    1.475684] usbcore: registered new device driver usb
+[    1.589970] vgaarb: loaded
+[    1.601476] clocksource: Switched to clocksource riscv_clocksource
+[    2.966772] NET: Registered PF_INET protocol family
+[    2.990250] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    3.060578] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    3.067974] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.074275] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    3.079925] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    3.091511] TCP: Hash tables configured (established 512 bind 512)
+[    3.106860] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.116534] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    3.140377] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.224303] RPC: Registered named UNIX socket transport module.
+[    3.229446] RPC: Registered udp transport module.
+[    3.231906] RPC: Registered tcp transport module.
+[    3.235134] RPC: Registered tcp-with-tls transport module.
+[    3.238700] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    3.242885] PCI: CLS 0 bytes, default 64
+[    3.409892] workingset: timestamp_bits=62 max_order=14 bucket_order=0
+[    3.502170] NFS: Registering the id_resolver key type
+[    3.510115] Key type id_resolver registered
+[    3.512604] Key type id_legacy registered
+[    3.519403] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.524007] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.579603] 9p: Installing v9fs 9p2000 file system support
+[    3.608329] NET: Registered PF_ALG protocol family
+[    3.618656] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.623750] io scheduler mq-deadline registered
+[    3.627456] io scheduler kyber registered
+[   23.484465] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   23.866109] [drm] radeon kernel modesetting enabled.
+[   25.539061] loop: module loaded
+[   25.767965] e1000e: Intel(R) PRO/1000 Network Driver
+[   25.771685] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   26.006623] usbcore: registered new interface driver uas
+[   26.015462] usbcore: registered new interface driver usb-storage
+[   26.108145] mousedev: PS/2 mouse device common for all mice
+[   26.155441] sdhci: Secure Digital Host Controller Interface driver
+[   26.159716] sdhci: Copyright(c) Pierre Ossman
+[   26.166402] sdhci-pltfm: SDHCI platform and OF driver helper
+[   26.193837] usbcore: registered new interface driver usbhid
+[   26.197784] usbhid: USB HID core driver
+[   26.230417] NET: Registered PF_INET6 protocol family
+[   26.456638] Segment Routing with IPv6
+[   26.468048] In-situ OAM (IOAM) with IPv6
+[   26.479956] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   26.555481] NET: Registered PF_PACKET protocol family
+[   26.569581] 9pnet: Installing 9P2000 support
+[   26.579376] Key type dns_resolver registered
+[   26.590195] start plist test
+[   27.235930] end plist test
+[   29.616274] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   30.339578] clk: Disabling unused clocks
+[   38.359011] Freeing unused kernel image (initmem) memory: 5104K
+[   38.365645] Run /bin/sh as init process
+[   38.367795]   with arguments:
+[   38.370253]     /bin/sh
+[   38.371754]   with environment:
+[   38.374254]     HOME=/
+[   38.375721]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # echo 'H4sIAAAAAAAAA+1ae3AURRrv2TebkCwsyAJBVjABoyyBDY8DicnmsYHjUiEkiBTnMpmZJG
+v2xewE' >> /tmp/physical-bench.b64
+~ # echo 'CBckCdksKCK4vMEq5Q5Oc5Z1J4cgeEYUReq4MgUqKl4RJBHk0CwgCArsde90784OoFZd3d
+X9kS81' >> /tmp/physical-bench.b64
+~ # echo '8/X3+x79mG96Otu9vHBmkYKiACEFuAyQFE4WsVyMm0aIXB3FJgM9vA8FQ4AGyiqJXS6gEn
+iWAiRw' >> /tmp/physical-bench.b64
+~ # echo 'HbZTYj8fxn0KKoHfh+0Ip+J+PuT3JzO4Iy2UyZSEq++qAaC8H0jgwBDXoj6Gh4lyeAyVwF
+fi9m9W' >> /tmp/physical-bench.b64
+~ # echo 'JPopsJ/uXlHWWagE3omrJ5yMiwpf63G89Xg8CDdjO7PEHlFpt8Ci8upUUV6dSiXwAmxXIP
+ObBf00' >> /tmp/physical-bench.b64
+~ # echo '4JcT7h4ow/XdbVwMuP2Ek9Ee63JWjnWxY1xOT92SMbzTzyyamD3G5ZuYzVr8Xss40jYD9r
+GXVMTa' >> /tmp/physical-bench.b64
+~ # echo 'myppB8of9KhSsC5ZokP9QdUmYTkVx0Ix0Tj3wf5aeOnh1RfEc0OJbRVYD0BzP0NuwXFFQV
+NKoWpL' >> /tmp/physical-bench.b64
+~ # echo 'I8kjFHPOceXrub95vsHwu+0NC/+ytSHneuRN3r69YVH3xoZ5W6emmp7UB29daBmQ8+TGhn
+0P1g6c' >> /tmp/physical-bench.b64
+~ # echo 'fOnptFl7XjJYSqZd/XX4ATKUd6Tp8OoPrw4tlYAPw3inDNdi3KBLxB/F+AIZPhXja2Vx5m
+P8zzLc' >> /tmp/physical-bench.b64
+~ # echo 'hPGwDM/HOJDFb0JtARcjvsmJeDK2N8vsjRjPkuEPYzxXhmcD9PwHgSVZ+L3C+CxsXyqzH4
+HxF2Tt' >> /tmp/physical-bench.b64
+~ # echo 'pzD+tgwHPp4RXMBXJ/iBj+N5Lw+4JU4BVHn5WsBzNAscDpjKjMMv0LzgcNNOD/ALLLQEVT
+7e6RGq' >> /tmp/physical-bench.b64
+~ # echo 'AOPy+jmwmHYKPicLFvNOgQNuN+0DPqePA8gZZfxEYJ853ZbvGG+xZseK4yfB8NUubyXtcv
+i8MBrH' >> /tmp/physical-bench.b64
+~ # echo '348apZD9UZKyMpqzCKFB/D3967qNGpTVtRgLRmUFWIT1ZPzQO9RX2n+Mq0HivKmT4NL30S
+DBpfOJ' >> /tmp/physical-bench.b64
+~ # echo 'SYJLE94swaUjP1qCKyR4lgTXSvDJElwnwXMluFKCF0twvQQvleBJEnyuBJfOMQskeIoEr5
+HgKnA7' >> /tmp/physical-bench.b64
+~ # echo 'bbICYFW+m6d8S7nSqMy/GWqGfLYRrHitGVTDSINyYHtzUoLVypToOyHKa1oT5RSZvCYg08
+vkNS0y' >> /tmp/physical-bench.b64
+~ # echo 'vUxes0Kml8lrmmV6mbymSaaXyWsaiZzXT9PVEz71g7qwJ7z8x4qFAa7sYpN92aMhjUHRty
+gUUJdT' >> /tmp/physical-bench.b64
+~ # echo 'hUZ9o7bkSmv3zcd6wo/cGKnNU+44zWgmPJLZojP1hIeHGYM6ZzQsLe/J7GKGqB+e93VPuP
+1Sxs3M' >> /tmp/physical-bench.b64
+~ # echo 'p5ki9ZQ53zCpaoOtIvBET9hxia8IPaUvh/qLO1p2bK2sUBeF1KcVUP42YM98iul/ZeLlUe
+Do9s5U' >> /tmp/physical-bench.b64
+~ # echo 'kKUsi2lPXW5bxZgKrRL7fzFpE6xR2wuhlhbFmW3lP1JFq8G8QE84co65hxurKTpYHQp+//
+3FZ5nN' >> /tmp/physical-bench.b64
+~ # echo '2kyjSjXgxYJBMMWM+sx5oT6NulUvmdi0Gub8WZWpJs3FfHVWZSgtL01mTQt0NWmsMkdFKS
+ergNLa' >> /tmp/physical-bench.b64
+~ # echo 'Qq2AfLf2Sq412J1r1aXkbQu0RHbrjHllgcD9sP9fG1UtCubZ7JGmBWnsmatnf8ho3QTTLR
+RInzUo' >> /tmp/physical-bench.b64
+~ # echo 'HY72hJ2w5+0nA/acrhT21QUjuPPC+Sdm1LbV65c66ebGsooZ1x/vrjz91Y3z1779DsbrrK
+yA9qfe' >> /tmp/physical-bench.b64
+~ # echo 'KW+yZ5y7VI6ehRk+iwBHFWZ0Qn3Xy1xbi/iMEE7BJ3fqy9/Dp9IWYJ7KHsXoJoza1blXm9
+1/e6cx' >> /tmp/physical-bench.b64
+~ # echo 'qFLt7wpo30QlHcL2n1ul/QJJyUgKPHFA80Ju29b9F57RjnFnPn+jM3T1auqcVjX3anBq8A
+QwLv4+' >> /tmp/physical-bench.b64
+~ # echo 'dWTjWRAKalVnNh++Fciwtv4RtG1AVmeG77q5d36pbdK8UtvepI7ipumh1dvVRv1S9bL5y+
+oD7i1J' >> /tmp/physical-bench.b64
+~ # echo '2z4aDHYf2gICK5kWlaGVy6h6v6qqugo+oVP/YAar+1P2piKqqKmwDCLtR2G29A0Mm9NK2X
+drM6gV' >> /tmp/physical-bench.b64
+~ # echo '72ujtU7cdGbb4VvW1r3UmYG7IigrGBAcpuBUHSgTLsJMGH5MbWcM3f0zL9g4gp068mU1zK
+X+l9PB' >> /tmp/physical-bench.b64
+~ # echo 'Ucq+Haw1rGde1K6vhNG2H76Fsia5K+0cM3jxQGkblh9iNIGBB7Rc3vyO+aVvHH3jQ0UsYv
+vfA3Zm' >> /tmp/physical-bench.b64
+~ # echo '2BV94IGQtlGHnviZddcvTaootZEIRvUGNXw/3p5wehB8+kb1ew/BfD80o76tVu/6qqFo2a
+5lffY0' >> /tmp/physical-bench.b64
+~ # echo 'FULLIsp+5W//PC5acaNgvh4WyzsnQf+DFw+I2VP4oJg97xXB/uw9shvbD4X2h7B9OrTH5e
+5RiVnU' >> /tmp/physical-bench.b64
+~ # echo '/o5UFm3S01D82/GdMGZ7O45vnHF9zjcJ+fiWqCk0ZNxEunlfS7WPvIn9DHD8DuB4g2C8/b
+hdsBx5' >> /tmp/physical-bench.b64
+~ # echo 'A9ffD9rjcjcsL98HQA/IVbQF8YhRzVwWMC6kImiM9Cvh+L2sWLvn9U1wFRpqOrinuRHOX+
+nIUj1h' >> /tmp/physical-bench.b64
+~ # echo '0yiIBYPZDMzHEPwArXu3OdjcKGrTrZvS0QjuHL/qmdCJCbk31721IRBY9V7cLq/fiE5jC9
+W0wq4C' >> /tmp/physical-bench.b64
+~ # echo 'mq51Z2F7fwjYR4LvwI4FCjaPam78bbv4faDwV89fQ/Mca3Zzbi9fb/byZrRo8ANx/QEJLS
+TMTI3T' >> /tmp/physical-bench.b64
+~ # echo 'xZp9dDXSiMRz1U4/XC6YfTy3yMktjn2XvN5aM+Ot8wjmSg4G4TAOjRjB6fXAWBxT669zYz
+y6XIlW' >> /tmp/physical-bench.b64
+~ # echo 'SuLSrEQEcNVTzQlxL0l8ugrWT+qt83BLfBwjwL74oTFb54JtixvDuC6O9nOx5pYWPzZ7en
+7eTIet' >> /tmp/physical-bench.b64
+~ # echo 'sCS/2JFfPH1mgbk0b/Zs0i68nBK7XkU7XRw7xQwXYUKdf1o6G/uke7wet9fjFbweJ2Nm6h
+kXZ/bT' >> /tmp/physical-bench.b64
+~ # echo 'bp+Lm2IWeCftmpZeF7VNrC+mM7u9LIc4aqofFRbTtZxD8Do4j8DXT0t3uerMLi/NOqKx/S
+JAbJBC' >> /tmp/physical-bench.b64
+~ # echo 'RHjYSRYG9UVFvbw+R2leWWFJOe4gNVQ5NReI65uua5HIUcgvQd4FOXszEpkL+XrIXZC/Bj
+lMT/A5' >> /tmp/physical-bench.b64
+~ # echo '5OshvwE5TO/YGku5tAxQDRQ1NFkRxdD6XQVtov/Gw7Uuwh6Clxli+F/UKIbqz4TYaIyZ4V
+UOrxzi' >> /tmp/physical-bench.b64
+~ # echo 'a0sx2FaqZjQpSg7aPrClEL8l8HoY2pA12wB4rUY62P4U4tekAF/A4h/gpYF49B95W0oHVb
+4+uTik' >> /tmp/physical-bench.b64
+~ # echo 'b1LMXKl6fKOheJWmaEOKMpnSf2A7WHDE9rHtE9tx20ewLltSyXO6Tf03D9hyz1bTtiHKY5
+T+mO2E' >> /tmp/physical-bench.b64
+~ # echo '7VPbZ7bPbSdtSXOPnfj0s89PslIjjJXrpWBB0kypOFO0kWEfR8E5z+k2pEg8jxz7+JOoYt
+4qDVJt' >> /tmp/physical-bench.b64
+~ # echo 'NMSVoJd6qZd6qZd6qZd6qZd6qZd66f+HBvTF+5aYV2FOfoOnMTdjTvbzyD4s+Y19MObXsH
+6oTB/7' >> /tmp/physical-bench.b64
+~ # echo 'Xwjvd6bJ9OS38X14X/PKrYgXcYMy/vs5IpNalMmeQiPWk3/0Q5iT3+xNmA8EiUT2AMJjRX
+/yf2op' >> /tmp/physical-bench.b64
+~ # echo '7vgALJO9hUEknoZKwIEmcb+pBvv3kdV/KyL2pwO3P4JlMs5hLL+ilu07/ZeI7DtHMBHch/
+e9/lec' >> /tmp/physical-bench.b64
+~ # echo 'kD0/f4p5tL2k4gHzOKtlvCULI9XM5F+NYyezzHgrN4Z18kJ9zCDPB/2iO8aAqoJFlUHNL5
+qY7Rzv' >> /tmp/physical-bench.b64
+~ # echo 'y3K40Y1Gtyp0Y9GNQbfKcfC21O2uc0ULNO32igUX72eipUpaZKJlpR8y+JB1lD4JWPw1fo
+EX6Epg' >> /tmp/physical-bench.b64
+~ # echo 'ie7B+YDF4xU4S55t+hiBrgaWak+dpYb21wALW+/x17tFLvCiZhHH+51eT4LggDqec9HIEJ
+d8LgFY' >> /tmp/physical-bench.b64
+~ # echo 'BG4JvPNelhZoYOFqHFU87eYcNSwfl4DFx3NOj1Nw0DxP16NGxctVUCBlGJt2OxlYsVeI3s
+Q6/GLw' >> /tmp/physical-bench.b64
+~ # echo 'Sr8fWBiv2815UJVoQC20IPDOyjoh/kPif0jofST76NHnHzvfIcr3yezlbwHaK9JK/OPnIE
+TZLLOX' >> /tmp/physical-bench.b64
+~ # echo '77Wlg8Q9RDLP7MPAXIyTeUY+L6H2XYXvaOxYB553DHgicd3Fn9CDQBwD4k/mrUbsvxl3GM
+1rlMSf' >> /tmp/physical-bench.b64
+~ # echo 'zB9WIM5ZxJ/MgyZcIZn3CMnHD+3vRyTtJ/PMK9h/hKz9ChkvBuIcRmQyj3Vghyxw5/YTQu
+cOVJJ4' >> /tmp/physical-bench.b64
+~ # echo 'ZN4kEznpp3z8CE5jfxvBsb8J+5N5G/kPvIN/FYif3UEUn4cwIBswg4zXyv3xeQIfrmhI4m
+Gi2/Jv' >> /tmp/physical-bench.b64
+~ # echo 'IUjM/7X4O7sWb7L/KKtfPn71Mv/4eR5RLpDZy+sPyvw7sH8H9m/5mfrXAXEsYt9Ncr5n2J
+3tSTiC' >> /tmp/physical-bench.b64
+~ # echo 'vwDEfXHiT9YJ1+7ir5PxV4B4viC2d4+/X+DeRLu7+aPfwjUS/9j5K+zfmZiOMT/y/A/iPh
+H/c3jd' >> /tmp/physical-bench.b64
+~ # echo 'cG74L6v/fZk/WXeEsX/jz/h/KPP34XMFPvNP10/oE4wRf3LOYwn2lx8+kvufxPVnyXDib5
+XhlIx3' >> /tmp/physical-bench.b64
+~ # echo 'iXX7ZGaxc3t3O6cnlZXgdkrDH46rP+P/bz0jA4DYKAAA' >> /tmp/physical-bench.b
+64
+~ # base64 -d /tmp/physical-bench.b64 | gzip -d > /tmp/physical-bench
+~ # chmod +x /tmp/physical-bench
+~ # sha256sum /tmp/physical-bench
+be3b295cc5a76822a5cd7938cae93edd3d2773b89c086ea1687d460c12b95804  /tmp/physical-bench
+~ # echo TRANSFER_DONE
+TRANSFER_DONE
+~ # /tmp/physical-bench; echo PHYSICAL_BENCH_RC=$?
+PHYSICAL_BENCH_CHILD PASS
+PHYSICAL_BENCH trial=0 mode=0 hooks=0 wake_to_entry=44832 load_cycles=328 wake_to_load=45160 roundtrip=150895
+PHYSICAL_BENCH trial=1 mode=1 hooks=2 wake_to_entry=54036 load_cycles=342 wake_to_load=54378 roundtrip=128643
+PHYSICAL_BENCH trial=2 mode=1 hooks=1 wake_to_entry=49251 load_cycles=329 wake_to_load=49580 roundtrip=131230
+PHYSICAL_BENCH trial=3 mode=0 hooks=0 wake_to_entry=23370 load_cycles=319 wake_to_load=23689 roundtrip=70696
+PHYSICAL_BENCH trial=4 mode=0 hooks=0 wake_to_entry=85256 load_cycles=346 wake_to_load=85602 roundtrip=140633
+PHYSICAL_BENCH trial=5 mode=1 hooks=3 wake_to_entry=66614 load_cycles=359 wake_to_load=66973 roundtrip=94890
+PHYSICAL_BENCH trial=6 mode=1 hooks=1 wake_to_entry=52468 load_cycles=316 wake_to_load=52784 roundtrip=134671
+PHYSICAL_BENCH trial=7 mode=0 hooks=0 wake_to_entry=63527 load_cycles=443 wake_to_load=63970 roundtrip=147159
+PHYSICAL_BENCH trial=8 mode=0 hooks=0 wake_to_entry=22753 load_cycles=269 wake_to_load=23022 roundtrip=148627
+PHYSICAL_BENCH trial=9 mode=1 hooks=2 wake_to_entry=24301 load_cycles=335 wake_to_load=24636 roundtrip=73366
+PHYSICAL_BENCH trial=10 mode=1 hooks=2 wake_to_entry=26809 load_cycles=389 wake_to_load=27198 roundtrip=96593
+PHYSICAL_BENCH trial=11 mode=0 hooks=0 wake_to_entry=48389 load_cycles=309 wake_to_load=48698 roundtrip=139926
+PHYSICAL_BENCH trial=12 mode=0 hooks=0 wake_to_entry=28936 load_cycles=331 wake_to_load=29267 roundtrip=79740
+PHYSICAL_BENCH trial=13 mode=1 hooks=2 wake_to_entry=51539 load_cycles=375 wake_to_load=51914 roundtrip=126075
+PHYSICAL_BENCH trial=14 mode=1 hooks=2 wake_to_entry=45784 load_cycles=342 wake_to_load=46126 roundtrip=151499
+PHYSICAL_BENCH trial=15 mode=0 hooks=0 wake_to_entry=44014 load_cycles=317 wake_to_load=44331 roundtrip=144967
+PHYSICAL_BENCH trial=16 mode=0 hooks=0 wake_to_entry=29582 load_cycles=291 wake_to_load=29873 roundtrip=80421
+PHYSICAL_BENCH trial=17 mode=1 hooks=3 wake_to_entry=65451 load_cycles=307 wake_to_load=65758 roundtrip=93081
+PHYSICAL_BENCH trial=18 mode=1 hooks=1 wake_to_entry=52302 load_cycles=328 wake_to_load=52630 roundtrip=81437
+PHYSICAL_BENCH trial=19 mode=0 hooks=0 wake_to_entry=51263 load_cycles=334 wake_to_load=51597 roundtrip=123389
+PHYSICAL_BENCH trial=20 mode=0 hooks=0 wake_to_entry=23724 load_cycles=323 wake_to_load=24047 roundtrip=74354
+PHYSICAL_BENCH trial=21 mode=1 hooks=1 wake_to_entry=33367 load_cycles=322 wake_to_load=33689 roundtrip=89734
+PHYSICAL_BENCH trial=22 mode=1 hooks=2 wake_to_entry=24989 load_cycles=389 wake_to_load=25378 roundtrip=82562
+PHYSICAL_BENCH trial=23 mode=0 hooks=0 wake_to_entry=31930 load_cycles=304 wake_to_load=32234 roundtrip=82472
+PHYSICAL_BENCH trial=24 mode=0 hooks=0 wake_to_entry=46701 load_cycles=316 wake_to_load=47017 roundtrip=133876
+PHYSICAL_BENCH trial=25 mode=1 hooks=2 wake_to_entry=23618 load_cycles=253 wake_to_load=23871 roundtrip=150917
+PHYSICAL_BENCH trial=26 mode=1 hooks=2 wake_to_entry=24080 load_cycles=350 wake_to_load=24430 roundtrip=162707
+PHYSICAL_BENCH trial=27 mode=0 hooks=0 wake_to_entry=51221 load_cycles=314 wake_to_load=51535 roundtrip=80239
+PHYSICAL_BENCH trial=28 mode=0 hooks=0 wake_to_entry=29398 load_cycles=279 wake_to_load=29677 roundtrip=90721
+PHYSICAL_BENCH trial=29 mode=1 hooks=2 wake_to_entry=25161 load_cycles=367 wake_to_load=25528 roundtrip=76053
+PHYSICAL_BENCH trial=30 mode=1 hooks=2 wake_to_entry=26122 load_cycles=370 wake_to_load=26492 roundtrip=70096
+PHYSICAL_BENCH trial=31 mode=0 hooks=0 wake_to_entry=24341 load_cycles=299 wake_to_load=24640 roundtrip=160172
+PHYSICAL_BENCH trial=32 mode=0 hooks=0 wake_to_entry=31521 load_cycles=339 wake_to_load=31860 roundtrip=80703
+PHYSICAL_BENCH trial=33 mode=1 hooks=2 wake_to_entry=25663 load_cycles=371 wake_to_load=26034 roundtrip=71405
+PHYSICAL_BENCH trial=34 mode=1 hooks=2 wake_to_entry=25728 load_cycles=371 wake_to_load=26099 roundtrip=70227
+PHYSICAL_BENCH trial=35 mode=0 hooks=0 wake_to_entry=80947 load_cycles=336 wake_to_load=81283 roundtrip=135549
+PHYSICAL_BENCH trial=36 mode=0 hooks=0 wake_to_entry=49942 load_cycles=363 wake_to_load=50305 roundtrip=135045
+PHYSICAL_BENCH trial=37 mode=1 hooks=2 wake_to_entry=50912 load_cycles=469 wake_to_load=51381 roundtrip=81321
+PHYSICAL_BENCH trial=38 mode=1 hooks=1 wake_to_entry=24566 load_cycles=354 wake_to_load=24920 roundtrip=147573
+PHYSICAL_BENCH trial=39 mode=0 hooks=0 wake_to_entry=81342 load_cycles=315 wake_to_load=81657 roundtrip=136658
+PHYSICAL_BENCH trial=40 mode=0 hooks=0 wake_to_entry=50725 load_cycles=387 wake_to_load=51112 roundtrip=124883
+PHYSICAL_BENCH trial=41 mode=1 hooks=2 wake_to_entry=45619 load_cycles=406 wake_to_load=46025 roundtrip=74450
+PHYSICAL_BENCH trial=42 mode=1 hooks=1 wake_to_entry=24667 load_cycles=354 wake_to_load=25021 roundtrip=76659
+PHYSICAL_BENCH trial=43 mode=0 hooks=0 wake_to_entry=47060 load_cycles=353 wake_to_load=47413 roundtrip=143417
+PHYSICAL_BENCH trial=44 mode=0 hooks=0 wake_to_entry=45217 load_cycles=354 wake_to_load=45571 roundtrip=143161
+PHYSICAL_BENCH trial=45 mode=1 hooks=2 wake_to_entry=24239 load_cycles=325 wake_to_load=24564 roundtrip=74641
+PHYSICAL_BENCH trial=46 mode=1 hooks=1 wake_to_entry=32620 load_cycles=275 wake_to_load=32895 roundtrip=89526
+PHYSICAL_BENCH trial=47 mode=0 hooks=0 wake_to_entry=47342 load_cycles=321 wake_to_load=47663 roundtrip=128734
+PHYSICAL_BENCH trial=48 mode=0 hooks=0 wake_to_entry=25475 load_cycles=339 wake_to_load=25814 roundtrip=80989
+PHYSICAL_BENCH trial=49 mode=1 hooks=1 wake_to_entry=52332 load_cycles=364 wake_to_load=52696 roundtrip=81607
+PHYSICAL_BENCH trial=50 mode=1 hooks=2 wake_to_entry=66893 load_cycles=310 wake_to_load=67203 roundtrip=93475
+PHYSICAL_BENCH trial=51 mode=0 hooks=0 wake_to_entry=24510 load_cycles=283 wake_to_load=24793 roundtrip=77384
+PHYSICAL_BENCH trial=52 mode=0 hooks=0 wake_to_entry=22853 load_cycles=253 wake_to_load=23106 roundtrip=150053
+PHYSICAL_BENCH trial=53 mode=1 hooks=2 wake_to_entry=64398 load_cycles=323 wake_to_load=64721 roundtrip=94590
+PHYSICAL_BENCH trial=54 mode=1 hooks=1 wake_to_entry=55134 load_cycles=364 wake_to_load=55498 roundtrip=143396
+PHYSICAL_BENCH trial=55 mode=0 hooks=0 wake_to_entry=24160 load_cycles=281 wake_to_load=24441 roundtrip=164759
+PHYSICAL_BENCH trial=56 mode=0 hooks=0 wake_to_entry=53058 load_cycles=384 wake_to_load=53442 roundtrip=82961
+PHYSICAL_BENCH trial=57 mode=1 hooks=1 wake_to_entry=25152 load_cycles=305 wake_to_load=25457 roundtrip=83227
+PHYSICAL_BENCH trial=58 mode=1 hooks=3 wake_to_entry=79140 load_cycles=315 wake_to_load=79455 roundtrip=140047
+PHYSICAL_BENCH trial=59 mode=0 hooks=0 wake_to_entry=51491 load_cycles=334 wake_to_load=51825 roundtrip=135339
+PHYSICAL_BENCH trial=60 mode=0 hooks=0 wake_to_entry=30010 load_cycles=269 wake_to_load=30279 roundtrip=159171
+PHYSICAL_BENCH trial=61 mode=1 hooks=2 wake_to_entry=24301 load_cycles=275 wake_to_load=24576 roundtrip=74776
+PHYSICAL_BENCH trial=62 mode=1 hooks=1 wake_to_entry=75615 load_cycles=332 wake_to_load=75947 roundtrip=161961
+PHYSICAL_BENCH trial=63 mode=0 hooks=0 wake_to_entry=24454 load_cycles=322 wake_to_load=24776 roundtrip=81843
+PHYSICAL_BENCH trial=64 mode=0 hooks=0 wake_to_entry=23130 load_cycles=314 wake_to_load=23444 roundtrip=150088
+PHYSICAL_BENCH trial=65 mode=1 hooks=2 wake_to_entry=24602 load_cycles=316 wake_to_load=24918 roundtrip=75348
+PHYSICAL_BENCH trial=66 mode=1 hooks=1 wake_to_entry=32486 load_cycles=300 wake_to_load=32786 roundtrip=83257
+PHYSICAL_BENCH trial=67 mode=0 hooks=0 wake_to_entry=60098 load_cycles=330 wake_to_load=60428 roundtrip=147743
+PHYSICAL_BENCH trial=68 mode=0 hooks=0 wake_to_entry=45829 load_cycles=303 wake_to_load=46132 roundtrip=138706
+PHYSICAL_BENCH trial=69 mode=1 hooks=2 wake_to_entry=23572 load_cycles=263 wake_to_load=23835 roundtrip=75200
+PHYSICAL_BENCH trial=70 mode=1 hooks=1 wake_to_entry=33464 load_cycles=341 wake_to_load=33805 roundtrip=160473
+PHYSICAL_BENCH trial=71 mode=0 hooks=0 wake_to_entry=30119 load_cycles=291 wake_to_load=30410 roundtrip=80558
+PHYSICAL_BENCH trial=72 mode=0 hooks=0 wake_to_entry=47032 load_cycles=297 wake_to_load=47329 roundtrip=75261
+PHYSICAL_BENCH trial=73 mode=1 hooks=2 wake_to_entry=71428 load_cycles=383 wake_to_load=71811 roundtrip=121949
+PHYSICAL_BENCH trial=74 mode=1 hooks=2 wake_to_entry=25037 load_cycles=363 wake_to_load=25400 roundtrip=77756
+PHYSICAL_BENCH trial=75 mode=0 hooks=0 wake_to_entry=48893 load_cycles=317 wake_to_load=49210 roundtrip=130574
+PHYSICAL_BENCH trial=76 mode=0 hooks=0 wake_to_entry=23556 load_cycles=269 wake_to_load=23825 roundtrip=163062
+PHYSICAL_BENCH trial=77 mode=1 hooks=3 wake_to_entry=50798 load_cycles=330 wake_to_load=51128 roundtrip=164988
+PHYSICAL_BENCH trial=78 mode=1 hooks=2 wake_to_entry=48724 load_cycles=315 wake_to_load=49039 roundtrip=129617
+PHYSICAL_BENCH trial=79 mode=0 hooks=0 wake_to_entry=23747 load_cycles=321 wake_to_load=24068 roundtrip=74573
+PHYSICAL_BENCH trial=80 mode=0 hooks=0 wake_to_entry=45012 load_cycles=349 wake_to_load=45361 roundtrip=144578
+PHYSICAL_BENCH trial=81 mode=1 hooks=2 wake_to_entry=24444 load_cycles=298 wake_to_load=24742 roundtrip=73704
+PHYSICAL_BENCH trial=82 mode=1 hooks=1 wake_to_entry=33170 load_cycles=329 wake_to_load=33499 roundtrip=85305
+PHYSICAL_BENCH trial=83 mode=0 hooks=0 wake_to_entry=24545 load_cycles=299 wake_to_load=24844 roundtrip=75774
+PHYSICAL_BENCH trial=84 mode=0 hooks=0 wake_to_entry=45849 load_cycles=300 wake_to_load=46149 roundtrip=128846
+PHYSICAL_BENCH trial=85 mode=1 hooks=2 wake_to_entry=23286 load_cycles=247 wake_to_load=23533 roundtrip=149362
+PHYSICAL_BENCH trial=86 mode=1 hooks=2 wake_to_entry=24039 load_cycles=271 wake_to_load=24310 roundtrip=73574
+PHYSICAL_BENCH trial=87 mode=0 hooks=0 wake_to_entry=46033 load_cycles=328 wake_to_load=46361 roundtrip=138028
+PHYSICAL_BENCH trial=88 mode=0 hooks=0 wake_to_entry=43955 load_cycles=269 wake_to_load=44224 roundtrip=134642
+PHYSICAL_BENCH trial=89 mode=1 hooks=3 wake_to_entry=51481 load_cycles=369 wake_to_load=51850 roundtrip=134721
+PHYSICAL_BENCH trial=90 mode=1 hooks=2 wake_to_entry=23174 load_cycles=256 wake_to_load=23430 roundtrip=144747
+PHYSICAL_BENCH trial=91 mode=0 hooks=0 wake_to_entry=22985 load_cycles=287 wake_to_load=23272 roundtrip=72968
+PHYSICAL_BENCH trial=92 mode=0 hooks=0 wake_to_entry=46253 load_cycles=297 wake_to_load=46550 roundtrip=137463
+PHYSICAL_BENCH trial=93 mode=1 hooks=2 wake_to_entry=23856 load_cycles=259 wake_to_load=24115 roundtrip=73479
+PHYSICAL_BENCH trial=94 mode=1 hooks=2 wake_to_entry=52205 load_cycles=349 wake_to_load=52554 roundtrip=145820
+PHYSICAL_BENCH trial=95 mode=0 hooks=0 wake_to_entry=22636 load_cycles=299 wake_to_load=22935 roundtrip=73297
+PHYSICAL_BENCH trial=96 mode=0 hooks=0 wake_to_entry=46083 load_cycles=272 wake_to_load=46355 roundtrip=133581
+PHYSICAL_BENCH trial=97 mode=1 hooks=2 wake_to_entry=23643 load_cycles=282 wake_to_load=23925 roundtrip=74176
+PHYSICAL_BENCH trial=98 mode=1 hooks=1 wake_to_entry=31673 load_cycles=279 wake_to_load=31952 roundtrip=81555
+PHYSICAL_BENCH trial=99 mode=0 hooks=0 wake_to_entry=59551 load_cycles=329 wake_to_load=59880 roundtrip=148469
+PHYSICAL_BENCH trial=100 mode=0 hooks=0 wake_to_entry=45709 load_cycles=299 wake_to_load=46008 roundtrip=138944
+PHYSICAL_BENCH trial=101 mode=1 hooks=2 wake_to_entry=23028 load_cycles=281 wake_to_load=23309 roundtrip=152305
+PHYSICAL_BENCH trial=102 mode=1 hooks=2 wake_to_entry=24298 load_cycles=303 wake_to_load=24601 roundtrip=172043
+PHYSICAL_BENCH trial=103 mode=0 hooks=0 wake_to_entry=53499 load_cycles=327 wake_to_load=53826 roundtrip=82640
+PHYSICAL_BENCH trial=104 mode=0 hooks=0 wake_to_entry=29971 load_cycles=377 wake_to_load=30348 roundtrip=81693
+PHYSICAL_BENCH trial=105 mode=1 hooks=5 wake_to_entry=66682 load_cycles=279 wake_to_load=66961 roundtrip=94177
+PHYSICAL_BENCH trial=106 mode=1 hooks=1 wake_to_entry=52190 load_cycles=346 wake_to_load=52536 roundtrip=142089
+PHYSICAL_BENCH trial=107 mode=0 hooks=0 wake_to_entry=51928 load_cycles=365 wake_to_load=52293 roundtrip=150200
+PHYSICAL_BENCH trial=108 mode=0 hooks=0 wake_to_entry=22830 load_cycles=283 wake_to_load=23113 roundtrip=72303
+PHYSICAL_BENCH trial=109 mode=1 hooks=2 wake_to_entry=24927 load_cycles=387 wake_to_load=25314 roundtrip=70541
+PHYSICAL_BENCH trial=110 mode=1 hooks=2 wake_to_entry=26126 load_cycles=364 wake_to_load=26490 roundtrip=83274
+PHYSICAL_BENCH trial=111 mode=0 hooks=0 wake_to_entry=65729 load_cycles=398 wake_to_load=66127 roundtrip=93541
+PHYSICAL_BENCH trial=112 mode=0 hooks=0 wake_to_entry=24476 load_cycles=281 wake_to_load=24757 roundtrip=80671
+PHYSICAL_BENCH trial=113 mode=1 hooks=2 wake_to_entry=26016 load_cycles=343 wake_to_load=26359 roundtrip=71084
+PHYSICAL_BENCH trial=114 mode=1 hooks=2 wake_to_entry=24878 load_cycles=363 wake_to_load=25241 roundtrip=69890
+PHYSICAL_BENCH trial=115 mode=0 hooks=0 wake_to_entry=45542 load_cycles=331 wake_to_load=45873 roundtrip=144637
+PHYSICAL_BENCH trial=116 mode=0 hooks=0 wake_to_entry=22341 load_cycles=255 wake_to_load=22596 roundtrip=84692
+PHYSICAL_BENCH trial=117 mode=1 hooks=1 wake_to_entry=46191 load_cycles=300 wake_to_load=46491 roundtrip=142580
+PHYSICAL_BENCH trial=118 mode=1 hooks=2 wake_to_entry=24423 load_cycles=281 wake_to_load=24704 roundtrip=74869
+PHYSICAL_BENCH trial=119 mode=0 hooks=0 wake_to_entry=55417 load_cycles=328 wake_to_load=55745 roundtrip=117874
+PHYSICAL_BENCH trial=120 mode=0 hooks=0 wake_to_entry=24029 load_cycles=303 wake_to_load=24332 roundtrip=74264
+PHYSICAL_BENCH trial=121 mode=1 hooks=2 wake_to_entry=24740 load_cycles=399 wake_to_load=25139 roundtrip=77970
+PHYSICAL_BENCH trial=122 mode=1 hooks=1 wake_to_entry=65873 load_cycles=312 wake_to_load=66185 roundtrip=95857
+PHYSICAL_BENCH trial=123 mode=0 hooks=0 wake_to_entry=30829 load_cycles=274 wake_to_load=31103 roundtrip=80764
+PHYSICAL_BENCH trial=124 mode=0 hooks=0 wake_to_entry=50696 load_cycles=300 wake_to_load=50996 roundtrip=135169
+PHYSICAL_BENCH trial=125 mode=1 hooks=2 wake_to_entry=22785 load_cycles=253 wake_to_load=23038 roundtrip=147623
+PHYSICAL_BENCH trial=126 mode=1 hooks=2 wake_to_entry=24310 load_cycles=253 wake_to_load=24563 roundtrip=73252
+PHYSICAL_BENCH trial=127 mode=0 hooks=0 wake_to_entry=45957 load_cycles=329 wake_to_load=46286 roundtrip=159756
+PHYSICAL_BENCH_PARENT PASS
+PHYSICAL_BENCH_RC=0
+~ # exit
+[  135.824526] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+[  135.828129] CPU: 0 PID: 1 Comm: sh Not tainted 6.6.0 #23
+[  135.830860] Hardware name: blackparrot,riscv64 (DT)
+[  135.833108] Call Trace:
+[  135.834585] [<ffffffff80005e78>] dump_backtrace+0x1c/0x24
+[  135.837642] [<ffffffff80803a70>] show_stack+0x2c/0x38
+[  135.840483] [<ffffffff80811860>] dump_stack_lvl+0x3c/0x54
+[  135.843479] [<ffffffff8081188c>] dump_stack+0x14/0x1c
+[  135.846292] [<ffffffff80803dc8>] panic+0x102/0x2b2
+[  135.848987] [<ffffffff80014904>] do_exit+0x76e/0x774
+[  135.851866] [<ffffffff80014a8a>] do_group_exit+0x24/0x70
+[  135.854798] [<ffffffff80014af2>] __wake_up_parent+0x0/0x20
+[  135.857802] [<ffffffff80812266>] do_trap_ecall_u+0xba/0x12e
+[  135.860828] [<ffffffff80003398>] ret_from_exception+0x0/0x64
+[  135.863967] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000 ]---
