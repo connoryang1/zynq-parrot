@@ -42,6 +42,10 @@ enum benchmark_mode {
   MODE_SWITCH_ONLY = 4,
   MODE_SERIAL_PREFETCH = 5,
   MODE_CPP_COROUTINE = 6,
+  MODE_FIXED_SOA_BATCH = 7,
+  MODE_FIXED_RECOMPUTE_BATCH = 8,
+  MODE_LEAN_COROUTINE = 9,
+  MODE_DIRECT_COROUTINE = 10,
   MODE_COUNT
 };
 
@@ -105,6 +109,34 @@ struct coroutine_scheduler {
 };
 
 static coroutine_scheduler cpp_scheduler;
+
+/* A power-of-two queue removes the division, count maintenance, and checked
+ * push/pop branches from the timed coroutine scheduler. The benchmark never
+ * has more than ten live handles, so a sixteen-entry ring cannot become full. */
+struct lean_coroutine_scheduler {
+  std::coroutine_handle<> queue[16];
+  unsigned head = 0;
+  unsigned tail = 0;
+
+  void reset() { head = tail = 0; }
+  void push(std::coroutine_handle<> handle)
+  {
+    queue[head] = handle;
+    head = (head + 1) & 15;
+  }
+  std::coroutine_handle<> pop()
+  {
+    std::coroutine_handle<> handle = queue[tail];
+    tail = (tail + 1) & 15;
+    return handle;
+  }
+  void run()
+  {
+    while (head != tail) pop().resume();
+  }
+};
+
+static lean_coroutine_scheduler lean_scheduler;
 
 /* Avoid pulling the hosted C++ allocator and exception runtime into this
  * freestanding benchmark. All ten frames coexist, are created outside the
@@ -171,12 +203,20 @@ static nano_task cpp_tasks[NANO_LOOKUP_WORKERS];
 
 struct prefetch_and_yield {
   const volatile struct index_line *line;
+  unsigned next;
+  unsigned mode;
 
   bool await_ready() const noexcept { return false; }
   void await_resume() const noexcept {}
   std::coroutine_handle<> await_suspend(std::coroutine_handle<> current) const
   {
     bp_prefetch_r(line);
+    if (mode == MODE_DIRECT_COROUTINE)
+      return cpp_tasks[next].handle;
+    if (mode == MODE_LEAN_COROUTINE) {
+      lean_scheduler.push(current);
+      return lean_scheduler.pop();
+    }
     cpp_scheduler.push(current);
     return cpp_scheduler.pop();
   }
@@ -208,7 +248,8 @@ static inline void publish(volatile struct lookup_result *out, uint64_t lower,
  * hint before yielding. The switch-only control executes the same number of
  * handoffs and publishes through the same result block without data accesses.
  */
-static __attribute__((noinline, aligned(64))) void lookup_worker(
+static __attribute__((noinline, noclone, aligned(64),
+                      optimize("no-unroll-loops"))) void lookup_worker(
   const volatile struct index_line *table, uint64_t entries, uint64_t key,
   volatile struct lookup_result *out, uint64_t mode, uint64_t next,
   uint64_t park, uint64_t levels)
@@ -227,8 +268,10 @@ static __attribute__((noinline, aligned(64))) void lookup_worker(
       switch_to(next);
       uint64_t value;
       __asm__ volatile(
+        ".ifndef nano_worker_consume_load\n"
         ".global nano_worker_consume_load\n"
         "nano_worker_consume_load:\n"
+        ".endif\n"
         "ld %0, 0(%1)\n" : "=r"(value) : "r"(line) : "memory");
       uint64_t links = line->packed_links;
       checksum += value;
@@ -258,7 +301,8 @@ static __attribute__((noinline, aligned(64))) void lookup_worker(
   switch_to(next);
 }
 
-static __attribute__((noinline)) void serial_lookup(
+static __attribute__((noinline, noclone,
+                      optimize("no-unroll-loops"))) void serial_lookup(
   const volatile struct index_line *const *tables, uint64_t entries,
   const uint64_t *queries, unsigned prefetch)
 {
@@ -271,8 +315,10 @@ static __attribute__((noinline)) void serial_lookup(
       if (prefetch) bp_prefetch_r(line);
       uint64_t value;
       __asm__ volatile(
+        ".ifndef nano_serial_consume_load\n"
         ".global nano_serial_consume_load\n"
         "nano_serial_consume_load:\n"
+        ".endif\n"
         "ld %0, 0(%1)\n" : "=r"(value) : "r"(line) : "memory");
       uint64_t links = line->packed_links;
       checksum += value;
@@ -295,18 +341,20 @@ static __attribute__((noinline)) void serial_lookup(
  * at every prefetch suspension, matching Nishanov's Nano-coroutine schedule. */
 static nano_task coroutine_lookup(
   const volatile struct index_line *table, uint64_t entries, uint64_t key,
-  volatile struct lookup_result *out)
+  volatile struct lookup_result *out, unsigned next, unsigned mode)
 {
   uint64_t lower = 0, length = entries, checksum = 0, steps = 0, node = 0;
   while (length) {
     uint64_t half = length >> 1;
     uint64_t middle = lower + half;
     const volatile struct index_line *line = &table[node];
-    co_await prefetch_and_yield{line};
+    co_await prefetch_and_yield{line, next, mode};
     uint64_t value;
     __asm__ volatile(
+      ".ifndef nano_coroutine_consume_load\n"
       ".global nano_coroutine_consume_load\n"
       "nano_coroutine_consume_load:\n"
+      ".endif\n"
       "ld %0, 0(%1)\n" : "=r"(value) : "r"(line) : "memory");
     uint64_t links = line->packed_links;
     checksum += value;
@@ -326,7 +374,8 @@ static nano_task coroutine_lookup(
 /* This is both the explicit-state-machine baseline and the ideal matched
  * batch: issue one hint for each live search, then consume the same ten
  * midpoints under the processor's actual request-capacity/arbitration rules. */
-static __attribute__((noinline)) void matched_batch(
+static __attribute__((noinline, noclone,
+                      optimize("no-unroll-loops"))) void matched_batch(
   const volatile struct index_line *const *tables, uint64_t entries,
   const uint64_t *queries, uint64_t levels)
 {
@@ -345,8 +394,10 @@ static __attribute__((noinline)) void matched_batch(
     for (unsigned i = 0; i < active_workers; ++i) {
       uint64_t value;
       __asm__ volatile(
+        ".ifndef nano_batch_consume_load\n"
         ".global nano_batch_consume_load\n"
         "nano_batch_consume_load:\n"
+        ".endif\n"
         "ld %0, 0(%1)\n" : "=r"(value) : "r"(lines[i]) : "memory");
       uint64_t links = lines[i]->packed_links;
       uint64_t half = length[i] >> 1;
@@ -366,6 +417,123 @@ static __attribute__((noinline)) void matched_batch(
     publish(&results[i], lower[i], checksum[i], levels);
 }
 
+/* Compile-time worker counts let the compiler unroll both phases and keep
+ * per-search state in registers where profitable. This is the optimized form
+ * of the same N-prefetches-then-N-loads schedule as matched_batch. */
+template <unsigned N>
+static __attribute__((noinline)) void fixed_soa_batch(
+  const volatile struct index_line *const *tables, uint64_t entries,
+  const uint64_t *queries, uint64_t levels)
+{
+  uint64_t lower[N] = {0};
+  uint64_t length[N];
+  uint64_t checksum[N] = {0};
+  uint64_t node[N] = {0};
+  const volatile struct index_line *lines[N];
+
+#pragma GCC unroll 16
+  for (unsigned i = 0; i < N; ++i) length[i] = entries;
+  for (uint64_t step = 0; step < levels; ++step) {
+#pragma GCC unroll 16
+    for (unsigned i = 0; i < N; ++i) {
+      lines[i] = &tables[i][node[i]];
+      bp_prefetch_r(lines[i]);
+    }
+#pragma GCC unroll 16
+    for (unsigned i = 0; i < N; ++i) {
+      uint64_t value;
+      __asm__ volatile("ld %0, 0(%1)" : "=r"(value) : "r"(lines[i]) : "memory");
+      uint64_t links = lines[i]->packed_links;
+      uint64_t half = length[i] >> 1;
+      uint64_t middle = lower[i] + half;
+      checksum[i] += value;
+      if (value < queries[i]) {
+        node[i] = (uint32_t)links;
+        lower[i] = middle + 1;
+        length[i] -= half + 1;
+      } else {
+        node[i] = links >> 32;
+        length[i] = half;
+      }
+    }
+  }
+#pragma GCC unroll 16
+  for (unsigned i = 0; i < N; ++i)
+    publish(&results[i], lower[i], checksum[i], levels);
+}
+
+struct software_search_state {
+  uint64_t lower;
+  uint64_t length;
+  uint64_t checksum;
+  uint64_t node;
+};
+
+/* This version avoids the line-pointer array. It recomputes each address in
+ * the consume phase, trading cheap arithmetic for one less explicit spill. */
+template <unsigned N>
+static __attribute__((noinline)) void fixed_recompute_batch(
+  const volatile struct index_line *const *tables, uint64_t entries,
+  const uint64_t *queries, uint64_t levels)
+{
+  software_search_state state[N];
+#pragma GCC unroll 16
+  for (unsigned i = 0; i < N; ++i) state[i] = {0, entries, 0, 0};
+  for (uint64_t step = 0; step < levels; ++step) {
+#pragma GCC unroll 16
+    for (unsigned i = 0; i < N; ++i)
+      bp_prefetch_r(&tables[i][state[i].node]);
+#pragma GCC unroll 16
+    for (unsigned i = 0; i < N; ++i) {
+      const volatile struct index_line *line = &tables[i][state[i].node];
+      uint64_t value;
+      __asm__ volatile("ld %0, 0(%1)" : "=r"(value) : "r"(line) : "memory");
+      uint64_t links = line->packed_links;
+      uint64_t half = state[i].length >> 1;
+      uint64_t middle = state[i].lower + half;
+      state[i].checksum += value;
+      if (value < queries[i]) {
+        state[i].node = (uint32_t)links;
+        state[i].lower = middle + 1;
+        state[i].length -= half + 1;
+      } else {
+        state[i].node = links >> 32;
+        state[i].length = half;
+      }
+    }
+  }
+#pragma GCC unroll 16
+  for (unsigned i = 0; i < N; ++i)
+    publish(&results[i], state[i].lower, state[i].checksum, levels);
+}
+
+#define DISPATCH_FIXED_BATCH(function) \
+  switch (active_workers) { \
+    case 2: function<2>(tables, entries, queries, levels); break; \
+    case 3: function<3>(tables, entries, queries, levels); break; \
+    case 4: function<4>(tables, entries, queries, levels); break; \
+    case 5: function<5>(tables, entries, queries, levels); break; \
+    case 6: function<6>(tables, entries, queries, levels); break; \
+    case 7: function<7>(tables, entries, queries, levels); break; \
+    case 8: function<8>(tables, entries, queries, levels); break; \
+    case 9: function<9>(tables, entries, queries, levels); break; \
+    case 10: function<10>(tables, entries, queries, levels); break; \
+  }
+
+static __attribute__((noinline)) void run_fixed_soa_batch(
+  const volatile struct index_line *const *tables, uint64_t entries,
+  const uint64_t *queries, uint64_t levels)
+{
+  DISPATCH_FIXED_BATCH(fixed_soa_batch);
+}
+
+static __attribute__((noinline)) void run_fixed_recompute_batch(
+  const volatile struct index_line *const *tables, uint64_t entries,
+  const uint64_t *queries, uint64_t levels)
+{
+  DISPATCH_FIXED_BATCH(fixed_recompute_batch);
+}
+
 static void clear_results(void)
 {
   for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) {
@@ -380,6 +548,7 @@ static void destroy_coroutines(void)
 {
   for (unsigned i = 0; i < NANO_LOOKUP_WORKERS; ++i) cpp_tasks[i].destroy();
   cpp_scheduler.reset();
+  lean_scheduler.reset();
   cpp_frame_next = 0;
 }
 
@@ -406,10 +575,15 @@ static void prepare(const volatile struct index_line *const *tables, uint64_t en
     seed_npc(i, (uint64_t)lookup_worker);
     __asm__ volatile("fence rw, rw" ::: "memory");
   }
-  if (mode == MODE_CPP_COROUTINE) {
+  if (mode == MODE_CPP_COROUTINE || mode == MODE_LEAN_COROUTINE
+      || mode == MODE_DIRECT_COROUTINE) {
     for (unsigned i = 0; i < active_workers; ++i) {
-      cpp_tasks[i] = coroutine_lookup(tables[i], entries, queries[i], &results[i]);
-      cpp_scheduler.push(cpp_tasks[i].handle);
+      cpp_tasks[i] = coroutine_lookup(tables[i], entries, queries[i], &results[i],
+                                      (i + 1) % active_workers, mode);
+      if (mode == MODE_LEAN_COROUTINE)
+        lean_scheduler.push(cpp_tasks[i].handle);
+      else
+        cpp_scheduler.push(cpp_tasks[i].handle);
     }
   }
 }
@@ -430,8 +604,14 @@ static __attribute__((noinline)) void run_operation(
     serial_lookup(tables, entries, queries, mode == MODE_SERIAL_PREFETCH);
   else if (mode == MODE_MATCHED_BATCH)
     matched_batch(tables, entries, queries, levels);
-  else if (mode == MODE_CPP_COROUTINE)
+  else if (mode == MODE_FIXED_SOA_BATCH)
+    run_fixed_soa_batch(tables, entries, queries, levels);
+  else if (mode == MODE_FIXED_RECOMPUTE_BATCH)
+    run_fixed_recompute_batch(tables, entries, queries, levels);
+  else if (mode == MODE_CPP_COROUTINE || mode == MODE_DIRECT_COROUTINE)
     cpp_scheduler.run();
+  else if (mode == MODE_LEAN_COROUTINE)
+    lean_scheduler.run();
   else
     ring(tables, entries, queries, mode, levels);
 }
@@ -521,11 +701,16 @@ static void initialize_table_pointers(void)
   drain_traffic();
 }
 
-/* Every invocation finishes in the same switch-only frontend state after
- * warming all instruction bodies on a distinct, already-small data index. */
-static void warm_instruction_paths(void)
+/* Warm the selected body on distinct, already-small data, then finish every
+ * invocation in the same switch-only frontend state. This avoids charging an
+ * implementation for cold instructions without letting unrelated warmups
+ * leave different final pipeline or instruction-cache state. */
+static void warm_instruction_paths(unsigned selected_mode)
 {
-  for (unsigned mode = 0; mode < MODE_COUNT; ++mode) {
+  unsigned modes[2] = {selected_mode, MODE_SWITCH_ONLY};
+  unsigned mode_count = selected_mode == MODE_SWITCH_ONLY ? 1 : 2;
+  for (unsigned index = 0; index < mode_count; ++index) {
+    unsigned mode = modes[index];
     prepare(warm_tables, NANO_LOOKUP_WARM_ENTRIES,
             nano_warm_queries, mode, NANO_LOOKUP_WARM_LEVELS);
     drain_traffic();
@@ -543,7 +728,9 @@ static const char *mode_name(unsigned mode)
 {
   static const char *const names[MODE_COUNT] = {
     "serial demand", "demand ring", "worker prefetch",
-    "matched batch", "switch-only", "serial prefetch", "C++20 coroutines"
+    "matched batch", "switch-only", "serial prefetch", "C++20 coroutines",
+    "fixed unrolled SoA batch", "fixed unrolled recompute batch",
+    "lean queue C++20 coroutines", "direct C++20 coroutines"
   };
   return names[mode];
 }
@@ -562,7 +749,7 @@ int main(void)
 
   initialize_table_pointers();
   emit_marker(0x8f);
-  warm_instruction_paths();
+  warm_instruction_paths(mode);
   prepare(measured_tables, NANO_LOOKUP_MEASURED_ENTRIES,
           nano_measured_queries, mode, NANO_LOOKUP_MEASURED_LEVELS);
   drain_traffic();

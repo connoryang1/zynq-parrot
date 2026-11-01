@@ -23,7 +23,7 @@ DDR_LATENCY_VERBOSE ?= 1
 STREAMS ?= 4
 STREAM_NODES ?= 32
 NANO_MODE ?= 2
-NANO_WORKERS ?= 5
+NANO_WORKERS ?= 8
 TARGET_BYPASS_TURNS ?= 128
 LIFECYCLE_EPOCHS ?= 6
 LIFECYCLE_EVICTION_LINES ?= 1024
@@ -222,8 +222,8 @@ run-mt_nano_lookup_benchmark: RUN_INPUT_ADDR = $(shell $(NM) -n $(ZP_RISCV_DIR)/
 run-mt_nano_lookup_benchmark: check-nano-lookup-config
 .PHONY: check-nano-lookup-config
 check-nano-lookup-config:
-	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 6 || $(NANO_WORKERS) < 2 || $(NANO_WORKERS) > 10 )); then \
-		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10, NANO_MODE in [0,6], and NANO_WORKERS in [2,10]"; exit 1; \
+	@if (( $(NUM_THREADS) != 2 || $(NUM_CONTEXTS) != 10 || $(PREFETCH_ELS) < 10 || $(PREFETCH_ELS) > 10 || $(NANO_MODE) < 0 || $(NANO_MODE) > 10 || $(NANO_WORKERS) < 2 || $(NANO_WORKERS) > 10 )); then \
+		echo "ERROR: Nano lookup requires NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10, NANO_MODE in [0,10], and NANO_WORKERS in [2,10]"; exit 1; \
 	fi
 .PHONY: check-dependent-topology
 check-dependent-topology:

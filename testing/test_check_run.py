@@ -100,7 +100,8 @@ class HarnessTests(unittest.TestCase):
         for mode, threads, contexts, slots, expected in (
                 (0, 2, 10, 10, True), (4, 2, 10, 10, True),
                 (5, 2, 10, 10, True), (6, 2, 10, 10, True),
-                (7, 2, 10, 10, False),
+                (7, 2, 10, 10, True), (10, 2, 10, 10, True),
+                (11, 2, 10, 10, False),
                 (2, 2, 4, 10, False),
                 (2, 2, 10, 9, False)):
             with self.subTest(mode=mode, threads=threads, contexts=contexts, slots=slots):

@@ -171,18 +171,21 @@ in the second. The detached side buffer consumes each word once and does not
 shift subword hits, so the benchmark unpacks the selected link in registers.
 This models database/search fan-out while ensuring that one shard's shared
 upper tree does not collapse the selected independent requests into one.
-Runtime `NANO_MODE=0..6` selects serial demand, demand ring, worker prefetch,
-matched software batch, switch-only, serial prefetch, or compiler-generated C++20 coroutines
-without changing the ELF/NBF. `NANO_WORKERS=2..10` selects the matched query/shard count;
-five is the maintained default selected by the complete speedup sweep. Every
-invocation warms all seven instruction bodies on separate 31-entry shards, seeds
-and clears common state, fences traffic, emits explicit
+Runtime `NANO_MODE=0..10` selects serial demand, demand ring, worker prefetch,
+matched software batch, switch-only, serial prefetch, checked compiler-generated
+C++20 coroutines, two compile-time-unrolled software batches, lean-queue
+coroutines, or direct symmetric-transfer coroutines without changing the
+ELF/NBF. `NANO_WORKERS=2..10` selects the matched query/shard count;
+eight is the maintained default selected by the fair-software sweep. Every
+invocation warms its selected instruction body on separate 31-entry shards,
+then runs switch-only to establish one common final frontend state, seeds and
+clears common state, fences traffic, emits explicit
 BEGIN/END markers around `0xCC0` timing, and checks all lower bounds, path
 checksums, step counts, and completions afterward. Run one mode at a time:
 
 ```sh
 make -C testing run-mt_nano_lookup_benchmark \
-  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=5 TRACE=1 \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=8 TRACE=1 \
   SIM_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10'
 ```
 
