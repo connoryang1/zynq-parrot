@@ -77,6 +77,16 @@ class Test {
     }
     throw std::runtime_error("architectural cache request timeout");
   }
+  void simultaneous_demand_replay(uint64_t addr) {
+    dut.req_type_i = miss_load; dut.req_addr_i = addr; dut.req_v_i = 1;
+    dut.replay_addr_i = addr; dut.replay_v_i = 1;
+    Handshake accepted = step();
+    dut.req_v_i = 0; dut.replay_v_i = 0;
+    require(accepted.request && accepted.replay,
+            "same-cycle demand/replay test did not admit both requests");
+    dut.metadata_way_i = 3; dut.metadata_v_i = 1; step();
+    dut.metadata_v_i = 0; step();
+  }
   void wait_sent(unsigned count) {
     for (unsigned n = 0; n < 200; ++n) {
       step();
@@ -133,6 +143,21 @@ public:
     tick(4); dut.reset_i = 0; tick(10);
     require(dut.replay_ready_o && !dut.req_lock_o, "UCE initialization failed");
 
+    // Demand and advisory replay can reach the independent ingress ports on
+    // the same edge. The demand owns that line once accepted; retaining the
+    // replay would issue redundant traffic and delay the already-queued miss.
+    dut.fwd_ready_i = 0;
+    simultaneous_demand_replay(0x8000f000);
+    require(dut.replay_valid_o == 0,
+            "same-cycle replay survived its accepted same-line demand");
+    dut.fwd_ready_i = 1;
+    wait_sent(1);
+    require(!sent[0].prefetch && sent[0].addr == 0x8000f000,
+            "same-cycle collision did not preserve only ordinary demand");
+    response(sent[0]); wait_idle_empty();
+    sent.clear();
+    data_writes = 0; side_writes = 0; publishes = 0;
+
     // A complete reply must install all four beats before publishing its tag.
     enqueue(0x80010027); wait_sent(1);
     require(sent[0].prefetch && sent[0].size == 6
@@ -169,8 +194,8 @@ public:
       wait_idle_empty();
       require(dut.replay_valid_o == 0 && side_writes == old_side_writes + 8,
               "side-buffer overtaken replay was not dropped exactly once");
-      std::cout << "[UCE-ICACHE-REPLAY] PASS: detached retirement and "
-                   "overtaken same-line replay drop\n";
+      std::cout << "[UCE-ICACHE-REPLAY] PASS: same-cycle collision, detached "
+                   "retirement, and overtaken same-line replay drop\n";
       return;
     }
 
@@ -231,9 +256,9 @@ public:
     require(dut.replay_valid_o == 0,
             "overtaken replay was not dropped for resident demand");
 
-    std::cout << "[UCE-ICACHE-REPLAY] PASS: full-line install, resident-line drop, "
-                 "fence drain-without-publish, demand-priority abort, "
-                 "overtaken same-line replay drop\n";
+    std::cout << "[UCE-ICACHE-REPLAY] PASS: same-cycle collision, full-line "
+                 "install, resident-line drop, fence drain-without-publish, "
+                 "demand-priority abort, overtaken same-line replay drop\n";
   }
 };
 }

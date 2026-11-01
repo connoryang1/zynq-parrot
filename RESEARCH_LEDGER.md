@@ -934,6 +934,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Missing:** a routed timing-clean image and fresh Linux stability/performance comparisons. Direct late-drop telemetry would be required before attributing any physical change to this mechanism; the existing FPGA bitstream predates it, and the board requires recovery before another live run.
 - **Decisive experiment:** route the exact simulation-accepted checkpoint, then use the conservative keep-restore table for a matched physical stability/performance comparison. Treat any result as the effect of the complete RTL checkpoint unless separate telemetry directly observes a late drop; do not use the pre-activation keep-dequeue boot stall as a mechanism test.
 
+### RL-098 — Same-edge demand/replay admission was a second duplicate-traffic race
+
+- **Status:** accepted focused and full-core simulation fix; routed/physical acceptance pending
+- **Root cause and red evidence:** the detached replay ingress and ordinary cache-request FIFO handshake independently. RL-097 compared replay only with a demand already in `cache_req_r`, leaving a one-cycle window in which an ordinary miss and identical detached replay could both be accepted before either became visible to the other comparator. A directed test holds the forward link, presents both on the same edge, observes both handshakes, and fails the unmodified `158adde75` RTL because the replay remains valid behind the accepted demand.
+- **Fix and validation:** the demand-match condition now also covers an ordinary load/store miss accepted on the current edge. The identical replay is acknowledged without allocation while the ordinary request proceeds; an unrelated or unaccepted request keeps prior behavior. Final side-buffer and legacy focused tests pass, the four-slot/80-cycle control remains 16 requests in 393 cycles at maximum occupancy four, and a clean traced two-resident/four-context `mt_icache_replay_test` reaches its test-specific replay PASS plus CORE/BSG PASS. Exact red/green logs, FSTs, manifests, full-core NBF/ELF, and hashes are under `logs/icache-replay-same-cycle-demand-20261101/`.
+- **Meaning:** the race is a real local source of redundant traffic and demand delay, independent of the later resident-demand case. Removing it improves protocol behavior but does not prove that either collision occurred in the accepted FPGA benchmark or caused the v1 table instability; no Linux speedup is assigned to it.
+- **Next gate:** the active route `20261101T125426Z-0fb3da28` contains RL-097 but predates this fix, so retain it only as the resident-only comparator/timing datapoint. Commit the exact accepted checkpoint, route it after the current job terminates, and require timing-clean fit before any recovery-qualified Linux comparison.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
