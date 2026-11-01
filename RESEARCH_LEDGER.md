@@ -988,6 +988,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Attribution:** an independent bootstrap against RL-102's joint wake/data analysis gives a joint-minus-instruction local-load effect of -33.75 cycles with block interval `[-37.5,-19]`, proving that the locally useful lines come from data hints rather than instruction replay. Incremental wake-to-load is +7,267.75 cycles with `[-9363,15621.5]`, unresolved with a harmful point estimate. Comparison SHA-256 is `ad026cf0...781f`; exact evidence is under `logs/instruction-control-corrected-route-20261101/`.
 - **Limit:** the ordinary instruction-only benchmark calls `getrusage()` after first use while the joint image uses its counted late hook, so the strict comparison excludes post-load and roundtrip. RL-102's within-image roundtrip gain remains valid but is not specifically attributable to data. The next useful gate is a lower-cost data-hint count or a size-neutral earlier timing, evaluated first for wake-to-load rather than tail throughput.
 
+### RL-104 — One data hint remains locally useful but does not rescue first use
+
+- **Status:** accepted corrected-route FPGA/Linux best-case line-count result; first-use benefit rejected as demonstrated
+- **Scope:** RL-102's exact wake-data NBF and routed bitstream, one registered group-seven target line and three zero registration arguments, one dependent target load, FIFO policy, persistent replay, four fresh opposite-order fixed-arm boots, and 512 accepted trials per arm
+- **Result:** the local load improves by 37 cycles on the replicate-stratified enabled-minus-disabled estimand, with circular-block interval `[-39,-19.5]`. Wake-to-load has a harmful +7,980.75-cycle point and unresolved `[-1869.5,16050]`. Roundtrip improves by 299.75 cycles with `[-688.5,-42.75]`, approximately 0.21% of the pooled disabled median.
+- **Evidence:** every arm binds `lines=1`, exact NBF/ELF/transfer/control/bitstream identities, expected hook counts, 512 ordered rows/tails, zero retries, kernel-failure screening, and terminal child/parent/core/host PASS. Analysis SHA-256 is `0a644a3b...67aec`; exact artifacts are under `logs/wake-data-line-count-20261101/`.
+- **Meaning:** one physical hint produces at least as much resolved local-load saving as the four-line case while reducing CSR issue count, yet still fails to move the noisy first-use boundary. Four CSR writes are therefore not the sole cause of the missing resume-latency gain. The next bounded candidate is the same one-line footprint issued earlier in scheduling while retaining successful-wakeup instruction replay and table/layout identity.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
