@@ -1,7 +1,7 @@
 {
-  "purpose": "Test the accepted futex-v1 membership without the two lines absent from both disabled traces, avoiding v2's two unhelpful replacement requests.",
+  "purpose": "Test the 14-line futex-v1 core present in both complete disabled traces while removing two entries observed only in replicate 2, avoiding v2's two replacement requests.",
   "fixed_shared_prefix": {
-    "policy": "retain the 14 futex-v1 entries demanded by both disabled traces; shrink capacity instead of replacing the two unused entries",
+    "policy": "retain the 14 futex-v1 entries present in both complete disabled traces; shrink capacity instead of replacing the two replicate-specific entries",
     "line_count": 14,
     "lines": [
       {"rank": 0, "paddr": 2158049344, "cache_set": 33, "source": "futex-v1 retained"},
@@ -21,6 +21,7 @@
     ]
   },
   "removed_lines": [2149840768, 2149594304],
+  "removed_line_observation": "neither line appears in replicate 1; both appear in replicate 2, so they are trace-variable rather than unused",
   "guardrails": {
     "capacity_reduced_from": 16,
     "trigger_unchanged": true,

@@ -139,11 +139,12 @@ median difference is -486.25 cycles. Its 100,000-sample IID interval is
 ten-handoff block interval is `[-686,-281.75]`, with every resample favoring
 replay.
 
-Pooled median I requests fall from 198 disabled to 183 enabled. Both disabled
-final traces demand the same 14 candidate lines; neither enabled trace demands
-any candidate line. The two candidate slots absent from both disabled traces
-are `0x8023f780` and `0x802034c0`, leaving one more bounded same-capacity tuning
-question before fixed-table iteration is exhausted.
+Pooled median I requests fall from 198 disabled to 183 enabled. The complete
+disabled traces contain a common core of 14 candidate lines; neither enabled
+trace demands any candidate line. Replicate 2 additionally demands
+`0x8023f780` and `0x802034c0`, while replicate 1 demands neither. The earlier
+description of those two entries as absent from both traces was incorrect;
+they are trace-variable rather than unused.
 
 The retained analysis is `futex-total-ab-results.json`; deterministic logs and
 statuses are under `futex-total-physical/`. This is the direct performance
@@ -153,7 +154,7 @@ throughput evidence.
 
 ## Final manual table iteration
 
-The two v1 entries absent from both RL-090 disabled traces were replaced by
+The two v1 entries seen only in RL-090 disabled replicate 2 were replaced by
 common early lines `0x80a12500` (`irqentry_nmi_exit`) and `0x802980c0`
 (`__riscv_sys_futex`). The earlier common `0x80203280` line was deliberately
 excluded because it lies in freed-init or alias-prone space. V2 retains 14 of
@@ -185,15 +186,21 @@ recoverable from exact local and committed evidence.
 V2 policy, header, build summaries, deterministic logs/statuses, and strict
 analysis are retained beside v1 evidence as `futex-prefix16-v2-*`,
 `futex-v2-physical/`, and `futex-v2-table-ab-results.json`.
+The historical v2 policy JSON/header retain their original predeclared
+"absent from both" wording for artifact identity; RL-099 and the membership
+audit supersede that interpretation without changing the built address table.
 
 ## Prefix-14 shrink candidate
 
 The next bounded candidate removes v1 entries `0x8023f780` and `0x802034c0`,
-which were absent from both disabled futex traces, and compacts the 14 retained
-entries without adding v2's replacement traffic. This exact membership is in
+which appear only in disabled replicate 2, and compacts the 14-line common core
+without adding v2's replacement traffic. This exact membership is in
 `futex-prefix14-shrink-candidate.json` and its generated source form is
 `futex-prefix14-shrink-header.h`. It is prepared but not built or measured; it
 has no performance or stability claim. Its gate is a strict opposite-order
 enabled/disabled comparison, with any terminal fault rejecting the candidate.
-The generator reproduced the retained header byte-for-byte. Candidate JSON and
-header SHA-256 values are `03a7ea38...e5b8e` and `af97662f...5b0d`.
+After correcting the policy wording, the generator again reproduces the
+retained header byte-for-byte. Candidate JSON and header SHA-256 values are
+`ae043a1a...727a` and `264d7cd2...e8c0`; the 14-address array is unchanged.
+`futex-v1-trace-membership-audit.json` (`9513d302...036c`) preserves the exact
+source hashes and corrected per-replicate membership.

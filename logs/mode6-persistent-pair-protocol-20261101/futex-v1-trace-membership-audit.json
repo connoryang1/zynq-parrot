@@ -1,0 +1,35 @@
+{
+  "purpose": "Correct the v1 table-membership interpretation without changing the accepted timing result.",
+  "source_sha256": {
+    "physical/rep1-disabled.log": "a3d9a56f049d7d5bbdced349318afef3da73c364a944ff3aee17e2bf0b1e0d7f",
+    "physical/rep2-disabled.log": "cabd5a0327e99d81e8f796d639e15c8131c1b52bdc80c9f8d402824d8b47ffb3",
+    "persistent-ab-results.json": "d5a80284cf392a4461fd6dc2d02caad52d58ab0648a3473d18b5fdce0681d049",
+    "futex-total-ab-results.json": "5650efa87fd1e8e08ce324b04e0bf0da330da5814768ceb82e0ab57c00d6e8c3"
+  },
+  "complete_trace_common_core": {
+    "line_count": 14,
+    "present_in_rep1": 14,
+    "present_in_rep2": 14,
+    "lines": [
+      "0x80a13840", "0x80246800", "0x80246840", "0x80a12200",
+      "0x80a12280", "0x80298000", "0x80298040", "0x8023f840",
+      "0x80a13a40", "0x80a13a80", "0x80a13c40", "0x80a13ac0",
+      "0x80236780", "0x80298100"
+    ]
+  },
+  "trace_variable_lines": [
+    {
+      "paddr": "0x8023f780",
+      "rep1_present": false,
+      "rep2_present": true,
+      "rep2_relative_cycle": 19624
+    },
+    {
+      "paddr": "0x802034c0",
+      "rep1_present": false,
+      "rep2_present": true,
+      "rep2_relative_cycle": 22214
+    }
+  ],
+  "correction": "The two variable lines were previously described as absent from both disabled traces. They are absent only from replicate 1 and therefore cannot be called unused."
+}
