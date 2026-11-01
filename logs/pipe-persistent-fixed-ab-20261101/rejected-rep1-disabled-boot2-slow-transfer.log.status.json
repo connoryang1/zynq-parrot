@@ -1,0 +1,16 @@
+{
+  "status": "FAIL",
+  "nbf_sha256": "5e42c2f6c801d71506a3c6fc5e708aa01c0e6a46996fc72bc64236135565d2bd",
+  "transfer_sha256": "855fb8493f10bf0b7a366bb5fb0b76755e99a3810417bb6b52109e638b6e60cc",
+  "elf_sha256": "16eb7b7b89c25383aaef23ce98d8206352e713e60e3ff72bc5c95ad60d25dcba",
+  "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "footprint": "hot-proxy",
+  "policy": "fifo",
+  "replay_state": "persistent",
+  "arm": "disabled",
+  "cells": [
+    "7:wake-trigger"
+  ],
+  "error": "EOF(\"End Of File (EOF). Exception style platform.\\n<pexpect.pty_spawn.spawn object at 0x7f482549be50>\\ncommand: /dev/shm/zp-linux-data-instruction-preview/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh\\nargs: [b'/dev/shm/zp-linux-data-instruction-preview/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh', b'xilinx@192.168.4.35', b'/dev/shm/zp-mode6-wakeup-build/linux-mode6-wakeup-prefix16.nbf']\\nbuffer (last 100 chars): ''\\nbefore (last 100 chars): 'INFO:    Returning from ps_main with RC: 0\\\\r\\\\nINFO:    BSG PASS\\\\r\\\\nConnection to 192.168.4.35 closed.\\\\r\\\\r\\\\n'\\nafter: <class 'pexpect.exceptions.EOF'>\\nmatch: None\\nmatch_index: None\\nexitstatus: None\\nflag_eof: True\\npid: 1220146\\nchild_fd: 5\\nclosed: False\\ntimeout: 300\\ndelimiter: <class 'pexpect.exceptions.EOF'>\\nlogfile: None\\nlogfile_read: <_io.TextIOWrapper name='logs/pipe-persistent-fixed-ab-20261101/rep1-disabled.log' mode='w' encoding='UTF-8'>\\nlogfile_send: None\\nmaxread: 2000\\nignorecase: False\\nsearchwindowsize: None\\ndelaybeforesend: 0.05\\ndelayafterclose: 0.1\\ndelayafterterminate: 0.1\\nsearcher: searcher_re:\\n    0: re.compile('(?:^|\\\\\\\\r?\\\\\\\\n)(?:~ )?# ')\")",
+  "recovery": "Power-cycle the board, wait for PYNQ readiness, and reload the verified overlay before another run."
+}

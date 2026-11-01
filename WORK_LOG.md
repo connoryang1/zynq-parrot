@@ -2,7 +2,7 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
-- **Persistent pipe A/B prepared — 2026-11-01:** added fixed enabled/disabled arms to the 512-trial FIFO pipe benchmark so persistent replay can be compared across fresh boots without interleaved-state leakage or per-trial `fence.i`; a strict exact-identity/timing analyzer and single-group runner path pass all 100 Linux tests and the 60-test focused harness. The clean RV64 ELF/transfer hash to `16eb7b7b...dcba`/`855fb849...60cc`; FPGA arms remain pending mandatory recovery (`logs/pipe-persistent-fixed-ab-20261101/`, RL-092).
+- **Persistent pipe A/B prepared — 2026-11-01:** added fixed enabled/disabled arms to the 512-trial FIFO pipe benchmark so persistent replay can be compared across fresh boots without interleaved-state leakage or per-trial `fence.i`; a strict analyzer and runner path pass all 100 Linux tests. One slow-transfer enabled feasibility arm passes, but two pre-sample boots end in host `Errant write`; widening base64 chunks reduces the upload from roughly 240 to 36 data commands, and local execution of transfer `b6d9f373...dd09e` reconstructs exact ELF `16eb7b7b...dcba`. Final matched FPGA arms restart with the fast identity (`logs/pipe-persistent-fixed-ab-20261101/`, RL-092).
 
 - **Final manual table expansion rejected — 2026-11-01:** replacing v1's last two unused entries with common early irq/futex lines produces opposite FPGA effects of -115.5 and +286.5 candidate-minus-v1 cycles; pooled v2 is 73 cycles slower, with IID `[-136.5,355.25]` and block `[-125.75,328]` intervals crossing zero. V1 remains accepted, and fixed-table membership tuning is closed (`logs/mode6-persistent-pair-protocol-20261101/`, RL-091).
 

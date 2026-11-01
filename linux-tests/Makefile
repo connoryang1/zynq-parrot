@@ -82,6 +82,10 @@ CFLAGS := -O2 -static -Wall -Wextra -Werror \
 # provenance separate from the older medany test-program default above.
 PHYSICAL_PREVIEW_CFLAGS := -O2 -static -Wall -Wextra -Werror \
   -march=rv64imafdc_zicsr_zifencei -mabi=lp64d
+# Keep the historical 76-column transfer by default, but allow longer chunks
+# for fragile slow-UART board sessions. Values well below the guest shell's
+# command-line limit reduce prompt round trips without changing ELF bytes.
+PHYSICAL_PREVIEW_TRANSFER_WIDTH ?= 76
 
 .PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-linux-data-preview stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
 
@@ -219,22 +223,22 @@ emit-cache-miss-trace-dynamic-transfer: check-linux-cc cache-miss-trace-capture-
 
 emit-physical-preview-benchmark-transfer: check-linux-cc physical-preview-benchmark
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark.b64'
-	@base64 -w 76 $(PHYSICAL_PREVIEW_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark.b64|"
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark.b64 > /tmp/scheduler_physical_preview_benchmark' 'chmod +x /tmp/scheduler_physical_preview_benchmark'
 
 emit-physical-preview-benchmark-dynamic-transfer: check-linux-cc physical-preview-benchmark-dynamic
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark_dynamic.b64'
-	@base64 -w 76 $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark_dynamic.b64|"
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark_dynamic.b64 > /tmp/scheduler_physical_preview_benchmark_dynamic' 'chmod +x /tmp/scheduler_physical_preview_benchmark_dynamic'
 
 emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture.b64'
-	@base64 -w 76 $(PHYSICAL_PREVIEW_TRACE_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture.b64|"
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture.b64 > /tmp/scheduler_physical_preview_trace_capture' 'chmod +x /tmp/scheduler_physical_preview_trace_capture'
 
 emit-physical-preview-trace-dynamic-transfer: check-linux-cc physical-preview-trace-dynamic
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture_dynamic.b64'
-	@base64 -w 76 $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture_dynamic.b64|"
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture_dynamic.b64 > /tmp/scheduler_physical_preview_trace_capture_dynamic' 'chmod +x /tmp/scheduler_physical_preview_trace_capture_dynamic'
 
 check-request-benchmark:

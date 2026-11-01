@@ -24,7 +24,7 @@ Every enabled or disabled arm receives a fresh physical power cycle, readiness w
 - Pipe-trained mode-6 NBF SHA-256: `5e42c2f6c801d71506a3c6fc5e708aa01c0e6a46996fc72bc64236135565d2bd`
 - Control-program SHA-256: `2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30`
 - Fixed-arm benchmark ELF SHA-256: `16eb7b7b89c25383aaef23ce98d8206352e713e60e3ff72bc5c95ad60d25dcba`
-- Fixed-arm transfer SHA-256: `855fb8493f10bf0b7a366bb5fb0b76755e99a3810417bb6b52109e638b6e60cc`
+- Fixed-arm transfer SHA-256: `b6d9f3731ebcbd6b2717a1e0d8987c7b6a3ee58364ce7d04ce19801f0d2dd09e`
 - Compiler: `/home/jhumphri/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc`
 
 The generated enabled command is:
@@ -38,3 +38,11 @@ The disabled arm changes only the final argument. The board runner selects only 
 ## Decision sequence
 
 First compare the pipe-trained table against disabled replay. If the opposite-order fixed-arm result resolves, compare the accepted futex-specific v1 table on the same pipe protocol to quantify specialization. If the initial group result is promising but set interference remains plausible, expand the fixed-arm comparison across all eight groups before claiming a pipe-path speedup.
+
+## Rejected boots
+
+The first disabled attempt reached `/init` and began Buildroot startup, then the host bridge reported `Errant write to 1c3d80` while the guest printed `Running sysctl`. The run ended with host BSG PASS before a shell, uploaded ELF, benchmark command, or timing sample existed. Exact launch hashes had passed, but the root cause of this intermittent pre-shell failure is not established; the transcript is rejected and retained as `rejected-rep1-disabled-boot1.log.gz` with its FAIL status.
+
+After complete recovery, the unchanged retry reached a shell but died with `Errant write to 1e3de8` near the end of the historical 76-column base64 upload. It issued roughly 240 individual shell commands over several minutes and still produced no benchmark sample. That transcript is `rejected-rep1-disabled-boot2-slow-transfer.log.gz`. A successful enabled feasibility run using the same slow transfer is retained as `exploratory-slow-transfer-enabled.log.gz`, but it is excluded from the matched A/B because the transfer protocol is changing.
+
+The second failure exposed avoidable guest exposure rather than a disabled-mode result. The exact 13,784-byte ELF compresses to 6,020 bytes and needs only 36 data commands when ordinary base64 lines widen from 76 to 512 characters. The Makefile now permits an explicit `PHYSICAL_PREVIEW_TRANSFER_WIDTH=512` while keeping 76 as the historical default. The exact 39-line transfer was generated with `make --no-print-directory` so redirected Make chatter cannot become bogus guest commands, and a local execution reconstructed the exact ELF SHA-256 byte for byte. Final A/B arms restart with this one fast-transfer identity. Every failed board state still requires a complete physical power cycle, readiness wait, and overlay reload.
