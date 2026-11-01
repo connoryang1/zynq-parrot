@@ -130,6 +130,8 @@ backends must implement. Its initial contract is deliberately small:
 - endpoints and shared regions are opaque kernel-issued values, never context
   numbers, page-table roots, PCs, or pointers;
 - a shared buffer is a region token plus an overflow-safe offset and length;
+- buffer-reference encoding rejects invalid messages and zeroes any newly
+  exposed word gap, so stale caller storage never becomes payload;
 - region permissions and direction are fixed at binding time rather than
   accepted from caller-controlled message bits;
 - services resolve buffer references through the runtime in their own address

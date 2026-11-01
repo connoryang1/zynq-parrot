@@ -7,7 +7,8 @@
 int main(void)
 {
     protected_rpc_message_t message;
-    memset(&message, 0, sizeof(message));
+    memset(&message, 0xa5, sizeof(message));
+    message.length = 0;
 
     const protected_rpc_buffer_ref_t input = {
         .region = {.opaque = UINT64_C(0x12340007)},
@@ -18,6 +19,7 @@ int main(void)
 
     assert(protected_rpc_encode_buffer(&message, 1, input));
     assert(message.length == 4);
+    assert(message.words[0] == 0);
     assert(protected_rpc_decode_buffer(&message, 1, &output));
     assert(output.region.opaque == input.region.opaque);
     assert(output.offset == input.offset);
@@ -31,6 +33,8 @@ int main(void)
     assert(!protected_rpc_buffer_range_valid(UINT64_MAX, &output));
 
     assert(!protected_rpc_encode_buffer(&message, 2, input));
+    message.length = PROTECTED_RPC_MAX_WORDS + 1;
+    assert(!protected_rpc_encode_buffer(&message, 0, input));
     message.length = 3;
     memset(&output, 0xa5, sizeof(output));
     assert(!protected_rpc_decode_buffer(&message, 1, &output));

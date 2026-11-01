@@ -165,11 +165,14 @@ static inline int protected_rpc_encode_buffer(
     protected_rpc_message_t *message, size_t first_word,
     protected_rpc_buffer_ref_t ref)
 {
-    if (message == NULL
+    if (!protected_rpc_message_valid(message)
         || first_word > PROTECTED_RPC_MAX_WORDS - PROTECTED_RPC_BUFFER_WORDS) {
         return 0;
     }
 
+    for (size_t word = message->length; word < first_word; word++) {
+        message->words[word] = 0;
+    }
     message->words[first_word] = ref.region.opaque;
     message->words[first_word + 1] = ref.offset;
     message->words[first_word + 2] = ref.length;
