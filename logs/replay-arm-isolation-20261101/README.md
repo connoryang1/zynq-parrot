@@ -70,8 +70,30 @@ The isolation-specific position check is more decisive. Leading-versus-trailing 
 
 Exact compressed raw/status, 20,000-sample partial-cell analysis, and 5,000-sample position analysis are retained under `physical-sweep/` with SHA-256 values `93f52385...6417`, `4eba9ac0...872e`, `b82bbef9...87f2f`, and `3146b082...5198`. The decompressed raw transcript hashes to `a1df868a...f5b1`.
 
+## Complete isolated mode-6 matrix
+
+After recovery through the documented private outlet fallback, the board passed readiness at 94 seconds, reloaded exact bitstream `e97e0517...2381`, and reported FPGA state `operating`. The exact NBF, corrected ELF, and transfer hashes matched. All eight `wake-trigger target fifo isolated` groups then completed 512 accepted trials apiece, with 13 asynchronous attempts filtered and repeated, eight zero cell exits, runner RC zero, and final child/parent/CORE/BSG PASS.
+
+The first attempt to inspect the fallback script with URL redaction had a shell-quoting syntax error and executed no controller request. A corrected redaction-only inspection confirmed its two PUT operations without exposing the endpoint; the maintained power helper then performed the accepted cycle. Keep endpoint parsing and use inside one shell process so the credential never enters command output or tracked evidence.
+
+Across 4,096 accepted trials, the stratified paired result does not show a cold first-resume gain. Wake-to-entry is `-1058.75 [-1886.75,580.25]` saved cycles, the four local data loads are `0 [-0.5,0]`, and wake-to-load is `-993.25 [-1834.75,822.5]`; negative values mean replay is slower. The complete roundtrip regresses by 7,838.5 cycles, with saved-cycle interval `[-9071.5,-5199.5]`. Five of eight individual groups have roundtrip intervals wholly below zero.
+
+The chronology check continues to validate isolation: trailing-disabled minus leading-disabled wake-to-load is `-16 [-80,37.5]`, unlike the historical persistent matrix's −888-cycle position shift. The first half is neutral at −59.5 paired wake-to-load cycles, while the second half is −1294.75; quarter signs vary. Thus the unresolved first-resume result is not promoted to a slowdown claim, but the full-return regression is stable enough to reject per-switch clear-and-refill mode 6 as a performance policy for this benchmark.
+
+The next discriminator is the same isolated eight-group matrix with selection-time mode 5. If it also regresses on roundtrip, the cold replay burst or its cache/transport effects dominate; if it does not, the early successful-wakeup launch creates the harmful tail. The fresh-boot persistent-pair A/B remains separately necessary because production retained lines avoid per-switch refill.
+
+Evidence hashes are:
+
+```text
+compressed raw: 93597e25b29c73a6f4a3d8465bb1a1c297fbd1e80c3ec5599ddea12621df3f91
+raw content:    2b721c1cd3247e878f061769a3944e3cd01a02c1841115aafdfcb389c698d2eb
+runner status:  bb3d9acde5fcf1275596272c593a9e15e887114c4cc57f1b7df7bf6ed6114324
+primary result: bfb253a24128b6ae4bbeaa3c30ac5fb450ba66e4ba1aabdf8abe135eceedb920
+chronology:     d9803d617f775cee6b928c788a642c8b9de1f35e51e8dab4cdaa448d5e9f5680
+```
+
 ## Acceptance plan and limits
 
-The complete eight-group isolated mode-6 matrix, isolated mode-5 selection-time control, and independent isolated mode-6 replication remain pending. A valid result must retain exact ELF/NBF/bitstream hashes, final runner/CORE/BSG PASS, and show that the full chronology analyzer remains free of a systematic arm-position effect. The feasibility run ended through guest shutdown, so the board must be physically power-cycled and the overlay reloaded before another launch; the current shell still lacks the private power-controller URL.
+The complete mode-6 matrix is now accepted. The isolated mode-5 selection-time control and fresh-boot persistent-pair A/B remain pending. Every run ends through guest shutdown, so the board must be physically power-cycled, pass readiness, and reload the exact overlay before another launch; use the documented local outlet fallback without exposing its endpoint.
 
 `fence.i` deliberately creates a cold-instruction best case and clears the ordinary local I-cache as well as the advisory buffer. It is a mechanism ceiling, not a claim about the natural temperature of general Linux context switches. A later representative workload must use a production clear/generation policy rather than issuing `fence.i` on every handoff.
