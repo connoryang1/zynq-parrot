@@ -33,6 +33,8 @@ The disabled arm changes only `wake-trigger` to `disabled`.
 
 The first local rebuild used the Makefile's unavailable default `riscv64-unknown-linux-gnu-gcc` name and stopped before producing a result. The confirmed cause was a missing `PATH` entry, not a source failure; all accepted rebuild commands pass the explicit Buildroot compiler path shown above. Future reproductions must keep that explicit toolchain argument.
 
+The mutable `linux-tests/out` ELF was later overwritten by the pipe-arm build. The complete accepted `physical/rep1-enabled.log` transcript retained all 255 base64 chunks, so `recovered-board-artifacts/` reconstructs the historical futex ELF directly rather than relying on compiler reproducibility. Its 14,528-byte ELF and regenerated 76-column transfer match the accepted hashes `91f0db11...c0cf` and `b5103c89...5518` exactly; `manifest.json` records the source transcript hash and procedure.
+
 ## Acceptance design
 
 Run two fresh-boot pairs in opposite order:
