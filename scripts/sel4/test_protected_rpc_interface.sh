@@ -100,3 +100,16 @@ printf '%s\r\r\n' \
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer "$uart_log"
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
     --components --caller-badge 24090 "$uart_log"
+
+badge_missing_log="$build_dir/physical-uart-badge-missing.log"
+grep -v '^SEL4_RPC_CALLER_BADGE ' "$uart_log" > "$badge_missing_log"
+if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components --caller-badge 24090 "$badge_missing_log" >/dev/null 2>&1; then
+    echo "caller-badge checker accepted a missing marker" >&2
+    exit 1
+fi
+if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components --caller-badge 24091 "$uart_log" >/dev/null 2>&1; then
+    echo "caller-badge checker accepted the wrong badge" >&2
+    exit 1
+fi
