@@ -262,6 +262,10 @@ outside the version-1 fast path and must never cause an automatic retry.
 7. Commit before complete preparation fails, staging after preparation clears
    the preparation state, and a prepared server begins with zero in every GPR
    not explicitly installed by the call transition.
+8. A nonzero badge minted into the caller's endpoint cap is derived by the
+   kernel and reaches the same handler context through ordinary endpoint IPC
+   and protected hardware RPC; the caller cannot supply or alter it in the
+   request payload.
 
 Any server fault/cancellation path not yet capable of producing an explicit
 `COMMITTED_FAILED` result is outside the hardware fast path and must be ruled
