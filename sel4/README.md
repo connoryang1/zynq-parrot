@@ -47,11 +47,12 @@ an overflowing range and unknown region fail closed, forced hardware reports
 `UNSUPPORTED` without contacting the server, and forced software reports the
 software path. On BlackParrot, the same test additionally binds a second
 blocked server through the kernel, executes 256 forced hardware calls, unbinds
-it, and invokes the same sum service eight times through ordinary endpoint
-IPC. The focused BlackParrot build skips the much slower 256-call software
-buffer workload, which remains unchanged in the generic/QEMU regression. This
-last path is built but remains runtime evidence pending the cycle-accurate
-full-system acceptance run.
+it, and uses automatic routing for eight more calls. The detached hardware
+backend reports a precise non-executed attempt, so each call falls back exactly
+once to the same service through ordinary endpoint IPC. The focused BlackParrot
+build skips the much slower 256-call software buffer workload, which remains
+unchanged in the generic/QEMU regression. The cycle-accurate full-system gate
+passes all 256 hardware calls and all eight post-unbind fallback calls.
 
 Materialize the test into a pinned sel4test checkout:
 
@@ -190,9 +191,10 @@ The pinned kernel patch in
 adds two private endpoint invocation labels. `BIND` requires the endpoint's
 send authority plus one server-TCB extra cap. The kernel requires that TCB to
 be the endpoint's sole blocked receiver, derives both SATPs and the endpoint
-badge, validates a fixed entry/SP/GP/TP and bounded word counts, generates a
-fresh token, and installs the descriptor through OpenSBI. `UNBIND` is accepted
-only from the recorded caller through the recorded endpoint.
+badge, confirms that both VSpace roots remain live in the ASID table and are
+physically distinct, validates a fixed entry/SP/GP/TP and bounded word counts,
+generates a fresh token, and installs the descriptor through OpenSBI. `UNBIND`
+is accepted only from the recorded caller through the recorded endpoint.
 
 The trusted wrapper in `src/protected_rpc_blackparrot_sel4.c` converts that
 token into the backend-private association used by `protected_rpc_call()`.
@@ -231,23 +233,56 @@ otherwise optimized build. This removes unrelated full-suite load/zero work
 from the cycle-accurate boot while preserving the same RPC test and makes its
 exact pass marker observable. The RPC-only driver uses 10-bit test-process and
 private-helper CSpaces (1,024 slots each), reserves 512 KiB for itself, and
-delegates one bounded 64 KiB untyped, instead of using
+delegates one bounded 512 KiB untyped, instead of using
 sel4test's generic 17-bit CSpaces and exhaustively probing every object size.
 A 17-bit seL4 CNode occupies 4 MiB because each capability slot is 32 bytes;
 the focused client/server test needs only a small, fixed set of capabilities.
-Both CNodes are therefore 32 KiB. QEMU boundary sweeps pass the unchanged
-256-call control with an 8 KiB delegated untyped; 64 KiB retains eightfold
-headroom. The untyped cap itself is not scrubbed, so the direct model saving
-comes from reducing the CNodes rather than merely narrowing that cap. The
-preceding 12-bit/4 MiB configuration had already cut roughly 40 minutes from
-BlackParrot setup relative to the generic configuration; the 10-bit result is
-QEMU-qualified pending its next full-core image. The same mode
+Both CNodes are therefore 32 KiB. The dedicated-server QEMU boundary sweep
+fails at 256 KiB while loading the server ELF and passes at 512 KiB, which is
+the retained bound. It covers the server CNode, mappings, page tables, frames,
+stack, IPC buffer, and allocator bookkeeping. The untyped cap itself is not
+scrubbed, so the direct model saving comes from reducing allocated objects
+rather than merely narrowing that cap. The preceding 12-bit/4 MiB
+configuration had already cut roughly 40
+minutes from BlackParrot setup relative to the generic configuration; the
+10-bit result is QEMU-qualified for its common/software path and
+full-core-qualified through hardware-test process construction. The same mode
 suppresses the generic bootinfo/untyped inventory; the exact test verdict stays
 enabled, while character-at-a-time diagnostic output no longer dominates boot.
+
+The former helper path used `sel4utils_bootstrap_clone_into_vspace` to
+allocate, temporarily map, copy, and unmap all 108 loadable pages of the test
+image. The focused test now embeds a stripped 74 KiB server ELF and maps its 41
+loadable pages instead. Including the embedded archive's 19-page footprint in
+the client image, this reduces server-related setup from 108 pages to roughly
+60 while preserving a distinct server VSpace. QEMU validates the ELF loader,
+entry-address handshake, eight matched software calls, and clean completion;
+the exact BlackParrot full-core image also qualifies the dedicated server,
+same-physical-VSpace rejection, hardware route, unbind, and automatic fallback.
 
 The same reduced configuration passes under QEMU before the slow full-core
 run; its concise transcript is retained as
 [`results/sel4test-rpc-only-qemu.log`](results/sel4test-rpc-only-qemu.log).
+
+The first full-core protected call isolated an integration mismatch rather
+than an RPC transport failure: all call predicates passed except SATP identity.
+seL4 assigned caller/server ASIDs 2 and 3, while this BlackParrot configuration
+implements one ASID bit; the old comparison narrowed only the live SATP. The
+captured predicate row is retained in
+[`results/sel4test-rpc-satp-diagnostic.log`](results/sel4test-rpc-satp-diagnostic.log).
+The corrected comparison applies the SATP WARL narrowing to the descriptor as
+well and still compares the implemented root PPN. The widened-ASID directed
+regression passes with descriptor ASIDs 2 and 3 on the one-bit-ASID model; the
+accepted full-core seL4 gate uses the corrected model.
+
+The accepted full-core transcript reports 90,308 cycles for 256 hardware calls
+(352 cycles/call) and 24,942 cycles for eight automatic software fallbacks after
+unbind (3,117 cycles/call). Thus this focused in-guest comparison measures an
+8.86x lower per-call cost for the hardware route. The fallback row includes the
+precise failed hardware probe plus ordinary seL4 IPC, so it is not a claim about
+all seL4 IPC workloads. The exact model and NBF SHA-256 values are
+`4a58a55c...32f26e` and `00428b15...d04d`; normalized evidence is retained in
+[`results/sel4test-rpc-only-blackparrot.log`](results/sel4test-rpc-only-blackparrot.log).
 
 The host must provide the pinned checkout's Python packages plus CMake, Ninja,
 and `riscv64-unknown-elf-*` on `PATH`. Package the resulting elfloader behind
@@ -267,7 +302,10 @@ entry instead of OpenSBI's default address, avoiding an otherwise redundant
 self-relocation in the slow core model. It also defaults to OpenSBI's
 no-boot-prints option because character-at-a-time firmware diagnostics consume
 several model minutes; set `OPENSBI_FW_OPTIONS=0` when those diagnostics are
-needed. Its output is deterministic for fixed inputs. If the OpenSBI cross
+needed. `OPENSBI_RISCV_ISA=rv64imafdc` supports older toolchains whose base ISA
+already includes CSR and fence instructions; the default remains the explicit
+`rv64imafdc_zicsr_zifencei` spelling. Its output is deterministic for fixed
+inputs. If the OpenSBI cross
 compiler is unavailable, `OPENSBI_BASE_FIRMWARE=/path/to/fw_payload.elf` reuses
 a previously qualified firmware container whose `.payload` address matches the
 new elfloader. The packager replaces only that section, extracts it again, and
@@ -288,7 +326,11 @@ scripts/sel4/run_blackparrot_rpc_sim.sh sel4-rpc.nbf run.log
 `BLACKPARROT_SIM`, `ZP_INSTALL_DIR`, and `BSG_TRACE_TIMEOUT_S` override its
 model, runtime-library root, and default four-hour guard respectively. The
 runner refuses to start while any BlackParrot testbench process is live, even
-when it comes from another worktree. It records the model and NBF paths and
+when it comes from another worktree. An isolated correctness run with distinct
+read-only model and image artifacts may opt out with
+`BLACKPARROT_ALLOW_CONCURRENT_SIM=1`; do not use that override for host-time
+measurements. The guest's simulated cycle counts are unaffected by host
+scheduling. The runner records the model and NBF paths and
 SHA-256 values before launch. A model override must implement the same
 descriptor-control ABI as the packaged OpenSBI: an older model can boot the
 entire seL4 image but reject installation with control status `UNSUPPORTED`,

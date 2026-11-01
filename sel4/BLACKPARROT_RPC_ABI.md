@@ -43,9 +43,13 @@ hardware installs the badge in a fixed non-message register for the runtime.
 
 The server context's general-register image, including its private stack, is
 prepared by the privileged installer.  A token match alone is insufficient:
-`pcall` also compares the current SATP and logical caller context.  This keeps a
-leaked or guessed token from becoming ambient authority when seL4 schedules a
-different process in the same physical hardware slot.
+`pcall` also compares the effective WARL SATP and logical caller context. The
+descriptor's mode, implemented ASID bits, and implemented root-PPN bits are
+compared after the same narrowing applied by the core's SATP CSR; the root PPN
+therefore remains part of the address-space identity even when software uses a
+wider ASID namespace. This keeps a leaked or guessed token from becoming
+ambient authority when seL4 schedules a different process in the same physical
+hardware slot.
 
 Installation and revocation are M-mode operations reached through one private
 OpenSBI extension.  seL4 first suspends the caller and server, pins and
@@ -119,12 +123,23 @@ OpenSBI to install the descriptor. Userspace never supplies either context ID
 or either SATP. The returned token is handed only to the trusted caller-side
 adapter.
 
+Both VSpace caps must still own their recorded entries in seL4's live ASID
+table, and their physical root page tables must differ. A copied page-table cap
+can retain mapped metadata after ASID deletion; that stale metadata is never
+accepted as a way to revive a retired address space through the hardware path.
+
 Resident context 1 is a clean hardware shadow of the server's VSpace, not a
 TCB scheduled independently by seL4. The ordinary server TCB remains blocked
 on the endpoint so a precisely `NOT_STARTED` call can use normal seL4 IPC on
 context 0. Since version 1 is single-core and depth one, the shadow service and
 the fallback server never execute concurrently. They use different transport
 entries around the same handler and memory-backed private state.
+
+The bind and unbind endpoint labels are reserved kernel control invocations.
+The ordinary seL4 IPC fastpath must divert both labels to the invocation
+decoder even when an operation such as zero-word `UNBIND` otherwise has a
+fastpath-eligible message shape; it must never deliver either label to the
+blocked fallback server.
 
 ## Privileged control operations
 

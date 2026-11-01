@@ -1,0 +1,12 @@
+SEL4_RPC_SIM model_sha256=4a58a55ca31f3ef1021db5afa6cf8fb5b8aab2e4f49ed2469b2e44f88b32f26e image_sha256=00428b15f2115d12eb006f234987390ae8836fc41190cec0a2b2e5217229d04d
+SEL4_RPC_SIM raw_transcript_sha256=57424818c52d78aca770792a822cb3e8eb75477824548b42337fa9e185423eaa
+SEL4_RPC_POOL count=1 size0=19
+Starting test 1: SEL4IPCRPC0002
+Running test SEL4IPCRPC0002 (Backend-neutral protected RPC over ordinary seL4 IPC)
+BlackParrot RPC bind: caller and server address spaces are not distinct
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=90308 cycles_per_call=352
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=24942 cycles_per_call=3117
+Test SEL4IPCRPC0002 passed
+
+# The bind diagnostic is the expected negative same-physical-VSpace test.
+# scripts/sel4/check_blackparrot_rpc_result.sh accepted the raw transcript.
