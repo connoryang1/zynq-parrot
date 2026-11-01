@@ -55,6 +55,8 @@ def load_run(path, arm, identity):
         "cache_allow_overflow": True,
         "cache_final_addresses": True,
     }
+    if identity.get("bitstream_sha256") is not None:
+        expected_status["bitstream_sha256"] = identity["bitstream_sha256"]
     for key, expected in expected_status.items():
         if status.get(key) != expected:
             raise ValueError(
@@ -68,6 +70,8 @@ def load_run(path, arm, identity):
         "CORE PASS",
         "BSG PASS",
     )
+    if identity.get("bitstream_sha256") is not None:
+        required += (f"BITSTREAM_SHA256={identity['bitstream_sha256']}",)
     for marker in required:
         if marker not in text:
             raise ValueError(f"{path}: missing marker {marker!r}")
@@ -170,6 +174,7 @@ def parse_args(argv=None):
     parser.add_argument("--transfer-sha256", required=True)
     parser.add_argument("--elf-sha256", required=True)
     parser.add_argument("--control-program-sha256", required=True)
+    parser.add_argument("--bitstream-sha256")
     parser.add_argument("--prefix-json", type=Path, required=True)
     parser.add_argument(
         "--replicate", action="append", nargs=3, required=True,
@@ -188,8 +193,11 @@ def analyze(args):
     orders = [replicate[0] for replicate in args.replicate]
     if sorted(orders) != ["disabled-enabled", "enabled-disabled"]:
         raise ValueError("replicates must contain both opposite boot orders")
-    for digest in (args.nbf_sha256, args.transfer_sha256, args.elf_sha256,
-                   args.control_program_sha256):
+    digests = (args.nbf_sha256, args.transfer_sha256, args.elf_sha256,
+               args.control_program_sha256)
+    if args.bitstream_sha256 is not None:
+        digests += (args.bitstream_sha256,)
+    for digest in digests:
         if not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ValueError("identities must be 64 lowercase hex SHA-256 values")
     if args.iid_resamples <= 0 or args.block_resamples <= 0:
@@ -199,6 +207,7 @@ def analyze(args):
         "transfer_sha256": args.transfer_sha256,
         "elf_sha256": args.elf_sha256,
         "control_program_sha256": args.control_program_sha256,
+        "bitstream_sha256": args.bitstream_sha256,
     }
     prefix = json.loads(args.prefix_json.read_text())
     try:

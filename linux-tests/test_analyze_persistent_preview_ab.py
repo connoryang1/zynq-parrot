@@ -14,11 +14,13 @@ SHA_NBF = "1" * 64
 SHA_TRANSFER = "2" * 64
 SHA_ELF = "3" * 64
 SHA_CONTROL = "4" * 64
+SHA_BITSTREAM = "5" * 64
 IDENTITY = {
     "nbf_sha256": SHA_NBF,
     "transfer_sha256": SHA_TRANSFER,
     "elf_sha256": SHA_ELF,
     "control_program_sha256": SHA_CONTROL,
+    "bitstream_sha256": SHA_BITSTREAM,
     "prefix_lines": [0x1000],
 }
 
@@ -37,6 +39,7 @@ def write_run(directory, name, mode, base):
             f"TRACE_PASS records=20 elapsed={base + sample}",
         ))
     text = "\n".join((
+        f"BITSTREAM_SHA256={SHA_BITSTREAM}",
         f"TRACE_PREVIEW mode={mode} value={value}",
         *rows,
         "TRACE_CAPTURE_PASS samples=201 allow_overflow=1",
@@ -55,6 +58,7 @@ def write_run(directory, name, mode, base):
         "transfer_sha256": SHA_TRANSFER,
         "elf_sha256": SHA_ELF,
         "control_program_sha256": SHA_CONTROL,
+        "bitstream_sha256": SHA_BITSTREAM,
         "window": "to-peer",
         "samples": 201,
         "program": "cache-miss",
@@ -87,6 +91,25 @@ class PersistentPreviewAnalysisTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "cache_preview_mode"):
                 load_run(path, "enabled", IDENTITY)
 
+    def test_status_bitstream_mismatch_fails_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(directory, "enabled.log", "wake-trigger", 100)
+            status = path.with_suffix(".log.status.json")
+            data = json.loads(status.read_text())
+            data["bitstream_sha256"] = "6" * 64
+            status.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, "bitstream_sha256"):
+                load_run(path, "enabled", IDENTITY)
+
+    def test_bitstream_log_marker_is_required(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(directory, "enabled.log", "wake-trigger", 100)
+            path.write_text(path.read_text().replace(
+                f"BITSTREAM_SHA256={SHA_BITSTREAM}\n", ""
+            ))
+            with self.assertRaisesRegex(ValueError, "BITSTREAM_SHA256"):
+                load_run(path, "enabled", IDENTITY)
+
     def test_compressed_log_uses_plain_log_status(self):
         with tempfile.TemporaryDirectory() as directory:
             path = write_run(directory, "enabled.log", "wake-trigger", 100)
@@ -108,6 +131,7 @@ class PersistentPreviewAnalysisTest(unittest.TestCase):
                 transfer_sha256=SHA_TRANSFER,
                 elf_sha256=SHA_ELF,
                 control_program_sha256=SHA_CONTROL,
+                bitstream_sha256=SHA_BITSTREAM,
                 prefix_json=Path(directory) / "prefix.json",
                 replicate=[
                     ("enabled-disabled", str(enabled1), str(disabled1)),

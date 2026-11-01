@@ -4,8 +4,8 @@
 # limited to the already-reviewed control-program command.
 set -euo pipefail
 
-[[ $# -eq 4 ]] || {
-  echo "usage: $0 <program.nbf> <nbf-sha256> <runner-sha256> <runtime-ms>" >&2
+[[ $# -eq 4 || $# -eq 5 ]] || {
+  echo "usage: $0 <program.nbf> <nbf-sha256> <runner-sha256> <runtime-ms> [bitstream-sha256]" >&2
   exit 2
 }
 
@@ -13,11 +13,16 @@ image=$1
 expected_nbf_sha=$2
 expected_runner_sha=$3
 runtime_limit_ms=$4
+expected_bit_sha=${5:-}
 
 [[ "$image" =~ ^[A-Za-z0-9._-]+\.nbf$ ]] || { echo "unsafe NBF name" >&2; exit 2; }
 [[ "$expected_nbf_sha" =~ ^[0-9a-fA-F]{64}$ ]] || { echo "invalid NBF SHA" >&2; exit 2; }
 [[ "$expected_runner_sha" =~ ^[0-9a-fA-F]{64}$ ]] || { echo "invalid runner SHA" >&2; exit 2; }
 [[ "$runtime_limit_ms" =~ ^[1-9][0-9]*$ ]] || { echo "invalid runtime limit" >&2; exit 2; }
+[[ -z "$expected_bit_sha" || "$expected_bit_sha" =~ ^[0-9a-fA-F]{64}$ ]] || {
+  echo "invalid bitstream SHA" >&2
+  exit 2
+}
 
 cd "$HOME/zynq-parrot/cosim/black-parrot-example/zynq"
 mkdir -p "$HOME/bp-logs"
@@ -54,6 +59,20 @@ actual_runner_sha=$(sha256sum ./control-program | awk '{print $1}')
   echo "CONTROL_PROGRAM_SHA_MISMATCH expected=$expected_runner_sha actual=$actual_runner_sha" >&2
   exit 64
 }
+actual_bit_sha=
+if [[ -n "$expected_bit_sha" ]]; then
+  load_dry_run=$(make -n load_bitstream BOARDNAME=pynqz2 VIVADO_VERSION=2024.2 VIVADO_MODE=batch)
+  load_bit=$(sed -n 's/.*Overlay("\([A-Za-z0-9_-]*\.bit\)").*/\1/p' <<<"$load_dry_run" | head -n 1)
+  [[ -n "$load_bit" && -f "$load_bit" ]] || {
+    echo "MISSING_BITSTREAM_LOAD_TARGET=${load_bit:-unknown}" >&2
+    exit 63
+  }
+  actual_bit_sha=$(sha256sum "$load_bit" | awk '{print $1}')
+  [[ "$actual_bit_sha" == "$expected_bit_sha" ]] || {
+    echo "BITSTREAM_SHA_MISMATCH expected=$expected_bit_sha actual=$actual_bit_sha file=$load_bit" >&2
+    exit 62
+  }
+fi
 
 mkdir "$lock" || { echo "ACTIVE_RUNNER"; exit 75; }
 printf '%s\n' "$$" > "$lock/owner"
@@ -70,6 +89,9 @@ trap cleanup EXIT
 
 printf 'CONTROL_PROGRAM_SHA256=%s\nNBF_SHA256=%s\nLOG=%s\n' \
   "$actual_runner_sha" "$actual_nbf_sha" "$log"
+if [[ -n "$actual_bit_sha" ]]; then
+  printf 'BITSTREAM_SHA256=%s\n' "$actual_bit_sha"
+fi
 command=(sudo -n ./control-program "$image" "$runtime_limit_ms")
 printf -v command_text '%q ' "${command[@]}"
 set +e

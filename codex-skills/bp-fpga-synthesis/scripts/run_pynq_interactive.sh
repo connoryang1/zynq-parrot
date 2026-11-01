@@ -10,11 +10,16 @@ local_nbf=$2
 image=$(basename -- "$local_nbf")
 runtime_limit_ms=${PYNQ_CONTROL_PROGRAM_TIMEOUT_MS:-300000}
 expected_runner_sha=${PYNQ_CONTROL_PROGRAM_SHA256:-}
+expected_bit_sha=${PYNQ_BITSTREAM_SHA256:-}
 
 [[ "$image" =~ ^[A-Za-z0-9._-]+\.nbf$ ]] || { echo "unsafe NBF name" >&2; exit 2; }
 [[ "$runtime_limit_ms" =~ ^[1-9][0-9]*$ ]] || { echo "invalid runtime limit" >&2; exit 2; }
 [[ "$expected_runner_sha" =~ ^[0-9a-fA-F]{64}$ ]] || {
   echo "PYNQ_CONTROL_PROGRAM_SHA256 is required" >&2
+  exit 2
+}
+[[ -z "$expected_bit_sha" || "$expected_bit_sha" =~ ^[0-9a-fA-F]{64}$ ]] || {
+  echo "PYNQ_BITSTREAM_SHA256 must be empty or 64 hexadecimal digits" >&2
   exit 2
 }
 [[ -t 0 && -t 1 ]] || { echo "interactive runner requires a PTY" >&2; exit 2; }
@@ -28,5 +33,8 @@ remote_nbf_sha=$(ssh -o BatchMode=yes "$ssh_host" \
   exit 1
 }
 
-exec ssh -tt -o BatchMode=yes "$ssh_host" \
-  "$remote_dir/run-blackparrot-interactive '$image' '$expected_nbf_sha' '$expected_runner_sha' '$runtime_limit_ms'"
+remote_command="$remote_dir/run-blackparrot-interactive '$image' '$expected_nbf_sha' '$expected_runner_sha' '$runtime_limit_ms'"
+if [[ -n "$expected_bit_sha" ]]; then
+  remote_command+=" '$expected_bit_sha'"
+fi
+exec ssh -tt -o BatchMode=yes "$ssh_host" "$remote_command"

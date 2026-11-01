@@ -951,6 +951,13 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Next decision:** after the exact RL-098 route passes, first retest accepted v1 on the corrected RTL. Use the 14-line common-core candidate only as the bounded fallback if v1 remains unstable or if direct telemetry shows the two variable lines create late/redundant work.
 - **Board-artifact readiness:** the exact v1 NBF remains available with SHA-256 `93b2e29d...8629`; a verified compressed copy is durable at `/home/coyang/fpga-artifacts/context-resume/linux-mode6-wakeup-futex-prefix16.nbf.xz` with archive SHA-256 `fedd46c9...e55d`. The mutable benchmark output had been overwritten by the later pipe build, but the complete accepted transcript reconstructs the exact 14,528-byte ELF and 258-line transfer at their original `91f0db11...c0cf` / `b5103c89...5518` hashes. Recovered binaries and a source-hashed manifest are under `logs/mode6-persistent-pair-protocol-20261101/recovered-board-artifacts/`; no compiler-equivalence assumption is needed for the next board run.
 
+### RL-100 — Physical comparison runs can bind the loaded bitstream identity
+
+- **Status:** accepted tooling guardrail; no hardware result
+- **Gap:** the serialized cache-capture runner previously bound NBF, transferred ELF, transfer text, and control-program hashes, but neither its status nor the strict persistent-pair analyzer recorded the loaded bitstream. The accepted evidence retained bitstream identity through separate staging records, leaving a future wrong-endpoint run detectable only by manual cross-check.
+- **Fix:** an optional expected bitstream SHA now propagates from `run_cache_miss_trace_capture.py --bitstream-sha256` through `PYNQ_BITSTREAM_SHA256`. Before taking the board lock, the installed helper derives the actual overlay filename from the board Makefile's dry-run load command, hashes that exact BIT, fails on mismatch, and prints the verified hash into the transcript. Status retains the hash, and `analyze_persistent_preview_ab.py --bitstream-sha256` requires both status equality and the transcript marker. Legacy callers remain compatible when no expected bitstream is supplied; the predeclared RL-098 physical comparison requires it.
+- **Validation:** both changed shell helpers pass `bash -n`; 22 focused runner/analyzer tests include invalid hash, status mismatch, and missing-marker rejection; all 111 discovered Linux tests pass. This guardrail prevents a repeated four-context-versus-prefetch5 endpoint mix-up from becoming timing evidence.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

@@ -124,10 +124,13 @@ byte or halfword NBF writes for this patch.
 
 For a real interactive Linux console, install the unprivileged serialization helper once with
 `scripts/install_pynq_interactive_runner.sh <ssh-host>`, then run
-`PYNQ_CONTROL_PROGRAM_SHA256=<reviewed-sha> scripts/run_pynq_interactive.sh <ssh-host> <linux-shell.nbf>`
+`PYNQ_CONTROL_PROGRAM_SHA256=<reviewed-sha> PYNQ_BITSTREAM_SHA256=<staged-bit-sha> scripts/run_pynq_interactive.sh <ssh-host> <linux-shell.nbf>`
 from a PTY. This retains the same board lock, exact NBF/runner hash checks, fixed checkout path,
 bounded target runtime, and persistent transcript as automated runs while allowing typed guest
-input. Never fall back to a direct `sudo ./control-program` session merely to gain stdin.
+input. When `PYNQ_BITSTREAM_SHA256` is supplied, the board helper derives the Makefile's actual
+overlay load target, verifies its exact staged BIT before taking the runner lock, and records the
+hash in the transcript. Require this for physical comparison runs. Never fall back to a direct
+`sudo ./control-program` session merely to gain stdin.
 
 ## Iteration Modes
 
@@ -181,8 +184,9 @@ ZP_FPGA_LOG_ROOT=/path/to/persistent-prefetch-logs \
 ```
 
 The launcher records `FPGA_CFG` and passes it as `CFG` to the immutable worker.
-The farm controller currently hardcodes the baseline configuration; setting
-`FPGA_CFG` on a farm `launch` command does not select the prefetch configuration.
+The synthesis-farm admission records and forwards its explicit FPGA configuration unchanged.
+Use the farm skill's `admit` and `plan` steps rather than setting `FPGA_CFG` on a farm launch;
+confirm the printed admission and resulting job manifest both name the intended endpoint.
 
 The launcher returns immediately and writes the job ID, PID, immutable source revisions,
 console log, reports, and artifact under `logs/fpga/<job-id>/`. It uses shared `install/` and

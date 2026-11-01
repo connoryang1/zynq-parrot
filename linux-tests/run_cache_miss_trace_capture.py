@@ -85,6 +85,7 @@ def parse_args(argv=None):
     parser.add_argument("--cache-final-addresses", action="store_true")
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
+    parser.add_argument("--bitstream-sha256")
     parser.add_argument("--runtime-ms", type=int, default=600_000)
     return parser.parse_args(argv)
 
@@ -94,6 +95,9 @@ def validate_args(args):
                          ("control program", args.control_sha256)):
         if not re.fullmatch(r"[0-9a-f]{64}", value):
             raise ValueError(f"{label} SHA-256 must be 64 lowercase hex digits")
+    if args.bitstream_sha256 is not None and not re.fullmatch(
+            r"[0-9a-f]{64}", args.bitstream_sha256):
+        raise ValueError("bitstream SHA-256 must be 64 lowercase hex digits")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     if not 1 <= args.samples <= 10_000:
@@ -119,6 +123,8 @@ def run(args):
     env = os.environ.copy()
     env["PYNQ_CONTROL_PROGRAM_SHA256"] = args.control_sha256
     env["PYNQ_CONTROL_PROGRAM_TIMEOUT_MS"] = str(args.runtime_ms)
+    if args.bitstream_sha256 is not None:
+        env["PYNQ_BITSTREAM_SHA256"] = args.bitstream_sha256
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     status = {
         "status": "running",
@@ -126,6 +132,7 @@ def run(args):
         "transfer_sha256": sha256(args.transfer),
         "elf_sha256": args.elf_sha256,
         "control_program_sha256": args.control_sha256,
+        "bitstream_sha256": args.bitstream_sha256,
         "window": args.window,
         "samples": args.samples,
         "program": args.program,

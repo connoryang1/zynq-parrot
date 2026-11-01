@@ -25,6 +25,7 @@ class TraceRunnerTest(unittest.TestCase):
             "transfer": transfer,
             "elf_sha256": "1" * 64,
             "control_sha256": "2" * 64,
+            "bitstream_sha256": None,
             "samples": 1,
             "window": "full",
             "program": "cache-miss",
@@ -143,6 +144,11 @@ class TraceRunnerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError, "ELF SHA-256"):
                 validate_args(self.args(directory, elf_sha256="bad"))
+
+    def test_bitstream_hash_format_fails_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "bitstream SHA-256"):
+                validate_args(self.args(directory, bitstream_sha256="bad"))
 
     def test_existing_inputs_are_accepted(self):
         with tempfile.TemporaryDirectory() as directory:
