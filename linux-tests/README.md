@@ -570,9 +570,13 @@ Build the compact shell-transfer executable with the matching SDK toolchain:
 
 ```sh
 make -s -C linux-tests emit-physical-preview-benchmark-dynamic-transfer \
-  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/install/bin/riscv64-unknown-linux-gnu-gcc \
+  BP_LINUX_CC=/home/jhumphri/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc \
   > linux-tests/out/scheduler_physical_preview_benchmark_dynamic.transfer
 ```
+
+Use the compiler from the Buildroot tree that produced the guest rootfs. The
+SDK's separate `riscv64-unknown-linux-gnu-gcc` has different default ISA and
+hardening specs and does not reproduce the accepted dynamic ELF byte-for-byte.
 
 Run `/tmp/scheduler_physical_preview_benchmark_dynamic GROUP TIMING`, where
 `GROUP` is 0--7 and `TIMING` is `early` or `late`. Each group places the four
@@ -625,6 +629,15 @@ nor any physical data hint. Run it with `--only-timing counter`. Comparing this
 matched eight-group control against `instruction` isolates the empty-table
 hardware-trigger cost from the software counter and benchmark filtering cost.
 
+The timing value `trigger` selects kernel mode five: enabled trials write only
+the instruction-prefix trigger, while neither arm increments the hook counter
+or issues data hints. Because hook deltas are zero by construction, this mode
+uses `getrusage()` to require exactly one voluntary pipe block and zero
+involuntary context switches in both arms. The second call occurs after the
+wake-to-load endpoint, so the primary first-resume metric excludes its cost;
+do not compare this mode's post-load tail directly with counter-filtered modes.
+Run the fixed eight-group plan with `--only-timing trigger`.
+
 After the verified overlay and NBF have been staged, the serialized board
 runner transfers and hash-checks the ELF once, executes every cell exactly once
 with alternating early/late order by group, and powers off for final
@@ -642,8 +655,9 @@ derive and hash a prefix containing only cells completed before the liveness
 change, and analyze that prefix together with a suffix that reaches final
 `CORE PASS` and `BSG PASS`. Report the multi-boot composition explicitly.
 For a predeclared single-timing replication, `--only-timing early|late`
-filters the fixed plan after the recovery boundary. The `instruction` and
-`counter` modes instead use their own fixed eight-cell plans. A fresh
+filters the fixed plan after the recovery boundary. The `instruction`,
+`counter`, and `trigger` modes instead use their own fixed eight-cell plans. A
+fresh
 single-timing run normally completes before the observed nine-to-ten-cell board
 liveness boundary; do not use the filter after inspecting individual set
 results to select a favorable timing.
@@ -665,6 +679,9 @@ combined tail as a third metric. Pool exact-binary repeats with repeated
 `--replicate LOG...` groups; this preserves independent boot and cache-set
 strata. Do not attribute a roundtrip median by subtracting independently
 estimated component medians, because medians are not additive.
+Trigger-only tails may be partitioned within their own matrix, but their second
+`getrusage()` call is inside that tail. Do not compare those tail components
+directly with counter-filtered modes.
 
 The runner writes `BOARD.log.status.json`. Any failed or interrupted run still
 requires a full board power cycle, PYNQ readiness wait, and verified overlay

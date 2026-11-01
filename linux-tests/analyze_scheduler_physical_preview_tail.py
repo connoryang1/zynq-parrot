@@ -173,7 +173,9 @@ def pool_tail(replicate_paths, timing, samples=20000):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--timing", choices=("early", "late", "instruction", "counter"),
+    parser.add_argument(
+        "--timing",
+        choices=("early", "late", "instruction", "counter", "trigger"),
                         required=True)
     parser.add_argument(
         "--replicate", nargs="+", action="append", type=Path,

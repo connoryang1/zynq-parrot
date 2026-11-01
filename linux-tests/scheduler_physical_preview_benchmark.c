@@ -10,8 +10,9 @@
  * pre-register-switch hook in the same kernel image. An optional hot-proxy
  * footprint redirects hints to freshly reread eviction-buffer lines while
  * leaving the measured dependent target ring cold. This approximates an
- * instruction-only and counter-only A/B without changing the kernel or losing
- * one-switch filtering.
+ * instruction-only and counter-only A/B without changing the kernel. Mode five
+ * removes hook accounting and uses getrusage context-switch deltas as an
+ * independent one-switch filter.
  */
 #include <stdint.h>
 #include <sched.h>
@@ -20,6 +21,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
+#include <sys/resource.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -37,7 +39,7 @@ enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
 
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
-	unsigned mode, hooks;
+	unsigned mode, hooks, accepted;
 };
 
 static inline uint64_t cycle(void)
@@ -105,8 +107,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = mode_for(trial);
 		unsigned long before_hook, after_hook;
+		struct rusage before_usage, after_usage;
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
+		long voluntary = 0, involuntary = 0;
 
 		for (unsigned page = 0; page < eviction_pages; page++)
 			for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
@@ -131,6 +135,9 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (before_hook == (unsigned long)-1)
 			fail("hook count before");
 		samples[trial].mode = enabled;
+		samples[trial].accepted = 0;
+		if (enable_mode == 5 && getrusage(RUSAGE_SELF, &before_usage))
+			fail("getrusage before handoff");
 		transfer(out, &token, 1); /* ready */
 		transfer(in, &token, 0);  /* parent blocks; scheduler selects child */
 		entry = cycle();
@@ -146,19 +153,28 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		/* Retain only one-switch handoffs. A timer preemption and second
-		 * selection issues another hint batch, so retry that trial rather
-		 * than mixing a two-selection case into this best-case ceiling. */
-		if (samples[trial].hooks != enabled) {
+		if (enable_mode == 5) {
+			if (getrusage(RUSAGE_SELF, &after_usage))
+				fail("getrusage after handoff");
+			voluntary = after_usage.ru_nvcsw - before_usage.ru_nvcsw;
+			involuntary = after_usage.ru_nivcsw - before_usage.ru_nivcsw;
+		}
+		/* Retain only one-switch handoffs. Counted modes use the scheduler
+		 * hook itself. Uncounted mode five instead requires exactly the one
+		 * voluntary pipe block and no involuntary switch in both A/B arms. */
+		if ((enable_mode == 5 && (samples[trial].hooks != 0
+					 || voluntary != 1 || involuntary != 0))
+			|| (enable_mode != 5 && samples[trial].hooks != enabled)) {
 			fprintf(stderr,
-				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u\n",
+				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u voluntary=%ld involuntary=%ld\n",
 				trial, enabled, enable_mode, before_hook, after_hook,
-				samples[trial].hooks);
+				samples[trial].hooks, voluntary, involuntary);
 			transfer(out, &token, 1); /* contaminated attempt done */
 			if (++retries > max_retries)
 				fail("too many scheduler hook retries");
 			continue;
 		}
+		samples[trial].accepted = 1;
 		samples[trial].done = cycle();
 		transfer(out, &token, 1); /* done */
 		trial++;
@@ -184,7 +200,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 5) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter] [target|hot-proxy] [normal|fifo]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger] [target|hot-proxy] [normal|fifo]\n",
 			argv[0]);
 		return 2;
 	}
@@ -204,6 +220,8 @@ int main(int argc, char **argv)
 			enable_mode = 3;
 		else if (!strcmp(argv[2], "counter"))
 			enable_mode = 4;
+		else if (!strcmp(argv[2], "trigger"))
+			enable_mode = 5;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -229,7 +247,8 @@ int main(int argc, char **argv)
 	       group, group * 4 * line_bytes, lines,
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
-	       enable_mode == 3 ? "instruction" : "counter", enable_mode,
+	       enable_mode == 3 ? "instruction" :
+	       enable_mode == 4 ? "counter" : "trigger", enable_mode,
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal");
 
 	if (fifo) {
@@ -263,7 +282,7 @@ int main(int argc, char **argv)
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 		samples[trial].returned = cycle();
-		if (samples[trial].hooks == samples[trial].mode)
+		if (samples[trial].accepted)
 			trial++;
 	}
 	if (waitpid(child, &status, 0) != child)

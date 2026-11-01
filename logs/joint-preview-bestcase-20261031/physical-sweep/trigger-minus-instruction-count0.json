@@ -1,0 +1,49 @@
+{
+  "bootstrap_samples": 20000,
+  "timings": {
+    "trigger_minus_instruction": {
+      "wake_to_entry": {
+        "control_saved_cycles": -220.0,
+        "candidate_saved_cycles": -19.0,
+        "candidate_minus_control_saved_cycles": 201.0,
+        "candidate_minus_control_95pct_ci": [
+          -623.5,
+          904.25
+        ]
+      },
+      "load_cycles": {
+        "control_saved_cycles": 0.0,
+        "candidate_saved_cycles": 0.0,
+        "candidate_minus_control_saved_cycles": 0.0,
+        "candidate_minus_control_95pct_ci": [
+          0.0,
+          1.5
+        ]
+      },
+      "wake_to_load": {
+        "control_saved_cycles": -200.75,
+        "candidate_saved_cycles": 105.0,
+        "candidate_minus_control_saved_cycles": 305.75,
+        "candidate_minus_control_95pct_ci": [
+          -472.0,
+          979.5
+        ]
+      },
+      "roundtrip": {
+        "control_saved_cycles": -450.75,
+        "candidate_saved_cycles": 867.0,
+        "candidate_minus_control_saved_cycles": 1317.75,
+        "candidate_minus_control_95pct_ci": [
+          759.25,
+          1925.75
+        ]
+      }
+    }
+  },
+  "timing_pairs": {
+    "trigger_minus_instruction": {
+      "control": "instruction",
+      "candidate": "trigger"
+    }
+  }
+}

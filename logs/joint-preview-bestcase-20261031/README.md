@@ -660,3 +660,63 @@ the old runner spawned the board process before opening the log, that attempt
 was treated as board contamination and followed by a full recovery. The
 runner now validates the log parent before board launch, with a regression
 test; no measurement from the failed invocation is retained.
+
+## Uncounted trigger-only control
+
+Runtime mode 5 issues only the instruction-prefix trigger. It performs no
+hook-counter update and no data-hint CSR writes. The benchmark uses
+`getrusage(RUSAGE_SELF)` around the handoff to accept exactly one voluntary
+pipe block and zero involuntary context switches in both arms; the second call
+is after the wake-to-load timestamp. The clean kernel `vmlinux.bin` SHA-256 is
+`3b498116624395c23ca6ea4177ceb57f12643a52632644cb851602849d84daa2`.
+The exact NBF, benchmark ELF, and transfer SHA-256 values are
+`b8ecabda679a5930890b4d9b94679ef16d9ad2b292b685ff8b9b6f2c0f5911d2`,
+`ed605f46f3c3975e6a80b0677aa88f6a15ceb8b52dabf282721870922e616345`,
+and `cc9b847d5aab2625597bfeeef41e18bdcd62c68732e113b8093c74d1c2470261`.
+Executable-section Linux and OpenSBI `.text` collision scans pass, and the NBF
+reconstructs the exact kernel while preserving the accepted count-zero
+OpenSBI/DTB region.
+
+The one-cell group-7 feasibility run passed 512 rows and tails with two
+rejected involuntary preemptions and final runner/CORE/BSG markers. After a
+fresh verified overlay reload, the predeclared full run completed all eight
+groups in one boot: 4,096 accepted rows and tails, 20 rejected attempts (each
+one voluntary plus one involuntary switch), eight child/parent/cell PASS sets,
+runner exit zero, and final CORE/BSG PASS. Both arms report zero hook deltas.
+
+Strict set-stratified analysis gives `-19 [-741,650.75]` wake-to-entry,
+`0 [0,0]` local-load, `+105 [-655.75,734.75]` wake-to-load, and
+`+867 [511.75,1314.5]` roundtrip cycles saved. The primary incoming-task
+endpoint is unresolved around zero. Independent trigger-minus-counter and
+trigger-minus-instruction wake-to-load contrasts are respectively
+`+525.25 [-303.25,1201]` and `+305.75 [-472,979.5]`; neither resolves.
+This confirms that the earlier resolved approximately 420-cycle cost belonged
+to counter instrumentation, not a demonstrated empty-trigger penalty.
+
+The within-mode tail partition reports `+15 [-15.5,51.25]` child-post-load,
+`+800.5 [412,1504.25]` return-handoff, and `-383 [-850.75,115.5]` combined
+tail cycles saved. Every row satisfies the exact additive identity, but robust
+component medians are not additive and do not localize the resolved roundtrip
+median. The second `getrusage()` also lies in this tail, so no cross-mode tail
+or Linux prefetch-speedup claim is made.
+
+Raw full-log/status SHA-256 values are `0ea82c7b...064` and `b587aeb9...56c`.
+The deterministic compressed full transcript hashes to `8bdd2b69...41a2`;
+the feasibility transcript hashes to `c7edbb43...ce74`.
+Base, tail, trigger-minus-counter, and trigger-minus-instruction analyses hash
+to `363ac5dc...e19`, `d20c7d32...0f8`, `92661992...439`, and
+`e23cc041...db1`.
+
+Two fail-closed command mistakes caused no board or evidence mutation. Patch
+reverse dry-runs were first invoked from the repository root without the
+kernel `-d` directory, so `patch` could not locate its targets; corrected
+explicit-directory dry-runs passed. Later, the trigger-tail analyzer output
+was accidentally named relative to the repository while the command was
+already in `linux-tests/`; redirection failed before the analyzer launched.
+The concurrently launched focused unit test completed and passed, and the
+analyzer was then run once from the repository root with the intended path.
+An initial final rebuild used the SDK's standalone GNU compiler and produced a
+different ELF layout. ELF comments and RISC-V attributes identified the tested
+binary as a Buildroot GCC product; rebuilding through the rootfs-matched
+Buildroot compiler reproduced the physical ELF byte-for-byte at
+`ed605f46...6345`. The maintained build example now names that compiler.

@@ -5,6 +5,8 @@ Mode three triggers instruction replay alone and accounts for that selection in
 the existing hook counter so the benchmark can retain its one-switch filter.
 Mode four increments only that counter, isolating software accounting overhead
 from the empty instruction-prefix hardware trigger.
+Mode five launches the trigger without counter accounting so a production-like
+path can be measured with an independent scheduler-contamination check.
 
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c

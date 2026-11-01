@@ -28,7 +28,8 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
         mode = 1 if trial % 4 in (1, 2) else 0
         entry = 100 + mode
         load = 300 - saved_load_cycles * mode
-        hooks = mode + (1 if extra_enabled_hook and mode and trial == 1 else 0)
+        hooks = 0 if timing == "trigger" else mode
+        hooks += 1 if extra_enabled_hook and mode and trial == 1 else 0
         post_load = 20
         return_handoff = 30 - saved_return_cycles * mode
         lines.append(
@@ -52,6 +53,9 @@ class SweepAnalyzerTest(unittest.TestCase):
 
     def test_single_cell_analyzer_accepts_counter_mode(self):
         self.assertEqual(TIMING_MODES["counter"], 4)
+
+    def test_single_cell_analyzer_accepts_trigger_mode(self):
+        self.assertEqual(TIMING_MODES["trigger"], 5)
 
     def test_partial_cell_reports_known_effect(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -91,6 +95,20 @@ class SweepAnalyzerTest(unittest.TestCase):
             20.0,
         )
 
+    def test_trigger_only_matrix_requires_zero_hooks_and_is_analyzable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "trigger.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="trigger")
+                for group in range(8)
+            ))
+            result = analyze([path])
+        self.assertEqual(
+            result["pooled"]["trigger"]["load_cycles"]
+            ["stratified_median_saved_cycles"],
+            20.0,
+        )
+
     def test_incomplete_sweep_is_rejected_by_default(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
@@ -102,7 +120,7 @@ class SweepAnalyzerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "run.log"
             path.write_text(transcript(extra_enabled_hook=True))
-            with self.assertRaisesRegex(ValueError, "expected exactly one hook"):
+            with self.assertRaisesRegex(ValueError, "expected hook count 1"):
                 analyze([path], allow_partial=True)
 
     def test_truncated_cell_is_rejected(self):
@@ -243,6 +261,20 @@ class SweepAnalyzerTest(unittest.TestCase):
         )
         self.assertEqual(
             result["pooled"]["post_load_total"]
+            ["stratified_median_saved_cycles"], 12.0,
+        )
+
+    def test_trigger_tail_partition_accepts_zero_hook_rows(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "trigger-tail.log"
+            path.write_text("\n".join(
+                transcript(group=group, timing="trigger", saved_load_cycles=0,
+                           saved_return_cycles=12, include_tail=True)
+                for group in range(8)
+            ))
+            result = analyze_tail([path], "trigger")
+        self.assertEqual(
+            result["pooled"]["return_handoff"]
             ["stratified_median_saved_cycles"], 12.0,
         )
 

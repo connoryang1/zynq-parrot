@@ -74,7 +74,8 @@ def analyze(paths, allow_partial=False):
                 raise ValueError(f"duplicate timing/group cell: {key}")
             cells[key] = {"rows": rows, "summary": result}
     observed_timings = {timing for timing, _group in cells}
-    if len(observed_timings) == 1 and observed_timings <= {"instruction", "counter"}:
+    if (len(observed_timings) == 1
+            and observed_timings <= {"instruction", "counter", "trigger"}):
         timing = next(iter(observed_timings))
         expected = {(timing, group) for group in range(8)}
     else:

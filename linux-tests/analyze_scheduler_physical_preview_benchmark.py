@@ -13,9 +13,16 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_entry=(\d+) load_cycles=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
-                    r"lines=(\d+) timing=(early|late|instruction|counter) mode=(\d+)")
+                    r"lines=(\d+) "
+                    r"timing=(early|late|instruction|counter|trigger) mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
-TIMING_MODES = {"early": 1, "late": 2, "instruction": 3, "counter": 4}
+TIMING_MODES = {
+    "early": 1,
+    "late": 2,
+    "instruction": 3,
+    "counter": 4,
+    "trigger": 5,
+}
 
 
 def percentile(values, fraction):
@@ -32,10 +39,11 @@ def summarize(rows, group, timing):
         if modes != [0, 1, 1, 0]:
             raise ValueError(f"unbalanced trial block at {start}: {modes}")
     for row in rows:
-        if row["hooks"] != row["mode"]:
+        expected_hooks = 0 if timing == "trigger" else row["mode"]
+        if row["hooks"] != expected_hooks:
             raise ValueError(
                 f"trial {row['trial']} had mode={row['mode']} hooks={row['hooks']}; "
-                "expected exactly one hook only when enabled"
+                f"expected hook count {expected_hooks} for {timing} timing"
             )
         if row["wake_to_entry"] + row["load_cycles"] != row["wake_to_load"]:
             raise ValueError(f"inconsistent timing at trial {row['trial']}")

@@ -82,6 +82,14 @@ class CellPlanTest(unittest.TestCase):
         )
         self.assertEqual(selected_cells(6, "counter"), counter[6:])
 
+    def test_trigger_plan_has_one_cell_per_group_and_suffix(self):
+        trigger = selected_cells(0, "trigger")
+        self.assertEqual(
+            trigger,
+            [(group, "trigger") for group in range(8)],
+        )
+        self.assertEqual(selected_cells(6, "trigger"), trigger[6:])
+
     def test_invalid_recovery_boundary_is_rejected(self):
         for start in (-1, 16):
             with self.assertRaisesRegex(ValueError, "start cell"):
