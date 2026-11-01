@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 #include "bp_utils.h"
-#include "../sel4/include/blackparrot_rpc_abi.h"
+#include "../sel4/internal/blackparrot_rpc_abi.h"
 
 #if BP_NUM_THREADS != 2 || (BP_NUM_CONTEXTS != 4 && BP_NUM_CONTEXTS != 10)
 #error "The protected RPC test requires two resident slots and four or ten logical contexts"

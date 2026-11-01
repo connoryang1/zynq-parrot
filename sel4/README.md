@@ -132,7 +132,11 @@ hold. It must never execute a request and then retry it through software.
 
 [`include/protected_rpc.h`](include/protected_rpc.h) is the public,
 microkernel-neutral interface that the ordinary seL4 and future hardware
-backends must implement. Its initial contract is deliberately small:
+backends must implement. The `include` directory contains only this application
+header. Backend, trusted-runtime, and hardware-protocol headers live under
+`internal` so a normal application include path cannot depend on tokens,
+context IDs, SATPs, or BlackParrot instructions. Its initial contract is
+deliberately small:
 
 - a synchronous call carries at most four 64-bit request and reply words;
 - endpoints and shared regions are opaque kernel-issued values, never context
@@ -150,7 +154,7 @@ backends must implement. Its initial contract is deliberately small:
 - forced-software and forced-hardware modes make the selected path observable.
 
 The internal backend boundary in
-[`include/protected_rpc_backend.h`](include/protected_rpc_backend.h) makes the
+[`internal/protected_rpc_backend.h`](internal/protected_rpc_backend.h) makes the
 exactly-once rule explicit. A hardware attempt atomically returns one of four
 states: completed, safe to fall back because execution definitely never
 started, rejected without execution, or failed after its commit point. Only

@@ -57,7 +57,7 @@ link_file "$platform/kernel/rpc.c" \
     "$kernel/src/plat/blackparrot/machine/rpc.c"
 link_file "$platform/kernel/rpc.h" \
     "$kernel/include/plat/blackparrot/plat/machine/rpc.h"
-link_file "$project_root/sel4/include/blackparrot_rpc_abi.h" \
+link_file "$project_root/sel4/internal/blackparrot_rpc_abi.h" \
     "$kernel/include/plat/blackparrot/plat/machine/blackparrot_rpc_abi.h"
 link_file "$platform/kernel/constants.h" \
     "$kernel/libsel4/sel4_plat_include/blackparrot/sel4/plat/api/constants.h"
@@ -73,9 +73,9 @@ link_file "$project_root/sel4/src/protected_rpc_hardware_blackparrot.c" \
     "$test_dir/protected_rpc_hardware_blackparrot.c"
 link_file "$project_root/sel4/src/protected_rpc_blackparrot_sel4.c" \
     "$test_dir/protected_rpc_blackparrot_sel4.c"
-link_file "$project_root/sel4/include/protected_rpc_blackparrot.h" \
+link_file "$project_root/sel4/internal/protected_rpc_blackparrot.h" \
     "$test_dir/protected_rpc_blackparrot.h"
-link_file "$project_root/sel4/include/blackparrot_rpc_abi.h" \
+link_file "$project_root/sel4/internal/blackparrot_rpc_abi.h" \
     "$test_dir/blackparrot_rpc_abi.h"
 
 echo "linked BlackParrot seL4 platform glue into $checkout"

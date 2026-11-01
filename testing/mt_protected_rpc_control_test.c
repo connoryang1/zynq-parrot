@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "bp_utils.h"
-#include "../sel4/include/blackparrot_rpc_abi.h"
+#include "../sel4/internal/blackparrot_rpc_abi.h"
 
 static inline void rpc_data_write(uint64_t value)
 {

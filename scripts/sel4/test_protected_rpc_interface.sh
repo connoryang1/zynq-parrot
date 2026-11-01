@@ -7,6 +7,16 @@ script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_root=$(realpath "$script_dir/../..")
 build_dir=$(mktemp -d)
 trap 'rm -rf "$build_dir"' EXIT HUP INT TERM
+internal_include="-I$project_root/sel4/internal"
+
+# Applications receive exactly one header; trusted runtime and transport
+# details must not drift back onto the public include path.
+public_headers=$(find "$project_root/sel4/include" -maxdepth 1 -type f \
+    -printf '%f\n' | LC_ALL=C sort)
+if [ "$public_headers" != "protected_rpc.h" ]; then
+    echo "unexpected protected-RPC public headers: $public_headers" >&2
+    exit 1
+fi
 
 ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
     -I"$project_root/sel4/include" \
@@ -15,6 +25,7 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
 "$build_dir/protected_rpc_interface_test"
 
 ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    "$internal_include" \
     -I"$project_root/sel4/include" \
     "$project_root/sel4/src/protected_rpc.c" \
     "$project_root/sel4/tests/protected_rpc_dispatch_test.c" \
@@ -22,6 +33,7 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
 "$build_dir/protected_rpc_dispatch_test"
 
 ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    "$internal_include" \
     -I"$project_root/sel4/tests/mock_sel4" \
     -I"$project_root/sel4/include" \
     "$project_root/sel4/src/protected_rpc_sel4.c" \
@@ -30,6 +42,7 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
 "$build_dir/protected_rpc_server_config_test"
 
 ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    "$internal_include" \
     -I"$project_root/sel4/include" \
     "$project_root/sel4/tests/blackparrot_rpc_abi_test.c" \
     -o "$build_dir/blackparrot_rpc_abi_test"
@@ -37,6 +50,7 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
 
 ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
     -DPROTECTED_RPC_BLACKPARROT_TEST_HOOK \
+    "$internal_include" \
     -I"$project_root/sel4/include" \
     "$project_root/sel4/src/protected_rpc.c" \
     "$project_root/sel4/src/protected_rpc_hardware_blackparrot.c" \
@@ -45,6 +59,7 @@ ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
 "$build_dir/protected_rpc_blackparrot_backend_test"
 
 ${CC:-cc} -std=c11 -Wall -Wextra -Werror -pedantic \
+    "$internal_include" \
     -I"$project_root/sel4/tests/mock_sel4" \
     -I"$project_root/sel4/include" \
     "$project_root/sel4/src/protected_rpc_blackparrot_sel4.c" \

@@ -46,6 +46,6 @@ ln -sfn "$project_root/sel4/src/protected_rpc_sel4.c" "$test_dir/protected_rpc_s
 ln -sfn "$project_root/sel4/src/protected_rpc_hardware_stub.c" \
     "$test_dir/protected_rpc_hardware_stub.c"
 ln -sfn "$project_root/sel4/include/protected_rpc.h" "$test_dir/protected_rpc.h"
-ln -sfn "$project_root/sel4/include/protected_rpc_backend.h" \
+ln -sfn "$project_root/sel4/internal/protected_rpc_backend.h" \
     "$test_dir/protected_rpc_backend.h"
 echo "linked protected-RPC tests and sources into $test_dir"
