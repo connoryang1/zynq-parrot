@@ -903,6 +903,13 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Roundtrip result:** enabled roundtrip medians are 162,065/162,255 versus disabled 164,782/163,691.5. The stratified difference is **-2,076.75 cycles**, with IID `[-2480.25,-1683]` and block `[-2473.75,-1668.75]`; all eight quarter differences favor enabled. Pooled medians are 162,152 versus 164,293.5, a **2,141.5-cycle or 1.30% reduction**.
 - **Interpretation and next gate:** retained replay now transfers beyond the futex harness as a two-handoff steady-state throughput effect, but shared warmed scheduler code can help the later return path and does not prove faster target entry. Compare current pipe-trained and accepted futex-v1 tables in fresh opposite order on this exact fixed-arm protocol before changing capacity or timing. Strict result SHA-256 is `56547ceb...11c`; full evidence and rejected slow-transfer boots are under `logs/pipe-persistent-fixed-ab-20261101/`.
 
+### RL-094 — Futex-v1 is unstable under the 512-handoff pipe workload
+
+- **Status:** cross-workload table comparison rejected; no performance contrast accepted
+- **Protocol and outcome:** the planned opposite-order current-versus-v1 comparison keeps mode 6 enabled in both arms. The current pipe-trained arm passes all 512 rows and terminal markers. Across four recovery-qualified v1 launches, one passes cleanly while three complete all benchmark rows/cell PASS and then fail terminal acceptance during `poweroff`; the first also reports earlier klogd spinlock/scheduling faults.
+- **Repeatability:** the last two rejected v1 boots fault at the same `wakeup_flusher_threads+0x5e/0xba` location with identical instruction bytes and different corrupted-looking bad addresses, then return to the shell with `Segmentation fault` instead of CORE/BSG PASS. A strict loader update rejects kernel BUG, panic, Oops, scheduling-while-atomic, and segmentation markers even if normal PASS text exists. All 104 Linux tests and 63 focused harness checks pass after this guardrail.
+- **Interpretation:** the failures occur after the measured rows, but three-of-four terminal instability makes selection of the one clean v1 timing invalid. V1 remains accepted for the four-boot futex-specific result in RL-090; it is rejected as a workload-independent/global table until the fault is isolated. The next bounded discriminator is a v2 pipe stability run, because v2 retains 14 v1 entries and removes only unused `0x8023f780`/`0x802034c0`. Full accepted/rejected evidence is under `logs/pipe-persistent-fixed-ab-20261101/`.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -973,7 +980,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-089 improves the current table, and RL-090 directly measures accepted v1 at a resolved 509.5-cycle/2.68% pooled futex reduction versus disabled. RL-091 closes manual fixed-table membership tuning, and RL-093 shows that the pipe-trained table transfers as a resolved 1.30% two-handoff pipe throughput effect while first resume remains unresolved. The next gate is a fresh current-table versus futex-v1 pipe comparison to quantify specialization before changing capacity or trigger timing.
+For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill, while RL-088 validates retained mode-6 replay. RL-090 measures futex-v1 at a resolved 2.68% futex reduction, and RL-093 shows that the pipe-trained table transfers as a resolved 1.30% two-handoff pipe throughput effect while first resume remains unresolved. RL-094 rejects v1 as a workload-independent table because three of four 512-handoff pipe launches fault at terminal poweroff. The next bounded functional gate is a v2 pipe stability run to test the two v1-only entries; do not use it to reopen v2's rejected futex performance or change capacity/timing yet.
 
 ## Delta log
 
