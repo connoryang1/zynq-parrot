@@ -37,6 +37,13 @@ both restore the original coroutine-over-batch ordering. These diagnostic
 variants are retained under `coroutine-scheduler-diagnostic/` and do not replace
 the complete accepted table above until one receives a full sweep and trace.
 
+The N=9 batch-versus-hardware gap is now retirement-attributed under one exact
+diagnostic ELF. Of the 2,888-cycle gap, 2,707 cycles (93.7%) are additional
+batch instructions and 181 (6.3%) are additional cycles without retirement.
+The dominant instruction cost is explicit array-state load/store and loop
+bookkeeping that hardware contexts keep in private registers. Compact reports
+and local waveform hashes are under `batch-hardware-attribution/`.
+
 Original rejected sweep:
 
 | Queries | Worker mode 2 | Coroutine mode 6 | Coroutine / worker |

@@ -1,0 +1,175 @@
+{
+  "verdict": "valid_retirement_windows",
+  "timescale": "1ps",
+  "begin_pc": 2147487446,
+  "end_pc": 2147487454,
+  "window_count": 8,
+  "sampling": "stable values before be.clk_i rising edges; boundary instructions excluded",
+  "signals": {
+    "clock": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.clk_i",
+    "commit_thread": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.retire_thread_id_lo",
+    "commit_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.calculator.commit_pkt_cast_o.instret",
+    "commit_pc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.calculator.commit_pkt_cast_o.pc"
+  },
+  "measured": {
+    "begin_timestamp": 129360075000,
+    "core_cycles": 5920,
+    "retired": 4590,
+    "by_thread": {
+      "1": 4590
+    },
+    "end_timestamp": 129656075000,
+    "no_retirement_cycles": 1330,
+    "ipc": 0.7753378378378378,
+    "by_symbol": {
+      "nano_batch_consume_load": 2951,
+      "matched_batch(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 1626,
+      "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 12,
+      "run_window": 1
+    }
+  },
+  "windows": [
+    {
+      "begin_timestamp": 115004675000,
+      "core_cycles": 164792,
+      "retired": 989,
+      "by_thread": {
+        "0": 989
+      },
+      "end_timestamp": 123244275000,
+      "no_retirement_cycles": 163803,
+      "ipc": 0.006001504927423662,
+      "by_symbol": {
+        "nano_serial_consume_load": 665,
+        "serial_lookup(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned int)": 315,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 8,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 124035575000,
+      "core_cycles": 8008,
+      "retired": 916,
+      "by_thread": {
+        "0": 436,
+        "1": 480
+      },
+      "end_timestamp": 124435975000,
+      "no_retirement_cycles": 7092,
+      "ipc": 0.11438561438561438,
+      "by_symbol": {
+        "nano_worker_consume_load": 564,
+        "lookup_worker(index_line const volatile*, unsigned long, unsigned long, lookup_result volatile*, unsigned long, unsigned long, unsigned long, unsigned long)": 324,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 16,
+        "ring(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned int, unsigned long) [clone .isra.0]": 11,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 124582625000,
+      "core_cycles": 1566,
+      "retired": 961,
+      "by_thread": {
+        "0": 460,
+        "1": 501
+      },
+      "end_timestamp": 124660925000,
+      "no_retirement_cycles": 605,
+      "ipc": 0.6136653895274585,
+      "by_symbol": {
+        "nano_worker_consume_load": 564,
+        "lookup_worker(index_line const volatile*, unsigned long, unsigned long, lookup_result volatile*, unsigned long, unsigned long, unsigned long, unsigned long)": 369,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 16,
+        "ring(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned int, unsigned long) [clone .isra.0]": 11,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 124802675000,
+      "core_cycles": 41284,
+      "retired": 2196,
+      "by_thread": {
+        "0": 2196
+      },
+      "end_timestamp": 126866875000,
+      "no_retirement_cycles": 39088,
+      "ipc": 0.053192520104641025,
+      "by_symbol": {
+        "nano_batch_consume_load": 1403,
+        "matched_batch(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 780,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 12,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 127008625000,
+      "core_cycles": 820,
+      "retired": 281,
+      "by_thread": {
+        "0": 186,
+        "1": 95
+      },
+      "end_timestamp": 127049625000,
+      "no_retirement_cycles": 539,
+      "ipc": 0.3426829268292683,
+      "by_symbol": {
+        "nano_worker_consume_load": 235,
+        "lookup_worker(index_line const volatile*, unsigned long, unsigned long, lookup_result volatile*, unsigned long, unsigned long, unsigned long, unsigned long)": 18,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 16,
+        "ring(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned int, unsigned long) [clone .isra.0]": 11,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 127163775000,
+      "core_cycles": 1228,
+      "retired": 1035,
+      "by_thread": {
+        "1": 1035
+      },
+      "end_timestamp": 127225175000,
+      "no_retirement_cycles": 193,
+      "ipc": 0.8428338762214984,
+      "by_symbol": {
+        "nano_serial_consume_load": 665,
+        "serial_lookup(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned int)": 360,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 9,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 128214925000,
+      "core_cycles": 10204,
+      "retired": 3468,
+      "by_thread": {
+        "1": 3468
+      },
+      "end_timestamp": 128725125000,
+      "no_retirement_cycles": 6736,
+      "ipc": 0.3398667189337515,
+      "by_symbol": {
+        "nano_coroutine_consume_load": 2703,
+        "coroutine_lookup(_ZL16coroutine_lookupPVK10index_linemmPV13lookup_resultj.Frame*) [clone .actor]": 612,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 152,
+        "run_window": 1
+      }
+    },
+    {
+      "begin_timestamp": 129360075000,
+      "core_cycles": 5920,
+      "retired": 4590,
+      "by_thread": {
+        "1": 4590
+      },
+      "end_timestamp": 129656075000,
+      "no_retirement_cycles": 1330,
+      "ipc": 0.7753378378378378,
+      "by_symbol": {
+        "nano_batch_consume_load": 2951,
+        "matched_batch(index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 1626,
+        "run_operation(unsigned int, index_line const volatile* const*, unsigned long, unsigned long const*, unsigned long)": 12,
+        "run_window": 1
+      }
+    }
+  ]
+}
