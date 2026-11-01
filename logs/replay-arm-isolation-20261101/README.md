@@ -92,8 +92,27 @@ primary result: bfb253a24128b6ae4bbeaa3c30ac5fb450ba66e4ba1aabdf8abe135eceedb920
 chronology:     d9803d617f775cee6b928c788a642c8b9de1f35e51e8dab4cdaa448d5e9f5680
 ```
 
+## Isolated mode-5 timing control
+
+After a second valid recovery and exact overlay reload, the same eight groups ran with selection-time mode 5 and no other benchmark or image change. All 4,096 trials were accepted after 14 filtered attempts; all cells exited zero and the run ended with terminal PASS.
+
+Mode 5 reproduces mode 6: wake-to-load is `-942.5 [-1746.75,913]` saved cycles, local loads are exactly `0 [0,0]`, and roundtrip is `-7514.5 [-9101.5,-4552.5]`. A direct 20,000-sample mode-6-minus-mode-5 comparison is unresolved for every endpoint: `-50.75 [-2080.25,1953]` wake-to-load and `-324 [-3549.5,2623]` roundtrip. The earlier wake trigger therefore neither fixes nor uniquely causes the regression; the forced cold replay/refill epoch is the common mechanism.
+
+The mode-5 chronology has a small resolved disabled-position drift of `65.5 [4.5,118]` cycles at wake-to-load, far below the historical −888 cycles and opposite in sign. Its paired first-resume interval remains broad, while the roundtrip regression is resolved in both halves. Treat this as a minor scheduler-phase residual rather than replay-buffer leakage; the fresh-boot persistent protocol avoids interleaved arms entirely.
+
+Mode-5 evidence hashes are:
+
+```text
+compressed raw: 74051576d12ebd1819bf44e5cc15d7d82f6980d9957a6b10a9009aac3e9f31f3
+raw content:    91b01ca3c7407c3c83c7750d590fc481401b87e49eaf257d620b5814aa9d6928
+runner status:  cb30ecd366ba223fcfc44c790aba05d32d182bcd5af7917e41b1ea03aac7a328
+primary result: 32dffa6cb2ddfade6cd9952b064868a27944c17029479144fec6498b558d22fa
+chronology:     012b16d0e4912649153f77a026c0be4d1d3dccc4be9f64ff4cd5365839788851
+mode6-mode5:    7ce6131238a146b4d66ee8c70574cfa8ceda97612a6fed31e4fa80450d7d86c7
+```
+
 ## Acceptance plan and limits
 
-The complete mode-6 matrix is now accepted. The isolated mode-5 selection-time control and fresh-boot persistent-pair A/B remain pending. Every run ends through guest shutdown, so the board must be physically power-cycled, pass readiness, and reload the exact overlay before another launch; use the documented local outlet fallback without exposing its endpoint.
+The complete isolated mode-6 matrix and mode-5 timing control are now accepted. The fresh-boot persistent-pair A/B remains pending and answers the production-retention question that per-trial invalidation intentionally cannot. Every run ends through guest shutdown, so the board must be physically power-cycled, pass readiness, and reload the exact overlay before another launch; use the documented local outlet fallback without exposing its endpoint.
 
 `fence.i` deliberately creates a cold-instruction best case and clears the ordinary local I-cache as well as the advisory buffer. It is a mechanism ceiling, not a claim about the natural temperature of general Linux context switches. A later representative workload must use a production clear/generation policy rather than issuing `fence.i` on every handoff.

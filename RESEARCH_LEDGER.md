@@ -839,6 +839,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** symmetric `fence.i` turns the experiment into a cold mechanism ceiling but forces every enabled switch to launch a new 16-line burst. That burst does not reliably accelerate initial resume and leaves a costly return-path tail. This does not contradict RL-063's persistent-buffer gain, where lines survive after warmup and later triggers suppress resident requests.
 - **Evidence and next discriminator:** compressed raw, runner status, primary analysis, and chronology hash to `93597e25...3f91`, `bb3d9acd...4324`, `bfb253a2...b920`, and `d9803d61...5680` under `logs/replay-arm-isolation-20261101/physical-sweep/`. After mandatory recovery, run the same isolated matrix with selection-time mode 5 to distinguish early-launch tail from generic cold-burst cost, then execute RL-085's fresh-boot persistent-pair A/B.
 
+### RL-087 — Selection-time control assigns the regression to the cold replay epoch
+
+- **Status:** accepted complete FPGA control; trigger-timing question resolved
+- **Scope and correctness:** after another valid recovery, the exact RL-086 image/ELF/transfer ran eight `trigger target fifo isolated` groups. It produced 4,096 accepted trials after 14 filtered attempts, eight zero cell exits, and terminal runner/child/parent/CORE/BSG PASS.
+- **Timing:** selection-time mode 5 measures `-1100.5 [-1850.5,653]` wake-to-entry, `0 [0,0]` local loads, `-942.5 [-1746.75,913]` wake-to-load, and `-7514.5 [-9101.5,-4552.5]` roundtrip saved cycles. It therefore reproduces mode 6's unresolved first-resume effect and resolved return regression.
+- **Direct comparison:** mode 6 minus mode 5 is `41.75 [-1967.5,1945.5]` wake-to-entry, `0 [-0.5,0]` local loads, `-50.75 [-2080.25,1953]` wake-to-load, and `-324 [-3549.5,2623]` roundtrip saved cycles. Every interval crosses zero. Earlier successful-wakeup timing neither fixes nor uniquely causes the regression; forced invalidation followed by a cold 16-line replay epoch is common to both.
+- **Chronology caveat:** trailing-disabled minus leading-disabled wake-to-load is a small `65.5 [4.5,118]` cycles, opposite in sign and far below the historical −888-cycle contamination. Both half-window roundtrip regressions remain resolved. Treat this as minor scheduler-phase residue, not evidence that detached lines survived `fence.i`.
+- **Evidence and consequence:** compressed raw, status, primary analysis, chronology, and direct comparison hash to `74051576...31f3`, `cb30ecd3...a328`, `32dffa6c...22fa`, `012b16d0...8851`, and `7ce61312...86c7`. Cold clear/refill timing is now exhausted. Proceed to RL-085's fresh-boot persistent-pair A/B, where retained lines suppress later refetches.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
@@ -909,7 +918,7 @@ The predictor-bank provenance fix is correct RTL, but the exact failing placemen
 
 ## Next experiment
 
-For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint. RL-083 supersedes RL-079--081's nonempty interleaved matrices as feature A/B evidence because completed advisory lines leaked across trial arms. RL-086 completes the isolated mode-6 matrix: first resume is unresolved around a 993-cycle slowdown and full return regresses by 7,838.5 cycles, while the disabled-position check remains neutral. This rejects per-switch clear-and-refill mode 6 for the benchmark but not persistent replay. RL-085 separately prepares a fresh-boot persistent-pair A/B for the current table, because clearing replay state each trial and retaining it across production switches answer different questions. After mandatory recovery, run the isolated mode-5 timing control, then execute the two opposite-order persistent-pair boot pairs. Only after those cold and steady-state results resolve should residual telemetry, capacity, ordering, retention, footprint, or workload change.
+For the cache-resume architecture, retain RL-063 old-16 as the historical persistent-pair checkpoint. RL-083 supersedes RL-079--081's nonempty interleaved matrices as feature A/B evidence because completed advisory lines leaked across trial arms. RL-086 and RL-087 show that both wake-time and selection-time cold replay have unresolved first-resume effects and resolved 7.5--7.8k-cycle return regressions; their direct difference is unresolved. This rejects per-switch clear-and-refill, not persistent replay. RL-085 separately prepares a fresh-boot persistent-pair A/B for the current table, because retaining lines across production switches is the mechanism that avoids the rejected cold burst. After mandatory recovery, execute the two opposite-order persistent-pair boot pairs. Only after that steady-state result resolves should residual telemetry, capacity, ordering, retention, footprint, or workload change.
 
 ## Delta log
 

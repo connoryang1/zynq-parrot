@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Selection-time control assigns regression to cold replay epoch — 2026-11-01:** the exact isolated mode-5 FPGA matrix also completes 4,096 trials and measures `-942.5 [-1746.75,913]` wake-to-load plus `-7514.5 [-9101.5,-4552.5]` roundtrip saved cycles. Direct mode 6 minus mode 5 is unresolved at every endpoint, so earlier wake timing is not the cause; forced clear/refill is the shared failing policy (`logs/replay-arm-isolation-20261101/`, RL-087).
+
 - **Full isolated mode-6 matrix rejects cold per-switch replay — 2026-11-01:** after valid power recovery and exact overlay reload, all eight FPGA groups completed 4,096 accepted trials with terminal PASS. Wake-to-load is unresolved at `-993.25 [-1834.75,822.5]` saved cycles, while roundtrip clearly regresses at `-7838.5 [-9071.5,-5199.5]`; the disabled-position contrast remains neutral at `-16 [-80,37.5]`, so arm leakage is not the cause (`logs/replay-arm-isolation-20261101/`, RL-086).
 
 - **Current mode-6 steady-state protocol prepared — 2026-11-01:** extended the persistent futex-pair benchmark to set runtime replay mode symmetrically on both tasks, made summary-only overflow acceptance explicit, and added a final-endpoint address diagnostic plus strict opposite-order fresh-boot analyzer. All 93 Linux-test Python checks pass and the Buildroot-GCC ELF/transfer hash to `91f0db11...c0cf`/`b5103c89...5518`; no FPGA run was launched because the board still requires physical recovery (`logs/mode6-persistent-pair-protocol-20261101/`, RL-085).
