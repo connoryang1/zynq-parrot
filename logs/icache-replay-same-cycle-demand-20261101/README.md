@@ -66,4 +66,22 @@ The exact full-core build log, FST, run log, NBF, and test ELF hash to `473a2765
 
 Streaming the exact FST through `fst2vcd` counts zero rising assertions of `icache_uce.detached_prefetch_accepted_demand_match`, one resident-demand match at time 2,167,275,000, and zero matches of either kind in the D-cache UCE. `full-core/predicate-audit.json` retains those counts and the source FST hash. Therefore the full-core run is an integration regression gate; only the directed UCE red/green case causally exercises the new same-edge branch.
 
-A new routed implementation is still required before accepting the candidate for FPGA/Linux use. The already-running route `20261101T125426Z-0fb3da28` predates this candidate and therefore cannot validate it.
+A new routed implementation is still required before accepting the candidate for FPGA/Linux use. Route `20261101T125426Z-0fb3da28` predates this candidate and can provide only a resident-drop timing comparator. The exact candidate route is synthesis-farm job `20261101T132904Z-e4861a8f`, pinned to top `e4861a8fa2f437ec4adf4c0d36fb644a9e38cb4a`, BlackParrot `174f2787a05ca48a6e4362fc59dc462d3d95572c`, and `e_bp_unicore_zynqparrot_prefetch5_cfg`; it must finish with a verified timing-clean package before board use.
+
+## Predeclared FPGA/Linux gate
+
+If the exact candidate route passes, rerun the accepted futex-v1 best-case comparison without changing the table or benchmark. Recover the board before every arm, wait for complete PYNQ readiness, stage and hash-check the new package plus the exact NBF, reload and verify the overlay, and run four fresh boots in these two opposite orders:
+
+1. wake-trigger, then disabled;
+2. disabled, then wake-trigger.
+
+Each arm uses 201 `to-peer` samples with summary-only capture, permitted recorder overflow, and final addresses. The fixed identities are:
+
+```text
+NBF SHA-256:             93b2e29de83be627631a6cb6e78b2a5529f9a42c89cb365894cfe7138a028629
+benchmark ELF SHA-256:   91f0db111470e9f3fd1a53bfd9b8d7b4404ffe8e20a792e4caa99171bbc1c0cf
+transfer SHA-256:        b5103c89b270f5cdcee8156de0a0a6d8b98ca32ecbba7de77e5cc11a6f0f5518
+control-program SHA-256: 2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+```
+
+The exact ELF and transfer are under `../mode6-persistent-pair-protocol-20261101/recovered-board-artifacts/`. The exact NBF is durably archived as `/home/coyang/fpga-artifacts/context-resume/linux-mode6-wakeup-futex-prefix16.nbf.xz`; streamed decompression reproduces the NBF hash above. Analyze only after all four arms pass their identity, numbered-sample, runtime-mode, final-capture, runner-exit, CORE, and BSG gates with `linux-tests/analyze_persistent_preview_ab.py` and `../mode6-persistent-pair-protocol-20261101/futex-prefix16-candidate.json`. This measures the complete corrected RTL checkpoint; no late-drop mechanism attribution is allowed without direct event telemetry.
