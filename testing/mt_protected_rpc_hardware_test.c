@@ -11,6 +11,10 @@
 #include "bp_utils.h"
 #include "../sel4/internal/blackparrot_rpc_abi.h"
 
+#ifndef RPC_FAULT_CASE
+#define RPC_FAULT_CASE 0
+#endif
+
 #if BP_NUM_THREADS != 2 || (BP_NUM_CONTEXTS != 4 && BP_NUM_CONTEXTS != 10)
 #error "The protected RPC test requires two resident slots and four or ten logical contexts"
 #endif
@@ -281,7 +285,20 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     ".option push\n.option norvc\n"
     ".global server_service\nserver_service:\n"
     "li t0, 0x50000\nld t1, 0(t0)\naddi t1, t1, 1\nsd t1, 0(t0)\n"
+#if RPC_FAULT_CASE == 0
     ".global server_fault_instruction\nserver_fault_instruction:\n.word 0\n"
+#elif RPC_FAULT_CASE == 1
+    "li t2, 0x70000\n.global server_fault_instruction\n"
+    "server_fault_instruction:\nld t3, 0(t2)\n"
+#elif RPC_FAULT_CASE == 2
+    "li t2, 0x70000\n.global server_fault_instruction\n"
+    "server_fault_instruction:\nsd zero, 0(t2)\n"
+#elif RPC_FAULT_CASE == 3
+    "li t2, 0x70000\njr t2\n"
+    ".global server_fault_instruction\nserver_fault_instruction:\nnop\n"
+#else
+#error "unsupported RPC_FAULT_CASE"
+#endif
     "1: j 1b\n"
     ".option pop\n"
   );
@@ -333,9 +350,29 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
     1, BP_RPC_FAULT_PC, &pc_status);
   const uint64_t fault_tval = rpc_fault_read(
     1, BP_RPC_FAULT_TVAL, &tval_status);
+#if RPC_FAULT_CASE == 0
+  const uint64_t expected_cause = 2;
   const uint64_t expected_fault_pc = SERVER_ENTRY_VA
     + physical_address(server_fault_instruction)
     - physical_address(server_entry);
+  const uint64_t expected_fault_tval = 0;
+#elif RPC_FAULT_CASE == 1
+  const uint64_t expected_cause = 13;
+  const uint64_t expected_fault_pc = SERVER_ENTRY_VA
+    + physical_address(server_fault_instruction)
+    - physical_address(server_entry);
+  const uint64_t expected_fault_tval = UINT64_C(0x70000);
+#elif RPC_FAULT_CASE == 2
+  const uint64_t expected_cause = 15;
+  const uint64_t expected_fault_pc = SERVER_ENTRY_VA
+    + physical_address(server_fault_instruction)
+    - physical_address(server_entry);
+  const uint64_t expected_fault_tval = UINT64_C(0x70000);
+#elif RPC_FAULT_CASE == 3
+  const uint64_t expected_cause = 12;
+  const uint64_t expected_fault_pc = UINT64_C(0x70000);
+  const uint64_t expected_fault_tval = UINT64_C(0x70000);
+#endif
   rpc_data_write(1);
   const uint64_t revoke = rpc_control(bp_rpc_control_word(
     BP_RPC_CONTROL_REVOKE, BP_RPC_FIELD_TOKEN, 0));
@@ -343,10 +380,12 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
                    && shared_page[0] == 1
                    && query == BP_RPC_CONTROL_FAULTED
                    && wrong_status == BP_RPC_CONTROL_STALE
-                   && cause_status == BP_RPC_CONTROL_OK && cause == 2
+                   && cause_status == BP_RPC_CONTROL_OK
+                   && cause == expected_cause
                    && pc_status == BP_RPC_CONTROL_OK
                    && fault_pc == expected_fault_pc
-                   && tval_status == BP_RPC_CONTROL_OK && fault_tval == 0
+                   && tval_status == BP_RPC_CONTROL_OK
+                   && fault_tval == expected_fault_tval
                    && revoke == BP_RPC_CONTROL_OK
                    && unexpected_mcause == 0;
   if (pass) {

@@ -184,15 +184,15 @@ the privileged record into the server TCB's ordinary fault protocol. Blocking,
 timeouts, maskable interrupts, and asynchronous cancellation remain separate
 state transitions rather than being relabeled synchronous faults.
 
-Before this candidate can become an implemented ABI version, directed tests
-must inject illegal-instruction, instruction-page, load-page, and store-page
-faults after a visible server-side counter update. Each must return the caller
-exactly once with zero reply words and `SERVER_FAULT`; `AUTO` must not invoke
-the software handler, and a retry must report `REVOKED` without changing the
-counter. Privileged tests must cover `FAULTED` query, fault-record access
-control, acknowledgement, fresh-token reinstall, and a fault racing
-revocation. A seL4 fault-endpoint test is additionally required before making
-any claim of ordinary seL4 fault-delivery equivalence.
+The directed full-core model now injects illegal-instruction, instruction-page,
+load-page, and store-page faults after a visible server-side counter update.
+Each returns the caller exactly once with zero reply words and `SERVER_FAULT`;
+the adapter tests forbid software fallback for the faulting request, and a
+hardware retry reports `REVOKED` without changing the counter. Privileged
+tests cover `FAULTED` query, token-checked fault-record access, and revoke.
+Fresh-token reinstall after fault and a fault racing revocation remain required.
+A seL4 fault-endpoint test is additionally required before making any claim of
+ordinary seL4 fault-delivery equivalence.
 
 The durable design makes the binding a kernel object/capability derived from
 authority over the endpoint and both TCBs. Its finalization invokes synchronous

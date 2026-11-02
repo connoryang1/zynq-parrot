@@ -402,10 +402,12 @@ path; merely installing a trap vector would move recovery into untrusted state
 and would not consume the continuation atomically. RL-071 now implements that
 opt-in synthetic return for an illegal instruction in full-core simulation,
 including terminal outcome, zero reply, one visible pre-fault effect, rejected
-retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4,
+retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4.
 The privileged controller also retains token-checked cause/PC/`tval` and
 rejects wrong-token or non-faulted reads. It does not close the remaining fault
-classes, OpenSBI exposure, or fault-endpoint semantics.
+race/reinstall gates, OpenSBI exposure, or fault-endpoint semantics. Directed
+full-core tests now cover illegal-instruction and instruction/load/store page
+faults with causes 2/12/13/15 and exact PC/`tval`.
 
 ## Resume checklist
 
