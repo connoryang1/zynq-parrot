@@ -7,6 +7,7 @@ physical=0
 shared_buffer=0
 components=0
 lifecycle=0
+smoke=0
 caller_badge_expected=
 while (($# > 1)); do
     case $1 in
@@ -14,6 +15,7 @@ while (($# > 1)); do
         --shared-buffer) shared_buffer=1 ;;
         --components) components=1 ;;
         --lifecycle) lifecycle=1 ;;
+        --smoke) smoke=1 ;;
         --caller-badge)
             (($# >= 3)) || break
             caller_badge_expected=$2
@@ -24,7 +26,7 @@ while (($# > 1)); do
     shift
 done
 if (($# != 1)); then
-    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--lifecycle] [--caller-badge DECIMAL] OUTPUT.log" >&2
+    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--lifecycle] [--smoke] [--caller-badge DECIMAL] OUTPUT.log" >&2
     exit 2
 fi
 if [[ -n $caller_badge_expected ]] \
@@ -310,7 +312,14 @@ if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
     echo "invalid RPC evidence: markers=$marker_count hardware_rows=$hardware_count software_rows=$software_count" >&2
     exit 1
 fi
-if ((hardware_calls != 256 || software_calls != 8)); then
+expected_hardware_calls=256
+expected_software_calls=8
+if ((smoke)); then
+    expected_hardware_calls=2
+    expected_software_calls=1
+fi
+if ((hardware_calls != expected_hardware_calls
+      || software_calls != expected_software_calls)); then
     echo "unexpected RPC call counts: hardware=$hardware_calls software=$software_calls" >&2
     exit 1
 fi

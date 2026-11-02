@@ -527,6 +527,15 @@ The bounded runner stops the slow model immediately after that exact gate:
 scripts/sel4/run_blackparrot_rpc_sim.sh sel4-rpc.nbf run.log
 ```
 
+For interface changes that need lifecycle correctness rather than a new
+performance result, configure with `SEL4_RPC_SMOKE=ON` and run with
+`SEL4_RPC_SMOKE=1`. This keeps the same service, authorization guards,
+map-triggered revoke, stale-token rejection, rebind, and fallback path, but
+uses two measured hardware calls, one fallback call, and one sample per
+distribution/cold-cache class. The smoke checker requires those exact reduced
+counts and the default checker rejects them; smoke output is never performance
+evidence.
+
 `BLACKPARROT_SIM`, `ZP_INSTALL_DIR`, and `BSG_TRACE_TIMEOUT_S` override its
 model, runtime-library root, and default four-hour guard respectively. The
 runner refuses to start while any BlackParrot testbench process is live, even

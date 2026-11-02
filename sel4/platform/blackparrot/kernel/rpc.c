@@ -36,15 +36,16 @@ static bp_rpc_binding_t bp_rpc_binding;
 static word_t bp_rpc_generation;
 
 static bp_rpc_sbi_ret_t bp_rpc_sbi_call(word_t operation, word_t arg0,
-                                        word_t arg1)
+                                        word_t arg1, word_t arg2)
 {
     register word_t a0 asm("a0") = arg0;
     register word_t a1 asm("a1") = arg1;
+    register word_t a2 asm("a2") = arg2;
     register word_t a6 asm("a6") = operation;
     register word_t a7 asm("a7") = BP_RPC_SBI_EXTENSION_ID;
 
     asm volatile("ecall"
-                 : "+r"(a0), "+r"(a1)
+                 : "+r"(a0), "+r"(a1), "+r"(a2)
                  : "r"(a6), "r"(a7)
                  : "memory");
     return (bp_rpc_sbi_ret_t) {
@@ -136,7 +137,24 @@ static void bp_rpc_revoke(void)
         return;
     }
     bp_rpc_sbi_ret_t result = bp_rpc_sbi_call(
-        BP_RPC_SBI_REVOKE, 0, bp_rpc_binding.token);
+        BP_RPC_SBI_QUERY, 0, bp_rpc_binding.token, 0);
+    if (result.error != 0
+        || (result.value != BP_RPC_CONTROL_OK
+            && result.value != BP_RPC_CONTROL_FAULTED)) {
+        fail("BlackParrot protected RPC query invariant failed");
+    }
+    if (result.value == BP_RPC_CONTROL_FAULTED) {
+        bp_rpc_fault_record_v1_t record;
+        result = bp_rpc_sbi_call(BP_RPC_SBI_READ_FAULT, 0,
+                                 bp_rpc_binding.token, (word_t)&record);
+        if (result.error != 0 || result.value != BP_RPC_CONTROL_OK
+            || !bp_rpc_user_address_valid(record.pc)
+            || (record.cause >> (wordBits - 1)) != 0) {
+            fail("BlackParrot protected RPC fault-record invariant failed");
+        }
+    }
+    result = bp_rpc_sbi_call(
+        BP_RPC_SBI_REVOKE, 0, bp_rpc_binding.token, 0);
     if (result.error != 0 || result.value != BP_RPC_CONTROL_OK) {
         fail("BlackParrot protected RPC revocation invariant failed");
     }
@@ -211,9 +229,10 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
     if (++bp_rpc_generation == 0) {
         bp_rpc_generation++;
     }
-    bp_rpc_descriptor_v1_t descriptor = {
-        .version = BP_RPC_ABI_VERSION,
-        .size = BP_RPC_DESCRIPTOR_V1_SIZE,
+    bp_rpc_descriptor_v2_t descriptor = {
+        .version = BP_RPC_ABI_VERSION_V2,
+        .size = BP_RPC_DESCRIPTOR_V2_SIZE,
+        .flags = BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION,
         .slot = 0,
         .request_words = request_words,
         .reply_words = reply_words,
@@ -228,7 +247,7 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
         .caller_context = 0,
         .server_context = 1,
     };
-    if (!bp_rpc_descriptor_v1_valid(&descriptor)) {
+    if (!bp_rpc_descriptor_v2_valid(&descriptor)) {
         return bp_rpc_error(seL4_InvalidArgument);
     }
     if (!bp_rpc_user_mapping(server_root, descriptor.server_entry,
@@ -279,7 +298,7 @@ static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
     }
 
     bp_rpc_sbi_ret_t result = bp_rpc_sbi_call(
-        BP_RPC_SBI_INSTALL, (word_t)&descriptor, 0);
+        BP_RPC_SBI_INSTALL, (word_t)&descriptor, 0, 0);
     if (result.error != 0 || (word_t)result.value != descriptor.token) {
         userError("BlackParrot RPC bind: firmware descriptor installation failed (error %ld, value %ld, token %llu)",
                   result.error, result.value,

@@ -64,6 +64,7 @@ CORRECTNESS_TESTS := \
     mt_protected_rpc_reference_test \
     mt_protected_rpc_control_test \
     mt_protected_rpc_hardware_test \
+    mt_protected_rpc_v2_hardware_test \
     mt_protected_rpc_fault_recovery_test \
     mt_protected_rpc_load_fault_recovery_test \
     mt_protected_rpc_store_fault_recovery_test \
@@ -161,7 +162,7 @@ $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/te
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_data_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c
 $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_reference_test.riscv: CFLAGS += -DRPC_FLUSH_ON_SWITCH=$(RPC_FLUSH_ON_SWITCH)
 $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_library_test.riscv: $(TOP)/software/include/bp_protected_rpc.h $(TOP)/testing/protected_rpc_demo_service.S
-$(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_control_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_hardware_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_fault_recovery_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_load_fault_recovery_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_store_fault_recovery_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_instruction_fault_recovery_test.riscv: $(TOP)/sel4/internal/blackparrot_rpc_abi.h
+$(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_control_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_hardware_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_v2_hardware_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_fault_recovery_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_load_fault_recovery_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_store_fault_recovery_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_protected_rpc_instruction_fault_recovery_test.riscv: $(TOP)/sel4/internal/blackparrot_rpc_abi.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_load_overlap_test.riscv $(ZP_RISCV_DIR)/bp-tests/mt_load_ahead_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_request_interleave_benchmark.riscv: $(TOP)/software/include/bp_load_ahead.h
 $(ZP_RISCV_DIR)/bp-tests/mt_ctxtsw_target_bypass_stress_test.riscv: CFLAGS += -DCTXTSW_TARGET_BYPASS_TURNS=$(TARGET_BYPASS_TURNS)
@@ -209,6 +210,7 @@ run-mt_umode_nonresident_handoff_test: check-nonresident-config
 run-mt_umode_resident_sv39_data_handoff_test: check-nonresident-config
 run-mt_rpc_context_transport_benchmark: check-rpc-config
 run-mt_protected_rpc_hardware_test: check-rpc-config
+run-mt_protected_rpc_v2_hardware_test: check-rpc-config
 run-mt_protected_rpc_fault_recovery_test: check-rpc-config
 run-mt_protected_rpc_load_fault_recovery_test: check-rpc-config
 run-mt_protected_rpc_store_fault_recovery_test: check-rpc-config

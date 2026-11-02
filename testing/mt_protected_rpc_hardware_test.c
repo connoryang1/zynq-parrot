@@ -120,7 +120,7 @@ static uint64_t rpc_install_descriptor(uint64_t token,
   status |= rpc_stage(BP_RPC_FIELD_SERVER_GP, 0);
   status |= rpc_stage(BP_RPC_FIELD_SERVER_TP, 0);
   status |= rpc_stage(BP_RPC_FIELD_CALLER_BADGE, UINT64_C(0x99));
-#ifdef RPC_FAULT_RECOVERY_TEST
+#if defined(RPC_FAULT_RECOVERY_TEST) || defined(RPC_V2_NORMAL_TEST)
   status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word_v2(4, 4, 0, 1));
 #else
   status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word(4, 4, 0, 1));

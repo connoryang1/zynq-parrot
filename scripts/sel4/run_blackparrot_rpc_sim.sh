@@ -15,6 +15,7 @@ result_checker=$project_root/scripts/sel4/check_blackparrot_rpc_result.sh
 model=${BLACKPARROT_SIM:-$project_root/cosim/black-parrot-minimal-example/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench}
 timeout_s=${BSG_TRACE_TIMEOUT_S:-14400}
 allow_concurrent=${BLACKPARROT_ALLOW_CONCURRENT_SIM:-0}
+smoke=${SEL4_RPC_SMOKE:-0}
 marker='Test SEL4IPCRPC0002 passed'
 failure_markers=(
     'Test SEL4IPCRPC0002 failed'
@@ -88,7 +89,11 @@ wait "$runner" || runner_status=$?
 trap - INT TERM EXIT
 
 if grep -Fq "$marker" "$output"; then
-    "$result_checker" "$output"
+    checker_args=()
+    if [[ "$smoke" == 1 ]]; then
+        checker_args+=(--smoke)
+    fi
+    "$result_checker" "${checker_args[@]}" "$output"
     exit 0
 fi
 if [[ -n "$failure_marker_seen" ]]; then

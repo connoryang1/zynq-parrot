@@ -150,8 +150,8 @@ the 112-byte descriptor layout but sets `version=2` and requires descriptor
 flag bit 0, `FAULT_COMPLETION`; the installer maps that flag to staged
 `CONFIG[48]`. Version 1 requires both the flag and `CONFIG[63:48]` to be zero.
 Version 2 admits synchronous server faults only with the following atomic
-contract. The directed hardware model implements the illegal-instruction case;
-OpenSBI and seL4 installation remain version 1:
+contract. The directed hardware model implements the fault matrix, OpenSBI
+accepts the version-2 image, and the experimental seL4 binding opts into it:
 
 1. Acceptance changes the slot from `LIVE` to `ACTIVE`. A precise synchronous
    exception while the recorded server context is active changes it to
@@ -176,13 +176,16 @@ OpenSBI and seL4 installation remain version 1:
    userspace cleanup call can leak the quarantined binding but cannot restart
    it or authorize object reuse.
 
-The minimum prototype may unwind directly in hardware and let the kernel reap
-the quarantined binding afterward. That is sufficient for at-most-once caller
-recovery, but it is not yet equivalent to normal seL4 fault-endpoint delivery.
-Claiming that equivalence requires a kernel-owned continuation that converts
-the privileged record into the server TCB's ordinary fault protocol. Blocking,
-timeouts, maskable interrupts, and asynchronous cancellation remain separate
-state transitions rather than being relabeled synchronous faults.
+The minimum prototype unwinds directly in hardware and lets the kernel consume
+the authenticated fault snapshot before it revokes the quarantined binding.
+That is sufficient for at-most-once caller recovery and safe object cleanup,
+but it is not equivalent to normal seL4 fault-endpoint delivery: the hardware
+shadow is not a schedulable server TCB continuation after caller unwind. Any
+future fault notification must therefore be explicitly non-resumable, or a new
+ABI must retain a kernel-owned continuation; it must not pretend that replying
+to an ordinary seL4 fault IPC can restart this RPC. Blocking, timeouts, maskable
+interrupts, and asynchronous cancellation remain separate state transitions
+rather than being relabeled synchronous faults.
 
 The directed full-core model now injects illegal-instruction, instruction-page,
 load-page, and store-page faults after a visible server-side counter update.

@@ -12,6 +12,7 @@ checkout=$(realpath "$1")
 build_dir=$2
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_root=$(realpath "$script_dir/../..")
+rpc_smoke=${SEL4_RPC_SMOKE:-OFF}
 validation_patch="$project_root/sel4/patches/sel4test-blackparrot-rpc-validation.patch"
 kernel_patch="$project_root/sel4/patches/sel4-blackparrot-rpc-kernel.patch"
 
@@ -54,6 +55,7 @@ build_dir=$(realpath "$build_dir")
         -DKernelFastpath=ON \
         -DKernelBlackParrotTestFinish=ON \
         -DSel4testRpcOnly=ON \
+        -DSel4testRpcSmoke="$rpc_smoke" \
         -DSel4testRpcPrinting=ON \
         -DLibSel4MuslcSysMorecoreBytes=65536 \
         -DLibSel4TestPrinterRegex='^SEL4IPCRPC0002$'
