@@ -82,6 +82,16 @@ class CellPlanTest(unittest.TestCase):
             disabled,
         )
 
+    def test_accepted_drop_arm_materializes_all_positional_arguments(self):
+        command = benchmark_command(
+            7, "wake-early-data", "target", "fifo", "persistent",
+            "accepted-drop", 4,
+        )
+        self.assertIn(
+            " 7 wake-early-data target fifo persistent accepted-drop; rc=$?",
+            command,
+        )
+
     def test_nondefault_line_count_materializes_all_arguments(self):
         command = benchmark_command(
             7, "wake-data", "target", "fifo", "persistent", "enabled", 1
@@ -193,6 +203,20 @@ class CellPlanTest(unittest.TestCase):
         )
         self.assertIn(
             " 7 wake-early-data target fifo persistent enabled 1; rc=$?",
+            command,
+        )
+
+    def test_wake_early_drop_uses_one_cell_per_group(self):
+        self.assertEqual(
+            selected_cells(0, "wake-early-drop"),
+            [(group, "wake-early-drop") for group in range(8)],
+        )
+        command = benchmark_command(
+            7, "wake-early-drop", "target", "fifo", "persistent",
+            "enabled", 4,
+        )
+        self.assertIn(
+            " 7 wake-early-drop target fifo persistent enabled; rc=$?",
             command,
         )
 

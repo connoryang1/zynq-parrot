@@ -31,7 +31,7 @@ def cell_plan():
 def selected_cells(start_cell, only_timing=None, only_group=None):
     """Return a disjoint suffix, optionally filtered to one timing."""
     if only_timing in ("instruction", "counter", "trigger", "wake-trigger",
-                       "wake-data", "wake-early-data"):
+                       "wake-data", "wake-early-data", "wake-early-drop"):
         cells = [(group, only_timing) for group in range(8)]
         if start_cell < 0 or start_cell >= len(cells):
             raise ValueError(
@@ -121,7 +121,8 @@ def parse_args(argv=None):
                         default="normal")
     parser.add_argument("--replay-state", choices=("persistent", "isolated"),
                         default="isolated")
-    parser.add_argument("--arm", choices=("alternating", "disabled", "enabled"),
+    parser.add_argument("--arm", choices=("alternating", "disabled", "enabled",
+                                          "accepted-drop"),
                         default="alternating")
     parser.add_argument("--lines", type=int, choices=range(1, 5), default=4)
     parser.add_argument("--lead-cycles", type=int, choices=range(0, 1_000_001),
@@ -129,7 +130,7 @@ def parse_args(argv=None):
     parser.add_argument("--only-timing",
                         choices=("early", "late", "instruction", "counter",
                                  "trigger", "wake-trigger", "wake-data",
-                                 "wake-early-data"))
+                                 "wake-early-data", "wake-early-drop"))
     parser.add_argument("--start-cell", type=int, default=0,
                         help="zero-based cell-plan index for a recovered suffix run")
     parser.add_argument("--only-group", type=int, choices=range(8))

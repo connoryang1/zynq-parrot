@@ -60,7 +60,8 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0008-blackparrot-gate-instruction-replay.patch \
 	$(CURDIR)/kernel-patches/0009-blackparrot-wakeup-instruction-replay.patch \
 	$(CURDIR)/kernel-patches/0010-blackparrot-wakeup-replay-late-data.patch \
-	$(CURDIR)/kernel-patches/0013-blackparrot-wakeup-data-preview.patch
+	$(CURDIR)/kernel-patches/0013-blackparrot-wakeup-data-preview.patch \
+	$(CURDIR)/kernel-patches/0014-blackparrot-wakeup-pma-drop-control.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb

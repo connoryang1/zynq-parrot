@@ -53,7 +53,12 @@ enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
        max_lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10,
        max_retries = 4096 };
 
-enum arm_mode { arm_alternating, arm_disabled, arm_enabled };
+enum arm_mode {
+	arm_alternating,
+	arm_disabled,
+	arm_enabled,
+	arm_accepted_drop,
+};
 
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
@@ -138,6 +143,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		fail("register preview lines");
 	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = mode_for(trial, arm);
+		unsigned preview_mode = arm == arm_accepted_drop
+			? (enabled ? enable_mode : 7) : (enabled ? enable_mode : 0);
 		unsigned long before_hook, after_hook;
 		struct rusage before_usage, after_usage;
 		uint64_t checksum = 0, entry, after_load;
@@ -168,7 +175,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		 * followed by the intended pipe-wakeup batch. Besides violating the
 		 * one-hook invariant, that gave the first batch excessive lead time. */
 		if (prctl(PR_BP_PREVIEW_ENABLE,
-			  enabled ? enable_mode : 0UL, 0UL, 0UL, 0UL))
+			  preview_mode, 0UL, 0UL, 0UL, 0UL))
 			fail("toggle preview emission");
 		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
 		if (before_hook == (unsigned long)-1)
@@ -206,10 +213,11 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			    && (samples[trial].hooks != 0
 					 || voluntary != 1 || involuntary != 0))
 			|| (!uncounted_mode(enable_mode, wake_data)
-			    && samples[trial].hooks != enabled)) {
+			    && samples[trial].hooks
+			       != (arm == arm_accepted_drop ? 1U : enabled))) {
 			fprintf(stderr,
 				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u voluntary=%ld involuntary=%ld\n",
-				trial, enabled, enable_mode, before_hook, after_hook,
+				trial, enabled, preview_mode, before_hook, after_hook,
 				samples[trial].hooks, voluntary, involuntary);
 			transfer(out, &token, 1); /* contaminated attempt done */
 			if (++retries > max_retries)
@@ -247,7 +255,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 9) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled] [active-lines-1..4] [lead-cycles-0..1000000]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled|accepted-drop] [active-lines-1..4] [lead-cycles-0..1000000]\n",
 			argv[0]);
 		return 2;
 	}
@@ -275,6 +283,8 @@ int main(int argc, char **argv)
 			enable_mode = 6, wake_data = 1;
 		else if (!strcmp(argv[2], "wake-early-data"))
 			enable_mode = 1, wake_data = 1;
+		else if (!strcmp(argv[2], "wake-early-drop"))
+			enable_mode = 7, wake_data = 1;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -309,6 +319,8 @@ int main(int argc, char **argv)
 			arm = arm_disabled;
 		else if (!strcmp(argv[6], "enabled"))
 			arm = arm_enabled;
+		else if (!strcmp(argv[6], "accepted-drop"))
+			arm = arm_accepted_drop;
 		else if (strcmp(argv[6], "alternating")) {
 			fprintf(stderr, "invalid trial arm: %s\n", argv[6]);
 			return 2;
@@ -334,8 +346,14 @@ int main(int argc, char **argv)
 		}
 		lead_cycles = parsed;
 	}
+	if (arm == arm_accepted_drop && (!wake_data || enable_mode != 1)) {
+		fprintf(stderr,
+			"accepted-drop requires wake-early-data timing\n");
+		return 2;
+	}
 	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s lead_cycles=%lu\n",
 	       group, group * max_lines * line_bytes, active_lines,
+	       wake_data && enable_mode == 7 ? "wake-early-drop" :
 	       wake_data && enable_mode == 1 ? "wake-early-data" :
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
@@ -346,7 +364,9 @@ int main(int argc, char **argv)
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal",
 	       isolate_replay ? "isolated" : "persistent",
 	       arm == arm_disabled ? "disabled" :
-	       arm == arm_enabled ? "enabled" : "alternating", lead_cycles);
+	       arm == arm_enabled ? "enabled" :
+	       arm == arm_accepted_drop ? "accepted-drop" : "alternating",
+	       lead_cycles);
 
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};

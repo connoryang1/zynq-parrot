@@ -1,0 +1,79 @@
+This patch adds a Linux-only control for successful-wakeup data preview. Mode
+seven executes the same metadata reads, instruction trigger, four physical CSR
+writes, and hook accounting as mode one, but substitutes nonzero local
+addresses that the hardware PMA rejects before D-UCE/L2 admission.
+
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -171,7 +171,8 @@
+ {
+ 	unsigned long paddr0, paddr1, paddr2, paddr3;
+ 
+-	if (READ_ONCE(task->thread.bp_preview_phys_mode) != 1
++	if ((READ_ONCE(task->thread.bp_preview_phys_mode) != 1
++	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 7)
+ 	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
+ 	    || !task->mm)
+ 		return;
+@@ -179,6 +180,14 @@
+ 	paddr1 = READ_ONCE(task->thread.bp_preview_paddr[1]);
+ 	paddr2 = READ_ONCE(task->thread.bp_preview_paddr[2]);
+ 	paddr3 = READ_ONCE(task->thread.bp_preview_paddr[3]);
++	/* Preserve all four volatile metadata reads and CSR retirements while
++	 * preventing a request from entering the preview queue or shared L2. */
++	if (READ_ONCE(task->thread.bp_preview_phys_mode) == 7) {
++		paddr0 = 0x1000;
++		paddr1 = 0x2000;
++		paddr2 = 0x3000;
++		paddr3 = 0x4000;
++	}
+ 	if (!(paddr0 | paddr1 | paddr2 | paddr3))
+ 		return;
+ 	if (paddr0)
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,7 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 off; 1 wake joint; 2 select joint; 3--5 controls; 6 wake/late. */
++/* 0 off; 1 wake joint; 2 select joint; 3--6 controls; 7 wake PMA-drop. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4357,9 +4357,10 @@
+ 		/* Preserve the accepted instruction-first ordering for joint mode
+ 		 * one, then give its four physical hints the rest of the wake-to-run
+ 		 * interval. Mode six remains the wake-replay/late-data control. */
+-		if (bp_preview_mode == 1 || bp_preview_mode == 6)
++		if (bp_preview_mode == 1 || bp_preview_mode == 6
++		    || bp_preview_mode == 7)
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+-		if (bp_preview_mode == 1)
++		if (bp_preview_mode == 1 || bp_preview_mode == 7)
+ 			riscv_bp_preview_wakeup(p);
+ 	}
+ #endif
+@@ -6693,7 +6694,8 @@
+ 
+ 		if (bp_preview_mode && bp_preview_mode != 4
+ 		    && bp_preview_mode != 6
+-		    && bp_preview_mode != 1) {
++		    && bp_preview_mode != 1
++		    && bp_preview_mode != 7) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 6 || arg3 || arg4 || arg5) {
++		if (arg2 > 7 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}

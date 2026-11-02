@@ -14,7 +14,7 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
                     r"lines=(\d+) "
-                    r"timing=(early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data) "
+                    r"timing=(early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop) "
                     r"mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
 TIMING_MODES = {
@@ -26,8 +26,12 @@ TIMING_MODES = {
     "wake-trigger": 6,
     "wake-data": 6,
     "wake-early-data": 1,
+    "wake-early-drop": 7,
 }
 LEAD_CYCLES = re.compile(r"PHYSICAL_BENCH_CONFIG[^\n]* lead_cycles=(\d+)")
+ARM = re.compile(
+    r"PHYSICAL_BENCH_CONFIG[^\n]* arm=(alternating|disabled|enabled|accepted-drop)"
+)
 
 
 def percentile(values, fraction):
@@ -108,11 +112,32 @@ def main():
     if (group > 7 or first_offset != group * 256 or lines not in range(1, 5)
             or mode != TIMING_MODES[timing]):
         raise SystemExit("invalid benchmark configuration marker")
+    arms = ARM.findall(text)
+    if len(arms) != 1:
+        raise SystemExit("expected exactly one benchmark arm marker")
+    arm = arms[0]
+    if arm == "accepted-drop" and timing != "wake-early-data":
+        raise SystemExit("accepted-drop requires wake-early-data timing")
     rows = []
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
         rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
-    result = summarize(rows, group, timing, lines=lines)
+    if arm == "accepted-drop":
+        for row in rows:
+            if row["hooks"] != 1:
+                raise SystemExit(
+                    f"accepted-drop trial {row['trial']} had "
+                    f"{row['hooks']} hooks; expected one"
+                )
+        # summarize() normally validates disabled-versus-enabled hook counts.
+        # Preserve its paired-block calculation while presenting dropped
+        # addresses as the control arm and accepted addresses as the target.
+        normalized = [dict(row, hooks=row["mode"]) for row in rows]
+        result = summarize(normalized, group, timing, lines=lines)
+        result["comparison"] = "pma-dropped-vs-accepted"
+    else:
+        result = summarize(rows, group, timing, lines=lines)
+        result["comparison"] = "disabled-vs-enabled"
     result["lead_cycles"] = lead_cycles
     print(json.dumps(result, indent=2))
 

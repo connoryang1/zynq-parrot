@@ -1,12 +1,17 @@
 """Validate balanced-cell parsing and full-sweep acceptance for preview analysis."""
 
+import contextlib
 import gzip
+import io
+import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from analyze_scheduler_physical_preview_sweep import analyze
-from analyze_scheduler_physical_preview_benchmark import TIMING_MODES
+from analyze_scheduler_physical_preview_benchmark import TIMING_MODES, main
 from compare_scheduler_physical_preview_sweeps import compare, compare_timing_pairs
 from pool_scheduler_physical_preview_replicates import pool
 from analyze_scheduler_physical_preview_tail import (
@@ -20,18 +25,20 @@ from analyze_scheduler_physical_preview_chronology import (
 
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
                core_marker="CORE PASS", saved_load_cycles=20,
-               saved_return_cycles=0, include_tail=False):
+               saved_return_cycles=0, include_tail=False,
+               arm="alternating"):
     mode_value = TIMING_MODES[timing]
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
-        f"lines=4 timing={timing} mode={mode_value}",
+        f"lines=4 timing={timing} mode={mode_value} arm={arm}",
         "PHYSICAL_BENCH_CHILD PASS",
     ]
     for trial in range(trials):
         mode = 1 if trial % 4 in (1, 2) else 0
         entry = 100 + mode
         load = 300 - saved_load_cycles * mode
-        hooks = 0 if timing in ("trigger", "wake-trigger") else mode
+        hooks = (1 if arm == "accepted-drop" else
+                 0 if timing in ("trigger", "wake-trigger") else mode)
         hooks += 1 if extra_enabled_hook and mode and trial == 1 else 0
         post_load = 20
         return_handoff = 30 - saved_return_cycles * mode
@@ -90,6 +97,23 @@ class SweepAnalyzerTest(unittest.TestCase):
             bootstrap_samples=100, lines=1,
         )
         self.assertEqual(result["active_lines"], 1)
+
+    def test_single_cell_analyzer_compares_accepted_against_pma_drop(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "accepted-drop.log"
+            path.write_text(transcript(
+                group=7, timing="wake-early-data", arm="accepted-drop"
+            ))
+            output = io.StringIO()
+            with mock.patch.object(sys, "argv", ["analyze", str(path)]):
+                with contextlib.redirect_stdout(output):
+                    main()
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["comparison"], "pma-dropped-vs-accepted")
+        self.assertEqual(
+            result["metrics"]["load_cycles"]["paired_median_saved_cycles"],
+            20.0,
+        )
 
     def test_single_cell_analyzer_accepts_counter_mode(self):
         self.assertEqual(TIMING_MODES["counter"], 4)

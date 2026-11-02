@@ -130,6 +130,56 @@ slots; it tracks nonzero CSR commands or their downstream work. A Linux-only
 control that executes the same CSR writes with PMA-rejected addresses is the
 next clean split between software/retirement cost and accepted memory traffic.
 
+## PMA-drop Linux control
+
+Kernel mode seven executes the same successful-wakeup helper, reads all four
+registered physical-address slots, increments the same hook counter, and
+writes CSR `0x9c0` four times, but substitutes local addresses `0x1000` through
+`0x4000`. The existing PMA gate rejects those values before D-UCE/L2. The
+maintained patch applies and reverses fuzz-free against the accepted kernel;
+the exact GCC 13.2 configuration links, and disassembly proves four constant
+CSR writes in mode seven while preserving mode one's real-address path.
+
+On the same candidate NBF and routed image, separate 512-trial group-seven
+FIFO arms show:
+
+- PMA-dropped mode seven has a neutral local-load estimate of -0.5 saved cycles
+  with 95% interval `[-1.5,0.5]`. Its wake-to-entry point is 554 cycles slower,
+  but the interval `[-1174.5,2010]` spans both signs.
+- Accepted mode one saves 24.5 local-load cycles with `[15.25,31.25]`. Its
+  wake-to-entry point is 694.75 cycles slower, with
+  `[-1267.75,1377.25]`.
+- An independent cross-boot bootstrap gives accepted-minus-dropped local
+  saving 25 cycles with `[15.5,31.75]`, but incremental wake-path saving
+  -140.75 cycles with `[-2797.75,1948]`.
+
+The tighter `accepted-drop` benchmark arm interleaves mode seven and mode one
+inside each `[drop,accepted,accepted,drop]` block. Both sides therefore execute
+one hook and four CSR writes; only PMA acceptance differs. Its clean retry has
+zero rejected handoffs and all child/parent, CORE, and BSG PASS markers.
+Accepted hints save 14.25 target-load cycles over dropped hints with
+`[11.25,20.75]`, while incremental wake-to-entry is unresolved at -629 saved
+cycles with `[-1685.75,1655.25]`. Request acceptance clearly causes the useful
+cache effect, but it does not resolve a downstream wake-path cost and cannot
+explain the earlier precise 611--822-cycle regression.
+
+The unresolved interval is structural benchmark noise, not merely a small
+sample: a typical four-trial block spans 23,574 wake-to-entry cycles, versus a
+hundreds-of-cycles candidate effect. The local-load interval remains tight.
+Post-hoc trimming would not be a defensible fix; the next measurement must
+timestamp immediately around the kernel wakeup helper and remove the long
+scheduler transit from the cost endpoint.
+
+Exact passing logs, statuses, and analyses are
+`group7-mode7-pma-drop-fifo.*`,
+`group7-mode1-accepted-same-image-fifo.*`, and
+`group7-accepted-vs-pma-drop-fifo.*` under the existing durable artifact
+directory. The minimal rebuild bundle is
+`/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/pma-drop-control-minimal.tar.xz`
+(SHA-256 `5d14cc3bce5100308b6f477765d5a1a1c1077af4b2f5dc7bc5e34d00ef48c7c6`).
+It contains the candidate NBF/kernel, exact build log/disassembly, both
+transfers, the direct-comparison ELF, and a per-file hash manifest.
+
 ## Workflow guardrail
 
 The first object compile used a hard-linked kernel clone. Source files and the
@@ -150,13 +200,37 @@ Before the trace rebuild, stale reproducible generated outputs in two inactive
 `/dev/shm` worktrees were cleaned to recover temporary space; no source or
 unique evidence was removed.
 
+The PMA-control build exposed four additional provenance guardrails. Regenerate
+multi-file kernel patches from exact source copies instead of hand-maintaining
+hunk counts, and run forward plus reverse dry-runs from a path whose working
+directory is explicit. Supply the retained Buildroot initramfs directory
+through `BR_BINARIES_DIR`; a first link failed because the copied configuration
+otherwise expanded it to `/rootfs.cpio`. Do not trust a copied `vmlinux.bin`
+beside a historical tree: the fail-closed NBF splicer rejected one stale file,
+whereas objcopy of the accepted ELF round-tripped the accepted NBF exactly.
+Finally, stage every new NBF with the hash-verifying artifact script before the
+interactive runner; the first launch stopped before privileged execution when
+the board copy was absent.
+
+The first direct accepted-versus-drop board attempt stopped during Linux boot
+at 3.591 seconds and hit the 300-second shell-prompt gate. It is retained under
+the explicit `boot-timeout` name and is not benchmark evidence; a full
+power-cycle/readiness/overlay recovery then produced the clean passing run.
+An attempted raw durable copy also exhausted the root filesystem while writing
+its second large file. Only the newly created incomplete duplicate was removed;
+the source artifacts remained intact, and the compact 22 MiB bundle above was
+verified before durable copy. Future preservation should check root capacity
+first and avoid redundant accepted payloads.
+
 ## Next discriminator
 
 Do not spend another experiment on more lead time, more L2 capacity, or CSR
-batching alone. Add a same-image Linux control that executes the same wakeup
-helper and four CSR writes but substitutes PMA-rejected local addresses, so no
-request enters D-UCE/L2. If the penalty disappears, test strict
-demand-over-preview QoS; if it remains, instrument Linux handoff phases before
-changing RTL. The eventual implementation target remains a context-tagged
-replay command with a separately throttled lane and
-issued/completed/consumed/late/drop counters.
+batching alone. The PMA-drop split now proves a useful accepted-request cache
+effect but cannot resolve incremental wake-path cost because the userspace
+endpoint crosses a 25k--50k-cycle scheduler phase. Add close cycle timestamps
+around the successful-wakeup helper and expose them to the benchmark, first
+comparing disabled, PMA-dropped, and accepted modes on the same kernel. Only a
+resolved accepted-minus-drop hook cost justifies request QoS changes; a
+resolved common helper/CSR cost instead justifies a single context-tag/batch
+command. The eventual implementation target remains a separately throttled
+lane with issued/completed/consumed/late/drop counters.
