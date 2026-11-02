@@ -62,6 +62,14 @@ the best coroutine. The first ratio measures the benefit of interleaving in
 addition to implementation overhead; only the fixed-batch ratio is the
 best-software headline.
 
+Switch-only executes 96 handoffs at N=8: eight workers times eleven rounds,
+plus one eight-context terminal lap. Its 1,211 cycles are therefore 12.615
+cycles per complete handoff on average. The roughly three-cycle target-launch
+observation from the focused context trace is only one microarchitectural
+portion of that interval; redirect, loop instructions, publication, and
+nonresident context handling surround it. Switch-only is still not subtracted
+from a data mode because those costs overlap memory differently.
+
 ## Disclosed N sweep
 
 The same O3 ELF/NBF/model supplies every row. N=8 maximizes the observed
@@ -99,19 +107,39 @@ ordered `run_window` pairs; the boundary instructions are excluded.
 | --- | ---: | ---: | ---: | ---: |
 | Hardware worker | 2,810 | 1,647 | 1,163 | 0.586 |
 | Fixed batch | 3,817 | 1,584 | 2,233 | 0.415 |
+| Direct C++20 coroutine | 5,567 | 5,076 | 491 | 0.912 |
 | Batch minus hardware | +1,007 | -63 | +1,070 | n/a |
+| Direct coroutine minus hardware | +2,757 | +3,429 | -672 | n/a |
+
+The coroutine therefore hides waiting successfully but executes 3.083x as
+many instructions as hardware. Its 2,757-cycle deficit closes exactly as
+`3,429 - 672`: about 38.966 additional retired instructions per useful node
+more than offset its 7.636 fewer no-retirement cycles per node. Symbol ranges
+place 4,872 of the 5,076 retirements inside the specialized direct-coroutine
+actor and 202 in its operation/drain wrapper; labels divide the actor at the
+consuming load, so these ranges are not individual-operation counts.
 
 UCE transaction analysis covers measured indexes `[0x80010000,0x80011b80)`
-and begins with zero outstanding measured-region work in both modes:
+and begins with zero outstanding measured-region work in all three modes:
 
 | N=8 mode | Hints / UCE transactions | Ordinary UCE reads | Peak | Average, whole window | Average, active interval | Issue span |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Hardware worker | 88 / 88 | 0 | 8 | 6.483 | 6.658 | 2,529 core cycles |
 | Fixed batch | 88 / 88 | 0 | 8 | 4.772 | 5.108 | 3,359 core cycles |
+| Direct C++20 coroutine | 88 / 88 | 0 | 5 | 3.272 | 3.554 | 4,918 core cycles |
 
-The hardware trace additionally records 88 retirements at the specialized
-consuming-load PC `0x80000d78`. The unrolled batch has multiple generated load
-sites, so its overlap report does not assert a single consuming-load PC.
+All three schedules accumulate the same 18,216 outstanding-request-cycle area,
+as expected from 88 identical request lifetimes. Hardware packs that area into
+the shortest window. The coroutine executes useful/control instructions almost
+continuously, but those instructions space new hints far enough apart that it
+never has more than five live requests. This is low overhead relative to an OS
+thread or stackful switch, but not zero instruction cost relative to custom
+register-context hardware on this fine-grained workload.
+
+The hardware and direct-coroutine traces each record 88 retirements at their
+specialized consuming-load PCs, `0x80000d78` and `0x80005074`. The unrolled
+batch has multiple generated load sites, so its overlap report does not assert
+a single consuming-load PC.
 Matched-region AXI correlation returned no transactions despite the documented
 address transform; no AXI occupancy or backing-bank parallelism claim is made.
 UCE request/response completeness, occupancy, and ordinary-read absence remain

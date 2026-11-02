@@ -204,8 +204,11 @@ the best direct coroutine (1.981x hardware). Clean retirement traces attribute
 the 1,007-cycle batch gap to 63 fewer retired batch instructions plus 1,070
 additional no-retirement cycles. UCE traces show 88 complete hints, zero
 ordinary measured-region reads, and peak eight for both schedules; hardware
-averages 6.483 outstanding over the whole window versus batch's 4.772. Exact
-logs, generated tables, hashes, commands, and limits are under
+averages 6.483 outstanding over the whole window versus batch's 4.772. Direct
+coroutine retires 5,076 instructions with only 491 no-retirement cycles; it
+keeps the core busy but peaks at five outstanding hints and averages 3.272
+because actor/frame work spaces issues across 4,918 cycles. Exact logs,
+generated tables, hashes, commands, and limits are under
 [`logs/nano-peer-review-20261101/`](../logs/nano-peer-review-20261101/).
 
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
