@@ -156,8 +156,15 @@ The maintained `discover -s linux-tests` form is the required invocation; its
 complete repeat passed all 148 tests, so the failed import is not a code result.
 
 This candidate has a linked Linux image but no boot or performance result yet.
-The routed FPGA job is recorded separately; board deployment remains gated on
-routed fit/timing and exact package verification.
+Exact job `20261102T075856Z-6e4ceb88` routes top `6e4ceb88` / BlackParrot
+`b4da98df9` with `e_bp_unicore_zynqparrot_prefetch16k_cfg`. Final setup
+WNS/TNS is `+0.226/0 ns`, hold WHS/THS is `+0.033/0 ns`, and placement uses
+50,716 LUTs (95.33%), 25,178 registers (23.66%), 94.5 BRAM tiles (67.50%), and
+11 DSPs (5.00%). The independently verified package and bitstream SHA-256
+values are `302eb27399b766daee525a5f2b99d845a181dfd3aeaf8b8d16775b5d2864b1ba`
+and `67268a0fcdb3e478b718c02e135d2a4525017473aac8cb5443db1e33b0f7d83c`.
+This passes routed fit/timing but remains unqualified on the board; Linux boot
+and performance are still pending.
 
 ## Design
 
