@@ -99,6 +99,37 @@ The validated ELF, run log, FST, and source are archived as
 The ELF, log, and FST SHA-256 values are respectively `ee18c7fa...f6d`,
 `e219a9a4...f92`, and `ab57fc06...e8`.
 
+## Shared L2 contention control
+
+The preview path gives architectural D-cache demand priority inside D-UCE, but
+after issue both I-cache/D-cache ordinary requests and physical previews enter
+the same round-robin forward crossbar and L2 request controller. Response
+selection prefers ordinary traffic; request admission does not inspect the
+preview bit. This is a real opportunity for interference, but a directed
+full-core control bounds its size for hot preview hits.
+
+`testing/mt_physical_preview_icache_contention_benchmark.c` places `fence.i`
+before the same matched zero-, one-, and four-command bodies, forcing the
+peer's first instruction through L2. After the initial transient, all six
+rotated sample groups measure the no-hint path one cycle faster than both the
+one- and four-hint paths; one and four are equal. The fixed ASCII checker,
+guest, CORE, and host pass on the clean trace-enabled 16 KiB model. Hot preview
+traffic therefore can delay a cold instruction handoff, but only by one cycle
+in this control—not the 611--822 cycles observed under Linux.
+
+The ELF, run log, FST, and source are archived as
+`/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261101/physical-preview-icache-contention-sim.tar.xz`
+(SHA-256 `2d696d15b13e79bb1419bc6be911be9ba4e5bbba810d47097b92124b624b115d`).
+The exact ELF, log, and FST SHA-256 values are `d2f0021c...7a3`,
+`5099f273...159`, and `4ff1110a...ac`.
+
+The Linux wakeup helper always reads all four contiguous registered-address
+slots before testing which are nonzero. Consequently the four-versus-one
+penalty scaling cannot be attributed to reading three additional metadata
+slots; it tracks nonzero CSR commands or their downstream work. A Linux-only
+control that executes the same CSR writes with PMA-rejected addresses is the
+next clean split between software/retirement cost and accepted memory traffic.
+
 ## Workflow guardrail
 
 The first object compile used a hard-linked kernel clone. Source files and the
@@ -122,10 +153,10 @@ unique evidence was removed.
 ## Next discriminator
 
 Do not spend another experiment on more lead time, more L2 capacity, or CSR
-batching alone. The next useful measurement is downstream: identify whether
-hot preview requests overlap ordinary kernel I-cache/D-cache/L2 traffic during
-the Linux switch path, and whether strict demand-over-preview QoS removes the
-roughly per-request first-use penalty. If it does, the implementation target is
-a context-tagged replay command with a separately throttled lane and
-issued/completed/consumed/late/drop counters. If it does not, instrument the
-Linux handoff phases before changing RTL again.
+batching alone. Add a same-image Linux control that executes the same wakeup
+helper and four CSR writes but substitutes PMA-rejected local addresses, so no
+request enters D-UCE/L2. If the penalty disappears, test strict
+demand-over-preview QoS; if it remains, instrument Linux handoff phases before
+changing RTL. The eventual implementation target remains a context-tagged
+replay command with a separately throttled lane and
+issued/completed/consumed/late/drop counters.
