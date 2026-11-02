@@ -24,7 +24,8 @@ module bp_prefetch_axi_master
    , localparam block_beats_lp = dcache_block_width_p / axi_data_width_p
    , localparam beat_count_width_lp = `BSG_SAFE_CLOG2(block_beats_lp)
    , localparam beats_per_bedrock_lp = bedrock_fill_width_p / axi_data_width_p
-   , localparam subbeat_count_width_lp = `BSG_SAFE_CLOG2(beats_per_bedrock_lp)
+   , localparam bedrock_beats_lp = dcache_block_width_p / bedrock_fill_width_p
+   , localparam bedrock_beat_count_width_lp = `BSG_SAFE_CLOG2(bedrock_beats_lp)
    )
   (input                                         clk_i
    , input                                       reset_i
@@ -60,11 +61,12 @@ module bp_prefetch_axi_master
   assign mem_fwd_header_cast_i = mem_fwd_header_i;
 
   logic [outstanding_p-1:0] slot_v_r;
+  logic [outstanding_p-1:0] slot_complete_r;
   bp_bedrock_mem_rev_header_s slot_header_r [outstanding_p];
   logic [outstanding_p-1:0][beat_count_width_lp-1:0] slot_beat_r;
   logic [outstanding_p-1:0][beat_count_width_lp-1:0] slot_last_beat_r;
-  logic [outstanding_p-1:0][subbeat_count_width_lp-1:0] slot_subbeat_r;
-  logic [outstanding_p-1:0][bedrock_fill_width_p-1:0] slot_fill_data_r;
+  logic [outstanding_p-1:0][bedrock_beat_count_width_lp-1:0] slot_last_bedrock_beat_r;
+  logic [outstanding_p-1:0][dcache_block_width_p-1:0] slot_line_r;
 
   logic free_v;
   logic [slot_width_lp-1:0] free_slot;
@@ -92,62 +94,89 @@ module bp_prefetch_axi_master
   wire response_id_valid = (axi_rid_i > 0) && (axi_rid_i <= outstanding_p);
   wire [slot_width_lp-1:0] response_slot = slot_width_lp'(axi_rid_i - 1'b1);
   logic response_slot_valid;
-  bp_bedrock_mem_rev_header_s response_header;
-  logic [subbeat_count_width_lp-1:0] response_subbeat;
-  logic [bedrock_fill_width_p-1:0] response_fill_data;
   always_comb begin
     response_slot_valid = 1'b0;
-    response_header = '0;
-    response_subbeat = '0;
-    response_fill_data = '0;
-    if (response_id_valid) begin
+    if (response_id_valid)
       response_slot_valid = slot_v_r[response_slot];
-      response_header = slot_header_r[response_slot];
-      response_subbeat = slot_subbeat_r[response_slot];
-      response_fill_data = slot_fill_data_r[response_slot];
-    end
-    response_fill_data[response_subbeat*axi_data_width_p +: axi_data_width_p] = axi_rdata_i;
   end
 
-  assign mem_rev_header_o = response_header;
-  assign mem_rev_data_o = response_fill_data;
-  wire response_fill_complete = response_subbeat == beats_per_bedrock_lp-1;
-  assign mem_rev_v_o = axi_rvalid_i & response_slot_valid & response_fill_complete;
-  assign axi_rready_o = response_slot_valid
-    & (!response_fill_complete | mem_rev_ready_and_i);
+  // AXI permits beats from different IDs to interleave.  BedRock packets do
+  // not, and the reverse crossbar locks one source until the packet's final
+  // beat.  Buffer each complete line here so AXI response acceptance never
+  // depends on that packet lock; otherwise an ordinary response behind a
+  // blocked prefetch beat can deadlock both sources on the shared AXI R port.
+  assign axi_rready_o = response_slot_valid;
   wire response_accept = axi_rvalid_i & axi_rready_o;
+
+  logic emit_v_r;
+  logic [slot_width_lp-1:0] emit_slot_r;
+  logic [bedrock_beat_count_width_lp-1:0] emit_beat_r;
+  logic complete_v;
+  logic [slot_width_lp-1:0] complete_slot;
+  always_comb begin
+    complete_v = 1'b0;
+    complete_slot = '0;
+    for (int i = outstanding_p-1; i >= 0; i--)
+      if (slot_complete_r[i]) begin
+        complete_v = 1'b1;
+        complete_slot = slot_width_lp'(i);
+      end
+  end
+
+  assign mem_rev_header_o = slot_header_r[emit_slot_r];
+  assign mem_rev_data_o
+    = slot_line_r[emit_slot_r][emit_beat_r*bedrock_fill_width_p +: bedrock_fill_width_p];
+  assign mem_rev_v_o = emit_v_r;
+  wire emit_yumi = mem_rev_v_o & mem_rev_ready_and_i;
+  wire emit_last = emit_beat_r == slot_last_bedrock_beat_r[emit_slot_r];
 
   always_ff @(posedge clk_i) begin
     if (reset_i) begin
       slot_v_r <= '0;
+      slot_complete_r <= '0;
       slot_beat_r <= '0;
       slot_last_beat_r <= '0;
-      slot_subbeat_r <= '0;
-      slot_fill_data_r <= '0;
+      slot_last_bedrock_beat_r <= '0;
+      emit_v_r <= 1'b0;
+      emit_slot_r <= '0;
+      emit_beat_r <= '0;
     end else begin
       if (request_accept) begin
         slot_v_r[free_slot] <= 1'b1;
+        slot_complete_r[free_slot] <= 1'b0;
         slot_header_r[free_slot] <= mem_fwd_header_cast_i;
         slot_beat_r[free_slot] <= '0;
         slot_last_beat_r[free_slot]
           <= beat_count_width_lp'(request_axi_beats - 1'b1);
-        slot_subbeat_r[free_slot] <= '0;
-        slot_fill_data_r[free_slot] <= '0;
+        slot_last_bedrock_beat_r[free_slot]
+          <= bedrock_beat_count_width_lp'
+            ((request_axi_beats / 8'(beats_per_bedrock_lp)) - 1'b1);
       end
 
       if (response_accept) begin
         slot_beat_r[response_slot] <= slot_beat_r[response_slot] + 1'b1;
-        slot_fill_data_r[response_slot] <= response_fill_data;
-        if (!response_fill_complete) begin
-          slot_subbeat_r[response_slot] <= response_subbeat + 1'b1;
+        slot_line_r[response_slot]
+          [slot_beat_r[response_slot]*axi_data_width_p +: axi_data_width_p]
+          <= axi_rdata_i;
+        if (axi_rlast_i)
+          slot_complete_r[response_slot] <= 1'b1;
+      end
+
+      if (!emit_v_r && complete_v) begin
+        emit_v_r <= 1'b1;
+        emit_slot_r <= complete_slot;
+        emit_beat_r <= '0;
+      end else if (emit_yumi) begin
+        if (emit_last) begin
+          emit_v_r <= 1'b0;
+          emit_beat_r <= '0;
+          slot_v_r[emit_slot_r] <= 1'b0;
+          slot_complete_r[emit_slot_r] <= 1'b0;
+          slot_beat_r[emit_slot_r] <= '0;
+          slot_last_beat_r[emit_slot_r] <= '0;
+          slot_last_bedrock_beat_r[emit_slot_r] <= '0;
         end else begin
-          slot_subbeat_r[response_slot] <= '0;
-          if (axi_rlast_i) begin
-            slot_v_r[response_slot] <= 1'b0;
-            slot_beat_r[response_slot] <= '0;
-            slot_last_beat_r[response_slot] <= '0;
-            slot_fill_data_r[response_slot] <= '0;
-          end
+          emit_beat_r <= emit_beat_r + 1'b1;
         end
       end
     end
@@ -180,8 +209,6 @@ module bp_prefetch_axi_master
       assert (axi_rlast_i
               == (slot_beat_r[response_slot] == slot_last_beat_r[response_slot]))
         else $error("Prefetch AXI bridge received AXI RLAST at the wrong beat");
-      assert (!axi_rlast_i || response_fill_complete)
-        else $error("Prefetch AXI bridge received AXI RLAST on a partial BedRock beat");
     end
   end
   // synopsys translate_on
