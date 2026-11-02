@@ -9,8 +9,12 @@
 #endif
 
 /* Private seL4/OpenSBI/BlackParrot boundary; not an application API. */
-#define BP_RPC_ABI_VERSION 1u
+#define BP_RPC_ABI_VERSION_V1 1u
+#define BP_RPC_ABI_VERSION_V2 2u
+#define BP_RPC_ABI_VERSION BP_RPC_ABI_VERSION_V1
 #define BP_RPC_DESCRIPTOR_V1_SIZE 112u
+#define BP_RPC_DESCRIPTOR_V2_SIZE BP_RPC_DESCRIPTOR_V1_SIZE
+#define BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION (1u << 0)
 #define BP_RPC_MAX_WORDS 4u
 #define BP_RPC_CSR_CALL 0x808
 #define BP_RPC_CSR_RETURN 0x809
@@ -99,6 +103,9 @@ typedef enum {
 #define BP_RPC_CONFIG_REPLY_WORDS_SHIFT 8u
 #define BP_RPC_CONFIG_CALLER_CONTEXT_SHIFT 16u
 #define BP_RPC_CONFIG_SERVER_CONTEXT_SHIFT 32u
+#define BP_RPC_CONFIG_FAULT_COMPLETION_SHIFT 48u
+#define BP_RPC_CONFIG_FAULT_COMPLETION \
+    (UINT64_C(1) << BP_RPC_CONFIG_FAULT_COMPLETION_SHIFT)
 
 static inline uint64_t bp_rpc_control_word(
     bp_rpc_control_command_t command, bp_rpc_descriptor_field_t field,
@@ -125,6 +132,15 @@ static inline uint64_t bp_rpc_config_word(
            | ((uint64_t)reply_words << BP_RPC_CONFIG_REPLY_WORDS_SHIFT)
            | ((uint64_t)caller_context << BP_RPC_CONFIG_CALLER_CONTEXT_SHIFT)
            | ((uint64_t)server_context << BP_RPC_CONFIG_SERVER_CONTEXT_SHIFT);
+}
+
+static inline uint64_t bp_rpc_config_word_v2(
+    uint8_t request_words, uint8_t reply_words, uint16_t caller_context,
+    uint16_t server_context)
+{
+    return bp_rpc_config_word(request_words, reply_words, caller_context,
+                              server_context)
+           | BP_RPC_CONFIG_FAULT_COMPLETION;
 }
 
 static inline uint64_t bp_rpc_sel4_counts(uint8_t request_words,
@@ -161,19 +177,22 @@ typedef struct {
     uint64_t reserved1[3];
 } bp_rpc_descriptor_v1_t;
 
+/* Version 2 deliberately preserves the installation-image size and offsets.
+ * Its required flag opts into synchronous-fault completion. */
+typedef bp_rpc_descriptor_v1_t bp_rpc_descriptor_v2_t;
+
 static inline int bp_rpc_user_address_valid(uint64_t address)
 {
     /* Version 1 admits only the positive Sv39 user half. */
     return address < (UINT64_C(1) << 38);
 }
 
-static inline int bp_rpc_descriptor_v1_valid(
+static inline int bp_rpc_descriptor_fields_valid(
     const bp_rpc_descriptor_v1_t *descriptor)
 {
     if (descriptor == (void *)0
-        || descriptor->version != BP_RPC_ABI_VERSION
         || descriptor->size != BP_RPC_DESCRIPTOR_V1_SIZE
-        || descriptor->flags != 0 || descriptor->slot != 0
+        || descriptor->slot != 0
         || descriptor->request_words > BP_RPC_MAX_WORDS
         || descriptor->reply_words > BP_RPC_MAX_WORDS
         || descriptor->reserved0 != 0 || descriptor->token == 0
@@ -198,6 +217,24 @@ static inline int bp_rpc_descriptor_v1_valid(
         }
     }
     return 1;
+}
+
+static inline int bp_rpc_descriptor_v1_valid(
+    const bp_rpc_descriptor_v1_t *descriptor)
+{
+    return descriptor != (void *)0
+           && descriptor->version == BP_RPC_ABI_VERSION_V1
+           && descriptor->flags == 0
+           && bp_rpc_descriptor_fields_valid(descriptor);
+}
+
+static inline int bp_rpc_descriptor_v2_valid(
+    const bp_rpc_descriptor_v2_t *descriptor)
+{
+    return descriptor != (void *)0
+           && descriptor->version == BP_RPC_ABI_VERSION_V2
+           && descriptor->flags == BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION
+           && bp_rpc_descriptor_fields_valid(descriptor);
 }
 
 static inline uint64_t bp_rpc_request_meta(uint8_t length)
@@ -260,6 +297,8 @@ static inline int bp_rpc_failure_meta_valid(uint64_t meta)
 #include <stddef.h>
 _Static_assert(sizeof(bp_rpc_descriptor_v1_t) == BP_RPC_DESCRIPTOR_V1_SIZE,
                "protected-RPC descriptor ABI size changed");
+_Static_assert(sizeof(bp_rpc_descriptor_v2_t) == BP_RPC_DESCRIPTOR_V2_SIZE,
+               "protected-RPC v2 descriptor ABI size changed");
 _Static_assert(offsetof(bp_rpc_descriptor_v1_t, token) == 16,
                "protected-RPC token ABI offset changed");
 _Static_assert(offsetof(bp_rpc_descriptor_v1_t, caller_satp) == 24,

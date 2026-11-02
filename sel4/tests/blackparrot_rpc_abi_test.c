@@ -57,6 +57,8 @@ int main(void)
            == UINT64_C(0x0402000000000000));
     assert(bp_rpc_config_word(4, 4, 0, 1)
            == UINT64_C(0x0000000100000404));
+    assert(bp_rpc_config_word_v2(4, 4, 0, 1)
+           == UINT64_C(0x0001000100000404));
     assert(bp_rpc_sel4_counts(4, 2) == UINT64_C(0x204));
     assert(BP_RPC_SEL4_BIND_LABEL != BP_RPC_SEL4_UNBIND_LABEL);
     assert(bp_rpc_sbi_extension_id(0) == UINT64_C(0x09000000));
@@ -81,5 +83,15 @@ int main(void)
     assert(bp_rpc_failure_meta_valid(BP_RPC_FAILURE_BACKEND_ERROR));
     assert(!bp_rpc_failure_meta_valid(4));
     assert(!bp_rpc_failure_meta_valid(UINT64_C(1) << 8));
+
+    bp_rpc_descriptor_v2_t descriptor_v2 = descriptor;
+    descriptor_v2.version = BP_RPC_ABI_VERSION_V2;
+    descriptor_v2.flags = BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION;
+    assert(bp_rpc_descriptor_v2_valid(&descriptor_v2));
+    assert(!bp_rpc_descriptor_v1_valid(&descriptor_v2));
+    descriptor_v2.flags = 0;
+    assert(!bp_rpc_descriptor_v2_valid(&descriptor_v2));
+    descriptor_v2.flags = BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION | (1u << 1);
+    assert(!bp_rpc_descriptor_v2_valid(&descriptor_v2));
     return 0;
 }

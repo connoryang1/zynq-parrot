@@ -145,9 +145,12 @@ themselves prove the seL4 kernel binding or end-to-end accelerated IPC.
 
 ### Version-2 synchronous-fault completion candidate
 
-Version 1 deliberately has no server-fault continuation. A later version may
-admit synchronous server faults only with the following atomic contract; this
-section reserves behavior, not a version-1 implementation:
+Version 1 deliberately has no server-fault continuation. Version 2 preserves
+the 112-byte descriptor layout but sets `version=2` and requires descriptor
+flag bit 0, `FAULT_COMPLETION`; the installer maps that flag to staged
+`CONFIG[48]`. Version 1 requires both the flag and `CONFIG[63:48]` to be zero.
+Version 2 may admit synchronous server faults only with the following atomic
+contract; these encodings reserve behavior, not an implemented hardware path:
 
 1. Acceptance changes the slot from `LIVE` to `ACTIVE`. A precise synchronous
    exception while the recorded server context is active changes it to
@@ -270,9 +273,11 @@ authorizing a call, and ensures that descriptor visibility cannot precede
 construction of its protection domain.
 
 The staged `CONFIG` value packs request words in bits 7:0, reply words in
-15:8, caller context in 31:16, and server context in 47:32; bits 63:48 are
-reserved zero. Version 1 accepts only slot 0, contexts 0/1, and word counts up
-to four, but rejecting other values at `COMMIT` leaves room for later tables.
+15:8, caller context in 31:16, and server context in 47:32. Version 1 requires
+bits 63:48 to be zero. Version 2 sets bit 48 for `FAULT_COMPLETION` and keeps
+bits 63:49 zero. Version 1 accepts only slot 0, contexts 0/1, and word counts
+up to four, but rejecting other values at `COMMIT` leaves room for later
+tables.
 
 The seL4 binding object owns the returned slot/token and the TCB/VSpace/endpoint
 references that keep the descriptor valid.  Teardown order is: stop both TCBs,
