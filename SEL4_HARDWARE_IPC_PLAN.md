@@ -384,10 +384,14 @@ nonzero-badge cases. Host and directed tests cover malformed buffer references,
 descriptor fields, continuation metadata, precise `NOT_STARTED`/`REVOKED`
 fallback counts, and no fallback after a committed failure. The remaining
 end-to-end gaps are endpoint/TCB/VSpace/ASID destruction variants beyond the
-accepted page-map revoke, plus injection of a real server fault, block, timeout,
-or interrupt after hardware acceptance. Version 1 is single-core and defers
-interrupts during an accepted call, so any expansion of that rule needs a new
-atomicity test rather than reusing the current no-race argument.
+accepted page-map revoke, plus block, timeout, or interrupt after hardware
+acceptance. RL-070 injects a real post-entry illegal instruction and confirms
+the documented version-1 boundary: preparation clears `stvec`/`mtvec`, the
+caller does not resume, and bounded simulation fails rather than falling back.
+Recovery therefore requires a new fault-continuation ABI and a terminal
+`COMMITTED_FAILED` unwind; it cannot reuse software fallback. Version 1 is
+single-core and defers interrupts during an accepted call, so any expansion of
+that rule needs a new atomicity test rather than the current no-race argument.
 
 ## Resume checklist
 

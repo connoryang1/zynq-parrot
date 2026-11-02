@@ -647,6 +647,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** precise revocation is no longer merely directed-model behavior: the complete seL4 binding lifecycle executes physically without giving back the hardware transport advantage. The atomic call CSR now distinguishes a revoked descriptor from a transiently ineligible live binding, so the runtime cannot retain and retry a stale token indefinitely.
 - **Limits:** this remains one resident, nonblocking caller/server pair, and the timing comparison to RL-068 is cross-image rather than repeated A/B. L1I stays warm in the cold-data cases and DDR row state is uncontrolled. The raw runner wrapper duplicated its live UART stream when it replayed the saved board log; that raw file is retained for provenance but correctly fails the single-run checker. The simulator timed out before badge, timing, suite, and host-pass markers, so only the physical transcript is accepted end-to-end evidence.
 
+### RL-070 — An accepted server fault confirms the version-1 continuation boundary
+
+- **Status:** accepted negative full-core diagnostic; no production change retained
+- **Scope:** a temporary variant of the clean two-domain hardware test that places a server-domain marker followed by an illegal instruction before `preturn`
+- **Claim:** adding the server-side illegal instruction prevents both caller continuation and the test's context-0 M-mode handler from producing a verdict; the bounded simulator ends with `CORE FAIL` at 19,606 retired instructions. The descriptor-preparation RTL explicitly clears both `stvec` and `mtvec`, matching the version-1 contract's statement that no synchronous-fault continuation exists. The unchanged hardware-RPC control still reaches guest and host PASS.
+- **Evidence:** local transcript `logs/protected-rpc-fault-20261102/server-illegal-instruction-failure.log`, SHA-256 `91a8b0299f3eab07ea500b1f6bef46eec3da3aea5ff03aa1bf2f4c6b60cc0b0b`; retained diagnostic patch SHA-256 `9df823d9d8254de8d6985609dfdb5539d2de5bd7bdcff6f4c74805dbebd5d393`. The corrected server placement produces the bounded nonreturn. The maintained `mt_protected_rpc_hardware_test` was restored and passes at 250/31 direct and 397/60 protected first/repeat cycles.
+- **Meaning:** version 1 is safe only for bounded, prefaulted services: after acceptance, software fallback would risk duplicate side effects and cannot be used. Fault-tolerant generalization needs an explicit kernel/hardware-owned fault continuation and a terminal `COMMITTED_FAILED` unwind to the caller, while keeping fallback forbidden.
+- **Limits:** this is an untraced exact-model illegal-instruction case, not physical evidence and not coverage of page faults, blocking, timeouts, or interrupts. Static program order places the marker before the fault, but the nonreturn does not independently prove that marker retired. The result localizes the missing contract/state rather than implementing recovery.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration
