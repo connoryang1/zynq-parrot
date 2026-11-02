@@ -35,6 +35,7 @@ TEST_MARKERS = {
     "mt_satp_asid_warl_test": "[BSG-PASS] satp ASID WARL width matches one-bit TLB tag",
     "mt_dependent_stream_benchmark": "[BSG-PASS] dependent streams, checksums and completion",
     "mt_nano_lookup_benchmark": "[BSG-PASS] Nano-style binary index lookups",
+    "mt_coroutine_overhead_benchmark": "[BSG-PASS] hot coroutine overhead benchmark completed",
     "mt_ddr_latency_benchmark": "[BSG-PASS] DDR dependent-load latency and prefetch lead sweep",
     "mt_remote_seed_order_test": "[BSG-PASS] remote seed source and target writeback ordering",
     "mt_resident_reseed_fetch_test": "[BSG-PASS] resident reseed cold-fetch and CSR preservation",

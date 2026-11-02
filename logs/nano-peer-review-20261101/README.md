@@ -168,6 +168,15 @@ cycles above: the ISA, compiler, memory system, workload layout, and clock
 metric differ. Full host commands and limitations are in the PR's
 [`RESULTS-2026-11-01.md`](https://github.com/connoryang1/context-switches/blob/benchmark/coroutine-overhead-20261101/benchmarking/RESULTS-2026-11-01.md).
 
+The same-core register-only follow-up removes that cross-platform ambiguity:
+[`nano-coroutine-overhead-20261102`](../nano-coroutine-overhead-20261102/README.md).
+On this RISC-V core/compiler, inline/manual/single-coroutine/eight-frame direct
+ring cost 3.396/13.003/34.005/29.045 cycles per operation, with frame creation
+outside timing. Direct-ring coroutine scheduling is therefore 16.042 cycles
+per operation above the manual state machine. Fresh exact-image N=2--5 checks
+find no hardware crossover; N=4 is closest to the optimized batch but remains
+2.5% slower.
+
 ## Reproduction identities
 
 - O3 ELF: `98c45aafc6aacd0423e9ac968cdfc38f8c0f08853a16ebdd907ad00160b1e256`

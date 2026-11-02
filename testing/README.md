@@ -65,6 +65,7 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_store_handoff_benchmark` | Matched pure and hot-store-before-switch rings for resident and nonresident handoffs |
 | `mt_dependent_stream_benchmark` | Shuffled dependent pointer chains; serial demand/prefetch, register-held software interleaving, and hardware context interleaving on the same graph |
 | `mt_nano_lookup_benchmark` | Two through ten Nano-coroutine-style binary index lookups; transport controls, hardware workers, runtime and compile-time software batches, and three compiler-generated C++20 coroutine schedulers from one runtime-selected executable |
+| `mt_coroutine_overhead_benchmark` | Hot register-only inline, manual-state, single-coroutine, and eight-frame direct-transfer controls with frame construction outside timing |
 | `mt_ddr_latency_benchmark` | First-touch and immediately cached dependent loads, matched timer controls, and six prefetch lead times on disjoint lines; processor-visible physical cycles |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
@@ -171,7 +172,17 @@ in the second. The detached side buffer consumes each word once and does not
 shift subword hits, so the benchmark unpacks the selected link in registers.
 This models database/search fan-out while ensuring that one shard's shared
 upper tree does not collapse the selected independent requests into one.
-Runtime `NANO_MODE=0..10` selects serial demand, demand ring, worker prefetch,
+
+`mt_coroutine_overhead_benchmark` removes cold/random memory from the
+comparison. It runs
+8,192 identical register additions through an inline loop, a no-inline manual
+state machine, one repeatedly resumed coroutine, and the eight-frame direct
+symmetric-transfer ring. Each row is instruction-warmed, frames are constructed
+before the timing markers, and aggregate results are checked. The accepted O3
+simulator result is 3.396/13.003/34.005/29.045 cycles per operation
+respectively; see
+[`logs/nano-coroutine-overhead-20261102/`](../logs/nano-coroutine-overhead-20261102/).
+For the Nano benchmark, runtime `NANO_MODE=0..10` selects serial demand, demand ring, worker prefetch,
 matched software batch, switch-only, serial prefetch, checked compiler-generated
 C++20 coroutines, two compile-time-unrolled software batches, lean-queue
 coroutines, or direct symmetric-transfer coroutines without changing the

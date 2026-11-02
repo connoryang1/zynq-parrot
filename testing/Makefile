@@ -95,6 +95,7 @@ CORRECTNESS_TESTS := \
 BENCHMARKS := \
     mt_dependent_stream_benchmark \
     mt_nano_lookup_benchmark \
+    mt_coroutine_overhead_benchmark \
     mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
     mt_prefetch_nonresident_interleave_benchmark \
@@ -169,6 +170,9 @@ $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: $(TOP)/testing/nano_loo
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: CC := $(CXX)
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: OPT_LEVEL := $(NANO_OPT)
 $(ZP_RISCV_DIR)/bp-tests/mt_nano_lookup_benchmark.riscv: CFLAGS += -std=gnu++20 -fno-exceptions -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -nodefaultlibs -lgcc -Wl,--start-group -lc -lgloss_dramfs -Wl,--end-group -Wl,--start-group,--whole-archive -lperch -Wl,--no-whole-archive,--end-group -lgcc
+$(ZP_RISCV_DIR)/bp-tests/mt_coroutine_overhead_benchmark.riscv: CC := $(CXX)
+$(ZP_RISCV_DIR)/bp-tests/mt_coroutine_overhead_benchmark.riscv: OPT_LEVEL := $(NANO_OPT)
+$(ZP_RISCV_DIR)/bp-tests/mt_coroutine_overhead_benchmark.riscv: CFLAGS += -std=gnu++20 -fno-exceptions -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -nodefaultlibs -lgcc -Wl,--start-group -lc -lgloss_dramfs -Wl,--end-group -Wl,--start-group,--whole-archive -lperch -Wl,--no-whole-archive,--end-group -lgcc
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_queue_depth_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_prefetch_handoff_lifecycle_test.riscv: $(TOP)/software/include/bp_prefetch.h
