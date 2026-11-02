@@ -26,6 +26,11 @@ int main(void)
     assert(offsetof(bp_rpc_descriptor_v1_t, caller_satp) == 24);
     assert(offsetof(bp_rpc_descriptor_v1_t, server_entry) == 40);
     assert(offsetof(bp_rpc_descriptor_v1_t, caller_badge) == 72);
+    assert(sizeof(bp_rpc_fault_record_v1_t) == 24);
+    assert(offsetof(bp_rpc_fault_record_v1_t, cause) == 0);
+    assert(offsetof(bp_rpc_fault_record_v1_t, pc) == 8);
+    assert(offsetof(bp_rpc_fault_record_v1_t, tval) == 16);
+    assert(BP_RPC_SBI_READ_FAULT == 3);
     assert(descriptor.caller_satp != descriptor.server_satp);
     assert(descriptor.request_words <= BP_RPC_MAX_WORDS);
     assert(descriptor.reply_words <= BP_RPC_MAX_WORDS);

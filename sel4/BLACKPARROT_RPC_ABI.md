@@ -233,12 +233,13 @@ blocked fallback server.
 
 ## Privileged control operations
 
-The private OpenSBI extension exposes three operations:
+The private OpenSBI extension exposes four operations:
 
 ```text
 INSTALL(versioned descriptor image) -> token or error (slot 0 in version 1)
 REVOKE(slot, token)                  -> OK, STALE, or BUSY
 QUERY(slot, token)                   -> OK, STALE, BUSY, or UNSUPPORTED
+READ_FAULT(slot, token, record_ptr)  -> OK plus {cause, PC, tval}, or status
 ```
 
 It uses the standard SBI vendor-extension ID derived from `mvendorid`; the
@@ -253,10 +254,11 @@ PCs, word counts, distinct caller/server identities, and supported fixed
 contexts.  User mode cannot invoke descriptor control.  `QUERY` is diagnostic;
 it is never used as the call eligibility decision.
 
-`bp_rpc_descriptor_v1_valid()` is the shared fail-closed validator: it also
-requires nonzero token, Sv39 SATPs, an aligned positive-canonical user entry
-and stack, and zero reserved fields. OpenSBI still copies the image before
-validation so supervisor memory cannot change underneath the check.
+The version-specific descriptor validators share a fail-closed field validator:
+it requires nonzero token, Sv39 SATPs, an aligned positive-canonical user entry
+and stack, and zero reserved fields. OpenSBI still copies the fixed-size image
+before validation so supervisor memory cannot change underneath the check. It
+stages config bit 48 only for a valid version-2 image.
 
 OpenSBI drives two M-mode-only custom CSRs defined in
 `blackparrot_rpc_abi.h`. It writes one 64-bit value to `M_DATA`, then writes a
@@ -274,8 +276,10 @@ control status. Version 2 also defines
 `READ_FAULT(CAUSE|PC|TVAL, slot)`: M mode first writes the token to `M_DATA`,
 writes the read command, requires `OK`, and then reads the selected value from
 `M_DATA`. A wrong token returns `STALE`; a live non-faulted slot or unknown
-component returns `INVALID`. Revoke clears the record. This command is not yet
-exported by the version-1 OpenSBI extension.
+component returns `INVALID`. Revoke clears the record. OpenSBI authenticates
+and reads all three components into an M-mode temporary before it copies the
+fixed 24-byte snapshot to an aligned supervisor pointer; it returns the exact
+control status and never exposes the machine CSRs to S mode.
 
 This data/control pair keeps the RTL boundary fixed while the
 versioned memory image evolves, prevents a partially staged descriptor from

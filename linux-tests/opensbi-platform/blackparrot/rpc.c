@@ -15,8 +15,8 @@
 #include "blackparrot_rpc_abi.h"
 #include "rpc.h"
 
-static int bp_rpc_copy_descriptor(bp_rpc_descriptor_v1_t *destination,
-                                  const void *source)
+static int bp_rpc_copy_from_supervisor(void *destination, const void *source,
+                                       size_t size)
 {
     struct sbi_trap_info trap = {0};
     uint64_t *output = (uint64_t *)destination;
@@ -25,9 +25,26 @@ static int bp_rpc_copy_descriptor(bp_rpc_descriptor_v1_t *destination,
     if (((uintptr_t)source & (sizeof(uint64_t) - 1)) != 0)
         return SBI_EINVALID_ADDR;
 
-    for (size_t index = 0;
-         index < sizeof(*destination) / sizeof(uint64_t); index++) {
+    for (size_t index = 0; index < size / sizeof(uint64_t); index++) {
         output[index] = sbi_load_u64(&input[index], &trap);
+        if (trap.cause)
+            return SBI_EINVALID_ADDR;
+    }
+    return 0;
+}
+
+static int bp_rpc_copy_to_supervisor(void *destination, const void *source,
+                                     size_t size)
+{
+    struct sbi_trap_info trap = {0};
+    uint64_t *output = (uint64_t *)destination;
+    const uint64_t *input = (const uint64_t *)source;
+
+    if (((uintptr_t)destination & (sizeof(uint64_t) - 1)) != 0)
+        return SBI_EINVALID_ADDR;
+
+    for (size_t index = 0; index < size / sizeof(uint64_t); index++) {
+        sbi_store_u64(&output[index], input[index], &trap);
         if (trap.cause)
             return SBI_EINVALID_ADDR;
     }
@@ -58,7 +75,9 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
                uint64_t *token, bp_rpc_control_status_t *status)
 {
     bp_rpc_descriptor_v1_t descriptor;
-    int error = bp_rpc_copy_descriptor(&descriptor, supervisor_descriptor);
+    int error = bp_rpc_copy_from_supervisor(&descriptor,
+                                            supervisor_descriptor,
+                                            sizeof(descriptor));
     bp_rpc_control_status_t control_status;
 
     if (error) {
@@ -66,7 +85,8 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
         *status = BP_RPC_CONTROL_INVALID;
         return error;
     }
-    if (!bp_rpc_descriptor_v1_valid(&descriptor)) {
+    if (!bp_rpc_descriptor_v1_valid(&descriptor)
+        && !bp_rpc_descriptor_v2_valid(&descriptor)) {
         *token = 0;
         *status = BP_RPC_CONTROL_INVALID;
         return SBI_EINVAL;
@@ -106,9 +126,15 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
         goto control_failure;
     control_status = bp_rpc_stage(
         descriptor.slot, BP_RPC_FIELD_CONFIG,
-        bp_rpc_config_word(descriptor.request_words, descriptor.reply_words,
-                           descriptor.caller_context,
-                           descriptor.server_context));
+        descriptor.version == BP_RPC_ABI_VERSION_V2
+        ? bp_rpc_config_word_v2(descriptor.request_words,
+                                descriptor.reply_words,
+                                descriptor.caller_context,
+                                descriptor.server_context)
+        : bp_rpc_config_word(descriptor.request_words,
+                             descriptor.reply_words,
+                             descriptor.caller_context,
+                             descriptor.server_context));
     if (control_status != BP_RPC_CONTROL_OK)
         goto control_failure;
 
@@ -144,6 +170,36 @@ static bp_rpc_control_status_t bp_rpc_query(uint32_t slot, uint64_t token)
                                                BP_RPC_FIELD_TOKEN, slot));
 }
 
+static int bp_rpc_read_fault(uint32_t slot, uint64_t token,
+                             bp_rpc_fault_record_v1_t *supervisor_record,
+                             bp_rpc_control_status_t *status)
+{
+    bp_rpc_fault_record_v1_t record;
+    uint64_t components[BP_RPC_FAULT_COMPONENTS];
+
+    if (((uintptr_t)supervisor_record & (sizeof(uint64_t) - 1)) != 0) {
+        *status = BP_RPC_CONTROL_INVALID;
+        return SBI_EINVALID_ADDR;
+    }
+
+    for (uint32_t component = 0; component < BP_RPC_FAULT_COMPONENTS;
+         component++) {
+        csr_write(BP_RPC_CSR_M_DATA, token);
+        *status = bp_rpc_control(bp_rpc_fault_read_word(
+            (bp_rpc_fault_component_t)component, slot));
+        if (*status != BP_RPC_CONTROL_OK)
+            return 0;
+        components[component] = csr_read(BP_RPC_CSR_M_DATA);
+    }
+
+    record.cause = components[BP_RPC_FAULT_CAUSE];
+    record.pc = components[BP_RPC_FAULT_PC];
+    record.tval = components[BP_RPC_FAULT_TVAL];
+
+    return bp_rpc_copy_to_supervisor(supervisor_record, &record,
+                                     sizeof(record));
+}
+
 bool bp_rpc_vendor_ext_check(void)
 {
     return true;
@@ -171,6 +227,14 @@ int bp_rpc_vendor_ext_provider(long funcid, struct sbi_trap_regs *regs,
         status = bp_rpc_query((uint32_t)regs->a0, regs->a1);
         out->value = status;
         return 0;
+    case BP_RPC_SBI_READ_FAULT:
+        {
+        int error = bp_rpc_read_fault(
+            (uint32_t)regs->a0, regs->a1,
+            (bp_rpc_fault_record_v1_t *)regs->a2, &status);
+        out->value = status;
+        return error;
+        }
     default:
         return SBI_ENOTSUPP;
     }

@@ -406,8 +406,11 @@ retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4.
 The privileged controller also retains token-checked cause/PC/`tval` and
 rejects wrong-token or non-faulted reads. Revoke and fresh-token reinstall prove
 that quarantine and fault metadata do not leak into the next generation. It
-does not close the remaining fault/revoke race, OpenSBI exposure, or
-fault-endpoint semantics. Directed
+does not close the remaining fault/revoke race or fault-endpoint semantics.
+The OpenSBI overlay now implements valid version-2 installation and a single
+token-checked 24-byte fault-snapshot call, and builds against the pinned
+firmware revision; kernel consumption and runtime verification are pending.
+Directed
 full-core tests now cover illegal-instruction and instruction/load/store page
 faults with causes 2/12/13/15 and exact PC/`tval`.
 

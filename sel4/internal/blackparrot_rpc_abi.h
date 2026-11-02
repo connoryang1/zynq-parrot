@@ -14,6 +14,7 @@
 #define BP_RPC_ABI_VERSION BP_RPC_ABI_VERSION_V1
 #define BP_RPC_DESCRIPTOR_V1_SIZE 112u
 #define BP_RPC_DESCRIPTOR_V2_SIZE BP_RPC_DESCRIPTOR_V1_SIZE
+#define BP_RPC_FAULT_RECORD_V1_SIZE 24u
 #define BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION (1u << 0)
 #define BP_RPC_MAX_WORDS 4u
 #define BP_RPC_CSR_CALL 0x808
@@ -54,6 +55,7 @@ typedef enum {
     BP_RPC_SBI_INSTALL = 0,
     BP_RPC_SBI_REVOKE = 1,
     BP_RPC_SBI_QUERY = 2,
+    BP_RPC_SBI_READ_FAULT = 3,
 } bp_rpc_sbi_operation_t;
 
 static inline uint64_t bp_rpc_sbi_extension_id(uint64_t mvendorid)
@@ -199,6 +201,14 @@ typedef struct {
  * Its required flag opts into synchronous-fault completion. */
 typedef bp_rpc_descriptor_v1_t bp_rpc_descriptor_v2_t;
 
+/* Fixed supervisor-visible snapshot copied by OpenSBI only after all three
+ * token-checked machine records have been read successfully. */
+typedef struct {
+    uint64_t cause;
+    uint64_t pc;
+    uint64_t tval;
+} bp_rpc_fault_record_v1_t;
+
 static inline int bp_rpc_user_address_valid(uint64_t address)
 {
     /* Version 1 admits only the positive Sv39 user half. */
@@ -317,6 +327,8 @@ _Static_assert(sizeof(bp_rpc_descriptor_v1_t) == BP_RPC_DESCRIPTOR_V1_SIZE,
                "protected-RPC descriptor ABI size changed");
 _Static_assert(sizeof(bp_rpc_descriptor_v2_t) == BP_RPC_DESCRIPTOR_V2_SIZE,
                "protected-RPC v2 descriptor ABI size changed");
+_Static_assert(sizeof(bp_rpc_fault_record_v1_t) == BP_RPC_FAULT_RECORD_V1_SIZE,
+               "protected-RPC fault record ABI size changed");
 _Static_assert(offsetof(bp_rpc_descriptor_v1_t, token) == 16,
                "protected-RPC token ABI offset changed");
 _Static_assert(offsetof(bp_rpc_descriptor_v1_t, caller_satp) == 24,
