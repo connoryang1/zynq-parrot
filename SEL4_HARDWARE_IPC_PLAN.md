@@ -230,13 +230,13 @@ Acceptance: the matched service passes through both backends; logs prove which
 path ran; invalid, stale, and revoked descriptors fail closed; fallback neither
 loses nor duplicates a request.
 
-Current checkpoint (2026-11-01): this gate passes in full-core simulation and
-on the routed PYNQ-Z2 endpoint. The focused physical run measures 374 cycles
-per hardware call versus 3,217 cycles per automatic post-unbind fallback and
-passes the complete three-test suite plus clean host termination. See RL-063 and
-`sel4/results/sel4test-rpc-only-blackparrot-fpga.log`. RL-064 now completes
-Stage 5's matched warm, L1D-cold, and L1D+L2-cold real-service gates, including
-the shared-mailbox/two-notification comparison.
+Current checkpoint (2026-11-02): the lifecycle-qualified routed PYNQ-Z2 image
+passes region isolation, mapping-triggered revocation, atomic stale-token
+rejection, rebind, nonzero badge authentication, and the complete three-test
+suite with clean host termination. The exact full-system simulator independently
+reaches the lifecycle marker before its four-hour timing-loop timeout; physical
+evidence is the accepted end-to-end gate. See RL-069 and
+`sel4/results/sel4test-rpc-lifecycle-fpga.log`.
 
 #### Initial kernel binding shape
 
@@ -338,6 +338,14 @@ direct/hardware/software/notification. Hardware remains 1.59x faster than
 ordinary IPC and removes 78.7% of its transport premium over the direct
 wrapper. See RL-068 and
 `sel4/results/sel4test-rpc-trusted-runtime-fpga.log`.
+
+The lifecycle-qualified successor preserves that result while closing the
+revocation outcome gap. Its warm medians are 2,934/3,461/5,440/10,597 cycles
+for direct/hardware/software/notification; hardware is 1.57x faster than
+ordinary IPC and removes 77.9% of its transport premium over direct. L1D-cold
+hardware/ordinary medians are 4,821/10,072 and hierarchy-cold medians are
+5,421/9,809. See RL-069 and
+`sel4/results/sel4test-rpc-lifecycle-fpga.log`.
 
 The first image trapped because the standalone server did not include seL4's
 generated platform configuration and emitted `rdcycle`; clean descriptor
