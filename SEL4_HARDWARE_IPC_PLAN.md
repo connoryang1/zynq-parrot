@@ -392,6 +392,14 @@ Recovery therefore requires a new fault-continuation ABI and a terminal
 `COMMITTED_FAILED` unwind; it cannot reuse software fallback. Version 1 is
 single-core and defers interrupts during an accepted call, so any expansion of
 that rule needs a new atomicity test rather than the current no-race argument.
+The version-2 candidate contract and its required tests are now fixed in
+`sel4/BLACKPARROT_RPC_ABI.md`. RTL inspection localizes the implementation
+seam: precise exception classification occurs in CSR retirement, but the
+protected continuation is owned by `bp_be_top`. A prototype must suppress the
+normal server trap update and drive a synthetic protected return through the
+existing caller-register install, context-bank selection, and frontend-reset
+path; merely installing a trap vector would move recovery into untrusted state
+and would not consume the continuation atomically.
 
 ## Resume checklist
 
