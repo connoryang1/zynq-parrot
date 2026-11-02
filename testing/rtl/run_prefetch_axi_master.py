@@ -61,7 +61,15 @@ def main():
         for line in verfiles.read_text().splitlines():
             if line.startswith("S "):
                 dependencies.add(Path(shlex.split(line)[-1]))
-    hashes = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+    def provenance_name(path):
+        try:
+            return str(path.relative_to(root))
+        except ValueError:
+            # Isolated worktrees intentionally share the canonical Verilator
+            # installation; retain that resolved tool dependency explicitly.
+            return f"external:{path}"
+
+    hashes = {provenance_name(path): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in sorted(dependencies)}
     artifacts = {f"obj{width}/Vprefetch_axi_master_tb":
                  hashlib.sha256((out / f"obj{width}/Vprefetch_axi_master_tb").read_bytes()).hexdigest()

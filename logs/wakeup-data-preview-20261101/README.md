@@ -180,6 +180,60 @@ localize the board-only stall before any RTL change. The diagnostic-only first
 ELF/transfer hashes remain preserved in its runner status as `eb124c22…6ecc` /
 `a64a9d17…abf`; they are not the current diagnostic collateral.
 
+The first traced demand-overlap reproduction inherited the ordinary
+100,000-poll controller timeout. Once the demand walk completed and replay made
+no progress, that bound generated more than 100 MiB of a still-open waveform
+and left only about 724 MiB in shared temporary storage. The run was
+interrupted and is invalid evidence. Diagnostic mode two now uses 2,048 polls;
+the simulator is cleaned before its repeat so only a closed bounded trace is
+retained.
+
+## Demand-overlap liveness root cause and simulator fix
+
+The raw FPGA diagnostic ended its first enabled command at status `0x24a9`:
+busy, no queued command, one held entry, next index ten, nine lower-cache
+admissions, one accepted trigger, and no filters or drops. A new diagnostic
+mode starts all 32 cold demand loads immediately after the same tag trigger.
+It reproduced the board shape in the full two-thread/four-context simulator:
+the demand walk completed, but the controller never drained.
+
+The trace resolved two independent lost-progress mechanisms. First, replay
+eligibility could rise just after the D-cache's negedge and disappear at the
+following architectural posedge. The old combinational `replay_issue_o`
+reported that half-cycle pulse even though the TL register never sampled it,
+leaving the source pending without a TV-stage terminal event. Replay issue is
+now registered at the actual D-cache TL capture, and a captured request flushed
+before TV explicitly returns through the bounded retry path.
+
+That correction advanced the controller from nine to seventeen admissions and
+exposed a downstream packet deadlock. AXI returned a prefetch burst while the
+BedRock reverse crossbar was locked to an ordinary multi-beat response. The
+streaming prefetch bridge backpressured that AXI beat; the ordinary response was
+behind it on the same AXI R channel, so neither packet could finish. The bridge
+now absorbs a complete line per outstanding AXI ID before presenting any
+BedRock beat, then drains one completed line as one contiguous BedRock packet.
+This also makes arbitrary AXI-ID interleaving safe at the packet boundary.
+
+The dedicated bridge gate passes 32- and 64-bit AXI with three fully
+interleaved IDs while the BedRock sink is blocked for every returned beat. On a
+clean trace-enabled full-model rebuild, cold replay, dirty-L1 filtering, and
+the immediate 32-line demand-overlap arm all reach their test-specific PASS
+plus CORE/host PASS. The existing physical-preview overhead control still
+reports zero=one=four across 21 samples, and the standalone replay controller
+gate passes. Exact volatile diagnostic/pass artifacts and hashes are under
+`/run/user/1001/tagged-replay-linux/`; the final area-conscious overlap FST,
+ELF, NBF, and run-log SHA-256 values begin `8a395377`, `f8088f00`, `941b2a9e`,
+and `fdd1dad9`. This is simulator liveness/coherence evidence, not a Linux speedup
+or a routed-FPGA acceptance result.
+
+Two preservation guardrails came from this diagnosis. A process probe whose
+pattern included its own `pgrep` command produced a false positive; future
+checks must exclude the probe process or inspect the simulator executable
+directly. Also, the first closed 13 MiB failing FST was hashed but not copied
+before the next trace overwrote the mutable simulator path. Its extracted
+signal transcripts remain, but the FST itself is no longer retained; every
+later closed waveform was copied and hashed before another run.
+
 This candidate has a linked Linux image but no boot or performance result yet.
 Exact job `20261102T075856Z-6e4ceb88` routes top `6e4ceb88` / BlackParrot
 `b4da98df9` with `e_bp_unicore_zynqparrot_prefetch16k_cfg`. Final setup

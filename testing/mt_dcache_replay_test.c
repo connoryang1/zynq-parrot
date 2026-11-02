@@ -1,7 +1,8 @@
 /* Validate tagged physical-data replay through the D-cache's L1 lookup path.
  * The default case leaves 32 host-initialized target lines cold and requires lower-cache admission;
- * diagnostic mode dirties them in L1 and requires all hints to be filtered.
- * Both cases verify that the replay completes without corrupting target data.
+ * diagnostic mode one dirties them in L1 and requires all hints to be filtered,
+ * while mode two immediately demands the cold lines during replay.
+ * All cases verify that replay does not corrupt target data.
  */
 #include <stdint.h>
 #include "bp_utils.h"
@@ -52,7 +53,7 @@ int main(void)
   // default arm leaves these lines cold without executing eviction traffic.
   uint64_t expected_sum = REPLAY_LINES * 7;
 
-#if BENCH_DIAGNOSTIC
+#if BENCH_DIAGNOSTIC == 1
   // Dirty-resident lines must be satisfied by the L1 lookup and must never
   // enter the lower detached-prefetch path.
   expected_sum = 0;
@@ -81,8 +82,23 @@ int main(void)
   write_csr_9c3(REPLAY_SLOT);
   bp_print_string("DCACHE-REPLAY triggered\n");
 
+#if BENCH_DIAGNOSTIC == 2
+  // Linux consumes the footprint as soon as the woken task runs. Exercise
+  // that coexistence instead of waiting for advisory replay to become idle.
+  uint64_t overlap_sum = 0;
+  for (unsigned i = 0; i < REPLAY_LINES; ++i)
+    overlap_sum += targets[i].value;
+  if (overlap_sum != expected_sum) {
+    bp_print_string("[BSG-FAIL] tagged replay overlap corrupted target data\n");
+    bp_finish(1);
+  }
+  bp_print_string("DCACHE-REPLAY overlap demand completed\n");
+#endif
+
   uint64_t status = 0;
-  unsigned timeout = 100000;
+  // A coexistence failure must terminate quickly enough to preserve a traced
+  // waveform without exhausting the shared simulator filesystem.
+  unsigned timeout = BENCH_DIAGNOSTIC == 2 ? 2048 : 100000;
   do {
     status = read_csr_9c3();
     if (!--timeout) {
@@ -101,8 +117,8 @@ int main(void)
   }
   bp_print_string("DCACHE-REPLAY drained\n");
 
-  uint64_t expected_accepted = BENCH_DIAGNOSTIC ? 0 : REPLAY_LINES;
-  uint64_t expected_filtered = BENCH_DIAGNOSTIC ? REPLAY_LINES : 0;
+  uint64_t expected_accepted = BENCH_DIAGNOSTIC == 1 ? 0 : REPLAY_LINES;
+  uint64_t expected_filtered = BENCH_DIAGNOSTIC == 1 ? REPLAY_LINES : 0;
   if (((status >> 10) & 0xffff) != expected_accepted
       || ((status >> 26) & 0xffff) != expected_filtered
       || ((status >> 42) & 0xff) != 1
@@ -119,7 +135,7 @@ int main(void)
     bp_finish(1);
   }
 
-#if BENCH_DIAGNOSTIC
+#if BENCH_DIAGNOSTIC == 1
   bp_print_string("DCACHE-REPLAY dirty-L1 filter passed\n");
 #else
   bp_print_string("DCACHE-REPLAY cold admission passed\n");
