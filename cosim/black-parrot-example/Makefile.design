@@ -69,17 +69,13 @@ DEFINES += BP_NUM_CONTEXTS=$(NUM_CONTEXTS)
 DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)
 endif
 
-# The prefetch endpoints are at or above the xc7z020's default-flow packing
-# limit once the instruction-prefix replay lane is present. Select the tool's
-# named area strategies for every static prefetch endpoint; the four-entry
-# endpoint previously fit with the defaults, but no longer does with the
-# replay lane enabled.
-ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch_cfg e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg),)
+# The prefetch endpoints and protected-RPC v2 seL4 endpoint are at or above the
+# xc7z020's default-flow packing limit. Select the established area-oriented
+# synthesis strategy, then recover timing with post-route physical cleanup.
+ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch_cfg e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg e_bp_unicore_zynqparrot_sel4_cfg),)
 SYNTH_STRATEGY ?= Flow_AreaOptimized_high
-# The replay-enabled endpoint remains area constrained, but Area_Explore can
-# leave the long frontend/realigner feedback path unroutable at the 50 MHz
-# target after tiny netlist changes.  Keep area-oriented synthesis, then use
-# the timing-focused implementation flow with post-route physical cleanup.
+# Area_Explore can leave long feedback paths unroutable at the 50 MHz target
+# after tiny netlist changes, so keep the timing-focused implementation flow.
 IMPL_STRATEGY ?= Performance_ExplorePostRoutePhysOpt
 endif
 
