@@ -378,6 +378,17 @@ The integration is incomplete until tests attempt to:
 - force an ineligible scheduling condition and verify one software execution,
   not a dropped or duplicated operation.
 
+Current coverage (2026-11-02): the routed FPGA closes stale generation,
+mapping-triggered revoke/rebind, region identity/permission, runtime-state, and
+nonzero-badge cases. Host and directed tests cover malformed buffer references,
+descriptor fields, continuation metadata, precise `NOT_STARTED`/`REVOKED`
+fallback counts, and no fallback after a committed failure. The remaining
+end-to-end gaps are endpoint/TCB/VSpace/ASID destruction variants beyond the
+accepted page-map revoke, plus injection of a real server fault, block, timeout,
+or interrupt after hardware acceptance. Version 1 is single-core and defers
+interrupts during an accepted call, so any expansion of that rule needs a new
+atomicity test rather than reusing the current no-race argument.
+
 ## Resume checklist
 
 When returning to this direction:
