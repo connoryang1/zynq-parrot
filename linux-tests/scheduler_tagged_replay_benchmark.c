@@ -7,6 +7,7 @@
  */
 #include <errno.h>
 #include <stdint.h>
+#include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -204,12 +205,14 @@ int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
 	unsigned mode = 9, delay = 0, gap = 2;
+	unsigned long lead_cycles = 0;
+	int fifo = 0;
 	volatile struct sample *samples;
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 4) {
-		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255]\n",
+	if (argc > 6) {
+		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000]\n",
 			argv[0]);
 		return 2;
 	}
@@ -241,14 +244,38 @@ int main(int argc, char **argv)
 		}
 		gap = parsed;
 	}
+	if (argc >= 5) {
+		if (!strcmp(argv[4], "fifo"))
+			fifo = 1;
+		else if (strcmp(argv[4], "normal")) {
+			fprintf(stderr, "invalid scheduling policy: %s\n", argv[4]);
+			return 2;
+		}
+	}
+	if (argc >= 6) {
+		char *end;
+		unsigned long parsed = strtoul(argv[5], &end, 10);
+
+		if (*end || parsed > 1000000) {
+			fprintf(stderr, "invalid lead cycles: %s\n", argv[5]);
+			return 2;
+		}
+		lead_cycles = parsed;
+	}
+	if (fifo) {
+		const struct sched_param parameter = {.sched_priority = 1};
+
+		if (sched_setscheduler(0, SCHED_FIFO, &parameter))
+			fail("sched_setscheduler FIFO");
+	}
 
 	samples = mmap(NULL, sizeof(*samples) * trials, PROT_READ | PROT_WRITE,
 		       MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu\n",
 	       mode == 10 ? "joint" : "data", replay_lines, replay_slot,
-	       delay, gap);
+	       delay, gap, fifo ? "fifo" : "normal", lead_cycles);
 	child = fork();
 	if (child < 0)
 		fail("fork");
@@ -261,9 +288,14 @@ int main(int argc, char **argv)
 	close(to_child[0]);
 	close(to_parent[1]);
 	for (unsigned trial = 0; trial < trials;) {
+		uint64_t lead_start;
+
 		transfer(to_parent[0], &token, 0);
 		samples[trial].launch = cycle();
 		transfer(to_child[1], &token, 1);
+		lead_start = cycle();
+		while (cycle() - lead_start < lead_cycles)
+			__asm__ volatile("" : : : "memory");
 		transfer(to_parent[0], &token, 0);
 		samples[trial].returned = cycle();
 		if (samples[trial].accepted)

@@ -531,4 +531,6 @@ check-harness:
 	  test_compare_scheduler_physical_preview_timing_fixed_ab.py \
 	  test_analyze_scheduler_physical_preview_table_ab.py \
 	  test_patch_nbf_memory_records.py \
-	  test_run_cache_miss_trace_capture.py test_analyze_persistent_preview_ab.py
+	  test_run_cache_miss_trace_capture.py test_analyze_persistent_preview_ab.py \
+	  test_run_scheduler_tagged_replay.py \
+	  test_analyze_scheduler_tagged_replay.py
