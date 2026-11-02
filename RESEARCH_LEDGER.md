@@ -1083,6 +1083,14 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the project now has the architectural shape selected by RL-113: software can prepare a 16--32-line footprint outside the critical path and issue one context tag, while hardware replays it at a bounded rate without consuming the architectural cache slot or violating dirty-L1 coherence. This proves mechanism safety/liveness in simulation only. It does not yet establish synthesis fit, Linux hook-cost reduction, useful-line timeliness, or end-to-end speedup.
 - **Evidence:** exact logs, same-binary cold repetitions, ELFs, NBFs, and compressed waveforms are under `logs/wakeup-data-preview-20261101/evidence/dcache-replay-backoff-*`; detailed rejected attempts and workflow guardrails are in that directory's `README.md`.
 
+### RL-115 — One-tag Linux replay candidate is linked but unmeasured
+
+- **Status:** accepted source/compile/link/package candidate; Linux boot and performance remain pending
+- **Design:** experimental modes nine and ten issue one hardware footprint tag at successful wakeup, with mode ten also launching instruction replay. A registration-time prctl expands four pinned page bases into up to 32 physical cache lines, selects one of four explicitly managed slots, and sets trigger delay plus issue gap. Lifecycle code disables publication and drains the replay engine before unpinning; a status prctl exports replay admission/filter/drop counters.
+- **Benchmark:** a new matched 32-line dependent-ring benchmark keeps pins, table programming, cache pressure, and `fence.i` identical, toggles only disabled versus one-tag replay, and selects data-only/joint, delay, and gap from the command line. Reconfiguration outside timing is also an idle barrier between arms.
+- **Verification:** patch `0017` applies and reverses fuzz-free after the maintained stack, affected objects and a complete 21 MiB kernel link with GCC 13.2, all 142 Linux host tests pass, and the dynamic benchmark cross-compiles. Exact linked-ELF audit finds only the six intended `0x9c1`--`0x9c3` sites. The generated kernel, OpenSBI payload, NBF, and benchmark SHA-256 prefixes are `300d72e9`, `67ab8291`, `853e029b`, and `aae420e0`.
+- **Limit:** this is not boot evidence or a speedup. The explicit slot ABI is suitable for the controlled one-CPU best-case experiment but does not solve general task-slot allocation or migration. Board use is gated on the concurrently running exact routed implementation and package verification.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

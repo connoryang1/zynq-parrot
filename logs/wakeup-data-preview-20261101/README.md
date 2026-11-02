@@ -77,6 +77,62 @@ result or an FPGA fit/timing result. The prototype still needs synthesis and a
 Linux benchmark in which one tagged trigger replaces the current serialized
 per-line hook before any speedup can be claimed.
 
+## Tagged Linux source candidate
+
+Patch `0017-blackparrot-tagged-data-replay.patch` adds two experimental wakeup
+modes. Mode nine issues one data-footprint tag; mode ten first launches the
+existing instruction prefix and then issues the same tag. A registration-time
+prctl expands four pinned, cache-line-aligned page bases into one to eight lines
+per base, programs an explicit hardware slot, and records a 16-bit trigger
+delay plus 8-bit issue gap. The explicit slot is intentionally a controlled
+single-CPU benchmark ABI, not a general Linux slot allocator.
+
+The release path disables publication and waits for both the legacy physical
+preview queue and the tagged replay engine to drain before unpinning pages.
+Fork/exec/exit lifecycle paths clear or release the slot metadata. A read-only
+status prctl exposes busy/queue state and accepted, filtered, accepted-trigger,
+and dropped-trigger counters so a performance result can distinguish useful
+replay from a dropped or still-active command.
+
+`scheduler_tagged_replay_benchmark.c` registers four page bases with eight
+lines each, constructs a 32-line dependent pointer ring, and compares disabled
+against tagged replay while keeping pins, table programming, cache pressure,
+and instruction-cache invalidation identical. Its arguments select data-only
+or joint replay, trigger delay, and issue gap. Reprogramming outside each timed
+trial doubles as an idle barrier, preventing a late command from contaminating
+the next arm.
+
+The patch applies and reverses fuzz-free after the maintained `0001`--`0016`
+stack. The exact GCC 13.2 configuration compiles the affected objects and links
+a complete 21 MiB `vmlinux`; all 142 Linux host tests pass, and the dynamic
+benchmark cross-compiles. The linked kernel SHA-256 is
+`300d72e9ad7826bae471ebd3109c99c2c78bc1ca7ec10ffb1bb05668338d6d2d`;
+the benchmark SHA-256 is
+`aae420e05c44b99626a5319ee152660295aea9cd4cf151582b6490c90c5d855d`.
+The exact OpenSBI payload and generated NBF are respectively
+`67ab829192001eb017a4ee608cab703bd27341d6ae8b58950053c8236ffb8774`
+and `853e029b72ae5d244363cc39ad5eaac78d5a392c43d4f0ad1d387d3b4707581f`.
+
+Exact ELF disassembly finds six uses of CSRs `0x9c1`--`0x9c3`, all intentional:
+two replay-idle reads in lifecycle/configuration, one userspace-status read,
+one table-entry write site, one configuration write, and one wakeup trigger.
+The raw NBF scanner also matches instruction-shaped words inside compressed
+initramfs data; the accepted predecessor NBF has the same class of false
+positive. Therefore the executable ELF audit, exact payload provenance, and
+the intended six-site list are the collision gate for this candidate.
+
+The lightweight source-overlay build exposed three workflow guardrails. An
+out-of-tree build must first remove symlinked in-tree build products, every
+patch-touched input including `arch/riscv/Kconfig` must be copied into the
+overlay, and final GCC/Verilator links must set `TMPDIR=/run/user/1001` while
+root-backed `/tmp` is full. Direct `bp3`/hostname SSH probes were also invalid
+outside the farm controller; subsequent monitoring uses the controller or its
+recorded endpoint. None of these failed attempts produced performance evidence.
+
+This candidate has a linked Linux image but no boot or performance result yet.
+The routed FPGA job is recorded separately; board deployment remains gated on
+routed fit/timing and exact package verification.
+
 ## Design
 
 Patch `0013-blackparrot-wakeup-data-preview.patch` changes mode one so a real

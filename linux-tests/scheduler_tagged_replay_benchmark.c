@@ -1,0 +1,297 @@
+#define _GNU_SOURCE
+
+/* Measure a best-case Linux handoff with one tagged 32-line data replay.
+ * Both arms retain identical pins and hardware footprint configuration; only
+ * the successful-wakeup trigger mode changes. Four page-aligned bases expand
+ * to eight cache lines each, and a dependent pointer ring exposes first use.
+ */
+#include <errno.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/prctl.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#if !defined(__riscv) || __riscv_xlen != 64
+#error "This benchmark requires RV64 BlackParrot"
+#endif
+
+#define PR_BP_PREVIEW_GET_COUNT 0x42505057
+#define PR_BP_PREVIEW_PIN_SET 0x42505059
+#define PR_BP_PREVIEW_ENABLE 0x4250505a
+#define PR_BP_PREVIEW_GET_HOOK_CYCLES 0x4250505b
+#define PR_BP_PREVIEW_REPLAY_CONFIG 0x4250505c
+#define PR_BP_PREVIEW_REPLAY_STATUS 0x4250505d
+
+enum {
+	warmup = 16,
+	measured_trials = 512,
+	trials = warmup + measured_trials,
+	page_bytes = 4096,
+	line_bytes = 64,
+	bases = 4,
+	lines_per_base = 8,
+	replay_lines = bases * lines_per_base,
+	eviction_pages = 16,
+	replay_slot = 2,
+	max_retries = 4096,
+};
+
+struct sample {
+	uint64_t launch, entry, after_load, done, returned;
+	unsigned long hook_cycles;
+	unsigned accepted_entries, filtered_entries, accepted_triggers, dropped_triggers;
+	unsigned hooks, enabled, accepted;
+};
+
+static inline uint64_t cycle(void)
+{
+	uint64_t value;
+
+	__asm__ volatile("csrr %0, 0xcc0" : "=r"(value) : : "memory");
+	return value;
+}
+
+static void fail(const char *what)
+{
+	perror(what);
+	exit(1);
+}
+
+static void transfer(int fd, char *token, int send)
+{
+	ssize_t count = send ? write(fd, token, 1) : read(fd, token, 1);
+
+	if (count != 1)
+		fail(send ? "write pipe" : "read pipe");
+}
+
+static unsigned trial_enabled(unsigned trial)
+{
+	return (trial ^ (trial >> 1)) & 1;
+}
+
+static void child_run(int in, int out, volatile struct sample *samples,
+		      unsigned mode, unsigned delay, unsigned gap)
+{
+	volatile unsigned char *target = mmap(NULL, bases * page_bytes,
+					       PROT_READ | PROT_WRITE,
+					       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	volatile unsigned char *eviction = mmap(NULL, eviction_pages * page_bytes,
+						PROT_READ | PROT_WRITE,
+						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	unsigned long target_addr[replay_lines];
+	unsigned retries = 0;
+	char token = 'x';
+
+	if (target == MAP_FAILED || eviction == MAP_FAILED)
+		fail("mmap replay benchmark");
+	for (unsigned base = 0; base < bases; base++)
+		for (unsigned line = 0; line < lines_per_base; line++) {
+			unsigned index = base * lines_per_base + line;
+
+			target_addr[index] = (unsigned long)&target[base * page_bytes
+							       + line * line_bytes];
+		}
+	for (unsigned line = 0; line < replay_lines; line++)
+		*(volatile unsigned long *)target_addr[line]
+			= target_addr[(line + 1) % replay_lines];
+	for (unsigned page = 0; page < eviction_pages; page++)
+		for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
+			eviction[page * page_bytes + offset] = page + offset;
+
+	if (prctl(PR_BP_PREVIEW_PIN_SET,
+		  target_addr[0], target_addr[lines_per_base],
+		  target_addr[2 * lines_per_base], target_addr[3 * lines_per_base]))
+		fail("pin tagged replay footprint");
+
+	for (unsigned trial = 0; trial < trials;) {
+		unsigned enabled = trial_enabled(trial);
+		unsigned long before_hook, after_hook;
+		uint64_t checksum = 0, entry, after_load;
+		unsigned long node;
+
+		/* Reconfiguration is outside timing and doubles as an idle barrier,
+		 * preventing a late command from one arm from warming the next arm.
+		 */
+		while (prctl(PR_BP_PREVIEW_REPLAY_CONFIG, replay_slot,
+			     lines_per_base, delay, gap)) {
+			if (errno != EBUSY)
+				fail("configure tagged replay footprint");
+			usleep(100);
+		}
+		for (unsigned page = 0; page < eviction_pages; page++)
+			for (unsigned offset = 0; offset < page_bytes; offset += line_bytes)
+				checksum += eviction[page * page_bytes + offset];
+		__asm__ volatile("fence rw, rw\nfence.i" : : : "memory");
+		if (checksum == UINT64_MAX)
+			fail("eviction checksum");
+		if (prctl(PR_BP_PREVIEW_ENABLE, enabled ? mode : 0,
+			  0UL, 0UL, 0UL))
+			fail("toggle tagged replay");
+		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
+		if (before_hook == (unsigned long)-1)
+			fail("hook count before");
+		samples[trial].enabled = enabled;
+		samples[trial].accepted = 0;
+		transfer(out, &token, 1);
+		transfer(in, &token, 0);
+		entry = cycle();
+		node = target_addr[0];
+		for (unsigned line = 0; line < replay_lines; line++)
+			node = *(volatile unsigned long *)node;
+		after_load = cycle();
+		if (node != target_addr[0])
+			fail("tagged replay target checksum");
+		after_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
+		if (after_hook == (unsigned long)-1)
+			fail("hook count after");
+		samples[trial].hooks = after_hook - before_hook;
+		if (samples[trial].hooks != enabled) {
+			fprintf(stderr,
+				"TAGGED_REPLAY_RETRY trial=%u enabled=%u hooks=%u\n",
+				trial, enabled, samples[trial].hooks);
+			transfer(out, &token, 1);
+			if (++retries > max_retries)
+				fail("too many tagged replay retries");
+			continue;
+		}
+		samples[trial].entry = entry;
+		samples[trial].after_load = after_load;
+		{
+			long hook_cycles = prctl(PR_BP_PREVIEW_GET_HOOK_CYCLES,
+						 0UL, 0UL, 0UL, 0UL);
+
+			if (hook_cycles < 0)
+				fail("read tagged replay hook cycles");
+			samples[trial].hook_cycles = hook_cycles;
+		}
+		{
+			long replay_status;
+			unsigned timeout = 1048576;
+
+			do {
+				replay_status = prctl(PR_BP_PREVIEW_REPLAY_STATUS,
+						      0UL, 0UL, 0UL, 0UL);
+				if (replay_status < 0)
+					fail("read tagged replay status");
+				if (!(replay_status & 0xf))
+					break;
+			} while (--timeout);
+			if (!timeout)
+				fail("tagged replay drain timeout");
+			samples[trial].accepted_entries = (replay_status >> 10) & 0xffff;
+			samples[trial].filtered_entries = (replay_status >> 26) & 0xffff;
+			samples[trial].accepted_triggers = (replay_status >> 42) & 0xff;
+			samples[trial].dropped_triggers = (replay_status >> 50) & 0xff;
+		}
+		samples[trial].accepted = 1;
+		samples[trial].done = cycle();
+		transfer(out, &token, 1);
+		trial++;
+	}
+	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
+		fail("disable tagged replay");
+	if (prctl(PR_BP_PREVIEW_PIN_SET, 0UL, 0UL, 0UL, 0UL))
+		fail("release tagged replay footprint");
+	printf("TAGGED_REPLAY_CHILD PASS retries=%u\n", retries);
+}
+
+int main(int argc, char **argv)
+{
+	int to_child[2], to_parent[2], status;
+	unsigned mode = 9, delay = 0, gap = 2;
+	volatile struct sample *samples;
+	char token = 'x';
+	pid_t child;
+
+	if (argc > 4) {
+		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255]\n",
+			argv[0]);
+		return 2;
+	}
+	if (argc >= 2) {
+		if (!strcmp(argv[1], "joint"))
+			mode = 10;
+		else if (strcmp(argv[1], "data")) {
+			fprintf(stderr, "invalid replay mode: %s\n", argv[1]);
+			return 2;
+		}
+	}
+	if (argc >= 3) {
+		char *end;
+		unsigned long parsed = strtoul(argv[2], &end, 10);
+
+		if (*end || parsed > 65535) {
+			fprintf(stderr, "invalid replay delay: %s\n", argv[2]);
+			return 2;
+		}
+		delay = parsed;
+	}
+	if (argc >= 4) {
+		char *end;
+		unsigned long parsed = strtoul(argv[3], &end, 10);
+
+		if (*end || parsed > 255) {
+			fprintf(stderr, "invalid replay gap: %s\n", argv[3]);
+			return 2;
+		}
+		gap = parsed;
+	}
+
+	samples = mmap(NULL, sizeof(*samples) * trials, PROT_READ | PROT_WRITE,
+		       MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
+		fail("shared memory or pipes");
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u\n",
+	       mode == 10 ? "joint" : "data", replay_lines, replay_slot,
+	       delay, gap);
+	child = fork();
+	if (child < 0)
+		fail("fork");
+	if (!child) {
+		close(to_child[1]);
+		close(to_parent[0]);
+		child_run(to_child[0], to_parent[1], samples, mode, delay, gap);
+		return 0;
+	}
+	close(to_child[0]);
+	close(to_parent[1]);
+	for (unsigned trial = 0; trial < trials;) {
+		transfer(to_parent[0], &token, 0);
+		samples[trial].launch = cycle();
+		transfer(to_child[1], &token, 1);
+		transfer(to_parent[0], &token, 0);
+		samples[trial].returned = cycle();
+		if (samples[trial].accepted)
+			trial++;
+	}
+	if (waitpid(child, &status, 0) != child)
+		fail("waitpid");
+	if (!WIFEXITED(status) || WEXITSTATUS(status)) {
+		fprintf(stderr, "tagged replay child failed: status=%d\n", status);
+		return 1;
+	}
+	for (unsigned trial = warmup; trial < trials; trial++) {
+		const volatile struct sample *s = &samples[trial];
+
+		if (!(s->launch <= s->entry && s->entry <= s->after_load
+		      && s->after_load <= s->done && s->done <= s->returned)) {
+			fprintf(stderr, "nonmonotonic tagged replay sample: %u\n", trial);
+			return 1;
+		}
+		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu\n",
+		       trial - warmup, s->enabled, s->hooks, s->hook_cycles,
+		       s->accepted_entries, s->filtered_entries,
+		       s->accepted_triggers, s->dropped_triggers,
+		       (unsigned long long)(s->entry - s->launch),
+		       (unsigned long long)(s->after_load - s->entry),
+		       (unsigned long long)(s->after_load - s->launch),
+		       (unsigned long long)(s->returned - s->launch));
+	}
+	puts("TAGGED_REPLAY_PARENT PASS");
+	return 0;
+}

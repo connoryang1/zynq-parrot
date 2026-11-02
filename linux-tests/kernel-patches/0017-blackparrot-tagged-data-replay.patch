@@ -1,0 +1,250 @@
+This patch replaces serialized successful-wakeup data hints with one tagged
+hardware-footprint trigger. It adds an experimental registration-time ABI for
+up to 32 pinned physical lines, configurable trigger delay, and replay gap.
+
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -90,6 +90,8 @@
+ 	unsigned long bp_preview_paddr[BP_PREVIEW_ADDRS];
+ 	struct mm_struct *bp_preview_phys_mm;
+ 	unsigned char bp_preview_phys_mode;
++	unsigned char bp_preview_replay_slot;
++	bool bp_preview_replay_configured;
+ 	unsigned long bp_preview_hook_count;
+ 	unsigned long bp_preview_last_hook_cycles;
+ 	/* Diagnostic counts for each incoming context-switch guard outcome. */
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -203,6 +203,26 @@
+ 		   READ_ONCE(task->thread.bp_preview_hook_count) + 1);
+ }
+ 
++/* Modes nine and ten replace per-line wakeup CSR writes with one footprint
++ * tag. The pinned pages and hardware table are prepared by prctl before the
++ * measured handoff; mode ten additionally launches instruction replay.
++ */
++static __always_inline void riscv_bp_replay_wakeup(struct task_struct *task)
++{
++	unsigned long slot;
++
++	if ((READ_ONCE(task->thread.bp_preview_phys_mode) != 9
++	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 10)
++	    || !READ_ONCE(task->thread.bp_preview_replay_configured)
++	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
++	    || !task->mm)
++		return;
++	slot = READ_ONCE(task->thread.bp_preview_replay_slot);
++	asm volatile("csrw 0x9c3, %0" : : "r"(slot) : "memory");
++	WRITE_ONCE(task->thread.bp_preview_hook_count,
++		   READ_ONCE(task->thread.bp_preview_hook_count) + 1);
++}
++
+ /* Mode two deliberately issues after MM/FPU/vector switch preparation and
+  * immediately before the architectural register/stack switch. This retains
+  * enough memory lead while minimizing tiny-L2 displacement before first use. */
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -99,6 +99,7 @@
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		pinned |= !!task->thread.bp_preview_pin[i];
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
++	WRITE_ONCE(task->thread.bp_preview_replay_configured, false);
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, NULL);
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		WRITE_ONCE(task->thread.bp_preview_paddr[i], 0);
+@@ -118,6 +119,22 @@
+ 	if (WARN_ON_ONCE(i == 65536))
+ 		return -ETIMEDOUT;
+ 
++	/* A tagged replay cannot be canceled because another task may own the
++	 * queued command. Wait for the small global engine to drain before any
++	 * page backing this task's footprint is unpinned.
++	 */
++	preempt_disable();
++	for (i = 0; i < 1048576; i++) {
++		unsigned long status;
++
++		asm volatile("csrr %0, 0x9c3" : "=r"(status) : : "memory");
++		if (!(status & 0xf))
++			break;
++	}
++	preempt_enable();
++	if (WARN_ON_ONCE(i == 1048576))
++		return -ETIMEDOUT;
++
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++) {
+ 		struct page *page = task->thread.bp_preview_pin[i];
+ 
+@@ -146,6 +163,7 @@
+ 	}
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, any ? task->mm : NULL);
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
++	WRITE_ONCE(task->thread.bp_preview_replay_configured, false);
+ 	return 0;
+ }
+ 
+@@ -256,6 +274,8 @@
+ 	       sizeof(dst->thread.bp_preview_paddr));
+ 	dst->thread.bp_preview_phys_mm = NULL;
+ 	dst->thread.bp_preview_phys_mode = 0;
++	dst->thread.bp_preview_replay_slot = 0;
++	dst->thread.bp_preview_replay_configured = false;
+ 	/* clear entire V context, including datap for a new task */
+ 	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
+ 
+@@ -278,6 +298,8 @@
+ 	       sizeof(p->thread.bp_preview_paddr));
+ 	p->thread.bp_preview_phys_mm = NULL;
+ 	p->thread.bp_preview_phys_mode = 0;
++	p->thread.bp_preview_replay_slot = 0;
++	p->thread.bp_preview_replay_configured = false;
+ 	p->thread.bp_preview_hook_count = 0;
+ 	p->thread.bp_preview_last_hook_cycles = 0;
+ 	memset(p->thread.bp_preview_guard_count, 0,
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,9 +311,13 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 off; 1 wake joint; 2 select joint; 3--7 controls; 8 wake data only. */
++/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9/10 tagged data/joint. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ /* Last successful-wakeup preview-hook duration in global BP cycles. */
+ #define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
++/* Configure slot, lines per pinned base, trigger delay, and replay gap. */
++#define PR_BP_PREVIEW_REPLAY_CONFIG	0x4250505c
++/* Read replay busy/queue state and saturating hardware counters. */
++#define PR_BP_PREVIEW_REPLAY_STATUS	0x4250505d
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4362,11 +4362,13 @@
+ 		 * one, then give its four physical hints the rest of the wake-to-run
+ 		 * interval. Mode six remains the wake-replay/late-data control. */
+ 		if (bp_preview_mode == 1 || bp_preview_mode == 6
+-		    || bp_preview_mode == 7)
++		    || bp_preview_mode == 7 || bp_preview_mode == 10)
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		if (bp_preview_mode == 1 || bp_preview_mode == 7
+ 		    || bp_preview_mode == 8)
+ 			riscv_bp_preview_wakeup(p);
++		if (bp_preview_mode == 9 || bp_preview_mode == 10)
++			riscv_bp_replay_wakeup(p);
+ 		asm volatile("csrr %0, 0xcc0" : "=r"(bp_preview_end)
+ 			     : : "memory");
+ 		WRITE_ONCE(p->thread.bp_preview_last_hook_cycles,
+@@ -6705,7 +6707,9 @@
+ 		    && bp_preview_mode != 6
+ 		    && bp_preview_mode != 1
+ 		    && bp_preview_mode != 7
+-		    && bp_preview_mode != 8) {
++		    && bp_preview_mode != 8
++		    && bp_preview_mode != 9
++		    && bp_preview_mode != 10) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 8 || arg3 || arg4 || arg5) {
++		if (arg2 > 10 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+@@ -2796,9 +2796,90 @@
+ 			error = -ENOENT;
+ 			break;
+ 		}
++		if (arg2 >= 9
++		    && !READ_ONCE(me->thread.bp_preview_replay_configured)) {
++			error = -ENOENT;
++			break;
++		}
+ 		WRITE_ONCE(me->thread.bp_preview_phys_mode, (unsigned char)arg2);
+ 		error = 0;
+ 		break;
++	case PR_BP_PREVIEW_REPLAY_CONFIG: {
++		unsigned long status, flags;
++		unsigned int slot = arg2;
++		unsigned int lines_per_base = arg3;
++		unsigned int delay = arg4;
++		unsigned int gap = arg5;
++		unsigned int base, line, index = 0;
++
++		if (slot >= 4 || !lines_per_base || lines_per_base > 8
++		    || delay > 65535 || gap > 255
++		    || READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {
++			error = -EINVAL;
++			break;
++		}
++		for (base = 0; base < BP_PREVIEW_ADDRS; base++) {
++			unsigned long paddr =
++				READ_ONCE(me->thread.bp_preview_paddr[base]);
++
++			if (!paddr)
++				continue;
++			if ((paddr & 63) || offset_in_page(paddr)
++			    + lines_per_base * 64 > PAGE_SIZE) {
++				error = -EINVAL;
++				goto replay_config_out;
++			}
++		}
++
++		/* A single-CPU experiment can configure the global table atomically
++		 * with respect to wakeup hooks by holding local interrupts off.
++		 */
++		local_irq_save(flags);
++		asm volatile("csrr %0, 0x9c3" : "=r"(status) : : "memory");
++		if (status & 0xf) {
++			error = -EBUSY;
++			local_irq_restore(flags);
++			break;
++		}
++		for (base = 0; base < BP_PREVIEW_ADDRS; base++) {
++			unsigned long paddr =
++				READ_ONCE(me->thread.bp_preview_paddr[base]);
++
++			if (!paddr)
++				continue;
++			for (line = 0; line < lines_per_base; line++) {
++				unsigned long entry = ((unsigned long)slot << 45)
++					| ((unsigned long)index << 40)
++					| (paddr + line * 64);
++
++				asm volatile("csrw 0x9c1, %0" : : "r"(entry)
++					     : "memory");
++				index++;
++			}
++		}
++		if (!index) {
++			error = -ENOENT;
++			local_irq_restore(flags);
++			break;
++		}
++		status = slot | ((unsigned long)index << 2)
++			 | ((unsigned long)delay << 8)
++			 | ((unsigned long)gap << 24) | (1UL << 63);
++		asm volatile("csrw 0x9c2, %0" : : "r"(status) : "memory");
++		local_irq_restore(flags);
++		WRITE_ONCE(me->thread.bp_preview_replay_slot, slot);
++		WRITE_ONCE(me->thread.bp_preview_replay_configured, true);
++		error = 0;
++replay_config_out:
++		break;
++	}
++	case PR_BP_PREVIEW_REPLAY_STATUS:
++		if (arg2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		asm volatile("csrr %0, 0x9c3" : "=r"(error) : : "memory");
++		break;
+ 	case PR_BP_PREVIEW_GET_COUNT:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;

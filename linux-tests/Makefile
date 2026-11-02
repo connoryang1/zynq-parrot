@@ -37,6 +37,8 @@ TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
 TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 PHYSICAL_PREVIEW_BENCH_APP := $(OUT)/scheduler_physical_preview_benchmark
 PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
+TAGGED_REPLAY_BENCH_APP := $(OUT)/scheduler_tagged_replay_benchmark
+TAGGED_REPLAY_BENCH_DYNAMIC_APP := $(OUT)/scheduler_tagged_replay_benchmark_dynamic
 PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
 PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -63,7 +65,8 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0013-blackparrot-wakeup-data-preview.patch \
 	$(CURDIR)/kernel-patches/0014-blackparrot-wakeup-pma-drop-control.patch \
 	$(CURDIR)/kernel-patches/0015-blackparrot-preview-hook-timing.patch \
-	$(CURDIR)/kernel-patches/0016-blackparrot-wakeup-data-only.patch
+	$(CURDIR)/kernel-patches/0016-blackparrot-wakeup-data-only.patch \
+	$(CURDIR)/kernel-patches/0017-blackparrot-tagged-data-replay.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -140,7 +143,7 @@ emit-benchmark-transfer: check-linux-cc benchmark
 	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
 
 # These pthread comparisons are independent of the custom-CSR shell demo.
-.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer physical-preview-benchmark physical-preview-benchmark-dynamic emit-physical-preview-benchmark-transfer emit-physical-preview-benchmark-dynamic-transfer physical-preview-trace physical-preview-trace-dynamic emit-physical-preview-trace-transfer emit-physical-preview-trace-dynamic-transfer
+.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer physical-preview-benchmark physical-preview-benchmark-dynamic emit-physical-preview-benchmark-transfer emit-physical-preview-benchmark-dynamic-transfer tagged-replay-benchmark tagged-replay-benchmark-dynamic emit-tagged-replay-benchmark-transfer emit-tagged-replay-benchmark-dynamic-transfer physical-preview-trace physical-preview-trace-dynamic emit-physical-preview-trace-transfer emit-physical-preview-trace-dynamic-transfer
 request-benchmark: $(REQUEST_APP)
 request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
 request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
@@ -150,6 +153,8 @@ cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
 cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 physical-preview-benchmark: $(PHYSICAL_PREVIEW_BENCH_APP)
 physical-preview-benchmark-dynamic: $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP)
+tagged-replay-benchmark: $(TAGGED_REPLAY_BENCH_APP)
+tagged-replay-benchmark-dynamic: $(TAGGED_REPLAY_BENCH_DYNAMIC_APP)
 physical-preview-trace: $(PHYSICAL_PREVIEW_TRACE_APP)
 physical-preview-trace-dynamic: $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP)
 
@@ -185,6 +190,14 @@ $(PHYSICAL_PREVIEW_BENCH_APP): scheduler_physical_preview_benchmark.c Makefile F
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+$(TAGGED_REPLAY_BENCH_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
+
+$(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
@@ -235,6 +248,16 @@ emit-physical-preview-benchmark-dynamic-transfer: check-linux-cc physical-previe
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark_dynamic.b64'
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark_dynamic.b64 > /tmp/scheduler_physical_preview_benchmark_dynamic' 'chmod +x /tmp/scheduler_physical_preview_benchmark_dynamic'
+
+emit-tagged-replay-benchmark-transfer: check-linux-cc tagged-replay-benchmark
+	@printf '%s\n' ': > /tmp/scheduler_tagged_replay_benchmark.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark.b64 > /tmp/scheduler_tagged_replay_benchmark' 'chmod +x /tmp/scheduler_tagged_replay_benchmark'
+
+emit-tagged-replay-benchmark-dynamic-transfer: check-linux-cc tagged-replay-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_tagged_replay_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark_dynamic.b64 > /tmp/scheduler_tagged_replay_benchmark_dynamic' 'chmod +x /tmp/scheduler_tagged_replay_benchmark_dynamic'
 
 emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture.b64'
