@@ -22,6 +22,10 @@
 #define SEL4_RPC_SEARCH_HIERARCHY_COLD_CALLS 64u
 #define SEL4_RPC_SEARCH_FALLBACK_CALLS 8u
 #endif
+#ifdef SEL4_RPC_FAULT_INJECTION
+#define SEL4_RPC_SEARCH_NOTIFICATION_REQUESTS 0u
+#define SEL4_RPC_SEARCH_SOFTWARE_REQUESTS 0u
+#else
 #define SEL4_RPC_SEARCH_NOTIFICATION_REQUESTS \
     (SEL4_RPC_SEARCH_WARMUP_CALLS + SEL4_RPC_SEARCH_MEASURED_CALLS \
      + SEL4_RPC_SEARCH_DISTRIBUTION_CALLS \
@@ -33,6 +37,7 @@
      + SEL4_RPC_SEARCH_L1D_COLD_CALLS \
      + SEL4_RPC_SEARCH_HIERARCHY_COLD_CALLS \
      + SEL4_RPC_SEARCH_FALLBACK_CALLS)
+#endif
 
 /* Notifications carry only a badge, so the comparison transport uses this
  * explicitly shared request/reply mailbox. It is a baseline, not the protected

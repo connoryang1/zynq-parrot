@@ -313,6 +313,21 @@ if ((sel4_failure_count != 0)); then
     echo "seL4 failure marker present: rows=$sel4_failure_count" >&2
     exit 1
 fi
+if ((fault_injection)); then
+    if ((marker_count != 1 || fault_recovery_count != 1
+         || guard_count != 1)); then
+        echo "invalid protected RPC fault-only evidence: markers=$marker_count fault_rows=$fault_recovery_count guard_rows=$guard_count" >&2
+        exit 1
+    fi
+    if ((physical)) \
+       && ((core_pass_count != 1 || bsg_pass_count != 1
+            || bsg_fail_count != 0)); then
+        echo "invalid physical completion: core_pass=$core_pass_count bsg_pass=$bsg_pass_count bsg_fail=$bsg_fail_count" >&2
+        exit 1
+    fi
+    echo 'accepted seL4 RPC fault gate: server fault, terminal retry, record consumption, and rebind verified'
+    exit 0
+fi
 if ((marker_count != 1 || hardware_count != 1 || software_count != 1)); then
     echo "invalid RPC evidence: markers=$marker_count hardware_rows=$hardware_count software_rows=$software_count" >&2
     exit 1

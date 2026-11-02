@@ -296,7 +296,9 @@ static int test_blackparrot_rejects_same_vspace(env_t env)
 
 static int test_blackparrot_hardware_binding(env_t env)
 {
+#ifndef SEL4_RPC_FAULT_INJECTION
     test_eq(test_blackparrot_rejects_same_vspace(env), 0);
+#endif
 
     sel4utils_process_t server = {0};
     cspacepath_t endpoint_path;
@@ -473,6 +475,7 @@ static int test_blackparrot_hardware_binding(env_t env)
     test_assert(protected_rpc_encode_buffer(&request, 0, search_ref));
     request.words[3] = ADAPTER_SEARCH_NEEDLE;
     request.length = 4;
+    protected_rpc_call_result_t result;
 
     const protected_rpc_region_binding_t local_region = {
         .region = {.opaque = ADAPTER_REGION_TOKEN},
@@ -514,6 +517,10 @@ static int test_blackparrot_hardware_binding(env_t env)
     uint64_t software_hierarchy_cold_samples[ADAPTER_HIERARCHY_COLD_CALLS];
     uint64_t notification_hierarchy_cold_samples[
         ADAPTER_HIERARCHY_COLD_CALLS];
+    uint64_t direct_elapsed = 0;
+    uint64_t notification_elapsed = 0;
+    uint64_t software_elapsed = 0;
+#ifndef SEL4_RPC_FAULT_INJECTION
     uint64_t direct_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
@@ -527,7 +534,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(local_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(local_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-    const uint64_t direct_elapsed = read_cycles() - direct_start;
+    direct_elapsed = read_cycles() - direct_start;
     for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
         const uint64_t sample_start = read_cycles();
         protected_rpc_status_t status = sel4_rpc_bounded_search_service(
@@ -586,8 +593,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(notification_reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(notification_reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-    const uint64_t notification_elapsed =
-        read_cycles() - notification_start;
+    notification_elapsed = read_cycles() - notification_start;
     for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
         notification_sequence++;
         const uint64_t sample_start = read_cycles();
@@ -641,7 +647,6 @@ static int test_blackparrot_hardware_binding(env_t env)
     const protected_rpc_call_options_t software = {
         .route = PROTECTED_RPC_ROUTE_SOFTWARE,
     };
-    protected_rpc_call_result_t result;
     uint64_t software_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_BP_SOFTWARE_CALLS; call++) {
@@ -655,7 +660,7 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-    const uint64_t software_elapsed = read_cycles() - software_start;
+    software_elapsed = read_cycles() - software_start;
     for (size_t sample = 0; sample < ADAPTER_DISTRIBUTION_CALLS; sample++) {
         const uint64_t sample_start = read_cycles();
         protected_rpc_status_t status = protected_rpc_call(
@@ -696,6 +701,11 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
+#else
+    /* The fault-only server skips notification and software baselines and
+     * proceeds directly from its ready message to endpoint receive. */
+    seL4_Yield();
+#endif
 
     const protected_rpc_blackparrot_binding_t binding = {
         .server_tcb = server.thread.tcb.cptr,
@@ -746,6 +756,40 @@ static int test_blackparrot_hardware_binding(env_t env)
     const protected_rpc_call_options_t hardware = {
         .route = PROTECTED_RPC_ROUTE_HARDWARE,
     };
+#ifdef SEL4_RPC_FAULT_INJECTION
+    /* A synchronous server fault is a committed failure: the caller resumes
+     * once, retry cannot enter the quarantined generation, and UNBIND makes
+     * the kernel authenticate and consume its privileged fault record before
+     * revocation.  The ordinary server TCB remains blocked on the endpoint,
+     * so a fresh generation can safely bind and complete a normal request. */
+    protected_rpc_message_t fault_request = request;
+    fault_request.words[3] = SEL4_RPC_FAULT_NEEDLE;
+    test_eq(protected_rpc_call(
+                rpc_endpoint, &fault_request, &hardware, &result),
+            PROTECTED_RPC_SERVER_FAULT);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 0);
+    test_eq(protected_rpc_call(
+                rpc_endpoint, &fault_request, &hardware, &result),
+            PROTECTED_RPC_REVOKED);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 0);
+    test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
+    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &binding),
+            PROTECTED_RPC_OK);
+    test_eq(protected_rpc_call(rpc_endpoint, &request, &hardware, &result),
+            PROTECTED_RPC_OK);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 4);
+    test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+    test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
+    printf("SEL4_RPC_FAULT_RECOVERY caller=server-fault retry=revoked "
+           "record=consumed rebind=verified\n");
+    destroy_rpc_server(env, &server, shadow_stack, shared_base, mailbox_base,
+                       &control_endpoint);
+    return sel4test_get_result();
+#endif
     uint64_t hardware_start = 0;
     for (seL4_Word call = 0;
          call < ADAPTER_WARMUP_CALLS + ADAPTER_MEASURED_CALLS; call++) {
@@ -811,37 +855,6 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
-
-#ifdef SEL4_RPC_FAULT_INJECTION
-    /* A synchronous server fault is a committed failure: the caller resumes
-     * once, retry cannot enter the quarantined generation, and UNBIND makes
-     * the kernel authenticate and consume its privileged fault record before
-     * revocation.  The ordinary server TCB remains blocked on the endpoint,
-     * so a fresh generation can safely bind and complete a normal request. */
-    protected_rpc_message_t fault_request = request;
-    fault_request.words[3] = SEL4_RPC_FAULT_NEEDLE;
-    test_eq(protected_rpc_call(
-                rpc_endpoint, &fault_request, &hardware, &result),
-            PROTECTED_RPC_SERVER_FAULT);
-    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-    test_eq(result.reply.length, 0);
-    test_eq(protected_rpc_call(
-                rpc_endpoint, &fault_request, &hardware, &result),
-            PROTECTED_RPC_REVOKED);
-    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-    test_eq(result.reply.length, 0);
-    test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
-    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &binding),
-            PROTECTED_RPC_OK);
-    test_eq(protected_rpc_call(rpc_endpoint, &request, &hardware, &result),
-            PROTECTED_RPC_OK);
-    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
-    test_eq(result.reply.length, 4);
-    test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
-    test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
-    printf("SEL4_RPC_FAULT_RECOVERY caller=server-fault retry=revoked "
-           "record=consumed rebind=verified\n");
-#endif
 
     /* Mapping any page into a bound VSpace must synchronously revoke before
      * the mapping becomes visible.  The first stale-token call reports that

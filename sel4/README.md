@@ -538,12 +538,14 @@ evidence.
 
 To exercise the version-2 failure boundary end to end, additionally configure
 and run with `SEL4_RPC_FAULT_INJECTION=ON` and
-`SEL4_RPC_FAULT_INJECTION=1`, respectively. This test-only build injects an
-illegal instruction from the protected service after its normal-path samples.
-Acceptance requires one `SERVER_FAULT` caller unwind, a non-entering retry,
-kernel consumption of the token-authenticated fault record during unbind, and
-a successful normal call under a fresh generation. The injection macro is not
-present in ordinary correctness or performance images.
+`SEL4_RPC_FAULT_INJECTION=1`, respectively. This test-only build bypasses the
+already-qualified comparison workloads and same-VSpace negative helper, then
+injects an illegal instruction from the protected service. Acceptance still
+requires the physical-region/permission/runtime guards, one `SERVER_FAULT`
+caller unwind, a non-entering retry, kernel consumption of the
+token-authenticated fault record during unbind, and a successful normal call
+under a fresh generation. The injection macro is not present in ordinary
+correctness or performance images.
 
 `BLACKPARROT_SIM`, `ZP_INSTALL_DIR`, and `BSG_TRACE_TIMEOUT_S` override its
 model, runtime-library root, and default four-hour guard respectively. The
