@@ -54,6 +54,9 @@ static volatile uint64_t unexpected_mcause;
 static volatile uint64_t unexpected_mepc;
 static volatile uint64_t unexpected_mtval;
 extern void server_service(void);
+#ifdef RPC_FAULT_RECOVERY_TEST
+extern void server_fault_instruction(void);
+#endif
 
 static inline void rpc_data_write(uint64_t value)
 {
@@ -86,6 +89,17 @@ static uint64_t rpc_control(uint64_t control)
   __asm__ volatile("csrw 0x7c4, %1\ncsrr %0, 0x7c4"
                    : "=r"(status) : "r"(control) : "memory");
   return status;
+}
+
+static uint64_t rpc_fault_read(uint64_t token,
+                               bp_rpc_fault_component_t component,
+                               uint64_t *status)
+{
+  uint64_t value;
+  rpc_data_write(token);
+  *status = rpc_control(bp_rpc_fault_read_word(component, 0));
+  __asm__ volatile("csrr %0, 0x7c3" : "=r"(value));
+  return value;
 }
 
 static uint64_t rpc_install_descriptor(uint64_t caller_satp,
@@ -267,7 +281,7 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     ".option push\n.option norvc\n"
     ".global server_service\nserver_service:\n"
     "li t0, 0x50000\nld t1, 0(t0)\naddi t1, t1, 1\nsd t1, 0(t0)\n"
-    ".word 0\n"
+    ".global server_fault_instruction\nserver_fault_instruction:\n.word 0\n"
     "1: j 1b\n"
     ".option pop\n"
   );
@@ -311,12 +325,28 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   rpc_data_write(1);
   const uint64_t query = rpc_control(bp_rpc_control_word(
     BP_RPC_CONTROL_READ_STATUS, BP_RPC_FIELD_TOKEN, 0));
+  uint64_t wrong_status, cause_status, pc_status, tval_status;
+  (void)rpc_fault_read(2, BP_RPC_FAULT_CAUSE, &wrong_status);
+  const uint64_t cause = rpc_fault_read(
+    1, BP_RPC_FAULT_CAUSE, &cause_status);
+  const uint64_t fault_pc = rpc_fault_read(
+    1, BP_RPC_FAULT_PC, &pc_status);
+  const uint64_t fault_tval = rpc_fault_read(
+    1, BP_RPC_FAULT_TVAL, &tval_status);
+  const uint64_t expected_fault_pc = SERVER_ENTRY_VA
+    + physical_address(server_fault_instruction)
+    - physical_address(server_entry);
   rpc_data_write(1);
   const uint64_t revoke = rpc_control(bp_rpc_control_word(
     BP_RPC_CONTROL_REVOKE, BP_RPC_FIELD_TOKEN, 0));
   const int pass = shared_page[3] == 1
                    && shared_page[0] == 1
                    && query == BP_RPC_CONTROL_FAULTED
+                   && wrong_status == BP_RPC_CONTROL_STALE
+                   && cause_status == BP_RPC_CONTROL_OK && cause == 2
+                   && pc_status == BP_RPC_CONTROL_OK
+                   && fault_pc == expected_fault_pc
+                   && tval_status == BP_RPC_CONTROL_OK && fault_tval == 0
                    && revoke == BP_RPC_CONTROL_OK
                    && unexpected_mcause == 0;
   if (pass) {
@@ -330,6 +360,10 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   bp_hprint_uint64(query);
   bp_hprint_uint64(revoke);
   bp_hprint_uint64(shared_page[4]);
+  bp_hprint_uint64(cause);
+  bp_hprint_uint64(fault_pc);
+  bp_hprint_uint64(expected_fault_pc);
+  bp_hprint_uint64(fault_tval);
   bp_print_string("\n");
   bp_finish(1);
 #else

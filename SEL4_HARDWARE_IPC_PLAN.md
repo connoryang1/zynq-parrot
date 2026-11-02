@@ -403,7 +403,9 @@ and would not consume the continuation atomically. RL-071 now implements that
 opt-in synthetic return for an illegal instruction in full-core simulation,
 including terminal outcome, zero reply, one visible pre-fault effect, rejected
 retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4,
-and it does not close the remaining fault classes or fault-endpoint semantics.
+The privileged controller also retains token-checked cause/PC/`tval` and
+rejects wrong-token or non-faulted reads. It does not close the remaining fault
+classes, OpenSBI exposure, or fault-endpoint semantics.
 
 ## Resume checklist
 

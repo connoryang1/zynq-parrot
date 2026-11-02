@@ -207,6 +207,13 @@ int main(void)
   EXPECT("query version-2 token",
          rpc_token_command(BP_RPC_CONTROL_READ_STATUS, 0, token + 3),
          BP_RPC_CONTROL_OK);
+  EXPECT("reject fault read before a fault",
+         rpc_token_command(BP_RPC_CONTROL_READ_FAULT, 0, token + 3),
+         BP_RPC_CONTROL_INVALID);
+  rpc_data_write(token + 4);
+  EXPECT("reject wrong-token fault read",
+         rpc_control(bp_rpc_fault_read_word(BP_RPC_FAULT_CAUSE, 0)),
+         BP_RPC_CONTROL_STALE);
   EXPECT("revoke version-2 token",
          rpc_token_command(BP_RPC_CONTROL_REVOKE, 0, token + 3),
          BP_RPC_CONTROL_OK);

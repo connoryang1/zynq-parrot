@@ -268,7 +268,14 @@ descriptor in one architectural step.
 
 `REVOKE` compares the token most recently written to `M_DATA` before clearing
 `valid`, and refuses an active slot. Reading `M_CONTROL` returns the last
-control status. This data/control pair keeps the RTL boundary fixed while the
+control status. Version 2 also defines
+`READ_FAULT(CAUSE|PC|TVAL, slot)`: M mode first writes the token to `M_DATA`,
+writes the read command, requires `OK`, and then reads the selected value from
+`M_DATA`. A wrong token returns `STALE`; a live non-faulted slot or unknown
+component returns `INVALID`. Revoke clears the record. This command is not yet
+exported by the version-1 OpenSBI extension.
+
+This data/control pair keeps the RTL boundary fixed while the
 versioned memory image evolves, prevents a partially staged descriptor from
 authorizing a call, and ensures that descriptor visibility cannot precede
 construction of its protection domain.

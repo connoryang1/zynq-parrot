@@ -55,6 +55,8 @@ int main(void)
            == UINT64_C(0x0100000000000000));
     assert(bp_rpc_prepare_word(BP_RPC_PREPARE_CSR, 0)
            == UINT64_C(0x0402000000000000));
+    assert(bp_rpc_fault_read_word(BP_RPC_FAULT_PC, 0)
+           == UINT64_C(0x0501000000000000));
     assert(bp_rpc_config_word(4, 4, 0, 1)
            == UINT64_C(0x0000000100000404));
     assert(bp_rpc_config_word_v2(4, 4, 0, 1)
