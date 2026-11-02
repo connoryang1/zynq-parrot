@@ -1,4 +1,4 @@
-This document preserves the proposed seL4 integration so the project can return to it after the protected-library work. It defines a microkernel-neutral fast-path boundary, the seL4 adapter, required hardware generalization, and evidence needed for a defensible result; it is a plan, not a record of completed seL4 support.
+This document defines the seL4 protected-RPC integration, its microkernel-neutral boundary, and the evidence required for a defensible acceleration claim. It also records which staged gates are accepted so future work can distinguish the completed one-pair prototype from optional generalization.
 
 # seL4 hardware IPC plan
 
@@ -21,6 +21,25 @@ registers, creates protected reply authority, publishes an optimized IPC fast
 path, and provides established IPC tests and benchmarks. A QEMU target lets the
 software integration begin without FPGA access. Fiasco.OC/L4Re remains a
 possible second adapter; a new custom microkernel is not the initial target.
+
+## Current disposition
+
+Stages 0--5 are accepted for the scoped single-core, one-caller/one-resident-
+server prototype. The public interface and ordinary seL4 backend precede and
+remain independent of the BlackParrot backend (RL-060); descriptor transport,
+kernel authorization, revocation, and exactly-once fallback pass simulation and
+physical FPGA execution (RL-062--RL-063, RL-069); and the matched isolated musl
+workload plus component timing show a 1.57x warm speedup over ordinary seL4 IPC
+while removing 77.9% of its transport premium over direct execution (RL-064--
+RL-069). Version 2 additionally returns precise synchronous server faults
+without replay and passes end to end in a fresh full-system model and on the
+PYNQ-Z2 (RL-071).
+
+Stage 6 is future generalization, not part of that accepted claim. Multiple
+clients or bindings, queues, nested calls, blocking/asynchronous cancellation,
+MCS donation, SMP migration, and resumable seL4 fault-endpoint delivery remain
+unsupported and must continue to select ordinary IPC or receive a separately
+specified atomic protocol before admission to the hardware path.
 
 This plan is based on the protected-RPC library checkpoint `844fcb8c`. That
 checkpoint demonstrates a fixed protected service entry, separate Sv39 roots,
@@ -382,37 +401,28 @@ Current coverage (2026-11-02): the routed FPGA closes stale generation,
 mapping-triggered revoke/rebind, region identity/permission, runtime-state, and
 nonzero-badge cases. Host and directed tests cover malformed buffer references,
 descriptor fields, continuation metadata, precise `NOT_STARTED`/`REVOKED`
-fallback counts, and no fallback after a committed failure. The remaining
-end-to-end gaps are endpoint/TCB/VSpace/ASID destruction variants beyond the
-accepted page-map revoke, plus block, timeout, or interrupt after hardware
-acceptance. RL-070 injects a real post-entry illegal instruction and confirms
-the documented version-1 boundary: preparation clears `stvec`/`mtvec`, the
-caller does not resume, and bounded simulation fails rather than falling back.
-Recovery therefore requires a new fault-continuation ABI and a terminal
-`COMMITTED_FAILED` unwind; it cannot reuse software fallback. Version 1 is
-single-core and defers interrupts during an accepted call, so any expansion of
-that rule needs a new atomicity test rather than the current no-race argument.
-The version-2 candidate contract and its required tests are now fixed in
-`sel4/BLACKPARROT_RPC_ABI.md`. RTL inspection localizes the implementation
-seam: precise exception classification occurs in CSR retirement, but the
-protected continuation is owned by `bp_be_top`. A prototype must suppress the
-normal server trap update and drive a synthetic protected return through the
-existing caller-register install, context-bank selection, and frontend-reset
-path; merely installing a trap vector would move recovery into untrusted state
-and would not consume the continuation atomically. RL-071 now implements that
-opt-in synthetic return for an illegal instruction in full-core simulation,
-including terminal outcome, zero reply, one visible pre-fault effect, rejected
-retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4.
-The privileged controller also retains token-checked cause/PC/`tval` and
-rejects wrong-token or non-faulted reads. Revoke and fresh-token reinstall prove
-that quarantine and fault metadata do not leak into the next generation. It
-does not close the remaining fault/revoke race or fault-endpoint semantics.
-The OpenSBI overlay now implements valid version-2 installation and a single
-token-checked 24-byte fault-snapshot call, and builds against the pinned
-firmware revision; kernel consumption and runtime verification are pending.
-Directed
-full-core tests now cover illegal-instruction and instruction/load/store page
-faults with causes 2/12/13/15 and exact PC/`tval`.
+fallback counts, and no fallback after a committed failure. RL-070 records the
+version-1 negative boundary: a post-entry illegal instruction cannot resume the
+caller and must never fall back through software.
+
+RL-071 closes that synchronous-fault gap with the opt-in version-2 contract in
+`sel4/BLACKPARROT_RPC_ABI.md`. Directed full-core tests cover illegal-instruction
+and instruction/load/store page faults (causes 2/12/13/15), exact PC/`tval`, one
+visible pre-fault effect, terminal `COMMITTED_FAILED`, zero reply, rejected
+retry, token-authenticated fault-record access, revoke, and clean fresh-token
+reinstall. OpenSBI installs the version-2 descriptor and exposes the fixed
+24-byte record; the seL4 kernel consumes it while reaping the quarantined
+binding. The exact fault-only seL4 lifecycle passes independently in a fresh
+full-system model and on the timing-clean PYNQ-Z2 route. Artifact identities and
+strict-checker results are retained in `logs/sel4-v2-fault-20261102/`.
+
+The remaining generalization gaps are a true fault/revoke race, ordinary seL4
+fault-endpoint equivalence, endpoint/TCB/VSpace/ASID destruction variants beyond
+the accepted page-map revoke, and block, timeout, cancellation, or interrupt
+after hardware acceptance. They are not silently supported by version 2:
+version 1 remains the prefaulted/nonblocking contract, version 2 adds only
+precise synchronous-fault unwind, and Stage 6 must define a new atomic state
+transition before admitting any asynchronous case.
 
 ## Resume checklist
 
