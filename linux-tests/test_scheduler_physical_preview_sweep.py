@@ -75,6 +75,22 @@ class SweepAnalyzerTest(unittest.TestCase):
     def test_single_cell_analyzer_accepts_instruction_mode(self):
         self.assertEqual(TIMING_MODES["instruction"], 3)
 
+    def test_single_cell_summary_retains_active_line_count(self):
+        from analyze_scheduler_physical_preview_benchmark import ROW, summarize
+
+        rows = []
+        for match in ROW.finditer(transcript(group=7, timing="wake-early-data")):
+            values = [int(value) for value in match.groups()]
+            rows.append(dict(zip(
+                ("trial", "mode", "hooks", "wake_to_entry", "load_cycles",
+                 "wake_to_load", "roundtrip"), values
+            )))
+        result = summarize(
+            rows, group=7, timing="wake-early-data",
+            bootstrap_samples=100, lines=1,
+        )
+        self.assertEqual(result["active_lines"], 1)
+
     def test_single_cell_analyzer_accepts_counter_mode(self):
         self.assertEqual(TIMING_MODES["counter"], 4)
 

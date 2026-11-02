@@ -73,6 +73,7 @@ CORRECTNESS_TESTS := \
     mt_resident_relaunch_prefetch_test \
     mt_resident_reseed_irq_test \
     mt_umode_prefetch_test \
+    mt_l2_capacity_integrity_test \
     mt_prefetch_hint_test \
     mt_prefetch_queue_depth_test \
     mt_prefetch_handoff_lifecycle_test \

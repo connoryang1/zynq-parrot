@@ -123,6 +123,16 @@ class TraceRunnerTest(unittest.TestCase):
                 "echo TRACE_CAPTURE_EXIT rc=$rc",
             )
 
+    def test_pipe_wakeup_early_data_command_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory, program="physical-preview-pipe",
+                             group=7, preview_mode="wake-early-data")
+            self.assertEqual(
+                guest_command(args),
+                f"{PIPE_GUEST_ELF} 7 wake-early-data; rc=$?; "
+                "echo TRACE_CAPTURE_EXIT rc=$rc",
+            )
+
     def test_pipe_rejects_multiple_samples(self):
         with tempfile.TemporaryDirectory() as directory:
             args = self.args(directory, program="physical-preview-pipe",
@@ -153,6 +163,13 @@ class TraceRunnerTest(unittest.TestCase):
     def test_existing_inputs_are_accepted(self):
         with tempfile.TemporaryDirectory() as directory:
             validate_args(self.args(directory))
+
+    def test_overlong_transfer_command_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = self.args(directory)
+            args.transfer.write_text("x" * 769 + "\n")
+            with self.assertRaisesRegex(ValueError, "transfer command"):
+                validate_args(args)
 
 
 if __name__ == "__main__":

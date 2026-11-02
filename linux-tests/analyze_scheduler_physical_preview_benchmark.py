@@ -34,7 +34,7 @@ def percentile(values, fraction):
     return ordered[round(fraction * (len(ordered) - 1))]
 
 
-def summarize(rows, group, timing, bootstrap_samples=20000):
+def summarize(rows, group, timing, bootstrap_samples=20000, lines=4):
     trials = len(rows)
     if trials != 512 or [row["trial"] for row in rows] != list(range(trials)):
         raise ValueError("expected exactly 512 ordered trials")
@@ -57,6 +57,7 @@ def summarize(rows, group, timing, bootstrap_samples=20000):
     rng = random.Random(0xB50)
     paired_blocks = trials // 4
     result = {"l2_set_group": group, "preview_timing": timing,
+              "active_lines": lines,
               "trials": trials,
               "trials_per_mode": trials // 2,
               "paired_blocks": paired_blocks, "metrics": {}}
@@ -99,14 +100,14 @@ def main():
     lines = int(configs[0][2])
     timing = configs[0][3]
     mode = int(configs[0][4])
-    if (group > 7 or first_offset != group * 256 or lines != 4
+    if (group > 7 or first_offset != group * 256 or lines not in range(1, 5)
             or mode != TIMING_MODES[timing]):
         raise SystemExit("invalid benchmark configuration marker")
     rows = []
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
         rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
-    print(json.dumps(summarize(rows, group, timing), indent=2))
+    print(json.dumps(summarize(rows, group, timing, lines=lines), indent=2))
 
 
 if __name__ == "__main__":

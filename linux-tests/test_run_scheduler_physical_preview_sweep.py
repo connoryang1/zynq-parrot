@@ -217,6 +217,32 @@ class CellPlanTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "log parent"):
                 validate_args(args)
 
+    def test_overlong_transfer_command_fails_before_board_launch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nbf = root / "image.nbf"
+            transfer = root / "transfer.sh"
+            nbf.write_text("nbf")
+            transfer.write_text("x" * 769 + "\n")
+            args = argparse.Namespace(
+                nbf=nbf,
+                transfer=transfer,
+                elf_sha256="1" * 64,
+                control_sha256="2" * 64,
+                bitstream_sha256=None,
+                runtime_ms=100,
+                footprint="target",
+                policy="normal",
+                replay_state="persistent",
+                arm="enabled",
+                only_timing=None,
+                only_group=None,
+                start_cell=0,
+                log=root / "run.log",
+            )
+            with self.assertRaisesRegex(ValueError, "transfer command"):
+                validate_args(args)
+
 
 if __name__ == "__main__":
     unittest.main()

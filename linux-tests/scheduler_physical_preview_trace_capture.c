@@ -37,6 +37,7 @@ enum {
 
 enum replay_mode {
 	replay_disabled = 0,
+	replay_wake_early_data = 1,
 	replay_trigger = 5,
 	replay_wake_trigger = 6,
 };
@@ -240,9 +241,12 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		if (samples[trial].hooks) {
-			fprintf(stderr, "TRACE_FAIL unexpected preview hook delta=%u\n",
-				samples[trial].hooks);
+		const unsigned expected_hooks =
+			trial_mode == replay_wake_early_data ? 1 : 0;
+		if (samples[trial].hooks != expected_hooks) {
+			fprintf(stderr,
+				"TRACE_FAIL preview hook delta=%u expected=%u\n",
+				samples[trial].hooks, expected_hooks);
 			exit(EXIT_FAILURE);
 		}
 		if (trial_mode &&
@@ -268,26 +272,29 @@ int main(int argc, char **argv)
 	if (argc > 3 || (argc >= 2 &&
 	    (argv[1][0] < '0' || argv[1][0] > '7' || argv[1][1]))) {
 		fprintf(stderr,
-			"usage: %s [l2-set-group-0..7] [disabled|trigger|wake-trigger]\n",
+			"usage: %s [l2-set-group-0..7] [disabled|wake-early-data|trigger|wake-trigger]\n",
 			argv[0]);
 		return 2;
 	}
 	if (argc >= 2)
 		group = (unsigned)(argv[1][0] - '0');
 	if (argc == 3) {
-		if (!strcmp(argv[2], "trigger"))
+		if (!strcmp(argv[2], "wake-early-data"))
+			replay = replay_wake_early_data;
+		else if (!strcmp(argv[2], "trigger"))
 			replay = replay_trigger;
 		else if (!strcmp(argv[2], "wake-trigger"))
 			replay = replay_wake_trigger;
 		else if (strcmp(argv[2], "disabled")) {
 			fprintf(stderr,
-				"usage: %s [l2-set-group-0..7] [disabled|trigger|wake-trigger]\n",
+				"usage: %s [l2-set-group-0..7] [disabled|wake-early-data|trigger|wake-trigger]\n",
 				argv[0]);
 			return 2;
 		}
 	}
 	printf("TRACE_CONFIG path=pipe group=%u first_offset=%u lines=%u warmups=%u replay=%s mode=%u\n",
 	       group, group * 4 * line_bytes, lines, warmup,
+	       replay == replay_wake_early_data ? "wake-early-data" :
 	       replay == replay_trigger ? "trigger" :
 	       replay == replay_wake_trigger ? "wake-trigger" : "disabled",
 	       replay);

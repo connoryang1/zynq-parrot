@@ -16,6 +16,7 @@ DEFAULT_HOST = "xilinx@192.168.4.35"
 DEFAULT_CONTROL_SHA = "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30"
 GUEST_ELF = "/tmp/scheduler_physical_preview_benchmark_dynamic"
 SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
+MAX_GUEST_COMMAND_LENGTH = 768
 
 
 def cell_plan():
@@ -142,6 +143,11 @@ def validate_args(args):
     selected_cells(args.start_cell, args.only_timing, args.only_group)
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
+    if any(len(command) > MAX_GUEST_COMMAND_LENGTH
+           for command in args.transfer.read_text().splitlines()):
+        raise ValueError(
+            f"transfer command exceeds {MAX_GUEST_COMMAND_LENGTH} characters"
+        )
     if not args.log.parent.is_dir():
         raise ValueError("log parent directory must exist before board launch")
 

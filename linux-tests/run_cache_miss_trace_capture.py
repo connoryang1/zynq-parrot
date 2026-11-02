@@ -18,6 +18,7 @@ GUEST_ELF = "/tmp/cache_miss_trace_capture_dynamic"
 PIPE_GUEST_ELF = "/tmp/scheduler_physical_preview_trace_capture_dynamic"
 SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 EXIT_MARKER = re.compile(r"TRACE_CAPTURE_EXIT rc=([0-9]+)\r*\n")
+MAX_GUEST_COMMAND_LENGTH = 768
 
 
 def sha256(path):
@@ -74,7 +75,8 @@ def parse_args(argv=None):
                         default="cache-miss")
     parser.add_argument("--group", type=int, default=0)
     parser.add_argument("--preview-mode",
-                        choices=("disabled", "trigger", "wake-trigger"),
+                        choices=("disabled", "wake-early-data", "trigger",
+                                 "wake-trigger"),
                         default="disabled")
     parser.add_argument("--cache-preview-mode",
                         choices=("legacy", "disabled", "trigger",
@@ -100,6 +102,11 @@ def validate_args(args):
         raise ValueError("bitstream SHA-256 must be 64 lowercase hex digits")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
+    if any(len(command) > MAX_GUEST_COMMAND_LENGTH
+           for command in args.transfer.read_text().splitlines()):
+        raise ValueError(
+            f"transfer command exceeds {MAX_GUEST_COMMAND_LENGTH} characters"
+        )
     if not 1 <= args.samples <= 10_000:
         raise ValueError("samples must be in 1..10000")
     if not 0 <= args.group <= 7:
