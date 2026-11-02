@@ -441,6 +441,18 @@ L1D+L2-cold hardware medians are 4,884 and 5,748 cycles, versus 10,106 and
 9,792 for ordinary IPC. The retained evidence is
 [`results/sel4test-rpc-trusted-runtime-fpga.log`](results/sel4test-rpc-trusted-runtime-fpga.log).
 
+The lifecycle-qualified image additionally verifies mapping-triggered
+revocation, atomic stale-token rejection, and successful rebind on the routed
+PYNQ-Z2. Its warm medians are 2,934/3,461/5,440/10,597 cycles for
+in-process/hardware/software/notification, so hardware is 1.57x faster than
+ordinary IPC and 1.18x direct. L1D-cold hardware/ordinary medians are
+4,821/10,072; data-hierarchy-cold medians are 5,421/9,809. The strict physical
+checker accepts the lifecycle, badge, shared-buffer, component, test-suite,
+core, host, and exit markers in
+[`results/sel4test-rpc-lifecycle-fpga.log`](results/sel4test-rpc-lifecycle-fpga.log).
+The wrapper's duplicated live-plus-saved output is retained separately under
+`logs/sel4-rpc-lifecycle-20261102/` and is intentionally rejected as evidence.
+
 The initial component image hung because the separately compiled stripped
 server did not include seL4's generated platform configuration and emitted
 `rdcycle`; the clean hardware server intentionally has no permission for that
