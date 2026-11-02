@@ -161,9 +161,11 @@ section reserves behavior, not a version-1 implementation:
    encoding. Raw cause, fault PC, and fault address remain in a privileged
    per-slot record and are never returned to the caller directly.
 4. `COMMITTED_FAILED` is terminal for that binding generation. The trusted
-   adapter reports the coarse status, clears its cached token, and never uses
-   ordinary IPC for the request. A later attempt with the old token returns
-   `REVOKED` without entering the service.
+   adapter reports the coarse status, clears its cached token, retains a
+   terminal endpoint marker until kernel cleanup, and never uses ordinary IPC
+   for the request. A later attempt with the old generation returns `REVOKED`
+   without entering the service; a new attach is denied until `UNBIND` reaps
+   the quarantined descriptor.
 5. `QUERY` exposes `FAULTED` to the kernel. Kernel teardown acknowledges and
    clears the privileged fault record before a new-token `INSTALL`; object and
    mapping references remain pinned until that acknowledgement. An omitted

@@ -8,6 +8,36 @@
 static protected_rpc_endpoint_t bound_endpoint;
 static uint64_t bound_token;
 
+static void clear_binding(void)
+{
+    memset(&bound_endpoint, 0, sizeof(bound_endpoint));
+    bound_token = 0;
+}
+
+static void retire_binding(void)
+{
+    /* Keep the endpoint association until kernel UNBIND reaps the faulted
+     * descriptor, but make another hardware call or attach impossible. */
+    bound_token = 0;
+}
+
+static protected_rpc_status_t failure_status(uint64_t meta)
+{
+    if (!bp_rpc_failure_meta_valid(meta)) {
+        return PROTECTED_RPC_BACKEND_ERROR;
+    }
+    switch (bp_rpc_failure_class(meta)) {
+    case BP_RPC_FAILURE_SERVER_FAULT:
+        return PROTECTED_RPC_SERVER_FAULT;
+    case BP_RPC_FAILURE_CANCELED:
+        return PROTECTED_RPC_CANCELED;
+    case BP_RPC_FAILURE_UNSPECIFIED:
+    case BP_RPC_FAILURE_BACKEND_ERROR:
+    default:
+        return PROTECTED_RPC_BACKEND_ERROR;
+    }
+}
+
 #ifdef PROTECTED_RPC_BLACKPARROT_TEST_HOOK
 extern uint64_t protected_rpc_blackparrot_arch_call(
     uint64_t token, uint64_t words[BP_RPC_MAX_WORDS], uint64_t request_meta,
@@ -47,7 +77,7 @@ protected_rpc_status_t protected_rpc_blackparrot_attach(
     if (endpoint.opaque == 0 || token == 0) {
         return PROTECTED_RPC_INVALID_ARGUMENT;
     }
-    if (bound_token != 0
+    if (bound_endpoint.opaque != 0
         && (bound_endpoint.opaque != endpoint.opaque || bound_token != token)) {
         return PROTECTED_RPC_DENIED;
     }
@@ -59,11 +89,10 @@ protected_rpc_status_t protected_rpc_blackparrot_attach(
 protected_rpc_status_t protected_rpc_blackparrot_detach(
     protected_rpc_endpoint_t endpoint)
 {
-    if (bound_token == 0 || bound_endpoint.opaque != endpoint.opaque) {
+    if (bound_endpoint.opaque != endpoint.opaque) {
         return PROTECTED_RPC_REVOKED;
     }
-    memset(&bound_endpoint, 0, sizeof(bound_endpoint));
-    bound_token = 0;
+    clear_binding();
     return PROTECTED_RPC_OK;
 }
 
@@ -80,7 +109,10 @@ static protected_rpc_status_t blackparrot_try_call(
     }
     if (bound_token == 0 || bound_endpoint.opaque != endpoint.opaque) {
         result->disposition = PROTECTED_RPC_ATTEMPT_FALLBACK_SAFE;
-        result->status = PROTECTED_RPC_UNSUPPORTED;
+        result->status = (bound_token == 0
+                          && bound_endpoint.opaque == endpoint.opaque)
+                         ? PROTECTED_RPC_REVOKED
+                         : PROTECTED_RPC_UNSUPPORTED;
         return result->status;
     }
 
@@ -96,6 +128,7 @@ static protected_rpc_status_t blackparrot_try_call(
     case BP_RPC_OUTCOME_COMPLETED:
         if (!bp_rpc_reply_meta_valid(reply_meta)
             || bp_rpc_reply_status(reply_meta) > PROTECTED_RPC_BACKEND_ERROR) {
+            retire_binding();
             result->disposition = PROTECTED_RPC_ATTEMPT_COMMITTED_FAILED;
             result->status = PROTECTED_RPC_BACKEND_ERROR;
             return result->status;
@@ -118,14 +151,19 @@ static protected_rpc_status_t blackparrot_try_call(
          * UNBIND.  REVOKED is authoritative proof that this token can never
          * start again, so release the local association and permit a fresh
          * kernel binding.  Do not do this for transient NOT_STARTED. */
-        memset(&bound_endpoint, 0, sizeof(bound_endpoint));
-        bound_token = 0;
+        clear_binding();
         result->disposition = PROTECTED_RPC_ATTEMPT_FALLBACK_SAFE;
         result->status = PROTECTED_RPC_REVOKED;
         return result->status;
 
     case BP_RPC_OUTCOME_COMMITTED_FAILED:
+        retire_binding();
+        result->disposition = PROTECTED_RPC_ATTEMPT_COMMITTED_FAILED;
+        result->status = failure_status(reply_meta);
+        return result->status;
+
     default:
+        retire_binding();
         result->disposition = PROTECTED_RPC_ATTEMPT_COMMITTED_FAILED;
         result->status = PROTECTED_RPC_BACKEND_ERROR;
         return result->status;

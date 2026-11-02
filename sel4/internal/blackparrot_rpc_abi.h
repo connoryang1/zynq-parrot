@@ -22,6 +22,7 @@
 #define BP_RPC_REPLY_META_LENGTH_MASK UINT64_C(0xff)
 #define BP_RPC_REPLY_META_STATUS_SHIFT 8u
 #define BP_RPC_REPLY_META_STATUS_MASK (UINT64_C(0xff) << BP_RPC_REPLY_META_STATUS_SHIFT)
+#define BP_RPC_FAILURE_META_CLASS_MASK UINT64_C(0xff)
 #define BP_RPC_SEL4_BIND_LABEL UINT64_C(0x42505201)
 #define BP_RPC_SEL4_UNBIND_LABEL UINT64_C(0x42505202)
 #define BP_RPC_SEL4_BIND_ARGUMENTS 5u
@@ -35,6 +36,15 @@ typedef enum {
     BP_RPC_OUTCOME_REVOKED = 2,
     BP_RPC_OUTCOME_COMMITTED_FAILED = 3,
 } bp_rpc_outcome_t;
+
+/* a5 when the call outcome is COMMITTED_FAILED. Zero is the version-1
+ * unspecified failure and maps fail-closed to BACKEND_ERROR. */
+typedef enum {
+    BP_RPC_FAILURE_UNSPECIFIED = 0,
+    BP_RPC_FAILURE_SERVER_FAULT = 1,
+    BP_RPC_FAILURE_CANCELED = 2,
+    BP_RPC_FAILURE_BACKEND_ERROR = 3,
+} bp_rpc_failure_class_t;
 
 typedef enum {
     BP_RPC_SBI_INSTALL = 0,
@@ -228,6 +238,22 @@ static inline int bp_rpc_reply_meta_valid(uint64_t meta)
     return (meta & ~(BP_RPC_REPLY_META_LENGTH_MASK
                      | BP_RPC_REPLY_META_STATUS_MASK)) == 0
            && bp_rpc_reply_length(meta) <= BP_RPC_MAX_WORDS;
+}
+
+static inline uint64_t bp_rpc_failure_meta(bp_rpc_failure_class_t failure)
+{
+    return (uint64_t)failure;
+}
+
+static inline bp_rpc_failure_class_t bp_rpc_failure_class(uint64_t meta)
+{
+    return (bp_rpc_failure_class_t)(meta & BP_RPC_FAILURE_META_CLASS_MASK);
+}
+
+static inline int bp_rpc_failure_meta_valid(uint64_t meta)
+{
+    return (meta & ~BP_RPC_FAILURE_META_CLASS_MASK) == 0
+           && bp_rpc_failure_class(meta) <= BP_RPC_FAILURE_BACKEND_ERROR;
 }
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L

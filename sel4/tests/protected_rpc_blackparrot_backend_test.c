@@ -110,11 +110,56 @@ int main(void)
     assert(protected_rpc_call(endpoint, &request, &options, &result)
            == PROTECTED_RPC_BACKEND_ERROR);
     assert(arch_calls == 1 && software_calls == 0);
+    expected_token++;
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_DENIED);
+    assert(protected_rpc_blackparrot_detach(endpoint) == PROTECTED_RPC_OK);
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_OK);
+
+    reset_arch(BP_RPC_OUTCOME_COMMITTED_FAILED,
+               bp_rpc_failure_meta(BP_RPC_FAILURE_SERVER_FAULT));
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_SERVER_FAULT);
+    assert(arch_calls == 1 && software_calls == 0);
+    assert(result.path == PROTECTED_RPC_PATH_HARDWARE);
+    assert(result.reply.length == 0);
+
+    reset_arch(BP_RPC_OUTCOME_COMPLETED,
+               bp_rpc_reply_meta(1, PROTECTED_RPC_OK));
+    options.route = PROTECTED_RPC_ROUTE_HARDWARE;
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_REVOKED);
+    assert(arch_calls == 0 && software_calls == 0);
+    options.route = PROTECTED_RPC_ROUTE_AUTO;
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_OK);
+    assert(arch_calls == 0 && software_calls == 1);
+    assert(result.path == PROTECTED_RPC_PATH_SOFTWARE);
+
+    expected_token++;
+    assert(protected_rpc_blackparrot_detach(endpoint) == PROTECTED_RPC_OK);
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_OK);
+
+    reset_arch(BP_RPC_OUTCOME_COMMITTED_FAILED,
+               bp_rpc_failure_meta(BP_RPC_FAILURE_CANCELED));
+    assert(protected_rpc_call(endpoint, &request, &options, &result)
+           == PROTECTED_RPC_CANCELED);
+    assert(arch_calls == 1 && software_calls == 0);
+    expected_token++;
+    assert(protected_rpc_blackparrot_detach(endpoint) == PROTECTED_RPC_OK);
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_OK);
 
     reset_arch(BP_RPC_OUTCOME_COMPLETED, UINT64_C(1) << 16);
     assert(protected_rpc_call(endpoint, &request, &options, &result)
            == PROTECTED_RPC_BACKEND_ERROR);
     assert(arch_calls == 1 && software_calls == 0);
+    expected_token++;
+    assert(protected_rpc_blackparrot_detach(endpoint) == PROTECTED_RPC_OK);
+    assert(protected_rpc_blackparrot_attach(endpoint, expected_token)
+           == PROTECTED_RPC_OK);
 
     reset_arch(BP_RPC_OUTCOME_COMPLETED, 0);
     assert(protected_rpc_call(other, &request, &options, &result)

@@ -73,5 +73,13 @@ int main(void)
     assert(bp_rpc_reply_status(meta) == 7);
     assert(!bp_rpc_reply_meta_valid(bp_rpc_reply_meta(5, 0)));
     assert(!bp_rpc_reply_meta_valid(UINT64_C(1) << 16));
+    assert(bp_rpc_failure_meta(BP_RPC_FAILURE_SERVER_FAULT) == 1);
+    assert(bp_rpc_failure_class(
+               bp_rpc_failure_meta(BP_RPC_FAILURE_CANCELED))
+           == BP_RPC_FAILURE_CANCELED);
+    assert(bp_rpc_failure_meta_valid(BP_RPC_FAILURE_UNSPECIFIED));
+    assert(bp_rpc_failure_meta_valid(BP_RPC_FAILURE_BACKEND_ERROR));
+    assert(!bp_rpc_failure_meta_valid(4));
+    assert(!bp_rpc_failure_meta_valid(UINT64_C(1) << 8));
     return 0;
 }
