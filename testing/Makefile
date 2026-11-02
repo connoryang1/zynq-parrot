@@ -97,6 +97,7 @@ BENCHMARKS := \
     mt_dependent_stream_benchmark \
     mt_ddr_latency_benchmark \
     mt_prefetch_interleave_benchmark \
+    mt_physical_preview_overhead_benchmark \
     mt_prefetch_nonresident_interleave_benchmark \
     mt_request_interleave_benchmark \
     mt_load_ahead_benchmark \

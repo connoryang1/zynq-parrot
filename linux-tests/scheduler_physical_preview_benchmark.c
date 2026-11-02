@@ -238,6 +238,7 @@ int main(int argc, char **argv)
 	int isolate_replay = 0;
 	int wake_data = 0;
 	unsigned active_lines = max_lines;
+	unsigned long lead_cycles = 0;
 	enum arm_mode arm = arm_alternating;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
@@ -245,8 +246,8 @@ int main(int argc, char **argv)
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 8) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled] [active-lines-1..4]\n",
+	if (argc > 9) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled] [active-lines-1..4] [lead-cycles-0..1000000]\n",
 			argv[0]);
 		return 2;
 	}
@@ -323,7 +324,17 @@ int main(int argc, char **argv)
 		}
 		active_lines = parsed;
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s\n",
+	if (argc >= 9) {
+		char *end;
+		unsigned long parsed = strtoul(argv[8], &end, 10);
+
+		if (*end || parsed > 1000000UL) {
+			fprintf(stderr, "invalid preview lead cycles: %s\n", argv[8]);
+			return 2;
+		}
+		lead_cycles = parsed;
+	}
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s lead_cycles=%lu\n",
 	       group, group * max_lines * line_bytes, active_lines,
 	       wake_data && enable_mode == 1 ? "wake-early-data" :
 	       enable_mode == 1 ? "early" :
@@ -335,7 +346,7 @@ int main(int argc, char **argv)
 	       hot_proxy ? "hot-proxy" : "target", fifo ? "fifo" : "normal",
 	       isolate_replay ? "isolated" : "persistent",
 	       arm == arm_disabled ? "disabled" :
-	       arm == arm_enabled ? "enabled" : "alternating");
+	       arm == arm_enabled ? "enabled" : "alternating", lead_cycles);
 
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
@@ -362,10 +373,18 @@ int main(int argc, char **argv)
 	close(to_child[0]);
 	close(to_parent[1]);
 	for (unsigned trial = 0; trial < trials;) {
+		uint64_t lead_start;
+
 		transfer(to_parent[0], &token, 0);
 		samples[trial].launch = cycle();
 		__asm__ volatile("fence rw, rw" : : : "memory");
 		transfer(to_child[1], &token, 1);
+		/* Under equal-priority SCHED_FIFO, the awakened child remains queued
+		 * until this parent blocks.  Keep the target off-core for an explicit
+		 * physical-cycle lead interval while detached previews can progress. */
+		lead_start = cycle();
+		while (cycle() - lead_start < lead_cycles)
+			__asm__ volatile("" : : : "memory");
 		transfer(to_parent[0], &token, 0);
 		samples[trial].returned = cycle();
 		if (samples[trial].accepted)

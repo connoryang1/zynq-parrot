@@ -1038,6 +1038,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Limit:** there is no linked candidate kernel, boot, or FPGA result yet. A hard-linked compile rewrote one shared generated-header timestamp; sources and the historical object were verified unchanged, but future full builds must not use that timestamp as provenance.
 - **Evidence:** source patch and detailed boundary are under `logs/wakeup-data-preview-20261101/`.
 
+### RL-110 — Successful-wakeup data is locally useful but perturbs Linux first use
+
+- **Status:** accepted FPGA/Linux negative end-to-end result plus full-core mechanism control
+- **Scope:** exact 16 KiB routed image and count-zero Linux candidate, four pinned physical hints at successful wakeup with the selection duplicate suppressed, complete eight-group FIFO/persistent fixed-arm matrix, explicit 512-cycle lead and hot-proxy controls, and a matched zero/one/four-command resident-handoff simulation
+- **Linux result:** four hints save 20 target-load cycles with block interval `[17.5,21.5]`, but make wake-to-first-use 610.75 cycles slower with `[494.25,726.75]`. An extra 512-cycle off-core lead leaves only an 11-cycle local saving and a harmful unresolved 489-cycle first-use point. Four immediately reread hot-proxy lines still make first use 822.25 cycles slower with `[465,1178.5]` and give no local benefit. Lead time, L2 capacity, and cold target refill traffic are therefore not supported as the dominant cause.
+- **Direct-overhead control:** a clean trace-enabled full-top benchmark measures the peer's first instruction 11 cycles after matched zero-, one-, and four-command bodies across all 21 rotated samples. Its waveform contains exactly 40 physical-preview-valid cycles in 16 expected bursts; each reaches D-UCE enqueue and the queue drains at depth one. Four CSR writes do not directly delay the immediate hardware handoff.
+- **Meaning:** the current lane can warm data by tens of cycles, but its detached requests perturb the much longer Linux handoff by hundreds. The penalty arises downstream of CSR retirement—most plausibly through shared cache/link traffic or scheduler-path interaction—not from insufficient issue lead or the architectural context-switch primitive. A single context-tag/batch command may reduce software overhead but cannot by itself be claimed to remove this measured penalty.
+- **Evidence:** exact FPGA logs/status/analyses and the validated simulation archive are under `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261101/`; the simulation archive SHA-256 is `e2157c7d...9062`. Detailed identities, limits, and workflow guardrails are in `logs/wakeup-data-preview-20261101/README.md`.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

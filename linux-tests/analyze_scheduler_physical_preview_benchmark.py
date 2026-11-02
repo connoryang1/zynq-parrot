@@ -27,6 +27,7 @@ TIMING_MODES = {
     "wake-data": 6,
     "wake-early-data": 1,
 }
+LEAD_CYCLES = re.compile(r"PHYSICAL_BENCH_CONFIG[^\n]* lead_cycles=(\d+)")
 
 
 def percentile(values, fraction):
@@ -100,6 +101,10 @@ def main():
     lines = int(configs[0][2])
     timing = configs[0][3]
     mode = int(configs[0][4])
+    lead_matches = LEAD_CYCLES.findall(text)
+    lead_cycles = int(lead_matches[0]) if lead_matches else 0
+    if len(lead_matches) > 1:
+        raise SystemExit("expected at most one preview lead-cycle marker")
     if (group > 7 or first_offset != group * 256 or lines not in range(1, 5)
             or mode != TIMING_MODES[timing]):
         raise SystemExit("invalid benchmark configuration marker")
@@ -107,7 +112,9 @@ def main():
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
         rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
-    print(json.dumps(summarize(rows, group, timing, lines=lines), indent=2))
+    result = summarize(rows, group, timing, lines=lines)
+    result["lead_cycles"] = lead_cycles
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

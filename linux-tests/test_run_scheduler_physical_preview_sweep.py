@@ -90,6 +90,16 @@ class CellPlanTest(unittest.TestCase):
             " 7 wake-data target fifo persistent enabled 1; rc=$?", command
         )
 
+    def test_lead_cycles_materialize_default_line_argument(self):
+        command = benchmark_command(
+            7, "wake-early-data", "target", "fifo", "persistent",
+            "alternating", 4, 512,
+        )
+        self.assertIn(
+            " 7 wake-early-data target fifo persistent alternating 4 512; rc=$?",
+            command,
+        )
+
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))
