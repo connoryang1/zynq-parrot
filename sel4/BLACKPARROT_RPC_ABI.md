@@ -273,6 +273,12 @@ three preparation acknowledgements. `COMMIT` succeeds only after the complete
 staged image and all preparation components are valid, then publishes the
 descriptor in one architectural step.
 
+Each `PREPARE` also arbitrates for the resident integer-bank write port. It
+returns `BUSY` if an older scalar/context write still owns that port rather
+than dropping either architectural update. OpenSBI applies a bounded retry
+with an explicit pipeline-drain backoff; this transient status is contained
+inside `INSTALL` and is not exposed as a spurious seL4 bind failure.
+
 `REVOKE` compares the token most recently written to `M_DATA` before clearing
 `valid`, and refuses an active slot. Reading `M_CONTROL` returns the last
 control status. Version 2 also defines

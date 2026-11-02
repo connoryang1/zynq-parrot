@@ -70,6 +70,26 @@ bp_rpc_stage(uint32_t slot, bp_rpc_descriptor_field_t field, uint64_t value)
         bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, slot));
 }
 
+static bp_rpc_control_status_t
+bp_rpc_prepare(uint32_t slot, bp_rpc_prepare_component_t component)
+{
+    bp_rpc_control_status_t status = BP_RPC_CONTROL_BUSY;
+
+    /* PREPARE owns the resident register bank's single physical write port.
+     * A preceding M-mode instruction may still be writing back when the
+     * control CSR first reaches the system pipe. Hardware reports BUSY rather
+     * than dropping that write; a fixed backoff drains the short in-order
+     * pipeline before a bounded retry. */
+    for (unsigned int attempt = 0; attempt < 8; attempt++) {
+        status = bp_rpc_control(bp_rpc_prepare_word(component, slot));
+        if (status != BP_RPC_CONTROL_BUSY)
+            break;
+        __asm__ volatile("nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop"
+                         : : : "memory");
+    }
+    return status;
+}
+
 static int
 bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
                uint64_t *token, bp_rpc_control_status_t *status)
@@ -140,8 +160,8 @@ bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
 
     for (unsigned int component = 0;
          component < BP_RPC_PREPARE_COMPONENTS; component++) {
-        control_status = bp_rpc_control(bp_rpc_prepare_word(
-            (bp_rpc_prepare_component_t)component, descriptor.slot));
+        control_status = bp_rpc_prepare(
+            descriptor.slot, (bp_rpc_prepare_component_t)component);
         if (control_status != BP_RPC_CONTROL_OK)
             goto control_failure;
     }
