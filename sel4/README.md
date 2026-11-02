@@ -452,6 +452,10 @@ core, host, and exit markers in
 [`results/sel4test-rpc-lifecycle-fpga.log`](results/sel4test-rpc-lifecycle-fpga.log).
 The wrapper's duplicated live-plus-saved output is retained separately under
 `logs/sel4-rpc-lifecycle-20261102/` and is intentionally rejected as evidence.
+The exact full-system simulator independently reaches the region guard and
+complete revoke/stale-token/rebind marker, then hits its four-hour trace limit
+before the timing loops; it is partial lifecycle evidence, not a simulation
+performance or suite-pass claim.
 
 The initial component image hung because the separately compiled stripped
 server did not include seL4's generated platform configuration and emitted
