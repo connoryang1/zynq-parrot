@@ -15,12 +15,10 @@ def write_run(root, corrupt_counter=False):
         "TAGGED_REPLAY_CONFIG mode=data lines=32 slot=2 delay=0 gap=2 "
         "policy=fifo lead_cycles=0"
     ]
-    admitted = triggers = 0
     for trial in range(512):
         enabled = (trial ^ (trial >> 1)) & 1
-        if enabled:
-            admitted += 32
-            triggers += 1
+        admitted = 32 if enabled else 0
+        triggers = enabled
         if corrupt_counter and trial == 5:
             admitted -= 1
         entry = 100 + trial % 3

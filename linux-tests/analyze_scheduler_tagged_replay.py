@@ -31,11 +31,6 @@ def percentile(values, fraction):
     return ordered[round(fraction * (len(ordered) - 1))]
 
 
-def counter_delta(current, previous, bits):
-    """Calculate a wrapping unsigned hardware-counter delta."""
-    return (current - previous) & ((1 << bits) - 1)
-
-
 def summarize_metric(rows, metric, rng, bootstrap_samples):
     """Use balanced 0,1,1,0 blocks to suppress monotonic timing drift."""
     disabled = [row[metric] for row in rows if not row["enabled"]]
@@ -137,23 +132,17 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError(f"trial {index} has inconsistent first-use timing")
         if row["wake_to_load"] > row["roundtrip"]:
             raise ValueError(f"trial {index} ends before first use")
-        if not index:
-            continue
-        previous = rows[index - 1]
-        admitted_delta = counter_delta(row["admitted"], previous["admitted"], 16)
-        filtered_delta = counter_delta(row["filtered"], previous["filtered"], 16)
-        trigger_delta = counter_delta(row["triggers"], previous["triggers"], 8)
-        dropped_delta = counter_delta(row["dropped"], previous["dropped"], 8)
-        expected = row["enabled"]
-        if trigger_delta != expected or dropped_delta != 0:
-            raise ValueError(f"trial {index} has invalid trigger/drop counter delta")
-        if expected:
-            if admitted_delta + filtered_delta != config["lines"]:
+        # PR_BP_PREVIEW_REPLAY_CONFIG sets the hardware clear bit before every
+        # trial, so these are independent snapshots rather than deltas.
+        if row["triggers"] != row["enabled"] or row["dropped"] != 0:
+            raise ValueError(f"trial {index} has invalid trigger/drop counters")
+        if row["enabled"]:
+            if row["admitted"] + row["filtered"] != config["lines"]:
                 raise ValueError(f"trial {index} did not complete all replay entries")
-            admitted += admitted_delta
-            filtered += filtered_delta
-            accepted_triggers += trigger_delta
-        elif admitted_delta or filtered_delta:
+            admitted += row["admitted"]
+            filtered += row["filtered"]
+            accepted_triggers += row["triggers"]
+        elif row["admitted"] or row["filtered"]:
             raise ValueError(f"disabled trial {index} changed replay counters")
 
     rng = random.Random(0x7A66ED)
