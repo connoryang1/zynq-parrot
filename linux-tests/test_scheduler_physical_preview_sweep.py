@@ -39,7 +39,7 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
         mode = 1 if trial % 4 in (1, 2) else 0
         entry = 100 + mode
         load = 300 - saved_load_cycles * mode
-        hooks = (1 if arm == "accepted-drop" else
+        hooks = (1 if arm in ("accepted-drop", "joint-data-only") else
                  0 if timing in ("trigger", "wake-trigger") else mode)
         hooks += 1 if extra_enabled_hook and mode and trial == 1 else 0
         post_load = 20
@@ -133,6 +133,24 @@ class SweepAnalyzerTest(unittest.TestCase):
             4.0,
         )
 
+    def test_single_cell_analyzer_compares_joint_against_data_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "joint-data-only.log"
+            path.write_text(transcript(
+                group=7, timing="wake-early-data", arm="joint-data-only",
+                hook_timing=True, added_hook_cycles=5,
+            ))
+            output = io.StringIO()
+            with mock.patch.object(sys, "argv", ["analyze", str(path)]):
+                with contextlib.redirect_stdout(output):
+                    main()
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["comparison"], "data-only-vs-joint")
+        self.assertEqual(
+            result["metrics"]["hook_cycles"]["paired_median_saved_cycles"],
+            -5.0,
+        )
+
     def test_single_cell_analyzer_accepts_counter_mode(self):
         self.assertEqual(TIMING_MODES["counter"], 4)
 
@@ -143,6 +161,7 @@ class SweepAnalyzerTest(unittest.TestCase):
         self.assertEqual(TIMING_MODES["wake-trigger"], 6)
         self.assertEqual(TIMING_MODES["wake-data"], 6)
         self.assertEqual(TIMING_MODES["wake-early-data"], 1)
+        self.assertEqual(TIMING_MODES["wake-early-data-only"], 8)
 
     def test_wakeup_early_data_matrix_requires_counted_hooks(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -59,6 +59,7 @@ enum arm_mode {
 	arm_disabled,
 	arm_enabled,
 	arm_accepted_drop,
+	arm_joint_data_only,
 };
 
 struct sample {
@@ -146,7 +147,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = mode_for(trial, arm);
 		unsigned preview_mode = arm == arm_accepted_drop
-			? (enabled ? enable_mode : 7) : (enabled ? enable_mode : 0);
+			? (enabled ? enable_mode : 7)
+			: arm == arm_joint_data_only
+			? (enabled ? enable_mode : 8)
+			: (enabled ? enable_mode : 0);
 		unsigned long before_hook, after_hook;
 		struct rusage before_usage, after_usage;
 		uint64_t checksum = 0, entry, after_load;
@@ -226,7 +230,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 					 || voluntary != 1 || involuntary != 0))
 			|| (!uncounted_mode(enable_mode, wake_data)
 			    && samples[trial].hooks
-			       != (arm == arm_accepted_drop ? 1U : enabled))) {
+			       != (arm == arm_accepted_drop
+				   || arm == arm_joint_data_only ? 1U : enabled))) {
 			fprintf(stderr,
 				"PHYSICAL_BENCH_RETRY trial=%u enabled=%u mode=%u before=%lu after=%lu delta=%u voluntary=%ld involuntary=%ld\n",
 				trial, enabled, preview_mode, before_hook, after_hook,
@@ -268,7 +273,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 10) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled|accepted-drop] [active-lines-1..4] [lead-cycles-0..1000000] [no-hook-timing|hook-timing]\n",
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop|wake-early-data-only] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled|accepted-drop|joint-data-only] [active-lines-1..4] [lead-cycles-0..1000000] [no-hook-timing|hook-timing]\n",
 			argv[0]);
 		return 2;
 	}
@@ -298,6 +303,8 @@ int main(int argc, char **argv)
 			enable_mode = 1, wake_data = 1;
 		else if (!strcmp(argv[2], "wake-early-drop"))
 			enable_mode = 7, wake_data = 1;
+		else if (!strcmp(argv[2], "wake-early-data-only"))
+			enable_mode = 8, wake_data = 1;
 		else {
 			fprintf(stderr, "invalid preview timing: %s\n", argv[2]);
 			return 2;
@@ -334,6 +341,8 @@ int main(int argc, char **argv)
 			arm = arm_enabled;
 		else if (!strcmp(argv[6], "accepted-drop"))
 			arm = arm_accepted_drop;
+		else if (!strcmp(argv[6], "joint-data-only"))
+			arm = arm_joint_data_only;
 		else if (strcmp(argv[6], "alternating")) {
 			fprintf(stderr, "invalid trial arm: %s\n", argv[6]);
 			return 2;
@@ -367,14 +376,16 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	if (arm == arm_accepted_drop && (!wake_data || enable_mode != 1)) {
+	if ((arm == arm_accepted_drop || arm == arm_joint_data_only)
+	    && (!wake_data || enable_mode != 1)) {
 		fprintf(stderr,
-			"accepted-drop requires wake-early-data timing\n");
+			"comparison arm requires wake-early-data timing\n");
 		return 2;
 	}
 	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s lead_cycles=%lu hook_timing=%u\n",
 	       group, group * max_lines * line_bytes, active_lines,
 	       wake_data && enable_mode == 7 ? "wake-early-drop" :
+	       wake_data && enable_mode == 8 ? "wake-early-data-only" :
 	       wake_data && enable_mode == 1 ? "wake-early-data" :
 	       enable_mode == 1 ? "early" :
 	       enable_mode == 2 ? "late" :
@@ -386,7 +397,8 @@ int main(int argc, char **argv)
 	       isolate_replay ? "isolated" : "persistent",
 	       arm == arm_disabled ? "disabled" :
 	       arm == arm_enabled ? "enabled" :
-	       arm == arm_accepted_drop ? "accepted-drop" : "alternating",
+	       arm == arm_accepted_drop ? "accepted-drop" :
+	       arm == arm_joint_data_only ? "joint-data-only" : "alternating",
 	       lead_cycles, measure_hook);
 
 	if (fifo) {

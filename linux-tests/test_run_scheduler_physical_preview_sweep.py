@@ -92,6 +92,17 @@ class CellPlanTest(unittest.TestCase):
             command,
         )
 
+    def test_joint_data_only_arm_materializes_all_positional_arguments(self):
+        command = benchmark_command(
+            7, "wake-early-data", "target", "fifo", "persistent",
+            "joint-data-only", 4, 0, True,
+        )
+        self.assertIn(
+            " 7 wake-early-data target fifo persistent joint-data-only 4 0 "
+            "hook-timing; rc=$?",
+            command,
+        )
+
     def test_nondefault_line_count_materializes_all_arguments(self):
         command = benchmark_command(
             7, "wake-data", "target", "fifo", "persistent", "enabled", 1
@@ -228,6 +239,21 @@ class CellPlanTest(unittest.TestCase):
         )
         self.assertIn(
             " 7 wake-early-drop target fifo persistent enabled; rc=$?",
+            command,
+        )
+
+    def test_wake_early_data_only_uses_one_cell_per_group(self):
+        self.assertEqual(
+            selected_cells(0, "wake-early-data-only"),
+            [(group, "wake-early-data-only") for group in range(8)],
+        )
+        command = benchmark_command(
+            7, "wake-early-data-only", "target", "fifo", "persistent",
+            "alternating", 4, 0, True,
+        )
+        self.assertIn(
+            " 7 wake-early-data-only target fifo persistent alternating 4 0 "
+            "hook-timing; rc=$?",
             command,
         )
 

@@ -1,0 +1,60 @@
+This patch adds a successful-wakeup data-only preview mode. Mode eight issues
+the registered physical hints and counts the hook like joint mode one, but it
+omits instruction replay so its fixed cost and Linux effect can be isolated.
+
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -172,7 +172,8 @@
+ 	unsigned long paddr0, paddr1, paddr2, paddr3;
+ 
+ 	if ((READ_ONCE(task->thread.bp_preview_phys_mode) != 1
+-	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 7)
++	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 7
++	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 8)
+ 	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
+ 	    || !task->mm)
+ 		return;
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,7 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 off; 1 wake joint; 2 select joint; 3--6 controls; 7 wake PMA-drop. */
++/* 0 off; 1 wake joint; 2 select joint; 3--7 controls; 8 wake data only. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ /* Last successful-wakeup preview-hook duration in global BP cycles. */
+ #define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4364,7 +4364,8 @@
+ 		if (bp_preview_mode == 1 || bp_preview_mode == 6
+ 		    || bp_preview_mode == 7)
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+-		if (bp_preview_mode == 1 || bp_preview_mode == 7)
++		if (bp_preview_mode == 1 || bp_preview_mode == 7
++		    || bp_preview_mode == 8)
+ 			riscv_bp_preview_wakeup(p);
+ 		asm volatile("csrr %0, 0xcc0" : "=r"(bp_preview_end)
+ 			     : : "memory");
+@@ -6703,7 +6704,8 @@
+ 		if (bp_preview_mode && bp_preview_mode != 4
+ 		    && bp_preview_mode != 6
+ 		    && bp_preview_mode != 1
+-		    && bp_preview_mode != 7) {
++		    && bp_preview_mode != 7
++		    && bp_preview_mode != 8) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 7 || arg3 || arg4 || arg5) {
++		if (arg2 > 8 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}

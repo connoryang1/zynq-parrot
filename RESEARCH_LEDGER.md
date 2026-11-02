@@ -1066,6 +1066,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** the next control should remove instruction trigger `0x5c0` while retaining successful-wakeup data hints; instruction-only replay was neutral and currently contributes to the fixed joint path. Longer term, the evidence favors one context-tag command plus hardware-resident footprint and an independently scheduled/throttled replay lane over serialized per-line CSR issue.
 - **Evidence:** exact `group7-hook-*` logs/status/analyses are under `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261101/`; the minimal timing bundle is `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/hook-timing-minimal.tar.xz` (SHA-256 `65df3050...3026`). One init-stage timeout is retained and excluded.
 
+### RL-113 — Removing instruction replay does not improve early data preview
+
+- **Status:** accepted same-image FPGA/Linux negative control
+- **Design:** mode eight issues the same successful-wakeup real physical hints and hook accounting as mode one but omits CSR `0x5c0`. A direct `[data-only,joint,joint,data-only]` arm keeps all four accepted data hints identical and toggles only instruction replay.
+- **Result:** data-only versus disabled saves 22.5 local-load cycles `[14.5,31]` and has unresolved wake-to-entry. In the decisive direct arm, joint versus data-only changes local loads by exactly 0 `[-1.5,2]`, wake-to-entry is unresolved at a harmful 31.5-cycle point, and joint is 9.25 hook cycles faster `[9,10]`. All 512 trials pass with zero retries and final child/parent, CORE, and BSG PASS.
+- **Interpretation:** instruction replay neither creates the data benefit nor explains the wake regression. The larger absolute hook cost on the data-only kernel image is a shared mode-dispatch/code-layout effect; cross-image close-hook values cannot be attributed to the removed trigger. Same-image direct controls are required.
+- **Decision:** data-only is not a better baseline. Further lead-time, capacity, trigger-removal, and four-to-one CSR experiments are exhausted. Implement one context-tag enqueue, hardware-resident 16--32-line footprint replay, and an independently scheduled/throttled lane; keep instruction replay optional and require counters plus a larger-footprint Linux value gate.
+- **Evidence:** exact passing logs/status/analyses are under `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261101/`; the candidate bundle is `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/data-only-minimal.tar.xz` (SHA-256 `f835c389...44e0`).
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

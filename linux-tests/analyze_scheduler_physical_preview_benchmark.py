@@ -15,7 +15,7 @@ ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
 HOOK = re.compile(r"PHYSICAL_BENCH_HOOK trial=(\d+) cycles=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
                     r"lines=(\d+) "
-                    r"timing=(early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop) "
+                    r"timing=(early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop|wake-early-data-only) "
                     r"mode=(\d+)")
 METRICS = ("wake_to_entry", "load_cycles", "wake_to_load", "roundtrip")
 TIMING_MODES = {
@@ -28,10 +28,11 @@ TIMING_MODES = {
     "wake-data": 6,
     "wake-early-data": 1,
     "wake-early-drop": 7,
+    "wake-early-data-only": 8,
 }
 LEAD_CYCLES = re.compile(r"PHYSICAL_BENCH_CONFIG[^\n]* lead_cycles=(\d+)")
 ARM = re.compile(
-    r"PHYSICAL_BENCH_CONFIG[^\n]* arm=(alternating|disabled|enabled|accepted-drop)"
+    r"PHYSICAL_BENCH_CONFIG[^\n]* arm=(alternating|disabled|enabled|accepted-drop|joint-data-only)"
 )
 HOOK_TIMING = re.compile(r"PHYSICAL_BENCH_CONFIG[^\n]* hook_timing=([01])")
 
@@ -124,8 +125,9 @@ def main():
     if len(arms) != 1:
         raise SystemExit("expected exactly one benchmark arm marker")
     arm = arms[0]
-    if arm == "accepted-drop" and timing != "wake-early-data":
-        raise SystemExit("accepted-drop requires wake-early-data timing")
+    if arm in ("accepted-drop", "joint-data-only") \
+            and timing != "wake-early-data":
+        raise SystemExit("comparison arm requires wake-early-data timing")
     rows = []
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
@@ -151,11 +153,11 @@ def main():
             )
     elif hook_rows:
         raise SystemExit("hook timings present while disabled")
-    if arm == "accepted-drop":
+    if arm in ("accepted-drop", "joint-data-only"):
         for row in rows:
             if row["hooks"] != 1:
                 raise SystemExit(
-                    f"accepted-drop trial {row['trial']} had "
+                    f"comparison trial {row['trial']} had "
                     f"{row['hooks']} hooks; expected one"
                 )
         # summarize() normally validates disabled-versus-enabled hook counts.
@@ -163,17 +165,20 @@ def main():
         # addresses as the control arm and accepted addresses as the target.
         normalized = [dict(row, hooks=row["mode"]) for row in rows]
         result = summarize(normalized, group, timing, lines=lines)
-        result["comparison"] = "pma-dropped-vs-accepted"
+        result["comparison"] = (
+            "pma-dropped-vs-accepted" if arm == "accepted-drop"
+            else "data-only-vs-joint"
+        )
     else:
         result = summarize(rows, group, timing, lines=lines)
         result["comparison"] = "disabled-vs-enabled"
     if hook_timing:
         result["metrics"]["hook_cycles"] = summarize_metric(
-            normalized if arm == "accepted-drop" else rows,
+            normalized if arm in ("accepted-drop", "joint-data-only") else rows,
             "hook_cycles", random.Random(0xB51), 20000
         )
         result["metrics"]["wake_to_entry_minus_hook"] = summarize_metric(
-            normalized if arm == "accepted-drop" else rows,
+            normalized if arm in ("accepted-drop", "joint-data-only") else rows,
             "wake_to_entry_minus_hook", random.Random(0xB52), 20000
         )
     result["hook_timing"] = hook_timing

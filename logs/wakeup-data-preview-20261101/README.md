@@ -218,6 +218,42 @@ The NBF, ELF, kernel, and disassembly hashes are respectively
 `944d6a04...0dd7`. Passing logs/status/analyses use the
 `group7-hook-*` names in the existing durable FPGA directory.
 
+## Data-only wakeup control
+
+Mode eight issues the same four real physical data hints and hook accounting
+as joint mode one but omits instruction replay CSR `0x5c0`. The full kernel
+links, disassembly proves mode eight enters the physical helper without the
+instruction trigger and suppresses the selection duplicate, the exact NBF
+splice round-trips, and all host gates pass.
+
+Against disabled on its own image, data-only saves 22.5 target-load cycles
+with `[14.5,31]` and has unresolved wake-to-entry at a harmful 27.75-cycle
+point with `[-727.25,1136]` in saved-cycle convention. Its hook overhead is
+267 cycles `[266,268]`, unexpectedly larger than the 174.75-cycle joint result
+from the preceding kernel image. That cross-image difference is not causal:
+adding mode eight changed mode-dispatch branches and code layout.
+
+The decisive same-image `[data-only,joint,joint,data-only]` arm keeps the four
+accepted data hints identical and toggles only `0x5c0`. It passes 512 trials
+with zero retries and all terminal markers. Joint versus data-only changes
+target loads by exactly 0 cycles with `[-1.5,2]`, changes wake-to-entry by a
+harmful 31.5-cycle point with `[-367,715.5]` in saved convention, and is 9.25
+cycles faster inside the hook with `[9,10]`. Instruction replay therefore
+does not explain the local gain, synchronous cost, or the earlier total wake
+regression. Data-only is not a demonstrated better baseline.
+
+This also establishes a measurement guardrail: absolute close-hook costs from
+different kernel images cannot be attributed to a single source feature when
+the compiler changes the shared mode-dispatch path. Prefer a same-image direct
+arm whenever a control mode can coexist with the candidate.
+
+The exact data-only NBF, direct-comparison ELF/transfer, build log,
+disassembly, and hash manifest are archived at
+`/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/data-only-minimal.tar.xz`
+(SHA-256 `f835c38960218b8ba4fb051aa68eee89b9f777e6c70b92997c2e1c38270644e0`).
+Passing evidence is `group7-hook-data-only-vs-disabled-fifo.*` and
+`group7-hook-joint-vs-data-only-fifo.*` in the durable FPGA directory.
+
 Exact passing logs, statuses, and analyses are
 `group7-mode7-pma-drop-fifo.*`,
 `group7-mode1-accepted-same-image-fifo.*`, and
@@ -279,14 +315,14 @@ performance estimates.
 
 ## Next discriminator
 
-Do not spend another experiment on more lead time, more L2 capacity, or a
-four-to-one CSR batch alone. Close timing now resolves about 127 cycles of
-common hook work and 64 additional accepted-request cycles, while extra hints
-two through four account for only about 39 cycles. The next bounded control is
-successful-wakeup **data only**: keep real physical hints and hook accounting
-but omit instruction trigger CSR `0x5c0`. Instruction-only replay was neutral
-in RL-079, and the current joint mode includes it in the dominant fixed cost.
-If data-only materially reduces the hook and total wake penalty while retaining
-the local gain, it becomes the implementation baseline. Otherwise move to one
-context-tag command, a hardware-resident 16--32-line footprint, and a
-separately throttled lane with issued/completed/consumed/late/drop counters.
+Do not spend another experiment on more lead time, more L2 capacity,
+instruction-trigger removal, or a four-to-one CSR batch alone. Data-only is
+neutral versus joint, and extra hints two through four account for only about
+39 hook cycles. The next implementation should replace the scheduler's
+per-line metadata walk with one stable context-tag command, enqueue it through
+a nonblocking command FIFO, and let a separately throttled lane replay a
+hardware-resident 16--32-line footprint. Keep instruction replay independently
+optional. Acceptance requires one-cycle-or-better architectural enqueue,
+unchanged switch-only/cold-I controls, issued/completed/consumed/late/drop
+counters, and a larger-footprint Linux arm whose local savings exceed command
+overhead before claiming end-to-end value.
