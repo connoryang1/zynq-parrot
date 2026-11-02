@@ -109,13 +109,13 @@ optional bitstream identities, and fails closed on missing guest/host markers.
 
 The patch applies and reverses fuzz-free after the maintained `0001`--`0016`
 stack. The exact GCC 13.2 configuration compiles the affected objects and links
-a complete 21 MiB `vmlinux`; all 148 current Linux host tests pass, and the dynamic
+a complete 21 MiB `vmlinux`; all 149 current Linux host tests pass, and the dynamic
 benchmark cross-compiles. The linked kernel SHA-256 is
 `300d72e9ad7826bae471ebd3109c99c2c78bc1ca7ec10ffb1bb05668338d6d2d`;
 the benchmark SHA-256 is
-`eb124c22d5146d9927e4418c868eb5da9591991d8c03136762f797a4b55e6ecc`.
+`6ba17304324bc72a4f389e1b2fe33245729dde7b2fee190c4a1da4690ee6071c`.
 The generated 246-command guest transfer has SHA-256
-`a64a9d177f6664f55b9cea9c57abf7e2cd6898b4b2201b5003670bdc34510abf`;
+`81e988f1a45a6e5456dbabeafb163f61a476d8fc67af6ee6cab67661d1cd5409`;
 its longest command is 137 characters, below the runner's fail-closed 768-byte
 limit. The paired analyzer requires exactly 256 enabled and 256 disabled rows,
 all 256 triggers and 8,192 entries accounted for, zero drops, coherent timing
@@ -154,6 +154,30 @@ A direct root-level `python3 -m unittest linux-tests/test_*.py` probe could not
 import sibling analyzer modules because `linux-tests` was not on `sys.path`.
 The maintained `discover -s linux-tests` form is the required invocation; its
 complete repeat passed all 148 tests, so the failed import is not a code result.
+
+The first shell benchmark launch exposed Linux's default periodic real-time
+bandwidth throttle after both processes entered equal-priority FIFO policy.
+That transcript is diagnostic only: the runner now sets and verifies
+`sched_rt_runtime_us=-1` for FIFO runs before timing, records the value in its
+status, and the analyzer rejects FIFO evidence without that binding. Normal
+scheduling runs leave the sysctl untouched. The preceding auto-shutdown NBF
+launch also reached clean Linux, CORE, and BSG PASS but never exposed a shell;
+it is boot evidence only, not a benchmark attempt. The maintained shell-NBF
+helper changes only bootargs and produced SHA-256 `08628c15185f4e99df9d8b19b0af6f24990d89e06fd4f1e9f50e2e2853056892`.
+A first redaction-display probe for the local power-controller fallback had a
+shell-quoting error and made no request; a safely redacted repeat identified the
+existing helper, after which maintained power-cycle and 90-second readiness
+gates passed without logging the credential.
+
+The first physical shell launch is rejected before measurement. After exact
+ELF verification and benchmark start, the initial tagged replay remained busy
+through 1,048,576 status polls; process release independently hit the same
+hardware-drain timeout and emitted the expected kernel warnings. No timing rows
+were produced. The next diagnostic prints the complete raw replay status at the
+userspace timeout so busy, queue, held-entry, next-index, and counter fields can
+localize the board-only stall before any RTL change. The diagnostic-only first
+ELF/transfer hashes remain preserved in its runner status as `eb124c22…6ecc` /
+`a64a9d17…abf`; they are not the current diagnostic collateral.
 
 This candidate has a linked Linux image but no boot or performance result yet.
 Exact job `20261102T075856Z-6e4ceb88` routes top `6e4ceb88` / BlackParrot

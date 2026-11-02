@@ -15,6 +15,10 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc",
         )
 
+    def test_fifo_disables_periodic_rt_throttling(self):
+        self.assertIn("sched_rt_runtime_us", runner.rt_setup_command("fifo"))
+        self.assertIsNone(runner.rt_setup_command("normal"))
+
     def test_delay_range_is_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

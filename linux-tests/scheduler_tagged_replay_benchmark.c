@@ -182,8 +182,12 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				if (!(replay_status & 0xf))
 					break;
 			} while (--timeout);
-			if (!timeout)
+			if (!timeout) {
+				fprintf(stderr,
+					"TAGGED_REPLAY_DRAIN_TIMEOUT trial=%u enabled=%u status=0x%016lx\n",
+					trial, enabled, replay_status);
 				fail("tagged replay drain timeout");
+			}
 			samples[trial].accepted_entries = (replay_status >> 10) & 0xffff;
 			samples[trial].filtered_entries = (replay_status >> 26) & 0xffff;
 			samples[trial].accepted_triggers = (replay_status >> 42) & 0xff;

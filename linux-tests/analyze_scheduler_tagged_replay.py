@@ -95,6 +95,12 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError(
                 f"status {key}={status.get(key)!r}, expected {config[key]!r}"
             )
+    expected_rt_runtime = -1 if policy == "fifo" else None
+    if status.get("rt_runtime_us") != expected_rt_runtime:
+        raise ValueError(
+            f"status rt_runtime_us={status.get('rt_runtime_us')!r}, "
+            f"expected {expected_rt_runtime!r}"
+        )
 
     required = ("TAGGED_REPLAY_CHILD PASS", "TAGGED_REPLAY_PARENT PASS", "BSG PASS")
     for marker in required:

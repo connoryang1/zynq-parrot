@@ -17,6 +17,7 @@ DEFAULT_CONTROL_SHA = "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754
 GUEST_ELF = "/tmp/scheduler_tagged_replay_benchmark_dynamic"
 SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 MAX_GUEST_COMMAND_LENGTH = 768
+RT_RUNTIME_PATH = "/proc/sys/kernel/sched_rt_runtime_us"
 
 
 def sha256(path):
@@ -27,6 +28,16 @@ def benchmark_command(mode, delay, gap, policy, lead_cycles):
     return (
         f"{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
+    )
+
+
+def rt_setup_command(policy):
+    """Remove periodic Linux RT throttling only for the FIFO best-case arm."""
+    if policy != "fifo":
+        return None
+    return (
+        f"echo -1 > {RT_RUNTIME_PATH}; value=$(/bin/cat {RT_RUNTIME_PATH}); "
+        "echo TAGGED_REPLAY_RT_RUNTIME value=$value"
     )
 
 
@@ -100,6 +111,7 @@ def run(args):
         "gap": args.gap,
         "policy": args.policy,
         "lead_cycles": args.lead_cycles,
+        "rt_runtime_us": -1 if args.policy == "fifo" else None,
         "command": command,
     }
     child = None
@@ -121,6 +133,11 @@ def run(args):
             child.sendline(f"/bin/busybox sha256sum {GUEST_ELF}")
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
             child.expect(SHELL_PROMPT)
+            rt_command = rt_setup_command(args.policy)
+            if rt_command is not None:
+                child.sendline(rt_command)
+                child.expect_exact("TAGGED_REPLAY_RT_RUNTIME value=-1")
+                child.expect(SHELL_PROMPT)
             child.sendline(command)
             child.expect(re.compile(r"TAGGED_REPLAY_EXIT rc=([0-9]+)\r*\n"),
                          timeout=1800)

@@ -49,6 +49,7 @@ def write_run(root, corrupt_counter=False):
         "gap": 2,
         "policy": "fifo",
         "lead_cycles": 0,
+        "rt_runtime_us": -1,
     }
     path.with_suffix(".log.status.json").write_text(json.dumps(status) + "\n")
     return path
