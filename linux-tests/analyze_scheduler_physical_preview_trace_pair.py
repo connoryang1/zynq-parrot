@@ -31,8 +31,8 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_trace(path, expected_preview):
-    """Validate one bounded trace and locate its four target demand misses."""
+def load_trace(path, expected_preview, expected_demand_count=4):
+    """Validate one bounded trace and locate the required target misses."""
     text = path.read_text(errors="replace").replace("\r", "")
     status_path = path.with_suffix(path.suffix + ".status.json")
     if not status_path.is_file():
@@ -89,9 +89,17 @@ def load_trace(path, expected_preview):
         and header["entry"] <= record["cycle"] <= header["after_load"]
         and (record["paddr"] & 0xfff) in target_offsets
     ]
-    if len(demand) != 4 or tuple(
-            record["paddr"] & 0xfff for record in demand) != target_offsets:
-        raise ValueError(f"{path}: missing ordered target demand misses")
+    demand_offsets = tuple(record["paddr"] & 0xfff for record in demand)
+    if not 0 <= expected_demand_count <= 4:
+        raise ValueError("expected demand count must be in 0..4")
+    if len(demand) != expected_demand_count or any(
+            demand_offsets[index] >= demand_offsets[index + 1]
+            for index in range(len(demand_offsets) - 1)) or any(
+                offset not in target_offsets for offset in demand_offsets):
+        raise ValueError(
+            f"{path}: expected {expected_demand_count} ordered target "
+            "demand misses"
+        )
     target_addresses = {record["paddr"] for record in demand}
     earlier = [
         record for record in records
@@ -118,14 +126,19 @@ def load_trace(path, expected_preview):
             }
             for record in demand
         ],
-        "target_records_before_entry": len(earlier),
+        "target_demand_miss_count": len(demand),
+        "target_records_before_entry": (
+            len(earlier) if target_addresses else None
+        ),
     }
 
 
-def compare(disabled_path, enabled_path):
+def compare(disabled_path, enabled_path, enabled_demand_count=4):
     """Validate an exact pair and summarize demand timing."""
-    disabled = load_trace(disabled_path, "disabled")
-    enabled = load_trace(enabled_path, "wake-early-data")
+    disabled = load_trace(disabled_path, "disabled", 4)
+    enabled = load_trace(
+        enabled_path, "wake-early-data", enabled_demand_count
+    )
     if disabled["identity"] != enabled["identity"]:
         raise ValueError("trace identities differ")
     return {
@@ -143,7 +156,9 @@ def compare(disabled_path, enabled_path):
         "interpretation_limit": (
             "The recorder reports architectural cache-miss events, not detached "
             "hint issue or completion directly. A target demand record can join "
-            "an already outstanding hint."
+            "an already outstanding hint. If no enabled target demand remains, "
+            "that boot's target physical addresses cannot be recovered from "
+            "this trace alone."
         ),
     }
 
@@ -152,9 +167,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--disabled", required=True, type=Path)
     parser.add_argument("--enabled", required=True, type=Path)
+    parser.add_argument(
+        "--enabled-demand-count", type=int, default=4,
+        choices=range(5),
+        help="required enabled target demand misses; default preserves the "
+             "accepted late-hint chronology gate",
+    )
     args = parser.parse_args(argv)
     try:
-        result = compare(args.disabled, args.enabled)
+        result = compare(
+            args.disabled, args.enabled, args.enabled_demand_count
+        )
     except (OSError, ValueError, json.JSONDecodeError) as error:
         raise SystemExit(str(error)) from error
     print(json.dumps(result, indent=2))

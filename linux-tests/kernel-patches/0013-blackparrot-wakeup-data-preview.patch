@@ -1,0 +1,100 @@
+This patch moves mode-one physical data preview from scheduler selection to a
+successful task wakeup. It keeps mode two as a same-image selection-time
+control, suppresses the duplicate selection trigger for mode one, and launches
+the existing instruction prefix immediately before the four data hints.
+
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -103,7 +103,7 @@ static __always_inline void riscv_bp_preview_next(struct task_struct *prev,
+ 	/* Pinned pages remain valid across an address-space switch. The custom
+ 	 * supervisor CSR queues an L2-only physical read without the target DTLB.
+ 	 */
+-	if (READ_ONCE(next->thread.bp_preview_phys_mode) == 1
++	if (READ_ONCE(next->thread.bp_preview_phys_mode) == 2
+ 	    && READ_ONCE(next->thread.bp_preview_phys_mm) == next->mm
+ 	    && next->mm) {
+ 		paddr0 = READ_ONCE(next->thread.bp_preview_paddr[0]);
+@@ -162,6 +162,37 @@ static __always_inline void riscv_bp_preview_next(struct task_struct *prev,
+ 		   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
+ }
+ 
++/* Mode one issues pinned physical hints after an actual wakeup, while the
++ * waker still has useful work before the target can be selected. The pinned
++ * pages remain valid without installing the target address space. Advisory
++ * queue admission is intentionally best effort, matching the selection hook.
++ */
++static __always_inline void riscv_bp_preview_wakeup(struct task_struct *task)
++{
++	unsigned long paddr0, paddr1, paddr2, paddr3;
++
++	if (READ_ONCE(task->thread.bp_preview_phys_mode) != 1
++	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
++	    || !task->mm)
++		return;
++	paddr0 = READ_ONCE(task->thread.bp_preview_paddr[0]);
++	paddr1 = READ_ONCE(task->thread.bp_preview_paddr[1]);
++	paddr2 = READ_ONCE(task->thread.bp_preview_paddr[2]);
++	paddr3 = READ_ONCE(task->thread.bp_preview_paddr[3]);
++	if (!(paddr0 | paddr1 | paddr2 | paddr3))
++		return;
++	if (paddr0)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr0) : "memory");
++	if (paddr1)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr1) : "memory");
++	if (paddr2)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr2) : "memory");
++	if (paddr3)
++		asm volatile("csrw 0x9c0, %0" : : "r"(paddr3) : "memory");
++	WRITE_ONCE(task->thread.bp_preview_hook_count,
++		   READ_ONCE(task->thread.bp_preview_hook_count) + 1);
++}
++
+ /* Mode two deliberately issues after MM/FPU/vector switch preparation and
+  * immediately before the architectural register/stack switch. This retains
+  * enough memory lead while minimizing tiny-L2 displacement before first use. */
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,7 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 off; 1/2 data; 3 instruction; 4 counter; 5 select; 6 wake replay. */
++/* 0 off; 1 wake joint; 2 select joint; 3--5 controls; 6 wake/late. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4350,10 +4350,18 @@ out:
+ 		ttwu_stat(p, task_cpu(p), wake_flags);
+ 
+ #ifdef CONFIG_RISCV
+-	/* Mode six launches only after a real wakeup. Unlike selection-time mode
+-	 * five, this can overlap replay with the waker's remaining kernel work. */
+-	if (success && READ_ONCE(p->thread.bp_preview_phys_mode) == 6)
+-		asm volatile("csrw 0x5c0, zero" ::: "memory");
++	if (success) {
++		unsigned char bp_preview_mode =
++			READ_ONCE(p->thread.bp_preview_phys_mode);
++
++		/* Preserve the accepted instruction-first ordering for joint mode
++		 * one, then give its four physical hints the rest of the wake-to-run
++		 * interval. Mode six remains the wake-replay/late-data control. */
++		if (bp_preview_mode == 1 || bp_preview_mode == 6)
++			asm volatile("csrw 0x5c0, zero" ::: "memory");
++		if (bp_preview_mode == 1)
++			riscv_bp_preview_wakeup(p);
++	}
+ #endif
+ 
+ 	return success;
+@@ -6684,7 +6692,8 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+			READ_ONCE(next->thread.bp_preview_phys_mode);
+ 
+ 		if (bp_preview_mode && bp_preview_mode != 4
+-		    && bp_preview_mode != 6) {
++		    && bp_preview_mode != 6
++		    && bp_preview_mode != 1) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count

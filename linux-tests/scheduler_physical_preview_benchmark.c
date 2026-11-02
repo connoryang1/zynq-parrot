@@ -18,10 +18,11 @@
  * early instruction trigger plus physical data hints through the late
  * pre-register-switch hook; its counted hook distinguishes the image at run
  * time without adding a new mode value that would shift replay-table symbols.
- * The wake-early-data experiment instead reuses mode one: instruction replay
- * starts at successful wakeup, then its existing physical hints issue at
- * scheduler selection. The distinct CLI name keeps it separate from the
- * historical mode-one image whose instruction replay also started at selection.
+ * The wake-early-data experiment reuses mode one. Historical binary-patched
+ * images started instruction replay at successful wakeup but retained data
+ * issue at scheduler selection; the maintained source stack now moves both to
+ * successful wakeup and suppresses both selection-time duplicates. Exact NBF
+ * identity therefore remains part of every timing claim.
  * An optional isolated replay-state executes fence.i in both arms before each
  * handoff so completed advisory lines cannot leak from an enabled trial into
  * a later disabled trial. The historical persistent state remains available

@@ -23,7 +23,7 @@ def write_trace(path, preview, mode, load_cycles, cycles):
         f"TRACE_HEADER path=pipe group=7 warmups=16 start=1000 launch=1010 "
         f"entry=1100 after_load=1200 returned=1300 wake_to_entry=90 "
         f"load_cycles={load_cycles} wake_to_load={90 + load_cycles} "
-        "i_count=0 d_count=4 i_overflow=0 d_overflow=0 armed=0 "
+        f"i_count=0 d_count={len(cycles)} i_overflow=0 d_overflow=0 armed=0 "
         "status=0x4",
     ]
     for index, (offset, cycle) in enumerate(zip(
@@ -33,7 +33,8 @@ def write_trace(path, preview, mode, load_cycles, cycles):
             f"relative={cycle - 1000} message=0x0 "
             f"paddr=0x080000{offset:03x} raw=0x0"
         )
-    lines.extend(("TRACE_PASS records=4 elapsed=200", "CORE PASS", "BSG PASS"))
+    lines.extend((f"TRACE_PASS records={len(cycles)} elapsed=200",
+                  "CORE PASS", "BSG PASS"))
     path.write_text("\n".join(lines) + "\n")
     status = {
         "status": "PASS",
@@ -67,6 +68,24 @@ class TracePairTest(unittest.TestCase):
             [20, 45, 70, 95],
         )
         self.assertEqual(result["enabled"]["target_records_before_entry"], 0)
+
+    def test_candidate_can_require_completed_target_lines(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            disabled = root / "disabled.log"
+            enabled = root / "enabled.log"
+            write_trace(disabled, "disabled", 0, 215,
+                        (1110, 1140, 1170, 1190))
+            write_trace(enabled, "wake-early-data", 1, 12, ())
+            result = compare(disabled, enabled, enabled_demand_count=0)
+            self.assertEqual(
+                result["enabled"]["target_demand_miss_count"], 0
+            )
+            self.assertIsNone(
+                result["enabled"]["target_records_before_entry"]
+            )
+            with self.assertRaisesRegex(ValueError, "expected 4"):
+                compare(disabled, enabled)
 
 
 if __name__ == "__main__":
