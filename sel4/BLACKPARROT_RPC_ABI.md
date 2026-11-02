@@ -190,9 +190,11 @@ Each returns the caller exactly once with zero reply words and `SERVER_FAULT`;
 the adapter tests forbid software fallback for the faulting request, and a
 hardware retry reports `REVOKED` without changing the counter. Privileged
 tests cover `FAULTED` query, token-checked fault-record access, and revoke.
-Fresh-token reinstall after fault and a fault racing revocation remain required.
-A seL4 fault-endpoint test is additionally required before making any claim of
-ordinary seL4 fault-delivery equivalence.
+They also revoke the faulted generation, reinstall the same pair under a fresh
+token, reject the old token, and prove that the new generation has no readable
+fault record. A fault racing revocation remains required. A seL4 fault-endpoint
+test is additionally required before making any claim of ordinary seL4
+fault-delivery equivalence.
 
 The durable design makes the binding a kernel object/capability derived from
 authority over the endpoint and both TCBs. Its finalization invokes synchronous

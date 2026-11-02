@@ -404,8 +404,10 @@ opt-in synthetic return for an illegal instruction in full-core simulation,
 including terminal outcome, zero reply, one visible pre-fault effect, rejected
 retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4.
 The privileged controller also retains token-checked cause/PC/`tval` and
-rejects wrong-token or non-faulted reads. It does not close the remaining fault
-race/reinstall gates, OpenSBI exposure, or fault-endpoint semantics. Directed
+rejects wrong-token or non-faulted reads. Revoke and fresh-token reinstall prove
+that quarantine and fault metadata do not leak into the next generation. It
+does not close the remaining fault/revoke race, OpenSBI exposure, or
+fault-endpoint semantics. Directed
 full-core tests now cover illegal-instruction and instruction/load/store page
 faults with causes 2/12/13/15 and exact PC/`tval`.
 

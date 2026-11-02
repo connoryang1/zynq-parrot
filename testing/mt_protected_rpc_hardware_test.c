@@ -106,12 +106,13 @@ static uint64_t rpc_fault_read(uint64_t token,
   return value;
 }
 
-static uint64_t rpc_install_descriptor(uint64_t caller_satp,
+static uint64_t rpc_install_descriptor(uint64_t token,
+                                       uint64_t caller_satp,
                                        uint64_t server_satp,
                                        uint64_t server_entry)
 {
   uint64_t status = 0;
-  status |= rpc_stage(BP_RPC_FIELD_TOKEN, 1);
+  status |= rpc_stage(BP_RPC_FIELD_TOKEN, token);
   status |= rpc_stage(BP_RPC_FIELD_CALLER_SATP, caller_satp);
   status |= rpc_stage(BP_RPC_FIELD_SERVER_SATP, server_satp);
   status |= rpc_stage(BP_RPC_FIELD_SERVER_ENTRY, server_entry);
@@ -376,6 +377,25 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   rpc_data_write(1);
   const uint64_t revoke = rpc_control(bp_rpc_control_word(
     BP_RPC_CONTROL_REVOKE, BP_RPC_FIELD_TOKEN, 0));
+  const uint64_t caller_satp =
+    SV39_MODE | (CALLER_ASID << SATP_ASID_SHIFT)
+    | (physical_address(caller_root) >> 12);
+  const uint64_t server_service_va =
+    SERVER_ENTRY_VA + physical_address(server_service)
+    - physical_address(server_entry);
+  const uint64_t reinstall = rpc_install_descriptor(
+    2, caller_satp, server_satp_value, server_service_va);
+  rpc_data_write(1);
+  const uint64_t old_query = rpc_control(bp_rpc_control_word(
+    BP_RPC_CONTROL_READ_STATUS, BP_RPC_FIELD_TOKEN, 0));
+  rpc_data_write(2);
+  const uint64_t fresh_query = rpc_control(bp_rpc_control_word(
+    BP_RPC_CONTROL_READ_STATUS, BP_RPC_FIELD_TOKEN, 0));
+  uint64_t fresh_fault_status;
+  (void)rpc_fault_read(2, BP_RPC_FAULT_CAUSE, &fresh_fault_status);
+  rpc_data_write(2);
+  const uint64_t fresh_revoke = rpc_control(bp_rpc_control_word(
+    BP_RPC_CONTROL_REVOKE, BP_RPC_FIELD_TOKEN, 0));
   const int pass = shared_page[3] == 1
                    && shared_page[0] == 1
                    && query == BP_RPC_CONTROL_FAULTED
@@ -387,17 +407,27 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
                    && tval_status == BP_RPC_CONTROL_OK
                    && fault_tval == expected_fault_tval
                    && revoke == BP_RPC_CONTROL_OK
+                   && reinstall == BP_RPC_CONTROL_OK
+                   && old_query == BP_RPC_CONTROL_STALE
+                   && fresh_query == BP_RPC_CONTROL_OK
+                   && fresh_fault_status == BP_RPC_CONTROL_INVALID
+                   && fresh_revoke == BP_RPC_CONTROL_OK
                    && unexpected_mcause == 0;
   if (pass) {
     bp_print_string("[BSG-PASS] protected RPC synchronous fault completion\n");
     bp_finish(0);
   }
   bp_print_string("[BSG-FAIL] protected RPC synchronous fault completion\n");
-  bp_print_string("verdict/effects/query/revoke: ");
+  bp_print_string("verdict/effects/query/revoke/reinstall/fresh: ");
   bp_hprint_uint64(shared_page[3]);
   bp_hprint_uint64(shared_page[0]);
   bp_hprint_uint64(query);
   bp_hprint_uint64(revoke);
+  bp_hprint_uint64(reinstall);
+  bp_hprint_uint64(old_query);
+  bp_hprint_uint64(fresh_query);
+  bp_hprint_uint64(fresh_fault_status);
+  bp_hprint_uint64(fresh_revoke);
   bp_hprint_uint64(shared_page[4]);
   bp_hprint_uint64(cause);
   bp_hprint_uint64(fault_pc);
@@ -517,7 +547,8 @@ int main(void)
     __asm__ volatile("li t0, 0x5a5a\ncsrw 0x803, t0\ncsrwi 0x805, 1"
                      : : : "t0", "memory");
     const uint64_t install_status =
-      rpc_install_descriptor(caller_satp, server_satp_value, server_service_va);
+      rpc_install_descriptor(1, caller_satp, server_satp_value,
+                             server_service_va);
     if (install_status != BP_RPC_CONTROL_OK) {
       bp_print_string("[BSG-FAIL] protected RPC descriptor installation\n");
       bp_hprint_uint64(install_status);
