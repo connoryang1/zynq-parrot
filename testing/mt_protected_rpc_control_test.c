@@ -1,4 +1,4 @@
-/* Validate the machine-only version-1 protected-RPC descriptor controller. */
+/* Validate the machine-only protected-RPC descriptor controller. */
 
 #include <stdint.h>
 
@@ -177,6 +177,39 @@ int main(void)
          BP_RPC_CONTROL_STALE);
   EXPECT("revoked call is terminal",
          rpc_call_outcome(token), BP_RPC_OUTCOME_REVOKED);
+
+  EXPECT("stage descriptor for reserved config test",
+         rpc_stage_descriptor(token + 2, caller_satp, server_satp),
+         BP_RPC_CONTROL_OK);
+  EXPECT("stage reserved config bit",
+         rpc_stage(BP_RPC_FIELD_CONFIG,
+                   bp_rpc_config_word(4, 4, 0, 1) | (UINT64_C(1) << 49)),
+         BP_RPC_CONTROL_OK);
+  EXPECT("reject reserved config bit",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE0), BP_RPC_CONTROL_INVALID);
+
+  EXPECT("stage version-2 descriptor",
+         rpc_stage_descriptor(token + 3, caller_satp, server_satp),
+         BP_RPC_CONTROL_OK);
+  EXPECT("stage fault-completion config",
+         rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word_v2(4, 4, 0, 1)),
+         BP_RPC_CONTROL_OK);
+  EXPECT("prepare v2 lower GPR line",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE0), BP_RPC_CONTROL_OK);
+  EXPECT("prepare v2 upper GPR line",
+         rpc_prepare(BP_RPC_PREPARE_GPR_LINE1), BP_RPC_CONTROL_OK);
+  EXPECT("prepare v2 CSR bank",
+         rpc_prepare(BP_RPC_PREPARE_CSR), BP_RPC_CONTROL_OK);
+  EXPECT("commit version-2 descriptor",
+         rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                                         BP_RPC_FIELD_TOKEN, 0)),
+         BP_RPC_CONTROL_OK);
+  EXPECT("query version-2 token",
+         rpc_token_command(BP_RPC_CONTROL_READ_STATUS, 0, token + 3),
+         BP_RPC_CONTROL_OK);
+  EXPECT("revoke version-2 token",
+         rpc_token_command(BP_RPC_CONTROL_REVOKE, 0, token + 3),
+         BP_RPC_CONTROL_OK);
 
   bp_print_string("[BSG-PASS] atomic protected RPC descriptor control\n");
   bp_finish(0);
