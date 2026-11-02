@@ -13,6 +13,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
+#include <sys/syscall.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -175,8 +176,13 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			unsigned timeout = 1048576;
 
 			do {
-				replay_status = prctl(PR_BP_PREVIEW_REPLAY_STATUS,
-						      0UL, 0UL, 0UL, 0UL);
+				/* libc declares prctl() with an int return, which truncates
+				 * the trigger/drop counters above bit 31. Use the raw syscall
+				 * ABI so the complete 64-bit custom status reaches userspace.
+				 */
+				replay_status = syscall(SYS_prctl,
+							PR_BP_PREVIEW_REPLAY_STATUS,
+							0UL, 0UL, 0UL, 0UL);
 				if (replay_status < 0)
 					fail("read tagged replay status");
 				if (!(replay_status & 0xf))

@@ -507,6 +507,48 @@ directory. The minimal rebuild bundle is
 It contains the candidate NBF/kernel, exact build log/disassembly, both
 transfers, the direct-comparison ELF, and a per-file hash manifest.
 
+## Tagged replay overlap fix: routed and measured
+
+The overlap-liveness correction now passes the exact PYNQ-Z2 route and the
+physical Linux gate. Top `954b2179`, BlackParrot `9b10ce46d`, and subsystem
+`136d558d` route at setup WNS/TNS `+0.109/0 ns` and hold WHS/THS
+`+0.023/0 ns`, using 51,108 LUTs (96.07%), 25,194 registers, 94.5 BRAM
+tiles, and 11 DSPs. The collected package and extracted bitstream SHA-256
+values are `f5a5951698c0e172501302c01230c722912ce91f17181fb97dd25b40146e5f45`
+and `168909eecd407d296202d16961f08f2ce96652f05d3a82321f7a5fbfcedb8bd8`.
+
+After one rejected transient boot and complete board recovery, all 256 enabled
+commands drain on that exact bitstream. Each completes 32 admissions, for
+8,192 total entries, with no filters or drops and final child, parent, CORE,
+and BSG PASS. This closes the board-only first-command stall that motivated
+the overlap reproducer.
+
+The first successful runs exposed a benchmark ABI error: libc's `prctl()`
+returns `int`, so assigning it to `long` had already discarded the trigger and
+drop counters above bit 31. The final benchmark reads this custom status with
+`syscall(SYS_prctl, ...)`; ELF and transfer SHA-256 values are
+`2d36052b9ff0d8f7dcf25491e997e0b87aa5223530b90febe84a8a76a05577e3`
+and `ff4546f357bca23c6d2bcd7e4a3a85db94e73fa80caf4442890ae4e1fe6f9121`.
+All 149 discovered Linux tests pass. Equal-priority FIFO remains rejected:
+the kernel emits `RT throttling activated` even after moving initialization
+outside FIFO and adding 2 ms and 20 ms rests between timed trials. Those
+changes were reverted; only the status fix remains.
+
+The accepted normal-policy run has 512 ordered trials and exact counters. The
+32 dependent target loads save 197.25 cycles with paired 95% interval
+`[184.5,212]`, about 10.9% versus the 1,811-cycle disabled median. The same
+run loses 4,242 cycles to entry and 3,987.25 cycles to first use; the latter
+interval is `[-7033.75,-1533]` in saved-cycle convention, about an 8.3%
+regression versus the 48,138-cycle disabled median. Roundtrip's +1,366.25
+cycle point is unresolved with `[-5719.25,6277]`. The hardware therefore
+delivers a resolved local data benefit but no end-to-end Linux speedup.
+
+Exact package, ELF, transfer, rejected FIFO attempts, accepted raw transcript,
+runner status, and strict analysis are durable under
+`/home/coyang/fpga-artifacts/context-resume/tagged-replay-overlap-buffer-20261102/`.
+The accepted transcript/status/analysis SHA-256 values begin `e76b5e04`,
+`d2003a7e`, and `7c2a8a72`.
+
 ## Workflow guardrail
 
 The first object compile used a hard-linked kernel clone. Source files and the

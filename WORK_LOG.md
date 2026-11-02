@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Tagged replay reaches accepted FPGA/Linux measurement — 2026-11-02:** the demand-overlap fixes route at `+0.109 ns` WNS using 51,108 LUTs and complete all 256 enabled 32-line commands on the FPGA. A full-width status-read fix exposes 8,192 admissions/256 triggers with zero drops; the accepted normal-policy run saves 197.25 cycles in the dependent data walk but loses 3,987.25 cycles to first use, so the mechanism is live and locally useful without an end-to-end speedup (`logs/wakeup-data-preview-20261101/`, RL-116).
+
 - **Successful-wakeup data candidate compiled — 2026-11-01:** mode one now emits the instruction trigger and four pinned physical hints after a real wakeup and suppresses both selection-time duplicates, while mode two remains a same-image selection control. The maintained patch suffix applies fuzz-free, the exact Linux configuration compiles the affected object, disassembly proves trigger/data ordering, and 134 host tests pass; full image, boot, and FPGA performance remain pending (`logs/wakeup-data-preview-20261101/`, RL-109).
 
 - **Selection-time data lateness proven on FPGA — 2026-11-01:** exact disabled and mode-one hardware miss captures on the routed 16 KiB image show all four target lines still demand-miss after entry; enabled shortens the four-load chain from 215 to 183 cycles but moves no recorder-visible target event before entry. This local benefit is late/in-flight rather than completed-line residency, so the next candidate is true successful-wakeup data issue, followed by a one-command hardware batch lane if serialized CSR cost remains too high (`logs/l2-16k-linux-ab-20261101/`, RL-108).
