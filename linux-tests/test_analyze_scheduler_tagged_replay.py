@@ -49,7 +49,6 @@ def write_run(root, corrupt_counter=False):
         "gap": 2,
         "policy": "fifo",
         "lead_cycles": 0,
-        "rt_runtime_us": -1,
     }
     path.with_suffix(".log.status.json").write_text(json.dumps(status) + "\n")
     return path
@@ -80,6 +79,13 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             status["gap"] = 3
             status_path.write_text(json.dumps(status) + "\n")
             with self.assertRaisesRegex(ValueError, "status gap"):
+                analyze(path, bootstrap_samples=10)
+
+    def test_rt_throttling_marker_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory))
+            path.write_text(path.read_text() + "sched: RT throttling activated\n")
+            with self.assertRaisesRegex(ValueError, "RT throttling activated"):
                 analyze(path, bootstrap_samples=10)
 
 

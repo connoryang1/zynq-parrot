@@ -155,12 +155,13 @@ import sibling analyzer modules because `linux-tests` was not on `sys.path`.
 The maintained `discover -s linux-tests` form is the required invocation; its
 complete repeat passed all 148 tests, so the failed import is not a code result.
 
-The first shell benchmark launch exposed Linux's default periodic real-time
-bandwidth throttle after both processes entered equal-priority FIFO policy.
-That transcript is diagnostic only: the runner now sets and verifies
-`sched_rt_runtime_us=-1` for FIFO runs before timing, records the value in its
-status, and the analyzer rejects FIFO evidence without that binding. Normal
-scheduling runs leave the sysctl untouched. The preceding auto-shutdown NBF
+The first shell benchmark launch exposed Linux's periodic real-time bandwidth
+throttle while the first hardware command was already stuck. That transcript
+is diagnostic only. This small kernel does not expose
+`/proc/sys/kernel/sched_rt_runtime_us`; a fail-closed setup probe confirmed the
+absence before timing and was removed. The analyzer instead rejects any timing
+evidence containing `RT throttling activated`; a successful bounded FIFO run
+must finish without consuming the kernel's RT budget. The preceding auto-shutdown NBF
 launch also reached clean Linux, CORE, and BSG PASS but never exposed a shell;
 it is boot evidence only, not a benchmark attempt. The maintained shell-NBF
 helper changes only bootargs and produced SHA-256 `08628c15185f4e99df9d8b19b0af6f24990d89e06fd4f1e9f50e2e2853056892`.
