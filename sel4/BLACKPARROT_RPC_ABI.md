@@ -143,6 +143,51 @@ reply contract. Its bare-metal descriptor-control, protected-transition, and
 distinct-address-space library tests are mechanism evidence; they do not by
 themselves prove the seL4 kernel binding or end-to-end accelerated IPC.
 
+### Version-2 synchronous-fault completion candidate
+
+Version 1 deliberately has no server-fault continuation. A later version may
+admit synchronous server faults only with the following atomic contract; this
+section reserves behavior, not a version-1 implementation:
+
+1. Acceptance changes the slot from `LIVE` to `ACTIVE`. A precise synchronous
+   exception while the recorded server context is active changes it to
+   `FAULTED`; it must not enter a userspace-provided trap vector.
+2. Hardware discards younger work, consumes the protected continuation once,
+   restores only the recorded caller, and returns `COMMITTED_FAILED`. Earlier
+   retired server stores remain visible and are never replayed or rolled back.
+3. `a0`--`a3` are zero and cannot expose a partial reply. `a5[7:0]` is a coarse
+   failure class: 1 is `SERVER_FAULT`, 2 is `CANCELED`, and 3 is
+   `BACKEND_ERROR`; bits 63:8 are zero. The descriptor version defines this
+   encoding. Raw cause, fault PC, and fault address remain in a privileged
+   per-slot record and are never returned to the caller directly.
+4. `COMMITTED_FAILED` is terminal for that binding generation. The trusted
+   adapter reports the coarse status, clears its cached token, and never uses
+   ordinary IPC for the request. A later attempt with the old token returns
+   `REVOKED` without entering the service.
+5. `QUERY` exposes `FAULTED` to the kernel. Kernel teardown acknowledges and
+   clears the privileged fault record before a new-token `INSTALL`; object and
+   mapping references remain pinned until that acknowledgement. An omitted
+   userspace cleanup call can leak the quarantined binding but cannot restart
+   it or authorize object reuse.
+
+The minimum prototype may unwind directly in hardware and let the kernel reap
+the quarantined binding afterward. That is sufficient for at-most-once caller
+recovery, but it is not yet equivalent to normal seL4 fault-endpoint delivery.
+Claiming that equivalence requires a kernel-owned continuation that converts
+the privileged record into the server TCB's ordinary fault protocol. Blocking,
+timeouts, maskable interrupts, and asynchronous cancellation remain separate
+state transitions rather than being relabeled synchronous faults.
+
+Before this candidate can become an implemented ABI version, directed tests
+must inject illegal-instruction, instruction-page, load-page, and store-page
+faults after a visible server-side counter update. Each must return the caller
+exactly once with zero reply words and `SERVER_FAULT`; `AUTO` must not invoke
+the software handler, and a retry must report `REVOKED` without changing the
+counter. Privileged tests must cover `FAULTED` query, fault-record access
+control, acknowledgement, fresh-token reinstall, and a fault racing
+revocation. A seL4 fault-endpoint test is additionally required before making
+any claim of ordinary seL4 fault-delivery equivalence.
+
 The durable design makes the binding a kernel object/capability derived from
 authority over the endpoint and both TCBs. Its finalization invokes synchronous
 revocation;
