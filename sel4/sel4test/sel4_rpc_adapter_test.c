@@ -752,6 +752,7 @@ static int test_blackparrot_hardware_binding(env_t env)
                            &control_endpoint);
         return sel4test_get_result();
     }
+    printf("SEL4_RPC_BIND accepted\n");
 
     const protected_rpc_call_options_t hardware = {
         .route = PROTECTED_RPC_ROUTE_HARDWARE,
