@@ -150,13 +150,17 @@ effects; the trace does not uniquely assign every such cycle.
 
 A separate x86-64 follow-up isolates the C++ machinery from this RISC-V memory
 model: [context-switches PR #1](https://github.com/connoryang1/context-switches/pull/1).
-With GCC 10.5 on the available Ivy Bridge VM, a direct resume/suspend step is
-normally 13--14 invariant-TSC ticks; the coroutine-specific delta above a
+With GCC 10.5 on the available Ivy Bridge VM, expanded sampling puts a direct
+resume/suspend step at 12.74--13.01 invariant-TSC ticks; the delta above a
 no-inline manual resume is about seven ticks. The actual FIFO/symmetric-transfer
 scheduler is about 13 ticks/element slower than its hand-written hot-data
 pipeline at N=16--32. In the 1 GiB random-load test at N=16, serial/manual-
 pipeline/phased-batch/coroutine medians are 228.20/104.07/103.17/104.77
-ns/element, so memory overlap hides nearly all of that small host overhead.
+ns/element in an initially quiet window. Independent-process follow-up samples
+encountered severe VM contention; their paired median coroutine gaps were 5.22
+ns versus pipeline and 2.70 ns versus batching, but with 19--29 ns paired
+standard deviations. The host evidence therefore supports the isolated cycle
+cost, not a precise sub-five-nanosecond memory-workload ordering.
 
 These host results corroborate that C++ coroutines are low-overhead, not
 zero-overhead. They are not numerically comparable to the RISC-V simulator
