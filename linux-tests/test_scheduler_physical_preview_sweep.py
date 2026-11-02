@@ -26,11 +26,13 @@ from analyze_scheduler_physical_preview_chronology import (
 def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
                core_marker="CORE PASS", saved_load_cycles=20,
                saved_return_cycles=0, include_tail=False,
-               arm="alternating"):
+               arm="alternating", hook_timing=False,
+               added_hook_cycles=0):
     mode_value = TIMING_MODES[timing]
     lines = [
         f"PHYSICAL_BENCH_CONFIG group={group} first_offset={group * 256} "
-        f"lines=4 timing={timing} mode={mode_value} arm={arm}",
+        f"lines=4 timing={timing} mode={mode_value} arm={arm} "
+        f"hook_timing={int(hook_timing)}",
         "PHYSICAL_BENCH_CHILD PASS",
     ]
     for trial in range(trials):
@@ -52,6 +54,11 @@ def transcript(group=0, timing="late", trials=512, extra_enabled_hook=False,
             lines.append(
                 f"PHYSICAL_BENCH_TAIL trial={trial} "
                 f"child_post_load={post_load} return_handoff={return_handoff}"
+            )
+        if hook_timing:
+            lines.append(
+                f"PHYSICAL_BENCH_HOOK trial={trial} "
+                f"cycles={10 + added_hook_cycles * mode}"
             )
     lines.extend(("PHYSICAL_BENCH_PARENT PASS", core_marker, "BSG PASS"))
     return "\n".join(lines)
@@ -102,7 +109,8 @@ class SweepAnalyzerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "accepted-drop.log"
             path.write_text(transcript(
-                group=7, timing="wake-early-data", arm="accepted-drop"
+                group=7, timing="wake-early-data", arm="accepted-drop",
+                hook_timing=True, added_hook_cycles=5,
             ))
             output = io.StringIO()
             with mock.patch.object(sys, "argv", ["analyze", str(path)]):
@@ -113,6 +121,16 @@ class SweepAnalyzerTest(unittest.TestCase):
         self.assertEqual(
             result["metrics"]["load_cycles"]["paired_median_saved_cycles"],
             20.0,
+        )
+        self.assertTrue(result["hook_timing"])
+        self.assertEqual(
+            result["metrics"]["hook_cycles"]["paired_median_saved_cycles"],
+            -5.0,
+        )
+        self.assertEqual(
+            result["metrics"]["wake_to_entry_minus_hook"]
+            ["paired_median_saved_cycles"],
+            4.0,
         )
 
     def test_single_cell_analyzer_accepts_counter_mode(self):

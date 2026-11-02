@@ -1056,6 +1056,16 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** accepted downstream work demonstrably creates the small local cache benefit, but no incremental downstream wake penalty is resolved. The large userspace wake endpoint is a poor localization metric: a typical paired block spans about 23,574 cycles. The next discriminator is a close kernel cycle interval around the helper for disabled, dropped, and accepted modes, not more capacity or lead time.
 - **Evidence:** exact passing logs/status/analyses are under `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261101/`; the compact candidate bundle is `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/pma-drop-control-minimal.tar.xz` (SHA-256 `5d14cc3b...c7c6`). One pre-userspace boot timeout is explicitly retained and excluded. Detailed build provenance and workflow guardrails are in `logs/wakeup-data-preview-20261101/README.md`.
 
+### RL-112 — Close kernel timing resolves fixed and accepted-request costs
+
+- **Status:** accepted exact-image FPGA/Linux decomposition; asynchronous post-hook remainder unresolved
+- **Instrumentation:** two global-cycle reads bracket the successful-wakeup mode branch, instruction trigger, physical helper, and CSR writes; mode zero uses the same empty bracket. A read-only prctl and opt-in benchmark marker preserve historical behavior. Full kernel link, disassembly, fail-closed NBF round trip, 85 host tests, and all clean board arms pass.
+- **Four-line result:** disabled-to-accepted adds 174.75 hook cycles with `[166.25,184.5]` and saves 15 target-load cycles with `[7.75,20.5]`. Accepted versus PMA-drop attributes 64 cycles `[59,73.25]` to request acceptance and saves 22 load cycles `[15.5,28]`; PMA-drop versus disabled attributes 127 cycles `[126,127]` to common trigger/helper/four-CSR work and has zero local effect.
+- **Scaling:** one accepted line still adds 135.5 hook cycles `[132.5,155]` and provides zero local gain. Extra hints two through four therefore add only about 39 cycles total. A four-to-one CSR batch can remove only this incremental portion, not the dominant fixed cost.
+- **End to end:** the four-line instrumented arm reproduces a 596.25-cycle wake-to-entry regression `[112.5,803]`. Subtracting each trial's hook leaves a harmful 415-cycle point but an interval spanning both signs, so only the 175-cycle synchronous component is independently resolved here.
+- **Meaning:** the next control should remove instruction trigger `0x5c0` while retaining successful-wakeup data hints; instruction-only replay was neutral and currently contributes to the fixed joint path. Longer term, the evidence favors one context-tag command plus hardware-resident footprint and an independently scheduled/throttled replay lane over serialized per-line CSR issue.
+- **Evidence:** exact `group7-hook-*` logs/status/analyses are under `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261101/`; the minimal timing bundle is `/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/hook-timing-minimal.tar.xz` (SHA-256 `65df3050...3026`). One init-stage timeout is retained and excluded.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

@@ -170,6 +170,54 @@ Post-hoc trimming would not be a defensible fix; the next measurement must
 timestamp immediately around the kernel wakeup helper and remove the long
 scheduler transit from the cost endpoint.
 
+## Kernel-local hook timing
+
+Patch `0015` records global cycle CSR `0xcc0` immediately before and after the
+successful-wakeup mode branch, instruction trigger, physical helper, and CSR
+writes. Mode zero traverses the same empty bracket. A read-only prctl exposes
+the latest interval, and the benchmark emits one ordered hook record per
+accepted handoff only when explicitly requested. Disassembly proves both cycle
+reads bracket every mode-one/mode-seven return path and that the four accepted
+or constant PMA-drop writes remain inside the interval.
+
+Four clean group-seven FPGA arms decompose the cost:
+
+- PMA-dropped mode seven versus disabled changes the hook from median 29 to
+  156 cycles: 127 cycles of overhead with 95% paired interval `[126,127]`.
+  Target loads remain exactly neutral: 0 saved cycles with `[-0.5,1]`.
+- Accepted mode one versus PMA-drop raises the hook from median 156 to 222
+  cycles. Request acceptance adds 64 cycles with `[59,73.25]`, while the four
+  target loads improve by 22 cycles with `[15.5,28]`.
+- Accepted mode one versus disabled directly measures 174.75 hook cycles of
+  overhead with `[166.25,184.5]` and saves 15 load cycles with `[7.75,20.5]`.
+  Wake-to-entry regresses by 596.25 cycles with `[112.5,803]`, reproducing the
+  earlier roughly 611-cycle matrix result. Subtracting each trial's own hook
+  leaves a harmful 415-cycle point, but its interval spans from 52.75 cycles
+  beneficial to 614.75 harmful; the asynchronous/scheduler remainder is not
+  independently resolved by this one group.
+- Reducing accepted data from four lines to one lowers hook overhead only to
+  135.5 cycles with `[132.5,155]` and produces exactly zero local-load gain.
+  The three extra hints therefore cost only about 39 cycles total. Four-to-one
+  CSR batching alone cannot remove the dominant fixed cost.
+
+The result changes the optimization priority. The tested four-load benefit is
+smaller than synchronous hook overhead even before any unresolved downstream
+effect. A single batch CSR can save only the roughly 39-cycle incremental
+portion. The larger opportunity is to remove the fixed scheduler-path work:
+use one context-tag command, retain the footprint in hardware, and let a
+separately scheduled lane walk it without backpressuring the architectural
+hook. A larger useful footprint is also required to amortize even the first
+command; one line is explicitly unsupported as a positive case.
+
+The exact timing NBF, benchmark ELF/transfer, build log, disassembly, and hash
+manifest are archived at
+`/home/coyang/fpga-artifacts/context-resume/wakeup-data-preview-20261102/hook-timing-minimal.tar.xz`
+(SHA-256 `65df305028ea04944d9d759775a95c805c0bc40c39fb1b05d0aea8ab2e443026`).
+The NBF, ELF, kernel, and disassembly hashes are respectively
+`702ecd7d...17f5`, `ba44d13a...0b4e`, `896fa8d3...d3fb`, and
+`944d6a04...0dd7`. Passing logs/status/analyses use the
+`group7-hook-*` names in the existing durable FPGA directory.
+
 Exact passing logs, statuses, and analyses are
 `group7-mode7-pma-drop-fifo.*`,
 `group7-mode1-accepted-same-image-fifo.*`, and
@@ -222,15 +270,23 @@ the source artifacts remained intact, and the compact 22 MiB bundle above was
 verified before durable copy. Future preservation should check root capacity
 first and avoid redundant accepted payloads.
 
+The first accepted-versus-disabled hook-timing launch reached init at Linux
+time 37.37 seconds but never produced a shell before the 300-second gate. Its
+log/status are retained under an explicit `boot-timeout` name. The identical
+NBF had already completed two clean timing arms, and a full recovery produced
+the passing accepted-versus-disabled retry; the timeout is excluded from all
+performance estimates.
+
 ## Next discriminator
 
-Do not spend another experiment on more lead time, more L2 capacity, or CSR
-batching alone. The PMA-drop split now proves a useful accepted-request cache
-effect but cannot resolve incremental wake-path cost because the userspace
-endpoint crosses a 25k--50k-cycle scheduler phase. Add close cycle timestamps
-around the successful-wakeup helper and expose them to the benchmark, first
-comparing disabled, PMA-dropped, and accepted modes on the same kernel. Only a
-resolved accepted-minus-drop hook cost justifies request QoS changes; a
-resolved common helper/CSR cost instead justifies a single context-tag/batch
-command. The eventual implementation target remains a separately throttled
-lane with issued/completed/consumed/late/drop counters.
+Do not spend another experiment on more lead time, more L2 capacity, or a
+four-to-one CSR batch alone. Close timing now resolves about 127 cycles of
+common hook work and 64 additional accepted-request cycles, while extra hints
+two through four account for only about 39 cycles. The next bounded control is
+successful-wakeup **data only**: keep real physical hints and hook accounting
+but omit instruction trigger CSR `0x5c0`. Instruction-only replay was neutral
+in RL-079, and the current joint mode includes it in the dominant fixed cost.
+If data-only materially reduces the hook and total wake penalty while retaining
+the local gain, it becomes the implementation baseline. Otherwise move to one
+context-tag command, a hardware-resident 16--32-line footprint, and a
+separately throttled lane with issued/completed/consumed/late/drop counters.

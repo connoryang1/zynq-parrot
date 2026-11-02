@@ -65,30 +65,35 @@ def cell_exit_pattern(group, timing):
 
 def benchmark_command(group, timing, footprint, policy="normal",
                       replay_state="persistent", arm="alternating", lines=4,
-                      lead_cycles=0):
+                      lead_cycles=0, hook_timing=False):
     """Build the guest command while preserving the historical default CLI."""
     guest_args = f"{group} {timing}"
     if (footprint != "target" or policy != "normal"
             or replay_state != "persistent" or arm != "alternating"
-            or lines != 4 or lead_cycles):
+            or lines != 4 or lead_cycles or hook_timing):
         guest_args += f" {footprint}"
     if (policy != "normal" or replay_state != "persistent"
-            or arm != "alternating" or lines != 4 or lead_cycles):
+            or arm != "alternating" or lines != 4 or lead_cycles
+            or hook_timing):
         guest_args += f" {policy}"
     if replay_state != "persistent":
         guest_args += f" {replay_state}"
-    elif arm != "alternating" or lines != 4 or lead_cycles:
+    elif arm != "alternating" or lines != 4 or lead_cycles or hook_timing:
         guest_args += " persistent"
     if arm != "alternating":
         guest_args += f" {arm}"
-    elif lines != 4 or lead_cycles:
+    elif lines != 4 or lead_cycles or hook_timing:
         guest_args += " alternating"
     if lines != 4:
         guest_args += f" {lines}"
-    elif lead_cycles:
+    elif lead_cycles or hook_timing:
         guest_args += " 4"
     if lead_cycles:
         guest_args += f" {lead_cycles}"
+    elif hook_timing:
+        guest_args += " 0"
+    if hook_timing:
+        guest_args += " hook-timing"
     return (
         f"{GUEST_ELF} {guest_args}; "
         f"rc=$?; echo PHYSICAL_CELL_EXIT group={group} "
@@ -127,6 +132,7 @@ def parse_args(argv=None):
     parser.add_argument("--lines", type=int, choices=range(1, 5), default=4)
     parser.add_argument("--lead-cycles", type=int, choices=range(0, 1_000_001),
                         default=0)
+    parser.add_argument("--hook-timing", action="store_true")
     parser.add_argument("--only-timing",
                         choices=("early", "late", "instruction", "counter",
                                  "trigger", "wake-trigger", "wake-data",
@@ -182,6 +188,7 @@ def run(args):
         "arm": args.arm,
         "lines": args.lines,
         "lead_cycles": args.lead_cycles,
+        "hook_timing": args.hook_timing,
         "cells": [f"{group}:{timing}"
                   for group, timing in selected_cells(
                       args.start_cell, args.only_timing, args.only_group)],
@@ -212,7 +219,8 @@ def run(args):
                     args.start_cell, args.only_timing, args.only_group):
                 child.sendline(benchmark_command(
                     group, timing, args.footprint, args.policy,
-                    args.replay_state, args.arm, args.lines, args.lead_cycles
+                    args.replay_state, args.arm, args.lines, args.lead_cycles,
+                    args.hook_timing
                 ))
                 child.expect(cell_exit_pattern(group, timing), timeout=900)
                 rc = int(child.match.group(1))

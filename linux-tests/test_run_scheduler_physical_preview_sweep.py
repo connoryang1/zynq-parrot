@@ -110,6 +110,17 @@ class CellPlanTest(unittest.TestCase):
             command,
         )
 
+    def test_hook_timing_materializes_zero_lead_argument(self):
+        command = benchmark_command(
+            7, "wake-early-data", "target", "fifo", "persistent",
+            "accepted-drop", 4, 0, True,
+        )
+        self.assertIn(
+            " 7 wake-early-data target fifo persistent accepted-drop 4 0 "
+            "hook-timing; rc=$?",
+            command,
+        )
+
     def test_accepts_both_established_root_prompts(self):
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n~ # "))
         self.assertIsNotNone(SHELL_PROMPT.search("\r\n# "))

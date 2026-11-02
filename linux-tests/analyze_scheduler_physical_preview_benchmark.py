@@ -12,6 +12,7 @@ from pathlib import Path
 ROW = re.compile(r"PHYSICAL_BENCH trial=(\d+) mode=(\d+) hooks=(\d+) "
                  r"wake_to_entry=(\d+) load_cycles=(\d+) "
                  r"wake_to_load=(\d+) roundtrip=(\d+)")
+HOOK = re.compile(r"PHYSICAL_BENCH_HOOK trial=(\d+) cycles=(\d+)")
 CONFIG = re.compile(r"PHYSICAL_BENCH_CONFIG group=(\d+) first_offset=(\d+) "
                     r"lines=(\d+) "
                     r"timing=(early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop) "
@@ -32,11 +33,35 @@ LEAD_CYCLES = re.compile(r"PHYSICAL_BENCH_CONFIG[^\n]* lead_cycles=(\d+)")
 ARM = re.compile(
     r"PHYSICAL_BENCH_CONFIG[^\n]* arm=(alternating|disabled|enabled|accepted-drop)"
 )
+HOOK_TIMING = re.compile(r"PHYSICAL_BENCH_CONFIG[^\n]* hook_timing=([01])")
 
 
 def percentile(values, fraction):
     ordered = sorted(values)
     return ordered[round(fraction * (len(ordered) - 1))]
+
+
+def summarize_metric(rows, metric, rng, bootstrap_samples):
+    off = [row[metric] for row in rows if row["mode"] == 0]
+    on = [row[metric] for row in rows if row["mode"] == 1]
+    blocks = []
+    for start in range(0, len(rows), 4):
+        block = rows[start:start + 4]
+        off_mean = (block[0][metric] + block[3][metric]) / 2
+        on_mean = (block[1][metric] + block[2][metric]) / 2
+        blocks.append(off_mean - on_mean)
+    estimate = statistics.median(blocks)
+    boots = [statistics.median(rng.choices(blocks, k=len(blocks)))
+             for _ in range(bootstrap_samples)]
+    return {
+        "off_median_cycles": statistics.median(off),
+        "on_median_cycles": statistics.median(on),
+        "paired_median_saved_cycles": estimate,
+        "paired_95pct_ci_saved_cycles": [percentile(boots, 0.025),
+                                          percentile(boots, 0.975)],
+        "off_range_cycles": [min(off), max(off)],
+        "on_range_cycles": [min(on), max(on)],
+    }
 
 
 def summarize(rows, group, timing, bootstrap_samples=20000, lines=4):
@@ -67,26 +92,9 @@ def summarize(rows, group, timing, bootstrap_samples=20000, lines=4):
               "trials_per_mode": trials // 2,
               "paired_blocks": paired_blocks, "metrics": {}}
     for metric in METRICS:
-        off = [row[metric] for row in rows if row["mode"] == 0]
-        on = [row[metric] for row in rows if row["mode"] == 1]
-        blocks = []
-        for start in range(0, trials, 4):
-            block = rows[start:start + 4]
-            off_mean = (block[0][metric] + block[3][metric]) / 2
-            on_mean = (block[1][metric] + block[2][metric]) / 2
-            blocks.append(off_mean - on_mean)
-        estimate = statistics.median(blocks)
-        boots = [statistics.median(rng.choices(blocks, k=paired_blocks))
-                 for _ in range(bootstrap_samples)]
-        result["metrics"][metric] = {
-            "off_median_cycles": statistics.median(off),
-            "on_median_cycles": statistics.median(on),
-            "paired_median_saved_cycles": estimate,
-            "paired_95pct_ci_saved_cycles": [percentile(boots, 0.025),
-                                              percentile(boots, 0.975)],
-            "off_range_cycles": [min(off), max(off)],
-            "on_range_cycles": [min(on), max(on)],
-        }
+        result["metrics"][metric] = summarize_metric(
+            rows, metric, rng, bootstrap_samples
+        )
     return result
 
 
@@ -122,6 +130,27 @@ def main():
     for match in ROW.finditer(text):
         values = [int(value) for value in match.groups()]
         rows.append(dict(zip(("trial", "mode", "hooks") + METRICS, values)))
+    hook_timing_matches = HOOK_TIMING.findall(text)
+    hook_timing = bool(hook_timing_matches
+                       and int(hook_timing_matches[0]))
+    if len(hook_timing_matches) > 1:
+        raise SystemExit("expected at most one hook-timing marker")
+    hook_rows = HOOK.findall(text)
+    if hook_timing:
+        if len(hook_rows) != len(rows):
+            raise SystemExit("expected one hook timing for every trial")
+        for expected, (trial, cycles) in enumerate(hook_rows):
+            if int(trial) != expected:
+                raise SystemExit("hook timings are not ordered by trial")
+            rows[expected]["hook_cycles"] = int(cycles)
+            if rows[expected]["hook_cycles"] > rows[expected]["wake_to_entry"]:
+                raise SystemExit("hook timing exceeds wake-to-entry interval")
+            rows[expected]["wake_to_entry_minus_hook"] = (
+                rows[expected]["wake_to_entry"]
+                - rows[expected]["hook_cycles"]
+            )
+    elif hook_rows:
+        raise SystemExit("hook timings present while disabled")
     if arm == "accepted-drop":
         for row in rows:
             if row["hooks"] != 1:
@@ -138,6 +167,16 @@ def main():
     else:
         result = summarize(rows, group, timing, lines=lines)
         result["comparison"] = "disabled-vs-enabled"
+    if hook_timing:
+        result["metrics"]["hook_cycles"] = summarize_metric(
+            normalized if arm == "accepted-drop" else rows,
+            "hook_cycles", random.Random(0xB51), 20000
+        )
+        result["metrics"]["wake_to_entry_minus_hook"] = summarize_metric(
+            normalized if arm == "accepted-drop" else rows,
+            "wake_to_entry_minus_hook", random.Random(0xB52), 20000
+        )
+    result["hook_timing"] = hook_timing
     result["lead_cycles"] = lead_cycles
     print(json.dumps(result, indent=2))
 

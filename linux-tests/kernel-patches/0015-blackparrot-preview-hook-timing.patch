@@ -1,0 +1,82 @@
+This patch measures the successful-wakeup preview hook inside the kernel. It
+stores the most recent close cycle interval per task and exposes it through a
+read-only experimental prctl so userspace can exclude scheduler transit noise.
+
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -91,6 +91,7 @@
+ 	struct mm_struct *bp_preview_phys_mm;
+ 	unsigned char bp_preview_phys_mode;
+ 	unsigned long bp_preview_hook_count;
++	unsigned long bp_preview_last_hook_cycles;
+ 	/* Diagnostic counts for each incoming context-switch guard outcome. */
+ 	unsigned long bp_preview_guard_count[5];
+ 	unsigned long vstate_ctrl;
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -209,6 +209,7 @@
+ 	       sizeof(current->thread.bp_preview_addr));
+ 	current->thread.bp_preview_mm = NULL;
+ 	current->thread.bp_preview_hook_count = 0;
++	current->thread.bp_preview_last_hook_cycles = 0;
+ 	memset(current->thread.bp_preview_guard_count, 0,
+ 	       sizeof(current->thread.bp_preview_guard_count));
+ #ifdef CONFIG_FPU
+@@ -278,6 +279,7 @@
+ 	p->thread.bp_preview_phys_mm = NULL;
+ 	p->thread.bp_preview_phys_mode = 0;
+ 	p->thread.bp_preview_hook_count = 0;
++	p->thread.bp_preview_last_hook_cycles = 0;
+ 	memset(p->thread.bp_preview_guard_count, 0,
+ 	       sizeof(p->thread.bp_preview_guard_count));
+ 	memset(&p->thread.s, 0, sizeof(p->thread.s));
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -313,5 +313,7 @@
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+ /* 0 off; 1 wake joint; 2 select joint; 3--6 controls; 7 wake PMA-drop. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
++/* Last successful-wakeup preview-hook duration in global BP cycles. */
++#define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4353,6 +4353,10 @@
+ 	if (success) {
+ 		unsigned char bp_preview_mode =
+ 			READ_ONCE(p->thread.bp_preview_phys_mode);
++		unsigned long bp_preview_start, bp_preview_end;
++
++		asm volatile("csrr %0, 0xcc0" : "=r"(bp_preview_start)
++			     : : "memory");
+ 
+ 		/* Preserve the accepted instruction-first ordering for joint mode
+ 		 * one, then give its four physical hints the rest of the wake-to-run
+@@ -4362,6 +4366,10 @@
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		if (bp_preview_mode == 1 || bp_preview_mode == 7)
+ 			riscv_bp_preview_wakeup(p);
++		asm volatile("csrr %0, 0xcc0" : "=r"(bp_preview_end)
++			     : : "memory");
++		WRITE_ONCE(p->thread.bp_preview_last_hook_cycles,
++			   bp_preview_end - bp_preview_start);
+ 	}
+ #endif
+ 
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2806,6 +2806,13 @@
+ 		}
+ 		error = READ_ONCE(me->thread.bp_preview_hook_count);
+ 		break;
++	case PR_BP_PREVIEW_GET_HOOK_CYCLES:
++		if (arg2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		error = READ_ONCE(me->thread.bp_preview_last_hook_cycles);
++		break;
+ 	case PR_BP_PREVIEW_GET_GUARD:
+ 		if (arg2 >= ARRAY_SIZE(me->thread.bp_preview_guard_count) ||
+ 		    arg3 || arg4 || arg5) {

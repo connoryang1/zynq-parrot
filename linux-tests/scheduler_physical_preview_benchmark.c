@@ -48,6 +48,7 @@
 #define PR_BP_PREVIEW_GET_COUNT 0x42505057
 #define PR_BP_PREVIEW_PIN_SET 0x42505059
 #define PR_BP_PREVIEW_ENABLE 0x4250505a
+#define PR_BP_PREVIEW_GET_HOOK_CYCLES 0x4250505b
 
 enum { warmup = 16, measured_trials = 512, trials = warmup + measured_trials,
        max_lines = 4, line_bytes = 64, page_bytes = 4096, eviction_pages = 10,
@@ -62,6 +63,7 @@ enum arm_mode {
 
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
+	unsigned long hook_cycles;
 	unsigned mode, hooks, accepted;
 };
 
@@ -104,7 +106,7 @@ static int uncounted_mode(unsigned mode, int wake_data)
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned group, unsigned enable_mode, int hot_proxy,
 		      int isolate_replay, int wake_data, unsigned active_lines,
-		      enum arm_mode arm)
+		      enum arm_mode arm, int measure_hook)
 {
 	volatile unsigned char *target = mmap(NULL, page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -200,6 +202,16 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
+		if (measure_hook) {
+			long hook_cycles = prctl(PR_BP_PREVIEW_GET_HOOK_CYCLES,
+						 0UL, 0UL, 0UL, 0UL);
+
+			if (hook_cycles < 0)
+				fail("read preview hook cycles");
+			samples[trial].hook_cycles = hook_cycles;
+		} else {
+			samples[trial].hook_cycles = 0;
+		}
 		if (uncounted_mode(enable_mode, wake_data)) {
 			if (getrusage(RUSAGE_SELF, &after_usage))
 				fail("getrusage after handoff");
@@ -247,6 +259,7 @@ int main(int argc, char **argv)
 	int wake_data = 0;
 	unsigned active_lines = max_lines;
 	unsigned long lead_cycles = 0;
+	int measure_hook = 0;
 	enum arm_mode arm = arm_alternating;
 	volatile struct sample *samples = mmap(NULL, sizeof(struct sample) * trials,
 					PROT_READ | PROT_WRITE,
@@ -254,8 +267,8 @@ int main(int argc, char **argv)
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 9) {
-		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled|accepted-drop] [active-lines-1..4] [lead-cycles-0..1000000]\n",
+	if (argc > 10) {
+		fprintf(stderr, "usage: %s [l2-set-group-0..7] [early|late|instruction|counter|trigger|wake-trigger|wake-data|wake-early-data|wake-early-drop] [target|hot-proxy] [normal|fifo] [persistent|isolated] [alternating|disabled|enabled|accepted-drop] [active-lines-1..4] [lead-cycles-0..1000000] [no-hook-timing|hook-timing]\n",
 			argv[0]);
 		return 2;
 	}
@@ -346,12 +359,20 @@ int main(int argc, char **argv)
 		}
 		lead_cycles = parsed;
 	}
+	if (argc >= 10) {
+		if (!strcmp(argv[9], "hook-timing"))
+			measure_hook = 1;
+		else if (strcmp(argv[9], "no-hook-timing")) {
+			fprintf(stderr, "invalid hook timing mode: %s\n", argv[9]);
+			return 2;
+		}
+	}
 	if (arm == arm_accepted_drop && (!wake_data || enable_mode != 1)) {
 		fprintf(stderr,
 			"accepted-drop requires wake-early-data timing\n");
 		return 2;
 	}
-	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s lead_cycles=%lu\n",
+	printf("PHYSICAL_BENCH_CONFIG group=%u first_offset=%u lines=%u timing=%s mode=%u footprint=%s policy=%s replay_state=%s arm=%s lead_cycles=%lu hook_timing=%u\n",
 	       group, group * max_lines * line_bytes, active_lines,
 	       wake_data && enable_mode == 7 ? "wake-early-drop" :
 	       wake_data && enable_mode == 1 ? "wake-early-data" :
@@ -366,7 +387,7 @@ int main(int argc, char **argv)
 	       arm == arm_disabled ? "disabled" :
 	       arm == arm_enabled ? "enabled" :
 	       arm == arm_accepted_drop ? "accepted-drop" : "alternating",
-	       lead_cycles);
+	       lead_cycles, measure_hook);
 
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
@@ -387,7 +408,8 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, group, enable_mode,
-			  hot_proxy, isolate_replay, wake_data, active_lines, arm);
+			  hot_proxy, isolate_replay, wake_data, active_lines, arm,
+			  measure_hook);
 		return 0;
 	}
 	close(to_child[0]);
@@ -434,6 +456,9 @@ int main(int argc, char **argv)
 		       trial - warmup,
 		       (unsigned long long)(s->done - s->after_load),
 		       (unsigned long long)(s->returned - s->done));
+		if (measure_hook)
+			printf("PHYSICAL_BENCH_HOOK trial=%u cycles=%lu\n",
+			       trial - warmup, s->hook_cycles);
 	}
 	puts("PHYSICAL_BENCH_PARENT PASS");
 	return 0;
