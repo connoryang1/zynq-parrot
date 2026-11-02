@@ -399,7 +399,11 @@ protected continuation is owned by `bp_be_top`. A prototype must suppress the
 normal server trap update and drive a synthetic protected return through the
 existing caller-register install, context-bank selection, and frontend-reset
 path; merely installing a trap vector would move recovery into untrusted state
-and would not consume the continuation atomically.
+and would not consume the continuation atomically. RL-071 now implements that
+opt-in synthetic return for an illegal instruction in full-core simulation,
+including terminal outcome, zero reply, one visible pre-fault effect, rejected
+retry, `FAULTED` query, and revoke. It is not yet wired through OpenSBI or seL4,
+and it does not close the remaining fault classes or fault-endpoint semantics.
 
 ## Resume checklist
 

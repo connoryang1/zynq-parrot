@@ -67,6 +67,7 @@ typedef enum {
     BP_RPC_CONTROL_BUSY = 2,
     BP_RPC_CONTROL_UNSUPPORTED = 3,
     BP_RPC_CONTROL_INVALID = 4,
+    BP_RPC_CONTROL_FAULTED = 5,
 } bp_rpc_control_status_t;
 
 typedef enum {

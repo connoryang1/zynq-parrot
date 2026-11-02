@@ -149,8 +149,9 @@ Version 1 deliberately has no server-fault continuation. Version 2 preserves
 the 112-byte descriptor layout but sets `version=2` and requires descriptor
 flag bit 0, `FAULT_COMPLETION`; the installer maps that flag to staged
 `CONFIG[48]`. Version 1 requires both the flag and `CONFIG[63:48]` to be zero.
-Version 2 may admit synchronous server faults only with the following atomic
-contract; these encodings reserve behavior, not an implemented hardware path:
+Version 2 admits synchronous server faults only with the following atomic
+contract. The directed hardware model implements the illegal-instruction case;
+OpenSBI and seL4 installation remain version 1:
 
 1. Acceptance changes the slot from `LIVE` to `ACTIVE`. A precise synchronous
    exception while the recorded server context is active changes it to

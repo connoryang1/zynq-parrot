@@ -656,6 +656,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** version 1 is safe only for bounded, prefaulted services: after acceptance, software fallback would risk duplicate side effects and cannot be used. Fault-tolerant generalization needs an explicit kernel/hardware-owned fault continuation and a terminal `COMMITTED_FAILED` unwind to the caller, while keeping fallback forbidden.
 - **Limits:** this is an untraced exact-model illegal-instruction case, not physical evidence and not coverage of page faults, blocking, timeouts, or interrupts. Static program order places the marker before the fault, but the nonreturn does not independently prove that marker retired. The result localizes the missing contract/state rather than implementing recovery.
 
+### RL-071 — Opt-in synchronous fault completion preserves at-most-once execution
+
+- **Status:** accepted full-core simulator mechanism; FPGA and seL4 integration pending
+- **Scope:** version-2 `FAULT_COMPLETION` descriptor, one resident caller/server pair, and a server-side visible increment followed by an illegal instruction
+- **Claim:** the caller resumes exactly once with `COMMITTED_FAILED`, failure class `SERVER_FAULT`, and zero `a0`--`a3`; the server increment is exactly one, retry returns `REVOKED` without re-entry, privileged `QUERY` returns `FAULTED`, and token-matched revoke succeeds. The unchanged version-1 test retains 250/31 direct and 397/60 protected first/repeat cycles.
+- **Evidence:** `make -C testing run-mt_protected_rpc_fault_recovery_test NUM_THREADS=2 NUM_CONTEXTS=4 VERILATOR_BUILD_JOBS=12`, plus the unchanged hardware and descriptor-control gates; BlackParrot `e255d81bc` and its top-level pointer. All reach guest/core/host PASS; the harness continues to accept the known post-PASS GPIO teardown assertion.
+- **Meaning:** the precise exception can reuse the protected continuation without exposing server trap state or replaying side effects. Faulting a slot quarantines its generation while preserving privileged cleanup.
+- **Limits:** simulator only; illegal instruction only. Raw cause/PC/address readout, page/access faults, fault-record authorization, revocation races, OpenSBI version-2 install, seL4 binding/fault-endpoint delivery, interrupts, blocking, cancellation, timeout, routing, and FPGA execution remain unverified.
+
 ## Superseded or rejected findings
 
 ### RS-001 — The 418/396 result is an intermediate configuration

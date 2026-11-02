@@ -33,6 +33,7 @@ TEST_MARKERS = {
     "mt_protected_rpc_reference_test": "[BSG-PASS] protected RPC capability, isolation and return",
     "mt_protected_rpc_control_test": "[BSG-PASS] atomic protected RPC descriptor control",
     "mt_protected_rpc_hardware_test": "[BSG-PASS] atomic protected RPC capability, fixed entry and return",
+    "mt_protected_rpc_fault_recovery_test": "[BSG-PASS] protected RPC synchronous fault completion",
     "mt_protected_rpc_library_test": "[BSG-PASS] protected RPC library address-space isolation",
     "mt_rpc_context_transport_benchmark": "[BSG-PASS] unprotected two-context RPC transport and isolation",
     "mt_opensbi_csr_probe_test": "[BSG-PASS] OpenSBI absent CSR probes trap",

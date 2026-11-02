@@ -101,7 +101,11 @@ static uint64_t rpc_install_descriptor(uint64_t caller_satp,
   status |= rpc_stage(BP_RPC_FIELD_SERVER_GP, 0);
   status |= rpc_stage(BP_RPC_FIELD_SERVER_TP, 0);
   status |= rpc_stage(BP_RPC_FIELD_CALLER_BADGE, UINT64_C(0x99));
+#ifdef RPC_FAULT_RECOVERY_TEST
+  status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word_v2(4, 4, 0, 1));
+#else
   status |= rpc_stage(BP_RPC_FIELD_CONFIG, bp_rpc_config_word(4, 4, 0, 1));
+#endif
   if (status != BP_RPC_CONTROL_OK)
     return status;
   for (unsigned component = 0; component < BP_RPC_PREPARE_COMPONENTS;
@@ -138,6 +142,25 @@ static void map_low_page(uint64_t *leaf, uint64_t va, const void *pa,
 
 static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(void)
 {
+#ifdef RPC_FAULT_RECOVERY_TEST
+  __asm__ volatile(
+    ".option push\n.option norvc\n"
+    "li t0, 0x50000\nsd zero, 0(t0)\nsd zero, 24(t0)\n"
+    "li a0, 0x11\nli a1, 0x22\nli a2, 0x33\nli a3, 0x44\n"
+    "li a4, 1\nli a5, 4\ncsrrw a4, 0x808, a4\n"
+    "li t3, 0xf101\nli t1, 3\nbne a4, t1, 1f\n"
+    "li t3, 0xf102\nli t1, 1\nbne a5, t1, 1f\n"
+    "li t3, 0xf103\nor t1, a0, a1\nor t1, t1, a2\nor t1, t1, a3\nbnez t1, 1f\n"
+    /* The faulted generation is terminal and cannot re-enter the server. */
+    "li a4, 1\nli a5, 4\ncsrrw a4, 0x808, a4\n"
+    "sd a4, 32(t0)\nli t3, 0xf104\nli t1, 2\nbne a4, t1, 1f\n"
+    "li t3, 0xf105\nld t1, 0(t0)\nli t2, 1\nbne t1, t2, 1f\n"
+    "sd t2, 24(t0)\nj 2f\n"
+    "1: sd t3, 24(t0)\n"
+    "2: ecall\n3: j 3b\n"
+    ".option pop\n"
+  );
+#else
   __asm__ volatile(
     ".option push\n.option norvc\n"
     /* Initialize the caller-private and explicitly shared state. */
@@ -234,10 +257,21 @@ static void __attribute__((naked, noinline, used, aligned(4096))) caller_entry(v
     "jalr zero, 0(s6)\n"
     ".option pop\n"
   );
+#endif
 }
 
 static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(void)
 {
+#ifdef RPC_FAULT_RECOVERY_TEST
+  __asm__ volatile(
+    ".option push\n.option norvc\n"
+    ".global server_service\nserver_service:\n"
+    "li t0, 0x50000\nld t1, 0(t0)\naddi t1, t1, 1\nsd t1, 0(t0)\n"
+    ".word 0\n"
+    "1: j 1b\n"
+    ".option pop\n"
+  );
+#else
   __asm__ volatile(
     ".option push\n.option norvc\n"
     /* Every protected entry carries the fixed badge and four atomically
@@ -268,10 +302,37 @@ static void __attribute__((naked, noinline, used, aligned(4096))) server_entry(v
     ".rept 8\nnop\n.endr\n4: j 4b\n"
     ".option pop\n"
   );
+#endif
 }
 
 static void __attribute__((used, noinline, noreturn)) machine_finish(void)
 {
+#ifdef RPC_FAULT_RECOVERY_TEST
+  rpc_data_write(1);
+  const uint64_t query = rpc_control(bp_rpc_control_word(
+    BP_RPC_CONTROL_READ_STATUS, BP_RPC_FIELD_TOKEN, 0));
+  rpc_data_write(1);
+  const uint64_t revoke = rpc_control(bp_rpc_control_word(
+    BP_RPC_CONTROL_REVOKE, BP_RPC_FIELD_TOKEN, 0));
+  const int pass = shared_page[3] == 1
+                   && shared_page[0] == 1
+                   && query == BP_RPC_CONTROL_FAULTED
+                   && revoke == BP_RPC_CONTROL_OK
+                   && unexpected_mcause == 0;
+  if (pass) {
+    bp_print_string("[BSG-PASS] protected RPC synchronous fault completion\n");
+    bp_finish(0);
+  }
+  bp_print_string("[BSG-FAIL] protected RPC synchronous fault completion\n");
+  bp_print_string("verdict/effects/query/revoke: ");
+  bp_hprint_uint64(shared_page[3]);
+  bp_hprint_uint64(shared_page[0]);
+  bp_hprint_uint64(query);
+  bp_hprint_uint64(revoke);
+  bp_hprint_uint64(shared_page[4]);
+  bp_print_string("\n");
+  bp_finish(1);
+#else
   const int pass = shared_page[3] == 1
                    && shared_page[1] == CALLER_PRIVATE_VALUE
                    && shared_page[2] == SERVER_PRIVATE_VALUE
@@ -305,6 +366,7 @@ static void __attribute__((used, noinline, noreturn)) machine_finish(void)
   bp_hprint_uint64(unexpected_mtval);
   bp_print_string("\n");
   bp_finish(1);
+#endif
   for (;;)
     ;
 }
