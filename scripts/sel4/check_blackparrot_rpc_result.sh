@@ -8,6 +8,7 @@ shared_buffer=0
 components=0
 lifecycle=0
 smoke=0
+fault_injection=0
 caller_badge_expected=
 while (($# > 1)); do
     case $1 in
@@ -16,6 +17,7 @@ while (($# > 1)); do
         --components) components=1 ;;
         --lifecycle) lifecycle=1 ;;
         --smoke) smoke=1 ;;
+        --fault-injection) fault_injection=1 ;;
         --caller-badge)
             (($# >= 3)) || break
             caller_badge_expected=$2
@@ -26,7 +28,7 @@ while (($# > 1)); do
     shift
 done
 if (($# != 1)); then
-    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--lifecycle] [--smoke] [--caller-badge DECIMAL] OUTPUT.log" >&2
+    echo "usage: $0 [--physical] [--shared-buffer] [--components] [--lifecycle] [--smoke] [--fault-injection] [--caller-badge DECIMAL] OUTPUT.log" >&2
     exit 2
 fi
 if [[ -n $caller_badge_expected ]] \
@@ -85,6 +87,7 @@ notification_components_count=0
 timebase_count=0
 caller_badge_count=0
 lifecycle_count=0
+fault_recovery_count=0
 
 while IFS= read -r line; do
     # A UART or nested PTY may preserve CRLF as either CRLF or CRCRLF.  Strip
@@ -302,6 +305,8 @@ while IFS= read -r line; do
         && hierarchy_state_count=$((hierarchy_state_count + 1))
     [[ $line == "SEL4_RPC_LIFECYCLE map-revoke=verified stale-token=verified rebind=verified" ]] \
         && lifecycle_count=$((lifecycle_count + 1))
+    [[ $line == "SEL4_RPC_FAULT_RECOVERY caller=server-fault retry=revoked record=consumed rebind=verified" ]] \
+        && fault_recovery_count=$((fault_recovery_count + 1))
 done < "$log"
 
 if ((sel4_failure_count != 0)); then
@@ -455,6 +460,10 @@ if ((lifecycle)) && ((lifecycle_count != 1)); then
     echo "invalid lifecycle evidence: rows=$lifecycle_count" >&2
     exit 1
 fi
+if ((fault_injection)) && ((fault_recovery_count != 1)); then
+    echo "invalid protected RPC fault-recovery evidence: rows=$fault_recovery_count" >&2
+    exit 1
+fi
 
 printf 'accepted seL4 RPC gate: hardware=%s cycles/call software-fallback=%s cycles/call\n' \
     "$hardware_per_call" "$software_per_call"
@@ -464,6 +473,9 @@ if [[ -n $caller_badge_expected ]]; then
 fi
 if ((lifecycle)); then
     echo 'lifecycle revocation: map revoke, stale token rejection, and rebind verified'
+fi
+if ((fault_injection)); then
+    echo 'fault recovery: server fault, terminal retry, record consumption, and rebind verified'
 fi
 if ((shared_buffer)); then
     printf 'matched warm paths: in-process=%s hardware=%s software=%s notification=%s cycles/call\n' \

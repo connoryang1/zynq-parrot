@@ -812,6 +812,37 @@ static int test_blackparrot_hardware_binding(env_t env)
         test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
     }
 
+#ifdef SEL4_RPC_FAULT_INJECTION
+    /* A synchronous server fault is a committed failure: the caller resumes
+     * once, retry cannot enter the quarantined generation, and UNBIND makes
+     * the kernel authenticate and consume its privileged fault record before
+     * revocation.  The ordinary server TCB remains blocked on the endpoint,
+     * so a fresh generation can safely bind and complete a normal request. */
+    protected_rpc_message_t fault_request = request;
+    fault_request.words[3] = SEL4_RPC_FAULT_NEEDLE;
+    test_eq(protected_rpc_call(
+                rpc_endpoint, &fault_request, &hardware, &result),
+            PROTECTED_RPC_SERVER_FAULT);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 0);
+    test_eq(protected_rpc_call(
+                rpc_endpoint, &fault_request, &hardware, &result),
+            PROTECTED_RPC_REVOKED);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 0);
+    test_eq(protected_rpc_blackparrot_unbind(rpc_endpoint), PROTECTED_RPC_OK);
+    test_eq(protected_rpc_blackparrot_bind(rpc_endpoint, &binding),
+            PROTECTED_RPC_OK);
+    test_eq(protected_rpc_call(rpc_endpoint, &request, &hardware, &result),
+            PROTECTED_RPC_OK);
+    test_eq(result.path, PROTECTED_RPC_PATH_HARDWARE);
+    test_eq(result.reply.length, 4);
+    test_eq(result.reply.words[0], ADAPTER_SEARCH_BYTES - 1);
+    test_eq(result.reply.words[1], ADAPTER_SEARCH_BYTES);
+    printf("SEL4_RPC_FAULT_RECOVERY caller=server-fault retry=revoked "
+           "record=consumed rebind=verified\n");
+#endif
+
     /* Mapping any page into a bound VSpace must synchronously revoke before
      * the mapping becomes visible.  The first stale-token call reports that
      * execution did not begin and clears the adapter's local association;

@@ -141,6 +141,21 @@ printf '%s\r\r\n' \
 "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
     --components --lifecycle --caller-badge 24090 "$uart_log"
 
+fault_log="$build_dir/physical-uart-fault.log"
+cp "$uart_log" "$fault_log"
+printf '%s\r\n' \
+    'SEL4_RPC_FAULT_RECOVERY caller=server-fault retry=revoked record=consumed rebind=verified' \
+    >> "$fault_log"
+"$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components --lifecycle --fault-injection --caller-badge 24090 \
+    "$fault_log"
+if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \
+    --components --lifecycle --fault-injection --caller-badge 24090 \
+    "$uart_log" >/dev/null 2>&1; then
+    echo "fault checker accepted a missing recovery marker" >&2
+    exit 1
+fi
+
 lifecycle_missing_log="$build_dir/physical-uart-lifecycle-missing.log"
 grep -v '^SEL4_RPC_LIFECYCLE ' "$uart_log" > "$lifecycle_missing_log"
 if "$script_dir/check_blackparrot_rpc_result.sh" --physical --shared-buffer \

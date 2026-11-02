@@ -30,6 +30,12 @@ protected_rpc_status_t sel4_rpc_bounded_search_service(
                    != *(const uint64_t *)cookie)) {
         return PROTECTED_RPC_DENIED;
     }
+#ifdef SEL4_RPC_FAULT_INJECTION
+    if (request != NULL && request->length == 4
+        && request->words[3] == SEL4_RPC_FAULT_NEEDLE) {
+        __asm__ volatile(".word 0" : : : "memory");
+    }
+#endif
     const uint64_t service_entry_cycles = search_read_cycles();
     protected_rpc_buffer_ref_t ref;
     protected_rpc_buffer_view_t view;

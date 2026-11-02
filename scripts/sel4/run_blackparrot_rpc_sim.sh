@@ -16,6 +16,7 @@ model=${BLACKPARROT_SIM:-$project_root/cosim/black-parrot-minimal-example/verila
 timeout_s=${BSG_TRACE_TIMEOUT_S:-14400}
 allow_concurrent=${BLACKPARROT_ALLOW_CONCURRENT_SIM:-0}
 smoke=${SEL4_RPC_SMOKE:-0}
+fault_injection=${SEL4_RPC_FAULT_INJECTION:-0}
 marker='Test SEL4IPCRPC0002 passed'
 failure_markers=(
     'Test SEL4IPCRPC0002 failed'
@@ -92,6 +93,9 @@ if grep -Fq "$marker" "$output"; then
     checker_args=()
     if [[ "$smoke" == 1 ]]; then
         checker_args+=(--smoke)
+    fi
+    if [[ "$fault_injection" == 1 ]]; then
+        checker_args+=(--fault-injection)
     fi
     "$result_checker" "${checker_args[@]}" "$output"
     exit 0
