@@ -2,6 +2,81 @@ This directory records the source-level successful-wakeup data-preview candidate
 
 # Successful-wakeup data preview
 
+On 2026-11-02, the first full elaboration of the tagged data-replay prototype
+exposed a pre-existing minimal-top reporter mismatch. Commit `7195fbc3` changed
+the reporter to a `bp_processor` hierarchy, while
+`cosim/black-parrot-minimal-example/v/top_zynq.sv` still instantiates
+`bp_unicore_lite` directly. Both non-trace and clean `TRACE=1` elaborations
+completed and then failed in the host C++ compile at those nonexistent names;
+neither produced a runnable model. The reporter was restored to the direct
+minimal-top hierarchy, and the guardrail is to require a clean trace build plus
+a previously known-good runtime before trusting feature behavior.
+
+The first corrected trace rebuild then failed during generated C++ compilation
+because GCC placed assembly temporaries in root-backed `/tmp`, which had only
+about 14 MiB free. The generated model occupied about 228 MiB and showed no RTL
+error. This result is also invalid; clean it and set `TMPDIR` to the roomy
+`/run/user/1001` filesystem for the replacement build.
+
+The first integrated 32-line protocol run intentionally initialized every
+target with stores. Its bounded trace reached the tagged trigger, admitted
+seven entries, then ended with replay busy at index eight, D-UCE preview count
+four, and both prefetch slots valid. The target lines were still dirty in L1,
+while physical preview bypasses L1 and requests them below it. This is evidence
+of a dirty-resident self-coherence hazard, not a performance result; the clean,
+never-written target control must pass before the mechanism can advance, and a
+final design must suppress or safely join dirty L1 residents.
+
+## Tagged hardware footprint replay prototype
+
+The replacement prototype stores four software-assigned footprints of up to
+32 physical cache-line addresses and accepts a two-entry queue of context-tag
+triggers. A trigger selects one footprint, waits its configured delay, and
+replays its entries with a configurable gap. Software writes the footprint and
+configuration outside the wakeup critical path; the wakeup operation is one
+tagged command rather than 16--32 serialized address CSRs. Saturating counters
+report accepted and dropped triggers plus entries admitted below L1 or filtered
+before the detached lower-cache path.
+
+The first integration drove replay directly into D-UCE and was rejected after
+dirty-resident targets filled its detached slots and stalled. The accepted
+integration instead sends each replay through the ordinary D-cache tag lookup,
+with priority below architectural memory traffic. An L1 hit, including a dirty
+hit, completes and filters the replay locally. An L1 miss enters the existing
+detached prefetch path only when that path accepts it. A refused miss is retried
+after a 16-cycle backoff; immediate retries had reproduced an intermittent
+storm that monopolized the request boundary while both detached slots were
+full.
+
+A clean trace-enabled two-resident/four-context model with 64 D-cache sets
+passes the cold 32-line test three consecutive times from the same ELF/NBF.
+Each run reports 32 lower-path admissions, zero filtered entries, one accepted
+trigger, no dropped triggers, intact data, and guest/CORE/host PASS. The
+dirty-resident arm reports zero lower admissions and 32 filtered entries with
+intact data and the same terminal gates. The existing physical-preview overhead
+benchmark also passes on the rebuilt model, and the standalone controller gate
+passes queueing, delay, gap, backpressure, filtering, counter, and 32-entry
+ordering checks.
+
+Exact logs, ELFs, NBFs, and compressed waveforms are under
+`evidence/dcache-replay-backoff-cold-run1`, `-run2`, `-run3`,
+`evidence/dcache-replay-backoff-dirty`, and
+`evidence/dcache-replay-backoff-regression`. The first preservation command
+incorrectly looked for run artifacts in `testing/`; the harness places them in
+`cosim/black-parrot-minimal-example/verilator/`. No result was lost, and later
+commands use the simulator directory explicitly.
+
+The first checkpoint push invoked both branch names from the BlackParrot
+submodule. The RTL branch pushed successfully, while Git correctly rejected
+the top-level branch name because that ref does not exist in the submodule;
+the top-level push was retried from the repository root. The guardrail is to
+run and verify each repository's push from its own worktree.
+
+This is simulator correctness and liveness evidence, not a Linux performance
+result or an FPGA fit/timing result. The prototype still needs synthesis and a
+Linux benchmark in which one tagged trigger replaces the current serialized
+per-line hook before any speedup can be claimed.
+
 ## Design
 
 Patch `0013-blackparrot-wakeup-data-preview.patch` changes mode one so a real
