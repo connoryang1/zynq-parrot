@@ -28,7 +28,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             if probe_status and enabled else 0
         entry_status = preblock
         if probe_status and enabled and downstream_status:
-            preblock |= (2 << 60) | (1 << 62)
+            preblock |= (2 << 60) | (1 << 63)
             entry_status |= 1 << 60
         rows.append(
             f"TAGGED_REPLAY trial={trial} enabled={enabled} hooks={enabled} "

@@ -182,6 +182,10 @@ public:
     for (unsigned i = 0; i < 10; ++i)
       request(hint, 0x80010003 + uint64_t(i)*0x1040);
     require(dut.prefetch_count_o == 10, "ten hints did not occupy ten live slots");
+    require(dut.prefetch_outstanding_o == 10,
+            "exported UCE outstanding count cannot represent a full table");
+    require(dut.prefetch_complete_o == 0,
+            "UCE reported a completed response before any response arrived");
     require(!dut.credits_empty_o, "queued/unsent hints invisible to fences");
     request(hint, 0x8001a000, false); // A full table holds the hint for replay.
     request(hint, 0x80010008); // A live 16-byte segment covers this duplicate.

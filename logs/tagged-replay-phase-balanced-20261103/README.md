@@ -41,9 +41,9 @@ head start reduces the entry point estimate without neutralizing first use;
 
 ## Architectural interpretation and next gate
 
-The routed configuration has only two D-cache prefetch slots
-(`dcache_prefetch_els = 2`). The replay controller holds later entries until a
-slot frees, so a 32-line tag streams through a two-entry window and can remain
+The routed configuration has four D-cache prefetch slots
+(`dcache_prefetch_els = 4`). The replay controller holds later entries until a
+slot frees, so a 32-line tag streams through a four-entry window and can remain
 active across the handoff. Status entry counters report admission into that
 window, not a separate timestamp for memory completion and useful cache
 publication.
@@ -117,7 +117,7 @@ specific failure attribution remains provisional until the corrected image
 passes the exact reproduction.
 
 The corrected kernel cleanup and configuration paths now require both bits
-3:0 and allocated-slot bits 61:60 to be zero. The benchmark uses the same mask
+3:0 and allocated-slot bits 62:60 to be zero. The benchmark uses the same mask
 between trials and before releasing pins. This wait occurs after the measured
 first-use endpoint, so it prevents cross-trial/lifetime contamination without
 serializing the wake-to-load interval under study.
@@ -137,38 +137,56 @@ hunk count before checkpointing.
 ## Downstream occupancy instrumentation
 
 The diagnostic candidate exports the instantaneous number of allocated UCE
-prefetch slots and the subset whose memory replies are complete but not yet
-retired. Replay status bits 61:60 carry allocated slots and bits 63:62 carry
-completed slots. These were the four reserved bits, so existing admission,
+prefetch slots and whether any memory reply is complete but not yet retired.
+Replay status bits 62:60 carry the allocated-slot count, saturated at seven,
+and bit 63 reports any completed reply awaiting retirement. These were the four
+reserved bits, so existing admission,
 filter, trigger, queue, and active-slot fields retain their encoding. The
 analyzer now reports both counts at the parent pre-block probe and at target
 entry, separately for enabled and disabled arms.
 
-BlackParrot checkpoint `291ff1a97` passes 97 Linux harness tests, the standalone replay
-controller gate (including the new status packing), the ten-slot UCE preview
-gate, and the full-line UCE replay gate. A clean trace-enabled full-core
-`NUM_THREADS=2 NUM_CONTEXTS=4` run of `mt_dcache_replay_test` reports tagged
-32-line replay PASS, CORE PASS, and BSG PASS; the harness classifies the known
-post-PASS GPIO finalizer assertion as `VALID RUN`. The fresh build log, run
-log, waveform, ELF, and NBF SHA-256 values are respectively
-`1c36551e...526`, `95023b67...8fe`, `f80647af...a0a`,
-`0ba67803...3f2`, and `f8d610ac...f7c`. The strengthened guest observes a
-nonzero tagged D-UCE slot count, rejects completed counts above allocated
-counts, and waits for allocated and completed counts to return to zero before
-PASS. It replaces the earlier false `0x9c0` drain check.
+The first telemetry checkpoint `291ff1a97` passed the controller, UCE, and
+clean trace-enabled full-core gates, but a subsequent exact-configuration audit
+found that its two-bit count could encode all four occupied FPGA slots as zero.
+Synthesis job `20261104T055758Z-cb7e1392` was canceled before board use. The
+corrected encoding is therefore the only board candidate: the UCE source count
+now represents the inclusive range from zero through `prefetch_els_p`, status
+bits 62:60 saturate that value at seven, and bit 63 is an any-complete flag.
+This cannot alias any nonzero occupancy through either the four-slot FPGA or
+ten-slot simulation endpoint.
 
-Routed implementation job `20261104T055758Z-cb7e1392` uses exact top
-`cb7e1392`, BlackParrot `291ff1a97`, and
-`e_bp_unicore_zynqparrot_prefetch_cfg`. It is the telemetry-only hardware
-checkpoint; the lifecycle-mask correction is software collateral and does not
-change the bitstream.
+The corrected ten-slot UCE gate fills all ten entries and reads an exported
+count of ten. The controller packing gate, all 153 discovered Linux tests, and
+a clean trace-enabled two-thread/four-context full-core replay run pass through
+guest, CORE, and host markers. The known post-PASS GPIO finalizer assertion is
+classified as `VALID RUN`. Exact full-core build/run/FST/ELF/NBF SHA-256 values
+are `5931752f...e0f`, `106d383a...659`, `fb5dc0ff...e70`,
+`c6c9e734...89c`, and `abb83ed0...9a9`.
+
+The accepted performance baseline uses the four-context/four-slot 16 KiB
+endpoint `e_bp_unicore_zynqparrot_prefetch16k_cfg`, as confirmed by its 94.5
+BRAM route. The corrected telemetry candidate must use that same endpoint;
+the canceled job's base `prefetch` endpoint was not a matched physical control.
+
+The matching Linux candidate links as `vmlinux` `b3eff097...641`; raw payload
+`c1a7bbea...9b0` splices into shell NBF `22a6e794...9b5`, and reverse splicing
+reproduces the prior corrected shell NBF `4e91d7b6...8d9` byte-for-byte. The
+dynamic benchmark and 50-command transfer hash to `83ea1cf3...f43` and
+`b6ea2b9b...b2a`, and local transfer execution reconstructs the exact ELF.
+Patch `0017` passes reverse dry-run against the linked source and forward
+dry-run against an isolated pre-patch reconstruction. The complete simulator,
+waveform, UCE, kernel, NBF, benchmark, and transfer bundle is preserved under
+`/home/coyang/fpga-artifacts/context-resume/tagged-replay-telemetry-count3-20261104/`;
+its manifest verifies in full.
 
 Two command-invocation mistakes produced no test result: direct module-style
 `unittest` omitted the `linux-tests` import path, and the first standalone RTL
 runner call omitted its required `--out` flag. The guardrail is to use
 `make -C linux-tests check-harness` and inspect each isolated runner's
 `--help`/argument parser before launch. Both canonical reruns pass as reported
-above.
+above. A later incremental Linux link also omitted `BR_BINARIES_DIR`, stopped
+before linking because `/rootfs.cpio` was unavailable, and produced no image;
+the accepted rerun explicitly binds it to the retained Buildroot images path.
 
 Do not continue delay/gap/lead tuning from this checkpoint. The next diagnostic
 must route the validated UCE occupancy fields into an exact FPGA image, and the next RTL

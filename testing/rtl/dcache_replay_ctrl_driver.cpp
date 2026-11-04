@@ -119,9 +119,9 @@ int main(int argc, char **argv) {
     dut.downstream_outstanding_i = 2;
     dut.downstream_complete_i = 1;
     dut.eval();
-    require(((dut.status_o >> 60) & 0x3) == 2,
+    require(((dut.status_o >> 60) & 0x7) == 2,
             "downstream outstanding status mismatch");
-    require(((dut.status_o >> 62) & 0x3) == 1,
+    require(((dut.status_o >> 63) & 0x1) == 1,
             "downstream complete status mismatch");
 
     pulse(dut.clear_counters_i);

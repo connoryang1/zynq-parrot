@@ -222,8 +222,8 @@ def analyze(path, bootstrap_samples=20000):
                 "filtered": (raw_status >> 26) & 0xffff,
                 "triggers": (raw_status >> 42) & 0xff,
                 "dropped": (raw_status >> 50) & 0xff,
-                "uce_outstanding": (raw_status >> 60) & 0x3,
-                "uce_complete": (raw_status >> 62) & 0x3,
+                "uce_outstanding": (raw_status >> 60) & 0x7,
+                "uce_complete": (raw_status >> 63) & 0x1,
                 "probe_cycles": cycles,
                 "entry_busy": entry_status & 1,
                 "entry_queued": (entry_status >> 1) & 0x3,
@@ -233,8 +233,8 @@ def analyze(path, bootstrap_samples=20000):
                 "entry_filtered": (entry_status >> 26) & 0xffff,
                 "entry_triggers": (entry_status >> 42) & 0xff,
                 "entry_dropped": (entry_status >> 50) & 0xff,
-                "entry_uce_outstanding": (entry_status >> 60) & 0x3,
-                "entry_uce_complete": (entry_status >> 62) & 0x3,
+                "entry_uce_outstanding": (entry_status >> 60) & 0x7,
+                "entry_uce_complete": (entry_status >> 63) & 0x1,
                 "entry_probe_cycles": entry_cycles,
             })
         enabled_probe = [row for row in decoded if row["enabled"]]

@@ -95,8 +95,8 @@ int main(void)
   unsigned timeout = BENCH_DIAGNOSTIC == 2 ? 2048 : 100000;
   do {
     status = read_csr_9c3();
-    uint64_t uce_outstanding = (status >> 60) & 3;
-    uint64_t uce_complete = (status >> 62) & 3;
+    uint64_t uce_outstanding = (status >> 60) & 7;
+    uint64_t uce_complete = (status >> 63) & 1;
     saw_uce_outstanding |= !!uce_outstanding;
     if (uce_complete > uce_outstanding) {
       bp_print_string("[BSG-FAIL] tagged data replay invalid UCE status\n");
@@ -110,9 +110,9 @@ int main(void)
   bp_print_string("DCACHE-REPLAY completed\n");
 
   // CSR 0x9c0 tracks only the narrow physical-preview queue. Tagged replay
-  // owns ordinary full-line prefetch slots, exported in status bits 61:60.
+  // owns ordinary full-line prefetch slots, exported in status bits 62:60.
   timeout = 100000;
-  while (((status = read_csr_9c3()) >> 60) & 3) {
+  while (((status = read_csr_9c3()) >> 60) & 7) {
     if (!--timeout) {
       bp_print_string("[BSG-FAIL] tagged data replay UCE drain timeout\n");
       bp_finish(1);
