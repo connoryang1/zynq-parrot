@@ -1,0 +1,119 @@
+{
+  "purpose": "Measure a matched Linux wakeup with one tagged data replay while validating that every enabled tag completed.",
+  "transcript": "/run/user/1001/tagged-replay-delay-sweep-20261103/phase-balanced-lines32-delay0-gap0-normal.log",
+  "transcript_sha256": "acc7d75fe32962b78effc611e45dabd3d8cc0cd88e748ffea35100099cbc0da8",
+  "status": "/run/user/1001/tagged-replay-delay-sweep-20261103/phase-balanced-lines32-delay0-gap0-normal.log.status.json",
+  "status_sha256": "c0c018688d2a278d75fd9aa88557ad9d1e3355e31cf9fb8d5313e418a968f899",
+  "identity": {
+    "nbf_sha256": "08628c15185f4e99df9d8b19b0af6f24990d89e06fd4f1e9f50e2e2853056892",
+    "transfer_sha256": "01897ac2fbbdb6bf80738443c1625268a2e1c935a445ab2eb88763efbc172256",
+    "elf_sha256": "3ea9aa25b5cd3cee000f68e4ba6077d66ef3eae94ea0942a8f9afb343ead8a91",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "168909eecd407d296202d16961f08f2ce96652f05d3a82321f7a5fbfcedb8bd8"
+  },
+  "config": {
+    "mode": "data",
+    "lines": 32,
+    "slot": 2,
+    "delay": 0,
+    "gap": 0,
+    "policy": "normal",
+    "lead_cycles": 0
+  },
+  "trials": 512,
+  "trials_per_arm": 256,
+  "filtered_attempts": 1072,
+  "counter_deltas": {
+    "admitted_entries": 8192,
+    "filtered_entries": 0,
+    "accepted_triggers": 256,
+    "dropped_triggers": 0
+  },
+  "metrics": {
+    "hook_cycles": {
+      "disabled_median_cycles": 38.0,
+      "enabled_median_cycles": 47.0,
+      "paired_median_saved_cycles": -4.5,
+      "paired_95pct_ci_saved_cycles": [
+        -10.0,
+        0.0
+      ],
+      "disabled_range_cycles": [
+        18,
+        159
+      ],
+      "enabled_range_cycles": [
+        38,
+        159
+      ]
+    },
+    "wake_to_entry": {
+      "disabled_median_cycles": 45359.5,
+      "enabled_median_cycles": 48740.0,
+      "paired_median_saved_cycles": -5036.0,
+      "paired_95pct_ci_saved_cycles": [
+        -6124.5,
+        -2699.25
+      ],
+      "disabled_range_cycles": [
+        23710,
+        129077
+      ],
+      "enabled_range_cycles": [
+        23873,
+        154232
+      ]
+    },
+    "load_cycles": {
+      "disabled_median_cycles": 1733.0,
+      "enabled_median_cycles": 1501.0,
+      "paired_median_saved_cycles": 223.5,
+      "paired_95pct_ci_saved_cycles": [
+        211.75,
+        233.0
+      ],
+      "disabled_range_cycles": [
+        1578,
+        22268
+      ],
+      "enabled_range_cycles": [
+        1391,
+        70794
+      ]
+    },
+    "wake_to_load": {
+      "disabled_median_cycles": 47166.0,
+      "enabled_median_cycles": 51252.0,
+      "paired_median_saved_cycles": -5561.75,
+      "paired_95pct_ci_saved_cycles": [
+        -7612.25,
+        -2998.75
+      ],
+      "disabled_range_cycles": [
+        25439,
+        130813
+      ],
+      "enabled_range_cycles": [
+        25399,
+        155810
+      ]
+    },
+    "roundtrip": {
+      "disabled_median_cycles": 128360.0,
+      "enabled_median_cycles": 119721.0,
+      "paired_median_saved_cycles": 1266.25,
+      "paired_95pct_ci_saved_cycles": [
+        -6666.0,
+        13036.25
+      ],
+      "disabled_range_cycles": [
+        73298,
+        221492
+      ],
+      "enabled_range_cycles": [
+        72996,
+        225791
+      ]
+    }
+  }
+}

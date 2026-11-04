@@ -11,7 +11,7 @@ class TaggedReplayRunnerTest(unittest.TestCase):
     def test_command_binds_all_experiment_parameters(self):
         self.assertEqual(
             runner.benchmark_command("joint", 123, 4, "fifo", 900),
-            "/tmp/scheduler_tagged_replay_benchmark_dynamic joint 123 4 fifo 900; "
+            "/tmp/scheduler_tagged_replay_benchmark_dynamic joint 123 4 fifo 900 8 0; "
             "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc",
         )
 
@@ -43,6 +43,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ])
             with self.assertRaisesRegex(ValueError, "transfer command"):
                 runner.validate_args(args)
+
+    def test_lines_per_base_range_is_fail_closed(self):
+        args = runner.parse_args([
+            "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
+            "--lines-per-base", "0",
+        ])
+        with self.assertRaisesRegex(ValueError, "lines per base"):
+            runner.validate_args(args)
 
 
 if __name__ == "__main__":

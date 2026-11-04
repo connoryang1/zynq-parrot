@@ -20,6 +20,12 @@ ROW = re.compile(
     r"dropped=(\d+) wake_to_entry=(\d+) load_cycles=(\d+) "
     r"wake_to_load=(\d+) roundtrip=(\d+)"
 )
+PROBE_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* probe_status=(0|1)")
+PROBE_ROW = re.compile(
+    r"^TAGGED_REPLAY trial=(\d+).* preblock_status=0x([0-9a-fA-F]{16}) "
+    r"preblock_probe_cycles=(\d+) entry_probe_status=0x([0-9a-fA-F]{16}) "
+    r"entry_probe_cycles=(\d+)$", re.MULTILINE
+)
 METRICS = (
     "hook_cycles", "wake_to_entry", "load_cycles", "wake_to_load", "roundtrip"
 )
@@ -32,14 +38,18 @@ def percentile(values, fraction):
 
 
 def summarize_metric(rows, metric, rng, bootstrap_samples):
-    """Use balanced 0,1,1,0 blocks to suppress monotonic timing drift."""
+    """Use polarity-alternating balanced blocks to suppress drift and phase."""
     disabled = [row[metric] for row in rows if not row["enabled"]]
     enabled = [row[metric] for row in rows if row["enabled"]]
     blocks = []
     for start in range(0, len(rows), 4):
         block = rows[start:start + 4]
-        disabled_mean = (block[0][metric] + block[3][metric]) / 2
-        enabled_mean = (block[1][metric] + block[2][metric]) / 2
+        disabled_mean = statistics.mean(
+            row[metric] for row in block if not row["enabled"]
+        )
+        enabled_mean = statistics.mean(
+            row[metric] for row in block if row["enabled"]
+        )
         blocks.append(disabled_mean - enabled_mean)
     estimate = statistics.median(blocks)
     boots = [statistics.median(rng.choices(blocks, k=len(blocks)))
@@ -88,13 +98,22 @@ def analyze(path, bootstrap_samples=20000):
         "policy": policy,
         "lead_cycles": int(lead),
     }
-    if config["lines"] != 32 or config["slot"] != 2:
+    probe_configs = PROBE_CONFIG.findall(text)
+    if len(probe_configs) > 1:
+        raise ValueError("expected at most one probe-status configuration")
+    config["probe_status"] = bool(int(probe_configs[0])) if probe_configs else False
+    if (config["lines"] not in range(4, 33, 4) or config["slot"] != 2):
         raise ValueError("unexpected replay footprint shape")
     for key in ("mode", "delay", "gap", "policy", "lead_cycles"):
         if status.get(key) != config[key]:
             raise ValueError(
                 f"status {key}={status.get(key)!r}, expected {config[key]!r}"
             )
+    if ("lines_per_base" in status
+            and status["lines_per_base"] * 4 != config["lines"]):
+        raise ValueError("status lines_per_base does not match replay footprint")
+    if bool(status.get("probe_status", False)) != config["probe_status"]:
+        raise ValueError("status probe_status does not match configuration")
     required = ("TAGGED_REPLAY_CHILD PASS", "TAGGED_REPLAY_PARENT PASS", "BSG PASS")
     for marker in required:
         if marker not in text:
@@ -120,8 +139,25 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("expected exactly 512 ordered trials")
     for start in range(0, len(rows), 4):
         pattern = [row["enabled"] for row in rows[start:start + 4]]
-        if pattern != [0, 1, 1, 0]:
+        expected = [0, 1, 1, 0] if (start // 4) % 2 == 0 else [1, 0, 0, 1]
+        if pattern != expected:
             raise ValueError(f"unbalanced trial block at {start}: {pattern}")
+
+    probe_rows = [
+        (int(trial), int(preblock_status, 16), int(preblock_cycles),
+         int(entry_status, 16), int(entry_cycles))
+        for trial, preblock_status, preblock_cycles, entry_status, entry_cycles
+        in PROBE_ROW.findall(text)
+    ]
+    if config["probe_status"]:
+        if (len(probe_rows) != len(rows)
+                or [row[0] for row in probe_rows] != list(range(len(rows)))):
+            raise ValueError("expected one ordered preblock status per trial")
+    elif probe_rows and any(preblock_status or preblock_cycles
+                            or entry_status or entry_cycles
+                            for _, preblock_status, preblock_cycles,
+                            entry_status, entry_cycles in probe_rows):
+        raise ValueError("disabled preblock probe reported nonzero data")
 
     admitted = filtered = accepted_triggers = 0
     for index, row in enumerate(rows):
@@ -145,9 +181,9 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError(f"disabled trial {index} changed replay counters")
 
     rng = random.Random(0x7A66ED)
-    return {
+    result = {
         "purpose": (
-            "Measure a matched Linux wakeup with one tagged 32-line data replay "
+            "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."
         ),
         "transcript": str(path),
@@ -173,6 +209,186 @@ def analyze(path, bootstrap_samples=20000):
             for metric in METRICS
         },
     }
+    if config["probe_status"]:
+        decoded = []
+        for trial, raw_status, cycles, entry_status, entry_cycles in probe_rows:
+            decoded.append({
+                "enabled": rows[trial]["enabled"],
+                "busy": raw_status & 1,
+                "queued": (raw_status >> 1) & 0x3,
+                "held": (raw_status >> 3) & 1,
+                "next_index": (raw_status >> 4) & 0x3f,
+                "admitted": (raw_status >> 10) & 0xffff,
+                "filtered": (raw_status >> 26) & 0xffff,
+                "triggers": (raw_status >> 42) & 0xff,
+                "dropped": (raw_status >> 50) & 0xff,
+                "uce_outstanding": (raw_status >> 60) & 0x3,
+                "uce_complete": (raw_status >> 62) & 0x3,
+                "probe_cycles": cycles,
+                "entry_busy": entry_status & 1,
+                "entry_queued": (entry_status >> 1) & 0x3,
+                "entry_held": (entry_status >> 3) & 1,
+                "entry_next_index": (entry_status >> 4) & 0x3f,
+                "entry_admitted": (entry_status >> 10) & 0xffff,
+                "entry_filtered": (entry_status >> 26) & 0xffff,
+                "entry_triggers": (entry_status >> 42) & 0xff,
+                "entry_dropped": (entry_status >> 50) & 0xff,
+                "entry_uce_outstanding": (entry_status >> 60) & 0x3,
+                "entry_uce_complete": (entry_status >> 62) & 0x3,
+                "entry_probe_cycles": entry_cycles,
+            })
+        enabled_probe = [row for row in decoded if row["enabled"]]
+        disabled_probe = [row for row in decoded if not row["enabled"]]
+        if any(row["triggers"] not in (0, 1) or row["dropped"]
+               for row in enabled_probe):
+            raise ValueError("enabled preblock probe has invalid trigger counters")
+        if any((not row["triggers"]
+                and (row["busy"] or row["queued"] or row["held"]
+                     or row["admitted"] or row["filtered"]))
+               for row in enabled_probe):
+            raise ValueError("preblock replay state changed before trigger visibility")
+        if any(row["admitted"] + row["filtered"] > config["lines"]
+               for row in enabled_probe):
+            raise ValueError("preblock replay counters exceed configured footprint")
+        if any(row["triggers"] or row["dropped"] for row in disabled_probe):
+            raise ValueError("disabled preblock probe has trigger counters")
+        if any(row["entry_triggers"] != 1 or row["entry_dropped"]
+               for row in enabled_probe):
+            raise ValueError("enabled entry probe has invalid trigger counters")
+        if any(row["entry_triggers"] or row["entry_dropped"]
+               for row in disabled_probe):
+            raise ValueError("disabled entry probe has trigger counters")
+        if any(row["entry_admitted"] + row["entry_filtered"] > config["lines"]
+               for row in enabled_probe):
+            raise ValueError("entry replay counters exceed configured footprint")
+        if any(row["uce_complete"] > row["uce_outstanding"]
+               or row["entry_uce_complete"] > row["entry_uce_outstanding"]
+               for row in decoded):
+            raise ValueError("UCE complete count exceeds outstanding count")
+        result["preblock_probe"] = {
+            "enabled_trigger_visible_trials": sum(
+                bool(row["triggers"]) for row in enabled_probe
+            ),
+            "enabled_trigger_not_visible_trials": sum(
+                not row["triggers"] for row in enabled_probe
+            ),
+            "enabled_fully_admitted_trials": sum(
+                row["triggers"] == 1
+                and row["admitted"] + row["filtered"] == config["lines"]
+                and not (row["busy"] or row["queued"] or row["held"])
+                for row in enabled_probe
+            ),
+            "enabled_busy_trials": sum(row["busy"] for row in enabled_probe),
+            "enabled_queued_trials": sum(bool(row["queued"])
+                                           for row in enabled_probe),
+            "enabled_held_trials": sum(row["held"] for row in enabled_probe),
+            "enabled_admitted_median": statistics.median(
+                row["admitted"] for row in enabled_probe
+            ),
+            "enabled_admitted_range": [
+                min(row["admitted"] for row in enabled_probe),
+                max(row["admitted"] for row in enabled_probe),
+            ],
+            "enabled_admitted_histogram": {
+                str(value): sum(row["admitted"] == value
+                                for row in enabled_probe)
+                for value in sorted({row["admitted"] for row in enabled_probe})
+            },
+            "enabled_next_index_median": statistics.median(
+                row["next_index"] for row in enabled_probe
+            ),
+            "enabled_next_index_range": [
+                min(row["next_index"] for row in enabled_probe),
+                max(row["next_index"] for row in enabled_probe),
+            ],
+            "probe_cycles_median": {
+                "disabled": statistics.median(
+                    row["probe_cycles"] for row in disabled_probe
+                ),
+                "enabled": statistics.median(
+                    row["probe_cycles"] for row in enabled_probe
+                ),
+            },
+            "uce_outstanding_histogram": {
+                arm: {
+                    str(value): sum(row["uce_outstanding"] == value
+                                    for row in arm_rows)
+                    for value in sorted({row["uce_outstanding"]
+                                         for row in arm_rows})
+                }
+                for arm, arm_rows in (("disabled", disabled_probe),
+                                      ("enabled", enabled_probe))
+            },
+            "uce_complete_histogram": {
+                arm: {
+                    str(value): sum(row["uce_complete"] == value
+                                    for row in arm_rows)
+                    for value in sorted({row["uce_complete"]
+                                         for row in arm_rows})
+                }
+                for arm, arm_rows in (("disabled", disabled_probe),
+                                      ("enabled", enabled_probe))
+            },
+            "entry_busy_trials": sum(row["entry_busy"] for row in enabled_probe),
+            "entry_queued_trials": sum(bool(row["entry_queued"])
+                                        for row in enabled_probe),
+            "entry_held_trials": sum(row["entry_held"] for row in enabled_probe),
+            "entry_fully_admitted_trials": sum(
+                row["entry_admitted"] + row["entry_filtered"] == config["lines"]
+                and not (row["entry_busy"] or row["entry_queued"]
+                         or row["entry_held"])
+                for row in enabled_probe
+            ),
+            "entry_admitted_median": statistics.median(
+                row["entry_admitted"] for row in enabled_probe
+            ),
+            "entry_admitted_range": [
+                min(row["entry_admitted"] for row in enabled_probe),
+                max(row["entry_admitted"] for row in enabled_probe),
+            ],
+            "entry_admitted_histogram": {
+                str(value): sum(row["entry_admitted"] == value
+                                for row in enabled_probe)
+                for value in sorted({row["entry_admitted"]
+                                     for row in enabled_probe})
+            },
+            "entry_next_index_median": statistics.median(
+                row["entry_next_index"] for row in enabled_probe
+            ),
+            "entry_next_index_range": [
+                min(row["entry_next_index"] for row in enabled_probe),
+                max(row["entry_next_index"] for row in enabled_probe),
+            ],
+            "entry_probe_cycles_median": {
+                "disabled": statistics.median(
+                    row["entry_probe_cycles"] for row in disabled_probe
+                ),
+                "enabled": statistics.median(
+                    row["entry_probe_cycles"] for row in enabled_probe
+                ),
+            },
+            "entry_uce_outstanding_histogram": {
+                arm: {
+                    str(value): sum(row["entry_uce_outstanding"] == value
+                                    for row in arm_rows)
+                    for value in sorted({row["entry_uce_outstanding"]
+                                         for row in arm_rows})
+                }
+                for arm, arm_rows in (("disabled", disabled_probe),
+                                      ("enabled", enabled_probe))
+            },
+            "entry_uce_complete_histogram": {
+                arm: {
+                    str(value): sum(row["entry_uce_complete"] == value
+                                    for row in arm_rows)
+                    for value in sorted({row["entry_uce_complete"]
+                                         for row in arm_rows})
+                }
+                for arm, arm_rows in (("disabled", disabled_probe),
+                                      ("enabled", enabled_probe))
+            },
+        }
+    return result
 
 
 def main():

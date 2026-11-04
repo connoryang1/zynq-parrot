@@ -1,0 +1,146 @@
+{
+  "purpose": "Measure a matched Linux wakeup with one tagged data replay while validating that every enabled tag completed.",
+  "transcript": "/run/user/1001/tagged-replay-delay-sweep-20261103/probe-lines32-lead10000-gap0-normal.log",
+  "transcript_sha256": "04121ef5fbcb3e26703a9befa5abfc8d1ccba3820fec6261b36768bebcc73c81",
+  "status": "/run/user/1001/tagged-replay-delay-sweep-20261103/probe-lines32-lead10000-gap0-normal.log.status.json",
+  "status_sha256": "2501178469e2434114fadb5e6399b9a6f9c38138b701b40a448c729ef7596def",
+  "identity": {
+    "nbf_sha256": "08628c15185f4e99df9d8b19b0af6f24990d89e06fd4f1e9f50e2e2853056892",
+    "transfer_sha256": "002a28d2a85a6b0f0bb2c50b98537c4812b71b4f496e832797ece3380254b1f2",
+    "elf_sha256": "2208a4fe7440e15a0c7ad8c8b3597ecc16a33f39932a0cfcf522d50c2f16e4c9",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "168909eecd407d296202d16961f08f2ce96652f05d3a82321f7a5fbfcedb8bd8"
+  },
+  "config": {
+    "mode": "data",
+    "lines": 32,
+    "slot": 2,
+    "delay": 0,
+    "gap": 0,
+    "policy": "normal",
+    "lead_cycles": 10000,
+    "probe_status": true
+  },
+  "trials": 512,
+  "trials_per_arm": 256,
+  "filtered_attempts": 680,
+  "counter_deltas": {
+    "admitted_entries": 8192,
+    "filtered_entries": 0,
+    "accepted_triggers": 256,
+    "dropped_triggers": 0
+  },
+  "metrics": {
+    "hook_cycles": {
+      "disabled_median_cycles": 47.0,
+      "enabled_median_cycles": 47.0,
+      "paired_median_saved_cycles": -0.75,
+      "paired_95pct_ci_saved_cycles": [
+        -10.0,
+        0.0
+      ],
+      "disabled_range_cycles": [
+        14,
+        116
+      ],
+      "enabled_range_cycles": [
+        38,
+        124
+      ]
+    },
+    "wake_to_entry": {
+      "disabled_median_cycles": 50201.0,
+      "enabled_median_cycles": 58753.5,
+      "paired_median_saved_cycles": -6265.0,
+      "paired_95pct_ci_saved_cycles": [
+        -10797.75,
+        -1797.5
+      ],
+      "disabled_range_cycles": [
+        24033,
+        94331
+      ],
+      "enabled_range_cycles": [
+        24171,
+        128703
+      ]
+    },
+    "load_cycles": {
+      "disabled_median_cycles": 1685.0,
+      "enabled_median_cycles": 1505.0,
+      "paired_median_saved_cycles": 189.5,
+      "paired_95pct_ci_saved_cycles": [
+        170.75,
+        197.5
+      ],
+      "disabled_range_cycles": [
+        1547,
+        56025
+      ],
+      "enabled_range_cycles": [
+        1368,
+        61611
+      ]
+    },
+    "wake_to_load": {
+      "disabled_median_cycles": 52202.5,
+      "enabled_median_cycles": 65720.5,
+      "paired_median_saved_cycles": -10448.25,
+      "paired_95pct_ci_saved_cycles": [
+        -13969.25,
+        -6727.5
+      ],
+      "disabled_range_cycles": [
+        26559,
+        137253
+      ],
+      "enabled_range_cycles": [
+        25694,
+        130196
+      ]
+    },
+    "roundtrip": {
+      "disabled_median_cycles": 139402.0,
+      "enabled_median_cycles": 147817.0,
+      "paired_median_saved_cycles": -12798.25,
+      "paired_95pct_ci_saved_cycles": [
+        -18821.25,
+        -9102.5
+      ],
+      "disabled_range_cycles": [
+        85289,
+        281236
+      ],
+      "enabled_range_cycles": [
+        84799,
+        253992
+      ]
+    }
+  },
+  "preblock_probe": {
+    "enabled_trigger_visible_trials": 186,
+    "enabled_trigger_not_visible_trials": 70,
+    "enabled_fully_admitted_trials": 186,
+    "enabled_busy_trials": 0,
+    "enabled_queued_trials": 0,
+    "enabled_held_trials": 0,
+    "enabled_admitted_median": 32.0,
+    "enabled_admitted_range": [
+      0,
+      32
+    ],
+    "enabled_admitted_histogram": {
+      "0": 70,
+      "32": 186
+    },
+    "enabled_next_index_median": 32.0,
+    "enabled_next_index_range": [
+      32,
+      32
+    ],
+    "probe_cycles_median": {
+      "disabled": 1191.0,
+      "enabled": 1270.0
+    }
+  }
+}

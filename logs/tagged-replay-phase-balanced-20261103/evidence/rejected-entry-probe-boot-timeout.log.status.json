@@ -1,0 +1,18 @@
+{
+  "status": "FAIL",
+  "nbf_sha256": "08628c15185f4e99df9d8b19b0af6f24990d89e06fd4f1e9f50e2e2853056892",
+  "transfer_sha256": "dee9cce1160d32afe0211b374e5fafc6049764fcdf5e2b4b3aa870ef15163819",
+  "elf_sha256": "3521811b13e6ee8edebc282dfd02d63cb61c74c8d2d4875e298a4018f4c581ec",
+  "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "bitstream_sha256": "168909eecd407d296202d16961f08f2ce96652f05d3a82321f7a5fbfcedb8bd8",
+  "mode": "data",
+  "delay": 0,
+  "gap": 0,
+  "policy": "normal",
+  "lead_cycles": 0,
+  "lines_per_base": 8,
+  "probe_status": true,
+  "command": "/tmp/scheduler_tagged_replay_benchmark_dynamic data 0 0 normal 0 8 1; rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc",
+  "error": "TIMEOUT(\"Timeout exceeded.\\n<pexpect.pty_spawn.spawn object at 0x7fb36051fb80>\\ncommand: /dev/shm/zp-linux-data-instruction-preview/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh\\nargs: [b'/dev/shm/zp-linux-data-instruction-preview/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh', b'xilinx@192.168.4.35', b'/run/user/1001/tagged-replay-linux/tagged-replay-linux-shell.nbf']\\nbuffer (last 100 chars): '   3.684915] io scheduler mq-deadline registered\\\\r\\\\r\\\\r\\\\n[    3.688500] io scheduler kyber registered\\\\r\\\\r\\\\r\\\\n'\\nbefore (last 100 chars): '   3.684915] io scheduler mq-deadline registered\\\\r\\\\r\\\\r\\\\n[    3.688500] io scheduler kyber registered\\\\r\\\\r\\\\r\\\\n'\\nafter: <class 'pexpect.exceptions.TIMEOUT'>\\nmatch: None\\nmatch_index: None\\nexitstatus: None\\nflag_eof: False\\npid: 2277769\\nchild_fd: 5\\nclosed: False\\ntimeout: 300\\ndelimiter: <class 'pexpect.exceptions.EOF'>\\nlogfile: None\\nlogfile_read: <_io.TextIOWrapper name='/run/user/1001/tagged-replay-delay-sweep-20261103/entry-probe-lines32-lead0-gap0-normal.log' mode='w' encoding='UTF-8'>\\nlogfile_send: None\\nmaxread: 2000\\nignorecase: False\\nsearchwindowsize: None\\ndelaybeforesend: 0.05\\ndelayafterclose: 0.1\\ndelayafterterminate: 0.1\\nsearcher: searcher_re:\\n    0: re.compile('(?:^|\\\\\\\\r?\\\\\\\\n)(?:~ )?# ')\")",
+  "recovery": "Power-cycle the board, wait for PYNQ readiness, and reload the verified overlay before another run."
+}

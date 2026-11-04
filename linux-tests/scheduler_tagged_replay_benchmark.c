@@ -1,9 +1,10 @@
 #define _GNU_SOURCE
 
-/* Measure a best-case Linux handoff with one tagged 32-line data replay.
+/* Measure a best-case Linux handoff with one tagged data replay.
  * Both arms retain identical pins and hardware footprint configuration; only
  * the successful-wakeup trigger mode changes. Four page-aligned bases expand
- * to eight cache lines each, and a dependent pointer ring exposes first use.
+ * to a configurable number of cache lines, and a dependent pointer ring
+ * exposes first use.
  */
 #include <errno.h>
 #include <stdint.h>
@@ -35,8 +36,8 @@ enum {
 	page_bytes = 4096,
 	line_bytes = 64,
 	bases = 4,
-	lines_per_base = 8,
-	replay_lines = bases * lines_per_base,
+	max_lines_per_base = 8,
+	max_replay_lines = bases * max_lines_per_base,
 	eviction_pages = 16,
 	replay_slot = 2,
 	max_retries = 4096,
@@ -44,7 +45,11 @@ enum {
 
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
+	uint64_t preblock_status;
+	uint64_t entry_probe_status;
 	unsigned long hook_cycles;
+	unsigned long preblock_probe_cycles;
+	unsigned long entry_probe_cycles;
 	unsigned accepted_entries, filtered_entries, accepted_triggers, dropped_triggers;
 	unsigned hooks, enabled, accepted;
 };
@@ -73,11 +78,15 @@ static void transfer(int fd, char *token, int send)
 
 static unsigned trial_enabled(unsigned trial)
 {
-	return (trial ^ (trial >> 1)) & 1;
+	/* Alternate block polarity so a four-trial scheduler phase cannot alias
+	 * into the enabled arm. Each block remains balanced and drift-resistant.
+	 */
+	return ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1);
 }
 
 static void child_run(int in, int out, volatile struct sample *samples,
-		      unsigned mode, unsigned delay, unsigned gap)
+		      unsigned mode, unsigned delay, unsigned gap,
+		      unsigned lines_per_base, int probe_status)
 {
 	volatile unsigned char *target = mmap(NULL, bases * page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -85,7 +94,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 	volatile unsigned char *eviction = mmap(NULL, eviction_pages * page_bytes,
 						PROT_READ | PROT_WRITE,
 						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	unsigned long target_addr[replay_lines];
+	unsigned long target_addr[max_replay_lines];
+	const unsigned replay_lines = bases * lines_per_base;
 	unsigned retries = 0;
 	char token = 'x';
 
@@ -142,6 +152,20 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		transfer(out, &token, 1);
 		transfer(in, &token, 0);
 		entry = cycle();
+		if (probe_status) {
+			uint64_t probe_start = cycle();
+			long replay_status = syscall(SYS_prctl,
+					PR_BP_PREVIEW_REPLAY_STATUS,
+					0UL, 0UL, 0UL, 0UL);
+
+			samples[trial].entry_probe_cycles = cycle() - probe_start;
+			if (replay_status < 0)
+				fail("read entry tagged replay status");
+			samples[trial].entry_probe_status = replay_status;
+		} else {
+			samples[trial].entry_probe_cycles = 0;
+			samples[trial].entry_probe_status = 0;
+		}
 		node = target_addr[0];
 		for (unsigned line = 0; line < replay_lines; line++)
 			node = *(volatile unsigned long *)node;
@@ -215,14 +239,15 @@ int main(int argc, char **argv)
 {
 	int to_child[2], to_parent[2], status;
 	unsigned mode = 9, delay = 0, gap = 2;
+	unsigned lines_per_base = max_lines_per_base;
 	unsigned long lead_cycles = 0;
-	int fifo = 0;
+	int fifo = 0, probe_status = 0;
 	volatile struct sample *samples;
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 6) {
-		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000]\n",
+	if (argc > 8) {
+		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1]\n",
 			argv[0]);
 		return 2;
 	}
@@ -272,6 +297,26 @@ int main(int argc, char **argv)
 		}
 		lead_cycles = parsed;
 	}
+	if (argc >= 7) {
+		char *end;
+		unsigned long parsed = strtoul(argv[6], &end, 10);
+
+		if (*end || parsed < 1 || parsed > max_lines_per_base) {
+			fprintf(stderr, "invalid lines per base: %s\n", argv[6]);
+			return 2;
+		}
+		lines_per_base = parsed;
+	}
+	if (argc >= 8) {
+		char *end;
+		unsigned long parsed = strtoul(argv[7], &end, 10);
+
+		if (*end || parsed > 1) {
+			fprintf(stderr, "invalid probe status flag: %s\n", argv[7]);
+			return 2;
+		}
+		probe_status = parsed;
+	}
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
 
@@ -283,16 +328,17 @@ int main(int argc, char **argv)
 		       MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu\n",
-	       mode == 10 ? "joint" : "data", replay_lines, replay_slot,
-	       delay, gap, fifo ? "fifo" : "normal", lead_cycles);
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu probe_status=%u\n",
+	       mode == 10 ? "joint" : "data", bases * lines_per_base, replay_slot,
+	       delay, gap, fifo ? "fifo" : "normal", lead_cycles, probe_status);
 	child = fork();
 	if (child < 0)
 		fail("fork");
 	if (!child) {
 		close(to_child[1]);
 		close(to_parent[0]);
-		child_run(to_child[0], to_parent[1], samples, mode, delay, gap);
+		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
+			  lines_per_base, probe_status);
 		return 0;
 	}
 	close(to_child[0]);
@@ -306,6 +352,20 @@ int main(int argc, char **argv)
 		lead_start = cycle();
 		while (cycle() - lead_start < lead_cycles)
 			__asm__ volatile("" : : : "memory");
+		if (probe_status) {
+			uint64_t probe_start = cycle();
+			long replay_status = syscall(SYS_prctl,
+					PR_BP_PREVIEW_REPLAY_STATUS,
+					0UL, 0UL, 0UL, 0UL);
+
+			samples[trial].preblock_probe_cycles = cycle() - probe_start;
+			if (replay_status < 0)
+				fail("read preblock tagged replay status");
+			samples[trial].preblock_status = replay_status;
+		} else {
+			samples[trial].preblock_probe_cycles = 0;
+			samples[trial].preblock_status = 0;
+		}
 		transfer(to_parent[0], &token, 0);
 		samples[trial].returned = cycle();
 		if (samples[trial].accepted)
@@ -325,14 +385,18 @@ int main(int argc, char **argv)
 			fprintf(stderr, "nonmonotonic tagged replay sample: %u\n", trial);
 			return 1;
 		}
-		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu\n",
+		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu\n",
 		       trial - warmup, s->enabled, s->hooks, s->hook_cycles,
 		       s->accepted_entries, s->filtered_entries,
 		       s->accepted_triggers, s->dropped_triggers,
 		       (unsigned long long)(s->entry - s->launch),
 		       (unsigned long long)(s->after_load - s->entry),
 		       (unsigned long long)(s->after_load - s->launch),
-		       (unsigned long long)(s->returned - s->launch));
+		       (unsigned long long)(s->returned - s->launch),
+		       (unsigned long long)s->preblock_status,
+		       s->preblock_probe_cycles,
+		       (unsigned long long)s->entry_probe_status,
+		       s->entry_probe_cycles);
 	}
 	puts("TAGGED_REPLAY_PARENT PASS");
 	return 0;

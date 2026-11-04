@@ -1,4 +1,4 @@
-"""Test strict analysis of the tagged 32-line Linux replay benchmark."""
+"""Test strict analysis of the tagged Linux replay benchmark."""
 
 import json
 import tempfile
@@ -8,27 +8,38 @@ from pathlib import Path
 from analyze_scheduler_tagged_replay import analyze
 
 
-def write_run(root, corrupt_counter=False):
+def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
+              downstream_status=False):
     """Create a complete synthetic matched A/B transcript and status."""
     path = root / "run.log"
     rows = [
-        "TAGGED_REPLAY_CONFIG mode=data lines=32 slot=2 delay=0 gap=2 "
-        "policy=fifo lead_cycles=0"
+        f"TAGGED_REPLAY_CONFIG mode=data lines={lines} slot=2 delay=0 gap=2 "
+        f"policy=fifo lead_cycles=0 probe_status={int(probe_status)}"
     ]
     for trial in range(512):
-        enabled = (trial ^ (trial >> 1)) & 1
-        admitted = 32 if enabled else 0
+        enabled = ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1)
+        admitted = lines if enabled else 0
         triggers = enabled
-        if corrupt_counter and trial == 5:
+        if corrupt_counter and trial == 4:
             admitted -= 1
         entry = 100 + trial % 3
         load = 280 if enabled else 300
+        preblock = ((1 << 42) | (admitted << 10)) \
+            if probe_status and enabled else 0
+        entry_status = preblock
+        if probe_status and enabled and downstream_status:
+            preblock |= (2 << 60) | (1 << 62)
+            entry_status |= 1 << 60
         rows.append(
             f"TAGGED_REPLAY trial={trial} enabled={enabled} hooks={enabled} "
             f"hook_cycles={10 + enabled} admitted={admitted} filtered=0 "
             f"triggers={triggers} dropped=0 wake_to_entry={entry} "
             f"load_cycles={load} wake_to_load={entry + load} "
-            f"roundtrip={entry + load + 40}"
+            f"roundtrip={entry + load + 40} "
+            f"preblock_status=0x{preblock:016x} "
+            f"preblock_probe_cycles={30 if probe_status else 0} "
+            f"entry_probe_status=0x{entry_status:016x} "
+            f"entry_probe_cycles={32 if probe_status else 0}"
         )
     rows.extend((
         "TAGGED_REPLAY_CHILD PASS retries=0",
@@ -49,6 +60,8 @@ def write_run(root, corrupt_counter=False):
         "gap": 2,
         "policy": "fifo",
         "lead_cycles": 0,
+        "lines_per_base": lines // 4,
+        "probe_status": probe_status,
     }
     path.with_suffix(".log.status.json").write_text(json.dumps(status) + "\n")
     return path
@@ -70,6 +83,41 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             path = write_run(Path(directory), corrupt_counter=True)
             with self.assertRaisesRegex(ValueError, "did not complete all replay entries"):
                 analyze(path, bootstrap_samples=10)
+
+    def test_reduced_footprint_passes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), lines=16), bootstrap_samples=10
+            )
+        self.assertEqual(result["config"]["lines"], 16)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 4096)
+
+    def test_preblock_probe_is_decoded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), lines=16, probe_status=True),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["preblock_probe"]["enabled_busy_trials"], 0)
+        self.assertEqual(result["preblock_probe"]["enabled_admitted_median"], 16)
+        self.assertEqual(result["preblock_probe"]["entry_admitted_median"], 16)
+
+    def test_downstream_uce_status_is_decoded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), lines=16, probe_status=True,
+                          downstream_status=True),
+                bootstrap_samples=10,
+            )
+        probe = result["preblock_probe"]
+        self.assertEqual(probe["uce_outstanding_histogram"]["enabled"], {"2": 256})
+        self.assertEqual(probe["uce_complete_histogram"]["enabled"], {"1": 256})
+        self.assertEqual(
+            probe["entry_uce_outstanding_histogram"]["enabled"], {"1": 256}
+        )
+        self.assertEqual(
+            probe["entry_uce_complete_histogram"]["enabled"], {"0": 256}
+        )
 
     def test_status_parameter_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run one tagged 32-line Linux replay experiment on the serialized PYNQ console."""
+"""Run one tagged Linux replay experiment on the serialized PYNQ console."""
 
 import argparse
 import hashlib
@@ -23,9 +23,11 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def benchmark_command(mode, delay, gap, policy, lead_cycles):
+def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
+                      probe_status=False):
     return (
-        f"{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles}; "
+        f"{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles} "
+        f"{lines_per_base} {int(probe_status)}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
     )
 
@@ -45,6 +47,8 @@ def parse_args(argv=None):
     parser.add_argument("--gap", type=int, default=2)
     parser.add_argument("--policy", choices=("normal", "fifo"), default="fifo")
     parser.add_argument("--lead-cycles", type=int, default=0)
+    parser.add_argument("--lines-per-base", type=int, default=8)
+    parser.add_argument("--probe-status", action="store_true")
     parser.add_argument("--print-command", action="store_true")
     return parser.parse_args(argv)
 
@@ -63,6 +67,8 @@ def validate_args(args):
         raise ValueError("gap must be in 0..255")
     if not 0 <= args.lead_cycles <= 1_000_000:
         raise ValueError("lead cycles must be in 0..1000000")
+    if not 1 <= args.lines_per_base <= 8:
+        raise ValueError("lines per base must be in 1..8")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
     if not args.nbf.is_file() or not args.transfer.is_file():
@@ -86,7 +92,8 @@ def run(args):
         env["PYNQ_BITSTREAM_SHA256"] = args.bitstream_sha256
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = benchmark_command(
-        args.mode, args.delay, args.gap, args.policy, args.lead_cycles
+        args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
+        args.lines_per_base, args.probe_status,
     )
     status = {
         "status": "running",
@@ -100,6 +107,8 @@ def run(args):
         "gap": args.gap,
         "policy": args.policy,
         "lead_cycles": args.lead_cycles,
+        "lines_per_base": args.lines_per_base,
+        "probe_status": args.probe_status,
         "command": command,
     }
     child = None

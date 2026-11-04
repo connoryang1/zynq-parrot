@@ -30,6 +30,8 @@ int main(int argc, char **argv) {
     dut.trigger_v_i = 0;
     dut.replay_yumi_i = 0;
     dut.replay_accepted_i = 0;
+    dut.downstream_outstanding_i = 0;
+    dut.downstream_complete_i = 0;
     dut.clear_counters_i = 0;
     tick(); tick();
     dut.reset_i = 0;
@@ -113,6 +115,14 @@ int main(int argc, char **argv) {
     require(((status >> 26) & 0xffff) == 1, "filtered-entry counter mismatch");
     require(((status >> 42) & 0xff) == 4, "accepted-trigger counter mismatch");
     require(((status >> 50) & 0xff) == 1, "dropped-trigger counter mismatch");
+
+    dut.downstream_outstanding_i = 2;
+    dut.downstream_complete_i = 1;
+    dut.eval();
+    require(((dut.status_o >> 60) & 0x3) == 2,
+            "downstream outstanding status mismatch");
+    require(((dut.status_o >> 62) & 0x3) == 1,
+            "downstream complete status mismatch");
 
     pulse(dut.clear_counters_i);
     require(((dut.status_o >> 10) & 0xffffffffffffULL) == 0,
