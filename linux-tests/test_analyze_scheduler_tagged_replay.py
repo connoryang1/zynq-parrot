@@ -11,13 +11,13 @@ from pool_scheduler_tagged_replay_replicates import pool
 
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
-              layout="aligned", mode="data"):
+              layout="aligned", mode="data", sync="pipe"):
     """Create a complete synthetic matched A/B transcript and status."""
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
         f"policy=fifo lead_cycles=0 layout={layout} "
-        f"probe_status={int(probe_status)}"
+        f"probe_status={int(probe_status)} sync={sync}"
     ]
     for trial in range(512):
         enabled = ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1)
@@ -69,6 +69,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "lines_per_base": lines // 4,
         "probe_status": probe_status,
         "layout": layout,
+        "sync": sync,
     }
     path.with_suffix(".log.status.json").write_text(json.dumps(status) + "\n")
     return path
@@ -114,6 +115,24 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["mode"], "data-late")
+
+    def test_futex_sync_is_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), sync="futex"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["sync"], "futex")
+
+    def test_status_sync_mismatch_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory), sync="futex")
+            status_path = path.with_suffix(".log.status.json")
+            status = json.loads(status_path.read_text())
+            status["sync"] = "pipe"
+            status_path.write_text(json.dumps(status) + "\n")
+            with self.assertRaisesRegex(ValueError, "status sync"):
+                analyze(path, bootstrap_samples=10)
 
     def test_two_valid_replicates_pool_paired_blocks(self):
         with tempfile.TemporaryDirectory() as directory:

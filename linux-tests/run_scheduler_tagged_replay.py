@@ -24,10 +24,10 @@ def sha256(path):
 
 
 def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
-                      probe_status=False, layout="aligned"):
+                      probe_status=False, layout="aligned", sync="pipe"):
     return (
         f"{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles} "
-        f"{lines_per_base} {int(probe_status)} {layout}; "
+        f"{lines_per_base} {int(probe_status)} {layout} {sync}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
     )
 
@@ -52,6 +52,7 @@ def parse_args(argv=None):
     parser.add_argument("--probe-status", action="store_true")
     parser.add_argument("--layout", choices=("aligned", "skew"),
                         default="aligned")
+    parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--print-command", action="store_true")
     return parser.parse_args(argv)
 
@@ -96,7 +97,7 @@ def run(args):
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = benchmark_command(
         args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
-        args.lines_per_base, args.probe_status, args.layout,
+        args.lines_per_base, args.probe_status, args.layout, args.sync,
     )
     status = {
         "status": "running",
@@ -113,6 +114,7 @@ def run(args):
         "lines_per_base": args.lines_per_base,
         "probe_status": args.probe_status,
         "layout": args.layout,
+        "sync": args.sync,
         "command": command,
     }
     child = None
@@ -179,7 +181,8 @@ def main(argv=None):
         raise SystemExit(str(error)) from error
     if args.print_command:
         print(benchmark_command(
-            args.mode, args.delay, args.gap, args.policy, args.lead_cycles
+            args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
+            args.lines_per_base, args.probe_status, args.layout, args.sync,
         ))
         return 0
     run(args)

@@ -22,6 +22,7 @@ ROW = re.compile(
 )
 PROBE_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* probe_status=(0|1)")
 LAYOUT_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* layout=(aligned|skew)")
+SYNC_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* sync=(pipe|futex)")
 PROBE_ROW = re.compile(
     r"^TAGGED_REPLAY trial=(\d+).* preblock_status=0x([0-9a-fA-F]{16}) "
     r"preblock_probe_cycles=(\d+) entry_probe_status=0x([0-9a-fA-F]{16}) "
@@ -107,6 +108,10 @@ def analyze(path, bootstrap_samples=20000):
     if len(layout_configs) > 1:
         raise ValueError("expected at most one footprint layout")
     config["layout"] = layout_configs[0] if layout_configs else "aligned"
+    sync_configs = SYNC_CONFIG.findall(text)
+    if len(sync_configs) > 1:
+        raise ValueError("expected at most one synchronization style")
+    config["sync"] = sync_configs[0] if sync_configs else "pipe"
     if (config["lines"] not in range(4, 33, 4) or config["slot"] != 2):
         raise ValueError("unexpected replay footprint shape")
     for key in ("mode", "delay", "gap", "policy", "lead_cycles"):
@@ -121,6 +126,8 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("status probe_status does not match configuration")
     if status.get("layout", "aligned") != config["layout"]:
         raise ValueError("status layout does not match configuration")
+    if status.get("sync", "pipe") != config["sync"]:
+        raise ValueError("status sync does not match configuration")
     required = ("TAGGED_REPLAY_CHILD PASS", "TAGGED_REPLAY_PARENT PASS", "BSG PASS")
     for marker in required:
         if marker not in text:

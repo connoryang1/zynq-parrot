@@ -7,6 +7,8 @@
  * exposes first use.
  */
 #include <errno.h>
+#include <linux/futex.h>
+#include <stdatomic.h>
 #include <stdint.h>
 #include <sched.h>
 #include <stdio.h>
@@ -59,6 +61,24 @@ struct sample {
 	unsigned hooks, enabled, accepted;
 };
 
+struct shared_state {
+	_Atomic uint32_t phase;
+	struct sample samples[trials];
+};
+
+enum sync_style {
+	sync_pipe,
+	sync_futex,
+};
+
+enum futex_phase {
+	futex_idle,
+	futex_child_ready,
+	futex_parent_go,
+	futex_child_done,
+	futex_parent_ack,
+};
+
 static inline uint64_t cycle(void)
 {
 	uint64_t value;
@@ -81,6 +101,52 @@ static void transfer(int fd, char *token, int send)
 		fail(send ? "write pipe" : "read pipe");
 }
 
+static void futex_wait_for(_Atomic uint32_t *word, uint32_t wanted)
+{
+	for (;;) {
+		uint32_t observed = atomic_load_explicit(word, memory_order_acquire);
+
+		if (observed == wanted)
+			return;
+		if (syscall(SYS_futex, (uint32_t *)word, FUTEX_WAIT,
+			    observed, NULL, NULL, 0) && errno != EAGAIN && errno != EINTR)
+			fail("futex wait tagged replay");
+	}
+}
+
+static void futex_set_wake(_Atomic uint32_t *word, uint32_t value)
+{
+	atomic_store_explicit(word, value, memory_order_release);
+	if (syscall(SYS_futex, (uint32_t *)word, FUTEX_WAKE,
+		    1, NULL, NULL, 0) < 0)
+		fail("futex wake tagged replay");
+}
+
+static void child_handoff_begin(int in, int out, char *token,
+				_Atomic uint32_t *phase, enum sync_style sync)
+{
+	if (sync == sync_pipe) {
+		transfer(out, token, 1);
+		transfer(in, token, 0);
+		return;
+	}
+	futex_wait_for(phase, futex_idle);
+	futex_set_wake(phase, futex_child_ready);
+	futex_wait_for(phase, futex_parent_go);
+}
+
+static void child_handoff_end(int out, char *token, _Atomic uint32_t *phase,
+			      enum sync_style sync)
+{
+	if (sync == sync_pipe) {
+		transfer(out, token, 1);
+		return;
+	}
+	futex_set_wake(phase, futex_child_done);
+	futex_wait_for(phase, futex_parent_ack);
+	futex_set_wake(phase, futex_idle);
+}
+
 static unsigned trial_enabled(unsigned trial)
 {
 	/* Alternate block polarity so a four-trial scheduler phase cannot alias
@@ -91,7 +157,8 @@ static unsigned trial_enabled(unsigned trial)
 
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned mode, unsigned delay, unsigned gap,
-		      unsigned lines_per_base, int probe_status, int skew_layout)
+		      unsigned lines_per_base, int probe_status, int skew_layout,
+		      _Atomic uint32_t *phase, enum sync_style sync)
 {
 	volatile unsigned char *target = mmap(NULL, bases * page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -161,8 +228,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			fail("hook count before");
 		samples[trial].enabled = enabled;
 		samples[trial].accepted = 0;
-		transfer(out, &token, 1);
-		transfer(in, &token, 0);
+		child_handoff_begin(in, out, &token, phase, sync);
 		entry = cycle();
 		if (probe_status) {
 			uint64_t probe_start = cycle();
@@ -192,7 +258,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			fprintf(stderr,
 				"TAGGED_REPLAY_RETRY trial=%u enabled=%u hooks=%u\n",
 				trial, enabled, samples[trial].hooks);
-			transfer(out, &token, 1);
+			child_handoff_end(out, &token, phase, sync);
 			if (++retries > max_retries)
 				fail("too many tagged replay retries");
 			continue;
@@ -237,7 +303,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		}
 		samples[trial].accepted = 1;
 		samples[trial].done = cycle();
-		transfer(out, &token, 1);
+		child_handoff_end(out, &token, phase, sync);
 		trial++;
 	}
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
@@ -254,12 +320,14 @@ int main(int argc, char **argv)
 	unsigned lines_per_base = max_lines_per_base;
 	unsigned long lead_cycles = 0;
 	int fifo = 0, probe_status = 0, skew_layout = 0;
+	enum sync_style sync = sync_pipe;
+	struct shared_state *shared;
 	volatile struct sample *samples;
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 9) {
-		fprintf(stderr, "usage: %s [data|data-late|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew]\n",
+	if (argc > 10) {
+		fprintf(stderr, "usage: %s [data|data-late|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
 			argv[0]);
 		return 2;
 	}
@@ -339,6 +407,14 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	if (argc >= 10) {
+		if (!strcmp(argv[9], "futex"))
+			sync = sync_futex;
+		else if (strcmp(argv[9], "pipe")) {
+			fprintf(stderr, "invalid synchronization style: %s\n", argv[9]);
+			return 2;
+		}
+	}
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
 
@@ -346,15 +422,18 @@ int main(int argc, char **argv)
 			fail("sched_setscheduler FIFO");
 	}
 
-	samples = mmap(NULL, sizeof(*samples) * trials, PROT_READ | PROT_WRITE,
+	shared = mmap(NULL, sizeof(*shared), PROT_READ | PROT_WRITE,
 		       MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
+	if (shared == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u\n",
+	atomic_init(&shared->phase, futex_idle);
+	samples = shared->samples;
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s\n",
 	       mode == 10 ? "joint" : mode == 11 ? "data-late" : "data",
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
-	       skew_layout ? "skew" : "aligned", probe_status);
+	       skew_layout ? "skew" : "aligned", probe_status,
+	       sync == sync_futex ? "futex" : "pipe");
 	child = fork();
 	if (child < 0)
 		fail("fork");
@@ -362,7 +441,8 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
-			  lines_per_base, probe_status, skew_layout);
+			  lines_per_base, probe_status, skew_layout,
+			  &shared->phase, sync);
 		return 0;
 	}
 	close(to_child[0]);
@@ -370,9 +450,15 @@ int main(int argc, char **argv)
 	for (unsigned trial = 0; trial < trials;) {
 		uint64_t lead_start;
 
-		transfer(to_parent[0], &token, 0);
+		if (sync == sync_pipe)
+			transfer(to_parent[0], &token, 0);
+		else
+			futex_wait_for(&shared->phase, futex_child_ready);
 		samples[trial].launch = cycle();
-		transfer(to_child[1], &token, 1);
+		if (sync == sync_pipe)
+			transfer(to_child[1], &token, 1);
+		else
+			futex_set_wake(&shared->phase, futex_parent_go);
 		lead_start = cycle();
 		while (cycle() - lead_start < lead_cycles)
 			__asm__ volatile("" : : : "memory");
@@ -390,8 +476,16 @@ int main(int argc, char **argv)
 			samples[trial].preblock_probe_cycles = 0;
 			samples[trial].preblock_status = 0;
 		}
-		transfer(to_parent[0], &token, 0);
+		if (sync == sync_pipe) {
+			transfer(to_parent[0], &token, 0);
+		} else {
+			futex_wait_for(&shared->phase, futex_child_done);
+		}
 		samples[trial].returned = cycle();
+		if (sync == sync_futex) {
+			futex_set_wake(&shared->phase, futex_parent_ack);
+			futex_wait_for(&shared->phase, futex_idle);
+		}
 		if (samples[trial].accepted)
 			trial++;
 	}

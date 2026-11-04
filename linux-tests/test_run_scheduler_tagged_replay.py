@@ -11,13 +11,13 @@ class TaggedReplayRunnerTest(unittest.TestCase):
     def test_command_binds_all_experiment_parameters(self):
         self.assertEqual(
             runner.benchmark_command("joint", 123, 4, "fifo", 900),
-            "/tmp/scheduler_tagged_replay_benchmark_dynamic joint 123 4 fifo 900 8 0 aligned; "
+            "/tmp/scheduler_tagged_replay_benchmark_dynamic joint 123 4 fifo 900 8 0 aligned pipe; "
             "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc",
         )
 
     def test_command_binds_skew_layout(self):
         self.assertIn(
-            " 8 1 skew; ",
+            " 8 1 skew pipe; ",
             runner.benchmark_command(
                 "data", 0, 0, "normal", 0, 8, True, "skew"
             ),
@@ -25,8 +25,16 @@ class TaggedReplayRunnerTest(unittest.TestCase):
 
     def test_command_binds_late_data_mode(self):
         self.assertIn(
-            " data-late 0 0 normal 0 8 0 aligned; ",
+            " data-late 0 0 normal 0 8 0 aligned pipe; ",
             runner.benchmark_command("data-late", 0, 0, "normal", 0),
+        )
+
+    def test_command_binds_futex_sync(self):
+        self.assertIn(
+            " 8 0 skew futex; ",
+            runner.benchmark_command(
+                "data", 0, 0, "normal", 0, 8, False, "skew", "futex"
+            ),
         )
 
     def test_delay_range_is_fail_closed(self):
