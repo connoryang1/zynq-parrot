@@ -484,7 +484,12 @@ int main(int argc, char **argv)
 		samples[trial].returned = cycle();
 		if (sync == sync_futex) {
 			futex_set_wake(&shared->phase, futex_parent_ack);
-			futex_wait_for(&shared->phase, futex_idle);
+			/* Do not wait for idle here. The child may pass through idle and
+			 * publish child-ready for the next attempt before this task runs,
+			 * making a transient-state wait deadlock. The next loop's stable
+			 * child-ready wait is the acknowledgement barrier; waitpid covers
+			 * the final accepted attempt.
+			 */
 		}
 		if (samples[trial].accepted)
 			trial++;

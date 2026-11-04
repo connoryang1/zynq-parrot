@@ -98,6 +98,11 @@ class LinuxHarnessTests(unittest.TestCase):
         self.assertIn("BSG_SKIP_DEBUG_ENTRY=1", recipe)
         self.assertIn("NBF_FILE=$(abspath $(TINY_INIT_NBF))", recipe)
 
+    def test_tagged_replay_parent_does_not_wait_for_transient_idle(self):
+        source = (HERE / "scheduler_tagged_replay_benchmark.c").read_text()
+        self.assertNotIn("futex_wait_for(&shared->phase, futex_idle);", source)
+        self.assertIn("futex_wait_for(&shared->phase, futex_child_ready);", source)
+
     def test_target_syscall_round_trip(self):
         for target in ("tiny", "shell-app"):
             for flag in (1, 0, 1):
