@@ -103,6 +103,15 @@ class LinuxHarnessTests(unittest.TestCase):
         self.assertNotIn("futex_wait_for(&shared->phase, futex_idle);", source)
         self.assertIn("futex_wait_for(&shared->phase, futex_child_ready);", source)
 
+    def test_tagged_replay_child_parks_before_timed_wake(self):
+        source = (HERE / "scheduler_tagged_replay_benchmark.c").read_text()
+        parent = source.split("for (unsigned trial = 0; trial < trials;)", 2)[2]
+        ready = parent.index("futex_wait_for(&shared->phase, futex_child_ready);")
+        park = parent.index("if (sched_yield())", ready)
+        launch = parent.index("samples[trial].launch = cycle();", park)
+        self.assertLess(ready, park)
+        self.assertLess(park, launch)
+
     def test_target_syscall_round_trip(self):
         for target in ("tiny", "shell-app"):
             for flag in (1, 0, 1):

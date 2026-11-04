@@ -467,8 +467,16 @@ int main(int argc, char **argv)
 
 		if (sync == sync_pipe)
 			transfer(to_parent[0], &token, 0);
-		else
+		else {
 			futex_wait_for(&shared->phase, futex_child_ready);
+			/* The ready store precedes the child's FUTEX_WAIT. Yield outside
+			 * the timed interval so the single-core child can enter the kernel
+			 * wait queue before the measured wake. The returned wake count is
+			 * still the fail-closed proof that this scheduling step succeeded.
+			 */
+			if (sched_yield())
+				fail("yield before tagged replay wake");
+		}
 		samples[trial].launch = cycle();
 		if (sync == sync_pipe) {
 			transfer(to_child[1], &token, 1);
