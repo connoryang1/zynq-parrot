@@ -230,6 +230,12 @@ A clean traced rerun passes and measures 2112 cycles for the immediate 32-load
 loop. This is a simulator control for comparing transport throttles, not a Linux
 speedup or a physical-latency estimate.
 
+A temporary prefetch-AXI cap of one burst passes the same traced overlap gate
+at exactly 2112 load cycles and the same total simulated finish time. It was
+fully reverted. The simple-memory model therefore does not expose the physical
+HP/DDR scheduling effect; this control neither promotes nor rejects a physical
+one-burst candidate. Drain age on the matched FPGA remains the decision gate.
+
 The top-level GitHub SSH push for this diagnostic checkpoint was unavailable
 with a public-key rejection; the BlackParrot mirror push succeeded. Synthesis
 therefore uses the local immutable launcher on the idle `blackparrot1` host,
