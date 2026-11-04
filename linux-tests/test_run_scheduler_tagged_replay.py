@@ -30,6 +30,20 @@ class TaggedReplayRunnerTest(unittest.TestCase):
     def test_timer_guard_marker_is_bound(self):
         self.assertEqual(runner.TIMER_GUARD_MARKER, "BP_REPLAY_TIMER_GUARD")
 
+    def test_transfer_timeout_defaults_to_three_minutes(self):
+        args = runner.parse_args([
+            "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
+        ])
+        self.assertEqual(args.transfer_timeout_s, 180)
+
+    def test_transfer_timeout_is_fail_closed(self):
+        args = runner.parse_args([
+            "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
+            "--transfer-timeout-s", "0",
+        ])
+        with self.assertRaisesRegex(ValueError, "transfer timeout"):
+            runner.validate_args(args)
+
     def test_command_binds_skew_layout(self):
         self.assertIn(
             " 8 1 skew pipe; ",

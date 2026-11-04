@@ -73,6 +73,7 @@ def parse_args(argv=None):
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--bitstream-sha256")
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
+    parser.add_argument("--transfer-timeout-s", type=int, default=180)
     parser.add_argument("--mode", choices=("off", "data", "data-late", "joint"),
                         default="data")
     parser.add_argument("--delay", type=int, default=0)
@@ -106,6 +107,8 @@ def validate_args(args):
         raise ValueError("lines per base must be in 1..8")
     if args.runtime_ms <= 0:
         raise ValueError("runtime limit must be positive")
+    if args.transfer_timeout_s <= 0:
+        raise ValueError("transfer timeout must be positive")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     validate_transfer(args.transfer, args.elf_sha256)
@@ -133,6 +136,7 @@ def run(args):
         "elf_sha256": args.elf_sha256,
         "control_program_sha256": args.control_sha256,
         "bitstream_sha256": args.bitstream_sha256,
+        "transfer_timeout_s": args.transfer_timeout_s,
         "mode": args.mode,
         "delay": args.delay,
         "gap": args.gap,
@@ -159,7 +163,7 @@ def run(args):
             child.expect(SHELL_PROMPT)
             for transfer_command in args.transfer.read_text().splitlines():
                 child.sendline(transfer_command)
-                child.expect(SHELL_PROMPT, timeout=60)
+                child.expect(SHELL_PROMPT, timeout=args.transfer_timeout_s)
             child.sendline(f"/bin/busybox sha256sum {GUEST_ELF}")
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
             child.expect(SHELL_PROMPT)
