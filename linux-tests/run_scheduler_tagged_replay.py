@@ -19,6 +19,7 @@ DEFAULT_CONTROL_SHA = "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754
 GUEST_ELF = "/tmp/scheduler_tagged_replay_benchmark_dynamic"
 SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 MAX_GUEST_COMMAND_LENGTH = 768
+TIMER_GUARD_MARKER = "BP_REPLAY_TIMER_GUARD"
 
 
 def sha256(path):
@@ -163,8 +164,14 @@ def run(args):
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
             child.expect(SHELL_PROMPT)
             child.sendline(command)
-            child.expect(re.compile(r"TAGGED_REPLAY_EXIT rc=([0-9]+)\r*\n"),
-                         timeout=1800)
+            outcome = child.expect([
+                re.compile(r"TAGGED_REPLAY_EXIT rc=([0-9]+)\r*\n"),
+                re.compile(TIMER_GUARD_MARKER + r"[^\r\n]*"),
+            ], timeout=1800)
+            if outcome == 1:
+                raise RuntimeError(
+                    "timer callback integrity guard fired: " + child.match.group(0)
+                )
             rc = int(child.match.group(1))
             if rc:
                 raise RuntimeError(f"tagged replay benchmark exited {rc}")

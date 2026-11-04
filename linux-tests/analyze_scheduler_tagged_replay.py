@@ -143,7 +143,8 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError(f"missing marker {marker!r}")
     if not re.search(r"\bCORE(?:\[0\])? PASS\b", text):
         raise ValueError("missing CORE PASS")
-    for marker in ("BUG:", "Kernel panic", "Oops:", "scheduling while atomic",
+    for marker in ("BUG:", "Kernel panic", "Oops:", "BP_REPLAY_TIMER_GUARD",
+                   "scheduling while atomic",
                    "Segmentation fault", "RT throttling activated"):
         if marker in text:
             raise ValueError(f"contains kernel failure marker {marker!r}")

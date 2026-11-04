@@ -27,6 +27,9 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc",
         )
 
+    def test_timer_guard_marker_is_bound(self):
+        self.assertEqual(runner.TIMER_GUARD_MARKER, "BP_REPLAY_TIMER_GUARD")
+
     def test_command_binds_skew_layout(self):
         self.assertIn(
             " 8 1 skew pipe; ",

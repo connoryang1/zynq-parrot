@@ -1,0 +1,48 @@
+This diagnostic guard turns an invalid RISC-V clock-event callback into a
+bounded evidence marker instead of an indirect jump.  It records the tagged
+replay status and the first cache line of the per-CPU clock-event object so a
+rare FPGA corruption can be distinguished from an ordinary Linux timer fault.
+
+--- a/drivers/clocksource/timer-riscv.c
++++ b/drivers/clocksource/timer-riscv.c
+@@ -17,6 +17,7 @@
+ #include <linux/irqdomain.h>
+ #include <linux/module.h>
+ #include <linux/sched_clock.h>
++#include <linux/sched.h>
+ #include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/interrupt.h>
+ #include <linux/of_irq.h>
+@@ -126,9 +127,31 @@ EXPORT_SYMBOL_GPL(riscv_cs_get_mult_shift);
+ static irqreturn_t riscv_timer_interrupt(int irq, void *dev_id)
+ {
+ 	struct clock_event_device *evdev = this_cpu_ptr(&riscv_clock_event);
++	void (*handler)(struct clock_event_device *);
++	unsigned long replay_status;
++	static bool guard_reported;
+ 
+ 	csr_clear(CSR_IE, IE_TIE);
+-	evdev->event_handler(evdev);
++	handler = READ_ONCE(evdev->event_handler);
++	if (unlikely(!core_kernel_text((unsigned long)handler))) {
++		/* Do not jump through a corrupted callback. The timer interrupt is
++		 * already masked, so one report is enough to preserve the first bad
++		 * value without creating an interrupt/console storm.
++		 */
++		asm volatile("csrr %0, 0x9c3"
++			     : "=r"(replay_status) : : "memory");
++		if (!READ_ONCE(guard_reported)) {
++			WRITE_ONCE(guard_reported, true);
++			pr_emerg("BP_REPLAY_TIMER_GUARD handler=%px evdev=%px replay_status=0x%016lx pid=%d comm=%s\n",
++				 handler, evdev, replay_status,
++				 current->pid, current->comm);
++			print_hex_dump(KERN_EMERG, "BP_REPLAY_TIMER_EVENT ",
++				       DUMP_PREFIX_OFFSET, 16, 8, evdev, 64,
++				       false);
++		}
++		return IRQ_HANDLED;
++	}
++	handler(evdev);
+ 
+ 	return IRQ_HANDLED;
+ }

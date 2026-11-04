@@ -138,6 +138,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
         self.assertEqual(result["metrics"]["load_cycles"]["median_cycles"], 300)
 
+    def test_timer_callback_guard_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory))
+            path.write_text(
+                path.read_text()
+                + "BP_REPLAY_TIMER_GUARD handler=0x2 replay_status=0x0\n"
+            )
+            with self.assertRaisesRegex(ValueError, "BP_REPLAY_TIMER_GUARD"):
+                analyze(path, bootstrap_samples=10)
+
     def test_nonwaking_futex_trial_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = write_run(Path(directory), sync="futex")
