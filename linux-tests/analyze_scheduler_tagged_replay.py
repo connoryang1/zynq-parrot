@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 CONFIG = re.compile(
-    r"TAGGED_REPLAY_CONFIG mode=(data|data-late|joint) lines=(\d+) slot=(\d+) "
+    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|joint) lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
 )
 ROW = re.compile(
@@ -65,6 +65,15 @@ def summarize_metric(rows, metric, rng, bootstrap_samples):
         ],
         "disabled_range_cycles": [min(disabled), max(disabled)],
         "enabled_range_cycles": [min(enabled), max(enabled)],
+    }
+
+
+def summarize_disabled_metric(rows, metric):
+    """Summarize a replay-off stability run without inventing an A/B effect."""
+    values = [row[metric] for row in rows]
+    return {
+        "median_cycles": statistics.median(values),
+        "range_cycles": [min(values), max(values)],
     }
 
 
@@ -151,11 +160,15 @@ def analyze(path, bootstrap_samples=20000):
     rows = [dict(zip(fields, map(int, match.groups()))) for match in ROW.finditer(text)]
     if len(rows) != 512 or [row["trial"] for row in rows] != list(range(512)):
         raise ValueError("expected exactly 512 ordered trials")
-    for start in range(0, len(rows), 4):
-        pattern = [row["enabled"] for row in rows[start:start + 4]]
-        expected = [0, 1, 1, 0] if (start // 4) % 2 == 0 else [1, 0, 0, 1]
-        if pattern != expected:
-            raise ValueError(f"unbalanced trial block at {start}: {pattern}")
+    if mode == "off":
+        if any(row["enabled"] for row in rows):
+            raise ValueError("replay-off stability run contains an enabled trial")
+    else:
+        for start in range(0, len(rows), 4):
+            pattern = [row["enabled"] for row in rows[start:start + 4]]
+            expected = [0, 1, 1, 0] if (start // 4) % 2 == 0 else [1, 0, 0, 1]
+            if pattern != expected:
+                raise ValueError(f"unbalanced trial block at {start}: {pattern}")
 
     probe_rows = [
         (int(trial), int(preblock_status, 16), int(preblock_cycles),
@@ -199,6 +212,8 @@ def analyze(path, bootstrap_samples=20000):
     rng = random.Random(0x7A66ED)
     result = {
         "purpose": (
+            "Validate replay-off futex stability without claiming an A/B effect."
+            if mode == "off" else
             "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."
         ),
@@ -212,7 +227,7 @@ def analyze(path, bootstrap_samples=20000):
         )},
         "config": config,
         "trials": len(rows),
-        "trials_per_arm": len(rows) // 2,
+        "trials_per_arm": len(rows) if mode == "off" else len(rows) // 2,
         "filtered_attempts": retry_markers,
         "counter_deltas": {
             "admitted_entries": admitted,
@@ -221,7 +236,9 @@ def analyze(path, bootstrap_samples=20000):
             "dropped_triggers": 0,
         },
         "metrics": {
-            metric: summarize_metric(rows, metric, rng, bootstrap_samples)
+            metric: (summarize_disabled_metric(rows, metric)
+                     if mode == "off" else
+                     summarize_metric(rows, metric, rng, bootstrap_samples))
             for metric in METRICS
         },
     }

@@ -54,6 +54,8 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
     controls = [load(path) for path in control_paths]
     candidates = [load(path) for path in candidate_paths]
     reference = controls[0][0]
+    if reference["config"]["mode"] == "off":
+        raise ValueError("replay-off stability runs have no route effect to compare")
     for result, _rows in controls[1:] + candidates:
         if reference["config"] != result["config"]:
             raise ValueError("route configurations do not match")

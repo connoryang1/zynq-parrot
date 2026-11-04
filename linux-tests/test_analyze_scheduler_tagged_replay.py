@@ -22,7 +22,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         f"probe_status={int(probe_status)} sync={sync}"
     ]
     for trial in range(512):
-        enabled = ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1)
+        enabled = (0 if mode == "off" else
+                   ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
         admitted = lines if enabled else 0
         triggers = enabled
         if corrupt_counter and trial == 4:
@@ -125,6 +126,17 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["sync"], "futex")
+
+    def test_replay_off_stability_run_has_no_ab_claim(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="off", sync="futex"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "off")
+        self.assertEqual(result["trials_per_arm"], 512)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
+        self.assertEqual(result["metrics"]["load_cycles"]["median_cycles"], 300)
 
     def test_nonwaking_futex_trial_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

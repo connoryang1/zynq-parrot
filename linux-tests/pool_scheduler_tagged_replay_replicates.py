@@ -50,6 +50,8 @@ def pool(paths, bootstrap_samples=20000):
         raise ValueError("bootstrap sample count must be positive")
     loaded = [load_rows(path) for path in paths]
     reference_config = loaded[0][0]["config"]
+    if reference_config["mode"] == "off":
+        raise ValueError("replay-off stability runs have no A/B effect to pool")
     reference_identity = loaded[0][0]["identity"]
     for index, (result, _rows) in enumerate(loaded[1:], start=1):
         if result["config"] != reference_config:

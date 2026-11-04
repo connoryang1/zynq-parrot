@@ -205,7 +205,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		fail("pin tagged replay footprint");
 
 	for (unsigned trial = 0; trial < trials;) {
-		unsigned enabled = trial_enabled(trial);
+		unsigned enabled = mode ? trial_enabled(trial) : 0;
 		unsigned long before_hook, after_hook;
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
@@ -341,12 +341,14 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 10) {
-		fprintf(stderr, "usage: %s [data|data-late|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
 			argv[0]);
 		return 2;
 	}
 	if (argc >= 2) {
-		if (!strcmp(argv[1], "joint"))
+		if (!strcmp(argv[1], "off"))
+			mode = 0;
+		else if (!strcmp(argv[1], "joint"))
 			mode = 10;
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
@@ -443,7 +445,7 @@ int main(int argc, char **argv)
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
 	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s\n",
-	       mode == 10 ? "joint" : mode == 11 ? "data-late" : "data",
+	       mode == 0 ? "off" : mode == 10 ? "joint" : mode == 11 ? "data-late" : "data",
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status,

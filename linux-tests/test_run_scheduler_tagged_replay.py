@@ -41,6 +41,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             runner.benchmark_command("data-late", 0, 0, "normal", 0),
         )
 
+    def test_command_binds_replay_off_stability_mode(self):
+        self.assertIn(
+            " off 0 0 normal 0 8 0 aligned futex; ",
+            runner.benchmark_command(
+                "off", 0, 0, "normal", 0, 8, False, "aligned", "futex"
+            ),
+        )
+
     def test_command_binds_futex_sync(self):
         self.assertIn(
             " 8 0 skew futex; ",
