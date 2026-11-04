@@ -8,6 +8,18 @@ import run_scheduler_tagged_replay as runner
 
 
 class TaggedReplayRunnerTest(unittest.TestCase):
+    @staticmethod
+    def valid_transfer(payload=b"ELF"):
+        import base64
+        encoded = base64.b64encode(payload).decode()
+        guest = runner.GUEST_ELF
+        return (
+            f": > {guest}.b64\n"
+            f"echo '{encoded}' >> {guest}.b64\n"
+            f"base64 -d {guest}.b64 > {guest}\n"
+            f"chmod +x {guest}\n"
+        )
+
     def test_command_binds_all_experiment_parameters(self):
         self.assertEqual(
             runner.benchmark_command("joint", 123, 4, "fifo", 900),
@@ -64,6 +76,35 @@ class TaggedReplayRunnerTest(unittest.TestCase):
                 str(nbf), str(transfer), "0" * 64, str(log),
             ])
             with self.assertRaisesRegex(ValueError, "transfer command"):
+                runner.validate_args(args)
+
+    def test_transfer_rejects_make_directory_chatter(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nbf = root / "image.nbf"
+            transfer = root / "transfer"
+            log = root / "run.log"
+            nbf.write_text("nbf")
+            transfer.write_text("make: Entering directory '/tmp'\n"
+                                + self.valid_transfer())
+            args = runner.parse_args([
+                str(nbf), str(transfer), "0" * 64, str(log),
+            ])
+            with self.assertRaisesRegex(ValueError, "unexpected shell commands"):
+                runner.validate_args(args)
+
+    def test_transfer_payload_hash_is_bound_before_board_launch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nbf = root / "image.nbf"
+            transfer = root / "transfer"
+            log = root / "run.log"
+            nbf.write_text("nbf")
+            transfer.write_text(self.valid_transfer())
+            args = runner.parse_args([
+                str(nbf), str(transfer), "0" * 64, str(log),
+            ])
+            with self.assertRaisesRegex(ValueError, "does not match ELF"):
                 runner.validate_args(args)
 
     def test_lines_per_base_range_is_fail_closed(self):

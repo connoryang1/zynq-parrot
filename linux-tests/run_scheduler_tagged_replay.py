@@ -2,6 +2,8 @@
 """Run one tagged Linux replay experiment on the serialized PYNQ console."""
 
 import argparse
+import base64
+import binascii
 import hashlib
 import json
 import os
@@ -30,6 +32,34 @@ def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
         f"{lines_per_base} {int(probe_status)} {layout} {sync}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
     )
+
+
+def validate_transfer(path, elf_sha256):
+    """Accept only the generated base64 transfer for the bound guest ELF."""
+    commands = path.read_text().splitlines()
+    b64_path = GUEST_ELF + ".b64"
+    if any(len(command) > MAX_GUEST_COMMAND_LENGTH for command in commands):
+        raise ValueError(
+            f"transfer command exceeds {MAX_GUEST_COMMAND_LENGTH} characters"
+        )
+    if len(commands) < 4 or commands[0] != f": > {b64_path}" or commands[-2:] != [
+            f"base64 -d {b64_path} > {GUEST_ELF}", f"chmod +x {GUEST_ELF}"]:
+        raise ValueError("transfer contains unexpected shell commands")
+    payload = []
+    pattern = re.compile(
+        r"echo '([A-Za-z0-9+/=]+)' >> " + re.escape(b64_path)
+    )
+    for command in commands[1:-2]:
+        match = pattern.fullmatch(command)
+        if match is None:
+            raise ValueError("transfer contains unexpected shell commands")
+        payload.append(match.group(1))
+    try:
+        decoded = base64.b64decode("".join(payload), validate=True)
+    except binascii.Error as error:
+        raise ValueError("transfer contains invalid base64") from error
+    if hashlib.sha256(decoded).hexdigest() != elf_sha256:
+        raise ValueError("transfer payload does not match ELF SHA-256")
 
 
 def parse_args(argv=None):
@@ -77,11 +107,7 @@ def validate_args(args):
         raise ValueError("runtime limit must be positive")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
-    if any(len(command) > MAX_GUEST_COMMAND_LENGTH
-           for command in args.transfer.read_text().splitlines()):
-        raise ValueError(
-            f"transfer command exceeds {MAX_GUEST_COMMAND_LENGTH} characters"
-        )
+    validate_transfer(args.transfer, args.elf_sha256)
     if not args.log.parent.is_dir():
         raise ValueError("log parent directory must exist before board launch")
 
