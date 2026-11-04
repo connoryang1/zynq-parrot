@@ -178,6 +178,10 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(
             result["metrics"]["load_cycles"]["pooled_saved_cycles"], 20
         )
+        self.assertAlmostEqual(
+            result["metrics"]["load_cycles"]["pooled_saved_percent"],
+            100.0 * 20 / 300,
+        )
 
     def test_distinct_routes_compare_incremental_block_effect(self):
         with tempfile.TemporaryDirectory() as directory:

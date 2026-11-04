@@ -10,9 +10,9 @@ from pathlib import Path
 from analyze_scheduler_tagged_replay import METRICS, ROW, analyze, percentile
 
 
-def block_differences(rows, metric):
-    """Return disabled-minus-enabled means for each balanced four-row block."""
-    differences = []
+def block_effects(rows, metric):
+    """Return absolute and disabled-normalized effects for each balanced block."""
+    effects = []
     for start in range(0, len(rows), 4):
         block = rows[start:start + 4]
         disabled = statistics.mean(
@@ -21,8 +21,9 @@ def block_differences(rows, metric):
         enabled = statistics.mean(
             row[metric] for row in block if row["enabled"]
         )
-        differences.append(disabled - enabled)
-    return differences
+        saved = disabled - enabled
+        effects.append((saved, 100.0 * saved / disabled))
+    return effects
 
 
 def load_rows(path):
@@ -73,22 +74,42 @@ def pool(paths, bootstrap_samples=20000):
         "metrics": {},
     }
     for metric in METRICS:
-        strata = [block_differences(rows, metric) for _result, rows in loaded]
+        effects = [block_effects(rows, metric) for _result, rows in loaded]
+        cycle_strata = [[effect[0] for effect in boot] for boot in effects]
+        percent_strata = [[effect[1] for effect in boot] for boot in effects]
         point = statistics.median(
-            value for blocks in strata for value in blocks
+            value for blocks in cycle_strata for value in blocks
         )
-        boots = []
+        percent_point = statistics.median(
+            value for blocks in percent_strata for value in blocks
+        )
+        cycle_boots = []
+        percent_boots = []
         for _ in range(bootstrap_samples):
-            sample = []
-            for blocks in strata:
-                sample.extend(rng.choices(blocks, k=len(blocks)))
-            boots.append(statistics.median(sample))
+            cycle_sample = []
+            percent_sample = []
+            for cycle_blocks, percent_blocks in zip(
+                    cycle_strata, percent_strata):
+                indices = rng.choices(range(len(cycle_blocks)),
+                                      k=len(cycle_blocks))
+                cycle_sample.extend(cycle_blocks[index] for index in indices)
+                percent_sample.extend(percent_blocks[index] for index in indices)
+            cycle_boots.append(statistics.median(cycle_sample))
+            percent_boots.append(statistics.median(percent_sample))
         output["metrics"][metric] = {
             "replicate_saved_cycles": [statistics.median(blocks)
-                                        for blocks in strata],
+                                        for blocks in cycle_strata],
             "pooled_saved_cycles": point,
             "pooled_95pct_ci_saved_cycles": [
-                percentile(boots, 0.025), percentile(boots, 0.975)
+                percentile(cycle_boots, 0.025),
+                percentile(cycle_boots, 0.975),
+            ],
+            "replicate_saved_percent": [statistics.median(blocks)
+                                         for blocks in percent_strata],
+            "pooled_saved_percent": percent_point,
+            "pooled_95pct_ci_saved_percent": [
+                percentile(percent_boots, 0.025),
+                percentile(percent_boots, 0.975),
             ],
         }
     return output
