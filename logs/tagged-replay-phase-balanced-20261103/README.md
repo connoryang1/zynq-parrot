@@ -236,6 +236,18 @@ fully reverted. The simple-memory model therefore does not expose the physical
 HP/DDR scheduling effect; this control neither promotes nor rejects a physical
 one-burst candidate. Drain age on the matched FPGA remains the decision gate.
 
+The proposed AXI-QoS candidate is not a self-contained RTL change on this
+board. AMD UG585 says the HP read-channel `FabricQosEn` bit selects dynamic
+fabric `ARQOS`, and its reset value is zero. Read-only live register sampling
+on the recovered PYNQ reports HP0 `AFI_RDCHAN_CTRL=0`, DDR QoS selection zero,
+and HP0 static read QoS zero. Thus assigning demand/prefetch `ARQOS` values in
+RTL alone would be inert; a valid QoS experiment must also enable the PS HP0
+and DDR dynamic-QoS controls and bind their values in the run evidence. The
+one-outstanding prefetch cap remains the simpler first physical candidate.
+The board image has no standalone `devmem`, and direct `dd` reads from
+`/dev/mem` fail with `Bad address`; the successful read-only method is a
+page-aligned `/dev/mem` mapping under the serialized board-access policy.
+
 The top-level GitHub SSH push for this diagnostic checkpoint was unavailable
 with a public-key rejection; the BlackParrot mirror push succeeded. Synthesis
 therefore uses the local immutable launcher on the idle `blackparrot1` host,
@@ -254,8 +266,9 @@ the accepted rerun explicitly binds it to the retained Buildroot images path.
 Do not continue delay/gap/lead tuning from this checkpoint. The next diagnostic
 must measure the non-invasive RTL drain-age telemetry on the matched FPGA;
 after that, the next RTL
-candidates should separately test demand-high/prefetch-low AXI QoS and a
-one-outstanding prefetch cap. A wider replay window is lower priority because
+candidate should test a one-outstanding prefetch cap. Demand-high/prefetch-low
+AXI QoS is secondary and must include explicit PS dynamic-QoS configuration,
+not only an RTL `ARQOS` assignment. A wider replay window is lower priority because
 it may increase the already measured scheduler-path contention. Any candidate must rerun
 the phase-balanced 32/16/8-line gates and preserve the existing overlap
 liveness tests.
