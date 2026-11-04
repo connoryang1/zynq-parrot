@@ -185,7 +185,7 @@ module bp_prefetch_axi_master
   wire unused = &{mem_fwd_data_i, 1'b0};
 
   initial begin
-    if (outstanding_p < 2 || outstanding_p >= (1 << axi_id_width_p))
+    if (outstanding_p < 1 || outstanding_p >= (1 << axi_id_width_p))
       $fatal(1, "Prefetch AXI outstanding count does not fit nonzero AXI IDs");
     if ((axi_data_width_p != 32 && axi_data_width_p != 64)
         || bedrock_fill_width_p != 64 || dcache_block_width_p != 512)
