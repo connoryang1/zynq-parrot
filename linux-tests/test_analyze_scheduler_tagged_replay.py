@@ -6,12 +6,14 @@ import unittest
 from pathlib import Path
 
 from analyze_scheduler_tagged_replay import analyze
+from compare_scheduler_tagged_replay_routes import compare
 from pool_scheduler_tagged_replay_replicates import pool
 
 
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
-              layout="aligned", mode="data", sync="pipe"):
+              layout="aligned", mode="data", sync="pipe",
+              enabled_load=280, bitstream_sha256="5" * 64):
     """Create a complete synthetic matched A/B transcript and status."""
     path = root / "run.log"
     rows = [
@@ -26,7 +28,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         if corrupt_counter and trial == 4:
             admitted -= 1
         entry = 100 + trial % 3
-        load = 280 if enabled else 300
+        load = enabled_load if enabled else 300
         preblock = ((1 << 42) | (admitted << 10)) \
             if probe_status and enabled else 0
         entry_status = preblock
@@ -60,7 +62,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "transfer_sha256": "2" * 64,
         "elf_sha256": "3" * 64,
         "control_program_sha256": "4" * 64,
-        "bitstream_sha256": "5" * 64,
+        "bitstream_sha256": bitstream_sha256,
         "mode": mode,
         "delay": 0,
         "gap": 2,
@@ -153,6 +155,23 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["replicate_count"], 2)
         self.assertEqual(
             result["metrics"]["load_cycles"]["pooled_saved_cycles"], 20
+        )
+
+    def test_distinct_routes_compare_incremental_block_effect(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(root / "control", bitstream_sha256="5" * 64)
+            candidate = write_run(
+                root / "candidate", enabled_load=260,
+                bitstream_sha256="6" * 64,
+            )
+            result = compare(control, candidate, bootstrap_samples=10)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]
+                  ["candidate_incremental_saved_cycles"],
+            20,
         )
 
     def test_preblock_probe_is_decoded(self):
