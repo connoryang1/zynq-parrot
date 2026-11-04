@@ -44,6 +44,10 @@ enum {
 	max_retries = 4096,
 };
 
+_Static_assert((bases - 1) * max_lines_per_base * line_bytes
+	       + max_lines_per_base * line_bytes <= page_bytes,
+	       "skewed replay footprint must remain inside each pinned page");
+
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
 	uint64_t preblock_status;
@@ -87,7 +91,7 @@ static unsigned trial_enabled(unsigned trial)
 
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned mode, unsigned delay, unsigned gap,
-		      unsigned lines_per_base, int probe_status)
+		      unsigned lines_per_base, int probe_status, int skew_layout)
 {
 	volatile unsigned char *target = mmap(NULL, bases * page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -105,8 +109,15 @@ static void child_run(int in, int out, volatile struct sample *samples,
 	for (unsigned base = 0; base < bases; base++)
 		for (unsigned line = 0; line < lines_per_base; line++) {
 			unsigned index = base * lines_per_base + line;
+			/* The historical layout places all four bases at identical page
+			 * offsets. Skew by one maximum-width footprint per page to keep
+			 * the line count constant while reducing L2 set concentration.
+			 */
+			unsigned set_offset = skew_layout
+				? base * max_lines_per_base * line_bytes : 0;
 
 			target_addr[index] = (unsigned long)&target[base * page_bytes
+							       + set_offset
 							       + line * line_bytes];
 		}
 	for (unsigned line = 0; line < replay_lines; line++)
@@ -242,13 +253,13 @@ int main(int argc, char **argv)
 	unsigned mode = 9, delay = 0, gap = 2;
 	unsigned lines_per_base = max_lines_per_base;
 	unsigned long lead_cycles = 0;
-	int fifo = 0, probe_status = 0;
+	int fifo = 0, probe_status = 0, skew_layout = 0;
 	volatile struct sample *samples;
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 8) {
-		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1]\n",
+	if (argc > 9) {
+		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew]\n",
 			argv[0]);
 		return 2;
 	}
@@ -318,6 +329,14 @@ int main(int argc, char **argv)
 		}
 		probe_status = parsed;
 	}
+	if (argc >= 9) {
+		if (!strcmp(argv[8], "skew"))
+			skew_layout = 1;
+		else if (strcmp(argv[8], "aligned")) {
+			fprintf(stderr, "invalid footprint layout: %s\n", argv[8]);
+			return 2;
+		}
+	}
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
 
@@ -329,9 +348,10 @@ int main(int argc, char **argv)
 		       MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu probe_status=%u\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u\n",
 	       mode == 10 ? "joint" : "data", bases * lines_per_base, replay_slot,
-	       delay, gap, fifo ? "fifo" : "normal", lead_cycles, probe_status);
+	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
+	       skew_layout ? "skew" : "aligned", probe_status);
 	child = fork();
 	if (child < 0)
 		fail("fork");
@@ -339,7 +359,7 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
-			  lines_per_base, probe_status);
+			  lines_per_base, probe_status, skew_layout);
 		return 0;
 	}
 	close(to_child[0]);

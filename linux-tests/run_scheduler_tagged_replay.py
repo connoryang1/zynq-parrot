@@ -24,10 +24,10 @@ def sha256(path):
 
 
 def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
-                      probe_status=False):
+                      probe_status=False, layout="aligned"):
     return (
         f"{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles} "
-        f"{lines_per_base} {int(probe_status)}; "
+        f"{lines_per_base} {int(probe_status)} {layout}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
     )
 
@@ -49,6 +49,8 @@ def parse_args(argv=None):
     parser.add_argument("--lead-cycles", type=int, default=0)
     parser.add_argument("--lines-per-base", type=int, default=8)
     parser.add_argument("--probe-status", action="store_true")
+    parser.add_argument("--layout", choices=("aligned", "skew"),
+                        default="aligned")
     parser.add_argument("--print-command", action="store_true")
     return parser.parse_args(argv)
 
@@ -93,7 +95,7 @@ def run(args):
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = benchmark_command(
         args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
-        args.lines_per_base, args.probe_status,
+        args.lines_per_base, args.probe_status, args.layout,
     )
     status = {
         "status": "running",
@@ -109,6 +111,7 @@ def run(args):
         "lead_cycles": args.lead_cycles,
         "lines_per_base": args.lines_per_base,
         "probe_status": args.probe_status,
+        "layout": args.layout,
         "command": command,
     }
     child = None

@@ -9,12 +9,14 @@ from analyze_scheduler_tagged_replay import analyze
 
 
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
-              downstream_status=False, status_bits_59_58=False):
+              downstream_status=False, status_bits_59_58=False,
+              layout="aligned"):
     """Create a complete synthetic matched A/B transcript and status."""
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode=data lines={lines} slot=2 delay=0 gap=2 "
-        f"policy=fifo lead_cycles=0 probe_status={int(probe_status)}"
+        f"policy=fifo lead_cycles=0 layout={layout} "
+        f"probe_status={int(probe_status)}"
     ]
     for trial in range(512):
         enabled = ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1)
@@ -65,6 +67,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "lead_cycles": 0,
         "lines_per_base": lines // 4,
         "probe_status": probe_status,
+        "layout": layout,
     }
     path.with_suffix(".log.status.json").write_text(json.dumps(status) + "\n")
     return path
@@ -94,6 +97,14 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             )
         self.assertEqual(result["config"]["lines"], 16)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 4096)
+
+    def test_skew_layout_is_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), layout="skew"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["layout"], "skew")
 
     def test_preblock_probe_is_decoded(self):
         with tempfile.TemporaryDirectory() as directory:
