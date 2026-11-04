@@ -106,6 +106,34 @@ from retry count and binary layout. Do not rerun gap 64 or use controller gap
 as the one-outstanding implementation. A real occupancy cap must act at the
 UCE/AXI allocation boundary and pass correctness gates before performance.
 
+The subsequent status audit found a confirmed lifecycle safety bug. Kernel
+patch `0017` described its page-release loop as a tagged-replay drain, but it
+tested only status bits 3:0 (controller busy/queue/held). The old CSR had no
+downstream state, and CSR `0x9c0` tracks only narrow speculative previews, not
+tagged full-line prefetch slots. Thus a controller-idle observation could be
+followed by unpinning while D-UCE/AXI work remained live. This is a concrete
+mechanism capable of explaining the gap-64 post-benchmark corruption, but the
+specific failure attribution remains provisional until the corrected image
+passes the exact reproduction.
+
+The corrected kernel cleanup and configuration paths now require both bits
+3:0 and allocated-slot bits 61:60 to be zero. The benchmark uses the same mask
+between trials and before releasing pins. This wait occurs after the measured
+first-use endpoint, so it prevents cross-trial/lifetime contamination without
+serializing the wake-to-load interval under study.
+
+The exact retained Linux output tree rebuilds and links the correction with
+Buildroot GCC 13.2. `vmlinux` and raw payload SHA-256 values are
+`94596d75...c09` and `f05b1119...971`. Fail-closed payload replacement creates
+interactive-shell NBF `4e91d7b6...8d9`; reversing that replacement reproduces
+the prior shell NBF `08628c15...892` byte for byte. The rebuilt dynamic
+benchmark and 50-command transfer hash to `69c76086...f1a` and
+`62cbc361...f5e`, and local transfer execution reconstructs the exact ELF.
+All 153 discovered Linux tests pass. Patch `0017` also passes explicit reverse
+dry-run against the built tree and forward dry-run against an isolated
+pre-patch reconstruction; this caught and corrected one intermediate malformed
+hunk count before checkpointing.
+
 ## Downstream occupancy instrumentation
 
 The diagnostic candidate exports the instantaneous number of allocated UCE
@@ -123,8 +151,17 @@ gate, and the full-line UCE replay gate. A clean trace-enabled full-core
 32-line replay PASS, CORE PASS, and BSG PASS; the harness classifies the known
 post-PASS GPIO finalizer assertion as `VALID RUN`. The fresh build log, run
 log, waveform, ELF, and NBF SHA-256 values are respectively
-`d3e22aad...cb62`, `5be59ffd...ef0`, `34d03d3d...f2b`,
-`67cd9cf7...14c0`, and `b9190503...597`.
+`1c36551e...526`, `95023b67...8fe`, `f80647af...a0a`,
+`0ba67803...3f2`, and `f8d610ac...f7c`. The strengthened guest observes a
+nonzero tagged D-UCE slot count, rejects completed counts above allocated
+counts, and waits for allocated and completed counts to return to zero before
+PASS. It replaces the earlier false `0x9c0` drain check.
+
+Routed implementation job `20261104T055758Z-cb7e1392` uses exact top
+`cb7e1392`, BlackParrot `291ff1a97`, and
+`e_bp_unicore_zynqparrot_prefetch_cfg`. It is the telemetry-only hardware
+checkpoint; the lifecycle-mask correction is software collateral and does not
+change the bitstream.
 
 Two command-invocation mistakes produced no test result: direct module-style
 `unittest` omitted the `linux-tests` import path, and the first standalone RTL

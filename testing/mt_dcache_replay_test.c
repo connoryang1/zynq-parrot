@@ -40,13 +40,6 @@ static inline uint64_t read_csr_9c3(void)
   return value;
 }
 
-static inline uint64_t read_csr_9c0(void)
-{
-  uint64_t value;
-  __asm__ volatile("csrr %0, 0x9c0" : "=r"(value) : : "memory");
-  return value;
-}
-
 int main(void)
 {
   // The host NBF loader initializes .data directly in simulated DRAM, so the
@@ -96,11 +89,19 @@ int main(void)
 #endif
 
   uint64_t status = 0;
+  unsigned saw_uce_outstanding = 0;
   // A coexistence failure must terminate quickly enough to preserve a traced
   // waveform without exhausting the shared simulator filesystem.
   unsigned timeout = BENCH_DIAGNOSTIC == 2 ? 2048 : 100000;
   do {
     status = read_csr_9c3();
+    uint64_t uce_outstanding = (status >> 60) & 3;
+    uint64_t uce_complete = (status >> 62) & 3;
+    saw_uce_outstanding |= !!uce_outstanding;
+    if (uce_complete > uce_outstanding) {
+      bp_print_string("[BSG-FAIL] tagged data replay invalid UCE status\n");
+      bp_finish(1);
+    }
     if (!--timeout) {
       bp_print_string("[BSG-FAIL] tagged data replay controller timeout\n");
       bp_finish(1);
@@ -108,8 +109,10 @@ int main(void)
   } while ((status & 1) || ((status >> 1) & 3));
   bp_print_string("DCACHE-REPLAY completed\n");
 
+  // CSR 0x9c0 tracks only the narrow physical-preview queue. Tagged replay
+  // owns ordinary full-line prefetch slots, exported in status bits 61:60.
   timeout = 100000;
-  while (!(read_csr_9c0() & 1)) {
+  while (((status = read_csr_9c3()) >> 60) & 3) {
     if (!--timeout) {
       bp_print_string("[BSG-FAIL] tagged data replay UCE drain timeout\n");
       bp_finish(1);
@@ -119,7 +122,9 @@ int main(void)
 
   uint64_t expected_accepted = BENCH_DIAGNOSTIC == 1 ? 0 : REPLAY_LINES;
   uint64_t expected_filtered = BENCH_DIAGNOSTIC == 1 ? REPLAY_LINES : 0;
-  if (((status >> 10) & 0xffff) != expected_accepted
+  if ((BENCH_DIAGNOSTIC != 1 && !saw_uce_outstanding)
+      || ((status >> 60) & 0xf) != 0
+      || ((status >> 10) & 0xffff) != expected_accepted
       || ((status >> 26) & 0xffff) != expected_filtered
       || ((status >> 42) & 0xff) != 1
       || ((status >> 50) & 0xff) != 0) {

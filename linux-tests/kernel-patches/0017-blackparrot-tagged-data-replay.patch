@@ -65,7 +65,7 @@ up to 32 pinned physical lines, configurable trigger delay, and replay gap.
 +		unsigned long status;
 +
 +		asm volatile("csrr %0, 0x9c3" : "=r"(status) : : "memory");
-+		if (!(status & 0xf))
++		if (!(status & (0xfUL | (3UL << 60))))
 +			break;
 +	}
 +	preempt_enable();
@@ -201,7 +201,7 @@ up to 32 pinned physical lines, configurable trigger delay, and replay gap.
 +		 */
 +		local_irq_save(flags);
 +		asm volatile("csrr %0, 0x9c3" : "=r"(status) : : "memory");
-+		if (status & 0xf) {
++		if (status & (0xfUL | (3UL << 60))) {
 +			error = -EBUSY;
 +			local_irq_restore(flags);
 +			break;

@@ -28,6 +28,7 @@
 #define PR_BP_PREVIEW_GET_HOOK_CYCLES 0x4250505b
 #define PR_BP_PREVIEW_REPLAY_CONFIG 0x4250505c
 #define PR_BP_PREVIEW_REPLAY_STATUS 0x4250505d
+#define BP_REPLAY_DRAIN_MASK (0xfUL | (3UL << 60))
 
 enum {
 	warmup = 16,
@@ -209,7 +210,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 							0UL, 0UL, 0UL, 0UL);
 				if (replay_status < 0)
 					fail("read tagged replay status");
-				if (!(replay_status & 0xf))
+				if (!(replay_status & BP_REPLAY_DRAIN_MASK))
 					break;
 			} while (--timeout);
 			if (!timeout) {
