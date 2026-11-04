@@ -64,6 +64,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             runner.benchmark_command("data-late", 0, 0, "normal", 0),
         )
 
+    def test_command_binds_instruction_selection_mode(self):
+        self.assertIn(
+            " instruction-select 0 0 normal 0 8 0 aligned pipe; ",
+            runner.benchmark_command(
+                "instruction-select", 0, 0, "normal", 0
+            ),
+        )
+
     def test_command_binds_replay_off_stability_mode(self):
         self.assertIn(
             " off 0 0 normal 0 8 0 aligned futex; ",

@@ -11,7 +11,8 @@ from pathlib import Path
 
 
 CONFIG = re.compile(
-    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|joint) lines=(\d+) slot=(\d+) "
+    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|joint) "
+    r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
 )
 ROW = re.compile(
@@ -199,9 +200,11 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError(f"trial {index} ends before first use")
         # PR_BP_PREVIEW_REPLAY_CONFIG sets the hardware clear bit before every
         # trial, so these are independent snapshots rather than deltas.
-        if row["triggers"] != row["enabled"] or row["dropped"] != 0:
+        expects_data = mode not in ("off", "instruction-select")
+        expected_triggers = row["enabled"] if expects_data else 0
+        if row["triggers"] != expected_triggers or row["dropped"] != 0:
             raise ValueError(f"trial {index} has invalid trigger/drop counters")
-        if row["enabled"]:
+        if row["enabled"] and expects_data:
             if row["admitted"] + row["filtered"] != config["lines"]:
                 raise ValueError(f"trial {index} did not complete all replay entries")
             admitted += row["admitted"]
@@ -215,6 +218,9 @@ def analyze(path, bootstrap_samples=20000):
         "purpose": (
             "Validate replay-off futex stability without claiming an A/B effect."
             if mode == "off" else
+            "Measure selection-time instruction replay under the matched "
+            "tagged-data workload without issuing a data tag."
+            if mode == "instruction-select" else
             "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."
         ),

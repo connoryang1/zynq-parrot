@@ -24,8 +24,9 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     for trial in range(512):
         enabled = (0 if mode == "off" else
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
-        admitted = lines if enabled else 0
-        triggers = enabled
+        expects_data = mode not in ("off", "instruction-select")
+        admitted = lines if enabled and expects_data else 0
+        triggers = enabled if expects_data else 0
         if corrupt_counter and trial == 4:
             admitted -= 1
         entry = 100 + trial % 3
@@ -118,6 +119,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["mode"], "data-late")
+
+    def test_instruction_selection_mode_has_no_data_counters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="instruction-select"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "instruction-select")
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
 
     def test_futex_sync_is_bound(self):
         with tempfile.TemporaryDirectory() as directory:
