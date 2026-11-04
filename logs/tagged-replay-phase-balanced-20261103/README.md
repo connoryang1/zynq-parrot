@@ -220,6 +220,22 @@ full-core run pass. Exact build/run/FST/ELF/NBF hashes are
 `1c36551e...526`, `568cf8e5...fd5`, `227d7265...afe`,
 `c29e5e55...d5d`, and `acdedcac...98f`.
 
+The immediate-demand simulator arm initially failed only its sampled-occupancy
+predicate. Waveform counters proved 32 admissions, one trigger, zero
+filters/drops, a complete drain, correct data, and final status
+`0x0c00040000008200`; the target load loop had simply consumed the entire
+UCE-active interval before polling began. The gate now requires sampled live
+occupancy only in the normal arm while retaining exact final counters in both.
+A clean traced rerun passes and measures 2112 cycles for the immediate 32-load
+loop. This is a simulator control for comparing transport throttles, not a Linux
+speedup or a physical-latency estimate.
+
+The top-level GitHub SSH push for this diagnostic checkpoint was unavailable
+with a public-key rejection; the BlackParrot mirror push succeeded. Synthesis
+therefore uses the local immutable launcher on the idle `blackparrot1` host,
+after readiness verified the exact clean top/BP pair and all nested gitlinks,
+rather than weakening the farm's remote-fetch checks.
+
 Two command-invocation mistakes produced no test result: direct module-style
 `unittest` omitted the `linux-tests` import path, and the first standalone RTL
 runner call omitted its required `--out` flag. The guardrail is to use

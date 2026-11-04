@@ -85,13 +85,18 @@ int main(void)
 #if BENCH_DIAGNOSTIC == 2
   // Linux consumes the footprint as soon as the woken task runs. Exercise
   // that coexistence instead of waiting for advisory replay to become idle.
+  uint64_t overlap_start = read_cycle();
   uint64_t overlap_sum = 0;
   for (unsigned i = 0; i < REPLAY_LINES; ++i)
     overlap_sum += targets[i].value;
+  uint64_t overlap_cycles = read_cycle() - overlap_start;
   if (overlap_sum != expected_sum) {
     bp_print_string("[BSG-FAIL] tagged replay overlap corrupted target data\n");
     bp_finish(1);
   }
+  bp_print_string("DCACHE-REPLAY overlap-cycles=");
+  bp_hprint_uint64(overlap_cycles);
+  bp_print_string("\n");
   bp_print_string("DCACHE-REPLAY overlap demand completed\n");
 #endif
 
@@ -142,7 +147,10 @@ int main(void)
 
   uint64_t expected_accepted = BENCH_DIAGNOSTIC == 1 ? 0 : REPLAY_LINES;
   uint64_t expected_filtered = BENCH_DIAGNOSTIC == 1 ? REPLAY_LINES : 0;
-  if ((BENCH_DIAGNOSTIC != 1 && !saw_uce_outstanding)
+  // The immediate-demand arm can spend the whole UCE-active interval in its
+  // target load loop before status polling starts.  Require sampled occupancy
+  // only in the normal arm; exact admission counters cover both cases.
+  if ((BENCH_DIAGNOSTIC == 0 && !saw_uce_outstanding)
       || ((status >> 60) & 0xf) != 0
       || ((status >> 10) & 0xffff) != expected_accepted
       || ((status >> 26) & 0xffff) != expected_filtered
