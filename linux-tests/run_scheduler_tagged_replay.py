@@ -20,6 +20,10 @@ GUEST_ELF = "/tmp/scheduler_tagged_replay_benchmark_dynamic"
 SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 MAX_GUEST_COMMAND_LENGTH = 768
 TIMER_GUARD_MARKER = "BP_REPLAY_TIMER_GUARD"
+KERNEL_FAILURE_MARKER = re.compile(
+    r"(?:BUG:|Kernel panic|Oops:|scheduling while atomic|"
+    r"Segmentation fault|RT throttling activated)"
+)
 
 
 def sha256(path):
@@ -171,10 +175,15 @@ def run(args):
             outcome = child.expect([
                 re.compile(r"TAGGED_REPLAY_EXIT rc=([0-9]+)\r*\n"),
                 re.compile(TIMER_GUARD_MARKER + r"[^\r\n]*"),
+                KERNEL_FAILURE_MARKER,
             ], timeout=1800)
             if outcome == 1:
                 raise RuntimeError(
                     "timer callback integrity guard fired: " + child.match.group(0)
+                )
+            if outcome == 2:
+                raise RuntimeError(
+                    "kernel failure marker: " + child.match.group(0)
                 )
             rc = int(child.match.group(1))
             if rc:

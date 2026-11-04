@@ -30,6 +30,12 @@ class TaggedReplayRunnerTest(unittest.TestCase):
     def test_timer_guard_marker_is_bound(self):
         self.assertEqual(runner.TIMER_GUARD_MARKER, "BP_REPLAY_TIMER_GUARD")
 
+    def test_kernel_failure_markers_are_bound(self):
+        for marker in ("BUG:", "Kernel panic", "Oops:",
+                       "scheduling while atomic", "Segmentation fault",
+                       "RT throttling activated"):
+            self.assertIsNotNone(runner.KERNEL_FAILURE_MARKER.search(marker))
+
     def test_transfer_timeout_defaults_to_three_minutes(self):
         args = runner.parse_args([
             "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
