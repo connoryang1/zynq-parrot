@@ -24,7 +24,9 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     for trial in range(512):
         enabled = (0 if mode == "off" else
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
-        expects_data = mode not in ("off", "instruction-select")
+        expects_data = mode not in (
+            "off", "instruction-select", "instruction-wake"
+        )
         admitted = lines if enabled and expects_data else 0
         triggers = enabled if expects_data else 0
         if corrupt_counter and trial == 4:
@@ -127,6 +129,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["mode"], "instruction-select")
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
+
+    def test_instruction_wakeup_mode_has_no_data_counters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="instruction-wake"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "instruction-wake")
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
 

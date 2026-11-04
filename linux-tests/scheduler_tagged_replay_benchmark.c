@@ -341,7 +341,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 10) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
 			argv[0]);
 		return 2;
 	}
@@ -350,6 +350,8 @@ int main(int argc, char **argv)
 			mode = 0;
 		else if (!strcmp(argv[1], "instruction-select"))
 			mode = 3;
+		else if (!strcmp(argv[1], "instruction-wake"))
+			mode = 4;
 		else if (!strcmp(argv[1], "joint"))
 			mode = 10;
 		else if (!strcmp(argv[1], "data-late"))
@@ -448,6 +450,7 @@ int main(int argc, char **argv)
 	samples = shared->samples;
 	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s\n",
 	       mode == 0 ? "off" : mode == 3 ? "instruction-select" :
+	       mode == 4 ? "instruction-wake" :
 	       mode == 10 ? "joint" : mode == 11 ? "data-late" : "data",
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
