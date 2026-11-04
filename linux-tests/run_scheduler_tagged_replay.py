@@ -42,7 +42,8 @@ def parse_args(argv=None):
     parser.add_argument("--control-sha256", default=DEFAULT_CONTROL_SHA)
     parser.add_argument("--bitstream-sha256")
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
-    parser.add_argument("--mode", choices=("data", "joint"), default="data")
+    parser.add_argument("--mode", choices=("data", "data-late", "joint"),
+                        default="data")
     parser.add_argument("--delay", type=int, default=0)
     parser.add_argument("--gap", type=int, default=2)
     parser.add_argument("--policy", choices=("normal", "fifo"), default="fifo")

@@ -23,6 +23,12 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_late_data_mode(self):
+        self.assertIn(
+            " data-late 0 0 normal 0 8 0 aligned; ",
+            runner.benchmark_command("data-late", 0, 0, "normal", 0),
+        )
+
     def test_delay_range_is_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

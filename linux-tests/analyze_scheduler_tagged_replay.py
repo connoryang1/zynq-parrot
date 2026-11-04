@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 CONFIG = re.compile(
-    r"TAGGED_REPLAY_CONFIG mode=(data|joint) lines=(\d+) slot=(\d+) "
+    r"TAGGED_REPLAY_CONFIG mode=(data|data-late|joint) lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
 )
 ROW = re.compile(

@@ -11,11 +11,11 @@ from pool_scheduler_tagged_replay_replicates import pool
 
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
-              layout="aligned"):
+              layout="aligned", mode="data"):
     """Create a complete synthetic matched A/B transcript and status."""
     path = root / "run.log"
     rows = [
-        f"TAGGED_REPLAY_CONFIG mode=data lines={lines} slot=2 delay=0 gap=2 "
+        f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
         f"policy=fifo lead_cycles=0 layout={layout} "
         f"probe_status={int(probe_status)}"
     ]
@@ -61,7 +61,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "elf_sha256": "3" * 64,
         "control_program_sha256": "4" * 64,
         "bitstream_sha256": "5" * 64,
-        "mode": "data",
+        "mode": mode,
         "delay": 0,
         "gap": 2,
         "policy": "fifo",
@@ -106,6 +106,14 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["layout"], "skew")
+
+    def test_late_data_mode_is_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="data-late"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "data-late")
 
     def test_two_valid_replicates_pool_paired_blocks(self):
         with tempfile.TemporaryDirectory() as directory:

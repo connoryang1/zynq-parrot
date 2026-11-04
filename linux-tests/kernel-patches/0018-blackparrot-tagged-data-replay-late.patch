@@ -1,0 +1,176 @@
+This patch adds a one-shot late tagged-data replay control. Mode eleven arms on
+a successful wakeup and consumes that arm immediately before the architectural
+register/stack switch, isolating trigger timing without replaying on later
+reschedules of the same task.
+
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -91,7 +91,7 @@
+ 	struct mm_struct *bp_preview_phys_mm;
+ 	unsigned char bp_preview_phys_mode;
+ 	unsigned char bp_preview_replay_slot;
+-	bool bp_preview_replay_configured;
++	unsigned char bp_preview_replay_state;
+ 	unsigned long bp_preview_hook_count;
+ 	unsigned long bp_preview_last_hook_cycles;
+ 	/* Diagnostic counts for each incoming context-switch guard outcome. */
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -82,6 +82,7 @@
+ 	if (has_vector())					\
+ 		__switch_to_vector(__prev, __next);	\
+ 	riscv_bp_preview_late(__next);			\
++	riscv_bp_replay_late(__next);			\
+ 	((last) = __switch_to(__prev, __next));		\
+ } while (0)
+ 
+@@ -213,7 +214,7 @@
+ 
+ 	if ((READ_ONCE(task->thread.bp_preview_phys_mode) != 9
+ 	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 10)
+-	    || !READ_ONCE(task->thread.bp_preview_replay_configured)
++	    || READ_ONCE(task->thread.bp_preview_replay_state) != 1
+ 	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
+ 	    || !task->mm)
+ 		return;
+@@ -222,6 +223,41 @@
+ 	WRITE_ONCE(task->thread.bp_preview_hook_count,
+ 		   READ_ONCE(task->thread.bp_preview_hook_count) + 1);
+ }
++
++/* Arm mode eleven only after a successful wake. A configured-but-unarmed task
++ * can be preempted before it blocks without consuming its future replay.
++ */
++static __always_inline void riscv_bp_replay_arm_late(struct task_struct *task)
++{
++	if (READ_ONCE(task->thread.bp_preview_phys_mode) != 11
++	    || READ_ONCE(task->thread.bp_preview_replay_state) != 1
++	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
++	    || !task->mm)
++		return;
++	WRITE_ONCE(task->thread.bp_preview_replay_state, 2);
++}
++
++/* Consume one successful-wakeup arm at the final architecture hook. Returning
++ * the state to configured prevents later reschedules from replaying again.
++ */
++static __always_inline void riscv_bp_replay_late(struct task_struct *task)
++{
++	unsigned long slot, start, end;
++
++	if (READ_ONCE(task->thread.bp_preview_phys_mode) != 11
++	    || READ_ONCE(task->thread.bp_preview_replay_state) != 2
++	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
++	    || !task->mm)
++		return;
++	WRITE_ONCE(task->thread.bp_preview_replay_state, 1);
++	slot = READ_ONCE(task->thread.bp_preview_replay_slot);
++	asm volatile("csrr %0, 0xcc0" : "=r"(start) : : "memory");
++	asm volatile("csrw 0x9c3, %0" : : "r"(slot) : "memory");
++	asm volatile("csrr %0, 0xcc0" : "=r"(end) : : "memory");
++	WRITE_ONCE(task->thread.bp_preview_last_hook_cycles, end - start);
++	WRITE_ONCE(task->thread.bp_preview_hook_count,
++		   READ_ONCE(task->thread.bp_preview_hook_count) + 1);
++}
+ 
+ /* Mode two deliberately issues after MM/FPU/vector switch preparation and
+  * immediately before the architectural register/stack switch. This retains
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -99,7 +99,7 @@
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		pinned |= !!task->thread.bp_preview_pin[i];
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
+-	WRITE_ONCE(task->thread.bp_preview_replay_configured, false);
++	WRITE_ONCE(task->thread.bp_preview_replay_state, 0);
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, NULL);
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		WRITE_ONCE(task->thread.bp_preview_paddr[i], 0);
+@@ -163,7 +163,7 @@
+ 	}
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, any ? task->mm : NULL);
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
+-	WRITE_ONCE(task->thread.bp_preview_replay_configured, false);
++	WRITE_ONCE(task->thread.bp_preview_replay_state, 0);
+ 	return 0;
+ }
+ 
+@@ -275,7 +275,7 @@
+ 	dst->thread.bp_preview_phys_mm = NULL;
+ 	dst->thread.bp_preview_phys_mode = 0;
+ 	dst->thread.bp_preview_replay_slot = 0;
+-	dst->thread.bp_preview_replay_configured = false;
++	dst->thread.bp_preview_replay_state = 0;
+ 	/* clear entire V context, including datap for a new task */
+ 	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
+ 
+@@ -299,7 +299,7 @@
+ 	p->thread.bp_preview_phys_mm = NULL;
+ 	p->thread.bp_preview_phys_mode = 0;
+ 	p->thread.bp_preview_replay_slot = 0;
+-	p->thread.bp_preview_replay_configured = false;
++	p->thread.bp_preview_replay_state = 0;
+ 	p->thread.bp_preview_hook_count = 0;
+ 	p->thread.bp_preview_last_hook_cycles = 0;
+ 	memset(p->thread.bp_preview_guard_count, 0,
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,7 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9/10 tagged data/joint. */
++/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ /* Last successful-wakeup preview-hook duration in global BP cycles. */
+ #define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4369,6 +4369,8 @@
+ 			riscv_bp_preview_wakeup(p);
+ 		if (bp_preview_mode == 9 || bp_preview_mode == 10)
+ 			riscv_bp_replay_wakeup(p);
++		if (bp_preview_mode == 11)
++			riscv_bp_replay_arm_late(p);
+ 		asm volatile("csrr %0, 0xcc0" : "=r"(bp_preview_end)
+ 			     : : "memory");
+ 		WRITE_ONCE(p->thread.bp_preview_last_hook_cycles,
+@@ -6709,7 +6711,8 @@
+ 		    && bp_preview_mode != 7
+ 		    && bp_preview_mode != 8
+ 		    && bp_preview_mode != 9
+-		    && bp_preview_mode != 10) {
++		    && bp_preview_mode != 10
++		    && bp_preview_mode != 11) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 10 || arg3 || arg4 || arg5) {
++		if (arg2 > 11 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+@@ -2797,7 +2797,7 @@
+ 			break;
+ 		}
+ 		if (arg2 >= 9
+-		    && !READ_ONCE(me->thread.bp_preview_replay_configured)) {
++		    && !READ_ONCE(me->thread.bp_preview_replay_state)) {
+ 			error = -ENOENT;
+ 			break;
+ 		}
+@@ -2868,7 +2868,7 @@
+ 		asm volatile("csrw 0x9c2, %0" : : "r"(status) : "memory");
+ 		local_irq_restore(flags);
+ 		WRITE_ONCE(me->thread.bp_preview_replay_slot, slot);
+-		WRITE_ONCE(me->thread.bp_preview_replay_configured, true);
++		WRITE_ONCE(me->thread.bp_preview_replay_state, 1);
+ 		error = 0;
+ replay_config_out:
+ 		break;

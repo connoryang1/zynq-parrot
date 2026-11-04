@@ -259,13 +259,15 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 9) {
-		fprintf(stderr, "usage: %s [data|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew]\n",
+		fprintf(stderr, "usage: %s [data|data-late|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew]\n",
 			argv[0]);
 		return 2;
 	}
 	if (argc >= 2) {
 		if (!strcmp(argv[1], "joint"))
 			mode = 10;
+		else if (!strcmp(argv[1], "data-late"))
+			mode = 11;
 		else if (strcmp(argv[1], "data")) {
 			fprintf(stderr, "invalid replay mode: %s\n", argv[1]);
 			return 2;
@@ -349,7 +351,8 @@ int main(int argc, char **argv)
 	if (samples == MAP_FAILED || pipe(to_child) || pipe(to_parent))
 		fail("shared memory or pipes");
 	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u\n",
-	       mode == 10 ? "joint" : "data", bases * lines_per_base, replay_slot,
+	       mode == 10 ? "joint" : mode == 11 ? "data-late" : "data",
+	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status);
 	child = fork();
