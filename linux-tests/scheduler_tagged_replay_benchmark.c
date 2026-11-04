@@ -54,6 +54,7 @@ struct sample {
 	uint64_t launch, entry, after_load, done, returned;
 	uint64_t preblock_status;
 	uint64_t entry_probe_status;
+	_Atomic unsigned wake_count;
 	unsigned long hook_cycles;
 	unsigned long preblock_probe_cycles;
 	unsigned long entry_probe_cycles;
@@ -114,12 +115,16 @@ static void futex_wait_for(_Atomic uint32_t *word, uint32_t wanted)
 	}
 }
 
-static void futex_set_wake(_Atomic uint32_t *word, uint32_t value)
+static int futex_set_wake(_Atomic uint32_t *word, uint32_t value)
 {
+	int woken;
+
 	atomic_store_explicit(word, value, memory_order_release);
-	if (syscall(SYS_futex, (uint32_t *)word, FUTEX_WAKE,
-		    1, NULL, NULL, 0) < 0)
+	woken = syscall(SYS_futex, (uint32_t *)word, FUTEX_WAKE,
+			1, NULL, NULL, 0);
+	if (woken < 0)
 		fail("futex wake tagged replay");
+	return woken;
 }
 
 static void child_handoff_begin(int in, int out, char *token,
@@ -228,6 +233,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			fail("hook count before");
 		samples[trial].enabled = enabled;
 		samples[trial].accepted = 0;
+		atomic_store_explicit(&samples[trial].wake_count, UINT32_MAX,
+				      memory_order_release);
 		child_handoff_begin(in, out, &token, phase, sync);
 		entry = cycle();
 		if (probe_status) {
@@ -254,10 +261,17 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
 		samples[trial].hooks = after_hook - before_hook;
-		if (samples[trial].hooks != enabled) {
+		while (atomic_load_explicit(&samples[trial].wake_count,
+					   memory_order_acquire) == UINT32_MAX)
+			__asm__ volatile("" : : : "memory");
+		if (samples[trial].hooks != enabled
+		    || atomic_load_explicit(&samples[trial].wake_count,
+					    memory_order_relaxed) != 1) {
 			fprintf(stderr,
-				"TAGGED_REPLAY_RETRY trial=%u enabled=%u hooks=%u\n",
-				trial, enabled, samples[trial].hooks);
+				"TAGGED_REPLAY_RETRY trial=%u enabled=%u hooks=%u woken=%u\n",
+				trial, enabled, samples[trial].hooks,
+				atomic_load_explicit(&samples[trial].wake_count,
+						     memory_order_relaxed));
 			child_handoff_end(out, &token, phase, sync);
 			if (++retries > max_retries)
 				fail("too many tagged replay retries");
@@ -449,16 +463,21 @@ int main(int argc, char **argv)
 	close(to_parent[1]);
 	for (unsigned trial = 0; trial < trials;) {
 		uint64_t lead_start;
+		int woken;
 
 		if (sync == sync_pipe)
 			transfer(to_parent[0], &token, 0);
 		else
 			futex_wait_for(&shared->phase, futex_child_ready);
 		samples[trial].launch = cycle();
-		if (sync == sync_pipe)
+		if (sync == sync_pipe) {
 			transfer(to_child[1], &token, 1);
-		else
-			futex_set_wake(&shared->phase, futex_parent_go);
+			woken = 1;
+		} else {
+			woken = futex_set_wake(&shared->phase, futex_parent_go);
+		}
+		atomic_store_explicit(&samples[trial].wake_count, woken,
+				      memory_order_release);
 		lead_start = cycle();
 		while (cycle() - lead_start < lead_cycles)
 			__asm__ volatile("" : : : "memory");
@@ -508,8 +527,10 @@ int main(int argc, char **argv)
 			fprintf(stderr, "nonmonotonic tagged replay sample: %u\n", trial);
 			return 1;
 		}
-		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu\n",
-		       trial - warmup, s->enabled, s->hooks, s->hook_cycles,
+		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u woken=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu\n",
+		       trial - warmup, s->enabled, s->hooks,
+		       atomic_load_explicit(&s->wake_count, memory_order_relaxed),
+		       s->hook_cycles,
 		       s->accepted_entries, s->filtered_entries,
 		       s->accepted_triggers, s->dropped_triggers,
 		       (unsigned long long)(s->entry - s->launch),

@@ -15,7 +15,7 @@ CONFIG = re.compile(
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
 )
 ROW = re.compile(
-    r"TAGGED_REPLAY trial=(\d+) enabled=(\d+) hooks=(\d+) "
+    r"TAGGED_REPLAY trial=(\d+) enabled=(\d+) hooks=(\d+) woken=(\d+) "
     r"hook_cycles=(\d+) admitted=(\d+) filtered=(\d+) triggers=(\d+) "
     r"dropped=(\d+) wake_to_entry=(\d+) load_cycles=(\d+) "
     r"wake_to_load=(\d+) roundtrip=(\d+)"
@@ -144,7 +144,7 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("retry count does not match filtered attempts")
 
     fields = (
-        "trial", "enabled", "hooks", "hook_cycles", "admitted", "filtered",
+        "trial", "enabled", "hooks", "woken", "hook_cycles", "admitted", "filtered",
         "triggers", "dropped", "wake_to_entry", "load_cycles", "wake_to_load",
         "roundtrip",
     )
@@ -177,6 +177,8 @@ def analyze(path, bootstrap_samples=20000):
     for index, row in enumerate(rows):
         if row["hooks"] != row["enabled"]:
             raise ValueError(f"trial {index} has invalid hook count")
+        if row["woken"] != 1:
+            raise ValueError(f"trial {index} did not wake exactly one child")
         if row["wake_to_entry"] + row["load_cycles"] != row["wake_to_load"]:
             raise ValueError(f"trial {index} has inconsistent first-use timing")
         if row["wake_to_load"] > row["roundtrip"]:

@@ -37,7 +37,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             preblock |= 3 << 58
             entry_status |= 2 << 58
         rows.append(
-            f"TAGGED_REPLAY trial={trial} enabled={enabled} hooks={enabled} "
+            f"TAGGED_REPLAY trial={trial} enabled={enabled} hooks={enabled} woken=1 "
             f"hook_cycles={10 + enabled} admitted={admitted} filtered=0 "
             f"triggers={triggers} dropped=0 wake_to_entry={entry} "
             f"load_cycles={load} wake_to_load={entry + load} "
@@ -123,6 +123,14 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["sync"], "futex")
+
+    def test_nonwaking_futex_trial_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory), sync="futex")
+            text = path.read_text().replace("hooks=0 woken=1", "hooks=0 woken=0", 1)
+            path.write_text(text)
+            with self.assertRaisesRegex(ValueError, "did not wake exactly one child"):
+                analyze(path, bootstrap_samples=10)
 
     def test_status_sync_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -33,7 +33,7 @@ def load_rows(path):
     result = analyze(path, bootstrap_samples=1)
     text = path.read_text(errors="replace").replace("\x00", "").replace("\r", "")
     fields = (
-        "trial", "enabled", "hooks", "hook_cycles", "admitted", "filtered",
+        "trial", "enabled", "hooks", "woken", "hook_cycles", "admitted", "filtered",
         "triggers", "dropped", "wake_to_entry", "load_cycles",
         "wake_to_load", "roundtrip",
     )
