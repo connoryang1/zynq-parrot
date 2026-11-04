@@ -333,6 +333,7 @@ int main(int argc, char **argv)
 	unsigned mode = 9, delay = 0, gap = 2;
 	unsigned lines_per_base = max_lines_per_base;
 	unsigned long lead_cycles = 0;
+	const char *mode_name = "data";
 	int fifo = 0, probe_status = 0, skew_layout = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
@@ -341,14 +342,16 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 10) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
 			argv[0]);
 		return 2;
 	}
 	if (argc >= 2) {
+		mode_name = argv[1];
 		if (!strcmp(argv[1], "off"))
 			mode = 0;
-		else if (!strcmp(argv[1], "instruction-select"))
+		else if (!strcmp(argv[1], "instruction-select")
+			 || !strcmp(argv[1], "joint-split"))
 			mode = 3;
 		else if (!strcmp(argv[1], "instruction-wake"))
 			mode = 4;
@@ -449,9 +452,7 @@ int main(int argc, char **argv)
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
 	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s\n",
-	       mode == 0 ? "off" : mode == 3 ? "instruction-select" :
-	       mode == 4 ? "instruction-wake" :
-	       mode == 10 ? "joint" : mode == 11 ? "data-late" : "data",
+	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status,

@@ -12,7 +12,7 @@ from pathlib import Path
 
 CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|"
-    r"instruction-wake|joint) "
+    r"instruction-wake|joint|joint-split) "
     r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
 )
@@ -227,6 +227,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure successful-wakeup instruction replay under the matched "
             "tagged-data workload without issuing a data tag."
             if mode == "instruction-wake" else
+            "Measure wake-time tagged data followed by selection-time "
+            "instruction replay under the matched workload."
+            if mode == "joint-split" else
             "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."
         ),

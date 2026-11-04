@@ -142,6 +142,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
 
+    def test_split_joint_mode_requires_data_counters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="joint-split"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "joint-split")
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+
     def test_futex_sync_is_bound(self):
         with tempfile.TemporaryDirectory() as directory:
             result = analyze(

@@ -80,6 +80,12 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_split_joint_mode(self):
+        self.assertIn(
+            " joint-split 0 0 normal 0 8 0 aligned pipe; ",
+            runner.benchmark_command("joint-split", 0, 0, "normal", 0),
+        )
+
     def test_command_binds_replay_off_stability_mode(self):
         self.assertIn(
             " off 0 0 normal 0 8 0 aligned futex; ",

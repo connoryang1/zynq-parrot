@@ -80,7 +80,8 @@ def parse_args(argv=None):
     parser.add_argument("--transfer-timeout-s", type=int, default=180)
     parser.add_argument("--mode", choices=("off", "data", "data-late",
                                             "instruction-select",
-                                            "instruction-wake", "joint"),
+                                            "instruction-wake", "joint",
+                                            "joint-split"),
                         default="data")
     parser.add_argument("--delay", type=int, default=0)
     parser.add_argument("--gap", type=int, default=2)
