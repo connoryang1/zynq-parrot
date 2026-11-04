@@ -404,7 +404,7 @@ module top_zynq
       ,.axi_addr_width_p(C_HP0_AXI_ADDR_WIDTH)
       ,.axi_data_width_p(C_HP0_AXI_DATA_WIDTH)
       ,.axi_id_width_p(6)
-      ,.outstanding_p(10)
+      ,.outstanding_p(1)
       )
     prefetch_mem
      (.clk_i(aclk)
