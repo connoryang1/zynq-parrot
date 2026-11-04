@@ -174,6 +174,27 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             20,
         )
 
+    def test_route_comparison_pools_independent_boots(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = []
+            for name, enabled_load, bit in (
+                    ("control1", 280, "5"), ("control2", 280, "5"),
+                    ("candidate1", 260, "6"), ("candidate2", 260, "6")):
+                (root / name).mkdir()
+                paths.append(write_run(
+                    root / name, enabled_load=enabled_load,
+                    bitstream_sha256=bit * 64,
+                ))
+            result = compare(paths[:2], paths[2:], bootstrap_samples=10)
+        self.assertEqual(len(result["control"]["transcripts"]), 2)
+        self.assertEqual(len(result["candidate"]["transcripts"]), 2)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]
+                  ["candidate_incremental_saved_cycles"],
+            20,
+        )
+
     def test_preblock_probe_is_decoded(self):
         with tempfile.TemporaryDirectory() as directory:
             result = analyze(

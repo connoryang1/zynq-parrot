@@ -41,23 +41,40 @@ def block_differences(rows, metric):
     return differences
 
 
-def compare(control_path, candidate_path, bootstrap_samples=20000):
-    """Measure candidate-minus-control change in paired replay benefit."""
+def compare(control_paths, candidate_paths, bootstrap_samples=20000):
+    """Measure candidate-minus-control change across independent boot strata."""
     if bootstrap_samples <= 0:
         raise ValueError("bootstrap sample count must be positive")
-    control, control_rows = load(control_path)
-    candidate, candidate_rows = load(candidate_path)
-    if control["config"] != candidate["config"]:
-        raise ValueError("route configurations do not match")
+    if isinstance(control_paths, (str, Path)):
+        control_paths = [Path(control_paths)]
+    if isinstance(candidate_paths, (str, Path)):
+        candidate_paths = [Path(candidate_paths)]
+    if not control_paths or not candidate_paths:
+        raise ValueError("each route requires at least one transcript")
+    controls = [load(path) for path in control_paths]
+    candidates = [load(path) for path in candidate_paths]
+    reference = controls[0][0]
+    for result, _rows in controls[1:] + candidates:
+        if reference["config"] != result["config"]:
+            raise ValueError("route configurations do not match")
     common_keys = (
         "nbf_sha256", "transfer_sha256", "elf_sha256",
         "control_program_sha256",
     )
-    for key in common_keys:
-        if control["identity"][key] != candidate["identity"][key]:
-            raise ValueError(f"route identity mismatch: {key}")
-    control_bit = control["identity"]["bitstream_sha256"]
-    candidate_bit = candidate["identity"]["bitstream_sha256"]
+    for result, _rows in controls[1:] + candidates:
+        for key in common_keys:
+            if reference["identity"][key] != result["identity"][key]:
+                raise ValueError(f"route identity mismatch: {key}")
+    control_bits = {
+        result["identity"]["bitstream_sha256"] for result, _rows in controls
+    }
+    candidate_bits = {
+        result["identity"]["bitstream_sha256"] for result, _rows in candidates
+    }
+    if len(control_bits) != 1 or len(candidate_bits) != 1:
+        raise ValueError("replicates within a route must use one bitstream")
+    control_bit = next(iter(control_bits))
+    candidate_bit = next(iter(candidate_bits))
     if control_bit == candidate_bit:
         raise ValueError("route comparison requires distinct bitstreams")
 
@@ -67,30 +84,44 @@ def compare(control_path, candidate_path, bootstrap_samples=20000):
             "Compare replay benefit across two physical routes while "
             "resampling balanced trial blocks independently."
         ),
-        "config": control["config"],
+        "config": reference["config"],
         "common_identity": {
-            key: control["identity"][key] for key in common_keys
+            key: reference["identity"][key] for key in common_keys
         },
         "control": {
-            "transcript": str(control_path),
+            "transcripts": [str(path) for path in control_paths],
             "bitstream_sha256": control_bit,
         },
         "candidate": {
-            "transcript": str(candidate_path),
+            "transcripts": [str(path) for path in candidate_paths],
             "bitstream_sha256": candidate_bit,
         },
         "bootstrap_samples": bootstrap_samples,
         "metrics": {},
     }
     for metric in METRICS:
-        control_blocks = block_differences(control_rows, metric)
-        candidate_blocks = block_differences(candidate_rows, metric)
+        control_strata = [
+            block_differences(rows, metric) for _result, rows in controls
+        ]
+        candidate_strata = [
+            block_differences(rows, metric) for _result, rows in candidates
+        ]
+        control_blocks = [value for stratum in control_strata for value in stratum]
+        candidate_blocks = [value for stratum in candidate_strata for value in stratum]
         control_point = statistics.median(control_blocks)
         candidate_point = statistics.median(candidate_blocks)
         boots = []
         for _ in range(bootstrap_samples):
-            control_sample = rng.choices(control_blocks, k=len(control_blocks))
-            candidate_sample = rng.choices(candidate_blocks, k=len(candidate_blocks))
+            control_sample = [
+                value
+                for stratum in control_strata
+                for value in rng.choices(stratum, k=len(stratum))
+            ]
+            candidate_sample = [
+                value
+                for stratum in candidate_strata
+                for value in rng.choices(stratum, k=len(stratum))
+            ]
             boots.append(
                 statistics.median(candidate_sample)
                 - statistics.median(control_sample)
@@ -110,10 +141,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("control", type=Path)
     parser.add_argument("candidate", type=Path)
+    parser.add_argument("--control-replicate", action="append", default=[],
+                        type=Path)
+    parser.add_argument("--candidate-replicate", action="append", default=[],
+                        type=Path)
     parser.add_argument("--bootstrap-samples", type=int, default=20000)
     args = parser.parse_args()
     try:
-        result = compare(args.control, args.candidate, args.bootstrap_samples)
+        result = compare(
+            [args.control, *args.control_replicate],
+            [args.candidate, *args.candidate_replicate],
+            args.bootstrap_samples,
+        )
     except ValueError as error:
         raise SystemExit(str(error)) from error
     print(json.dumps(result, indent=2))
