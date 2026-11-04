@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from analyze_scheduler_tagged_replay import analyze
+from pool_scheduler_tagged_replay_replicates import pool
 
 
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
@@ -105,6 +106,19 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["layout"], "skew")
+
+    def test_two_valid_replicates_pool_paired_blocks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "first").mkdir()
+            (root / "second").mkdir()
+            first = write_run(root / "first")
+            second = write_run(root / "second")
+            result = pool([first, second], bootstrap_samples=10)
+        self.assertEqual(result["replicate_count"], 2)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]["pooled_saved_cycles"], 20
+        )
 
     def test_preblock_probe_is_decoded(self):
         with tempfile.TemporaryDirectory() as directory:
