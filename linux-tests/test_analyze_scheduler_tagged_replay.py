@@ -9,7 +9,7 @@ from analyze_scheduler_tagged_replay import analyze
 
 
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
-              downstream_status=False):
+              downstream_status=False, status_bits_59_58=False):
     """Create a complete synthetic matched A/B transcript and status."""
     path = root / "run.log"
     rows = [
@@ -30,6 +30,9 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         if probe_status and enabled and downstream_status:
             preblock |= (2 << 60) | (1 << 63)
             entry_status |= 1 << 60
+        if probe_status and enabled and status_bits_59_58:
+            preblock |= 3 << 58
+            entry_status |= 2 << 58
         rows.append(
             f"TAGGED_REPLAY trial={trial} enabled={enabled} hooks={enabled} "
             f"hook_cycles={10 + enabled} admitted={admitted} filtered=0 "
@@ -117,6 +120,21 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         )
         self.assertEqual(
             probe["entry_uce_complete_histogram"]["enabled"], {"0": 256}
+        )
+
+    def test_status_bits_59_58_are_reported_neutrally(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), lines=16, probe_status=True,
+                          status_bits_59_58=True),
+                bootstrap_samples=10,
+            )
+        probe = result["preblock_probe"]
+        self.assertEqual(
+            probe["status_bits_59_58_histogram"]["enabled"], {"3": 256}
+        )
+        self.assertEqual(
+            probe["entry_status_bits_59_58_histogram"]["enabled"], {"2": 256}
         )
 
     def test_status_parameter_mismatch_is_rejected(self):

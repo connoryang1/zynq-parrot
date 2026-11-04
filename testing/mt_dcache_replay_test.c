@@ -40,6 +40,13 @@ static inline uint64_t read_csr_9c3(void)
   return value;
 }
 
+static inline uint64_t read_cycle(void)
+{
+  uint64_t value;
+  __asm__ volatile("rdcycle %0" : "=r"(value));
+  return value;
+}
+
 int main(void)
 {
   // The host NBF loader initializes .data directly in simulated DRAM, so the
@@ -119,6 +126,19 @@ int main(void)
     }
   }
   bp_print_string("DCACHE-REPLAY drained\n");
+
+  if (((status >> 58) & 3) == 0) {
+    bp_print_string("[BSG-FAIL] tagged data replay drain age not visible\n");
+    bp_finish(1);
+  }
+  uint64_t drain_wait_start = read_cycle();
+  while (read_cycle() - drain_wait_start < 2050)
+    ;
+  status = read_csr_9c3();
+  if (((status >> 58) & 3) != 3) {
+    bp_print_string("[BSG-FAIL] tagged data replay drain age did not saturate\n");
+    bp_finish(1);
+  }
 
   uint64_t expected_accepted = BENCH_DIAGNOSTIC == 1 ? 0 : REPLAY_LINES;
   uint64_t expected_filtered = BENCH_DIAGNOSTIC == 1 ? REPLAY_LINES : 0;

@@ -98,6 +98,16 @@ int main(int argc, char **argv) {
     for (unsigned i = 0; i < expected.size(); ++i)
       require(consumed[i] == expected[i], "footprint replay order/data mismatch");
 
+    tick();
+    require(((dut.status_o >> 58) & 0x3) == 1,
+            "freshly drained replay did not enter the recent-age bucket");
+    for (unsigned i = 0; i < 512; ++i) tick();
+    require(((dut.status_o >> 58) & 0x3) == 2,
+            "drain age did not enter the 512-cycle bucket");
+    for (unsigned i = 0; i < 1536; ++i) tick();
+    require(((dut.status_o >> 58) & 0x3) == 3,
+            "drain age did not enter the 2048-cycle bucket");
+
     // Fill the two-entry command queue while a long-delay command is active;
     // a fourth trigger must be dropped rather than corrupting queued tags.
     dut.config_write_slot_i = 2;
@@ -109,6 +119,9 @@ int main(int argc, char **argv) {
       dut.trigger_slot_i = slot;
       pulse(dut.trigger_v_i);
     }
+
+    require(((dut.status_o >> 58) & 0x3) == 0,
+            "new replay did not clear the completed-drain age");
 
     const uint64_t status = dut.status_o;
     require(((status >> 10) & 0xffff) == 31, "accepted-entry counter mismatch");
@@ -129,7 +142,8 @@ int main(int argc, char **argv) {
             "counter clear did not clear replay/trigger counters");
 
     std::cout << "[DCACHE-REPLAY-CTRL] PASS: tagged command queue, delayed "
-                 "32-entry replay, gap throttle, backpressure, filtering, counters\n";
+                 "32-entry replay, gap throttle, backpressure, filtering, "
+                 "counters, drain-age telemetry\n";
     return 0;
   } catch (const std::exception &error) {
     std::cerr << "[DCACHE-REPLAY-CTRL] FAIL: " << error.what() << "\n";

@@ -222,6 +222,7 @@ def analyze(path, bootstrap_samples=20000):
                 "filtered": (raw_status >> 26) & 0xffff,
                 "triggers": (raw_status >> 42) & 0xff,
                 "dropped": (raw_status >> 50) & 0xff,
+                "status_bits_59_58": (raw_status >> 58) & 0x3,
                 "uce_outstanding": (raw_status >> 60) & 0x7,
                 "uce_complete": (raw_status >> 63) & 0x1,
                 "probe_cycles": cycles,
@@ -233,6 +234,7 @@ def analyze(path, bootstrap_samples=20000):
                 "entry_filtered": (entry_status >> 26) & 0xffff,
                 "entry_triggers": (entry_status >> 42) & 0xff,
                 "entry_dropped": (entry_status >> 50) & 0xff,
+                "entry_status_bits_59_58": (entry_status >> 58) & 0x3,
                 "entry_uce_outstanding": (entry_status >> 60) & 0x7,
                 "entry_uce_complete": (entry_status >> 63) & 0x1,
                 "entry_probe_cycles": entry_cycles,
@@ -319,6 +321,19 @@ def analyze(path, bootstrap_samples=20000):
                 for arm, arm_rows in (("disabled", disabled_probe),
                                       ("enabled", enabled_probe))
             },
+            # These bits were the active-slot field in older FPGA images and
+            # are drain-age buckets in the diagnostic image.  Keep the JSON
+            # label neutral so historical transcripts remain interpretable.
+            "status_bits_59_58_histogram": {
+                arm: {
+                    str(value): sum(row["status_bits_59_58"] == value
+                                    for row in arm_rows)
+                    for value in sorted({row["status_bits_59_58"]
+                                         for row in arm_rows})
+                }
+                for arm, arm_rows in (("disabled", disabled_probe),
+                                      ("enabled", enabled_probe))
+            },
             "uce_complete_histogram": {
                 arm: {
                     str(value): sum(row["uce_complete"] == value
@@ -372,6 +387,16 @@ def analyze(path, bootstrap_samples=20000):
                     str(value): sum(row["entry_uce_outstanding"] == value
                                     for row in arm_rows)
                     for value in sorted({row["entry_uce_outstanding"]
+                                         for row in arm_rows})
+                }
+                for arm, arm_rows in (("disabled", disabled_probe),
+                                      ("enabled", enabled_probe))
+            },
+            "entry_status_bits_59_58_histogram": {
+                arm: {
+                    str(value): sum(row["entry_status_bits_59_58"] == value
+                                    for row in arm_rows)
+                    for value in sorted({row["entry_status_bits_59_58"]
                                          for row in arm_rows})
                 }
                 for arm, arm_rows in (("disabled", disabled_probe),

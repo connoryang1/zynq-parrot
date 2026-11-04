@@ -179,6 +179,47 @@ waveform, UCE, kernel, NBF, benchmark, and transfer bundle is preserved under
 `/home/coyang/fpga-artifacts/context-resume/tagged-replay-telemetry-count3-20261104/`;
 its manifest verifies in full.
 
+The exact matched route signs off only after post-route physical optimization:
+setup WNS/TNS is `+0.009/0 ns`, hold WHS/THS is `+0.026/0 ns`, and utilization
+is 50,423 LUTs (94.78%), 25,191 registers, 94.5 BRAM tiles, and 11 DSPs. The
+farm launcher initially selected the earlier routed report and falsely labeled
+the job failed; a branch-pinned recheck selected the post-physopt report and
+marked job `20261104T063840Z-9722a332` PASS. The exact package and bitstream
+hashes are `dec404e7...9e4` and `7c90de5e...403`.
+
+On FPGA, the first corrected telemetry run completes 512 balanced trials and
+final CORE/BSG PASS. Both the parent pre-block probe and the child userspace
+entry probe report zero allocated UCE slots and zero completed replies awaiting
+retirement in every arm. The latter probe costs roughly 1,200--1,400 cycles,
+so this proves only that replay has drained by the syscall observation point;
+it does not prove that no work was live at the architectural switch boundary.
+The corresponding unprobed retry saves `186.75 [169,200.5]` local-load cycles
+but loses `2048.25 [692,3764.5]` wake-to-load cycles. A later recovered old-image
+control saves `213.5` local cycles and loses `1539.5` wake-to-load cycles. These
+are separate runs rather than pooled replicates, but both preserve the same
+conclusion: useful cache warming remains smaller than the wake-path penalty.
+
+One unprobed launch stalled during Linux initialization and was rejected before
+benchmark execution. A proposed earlier kernel-side snapshot was also rejected:
+both an expanded-`thread_struct` build and a layout-safe build that reused
+existing diagnostic counters emitted binary fragments into the boot console and
+lost the runner before userspace, while a fully recovered old-kernel control on
+the same route completed all trials and terminal markers. All snapshot code was
+reverted and the 97-test baseline harness passes.
+
+The replacement instrument preserves the exact passing Linux image. Replay
+status bits 59:58, whose old active-slot value is not consumed by the benchmark,
+now encode time since the controller and downstream UCE both became idle: zero
+means no completed drain or live replay, one means 1--511 cycles, two means
+512--2047 cycles, and three means at least 2048 cycles. Counter clear resets the
+age, so disabled trials remain a zero control. The standalone controller checks
+all four transitions and a new trigger reset; the full-core guest additionally
+requires a visible fresh drain and saturation after 2050 cycles. The controller,
+all 154 discovered Linux tests, and a clean trace-enabled two-thread/four-context
+full-core run pass. Exact build/run/FST/ELF/NBF hashes are
+`1c36551e...526`, `568cf8e5...fd5`, `227d7265...afe`,
+`c29e5e55...d5d`, and `acdedcac...98f`.
+
 Two command-invocation mistakes produced no test result: direct module-style
 `unittest` omitted the `linux-tests` import path, and the first standalone RTL
 runner call omitted its required `--out` flag. The guardrail is to use
@@ -189,7 +230,8 @@ before linking because `/rootfs.cpio` was unavailable, and produced no image;
 the accepted rerun explicitly binds it to the retained Buildroot images path.
 
 Do not continue delay/gap/lead tuning from this checkpoint. The next diagnostic
-must route the validated UCE occupancy fields into an exact FPGA image, and the next RTL
+must measure the non-invasive RTL drain-age telemetry on the matched FPGA;
+after that, the next RTL
 candidates should separately test demand-high/prefetch-low AXI QoS and a
 one-outstanding prefetch cap. A wider replay window is lower priority because
 it may increase the already measured scheduler-path contention. Any candidate must rerun
