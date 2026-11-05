@@ -222,8 +222,8 @@ because actor/frame work spaces issues across 4,918 cycles. Exact logs,
 generated tables, hashes, commands, and limits are under
 [`logs/nano-peer-review-20261101/`](../logs/nano-peer-review-20261101/).
 
-The first complete PYNQ-Z2 matrix runs all eleven N=8 modes four times on the
-qualified `b7cf9953` / BlackParrot `c50b8571` ten-context overlay. Physical
+An independent all-mode PYNQ-Z2 extension runs all eleven N=8 modes four times
+on the qualified `b7cf9953` / BlackParrot `c50b8571` ten-context overlay. Physical
 medians for serial demand/serial prefetch/hardware/fixed-SoA-batch/direct
 coroutine are 6,116/3,995/7,030.5/6,369.5/8,407 cycles. The best batch is
 1.104x faster than hardware, while hardware is 1.196x faster than the direct
@@ -231,7 +231,9 @@ coroutine. This physical result is intentionally separate from the synthetic
 200-cycle matrix: the board's roughly 41-cycle first-touch latency is too short
 to repay fine-grained interleaving overhead here. The overlay predates the
 Nano branch's `6c79a4210` switch-boundary interlock, so this is accepted
-platform evidence rather than an exact RTL-revision reproduction. Exact
+platform evidence rather than an exact RTL-revision reproduction. Its five
+headline rows reproduce the earlier physical N=2--10 sweep at N=8 within
+1.216% or less. Exact
 identities, ranges, transcripts, and exclusions are under
 [`logs/nano-fpga-20261104/`](../logs/nano-fpga-20261104/).
 

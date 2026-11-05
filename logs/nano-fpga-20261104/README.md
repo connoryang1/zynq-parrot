@@ -1,4 +1,4 @@
-This evidence records the first complete physical-FPGA run of all eleven Nano lookup schedules. It keeps the physical-DDR result separate from the synthetic 200-cycle simulator result and retains every accepted transcript. The routed overlay is a qualified ten-context ancestor of the newer Nano simulation RTL, so this is an FPGA platform comparison rather than an exact RTL-revision reproduction.
+This evidence extends the earlier five-headline-mode physical sweep with a complete run of all eleven Nano lookup schedules at N=8. It keeps the physical-DDR result separate from the synthetic 200-cycle simulator result and retains every accepted transcript. The routed overlay is a qualified ten-context ancestor of the newer Nano simulation RTL, so this is an FPGA platform comparison rather than an exact RTL-revision reproduction.
 
 # Nano N=8 physical-FPGA matrix
 
@@ -21,6 +21,8 @@ Every mode passed four independent processor-reset invocations, its mode/query s
 | 10 | Direct C++20 coroutine | 8,407.0 | 8,404--8,416 | 95.534 |
 
 The best explicit software batch is 1.104x faster than hardware. Hardware is 1.196x faster than the best direct coroutine, but serial prefetch is 1.760x faster than hardware. Unlike the 200-cycle simulator, this FPGA therefore does not benefit from interleaving this fine-grained lookup: the measured first-touch DDR path is only about 41 core cycles on this low-frequency platform, so request scheduling and state-management work exceed the latency hidden. Serial prefetch is the only visibly variable row; its full accepted range is reported rather than selecting the 3,661-cycle sample.
+
+The independent earlier three-sample N=2--10 physical sweep reports N=8 medians of 6,114 serial demand, 3,947 serial prefetch, 6,365 fixed batch, 7,025 hardware, and 8,405 direct coroutine cycles. This all-mode extension differs by only 0.033%/1.216%/0.071%/0.078%/0.024%, respectively; the larger serial-prefetch difference is consistent with this row's 3,661--4,270 accepted range. The two retained evidence sets therefore agree on the physical ordering and magnitude.
 
 ## Hardware and software identity
 
