@@ -21,12 +21,12 @@ class IcachePrefixTest(unittest.TestCase):
         )
 
     def test_committed_header_matches_model(self):
-        generated = EMITTER.render(self.result)
+        generated = EMITTER.render(self.result, 16)
         committed = (
             HERE / "opensbi-platform/blackparrot/icache_prefix.h"
         ).read_text()
         self.assertEqual(generated, committed)
-        self.assertEqual(generated.count("UL,"), 63)
+        self.assertEqual(generated.count("UL,"), 16)
 
     def test_limit_emits_ranked_prefix(self):
         generated = EMITTER.render(self.result, 3)

@@ -48,7 +48,7 @@ DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
 INIT_SCRIPT := $(CURDIR)/rootfs-overlay/etc/init.d/S200ctxtsw_user_smoke.sh
 OPENSBI_PLATFORM_OVERLAY := $(CURDIR)/opensbi-platform/blackparrot
 ICACHE_PREFIX_RESULTS ?= $(TOP)/logs/cache-resume-trace-model-20261030/results.json
-ICACHE_PREFIX_LIMIT ?=
+ICACHE_PREFIX_LIMIT ?= 16
 ICACHE_PREFIX_HEADER := $(OPENSBI_PLATFORM_OVERLAY)/icache_prefix.h
 ICACHE_PREFIX_GENERATOR := $(CURDIR)/emit_icache_prefix_header.py
 LINUX_PREFIX_PATCH := $(CURDIR)/kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch
@@ -67,7 +67,8 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0015-blackparrot-preview-hook-timing.patch \
 	$(CURDIR)/kernel-patches/0016-blackparrot-wakeup-data-only.patch \
 	$(CURDIR)/kernel-patches/0017-blackparrot-tagged-data-replay.patch \
-	$(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch
+	$(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch \
+	$(CURDIR)/kernel-patches/0020-blackparrot-tagged-data-instruction-split.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb

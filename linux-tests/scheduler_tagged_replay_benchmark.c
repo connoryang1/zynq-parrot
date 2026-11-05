@@ -352,8 +352,7 @@ int main(int argc, char **argv)
 		mode_name = argv[1];
 		if (!strcmp(argv[1], "off"))
 			mode = 0;
-		else if (!strcmp(argv[1], "instruction-select")
-			 || !strcmp(argv[1], "joint-split"))
+		else if (!strcmp(argv[1], "instruction-select"))
 			mode = 3;
 		else if (!strcmp(argv[1], "instruction-wake"))
 			mode = 4;
@@ -361,6 +360,8 @@ int main(int argc, char **argv)
 			mode = 10;
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
+		else if (!strcmp(argv[1], "joint-split"))
+			mode = 12;
 		else if (strcmp(argv[1], "data")) {
 			fprintf(stderr, "invalid replay mode: %s\n", argv[1]);
 			return 2;

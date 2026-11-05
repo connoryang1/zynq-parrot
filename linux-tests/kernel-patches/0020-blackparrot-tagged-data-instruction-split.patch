@@ -1,0 +1,62 @@
+This patch adds a source-level mode for the accepted split-trigger schedule.
+Mode twelve issues one tagged data-footprint command at successful wakeup and
+launches shared instruction-prefix replay only after final task selection.  It
+keeps the two mechanisms out of the unsafe back-to-back wakeup sequence while
+accounting both hooks so the benchmark can reject intervening reschedules.
+
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -213,6 +213,7 @@ static __always_inline void riscv_bp_replay_wakeup(struct task_struct *task)
+ 
+ 	if ((READ_ONCE(task->thread.bp_preview_phys_mode) != 9
+-	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 10)
++	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 10
++	     && READ_ONCE(task->thread.bp_preview_phys_mode) != 12)
+ 	    || READ_ONCE(task->thread.bp_preview_replay_state) != 1
+ 	    || READ_ONCE(task->thread.bp_preview_phys_mm) != task->mm
+ 	    || !task->mm)
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -311,7 +311,8 @@
+ #define PR_BP_PREVIEW_GET_GUARD	0x42505058
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+-/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay. */
++/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay;
++ * 12 wake-tagged-data plus selection-time instruction replay. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ /* Last successful-wakeup preview-hook duration in global BP cycles. */
+ #define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4367,7 +4367,8 @@ static int try_to_wake_up(struct task_struct *p, unsigned int state,
+ 		if (bp_preview_mode == 1 || bp_preview_mode == 7
+ 		    || bp_preview_mode == 8)
+ 			riscv_bp_preview_wakeup(p);
+-		if (bp_preview_mode == 9 || bp_preview_mode == 10)
++		if (bp_preview_mode == 9 || bp_preview_mode == 10
++		    || bp_preview_mode == 12)
+ 			riscv_bp_replay_wakeup(p);
+ 		if (bp_preview_mode == 11)
+ 			riscv_bp_replay_arm_late(p);
+@@ -6716,7 +6717,8 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count
+ 		 * the selection here; mode four also skips the hardware trigger. */
+-		if (bp_preview_mode == 3 || bp_preview_mode == 4)
++		if (bp_preview_mode == 3 || bp_preview_mode == 4
++		    || bp_preview_mode == 12)
+ 			WRITE_ONCE(next->thread.bp_preview_hook_count,
+ 				   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
+ #endif
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,7 +2788,7 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 11 || arg3 || arg4 || arg5) {
++		if (arg2 > 12 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
