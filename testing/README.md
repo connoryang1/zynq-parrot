@@ -64,7 +64,8 @@ before the next test overwrites shared `prog.*`, `run.log`, and waveform files.
 | `mt_ctxtsw_nonresident_overhead_benchmark` | Matched global-cycle rings, with untimed completion checks for both peers |
 | `mt_ctxtsw_store_handoff_benchmark` | Matched pure and hot-store-before-switch rings for resident and nonresident handoffs |
 | `mt_dependent_stream_benchmark` | Shuffled dependent pointer chains; serial demand/prefetch, register-held software interleaving, and hardware context interleaving on the same graph |
-| `mt_nano_lookup_benchmark` | Two through ten Nano-coroutine-style binary index lookups; serial demand, demand ring, worker prefetch, matched batch, switch-only, serial prefetch, and real C++20 coroutines from one runtime-selected executable |
+| `mt_nano_lookup_benchmark` | Two through ten Nano-coroutine-style binary index lookups; transport controls, hardware workers, runtime and compile-time software batches, and three compiler-generated C++20 coroutine schedulers from one runtime-selected executable |
+| `mt_coroutine_overhead_benchmark` | Hot register-only inline, manual-state, single-coroutine, and eight-frame direct-transfer controls with frame construction outside timing |
 | `mt_ddr_latency_benchmark` | First-touch and immediately cached dependent loads, matched timer controls, and six prefetch lead times on disjoint lines; processor-visible physical cycles |
 | `mt_load_ahead_benchmark` | Serial, same-context load-ahead, and resident schedules with/without load-ahead; equal useful demand loads and arithmetic, verified data/peer completion |
 | `mt_request_interleave_benchmark` | Two independent resident request streams, matched no-prefetch handoff and batch2 controls; shuffled first-touch lines, per-worker counts/checksums and final drain |
@@ -171,23 +172,68 @@ in the second. The detached side buffer consumes each word once and does not
 shift subword hits, so the benchmark unpacks the selected link in registers.
 This models database/search fan-out while ensuring that one shard's shared
 upper tree does not collapse the selected independent requests into one.
-Runtime `NANO_MODE=0..6` selects serial demand, demand ring, worker prefetch,
-matched software batch, switch-only, serial prefetch, or compiler-generated C++20 coroutines
-without changing the ELF/NBF. `NANO_WORKERS=2..10` selects the matched query/shard count;
-five is the maintained default selected by the complete speedup sweep. Every
-invocation warms all seven instruction bodies on separate 31-entry shards, seeds
-and clears common state, fences traffic, emits explicit
+
+`mt_coroutine_overhead_benchmark` removes cold/random memory from the
+comparison. It runs
+8,192 identical register additions through an inline loop, a no-inline manual
+state machine, one repeatedly resumed coroutine, and the eight-frame direct
+symmetric-transfer ring. Each row is instruction-warmed, frames are constructed
+before the timing markers, and aggregate results are checked. The accepted O3
+simulator result is 3.396/13.003/34.005/29.045 cycles per operation
+respectively; see
+[`logs/nano-coroutine-overhead-20261102/`](../logs/nano-coroutine-overhead-20261102/).
+For the Nano benchmark, runtime `NANO_MODE=0..10` selects serial demand, demand ring, worker prefetch,
+matched software batch, switch-only, serial prefetch, checked compiler-generated
+C++20 coroutines, two compile-time-unrolled software batches, lean-queue
+coroutines, or direct symmetric-transfer coroutines without changing the
+ELF/NBF. `NANO_WORKERS=2..10` selects the matched query/shard count;
+eight is the maintained default selected by the fair-software sweep. Every
+invocation warms all eleven instruction bodies in one fixed order on separate
+31-entry shards, then runs switch-only to establish identical cache, predictor,
+and frontend history. It seeds and clears common state, fences traffic, emits explicit
 BEGIN/END markers around `0xCC0` timing, and checks all lower bounds, path
 checksums, step counts, and completions afterward. Run one mode at a time:
 
+The Nano target defaults to `NANO_OPT=-O3`; use `NANO_OPT=-O2` only for the
+documented compiler-sensitivity control. Mode and worker-count dispatch occur
+before BEGIN, and every measured implementation enters through one identical
+indirect operation call.
+
 ```sh
 make -C testing run-mt_nano_lookup_benchmark \
-  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=5 TRACE=1 \
+  NUM_THREADS=2 NUM_CONTEXTS=10 PREFETCH_ELS=10 NANO_MODE=2 NANO_WORKERS=8 TRACE=1 \
   SIM_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10'
 ```
 
 The workload contract, trace requirements, accepted/rejected measurements, and
 PR status are maintained in [the Nano lookup experiment](../NANO_LOOKUP_EXPERIMENT.md).
+
+The peer-review simulator matrix uses one exact O3 ELF/NBF/model for the full
+hardware/fixed-batch N=2..10 sweep. Its selected-and-disclosed N=8 result is
+2,810 hardware cycles versus 3,817 fixed-batch cycles (1.358x) and 5,567 for
+the best direct coroutine (1.981x hardware). Clean retirement traces attribute
+the 1,007-cycle batch gap to 63 fewer retired batch instructions plus 1,070
+additional no-retirement cycles. UCE traces show 88 complete hints, zero
+ordinary measured-region reads, and peak eight for both schedules; hardware
+averages 6.483 outstanding over the whole window versus batch's 4.772. Direct
+coroutine retires 5,076 instructions with only 491 no-retirement cycles; it
+keeps the core busy but peaks at five outstanding hints and averages 3.272
+because actor/frame work spaces issues across 4,918 cycles. Exact logs,
+generated tables, hashes, commands, and limits are under
+[`logs/nano-peer-review-20261101/`](../logs/nano-peer-review-20261101/).
+
+The older `c50b8571` PYNQ-Z2 result is retained under
+[`logs/nano-fpga-20261104/`](../logs/nano-fpga-20261104/) but is superseded for
+performance interpretation because it predates four relevant hint and switch
+fixes. On the exact `6c79a4210` five-slot route, N=5 medians are 1,035 fixed
+batch, 1,720 hardware, 2,169 serial-prefetch, 3,270 direct-coroutine, and 3,830
+serial-demand cycles. These are 18.818/31.273/39.436/59.455/69.636 cycles per
+useful node. Prewarming changes batch/hardware/coroutine by only +4/-1/0 cycles,
+while switch-only measures 12.517 cycles per complete handoff. The coroutine
+hides memory but retires 3,018 diagnostic-window instructions versus batch's
+896. The complete N=2--5 sweep and exact identities are under
+[`logs/nano-exact-fpga-20261105/`](../logs/nano-exact-fpga-20261105/); N=6--10
+still require an exact ten-slot route.
 
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
 prints all samples after measuring. Each load interval is CSR `0xCC0`, load,
