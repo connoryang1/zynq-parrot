@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Kernel patch-stack upgrade repaired — 2026-11-05:** extending an already materialized 0018 Linux tree initially failed because the staging target treated the stack as all-or-nothing, while checking every old patch independently also failed after later patches rewrote their context. The target now recognizes the current tail, the verified previous tail, or a clean tree; real partial-tree upgrade, repeated invocation, and a pristine Linux 6.6 fixture all apply through mode 12 successfully, with all 183 host tests passing.
+
 - **Split joint schedule made rebuildable — 2026-11-05:** added Linux mode 12 for successful-wakeup tagged-data replay plus final-selection instruction replay, made the measured 16-line instruction prefix the maintained default, and switched the `joint-split` benchmark off binary-patched mode 3. Both affected Linux 6.6 objects compile with the exact configured RISC-V toolchain, the dynamic benchmark cross-compiles, and all 183 host tests pass; this source checkpoint preserves the existing FPGA result without claiming a new measurement.
 
 - **Bounded joint replay resolves first-use gain — 2026-11-05:** separated tagged data at successful wake from instruction replay at final selection, then reduced the ordered instruction prefix from 63 to 16 lines. Two fresh FPGA boots with a 32-line skewed data footprint pool to `528 [505.25,551]` local cycles and `4254.5 [1991.5,5762]` wake-to-load cycles saved (10.24%); prefix 32 is neutral, prefix 63 is harmful at first use, prefix 8 fails terminal acceptance, and a 16-line data footprint is neutral (`/home/coyang/fpga-artifacts/context-resume/tagged-replay-wake-instruction-20261104/`, RL-118).

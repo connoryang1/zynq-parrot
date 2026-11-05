@@ -69,6 +69,7 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0017-blackparrot-tagged-data-replay.patch \
 	$(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch \
 	$(CURDIR)/kernel-patches/0020-blackparrot-tagged-data-instruction-split.patch
+LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -357,15 +358,24 @@ stage-linux-prefix-trigger:
 	fi
 
 # Apply the measured data-preview stack after the independent instruction
-# trigger. Reverse dry-runs keep repeated image builds idempotent while a failed
-# forward dry-run stops before partially changing the materialized kernel tree.
+# trigger. Later patches rewrite context from earlier patches, so individual
+# reverse checks are not reliable. Recognize the complete current stack, the
+# immediately preceding stack tail, or a clean tree; reject every other state.
 stage-linux-data-preview: stage-linux-prefix-trigger
-	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
 		echo "physical data-preview stack already applied"; \
+	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(LINUX_DATA_PREVIOUS_TAIL) >/dev/null 2>&1; then \
+		patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+			< $(lastword $(LINUX_DATA_PATCHES)); \
+		patch -d $(LINUX_BUILD_DIR) -p1 --forward \
+			< $(lastword $(LINUX_DATA_PATCHES)); \
 	else \
 		set -e; for patch_file in $(LINUX_DATA_PATCHES); do \
-			patch -d $(LINUX_BUILD_DIR) -p1 --dry-run < $$patch_file >/dev/null; \
-			patch -d $(LINUX_BUILD_DIR) -p1 < $$patch_file; \
+			patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+				< $$patch_file >/dev/null; \
+			patch -d $(LINUX_BUILD_DIR) -p1 --forward < $$patch_file; \
 		done; \
 	fi
 
