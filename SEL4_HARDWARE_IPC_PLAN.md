@@ -414,7 +414,8 @@ reinstall. OpenSBI installs the version-2 descriptor and exposes the fixed
 24-byte record; the seL4 kernel consumes it while reaping the quarantined
 binding. The exact fault-only seL4 lifecycle passes independently in a fresh
 full-system model and on the timing-clean PYNQ-Z2 route. Artifact identities and
-strict-checker results are retained in `logs/sel4-v2-fault-20261102/`.
+strict-checker results are retained in
+`sel4/results/sel4-v2-fault-summary.md`.
 
 The remaining generalization gaps are a true fault/revoke race, ordinary seL4
 fault-endpoint equivalence, endpoint/TCB/VSpace/ASID destruction variants beyond
