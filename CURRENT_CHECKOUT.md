@@ -13,8 +13,14 @@ registers, 85.5 BRAM tiles, and 11 DSPs. Package SHA-256 is
 `075b6da4f83221e4d977096f746a980e61f7eebee46335542dfb27b7915b90e6` and
 bitstream SHA-256 is
 `7741071186afca6dee94d4cf8a91239b2040728a0b2a283ee8c518cc360360ae`.
-Physical operand-capture acceptance and a new route of the legacy-interface
-lock remain pending. Protected endpoints are resident-only, and nesting,
+The exact route is now physically accepted: a fresh-overlay k2 control passes
+at 20,547 cycles, raw transport passes at 174/31 direct and 163/109 RPC cycles,
+and the protected test passes without operand-settling NOPs at 170/31 direct and
+74/66 protected cycles. This proves the write-through shadow fixes the earlier
+board-only stale `a2`/`a3` capture. Exact staging identities and transcripts are
+under `logs/protected-rpc-hardware-fixed-20261013/physical-board-r3-shadow/`.
+A new route of the legacy-interface lock remains pending. Protected endpoints
+are resident-only, and nesting,
 revocation, interrupts, multi-capability policy, and Linux integration remain
 outside the prototype.
 
@@ -27,7 +33,7 @@ settling control passed at 80/72 cycles. BlackParrot `683cc87d1` replaces that
 ambiguous tap for `a0`--`a3` with a 512-bit two-slot write-through shadow and
 passes clean traced four- and ten-context simulation at the unchanged 90/66
 cycles. Exact job `20261013T181619Z-2e0ce866-prefetch5-direct-worker` completed
-route and package verification; physical acceptance is next.
+route and package verification and the physical acceptance ladder above.
 
 The active protected-RPC review branch pins BlackParrot `f2f5f246a`, which adds
 the U/S legacy-interface lock to the routed operand-shadow tree. This security
