@@ -190,8 +190,9 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("disabled preblock probe reported nonzero data")
 
     admitted = filtered = accepted_triggers = 0
+    expected_enabled_hooks = 2 if mode == "joint-split" else 1
     for index, row in enumerate(rows):
-        if row["hooks"] != row["enabled"]:
+        if row["hooks"] != row["enabled"] * expected_enabled_hooks:
             raise ValueError(f"trial {index} has invalid hook count")
         if row["woken"] != 1:
             raise ValueError(f"trial {index} did not wake exactly one child")

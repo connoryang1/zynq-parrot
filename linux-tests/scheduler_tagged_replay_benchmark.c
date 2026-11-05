@@ -163,7 +163,8 @@ static unsigned trial_enabled(unsigned trial)
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned mode, unsigned delay, unsigned gap,
 		      unsigned lines_per_base, int probe_status, int skew_layout,
-		      _Atomic uint32_t *phase, enum sync_style sync)
+		      unsigned expected_enabled_hooks, _Atomic uint32_t *phase,
+		      enum sync_style sync)
 {
 	volatile unsigned char *target = mmap(NULL, bases * page_bytes,
 					       PROT_READ | PROT_WRITE,
@@ -264,7 +265,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		while (atomic_load_explicit(&samples[trial].wake_count,
 					   memory_order_acquire) == UINT32_MAX)
 			__asm__ volatile("" : : : "memory");
-		if (samples[trial].hooks != enabled
+		if (samples[trial].hooks != enabled * expected_enabled_hooks
 		    || atomic_load_explicit(&samples[trial].wake_count,
 					    memory_order_relaxed) != 1) {
 			fprintf(stderr,
@@ -334,6 +335,7 @@ int main(int argc, char **argv)
 	unsigned lines_per_base = max_lines_per_base;
 	unsigned long lead_cycles = 0;
 	const char *mode_name = "data";
+	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
@@ -364,6 +366,8 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	if (!strcmp(mode_name, "joint-split"))
+		expected_enabled_hooks = 2;
 	if (argc >= 3) {
 		char *end;
 		unsigned long parsed = strtoul(argv[2], &end, 10);
@@ -465,7 +469,7 @@ int main(int argc, char **argv)
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
 			  lines_per_base, probe_status, skew_layout,
-			  &shared->phase, sync);
+			  expected_enabled_hooks, &shared->phase, sync);
 		return 0;
 	}
 	close(to_child[0]);
