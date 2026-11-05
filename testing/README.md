@@ -222,20 +222,18 @@ because actor/frame work spaces issues across 4,918 cycles. Exact logs,
 generated tables, hashes, commands, and limits are under
 [`logs/nano-peer-review-20261101/`](../logs/nano-peer-review-20261101/).
 
-An independent all-mode PYNQ-Z2 extension runs all eleven N=8 modes four times
-on the qualified `b7cf9953` / BlackParrot `c50b8571` ten-context overlay. Physical
-medians for serial demand/serial prefetch/hardware/fixed-SoA-batch/direct
-coroutine are 6,116/3,995/7,030.5/6,369.5/8,407 cycles. The best batch is
-1.104x faster than hardware, while hardware is 1.196x faster than the direct
-coroutine. This physical result is intentionally separate from the synthetic
-200-cycle matrix: the board's roughly 41-cycle first-touch latency is too short
-to repay fine-grained interleaving overhead here. The overlay predates the
-Nano branch's `6c79a4210` switch-boundary interlock, so this is accepted
-platform evidence rather than an exact RTL-revision reproduction. Its five
-headline rows reproduce the earlier physical N=2--10 sweep at N=8 within
-1.216% or less. Exact
-identities, ranges, transcripts, and exclusions are under
-[`logs/nano-fpga-20261104/`](../logs/nano-fpga-20261104/).
+The older `c50b8571` PYNQ-Z2 result is retained under
+[`logs/nano-fpga-20261104/`](../logs/nano-fpga-20261104/) but is superseded for
+performance interpretation because it predates four relevant hint and switch
+fixes. On the exact `6c79a4210` five-slot route, N=5 medians are 1,035 fixed
+batch, 1,720 hardware, 2,169 serial-prefetch, 3,270 direct-coroutine, and 3,830
+serial-demand cycles. These are 18.818/31.273/39.436/59.455/69.636 cycles per
+useful node. Prewarming changes batch/hardware/coroutine by only +4/-1/0 cycles,
+while switch-only measures 12.517 cycles per complete handoff. The coroutine
+hides memory but retires 3,018 diagnostic-window instructions versus batch's
+896. The complete N=2--5 sweep and exact identities are under
+[`logs/nano-exact-fpga-20261105/`](../logs/nano-exact-fpga-20261105/); N=6--10
+still require an exact ten-slot route.
 
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
 prints all samples after measuring. Each load interval is CSR `0xCC0`, load,

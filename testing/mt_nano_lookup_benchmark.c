@@ -343,14 +343,17 @@ static __attribute__((noinline, noclone,
 template <unsigned ScheduleMode>
 static nano_task coroutine_lookup(
   const volatile struct index_line *table, uint64_t entries, uint64_t key,
-  volatile struct lookup_result *out, unsigned next)
+  volatile struct lookup_result *out, unsigned next, uint64_t levels)
 {
-  uint64_t lower = 0, length = entries, checksum = 0, steps = 0, node = 0;
+  uint64_t lower = 0, length = entries, checksum = 0, node = 0;
   while (length) {
-    uint64_t half = length >> 1;
-    uint64_t middle = lower + half;
     const volatile struct index_line *line = &table[node];
     co_await prefetch_and_yield<ScheduleMode>{line, next};
+    // Keep derived search state out of the coroutine frame. Recomputing these
+    // cheap values after resumption avoids preserving them across every
+    // suspension and matches the explicit batch's consume phase.
+    uint64_t half = length >> 1;
+    uint64_t middle = lower + half;
     uint64_t value;
     if constexpr (ScheduleMode == MODE_CPP_COROUTINE) {
       __asm__ volatile(
@@ -376,7 +379,6 @@ static nano_task coroutine_lookup(
     }
     uint64_t links = line->packed_links;
     checksum += value;
-    ++steps;
     if (value < key) {
       node = (uint32_t)links;
       lower = middle + 1;
@@ -386,7 +388,7 @@ static nano_task coroutine_lookup(
       length = half;
     }
   }
-  publish(out, lower, checksum, steps);
+  publish(out, lower, checksum, levels);
 }
 
 /* This is both the explicit-state-machine baseline and the ideal matched
@@ -572,16 +574,16 @@ static void prepare(const volatile struct index_line *const *tables, uint64_t en
       unsigned next = (i + 1) % active_workers;
       if (mode == MODE_CPP_COROUTINE)
         cpp_tasks[i] = coroutine_lookup<MODE_CPP_COROUTINE>(
-          tables[i], entries, queries[i], &results[i], next);
+          tables[i], entries, queries[i], &results[i], next, levels);
       else if (mode == MODE_LEAN_COROUTINE)
         cpp_tasks[i] = coroutine_lookup<MODE_LEAN_COROUTINE>(
-          tables[i], entries, queries[i], &results[i], next);
+          tables[i], entries, queries[i], &results[i], next, levels);
       else
         cpp_tasks[i] = coroutine_lookup<MODE_DIRECT_COROUTINE>(
-          tables[i], entries, queries[i], &results[i], next);
+          tables[i], entries, queries[i], &results[i], next, levels);
       if (mode == MODE_LEAN_COROUTINE)
         lean_scheduler.push(cpp_tasks[i].handle);
-      else
+      else if (mode == MODE_CPP_COROUTINE)
         cpp_scheduler.push(cpp_tasks[i].handle);
     }
   }
@@ -623,6 +625,15 @@ static __attribute__((noinline)) void lean_coroutine_operation(
   lean_scheduler.run();
 }
 
+static __attribute__((noinline)) void direct_coroutine_operation(
+  const volatile struct index_line *const *, uint64_t, const uint64_t *, uint64_t)
+{
+  // Resuming frame zero transfers directly around the ring until it reaches
+  // final suspend. The remaining frames then need one terminal resume each;
+  // no checked FIFO or modulo operation is required for this fixed schedule.
+  for (unsigned i = 0; i < active_workers; ++i) cpp_tasks[i].handle.resume();
+}
+
 using operation_fn = void (*)(const volatile struct index_line *const *,
                               uint64_t, const uint64_t *, uint64_t);
 
@@ -654,7 +665,7 @@ static operation_fn select_operation(unsigned mode)
       SELECT_FIXED_BATCH(fixed_recompute_batch);
       break;
     case MODE_LEAN_COROUTINE: return lean_coroutine_operation;
-    case MODE_DIRECT_COROUTINE: return checked_coroutine_operation;
+    case MODE_DIRECT_COROUTINE: return direct_coroutine_operation;
   }
   return nullptr;
 }
@@ -711,6 +722,16 @@ static inline uint64_t read_global_cycle(void)
   return value;
 }
 
+#ifdef NANO_DIAGNOSTIC_INSTRET
+static uint64_t diagnostic_instret;
+static inline uint64_t read_instret(void)
+{
+  uint64_t value;
+  __asm__ volatile("csrr %0, 0xb02" : "=r"(value) : : "memory");
+  return value;
+}
+#endif
+
 static void emit_marker(unsigned id)
 {
   *SIGNAL_BASE_ADDR = id;
@@ -725,7 +746,13 @@ extern "C" __attribute__((noinline, noclone, aligned(64))) uint64_t run_window(
 {
   emit_marker(begin_marker);
   uint64_t begin = read_global_cycle();
+#ifdef NANO_DIAGNOSTIC_INSTRET
+  uint64_t instret_begin = read_instret();
+#endif
   operation(tables, entries, queries, levels);
+#ifdef NANO_DIAGNOSTIC_INSTRET
+  diagnostic_instret = read_instret() - instret_begin;
+#endif
   uint64_t end = read_global_cycle();
   emit_marker(end_marker);
   return end - begin;
@@ -800,6 +827,18 @@ int main(void)
   initialize_table_pointers();
   emit_marker(0x8f);
   warm_instruction_paths();
+#ifdef NANO_PREWARM_MEASURED
+  // Diagnostic only: make the measured paths resident without changing the
+  // selected timed body, then repeat the ordinary preparation contract.
+  prepare(measured_tables, NANO_LOOKUP_MEASURED_ENTRIES,
+          nano_measured_queries, MODE_SERIAL_DEMAND,
+          NANO_LOOKUP_MEASURED_LEVELS);
+  serial_lookup(measured_tables, NANO_LOOKUP_MEASURED_ENTRIES,
+                nano_measured_queries, 0);
+  drain_traffic();
+  check_results(MODE_SERIAL_DEMAND, NANO_LOOKUP_MEASURED_ENTRIES,
+                nano_measured_queries, NANO_LOOKUP_MEASURED_LEVELS);
+#endif
   prepare(measured_tables, NANO_LOOKUP_MEASURED_ENTRIES,
           nano_measured_queries, mode, NANO_LOOKUP_MEASURED_LEVELS);
   operation_fn operation = select_operation(mode);
@@ -822,6 +861,9 @@ int main(void)
   bp_print_string(" levels="); bp_hprint_uint64(NANO_LOOKUP_MEASURED_LEVELS);
   bp_print_string(" cycles="); bp_hprint_uint64(cycles);
   bp_print_string(" checksum="); bp_hprint_uint64(checksum);
+#ifdef NANO_DIAGNOSTIC_INSTRET
+  bp_print_string(" instret="); bp_hprint_uint64(diagnostic_instret);
+#endif
   bp_print_string("\nMode: "); bp_print_string((char *)mode_name(mode));
   bp_print_string("; checks: pass\n");
   bp_print_string("[BSG-PASS] Nano-style binary index lookups\n");
