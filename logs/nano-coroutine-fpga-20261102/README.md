@@ -108,7 +108,7 @@ so the serial-prefetch spread is not explained by different allocation bases.
 - Both benchmarks use `-O3`, the board integer startup, and physical cycle CSR
   `0xcc0`.  Nano uses one ELF; only the aligned `benchmark_mode = mode | N<<8`
   word is patched before unfreeze.
-- `samples.csv` retains every accepted result.  `raw-transcripts.tar.gz`
-  retains all 135 Nano transcripts, five hot transcripts, staging and overlay
-  logs, and NBF hashes.  Each local transcript contains the runner's live copy
-  and retained replay; these are one invocation, not two samples.
+- `samples.csv` retains every accepted result. Raw transcripts, staging logs,
+  and generated NBF images are intentionally omitted from the review branch.
+  Each original local transcript contained the runner's live copy and retained
+  replay; those were one invocation, not two samples.

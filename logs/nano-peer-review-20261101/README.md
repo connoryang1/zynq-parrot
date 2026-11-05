@@ -198,7 +198,7 @@ VERILATOR_BUILD_JOBS=4 make build NUM_THREADS=2 NUM_CONTEXTS=10 \
   EXTRA_DEFINES='BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=200 BP_AXI_MEM_READ_QUEUE_DEPTH=10 BP_DCACHE_PREFETCH_ELS=10 BP_PREFETCH_AXI_BYPASS'
 ```
 
-Validate a retained Nano transcript:
+Validate a locally generated Nano transcript:
 
 ```sh
 python3 testing/check_run.py path/to/run.log \
@@ -214,13 +214,10 @@ python3 logs/nano-peer-review-20261101/generate_results.py
 
 ## Evidence layout and rejected attempts
 
-- `runs/` contains 34 qualified Nano transcripts and the independent
-  dependent-stream regression.
-- `results.csv` and `sweep.csv` are mechanically generated from those logs.
-- `trace/` contains accepted run logs, retirement reports, overlap reports,
-  executable/image hashes, and raw-waveform hashes. Raw FSTs are not committed.
-- `builds/` contains clean non-trace/trace build logs and the failed incomplete-
-  worktree build log.
+`results.csv`, `sweep.csv`, and `validation.txt` retain the qualified summary.
+`generate_results.py` regenerates the tables when the original run transcripts
+are supplied locally. Raw runs, build logs, trace reports, waveforms, and
+generated images are intentionally omitted from the review branch.
 
 No failed setup produced a retained performance row. An initial clean build
 used an empty worktree-local install and stopped before Verilator; the accepted

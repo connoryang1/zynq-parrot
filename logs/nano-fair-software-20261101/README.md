@@ -81,7 +81,7 @@ the ten-context/request system reaches saturation.
   physical speedup claim or a new retirement-level attribution of the residual
   35.5% O3 gap.
 
-`runs/` contains the complete simulator transcripts. `compact-results.txt`
-extracts benchmark and verdict lines, and `run-sha256.txt` hashes every retained
-transcript. The O3 ELF SHA-256 is
+`results.csv` contains the qualified aggregate rows used here. Raw simulator
+transcripts and generated images are intentionally omitted from the review
+branch to keep the patch small. The O3 ELF SHA-256 is
 `4b8257e371027b143763abe5bd4a2b54ba392331f9eacb138490f9f9f9958f21`.

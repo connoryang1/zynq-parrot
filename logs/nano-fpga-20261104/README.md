@@ -44,7 +44,13 @@ One O3 board ELF supplies all rows. Each NBF differs only in the aligned eight-b
 
 ## Evidence and limits
 
-`board-all-samples.json` and `board-summary.json` are generated from the retained `mode*-board*.log` transcripts by `analyze_board_results.py`. `board-image-manifest.json` records source, ELF, CRT, NBF tool, and per-mode image hashes; `build_board_images.py` reproduces the images and rejects any 64-bit NBF write outside the board's 32-bit address window.
+`board-all-samples.json` and `board-summary.json` preserve the accepted sample
+set and aggregate results. `analyze_board_results.py` regenerates them when the
+raw `mode*-board*.log` transcripts are supplied locally; those transcripts and
+generated images are intentionally omitted from the review branch.
+`board-image-manifest.json` records source, ELF, CRT, NBF-tool, and per-mode
+image hashes; `build_board_images.py` reproduces the images and rejects any
+64-bit NBF write outside the board's 32-bit address window.
 
 Two bring-up failures are excluded from performance results. An initially empty expected-runner argument exposed a maintained SSH wrapper bug before `control-program` launched. A first image build rebased only the initial Verilog address marker, producing later NBF writes above 4 GiB; the host loader exited before guest startup. The corrected builder rebases every marker, validates all write addresses, and all subsequent runs pass.
 

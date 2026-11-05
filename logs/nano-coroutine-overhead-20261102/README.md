@@ -70,4 +70,5 @@ could not rebuild the model because this worktree lacks populated submodule
 collateral, so the run reused the already-qualified clean model above and a
 fresh NBF. The checker suite passes 17/17 with `TMPDIR=/dev/shm`; the root
 filesystem had no free temporary-directory blocks. `compact-results.txt`
-retains the decisive guest output extracted from the simulator runs.
+was used to extract the decisive guest output. The review branch retains the
+aggregate results here rather than generated images or raw transcripts.

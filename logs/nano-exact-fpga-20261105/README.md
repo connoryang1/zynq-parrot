@@ -69,6 +69,12 @@ On the stale ten-slot overlay, N=5 demand/prefetch/batch/hardware/direct-corouti
 - Final normal ELF SHA-256: `30567bad4c1bae114cca49ed4f0efb3f5a77d86150aa639708f40c1ac473f658`.
 - Board runner SHA-256: `2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30`.
 
-The retained final ELF and disassembly pin the code actually run. The two accounting flags are disabled in every headline image. A later default-Makefile rebuild used a different installed startup object, so whole-ELF byte identity is not claimed; the benchmark coroutine actors, direct scheduler, and timed-window functions retain the same sizes. `SHA256SUMS` covers the retained ELF, disassembly, base NBF, selector-patched images, identities, results, and raw transcripts.
+The recorded final ELF hash pins the code actually run. The two accounting
+flags are disabled in every headline image. A later default-Makefile rebuild
+used a different installed startup object, so whole-ELF byte identity is not
+claimed; the benchmark coroutine actors, direct scheduler, and timed-window
+functions retain the same sizes. Generated ELFs, disassemblies, NBF images,
+and raw transcripts are intentionally omitted from the review branch;
+`results.csv` retains the accepted measurements.
 
 This route has only five prefetch slots, so N=2--5 is the capacity-qualified sweep. It proves the expected physical ordering and explains the old reversal, but an exact ten-slot route is still required before replacing the previous N=6--10 platform rows. No physical AXI waveform was collected; hot/cold timing, `instret`, switch-only, and the exact-RTL A/B account for the observed totals without assigning individual no-retirement cycles to a specific downstream bus stage.
