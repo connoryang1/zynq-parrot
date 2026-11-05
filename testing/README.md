@@ -222,6 +222,19 @@ because actor/frame work spaces issues across 4,918 cycles. Exact logs,
 generated tables, hashes, commands, and limits are under
 [`logs/nano-peer-review-20261101/`](../logs/nano-peer-review-20261101/).
 
+The first complete PYNQ-Z2 matrix runs all eleven N=8 modes four times on the
+qualified `b7cf9953` / BlackParrot `c50b8571` ten-context overlay. Physical
+medians for serial demand/serial prefetch/hardware/fixed-SoA-batch/direct
+coroutine are 6,116/3,995/7,030.5/6,369.5/8,407 cycles. The best batch is
+1.104x faster than hardware, while hardware is 1.196x faster than the direct
+coroutine. This physical result is intentionally separate from the synthetic
+200-cycle matrix: the board's roughly 41-cycle first-touch latency is too short
+to repay fine-grained interleaving overhead here. The overlay predates the
+Nano branch's `6c79a4210` switch-boundary interlock, so this is accepted
+platform evidence rather than an exact RTL-revision reproduction. Exact
+identities, ranges, transcripts, and exclusions are under
+[`logs/nano-fpga-20261104/`](../logs/nano-fpga-20261104/).
+
 `mt_ddr_latency_benchmark` uses 16 unique first-touch lines per condition and
 prints all samples after measuring. Each load interval is CSR `0xCC0`, load,
 dependent add, CSR `0xCC0`; a register-only control and an immediate same-line

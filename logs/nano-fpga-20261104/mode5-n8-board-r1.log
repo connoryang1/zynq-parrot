@@ -1,0 +1,202 @@
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+RUNNER_STARTED_PID=5527 LOG=/home/xilinx/bp-logs/nano-mode5-n8-20261105T000837Z-2752822.log STATUS=/home/xilinx/bp-logs/nano-mode5-n8-20261105T000837Z-2752822.status
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeeaf6c0 40000004 16 1
+INFO:    Creating host: 0xbeeaf6c0 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d01000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d01000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1389867
+DEBUG-PS: ps.cpp: 1-1391403
+DEBUG-PS: ps.cpp: 2-1391899
+DEBUG-PS: ps.cpp: 3-1392116
+DEBUG-PS: ps.cpp: 4-1393646
+DEBUG-PS: ps.cpp: 5-1396453
+DEBUG-PS: ps.cpp: 6-1396879
+DEBUG-PS: ps.cpp: 7-1398340
+DEBUG-PS: ps.cpp: 8-1399871
+DEBUG-PS: ps.cpp: 9-1401255
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 6422
+DEBUG-PS: ps.cpp: finished loading 6422 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABINFO:    CTXTSW_GLOBAL_MARKER id=143
+INFO:    CTXTSW_GLOBAL_MARKER id=144
+INFO:    CTXTSW_GLOBAL_MARKER id=128
+INFO:    CTXTSW_GLOBAL_MARKER id=145
+INFO:    CTXTSW_GLOBAL_MARKER id=129
+INFO:    CTXTSW_GLOBAL_MARKER id=146
+INFO:    CTXTSW_GLOBAL_MARKER id=130
+INFO:    CTXTSW_GLOBAL_MARKER id=147
+INFO:    CTXTSW_GLOBAL_MARKER id=131
+INFO:    CTXTSW_GLOBAL_MARKER id=148
+INFO:    CTXTSW_GLOBAL_MARKER id=132
+INFO:    CTXTSW_GLOBAL_MARKER id=149
+INFO:    CTXTSW_GLOBAL_MARKER id=133
+INFO:    CTXTSW_GLOBAL_MARKER id=150
+INFO:    CTXTSW_GLOBAL_MARKER id=134
+INFO:    CTXTSW_GLOBAL_MARKER id=151
+INFO:    CTXTSW_GLOBAL_MARKER id=135
+INFO:    CTXTSW_GLOBAL_MARKER id=152
+INFO:    CTXTSW_GLOBAL_MARKER id=136
+INFO:    CTXTSW_GLOBAL_MARKER id=153
+INFO:    CTXTSW_GLOBAL_MARKER id=137
+INFO:    CTXTSW_GLOBAL_MARKER id=154
+INFO:    CTXTSW_GLOBAL_MARKER id=138
+INFO:    CTXTSW_GLOBAL_MARKER id=175
+INFO:    CTXTSW_GLOBAL_MARKER id=191
+INFO:    CTXTSW_GLOBAL_MARKER id=101
+INFO:    CTXTSW_GLOBAL_MARKER id=117
+Benchmark: NANO_LOOKUP mode=0x0000000000000005 queries=0x0000000000000008 levels=0x000000000000000b cycles=0x0000000000000ebd checksum=0x0000000000024d10
+Mode: serial prefetch; checks: pass
+[BSG-PASS] Nano-style binary index lookups
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):            1,983 (             7bf)
+INFO:    ps.cpp: minstret (instructions retired):           61,485 (            f02d)
+INFO:    ps.cpp: minstret delta:                            59,502 (            e86e)
+INFO:    ps.cpp: MTIME start:                            1,449,489 (          161e11)
+INFO:    ps.cpp: MTIME stop:                             1,456,473 (          163959)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,984 (            1b48)
+INFO:    ps.cpp: IPC        :                             1.064970
+INFO:    ps.cpp: minstret (instructions retired):           61,567 (            f07f)
+INFO:    ps.cpp: wall clock time                :        9,948,156 (          97cbfc) ns
+INFO:    ps.cpp: sim/emul speed                 :   336,979,034.10 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d01000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+RUNNER_EXIT=0
+Script started on 2026-11-05 00:08:38+0000
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=1, bitbang=0, dram_init=0, dram_base=378535936
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbeeaf6c0 40000004 16 1
+INFO:    Creating host: 0xbeeaf6c0 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d01000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3d01000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1389867
+DEBUG-PS: ps.cpp: 1-1391403
+DEBUG-PS: ps.cpp: 2-1391899
+DEBUG-PS: ps.cpp: 3-1392116
+DEBUG-PS: ps.cpp: 4-1393646
+DEBUG-PS: ps.cpp: 5-1396453
+DEBUG-PS: ps.cpp: 6-1396879
+DEBUG-PS: ps.cpp: 7-1398340
+DEBUG-PS: ps.cpp: 8-1399871
+DEBUG-PS: ps.cpp: 9-1401255
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 6422
+DEBUG-PS: ps.cpp: finished loading 6422 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ABINFO:    CTXTSW_GLOBAL_MARKER id=143
+INFO:    CTXTSW_GLOBAL_MARKER id=144
+INFO:    CTXTSW_GLOBAL_MARKER id=128
+INFO:    CTXTSW_GLOBAL_MARKER id=145
+INFO:    CTXTSW_GLOBAL_MARKER id=129
+INFO:    CTXTSW_GLOBAL_MARKER id=146
+INFO:    CTXTSW_GLOBAL_MARKER id=130
+INFO:    CTXTSW_GLOBAL_MARKER id=147
+INFO:    CTXTSW_GLOBAL_MARKER id=131
+INFO:    CTXTSW_GLOBAL_MARKER id=148
+INFO:    CTXTSW_GLOBAL_MARKER id=132
+INFO:    CTXTSW_GLOBAL_MARKER id=149
+INFO:    CTXTSW_GLOBAL_MARKER id=133
+INFO:    CTXTSW_GLOBAL_MARKER id=150
+INFO:    CTXTSW_GLOBAL_MARKER id=134
+INFO:    CTXTSW_GLOBAL_MARKER id=151
+INFO:    CTXTSW_GLOBAL_MARKER id=135
+INFO:    CTXTSW_GLOBAL_MARKER id=152
+INFO:    CTXTSW_GLOBAL_MARKER id=136
+INFO:    CTXTSW_GLOBAL_MARKER id=153
+INFO:    CTXTSW_GLOBAL_MARKER id=137
+INFO:    CTXTSW_GLOBAL_MARKER id=154
+INFO:    CTXTSW_GLOBAL_MARKER id=138
+INFO:    CTXTSW_GLOBAL_MARKER id=175
+INFO:    CTXTSW_GLOBAL_MARKER id=191
+INFO:    CTXTSW_GLOBAL_MARKER id=101
+INFO:    CTXTSW_GLOBAL_MARKER id=117
+Benchmark: NANO_LOOKUP mode=0x0000000000000005 queries=0x0000000000000008 levels=0x000000000000000b cycles=0x0000000000000ebd checksum=0x0000000000024d10
+Mode: serial prefetch; checks: pass
+[BSG-PASS] Nano-style binary index lookups
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):            1,983 (             7bf)
+INFO:    ps.cpp: minstret (instructions retired):           61,485 (            f02d)
+INFO:    ps.cpp: minstret delta:                            59,502 (            e86e)
+INFO:    ps.cpp: MTIME start:                            1,449,489 (          161e11)
+INFO:    ps.cpp: MTIME stop:                             1,456,473 (          163959)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):               6,984 (            1b48)
+INFO:    ps.cpp: IPC        :                             1.064970
+INFO:    ps.cpp: minstret (instructions retired):           61,567 (            f07f)
+INFO:    ps.cpp: wall clock time                :        9,948,156 (          97cbfc) ns
+INFO:    ps.cpp: sim/emul speed                 :   336,979,034.10 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000001
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3d01000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+
+Script done on 2026-11-05 00:08:39+0000
