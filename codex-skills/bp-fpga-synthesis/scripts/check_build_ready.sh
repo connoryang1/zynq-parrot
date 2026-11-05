@@ -31,9 +31,11 @@ else
 fi
 check_path "$repo_dir/import/black-parrot/.git" "BlackParrot submodule"
 check_path "$repo_dir/import/basejump_stl/.git" "BaseJump submodule"
+check_path "$repo_dir/import/black-parrot-subsystems/.git" "BlackParrot subsystems submodule"
 check_path "$repo_dir/import/black-parrot/external/basejump_stl/.git" "BlackParrot nested BaseJump submodule"
 check_path "$repo_dir/import/black-parrot/external/HardFloat/.git" "BlackParrot nested HardFloat submodule"
 check_path "$repo_dir/import/black-parrot/external/bedrock/.git" "BlackParrot nested BedRock submodule"
+check_path "$repo_dir/import/black-parrot-subsystems/import/riscv-dbg/.git" "BlackParrot nested riscv-dbg submodule"
 check_path "$repo_dir/install/bin" "prepared tool installation"
 check_path "$repo_dir/install/include/boost/coroutine2/all.hpp" "Boost coroutine headers"
 check_path "$repo_dir/install/lib/libboost_coroutine.so" "Boost coroutine library"
@@ -77,6 +79,18 @@ if [[ -e "$repo_dir/import/basejump_stl/.git" ]]; then
   printf 'BSG checkout:%.12s\n' "$actual"
   if [[ "$expected" != "$actual" ]]; then
     echo "FAIL: BaseJump checkout does not match the top-level gitlink"
+    fail=1
+  fi
+fi
+
+if [[ -e "$repo_dir/import/black-parrot-subsystems/import/riscv-dbg/.git" ]]; then
+  expected=$(git -C "$repo_dir/import/black-parrot-subsystems" \
+    ls-tree HEAD import/riscv-dbg | awk '{print $3}')
+  actual=$(git -C "$repo_dir/import/black-parrot-subsystems/import/riscv-dbg" \
+    rev-parse HEAD 2>/dev/null || true)
+  printf 'riscv-dbg pinned: %.12s checkout: %.12s\n' "$expected" "$actual"
+  if [[ -z "$expected" || "$expected" != "$actual" ]]; then
+    echo "FAIL: nested riscv-dbg checkout does not match its gitlink"
     fail=1
   fi
 fi

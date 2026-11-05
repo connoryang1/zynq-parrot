@@ -1,0 +1,261 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * BlackParrot protected-RPC control plane. This is the only firmware code
+ * allowed to publish or revoke the hardware descriptor used by supervisor
+ * kernels; applications never see these CSRs.
+ */
+
+#include <sbi/riscv_asm.h>
+#include <sbi/sbi_ecall.h>
+#include <sbi/sbi_error.h>
+#include <sbi/sbi_trap.h>
+#include <sbi/sbi_unpriv.h>
+
+#include "blackparrot_rpc_abi.h"
+#include "rpc.h"
+
+static int bp_rpc_copy_from_supervisor(void *destination, const void *source,
+                                       size_t size)
+{
+    struct sbi_trap_info trap = {0};
+    uint64_t *output = (uint64_t *)destination;
+    const uint64_t *input = (const uint64_t *)source;
+
+    if (((uintptr_t)source & (sizeof(uint64_t) - 1)) != 0)
+        return SBI_EINVALID_ADDR;
+
+    for (size_t index = 0; index < size / sizeof(uint64_t); index++) {
+        output[index] = sbi_load_u64(&input[index], &trap);
+        if (trap.cause)
+            return SBI_EINVALID_ADDR;
+    }
+    return 0;
+}
+
+static int bp_rpc_copy_to_supervisor(void *destination, const void *source,
+                                     size_t size)
+{
+    struct sbi_trap_info trap = {0};
+    uint64_t *output = (uint64_t *)destination;
+    const uint64_t *input = (const uint64_t *)source;
+
+    if (((uintptr_t)destination & (sizeof(uint64_t) - 1)) != 0)
+        return SBI_EINVALID_ADDR;
+
+    for (size_t index = 0; index < size / sizeof(uint64_t); index++) {
+        sbi_store_u64(&output[index], input[index], &trap);
+        if (trap.cause)
+            return SBI_EINVALID_ADDR;
+    }
+    return 0;
+}
+
+static bp_rpc_control_status_t bp_rpc_status(void)
+{
+    return (bp_rpc_control_status_t)csr_read(BP_RPC_CSR_M_CONTROL);
+}
+
+static bp_rpc_control_status_t bp_rpc_control(uint64_t control)
+{
+    csr_write(BP_RPC_CSR_M_CONTROL, control);
+    return bp_rpc_status();
+}
+
+static bp_rpc_control_status_t
+bp_rpc_stage(uint32_t slot, bp_rpc_descriptor_field_t field, uint64_t value)
+{
+    csr_write(BP_RPC_CSR_M_DATA, value);
+    return bp_rpc_control(
+        bp_rpc_control_word(BP_RPC_CONTROL_STAGE, field, slot));
+}
+
+static bp_rpc_control_status_t
+bp_rpc_prepare(uint32_t slot, bp_rpc_prepare_component_t component)
+{
+    bp_rpc_control_status_t status = BP_RPC_CONTROL_BUSY;
+
+    /* PREPARE owns the resident register bank's single physical write port.
+     * A preceding M-mode instruction may still be writing back when the
+     * control CSR first reaches the system pipe. Hardware reports BUSY rather
+     * than dropping that write; a fixed backoff drains the short in-order
+     * pipeline before a bounded retry. */
+    for (unsigned int attempt = 0; attempt < 8; attempt++) {
+        status = bp_rpc_control(bp_rpc_prepare_word(component, slot));
+        if (status != BP_RPC_CONTROL_BUSY)
+            break;
+        __asm__ volatile("nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop"
+                         : : : "memory");
+    }
+    return status;
+}
+
+static int
+bp_rpc_install(const bp_rpc_descriptor_v1_t *supervisor_descriptor,
+               uint64_t *token, bp_rpc_control_status_t *status)
+{
+    bp_rpc_descriptor_v1_t descriptor;
+    int error = bp_rpc_copy_from_supervisor(&descriptor,
+                                            supervisor_descriptor,
+                                            sizeof(descriptor));
+    bp_rpc_control_status_t control_status;
+
+    if (error) {
+        *token = 0;
+        *status = BP_RPC_CONTROL_INVALID;
+        return error;
+    }
+    if (!bp_rpc_descriptor_v1_valid(&descriptor)
+        && !bp_rpc_descriptor_v2_valid(&descriptor)) {
+        *token = 0;
+        *status = BP_RPC_CONTROL_INVALID;
+        return SBI_EINVAL;
+    }
+
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_TOKEN,
+                                  descriptor.token);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CALLER_SATP,
+                                  descriptor.caller_satp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_SATP,
+                                  descriptor.server_satp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_ENTRY,
+                                  descriptor.server_entry);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_SP,
+                                  descriptor.server_sp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_GP,
+                                  descriptor.server_gp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_SERVER_TP,
+                                  descriptor.server_tp);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(descriptor.slot, BP_RPC_FIELD_CALLER_BADGE,
+                                  descriptor.caller_badge);
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+    control_status = bp_rpc_stage(
+        descriptor.slot, BP_RPC_FIELD_CONFIG,
+        descriptor.version == BP_RPC_ABI_VERSION_V2
+        ? bp_rpc_config_word_v2(descriptor.request_words,
+                                descriptor.reply_words,
+                                descriptor.caller_context,
+                                descriptor.server_context)
+        : bp_rpc_config_word(descriptor.request_words,
+                             descriptor.reply_words,
+                             descriptor.caller_context,
+                             descriptor.server_context));
+    if (control_status != BP_RPC_CONTROL_OK)
+        goto control_failure;
+
+    for (unsigned int component = 0;
+         component < BP_RPC_PREPARE_COMPONENTS; component++) {
+        control_status = bp_rpc_prepare(
+            descriptor.slot, (bp_rpc_prepare_component_t)component);
+        if (control_status != BP_RPC_CONTROL_OK)
+            goto control_failure;
+    }
+
+    control_status = bp_rpc_control(
+        bp_rpc_control_word(BP_RPC_CONTROL_COMMIT,
+                            BP_RPC_FIELD_TOKEN, descriptor.slot));
+
+control_failure:
+    *status = control_status;
+    *token = *status == BP_RPC_CONTROL_OK ? descriptor.token : 0;
+    return *status == BP_RPC_CONTROL_INVALID ? SBI_EINVAL : 0;
+}
+
+static bp_rpc_control_status_t bp_rpc_revoke(uint32_t slot, uint64_t token)
+{
+    csr_write(BP_RPC_CSR_M_DATA, token);
+    return bp_rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_REVOKE,
+                                               BP_RPC_FIELD_TOKEN, slot));
+}
+
+static bp_rpc_control_status_t bp_rpc_query(uint32_t slot, uint64_t token)
+{
+    csr_write(BP_RPC_CSR_M_DATA, token);
+    return bp_rpc_control(bp_rpc_control_word(BP_RPC_CONTROL_READ_STATUS,
+                                               BP_RPC_FIELD_TOKEN, slot));
+}
+
+static int bp_rpc_read_fault(uint32_t slot, uint64_t token,
+                             bp_rpc_fault_record_v1_t *supervisor_record,
+                             bp_rpc_control_status_t *status)
+{
+    bp_rpc_fault_record_v1_t record;
+    uint64_t components[BP_RPC_FAULT_COMPONENTS];
+
+    if (((uintptr_t)supervisor_record & (sizeof(uint64_t) - 1)) != 0) {
+        *status = BP_RPC_CONTROL_INVALID;
+        return SBI_EINVALID_ADDR;
+    }
+
+    for (uint32_t component = 0; component < BP_RPC_FAULT_COMPONENTS;
+         component++) {
+        csr_write(BP_RPC_CSR_M_DATA, token);
+        *status = bp_rpc_control(bp_rpc_fault_read_word(
+            (bp_rpc_fault_component_t)component, slot));
+        if (*status != BP_RPC_CONTROL_OK)
+            return 0;
+        components[component] = csr_read(BP_RPC_CSR_M_DATA);
+    }
+
+    record.cause = components[BP_RPC_FAULT_CAUSE];
+    record.pc = components[BP_RPC_FAULT_PC];
+    record.tval = components[BP_RPC_FAULT_TVAL];
+
+    return bp_rpc_copy_to_supervisor(supervisor_record, &record,
+                                     sizeof(record));
+}
+
+bool bp_rpc_vendor_ext_check(void)
+{
+    return true;
+}
+
+int bp_rpc_vendor_ext_provider(long funcid, struct sbi_trap_regs *regs,
+                               struct sbi_ecall_return *out)
+{
+    uint64_t token = 0;
+    bp_rpc_control_status_t status;
+
+    switch (funcid) {
+    case BP_RPC_SBI_INSTALL:
+        {
+        int error = bp_rpc_install(
+            (const bp_rpc_descriptor_v1_t *)regs->a0, &token, &status);
+        out->value = status == BP_RPC_CONTROL_OK ? token : status;
+        return error;
+        }
+    case BP_RPC_SBI_REVOKE:
+        status = bp_rpc_revoke((uint32_t)regs->a0, regs->a1);
+        out->value = status;
+        return 0;
+    case BP_RPC_SBI_QUERY:
+        status = bp_rpc_query((uint32_t)regs->a0, regs->a1);
+        out->value = status;
+        return 0;
+    case BP_RPC_SBI_READ_FAULT:
+        {
+        int error = bp_rpc_read_fault(
+            (uint32_t)regs->a0, regs->a1,
+            (bp_rpc_fault_record_v1_t *)regs->a2, &status);
+        out->value = status;
+        return error;
+        }
+    default:
+        return SBI_ENOTSUPP;
+    }
+}

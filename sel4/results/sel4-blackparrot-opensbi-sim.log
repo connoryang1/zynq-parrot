@@ -1,0 +1,24 @@
+BlackParrot seL4 Stage-3 traced boot diagnostic (normalized)
+Date: 2026-10-31
+Model: nt2-nc4-cfge_bp_custom_cfg-trace1
+NBF SHA-256: dfa0b5e234105b90dfd236f2bdbd00c494bf1a7d423c51d53e9c37868efa9b3b
+Runtime bound: 600 seconds
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : m
+
+The final line was interrupted by the bounded simulator timeout; it is not an
+OpenSBI error. At close, the model reported 542,433 retired instructions,
+M-mode, debug disabled, mtvec=0x800003d8, and a closed FST. The harness's final
+BSG PASS means it shut down cleanly at the bound; it is not the seL4 RPC test
+pass. Stage 3 still requires the exact `Test SEL4IPCRPC0002 passed` marker.

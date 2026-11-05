@@ -22,6 +22,12 @@ package bp_common_pkg;
       // This historical schema has no separate logical-context count. Keep
       // the resident register banks at the validated PYNQ-Z2 fit dimension.
       ,num_threads: 2
+      // The metadata carries a resident-thread ID. The default configuration
+      // has four slots (two ID bits); this endpoint has two (one ID bit).
+      // Match the accepted 2-thread/4-context full-core simulation exactly.
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+                                  - $clog2(bp_default_cfg_p.num_threads)
+                                  + $clog2(2)
 
       ,icache_fill_width: 64
 
@@ -59,6 +65,21 @@ package bp_common_pkg;
   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_cfg_p
                         ,bp_unicore_zynqparrot_cfg_override_p
                         ,bp_default_cfg_p
+                        );
+
+  // The seL4 protected-RPC endpoint is integer-only.  Keep the stock
+  // ZynqParrot configuration FP-capable for general workloads, while allowing
+  // synthesis to remove the unused FP register file and divide/sqrt unit from
+  // this board image. Integer multiply/divide support is unchanged.
+  localparam bp_proc_param_s bp_unicore_zynqparrot_sel4_cfg_override_p =
+    '{num_threads: 2
+      ,num_contexts: 4
+      ,fpu_support: 0
+      ,default: "inv"
+      };
+  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_sel4_cfg_p
+                        ,bp_unicore_zynqparrot_sel4_cfg_override_p
+                        ,bp_unicore_zynqparrot_cfg_p
                         );
 
   localparam bp_proc_param_s bp_multicore_zynqparrot_cfg_override_p =
@@ -160,7 +181,8 @@ package bp_common_pkg;
 
   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =
   {
-    bp_unicore_zynqparrot_prefetch5_cfg_p
+    bp_unicore_zynqparrot_sel4_cfg_p
+    ,bp_unicore_zynqparrot_prefetch5_cfg_p
     ,bp_unicore_zynqparrot_prefetch10_cfg_p
     ,bp_unicore_zynqparrot_prefetch_cfg_p
     ,bp_multicore_zynqparrot_cfg_p
@@ -175,7 +197,8 @@ package bp_common_pkg;
   // This enum MUST be kept up to date with the parameter array above
   typedef enum bit [lg_max_cfgs-1:0]
   {
-    e_bp_unicore_zynqparrot_prefetch5_cfg           = 6
+    e_bp_unicore_zynqparrot_sel4_cfg                = 7
+    ,e_bp_unicore_zynqparrot_prefetch5_cfg           = 6
     ,e_bp_unicore_zynqparrot_prefetch10_cfg          = 5
     ,e_bp_unicore_zynqparrot_prefetch_cfg           = 4
     ,e_bp_multicore_zynqparrot_cfg                  = 3

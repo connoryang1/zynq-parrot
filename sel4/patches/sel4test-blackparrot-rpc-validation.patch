@@ -1,0 +1,289 @@
+diff --git a/apps/sel4test-driver/CMakeLists.txt b/apps/sel4test-driver/CMakeLists.txt
+index bb4a6a1..8b18a25 100644
+--- a/apps/sel4test-driver/CMakeLists.txt
++++ b/apps/sel4test-driver/CMakeLists.txt
+@@ -49,6 +49,10 @@ endif()
+-
++
+ config_option(Sel4testHaveTimer HAVE_TIMER "Enable tests that require a timer driver" DEFAULT ON)
+-
++
++config_option(Sel4testRpcOnly RPC_ONLY "Build only the bounded protected-RPC validation" DEFAULT OFF)
++config_option(Sel4testRpcSmoke RPC_SMOKE "Use reduced protected-RPC correctness counts" DEFAULT OFF)
++config_option(Sel4testRpcFaultInjection RPC_FAULT_INJECTION "Inject a protected-RPC server fault" DEFAULT OFF)
++
+ config_option(Sel4testSimulation SIMULATION "Disable tests not suitable for simulation" DEFAULT OFF)
+-
++
+ config_option(
+diff --git a/apps/sel4test-driver/include/test_init_data.h b/apps/sel4test-driver/include/test_init_data.h
+index 7bf2911..22b7c19 100644
+--- a/apps/sel4test-driver/include/test_init_data.h
++++ b/apps/sel4test-driver/include/test_init_data.h
+@@ -11,7 +11,14 @@
+ #include <sel4test/test.h>
+ #include <sel4utils/elf.h>
+-
++
++/* The focused RPC image needs only a small, fixed set of capabilities. Avoid
++ * constructing and scrubbing sel4test's generic 4 MiB, 17-bit CNode in the
++ * cycle-accurate model; 1,024 slots leave ample headroom for the test process. */
++#if CONFIG_RPC_ONLY
++#define TEST_PROCESS_CSPACE_SIZE_BITS 10
++#else
+ #define TEST_PROCESS_CSPACE_SIZE_BITS 17
++#endif
+ /* Init data shared between sel4test-driver and the sel4test-tests app -- the
+  * sel4test-driver creates a shmem page to be shared between the driver and the
+  * test child processes, and uses this struct to pass the data in the shmem
+diff --git a/apps/sel4test-driver/src/main.c b/apps/sel4test-driver/src/main.c
+index b540758..d5ed473 100644
+--- a/apps/sel4test-driver/src/main.c
++++ b/apps/sel4test-driver/src/main.c
+@@ -132,8 +132,13 @@ static unsigned int allocate_untypeds(vka_object_t *untypeds, size_t bytes, unsi
+     unsigned int num_untypeds = 0;
+     size_t allocated = 0;
+-
++
++    /* The reduced RPC test needs a bounded pool, not sel4test's exhaustive
++     * allocator inventory. Starting at 8 MiB avoids dozens of deliberately
++     * failing searches in the cycle-accurate BlackParrot model. */
++    uint8_t first_size_bits = config_set(CONFIG_RPC_ONLY) ? 23 : seL4_WordBits - 1;
++
+     /* try to allocate as many of each possible untyped size as possible */
+-    for (uint8_t size_bits = seL4_WordBits - 1; size_bits > PAGE_BITS_4K; size_bits--) {
++    for (uint8_t size_bits = first_size_bits; size_bits > PAGE_BITS_4K; size_bits--) {
+         /* keep allocating until we run out, or if allocating would
+          * cause us to allocate too much memory*/
+         while (num_untypeds < max_untypeds &&
+@@ -151,10 +156,21 @@ static unsigned int populate_untypeds(vka_object_t *untypeds)
+ {
+     /* First reserve some memory for the driver */
+     vka_object_t reserve[DRIVER_NUM_UNTYPEDS];
+-    unsigned int reserve_num = allocate_untypeds(reserve, DRIVER_UNTYPED_MEMORY, DRIVER_NUM_UNTYPEDS);
++    size_t driver_bytes = config_set(CONFIG_RPC_ONLY) ? BIT(19) : DRIVER_UNTYPED_MEMORY;
++    unsigned int reserve_num = allocate_untypeds(reserve, driver_bytes, DRIVER_NUM_UNTYPEDS);
+-
++
+     /* Now allocate everything else for the tests */
+-    unsigned int num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
++    unsigned int num_untypeds;
++    if (config_set(CONFIG_RPC_ONLY)) {
++        /* The focused test uses a 10-bit CSpace instead of sel4test's generic
++         * 17-bit CSpace. The BlackParrot-only hardware case constructs a
++         * second address space, including a 32 KiB CNode and bootstrap/page
++         * table frames. The dedicated server path fails with 256 KiB and
++         * passes with one 512 KiB untyped. The cap is not scrubbed. */
++        num_untypeds = allocate_untypeds(untypeds, BIT(19), 1);
++    } else {
++        num_untypeds = allocate_untypeds(untypeds, UINT_MAX, ARRAY_SIZE(untyped_size_bits_list));
++    }
+     /* Fill out the size_bits list */
+     for (unsigned int i = 0; i < num_untypeds; i++) {
+         untyped_size_bits_list[i] = untypeds[i].size_bits;
+@@ -272,6 +288,14 @@ void sel4test_stop_tests(test_result_t result, int tests_done, int tests_failed,
+         printf("*** ALL tests not run ***\n");
+     } else {
+         printf("All is well in the universe\n");
++#if defined(CONFIG_PLAT_BLACKPARROT) && CONFIG_RPC_ONLY
++        /* This focused build enables a test-only kernel DebugHalt proxy to
++         * OpenSBI shutdown. Signal it only after the complete suite; otherwise
++         * control-program cannot distinguish success from the driver's
++         * intentional post-suite idle loop. */
++        register seL4_Word syscall asm("a7") = (seL4_Word)-11;
++        __asm__ volatile("ecall" :: "r"(syscall) : "memory");
++#endif
+     }
+     printf("\n\n");
+ }
+@@ -446,6 +470,13 @@ void *main_continued(void *arg UNUSED)
+     /* allocate lots of untyped memory for tests to use */
+     env.num_untypeds = populate_untypeds(untypeds);
+     env.untypeds = untypeds;
++    if (config_set(CONFIG_RPC_ONLY)) {
++        printf("SEL4_RPC_POOL count=%u", env.num_untypeds);
++        for (unsigned int i = 0; i < env.num_untypeds; i++) {
++            printf(" size%u=%u", i, untypeds[i].size_bits);
++        }
++        printf("\n");
++    }
+-
++
+     /* create a frame that will act as the init data, we can then map that
+      * in to target processes */
+@@ -646,7 +677,9 @@ int main(void)
+     /* Restore the IRQ interface's register function */
+     env.ops.irq_ops.irq_register_fn = irq_register_fn_copy;
+-
++
+-    simple_print(&env.simple);
++    if (!config_set(CONFIG_RPC_ONLY)) {
++        simple_print(&env.simple);
++    }
+-
++
+     /* switch to a bigger, safer stack with a guard page
+      * before starting the tests */
+diff --git a/apps/sel4test-tests/CMakeLists.txt b/apps/sel4test-tests/CMakeLists.txt
+index cb3b677..31dc939 100644
+--- a/apps/sel4test-tests/CMakeLists.txt
++++ b/apps/sel4test-tests/CMakeLists.txt
+@@ -14,20 +14,86 @@ if(KernelArchRiscV)
+     set(arch arm)
+ endif()
+-
++
+-file(
+-    GLOB
++if(Sel4testRpcOnly)
++    set(
+         deps
+-        src/*.c
+-        src/tests/*.c
+-        src/tests/*.S
+-        src/arch/${arch}/*.c
+-        src/arch/${KernelArch}/tests/*.c
+-        src/*.cxx
+-        src/tests/*.cxx
+-        src/arch/${KernelArch}/tests/*.S
+-)
++        src/main.c
++        src/helpers.c
++        src/tests/sel4_rpc_adapter_test.c
++        src/tests/sel4_rpc_search_service.c
++        src/tests/protected_rpc.c
++        src/tests/protected_rpc_sel4.c
++        src/arch/${arch}/arch.c
++    )
++    if(KernelPlatformBlackParrot)
++        list(
++            APPEND deps
++            src/tests/protected_rpc_hardware_blackparrot.c
++            src/tests/protected_rpc_blackparrot_sel4.c
++        )
++    else()
++        list(APPEND deps src/tests/protected_rpc_hardware_stub.c)
++    endif()
++
++    # Keep the hardware server in a tiny, distinct ELF instead of cloning all
++    # loadable pages of sel4test-tests into its address space.
++    add_executable(
++        sel4-rpc-server EXCLUDE_FROM_ALL
++        src/tests/sel4_rpc_server.c
++        src/tests/sel4_rpc_search_service.c
++        src/tests/protected_rpc_sel4.c
++    )
++    if(KernelPlatformBlackParrot)
++        target_sources(
++            sel4-rpc-server PRIVATE
++            src/tests/protected_rpc_blackparrot_server.c
++        )
++    endif()
++    target_include_directories(sel4-rpc-server PRIVATE include)
++    target_compile_options(
++        sel4-rpc-server PRIVATE
++        -ffunction-sections -fdata-sections -fno-builtin-memchr
++    )
++    target_link_options(sel4-rpc-server PRIVATE -Wl,--gc-sections -Wl,-s)
++    target_link_libraries(
++        sel4-rpc-server
++        PUBLIC sel4_autoconf muslc sel4 sel4runtime sel4muslcsys
++    )
++    if(Sel4testRpcSmoke)
++        target_compile_definitions(sel4-rpc-server PRIVATE SEL4_RPC_SMOKE=1)
++    endif()
++    if(Sel4testRpcFaultInjection)
++        target_compile_definitions(sel4-rpc-server PRIVATE SEL4_RPC_FAULT_INJECTION=1)
++    endif()
++    include(cpio)
++    MakeCPIO(rpc-server-archive.o "$<TARGET_FILE:sel4-rpc-server>")
++    list(APPEND deps rpc-server-archive.o)
++else()
++    file(
++        GLOB
++            deps
++            src/*.c
++            src/tests/*.c
++            src/tests/*.S
++            src/arch/${arch}/*.c
++            src/arch/${KernelArch}/tests/*.c
++            src/*.cxx
++            src/tests/*.cxx
++            src/arch/${KernelArch}/tests/*.S
++    )
++endif()
+-
++
+ add_executable(sel4test-tests EXCLUDE_FROM_ALL ${deps})
++if(Sel4testRpcOnly)
++    target_compile_definitions(sel4test-tests PRIVATE SEL4TEST_RPC_ONLY=1)
++    if(Sel4testRpcSmoke)
++        target_compile_definitions(sel4test-tests PRIVATE SEL4_RPC_SMOKE=1)
++    endif()
++    if(Sel4testRpcFaultInjection)
++        target_compile_definitions(sel4test-tests PRIVATE SEL4_RPC_FAULT_INJECTION=1)
++    endif()
++    target_compile_options(sel4test-tests PRIVATE -fno-builtin-memchr)
++endif()
+ # special handling for "arm_hyp", it's really "aarch32"
+ set(_inc_folder_KernelSel4Arch "${KernelSel4Arch}")
+ if("${KernelSel4Arch}" STREQUAL "arm_hyp")
+diff --git a/apps/sel4test-tests/src/helpers.c b/apps/sel4test-tests/src/helpers.c
+index f3a8243..ed5c1ff 100644
+--- a/apps/sel4test-tests/src/helpers.c
++++ b/apps/sel4test-tests/src/helpers.c
+@@ -197,7 +197,14 @@ void create_helper_process_custom_asid(env_t env, helper_thread_t *thread, seL4_
+     sel4utils_process_config_t config = process_config_default_simple(&env->simple, "", OUR_PRIO - 1);
+     config = process_config_asid_pool(config, asid);
+     config = process_config_noelf(config, NULL, 0);
++#ifdef SEL4TEST_RPC_ONLY
++    /* The focused RPC helper needs only its process/runtime capabilities.
++     * Keeping its private CNode small avoids requiring another contiguous
++     * 128 KiB object after the test process has fragmented its bounded pool. */
++    config = process_config_create_cnode(config, 10);
++#else
+     config = process_config_create_cnode(config, TEST_PROCESS_CSPACE_SIZE_BITS);
++#endif
+     config = process_config_create_vspace(config, env->regions, env->num_regions);
+     vka_object_t fault_endpoint = { .cptr = env->endpoint };
+     config = process_config_fault_endpoint(config, fault_endpoint);
+diff --git a/apps/sel4test-tests/src/main.c b/apps/sel4test-tests/src/main.c
+index a6e3cb2..8bae149 100644
+--- a/apps/sel4test-tests/src/main.c
++++ b/apps/sel4test-tests/src/main.c
+@@ -30,9 +30,15 @@
+ #include "test.h"
+ #include "init.h"
+-
++
+-/* dummy global for libsel4muslcsys */
++/* The focused RPC image embeds its tiny server ELF. Other configurations keep
++ * the dummy globals expected by libsel4muslcsys. */
++#ifdef SEL4TEST_RPC_ONLY
++extern char _cpio_archive[];
++extern char _cpio_archive_end[];
++#else
+ char _cpio_archive[1];
+ char _cpio_archive_end[1];
++#endif
+-
++
+ /* endpoint to call back to the test driver on */
+ static seL4_CPtr endpoint;
+diff --git a/settings.cmake b/settings.cmake
+index 522a147..8145e0b 100644
+--- a/settings.cmake
++++ b/settings.cmake
+@@ -87,6 +87,10 @@ if(NOT Sel4testAllowSettingsOverride)
+-
++
+   ApplyCommonReleaseVerificationSettings(${RELEASE} ${VERIFICATION})
+-
++
++  if(Sel4testRpcPrinting)
++    set(KernelPrinting ON CACHE BOOL "" FORCE)
++  endif()
++
+   if(BAMBOO)
+     set(LibSel4TestPrintXML ON CACHE BOOL "" FORCE)
+   else()

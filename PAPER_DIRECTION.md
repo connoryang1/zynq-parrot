@@ -26,6 +26,9 @@ service in a separate address space. A caller uses a hardware-authorized
 server uses `preturn` to return one register result through a continuation that
 userspace cannot forge. The server's private mappings must remain inaccessible
 to the caller, and the caller must not be able to select an internal server PC.
+The follow-on [seL4 hardware IPC plan](SEL4_HARDWARE_IPC_PLAN.md) preserves a
+microkernel-neutral adapter, fast-path eligibility contract, fallback rules,
+and staged path from this one-pair mechanism to an existing microkernel.
 
 The work is staged so each result supports a distinct claim:
 

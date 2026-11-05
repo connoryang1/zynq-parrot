@@ -4,10 +4,11 @@ This directory contains build support for ZynqParrot host environments and small
 
 Include `bp_protected_rpc.h` with `-Isoftware/include` to invoke a
 monitor-installed protected service. `bp_protected_rpc_call4()` carries four
-64-bit arguments to the service and returns one 64-bit result. The current
-prototype implements capability 1 and enters the service at the address fixed
-by its privileged descriptor; service code returns with `preturn` rather than
-choosing a caller address.
+64-bit arguments to the service, requests four argument words, and returns the
+first reply word. A non-completed architectural outcome is reported as
+`UINT64_MAX`. The capability token and service entry are fixed by an atomically
+published privileged descriptor; service code returns with `preturn` and
+explicit reply metadata rather than choosing a caller address.
 
 Raw pointers must not cross this ABI. Caller and service have distinct page
 tables, so the same virtual address may name different storage and a caller

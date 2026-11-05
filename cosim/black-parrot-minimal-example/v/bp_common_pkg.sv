@@ -49,9 +49,26 @@ package bp_common_pkg;
                         ,bp_default_cfg_p
                         );
 
+  // Match the integer-only seL4 FPGA endpoint without changing the ordinary
+  // ZynqParrot simulator configuration used by FP-capable tests.
+  localparam bp_proc_param_s bp_unicore_zynqparrot_sel4_cfg_override_p =
+    '{num_threads: 2
+      ,num_contexts: 4
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+                                  - $clog2(bp_default_cfg_p.num_threads)
+                                  + $clog2(2)
+      ,fpu_support: 0
+      ,default: "inv"
+      };
+  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_sel4_cfg_p
+                        ,bp_unicore_zynqparrot_sel4_cfg_override_p
+                        ,bp_unicore_zynqparrot_cfg_p
+                        );
+
   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =
   {
-    bp_unicore_zynqparrot_cfg_p
+    bp_unicore_zynqparrot_sel4_cfg_p
+    ,bp_unicore_zynqparrot_cfg_p
 
     // A custom BP configuration generated from Makefile
     ,bp_custom_cfg_p
@@ -62,7 +79,8 @@ package bp_common_pkg;
   // This enum MUST be kept up to date with the parameter array above
   typedef enum bit [lg_max_cfgs-1:0]
   {
-    e_bp_unicore_zynqparrot_cfg                     = 2
+    e_bp_unicore_zynqparrot_sel4_cfg                = 3
+    ,e_bp_unicore_zynqparrot_cfg                     = 2
 
     // A custom BP configuration generated from `defines
     ,e_bp_custom_cfg                                = 1

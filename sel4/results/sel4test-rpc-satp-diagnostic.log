@@ -1,0 +1,30 @@
+SEL4_RPC_SIM model_sha256=22bce363edafda3102e066433b99f72c1b4bfeda8a0888b560a88062cebed4c1 image_sha256=45b275ff0048ea0a01c24403d24ee3d227bb121644ecaca2efa8fca54f1f86fa
+Running test SEL4IPCRPC0002 (Backend-neutral protected RPC over ordinary seL4 IPC)
+BP_RPC_CALL_REJECT ready={valid=1 idle=1 satp=0 caller_context=1 server_resident=1} token_match=1 request_meta=0x4 request_limit=4 current_context=0 caller_context=0 server_context=1
+	Error: Check call_status(4) == PROTECTED_RPC_OK(0) failed.
+
+# Diagnosis: the old model compared the implemented-width current SATP with
+# the un-narrowed descriptor SATP. seL4 assigned caller/server ASIDs 2/3 while
+# this BlackParrot configuration implements one ASID bit. Every other pcall
+# eligibility predicate passed. The corrected RTL compares effective WARL
+# SATPs and retains the implemented root PPN as part of address-space identity.
+
+FIXED_MODEL model_sha256=4a58a55ca31f3ef1021db5afa6cf8fb5b8aab2e4f49ed2469b2e44f88b32f26e
+WIDE_ASID_REGRESSION caller_asid=2 server_asid=3 direct_first=250 direct_repeat=31 protected_first=396 protected_repeat=58
+[BSG-PASS] atomic protected RPC capability, fixed entry and return
+VALID RUN: guest and host PASS
+
+FIXED_MODEL_REGRESSION [BSG-PASS] atomic protected RPC descriptor control
+FIXED_MODEL_REGRESSION [BSG-PASS] protected RPC library address-space isolation
+FIXED_MODEL_REGRESSION [BSG-PASS] ctxtsw smoke test completed
+
+SEL4_FIXED_SATP_RUN hardware_calls=256 result=completed
+FASTPATH_UNBIND_DIAGNOSTIC observed_status=1 cause=reserved_zero_word_unbind_delivered_to_fallback_server
+FASTPATH_UNBIND_FIX reserved_bind_and_unbind_labels_diverted_to_kernel_slowpath
+
+ACCEPTED_MODEL model_sha256=4a58a55ca31f3ef1021db5afa6cf8fb5b8aab2e4f49ed2469b2e44f88b32f26e
+ACCEPTED_IMAGE image_sha256=00428b15f2115d12eb006f234987390ae8836fc41190cec0a2b2e5217229d04d
+ACCEPTED_NEGATIVE same_physical_vspace_bind=denied
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=90308 cycles_per_call=352
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=24942 cycles_per_call=3117
+Test SEL4IPCRPC0002 passed

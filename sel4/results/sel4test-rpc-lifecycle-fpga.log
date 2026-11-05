@@ -1,0 +1,148 @@
+CONTROL_PROGRAM_SHA256=2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30
+BITSTREAM_SHA256=b78b54c3e139a8cc44cb803a3424979bc507dcdfc11a67280261d2ac9b3b42bc
+RUNNER_STARTED_PID=4634 LOG=/home/xilinx/bp-logs/sel4-rpc-internal-dispatch-20261102T032837Z-1923447.log STATUS=/home/xilinx/bp-logs/sel4-rpc-internal-dispatch-20261102T032837Z-1923447.status
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 1800000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbed02690 40000004 16 1
+INFO:    Creating host: 0xbed02690 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c95000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c95000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-1534796
+DEBUG-PS: ps.cpp: 1-1534994
+DEBUG-PS: ps.cpp: 2-1535174
+DEBUG-PS: ps.cpp: 3-1535348
+DEBUG-PS: ps.cpp: 4-1535542
+DEBUG-PS: ps.cpp: 5-1535715
+DEBUG-PS: ps.cpp: 6-1535894
+DEBUG-PS: ps.cpp: 7-1536067
+DEBUG-PS: ps.cpp: 8-1536238
+DEBUG-PS: ps.cpp: 9-1536406
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 109804
+DEBUG-PS: ps.cpp: finished loading 109804 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+ELF-loader started on (HART 0) (NODES 1)
+  paddr=[8032f000..803fcfff]
+Looking for DTB in CPIO archive...found at 803480e8.
+Loaded DTB from 803480e8.
+   paddr=[80218000..80218fff]
+ELF-loading image 'kernel' to 80200000
+  paddr=[80200000..80217fff]
+  vaddr=[ffffffff80200000..ffffffff80217fff]
+  virt_entry=ffffffff80200000
+ELF-loading image 'rootserver' to 80219000
+  paddr=[80219000..8030efff]
+  vaddr=[10000..105fff]
+  virt_entry=14e26
+Enabling MMU and paging
+Jumping to kernel-image entry point...
+
+Init local IRQ
+no PLIC present, skip hart specific initialisation
+Bootstrapping kernel
+Initializing PLIC...
+no PLIC present, skip platform specific initialisation
+Available phys memory regions: 1
+  [80200000..84000000)
+Reserved virt address space regions: 3
+  [ffffffc080200000..ffffffc080218000)
+  [ffffffc080218000..ffffffc08021845b)
+  [ffffffc080219000..ffffffc08030f000)
+Booting all finished, dropped to user space
+
+Warning: using printf before serial is set up. This only works as your
+printf is backed by seL4_Debug_PutChar()
+Switching to a safer, bigger stack... [0m[1m<<[0m[32mseL4(CPU 0)[0m[1m [decodeRISCVPageTableInvocation/787 T0xffffffc083fc7400 "" @31cf6]: RISCVPageTableMap: All objects mapped at this address>>[0m
+
+seL4 Test
+=========
+
+SEL4_RPC_POOL count=1 size0=19
+Starting test suite sel4test
+Starting test 0: Test that there are tests
+Starting test 1: SEL4IPCRPC0002
+Running test SEL4IPCRPC0002 (Backend-neutral protected RPC over ordinary seL4 IPC)
+[0m[1m<<[0m[32mseL4(CPU 0)[0m[1m [bp_rpc_bind/198 T0xffffffc083fc7c00 "" @1abd2]: BlackParrot RPC bind: caller and server address spaces are not distinct>>[0m
+SEL4_RPC_REGION_GUARD physical-mismatch=denied write-escalation=denied runtime-state=denied
+SEL4_RPC_LIFECYCLE map-revoke=verified stale-token=verified rebind=verified
+SEL4_RPC_CALLER_BADGE value=24090 software=verified hardware=verified
+SEL4_RPC_WORKLOAD name=libc-bounded-search bytes=1024
+SEL4_RPC_ADAPTER path=in-process calls=256 total_cycles=804729 cycles_per_call=3143
+SEL4_RPC_ADAPTER path=hardware calls=256 total_cycles=951158 cycles_per_call=3715
+SEL4_RPC_ADAPTER path=software calls=256 total_cycles=1497165 cycles_per_call=5848
+SEL4_RPC_ADAPTER path=notification calls=256 total_cycles=2882535 cycles_per_call=11259
+SEL4_RPC_ADAPTER path=software-fallback calls=8 total_cycles=55888 cycles_per_call=6986
+SEL4_RPC_DISTRIBUTION path=in-process samples=64 min=2928 median=2934 p95=5121 max=6082
+SEL4_RPC_DISTRIBUTION path=hardware samples=64 min=3461 median=3461 p95=5626 max=6574
+SEL4_RPC_DISTRIBUTION path=software samples=64 min=5436 median=5440 p95=7630 max=8510
+SEL4_RPC_DISTRIBUTION path=notification samples=64 min=10182 median=10597 p95=12810 max=12952
+SEL4_RPC_TIMEBASE counter=blackparrot-global-cycle-csr-0xcc0 scope=core-wide
+SEL4_RPC_COMPONENTS path=in-process samples=64 pre_median=21 service_median=2900 post_median=13
+SEL4_RPC_COMPONENTS path=hardware samples=64 pre_median=383 service_median=2891 post_median=187
+SEL4_RPC_COMPONENTS path=software samples=64 pre_median=1293 service_median=2983 post_median=1164
+SEL4_RPC_COMPONENTS path=notification samples=64 pre_median=3874 service_median=2977 post_median=3740
+SEL4_RPC_NOTIFICATION_BASELINE mailbox=shared-rw data-region=server-ro request-signal=notification reply-signal=notification
+SEL4_RPC_CACHE_STATE kind=l1d-cold lower-cache=warm method=blackparrot-flush-all samples=64
+SEL4_RPC_DISTRIBUTION path=l1d-cold/in-process samples=64 min=3894 median=3894 p95=8034 max=15259
+SEL4_RPC_DISTRIBUTION path=l1d-cold/hardware samples=64 min=4819 median=4821 p95=8792 max=10041
+SEL4_RPC_DISTRIBUTION path=l1d-cold/software samples=64 min=9536 median=10072 p95=13308 max=14169
+SEL4_RPC_DISTRIBUTION path=l1d-cold/notification samples=64 min=14864 median=15728 p95=19185 max=19419
+SEL4_RPC_CACHE_STATE kind=data-hierarchy-cold l1d=cold l2=cold l1i=warm dram-row=uncontrolled method=4x-l2-evict samples=64
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/in-process samples=64 min=4365 median=4379 p95=8371 max=10018
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/hardware samples=64 min=5410 median=5421 p95=9410 max=11381
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/software samples=64 min=9446 median=9809 p95=13947 max=14179
+SEL4_RPC_DISTRIBUTION path=data-hierarchy-cold/notification samples=64 min=14324 median=15047 p95=19097 max=19526
+Test SEL4IPCRPC0002 passed
+Starting test 3: Test all tests ran
+Test suite passed. 3 tests passed. 0 tests disabled.
+All is well in the universe
+halting...INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              829 (             33d)
+INFO:    ps.cpp: minstret (instructions retired):       18,078,190 (         113d9ee)
+INFO:    ps.cpp: minstret delta:                        18,077,361 (         113d6b1)
+INFO:    ps.cpp: MTIME start:                            5,711,810 (          5727c2)
+INFO:    ps.cpp: MTIME stop:                            22,019,804 (         14ffedc)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):          16,307,994 (          f8d71a)
+INFO:    ps.cpp: IPC        :                             0.138562
+INFO:    ps.cpp: minstret (instructions retired):       18,078,271 (         113da3f)
+INFO:    ps.cpp: wall clock time                :    3,261,633,522 (        c26893f2) ns
+INFO:    ps.cpp: sim/emul speed                 : 2,399,974,450.59 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000145
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c95000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+RUNNER_EXIT=0

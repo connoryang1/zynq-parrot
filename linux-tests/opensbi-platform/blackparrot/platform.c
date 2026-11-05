@@ -23,6 +23,7 @@
 #include <sbi_utils/timer/aclint_mtimer.h>
 
 #include "icache_prefix.h"
+#include "rpc.h"
 
 #define PLATFORM_FIRST_HARTID 0
 
@@ -253,7 +254,9 @@ const struct sbi_platform_operations platform_ops = {
     .final_init   = platform_final_init,
     .console_init = platform_console_init,
     .ipi_init     = platform_ipi_init,
-    .timer_init   = platform_timer_init
+    .timer_init   = platform_timer_init,
+    .vendor_ext_check = bp_rpc_vendor_ext_check,
+    .vendor_ext_provider = bp_rpc_vendor_ext_provider
 };
 
 const struct sbi_platform platform = {

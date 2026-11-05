@@ -105,6 +105,26 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
         }
     }
 
+    uint64_t read_dram_word(uint64_t guest_addr, unsigned bytes,
+                            unsigned long physical_base) const {
+        assert(guest_addr >= 0x80000000ULL);
+        assert(bytes == 4 || bytes == 8);
+        const uint32_t translated =
+            static_cast<uint32_t>(guest_addr ^ 0x80000000ULL)
+            + static_cast<uint32_t>(physical_base);
+        const auto &ram = tb->rootp
+            ->bsg_nonsynth_zynq_testbench__DOT__axi_mem__DOT__ram;
+        uint64_t data = 0;
+        for (unsigned byte = 0; byte < bytes; ++byte) {
+            const uint32_t address = translated + byte;
+            const uint32_t index = (address >> 2) & 0x0fffffffU;
+            const uint32_t shift = (address & 3U) * 8U;
+            data |= static_cast<uint64_t>((ram[index] >> shift) & 0xffU)
+                    << (byte * 8U);
+        }
+        return data;
+    }
+
     void zero_dram(unsigned long physical_base, size_t bytes) {
         assert((bytes & 3U) == 0);
         auto &ram = tb->rootp
@@ -135,11 +155,12 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
                     csr->__PVT__mcause_reg__DOT__data_r);
         // The generated members expose BlackParrot's compact CSR storage:
         // EPCs omit bit 0 and mtvec omits its two fixed alignment bits.
-        bsg_pr_info("ps.cpp: processor state: mepc=0x%llx dpc=0x%llx mtvec=0x%llx satp=0x%llx\n",
+        bsg_pr_info("ps.cpp: processor state: mepc=0x%llx dpc=0x%llx mtvec=0x%llx satp=0x%llx mtval=0x%llx\n",
                     (unsigned long long)csr->__PVT__mepc_reg__DOT__data_r << 1,
                     (unsigned long long)csr->__PVT__dpc_reg__DOT__data_r << 1,
                     (unsigned long long)csr->__PVT__mtvec_reg__DOT__data_r << 2,
-                    (unsigned long long)csr->__PVT__satp_reg__DOT__data_r);
+                    (unsigned long long)csr->__PVT__satp_reg__DOT__data_r,
+                    (unsigned long long)csr->__PVT__mtval_reg__DOT__data_r);
     }
 
     void *allocate_dram(unsigned long len_in_bytes,

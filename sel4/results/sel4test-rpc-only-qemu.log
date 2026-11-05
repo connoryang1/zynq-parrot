@@ -1,0 +1,18 @@
+Configuration: qemu-riscv-virt, riscv64, release fastpath
+Validation options: Sel4testRpcOnly=ON, Sel4testRpcPrinting=ON
+LibSel4MuslcSysMorecoreBytes=65536
+Test process CSpace bits: 10
+Dedicated server CSpace bits: 10
+Dedicated server archive bytes: 74768
+Delegated test untyped boundary: 262144 fails loading the server ELF
+Delegated test untyped bytes: 524288
+SEL4_RPC_POOL count=1 size0=19
+Starting test suite sel4test
+Starting test 0: Test that there are tests
+Starting test 1: SEL4IPCRPC0002
+Running test SEL4IPCRPC0002 (Backend-neutral protected RPC over ordinary seL4 IPC)
+SEL4_RPC_ADAPTER path=software-dedicated calls=8 total_cycles=8638282 cycles_per_call=1079785
+Test SEL4IPCRPC0002 passed
+Starting test 3: Test all tests ran
+Test suite passed. 3 tests passed. 0 tests disabled.
+All is well in the universe

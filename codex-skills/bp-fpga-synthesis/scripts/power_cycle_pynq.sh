@@ -31,6 +31,17 @@ curl -fsS -X PUT "$PYNQ_POWER_STATE_URL" \
   -H 'Content-Type: application/json' -d '{"on":false}' >/dev/null
 sleep "$off_seconds"
 
+# Some outlet APIs return HTTP 200 with an error object for an invalid
+# resource.  curl -f cannot distinguish that from a successful state change,
+# so require the board itself to disappear before claiming a power cycle.
+if ssh -o BatchMode=yes -o ConnectTimeout=2 "$ssh_host" true 2>/dev/null; then
+  echo "error: board remained reachable after outlet power-off request" >&2
+  # Always restore the requested on state before returning an error.
+  curl -fsS -X PUT "$PYNQ_POWER_STATE_URL" \
+    -H 'Content-Type: application/json' -d '{"on":true}' >/dev/null || true
+  exit 1
+fi
+
 echo "Powering on the PYNQ outlet"
 curl -fsS -X PUT "$PYNQ_POWER_STATE_URL" \
   -H 'Content-Type: application/json' -d '{"on":true}' >/dev/null

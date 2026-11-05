@@ -1,0 +1,388 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#include <api/syscall.h>
+#include <arch/machine.h>
+#include <kernel/vspace.h>
+#include <model/statedata.h>
+#include <object/endpoint.h>
+#include <object/tcb.h>
+#include <plat/machine/blackparrot_rpc_abi.h>
+#include <plat/machine/rpc.h>
+
+/* BlackParrot reports mvendorid zero, selecting the first SBI vendor ID. */
+#define BP_RPC_SBI_EXTENSION_ID BP_RPC_SBI_VENDOR_BASE
+
+typedef struct bp_rpc_sbi_ret {
+    long error;
+    long value;
+} bp_rpc_sbi_ret_t;
+
+typedef struct bp_rpc_binding {
+    endpoint_t *endpoint;
+    tcb_t *caller;
+    tcb_t *server;
+    asid_t caller_asid;
+    asid_t server_asid;
+    word_t token;
+    word_t region_token;
+    word_t region_ppn;
+    word_t region_caller_base;
+    word_t region_server_base;
+    word_t region_size;
+    word_t region_access;
+} bp_rpc_binding_t;
+
+static bp_rpc_binding_t bp_rpc_binding;
+static word_t bp_rpc_generation;
+
+static bp_rpc_sbi_ret_t bp_rpc_sbi_call(word_t operation, word_t arg0,
+                                        word_t arg1, word_t arg2)
+{
+    register word_t a0 asm("a0") = arg0;
+    register word_t a1 asm("a1") = arg1;
+    register word_t a2 asm("a2") = arg2;
+    register word_t a6 asm("a6") = operation;
+    register word_t a7 asm("a7") = BP_RPC_SBI_EXTENSION_ID;
+
+    asm volatile("ecall"
+                 : "+r"(a0), "+r"(a1), "+r"(a2)
+                 : "r"(a6), "r"(a7)
+                 : "memory");
+    return (bp_rpc_sbi_ret_t) {
+        .error = (long)a0,
+        .value = (long)a1,
+    };
+}
+
+static bool_t bp_rpc_tcb_satp(tcb_t *tcb, word_t *satp_value,
+                              asid_t *asid_value, pte_t **root_value)
+{
+    cap_t root_cap = TCB_PTR_CTE_PTR(tcb, tcbVTable)->cap;
+    if (cap_get_capType(root_cap) != cap_page_table_cap
+        || !cap_page_table_cap_get_capPTIsMapped(root_cap)) {
+        return false;
+    }
+
+    asid_t asid = cap_page_table_cap_get_capPTMappedASID(root_cap);
+    if (asid == asidInvalid) {
+        return false;
+    }
+    pte_t *root = PTE_PTR(cap_page_table_cap_get_capPTBasePtr(root_cap));
+    findVSpaceForASID_ret_t found = findVSpaceForASID(asid);
+    if (found.status != EXCEPTION_NONE || found.vspace_root != root) {
+        /* A copied page-table cap retains its mapped fields after the ASID is
+         * deleted. Never let that stale metadata revive a retired VSpace. */
+        return false;
+    }
+    satp_t satp = satp_new(SATP_MODE, asid,
+                           addrFromPPtr(root) >> seL4_PageBits);
+    *satp_value = satp.words[0];
+    *asid_value = asid;
+    if (root_value != NULL) {
+        *root_value = root;
+    }
+    return true;
+}
+
+static bool_t bp_rpc_user_mapping(pte_t *root, word_t address,
+                                  bool_t readable, bool_t executable,
+                                  bool_t writable)
+{
+    lookupPTSlot_ret_t lookup = lookupPTSlot(root, address);
+    pte_t *pte = lookup.ptSlot;
+    bool_t leaf = pte_ptr_get_read(pte) || pte_ptr_get_write(pte)
+                  || pte_ptr_get_execute(pte);
+    return pte_ptr_get_valid(pte) && leaf && pte_ptr_get_user(pte)
+           && (!readable || pte_ptr_get_read(pte))
+           && (!executable || pte_ptr_get_execute(pte))
+           && (!writable || pte_ptr_get_write(pte));
+}
+
+static bool_t bp_rpc_user_4k_mapping(pte_t *root, word_t address,
+                                     bool_t writable, word_t *ppn)
+{
+    lookupPTSlot_ret_t lookup = lookupPTSlot(root, address);
+    pte_t *pte = lookup.ptSlot;
+    bool_t leaf = pte_ptr_get_read(pte) || pte_ptr_get_write(pte)
+                  || pte_ptr_get_execute(pte);
+    if (lookup.ptBitsLeft != seL4_PageBits || !pte_ptr_get_valid(pte)
+        || !leaf || !pte_ptr_get_user(pte) || !pte_ptr_get_read(pte)
+        || (writable && !pte_ptr_get_write(pte))) {
+        return false;
+    }
+    *ppn = pte_ptr_get_ppn(pte);
+    return true;
+}
+
+static void bp_rpc_reply_word(word_t value)
+{
+    tcb_t *thread = NODE_STATE(ksCurThread);
+    word_t *ipc_buffer = lookupIPCBuffer(true, thread);
+    setRegister(thread, badgeRegister, 0);
+    unsigned int length = setMR(thread, ipc_buffer, 0, value);
+    setRegister(thread, msgInfoRegister, wordFromMessageInfo(
+                    seL4_MessageInfo_new(0, 0, 0, length)));
+    setThreadState(thread, ThreadState_Running);
+}
+
+static exception_t bp_rpc_error(word_t type)
+{
+    current_syscall_error.type = type;
+    return EXCEPTION_SYSCALL_ERROR;
+}
+
+static void bp_rpc_revoke(void)
+{
+    if (bp_rpc_binding.token == 0) {
+        return;
+    }
+    bp_rpc_sbi_ret_t result = bp_rpc_sbi_call(
+        BP_RPC_SBI_QUERY, 0, bp_rpc_binding.token, 0);
+    if (result.error != 0
+        || (result.value != BP_RPC_CONTROL_OK
+            && result.value != BP_RPC_CONTROL_FAULTED)) {
+        fail("BlackParrot protected RPC query invariant failed");
+    }
+    if (result.value == BP_RPC_CONTROL_FAULTED) {
+        bp_rpc_fault_record_v1_t record;
+        result = bp_rpc_sbi_call(BP_RPC_SBI_READ_FAULT, 0,
+                                 bp_rpc_binding.token, (word_t)&record);
+        if (result.error != 0 || result.value != BP_RPC_CONTROL_OK
+            || !bp_rpc_user_address_valid(record.pc)
+            || (record.cause >> (wordBits - 1)) != 0) {
+            fail("BlackParrot protected RPC fault-record invariant failed");
+        }
+    }
+    result = bp_rpc_sbi_call(
+        BP_RPC_SBI_REVOKE, 0, bp_rpc_binding.token, 0);
+    if (result.error != 0 || result.value != BP_RPC_CONTROL_OK) {
+        fail("BlackParrot protected RPC revocation invariant failed");
+    }
+    bp_rpc_binding = (bp_rpc_binding_t) {0};
+}
+
+static exception_t bp_rpc_bind(word_t length, cap_t endpoint_cap,
+                               word_t *buffer)
+{
+    if ((length != BP_RPC_SEL4_BIND_ARGUMENTS
+         && length != BP_RPC_SEL4_BIND_REGION_ARGUMENTS)
+        || current_extra_caps.excaprefs[0] == NULL) {
+        return bp_rpc_error(seL4_TruncatedMessage);
+    }
+    cap_t server_cap = current_extra_caps.excaprefs[0]->cap;
+    if (cap_get_capType(server_cap) != cap_thread_cap) {
+        current_syscall_error.invalidCapNumber = 1;
+        return bp_rpc_error(seL4_InvalidCapability);
+    }
+    if (bp_rpc_binding.token != 0) {
+        return bp_rpc_error(seL4_DeleteFirst);
+    }
+
+    endpoint_t *endpoint = EP_PTR(cap_endpoint_cap_get_capEPPtr(endpoint_cap));
+    tcb_t *caller = NODE_STATE(ksCurThread);
+    tcb_t *server = TCB_PTR(cap_thread_cap_get_capTCBPtr(server_cap));
+    tcb_queue_t queue = ep_ptr_get_queue(endpoint);
+    if (endpoint_ptr_get_state(endpoint) != EPState_Recv) {
+        userError("BlackParrot RPC bind: endpoint is not in receive state");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (queue.head != server || queue.end != server) {
+        userError("BlackParrot RPC bind: server is not the endpoint's sole receiver");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (thread_state_get_tsType(server->tcbState)
+        != ThreadState_BlockedOnReceive) {
+        userError("BlackParrot RPC bind: server is not blocked on receive");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (EP_PTR(thread_state_get_blockingObject(server->tcbState))
+        != endpoint) {
+        userError("BlackParrot RPC bind: server is blocked on another endpoint");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+
+    word_t caller_satp, server_satp;
+    asid_t caller_asid, server_asid;
+    pte_t *caller_root, *server_root;
+    if (!bp_rpc_tcb_satp(caller, &caller_satp, &caller_asid, &caller_root)) {
+        userError("BlackParrot RPC bind: caller address space is invalid");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (!bp_rpc_tcb_satp(server, &server_satp, &server_asid, &server_root)) {
+        userError("BlackParrot RPC bind: server address space is invalid");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (caller_root == server_root) {
+        userError("BlackParrot RPC bind: caller and server address spaces are not distinct");
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+
+    word_t counts = getSyscallArg(4, buffer);
+    uint8_t request_words = counts;
+    uint8_t reply_words = counts >> 8;
+    if ((counts >> 16) != 0 || request_words > BP_RPC_MAX_WORDS
+        || reply_words > BP_RPC_MAX_WORDS) {
+        current_syscall_error.invalidArgumentNumber = 4;
+        return bp_rpc_error(seL4_InvalidArgument);
+    }
+
+    if (++bp_rpc_generation == 0) {
+        bp_rpc_generation++;
+    }
+    bp_rpc_descriptor_v2_t descriptor = {
+        .version = BP_RPC_ABI_VERSION_V2,
+        .size = BP_RPC_DESCRIPTOR_V2_SIZE,
+        .flags = BP_RPC_DESCRIPTOR_FLAG_FAULT_COMPLETION,
+        .slot = 0,
+        .request_words = request_words,
+        .reply_words = reply_words,
+        .token = bp_rpc_generation,
+        .caller_satp = caller_satp,
+        .server_satp = server_satp,
+        .server_entry = getSyscallArg(0, buffer),
+        .server_sp = getSyscallArg(1, buffer),
+        .server_gp = getSyscallArg(2, buffer),
+        .server_tp = getSyscallArg(3, buffer),
+        .caller_badge = cap_endpoint_cap_get_capEPBadge(endpoint_cap),
+        .caller_context = 0,
+        .server_context = 1,
+    };
+    if (!bp_rpc_descriptor_v2_valid(&descriptor)) {
+        return bp_rpc_error(seL4_InvalidArgument);
+    }
+    if (!bp_rpc_user_mapping(server_root, descriptor.server_entry,
+                             false, true, false)
+        || !bp_rpc_user_mapping(server_root, descriptor.server_sp - 1,
+                                true, false, true)
+        || (descriptor.server_gp != 0
+            && !bp_rpc_user_mapping(server_root, descriptor.server_gp,
+                                    true, false, false))
+        || (descriptor.server_tp != 0
+            && !bp_rpc_user_mapping(server_root, descriptor.server_tp,
+                                    true, false, false))) {
+        return bp_rpc_error(seL4_FailedLookup);
+    }
+
+    word_t region_token = 0;
+    word_t region_ppn = 0;
+    word_t region_caller_base = 0;
+    word_t region_server_base = 0;
+    word_t region_size = 0;
+    word_t region_access = 0;
+    if (length == BP_RPC_SEL4_BIND_REGION_ARGUMENTS) {
+        region_token = getSyscallArg(5, buffer);
+        region_caller_base = getSyscallArg(6, buffer);
+        region_server_base = getSyscallArg(7, buffer);
+        region_size = getSyscallArg(8, buffer);
+        region_access = getSyscallArg(9, buffer);
+        if (region_token == 0 || region_size != BIT(seL4_PageBits)
+            || !IS_ALIGNED(region_caller_base, seL4_PageBits)
+            || !IS_ALIGNED(region_server_base, seL4_PageBits)
+            || region_access == 0
+            || (region_access & ~(BP_RPC_REGION_ACCESS_READ
+                                  | BP_RPC_REGION_ACCESS_WRITE)) != 0) {
+            current_syscall_error.invalidArgumentNumber = 5;
+            return bp_rpc_error(seL4_InvalidArgument);
+        }
+
+        word_t caller_ppn, server_ppn;
+        bool_t server_writable = region_access & BP_RPC_REGION_ACCESS_WRITE;
+        if (!bp_rpc_user_4k_mapping(caller_root, region_caller_base,
+                                    true, &caller_ppn)
+            || !bp_rpc_user_4k_mapping(server_root, region_server_base,
+                                       server_writable, &server_ppn)
+            || caller_ppn != server_ppn) {
+            return bp_rpc_error(seL4_FailedLookup);
+        }
+        region_ppn = caller_ppn;
+    }
+
+    bp_rpc_sbi_ret_t result = bp_rpc_sbi_call(
+        BP_RPC_SBI_INSTALL, (word_t)&descriptor, 0, 0);
+    if (result.error != 0 || (word_t)result.value != descriptor.token) {
+        userError("BlackParrot RPC bind: firmware descriptor installation failed (error %ld, value %ld, token %llu)",
+                  result.error, result.value,
+                  (unsigned long long)descriptor.token);
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+
+    bp_rpc_binding = (bp_rpc_binding_t) {
+        .endpoint = endpoint,
+        .caller = caller,
+        .server = server,
+        .caller_asid = caller_asid,
+        .server_asid = server_asid,
+        .token = descriptor.token,
+        .region_token = region_token,
+        .region_ppn = region_ppn,
+        .region_caller_base = region_caller_base,
+        .region_server_base = region_server_base,
+        .region_size = region_size,
+        .region_access = region_access,
+    };
+    bp_rpc_reply_word(descriptor.token);
+    return EXCEPTION_NONE;
+}
+
+bool_t bp_rpc_is_endpoint_invocation(word_t label)
+{
+    return label == BP_RPC_SEL4_BIND_LABEL
+           || label == BP_RPC_SEL4_UNBIND_LABEL;
+}
+
+exception_t bp_rpc_decode_endpoint_invocation(word_t label, word_t length,
+                                               cap_t endpoint_cap, bool_t call,
+                                               word_t *buffer)
+{
+    if (!call) {
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    if (label == BP_RPC_SEL4_BIND_LABEL) {
+        return bp_rpc_bind(length, endpoint_cap, buffer);
+    }
+    endpoint_t *endpoint = EP_PTR(cap_endpoint_cap_get_capEPPtr(endpoint_cap));
+    if (bp_rpc_binding.token == 0 || bp_rpc_binding.endpoint != endpoint
+        || bp_rpc_binding.caller != NODE_STATE(ksCurThread)) {
+        return bp_rpc_error(seL4_IllegalOperation);
+    }
+    bp_rpc_revoke();
+    bp_rpc_reply_word(BP_RPC_CONTROL_OK);
+    return EXCEPTION_NONE;
+}
+
+void bp_rpc_finalise_endpoint(endpoint_t *endpoint)
+{
+    if (bp_rpc_binding.endpoint == endpoint) {
+        bp_rpc_revoke();
+    }
+}
+
+void bp_rpc_finalise_tcb(tcb_t *tcb)
+{
+    if (bp_rpc_binding.caller == tcb || bp_rpc_binding.server == tcb) {
+        bp_rpc_revoke();
+    }
+}
+
+void bp_rpc_tcb_vspace_change(tcb_t *tcb)
+{
+    bp_rpc_finalise_tcb(tcb);
+}
+
+void bp_rpc_revoke_asid(asid_t asid)
+{
+    if ((bp_rpc_binding.token != 0)
+        && (bp_rpc_binding.caller_asid == asid
+            || bp_rpc_binding.server_asid == asid)) {
+        bp_rpc_revoke();
+    }
+}
+
+void bp_rpc_revoke_asid_pool(asid_t asid_base)
+{
+    if ((bp_rpc_binding.token != 0)
+        && (ASID_HIGH(bp_rpc_binding.caller_asid) == ASID_HIGH(asid_base)
+            || ASID_HIGH(bp_rpc_binding.server_asid) == ASID_HIGH(asid_base))) {
+        bp_rpc_revoke();
+    }
+}

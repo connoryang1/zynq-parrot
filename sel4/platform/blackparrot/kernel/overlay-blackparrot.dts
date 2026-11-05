@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+/ {
+    chosen {
+        seL4,kernel-devices = &{/soc/clint@300000};
+    };
+
+    reserved-memory {
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+
+        sbi@80000000 {
+            reg = <0x0 0x80000000 0x0 0x00200000>;
+            no-map;
+        };
+    };
+};
