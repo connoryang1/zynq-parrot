@@ -232,7 +232,7 @@ def analyze(path, bootstrap_samples=20000):
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
             "Measure one wake-time tagged command whose hardware follow "
-            "launches instruction replay only after data replay drains."
+            "launches instruction replay before ordered data replay."
             if mode == "joint-split" else
             "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."

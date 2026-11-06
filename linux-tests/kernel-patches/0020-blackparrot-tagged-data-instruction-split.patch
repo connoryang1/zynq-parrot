@@ -1,8 +1,7 @@
 This patch adds a source-level mode for hardware-sequenced joint replay. Mode
 twelve issues one tagged data-footprint command at successful wakeup with a
-follow bit that launches shared instruction-prefix replay only after the data
-controller and its downstream D-UCE state drain. No final-selection software
-hook is needed.
+follow bit that launches shared instruction-prefix replay before the ordered
+data footprint. No final-selection software hook is needed.
 
 --- a/arch/riscv/include/asm/switch_to.h
 +++ b/arch/riscv/include/asm/switch_to.h
@@ -18,7 +17,7 @@ hook is needed.
 @@ -314 +314,2 @@
 -/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay. */
 +/* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay;
-+ * 12 hardware-sequenced tagged-data then instruction replay. */
++ * 12 hardware-sequenced instruction then tagged-data replay. */
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
 @@ -4370 +4370,2 @@

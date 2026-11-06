@@ -186,16 +186,28 @@ int main(int argc, char **argv) {
       tick();
     }
 
+    // Model unrelated kernel data traffic at wakeup. It must not delay the
+    // independent instruction trigger, but followed data must remain held
+    // until the older D-UCE state drains.
+    dut.downstream_outstanding_i = 2;
+    dut.downstream_complete_i = 1;
     dut.follow_ready_i = 1;
     dut.eval();
     require(dut.follow_trigger_o,
-            "instruction trigger missing before data replay");
+            "D-UCE traffic postponed the independent instruction trigger");
     require(!dut.replay_v_o,
             "data replay overlapped instruction trigger");
     tick();
     require(!dut.follow_trigger_o, "instruction trigger lasted more than one cycle");
 
     dut.follow_active_i = 1;
+    for (unsigned cycle = 0; cycle < 3; ++cycle) {
+      require(!dut.replay_v_o,
+              "followed data escaped before older D-UCE state drained");
+      tick();
+    }
+    dut.downstream_outstanding_i = 0;
+    dut.downstream_complete_i = 0;
     for (unsigned cycle = 0; cycle < 40 && replay_count < 2; ++cycle) {
       if (dut.replay_v_o) {
         require(dut.follow_active_i,

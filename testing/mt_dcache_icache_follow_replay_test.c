@@ -8,6 +8,8 @@
 
 #define REPLAY_SLOT 1
 #define FOLLOW_INSTRUCTION_PREFIX 4
+#define CONTENTION_COMMANDS 2
+#define CONTENTION_FOLLOWS 1
 #define STRESS_ITERS 128
 #define RESIDENT_ITERS 32
 
@@ -79,6 +81,29 @@ int main(void)
 
   uint64_t dstatus = 0, istatus = 0;
   uint64_t instruction_sum = 0;
+
+  /* Queue a follow command behind a cold data replay.  The first command's
+   * D-UCE request should not postpone the independent instruction trigger;
+   * the followed data remains ordered behind that older D-UCE state. */
+  __asm__ volatile("fence.i" : : : "memory");
+  __asm__ volatile("csrw 0x9c3, %0"
+                    : : "r"((uint64_t)REPLAY_SLOT) : "memory");
+  __asm__ volatile("csrw 0x9c3, %0"
+                    : : "r"((uint64_t)(REPLAY_SLOT
+                                         | FOLLOW_INSTRUCTION_PREFIX))
+                    : "memory");
+  {
+    unsigned timeout = 100000;
+    do {
+      dstatus = data_status();
+      istatus = prefix_status();
+      if (!--timeout)
+        fail("contention timeout", dstatus, istatus);
+    } while ((dstatus & 1) || ((dstatus >> 1) & 3)
+             || ((dstatus >> 60) & 0xf) || (istatus & (1ULL << 1))
+             || (((istatus >> 38) & 0xff) < CONTENTION_FOLLOWS));
+  }
+
   for (unsigned iter = 0; iter < STRESS_ITERS; iter++) {
     /* Force the shared prefix to become useful again instead of letting later
      * commands collapse into resident-entry drops. Bit two remains the only
@@ -97,7 +122,8 @@ int main(void)
         fail("timeout", dstatus, istatus);
     } while ((dstatus & 1) || ((dstatus >> 1) & 3)
              || ((dstatus >> 60) & 0xf) || (istatus & (1ULL << 1))
-             || (((istatus >> 38) & 0xff) <= iter));
+             || (((istatus >> 38) & 0xff)
+                 <= CONTENTION_FOLLOWS + iter));
 
     if (data_target.value != 0x123456789abcdef0ULL)
       fail("data corrupted", dstatus, istatus);
@@ -123,7 +149,8 @@ int main(void)
         fail("resident-prefix timeout", dstatus, istatus);
     } while ((dstatus & 1) || ((dstatus >> 1) & 3)
              || ((dstatus >> 60) & 0xf) || (istatus & (1ULL << 1))
-             || (((istatus >> 38) & 0xff) <= STRESS_ITERS + iter));
+             || (((istatus >> 38) & 0xff)
+                 <= CONTENTION_FOLLOWS + STRESS_ITERS + iter));
 
     if (data_target.value != 0x123456789abcdef0ULL)
       fail("resident-prefix data corrupted", dstatus, istatus);
@@ -132,11 +159,13 @@ int main(void)
   }
 
   if ((((dstatus >> 10) & 0xffff) + ((dstatus >> 26) & 0xffff))
-        != STRESS_ITERS + RESIDENT_ITERS
-      || ((dstatus >> 42) & 0xff) != STRESS_ITERS + RESIDENT_ITERS
+        != CONTENTION_COMMANDS + STRESS_ITERS + RESIDENT_ITERS
+      || ((dstatus >> 42) & 0xff)
+         != CONTENTION_COMMANDS + STRESS_ITERS + RESIDENT_ITERS
       || ((dstatus >> 50) & 0xff) != 0
-      || ((istatus >> 22) & 0xffff) != 2 * STRESS_ITERS
-      || ((istatus >> 38) & 0xff) != STRESS_ITERS + RESIDENT_ITERS
+      || ((istatus >> 22) & 0xffff) != 2 * (CONTENTION_FOLLOWS + STRESS_ITERS)
+      || ((istatus >> 38) & 0xff)
+         != CONTENTION_FOLLOWS + STRESS_ITERS + RESIDENT_ITERS
       || ((istatus >> 46) & 0xff) != 0
       || ((istatus >> 55) & 0x1ff) != 2 * RESIDENT_ITERS)
     fail("counter mismatch", dstatus, istatus);
