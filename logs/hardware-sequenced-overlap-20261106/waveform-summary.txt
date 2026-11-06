@@ -27,3 +27,15 @@ data_without_iuce_occupancy=32
 The final 32 commands intentionally omit fence.i. Their 64 prefix entries are
 reported by the architectural status as resident drops, so no I-UCE allocation
 is expected; all 32 tagged-data launches and target checks still complete.
+
+Representative first resident-prefix command (command 129):
+time=5072925000 follow_trigger=1 data_replay=0 instruction_replay=0 iuce_occupancy=0000
+time=5072975000 follow_wait=1
+time=5073025000 follow_seen=1 follow_launched=1 iuce_occupancy=0000
+time=5073075000 follow_wait=0 follow_seen=0 follow_launched=0
+time=5073175000 data_replay=1 iuce_occupancy=0000
+time=5073275000 data_replay=0 iuce_occupancy=0000
+
+No instruction replay reaches the I-UCE in this resident case. The prefix
+controller still exposes its active boundary, allowing the registered follow
+sequencer to release data after the resident-drop decision.
