@@ -17,11 +17,11 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     """Create a complete synthetic matched A/B transcript and status."""
     kernel_modes = {
         "off": 0, "data": 9, "data-late": 11,
-        "instruction-select": 3, "instruction-wake": 6, "joint": 10,
+        "instruction-select": 3, "instruction-wake": 13, "joint": 10,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
-    expected_hooks = 0 if mode == "instruction-wake" else 1
+    expected_hooks = 1
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
@@ -149,15 +149,15 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["mode"], "instruction-wake")
-        self.assertEqual(result["config"]["kernel_mode"], 6)
-        self.assertEqual(result["config"]["expected_hooks"], 0)
+        self.assertEqual(result["config"]["kernel_mode"], 13)
+        self.assertEqual(result["config"]["expected_hooks"], 1)
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
 
     def test_counter_only_mode_four_cannot_be_labeled_instruction_wakeup(self):
         with tempfile.TemporaryDirectory() as directory:
             path = write_run(Path(directory), mode="instruction-wake")
-            text = path.read_text().replace("kernel_mode=6", "kernel_mode=4")
+            text = path.read_text().replace("kernel_mode=13", "kernel_mode=4")
             path.write_text(text)
             with self.assertRaisesRegex(ValueError, "kernel mode"):
                 analyze(path, bootstrap_samples=10)

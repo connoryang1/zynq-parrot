@@ -375,11 +375,10 @@ int main(int argc, char **argv)
 			mode = 3;
 		else if (!strcmp(argv[1], "instruction-wake")) {
 			/* Kernel mode four is the selection-time counter-only control.
-			 * Mode six is the actual successful-wakeup 0x5c0 trigger and does
-			 * not update bp_preview_hook_count. The futex wake-count gate still
-			 * proves that every accepted sample performed a real wakeup. */
-			mode = 6;
-			expected_enabled_hooks = 0;
+			 * Mode six combines wakeup instruction replay with late physical
+			 * data replay. Mode thirteen is the dedicated instruction-only
+			 * successful-wakeup trigger and accounts for exactly one hook. */
+			mode = 13;
 		}
 		else if (!strcmp(argv[1], "joint"))
 			mode = 10;

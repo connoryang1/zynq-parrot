@@ -1,0 +1,47 @@
+This patch adds a dedicated instruction-only successful-wakeup replay mode.
+Mode thirteen writes the shared instruction-prefix trigger and accounts for one
+hook, but it issues no physical or tagged data replay and has no selection-time
+fallback. This avoids reusing mode four (counter only) or mode six (instruction
+wakeup plus late physical data replay).
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -312,7 +312,8 @@
+ /* Pin up to four target user pages for cross-mm physical L2 preview. */
+ #define PR_BP_PREVIEW_PIN_SET	0x42505059
+ /* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay;
+- * 12 hardware-sequenced tagged-data then instruction replay. */
++ * 12 hardware-sequenced tagged-data then instruction replay;
++ * 13 successful-wakeup instruction replay only. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ /* Last successful-wakeup preview-hook duration in global BP cycles. */
+ #define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -4364,3 +4364,7 @@
+-		if (bp_preview_mode == 1 || bp_preview_mode == 6
+-		    || bp_preview_mode == 7 || bp_preview_mode == 10)
++		if (bp_preview_mode == 1 || bp_preview_mode == 6
++		    || bp_preview_mode == 7 || bp_preview_mode == 10
++		    || bp_preview_mode == 13)
+-			asm volatile("csrw 0x5c0, zero" ::: "memory");
++			asm volatile("csrw 0x5c0, zero" ::: "memory");
++		if (bp_preview_mode == 13)
++			WRITE_ONCE(p->thread.bp_preview_hook_count,
++				   READ_ONCE(p->thread.bp_preview_hook_count) + 1);
+@@ -6716,2 +6719,3 @@
+-		    && bp_preview_mode != 11
+-		    && bp_preview_mode != 12) {
++		    && bp_preview_mode != 11
++		    && bp_preview_mode != 12
++		    && bp_preview_mode != 13) {
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2786 +2786 @@
+-		if (arg2 > 12 || arg3 || arg4 || arg5) {
++		if (arg2 > 13 || arg3 || arg4 || arg5) {
+@@ -2794,2 +2794,2 @@
+-		if (arg2 >= 9
++		if (arg2 >= 9 && arg2 <= 12
+-		    && !READ_ONCE(me->thread.bp_preview_replay_state)) {
++		    && !READ_ONCE(me->thread.bp_preview_replay_state)) {

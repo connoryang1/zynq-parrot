@@ -138,7 +138,7 @@ def analyze(path, bootstrap_samples=20000):
             "data": 9,
             "data-late": 11,
             "instruction-select": 3,
-            "instruction-wake": 6,
+            "instruction-wake": 13,
             "joint": 10,
             "joint-split": 12,
             "joint-split-one-hook": 12,
@@ -148,7 +148,7 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("mode name does not match configured kernel mode")
     elif mode == "instruction-wake":
         raise ValueError(
-            "instruction-wake transcript lacks corrected kernel-mode binding"
+            "instruction-wake transcript lacks dedicated kernel-mode binding"
         )
     if (config["lines"] not in range(4, 33, 4) or config["slot"] != 2):
         raise ValueError("unexpected replay footprint shape")
