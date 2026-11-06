@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from analyze_scheduler_tagged_replay import analyze
+from compare_scheduler_tagged_replay_prefixes import compare as compare_prefixes
 from compare_scheduler_tagged_replay_routes import compare
 from pool_scheduler_tagged_replay_replicates import pool
 
@@ -14,7 +15,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
               layout="aligned", mode="data", sync="pipe",
               enabled_load=280, bitstream_sha256="5" * 64,
-              prefix_entries=16):
+              prefix_entries=16, nbf_sha256="1" * 64):
     """Create a complete synthetic matched A/B transcript and status."""
     kernel_modes = {
         "off": 0, "data": 9, "data-late": 11,
@@ -81,7 +82,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     path.write_text("\n".join(rows) + "\n")
     status = {
         "status": "PASS",
-        "nbf_sha256": "1" * 64,
+        "nbf_sha256": nbf_sha256,
         "transfer_sha256": "2" * 64,
         "elf_sha256": "3" * 64,
         "control_program_sha256": "4" * 64,
@@ -351,6 +352,70 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                     bitstream_sha256=bit * 64,
                 ))
             result = compare(paths[:2], paths[2:], bootstrap_samples=10)
+        self.assertEqual(len(result["control"]["transcripts"]), 2)
+        self.assertEqual(len(result["candidate"]["transcripts"]), 2)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]
+                  ["candidate_incremental_saved_cycles"],
+            20,
+        )
+
+    def test_prefix_comparison_holds_route_and_benchmark_fixed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-wake",
+                prefix_entries=16, nbf_sha256="1" * 64,
+                enabled_load=280,
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-wake",
+                prefix_entries=3, nbf_sha256="2" * 64,
+                enabled_load=260,
+            )
+            result = compare_prefixes(control, candidate, bootstrap_samples=10)
+        self.assertEqual(result["control"]["configured_entries"], 16)
+        self.assertEqual(result["candidate"]["configured_entries"], 3)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]
+                  ["candidate_incremental_saved_cycles"],
+            20,
+        )
+
+    def test_prefix_comparison_rejects_same_nbf(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-wake", prefix_entries=16
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-wake", prefix_entries=3
+            )
+            with self.assertRaisesRegex(ValueError, "distinct NBFs"):
+                compare_prefixes(control, candidate, bootstrap_samples=10)
+
+    def test_prefix_comparison_pools_independent_boots(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paths = []
+            for name, prefix, nbf, load in (
+                    ("control1", 16, "1", 280),
+                    ("control2", 16, "1", 280),
+                    ("candidate1", 3, "2", 260),
+                    ("candidate2", 3, "2", 260)):
+                (root / name).mkdir()
+                paths.append(write_run(
+                    root / name, mode="instruction-wake",
+                    prefix_entries=prefix, nbf_sha256=nbf * 64,
+                    enabled_load=load,
+                ))
+            result = compare_prefixes(
+                paths[:2], paths[2:], bootstrap_samples=10
+            )
         self.assertEqual(len(result["control"]["transcripts"]), 2)
         self.assertEqual(len(result["candidate"]["transcripts"]), 2)
         self.assertEqual(
