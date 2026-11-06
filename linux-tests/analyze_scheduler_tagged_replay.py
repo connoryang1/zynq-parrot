@@ -190,7 +190,7 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("disabled preblock probe reported nonzero data")
 
     admitted = filtered = accepted_triggers = 0
-    expected_enabled_hooks = 2 if mode == "joint-split" else 1
+    expected_enabled_hooks = 1
     for index, row in enumerate(rows):
         if row["hooks"] != row["enabled"] * expected_enabled_hooks:
             raise ValueError(f"trial {index} has invalid hook count")
@@ -231,8 +231,8 @@ def analyze(path, bootstrap_samples=20000):
             "Measure wake-time tagged data while the selection block is "
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
-            "Measure wake-time tagged data followed by selection-time "
-            "instruction replay under the matched workload."
+            "Measure one wake-time tagged command whose hardware follow "
+            "launches instruction replay only after data replay drains."
             if mode == "joint-split" else
             "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."

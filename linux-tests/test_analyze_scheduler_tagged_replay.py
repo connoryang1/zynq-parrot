@@ -44,7 +44,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             entry_status |= 2 << 58
         rows.append(
             f"TAGGED_REPLAY trial={trial} enabled={enabled} "
-            f"hooks={enabled * (2 if mode == 'joint-split' else 1)} woken=1 "
+            f"hooks={enabled} woken=1 "
             f"hook_cycles={10 + enabled} admitted={admitted} filtered=0 "
             f"triggers={triggers} dropped=0 wake_to_entry={entry} "
             f"load_cycles={load} wake_to_load={entry + load} "
@@ -153,11 +153,11 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
 
-    def test_split_joint_mode_requires_both_hooks(self):
+    def test_split_joint_mode_requires_one_hardware_command_hook(self):
         with tempfile.TemporaryDirectory() as directory:
             path = write_run(Path(directory), mode="joint-split")
             path.write_text(path.read_text().replace(
-                "enabled=1 hooks=2", "enabled=1 hooks=1", 1
+                "enabled=1 hooks=1", "enabled=1 hooks=2", 1
             ))
             with self.assertRaisesRegex(ValueError, "invalid hook count"):
                 analyze(path, bootstrap_samples=10)

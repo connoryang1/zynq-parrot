@@ -368,8 +368,6 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
-	if (!strcmp(mode_name, "joint-split"))
-		expected_enabled_hooks = 2;
 	if (argc >= 3) {
 		char *end;
 		unsigned long parsed = strtoul(argv[2], &end, 10);
