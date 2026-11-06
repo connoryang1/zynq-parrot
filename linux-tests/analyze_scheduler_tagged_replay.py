@@ -26,6 +26,9 @@ ROW = re.compile(
 PROBE_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* probe_status=(0|1)")
 LAYOUT_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* layout=(aligned|skew)")
 SYNC_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* sync=(pipe|futex)")
+KERNEL_CONFIG = re.compile(
+    r"TAGGED_REPLAY_CONFIG .* kernel_mode=(\d+) expected_hooks=(\d+)"
+)
 PROBE_ROW = re.compile(
     r"^TAGGED_REPLAY trial=(\d+).* preblock_status=0x([0-9a-fA-F]{16}) "
     r"preblock_probe_cycles=(\d+) entry_probe_status=0x([0-9a-fA-F]{16}) "
@@ -124,6 +127,29 @@ def analyze(path, bootstrap_samples=20000):
     if len(sync_configs) > 1:
         raise ValueError("expected at most one synchronization style")
     config["sync"] = sync_configs[0] if sync_configs else "pipe"
+    kernel_configs = KERNEL_CONFIG.findall(text)
+    if len(kernel_configs) > 1:
+        raise ValueError("expected at most one kernel-mode configuration")
+    if kernel_configs:
+        config["kernel_mode"] = int(kernel_configs[0][0])
+        config["expected_hooks"] = int(kernel_configs[0][1])
+        expected_kernel_modes = {
+            "off": 0,
+            "data": 9,
+            "data-late": 11,
+            "instruction-select": 3,
+            "instruction-wake": 6,
+            "joint": 10,
+            "joint-split": 12,
+            "joint-split-one-hook": 12,
+            "joint-follow-only": 12,
+        }
+        if config["kernel_mode"] != expected_kernel_modes[mode]:
+            raise ValueError("mode name does not match configured kernel mode")
+    elif mode == "instruction-wake":
+        raise ValueError(
+            "instruction-wake transcript lacks corrected kernel-mode binding"
+        )
     if (config["lines"] not in range(4, 33, 4) or config["slot"] != 2):
         raise ValueError("unexpected replay footprint shape")
     for key in ("mode", "delay", "gap", "policy", "lead_cycles"):
@@ -192,7 +218,7 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("disabled preblock probe reported nonzero data")
 
     admitted = filtered = accepted_triggers = 0
-    expected_enabled_hooks = 1
+    expected_enabled_hooks = config.get("expected_hooks", 1)
     for index, row in enumerate(rows):
         if row["hooks"] != row["enabled"] * expected_enabled_hooks:
             raise ValueError(f"trial {index} has invalid hook count")

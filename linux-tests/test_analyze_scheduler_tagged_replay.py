@@ -15,11 +15,19 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               layout="aligned", mode="data", sync="pipe",
               enabled_load=280, bitstream_sha256="5" * 64):
     """Create a complete synthetic matched A/B transcript and status."""
+    kernel_modes = {
+        "off": 0, "data": 9, "data-late": 11,
+        "instruction-select": 3, "instruction-wake": 6, "joint": 10,
+        "joint-split": 12, "joint-split-one-hook": 12,
+        "joint-follow-only": 12,
+    }
+    expected_hooks = 0 if mode == "instruction-wake" else 1
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
         f"policy=fifo lead_cycles=0 layout={layout} "
-        f"probe_status={int(probe_status)} sync={sync}"
+        f"probe_status={int(probe_status)} sync={sync} "
+        f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks}"
     ]
     for trial in range(512):
         enabled = (0 if mode == "off" else
@@ -45,7 +53,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             entry_status |= 2 << 58
         rows.append(
             f"TAGGED_REPLAY trial={trial} enabled={enabled} "
-            f"hooks={enabled} woken=1 "
+            f"hooks={enabled * expected_hooks} woken=1 "
             f"hook_cycles={10 + enabled} admitted={admitted} filtered=0 "
             f"triggers={triggers} dropped=0 wake_to_entry={entry} "
             f"load_cycles={load} wake_to_load={entry + load} "
@@ -141,8 +149,18 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["mode"], "instruction-wake")
+        self.assertEqual(result["config"]["kernel_mode"], 6)
+        self.assertEqual(result["config"]["expected_hooks"], 0)
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
+
+    def test_counter_only_mode_four_cannot_be_labeled_instruction_wakeup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory), mode="instruction-wake")
+            text = path.read_text().replace("kernel_mode=6", "kernel_mode=4")
+            path.write_text(text)
+            with self.assertRaisesRegex(ValueError, "kernel mode"):
+                analyze(path, bootstrap_samples=10)
 
     def test_split_joint_mode_requires_data_counters(self):
         with tempfile.TemporaryDirectory() as directory:

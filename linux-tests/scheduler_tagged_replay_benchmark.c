@@ -373,8 +373,14 @@ int main(int argc, char **argv)
 			mode = 0;
 		else if (!strcmp(argv[1], "instruction-select"))
 			mode = 3;
-		else if (!strcmp(argv[1], "instruction-wake"))
-			mode = 4;
+		else if (!strcmp(argv[1], "instruction-wake")) {
+			/* Kernel mode four is the selection-time counter-only control.
+			 * Mode six is the actual successful-wakeup 0x5c0 trigger and does
+			 * not update bp_preview_hook_count. The futex wake-count gate still
+			 * proves that every accepted sample performed a real wakeup. */
+			mode = 6;
+			expected_enabled_hooks = 0;
+		}
 		else if (!strcmp(argv[1], "joint"))
 			mode = 10;
 		else if (!strcmp(argv[1], "data-late"))
@@ -478,12 +484,13 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status,
-	       sync == sync_futex ? "futex" : "pipe");
+	       sync == sync_futex ? "futex" : "pipe", mode,
+	       expected_enabled_hooks);
 	child = fork();
 	if (child < 0)
 		fail("fork");
