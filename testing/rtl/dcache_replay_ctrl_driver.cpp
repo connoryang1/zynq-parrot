@@ -28,10 +28,12 @@ int main(int argc, char **argv) {
     dut.entry_write_v_i = 0;
     dut.config_write_v_i = 0;
     dut.trigger_v_i = 0;
+    dut.trigger_follow_i = 0;
     dut.replay_yumi_i = 0;
     dut.replay_accepted_i = 0;
     dut.downstream_outstanding_i = 0;
     dut.downstream_complete_i = 0;
+    dut.follow_ready_i = 1;
     dut.clear_counters_i = 0;
     tick(); tick();
     dut.reset_i = 0;
@@ -141,9 +143,103 @@ int main(int argc, char **argv) {
     require(((dut.status_o >> 10) & 0xffffffffffffULL) == 0,
             "counter clear did not clear replay/trigger counters");
 
+    // Reset away the queue-pressure case, then prove that a follow command
+    // cannot trigger instruction replay until admitted D-UCE work and its
+    // completed-response buffer have both drained.  A queued command must not
+    // overtake that pulse.
+    dut.reset_i = 1;
+    dut.downstream_outstanding_i = 0;
+    dut.downstream_complete_i = 0;
+    tick(); tick();
+    dut.reset_i = 0;
+    tick();
+
+    dut.entry_write_slot_i = 1;
+    dut.entry_write_index_i = 0;
+    dut.entry_write_paddr_i = 0x80020000ULL;
+    pulse(dut.entry_write_v_i);
+    dut.config_write_slot_i = 1;
+    dut.config_write_count_i = 1;
+    dut.config_write_delay_i = 0;
+    dut.config_write_gap_i = 0;
+    pulse(dut.config_write_v_i);
+
+    // Begin at zero to model the final replay admission and the downstream
+    // allocation becoming visible only after that controller edge.
+    dut.downstream_outstanding_i = 0;
+    dut.trigger_slot_i = 1;
+    dut.trigger_follow_i = 1;
+    pulse(dut.trigger_v_i);
+    dut.trigger_follow_i = 0;
+    pulse(dut.trigger_v_i);
+
+    unsigned replay_count = 0;
+    for (unsigned cycle = 0; cycle < 40 && replay_count == 0; ++cycle) {
+      if (dut.replay_v_o) {
+        dut.replay_yumi_i = 1;
+        dut.replay_accepted_i = 1;
+        ++replay_count;
+      }
+      require(!dut.follow_trigger_o,
+              "follow trigger escaped while data was outstanding");
+      tick();
+      dut.replay_yumi_i = 0;
+      dut.replay_accepted_i = 0;
+    }
+    require(replay_count == 1, "follow command did not replay its data entry");
+    require(!dut.follow_trigger_o,
+            "follow trigger escaped before downstream allocation settled");
+    dut.downstream_outstanding_i = 2;
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.replay_v_o,
+              "queued command overtook pending instruction follow");
+      require(!dut.follow_trigger_o,
+              "follow trigger ignored outstanding data state");
+      tick();
+    }
+
+    dut.downstream_outstanding_i = 0;
+    dut.downstream_complete_i = 1;
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.follow_trigger_o,
+              "follow trigger ignored completed-response state");
+      tick();
+    }
+
+    dut.downstream_complete_i = 0;
+    dut.follow_ready_i = 0;
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.follow_trigger_o,
+              "follow trigger ignored instruction-controller backpressure");
+      tick();
+    }
+    dut.follow_ready_i = 1;
+    dut.eval();
+    require(dut.follow_trigger_o,
+            "follow trigger missing after complete downstream drain");
+    tick();
+    require(!dut.follow_trigger_o, "follow trigger lasted more than one cycle");
+
+    for (unsigned cycle = 0; cycle < 40 && replay_count == 1; ++cycle) {
+      if (dut.replay_v_o) {
+        dut.replay_yumi_i = 1;
+        dut.replay_accepted_i = 1;
+        ++replay_count;
+      }
+      tick();
+      dut.replay_yumi_i = 0;
+      dut.replay_accepted_i = 0;
+    }
+    require(replay_count == 2, "queued non-follow command did not resume");
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.follow_trigger_o,
+              "non-follow command emitted an instruction trigger");
+      tick();
+    }
+
     std::cout << "[DCACHE-REPLAY-CTRL] PASS: tagged command queue, delayed "
                  "32-entry replay, gap throttle, backpressure, filtering, "
-                 "counters, drain-age telemetry\n";
+                 "counters, drain-age telemetry, downstream-drained follow\n";
     return 0;
   } catch (const std::exception &error) {
     std::cerr << "[DCACHE-REPLAY-CTRL] FAIL: " << error.what() << "\n";
