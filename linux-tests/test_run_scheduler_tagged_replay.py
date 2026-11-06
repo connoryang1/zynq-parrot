@@ -33,6 +33,7 @@ class TaggedReplayRunnerTest(unittest.TestCase):
     def test_kernel_failure_markers_are_bound(self):
         for marker in ("BUG:", "Kernel panic", "Oops:", "Oops [#1]",
                        "scheduling while atomic", "Segmentation fault",
+                       "scheduler_tagge[41]: unhandled signal 11 code 0x2",
                        "RT throttling activated"):
             self.assertIsNotNone(runner.KERNEL_FAILURE_MARKER.search(marker))
 

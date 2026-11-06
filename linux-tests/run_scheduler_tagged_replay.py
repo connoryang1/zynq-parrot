@@ -22,7 +22,7 @@ MAX_GUEST_COMMAND_LENGTH = 768
 TIMER_GUARD_MARKER = "BP_REPLAY_TIMER_GUARD"
 KERNEL_FAILURE_MARKER = re.compile(
     r"(?:BUG:|Kernel panic|Oops(?:[: ]|\r?\n)|scheduling while atomic|"
-    r"Segmentation fault|RT throttling activated)"
+    r"Segmentation fault|unhandled signal [0-9]+|RT throttling activated)"
 )
 
 

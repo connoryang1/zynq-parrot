@@ -333,6 +333,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "RT throttling activated"):
                 analyze(path, bootstrap_samples=10)
 
+    def test_unhandled_userspace_signal_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory))
+            path.write_text(
+                path.read_text()
+                + "scheduler_tagge[41]: unhandled signal 11 code 0x2\n"
+            )
+            with self.assertRaisesRegex(ValueError, "unhandled signal"):
+                analyze(path, bootstrap_samples=10)
+
 
 if __name__ == "__main__":
     unittest.main()

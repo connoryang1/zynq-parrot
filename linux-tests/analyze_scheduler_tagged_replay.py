@@ -147,7 +147,8 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("missing CORE PASS")
     for marker in ("BUG:", "Kernel panic", "Oops:", "BP_REPLAY_TIMER_GUARD",
                    "scheduling while atomic",
-                   "Segmentation fault", "RT throttling activated"):
+                   "Segmentation fault", "unhandled signal ",
+                   "RT throttling activated"):
         if marker in text:
             raise ValueError(f"contains kernel failure marker {marker!r}")
     retry_markers = len(re.findall(r"^TAGGED_REPLAY_RETRY ", text, re.MULTILINE))
