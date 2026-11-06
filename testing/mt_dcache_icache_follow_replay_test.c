@@ -9,6 +9,7 @@
 #define REPLAY_SLOT 1
 #define FOLLOW_INSTRUCTION_PREFIX 4
 #define STRESS_ITERS 128
+#define RESIDENT_ITERS 32
 
 struct cache_line { uint64_t value, padding[7]; };
 
@@ -104,13 +105,40 @@ int main(void)
     instruction_sum += instruction_target_b(iter);
   }
 
+  uint64_t resident_instruction_sum = 0;
+  for (unsigned iter = 0; iter < RESIDENT_ITERS; iter++) {
+    /* Linux does not invalidate the I-cache before every scheduler trigger.
+     * Keep both prefix lines resident and require the hardware follow to make
+     * progress through the prefix controller's resident-drop path. */
+    __asm__ volatile("csrw 0x9c3, %0"
+                      : : "r"((uint64_t)(REPLAY_SLOT
+                                         | FOLLOW_INSTRUCTION_PREFIX))
+                      : "memory");
+
+    unsigned timeout = 100000;
+    do {
+      dstatus = data_status();
+      istatus = prefix_status();
+      if (!--timeout)
+        fail("resident-prefix timeout", dstatus, istatus);
+    } while ((dstatus & 1) || ((dstatus >> 1) & 3)
+             || ((dstatus >> 60) & 0xf) || (istatus & (1ULL << 1))
+             || (((istatus >> 38) & 0xff) <= STRESS_ITERS + iter));
+
+    if (data_target.value != 0x123456789abcdef0ULL)
+      fail("resident-prefix data corrupted", dstatus, istatus);
+    resident_instruction_sum += instruction_target_a(iter);
+    resident_instruction_sum += instruction_target_b(iter);
+  }
+
   if ((((dstatus >> 10) & 0xffff) + ((dstatus >> 26) & 0xffff))
-        != STRESS_ITERS
-      || ((dstatus >> 42) & 0xff) != STRESS_ITERS
+        != STRESS_ITERS + RESIDENT_ITERS
+      || ((dstatus >> 42) & 0xff) != STRESS_ITERS + RESIDENT_ITERS
       || ((dstatus >> 50) & 0xff) != 0
       || ((istatus >> 22) & 0xffff) != 2 * STRESS_ITERS
-      || ((istatus >> 38) & 0xff) != STRESS_ITERS
-      || ((istatus >> 46) & 0xff) != 0)
+      || ((istatus >> 38) & 0xff) != STRESS_ITERS + RESIDENT_ITERS
+      || ((istatus >> 46) & 0xff) != 0
+      || ((istatus >> 55) & 0x1ff) != 2 * RESIDENT_ITERS)
     fail("counter mismatch", dstatus, istatus);
 
   uint64_t expected_instruction_sum
@@ -118,6 +146,11 @@ int main(void)
       + (uint64_t)STRESS_ITERS * (17 + 29);
   if (instruction_sum != expected_instruction_sum)
     fail("replayed contents corrupted", dstatus, istatus);
+  uint64_t expected_resident_instruction_sum
+    = (uint64_t)RESIDENT_ITERS * (RESIDENT_ITERS - 1)
+      + (uint64_t)RESIDENT_ITERS * (17 + 29);
+  if (resident_instruction_sum != expected_resident_instruction_sum)
+    fail("resident-prefix contents corrupted", dstatus, istatus);
 
   bp_print_string("[BSG-PASS] hardware-sequenced instruction then data replay\n");
   bp_finish(0);

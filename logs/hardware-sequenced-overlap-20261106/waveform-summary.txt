@@ -16,3 +16,14 @@ data_while_iuce_occupied=128
 data_without_iuce_occupancy=0
 
 The instruction replay signal has one additional rising edge outside the 256 accepted prefix entries counted by the test, so the architectural entry and trigger counters—not a raw global signal-edge count—are used for instruction replay acceptance.
+
+Extended resident-prefix trace scan:
+follow_triggers=160
+instruction_replay_signal_edges=257
+data_replays=160
+data_while_iuce_occupied=128
+data_without_iuce_occupancy=32
+
+The final 32 commands intentionally omit fence.i. Their 64 prefix entries are
+reported by the architectural status as resident drops, so no I-UCE allocation
+is expected; all 32 tagged-data launches and target checks still complete.

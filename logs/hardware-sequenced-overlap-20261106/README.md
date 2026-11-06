@@ -15,7 +15,7 @@ The D-cache replay controller still emits the instruction-prefix trigger first. 
 
 ## Joint stress
 
-The joint test was strengthened from one command to 128 commands. Each iteration executes `fence.i`, emits one bit-2 tagged command, waits for both controllers to become idle, checks the data target, and executes both instruction targets. It requires 128 accepted tagged triggers with no drops, 256 accepted instruction entries, 128 instruction triggers with no drops, and correct target contents.
+The joint test was strengthened from one command to 128 cold/replayed commands plus 32 resident-prefix commands. Each of the first 128 iterations executes `fence.i`, emits one bit-2 tagged command, waits for both controllers to become idle, checks the data target, and executes both instruction targets. The final 32 iterations omit `fence.i`, matching Linux's repeated scheduler-trigger shape and forcing the prefix controller through its resident-drop path. The complete test requires 160 tagged triggers with no drops, 256 accepted instruction entries, 64 resident instruction drops, 160 instruction triggers with no drops, and correct target contents.
 
 Command:
 
@@ -24,7 +24,7 @@ make -C testing clean
 make -C testing -j12 run-mt_dcache_icache_follow_replay_test NUM_THREADS=2 NUM_CONTEXTS=4 TRACE=1 VERILATOR_BUILD_JOBS=12
 ```
 
-Result: the dedicated guest marker, `CORE PASS`, host `BSG PASS`, and `VALID RUN` all complete. The run retires 11,690 instructions. `joint-128.run.log`, `joint-128.prog.riscv`, `joint-128.prog.nbf`, and `joint-128.dump.fst` are immutable copies made before the shared simulator artifacts were reused.
+The clean-build 128-command result reaches the dedicated guest marker, `CORE PASS`, host `BSG PASS`, and `VALID RUN` at 11,690 retired instructions. `joint-128.run.log`, `joint-128.prog.riscv`, `joint-128.prog.nbf`, and `joint-128.dump.fst` are immutable copies made before the shared simulator artifacts were reused. The subsequent software-only resident-prefix extension passes the same terminal gates at 13,736 retired instructions; its exact artifacts use the `resident-prefix` prefix.
 
 ## Waveform proof
 
@@ -40,7 +40,7 @@ bU!  blackparrot.dcache_replay_ctrl.follow_seen_r
 tU!  blackparrot.dcache_replay_ctrl.follow_launched
 ```
 
-For the first observed combined command, the instruction follow pulse occurs at trace time 337125000. Prefix activity is registered at 337225000; the first instruction replay is offered at 337325000. At 337375000 the first I-UCE slot becomes occupied and tagged data is offered in the same trace timestamp. The second instruction replay is offered at 337525000 while that slot remains occupied. A complete trace scan finds 128 tagged-data rising edges and all 128 occur with nonzero I-UCE prefix occupancy; zero tagged-data launches occur without it. `waveform-summary.txt` retains the representative transition sequence and scan result.
+For the first observed combined command, the instruction follow pulse occurs at trace time 337125000. Prefix activity is registered at 337225000; the first instruction replay is offered at 337325000. At 337375000 the first I-UCE slot becomes occupied and tagged data is offered in the same trace timestamp. The second instruction replay is offered at 337525000 while that slot remains occupied. A complete scan of the cold/replayed phase finds 128 tagged-data rising edges and all 128 occur with nonzero I-UCE prefix occupancy. In the extended trace, the additional 32 resident-prefix commands release data with zero I-UCE occupancy after the prefix controller identifies both lines as already resident; all complete and the architectural counters report exactly 64 resident drops. `waveform-summary.txt` retains both scan results.
 
 ## Independent regressions
 
