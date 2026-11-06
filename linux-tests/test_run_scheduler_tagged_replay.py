@@ -110,6 +110,17 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_guest_diagnostic_environment(self):
+        self.assertTrue(
+            runner.benchmark_command(
+                "joint-split", 0, 0, "normal", 0, 8, False,
+                "skew", "futex", True,
+            ).startswith(
+                "BP_TAGGED_REPLAY_DIAG=1 "
+                "/tmp/scheduler_tagged_replay_benchmark_dynamic "
+            )
+        )
+
     def test_delay_range_is_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

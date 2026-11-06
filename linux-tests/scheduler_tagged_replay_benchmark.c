@@ -67,6 +67,17 @@ struct shared_state {
 	struct sample samples[trials];
 };
 
+static int diagnostic_progress;
+
+static void diagnostic_stage(const char *role, const char *stage,
+			     unsigned trial, unsigned enabled)
+{
+	if (diagnostic_progress)
+		fprintf(stderr,
+			"TAGGED_REPLAY_DIAG role=%s stage=%s trial=%u enabled=%u\n",
+			role, stage, trial, enabled);
+}
+
 enum sync_style {
 	sync_pipe,
 	sync_futex,
@@ -211,6 +222,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
 
+		diagnostic_stage("child", "configure_begin", trial, enabled);
 		/* Reconfiguration is outside timing and doubles as an idle barrier,
 		 * preventing a late command from one arm from warming the next arm.
 		 */
@@ -236,7 +248,9 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		samples[trial].accepted = 0;
 		atomic_store_explicit(&samples[trial].wake_count, UINT32_MAX,
 				      memory_order_release);
+		diagnostic_stage("child", "handoff_begin", trial, enabled);
 		child_handoff_begin(in, out, &token, phase, sync);
+		diagnostic_stage("child", "resumed", trial, enabled);
 		entry = cycle();
 		if (probe_status) {
 			uint64_t probe_start = cycle();
@@ -274,6 +288,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				atomic_load_explicit(&samples[trial].wake_count,
 						     memory_order_relaxed));
 			child_handoff_end(out, &token, phase, sync);
+			diagnostic_stage("child", "retry_complete", trial, enabled);
 			if (++retries > max_retries)
 				fail("too many tagged replay retries");
 			continue;
@@ -318,7 +333,9 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		}
 		samples[trial].accepted = 1;
 		samples[trial].done = cycle();
+		diagnostic_stage("child", "accepted_end_begin", trial, enabled);
 		child_handoff_end(out, &token, phase, sync);
+		diagnostic_stage("child", "accepted_complete", trial, enabled);
 		trial++;
 	}
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL))
@@ -442,6 +459,7 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	diagnostic_progress = getenv("BP_TAGGED_REPLAY_DIAG") != NULL;
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
 
@@ -477,7 +495,9 @@ int main(int argc, char **argv)
 	for (unsigned trial = 0; trial < trials;) {
 		uint64_t lead_start;
 		int woken;
+		unsigned enabled = mode ? trial_enabled(trial) : 0;
 
+		diagnostic_stage("parent", "wait_ready", trial, enabled);
 		if (sync == sync_pipe)
 			transfer(to_parent[0], &token, 0);
 		else {
@@ -490,6 +510,7 @@ int main(int argc, char **argv)
 			if (sched_yield())
 				fail("yield before tagged replay wake");
 		}
+		diagnostic_stage("parent", "ready", trial, enabled);
 		samples[trial].launch = cycle();
 		if (sync == sync_pipe) {
 			transfer(to_child[1], &token, 1);
@@ -499,6 +520,7 @@ int main(int argc, char **argv)
 		}
 		atomic_store_explicit(&samples[trial].wake_count, woken,
 				      memory_order_release);
+		diagnostic_stage("parent", "wake_complete", trial, enabled);
 		lead_start = cycle();
 		while (cycle() - lead_start < lead_cycles)
 			__asm__ volatile("" : : : "memory");
@@ -521,9 +543,11 @@ int main(int argc, char **argv)
 		} else {
 			futex_wait_for(&shared->phase, futex_child_done);
 		}
+		diagnostic_stage("parent", "child_done", trial, enabled);
 		samples[trial].returned = cycle();
 		if (sync == sync_futex) {
 			futex_set_wake(&shared->phase, futex_parent_ack);
+			diagnostic_stage("parent", "ack_complete", trial, enabled);
 			/* Do not wait for idle here. The child may pass through idle and
 			 * publish child-ready for the next attempt before this task runs,
 			 * making a transient-state wait deadlock. The next loop's stable

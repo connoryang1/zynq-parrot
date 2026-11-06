@@ -31,9 +31,11 @@ def sha256(path):
 
 
 def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
-                      probe_status=False, layout="aligned", sync="pipe"):
+                      probe_status=False, layout="aligned", sync="pipe",
+                      guest_diagnostic=False):
+    prefix = "BP_TAGGED_REPLAY_DIAG=1 " if guest_diagnostic else ""
     return (
-        f"{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles} "
+        f"{prefix}{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles} "
         f"{lines_per_base} {int(probe_status)} {layout} {sync}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
     )
@@ -93,6 +95,7 @@ def parse_args(argv=None):
     parser.add_argument("--layout", choices=("aligned", "skew"),
                         default="aligned")
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
+    parser.add_argument("--guest-diagnostic", action="store_true")
     parser.add_argument("--print-command", action="store_true")
     return parser.parse_args(argv)
 
@@ -136,6 +139,7 @@ def run(args):
     command = benchmark_command(
         args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
         args.lines_per_base, args.probe_status, args.layout, args.sync,
+        args.guest_diagnostic,
     )
     status = {
         "status": "running",
@@ -154,6 +158,7 @@ def run(args):
         "probe_status": args.probe_status,
         "layout": args.layout,
         "sync": args.sync,
+        "guest_diagnostic": args.guest_diagnostic,
         "command": command,
     }
     child = None
@@ -233,6 +238,7 @@ def main(argv=None):
         print(benchmark_command(
             args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
             args.lines_per_base, args.probe_status, args.layout, args.sync,
+            args.guest_diagnostic,
         ))
         return 0
     run(args)
