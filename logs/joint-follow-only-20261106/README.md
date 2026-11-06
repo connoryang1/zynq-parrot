@@ -86,8 +86,41 @@ the scoped collision gates.
 
 ## Board result
 
-Pending. A valid run must use the exact routed package and NBF above, complete
-512 phase-balanced skewed/futex trials, observe 256 accepted enabled triggers,
-observe zero admitted, filtered, and dropped entries, and finish with guest,
-kernel, core, and host PASS markers. A terminal or interrupted run requires a
-hard board recovery before any retry.
+Two independently power-cycled, restaged, and reloaded boots pass the exact
+512-trial skewed/futex workload. Each observes 256 accepted hardware-follow
+triggers, zero admitted entries, zero resident-filtered entries, zero drops,
+and terminal parent, core, host, and runner PASS. The first and second
+transcript SHA-256 values are respectively
+`e59d11c96e9c895cd370d377eaec2e475a52fcc16e897d6a83f8db7c60b34acc`
+and `5660173947d8f1f8e870e77a4b231c28bf7af3f4636398e28860325f147a765d`;
+their byte-identical status SHA-256 is
+`a834c4ba956e29b6c080ab7d12d42ec1521c2515d03aff2805bc6cc3aad33c44`.
+
+Boot-stratified pooling of 100,000 resamples reports:
+
+| metric | median cycles saved | 95% interval | median percent saved |
+| --- | ---: | ---: | ---: |
+| hook | -37.5 | [-39.5, -35.5] | -22.86% |
+| wake to target entry | 403.75 | [-1307.5, 1588] | 1.29% |
+| target loads | -5.5 | [-22, 13] | -0.34% |
+| wake through target loads | 344.5 | [-1666.5, 2736] | 1.02% |
+| full roundtrip | -2248.25 | [-5306.5, 413.5] | -2.49% |
+
+Removing all detached data traffic leaves follow-only in the same unresolved
+regime as ordinary 32-line joint replay (`552.25 [-1310,3454.5]` cycles), while
+its target-load interval centers at zero as expected for no data replay. The
+initial interpretation compared this result with two runs labeled
+`instruction-wake`, but source and disassembly audit later proved those runs
+selected kernel mode four, a hook-counter-only control that emits no `0x5c0`
+trigger. Their `3771.5 [588.5,5304.5]` point is not instruction replay evidence.
+
+A corrected dedicated mode-thirteen direct trigger subsequently pools to
+`-460 [-1885.25,685.25]` wake-to-load cycles saved, statistically consistent
+with follow-only and with no benefit. Thus detached data traffic is not the
+primary suppressor, but neither is the hardware-follow path: the configured
+instruction prefix itself does not help this exact workload. See
+`logs/corrected-instruction-wake-20261106/` and the matching durable artifact
+directory for the correction.
+
+Both terminal board runs were followed by mandatory hard recovery. The board
+was left ready at 93 seconds uptime with no experiment overlay reloaded.
