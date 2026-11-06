@@ -29,6 +29,10 @@ SYNC_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* sync=(pipe|futex)")
 KERNEL_CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG .* kernel_mode=(\d+) expected_hooks=(\d+)"
 )
+ICACHE_STATUS = re.compile(
+    r"^TAGGED_REPLAY_ICACHE_STATUS before=0x([0-9a-fA-F]{16}) "
+    r"after=0x([0-9a-fA-F]{16})$", re.MULTILINE
+)
 PROBE_ROW = re.compile(
     r"^TAGGED_REPLAY trial=(\d+).* preblock_status=0x([0-9a-fA-F]{16}) "
     r"preblock_probe_cycles=(\d+) entry_probe_status=0x([0-9a-fA-F]{16}) "
@@ -183,6 +187,59 @@ def analyze(path, bootstrap_samples=20000):
     if retry_pass != [str(retry_markers)]:
         raise ValueError("retry count does not match filtered attempts")
 
+    icache_statuses = ICACHE_STATUS.findall(text)
+    if mode == "instruction-wake":
+        if len(icache_statuses) != 1:
+            raise ValueError("instruction-wake requires one I-cache status marker")
+        before = int(icache_statuses[0][0], 16)
+        after = int(icache_statuses[0][1], 16)
+        before_decoded = {
+            "ready": before & 1,
+            "busy": (before >> 1) & 1,
+            "entry_held": (before >> 2) & 1,
+            "read_pending": (before >> 3) & 1,
+            "configured_entries": (before >> 4) & 0x1ff,
+            "next_index": (before >> 13) & 0x1ff,
+            "accepted_entries": (before >> 22) & 0xffff,
+            "accepted_triggers": (before >> 38) & 0xff,
+            "dropped_triggers": (before >> 46) & 0xff,
+            "resident_query_pending": (before >> 54) & 1,
+            "resident_drops": (before >> 55) & 0x1ff,
+        }
+        after_decoded = {
+            "ready": after & 1,
+            "busy": (after >> 1) & 1,
+            "entry_held": (after >> 2) & 1,
+            "read_pending": (after >> 3) & 1,
+            "configured_entries": (after >> 4) & 0x1ff,
+            "next_index": (after >> 13) & 0x1ff,
+            "accepted_entries": (after >> 22) & 0xffff,
+            "accepted_triggers": (after >> 38) & 0xff,
+            "dropped_triggers": (after >> 46) & 0xff,
+            "resident_query_pending": (after >> 54) & 1,
+            "resident_drops": (after >> 55) & 0x1ff,
+        }
+        if (before_decoded["configured_entries"] != 16
+                or any(before_decoded[key] for key in (
+                    "busy", "entry_held", "read_pending", "next_index",
+                    "accepted_entries", "accepted_triggers",
+                    "dropped_triggers", "resident_query_pending",
+                    "resident_drops"))):
+            raise ValueError("instruction-prefix baseline is not clean and configured")
+        if (after_decoded["configured_entries"] != 16
+                or after_decoded["next_index"] != 16
+                or after_decoded["accepted_triggers"] != 0xff
+                or after_decoded["dropped_triggers"]
+                or any(after_decoded[key] for key in (
+                    "busy", "entry_held", "read_pending",
+                    "resident_query_pending"))):
+            raise ValueError("instruction-prefix replay did not drain cleanly")
+        if not (after_decoded["accepted_entries"]
+                or after_decoded["resident_drops"]):
+            raise ValueError("instruction-prefix triggers processed no entries")
+    elif icache_statuses:
+        raise ValueError("unexpected I-cache status marker for non-instruction mode")
+
     fields = (
         "trial", "enabled", "hooks", "woken", "hook_cycles", "admitted", "filtered",
         "triggers", "dropped", "wake_to_entry", "load_cycles", "wake_to_load",
@@ -294,6 +351,11 @@ def analyze(path, bootstrap_samples=20000):
             for metric in METRICS
         },
     }
+    if mode == "instruction-wake":
+        result["icache_prefix_status"] = {
+            "before": before_decoded,
+            "after": after_decoded,
+        }
     if config["probe_status"]:
         decoded = []
         for trial, raw_status, cycles, entry_status, entry_cycles in probe_rows:

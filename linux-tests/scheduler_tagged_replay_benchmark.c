@@ -30,6 +30,7 @@
 #define PR_BP_PREVIEW_GET_HOOK_CYCLES 0x4250505b
 #define PR_BP_PREVIEW_REPLAY_CONFIG 0x4250505c
 #define PR_BP_PREVIEW_REPLAY_STATUS 0x4250505d
+#define PR_BP_PREVIEW_ICACHE_STATUS 0x4250505e
 #define BP_REPLAY_DRAIN_MASK (0xfUL | (7UL << 60))
 
 enum {
@@ -103,6 +104,16 @@ static void fail(const char *what)
 {
 	perror(what);
 	exit(1);
+}
+
+static uint64_t icache_prefix_status(void)
+{
+	uint64_t status;
+
+	if (syscall(SYS_prctl, PR_BP_PREVIEW_ICACHE_STATUS,
+		    (unsigned long)&status, 0UL, 0UL, 0UL))
+		fail("read instruction-prefix status");
+	return status;
 }
 
 static void transfer(int fd, char *token, int send)
@@ -359,6 +370,7 @@ int main(int argc, char **argv)
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
 	volatile struct sample *samples;
+	uint64_t icache_status_before = 0, icache_status_after = 0;
 	char token = 'x';
 	pid_t child;
 
@@ -490,6 +502,8 @@ int main(int argc, char **argv)
 	       skew_layout ? "skew" : "aligned", probe_status,
 	       sync == sync_futex ? "futex" : "pipe", mode,
 	       expected_enabled_hooks);
+	if (!strcmp(mode_name, "instruction-wake"))
+		icache_status_before = icache_prefix_status();
 	child = fork();
 	if (child < 0)
 		fail("fork");
@@ -575,6 +589,12 @@ int main(int argc, char **argv)
 	if (!WIFEXITED(status) || WEXITSTATUS(status)) {
 		fprintf(stderr, "tagged replay child failed: status=%d\n", status);
 		return 1;
+	}
+	if (!strcmp(mode_name, "instruction-wake")) {
+		icache_status_after = icache_prefix_status();
+		printf("TAGGED_REPLAY_ICACHE_STATUS before=0x%016llx after=0x%016llx\n",
+		       (unsigned long long)icache_status_before,
+		       (unsigned long long)icache_status_after);
 	}
 	for (unsigned trial = warmup; trial < trials; trial++) {
 		const volatile struct sample *s = &samples[trial];

@@ -29,6 +29,14 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         f"probe_status={int(probe_status)} sync={sync} "
         f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks}"
     ]
+    if mode == "instruction-wake":
+        before = (16 << 4) | 1
+        after = ((0x1ff << 55) | (0xff << 38) | (16 << 13)
+                 | (16 << 4) | 1)
+        rows.append(
+            f"TAGGED_REPLAY_ICACHE_STATUS before=0x{before:016x} "
+            f"after=0x{after:016x}"
+        )
     for trial in range(512):
         enabled = (0 if mode == "off" else
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
@@ -153,6 +161,22 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["config"]["expected_hooks"], 1)
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["accepted_triggers"], 255
+        )
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["resident_drops"], 511
+        )
+
+    def test_instruction_wakeup_requires_prefix_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory), mode="instruction-wake")
+            path.write_text("\n".join(
+                line for line in path.read_text().splitlines()
+                if not line.startswith("TAGGED_REPLAY_ICACHE_STATUS ")
+            ) + "\n")
+            with self.assertRaisesRegex(ValueError, "I-cache status marker"):
+                analyze(path, bootstrap_samples=10)
 
     def test_counter_only_mode_four_cannot_be_labeled_instruction_wakeup(self):
         with tempfile.TemporaryDirectory() as directory:

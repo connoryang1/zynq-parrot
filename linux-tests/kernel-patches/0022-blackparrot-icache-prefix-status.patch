@@ -1,0 +1,38 @@
+This patch exposes the shared instruction-prefix controller status to the
+diagnostic benchmark. The status is copied through a userspace pointer because
+its resident-drop counter occupies bit 63 and therefore cannot safely use the
+signed prctl return value.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -321,5 +321,7 @@
+ #define PR_BP_PREVIEW_REPLAY_CONFIG	0x4250505c
+ /* Read replay busy/queue state and saturating hardware counters. */
+ #define PR_BP_PREVIEW_REPLAY_STATUS	0x4250505d
++/* Copy the 64-bit shared instruction-prefix controller status to arg2. */
++#define PR_BP_PREVIEW_ICACHE_STATUS	0x4250505e
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2884,5 +2884,20 @@
+ 		asm volatile("csrr %0, 0x9c3" : "=r"(error) : : "memory");
+ 		break;
++	case PR_BP_PREVIEW_ICACHE_STATUS: {
++		unsigned long status;
++
++		if (!arg2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		asm volatile("csrr %0, 0x5c0" : "=r"(status) : : "memory");
++		if (copy_to_user((unsigned long __user *)arg2, &status,
++				 sizeof(status)))
++			error = -EFAULT;
++		else
++			error = 0;
++		break;
++	}
+ 	case PR_BP_PREVIEW_GET_COUNT:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
