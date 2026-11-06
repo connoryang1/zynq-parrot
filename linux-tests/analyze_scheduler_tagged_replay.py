@@ -219,15 +219,16 @@ def analyze(path, bootstrap_samples=20000):
             "resident_query_pending": (after >> 54) & 1,
             "resident_drops": (after >> 55) & 0x1ff,
         }
-        if (before_decoded["configured_entries"] != 16
+        prefix_entries = before_decoded["configured_entries"]
+        if (prefix_entries not in range(1, 257)
                 or any(before_decoded[key] for key in (
                     "busy", "entry_held", "read_pending", "next_index",
                     "accepted_entries", "accepted_triggers",
                     "dropped_triggers", "resident_query_pending",
                     "resident_drops"))):
             raise ValueError("instruction-prefix baseline is not clean and configured")
-        if (after_decoded["configured_entries"] != 16
-                or after_decoded["next_index"] != 16
+        if (after_decoded["configured_entries"] != prefix_entries
+                or after_decoded["next_index"] != prefix_entries
                 or after_decoded["accepted_triggers"] != 0xff
                 or after_decoded["dropped_triggers"]
                 or any(after_decoded[key] for key in (

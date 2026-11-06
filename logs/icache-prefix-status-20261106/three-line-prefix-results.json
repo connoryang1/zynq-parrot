@@ -1,0 +1,49 @@
+{
+  "purpose": "Select only instruction-prefix lines with a positive demand-event reduction in the matched replay-off/on entry trace pair.",
+  "input_identity": {
+    "source_prefix": "logs/icache-prefix-status-20261106/exact-prefix-results.json",
+    "source_prefix_sha256": "7be071fa18200799ba9c8cd3c072ebbd237c8525fd2676fe398995c4f1c46d34",
+    "matched_analysis": "/home/coyang/fpga-artifacts/context-resume/exact-futex-prefix-20261106/board/matched-entry-prefix-analysis.json",
+    "matched_analysis_sha256": "9e92af1223d61377baad5f6b24174a0213f032b41482414568090a080660d959",
+    "kernel_sha256": "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9"
+  },
+  "fixed_shared_prefix": {
+    "policy": "positive off-minus-on demand-event reduction, descending by reduction then ascending original prefix rank",
+    "line_count": 3,
+    "lines": [
+      {
+        "rank": 0,
+        "relative": 8388,
+        "paddr": 2158045632,
+        "paddr_hex": "0x0000000080a129c0",
+        "cache_set": 39,
+        "source_rank": 2,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      },
+      {
+        "rank": 1,
+        "relative": 8655,
+        "paddr": 2147544000,
+        "paddr_hex": "0x000000008000ebc0",
+        "cache_set": 47,
+        "source_rank": 3,
+        "off_events": 2,
+        "on_events": 1,
+        "event_reduction": 1
+      },
+      {
+        "rank": 2,
+        "relative": 10815,
+        "paddr": 2149907520,
+        "paddr_hex": "0x000000008024fc40",
+        "cache_set": 49,
+        "source_rank": 15,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      }
+    ]
+  }
+}

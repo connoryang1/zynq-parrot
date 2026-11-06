@@ -13,7 +13,8 @@ from pool_scheduler_tagged_replay_replicates import pool
 def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
               layout="aligned", mode="data", sync="pipe",
-              enabled_load=280, bitstream_sha256="5" * 64):
+              enabled_load=280, bitstream_sha256="5" * 64,
+              prefix_entries=16):
     """Create a complete synthetic matched A/B transcript and status."""
     kernel_modes = {
         "off": 0, "data": 9, "data-late": 11,
@@ -30,9 +31,9 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks}"
     ]
     if mode == "instruction-wake":
-        before = (16 << 4) | 1
-        after = ((0x1ff << 55) | (0xff << 38) | (16 << 13)
-                 | (16 << 4) | 1)
+        before = (prefix_entries << 4) | 1
+        after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
+                 | (prefix_entries << 4) | 1)
         rows.append(
             f"TAGGED_REPLAY_ICACHE_STATUS before=0x{before:016x} "
             f"after=0x{after:016x}"
@@ -176,6 +177,37 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 if not line.startswith("TAGGED_REPLAY_ICACHE_STATUS ")
             ) + "\n")
             with self.assertRaisesRegex(ValueError, "I-cache status marker"):
+                analyze(path, bootstrap_samples=10)
+
+    def test_instruction_wakeup_accepts_image_bound_prefix_count(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(
+                    Path(directory), mode="instruction-wake", prefix_entries=3
+                ),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(
+            result["icache_prefix_status"]["before"]["configured_entries"], 3
+        )
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["next_index"], 3
+        )
+
+    def test_instruction_wakeup_rejects_changed_prefix_count(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(
+                Path(directory), mode="instruction-wake", prefix_entries=3
+            )
+            text = path.read_text()
+            old_after = ((0x1ff << 55) | (0xff << 38) | (3 << 13)
+                         | (3 << 4) | 1)
+            changed_after = ((0x1ff << 55) | (0xff << 38) | (4 << 13)
+                             | (4 << 4) | 1)
+            path.write_text(text.replace(
+                f"after=0x{old_after:016x}", f"after=0x{changed_after:016x}"
+            ))
+            with self.assertRaisesRegex(ValueError, "did not drain cleanly"):
                 analyze(path, bootstrap_samples=10)
 
     def test_counter_only_mode_four_cannot_be_labeled_instruction_wakeup(self):

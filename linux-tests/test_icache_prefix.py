@@ -17,28 +17,28 @@ SPEC.loader.exec_module(EMITTER)
 class IcachePrefixTest(unittest.TestCase):
     def setUp(self):
         self.result = json.loads(
-            (ROOT / "logs/icache-prefix-status-20261106/exact-prefix-results.json").read_text()
+            (ROOT / "logs/icache-prefix-status-20261106/three-line-prefix-results.json").read_text()
         )
 
     def test_committed_header_matches_model(self):
-        generated = EMITTER.render(self.result, 16)
+        generated = EMITTER.render(self.result)
         committed = (
             HERE / "opensbi-platform/blackparrot/icache_prefix.h"
         ).read_text()
         self.assertEqual(generated, committed)
-        self.assertEqual(generated.count("UL,"), 16)
+        self.assertEqual(generated.count("UL,"), 3)
         self.assertEqual(
             self.result["input_identity"]["kernel_sha256"],
             "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9",
         )
 
     def test_limit_emits_ranked_prefix(self):
-        generated = EMITTER.render(self.result, 3)
-        self.assertIn("#define BP_ICACHE_PREFIX_COUNT 3U", generated)
-        for line in self.result["fixed_shared_prefix"]["lines"][:3]:
+        generated = EMITTER.render(self.result, 2)
+        self.assertIn("#define BP_ICACHE_PREFIX_COUNT 2U", generated)
+        for line in self.result["fixed_shared_prefix"]["lines"][:2]:
             self.assertIn(f"0x{int(line['paddr']):016x}UL", generated)
-        fourth = self.result["fixed_shared_prefix"]["lines"][3]
-        self.assertNotIn(f"0x{int(fourth['paddr']):016x}UL", generated)
+        third = self.result["fixed_shared_prefix"]["lines"][2]
+        self.assertNotIn(f"0x{int(third['paddr']):016x}UL", generated)
 
     def test_rejects_misaligned_line(self):
         malformed = copy.deepcopy(self.result)
