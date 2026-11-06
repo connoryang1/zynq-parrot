@@ -214,7 +214,7 @@ static unsigned trial_enabled(unsigned trial)
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned mode, unsigned delay, unsigned gap,
 		      unsigned lines_per_base, unsigned config_lines_per_base,
-		      int probe_status, int skew_layout,
+		      int probe_status, int skew_layout, int trace_stop_at_entry,
 		      unsigned expected_enabled_hooks, _Atomic uint32_t *phase,
 		      enum sync_style sync)
 {
@@ -293,6 +293,11 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		child_handoff_begin(in, out, &token, phase, sync);
 		diagnostic_stage("child", "resumed", trial, enabled);
 		entry = cycle();
+		if (samples[trial].trace_start && trace_stop_at_entry) {
+			trace_control(0);
+			__asm__ volatile("nop\nnop\nnop" : : : "memory");
+			samples[trial].trace_status = trace_status();
+		}
 		if (probe_status) {
 			uint64_t probe_start = cycle();
 			long replay_status = syscall(SYS_prctl,
@@ -313,7 +318,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		after_load = cycle();
 		if (node != target_addr[0])
 			fail("tagged replay target checksum");
-		if (samples[trial].trace_start) {
+		if (samples[trial].trace_start && !trace_stop_at_entry) {
 			trace_control(0);
 			__asm__ volatile("nop\nnop\nnop" : : : "memory");
 			samples[trial].trace_status = trace_status();
@@ -401,6 +406,7 @@ int main(int argc, char **argv)
 	const char *mode_name = "data";
 	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
+	int trace_stop_at_entry = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
 	volatile struct sample *samples;
@@ -409,7 +415,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry]\n",
 			argv[0]);
 		return 2;
 	}
@@ -516,6 +522,10 @@ int main(int argc, char **argv)
 	if (argc >= 11) {
 		if (!strcmp(argv[10], "trace-icache"))
 			trace_icache = 1;
+		else if (!strcmp(argv[10], "trace-icache-entry")) {
+			trace_icache = 1;
+			trace_stop_at_entry = 1;
+		}
 		else if (strcmp(argv[10], "no-trace")) {
 			fprintf(stderr, "invalid instruction trace mode: %s\n", argv[10]);
 			return 2;
@@ -537,13 +547,14 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status,
 	       sync == sync_futex ? "futex" : "pipe", mode,
-	       expected_enabled_hooks, trace_icache);
+	       expected_enabled_hooks, trace_icache,
+	       trace_stop_at_entry ? "entry" : "after-load");
 	if (!strcmp(mode_name, "instruction-wake"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
@@ -554,7 +565,7 @@ int main(int argc, char **argv)
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
 			  lines_per_base, config_lines_per_base, probe_status,
-			  skew_layout,
+			  skew_layout, trace_stop_at_entry,
 			  expected_enabled_hooks, &shared->phase, sync);
 		return 0;
 	}

@@ -128,6 +128,22 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_entry_bounded_instruction_trace(self):
+        self.assertIn(
+            " 8 0 skew futex trace-icache-entry; ",
+            runner.benchmark_command(
+                "instruction-wake", 0, 0, "normal", 0, 8, False,
+                "skew", "futex", False, False, True,
+            ),
+        )
+
+    def test_instruction_trace_modes_are_mutually_exclusive(self):
+        with self.assertRaises(SystemExit):
+            runner.parse_args([
+                "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
+                "--trace-icache", "--trace-icache-entry",
+            ])
+
     def test_command_binds_guest_diagnostic_environment(self):
         self.assertTrue(
             runner.benchmark_command(
