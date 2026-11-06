@@ -32,11 +32,12 @@ def sha256(path):
 
 def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
                       probe_status=False, layout="aligned", sync="pipe",
-                      guest_diagnostic=False):
+                      guest_diagnostic=False, trace_icache=False):
     prefix = "BP_TAGGED_REPLAY_DIAG=1 " if guest_diagnostic else ""
     return (
         f"{prefix}{GUEST_ELF} {mode} {delay} {gap} {policy} {lead_cycles} "
-        f"{lines_per_base} {int(probe_status)} {layout} {sync}; "
+        f"{lines_per_base} {int(probe_status)} {layout} {sync}"
+        f"{' trace-icache' if trace_icache else ''}; "
         "rc=$?; echo TAGGED_REPLAY_EXIT rc=$rc"
     )
 
@@ -97,6 +98,7 @@ def parse_args(argv=None):
                         default="aligned")
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--guest-diagnostic", action="store_true")
+    parser.add_argument("--trace-icache", action="store_true")
     parser.add_argument("--print-command", action="store_true")
     return parser.parse_args(argv)
 
@@ -140,7 +142,7 @@ def run(args):
     command = benchmark_command(
         args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
         args.lines_per_base, args.probe_status, args.layout, args.sync,
-        args.guest_diagnostic,
+        args.guest_diagnostic, args.trace_icache,
     )
     status = {
         "status": "running",
@@ -160,6 +162,7 @@ def run(args):
         "layout": args.layout,
         "sync": args.sync,
         "guest_diagnostic": args.guest_diagnostic,
+        "trace_icache": args.trace_icache,
         "command": command,
     }
     child = None
@@ -212,6 +215,8 @@ def run(args):
                        "BSG PASS"):
             if marker not in transcript:
                 raise RuntimeError(f"required marker missing: {marker}")
+        if args.trace_icache and "TAGGED_REPLAY_ITRACE_PASS" not in transcript:
+            raise RuntimeError("required instruction-trace marker missing")
         status.update(status="PASS", runner_exit=0)
     except (Exception, KeyboardInterrupt) as error:
         status.update(
@@ -239,7 +244,7 @@ def main(argv=None):
         print(benchmark_command(
             args.mode, args.delay, args.gap, args.policy, args.lead_cycles,
             args.lines_per_base, args.probe_status, args.layout, args.sync,
-            args.guest_diagnostic,
+            args.guest_diagnostic, args.trace_icache,
         ))
         return 0
     run(args)

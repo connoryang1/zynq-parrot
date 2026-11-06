@@ -32,6 +32,7 @@
 #define PR_BP_PREVIEW_REPLAY_STATUS 0x4250505d
 #define PR_BP_PREVIEW_ICACHE_STATUS 0x4250505e
 #define BP_REPLAY_DRAIN_MASK (0xfUL | (7UL << 60))
+#define TRACE_DEPTH 256U
 
 enum {
 	warmup = 16,
@@ -53,6 +54,7 @@ _Static_assert((bases - 1) * max_lines_per_base * line_bytes
 
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
+	uint64_t trace_start, trace_status;
 	uint64_t preblock_status;
 	uint64_t entry_probe_status;
 	_Atomic unsigned wake_count;
@@ -97,6 +99,33 @@ static inline uint64_t cycle(void)
 	uint64_t value;
 
 	__asm__ volatile("csrr %0, 0xcc0" : "=r"(value) : : "memory");
+	return value;
+}
+
+static inline void trace_control(uint64_t value)
+{
+	__asm__ volatile("csrw 0x805, %0" : : "r"(value) : "memory");
+}
+
+static inline uint64_t trace_status(void)
+{
+	uint64_t value;
+
+	__asm__ volatile("csrr %0, 0x805" : "=r"(value) : : "memory");
+	return value;
+}
+
+static inline uint64_t trace_record(unsigned index)
+{
+	uint64_t value;
+
+	__asm__ volatile(
+		"csrw 0x806, %1\n"
+		"nop\n"
+		"nop\n"
+		"nop\n"
+		"csrr %0, 0x807\n"
+		: "=r"(value) : "r"((uint64_t)index) : "memory");
 	return value;
 }
 
@@ -284,6 +313,11 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		after_load = cycle();
 		if (node != target_addr[0])
 			fail("tagged replay target checksum");
+		if (samples[trial].trace_start) {
+			trace_control(0);
+			__asm__ volatile("nop\nnop\nnop" : : : "memory");
+			samples[trial].trace_status = trace_status();
+		}
 		after_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
 		if (after_hook == (unsigned long)-1)
 			fail("hook count after");
@@ -366,7 +400,7 @@ int main(int argc, char **argv)
 	unsigned long lead_cycles = 0;
 	const char *mode_name = "data";
 	unsigned expected_enabled_hooks = 1;
-	int fifo = 0, probe_status = 0, skew_layout = 0;
+	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
 	volatile struct sample *samples;
@@ -374,8 +408,8 @@ int main(int argc, char **argv)
 	char token = 'x';
 	pid_t child;
 
-	if (argc > 10) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
+	if (argc > 11) {
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache]\n",
 			argv[0]);
 		return 2;
 	}
@@ -479,6 +513,14 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	if (argc >= 11) {
+		if (!strcmp(argv[10], "trace-icache"))
+			trace_icache = 1;
+		else if (strcmp(argv[10], "no-trace")) {
+			fprintf(stderr, "invalid instruction trace mode: %s\n", argv[10]);
+			return 2;
+		}
+	}
 	if (!strcmp(mode_name, "joint-follow-only"))
 		config_lines_per_base = 0;
 	diagnostic_progress = getenv("BP_TAGGED_REPLAY_DIAG") != NULL;
@@ -495,13 +537,13 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status,
 	       sync == sync_futex ? "futex" : "pipe", mode,
-	       expected_enabled_hooks);
+	       expected_enabled_hooks, trace_icache);
 	if (!strcmp(mode_name, "instruction-wake"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
@@ -537,6 +579,11 @@ int main(int argc, char **argv)
 				fail("yield before tagged replay wake");
 		}
 		diagnostic_stage("parent", "ready", trial, enabled);
+		if (trace_icache && trial == warmup + (mode != 0)) {
+			trace_control(2);
+			samples[trial].trace_start = cycle();
+			trace_control(3);
+		}
 		samples[trial].launch = cycle();
 		if (sync == sync_pipe) {
 			transfer(to_child[1], &token, 1);
@@ -589,6 +636,36 @@ int main(int argc, char **argv)
 	if (!WIFEXITED(status) || WEXITSTATUS(status)) {
 		fprintf(stderr, "tagged replay child failed: status=%d\n", status);
 		return 1;
+	}
+	if (trace_icache) {
+		const unsigned trace_trial = warmup + (mode != 0);
+		const uint64_t raw_status = samples[trace_trial].trace_status;
+		const unsigned icount = raw_status & 0x1ff;
+		const unsigned dcount = (raw_status >> 9) & 0x1ff;
+		const unsigned ioverflow = (raw_status >> 18) & 1;
+		const unsigned doverflow = (raw_status >> 19) & 1;
+		const unsigned armed = (raw_status >> 20) & 1;
+		const uint32_t start = (uint32_t)samples[trace_trial].trace_start;
+
+		printf("TAGGED_REPLAY_ITRACE_HEADER trial=%u enabled=%u i_count=%u d_count=%u i_overflow=%u d_overflow=%u armed=%u status=0x%016llx\n",
+		       trace_trial - warmup, samples[trace_trial].enabled,
+		       icount, dcount, ioverflow, doverflow, armed,
+		       (unsigned long long)raw_status);
+		if (armed || ioverflow || doverflow || !icount
+		    || icount > TRACE_DEPTH || dcount > TRACE_DEPTH) {
+			fputs("TAGGED_REPLAY_ITRACE_FAIL invalid recorder status\n", stderr);
+			return 1;
+		}
+		for (unsigned index = 0; index < icount; index++) {
+			const uint64_t record = trace_record(index);
+			const uint32_t relative = (uint32_t)(record >> 32) - start;
+			const uint64_t paddr = (record & UINT64_C(0x0fffffff)) << 6;
+
+			printf("TAGGED_REPLAY_ITRACE_RECORD index=%u relative=%u paddr=0x%09llx raw=0x%016llx\n",
+			       index, relative, (unsigned long long)paddr,
+			       (unsigned long long)record);
+		}
+		printf("TAGGED_REPLAY_ITRACE_PASS records=%u\n", icount);
 	}
 	if (!strcmp(mode_name, "instruction-wake")) {
 		icache_status_after = icache_prefix_status();

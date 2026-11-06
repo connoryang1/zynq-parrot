@@ -119,13 +119,22 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_instruction_trace(self):
+        self.assertIn(
+            " 8 0 skew futex trace-icache; ",
+            runner.benchmark_command(
+                "off", 0, 0, "normal", 0, 8, False,
+                "skew", "futex", False, True,
+            ),
+        )
+
     def test_command_binds_guest_diagnostic_environment(self):
         self.assertTrue(
             runner.benchmark_command(
                 "joint-split", 0, 0, "normal", 0, 8, False,
                 "skew", "futex", True,
             ).startswith(
-                "BP_TAGGED_REPLAY_DIAG=1 "
+            "BP_TAGGED_REPLAY_DIAG=1 "
                 "/tmp/scheduler_tagged_replay_benchmark_dynamic "
             )
         )
