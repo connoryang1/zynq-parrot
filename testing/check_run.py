@@ -71,7 +71,7 @@ TEST_MARKERS = {
     "mt_prefetch_protocol_test": "[BSG-PASS] detached prefetch protocol",
     "mt_icache_replay_test": "[BSG-PASS] shared-prefix and physical I-cache replay",
     "mt_dcache_replay_test": "[BSG-PASS] tagged 32-line physical data replay",
-    "mt_dcache_icache_follow_replay_test": "[BSG-PASS] hardware-sequenced data then instruction replay",
+    "mt_dcache_icache_follow_replay_test": "[BSG-PASS] hardware-sequenced instruction then data replay",
     "mt_umode_prefetch_test": "[BSG-PASS] U-mode Sv39 nonfaulting prefetch permissions",
     "mt_ctxtsw_gpr_ring_stress": "[BSG-PASS] all GPRs preserved through 4-context ring",
     "mt_ctxtsw_pure_ring_stress_test": "[BSG-PASS] pure ctxtsw ring stress completed",

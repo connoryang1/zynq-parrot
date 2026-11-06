@@ -1,7 +1,7 @@
-/* Validate integrated data-then-instruction replay from one tagged command.
- * A trigger with bit two set must replay the configured D-cache footprint,
- * wait for all detached data responses to retire, and then start the shared
- * I-cache prefix without a second architectural CSR write.
+/* Validate integrated instruction-then-data replay from one tagged command.
+ * A trigger with bit two set must replay the shared I-cache prefix, wait for
+ * its detached responses to retire, and then start the configured D-cache
+ * footprint without a second architectural CSR write.
  */
 #include <stdint.h>
 #include "bp_utils.h"
@@ -54,7 +54,7 @@ static inline uint64_t data_status(void)
 
 static void fail(const char *message, uint64_t data, uint64_t instruction)
 {
-  bp_print_string("[BSG-FAIL] data-followed-by-instruction replay: ");
+  bp_print_string("[BSG-FAIL] instruction-followed-by-data replay: ");
   bp_print_string(message);
   bp_print_string(" data/instruction-status=");
   bp_hprint_uint64(data);
@@ -107,7 +107,7 @@ int main(void)
       || instruction_target_b(100) != 129)
     fail("replayed contents corrupted", dstatus, istatus);
 
-  bp_print_string("[BSG-PASS] hardware-sequenced data then instruction replay\n");
+  bp_print_string("[BSG-PASS] hardware-sequenced instruction then data replay\n");
   bp_finish(0);
   return 0;
 }

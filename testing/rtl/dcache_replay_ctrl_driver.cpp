@@ -34,6 +34,10 @@ int main(int argc, char **argv) {
     dut.downstream_outstanding_i = 0;
     dut.downstream_complete_i = 0;
     dut.follow_ready_i = 1;
+    dut.follow_active_i = 0;
+    dut.follow_configured_i = 1;
+    dut.follow_downstream_outstanding_i = 0;
+    dut.follow_downstream_complete_i = 0;
     dut.clear_counters_i = 0;
     tick(); tick();
     dut.reset_i = 0;
@@ -143,13 +147,18 @@ int main(int argc, char **argv) {
     require(((dut.status_o >> 10) & 0xffffffffffffULL) == 0,
             "counter clear did not clear replay/trigger counters");
 
-    // Reset away the queue-pressure case, then prove that a follow command
-    // cannot trigger instruction replay until admitted D-UCE work and its
-    // completed-response buffer have both drained.  A queued command must not
-    // overtake that pulse.
+    // Reset away the queue-pressure case, then prove instruction-first
+    // ordering. A follow command must trigger the prefix before exposing any
+    // data entry, and data must wait for both the prefix controller and I-UCE
+    // response state to drain. A queued command cannot overtake the sequence.
     dut.reset_i = 1;
     dut.downstream_outstanding_i = 0;
     dut.downstream_complete_i = 0;
+    dut.follow_active_i = 0;
+    dut.follow_configured_i = 1;
+    dut.follow_downstream_outstanding_i = 0;
+    dut.follow_downstream_complete_i = 0;
+    dut.follow_ready_i = 0;
     tick(); tick();
     dut.reset_i = 0;
     tick();
@@ -164,9 +173,6 @@ int main(int argc, char **argv) {
     dut.config_write_gap_i = 0;
     pulse(dut.config_write_v_i);
 
-    // Begin at zero to model the final replay admission and the downstream
-    // allocation becoming visible only after that controller edge.
-    dut.downstream_outstanding_i = 0;
     dut.trigger_slot_i = 1;
     dut.trigger_follow_i = 1;
     pulse(dut.trigger_v_i);
@@ -174,53 +180,56 @@ int main(int argc, char **argv) {
     pulse(dut.trigger_v_i);
 
     unsigned replay_count = 0;
-    for (unsigned cycle = 0; cycle < 40 && replay_count == 0; ++cycle) {
-      if (dut.replay_v_o) {
-        dut.replay_yumi_i = 1;
-        dut.replay_accepted_i = 1;
-        ++replay_count;
-      }
-      require(!dut.follow_trigger_o,
-              "follow trigger escaped while data was outstanding");
-      tick();
-      dut.replay_yumi_i = 0;
-      dut.replay_accepted_i = 0;
-    }
-    require(replay_count == 1, "follow command did not replay its data entry");
-    require(!dut.follow_trigger_o,
-            "follow trigger escaped before downstream allocation settled");
-    dut.downstream_outstanding_i = 2;
-    for (unsigned i = 0; i < 3; ++i) {
+    for (unsigned cycle = 0; cycle < 3; ++cycle) {
       require(!dut.replay_v_o,
-              "queued command overtook pending instruction follow");
+              "data replay escaped before instruction trigger");
       require(!dut.follow_trigger_o,
-              "follow trigger ignored outstanding data state");
+              "instruction trigger ignored prefix-controller backpressure");
       tick();
     }
 
-    dut.downstream_outstanding_i = 0;
-    dut.downstream_complete_i = 1;
-    for (unsigned i = 0; i < 3; ++i) {
-      require(!dut.follow_trigger_o,
-              "follow trigger ignored completed-response state");
-      tick();
-    }
-
-    dut.downstream_complete_i = 0;
-    dut.follow_ready_i = 0;
-    for (unsigned i = 0; i < 3; ++i) {
-      require(!dut.follow_trigger_o,
-              "follow trigger ignored instruction-controller backpressure");
-      tick();
-    }
     dut.follow_ready_i = 1;
     dut.eval();
     require(dut.follow_trigger_o,
-            "follow trigger missing after complete downstream drain");
+            "instruction trigger missing before data replay");
+    require(!dut.replay_v_o,
+            "data replay overlapped instruction trigger");
     tick();
-    require(!dut.follow_trigger_o, "follow trigger lasted more than one cycle");
+    require(!dut.follow_trigger_o, "instruction trigger lasted more than one cycle");
 
-    for (unsigned cycle = 0; cycle < 40 && replay_count == 1; ++cycle) {
+    dut.follow_active_i = 1;
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.replay_v_o,
+              "data replay overlapped active prefix controller");
+      require(!dut.follow_trigger_o,
+              "instruction trigger repeated while prefix was active");
+      tick();
+    }
+
+    // Prefix admission can finish one edge before its final I-UCE allocation
+    // becomes visible. Hold an outstanding slot across that boundary.
+    dut.follow_active_i = 0;
+    dut.follow_downstream_outstanding_i = 0;
+    require(!dut.replay_v_o,
+            "data replay escaped on the prefix-idle boundary");
+    tick();
+    dut.follow_downstream_outstanding_i = 2;
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.replay_v_o,
+              "data replay ignored outstanding instruction state");
+      tick();
+    }
+
+    dut.follow_downstream_outstanding_i = 0;
+    dut.follow_downstream_complete_i = 1;
+    for (unsigned i = 0; i < 3; ++i) {
+      require(!dut.replay_v_o,
+              "data replay ignored completed instruction response");
+      tick();
+    }
+
+    dut.follow_downstream_complete_i = 0;
+    for (unsigned cycle = 0; cycle < 40 && replay_count < 2; ++cycle) {
       if (dut.replay_v_o) {
         dut.replay_yumi_i = 1;
         dut.replay_accepted_i = 1;
@@ -230,16 +239,73 @@ int main(int argc, char **argv) {
       dut.replay_yumi_i = 0;
       dut.replay_accepted_i = 0;
     }
-    require(replay_count == 2, "queued non-follow command did not resume");
+    require(replay_count == 2,
+            "instruction-first data and queued command did not both drain");
     for (unsigned i = 0; i < 3; ++i) {
       require(!dut.follow_trigger_o,
               "non-follow command emitted an instruction trigger");
       tick();
     }
 
+    // A follow command with a deliberately empty prefix still emits the one
+    // architectural trigger, observes the idle boundary, and then releases
+    // data. This is the disabled-instruction control used by Linux A/B runs.
+    dut.reset_i = 1;
+    dut.follow_active_i = 0;
+    dut.follow_configured_i = 0;
+    dut.follow_downstream_outstanding_i = 0;
+    dut.follow_downstream_complete_i = 0;
+    dut.follow_ready_i = 1;
+    tick(); tick();
+    dut.reset_i = 0;
+    tick();
+
+    dut.entry_write_slot_i = 0;
+    dut.entry_write_index_i = 0;
+    dut.entry_write_paddr_i = 0x80030000ULL;
+    pulse(dut.entry_write_v_i);
+    dut.config_write_slot_i = 0;
+    dut.config_write_count_i = 1;
+    dut.config_write_delay_i = 0;
+    dut.config_write_gap_i = 0;
+    pulse(dut.config_write_v_i);
+
+    dut.trigger_slot_i = 0;
+    dut.trigger_follow_i = 1;
+    pulse(dut.trigger_v_i);
+    dut.trigger_follow_i = 0;
+
+    unsigned empty_prefix_triggers = 0;
+    unsigned empty_prefix_replays = 0;
+    for (unsigned cycle = 0; cycle < 40 && empty_prefix_replays == 0; ++cycle) {
+      dut.eval();
+      if (dut.follow_trigger_o) {
+        require(empty_prefix_triggers == 0,
+                "empty prefix emitted more than one instruction trigger");
+        require(!dut.replay_v_o,
+                "empty-prefix data overlapped its instruction trigger");
+        ++empty_prefix_triggers;
+      }
+      if (dut.replay_v_o) {
+        require(empty_prefix_triggers == 1,
+                "empty-prefix data escaped before its instruction trigger");
+        dut.replay_yumi_i = 1;
+        dut.replay_accepted_i = 1;
+        ++empty_prefix_replays;
+      }
+      tick();
+      dut.replay_yumi_i = 0;
+      dut.replay_accepted_i = 0;
+    }
+    require(empty_prefix_triggers == 1,
+            "empty prefix did not emit exactly one instruction trigger");
+    require(empty_prefix_replays == 1,
+            "empty prefix deadlocked the following data replay");
+
     std::cout << "[DCACHE-REPLAY-CTRL] PASS: tagged command queue, delayed "
                  "32-entry replay, gap throttle, backpressure, filtering, "
-                 "counters, drain-age telemetry, downstream-drained follow\n";
+                 "counters, drain-age telemetry, instruction-first drain, "
+                 "empty-prefix release\n";
     return 0;
   } catch (const std::exception &error) {
     std::cerr << "[DCACHE-REPLAY-CTRL] FAIL: " << error.what() << "\n";
