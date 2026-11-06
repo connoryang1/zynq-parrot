@@ -406,7 +406,7 @@ int main(int argc, char **argv)
 	const char *mode_name = "data";
 	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
-	int trace_stop_at_entry = 0;
+	int trace_stop_at_entry = 0, trace_allow_i_overflow = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
 	volatile struct sample *samples;
@@ -415,7 +415,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix]\n",
 			argv[0]);
 		return 2;
 	}
@@ -526,6 +526,11 @@ int main(int argc, char **argv)
 			trace_icache = 1;
 			trace_stop_at_entry = 1;
 		}
+		else if (!strcmp(argv[10], "trace-icache-entry-prefix")) {
+			trace_icache = 1;
+			trace_stop_at_entry = 1;
+			trace_allow_i_overflow = 1;
+		}
 		else if (strcmp(argv[10], "no-trace")) {
 			fprintf(stderr, "invalid instruction trace mode: %s\n", argv[10]);
 			return 2;
@@ -547,14 +552,15 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       skew_layout ? "skew" : "aligned", probe_status,
 	       sync == sync_futex ? "futex" : "pipe", mode,
 	       expected_enabled_hooks, trace_icache,
-	       trace_stop_at_entry ? "entry" : "after-load");
+	       trace_stop_at_entry ? "entry" : "after-load",
+	       trace_allow_i_overflow);
 	if (!strcmp(mode_name, "instruction-wake"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
@@ -669,7 +675,7 @@ int main(int argc, char **argv)
 		       trace_trial - warmup, samples[trace_trial].enabled,
 		       icount, dcount, ioverflow, doverflow, armed,
 		       (unsigned long long)raw_status);
-		if (armed || ioverflow || doverflow || !icount
+		if (armed || (!trace_allow_i_overflow && ioverflow) || doverflow || !icount
 		    || icount > TRACE_DEPTH || dcount > TRACE_DEPTH) {
 			fputs("TAGGED_REPLAY_ITRACE_FAIL invalid recorder status\n", stderr);
 			return 1;
@@ -683,7 +689,11 @@ int main(int argc, char **argv)
 			       index, relative, (unsigned long long)paddr,
 			       (unsigned long long)record);
 		}
-		printf("TAGGED_REPLAY_ITRACE_PASS records=%u\n", icount);
+		if (trace_allow_i_overflow)
+			printf("TAGGED_REPLAY_ITRACE_PREFIX_PASS truncated=%u records=%u\n",
+			       ioverflow, icount);
+		else
+			printf("TAGGED_REPLAY_ITRACE_PASS records=%u\n", icount);
 	}
 	if (!strcmp(mode_name, "instruction-wake")) {
 		icache_status_after = icache_prefix_status();
