@@ -31,7 +31,7 @@ class TaggedReplayRunnerTest(unittest.TestCase):
         self.assertEqual(runner.TIMER_GUARD_MARKER, "BP_REPLAY_TIMER_GUARD")
 
     def test_kernel_failure_markers_are_bound(self):
-        for marker in ("BUG:", "Kernel panic", "Oops:",
+        for marker in ("BUG:", "Kernel panic", "Oops:", "Oops [#1]",
                        "scheduling while atomic", "Segmentation fault",
                        "RT throttling activated"):
             self.assertIsNotNone(runner.KERNEL_FAILURE_MARKER.search(marker))
@@ -84,6 +84,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
         self.assertIn(
             " joint-split 0 0 normal 0 8 0 aligned pipe; ",
             runner.benchmark_command("joint-split", 0, 0, "normal", 0),
+        )
+
+    def test_command_binds_split_joint_one_hook_diagnostic(self):
+        self.assertIn(
+            " joint-split-one-hook 0 0 normal 0 8 0 aligned pipe; ",
+            runner.benchmark_command(
+                "joint-split-one-hook", 0, 0, "normal", 0
+            ),
         )
 
     def test_command_binds_replay_off_stability_mode(self):

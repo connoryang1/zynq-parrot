@@ -344,7 +344,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 10) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
 			argv[0]);
 		return 2;
 	}
@@ -360,7 +360,8 @@ int main(int argc, char **argv)
 			mode = 10;
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
-		else if (!strcmp(argv[1], "joint-split"))
+		else if (!strcmp(argv[1], "joint-split")
+			 || !strcmp(argv[1], "joint-split-one-hook"))
 			mode = 12;
 		else if (strcmp(argv[1], "data")) {
 			fprintf(stderr, "invalid replay mode: %s\n", argv[1]);

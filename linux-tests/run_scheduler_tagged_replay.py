@@ -21,7 +21,7 @@ SHELL_PROMPT = re.compile(r"(?:^|\r?\n)(?:~ )?# ")
 MAX_GUEST_COMMAND_LENGTH = 768
 TIMER_GUARD_MARKER = "BP_REPLAY_TIMER_GUARD"
 KERNEL_FAILURE_MARKER = re.compile(
-    r"(?:BUG:|Kernel panic|Oops:|scheduling while atomic|"
+    r"(?:BUG:|Kernel panic|Oops(?:[: ]|\r?\n)|scheduling while atomic|"
     r"Segmentation fault|RT throttling activated)"
 )
 
@@ -81,7 +81,8 @@ def parse_args(argv=None):
     parser.add_argument("--mode", choices=("off", "data", "data-late",
                                             "instruction-select",
                                             "instruction-wake", "joint",
-                                            "joint-split"),
+                                            "joint-split",
+                                            "joint-split-one-hook"),
                         default="data")
     parser.add_argument("--delay", type=int, default=0)
     parser.add_argument("--gap", type=int, default=2)

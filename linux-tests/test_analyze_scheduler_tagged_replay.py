@@ -162,6 +162,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "invalid hook count"):
                 analyze(path, bootstrap_samples=10)
 
+    def test_split_joint_one_hook_diagnostic_keeps_data_counters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="joint-split-one-hook"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "joint-split-one-hook")
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+
     def test_futex_sync_is_bound(self):
         with tempfile.TemporaryDirectory() as directory:
             result = analyze(
