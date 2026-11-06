@@ -1,0 +1,37 @@
+Purpose: record the exact contention waveform proving that instruction follow no longer waits for unrelated D-UCE state, while followed data remains ordered behind it.
+
+Signals in the full-core FST:
+
+  D'  dcache_replay_follow_trigger_lo
+  I'  dcache_prefetch_outstanding_status_lo[2:0]
+  A'  dcache_replay_v_lo
+  g&  icache_replay_lane_v_lo
+  aU! follow_wait_r
+  bU! follow_seen_r
+  tU! follow_launched
+
+First contention sequence:
+
+  time=337725000 dcache_replay_v_lo=1
+  time=337825000 dcache_replay_v_lo=0
+  time=337850000 dcache_prefetch_outstanding_status_lo=001
+  time=337925000 dcache_replay_follow_trigger_lo=1
+  time=337975000 dcache_replay_follow_trigger_lo=0 follow_wait_r=1
+  time=338025000 follow_seen_r=1
+  time=338125000 icache_replay_lane_v_lo=1
+  time=338175000 icache_replay_lane_v_lo=0
+  time=338325000 icache_replay_lane_v_lo=1
+  time=338375000 icache_replay_lane_v_lo=0
+  time=338500000 follow_launched=1 dcache_prefetch_outstanding_status_lo=000
+  time=338525000 follow_launched=0 follow_seen_r=0 follow_wait_r=0
+  time=338625000 dcache_replay_v_lo=1
+  time=338725000 dcache_replay_v_lo=0
+
+SHA-256:
+
+  joint-contention-dump.fst  0deda6b502cdf6339cc447a2f5d6f74701d1530129b9f0cc9b141831229f5141
+  joint-contention-run.log   30b4596bcf33a728e7ed022fe4adde08d730dbde4b9f8850822d8cad78ff90a6
+  data-only-dump.fst         7e732a1ea62a490f5d609cc75067bb7c8cc461b11b2de9f341fc13595022e41c
+  data-only-run.log          dd130af544dad8c1cf38236fff5bdaa3e77c6806ca81808caeaf1efc6bd937dc
+  instruction-only-dump.fst  286fa66c8d3150969fbfbe9c82b60e8d0972bfb391d0afff8fec17c52d98504d
+  instruction-only-run.log   b2222671c0922f786e837a034d7ddb7ce933f192b0f2e2b1c400170dbc777796
