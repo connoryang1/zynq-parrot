@@ -173,7 +173,8 @@ static unsigned trial_enabled(unsigned trial)
 
 static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned mode, unsigned delay, unsigned gap,
-		      unsigned lines_per_base, int probe_status, int skew_layout,
+		      unsigned lines_per_base, unsigned config_lines_per_base,
+		      int probe_status, int skew_layout,
 		      unsigned expected_enabled_hooks, _Atomic uint32_t *phase,
 		      enum sync_style sync)
 {
@@ -227,7 +228,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		 * preventing a late command from one arm from warming the next arm.
 		 */
 		while (prctl(PR_BP_PREVIEW_REPLAY_CONFIG, replay_slot,
-			     lines_per_base, delay, gap)) {
+			     config_lines_per_base, delay, gap)) {
 			if (errno != EBUSY)
 				fail("configure tagged replay footprint");
 			usleep(100);
@@ -350,6 +351,7 @@ int main(int argc, char **argv)
 	int to_child[2], to_parent[2], status;
 	unsigned mode = 9, delay = 0, gap = 2;
 	unsigned lines_per_base = max_lines_per_base;
+	unsigned config_lines_per_base = max_lines_per_base;
 	unsigned long lead_cycles = 0;
 	const char *mode_name = "data";
 	unsigned expected_enabled_hooks = 1;
@@ -361,7 +363,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 10) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex]\n",
 			argv[0]);
 		return 2;
 	}
@@ -378,7 +380,8 @@ int main(int argc, char **argv)
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
 		else if (!strcmp(argv[1], "joint-split")
-			 || !strcmp(argv[1], "joint-split-one-hook"))
+			 || !strcmp(argv[1], "joint-split-one-hook")
+			 || !strcmp(argv[1], "joint-follow-only"))
 			mode = 12;
 		else if (strcmp(argv[1], "data")) {
 			fprintf(stderr, "invalid replay mode: %s\n", argv[1]);
@@ -459,6 +462,8 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	if (!strcmp(mode_name, "joint-follow-only"))
+		config_lines_per_base = 0;
 	diagnostic_progress = getenv("BP_TAGGED_REPLAY_DIAG") != NULL;
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
@@ -486,7 +491,8 @@ int main(int argc, char **argv)
 		close(to_child[1]);
 		close(to_parent[0]);
 		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
-			  lines_per_base, probe_status, skew_layout,
+			  lines_per_base, config_lines_per_base, probe_status,
+			  skew_layout,
 			  expected_enabled_hooks, &shared->phase, sync);
 		return 0;
 	}

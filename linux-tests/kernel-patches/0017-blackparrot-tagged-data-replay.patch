@@ -177,7 +177,7 @@ up to 32 pinned physical lines, configurable trigger delay, and replay gap.
 +		unsigned int gap = arg5;
 +		unsigned int base, line, index = 0;
 +
-+		if (slot >= 4 || !lines_per_base || lines_per_base > 8
++		if (slot >= 4 || lines_per_base > 8
 +		    || delay > 65535 || gap > 255
 +		    || READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {
 +			error = -EINVAL;
@@ -222,7 +222,10 @@ up to 32 pinned physical lines, configurable trigger delay, and replay gap.
 +				index++;
 +			}
 +		}
-+		if (!index) {
++		/* A zero-entry slot is a diagnostic follow-only command: it keeps
++		 * the tagged wakeup and hardware instruction-follow path while
++		 * suppressing all detached data traffic. */
++		if (!index && lines_per_base) {
 +			error = -ENOENT;
 +			local_irq_restore(flags);
 +			break;

@@ -24,11 +24,12 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     for trial in range(512):
         enabled = (0 if mode == "off" else
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
-        expects_data = mode not in (
+        expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake"
         )
-        admitted = lines if enabled and expects_data else 0
-        triggers = enabled if expects_data else 0
+        admitted = (lines if enabled and expects_trigger
+                    and mode != "joint-follow-only" else 0)
+        triggers = enabled if expects_trigger else 0
         if corrupt_counter and trial == 4:
             admitted -= 1
         entry = 100 + trial % 3
@@ -171,6 +172,16 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["config"]["mode"], "joint-split-one-hook")
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+
+    def test_joint_follow_only_accepts_tags_without_data_entries(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="joint-follow-only"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["mode"], "joint-follow-only")
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
 
     def test_futex_sync_is_bound(self):
         with tempfile.TemporaryDirectory() as directory:

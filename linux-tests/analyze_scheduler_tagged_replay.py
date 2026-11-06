@@ -12,7 +12,8 @@ from pathlib import Path
 
 CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|"
-    r"instruction-wake|joint|joint-split|joint-split-one-hook) "
+    r"instruction-wake|joint|joint-split|joint-split-one-hook|"
+    r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
 )
@@ -203,14 +204,15 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError(f"trial {index} ends before first use")
         # PR_BP_PREVIEW_REPLAY_CONFIG sets the hardware clear bit before every
         # trial, so these are independent snapshots rather than deltas.
-        expects_data = mode not in (
+        expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake"
         )
-        expected_triggers = row["enabled"] if expects_data else 0
+        expected_entries = 0 if mode == "joint-follow-only" else config["lines"]
+        expected_triggers = row["enabled"] if expects_trigger else 0
         if row["triggers"] != expected_triggers or row["dropped"] != 0:
             raise ValueError(f"trial {index} has invalid trigger/drop counters")
-        if row["enabled"] and expects_data:
-            if row["admitted"] + row["filtered"] != config["lines"]:
+        if row["enabled"] and expects_trigger:
+            if row["admitted"] + row["filtered"] != expected_entries:
                 raise ValueError(f"trial {index} did not complete all replay entries")
             admitted += row["admitted"]
             filtered += row["filtered"]
@@ -235,6 +237,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure one wake-time tagged command whose hardware follow "
             "launches instruction replay before ordered data replay."
             if mode == "joint-split" else
+            "Measure the hardware-follow instruction path with an accepted "
+            "zero-entry tagged command and no detached data traffic."
+            if mode == "joint-follow-only" else
             "Measure a matched Linux wakeup with one tagged data replay "
             "while validating that every enabled tag completed."
         ),

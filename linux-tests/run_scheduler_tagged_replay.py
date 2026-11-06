@@ -84,7 +84,8 @@ def parse_args(argv=None):
                                             "instruction-select",
                                             "instruction-wake", "joint",
                                             "joint-split",
-                                            "joint-split-one-hook"),
+                                            "joint-split-one-hook",
+                                            "joint-follow-only"),
                         default="data")
     parser.add_argument("--delay", type=int, default=0)
     parser.add_argument("--gap", type=int, default=2)
