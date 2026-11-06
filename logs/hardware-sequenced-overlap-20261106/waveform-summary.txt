@@ -1,0 +1,18 @@
+Joint 128-command waveform summary
+
+Representative first combined command:
+time=337125000 follow_trigger=1 data_replay=0 instruction_replay=0 iuce_occupancy=0000
+time=337225000 follow_wait=1 follow_seen=1 follow_launched=1
+time=337325000 instruction_replay=1 iuce_occupancy=0000
+time=337375000 instruction_replay=0 iuce_occupancy=0001 data_replay=1
+time=337525000 instruction_replay=1 iuce_occupancy=0001 data_replay=0
+time=337575000 instruction_replay=0 iuce_occupancy=0011 data_replay=0
+time=338925000 iuce_occupancy=0010
+
+Complete-trace rising-edge scan:
+follow_triggers=128
+data_replays=128
+data_while_iuce_occupied=128
+data_without_iuce_occupancy=0
+
+The instruction replay signal has one additional rising edge outside the 256 accepted prefix entries counted by the test, so the architectural entry and trigger counters—not a raw global signal-edge count—are used for instruction replay acceptance.
