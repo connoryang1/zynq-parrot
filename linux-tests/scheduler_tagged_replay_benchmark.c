@@ -590,7 +590,13 @@ int main(int argc, char **argv)
 				fail("yield before tagged replay wake");
 		}
 		diagnostic_stage("parent", "ready", trial, enabled);
-		if (trace_icache && trial == warmup + (mode != 0)) {
+		/* Entry-bounded A/B diagnostics always use measured trial one so the
+		 * scheduler phase is matched even when the replay mode is disabled.
+		 * Preserve trial zero for the original complete replay-off extractor.
+		 */
+		if (trace_icache
+		    && trial == warmup
+				+ (unsigned)((mode != 0) || trace_stop_at_entry)) {
 			trace_control(2);
 			samples[trial].trace_start = cycle();
 			trace_control(3);
@@ -649,7 +655,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	if (trace_icache) {
-		const unsigned trace_trial = warmup + (mode != 0);
+		const unsigned trace_trial =
+			warmup + (unsigned)((mode != 0) || trace_stop_at_entry);
 		const uint64_t raw_status = samples[trace_trial].trace_status;
 		const unsigned icount = raw_status & 0x1ff;
 		const unsigned dcount = (raw_status >> 9) & 0x1ff;
