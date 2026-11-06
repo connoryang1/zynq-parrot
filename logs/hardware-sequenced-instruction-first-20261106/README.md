@@ -31,6 +31,8 @@ The standalone controller gate also passes configured-prefix backpressure, activ
 
 The first data-only regression trace was accidentally overwritten by the following instruction-only run. No conclusion depends on that lost trace: the data regression was immediately rerun with the same command and its replacement trace is retained here. Future trace sequences must copy and hash each closed FST before launching the next run, even when the preceding terminal markers already passed.
 
+A later board-collateral preflight first invoked two unittest files by path from the repository root; their sibling imports were consequently absent from Python's module path and both failed before test execution. The corrected discovery command, `python3 -m unittest discover -s linux-tests -p 'test_*scheduler_tagged_replay*.py'`, runs all 41 matching tests successfully. Use discovery with `-s linux-tests` for this suite rather than treating the hyphenated directory as an importable package.
+
 ## Artifact hashes
 
 ```text
