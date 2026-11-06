@@ -57,7 +57,7 @@ def main():
     parser.add_argument(
         "--results",
         type=Path,
-        default=root / "logs/cache-resume-trace-model-20261030/results.json",
+        default=root / "logs/icache-prefix-status-20261106/exact-prefix-results.json",
     )
     parser.add_argument(
         "--output",

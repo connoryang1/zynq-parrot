@@ -1,0 +1,133 @@
+{
+  "purpose": "Bind a best-case shared prefix to one exact tagged-futex trace.",
+  "input_identity": {
+    "transcript": "/home/coyang/fpga-artifacts/context-resume/icache-prefix-status-20261106/board/tagged-futex-off-itrace.log",
+    "transcript_sha256": "a9b018c74d80bed49feac38011ff2785cbbb409f69b074ebc8d5dfae3a987b16",
+    "status": "/home/coyang/fpga-artifacts/context-resume/icache-prefix-status-20261106/board/tagged-futex-off-itrace.log.status.json",
+    "status_sha256": "dd71f7ba1b36852e944f62c5fd43572e452f90957a8cbf1cae01bbdc39e82ceb",
+    "kernel_sha256": "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9"
+  },
+  "selection": {
+    "floor_relative_cycle": 8200,
+    "captured_instruction_records": 119,
+    "selected_lines": 16
+  },
+  "fixed_shared_prefix": {
+    "policy": "first 16 unique privileged I-miss lines at or after exact-trace relative cycle 8200, in demand order",
+    "line_count": 16,
+    "lines": [
+      {
+        "rank": 0,
+        "relative": 8207,
+        "paddr": 2149810944,
+        "paddr_hex": "0x0000000080238300",
+        "cache_set": 12
+      },
+      {
+        "rank": 1,
+        "relative": 8266,
+        "paddr": 2149811008,
+        "paddr_hex": "0x0000000080238340",
+        "cache_set": 13
+      },
+      {
+        "rank": 2,
+        "relative": 8388,
+        "paddr": 2158045632,
+        "paddr_hex": "0x0000000080a129c0",
+        "cache_set": 39
+      },
+      {
+        "rank": 3,
+        "relative": 8655,
+        "paddr": 2147544000,
+        "paddr_hex": "0x000000008000ebc0",
+        "cache_set": 47
+      },
+      {
+        "rank": 4,
+        "relative": 8746,
+        "paddr": 2147529920,
+        "paddr_hex": "0x000000008000b4c0",
+        "cache_set": 19
+      },
+      {
+        "rank": 5,
+        "relative": 8788,
+        "paddr": 2147548288,
+        "paddr_hex": "0x000000008000fc80",
+        "cache_set": 50
+      },
+      {
+        "rank": 6,
+        "relative": 8847,
+        "paddr": 2147511232,
+        "paddr_hex": "0x0000000080006bc0",
+        "cache_set": 47
+      },
+      {
+        "rank": 7,
+        "relative": 9013,
+        "paddr": 2147498816,
+        "paddr_hex": "0x0000000080003b40",
+        "cache_set": 45
+      },
+      {
+        "rank": 8,
+        "relative": 9486,
+        "paddr": 2149828224,
+        "paddr_hex": "0x000000008023c680",
+        "cache_set": 26
+      },
+      {
+        "rank": 9,
+        "relative": 9528,
+        "paddr": 2149828288,
+        "paddr_hex": "0x000000008023c6c0",
+        "cache_set": 27
+      },
+      {
+        "rank": 10,
+        "relative": 9578,
+        "paddr": 2149828352,
+        "paddr_hex": "0x000000008023c700",
+        "cache_set": 28
+      },
+      {
+        "rank": 11,
+        "relative": 9677,
+        "paddr": 2149857728,
+        "paddr_hex": "0x00000000802439c0",
+        "cache_set": 39
+      },
+      {
+        "rank": 12,
+        "relative": 9762,
+        "paddr": 2149858112,
+        "paddr_hex": "0x0000000080243b40",
+        "cache_set": 45
+      },
+      {
+        "rank": 13,
+        "relative": 10082,
+        "paddr": 2149856960,
+        "paddr_hex": "0x00000000802436c0",
+        "cache_set": 27
+      },
+      {
+        "rank": 14,
+        "relative": 10317,
+        "paddr": 2149906880,
+        "paddr_hex": "0x000000008024f9c0",
+        "cache_set": 39
+      },
+      {
+        "rank": 15,
+        "relative": 10815,
+        "paddr": 2149907520,
+        "paddr_hex": "0x000000008024fc40",
+        "cache_set": 49
+      }
+    ]
+  }
+}

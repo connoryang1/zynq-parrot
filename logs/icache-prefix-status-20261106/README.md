@@ -32,21 +32,26 @@ illegal-instruction trap during the validated base64 transfer, before the ELF
 or new status operation ran. It is retained as `rejected-upload-trap-attempt1`
 and was followed by the required hard recovery.
 
-## Prefix relevance root cause
+## Prefix relevance result
 
 The configured table is the first 16 physical lines from
-`logs/cache-resume-trace-model-20261030/results.json`. The original raw trace
-shows those numeric addresses as instruction-demand misses in its linked image.
-In both corrected mode-thirteen kernels, however, the 15 addresses in the
-kernel physical range decode as unrelated FAT/VFAT, journal, and firmware
-loader code; `0x8000b4c0` lies in the firmware range. Kernel relinking changed
-the meaning of the physical addresses, but the old header was reused.
+`logs/cache-resume-trace-model-20261030/results.json`. A disabled capture of the
+exact current tagged-futex workload records 119 I-side and 67 D-side misses
+without overflow. Only two installed lines occur in the complete I-side window:
+`0x8000b4c0` at relative cycle 8,746 and `0x8023f3c0` at cycle 12,008.
+
+The first symbol audit incorrectly added the physical address directly to the
+kernel virtual prefix and was corrected before retraining. The valid mapping
+subtracts physical load base `0x80200000` before adding linked virtual base
+`0xffffffff80000000`; it maps the nonmatching old entries mostly to migration,
+affinity, and other CFS paths. They remain valid code addresses, but they do not
+cover this measured handoff.
 
 Thus the controller is functioning and issuing substantial replay traffic, but
-the physical prefix is stale for the workload under measurement. The next
-valid performance experiment must capture the current exact futex handoff,
-regenerate the prefix, bind it to the kernel/payload hash, and rebuild only the
-software image on the accepted routed RTL.
+the installed prefix has only 2/16 coverage. The next performance experiment
+must select current misses after the wake hook (not earlier syscall misses),
+bind the table to the exact kernel/payload hash, and rebuild only the software
+image on the accepted routed RTL.
 
 Durable raw artifacts are under
 `/home/coyang/fpga-artifacts/context-resume/icache-prefix-status-20261106/`.
