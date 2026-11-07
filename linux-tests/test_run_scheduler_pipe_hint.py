@@ -18,6 +18,13 @@ class PipeHintRunnerTests(unittest.TestCase):
         ])
         self.assertEqual(args.policy, "seed")
 
+    def test_warmup_is_bound_into_runner_arguments(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--warmup", "256",
+        ])
+        self.assertEqual(args.warmup, 256)
+
     def test_status_uses_pointer_copy_abi(self):
         source = (Path(__file__).resolve().parent
                   / "scheduler_pipe_hint_benchmark.c").read_text()

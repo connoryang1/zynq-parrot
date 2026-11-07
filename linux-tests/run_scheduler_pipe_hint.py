@@ -65,6 +65,7 @@ def parse_args(argv=None):
     parser.add_argument("--repeats", type=int, default=8)
     parser.add_argument("--policy", choices=("continuous", "seed"),
                         default="continuous")
+    parser.add_argument("--warmup", type=int, default=32)
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
     return parser.parse_args(argv)
 
@@ -75,8 +76,10 @@ def validate_args(args):
                          ("bitstream", args.bitstream_sha256)):
         if not re.fullmatch(r"[0-9a-f]{64}", value):
             raise ValueError(f"{label} SHA-256 must be 64 lowercase hex digits")
-    if not 1 <= args.loops <= 1_000_000 or not 1 <= args.repeats <= 1_000_000:
-        raise ValueError("loops and repeats must be in 1..1000000")
+    if (not 1 <= args.loops <= 1_000_000
+            or not 1 <= args.repeats <= 1_000_000
+            or not 1 <= args.warmup <= 1_000_000):
+        raise ValueError("loops, repeats, and warmup must be in 1..1000000")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     if not args.log.parent.is_dir():
@@ -88,7 +91,8 @@ def run(args):
     repo = Path(__file__).resolve().parents[1]
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
-    command = f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy}"
+    command = (f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy} "
+               f"{args.warmup}")
     status = {
         "status": "running",
         "nbf_sha256": sha256(args.nbf),
@@ -99,6 +103,7 @@ def run(args):
         "loops": args.loops,
         "repeats": args.repeats,
         "policy": args.policy,
+        "warmup": args.warmup,
         "command": command,
     }
     env = os.environ.copy()

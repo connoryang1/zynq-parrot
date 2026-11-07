@@ -111,7 +111,7 @@ static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
 	issue_hint(enabled && (policy == hint_continuous || iteration == 0));
 }
 
-static uint64_t run_cell(unsigned enabled, unsigned loops,
+static uint64_t run_cell(unsigned enabled, unsigned loops, unsigned warmup,
 			 enum hint_policy policy)
 {
 	int to_child[2], to_parent[2], ready[2];
@@ -131,7 +131,7 @@ static uint64_t run_cell(unsigned enabled, unsigned loops,
 		close(ready[0]);
 		flush_instruction_state();
 		transfer(ready[1], &token, 1);
-		for (unsigned i = 0; i < warmup_roundtrips + loops; ++i) {
+		for (unsigned i = 0; i < warmup + loops; ++i) {
 			transfer(to_child[0], &token, 0);
 			issue_iteration_hint(enabled, policy, i);
 			transfer(to_parent[1], &token, 1);
@@ -144,14 +144,14 @@ static uint64_t run_cell(unsigned enabled, unsigned loops,
 	close(ready[1]);
 	transfer(ready[0], &token, 0);
 	flush_instruction_state();
-	for (unsigned i = 0; i < warmup_roundtrips; ++i) {
+	for (unsigned i = 0; i < warmup; ++i) {
 		issue_iteration_hint(enabled, policy, i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 	}
 	begin = cycle();
 	for (unsigned i = 0; i < loops; ++i) {
-		issue_iteration_hint(enabled, policy, warmup_roundtrips + i);
+		issue_iteration_hint(enabled, policy, warmup + i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 	}
@@ -168,11 +168,12 @@ int main(int argc, char **argv)
 {
 	unsigned loops = default_loops;
 	unsigned repeats = default_repeats;
+	unsigned warmup = warmup_roundtrips;
 	enum hint_policy policy = hint_continuous;
 	unsigned long before, after;
 
-	if (argc > 4) {
-		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed]\n",
+	if (argc > 5) {
+		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed] [warmup]\n",
 			argv[0]);
 		return 2;
 	}
@@ -182,16 +183,18 @@ int main(int argc, char **argv)
 		repeats = parse_positive(argv[2], "repeats");
 	if (argc > 3)
 		policy = parse_policy(argv[3]);
+	if (argc > 4)
+		warmup = parse_positive(argv[4], "warmup");
 	before = prefix_status();
 	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s\n",
-	       loops, repeats, warmup_roundtrips, (before >> 4) & 0x1ffUL,
+	       loops, repeats, warmup, (before >> 4) & 0x1ffUL,
 	       policy == hint_continuous ? "continuous" : "seed");
 	for (unsigned repeat = 0; repeat < repeats; ++repeat) {
 		unsigned first = repeat & 1U;
 
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned enabled = first ^ order;
-			uint64_t elapsed = run_cell(enabled, loops, policy);
+			uint64_t elapsed = run_cell(enabled, loops, warmup, policy);
 
 			printf("PIPE_HINT_RESULT repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
 			       repeat, order, enabled,

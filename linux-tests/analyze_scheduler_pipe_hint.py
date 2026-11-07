@@ -74,6 +74,8 @@ def analyze(path, bootstrap_samples=20000):
     policy = configs[0][4] or "continuous"
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
+    if warmup != runner.get("warmup", 32):
+        raise ValueError("transcript and runner warmup differ")
     if policy != runner.get("policy", "continuous"):
         raise ValueError("transcript and runner policy differ")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
@@ -175,7 +177,7 @@ def analyze(path, bootstrap_samples=20000):
         "icache_prefix_status": {"before": before, "after": after},
         "interpretation_limits": [
             "One Linux boot supplies paired repeat blocks but not independent boot strata.",
-            "The 32 warmup roundtrips intentionally measure hot sustained throughput, not cold first resume.",
+            f"The {warmup} warmup roundtrips intentionally measure hot sustained throughput, not cold first resume.",
         ],
     }
 
