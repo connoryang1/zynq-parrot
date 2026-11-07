@@ -69,6 +69,43 @@ class StableIcachePrefixTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "elf_sha256"):
                 selector.select([first, second], "a" * 64, 100, 1)
 
+    def test_aligns_selection_on_per_trace_anchor(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            anchor = 0x80002000
+            first = self.make_trace(root, "a.log", [
+                (80, 0x80001000), (100, anchor),
+                (140, 0x80003000), (200, 0x80004000),
+            ])
+            second = self.make_trace(root, "b.log", [
+                (260, 0x80001000), (300, anchor),
+                (350, 0x80003000), (450, 0x80004000),
+            ])
+            result = selector.select(
+                [first, second], "a" * 64, selection_floor=None,
+                limit=3, anchor_paddr=anchor,
+            )
+        lines = result["fixed_shared_prefix"]["lines"]
+        self.assertEqual(
+            [line["paddr"] for line in lines],
+            [anchor, 0x80003000, 0x80004000],
+        )
+        self.assertEqual(lines[1]["trace_relative_to_anchor"], [40, 50])
+        self.assertEqual(
+            result["selection"]["trace_floor_relative_cycles"], [100, 300]
+        )
+
+    def test_rejects_missing_anchor(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = self.make_trace(root, "a.log", [(100, 0x80002000)])
+            second = self.make_trace(root, "b.log", [(120, 0x80003000)])
+            with self.assertRaisesRegex(ValueError, "anchor .* absent"):
+                selector.select(
+                    [first, second], "a" * 64, selection_floor=None,
+                    limit=1, anchor_paddr=0x80002000,
+                )
+
     def test_rejects_too_few_stable_lines(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

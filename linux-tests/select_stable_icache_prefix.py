@@ -18,12 +18,17 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def select(paths, kernel_sha256, selection_floor, limit):
+def select(paths, kernel_sha256, selection_floor, limit, anchor_paddr=None):
     if len(paths) < 2:
         raise ValueError("stable selection requires at least two traces")
     if not re.fullmatch(r"[0-9a-f]{64}", kernel_sha256):
         raise ValueError("kernel SHA-256 must be 64 lowercase hex digits")
-    if selection_floor < 0 or not 1 <= limit <= 256:
+    if ((selection_floor is None) == (anchor_paddr is None)
+            or (selection_floor is not None and selection_floor < 0)
+            or (anchor_paddr is not None
+                and (anchor_paddr & 63
+                     or not PRIVILEGED_START <= anchor_paddr < PRIVILEGED_END))
+            or not 1 <= limit <= 256):
         raise ValueError("invalid selection floor or limit")
     traces = [load_trace(path, "off", 0) for path in paths]
     reference = traces[0]["status"]
@@ -34,12 +39,26 @@ def select(paths, kernel_sha256, selection_floor, limit):
             if trace["status"].get(key) != reference.get(key):
                 raise ValueError(f"replay-off trace identity mismatch: {key}")
 
+    if anchor_paddr is None:
+        floors = [selection_floor] * len(traces)
+    else:
+        floors = []
+        for trace in traces:
+            anchor = next((record["relative"] for record in trace["records"]
+                           if (record["paddr"] & ~63) == anchor_paddr), None)
+            if anchor is None:
+                raise ValueError(
+                    f"anchor 0x{anchor_paddr:016x} is absent from "
+                    f"{trace['path']}"
+                )
+            floors.append(anchor)
+
     first_by_trace = []
-    for trace in traces:
+    for trace, floor in zip(traces, floors):
         first = {}
         for record in trace["records"]:
             address = record["paddr"] & ~63
-            if (record["relative"] >= selection_floor
+            if (record["relative"] >= floor
                     and PRIVILEGED_START <= address < PRIVILEGED_END):
                 first.setdefault(address, record["relative"])
         first_by_trace.append(first)
@@ -47,7 +66,8 @@ def select(paths, kernel_sha256, selection_floor, limit):
     for first in first_by_trace[1:]:
         common &= set(first)
     ranked = sorted(
-        (max(first[address] for first in first_by_trace), address)
+        (max(first[address] - floor
+             for first, floor in zip(first_by_trace, floors)), address)
         for address in common
     )
     if len(ranked) < limit:
@@ -80,15 +100,25 @@ def select(paths, kernel_sha256, selection_floor, limit):
         },
         "selection": {
             "floor_relative_cycle": selection_floor,
+            "anchor_paddr": anchor_paddr,
+            "anchor_paddr_hex": (
+                f"0x{anchor_paddr:016x}" if anchor_paddr is not None else None
+            ),
+            "trace_floor_relative_cycles": floors,
             "stable_lines_available": len(ranked),
             "selected_lines": limit,
             "trace_count": len(traces),
         },
         "fixed_shared_prefix": {
             "policy": (
-                f"first {limit} privileged lines present at or after relative "
-                f"cycle {selection_floor} in every matched replay-off entry "
-                "trace, ranked by latest first occurrence"
+                (f"first {limit} privileged lines present at or after anchor "
+                 f"0x{anchor_paddr:016x} in every matched replay-off entry "
+                 "trace, ranked by latest first occurrence relative to the "
+                 "per-trace anchor")
+                if anchor_paddr is not None else
+                (f"first {limit} privileged lines present at or after relative "
+                 f"cycle {selection_floor} in every matched replay-off entry "
+                 "trace, ranked by latest first occurrence")
             ),
             "line_count": limit,
             "lines": [
@@ -97,6 +127,10 @@ def select(paths, kernel_sha256, selection_floor, limit):
                     "relative": relative,
                     "trace_first_relatives": [
                         first[address] for first in first_by_trace
+                    ],
+                    "trace_relative_to_anchor": [
+                        first[address] - floor
+                        for first, floor in zip(first_by_trace, floors)
                     ],
                     "paddr": address,
                     "paddr_hex": f"0x{address:016x}",
@@ -112,12 +146,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trace", nargs="+", type=Path)
     parser.add_argument("--kernel-sha256", required=True)
-    parser.add_argument("--selection-floor", type=int, required=True)
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--selection-floor", type=int)
+    selection.add_argument(
+        "--anchor-paddr", type=lambda value: int(value, 0),
+        help="align each trace on this cache-line physical address",
+    )
     parser.add_argument("--limit", type=int, default=16)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     result = select(
-        args.trace, args.kernel_sha256, args.selection_floor, args.limit
+        args.trace, args.kernel_sha256, args.selection_floor, args.limit,
+        args.anchor_paddr,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")

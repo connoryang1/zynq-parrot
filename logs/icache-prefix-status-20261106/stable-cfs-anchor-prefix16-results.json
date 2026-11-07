@@ -1,0 +1,321 @@
+{
+  "purpose": "Select a stable post-switch shared instruction prefix from multiple matched replay-off entry traces.",
+  "input_identity": {
+    "traces": [
+      {
+        "transcript": "/home/coyang/fpga-artifacts/context-resume/exact-futex-prefix-20261106/board/off-exact-prefix-entry-prefix.log",
+        "transcript_sha256": "bf4a7435ba9cf34dc980249201aa6ef7d4247f552a4fdad732448a036f791dc7",
+        "status_sha256": "05dcabcad4266431fe27e9c27f84e35cc27326252415caddc13ecca8e34272cd",
+        "nbf_sha256": "62c56ad56441bffaaf52b89216ee3e3cc80a1ec3752338493f6c5ec4b2d7116c"
+      },
+      {
+        "transcript": "/home/coyang/fpga-artifacts/context-resume/three-line-futex-prefix-20261106/board/off-three-line-entry-prefix.log",
+        "transcript_sha256": "534951eee086a05b91eb25d315324d24a09cb2692ee337b2e868299005ece7c5",
+        "status_sha256": "67405979491ae9733bfd6d446db089847d8de4a07f5bd5178d06dd479805f045",
+        "nbf_sha256": "e19767b0eecb651c404d72448a465c691c28ceb963c40edc44ccb28eb8cf801f"
+      },
+      {
+        "transcript": "/home/coyang/fpga-artifacts/context-resume/stable-post-switch-prefix-12-20261106/board/off-stable12-entry-prefix.log",
+        "transcript_sha256": "e42108627062e3670e1ebe990af877fdbf24b9490f7bbf966dafb2e3a833a744",
+        "status_sha256": "97ca991a1a23e548a549adbf30ced92ae2ae5491de72710355b16e9b7e401879",
+        "nbf_sha256": "2b67460168a73c25afeee90c9bf3989499a109a539e68ddc04f0b871f2fde4f2"
+      }
+    ],
+    "elf_sha256": "4f3a113d78a7567dff796c83ef50c16c64484bb219a7e8a55fd4f3e70a2a61ef",
+    "transfer_sha256": "a6c554f2cc0ba5d2eb49449270af4a7657bdb7275e247618ab9f4dce01fab360",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "1caf54e7e1adb2eec7ac7a0eb32b3827d3c9c364cbb76dfed45eb77648d4949f",
+    "kernel_sha256": "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9"
+  },
+  "selection": {
+    "floor_relative_cycle": null,
+    "anchor_paddr": 2149845760,
+    "anchor_paddr_hex": "0x0000000080240b00",
+    "trace_floor_relative_cycles": [
+      25446,
+      25205,
+      22676
+    ],
+    "stable_lines_available": 25,
+    "selected_lines": 16,
+    "trace_count": 3
+  },
+  "fixed_shared_prefix": {
+    "policy": "first 16 privileged lines present at or after anchor 0x0000000080240b00 in every matched replay-off entry trace, ranked by latest first occurrence relative to the per-trace anchor",
+    "line_count": 16,
+    "lines": [
+      {
+        "rank": 0,
+        "relative": 0,
+        "trace_first_relatives": [
+          25446,
+          25205,
+          22676
+        ],
+        "trace_relative_to_anchor": [
+          0,
+          0,
+          0
+        ],
+        "paddr": 2149845760,
+        "paddr_hex": "0x0000000080240b00",
+        "cache_set": 44
+      },
+      {
+        "rank": 1,
+        "relative": 51,
+        "trace_first_relatives": [
+          25496,
+          25255,
+          22727
+        ],
+        "trace_relative_to_anchor": [
+          50,
+          50,
+          51
+        ],
+        "paddr": 2149845824,
+        "paddr_hex": "0x0000000080240b40",
+        "cache_set": 45
+      },
+      {
+        "rank": 2,
+        "relative": 246,
+        "trace_first_relatives": [
+          25644,
+          25396,
+          22922
+        ],
+        "trace_relative_to_anchor": [
+          198,
+          191,
+          246
+        ],
+        "paddr": 2149845888,
+        "paddr_hex": "0x0000000080240b80",
+        "cache_set": 46
+      },
+      {
+        "rank": 3,
+        "relative": 951,
+        "trace_first_relatives": [
+          26397,
+          26149,
+          23623
+        ],
+        "trace_relative_to_anchor": [
+          951,
+          944,
+          947
+        ],
+        "paddr": 2149907264,
+        "paddr_hex": "0x000000008024fb40",
+        "cache_set": 45
+      },
+      {
+        "rank": 4,
+        "relative": 1260,
+        "trace_first_relatives": [
+          26706,
+          26250,
+          23887
+        ],
+        "trace_relative_to_anchor": [
+          1260,
+          1045,
+          1211
+        ],
+        "paddr": 2149907392,
+        "paddr_hex": "0x000000008024fbc0",
+        "cache_set": 47
+      },
+      {
+        "rank": 5,
+        "relative": 2209,
+        "trace_first_relatives": [
+          27655,
+          27081,
+          24725
+        ],
+        "trace_relative_to_anchor": [
+          2209,
+          1876,
+          2049
+        ],
+        "paddr": 2149856000,
+        "paddr_hex": "0x0000000080243300",
+        "cache_set": 12
+      },
+      {
+        "rank": 6,
+        "relative": 2263,
+        "trace_first_relatives": [
+          27709,
+          27135,
+          24779
+        ],
+        "trace_relative_to_anchor": [
+          2263,
+          1930,
+          2103
+        ],
+        "paddr": 2149856064,
+        "paddr_hex": "0x0000000080243340",
+        "cache_set": 13
+      },
+      {
+        "rank": 7,
+        "relative": 2562,
+        "trace_first_relatives": [
+          28008,
+          27434,
+          25005
+        ],
+        "trace_relative_to_anchor": [
+          2562,
+          2229,
+          2329
+        ],
+        "paddr": 2149870528,
+        "paddr_hex": "0x0000000080246bc0",
+        "cache_set": 47
+      },
+      {
+        "rank": 8,
+        "relative": 2607,
+        "trace_first_relatives": [
+          28053,
+          27479,
+          25050
+        ],
+        "trace_relative_to_anchor": [
+          2607,
+          2274,
+          2374
+        ],
+        "paddr": 2149870592,
+        "paddr_hex": "0x0000000080246c00",
+        "cache_set": 48
+      },
+      {
+        "rank": 9,
+        "relative": 2654,
+        "trace_first_relatives": [
+          28100,
+          27526,
+          25097
+        ],
+        "trace_relative_to_anchor": [
+          2654,
+          2321,
+          2421
+        ],
+        "paddr": 2149870656,
+        "paddr_hex": "0x0000000080246c40",
+        "cache_set": 49
+      },
+      {
+        "rank": 10,
+        "relative": 2767,
+        "trace_first_relatives": [
+          28213,
+          27598,
+          25214
+        ],
+        "trace_relative_to_anchor": [
+          2767,
+          2393,
+          2538
+        ],
+        "paddr": 2149858240,
+        "paddr_hex": "0x0000000080243bc0",
+        "cache_set": 47
+      },
+      {
+        "rank": 11,
+        "relative": 2873,
+        "trace_first_relatives": [
+          28319,
+          27704,
+          25331
+        ],
+        "trace_relative_to_anchor": [
+          2873,
+          2499,
+          2655
+        ],
+        "paddr": 2149858368,
+        "paddr_hex": "0x0000000080243c40",
+        "cache_set": 49
+      },
+      {
+        "rank": 12,
+        "relative": 2918,
+        "trace_first_relatives": [
+          28364,
+          27749,
+          25376
+        ],
+        "trace_relative_to_anchor": [
+          2918,
+          2544,
+          2700
+        ],
+        "paddr": 2149858432,
+        "paddr_hex": "0x0000000080243c80",
+        "cache_set": 50
+      },
+      {
+        "rank": 13,
+        "relative": 3009,
+        "trace_first_relatives": [
+          28455,
+          27846,
+          25467
+        ],
+        "trace_relative_to_anchor": [
+          3009,
+          2641,
+          2791
+        ],
+        "paddr": 2149870720,
+        "paddr_hex": "0x0000000080246c80",
+        "cache_set": 50
+      },
+      {
+        "rank": 14,
+        "relative": 3082,
+        "trace_first_relatives": [
+          28528,
+          27958,
+          25540
+        ],
+        "trace_relative_to_anchor": [
+          3082,
+          2753,
+          2864
+        ],
+        "paddr": 2149856704,
+        "paddr_hex": "0x00000000802435c0",
+        "cache_set": 23
+      },
+      {
+        "rank": 15,
+        "relative": 3219,
+        "trace_first_relatives": [
+          28665,
+          28095,
+          25636
+        ],
+        "trace_relative_to_anchor": [
+          3219,
+          2890,
+          2960
+        ],
+        "paddr": 2149843648,
+        "paddr_hex": "0x00000000802402c0",
+        "cache_set": 11
+      }
+    ]
+  }
+}
