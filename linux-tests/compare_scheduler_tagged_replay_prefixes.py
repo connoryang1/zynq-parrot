@@ -28,7 +28,8 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
         if reference["config"] != result["config"]:
             raise ValueError("prefix-image configurations do not match")
     if reference["config"]["mode"] not in (
-            "instruction-wake", "instruction-explicit"):
+            "instruction-wake", "instruction-explicit",
+            "instruction-explicit-roundtrip"):
         raise ValueError(
             "prefix-image comparison requires an instruction replay mode"
         )

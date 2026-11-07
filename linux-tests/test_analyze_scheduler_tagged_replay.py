@@ -8,6 +8,9 @@ from pathlib import Path
 from analyze_scheduler_tagged_replay import analyze
 from analyze_scheduler_tagged_replay_tail import pool as pool_tail
 from compare_scheduler_tagged_replay_prefixes import compare as compare_prefixes
+from compare_scheduler_tagged_replay_tail_prefixes import (
+    compare as compare_tail_prefixes,
+)
 from compare_scheduler_tagged_replay_routes import compare
 from pool_scheduler_tagged_replay_replicates import pool
 
@@ -448,6 +451,48 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             result["metrics"]["load_cycles"]
                   ["candidate_incremental_saved_cycles"],
             20,
+        )
+
+    def test_prefix_comparison_accepts_explicit_roundtrip_mode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-explicit-roundtrip",
+                prefix_entries=8, nbf_sha256="1" * 64,
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-explicit-roundtrip",
+                prefix_entries=16, nbf_sha256="2" * 64,
+            )
+            result = compare_prefixes(
+                control, candidate, bootstrap_samples=10
+            )
+        self.assertEqual(
+            result["config"]["mode"], "instruction-explicit-roundtrip"
+        )
+
+    def test_tail_prefix_comparison_accepts_explicit_roundtrip_mode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-explicit-roundtrip",
+                prefix_entries=8, nbf_sha256="1" * 64, tail=True,
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-explicit-roundtrip",
+                prefix_entries=16, nbf_sha256="2" * 64, tail=True,
+            )
+            result = compare_tail_prefixes(
+                control, candidate, bootstrap_samples=10
+            )
+        self.assertEqual(
+            result["metrics"]["return_handoff"]
+                  ["candidate_incremental_saved_cycles"],
+            0,
         )
 
     def test_prefix_comparison_rejects_same_nbf(self):
