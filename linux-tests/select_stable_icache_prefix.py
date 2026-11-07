@@ -18,7 +18,8 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def select(paths, kernel_sha256, selection_floor, limit, anchor_paddr=None):
+def select(paths, kernel_sha256, selection_floor, limit, anchor_paddr=None,
+           mode="off"):
     if len(paths) < 2:
         raise ValueError("stable selection requires at least two traces")
     if not re.fullmatch(r"[0-9a-f]{64}", kernel_sha256):
@@ -30,7 +31,10 @@ def select(paths, kernel_sha256, selection_floor, limit, anchor_paddr=None):
                      or not PRIVILEGED_START <= anchor_paddr < PRIVILEGED_END))
             or not 1 <= limit <= 256):
         raise ValueError("invalid selection floor or limit")
-    traces = [load_trace(path, "off", 0) for path in paths]
+    if mode not in ("off", "instruction-explicit-directed"):
+        raise ValueError("unsupported entry-trace mode")
+    expected_trial = 1 if mode == "off" else 0
+    traces = [load_trace(path, mode, 0, expected_trial) for path in paths]
     reference = traces[0]["status"]
     for trace in traces[1:]:
         for key in IDENTITY_KEYS:
@@ -99,6 +103,7 @@ def select(paths, kernel_sha256, selection_floor, limit, anchor_paddr=None):
             "kernel_sha256": kernel_sha256,
         },
         "selection": {
+            "mode": mode,
             "floor_relative_cycle": selection_floor,
             "anchor_paddr": anchor_paddr,
             "anchor_paddr_hex": (
@@ -153,11 +158,15 @@ def main():
         help="align each trace on this cache-line physical address",
     )
     parser.add_argument("--limit", type=int, default=16)
+    parser.add_argument(
+        "--mode", choices=("off", "instruction-explicit-directed"),
+        default="off",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     result = select(
         args.trace, args.kernel_sha256, args.selection_floor, args.limit,
-        args.anchor_paddr,
+        args.anchor_paddr, args.mode,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
