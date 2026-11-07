@@ -8,6 +8,7 @@ BP_LINUX_CC_PATH := $(shell command -v $(BP_LINUX_CC) 2>/dev/null)
 BP_LINUX_PREFIX ?= $(patsubst %gcc,%,$(BP_LINUX_CC_PATH))
 BP_LINUX_TOOLCHAIN_BIN ?= $(dir $(BP_LINUX_CC_PATH))
 BP_LINUX_TARGET ?= $(patsubst %-gcc,%,$(notdir $(BP_LINUX_CC_PATH)))
+BP_LINUX_DYNAMIC_CC ?= $(SDK_LINUX_DIR)/work/buildroot/host/bin/riscv64-linux-gcc
 BP_OBJCOPY ?= $(TOP)/install/bin/riscv64-unknown-elf-objcopy
 BP_DTS_PYTHON ?= python3
 BP_CPIO ?= cpio
@@ -101,7 +102,7 @@ PHYSICAL_PREVIEW_CFLAGS := -O2 -static -Wall -Wextra -Werror \
 # command-line limit reduce prompt round trips without changing ELF bytes.
 PHYSICAL_PREVIEW_TRANSFER_WIDTH ?= 76
 
-.PHONY: app tiny check-linux-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-linux-data-preview stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
+.PHONY: app tiny check-linux-cc check-linux-dynamic-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-linux-data-preview stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
 
 app: $(APP)
 
@@ -173,9 +174,9 @@ $(REQUEST_APP) $(REQUEST_LOAD_AHEAD_APP): request_benchmark.c ../software/includ
 
 # Optional compact shell-transfer ELF. The guest must provide the matching
 # RV64 lp64d dynamic loader and all required GLIBC symbol versions.
-$(REQUEST_DYNAMIC_APP) $(REQUEST_LOAD_AHEAD_DYNAMIC_APP): request_benchmark.c ../software/include/bp_prefetch.h ../software/include/bp_load_ahead.h ../testing/mt_seed.h Makefile FORCE
+$(REQUEST_DYNAMIC_APP) $(REQUEST_LOAD_AHEAD_DYNAMIC_APP): request_benchmark.c ../software/include/bp_prefetch.h ../software/include/bp_load_ahead.h ../testing/mt_seed.h Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread \
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread \
 	  -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=$(REQUEST_NUM_CONTEXTS) \
 	  -DBP_REQUEST_LOAD_AHEAD=$(if $(filter $(REQUEST_LOAD_AHEAD_DYNAMIC_APP),$@),1,0) -o $@ $< >&2
 
@@ -187,40 +188,40 @@ $(TRACE_CAPTURE_APP): cache_miss_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
 
-$(TRACE_CAPTURE_DYNAMIC_APP): cache_miss_trace_capture.c Makefile FORCE
+$(TRACE_CAPTURE_DYNAMIC_APP): cache_miss_trace_capture.c Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_BENCH_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
 
-$(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
+$(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
 $(TAGGED_REPLAY_BENCH_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
 
-$(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE
+$(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
 $(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
 
-$(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
+$(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
-	@$(BP_LINUX_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
 emit-request-transfer: check-linux-cc request-benchmark
 	@printf '%s\n' ': > /tmp/request_benchmark.b64'
 	@base64 -w 76 $(REQUEST_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark.b64|"
 	@printf '%s\n' 'base64 -d /tmp/request_benchmark.b64 > /tmp/request_benchmark' 'chmod +x /tmp/request_benchmark'
 
-emit-request-dynamic-transfer: check-linux-cc request-benchmark-dynamic
+emit-request-dynamic-transfer: check-linux-dynamic-cc request-benchmark-dynamic
 	@printf '%s\n' ': > /tmp/request_benchmark_dynamic.b64'
 	@base64 -w 76 $(REQUEST_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/request_benchmark_dynamic.b64 > /tmp/request_benchmark_dynamic' 'chmod +x /tmp/request_benchmark_dynamic'
@@ -230,7 +231,7 @@ emit-request-load-ahead-transfer: check-linux-cc request-benchmark-load-ahead
 	@base64 -w 76 $(REQUEST_LOAD_AHEAD_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_load_ahead.b64|"
 	@printf '%s\n' 'base64 -d /tmp/request_benchmark_load_ahead.b64 > /tmp/request_benchmark_load_ahead' 'chmod +x /tmp/request_benchmark_load_ahead'
 
-emit-request-load-ahead-dynamic-transfer: check-linux-cc request-benchmark-load-ahead-dynamic
+emit-request-load-ahead-dynamic-transfer: check-linux-dynamic-cc request-benchmark-load-ahead-dynamic
 	@printf '%s\n' ': > /tmp/request_benchmark_load_ahead_dynamic.b64'
 	@base64 -w 76 $(REQUEST_LOAD_AHEAD_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_load_ahead_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/request_benchmark_load_ahead_dynamic.b64 > /tmp/request_benchmark_load_ahead_dynamic' 'chmod +x /tmp/request_benchmark_load_ahead_dynamic'
@@ -240,7 +241,7 @@ emit-cache-miss-trace-transfer: check-linux-cc cache-miss-trace-capture
 	@base64 -w 76 $(TRACE_CAPTURE_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture.b64|"
 	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture.b64 > /tmp/cache_miss_trace_capture' 'chmod +x /tmp/cache_miss_trace_capture'
 
-emit-cache-miss-trace-dynamic-transfer: check-linux-cc cache-miss-trace-capture-dynamic
+emit-cache-miss-trace-dynamic-transfer: check-linux-dynamic-cc cache-miss-trace-capture-dynamic
 	@printf '%s\n' ': > /tmp/cache_miss_trace_capture_dynamic.b64'
 	@base64 -w 76 $(TRACE_CAPTURE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_capture_dynamic' 'chmod +x /tmp/cache_miss_trace_capture_dynamic'
@@ -250,7 +251,7 @@ emit-physical-preview-benchmark-transfer: check-linux-cc physical-preview-benchm
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark.b64 > /tmp/scheduler_physical_preview_benchmark' 'chmod +x /tmp/scheduler_physical_preview_benchmark'
 
-emit-physical-preview-benchmark-dynamic-transfer: check-linux-cc physical-preview-benchmark-dynamic
+emit-physical-preview-benchmark-dynamic-transfer: check-linux-dynamic-cc physical-preview-benchmark-dynamic
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark_dynamic.b64'
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark_dynamic.b64 > /tmp/scheduler_physical_preview_benchmark_dynamic' 'chmod +x /tmp/scheduler_physical_preview_benchmark_dynamic'
@@ -260,7 +261,7 @@ emit-tagged-replay-benchmark-transfer: check-linux-cc tagged-replay-benchmark
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark.b64 > /tmp/scheduler_tagged_replay_benchmark' 'chmod +x /tmp/scheduler_tagged_replay_benchmark'
 
-emit-tagged-replay-benchmark-dynamic-transfer: check-linux-cc tagged-replay-benchmark-dynamic
+emit-tagged-replay-benchmark-dynamic-transfer: check-linux-dynamic-cc tagged-replay-benchmark-dynamic
 	@printf '%s\n' ': > /tmp/scheduler_tagged_replay_benchmark_dynamic.b64'
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark_dynamic.b64 > /tmp/scheduler_tagged_replay_benchmark_dynamic' 'chmod +x /tmp/scheduler_tagged_replay_benchmark_dynamic'
@@ -270,7 +271,7 @@ emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture.b64 > /tmp/scheduler_physical_preview_trace_capture' 'chmod +x /tmp/scheduler_physical_preview_trace_capture'
 
-emit-physical-preview-trace-dynamic-transfer: check-linux-cc physical-preview-trace-dynamic
+emit-physical-preview-trace-dynamic-transfer: check-linux-dynamic-cc physical-preview-trace-dynamic
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture_dynamic.b64'
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture_dynamic.b64 > /tmp/scheduler_physical_preview_trace_capture_dynamic' 'chmod +x /tmp/scheduler_physical_preview_trace_capture_dynamic'
@@ -301,6 +302,11 @@ check-linux-cc:
 	}
 	@command -v $(BP_LINUX_PREFIX)objcopy >/dev/null || { \
 	  echo "missing matching Linux objcopy tool $(BP_LINUX_PREFIX)objcopy" >&2; exit 2; \
+	}
+
+check-linux-dynamic-cc:
+	@test -x $(BP_LINUX_DYNAMIC_CC) || { \
+	  echo "missing BP_LINUX_DYNAMIC_CC=$(BP_LINUX_DYNAMIC_CC); prepare the matching Buildroot image toolchain" >&2; exit 2; \
 	}
 
 # Building an image additionally needs the bare-metal objcopy and the NBF
