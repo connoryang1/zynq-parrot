@@ -31,6 +31,7 @@
 #define PR_BP_PREVIEW_REPLAY_CONFIG 0x4250505c
 #define PR_BP_PREVIEW_REPLAY_STATUS 0x4250505d
 #define PR_BP_PREVIEW_ICACHE_STATUS 0x4250505e
+#define PR_BP_PREVIEW_ICACHE_TRIGGER 0x4250505f
 #define BP_REPLAY_DRAIN_MASK (0xfUL | (7UL << 60))
 #define TRACE_DEPTH 256U
 
@@ -215,7 +216,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned mode, unsigned delay, unsigned gap,
 		      unsigned lines_per_base, unsigned config_lines_per_base,
 		      int probe_status, int skew_layout, int trace_stop_at_entry,
-		      unsigned expected_enabled_hooks, _Atomic uint32_t *phase,
+		      unsigned expected_enabled_hooks, int explicit_instruction,
+		      _Atomic uint32_t *phase,
 		      enum sync_style sync)
 {
 	volatile unsigned char *target = mmap(NULL, bases * page_bytes,
@@ -258,7 +260,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		fail("pin tagged replay footprint");
 
 	for (unsigned trial = 0; trial < trials;) {
-		unsigned enabled = mode ? trial_enabled(trial) : 0;
+		unsigned enabled = (mode || explicit_instruction)
+			? trial_enabled(trial) : 0;
 		unsigned long before_hook, after_hook;
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
@@ -406,6 +409,7 @@ int main(int argc, char **argv)
 	const char *mode_name = "data";
 	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
+	int explicit_instruction = 0;
 	int trace_stop_at_entry = 0, trace_allow_i_overflow = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
@@ -415,7 +419,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix]\n",
 			argv[0]);
 		return 2;
 	}
@@ -431,6 +435,11 @@ int main(int argc, char **argv)
 			 * data replay. Mode thirteen is the dedicated instruction-only
 			 * successful-wakeup trigger and accounts for exactly one hook. */
 			mode = 13;
+		}
+		else if (!strcmp(argv[1], "instruction-explicit")) {
+			mode = 0;
+			explicit_instruction = 1;
+			expected_enabled_hooks = 0;
 		}
 		else if (!strcmp(argv[1], "joint"))
 			mode = 10;
@@ -561,7 +570,8 @@ int main(int argc, char **argv)
 	       expected_enabled_hooks, trace_icache,
 	       trace_stop_at_entry ? "entry" : "after-load",
 	       trace_allow_i_overflow);
-	if (!strcmp(mode_name, "instruction-wake"))
+	if (!strcmp(mode_name, "instruction-wake")
+	    || !strcmp(mode_name, "instruction-explicit"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
 	if (child < 0)
@@ -572,7 +582,8 @@ int main(int argc, char **argv)
 		child_run(to_child[0], to_parent[1], samples, mode, delay, gap,
 			  lines_per_base, config_lines_per_base, probe_status,
 			  skew_layout, trace_stop_at_entry,
-			  expected_enabled_hooks, &shared->phase, sync);
+			  expected_enabled_hooks, explicit_instruction,
+			  &shared->phase, sync);
 		return 0;
 	}
 	close(to_child[0]);
@@ -580,7 +591,8 @@ int main(int argc, char **argv)
 	for (unsigned trial = 0; trial < trials;) {
 		uint64_t lead_start;
 		int woken;
-		unsigned enabled = mode ? trial_enabled(trial) : 0;
+		unsigned enabled = (mode || explicit_instruction)
+			? trial_enabled(trial) : 0;
 
 		diagnostic_stage("parent", "wait_ready", trial, enabled);
 		if (sync == sync_pipe)
@@ -602,12 +614,17 @@ int main(int argc, char **argv)
 		 */
 		if (trace_icache
 		    && trial == warmup
-				+ (unsigned)((mode != 0) || trace_stop_at_entry)) {
+				+ (unsigned)((mode != 0) || explicit_instruction
+					     || trace_stop_at_entry)) {
 			trace_control(2);
 			samples[trial].trace_start = cycle();
 			trace_control(3);
 		}
 		samples[trial].launch = cycle();
+		if (explicit_instruction
+		    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled,
+			     0UL, 0UL, 0UL))
+			fail("explicit instruction-prefix trigger");
 		if (sync == sync_pipe) {
 			transfer(to_child[1], &token, 1);
 			woken = 1;
@@ -662,7 +679,8 @@ int main(int argc, char **argv)
 	}
 	if (trace_icache) {
 		const unsigned trace_trial =
-			warmup + (unsigned)((mode != 0) || trace_stop_at_entry);
+			warmup + (unsigned)((mode != 0) || explicit_instruction
+					    || trace_stop_at_entry);
 		const uint64_t raw_status = samples[trace_trial].trace_status;
 		const unsigned icount = raw_status & 0x1ff;
 		const unsigned dcount = (raw_status >> 9) & 0x1ff;
@@ -695,7 +713,8 @@ int main(int argc, char **argv)
 		else
 			printf("TAGGED_REPLAY_ITRACE_PASS records=%u\n", icount);
 	}
-	if (!strcmp(mode_name, "instruction-wake")) {
+	if (!strcmp(mode_name, "instruction-wake")
+	    || !strcmp(mode_name, "instruction-explicit")) {
 		icache_status_after = icache_prefix_status();
 		printf("TAGGED_REPLAY_ICACHE_STATUS before=0x%016llx after=0x%016llx\n",
 		       (unsigned long long)icache_status_before,

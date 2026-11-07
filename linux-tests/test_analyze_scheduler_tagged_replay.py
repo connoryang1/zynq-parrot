@@ -20,10 +20,11 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     kernel_modes = {
         "off": 0, "data": 9, "data-late": 11,
         "instruction-select": 3, "instruction-wake": 13, "joint": 10,
+        "instruction-explicit": 0,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
-    expected_hooks = 1
+    expected_hooks = 0 if mode == "instruction-explicit" else 1
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
@@ -31,7 +32,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         f"probe_status={int(probe_status)} sync={sync} "
         f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks}"
     ]
-    if mode == "instruction-wake":
+    if mode in ("instruction-wake", "instruction-explicit"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -43,7 +44,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         enabled = (0 if mode == "off" else
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
         expects_trigger = mode not in (
-            "off", "instruction-select", "instruction-wake"
+            "off", "instruction-select", "instruction-wake",
+            "instruction-explicit"
         )
         admitted = (lines if enabled and expects_trigger
                     and mode != "joint-follow-only" else 0)
@@ -179,6 +181,20 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             ) + "\n")
             with self.assertRaisesRegex(ValueError, "I-cache status marker"):
                 analyze(path, bootstrap_samples=10)
+
+    def test_explicit_instruction_mode_has_no_wakeup_hook(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="instruction-explicit"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["kernel_mode"], 0)
+        self.assertEqual(result["config"]["expected_hooks"], 0)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["accepted_triggers"],
+            255,
+        )
 
     def test_instruction_wakeup_accepts_image_bound_prefix_count(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -70,8 +70,9 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch \
 	$(CURDIR)/kernel-patches/0020-blackparrot-tagged-data-instruction-split.patch \
 	$(CURDIR)/kernel-patches/0021-blackparrot-dedicated-wakeup-instruction-replay.patch \
-	$(CURDIR)/kernel-patches/0022-blackparrot-icache-prefix-status.patch
-LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch
+	$(CURDIR)/kernel-patches/0022-blackparrot-icache-prefix-status.patch \
+	$(CURDIR)/kernel-patches/0023-blackparrot-explicit-instruction-prefix-trigger.patch
+LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0022-blackparrot-icache-prefix-status.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -394,10 +395,11 @@ stage-rootfs: check-image-toolchain app
 # Rebuild a boot image with the smoke executable in its initramfs.  The SDK
 # Makefile does not track overlay-file changes, so clean_sysroot is deliberate:
 # it prevents a stale rootfs from being packaged as a purported demo image.
-linux-image: check-image-toolchain stage-opensbi-platform
+linux-image: check-image-toolchain stage-opensbi-platform stage-linux-data-preview
 	$(MAKE) -C $(SDK_LINUX_DIR) clean_sysroot
 	$(MAKE) -C $(SDK_LINUX_DIR) sysroot WITH_SHELL=$(INIT_SCRIPT)
 	$(MAKE) stage-rootfs
+	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
 	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL=$(INIT_SCRIPT) \
 	  LINUX_TARGET=$(BP_LINUX_TARGET)
 	@mkdir -p $(OUT)

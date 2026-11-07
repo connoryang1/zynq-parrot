@@ -12,7 +12,7 @@ from pathlib import Path
 
 CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|"
-    r"instruction-wake|joint|joint-split|joint-split-one-hook|"
+    r"instruction-wake|instruction-explicit|joint|joint-split|joint-split-one-hook|"
     r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
@@ -143,6 +143,7 @@ def analyze(path, bootstrap_samples=20000):
             "data-late": 11,
             "instruction-select": 3,
             "instruction-wake": 13,
+            "instruction-explicit": 0,
             "joint": 10,
             "joint-split": 12,
             "joint-split-one-hook": 12,
@@ -150,9 +151,9 @@ def analyze(path, bootstrap_samples=20000):
         }
         if config["kernel_mode"] != expected_kernel_modes[mode]:
             raise ValueError("mode name does not match configured kernel mode")
-    elif mode == "instruction-wake":
+    elif mode in ("instruction-wake", "instruction-explicit"):
         raise ValueError(
-            "instruction-wake transcript lacks dedicated kernel-mode binding"
+            f"{mode} transcript lacks dedicated kernel-mode binding"
         )
     if (config["lines"] not in range(4, 33, 4) or config["slot"] != 2):
         raise ValueError("unexpected replay footprint shape")
@@ -188,9 +189,9 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("retry count does not match filtered attempts")
 
     icache_statuses = ICACHE_STATUS.findall(text)
-    if mode == "instruction-wake":
+    if mode in ("instruction-wake", "instruction-explicit"):
         if len(icache_statuses) != 1:
-            raise ValueError("instruction-wake requires one I-cache status marker")
+            raise ValueError(f"{mode} requires one I-cache status marker")
         before = int(icache_statuses[0][0], 16)
         after = int(icache_statuses[0][1], 16)
         before_decoded = {
@@ -289,7 +290,8 @@ def analyze(path, bootstrap_samples=20000):
         # PR_BP_PREVIEW_REPLAY_CONFIG sets the hardware clear bit before every
         # trial, so these are independent snapshots rather than deltas.
         expects_trigger = mode not in (
-            "off", "instruction-select", "instruction-wake"
+            "off", "instruction-select", "instruction-wake",
+            "instruction-explicit"
         )
         expected_entries = 0 if mode == "joint-follow-only" else config["lines"]
         expected_triggers = row["enabled"] if expects_trigger else 0
@@ -315,6 +317,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure successful-wakeup instruction replay under the matched "
             "tagged-data workload without issuing a data tag."
             if mode == "instruction-wake" else
+            "Measure an explicit parent-issued instruction-prefix hint "
+            "immediately before the matched blocking handoff."
+            if mode == "instruction-explicit" else
             "Measure wake-time tagged data while the selection block is "
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
@@ -352,7 +357,7 @@ def analyze(path, bootstrap_samples=20000):
             for metric in METRICS
         },
     }
-    if mode == "instruction-wake":
+    if mode in ("instruction-wake", "instruction-explicit"):
         result["icache_prefix_status"] = {
             "before": before_decoded,
             "after": after_decoded,

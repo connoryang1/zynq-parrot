@@ -81,6 +81,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_explicit_instruction_mode(self):
+        self.assertIn(
+            " instruction-explicit 0 0 normal 0 8 0 aligned pipe; ",
+            runner.benchmark_command(
+                "instruction-explicit", 0, 0, "normal", 0
+            ),
+        )
+
     def test_command_binds_split_joint_mode(self):
         self.assertIn(
             " joint-split 0 0 normal 0 8 0 aligned pipe; ",

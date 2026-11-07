@@ -1,0 +1,34 @@
+This patch exposes an explicit shared instruction-prefix trigger for a
+scheduler-aware userspace experiment. Both A/B arms execute the same prctl;
+argument zero is a no-op and argument one emits the existing supervisor CSR
+write, so the measured interval includes the software-hint cost.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -323,5 +323,7 @@
+ #define PR_BP_PREVIEW_REPLAY_STATUS	0x4250505d
+ /* Copy the 64-bit shared instruction-prefix controller status to arg2. */
+ #define PR_BP_PREVIEW_ICACHE_STATUS	0x4250505e
++/* Optionally trigger the shared instruction prefix: arg2 is zero or one. */
++#define PR_BP_PREVIEW_ICACHE_TRIGGER	0x4250505f
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2899,6 +2899,16 @@
+ 			error = 0;
+ 		break;
+ 	}
++	case PR_BP_PREVIEW_ICACHE_TRIGGER:
++		if (arg2 > 1 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		/* Keep the no-op arm in the same syscall and branch path. */
++		if (arg2)
++			asm volatile("csrw 0x5c0, zero" ::: "memory");
++		error = 0;
++		break;
+ 	case PR_BP_PREVIEW_GET_COUNT:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
