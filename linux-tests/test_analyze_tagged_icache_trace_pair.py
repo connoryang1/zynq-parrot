@@ -10,7 +10,7 @@ import analyze_tagged_icache_trace_pair as analyzer
 
 class TaggedIcacheTracePairTest(unittest.TestCase):
     def make_trace(self, root, name, mode, enabled, lines, overflow=False,
-                   trial=1, explicit_off=False):
+                   trial=1, explicit_off=False, return_window=False):
         path = root / name
         status = {
             "status": "PASS", "mode": mode,
@@ -22,6 +22,11 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
         if explicit_off:
             status["trace_icache_entry_prefix"] = False
             status["trace_icache_entry_prefix_off"] = True
+        if return_window:
+            status["trace_icache_entry_prefix"] = False
+            status["trace_icache_entry_prefix_off"] = False
+            status["trace_icache_return_prefix"] = not explicit_off
+            status["trace_icache_return_prefix_off"] = explicit_off
         path.with_suffix(path.suffix + ".status.json").write_text(
             json.dumps(status) + "\n"
         )
@@ -77,6 +82,22 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
                 [0x80002000], trial=1,
             )
             result = analyzer.analyze(off, on, self.make_prefix(root))
+        self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
+
+    def test_accepts_explicit_roundtrip_return_window(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            off = self.make_trace(
+                root, "off.log", "instruction-explicit-roundtrip", 0,
+                [0x80001000, 0x80002000], trial=0, explicit_off=True,
+                return_window=True,
+            )
+            on = self.make_trace(
+                root, "on.log", "instruction-explicit-roundtrip", 1,
+                [0x80002000], trial=1, return_window=True,
+            )
+            result = analyzer.analyze(off, on, self.make_prefix(root))
+        self.assertEqual(result["window"], "return")
         self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
 
     def test_interpretation_names_truncated_arm(self):

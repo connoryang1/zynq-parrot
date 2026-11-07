@@ -97,6 +97,22 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_explicit_roundtrip_return_trace_arms(self):
+        self.assertIn(
+            " trace-icache-return-prefix; ",
+            runner.benchmark_command(
+                "instruction-explicit-roundtrip", 0, 0, "normal", 0,
+                trace_icache_return_prefix=True,
+            ),
+        )
+        self.assertIn(
+            " trace-icache-return-prefix-off; ",
+            runner.benchmark_command(
+                "instruction-explicit-roundtrip", 0, 0, "normal", 0,
+                trace_icache_return_prefix_off=True,
+            ),
+        )
+
     def test_command_binds_explicit_disabled_trace_arm(self):
         self.assertIn(
             " instruction-explicit 0 0 normal 0 8 0 aligned pipe "

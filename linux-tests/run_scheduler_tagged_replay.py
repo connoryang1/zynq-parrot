@@ -35,9 +35,15 @@ def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
                       guest_diagnostic=False, trace_icache=False,
                       trace_icache_entry=False,
                       trace_icache_entry_prefix=False,
-                      trace_icache_entry_prefix_off=False):
+                      trace_icache_entry_prefix_off=False,
+                      trace_icache_return_prefix=False,
+                      trace_icache_return_prefix_off=False):
     prefix = "BP_TAGGED_REPLAY_DIAG=1 " if guest_diagnostic else ""
-    trace_arg = (" trace-icache-entry-prefix-off"
+    trace_arg = (" trace-icache-return-prefix-off"
+                 if trace_icache_return_prefix_off else
+                 " trace-icache-return-prefix"
+                 if trace_icache_return_prefix else
+                 " trace-icache-entry-prefix-off"
                  if trace_icache_entry_prefix_off else
                  " trace-icache-entry-prefix" if trace_icache_entry_prefix else
                  " trace-icache-entry" if trace_icache_entry else
@@ -114,6 +120,8 @@ def parse_args(argv=None):
     trace_group.add_argument("--trace-icache-entry", action="store_true")
     trace_group.add_argument("--trace-icache-entry-prefix", action="store_true")
     trace_group.add_argument("--trace-icache-entry-prefix-off", action="store_true")
+    trace_group.add_argument("--trace-icache-return-prefix", action="store_true")
+    trace_group.add_argument("--trace-icache-return-prefix-off", action="store_true")
     parser.add_argument("--print-command", action="store_true")
     return parser.parse_args(argv)
 
@@ -159,6 +167,7 @@ def run(args):
         args.lines_per_base, args.probe_status, args.layout, args.sync,
         args.guest_diagnostic, args.trace_icache, args.trace_icache_entry,
         args.trace_icache_entry_prefix, args.trace_icache_entry_prefix_off,
+        args.trace_icache_return_prefix, args.trace_icache_return_prefix_off,
     )
     status = {
         "status": "running",
@@ -180,10 +189,14 @@ def run(args):
         "guest_diagnostic": args.guest_diagnostic,
         "trace_icache": (args.trace_icache or args.trace_icache_entry
                          or args.trace_icache_entry_prefix
-                         or args.trace_icache_entry_prefix_off),
+                         or args.trace_icache_entry_prefix_off
+                         or args.trace_icache_return_prefix
+                         or args.trace_icache_return_prefix_off),
         "trace_icache_entry": args.trace_icache_entry,
         "trace_icache_entry_prefix": args.trace_icache_entry_prefix,
         "trace_icache_entry_prefix_off": args.trace_icache_entry_prefix_off,
+        "trace_icache_return_prefix": args.trace_icache_return_prefix,
+        "trace_icache_return_prefix_off": args.trace_icache_return_prefix_off,
         "command": command,
     }
     child = None
@@ -240,7 +253,9 @@ def run(args):
                 and "TAGGED_REPLAY_ITRACE_PASS" not in transcript):
             raise RuntimeError("required instruction-trace marker missing")
         if ((args.trace_icache_entry_prefix
-             or args.trace_icache_entry_prefix_off)
+             or args.trace_icache_entry_prefix_off
+             or args.trace_icache_return_prefix
+             or args.trace_icache_return_prefix_off)
                 and "TAGGED_REPLAY_ITRACE_PREFIX_PASS" not in transcript):
             raise RuntimeError("required instruction-trace prefix marker missing")
         status.update(status="PASS", runner_exit=0)

@@ -36,16 +36,24 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_trace(path, expected_mode, expected_enabled, expected_trial=1):
+def load_trace(path, expected_mode, expected_enabled, expected_trial=1,
+               expected_window="entry"):
     status_path = path.with_suffix(path.suffix + ".status.json")
     if not status_path.is_file():
         raise ValueError(f"missing status for {path}")
     status = json.loads(status_path.read_text())
     if status.get("status") != "PASS" or status.get("mode") != expected_mode:
         raise ValueError(f"unexpected runner status or mode for {path}")
-    if not (status.get("trace_icache_entry_prefix")
-            or status.get("trace_icache_entry_prefix_off")):
-        raise ValueError(f"trace is not an entry-prefix capture: {path}")
+    entry_capture = (status.get("trace_icache_entry_prefix")
+                     or status.get("trace_icache_entry_prefix_off"))
+    return_capture = (status.get("trace_icache_return_prefix")
+                      or status.get("trace_icache_return_prefix_off"))
+    if ((expected_window == "entry" and not entry_capture)
+            or (expected_window == "return" and not return_capture)
+            or (expected_window not in ("entry", "return"))):
+        raise ValueError(
+            f"trace is not an {expected_window}-prefix capture: {path}"
+        )
 
     text = path.read_text(errors="replace").replace("\r", "")
     headers = HEADER.findall(text)
@@ -98,6 +106,7 @@ def load_trace(path, expected_mode, expected_enabled, expected_trial=1):
             "wake_to_load": row[4],
             "roundtrip": row[5],
         },
+        "window": expected_window,
     }
 
 
@@ -122,12 +131,22 @@ def analyze(off_path, on_path, prefix_path):
     if not off_status_path.is_file():
         raise ValueError(f"missing status for {off_path}")
     off_mode = json.loads(off_status_path.read_text()).get("mode")
-    if off_mode == "instruction-explicit":
+    if off_mode == "instruction-explicit-roundtrip":
+        off = load_trace(
+            off_path, "instruction-explicit-roundtrip", 0, 0, "return"
+        )
+        on = load_trace(
+            on_path, "instruction-explicit-roundtrip", 1, 1, "return"
+        )
+        window = "return"
+    elif off_mode == "instruction-explicit":
         off = load_trace(off_path, "instruction-explicit", 0, 0)
         on = load_trace(on_path, "instruction-explicit", 1, 1)
+        window = "entry"
     else:
         off = load_trace(off_path, "off", 0)
         on = load_trace(on_path, "instruction-wake", 1)
+        window = "entry"
     for key in IDENTITY_KEYS:
         if off["status"].get(key) != on["status"].get(key):
             raise ValueError(f"off/on identity mismatch: {key}")
@@ -145,9 +164,10 @@ def analyze(off_path, on_path, prefix_path):
     added = [line for line in prefix_lines if line not in off_set and line in on_set]
     return {
         "purpose": (
-            "Compare same-image, same-ELF, adjacent-arm entry-bounded I-miss "
+            f"Compare same-image, same-ELF, adjacent-arm {window}-bounded I-miss "
             "prefixes without treating a truncated arm as complete."
         ),
+        "window": window,
         "prefix": {
             "path": str(prefix_path),
             "sha256": sha256(prefix_path),
