@@ -28,11 +28,14 @@ def load_excluded_prefix(path):
     return excluded
 
 
-def select(paths, excluded_prefix_path, limit, allow_truncated=False):
+def select(paths, excluded_prefix_path, limit, allow_truncated=False,
+           anchor_paddr=None):
     if len(paths) < 3:
         raise ValueError("return selection requires at least three traces")
     if not 1 <= limit <= 256:
         raise ValueError("invalid selection limit")
+    if anchor_paddr is not None and anchor_paddr & 63:
+        raise ValueError("return anchor is not cache-line aligned")
     traces = [
         load_trace(
             path, "instruction-explicit-roundtrip", 0, 0, "return"
@@ -51,8 +54,23 @@ def select(paths, excluded_prefix_path, limit, allow_truncated=False):
 
     excluded = load_excluded_prefix(excluded_prefix_path)
     first_by_trace = []
+    anchor_relatives = []
     for trace in traces:
-        boundary = trace["return_hint"]["end_relative"]
+        hint_end = trace["return_hint"]["end_relative"]
+        anchor_relative = None
+        if anchor_paddr is not None:
+            anchor_relative = next(
+                (record["relative"] for record in trace["records"]
+                 if (record["paddr"] & ~63) == anchor_paddr),
+                None,
+            )
+            if anchor_relative is None:
+                raise ValueError(
+                    f"return anchor 0x{anchor_paddr:016x} is absent: "
+                    f"{trace['path']}"
+                )
+        anchor_relatives.append(anchor_relative)
+        boundary = max(hint_end, anchor_relative or hint_end)
         first = {}
         for record in trace["records"]:
             address = record["paddr"] & ~63
@@ -63,7 +81,10 @@ def select(paths, excluded_prefix_path, limit, allow_truncated=False):
     for first in first_by_trace[1:]:
         common &= set(first)
 
-    boundaries = [trace["return_hint"]["end_relative"] for trace in traces]
+    boundaries = [
+        max(trace["return_hint"]["end_relative"], anchor or 0)
+        for trace, anchor in zip(traces, anchor_relatives)
+    ]
     ranked = []
     for address in common:
         relatives = [first[address] for first in first_by_trace]
@@ -109,10 +130,18 @@ def select(paths, excluded_prefix_path, limit, allow_truncated=False):
             "stable_reverse_only_lines_available": len(ranked),
             "selected_lines": limit,
             "truncated_prefixes_allowed": allow_truncated,
+            "anchor_paddr": anchor_paddr,
+            "anchor_paddr_hex": (
+                f"0x{anchor_paddr:016x}" if anchor_paddr is not None else None
+            ),
+            "trace_anchor_relatives": anchor_relatives,
+            "trace_selection_floor_relatives": boundaries,
             "policy": (
-                "intersect first occurrences at or after each trace's return-"
-                "hint completion, exclude the installed forward prefix, then "
-                "rank by the latest per-trace distance after hint completion"
+                "intersect first occurrences at or after each trace's "
+                + ("aligned return anchor" if anchor_paddr is not None else
+                   "return-hint completion")
+                + ", exclude the installed forward prefix, then "
+                "rank by the latest per-trace distance after that selection floor"
             ),
         },
         "fixed_shared_prefix": {
@@ -123,9 +152,9 @@ def select(paths, excluded_prefix_path, limit, allow_truncated=False):
                     "paddr": address,
                     "paddr_hex": f"0x{address:016x}",
                     "trace_first_relatives": relatives,
-                    "trace_relative_to_hint_end": after_hint,
-                    "worst_relative_to_hint_end": worst,
-                    "median_relative_to_hint_end": median,
+                    "trace_relative_to_selection_floor": after_hint,
+                    "worst_relative_to_selection_floor": worst,
+                    "median_relative_to_selection_floor": median,
                     "cache_set": (address // 64) % 64,
                 }
                 for rank, (worst, median, address, relatives, after_hint)
@@ -147,11 +176,15 @@ def main():
             "intersection only"
         ),
     )
+    parser.add_argument(
+        "--anchor-paddr", type=lambda value: int(value, 0),
+        help="align selection on this cache-line physical switch boundary",
+    )
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     result = select(
         args.trace, args.exclude_prefix, args.limit,
-        args.allow_truncated_prefixes,
+        args.allow_truncated_prefixes, args.anchor_paddr,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")

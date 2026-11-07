@@ -77,7 +77,9 @@ class StableReturnIcachePrefixTest(unittest.TestCase):
             [line["paddr"] for line in lines],
             [0x80002000, 0x80003000],
         )
-        self.assertEqual(lines[0]["trace_relative_to_hint_end"], [10, 10, 0])
+        self.assertEqual(
+            lines[0]["trace_relative_to_selection_floor"], [10, 10, 0]
+        )
 
     def test_rejects_missing_hint_boundary(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -118,6 +120,46 @@ class StableReturnIcachePrefixTest(unittest.TestCase):
                 allow_truncated=True,
             )
         self.assertTrue(result["selection"]["truncated_prefixes_allowed"])
+
+    def test_aligns_selection_on_per_trace_switch_anchor(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            anchor = 0x80004000
+            traces = [
+                self.make_trace(root, "a.log", [
+                    (40, 0x80002000), (100, anchor), (130, 0x80003000),
+                ]),
+                self.make_trace(root, "b.log", [
+                    (50, 0x80002000), (200, anchor), (240, 0x80003000),
+                ]),
+                self.make_trace(root, "c.log", [
+                    (60, 0x80002000), (300, anchor), (350, 0x80003000),
+                ]),
+            ]
+            result = selector.select(
+                traces, self.make_prefix(root), 2,
+                anchor_paddr=anchor,
+            )
+        lines = result["fixed_shared_prefix"]["lines"]
+        self.assertEqual(
+            [line["paddr"] for line in lines], [anchor, 0x80003000]
+        )
+        self.assertEqual(
+            result["selection"]["trace_anchor_relatives"], [100, 200, 300]
+        )
+
+    def test_rejects_missing_switch_anchor(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            traces = [
+                self.make_trace(root, f"{name}.log", [(40, 0x80002000)])
+                for name in "abc"
+            ]
+            with self.assertRaisesRegex(ValueError, "anchor .* is absent"):
+                selector.select(
+                    traces, self.make_prefix(root), 1,
+                    anchor_paddr=0x80004000,
+                )
 
     def test_rejects_identity_mismatch(self):
         with tempfile.TemporaryDirectory() as directory:
