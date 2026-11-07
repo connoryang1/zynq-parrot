@@ -21,6 +21,10 @@ PREFIX_PASS = re.compile(
     r"^TAGGED_REPLAY_ITRACE_PREFIX_PASS truncated=(\d+) records=(\d+)$",
     re.MULTILINE,
 )
+RETURN_HINT = re.compile(
+    r"^TAGGED_REPLAY_RETURN_HINT trial=(\d+) enabled=(\d+) "
+    r"begin_relative=(\d+) end_relative=(\d+)$", re.MULTILINE
+)
 ROW = re.compile(
     r"^TAGGED_REPLAY trial=(\d+) enabled=(\d+).* "
     r"wake_to_entry=(\d+) load_cycles=(\d+) wake_to_load=(\d+) "
@@ -84,6 +88,21 @@ def load_trace(path, expected_mode, expected_enabled, expected_trial=1,
          "paddr": int(paddr, 16), "raw": int(raw_record, 16)}
         for index, relative, paddr, raw_record in matches
     ]
+    hint_matches = RETURN_HINT.findall(text)
+    if len(hint_matches) > 1:
+        raise ValueError(f"multiple return hint boundaries in {path}")
+    return_hint = None
+    if hint_matches:
+        hint_trial, hint_enabled, hint_begin, hint_end = map(
+            int, hint_matches[0]
+        )
+        if (hint_trial != expected_trial or hint_enabled != expected_enabled
+                or hint_begin > hint_end):
+            raise ValueError(f"invalid return hint boundary in {path}")
+        return_hint = {
+            "begin_relative": hint_begin,
+            "end_relative": hint_end,
+        }
     rows = [tuple(map(int, match)) for match in ROW.findall(text)]
     row = next((match for match in rows if match[0] == expected_trial), None)
     if row is None or row[1] != expected_enabled:
@@ -99,6 +118,7 @@ def load_trace(path, expected_mode, expected_enabled, expected_trial=1,
         "repeated_events": icount - len({record["paddr"] for record in records}),
         "truncated": bool(ioverflow),
         "last_relative": records[-1]["relative"],
+        "return_hint": return_hint,
         "records": records,
         "timing": {
             "wake_to_entry": row[2],

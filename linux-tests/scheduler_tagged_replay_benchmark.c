@@ -56,6 +56,7 @@ _Static_assert((bases - 1) * max_lines_per_base * line_bytes
 struct sample {
 	uint64_t launch, entry, after_load, done, returned;
 	uint64_t trace_start, trace_status;
+	uint64_t return_hint_begin, return_hint_end;
 	uint64_t preblock_status;
 	uint64_t entry_probe_status;
 	_Atomic unsigned wake_count;
@@ -197,11 +198,17 @@ static void child_handoff_begin(int in, int out, char *token,
 
 static void child_handoff_end(int out, char *token, _Atomic uint32_t *phase,
 			      enum sync_style sync, int explicit_return_instruction,
-			      unsigned enabled)
+			      unsigned enabled, int record_return_hint,
+			      volatile uint64_t *return_hint_begin,
+			      volatile uint64_t *return_hint_end)
 {
+	if (record_return_hint)
+		*return_hint_begin = cycle();
 	if (explicit_return_instruction
 	    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled, 0UL, 0UL, 0UL))
 		fail("explicit return instruction-prefix trigger");
+	if (record_return_hint)
+		*return_hint_end = cycle();
 	if (sync == sync_pipe) {
 		transfer(out, token, 1);
 		return;
@@ -351,7 +358,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				atomic_load_explicit(&samples[trial].wake_count,
 						     memory_order_relaxed));
 			child_handoff_end(out, &token, phase, sync,
-					  explicit_return_instruction, enabled);
+					  explicit_return_instruction, enabled,
+					  trace_return && trial == trace_trial,
+					  &samples[trial].return_hint_begin,
+					  &samples[trial].return_hint_end);
 			diagnostic_stage("child", "retry_complete", trial, enabled);
 			if (++retries > max_retries)
 				fail("too many tagged replay retries");
@@ -404,7 +414,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		}
 		diagnostic_stage("child", "accepted_end_begin", trial, enabled);
 		child_handoff_end(out, &token, phase, sync,
-				  explicit_return_instruction, enabled);
+				  explicit_return_instruction, enabled,
+				  trace_return && trial == trace_trial,
+				  &samples[trial].return_hint_begin,
+				  &samples[trial].return_hint_end);
 		diagnostic_stage("child", "accepted_complete", trial, enabled);
 		trial++;
 	}
@@ -751,6 +764,23 @@ int main(int argc, char **argv)
 		       trace_trial - warmup, samples[trace_trial].enabled,
 		       icount, dcount, ioverflow, doverflow, armed,
 		       (unsigned long long)raw_status);
+		if (trace_return) {
+			const uint64_t hint_begin =
+				samples[trace_trial].return_hint_begin;
+			const uint64_t hint_end = samples[trace_trial].return_hint_end;
+
+			if (!(samples[trace_trial].trace_start <= hint_begin
+			      && hint_begin <= hint_end
+			      && hint_end <= samples[trace_trial].returned)) {
+				fputs("TAGGED_REPLAY_ITRACE_FAIL invalid return hint boundary\n",
+				      stderr);
+				return 1;
+			}
+			printf("TAGGED_REPLAY_RETURN_HINT trial=%u enabled=%u begin_relative=%u end_relative=%u\n",
+			       trace_trial - warmup, samples[trace_trial].enabled,
+			       (uint32_t)hint_begin - start,
+			       (uint32_t)hint_end - start);
+		}
 		if (armed || (!trace_allow_i_overflow && ioverflow) || doverflow || !icount
 		    || icount > TRACE_DEPTH || dcount > TRACE_DEPTH) {
 			fputs("TAGGED_REPLAY_ITRACE_FAIL invalid recorder status\n", stderr);
