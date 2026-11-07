@@ -11,7 +11,7 @@ import analyze_tagged_icache_trace_pair as analyzer
 class TaggedIcacheTracePairTest(unittest.TestCase):
     def make_trace(self, root, name, mode, enabled, lines, overflow=False,
                    trial=1, explicit_off=False, return_window=False,
-                   data_overflow=False):
+                   data_overflow=False, enabled_first=False):
         path = root / name
         status = {
             "status": "PASS", "mode": mode,
@@ -23,6 +23,9 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
         if explicit_off:
             status["trace_icache_entry_prefix"] = False
             status["trace_icache_entry_prefix_off"] = True
+        if enabled_first:
+            status["trace_icache_entry_prefix"] = False
+            status["trace_icache_entry_prefix_first"] = True
         if return_window:
             status["trace_icache_entry_prefix"] = False
             status["trace_icache_entry_prefix_off"] = False
@@ -85,6 +88,25 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
             )
             result = analyzer.analyze(off, on, self.make_prefix(root))
         self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
+
+    def test_accepts_independently_recovered_enabled_first_arm(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            off = self.make_trace(
+                root, "off.log", "instruction-explicit", 0,
+                [0x80001000, 0x80002000], trial=0, explicit_off=True,
+            )
+            on = self.make_trace(
+                root, "on.log", "instruction-explicit", 1,
+                [0x80002000], trial=0, enabled_first=True,
+            )
+            result = analyzer.analyze(off, on, self.make_prefix(root))
+        self.assertEqual(result["pairing"], "independently-recovered-trial-zero")
+        self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
+        self.assertIn(
+            "observational differences",
+            " ".join(result["interpretation_limits"]),
+        )
 
     def test_accepts_explicit_roundtrip_return_window(self):
         with tempfile.TemporaryDirectory() as directory:

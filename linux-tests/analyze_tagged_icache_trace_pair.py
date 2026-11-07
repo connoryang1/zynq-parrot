@@ -49,6 +49,7 @@ def load_trace(path, expected_mode, expected_enabled, expected_trial=1,
     if status.get("status") != "PASS" or status.get("mode") != expected_mode:
         raise ValueError(f"unexpected runner status or mode for {path}")
     entry_capture = (status.get("trace_icache_entry_prefix")
+                     or status.get("trace_icache_entry_prefix_first")
                      or status.get("trace_icache_entry_prefix_off"))
     return_capture = (status.get("trace_icache_return_prefix")
                       or status.get("trace_icache_return_prefix_off"))
@@ -170,6 +171,11 @@ def analyze(off_path, on_path, prefix_path):
     if not off_status_path.is_file():
         raise ValueError(f"missing status for {off_path}")
     off_mode = json.loads(off_status_path.read_text()).get("mode")
+    on_status_path = on_path.with_suffix(on_path.suffix + ".status.json")
+    if not on_status_path.is_file():
+        raise ValueError(f"missing status for {on_path}")
+    on_status = json.loads(on_status_path.read_text())
+    enabled_first = bool(on_status.get("trace_icache_entry_prefix_first"))
     if off_mode == "instruction-explicit-roundtrip":
         off = load_trace(
             off_path, "instruction-explicit-roundtrip", 0, 0, "return"
@@ -180,7 +186,10 @@ def analyze(off_path, on_path, prefix_path):
         window = "return"
     elif off_mode == "instruction-explicit":
         off = load_trace(off_path, "instruction-explicit", 0, 0)
-        on = load_trace(on_path, "instruction-explicit", 1, 1)
+        on = load_trace(
+            on_path, "instruction-explicit", 1,
+            0 if enabled_first else 1,
+        )
         window = "entry"
     elif off_mode == "instruction-explicit-directed":
         off = load_trace(
@@ -211,8 +220,14 @@ def analyze(off_path, on_path, prefix_path):
     added = [line for line in prefix_lines if line not in off_set and line in on_set]
     return {
         "purpose": (
-            f"Compare same-image, same-ELF, adjacent-arm {window}-bounded I-miss "
-            "prefixes without treating a truncated arm as complete."
+            f"Compare same-image, same-ELF, "
+            f"{'independently recovered trial-zero' if enabled_first else 'adjacent-arm'} "
+            f"{window}-bounded I-miss prefixes without treating a truncated "
+            "arm as complete."
+        ),
+        "pairing": (
+            "independently-recovered-trial-zero"
+            if enabled_first else "adjacent-arm"
         ),
         "window": window,
         "prefix": {
@@ -254,7 +269,11 @@ def analyze(off_path, on_path, prefix_path):
             f"The {name} trace is a retained first-256 prefix, not a complete entry window."
             for name, trace in (("replay-off", off), ("replay-on", on))
             if trace["truncated"]
-        ] + [
+        ] + ([
+            "Independent recovered boots preserve image identities and trial phase, "
+            "but not microarchitectural starting state; removed/added sets are "
+            "observational differences, not causal replay attribution."
+        ] if enabled_first else []) + [
             "One trace pair is mechanism evidence, not a statistical performance estimate."
         ]),
     }
