@@ -102,6 +102,21 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
         self.assertEqual(result["window"], "return")
         self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
 
+    def test_accepts_direction_selected_entry_window(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            off = self.make_trace(
+                root, "off.log", "instruction-explicit-directed", 0,
+                [0x80001000, 0x80002000], trial=0, explicit_off=True,
+            )
+            on = self.make_trace(
+                root, "on.log", "instruction-explicit-directed", 1,
+                [0x80002000], trial=1,
+            )
+            result = analyzer.analyze(off, on, self.make_prefix(root))
+        self.assertEqual(result["window"], "entry")
+        self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
+
     def test_interpretation_names_truncated_arm(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -182,6 +182,14 @@ def analyze(off_path, on_path, prefix_path):
         off = load_trace(off_path, "instruction-explicit", 0, 0)
         on = load_trace(on_path, "instruction-explicit", 1, 1)
         window = "entry"
+    elif off_mode == "instruction-explicit-directed":
+        off = load_trace(
+            off_path, "instruction-explicit-directed", 0, 0
+        )
+        on = load_trace(
+            on_path, "instruction-explicit-directed", 1, 1
+        )
+        window = "entry"
     else:
         off = load_trace(off_path, "off", 0)
         on = load_trace(on_path, "instruction-wake", 1)
