@@ -14,7 +14,8 @@ from analyze_scheduler_tagged_replay import percentile
 
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
-    r"configured_entries=(\d+)(?: policy=(continuous|seed|preseed))?$", re.MULTILINE
+    r"configured_entries=(\d+)(?: policy=(continuous|seed|preseed))?"
+    r"(?: sync=(pipe|futex))?$", re.MULTILINE
 )
 ROW = re.compile(
     r"^PIPE_HINT_RESULT repeat=(\d+) order=(\d+) enabled=([01]) "
@@ -72,12 +73,15 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("expected exactly one config and status marker")
     loops, repeats, warmup, configured = map(int, configs[0][:4])
     policy = configs[0][4] or "continuous"
+    sync = configs[0][5] or "pipe"
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
     if warmup != runner.get("warmup", 32):
         raise ValueError("transcript and runner warmup differ")
     if policy != runner.get("policy", "continuous"):
         raise ValueError("transcript and runner policy differ")
+    if sync != runner.get("sync", "pipe"):
+        raise ValueError("transcript and runner sync differ")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
                    cycles=int(d), loops=int(e)) for a, b, c, d, e in ROW.findall(text)]
     if len(parsed) != repeats * 2:
@@ -153,7 +157,7 @@ def analyze(path, bootstrap_samples=20000):
                   if pair["enabled_order"] == order]
         by_order[str(order)] = statistics.median(values)
     return {
-        "purpose": "Measure sustained hot pipe roundtrip throughput with matched explicit instruction hints.",
+        "purpose": f"Measure sustained hot {sync} roundtrip throughput with matched explicit instruction hints.",
         "transcript": str(path),
         "transcript_sha256": sha256(path),
         "status": str(status_path),
@@ -162,7 +166,8 @@ def analyze(path, bootstrap_samples=20000):
             "nbf_sha256", "transfer_sha256", "elf_sha256",
             "control_program_sha256", "bitstream_sha256")},
         "config": {"loops": loops, "repeats": repeats, "warmup": warmup,
-                   "configured_entries": configured, "policy": policy},
+                   "configured_entries": configured, "policy": policy,
+                   "sync": sync},
         "pairs": pairs,
         "metrics": {
             "disabled_median_cycles_per_roundtrip": statistics.median(
@@ -180,7 +185,7 @@ def analyze(path, bootstrap_samples=20000):
         "icache_prefix_status": {"before": before, "after": after},
         "interpretation_limits": [
             "One Linux boot supplies paired repeat blocks but not independent boot strata.",
-            f"The {warmup} warmup roundtrips intentionally measure hot sustained throughput, not cold first resume.",
+            f"The {warmup} warmup {sync} roundtrips intentionally measure hot sustained throughput, not cold first resume.",
         ],
     }
 

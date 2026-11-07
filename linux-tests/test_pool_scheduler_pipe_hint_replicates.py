@@ -41,6 +41,19 @@ class PipeHintPoolTests(unittest.TestCase):
         self.assertEqual(analyze.call_count, 3)
 
     @mock.patch("pool_scheduler_pipe_hint_replicates.analyze")
+    def test_labels_futex_pool_from_bound_configuration(self, analyze):
+        config = {"loops": 10, "repeats": 1, "warmup": 256,
+                  "configured_entries": 16, "policy": "preseed",
+                  "sync": "futex"}
+        analyze.side_effect = [
+            result("same", [(10.0, 1.0)], config),
+            result("same", [(20.0, 2.0)], config),
+        ]
+        pooled = pool([Path("a"), Path("b")], 10)
+        self.assertIn("futex", pooled["purpose"])
+        self.assertIn("futex", pooled["interpretation_limits"][0])
+
+    @mock.patch("pool_scheduler_pipe_hint_replicates.analyze")
     def test_rejects_identity_mismatch(self, analyze):
         analyze.side_effect = [
             result("first", [(10.0, 1.0)]),

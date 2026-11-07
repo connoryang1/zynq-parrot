@@ -66,6 +66,7 @@ def parse_args(argv=None):
     parser.add_argument("--policy", choices=("continuous", "seed", "preseed"),
                         default="continuous")
     parser.add_argument("--warmup", type=int, default=32)
+    parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
     return parser.parse_args(argv)
 
@@ -92,7 +93,7 @@ def run(args):
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = (f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy} "
-               f"{args.warmup}")
+               f"{args.warmup} {args.sync}")
     status = {
         "status": "running",
         "nbf_sha256": sha256(args.nbf),
@@ -104,6 +105,7 @@ def run(args):
         "repeats": args.repeats,
         "policy": args.policy,
         "warmup": args.warmup,
+        "sync": args.sync,
         "command": command,
     }
     env = os.environ.copy()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pool sustained pipe-hint replications with a hierarchical bootstrap."""
+"""Pool sustained synchronization-hint replications hierarchically."""
 
 import argparse
 import json
@@ -28,6 +28,7 @@ def pool(paths, bootstrap_samples=20000):
     results = [analyze(path, bootstrap_samples=1) for path in paths]
     config = results[0]["config"]
     identity = results[0]["identity"]
+    sync = config.get("sync", "pipe")
     for index, result in enumerate(results[1:], start=1):
         if result["config"] != config:
             raise ValueError(f"replicate {index} configuration mismatch")
@@ -64,7 +65,7 @@ def pool(paths, bootstrap_samples=20000):
 
     return {
         "purpose": (
-            "Pool sustained hot pipe-hint comparisons while preserving "
+            f"Pool sustained hot {sync}-hint comparisons while preserving "
             "matched pairs and independent Linux-boot variation."
         ),
         "config": config,
@@ -92,7 +93,7 @@ def pool(paths, bootstrap_samples=20000):
             ],
         },
         "interpretation_limits": [
-            "The three boots support a sustained hot ping-pong workload, not a cold first-resume claim.",
+            f"The three boots support a sustained hot {sync} ping-pong workload, not a cold first-resume claim.",
             "The interval is a hierarchical bootstrap over a small number of independent boots.",
         ],
     }
