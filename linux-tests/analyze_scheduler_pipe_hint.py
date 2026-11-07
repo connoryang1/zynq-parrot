@@ -14,7 +14,7 @@ from analyze_scheduler_tagged_replay import percentile
 
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
-    r"configured_entries=(\d+)$", re.MULTILINE
+    r"configured_entries=(\d+)(?: policy=(continuous|seed))?$", re.MULTILINE
 )
 ROW = re.compile(
     r"^PIPE_HINT_RESULT repeat=(\d+) order=(\d+) enabled=([01]) "
@@ -70,9 +70,12 @@ def analyze(path, bootstrap_samples=20000):
     statuses = STATUS.findall(text)
     if len(configs) != 1 or len(statuses) != 1:
         raise ValueError("expected exactly one config and status marker")
-    loops, repeats, warmup, configured = map(int, configs[0])
+    loops, repeats, warmup, configured = map(int, configs[0][:4])
+    policy = configs[0][4] or "continuous"
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
+    if policy != runner.get("policy", "continuous"):
+        raise ValueError("transcript and runner policy differ")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
                    cycles=int(d), loops=int(e)) for a, b, c, d, e in ROW.findall(text)]
     if len(parsed) != repeats * 2:
@@ -113,11 +116,23 @@ def analyze(path, bootstrap_samples=20000):
             "accepted_entries", "accepted_triggers", "dropped_triggers",
             "resident_query_pending", "resident_drops")):
         raise ValueError("instruction-prefix baseline is not clean")
-    if (after["next_index"] != configured or after["accepted_triggers"] != 0xff
+    expected_entries = min(0xffff, repeats * configured)
+    if policy == "seed":
+        expected_triggers = min(0xff, repeats * 2)
+        expected_resident_drops = min(0x1ff, repeats * configured)
+    else:
+        total_triggers = repeats * 2 * (warmup + loops)
+        expected_triggers = min(0xff, total_triggers)
+        expected_resident_drops = min(
+            0x1ff, (total_triggers - repeats) * configured)
+    if (after["next_index"] != configured
+            or after["accepted_entries"] != expected_entries
+            or after["accepted_triggers"] != expected_triggers
+            or after["resident_drops"] != expected_resident_drops
             or after["dropped_triggers"] or int(printed_dropped)
             or any(after[key] for key in (
                 "busy", "entry_held", "read_pending", "resident_query_pending"))
-            or not (after["accepted_entries"] or after["resident_drops"])):
+            or not after["accepted_entries"]):
         raise ValueError("instruction-prefix replay did not drain cleanly")
 
     saved = [pair["saved_cycles_per_roundtrip"] for pair in pairs]
@@ -142,7 +157,7 @@ def analyze(path, bootstrap_samples=20000):
             "nbf_sha256", "transfer_sha256", "elf_sha256",
             "control_program_sha256", "bitstream_sha256")},
         "config": {"loops": loops, "repeats": repeats, "warmup": warmup,
-                   "configured_entries": configured},
+                   "configured_entries": configured, "policy": policy},
         "pairs": pairs,
         "metrics": {
             "disabled_median_cycles_per_roundtrip": statistics.median(

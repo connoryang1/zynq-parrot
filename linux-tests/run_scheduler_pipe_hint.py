@@ -63,6 +63,8 @@ def parse_args(argv=None):
     parser.add_argument("--bitstream-sha256", required=True)
     parser.add_argument("--loops", type=int, default=512)
     parser.add_argument("--repeats", type=int, default=8)
+    parser.add_argument("--policy", choices=("continuous", "seed"),
+                        default="continuous")
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
     return parser.parse_args(argv)
 
@@ -86,7 +88,7 @@ def run(args):
     repo = Path(__file__).resolve().parents[1]
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
-    command = f"{GUEST_ELF} {args.loops} {args.repeats}"
+    command = f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy}"
     status = {
         "status": "running",
         "nbf_sha256": sha256(args.nbf),
@@ -96,6 +98,7 @@ def run(args):
         "bitstream_sha256": args.bitstream_sha256,
         "loops": args.loops,
         "repeats": args.repeats,
+        "policy": args.policy,
         "command": command,
     }
     env = os.environ.copy()

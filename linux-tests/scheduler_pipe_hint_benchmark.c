@@ -2,16 +2,17 @@
 
 /* SPDX-License-Identifier: GPL-2.0
  *
- * Measure sustained two-process pipe ping-pong with a matched explicit
- * instruction-prefix hint immediately before every peer wake. The loop shape
- * is derived from Linux perf's tools/perf/bench/sched-pipe.c, which in turn is
- * based on Ingo Molnar's pipe-test-1m.c. Setup and fork are outside timing;
- * both arms execute the same prctl, and argument zero is the disabled no-op.
+ * Measure sustained two-process pipe ping-pong with either continuous or
+ * one-time-seed instruction-prefix hints. The loop shape is derived from Linux
+ * perf's tools/perf/bench/sched-pipe.c, which in turn is based on Ingo Molnar's
+ * pipe-test-1m.c. Setup and fork are outside timing; both arms execute the same
+ * prctl before each wake, and argument zero is the disabled no-op.
  */
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/prctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -27,6 +28,11 @@ enum {
 	default_loops = 512,
 	default_repeats = 8,
 	warmup_roundtrips = 32,
+};
+
+enum hint_policy {
+	hint_continuous,
+	hint_seed_once,
 };
 
 static void fail(const char *message)
@@ -73,6 +79,16 @@ static unsigned parse_positive(const char *text, const char *label)
 	return (unsigned)value;
 }
 
+static enum hint_policy parse_policy(const char *text)
+{
+	if (!strcmp(text, "continuous"))
+		return hint_continuous;
+	if (!strcmp(text, "seed"))
+		return hint_seed_once;
+	fprintf(stderr, "policy must be continuous or seed\n");
+	exit(2);
+}
+
 static unsigned long prefix_status(void)
 {
 	unsigned long status;
@@ -89,7 +105,14 @@ static void issue_hint(unsigned enabled)
 		fail("instruction-prefix trigger");
 }
 
-static uint64_t run_cell(unsigned enabled, unsigned loops)
+static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
+				 unsigned iteration)
+{
+	issue_hint(enabled && (policy == hint_continuous || iteration == 0));
+}
+
+static uint64_t run_cell(unsigned enabled, unsigned loops,
+			 enum hint_policy policy)
 {
 	int to_child[2], to_parent[2], ready[2];
 	unsigned char token = 0;
@@ -110,7 +133,7 @@ static uint64_t run_cell(unsigned enabled, unsigned loops)
 		transfer(ready[1], &token, 1);
 		for (unsigned i = 0; i < warmup_roundtrips + loops; ++i) {
 			transfer(to_child[0], &token, 0);
-			issue_hint(enabled);
+			issue_iteration_hint(enabled, policy, i);
 			transfer(to_parent[1], &token, 1);
 		}
 		_exit(0);
@@ -122,13 +145,13 @@ static uint64_t run_cell(unsigned enabled, unsigned loops)
 	transfer(ready[0], &token, 0);
 	flush_instruction_state();
 	for (unsigned i = 0; i < warmup_roundtrips; ++i) {
-		issue_hint(enabled);
+		issue_iteration_hint(enabled, policy, i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 	}
 	begin = cycle();
 	for (unsigned i = 0; i < loops; ++i) {
-		issue_hint(enabled);
+		issue_iteration_hint(enabled, policy, warmup_roundtrips + i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 	}
@@ -145,25 +168,30 @@ int main(int argc, char **argv)
 {
 	unsigned loops = default_loops;
 	unsigned repeats = default_repeats;
+	enum hint_policy policy = hint_continuous;
 	unsigned long before, after;
 
-	if (argc > 3) {
-		fprintf(stderr, "usage: %s [loops] [repeats]\n", argv[0]);
+	if (argc > 4) {
+		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed]\n",
+			argv[0]);
 		return 2;
 	}
 	if (argc > 1)
 		loops = parse_positive(argv[1], "loops");
 	if (argc > 2)
 		repeats = parse_positive(argv[2], "repeats");
+	if (argc > 3)
+		policy = parse_policy(argv[3]);
 	before = prefix_status();
-	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu\n",
-	       loops, repeats, warmup_roundtrips, (before >> 4) & 0x1ffUL);
+	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s\n",
+	       loops, repeats, warmup_roundtrips, (before >> 4) & 0x1ffUL,
+	       policy == hint_continuous ? "continuous" : "seed");
 	for (unsigned repeat = 0; repeat < repeats; ++repeat) {
 		unsigned first = repeat & 1U;
 
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned enabled = first ^ order;
-			uint64_t elapsed = run_cell(enabled, loops);
+			uint64_t elapsed = run_cell(enabled, loops, policy);
 
 			printf("PIPE_HINT_RESULT repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
 			       repeat, order, enabled,
