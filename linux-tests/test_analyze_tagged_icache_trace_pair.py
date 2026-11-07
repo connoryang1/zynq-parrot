@@ -10,7 +10,8 @@ import analyze_tagged_icache_trace_pair as analyzer
 
 class TaggedIcacheTracePairTest(unittest.TestCase):
     def make_trace(self, root, name, mode, enabled, lines, overflow=False,
-                   trial=1, explicit_off=False, return_window=False):
+                   trial=1, explicit_off=False, return_window=False,
+                   data_overflow=False):
         path = root / name
         status = {
             "status": "PASS", "mode": mode,
@@ -38,7 +39,8 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
         path.write_text(
             f"TAGGED_REPLAY_ITRACE_HEADER trial={trial} enabled={enabled} "
             f"i_count={len(lines)} d_count=1 i_overflow={int(overflow)} "
-            "d_overflow=0 armed=0 status=0x0000000000000000\n"
+            f"d_overflow={int(data_overflow)} armed=0 "
+            "status=0x0000000000000000\n"
             + records
             + f"TAGGED_REPLAY_ITRACE_PREFIX_PASS truncated={int(overflow)} "
               f"records={len(lines)}\n"
@@ -113,6 +115,19 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
             )
             result = analyzer.analyze(off, on, self.make_prefix(root))
         self.assertIn("replay-on trace", result["interpretation_limits"][0])
+
+    def test_accepts_unconsumed_data_recorder_overflow(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            trace = self.make_trace(
+                root, "off.log", "instruction-explicit-roundtrip", 0,
+                [0x80001000], trial=0, explicit_off=True,
+                return_window=True, data_overflow=True,
+            )
+            result = analyzer.load_trace(
+                trace, "instruction-explicit-roundtrip", 0, 0, "return"
+            )
+        self.assertTrue(result["data_truncated"])
 
     def test_rejects_identity_mismatch(self):
         with tempfile.TemporaryDirectory() as directory:

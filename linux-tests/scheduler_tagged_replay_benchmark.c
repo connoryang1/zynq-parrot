@@ -781,7 +781,7 @@ int main(int argc, char **argv)
 			       (uint32_t)hint_begin - start,
 			       (uint32_t)hint_end - start);
 		}
-		if (armed || (!trace_allow_i_overflow && ioverflow) || doverflow || !icount
+		if (armed || (!trace_allow_i_overflow && (ioverflow || doverflow)) || !icount
 		    || icount > TRACE_DEPTH || dcount > TRACE_DEPTH) {
 			fputs("TAGGED_REPLAY_ITRACE_FAIL invalid recorder status\n", stderr);
 			return 1;

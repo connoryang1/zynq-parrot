@@ -103,6 +103,22 @@ class StableReturnIcachePrefixTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "truncated"):
                 selector.select(traces, self.make_prefix(root), 1)
 
+    def test_explicitly_accepts_truncated_prefix_for_positive_intersection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            records = [(40 + index, 0x80002000 + index * 64)
+                       for index in range(256)]
+            traces = [
+                self.make_trace(root, f"{name}.log", records,
+                                overflow=name == "c")
+                for name in "abc"
+            ]
+            result = selector.select(
+                traces, self.make_prefix(root), 1,
+                allow_truncated=True,
+            )
+        self.assertTrue(result["selection"]["truncated_prefixes_allowed"])
+
     def test_rejects_identity_mismatch(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

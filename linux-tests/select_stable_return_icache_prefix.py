@@ -28,7 +28,7 @@ def load_excluded_prefix(path):
     return excluded
 
 
-def select(paths, excluded_prefix_path, limit):
+def select(paths, excluded_prefix_path, limit, allow_truncated=False):
     if len(paths) < 3:
         raise ValueError("return selection requires at least three traces")
     if not 1 <= limit <= 256:
@@ -41,7 +41,7 @@ def select(paths, excluded_prefix_path, limit):
     ]
     reference = traces[0]["status"]
     for trace in traces:
-        if trace["truncated"]:
+        if trace["truncated"] and not allow_truncated:
             raise ValueError(f"return trace is truncated: {trace['path']}")
         if trace["return_hint"] is None:
             raise ValueError(f"return hint boundary is absent: {trace['path']}")
@@ -93,6 +93,8 @@ def select(paths, excluded_prefix_path, limit):
                     "status_sha256": trace["status_sha256"],
                     "record_count": trace["record_count"],
                     "unique_lines": trace["unique_lines"],
+                    "truncated": trace["truncated"],
+                    "data_truncated": trace["data_truncated"],
                     "hint_end_relative": trace["return_hint"]["end_relative"],
                 }
                 for path, trace in zip(paths, traces)
@@ -106,6 +108,7 @@ def select(paths, excluded_prefix_path, limit):
             "excluded_line_count": len(excluded),
             "stable_reverse_only_lines_available": len(ranked),
             "selected_lines": limit,
+            "truncated_prefixes_allowed": allow_truncated,
             "policy": (
                 "intersect first occurrences at or after each trace's return-"
                 "hint completion, exclude the installed forward prefix, then "
@@ -137,9 +140,19 @@ def main():
     parser.add_argument("trace", nargs="+", type=Path)
     parser.add_argument("--exclude-prefix", required=True, type=Path)
     parser.add_argument("--limit", type=int, default=8)
+    parser.add_argument(
+        "--allow-truncated-prefixes", action="store_true",
+        help=(
+            "allow retained first-256 I-miss prefixes for positive "
+            "intersection only"
+        ),
+    )
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    result = select(args.trace, args.exclude_prefix, args.limit)
+    result = select(
+        args.trace, args.exclude_prefix, args.limit,
+        args.allow_truncated_prefixes,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(

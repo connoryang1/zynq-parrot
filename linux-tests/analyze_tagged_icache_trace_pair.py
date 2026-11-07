@@ -72,7 +72,7 @@ def load_trace(path, expected_mode, expected_enabled, expected_trial=1,
     truncated, pass_count = map(int, passes[0])
     if trial != expected_trial or enabled != expected_enabled:
         raise ValueError(f"trace trial/arm mismatch in {path}")
-    if armed or doverflow or not icount or icount > 256 or dcount > 256:
+    if armed or not icount or icount > 256 or dcount > 256:
         raise ValueError(f"invalid recorder status in {path}")
     if ioverflow and icount != 256:
         raise ValueError(f"overflowed trace did not retain 256 records in {path}")
@@ -117,6 +117,7 @@ def load_trace(path, expected_mode, expected_enabled, expected_trial=1,
         "unique_lines": len({record["paddr"] for record in records}),
         "repeated_events": icount - len({record["paddr"] for record in records}),
         "truncated": bool(ioverflow),
+        "data_truncated": bool(doverflow),
         "last_relative": records[-1]["relative"],
         "return_hint": return_hint,
         "records": records,
