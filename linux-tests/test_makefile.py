@@ -25,7 +25,8 @@ APPS = {"app": "ctxtsw_user_smoke", "tiny": "ctxtsw_user_tiny",
         "cache-miss-trace-capture": "cache_miss_trace_capture",
         "cache-miss-trace-capture-dynamic": "cache_miss_trace_capture_dynamic",
         "tagged-replay-benchmark": "scheduler_tagged_replay_benchmark",
-        "tagged-replay-benchmark-dynamic": "scheduler_tagged_replay_benchmark_dynamic"}
+        "tagged-replay-benchmark-dynamic": "scheduler_tagged_replay_benchmark_dynamic",
+        "pipe-hint-benchmark-dynamic": "scheduler_pipe_hint_benchmark_dynamic"}
 FAKE_COMPILER = """#!/usr/bin/env python3
 import json, os, pathlib, sys
 args = sys.argv[1:]
@@ -177,7 +178,8 @@ class LinuxHarnessTests(unittest.TestCase):
                             ("emit-cache-miss-trace-transfer", "cache_miss_trace_capture"),
                             ("emit-cache-miss-trace-dynamic-transfer", "cache_miss_trace_capture_dynamic"),
                             ("emit-tagged-replay-benchmark-transfer", "scheduler_tagged_replay_benchmark"),
-                            ("emit-tagged-replay-benchmark-dynamic-transfer", "scheduler_tagged_replay_benchmark_dynamic")):
+                            ("emit-tagged-replay-benchmark-dynamic-transfer", "scheduler_tagged_replay_benchmark_dynamic"),
+                            ("emit-pipe-hint-benchmark-dynamic-transfer", "scheduler_pipe_hint_benchmark_dynamic")):
             for flag in (1, 0, 1):
                 with self.subTest(target=target, flag=flag):
                     result = self.make(target, "TINY_TARGET_SYSCALL=" + str(flag))
@@ -208,7 +210,8 @@ class LinuxHarnessTests(unittest.TestCase):
                             ("emit-cache-miss-trace-transfer", "cache_miss_trace_capture"),
                             ("emit-cache-miss-trace-dynamic-transfer", "cache_miss_trace_capture_dynamic"),
                             ("emit-tagged-replay-benchmark-transfer", "scheduler_tagged_replay_benchmark"),
-                            ("emit-tagged-replay-benchmark-dynamic-transfer", "scheduler_tagged_replay_benchmark_dynamic")):
+                            ("emit-tagged-replay-benchmark-dynamic-transfer", "scheduler_tagged_replay_benchmark_dynamic"),
+                            ("emit-pipe-hint-benchmark-dynamic-transfer", "scheduler_pipe_hint_benchmark_dynamic")):
             with self.subTest(target=target):
                 good = self.make(target)
                 self.assertEqual(good.returncode, 0, good.stderr)

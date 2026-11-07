@@ -40,6 +40,7 @@ PHYSICAL_PREVIEW_BENCH_APP := $(OUT)/scheduler_physical_preview_benchmark
 PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
 TAGGED_REPLAY_BENCH_APP := $(OUT)/scheduler_tagged_replay_benchmark
 TAGGED_REPLAY_BENCH_DYNAMIC_APP := $(OUT)/scheduler_tagged_replay_benchmark_dynamic
+PIPE_HINT_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_dynamic
 PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
 PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -209,6 +210,10 @@ $(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
+$(PIPE_HINT_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
 $(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
@@ -266,6 +271,14 @@ emit-tagged-replay-benchmark-dynamic-transfer: check-linux-dynamic-cc tagged-rep
 	@printf '%s\n' ': > /tmp/scheduler_tagged_replay_benchmark_dynamic.b64'
 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark_dynamic.b64|"
 	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark_dynamic.b64 > /tmp/scheduler_tagged_replay_benchmark_dynamic' 'chmod +x /tmp/scheduler_tagged_replay_benchmark_dynamic'
+
+.PHONY: pipe-hint-benchmark-dynamic emit-pipe-hint-benchmark-dynamic-transfer
+pipe-hint-benchmark-dynamic: $(PIPE_HINT_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
 
 emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture.b64'
