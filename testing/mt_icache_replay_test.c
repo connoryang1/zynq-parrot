@@ -69,11 +69,15 @@ static uint64_t wait_prefix_idle(void)
 
 static void fail(void);
 
+static uint64_t prefix_range(unsigned start, unsigned count)
+{
+  return (1ULL << 63) | ((uint64_t)count << 8) | start;
+}
+
 static void __attribute__((naked, noinline, used)) supervisor_prefix_trigger(void)
 {
   __asm__ volatile(
-    "li t0, 1\n"
-    "csrw 0x5c0, t0\n"
+    "csrw 0x5c0, a0\n"
     "ecall\n"
     "ret\n");
 }
@@ -101,7 +105,7 @@ static void __attribute__((naked, aligned(4), used)) supervisor_trap(void)
     "1: j fail\n");
 }
 
-static void __attribute__((naked, noinline)) enter_supervisor_trigger(void)
+static void __attribute__((naked, noinline)) enter_supervisor_trigger(uint64_t payload)
 {
   __asm__ volatile(
     "csrw medeleg, zero\n"
@@ -151,7 +155,7 @@ int main(void)
   prefix_set(3, replay_target_d);
   __asm__ volatile("csrw 0x7c2, %0" : : "r"(4UL) : "memory");
   observed_phase = 1;
-  enter_supervisor_trigger();
+  enter_supervisor_trigger(1);
   observed_phase = 2;
 
   uint64_t status = wait_prefix_idle();
@@ -173,7 +177,7 @@ int main(void)
    * advisory buffer must query and drop them rather than withdrawing and
    * refetching them through the UCE. */
   observed_phase = 4;
-  enter_supervisor_trigger();
+  enter_supervisor_trigger(1);
   status = wait_prefix_idle();
   if (((status >> 22) & 0xffff) != 4
       || ((status >> 38) & 0xff) != 2
@@ -185,7 +189,7 @@ int main(void)
    * stale residency. */
   observed_phase = 5;
   __asm__ volatile("fence.i" : : : "memory");
-  enter_supervisor_trigger();
+  enter_supervisor_trigger(1);
   status = wait_prefix_idle();
   if (((status >> 22) & 0xffff) != 8
       || ((status >> 38) & 0xff) != 3
@@ -196,6 +200,29 @@ int main(void)
     fail();
 
   post_replay_demand_stream();
+
+  /* S-mode may select a bounded subrange of the immutable M-mode table but
+   * cannot supply addresses. Replaying only entry two must admit one line;
+   * a range that extends past the configured count must be dropped. */
+  observed_phase = 6;
+  __asm__ volatile("fence.i" : : : "memory");
+  enter_supervisor_trigger(prefix_range(2, 1));
+  status = wait_prefix_idle();
+  if (((status >> 13) & 0x1ff) != 3
+      || ((status >> 22) & 0xffff) != 9
+      || ((status >> 38) & 0xff) != 4
+      || ((status >> 46) & 0xff) != 0)
+    fail();
+  if (replay_target_c(300) != 341)
+    fail();
+
+  observed_phase = 7;
+  enter_supervisor_trigger(prefix_range(3, 2));
+  status = wait_prefix_idle();
+  if (((status >> 22) & 0xffff) != 9
+      || ((status >> 38) & 0xff) != 4
+      || ((status >> 46) & 0xff) != 1)
+    fail();
 
   /* fence.i must cancel the old replay epoch. An already-issued response may
    * return, but it must drain without publishing and ordinary demand must
