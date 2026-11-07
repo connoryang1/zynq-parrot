@@ -9,7 +9,8 @@ import analyze_tagged_icache_trace_pair as analyzer
 
 
 class TaggedIcacheTracePairTest(unittest.TestCase):
-    def make_trace(self, root, name, mode, enabled, lines, overflow=False):
+    def make_trace(self, root, name, mode, enabled, lines, overflow=False,
+                   trial=1, explicit_off=False):
         path = root / name
         status = {
             "status": "PASS", "mode": mode,
@@ -18,6 +19,9 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
             "elf_sha256": "3" * 64, "control_program_sha256": "4" * 64,
             "bitstream_sha256": "5" * 64,
         }
+        if explicit_off:
+            status["trace_icache_entry_prefix"] = False
+            status["trace_icache_entry_prefix_off"] = True
         path.with_suffix(path.suffix + ".status.json").write_text(
             json.dumps(status) + "\n"
         )
@@ -27,13 +31,13 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
             for index, line in enumerate(lines)
         )
         path.write_text(
-            f"TAGGED_REPLAY_ITRACE_HEADER trial=1 enabled={enabled} "
+            f"TAGGED_REPLAY_ITRACE_HEADER trial={trial} enabled={enabled} "
             f"i_count={len(lines)} d_count=1 i_overflow={int(overflow)} "
             "d_overflow=0 armed=0 status=0x0000000000000000\n"
             + records
             + f"TAGGED_REPLAY_ITRACE_PREFIX_PASS truncated={int(overflow)} "
               f"records={len(lines)}\n"
-            + f"TAGGED_REPLAY trial=1 enabled={enabled} hooks={enabled} "
+            + f"TAGGED_REPLAY trial={trial} enabled={enabled} hooks={enabled} "
               "woken=1 hook_cycles=1 admitted=0 filtered=0 triggers=0 dropped=0 "
               "wake_to_entry=20 load_cycles=3 wake_to_load=23 roundtrip=40\n"
         )
@@ -60,6 +64,34 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
             self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
             self.assertEqual(result["configured_lines"]["net_event_reduction"], 2)
             self.assertEqual(result["set_comparison"]["common_unique_lines"], 1)
+
+    def test_accepts_explicit_disabled_and_enabled_arms(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            off = self.make_trace(
+                root, "off.log", "instruction-explicit", 0,
+                [0x80001000, 0x80002000], trial=0, explicit_off=True,
+            )
+            on = self.make_trace(
+                root, "on.log", "instruction-explicit", 1,
+                [0x80002000], trial=1,
+            )
+            result = analyzer.analyze(off, on, self.make_prefix(root))
+        self.assertEqual(result["configured_lines"]["net_distinct_reduction"], 1)
+
+    def test_interpretation_names_truncated_arm(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            off = self.make_trace(
+                root, "off.log", "instruction-explicit", 0,
+                [0x80001000], trial=0, explicit_off=True,
+            )
+            on = self.make_trace(
+                root, "on.log", "instruction-explicit", 1,
+                [0x80001000] * 256, overflow=True,
+            )
+            result = analyzer.analyze(off, on, self.make_prefix(root))
+        self.assertIn("replay-on trace", result["interpretation_limits"][0])
 
     def test_rejects_identity_mismatch(self):
         with tempfile.TemporaryDirectory() as directory:

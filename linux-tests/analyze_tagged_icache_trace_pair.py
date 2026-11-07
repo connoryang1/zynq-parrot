@@ -36,14 +36,15 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_trace(path, expected_mode, expected_enabled):
+def load_trace(path, expected_mode, expected_enabled, expected_trial=1):
     status_path = path.with_suffix(path.suffix + ".status.json")
     if not status_path.is_file():
         raise ValueError(f"missing status for {path}")
     status = json.loads(status_path.read_text())
     if status.get("status") != "PASS" or status.get("mode") != expected_mode:
         raise ValueError(f"unexpected runner status or mode for {path}")
-    if not status.get("trace_icache_entry_prefix"):
+    if not (status.get("trace_icache_entry_prefix")
+            or status.get("trace_icache_entry_prefix_off")):
         raise ValueError(f"trace is not an entry-prefix capture: {path}")
 
     text = path.read_text(errors="replace").replace("\r", "")
@@ -57,7 +58,7 @@ def load_trace(path, expected_mode, expected_enabled):
     icount, dcount = int(icount), int(dcount)
     ioverflow, doverflow, armed = int(ioverflow), int(doverflow), int(armed)
     truncated, pass_count = map(int, passes[0])
-    if trial != 1 or enabled != expected_enabled:
+    if trial != expected_trial or enabled != expected_enabled:
         raise ValueError(f"trace trial/arm mismatch in {path}")
     if armed or doverflow or not icount or icount > 256 or dcount > 256:
         raise ValueError(f"invalid recorder status in {path}")
@@ -76,7 +77,7 @@ def load_trace(path, expected_mode, expected_enabled):
         for index, relative, paddr, raw_record in matches
     ]
     rows = [tuple(map(int, match)) for match in ROW.findall(text)]
-    row = next((match for match in rows if match[0] == 1), None)
+    row = next((match for match in rows if match[0] == expected_trial), None)
     if row is None or row[1] != expected_enabled:
         raise ValueError(f"missing measured trace row in {path}")
     return {
@@ -117,8 +118,16 @@ def configured_summary(trace, prefix_lines):
 
 
 def analyze(off_path, on_path, prefix_path):
-    off = load_trace(off_path, "off", 0)
-    on = load_trace(on_path, "instruction-wake", 1)
+    off_status_path = off_path.with_suffix(off_path.suffix + ".status.json")
+    if not off_status_path.is_file():
+        raise ValueError(f"missing status for {off_path}")
+    off_mode = json.loads(off_status_path.read_text()).get("mode")
+    if off_mode == "instruction-explicit":
+        off = load_trace(off_path, "instruction-explicit", 0, 0)
+        on = load_trace(on_path, "instruction-explicit", 1, 1)
+    else:
+        off = load_trace(off_path, "off", 0)
+        on = load_trace(on_path, "instruction-wake", 1)
     for key in IDENTITY_KEYS:
         if off["status"].get(key) != on["status"].get(key):
             raise ValueError(f"off/on identity mismatch: {key}")
@@ -136,8 +145,8 @@ def analyze(off_path, on_path, prefix_path):
     added = [line for line in prefix_lines if line not in off_set and line in on_set]
     return {
         "purpose": (
-            "Compare same-image, same-ELF, same-trial entry-bounded I-miss "
-            "prefixes without treating a truncated trace as complete."
+            "Compare same-image, same-ELF, adjacent-arm entry-bounded I-miss "
+            "prefixes without treating a truncated arm as complete."
         ),
         "prefix": {
             "path": str(prefix_path),
@@ -171,10 +180,13 @@ def analyze(off_path, on_path, prefix_path):
             key: on["timing"][key] - off["timing"][key]
             for key in off["timing"]
         },
-        "interpretation_limits": [
-            "The replay-off trace is a retained first-256 prefix, not a complete entry window.",
-            "One trace pair is mechanism evidence, not a statistical performance estimate.",
-        ],
+        "interpretation_limits": ([
+            f"The {name} trace is a retained first-256 prefix, not a complete entry window."
+            for name, trace in (("replay-off", off), ("replay-on", on))
+            if trace["truncated"]
+        ] + [
+            "One trace pair is mechanism evidence, not a statistical performance estimate."
+        ]),
     }
 
 
