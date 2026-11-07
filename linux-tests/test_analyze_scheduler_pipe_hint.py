@@ -80,6 +80,31 @@ class PipeHintAnalyzerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "policy differ"):
                 analyze(log, bootstrap_samples=10)
 
+    def test_accepts_exact_preseed_counters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "run.log"
+            log.write_text(
+                "PIPE_HINT_CONFIG loops=10 repeats=2 warmup=256 "
+                "configured_entries=16 policy=preseed\n"
+                "PIPE_HINT_RESULT repeat=0 order=0 enabled=0 cycles=1000 loops=10\n"
+                "PIPE_HINT_RESULT repeat=0 order=1 enabled=1 cycles=900 loops=10\n"
+                "PIPE_HINT_RESULT repeat=1 order=0 enabled=1 cycles=800 loops=10\n"
+                "PIPE_HINT_RESULT repeat=1 order=1 enabled=0 cycles=1000 loops=10\n"
+                "PIPE_HINT_STATUS before=0x0000000000000101 "
+                "after=0x0000008008020101 configured_entries=16 dropped=0\n"
+                "PIPE_HINT_PASS\nCORE PASS\nBSG PASS\n"
+            )
+            identity = "a" * 64
+            log.with_suffix(".log.status.json").write_text(json.dumps({
+                "status": "PASS", "loops": 10, "repeats": 2,
+                "warmup": 256, "policy": "preseed",
+                "nbf_sha256": identity, "transfer_sha256": identity,
+                "elf_sha256": identity, "control_program_sha256": identity,
+                "bitstream_sha256": identity,
+            }))
+            result = analyze(log, bootstrap_samples=10)
+            self.assertEqual(result["config"]["policy"], "preseed")
+
 
 if __name__ == "__main__":
     unittest.main()

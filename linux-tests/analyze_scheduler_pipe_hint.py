@@ -14,7 +14,7 @@ from analyze_scheduler_tagged_replay import percentile
 
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
-    r"configured_entries=(\d+)(?: policy=(continuous|seed))?$", re.MULTILINE
+    r"configured_entries=(\d+)(?: policy=(continuous|seed|preseed))?$", re.MULTILINE
 )
 ROW = re.compile(
     r"^PIPE_HINT_RESULT repeat=(\d+) order=(\d+) enabled=([01]) "
@@ -119,7 +119,10 @@ def analyze(path, bootstrap_samples=20000):
             "resident_query_pending", "resident_drops")):
         raise ValueError("instruction-prefix baseline is not clean")
     expected_entries = min(0xffff, repeats * configured)
-    if policy == "seed":
+    if policy == "preseed":
+        expected_triggers = min(0xff, repeats)
+        expected_resident_drops = 0
+    elif policy == "seed":
         expected_triggers = min(0xff, repeats * 2)
         expected_resident_drops = min(0x1ff, repeats * configured)
     else:

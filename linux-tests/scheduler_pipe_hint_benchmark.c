@@ -5,8 +5,9 @@
  * Measure sustained two-process pipe ping-pong with either continuous or
  * one-time-seed instruction-prefix hints. The loop shape is derived from Linux
  * perf's tools/perf/bench/sched-pipe.c, which in turn is based on Ingo Molnar's
- * pipe-test-1m.c. Setup and fork are outside timing; both arms execute the same
- * prctl before each wake, and argument zero is the disabled no-op.
+ * pipe-test-1m.c. Setup and fork are outside timing. Continuous/seed policies
+ * execute matched prctls before wakes; preseed executes one matched setup call
+ * after both fences and no syscall in the warmup or measured loops.
  */
 #include <errno.h>
 #include <stdint.h>
@@ -33,6 +34,7 @@ enum {
 enum hint_policy {
 	hint_continuous,
 	hint_seed_once,
+	hint_preseed,
 };
 
 static void fail(const char *message)
@@ -85,7 +87,9 @@ static enum hint_policy parse_policy(const char *text)
 		return hint_continuous;
 	if (!strcmp(text, "seed"))
 		return hint_seed_once;
-	fprintf(stderr, "policy must be continuous or seed\n");
+	if (!strcmp(text, "preseed"))
+		return hint_preseed;
+	fprintf(stderr, "policy must be continuous, seed, or preseed\n");
 	exit(2);
 }
 
@@ -133,7 +137,8 @@ static uint64_t run_cell(unsigned enabled, unsigned loops, unsigned warmup,
 		transfer(ready[1], &token, 1);
 		for (unsigned i = 0; i < warmup + loops; ++i) {
 			transfer(to_child[0], &token, 0);
-			issue_iteration_hint(enabled, policy, i);
+			if (policy != hint_preseed)
+				issue_iteration_hint(enabled, policy, i);
 			transfer(to_parent[1], &token, 1);
 		}
 		_exit(0);
@@ -144,14 +149,18 @@ static uint64_t run_cell(unsigned enabled, unsigned loops, unsigned warmup,
 	close(ready[1]);
 	transfer(ready[0], &token, 0);
 	flush_instruction_state();
+	if (policy == hint_preseed)
+		issue_hint(enabled);
 	for (unsigned i = 0; i < warmup; ++i) {
-		issue_iteration_hint(enabled, policy, i);
+		if (policy != hint_preseed)
+			issue_iteration_hint(enabled, policy, i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 	}
 	begin = cycle();
 	for (unsigned i = 0; i < loops; ++i) {
-		issue_iteration_hint(enabled, policy, warmup + i);
+		if (policy != hint_preseed)
+			issue_iteration_hint(enabled, policy, warmup + i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
 	}
@@ -173,7 +182,7 @@ int main(int argc, char **argv)
 	unsigned long before, after;
 
 	if (argc > 5) {
-		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed] [warmup]\n",
+		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed|preseed] [warmup]\n",
 			argv[0]);
 		return 2;
 	}
@@ -188,7 +197,8 @@ int main(int argc, char **argv)
 	before = prefix_status();
 	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s\n",
 	       loops, repeats, warmup, (before >> 4) & 0x1ffUL,
-	       policy == hint_continuous ? "continuous" : "seed");
+	       policy == hint_continuous ? "continuous"
+	       : policy == hint_seed_once ? "seed" : "preseed");
 	for (unsigned repeat = 0; repeat < repeats; ++repeat) {
 		unsigned first = repeat & 1U;
 

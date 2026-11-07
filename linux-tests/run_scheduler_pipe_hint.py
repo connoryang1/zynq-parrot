@@ -63,7 +63,7 @@ def parse_args(argv=None):
     parser.add_argument("--bitstream-sha256", required=True)
     parser.add_argument("--loops", type=int, default=512)
     parser.add_argument("--repeats", type=int, default=8)
-    parser.add_argument("--policy", choices=("continuous", "seed"),
+    parser.add_argument("--policy", choices=("continuous", "seed", "preseed"),
                         default="continuous")
     parser.add_argument("--warmup", type=int, default=32)
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
