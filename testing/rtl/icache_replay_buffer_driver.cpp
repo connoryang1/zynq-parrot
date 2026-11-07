@@ -41,13 +41,13 @@ class Test {
     require(dut.replay_yumi_o, "replay-buffer write was not accepted");
     dut.replay_v_i = 0; step();
   }
-  void write_line_burst() {
-    dut.replay_addr_i = line;
+  void write_line_burst(uint64_t addr = line, uint64_t word_seed = seed) {
+    dut.replay_addr_i = addr;
     dut.replay_v_i = 1;
     for (unsigned beat = 0; beat < 4; ++beat) {
       dut.replay_fill_i = 1u << beat;
-      dut.replay_word0_i = seed + beat*2;
-      dut.replay_word1_i = seed + beat*2 + 1;
+      dut.replay_word0_i = word_seed + beat*2;
+      dut.replay_word1_i = word_seed + beat*2 + 1;
       step();
       require(dut.replay_yumi_o,
               "consecutive replay-buffer write was not accepted");
@@ -128,9 +128,26 @@ public:
     fence();
     require(!query(line), "invalidated replay line reported resident");
     fetch(line, false);
+
+    // Fill the configured 32-entry capacity exactly. The next distinct line
+    // must replace slot zero while every other completed entry remains live.
+    dut.reset_i = 1; step(); step(); dut.reset_i = 0; step(); initialize();
+    for (unsigned slot = 0; slot < 32; ++slot)
+      write_line_burst(line + slot*64, seed + slot*16);
+    for (unsigned slot = 0; slot < 32; ++slot) {
+      const uint64_t addr = line + slot*64;
+      require(query(addr), "32-entry replay capacity lost a completed line");
+      require(fetch(addr, true) == seed + slot*16,
+              "32-entry replay capacity returned incorrect data");
+    }
+    write_line_burst(line + 32*64, seed + 32*16);
+    require(!query(line), "33rd replay line did not replace slot zero");
+    require(query(line + 64), "33rd replay line replaced the wrong old slot");
+    require(query(line + 32*64), "33rd replay line was not published");
     std::cout << "[ICACHE-REPLAY-BUFFER] PASS: partial-line exclusion, "
                  "completed-residency query, consecutive four-beat fill, "
-                 "eight-word execution data, fence invalidation\n";
+                 "eight-word execution data, fence invalidation, "
+                 "32-entry capacity and replacement\n";
   }
 };
 }

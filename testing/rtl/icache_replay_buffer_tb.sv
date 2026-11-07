@@ -91,7 +91,7 @@ module icache_replay_buffer_tb
      ,.sets_p(sets_lp), .assoc_p(assoc_lp)
      ,.block_width_p(block_lp), .fill_width_p(fill_lp)
      ,.data_width_p(data_lp), .tag_width_p(tag_lp), .id_width_p(id_lp)
-     ,.replay_buffer_p(1'b1), .replay_buffer_els_p(4)
+     ,.replay_buffer_p(1'b1), .replay_buffer_els_p(32)
      )
    dut
     (.clk_i(clk_i), .reset_i(reset_i)
