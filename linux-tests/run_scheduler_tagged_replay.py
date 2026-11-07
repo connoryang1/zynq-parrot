@@ -22,7 +22,8 @@ MAX_GUEST_COMMAND_LENGTH = 768
 TIMER_GUARD_MARKER = "BP_REPLAY_TIMER_GUARD"
 KERNEL_FAILURE_MARKER = re.compile(
     r"(?:BUG:|Kernel panic|Oops(?:[: ]|\r?\n)|scheduling while atomic|"
-    r"Segmentation fault|unhandled signal [0-9]+|RT throttling activated)"
+    r"Segmentation fault|unhandled signal [0-9]+|RT throttling activated|"
+    r"sbi_trap_error:)"
 )
 
 
@@ -153,6 +154,23 @@ def validate_args(args):
         raise ValueError("log parent directory must exist before board launch")
 
 
+def expect_shell_prompt(child, timeout, stage):
+    outcome = child.expect([
+        SHELL_PROMPT,
+        re.compile(TIMER_GUARD_MARKER + r"[^\r\n]*"),
+        KERNEL_FAILURE_MARKER,
+    ], timeout=timeout)
+    if outcome == 1:
+        raise RuntimeError(
+            f"timer callback integrity guard fired during {stage}: "
+            + child.match.group(0)
+        )
+    if outcome == 2:
+        raise RuntimeError(
+            f"kernel failure marker during {stage}: " + child.match.group(0)
+        )
+
+
 def run(args):
     repo = Path(__file__).resolve().parents[1]
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
@@ -211,13 +229,15 @@ def run(args):
         child.setwinsize(50, 180)
         with args.log.open("w") as log:
             child.logfile_read = log
-            child.expect(SHELL_PROMPT)
+            expect_shell_prompt(child, 300, "Linux boot")
             for transfer_command in args.transfer.read_text().splitlines():
                 child.sendline(transfer_command)
-                child.expect(SHELL_PROMPT, timeout=args.transfer_timeout_s)
+                expect_shell_prompt(
+                    child, args.transfer_timeout_s, "guest ELF transfer"
+                )
             child.sendline(f"/bin/busybox sha256sum {GUEST_ELF}")
             child.expect_exact(f"{args.elf_sha256}  {GUEST_ELF}")
-            child.expect(SHELL_PROMPT)
+            expect_shell_prompt(child, 300, "guest ELF verification")
             child.sendline(command)
             outcome = child.expect([
                 re.compile(r"TAGGED_REPLAY_EXIT rc=([0-9]+)\r*\n"),
@@ -235,7 +255,7 @@ def run(args):
             rc = int(child.match.group(1))
             if rc:
                 raise RuntimeError(f"tagged replay benchmark exited {rc}")
-            child.expect(SHELL_PROMPT)
+            expect_shell_prompt(child, 300, "benchmark completion")
             child.sendline("poweroff -f")
             child.expect(re.compile(r"CORE(?:\[0\])? PASS"), timeout=180)
             child.expect(pexpect.EOF, timeout=180)

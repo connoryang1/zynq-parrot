@@ -34,7 +34,7 @@ class TaggedReplayRunnerTest(unittest.TestCase):
         for marker in ("BUG:", "Kernel panic", "Oops:", "Oops [#1]",
                        "scheduling while atomic", "Segmentation fault",
                        "scheduler_tagge[41]: unhandled signal 11 code 0x2",
-                       "RT throttling activated"):
+                       "RT throttling activated", "sbi_trap_error:"):
             self.assertIsNotNone(runner.KERNEL_FAILURE_MARKER.search(marker))
 
     def test_transfer_timeout_defaults_to_three_minutes(self):
