@@ -17,7 +17,7 @@ SPEC.loader.exec_module(EMITTER)
 class IcachePrefixTest(unittest.TestCase):
     def setUp(self):
         self.result = json.loads(
-            (ROOT / "logs/icache-prefix-status-20261106/stable-post-switch-prefix-results.json").read_text()
+            (ROOT / "logs/icache-prefix-status-20261106/stable-post-switch-prefix-12-results.json").read_text()
         )
 
     def test_committed_header_matches_model(self):
@@ -26,7 +26,7 @@ class IcachePrefixTest(unittest.TestCase):
             HERE / "opensbi-platform/blackparrot/icache_prefix.h"
         ).read_text()
         self.assertEqual(generated, committed)
-        self.assertEqual(generated.count("UL,"), 16)
+        self.assertEqual(generated.count("UL,"), 12)
         self.assertEqual(
             self.result["input_identity"]["kernel_sha256"],
             "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9",

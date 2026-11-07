@@ -1,0 +1,168 @@
+{
+  "purpose": "Select a stable post-switch shared instruction prefix from multiple matched replay-off entry traces.",
+  "input_identity": {
+    "traces": [
+      {
+        "transcript": "/home/coyang/fpga-artifacts/context-resume/exact-futex-prefix-20261106/board/off-exact-prefix-entry-prefix.log",
+        "transcript_sha256": "bf4a7435ba9cf34dc980249201aa6ef7d4247f552a4fdad732448a036f791dc7",
+        "status_sha256": "05dcabcad4266431fe27e9c27f84e35cc27326252415caddc13ecca8e34272cd",
+        "nbf_sha256": "62c56ad56441bffaaf52b89216ee3e3cc80a1ec3752338493f6c5ec4b2d7116c"
+      },
+      {
+        "transcript": "/home/coyang/fpga-artifacts/context-resume/three-line-futex-prefix-20261106/board/off-three-line-entry-prefix.log",
+        "transcript_sha256": "534951eee086a05b91eb25d315324d24a09cb2692ee337b2e868299005ece7c5",
+        "status_sha256": "67405979491ae9733bfd6d446db089847d8de4a07f5bd5178d06dd479805f045",
+        "nbf_sha256": "e19767b0eecb651c404d72448a465c691c28ceb963c40edc44ccb28eb8cf801f"
+      }
+    ],
+    "elf_sha256": "4f3a113d78a7567dff796c83ef50c16c64484bb219a7e8a55fd4f3e70a2a61ef",
+    "transfer_sha256": "a6c554f2cc0ba5d2eb49449270af4a7657bdb7275e247618ab9f4dce01fab360",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "1caf54e7e1adb2eec7ac7a0eb32b3827d3c9c364cbb76dfed45eb77648d4949f",
+    "kernel_sha256": "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9"
+  },
+  "selection": {
+    "floor_relative_cycle": 22600,
+    "stable_lines_available": 61,
+    "selected_lines": 12,
+    "trace_count": 2
+  },
+  "fixed_shared_prefix": {
+    "policy": "first 12 privileged lines present at or after relative cycle 22600 in every matched replay-off entry trace, ranked by latest first occurrence",
+    "line_count": 12,
+    "lines": [
+      {
+        "rank": 0,
+        "relative": 22786,
+        "trace_first_relatives": [
+          22786,
+          22611
+        ],
+        "paddr": 2158050304,
+        "paddr_hex": "0x0000000080a13c00",
+        "cache_set": 48
+      },
+      {
+        "rank": 1,
+        "relative": 22835,
+        "trace_first_relatives": [
+          22835,
+          22660
+        ],
+        "paddr": 2158050368,
+        "paddr_hex": "0x0000000080a13c40",
+        "cache_set": 49
+      },
+      {
+        "rank": 2,
+        "relative": 23033,
+        "trace_first_relatives": [
+          23033,
+          22891
+        ],
+        "paddr": 2150073344,
+        "paddr_hex": "0x0000000080278400",
+        "cache_set": 16
+      },
+      {
+        "rank": 3,
+        "relative": 23077,
+        "trace_first_relatives": [
+          23077,
+          22935
+        ],
+        "paddr": 2150072896,
+        "paddr_hex": "0x0000000080278240",
+        "cache_set": 9
+      },
+      {
+        "rank": 4,
+        "relative": 23122,
+        "trace_first_relatives": [
+          23122,
+          22980
+        ],
+        "paddr": 2150072960,
+        "paddr_hex": "0x0000000080278280",
+        "cache_set": 10
+      },
+      {
+        "rank": 5,
+        "relative": 23193,
+        "trace_first_relatives": [
+          23193,
+          23051
+        ],
+        "paddr": 2150073472,
+        "paddr_hex": "0x0000000080278480",
+        "cache_set": 18
+      },
+      {
+        "rank": 6,
+        "relative": 23440,
+        "trace_first_relatives": [
+          23440,
+          23298
+        ],
+        "paddr": 2158050432,
+        "paddr_hex": "0x0000000080a13c80",
+        "cache_set": 50
+      },
+      {
+        "rank": 7,
+        "relative": 23490,
+        "trace_first_relatives": [
+          23490,
+          23345
+        ],
+        "paddr": 2158050496,
+        "paddr_hex": "0x0000000080a13cc0",
+        "cache_set": 51
+      },
+      {
+        "rank": 8,
+        "relative": 23541,
+        "trace_first_relatives": [
+          23541,
+          23399
+        ],
+        "paddr": 2158050560,
+        "paddr_hex": "0x0000000080a13d00",
+        "cache_set": 52
+      },
+      {
+        "rank": 9,
+        "relative": 23606,
+        "trace_first_relatives": [
+          23606,
+          23464
+        ],
+        "paddr": 2149811136,
+        "paddr_hex": "0x00000000802383c0",
+        "cache_set": 15
+      },
+      {
+        "rank": 10,
+        "relative": 23712,
+        "trace_first_relatives": [
+          23712,
+          23570
+        ],
+        "paddr": 2150189888,
+        "paddr_hex": "0x0000000080294b40",
+        "cache_set": 45
+      },
+      {
+        "rank": 11,
+        "relative": 23755,
+        "trace_first_relatives": [
+          23755,
+          23613
+        ],
+        "paddr": 2150189952,
+        "paddr_hex": "0x0000000080294b80",
+        "cache_set": 46
+      }
+    ]
+  }
+}
