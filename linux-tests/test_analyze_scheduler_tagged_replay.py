@@ -22,10 +22,13 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "off": 0, "data": 9, "data-late": 11,
         "instruction-select": 3, "instruction-wake": 13, "joint": 10,
         "instruction-explicit": 0,
+        "instruction-explicit-roundtrip": 0,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
-    expected_hooks = 0 if mode == "instruction-explicit" else 1
+    expected_hooks = 0 if mode in (
+        "instruction-explicit", "instruction-explicit-roundtrip"
+    ) else 1
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
@@ -33,7 +36,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         f"probe_status={int(probe_status)} sync={sync} "
         f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks}"
     ]
-    if mode in ("instruction-wake", "instruction-explicit"):
+    if mode in ("instruction-wake", "instruction-explicit",
+                "instruction-explicit-roundtrip"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -46,7 +50,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
         expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake",
-            "instruction-explicit"
+            "instruction-explicit", "instruction-explicit-roundtrip"
         )
         admitted = (lines if enabled and expects_trigger
                     and mode != "joint-follow-only" else 0)
@@ -224,6 +228,19 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             result["icache_prefix_status"]["after"]["accepted_triggers"],
             255,
         )
+
+    def test_explicit_roundtrip_mode_has_no_wakeup_hook_or_data_command(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(
+                    Path(directory), mode="instruction-explicit-roundtrip"
+                ),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["kernel_mode"], 0)
+        self.assertEqual(result["config"]["expected_hooks"], 0)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 0)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 0)
 
     def test_instruction_wakeup_accepts_image_bound_prefix_count(self):
         with tempfile.TemporaryDirectory() as directory:
