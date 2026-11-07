@@ -236,7 +236,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned expected_enabled_hooks, int explicit_instruction,
 		      int explicit_return_instruction,
 		      int explicit_directional_instruction,
-		      int trace_return, unsigned trace_trial,
+		      int trace_return, int trace_enabled_first,
+		      unsigned trace_trial,
 		      _Atomic uint32_t *phase,
 		      enum sync_style sync)
 {
@@ -281,7 +282,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 
 	for (unsigned trial = 0; trial < trials;) {
 		unsigned enabled = (mode || explicit_instruction)
-			? trial_enabled(trial) : 0;
+			? (trial_enabled(trial) ^ trace_enabled_first) : 0;
 		unsigned long before_hook, after_hook;
 		uint64_t checksum = 0, entry, after_load;
 		unsigned long node;
@@ -449,6 +450,7 @@ int main(int argc, char **argv)
 	int trace_stop_at_entry = 0, trace_allow_i_overflow = 0;
 	int trace_return = 0;
 	int trace_explicit_disabled = 0;
+	int trace_enabled_first = 0;
 	unsigned trace_trial = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
@@ -458,7 +460,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -592,6 +594,12 @@ int main(int argc, char **argv)
 			trace_stop_at_entry = 1;
 			trace_allow_i_overflow = 1;
 		}
+		else if (!strcmp(argv[10], "trace-icache-entry-prefix-first")) {
+			trace_icache = 1;
+			trace_stop_at_entry = 1;
+			trace_allow_i_overflow = 1;
+			trace_enabled_first = 1;
+		}
 		else if (!strcmp(argv[10], "trace-icache-entry-prefix-off")) {
 			trace_icache = 1;
 			trace_stop_at_entry = 1;
@@ -618,12 +626,16 @@ int main(int argc, char **argv)
 		fputs("disabled-arm trace requires instruction-explicit mode\n", stderr);
 		return 2;
 	}
+	if (trace_enabled_first && !explicit_instruction) {
+		fputs("enabled-first trace requires instruction-explicit mode\n", stderr);
+		return 2;
+	}
 	if (trace_return && !explicit_return_instruction) {
 		fputs("return trace requires instruction-explicit-roundtrip mode\n", stderr);
 		return 2;
 	}
 	if (trace_icache)
-		trace_trial = warmup + (trace_explicit_disabled ? 0U
+		trace_trial = warmup + ((trace_explicit_disabled || trace_enabled_first) ? 0U
 			: (unsigned)((mode != 0) || explicit_instruction
 				     || trace_stop_at_entry));
 	if (!strcmp(mode_name, "joint-follow-only"))
@@ -651,7 +663,8 @@ int main(int argc, char **argv)
 	       expected_enabled_hooks, trace_icache,
 	       trace_return ? "return" : trace_stop_at_entry ? "entry" : "after-load",
 	       trace_allow_i_overflow,
-	       trace_icache ? (trace_explicit_disabled ? "disabled" : "enabled")
+	       trace_icache ? (trace_explicit_disabled ? "disabled"
+			       : trace_enabled_first ? "enabled-first" : "enabled")
 		: "none",
 	       explicit_directional_instruction ? "0:8,8:8" : "full");
 	if (!strcmp(mode_name, "instruction-wake")
@@ -671,7 +684,7 @@ int main(int argc, char **argv)
 			  expected_enabled_hooks, explicit_instruction,
 			  explicit_return_instruction,
 			  explicit_directional_instruction,
-			  trace_return, trace_trial,
+			  trace_return, trace_enabled_first, trace_trial,
 			  &shared->phase, sync);
 		return 0;
 	}
@@ -681,7 +694,7 @@ int main(int argc, char **argv)
 		uint64_t lead_start;
 		int woken;
 		unsigned enabled = (mode || explicit_instruction)
-			? trial_enabled(trial) : 0;
+			? (trial_enabled(trial) ^ trace_enabled_first) : 0;
 
 		diagnostic_stage("parent", "wait_ready", trial, enabled);
 		if (sync == sync_pipe)
