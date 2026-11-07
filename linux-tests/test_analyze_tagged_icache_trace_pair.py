@@ -115,6 +115,15 @@ class TaggedIcacheTracePairTest(unittest.TestCase):
             )
             result = analyzer.analyze(off, on, self.make_prefix(root))
         self.assertIn("replay-on trace", result["interpretation_limits"][0])
+        coverage = result["configured_lines"]["absence_coverage"]
+        self.assertFalse(coverage["replay_on_is_complete"])
+        self.assertTrue(
+            coverage["retained_on_prefix_reaches_off_configured_horizon"]
+        )
+        self.assertEqual(
+            coverage["latest_replay_off_configured_relative"], 100
+        )
+        self.assertEqual(coverage["replay_on_last_relative"], 355)
 
     def test_accepts_unconsumed_data_recorder_overflow(self):
         with tempfile.TemporaryDirectory() as directory:

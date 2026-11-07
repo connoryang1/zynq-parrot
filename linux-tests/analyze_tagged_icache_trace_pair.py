@@ -147,6 +147,24 @@ def configured_summary(trace, prefix_lines):
     }
 
 
+def configured_absence_coverage(off, on, off_configured):
+    """Report whether the retained replay-on prefix reaches the control horizon."""
+    off_relatives = [
+        relative
+        for line in off_configured["lines"]
+        for relative in line["relatives"]
+    ]
+    latest_off = max(off_relatives) if off_relatives else None
+    return {
+        "latest_replay_off_configured_relative": latest_off,
+        "replay_on_last_relative": on["last_relative"],
+        "replay_on_is_complete": not on["truncated"],
+        "retained_on_prefix_reaches_off_configured_horizon": (
+            latest_off is None or on["last_relative"] >= latest_off
+        ),
+    }
+
+
 def analyze(off_path, on_path, prefix_path):
     off_status_path = off_path.with_suffix(off_path.suffix + ".status.json")
     if not off_status_path.is_file():
@@ -215,6 +233,9 @@ def analyze(off_path, on_path, prefix_path):
             ),
             "net_event_reduction": (
                 off_configured["events"] - on_configured["events"]
+            ),
+            "absence_coverage": configured_absence_coverage(
+                off, on, off_configured
             ),
         },
         "single_trace_timing_delta_on_minus_off": {
