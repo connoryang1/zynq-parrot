@@ -15,6 +15,26 @@ def _boot_effects(result, key):
     return [pair[key] for pair in result["pairs"]]
 
 
+def _hierarchical_median(strata, bootstrap_samples, seed):
+    """Pool boot/block strata without treating blocks as independent boots."""
+    flat = [value for boot in strata for value in boot]
+    rng = random.Random(seed)
+    draws = []
+    boot_indices = range(len(strata))
+    for _ in range(bootstrap_samples):
+        sampled = []
+        for boot_index in rng.choices(boot_indices, k=len(strata)):
+            values = strata[boot_index]
+            sampled.extend(rng.choices(values, k=len(values)))
+        draws.append(statistics.median(sampled))
+    return {
+        "paired_median": statistics.median(flat),
+        "hierarchical_95pct_ci": [
+            percentile(draws, 0.025), percentile(draws, 0.975),
+        ],
+    }
+
+
 def pool(paths, bootstrap_samples=20000):
     """Validate and pool matched pairs while resampling boots and pairs."""
     if len(paths) < 2:
@@ -63,7 +83,7 @@ def pool(paths, bootstrap_samples=20000):
         cycle_draws.append(statistics.median(sampled_cycles))
         percent_draws.append(statistics.median(sampled_percent))
 
-    return {
+    output = {
         "purpose": (
             f"Pool sustained hot {sync}-hint comparisons while preserving "
             "matched pairs and independent Linux-boot variation."
@@ -97,6 +117,24 @@ def pool(paths, bootstrap_samples=20000):
             "The interval is a hierarchical bootstrap over a small number of independent boots.",
         ],
     }
+    if config.get("profile", "plain") == "legs":
+        output["resume_legs"] = {}
+        for index, name in enumerate((
+                "child_resume", "parent_resume", "combined_resume",
+                "unattributed")):
+            key = f"saved_{name}_cycles_per_roundtrip"
+            strata = [_boot_effects(result, key) for result in results]
+            summary = _hierarchical_median(
+                strata, bootstrap_samples, 0x4c454750 + index)
+            output["resume_legs"][name] = {
+                "paired_median_saved_cycles_per_roundtrip": summary[
+                    "paired_median"],
+                "hierarchical_95pct_ci_saved_cycles_per_roundtrip": summary[
+                    "hierarchical_95pct_ci"],
+                "replicate_medians": [
+                    statistics.median(values) for values in strata],
+            }
+    return output
 
 
 def main(argv=None):

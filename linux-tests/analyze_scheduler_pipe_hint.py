@@ -15,11 +15,15 @@ from analyze_scheduler_tagged_replay import percentile
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
     r"configured_entries=(\d+)(?: policy=(continuous|seed|preseed))?"
-    r"(?: sync=(pipe|futex))?$", re.MULTILINE
+    r"(?: sync=(pipe|futex))?(?: profile=(plain|legs))?$", re.MULTILINE
 )
 ROW = re.compile(
     r"^PIPE_HINT_RESULT repeat=(\d+) order=(\d+) enabled=([01]) "
     r"cycles=(\d+) loops=(\d+)$", re.MULTILINE
+)
+LEGS = re.compile(
+    r"^PIPE_HINT_LEGS repeat=(\d+) order=(\d+) enabled=([01]) "
+    r"child_resume=(\d+) parent_resume=(\d+) loops=(\d+)$", re.MULTILINE
 )
 STATUS = re.compile(
     r"^PIPE_HINT_STATUS before=0x([0-9a-fA-F]{16}) "
@@ -74,6 +78,7 @@ def analyze(path, bootstrap_samples=20000):
     loops, repeats, warmup, configured = map(int, configs[0][:4])
     policy = configs[0][4] or "continuous"
     sync = configs[0][5] or "pipe"
+    profile = configs[0][6] or "plain"
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
     if warmup != runner.get("warmup", 32):
@@ -82,10 +87,34 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("transcript and runner policy differ")
     if sync != runner.get("sync", "pipe"):
         raise ValueError("transcript and runner sync differ")
+    if profile != runner.get("profile", "plain"):
+        raise ValueError("transcript and runner profile differ")
+    if profile == "legs" and sync != "futex":
+        raise ValueError("legs profile requires futex synchronization")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
                    cycles=int(d), loops=int(e)) for a, b, c, d, e in ROW.findall(text)]
     if len(parsed) != repeats * 2:
         raise ValueError("result row count does not match repeats")
+    legs = [dict(repeat=int(a), order=int(b), enabled=int(c),
+                 child_resume=int(d), parent_resume=int(e), loops=int(f))
+            for a, b, c, d, e, f in LEGS.findall(text)]
+    if len(legs) != (repeats * 2 if profile == "legs" else 0):
+        raise ValueError("leg row count does not match profile")
+    leg_by_key = {(row["repeat"], row["order"], row["enabled"]): row
+                  for row in legs}
+    if len(leg_by_key) != len(legs):
+        raise ValueError("duplicate leg row")
+    for row in parsed:
+        if profile != "legs":
+            continue
+        key = (row["repeat"], row["order"], row["enabled"])
+        leg = leg_by_key.get(key)
+        if leg is None or leg["loops"] != loops:
+            raise ValueError("leg row does not match result row")
+        if leg["child_resume"] + leg["parent_resume"] > row["cycles"]:
+            raise ValueError("profiled handoffs exceed complete transaction")
+        row.update(child_resume=leg["child_resume"],
+                   parent_resume=leg["parent_resume"])
     pairs = []
     for repeat in range(repeats):
         rows = [row for row in parsed if row["repeat"] == repeat]
@@ -100,7 +129,7 @@ def analyze(path, bootstrap_samples=20000):
         disabled = next(row for row in rows if not row["enabled"])
         enabled = next(row for row in rows if row["enabled"])
         saved = (disabled["cycles"] - enabled["cycles"]) / loops
-        pairs.append({
+        pair = {
             "repeat": repeat,
             "enabled_order": next(row["order"] for row in rows if row["enabled"]),
             "disabled_cycles_per_roundtrip": disabled["cycles"] / loops,
@@ -108,7 +137,20 @@ def analyze(path, bootstrap_samples=20000):
             "saved_cycles_per_roundtrip": saved,
             "saved_percent": 100.0 * (disabled["cycles"] - enabled["cycles"])
                              / disabled["cycles"],
-        })
+        }
+        if profile == "legs":
+            for leg in ("child_resume", "parent_resume"):
+                pair[f"disabled_{leg}_cycles_per_roundtrip"] = disabled[leg] / loops
+                pair[f"enabled_{leg}_cycles_per_roundtrip"] = enabled[leg] / loops
+                pair[f"saved_{leg}_cycles_per_roundtrip"] = (
+                    disabled[leg] - enabled[leg]) / loops
+            pair["saved_combined_resume_cycles_per_roundtrip"] = (
+                pair["saved_child_resume_cycles_per_roundtrip"]
+                + pair["saved_parent_resume_cycles_per_roundtrip"])
+            pair["saved_unattributed_cycles_per_roundtrip"] = (
+                pair["saved_cycles_per_roundtrip"]
+                - pair["saved_combined_resume_cycles_per_roundtrip"])
+        pairs.append(pair)
 
     before_hex, after_hex, printed_configured, printed_dropped = statuses[0]
     before = decode_status(int(before_hex, 16))
@@ -156,6 +198,31 @@ def analyze(path, bootstrap_samples=20000):
         values = [pair["saved_cycles_per_roundtrip"] for pair in pairs
                   if pair["enabled_order"] == order]
         by_order[str(order)] = statistics.median(values)
+    metrics = {
+        "disabled_median_cycles_per_roundtrip": statistics.median(
+            pair["disabled_cycles_per_roundtrip"] for pair in pairs),
+        "enabled_median_cycles_per_roundtrip": statistics.median(
+            pair["enabled_cycles_per_roundtrip"] for pair in pairs),
+        "paired_median_saved_cycles_per_roundtrip": statistics.median(saved),
+        "paired_95pct_ci_saved_cycles_per_roundtrip": [
+            percentile(boot_saved, 0.025), percentile(boot_saved, 0.975)],
+        "paired_median_saved_percent": statistics.median(saved_percent),
+        "paired_95pct_ci_saved_percent": [
+            percentile(boot_percent, 0.025), percentile(boot_percent, 0.975)],
+        "saved_cycles_by_enabled_order": by_order,
+    }
+    if profile == "legs":
+        for index, name in enumerate((
+                "child_resume", "parent_resume", "combined_resume",
+                "unattributed")):
+            key = f"saved_{name}_cycles_per_roundtrip"
+            values = [pair[key] for pair in pairs]
+            leg_rng = random.Random(0x4c454700 + index)
+            draws = [statistics.median(leg_rng.choices(values, k=len(values)))
+                     for _ in range(bootstrap_samples)]
+            metrics[f"paired_median_{key}"] = statistics.median(values)
+            metrics[f"paired_95pct_ci_{key}"] = [
+                percentile(draws, 0.025), percentile(draws, 0.975)]
     return {
         "purpose": f"Measure sustained hot {sync} roundtrip throughput with matched explicit instruction hints.",
         "transcript": str(path),
@@ -167,21 +234,9 @@ def analyze(path, bootstrap_samples=20000):
             "control_program_sha256", "bitstream_sha256")},
         "config": {"loops": loops, "repeats": repeats, "warmup": warmup,
                    "configured_entries": configured, "policy": policy,
-                   "sync": sync},
+                   "sync": sync, "profile": profile},
         "pairs": pairs,
-        "metrics": {
-            "disabled_median_cycles_per_roundtrip": statistics.median(
-                pair["disabled_cycles_per_roundtrip"] for pair in pairs),
-            "enabled_median_cycles_per_roundtrip": statistics.median(
-                pair["enabled_cycles_per_roundtrip"] for pair in pairs),
-            "paired_median_saved_cycles_per_roundtrip": statistics.median(saved),
-            "paired_95pct_ci_saved_cycles_per_roundtrip": [
-                percentile(boot_saved, 0.025), percentile(boot_saved, 0.975)],
-            "paired_median_saved_percent": statistics.median(saved_percent),
-            "paired_95pct_ci_saved_percent": [
-                percentile(boot_percent, 0.025), percentile(boot_percent, 0.975)],
-            "saved_cycles_by_enabled_order": by_order,
-        },
+        "metrics": metrics,
         "icache_prefix_status": {"before": before, "after": after},
         "interpretation_limits": [
             "One Linux boot supplies paired repeat blocks but not independent boot strata.",

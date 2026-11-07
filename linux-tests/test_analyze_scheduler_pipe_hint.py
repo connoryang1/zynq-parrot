@@ -131,6 +131,46 @@ class PipeHintAnalyzerTests(unittest.TestCase):
             self.assertEqual(result["config"]["sync"], "futex")
             self.assertIn("futex", result["purpose"])
 
+    def test_profiles_two_resume_legs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "run.log"
+            log.write_text(
+                "PIPE_HINT_CONFIG loops=10 repeats=2 warmup=256 "
+                "configured_entries=16 policy=preseed sync=futex profile=legs\n"
+                "PIPE_HINT_RESULT repeat=0 order=0 enabled=0 cycles=10000 loops=10\n"
+                "PIPE_HINT_LEGS repeat=0 order=0 enabled=0 child_resume=4000 parent_resume=3000 loops=10\n"
+                "PIPE_HINT_RESULT repeat=0 order=1 enabled=1 cycles=9000 loops=10\n"
+                "PIPE_HINT_LEGS repeat=0 order=1 enabled=1 child_resume=3500 parent_resume=2800 loops=10\n"
+                "PIPE_HINT_RESULT repeat=1 order=0 enabled=1 cycles=8000 loops=10\n"
+                "PIPE_HINT_LEGS repeat=1 order=0 enabled=1 child_resume=3000 parent_resume=2500 loops=10\n"
+                "PIPE_HINT_RESULT repeat=1 order=1 enabled=0 cycles=10000 loops=10\n"
+                "PIPE_HINT_LEGS repeat=1 order=1 enabled=0 child_resume=4000 parent_resume=3000 loops=10\n"
+                "PIPE_HINT_STATUS before=0x0000000000000101 "
+                "after=0x0000008008020101 configured_entries=16 dropped=0\n"
+                "PIPE_HINT_PASS\nCORE PASS\nBSG PASS\n"
+            )
+            identity = "a" * 64
+            log.with_suffix(".log.status.json").write_text(json.dumps({
+                "status": "PASS", "loops": 10, "repeats": 2,
+                "warmup": 256, "policy": "preseed", "sync": "futex",
+                "profile": "legs", "nbf_sha256": identity,
+                "transfer_sha256": identity, "elf_sha256": identity,
+                "control_program_sha256": identity,
+                "bitstream_sha256": identity,
+            }))
+            result = analyze(log, bootstrap_samples=10)
+            self.assertEqual(result["config"]["profile"], "legs")
+            self.assertEqual(
+                result["metrics"][
+                    "paired_median_saved_combined_resume_cycles_per_roundtrip"],
+                110.0,
+            )
+            self.assertEqual(
+                result["metrics"][
+                    "paired_median_saved_unattributed_cycles_per_roundtrip"],
+                40.0,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -67,6 +67,7 @@ def parse_args(argv=None):
                         default="continuous")
     parser.add_argument("--warmup", type=int, default=32)
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
+    parser.add_argument("--profile", choices=("plain", "legs"), default="plain")
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
     return parser.parse_args(argv)
 
@@ -81,6 +82,8 @@ def validate_args(args):
             or not 1 <= args.repeats <= 1_000_000
             or not 1 <= args.warmup <= 1_000_000):
         raise ValueError("loops, repeats, and warmup must be in 1..1000000")
+    if args.profile == "legs" and args.sync != "futex":
+        raise ValueError("legs profile requires futex synchronization")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     if not args.log.parent.is_dir():
@@ -93,7 +96,7 @@ def run(args):
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = (f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy} "
-               f"{args.warmup} {args.sync}")
+               f"{args.warmup} {args.sync} {args.profile}")
     status = {
         "status": "running",
         "nbf_sha256": sha256(args.nbf),
@@ -106,6 +109,7 @@ def run(args):
         "policy": args.policy,
         "warmup": args.warmup,
         "sync": args.sync,
+        "profile": args.profile,
         "command": command,
     }
     env = os.environ.copy()

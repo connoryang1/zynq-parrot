@@ -54,6 +54,31 @@ class PipeHintPoolTests(unittest.TestCase):
         self.assertIn("futex", pooled["interpretation_limits"][0])
 
     @mock.patch("pool_scheduler_pipe_hint_replicates.analyze")
+    def test_pools_profiled_resume_legs(self, analyze):
+        config = {"loops": 10, "repeats": 1, "warmup": 256,
+                  "configured_entries": 16, "policy": "preseed",
+                  "sync": "futex", "profile": "legs"}
+        first = result("same", [(100.0, 10.0)], config)
+        second = result("same", [(120.0, 12.0)], config)
+        for item, child, parent in ((first, 30.0, 40.0),
+                                    (second, 50.0, 20.0)):
+            pair = item["pairs"][0]
+            pair.update({
+                "saved_child_resume_cycles_per_roundtrip": child,
+                "saved_parent_resume_cycles_per_roundtrip": parent,
+                "saved_combined_resume_cycles_per_roundtrip": child + parent,
+                "saved_unattributed_cycles_per_roundtrip": (
+                    pair["saved_cycles_per_roundtrip"] - child - parent),
+            })
+        analyze.side_effect = [first, second]
+        pooled = pool([Path("a"), Path("b")], 10)
+        self.assertEqual(
+            pooled["resume_legs"]["combined_resume"]
+                  ["paired_median_saved_cycles_per_roundtrip"],
+            70.0,
+        )
+
+    @mock.patch("pool_scheduler_pipe_hint_replicates.analyze")
     def test_rejects_identity_mismatch(self, analyze):
         analyze.side_effect = [
             result("first", [(10.0, 1.0)]),

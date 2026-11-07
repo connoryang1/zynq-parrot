@@ -7,7 +7,12 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from run_scheduler_pipe_hint import GUEST_ELF, parse_args, validate_transfer
+from run_scheduler_pipe_hint import (
+    GUEST_ELF,
+    parse_args,
+    validate_args,
+    validate_transfer,
+)
 
 
 class PipeHintRunnerTests(unittest.TestCase):
@@ -38,6 +43,22 @@ class PipeHintRunnerTests(unittest.TestCase):
             "--bitstream-sha256", "b" * 64, "--sync", "futex",
         ])
         self.assertEqual(args.sync, "futex")
+
+    def test_resume_leg_profile_is_bound_into_runner_arguments(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--sync", "futex",
+            "--profile", "legs",
+        ])
+        self.assertEqual(args.profile, "legs")
+
+    def test_resume_leg_profile_rejects_pipe_sync(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--profile", "legs",
+        ])
+        with self.assertRaisesRegex(ValueError, "requires futex"):
+            validate_args(args)
 
     def test_status_uses_pointer_copy_abi(self):
         source = (Path(__file__).resolve().parent

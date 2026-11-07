@@ -46,6 +46,25 @@ enum sync_policy {
 	sync_futex,
 };
 
+enum profile_policy {
+	profile_plain,
+	profile_legs,
+};
+
+struct cell_result {
+	uint64_t elapsed;
+	uint64_t child_resume;
+	uint64_t parent_resume;
+};
+
+struct futex_shared {
+	_Atomic uint32_t turn;
+	uint32_t pad;
+	volatile uint64_t parent_launch;
+	volatile uint64_t child_launch;
+	volatile uint64_t child_resume;
+};
+
 static void fail(const char *message)
 {
 	perror(message);
@@ -112,6 +131,16 @@ static enum sync_policy parse_sync(const char *text)
 	exit(2);
 }
 
+static enum profile_policy parse_profile(const char *text)
+{
+	if (!strcmp(text, "plain"))
+		return profile_plain;
+	if (!strcmp(text, "legs"))
+		return profile_legs;
+	fprintf(stderr, "profile must be plain or legs\n");
+	exit(2);
+}
+
 static unsigned long prefix_status(void)
 {
 	unsigned long status;
@@ -155,8 +184,9 @@ static void futex_set_wake(_Atomic uint32_t *word, uint32_t value)
 		fail("futex wake");
 }
 
-static uint64_t run_pipe_cell(unsigned enabled, unsigned loops, unsigned warmup,
-			      enum hint_policy policy)
+static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
+					unsigned warmup,
+					enum hint_policy policy)
 {
 	int to_child[2], to_parent[2], ready[2];
 	unsigned char token = 0;
@@ -210,23 +240,26 @@ static uint64_t run_pipe_cell(unsigned enabled, unsigned loops, unsigned warmup,
 		fputs("pipe child failed\n", stderr);
 		exit(1);
 	}
-	return end - begin;
+	return (struct cell_result){ .elapsed = end - begin };
 }
 
-static uint64_t run_futex_cell(unsigned enabled, unsigned loops,
-			       unsigned warmup, enum hint_policy policy)
+static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
+					 unsigned warmup,
+					 enum hint_policy policy,
+					 enum profile_policy profile)
 {
-	_Atomic uint32_t *turn = mmap(NULL, sizeof(*turn), PROT_READ | PROT_WRITE,
-				     MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	struct futex_shared *shared = mmap(NULL, sizeof(*shared),
+					  PROT_READ | PROT_WRITE,
+					  MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 	int ready[2];
 	unsigned char token = 0;
-	uint64_t begin, end;
+	uint64_t begin, end, parent_resume = 0;
 	pid_t child;
 	int status;
 
-	if (turn == MAP_FAILED || pipe(ready))
+	if (shared == MAP_FAILED || pipe(ready))
 		fail("futex setup");
-	atomic_init(turn, 0);
+	atomic_init(&shared->turn, 0);
 	child = fork();
 	if (child < 0)
 		fail("fork");
@@ -234,12 +267,18 @@ static uint64_t run_futex_cell(unsigned enabled, unsigned loops,
 		close(ready[0]);
 		flush_instruction_state();
 		transfer(ready[1], &token, 1);
+		uint64_t child_resume = 0;
 		for (unsigned i = 0; i < warmup + loops; ++i) {
-			futex_wait_for(turn, 1);
+			futex_wait_for(&shared->turn, 1);
+			if (profile == profile_legs && i >= warmup)
+				child_resume += cycle() - shared->parent_launch;
 			if (policy != hint_preseed)
 				issue_iteration_hint(enabled, policy, i);
-			futex_set_wake(turn, 0);
+			if (profile == profile_legs && i >= warmup)
+				shared->child_launch = cycle();
+			futex_set_wake(&shared->turn, 0);
 		}
+		shared->child_resume = child_resume;
 		_exit(0);
 	}
 
@@ -251,15 +290,19 @@ static uint64_t run_futex_cell(unsigned enabled, unsigned loops,
 	for (unsigned i = 0; i < warmup; ++i) {
 		if (policy != hint_preseed)
 			issue_iteration_hint(enabled, policy, i);
-		futex_set_wake(turn, 1);
-		futex_wait_for(turn, 0);
+		futex_set_wake(&shared->turn, 1);
+		futex_wait_for(&shared->turn, 0);
 	}
 	begin = cycle();
 	for (unsigned i = 0; i < loops; ++i) {
 		if (policy != hint_preseed)
 			issue_iteration_hint(enabled, policy, warmup + i);
-		futex_set_wake(turn, 1);
-		futex_wait_for(turn, 0);
+		if (profile == profile_legs)
+			shared->parent_launch = cycle();
+		futex_set_wake(&shared->turn, 1);
+		futex_wait_for(&shared->turn, 0);
+		if (profile == profile_legs)
+			parent_resume += cycle() - shared->child_launch;
 	}
 	end = cycle();
 	if (waitpid(child, &status, 0) != child || !WIFEXITED(status)
@@ -267,9 +310,14 @@ static uint64_t run_futex_cell(unsigned enabled, unsigned loops,
 		fputs("futex child failed\n", stderr);
 		exit(1);
 	}
-	if (munmap((void *)turn, sizeof(*turn)))
+	struct cell_result result = {
+		.elapsed = end - begin,
+		.child_resume = shared->child_resume,
+		.parent_resume = parent_resume,
+	};
+	if (munmap(shared, sizeof(*shared)))
 		fail("futex munmap");
-	return end - begin;
+	return result;
 }
 
 int main(int argc, char **argv)
@@ -279,10 +327,11 @@ int main(int argc, char **argv)
 	unsigned warmup = warmup_roundtrips;
 	enum hint_policy policy = hint_continuous;
 	enum sync_policy sync = sync_pipe;
+	enum profile_policy profile = profile_plain;
 	unsigned long before, after;
 
-	if (argc > 6) {
-		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed|preseed] [warmup] [pipe|futex]\n",
+	if (argc > 7) {
+		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|seed|preseed] [warmup] [pipe|futex] [plain|legs]\n",
 			argv[0]);
 		return 2;
 	}
@@ -296,24 +345,38 @@ int main(int argc, char **argv)
 		warmup = parse_positive(argv[4], "warmup");
 	if (argc > 5)
 		sync = parse_sync(argv[5]);
+	if (argc > 6)
+		profile = parse_profile(argv[6]);
+	if (profile == profile_legs && sync != sync_futex) {
+		fputs("legs profile requires futex synchronization\n", stderr);
+		return 2;
+	}
 	before = prefix_status();
-	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s sync=%s\n",
+	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s sync=%s profile=%s\n",
 	       loops, repeats, warmup, (before >> 4) & 0x1ffUL,
 	       policy == hint_continuous ? "continuous"
 	       : policy == hint_seed_once ? "seed" : "preseed",
-	       sync == sync_pipe ? "pipe" : "futex");
+	       sync == sync_pipe ? "pipe" : "futex",
+	       profile == profile_plain ? "plain" : "legs");
 	for (unsigned repeat = 0; repeat < repeats; ++repeat) {
 		unsigned first = repeat & 1U;
 
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned enabled = first ^ order;
-			uint64_t elapsed = sync == sync_pipe
+			struct cell_result result = sync == sync_pipe
 				? run_pipe_cell(enabled, loops, warmup, policy)
-				: run_futex_cell(enabled, loops, warmup, policy);
+				: run_futex_cell(enabled, loops, warmup, policy,
+						  profile);
 
 			printf("PIPE_HINT_RESULT repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
 			       repeat, order, enabled,
-			       (unsigned long long)elapsed, loops);
+			       (unsigned long long)result.elapsed, loops);
+			if (profile == profile_legs)
+				printf("PIPE_HINT_LEGS repeat=%u order=%u enabled=%u child_resume=%llu parent_resume=%llu loops=%u\n",
+				       repeat, order, enabled,
+				       (unsigned long long)result.child_resume,
+				       (unsigned long long)result.parent_resume,
+				       loops);
 			fflush(stdout);
 		}
 	}
