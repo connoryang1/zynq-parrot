@@ -8,6 +8,11 @@
 namespace {
 constexpr uint64_t line = UINT64_C(0x80012000);
 constexpr uint64_t seed = UINT64_C(0x7193000000000000);
+unsigned replay_bank(uint64_t addr) {
+  const uint64_t line_addr = addr >> 6;
+  return (((line_addr >> 0) ^ (line_addr >> 13)) & 1)
+         | ((((line_addr >> 3) ^ (line_addr >> 6)) & 1) << 1);
+}
 void require(bool value, const char *message) {
   if (!value) throw std::runtime_error(message);
 }
@@ -144,10 +149,36 @@ public:
     require(!query(line), "33rd replay line did not replace slot zero");
     require(query(line + 64), "33rd replay line replaced the wrong old slot");
     require(query(line + 32*64), "33rd replay line was not published");
+
+    // Force nine distinct lines through one hash bank. Eight ways must remain
+    // simultaneously resident, and the ninth must replace only that bank's
+    // oldest entry. This catches a design that passes the evenly distributed
+    // sequential-capacity test but still uses a global replacement pointer.
+    dut.reset_i = 1; step(); step(); dut.reset_i = 0; step(); initialize();
+    uint64_t same_bank_lines[9] = {};
+    unsigned same_bank_count = 0;
+    for (unsigned offset = 0; same_bank_count < 9; ++offset) {
+      const uint64_t candidate = line + uint64_t(offset)*64;
+      if (replay_bank(candidate) == replay_bank(line))
+        same_bank_lines[same_bank_count++] = candidate;
+    }
+    for (unsigned way = 0; way < 8; ++way)
+      write_line_burst(same_bank_lines[way], seed + way*16);
+    for (unsigned way = 0; way < 8; ++way)
+      require(query(same_bank_lines[way]),
+              "one-bank fill lost an entry before reaching eight ways");
+    write_line_burst(same_bank_lines[8], seed + 8*16);
+    require(!query(same_bank_lines[0]),
+            "ninth same-bank line did not replace the oldest way");
+    for (unsigned way = 1; way < 8; ++way)
+      require(query(same_bank_lines[way]),
+              "ninth same-bank line replaced a non-oldest way");
+    require(query(same_bank_lines[8]),
+            "ninth same-bank line was not published");
     std::cout << "[ICACHE-REPLAY-BUFFER] PASS: partial-line exclusion, "
                  "completed-residency query, consecutive four-beat fill, "
                  "eight-word execution data, fence invalidation, "
-                 "32-entry capacity and replacement\n";
+                 "32-entry capacity, and four-bank/eight-way replacement\n";
   }
 };
 }
