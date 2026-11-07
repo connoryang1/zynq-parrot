@@ -1,0 +1,121 @@
+{
+  "purpose": "Select only instruction-prefix lines with a positive demand-event reduction in the matched replay-off/on entry trace pair.",
+  "input_identity": {
+    "source_prefix": "logs/icache-prefix-status-20261106/stable-post-switch-prefix-12-results.json",
+    "source_prefix_sha256": "b8ccdbfadfb6423c976abef94d82b68176ef4e515667e685203dae5c87611d60",
+    "matched_analysis": "/home/coyang/fpga-artifacts/context-resume/stable-post-switch-prefix-12-20261106/board/matched-stable12-entry-prefix-analysis.json",
+    "matched_analysis_sha256": "8b19e4ba57386a35546a8f01315c144869809e77dc64926512e728ad7bbec48e",
+    "kernel_sha256": "cd7390d9b1cff1941fcf132fc1fca55555381eb1cfcfc39a97bca82ace2ab2e9"
+  },
+  "fixed_shared_prefix": {
+    "policy": "positive off-minus-on demand-event reduction, descending by reduction then ascending original prefix rank",
+    "line_count": 7,
+    "lines": [
+      {
+        "rank": 0,
+        "relative": 23755,
+        "trace_first_relatives": [
+          23755,
+          23613
+        ],
+        "paddr": 2150189952,
+        "paddr_hex": "0x0000000080294b80",
+        "cache_set": 46,
+        "source_rank": 11,
+        "off_events": 2,
+        "on_events": 0,
+        "event_reduction": 2
+      },
+      {
+        "rank": 1,
+        "relative": 22786,
+        "trace_first_relatives": [
+          22786,
+          22611
+        ],
+        "paddr": 2158050304,
+        "paddr_hex": "0x0000000080a13c00",
+        "cache_set": 48,
+        "source_rank": 0,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      },
+      {
+        "rank": 2,
+        "relative": 22835,
+        "trace_first_relatives": [
+          22835,
+          22660
+        ],
+        "paddr": 2158050368,
+        "paddr_hex": "0x0000000080a13c40",
+        "cache_set": 49,
+        "source_rank": 1,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      },
+      {
+        "rank": 3,
+        "relative": 23033,
+        "trace_first_relatives": [
+          23033,
+          22891
+        ],
+        "paddr": 2150073344,
+        "paddr_hex": "0x0000000080278400",
+        "cache_set": 16,
+        "source_rank": 2,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      },
+      {
+        "rank": 4,
+        "relative": 23440,
+        "trace_first_relatives": [
+          23440,
+          23298
+        ],
+        "paddr": 2158050432,
+        "paddr_hex": "0x0000000080a13c80",
+        "cache_set": 50,
+        "source_rank": 6,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      },
+      {
+        "rank": 5,
+        "relative": 23490,
+        "trace_first_relatives": [
+          23490,
+          23345
+        ],
+        "paddr": 2158050496,
+        "paddr_hex": "0x0000000080a13cc0",
+        "cache_set": 51,
+        "source_rank": 7,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      },
+      {
+        "rank": 6,
+        "relative": 23606,
+        "trace_first_relatives": [
+          23606,
+          23464
+        ],
+        "paddr": 2149811136,
+        "paddr_hex": "0x00000000802383c0",
+        "cache_set": 15,
+        "source_rank": 9,
+        "off_events": 1,
+        "on_events": 0,
+        "event_reduction": 1
+      }
+    ]
+  }
+}
