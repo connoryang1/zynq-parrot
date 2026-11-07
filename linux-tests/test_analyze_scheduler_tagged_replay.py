@@ -523,6 +523,33 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             result["config"]["mode"], "instruction-explicit-roundtrip"
         )
 
+    def test_prefix_comparison_accepts_same_count_directional_tables(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-explicit-directed",
+                prefix_entries=16, nbf_sha256="1" * 64,
+                enabled_load=280,
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-explicit-directed",
+                prefix_entries=16, nbf_sha256="2" * 64,
+                enabled_load=260,
+            )
+            result = compare_prefixes(
+                control, candidate, bootstrap_samples=10
+            )
+        self.assertEqual(result["comparison_kind"], "table_content")
+        self.assertEqual(result["control"]["configured_entries"], 16)
+        self.assertEqual(result["candidate"]["configured_entries"], 16)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]
+                  ["candidate_incremental_saved_cycles"],
+            20,
+        )
+
     def test_tail_prefix_comparison_accepts_explicit_roundtrip_mode(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -29,7 +29,8 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
             raise ValueError("prefix-image configurations do not match")
     if reference["config"]["mode"] not in (
             "instruction-wake", "instruction-explicit",
-            "instruction-explicit-roundtrip"):
+            "instruction-explicit-roundtrip",
+            "instruction-explicit-directed"):
         raise ValueError(
             "prefix-image comparison requires an instruction replay mode"
         )
@@ -68,9 +69,6 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
         raise ValueError("replicates within a prefix image must use one count")
     control_count = next(iter(control_counts))
     candidate_count = next(iter(candidate_counts))
-    if control_count == candidate_count:
-        raise ValueError("prefix-image comparison requires distinct prefix counts")
-
     rng = random.Random(0x7A66ED04)
     output = {
         "purpose": (
@@ -95,6 +93,10 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
             "filtered_attempts": [result["filtered_attempts"]
                                   for result, _rows in candidates],
         },
+        "comparison_kind": (
+            "table_content" if control_count == candidate_count else
+            "table_count_or_content"
+        ),
         "bootstrap_samples": bootstrap_samples,
         "metrics": {},
         "interpretation_limits": [
