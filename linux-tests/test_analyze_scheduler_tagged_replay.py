@@ -26,21 +26,25 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-select": 3, "instruction-wake": 13, "joint": 10,
         "instruction-explicit": 0,
         "instruction-explicit-roundtrip": 0,
+        "instruction-explicit-directed": 0,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
     expected_hooks = 0 if mode in (
-        "instruction-explicit", "instruction-explicit-roundtrip"
+        "instruction-explicit", "instruction-explicit-roundtrip",
+        "instruction-explicit-directed"
     ) else 1
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
         f"policy=fifo lead_cycles=0 layout={layout} "
         f"probe_status={int(probe_status)} sync={sync} "
-        f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks}"
+        f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks} "
+        f"icache_ranges={'0:8,8:8' if mode == 'instruction-explicit-directed' else 'full'}"
     ]
     if mode in ("instruction-wake", "instruction-explicit",
-                "instruction-explicit-roundtrip"):
+                "instruction-explicit-roundtrip",
+                "instruction-explicit-directed"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -53,7 +57,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
                    ((trial ^ (trial >> 1)) & 1) ^ ((trial >> 2) & 1))
         expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake",
-            "instruction-explicit", "instruction-explicit-roundtrip"
+            "instruction-explicit", "instruction-explicit-roundtrip",
+            "instruction-explicit-directed"
         )
         admitted = (lines if enabled and expects_trigger
                     and mode != "joint-follow-only" else 0)
@@ -585,6 +590,23 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             status["gap"] = 3
             status_path.write_text(json.dumps(status) + "\n")
             with self.assertRaisesRegex(ValueError, "status gap"):
+                analyze(path, bootstrap_samples=10)
+
+    def test_directional_instruction_ranges_are_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(
+                Path(directory), mode="instruction-explicit-directed"
+            )
+            result = analyze(path, bootstrap_samples=10)
+            self.assertEqual(
+                result["config"]["icache_ranges"], "0:8,8:8"
+            )
+            path.write_text(
+                path.read_text().replace(
+                    "icache_ranges=0:8,8:8", "icache_ranges=full", 1
+                )
+            )
+            with self.assertRaisesRegex(ValueError, "instruction range"):
                 analyze(path, bootstrap_samples=10)
 
     def test_rt_throttling_marker_is_rejected(self):

@@ -1,0 +1,50 @@
+This patch extends the explicit instruction-prefix hint with an optional
+bounds-checked table range. The kernel still supplies no physical address:
+M-mode owns the immutable table, while S-mode encodes only a start/count that
+the replay controller validates again against the configured entry count.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -323,7 +323,8 @@ struct prctl_mm_map {
+ #define PR_BP_PREVIEW_REPLAY_STATUS	0x4250505d
+ /* Copy the 64-bit shared instruction-prefix controller status to arg2. */
+ #define PR_BP_PREVIEW_ICACHE_STATUS	0x4250505e
+-/* Optionally trigger the shared instruction prefix: arg2 is zero or one. */
++/* Optionally trigger the shared instruction prefix: arg2 enables it; arg3 and
++ * arg4 select a table start/count, or both zero retain the full table. */
+ #define PR_BP_PREVIEW_ICACHE_TRIGGER	0x4250505f
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2900,16 +2900,27 @@ SYSCALL_DEFINE5(prctl, int, option, unsi
+ 			error = 0;
+ 		break;
+ 	}
+-	case PR_BP_PREVIEW_ICACHE_TRIGGER:
+-		if (arg2 > 1 || arg3 || arg4 || arg5) {
++	case PR_BP_PREVIEW_ICACHE_TRIGGER: {
++		unsigned long trigger = 0;
++
++		/* A zero start/count retains legacy full-table replay. Otherwise
++		 * encode only a bounded table selection; hardware validates it
++		 * again against the immutable M-mode configured count.
++		 */
++		if (arg2 > 1 || arg5 || (!arg4 && arg3)
++		    || arg3 > 255 || arg4 > 256 || arg3 + arg4 > 256) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
++		if (arg4)
++			trigger = (1UL << 63) | (arg4 << 8) | arg3;
+ 		/* Keep the no-op arm in the same syscall and branch path. */
+ 		if (arg2)
+-			asm volatile("csrw 0x5c0, zero" ::: "memory");
++			asm volatile("csrw 0x5c0, %0"
++				     : : "r"(trigger) : "memory");
+ 		error = 0;
+ 		break;
++	}
+ 	case PR_BP_PREVIEW_GET_COUNT:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;

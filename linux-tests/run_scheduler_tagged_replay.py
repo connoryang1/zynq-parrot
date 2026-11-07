@@ -101,6 +101,7 @@ def parse_args(argv=None):
                                             "instruction-wake",
                                             "instruction-explicit",
                                             "instruction-explicit-roundtrip",
+                                            "instruction-explicit-directed",
                                             "joint",
                                             "joint-split",
                                             "joint-split-one-hook",

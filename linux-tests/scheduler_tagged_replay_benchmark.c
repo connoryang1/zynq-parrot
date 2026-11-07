@@ -198,6 +198,7 @@ static void child_handoff_begin(int in, int out, char *token,
 
 static void child_handoff_end(int out, char *token, _Atomic uint32_t *phase,
 			      enum sync_style sync, int explicit_return_instruction,
+			      int explicit_directional_instruction,
 			      unsigned enabled, int record_return_hint,
 			      volatile uint64_t *return_hint_begin,
 			      volatile uint64_t *return_hint_end)
@@ -205,7 +206,9 @@ static void child_handoff_end(int out, char *token, _Atomic uint32_t *phase,
 	if (record_return_hint)
 		*return_hint_begin = cycle();
 	if (explicit_return_instruction
-	    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled, 0UL, 0UL, 0UL))
+	    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled,
+		     explicit_directional_instruction ? 8UL : 0UL,
+		     explicit_directional_instruction ? 8UL : 0UL, 0UL))
 		fail("explicit return instruction-prefix trigger");
 	if (record_return_hint)
 		*return_hint_end = cycle();
@@ -232,6 +235,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		      int probe_status, int skew_layout, int trace_stop_at_entry,
 		      unsigned expected_enabled_hooks, int explicit_instruction,
 		      int explicit_return_instruction,
+		      int explicit_directional_instruction,
 		      int trace_return, unsigned trace_trial,
 		      _Atomic uint32_t *phase,
 		      enum sync_style sync)
@@ -358,7 +362,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				atomic_load_explicit(&samples[trial].wake_count,
 						     memory_order_relaxed));
 			child_handoff_end(out, &token, phase, sync,
-					  explicit_return_instruction, enabled,
+					  explicit_return_instruction,
+					  explicit_directional_instruction, enabled,
 					  trace_return && trial == trace_trial,
 					  &samples[trial].return_hint_begin,
 					  &samples[trial].return_hint_end);
@@ -414,7 +419,8 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		}
 		diagnostic_stage("child", "accepted_end_begin", trial, enabled);
 		child_handoff_end(out, &token, phase, sync,
-				  explicit_return_instruction, enabled,
+				  explicit_return_instruction,
+				  explicit_directional_instruction, enabled,
 				  trace_return && trial == trace_trial,
 				  &samples[trial].return_hint_begin,
 				  &samples[trial].return_hint_end);
@@ -439,6 +445,7 @@ int main(int argc, char **argv)
 	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
 	int explicit_instruction = 0, explicit_return_instruction = 0;
+	int explicit_directional_instruction = 0;
 	int trace_stop_at_entry = 0, trace_allow_i_overflow = 0;
 	int trace_return = 0;
 	int trace_explicit_disabled = 0;
@@ -451,7 +458,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -477,6 +484,13 @@ int main(int argc, char **argv)
 			mode = 0;
 			explicit_instruction = 1;
 			explicit_return_instruction = 1;
+			expected_enabled_hooks = 0;
+		}
+		else if (!strcmp(argv[1], "instruction-explicit-directed")) {
+			mode = 0;
+			explicit_instruction = 1;
+			explicit_return_instruction = 1;
+			explicit_directional_instruction = 1;
 			expected_enabled_hooks = 0;
 		}
 		else if (!strcmp(argv[1], "joint"))
@@ -628,7 +642,7 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u trace_arm=%s\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u trace_arm=%s icache_ranges=%s\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
@@ -638,10 +652,12 @@ int main(int argc, char **argv)
 	       trace_return ? "return" : trace_stop_at_entry ? "entry" : "after-load",
 	       trace_allow_i_overflow,
 	       trace_icache ? (trace_explicit_disabled ? "disabled" : "enabled")
-		: "none");
+		: "none",
+	       explicit_directional_instruction ? "0:8,8:8" : "full");
 	if (!strcmp(mode_name, "instruction-wake")
 	    || !strcmp(mode_name, "instruction-explicit")
-	    || !strcmp(mode_name, "instruction-explicit-roundtrip"))
+	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
+	    || !strcmp(mode_name, "instruction-explicit-directed"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
 	if (child < 0)
@@ -654,6 +670,7 @@ int main(int argc, char **argv)
 			  skew_layout, trace_stop_at_entry,
 			  expected_enabled_hooks, explicit_instruction,
 			  explicit_return_instruction,
+			  explicit_directional_instruction,
 			  trace_return, trace_trial,
 			  &shared->phase, sync);
 		return 0;
@@ -691,8 +708,8 @@ int main(int argc, char **argv)
 		}
 		samples[trial].launch = cycle();
 		if (explicit_instruction
-		    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled,
-			     0UL, 0UL, 0UL))
+		    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled, 0UL,
+			     explicit_directional_instruction ? 8UL : 0UL, 0UL))
 			fail("explicit instruction-prefix trigger");
 		if (sync == sync_pipe) {
 			transfer(to_child[1], &token, 1);
@@ -803,7 +820,8 @@ int main(int argc, char **argv)
 	}
 	if (!strcmp(mode_name, "instruction-wake")
 	    || !strcmp(mode_name, "instruction-explicit")
-	    || !strcmp(mode_name, "instruction-explicit-roundtrip")) {
+	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
+	    || !strcmp(mode_name, "instruction-explicit-directed")) {
 		icache_status_after = icache_prefix_status();
 		printf("TAGGED_REPLAY_ICACHE_STATUS before=0x%016llx after=0x%016llx\n",
 		       (unsigned long long)icache_status_before,

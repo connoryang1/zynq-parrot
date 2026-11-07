@@ -72,8 +72,9 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0020-blackparrot-tagged-data-instruction-split.patch \
 	$(CURDIR)/kernel-patches/0021-blackparrot-dedicated-wakeup-instruction-replay.patch \
 	$(CURDIR)/kernel-patches/0022-blackparrot-icache-prefix-status.patch \
-	$(CURDIR)/kernel-patches/0023-blackparrot-explicit-instruction-prefix-trigger.patch
-LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0022-blackparrot-icache-prefix-status.patch
+	$(CURDIR)/kernel-patches/0023-blackparrot-explicit-instruction-prefix-trigger.patch \
+	$(CURDIR)/kernel-patches/0024-blackparrot-select-instruction-prefix-range.patch
+LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0023-blackparrot-explicit-instruction-prefix-trigger.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb

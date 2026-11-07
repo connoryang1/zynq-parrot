@@ -13,6 +13,7 @@ from pathlib import Path
 CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
+    r"instruction-explicit-directed|"
     r"joint|joint-split|joint-split-one-hook|"
     r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
@@ -27,6 +28,9 @@ ROW = re.compile(
 PROBE_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* probe_status=(0|1)")
 LAYOUT_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* layout=(aligned|skew)")
 SYNC_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* sync=(pipe|futex)")
+ICACHE_RANGES_CONFIG = re.compile(
+    r"TAGGED_REPLAY_CONFIG .* icache_ranges=(full|0:8,8:8)"
+)
 KERNEL_CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG .* kernel_mode=(\d+) expected_hooks=(\d+)"
 )
@@ -146,6 +150,7 @@ def analyze(path, bootstrap_samples=20000):
             "instruction-wake": 13,
             "instruction-explicit": 0,
             "instruction-explicit-roundtrip": 0,
+            "instruction-explicit-directed": 0,
             "joint": 10,
             "joint-split": 12,
             "joint-split-one-hook": 12,
@@ -154,7 +159,8 @@ def analyze(path, bootstrap_samples=20000):
         if config["kernel_mode"] != expected_kernel_modes[mode]:
             raise ValueError("mode name does not match configured kernel mode")
     elif mode in ("instruction-wake", "instruction-explicit",
-                  "instruction-explicit-roundtrip"):
+                  "instruction-explicit-roundtrip",
+                  "instruction-explicit-directed"):
         raise ValueError(
             f"{mode} transcript lacks dedicated kernel-mode binding"
         )
@@ -174,6 +180,14 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("status layout does not match configuration")
     if status.get("sync", "pipe") != config["sync"]:
         raise ValueError("status sync does not match configuration")
+    ranges = ICACHE_RANGES_CONFIG.findall(text)
+    if len(ranges) > 1:
+        raise ValueError("expected at most one instruction range configuration")
+    config["icache_ranges"] = ranges[0] if ranges else "full"
+    expected_ranges = ("0:8,8:8"
+                       if mode == "instruction-explicit-directed" else "full")
+    if config["icache_ranges"] != expected_ranges:
+        raise ValueError("mode does not match instruction range configuration")
     required = ("TAGGED_REPLAY_CHILD PASS", "TAGGED_REPLAY_PARENT PASS", "BSG PASS")
     for marker in required:
         if marker not in text:
@@ -193,7 +207,8 @@ def analyze(path, bootstrap_samples=20000):
 
     icache_statuses = ICACHE_STATUS.findall(text)
     if mode in ("instruction-wake", "instruction-explicit",
-                "instruction-explicit-roundtrip"):
+                "instruction-explicit-roundtrip",
+                "instruction-explicit-directed"):
         if len(icache_statuses) != 1:
             raise ValueError(f"{mode} requires one I-cache status marker")
         before = int(icache_statuses[0][0], 16)
@@ -295,7 +310,8 @@ def analyze(path, bootstrap_samples=20000):
         # trial, so these are independent snapshots rather than deltas.
         expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake",
-            "instruction-explicit", "instruction-explicit-roundtrip"
+            "instruction-explicit", "instruction-explicit-roundtrip",
+            "instruction-explicit-directed"
         )
         expected_entries = 0 if mode == "joint-follow-only" else config["lines"]
         expected_triggers = row["enabled"] if expects_trigger else 0
@@ -327,6 +343,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure matched explicit instruction-prefix hints immediately "
             "before both pipe wakes in the full synchronization roundtrip."
             if mode == "instruction-explicit-roundtrip" else
+            "Measure direction-selected forward and reverse instruction "
+            "subranges immediately before their corresponding pipe wakes."
+            if mode == "instruction-explicit-directed" else
             "Measure wake-time tagged data while the selection block is "
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
@@ -365,7 +384,8 @@ def analyze(path, bootstrap_samples=20000):
         },
     }
     if mode in ("instruction-wake", "instruction-explicit",
-                "instruction-explicit-roundtrip"):
+                "instruction-explicit-roundtrip",
+                "instruction-explicit-directed"):
         result["icache_prefix_status"] = {
             "before": before_decoded,
             "after": after_decoded,

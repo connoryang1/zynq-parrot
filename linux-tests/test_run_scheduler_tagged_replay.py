@@ -97,6 +97,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_explicit_directional_instruction_mode(self):
+        self.assertIn(
+            " instruction-explicit-directed 0 0 normal 0 8 0 aligned pipe; ",
+            runner.benchmark_command(
+                "instruction-explicit-directed", 0, 0, "normal", 0
+            ),
+        )
+
     def test_command_binds_explicit_roundtrip_return_trace_arms(self):
         self.assertIn(
             " trace-icache-return-prefix; ",
