@@ -8,6 +8,7 @@ from pathlib import Path
 from analyze_scheduler_tagged_replay import analyze
 from analyze_scheduler_tagged_replay_tail import pool as pool_tail
 from compare_scheduler_tagged_replay_prefixes import compare as compare_prefixes
+from compare_scheduler_tagged_replay_modes import compare as compare_modes
 from compare_scheduler_tagged_replay_tail_prefixes import (
     compare as compare_tail_prefixes,
 )
@@ -457,6 +458,50 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                   ["candidate_incremental_saved_cycles"],
             20,
         )
+
+    def test_mode_comparison_holds_exact_image_and_workload_fixed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-explicit-roundtrip",
+                prefix_entries=16, enabled_load=280,
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-explicit-directed",
+                prefix_entries=16, enabled_load=260,
+            )
+            result = compare_modes(control, candidate, bootstrap_samples=10)
+        self.assertEqual(result["configured_entries"], 16)
+        self.assertEqual(
+            result["metrics"]["load_cycles"]
+                  ["direction_selected_incremental_saved_cycles"],
+            20,
+        )
+
+    def test_mode_comparison_rejects_identity_or_table_drift(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "control").mkdir()
+            (root / "candidate").mkdir()
+            control = write_run(
+                root / "control", mode="instruction-explicit-roundtrip",
+                prefix_entries=16,
+            )
+            candidate = write_run(
+                root / "candidate", mode="instruction-explicit-directed",
+                prefix_entries=16, nbf_sha256="2" * 64,
+            )
+            with self.assertRaisesRegex(ValueError, "exact image"):
+                compare_modes(control, candidate, bootstrap_samples=10)
+
+            candidate = write_run(
+                root / "candidate", mode="instruction-explicit-directed",
+                prefix_entries=8,
+            )
+            with self.assertRaisesRegex(ValueError, "16-entry"):
+                compare_modes(control, candidate, bootstrap_samples=10)
 
     def test_prefix_comparison_accepts_explicit_roundtrip_mode(self):
         with tempfile.TemporaryDirectory() as directory:
