@@ -27,8 +27,11 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
     for result, _rows in controls[1:] + candidates:
         if reference["config"] != result["config"]:
             raise ValueError("prefix-image configurations do not match")
-    if reference["config"]["mode"] != "instruction-wake":
-        raise ValueError("prefix-image comparison requires instruction-wake mode")
+    if reference["config"]["mode"] not in (
+            "instruction-wake", "instruction-explicit"):
+        raise ValueError(
+            "prefix-image comparison requires an instruction replay mode"
+        )
 
     same_keys = (
         "transfer_sha256", "elf_sha256", "control_program_sha256",
@@ -95,9 +98,16 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
         "metrics": {},
         "interpretation_limits": [
             "Boot strata are resampled independently within each prefix image.",
-            "Large filtered-wake counts limit this to mechanism-quality evidence.",
         ],
     }
+    if reference["config"]["mode"] == "instruction-wake":
+        output["interpretation_limits"].append(
+            "Large filtered-wake counts limit this to mechanism-quality evidence."
+        )
+    else:
+        output["interpretation_limits"].append(
+            "Explicit mode removes wake-hook filtering but not scheduler-path variation."
+        )
     for metric in METRICS:
         control_strata = [
             block_differences(rows, metric) for _result, rows in controls

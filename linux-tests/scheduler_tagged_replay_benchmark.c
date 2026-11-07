@@ -411,6 +411,8 @@ int main(int argc, char **argv)
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
 	int explicit_instruction = 0;
 	int trace_stop_at_entry = 0, trace_allow_i_overflow = 0;
+	int trace_explicit_disabled = 0;
+	unsigned trace_trial = 0;
 	enum sync_style sync = sync_pipe;
 	struct shared_state *shared;
 	volatile struct sample *samples;
@@ -419,7 +421,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -540,11 +542,25 @@ int main(int argc, char **argv)
 			trace_stop_at_entry = 1;
 			trace_allow_i_overflow = 1;
 		}
+		else if (!strcmp(argv[10], "trace-icache-entry-prefix-off")) {
+			trace_icache = 1;
+			trace_stop_at_entry = 1;
+			trace_allow_i_overflow = 1;
+			trace_explicit_disabled = 1;
+		}
 		else if (strcmp(argv[10], "no-trace")) {
 			fprintf(stderr, "invalid instruction trace mode: %s\n", argv[10]);
 			return 2;
 		}
 	}
+	if (trace_explicit_disabled && !explicit_instruction) {
+		fputs("disabled-arm trace requires instruction-explicit mode\n", stderr);
+		return 2;
+	}
+	if (trace_icache)
+		trace_trial = warmup + (trace_explicit_disabled ? 0U
+			: (unsigned)((mode != 0) || explicit_instruction
+				     || trace_stop_at_entry));
 	if (!strcmp(mode_name, "joint-follow-only"))
 		config_lines_per_base = 0;
 	diagnostic_progress = getenv("BP_TAGGED_REPLAY_DIAG") != NULL;
@@ -561,7 +577,7 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u trace_arm=%s\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
@@ -569,7 +585,9 @@ int main(int argc, char **argv)
 	       sync == sync_futex ? "futex" : "pipe", mode,
 	       expected_enabled_hooks, trace_icache,
 	       trace_stop_at_entry ? "entry" : "after-load",
-	       trace_allow_i_overflow);
+	       trace_allow_i_overflow,
+	       trace_icache ? (trace_explicit_disabled ? "disabled" : "enabled")
+		: "none");
 	if (!strcmp(mode_name, "instruction-wake")
 	    || !strcmp(mode_name, "instruction-explicit"))
 		icache_status_before = icache_prefix_status();
@@ -612,10 +630,7 @@ int main(int argc, char **argv)
 		 * scheduler phase is matched even when the replay mode is disabled.
 		 * Preserve trial zero for the original complete replay-off extractor.
 		 */
-		if (trace_icache
-		    && trial == warmup
-				+ (unsigned)((mode != 0) || explicit_instruction
-					     || trace_stop_at_entry)) {
+		if (trace_icache && trial == trace_trial) {
 			trace_control(2);
 			samples[trial].trace_start = cycle();
 			trace_control(3);
@@ -678,9 +693,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	if (trace_icache) {
-		const unsigned trace_trial =
-			warmup + (unsigned)((mode != 0) || explicit_instruction
-					    || trace_stop_at_entry);
 		const uint64_t raw_status = samples[trace_trial].trace_status;
 		const unsigned icount = raw_status & 0x1ff;
 		const unsigned dcount = (raw_status >> 9) & 0x1ff;

@@ -382,18 +382,22 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             (root / "control").mkdir()
             (root / "candidate").mkdir()
             control = write_run(
-                root / "control", mode="instruction-wake",
+                root / "control", mode="instruction-explicit",
                 prefix_entries=16, nbf_sha256="1" * 64,
                 enabled_load=280,
             )
             candidate = write_run(
-                root / "candidate", mode="instruction-wake",
+                root / "candidate", mode="instruction-explicit",
                 prefix_entries=3, nbf_sha256="2" * 64,
                 enabled_load=260,
             )
             result = compare_prefixes(control, candidate, bootstrap_samples=10)
         self.assertEqual(result["control"]["configured_entries"], 16)
         self.assertEqual(result["candidate"]["configured_entries"], 3)
+        self.assertIn(
+            "Explicit mode removes wake-hook filtering",
+            result["interpretation_limits"][1],
+        )
         self.assertEqual(
             result["metrics"]["load_cycles"]
                   ["candidate_incremental_saved_cycles"],

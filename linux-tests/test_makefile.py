@@ -64,6 +64,7 @@ class LinuxHarnessTests(unittest.TestCase):
         return subprocess.run(
             ["make", "--no-print-directory", "-C", str(HERE), target,
              "OUT=" + str(self.out), "BP_LINUX_CC=" + str(self.base / compiler),
+             "BP_LINUX_DYNAMIC_CC=" + str(self.base / compiler),
              "BP_LINUX_PREFIX=" + str(self.base) + "/", *options],
             env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10)
 

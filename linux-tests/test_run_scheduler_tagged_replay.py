@@ -89,6 +89,24 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_explicit_disabled_trace_arm(self):
+        self.assertIn(
+            " instruction-explicit 0 0 normal 0 8 0 aligned pipe "
+            "trace-icache-entry-prefix-off; ",
+            runner.benchmark_command(
+                "instruction-explicit", 0, 0, "normal", 0,
+                trace_icache_entry_prefix_off=True,
+            ),
+        )
+
+    def test_disabled_trace_arm_is_mutually_exclusive(self):
+        with self.assertRaises(SystemExit):
+            runner.parse_args([
+                "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
+                "--trace-icache-entry-prefix",
+                "--trace-icache-entry-prefix-off",
+            ])
+
     def test_command_binds_split_joint_mode(self):
         self.assertIn(
             " joint-split 0 0 normal 0 8 0 aligned pipe; ",
