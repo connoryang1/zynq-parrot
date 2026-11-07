@@ -71,6 +71,9 @@ struct shared_state {
 	struct sample samples[trials];
 };
 
+static void print_tail_partitions(volatile struct sample *samples)
+	__attribute__((noinline));
+
 static int diagnostic_progress;
 
 static void diagnostic_stage(const char *role, const char *stage,
@@ -755,6 +758,24 @@ int main(int argc, char **argv)
 		       (unsigned long long)s->entry_probe_status,
 		       s->entry_probe_cycles);
 	}
+	print_tail_partitions(samples);
 	puts("TAGGED_REPLAY_PARENT PASS");
 	return 0;
+}
+
+static void print_tail_partitions(volatile struct sample *samples)
+{
+	/* These timestamps already bracket the accepted child bookkeeping and
+	 * reply path. Emit their partitions only after all timing and original row
+	 * output is complete so localization cannot perturb the handoff itself.
+	 */
+	for (unsigned trial = warmup; trial < trials; trial++) {
+		const volatile struct sample *s = &samples[trial];
+
+		printf("TAGGED_REPLAY_TAIL trial=%u enabled=%u child_post_load=%llu return_handoff=%llu post_load_total=%llu\n",
+		       trial - warmup, s->enabled,
+		       (unsigned long long)(s->done - s->after_load),
+		       (unsigned long long)(s->returned - s->done),
+		       (unsigned long long)(s->returned - s->after_load));
+	}
 }

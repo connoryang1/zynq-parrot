@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from analyze_scheduler_tagged_replay import analyze
+from analyze_scheduler_tagged_replay_tail import pool as pool_tail
 from compare_scheduler_tagged_replay_prefixes import compare as compare_prefixes
 from compare_scheduler_tagged_replay_routes import compare
 from pool_scheduler_tagged_replay_replicates import pool
@@ -15,7 +16,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
               layout="aligned", mode="data", sync="pipe",
               enabled_load=280, bitstream_sha256="5" * 64,
-              prefix_entries=16, nbf_sha256="1" * 64):
+              prefix_entries=16, nbf_sha256="1" * 64, tail=False):
     """Create a complete synthetic matched A/B transcript and status."""
     kernel_modes = {
         "off": 0, "data": 9, "data-late": 11,
@@ -75,6 +76,14 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             f"entry_probe_status=0x{entry_status:016x} "
             f"entry_probe_cycles={32 if probe_status else 0}"
         )
+        if tail:
+            child_post_load = 10 + enabled
+            return_handoff = 30 - enabled
+            rows.append(
+                f"TAGGED_REPLAY_TAIL trial={trial} enabled={enabled} "
+                f"child_post_load={child_post_load} "
+                f"return_handoff={return_handoff} post_load_total=40"
+            )
     rows.extend((
         "TAGGED_REPLAY_CHILD PASS retries=0",
         "TAGGED_REPLAY_PARENT PASS",
@@ -104,6 +113,26 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
 
 
 class TaggedReplayAnalyzerTest(unittest.TestCase):
+    def test_tail_partition_and_endpoint_identities_pass(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = pool_tail(
+                [write_run(Path(directory), tail=True)],
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["replicate_count"], 1)
+        self.assertEqual(
+            result["metrics"]["post_load_total"]["pooled_saved_cycles"], 0
+        )
+
+    def test_tail_endpoint_mismatch_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(Path(directory), tail=True)
+            path.write_text(path.read_text().replace(
+                "post_load_total=40", "post_load_total=41", 1
+            ))
+            with self.assertRaisesRegex(ValueError, "tail partition mismatch"):
+                pool_tail([path], bootstrap_samples=10)
+
     def test_known_effect_and_complete_counters_pass(self):
         with tempfile.TemporaryDirectory() as directory:
             result = analyze(write_run(Path(directory)), bootstrap_samples=100)
