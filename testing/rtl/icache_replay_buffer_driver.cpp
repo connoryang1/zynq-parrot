@@ -10,12 +10,12 @@ constexpr uint64_t line = UINT64_C(0x80012000);
 constexpr uint64_t seed = UINT64_C(0x7193000000000000);
 unsigned replay_bank(uint64_t addr) {
   const uint64_t line_addr = addr >> 6;
-  return (((line_addr >> 1) ^ (line_addr >> 3) ^ (line_addr >> 4)
-           ^ (line_addr >> 8) ^ (line_addr >> 11)) & 1)
-         | ((((line_addr >> 0) ^ (line_addr >> 2) ^ (line_addr >> 3)
-              ^ (line_addr >> 5) ^ (line_addr >> 11)) & 1) << 1)
-         | ((((line_addr >> 2) ^ (line_addr >> 4) ^ (line_addr >> 6)
-              ^ (line_addr >> 12)) & 1) << 2);
+  return (((line_addr >> 0) ^ (line_addr >> 4) ^ (line_addr >> 8)
+           ^ (line_addr >> 22)) & 1)
+         | ((((line_addr >> 1) ^ (line_addr >> 4) ^ (line_addr >> 9)
+              ^ (line_addr >> 10) ^ (line_addr >> 15)) & 1) << 1)
+         | ((((line_addr >> 2) ^ (line_addr >> 9) ^ (line_addr >> 13)
+              ^ (line_addr >> 15) ^ (line_addr >> 17)) & 1) << 2);
 }
 void require(bool value, const char *message) {
   if (!value) throw std::runtime_error(message);
