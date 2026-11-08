@@ -16,8 +16,10 @@ from analyze_scheduler_tagged_replay_tail import (
 from pool_scheduler_tagged_replay_replicates import block_effects, load_rows
 
 
-CONTROL_MODE = "data-prewake-equalized-quiescent"
-CANDIDATE_MODE = "joint-preseed-quiescent"
+MODE_PAIRS = {
+    "data-prewake-equalized-quiescent": "joint-preseed-quiescent",
+    "data-prewake-short": "joint-preseed-short",
+}
 
 
 def _workload_config(config):
@@ -45,12 +47,18 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
     candidate_paths = [Path(path) for path in candidate_paths]
     controls = [load_rows(path) for path in control_paths]
     candidates = [load_rows(path) for path in candidate_paths]
-    if any(result["config"]["mode"] != CONTROL_MODE
+    control_mode = controls[0][0]["config"]["mode"]
+    candidate_mode = candidates[0][0]["config"]["mode"]
+    if control_mode not in MODE_PAIRS:
+        raise ValueError("unsupported data-prewake control mode")
+    if any(result["config"]["mode"] != control_mode
            for result, _rows in controls):
-        raise ValueError(f"control transcripts must use {CONTROL_MODE}")
-    if any(result["config"]["mode"] != CANDIDATE_MODE
-           for result, _rows in candidates):
-        raise ValueError(f"candidate transcripts must use {CANDIDATE_MODE}")
+        raise ValueError(f"control transcripts must use {control_mode}")
+    expected_candidate = MODE_PAIRS[control_mode]
+    if candidate_mode != expected_candidate or any(
+            result["config"]["mode"] != expected_candidate
+            for result, _rows in candidates):
+        raise ValueError(f"candidate transcripts must use {expected_candidate}")
 
     reference = controls[0][0]
     workload = _workload_config(reference["config"])
@@ -78,11 +86,11 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
         "workload_config": workload,
         "identity": identity,
         "control": {
-            "mode": CONTROL_MODE,
+            "mode": control_mode,
             "transcripts": [str(path) for path in control_paths],
         },
         "candidate": {
-            "mode": CANDIDATE_MODE,
+            "mode": candidate_mode,
             "transcripts": [str(path) for path in candidate_paths],
         },
         "bootstrap_samples": bootstrap_samples,

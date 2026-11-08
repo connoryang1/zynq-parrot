@@ -28,7 +28,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     kernel_modes = {
         "off": 0, "data": 9, "data-prewake": 0,
         "data-prewake-equalized": 0,
-        "data-prewake-equalized-quiescent": 0, "data-late": 11,
+        "data-prewake-equalized-quiescent": 0, "data-prewake-short": 0,
+        "data-late": 11,
         "instruction-select": 3, "instruction-wake": 13, "joint": 10,
         "instruction-explicit": 0,
         "instruction-explicit-roundtrip": 0,
@@ -45,6 +46,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-explicit", "instruction-explicit-roundtrip",
         "instruction-explicit-directed", "data-prewake",
         "data-prewake-equalized", "data-prewake-equalized-quiescent",
+        "data-prewake-short",
         "joint-prewake-quiescent", "joint-preseed-quiescent",
         "joint-preseed-drained", "joint-preseed-short"
     ) else 1
@@ -52,13 +54,15 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         65536 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
-        8192 if mode == "joint-preseed-short" else
+        8192 if mode in ("data-prewake-short", "joint-preseed-short") else
         262144 if mode == "data-prewake-equalized" else 0
     )
     prewake_max = 73728 if mode in (
         "data-prewake-equalized-quiescent", "joint-prewake-quiescent",
         "joint-preseed-quiescent"
-    ) else 16384 if mode == "joint-preseed-short" else 0
+    ) else 16384 if mode in (
+        "data-prewake-short", "joint-preseed-short"
+    ) else 0
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
@@ -190,6 +194,27 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             result["tail_metrics"]["return_handoff"]["instruction_increment_saved_cycles"],
             0,
         )
+
+    def test_short_prewake_comparison_accepts_matched_mode_pair(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            controls = []
+            candidates = []
+            for label, mode, paths in (
+                    ("data", "data-prewake-short", controls),
+                    ("joint", "joint-preseed-short", candidates)):
+                for index in range(2):
+                    subdir = root / f"{label}-{index}"
+                    subdir.mkdir()
+                    paths.append(write_run(
+                        subdir, mode=mode, lines=32, prefix_entries=32,
+                        tail=True,
+                    ))
+            result = compare_prewake(controls, candidates, bootstrap_samples=10)
+        self.assertEqual(result["control"]["mode"], "data-prewake-short")
+        self.assertEqual(result["candidate"]["mode"], "joint-preseed-short")
+        self.assertEqual(result["workload_config"]["prewake_budget_cycles"], 8192)
+        self.assertEqual(result["workload_config"]["prewake_max_cycles"], 16384)
 
     def test_tail_loader_reuses_quiescent_whole_block_filter(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -504,6 +529,17 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["stretched_prewake_trials"], 1)
         self.assertEqual(result["filtered_prewake_blocks"], 1)
         self.assertEqual(result["analyzed_trials"], 508)
+
+    def test_short_data_only_uses_identical_duration_policy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="data-prewake-short"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["prewake_budget_cycles"], 8192)
+        self.assertEqual(result["config"]["prewake_max_cycles"], 16384)
+        self.assertNotIn("icache_prefix_status", result)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
 
     def test_split_joint_mode_requires_one_hardware_command_hook(self):
         with tempfile.TemporaryDirectory() as directory:

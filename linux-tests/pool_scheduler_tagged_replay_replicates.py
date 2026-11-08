@@ -48,6 +48,7 @@ def load_rows(path):
             for match in ROW.finditer(text)]
     if result["config"]["mode"] in (
             "data-prewake-equalized", "data-prewake-equalized-quiescent",
+            "data-prewake-short",
             "joint-prewake-quiescent", "joint-preseed-quiescent",
             "joint-preseed-short"):
         prewake = [int(cycles) for _trial, cycles in PREWAKE_ROW.findall(text)]
@@ -57,6 +58,7 @@ def load_rows(path):
             row["prewake_cycles"] = cycles
         if result["config"]["mode"] in (
                 "data-prewake-equalized-quiescent",
+                "data-prewake-short",
                 "joint-prewake-quiescent", "joint-preseed-quiescent",
                 "joint-preseed-short"):
             maximum = result["config"]["prewake_max_cycles"]
@@ -104,6 +106,7 @@ def pool(paths, bootstrap_samples=20000):
                          if reference_config["mode"] in (
                              "data-prewake-equalized",
                              "data-prewake-equalized-quiescent",
+                             "data-prewake-short",
                              "joint-prewake-quiescent",
                              "joint-preseed-quiescent",
                              "joint-preseed-short",

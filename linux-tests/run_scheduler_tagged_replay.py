@@ -107,6 +107,7 @@ def parse_args(argv=None):
     parser.add_argument("--mode", choices=("off", "data", "data-prewake",
                                             "data-prewake-equalized",
                                             "data-prewake-equalized-quiescent",
+                                            "data-prewake-short",
                                             "data-late",
                                             "instruction-select",
                                             "instruction-wake",

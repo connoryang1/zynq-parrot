@@ -551,7 +551,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-preseed-short|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-prewake-short|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-preseed-short|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -632,10 +632,11 @@ int main(int argc, char **argv)
 			mode = 11;
 		else if (!strcmp(argv[1], "data-prewake")
 			 || !strcmp(argv[1], "data-prewake-equalized")
-			 || !strcmp(argv[1], "data-prewake-equalized-quiescent")) {
+			 || !strcmp(argv[1], "data-prewake-equalized-quiescent")
+			 || !strcmp(argv[1], "data-prewake-short")) {
 			mode = 0;
-			explicit_data_prewake = !strcmp(
-				argv[1], "data-prewake-equalized-quiescent") ? 3
+			explicit_data_prewake = !strcmp(argv[1], "data-prewake-short") ? 4
+				: !strcmp(argv[1], "data-prewake-equalized-quiescent") ? 3
 				: !strcmp(argv[1], "data-prewake-equalized") ? 2 : 1;
 			expected_enabled_hooks = 0;
 		}

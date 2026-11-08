@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 CONFIG = re.compile(
-    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|"
+    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-prewake-short|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
     r"instruction-explicit-directed|"
     r"joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-preseed-short|joint-split|joint-split-one-hook|"
@@ -155,7 +155,7 @@ def analyze(path, bootstrap_samples=20000):
         65536 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
-        8192 if mode == "joint-preseed-short" else
+        8192 if mode in ("data-prewake-short", "joint-preseed-short") else
         262144 if mode == "data-prewake-equalized" else 0
     )
     if config["prewake_budget_cycles"] != expected_prewake_budget:
@@ -170,7 +170,7 @@ def analyze(path, bootstrap_samples=20000):
         73728 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
-        16384 if mode == "joint-preseed-short" else 0
+        16384 if mode in ("data-prewake-short", "joint-preseed-short") else 0
     )
     if config["prewake_max_cycles"] != expected_prewake_max:
         raise ValueError("unexpected prewake equalization maximum")
@@ -198,6 +198,7 @@ def analyze(path, bootstrap_samples=20000):
             "data-prewake": 0,
             "data-prewake-equalized": 0,
             "data-prewake-equalized-quiescent": 0,
+            "data-prewake-short": 0,
             "data-late": 11,
             "instruction-select": 3,
             "instruction-wake": 13,
@@ -353,6 +354,7 @@ def analyze(path, bootstrap_samples=20000):
     filtered_prewake_blocks = 0
     if mode in ("data-prewake-equalized",
                 "data-prewake-equalized-quiescent",
+                "data-prewake-short",
                 "joint-prewake-quiescent",
                 "joint-preseed-quiescent",
                 "joint-preseed-drained", "joint-preseed-short"):
@@ -367,7 +369,8 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("prewake duration ended before its fixed budget")
         if mode in ("data-prewake-equalized-quiescent",
                     "joint-prewake-quiescent",
-                    "joint-preseed-quiescent", "joint-preseed-short"):
+                    "joint-preseed-quiescent", "data-prewake-short",
+                    "joint-preseed-short"):
             stretched_prewake_trials = sum(
                 row["prewake_cycles"] > expected_prewake_max for row in rows
             )
@@ -502,6 +505,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure fully drained data replay after accepting only quiescent "
             "pre-readiness intervals with a bounded physical-cycle duration."
             if mode == "data-prewake-equalized-quiescent" else
+            "Measure data-only prewake under normal scheduling with the frozen "
+            "8,192-cycle floor and 16,384-cycle interruption cutoff."
+            if mode == "data-prewake-short" else
             "Measure wake-time tagged data while the selection block is "
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
@@ -548,6 +554,7 @@ def analyze(path, bootstrap_samples=20000):
     }
     if mode in ("data-prewake-equalized",
                 "data-prewake-equalized-quiescent",
+                "data-prewake-short",
                 "joint-prewake-quiescent",
                 "joint-preseed-quiescent", "joint-preseed-short"):
         result["prewake_equalization"] = summarize_metric(
