@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare data-only prewake with joint instruction/data preseed across boots."""
+"""Compare one-component prewake with joint instruction/data preseed."""
 
 import argparse
 import json
@@ -19,6 +19,7 @@ from pool_scheduler_tagged_replay_replicates import block_effects, load_rows
 MODE_PAIRS = {
     "data-prewake-equalized-quiescent": "joint-preseed-quiescent",
     "data-prewake-short": "joint-preseed-short",
+    "instruction-preseed-short": "joint-preseed-short",
 }
 
 
@@ -37,8 +38,50 @@ def _draw(rng, strata, value_index):
     return statistics.median(sample)
 
 
+def _metric_summary(control_cycles, candidate_cycles, control_percent,
+                    candidate_percent, cycle_draws, percent_draws,
+                    added_component):
+    """Name the direct increment without assuming which lane is the control."""
+    result = {
+        "control_saved_cycles": control_cycles,
+        "joint_preseed_saved_cycles": candidate_cycles,
+        "added_component_increment_saved_cycles": candidate_cycles - control_cycles,
+        "added_component_increment_95pct_ci_saved_cycles": [
+            percentile(cycle_draws, 0.025), percentile(cycle_draws, 0.975)
+        ],
+        "control_saved_percent": control_percent,
+        "joint_preseed_saved_percent": candidate_percent,
+        "added_component_increment_saved_percentage_points": (
+            candidate_percent - control_percent
+        ),
+        "added_component_increment_95pct_ci_saved_percentage_points": [
+            percentile(percent_draws, 0.025), percentile(percent_draws, 0.975)
+        ],
+    }
+    prefix = f"{added_component}_increment"
+    result[f"{prefix}_saved_cycles"] = result[
+        "added_component_increment_saved_cycles"
+    ]
+    result[f"{prefix}_95pct_ci_saved_cycles"] = result[
+        "added_component_increment_95pct_ci_saved_cycles"
+    ]
+    result[f"{prefix}_saved_percentage_points"] = result[
+        "added_component_increment_saved_percentage_points"
+    ]
+    result[f"{prefix}_95pct_ci_saved_percentage_points"] = result[
+        "added_component_increment_95pct_ci_saved_percentage_points"
+    ]
+    if added_component == "instruction":
+        result["data_only_saved_cycles"] = control_cycles
+        result["data_only_saved_percent"] = control_percent
+    else:
+        result["instruction_only_saved_cycles"] = control_cycles
+        result["instruction_only_saved_percent"] = control_percent
+    return result
+
+
 def compare(control_paths, candidate_paths, bootstrap_samples=20000):
-    """Measure the incremental value of early instruction preseed."""
+    """Measure the component added by joint preseed over a one-lane control."""
     if len(control_paths) < 2 or len(candidate_paths) < 2:
         raise ValueError("each prewake mode requires at least two independent boots")
     if bootstrap_samples <= 0:
@@ -50,11 +93,14 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
     control_mode = controls[0][0]["config"]["mode"]
     candidate_mode = candidates[0][0]["config"]["mode"]
     if control_mode not in MODE_PAIRS:
-        raise ValueError("unsupported data-prewake control mode")
+        raise ValueError("unsupported one-component prewake control mode")
     if any(result["config"]["mode"] != control_mode
            for result, _rows in controls):
         raise ValueError(f"control transcripts must use {control_mode}")
     expected_candidate = MODE_PAIRS[control_mode]
+    added_component = (
+        "data" if control_mode == "instruction-preseed-short" else "instruction"
+    )
     if candidate_mode != expected_candidate or any(
             result["config"]["mode"] != expected_candidate
             for result, _rows in candidates):
@@ -73,16 +119,18 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
                 raise ValueError(
                     f"{label} replicate {index} exact image identity mismatch"
                 )
+    icache_runs = candidates + (controls if added_component == "data" else [])
     if any(result["icache_prefix_status"]["before"]["configured_entries"] != 32
-           for result, _rows in candidates):
+           for result, _rows in icache_runs):
         raise ValueError("joint preseed requires one exact 32-entry prefix table")
 
     rng = random.Random(0x50524557)
     output = {
         "purpose": (
-            "Measure the incremental effect of a drained 32-line instruction "
-            "preseed over the same drained 32-line data prewake."
+            f"Measure the incremental effect of drained 32-line {added_component} "
+            "replay over the matching one-component short prewake."
         ),
+        "added_component": added_component,
         "workload_config": workload,
         "identity": identity,
         "control": {
@@ -122,23 +170,10 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
             percent_draws.append(
                 _draw(rng, candidate_strata, 1) - _draw(rng, control_strata, 1)
             )
-        output["metrics"][metric] = {
-            "data_only_saved_cycles": control_cycles,
-            "joint_preseed_saved_cycles": candidate_cycles,
-            "instruction_increment_saved_cycles": candidate_cycles - control_cycles,
-            "instruction_increment_95pct_ci_saved_cycles": [
-                percentile(cycle_draws, 0.025), percentile(cycle_draws, 0.975)
-            ],
-            "data_only_saved_percent": control_percent,
-            "joint_preseed_saved_percent": candidate_percent,
-            "instruction_increment_saved_percentage_points": (
-                candidate_percent - control_percent
-            ),
-            "instruction_increment_95pct_ci_saved_percentage_points": [
-                percentile(percent_draws, 0.025),
-                percentile(percent_draws, 0.975),
-            ],
-        }
+        output["metrics"][metric] = _metric_summary(
+            control_cycles, candidate_cycles, control_percent, candidate_percent,
+            cycle_draws, percent_draws, added_component,
+        )
     tail_controls = [load_tail(path) for path in control_paths]
     tail_candidates = [load_tail(path) for path in candidate_paths]
     for metric in TAIL_METRICS:
@@ -161,34 +196,22 @@ def compare(control_paths, candidate_paths, bootstrap_samples=20000):
             percent_draws.append(
                 _draw(rng, candidate_strata, 1) - _draw(rng, control_strata, 1)
             )
-        output["tail_metrics"][metric] = {
-            "data_only_saved_cycles": control_cycles,
-            "joint_preseed_saved_cycles": candidate_cycles,
-            "instruction_increment_saved_cycles": candidate_cycles - control_cycles,
-            "instruction_increment_95pct_ci_saved_cycles": [
-                percentile(cycle_draws, 0.025), percentile(cycle_draws, 0.975)
-            ],
-            "data_only_saved_percent": control_percent,
-            "joint_preseed_saved_percent": candidate_percent,
-            "instruction_increment_saved_percentage_points": (
-                candidate_percent - control_percent
-            ),
-            "instruction_increment_95pct_ci_saved_percentage_points": [
-                percentile(percent_draws, 0.025),
-                percentile(percent_draws, 0.975),
-            ],
-        }
+        output["tail_metrics"][metric] = _metric_summary(
+            control_cycles, candidate_cycles, control_percent, candidate_percent,
+            cycle_draws, percent_draws, added_component,
+        )
     return output
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data", nargs="+", required=True, type=Path)
+    parser.add_argument("--control", "--data", dest="control", nargs="+",
+                        required=True, type=Path)
     parser.add_argument("--joint", nargs="+", required=True, type=Path)
     parser.add_argument("--bootstrap-samples", type=int, default=20000)
     args = parser.parse_args(argv)
     try:
-        result = compare(args.data, args.joint, args.bootstrap_samples)
+        result = compare(args.control, args.joint, args.bootstrap_samples)
     except ValueError as error:
         raise SystemExit(str(error)) from error
     print(json.dumps(result, indent=2))

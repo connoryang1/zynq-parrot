@@ -114,6 +114,7 @@ def parse_args(argv=None):
                                             "instruction-explicit",
                                             "instruction-explicit-roundtrip",
                                             "instruction-explicit-directed",
+                                            "instruction-preseed-short",
                                             "joint",
                                             "joint-explicit",
                                             "joint-prewake-quiescent",

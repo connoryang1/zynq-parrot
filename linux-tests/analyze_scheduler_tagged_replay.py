@@ -13,7 +13,7 @@ from pathlib import Path
 CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-prewake-short|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
-    r"instruction-explicit-directed|"
+    r"instruction-explicit-directed|instruction-preseed-short|"
     r"joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-preseed-short|joint-split|joint-split-one-hook|"
     r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
@@ -155,7 +155,8 @@ def analyze(path, bootstrap_samples=20000):
         65536 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
-        8192 if mode in ("data-prewake-short", "joint-preseed-short") else
+        8192 if mode in ("data-prewake-short", "instruction-preseed-short",
+                         "joint-preseed-short") else
         262144 if mode == "data-prewake-equalized" else 0
     )
     if config["prewake_budget_cycles"] != expected_prewake_budget:
@@ -170,7 +171,8 @@ def analyze(path, bootstrap_samples=20000):
         73728 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
-        16384 if mode in ("data-prewake-short", "joint-preseed-short") else 0
+        16384 if mode in ("data-prewake-short", "instruction-preseed-short",
+                          "joint-preseed-short") else 0
     )
     if config["prewake_max_cycles"] != expected_prewake_max:
         raise ValueError("unexpected prewake equalization maximum")
@@ -205,6 +207,7 @@ def analyze(path, bootstrap_samples=20000):
             "instruction-explicit": 0,
             "instruction-explicit-roundtrip": 0,
             "instruction-explicit-directed": 0,
+            "instruction-preseed-short": 0,
             "joint": 10,
             "joint-explicit": 9,
             "joint-prewake-quiescent": 0,
@@ -219,7 +222,8 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("mode name does not match configured kernel mode")
     elif mode in ("instruction-wake", "instruction-explicit",
                   "instruction-explicit-roundtrip",
-                        "instruction-explicit-directed", "joint-explicit",
+                        "instruction-explicit-directed",
+                        "instruction-preseed-short", "joint-explicit",
                         "joint-prewake-quiescent",
                         "joint-preseed-quiescent",
                         "joint-preseed-drained", "joint-preseed-short"):
@@ -274,7 +278,8 @@ def analyze(path, bootstrap_samples=20000):
     icache_statuses = ICACHE_STATUS.findall(text)
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed", "joint-explicit",
+                "instruction-explicit-directed", "instruction-preseed-short",
+                "joint-explicit",
                 "joint-prewake-quiescent",
                 "joint-preseed-quiescent",
                 "joint-preseed-drained", "joint-preseed-short"):
@@ -354,7 +359,7 @@ def analyze(path, bootstrap_samples=20000):
     filtered_prewake_blocks = 0
     if mode in ("data-prewake-equalized",
                 "data-prewake-equalized-quiescent",
-                "data-prewake-short",
+                "data-prewake-short", "instruction-preseed-short",
                 "joint-prewake-quiescent",
                 "joint-preseed-quiescent",
                 "joint-preseed-drained", "joint-preseed-short"):
@@ -370,6 +375,7 @@ def analyze(path, bootstrap_samples=20000):
         if mode in ("data-prewake-equalized-quiescent",
                     "joint-prewake-quiescent",
                     "joint-preseed-quiescent", "data-prewake-short",
+                    "instruction-preseed-short",
                     "joint-preseed-short"):
             stretched_prewake_trials = sum(
                 row["prewake_cycles"] > expected_prewake_max for row in rows
@@ -446,7 +452,7 @@ def analyze(path, bootstrap_samples=20000):
         expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake",
             "instruction-explicit", "instruction-explicit-roundtrip",
-            "instruction-explicit-directed"
+            "instruction-explicit-directed", "instruction-preseed-short"
         )
         expected_entries = 0 if mode == "joint-follow-only" else config["lines"]
         expected_triggers = row["enabled"] if expects_trigger else 0
@@ -481,6 +487,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure direction-selected forward and reverse instruction "
             "subranges immediately before their corresponding pipe wakes."
             if mode == "instruction-explicit-directed" else
+            "Measure instruction-only preseed under normal scheduling with "
+            "the frozen 8,192-cycle floor and 16,384-cycle interruption cutoff."
+            if mode == "instruction-preseed-short" else
             "Measure an explicit parent-issued instruction prefix immediately "
             "before the same wake whose kernel hook launches tagged data replay."
             if mode == "joint-explicit" else
@@ -555,6 +564,7 @@ def analyze(path, bootstrap_samples=20000):
     if mode in ("data-prewake-equalized",
                 "data-prewake-equalized-quiescent",
                 "data-prewake-short",
+                "instruction-preseed-short",
                 "joint-prewake-quiescent",
                 "joint-preseed-quiescent", "joint-preseed-short"):
         result["prewake_equalization"] = summarize_metric(
@@ -577,6 +587,7 @@ def analyze(path, bootstrap_samples=20000):
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
                 "instruction-explicit-directed", "joint-explicit",
+                "instruction-preseed-short",
                 "joint-prewake-quiescent",
                 "joint-preseed-quiescent",
                 "joint-preseed-drained", "joint-preseed-short"):

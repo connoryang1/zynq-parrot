@@ -393,8 +393,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 					"explicit instruction preseed drain");
 			if (explicit_data_prewake)
 				replay_status_wait_drain("explicit data prewake drain");
-			if (explicit_data_prewake >= 2) {
-				const uint64_t budget = explicit_data_prewake == 4
+			if (explicit_data_prewake >= 2
+			    || explicit_instruction_prewake == 2) {
+				const uint64_t budget = (explicit_data_prewake == 4
+					|| explicit_instruction_prewake == 2)
 					? JOINT_PRESEED_SHORT_CYCLES
 					: explicit_data_prewake == 3
 					? DATA_PREWAKE_QUIESCENT_CYCLES
@@ -551,7 +553,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-prewake-short|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-preseed-short|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-prewake-short|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|instruction-preseed-short|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-preseed-short|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -584,6 +586,13 @@ int main(int argc, char **argv)
 			explicit_instruction = 1;
 			explicit_return_instruction = 1;
 			explicit_directional_instruction = 1;
+			expected_enabled_hooks = 0;
+		}
+		else if (!strcmp(argv[1], "instruction-preseed-short")) {
+			/* Launch and drain only the instruction lane before readiness,
+			 * then apply the same short-lead floor used by the joint arm. */
+			mode = 0;
+			explicit_instruction_prewake = 2;
 			expected_enabled_hooks = 0;
 		}
 		else if (!strcmp(argv[1], "joint"))
@@ -809,13 +818,13 @@ int main(int argc, char **argv)
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
 	       (unsigned long long)(explicit_data_prewake == 3
 		? DATA_PREWAKE_QUIESCENT_CYCLES
-		: explicit_data_prewake == 4
+		: (explicit_data_prewake == 4 || explicit_instruction_prewake == 2)
 		? JOINT_PRESEED_SHORT_CYCLES
 		: explicit_data_prewake == 2
 		? DATA_PREWAKE_EQUALIZED_CYCLES : 0),
 	       (unsigned long long)(explicit_data_prewake == 3
 		? DATA_PREWAKE_QUIESCENT_MAX_CYCLES
-		: explicit_data_prewake == 4
+		: (explicit_data_prewake == 4 || explicit_instruction_prewake == 2)
 		? JOINT_PRESEED_SHORT_MAX_CYCLES : 0),
 	       rt_unlimited,
 	       skew_layout ? "skew" : "aligned", probe_status,
@@ -831,6 +840,7 @@ int main(int argc, char **argv)
 	    || !strcmp(mode_name, "instruction-explicit")
 	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
 	    || !strcmp(mode_name, "instruction-explicit-directed")
+	    || !strcmp(mode_name, "instruction-preseed-short")
 	    || !strcmp(mode_name, "joint-explicit")
 	    || !strcmp(mode_name, "joint-prewake-quiescent")
 	    || !strcmp(mode_name, "joint-preseed-quiescent")
@@ -1004,6 +1014,7 @@ int main(int argc, char **argv)
 	    || !strcmp(mode_name, "instruction-explicit")
 	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
 	    || !strcmp(mode_name, "instruction-explicit-directed")
+	    || !strcmp(mode_name, "instruction-preseed-short")
 	    || !strcmp(mode_name, "joint-explicit")
 	    || !strcmp(mode_name, "joint-prewake-quiescent")
 	    || !strcmp(mode_name, "joint-preseed-quiescent")

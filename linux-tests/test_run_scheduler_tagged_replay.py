@@ -269,6 +269,15 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_short_instruction_only_preseed(self):
+        self.assertIn(
+            " instruction-preseed-short 0 0 normal 0 8 0 skew futex; ",
+            runner.benchmark_command(
+                "instruction-preseed-short", 0, 0, "normal", 0, 8, False,
+                "skew", "futex",
+            ),
+        )
+
     def test_print_command_preserves_unlimited_rt_policy(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

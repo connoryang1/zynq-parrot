@@ -34,6 +34,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-explicit": 0,
         "instruction-explicit-roundtrip": 0,
         "instruction-explicit-directed": 0,
+        "instruction-preseed-short": 0,
         "joint-explicit": 9,
         "joint-prewake-quiescent": 0,
         "joint-preseed-quiescent": 0,
@@ -45,6 +46,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     expected_hooks = 0 if mode in (
         "instruction-explicit", "instruction-explicit-roundtrip",
         "instruction-explicit-directed", "data-prewake",
+        "instruction-preseed-short",
         "data-prewake-equalized", "data-prewake-equalized-quiescent",
         "data-prewake-short",
         "joint-prewake-quiescent", "joint-preseed-quiescent",
@@ -54,14 +56,16 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         65536 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
-        8192 if mode in ("data-prewake-short", "joint-preseed-short") else
+        8192 if mode in ("data-prewake-short", "instruction-preseed-short",
+                         "joint-preseed-short") else
         262144 if mode == "data-prewake-equalized" else 0
     )
     prewake_max = 73728 if mode in (
         "data-prewake-equalized-quiescent", "joint-prewake-quiescent",
         "joint-preseed-quiescent"
     ) else 16384 if mode in (
-        "data-prewake-short", "joint-preseed-short"
+        "data-prewake-short", "instruction-preseed-short",
+        "joint-preseed-short"
     ) else 0
     path = root / "run.log"
     rows = [
@@ -79,7 +83,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     prewake_cycles = (prewake_budget + 4 if prewake_budget else raw_prewake)
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed", "joint-explicit",
+                "instruction-explicit-directed", "instruction-preseed-short",
+                "joint-explicit",
                 "joint-prewake-quiescent", "joint-preseed-quiescent",
                 "joint-preseed-drained", "joint-preseed-short"):
         before = (prefix_entries << 4) | 1
@@ -95,7 +100,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         expects_trigger = mode not in (
             "off", "instruction-select", "instruction-wake",
             "instruction-explicit", "instruction-explicit-roundtrip",
-            "instruction-explicit-directed"
+            "instruction-explicit-directed", "instruction-preseed-short"
         )
         admitted = (lines if enabled and expects_trigger
                     and mode != "joint-follow-only" else 0)
@@ -215,6 +220,31 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["candidate"]["mode"], "joint-preseed-short")
         self.assertEqual(result["workload_config"]["prewake_budget_cycles"], 8192)
         self.assertEqual(result["workload_config"]["prewake_max_cycles"], 16384)
+
+    def test_short_instruction_comparison_attributes_data_increment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            controls = []
+            candidates = []
+            for label, mode, paths in (
+                    ("instruction", "instruction-preseed-short", controls),
+                    ("joint", "joint-preseed-short", candidates)):
+                for index in range(2):
+                    subdir = root / f"{label}-{index}"
+                    subdir.mkdir()
+                    paths.append(write_run(
+                        subdir, mode=mode, lines=32, prefix_entries=32,
+                        tail=True,
+                    ))
+            result = compare_prewake(controls, candidates, bootstrap_samples=10)
+        self.assertEqual(result["added_component"], "data")
+        self.assertEqual(result["control"]["mode"], "instruction-preseed-short")
+        self.assertIn(
+            "data_increment_saved_cycles", result["metrics"]["roundtrip"]
+        )
+        self.assertNotIn(
+            "data_only_saved_cycles", result["metrics"]["roundtrip"]
+        )
 
     def test_tail_loader_reuses_quiescent_whole_block_filter(self):
         with tempfile.TemporaryDirectory() as directory:
