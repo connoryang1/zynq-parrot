@@ -10,12 +10,14 @@ constexpr uint64_t line = UINT64_C(0x80012000);
 constexpr uint64_t seed = UINT64_C(0x7193000000000000);
 unsigned replay_bank(uint64_t addr) {
   const uint64_t line_addr = addr >> 6;
-  return (((line_addr >> 0) ^ (line_addr >> 4) ^ (line_addr >> 8)
-           ^ (line_addr >> 22)) & 1)
-         | ((((line_addr >> 1) ^ (line_addr >> 4) ^ (line_addr >> 9)
-              ^ (line_addr >> 10) ^ (line_addr >> 15)) & 1) << 1)
-         | ((((line_addr >> 2) ^ (line_addr >> 9) ^ (line_addr >> 13)
-              ^ (line_addr >> 15) ^ (line_addr >> 17)) & 1) << 2);
+  return (((line_addr >> 0) ^ (line_addr >> 3) ^ (line_addr >> 13)
+           ^ (line_addr >> 18) ^ (line_addr >> 24)) & 1)
+         | ((((line_addr >> 2) ^ (line_addr >> 4) ^ (line_addr >> 9)
+              ^ (line_addr >> 11) ^ (line_addr >> 24)) & 1) << 1)
+         | ((((line_addr >> 1) ^ (line_addr >> 9)
+              ^ (line_addr >> 24)) & 1) << 2)
+         | ((((line_addr >> 3) ^ (line_addr >> 5) ^ (line_addr >> 8)
+              ^ (line_addr >> 9) ^ (line_addr >> 18)) & 1) << 3);
 }
 void require(bool value, const char *message) {
   if (!value) throw std::runtime_error(message);
@@ -138,51 +140,51 @@ public:
     require(!query(line), "invalidated replay line reported resident");
     fetch(line, false);
 
-    // Fill exactly four ways in each of the eight hash banks. A fifth line in
+    // Fill exactly two ways in each of the sixteen hash banks. A third line in
     // one nonzero bank must replace only that bank's oldest entry. Selecting
     // addresses by bank keeps this capacity/replacement contract independent
     // of any accidental distribution of consecutive physical lines.
     dut.reset_i = 1; step(); step(); dut.reset_i = 0; step(); initialize();
-    uint64_t bank_lines[8][5] = {};
-    unsigned bank_counts[8] = {};
+    uint64_t bank_lines[16][3] = {};
+    unsigned bank_counts[16] = {};
     unsigned total_found = 0;
-    for (unsigned offset = 0; offset < 4096 && total_found < 40; ++offset) {
+    for (unsigned offset = 0; offset < 4096 && total_found < 48; ++offset) {
       const uint64_t candidate = line + uint64_t(offset)*64;
       const unsigned bank = replay_bank(candidate);
-      if (bank_counts[bank] < 5) {
+      if (bank_counts[bank] < 3) {
         bank_lines[bank][bank_counts[bank]++] = candidate;
         ++total_found;
       }
     }
-    require(total_found == 40,
-            "bank hash search did not find five lines in every bank");
-    for (unsigned bank = 0; bank < 8; ++bank)
-      for (unsigned way = 0; way < 4; ++way)
-        write_line_burst(bank_lines[bank][way], seed + (bank*4 + way)*16);
-    for (unsigned bank = 0; bank < 8; ++bank)
-      for (unsigned way = 0; way < 4; ++way) {
+    require(total_found == 48,
+            "bank hash search did not find three lines in every bank");
+    for (unsigned bank = 0; bank < 16; ++bank)
+      for (unsigned way = 0; way < 2; ++way)
+        write_line_burst(bank_lines[bank][way], seed + (bank*2 + way)*16);
+    for (unsigned bank = 0; bank < 16; ++bank)
+      for (unsigned way = 0; way < 2; ++way) {
         require(query(bank_lines[bank][way]),
                 "32-entry banked capacity lost a completed line");
         require(fetch(bank_lines[bank][way], true)
-                  == seed + (bank*4 + way)*16,
+                  == seed + (bank*2 + way)*16,
                 "32-entry banked capacity returned incorrect data");
       }
-    constexpr unsigned replacement_bank = 5;
-    write_line_burst(bank_lines[replacement_bank][4], seed + 32*16);
+    constexpr unsigned replacement_bank = 11;
+    write_line_burst(bank_lines[replacement_bank][2], seed + 32*16);
     require(!query(bank_lines[replacement_bank][0]),
-            "fifth same-bank line did not replace the oldest way");
-    for (unsigned bank = 0; bank < 8; ++bank)
-      for (unsigned way = bank == replacement_bank ? 1 : 0; way < 4; ++way)
+            "third same-bank line did not replace the oldest way");
+    for (unsigned bank = 0; bank < 16; ++bank)
+      for (unsigned way = bank == replacement_bank ? 1 : 0; way < 2; ++way)
         require(query(bank_lines[bank][way]),
-                "fifth same-bank line replaced another bank or newer way");
-    require(query(bank_lines[replacement_bank][4]),
-            "fifth same-bank line was not published");
-    require(fetch(bank_lines[replacement_bank][4], true) == seed + 32*16,
-            "fifth same-bank line returned incorrect data");
+                "third same-bank line replaced another bank or newer way");
+    require(query(bank_lines[replacement_bank][2]),
+            "third same-bank line was not published");
+    require(fetch(bank_lines[replacement_bank][2], true) == seed + 32*16,
+            "third same-bank line returned incorrect data");
     std::cout << "[ICACHE-REPLAY-BUFFER] PASS: partial-line exclusion, "
                  "completed-residency query, consecutive four-beat fill, "
                  "eight-word execution data, fence invalidation, "
-                 "32-entry capacity, and eight-bank/four-way replacement\n";
+                 "32-entry capacity, and sixteen-bank/two-way replacement\n";
   }
 };
 }
