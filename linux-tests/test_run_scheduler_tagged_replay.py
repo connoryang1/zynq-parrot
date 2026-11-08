@@ -242,6 +242,15 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_raw_drained_preseed(self):
+        self.assertIn(
+            " joint-preseed-drained 0 0 normal 0 8 0 skew futex; ",
+            runner.benchmark_command(
+                "joint-preseed-drained", 0, 0, "normal", 0, 8, False,
+                "skew", "futex",
+            ),
+        )
+
     def test_print_command_preserves_unlimited_rt_policy(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

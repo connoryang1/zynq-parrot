@@ -14,7 +14,7 @@ CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
     r"instruction-explicit-directed|"
-    r"joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-split|joint-split-one-hook|"
+    r"joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-split|joint-split-one-hook|"
     r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
@@ -37,6 +37,11 @@ PREWAKE_ROW = re.compile(
     r"^TAGGED_REPLAY trial=(\d+).* prewake_cycles=(\d+) preblock_status=",
     re.MULTILINE,
 )
+PREWAKE_LEAD_ROW = re.compile(
+    r"^TAGGED_REPLAY trial=(\d+).* prewake_to_launch_cycles=(\d+) "
+    r"prewake_done_to_launch_cycles=(\d+)$",
+    re.MULTILINE,
+)
 LAYOUT_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* layout=(aligned|skew)")
 SYNC_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* sync=(pipe|futex)")
 ICACHE_RANGES_CONFIG = re.compile(
@@ -52,7 +57,8 @@ ICACHE_STATUS = re.compile(
 PROBE_ROW = re.compile(
     r"^TAGGED_REPLAY trial=(\d+).* preblock_status=0x([0-9a-fA-F]{16}) "
     r"preblock_probe_cycles=(\d+) entry_probe_status=0x([0-9a-fA-F]{16}) "
-    r"entry_probe_cycles=(\d+)$", re.MULTILINE
+    r"entry_probe_cycles=(\d+)(?: prewake_to_launch_cycles=\d+ "
+    r"prewake_done_to_launch_cycles=\d+)?$", re.MULTILINE
 )
 METRICS = (
     "hook_cycles", "wake_to_entry", "load_cycles", "wake_to_load", "roundtrip"
@@ -200,6 +206,7 @@ def analyze(path, bootstrap_samples=20000):
             "joint-explicit": 9,
             "joint-prewake-quiescent": 0,
             "joint-preseed-quiescent": 0,
+            "joint-preseed-drained": 0,
             "joint-split": 12,
             "joint-split-one-hook": 12,
             "joint-follow-only": 12,
@@ -210,7 +217,8 @@ def analyze(path, bootstrap_samples=20000):
                   "instruction-explicit-roundtrip",
                         "instruction-explicit-directed", "joint-explicit",
                         "joint-prewake-quiescent",
-                        "joint-preseed-quiescent"):
+                        "joint-preseed-quiescent",
+                        "joint-preseed-drained"):
         raise ValueError(
             f"{mode} transcript lacks dedicated kernel-mode binding"
         )
@@ -264,7 +272,8 @@ def analyze(path, bootstrap_samples=20000):
                 "instruction-explicit-roundtrip",
                 "instruction-explicit-directed", "joint-explicit",
                 "joint-prewake-quiescent",
-                "joint-preseed-quiescent"):
+                "joint-preseed-quiescent",
+                "joint-preseed-drained"):
         if len(icache_statuses) != 1:
             raise ValueError(f"{mode} requires one I-cache status marker")
         before = int(icache_statuses[0][0], 16)
@@ -342,7 +351,8 @@ def analyze(path, bootstrap_samples=20000):
     if mode in ("data-prewake-equalized",
                 "data-prewake-equalized-quiescent",
                 "joint-prewake-quiescent",
-                "joint-preseed-quiescent"):
+                "joint-preseed-quiescent",
+                "joint-preseed-drained"):
         prewake_matches = PREWAKE_ROW.findall(text)
         if (len(prewake_matches) != len(rows)
                 or [int(trial) for trial, _ in prewake_matches]
@@ -371,6 +381,30 @@ def analyze(path, bootstrap_samples=20000):
         prewake_rows = [
             {"enabled": row["enabled"],
              "prewake_cycles": row["prewake_cycles"]}
+            for row in analysis_rows
+        ]
+
+    prewake_lead_rows = []
+    if mode == "joint-preseed-drained":
+        lead_matches = PREWAKE_LEAD_ROW.findall(text)
+        if (len(lead_matches) != len(rows)
+                or [int(trial) for trial, _total, _slack in lead_matches]
+                != list(range(len(rows)))):
+            raise ValueError("expected one ordered prewake lead interval per trial")
+        for index, (_trial, total, slack) in enumerate(lead_matches):
+            rows[index]["prewake_to_launch_cycles"] = int(total)
+            rows[index]["prewake_done_to_launch_cycles"] = int(slack)
+            if (rows[index]["prewake_cycles"]
+                    + rows[index]["prewake_done_to_launch_cycles"]
+                    != rows[index]["prewake_to_launch_cycles"]):
+                raise ValueError("prewake lead partition does not match")
+        prewake_lead_rows = [
+            {
+                "enabled": row["enabled"],
+                "prewake_to_launch_cycles": row["prewake_to_launch_cycles"],
+                "prewake_done_to_launch_cycles":
+                    row["prewake_done_to_launch_cycles"],
+            }
             for row in analysis_rows
         ]
 
@@ -450,6 +484,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure a wake after both instruction and data replay lanes were "
             "launched, drained, and equalized during a bounded preseed."
             if mode == "joint-preseed-quiescent" else
+            "Measure natural instruction-plus-data trigger-to-drain time and "
+            "the remaining scheduler lead before wake, without equalization."
+            if mode == "joint-preseed-drained" else
             "Measure a fully drained explicit data replay before publishing "
             "readiness and starting the later timed wake."
             if mode == "data-prewake" else
@@ -510,11 +547,26 @@ def analyze(path, bootstrap_samples=20000):
         result["prewake_equalization"] = summarize_metric(
             prewake_rows, "prewake_cycles", rng, bootstrap_samples
         )
+    if mode == "joint-preseed-drained":
+        result["prewake_timing"] = {
+            "trigger_to_drain": summarize_metric(
+                prewake_rows, "prewake_cycles", rng, bootstrap_samples
+            ),
+            "trigger_to_launch": summarize_metric(
+                prewake_lead_rows, "prewake_to_launch_cycles", rng,
+                bootstrap_samples,
+            ),
+            "drain_to_launch": summarize_metric(
+                prewake_lead_rows, "prewake_done_to_launch_cycles", rng,
+                bootstrap_samples,
+            ),
+        }
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
                 "instruction-explicit-directed", "joint-explicit",
                 "joint-prewake-quiescent",
-                "joint-preseed-quiescent"):
+                "joint-preseed-quiescent",
+                "joint-preseed-drained"):
         result["icache_prefix_status"] = {
             "before": before_decoded,
             "after": after_decoded,

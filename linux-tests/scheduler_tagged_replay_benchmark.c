@@ -65,6 +65,7 @@ struct sample {
 	uint64_t launch, entry, after_load, done, returned;
 	uint64_t trace_start, trace_status;
 	uint64_t return_hint_begin, return_hint_end;
+	uint64_t prewake_start, prewake_done;
 	uint64_t preblock_status;
 	uint64_t entry_probe_status;
 	_Atomic unsigned wake_count;
@@ -373,6 +374,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		 * its scheduler-critical path. */
 		if (explicit_instruction_prewake || explicit_data_prewake) {
 			uint64_t prewake_start = cycle();
+			samples[trial].prewake_start = prewake_start;
 
 			/* Launch both independent lanes before waiting so their memory
 			 * traffic may overlap. Both must become idle before readiness. */
@@ -398,8 +400,12 @@ static void child_run(int in, int out, volatile struct sample *samples,
 				       < budget)
 					__asm__ volatile("nop" : : : "memory");
 			}
-			samples[trial].prewake_cycles = cycle() - prewake_start;
+			samples[trial].prewake_done = cycle();
+			samples[trial].prewake_cycles =
+				samples[trial].prewake_done - prewake_start;
 		} else {
+			samples[trial].prewake_start = 0;
+			samples[trial].prewake_done = 0;
 			samples[trial].prewake_cycles = 0;
 		}
 		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
@@ -541,7 +547,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-preseed-drained|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -599,6 +605,14 @@ int main(int argc, char **argv)
 			mode = 0;
 			explicit_instruction_prewake = 1;
 			explicit_data_prewake = 3;
+			expected_enabled_hooks = 0;
+		}
+		else if (!strcmp(argv[1], "joint-preseed-drained")) {
+			/* Measure the natural trigger-to-drain duration without adding an
+			 * equalization floor. This is lead-time diagnostics, not a fair A/B. */
+			mode = 0;
+			explicit_instruction_prewake = 1;
+			explicit_data_prewake = 1;
 			expected_enabled_hooks = 0;
 		}
 		else if (!strcmp(argv[1], "data-late"))
@@ -801,7 +815,8 @@ int main(int argc, char **argv)
 	    || !strcmp(mode_name, "instruction-explicit-directed")
 	    || !strcmp(mode_name, "joint-explicit")
 	    || !strcmp(mode_name, "joint-prewake-quiescent")
-	    || !strcmp(mode_name, "joint-preseed-quiescent"))
+	    || !strcmp(mode_name, "joint-preseed-quiescent")
+	    || !strcmp(mode_name, "joint-preseed-drained"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
 	if (child < 0)
@@ -972,7 +987,8 @@ int main(int argc, char **argv)
 	    || !strcmp(mode_name, "instruction-explicit-directed")
 	    || !strcmp(mode_name, "joint-explicit")
 	    || !strcmp(mode_name, "joint-prewake-quiescent")
-	    || !strcmp(mode_name, "joint-preseed-quiescent")) {
+	    || !strcmp(mode_name, "joint-preseed-quiescent")
+	    || !strcmp(mode_name, "joint-preseed-drained")) {
 		icache_status_after = icache_prefix_status();
 		printf("TAGGED_REPLAY_ICACHE_STATUS before=0x%016llx after=0x%016llx\n",
 		       (unsigned long long)icache_status_before,
@@ -986,7 +1002,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "nonmonotonic tagged replay sample: %u\n", trial);
 			return 1;
 		}
-		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u woken=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu prewake_cycles=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu\n",
+		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u woken=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu prewake_cycles=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu prewake_to_launch_cycles=%llu prewake_done_to_launch_cycles=%llu\n",
 		       trial - warmup, s->enabled, s->hooks,
 		       atomic_load_explicit(&s->wake_count, memory_order_relaxed),
 		       s->hook_cycles,
@@ -1000,7 +1016,11 @@ int main(int argc, char **argv)
 		       (unsigned long long)s->preblock_status,
 		       s->preblock_probe_cycles,
 		       (unsigned long long)s->entry_probe_status,
-		       s->entry_probe_cycles);
+		       s->entry_probe_cycles,
+		       (unsigned long long)(s->prewake_start
+			? s->launch - s->prewake_start : 0),
+		       (unsigned long long)(s->prewake_done
+			? s->launch - s->prewake_done : 0));
 	}
 	print_tail_partitions(samples);
 	puts("TAGGED_REPLAY_PARENT PASS");

@@ -36,6 +36,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "joint-explicit": 9,
         "joint-prewake-quiescent": 0,
         "joint-preseed-quiescent": 0,
+        "joint-preseed-drained": 0,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
@@ -43,7 +44,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-explicit", "instruction-explicit-roundtrip",
         "instruction-explicit-directed", "data-prewake",
         "data-prewake-equalized", "data-prewake-equalized-quiescent",
-        "joint-prewake-quiescent", "joint-preseed-quiescent"
+        "joint-prewake-quiescent", "joint-preseed-quiescent",
+        "joint-preseed-drained"
     ) else 1
     prewake_budget = (
         65536 if mode in ("data-prewake-equalized-quiescent",
@@ -67,10 +69,13 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks} "
         f"icache_ranges={'0:8,8:8' if mode == 'instruction-explicit-directed' else 'full'}"
     ]
+    raw_prewake = 40 if mode == "joint-preseed-drained" else 0
+    prewake_cycles = (prewake_budget + 4 if prewake_budget else raw_prewake)
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
                 "instruction-explicit-directed", "joint-explicit",
-                "joint-prewake-quiescent", "joint-preseed-quiescent"):
+                "joint-prewake-quiescent", "joint-preseed-quiescent",
+                "joint-preseed-drained"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -109,11 +114,13 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             f"triggers={triggers} dropped=0 wake_to_entry={entry} "
             f"load_cycles={load} wake_to_load={entry + load} "
             f"roundtrip={entry + load + 40} "
-            f"prewake_cycles={prewake_budget + 4 if prewake_budget else 0} "
+            f"prewake_cycles={prewake_cycles} "
             f"preblock_status=0x{preblock:016x} "
             f"preblock_probe_cycles={30 if probe_status else 0} "
             f"entry_probe_status=0x{entry_status:016x} "
-            f"entry_probe_cycles={32 if probe_status else 0}"
+            f"entry_probe_cycles={32 if probe_status else 0} "
+            f"prewake_to_launch_cycles={100 if raw_prewake else 0} "
+            f"prewake_done_to_launch_cycles={60 if raw_prewake else 0}"
         )
         if tail:
             child_post_load = 10 + enabled
@@ -456,6 +463,28 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(
             result["icache_prefix_status"]["after"]["accepted_triggers"],
             255,
+        )
+
+    def test_drained_preseed_reports_raw_transport_and_scheduler_lead(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="joint-preseed-drained"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(
+            result["prewake_timing"]["trigger_to_drain"]
+                  ["enabled_median_cycles"],
+            40,
+        )
+        self.assertEqual(
+            result["prewake_timing"]["trigger_to_launch"]
+                  ["enabled_median_cycles"],
+            100,
+        )
+        self.assertEqual(
+            result["prewake_timing"]["drain_to_launch"]
+                  ["enabled_median_cycles"],
+            60,
         )
 
     def test_split_joint_mode_requires_one_hardware_command_hook(self):

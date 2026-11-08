@@ -117,6 +117,7 @@ def parse_args(argv=None):
                                             "joint-explicit",
                                             "joint-prewake-quiescent",
                                             "joint-preseed-quiescent",
+                                            "joint-preseed-drained",
                                             "joint-split",
                                             "joint-split-one-hook",
                                             "joint-follow-only"),
