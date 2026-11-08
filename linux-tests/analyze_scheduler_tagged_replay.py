@@ -14,7 +14,7 @@ CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
     r"instruction-explicit-directed|"
-    r"joint|joint-split|joint-split-one-hook|"
+    r"joint|joint-explicit|joint-split|joint-split-one-hook|"
     r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
@@ -152,6 +152,7 @@ def analyze(path, bootstrap_samples=20000):
             "instruction-explicit-roundtrip": 0,
             "instruction-explicit-directed": 0,
             "joint": 10,
+            "joint-explicit": 9,
             "joint-split": 12,
             "joint-split-one-hook": 12,
             "joint-follow-only": 12,
@@ -160,7 +161,7 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("mode name does not match configured kernel mode")
     elif mode in ("instruction-wake", "instruction-explicit",
                   "instruction-explicit-roundtrip",
-                  "instruction-explicit-directed"):
+                  "instruction-explicit-directed", "joint-explicit"):
         raise ValueError(
             f"{mode} transcript lacks dedicated kernel-mode binding"
         )
@@ -208,7 +209,7 @@ def analyze(path, bootstrap_samples=20000):
     icache_statuses = ICACHE_STATUS.findall(text)
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed"):
+                "instruction-explicit-directed", "joint-explicit"):
         if len(icache_statuses) != 1:
             raise ValueError(f"{mode} requires one I-cache status marker")
         before = int(icache_statuses[0][0], 16)
@@ -346,6 +347,9 @@ def analyze(path, bootstrap_samples=20000):
             "Measure direction-selected forward and reverse instruction "
             "subranges immediately before their corresponding pipe wakes."
             if mode == "instruction-explicit-directed" else
+            "Measure an explicit parent-issued instruction prefix immediately "
+            "before the same wake whose kernel hook launches tagged data replay."
+            if mode == "joint-explicit" else
             "Measure wake-time tagged data while the selection block is "
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
@@ -385,7 +389,7 @@ def analyze(path, bootstrap_samples=20000):
     }
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed"):
+                "instruction-explicit-directed", "joint-explicit"):
         result["icache_prefix_status"] = {
             "before": before_decoded,
             "after": after_decoded,

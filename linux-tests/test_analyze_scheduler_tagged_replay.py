@@ -28,6 +28,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-explicit": 0,
         "instruction-explicit-roundtrip": 0,
         "instruction-explicit-directed": 0,
+        "joint-explicit": 9,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
@@ -45,7 +46,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     ]
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed"):
+                "instruction-explicit-directed", "joint-explicit"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -299,6 +300,21 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["config"]["mode"], "joint-split")
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+
+    def test_explicit_instruction_and_wake_data_require_both_engines(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="joint-explicit"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["kernel_mode"], 9)
+        self.assertEqual(result["config"]["expected_hooks"], 1)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["accepted_triggers"],
+            255,
+        )
 
     def test_split_joint_mode_requires_one_hardware_command_hook(self):
         with tempfile.TemporaryDirectory() as directory:

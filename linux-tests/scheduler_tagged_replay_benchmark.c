@@ -460,7 +460,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -497,6 +497,13 @@ int main(int argc, char **argv)
 		}
 		else if (!strcmp(argv[1], "joint"))
 			mode = 10;
+		else if (!strcmp(argv[1], "joint-explicit")) {
+			/* Keep the proven wake-time data hook, but launch the shared
+			 * instruction prefix explicitly before the same wake. This isolates
+			 * useful I/D overlap from the hardware-follow sequencer. */
+			mode = 9;
+			explicit_instruction = 1;
+		}
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
 		else if (!strcmp(argv[1], "joint-split")
@@ -670,7 +677,8 @@ int main(int argc, char **argv)
 	if (!strcmp(mode_name, "instruction-wake")
 	    || !strcmp(mode_name, "instruction-explicit")
 	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
-	    || !strcmp(mode_name, "instruction-explicit-directed"))
+	    || !strcmp(mode_name, "instruction-explicit-directed")
+	    || !strcmp(mode_name, "joint-explicit"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
 	if (child < 0)
@@ -834,7 +842,8 @@ int main(int argc, char **argv)
 	if (!strcmp(mode_name, "instruction-wake")
 	    || !strcmp(mode_name, "instruction-explicit")
 	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
-	    || !strcmp(mode_name, "instruction-explicit-directed")) {
+	    || !strcmp(mode_name, "instruction-explicit-directed")
+	    || !strcmp(mode_name, "joint-explicit")) {
 		icache_status_after = icache_prefix_status();
 		printf("TAGGED_REPLAY_ICACHE_STATUS before=0x%016llx after=0x%016llx\n",
 		       (unsigned long long)icache_status_before,

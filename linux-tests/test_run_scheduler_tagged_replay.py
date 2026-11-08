@@ -179,6 +179,14 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             ),
         )
 
+    def test_command_binds_explicit_instruction_with_wake_data(self):
+        self.assertIn(
+            " joint-explicit 0 0 normal 0 8 0 skew pipe; ",
+            runner.benchmark_command(
+                "joint-explicit", 0, 0, "normal", 0, 8, False, "skew"
+            ),
+        )
+
     def test_command_binds_replay_off_stability_mode(self):
         self.assertIn(
             " off 0 0 normal 0 8 0 aligned futex; ",
