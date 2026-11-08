@@ -53,6 +53,40 @@ class PipeHintRunnerTests(unittest.TestCase):
         ])
         self.assertEqual(args.profile, "legs")
 
+    def test_working_set_is_bound_into_runner_arguments(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--sync", "futex",
+            "--working-set-kib", "256",
+        ])
+        self.assertEqual(args.working_set_kib, 256)
+        self.assertTrue(build_guest_command(args).endswith("futex plain 256"))
+
+    def test_accepts_unmatched_continuous_policy(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64,
+            "--policy", "continuous-unmatched",
+        ])
+        self.assertEqual(args.policy, "continuous-unmatched")
+
+    def test_futex_early_policy_requires_futex(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64,
+            "--policy", "futex-early",
+        ])
+        with self.assertRaisesRegex(ValueError, "requires futex"):
+            validate_args(args)
+
+    def test_accepts_futex_early_policy_with_futex(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64,
+            "--policy", "futex-early", "--sync", "futex",
+        ])
+        self.assertEqual(args.policy, "futex-early")
+
     def test_resume_leg_profile_rejects_pipe_sync(self):
         args = parse_args([
             "image.nbf", "transfer", "a" * 64, "result.log",
@@ -86,6 +120,25 @@ class PipeHintRunnerTests(unittest.TestCase):
                   / "scheduler_pipe_hint_benchmark.c").read_text()
         self.assertIn("(unsigned long)&status", source)
         self.assertNotIn("PR_BP_PREVIEW_ICACHE_STATUS, 0UL", source)
+
+    def test_parent_resume_leg_stops_before_working_set(self):
+        source = (Path(__file__).resolve().parent
+                  / "scheduler_pipe_hint_benchmark.c").read_text()
+        futex = source.split("static struct cell_result run_futex_cell", 1)[1]
+        measured = futex.split("begin = cycle();", 1)[1].split(
+            "end = cycle();", 1)[0]
+        resume = measured.index(
+            "parent_resume += cycle() - shared->child_launch;")
+        working_set = measured.index(
+            "parent_checksum += touch_working_set(")
+        self.assertLess(resume, working_set)
+
+    def test_futex_early_patch_excludes_internal_wake_callers(self):
+        patch = (Path(__file__).resolve().parent / "kernel-patches" /
+                 "0026-blackparrot-early-futex-instruction-replay.patch").read_text()
+        self.assertIn("--- a/kernel/futex/syscalls.c", patch)
+        self.assertIn("this at syscall dispatch excludes internal", patch)
+        self.assertNotIn("--- a/kernel/futex/waitwake.c", patch)
 
     def test_transfer_binds_exact_elf(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -49,6 +49,44 @@ class PipeHintPolicyComparatorTests(unittest.TestCase):
             compare([Path("s1"), Path("s2")],
                     [Path("c1"), Path("c2")], 10)
 
+    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+    def test_compares_continuous_with_preseed_explicitly(self, analyze):
+        analyze.side_effect = [
+            result("preseed", "same", [(10.0, 1.0)]),
+            result("preseed", "same", [(20.0, 2.0)]),
+            result("continuous", "same", [(40.0, 4.0)]),
+            result("continuous", "same", [(50.0, 5.0)]),
+        ]
+        output = compare([Path("p1"), Path("p2")],
+                         [Path("c1"), Path("c2")], 100,
+                         baseline_policy="preseed")
+        self.assertEqual(output["baseline_policy"], "preseed")
+        self.assertEqual(
+            output["continuous_minus_baseline"][
+                "saved_cycles_per_roundtrip"],
+            30.0,
+        )
+        self.assertNotIn("continuous_minus_seed", output)
+
+    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+    def test_compares_matched_with_unmatched_continuous(self, analyze):
+        analyze.side_effect = [
+            result("continuous-unmatched", "same", [(10.0, 1.0)]),
+            result("continuous-unmatched", "same", [(20.0, 2.0)]),
+            result("continuous", "same", [(40.0, 4.0)]),
+            result("continuous", "same", [(50.0, 5.0)]),
+        ]
+        output = compare([Path("u1"), Path("u2")],
+                         [Path("c1"), Path("c2")], 100,
+                         baseline_policy="continuous-unmatched")
+        self.assertEqual(output["baseline_policy"],
+                         "continuous-unmatched")
+        self.assertEqual(
+            output["continuous_minus_baseline"][
+                "saved_percentage_points"],
+            3.0,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -63,11 +63,13 @@ def parse_args(argv=None):
     parser.add_argument("--bitstream-sha256", required=True)
     parser.add_argument("--loops", type=int, default=512)
     parser.add_argument("--repeats", type=int, default=8)
-    parser.add_argument("--policy", choices=("continuous", "seed", "preseed"),
+    parser.add_argument("--policy", choices=("continuous", "continuous-unmatched",
+                                              "futex-early", "seed", "preseed"),
                         default="continuous")
     parser.add_argument("--warmup", type=int, default=32)
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--profile", choices=("plain", "legs"), default="plain")
+    parser.add_argument("--working-set-kib", type=int, default=0)
     parser.add_argument(
         "--legacy-four-arg-cli", action="store_true",
         help=("invoke the preserved pre-sync/profile benchmark ABI; valid only "
@@ -87,9 +89,14 @@ def validate_args(args):
             or not 1 <= args.repeats <= 1_000_000
             or not 1 <= args.warmup <= 1_000_000):
         raise ValueError("loops, repeats, and warmup must be in 1..1000000")
+    if not 0 <= args.working_set_kib <= 65536:
+        raise ValueError("working-set-kib must be in 0..65536")
     if args.profile == "legs" and args.sync != "futex":
         raise ValueError("legs profile requires futex synchronization")
-    if args.legacy_four_arg_cli and (args.sync != "pipe" or args.profile != "plain"):
+    if args.policy == "futex-early" and args.sync != "futex":
+        raise ValueError("futex-early policy requires futex synchronization")
+    if args.legacy_four_arg_cli and (args.sync != "pipe" or args.profile != "plain"
+                                     or args.working_set_kib):
         raise ValueError("legacy four-argument CLI requires pipe/plain")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
@@ -102,7 +109,7 @@ def build_guest_command(args):
     command = (f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy} "
                f"{args.warmup}")
     if not args.legacy_four_arg_cli:
-        command += f" {args.sync} {args.profile}"
+        command += f" {args.sync} {args.profile} {args.working_set_kib}"
     return command
 
 
@@ -124,6 +131,7 @@ def run(args):
         "warmup": args.warmup,
         "sync": args.sync,
         "profile": args.profile,
+        "working_set_kib": args.working_set_kib,
         "legacy_four_arg_cli": args.legacy_four_arg_cli,
         "command": command,
     }

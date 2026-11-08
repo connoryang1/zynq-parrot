@@ -31,13 +31,17 @@ def _draw_hierarchical(rng, strata):
     return statistics.median(sample)
 
 
-def compare(seed_paths, continuous_paths, bootstrap_samples=20000):
-    """Return continuous-minus-seed incremental effects with strict identity."""
+def compare(seed_paths, continuous_paths, bootstrap_samples=20000,
+            baseline_policy="seed"):
+    """Return continuous-minus-baseline effects with strict identity."""
+    if baseline_policy not in ("seed", "preseed", "continuous-unmatched"):
+        raise ValueError(
+            "baseline policy must be seed, preseed, or continuous-unmatched")
     if len(seed_paths) < 2 or len(continuous_paths) < 2:
         raise ValueError("each policy requires at least two independent boots")
     if bootstrap_samples <= 0:
         raise ValueError("bootstrap sample count must be positive")
-    seed = _load(seed_paths, "seed")
+    seed = _load(seed_paths, baseline_policy)
     continuous = _load(continuous_paths, "continuous")
     reference_identity = seed[0]["identity"]
     reference_config = {key: value for key, value in seed[0]["config"].items()
@@ -70,11 +74,24 @@ def compare(seed_paths, continuous_paths, bootstrap_samples=20000):
         percent_draws.append(
             _draw_hierarchical(rng, continuous_percent)
             - _draw_hierarchical(rng, seed_percent))
-    return {
+    effect = {
+        "saved_cycles_per_roundtrip": point_cycles,
+        "hierarchical_95pct_ci_saved_cycles_per_roundtrip": [
+            percentile(cycle_draws, 0.025),
+            percentile(cycle_draws, 0.975),
+        ],
+        "saved_percentage_points": point_percent,
+        "hierarchical_95pct_ci_saved_percentage_points": [
+            percentile(percent_draws, 0.025),
+            percentile(percent_draws, 0.975),
+        ],
+    }
+    output = {
         "purpose": (
             "Measure the incremental sustained benefit of continuous hints "
-            "over a one-time cache-state seed using one exact ELF."
+            f"over {baseline_policy} using one exact ELF."
         ),
+        "baseline_policy": baseline_policy,
         "identity": reference_identity,
         "config": reference_config,
         "seed_replicates": [str(path) for path in seed_paths],
@@ -84,30 +101,26 @@ def compare(seed_paths, continuous_paths, bootstrap_samples=20000):
                                        for boot in seed_cycles],
         "continuous_saved_cycles_per_boot": [statistics.median(boot)
                                              for boot in continuous_cycles],
-        "continuous_minus_seed": {
-            "saved_cycles_per_roundtrip": point_cycles,
-            "hierarchical_95pct_ci_saved_cycles_per_roundtrip": [
-                percentile(cycle_draws, 0.025),
-                percentile(cycle_draws, 0.975),
-            ],
-            "saved_percentage_points": point_percent,
-            "hierarchical_95pct_ci_saved_percentage_points": [
-                percentile(percent_draws, 0.025),
-                percentile(percent_draws, 0.975),
-            ],
-        },
+        "continuous_minus_baseline": effect,
     }
+    if baseline_policy == "seed":
+        output["continuous_minus_seed"] = effect
+    return output
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seed", nargs="+", required=True, type=Path)
     parser.add_argument("--continuous", nargs="+", required=True, type=Path)
+    parser.add_argument("--baseline-policy",
+                        choices=("seed", "preseed", "continuous-unmatched"),
+                        default="seed")
     parser.add_argument("--bootstrap-samples", type=int, default=20000)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     try:
-        result = compare(args.seed, args.continuous, args.bootstrap_samples)
+        result = compare(args.seed, args.continuous, args.bootstrap_samples,
+                         args.baseline_policy)
     except ValueError as error:
         raise SystemExit(str(error)) from error
     rendered = json.dumps(result, indent=2) + "\n"

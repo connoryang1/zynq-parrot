@@ -14,8 +14,9 @@ from analyze_scheduler_tagged_replay import percentile
 
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
-    r"configured_entries=(\d+)(?: policy=(continuous|seed|preseed))?"
-    r"(?: sync=(pipe|futex))?(?: profile=(plain|legs))?$", re.MULTILINE
+    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|seed|preseed))?"
+    r"(?: sync=(pipe|futex))?(?: profile=(plain|legs))?"
+    r"(?: working_set_kib=(\d+))?$", re.MULTILINE
 )
 ROW = re.compile(
     r"^PIPE_HINT_RESULT repeat=(\d+) order=(\d+) enabled=([01]) "
@@ -79,6 +80,7 @@ def analyze(path, bootstrap_samples=20000):
     policy = configs[0][4] or "continuous"
     sync = configs[0][5] or "pipe"
     profile = configs[0][6] or "plain"
+    working_set_kib = int(configs[0][7] or 0)
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
     if warmup != runner.get("warmup", 32):
@@ -89,6 +91,8 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("transcript and runner sync differ")
     if profile != runner.get("profile", "plain"):
         raise ValueError("transcript and runner profile differ")
+    if working_set_kib != runner.get("working_set_kib", 0):
+        raise ValueError("transcript and runner working set differ")
     if profile == "legs" and sync != "futex":
         raise ValueError("legs profile requires futex synchronization")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
@@ -168,16 +172,30 @@ def analyze(path, bootstrap_samples=20000):
     if policy == "preseed":
         expected_triggers = min(0xff, repeats)
         expected_resident_drops = 0
+        entries_ok = after["accepted_entries"] == expected_entries
     elif policy == "seed":
         expected_triggers = min(0xff, repeats * 2)
         expected_resident_drops = min(0x1ff, repeats * configured)
+        entries_ok = after["accepted_entries"] == expected_entries
+    elif policy == "futex-early":
+        # An armed process can execute untimed lifecycle futex wakes during
+        # fork/exit in addition to the measured ping-pong. Every cold launch
+        # must still install one complete table, and all activity must drain.
+        total_triggers = repeats * 2 * (warmup + loops)
+        expected_triggers = min(0xff, total_triggers)
+        expected_resident_drops = min(0x1ff, total_triggers * configured)
+        entries_ok = (
+            after["accepted_entries"] >= expected_entries
+            and after["accepted_entries"] % configured == 0
+        )
     else:
         total_triggers = repeats * 2 * (warmup + loops)
         expected_triggers = min(0xff, total_triggers)
         expected_resident_drops = min(
             0x1ff, (total_triggers - repeats) * configured)
+        entries_ok = after["accepted_entries"] == expected_entries
     if (after["next_index"] != configured
-            or after["accepted_entries"] != expected_entries
+            or not entries_ok
             or after["accepted_triggers"] != expected_triggers
             or after["resident_drops"] != expected_resident_drops
             or after["dropped_triggers"] or int(printed_dropped)
@@ -223,8 +241,12 @@ def analyze(path, bootstrap_samples=20000):
             metrics[f"paired_median_{key}"] = statistics.median(values)
             metrics[f"paired_95pct_ci_{key}"] = [
                 percentile(draws, 0.025), percentile(draws, 0.975)]
+    mechanism = ("kernel-integrated instruction replay"
+                 if policy == "futex-early"
+                 else "matched explicit instruction hints")
     return {
-        "purpose": f"Measure sustained hot {sync} roundtrip throughput with matched explicit instruction hints.",
+        "purpose": (f"Measure sustained hot {sync} roundtrip throughput with "
+                    f"{mechanism}."),
         "transcript": str(path),
         "transcript_sha256": sha256(path),
         "status": str(status_path),
@@ -234,13 +256,15 @@ def analyze(path, bootstrap_samples=20000):
             "control_program_sha256", "bitstream_sha256")},
         "config": {"loops": loops, "repeats": repeats, "warmup": warmup,
                    "configured_entries": configured, "policy": policy,
-                   "sync": sync, "profile": profile},
+                   "sync": sync, "profile": profile,
+                   "working_set_kib": working_set_kib},
         "pairs": pairs,
         "metrics": metrics,
         "icache_prefix_status": {"before": before, "after": after},
         "interpretation_limits": [
             "One Linux boot supplies paired repeat blocks but not independent boot strata.",
             f"The {warmup} warmup {sync} roundtrips intentionally measure hot sustained throughput, not cold first resume.",
+            f"Each process scans a private {working_set_kib} KiB working set after every resume.",
         ],
     }
 

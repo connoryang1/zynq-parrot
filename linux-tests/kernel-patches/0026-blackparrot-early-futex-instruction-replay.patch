@@ -1,0 +1,33 @@
+This patch adds an instruction-only replay mode at userspace futex-wake
+dispatch. Mode fourteen is registered once per task and launches the
+machine-configured shared prefix before futex key lookup, preserving pre-wake
+lead without a separate hint syscall in the synchronization loop. Keeping the
+hook in do_futex excludes internal robust-list and clear-child-tid wakeups.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -316 +316,2 @@
+- * 13 successful-wakeup instruction replay only. */
++ * 13 successful-wakeup instruction replay only;
++ * 14 instruction replay at futex-wake entry. */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2791 +2791 @@
+-		if (arg2 > 13 || arg3 || arg4 || arg5) {
++		if (arg2 > 14 || arg3 || arg4 || arg5) {
+@@ -2795 +2795,2 @@
+-		if (arg2 && READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {
++		if (arg2 && arg2 != 14
++		    && READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {
+--- a/kernel/futex/syscalls.c
++++ b/kernel/futex/syscalls.c
+@@ -110,0 +111,9 @@
++#ifdef CONFIG_RISCV
++		/* Mode fourteen is armed once outside the measured loop. The
++		 * machine-owned prefix is safe to launch before key lookup. Keeping
++		 * this at syscall dispatch excludes internal lifecycle wakeups.
++		 */
++		if (READ_ONCE(current->thread.bp_preview_phys_mode) == 14)
++			asm volatile("csrw 0x5c0, zero" ::: "memory");
++#endif
++
