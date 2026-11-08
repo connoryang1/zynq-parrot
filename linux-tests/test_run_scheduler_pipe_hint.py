@@ -9,6 +9,7 @@ import unittest
 
 from run_scheduler_pipe_hint import (
     GUEST_ELF,
+    build_guest_command,
     parse_args,
     validate_args,
     validate_transfer,
@@ -58,6 +59,26 @@ class PipeHintRunnerTests(unittest.TestCase):
             "--bitstream-sha256", "b" * 64, "--profile", "legs",
         ])
         with self.assertRaisesRegex(ValueError, "requires futex"):
+            validate_args(args)
+
+    def test_legacy_four_arg_cli_omits_new_mode_arguments(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--policy", "preseed",
+            "--warmup", "256", "--legacy-four-arg-cli",
+        ])
+        self.assertEqual(
+            build_guest_command(args),
+            f"{GUEST_ELF} 512 8 preseed 256",
+        )
+
+    def test_legacy_four_arg_cli_rejects_new_futex_mode(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--sync", "futex",
+            "--legacy-four-arg-cli",
+        ])
+        with self.assertRaisesRegex(ValueError, "requires pipe/plain"):
             validate_args(args)
 
     def test_status_uses_pointer_copy_abi(self):
