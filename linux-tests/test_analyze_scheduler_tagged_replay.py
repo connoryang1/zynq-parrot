@@ -37,6 +37,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "joint-prewake-quiescent": 0,
         "joint-preseed-quiescent": 0,
         "joint-preseed-drained": 0,
+        "joint-preseed-short": 0,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
@@ -45,18 +46,19 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-explicit-directed", "data-prewake",
         "data-prewake-equalized", "data-prewake-equalized-quiescent",
         "joint-prewake-quiescent", "joint-preseed-quiescent",
-        "joint-preseed-drained"
+        "joint-preseed-drained", "joint-preseed-short"
     ) else 1
     prewake_budget = (
         65536 if mode in ("data-prewake-equalized-quiescent",
                           "joint-prewake-quiescent",
                           "joint-preseed-quiescent") else
+        8192 if mode == "joint-preseed-short" else
         262144 if mode == "data-prewake-equalized" else 0
     )
     prewake_max = 73728 if mode in (
         "data-prewake-equalized-quiescent", "joint-prewake-quiescent",
         "joint-preseed-quiescent"
-    ) else 0
+    ) else 16384 if mode == "joint-preseed-short" else 0
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
@@ -75,7 +77,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
                 "instruction-explicit-roundtrip",
                 "instruction-explicit-directed", "joint-explicit",
                 "joint-prewake-quiescent", "joint-preseed-quiescent",
-                "joint-preseed-drained"):
+                "joint-preseed-drained", "joint-preseed-short"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -486,6 +488,22 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                   ["enabled_median_cycles"],
             60,
         )
+
+    def test_short_preseed_uses_frozen_budget_and_filters_interruption(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(
+                Path(directory), mode="joint-preseed-short", lines=32,
+                prefix_entries=32,
+            )
+            path.write_text(path.read_text().replace(
+                "prewake_cycles=8196", "prewake_cycles=16385", 1
+            ))
+            result = analyze(path, bootstrap_samples=10)
+        self.assertEqual(result["config"]["prewake_budget_cycles"], 8192)
+        self.assertEqual(result["config"]["prewake_max_cycles"], 16384)
+        self.assertEqual(result["stretched_prewake_trials"], 1)
+        self.assertEqual(result["filtered_prewake_blocks"], 1)
+        self.assertEqual(result["analyzed_trials"], 508)
 
     def test_split_joint_mode_requires_one_hardware_command_hook(self):
         with tempfile.TemporaryDirectory() as directory:
