@@ -11,6 +11,9 @@ from analyze_scheduler_tagged_replay_tail import pool as pool_tail
 from compare_scheduler_tagged_replay_prefixes import compare as compare_prefixes
 from compare_scheduler_tagged_replay_modes import compare as compare_modes
 from compare_scheduler_tagged_replay_prewake import compare as compare_prewake
+from compare_scheduler_tagged_replay_trigger_timing import (
+    compare as compare_trigger_timing,
+)
 from compare_scheduler_tagged_replay_tail_prefixes import (
     compare as compare_tail_prefixes,
 )
@@ -244,6 +247,28 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         )
         self.assertNotIn(
             "data_only_saved_cycles", result["metrics"]["roundtrip"]
+        )
+
+    def test_trigger_timing_comparison_holds_exact_workload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            wake = []
+            prewake = []
+            for label, mode, paths in (
+                    ("wake", "instruction-wake", wake),
+                    ("prewake", "instruction-explicit", prewake)):
+                for index in range(2):
+                    subdir = root / f"{label}-{index}"
+                    subdir.mkdir()
+                    paths.append(write_run(
+                        subdir, mode=mode, lines=32, prefix_entries=32,
+                    ))
+            result = compare_trigger_timing(wake, prewake, bootstrap_samples=10)
+        self.assertEqual(result["control"]["mode"], "instruction-wake")
+        self.assertEqual(result["candidate"]["mode"], "instruction-explicit")
+        self.assertEqual(
+            result["metrics"]["roundtrip"]["prewake_increment_saved_cycles"],
+            0,
         )
 
     def test_tail_loader_reuses_quiescent_whole_block_filter(self):
