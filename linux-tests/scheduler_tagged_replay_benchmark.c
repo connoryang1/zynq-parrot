@@ -40,6 +40,8 @@
 #define DATA_PREWAKE_QUIESCENT_CYCLES 65536ULL
 #define DATA_PREWAKE_QUIESCENT_MAX_CYCLES \
 	(DATA_PREWAKE_QUIESCENT_CYCLES + 8192ULL)
+#define ICACHE_PREFIX_DRAIN_MASK \
+	((1ULL << 1) | (1ULL << 2) | (1ULL << 3) | (1ULL << 54))
 
 enum {
 	warmup = 16,
@@ -170,6 +172,23 @@ static uint64_t icache_prefix_status(void)
 	return status;
 }
 
+static uint64_t icache_prefix_status_wait_drain(const char *what)
+{
+	unsigned timeout = 1048576;
+	uint64_t status;
+
+	do {
+		status = icache_prefix_status();
+		if (!(status & ICACHE_PREFIX_DRAIN_MASK))
+			return status;
+	} while (--timeout);
+	fprintf(stderr, "TAGGED_REPLAY_ICACHE_DRAIN_TIMEOUT stage=%s status=0x%016llx\n",
+		what, (unsigned long long)status);
+	errno = ETIMEDOUT;
+	fail(what);
+	return 0;
+}
+
 static unsigned long replay_status_wait_drain(const char *what)
 {
 	unsigned timeout = 1048576;
@@ -273,6 +292,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned lines_per_base, unsigned config_lines_per_base,
 		      int probe_status, int skew_layout, int trace_stop_at_entry,
 		      unsigned expected_enabled_hooks, int explicit_instruction,
+		      int explicit_instruction_prewake,
 		      int explicit_data_prewake,
 		      int explicit_return_instruction,
 		      int explicit_directional_instruction,
@@ -321,7 +341,9 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		fail("pin tagged replay footprint");
 
 	for (unsigned trial = 0; trial < trials;) {
-		unsigned enabled = (mode || explicit_instruction || explicit_data_prewake)
+		unsigned enabled = (mode || explicit_instruction
+				    || explicit_instruction_prewake
+				    || explicit_data_prewake)
 			? (trial_enabled(trial) ^ trace_enabled_first) : 0;
 		unsigned long before_hook, after_hook;
 		uint64_t checksum = 0, entry, after_load;
@@ -349,13 +371,24 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		/* Complete this oracle replay before publishing readiness. The later
 		 * parent wake is the measured boundary, so no replay transport lies on
 		 * its scheduler-critical path. */
-		if (explicit_data_prewake) {
+		if (explicit_instruction_prewake || explicit_data_prewake) {
 			uint64_t prewake_start = cycle();
 
-			if (prctl(PR_BP_PREVIEW_REPLAY_TRIGGER, enabled,
-				  0UL, 0UL, 0UL))
+			/* Launch both independent lanes before waiting so their memory
+			 * traffic may overlap. Both must become idle before readiness. */
+			if (explicit_instruction_prewake
+			    && prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled,
+				     0UL, 0UL, 0UL))
+				fail("explicit instruction preseed trigger");
+			if (explicit_data_prewake
+			    && prctl(PR_BP_PREVIEW_REPLAY_TRIGGER, enabled,
+				     0UL, 0UL, 0UL))
 				fail("explicit data prewake trigger");
-			replay_status_wait_drain("explicit data prewake drain");
+			if (explicit_instruction_prewake)
+				icache_prefix_status_wait_drain(
+					"explicit instruction preseed drain");
+			if (explicit_data_prewake)
+				replay_status_wait_drain("explicit data prewake drain");
 			if (explicit_data_prewake >= 2) {
 				const uint64_t budget = explicit_data_prewake == 3
 					? DATA_PREWAKE_QUIESCENT_CYCLES
@@ -491,6 +524,7 @@ int main(int argc, char **argv)
 	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
 	int explicit_instruction = 0, explicit_return_instruction = 0;
+	int explicit_instruction_prewake = 0;
 	int explicit_data_prewake = 0;
 	int explicit_directional_instruction = 0;
 	int rt_unlimited = 0;
@@ -507,7 +541,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -550,6 +584,22 @@ int main(int argc, char **argv)
 			 * useful I/D overlap from the hardware-follow sequencer. */
 			mode = 9;
 			explicit_instruction = 1;
+		}
+		else if (!strcmp(argv[1], "joint-prewake-quiescent")) {
+			/* Drain data before readiness, then launch the independent shared
+			 * instruction prefix immediately before the measured parent wake. */
+			mode = 0;
+			explicit_instruction = 1;
+			explicit_data_prewake = 3;
+			expected_enabled_hooks = 0;
+		}
+		else if (!strcmp(argv[1], "joint-preseed-quiescent")) {
+			/* Launch and drain both independent replay lanes before publishing
+			 * readiness, leaving the measured wake path free of hint work. */
+			mode = 0;
+			explicit_instruction_prewake = 1;
+			explicit_data_prewake = 3;
+			expected_enabled_hooks = 0;
 		}
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
@@ -749,7 +799,9 @@ int main(int argc, char **argv)
 	    || !strcmp(mode_name, "instruction-explicit")
 	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
 	    || !strcmp(mode_name, "instruction-explicit-directed")
-	    || !strcmp(mode_name, "joint-explicit"))
+	    || !strcmp(mode_name, "joint-explicit")
+	    || !strcmp(mode_name, "joint-prewake-quiescent")
+	    || !strcmp(mode_name, "joint-preseed-quiescent"))
 		icache_status_before = icache_prefix_status();
 	child = fork();
 	if (child < 0)
@@ -761,6 +813,7 @@ int main(int argc, char **argv)
 			  lines_per_base, config_lines_per_base, probe_status,
 			  skew_layout, trace_stop_at_entry,
 			  expected_enabled_hooks, explicit_instruction,
+			  explicit_instruction_prewake,
 			  explicit_data_prewake,
 			  explicit_return_instruction,
 			  explicit_directional_instruction,
@@ -773,7 +826,9 @@ int main(int argc, char **argv)
 	for (unsigned trial = 0; trial < trials;) {
 		uint64_t lead_start;
 		int woken;
-		unsigned enabled = (mode || explicit_instruction || explicit_data_prewake)
+		unsigned enabled = (mode || explicit_instruction
+				    || explicit_instruction_prewake
+				    || explicit_data_prewake)
 			? (trial_enabled(trial) ^ trace_enabled_first) : 0;
 
 		diagnostic_stage("parent", "wait_ready", trial, enabled);
@@ -915,7 +970,9 @@ int main(int argc, char **argv)
 	    || !strcmp(mode_name, "instruction-explicit")
 	    || !strcmp(mode_name, "instruction-explicit-roundtrip")
 	    || !strcmp(mode_name, "instruction-explicit-directed")
-	    || !strcmp(mode_name, "joint-explicit")) {
+	    || !strcmp(mode_name, "joint-explicit")
+	    || !strcmp(mode_name, "joint-prewake-quiescent")
+	    || !strcmp(mode_name, "joint-preseed-quiescent")) {
 		icache_status_after = icache_prefix_status();
 		printf("TAGGED_REPLAY_ICACHE_STATUS before=0x%016llx after=0x%016llx\n",
 		       (unsigned long long)icache_status_before,

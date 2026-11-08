@@ -6,9 +6,11 @@ import unittest
 from pathlib import Path
 
 from analyze_scheduler_tagged_replay import analyze
+from analyze_scheduler_tagged_replay_tail import load as load_tail
 from analyze_scheduler_tagged_replay_tail import pool as pool_tail
 from compare_scheduler_tagged_replay_prefixes import compare as compare_prefixes
 from compare_scheduler_tagged_replay_modes import compare as compare_modes
+from compare_scheduler_tagged_replay_prewake import compare as compare_prewake
 from compare_scheduler_tagged_replay_tail_prefixes import (
     compare as compare_tail_prefixes,
 )
@@ -32,19 +34,27 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "instruction-explicit-roundtrip": 0,
         "instruction-explicit-directed": 0,
         "joint-explicit": 9,
+        "joint-prewake-quiescent": 0,
+        "joint-preseed-quiescent": 0,
         "joint-split": 12, "joint-split-one-hook": 12,
         "joint-follow-only": 12,
     }
     expected_hooks = 0 if mode in (
         "instruction-explicit", "instruction-explicit-roundtrip",
         "instruction-explicit-directed", "data-prewake",
-        "data-prewake-equalized", "data-prewake-equalized-quiescent"
+        "data-prewake-equalized", "data-prewake-equalized-quiescent",
+        "joint-prewake-quiescent", "joint-preseed-quiescent"
     ) else 1
     prewake_budget = (
-        65536 if mode == "data-prewake-equalized-quiescent" else
+        65536 if mode in ("data-prewake-equalized-quiescent",
+                          "joint-prewake-quiescent",
+                          "joint-preseed-quiescent") else
         262144 if mode == "data-prewake-equalized" else 0
     )
-    prewake_max = 73728 if mode == "data-prewake-equalized-quiescent" else 0
+    prewake_max = 73728 if mode in (
+        "data-prewake-equalized-quiescent", "joint-prewake-quiescent",
+        "joint-preseed-quiescent"
+    ) else 0
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
@@ -59,7 +69,8 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     ]
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed", "joint-explicit"):
+                "instruction-explicit-directed", "joint-explicit",
+                "joint-prewake-quiescent", "joint-preseed-quiescent"):
         before = (prefix_entries << 4) | 1
         after = ((0x1ff << 55) | (0xff << 38) | (prefix_entries << 13)
                  | (prefix_entries << 4) | 1)
@@ -142,6 +153,49 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
 
 
 class TaggedReplayAnalyzerTest(unittest.TestCase):
+    def test_prewake_comparison_holds_exact_image_and_filters_blocks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            controls = []
+            candidates = []
+            for label, mode, paths in (
+                    ("data", "data-prewake-equalized-quiescent", controls),
+                    ("joint", "joint-preseed-quiescent", candidates)):
+                for index in range(2):
+                    subdir = root / f"{label}-{index}"
+                    subdir.mkdir()
+                    paths.append(write_run(
+                        subdir, mode=mode, lines=32, prefix_entries=32,
+                        rt_unlimited=True, tail=True,
+                    ))
+            result = compare_prewake(controls, candidates, bootstrap_samples=10)
+        self.assertEqual(result["control"]["mode"],
+                         "data-prewake-equalized-quiescent")
+        self.assertEqual(result["candidate"]["mode"],
+                         "joint-preseed-quiescent")
+        self.assertEqual(
+            result["metrics"]["load_cycles"]["instruction_increment_saved_cycles"],
+            0,
+        )
+        self.assertEqual(
+            result["tail_metrics"]["return_handoff"]["instruction_increment_saved_cycles"],
+            0,
+        )
+
+    def test_tail_loader_reuses_quiescent_whole_block_filter(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(
+                Path(directory), mode="joint-preseed-quiescent", lines=32,
+                prefix_entries=32, rt_unlimited=True, tail=True,
+            )
+            text = path.read_text()
+            text = text.replace(
+                "prewake_cycles=65540", "prewake_cycles=73729", 1
+            )
+            path.write_text(text)
+            _result, tails = load_tail(path)
+        self.assertEqual(len(tails), 508)
+
     def test_tail_partition_and_endpoint_identities_pass(self):
         with tempfile.TemporaryDirectory() as directory:
             result = pool_tail(
@@ -361,6 +415,44 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
         self.assertEqual(result["config"]["expected_hooks"], 1)
         self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
         self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["accepted_triggers"],
+            255,
+        )
+
+    def test_explicit_instruction_and_prewake_data_require_both_engines(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(
+                    Path(directory), mode="joint-prewake-quiescent",
+                    rt_unlimited=True,
+                ),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["kernel_mode"], 0)
+        self.assertEqual(result["config"]["expected_hooks"], 0)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+        self.assertEqual(result["analyzed_trials"], 512)
+        self.assertEqual(
+            result["icache_prefix_status"]["after"]["accepted_triggers"],
+            255,
+        )
+
+    def test_preseed_instruction_and_data_require_both_engines(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(
+                    Path(directory), mode="joint-preseed-quiescent",
+                    rt_unlimited=True,
+                ),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["kernel_mode"], 0)
+        self.assertEqual(result["config"]["expected_hooks"], 0)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+        self.assertEqual(result["counter_deltas"]["admitted_entries"], 8192)
+        self.assertEqual(result["analyzed_trials"], 512)
         self.assertEqual(
             result["icache_prefix_status"]["after"]["accepted_triggers"],
             255,

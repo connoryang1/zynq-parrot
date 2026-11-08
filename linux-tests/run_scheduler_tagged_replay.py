@@ -115,6 +115,8 @@ def parse_args(argv=None):
                                             "instruction-explicit-directed",
                                             "joint",
                                             "joint-explicit",
+                                            "joint-prewake-quiescent",
+                                            "joint-preseed-quiescent",
                                             "joint-split",
                                             "joint-split-one-hook",
                                             "joint-follow-only"),
@@ -332,6 +334,9 @@ def main(argv=None):
             args.trace_icache_entry_prefix,
             args.trace_icache_entry_prefix_first,
             args.trace_icache_entry_prefix_off,
+            args.trace_icache_return_prefix,
+            args.trace_icache_return_prefix_off,
+            args.rt_unlimited,
         ))
         return 0
     run(args)

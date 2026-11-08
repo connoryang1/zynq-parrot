@@ -1,5 +1,8 @@
 """Test fail-closed planning for the tagged replay board runner."""
 
+import contextlib
+import hashlib
+import io
 import tempfile
 import unittest
 from pathlib import Path
@@ -220,6 +223,46 @@ class TaggedReplayRunnerTest(unittest.TestCase):
                 "joint-explicit", 0, 0, "normal", 0, 8, False, "skew"
             ),
         )
+
+    def test_command_binds_explicit_instruction_with_prewake_data(self):
+        self.assertIn(
+            " joint-prewake-quiescent 0 0 fifo 0 8 0 skew futex; ",
+            runner.benchmark_command(
+                "joint-prewake-quiescent", 0, 0, "fifo", 0, 8, False,
+                "skew", "futex", rt_unlimited=True,
+            ),
+        )
+
+    def test_command_binds_preseed_instruction_with_prewake_data(self):
+        self.assertIn(
+            " joint-preseed-quiescent 0 0 fifo 0 8 0 skew futex; ",
+            runner.benchmark_command(
+                "joint-preseed-quiescent", 0, 0, "fifo", 0, 8, False,
+                "skew", "futex", rt_unlimited=True,
+            ),
+        )
+
+    def test_print_command_preserves_unlimited_rt_policy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nbf = root / "linux.nbf"
+            transfer = root / "benchmark.transfer"
+            log = root / "run.log"
+            nbf.write_bytes(b"nbf")
+            elf = b"elf"
+            digest = hashlib.sha256(elf).hexdigest()
+            transfer.write_text(self.valid_transfer(elf))
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                rc = runner.main([
+                    str(nbf), str(transfer), digest, str(log),
+                    "--mode", "joint-preseed-quiescent", "--policy", "fifo",
+                    "--rt-unlimited", "--print-command",
+                ])
+        self.assertEqual(rc, 0)
+        self.assertTrue(output.getvalue().startswith(
+            "BP_TAGGED_REPLAY_RT_UNLIMITED=1 "
+        ))
 
     def test_command_binds_replay_off_stability_mode(self):
         self.assertIn(

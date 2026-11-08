@@ -47,13 +47,16 @@ def load_rows(path):
     rows = [dict(zip(fields, map(int, match.groups())))
             for match in ROW.finditer(text)]
     if result["config"]["mode"] in (
-            "data-prewake-equalized", "data-prewake-equalized-quiescent"):
+            "data-prewake-equalized", "data-prewake-equalized-quiescent",
+            "joint-prewake-quiescent", "joint-preseed-quiescent"):
         prewake = [int(cycles) for _trial, cycles in PREWAKE_ROW.findall(text)]
         if len(prewake) != len(rows):
             raise ValueError("prewake row count changed after strict validation")
         for row, cycles in zip(rows, prewake):
             row["prewake_cycles"] = cycles
-        if result["config"]["mode"] == "data-prewake-equalized-quiescent":
+        if result["config"]["mode"] in (
+                "data-prewake-equalized-quiescent",
+                "joint-prewake-quiescent", "joint-preseed-quiescent"):
             maximum = result["config"]["prewake_max_cycles"]
             rows = [
                 row
@@ -99,6 +102,8 @@ def pool(paths, bootstrap_samples=20000):
                          if reference_config["mode"] in (
                              "data-prewake-equalized",
                              "data-prewake-equalized-quiescent",
+                             "joint-prewake-quiescent",
+                             "joint-preseed-quiescent",
                          )
                          else ())
     for metric in metrics:

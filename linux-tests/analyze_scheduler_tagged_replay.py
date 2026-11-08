@@ -14,7 +14,7 @@ CONFIG = re.compile(
     r"TAGGED_REPLAY_CONFIG mode=(off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
     r"instruction-explicit-directed|"
-    r"joint|joint-explicit|joint-split|joint-split-one-hook|"
+    r"joint|joint-explicit|joint-prewake-quiescent|joint-preseed-quiescent|joint-split|joint-split-one-hook|"
     r"joint-follow-only) "
     r"lines=(\d+) slot=(\d+) "
     r"delay=(\d+) gap=(\d+) policy=(normal|fifo) lead_cycles=(\d+)"
@@ -146,7 +146,9 @@ def analyze(path, bootstrap_samples=20000):
         int(prewake_configs[0]) if prewake_configs else 0
     )
     expected_prewake_budget = (
-        65536 if mode == "data-prewake-equalized-quiescent" else
+        65536 if mode in ("data-prewake-equalized-quiescent",
+                          "joint-prewake-quiescent",
+                          "joint-preseed-quiescent") else
         262144 if mode == "data-prewake-equalized" else 0
     )
     if config["prewake_budget_cycles"] != expected_prewake_budget:
@@ -158,7 +160,9 @@ def analyze(path, bootstrap_samples=20000):
         int(prewake_max_configs[0]) if prewake_max_configs else 0
     )
     expected_prewake_max = (
-        73728 if mode == "data-prewake-equalized-quiescent" else 0
+        73728 if mode in ("data-prewake-equalized-quiescent",
+                          "joint-prewake-quiescent",
+                          "joint-preseed-quiescent") else 0
     )
     if config["prewake_max_cycles"] != expected_prewake_max:
         raise ValueError("unexpected prewake equalization maximum")
@@ -194,6 +198,8 @@ def analyze(path, bootstrap_samples=20000):
             "instruction-explicit-directed": 0,
             "joint": 10,
             "joint-explicit": 9,
+            "joint-prewake-quiescent": 0,
+            "joint-preseed-quiescent": 0,
             "joint-split": 12,
             "joint-split-one-hook": 12,
             "joint-follow-only": 12,
@@ -202,7 +208,9 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("mode name does not match configured kernel mode")
     elif mode in ("instruction-wake", "instruction-explicit",
                   "instruction-explicit-roundtrip",
-                  "instruction-explicit-directed", "joint-explicit"):
+                        "instruction-explicit-directed", "joint-explicit",
+                        "joint-prewake-quiescent",
+                        "joint-preseed-quiescent"):
         raise ValueError(
             f"{mode} transcript lacks dedicated kernel-mode binding"
         )
@@ -254,7 +262,9 @@ def analyze(path, bootstrap_samples=20000):
     icache_statuses = ICACHE_STATUS.findall(text)
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed", "joint-explicit"):
+                "instruction-explicit-directed", "joint-explicit",
+                "joint-prewake-quiescent",
+                "joint-preseed-quiescent"):
         if len(icache_statuses) != 1:
             raise ValueError(f"{mode} requires one I-cache status marker")
         before = int(icache_statuses[0][0], 16)
@@ -330,7 +340,9 @@ def analyze(path, bootstrap_samples=20000):
     stretched_prewake_trials = 0
     filtered_prewake_blocks = 0
     if mode in ("data-prewake-equalized",
-                "data-prewake-equalized-quiescent"):
+                "data-prewake-equalized-quiescent",
+                "joint-prewake-quiescent",
+                "joint-preseed-quiescent"):
         prewake_matches = PREWAKE_ROW.findall(text)
         if (len(prewake_matches) != len(rows)
                 or [int(trial) for trial, _ in prewake_matches]
@@ -340,7 +352,9 @@ def analyze(path, bootstrap_samples=20000):
             rows[index]["prewake_cycles"] = int(cycles)
         if any(row["prewake_cycles"] < expected_prewake_budget for row in rows):
             raise ValueError("prewake duration ended before its fixed budget")
-        if mode == "data-prewake-equalized-quiescent":
+        if mode in ("data-prewake-equalized-quiescent",
+                    "joint-prewake-quiescent",
+                    "joint-preseed-quiescent"):
             stretched_prewake_trials = sum(
                 row["prewake_cycles"] > expected_prewake_max for row in rows
             )
@@ -430,6 +444,12 @@ def analyze(path, bootstrap_samples=20000):
             "Measure an explicit parent-issued instruction prefix immediately "
             "before the same wake whose kernel hook launches tagged data replay."
             if mode == "joint-explicit" else
+            "Measure an explicit instruction-prefix trigger immediately before "
+            "a wake whose data footprint was drained during a bounded prewake."
+            if mode == "joint-prewake-quiescent" else
+            "Measure a wake after both instruction and data replay lanes were "
+            "launched, drained, and equalized during a bounded preseed."
+            if mode == "joint-preseed-quiescent" else
             "Measure a fully drained explicit data replay before publishing "
             "readiness and starting the later timed wake."
             if mode == "data-prewake" else
@@ -484,13 +504,17 @@ def analyze(path, bootstrap_samples=20000):
         },
     }
     if mode in ("data-prewake-equalized",
-                "data-prewake-equalized-quiescent"):
+                "data-prewake-equalized-quiescent",
+                "joint-prewake-quiescent",
+                "joint-preseed-quiescent"):
         result["prewake_equalization"] = summarize_metric(
             prewake_rows, "prewake_cycles", rng, bootstrap_samples
         )
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
-                "instruction-explicit-directed", "joint-explicit"):
+                "instruction-explicit-directed", "joint-explicit",
+                "joint-prewake-quiescent",
+                "joint-preseed-quiescent"):
         result["icache_prefix_status"] = {
             "before": before_decoded,
             "after": after_decoded,

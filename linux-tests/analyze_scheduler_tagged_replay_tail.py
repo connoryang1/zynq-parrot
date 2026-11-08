@@ -8,7 +8,8 @@ import re
 import statistics
 from pathlib import Path
 
-from analyze_scheduler_tagged_replay import ROW, analyze, percentile
+from analyze_scheduler_tagged_replay import ROW, percentile
+from pool_scheduler_tagged_replay_replicates import load_rows
 
 
 TAIL_ROW = re.compile(
@@ -21,7 +22,7 @@ TAIL_METRICS = ("child_post_load", "return_handoff", "post_load_total")
 
 def load(path):
     """Apply the primary validator, then require exact tail identities."""
-    result = analyze(path, bootstrap_samples=1)
+    result, filtered_base_rows = load_rows(path)
     text = path.read_text(errors="replace").replace("\x00", "").replace("\r", "")
     base_fields = (
         "trial", "enabled", "hooks", "woken", "hook_cycles", "admitted",
@@ -45,6 +46,10 @@ def load(path):
             raise ValueError(f"tail partition mismatch at trial {base['trial']}")
         if base["wake_to_load"] + tail["post_load_total"] != base["roundtrip"]:
             raise ValueError(f"tail endpoint mismatch at trial {base['trial']}")
+    retained_trials = {row["trial"] for row in filtered_base_rows}
+    tails = [row for row in tails if row["trial"] in retained_trials]
+    if len(tails) != len(filtered_base_rows):
+        raise ValueError("tail rows changed after primary duration filtering")
     return result, tails
 
 
