@@ -39,8 +39,13 @@ def benchmark_command(mode, delay, gap, policy, lead_cycles, lines_per_base=8,
                       trace_icache_entry_prefix_first=False,
                       trace_icache_entry_prefix_off=False,
                       trace_icache_return_prefix=False,
-                      trace_icache_return_prefix_off=False):
-    prefix = "BP_TAGGED_REPLAY_DIAG=1 " if guest_diagnostic else ""
+                      trace_icache_return_prefix_off=False,
+                      rt_unlimited=False):
+    prefix = ""
+    if guest_diagnostic:
+        prefix += "BP_TAGGED_REPLAY_DIAG=1 "
+    if rt_unlimited:
+        prefix += "BP_TAGGED_REPLAY_RT_UNLIMITED=1 "
     trace_arg = (" trace-icache-return-prefix-off"
                  if trace_icache_return_prefix_off else
                  " trace-icache-return-prefix"
@@ -99,7 +104,10 @@ def parse_args(argv=None):
     parser.add_argument("--bitstream-sha256")
     parser.add_argument("--runtime-ms", type=int, default=3_600_000)
     parser.add_argument("--transfer-timeout-s", type=int, default=180)
-    parser.add_argument("--mode", choices=("off", "data", "data-late",
+    parser.add_argument("--mode", choices=("off", "data", "data-prewake",
+                                            "data-prewake-equalized",
+                                            "data-prewake-equalized-quiescent",
+                                            "data-late",
                                             "instruction-select",
                                             "instruction-wake",
                                             "instruction-explicit",
@@ -121,6 +129,7 @@ def parse_args(argv=None):
                         default="aligned")
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--guest-diagnostic", action="store_true")
+    parser.add_argument("--rt-unlimited", action="store_true")
     trace_group = parser.add_mutually_exclusive_group()
     trace_group.add_argument("--trace-icache", action="store_true")
     trace_group.add_argument("--trace-icache-entry", action="store_true")
@@ -153,6 +162,8 @@ def validate_args(args):
         raise ValueError("runtime limit must be positive")
     if args.transfer_timeout_s <= 0:
         raise ValueError("transfer timeout must be positive")
+    if args.rt_unlimited and args.policy != "fifo":
+        raise ValueError("unlimited RT runtime requires FIFO policy")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     validate_transfer(args.transfer, args.elf_sha256)
@@ -193,6 +204,7 @@ def run(args):
         args.trace_icache_entry_prefix, args.trace_icache_entry_prefix_first,
         args.trace_icache_entry_prefix_off,
         args.trace_icache_return_prefix, args.trace_icache_return_prefix_off,
+        args.rt_unlimited,
     )
     status = {
         "status": "running",
@@ -212,6 +224,7 @@ def run(args):
         "layout": args.layout,
         "sync": args.sync,
         "guest_diagnostic": args.guest_diagnostic,
+        "rt_unlimited": args.rt_unlimited,
         "trace_icache": (args.trace_icache or args.trace_icache_entry
                          or args.trace_icache_entry_prefix
                          or args.trace_icache_entry_prefix_first

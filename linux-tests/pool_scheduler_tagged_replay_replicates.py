@@ -7,7 +7,13 @@ import random
 import statistics
 from pathlib import Path
 
-from analyze_scheduler_tagged_replay import METRICS, ROW, analyze, percentile
+from analyze_scheduler_tagged_replay import (
+    METRICS,
+    PREWAKE_ROW,
+    ROW,
+    analyze,
+    percentile,
+)
 
 
 def block_effects(rows, metric):
@@ -40,6 +46,22 @@ def load_rows(path):
     )
     rows = [dict(zip(fields, map(int, match.groups())))
             for match in ROW.finditer(text)]
+    if result["config"]["mode"] in (
+            "data-prewake-equalized", "data-prewake-equalized-quiescent"):
+        prewake = [int(cycles) for _trial, cycles in PREWAKE_ROW.findall(text)]
+        if len(prewake) != len(rows):
+            raise ValueError("prewake row count changed after strict validation")
+        for row, cycles in zip(rows, prewake):
+            row["prewake_cycles"] = cycles
+        if result["config"]["mode"] == "data-prewake-equalized-quiescent":
+            maximum = result["config"]["prewake_max_cycles"]
+            rows = [
+                row
+                for start in range(0, len(rows), 4)
+                if all(candidate["prewake_cycles"] <= maximum
+                       for candidate in rows[start:start + 4])
+                for row in rows[start:start + 4]
+            ]
     return result, rows
 
 
@@ -73,7 +95,13 @@ def pool(paths, bootstrap_samples=20000):
         "bootstrap_samples": bootstrap_samples,
         "metrics": {},
     }
-    for metric in METRICS:
+    metrics = METRICS + (("prewake_cycles",)
+                         if reference_config["mode"] in (
+                             "data-prewake-equalized",
+                             "data-prewake-equalized-quiescent",
+                         )
+                         else ())
+    for metric in metrics:
         effects = [block_effects(rows, metric) for _result, rows in loaded]
         cycle_strata = [[effect[0] for effect in boot] for boot in effects]
         percent_strata = [[effect[1] for effect in boot] for boot in effects]

@@ -114,6 +114,22 @@ class LinuxHarnessTests(unittest.TestCase):
         self.assertLess(ready, park)
         self.assertLess(park, launch)
 
+    def test_data_prewake_drains_before_child_ready(self):
+        source = (HERE / "scheduler_tagged_replay_benchmark.c").read_text()
+        child = source.split("for (unsigned trial = 0; trial < trials;)", 2)[1]
+        trigger = child.index("PR_BP_PREVIEW_REPLAY_TRIGGER")
+        drain = child.index('replay_status_wait_drain("explicit data prewake drain")')
+        ready = child.index("child_handoff_begin(")
+        self.assertLess(trigger, drain)
+        self.assertLess(drain, ready)
+
+    def test_explicit_data_trigger_is_same_task_and_address_opaque(self):
+        patch = (HERE / "kernel-patches" /
+                 "0025-blackparrot-explicit-data-replay-trigger.patch").read_text()
+        self.assertIn("bp_preview_phys_mm) != me->mm", patch)
+        self.assertIn("bp_preview_replay_slot", patch)
+        self.assertNotIn("bp_preview_paddr", patch)
+
     def test_target_syscall_round_trip(self):
         for target in ("tiny", "shell-app"):
             for flag in (1, 0, 1):

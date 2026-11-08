@@ -65,6 +65,40 @@ class TaggedReplayRunnerTest(unittest.TestCase):
             runner.benchmark_command("data-late", 0, 0, "normal", 0),
         )
 
+    def test_command_binds_prewake_data_mode(self):
+        self.assertIn(
+            " data-prewake 0 0 normal 0 8 0 skew futex; ",
+            runner.benchmark_command(
+                "data-prewake", 0, 0, "normal", 0, 8, False,
+                "skew", "futex"
+            ),
+        )
+
+    def test_command_binds_equalized_prewake_data_mode(self):
+        self.assertIn(
+            " data-prewake-equalized 0 0 normal 0 8 0 skew futex; ",
+            runner.benchmark_command(
+                "data-prewake-equalized", 0, 0, "normal", 0, 8, False,
+                "skew", "futex",
+            ),
+        )
+
+    def test_command_binds_unlimited_rt_policy(self):
+        self.assertTrue(
+            runner.benchmark_command(
+                "data-prewake-equalized", 0, 0, "fifo", 0,
+                rt_unlimited=True,
+            ).startswith("BP_TAGGED_REPLAY_RT_UNLIMITED=1 ")
+        )
+
+    def test_unlimited_rt_policy_requires_fifo(self):
+        args = runner.parse_args([
+            "missing.nbf", "missing.transfer", "0" * 64, "missing.log",
+            "--policy", "normal", "--rt-unlimited",
+        ])
+        with self.assertRaisesRegex(ValueError, "requires FIFO"):
+            runner.validate_args(args)
+
     def test_command_binds_instruction_selection_mode(self):
         self.assertIn(
             " instruction-select 0 0 normal 0 8 0 aligned pipe; ",

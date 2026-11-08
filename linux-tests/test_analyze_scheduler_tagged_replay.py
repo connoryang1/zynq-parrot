@@ -20,10 +20,13 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
               downstream_status=False, status_bits_59_58=False,
               layout="aligned", mode="data", sync="pipe",
               enabled_load=280, bitstream_sha256="5" * 64,
-              prefix_entries=16, nbf_sha256="1" * 64, tail=False):
+              prefix_entries=16, nbf_sha256="1" * 64, tail=False,
+              rt_unlimited=False):
     """Create a complete synthetic matched A/B transcript and status."""
     kernel_modes = {
-        "off": 0, "data": 9, "data-late": 11,
+        "off": 0, "data": 9, "data-prewake": 0,
+        "data-prewake-equalized": 0,
+        "data-prewake-equalized-quiescent": 0, "data-late": 11,
         "instruction-select": 3, "instruction-wake": 13, "joint": 10,
         "instruction-explicit": 0,
         "instruction-explicit-roundtrip": 0,
@@ -34,12 +37,22 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
     }
     expected_hooks = 0 if mode in (
         "instruction-explicit", "instruction-explicit-roundtrip",
-        "instruction-explicit-directed"
+        "instruction-explicit-directed", "data-prewake",
+        "data-prewake-equalized", "data-prewake-equalized-quiescent"
     ) else 1
+    prewake_budget = (
+        65536 if mode == "data-prewake-equalized-quiescent" else
+        262144 if mode == "data-prewake-equalized" else 0
+    )
+    prewake_max = 73728 if mode == "data-prewake-equalized-quiescent" else 0
     path = root / "run.log"
     rows = [
         f"TAGGED_REPLAY_CONFIG mode={mode} lines={lines} slot=2 delay=0 gap=2 "
-        f"policy=fifo lead_cycles=0 layout={layout} "
+        f"policy=fifo lead_cycles=0 "
+        f"prewake_budget_cycles={prewake_budget} "
+        f"prewake_max_cycles={prewake_max} "
+        f"rt_unlimited={int(rt_unlimited)} "
+        f"layout={layout} "
         f"probe_status={int(probe_status)} sync={sync} "
         f"kernel_mode={kernel_modes[mode]} expected_hooks={expected_hooks} "
         f"icache_ranges={'0:8,8:8' if mode == 'instruction-explicit-directed' else 'full'}"
@@ -85,6 +98,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
             f"triggers={triggers} dropped=0 wake_to_entry={entry} "
             f"load_cycles={load} wake_to_load={entry + load} "
             f"roundtrip={entry + load + 40} "
+            f"prewake_cycles={prewake_budget + 4 if prewake_budget else 0} "
             f"preblock_status=0x{preblock:016x} "
             f"preblock_probe_cycles={30 if probe_status else 0} "
             f"entry_probe_status=0x{entry_status:016x} "
@@ -119,6 +133,7 @@ def write_run(root, corrupt_counter=False, lines=32, probe_status=False,
         "lead_cycles": 0,
         "lines_per_base": lines // 4,
         "probe_status": probe_status,
+        "rt_unlimited": rt_unlimited,
         "layout": layout,
         "sync": sync,
     }
@@ -186,6 +201,41 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
                 bootstrap_samples=10,
             )
         self.assertEqual(result["config"]["mode"], "data-late")
+
+    def test_prewake_data_mode_has_no_wakeup_hook(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="data-prewake"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["kernel_mode"], 0)
+        self.assertEqual(result["config"]["expected_hooks"], 0)
+        self.assertEqual(result["counter_deltas"]["accepted_triggers"], 256)
+
+    def test_equalized_prewake_binds_fixed_cycle_budget(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(Path(directory), mode="data-prewake-equalized"),
+                bootstrap_samples=10,
+            )
+        self.assertEqual(result["config"]["prewake_budget_cycles"], 262144)
+        self.assertEqual(
+            result["prewake_equalization"]["disabled_median_cycles"], 262148
+        )
+        self.assertEqual(
+            result["prewake_equalization"]["enabled_median_cycles"], 262148
+        )
+
+    def test_equalized_prewake_binds_unlimited_rt_policy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(
+                write_run(
+                    Path(directory), mode="data-prewake-equalized",
+                    rt_unlimited=True,
+                ),
+                bootstrap_samples=10,
+            )
+        self.assertTrue(result["config"]["rt_unlimited"])
 
     def test_instruction_selection_mode_has_no_data_counters(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -408,6 +458,50 @@ class TaggedReplayAnalyzerTest(unittest.TestCase):
             result["metrics"]["load_cycles"]["pooled_saved_percent"],
             100.0 * 20 / 300,
         )
+
+    def test_equalized_replicates_pool_prewake_duration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "first").mkdir()
+            (root / "second").mkdir()
+            first = write_run(root / "first", mode="data-prewake-equalized",
+                              rt_unlimited=True)
+            second = write_run(root / "second", mode="data-prewake-equalized",
+                               rt_unlimited=True)
+            result = pool([first, second], bootstrap_samples=10)
+        self.assertEqual(
+            result["metrics"]["prewake_cycles"]["pooled_saved_cycles"], 0
+        )
+
+    def test_quiescent_equalization_rejects_in_guest_retry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(
+                Path(directory), mode="data-prewake-equalized-quiescent",
+                rt_unlimited=True,
+            )
+            text = path.read_text().replace(
+                "TAGGED_REPLAY_CHILD PASS retries=0",
+                "TAGGED_REPLAY_PREWAKE_RETRY trial=3 enabled=0 cycles=140000\n"
+                "TAGGED_REPLAY_CHILD PASS retries=0",
+            )
+            path.write_text(text)
+            with self.assertRaisesRegex(ValueError, "in-guest prewake retry"):
+                analyze(path, bootstrap_samples=10)
+
+    def test_quiescent_equalization_filters_stretched_balanced_block(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_run(
+                Path(directory), mode="data-prewake-equalized-quiescent",
+                rt_unlimited=True,
+            )
+            path.write_text(path.read_text().replace(
+                "prewake_cycles=65540", "prewake_cycles=73729", 1
+            ))
+            result = analyze(path, bootstrap_samples=10)
+        self.assertEqual(result["config"]["prewake_max_cycles"], 73728)
+        self.assertEqual(result["stretched_prewake_trials"], 1)
+        self.assertEqual(result["filtered_prewake_blocks"], 1)
+        self.assertEqual(result["analyzed_trials"], 508)
 
     def test_distinct_routes_compare_incremental_block_effect(self):
         with tempfile.TemporaryDirectory() as directory:

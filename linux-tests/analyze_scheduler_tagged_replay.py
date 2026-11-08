@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 CONFIG = re.compile(
-    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-late|instruction-select|"
+    r"TAGGED_REPLAY_CONFIG mode=(off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|"
     r"instruction-wake|instruction-explicit|instruction-explicit-roundtrip|"
     r"instruction-explicit-directed|"
     r"joint|joint-explicit|joint-split|joint-split-one-hook|"
@@ -26,6 +26,17 @@ ROW = re.compile(
     r"wake_to_load=(\d+) roundtrip=(\d+)"
 )
 PROBE_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* probe_status=(0|1)")
+PREWAKE_CONFIG = re.compile(
+    r"TAGGED_REPLAY_CONFIG .* prewake_budget_cycles=(\d+)"
+)
+PREWAKE_MAX_CONFIG = re.compile(
+    r"TAGGED_REPLAY_CONFIG .* prewake_max_cycles=(\d+)"
+)
+RT_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* rt_unlimited=(0|1)")
+PREWAKE_ROW = re.compile(
+    r"^TAGGED_REPLAY trial=(\d+).* prewake_cycles=(\d+) preblock_status=",
+    re.MULTILINE,
+)
 LAYOUT_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* layout=(aligned|skew)")
 SYNC_CONFIG = re.compile(r"TAGGED_REPLAY_CONFIG .* sync=(pipe|futex)")
 ICACHE_RANGES_CONFIG = re.compile(
@@ -128,6 +139,33 @@ def analyze(path, bootstrap_samples=20000):
     if len(probe_configs) > 1:
         raise ValueError("expected at most one probe-status configuration")
     config["probe_status"] = bool(int(probe_configs[0])) if probe_configs else False
+    prewake_configs = PREWAKE_CONFIG.findall(text)
+    if len(prewake_configs) > 1:
+        raise ValueError("expected at most one prewake budget configuration")
+    config["prewake_budget_cycles"] = (
+        int(prewake_configs[0]) if prewake_configs else 0
+    )
+    expected_prewake_budget = (
+        65536 if mode == "data-prewake-equalized-quiescent" else
+        262144 if mode == "data-prewake-equalized" else 0
+    )
+    if config["prewake_budget_cycles"] != expected_prewake_budget:
+        raise ValueError("unexpected prewake equalization budget")
+    prewake_max_configs = PREWAKE_MAX_CONFIG.findall(text)
+    if len(prewake_max_configs) > 1:
+        raise ValueError("expected at most one prewake maximum configuration")
+    config["prewake_max_cycles"] = (
+        int(prewake_max_configs[0]) if prewake_max_configs else 0
+    )
+    expected_prewake_max = (
+        73728 if mode == "data-prewake-equalized-quiescent" else 0
+    )
+    if config["prewake_max_cycles"] != expected_prewake_max:
+        raise ValueError("unexpected prewake equalization maximum")
+    rt_configs = RT_CONFIG.findall(text)
+    if len(rt_configs) > 1:
+        raise ValueError("expected at most one RT-runtime configuration")
+    config["rt_unlimited"] = bool(int(rt_configs[0])) if rt_configs else False
     layout_configs = LAYOUT_CONFIG.findall(text)
     if len(layout_configs) > 1:
         raise ValueError("expected at most one footprint layout")
@@ -145,6 +183,9 @@ def analyze(path, bootstrap_samples=20000):
         expected_kernel_modes = {
             "off": 0,
             "data": 9,
+            "data-prewake": 0,
+            "data-prewake-equalized": 0,
+            "data-prewake-equalized-quiescent": 0,
             "data-late": 11,
             "instruction-select": 3,
             "instruction-wake": 13,
@@ -177,6 +218,8 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("status lines_per_base does not match replay footprint")
     if bool(status.get("probe_status", False)) != config["probe_status"]:
         raise ValueError("status probe_status does not match configuration")
+    if bool(status.get("rt_unlimited", False)) != config["rt_unlimited"]:
+        raise ValueError("status RT-runtime policy does not match configuration")
     if status.get("layout", "aligned") != config["layout"]:
         raise ValueError("status layout does not match configuration")
     if status.get("sync", "pipe") != config["sync"]:
@@ -205,6 +248,8 @@ def analyze(path, bootstrap_samples=20000):
     retry_pass = re.findall(r"TAGGED_REPLAY_CHILD PASS retries=(\d+)", text)
     if retry_pass != [str(retry_markers)]:
         raise ValueError("retry count does not match filtered attempts")
+    if re.search(r"^TAGGED_REPLAY_PREWAKE_RETRY ", text, re.MULTILINE):
+        raise ValueError("unexpected in-guest prewake retry")
 
     icache_statuses = ICACHE_STATUS.findall(text)
     if mode in ("instruction-wake", "instruction-explicit",
@@ -280,6 +325,41 @@ def analyze(path, bootstrap_samples=20000):
             if pattern != expected:
                 raise ValueError(f"unbalanced trial block at {start}: {pattern}")
 
+    analysis_rows = rows
+    prewake_rows = []
+    stretched_prewake_trials = 0
+    filtered_prewake_blocks = 0
+    if mode in ("data-prewake-equalized",
+                "data-prewake-equalized-quiescent"):
+        prewake_matches = PREWAKE_ROW.findall(text)
+        if (len(prewake_matches) != len(rows)
+                or [int(trial) for trial, _ in prewake_matches]
+                != list(range(len(rows)))):
+            raise ValueError("expected one ordered prewake duration per trial")
+        for index, (_, cycles) in enumerate(prewake_matches):
+            rows[index]["prewake_cycles"] = int(cycles)
+        if any(row["prewake_cycles"] < expected_prewake_budget for row in rows):
+            raise ValueError("prewake duration ended before its fixed budget")
+        if mode == "data-prewake-equalized-quiescent":
+            stretched_prewake_trials = sum(
+                row["prewake_cycles"] > expected_prewake_max for row in rows
+            )
+            analysis_rows = []
+            for start in range(0, len(rows), 4):
+                block = rows[start:start + 4]
+                if any(row["prewake_cycles"] > expected_prewake_max
+                       for row in block):
+                    filtered_prewake_blocks += 1
+                else:
+                    analysis_rows.extend(block)
+            if len(analysis_rows) < 128:
+                raise ValueError("fewer than 32 quiescent balanced blocks remain")
+        prewake_rows = [
+            {"enabled": row["enabled"],
+             "prewake_cycles": row["prewake_cycles"]}
+            for row in analysis_rows
+        ]
+
     probe_rows = [
         (int(trial), int(preblock_status, 16), int(preblock_cycles),
          int(entry_status, 16), int(entry_cycles))
@@ -350,6 +430,15 @@ def analyze(path, bootstrap_samples=20000):
             "Measure an explicit parent-issued instruction prefix immediately "
             "before the same wake whose kernel hook launches tagged data replay."
             if mode == "joint-explicit" else
+            "Measure a fully drained explicit data replay before publishing "
+            "readiness and starting the later timed wake."
+            if mode == "data-prewake" else
+            "Measure fully drained data replay after equalizing both arms to "
+            "the same pre-readiness physical-cycle budget."
+            if mode == "data-prewake-equalized" else
+            "Measure fully drained data replay after accepting only quiescent "
+            "pre-readiness intervals with a bounded physical-cycle duration."
+            if mode == "data-prewake-equalized-quiescent" else
             "Measure wake-time tagged data while the selection block is "
             "disabled for diagnostic isolation."
             if mode == "joint-split-one-hook" else
@@ -373,7 +462,13 @@ def analyze(path, bootstrap_samples=20000):
         "config": config,
         "trials": len(rows),
         "trials_per_arm": len(rows) if mode == "off" else len(rows) // 2,
+        "analyzed_trials": len(analysis_rows),
+        "analyzed_trials_per_arm": (
+            len(analysis_rows) if mode == "off" else len(analysis_rows) // 2
+        ),
         "filtered_attempts": retry_markers,
+        "stretched_prewake_trials": stretched_prewake_trials,
+        "filtered_prewake_blocks": filtered_prewake_blocks,
         "counter_deltas": {
             "admitted_entries": admitted,
             "filtered_entries": filtered,
@@ -381,12 +476,18 @@ def analyze(path, bootstrap_samples=20000):
             "dropped_triggers": 0,
         },
         "metrics": {
-            metric: (summarize_disabled_metric(rows, metric)
+            metric: (summarize_disabled_metric(analysis_rows, metric)
                      if mode == "off" else
-                     summarize_metric(rows, metric, rng, bootstrap_samples))
+                     summarize_metric(analysis_rows, metric, rng,
+                                      bootstrap_samples))
             for metric in METRICS
         },
     }
+    if mode in ("data-prewake-equalized",
+                "data-prewake-equalized-quiescent"):
+        result["prewake_equalization"] = summarize_metric(
+            prewake_rows, "prewake_cycles", rng, bootstrap_samples
+        )
     if mode in ("instruction-wake", "instruction-explicit",
                 "instruction-explicit-roundtrip",
                 "instruction-explicit-directed", "joint-explicit"):

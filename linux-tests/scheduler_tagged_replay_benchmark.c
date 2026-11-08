@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <sys/mount.h>
 #include <sys/prctl.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>
@@ -32,8 +33,13 @@
 #define PR_BP_PREVIEW_REPLAY_STATUS 0x4250505d
 #define PR_BP_PREVIEW_ICACHE_STATUS 0x4250505e
 #define PR_BP_PREVIEW_ICACHE_TRIGGER 0x4250505f
+#define PR_BP_PREVIEW_REPLAY_TRIGGER 0x42505060
 #define BP_REPLAY_DRAIN_MASK (0xfUL | (7UL << 60))
 #define TRACE_DEPTH 256U
+#define DATA_PREWAKE_EQUALIZED_CYCLES 262144ULL
+#define DATA_PREWAKE_QUIESCENT_CYCLES 65536ULL
+#define DATA_PREWAKE_QUIESCENT_MAX_CYCLES \
+	(DATA_PREWAKE_QUIESCENT_CYCLES + 8192ULL)
 
 enum {
 	warmup = 16,
@@ -61,6 +67,7 @@ struct sample {
 	uint64_t entry_probe_status;
 	_Atomic unsigned wake_count;
 	unsigned long hook_cycles;
+	uint64_t prewake_cycles;
 	unsigned long preblock_probe_cycles;
 	unsigned long entry_probe_cycles;
 	unsigned accepted_entries, filtered_entries, accepted_triggers, dropped_triggers;
@@ -140,6 +147,19 @@ static void fail(const char *what)
 	exit(1);
 }
 
+static void disable_rt_throttling(void)
+{
+	FILE *file;
+
+	if (mount("proc", "/proc", "proc", 0, NULL) && errno != EBUSY)
+		fail("mount proc for RT control");
+	file = fopen("/proc/sys/kernel/sched_rt_runtime_us", "w");
+	if (!file)
+		fail("open RT runtime control");
+	if (fputs("-1\n", file) == EOF || fclose(file))
+		fail("disable RT throttling");
+}
+
 static uint64_t icache_prefix_status(void)
 {
 	uint64_t status;
@@ -148,6 +168,25 @@ static uint64_t icache_prefix_status(void)
 		    (unsigned long)&status, 0UL, 0UL, 0UL))
 		fail("read instruction-prefix status");
 	return status;
+}
+
+static unsigned long replay_status_wait_drain(const char *what)
+{
+	unsigned timeout = 1048576;
+	long status;
+
+	do {
+		status = syscall(SYS_prctl, PR_BP_PREVIEW_REPLAY_STATUS,
+				 0UL, 0UL, 0UL, 0UL);
+		if (status < 0)
+			fail(what);
+		if (!((unsigned long)status & BP_REPLAY_DRAIN_MASK))
+			return status;
+	} while (--timeout);
+	fprintf(stderr, "TAGGED_REPLAY_DRAIN_TIMEOUT stage=%s status=0x%016lx\n",
+		what, (unsigned long)status);
+	fail(what);
+	return 0;
 }
 
 static void transfer(int fd, char *token, int send)
@@ -234,6 +273,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		      unsigned lines_per_base, unsigned config_lines_per_base,
 		      int probe_status, int skew_layout, int trace_stop_at_entry,
 		      unsigned expected_enabled_hooks, int explicit_instruction,
+		      int explicit_data_prewake,
 		      int explicit_return_instruction,
 		      int explicit_directional_instruction,
 		      int trace_return, int trace_enabled_first,
@@ -281,7 +321,7 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		fail("pin tagged replay footprint");
 
 	for (unsigned trial = 0; trial < trials;) {
-		unsigned enabled = (mode || explicit_instruction)
+		unsigned enabled = (mode || explicit_instruction || explicit_data_prewake)
 			? (trial_enabled(trial) ^ trace_enabled_first) : 0;
 		unsigned long before_hook, after_hook;
 		uint64_t checksum = 0, entry, after_load;
@@ -306,6 +346,29 @@ static void child_run(int in, int out, volatile struct sample *samples,
 		if (prctl(PR_BP_PREVIEW_ENABLE, enabled ? mode : 0,
 			  0UL, 0UL, 0UL))
 			fail("toggle tagged replay");
+		/* Complete this oracle replay before publishing readiness. The later
+		 * parent wake is the measured boundary, so no replay transport lies on
+		 * its scheduler-critical path. */
+		if (explicit_data_prewake) {
+			uint64_t prewake_start = cycle();
+
+			if (prctl(PR_BP_PREVIEW_REPLAY_TRIGGER, enabled,
+				  0UL, 0UL, 0UL))
+				fail("explicit data prewake trigger");
+			replay_status_wait_drain("explicit data prewake drain");
+			if (explicit_data_prewake >= 2) {
+				const uint64_t budget = explicit_data_prewake == 3
+					? DATA_PREWAKE_QUIESCENT_CYCLES
+					: DATA_PREWAKE_EQUALIZED_CYCLES;
+
+				while (cycle() - prewake_start
+				       < budget)
+					__asm__ volatile("nop" : : : "memory");
+			}
+			samples[trial].prewake_cycles = cycle() - prewake_start;
+		} else {
+			samples[trial].prewake_cycles = 0;
+		}
 		before_hook = prctl(PR_BP_PREVIEW_GET_COUNT, 0UL, 0UL, 0UL, 0UL);
 		if (before_hook == (unsigned long)-1)
 			fail("hook count before");
@@ -384,28 +447,10 @@ static void child_run(int in, int out, volatile struct sample *samples,
 			samples[trial].hook_cycles = hook_cycles;
 		}
 		{
-			long replay_status;
-			unsigned timeout = 1048576;
+			/* The raw syscall preserves status counters above bit 31. */
+			unsigned long replay_status = replay_status_wait_drain(
+				"read tagged replay status");
 
-			do {
-				/* libc declares prctl() with an int return, which truncates
-				 * the trigger/drop counters above bit 31. Use the raw syscall
-				 * ABI so the complete 64-bit custom status reaches userspace.
-				 */
-				replay_status = syscall(SYS_prctl,
-							PR_BP_PREVIEW_REPLAY_STATUS,
-							0UL, 0UL, 0UL, 0UL);
-				if (replay_status < 0)
-					fail("read tagged replay status");
-				if (!(replay_status & BP_REPLAY_DRAIN_MASK))
-					break;
-			} while (--timeout);
-			if (!timeout) {
-				fprintf(stderr,
-					"TAGGED_REPLAY_DRAIN_TIMEOUT trial=%u enabled=%u status=0x%016lx\n",
-					trial, enabled, replay_status);
-				fail("tagged replay drain timeout");
-			}
 			samples[trial].accepted_entries = (replay_status >> 10) & 0xffff;
 			samples[trial].filtered_entries = (replay_status >> 26) & 0xffff;
 			samples[trial].accepted_triggers = (replay_status >> 42) & 0xff;
@@ -446,7 +491,9 @@ int main(int argc, char **argv)
 	unsigned expected_enabled_hooks = 1;
 	int fifo = 0, probe_status = 0, skew_layout = 0, trace_icache = 0;
 	int explicit_instruction = 0, explicit_return_instruction = 0;
+	int explicit_data_prewake = 0;
 	int explicit_directional_instruction = 0;
+	int rt_unlimited = 0;
 	int trace_stop_at_entry = 0, trace_allow_i_overflow = 0;
 	int trace_return = 0;
 	int trace_explicit_disabled = 0;
@@ -460,7 +507,7 @@ int main(int argc, char **argv)
 	pid_t child;
 
 	if (argc > 11) {
-		fprintf(stderr, "usage: %s [off|data|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
+		fprintf(stderr, "usage: %s [off|data|data-prewake|data-prewake-equalized|data-prewake-equalized-quiescent|data-late|instruction-select|instruction-wake|instruction-explicit|instruction-explicit-roundtrip|instruction-explicit-directed|joint|joint-explicit|joint-split|joint-split-one-hook|joint-follow-only] [delay-0..65535] [gap-0..255] [normal|fifo] [lead-cycles-0..1000000] [lines-per-base-1..8] [probe-status-0|1] [aligned|skew] [pipe|futex] [no-trace|trace-icache|trace-icache-entry|trace-icache-entry-prefix|trace-icache-entry-prefix-first|trace-icache-entry-prefix-off|trace-icache-return-prefix|trace-icache-return-prefix-off]\n",
 			argv[0]);
 		return 2;
 	}
@@ -506,6 +553,15 @@ int main(int argc, char **argv)
 		}
 		else if (!strcmp(argv[1], "data-late"))
 			mode = 11;
+		else if (!strcmp(argv[1], "data-prewake")
+			 || !strcmp(argv[1], "data-prewake-equalized")
+			 || !strcmp(argv[1], "data-prewake-equalized-quiescent")) {
+			mode = 0;
+			explicit_data_prewake = !strcmp(
+				argv[1], "data-prewake-equalized-quiescent") ? 3
+				: !strcmp(argv[1], "data-prewake-equalized") ? 2 : 1;
+			expected_enabled_hooks = 0;
+		}
 		else if (!strcmp(argv[1], "joint-split")
 			 || !strcmp(argv[1], "joint-split-one-hook")
 			 || !strcmp(argv[1], "joint-follow-only"))
@@ -648,6 +704,14 @@ int main(int argc, char **argv)
 	if (!strcmp(mode_name, "joint-follow-only"))
 		config_lines_per_base = 0;
 	diagnostic_progress = getenv("BP_TAGGED_REPLAY_DIAG") != NULL;
+	rt_unlimited = getenv("BP_TAGGED_REPLAY_RT_UNLIMITED") != NULL;
+	if (rt_unlimited) {
+		if (!fifo) {
+			fputs("unlimited RT runtime requires FIFO policy\n", stderr);
+			return 2;
+		}
+		disable_rt_throttling();
+	}
 	if (fifo) {
 		const struct sched_param parameter = {.sched_priority = 1};
 
@@ -661,10 +725,17 @@ int main(int argc, char **argv)
 		fail("shared memory or pipes");
 	atomic_init(&shared->phase, futex_idle);
 	samples = shared->samples;
-	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u trace_arm=%s icache_ranges=%s\n",
+	printf("TAGGED_REPLAY_CONFIG mode=%s lines=%u slot=%u delay=%u gap=%u policy=%s lead_cycles=%lu prewake_budget_cycles=%llu prewake_max_cycles=%llu rt_unlimited=%u layout=%s probe_status=%u sync=%s kernel_mode=%u expected_hooks=%u trace_icache=%u trace_stop=%s trace_prefix=%u trace_arm=%s icache_ranges=%s\n",
 	       mode_name,
 	       bases * lines_per_base, replay_slot,
 	       delay, gap, fifo ? "fifo" : "normal", lead_cycles,
+	       (unsigned long long)(explicit_data_prewake == 3
+		? DATA_PREWAKE_QUIESCENT_CYCLES
+		: explicit_data_prewake == 2
+		? DATA_PREWAKE_EQUALIZED_CYCLES : 0),
+	       (unsigned long long)(explicit_data_prewake == 3
+		? DATA_PREWAKE_QUIESCENT_MAX_CYCLES : 0),
+	       rt_unlimited,
 	       skew_layout ? "skew" : "aligned", probe_status,
 	       sync == sync_futex ? "futex" : "pipe", mode,
 	       expected_enabled_hooks, trace_icache,
@@ -690,6 +761,7 @@ int main(int argc, char **argv)
 			  lines_per_base, config_lines_per_base, probe_status,
 			  skew_layout, trace_stop_at_entry,
 			  expected_enabled_hooks, explicit_instruction,
+			  explicit_data_prewake,
 			  explicit_return_instruction,
 			  explicit_directional_instruction,
 			  trace_return, trace_enabled_first, trace_trial,
@@ -701,7 +773,7 @@ int main(int argc, char **argv)
 	for (unsigned trial = 0; trial < trials;) {
 		uint64_t lead_start;
 		int woken;
-		unsigned enabled = (mode || explicit_instruction)
+		unsigned enabled = (mode || explicit_instruction || explicit_data_prewake)
 			? (trial_enabled(trial) ^ trace_enabled_first) : 0;
 
 		diagnostic_stage("parent", "wait_ready", trial, enabled);
@@ -857,7 +929,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "nonmonotonic tagged replay sample: %u\n", trial);
 			return 1;
 		}
-		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u woken=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu\n",
+		printf("TAGGED_REPLAY trial=%u enabled=%u hooks=%u woken=%u hook_cycles=%lu admitted=%u filtered=%u triggers=%u dropped=%u wake_to_entry=%llu load_cycles=%llu wake_to_load=%llu roundtrip=%llu prewake_cycles=%llu preblock_status=0x%016llx preblock_probe_cycles=%lu entry_probe_status=0x%016llx entry_probe_cycles=%lu\n",
 		       trial - warmup, s->enabled, s->hooks,
 		       atomic_load_explicit(&s->wake_count, memory_order_relaxed),
 		       s->hook_cycles,
@@ -867,6 +939,7 @@ int main(int argc, char **argv)
 		       (unsigned long long)(s->after_load - s->entry),
 		       (unsigned long long)(s->after_load - s->launch),
 		       (unsigned long long)(s->returned - s->launch),
+		       (unsigned long long)s->prewake_cycles,
 		       (unsigned long long)s->preblock_status,
 		       s->preblock_probe_cycles,
 		       (unsigned long long)s->entry_probe_status,

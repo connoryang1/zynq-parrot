@@ -1,0 +1,52 @@
+This patch exposes the configured tagged-data footprint through an explicit
+same-task trigger. It lets the benchmark complete replay before publishing its
+ready state without exposing physical addresses or another task's slot.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -325,4 +325,6 @@ struct prctl_mm_map {
+  * arg4 select a table start/count, or both zero retain the full table. */
+ #define PR_BP_PREVIEW_ICACHE_TRIGGER	0x4250505f
++/* Optionally trigger this task's configured tagged-data replay slot. */
++#define PR_BP_PREVIEW_REPLAY_TRIGGER	0x42505060
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2916,6 +2916,36 @@ SYSCALL_DEFINE5(prctl, int, option, unsi
+ 		error = 0;
+ 		break;
+ 	}
++	case PR_BP_PREVIEW_REPLAY_TRIGGER: {
++		unsigned long flags, slot, status;
++
++		if (arg2 > 1 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		if (READ_ONCE(me->thread.bp_preview_replay_state) != 1
++		    || READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {
++			error = -ENOENT;
++			break;
++		}
++		/* Serialize the explicit command with configuration and any prior
++		 * global replay command. The zero arm follows the same checks but
++		 * deliberately leaves the configured slot idle.
++		 */
++		local_irq_save(flags);
++		asm volatile("csrr %0, 0x9c3" : "=r"(status) : : "memory");
++		if (status & (0xfUL | (7UL << 60))) {
++			error = -EBUSY;
++			local_irq_restore(flags);
++			break;
++		}
++		slot = READ_ONCE(me->thread.bp_preview_replay_slot);
++		if (arg2)
++			asm volatile("csrw 0x9c3, %0" : : "r"(slot) : "memory");
++		local_irq_restore(flags);
++		error = 0;
++		break;
++	}
+ 	case PR_BP_PREVIEW_GET_COUNT:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
