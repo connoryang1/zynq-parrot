@@ -239,10 +239,10 @@ case ${1:-} in
     example_dir="$worktree/cosim/black-parrot-example"
     "$script_dir/summarize_vivado.sh" "$vivado_dir" >"$job_dir/summary.txt"
 
-    timing=$(find "$vivado_dir" -type f -name '*timing_summary_routed.rpt' -print -quit)
-    util=$(find "$vivado_dir" -type f \
-      \( -name '*utilization*placed*.rpt' -o -name '*utilization*routed*.rpt' \) \
-      -print -quit)
+    # Bitgen uses the post-route-physopt checkpoint when that optional step is
+    # enabled.  Select its report before the retained route_design report.
+    timing=$("$script_dir/select_vivado_report.sh" timing "$vivado_dir")
+    util=$("$script_dir/select_vivado_report.sh" utilization "$vivado_dir")
     for required in \
       "$vivado_dir/black_parrot_bd_1.bit" \
       "$vivado_dir/black_parrot_bd_1.hwh" \

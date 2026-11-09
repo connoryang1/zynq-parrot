@@ -2,8 +2,9 @@
 set -euo pipefail
 
 vivado_dir=${1:-.}
-timing=$(find "$vivado_dir" -type f -name '*timing_summary_routed.rpt' -print -quit 2>/dev/null || true)
-util=$(find "$vivado_dir" -type f \( -name '*utilization*placed*.rpt' -o -name '*utilization*routed*.rpt' -o -name '*utilization*.rpt' \) -print -quit 2>/dev/null || true)
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+timing=$("$script_dir/select_vivado_report.sh" timing "$vivado_dir")
+util=$("$script_dir/select_vivado_report.sh" utilization "$vivado_dir")
 
 echo "Vivado directory: $vivado_dir"
 if [[ -n "$timing" ]]; then
