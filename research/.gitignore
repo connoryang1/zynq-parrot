@@ -10,3 +10,10 @@
 *.a
 **/Vbsg_nonsynth_zynq_testbench
 **/vmlinux
+
+# Kernel link products and immutable copied inputs are hash-bound in manifests.
+retention-kernel-*/input-*
+retention-kernel-*/object-kernel*
+retention-kernel-*/link-vmlinux
+retention-kernel-*/link-System.map
+retention-kernel-*/link-usr_initramfs_inc_data

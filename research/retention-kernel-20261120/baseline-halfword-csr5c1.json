@@ -1,0 +1,106 @@
+{
+  "scope": "complete reconstructed baseline byte windows at every two-byte boundary, including cross-record boundaries",
+  "predicate": "little-endian 32-bit word: opcode low7=0x73, funct3 nonzero, csr high12=0x5c1",
+  "alignment": 2,
+  "source_nbf_sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+  "kernel": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/old-kernel-from-ef50.bin",
+    "base": "0x80200000",
+    "bytes": 24034304,
+    "sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+    "matches": [
+      {
+        "offset": "0xca9eba",
+        "address": "0x80ea9eba",
+        "word": "0x5c16cf73",
+        "funct3": 4,
+        "rd": 30,
+        "rs1": 13,
+        "classification": "unclassified potential encoding; not automatically executable or safe"
+      },
+      {
+        "offset": "0xdf6dca",
+        "address": "0x80ff6dca",
+        "word": "0x5c1ebaf3",
+        "funct3": 3,
+        "rd": 21,
+        "rs1": 29,
+        "classification": "unclassified potential encoding; not automatically executable or safe"
+      },
+      {
+        "offset": "0xea5eb8",
+        "address": "0x810a5eb8",
+        "word": "0x5c1f58f3",
+        "funct3": 5,
+        "rd": 17,
+        "rs1": 30,
+        "classification": "unclassified potential encoding; not automatically executable or safe"
+      }
+    ]
+  },
+  "firmware": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/baseline-firmware-memory-80000000-80200000.bin",
+    "base": "0x80000000",
+    "end_exclusive": "0x80200000",
+    "bytes": 2097152,
+    "sha256": "c7e557599e4b7eebaa33e62fc5b32b6848eee70e47d0b18d66640db99e9ef179",
+    "written_bytes": 136328,
+    "nbf_records_by_width_bytes": {
+      "8": 17047
+    },
+    "ordered_overwrites": [
+      {
+        "line": 1916335,
+        "address": "0x800163a0",
+        "width": 8,
+        "previous_bytes_hex": "636f6e736f6c653d",
+        "new_bytes_hex": "636f6e736f6c653d",
+        "policy": "apply in source NBF order and retain explicit overwrite evidence"
+      },
+      {
+        "line": 1916336,
+        "address": "0x800163a8",
+        "width": 8,
+        "previous_bytes_hex": "68766330206c6f67",
+        "new_bytes_hex": "68766330206c6f67",
+        "policy": "apply in source NBF order and retain explicit overwrite evidence"
+      },
+      {
+        "line": 1916337,
+        "address": "0x800163b0",
+        "width": 8,
+        "previous_bytes_hex": "6c6576656c3d3820",
+        "new_bytes_hex": "6c6576656c3d3820",
+        "policy": "apply in source NBF order and retain explicit overwrite evidence"
+      },
+      {
+        "line": 1916338,
+        "address": "0x800163b8",
+        "width": 8,
+        "previous_bytes_hex": "7264696e69743d2f",
+        "new_bytes_hex": "7264696e69743d2f",
+        "policy": "apply in source NBF order and retain explicit overwrite evidence"
+      },
+      {
+        "line": 1916339,
+        "address": "0x800163c0",
+        "width": 8,
+        "previous_bytes_hex": "6374787473775f75",
+        "new_bytes_hex": "62696e2f73682020",
+        "policy": "apply in source NBF order and retain explicit overwrite evidence"
+      },
+      {
+        "line": 1916340,
+        "address": "0x800163c8",
+        "width": 8,
+        "previous_bytes_hex": "7365725f74696e79",
+        "new_bytes_hex": "2020202020202020",
+        "policy": "apply in source NBF order and retain explicit overwrite evidence"
+      }
+    ],
+    "unwritten_bytes": "zero-filled nominal reconstruction; not a statement about arbitrary stale runtime DRAM",
+    "matches": []
+  },
+  "other_memory": "not scanned; no completeness claim outside the two named windows",
+  "result": "REVIEW_REQUIRED"
+}

@@ -1,0 +1,40 @@
+{
+  "scope": "RV64 object/source validation, not old-hardware runtime proof",
+  "probe": {
+    "csr": "0x5c1",
+    "minimum_privilege": "supervisor",
+    "fault_text_offset": "0xa",
+    "fixup_text_offset": "0xe",
+    "value_register": "a4/x14",
+    "error_register": "a5/x15",
+    "initialized_both_zero": true,
+    "extable_type": 3,
+    "extable_data": "0x1cf",
+    "capability_or_fault_error": -19
+  },
+  "control": {
+    "csr_write_text_offset": "0x3a92",
+    "fence_i_text_offset": "0x3a96",
+    "write_followed_immediately_by_fence": true,
+    "preemption_count_restored_after_fence": true
+  },
+  "status": {
+    "preemption_count_restore_text_offset": "0x3b00",
+    "copy_to_user_text_offset": "0x3b10",
+    "copy_bytes": 8
+  },
+  "canonical_tracked_inputs_unchanged": true,
+  "config_sha256": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+  "rootfs_cpio_sha256": "ac6afe2de4e786e2a63109d5ea0867878d888693c4ac83c244b0a7cbbd5daca0",
+  "artifacts": {
+    "object-kernel_sys.o": "c26eed18159053fe2947d5c4454438e2a1e77a6ee9c43201e75cb4484b343f86",
+    "object-kernel_.sys.o.cmd": "c49ec36548570dd66e5d4a883b8ddfba2e5db39f7f45948e30f7060ed63c9bb8",
+    "object-build.log": "bfef13d13ce9f3833c093f7e91ce638e7172c381b2875b17b1f964ac209030af",
+    "input-kernel_sys.c": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb",
+    "input-.config": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+    "sys.disassembly.txt": "3f64ffee5e2cc03a43ac32e5b77a3fdcd430cbcab3667dfd9e458f96536f1b26",
+    "sys.relocations.txt": "439a4c722855a84a08f85d274647239f20c48f0a285aa1fdacbb88114cae2d1e",
+    "sys.extable.hex.txt": "d3f048316b686fbe1a914f268575a91029bbd06f45814778dddaea60ba096db8",
+    "sys.extable.bin": "9cb8846c3a29e36c80e1a460d79689683736c0017fe8bd48b6774af02c516f47"
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "scope": "full-burst wrapper conditional synthetic AXI service audit, not measured DRAM/FPGA latency",
+  "sampling": "stable values before actual BE/AXI rising edge; identical VCD clock identifier verified",
+  "signals": {
+    "latency": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.read_latency_p",
+    "queue_depth": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.read_queue_els_p",
+    "axi_clock": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.clk_i",
+    "arid": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_arid_i",
+    "araddr": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_araddr_i",
+    "arlen": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_arlen_i",
+    "arsize": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_arsize_i",
+    "arburst": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_arburst_i",
+    "arvalid": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_arvalid_i",
+    "arready": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_arready_o",
+    "rid": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_rid_o",
+    "rlast": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_rlast_o",
+    "rvalid": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_rvalid_o",
+    "rready": "TOP.bsg_nonsynth_zynq_testbench.axi_mem.axi_rready_i",
+    "clock": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.clk_i",
+    "reset": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.reset_i",
+    "commit_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.commit_pkt_cast_o.instret",
+    "commit_pc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.commit_pkt_cast_o.pc"
+  },
+  "identical_be_axi_clock": true,
+  "configured_model_latency_ticks": [
+    200
+  ],
+  "configured_queue_depth": [
+    4
+  ],
+  "timed_r_backpressure_cycles": 0,
+  "timed_accepted_beat_gap_ticks": {
+    "1": 56
+  },
+  "timed_boundaries": [
+    {
+      "kind": "begin",
+      "cycle": 246323,
+      "timestamp": 12316175000
+    },
+    {
+      "kind": "end",
+      "cycle": 248267,
+      "timestamp": 12413375000
+    }
+  ],
+  "timed_commit_window_cycles": 1944,
+  "total_accepted_ar": 675,
+  "timed_accepted_ar": 8,
+  "timed_arlen_histogram": {
+    "7": 8
+  },
+  "timed_arsize_histogram": {
+    "3": 8
+  },
+  "timed_ar_by_raw_axi_64byte_line": {
+    "0x340": 1,
+    "0x1000": 1,
+    "0x1040": 1,
+    "0x1080": 1,
+    "0x10c0": 1,
+    "0x1100": 1,
+    "0x1140": 1,
+    "0x1180": 1
+  },
+  "max_outstanding_ar_entire_run": 1,
+  "timed_ar_to_first_r_offer_ticks": {
+    "200": 8
+  },
+  "timed_ar_to_last_r_accept_ticks": {
+    "207": 8
+  },
+  "timed_transactions": [
+    {
+      "ar_cycle": 246341,
+      "address": "0x340",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 246541,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        246541,
+        246542,
+        246543,
+        246544,
+        246545,
+        246546,
+        246547,
+        246548
+      ],
+      "completion_cycle": 246548
+    },
+    {
+      "ar_cycle": 246576,
+      "address": "0x1000",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 246776,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        246776,
+        246777,
+        246778,
+        246779,
+        246780,
+        246781,
+        246782,
+        246783
+      ],
+      "completion_cycle": 246783
+    },
+    {
+      "ar_cycle": 246815,
+      "address": "0x1040",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 247015,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        247015,
+        247016,
+        247017,
+        247018,
+        247019,
+        247020,
+        247021,
+        247022
+      ],
+      "completion_cycle": 247022
+    },
+    {
+      "ar_cycle": 247054,
+      "address": "0x1080",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 247254,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        247254,
+        247255,
+        247256,
+        247257,
+        247258,
+        247259,
+        247260,
+        247261
+      ],
+      "completion_cycle": 247261
+    },
+    {
+      "ar_cycle": 247293,
+      "address": "0x10c0",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 247493,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        247493,
+        247494,
+        247495,
+        247496,
+        247497,
+        247498,
+        247499,
+        247500
+      ],
+      "completion_cycle": 247500
+    },
+    {
+      "ar_cycle": 247532,
+      "address": "0x1100",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 247732,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        247732,
+        247733,
+        247734,
+        247735,
+        247736,
+        247737,
+        247738,
+        247739
+      ],
+      "completion_cycle": 247739
+    },
+    {
+      "ar_cycle": 247771,
+      "address": "0x1140",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 247971,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        247971,
+        247972,
+        247973,
+        247974,
+        247975,
+        247976,
+        247977,
+        247978
+      ],
+      "completion_cycle": 247978
+    },
+    {
+      "ar_cycle": 248010,
+      "address": "0x1180",
+      "id": 0,
+      "len": 7,
+      "size_log2_bytes": 3,
+      "burst": 1,
+      "timed": true,
+      "first_offer_cycle": 248210,
+      "accepted_beats": 8,
+      "accepted_beat_cycles": [
+        248210,
+        248211,
+        248212,
+        248213,
+        248214,
+        248215,
+        248216,
+        248217
+      ],
+      "completion_cycle": 248217
+    }
+  ],
+  "pending_at_trace_end": 0,
+  "issues": []
+}

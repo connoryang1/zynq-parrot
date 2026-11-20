@@ -1,0 +1,23 @@
+This report records the offline relink and reversible packaging of the retention-control kernel with the exact rootfs from the accepted Linux image. It removes the prepared-SDK rootfs difference found during the CSR collision review. Boot behavior and performance still require validation on the reserved FPGA session.
+
+The candidate for that runtime gate is `kernel27-accepted-rootfs/linux-prefix32-retention27-accepted-rootfs-shell.nbf` under `/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120`. Its SHA-256 is `c7c1e214796644b1dbe728cc274ca3d776c1cd24d4eb7ff570e109f44b53e3ff`. The earlier `ac19...` package remains a prepared-SDK-rootfs diagnostic; none of its input files or manifests were replaced.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| Linked accepted-rootfs ELF | `4951f1e68c227e765498943946e16aad05306158976cd20c1ffc20a982a7966d` |
+| Stripped accepted-rootfs ELF | `c6e8144f44e06885d201c933cab1445167a2a37178e03ccae5bd4b90e88508cd` |
+| Converted/re-extracted kernel binary, 24,034,304 bytes | `64f993713e1d7d5fcae57c26e42b32369d0bccfa0235635dd0b0010871f57435` |
+| Embedded accepted CPIO, 8,194,560 bytes | `e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50` |
+| Embedded accepted gzip stream, 3,303,052 bytes | `0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf` |
+| Preserved kernel configuration | `0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8` |
+| Patch 0027 | `c48971940f38c27493d95fbff9e2e905c794550efe839625b9d1d1a38981dbd3` |
+
+The root agent ran the link phase in the existing independent RAM kernel copy. The new `linux-retention-accepted-inputs` directory supplied the extracted accepted CPIO through `BR_BINARIES_DIR`; the original ac6 input directory stayed intact. The build exited zero in 35.9 seconds, retained `#28 SMP Fri Nov 20 15:11:06 EST 2026`, and preserved the patched sources and configuration. Recorded canonical SDK input hashes are unchanged. `accepted-rootfs/manifest.json` retains the exact command, selected build environment, closed build log identity, source/object identities, and output hashes. The subagent's private RAM namespace was an infrastructure limitation; it did not constitute a source/build failure.
+
+The exact SDK strip/objcopy recipe produced the binary. Its embedded gzip stream is byte-identical to the accepted old stream and starts at the same kernel offset `0xc126b0`. Forward replacement into source NBF `ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4` followed by reverse replacement reproduced that original NBF byte for byte. Re-extraction reproduced the new binary byte for byte. All 17,058 ordered nonkernel collateral records remain unchanged, with ordered-byte SHA-256 `fc6b8becc65aa2709c91fc48f6ca0e437f2cbd393d07bdc674a239dbd2f7ff8d`.
+
+Disassembly of every executable ELF section, including halfword instruction alignment, finds exactly two CSR `0x5c1` uses: the reviewed read at `ffffffff80020e9e` in `bp_icache_retention_probe`, and the control write at `ffffffff800245ca` in `__do_sys_prctl`. The write is immediately followed by `fence.i`. The read's exception-table entry has type 3, data `0x1cf`, and fixup `ffffffff80020ea2`; it places the error in `a5` and zeroes the distinct value register `a4`. Both registers are initialized to zero before the read. `kernel/sys.o` is byte-identical to the previously reviewed object. This supports the intended safe fallback path but cannot replace the absent-capability probe on old hardware.
+
+`accepted-rootfs/package-manifest.json` and its external copy bind the conversion, payload, collateral, CSR and exception-table checks. `verify_accepted_rootfs_package.py` independently rechecks recorded durable artifact hashes, canonical inputs, preserved diagnostics, patch/config/object identity, rootfs bytes, reverse splice, payload reconstruction and the probe's register initialization; its result is `accepted-rootfs/verification.json`. The baseline collision proof remains `baseline-csr5c1-review.json`: zero executable old-kernel CSR uses and zero potential encodings in the reconstructed firmware window, with three raw old-kernel compressed-data candidates explicitly retained.
+
+No board operation occurred in this gate. The new helper kernel remains a new experimental baseline; retention performance must compare matched controls inside this exact image rather than attribute a difference from the old kernel solely to retention. The next runtime prerequisite is the strict `icache_retention_probe absent` check on the old bitstream, followed by the separately reserved capability-present gate for new hardware.

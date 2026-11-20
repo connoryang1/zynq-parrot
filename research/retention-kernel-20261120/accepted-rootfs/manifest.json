@@ -1,0 +1,135 @@
+{
+  "state": "accepted-rootfs-link-complete",
+  "scope": "offline relink with exact accepted rootfs; no boot/performance acceptance",
+  "infrastructure": "default subagent /dev/shm namespace is private; root executes host-RAM link, not a source failure",
+  "old_diagnostic_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/manifest.json",
+    "sha256": "b1360acf4caeeffc21cb2ccad0c3a724253256d4031793a7c6ac6625347f8c13",
+    "bytes": 7001
+  },
+  "preserved_diagnostic_hashes": {
+    "manifest.json": "b1360acf4caeeffc21cb2ccad0c3a724253256d4031793a7c6ac6625347f8c13",
+    "package-manifest.json": "f319381b9087705a1ed80949e8b12d6f79f45c4750fdd05dd5f13e3e65820fdd",
+    "link-vmlinux": "6616df2494f0ae227df40751aa76e7edd1f77656830487e21456d00d856c6467",
+    "link-System.map": "e759df68ad56db339b53a7165ed0a7ce6db11212c2a2449cb8d04d87c0dbb9e4",
+    "link-usr_initramfs_inc_data": "83034d329c2fed13822c9b4744deae8ce3fd6f48964ec7298201a24dd7521745",
+    "input-.config": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+    "input-kernel_sys.c": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb"
+  },
+  "original_input_rootfs_sha256": "ac6afe2de4e786e2a63109d5ea0867878d888693c4ac83c244b0a7cbbd5daca0",
+  "canonical_before": {
+    "kernel/sys.c": "557a4d61afbe418aa15381d701ea347ab8b1312654e84daa38aedce632846f0b",
+    "fs/pipe.c": "4d6078c420a4f46c98330f77311159dd04ea052ab7c249beef263812b09afe12",
+    "kernel/futex/syscalls.c": "c907028ea82d2de42b8b25cc5f8a5436a4b53b3c0320d0ad55acb4bdabc38a55",
+    "include/uapi/linux/prctl.h": "ff3db3a513963db6902e9fd5d60fee9e21c4056bcea298a624fad0de830d00bf",
+    ".config": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+    "include/generated/autoconf.h": "775c229bfea58352b28df78179e9f1d255ccbfaaac7668efe9023f08d1130157",
+    "include/config/auto.conf": "6dd783bc55ddc19b6c73ec1b6705e9986b923699d4cce19226a894d2fd6fa61d",
+    "kernel/.sys.o.cmd": "42d9a1c4921997a653fd9a9b7df65938e0356c1ecd5dc1bfd2b1918e57bb58b8",
+    "usr/initramfs_inc_data": "83034d329c2fed13822c9b4744deae8ce3fd6f48964ec7298201a24dd7521745",
+    "usr/.initramfs_inc_data.cmd": "fd919646b108affe228250f8c10f84374f83f9f55c765eb9081c3930328b9a69",
+    "arch/riscv/kernel/traps.c": "e0208343d59bfad9a64eeeafd1f8624147f68e203268aa600ea2d5e24aac0718",
+    "arch/riscv/mm/extable.c": "b5d014b6f8254a398c81d0a580882551211d7584d94e97e5dd1e4179c741d976",
+    "arch/riscv/include/asm/asm-extable.h": "a1144c5f76ad11c933b25c14702955c0f207ad573e2ff7593e91d287bc20abf6"
+  },
+  "accepted_cpio": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+    "sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+    "bytes": 8194560
+  },
+  "ram_inputs": "/dev/shm/zp-linux-resume-capacity-20261120/linux-retention-accepted-inputs",
+  "env": {
+    "ARCH": "riscv",
+    "CROSS_COMPILE": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-",
+    "BR_BINARIES_DIR": "/dev/shm/zp-linux-resume-capacity-20261120/linux-retention-accepted-inputs",
+    "TMPDIR": "/dev/shm/zp-linux-resume-capacity-20261120/linux-retention-accepted-inputs/tmp",
+    "CCACHE_DISABLE": "1",
+    "KBUILD_BUILD_VERSION": "28",
+    "KBUILD_BUILD_TIMESTAMP": "Fri Nov 20 15:11:06 EST 2026",
+    "KBUILD_BUILD_USER": "coyang",
+    "KBUILD_BUILD_HOST": "blackparrot1"
+  },
+  "uts_before": "#define UTS_VERSION \"#28 SMP Fri Nov 20 15:11:06 EST 2026\"\n",
+  "version_file_before": "28",
+  "config_before_sha256": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+  "patched_source_before_sha256": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb",
+  "command": [
+    "make",
+    "-C",
+    "/dev/shm/zp-linux-resume-capacity-20261120/linux-retention-kernel",
+    "-j8",
+    "ARCH=riscv",
+    "CROSS_COMPILE=/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-",
+    "V=1",
+    "vmlinux"
+  ],
+  "exit_code": 0,
+  "seconds": 35.93268132209778,
+  "canonical_after": {
+    "kernel/sys.c": "557a4d61afbe418aa15381d701ea347ab8b1312654e84daa38aedce632846f0b",
+    "fs/pipe.c": "4d6078c420a4f46c98330f77311159dd04ea052ab7c249beef263812b09afe12",
+    "kernel/futex/syscalls.c": "c907028ea82d2de42b8b25cc5f8a5436a4b53b3c0320d0ad55acb4bdabc38a55",
+    "include/uapi/linux/prctl.h": "ff3db3a513963db6902e9fd5d60fee9e21c4056bcea298a624fad0de830d00bf",
+    ".config": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+    "include/generated/autoconf.h": "775c229bfea58352b28df78179e9f1d255ccbfaaac7668efe9023f08d1130157",
+    "include/config/auto.conf": "6dd783bc55ddc19b6c73ec1b6705e9986b923699d4cce19226a894d2fd6fa61d",
+    "kernel/.sys.o.cmd": "42d9a1c4921997a653fd9a9b7df65938e0356c1ecd5dc1bfd2b1918e57bb58b8",
+    "usr/initramfs_inc_data": "83034d329c2fed13822c9b4744deae8ce3fd6f48964ec7298201a24dd7521745",
+    "usr/.initramfs_inc_data.cmd": "fd919646b108affe228250f8c10f84374f83f9f55c765eb9081c3930328b9a69",
+    "arch/riscv/kernel/traps.c": "e0208343d59bfad9a64eeeafd1f8624147f68e203268aa600ea2d5e24aac0718",
+    "arch/riscv/mm/extable.c": "b5d014b6f8254a398c81d0a580882551211d7584d94e97e5dd1e4179c741d976",
+    "arch/riscv/include/asm/asm-extable.h": "a1144c5f76ad11c933b25c14702955c0f207ad573e2ff7593e91d287bc20abf6"
+  },
+  "uts_after": "#define UTS_VERSION \"#28 SMP Fri Nov 20 15:11:06 EST 2026\"\n",
+  "version_file_after": "28",
+  "artifacts": {
+    "vmlinux": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-vmlinux",
+      "sha256": "4951f1e68c227e765498943946e16aad05306158976cd20c1ffc20a982a7966d",
+      "bytes": 22075832
+    },
+    "System.map": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-System.map",
+      "sha256": "77f1dba3564ba5736c4496196e92943e1690884e5d309f21e17e1d24997be9be",
+      "bytes": 2428133
+    },
+    "usr/initramfs_inc_data": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-initramfs_inc_data",
+      "sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+      "bytes": 3303052
+    },
+    "usr/.initramfs_inc_data.cmd": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-initramfs.cmd",
+      "sha256": "5cf72ced001d8b30396e68a9beea0fef3eae826111288c0a668bdef6ad3740da",
+      "bytes": 167
+    },
+    ".config": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-config",
+      "sha256": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+      "bytes": 105151
+    },
+    "kernel/sys.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.c",
+      "sha256": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb",
+      "bytes": 78666
+    },
+    "kernel/sys.o": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.o",
+      "sha256": "c26eed18159053fe2947d5c4454438e2a1e77a6ee9c43201e75cb4484b343f86",
+      "bytes": 100784
+    },
+    "kernel/.sys.o.cmd": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-sys.o.cmd",
+      "sha256": "c49ec36548570dd66e5d4a883b8ddfba2e5db39f7f45948e30f7060ed63c9bb8",
+      "bytes": 55739
+    }
+  },
+  "decompressed_cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+  "decompressed_cpio_bytes": 8194560,
+  "compressed_matches_original": true,
+  "build_log": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-build.log",
+    "sha256": "de88a71aa0bc937855475e83f4505e33dd0f805beb27cc6a465a4af9c9663a30",
+    "bytes": 75873
+  }
+}

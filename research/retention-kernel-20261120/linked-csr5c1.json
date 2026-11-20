@@ -1,0 +1,42 @@
+{
+  "command": [
+    "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+    "-d",
+    "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/link-vmlinux"
+  ],
+  "scope": "all executable ELF sections; includes 2-byte instruction alignment",
+  "matches": [
+    {
+      "address": "0xffffffff80020e9e",
+      "word": "0x5c102773",
+      "asm": "csrr\ta4,0x5c1",
+      "functions": [
+        "bp_icache_retention_probe"
+      ],
+      "funct3": 2,
+      "rd": 14,
+      "rs1": 0,
+      "next_instruction": {
+        "address": "0xffffffff80020ea2",
+        "word": "0xeb81",
+        "asm": "bnez\ta5,ffffffff80020eb2 <bp_icache_retention_probe+0x1e>"
+      }
+    },
+    {
+      "address": "0xffffffff800245ca",
+      "word": "0x5c199073",
+      "asm": "csrw\t0x5c1,s3",
+      "functions": [
+        "__do_sys_prctl"
+      ],
+      "funct3": 1,
+      "rd": 0,
+      "rs1": 19,
+      "next_instruction": {
+        "address": "0xffffffff800245ce",
+        "word": "0x100f",
+        "asm": "fence.i"
+      }
+    }
+  ]
+}

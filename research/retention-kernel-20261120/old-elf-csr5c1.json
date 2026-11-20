@@ -1,0 +1,209 @@
+{
+  "scope": "exact accepted old payload bound by objcopy from archived stripped ELF; disassemble all executable sections including 2-byte instruction alignment",
+  "source": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/images/vmlinux-stripped",
+  "snapshot": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf",
+  "old_elf_sha256": "0792746ba2caf6b2370d923319187f62243c8a0262c876c19a18e2946257d4a3",
+  "conversion_command": [
+    "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+    "-O",
+    "binary",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped-reconstructed.bin"
+  ],
+  "reconstructed_payload_sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+  "expected_old_payload_sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+  "image_lma_base": "0x0",
+  "sections": [
+    {
+      "name": ".head.text",
+      "bytes": 7824,
+      "vma": "0xffffffff80000000",
+      "lma": "0x0",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, CODE"
+    },
+    {
+      "name": ".text",
+      "bytes": 8489608,
+      "vma": "0xffffffff80002000",
+      "lma": "0x2000",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, CODE"
+    },
+    {
+      "name": ".init.text",
+      "bytes": 234460,
+      "vma": "0xffffffff80a00000",
+      "lma": "0xa00000",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, CODE"
+    },
+    {
+      "name": ".exit.text",
+      "bytes": 6830,
+      "vma": "0xffffffff80a393e0",
+      "lma": "0xa393e0",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, CODE"
+    },
+    {
+      "name": ".init.data",
+      "bytes": 3378504,
+      "vma": "0xffffffff80c00000",
+      "lma": "0xc00000",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": ".init.pi",
+      "bytes": 9494,
+      "vma": "0xffffffff80f38d48",
+      "lma": "0xf38d48",
+      "flags": "CONTENTS, ALLOC, LOAD, CODE"
+    },
+    {
+      "name": ".init.bss",
+      "bytes": 64,
+      "vma": "0xffffffff80f3b260",
+      "lma": "0xf3b260",
+      "flags": "ALLOC"
+    },
+    {
+      "name": ".data..percpu",
+      "bytes": 37944,
+      "vma": "0xffffffff80f3c000",
+      "lma": "0xf3c000",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": ".alternative",
+      "bytes": 2288,
+      "vma": "0xffffffff80f45438",
+      "lma": "0xf45438",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": ".rodata",
+      "bytes": 2738584,
+      "vma": "0xffffffff81000000",
+      "lma": "0x1000000",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": ".pci_fixup",
+      "bytes": 16224,
+      "vma": "0xffffffff8129c998",
+      "lma": "0x129c998",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": "__ksymtab",
+      "bytes": 121800,
+      "vma": "0xffffffff812a08f8",
+      "lma": "0x12a08f8",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": "__ksymtab_gpl",
+      "bytes": 111240,
+      "vma": "0xffffffff812be4c0",
+      "lma": "0x12be4c0",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": "__ksymtab_strings",
+      "bytes": 188827,
+      "vma": "0xffffffff812d9748",
+      "lma": "0x12d9748",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": "__param",
+      "bytes": 12080,
+      "vma": "0xffffffff813078e8",
+      "lma": "0x13078e8",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": "__modver",
+      "bytes": 504,
+      "vma": "0xffffffff8130a818",
+      "lma": "0x130a818",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": "__ex_table",
+      "bytes": 6552,
+      "vma": "0xffffffff8130aa10",
+      "lma": "0x130aa10",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": ".notes",
+      "bytes": 84,
+      "vma": "0xffffffff8130c3a8",
+      "lma": "0x130c3a8",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": ".srodata",
+      "bytes": 1952,
+      "vma": "0xffffffff81400000",
+      "lma": "0x1400000",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": ".data",
+      "bytes": 868816,
+      "vma": "0xffffffff81600000",
+      "lma": "0x1600000",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": "__bug_table",
+      "bytes": 92760,
+      "vma": "0xffffffff816d41d0",
+      "lma": "0x16d41d0",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": ".sdata",
+      "bytes": 3620,
+      "vma": "0xffffffff816eac28",
+      "lma": "0x16eac28",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": ".got",
+      "bytes": 32,
+      "vma": "0xffffffff816eba50",
+      "lma": "0x16eba50",
+      "flags": "CONTENTS, ALLOC, LOAD, DATA"
+    },
+    {
+      "name": ".pecoff_edata_padding",
+      "bytes": 400,
+      "vma": "0xffffffff816eba70",
+      "lma": "0x16eba70",
+      "flags": "CONTENTS, ALLOC, LOAD, READONLY, DATA"
+    },
+    {
+      "name": ".sbss",
+      "bytes": 8189,
+      "vma": "0xffffffff816ec000",
+      "lma": "0x16ec000",
+      "flags": "ALLOC"
+    },
+    {
+      "name": ".bss",
+      "bytes": 389872,
+      "vma": "0xffffffff816ee000",
+      "lma": "0x16ee000",
+      "flags": "ALLOC"
+    },
+    {
+      "name": ".comment",
+      "bytes": 46,
+      "vma": "0x0",
+      "lma": "0x0",
+      "flags": "CONTENTS, READONLY"
+    }
+  ],
+  "executable_csr5c1_matches": [],
+  "result": "NO_EXECUTABLE_CSR5C1"
+}

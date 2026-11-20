@@ -1,0 +1,11 @@
+{
+  "scope": "host-only wrapped ABI microprobe with real fork/wait; no hardware, credentials or SDK changed",
+  "command": "python3 -m unittest discover -s linux-tests -p test_icache_retention_probe.py -q",
+  "tests": 4,
+  "result": "PASS",
+  "rejected_fixture": {
+    "symptom": "initial mock compilation failed before any tests",
+    "cause": "a string.h include was emitted before the mock _GNU_SOURCE definition, disabling GNU/POSIX declarations in strict C11",
+    "correction": "_GNU_SOURCE now precedes all mock includes; no pre-fix runtime results accepted"
+  }
+}

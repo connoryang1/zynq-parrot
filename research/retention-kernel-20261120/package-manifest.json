@@ -1,0 +1,189 @@
+{
+  "state": "diagnostic-prepared-sdk-rootfs-only",
+  "scope": "reversible offline kernel replacement; no boot, old-hardware fallback or performance acceptance",
+  "source_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/linux-prefix32-futex-usersyscall-shell.nbf",
+    "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "bytes": 70904691
+  },
+  "candidate_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/linux-prefix32-retention27-shell.nbf",
+    "sha256": "ac19d09fb014d1ffd4a1c2974a4035cc37ffaf334f33dc89f8def5641f6777bd",
+    "bytes": 71282794
+  },
+  "old_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/old-kernel-from-ef50.bin",
+    "sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+    "bytes": 24034304
+  },
+  "new_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/vmlinux.bin",
+    "sha256": "ea02f79ad9c1f9524cf912d5ca6748a6bfa588983b9163cc17e79557e6977882",
+    "bytes": 24034304
+  },
+  "candidate_extracted_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/new-kernel-extracted.bin",
+    "sha256": "ea02f79ad9c1f9524cf912d5ca6748a6bfa588983b9163cc17e79557e6977882",
+    "bytes": 24034304
+  },
+  "reverse_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/reverse-to-ef50.nbf",
+    "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "bytes": 70904691
+  },
+  "linked_elf": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/link-vmlinux",
+    "sha256": "6616df2494f0ae227df40751aa76e7edd1f77656830487e21456d00d856c6467",
+    "bytes": 22157752
+  },
+  "stripped_elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/vmlinux-stripped",
+    "sha256": "0827e3b420fea3fef05d59cd075f08b4642c1db16b1d34d8bdbea5f65ae7844c",
+    "bytes": 18412672
+  },
+  "configuration": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/input-.config",
+    "sha256": "0993bc8c2626df752520634f78a3826c952a269dfb09871541e4b1fbe0e53cd8",
+    "bytes": 105151
+  },
+  "source_patch": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/kernel-patches/0027-blackparrot-icache-retention-control.patch",
+    "sha256": "c48971940f38c27493d95fbff9e2e905c794550efe839625b9d1d1a38981dbd3",
+    "bytes": 3506
+  },
+  "build_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/manifest.json",
+    "sha256": "b1360acf4caeeffc21cb2ccad0c3a724253256d4031793a7c6ac6625347f8c13",
+    "bytes": 7001
+  },
+  "object_review": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/object-review.json",
+    "sha256": "48e00b37542c6a64d4ae59beafffaeb40b0c6f0a05b61c8493019d51d4447dd9",
+    "bytes": 1830
+  },
+  "conversion_commands": [
+    [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-strip",
+      "-o",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/conversion-verification-kjh17_d9/vmlinux-stripped",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/link-vmlinux"
+    ],
+    [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+      "-O",
+      "binary",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/conversion-verification-kjh17_d9/vmlinux-stripped",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/conversion-verification-kjh17_d9/vmlinux.bin"
+    ]
+  ],
+  "config_rootfs_unchanged": true,
+  "embedded_rootfs_cpio_sha256": "ac6afe2de4e786e2a63109d5ea0867878d888693c4ac83c244b0a7cbbd5daca0",
+  "compressed_rootfs": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/link-usr_initramfs_inc_data",
+    "sha256": "83034d329c2fed13822c9b4744deae8ce3fd6f48964ec7298201a24dd7521745",
+    "bytes": 3384497
+  },
+  "extraction": {
+    "base": 2149580800,
+    "bytes": 24034304,
+    "records": 1899285
+  },
+  "forward_splice": {
+    "base": 2149580800,
+    "bytes": 24034304,
+    "old_records": 1899285,
+    "new_records": 1909504,
+    "preserved_records": 17058
+  },
+  "reverse_splice": {
+    "base": 2149580800,
+    "bytes": 24034304,
+    "old_records": 1909504,
+    "new_records": 1899285,
+    "preserved_records": 17058
+  },
+  "preserved_nonkernel_collateral": {
+    "records": 17058,
+    "ordered_bytes_sha256": "fc6b8becc65aa2709c91fc48f6ca0e437f2cbd393d07bdc674a239dbd2f7ff8d"
+  },
+  "csr5c1_executable_uses": {
+    "command": [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+      "-d",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/link-vmlinux"
+    ],
+    "scope": "all executable ELF sections; includes 2-byte instruction alignment",
+    "matches": [
+      {
+        "address": "0xffffffff80020e9e",
+        "word": "0x5c102773",
+        "asm": "csrr\ta4,0x5c1",
+        "functions": [
+          "bp_icache_retention_probe"
+        ],
+        "funct3": 2,
+        "rd": 14,
+        "rs1": 0,
+        "next_instruction": {
+          "address": "0xffffffff80020ea2",
+          "word": "0xeb81",
+          "asm": "bnez\ta5,ffffffff80020eb2 <bp_icache_retention_probe+0x1e>"
+        }
+      },
+      {
+        "address": "0xffffffff800245ca",
+        "word": "0x5c199073",
+        "asm": "csrw\t0x5c1,s3",
+        "functions": [
+          "__do_sys_prctl"
+        ],
+        "funct3": 1,
+        "rd": 0,
+        "rs1": 19,
+        "next_instruction": {
+          "address": "0xffffffff800245ce",
+          "word": "0x100f",
+          "asm": "fence.i"
+        }
+      }
+    ]
+  },
+  "baseline_csr_scan": {
+    "command": [
+      "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/check_nbf_csr_collisions.sh",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/linux-prefix32-futex-usersyscall-shell.nbf",
+      "5c1"
+    ],
+    "result": "PASS",
+    "scope": "32-bit words at 4-byte-aligned NBF positions only; not complete RVC instruction coverage"
+  },
+  "qualification": "Preserved shared-prefix table is byte-identical; this does not establish its usefulness for the new kernel.",
+  "config_rootfs_unchanged_scope": "configuration and rootfs preserved from prepared canonical SDK input; not from accepted source NBF",
+  "accepted_source_embedded_rootfs": {
+    "cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+    "cpio_bytes": 8194560,
+    "compressed_sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf"
+  },
+  "embedded_rootfs_matches_accepted_source": false,
+  "rootfs_scope_correction": "New kernel preserves its prepared SDK rootfs, which differs from ef50 accepted-image rootfs. Cross-image performance differences cannot be attributed solely to retention.",
+  "offline_splice_verified": true,
+  "deployment_status": "PENDING: restore accepted rootfs, relink helper kernel, reconvert and repackage before any deployment acceptance",
+  "accepted_rootfs_extraction": {
+    "state": "exact-accepted-rootfs-extracted",
+    "source_payload": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/old-kernel-from-ef50.bin",
+    "source_payload_sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+    "source_nbf_sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "gzip_offset_in_kernel_payload": "0xc126b0",
+    "gzip_end_exclusive": "0xf38d3c",
+    "gzip_physical_start": "0x80e126b0",
+    "compressed_path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio.gz",
+    "compressed_bytes": 3303052,
+    "compressed_sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+    "cpio_path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+    "cpio_bytes": 8194560,
+    "cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+    "validation": "gzip CRC and uncompressed size validated; newc CPIO magic070701/070702 checked during discovery",
+    "next_gate": "root relinks isolated helper kernel against accepted CPIO; no kernel build performed here"
+  },
+  "acceptance_scope_correction": "ac19 candidate is a prepared-SDK-rootfs diagnostic, not an accepted deployable control"
+}

@@ -1,0 +1,710 @@
+{
+  "scope": "feature engagement / consumption, not speedup",
+  "sampling": "stable values before actual BE rising edges",
+  "window": "commit of source global-cycle CSR reads; diagnostic boundary only",
+  "timescale": "1ps",
+  "capture_parameter_observed": [
+    1
+  ],
+  "fill_beats_per_line": 8,
+  "stats": {
+    "accepted_cached_misses": 39,
+    "accepted_capture_beats": 312,
+    "registered_capture_writes": 312,
+    "completion_epochs": 39,
+    "consumed_cache_fetches": 6253,
+    "timed_prefix_consumed_fetches": 50,
+    "timed_prefix_cache_fetches": 50
+  },
+  "timed_stats": {
+    "consumed_cache_fetches": 70,
+    "accepted_cached_misses": 8,
+    "accepted_capture_beats": 64,
+    "registered_capture_writes": 64,
+    "completion_epochs": 8,
+    "timed_prefix_consumed_fetches": 50,
+    "timed_prefix_cache_fetches": 50
+  },
+  "timed_boundaries": [
+    {
+      "kind": "begin",
+      "cycle": 246323,
+      "timestamp": 12316175000,
+      "pc": "0x8000040c"
+    },
+    {
+      "kind": "end",
+      "cycle": 248267,
+      "timestamp": 12413375000,
+      "pc": "0x80000414"
+    }
+  ],
+  "timed_commit_window_cycles": 1944,
+  "max_complete_entries": 27,
+  "prefix_complete_at_begin": [],
+  "distinct_captured_lines": 39,
+  "distinct_completed_lines": 39,
+  "captured_beats_by_line": {
+    "0x80000000": 8,
+    "0x80000040": 8,
+    "0x80000080": 8,
+    "0x800000c0": 8,
+    "0x80000100": 8,
+    "0x800001c0": 8,
+    "0x80000200": 8,
+    "0x80000240": 8,
+    "0x80000280": 8,
+    "0x80000300": 8,
+    "0x80000340": 8,
+    "0x80000380": 8,
+    "0x800003c0": 8,
+    "0x80000400": 8,
+    "0x80000440": 8,
+    "0x80000480": 8,
+    "0x800004c0": 8,
+    "0x80001000": 8,
+    "0x80001040": 8,
+    "0x80001080": 8,
+    "0x800010c0": 8,
+    "0x80001100": 8,
+    "0x80001140": 8,
+    "0x80001180": 8,
+    "0x80002600": 8,
+    "0x80002640": 8,
+    "0x80002680": 8,
+    "0x800026c0": 8,
+    "0x80002700": 8,
+    "0x80002740": 8,
+    "0x80002780": 8,
+    "0x800049c0": 8,
+    "0x80006fc0": 8,
+    "0x80007000": 8,
+    "0x80007040": 8,
+    "0x80007080": 8,
+    "0x800070c0": 8,
+    "0x80007100": 8,
+    "0x80007140": 8
+  },
+  "completed_epochs_by_line": {
+    "0x80000000": 1,
+    "0x80000040": 1,
+    "0x80000080": 1,
+    "0x800000c0": 1,
+    "0x80000100": 1,
+    "0x800001c0": 1,
+    "0x80000200": 1,
+    "0x80000240": 1,
+    "0x80000280": 1,
+    "0x80000300": 1,
+    "0x80000340": 1,
+    "0x80000380": 1,
+    "0x800003c0": 1,
+    "0x80000400": 1,
+    "0x80000440": 1,
+    "0x80000480": 1,
+    "0x800004c0": 1,
+    "0x80001000": 1,
+    "0x80001040": 1,
+    "0x80001080": 1,
+    "0x800010c0": 1,
+    "0x80001100": 1,
+    "0x80001140": 1,
+    "0x80001180": 1,
+    "0x80002600": 1,
+    "0x80002640": 1,
+    "0x80002680": 1,
+    "0x800026c0": 1,
+    "0x80002700": 1,
+    "0x80002740": 1,
+    "0x80002780": 1,
+    "0x800049c0": 1,
+    "0x80006fc0": 1,
+    "0x80007000": 1,
+    "0x80007040": 1,
+    "0x80007080": 1,
+    "0x800070c0": 1,
+    "0x80007100": 1,
+    "0x80007140": 1
+  },
+  "consumed_side_fetches_by_line": {},
+  "timed_side_fetches_by_line": {},
+  "timed_cache_fetches_by_line": {
+    "0x80000300": 3,
+    "0x80000340": 3,
+    "0x80000380": 10,
+    "0x80000400": 4,
+    "0x80001000": 8,
+    "0x80001040": 8,
+    "0x80001080": 8,
+    "0x800010c0": 8,
+    "0x80001100": 8,
+    "0x80001140": 8,
+    "0x80001180": 2
+  },
+  "final_complete_lines": {
+    "0": "0x80000000",
+    "1": "0x80000080",
+    "2": "0x80000100",
+    "3": "0x80000400",
+    "4": "0x80000480",
+    "8": "0x80000040",
+    "9": "0x800000c0",
+    "10": "0x800001c0",
+    "11": "0x800049c0",
+    "12": "0x80000440",
+    "13": "0x800004c0",
+    "16": "0x80001000",
+    "17": "0x80001080",
+    "18": "0x80001100",
+    "19": "0x80001180",
+    "20": "0x80007100",
+    "21": "0x80007080",
+    "22": "0x80007000",
+    "23": "0x80000380",
+    "24": "0x80001140",
+    "25": "0x80007140",
+    "26": "0x800070c0",
+    "27": "0x80007040",
+    "28": "0x80006fc0",
+    "29": "0x80000340",
+    "30": "0x80001040",
+    "31": "0x800010c0"
+  },
+  "prefix_events": [
+    {
+      "event": "capture",
+      "cycle": 246790,
+      "line": "0x80001000",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246791,
+      "line": "0x80001000",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246792,
+      "line": "0x80001000",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246793,
+      "line": "0x80001000",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246794,
+      "line": "0x80001000",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246795,
+      "line": "0x80001000",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246796,
+      "line": "0x80001000",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 246797,
+      "line": "0x80001000",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 246799,
+      "line": "0x80001000",
+      "slot": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247029,
+      "line": "0x80001040",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247030,
+      "line": "0x80001040",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247031,
+      "line": "0x80001040",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247032,
+      "line": "0x80001040",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247033,
+      "line": "0x80001040",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247034,
+      "line": "0x80001040",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247035,
+      "line": "0x80001040",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247036,
+      "line": "0x80001040",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 247038,
+      "line": "0x80001040",
+      "slot": 30,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247268,
+      "line": "0x80001080",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247269,
+      "line": "0x80001080",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247270,
+      "line": "0x80001080",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247271,
+      "line": "0x80001080",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247272,
+      "line": "0x80001080",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247273,
+      "line": "0x80001080",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247274,
+      "line": "0x80001080",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247275,
+      "line": "0x80001080",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 247277,
+      "line": "0x80001080",
+      "slot": 17,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247507,
+      "line": "0x800010c0",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247508,
+      "line": "0x800010c0",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247509,
+      "line": "0x800010c0",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247510,
+      "line": "0x800010c0",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247511,
+      "line": "0x800010c0",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247512,
+      "line": "0x800010c0",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247513,
+      "line": "0x800010c0",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247514,
+      "line": "0x800010c0",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 247516,
+      "line": "0x800010c0",
+      "slot": 31,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247746,
+      "line": "0x80001100",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247747,
+      "line": "0x80001100",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247748,
+      "line": "0x80001100",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247749,
+      "line": "0x80001100",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247750,
+      "line": "0x80001100",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247751,
+      "line": "0x80001100",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247752,
+      "line": "0x80001100",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247753,
+      "line": "0x80001100",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 247755,
+      "line": "0x80001100",
+      "slot": 18,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247985,
+      "line": "0x80001140",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247986,
+      "line": "0x80001140",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247987,
+      "line": "0x80001140",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247988,
+      "line": "0x80001140",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247989,
+      "line": "0x80001140",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247990,
+      "line": "0x80001140",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247991,
+      "line": "0x80001140",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 247992,
+      "line": "0x80001140",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 247994,
+      "line": "0x80001140",
+      "slot": 24,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248224,
+      "line": "0x80001180",
+      "mask": 1,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248225,
+      "line": "0x80001180",
+      "mask": 2,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248226,
+      "line": "0x80001180",
+      "mask": 4,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248227,
+      "line": "0x80001180",
+      "mask": 8,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248228,
+      "line": "0x80001180",
+      "mask": 16,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248229,
+      "line": "0x80001180",
+      "mask": 32,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248230,
+      "line": "0x80001180",
+      "mask": 64,
+      "timed": true
+    },
+    {
+      "event": "capture",
+      "cycle": 248231,
+      "line": "0x80001180",
+      "mask": 128,
+      "timed": true
+    },
+    {
+      "event": "complete",
+      "cycle": 248233,
+      "line": "0x80001180",
+      "slot": 19,
+      "timed": true
+    }
+  ],
+  "provenance_issues": [],
+  "signals": {
+    "clock": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.clk_i",
+    "reset": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.reset_i",
+    "commit_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.commit_pkt_cast_o.instret",
+    "commit_pc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.commit_pkt_cast_o.pc",
+    "enabled": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_demand_capture_p",
+    "abort": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.miss_abort_i",
+    "hit_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.hit_v_o",
+    "hit_yumi": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.yumi_i",
+    "req_yumi": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.cache_req_yumi_i",
+    "data_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.data_mem_pkt_v_i",
+    "data_yumi": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.data_mem_pkt_yumi_o",
+    "abort_inflight": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.abort_inflight",
+    "data_addr": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.addr",
+    "data_fill": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.fill_index",
+    "data_opcode": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.opcode",
+    "fetch_addr": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.paddr_tv_r",
+    "cache_hit": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.cache_hit_v_tv",
+    "alloc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_alloc_r",
+    "addr0": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[0]",
+    "addr1": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[1]",
+    "addr2": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[2]",
+    "addr3": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[3]",
+    "addr4": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[4]",
+    "addr5": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[5]",
+    "addr6": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[6]",
+    "addr7": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[7]",
+    "addr8": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[8]",
+    "addr9": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[9]",
+    "addr10": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[10]",
+    "addr11": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[11]",
+    "addr12": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[12]",
+    "addr13": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[13]",
+    "addr14": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[14]",
+    "addr15": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[15]",
+    "addr16": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[16]",
+    "addr17": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[17]",
+    "addr18": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[18]",
+    "addr19": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[19]",
+    "addr20": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[20]",
+    "addr21": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[21]",
+    "addr22": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[22]",
+    "addr23": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[23]",
+    "addr24": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[24]",
+    "addr25": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[25]",
+    "addr26": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[26]",
+    "addr27": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[27]",
+    "addr28": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[28]",
+    "addr29": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[29]",
+    "addr30": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[30]",
+    "addr31": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_addr_r[31]",
+    "beat0": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[0]",
+    "beat1": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[1]",
+    "beat2": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[2]",
+    "beat3": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[3]",
+    "beat4": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[4]",
+    "beat5": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[5]",
+    "beat6": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[6]",
+    "beat7": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[7]",
+    "beat8": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[8]",
+    "beat9": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[9]",
+    "beat10": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[10]",
+    "beat11": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[11]",
+    "beat12": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[12]",
+    "beat13": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[13]",
+    "beat14": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[14]",
+    "beat15": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[15]",
+    "beat16": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[16]",
+    "beat17": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[17]",
+    "beat18": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[18]",
+    "beat19": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[19]",
+    "beat20": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[20]",
+    "beat21": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[21]",
+    "beat22": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[22]",
+    "beat23": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[23]",
+    "beat24": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[24]",
+    "beat25": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[25]",
+    "beat26": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[26]",
+    "beat27": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[27]",
+    "beat28": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[28]",
+    "beat29": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[29]",
+    "beat30": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[30]",
+    "beat31": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_beat_v_r[31]",
+    "buffer_hit": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_hit_tv",
+    "req_addr": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.cache_req_cast_o.addr",
+    "cached_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.cached_req",
+    "capture_active": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.demand_capture_active_r",
+    "capture_input": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.demand_capture_input",
+    "buffer_write_addr": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_pkt_r.addr",
+    "buffer_write_demand": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_pkt_demand_r",
+    "buffer_write": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_write",
+    "buffer_write_slot": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.replay_buffer_write_slot"
+  }
+}

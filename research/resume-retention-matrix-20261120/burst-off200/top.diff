@@ -1,0 +1,330 @@
+diff --git a/tools/run_resume_retention_matrix.py b/tools/run_resume_retention_matrix.py
+index 1e539027..e1e0f049 100644
+--- a/tools/run_resume_retention_matrix.py
++++ b/tools/run_resume_retention_matrix.py
+@@ -12,6 +12,7 @@ import os
+ from pathlib import Path
+ import re
+ import resource
++import shlex
+ import shutil
+ import subprocess
+ import sys
+@@ -24,6 +25,10 @@ TEST = "mt_context_resume_prefix_benchmark"
+ MODEL = "Vbsg_nonsynth_zynq_testbench"
+ SCOPE = "Synthetic full-core nonresident instruction-prefix study; not Linux or FPGA performance."
+ TRANSPORTS = ("minimal-axil", "full-burst")
++BP_RTL_SOURCES = ("bp_fe/src/v/bp_fe_icache.sv",
++                  "bp_be/src/v/bp_be_calculator/bp_be_csr.sv")
++NBF_TOOL = "bp_common/software/py/nbf.py"
++NESTED_SOURCES = ("basejump_stl", "HardFloat", "bedrock")
+ 
+ 
+ def transport_scope(transport):
+@@ -58,7 +63,43 @@ def copy_verified(source, target):
+     return record(target)
+ 
+ 
+-def model_identity(directory, build_log, capture, latency, transport="minimal-axil"):
++def git_checkout(path):
++    """Never let Git discover an ancestor for an uninitialized submodule."""
++    path = path.resolve()
++    if not (path / ".git").exists():
++        raise ValueError(f"selected source lacks .git: {path}")
++    try:
++        top = subprocess.check_output(["git", "-C", str(path), "rev-parse", "--show-toplevel"], text=True).strip()
++        if Path(top).resolve() != path:
++            raise ValueError(f"selected Git root differs: {path}")
++        revision = subprocess.check_output(["git", "-C", str(path), "rev-parse", "HEAD"], text=True).strip()
++        diff = subprocess.check_output(["git", "-C", str(path), "diff", "HEAD", "--binary"])
++    except subprocess.CalledProcessError as error:
++        raise ValueError(f"invalid selected Git checkout: {path}") from error
++    return {"root": str(path), "revision": revision,
++            "diff_sha256": hashlib.sha256(diff).hexdigest(), "diff_bytes": len(diff)}
++
++
++def blackparrot_identity(bp):
++    """Bind selected source, ordinary nested gitlinks and the conversion tool."""
++    identity = git_checkout(bp)
++    identity["rtl_sources"] = [record(bp / name) for name in BP_RTL_SOURCES]
++    identity["nbf_tool"] = record(bp / NBF_TOOL)
++    identity["nested_sources"] = []
++    for name in NESTED_SOURCES:
++        relative = "external/" + name
++        entry = subprocess.check_output(["git", "-C", str(bp), "ls-tree", "HEAD", relative], text=True).split()
++        if len(entry) != 4 or entry[:2] != ["160000", "commit"]:
++            raise ValueError(f"missing selected BlackParrot gitlink: {relative}")
++        nested = git_checkout(bp / relative)
++        if nested["revision"] != entry[2] or nested["diff_bytes"]:
++            raise ValueError(f"nested source differs from selected gitlink: {relative}")
++        nested["gitlink_revision"] = entry[2]
++        identity["nested_sources"].append(nested)
++    return identity
++
++
++def model_identity(directory, build_log, capture, latency, transport="minimal-axil", bp=None):
+     """Check ifdef semantics and the maintained model stamp before any run."""
+     expected = (f".build_config-nt2-nc4-cfge_bp_custom_cfg-trace1"
+                 f"-axipipe-lat{latency}-q4" + ("-icapture" if capture == "on" else ""))
+@@ -103,15 +144,23 @@ def model_identity(directory, build_log, capture, latency, transport="minimal-ax
+         raise ValueError("build command capture mode does not match requested control")
+     design = "black-parrot-example" if full else "black-parrot-minimal-example"
+     required_sources = [ROOT / "cosim" / design / relative for relative in ("ps.cpp", "v/top.v")]
+-    tokens = commands[0].split()
++    tokens = shlex.split(commands[0])
+     if any(str(source) not in tokens for source in required_sources):
+         raise ValueError("build command host/RTL source does not match the selected transport")
++    bp = (bp or ROOT / "import/black-parrot").resolve()
++    for relative in BP_RTL_SOURCES:
++        actual = [Path(token).resolve() for token in tokens
++                  if token.endswith("/" + relative)]
++        if actual != [(bp / relative).resolve()]:
++            raise ValueError(f"model RTL source does not match selected BlackParrot root: {relative}")
++    selected_source = blackparrot_identity(bp)
+     if not (directory / "obj_dir" / MODEL).is_file():
+         raise ValueError("completed model binary is missing")
+     return {"stamp": expected, "verilator_command": commands[0],
+             "verilator_command_source": command_source, "defines": defines,
+             "physical_threads": 2, "logical_contexts": 4, "trace": "FST",
+             "capture": capture, "transport": transport,
++            "blackparrot_source": selected_source,
+             "transport_sources": [record(source) for source in required_sources],
+             "configured_axi_memory_latency_ticks": latency,
+             "memory_queue_depth": 4, "axi_data_width_bits": 64 if full else 32, "aclk_mhz": 20,
+@@ -191,6 +240,8 @@ def main(argv=None):
+     parser.add_argument("--output", type=Path, required=True)
+     parser.add_argument("--modes", type=int, choices=range(4), nargs="+", default=[0, 1, 2, 3])
+     parser.add_argument("--elf-from", type=Path, help="first session.json, binding one exact ELF and compiler command")
++    parser.add_argument("--bp", type=Path, default=ROOT / "import/black-parrot",
++                        help="exact BlackParrot checkout used by the completed model and NBF converter")
+     parser.add_argument("--toolchain", type=Path, default=Path("/home/coyang/zynq-parrot/install"))
+     parser.add_argument("--native-timeout", type=int, choices=(240, 600), default=240)
+     args = parser.parse_args(argv)
+@@ -199,7 +250,8 @@ def main(argv=None):
+     directory, output = args.model_dir.resolve(), args.output.resolve()
+     if output.exists():
+         parser.error("output must be new; retained evidence is never overwritten")
+-    identity = model_identity(directory, args.build_log, args.capture, args.latency, args.transport)
++    bp = args.bp.resolve()
++    identity = model_identity(directory, args.build_log, args.capture, args.latency, args.transport, bp)
+     output.mkdir(parents=True)
+     scope = transport_scope(args.transport)
+     state = {"scope": scope, "state": "preparing", "model": identity, "runs": []}
+@@ -222,10 +274,13 @@ def main(argv=None):
+         command_source["path"] = str(snapshot.resolve())
+         copy_verified(directory / "obj_dir" / identity["stamp"], model_dir / identity["stamp"])
+         copy_verified(Path(__file__).resolve(), output / "runner.py")
+-        for name, location in (("top", ROOT), ("blackparrot", ROOT / "import/black-parrot")):
++        for name, location in (("top", ROOT), ("blackparrot", bp)):
+             revision = subprocess.check_output(["git", "-C", str(location), "rev-parse", "HEAD"], text=True).strip()
+             state[name + "_revision"] = revision
+-            diff = subprocess.check_output(["git", "-C", str(location), "diff", "--binary"])
++            diff = subprocess.check_output(["git", "-C", str(location), "diff", "HEAD", "--binary"])
++            if name == "blackparrot" and (revision != identity["blackparrot_source"]["revision"]
++                    or hashlib.sha256(diff).hexdigest() != identity["blackparrot_source"]["diff_sha256"]):
++                raise ValueError("selected BlackParrot source changed before archival")
+             (output / (name + ".diff")).write_bytes(diff)
+ 
+         program = output / "program"
+@@ -267,7 +322,10 @@ def main(argv=None):
+             raise ValueError("ELF-to-memory conversion failed")
+         mem.write_text(mem.read_text().replace("@8", "@0"))
+         nbf = program / "prog.nbf"
+-        nbf_command = [sys.executable, str(ROOT / "import/black-parrot/bp_common/software/py/nbf.py"),
++        nbf_tool = bp / NBF_TOOL
++        if sha256(nbf_tool) != identity["blackparrot_source"]["nbf_tool"]["sha256"]:
++            raise ValueError("selected BlackParrot NBF tool changed during preparation")
++        nbf_command = [sys.executable, str(nbf_tool),
+                        "--skip_zeros", "--keep_mem_zeros", "--mem", str(mem), "--ncpus", "1"]
+         if args.transport == "full-burst":
+             nbf_command += ["--config", "--debug"]
+diff --git a/tools/test_run_resume_retention_matrix.py b/tools/test_run_resume_retention_matrix.py
+index 9c07acb6..2a5f6d81 100644
+--- a/tools/test_run_resume_retention_matrix.py
++++ b/tools/test_run_resume_retention_matrix.py
+@@ -1,11 +1,13 @@
+ """Check matrix identity and result validation without executing a simulator."""
+ from pathlib import Path
+ import tempfile
++import subprocess
++from unittest import mock
+ import unittest
+ 
+ from run_resume_retention_matrix import (
+     MODEL, ROOT, guest_metrics, model_identity, patch_full_nbf, runtime_control,
+-    sha256, transport_scope,
++    sha256, transport_scope, blackparrot_identity, git_checkout, main, BP_RTL_SOURCES, NBF_TOOL,
+ )
+ 
+ 
+@@ -19,6 +21,24 @@ class RetentionMatrixValidationTests(unittest.TestCase):
+         self.log = self.root / "build.log"
+         self.stamp = self.root / "obj_dir/.build_config-nt2-nc4-cfge_bp_custom_cfg-trace1-axipipe-lat40-q4-icapture"
+         self.stamp.touch()
++        self.bp = self.root / "selected-bp"
++        self.bp.mkdir()
++        self.git(self.bp, "init", "-q")
++        for relative in BP_RTL_SOURCES + (NBF_TOOL,):
++            path = self.bp / relative
++            path.parent.mkdir(parents=True, exist_ok=True)
++            path.write_text("selected source: " + relative + "\n")
++            self.git(self.bp, "add", relative)
++        for name in ("basejump_stl", "HardFloat", "bedrock"):
++            nested = self.bp / "external" / name
++            nested.mkdir(parents=True)
++            self.git(nested, "init", "-q")
++            (nested / "source.txt").write_text(name + " exact source\n")
++            self.git(nested, "add", "source.txt")
++            self.git(nested, "commit", "-qm", "nested source")
++            revision = self.git(nested, "rev-parse", "HEAD").strip()
++            self.git(self.bp, "update-index", "--add", "--cacheinfo", "160000," + revision + ",external/" + name)
++        self.git(self.bp, "commit", "-qm", "selected BP source")
+         self.command = (
+             "verilator --cc --trace-fst +define+BP_NUM_THREADS=2 "
+             "+define+BP_NUM_CONTEXTS=4 +define+BP_AXI_MEM_PIPELINED "
+@@ -27,30 +47,102 @@ class RetentionMatrixValidationTests(unittest.TestCase):
+             "+define+BP_AXI_MEM_READ_LATENCY=40 +define+BP_AXI_MEM_READ_QUEUE_DEPTH=4 "
+             "+define+BP_ICACHE_REPLAY_DEMAND_CAPTURE=0 "
+             + str(ROOT / "cosim/black-parrot-minimal-example/ps.cpp") + " "
+-            + str(ROOT / "cosim/black-parrot-minimal-example/v/top.v") + "\n")
++            + str(ROOT / "cosim/black-parrot-minimal-example/v/top.v") + " "
++            + " ".join(str(self.bp / path) for path in BP_RTL_SOURCES) + "\n")
+         self.log.write_text(self.command)
+ 
++    def git(self, path, *arguments):
++        return subprocess.check_output(["git", "-c", "user.name=Matrix Test", "-c",
++            "user.email=matrix@example.invalid", "-c", "commit.gpgsign=false", "-c",
++            "core.hooksPath=/dev/null", "-C", str(path)] + list(arguments), text=True)
++
++    def identity(self, *arguments, **keywords):
++        return model_identity(*arguments, bp=self.bp, **keywords)
++
++    def test_selected_git_identity_and_nbf_converter_are_bound(self):
++        parsed = self.identity(self.root, self.log, "on", 40)
++        source = parsed["blackparrot_source"]
++        self.assertEqual(source["root"], str(self.bp.resolve()))
++        self.assertEqual(source["revision"], self.git(self.bp, "rev-parse", "HEAD").strip())
++        self.assertEqual(source["diff_bytes"], 0)
++        self.assertEqual(source["nbf_tool"]["path"], str(self.bp / NBF_TOOL))
++        self.assertEqual(source["nbf_tool"]["sha256"], sha256(self.bp / NBF_TOOL))
++        self.assertEqual(len(source["nested_sources"]), 3)
++        self.assertTrue(all(row["revision"] == row["gitlink_revision"]
++                            for row in source["nested_sources"]))
++        # Record staged changes too; ordinary git diff alone would miss them.
++        (self.bp / NBF_TOOL).write_text("changed converter\n")
++        self.git(self.bp, "add", NBF_TOOL)
++        changed = blackparrot_identity(self.bp)
++        self.assertGreater(changed["diff_bytes"], 0)
++        self.assertNotEqual(changed["diff_sha256"], source["diff_sha256"])
++        self.assertNotEqual(changed["nbf_tool"]["sha256"], source["nbf_tool"]["sha256"])
++
++    def test_matching_stamp_rejects_mixed_or_wrong_actual_rtl_roots(self):
++        for relative in BP_RTL_SOURCES:
++            wrong = self.command.replace(str(self.bp / relative), str(ROOT / "import/black-parrot" / relative))
++            self.log.write_text(wrong)
++            with self.assertRaisesRegex(ValueError, "model RTL source"):
++                self.identity(self.root, self.log, "on", 40)
++        self.log.write_text(self.command.rstrip() + " " + str(ROOT / "import/black-parrot" / BP_RTL_SOURCES[0]) + "\n")
++        with self.assertRaises(ValueError):
++            self.identity(self.root, self.log, "on", 40)
++        self.log.write_text(self.command.replace(str(self.bp / BP_RTL_SOURCES[1]), ""))
++        with self.assertRaisesRegex(ValueError, "model RTL source"):
++            self.identity(self.root, self.log, "on", 40)
++
++    def test_uninitialized_source_cannot_discover_parent_git_checkout(self):
++        missing = self.bp / "uninitialized"
++        missing.mkdir()
++        with self.assertRaisesRegex(ValueError, "lacks .git"):
++            git_checkout(missing)
++        (self.bp / "external/HardFloat/.git").rename(self.root / "saved-hardfloat-git")
++        with self.assertRaisesRegex(ValueError, "lacks .git"):
++            blackparrot_identity(self.bp)
++
++    def test_changed_nested_content_or_revision_cannot_claim_pinned_identity(self):
++        nested = self.bp / "external/bedrock"
++        (nested / "source.txt").write_text("dirty nested source\n")
++        with self.assertRaisesRegex(ValueError, "differs from selected gitlink"):
++            blackparrot_identity(self.bp)
++        self.git(nested, "add", "source.txt")
++        self.git(nested, "commit", "-qm", "different nested revision")
++        with self.assertRaisesRegex(ValueError, "differs from selected gitlink"):
++            blackparrot_identity(self.bp)
++
++    def test_cli_default_and_explicit_bp_are_forwarded_before_any_execution(self):
++        for selected in (None, self.bp):
++            argv = ["--model-dir", str(self.root), "--build-log", str(self.log),
++                    "--capture", "on", "--latency", "40", "--output", str(self.root / "never-created")]
++            if selected is not None:
++                argv += ["--bp", str(selected)]
++            with mock.patch("run_resume_retention_matrix.model_identity", side_effect=ValueError("identity checked")) as check:
++                with self.assertRaisesRegex(ValueError, "identity checked"):
++                    main(argv)
++                self.assertEqual(check.call_args[0][-1], (selected or ROOT / "import/black-parrot").resolve())
++            self.assertFalse((self.root / "never-created").exists())
++
+     def test_macro_zero_is_enabled_ifdef_and_never_an_off_control(self):
+-        result = model_identity(self.root, self.log, "on", 40)
++        result = self.identity(self.root, self.log, "on", 40)
+         self.assertEqual(result["capture"], "on")
+         self.stamp.rename(self.stamp.with_name(self.stamp.name[:-len("-icapture")]))
+         with self.assertRaisesRegex(ValueError, "capture mode"):
+-            model_identity(self.root, self.log, "off", 40)
++            self.identity(self.root, self.log, "off", 40)
+ 
+     def test_rejects_model_stamp_latency_or_ambiguous_stamps(self):
+         with self.assertRaisesRegex(ValueError, "model stamps"):
+-            model_identity(self.root, self.log, "on", 200)
++            self.identity(self.root, self.log, "on", 200)
+         (self.root / "obj_dir/.build_config-stale").touch()
+         with self.assertRaisesRegex(ValueError, "ambiguous model stamps"):
+-            model_identity(self.root, self.log, "on", 40)
++            self.identity(self.root, self.log, "on", 40)
+ 
+     def test_rejects_build_command_topology_and_multiple_builds(self):
+         self.log.write_text(self.command.replace("BP_NUM_CONTEXTS=4", "BP_NUM_CONTEXTS=2"))
+         with self.assertRaisesRegex(ValueError, "topology/latency/depth"):
+-            model_identity(self.root, self.log, "on", 40)
++            self.identity(self.root, self.log, "on", 40)
+         self.log.write_text(self.command * 2)
+         with self.assertRaisesRegex(ValueError, "one exact"):
+-            model_identity(self.root, self.log, "on", 40)
++            self.identity(self.root, self.log, "on", 40)
+ 
+     def test_runtime_patch_and_checksum_are_bound_to_requested_mode(self):
+         text = (
+@@ -72,7 +164,7 @@ class RetentionMatrixValidationTests(unittest.TestCase):
+         # The real C record stores arguments without the executable name.
+         arguments = self.command.strip().split(" ", 1)[1]
+         verfiles.write_text('# Verilator dependency manifest\nC "' + arguments + '"\n')
+-        parsed = model_identity(self.root, self.log, "on", 40)
++        parsed = self.identity(self.root, self.log, "on", 40)
+         source = parsed["verilator_command_source"]
+         self.assertEqual(source["kind"], "verilator-command-record")
+         self.assertEqual(source["path"], str(verfiles.resolve()))
+@@ -90,7 +182,7 @@ class RetentionMatrixValidationTests(unittest.TestCase):
+             with self.subTest(command=replacement):
+                 verfiles.write_text('C "' + replacement.strip() + '"\n')
+                 with self.assertRaises(ValueError):
+-                    model_identity(self.root, self.log, "on", 40)
++                    self.identity(self.root, self.log, "on", 40)
+ 
+     def test_full_transport_binds_64_bit_gp_ports_and_actual_sources(self):
+         full_command = (self.command.replace("HP0_DATA_WIDTH=32", "HP0_DATA_WIDTH=64")
+@@ -98,7 +190,7 @@ class RetentionMatrixValidationTests(unittest.TestCase):
+                         .replace("--cc", "--cc +define+GP1_ENABLE=1 +define+GP2_ENABLE=1 "
+                                  "+define+HP1_ENABLE=1 +define+WATCHDOG_ENABLE"))
+         self.log.write_text(full_command)
+-        identity = model_identity(self.root, self.log, "on", 40, "full-burst")
++        identity = self.identity(self.root, self.log, "on", 40, "full-burst")
+         self.assertEqual(identity["axi_data_width_bits"], 64)
+         self.assertEqual(identity["transport"], "full-burst")
+         for wrong in (full_command.replace("HP0_DATA_WIDTH=64", "HP0_DATA_WIDTH=32"),
+@@ -107,7 +199,7 @@ class RetentionMatrixValidationTests(unittest.TestCase):
+             with self.subTest(command=wrong):
+                 self.log.write_text(wrong)
+                 with self.assertRaises(ValueError):
+-                    model_identity(self.root, self.log, "on", 40, "full-burst")
++                    self.identity(self.root, self.log, "on", 40, "full-burst")
+         self.assertIn("functional/capacity diagnostic only", transport_scope("minimal-axil"))
+ 
+     def test_offline_full_patch_reconstructs_exact_bytes_and_other_records(self):

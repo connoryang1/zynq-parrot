@@ -1,0 +1,125 @@
+{
+  "scope": "raw candidates retained; baseline stripped ELF is byte-bound to old accepted payload, all executable sections disassembled",
+  "old_elf_sha256": "0792746ba2caf6b2370d923319187f62243c8a0262c876c19a18e2946257d4a3",
+  "old_payload_sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+  "firmware_raw_sha256": "c7e557599e4b7eebaa33e62fc5b32b6848eee70e47d0b18d66640db99e9ef179",
+  "firmware_every_2byte_potential_encodings": [],
+  "kernel_raw_potential_encodings": [
+    {
+      "offset": "0xca9eba",
+      "address": "0x80ea9eba",
+      "word": "0x5c16cf73",
+      "funct3": 4,
+      "rd": 30,
+      "rs1": 13,
+      "classification": "potential encoding inside non-executable validated compressed CPIO initramfs",
+      "section": ".init.data",
+      "section_flags": "CONTENTS, ALLOC, LOAD, DATA",
+      "executable_section": false,
+      "valid_csr_funct3": false,
+      "validated_cpio_gzip_span": [
+        {
+          "offset": "0xc126b0",
+          "end_exclusive": "0xf38d3c",
+          "compressed_sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+          "decompressed_cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+          "decompressed_bytes": 8194560
+        }
+      ],
+      "isa_note": "funct3=4 is reserved SYSTEM, not a valid CSR operation; conservative predicate intentionally retained it"
+    },
+    {
+      "offset": "0xdf6dca",
+      "address": "0x80ff6dca",
+      "word": "0x5c1ebaf3",
+      "funct3": 3,
+      "rd": 21,
+      "rs1": 29,
+      "classification": "potential encoding inside non-executable validated compressed CPIO initramfs",
+      "section": ".init.data",
+      "section_flags": "CONTENTS, ALLOC, LOAD, DATA",
+      "executable_section": false,
+      "valid_csr_funct3": true,
+      "validated_cpio_gzip_span": [
+        {
+          "offset": "0xc126b0",
+          "end_exclusive": "0xf38d3c",
+          "compressed_sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+          "decompressed_cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+          "decompressed_bytes": 8194560
+        }
+      ]
+    },
+    {
+      "offset": "0xea5eb8",
+      "address": "0x810a5eb8",
+      "word": "0x5c1f58f3",
+      "funct3": 5,
+      "rd": 17,
+      "rs1": 30,
+      "classification": "potential encoding inside non-executable validated compressed CPIO initramfs",
+      "section": ".init.data",
+      "section_flags": "CONTENTS, ALLOC, LOAD, DATA",
+      "executable_section": false,
+      "valid_csr_funct3": true,
+      "validated_cpio_gzip_span": [
+        {
+          "offset": "0xc126b0",
+          "end_exclusive": "0xf38d3c",
+          "compressed_sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+          "decompressed_cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+          "decompressed_bytes": 8194560
+        }
+      ]
+    }
+  ],
+  "baseline_executable_csr5c1_uses": [],
+  "validated_cpio_gzip_spans": [
+    {
+      "offset": "0xc126b0",
+      "end_exclusive": "0xf38d3c",
+      "compressed_sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+      "decompressed_cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+      "decompressed_bytes": 8194560
+    }
+  ],
+  "new_kernel_expected_executable_uses": [
+    {
+      "address": "0xffffffff80020e9e",
+      "word": "0x5c102773",
+      "asm": "csrr\ta4,0x5c1",
+      "functions": [
+        "bp_icache_retention_probe"
+      ],
+      "funct3": 2,
+      "rd": 14,
+      "rs1": 0,
+      "next_instruction": {
+        "address": "0xffffffff80020ea2",
+        "word": "0xeb81",
+        "asm": "bnez\ta5,ffffffff80020eb2 <bp_icache_retention_probe+0x1e>"
+      }
+    },
+    {
+      "address": "0xffffffff800245ca",
+      "word": "0x5c199073",
+      "asm": "csrw\t0x5c1,s3",
+      "functions": [
+        "__do_sys_prctl"
+      ],
+      "funct3": 1,
+      "rd": 0,
+      "rs1": 19,
+      "next_instruction": {
+        "address": "0xffffffff800245ce",
+        "word": "0x100f",
+        "asm": "fence.i"
+      }
+    }
+  ],
+  "conclusion": "No baseline executable-kernel CSR5c1 uses and no potential encodings in the reconstructed firmware window; three raw kernel data candidates remain explicitly reported.",
+  "limits": [
+    "Zero-fill is the nominal NBF reconstruction convention; arbitrary stale DRAM is not scanned.",
+    "Memory outside 0x80000000..0x80200000 firmware and the named old-kernel payload is outside scope."
+  ]
+}

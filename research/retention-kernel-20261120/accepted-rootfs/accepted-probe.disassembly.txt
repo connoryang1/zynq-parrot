@@ -1,0 +1,30 @@
+
+/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-vmlinux:     file format elf64-littleriscv
+
+
+Disassembly of section .head.text:
+
+Disassembly of section .text:
+
+ffffffff80020e94 <bp_icache_retention_probe>:
+ffffffff80020e94:	1141                	add	sp,sp,-16
+ffffffff80020e96:	e422                	sd	s0,8(sp)
+ffffffff80020e98:	4781                	li	a5,0
+ffffffff80020e9a:	0800                	add	s0,sp,16
+ffffffff80020e9c:	873e                	mv	a4,a5
+ffffffff80020e9e:	5c102773          	csrr	a4,0x5c1
+ffffffff80020ea2:	eb81                	bnez	a5,ffffffff80020eb2 <bp_icache_retention_probe+0x1e>
+ffffffff80020ea4:	00075763          	bgez	a4,ffffffff80020eb2 <bp_icache_retention_probe+0x1e>
+ffffffff80020ea8:	e118                	sd	a4,0(a0)
+ffffffff80020eaa:	4501                	li	a0,0
+ffffffff80020eac:	6422                	ld	s0,8(sp)
+ffffffff80020eae:	0141                	add	sp,sp,16
+ffffffff80020eb0:	8082                	ret
+ffffffff80020eb2:	5535                	li	a0,-19
+ffffffff80020eb4:	bfe5                	j	ffffffff80020eac <bp_icache_retention_probe+0x18>
+
+Disassembly of section .init.text:
+
+Disassembly of section .exit.text:
+
+Disassembly of section .init.pi:

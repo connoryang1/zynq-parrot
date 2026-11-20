@@ -1,0 +1,45 @@
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -2788,11 +2788,11 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 15 || arg3 || arg4 || arg5) {
++		if (arg2 > 14 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+-		if (arg2 && arg2 != 14 && arg2 != 15
++		if (arg2 && arg2 != 14
+ 		    && READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {
+ 			error = -ENOENT;
+ 			break;
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -314,8 +314,7 @@
+ /* 0 off; 1 wake joint; 2 select joint; 3--8 controls; 9--11 tagged replay;
+  * 12 hardware-sequenced tagged-data then instruction replay;
+  * 13 successful-wakeup instruction replay only;
+- * 14 instruction replay at futex-wake entry;
+- * 15 instruction replay at pipe-write entry. */
++ * 14 instruction replay at futex-wake entry. */
+ #define PR_BP_PREVIEW_ENABLE	0x4250505a
+ /* Last successful-wakeup preview-hook duration in global BP cycles. */
+ #define PR_BP_PREVIEW_GET_HOOK_CYCLES	0x4250505b
+--- a/fs/pipe.c
++++ b/fs/pipe.c
+@@ -428,14 +428,6 @@
+ 	/* Null write succeeds. */
+ 	if (unlikely(total_len == 0))
+ 		return 0;
+-
+-#ifdef CONFIG_RISCV
+-	/* Mode fifteen is inherited by an opted-in pipe workload. Launch the
+-	 * machine-owned shared prefix before pipe locking and reader wakeup.
+-	 */
+-	if (READ_ONCE(current->thread.bp_preview_phys_mode) == 15)
+-		asm volatile("csrw 0x5c0, zero" ::: "memory");
+-#endif
+ 
+ 	__pipe_lock(pipe);
+ 

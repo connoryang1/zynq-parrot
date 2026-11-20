@@ -1,0 +1,13 @@
+{
+  "scope": "offline scanner checks; no hardware execution",
+  "halfword_read_offset2": true,
+  "cross_record_rd_odd_f3_offset6": true,
+  "funct3_zero_excluded": true,
+  "other_csr_excluded": true,
+  "scanner_sha256": "4a24d0070e67205452f5a40c4ba19eb436644e40b8388a6e3f7fe4d395ed23d2",
+  "rejected_preflight": {
+    "symptom": "initial reconstruction stopped at overlapping firmware record",
+    "cause": "six intentional final bootarg-string overwrites in accepted NBF",
+    "correction": "retain old/new bytes and apply source load order; no pre-fix scan accepted"
+  }
+}

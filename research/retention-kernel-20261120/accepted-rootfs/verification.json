@@ -1,0 +1,46 @@
+{
+  "state": "PASS",
+  "scope": "durable offline identities; no boot or performance acceptance",
+  "package_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/package-manifest.json",
+    "sha256": "6ae91f1f54bdef7da052de4443d7072e8f81177467c83f025bd886a9af1af8cb",
+    "bytes": 5839
+  },
+  "link_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/manifest.json",
+    "sha256": "9e4c469c4678c2900f929a4a752d57766599c78a54a478a34119bfca1b95d025",
+    "bytes": 8088
+  },
+  "driver": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted_rootfs_gate.py",
+    "sha256": "b57f6514308befc0eef703a84cc5cc5c2e1d8f799870407b6ca12295265a6343",
+    "bytes": 14433
+  },
+  "source_patch": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/kernel-patches/0027-blackparrot-icache-retention-control.patch",
+    "sha256": "c48971940f38c27493d95fbff9e2e905c794550efe839625b9d1d1a38981dbd3",
+    "bytes": 3506
+  },
+  "baseline_collision_review": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/baseline-csr5c1-review.json",
+    "sha256": "439128bb83e174399898563c88c92c574cc50c873ee398c27dcafb2c6f58d08b",
+    "bytes": 4592
+  },
+  "probe_disassembly": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-probe.disassembly.txt",
+    "sha256": "8da642a2ff3a0fe0464b1b995ddc69277c08b3a70337979a27581f3905d8d835",
+    "bytes": 1243
+  },
+  "probe_disassembly_command": [
+    "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+    "-d",
+    "--disassemble=bp_icache_retention_probe",
+    "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-vmlinux"
+  ],
+  "canonical_inputs_unchanged": true,
+  "original_diagnostics_unchanged": true,
+  "kernel_sys_object_unchanged_from_reviewed_gate": true,
+  "accepted_rootfs_compressed_and_uncompressed_exact": true,
+  "reverse_splice_byte_exact": true,
+  "candidate_payload_byte_exact": true
+}
