@@ -1,0 +1,15 @@
+{
+  "purpose": "Record pre-execution runner setup failures; no target program or simulator was launched.",
+  "failures": [
+    {
+      "stage": "inline helper import",
+      "symptom": "ModuleNotFoundError from repository root",
+      "correction": "Set PYTHONPATH=tools for standalone helper checks."
+    },
+    {
+      "stage": "runner Python parse",
+      "symptom": "Missing closing parenthesis in private-region overlap check",
+      "correction": "Syntax corrected and compile() required before next invocation."
+    }
+  ]
+}

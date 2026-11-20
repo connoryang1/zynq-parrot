@@ -1,0 +1,156 @@
+{
+  "purpose": "Bind complete old-trace D-cache observability validation and a bounded diagnostic of the failed new 1 KiB trace to exact retained inputs. The old trace has zero actual normal-L1 replacement evictions and supplies no victim-capacity curve; the new trace has no PASS and supplies no accepted capacity evidence.",
+  "state": "complete_bounded_observability_gate",
+  "source_revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57",
+  "source_conditions": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_be_dcache.sv",
+      "bytes": 62116,
+      "sha256": "e870cb1f70ed6055c6aa304377b1f41690a2dff111dc3f03f60b9368873c74df",
+      "repository_path": "bp_be/src/v/bp_be_dcache/bp_be_dcache.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_be_pipe_mem.sv",
+      "bytes": 24783,
+      "sha256": "498ad8915b8bb511691ee404c9b4a3a7e198369964e39975222c67b67f354ed4",
+      "repository_path": "bp_be/src/v/bp_be_calculator/bp_be_pipe_mem.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_unicore_lite.sv",
+      "bytes": 21491,
+      "sha256": "e4a4a38bc8da53d8eb917af0cb54b7b8379ff1cc88dbaa8fe16e9a75b58b3c16",
+      "repository_path": "bp_top/src/v/bp_unicore_lite.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_uce.sv",
+      "bytes": 89440,
+      "sha256": "eac00dc10346da564d89d52435bf156427be263f8756e5811f25fa2b0be211af",
+      "repository_path": "bp_me/src/v/cce/bp_uce.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_common_cache_engine_pkgdef.svh",
+      "bytes": 2730,
+      "sha256": "d2666cbbafcbe010eb9cdc8e9e49ca6281a0a0adb4c850401b8aad4a317cd7e1",
+      "repository_path": "bp_common/src/include/bp_common_cache_engine_pkgdef.svh",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_common_bedrock_pkgdef.svh",
+      "bytes": 8324,
+      "sha256": "095fb04f72df80d2490bfb23d3fe7b9550ecfce4128e533a80fccd37eb634e6a",
+      "repository_path": "bp_common/src/include/bp_common_bedrock_pkgdef.svh",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    }
+  ],
+  "analyzer_sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer/analyze_resume_data_reuse_vcd.py",
+      "bytes": 31814,
+      "sha256": "0caba4960b3cfacc2717fd2c6bcf5ab0bd42024f62051bdfc7641e0f32c80f61"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer/cache_overlap_vcd.py",
+      "bytes": 14922,
+      "sha256": "2aca0455d596126fdd9743cdb4ecc3d29a3da18a0833a86ad30f80b1e6f470cb"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer/test_analyze_resume_data_reuse_vcd.py",
+      "bytes": 15886,
+      "sha256": "f8b6fc3ac4a76cde9390cee5a70fcd8aed1023e8a5d54b78f69a12724b473909"
+    }
+  ],
+  "old_session": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/session.json",
+    "bytes": 56345,
+    "sha256": "bc9740502055155e6d74688e43cc8f1568b22a12235bafe462af8eac5c5a82fc"
+  },
+  "old_model": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/model/Vbsg_nonsynth_zynq_testbench",
+    "sha256": "85505d381643fca1a118c9e5d6930468e9bcce736ebfd0a926fb36419064af8b",
+    "bytes": 15396464
+  },
+  "old_trace": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/mode0/dump.fst",
+    "sha256": "f7924699335c723ffaceeb8c5c7044d7c4c1366c630033c6d69e3039c5a80e51",
+    "bytes": 24342196
+  },
+  "old_elf": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/mode0/prog.riscv",
+    "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+    "bytes": 176008
+  },
+  "old_program_source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/program/mt_context_resume_prefix_benchmark.c",
+    "sha256": "c99daa1a807d94e6904588045f0e56f6223e43ba51d0f3499d9454f49147f431",
+    "bytes": 3584
+  },
+  "old_initial_report": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/old-ffc-validation-initial.json",
+    "bytes": 20414,
+    "sha256": "e5c9b78e41956bc33bc4f56c86c24e67637b8f0c2dc3fa08d10cae8132477ba9"
+  },
+  "failed_session": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/one-kib/session.json",
+    "bytes": 5811,
+    "sha256": "dce8237f5b35c9a187ab69eb5a9b1befe9ba020b1ab3665442af457f8fac1ac1"
+  },
+  "failed_trace": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/one-kib/runtime/dump.fst",
+    "bytes": 157286400,
+    "sha256": "cd7332774dccc5e3e2d3e8f7edde4dc5832562b6a719cc470896fef685d23e11"
+  },
+  "failed_elf": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/one-kib/program/benchmark.riscv",
+    "bytes": 172208,
+    "sha256": "cc97e23db7f56f59dd25be41b7e179d8643078fdee9d71e96d1ab3597216c204"
+  },
+  "failed_prefix_report": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/one-kib-failed-prefix-progress.json",
+    "bytes": 4249,
+    "sha256": "b4e10798d92a97d9c63b6a4f2b2eea9d4067a4a49024f41c16a1250a79cd26d9"
+  },
+  "failed_prefix_limits": "Conversion intentionally terminated after 60 seconds. Last observed PC and request counts describe the readable prefix, not the final FST timestamp; no later-stall inference is possible.",
+  "confirmed_l1_geometry": {
+    "sets": 64,
+    "ways": 8,
+    "line_bytes": 64,
+    "capacity_bytes": 32768
+  },
+  "sampling_correction": {
+    "symptom": "BE-posedge sampling failed an exact synchronous tag-read check at edge153846.",
+    "source_backed_cause": "bp_be_pipe_mem clocks Dcache and bp_unicore_lite clocks Dcache UCE on negedge_clk=~BEclk.",
+    "guardrail": "Sample actual Dcache rising edges for accesses/tags/refills and actual BE rising edges for CSR commit labels; reject any read/write/hit/fill mismatch."
+  },
+  "final_analysis_command": "fst2vcd /home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/mode0/dump.fst | python3 /home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer/analyze_resume_data_reuse_vcd.py --output /home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/old-ffc-validation.json",
+  "failed_prefix_disassembly_fact": {
+    "pc": "0x80000c64",
+    "instruction": "bnez a3,0x80000c4c",
+    "interpretation": "lookup nonzero-key/probe loop; previous observed instruction0x80000c62 is ld a3,0(a4). No final trace-state inference.",
+    "disassembly_path": "research/resume-data-reuse-20261120/one-kib/program/disassembly.txt"
+  },
+  "old_trace_validation": "passed",
+  "old_report": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/old-ffc-validation.json",
+    "sha256": "c25588ac23bb1fc3516b3c5c163b0364c4320ace8f05fc3287fe62a36bf9928b",
+    "bytes": 21158
+  },
+  "old_validation_log": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/old-ffc-validation.log",
+    "sha256": "fa87ce5721404e42c598687f558f30852fecedebea8e3c35019c90d8c26c4128",
+    "bytes": 1657
+  },
+  "analyzer_tests": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer-tests.log",
+    "sha256": "cb91310aa4e4f2518e6d5a5c7a4d3abe75ad21a9f18e95452a411ce915eb7e5c",
+    "bytes": 1474
+  },
+  "old_actual_replacement_evictions": 0,
+  "old_victim_coverage_all_capacities": 0,
+  "real_nonzero_eviction_path_exercised": false,
+  "new_one_kib_validation": "failed: SIGXFSZ at150MiB trace bound; no guest PASS; no accepted capacity coverage",
+  "new_32_kib_executed": false
+}

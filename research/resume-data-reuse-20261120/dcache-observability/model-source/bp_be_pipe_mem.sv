@@ -1,0 +1,578 @@
+/**
+ *
+ * Name:
+ *   bp_be_pipe_mem.v
+ *
+ * Description:
+ *   Pipeline for RISC-V memory instructions. This includes both int + float loads + stores.
+ *
+ * Notes:
+ *
+ */
+
+`include "bp_common_defines.svh"
+`include "bp_be_defines.svh"
+
+module bp_be_pipe_mem
+ import bp_common_pkg::*;
+ import bp_be_pkg::*;
+ #(parameter bp_params_e bp_params_p = e_bp_default_cfg
+   `declare_bp_proc_params(bp_params_p)
+   `declare_bp_be_dcache_engine_if_widths(paddr_width_p, dcache_tag_width_p, dcache_sets_p, dcache_assoc_p, dword_width_gp, dcache_block_width_p, dcache_fill_width_p, dcache_req_id_width_p)
+   `declare_bp_be_if_widths(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p, fetch_ptr_p, issue_ptr_p)
+   // Generated parameters
+   , localparam cfg_bus_width_lp      = `bp_cfg_bus_width(vaddr_width_p, hio_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, did_width_p)
+   )
+  (input                                  clk_i
+   , input                                reset_i
+
+   , input [cfg_bus_width_lp-1:0]         cfg_bus_i
+   , input                                flush_i
+   , input                                sfence_i
+
+   , output logic                         busy_o
+   , output logic                         ordered_o
+
+   , input [reservation_width_lp-1:0]     reservation_i
+   , input [dword_width_gp-1:0]           rs2_val_i
+
+   , input [commit_pkt_width_lp-1:0]      commit_pkt_i
+
+   , output logic                         tlb_load_miss_v_o
+   , output logic                         tlb_store_miss_v_o
+   , output logic                         cache_miss_v_o
+   , output logic                         cache_replay_v_o
+   , output logic                         load_misaligned_v_o
+   , output logic                         load_access_fault_v_o
+   , output logic                         load_page_fault_v_o
+   , output logic                         store_misaligned_v_o
+   , output logic                         store_access_fault_v_o
+   , output logic                         store_page_fault_v_o
+
+   , output logic [dpath_width_gp-1:0]    early_data_o
+   , output logic                         early_v_o
+   , output logic [dpath_width_gp-1:0]    final_data_o
+   , output logic                         final_v_o
+
+   , output logic [wb_pkt_width_lp-1:0]   late_wb_pkt_o
+   , output logic                         late_wb_v_o
+
+   , input [trans_info_width_lp-1:0]          trans_info_i
+
+   // Serialized context-cache service path. The request address is physical
+   // and cacheable, so this bypasses the DMMU while still using the L1 D$.
+   , input                                           context_cache_dcache_v_i
+   , input                                           context_cache_dcache_w_i
+   , input [reg_addr_width_gp-1:0]                   context_cache_dcache_id_i
+   , input [paddr_width_p-1:0]                       context_cache_dcache_paddr_i
+   , input [dword_width_gp-1:0]                      context_cache_dcache_data_i
+   , output logic                                    context_cache_dcache_yumi_o
+   , output logic                                    context_cache_dcache_ready_o
+   , output logic                                    context_cache_dcache_resp_v_o
+   , output logic [reg_addr_width_gp-1:0]            context_cache_dcache_resp_id_o
+   , output logic [dword_width_gp-1:0]               context_cache_dcache_resp_data_o
+
+   // Independent physical replay requests use the normal L1 lookup. This
+   // filters resident and dirty lines before any cache-engine request.
+   , input                                           dcache_replay_v_i
+   , input [paddr_width_p-1:0]                       dcache_replay_paddr_i
+   , output logic                                    dcache_replay_yumi_o
+   , output logic                                    dcache_replay_accepted_o
+
+   // D$-LCE Interface
+   // signals to LCE
+   , output logic [dcache_req_width_lp-1:0]          cache_req_o
+   , output logic                                    cache_req_v_o
+   , input                                           cache_req_yumi_i
+   , input                                           cache_req_lock_i
+   , output logic [dcache_req_metadata_width_lp-1:0] cache_req_metadata_o
+   , output logic                                    cache_req_metadata_v_o
+   , input [dcache_req_id_width_p-1:0]               cache_req_id_i
+   , input                                           cache_req_critical_i
+   , input                                           cache_req_last_i
+   , input                                           cache_req_credits_full_i
+   , input                                           cache_req_credits_empty_i
+
+   , input                                           data_mem_pkt_v_i
+   , input [dcache_data_mem_pkt_width_lp-1:0]        data_mem_pkt_i
+   , output logic                                    data_mem_pkt_yumi_o
+   , output logic [dcache_block_width_p-1:0]         data_mem_o
+
+   , input                                           tag_mem_pkt_v_i
+   , input [dcache_tag_mem_pkt_width_lp-1:0]         tag_mem_pkt_i
+   , output logic                                    tag_mem_pkt_yumi_o
+   , output logic [dcache_tag_info_width_lp-1:0]     tag_mem_o
+
+   , input                                           stat_mem_pkt_v_i
+   , input [dcache_stat_mem_pkt_width_lp-1:0]        stat_mem_pkt_i
+   , output logic                                    stat_mem_pkt_yumi_o
+   , output logic [dcache_stat_info_width_lp-1:0]    stat_mem_o
+   );
+
+  `declare_bp_core_if(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p);
+  `declare_bp_be_if(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p, fetch_ptr_p, issue_ptr_p);
+  `declare_bp_be_dcache_pkt_s(vaddr_width_p);
+
+  `declare_bp_cfg_bus_s(vaddr_width_p, hio_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, did_width_p);
+  `declare_bp_be_dcache_engine_if(paddr_width_p, dcache_tag_width_p, dcache_sets_p, dcache_assoc_p, dword_width_gp, dcache_block_width_p, dcache_fill_width_p, dcache_req_id_width_p);
+  `bp_cast_o(bp_be_dcache_req_s, cache_req);
+  `bp_cast_o(bp_be_wb_pkt_s, late_wb_pkt);
+  `bp_cast_i(bp_be_trans_info_s, trans_info);
+  `bp_cast_i(bp_cfg_bus_s, cfg_bus);
+  `bp_cast_i(bp_be_commit_pkt_s, commit_pkt);
+
+  wire negedge_clk = ~clk_i;
+  wire posedge_clk =  clk_i;
+
+  // Cast input and output ports
+  bp_be_reservation_s reservation;
+  bp_be_decode_s      decode;
+  rv64_instr_s        instr;
+
+  assign reservation = reservation_i;
+  assign decode = reservation.decode;
+  assign instr = reservation.instr;
+  wire [vaddr_width_p-1:0] pc   = reservation.pc;
+  wire [dword_width_gp-1:0] rs1 = reservation.isrc1;
+  wire [dword_width_gp-1:0] rs2 = reservation.isrc2;
+  wire [dword_width_gp-1:0] imm = reservation.isrc3;
+  wire [thread_id_width_p-1:0] reservation_thread_id = reservation.thread_id[0 +: thread_id_width_p];
+
+  wire is_req = reservation.v & (decode.pipe_mem_early_v | decode.pipe_mem_final_v);
+  wire is_prefetch = is_req & decode.dcache_prefetch_v;
+  wire [rv64_eaddr_width_gp-1:0] eaddr = rs1 + imm;
+
+  // Preserve the hint's identity at both the MMU response and early-retire
+  // stages. Unsupported translations and hot hints remain nonfaulting no-ops;
+  // a permitted cold hint rejected by a transient cache conflict replays.
+  logic prefetch_mmu_r, prefetch_early_r;
+  logic prefetch_busy_mmu_r, prefetch_busy_early_r;
+  bsg_dff_reset
+   #(.width_p(2))
+   prefetch_pipe
+    (.clk_i(negedge_clk)
+     ,.reset_i(reset_i)
+     ,.data_i({is_prefetch, prefetch_mmu_r})
+     ,.data_o({prefetch_mmu_r, prefetch_early_r})
+     );
+
+  // A hint can be clear to dispatch and then reach the memory pipe one cycle
+  // after another request makes the D-cache busy. dcache_pkt_v suppresses the
+  // hint in that case, so remember the suppression through the same MMU/early
+  // stages and replay it rather than letting an unissued hint retire.
+  bsg_dff_reset
+   #(.width_p(2))
+   prefetch_busy_pipe
+    (.clk_i(negedge_clk)
+     ,.reset_i(reset_i)
+     ,.data_i({is_prefetch & dcache_busy_lo, prefetch_busy_mmu_r})
+     ,.data_o({prefetch_busy_mmu_r, prefetch_busy_early_r})
+     );
+
+  logic early_v_r;
+  bsg_dff_chain
+   #(.width_p(1), .num_stages_p(2))
+   req_chain
+    (.clk_i(negedge_clk)
+     ,.data_i(is_req)
+     ,.data_o(early_v_r)
+     );
+
+  // D-TLB connections
+  wire dtlb_r_store  = is_req & (decode.dcache_w_v | decode.dcache_cbo_v);
+  wire dtlb_r_load   = is_req & (decode.dcache_r_v | decode.dcache_prefetch_v);
+  wire dtlb_r_cbo    = is_req & decode.dcache_cbo_v;
+  wire dtlb_r_ptw    = is_req & decode.dcache_mmu_v;
+  wire dtlb_r_v      = dtlb_r_store | dtlb_r_load | dtlb_r_cbo | dtlb_r_ptw;
+
+  logic [vtag_width_p-1:0] dtlb_w_vtag;
+  bp_pte_leaf_s dtlb_w_entry;
+  wire dtlb_w_v       = commit_pkt_cast_i.dtlb_fill_v;
+  assign dtlb_w_vtag  = commit_pkt_cast_i.vaddr[page_offset_width_gp+:vtag_width_p];
+  assign dtlb_w_entry = commit_pkt_cast_i.pte_leaf;
+
+  // Some duplicated decode logic from dcache_decoder. Can send this information
+  //   as part of dcache_pkt to reduce overhead
+  logic [1:0] dtlb_r_size;
+  always_comb
+    unique case (decode.fu_op)
+      e_dcache_op_lb, e_dcache_op_lbu, e_dcache_op_sb, e_dcache_op_prefetch:
+                                                   dtlb_r_size = 2'b00;
+      e_dcache_op_lh, e_dcache_op_lhu, e_dcache_op_sh: dtlb_r_size = 2'b01;
+      e_dcache_op_amoswapw, e_dcache_op_amoaddw, e_dcache_op_amoxorw
+      ,e_dcache_op_amoandw, e_dcache_op_amoorw, e_dcache_op_amominw
+      ,e_dcache_op_amomaxw, e_dcache_op_amominuw, e_dcache_op_amomaxuw
+      ,e_dcache_op_lw, e_dcache_op_lwu, e_dcache_op_sw
+      ,e_dcache_op_flw, e_dcache_op_fsw
+      ,e_dcache_op_lrw, e_dcache_op_scw:               dtlb_r_size = 2'b10;
+      default: dtlb_r_size = 2'b11;
+    endcase
+
+  logic dtlb_v_lo;
+  logic [ptag_width_p-1:0] dtlb_ptag_lo;
+  logic dtlb_ptag_uncached_lo, dtlb_ptag_dram_lo, dtlb_ptag_nonidem_lo;
+  logic dtlb_load_miss_lo, dtlb_load_access_fault_lo;
+  logic dtlb_load_misaligned_lo, dtlb_load_page_fault_lo;
+  wire uncached_mode_li = cfg_bus_cast_i.dcache_mode == e_lce_mode_uncached;
+  wire nonspec_mode_li = cfg_bus_cast_i.dcache_mode == e_lce_mode_nonspec;
+  bp_mmu
+   #(.bp_params_p(bp_params_p)
+     ,.tlb_els_4k_p(dtlb_els_4k_p)
+     ,.tlb_els_2m_p(dtlb_els_2m_p)
+     ,.tlb_els_1g_p(dtlb_els_1g_p)
+     ,.latch_last_read_p(0)
+     )
+   dmmu
+    (.clk_i(negedge_clk)
+     ,.reset_i(reset_i)
+     ,.cfg_bus_i(cfg_bus_i)
+
+     ,.flush_i(flush_i)
+     ,.fence_i(sfence_i)
+     ,.priv_mode_i(trans_info_cast_i.priv_mode)
+     ,.asid_i(trans_info_cast_i.asid)
+     ,.sum_i(trans_info_cast_i.mstatus_sum)
+     ,.mxr_i(trans_info_cast_i.mstatus_mxr)
+     ,.trans_en_i(trans_info_cast_i.translation_en)
+     ,.uncached_mode_i(uncached_mode_li)
+     ,.nonspec_mode_i(nonspec_mode_li)
+     ,.hio_mask_i(cfg_bus_cast_i.hio_mask)
+
+     ,.w_v_i(dtlb_w_v)
+     ,.w_vtag_i(dtlb_w_vtag)
+     ,.w_entry_i(dtlb_w_entry)
+
+     ,.r_v_i(dtlb_r_v)
+     ,.r_instr_i('0)
+     ,.r_load_i(dtlb_r_load)
+     ,.r_store_i(dtlb_r_store)
+     ,.r_cbo_i(dtlb_r_cbo)
+     ,.r_ptw_i(dtlb_r_ptw)
+     ,.r_eaddr_i(eaddr)
+     ,.r_size_i(dtlb_r_size)
+
+     ,.r_v_o(dtlb_v_lo)
+     ,.r_ptag_o(dtlb_ptag_lo)
+     ,.r_instr_miss_o()
+     ,.r_load_miss_o(dtlb_load_miss_lo)
+     ,.r_store_miss_o(tlb_store_miss_v_o)
+     ,.r_uncached_o(dtlb_ptag_uncached_lo)
+     ,.r_nonidem_o(dtlb_ptag_nonidem_lo)
+     ,.r_dram_o(dtlb_ptag_dram_lo)
+     ,.r_instr_access_fault_o()
+     ,.r_load_access_fault_o(dtlb_load_access_fault_lo)
+     ,.r_store_access_fault_o(store_access_fault_v_o)
+     ,.r_instr_misaligned_o()
+     ,.r_load_misaligned_o(dtlb_load_misaligned_lo)
+     ,.r_store_misaligned_o(store_misaligned_v_o)
+     ,.r_instr_page_fault_o()
+     ,.r_load_page_fault_o(dtlb_load_page_fault_lo)
+     ,.r_store_page_fault_o(store_page_fault_v_o)
+     );
+
+  // A hint never invokes the PTW or reports an architectural fault. Reusing
+  // the load-permission lookup is deliberately conservative: an unavailable
+  // translation or a denied read simply drops the hint. No A/D bits are
+  // checked or updated through a prefetch-triggered page walk.
+  assign tlb_load_miss_v_o     = dtlb_load_miss_lo & ~prefetch_mmu_r;
+  assign load_access_fault_v_o = dtlb_load_access_fault_lo & ~prefetch_mmu_r;
+  assign load_misaligned_v_o   = dtlb_load_misaligned_lo & ~prefetch_mmu_r;
+  assign load_page_fault_v_o   = dtlb_load_page_fault_lo & ~prefetch_mmu_r;
+
+  // A context request first needs its physical tag in the D$ TV stage, then
+  // remains outstanding until the D$ returns its load data or store ordering
+  // acknowledgement. Keep those lifetimes distinct: a future load window
+  // needs to accept a new TL request while an older load still awaits data.
+  logic context_cache_dcache_ptag_v_r;
+  logic dcache_replay_ptag_v_r;
+  logic dcache_replay_pending_r;
+  logic [4:0] dcache_replay_retry_wait_r;
+  logic context_cache_dcache_resp_pending_r;
+  logic context_cache_dcache_store_r;
+  logic [paddr_width_p-1:0] context_cache_dcache_paddr_r;
+  logic [paddr_width_p-1:0] dcache_replay_paddr_r;
+  logic [dword_width_gp-1:0] context_cache_dcache_data_r;
+  wire context_cache_dcache_accept_li = context_cache_dcache_v_i
+                                        & context_cache_dcache_ready_o;
+  wire dcache_replay_accept_li = dcache_replay_v_i
+                                  & ~context_cache_dcache_v_i
+                                  & ~dcache_replay_pending_r
+                                  & (dcache_replay_retry_wait_r == '0)
+                                  & ~is_req & ~dcache_busy_lo & ~flush_i;
+  assign context_cache_dcache_yumi_o = context_cache_dcache_accept_li;
+  assign context_cache_dcache_ready_o = ~context_cache_dcache_resp_pending_r
+                                        & ~is_req
+                                        & ~dcache_busy_lo;
+
+  bp_be_dcache_pkt_s dcache_pkt;
+  wire dcache_pkt_v = context_cache_dcache_accept_li | dcache_replay_accept_li
+                       | (is_req & (~is_prefetch | (~dcache_busy_lo & ~flush_i)));
+  assign dcache_pkt = context_cache_dcache_accept_li
+                          ? '{thread_id : '0
+                          ,rd_addr : context_cache_dcache_id_i
+                          ,opcode : context_cache_dcache_w_i ? e_dcache_op_sd : e_dcache_op_ld
+                          // Some FPGA configurations use a physical address
+                          // narrower than the virtual address.  A sized cast
+                          // preserves the old low-bit mapping while allowing
+                          // Vivado to zero-extend instead of selecting bits
+                          // beyond the input width.
+                          ,vaddr  : vaddr_width_p'(context_cache_dcache_paddr_i)
+                          }
+                      : dcache_replay_accept_li
+                        ? '{thread_id : '0
+                            ,rd_addr : '0
+                            ,opcode : e_dcache_op_prefetch
+                            ,vaddr : vaddr_width_p'(dcache_replay_paddr_i)
+                            }
+                      : '{thread_id : reservation_thread_id
+                          ,rd_addr : instr.t.rtype.rd_addr
+                          ,opcode : decode.fu_op.t.dcache_fu_op
+                          ,vaddr  : eaddr
+                          };
+  logic frs2_r_v_r;
+  bsg_dff
+   #(.width_p(1))
+   freg
+    (.clk_i(posedge_clk)
+     ,.data_i(decode.frs2_r_v)
+     ,.data_o(frs2_r_v_r)
+     );
+
+  // D$ can't handle misaligned accesses
+  // Only a permitted cached, idempotent DRAM translation may issue a hint.
+  // In particular, do not turn MMIO or uncached addresses into real reads.
+  wire prefetch_ptag_allowed = dtlb_ptag_dram_lo
+                                & ~dtlb_ptag_uncached_lo & ~dtlb_ptag_nonidem_lo;
+  wire dcache_ptag_v = context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r
+                       | (dtlb_v_lo & ~dtlb_load_misaligned_lo & ~store_misaligned_v_o
+                          & (~prefetch_mmu_r | (prefetch_ptag_allowed & ~flush_i)));
+  wire [ptag_width_p-1:0] dcache_ptag_li =
+    (context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r)
+    ? (context_cache_dcache_ptag_v_r
+       ? context_cache_dcache_paddr_r[page_offset_width_gp+:ptag_width_p]
+       : dcache_replay_paddr_r[page_offset_width_gp+:ptag_width_p])
+    : dtlb_ptag_lo;
+  wire dcache_ptag_uncached_li = (context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r)
+                                 ? 1'b0
+                                 : dtlb_ptag_uncached_lo;
+  wire dcache_ptag_dram_li = (context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r)
+                             ? 1'b1
+                             : dtlb_ptag_dram_lo;
+
+  logic dcache_v;
+  logic [dword_width_gp-1:0] dcache_data;
+  logic [$bits(bp_be_int_tag_e)-1:0] dcache_tag;
+  logic [reg_addr_width_gp-1:0] dcache_rd_addr;
+  logic [thread_id_width_p-1:0] dcache_thread_id;
+  logic dcache_unsigned, dcache_int, dcache_float, dcache_ptw, dcache_ret, dcache_late;
+  logic dcache_prefetch_replay;
+  logic dcache_replay_issue_lo, dcache_replay_done_lo;
+  logic dcache_busy_lo, dcache_ordered_lo;
+  assign dcache_replay_yumi_o = dcache_replay_done_lo;
+  wire [dword_width_gp-1:0] dcache_st_data = context_cache_dcache_ptag_v_r
+                                             ? context_cache_dcache_data_r
+                                             : rs2_val_i;
+  bp_be_dcache
+   #(.bp_params_p(bp_params_p))
+   dcache
+    (.clk_i(negedge_clk)
+     ,.reset_i(reset_i)
+
+     ,.busy_o(dcache_busy_lo)
+     ,.ordered_o(dcache_ordered_lo)
+
+     ,.v_i(dcache_pkt_v)
+     ,.dcache_pkt_i(dcache_pkt)
+     ,.replay_i(dcache_replay_accept_li)
+
+     ,.ptag_v_i(dcache_ptag_v)
+     ,.ptag_i(dcache_ptag_li)
+     ,.ptag_uncached_i(dcache_ptag_uncached_li)
+     ,.ptag_dram_i(dcache_ptag_dram_li)
+
+     ,.st_data_i(dcache_st_data)
+     ,.flush_i(flush_i)
+
+     ,.v_o(dcache_v)
+     ,.data_o(dcache_data)
+     ,.rd_addr_o(dcache_rd_addr)
+     ,.thread_id_o(dcache_thread_id)
+     ,.unsigned_o(dcache_unsigned)
+     ,.tag_o(dcache_tag)
+     ,.int_o(dcache_int)
+     ,.float_o(dcache_float)
+     ,.ptw_o(dcache_ptw)
+     ,.ret_o(dcache_ret)
+     ,.late_o(dcache_late)
+     ,.prefetch_replay_o(dcache_prefetch_replay)
+     ,.replay_issue_o(dcache_replay_issue_lo)
+     ,.replay_done_o(dcache_replay_done_lo)
+     ,.replay_accepted_o(dcache_replay_accepted_o)
+
+     // D$-LCE Interface
+     ,.cache_req_o(cache_req_cast_o)
+     ,.cache_req_v_o(cache_req_v_o)
+     ,.cache_req_yumi_i(cache_req_yumi_i)
+     ,.cache_req_lock_i(cache_req_lock_i)
+     ,.cache_req_metadata_o(cache_req_metadata_o)
+     ,.cache_req_metadata_v_o(cache_req_metadata_v_o)
+     ,.cache_req_id_i(cache_req_id_i)
+     ,.cache_req_critical_i(cache_req_critical_i)
+     ,.cache_req_last_i(cache_req_last_i)
+     ,.cache_req_credits_full_i(cache_req_credits_full_i)
+     ,.cache_req_credits_empty_i(cache_req_credits_empty_i)
+
+     ,.data_mem_pkt_v_i(data_mem_pkt_v_i)
+     ,.data_mem_pkt_i(data_mem_pkt_i)
+     ,.data_mem_o(data_mem_o)
+     ,.data_mem_pkt_yumi_o(data_mem_pkt_yumi_o)
+     ,.tag_mem_pkt_v_i(tag_mem_pkt_v_i)
+     ,.tag_mem_pkt_i(tag_mem_pkt_i)
+     ,.tag_mem_o(tag_mem_o)
+     ,.tag_mem_pkt_yumi_o(tag_mem_pkt_yumi_o)
+     ,.stat_mem_pkt_v_i(stat_mem_pkt_v_i)
+     ,.stat_mem_pkt_i(stat_mem_pkt_i)
+     ,.stat_mem_o(stat_mem_o)
+     ,.stat_mem_pkt_yumi_o(stat_mem_pkt_yumi_o)
+     );
+
+  wire early_v_li = reservation.v & reservation.decode.pipe_mem_early_v;
+  bsg_dff_chain
+   #(.width_p(1), .num_stages_p(1))
+   early_chain
+    (.clk_i(posedge_clk)
+
+     ,.data_i(early_v_li)
+     ,.data_o(early_v_o)
+     );
+
+  assign cache_miss_v_o   = ~context_cache_dcache_resp_pending_r
+                             & early_v_r & ~prefetch_early_r
+                             & ~(dcache_v |  dcache_late) &  cache_req_yumi_i;
+  assign cache_replay_v_o = ~context_cache_dcache_resp_pending_r
+                             & early_v_r
+                             & (~prefetch_early_r
+                                | prefetch_busy_early_r
+                                | dcache_prefetch_replay)
+                             & ~(dcache_v & ~dcache_late) & ~cache_req_yumi_i;
+
+  bp_be_int_reg_s dcache_idata;
+  bp_be_int_box
+   #(.bp_params_p(bp_params_p))
+   int_box
+    (.raw_i(dcache_data)
+     ,.tag_i(dcache_tag)
+     ,.unsigned_i(dcache_unsigned)
+     ,.reg_o(dcache_idata)
+     );
+  assign early_data_o = dcache_idata;
+
+  bp_be_fp_reg_s dcache_fdata;
+  bp_be_fp_box
+   #(.bp_params_p(bp_params_p))
+   fp_box
+    (.ieee_i(dcache_data)
+     ,.tag_i(dcache_tag[0])
+     ,.reg_o(dcache_fdata)
+     );
+
+  logic [dpath_width_gp-1:0] dcache_data_r;
+  logic [reg_addr_width_gp-1:0] dcache_rd_addr_r;
+  logic [thread_id_width_p-1:0] dcache_thread_id_r;
+  wire [dpath_width_gp-1:0] dcache_data_n = dcache_float ? dcache_fdata : dcache_idata;
+  bsg_dff
+  #(.width_p(dpath_width_gp+reg_addr_width_gp+thread_id_width_p))
+  data_reg
+   (.clk_i(negedge_clk)
+    ,.data_i({dcache_data_n, dcache_rd_addr, dcache_thread_id})
+    ,.data_o({dcache_data_r, dcache_rd_addr_r, dcache_thread_id_r})
+    );
+
+  logic dcache_v_r, dcache_int_r, dcache_float_r, dcache_ptw_r, dcache_late_r, dcache_ret_r;
+  bsg_dff
+   #(.width_p(6))
+   final_reg
+    (.clk_i(posedge_clk)
+     ,.data_i({dcache_v, dcache_int, dcache_float, dcache_ptw, dcache_late, dcache_ret})
+     ,.data_o({dcache_v_r, dcache_int_r, dcache_float_r, dcache_ptw_r, dcache_late_r, dcache_ret_r})
+     );
+
+  wire final_v_li = reservation.v & reservation.decode.pipe_mem_final_v;
+  bsg_dff_chain
+   #(.width_p(1), .num_stages_p(2))
+   final_chain
+    (.clk_i(posedge_clk)
+
+     ,.data_i(final_v_li)
+     ,.data_o(final_v_o)
+     );
+  assign final_data_o = dcache_data_r;
+
+  // Pipeline these slow signals
+  bsg_dff
+   #(.width_p(2))
+   sync_reg
+    (.clk_i(posedge_clk)
+     ,.data_i({dcache_ordered_lo, dcache_busy_lo})
+     ,.data_o({ordered_o, busy_o})
+     );
+
+  assign late_wb_v_o = ~context_cache_dcache_resp_pending_r
+                       & dcache_v_r & dcache_ret_r & (dcache_late_r | dcache_ptw_r);
+  assign late_wb_pkt_cast_o = '{ird_w_v  : dcache_int_r
+                                ,frd_w_v : dcache_float_r
+                                ,ptw_w_v : dcache_ptw_r
+                                ,thread_id : dcache_thread_id_r
+                                ,rd_addr : dcache_rd_addr_r
+                                ,rd_data : dcache_data_r
+                                ,default : '0
+                                };
+
+  assign context_cache_dcache_resp_v_o = context_cache_dcache_resp_pending_r
+                                         & (context_cache_dcache_store_r
+                                            ? dcache_ordered_lo
+                                            : dcache_v);
+  assign context_cache_dcache_resp_data_o = dcache_data;
+  assign context_cache_dcache_resp_id_o = dcache_rd_addr;
+
+  always_ff @(posedge posedge_clk)
+    if (reset_i) begin
+      context_cache_dcache_ptag_v_r <= 1'b0;
+      dcache_replay_ptag_v_r <= 1'b0;
+      dcache_replay_pending_r <= 1'b0;
+      dcache_replay_retry_wait_r <= '0;
+      context_cache_dcache_resp_pending_r <= 1'b0;
+      context_cache_dcache_store_r <= 1'b0;
+      context_cache_dcache_paddr_r <= '0;
+      dcache_replay_paddr_r <= '0;
+      context_cache_dcache_data_r <= '0;
+    end else begin
+      // The request accepted in this cycle is consumed by the D$ TL stage;
+      // its physical tag and store data are required in the following TV stage.
+      context_cache_dcache_ptag_v_r <= context_cache_dcache_accept_li;
+      dcache_replay_ptag_v_r <= dcache_replay_accept_li;
+      if (dcache_replay_issue_lo)
+        dcache_replay_pending_r <= 1'b1;
+      else if (dcache_replay_done_lo)
+        dcache_replay_pending_r <= 1'b0;
+      else if (dcache_replay_pending_r & dcache_prefetch_replay) begin
+        dcache_replay_pending_r <= 1'b0;
+        // A full detached-prefetch path must get time to drain. Immediate
+        // tag-pipeline retries can otherwise monopolize the request boundary.
+        dcache_replay_retry_wait_r <= 5'd16;
+      end else if (dcache_replay_retry_wait_r != '0)
+        dcache_replay_retry_wait_r <= dcache_replay_retry_wait_r - 1'b1;
+      if (dcache_replay_accept_li)
+        dcache_replay_paddr_r <= dcache_replay_paddr_i;
+      if (context_cache_dcache_accept_li) begin
+        context_cache_dcache_resp_pending_r <= 1'b1;
+        context_cache_dcache_store_r <= context_cache_dcache_w_i;
+        context_cache_dcache_paddr_r <= context_cache_dcache_paddr_i;
+        context_cache_dcache_data_r <= context_cache_dcache_data_i;
+      end else if (context_cache_dcache_resp_v_o) begin
+        context_cache_dcache_resp_pending_r <= 1'b0;
+        context_cache_dcache_store_r <= 1'b0;
+      end
+    end
+
+endmodule

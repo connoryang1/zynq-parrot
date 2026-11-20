@@ -1,0 +1,504 @@
+
+`include "bp_common_defines.svh"
+`include "bp_top_defines.svh"
+`include "bp_fe_defines.svh"
+`include "bp_be_defines.svh"
+
+module bp_unicore_lite
+ import bsg_wormhole_router_pkg::*;
+ import bp_common_pkg::*;
+ import bp_be_pkg::*;
+ import bp_fe_pkg::*;
+ import bp_me_pkg::*;
+ import bsg_noc_pkg::*;
+ #(parameter bp_params_e bp_params_p = e_bp_default_cfg
+   , parameter bit cache_miss_trace_p = 1'b0
+   `declare_bp_proc_params(bp_params_p)
+   `declare_bp_bedrock_if_widths(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p)
+
+   , localparam cfg_bus_width_lp = `bp_cfg_bus_width(vaddr_width_p, hio_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, did_width_p)
+   )
+  (input                                               clk_i
+   , input                                             reset_i
+
+   , input [cfg_bus_width_lp-1:0]                      cfg_bus_i
+
+   // Outgoing BP Stream Mem Buses from I$ and D$
+   , output logic [1:0][mem_fwd_header_width_lp-1:0]   mem_fwd_header_o
+   , output logic [1:0][bedrock_fill_width_p-1:0]      mem_fwd_data_o
+   , output logic [1:0]                                mem_fwd_v_o
+   , input [1:0]                                       mem_fwd_ready_and_i
+
+   , input [1:0][mem_rev_header_width_lp-1:0]          mem_rev_header_i
+   , input [1:0][bedrock_fill_width_p-1:0]             mem_rev_data_i
+   , input [1:0]                                       mem_rev_v_i
+   , output logic [1:0]                                mem_rev_ready_and_o
+
+   , input                                             debug_irq_i
+   , input                                             timer_irq_i
+   , input                                             software_irq_i
+   , input                                             m_external_irq_i
+   , input                                             s_external_irq_i
+   );
+
+  `declare_bp_cfg_bus_s(vaddr_width_p, hio_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, did_width_p);
+  `declare_bp_fe_icache_engine_if(paddr_width_p, icache_tag_width_p, icache_sets_p, icache_assoc_p, icache_data_width_p, icache_block_width_p, icache_fill_width_p, icache_req_id_width_p);
+  `declare_bp_be_dcache_engine_if(paddr_width_p, dcache_tag_width_p, dcache_sets_p, dcache_assoc_p, dcache_data_width_p, dcache_block_width_p, dcache_fill_width_p, dcache_req_id_width_p);
+  `declare_bp_bedrock_if(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p);
+  `bp_cast_i(bp_cfg_bus_s, cfg_bus);
+
+  bp_fe_icache_req_s icache_req_lo;
+  logic icache_req_v_lo, icache_req_yumi_li, icache_req_lock_li, icache_req_metadata_v_lo;
+  bp_fe_icache_req_metadata_s icache_req_metadata_lo;
+  logic [icache_req_id_width_p-1:0] icache_req_id_li;
+  logic icache_req_critical_li, icache_req_last_li;
+  logic icache_req_credits_full_li, icache_req_credits_empty_li;
+  logic icache_replay_v_lo, icache_replay_direct_ready_lo;
+  logic [paddr_width_p-1:0] icache_replay_paddr_lo;
+  logic icache_replay_lane_v_lo, icache_replay_lane_ready_li;
+  logic [paddr_width_p-1:0] icache_replay_lane_paddr_lo;
+  logic icache_replay_query_v_lo, icache_replay_query_hit_li;
+  logic [paddr_width_p-1:0] icache_replay_query_paddr_lo;
+  logic [dword_width_gp-1:0] icache_prefix_status_lo;
+  logic icache_prefix_entry_v_lo, icache_prefix_count_v_lo;
+  logic icache_prefix_trigger_v_lo, icache_prefix_clear_v_lo;
+  logic icache_prefix_trigger_range_v_lo;
+  logic [7:0] icache_prefix_entry_index_lo;
+  logic [7:0] icache_prefix_trigger_start_lo;
+  logic [8:0] icache_prefix_count_lo;
+  logic [8:0] icache_prefix_trigger_count_lo;
+  logic [paddr_width_p-1:0] icache_prefix_entry_paddr_lo;
+
+  bp_fe_icache_tag_mem_pkt_s icache_tag_mem_pkt_li;
+  logic icache_tag_mem_pkt_v_li, icache_tag_mem_pkt_yumi_lo;
+  bp_fe_icache_tag_info_s icache_tag_mem_lo;
+  bp_fe_icache_data_mem_pkt_s icache_data_mem_pkt_li;
+  logic icache_data_mem_pkt_v_li, icache_data_mem_pkt_yumi_lo;
+  logic [icache_block_width_p-1:0] icache_data_mem_lo;
+  bp_fe_icache_stat_mem_pkt_s icache_stat_mem_pkt_li;
+  logic icache_stat_mem_pkt_v_li, icache_stat_mem_pkt_yumi_lo;
+  bp_fe_icache_stat_info_s icache_stat_mem_lo;
+
+  bp_be_dcache_req_s dcache_req_lo;
+  logic dcache_req_v_lo, dcache_req_yumi_li, dcache_req_lock_li, dcache_req_metadata_v_lo;
+  bp_be_dcache_req_metadata_s dcache_req_metadata_lo;
+  logic physical_preview_v_lo;
+  logic [paddr_width_p-1:0] physical_preview_paddr_lo;
+  logic dcache_replay_entry_v_lo, dcache_replay_config_v_lo;
+  logic dcache_replay_trigger_v_lo;
+  logic [dword_width_gp-1:0] dcache_replay_payload_lo;
+  logic [dword_width_gp-1:0] dcache_replay_status_lo;
+  logic dcache_replay_v_lo, dcache_replay_yumi_li;
+  logic dcache_replay_accepted_li;
+  logic dcache_replay_follow_trigger_lo;
+  logic [paddr_width_p-1:0] dcache_replay_paddr_lo;
+  logic dcache_replay_core_yumi_lo, dcache_replay_core_accepted_lo;
+  logic [`BSG_WIDTH(dcache_prefetch_els_p+1)-1:0]
+    dcache_prefetch_outstanding_count_lo, dcache_prefetch_complete_count_lo;
+  logic [2:0] dcache_prefetch_outstanding_status_lo;
+  logic dcache_prefetch_complete_status_lo;
+  always_comb begin
+    dcache_prefetch_outstanding_status_lo
+      = (dcache_prefetch_outstanding_count_lo > 7)
+        ? 3'd7 : 3'(dcache_prefetch_outstanding_count_lo);
+    dcache_prefetch_complete_status_lo
+      = |dcache_prefetch_complete_count_lo;
+  end
+  logic [paddr_width_p-1:0] dcache_preview_paddr_li;
+  logic dcache_preview_v_li;
+  logic physical_preview_uncached_lo, physical_preview_nonidem_lo;
+  logic physical_preview_dram_lo;
+  logic physical_preview_idle_lo;
+  bp_pma
+   #(.bp_params_p(bp_params_p))
+   physical_preview_pma
+    (.clk_i(posedge_clk)
+     ,.reset_i(reset_i)
+     ,.ptag_i(dcache_preview_paddr_li[page_offset_width_gp+:ptag_width_p])
+     ,.uncached_mode_i(1'b0)
+     ,.nonspec_mode_i(1'b0)
+     ,.uncached_o(physical_preview_uncached_lo)
+     ,.nonidem_o(physical_preview_nonidem_lo)
+     ,.dram_o(physical_preview_dram_lo)
+     );
+  // Only cached, idempotent DRAM may be read speculatively. The request is
+  // best effort and never backpressures architectural retirement.
+  wire physical_preview_allowed_lo = dcache_preview_v_li
+    & physical_preview_dram_lo & ~physical_preview_uncached_lo
+    & ~physical_preview_nonidem_lo;
+  assign dcache_preview_paddr_li = physical_preview_v_lo
+                                   ? physical_preview_paddr_lo
+                                   : dcache_replay_paddr_lo;
+  assign dcache_preview_v_li = physical_preview_v_lo | dcache_replay_v_lo;
+  wire dcache_replay_allowed_lo = dcache_replay_v_lo
+    & ~physical_preview_v_lo & (dcache_replay_paddr_lo != '0)
+    & physical_preview_allowed_lo;
+  assign dcache_replay_accepted_li = dcache_replay_core_accepted_lo;
+  assign dcache_replay_yumi_li = dcache_replay_v_lo
+    & (dcache_replay_core_yumi_lo
+       | (~physical_preview_v_lo
+          & ((dcache_replay_paddr_lo == '0) | ~physical_preview_allowed_lo)));
+  logic [dcache_req_id_width_p-1:0] dcache_req_id_li;
+  logic dcache_req_critical_li, dcache_req_last_li;
+  logic dcache_req_credits_full_li, dcache_req_credits_empty_li;
+
+  bp_be_dcache_tag_mem_pkt_s dcache_tag_mem_pkt_li;
+  logic dcache_tag_mem_pkt_v_li, dcache_tag_mem_pkt_yumi_lo;
+  bp_be_dcache_tag_info_s dcache_tag_mem_lo;
+  bp_be_dcache_data_mem_pkt_s dcache_data_mem_pkt_li;
+  logic dcache_data_mem_pkt_v_li, dcache_data_mem_pkt_yumi_lo;
+  logic [dcache_block_width_p-1:0] dcache_data_mem_lo;
+  bp_be_dcache_stat_mem_pkt_s dcache_stat_mem_pkt_li;
+  logic dcache_stat_mem_pkt_v_li, dcache_stat_mem_pkt_yumi_lo;
+  bp_be_dcache_stat_info_s dcache_stat_mem_lo;
+
+  wire posedge_clk = clk_i;
+  wire negedge_clk = ~clk_i;
+
+  wire [did_width_p-1:0] did_li = cfg_bus_cast_i.did;
+  wire [1:0][lce_id_width_p-1:0] lce_id_li = {cfg_bus_cast_i.dcache_id, cfg_bus_cast_i.icache_id};
+  bp_core_minimal
+   #(.bp_params_p(bp_params_p)
+     ,.cache_miss_trace_p(cache_miss_trace_p)
+     ,.icache_replay_buffer_p(1'b1)
+     ,.icache_replay_buffer_els_p(32)
+     )
+   core_minimal
+    (.clk_i(posedge_clk)
+     ,.reset_i(reset_i)
+     ,.cfg_bus_i(cfg_bus_cast_i)
+     ,.physical_preview_v_o(physical_preview_v_lo)
+     ,.physical_preview_paddr_o(physical_preview_paddr_lo)
+     ,.physical_preview_idle_i(physical_preview_idle_lo)
+     ,.dcache_replay_status_i(dcache_replay_status_lo)
+     ,.dcache_replay_entry_v_o(dcache_replay_entry_v_lo)
+     ,.dcache_replay_config_v_o(dcache_replay_config_v_lo)
+     ,.dcache_replay_trigger_v_o(dcache_replay_trigger_v_lo)
+     ,.dcache_replay_payload_o(dcache_replay_payload_lo)
+     ,.dcache_replay_v_i(dcache_replay_allowed_lo)
+     ,.dcache_replay_paddr_i(dcache_replay_paddr_lo)
+     ,.dcache_replay_yumi_o(dcache_replay_core_yumi_lo)
+     ,.dcache_replay_accepted_o(dcache_replay_core_accepted_lo)
+
+     ,.icache_req_o(icache_req_lo)
+     ,.icache_req_v_o(icache_req_v_lo)
+     ,.icache_req_yumi_i(icache_req_yumi_li)
+     ,.icache_req_lock_i(icache_req_lock_li)
+     ,.icache_req_metadata_o(icache_req_metadata_lo)
+     ,.icache_req_metadata_v_o(icache_req_metadata_v_lo)
+     ,.icache_req_id_i(icache_req_id_li)
+     ,.icache_req_critical_i(icache_req_critical_li)
+     ,.icache_req_last_i(icache_req_last_li)
+     ,.icache_req_credits_full_i(icache_req_credits_full_li)
+     ,.icache_req_credits_empty_i(icache_req_credits_empty_li)
+
+     ,.icache_tag_mem_pkt_i(icache_tag_mem_pkt_li)
+     ,.icache_tag_mem_pkt_v_i(icache_tag_mem_pkt_v_li)
+     ,.icache_tag_mem_pkt_yumi_o(icache_tag_mem_pkt_yumi_lo)
+     ,.icache_tag_mem_o(icache_tag_mem_lo)
+
+     ,.icache_data_mem_pkt_i(icache_data_mem_pkt_li)
+     ,.icache_data_mem_pkt_v_i(icache_data_mem_pkt_v_li)
+     ,.icache_data_mem_pkt_yumi_o(icache_data_mem_pkt_yumi_lo)
+     ,.icache_data_mem_o(icache_data_mem_lo)
+
+     ,.icache_stat_mem_pkt_v_i(icache_stat_mem_pkt_v_li)
+     ,.icache_stat_mem_pkt_i(icache_stat_mem_pkt_li)
+     ,.icache_stat_mem_pkt_yumi_o(icache_stat_mem_pkt_yumi_lo)
+     ,.icache_stat_mem_o(icache_stat_mem_lo)
+
+     ,.dcache_req_o(dcache_req_lo)
+     ,.dcache_req_v_o(dcache_req_v_lo)
+     ,.dcache_req_yumi_i(dcache_req_yumi_li)
+     ,.dcache_req_lock_i(dcache_req_lock_li)
+     ,.dcache_req_metadata_o(dcache_req_metadata_lo)
+     ,.dcache_req_metadata_v_o(dcache_req_metadata_v_lo)
+     ,.dcache_req_id_i(dcache_req_id_li)
+     ,.dcache_req_critical_i(dcache_req_critical_li)
+     ,.dcache_req_last_i(dcache_req_last_li)
+     ,.dcache_req_credits_full_i(dcache_req_credits_full_li)
+     ,.dcache_req_credits_empty_i(dcache_req_credits_empty_li)
+
+     ,.dcache_tag_mem_pkt_i(dcache_tag_mem_pkt_li)
+     ,.dcache_tag_mem_pkt_v_i(dcache_tag_mem_pkt_v_li)
+     ,.dcache_tag_mem_pkt_yumi_o(dcache_tag_mem_pkt_yumi_lo)
+     ,.dcache_tag_mem_o(dcache_tag_mem_lo)
+
+     ,.dcache_data_mem_pkt_i(dcache_data_mem_pkt_li)
+     ,.dcache_data_mem_pkt_v_i(dcache_data_mem_pkt_v_li)
+     ,.dcache_data_mem_pkt_yumi_o(dcache_data_mem_pkt_yumi_lo)
+     ,.dcache_data_mem_o(dcache_data_mem_lo)
+
+     ,.dcache_stat_mem_pkt_v_i(dcache_stat_mem_pkt_v_li)
+     ,.dcache_stat_mem_pkt_i(dcache_stat_mem_pkt_li)
+     ,.dcache_stat_mem_pkt_yumi_o(dcache_stat_mem_pkt_yumi_lo)
+     ,.dcache_stat_mem_o(dcache_stat_mem_lo)
+
+     ,.debug_irq_i(debug_irq_i)
+     ,.timer_irq_i(timer_irq_i)
+     ,.software_irq_i(software_irq_i)
+     ,.m_external_irq_i(m_external_irq_i)
+     ,.s_external_irq_i(s_external_irq_i)
+     ,.icache_replay_query_v_i(icache_replay_query_v_lo)
+     ,.icache_replay_query_paddr_i(icache_replay_query_paddr_lo)
+     ,.icache_replay_query_hit_o(icache_replay_query_hit_li)
+     ,.icache_replay_ready_i(icache_replay_direct_ready_lo)
+     ,.icache_replay_v_o(icache_replay_v_lo)
+     ,.icache_replay_paddr_o(icache_replay_paddr_lo)
+     ,.icache_prefix_status_i(icache_prefix_status_lo)
+     ,.icache_prefix_entry_v_o(icache_prefix_entry_v_lo)
+     ,.icache_prefix_entry_index_o(icache_prefix_entry_index_lo)
+     ,.icache_prefix_entry_paddr_o(icache_prefix_entry_paddr_lo)
+     ,.icache_prefix_count_v_o(icache_prefix_count_v_lo)
+     ,.icache_prefix_count_o(icache_prefix_count_lo)
+     ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_lo)
+     ,.icache_prefix_trigger_range_v_o(icache_prefix_trigger_range_v_lo)
+     ,.icache_prefix_trigger_start_o(icache_prefix_trigger_start_lo)
+     ,.icache_prefix_trigger_count_o(icache_prefix_trigger_count_lo)
+     ,.icache_prefix_clear_v_o(icache_prefix_clear_v_lo)
+     );
+
+  bp_icache_replay_ctrl
+   #(.paddr_width_p(paddr_width_p))
+   icache_replay_ctrl
+    (.clk_i(posedge_clk)
+     ,.reset_i(reset_i)
+     ,.direct_v_i(icache_replay_v_lo)
+     ,.direct_paddr_i(icache_replay_paddr_lo)
+     ,.direct_ready_o(icache_replay_direct_ready_lo)
+     ,.entry_write_v_i(icache_prefix_entry_v_lo)
+     ,.entry_write_index_i(icache_prefix_entry_index_lo)
+     ,.entry_write_paddr_i(icache_prefix_entry_paddr_lo)
+     ,.count_write_v_i(icache_prefix_count_v_lo)
+     ,.count_i(icache_prefix_count_lo)
+     ,.clear_counters_i(icache_prefix_clear_v_lo)
+     ,.trigger_v_i(icache_prefix_trigger_v_lo
+                   | dcache_replay_follow_trigger_lo)
+     ,.trigger_range_v_i(icache_prefix_trigger_v_lo
+                         & ~dcache_replay_follow_trigger_lo
+                         & icache_prefix_trigger_range_v_lo)
+     ,.trigger_start_i(icache_prefix_trigger_start_lo)
+     ,.trigger_count_i(icache_prefix_trigger_count_lo)
+     ,.resident_query_v_o(icache_replay_query_v_lo)
+     ,.resident_query_paddr_o(icache_replay_query_paddr_lo)
+     ,.resident_i(icache_replay_query_hit_li)
+     ,.replay_v_o(icache_replay_lane_v_lo)
+     ,.replay_paddr_o(icache_replay_lane_paddr_lo)
+     ,.replay_ready_i(icache_replay_lane_ready_li)
+     ,.status_o(icache_prefix_status_lo)
+     );
+
+  bp_uce
+   #(.bp_params_p(bp_params_p)
+     ,.assoc_p(icache_assoc_p)
+     ,.sets_p(icache_sets_p)
+     ,.block_width_p(icache_block_width_p)
+     ,.fill_width_p(icache_fill_width_p)
+     ,.data_width_p(icache_data_width_p)
+     ,.tag_width_p(icache_tag_width_p)
+     ,.id_width_p(icache_req_id_width_p)
+     ,.writeback_p(icache_features_p[e_cfg_writeback])
+     ,.prefetch_p(1'b1)
+     ,.prefetch_els_p(4)
+     ,.prefetch_full_line_p(1'b1)
+     ,.prefetch_demand_priority_p(1'b1)
+     ,.prefetch_critical_forward_p(1'b0)
+     ,.prefetch_side_buffer_p(1'b1)
+     )
+   icache_uce
+    (.clk_i(posedge_clk)
+     ,.reset_i(reset_i)
+
+     ,.did_i(did_li)
+     ,.lce_id_i(lce_id_li[0])
+
+     ,.cache_req_i(icache_req_lo)
+     ,.cache_req_v_i(icache_req_v_lo)
+     ,.cache_req_yumi_o(icache_req_yumi_li)
+     ,.cache_req_lock_o(icache_req_lock_li)
+     ,.cache_req_metadata_i(icache_req_metadata_lo)
+     ,.cache_req_metadata_v_i(icache_req_metadata_v_lo)
+     ,.preview_paddr_i('0)
+     ,.preview_v_i(1'b0)
+     ,.preview_cancel_i(1'b0)
+     ,.preview_ready_o()
+     ,.preview_idle_o()
+     ,.cache_req_id_o(icache_req_id_li)
+     ,.cache_req_critical_o(icache_req_critical_li)
+     ,.cache_req_last_o(icache_req_last_li)
+     ,.cache_req_credits_full_o(icache_req_credits_full_li)
+     ,.cache_req_credits_empty_o(icache_req_credits_empty_li)
+
+     ,.detached_prefetch_addr_i(icache_replay_lane_paddr_lo)
+     ,.detached_prefetch_v_i(icache_replay_lane_v_lo)
+     ,.detached_prefetch_ready_and_o(icache_replay_lane_ready_li)
+     ,.prefetch_outstanding_o()
+     ,.prefetch_complete_o()
+
+     ,.tag_mem_pkt_o(icache_tag_mem_pkt_li)
+     ,.tag_mem_pkt_v_o(icache_tag_mem_pkt_v_li)
+     ,.tag_mem_pkt_yumi_i(icache_tag_mem_pkt_yumi_lo)
+     ,.tag_mem_i(icache_tag_mem_lo)
+
+     ,.data_mem_pkt_o(icache_data_mem_pkt_li)
+     ,.data_mem_pkt_v_o(icache_data_mem_pkt_v_li)
+     ,.data_mem_pkt_yumi_i(icache_data_mem_pkt_yumi_lo)
+     ,.data_mem_i(icache_data_mem_lo)
+
+     ,.stat_mem_pkt_o(icache_stat_mem_pkt_li)
+     ,.stat_mem_pkt_v_o(icache_stat_mem_pkt_v_li)
+     ,.stat_mem_pkt_yumi_i(icache_stat_mem_pkt_yumi_lo)
+     ,.stat_mem_i(icache_stat_mem_lo)
+
+     ,.mem_fwd_header_o(mem_fwd_header_o[0])
+     ,.mem_fwd_data_o(mem_fwd_data_o[0])
+     ,.mem_fwd_v_o(mem_fwd_v_o[0])
+     ,.mem_fwd_ready_and_i(mem_fwd_ready_and_i[0])
+
+     ,.mem_rev_header_i(mem_rev_header_i[0])
+     ,.mem_rev_data_i(mem_rev_data_i[0])
+     ,.mem_rev_v_i(mem_rev_v_i[0])
+     ,.mem_rev_ready_and_o(mem_rev_ready_and_o[0])
+     );
+
+  bp_bedrock_mem_fwd_header_s [1:1] _mem_fwd_header_o;
+  logic [1:1][bedrock_fill_width_p-1:0] _mem_fwd_data_o;
+  logic [1:1] _mem_fwd_v_o, _mem_fwd_ready_and_i;
+  bp_bedrock_mem_rev_header_s [1:1] _mem_rev_header_i;
+  logic [1:1][bedrock_fill_width_p-1:0] _mem_rev_data_i;
+  logic [1:1] _mem_rev_v_i, _mem_rev_ready_and_o;
+
+  bp_dcache_replay_ctrl
+   #(.paddr_width_p(paddr_width_p))
+   dcache_replay_ctrl
+    (.clk_i(posedge_clk)
+     ,.reset_i(reset_i)
+     ,.entry_write_v_i(dcache_replay_entry_v_lo)
+     ,.entry_write_slot_i(dcache_replay_payload_lo[46:45])
+     ,.entry_write_index_i(dcache_replay_payload_lo[44:40])
+     ,.entry_write_paddr_i(dcache_replay_payload_lo[0+:paddr_width_p])
+     ,.config_write_v_i(dcache_replay_config_v_lo)
+     ,.config_write_slot_i(dcache_replay_payload_lo[1:0])
+     ,.config_write_count_i(dcache_replay_payload_lo[7:2])
+     ,.config_write_delay_i(dcache_replay_payload_lo[23:8])
+     ,.config_write_gap_i(dcache_replay_payload_lo[31:24])
+     ,.trigger_v_i(dcache_replay_trigger_v_lo)
+     ,.trigger_slot_i(dcache_replay_payload_lo[1:0])
+     ,.trigger_follow_i(dcache_replay_payload_lo[2])
+     ,.replay_v_o(dcache_replay_v_lo)
+     ,.replay_paddr_o(dcache_replay_paddr_lo)
+     ,.replay_yumi_i(dcache_replay_yumi_li)
+     ,.replay_accepted_i(dcache_replay_accepted_li)
+     ,.downstream_outstanding_i(dcache_prefetch_outstanding_status_lo)
+     ,.downstream_complete_i(dcache_prefetch_complete_status_lo)
+     ,.follow_ready_i(~icache_prefix_status_lo[1])
+     ,.follow_active_i(icache_prefix_status_lo[1])
+     ,.follow_configured_i(|icache_prefix_status_lo[12:4])
+     ,.follow_trigger_o(dcache_replay_follow_trigger_lo)
+     ,.clear_counters_i(dcache_replay_config_v_lo
+                        & dcache_replay_payload_lo[dword_width_gp-1])
+     ,.status_o(dcache_replay_status_lo)
+     );
+
+  bp_uce
+   #(.bp_params_p(bp_params_p)
+     ,.assoc_p(dcache_assoc_p)
+     ,.sets_p(dcache_sets_p)
+     ,.block_width_p(dcache_block_width_p)
+     ,.fill_width_p(dcache_fill_width_p)
+     ,.data_width_p(dcache_data_width_p)
+     ,.tag_width_p(dcache_tag_width_p)
+     ,.id_width_p(dcache_req_id_width_p)
+     ,.writeback_p(dcache_features_p[e_cfg_writeback])
+     ,.prefetch_els_p(dcache_prefetch_els_p)
+     ,.prefetch_full_line_p(dcache_prefetch_full_line_p)
+     ,.prefetch_ignore_credits_p(1'b1)
+     )
+   dcache_uce
+    (.clk_i(negedge_clk)
+     ,.reset_i(reset_i)
+
+     ,.did_i(did_li)
+     ,.lce_id_i(lce_id_li[1])
+
+     ,.cache_req_i(dcache_req_lo)
+     ,.cache_req_v_i(dcache_req_v_lo)
+     ,.cache_req_yumi_o(dcache_req_yumi_li)
+     ,.cache_req_lock_o(dcache_req_lock_li)
+     ,.cache_req_metadata_i(dcache_req_metadata_lo)
+     ,.cache_req_metadata_v_i(dcache_req_metadata_v_lo)
+     ,.preview_paddr_i(physical_preview_paddr_lo)
+     ,.preview_v_i(physical_preview_v_lo & physical_preview_allowed_lo
+                   & (physical_preview_paddr_lo != '0))
+     ,.preview_cancel_i(physical_preview_v_lo & (physical_preview_paddr_lo == '0))
+     ,.preview_ready_o()
+     ,.preview_idle_o(physical_preview_idle_lo)
+     ,.cache_req_id_o(dcache_req_id_li)
+     ,.cache_req_critical_o(dcache_req_critical_li)
+     ,.cache_req_last_o(dcache_req_last_li)
+     ,.cache_req_credits_full_o(dcache_req_credits_full_li)
+     ,.cache_req_credits_empty_o(dcache_req_credits_empty_li)
+
+     ,.detached_prefetch_addr_i('0)
+     ,.detached_prefetch_v_i(1'b0)
+     ,.detached_prefetch_ready_and_o()
+     ,.prefetch_outstanding_o(dcache_prefetch_outstanding_count_lo)
+     ,.prefetch_complete_o(dcache_prefetch_complete_count_lo)
+
+     ,.tag_mem_pkt_o(dcache_tag_mem_pkt_li)
+     ,.tag_mem_pkt_v_o(dcache_tag_mem_pkt_v_li)
+     ,.tag_mem_pkt_yumi_i(dcache_tag_mem_pkt_yumi_lo)
+     ,.tag_mem_i(dcache_tag_mem_lo)
+
+     ,.data_mem_pkt_o(dcache_data_mem_pkt_li)
+     ,.data_mem_pkt_v_o(dcache_data_mem_pkt_v_li)
+     ,.data_mem_pkt_yumi_i(dcache_data_mem_pkt_yumi_lo)
+     ,.data_mem_i(dcache_data_mem_lo)
+
+     ,.stat_mem_pkt_o(dcache_stat_mem_pkt_li)
+     ,.stat_mem_pkt_v_o(dcache_stat_mem_pkt_v_li)
+     ,.stat_mem_pkt_yumi_i(dcache_stat_mem_pkt_yumi_lo)
+     ,.stat_mem_i(dcache_stat_mem_lo)
+
+     ,.mem_fwd_header_o(_mem_fwd_header_o[1])
+     ,.mem_fwd_data_o(_mem_fwd_data_o[1])
+     ,.mem_fwd_v_o(_mem_fwd_v_o[1])
+     ,.mem_fwd_ready_and_i(_mem_fwd_ready_and_i[1])
+
+     ,.mem_rev_header_i(_mem_rev_header_i[1])
+     ,.mem_rev_data_i(_mem_rev_data_i[1])
+     ,.mem_rev_v_i(_mem_rev_v_i[1])
+     ,.mem_rev_ready_and_o(_mem_rev_ready_and_o[1])
+     );
+
+  bsg_fifo_1r1w_edge
+   #(.width_p($bits(bp_bedrock_mem_fwd_header_s)+bedrock_fill_width_p))
+   mem_fwd
+    (.clk_i(negedge_clk)
+     ,.reset_i(reset_i)
+
+     ,.data_i({_mem_fwd_header_o[1], _mem_fwd_data_o[1]})
+     ,.v_i(_mem_fwd_v_o[1])
+     ,.ready_and_o(_mem_fwd_ready_and_i[1])
+
+     ,.data_o({mem_fwd_header_o[1], mem_fwd_data_o[1]})
+     ,.v_o(mem_fwd_v_o[1])
+     ,.ready_and_i(mem_fwd_ready_and_i[1])
+     );
+
+  bsg_fifo_1r1w_edge
+   #(.width_p($bits(bp_bedrock_mem_rev_header_s)+bedrock_fill_width_p))
+   mem_rev
+    (.clk_i(posedge_clk)
+     ,.reset_i(reset_i)
+
+     ,.data_i({mem_rev_header_i[1], mem_rev_data_i[1]})
+     ,.v_i(mem_rev_v_i[1])
+     ,.ready_and_o(mem_rev_ready_and_o[1])
+
+     ,.data_o({_mem_rev_header_i[1], _mem_rev_data_i[1]})
+     ,.v_o(_mem_rev_v_i[1])
+     ,.ready_and_i(_mem_rev_ready_and_o[1])
+     );
+
+endmodule
