@@ -1332,6 +1332,8 @@ The experiments are valuable where they quantify these effects, expose unexpecte
 - **Meaning:** natural data demand does not turn local cache work into uniform complete execution gains. Parsing is a useful replication candidate; lookup and chase remain negative or unresolved controls. Static address-table tuning is unjustified by this evidence.
 - **Limits:** these original-ELF measurements include triggers and interference in each two-switch request, but exclude allocation, fork, warmup, checker and teardown. They are not whole-program or replicated application speedups. A separate optional ELF adds whole-cell timing and actual retention-use telemetry without changing the original ELF bytes.
 
+- **Subsequent mode-14 mechanism gate (2026-11-20):** complete matched short boots on the same accepted bitstream and exact e943 ELF/gzip transfer record 93 unsaturated triggers/160 admissions on ef50 versus 26 triggers/64 admissions on the one-byte d14 early-only control, with zero drops. The 26 control triggers equal known early wake calls. Source/binary proof identifies the removed selection path, but counters cover setup through teardown and resident drops saturate; this does not price timed cost, unique capacity or speedup. Whole-cell/resource execution comparisons remain pending (`research/mode14-early-only-20261120/physical-counter-gate.json`).
+
 ### RL-126 — First completed demand-line retention is an unaccepted capacity experiment
 
 - **Status:** frozen RTL `2958cd72137d195537b2c86ad11537ea9cd6388e`; directed cache, real CSR decoder/wrapper, full-core context/privilege and default-policy smoke gates pass; route and Linux execution pending

@@ -1,4 +1,4 @@
-This study isolates the extra scheduler-selection trigger unintentionally retained by historical Linux mode 14. It prepares a single-instruction control from the exact accepted old image and separately corrects the maintained source patch stack. No FPGA execution or performance result is claimed here.
+This study isolates the extra scheduler-selection trigger unintentionally retained by historical Linux mode 14. It prepares a single-instruction control from the exact accepted old image and separately corrects the maintained source patch stack. Complete short FPGA runs confirm the trigger difference; execution-speed improvement remains unaccepted.
 
 The exact accepted old ELF `0792746b...d4a3` converts to payload `bf0318e8...be6d`, matching source NBF `ef50be19...1cf4`. Its mode-14 futex-entry trigger is at virtual address `ffffffff8009848e`. The late selection path also admits mode 14: it subtracts six, truncates to a byte, and skips the trigger only when that result is at most seven. Mode 14 produces eight and reaches `csrw 0x5c0,zero` at `ffffffff80813fee`. The TTWU mode dispatch separately excludes mode 14. Mode zero bypasses the selection block; this defect does not explain failures before any task is armed.
 
@@ -27,3 +27,12 @@ The analyzer now uses actual unsaturated sweep accounting: processed entries equ
 A distinct `pipe-hint-benchmark-plain-resources-dynamic` target also builds resource and whole-cell timing without zlib or the retention ABI. Its compressed-transfer target is `emit-pipe-hint-benchmark-plain-resources-compressed-transfer`. The existing six ELF recipes are unchanged; the root agent owns cross-compilation and artifact identity validation. No benchmark C or frozen session-runner source changed for this addition.
 
 `host-tests.log` records the focused patch, analyzer, policy/route comparator, retention and resource-accounting tests. The next causal measurement must compare complete execution of the original and control images with the same ELF, workload, footprint, loop/warmup counts and terminal protocol across recovered boot strata; a faster metadata sweep or an isolated local endpoint is insufficient.
+
+Two separately reserved, hard-recovered FPGA boots close the first mechanism gate. Both use the accepted f091 bitstream, exact e943 ELF and gzip-transfer identity, scan with 32 KiB per process, 8 timed loops, 4 warmups and 2 paired repeats. The only image difference is the reviewed instruction byte. Each verifies the guest ELF, completes independent checks, returns to the shell and reaches CORE/BSG PASS with runner exit zero.
+
+| Image / session | Accepted triggers | Admitted lines | Dropped triggers |
+| --- | ---: | ---: | ---: |
+| Accepted old ef50 / 11 | 93 | 160 | 0 |
+| Early-only d14 / 10 | 26 | 64 | 0 |
+
+The 26 early-only triggers equal the 26 known parent wake calls. The old image's 67 additional triggers agree with its proven selection path. These counters cover setup, warmup, timing and teardown together; they do not locate those extra triggers inside the timed interval, price their execution cost, identify unique retained capacity, or establish 93 as a general scheduling frequency. Resident drops saturate at 511 in both runs. `physical-counter-gate.json` binds raw logs, runner statuses, reservation/release manifests, configurations and unsaturated counter values. These short plain-ELF runs have no WHOLE/resource rows and are ineligible for the dedicated whole-cell performance comparator.
