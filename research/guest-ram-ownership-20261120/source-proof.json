@@ -1,0 +1,108 @@
+{
+  "top": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/v/top_zynq.sv",
+    "git_blob": "64755b7f574cb2ce84e3fd84faef89f1c7032b30",
+    "bytes": 35875,
+    "sha256": "06fb7de89d18db8958ade1e7beac863c11418f2e3421cc1e387bc3a40bed44cf",
+    "excerpts": [
+      {
+        "first_line": 248,
+        "last_line": 253,
+        "text": "248    logic                                 bp_s_axil_rready;\n249 \n250    localparam debug_lp = 0;\n251    localparam memory_upper_limit_lp = 256*1024*1024;\n252 \n253    // Connect Shell to AXI Bus Interface S00_AXI"
+      },
+      {
+        "first_line": 664,
+        "last_line": 677,
+        "text": "664    // to translate from BP DRAM space to ARM PS DRAM space\n665    // we xor-subtract the BP DRAM base address (32'h8000_0000) and add the\n666    // ARM PS allocated memory space physical address.\n667 \n668    //always @(negedge aclk)\n669    //  begin\n670    //     if (hp0_axi_awvalid && ((axi_awaddr ^ 32'h8000_0000) >= memory_upper_limit_lp))\n671    //       $display(\"top_zynq: unexpectedly high DRAM write: %x\",axi_awaddr);\n672    //     if (hp0_axi_arvalid && ((axi_araddr ^ 32'h8000_0000) >= memory_upper_limit_lp))\n673    //       $display(\"top_zynq: unexpectedly high DRAM read: %x\",axi_araddr);\n674    //  end\n675 \n676    assign hp0_axi_awaddr = (axi_awaddr ^ 32'h8000_0000) + dram_base_li;\n677    assign hp0_axi_araddr = (axi_araddr ^ 32'h8000_0000) + dram_base_li;"
+      }
+    ]
+  },
+  "host": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/ps.cpp",
+    "git_blob": "667609c1648a4bd17fc7d4f054b34b3b15665934",
+    "bytes": 22068,
+    "sha256": "0363fadce9d0fe23438bc88948ef1a1221cd0db10875b077de8f925c8d1a500c",
+    "excerpts": [
+      {
+        "first_line": 26,
+        "last_line": 29,
+        "text": "26 #ifndef DRAM_ALLOCATE_SIZE_MB\n27 #define DRAM_ALLOCATE_SIZE_MB 128\n28 #endif\n29 #define DRAM_ALLOCATE_SIZE (DRAM_ALLOCATE_SIZE_MB * 1024 * 1024)"
+      },
+      {
+        "first_line": 179,
+        "last_line": 203,
+        "text": "179     unsigned long phys_ptr;\n180     volatile int *buf;\n181     data = zpl->shell_read(GP0_RD_CSR_DRAM_INITED);\n182     if (data != 0)\n183         bsg_pr_warn(\n184             \"ps.cpp: ignoring stale cross-process DRAM base pointer %x\\n\",\n185             zpl->shell_read(GP0_RD_CSR_DRAM_BASE));\n186     zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);\n187 \n188     bsg_pr_info(\"ps.cpp: allocating owned DRAM buffer with size %ld\\n\",\n189                 (long)DRAM_ALLOCATE_SIZE);\n190     buf = (volatile int *)zpl->allocate_dram(DRAM_ALLOCATE_SIZE, &phys_ptr);\n191 #ifdef AXI_MEM_ENABLE\n192     // The simulation AXI RAM is a separate address space, not a mapping of\n193     // this host allocation. A malloc pointer is neither page aligned nor\n194     // bounded by that RAM and shifts otherwise legal cache-line bursts across\n195     // AXI's 4 KiB boundaries. NBF writes initialize the simulated RAM via AXI.\n196     phys_ptr = 0;\n197 #endif\n198     bsg_pr_info(\"ps.cpp: received %p (phys = %lx)\\n\", buf, phys_ptr);\n199     zpl->shell_write(GP0_WR_CSR_DRAM_BASE, phys_ptr, mask1);\n200     assert((zpl->shell_read(GP0_RD_CSR_DRAM_BASE) == (int32_t)(phys_ptr)));\n201     bsg_pr_info(\"ps.cpp: wrote and verified base register\\n\");\n202     zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x1, mask2);\n203     assert(zpl->shell_read(GP0_RD_CSR_DRAM_INITED) == 1);"
+      }
+    ]
+  },
+  "allocator": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/include/zynq/bsg_zynq_pl.h",
+    "git_blob": "d8e3bb23ec524aa95af2f0f8d5494fb45fda24ce",
+    "bytes": 4530,
+    "sha256": "48d980b9c52fe702162c1421f141203a32741402d05fe18ccdd3c2b67e1188ad",
+    "excerpts": [
+      {
+        "first_line": 86,
+        "last_line": 108,
+        "text": "86     // returns virtual pointer, writes physical parameter into arguments\n87     void *allocate_dram(unsigned long len_in_bytes,\n88                         unsigned long *physical_ptr) override {\n89         py::gil_scoped_acquire acquire;\n90 \n91         // for now, we do uncacheable to keep things simple, memory accesses go\n92         // straight to DRAM and\n93         // thus would be coherent with the PL\n94         py::module_ pynq = py::module_::import(\"pynq\");\n95         py::object buffer = pynq.attr(\"allocate\")(\n96             py::arg(\"shape\") = py::make_tuple(len_in_bytes),\n97             py::arg(\"dtype\") = \"u1\");\n98 \n99         *physical_ptr = buffer.attr(\"physical_address\").cast<unsigned long>();\n100 \n101         auto array = buffer.cast<py::array_t<uint8_t>>();\n102         py::buffer_info info = array.request();\n103         void *virtual_ptr = info.ptr;\n104 \n105         DramMap *dram_map = get_dram_map();\n106         (*dram_map)[virtual_ptr] = buffer;\n107 \n108         return virtual_ptr;"
+      }
+    ]
+  },
+  "host_make": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/zynq/Makefile",
+    "git_blob": "57b6a0ad520a48783a87d79d780971bb5928c28c",
+    "bytes": 416,
+    "sha256": "28114844f8057b71bdbe3c6ff5fbcd6986e72667537bb05d6f3054ee82e6af85",
+    "excerpts": [
+      {
+        "first_line": 6,
+        "last_line": 14,
+        "text": "6 DEFINES += GP0_ADDR_SIZE_BYTES=4096\n7 DEFINES += GP1_ADDR_SIZE_BYTES=0x30000000\n8 ifeq ($(BOARDNAME),pynqz2)\n9 DEFINES += DRAM_ALLOCATE_SIZE_MB=64\n10 else ifeq ($(BOARDNAME),ultra96v2)\n11 DEFINES += DRAM_ALLOCATE_SIZE_MB=200\n12 else ifeq ($(BOARDNAME),mercuryxu1)\n13 DEFINES += DRAM_ALLOCATE_SIZE_MB=200\n14 endif"
+      }
+    ]
+  },
+  "riscv_mem": {
+    "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/arch/riscv/mm/init.c",
+    "bytes": 45605,
+    "sha256": "573814778113cc63e7a9159d4bf16c1910ba488ce7c29288897dfd9fb27415d4",
+    "excerpts": [
+      {
+        "first_line": 173,
+        "last_line": 203,
+        "text": "173 /* Limit the memory size via mem. */\n174 static phys_addr_t memory_limit;\n175 \n176 static int __init early_mem(char *p)\n177 {\n178 \tu64 size;\n179 \n180 \tif (!p)\n181 \t\treturn 1;\n182 \n183 \tsize = memparse(p, &p) & PAGE_MASK;\n184 \tmemory_limit = min_t(u64, size, memory_limit);\n185 \n186 \tpr_notice(\"Memory limited to %lldMB\\n\", (u64)memory_limit >> 20);\n187 \n188 \treturn 0;\n189 }\n190 early_param(\"mem\", early_mem);\n191 \n192 static void __init setup_bootmem(void)\n193 {\n194 \tphys_addr_t vmlinux_end = __pa_symbol(&_end);\n195 \tphys_addr_t max_mapped_addr;\n196 \tphys_addr_t phys_ram_end, vmlinux_start;\n197 \n198 \tif (IS_ENABLED(CONFIG_XIP_KERNEL))\n199 \t\tvmlinux_start = __pa_symbol(&_sdata);\n200 \telse\n201 \t\tvmlinux_start = __pa_symbol(&_start);\n202 \n203 \tmemblock_enforce_memory_limit(memory_limit);"
+      }
+    ]
+  },
+  "memblock": {
+    "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/mm/memblock.c",
+    "bytes": 64453,
+    "sha256": "49004c95259760df45e4955dbb7e8216856b483739b4f41c0880be8200152148",
+    "excerpts": [
+      {
+        "first_line": 1702,
+        "last_line": 1740,
+        "text": "1702 static phys_addr_t __init_memblock __find_max_addr(phys_addr_t limit)\n1703 {\n1704 \tphys_addr_t max_addr = PHYS_ADDR_MAX;\n1705 \tstruct memblock_region *r;\n1706 \n1707 \t/*\n1708 \t * translate the memory @limit size into the max address within one of\n1709 \t * the memory memblock regions, if the @limit exceeds the total size\n1710 \t * of those regions, max_addr will keep original value PHYS_ADDR_MAX\n1711 \t */\n1712 \tfor_each_mem_region(r) {\n1713 \t\tif (limit <= r->size) {\n1714 \t\t\tmax_addr = r->base + limit;\n1715 \t\t\tbreak;\n1716 \t\t}\n1717 \t\tlimit -= r->size;\n1718 \t}\n1719 \n1720 \treturn max_addr;\n1721 }\n1722 \n1723 void __init memblock_enforce_memory_limit(phys_addr_t limit)\n1724 {\n1725 \tphys_addr_t max_addr;\n1726 \n1727 \tif (!limit)\n1728 \t\treturn;\n1729 \n1730 \tmax_addr = __find_max_addr(limit);\n1731 \n1732 \t/* @limit exceeds the total size of the memory, do nothing */\n1733 \tif (max_addr == PHYS_ADDR_MAX)\n1734 \t\treturn;\n1735 \n1736 \t/* truncate both memory and reserved regions */\n1737 \tmemblock_remove_range(&memblock.memory, max_addr,\n1738 \t\t\t      PHYS_ADDR_MAX);\n1739 \tmemblock_remove_range(&memblock.reserved, max_addr,\n1740 \t\t\t      PHYS_ADDR_MAX);"
+      }
+    ]
+  },
+  "historical_46MiB_runner": {
+    "path": "/home/coyang/zynq-parrot/logs/linux-memory46-boot-control-20261006/README.md",
+    "bytes": 8549,
+    "sha256": "dcea136793c43a46efbeaff48a17cad1300c28b975d3682c3ab33dc370c4afa7",
+    "excerpts": [
+      {
+        "first_line": 10,
+        "last_line": 17,
+        "text": "10 \n11 - top-level route: `e860ceea`\n12 - BlackParrot RTL: `52c5dde701263b4a476fc87ae0c37afb9721cfcb`\n13 - bitstream SHA-256:\n14   `f4a183d8f900170ce5a6eb59366d56609cbe0f492063ea5a41b791d807306c5a`\n15 - 46 MiB `control-program` SHA-256:\n16   `2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30`\n17 - OpenSBI-only prefix NBF SHA-256:"
+      }
+    ]
+  }
+}

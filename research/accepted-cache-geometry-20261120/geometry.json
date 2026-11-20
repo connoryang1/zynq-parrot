@@ -1,0 +1,446 @@
+{
+  "purpose": "Audit cache and advisory-store geometry of the accepted f091 FPGA package from its exact recorded source revisions and default static configuration. Separate source inference from actual FFC elaborated constants and historical L2-only capacity controls; no build, target execution or board I/O occurred.",
+  "state": "read_only_source_audit_complete",
+  "accepted_package": {
+    "bit_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "package": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "sha256": "b139be87bdadf965f2d5e7eb7cd290bc56be76753a2377dc25f5c690a69d5ab1",
+      "bytes": 1750672
+    },
+    "revisions": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/revisions.txt",
+      "sha256": "a52606104171e6aa7708eb66d5e4dce2f94375285c3b7b52554e88ed46eedbc3",
+      "bytes": 363
+    },
+    "top_revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "blackparrot_revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "configuration": "e_bp_unicore_zynqparrot_prefetch_cfg",
+    "configuration_enum": 4,
+    "physical_threads_source_inferred": 2,
+    "logical_contexts_source_inferred": 4,
+    "basis": "recorded static CFG, default NUM_THREADS/NUM_CONTEXTS flags; no independent routed geometry elaboration recovered",
+    "actual_route_geometry_verified": false,
+    "vds_dcp_available": false,
+    "no_unrecorded_override_assumed": true
+  },
+  "accepted_source_inferred": {
+    "L1I": {
+      "sets": 64,
+      "ways": 8,
+      "line_bytes": 64,
+      "data_capacity_bytes": 32768,
+      "scope": "per core, shared by physical/logical contexts",
+      "fill_width_bits": 64
+    },
+    "L1D": {
+      "sets": 64,
+      "ways": 8,
+      "line_bytes": 64,
+      "data_capacity_bytes": 32768,
+      "scope": "per core, shared by physical/logical contexts",
+      "fill_width_bits": 64
+    },
+    "L2": {
+      "slices": 1,
+      "banks_per_slice": 2,
+      "sets_per_bank": 16,
+      "ways": 2,
+      "line_bytes": 64,
+      "data_capacity_bytes": 4096,
+      "data_width_bits": 64,
+      "fill_width_bits": 64,
+      "capacity_formula": "1*2*16*2*64"
+    },
+    "I_advisory": {
+      "complete_line_entries": 32,
+      "bytes_per_entry": 64,
+      "retained_payload_bytes": 2048,
+      "banks": 4,
+      "ways_per_bank": 8,
+      "scope": "one shared cache-local store per core, not per resident/logical context",
+      "uce_transaction_slots": 4,
+      "controller_address_entries": 256,
+      "controller_is_payload_storage": false
+    },
+    "D_advisory": {
+      "segment_entries": 4,
+      "bytes_per_segment": 16,
+      "words_per_segment": 2,
+      "word_bits": 64,
+      "retained_payload_bytes": 64,
+      "scope": "TOTAL per core/cache instance, shared across all resident and logical contexts",
+      "context_tag_present": false,
+      "lookup_tag": "physical address[PADDR-1:4] plus valid bits",
+      "one_use_word_consumption": true,
+      "matching_store_or_normal_l1_hit_invalidates": true,
+      "prefetch_full_line": false,
+      "uce_transaction_slots": 4,
+      "uce_preview_address_queue_entries": 4,
+      "replay_command_queue_entries": 2,
+      "replay_address_slots": 4,
+      "replay_addresses_per_slot": 32,
+      "request_queues_are_payload_storage": false
+    }
+  },
+  "inheritance": [
+    {
+      "step": "select",
+      "source": "cfg_select",
+      "lines": [
+        8,
+        14
+      ],
+      "fact": "generated bsg_blackparrot_pkg.bp_cfg_gp=recordedCFG; top_instantiation:14 defaults bp_params_p to bp_cfg_gp"
+    },
+    {
+      "step": "schema_defaults",
+      "source": "schema",
+      "lines": [
+        325,
+        346,
+        347,
+        367,
+        370,
+        371,
+        372
+      ],
+      "fact": "I/D64sets8ways512-bitblock; L2slices2,banks1,sets32,ways2,block512; Dels2/full_line0"
+    },
+    {
+      "step": "derive",
+      "source": "macros",
+      "lines": [
+        217,
+        229
+      ],
+      "fact": "field value inv inherits fallback; derive builds every field through the override macro"
+    },
+    {
+      "step": "top_base",
+      "source": "top_pkg",
+      "lines": [
+        24,
+        26,
+        28,
+        34,
+        35,
+        37,
+        47,
+        59
+      ],
+      "fact": "base derives bp_default; residentthreads2; fills64bits; L2slices1,banks1; no L1set/way/blockoverride and no L2sets/ways/blockoverride"
+    },
+    {
+      "step": "selected_static_prefetch",
+      "source": "top_pkg",
+      "lines": [
+        115,
+        118,
+        124,
+        128,
+        130
+      ],
+      "fact": "banks2,Dels4; L2sets=(basebanks*baseL2sets)/2=(1*32)/2=16; inherits all L1geometry and Dfull_line0"
+    },
+    {
+      "step": "legacy_two_bank_define",
+      "source": "top_pkg",
+      "lines": [
+        38,
+        43,
+        44,
+        45
+      ],
+      "fact": "Even if BP_ZYNQ_PREFETCH_TWO_BANKS were enabled, basebanks2,basesets16 and the named override still derives16sets/bank and overridesDels to4. This does not change selected cache capacities."
+    },
+    {
+      "step": "custom_define_scope",
+      "source": "schema",
+      "lines": [
+        419,
+        462,
+        470,
+        476,
+        493,
+        496
+      ],
+      "fact": "BP_L2_SETS, BP_DCACHE_PREFETCH_ELS and other define overrides construct bp_custom_cfg_p; selected static enum4 is distinct from e_bp_custom_cfg enum1. Recorded default thread flags do not select customCFG."
+    },
+    {
+      "step": "module_localparams",
+      "source": "macros",
+      "lines": [
+        76,
+        86,
+        92,
+        93,
+        120,
+        123,
+        130
+      ],
+      "fact": "cache modules use selected proc_param fields; L2enabled bit is set; wordsperL2block=512/64=8"
+    },
+    {
+      "step": "actual_array_shapes",
+      "source": "l2_instantiation",
+      "lines": [
+        112,
+        118,
+        119,
+        120
+      ],
+      "fact": "one bsg_cache per L2bank; sets=l2_sets_p,ways=l2_assoc_p,blockwords=l2_block_size_in_words_p; unicore_routing:362 has one slice per l2_slices_p"
+    },
+    {
+      "step": "I_store_override",
+      "source": "unicore_lite",
+      "lines": [
+        163,
+        164,
+        302,
+        303,
+        306
+      ],
+      "fact": "core_minimal receives enabledIstore/32entries; modulepass-through toFE/ICache; I-UCE4full-line side-buffer transactions. icache:153-167 derives4banks8ways; icache:890 declares64-bitwordbanks over32entries."
+    },
+    {
+      "step": "D_store_scope",
+      "source": "dcache",
+      "lines": [
+        492,
+        494,
+        495,
+        496,
+        502,
+        513,
+        515,
+        518
+      ],
+      "fact": "els4,one physical16Btag per entry,2wordvalidbits and8total64-bitwords; no thread/context dimension or tags"
+    }
+  ],
+  "D_transport_source_conditions": {
+    "source_refs": [
+      "uce:148-149",
+      "uce:1287-1293",
+      "uce:1307-1318",
+      "response_pump:104-105",
+      "top_pkg:28,32",
+      "top_instantiation:174-180,711",
+      "unicore_routing:190-196"
+    ],
+    "logical_read_bytes": 16,
+    "bedrock_fill_bits": 64,
+    "response_words": 2,
+    "response_word_bytes": 8,
+    "interpretation": "full_line0 selects a16-byte BedRock read; narrow response words are forwarded at base+(fill_count<<3), so this is two8-byte logical response beats, not a64-byte UCE forward of which16bytes are retained.",
+    "physical_preview_ingress": "Only directCSR0x9c0 enters UCE.preview_v, sets prefetch_preview_r=1, and discards narrow replies. Tagged physical replay is a separate ingress.",
+    "routing_under_default_flags": "top_zynq derives prefetch_axi_bypass=0 for selected four-entry namedCFG; only5/10CFG or explicit BP_PREFETCH_AXI_BYPASS enables direct bypass. Therefore default narrow D requests traverse normal L2 routing.",
+    "lower_hierarchy_limit": "An ordinary L2miss may allocate/fetch a64-byte block. No physical AXI transaction count, DRAM byte count, latency, L2pressure or bandwidth cost is established by this source audit.",
+    "tagged_replay_ingress": "CSR0x9c1/9c2 configure controller;CSR0x9c3 (explicitLinuxPR0x42505060) triggers slot. Controller\u2192PMA\u2192pipe_mem e_dcache_op_prefetch with supplied physical ptag\u2192Dcache e_cache_prefetch\u2192UCE prefetch_allocate sets preview_r=0\u2192narrow e_cache_data_mem_prefetch replies can fill global64B D advisory store. Physical-address input does not imply direct-preview reply discard.",
+    "tagged_source_lines": {
+      "bp_be_csr.sv": [
+        1117,
+        1120,
+        1123
+      ],
+      "bp_unicore_lite.sv": [
+        133,
+        178,
+        377,
+        378,
+        381,
+        382,
+        383,
+        384,
+        386,
+        387,
+        430,
+        431
+      ],
+      "bp_be_pipe_mem.sv": [
+        297,
+        321,
+        324,
+        325,
+        346,
+        353
+      ],
+      "bp_be_dcache.sv": [
+        802,
+        855,
+        856
+      ],
+      "bp_uce.sv": [
+        198,
+        199,
+        1603,
+        1609,
+        1637,
+        1646,
+        1307,
+        1309,
+        1313
+      ]
+    },
+    "csr_fields": {
+      "9c1": "slot[46:45],entry[44:40],paddr[33:0]",
+      "9c2": "slot[1:0],count[7:2],delay[23:8],gap[31:24],clear countersbit63",
+      "9c3": "slot[1:0],instructionfollowbit2; no preview-versus-cache selector"
+    },
+    "l2_allocation_source": "Defaultbypass0 routes bothnarrowDingresses toL2. bp_me_cache_controller.sv:556-569 maps16Bmem_rd toLM; recordedBaseJump3dff9f43 bsg_cache_decode.sv:43-51 makesLMaload; bsg_cache_miss.sv:324-337 choosesway andblockalignedDMAfill;455-490fillsdataandpublishestagvalid. This is an allocating normalL2load path, not measuredtraffic.",
+    "source_claim_limit": "Tagged can populate sidebuffer and allocate L2; source alone does not prove how much is resident atfirstuse, actualsidehits, AXIbytes, interference or performanceattribution. UCEdrainedstatus isnotadvisorywordvalidoccupancy.",
+    "replay_path_source_proof": {
+      "path": "replay-path-source-proof.json",
+      "sha256": "1d6abf98257db0ed469741780e2947649e0763dbf1115092c7d1adc744297b06"
+    },
+    "kernel_prctl_routes": {
+      "config": {
+        "prctl": "0x4250505c",
+        "retained_source": "research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.c",
+        "lines": "2905-2971",
+        "csr": "0x9c1 entries; 0x9c2 config"
+      },
+      "explicit_trigger": {
+        "prctl": "0x42505060",
+        "retained_source": "research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.c",
+        "lines": "3020-3050",
+        "csr": "0x9c3 = slot when enabled; no write when disabled"
+      },
+      "direct_preview": {
+        "csr": "0x9c0",
+        "source_path": "UCE preview_v input only; preview_r=1; replies discarded"
+      },
+      "selector_limit": "0x9c3 bit2 selects instruction follow behavior, not direct-preview versus advisory-store ingress"
+    }
+  },
+  "ffc_actual_comparison": {
+    "session": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/session.json",
+      "sha256": "bc9740502055155e6d74688e43cc8f1568b22a12235bafe462af8eac5c5a82fc",
+      "bytes": 56345
+    },
+    "model": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off40/model/Vbsg_nonsynth_zynq_testbench",
+      "sha256": "85505d381643fca1a118c9e5d6930468e9bcce736ebfd0a926fb36419064af8b",
+      "bytes": 15396464
+    },
+    "top_revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+    "blackparrot_revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57",
+    "configuration": "e_bp_custom_cfg;BP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p",
+    "defines": {
+      "BP_NCPUS": "1",
+      "BP_CUSTOM_BASE_CFG": "bp_unicore_zynqparrot_cfg_p",
+      "BP_NUM_THREADS": "2",
+      "BP_NUM_CONTEXTS": "4",
+      "BRANCH_METADATA_FWD_WIDTH": "50",
+      "BP_AXI_MEM_PIPELINED": "1",
+      "BP_AXI_MEM_READ_LATENCY": "40",
+      "BP_AXI_MEM_READ_QUEUE_DEPTH": "4"
+    },
+    "initial_parameter_evidence": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/accepted-cache-geometry-20261120/ffc-initial-parameters.json",
+      "sha256": "494e26ec2ec02e08ac3496260a4f41d752e7097d850d22402f46a68c0f221ab1",
+      "bytes": 7500
+    },
+    "L1I": {
+      "sets": 64,
+      "ways": 8,
+      "line_bytes": 64,
+      "data_capacity_bytes": 32768,
+      "scope": "per core, shared by physical/logical contexts",
+      "fill_width_bits": 64
+    },
+    "L1D": {
+      "sets": 64,
+      "ways": 8,
+      "line_bytes": 64,
+      "data_capacity_bytes": 32768,
+      "scope": "per core, shared by physical/logical contexts",
+      "fill_width_bits": 64
+    },
+    "L2": {
+      "slices": 1,
+      "banks_per_slice": 1,
+      "sets_per_bank": 32,
+      "ways": 2,
+      "line_bytes": 64,
+      "data_capacity_bytes": 4096,
+      "capacity_formula": "1*1*32*2*64"
+    },
+    "I_advisory": {
+      "entries": 32,
+      "entry_bytes": 64,
+      "payload_bytes": 2048,
+      "banks": 4,
+      "ways_per_bank": 8,
+      "I_UCE_transactions": 4
+    },
+    "D_advisory": {
+      "segment_entries": 2,
+      "entry_bytes": 16,
+      "payload_bytes": 32,
+      "full_line": false,
+      "D_UCE_transactions": 2,
+      "observed_64bit_data_words": 4
+    },
+    "normal_baseline_only": "Existing analyzer rejects any accepted prefetch_req or consumed side_hit, and validated only normal-cache references/refills. Its result does not exercise D advisory storage or prove a side-capacity benefit.",
+    "mapping_difference": "Same L2 totalbytes does not mean same bankmapping/concurrency; acceptedstatic2x16 differs from FFC1x32. Also acceptedD64B differs from FFC32B."
+  },
+  "historical_RL106": {
+    "archive": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/l2-capacity-preview-20261101.tar.xz",
+      "sha256": "fa243da65ce6ea9eee17113d1812d8d84147f0ea80abf4fa1810b6a6304e9140",
+      "bytes": 20665708
+    },
+    "parameter_proof": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/accepted-cache-geometry-20261120/rl106-parameter-proof.txt",
+      "sha256": "6402ecc431a3f938e735a593ca00c01e268fc7606c021c6cd5fc7dc89e7f42ff",
+      "bytes": 509
+    },
+    "original_readme": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/accepted-cache-geometry-20261120/rl106-original-readme.txt",
+      "sha256": "236151f17dd811bbfef15d8ad64cc60252d67a171f736e7fbe2ffc7390f68bab",
+      "bytes": 5702
+    },
+    "dynamic_configuration": {
+      "physical_threads": 2,
+      "logical_contexts": 10,
+      "extra_defines": "BP_ZYNQ_PREFETCH_TWO_BANKS BP_AXI_MEM_PIPELINED BP_L2_SETS=32-or-64"
+    },
+    "arms": [
+      {
+        "L2_banks": 2,
+        "sets_per_bank": 32,
+        "ways": 2,
+        "line_bytes": 64,
+        "total_bytes": 8192,
+        "elaborated_l2_sets_p": "0x20"
+      },
+      {
+        "L2_banks": 2,
+        "sets_per_bank": 64,
+        "ways": 2,
+        "line_bytes": 64,
+        "total_bytes": 16384,
+        "elaborated_l2_sets_p": "0x40"
+      }
+    ],
+    "L1_geometry_changed": false,
+    "claim_limit": "Directed L2 retention difference only. Does not establish L1D capacity, D advisory retention, I advisory capacity, application speedup, or geometry of the accepted f091 route. Namedstatic16KiBendpoint is a separate smoke, not selectedCFG4."
+  },
+  "source_objects": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/accepted-cache-geometry-20261120/source-objects.json",
+    "sha256": "9f5755ab237dbaeb5873850e1be4384c39b396a41f9772a4a526722991be939e",
+    "bytes": 42219
+  },
+  "findings": [
+    "Acceptedstatic source resolves32KiB L1I and32KiB L1D; any16KiB L1 label is unsupported by these exactobjects.",
+    "Acceptedstatic source resolves4KiB L2(two16-setbanks), not the unselected16KiB L2endpoint.",
+    "D64B is global retained payload, not percontext, and must not be multiplied by UCEslots, replayaddresscounts, or logicalcontextcount.",
+    "Logical16B D replies do not establish physical memory traffic; lower-level allocation and interference need traces.",
+    "Source-inferred acceptedFPGA parameters remain separate from actual FFC waveform elaborated parameters."
+  ],
+  "no_build_or_board_io": true
+}

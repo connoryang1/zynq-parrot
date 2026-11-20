@@ -1,0 +1,362 @@
+{
+  "top_pkg": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/v/bp_common_pkg.sv",
+    "git_blob": "020f49871fae426282a0b38a4f4311d600e11d6e",
+    "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7",
+    "bytes": 7955,
+    "excerpts": [
+      {
+        "first_line": 19,
+        "last_line": 62,
+        "text": "19   localparam bp_proc_param_s bp_unicore_zynqparrot_cfg_override_p =\n20     '{paddr_width: 34\n21 \n22       // This historical schema has no separate logical-context count. Keep\n23       // the resident register banks at the validated PYNQ-Z2 fit dimension.\n24       ,num_threads: 2\n25 \n26       ,icache_fill_width: 64\n27 \n28       ,dcache_fill_width: 64\n29 \n30       ,acache_fill_width: 64\n31 \n32       ,bedrock_fill_width: 64\n33 \n34       ,l2_data_width: 64\n35       ,l2_fill_width: 64\n36       // Keep the PYNQ-Z2 implementation within the xc7z020 LUT/slice budget.\n37       ,l2_slices    : 1\n38 `ifdef BP_ZYNQ_PREFETCH_TWO_BANKS\n39       // Experimental downstream capacity: retain 4 KiB total (2 ways, 64 B\n40       // lines), with adjacent lines in different banks. Each bank still has\n41       // one miss handler; the shared controller must also admit both requests\n42       // before this can overlap cold fills. Requires full-top and routed gates.\n43       ,l2_banks     : 2\n44       ,l2_sets      : bp_default_cfg_p.l2_sets / 2\n45       ,dcache_prefetch_els: 10\n46 `else\n47       ,l2_banks     : 1\n48 `endif\n49 \n50       ,itlb_els_4k : 16\n51       ,itlb_els_2m : 1\n52       ,itlb_els_1g : 1\n53       ,dtlb_els_4k : 16\n54       ,dtlb_els_2m : 4\n55       ,dtlb_els_1g : 1\n56 \n57       ,default : \"inv\"\n58       };\n59   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_cfg_p\n60                         ,bp_unicore_zynqparrot_cfg_override_p\n61                         ,bp_default_cfg_p\n62                         );"
+      },
+      {
+        "first_line": 114,
+        "last_line": 131,
+        "text": "114   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch_cfg_override_p =\n115     '{l2_banks: 2\n116       // Four detached fills fit the PYNQ-Z2 target while the parameterized\n117       // simulator can still request ten for the ten-worker experiment.\n118       ,dcache_prefetch_els: 4\n119       // Branch metadata includes the resident thread ID. The default has four\n120       // slots; this two-slot endpoint needs one fewer bit (50 rather than 51).\n121       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width\n122                                   - $clog2(bp_default_cfg_p.num_threads)\n123                                   + $clog2(bp_unicore_zynqparrot_cfg_p.num_threads)\n124       ,l2_sets: (bp_unicore_zynqparrot_cfg_p.l2_banks\n125                  * bp_unicore_zynqparrot_cfg_p.l2_sets) / 2\n126       ,default: \"inv\"\n127       };\n128   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch_cfg_p\n129                         ,bp_unicore_zynqparrot_prefetch_cfg_override_p\n130                         ,bp_unicore_zynqparrot_cfg_p\n131                         );"
+      },
+      {
+        "first_line": 164,
+        "last_line": 195,
+        "text": "164   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p =\n165     '{l2_sets: 64\n166       ,default: \"inv\"\n167       };\n168   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch16k_cfg_p\n169                         ,bp_unicore_zynqparrot_prefetch16k_cfg_override_p\n170                         ,bp_unicore_zynqparrot_prefetch_cfg_p\n171                         );\n172 \n173   parameter bp_proc_param_s [max_cfgs-1:0] all_cfgs_gp =\n174   {\n175     bp_unicore_zynqparrot_prefetch16k_cfg_p\n176     ,bp_unicore_zynqparrot_prefetch5_cfg_p\n177     ,bp_unicore_zynqparrot_prefetch10_cfg_p\n178     ,bp_unicore_zynqparrot_prefetch_cfg_p\n179     ,bp_multicore_zynqparrot_cfg_p\n180     ,bp_unicore_zynqparrot_cfg_p\n181 \n182     // A custom BP configuration generated from Makefile\n183     ,bp_custom_cfg_p\n184     // The default BP\n185     ,bp_default_cfg_p\n186   };\n187 \n188   // This enum MUST be kept up to date with the parameter array above\n189   typedef enum bit [lg_max_cfgs-1:0]\n190   {\n191     e_bp_unicore_zynqparrot_prefetch16k_cfg         = 7\n192     ,e_bp_unicore_zynqparrot_prefetch5_cfg           = 6\n193     ,e_bp_unicore_zynqparrot_prefetch10_cfg          = 5\n194     ,e_bp_unicore_zynqparrot_prefetch_cfg           = 4\n195     ,e_bp_multicore_zynqparrot_cfg                  = 3"
+      }
+    ]
+  },
+  "top_design": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/Makefile.design",
+    "git_blob": "7831ea5abb1a95117a3a46c0c143ebfecdf079ba",
+    "sha256": "788766b32948ee71d43cbaf9b7c6fc0a8dadab9c4c791f89cc8ad3cd39c558a9",
+    "bytes": 4369,
+    "excerpts": [
+      {
+        "first_line": 61,
+        "last_line": 70,
+        "text": "61 ifneq ($(NUM_THREADS),)\n62 NUM_CONTEXTS ?= $(NUM_THREADS)\n63 THREAD_ID_WIDTH := $(shell awk 'BEGIN { n=$(NUM_THREADS)-1; w=0; while (n > 0) { w++; n=int(n/2); } print w; }')\n64 BRANCH_METADATA_FWD_WIDTH ?= $(shell awk 'BEGIN { print 49 + $(THREAD_ID_WIDTH); }')\n65 CFG ?= e_bp_custom_cfg\n66 DEFINES += BP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p\n67 DEFINES += BP_NUM_THREADS=$(NUM_THREADS)\n68 DEFINES += BP_NUM_CONTEXTS=$(NUM_CONTEXTS)\n69 DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)\n70 endif"
+      },
+      {
+        "first_line": 92,
+        "last_line": 103,
+        "text": "92 ifeq ($(CFG),e_bp_custom_cfg)\n93 ifeq ($(strip $(NUM_THREADS)),)\n94 $(error CFG=e_bp_custom_cfg requires NUM_THREADS=<resident slots> and NUM_CONTEXTS=<logical contexts>; use NUM_THREADS=2 NUM_CONTEXTS=4 for the PYNQ-Z2 context-cache build)\n95 endif\n96 ifeq ($(strip $(NUM_CONTEXTS)),)\n97 $(error CFG=e_bp_custom_cfg requires NUM_CONTEXTS=<logical contexts>; use NUM_THREADS=2 NUM_CONTEXTS=4 for the PYNQ-Z2 context-cache build)\n98 endif\n99 endif\n100 ifneq ($(strip $(NUM_THREADS)),)\n101 ifneq ($(CFG),e_bp_custom_cfg)\n102 $(error NUM_THREADS/NUM_CONTEXTS select custom context-cache dimensions and require CFG=e_bp_custom_cfg)\n103 endif"
+      }
+    ]
+  },
+  "cfg_select": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/Makefile.collateral",
+    "git_blob": "fe3de375819d50443c74b1eb710909d9176b847d",
+    "sha256": "edf7fd183ecabc67b506518a23a9fed9725f2003ec2b378988fe9109dc24959b",
+    "bytes": 1376,
+    "excerpts": [
+      {
+        "first_line": 8,
+        "last_line": 16,
+        "text": "8 CFG ?= e_bp_unicore_zynqparrot_cfg\n9 bsg_blackparrot_pkg.sv:\n10 \t@$(ECHO) \"package bsg_blackparrot_pkg;\" >> $@\n11 \t@$(ECHO) >> $@\n12 \t@$(ECHO) \"import bp_common_pkg::*;\" >> $@\n13 \t@$(ECHO) >> $@\n14 \t@$(ECHO) \"localparam bp_params_e bp_cfg_gp = $(CFG);\" >> $@\n15 \t@$(ECHO) >> $@\n16 \t@$(ECHO) \"endpackage\" >> $@"
+      }
+    ]
+  },
+  "top_instantiation": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/v/top_zynq.sv",
+    "git_blob": "64755b7f574cb2ce84e3fd84faef89f1c7032b30",
+    "sha256": "06fb7de89d18db8958ade1e7beac863c11418f2e3421cc1e387bc3a40bed44cf",
+    "bytes": 35875,
+    "excerpts": [
+      {
+        "first_line": 14,
+        "last_line": 15,
+        "text": "14  #(parameter bp_params_e bp_params_p = bp_cfg_gp\n15    `declare_bp_proc_params(bp_params_p)"
+      },
+      {
+        "first_line": 170,
+        "last_line": 180,
+        "text": "170    localparam bp_axil_addr_width_lp = 32;\n171    localparam bp_axil_data_width_lp = 32;\n172    localparam bp_axi_addr_width_lp  = 32;\n173    localparam bp_axi_data_width_lp  = 64;\n174 `ifdef BP_PREFETCH_AXI_BYPASS\n175    localparam prefetch_axi_bypass_lp = 1'b1;\n176 `else\n177    localparam prefetch_axi_bypass_lp =\n178      (bp_params_p == e_bp_unicore_zynqparrot_prefetch10_cfg)\n179      || (bp_params_p == e_bp_unicore_zynqparrot_prefetch5_cfg);\n180 `endif"
+      },
+      {
+        "first_line": 701,
+        "last_line": 713,
+        "text": "701    bp_axi_top #\n702      (.bp_params_p(bp_params_p)\n703       ,.m_axil_addr_width_p(bp_axil_addr_width_lp)\n704       ,.m_axil_data_width_p(bp_axil_data_width_lp)\n705       ,.s_axil_addr_width_p(bp_axil_addr_width_lp)\n706       ,.s_axil_data_width_p(bp_axil_data_width_lp)\n707       ,.axi_addr_width_p(bp_axi_addr_width_lp)\n708       ,.axi_data_width_p(bp_axi_data_width_lp)\n709       ,.axi_id_width_p(6)\n710       ,.axi_core_clk_async_p(0)\n711       ,.prefetch_bypass_p(prefetch_axi_bypass_lp)\n712       ,.prefetch_outstanding_p(1)\n713       ,.cache_miss_trace_p(1'b1)"
+      }
+    ]
+  },
+  "schema": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_common/src/include/bp_common_aviary_cfg_pkgdef.svh",
+    "git_blob": "5e75c114e3d9795fc4d69e8a3a1d257c001d230c",
+    "sha256": "1505b65cd6fba12f3cb4ccb8c49bae7aed7c27d4f67c74c897a9ab476763173f",
+    "bytes": 21844,
+    "excerpts": [
+      {
+        "first_line": 291,
+        "last_line": 302,
+        "text": "291   localparam bp_proc_param_s bp_default_cfg_p =\n292     '{cc_x_dim  : 1\n293       ,cc_y_dim : 1\n294       ,ic_y_dim : 0\n295       ,mc_y_dim : 0\n296       ,cac_x_dim: 0\n297       ,sac_x_dim: 0\n298       ,cacc_type: e_cacc_none\n299       ,sacc_type: e_sacc_none\n300 \n301       ,num_cce: 1\n302       ,num_lce: 2"
+      },
+      {
+        "first_line": 325,
+        "last_line": 347,
+        "text": "325       ,icache_features      : (1 << e_cfg_enabled) | (1 << e_cfg_misaligned)\n326       ,icache_sets          : 64\n327       ,icache_assoc         : 8\n328       ,icache_block_width   : 512\n329       ,icache_fill_width    : 128\n330       ,icache_mshr          : 1\n331       ,icache_data_width    : 64\n332 \n333       ,dcache_features      : (1 << e_cfg_enabled)\n334                               | (1 << e_cfg_writeback)\n335                               | (1 << e_cfg_lr_sc)\n336                               | (1 << e_cfg_amo_swap)\n337                               | (1 << e_cfg_amo_fetch_logic)\n338                               | (1 << e_cfg_amo_fetch_arithmetic)\n339                               | (1 << e_cfg_hit_under_miss)\n340       ,dcache_sets          : 64\n341       ,dcache_assoc         : 8\n342       ,dcache_block_width   : 512\n343       ,dcache_fill_width    : 128\n344       ,dcache_mshr          : 1\n345       ,dcache_data_width    : 64\n346       ,dcache_prefetch_els  : 2\n347       ,dcache_prefetch_full_line : 0"
+      },
+      {
+        "first_line": 362,
+        "last_line": 373,
+        "text": "362       ,l2_features          : (1 << e_cfg_enabled)\n363                               | (1 << e_cfg_writeback)\n364                               | (1 << e_cfg_amo_swap)\n365                               | (1 << e_cfg_amo_fetch_logic)\n366                               | (1 << e_cfg_amo_fetch_arithmetic)\n367       ,l2_slices           : 2\n368       ,l2_banks            : 1\n369       ,l2_data_width       : 128\n370       ,l2_sets             : 32\n371       ,l2_assoc            : 2\n372       ,l2_block_width      : 512\n373       ,l2_fill_width       : 128"
+      },
+      {
+        "first_line": 405,
+        "last_line": 406,
+        "text": "405       ,num_threads           : 4               // Default multi-context configuration\n406       ,num_contexts          : 4               // Defaults to resident slots until context cache is enabled"
+      },
+      {
+        "first_line": 461,
+        "last_line": 477,
+        "text": "461       ,`bp_aviary_define_override(icache_features, BP_ICACHE_FEATURES, `BP_CUSTOM_BASE_CFG)\n462       ,`bp_aviary_define_override(icache_sets, BP_ICACHE_SETS, `BP_CUSTOM_BASE_CFG)\n463       ,`bp_aviary_define_override(icache_assoc, BP_ICACHE_ASSOC, `BP_CUSTOM_BASE_CFG)\n464       ,`bp_aviary_define_override(icache_block_width, BP_ICACHE_BLOCK_WIDTH, `BP_CUSTOM_BASE_CFG)\n465       ,`bp_aviary_define_override(icache_fill_width, BP_ICACHE_FILL_WIDTH, `BP_CUSTOM_BASE_CFG)\n466       ,`bp_aviary_define_override(icache_data_width, BP_ICACHE_DATA_WIDTH, `BP_CUSTOM_BASE_CFG)\n467       ,`bp_aviary_define_override(icache_mshr, BP_ICACHE_MSHR, `BP_CUSTOM_BASE_CFG)\n468 \n469       ,`bp_aviary_define_override(dcache_features, BP_DCACHE_FEATURES, `BP_CUSTOM_BASE_CFG)\n470       ,`bp_aviary_define_override(dcache_sets, BP_DCACHE_SETS, `BP_CUSTOM_BASE_CFG)\n471       ,`bp_aviary_define_override(dcache_assoc, BP_DCACHE_ASSOC, `BP_CUSTOM_BASE_CFG)\n472       ,`bp_aviary_define_override(dcache_block_width, BP_DCACHE_BLOCK_WIDTH, `BP_CUSTOM_BASE_CFG)\n473       ,`bp_aviary_define_override(dcache_fill_width, BP_DCACHE_FILL_WIDTH, `BP_CUSTOM_BASE_CFG)\n474       ,`bp_aviary_define_override(dcache_data_width, BP_DCACHE_DATA_WIDTH, `BP_CUSTOM_BASE_CFG)\n475       ,`bp_aviary_define_override(dcache_mshr, BP_DCACHE_MSHR, `BP_CUSTOM_BASE_CFG)\n476       ,`bp_aviary_define_override(dcache_prefetch_els, BP_DCACHE_PREFETCH_ELS, `BP_CUSTOM_BASE_CFG)\n477       ,`bp_aviary_define_override(dcache_prefetch_full_line, BP_DCACHE_PREFETCH_FULL_LINE, `BP_CUSTOM_BASE_CFG)"
+      },
+      {
+        "first_line": 492,
+        "last_line": 499,
+        "text": "492       ,`bp_aviary_define_override(l2_features, BP_L2_FEATURES, `BP_CUSTOM_BASE_CFG)\n493       ,`bp_aviary_define_override(l2_slices, BP_L2_SLICES, `BP_CUSTOM_BASE_CFG)\n494       ,`bp_aviary_define_override(l2_banks, BP_L2_BANKS, `BP_CUSTOM_BASE_CFG)\n495       ,`bp_aviary_define_override(l2_data_width, BP_L2_DATA_WIDTH, `BP_CUSTOM_BASE_CFG)\n496       ,`bp_aviary_define_override(l2_sets, BP_L2_SETS, `BP_CUSTOM_BASE_CFG)\n497       ,`bp_aviary_define_override(l2_assoc, BP_L2_ASSOC, `BP_CUSTOM_BASE_CFG)\n498       ,`bp_aviary_define_override(l2_block_width, BP_L2_BLOCK_WIDTH, `BP_CUSTOM_BASE_CFG)\n499       ,`bp_aviary_define_override(l2_fill_width, BP_L2_FILL_WIDTH, `BP_CUSTOM_BASE_CFG)"
+      }
+    ]
+  },
+  "macros": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_common/src/include/bp_common_aviary_defines.svh",
+    "git_blob": "5e6b798473e36d1841d8a99876fd9547abb07544",
+    "sha256": "534fb7f884e50131d4089e8b16f2be804db7af1ef38226e551dec448d30f6f8f",
+    "bytes": 32097,
+    "excerpts": [
+      {
+        "first_line": 75,
+        "last_line": 95,
+        "text": "75     , localparam bp_cache_features_t icache_features_p = bp_cache_features_t'(proc_param_lp.icache_features)  \\\n76     , localparam icache_sets_p              = proc_param_lp.icache_sets                            \\\n77     , localparam icache_assoc_p             = proc_param_lp.icache_assoc                           \\\n78     , localparam icache_block_width_p       = proc_param_lp.icache_block_width                     \\\n79     , localparam icache_fill_width_p        = proc_param_lp.icache_fill_width                      \\\n80     , localparam icache_data_width_p        = proc_param_lp.icache_data_width                      \\\n81     , localparam icache_mshr_p              = proc_param_lp.icache_mshr                            \\\n82     , localparam icache_req_id_width_p      = `BSG_SAFE_CLOG2(icache_mshr_p)                       \\\n83     , localparam icache_way_groups_p        = icache_sets_p                                        \\\n84                                                                                                    \\\n85     , localparam bp_cache_features_t dcache_features_p          = bp_cache_features_t'(proc_param_lp.dcache_features)  \\\n86     , localparam dcache_sets_p              = proc_param_lp.dcache_sets                            \\\n87     , localparam dcache_assoc_p             = proc_param_lp.dcache_assoc                           \\\n88     , localparam dcache_block_width_p       = proc_param_lp.dcache_block_width                     \\\n89     , localparam dcache_fill_width_p        = proc_param_lp.dcache_fill_width                      \\\n90     , localparam dcache_data_width_p        = proc_param_lp.dcache_data_width                      \\\n91     , localparam dcache_mshr_p              = proc_param_lp.dcache_mshr                            \\\n92     , localparam dcache_prefetch_els_p      = proc_param_lp.dcache_prefetch_els                    \\\n93     , localparam dcache_prefetch_full_line_p = proc_param_lp.dcache_prefetch_full_line             \\\n94     , localparam dcache_req_id_width_p      = `BSG_SAFE_CLOG2(dcache_mshr_p)                       \\\n95     , localparam dcache_way_groups_p        = dcache_sets_p                                        \\"
+      },
+      {
+        "first_line": 120,
+        "last_line": 131,
+        "text": "120     , localparam bp_cache_features_t l2_features_p = bp_cache_features_t'(proc_param_lp.l2_features)                   \\\n121     , localparam l2_slices_p          = l2_features_p[e_cfg_enabled] ? proc_param_lp.l2_slices : 1 \\\n122     , localparam l2_banks_p           = l2_features_p[e_cfg_enabled] ? proc_param_lp.l2_banks : 1  \\\n123     , localparam l2_sets_p            = l2_features_p[e_cfg_enabled] ? proc_param_lp.l2_sets  : 4  \\\n124     , localparam l2_assoc_p           = l2_features_p[e_cfg_enabled] ? proc_param_lp.l2_assoc : 2  \\\n125     , localparam l2_block_width_p     = proc_param_lp.l2_block_width                               \\\n126     , localparam l2_fill_width_p      = proc_param_lp.l2_fill_width                                \\\n127     , localparam l2_data_width_p      = proc_param_lp.l2_data_width                                \\\n128     , localparam l2_dmas_p = l2_slices_p * l2_banks_p                                              \\\n129                                                                                                    \\\n130     , localparam l2_block_size_in_words_p = l2_block_width_p / l2_data_width_p                     \\\n131     , localparam l2_block_size_in_fill_p  = l2_block_width_p / l2_fill_width_p                     \\"
+      },
+      {
+        "first_line": 217,
+        "last_line": 231,
+        "text": "217     `define bp_aviary_parameter_override(parameter_mp, override_cfg_mp, default_cfg_mp) \\\n218       parameter_mp: (override_cfg_mp.``parameter_mp`` == \"inv\") \\\n219                     ? default_cfg_mp.``parameter_mp``           \\\n220                     : override_cfg_mp.``parameter_mp``          \\\n221 \n222     `define bp_aviary_define_override(parameter_mp, define_mp, default_cfg_mp) \\\n223       `ifdef define_mp                                          \\\n224       parameter_mp: `define_mp                                  \\\n225       `else                                                     \\\n226       parameter_mp: default_cfg_mp.``parameter_mp``             \\\n227       `endif\n228 \n229     `define bp_aviary_derive_cfg(cfg_name_mp, override_cfg_mp, default_cfg_mp) \\\n230       localparam bp_proc_param_s cfg_name_mp =                                                     \\\n231         '{`bp_aviary_parameter_override(cc_x_dim, override_cfg_mp, default_cfg_mp)                 \\"
+      }
+    ]
+  },
+  "unicore_lite": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_top/src/v/bp_unicore_lite.sv",
+    "git_blob": "b9b5da468e720a119352e0127ccec4c734c9dd77",
+    "sha256": "e4a4a38bc8da53d8eb917af0cb54b7b8379ff1cc88dbaa8fe16e9a75b58b3c16",
+    "bytes": 21491,
+    "excerpts": [
+      {
+        "first_line": 160,
+        "last_line": 165,
+        "text": "160   bp_core_minimal\n161    #(.bp_params_p(bp_params_p)\n162      ,.cache_miss_trace_p(cache_miss_trace_p)\n163      ,.icache_replay_buffer_p(1'b1)\n164      ,.icache_replay_buffer_els_p(32)\n165      )"
+      },
+      {
+        "first_line": 261,
+        "last_line": 264,
+        "text": "261   bp_icache_replay_ctrl\n262    #(.paddr_width_p(paddr_width_p))\n263    icache_replay_ctrl\n264     (.clk_i(posedge_clk)"
+      },
+      {
+        "first_line": 291,
+        "last_line": 307,
+        "text": "291   bp_uce\n292    #(.bp_params_p(bp_params_p)\n293      ,.assoc_p(icache_assoc_p)\n294      ,.sets_p(icache_sets_p)\n295      ,.block_width_p(icache_block_width_p)\n296      ,.fill_width_p(icache_fill_width_p)\n297      ,.data_width_p(icache_data_width_p)\n298      ,.tag_width_p(icache_tag_width_p)\n299      ,.id_width_p(icache_req_id_width_p)\n300      ,.writeback_p(icache_features_p[e_cfg_writeback])\n301      ,.prefetch_p(1'b1)\n302      ,.prefetch_els_p(4)\n303      ,.prefetch_full_line_p(1'b1)\n304      ,.prefetch_demand_priority_p(1'b1)\n305      ,.prefetch_critical_forward_p(1'b0)\n306      ,.prefetch_side_buffer_p(1'b1)\n307      )"
+      },
+      {
+        "first_line": 371,
+        "last_line": 374,
+        "text": "371   bp_dcache_replay_ctrl\n372    #(.paddr_width_p(paddr_width_p))\n373    dcache_replay_ctrl\n374     (.clk_i(posedge_clk)"
+      },
+      {
+        "first_line": 403,
+        "last_line": 418,
+        "text": "403   bp_uce\n404    #(.bp_params_p(bp_params_p)\n405      ,.assoc_p(dcache_assoc_p)\n406      ,.sets_p(dcache_sets_p)\n407      ,.block_width_p(dcache_block_width_p)\n408      ,.fill_width_p(dcache_fill_width_p)\n409      ,.data_width_p(dcache_data_width_p)\n410      ,.tag_width_p(dcache_tag_width_p)\n411      ,.id_width_p(dcache_req_id_width_p)\n412      ,.writeback_p(dcache_features_p[e_cfg_writeback])\n413      ,.prefetch_els_p(dcache_prefetch_els_p)\n414      ,.prefetch_full_line_p(dcache_prefetch_full_line_p)\n415      ,.prefetch_ignore_credits_p(1'b1)\n416      )\n417    dcache_uce\n418     (.clk_i(negedge_clk)"
+      }
+    ]
+  },
+  "icache": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_fe/src/v/bp_fe_icache.sv",
+    "git_blob": "976f8bb35bc00483d94f6709c629ea02a4da16bc",
+    "sha256": "70b971b43e74746bb4b14977ba02449ab0a1ab38d271c18c6926e72cd91e1c76",
+    "bytes": 44221,
+    "excerpts": [
+      {
+        "first_line": 44,
+        "last_line": 52,
+        "text": "44    , parameter sets_p        = icache_sets_p\n45    , parameter assoc_p       = icache_assoc_p\n46    , parameter block_width_p = icache_block_width_p\n47    , parameter fill_width_p  = icache_fill_width_p\n48    , parameter data_width_p  = icache_data_width_p\n49    , parameter tag_width_p   = icache_tag_width_p\n50    , parameter id_width_p    = icache_req_id_width_p\n51    , parameter bit replay_buffer_p = 1'b0\n52    , parameter replay_buffer_els_p = 16"
+      },
+      {
+        "first_line": 153,
+        "last_line": 167,
+        "text": "153   localparam replay_buffer_els_lp = replay_buffer_p ? replay_buffer_els_p : 1;\n154   localparam replay_buffer_slot_width_lp = `BSG_SAFE_CLOG2(replay_buffer_els_lp);\n155   localparam replay_words_per_line_lp = block_width_p / data_width_p;\n156   localparam replay_words_per_fill_lp = fill_width_p / data_width_p;\n157   // The 32-entry FPGA configuration is organized as four hashed banks of\n158   // eight associative ways.  Fixed-capacity banking removes the 32-way tag\n159   // search from the fetch path while preserving one monolithic 32-entry data\n160   // index.  The selected XORs distribute every retained Linux prefix used by\n161   // this project within eight ways; other capacities keep the legacy flat\n162   // organization and replacement policy.\n163   localparam replay_buffer_banks_lp = 4;\n164   localparam replay_buffer_bank_width_lp = `BSG_SAFE_CLOG2(replay_buffer_banks_lp);\n165   localparam replay_buffer_bank_ways_lp = replay_buffer_els_lp / replay_buffer_banks_lp;\n166   localparam replay_buffer_bank_way_width_lp = `BSG_SAFE_CLOG2(replay_buffer_bank_ways_lp);\n167   localparam replay_buffer_banked_lp = replay_buffer_p & (replay_buffer_els_lp == 32);"
+      },
+      {
+        "first_line": 479,
+        "last_line": 483,
+        "text": "479   logic [replay_buffer_els_lp-1:0] replay_buffer_alloc_r;\n480   logic [replay_buffer_els_lp-1:0][paddr_width_p-block_offset_width_lp-1:0]\n481     replay_buffer_addr_r;\n482   logic [replay_buffer_els_lp-1:0][block_size_in_fill_lp-1:0]\n483     replay_buffer_beat_v_r;"
+      },
+      {
+        "first_line": 890,
+        "last_line": 894,
+        "text": "890     localparam beat_lp = word / replay_words_per_fill_lp;\n891     localparam fill_word_lp = word % replay_words_per_fill_lp;\n892     (* ram_style = \"distributed\" *)\n893     logic [data_width_p-1:0] mem [replay_buffer_els_lp];\n894     always_ff @(posedge clk_i)"
+      }
+    ]
+  },
+  "dcache": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_dcache/bp_be_dcache.sv",
+    "git_blob": "6db99688cd297f2581a81d32bf943612f0900ae5",
+    "sha256": "e870cb1f70ed6055c6aa304377b1f41690a2dff111dc3f03f60b9368873c74df",
+    "bytes": 62116,
+    "excerpts": [
+      {
+        "first_line": 98,
+        "last_line": 104,
+        "text": "98    , parameter sets_p         = dcache_sets_p\n99    , parameter assoc_p        = dcache_assoc_p\n100    , parameter block_width_p  = dcache_block_width_p\n101    , parameter fill_width_p   = dcache_fill_width_p\n102    , parameter data_width_p   = dcache_data_width_p\n103    , parameter tag_width_p    = dcache_tag_width_p\n104    , parameter mshr_p         = dcache_mshr_p"
+      },
+      {
+        "first_line": 490,
+        "last_line": 523,
+        "text": "490   // miss engine. Entries are one-use advisory data and are invalidated by a\n491   // matching store or ordinary L1 hit.\n492   localparam prefetch_buffer_els_lp = dcache_prefetch_els_p;\n493   localparam prefetch_buffer_slot_width_lp = `BSG_SAFE_CLOG2(prefetch_buffer_els_lp);\n494   logic [prefetch_buffer_els_lp-1:0] prefetch_buffer_v_r;\n495   logic [prefetch_buffer_els_lp-1:0][paddr_width_p-1:4] prefetch_buffer_addr_r;\n496   logic [prefetch_buffer_els_lp-1:0][1:0] prefetch_buffer_word_v_r;\n497   logic [prefetch_buffer_slot_width_lp-1:0] prefetch_buffer_replace_r;\n498   // The data array has one synchronous write and one asynchronous selected\n499   // read. Leaving its contents unreset lets FPGA tools map it to compact\n500   // distributed RAM; word-valid state guards every architectural read.\n501   (* ram_style = \"distributed\" *)\n502   logic [dword_width_gp-1:0] prefetch_buffer_data_r [prefetch_buffer_els_lp*2];\n503   logic prefetch_buffer_hit_tv, prefetch_buffer_segment_tv;\n504   logic [prefetch_buffer_slot_width_lp-1:0] prefetch_buffer_hit_slot_tv;\n505   logic [dword_width_gp-1:0] prefetch_buffer_data_tv;\n506   always_comb begin\n507     prefetch_buffer_hit_tv = 1'b0;\n508     prefetch_buffer_segment_tv = 1'b0;\n509     prefetch_buffer_hit_slot_tv = '0;\n510     prefetch_buffer_data_tv = '0;\n511     for (int i = prefetch_buffer_els_lp-1; i >= 0; i--) begin\n512       if (prefetch_buffer_v_r[i]\n513           & (prefetch_buffer_addr_r[i] == paddr_tv_r[paddr_width_p-1:4])) begin\n514         prefetch_buffer_segment_tv = &prefetch_buffer_word_v_r[i];\n515         if (prefetch_buffer_word_v_r[i][paddr_tv_r[3]]) begin\n516           prefetch_buffer_hit_tv = 1'b1;\n517           prefetch_buffer_hit_slot_tv = prefetch_buffer_slot_width_lp'(i);\n518           prefetch_buffer_data_tv = prefetch_buffer_data_r[2*i+paddr_tv_r[3]];\n519         end\n520       end\n521     end\n522     prefetch_buffer_hit_tv &= v_tv_r & decode_tv_r.load_op\n523                               & ~uncached_tv_r & ~cache_load_hit_tv;"
+      },
+      {
+        "first_line": 1125,
+        "last_line": 1158,
+        "text": "1125       // Consume only the selected word. A 16-byte pointer-stream reply may\n1126       // contain both the next pointer and adjacent payload, and consecutive\n1127       // loads must be able to use both words. The rotating replacement pointer\n1128       // below prevents an unused neighbor from pinning a full advisory buffer.\n1129       // A later miss remains architecturally safe even if a redirect squashes\n1130       // the consuming instruction.\n1131       if (prefetch_buffer_hit_tv) begin\n1132         prefetch_buffer_word_v_r[prefetch_buffer_hit_slot_tv][paddr_tv_r[3]] <= 1'b0;\n1133         if (!(|(prefetch_buffer_word_v_r[prefetch_buffer_hit_slot_tv]\n1134                & ~(2'(1) << paddr_tv_r[3]))))\n1135           prefetch_buffer_v_r[prefetch_buffer_hit_slot_tv] <= 1'b0;\n1136       end\n1137 \n1138       // A local store or an authoritative L1 copy supersedes advisory data.\n1139       for (int i = 0; i < prefetch_buffer_els_lp; i++) begin\n1140         if (prefetch_buffer_v_r[i]\n1141             & (prefetch_buffer_addr_r[i] == paddr_tv_r[paddr_width_p-1:4])\n1142             & v_tv_r\n1143             & (decode_tv_r.store_op | cache_load_hit_tv)) begin\n1144           prefetch_buffer_v_r[i] <= 1'b0;\n1145           prefetch_buffer_word_v_r[i] <= '0;\n1146         end\n1147       end\n1148 \n1149       if (prefetch_buffer_write & data_mem_pkt_yumi_o) begin\n1150         prefetch_buffer_v_r[prefetch_buffer_write_slot] <= 1'b1;\n1151         prefetch_buffer_addr_r[prefetch_buffer_write_slot]\n1152           <= data_mem_pkt_cast_i.addr[paddr_width_p-1:4];\n1153         if (!prefetch_buffer_write_match)\n1154           prefetch_buffer_word_v_r[prefetch_buffer_write_slot]\n1155             <= 2'(1) << data_mem_pkt_cast_i.addr[3];\n1156         else\n1157           prefetch_buffer_word_v_r[prefetch_buffer_write_slot]\n1158                                     [data_mem_pkt_cast_i.addr[3]] <= 1'b1;"
+      }
+    ]
+  },
+  "uce": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_me/src/v/cce/bp_uce.sv",
+    "git_blob": "6dc7d777f8e535b24141589e71dfdbdfc28772bf",
+    "sha256": "299edaa8ea79fcdf1b18d7189b4057220983ba87a5f0f6bc68ab5ecee9d5d1db",
+    "bytes": 89320,
+    "excerpts": [
+      {
+        "first_line": 31,
+        "last_line": 46,
+        "text": "31     , parameter prefetch_p = writeback_p\n32     , parameter prefetch_els_p = 2\n33     , parameter bit prefetch_full_line_p = 1'b0\n34     // Instruction replay must never lock out an architectural cache request.\n35     // In this mode cache fast paths win SRAM arbitration, and a demand miss\n36     // cancels any advisory installation before the demand enters the UCE.\n37     , parameter bit prefetch_demand_priority_p = 1'b0\n38     // D-cache full-line mode may forward the requested sector into its side\n39     // buffer. I-cache replay has no such buffer and captures every beat only\n40     // in the detached line store until installation.\n41     , parameter bit prefetch_critical_forward_p = 1'b1\n42     // Completed full-line replies may retire into a cache-local advisory\n43     // buffer instead of replacing a line in the live cache arrays. This is\n44     // required for instruction replay: asynchronous slow-path writes to a\n45     // running banked I-cache cannot preserve the frontend's SRAM epoch.\n46     , parameter bit prefetch_side_buffer_p = 1'b0"
+      },
+      {
+        "first_line": 125,
+        "last_line": 149,
+        "text": "125   localparam block_size_in_fill_lp = block_width_p / fill_width_p;\n126   localparam fill_size_in_bank_lp = fill_width_p / bank_width_lp;\n127   localparam fill_cnt_width_lp = `BSG_SAFE_CLOG2(block_size_in_fill_lp);\n128   localparam fill_offset_width_lp = `BSG_SAFE_CLOG2(fill_width_p>>3);\n129   localparam bank_sub_offset_width_lp = $clog2(fill_size_in_bank_lp);\n130   localparam prefetch_slot_width_lp = `BSG_SAFE_CLOG2(prefetch_els_p);\n131   localparam prefetch_match_offset_width_lp = prefetch_full_line_p ? block_offset_width_lp : 4;\n132   localparam prefetch_tag_width_lp = `BSG_SAFE_CLOG2(lce_assoc_p);\n133   localparam prefetch_state_width_lp = $bits(bp_coh_states_e);\n134   localparam prefetch_id_width_lp = prefetch_tag_width_lp + prefetch_state_width_lp;\n135   localparam preview_queue_els_lp = 4;\n136   localparam preview_queue_ptr_width_lp = `BSG_SAFE_CLOG2(preview_queue_els_lp);\n137   localparam preview_queue_count_width_lp = `BSG_SAFE_CLOG2(preview_queue_els_lp+1);\n138 \n139   localparam bp_bedrock_msg_size_e block_msg_size_lp = (block_width_p == 512)\n140                                                        ? e_bedrock_msg_size_64\n141                                                        : (block_width_p == 256)\n142                                                          ? e_bedrock_msg_size_32\n143                                                          : (block_width_p == 128)\n144                                                            ? e_bedrock_msg_size_16\n145                                                            : (block_width_p == 64)\n146                                                              ? e_bedrock_msg_size_8\n147                                                              : e_bedrock_msg_size_64;\n148   localparam bp_bedrock_msg_size_e prefetch_msg_size_lp\n149     = prefetch_full_line_p ? block_msg_size_lp : e_bedrock_msg_size_16;"
+      },
+      {
+        "first_line": 164,
+        "last_line": 175,
+        "text": "164   logic [prefetch_els_p-1:0] prefetch_valid_r, prefetch_sent_r, prefetch_way_v_r;\n165   logic [prefetch_els_p-1:0] prefetch_cancel_r;\n166   logic [prefetch_els_p-1:0] prefetch_complete_r;\n167   logic [prefetch_els_p-1:0] prefetch_preview_r;\n168   logic [prefetch_els_p-1:0][paddr_width_p-1:0] prefetch_addr_r;\n169   logic [prefetch_els_p-1:0][block_offset_width_lp-1:4] prefetch_critical_segment_r;\n170   logic [prefetch_els_p-1:0][`BSG_SAFE_CLOG2(assoc_p)-1:0] prefetch_way_r;\n171   logic [prefetch_els_p-1:0][fill_cnt_width_lp-1:0] prefetch_fill_count_r;\n172   // Full-line mode decouples memory reception from L1 installation. Each\n173   // detached request owns one line buffer, allowing responses to complete at\n174   // memory speed while the single cache write port drains lines later.\n175   logic [block_size_in_fill_lp-1:0][fill_width_p-1:0] prefetch_install_line_r;"
+      },
+      {
+        "first_line": 1280,
+        "last_line": 1318,
+        "text": "1280       if (prefetch_p & prefetch_issue_v\n1281           & ((is_ready | is_read_request | is_uc_read_wait | is_writeback_read)\n1282              & ~prefetch_demand_match\n1283              | (is_send_critical & miss_v_r & prefetch_demand_match))\n1284           & ~load_resp_v_li & ~store_resp_v_li & ~prefetch_response\n1285           & ~cache_req_credits_full_o & ~inval_v_li & ~inval_v_r) begin\n1286         fsm_fwd_header_lo = '0;\n1287         fsm_fwd_header_lo.msg_type = e_bedrock_mem_rd;\n1288         fsm_fwd_header_lo.addr = prefetch_addr_r[prefetch_issue_slot];\n1289         fsm_fwd_header_lo.size = prefetch_msg_size_lp;\n1290         fsm_fwd_header_lo.payload.prefetch = 1'b1;\n1291         // Physical previews warm the coherent L2 and discard their replies;\n1292         // translated architectural hints retain the D-cache side buffer.\n1293         fsm_fwd_header_lo.payload.speculative = prefetch_preview_r[prefetch_issue_slot];\n1294         fsm_fwd_header_lo.payload.way_id = prefetch_tag_width_lp'(prefetch_issue_slot);\n1295         fsm_fwd_header_lo.payload.state = bp_coh_states_e'\n1296           (prefetch_issue_slot >> prefetch_tag_width_lp);\n1297         fsm_fwd_header_lo.payload.lce_id = lce_id_i;\n1298         fsm_fwd_header_lo.payload.src_did = did_i;\n1299         fsm_fwd_data_lo = '0;\n1300         fsm_fwd_v_lo = fsm_fwd_ready_then_li;\n1301         prefetch_issue = fsm_fwd_v_lo & fsm_fwd_last_lo;\n1302       end\n1303 \n1304       // Narrow detached replies bypass L1 replacement. Each returned word is\n1305       // written into the D$ side buffer and therefore never locks the cache\n1306       // SRAMs or blocks an unrelated hit.\n1307       if (!prefetch_full_line_p && prefetch_response) begin\n1308         if (inval_v_li | prefetch_cancel_r[prefetch_response_slot]\n1309             | prefetch_preview_r[prefetch_response_slot]) begin\n1310           prefetch_response_yumi = 1'b1;\n1311         end else begin\n1312           data_mem_pkt_cast_o = '0;\n1313           data_mem_pkt_cast_o.opcode = e_cache_data_mem_prefetch;\n1314           data_mem_pkt_cast_o.addr = prefetch_addr_r[prefetch_response_slot]\n1315             + (paddr_width_p'(prefetch_fill_count_r[prefetch_response_slot]) << 3);\n1316           data_mem_pkt_cast_o.data = fsm_rev_data_li;\n1317           data_mem_pkt_v_o = 1'b1;\n1318           prefetch_response_yumi = data_mem_pkt_yumi_i;"
+      }
+    ]
+  },
+  "d_replay_controller": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_top/src/v/bp_dcache_replay_ctrl.sv",
+    "git_blob": "bbd42534ffeb6527b15a8cf396bdefb3fa61e3c7",
+    "sha256": "c658e1756d070b3ea2be9012c98a8534d68439a6e8e7cfbb68413487618876fa",
+    "bytes": 12643,
+    "excerpts": [
+      {
+        "first_line": 1,
+        "last_line": 9,
+        "text": "1 module bp_dcache_replay_ctrl\n2  #(parameter paddr_width_p = 40\n3    , parameter slots_p = 4\n4    , parameter entries_per_slot_p = 32\n5    , parameter command_queue_els_p = 2\n6    , localparam slot_width_lp = $clog2(slots_p)\n7    , localparam entry_width_lp = $clog2(entries_per_slot_p)\n8    , localparam count_width_lp = $clog2(entries_per_slot_p+1)\n9    , localparam command_ptr_width_lp = $clog2(command_queue_els_p)"
+      }
+    ]
+  },
+  "i_replay_controller": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_top/src/v/bp_icache_replay_ctrl.sv",
+    "git_blob": "d035130fa4b5bba402cd5eaa9974f5364e786c44",
+    "sha256": "7a958c46fecac9f20a867bc7423699310f13c8c739177e5306d8b1d01051c696",
+    "bytes": 6607,
+    "excerpts": [
+      {
+        "first_line": 1,
+        "last_line": 5,
+        "text": "1 module bp_icache_replay_ctrl\n2  #(parameter paddr_width_p = 40\n3    , parameter els_p = 256\n4    , localparam index_width_lp = $clog2(els_p)\n5    , localparam count_width_lp = $clog2(els_p+1)"
+      },
+      {
+        "first_line": 45,
+        "last_line": 46,
+        "text": "45   logic [paddr_width_p-1:0] prefix_mem [0:els_p-1];\n46   logic [count_width_lp-1:0] count_r, fetch_index_r, fetch_end_r;"
+      }
+    ]
+  },
+  "l2_instantiation": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_me/src/v/dev/bp_me_cache_slice.sv",
+    "git_blob": "bac1ff9fa2b8e2285a3c609355224ef9871ce93d",
+    "sha256": "ff5e3b00aa32e66f56925a9edfcd5b96d604c8fd5e6ce4e50c55a0befad16e54",
+    "bytes": 6465,
+    "excerpts": [
+      {
+        "first_line": 110,
+        "last_line": 120,
+        "text": "110   `declare_bsg_cache_dma_pkt_s(daddr_width_p, l2_block_size_in_words_p);\n111   bsg_cache_dma_pkt_s [l2_banks_p-1:0] dma_pkt_lo, dma_pkt_cast_o;\n112   for (genvar i = 0; i < l2_banks_p; i++)\n113     begin : bank\n114       bsg_cache\n115        #(.addr_width_p(daddr_width_p)\n116          ,.data_width_p(l2_data_width_p)\n117          ,.dma_data_width_p(l2_fill_width_p)\n118          ,.block_size_in_words_p(l2_block_size_in_words_p)\n119          ,.sets_p(l2_sets_p)\n120          ,.ways_p(l2_assoc_p)"
+      }
+    ]
+  },
+  "unicore_routing": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_top/src/v/bp_unicore.sv",
+    "git_blob": "94c5f8c515e00a2f3ccfaab62edef3470684d132",
+    "sha256": "2f9309352534976b3a851404b30ed0bac1655c8c7a46233ccfbe7147cc63c5b9",
+    "bytes": 18171,
+    "excerpts": [
+      {
+        "first_line": 69,
+        "last_line": 70,
+        "text": "69    // Optional direct path for detached dcache prefetches. This path is only\n70    // valid for full-line BedRock reads and bypasses the L2 cache slices."
+      },
+      {
+        "first_line": 190,
+        "last_line": 196,
+        "text": "190       wire is_io_fwd       = is_host_fwd | is_other_hio | is_other_core;\n191       wire is_dcache_prefetch_fwd = prefetch_bypass_p\n192         && (i == dcache_proc_id_lp)\n193         && proc_fwd_header_lo[i].payload.prefetch\n194         && (proc_fwd_header_lo[i].msg_type == e_bedrock_mem_rd)\n195         && ~is_local & ~is_io_fwd;\n196       wire is_l2s_fwd      = ~is_local & ~is_io_fwd & ~is_dcache_prefetch_fwd;"
+      },
+      {
+        "first_line": 362,
+        "last_line": 366,
+        "text": "362   for (genvar i = 0; i < l2_slices_p; i++)\n363     begin : slices\n364       bp_me_cache_slice\n365        #(.bp_params_p(bp_params_p))\n366        l2s"
+      }
+    ]
+  },
+  "response_pump": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_me/src/v/network/bp_me_stream_pump_in.sv",
+    "git_blob": "c3f01b525a01d40028f1442936fada0f6a8f6cc9",
+    "sha256": "6e14a3027a2c02dfdbbc898509d69f51e3133ec42dac105ffdec37834f0a6d90",
+    "bytes": 5862,
+    "excerpts": [
+      {
+        "first_line": 104,
+        "last_line": 107,
+        "text": "104   wire [fsm_cnt_width_lp-1:0] stream_size =\n105     `BSG_MAX((1'b1 << msg_header_li.size) / fsm_bytes_lp, 1'b1) - 1'b1;\n106   wire nz_stream  = stream_size > '0;\n107   wire fsm_stream = fsm_stream_mask_p[msg_header_li.msg_type];"
+      }
+    ]
+  }
+}

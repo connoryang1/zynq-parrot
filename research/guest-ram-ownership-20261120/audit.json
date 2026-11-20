@@ -1,0 +1,163 @@
+{
+  "scope": "Read-only source/log/actual-NBF audit; no target execution or image generation",
+  "conclusion": "Guest advertised RAM exceeds the requested owned allocation by 18 MiB; crash causation unproven",
+  "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "session14_status": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session14/0-scan32-futex-early.log.status.json",
+    "bytes": 893,
+    "sha256": "7efb725733a227750e698e4888728a3e42fd82bf2a2aa4787d265674d530c99b"
+  },
+  "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+  "accepted_top_revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+  "source_binding_limit": "Source remap follows recorded accepted top revision. No new elaboration, netlist validation or physical traffic observation was performed.",
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session14/0-scan32-futex-early.log",
+    "bytes": 16923,
+    "sha256": "9abf10e34fbaa0439f745e4b03ee05ded9f5c3c8861bc0636e7dbbe922736625"
+  },
+  "log_evidence": [
+    {
+      "line": 23,
+      "text": "INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496"
+    },
+    {
+      "line": 24,
+      "text": "bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3d2e000, physical ptr=0x16900000"
+    },
+    {
+      "line": 190,
+      "text": "[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000"
+    },
+    {
+      "line": 193,
+      "text": "[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000"
+    },
+    {
+      "line": 199,
+      "text": "[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000083ffffff]"
+    },
+    {
+      "line": 211,
+      "text": "[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]"
+    },
+    {
+      "line": 214,
+      "text": "[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000083ffffff]"
+    },
+    {
+      "line": 241,
+      "text": "[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh          "
+    },
+    {
+      "line": 250,
+      "text": "[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 16160"
+    },
+    {
+      "line": 280,
+      "text": "[    0.000000] Memory: 39540K/65536K available (8290K kernel code, 3735K rwdata, 4096K rodata, 5399K init, 388K bss, 25996K reserved, 0K cma-reserved)"
+    },
+    {
+      "line": 379,
+      "text": "[    0.859529] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations"
+    }
+  ],
+  "firmware": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/baseline-firmware-memory-80000000-80200000.bin",
+    "bytes": 2097152,
+    "sha256": "c7e557599e4b7eebaa33e62fc5b32b6848eee70e47d0b18d66640db99e9ef179"
+  },
+  "dtb": {
+    "sha256": "0bfe298c94459fa94ad93c368b73b6d6892c8ffe8807e28e5479dafbce39215f",
+    "bytes": 1209,
+    "memory_base": "0x80000000",
+    "memory_bytes": 67108864,
+    "memory_end_exclusive": "0x84000000",
+    "memreserve": [],
+    "reserved_memory_properties": [],
+    "bootargs": "console=hvc0 loglevel=8 rdinit=/bin/sh          "
+  },
+  "accepted_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/linux-prefix32-futex-usersyscall-shell.nbf",
+    "bytes": 70904691,
+    "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "dtb_matches_retained_firmware_with_zero_filled_sparse_holes": true,
+    "dtb_unwritten_zero_byte_offsets": [
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      1208
+    ],
+    "sparse_hole_limit": "NBF omits these zero bytes; comparison is image reconstruction, not a claim about runtime allocator initialization. Boot log independently proves actual Linux range.",
+    "dram_write_records": 1916332,
+    "highest_dram_write_end_exclusive": "0x818eba68",
+    "all_dram_image_writes_within_requested_46MiB": true
+  },
+  "session14_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-baseline-shell.nbf",
+    "bytes": 69843716,
+    "sha256": "e9aeba407073407cd01f91e2a687c21c4c8a6917b70886d997ce6852270b4508",
+    "dtb_matches_retained_firmware_with_zero_filled_sparse_holes": true,
+    "dtb_unwritten_zero_byte_offsets": [
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      1208
+    ],
+    "sparse_hole_limit": "NBF omits these zero bytes; comparison is image reconstruction, not a claim about runtime allocator initialization. Boot log independently proves actual Linux range.",
+    "dram_write_records": 1887657,
+    "highest_dram_write_end_exclusive": "0x818eba68",
+    "all_dram_image_writes_within_requested_46MiB": true
+  },
+  "requested_allocation_bytes": 48234496,
+  "guest_advertised_bytes": 67108864,
+  "unowned_advertised_bytes": 18874368,
+  "guest_owned_range": [
+    "0x80000000",
+    "0x82e00000"
+  ],
+  "guest_excess_range": [
+    "0x82e00000",
+    "0x84000000"
+  ],
+  "session14_host_requested_range": [
+    "0x16900000",
+    "0x19700000"
+  ],
+  "session14_host_excess_range": [
+    "0x19700000",
+    "0x1a900000"
+  ],
+  "interval_convention": "half-open [begin,end)",
+  "guards": "No active 46MiB bound/mask in accepted top remap. The commented 256MiB warning is neither an enforcing guard nor the requested allocation bound.",
+  "ownership_limit": "pynq.allocate shape=(requested_bytes,), dtype=u1; no retained evidence grants ownership of extra 18MiB. BO/CMA rounding or free totals are insufficient.",
+  "reservations": "Retained zero-reconstructed input DTB has no memreserve/reserved-memory (NBF skips16zero memreserve bytes; see sparse-hole limit). Actual OpenSBI boot reports only two low regions totaling320KiB; Linux node/zone initialization extends to0x83ffffff. Aggregate reserved=25996K does not establish a reservation of the upper18MiB.",
+  "provenance_limit": "Historical README names exact2dd9 as46MiB. Recorded top Makefile default is64MiB; exact binary build invocation/local executable not recovered. Runtime requests are direct evidence independent of build provenance.",
+  "candidate_control": "NEW matched NBF pair with bootarg mem=46M, same immutable2dd9 runner. Source early_mem clamps memory_limit; setup_bootmem enforces it. Prospective until actual new boots verify limit and usable node end; changes baseline for all arms.",
+  "causation_limit": "No faulting physical address or HP0 traffic demonstrates an out-of-buffer access causing SIG11/PID-null/post-exit failures. Passing session14 does not establish safety of the old64MiB contract."
+}

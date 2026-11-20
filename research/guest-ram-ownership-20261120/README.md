@@ -1,0 +1,15 @@
+# Guest RAM ownership audit, 2026-11-20
+
+The accepted `2dd9c411…a217c30` runner requests **46 MiB**, while the actual session14 Linux boot initializes a **64 MiB** physical RAM range. The accepted source remaps guest DRAM offsets by adding the host buffer base, without a bound tied to the allocation. Guest addresses `[0x82e00000,0x84000000)` therefore correspond to **18 MiB beyond the requested owned buffer** under this mapping.
+
+Session14 reports host base `0x16900000`. Its requested allocation covers `[0x16900000,0x19700000)`; the excess guest range maps to `[0x19700000,0x1a900000)`. No retained API evidence grants ownership of that excess. Possible BO rounding, CMA free totals, or a passing run do not establish ownership.
+
+The log explicitly initializes DMA32/node0 through `0x83ffffff`, with no `mem=` boot argument. OpenSBI reports only two low reservations totaling320 KiB. The aggregate Linux `25996K reserved` count does not establish a high18 MiB guard. The actual NBF memory/bootargs properties match the retained firmware DTB: one64 MiB region, no reserved-memory node. The NBF skips16zero memreserve-table bytes and one padding byte, so the retained DTB comparison explicitly records zero-filled sparse holes; it does not prove runtime zero initialization. The Linux boot endpoints independently establish the advertised high range.
+
+Both original `ef50be19…` and embedded `e9aeba40…` NBF image writes end at `0x818eba68`, within46 MiB. Thus the image load bounds pass while the guest RAM ownership contract remains inconsistent. This is a bounds finding, **not proof that an out-of-buffer access caused SIG11, PID-null, or post-exit failures**. No faulting physical address or HP0 traffic observation is available here.
+
+The historical canonical `logs/linux-memory46-boot-control-20261006/README.md` binds the exact runner SHA to46 MiB. The recorded accepted top Makefile defaults to64 MiB, so the binary cannot be reproduced from that default alone; its exact compile invocation/local executable was not recovered. Runtime allocation logs directly establish its requested size. The accepted top's only `memory_upper_limit` check is a commented256 MiB diagnostic; it enforces no bound.
+
+A prospective bounded control is a **new matched NBF pair with `mem=46M`**, retaining the immutable46 MiB runner and sharing the same rootfs between arms. Linux6.6 `arch/riscv/mm/init.c` parses/page-aligns/clamps the limit and invokes `memblock_enforce_memory_limit`; `mm/memblock.c` removes memory above that limit. Actual new boot logs must verify the limit and resulting range before accepting performance. This audit creates no images and performs no board operations.
+
+Run `python3 research/guest-ram-ownership-20261120/reproduce_audit.py` from the repository. It reads both NBFs, the retained firmware, session14 logs/status and exact git source objects, then rewrites only `audit.json` and `source-proof.json`. These files retain hashes, numbered excerpts, interval arithmetic and explicit limits. The source remap is inferred from the recorded accepted revision; no elaboration/netlist/physical-traffic verification was added.

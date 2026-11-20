@@ -1,0 +1,347 @@
+{
+  "csr": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+    "git_blob": "f533b20c29c28c0a6ffabf4b197ffd9867a59871",
+    "sha256": "1ae22a79320bc96502fa6c957d4d0ca30a9e1f15527101a94d6bfaa5416f298d",
+    "bytes": 52112,
+    "excerpts": [
+      {
+        "first_line": 1106,
+        "last_line": 1125,
+        "text": "1106   assign physical_preview_v_o = csr_w_v_li & retire_pkt_cast_i.instret\n1107                                 & (csr_addr_li == 12'h9c0)\n1108                                 & (is_s_mode | is_m_mode)\n1109                                 & ~(|csr_data_li[dword_width_gp-1:paddr_width_p]);\n1110   assign physical_preview_paddr_o = csr_data_li[0+:paddr_width_p];\n1111 \n1112   // The direct 0x9c0 primitive remains available as a matched control. The\n1113   // new interface moves all per-line writes outside the wakeup path: 0x9c1\n1114   // programs a table entry, 0x9c2 programs its count/timing, and 0x9c3 queues\n1115   // one software-assigned slot tag. All remain supervisor-only physical-data\n1116   // operations, matching the privilege boundary of the original primitive.\n1117   assign dcache_replay_entry_v_o = csr_w_v_li & retire_pkt_cast_i.instret\n1118                                     & (csr_addr_li == 12'h9c1)\n1119                                     & (is_s_mode | is_m_mode);\n1120   assign dcache_replay_config_v_o = csr_w_v_li & retire_pkt_cast_i.instret\n1121                                      & (csr_addr_li == 12'h9c2)\n1122                                      & (is_s_mode | is_m_mode);\n1123   assign dcache_replay_trigger_v_o = csr_w_v_li & retire_pkt_cast_i.instret\n1124                                       & (csr_addr_li == 12'h9c3)\n1125                                       & (is_s_mode | is_m_mode);"
+      }
+    ]
+  },
+  "unicores": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_top/src/v/bp_unicore_lite.sv",
+    "git_blob": "b9b5da468e720a119352e0127ccec4c734c9dd77",
+    "sha256": "e4a4a38bc8da53d8eb917af0cb54b7b8379ff1cc88dbaa8fe16e9a75b58b3c16",
+    "bytes": 21491,
+    "excerpts": [
+      {
+        "first_line": 124,
+        "last_line": 140,
+        "text": "124   // Only cached, idempotent DRAM may be read speculatively. The request is\n125   // best effort and never backpressures architectural retirement.\n126   wire physical_preview_allowed_lo = dcache_preview_v_li\n127     & physical_preview_dram_lo & ~physical_preview_uncached_lo\n128     & ~physical_preview_nonidem_lo;\n129   assign dcache_preview_paddr_li = physical_preview_v_lo\n130                                    ? physical_preview_paddr_lo\n131                                    : dcache_replay_paddr_lo;\n132   assign dcache_preview_v_li = physical_preview_v_lo | dcache_replay_v_lo;\n133   wire dcache_replay_allowed_lo = dcache_replay_v_lo\n134     & ~physical_preview_v_lo & (dcache_replay_paddr_lo != '0)\n135     & physical_preview_allowed_lo;\n136   assign dcache_replay_accepted_li = dcache_replay_core_accepted_lo;\n137   assign dcache_replay_yumi_li = dcache_replay_v_lo\n138     & (dcache_replay_core_yumi_lo\n139        | (~physical_preview_v_lo\n140           & ((dcache_replay_paddr_lo == '0) | ~physical_preview_allowed_lo)));"
+      },
+      {
+        "first_line": 178,
+        "last_line": 196,
+        "text": "178      ,.dcache_replay_v_i(dcache_replay_allowed_lo)\n179      ,.dcache_replay_paddr_i(dcache_replay_paddr_lo)\n180      ,.dcache_replay_yumi_o(dcache_replay_core_yumi_lo)\n181      ,.dcache_replay_accepted_o(dcache_replay_core_accepted_lo)\n182 \n183      ,.icache_req_o(icache_req_lo)\n184      ,.icache_req_v_o(icache_req_v_lo)\n185      ,.icache_req_yumi_i(icache_req_yumi_li)\n186      ,.icache_req_lock_i(icache_req_lock_li)\n187      ,.icache_req_metadata_o(icache_req_metadata_lo)\n188      ,.icache_req_metadata_v_o(icache_req_metadata_v_lo)\n189      ,.icache_req_id_i(icache_req_id_li)\n190      ,.icache_req_critical_i(icache_req_critical_li)\n191      ,.icache_req_last_i(icache_req_last_li)\n192      ,.icache_req_credits_full_i(icache_req_credits_full_li)\n193      ,.icache_req_credits_empty_i(icache_req_credits_empty_li)\n194 \n195      ,.icache_tag_mem_pkt_i(icache_tag_mem_pkt_li)\n196      ,.icache_tag_mem_pkt_v_i(icache_tag_mem_pkt_v_li)"
+      },
+      {
+        "first_line": 376,
+        "last_line": 399,
+        "text": "376      ,.entry_write_v_i(dcache_replay_entry_v_lo)\n377      ,.entry_write_slot_i(dcache_replay_payload_lo[46:45])\n378      ,.entry_write_index_i(dcache_replay_payload_lo[44:40])\n379      ,.entry_write_paddr_i(dcache_replay_payload_lo[0+:paddr_width_p])\n380      ,.config_write_v_i(dcache_replay_config_v_lo)\n381      ,.config_write_slot_i(dcache_replay_payload_lo[1:0])\n382      ,.config_write_count_i(dcache_replay_payload_lo[7:2])\n383      ,.config_write_delay_i(dcache_replay_payload_lo[23:8])\n384      ,.config_write_gap_i(dcache_replay_payload_lo[31:24])\n385      ,.trigger_v_i(dcache_replay_trigger_v_lo)\n386      ,.trigger_slot_i(dcache_replay_payload_lo[1:0])\n387      ,.trigger_follow_i(dcache_replay_payload_lo[2])\n388      ,.replay_v_o(dcache_replay_v_lo)\n389      ,.replay_paddr_o(dcache_replay_paddr_lo)\n390      ,.replay_yumi_i(dcache_replay_yumi_li)\n391      ,.replay_accepted_i(dcache_replay_accepted_li)\n392      ,.downstream_outstanding_i(dcache_prefetch_outstanding_status_lo)\n393      ,.downstream_complete_i(dcache_prefetch_complete_status_lo)\n394      ,.follow_ready_i(~icache_prefix_status_lo[1])\n395      ,.follow_active_i(icache_prefix_status_lo[1])\n396      ,.follow_configured_i(|icache_prefix_status_lo[12:4])\n397      ,.follow_trigger_o(dcache_replay_follow_trigger_lo)\n398      ,.clear_counters_i(dcache_replay_config_v_lo\n399                         & dcache_replay_payload_lo[dword_width_gp-1])"
+      },
+      {
+        "first_line": 430,
+        "last_line": 435,
+        "text": "430      ,.preview_paddr_i(physical_preview_paddr_lo)\n431      ,.preview_v_i(physical_preview_v_lo & physical_preview_allowed_lo\n432                    & (physical_preview_paddr_lo != '0))\n433      ,.preview_cancel_i(physical_preview_v_lo & (physical_preview_paddr_lo == '0))\n434      ,.preview_ready_o()\n435      ,.preview_idle_o(physical_preview_idle_lo)"
+      }
+    ]
+  },
+  "injection": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_calculator/bp_be_pipe_mem.sv",
+    "git_blob": "3a07d19a227375a986373bd54588d6514d08da43",
+    "sha256": "498ad8915b8bb511691ee404c9b4a3a7e198369964e39975222c67b67f354ed4",
+    "bytes": 24783,
+    "excerpts": [
+      {
+        "first_line": 297,
+        "last_line": 326,
+        "text": "297   wire dcache_replay_accept_li = dcache_replay_v_i\n298                                   & ~context_cache_dcache_v_i\n299                                   & ~dcache_replay_pending_r\n300                                   & (dcache_replay_retry_wait_r == '0)\n301                                   & ~is_req & ~dcache_busy_lo & ~flush_i;\n302   assign context_cache_dcache_yumi_o = context_cache_dcache_accept_li;\n303   assign context_cache_dcache_ready_o = ~context_cache_dcache_resp_pending_r\n304                                         & ~is_req\n305                                         & ~dcache_busy_lo;\n306 \n307   bp_be_dcache_pkt_s dcache_pkt;\n308   wire dcache_pkt_v = context_cache_dcache_accept_li | dcache_replay_accept_li\n309                        | (is_req & (~is_prefetch | (~dcache_busy_lo & ~flush_i)));\n310   assign dcache_pkt = context_cache_dcache_accept_li\n311                           ? '{thread_id : '0\n312                           ,rd_addr : context_cache_dcache_id_i\n313                           ,opcode : context_cache_dcache_w_i ? e_dcache_op_sd : e_dcache_op_ld\n314                           // Some FPGA configurations use a physical address\n315                           // narrower than the virtual address.  A sized cast\n316                           // preserves the old low-bit mapping while allowing\n317                           // Vivado to zero-extend instead of selecting bits\n318                           // beyond the input width.\n319                           ,vaddr  : vaddr_width_p'(context_cache_dcache_paddr_i)\n320                           }\n321                       : dcache_replay_accept_li\n322                         ? '{thread_id : '0\n323                             ,rd_addr : '0\n324                             ,opcode : e_dcache_op_prefetch\n325                             ,vaddr : vaddr_width_p'(dcache_replay_paddr_i)\n326                             }"
+      },
+      {
+        "first_line": 344,
+        "last_line": 360,
+        "text": "344   wire prefetch_ptag_allowed = dtlb_ptag_dram_lo\n345                                 & ~dtlb_ptag_uncached_lo & ~dtlb_ptag_nonidem_lo;\n346   wire dcache_ptag_v = context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r\n347                        | (dtlb_v_lo & ~dtlb_load_misaligned_lo & ~store_misaligned_v_o\n348                           & (~prefetch_mmu_r | (prefetch_ptag_allowed & ~flush_i)));\n349   wire [ptag_width_p-1:0] dcache_ptag_li =\n350     (context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r)\n351     ? (context_cache_dcache_ptag_v_r\n352        ? context_cache_dcache_paddr_r[page_offset_width_gp+:ptag_width_p]\n353        : dcache_replay_paddr_r[page_offset_width_gp+:ptag_width_p])\n354     : dtlb_ptag_lo;\n355   wire dcache_ptag_uncached_li = (context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r)\n356                                  ? 1'b0\n357                                  : dtlb_ptag_uncached_lo;\n358   wire dcache_ptag_dram_li = (context_cache_dcache_ptag_v_r | dcache_replay_ptag_v_r)\n359                              ? 1'b1\n360                              : dtlb_ptag_dram_lo;"
+      }
+    ]
+  },
+  "dcache": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_dcache/bp_be_dcache.sv",
+    "git_blob": "6db99688cd297f2581a81d32bf943612f0900ae5",
+    "sha256": "e870cb1f70ed6055c6aa304377b1f41690a2dff111dc3f03f60b9368873c74df",
+    "bytes": 62116,
+    "excerpts": [
+      {
+        "first_line": 492,
+        "last_line": 523,
+        "text": "492   localparam prefetch_buffer_els_lp = dcache_prefetch_els_p;\n493   localparam prefetch_buffer_slot_width_lp = `BSG_SAFE_CLOG2(prefetch_buffer_els_lp);\n494   logic [prefetch_buffer_els_lp-1:0] prefetch_buffer_v_r;\n495   logic [prefetch_buffer_els_lp-1:0][paddr_width_p-1:4] prefetch_buffer_addr_r;\n496   logic [prefetch_buffer_els_lp-1:0][1:0] prefetch_buffer_word_v_r;\n497   logic [prefetch_buffer_slot_width_lp-1:0] prefetch_buffer_replace_r;\n498   // The data array has one synchronous write and one asynchronous selected\n499   // read. Leaving its contents unreset lets FPGA tools map it to compact\n500   // distributed RAM; word-valid state guards every architectural read.\n501   (* ram_style = \"distributed\" *)\n502   logic [dword_width_gp-1:0] prefetch_buffer_data_r [prefetch_buffer_els_lp*2];\n503   logic prefetch_buffer_hit_tv, prefetch_buffer_segment_tv;\n504   logic [prefetch_buffer_slot_width_lp-1:0] prefetch_buffer_hit_slot_tv;\n505   logic [dword_width_gp-1:0] prefetch_buffer_data_tv;\n506   always_comb begin\n507     prefetch_buffer_hit_tv = 1'b0;\n508     prefetch_buffer_segment_tv = 1'b0;\n509     prefetch_buffer_hit_slot_tv = '0;\n510     prefetch_buffer_data_tv = '0;\n511     for (int i = prefetch_buffer_els_lp-1; i >= 0; i--) begin\n512       if (prefetch_buffer_v_r[i]\n513           & (prefetch_buffer_addr_r[i] == paddr_tv_r[paddr_width_p-1:4])) begin\n514         prefetch_buffer_segment_tv = &prefetch_buffer_word_v_r[i];\n515         if (prefetch_buffer_word_v_r[i][paddr_tv_r[3]]) begin\n516           prefetch_buffer_hit_tv = 1'b1;\n517           prefetch_buffer_hit_slot_tv = prefetch_buffer_slot_width_lp'(i);\n518           prefetch_buffer_data_tv = prefetch_buffer_data_r[2*i+paddr_tv_r[3]];\n519         end\n520       end\n521     end\n522     prefetch_buffer_hit_tv &= v_tv_r & decode_tv_r.load_op\n523                               & ~uncached_tv_r & ~cache_load_hit_tv;"
+      },
+      {
+        "first_line": 793,
+        "last_line": 808,
+        "text": "793   wire prefetch_sent       = prefetch_req & cache_req_yumi_i;\n794   wire replay_retry = v_tv_r & replay_tv_r & prefetch_req\n795                       & ~cache_req_yumi_i;\n796   assign replay_done_o = v_tv_r & replay_tv_r & ~replay_retry;\n797   assign replay_accepted_o = prefetch_sent & replay_tv_r;\n798 \n799   // Prefetch hints are non-architectural demand misses, not ordinary loads.\n800   // They avoid issuing if the line is already hot in L1, and a miss here\n801   // should still fill L1 state for later demand accesses.\n802   wire prefetch_req = v_tv_r & decode_tv_r.prefetch_op & ~cache_load_hit_tv\n803     & ~prefetch_buffer_segment_tv\n804     & ~uncached_tv_r & ~snoop_tv_r\n805     & features_p[e_cfg_writeback];\n806   assign prefetch_replay_o = (prefetch_req & ~cache_req_yumi_i)\n807                              | replay_tl_retry_r;\n808   assign cache_req_v_o = is_ready & (blocking_req | nonblocking_req | prefetch_req);"
+      },
+      {
+        "first_line": 850,
+        "last_line": 858,
+        "text": "850         {1'b1, e_dcache_subop_amominu}: cache_req_cast_o.subop = e_req_amominu;\n851         {1'b1, e_dcache_subop_amomaxu}: cache_req_cast_o.subop = e_req_amomaxu;\n852         default: cache_req_cast_o.subop = e_req_store;\n853       endcase\n854 \n855       if (prefetch_req)\n856         cache_req_cast_o.msg_type = e_cache_prefetch;\n857       else if (bflush_req)\n858         cache_req_cast_o.msg_type = e_cache_bflush;"
+      },
+      {
+        "first_line": 1080,
+        "last_line": 1116,
+        "text": "1080   wire prefetch_buffer_write = data_mem_pkt_v_i\n1081     & (data_mem_pkt_cast_i.opcode == e_cache_data_mem_prefetch);\n1082   logic prefetch_buffer_write_match;\n1083   logic [prefetch_buffer_slot_width_lp-1:0] prefetch_buffer_write_slot;\n1084   always_comb begin\n1085     prefetch_buffer_write_match = 1'b0;\n1086     // A full advisory buffer may contain predictions that software never\n1087     // consumes. Rotate those replacements so a stream of new replies cannot\n1088     // repeatedly overwrite one slot while stale entries pin every other slot.\n1089     prefetch_buffer_write_slot = prefetch_buffer_replace_r;\n1090     for (int i = prefetch_buffer_els_lp-1; i >= 0; i--) begin\n1091       if (prefetch_buffer_v_r[i]\n1092           & (prefetch_buffer_addr_r[i]\n1093              == data_mem_pkt_cast_i.addr[paddr_width_p-1:4])) begin\n1094         prefetch_buffer_write_match = 1'b1;\n1095         prefetch_buffer_write_slot = prefetch_buffer_slot_width_lp'(i);\n1096       end\n1097       if (!prefetch_buffer_v_r[i] & !prefetch_buffer_write_match) begin\n1098         prefetch_buffer_write_slot = prefetch_buffer_slot_width_lp'(i);\n1099       end\n1100     end\n1101   end\n1102 \n1103   wire data_mem_pkt_sram_yumi = data_mem_pkt_v_i\n1104     & ~lrsc_lock\n1105     & ~{|data_mem_fast_read & (data_mem_pkt_cast_i.opcode == e_cache_data_mem_read)}\n1106     & ~{|data_mem_fast_write & (data_mem_pkt_cast_i.opcode == e_cache_data_mem_read)}\n1107     & ~|{data_mem_fast_read & data_mem_write_bank_mask}\n1108     & ~|{data_mem_fast_write & data_mem_write_bank_mask}\n1109     & ~(v_tl_r & cache_req_critical_i)\n1110     & ~(wbuf_snoop_match_lo);\n1111   // Detached responses do not touch the cache SRAMs. If advisory entries are\n1112   // all occupied, replacing one is safe and prevents the memory response from\n1113   // deadlocking behind an entry that software never consumes.\n1114   assign data_mem_pkt_yumi_o = prefetch_buffer_write\n1115     ? 1'b1\n1116     : data_mem_pkt_sram_yumi;"
+      },
+      {
+        "first_line": 1131,
+        "last_line": 1158,
+        "text": "1131       if (prefetch_buffer_hit_tv) begin\n1132         prefetch_buffer_word_v_r[prefetch_buffer_hit_slot_tv][paddr_tv_r[3]] <= 1'b0;\n1133         if (!(|(prefetch_buffer_word_v_r[prefetch_buffer_hit_slot_tv]\n1134                & ~(2'(1) << paddr_tv_r[3]))))\n1135           prefetch_buffer_v_r[prefetch_buffer_hit_slot_tv] <= 1'b0;\n1136       end\n1137 \n1138       // A local store or an authoritative L1 copy supersedes advisory data.\n1139       for (int i = 0; i < prefetch_buffer_els_lp; i++) begin\n1140         if (prefetch_buffer_v_r[i]\n1141             & (prefetch_buffer_addr_r[i] == paddr_tv_r[paddr_width_p-1:4])\n1142             & v_tv_r\n1143             & (decode_tv_r.store_op | cache_load_hit_tv)) begin\n1144           prefetch_buffer_v_r[i] <= 1'b0;\n1145           prefetch_buffer_word_v_r[i] <= '0;\n1146         end\n1147       end\n1148 \n1149       if (prefetch_buffer_write & data_mem_pkt_yumi_o) begin\n1150         prefetch_buffer_v_r[prefetch_buffer_write_slot] <= 1'b1;\n1151         prefetch_buffer_addr_r[prefetch_buffer_write_slot]\n1152           <= data_mem_pkt_cast_i.addr[paddr_width_p-1:4];\n1153         if (!prefetch_buffer_write_match)\n1154           prefetch_buffer_word_v_r[prefetch_buffer_write_slot]\n1155             <= 2'(1) << data_mem_pkt_cast_i.addr[3];\n1156         else\n1157           prefetch_buffer_word_v_r[prefetch_buffer_write_slot]\n1158                                     [data_mem_pkt_cast_i.addr[3]] <= 1'b1;"
+      }
+    ]
+  },
+  "uce": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_me/src/v/cce/bp_uce.sv",
+    "git_blob": "6dc7d777f8e535b24141589e71dfdbdfc28772bf",
+    "sha256": "299edaa8ea79fcdf1b18d7189b4057220983ba87a5f0f6bc68ab5ecee9d5d1db",
+    "bytes": 89320,
+    "excerpts": [
+      {
+        "first_line": 148,
+        "last_line": 161,
+        "text": "148   localparam bp_bedrock_msg_size_e prefetch_msg_size_lp\n149     = prefetch_full_line_p ? block_msg_size_lp : e_bedrock_msg_size_16;\n150 \n151   `declare_bp_bedrock_if(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p);\n152   `declare_bp_cache_engine_generic_if(paddr_width_p, tag_width_p, sets_p, assoc_p, data_width_p, block_width_p, fill_width_p, id_width_p, cache);\n153 \n154   `bp_cast_i(bp_cache_req_s, cache_req);\n155   `bp_cast_i(bp_cache_req_metadata_s, cache_req_metadata);\n156   `bp_cast_o(bp_cache_tag_mem_pkt_s, tag_mem_pkt);\n157   `bp_cast_o(bp_cache_data_mem_pkt_s, data_mem_pkt);\n158   `bp_cast_o(bp_cache_stat_mem_pkt_s, stat_mem_pkt);\n159 \n160   wire prefetch_v_li = prefetch_p & cache_req_v_i\n161     & (cache_req_cast_i.msg_type == e_cache_prefetch);"
+      },
+      {
+        "first_line": 198,
+        "last_line": 200,
+        "text": "198   wire prefetch_accept = cache_req_yumi_o & prefetch_v_li;\n199   wire prefetch_allocate = prefetch_accept & prefetch_free_v & ~prefetch_duplicate_v;\n200   wire prefetch_drop = prefetch_accept & (~prefetch_free_v | prefetch_duplicate_v);"
+      },
+      {
+        "first_line": 1287,
+        "last_line": 1318,
+        "text": "1287         fsm_fwd_header_lo.msg_type = e_bedrock_mem_rd;\n1288         fsm_fwd_header_lo.addr = prefetch_addr_r[prefetch_issue_slot];\n1289         fsm_fwd_header_lo.size = prefetch_msg_size_lp;\n1290         fsm_fwd_header_lo.payload.prefetch = 1'b1;\n1291         // Physical previews warm the coherent L2 and discard their replies;\n1292         // translated architectural hints retain the D-cache side buffer.\n1293         fsm_fwd_header_lo.payload.speculative = prefetch_preview_r[prefetch_issue_slot];\n1294         fsm_fwd_header_lo.payload.way_id = prefetch_tag_width_lp'(prefetch_issue_slot);\n1295         fsm_fwd_header_lo.payload.state = bp_coh_states_e'\n1296           (prefetch_issue_slot >> prefetch_tag_width_lp);\n1297         fsm_fwd_header_lo.payload.lce_id = lce_id_i;\n1298         fsm_fwd_header_lo.payload.src_did = did_i;\n1299         fsm_fwd_data_lo = '0;\n1300         fsm_fwd_v_lo = fsm_fwd_ready_then_li;\n1301         prefetch_issue = fsm_fwd_v_lo & fsm_fwd_last_lo;\n1302       end\n1303 \n1304       // Narrow detached replies bypass L1 replacement. Each returned word is\n1305       // written into the D$ side buffer and therefore never locks the cache\n1306       // SRAMs or blocks an unrelated hit.\n1307       if (!prefetch_full_line_p && prefetch_response) begin\n1308         if (inval_v_li | prefetch_cancel_r[prefetch_response_slot]\n1309             | prefetch_preview_r[prefetch_response_slot]) begin\n1310           prefetch_response_yumi = 1'b1;\n1311         end else begin\n1312           data_mem_pkt_cast_o = '0;\n1313           data_mem_pkt_cast_o.opcode = e_cache_data_mem_prefetch;\n1314           data_mem_pkt_cast_o.addr = prefetch_addr_r[prefetch_response_slot]\n1315             + (paddr_width_p'(prefetch_fill_count_r[prefetch_response_slot]) << 3);\n1316           data_mem_pkt_cast_o.data = fsm_rev_data_li;\n1317           data_mem_pkt_v_o = 1'b1;\n1318           prefetch_response_yumi = data_mem_pkt_yumi_i;"
+      },
+      {
+        "first_line": 1603,
+        "last_line": 1615,
+        "text": "1603       if (prefetch_allocate) begin\n1604         prefetch_valid_r[prefetch_free_slot] <= 1'b1;\n1605         prefetch_sent_r[prefetch_free_slot] <= 1'b0;\n1606         prefetch_way_v_r[prefetch_free_slot] <= 1'b0;\n1607         prefetch_cancel_r[prefetch_free_slot] <= 1'b0;\n1608         prefetch_complete_r[prefetch_free_slot] <= 1'b0;\n1609         prefetch_preview_r[prefetch_free_slot] <= 1'b0;\n1610         prefetch_addr_r[prefetch_free_slot]\n1611           <= {cache_req_cast_i.addr[paddr_width_p-1:prefetch_match_offset_width_lp]\n1612               ,prefetch_match_offset_width_lp'(0)};\n1613         prefetch_critical_segment_r[prefetch_free_slot]\n1614           <= cache_req_cast_i.addr[block_offset_width_lp-1:4];\n1615         prefetch_fill_count_r[prefetch_free_slot] <= '0;"
+      },
+      {
+        "first_line": 1637,
+        "last_line": 1649,
+        "text": "1637       if (preview_allocate) begin\n1638         prefetch_valid_r[prefetch_free_slot] <= 1'b1;\n1639         prefetch_sent_r[prefetch_free_slot] <= 1'b0;\n1640         // Physical previews never install into L1, but the existing issue\n1641         // selector uses way_v as its admission-ready bit.\n1642         prefetch_way_v_r[prefetch_free_slot] <= 1'b1;\n1643         prefetch_way_r[prefetch_free_slot] <= '0;\n1644         prefetch_cancel_r[prefetch_free_slot] <= 1'b0;\n1645         prefetch_complete_r[prefetch_free_slot] <= 1'b0;\n1646         prefetch_preview_r[prefetch_free_slot] <= 1'b1;\n1647         prefetch_addr_r[prefetch_free_slot] <= preview_head_addr;\n1648         prefetch_critical_segment_r[prefetch_free_slot] <= '0;\n1649         prefetch_fill_count_r[prefetch_free_slot] <= '0;"
+      }
+    ]
+  },
+  "l2op": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_me/src/v/dev/bp_me_cache_controller.sv",
+    "git_blob": "bb2e15862db5483820131241b5a68da350a33939",
+    "sha256": "756e2fcf84fce3909fd67af58721d4447a47f7a02e74f08fa285949928bdc132",
+    "bytes": 26232,
+    "excerpts": [
+      {
+        "first_line": 181,
+        "last_line": 182,
+        "text": "181     wire fwd_prefetch = fsm_fwd_header_li.payload.prefetch\n182       && (fsm_fwd_header_li.msg_type == e_bedrock_mem_rd);"
+      },
+      {
+        "first_line": 556,
+        "last_line": 569,
+        "text": "556             else\n557               unique casez (fsm_fwd_header_li.msg_type)\n558                 e_bedrock_mem_rd:\n559                   case (fsm_fwd_header_li.size)\n560                     e_bedrock_msg_size_1: cache_pkt.opcode = LB;\n561                     e_bedrock_msg_size_2: cache_pkt.opcode = LH;\n562                     e_bedrock_msg_size_4: cache_pkt.opcode = LW;\n563                     e_bedrock_msg_size_8: cache_pkt.opcode = LD;\n564                     //e_bedrock_msg_size_16\n565                     //,e_bedrock_msg_size_32\n566                     //,e_bedrock_msg_size_64\n567                     //,e_bedrock_msg_size_128\n568                     default: cache_pkt.opcode = LM;\n569                   endcase"
+      }
+    ]
+  },
+  "bypass": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+    "path": "cosim/black-parrot-example/v/top_zynq.sv",
+    "git_blob": "64755b7f574cb2ce84e3fd84faef89f1c7032b30",
+    "sha256": "06fb7de89d18db8958ade1e7beac863c11418f2e3421cc1e387bc3a40bed44cf",
+    "bytes": 35875,
+    "excerpts": [
+      {
+        "first_line": 174,
+        "last_line": 180,
+        "text": "174 `ifdef BP_PREFETCH_AXI_BYPASS\n175    localparam prefetch_axi_bypass_lp = 1'b1;\n176 `else\n177    localparam prefetch_axi_bypass_lp =\n178      (bp_params_p == e_bp_unicore_zynqparrot_prefetch10_cfg)\n179      || (bp_params_p == e_bp_unicore_zynqparrot_prefetch5_cfg);\n180 `endif"
+      },
+      {
+        "first_line": 705,
+        "last_line": 713,
+        "text": "705       ,.s_axil_addr_width_p(bp_axil_addr_width_lp)\n706       ,.s_axil_data_width_p(bp_axil_data_width_lp)\n707       ,.axi_addr_width_p(bp_axi_addr_width_lp)\n708       ,.axi_data_width_p(bp_axi_data_width_lp)\n709       ,.axi_id_width_p(6)\n710       ,.axi_core_clk_async_p(0)\n711       ,.prefetch_bypass_p(prefetch_axi_bypass_lp)\n712       ,.prefetch_outstanding_p(1)\n713       ,.cache_miss_trace_p(1'b1)"
+      }
+    ]
+  },
+  "l2decode": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl",
+    "revision": "3dff9f43af8e1bb850da0b41696514396fa0fa7e",
+    "path": "bsg_cache/bsg_cache_decode.sv",
+    "git_blob": "c8a420c2a8f4b1d90578ab252a999bda6843f448",
+    "sha256": "9c15e04cbb89e378c1cb417bcf38abf6443bfa513e31a4321c92cb2d3fc854c1",
+    "bytes": 2838,
+    "excerpts": [
+      {
+        "first_line": 43,
+        "last_line": 51,
+        "text": "43   assign decode_o.ld_op = (opcode_i == LB)\n44     || (opcode_i == LH)\n45     || (opcode_i == LW)\n46     || (opcode_i == LD)\n47     || (opcode_i == LBU)\n48     || (opcode_i == LHU)\n49     || (opcode_i == LWU)\n50     || (opcode_i == LDU)\n51     || (opcode_i == LM);"
+      }
+    ]
+  },
+  "l2fill": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl",
+    "revision": "3dff9f43af8e1bb850da0b41696514396fa0fa7e",
+    "path": "bsg_cache/bsg_cache_miss.sv",
+    "git_blob": "5e5d68b51ca2124c26074cefd1a4046e7c814e66",
+    "sha256": "3263044d846c471ae1548cede54a08cb0667948ac2149163d5a9284f5627a13d",
+    "bytes": 19883,
+    "excerpts": [
+      {
+        "first_line": 324,
+        "last_line": 337,
+        "text": "324         chosen_way_n = track_miss_i ? tag_hit_way_id_i : (invalid_exist ? invalid_way_id : lru_way_id);\n325 \n326         dma_cmd_o = e_dma_send_fill_addr;          \n327         dma_addr_o = {\n328           addr_tag_v,\n329           {(sets_p>1){addr_index_v}},\n330           {(block_offset_width_lp){1'b0}}\n331         };\n332 \n333         // if the chosen way is dirty and valid, then evict.\n334         miss_state_n = dma_done_i\n335           ? ((~track_miss_i & stat_info_in.dirty[chosen_way_n] & valid_v_i[chosen_way_n])\n336             ? SEND_EVICT_ADDR\n337             : GET_FILL_DATA)"
+      },
+      {
+        "first_line": 455,
+        "last_line": 490,
+        "text": "455       // Set the DMA engine to start writing the new block to the data_mem.\n456       // Do not start until the store buffer is empty.\n457       GET_FILL_DATA: begin\n458         dma_cmd_o = e_dma_get_fill_data;\n459         dma_addr_o = {\n460           addr_tag_v,\n461           {(sets_p>1){addr_index_v}},\n462           {(block_size_in_words_p > 1){addr_block_offset_v}}, // used for snoop data in dma.\n463           {(lg_data_mask_width_lp){1'b0}}\n464         };\n465 \n466         // For store tag miss, set the dirty bit for the chosen way.\n467         // For load tag miss, clear the dirty bit for the chosen way.\n468         // For track miss, do not touch the dirty bit for the chosen way.\n469         // Set the lru_bits, so that the chosen way is not the LRU.\n470         // We are choosing a way to bring in a new block, which is technically\n471         // the MRU. lru decode unit generates the next state LRU bits, so that\n472         // the input way is \"not\" the LRU way.\n473         stat_mem_v_o = dma_done_i;\n474         stat_mem_w_o = 1'b1;\n475         stat_mem_data_out.dirty = {ways_p{decode_v_i.st_op | decode_v_i.atomic_op}};\n476         stat_mem_data_out.lru_bits = chosen_way_lru_data;\n477         stat_mem_w_mask_out.dirty = track_miss_i ? {ways_p{1'b0}} : chosen_way_decode;\n478         stat_mem_w_mask_out.lru_bits = chosen_way_lru_mask;\n479 \n480         // set the tag and the valid bit to 1'b1 for the chosen way.\n481         tag_mem_v_o = dma_done_i;\n482         tag_mem_w_o = 1'b1;\n483 \n484         for (integer i = 0; i < ways_p; i++) begin\n485           tag_mem_data_out[i].tag = addr_tag_v;\n486           tag_mem_data_out[i].lock = decode_v_i.alock_op;\n487           tag_mem_data_out[i].valid = 1'b1; \n488           tag_mem_w_mask_out[i].tag = {tag_width_lp{chosen_way_decode[i]}};\n489           tag_mem_w_mask_out[i].lock = chosen_way_decode[i];\n490           tag_mem_w_mask_out[i].valid = chosen_way_decode[i];"
+      }
+    ]
+  },
+  "accepted_kernel_snapshot": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.c",
+    "sha256": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb",
+    "bytes": 78666,
+    "excerpts": [
+      {
+        "first_line": 2945,
+        "last_line": 2971,
+        "text": "2945 \n2946 \t\t\tif (!paddr)\n2947 \t\t\t\tcontinue;\n2948 \t\t\tfor (line = 0; line < lines_per_base; line++) {\n2949 \t\t\t\tunsigned long entry = ((unsigned long)slot << 45)\n2950 \t\t\t\t\t| ((unsigned long)index << 40)\n2951 \t\t\t\t\t| (paddr + line * 64);\n2952 \n2953 \t\t\t\tasm volatile(\"csrw 0x9c1, %0\" : : \"r\"(entry)\n2954 \t\t\t\t\t     : \"memory\");\n2955 \t\t\t\tindex++;\n2956 \t\t\t}\n2957 \t\t}\n2958 \t\t/* A zero-entry slot is a diagnostic follow-only command: it keeps\n2959 \t\t * the tagged wakeup and hardware instruction-follow path while\n2960 \t\t * suppressing all detached data traffic. */\n2961 \t\tif (!index && lines_per_base) {\n2962 \t\t\terror = -ENOENT;\n2963 \t\t\tlocal_irq_restore(flags);\n2964 \t\t\tbreak;\n2965 \t\t}\n2966 \t\tstatus = slot | ((unsigned long)index << 2)\n2967 \t\t\t | ((unsigned long)delay << 8)\n2968 \t\t\t | ((unsigned long)gap << 24) | (1UL << 63);\n2969 \t\tasm volatile(\"csrw 0x9c2, %0\" : : \"r\"(status) : \"memory\");\n2970 \t\tlocal_irq_restore(flags);\n2971 \t\tWRITE_ONCE(me->thread.bp_preview_replay_slot, slot);"
+      },
+      {
+        "first_line": 3020,
+        "last_line": 3050,
+        "text": "3020 \tcase PR_BP_PREVIEW_REPLAY_TRIGGER: {\n3021 \t\tunsigned long flags, slot, status;\n3022 \n3023 \t\tif (arg2 > 1 || arg3 || arg4 || arg5) {\n3024 \t\t\terror = -EINVAL;\n3025 \t\t\tbreak;\n3026 \t\t}\n3027 \t\tif (READ_ONCE(me->thread.bp_preview_replay_state) != 1\n3028 \t\t    || READ_ONCE(me->thread.bp_preview_phys_mm) != me->mm) {\n3029 \t\t\terror = -ENOENT;\n3030 \t\t\tbreak;\n3031 \t\t}\n3032 \t\t/* Serialize the explicit command with configuration and any prior\n3033 \t\t * global replay command. The zero arm follows the same checks but\n3034 \t\t * deliberately leaves the configured slot idle.\n3035 \t\t */\n3036 \t\tlocal_irq_save(flags);\n3037 \t\tasm volatile(\"csrr %0, 0x9c3\" : \"=r\"(status) : : \"memory\");\n3038 \t\tif (status & (0xfUL | (7UL << 60))) {\n3039 \t\t\terror = -EBUSY;\n3040 \t\t\tlocal_irq_restore(flags);\n3041 \t\t\tbreak;\n3042 \t\t}\n3043 \t\tslot = READ_ONCE(me->thread.bp_preview_replay_slot);\n3044 \t\tif (arg2)\n3045 \t\t\tasm volatile(\"csrw 0x9c3, %0\" : : \"r\"(slot) : \"memory\");\n3046 \t\tlocal_irq_restore(flags);\n3047 \t\terror = 0;\n3048 \t\tbreak;\n3049 \t}\n3050 \tcase PR_BP_PREVIEW_GET_COUNT:"
+      }
+    ]
+  },
+  "csr_thread_mux": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_csr_wrapper_mt.sv",
+    "git_blob": "459da0441e260c74ffaec27e702799267289b052",
+    "sha256": "ec2485a1e717b39d9203fb8be40ba6efc3a09689784c7c43101641ed1036579b",
+    "bytes": 21141,
+    "excerpts": [
+      {
+        "first_line": 358,
+        "last_line": 363,
+        "text": "358   assign physical_preview_v_o = physical_preview_v_co[retire_thread_id_i];\n359   assign physical_preview_paddr_o = physical_preview_paddr_co[retire_thread_id_i];\n360   assign dcache_replay_entry_v_o = dcache_replay_entry_v_co[retire_thread_id_i];\n361   assign dcache_replay_config_v_o = dcache_replay_config_v_co[retire_thread_id_i];\n362   assign dcache_replay_trigger_v_o = dcache_replay_trigger_v_co[retire_thread_id_i];\n363   assign dcache_replay_payload_o = dcache_replay_payload_co[retire_thread_id_i];"
+      }
+    ]
+  },
+  "core_bridge": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_top/src/v/bp_core_minimal.sv",
+    "git_blob": "9057072df88709cc81289c3275e399bcb903ce0a",
+    "sha256": "6974dcf11a46d4eed680a129e714f4dd223fc74715f57cda914dd0749d30f441",
+    "bytes": 18499,
+    "excerpts": [
+      {
+        "first_line": 381,
+        "last_line": 392,
+        "text": "381      ,.physical_preview_idle_i(physical_preview_idle_i)\n382      ,.physical_preview_v_o(physical_preview_v_lo)\n383      ,.physical_preview_paddr_o(physical_preview_paddr_lo)\n384      ,.dcache_replay_status_i(dcache_replay_status_i)\n385      ,.dcache_replay_entry_v_o(dcache_replay_entry_v_o)\n386      ,.dcache_replay_config_v_o(dcache_replay_config_v_o)\n387      ,.dcache_replay_trigger_v_o(dcache_replay_trigger_v_o)\n388      ,.dcache_replay_payload_o(dcache_replay_payload_o)\n389      ,.dcache_replay_v_i(dcache_replay_v_i)\n390      ,.dcache_replay_paddr_i(dcache_replay_paddr_i)\n391      ,.dcache_replay_yumi_o(dcache_replay_yumi_o)\n392      ,.dcache_replay_accepted_o(dcache_replay_accepted_o)"
+      }
+    ]
+  },
+  "be_bridge": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_top.sv",
+    "git_blob": "5b7ea96e226f5e0d002a81c1ac899a3db6f8477b",
+    "sha256": "c9093548f529f12a5c505244a321c1a20d1907b497088e8320710e2331b6cd32",
+    "bytes": 86596,
+    "excerpts": [
+      {
+        "first_line": 1618,
+        "last_line": 1629,
+        "text": "1618      ,.physical_preview_idle_i(physical_preview_idle_i)\n1619      ,.physical_preview_v_o(physical_preview_v_o)\n1620      ,.physical_preview_paddr_o(physical_preview_paddr_o)\n1621      ,.dcache_replay_status_i(dcache_replay_status_i)\n1622      ,.dcache_replay_entry_v_o(dcache_replay_entry_v_o)\n1623      ,.dcache_replay_config_v_o(dcache_replay_config_v_o)\n1624      ,.dcache_replay_trigger_v_o(dcache_replay_trigger_v_o)\n1625      ,.dcache_replay_payload_o(dcache_replay_payload_o)\n1626      ,.dcache_replay_v_i(dcache_replay_v_i)\n1627      ,.dcache_replay_paddr_i(dcache_replay_paddr_i)\n1628      ,.dcache_replay_yumi_o(dcache_replay_yumi_o)\n1629      ,.dcache_replay_accepted_o(dcache_replay_accepted_o)"
+      }
+    ]
+  },
+  "calculator_bridge": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_calculator/bp_be_calculator_top.sv",
+    "git_blob": "31c196b07a3c31ca3ba9a81af89fba2f3dc82aa0",
+    "sha256": "aaedeee836d75141a495d14ebfb46e924bb6293d2bad62f33c94498a8198b619",
+    "bytes": 41142,
+    "excerpts": [
+      {
+        "first_line": 425,
+        "last_line": 432,
+        "text": "425      ,.physical_preview_idle_i(physical_preview_idle_i)\n426      ,.physical_preview_v_o(physical_preview_v_o)\n427      ,.physical_preview_paddr_o(physical_preview_paddr_o)\n428      ,.dcache_replay_status_i(dcache_replay_status_i)\n429      ,.dcache_replay_entry_v_o(dcache_replay_entry_v_o)\n430      ,.dcache_replay_config_v_o(dcache_replay_config_v_o)\n431      ,.dcache_replay_trigger_v_o(dcache_replay_trigger_v_o)\n432      ,.dcache_replay_payload_o(dcache_replay_payload_o)"
+      },
+      {
+        "first_line": 646,
+        "last_line": 649,
+        "text": "646      ,.dcache_replay_v_i(dcache_replay_v_i)\n647      ,.dcache_replay_paddr_i(dcache_replay_paddr_i)\n648      ,.dcache_replay_yumi_o(dcache_replay_yumi_o)\n649      ,.dcache_replay_accepted_o(dcache_replay_accepted_o)"
+      }
+    ]
+  },
+  "dcache_decoder": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+    "path": "bp_be/src/v/bp_be_dcache/bp_be_dcache_decoder.sv",
+    "git_blob": "c3bb92ce3b8768ac17ba57a251a30eebc5e79105",
+    "sha256": "8ea9cffc6c15196d9191239a1f624d7ac0b02e1e784f0c400fca8779928bc6ad",
+    "bytes": 7560,
+    "excerpts": [
+      {
+        "first_line": 23,
+        "last_line": 28,
+        "text": "23   always_comb begin\n24     decode_cast_o = '0;\n25 \n26     decode_cast_o.prefetch_op = pkt_cast_i.opcode == e_dcache_op_prefetch;\n27 \n28     // Atomic op decoding"
+      },
+      {
+        "first_line": 68,
+        "last_line": 75,
+        "text": "68 \n69     decode_cast_o.load_op = (decode_cast_o.amo_op | decode_cast_o.lr_op) || pkt_cast_i.opcode inside\n70       {e_dcache_op_flw, e_dcache_op_fld\n71        ,e_dcache_op_ld, e_dcache_op_lw, e_dcache_op_lh, e_dcache_op_lb\n72        ,e_dcache_op_lwu, e_dcache_op_lhu, e_dcache_op_lbu\n73        ,e_dcache_op_ptw, e_dcache_op_prefetch\n74        };\n75 "
+      },
+      {
+        "first_line": 134,
+        "last_line": 140,
+        "text": "134     // Return\n135     decode_cast_o.ret_op = decode_cast_o.load_op\n136       & ~decode_cast_o.prefetch_op\n137       & (decode_cast_o.ptw_op\n138          | decode_cast_o.float_op\n139          | (decode_cast_o.int_op && (decode_cast_o.rd_addr != '0))\n140          );"
+      }
+    ]
+  },
+  "l2_miss_trigger": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl",
+    "revision": "3dff9f43af8e1bb850da0b41696514396fa0fa7e",
+    "path": "bsg_cache/bsg_cache.sv",
+    "git_blob": "6f2e2e445f550c317d7fbe15dfa4bd82506fcce1",
+    "sha256": "df28a69a86811e49daa0fbd6c88554c8fe0577e00ba8643c0d396d4de40caf98",
+    "bytes": 39014,
+    "excerpts": [
+      {
+        "first_line": 377,
+        "last_line": 381,
+        "text": "377   // miss_v signal activates the miss handling unit.\n378   // MBT: the ~decode_v_r.tagst_op is necessary at the top of this expression\n379   //      to avoid X-pessimism post synthesis due to X's coming out of the tags\n380   wire miss_v = (~decode_v_r.tagst_op) & v_v_r\n381     & (ld_st_amo_tag_miss | track_miss | tagfl_hit | aflinv_hit | alock_miss | aunlock_hit);"
+      }
+    ]
+  },
+  "kernel_uapi_snapshot": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/input-include_uapi_linux_prctl.h",
+    "sha256": "7eb58c54f5c7c82ee71373a42aafe584c9644b79e324e37b6d96e5970c05f1e0",
+    "bytes": 12643,
+    "excerpts": [
+      {
+        "first_line": 320,
+        "last_line": 331,
+        "text": "320 #define PR_BP_PREVIEW_GET_HOOK_CYCLES\t0x4250505b\n321 /* Configure slot, lines per pinned base, trigger delay, and replay gap. */\n322 #define PR_BP_PREVIEW_REPLAY_CONFIG\t0x4250505c\n323 /* Read replay busy/queue state and saturating hardware counters. */\n324 #define PR_BP_PREVIEW_REPLAY_STATUS\t0x4250505d\n325 /* Copy the 64-bit shared instruction-prefix controller status to arg2. */\n326 #define PR_BP_PREVIEW_ICACHE_STATUS\t0x4250505e\n327 /* Optionally trigger the shared instruction prefix: arg2 enables it; arg3 and\n328  * arg4 select a table start/count, or both zero retain the full table. */\n329 #define PR_BP_PREVIEW_ICACHE_TRIGGER\t0x4250505f\n330 /* Optionally trigger this task's configured tagged-data replay slot. */\n331 #define PR_BP_PREVIEW_REPLAY_TRIGGER\t0x42505060"
+      }
+    ],
+    "scope": "retained kernel input UAPI snapshot; constants agree with host benchmark and accepted kernel switch cases"
+  }
+}
