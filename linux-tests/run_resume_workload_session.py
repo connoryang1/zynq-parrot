@@ -36,9 +36,9 @@ def recover(host, env):
 
 
 def cell(text):
-    match = re.fullmatch(r'(scan|lookup|parse|chase):(\d+):(futex-early|futex-early-both|preseed)', text)
+    match = re.fullmatch(r'(scan|lookup|parse|chase|deflate):(\d+):(futex-early|futex-early-both|preseed|retention-rr|retention-first)', text)
     if not match or int(match[2]) > 65536:
-        raise argparse.ArgumentTypeError('cell must be workload:kib:policy (early, both, or preseed)')
+        raise argparse.ArgumentTypeError('cell must be workload:kib:policy (early, both, preseed, or retention)')
     return match[1], int(match[2]), match[3]
 
 
@@ -50,6 +50,7 @@ def main(argv=None):
     parser.add_argument('package', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--bitstream-sha256', required=True)
+    parser.add_argument('--zlib-library', type=Path)
     parser.add_argument('--host', default='xilinx@192.168.4.35')
     parser.add_argument('--cell', action='append', type=cell, required=True)
     parser.add_argument('--loops', type=int, default=64)
@@ -72,6 +73,7 @@ def main(argv=None):
             '--sync', 'futex', '--policy', policy, '--loops', str(args.loops),
             '--warmup', str(args.warmup), '--repeats', str(args.repeats)])
         plan.append(parsed)
+        parsed.zlib_library = args.zlib_library
     env = os.environ.copy()
     if not env.get('PYNQ_POWER_STATE_URL'):
         # Existing local fallback, never echo or retain the credential.

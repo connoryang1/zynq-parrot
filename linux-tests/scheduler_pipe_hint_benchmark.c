@@ -24,6 +24,11 @@
 #include <unistd.h>
 #include <time.h>
 #include "resume_workload.h"
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+#include <signal.h>
+#define PR_BP_ICACHE_RETENTION_CONTROL 0x42505061
+#define PR_BP_ICACHE_RETENTION_STATUS 0x42505062
+#endif
 
 #if !defined(BP_RESUME_HOST_VERIFY) && (!defined(__riscv) || __riscv_xlen != 64)
 #error "This benchmark requires RV64 BlackParrot"
@@ -53,6 +58,10 @@ enum hint_policy {
 	hint_futex_early_both,
 	hint_seed_once,
 	hint_preseed,
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	hint_retention_rr,
+	hint_retention_first,
+#endif
 };
 
 enum sync_policy {
@@ -181,7 +190,15 @@ static enum hint_policy parse_policy(const char *text)
 		return hint_seed_once;
 	if (!strcmp(text, "preseed"))
 		return hint_preseed;
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	if (!strcmp(text, "retention-rr"))
+		return hint_retention_rr;
+	if (!strcmp(text, "retention-first"))
+		return hint_retention_first;
+	fprintf(stderr, "policy must be continuous, continuous-unmatched, futex-early, futex-early-both, seed, preseed, retention-rr, or retention-first\n");
+#else
 	fprintf(stderr, "policy must be continuous, continuous-unmatched, futex-early, futex-early-both, seed, or preseed\n");
+#endif
 	exit(2);
 }
 
@@ -222,7 +239,12 @@ static unsigned long prefix_status(void)
 static void issue_hint(unsigned enabled)
 {
 #ifdef BP_RESUME_HOST_VERIFY
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	extern void bp_resume_host_retention_hint(unsigned enabled);
+	bp_resume_host_retention_hint(enabled);
+#else
 	(void)enabled;
+#endif
 #else
 	if (prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled, 0UL, 0UL, 0UL))
 		fail("instruction-prefix trigger");
@@ -232,6 +254,10 @@ static void issue_hint(unsigned enabled)
 static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
 				 unsigned iteration)
 {
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	if (policy == hint_retention_rr || policy == hint_retention_first)
+		return;
+#endif
 	if (policy == hint_continuous_unmatched) {
 		if (enabled)
 			issue_hint(1);
@@ -243,7 +269,12 @@ static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
 static void set_futex_early_mode(unsigned enabled)
 {
 #ifdef BP_RESUME_HOST_VERIFY
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	extern void bp_resume_host_retention_task_mode(unsigned enabled);
+	bp_resume_host_retention_task_mode(enabled);
+#else
 	(void)enabled;
+#endif
 #else
 	if (prctl(PR_BP_PREVIEW_ENABLE, enabled ? 14UL : 0UL, 0UL, 0UL, 0UL))
 		fail("futex-early preview mode");
@@ -254,6 +285,118 @@ static int is_futex_early(enum hint_policy policy)
 {
 	return policy == hint_futex_early || policy == hint_futex_early_both;
 }
+
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+#ifdef BP_RESUME_HOST_VERIFY
+/* Host tests must supply an explicit shared-state hardware mock. */
+extern int bp_resume_host_retention_prctl(int option, unsigned long arg2,
+		unsigned long arg3, unsigned long arg4, unsigned long arg5);
+#define retention_prctl bp_resume_host_retention_prctl
+#else
+#define retention_prctl prctl
+#endif
+
+static pid_t retention_owner, retention_child;
+static unsigned retention_armed;
+
+static uint64_t retention_read_status(void)
+{
+	uint64_t status = 0;
+
+	if (retention_prctl(PR_BP_ICACHE_RETENTION_STATUS,
+			    (unsigned long)&status, 0UL, 0UL, 0UL))
+		fail("I-retention status/probe");
+	if (!(status & (UINT64_C(1) << 63))) {
+		errno = ENODEV;
+		fail("I-retention capability absent");
+	}
+	return status;
+}
+
+static void retention_cleanup(void)
+{
+	int status;
+	pid_t waited;
+
+	/* The policy is CPU-global. Inherited child exit handlers must never
+	 * disable it during the parent's measurement or another child's work.
+	 */
+	if (getpid() != retention_owner)
+		return;
+	if (retention_child > 0) {
+		do { waited = waitpid(retention_child, &status, WNOHANG); }
+		while (waited < 0 && errno == EINTR);
+		if (!waited) {
+			kill(retention_child, SIGKILL);
+			while (waitpid(retention_child, &status, 0) < 0 && errno == EINTR) { }
+		}
+		retention_child = 0;
+	}
+	if (retention_armed) {
+		if (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, 0UL, 0UL, 0UL, 0UL)) {
+			perror("I-retention error cleanup/reset");
+			_Exit(1);
+		}
+		retention_armed = 0;
+	}
+}
+
+static void retention_initialize(void)
+{
+	retention_owner = getpid();
+	if (atexit(retention_cleanup))
+		fail("I-retention cleanup registration");
+	(void)retention_read_status();
+	retention_armed = 1;
+	/* Exec need not clear an old per-task preview mode. Retention tests
+	 * must not accidentally inherit kernel wake hints from earlier code.
+	 * Explicit futex policies rearm their own mode later as before.
+	 */
+	set_futex_early_mode(0);
+}
+
+static unsigned retention_mode(enum hint_policy policy, unsigned enabled)
+{
+	if (!enabled)
+		return 0;
+	return policy == hint_retention_rr ? 1 : policy == hint_retention_first ? 2 : 0;
+}
+
+static void retention_start_cell(enum hint_policy policy, unsigned enabled)
+{
+	unsigned mode = retention_mode(policy, enabled);
+
+	retention_armed = 1;
+	/* Both processes have allocated private state and completed setup fences.
+	 * One global write/fence resets this cell; no per-wake hint is emitted.
+	 */
+	if (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, (unsigned long)mode,
+			    0UL, 0UL, 0UL))
+		fail("I-retention policy control");
+	if ((retention_read_status() & 3) != mode) {
+		errno = EIO;
+		fail("I-retention policy readback");
+	}
+}
+
+static uint64_t retention_finish_cell(enum hint_policy policy, unsigned enabled)
+{
+	uint64_t status = retention_read_status();
+
+	if ((status & 3) != retention_mode(policy, enabled)) {
+		errno = EIO;
+		fail("I-retention policy changed during cell");
+	}
+	if (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, 0UL, 0UL, 0UL, 0UL))
+		fail("I-retention normal reset");
+	if (retention_read_status() & 3) {
+		errno = EIO;
+		fail("I-retention reset readback");
+	}
+	retention_armed = 0;
+	return status;
+}
+#endif
 
 static void futex_wait_for(_Atomic uint32_t *word, uint32_t wanted)
 {
@@ -295,6 +438,10 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 	child = fork();
 	if (child < 0)
 		fail("fork");
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	if (child)
+		retention_child = child;
+#endif
 	if (!child) {
 		struct resume_workload child_working_set =
 			allocate_working_set(working_set_kib, 0x5a, workload);
@@ -324,6 +471,9 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 	close(ready[1]);
 	transfer(ready[0], &token, 0);
 	flush_instruction_state();
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	retention_start_cell(policy, enabled);
+#endif
 	if (policy == hint_preseed)
 		issue_hint(enabled);
 	for (unsigned i = 0; i < warmup; ++i) {
@@ -351,6 +501,9 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 	close(to_child[1]);
 	close(to_parent[0]);
 	close(ready[0]);
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	retention_child = 0;
+#endif
 	check_working_set(&parent_working_set, parent_checksum);
 	return (struct cell_result){ .elapsed = end - begin };
 }
@@ -381,6 +534,10 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 	child = fork();
 	if (child < 0)
 		fail("fork");
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	if (child)
+		retention_child = child;
+#endif
 	if (!child) {
 		struct resume_workload child_working_set =
 			allocate_working_set(working_set_kib, 0x3c, workload);
@@ -418,6 +575,9 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 	close(ready[1]);
 	transfer(ready[0], &token, 0);
 	flush_instruction_state();
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	retention_start_cell(policy, enabled);
+#endif
 	if (policy == hint_preseed)
 		issue_hint(enabled);
 	for (unsigned i = 0; i < warmup; ++i) {
@@ -447,6 +607,9 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 		exit(1);
 	}
 	close(ready[0]);
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	retention_child = 0;
+#endif
 	struct cell_result result = {
 		.elapsed = end - begin,
 		.child_resume = shared->child_resume,
@@ -471,7 +634,11 @@ int main(int argc, char **argv)
 	unsigned long before, after;
 
 	if (argc > 9) {
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed|retention-rr|retention-first] [warmup] [pipe|futex] [plain|legs] [working-set-kib] [scan|lookup|parse|chase]\n",
+#else
 		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed] [warmup] [pipe|futex] [plain|legs] [working-set-kib] [scan|lookup|parse|chase]\n",
+#endif
 			argv[0]);
 		return 2;
 	}
@@ -492,7 +659,11 @@ int main(int argc, char **argv)
 	if (argc > 8)
 		workload = argv[8];
 	if (strcmp(workload, "scan") && strcmp(workload, "lookup")
-	    && strcmp(workload, "parse") && strcmp(workload, "chase")) {
+	    && strcmp(workload, "parse") && strcmp(workload, "chase")
+#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
+	    && strcmp(workload, "deflate")
+#endif
+	   ) {
 		fputs("invalid resume workload\n", stderr);
 		return 2;
 	}
@@ -504,6 +675,14 @@ int main(int argc, char **argv)
 		fputs("futex-early policy requires futex synchronization\n", stderr);
 		return 2;
 	}
+#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
+	if (!strcmp(workload, "deflate"))
+		printf(PIPE_HINT_LABEL("LIBRARY") " name=zlib version=%s block_bytes=%u input_corpus_kib=%u\n",
+		       zlibVersion(), RESUME_ZLIB_BLOCK_BYTES, working_set_kib);
+#endif
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	retention_initialize();
+#endif
 	before = prefix_status();
 #ifdef BP_RESUME_HOST_VERIFY
 	fputs("Software protocol verification only; host nanoseconds are not BlackParrot cycles.\n", stderr);
@@ -514,6 +693,10 @@ int main(int argc, char **argv)
 	       : policy == hint_continuous_unmatched ? "continuous-unmatched"
 	       : policy == hint_futex_early ? "futex-early"
 	       : policy == hint_futex_early_both ? "futex-early-both"
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+	       : policy == hint_retention_rr ? "retention-rr"
+	       : policy == hint_retention_first ? "retention-first"
+#endif
 	       : policy == hint_seed_once ? "seed" : "preseed",
 	       sync == sync_pipe ? "pipe" : "futex",
 	       profile == profile_plain ? "plain" : "legs", working_set_kib, workload);
@@ -522,11 +705,21 @@ int main(int argc, char **argv)
 
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned enabled = first ^ order;
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+			uint64_t whole_begin = cycle(), whole_elapsed, retention_status;
+#endif
 			struct cell_result result = sync == sync_pipe
 				? run_pipe_cell(enabled, loops, warmup, policy,
 						working_set_kib, workload)
 				: run_futex_cell(enabled, loops, warmup, policy,
 						  profile, working_set_kib, workload);
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+			/* Charge allocation, fork, setup, warmup, verification, teardown,
+			 * status reads and policy reset separately from steady work.
+			 */
+			retention_status = retention_finish_cell(policy, enabled);
+			whole_elapsed = cycle() - whole_begin;
+#endif
 
 			printf(PIPE_HINT_LABEL("RESULT") " repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
 			       repeat, order, enabled,
@@ -537,6 +730,15 @@ int main(int argc, char **argv)
 				       (unsigned long long)result.child_resume,
 				       (unsigned long long)result.parent_resume,
 				       loops);
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+			printf(PIPE_HINT_LABEL("WHOLE") " repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
+			       repeat, order, enabled, (unsigned long long)whole_elapsed, loops);
+			printf(PIPE_HINT_LABEL("RETENTION") " repeat=%u order=%u enabled=%u raw=0x%016llx capability=%u mode=%u completed=%u consumed_fetches=%u\n",
+			       repeat, order, enabled, (unsigned long long)retention_status,
+			       (unsigned)(retention_status >> 63), (unsigned)(retention_status & 3),
+			       (unsigned)((retention_status >> 2) & 1),
+			       (unsigned)((retention_status >> 16) & 0xffff));
+#endif
 			fflush(stdout);
 		}
 	}

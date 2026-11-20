@@ -1,0 +1,121 @@
+This patch adds privileged control and actual 64-bit status for the experimental
+CPU-global instruction-retention policy. Illegal CSR reads use the RISC-V
+exception table, so old hardware reports ENODEV instead of crashing Linux.
+No physical addresses, page pins, or per-task state are added.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -332,0 +333,12 @@
++/* Experimental CPU-global I-retention policy: arg2 is 0 legacy, 1 demand RR,
++ * or 2 first completed lines per bank. Other arguments must be zero.
++ * CAP_SYS_ADMIN and exactly one possible CPU are required; every control
++ * operation includes fence.i after probing hardware capability.
++ */
++#define PR_BP_ICACHE_RETENTION_CONTROL	0x42505061
++/* Copy actual 64-bit status to arg2; other arguments zero. Bit 63 is capability,
++ * bits 1:0 are policy, bit 2 is sticky publication, and bits 31:16 count
++ * saturating side-store-only instruction hits. Same privilege/CPU guards.
++ */
++#define PR_BP_ICACHE_RETENTION_STATUS	0x42505062
++
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -82,0 +83,59 @@
++#if defined(CONFIG_RISCV) && defined(CONFIG_64BIT) && defined(CONFIG_MMU)
++#include <asm/asm-extable.h>
++
++/* The illegal-instruction trap uses fixup_exception() for kernel faults.
++ * This read therefore also works as a feature probe on pre-retention RTL.
++ * Separate early-clobber outputs keep the extable error and zero registers
++ * distinct even though both inputs start at zero.
++ */
++static int bp_icache_retention_probe(u64 *status)
++{
++	unsigned long err = 0, value = 0;
++
++	asm volatile("1: csrr %[value], 0x5c1\n"
++		     "2:\n"
++		     _ASM_EXTABLE_UACCESS_ERR_ZERO(1b, 2b, %[err], %[value])
++		     : [err] "+&r" (err), [value] "+&r" (value)
++		     : : "memory");
++	if (err || !(value & (1UL << 63)))
++		return -ENODEV;
++	*status = value;
++	return 0;
++}
++
++static int bp_icache_retention_control(unsigned long mode)
++{
++	u64 status;
++	int error;
++
++	preempt_disable();
++	error = bp_icache_retention_probe(&status);
++	if (!error)
++		/* Every accepted mode change, including mode zero, starts clean. */
++		asm volatile("csrw 0x5c1, %0\nfence.i\n"
++			     : : "r" (mode) : "memory");
++	preempt_enable();
++	return error;
++}
++
++static int bp_icache_retention_status(u64 *status)
++{
++	int error;
++
++	preempt_disable();
++	error = bp_icache_retention_probe(status);
++	preempt_enable();
++	return error;
++}
++#else
++static int bp_icache_retention_control(unsigned long mode)
++{
++	return -ENODEV;
++}
++
++static int bp_icache_retention_status(u64 *status)
++{
++	return -ENODEV;
++}
++#endif
++
+@@ -2725,0 +2785,38 @@
++	case PR_BP_ICACHE_RETENTION_CONTROL:
++		if (arg2 > 2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		if (!capable(CAP_SYS_ADMIN)) {
++			error = -EPERM;
++			break;
++		}
++		/* The retained store is CPU-global, not task or page-pin state. */
++		if (num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		error = bp_icache_retention_control(arg2);
++		break;
++	case PR_BP_ICACHE_RETENTION_STATUS: {
++		u64 status = 0;
++
++		if (!arg2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		if (!capable(CAP_SYS_ADMIN)) {
++			error = -EPERM;
++			break;
++		}
++		if (num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		error = bp_icache_retention_status(&status);
++		/* User copies may fault and sleep; preemption is enabled here. */
++		if (!error && copy_to_user((u64 __user *)arg2, &status,
++					   sizeof(status)))
++			error = -EFAULT;
++		break;
++	}

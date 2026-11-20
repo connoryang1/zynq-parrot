@@ -13,10 +13,37 @@ from run_scheduler_pipe_hint import (
     parse_args,
     validate_args,
     validate_transfer,
+    library_transfer,
+    GUEST_ZLIB,
 )
 
 
 class PipeHintRunnerTests(unittest.TestCase):
+    def test_optional_library_has_only_bounded_fixed_destination_commands(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "library"
+            payload = bytes(range(256)) * 11
+            path.write_bytes(payload)
+            commands = library_transfer(path)
+            self.assertEqual(commands[0], f": > {GUEST_ZLIB}.b64")
+            self.assertEqual(commands[-1], f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}")
+            self.assertTrue(all(len(command) <= 768 for command in commands))
+            encoded = "".join(command.split("'")[1] for command in commands[1:-1])
+            self.assertEqual(base64.b64decode(encoded), payload)
+
+    def test_retention_and_deflate_arguments_bind_optional_library(self):
+        for policy in ("retention-rr", "retention-first"):
+            args = parse_args([
+                "image.nbf", "transfer", "a" * 64, "result.log",
+                "--bitstream-sha256", "b" * 64, "--policy", policy,
+                "--workload", "deflate", "--working-set-kib", "32",
+                "--zlib-library", "exact-libz.so.1",
+            ])
+            command = build_guest_command(args)
+            self.assertTrue(command.startswith("LD_LIBRARY_PATH=/tmp " + GUEST_ELF))
+            self.assertIn(policy, command)
+            self.assertTrue(command.endswith("pipe plain 32 deflate"))
+
     def test_seed_policy_is_bound_into_runner_arguments(self):
         args = parse_args([
             "image.nbf", "transfer", "a" * 64, "result.log",

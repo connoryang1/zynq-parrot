@@ -14,10 +14,10 @@ from analyze_scheduler_tagged_replay import percentile
 
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
-    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed))?"
+    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed|retention-rr|retention-first))?"
     r"(?: sync=(pipe|futex))?(?: profile=(plain|legs))?"
     r"(?: working_set_kib=(\d+))?"
-    r"(?: workload=(scan|lookup|parse|chase))?"
+    r"(?: workload=(scan|lookup|parse|chase|deflate))?"
     r"(?: terminal_handshake=([01]))?$", re.MULTILINE
 )
 ROW = re.compile(
@@ -33,6 +33,100 @@ STATUS = re.compile(
     r"after=0x([0-9a-fA-F]{16}) configured_entries=(\d+) dropped=(\d+)$",
     re.MULTILINE,
 )
+
+WHOLE = re.compile(
+    r"^PIPE_HINT_WHOLE repeat=(\d+) order=(\d+) enabled=([01]) "
+    r"cycles=(\d+) loops=(\d+)$", re.MULTILINE
+)
+RETENTION = re.compile(
+    r"^PIPE_HINT_RETENTION repeat=(\d+) order=(\d+) enabled=([01]) "
+    r"raw=0x([0-9a-fA-F]{16}) capability=([01]) mode=([0-3]) "
+    r"completed=([01]) consumed_fetches=(\d+)$", re.MULTILINE
+)
+RETENTION_POLICIES = {"retention-rr": 1, "retention-first": 2}
+
+
+def retention_rows(text, parsed, policy, loops, repeats, profile):
+    """Bind every raw post-teardown diagnostic and whole cell to steady work."""
+    if loops <= 0 or repeats < 2:
+        raise ValueError("retention comparison requires positive loops and at least two repeats")
+    patterns = {"CONFIG": CONFIG, "RESULT": ROW, "LEGS": LEGS,
+                "WHOLE": WHOLE, "RETENTION": RETENTION, "STATUS": STATUS,
+                "PASS": re.compile(r"^PIPE_HINT_PASS$")}
+    actual_markers = []
+    for line in text.splitlines():
+        if not line.startswith("PIPE_HINT_"):
+            continue
+        name = line.split(" ", 1)[0][len("PIPE_HINT_"):]
+        if name not in patterns or not patterns[name].fullmatch(line):
+            raise ValueError("malformed or unexpected retention protocol marker")
+        actual_markers.append(name)
+    cell_markers = ["RESULT"] + (["LEGS"] if profile == "legs" else []) + ["WHOLE", "RETENTION"]
+    if actual_markers != ["CONFIG"] + cell_markers * (repeats * 2) + ["STATUS", "PASS"]:
+        raise ValueError("retention cell markers missing, duplicated, or out of order")
+    expected_keys = [(repeat, order, (repeat & 1) ^ order)
+                     for repeat in range(repeats) for order in range(2)]
+    key = lambda row: (row["repeat"], row["order"], row["enabled"])
+    if [key(row) for row in parsed] != expected_keys:
+        raise ValueError("retention result row order or identity differs")
+    whole = [dict(repeat=int(a), order=int(b), enabled=int(c),
+                  cycles=int(d), loops=int(e)) for a,b,c,d,e in WHOLE.findall(text)]
+    diagnostics = []
+    allowed = (1 << 63) | (0xffff << 16) | 7
+    for a,b,c,raw_hex,cap,mode,completed,consumed in RETENTION.findall(text):
+        raw = int(raw_hex, 16)
+        decoded = {"capability": raw >> 63, "mode": raw & 3,
+                   "completed": (raw >> 2) & 1,
+                   "consumed_fetches": (raw >> 16) & 0xffff}
+        printed = dict(zip(decoded, map(int, (cap,mode,completed,consumed))))
+        if raw & ~allowed or decoded != printed:
+            raise ValueError("retention raw status has forbidden bits or printed decode mismatch")
+        enabled = int(c)
+        if decoded["capability"] != 1 or decoded["mode"] != (RETENTION_POLICIES[policy] if enabled else 0):
+            raise ValueError("retention capability or policy mode mismatch")
+        if not enabled and (decoded["completed"] or decoded["consumed_fetches"]):
+            raise ValueError("disabled retention cell contains stale capture or side-hit diagnostics")
+        diagnostics.append(dict(repeat=int(a), order=int(b), enabled=enabled,
+                                raw=f"0x{raw:016x}", **decoded))
+    if [key(row) for row in whole] != expected_keys or [key(row) for row in diagnostics] != expected_keys:
+        raise ValueError("whole/retention rows are not a bijection with steady results")
+    if profile == "legs":
+        leg_keys = [tuple(map(int, row[:3])) for row in LEGS.findall(text)]
+        if leg_keys != expected_keys:
+            raise ValueError("retention leg row order or identity differs")
+    for steady, cell in zip(parsed, whole):
+        if cell["loops"] != loops or cell["cycles"] < steady["cycles"]:
+            raise ValueError("whole cell loop count differs or cycles are below steady result")
+    return whole, diagnostics
+
+
+def summarize_whole_cells(rows, repeats, bootstrap_samples):
+    """Keep complete-cell paired uncertainty separate from steady throughput."""
+    pairs = []
+    for repeat in range(repeats):
+        cells = [row for row in rows if row["repeat"] == repeat]
+        disabled = next(row for row in cells if not row["enabled"])
+        enabled = next(row for row in cells if row["enabled"])
+        pairs.append({"repeat": repeat, "enabled_order": enabled["order"],
+                      "disabled_cycles_per_cell": disabled["cycles"],
+                      "enabled_cycles_per_cell": enabled["cycles"],
+                      "saved_cycles_per_cell": disabled["cycles"] - enabled["cycles"],
+                      "saved_percent": 100.0 * (disabled["cycles"] - enabled["cycles"]) / disabled["cycles"]})
+    rng = random.Random(0x57484f4c)
+    saved = [pair["saved_cycles_per_cell"] for pair in pairs]
+    percent = [pair["saved_percent"] for pair in pairs]
+    boot = [statistics.median(rng.choices(saved, k=len(saved))) for _ in range(bootstrap_samples)]
+    boot_percent = [statistics.median(rng.choices(percent, k=len(percent))) for _ in range(bootstrap_samples)]
+    return {"pairs": pairs, "metrics": {
+        "disabled_median_cycles_per_cell": statistics.median(pair["disabled_cycles_per_cell"] for pair in pairs),
+        "enabled_median_cycles_per_cell": statistics.median(pair["enabled_cycles_per_cell"] for pair in pairs),
+        "paired_median_saved_cycles_per_cell": statistics.median(saved),
+        "paired_95pct_ci_saved_cycles_per_cell": [percentile(boot, 0.025), percentile(boot, 0.975)],
+        "paired_median_saved_percent": statistics.median(percent),
+        "paired_95pct_ci_saved_percent": [percentile(boot_percent, 0.025), percentile(boot_percent, 0.975)],
+        "saved_cycles_by_enabled_order": {str(order): statistics.median(
+            pair["saved_cycles_per_cell"] for pair in pairs if pair["enabled_order"] == order) for order in (0,1)}},
+        "scope": "Complete measured cell includes allocation, fork, setup, warmup, steady work, checks, teardown, status reads and policy reset; printed rows are outside timing."}
 
 
 def sha256(path):
@@ -73,6 +167,10 @@ def analyze(path, bootstrap_samples=20000):
     for marker in ("PIPE_HINT_PASS", "CORE PASS", "BSG PASS"):
         if marker not in text:
             raise ValueError(f"missing terminal marker {marker}")
+
+    if "zlib_library_sha256" in runner and not re.fullmatch(
+            r"[0-9a-f]{64}", str(runner["zlib_library_sha256"])):
+        raise ValueError("status lacks valid zlib_library_sha256")
 
     configs = CONFIG.findall(text)
     statuses = STATUS.findall(text)
@@ -131,6 +229,10 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("profiled handoffs exceed complete transaction")
         row.update(child_resume=leg["child_resume"],
                    parent_resume=leg["parent_resume"])
+    whole_rows, diagnostics = (retention_rows(text, parsed, policy, loops, repeats, profile)
+                               if policy in RETENTION_POLICIES else (None, None))
+    if policy not in RETENTION_POLICIES and (WHOLE.search(text) or RETENTION.search(text)):
+        raise ValueError("retention markers require a retention policy")
     pairs = []
     for repeat in range(repeats):
         rows = [row for row in parsed if row["repeat"] == repeat]
@@ -181,7 +283,12 @@ def analyze(path, bootstrap_samples=20000):
             "resident_query_pending", "resident_drops")):
         raise ValueError("instruction-prefix baseline is not clean")
     expected_entries = min(0xffff, repeats * configured)
-    if policy == "preseed":
+    if policy in RETENTION_POLICIES:
+        if (int(printed_dropped) or any(after[key] for key in (
+                "busy", "entry_held", "read_pending", "next_index", "accepted_entries",
+                "accepted_triggers", "dropped_triggers", "resident_query_pending", "resident_drops"))):
+            raise ValueError("retention cell contains stale explicit prefix hint activity")
+    elif policy == "preseed":
         expected_triggers = min(0xff, repeats)
         expected_resident_drops = 0
         entries_ok = after["accepted_entries"] == expected_entries
@@ -207,7 +314,7 @@ def analyze(path, bootstrap_samples=20000):
         expected_resident_drops = min(
             0x1ff, (total_triggers - repeats) * configured)
         entries_ok = after["accepted_entries"] == expected_entries
-    if (after["next_index"] != configured
+    if policy not in RETENTION_POLICIES and (after["next_index"] != configured
             or not entries_ok
             or after["accepted_triggers"] != expected_triggers
             or after["resident_drops"] != expected_resident_drops
@@ -254,10 +361,11 @@ def analyze(path, bootstrap_samples=20000):
             metrics[f"paired_median_{key}"] = statistics.median(values)
             metrics[f"paired_95pct_ci_{key}"] = [
                 percentile(draws, 0.025), percentile(draws, 0.975)]
-    mechanism = ("kernel-integrated instruction replay"
+    mechanism = ("demand-populated instruction retention" if policy in RETENTION_POLICIES else
+                 "kernel-integrated instruction replay"
                  if policy in ("futex-early", "futex-early-both")
                  else "matched explicit instruction hints")
-    return {
+    result = {
         "purpose": (f"Measure sustained {sync} roundtrip throughput with "
                     f"{workload} work and {mechanism}."),
         "transcript": str(path),
@@ -281,6 +389,18 @@ def analyze(path, bootstrap_samples=20000):
             f"Each process scans a private {working_set_kib} KiB working set after every resume.",
         ],
     }
+
+    if "zlib_library_sha256" in runner:
+        result["identity"]["zlib_library_sha256"] = runner["zlib_library_sha256"]
+    if policy in RETENTION_POLICIES:
+        result["whole_cell"] = summarize_whole_cells(whole_rows, repeats, bootstrap_samples)
+        result["retention_status"] = {
+            "rows": diagnostics,
+            "scope": "Actual raw hardware CPU-global cumulative consumed side-only I-cache fetch responses, after the setup policy write/reset through warmup, steady work and teardown until the status read; not steady-only retired instructions or cache lines.",
+            "mechanism": "Demand admission reuses the existing retained capacity and refill stream without additional prefetch traffic; mode 1 is RR, mode 2 pins first completed lines per bank. Zero consumed fetches and negative paired effects remain valid controls."}
+        result["interpretation_limits"].append(
+            "Retention diagnostics are post-teardown cumulative; positive counts do not alone prove a complete-cell benefit, and zero counts do not invalidate a negative control.")
+    return result
 
 
 def main(argv=None):

@@ -22,7 +22,17 @@ from run_scheduler_tagged_replay import (
 
 
 GUEST_ELF = "/tmp/scheduler_pipe_hint_benchmark_dynamic"
+GUEST_ZLIB = "/tmp/libz.so.1"
 MAX_GUEST_COMMAND_LENGTH = 768
+
+
+def library_transfer(path):
+    """Generate bounded, fixed-destination commands for an optional RV64 library."""
+    payload = base64.b64encode(path.read_bytes()).decode("ascii")
+    return [f": > {GUEST_ZLIB}.b64", *(
+        f"echo '{payload[index:index + 192]}' >> {GUEST_ZLIB}.b64"
+        for index in range(0, len(payload), 192)),
+        f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}"]
 
 
 def sha256(path):
@@ -65,14 +75,16 @@ def parse_args(argv=None):
     parser.add_argument("--repeats", type=int, default=8)
     parser.add_argument("--policy", choices=("continuous", "continuous-unmatched",
                                               "futex-early", "futex-early-both",
-                                              "seed", "preseed"),
+                                              "seed", "preseed", "retention-rr", "retention-first"),
                         default="continuous")
     parser.add_argument("--warmup", type=int, default=32)
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--profile", choices=("plain", "legs"), default="plain")
     parser.add_argument("--working-set-kib", type=int, default=0)
-    parser.add_argument("--workload", choices=("scan", "lookup", "parse", "chase"),
+    parser.add_argument("--workload", choices=("scan", "lookup", "parse", "chase", "deflate"),
                         default="scan")
+    parser.add_argument("--zlib-library", type=Path,
+                        help="exact RV64 libz.so.1 staged with this ELF and bound by SHA-256")
     parser.add_argument("--legacy-no-terminal-handshake", action="store_true",
                         help="bind an older seven-argument guest without the final verification barrier")
     parser.add_argument(
@@ -105,6 +117,8 @@ def validate_args(args):
         raise ValueError("legacy four-argument CLI requires pipe/plain")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
+    if args.zlib_library is not None and not args.zlib_library.is_file():
+        raise ValueError("zlib library must exist")
     if not args.log.parent.is_dir():
         raise ValueError("log parent directory must exist")
     validate_transfer(args.transfer, args.elf_sha256)
@@ -117,6 +131,8 @@ def build_guest_command(args):
         command += f" {args.sync} {args.profile} {args.working_set_kib}"
         if args.workload != "scan":
             command += f" {args.workload}"
+    if args.zlib_library is not None:
+        command = "LD_LIBRARY_PATH=/tmp " + command
     return command
 
 
@@ -145,6 +161,8 @@ def run(args):
         "legacy_four_arg_cli": args.legacy_four_arg_cli,
         "command": command,
     }
+    if args.zlib_library is not None:
+        status["zlib_library_sha256"] = sha256(args.zlib_library)
     env = os.environ.copy()
     env["PYNQ_CONTROL_PROGRAM_SHA256"] = args.control_sha256
     env["PYNQ_CONTROL_PROGRAM_TIMEOUT_MS"] = str(args.runtime_ms)
@@ -159,6 +177,13 @@ def run(args):
         with args.log.open("w") as log:
             child.logfile_read = log
             expect_shell_prompt(child, 300, "Linux boot")
+            if args.zlib_library is not None:
+                for transfer_command in library_transfer(args.zlib_library):
+                    child.sendline(transfer_command)
+                    expect_shell_prompt(child, 180, "guest zlib transfer")
+                child.sendline(f"/bin/busybox sha256sum {GUEST_ZLIB}")
+                child.expect_exact(f"{status['zlib_library_sha256']}  {GUEST_ZLIB}")
+                expect_shell_prompt(child, 180, "guest zlib verification")
             for transfer_command in args.transfer.read_text().splitlines():
                 child.sendline(transfer_command)
                 expect_shell_prompt(child, 180, "guest ELF transfer")
