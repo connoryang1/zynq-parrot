@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import re
 import resource
+import shlex
 import shutil
 import subprocess
 import sys
@@ -24,6 +25,10 @@ TEST = "mt_context_resume_prefix_benchmark"
 MODEL = "Vbsg_nonsynth_zynq_testbench"
 SCOPE = "Synthetic full-core nonresident instruction-prefix study; not Linux or FPGA performance."
 TRANSPORTS = ("minimal-axil", "full-burst")
+BP_RTL_SOURCES = ("bp_fe/src/v/bp_fe_icache.sv",
+                  "bp_be/src/v/bp_be_calculator/bp_be_csr.sv")
+NBF_TOOL = "bp_common/software/py/nbf.py"
+NESTED_SOURCES = ("basejump_stl", "HardFloat", "bedrock")
 
 
 def transport_scope(transport):
@@ -58,7 +63,43 @@ def copy_verified(source, target):
     return record(target)
 
 
-def model_identity(directory, build_log, capture, latency, transport="minimal-axil"):
+def git_checkout(path):
+    """Never let Git discover an ancestor for an uninitialized submodule."""
+    path = path.resolve()
+    if not (path / ".git").exists():
+        raise ValueError(f"selected source lacks .git: {path}")
+    try:
+        top = subprocess.check_output(["git", "-C", str(path), "rev-parse", "--show-toplevel"], text=True).strip()
+        if Path(top).resolve() != path:
+            raise ValueError(f"selected Git root differs: {path}")
+        revision = subprocess.check_output(["git", "-C", str(path), "rev-parse", "HEAD"], text=True).strip()
+        diff = subprocess.check_output(["git", "-C", str(path), "diff", "HEAD", "--binary"])
+    except subprocess.CalledProcessError as error:
+        raise ValueError(f"invalid selected Git checkout: {path}") from error
+    return {"root": str(path), "revision": revision,
+            "diff_sha256": hashlib.sha256(diff).hexdigest(), "diff_bytes": len(diff)}
+
+
+def blackparrot_identity(bp):
+    """Bind selected source, ordinary nested gitlinks and the conversion tool."""
+    identity = git_checkout(bp)
+    identity["rtl_sources"] = [record(bp / name) for name in BP_RTL_SOURCES]
+    identity["nbf_tool"] = record(bp / NBF_TOOL)
+    identity["nested_sources"] = []
+    for name in NESTED_SOURCES:
+        relative = "external/" + name
+        entry = subprocess.check_output(["git", "-C", str(bp), "ls-tree", "HEAD", relative], text=True).split()
+        if len(entry) != 4 or entry[:2] != ["160000", "commit"]:
+            raise ValueError(f"missing selected BlackParrot gitlink: {relative}")
+        nested = git_checkout(bp / relative)
+        if nested["revision"] != entry[2] or nested["diff_bytes"]:
+            raise ValueError(f"nested source differs from selected gitlink: {relative}")
+        nested["gitlink_revision"] = entry[2]
+        identity["nested_sources"].append(nested)
+    return identity
+
+
+def model_identity(directory, build_log, capture, latency, transport="minimal-axil", bp=None):
     """Check ifdef semantics and the maintained model stamp before any run."""
     expected = (f".build_config-nt2-nc4-cfge_bp_custom_cfg-trace1"
                 f"-axipipe-lat{latency}-q4" + ("-icapture" if capture == "on" else ""))
@@ -103,15 +144,23 @@ def model_identity(directory, build_log, capture, latency, transport="minimal-ax
         raise ValueError("build command capture mode does not match requested control")
     design = "black-parrot-example" if full else "black-parrot-minimal-example"
     required_sources = [ROOT / "cosim" / design / relative for relative in ("ps.cpp", "v/top.v")]
-    tokens = commands[0].split()
+    tokens = shlex.split(commands[0])
     if any(str(source) not in tokens for source in required_sources):
         raise ValueError("build command host/RTL source does not match the selected transport")
+    bp = (bp or ROOT / "import/black-parrot").resolve()
+    for relative in BP_RTL_SOURCES:
+        actual = [Path(token).resolve() for token in tokens
+                  if token.endswith("/" + relative)]
+        if actual != [(bp / relative).resolve()]:
+            raise ValueError(f"model RTL source does not match selected BlackParrot root: {relative}")
+    selected_source = blackparrot_identity(bp)
     if not (directory / "obj_dir" / MODEL).is_file():
         raise ValueError("completed model binary is missing")
     return {"stamp": expected, "verilator_command": commands[0],
             "verilator_command_source": command_source, "defines": defines,
             "physical_threads": 2, "logical_contexts": 4, "trace": "FST",
             "capture": capture, "transport": transport,
+            "blackparrot_source": selected_source,
             "transport_sources": [record(source) for source in required_sources],
             "configured_axi_memory_latency_ticks": latency,
             "memory_queue_depth": 4, "axi_data_width_bits": 64 if full else 32, "aclk_mhz": 20,
@@ -191,6 +240,8 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--modes", type=int, choices=range(4), nargs="+", default=[0, 1, 2, 3])
     parser.add_argument("--elf-from", type=Path, help="first session.json, binding one exact ELF and compiler command")
+    parser.add_argument("--bp", type=Path, default=ROOT / "import/black-parrot",
+                        help="exact BlackParrot checkout used by the completed model and NBF converter")
     parser.add_argument("--toolchain", type=Path, default=Path("/home/coyang/zynq-parrot/install"))
     parser.add_argument("--native-timeout", type=int, choices=(240, 600), default=240)
     args = parser.parse_args(argv)
@@ -199,7 +250,8 @@ def main(argv=None):
     directory, output = args.model_dir.resolve(), args.output.resolve()
     if output.exists():
         parser.error("output must be new; retained evidence is never overwritten")
-    identity = model_identity(directory, args.build_log, args.capture, args.latency, args.transport)
+    bp = args.bp.resolve()
+    identity = model_identity(directory, args.build_log, args.capture, args.latency, args.transport, bp)
     output.mkdir(parents=True)
     scope = transport_scope(args.transport)
     state = {"scope": scope, "state": "preparing", "model": identity, "runs": []}
@@ -222,10 +274,13 @@ def main(argv=None):
         command_source["path"] = str(snapshot.resolve())
         copy_verified(directory / "obj_dir" / identity["stamp"], model_dir / identity["stamp"])
         copy_verified(Path(__file__).resolve(), output / "runner.py")
-        for name, location in (("top", ROOT), ("blackparrot", ROOT / "import/black-parrot")):
+        for name, location in (("top", ROOT), ("blackparrot", bp)):
             revision = subprocess.check_output(["git", "-C", str(location), "rev-parse", "HEAD"], text=True).strip()
             state[name + "_revision"] = revision
-            diff = subprocess.check_output(["git", "-C", str(location), "diff", "--binary"])
+            diff = subprocess.check_output(["git", "-C", str(location), "diff", "HEAD", "--binary"])
+            if name == "blackparrot" and (revision != identity["blackparrot_source"]["revision"]
+                    or hashlib.sha256(diff).hexdigest() != identity["blackparrot_source"]["diff_sha256"]):
+                raise ValueError("selected BlackParrot source changed before archival")
             (output / (name + ".diff")).write_bytes(diff)
 
         program = output / "program"
@@ -267,7 +322,10 @@ def main(argv=None):
             raise ValueError("ELF-to-memory conversion failed")
         mem.write_text(mem.read_text().replace("@8", "@0"))
         nbf = program / "prog.nbf"
-        nbf_command = [sys.executable, str(ROOT / "import/black-parrot/bp_common/software/py/nbf.py"),
+        nbf_tool = bp / NBF_TOOL
+        if sha256(nbf_tool) != identity["blackparrot_source"]["nbf_tool"]["sha256"]:
+            raise ValueError("selected BlackParrot NBF tool changed during preparation")
+        nbf_command = [sys.executable, str(nbf_tool),
                        "--skip_zeros", "--keep_mem_zeros", "--mem", str(mem), "--ncpus", "1"]
         if args.transport == "full-burst":
             nbf_command += ["--config", "--debug"]
