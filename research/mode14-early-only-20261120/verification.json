@@ -1,0 +1,45 @@
+{
+  "state": "PASS",
+  "scope": "offline only; no board or kernel build",
+  "manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/mode14-early-only-20261120/manifest.json",
+    "sha256": "f5040dc8b5dfd919c7cb446d0e4aa05e5c4704a2b5c705b62f90e9acc3d9067b",
+    "bytes": 8052
+  },
+  "verifier": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/mode14-early-only-20261120/verify_control.py",
+    "sha256": "49bab642a8c3072cffda966f1a45edb5accef8d809efcc308a607a3fbc38aebe",
+    "bytes": 3229
+  },
+  "full_payload_differences": [
+    {
+      "offset": "0x813fe8",
+      "original": "0x1d",
+      "control": "0x21"
+    }
+  ],
+  "full_elf_differences": [
+    {
+      "offset": "0x814fe8",
+      "original": "0x1d",
+      "control": "0x21"
+    }
+  ],
+  "full_nbf_ascii_differences": [
+    {
+      "offset": "0x25f22ba",
+      "original": "0x31",
+      "control": "0x32"
+    },
+    {
+      "offset": "0x25f22bb",
+      "original": "0x64",
+      "control": "0x31"
+    }
+  ],
+  "changed_modes": [
+    14
+  ],
+  "reverse_nbf_byte_exact": true,
+  "conversion_and_extraction_byte_exact": true
+}

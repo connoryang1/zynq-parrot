@@ -321,6 +321,51 @@ class PipeHintAnalyzerTests(unittest.TestCase):
                 320,
             )
 
+    def test_unsaturated_mode14_uses_actual_sweeps_not_wake_only_equality(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "run.log"
+            identity = "a" * 64
+            runner = {
+                "status": "PASS", "loops": 1, "repeats": 2, "warmup": 1,
+                "policy": "futex-early", "sync": "futex", "terminal_handshake": 1,
+                "nbf_sha256": identity, "transfer_sha256": identity,
+                "elf_sha256": identity, "control_program_sha256": identity,
+                "bitstream_sha256": identity,
+            }
+            log.with_suffix(".log.status.json").write_text(json.dumps(runner))
+
+            def write(triggers, resident, admitted=32):
+                # Six explicit parent wakes are known. Additional selections
+                # are kernel/schedule dependent. Two fresh cells admit 32 lines.
+                after = (1 | (16 << 4) | (16 << 13) | (admitted << 22)
+                         | (triggers << 38) | (resident << 55))
+                log.write_text(
+                    "PIPE_HINT_CONFIG loops=1 repeats=2 warmup=1 configured_entries=16 "
+                    "policy=futex-early sync=futex terminal_handshake=1\n"
+                    + "".join(
+                        f"PIPE_HINT_RESULT repeat={repeat} order={order} "
+                        f"enabled={(repeat & 1) ^ order} cycles=1000 loops=1\n"
+                        for repeat in range(2) for order in range(2))
+                    + f"PIPE_HINT_STATUS before=0x0000000000000101 after=0x{after:016x} "
+                    "configured_entries=16 dropped=0\nPIPE_HINT_PASS\nCORE PASS\nBSG PASS\n")
+
+            # The third case re-admits one evicted line. Entry admission is
+            # per line; divisibility by the configured table size is unjustified.
+            for triggers, admitted in ((6, 32), (10, 32), (10, 33), (13, 32)):
+                with self.subTest(triggers=triggers, admitted=admitted):
+                    write(triggers, triggers * 16 - admitted, admitted)
+                    result = analyze(log, 10)
+                    self.assertEqual(result["trigger_accounting"]["early_wake_opportunities"], 6)
+                    self.assertFalse(result["trigger_accounting"]["accepted_triggers_saturated"])
+                    self.assertTrue(any("combined-policy" in text
+                                        for text in result["interpretation_limits"]))
+            for triggers, resident, admitted in ((5, 48, 32), (10, 64, 32),
+                                                  (6, 511, 32), (6, 65, 31)):
+                with self.subTest(invalid=(triggers, resident, admitted)):
+                    write(triggers, resident, admitted)
+                    with self.assertRaisesRegex(ValueError, "did not drain cleanly"):
+                        analyze(log, 10)
+
     def test_profiles_two_resume_legs(self):
         with tempfile.TemporaryDirectory() as directory:
             log = Path(directory) / "run.log"

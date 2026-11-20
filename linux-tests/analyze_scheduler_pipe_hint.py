@@ -173,6 +173,28 @@ def decode_status(value):
     }
 
 
+def mode14_counters_consistent(after, configured, early_wakes):
+    """Validate actual sweeps without assuming a kernel's selection-hook policy.
+
+    Early wake calls are a lower bound: historical mode 14 also triggers when
+    an armed task is selected. Unsaturated counters give exact processed-slot
+    accounting; saturated counters cannot recover the missing trigger count.
+    """
+    triggers = after["accepted_triggers"]
+    admitted = after["accepted_entries"]
+    resident = after["resident_drops"]
+    if triggers < min(0xff, early_wakes):
+        return False
+    if triggers < 0xff:
+        processed = triggers * configured
+        return admitted <= processed and resident == min(0x1ff, processed - admitted)
+    if admitted < 0xffff and resident < 0x1ff:
+        processed = admitted + resident
+        return (processed % configured == 0
+                and processed // configured >= max(0xff, early_wakes))
+    return True
+
+
 def analyze(path, bootstrap_samples=20000):
     """Fail closed on identities, order balance, controller drain, and markers."""
     if bootstrap_samples <= 0:
@@ -236,6 +258,8 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("legs profile requires futex synchronization")
     if policy in ("futex-early", "futex-early-both") and sync != "futex":
         raise ValueError("early futex replay requires futex synchronization")
+    if policy in ("futex-early", "futex-early-both") and not 1 <= configured <= 256:
+        raise ValueError("mode-14 replay requires a configured prefix of 1..256 entries")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
                    cycles=int(d), loops=int(e)) for a, b, c, d, e in ROW.findall(text)]
     if len(parsed) != repeats * 2:
@@ -332,15 +356,21 @@ def analyze(path, bootstrap_samples=20000):
         entries_ok = after["accepted_entries"] == expected_entries
     elif policy in ("futex-early", "futex-early-both"):
         # Linux clears the child's preview mode on clone. Historical
-        # futex-early therefore arms only the parent; the both variant rearms
-        # the child explicitly. The final release wake is outside timing.
+        # futex-early arms only the parent; both explicitly rearms the child.
+        # Patch 0026 also left mode 14 enabled at scheduler selection. Its
+        # actual selection count is not determined by loop count. Patch 0028
+        # removes that extra site; do not infer either kernel from this label.
+        # The final parent release wake is outside timing.
         directions = 2 if policy == "futex-early-both" else 1
         total_triggers = repeats * (directions * (warmup + loops) + terminal_handshake)
-        expected_triggers = min(0xff, total_triggers)
-        expected_resident_drops = min(0x1ff, total_triggers * configured)
+        expected_triggers = expected_resident_drops = None
         entries_ok = (
+            # Each enabled cell fences after child readiness, before its first
+            # wake, so the known distinct prefix must be admitted once. Later
+            # side-store replacement can require any number of extra entries;
+            # the controller counts admissions, not complete table reloads.
             after["accepted_entries"] >= expected_entries
-            and after["accepted_entries"] % configured == 0
+            and mode14_counters_consistent(after, configured, total_triggers)
         )
     else:
         total_triggers = repeats * 2 * (warmup + loops)
@@ -350,8 +380,10 @@ def analyze(path, bootstrap_samples=20000):
         entries_ok = after["accepted_entries"] == expected_entries
     if policy not in RETENTION_POLICIES and (after["next_index"] != configured
             or not entries_ok
-            or after["accepted_triggers"] != expected_triggers
-            or after["resident_drops"] != expected_resident_drops
+            or (expected_triggers is not None
+                and after["accepted_triggers"] != expected_triggers)
+            or (expected_resident_drops is not None
+                and after["resident_drops"] != expected_resident_drops)
             or after["dropped_triggers"] or int(printed_dropped)
             or any(after[key] for key in (
                 "busy", "entry_held", "read_pending", "resident_query_pending"))
@@ -396,7 +428,7 @@ def analyze(path, bootstrap_samples=20000):
             metrics[f"paired_95pct_ci_{key}"] = [
                 percentile(draws, 0.025), percentile(draws, 0.975)]
     mechanism = ("demand-populated instruction retention" if policy in RETENTION_POLICIES else
-                 "kernel-integrated instruction replay"
+                 "kernel-integrated mode-14 instruction replay"
                  if policy in ("futex-early", "futex-early-both")
                  else "matched explicit instruction hints")
     result = {
@@ -423,6 +455,17 @@ def analyze(path, bootstrap_samples=20000):
             f"Each process performs checked {workload} work over a private {working_set_kib} KiB input corpus after every resume.",
         ],
     }
+
+    if policy in ("futex-early", "futex-early-both"):
+        result["trigger_accounting"] = {
+            "early_wake_opportunities": total_triggers,
+            "accepted_triggers_saturated": after["accepted_triggers"] == 0xff,
+            "scope": "Early wakes are a lower bound; scheduler-selection triggers depend on the exact kernel image.",
+        }
+        result["interpretation_limits"].append(
+            "Historical patch-0026 mode 14 triggers at both userspace futex-wake entry and incoming-task selection. "
+            "Patch 0028 removes the selection trigger. Saturated historical gains remain combined-policy results; "
+            "the policy label and saturated counters do not establish early-only attribution.")
 
     if "zlib_library_sha256" in runner:
         result["identity"]["zlib_library_sha256"] = runner["zlib_library_sha256"]

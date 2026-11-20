@@ -820,6 +820,14 @@ remain inside each complete two-switch transaction.
 Linux clears task preview registration during fork. The historical `futex-early`
 policy therefore arms only the parent. `futex-early-both` additionally registers
 the child after fork, outside timing, to test reverse-direction wakes explicitly.
+In the accepted old kernel, mode 14 also triggers when an armed task is selected;
+the policy label therefore does not imply exclusively early wake replay. Patch
+0028 removes that late site in the maintained source stack. The separate
+`research/mode14-early-only-20261120/` exact-old-image control changes one
+instruction byte while preserving addresses and rootfs, and requires its own
+complete-execution comparison. Historical saturated results retain combined
+early-plus-selection attribution; unsaturated accounting uses observed sweeps
+rather than an exact wake-only trigger formula.
 `preseed` issues one setup hint and no measured-loop hint; compare it against
 continuous policies with the same ELF, loops, warmups, workload and footprint
 before attributing value to repeated prefetching. Demand-filled instruction
@@ -831,6 +839,13 @@ For software protocol checks, run `python3 -m unittest discover -s linux-tests
 on one permitted CPU with checked values. It emits distinct `HOST_VERIFY`
 markers and host nanoseconds, which the FPGA analyzer cannot accept as physical
 performance evidence.
+
+`make pipe-hint-benchmark-plain-resources-dynamic` adds whole-cell and OS
+resource diagnostics for scan, lookup, parse and chase without zlib or the
+experimental retention CSR ABI. Use
+`make emit-pipe-hint-benchmark-plain-resources-compressed-transfer` for its
+gzip console transfer. This creates a distinct ELF; comparisons still require
+the same exact ELF identity in both policy arms.
 
 The single physical board requires the common exclusive reservation
 `/home/coyang/fpga-artifacts/pynq-session.lock` for the **entire session**, including

@@ -1,0 +1,172 @@
+{
+  "state": "offline-causal-control-verified",
+  "scope": "no board execution or performance acceptance",
+  "source_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/linux-prefix32-futex-usersyscall-shell.nbf",
+    "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "bytes": 70904691
+  },
+  "original_elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf",
+    "sha256": "0792746ba2caf6b2370d923319187f62243c8a0262c876c19a18e2946257d4a3",
+    "bytes": 18330752
+  },
+  "original_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/old-reconstructed.bin",
+    "sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+    "bytes": 24034304
+  },
+  "candidate_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/linux-prefix32-mode14-early-only-shell.nbf",
+    "sha256": "d14dc8b00908bb7c7a310d4c517f31752a9db4f5836b5d60b5d916d596a7847b",
+    "bytes": 70904691
+  },
+  "reverse_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/reverse-to-ef50.nbf",
+    "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "bytes": 70904691
+  },
+  "control_elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.elf",
+    "sha256": "9628496c7742dafb8f67595a34c52dbb0d180029891fa84aa10256b7b0c15f3c",
+    "bytes": 18330752
+  },
+  "control_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.bin",
+    "sha256": "f5744fc63c6bcca79c6252dbae0fa9462cd49fd06fe797c2431ee40c82bea481",
+    "bytes": 24034304
+  },
+  "converted_control_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/control-from-elf.bin",
+    "sha256": "f5744fc63c6bcca79c6252dbae0fa9462cd49fd06fe797c2431ee40c82bea481",
+    "bytes": 24034304
+  },
+  "reextracted_payload": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/control-extracted.bin",
+    "sha256": "f5744fc63c6bcca79c6252dbae0fa9462cd49fd06fe797c2431ee40c82bea481",
+    "bytes": 24034304
+  },
+  "conversion_commands": [
+    [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+      "-O",
+      "binary",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/old-reconstructed.bin"
+    ],
+    [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+      "-O",
+      "binary",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.elf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/control-from-elf.bin"
+    ]
+  ],
+  "instruction": {
+    "vma": "0xffffffff80813fe8",
+    "physical": "0x80a13fe8",
+    "payload_offset": "0x813fe8",
+    "elf_offset": "0x814fe8",
+    "old_halfword": "0x471d",
+    "new_halfword": "0x4721",
+    "old_byte": "0x1d",
+    "new_byte": "0x21",
+    "binary_changed_bytes": 1,
+    "elf_changed_bytes": 1,
+    "meaning": "li a4,7 -> li a4,8; excludes mode14 from the late selection trigger"
+  },
+  "nbf_changed_record": {
+    "line": 1075385,
+    "original": "03_0000000080a13fe8_1073e0f77de3471d",
+    "control": "03_0000000080a13fe8_1073e0f77de34721"
+  },
+  "all_modes": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/all-256-mode-proof.json",
+    "sha256": "d97d52d0a4eab6042e60f81ae6dc2e3f81b10beb464ff572f6bd491874f0d9b0",
+    "bytes": 21420
+  },
+  "changed_modes": [
+    14
+  ],
+  "alternatives_checked": 143,
+  "alternatives_overlaps": [],
+  "disassemblies": [
+    {
+      "command": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+        "-d",
+        "--start-address=0xffffffff80813fd8",
+        "--stop-address=0xffffffff80814000",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf"
+      ],
+      "artifact": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/original-predicate.disassembly.txt",
+        "sha256": "34be5acb35dd7d901cd572bf481c71c734f4faef67992209c27edaed4b2f3bc3",
+        "bytes": 878
+      }
+    },
+    {
+      "command": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+        "-d",
+        "--start-address=0xffffffff80813df2",
+        "--stop-address=0xffffffff80813e1a",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf"
+      ],
+      "artifact": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/original-join.disassembly.txt",
+        "sha256": "1903771ae4cf156b23830d5a4562b492e3b44d34f0c70de5e0e5f3f5545f8f10",
+        "bytes": 847
+      }
+    },
+    {
+      "command": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+        "-d",
+        "--start-address=0xffffffff80813fd8",
+        "--stop-address=0xffffffff80814000",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.elf"
+      ],
+      "artifact": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/control-predicate.disassembly.txt",
+        "sha256": "187d32c8b6749ce944cd4a619564d66d6fe3515d434186cec027f673aea019d7",
+        "bytes": 901
+      }
+    },
+    {
+      "command": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+        "-d",
+        "--start-address=0xffffffff80813df2",
+        "--stop-address=0xffffffff80813e1a",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.elf"
+      ],
+      "artifact": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/control-join.disassembly.txt",
+        "sha256": "479b513a8ffc5f30a48045085412a90706278beee80e99e13c6c4df268d43d1d",
+        "bytes": 870
+      }
+    }
+  ],
+  "a4_lifetime": "Both paths join at 0xffffffff80813e04, which overwrites a4 with ld a4,112(s3) before any use.",
+  "reverse_nbf_byte_exact": true,
+  "accepted_rootfs_gzip": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio.gz",
+    "sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+    "bytes": 3303052
+  },
+  "rootfs_offset": "0xc126b0",
+  "original_inputs_unchanged": true,
+  "source_patch": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/kernel-patches/0028-blackparrot-mode14-early-only.patch",
+    "sha256": "de8a28bcac37beb8240dac8de6aac86936514688e1f861e589b6c159c0940b26",
+    "bytes": 698
+  },
+  "source_patch_scope": "Separate newer source stack: 0026 -> 0027 -> 0028; control NBF retains the old ABI without 0027.",
+  "driver": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/mode14-early-only-20261120/prepare_control.py",
+    "sha256": "b831e07be94c955535bdadcdd192a86a6c1f5d9ed4746bc832a4f9098debcfd5",
+    "bytes": 11949
+  },
+  "interpretation": "Historical mode14 effects measure early-entry plus scheduler-selection replay. This image removes only the latter; complete-execution comparison remains required."
+}

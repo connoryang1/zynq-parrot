@@ -46,6 +46,7 @@ PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_re
 ICACHE_RETENTION_PROBE_DYNAMIC_APP := $(OUT)/icache_retention_probe_dynamic
 PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_resources_dynamic
 PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_resources_dynamic
+PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_resources_dynamic
 PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
 PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -82,8 +83,10 @@ LINUX_DATA_PATCHES := \
 	$(CURDIR)/kernel-patches/0024-blackparrot-select-instruction-prefix-range.patch \
 	$(CURDIR)/kernel-patches/0025-blackparrot-explicit-data-replay-trigger.patch \
 	$(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch \
-	$(CURDIR)/kernel-patches/0027-blackparrot-icache-retention-control.patch
-LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch
+	$(CURDIR)/kernel-patches/0027-blackparrot-icache-retention-control.patch \
+	$(CURDIR)/kernel-patches/0028-blackparrot-mode14-early-only.patch
+LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0027-blackparrot-icache-retention-control.patch
+LINUX_DATA_PRE_RETENTION_TAIL := $(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch
 LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
 GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
 GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
@@ -240,6 +243,12 @@ $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -o $@ $< -lz >&2
 
+# Plain request workloads need resource/whole-cell timing without zlib or the
+# experimental retention CSR ABI. Keep every existing ELF recipe unchanged.
+$(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_RESOURCE_STATS=1 -o $@ $< >&2
+
 $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
@@ -332,6 +341,12 @@ emit-pipe-hint-benchmark-retention-compressed-transfer: check-linux-dynamic-cc p
 .PHONY: pipe-hint-benchmark-resources-dynamic pipe-hint-benchmark-retention-resources-dynamic emit-pipe-hint-benchmark-resources-compressed-transfer emit-pipe-hint-benchmark-retention-resources-compressed-transfer
 pipe-hint-benchmark-resources-dynamic: $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)
 pipe-hint-benchmark-retention-resources-dynamic: $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-plain-resources-dynamic emit-pipe-hint-benchmark-plain-resources-compressed-transfer
+pipe-hint-benchmark-plain-resources-dynamic: $(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-plain-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-plain-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP)
 
 emit-pipe-hint-benchmark-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-resources-dynamic
 	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)
@@ -453,18 +468,33 @@ stage-linux-prefix-trigger:
 # Apply the measured data-preview stack after the independent instruction
 # trigger. Later patches rewrite context from earlier patches, so individual
 # reverse checks are not reliable. Recognize the complete current stack, the
-# immediately preceding stack tail, or a clean tree; reject every other state.
+# preceding retention/early-futex tails, or a clean tree; reject partial tails.
 stage-linux-data-preview: stage-linux-prefix-trigger
-	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
-		< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
-		echo "physical data-preview stack already applied"; \
+	@set -e; if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(LINUX_DATA_PREVIOUS_TAIL) >/dev/null 2>&1; then \
+		if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+			< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+			echo "physical data-preview stack already applied"; \
+		else \
+			patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+				< $(lastword $(LINUX_DATA_PATCHES)); \
+			patch -d $(LINUX_BUILD_DIR) -p1 --forward \
+				< $(lastword $(LINUX_DATA_PATCHES)); \
+		fi; \
 	elif grep -Eq 'PR_BP_ICACHE_RETENTION_(CONTROL|STATUS)|bp_icache_retention_' \
 		$(LINUX_BUILD_DIR)/kernel/sys.c $(LINUX_BUILD_DIR)/include/uapi/linux/prctl.h; then \
 		echo "partial I-retention patch; restore the complete previous stack before staging" >&2; exit 1; \
 	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
-		< $(LINUX_DATA_PREVIOUS_TAIL) >/dev/null 2>&1; then \
+		< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+		echo "mode-14 tail present without complete I-retention patch" >&2; exit 1; \
+	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(LINUX_DATA_PRE_RETENTION_TAIL) >/dev/null 2>&1; then \
+		patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+			< $(LINUX_DATA_PREVIOUS_TAIL); \
 		patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
 			< $(lastword $(LINUX_DATA_PATCHES)); \
+		patch -d $(LINUX_BUILD_DIR) -p1 --forward \
+			< $(LINUX_DATA_PREVIOUS_TAIL); \
 		patch -d $(LINUX_BUILD_DIR) -p1 --forward \
 			< $(lastword $(LINUX_DATA_PATCHES)); \
 	else \

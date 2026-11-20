@@ -133,6 +133,23 @@ void bp_resume_host_retention_task_mode(unsigned enabled) { event("task_mode", e
 
 
 class ResumeResourceAccountingTests(unittest.TestCase):
+    def test_plain_resource_make_target_does_not_link_optional_library_or_abi(self):
+        run = subprocess.run(
+            ["make", "--no-print-directory", "-n", "-C", str(HERE),
+             "emit-pipe-hint-benchmark-plain-resources-compressed-transfer",
+             "BP_LINUX_DYNAMIC_CC=/bin/true", "OUT=" + str(self.root / "make-only")],
+            text=True, capture_output=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        commands = [line for line in run.stdout.splitlines()
+                    if " -o " in line and "scheduler_pipe_hint_benchmark.c" in line]
+        self.assertEqual(len(commands), 1, run.stdout)
+        self.assertIn("-DBP_RESUME_RESOURCE_STATS=1", commands[0])
+        self.assertNotIn("BP_RESUME_ZLIB", commands[0])
+        self.assertNotIn("BP_RESUME_RETENTION", commands[0])
+        self.assertNotIn("-lz", commands[0])
+        self.assertIn("scheduler_pipe_hint_benchmark_plain_resources_dynamic", run.stdout)
+        self.assertIn("emit_resume_transfer.py", run.stdout)
+
     @classmethod
     def setUpClass(cls):
         cls.temp = tempfile.TemporaryDirectory(prefix="resume-resource-host-")

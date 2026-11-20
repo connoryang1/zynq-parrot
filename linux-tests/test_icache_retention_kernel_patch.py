@@ -13,6 +13,7 @@ import unittest
 
 HERE = Path(__file__).resolve().parent
 PATCH = HERE / "kernel-patches/0027-blackparrot-icache-retention-control.patch"
+EARLY_ONLY = HERE / "kernel-patches/0028-blackparrot-mode14-early-only.patch"
 PREVIOUS = HERE / "kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch"
 DEFAULT_SOURCE = Path("/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6")
 FILES = ("kernel/sys.c", "include/uapi/linux/prctl.h", "kernel/futex/syscalls.c", "kernel/sched/core.c")
@@ -91,8 +92,50 @@ class IcacheRetentionKernelPatchTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("stack already applied", result.stdout)
         self.assertEqual(self.snapshot(), accepted)
+        self.assertEqual(self.patch(EARLY_ONLY, reverse=True).returncode, 0)
         self.assertEqual(self.patch(reverse=True).returncode, 0)
         self.assertEqual(self.snapshot(), self.baseline)
+
+    def test_stage_upgrades_complete_0027_without_partial_false_positive(self):
+        self.assertEqual(self.patch().returncode, 0)
+        retention = self.snapshot()
+        result = self.stage()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.patch(EARLY_ONLY, reverse=True).returncode, 0)
+        self.assertEqual(self.snapshot(), retention)
+
+    def test_0028_actual_source_roundtrip_and_all_mode_predicates(self):
+        core = self.tree / "kernel/sched/core.c"
+
+        def selection_modes():
+            text = core.read_text().split("if (bp_preview_mode &&", 1)[1]
+            predicate = "bp_preview_mode &&" + text.split(") {", 1)[0]
+            source = ('#include <stdio.h>\nint main(void) {\n'
+                      'for (unsigned bp_preview_mode=0; bp_preview_mode<256; ++bp_preview_mode)\n'
+                      'if (' + predicate + ') printf("%u\\n", bp_preview_mode);\nreturn 0; }\n')
+            binary = self.tree / "predicate"
+            compiled = subprocess.run([os.environ.get("BP_HOST_CC", "cc"), "-x", "c", "-",
+                                       "-o", str(binary)], input=source, text=True,
+                                      capture_output=True, timeout=10)
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+            return set(map(int, subprocess.check_output([str(binary)], text=True).split()))
+
+        old = selection_modes()
+        self.assertEqual(old, {2, 3, 5} | set(range(14, 256)))
+        self.assertEqual(self.patch(EARLY_ONLY, dry_run=True).returncode, 0)
+        self.assertEqual(self.patch(EARLY_ONLY).returncode, 0)
+        self.assertEqual(selection_modes(), old - {14})
+        self.assertEqual(self.patch(EARLY_ONLY, reverse=True, dry_run=True).returncode, 0)
+        self.assertEqual(self.patch(EARLY_ONLY, reverse=True).returncode, 0)
+        self.assertEqual(self.snapshot(), self.baseline)
+
+    def test_stage_rejects_0028_without_0027_and_preserves_sources(self):
+        self.assertEqual(self.patch(EARLY_ONLY).returncode, 0)
+        partial = self.snapshot()
+        result = self.stage()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("mode-14 tail present without complete", result.stderr)
+        self.assertEqual(self.snapshot(), partial)
 
     def test_stage_rejects_a_partial_zero_context_tail_without_duplication(self):
         header_only = PATCH.read_text().split("--- a/kernel/sys.c", 1)[0]

@@ -1,0 +1,17 @@
+This patch excludes mode fourteen from the late scheduler-selection trigger.
+Its explicit userspace futex-wake entry trigger remains unchanged, so mode
+fourteen no longer combines early wake replay with incoming-task selection.
+Historical mode-fourteen results used both sites and retain that scope.
+
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -6719,7 +6719,8 @@
+ 		    && bp_preview_mode != 10
+ 		    && bp_preview_mode != 11
+ 		    && bp_preview_mode != 12
+-		    && bp_preview_mode != 13) {
++		    && bp_preview_mode != 13
++		    && bp_preview_mode != 14) {
+ 			asm volatile("csrw 0x5c0, zero" ::: "memory");
+ 		}
+ 		/* Modes three and four skip physical data-hint CSR writes. Count
