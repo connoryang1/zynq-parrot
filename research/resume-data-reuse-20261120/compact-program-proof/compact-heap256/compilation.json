@@ -1,0 +1,71 @@
+{
+  "scope": "Offline compact fixed256KiB heap proof; no target execution.",
+  "compile_argv": [
+    "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+    "-O2",
+    "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+    "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+    "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+    "-DNUM_THREADS=2",
+    "-DBP_NUM_THREADS=2",
+    "-DBP_NUM_CONTEXTS=4",
+    "-DBP_RESUME_ZLIB=0",
+    "-DBP_RESUME_DATA_COMPACT=1",
+    "-Wl,--defsym=__heap_size=0x40000",
+    "-o",
+    "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-heap256/compact.riscv",
+    "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_resume_data_reuse_benchmark.c"
+  ],
+  "elf": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-heap256/compact.riscv",
+    "sha256": "f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd",
+    "bytes": 172048
+  },
+  "symbols": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-heap256/symbols.txt",
+    "sha256": "f75c101fc14e8f618fce91607ba70520161e9c6c13735bcfc104a05ff8d5c9c8",
+    "bytes": 11601
+  },
+  "disassembly": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-heap256/disassembly.txt",
+    "sha256": "ebab34ab27abcf7e88ac9b215f3a991f999b9d883c83d794927ff046193aa210",
+    "bytes": 474363
+  },
+  "sections": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-heap256/sections.txt",
+    "sha256": "3ec96b067925f48b834fca0ebb39d06c3baddd2a4eef71b8f28314a267337f01",
+    "bytes": 4889
+  },
+  "source": {
+    "testing/mt_resume_data_reuse_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_resume_data_reuse_benchmark.c",
+      "sha256": "fe0b23e69946f0614634d82e1953c94c599ee3dfdc9b9430f6af510c4bea6945",
+      "bytes": 6447
+    },
+    "testing/mt_seed.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_seed.h",
+      "sha256": "f2b82e27b9f242efec101b40b3ec77da9f7152114be196fb8bd3d5f88a5bcbe3",
+      "bytes": 3351
+    },
+    "linux-tests/resume_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/linux-tests/resume_workload.h",
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+      "bytes": 10958
+    },
+    "testing/check_run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/check_run.py",
+      "sha256": "e1c8016f993d63a5ff2efc8e19c7d17e0db17894a357b0e74b27a5ac214845d6",
+      "bytes": 9427
+    }
+  },
+  "linker_script": {
+    "path": "/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.ld",
+    "sha256": "a43393a91a89dc5e76579a2648a3a15eafe0d1c69258a6da707df3b1eee7065b",
+    "bytes": 3762
+  },
+  "sbrk_source": {
+    "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/libgloss-dramfs/sys/sys_sbrk.c",
+    "sha256": "a5778dd09414d841ad0739e55323b6b6e1369c92280d2d56df9dc82d6aa25547",
+    "bytes": 391
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "scope": "Fixed compact ELF with256KiB heap for BOTH1/32KiB; no target execution.",
+  "elf_sha256": "f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd",
+  "hot_functions": {
+    "legacy": {
+      "request": {
+        "address": "0x80000a4a",
+        "bytes": 650,
+        "instructions": 220,
+        "sha256": "7d99164b147e9d8c43637f0b02cae5deb2a76895f525aabe2ffe490a396de173"
+      },
+      "peer": {
+        "address": "0x80000cd4",
+        "bytes": 142,
+        "instructions": 47,
+        "sha256": "416a5fe6437a6d93641b2caa21ad685a1b323e56dae005e1af2f6c139a35fbc7"
+      }
+    },
+    "compact128": {
+      "request": {
+        "address": "0x800009c2",
+        "bytes": 650,
+        "instructions": 220,
+        "sha256": "7d99164b147e9d8c43637f0b02cae5deb2a76895f525aabe2ffe490a396de173"
+      },
+      "peer": {
+        "address": "0x80000c4c",
+        "bytes": 142,
+        "instructions": 47,
+        "sha256": "416a5fe6437a6d93641b2caa21ad685a1b323e56dae005e1af2f6c139a35fbc7"
+      }
+    },
+    "compact256": {
+      "request": {
+        "address": "0x800009c2",
+        "bytes": 650,
+        "instructions": 220,
+        "sha256": "7d99164b147e9d8c43637f0b02cae5deb2a76895f525aabe2ffe490a396de173"
+      },
+      "peer": {
+        "address": "0x80000c4c",
+        "bytes": 142,
+        "instructions": 47,
+        "sha256": "416a5fe6437a6d93641b2caa21ad685a1b323e56dae005e1af2f6c139a35fbc7"
+      }
+    }
+  },
+  "all_request_peer_machine_bytes_identical": true,
+  "layout": {
+    "legacy": {
+      "_end": "0x8000b128",
+      "__heap_size": "0x20000",
+      "__heap_end": "0x8002c000",
+      "__stack_start": "0x8002c000",
+      "__stack_size": "0x40000",
+      "__global_pointer$": "0x80007cc0",
+      "resume_data_config": "0x800074c8",
+      "phases": "0x800076b0",
+      "work": "0x80007590",
+      "stacks": "0x80007af0"
+    },
+    "compact128": {
+      "_end": "0x8000b088",
+      "__heap_size": "0x20000",
+      "__heap_end": "0x8002c000",
+      "__stack_start": "0x8002c000",
+      "__stack_size": "0x40000",
+      "__global_pointer$": "0x80007c20",
+      "resume_data_config": "0x80007428",
+      "phases": "0x80007610",
+      "work": "0x800074f0",
+      "stacks": "0x80007a50"
+    },
+    "compact256": {
+      "_end": "0x8000b088",
+      "__heap_size": "0x40000",
+      "__heap_end": "0x8004c000",
+      "__stack_start": "0x8004c000",
+      "__stack_size": "0x40000",
+      "__global_pointer$": "0x80007c20",
+      "resume_data_config": "0x80007428",
+      "phases": "0x80007610",
+      "work": "0x800074f0",
+      "stacks": "0x80007a50"
+    }
+  },
+  "only_heap128_to256_text_instruction_changes": [
+    {
+      "pc": "0x800000e8",
+      "old": "auipc\ttp,0x2c",
+      "new": "auipc\ttp,0x4c"
+    },
+    {
+      "pc": "0x800025c0",
+      "old": "auipc\ta4,0x2a",
+      "new": "auipc\ta4,0x4a"
+    }
+  ],
+  "available_sbrk_bytes_exclusive_end": 266103,
+  "conservative_four_table_allocation_allowance_bytes": 164096,
+  "allowance_description": "4*(32768 inputbytes +64 chunk/minimum/alignment allowance +2*4096 page-round/correction allowances); source defaults top_pad0,16Balignment,32Bminimum chunk,4KiBpages (128B SMALL_MEMORY would be smaller).",
+  "reserved_heap_bytes": 262144,
+  "loaded_image_extent_unchanged_from_compact128": {
+    "base": "0x80000000",
+    "file_bytes": "0x7458",
+    "mem_bytes": "0xb088"
+  },
+  "model_dram_allocation_bytes": 134217728,
+  "upper_bound_four256KiB_hart_stacks_end": "0x8014c000",
+  "limitations": [
+    "These bounds are source/link checks, not a completed32KiB target run.",
+    "Static image/code layout differs from failed legacydataset; no old/new performance comparison.",
+    "No per-footprint heap or layout variation: only configword changes1to32."
+  ],
+  "readelf_actual_load_segment_comparison": {
+    "compact128": [
+      [
+        "0x0000000080000000",
+        "0x0000000080000000",
+        "0x007458",
+        "0x00b088"
+      ]
+    ],
+    "compact256": [
+      [
+        "0x0000000080000000",
+        "0x0000000080000000",
+        "0x007458",
+        "0x00b088"
+      ]
+    ]
+  },
+  "allocator_source": {
+    "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/riscv-gnu-toolchain/newlib/newlib/libc/stdlib/_mallocr.c",
+    "sha256": "a4b2809212a51a6d3af6e9e36274be9f4ff12b78bd1233bb06fe6ea5841c3bc8",
+    "bytes": 113542,
+    "lines": "310-329,818-819,1404-1422,2144-2210"
+  }
+}

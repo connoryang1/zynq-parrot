@@ -1,0 +1,17 @@
+This is a bounded same-program retry admission, not performance selection. The compact 1 KiB target at native 600 seconds failed before its final summary/PASS/CORE/host handshake. It remains failed and is preserved under `../compact-one-kib/`. No 32 KiB execution is admitted by this report.
+
+The previous log contains the compact marker, all four corpus rows (`runs=16` and checked sums), all three peer-stack rows, then the partial final line `DATA_REUSE_PHASES warm_begin=0x000000000002712f timed_begin=0x0000000000074f6a timed_end=0x000000` before the native timeout. Source prints these only after every request and independent check completes. The local check completion does not replace complete execution: there is no custom PASS/CORE PASS, the native target reports timeout after 612,725 ms, `ps_main` returns 124, BSG FAIL and the GPIO final-block fatal follow, and the overall process exits `-6` after 658.81 seconds. No accepted complete timing or capacity result is taken from the partial summary.
+
+The root agent authorized one retry with the same ELF `f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd`, same copied model `77f76ae7527c2e9ed796fad48a8344e2dbbc10a5d90a69ccfb829e0bc2754ad5`, same 256 KiB heap and exact 1 KiB NBF patch. The native budget becomes 900 seconds solely to finish the remaining diagnostic UART output and terminal handshake. There is no C edit, compilation, relayout, work-count or cache-policy change. The 150 MiB FST bound remains.
+
+`--native-runtime-seconds` now accepts only 600, 900 or 1800, defaults to 600, and binds a host guard equal to native plus 180 seconds. A 900-second case requires an explicit failed compact 1 KiB repeat; its host guard is 1080 seconds. The 1800-second choice is restricted to 32 KiB reuse of a passed compact 1 KiB program, but full-access validation and explicit later root admission are still required before issuing any 32 KiB command. There is no automatic expansion or repeat.
+
+The repeat path verifies the failed predecessor's exact protocol/model/ELF, all archived and current source hashes, all program artifacts, the one-word runtime footprint patch, and the predecessor's log/FST. It copies the ELF/memory/NBF verbatim and carries forward the original compilation provenance. The original legacy failed-program path still requires `cc97e23d...`/the original model, and the generic accepted-program path still requires a passed 1 KiB session on the selected model and matching protocol. The old output schema remains strict.
+
+Thirty-two host policy/protocol tests pass. One exercises complete 900-second preparation with external queries mocked and target launch stopped by a mock: no compiler is called, ELF/NBF hashes remain identical, command payload is `prog.nbf 900000`, and the manifest records the 1080-second guard and post-check-output reason. The preparing agent did not execute a target. `admission.json` binds the failed input, raw log/FST/program, new runner and tests; copies of the runner/tests preserve the exact admission implementation.
+
+Ready command for root review/execution, using a new output directory:
+
+```sh
+python3 -B tools/run_resume_data_reuse.py --output research/resume-data-reuse-20261120/compact-one-kib-900 --footprint-kib 1 --scoped-validation research/resume-data-reuse-20261120/scoped-mode0-validation/validation.json --compact --repeat-program-from research/resume-data-reuse-20261120/compact-one-kib/session.json --native-runtime-seconds 900
+```

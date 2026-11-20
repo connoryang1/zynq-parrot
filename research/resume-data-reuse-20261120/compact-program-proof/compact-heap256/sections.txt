@@ -1,0 +1,82 @@
+There are 26 section headers, starting at offset 0x29990:
+
+Section Headers:
+  [Nr] Name              Type             Address           Offset
+       Size              EntSize          Flags  Link  Info  Align
+  [ 0]                   NULL             0000000000000000  00000000
+       0000000000000000  0000000000000000           0     0     0
+  [ 1] .text             PROGBITS         0000000080000000  00001000
+       0000000000006348  0000000000000000  AX       0     0     8
+  [ 2] .rodata           PROGBITS         0000000080006348  00007348
+       0000000000000386  0000000000000000   A       0     0     8
+  [ 3] .init_array       INIT_ARRAY       00000000800066d0  000076d0
+       0000000000000018  0000000000000008  WA       0     0     8
+  [ 4] .fini_array       FINI_ARRAY       00000000800066e8  000076e8
+       0000000000000008  0000000000000008  WA       0     0     8
+  [ 5] .eh_frame         PROGBITS         00000000800066f0  000076f0
+       000000000000002c  0000000000000000   A       0     0     8
+  [ 6] .data             PROGBITS         0000000080006720  00007720
+       0000000000000360  0000000000000000  WA       0     0     8
+  [ 7] .data.__mall[...] PROGBITS         0000000080006a80  00007a80
+       0000000000000810  0000000000000000  WA       0     0     8
+  [ 8] .data.__sglue     PROGBITS         0000000080007290  00008290
+       0000000000000018  0000000000000000  WA       0     0     8
+  [ 9] .data._impur[...] PROGBITS         00000000800072a8  000082a8
+       0000000000000178  0000000000000000  WA       0     0     8
+  [10] .sdata            PROGBITS         0000000080007420  00008420
+       0000000000000038  0000000000000000  WA       0     0     8
+  [11] .bss              NOBITS           0000000080007458  00008458
+       0000000000003c30  0000000000000000  WA       0     0     8
+  [12] .comment          PROGBITS         0000000000000000  00008458
+       0000000000000031  0000000000000001  MS       0     0     1
+  [13] .riscv.attributes RISCV_ATTRIBUTE  0000000000000000  00008489
+       0000000000000063  0000000000000000           0     0     1
+  [14] .debug_aranges    PROGBITS         0000000000000000  000084f0
+       0000000000000300  0000000000000000           0     0     16
+  [15] .debug_info       PROGBITS         0000000000000000  000087f0
+       0000000000009b30  0000000000000000           0     0     1
+  [16] .debug_abbrev     PROGBITS         0000000000000000  00012320
+       0000000000001554  0000000000000000           0     0     1
+  [17] .debug_line       PROGBITS         0000000000000000  00013874
+       0000000000008e02  0000000000000000           0     0     1
+  [18] .debug_frame      PROGBITS         0000000000000000  0001c678
+       0000000000001220  0000000000000000           0     0     8
+  [19] .debug_str        PROGBITS         0000000000000000  0001d898
+       0000000000000d87  0000000000000001  MS       0     0     1
+  [20] .debug_line_str   PROGBITS         0000000000000000  0001e61f
+       0000000000000771  0000000000000001  MS       0     0     1
+  [21] .debug_loclists   PROGBITS         0000000000000000  0001ed90
+       000000000000685e  0000000000000000           0     0     1
+  [22] .debug_rnglists   PROGBITS         0000000000000000  000255ee
+       0000000000000a9b  0000000000000000           0     0     1
+  [23] .symtab           SYMTAB           0000000000000000  00026090
+       0000000000002838  0000000000000018          24   244     8
+  [24] .strtab           STRTAB           0000000000000000  000288c8
+       0000000000000f9c  0000000000000000           0     0     1
+  [25] .shstrtab         STRTAB           0000000000000000  00029864
+       0000000000000129  0000000000000000           0     0     1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  D (mbind), p (processor specific)
+
+Elf file type is EXEC (Executable file)
+Entry point 0x80000000
+There are 3 program headers, starting at offset 64
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  RISCV_ATTRIBUT 0x0000000000008489 0x0000000000000000 0x0000000000000000
+                 0x0000000000000063 0x0000000000000000  R      0x1
+  LOAD           0x0000000000001000 0x0000000080000000 0x0000000080000000
+                 0x0000000000007458 0x000000000000b088  RWE    0x1000
+  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000000000 0x0000000000000000  RW     0x10
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .riscv.attributes 
+   01     .text .rodata .init_array .fini_array .eh_frame .data .data.__malloc_av_ .data.__sglue .data._impure_data .sdata .bss 
+   02     

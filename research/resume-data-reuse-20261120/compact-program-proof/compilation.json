@@ -1,0 +1,91 @@
+{
+  "scope": "Offline compilation/source/assembly proof only; no target execution and no performance comparison.",
+  "source": {
+    "testing/mt_resume_data_reuse_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_resume_data_reuse_benchmark.c",
+      "sha256": "fe0b23e69946f0614634d82e1953c94c599ee3dfdc9b9430f6af510c4bea6945",
+      "bytes": 6447
+    },
+    "testing/mt_seed.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_seed.h",
+      "sha256": "f2b82e27b9f242efec101b40b3ec77da9f7152114be196fb8bd3d5f88a5bcbe3",
+      "bytes": 3351
+    },
+    "linux-tests/resume_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/linux-tests/resume_workload.h",
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+      "bytes": 10958
+    },
+    "testing/check_run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/check_run.py",
+      "sha256": "e1c8016f993d63a5ff2efc8e19c7d17e0db17894a357b0e74b27a5ac214845d6",
+      "bytes": 9427
+    }
+  },
+  "programs": {
+    "legacy": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/legacy.riscv",
+        "sha256": "cc97e23db7f56f59dd25be41b7e179d8643078fdee9d71e96d1ab3597216c204",
+        "bytes": 172208
+      },
+      "compile_argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+        "-O2",
+        "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+        "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+        "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+        "-DNUM_THREADS=2",
+        "-DBP_NUM_THREADS=2",
+        "-DBP_NUM_CONTEXTS=4",
+        "-DBP_RESUME_ZLIB=0",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/legacy.riscv",
+        "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_resume_data_reuse_benchmark.c"
+      ],
+      "symbols": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/legacy-symbols.txt",
+        "sha256": "a1bf94797a41f4a45d1028e6eacdf40553bf97b058d6fe657eb02ef1e10451a4",
+        "bytes": 8337
+      },
+      "disassembly": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/legacy-disassembly.txt",
+        "sha256": "02cae27fe5a7d738dcab4b3673f35ab006dca4b28ce9fbe9152d271be3b0ef78",
+        "bytes": 476515
+      }
+    },
+    "compact": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact.riscv",
+        "sha256": "1d7dee936e5801c6cec4315506e50381d3f5644a5da15fee3c0762eac541da8c",
+        "bytes": 172048
+      },
+      "compile_argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+        "-O2",
+        "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+        "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+        "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+        "-DNUM_THREADS=2",
+        "-DBP_NUM_THREADS=2",
+        "-DBP_NUM_CONTEXTS=4",
+        "-DBP_RESUME_ZLIB=0",
+        "-DBP_RESUME_DATA_COMPACT=1",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact.riscv",
+        "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/source/testing/mt_resume_data_reuse_benchmark.c"
+      ],
+      "symbols": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-symbols.txt",
+        "sha256": "7e411c768aa8a0c508bab2e3c4b46c63986f98791e8c763a461f5d9e2c0dac88",
+        "bytes": 8337
+      },
+      "disassembly": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-program-proof/compact-disassembly.txt",
+        "sha256": "cc883cdb088d05be08d90dd9c0601771af583181da1ba50f47eefcb26b2d49a7",
+        "bytes": 474341
+      }
+    }
+  },
+  "new_guard_legacy_elf_byte_identical_to_old_cc97": true
+}

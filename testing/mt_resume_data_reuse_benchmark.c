@@ -13,6 +13,12 @@
 #if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
 #error "This bounded control uses plain lookup only"
 #endif
+#ifndef BP_RESUME_DATA_COMPACT
+#define BP_RESUME_DATA_COMPACT 0
+#endif
+#if BP_RESUME_DATA_COMPACT != 0 && BP_RESUME_DATA_COMPACT != 1
+#error "BP_RESUME_DATA_COMPACT must be0 or1"
+#endif
 
 enum { actors = 4, warm_rounds = 8, timed_rounds = 8,
        total_rounds = warm_rounds + timed_rounds, stack_words = 512 };
@@ -117,6 +123,12 @@ int main(void)
     }
   }
 
+#if BP_RESUME_DATA_COMPACT
+  /* Retired CSR labels retain all request boundaries in the selected FST.
+   * Keep checks/stores above; avoid64 post-check UART diagnostic rows.
+   */
+  bp_print_string("DATA_REUSE_PROTOCOL compact-v1\n");
+#endif
   bp_print_string("DATA_REUSE_CONFIG lookup actors=4 resident=2 warm=8 timed=8 kib=");
   bp_hprint_uint64(kib); bp_print_string("\n");
   for (unsigned a = 0; a < actors; ++a) {
@@ -129,6 +141,7 @@ int main(void)
       field(" bytes=", sizeof(stacks[0])); bp_print_string("\n");
     }
   }
+#if !BP_RESUME_DATA_COMPACT
   for (unsigned epoch = 0; epoch < total_rounds; ++epoch)
     for (unsigned a = 0; a < actors; ++a) {
       bp_print_string("DATA_REUSE_EPOCH actor="); bp_cprint('0' + a);
@@ -136,6 +149,7 @@ int main(void)
       field(" begin=", phases[a][epoch].begin);
       field(" end=", phases[a][epoch].end); bp_print_string("\n");
     }
+#endif
   bp_print_string("DATA_REUSE_PHASES"); field(" warm_begin=", warm_begin);
   field(" timed_begin=", timed_begin); field(" timed_end=", timed_end);
   field(" cycles=", timed_end - timed_begin); bp_print_string("\n");

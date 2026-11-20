@@ -1,0 +1,44 @@
+{
+  "scope": "Compile/source proof only; no target execution or old/new performance comparison.",
+  "functions": {
+    "legacy": {
+      "peer": {
+        "address": "0x80000cd4",
+        "bytes": 142,
+        "instructions": 47,
+        "machine_bytes_sha256": "416a5fe6437a6d93641b2caa21ad685a1b323e56dae005e1af2f6c139a35fbc7"
+      },
+      "request": {
+        "address": "0x80000a4a",
+        "bytes": 650,
+        "instructions": 220,
+        "machine_bytes_sha256": "7d99164b147e9d8c43637f0b02cae5deb2a76895f525aabe2ffe490a396de173"
+      }
+    },
+    "compact": {
+      "peer": {
+        "address": "0x80000c4c",
+        "bytes": 142,
+        "instructions": 47,
+        "machine_bytes_sha256": "416a5fe6437a6d93641b2caa21ad685a1b323e56dae005e1af2f6c139a35fbc7"
+      },
+      "request": {
+        "address": "0x800009c2",
+        "bytes": 650,
+        "instructions": 220,
+        "machine_bytes_sha256": "7d99164b147e9d8c43637f0b02cae5deb2a76895f525aabe2ffe490a396de173"
+      }
+    }
+  },
+  "request_and_peer_exact_machine_bytes_unchanged": true,
+  "all_pre_main_helpers_source_byte_identical": true,
+  "main_allocation_seed_warm_timed_and_independent_checks_source_byte_identical": true,
+  "legacy_default_elf_still_exact_cc97": true,
+  "compact_protocol": "compact-v1",
+  "compact_elf_sha256": "1d7dee936e5801c6cec4315506e50381d3f5644a5da15fee3c0762eac541da8c",
+  "limitations": [
+    "New ELF/code layout and allocator bases may differ; this is a separate dataset.",
+    "Main call relocations may differ after removing printing code; no address padding or tuned alignment was added.",
+    "All64 timestamp stores/chronology checks remain; no64epoch UART rows in compact variant."
+  ]
+}

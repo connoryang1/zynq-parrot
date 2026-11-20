@@ -15,6 +15,7 @@ SPEC.loader.exec_module(R)
 BASE = Path(__file__).resolve().parent
 GATE = BASE/'scoped-mode0-validation/validation.json'
 FAILED = BASE/'one-kib/session.json'
+COMPACT_FAILED = BASE/'compact-one-kib/session.json'
 
 
 class AdmissionTests(unittest.TestCase):
@@ -22,7 +23,9 @@ class AdmissionTests(unittest.TestCase):
         self.scratch = tempfile.TemporaryDirectory(prefix='resume-admission-')
         self.addCleanup(self.scratch.cleanup)
         self.tmp = Path(self.scratch.name)
-        self.sources = {name:R.record(ROOT/name) for name in R.DEPENDENCIES}
+        # Positive legacy-policy fixtures retain the archived legacy sources;
+        # the current C file now also contains a separately guarded protocol.
+        self.sources = copy.deepcopy(json.loads(FAILED.read_text())['source'])
 
     def prior(self, change):
         value = json.loads(FAILED.read_text())
@@ -139,6 +142,158 @@ class AdmissionTests(unittest.TestCase):
         path=self.prior(lambda v:v['source'][R.DEPENDENCIES[0]].update(path=str(bad)))
         with self.assertRaisesRegex(ValueError,'bound artifact'):
             R.reuse_program(path,True,1,R.SCOPED_SHA,self.sources)
+
+    def test_protocol_mismatch_rejected(self):
+        with self.assertRaisesRegex(ValueError,'protocol differs'):
+            R.reuse_program(FAILED,True,1,R.SCOPED_SHA,self.sources,'compact-v1')
+
+
+class CompactProtocolTests(unittest.TestCase):
+    def transcript(self,kib=1):
+        rows=['DATA_REUSE_PROTOCOL compact-v1',
+              'DATA_REUSE_CONFIG lookup actors=4 resident=2 warm=8 timed=8 kib=0x%x'%kib]
+        for a in range(4):
+            rows.append('DATA_REUSE_REGION actor=%d base=0x%x bytes=0x%x runs=0x10 sum=0x123'%(a,0x81000000+a*0x10000,kib*1024))
+            if a:rows.append('DATA_REUSE_STACK actor=%d base=0x%x bytes=0x1000'%(a,0x82000000+(a-1)*4096))
+        rows+=['DATA_REUSE_PHASES warm_begin=0xa timed_begin=0x154 timed_end=0x294 cycles=0x140',
+               R.PASS,'BSG-INFO:    CORE PASS','BSG-INFO:    BSG PASS']
+        return '\n'.join(rows)+'\n'
+
+    def test_both_footprints_preserve_complete_ring_metric(self):
+        for kib in (1,32):
+            result=R.compact_guest_observations(self.transcript(kib),kib)
+            self.assertEqual(result['complete_ring_cycles'],320)
+            self.assertEqual(result['timed_requests'],32)
+            self.assertEqual(result['protocol'],'compact-v1')
+            self.assertEqual(len(result['stacks']),3)
+            self.assertNotIn('epochs',result)
+
+    def test_rejects_missing_wrong_or_duplicated_protocol(self):
+        text=self.transcript()
+        for bad in (text.replace('DATA_REUSE_PROTOCOL compact-v1\n',''),
+                    text.replace('compact-v1','compact-v0'),
+                    'DATA_REUSE_PROTOCOL compact-v1\n'+text):
+            with self.subTest(text=bad[:80]),self.assertRaises(ValueError):
+                R.compact_guest_observations(bad,1)
+
+    def test_rejects_epoch_uart_rows_and_unknown_rows(self):
+        for row in ('DATA_REUSE_EPOCH actor=0 epoch=0x00 begin=0x10 end=0x11',
+                    'DATA_REUSE_UNKNOWN 0'):
+            with self.subTest(row=row),self.assertRaises(ValueError):
+                R.compact_guest_observations(self.transcript().replace(R.PASS,row+'\n'+R.PASS),1)
+
+    def test_requires_all_peer_stacks_and_exact_sizes(self):
+        text=self.transcript()
+        missing='\n'.join(line for line in text.splitlines()if not line.startswith('DATA_REUSE_STACK actor=2'))+'\n'
+        for bad in (missing,text.replace('bytes=0x1000','bytes=0x800',1)):
+            with self.assertRaises(ValueError):R.compact_guest_observations(bad,1)
+
+    def test_rejects_stack_corpus_overlap(self):
+        with self.assertRaisesRegex(ValueError,'overlap'):
+            R.compact_guest_observations(self.transcript().replace('base=0x82000000','base=0x81000000'),1)
+
+    def test_requires_all16_requests_and_requested_table_bytes(self):
+        text=self.transcript()
+        for bad in (text.replace('runs=0x10','runs=0xf',1),text.replace('bytes=0x400','bytes=0x800',1)):
+            with self.assertRaises(ValueError):R.compact_guest_observations(bad,1)
+
+    def test_requires_order_and_complete_phase_bounds(self):
+        text=self.transcript()
+        for bad in (text.replace('actor=0','actor=1',1),
+                    text.replace('cycles=0x140','cycles=0x141'),
+                    text.replace('timed_end=0x294','timed_end=0x154')):
+            with self.assertRaises(ValueError):R.compact_guest_observations(bad,1)
+
+    def test_requires_custom_and_core_completion_in_order(self):
+        text=self.transcript()
+        for bad in (text.replace(R.PASS,''),text.replace('CORE PASS','CORE FAIL'),
+                    text.replace(R.PASS,'').replace('BSG PASS','BSG PASS\n'+R.PASS)):
+            with self.assertRaises(ValueError):R.compact_guest_observations(bad,1)
+
+    def test_legacy_parser_remains_strict(self):
+        text=self.transcript()
+        with self.assertRaises(ValueError):R.guest_observations(text,1)
+        legacy=text.replace('DATA_REUSE_PROTOCOL compact-v1\n','')
+        with self.assertRaisesRegex(ValueError,'actor epochs'):R.guest_observations(legacy,1)
+        phases=[]
+        for e in range(16):
+            for a in range(4):
+                b=20+(4*e+a)*10
+                phases.append('DATA_REUSE_EPOCH actor=%d epoch=0x%x begin=0x%x end=0x%x'%(a,e,b,b+3))
+        legacy=legacy.replace('DATA_REUSE_PHASES ','\n'.join(phases)+'\nDATA_REUSE_PHASES ')
+        self.assertEqual(len(R.guest_observations(legacy,1)['epochs']),64)
+        with self.assertRaises(ValueError):R.compact_guest_observations(legacy,1)
+
+
+class BudgetAndCompactRepeatTests(unittest.TestCase):
+    def setUp(self):
+        self.scratch=tempfile.TemporaryDirectory(prefix='resume-budget-')
+        self.addCleanup(self.scratch.cleanup);self.tmp=Path(self.scratch.name)
+        self.sources={name:R.record(ROOT/name)for name in R.DEPENDENCIES}
+
+    def test_default_budget_and_explicit_bounds(self):
+        self.assertEqual(R.execution_budget(600,1,False),
+                         {'native_runtime_seconds':600,'host_guard_seconds':780})
+        self.assertEqual(R.execution_budget(900,1,True,repeat=True)['host_guard_seconds'],1080)
+        self.assertEqual(R.execution_budget(1800,32,True,accepted_program=True)['host_guard_seconds'],1980)
+
+    def test_rejects_unbounded_or_wrong_workload_budget(self):
+        for seconds in (-1,0,1,599,601,901,3600):
+            with self.subTest(seconds=seconds),self.assertRaises(ValueError):
+                R.execution_budget(seconds,1,True,repeat=True)
+        for args in ((900,1,True,False,False),(900,32,True,True,False),
+                     (900,1,False,True,False),(1800,1,True,False,True),
+                     (1800,32,True,False,False),(1800,32,True,True,True)):
+            with self.subTest(args=args),self.assertRaises(ValueError):R.execution_budget(*args)
+
+    def test_exact_failed_compact_program_reuse(self):
+        value=R.reuse_program(COMPACT_FAILED,True,1,R.SCOPED_SHA,self.sources,'compact-v1')
+        self.assertEqual(value['program']['elf']['sha256'],R.COMPACT_ELF_SHA)
+        self.assertEqual(value['native_runtime_seconds'],600)
+
+    def test_compact_repeat_rejects_wrong_flag_model_or_32kib(self):
+        for repeat,kib,model,protocol in ((True,1,R.SCOPED_SHA,'epochs-v1'),
+                                        (True,1,R.MODEL_SHA,'compact-v1'),
+                                        (True,32,R.SCOPED_SHA,'compact-v1'),
+                                        (False,32,R.SCOPED_SHA,'compact-v1')):
+            with self.subTest(args=(repeat,kib,model,protocol)),self.assertRaises(ValueError):
+                R.reuse_program(COMPACT_FAILED,repeat,kib,model,self.sources,protocol)
+
+    def test_runtime_footprint_patch_must_remain_exactly_one_kib(self):
+        value=json.loads(COMPACT_FAILED.read_text())
+        original=Path(value['program']['nbf']['path']).read_text()
+        wrong=self.tmp/'wrong.nbf';wrong.write_text(R.patch_config(original,int(value['program']['symbols']['resume_data_config'],16),32))
+        value['runtime_nbf']=R.record(wrong)
+        path=self.tmp/'prior.json';path.write_text(json.dumps(value))
+        with self.assertRaisesRegex(ValueError,'exact1KiB config'):
+            R.reuse_program(path,True,1,R.SCOPED_SHA,self.sources,'compact-v1')
+
+    def test_prepare900_reuses_elf_and_nbf_without_compiler_or_target(self):
+        previous=json.loads(COMPACT_FAILED.read_text())
+        output=self.tmp/'prepared'
+        class StopBeforeTarget(Exception):pass
+        def query(argv,**kwargs):
+            if argv[0]=='git' and 'rev-parse'in argv:return R.BP_REV+'\n'
+            if argv[0]=='git' and 'show'in argv:
+                return Path('/home/coyang/bp-linux-demand-copy-control/bp_common/software/py/nbf.py').read_bytes()
+            if str(argv[0]).endswith('-nm'):return Path(previous['program']['symbol_file']['path']).read_text()
+            if str(argv[0]).endswith('-objdump'):return Path(previous['program']['disassembly']['path']).read_text()
+            raise AssertionError('unexpected external query: '+repr(argv))
+        with patch.object(R.subprocess,'check_output',side_effect=query),\
+             patch.object(R.subprocess,'Popen',side_effect=StopBeforeTarget),\
+             patch.object(R,'command') as compiler:
+            with self.assertRaises(StopBeforeTarget):
+                R.main(['--output',str(output),'--footprint-kib','1','--compact',
+                        '--scoped-validation',str(GATE),'--repeat-program-from',str(COMPACT_FAILED),
+                        '--native-runtime-seconds','900'])
+            compiler.assert_not_called()
+        prepared=json.loads((output/'session.json').read_text())
+        self.assertEqual(prepared['native_runtime_seconds'],900)
+        self.assertEqual(prepared['host_guard_seconds'],1080)
+        self.assertEqual(prepared['program']['elf']['sha256'],R.COMPACT_ELF_SHA)
+        self.assertEqual(prepared['runtime_nbf']['sha256'],previous['runtime_nbf']['sha256'])
+        self.assertEqual(prepared['command'][1],'+c_args=prog.nbf 900000')
+        self.assertIn('post-check',prepared['runtime_budget_reason'])
 
 
 if __name__=='__main__':
