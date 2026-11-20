@@ -1,0 +1,72 @@
+{
+  "state": "offline preregistered measurement plan; no performance acceptance",
+  "question": "Does removing scheduler-selection replay improve complete execution across private post-resume demands at unchanged retained capacity?",
+  "hypothesis": "Removing duplicate/unscheduled selection sweeps can reduce trigger work and interference; losing useful late replay may instead hurt. No gain is assumed.",
+  "fixed_controls": {
+    "image_pair": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/mode14-early-only-20261120/manifest.json",
+      "sha256": "f5040dc8b5dfd919c7cb446d0e4aa05e5c4704a2b5c705b62f90e9acc3d9067b",
+      "bytes": 8052
+    },
+    "elf_manifest": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/plain-resources/manifest.json",
+      "sha256": "aea8d7eefb22ece08356f06d864d52b67df575b128f52aff66962ed56adc31a4",
+      "bytes": 4197
+    },
+    "elf_sha256": "ce0a21a67a36f522c46c590cf790b18bc535f09b85e8d8f20fd36e9a591cec70",
+    "transfer_sha256": "6816abed502a0b54c70cda4112376a7e19a84580e1b675f359e6ecfd8e3fc98c",
+    "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "loops": 64,
+    "warmup": 32,
+    "repeats": 4,
+    "working_set_kib": 32,
+    "policy": "futex-early",
+    "sync": "futex",
+    "terminal_handshake": 1,
+    "resource_stats": 1,
+    "zlib": false,
+    "retention_CSR": false
+  },
+  "workloads": [
+    "scan",
+    "lookup",
+    "parse",
+    "chase"
+  ],
+  "first_block": [
+    "scan",
+    "parse"
+  ],
+  "negative_or_unresolved_controls": [
+    "lookup",
+    "chase"
+  ],
+  "boot_plan": {
+    "minimum_per_image_per_workload": 2,
+    "image_order_per_block": [
+      "accepted_old",
+      "early_only",
+      "early_only",
+      "accepted_old"
+    ],
+    "workload_order_per_image_visit": [
+      "forward",
+      "forward",
+      "reverse",
+      "reverse"
+    ],
+    "maximum_cells_per_shared_session": 2,
+    "each_cell": "fresh power-recovered boot, global flock retained through recovery; release between sessions for other owners"
+  },
+  "primary_endpoint": "control-minus-old change in paired off-on whole-cell benefit; allocation/fork/warmup/checks/reaping/frees/resource observation included",
+  "secondary_endpoint": "paired complete two-switch steady transaction, including kernel trigger work/interference",
+  "resources": "actual whole-cell OS faults/switches/user/system counters; not cache-miss proxies",
+  "analysis": "dedicated fixed-image comparator; >=2 independent complete boots per image; same config/ELF/transfer/bitstream, hierarchical resampling boots then paired blocks",
+  "failure_policy": "Preserve native timeout, transfer/kernel/terminal failures and recover before lock release; never accept partial rows. No count-based or performance-based stopping/cherry-picking inside an accepted boot.",
+  "interpretation_limits": [
+    "Counter pilots10/11 have different ELF and loop counts and are not pooled with performance runs.",
+    "No new retained capacity, address table, rootfs or hardware is introduced by this pair.",
+    "A single workload or unreplicated boot cannot establish general application benefit.",
+    "If whole-cell cost regresses despite a local/steady gain, reject the optimization claim."
+  ]
+}

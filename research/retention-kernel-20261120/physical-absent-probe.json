@@ -1,0 +1,42 @@
+{
+  "state": "PASS",
+  "scope": "physical unsupported-hardware ABI fallback; no capable retention policy or speedup tested",
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session12/session.json",
+    "bytes": 2427,
+    "sha256": "5272e97acd3790b58c6014ddeb0ccc04de6e966ad10f0661e5625e03a3a67b86"
+  },
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session12/0-retention-probe-absent.log",
+    "bytes": 24290,
+    "sha256": "b13e545837ee591975a6116c86a7bce06a0000f5b8f78457afac177534f1e960"
+  },
+  "runner_status": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session12/0-retention-probe-absent.log.status.json",
+    "bytes": 813,
+    "sha256": "fc8ce9b68bdc6c338ef8dd995955597fd53a8cadd25d82663dc83453440a7b9d"
+  },
+  "probe_source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/icache_retention_probe.c",
+    "bytes": 5543,
+    "sha256": "e7d43ee8ff8023ababb60aa55e918c8d47ea01f758bb45efd34b3d150bc6d4ae"
+  },
+  "identity": {
+    "nbf_sha256": "c7c1e214796644b1dbe728cc274ca3d776c1cd24d4eb7ff570e109f44b53e3ff",
+    "transfer_sha256": "24850264f31962c08879c9a5ff1acbc893a548197f6ca6553daf93cb0051e5aa",
+    "elf_sha256": "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+  },
+  "checked_contract": [
+    "Control modes0/1/2 return ENODEV on unsupported hardware.",
+    "Status returns ENODEV without modifying initialized sentinel before and after child.",
+    "Invalid mode/null status/nonzero spare arguments return EINVAL.",
+    "Child actually dropsuid/gid65534; all controls/status return EPERM with output unchanged.",
+    "Normal parent return, shell prompt, CORE/BSG PASS, runner_exit0."
+  ],
+  "acceptance_limits": [
+    "Capability-present global readback/write/reset on new RTL remains pending.",
+    "This is a newkernel baseline and cannot price retention against historical kernel timing."
+  ]
+}
