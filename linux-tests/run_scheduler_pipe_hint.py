@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import zlib
 
 import pexpect
 
@@ -51,17 +52,28 @@ def validate_transfer(path, elf_sha256):
         raise ValueError(
             f"transfer command exceeds {MAX_GUEST_COMMAND_LENGTH} characters"
         )
-    if len(commands) < 4 or commands[0] != f": > {b64_path}" or commands[-2:] != [
-            f"base64 -d {b64_path} > {GUEST_ELF}", f"chmod +x {GUEST_ELF}"]:
+    plain_tail = [f"base64 -d {b64_path} > {GUEST_ELF}", f"chmod +x {GUEST_ELF}"]
+    gzip_tail = [f"base64 -d {b64_path} > {GUEST_ELF}.gz",
+                 f"/bin/busybox gunzip -c {GUEST_ELF}.gz > {GUEST_ELF}",
+                 f"chmod +x {GUEST_ELF}"]
+    compressed = commands[-3:] == gzip_tail
+    tail = gzip_tail if compressed else plain_tail
+    if (len(commands) < len(tail) + 2 or commands[0] != f": > {b64_path}"
+            or commands[-len(tail):] != tail):
         raise ValueError("transfer contains unexpected shell commands")
     payload = []
     pattern = re.compile(r"echo '([A-Za-z0-9+/=]+)' >> " + re.escape(b64_path))
-    for command in commands[1:-2]:
+    for command in commands[1:-len(tail)]:
         match = pattern.fullmatch(command)
         if match is None:
             raise ValueError("transfer contains unexpected shell commands")
         payload.append(match.group(1))
     decoded = base64.b64decode("".join(payload), validate=True)
+    if compressed:
+        try:
+            decoded = gzip.decompress(decoded)
+        except (OSError, EOFError, zlib.error) as error:
+            raise ValueError("invalid gzip ELF payload") from error
     if hashlib.sha256(decoded).hexdigest() != elf_sha256:
         raise ValueError("transfer payload does not match ELF SHA-256")
 
@@ -89,6 +101,8 @@ def parse_args(argv=None):
                         default="scan")
     parser.add_argument("--zlib-library", type=Path,
                         help="exact RV64 libz.so.1 staged with this ELF and bound by SHA-256")
+    parser.add_argument("--retention-probe", choices=("absent", "present"),
+                        help="run the separately bound ABI diagnostic instead of a benchmark")
     parser.add_argument("--legacy-no-terminal-handshake", action="store_true",
                         help="bind an older seven-argument guest without the final verification barrier")
     parser.add_argument(
@@ -119,6 +133,8 @@ def validate_args(args):
     if args.legacy_four_arg_cli and (args.sync != "pipe" or args.profile != "plain"
                                      or args.working_set_kib or args.workload != "scan"):
         raise ValueError("legacy four-argument CLI requires pipe/plain")
+    if args.retention_probe and (args.legacy_four_arg_cli or args.zlib_library is not None):
+        raise ValueError("retention ABI probe requires its own ELF and no optional library")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
     if args.zlib_library is not None and not args.zlib_library.is_file():
@@ -129,6 +145,8 @@ def validate_args(args):
 
 
 def build_guest_command(args):
+    if args.retention_probe:
+        return f"{GUEST_ELF} {args.retention_probe}"
     command = (f"{GUEST_ELF} {args.loops} {args.repeats} {args.policy} "
                f"{args.warmup}")
     if not args.legacy_four_arg_cli:
@@ -145,6 +163,8 @@ def run(args):
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = build_guest_command(args)
+    pass_marker = (f"ICACHE_RETENTION_PROBE_PASS capability={args.retention_probe}"
+                   if args.retention_probe else "PIPE_HINT_PASS")
     status = {
         "status": "running",
         "nbf_sha256": sha256(args.nbf),
@@ -168,6 +188,8 @@ def run(args):
     if args.zlib_library is not None:
         status["zlib_library_sha256"] = sha256(args.zlib_library)
         status["zlib_transfer_encoding"] = "gzip-base64-v1"
+    if args.retention_probe:
+        status["retention_probe_capability"] = args.retention_probe
     env = os.environ.copy()
     env["PYNQ_CONTROL_PROGRAM_SHA256"] = args.control_sha256
     env["PYNQ_CONTROL_PROGRAM_TIMEOUT_MS"] = str(args.runtime_ms)
@@ -197,7 +219,7 @@ def run(args):
             expect_shell_prompt(child, 300, "guest ELF verification")
             child.sendline(command)
             outcome = child.expect([
-                re.compile(r"PIPE_HINT_PASS\r*\n"),
+                re.compile(re.escape(pass_marker) + r"\r*\n"),
                 re.compile(TIMER_GUARD_MARKER + r"[^\r\n]*"),
                 KERNEL_FAILURE_MARKER,
                 SHELL_PROMPT,
@@ -207,7 +229,7 @@ def run(args):
             if outcome == 2:
                 raise RuntimeError("kernel failure marker: " + child.match.group(0))
             if outcome == 3:
-                raise RuntimeError("benchmark returned to shell before PIPE_HINT_PASS")
+                raise RuntimeError("guest returned to shell before " + pass_marker)
             expect_shell_prompt(child, 300, "benchmark completion")
             child.sendline("poweroff -f")
             child.expect(re.compile(r"CORE(?:\[0\])? PASS"), timeout=180)
@@ -218,7 +240,7 @@ def run(args):
                 f"interactive runner exit={child.exitstatus} signal={child.signalstatus}"
             )
         transcript = args.log.read_text(errors="replace")
-        for marker in ("PIPE_HINT_PASS", "BSG PASS"):
+        for marker in (pass_marker, "BSG PASS"):
             if marker not in transcript:
                 raise RuntimeError(f"required marker missing: {marker}")
         status.update(status="PASS", runner_exit=0)

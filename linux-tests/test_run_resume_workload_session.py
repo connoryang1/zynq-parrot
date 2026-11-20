@@ -104,6 +104,33 @@ class ResumeWorkloadSessionTests(unittest.TestCase):
             fcntl.flock(owner, fcntl.LOCK_UN)
         self.assert_released_unchanged()
 
+    def test_abi_probe_retains_full_session_reservation(self):
+        argv = self.argv.copy()
+        while "--cell" in argv:
+            index = argv.index("--cell")
+            del argv[index:index + 2]
+        argv += ["--retention-probe", "absent"]
+        self.assertEqual(session.main(argv), 0)
+        parsed = self.run_guest.call_args[0][0]
+        self.assertEqual(parsed.retention_probe, "absent")
+        self.assertEqual(self.run_guest.call_count, 1)
+        self.assertEqual(self.events[:2], ["stage_pynq_artifacts.sh", "recover"])
+        self.assert_released_unchanged()
+
+    def test_host_snapshot_preserves_bytes_and_detects_changed_source(self):
+        source = self.root / "source"
+        source.mkdir()
+        (source / "host.py").write_bytes(b"original source\n")
+        with mock.patch.object(session, "ROOT", source), mock.patch.object(
+                session, "HOST_SOURCES", ("host.py",)):
+            records = session.snapshot_sources(self.root / "snapshot")
+            session.verify_sources(records)
+            (source / "host.py").write_bytes(b"changed source\n")
+            with self.assertRaisesRegex(RuntimeError, "host source changed"):
+                session.verify_sources(records)
+        self.assertEqual((self.root / "snapshot/host-sources/host.py").read_bytes(),
+                         b"original source\n")
+
     def test_success_holds_one_inode_over_full_stage_recover_run_order(self):
         self.assertEqual(session.main(self.argv), 0)
         self.assertEqual(self.events, [

@@ -24,6 +24,9 @@
 #include <unistd.h>
 #include <time.h>
 #include "resume_workload.h"
+#if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
+#include <sys/resource.h>
+#endif
 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
 #include <signal.h>
 #define PR_BP_ICACHE_RETENTION_CONTROL 0x42505061
@@ -93,6 +96,98 @@ static void fail(const char *message)
 	perror(message);
 	exit(1);
 }
+
+#if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
+struct cell_resources {
+	struct rusage self, children;
+};
+
+struct cell_resource_delta {
+	uint64_t minor_faults, major_faults, user_us, system_us;
+	uint64_t voluntary_switches, involuntary_switches;
+};
+
+static void resource_invalid(void)
+{
+	errno = EOVERFLOW;
+	fail("cell resource accounting");
+}
+
+static uint64_t resource_sum(uint64_t a, uint64_t b)
+{
+	if (a > UINT64_MAX - b)
+		resource_invalid();
+	return a + b;
+}
+
+static uint64_t resource_counter_delta(long after, long before)
+{
+	if (before < 0 || after < before)
+		resource_invalid();
+	return (uint64_t)after - (uint64_t)before;
+}
+
+static uint64_t resource_time_delta(struct timeval after, struct timeval before)
+{
+	uint64_t seconds, microseconds;
+
+	if (before.tv_sec < 0 || after.tv_sec < before.tv_sec
+	    || before.tv_usec < 0 || before.tv_usec >= 1000000
+	    || after.tv_usec < 0 || after.tv_usec >= 1000000)
+		resource_invalid();
+	seconds = (uint64_t)after.tv_sec - (uint64_t)before.tv_sec;
+	if (after.tv_usec < before.tv_usec) {
+		if (!seconds)
+			resource_invalid();
+		--seconds;
+		microseconds = 1000000 + after.tv_usec - before.tv_usec;
+	} else {
+		microseconds = after.tv_usec - before.tv_usec;
+	}
+	if (seconds > (UINT64_MAX - microseconds) / 1000000)
+		resource_invalid();
+	return seconds * 1000000 + microseconds;
+}
+
+static struct cell_resources resource_snapshot(void)
+{
+	struct cell_resources usage;
+
+	if (getrusage(RUSAGE_SELF, &usage.self))
+		fail("cell resource self");
+	if (getrusage(RUSAGE_CHILDREN, &usage.children))
+		fail("cell resource children");
+	return usage;
+}
+
+static struct cell_resource_delta resource_delta(struct cell_resources after,
+						 struct cell_resources before)
+{
+	/* Children are reaped before the ending snapshot. Subtract each
+	 * cumulative total before combining, so earlier cells are excluded.
+	 */
+	return (struct cell_resource_delta){
+		.minor_faults = resource_sum(
+			resource_counter_delta(after.self.ru_minflt, before.self.ru_minflt),
+			resource_counter_delta(after.children.ru_minflt, before.children.ru_minflt)),
+		.major_faults = resource_sum(
+			resource_counter_delta(after.self.ru_majflt, before.self.ru_majflt),
+			resource_counter_delta(after.children.ru_majflt, before.children.ru_majflt)),
+		.user_us = resource_sum(
+			resource_time_delta(after.self.ru_utime, before.self.ru_utime),
+			resource_time_delta(after.children.ru_utime, before.children.ru_utime)),
+		.system_us = resource_sum(
+			resource_time_delta(after.self.ru_stime, before.self.ru_stime),
+			resource_time_delta(after.children.ru_stime, before.children.ru_stime)),
+		.voluntary_switches = resource_sum(
+			resource_counter_delta(after.self.ru_nvcsw, before.self.ru_nvcsw),
+			resource_counter_delta(after.children.ru_nvcsw, before.children.ru_nvcsw)),
+		.involuntary_switches = resource_sum(
+			resource_counter_delta(after.self.ru_nivcsw, before.self.ru_nivcsw),
+			resource_counter_delta(after.children.ru_nivcsw, before.children.ru_nivcsw)),
+	};
+}
+#endif
 
 static uint64_t cycle(void)
 {
@@ -705,8 +800,16 @@ int main(int argc, char **argv)
 
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned enabled = first ^ order;
+#if (defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION) \
+ || (defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS)
+			uint64_t whole_begin = cycle(), whole_elapsed;
+#endif
 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
-			uint64_t whole_begin = cycle(), whole_elapsed, retention_status;
+			uint64_t retention_status;
+#endif
+#if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
+			struct cell_resources resources_before = resource_snapshot();
+			struct cell_resource_delta resources;
 #endif
 			struct cell_result result = sync == sync_pipe
 				? run_pipe_cell(enabled, loops, warmup, policy,
@@ -718,6 +821,15 @@ int main(int argc, char **argv)
 			 * status reads and policy reset separately from steady work.
 			 */
 			retention_status = retention_finish_cell(policy, enabled);
+#endif
+#if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
+			/* Include verification, reaping, frees, and retention reset/status.
+			 * The whole-cell timer also charges both observer snapshots.
+			 */
+			resources = resource_delta(resource_snapshot(), resources_before);
+#endif
+#if (defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION) \
+ || (defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS)
 			whole_elapsed = cycle() - whole_begin;
 #endif
 
@@ -730,14 +842,27 @@ int main(int argc, char **argv)
 				       (unsigned long long)result.child_resume,
 				       (unsigned long long)result.parent_resume,
 				       loops);
-#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
+#if (defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION) \
+ || (defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS)
 			printf(PIPE_HINT_LABEL("WHOLE") " repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
 			       repeat, order, enabled, (unsigned long long)whole_elapsed, loops);
+#endif
+#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
 			printf(PIPE_HINT_LABEL("RETENTION") " repeat=%u order=%u enabled=%u raw=0x%016llx capability=%u mode=%u completed=%u consumed_fetches=%u\n",
 			       repeat, order, enabled, (unsigned long long)retention_status,
 			       (unsigned)(retention_status >> 63), (unsigned)(retention_status & 3),
 			       (unsigned)((retention_status >> 2) & 1),
 			       (unsigned)((retention_status >> 16) & 0xffff));
+#endif
+#if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
+			printf(PIPE_HINT_LABEL("RESOURCE") " repeat=%u order=%u enabled=%u minor_faults=%llu major_faults=%llu user_us=%llu system_us=%llu voluntary_switches=%llu involuntary_switches=%llu\n",
+			       repeat, order, enabled,
+			       (unsigned long long)resources.minor_faults,
+			       (unsigned long long)resources.major_faults,
+			       (unsigned long long)resources.user_us,
+			       (unsigned long long)resources.system_us,
+			       (unsigned long long)resources.voluntary_switches,
+			       (unsigned long long)resources.involuntary_switches);
 #endif
 			fflush(stdout);
 		}

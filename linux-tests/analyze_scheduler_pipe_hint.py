@@ -44,14 +44,23 @@ RETENTION = re.compile(
     r"completed=([01]) consumed_fetches=(\d+)$", re.MULTILINE
 )
 RETENTION_POLICIES = {"retention-rr": 1, "retention-first": 2}
+LIBRARY = re.compile(
+    r"^PIPE_HINT_LIBRARY name=zlib version=([A-Za-z0-9._+-]+) "
+    r"block_bytes=(\d+) input_corpus_kib=(\d+)$", re.MULTILINE)
+RESOURCE_FIELDS = ("minor_faults", "major_faults", "user_us", "system_us",
+                   "voluntary_switches", "involuntary_switches")
+RESOURCE = re.compile(
+    r"^PIPE_HINT_RESOURCE repeat=(\d+) order=(\d+) enabled=([01]) "
+    + " ".join(name + r"=(\d+)" for name in RESOURCE_FIELDS) + r"$", re.MULTILINE)
 
 
-def retention_rows(text, parsed, policy, loops, repeats, profile):
+def retention_rows(text, parsed, policy, loops, repeats, profile, resources=False):
     """Bind every raw post-teardown diagnostic and whole cell to steady work."""
     if loops <= 0 or repeats < 2:
         raise ValueError("retention comparison requires positive loops and at least two repeats")
     patterns = {"CONFIG": CONFIG, "RESULT": ROW, "LEGS": LEGS,
                 "WHOLE": WHOLE, "RETENTION": RETENTION, "STATUS": STATUS,
+                "RESOURCE": RESOURCE, "LIBRARY": LIBRARY,
                 "PASS": re.compile(r"^PIPE_HINT_PASS$")}
     actual_markers = []
     for line in text.splitlines():
@@ -61,8 +70,11 @@ def retention_rows(text, parsed, policy, loops, repeats, profile):
         if name not in patterns or not patterns[name].fullmatch(line):
             raise ValueError("malformed or unexpected retention protocol marker")
         actual_markers.append(name)
-    cell_markers = ["RESULT"] + (["LEGS"] if profile == "legs" else []) + ["WHOLE", "RETENTION"]
-    if actual_markers != ["CONFIG"] + cell_markers * (repeats * 2) + ["STATUS", "PASS"]:
+    retained = policy in RETENTION_POLICIES or bool(RETENTION.search(text))
+    cell_markers = (["RESULT"] + (["LEGS"] if profile == "legs" else []) + ["WHOLE"]
+                    + (["RETENTION"] if retained else []) + (["RESOURCE"] if resources else []))
+    prefix = (["LIBRARY"] if LIBRARY.search(text) else []) + ["CONFIG"]
+    if actual_markers != prefix + cell_markers * (repeats * 2) + ["STATUS", "PASS"]:
         raise ValueError("retention cell markers missing, duplicated, or out of order")
     expected_keys = [(repeat, order, (repeat & 1) ^ order)
                      for repeat in range(repeats) for order in range(2)]
@@ -82,14 +94,26 @@ def retention_rows(text, parsed, policy, loops, repeats, profile):
         if raw & ~allowed or decoded != printed:
             raise ValueError("retention raw status has forbidden bits or printed decode mismatch")
         enabled = int(c)
-        if decoded["capability"] != 1 or decoded["mode"] != (RETENTION_POLICIES[policy] if enabled else 0):
+        expected_mode = RETENTION_POLICIES.get(policy, 0) if enabled else 0
+        if policy not in RETENTION_POLICIES and decoded["mode"]:
+            raise ValueError("retention markers require a retention policy for nonzero capture mode")
+        if decoded["capability"] != 1 or decoded["mode"] != expected_mode:
             raise ValueError("retention capability or policy mode mismatch")
+        if policy not in RETENTION_POLICIES and decoded["completed"]:
+            raise ValueError("legacy mode-zero telemetry cannot publish demand-capture lines")
         if not enabled and (decoded["completed"] or decoded["consumed_fetches"]):
             raise ValueError("disabled retention cell contains stale capture or side-hit diagnostics")
         diagnostics.append(dict(repeat=int(a), order=int(b), enabled=enabled,
                                 raw=f"0x{raw:016x}", **decoded))
-    if [key(row) for row in whole] != expected_keys or [key(row) for row in diagnostics] != expected_keys:
+    if ([key(row) for row in whole] != expected_keys
+            or (retained and [key(row) for row in diagnostics] != expected_keys)):
         raise ValueError("whole/retention rows are not a bijection with steady results")
+    resource_rows = [dict(zip(("repeat", "order", "enabled", *RESOURCE_FIELDS), map(int, row)))
+                     for row in RESOURCE.findall(text)]
+    if resources and [key(row) for row in resource_rows] != expected_keys:
+        raise ValueError("resource rows are not a bijection with steady results")
+    if any(row[field] > (1 << 64) - 1 for row in resource_rows for field in RESOURCE_FIELDS):
+        raise ValueError("resource counter exceeds 64-bit report range")
     if profile == "legs":
         leg_keys = [tuple(map(int, row[:3])) for row in LEGS.findall(text)]
         if leg_keys != expected_keys:
@@ -97,7 +121,7 @@ def retention_rows(text, parsed, policy, loops, repeats, profile):
     for steady, cell in zip(parsed, whole):
         if cell["loops"] != loops or cell["cycles"] < steady["cycles"]:
             raise ValueError("whole cell loop count differs or cycles are below steady result")
-    return whole, diagnostics
+    return whole, diagnostics, resource_rows
 
 
 def summarize_whole_cells(rows, repeats, bootstrap_samples):
@@ -126,7 +150,7 @@ def summarize_whole_cells(rows, repeats, bootstrap_samples):
         "paired_95pct_ci_saved_percent": [percentile(boot_percent, 0.025), percentile(boot_percent, 0.975)],
         "saved_cycles_by_enabled_order": {str(order): statistics.median(
             pair["saved_cycles_per_cell"] for pair in pairs if pair["enabled_order"] == order) for order in (0,1)}},
-        "scope": "Complete measured cell includes allocation, fork, setup, warmup, steady work, checks, teardown, status reads and policy reset; printed rows are outside timing."}
+        "scope": "Complete measured cell includes allocation, fork, setup, warmup, steady work, checks and teardown, plus any enabled status, policy-reset and resource-observer calls; printed rows are outside timing."}
 
 
 def sha256(path):
@@ -183,6 +207,13 @@ def analyze(path, bootstrap_samples=20000):
     working_set_kib = int(configs[0][7] or 0)
     workload = configs[0][8] or "scan"
     terminal_handshake = int(configs[0][9] or 0)
+    libraries = LIBRARY.findall(text)
+    if workload == "deflate":
+        if (len(libraries) != 1 or int(libraries[0][1]) != 4096
+                or int(libraries[0][2]) != working_set_kib):
+            raise ValueError("deflate library marker does not match its block/corpus configuration")
+    elif libraries or "PIPE_HINT_LIBRARY " in text:
+        raise ValueError("library marker requires the deflate workload")
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
     if warmup != runner.get("warmup", 32):
@@ -229,9 +260,12 @@ def analyze(path, bootstrap_samples=20000):
             raise ValueError("profiled handoffs exceed complete transaction")
         row.update(child_resume=leg["child_resume"],
                    parent_resume=leg["parent_resume"])
-    whole_rows, diagnostics = (retention_rows(text, parsed, policy, loops, repeats, profile)
-                               if policy in RETENTION_POLICIES else (None, None))
-    if policy not in RETENTION_POLICIES and (WHOLE.search(text) or RETENTION.search(text)):
+    has_resources = bool(re.search(r"^PIPE_HINT_RESOURCE(?:[ =]|$)", text, re.MULTILINE))
+    has_retention = bool(RETENTION.search(text))
+    whole_rows, diagnostics, resource_rows = (
+        retention_rows(text, parsed, policy, loops, repeats, profile, has_resources)
+        if policy in RETENTION_POLICIES or has_resources or has_retention else (None, None, None))
+    if policy not in RETENTION_POLICIES and not has_resources and not has_retention and WHOLE.search(text):
         raise ValueError("retention markers require a retention policy")
     pairs = []
     for repeat in range(repeats):
@@ -386,18 +420,32 @@ def analyze(path, bootstrap_samples=20000):
         "interpretation_limits": [
             "One Linux boot supplies paired repeat blocks but not independent boot strata.",
             f"The {warmup} warmup {sync} roundtrips intentionally measure hot sustained throughput, not cold first resume.",
-            f"Each process scans a private {working_set_kib} KiB working set after every resume.",
+            f"Each process performs checked {workload} work over a private {working_set_kib} KiB input corpus after every resume.",
         ],
     }
 
     if "zlib_library_sha256" in runner:
         result["identity"]["zlib_library_sha256"] = runner["zlib_library_sha256"]
-    if policy in RETENTION_POLICIES:
+    if libraries:
+        result["library"] = dict(name="zlib", version=libraries[0][0],
+                                  block_bytes=4096, input_corpus_kib=working_set_kib)
+        result["interpretation_limits"].append(
+            "The deflate corpus size excludes codec scratch space and internal library allocations.")
+    if whole_rows is not None:
         result["whole_cell"] = summarize_whole_cells(whole_rows, repeats, bootstrap_samples)
+    if has_resources:
+        result["config"]["resource_stats"] = 1
+        result["resources"] = {"rows": resource_rows, "scope": (
+            "Per complete cell, getrusage deltas sum the parent and its completed child. "
+            "Page faults and scheduler counters are OS diagnostics, not L1 cache-miss counts; "
+            "user/system times have the kernel's accounting resolution. Observer calls are included in whole-cell timing.")}
+    if has_retention:
         result["retention_status"] = {
             "rows": diagnostics,
             "scope": "Actual raw hardware CPU-global cumulative consumed side-only I-cache fetch responses, after the setup policy write/reset through warmup, steady work and teardown until the status read; not steady-only retired instructions or cache lines.",
-            "mechanism": "Demand admission reuses the existing retained capacity and refill stream without additional prefetch traffic; mode 1 is RR, mode 2 pins first completed lines per bank. Zero consumed fetches and negative paired effects remain valid controls."}
+            "mechanism": ("Demand admission reuses the existing retained capacity and refill stream without additional prefetch traffic; mode 1 is RR, mode 2 pins first completed lines per bank. Zero consumed fetches and negative paired effects remain valid controls."
+                          if policy in RETENTION_POLICIES else
+                          "Mode zero preserves legacy advisory replay; side-only fetches here can come from explicit instruction replay, not demand-capture admission.")}
         result["interpretation_limits"].append(
             "Retention diagnostics are post-teardown cumulative; positive counts do not alone prove a complete-cell benefit, and zero counts do not invalidate a negative control.")
     return result

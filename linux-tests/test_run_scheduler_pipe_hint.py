@@ -20,6 +20,39 @@ from run_scheduler_pipe_hint import (
 
 
 class PipeHintRunnerTests(unittest.TestCase):
+    def test_compressed_transfer_roundtrip_and_rejection(self):
+        from emit_resume_transfer import commands
+        with tempfile.TemporaryDirectory() as directory:
+            elf, transfer = Path(directory) / "elf", Path(directory) / "transfer"
+            payload = bytes(range(256)) * 100
+            elf.write_bytes(payload)
+            generated = commands(elf)
+            transfer.write_text("\n".join(generated) + "\n")
+            expected = hashlib.sha256(payload).hexdigest()
+            validate_transfer(transfer, expected)
+            self.assertEqual(generated, commands(elf))
+            with self.assertRaisesRegex(ValueError, "SHA-256"):
+                validate_transfer(transfer, "0" * 64)
+            transfer.write_text("\n".join(generated).replace("gunzip -c", "gunzip -f") + "\n")
+            with self.assertRaisesRegex(ValueError, "unexpected shell"):
+                validate_transfer(transfer, expected)
+            generated[1] = generated[1].replace(generated[1].split("'")[1], "AAAA")
+            transfer.write_text("\n".join(generated) + "\n")
+            with self.assertRaisesRegex(ValueError, "gzip ELF"):
+                validate_transfer(transfer, expected)
+
+    def test_abi_probe_has_its_own_exact_command(self):
+        for capability in ("absent", "present"):
+            args = parse_args([
+                "image.nbf", "transfer", "a" * 64, "result.log",
+                "--bitstream-sha256", "b" * 64,
+                "--retention-probe", capability,
+            ])
+            self.assertEqual(build_guest_command(args), GUEST_ELF + " " + capability)
+            args.zlib_library = Path("library")
+            with self.assertRaisesRegex(ValueError, "probe requires its own ELF"):
+                validate_args(args)
+
     def test_optional_library_has_only_bounded_fixed_destination_commands(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "library"

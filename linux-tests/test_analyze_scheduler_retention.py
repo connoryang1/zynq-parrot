@@ -163,7 +163,8 @@ class SchedulerRetentionAnalyzerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'retention markers require'): self.parse(legacy_text, bad)
         good = copy.deepcopy(runner); good['zlib_library_sha256'] = 'b' * 64
         self.assertEqual(self.parse(text, good)['identity']['zlib_library_sha256'], 'b' * 64)
-        deflate = text.replace('workload=lookup', 'workload=deflate')
+        deflate = ('PIPE_HINT_LIBRARY name=zlib version=1.2.13 block_bytes=4096 input_corpus_kib=32\n'
+                   + text.replace('workload=lookup', 'workload=deflate'))
         good['workload'] = 'deflate'
         self.assertEqual(self.parse(deflate, good)['identity']['zlib_library_sha256'], 'b' * 64)
         self.assertNotIn('zlib_library_sha256', self.parse(text, runner)['identity'])

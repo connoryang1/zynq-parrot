@@ -43,6 +43,9 @@ TAGGED_REPLAY_BENCH_DYNAMIC_APP := $(OUT)/scheduler_tagged_replay_benchmark_dyna
 PIPE_HINT_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_dynamic
 PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_dynamic
 PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_dynamic
+ICACHE_RETENTION_PROBE_DYNAMIC_APP := $(OUT)/icache_retention_probe_dynamic
+PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_resources_dynamic
+PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_resources_dynamic
 PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
 PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -229,6 +232,18 @@ $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
 
+$(ICACHE_RETENTION_PROBE_DYNAMIC_APP): icache_retention_probe.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+$(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -o $@ $< -lz >&2
+
+$(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
+
 $(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
@@ -300,6 +315,29 @@ pipe-hint-benchmark-zlib-dynamic: $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP)
 
 .PHONY: pipe-hint-benchmark-retention-dynamic emit-pipe-hint-benchmark-retention-dynamic-transfer
 pipe-hint-benchmark-retention-dynamic: $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP)
+
+.PHONY: icache-retention-probe-dynamic emit-icache-retention-probe-dynamic-transfer
+icache-retention-probe-dynamic: $(ICACHE_RETENTION_PROBE_DYNAMIC_APP)
+
+emit-icache-retention-probe-dynamic-transfer: check-linux-dynamic-cc icache-retention-probe-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(ICACHE_RETENTION_PROBE_DYNAMIC_APP)
+
+.PHONY: emit-pipe-hint-benchmark-zlib-compressed-transfer emit-pipe-hint-benchmark-retention-compressed-transfer
+emit-pipe-hint-benchmark-zlib-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-zlib-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-retention-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-resources-dynamic pipe-hint-benchmark-retention-resources-dynamic emit-pipe-hint-benchmark-resources-compressed-transfer emit-pipe-hint-benchmark-retention-resources-compressed-transfer
+pipe-hint-benchmark-resources-dynamic: $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)
+pipe-hint-benchmark-retention-resources-dynamic: $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-retention-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP)
 
 emit-pipe-hint-benchmark-retention-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-dynamic
 	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'

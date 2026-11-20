@@ -4,6 +4,7 @@ import argparse
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,31 @@ from run_scheduler_pipe_hint import parse_args as guest_args, run, validate_args
 SESSION_LOCK = Path('/home/coyang/fpga-artifacts/pynq-session.lock')
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / 'codex-skills/bp-fpga-synthesis/scripts'
+HOST_SOURCES = (
+    'linux-tests/run_resume_workload_session.py',
+    'linux-tests/run_scheduler_pipe_hint.py',
+    'linux-tests/run_scheduler_tagged_replay.py',
+    *(f'codex-skills/bp-fpga-synthesis/scripts/{name}.sh' for name in (
+        'stage_pynq_artifacts', 'power_cycle_pynq', 'wait_pynq_ready',
+        'load_pynq_overlay', 'run_pynq_interactive')),
+)
+
+
+def snapshot_sources(output):
+    records = {}
+    for relative in HOST_SOURCES:
+        data = (ROOT / relative).read_bytes()
+        target = output / 'host-sources' / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        records[relative] = hashlib.sha256(data).hexdigest()
+    return records
+
+
+def verify_sources(records):
+    for relative, expected in records.items():
+        if hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() != expected:
+            raise RuntimeError('host source changed during physical session: ' + relative)
 
 
 @contextmanager
@@ -52,7 +78,9 @@ def main(argv=None):
     parser.add_argument('--bitstream-sha256', required=True)
     parser.add_argument('--zlib-library', type=Path)
     parser.add_argument('--host', default='xilinx@192.168.4.35')
-    parser.add_argument('--cell', action='append', type=cell, required=True)
+    operation = parser.add_mutually_exclusive_group(required=True)
+    operation.add_argument('--cell', action='append', type=cell)
+    operation.add_argument('--retention-probe', choices=('absent', 'present'))
     parser.add_argument('--loops', type=int, default=64)
     parser.add_argument('--warmup', type=int, default=32)
     parser.add_argument('--repeats', type=int, default=4)
@@ -64,7 +92,7 @@ def main(argv=None):
         parser.error('session output must be new; existing evidence is never overwritten')
     # Validate every guest command/transfer before reserving or touching a board.
     plan = []
-    for index, (workload, kib, policy) in enumerate(args.cell):
+    for index, (workload, kib, policy) in enumerate(args.cell or []):
         parsed = guest_args([
             str(args.nbf), str(args.transfer), args.elf_sha256,
             str(args.output / f'{index}-{workload}{kib}-{policy}.log'),
@@ -74,6 +102,14 @@ def main(argv=None):
             '--warmup', str(args.warmup), '--repeats', str(args.repeats)])
         plan.append(parsed)
         parsed.zlib_library = args.zlib_library
+    if args.retention_probe:
+        plan.append(guest_args([
+            str(args.nbf), str(args.transfer), args.elf_sha256,
+            str(args.output / f'0-retention-probe-{args.retention_probe}.log'),
+            '--bitstream-sha256', args.bitstream_sha256, '--host', args.host,
+            '--retention-probe', args.retention_probe]))
+        if args.zlib_library is not None:
+            parser.error('retention probe uses no optional zlib library')
     env = os.environ.copy()
     if not env.get('PYNQ_POWER_STATE_URL'):
         # Existing local fallback, never echo or retain the credential.
@@ -90,6 +126,7 @@ def main(argv=None):
         status = {'reservation': str(SESSION_LOCK), 'host': args.host,
                   'all_three_acknowledged': True, 'state': 'reserved',
                   'started_utc': datetime.now(timezone.utc).isoformat(),
+                  'host_source_sha256': snapshot_sources(args.output),
                   'plan': [vars(parsed) for parsed in plan]}
         status_path = args.output / 'session.json'
         def save():
@@ -105,6 +142,7 @@ def main(argv=None):
             for parsed in plan:
                 recover(args.host, env)
                 run(parsed)  # Still uses the hash-bound serialized board runner.
+            verify_sources(status['host_source_sha256'])
             status['state'] = 'complete'
         except BaseException as error:
             status.update(state='failed', error=repr(error))
