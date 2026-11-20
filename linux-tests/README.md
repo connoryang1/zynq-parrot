@@ -796,3 +796,50 @@ Add `--summary-only` for repeated timing batches. It prints the same header,
 overflow decision, and terminal `TRACE_PASS` or `TRACE_TRUNCATED`, but skips
 record CSR readout and per-record output after disarm. The option changes only
 post-interval observation; it can appear before or after `--window`.
+
+## Natural post-resume demand and capacity controls
+
+`scheduler_pipe_hint_benchmark_dynamic` accepts a final `scan`, `lookup`, `parse`,
+or `chase` argument after working-set KiB. Both processes allocate private state
+after fork. Lookup processes 64 changing integer-key requests per resume, with
+seven eighths hits and one eighth misses in an open-addressed table; parsing
+walks compact variable-length text records. Chase follows 64 dependent links per
+epoch through a shuffled ring and advances across epochs: its low-reuse control
+applies when the footprint exceeds 64 nodes. Scan preserves the cache-line
+stride control. No workload supplies a favorable physical replay address table.
+
+All values contribute to a checksum checked against generated reference values.
+A final pipe/futex handshake parks the child until the parent samples the timed
+endpoint, keeping potentially expensive reference verification outside timing.
+`terminal_handshake=1` binds this endpoint in the analyzer; old guests require
+`--legacy-no-terminal-handshake` in the runner and cannot be pooled with the new
+shape. Setup, allocation and verification are outside steady-state timing, while
+both processes' request processing, wake triggers, scheduling and interference
+remain inside each complete two-switch transaction.
+
+Linux clears task preview registration during fork. The historical `futex-early`
+policy therefore arms only the parent. `futex-early-both` additionally registers
+the child after fork, outside timing, to test reverse-direction wakes explicitly.
+`preseed` issues one setup hint and no measured-loop hint; compare it against
+continuous policies with the same ELF, loops, warmups, workload and footprint
+before attributing value to repeated prefetching. Demand-filled instruction
+capacity is a separate opt-in RTL experiment: equal storage alone does not match
+its all-demand admission policy to the selected replay prefix.
+
+For software protocol checks, run `python3 -m unittest discover -s linux-tests
+-p test_resume_workload.py`. Its host build runs real fork, pipe and futex code
+on one permitted CPU with checked values. It emits distinct `HOST_VERIFY`
+markers and host nanoseconds, which the FPGA analyzer cannot accept as physical
+performance evidence.
+
+The single physical board requires the common exclusive reservation
+`/home/coyang/fpga-artifacts/pynq-session.lock` for the **entire session**, including
+uploads, power cycles, overlay loads, tests and recovery, in addition to the
+board-side serialized program runner. Never delete, replace or recreate that
+lock file. All three task owners must acknowledge the same path before use.
+`run_resume_workload_session.py` opens the existing inode read-only, acquires a
+nonblocking exclusive flock, stages a verified package/NBF, runs a short matrix
+with hard recovery before every boot, and recovers a failed run before releasing.
+It requires `--all-three-acknowledged`; this records externally confirmed
+coordination rather than obtaining it. If busy, it performs no board operations.
+Keep sessions short so the other experiments can take turns.

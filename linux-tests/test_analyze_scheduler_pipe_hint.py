@@ -31,10 +31,49 @@ class PipeHintAnalyzerTests(unittest.TestCase):
                 "bitstream_sha256": identity,
             }))
             result = analyze(log, bootstrap_samples=100)
+            self.assertEqual(result["config"]["workload"], "scan")
             self.assertEqual(
                 result["metrics"]["paired_median_saved_cycles_per_roundtrip"],
                 15.0,
             )
+
+    def test_binds_natural_workload_and_rejects_status_mismatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "run.log"
+            identity = "a" * 64
+            runner = {
+                "status": "PASS", "loops": 10, "repeats": 2,
+                "working_set_kib": 32,
+                "nbf_sha256": identity, "transfer_sha256": identity,
+                "elf_sha256": identity, "control_program_sha256": identity,
+                "bitstream_sha256": identity,
+            }
+            status = log.with_suffix(".log.status.json")
+            for workload in ("scan", "lookup", "parse", "chase"):
+                with self.subTest(workload=workload):
+                    log.write_text(
+                        "PIPE_HINT_CONFIG loops=10 repeats=2 warmup=32 configured_entries=16 "
+                        f"policy=continuous sync=pipe profile=plain working_set_kib=32 workload={workload}\n"
+                        "PIPE_HINT_RESULT repeat=0 order=0 enabled=0 cycles=1000 loops=10\n"
+                        "PIPE_HINT_RESULT repeat=0 order=1 enabled=1 cycles=900 loops=10\n"
+                        "PIPE_HINT_RESULT repeat=1 order=0 enabled=1 cycles=800 loops=10\n"
+                        "PIPE_HINT_RESULT repeat=1 order=1 enabled=0 cycles=1000 loops=10\n"
+                        "PIPE_HINT_STATUS before=0x0000000000000101 "
+                        "after=0xff802a0008020101 configured_entries=16 dropped=0\n"
+                        "PIPE_HINT_PASS\nCORE PASS\nBSG PASS\n"
+                    )
+                    runner["workload"] = workload
+                    status.write_text(json.dumps(runner))
+                    self.assertEqual(analyze(log, 10)["config"]["workload"], workload)
+                    runner["workload"] = "parse" if workload != "parse" else "scan"
+                    status.write_text(json.dumps(runner))
+                    with self.assertRaisesRegex(ValueError, "workload differ"):
+                        analyze(log, 10)
+                    if workload != "scan":
+                        del runner["workload"]
+                        status.write_text(json.dumps(runner))
+                        with self.assertRaisesRegex(ValueError, "workload differ"):
+                            analyze(log, 10)
 
     def test_rejects_unbalanced_order(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -196,7 +235,7 @@ class PipeHintAnalyzerTests(unittest.TestCase):
                 "PIPE_HINT_RESULT repeat=1 order=0 enabled=1 cycles=800 loops=10\n"
                 "PIPE_HINT_RESULT repeat=1 order=1 enabled=0 cycles=1000 loops=10\n"
                 "PIPE_HINT_STATUS before=0x0000000000000101 "
-                "after=0xff802a0008020101 configured_entries=16 dropped=0\n"
+                "after=0xff80150008020101 configured_entries=16 dropped=0\n"
                 "PIPE_HINT_PASS\nCORE PASS\nBSG PASS\n"
             )
             identity = "a" * 64
@@ -210,6 +249,43 @@ class PipeHintAnalyzerTests(unittest.TestCase):
             }))
             result = analyze(log, bootstrap_samples=10)
             self.assertEqual(result["config"]["policy"], "futex-early")
+
+    def test_terminal_barrier_and_explicit_both_direction_accounting(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "run.log"
+            status_path = log.with_suffix(".log.status.json")
+            identity = "a" * 64
+            for policy, triggers in (("futex-early", 86), ("futex-early-both", 170)):
+                with self.subTest(policy=policy):
+                    after = (1 | (16 << 4) | (16 << 13) | (32 << 22)
+                             | (triggers << 38) | (511 << 55))
+                    log.write_text(
+                        "PIPE_HINT_CONFIG loops=10 repeats=2 warmup=32 configured_entries=16 "
+                        f"policy={policy} sync=futex profile=plain working_set_kib=32 "
+                        "workload=lookup terminal_handshake=1\n"
+                        + "".join(
+                            f"PIPE_HINT_RESULT repeat={repeat} order={order} "
+                            f"enabled={(repeat & 1) ^ order} cycles=1000 loops=10\n"
+                            for repeat in range(2) for order in range(2))
+                        + f"PIPE_HINT_STATUS before=0x0000000000000101 after=0x{after:016x} "
+                        "configured_entries=16 dropped=0\nPIPE_HINT_PASS\nCORE PASS\nBSG PASS\n"
+                    )
+                    runner = {
+                        "status": "PASS", "loops": 10, "repeats": 2,
+                        "warmup": 32, "policy": policy, "sync": "futex",
+                        "working_set_kib": 32, "workload": "lookup", "terminal_handshake": 1,
+                        "nbf_sha256": identity, "transfer_sha256": identity,
+                        "elf_sha256": identity, "control_program_sha256": identity,
+                        "bitstream_sha256": identity,
+                    }
+                    status_path.write_text(json.dumps(runner))
+                    parsed = analyze(log, 10)
+                    self.assertEqual(parsed["config"]["terminal_handshake"], 1)
+                    self.assertEqual(parsed["icache_prefix_status"]["after"]["accepted_triggers"], triggers)
+                    runner["terminal_handshake"] = 0
+                    status_path.write_text(json.dumps(runner))
+                    with self.assertRaisesRegex(ValueError, "terminal handshake differ"):
+                        analyze(log, 10)
 
     def test_futex_early_accepts_whole_table_reload_counts(self):
         with tempfile.TemporaryDirectory() as directory:

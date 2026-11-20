@@ -91,6 +91,18 @@ class PipeHintPoolTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "at least two"):
             pool([Path("a")], 10)
 
+    @mock.patch("pool_scheduler_pipe_hint_replicates.analyze")
+    def test_rejects_different_natural_workloads(self, analyze):
+        for candidate in ("lookup", "parse", "chase"):
+            with self.subTest(candidate=candidate):
+                first = result("same", [(10.0, 1.0)])
+                second = result("same", [(20.0, 2.0)])
+                first["config"]["workload"] = "scan"
+                second["config"]["workload"] = candidate
+                analyze.side_effect = [first, second]
+                with self.assertRaisesRegex(ValueError, "configuration mismatch"):
+                    pool([Path("a"), Path("b")], 10)
+
 
 if __name__ == "__main__":
     unittest.main()

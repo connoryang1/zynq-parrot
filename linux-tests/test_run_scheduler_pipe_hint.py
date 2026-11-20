@@ -61,6 +61,27 @@ class PipeHintRunnerTests(unittest.TestCase):
         ])
         self.assertEqual(args.working_set_kib, 256)
         self.assertTrue(build_guest_command(args).endswith("futex plain 256"))
+        self.assertEqual(args.workload, "scan")
+
+    def test_natural_workload_is_appended_without_changing_scan_abi(self):
+        for workload in ("scan", "lookup", "parse", "chase"):
+            with self.subTest(workload=workload):
+                args = parse_args([
+                    "image.nbf", "transfer", "a" * 64, "result.log",
+                    "--bitstream-sha256", "b" * 64,
+                    "--working-set-kib", "32", "--workload", workload,
+                ])
+                suffix = "pipe plain 32" + (f" {workload}" if workload != "scan" else "")
+                self.assertTrue(build_guest_command(args).endswith(suffix))
+
+    def test_legacy_cli_rejects_natural_workload(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64, "--workload", "lookup",
+            "--legacy-four-arg-cli",
+        ])
+        with self.assertRaisesRegex(ValueError, "requires pipe/plain"):
+            validate_args(args)
 
     def test_accepts_unmatched_continuous_policy(self):
         args = parse_args([
@@ -86,6 +107,25 @@ class PipeHintRunnerTests(unittest.TestCase):
             "--policy", "futex-early", "--sync", "futex",
         ])
         self.assertEqual(args.policy, "futex-early")
+
+    def test_both_directions_is_explicit_and_requires_futex(self):
+        args = parse_args([
+            "image.nbf", "transfer", "a" * 64, "result.log",
+            "--bitstream-sha256", "b" * 64,
+            "--policy", "futex-early-both", "--workload", "lookup",
+        ])
+        with self.assertRaisesRegex(ValueError, "requires futex"):
+            validate_args(args)
+        args.sync = "futex"
+        self.assertIn(" futex-early-both ", build_guest_command(args))
+
+    def test_legacy_terminal_protocol_must_be_selected_explicitly(self):
+        common = ["image.nbf", "transfer", "a" * 64, "result.log",
+                  "--bitstream-sha256", "b" * 64]
+        self.assertFalse(parse_args(common).legacy_no_terminal_handshake)
+        old = parse_args(common + ["--legacy-no-terminal-handshake"])
+        self.assertTrue(old.legacy_no_terminal_handshake)
+        self.assertEqual(build_guest_command(old), build_guest_command(parse_args(common)))
 
     def test_resume_leg_profile_rejects_pipe_sync(self):
         args = parse_args([
@@ -130,7 +170,7 @@ class PipeHintRunnerTests(unittest.TestCase):
         resume = measured.index(
             "parent_resume += cycle() - shared->child_launch;")
         working_set = measured.index(
-            "parent_checksum += touch_working_set(")
+            "parent_checksum += resume_workload_run(")
         self.assertLess(resume, working_set)
 
     def test_futex_early_patch_excludes_internal_wake_callers(self):

@@ -23,6 +23,17 @@ def result(policy, identity, effects):
 
 class PipeHintPolicyComparatorTests(unittest.TestCase):
     @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+    def test_rejects_different_workloads_between_policies(self, analyze):
+        samples = [result("preseed", "same", [(10.0, 1.0)]) for _ in range(2)]
+        samples += [result("continuous", "same", [(20.0, 2.0)]) for _ in range(2)]
+        for index, sample in enumerate(samples):
+            sample["config"]["workload"] = "lookup" if index < 2 else "parse"
+        analyze.side_effect = samples
+        with self.assertRaisesRegex(ValueError, "configuration mismatch"):
+            compare([Path("p1"), Path("p2")],
+                    [Path("c1"), Path("c2")], 10, baseline_policy="preseed")
+
+    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
     def test_reports_continuous_minus_seed(self, analyze):
         analyze.side_effect = [
             result("seed", "same", [(10.0, 1.0), (20.0, 2.0)]),

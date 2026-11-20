@@ -64,12 +64,17 @@ def parse_args(argv=None):
     parser.add_argument("--loops", type=int, default=512)
     parser.add_argument("--repeats", type=int, default=8)
     parser.add_argument("--policy", choices=("continuous", "continuous-unmatched",
-                                              "futex-early", "seed", "preseed"),
+                                              "futex-early", "futex-early-both",
+                                              "seed", "preseed"),
                         default="continuous")
     parser.add_argument("--warmup", type=int, default=32)
     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
     parser.add_argument("--profile", choices=("plain", "legs"), default="plain")
     parser.add_argument("--working-set-kib", type=int, default=0)
+    parser.add_argument("--workload", choices=("scan", "lookup", "parse", "chase"),
+                        default="scan")
+    parser.add_argument("--legacy-no-terminal-handshake", action="store_true",
+                        help="bind an older seven-argument guest without the final verification barrier")
     parser.add_argument(
         "--legacy-four-arg-cli", action="store_true",
         help=("invoke the preserved pre-sync/profile benchmark ABI; valid only "
@@ -93,10 +98,10 @@ def validate_args(args):
         raise ValueError("working-set-kib must be in 0..65536")
     if args.profile == "legs" and args.sync != "futex":
         raise ValueError("legs profile requires futex synchronization")
-    if args.policy == "futex-early" and args.sync != "futex":
+    if args.policy in ("futex-early", "futex-early-both") and args.sync != "futex":
         raise ValueError("futex-early policy requires futex synchronization")
     if args.legacy_four_arg_cli and (args.sync != "pipe" or args.profile != "plain"
-                                     or args.working_set_kib):
+                                     or args.working_set_kib or args.workload != "scan"):
         raise ValueError("legacy four-argument CLI requires pipe/plain")
     if not args.nbf.is_file() or not args.transfer.is_file():
         raise ValueError("NBF and transfer files must exist")
@@ -110,6 +115,8 @@ def build_guest_command(args):
                f"{args.warmup}")
     if not args.legacy_four_arg_cli:
         command += f" {args.sync} {args.profile} {args.working_set_kib}"
+        if args.workload != "scan":
+            command += f" {args.workload}"
     return command
 
 
@@ -132,6 +139,9 @@ def run(args):
         "sync": args.sync,
         "profile": args.profile,
         "working_set_kib": args.working_set_kib,
+        "workload": args.workload,
+        "terminal_handshake": int(not (args.legacy_four_arg_cli
+                                       or args.legacy_no_terminal_handshake)),
         "legacy_four_arg_cli": args.legacy_four_arg_cli,
         "command": command,
     }

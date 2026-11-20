@@ -14,9 +14,11 @@ from analyze_scheduler_tagged_replay import percentile
 
 CONFIG = re.compile(
     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
-    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|seed|preseed))?"
+    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed))?"
     r"(?: sync=(pipe|futex))?(?: profile=(plain|legs))?"
-    r"(?: working_set_kib=(\d+))?$", re.MULTILINE
+    r"(?: working_set_kib=(\d+))?"
+    r"(?: workload=(scan|lookup|parse|chase))?"
+    r"(?: terminal_handshake=([01]))?$", re.MULTILINE
 )
 ROW = re.compile(
     r"^PIPE_HINT_RESULT repeat=(\d+) order=(\d+) enabled=([01]) "
@@ -81,6 +83,8 @@ def analyze(path, bootstrap_samples=20000):
     sync = configs[0][5] or "pipe"
     profile = configs[0][6] or "plain"
     working_set_kib = int(configs[0][7] or 0)
+    workload = configs[0][8] or "scan"
+    terminal_handshake = int(configs[0][9] or 0)
     if loops != runner.get("loops") or repeats != runner.get("repeats"):
         raise ValueError("transcript and runner configuration differ")
     if warmup != runner.get("warmup", 32):
@@ -93,8 +97,16 @@ def analyze(path, bootstrap_samples=20000):
         raise ValueError("transcript and runner profile differ")
     if working_set_kib != runner.get("working_set_kib", 0):
         raise ValueError("transcript and runner working set differ")
+    if workload != runner.get("workload", "scan"):
+        raise ValueError("transcript and runner workload differ")
+    if terminal_handshake != runner.get("terminal_handshake", 0):
+        raise ValueError("transcript and runner terminal handshake differ")
+    if policy == "futex-early-both" and not terminal_handshake:
+        raise ValueError("futex-early-both requires the terminal handshake protocol")
     if profile == "legs" and sync != "futex":
         raise ValueError("legs profile requires futex synchronization")
+    if policy in ("futex-early", "futex-early-both") and sync != "futex":
+        raise ValueError("early futex replay requires futex synchronization")
     parsed = [dict(repeat=int(a), order=int(b), enabled=int(c),
                    cycles=int(d), loops=int(e)) for a, b, c, d, e in ROW.findall(text)]
     if len(parsed) != repeats * 2:
@@ -177,11 +189,12 @@ def analyze(path, bootstrap_samples=20000):
         expected_triggers = min(0xff, repeats * 2)
         expected_resident_drops = min(0x1ff, repeats * configured)
         entries_ok = after["accepted_entries"] == expected_entries
-    elif policy == "futex-early":
-        # An armed process can execute untimed lifecycle futex wakes during
-        # fork/exit in addition to the measured ping-pong. Every cold launch
-        # must still install one complete table, and all activity must drain.
-        total_triggers = repeats * 2 * (warmup + loops)
+    elif policy in ("futex-early", "futex-early-both"):
+        # Linux clears the child's preview mode on clone. Historical
+        # futex-early therefore arms only the parent; the both variant rearms
+        # the child explicitly. The final release wake is outside timing.
+        directions = 2 if policy == "futex-early-both" else 1
+        total_triggers = repeats * (directions * (warmup + loops) + terminal_handshake)
         expected_triggers = min(0xff, total_triggers)
         expected_resident_drops = min(0x1ff, total_triggers * configured)
         entries_ok = (
@@ -242,11 +255,11 @@ def analyze(path, bootstrap_samples=20000):
             metrics[f"paired_95pct_ci_{key}"] = [
                 percentile(draws, 0.025), percentile(draws, 0.975)]
     mechanism = ("kernel-integrated instruction replay"
-                 if policy == "futex-early"
+                 if policy in ("futex-early", "futex-early-both")
                  else "matched explicit instruction hints")
     return {
-        "purpose": (f"Measure sustained hot {sync} roundtrip throughput with "
-                    f"{mechanism}."),
+        "purpose": (f"Measure sustained {sync} roundtrip throughput with "
+                    f"{workload} work and {mechanism}."),
         "transcript": str(path),
         "transcript_sha256": sha256(path),
         "status": str(status_path),
@@ -257,7 +270,8 @@ def analyze(path, bootstrap_samples=20000):
         "config": {"loops": loops, "repeats": repeats, "warmup": warmup,
                    "configured_entries": configured, "policy": policy,
                    "sync": sync, "profile": profile,
-                   "working_set_kib": working_set_kib},
+                   "working_set_kib": working_set_kib, "workload": workload,
+                   "terminal_handshake": terminal_handshake},
         "pairs": pairs,
         "metrics": metrics,
         "icache_prefix_status": {"before": before, "after": after},

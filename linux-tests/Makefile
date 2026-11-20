@@ -212,7 +212,7 @@ $(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 
-$(PIPE_HINT_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c Makefile FORCE | check-linux-dynamic-cc
+$(PIPE_HINT_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
 

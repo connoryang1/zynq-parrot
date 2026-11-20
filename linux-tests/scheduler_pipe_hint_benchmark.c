@@ -22,9 +22,18 @@
 #include <sys/syscall.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <time.h>
+#include "resume_workload.h"
 
-#if !defined(__riscv) || __riscv_xlen != 64
+#if !defined(BP_RESUME_HOST_VERIFY) && (!defined(__riscv) || __riscv_xlen != 64)
 #error "This benchmark requires RV64 BlackParrot"
+#endif
+
+#ifdef BP_RESUME_HOST_VERIFY
+/* Software protocol verification only: never emit FPGA performance markers. */
+#define PIPE_HINT_LABEL(name) "PIPE_HINT_HOST_VERIFY_" name
+#else
+#define PIPE_HINT_LABEL(name) "PIPE_HINT_" name
 #endif
 
 #define PR_BP_PREVIEW_ICACHE_STATUS 0x4250505e
@@ -41,6 +50,7 @@ enum hint_policy {
 	hint_continuous,
 	hint_continuous_unmatched,
 	hint_futex_early,
+	hint_futex_early_both,
 	hint_seed_once,
 	hint_preseed,
 };
@@ -77,15 +87,26 @@ static void fail(const char *message)
 
 static uint64_t cycle(void)
 {
+#ifdef BP_RESUME_HOST_VERIFY
+	struct timespec now;
+	if (clock_gettime(CLOCK_MONOTONIC, &now))
+		fail("host verification clock");
+	return (uint64_t)now.tv_sec * 1000000000 + now.tv_nsec;
+#else
 	uint64_t value;
 
 	__asm__ volatile("csrr %0, 0xcc0" : "=r"(value) : : "memory");
 	return value;
+#endif
 }
 
 static void flush_instruction_state(void)
 {
+#ifdef BP_RESUME_HOST_VERIFY
+	atomic_thread_fence(memory_order_seq_cst);
+#else
 	__asm__ volatile("fence.i" : : : "memory");
+#endif
 }
 
 static void transfer(int fd, unsigned char *token, int write_token)
@@ -120,43 +141,30 @@ static unsigned parse_working_set(const char *text)
 
 	errno = 0;
 	value = strtoul(text, &end, 0);
-	if (errno || !end || *end || value > 65536UL) {
+	if (errno || !end || end == text || *end || text[0] == '-' || value > 65536UL) {
 		fputs("working-set-kib must be in 0..65536\n", stderr);
 		exit(2);
 	}
 	return (unsigned)value;
 }
 
-static volatile unsigned char *allocate_working_set(unsigned kib, unsigned salt)
+static struct resume_workload allocate_working_set(unsigned kib, unsigned salt,
+						   const char *workload)
 {
-	size_t bytes = (size_t)kib * 1024;
-	volatile unsigned char *buffer;
+	struct resume_workload result;
 
-	if (!bytes)
-		return NULL;
-	buffer = mmap(NULL, bytes, PROT_READ | PROT_WRITE,
-		      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (buffer == MAP_FAILED)
-		fail("working-set mmap");
-	for (size_t offset = 0; offset < bytes; offset += 64)
-		buffer[offset] = (unsigned char)(salt + offset / 64);
-	return buffer;
+	if (resume_workload_init(&result, workload, kib, salt))
+		fail("working-set allocation");
+	return result;
 }
 
-static uint64_t touch_working_set(volatile unsigned char *buffer, unsigned kib)
+static void check_working_set(struct resume_workload *work, uint64_t checksum)
 {
-	size_t bytes = (size_t)kib * 1024;
-	uint64_t checksum = 0;
-
-	for (size_t offset = 0; offset < bytes; offset += 64)
-		checksum += buffer[offset];
-	return checksum;
-}
-
-static void release_working_set(volatile unsigned char *buffer, unsigned kib)
-{
-	if (buffer && munmap((void *)buffer, (size_t)kib * 1024))
-		fail("working-set munmap");
+	if (!resume_workload_check_total(work, checksum)) {
+		fputs("working-set checksum mismatch\n", stderr);
+		exit(1);
+	}
+	resume_workload_free(work);
 }
 
 static enum hint_policy parse_policy(const char *text)
@@ -167,11 +175,13 @@ static enum hint_policy parse_policy(const char *text)
 		return hint_continuous_unmatched;
 	if (!strcmp(text, "futex-early"))
 		return hint_futex_early;
+	if (!strcmp(text, "futex-early-both"))
+		return hint_futex_early_both;
 	if (!strcmp(text, "seed"))
 		return hint_seed_once;
 	if (!strcmp(text, "preseed"))
 		return hint_preseed;
-	fprintf(stderr, "policy must be continuous, continuous-unmatched, futex-early, seed, or preseed\n");
+	fprintf(stderr, "policy must be continuous, continuous-unmatched, futex-early, futex-early-both, seed, or preseed\n");
 	exit(2);
 }
 
@@ -197,18 +207,26 @@ static enum profile_policy parse_profile(const char *text)
 
 static unsigned long prefix_status(void)
 {
+#ifdef BP_RESUME_HOST_VERIFY
+	return (32UL << 4) | 1;
+#else
 	unsigned long status;
 
 	if (prctl(PR_BP_PREVIEW_ICACHE_STATUS, (unsigned long)&status,
 		  0UL, 0UL, 0UL))
 		fail("instruction-prefix status");
 	return status;
+#endif
 }
 
 static void issue_hint(unsigned enabled)
 {
+#ifdef BP_RESUME_HOST_VERIFY
+	(void)enabled;
+#else
 	if (prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled, 0UL, 0UL, 0UL))
 		fail("instruction-prefix trigger");
+#endif
 }
 
 static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
@@ -224,8 +242,17 @@ static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
 
 static void set_futex_early_mode(unsigned enabled)
 {
+#ifdef BP_RESUME_HOST_VERIFY
+	(void)enabled;
+#else
 	if (prctl(PR_BP_PREVIEW_ENABLE, enabled ? 14UL : 0UL, 0UL, 0UL, 0UL))
 		fail("futex-early preview mode");
+#endif
+}
+
+static int is_futex_early(enum hint_policy policy)
+{
+	return policy == hint_futex_early || policy == hint_futex_early_both;
 }
 
 static void futex_wait_for(_Atomic uint32_t *word, uint32_t wanted)
@@ -252,14 +279,15 @@ static void futex_set_wake(_Atomic uint32_t *word, uint32_t value)
 static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 					unsigned warmup,
 					enum hint_policy policy,
-					unsigned working_set_kib)
+					unsigned working_set_kib,
+					 const char *workload)
 {
 	int to_child[2], to_parent[2], ready[2];
 	unsigned char token = 0;
 	uint64_t begin, end;
 	pid_t child;
 	int status;
-	volatile unsigned char *parent_working_set;
+	struct resume_workload parent_working_set;
 	uint64_t parent_checksum = 0;
 
 	if (pipe(to_child) || pipe(to_parent) || pipe(ready))
@@ -268,8 +296,8 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 	if (child < 0)
 		fail("fork");
 	if (!child) {
-		volatile unsigned char *child_working_set =
-			allocate_working_set(working_set_kib, 0x5a);
+		struct resume_workload child_working_set =
+			allocate_working_set(working_set_kib, 0x5a, workload);
 		uint64_t child_checksum = 0;
 
 		close(to_child[1]);
@@ -279,17 +307,18 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 		transfer(ready[1], &token, 1);
 		for (unsigned i = 0; i < warmup + loops; ++i) {
 			transfer(to_child[0], &token, 0);
-			child_checksum += touch_working_set(
-				child_working_set, working_set_kib);
+			child_checksum += resume_workload_run(&child_working_set);
 			if (policy != hint_preseed)
 				issue_iteration_hint(enabled, policy, i);
 			transfer(to_parent[1], &token, 1);
 		}
-		release_working_set(child_working_set, working_set_kib);
-		_exit(child_checksum == UINT64_MAX);
+		/* Parent releases this only after sampling the timed endpoint. */
+		transfer(to_child[0], &token, 0);
+		check_working_set(&child_working_set, child_checksum);
+		_exit(0);
 	}
 
-	parent_working_set = allocate_working_set(working_set_kib, 0xa5);
+	parent_working_set = allocate_working_set(working_set_kib, 0xa5, workload);
 	close(to_child[0]);
 	close(to_parent[1]);
 	close(ready[1]);
@@ -302,8 +331,7 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 			issue_iteration_hint(enabled, policy, i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
-		parent_checksum += touch_working_set(
-			parent_working_set, working_set_kib);
+		parent_checksum += resume_workload_run(&parent_working_set);
 	}
 	begin = cycle();
 	for (unsigned i = 0; i < loops; ++i) {
@@ -311,18 +339,19 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
 			issue_iteration_hint(enabled, policy, warmup + i);
 		transfer(to_child[1], &token, 1);
 		transfer(to_parent[0], &token, 0);
-		parent_checksum += touch_working_set(
-			parent_working_set, working_set_kib);
+		parent_checksum += resume_workload_run(&parent_working_set);
 	}
 	end = cycle();
+	transfer(to_child[1], &token, 1);
 	if (waitpid(child, &status, 0) != child || !WIFEXITED(status)
 	    || WEXITSTATUS(status)) {
 		fputs("pipe child failed\n", stderr);
 		exit(1);
 	}
-	release_working_set(parent_working_set, working_set_kib);
-	if (parent_checksum == UINT64_MAX)
-		fail("working-set checksum");
+	close(to_child[1]);
+	close(to_parent[0]);
+	close(ready[0]);
+	check_working_set(&parent_working_set, parent_checksum);
 	return (struct cell_result){ .elapsed = end - begin };
 }
 
@@ -330,7 +359,8 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 					 unsigned warmup,
 					 enum hint_policy policy,
 					 enum profile_policy profile,
-					 unsigned working_set_kib)
+					 unsigned working_set_kib,
+					 const char *workload)
 {
 	struct futex_shared *shared = mmap(NULL, sizeof(*shared),
 					  PROT_READ | PROT_WRITE,
@@ -340,20 +370,25 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 	uint64_t begin, end, parent_resume = 0;
 	pid_t child;
 	int status;
-	volatile unsigned char *parent_working_set;
+	struct resume_workload parent_working_set;
 	uint64_t parent_checksum = 0;
 
 	if (shared == MAP_FAILED || pipe(ready))
 		fail("futex setup");
-	if (policy == hint_futex_early)
+	if (is_futex_early(policy))
 		set_futex_early_mode(enabled);
 	atomic_init(&shared->turn, 0);
 	child = fork();
 	if (child < 0)
 		fail("fork");
 	if (!child) {
-		volatile unsigned char *child_working_set =
-			allocate_working_set(working_set_kib, 0x3c);
+		struct resume_workload child_working_set =
+			allocate_working_set(working_set_kib, 0x3c, workload);
+		/* Linux clears preview mode in both clone paths. Preserve the
+		 * historical parent-only policy; opt in explicitly for reverse wakes.
+		 */
+		if (policy == hint_futex_early_both)
+			set_futex_early_mode(enabled);
 		close(ready[0]);
 		flush_instruction_state();
 		transfer(ready[1], &token, 1);
@@ -363,36 +398,38 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 			futex_wait_for(&shared->turn, 1);
 			if (profile == profile_legs && i >= warmup)
 				child_resume += cycle() - shared->parent_launch;
-			child_checksum += touch_working_set(
-				child_working_set, working_set_kib);
-			if (policy != hint_preseed && policy != hint_futex_early)
+			child_checksum += resume_workload_run(&child_working_set);
+			if (policy != hint_preseed && !is_futex_early(policy))
 				issue_iteration_hint(enabled, policy, i);
 			if (profile == profile_legs && i >= warmup)
 				shared->child_launch = cycle();
 			futex_set_wake(&shared->turn, 0);
 		}
 		shared->child_resume = child_resume;
-		release_working_set(child_working_set, working_set_kib);
-		_exit(child_checksum == UINT64_MAX);
+		/* Verification can take O(roundtrips * requests) work. Park until
+		 * the parent has sampled end; it must not delay the last return.
+		 */
+		futex_wait_for(&shared->turn, 2);
+		check_working_set(&child_working_set, child_checksum);
+		_exit(0);
 	}
 
-	parent_working_set = allocate_working_set(working_set_kib, 0xc3);
+	parent_working_set = allocate_working_set(working_set_kib, 0xc3, workload);
 	close(ready[1]);
 	transfer(ready[0], &token, 0);
 	flush_instruction_state();
 	if (policy == hint_preseed)
 		issue_hint(enabled);
 	for (unsigned i = 0; i < warmup; ++i) {
-		if (policy != hint_preseed && policy != hint_futex_early)
+		if (policy != hint_preseed && !is_futex_early(policy))
 			issue_iteration_hint(enabled, policy, i);
 		futex_set_wake(&shared->turn, 1);
 		futex_wait_for(&shared->turn, 0);
-		parent_checksum += touch_working_set(
-			parent_working_set, working_set_kib);
+		parent_checksum += resume_workload_run(&parent_working_set);
 	}
 	begin = cycle();
 	for (unsigned i = 0; i < loops; ++i) {
-		if (policy != hint_preseed && policy != hint_futex_early)
+		if (policy != hint_preseed && !is_futex_early(policy))
 			issue_iteration_hint(enabled, policy, warmup + i);
 		if (profile == profile_legs)
 			shared->parent_launch = cycle();
@@ -400,15 +437,16 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 		futex_wait_for(&shared->turn, 0);
 		if (profile == profile_legs)
 			parent_resume += cycle() - shared->child_launch;
-		parent_checksum += touch_working_set(
-			parent_working_set, working_set_kib);
+		parent_checksum += resume_workload_run(&parent_working_set);
 	}
 	end = cycle();
+	futex_set_wake(&shared->turn, 2);
 	if (waitpid(child, &status, 0) != child || !WIFEXITED(status)
 	    || WEXITSTATUS(status)) {
 		fputs("futex child failed\n", stderr);
 		exit(1);
 	}
+	close(ready[0]);
 	struct cell_result result = {
 		.elapsed = end - begin,
 		.child_resume = shared->child_resume,
@@ -416,9 +454,7 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
 	};
 	if (munmap(shared, sizeof(*shared)))
 		fail("futex munmap");
-	release_working_set(parent_working_set, working_set_kib);
-	if (parent_checksum == UINT64_MAX)
-		fail("working-set checksum");
+	check_working_set(&parent_working_set, parent_checksum);
 	return result;
 }
 
@@ -428,13 +464,14 @@ int main(int argc, char **argv)
 	unsigned repeats = default_repeats;
 	unsigned warmup = warmup_roundtrips;
 	unsigned working_set_kib = 0;
+	const char *workload = "scan";
 	enum hint_policy policy = hint_continuous;
 	enum sync_policy sync = sync_pipe;
 	enum profile_policy profile = profile_plain;
 	unsigned long before, after;
 
-	if (argc > 8) {
-		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|continuous-unmatched|futex-early|seed|preseed] [warmup] [pipe|futex] [plain|legs] [working-set-kib]\n",
+	if (argc > 9) {
+		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed] [warmup] [pipe|futex] [plain|legs] [working-set-kib] [scan|lookup|parse|chase]\n",
 			argv[0]);
 		return 2;
 	}
@@ -452,23 +489,34 @@ int main(int argc, char **argv)
 		profile = parse_profile(argv[6]);
 	if (argc > 7)
 		working_set_kib = parse_working_set(argv[7]);
+	if (argc > 8)
+		workload = argv[8];
+	if (strcmp(workload, "scan") && strcmp(workload, "lookup")
+	    && strcmp(workload, "parse") && strcmp(workload, "chase")) {
+		fputs("invalid resume workload\n", stderr);
+		return 2;
+	}
 	if (profile == profile_legs && sync != sync_futex) {
 		fputs("legs profile requires futex synchronization\n", stderr);
 		return 2;
 	}
-	if (policy == hint_futex_early && sync != sync_futex) {
+	if (is_futex_early(policy) && sync != sync_futex) {
 		fputs("futex-early policy requires futex synchronization\n", stderr);
 		return 2;
 	}
 	before = prefix_status();
-	printf("PIPE_HINT_CONFIG loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s sync=%s profile=%s working_set_kib=%u\n",
+#ifdef BP_RESUME_HOST_VERIFY
+	fputs("Software protocol verification only; host nanoseconds are not BlackParrot cycles.\n", stderr);
+#endif
+	printf(PIPE_HINT_LABEL("CONFIG") " loops=%u repeats=%u warmup=%u configured_entries=%lu policy=%s sync=%s profile=%s working_set_kib=%u workload=%s terminal_handshake=1\n",
 	       loops, repeats, warmup, (before >> 4) & 0x1ffUL,
 	       policy == hint_continuous ? "continuous"
 	       : policy == hint_continuous_unmatched ? "continuous-unmatched"
 	       : policy == hint_futex_early ? "futex-early"
+	       : policy == hint_futex_early_both ? "futex-early-both"
 	       : policy == hint_seed_once ? "seed" : "preseed",
 	       sync == sync_pipe ? "pipe" : "futex",
-	       profile == profile_plain ? "plain" : "legs", working_set_kib);
+	       profile == profile_plain ? "plain" : "legs", working_set_kib, workload);
 	for (unsigned repeat = 0; repeat < repeats; ++repeat) {
 		unsigned first = repeat & 1U;
 
@@ -476,15 +524,15 @@ int main(int argc, char **argv)
 			unsigned enabled = first ^ order;
 			struct cell_result result = sync == sync_pipe
 				? run_pipe_cell(enabled, loops, warmup, policy,
-						working_set_kib)
+						working_set_kib, workload)
 				: run_futex_cell(enabled, loops, warmup, policy,
-						  profile, working_set_kib);
+						  profile, working_set_kib, workload);
 
-			printf("PIPE_HINT_RESULT repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
+			printf(PIPE_HINT_LABEL("RESULT") " repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
 			       repeat, order, enabled,
 			       (unsigned long long)result.elapsed, loops);
 			if (profile == profile_legs)
-				printf("PIPE_HINT_LEGS repeat=%u order=%u enabled=%u child_resume=%llu parent_resume=%llu loops=%u\n",
+				printf(PIPE_HINT_LABEL("LEGS") " repeat=%u order=%u enabled=%u child_resume=%llu parent_resume=%llu loops=%u\n",
 				       repeat, order, enabled,
 				       (unsigned long long)result.child_resume,
 				       (unsigned long long)result.parent_resume,
@@ -493,9 +541,9 @@ int main(int argc, char **argv)
 		}
 	}
 	after = prefix_status();
-	printf("PIPE_HINT_STATUS before=0x%016lx after=0x%016lx configured_entries=%lu dropped=%lu\n",
+	printf(PIPE_HINT_LABEL("STATUS") " before=0x%016lx after=0x%016lx configured_entries=%lu dropped=%lu\n",
 	       before, after, (after >> 4) & 0x1ffUL,
 	       (after >> 46) & 0xffUL);
-	puts("PIPE_HINT_PASS");
+	puts(PIPE_HINT_LABEL("PASS"));
 	return 0;
 }
