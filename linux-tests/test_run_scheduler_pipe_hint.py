@@ -3,6 +3,7 @@
 
 import base64
 import hashlib
+import gzip
 from pathlib import Path
 import tempfile
 import unittest
@@ -26,10 +27,12 @@ class PipeHintRunnerTests(unittest.TestCase):
             path.write_bytes(payload)
             commands = library_transfer(path)
             self.assertEqual(commands[0], f": > {GUEST_ZLIB}.b64")
-            self.assertEqual(commands[-1], f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}")
+            self.assertEqual(commands[-2], f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}.gz")
+            self.assertEqual(commands[-1], f"/bin/busybox gunzip -c {GUEST_ZLIB}.gz > {GUEST_ZLIB}")
             self.assertTrue(all(len(command) <= 768 for command in commands))
-            encoded = "".join(command.split("'")[1] for command in commands[1:-1])
-            self.assertEqual(base64.b64decode(encoded), payload)
+            encoded = "".join(command.split("'")[1] for command in commands[1:-2])
+            self.assertEqual(gzip.decompress(base64.b64decode(encoded)), payload)
+            self.assertEqual(commands, library_transfer(path))
 
     def test_retention_and_deflate_arguments_bind_optional_library(self):
         for policy in ("retention-rr", "retention-first"):

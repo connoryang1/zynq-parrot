@@ -4,6 +4,7 @@
 import argparse
 import base64
 import hashlib
+import gzip
 import json
 import os
 from pathlib import Path
@@ -28,11 +29,14 @@ MAX_GUEST_COMMAND_LENGTH = 768
 
 def library_transfer(path):
     """Generate bounded, fixed-destination commands for an optional RV64 library."""
-    payload = base64.b64encode(path.read_bytes()).decode("ascii")
+    # Reduce shell command count before timing. BusyBox gunzip is enabled in
+    # the bound rootfs; the runner verifies the original decompressed bytes.
+    payload = base64.b64encode(gzip.compress(path.read_bytes(), mtime=0)).decode("ascii")
     return [f": > {GUEST_ZLIB}.b64", *(
-        f"echo '{payload[index:index + 192]}' >> {GUEST_ZLIB}.b64"
-        for index in range(0, len(payload), 192)),
-        f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}"]
+        f"echo '{payload[index:index + 512]}' >> {GUEST_ZLIB}.b64"
+        for index in range(0, len(payload), 512)),
+        f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}.gz",
+        f"/bin/busybox gunzip -c {GUEST_ZLIB}.gz > {GUEST_ZLIB}"]
 
 
 def sha256(path):
@@ -163,6 +167,7 @@ def run(args):
     }
     if args.zlib_library is not None:
         status["zlib_library_sha256"] = sha256(args.zlib_library)
+        status["zlib_transfer_encoding"] = "gzip-base64-v1"
     env = os.environ.copy()
     env["PYNQ_CONTROL_PROGRAM_SHA256"] = args.control_sha256
     env["PYNQ_CONTROL_PROGRAM_TIMEOUT_MS"] = str(args.runtime_ms)
