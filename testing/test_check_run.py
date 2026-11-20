@@ -194,6 +194,11 @@ class HarnessTests(unittest.TestCase):
                      (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=0 BP_AXI_MEM_READ_QUEUE_DEPTH=0",
                       "-axipipe-lat0-q0"),
                      (4, "BP_AXI_MEM_READ_LATENCY=60 BP_AXI_MEM_READ_QUEUE_DEPTH=8", ""),
+                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE", "-icapture"),
+                     (4, "", ""),
+                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE=0", "-icapture"),
+                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE BP_AXI_MEM_PIPELINED",
+                      "-axipipe-lat40-q4-icapture"),
                      (4, "", ""))
             for contexts, defines, suffix in cases:
                 stamp = ".build_config-nt2-nc{}-cfgtest-trace1{}".format(

@@ -22,7 +22,9 @@
 
 #include "Vbsg_nonsynth_zynq_testbench.h"
 #include "Vbsg_nonsynth_zynq_testbench___024root.h"
+#ifdef BP_SIM_MINIMAL_PROCESSOR_STATE
 #include "Vbsg_nonsynth_zynq_testbench_bp_be_csr__Bz2.h"
+#endif
 #include "bsg_zynq_pl_simulation.h"
 #include "verilated.h"
 
@@ -119,6 +121,7 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
     // the simulated program has not brought up its console yet. This is a
     // simulation-only observation of Verilator state; it does not perturb RTL.
     void print_processor_state(void) {
+#ifdef BP_SIM_MINIMAL_PROCESSOR_STATE
         auto *root = tb->rootp;
         auto *csr = root
             ->__PVT__bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__core_minimal__DOT__be__DOT__calculator__DOT__pipe_sys__DOT__csr__DOT__gen_csr__BRA__0__KET____DOT__csr_inst;
@@ -140,6 +143,9 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
                     (unsigned long long)csr->__PVT__dpc_reg__DOT__data_r << 1,
                     (unsigned long long)csr->__PVT__mtvec_reg__DOT__data_r << 2,
                     (unsigned long long)csr->__PVT__satp_reg__DOT__data_r);
+#else
+        bsg_pr_info("ps.cpp: processor snapshot unavailable for this hierarchy\n");
+#endif
     }
 
     void *allocate_dram(unsigned long len_in_bytes,
