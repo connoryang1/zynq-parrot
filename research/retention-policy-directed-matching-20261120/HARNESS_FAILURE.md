@@ -1,0 +1,3 @@
+This note records a rejected additional matching-tag refresh stimulus. The existing committed RTL and prior extended directed acceptance are unchanged.
+
+The added test cleared ordinary SRAM tags and attempted to create a new demand miss for a completed retained line. That line correctly hit in the retained store, so the helper rejected the stimulus before any refill. This is not a hardware failure: a matching completed side copy cannot naturally create this ordinary demand miss. The invalid extra stimulus was removed, returning the driver byte-for-byte to the accepted extended gate version; no simulator rebuild was launched after the parent requested analysis-only work. Existing rotated partial-epoch and explicit replay refresh checks remain accepted.

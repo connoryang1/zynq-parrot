@@ -29,6 +29,7 @@ GPIO_STOP = re.compile(
 # Match the selected program's completed checks, not just the common CRT exit.
 # The benchmark banner is emitted only after both measured rings return.
 TEST_MARKERS = {
+    "mt_icache_retention_control_test": "[BSG-PASS] runtime instruction retention global contexts S/M policy and U denial",
     "mt_machine_trap_test": "[BSG-PASS] cold M-mode ECALL trap and return",
     "mt_protected_rpc_reference_test": "[BSG-PASS] protected RPC capability, isolation and return",
     "mt_protected_rpc_hardware_test": "[BSG-PASS] atomic protected RPC capability, fixed entry and return",

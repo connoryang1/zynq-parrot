@@ -60,6 +60,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_icache_retention_control_test \
     mt_machine_trap_test \
     mt_protected_rpc_reference_test \
     mt_protected_rpc_hardware_test \
@@ -135,7 +136,7 @@ $(LOG_DIR):
 	@mkdir -p $@
 
 define TEST_RULES
-$(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(TOP)/testing/$(1).c $(TOP)/testing/mt_seed.h FORCE | $(LOG_DIR)
+$(ZP_RISCV_DIR)/bp-tests/$(1).riscv: $(or $(TEST_SOURCE_$(1)),$(TOP)/testing/$(1).c) $(TOP)/testing/mt_seed.h FORCE | $(LOG_DIR)
 	@echo "  [CC]    Compiling $(1).riscv (Threads: $(NUM_THREADS))..."
 	@$$(CC) -o $$@ $$< $$(CFLAGS) >> $(LOG_DIR)/software_build.log 2>&1
 
@@ -152,6 +153,8 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 	python3 $$(TOP)/testing/check_run.py $$(SIM_DIR)/run.log --test $(1) --exit-code $$$$sim_rc $$(if $$(RUN_EXPECT_DEPENDENT),--dependent-config=$$(RUN_EXPECT_DEPENDENT),)
 endef
 
+TEST_SOURCE_mt_icache_retention_control_test := $(TOP)/testing/rtl/retention_control_test.c
+$(ZP_RISCV_DIR)/bp-tests/mt_icache_retention_control_test.riscv: CFLAGS += -I$(TOP)/testing
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 
 $(ZP_RISCV_DIR)/bp-tests/mt_umode_nonresident_sv39_handoff_test.riscv: $(TOP)/testing/mt_umode_nonresident_handoff_test.c

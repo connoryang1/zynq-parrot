@@ -1,0 +1,876 @@
+{
+  "purpose": "Consolidate only completed physical natural-demand sessions1/2, preserving raw identity and complete steady-request paired uncertainty. This is not an accepted optimization, a simulation projection, or a process-setup timing result.",
+  "source_artifact_root": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120",
+  "included_sessions": [
+    "session1",
+    "session2"
+  ],
+  "excluded": "Active session3 and unrelated earlier board attempts were not used.",
+  "hardware": {
+    "platform": "PYNQ-Z2 physical FPGA",
+    "single_linux_hart_observed": true,
+    "topology": {
+      "actual_route_elaboration_counts": "not independently recovered from archived route artifacts",
+      "source_inferred_physical_slots": 2,
+      "source_inferred_logical_contexts": 4,
+      "previous_4_4_claim": "unverified and not propagated",
+      "basis": "revisions.txt selects static e_bp_unicore_zynqparrot_prefetch_cfg with default thread/context flags. Exact top package override has num_threads=2; named prefetch config derives it. Exact BP schema defaults num_contexts=4. No explicit override appears in recorded build metadata; no synthesis vds/dcp was retained.",
+      "sources": [
+        {
+          "repository": "/home/coyang/zynq-parrot-linux-research",
+          "revision": "b4c82aded497b61b995c86199c6f618aadafb195",
+          "path": "cosim/black-parrot-example/v/bp_common_pkg.sv",
+          "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7",
+          "bytes": 7955
+        },
+        {
+          "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+          "revision": "684e5d8bcc45306a1cd02f89a521542f2e27e8ef",
+          "path": "bp_common/src/include/bp_common_aviary_cfg_pkgdef.svh",
+          "sha256": "1505b65cd6fba12f3cb4ccb8c49bae7aed7c27d4f67c74c897a9ab476763173f",
+          "bytes": 21844
+        }
+      ],
+      "recorded_configuration": "e_bp_unicore_zynqparrot_prefetch_cfg",
+      "recorded_thread_override": "<default>",
+      "recorded_context_override": "<default>",
+      "explicit_synthesis_overrides_recorded": false,
+      "hwh_context_dimension_parameters_present": false,
+      "source_mapping": {
+        "physical_slots": "top b4c82ade cosim/black-parrot-example/v/bp_common_pkg.sv:24 sets num_threads=2; lines114\u2013130 derive prefetch config from that base without overriding num_threads",
+        "logical_contexts": "BP684e5d8b bp_common/src/include/bp_common_aviary_cfg_pkgdef.svh:406 defaults num_contexts=4; named top configuration does not override it"
+      },
+      "route_elaboration_counts_verified": false
+    },
+    "package": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "sha256": "b139be87bdadf965f2d5e7eb7cd290bc56be76753a2377dc25f5c690a69d5ab1",
+      "bytes": 1750672
+    },
+    "package_verification": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/package-verification.txt",
+      "sha256": "ec822e6e582ff68e64144dd1a8b67a889ad28111ea03cc327eaa29f71d6bc8c7",
+      "bytes": 430
+    },
+    "package_members": {
+      "black_parrot_bd_1.bit": {
+        "sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+        "bytes": 4045685
+      },
+      "black_parrot_bd_1.map": {
+        "sha256": "cc43f4d00b80bf04c4c0050a7f2af1dc64599c330909ae5bcd3117d1564eb2ef",
+        "bytes": 81
+      },
+      "black_parrot_bd_1.hwh": {
+        "sha256": "76ea1791e6b482580f574446ef77bc78525f26ca39232ccc4b2bd395d3528005",
+        "bytes": 311517
+      }
+    },
+    "routed_revisions": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/revisions.txt",
+      "sha256": "a52606104171e6aa7708eb66d5e4dce2f94375285c3b7b52554e88ed46eedbc3",
+      "bytes": 363
+    },
+    "routed_console": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/console.log",
+      "sha256": "3931e51160a2d9018cd54f360ec35e4d18053febad1da7e7c5cf827332e5b992",
+      "bytes": 1044837
+    }
+  },
+  "identity": {
+    "nbf_sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "transfer_sha256": "40afe5254421b118c1e3e0996af99376b9548fa84176ecc6419f2e23ea325e5e",
+    "elf_sha256": "e943befa9eed8b9a4258c88c5c822745017c42ef1d5af9f3bc07c56a0eade86a",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+  },
+  "nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/linux-prefix32-futex-usersyscall-shell.nbf",
+    "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+    "bytes": 70904691
+  },
+  "transfer": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/workload-v2.transfer",
+    "sha256": "40afe5254421b118c1e3e0996af99376b9548fa84176ecc6419f2e23ea325e5e",
+    "bytes": 34253
+  },
+  "decoded_transfer_elf": {
+    "sha256": "e943befa9eed8b9a4258c88c5c822745017c42ef1d5af9f3bc07c56a0eade86a",
+    "bytes": 22752,
+    "class": "ELF64",
+    "machine": "RISC-V",
+    "method": "Offline base64 concatenation from exact transfer commands; nothing executed."
+  },
+  "source_checkpoint": {
+    "revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+    "files": [
+      {
+        "repository": "/home/coyang/zynq-parrot-linux-research",
+        "revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+        "path": "linux-tests/scheduler_pipe_hint_benchmark.c",
+        "sha256": "a987b530f33187adfc4e57c2afa7c78a151409f09fb9706bf40f5324578643dd",
+        "bytes": 16005
+      },
+      {
+        "repository": "/home/coyang/zynq-parrot-linux-research",
+        "revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+        "path": "linux-tests/resume_workload.h",
+        "sha256": "011d934f3be12b660897c656697bc19f9b06b3ec490d84ff8b4199b892e97b7f",
+        "bytes": 6839
+      },
+      {
+        "repository": "/home/coyang/zynq-parrot-linux-research",
+        "revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+        "path": "linux-tests/Makefile",
+        "sha256": "6f2672738d72ac5ec3a5af016ccd61ebec4c5c9e1311b89fea0016e6fa99697f",
+        "bytes": 34637
+      },
+      {
+        "repository": "/home/coyang/zynq-parrot-linux-research",
+        "revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+        "path": "linux-tests/analyze_scheduler_pipe_hint.py",
+        "sha256": "0d85413be44dc03729b6d8c7e891403bc701b5692519a22c8966fa447045bf91",
+        "bytes": 15065
+      }
+    ],
+    "compiler_reported_by_parent": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+    "build_rule": "PHYSICAL_PREVIEW_CFLAGS minus-static, -no-pie, -std=c11, dynamic pipe-hint target",
+    "rebuild_scope": "The parent confirmed the current default-guard build has byte-identical e943 ELF. This report independently verifies archived transfer identity and hashes the supplied exact source checkpoint objects; it did not rebuild or rerun the workload."
+  },
+  "sessions": [
+    {
+      "name": "session1",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/session.json",
+        "sha256": "29e9e1b64eaf2c540ccc751b8310337d28b25e0e2f367a5fe31aec6283f093fc",
+        "bytes": 2244
+      },
+      "reservation": "/home/coyang/fpga-artifacts/pynq-session.lock",
+      "all_three_acknowledged": true,
+      "state": "complete",
+      "started_utc": "2026-11-20T07:31:09.323817+00:00",
+      "released_utc": "2026-11-20T07:43:12.444869+00:00",
+      "runs": 2
+    },
+    {
+      "name": "session2",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/session.json",
+        "sha256": "396ddc35c069e26f0dbfc6466f7c6beb62f597bfd453c12ef243dcae3c2d1772",
+        "bytes": 2244
+      },
+      "reservation": "/home/coyang/fpga-artifacts/pynq-session.lock",
+      "all_three_acknowledged": true,
+      "state": "complete",
+      "started_utc": "2026-11-20T07:58:17.036615+00:00",
+      "released_utc": "2026-11-20T08:11:06.795943+00:00",
+      "runs": 2
+    }
+  ],
+  "measurement": {
+    "endpoint": "64 complete steady futex roundtrips, each two switches plus private checked work by child and parent, normalized per roundtrip",
+    "warmup_roundtrips": 32,
+    "paired_repeats_per_workload": 4,
+    "arm_order": "repeat0 off/on, repeat1 on/off, repeat2 off/on, repeat3 on/off",
+    "terminal_handshake": 1,
+    "terminal_scope": "Child parks until parent samples end, then verification/terminal release/join occur outside steady timer. Cumulative prefix status includes the final release.",
+    "included_costs": "Kernel hint trigger cost, synchronization, both resumed requests and interference during the steady timed loop.",
+    "excluded_costs": "Allocation, fork, setup, warmup, independent checksum verification, teardown, printing and any future whole-cell policy setup/reset metric.",
+    "statistic": "Median of per-repeat off-minus-on differences and percentages; stored paired bootstrap 95% CIs, four paired blocks within one workload boot. Positive values mean saved cycles.",
+    "whole_cell_setup_metric_available": false
+  },
+  "workloads": [
+    {
+      "workload": "scan",
+      "session": "session1",
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "scan",
+        "terminal_handshake": 1
+      },
+      "analysis": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/0-scan32-futex-early.analysis.json",
+        "sha256": "fd7dceeea3dab85a399d65062abc16ec6bdbe71d1595f8e61add470f5e040e83",
+        "bytes": 3805
+      },
+      "raw_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/0-scan32-futex-early.log",
+        "sha256": "7b070e372317b3193abb0bf6d155393d0105e5aa3976fae30989e54a34da424e",
+        "bytes": 53282
+      },
+      "runner_status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/0-scan32-futex-early.log.status.json",
+        "sha256": "34196bf20c1bd8f945b2d1f5671a62f927a4ad04f322842f39678a246bff2211",
+        "bytes": 801
+      },
+      "metrics": {
+        "disabled_median_cycles_per_roundtrip": 175107.3046875,
+        "enabled_median_cycles_per_roundtrip": 172990.9453125,
+        "paired_median_saved_cycles_per_roundtrip": 2995.5078125,
+        "paired_95pct_ci_saved_cycles_per_roundtrip": [
+          125.578125,
+          6612.265625
+        ],
+        "paired_median_saved_percent": 1.730289262628944,
+        "paired_95pct_ci_saved_percent": [
+          0.07118387094117087,
+          3.6417953861498438
+        ],
+        "saved_cycles_by_enabled_order": {
+          "0": 1671.890625,
+          "1": 4692.5390625
+        }
+      },
+      "paired_repeats": [
+        {
+          "repeat": 0,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 181566.09375,
+          "enabled_cycles_per_roundtrip": 174953.828125,
+          "saved_cycles_per_roundtrip": 6612.265625,
+          "saved_percent": 3.6417953861498438
+        },
+        {
+          "repeat": 1,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 176413.734375,
+          "enabled_cycles_per_roundtrip": 176288.15625,
+          "saved_cycles_per_roundtrip": 125.578125,
+          "saved_percent": 0.07118387094117087
+        },
+        {
+          "repeat": 2,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 173800.875,
+          "enabled_cycles_per_roundtrip": 171028.0625,
+          "saved_cycles_per_roundtrip": 2772.8125,
+          "saved_percent": 1.595396168172341
+        },
+        {
+          "repeat": 3,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 172540.9375,
+          "enabled_cycles_per_roundtrip": 169322.734375,
+          "saved_cycles_per_roundtrip": 3218.203125,
+          "saved_percent": 1.8651823570855468
+        }
+      ],
+      "prefix_status": {
+        "before": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 0,
+          "accepted_entries": 0,
+          "accepted_triggers": 0,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 0
+        },
+        "after": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 32,
+          "accepted_entries": 320,
+          "accepted_triggers": 255,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 511
+        }
+      },
+      "raw_rows": [
+        {
+          "repeat": 0,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 11620230,
+          "loops": 64
+        },
+        {
+          "repeat": 0,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 11197045,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 11282442,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 11290479,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 11123256,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 10945796,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 10836655,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 11042620,
+          "loops": 64
+        }
+      ],
+      "linux_boots_in_log": 1,
+      "independent_boots_per_workload": 1
+    },
+    {
+      "workload": "lookup",
+      "session": "session1",
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "lookup",
+        "terminal_handshake": 1
+      },
+      "analysis": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/1-lookup32-futex-early.analysis.json",
+        "sha256": "ba8adedee472f93962a2a16bcd97dc7744418419ed716f5d1267bfc06d3d93dd",
+        "bytes": 3822
+      },
+      "raw_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/1-lookup32-futex-early.log",
+        "sha256": "c6e9b79609e196943e0326ede0b78e40393a89bff756ca5cb536df9999739b62",
+        "bytes": 53283
+      },
+      "runner_status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/1-lookup32-futex-early.log.status.json",
+        "sha256": "ecfbab2b83554e5e439ee8c9300cd0c8f37c6f42417b6973f64f802dbfc6366e",
+        "bytes": 810
+      },
+      "metrics": {
+        "disabled_median_cycles_per_roundtrip": 120476.7265625,
+        "enabled_median_cycles_per_roundtrip": 120843.0390625,
+        "paired_median_saved_cycles_per_roundtrip": 268.6640625,
+        "paired_95pct_ci_saved_cycles_per_roundtrip": [
+          -3080.796875,
+          2818.421875
+        ],
+        "paired_median_saved_percent": 0.2219211452697947,
+        "paired_95pct_ci_saved_percent": [
+          -2.6028999672741477,
+          2.3452473373338063
+        ],
+        "saved_cycles_by_enabled_order": {
+          "0": 1562.8203125,
+          "1": -1425.34375
+        }
+      },
+      "paired_repeats": [
+        {
+          "repeat": 0,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 121445.84375,
+          "enabled_cycles_per_roundtrip": 121215.734375,
+          "saved_cycles_per_roundtrip": 230.109375,
+          "saved_percent": 0.18947488682584085
+        },
+        {
+          "repeat": 1,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 120777.5625,
+          "enabled_cycles_per_roundtrip": 120470.34375,
+          "saved_cycles_per_roundtrip": 307.21875,
+          "saved_percent": 0.25436740371374855
+        },
+        {
+          "repeat": 2,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 118360.171875,
+          "enabled_cycles_per_roundtrip": 121440.96875,
+          "saved_cycles_per_roundtrip": -3080.796875,
+          "saved_percent": -2.6028999672741477
+        },
+        {
+          "repeat": 3,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 120175.890625,
+          "enabled_cycles_per_roundtrip": 117357.46875,
+          "saved_cycles_per_roundtrip": 2818.421875,
+          "saved_percent": 2.3452473373338063
+        }
+      ],
+      "prefix_status": {
+        "before": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 0,
+          "accepted_entries": 0,
+          "accepted_triggers": 0,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 0
+        },
+        "after": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 32,
+          "accepted_entries": 320,
+          "accepted_triggers": 255,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 511
+        }
+      },
+      "raw_rows": [
+        {
+          "repeat": 0,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 7772534,
+          "loops": 64
+        },
+        {
+          "repeat": 0,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 7757807,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 7710102,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 7729764,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 7575051,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 7772222,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 7510878,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 7691257,
+          "loops": 64
+        }
+      ],
+      "linux_boots_in_log": 1,
+      "independent_boots_per_workload": 1
+    },
+    {
+      "workload": "parse",
+      "session": "session2",
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "parse",
+        "terminal_handshake": 1
+      },
+      "analysis": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/0-parse32-futex-early.analysis.json",
+        "sha256": "bf135b6c1682d6903076fdf058e565e7e24bf5ccfbb7c3f85eccee4da63f07e4",
+        "bytes": 3814
+      },
+      "raw_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/0-parse32-futex-early.log",
+        "sha256": "426cf184b91171886396e1032b27e9ebbe804e4f5e56caa049e3e371cb6d7afa",
+        "bytes": 53289
+      },
+      "runner_status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/0-parse32-futex-early.log.status.json",
+        "sha256": "63b9565852e0e6fd451a4f40169e4f2a4cc467548e4f3e2f36c0dd34474e301b",
+        "bytes": 808
+      },
+      "metrics": {
+        "disabled_median_cycles_per_roundtrip": 837363.8515625,
+        "enabled_median_cycles_per_roundtrip": 826585.6171875,
+        "paired_median_saved_cycles_per_roundtrip": 11262.0234375,
+        "paired_95pct_ci_saved_cycles_per_roundtrip": [
+          7994.359375,
+          16222.4375
+        ],
+        "paired_median_saved_percent": 1.3473873601348532,
+        "paired_95pct_ci_saved_percent": [
+          0.9555685171271107,
+          1.9057005360611035
+        ],
+        "saved_cycles_by_enabled_order": {
+          "0": 10778.234375,
+          "1": 12592.1875
+        }
+      },
+      "paired_repeats": [
+        {
+          "repeat": 0,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 851258.484375,
+          "enabled_cycles_per_roundtrip": 835036.046875,
+          "saved_cycles_per_roundtrip": 16222.4375,
+          "saved_percent": 1.9057005360611035
+        },
+        {
+          "repeat": 1,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 836607.65625,
+          "enabled_cycles_per_roundtrip": 828613.296875,
+          "saved_cycles_per_roundtrip": 7994.359375,
+          "saved_percent": 0.9555685171271107
+        },
+        {
+          "repeat": 2,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 832416.96875,
+          "enabled_cycles_per_roundtrip": 823455.03125,
+          "saved_cycles_per_roundtrip": 8961.9375,
+          "saved_percent": 1.0766163877530879
+        },
+        {
+          "repeat": 3,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 838120.046875,
+          "enabled_cycles_per_roundtrip": 824557.9375,
+          "saved_cycles_per_roundtrip": 13562.109375,
+          "saved_percent": 1.6181583325166184
+        }
+      ],
+      "prefix_status": {
+        "before": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 0,
+          "accepted_entries": 0,
+          "accepted_triggers": 0,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 0
+        },
+        "after": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 32,
+          "accepted_entries": 320,
+          "accepted_triggers": 255,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 511
+        }
+      },
+      "raw_rows": [
+        {
+          "repeat": 0,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 54480543,
+          "loops": 64
+        },
+        {
+          "repeat": 0,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 53442307,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 53031251,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 53542890,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 53274686,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 52701122,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 52771708,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 53639683,
+          "loops": 64
+        }
+      ],
+      "linux_boots_in_log": 1,
+      "independent_boots_per_workload": 1
+    },
+    {
+      "workload": "chase",
+      "session": "session2",
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "chase",
+        "terminal_handshake": 1
+      },
+      "analysis": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/1-chase32-futex-early.analysis.json",
+        "sha256": "12a822eeb08848652261095e17bc21e77a3e6a6599ce6bc67e3c4d173d482f65",
+        "bytes": 3798
+      },
+      "raw_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/1-chase32-futex-early.log",
+        "sha256": "a530cde08429a914265562c31c0cfd8891cd29b04b6052a26483373556bc5843",
+        "bytes": 53281
+      },
+      "runner_status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session2/1-chase32-futex-early.log.status.json",
+        "sha256": "11b4c356641115358d4662ced9791eb96fa827599f1b482bace7fc737815aa11",
+        "bytes": 808
+      },
+      "metrics": {
+        "disabled_median_cycles_per_roundtrip": 85318.34375,
+        "enabled_median_cycles_per_roundtrip": 85225.0078125,
+        "paired_median_saved_cycles_per_roundtrip": -858.03125,
+        "paired_95pct_ci_saved_cycles_per_roundtrip": [
+          -4479.875,
+          2566.25
+        ],
+        "paired_median_saved_percent": -1.0241477957654774,
+        "paired_95pct_ci_saved_percent": [
+          -5.187523758570047,
+          2.925333290111166
+        ],
+        "saved_cycles_by_enabled_order": {
+          "0": 1205.3515625,
+          "1": -3020.1953125
+        }
+      },
+      "paired_repeats": [
+        {
+          "repeat": 0,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 86358.640625,
+          "enabled_cycles_per_roundtrip": 90838.515625,
+          "saved_cycles_per_roundtrip": -4479.875,
+          "saved_percent": -5.187523758570047
+        },
+        {
+          "repeat": 1,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 84278.046875,
+          "enabled_cycles_per_roundtrip": 84433.59375,
+          "saved_cycles_per_roundtrip": -155.546875,
+          "saved_percent": -0.1845639294782245
+        },
+        {
+          "repeat": 2,
+          "enabled_order": 1,
+          "disabled_cycles_per_roundtrip": 83730.703125,
+          "enabled_cycles_per_roundtrip": 85291.21875,
+          "saved_cycles_per_roundtrip": -1560.515625,
+          "saved_percent": -1.8637316620527304
+        },
+        {
+          "repeat": 3,
+          "enabled_order": 0,
+          "disabled_cycles_per_roundtrip": 87725.046875,
+          "enabled_cycles_per_roundtrip": 85158.796875,
+          "saved_cycles_per_roundtrip": 2566.25,
+          "saved_percent": 2.925333290111166
+        }
+      ],
+      "prefix_status": {
+        "before": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 0,
+          "accepted_entries": 0,
+          "accepted_triggers": 0,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 0
+        },
+        "after": {
+          "ready": 1,
+          "busy": 0,
+          "entry_held": 0,
+          "read_pending": 0,
+          "configured_entries": 32,
+          "next_index": 32,
+          "accepted_entries": 320,
+          "accepted_triggers": 255,
+          "dropped_triggers": 0,
+          "resident_query_pending": 0,
+          "resident_drops": 511
+        }
+      },
+      "raw_rows": [
+        {
+          "repeat": 0,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 5526953,
+          "loops": 64
+        },
+        {
+          "repeat": 0,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 5813665,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 5403750,
+          "loops": 64
+        },
+        {
+          "repeat": 1,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 5393795,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 0,
+          "enabled": 0,
+          "cycles": 5358765,
+          "loops": 64
+        },
+        {
+          "repeat": 2,
+          "order": 1,
+          "enabled": 1,
+          "cycles": 5458638,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 0,
+          "enabled": 1,
+          "cycles": 5450163,
+          "loops": 64
+        },
+        {
+          "repeat": 3,
+          "order": 1,
+          "enabled": 0,
+          "cycles": 5614403,
+          "loops": 64
+        }
+      ],
+      "linux_boots_in_log": 1,
+      "independent_boots_per_workload": 1
+    }
+  ],
+  "interpretation": [
+    "Scan and parse have positive within-boot paired confidence intervals; lookup and chase intervals cross zero, with chase point estimate negative.",
+    "Every workload uses a different request pattern and independent generator-derived correctness checks; none is a representative real application or a zlib/library workload.",
+    "Each workload has one boot, not independent repeated-boot replication. Four different workloads/boots do not form four strata for one workload.",
+    "Controller admission and resident-drop telemetry are cumulative and partly saturated; these logs do not timestamp first-use readiness, expose side-only hits, or isolate extra retained capacity from prefetch.",
+    "No new hardware optimization is accepted by these measurements. Session3 replication/preseed results are deliberately pending."
+  ],
+  "readme_sha256": "d971fa66f07b580cdb74491d9c55a3ee08e31f7443451a54094ef49d91c9a41e"
+}

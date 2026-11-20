@@ -1,0 +1,3 @@
+This note records the second directed test harness failure. The complete mode 0/1/2 regression and counter saturation cases passed before an incomplete synthetic engine transaction blocked the next demand.
+
+The partial-abort reclamation stimulus aborted after one beat but never delivered the remaining ordinary response or last-beat engine completion. The I-cache correctly retained its normal in-flight transaction state. The corrected stimulus drains the ordinary engine response after abort while the capture token stays disabled; its partially captured side entry remains unpublished and replaceable. No RTL change was made for this failure.
