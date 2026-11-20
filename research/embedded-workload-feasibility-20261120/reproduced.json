@@ -1,0 +1,72 @@
+{
+  "scope": "in-memory backup feasibility only; no images written",
+  "python": "3.8.10 (default, Mar 18 2025, 20:04:55) \n[GCC 9.4.0]",
+  "zlib_build": "1.2.11",
+  "zlib_runtime": "1.2.11",
+  "payloads": [
+    {
+      "destination": "opt/bp-resume/plain",
+      "source": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/scheduler_pipe_hint_benchmark_dynamic",
+      "bytes": 22752,
+      "sha256": "e943befa9eed8b9a4258c88c5c822745017c42ef1d5af9f3bc07c56a0eade86a"
+    },
+    {
+      "destination": "opt/bp-resume/plain_resources",
+      "source": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/plain-resources/scheduler_pipe_hint_benchmark_plain_resources_dynamic",
+      "bytes": 22888,
+      "sha256": "ce0a21a67a36f522c46c590cf790b18bc535f09b85e8d8f20fd36e9a591cec70"
+    },
+    {
+      "destination": "opt/bp-resume/probe",
+      "source": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/icache_retention_probe_dynamic",
+      "bytes": 14184,
+      "sha256": "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2"
+    },
+    {
+      "destination": "opt/bp-resume/zlib",
+      "source": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/scheduler_pipe_hint_benchmark_zlib_dynamic",
+      "bytes": 23112,
+      "sha256": "407fd9ec2edb0e67cce2e3b7c7049cc3cfa85809189619d99d13dabc51574308"
+    },
+    {
+      "destination": "opt/bp-resume/libz.so.1",
+      "source": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/libz.so.1",
+      "bytes": 98120,
+      "sha256": "e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b"
+    }
+  ],
+  "candidate": {
+    "path": "usr/bin/ctxtsw_user_smoke",
+    "bytes": 676728,
+    "sha256": "1f8676bdc62331a7790f61aa0496f5ee76ff92fc411e803ec6184d9bab5160a5",
+    "cpio_header_offset": 3773672,
+    "body_offset": 3773808,
+    "end_offset": 4450536
+  },
+  "replacement": {
+    "bytes": 17,
+    "sha256": "275239824e00e61b0a220e61a41791c7e9b4bd726f8b0c27077a338f8131c9dc"
+  },
+  "measurements": [
+    {
+      "scenario": "append_all_five_unchanged",
+      "cpio_bytes": 8376536,
+      "cpio_sha256": "4c76f787f8301452322f4a06412c9797c5583c6eae7fb3218ff357ef38cfd0e6",
+      "gzip_bytes": 3373870,
+      "gzip_sha256": "32c08e9243b7ac5d9450a4aa297613801c204ae6b7cf1ae048fa5dba6abe03ac",
+      "margin_to_fixed_span": -70818
+    },
+    {
+      "scenario": "one_smoke_replacement_plus_all_five",
+      "cpio_bytes": 7699828,
+      "cpio_sha256": "2c2947254da730b962b17ba043f53eef279d1b232b1fb659669e46a6b284e9d7",
+      "gzip_bytes": 3073651,
+      "gzip_sha256": "e10885c820b8141d93fe55b72a03d3c32e80a24493575e9a6c1b737ca8d80955",
+      "margin_to_fixed_span": 229401,
+      "padded_bytes": 3303052,
+      "padded_sha256": "f1b4b240e06ffc5fb5387d775c4dca207abab79683a45d1794600da6b8258aa7",
+      "padding_bytes": 229401,
+      "crc_isize_and_roundtrip_verified": true
+    }
+  ]
+}

@@ -1,0 +1,207 @@
+{
+  "purpose": "Record an offline backup option for embedding exact workload payloads within the accepted fixed-size initramfs window. This is feasibility evidence only, since session9 gzip transfer already passed; no images, NBF, runner changes, builds, or deployments are authorized here.",
+  "state": "size_and_source_format_feasible_only_with_one_existing_file_replacement",
+  "backup_only": true,
+  "target_execution_performed": false,
+  "images_written": false,
+  "accepted_inputs_modified": false,
+  "measurements_origin": "Completed in-memory gzip9 measurements before the instruction to stop further encoders; the retained reproducer was syntax-checked only and was not run again.",
+  "environment": {
+    "python": "3.8.10 (default, Mar 18 2025, 20:04:55) \n[GCC 9.4.0]",
+    "zlib_build": "1.2.11",
+    "zlib_runtime": "1.2.11"
+  },
+  "accepted_cpio": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+    "bytes": 8194560,
+    "sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50"
+  },
+  "accepted_gzip": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio.gz",
+    "bytes": 3303052,
+    "sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf"
+  },
+  "accepted_cpio_entries": 419,
+  "original_trailer_end": 8194468,
+  "original_zero_tail_bytes": 92,
+  "fixed_span": {
+    "kernel_binary_offset": "0xc126b0",
+    "bytes": 3303052,
+    "kernel_end_offset_exclusive": "0xf38d3c",
+    "physical_begin": "0x80e126b0",
+    "physical_end_exclusive": "0x81138d3c",
+    "boundary_requirement": "Final8-byte NBF word has4 rootfs bytes and4 bytes outside rootfs; any future patch must preserve those outside bytes and every other non-rootfs byte."
+  },
+  "candidate": {
+    "cpio_path": "usr/bin/ctxtsw_user_smoke",
+    "bytes": 676728,
+    "sha256": "1f8676bdc62331a7790f61aa0496f5ee76ff92fc411e803ec6184d9bab5160a5",
+    "mode": "0100755",
+    "nlink": 1,
+    "header_offset": 3773672,
+    "body_offset": 3773808,
+    "member_end": 4450536,
+    "exact_matching_staged_artifacts": [
+      {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/sysroot/usr/bin/ctxtsw_user_smoke",
+        "bytes": 676728,
+        "sha256": "1f8676bdc62331a7790f61aa0496f5ee76ff92fc411e803ec6184d9bab5160a5"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/usr/bin/ctxtsw_user_smoke",
+        "bytes": 676728,
+        "sha256": "1f8676bdc62331a7790f61aa0496f5ee76ff92fc411e803ec6184d9bab5160a5"
+      }
+    ],
+    "project_provenance": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/ctxtsw_user_smoke.c",
+        "bytes": 2938,
+        "sha256": "379fb9ea2d8ed8c7d93561e0ceb97cd78d76c105661aa4b0009008bfa4f05676"
+      },
+      "makefile": {
+        "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/Makefile",
+        "bytes": 42022,
+        "sha256": "a4f96d770c61e7efee19301b45d496cb0441eac6c3d3c3131c17331a82115efb"
+      },
+      "build_rule_line": 129,
+      "static_cflags_line": 106,
+      "stage_rootfs_install_line": 515
+    },
+    "unused_scope": "Only the accepted interactive rdinit=/bin/sh workflow and current workload runners. Not unused for a general /sbin/init boot.",
+    "boot_evidence": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session9/0-scan32-futex-early.log",
+      "line": 133,
+      "exact_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh"
+    },
+    "existing_hook_references": [
+      "etc/init.d/S200ctxtsw_user_smoke.sh",
+      "etc/init.d/S200S200ctxtsw_user_smoke.sh"
+    ],
+    "hook_risk": "Both existing legacy hooks invoke this file under rcS; replacing it invalidates the legacy auto-smoke workflow. No removal from accepted rootfs is authorized."
+  },
+  "payloads": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/scheduler_pipe_hint_benchmark_dynamic",
+      "bytes": 22752,
+      "sha256": "e943befa9eed8b9a4258c88c5c822745017c42ef1d5af9f3bc07c56a0eade86a",
+      "destination": "opt/bp-resume/plain"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/plain-resources/scheduler_pipe_hint_benchmark_plain_resources_dynamic",
+      "bytes": 22888,
+      "sha256": "ce0a21a67a36f522c46c590cf790b18bc535f09b85e8d8f20fd36e9a591cec70",
+      "destination": "opt/bp-resume/plain_resources"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/icache_retention_probe_dynamic",
+      "bytes": 14184,
+      "sha256": "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2",
+      "destination": "opt/bp-resume/probe"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/scheduler_pipe_hint_benchmark_zlib_dynamic",
+      "bytes": 23112,
+      "sha256": "407fd9ec2edb0e67cce2e3b7c7049cc3cfa85809189619d99d13dabc51574308",
+      "destination": "opt/bp-resume/zlib"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/libz.so.1",
+      "bytes": 98120,
+      "sha256": "e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b",
+      "destination": "opt/bp-resume/libz.so.1"
+    }
+  ],
+  "appendix": {
+    "bytes": 181976,
+    "format": "newc070701, ordered opt/bp-resume directory then fivefiles thenTRAILER, uid/gid0,mtime0,nlink1,inodes1..6/20,4-bytepadding",
+    "original_file_bytes_changed": false
+  },
+  "append_only_measurement": {
+    "cpio_bytes": 8376536,
+    "cpio_sha256": "4c76f787f8301452322f4a06412c9797c5583c6eae7fb3218ff357ef38cfd0e6",
+    "gzip9_bytes": 3373870,
+    "gzip9_sha256": "32c08e9243b7ac5d9450a4aa297613801c204ae6b7cf1ae048fa5dba6abe03ac",
+    "excess_bytes": 70818,
+    "fits": false
+  },
+  "one_file_replacement_measurement": {
+    "replacement_body": "#!/bin/sh\nexit 1\n",
+    "replacement_bytes": 17,
+    "replacement_sha256": "275239824e00e61b0a220e61a41791c7e9b4bd726f8b0c27077a338f8131c9dc",
+    "scope": "Inventory size bound only; this placeholder was not selected for deployment.",
+    "existing_member_change": "Only smoke c_filesize field and body/padding change; every other existing member header/body/order retained.",
+    "cpio_bytes": 7699828,
+    "cpio_sha256": "2c2947254da730b962b17ba043f53eef279d1b232b1fb659669e46a6b284e9d7",
+    "gzip9_bytes": 3073651,
+    "zero_padding_bytes": 229401,
+    "padded_bytes": 3303052,
+    "padded_sha256": "f1b4b240e06ffc5fb5387d775c4dca207abab79683a45d1794600da6b8258aa7",
+    "fits": true,
+    "crc_isize_full_roundtrip_verified": true,
+    "uncompressed_outputs_written": false
+  },
+  "primary_actual_linux_source": [
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/init/initramfs.c",
+      "bytes": 17546,
+      "sha256": "1039b445af77d589fe18631d65d8a438dad9de1161f7e17654bad9da7166048f",
+      "facts": {
+        "361": "TRAILER clears hard-link table and transitions toReset",
+        "459": "flush_buffer resumes at following newc header after archive padding",
+        "500": "Outer unpack loop accepts compressed/uncompressed members while input length remains",
+        "509": "Outer unpack loop skips arbitrary NUL padding",
+        "519": "decompressor consumes its member and reports my_inptr",
+        "692": "Built-in unpack input length is __initramfs_size"
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/lib/decompress_inflate.c",
+      "bytes": 4873,
+      "sha256": "1f0ef737c3c9978746b84ba252fa365404d8bced3138dd0b170cc929521f9951",
+      "facts": {
+        "53": "flush-output path allocates a32KiB streaming buffer",
+        "156": "Repeated raw inflate plus output flush, so output is not limited to old archive size",
+        "170": "Stops at Z_STREAM_END",
+        "181": "Returns compressed consumed position plus8 trailer bytes; remaining padded input is left to outer loop"
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/usr/initramfs_data.S",
+      "bytes": 1243,
+      "sha256": "a084b18f567d6535d0160a1fe6604b1b113e5c905f462cf15fae810a2a736cbd",
+      "facts": {
+        "25": "Compressed bytes reside in .init.ramfs",
+        "33": "__initramfs_size is compressed incbin byte count, not uncompressed ISIZE"
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/init/main.c",
+      "bytes": 38587,
+      "sha256": "c81e14e12af6758462fc07bb32b04417fdd5a6ccfa69eb98a9bd5bdc5e9bb1af",
+      "facts": {
+        "589": "rdinit overrides ramdisk_execute_command",
+        "1462": "Successful direct execution returns before /sbin/init fallback"
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/Documentation/driver-api/early-userspace/buffer-format.rst",
+      "bytes": 4857,
+      "sha256": "33d806e12230952301bdc1860f554262f746bc97799a3860bf6d00427a29ad60"
+    }
+  ],
+  "baseline_and_pairing_rules": [
+    "Any embedded-payload result is a new rootfs baseline, even with identical kernel instructions and table addresses.",
+    "All matched old/new mode14 arms must use the exact same new padded rootfs bytes and rootfs SHA, plus identical embedded ELF/library bytes.",
+    "Do not pool timings with the old accepted e2f7-rootfs results. Rootfs allocation/boot state changes even when code addresses do not.",
+    "Future fixed-span packaging must prove byte identity outside the rootfs range in kernel payload and all NBF records, including the partial final word.",
+    "Use /opt/bp-resume and explicit LD_LIBRARY_PATH for its unchanged libz; /tmp is a mount target in accepted fstab.",
+    "Keep the original accepted CPIO, gzip, NBF and current runners untouched."
+  ],
+  "reproducer": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workload-feasibility-20261120/reproduce_feasibility.py",
+    "bytes": 6828,
+    "sha256": "e3a64b598f2c740e37347dabf85464434e0972bb7cbfab21759734bcc9c79afe"
+  },
+  "reproducer_validation": "Python compile() syntax pass only; no additional encoder run after stop instruction."
+}
