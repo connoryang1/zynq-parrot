@@ -38,6 +38,7 @@ module uce_icache_replay_tb
    output [3:0] fwd_type_o,
    output [2:0] fwd_size_o,
    output [63:0] fwd_addr_o,
+   output [63:0] data_addr_o,
    output [7:0] fwd_way_o,
    output [2:0] fwd_state_o,
    output fwd_prefetch_o,
@@ -96,6 +97,7 @@ module uce_icache_replay_tb
   assign data_opcode_o = data_pkt.opcode;
   assign stat_opcode_o = stat_pkt.opcode;
   assign data_fill_o = data_pkt.fill_index;
+  assign data_addr_o = 64'(data_pkt.addr);
   assign data_word0_o = data_pkt.data[0+:64];
   assign data_word1_o = data_pkt.data[64+:64];
   assign fwd_type_o = fwd.msg_type;

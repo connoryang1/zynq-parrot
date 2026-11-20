@@ -1,0 +1,16 @@
+[
+  "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+  "-O2",
+  "-I/home/coyang/zynq-parrot-linux-research/software/include",
+  "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+  "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+  "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+  "-DNUM_THREADS=2",
+  "-DBP_NUM_THREADS=2",
+  "-DBP_NUM_CONTEXTS=4",
+  "-DBENCH_DIAGNOSTIC=0",
+  "-DBENCH_BARRIER=0",
+  "-o",
+  "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/on40/program/benchmark.riscv",
+  "/home/coyang/zynq-parrot-linux-research/testing/mt_context_resume_prefix_benchmark.c"
+]

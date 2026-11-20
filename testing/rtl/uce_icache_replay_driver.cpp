@@ -21,6 +21,9 @@ class Test {
   VerilatedFstC trace;
   unsigned cycles = 0, data_writes = 0, side_writes = 0, publishes = 0;
   std::vector<Header> sent;
+  bool expect_normal_addr = false;
+  uint64_t normal_line_addr = 0;
+  unsigned normal_addr_beats = 0;
 
   Handshake step() {
     require(++cycles < 4000, "global I-cache replay cycle limit");
@@ -38,14 +41,27 @@ class Test {
     if (!dut.reset_i && dut.fwd_v_o && dut.fwd_ready_i)
       sent.push_back({dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o,
                       dut.fwd_state_o, dut.fwd_addr_o, bool(dut.fwd_prefetch_o)});
+    if (!dut.reset_i && expect_normal_addr && dut.data_v_o
+        && dut.arrays_accept_i && dut.data_opcode_o == 0) {
+      unsigned beat = 0, mask = dut.data_fill_o;
+      require(mask && !(mask & (mask-1)), "ordinary refill emitted invalid fill mask");
+      while ((1u << beat) != mask) ++beat;
+      require(dut.data_addr_o == normal_line_addr + beat*16,
+              "ordinary refill packet lost physical beat address");
+      ++normal_addr_beats;
+    }
     if (!dut.reset_i && dut.data_v_o && dut.arrays_accept_i
         && dut.data_opcode_o == (dut.side_buffer_o ? 3 : 0)) {
       unsigned beat = 0, mask = dut.data_fill_o;
       require(mask && !(mask & (mask-1)), "installer emitted invalid fill mask");
       while ((1u << beat) != mask) ++beat;
-      require(dut.data_word0_o == seed + beat*2
-              && dut.data_word1_o == seed + beat*2 + 1,
-              "installer corrupted a replay beat");
+      if (!(dut.data_word0_o == seed + beat*2
+            && dut.data_word1_o == seed + beat*2 + 1)) {
+        std::cerr << "beat mismatch mask=" << mask << " expected_index=" << beat
+                  << " normal=" << expect_normal_addr << " data0=0x" << std::hex
+                  << dut.data_word0_o << " addr=0x" << dut.data_addr_o << std::dec << '\n';
+        throw std::runtime_error("installer corrupted a replay beat");
+      }
       if (dut.side_buffer_o) ++side_writes;
       else ++data_writes;
     }
@@ -96,10 +112,15 @@ class Test {
     throw std::runtime_error("memory request timeout");
   }
   void response(const Header &h, unsigned first = 0) {
+    expect_normal_addr = !h.prefetch;
+    normal_line_addr = h.addr & ~UINT64_C(63);
     for (unsigned beat = first; beat < 4; ++beat) {
       dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
       dut.rev_way_i = h.way; dut.rev_state_i = h.state;
       dut.rev_prefetch_i = h.prefetch;
+      // This wrapper's widest configured beat is one complete line, so
+      // even an unaligned request returns sectors in aligned wire order.
+      // The pump separately marks the requested sector as critical.
       dut.rev_word0_i = seed + beat*2; dut.rev_word1_i = seed + beat*2 + 1;
       dut.rev_v_i = 1;
       bool accepted = false;
@@ -109,6 +130,7 @@ class Test {
       require(accepted, "reverse replay response timeout");
       dut.rev_v_i = 0; step();
     }
+    expect_normal_addr = false;
   }
   void one_response_beat(const Header &h) {
     dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
@@ -155,6 +177,14 @@ public:
     require(!sent[0].prefetch && sent[0].addr == 0x8000f000,
             "same-cycle collision did not preserve only ordinary demand");
     response(sent[0]); wait_idle_empty();
+    sent.clear();
+    // An unaligned ordinary request must still expose the current physical
+    // beat address as well as its SRAM index/way and fill mask.
+    request(miss_load, 0x8000f020); wait_sent(1);
+    require(!sent[0].prefetch && sent[0].addr == 0x8000f020,
+            "ordinary request lost its critical-sector offset");
+    response(sent[0]); wait_idle_empty();
+    require(normal_addr_beats == 8, "ordinary physical-address gate missed refill beats");
     sent.clear();
     data_writes = 0; side_writes = 0; publishes = 0;
 

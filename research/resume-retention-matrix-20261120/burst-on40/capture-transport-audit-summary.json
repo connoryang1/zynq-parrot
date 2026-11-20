@@ -1,0 +1,311 @@
+{
+  "purpose": "Source- and trace-bound full-burst capture engagement and AXI timing audit; not an independent performance acceptance.",
+  "scope": "Synthetic full-core nonresident instruction-prefix study; not Linux or FPGA performance.",
+  "blackparrot_revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57",
+  "top_revision_at_recording": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+  "physical_threads": 2,
+  "logical_contexts": 4,
+  "model_latency_ticks": 40,
+  "model_queue_depth": 4,
+  "axi_data_width_bits": 64,
+  "mode_results": [
+    {
+      "mode": 0,
+      "input_fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode0/dump.fst",
+        "sha256": "2c827931243999b39d7074abdbb707f424897ace6233abf146c49d0315e9aa33",
+        "bytes": 24351640
+      },
+      "input_elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode0/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "patched_nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode0/prog.nbf",
+        "sha256": "279585f615445d2c6c64fb975ce40ad7d7d3ebbaad9e16d841d2bef763f5c768",
+        "bytes": 158471
+      },
+      "run_log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode0/run.log",
+        "sha256": "1dd2a35c92f6b7966c3d0b7d6cd2533c8a3fdc5bcf09630fd18075f491a98af5",
+        "bytes": 90507
+      },
+      "analysis": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode0/capture-engagement.json",
+        "sha256": "b86f4cdac42f048de39a06fa9a0945816b7650bb5093ed23c41e72986ed7c566",
+        "bytes": 26627
+      },
+      "commit_window_cycles": 664,
+      "capture_parameter_observed": [
+        1
+      ],
+      "full_run_stats": {
+        "accepted_cached_misses": 39,
+        "accepted_capture_beats": 312,
+        "registered_capture_writes": 312,
+        "completion_epochs": 39,
+        "consumed_cache_fetches": 6253,
+        "timed_prefix_consumed_fetches": 50,
+        "timed_prefix_cache_fetches": 50
+      },
+      "timed_stats": {
+        "consumed_cache_fetches": 70,
+        "accepted_cached_misses": 8,
+        "accepted_capture_beats": 64,
+        "registered_capture_writes": 64,
+        "completion_epochs": 8,
+        "timed_prefix_consumed_fetches": 50,
+        "timed_prefix_cache_fetches": 50
+      },
+      "provenance_issues": [],
+      "prefix_complete_at_begin": [],
+      "max_complete_entries": 27
+    },
+    {
+      "mode": 1,
+      "input_fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode1/dump.fst",
+        "sha256": "f51b6bc67c445f46315fb4b9cc55ff79d6057b69b9b50d4df9d4e64a4e8b5085",
+        "bytes": 24862712
+      },
+      "input_elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode1/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "patched_nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode1/prog.nbf",
+        "sha256": "6c0d6f0d1f08c94a56a5252a91cdf7654d7a6c7150385fbb6d0e23add395dc37",
+        "bytes": 158471
+      },
+      "run_log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode1/run.log",
+        "sha256": "b27a0da98af9f33a3983e5d942d523da3b51ba0438e0253400b0f64f07034bd6",
+        "bytes": 90507
+      },
+      "analysis": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode1/capture-engagement.json",
+        "sha256": "adcb6924090456a5224a72ddf21db308f9a730362321cd448ab5e5946c82906c",
+        "bytes": 26783
+      },
+      "commit_window_cycles": 197,
+      "capture_parameter_observed": [
+        1
+      ],
+      "full_run_stats": {
+        "accepted_cached_misses": 39,
+        "accepted_capture_beats": 312,
+        "registered_capture_writes": 312,
+        "completion_epochs": 39,
+        "consumed_cache_fetches": 6344,
+        "timed_prefix_consumed_fetches": 50,
+        "timed_prefix_cache_fetches": 50
+      },
+      "timed_stats": {
+        "accepted_capture_beats": 8,
+        "registered_capture_writes": 8,
+        "completion_epochs": 1,
+        "consumed_cache_fetches": 69,
+        "timed_prefix_consumed_fetches": 50,
+        "timed_prefix_cache_fetches": 50
+      },
+      "provenance_issues": [],
+      "prefix_complete_at_begin": [
+        "0x80001000",
+        "0x80001040",
+        "0x80001080",
+        "0x800010c0",
+        "0x80001100",
+        "0x80001140",
+        "0x80001180"
+      ],
+      "max_complete_entries": 27
+    },
+    {
+      "mode": 2,
+      "input_fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode2/dump.fst",
+        "sha256": "cbcdf96470d77c53d8c1220848b54aa755bce2decb37dbcc95a44acf6cf22981",
+        "bytes": 24897456
+      },
+      "input_elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode2/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "patched_nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode2/prog.nbf",
+        "sha256": "28e508fc6228c869d22efb1cad3e20688232cee4cb70987b70a040f7d5d76cd6",
+        "bytes": 158471
+      },
+      "run_log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode2/run.log",
+        "sha256": "de43d825e4a669d91027ac76e6bd34087923de482642de76b36494808c49ef59",
+        "bytes": 90507
+      },
+      "analysis": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode2/capture-engagement.json",
+        "sha256": "6aded8be5ff492bde92f64b2435634a74af0f21eca63f776b73b7e4469aaa0aa",
+        "bytes": 26817
+      },
+      "commit_window_cycles": 254,
+      "capture_parameter_observed": [
+        1
+      ],
+      "full_run_stats": {
+        "accepted_cached_misses": 39,
+        "accepted_capture_beats": 312,
+        "registered_capture_writes": 312,
+        "completion_epochs": 39,
+        "consumed_cache_fetches": 6461,
+        "timed_prefix_consumed_fetches": 50,
+        "timed_prefix_cache_fetches": 50
+      },
+      "timed_stats": {
+        "accepted_capture_beats": 16,
+        "registered_capture_writes": 16,
+        "completion_epochs": 2,
+        "consumed_cache_fetches": 68,
+        "timed_prefix_consumed_fetches": 50,
+        "timed_prefix_cache_fetches": 50,
+        "accepted_cached_misses": 1
+      },
+      "provenance_issues": [],
+      "prefix_complete_at_begin": [
+        "0x80001000",
+        "0x80001040",
+        "0x80001080",
+        "0x800010c0",
+        "0x80001100",
+        "0x80001140",
+        "0x80001180"
+      ],
+      "max_complete_entries": 27
+    },
+    {
+      "mode": 3,
+      "input_fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode3/dump.fst",
+        "sha256": "3330a50e87ba48557212dfe6205f647fbdf84a9e93a17131c616398151fe7cbc",
+        "bytes": 24346795
+      },
+      "input_elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode3/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "patched_nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode3/prog.nbf",
+        "sha256": "ea7b30876547c7e018668d9291372d3d6a5a6a0decee58822abb9f0246b39b3d",
+        "bytes": 158471
+      },
+      "run_log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode3/run.log",
+        "sha256": "f1059f45c2c797930e171e1aeda877619256dc5eeae6a7cc992720c7334e9605",
+        "bytes": 90507
+      },
+      "analysis": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode3/capture-engagement.json",
+        "sha256": "250c77aee5ebfaf85f51d1d2e0737fb7a6ab10c72089e5d5545bf85c74e3b685",
+        "bytes": 17953
+      },
+      "commit_window_cycles": 111,
+      "capture_parameter_observed": [
+        1
+      ],
+      "full_run_stats": {
+        "accepted_cached_misses": 32,
+        "accepted_capture_beats": 256,
+        "registered_capture_writes": 256,
+        "completion_epochs": 32,
+        "consumed_cache_fetches": 6228
+      },
+      "timed_stats": {
+        "consumed_cache_fetches": 18,
+        "accepted_cached_misses": 1,
+        "accepted_capture_beats": 8,
+        "registered_capture_writes": 8,
+        "completion_epochs": 1
+      },
+      "provenance_issues": [],
+      "prefix_complete_at_begin": [],
+      "max_complete_entries": 27
+    }
+  ],
+  "axi_mode0_analysis": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/mode0/axi-burst-service.json",
+    "sha256": "2fcbe88f32b293fcbb8bea3adb88a8f2d1c9b61bd7966ec368a13183d1856181",
+    "bytes": 6229
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/tools/analyze_icache_demand_capture_vcd.py",
+      "sha256": "8ab06a7b03e85a1510c2337b1a6a8bf52772fab640200aa50f6e379c595c100e",
+      "bytes": 9312
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/tools/analyze_axi_burst_service_vcd.py",
+      "sha256": "90e532128d1ebd138d0c0378a90beb9343bdd3d4aa5163218267d17a56681c09",
+      "bytes": 5445
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/tools/test_analyze_axi_burst_service_vcd.py",
+      "sha256": "1b3498a5703389f2e8b6ab095f93fdf527dddb7c791016e9302df14e5023cef0",
+      "bytes": 3618
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/tools/cache_overlap_vcd.py",
+      "sha256": "2aca0455d596126fdd9743cdb4ecc3d29a3da18a0833a86ad30f80b1e6f470cb",
+      "bytes": 14922
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/cosim/black-parrot-example/v/top_zynq.sv",
+      "sha256": "06fb7de89d18db8958ade1e7beac863c11418f2e3421cc1e387bc3a40bed44cf",
+      "bytes": 35875
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/cosim/v/bsg_nonsynth_zynq_testbench.sv",
+      "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7",
+      "bytes": 18810
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/cosim/v/bp_nonsynth_axi_mem_pipelined.sv",
+      "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e",
+      "bytes": 10723
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_axi_top.sv",
+      "sha256": "5fe2286b2b90b07b701c386063749428e7de60a3d45edcb66e446257362fcf75",
+      "bytes": 26779
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_icache.sv",
+      "sha256": "c28a4af34322692d1aab94843c00d77a6cedffaf3818ea2bfb062226d45904f1",
+      "bytes": 46467
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+      "sha256": "eac00dc10346da564d89d52435bf156427be263f8756e5811f25fa2b0be211af",
+      "bytes": 89440
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/session.json",
+      "sha256": "36d9991e3c623680ca3584b83b2661f6566942f5edfb2dc2a4c59b205599d73a",
+      "bytes": 56442
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/program/mt_context_resume_prefix_benchmark.c",
+      "sha256": "c99daa1a807d94e6904588045f0e56f6223e43ba51d0f3499d9454f49147f431",
+      "bytes": 3584
+    }
+  ],
+  "report": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/CAPTURE_TRANSPORT_AUDIT.md",
+    "sha256": "c9603416563b088c7006dcbeac54f9ed7c7293555025b2b3d62997168b78f62c"
+  },
+  "parser_fixture_verification": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-on40/parser-fixture-verification.json",
+    "sha256": "07569c95d0f6ae617de2e831c49c4af54c7130ecb15d50fce9b47dd883e3d335"
+  }
+}

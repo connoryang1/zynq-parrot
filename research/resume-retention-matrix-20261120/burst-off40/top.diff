@@ -1,0 +1,1647 @@
+diff --git a/RESEARCH_LEDGER.md b/RESEARCH_LEDGER.md
+index 761ae64f..5892a7de 100644
+--- a/RESEARCH_LEDGER.md
++++ b/RESEARCH_LEDGER.md
+@@ -1313,6 +1313,15 @@ The experiments are valuable where they quantify these effects, expose unexpecte
+ - **Meaning:** prior coverage alone does not establish a need for speculative traffic. A demand-populated equal-capacity RTL control and recurrent natural workloads are necessary before attributing gains to prefetching.
+ - **Limits:** fixed observed arrivals are deliberately not rescheduled Linux execution. Conditional service envelopes include illustrative trigger cost and all response drain; they are neither FPGA measurements nor calibrated cycle-accurate simulations.
+ 
++### RL-124 — Minimal-top latency sweeps are serialized-word controls, not line-DRAM projections
++
++- **Status:** confirmed wrapper-source audit; matched complete controls at the lower setting; detailed transport counters pending
++- **Scope:** `cosim/black-parrot-minimal-example`, two resident/four logical contexts, one fixed ELF, 32-line side store, pipelined responder latency 40/200 and queue four
++- **Claim:** capture on/off at latency 40 gives identical cold/target-warm/source-warm/switch-only windows of 5,544/807/1,474/721 global-CSR cycles. In the target-warm trace, all seven prefix lines are complete in the side store at measured entry, but all fifty timed prefix fetches hit ordinary L1; capture is engaged and provides no unique retained-capacity benefit in this case. The minimal top drives ordinary HP0 AR from AXI-Lite with 32-bit words and ARLEN zero. Its cold 40-to-200 increase of 20,480 counts therefore cannot be interpreted as a 160-cycle whole-line DRAM increase. Full-top `bp_axi_top` instead configures complete-line AXI bursts.
++- **Evidence:** `research/resume-retention-matrix-20261120/on40/` and `off40/`; `research/demand-capture-fullcore-20261120/`; wrapper assignments in `cosim/black-parrot-minimal-example/v/top_zynq.sv` and burst configuration in `import/black-parrot-subsystems/blackparrot/v/bp_axi_top.sv`.
++- **Meaning:** matching physical side-store bytes does not guarantee extra unique lines beyond L1. Use actual burst transport with independently fixed response bandwidth before estimating realistic latency sensitivity; keep minimal-top runs as conditional functional/capacity diagnostics.
++- **Limits:** these are synthetic nonresident prefix roundtrips with equal prior warmup, not whole Linux applications or FPGA measurements. The all-demand admission policy remains different from selected-prefix retention.
++
+ ## Superseded or rejected findings
+ 
+ ### RS-001 — The 418/396 result is an intermediate configuration
+@@ -1387,6 +1396,12 @@ For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill
+ 
+ ## Delta log
+ 
++- **2026-11-20 — Full-top host diagnostic scoped to its hierarchy:** the first full-burst simulator build completed RTL elaboration but C++ compilation failed because the shared host header unconditionally named minimal-top processor members. Gate the optional timeout snapshot and CSR generated-type include behind `BP_SIM_MINIMAL_PROCESSOR_STATE`, set only by the minimal design; the full design never calls that snapshot. No runtime or latency result exists from the failed build; full-top compilation and a fresh minimal known-good flow must both pass before accepting this infrastructure correction.
++
++- **2026-11-20 — Full-core temporary output restored after clean:** the first clean full-core build removed the `obj_dir` symlink prepared for RAM-backed output. Its generated code then reached the nearly full disk; the owned build/remaining compiler Make process were stopped, the failed generated directory was preserved in approved RAM space, and no runtime result was accepted. Create and verify the output symlink **after** clean, keep the FST in the same approved temporary area, and require a successful complete rebuild before simulation.
++
++- **2026-11-20 — Sparse host-suite fixture restored:** the expanded Linux host suite ran 349 tests; 345 passed and four failed before assertions because sparse checkout omitted the historical prefix JSON required by `test_icache_prefix.py`. Materialize that exact fixture from `git show HEAD:logs/icache-prefix-status-20261106/stable-cfs-anchor-prefix16-results.json` before rerunning the four tests; no feature behavior was inferred from the failed fixture loads.
++
+ - **2026-11-20 — Isolated checkout and board preflight:** the first full worktree checkout exhausted free space and was automatically removed by Git; a no-checkout worktree followed by sparse checkout excluding archived `logs/` succeeded (the new worktree's missing `info/` directory had to be created first). Existing archived evidence was preserved. The first board workload invocation failed before SSH/NBF execution because sandbox network access was denied, while the independent board recovery was still pending. Keep recovery completion as a strict dependency, use the approved network escalation, retain failed statuses, and never infer guest behavior from these host preflight failures.
+ 
+ - **2026-11-08 — Patch whitespace recheck path corrected:** after converting patch 0026 to zero-context hunks so staged whitespace validation would accept the patch-as-data, the first reverse dry-run used a repository-root-relative filename from inside `linux-tests/` and failed before opening the file. Use the local `kernel-patches/0026-...patch` path from that directory; only the corrected reverse dry-run is evidence.
+diff --git a/cosim/black-parrot-minimal-example/Makefile.design b/cosim/black-parrot-minimal-example/Makefile.design
+index 2bfb1f51..fbaf5bc0 100644
+--- a/cosim/black-parrot-minimal-example/Makefile.design
++++ b/cosim/black-parrot-minimal-example/Makefile.design
+@@ -13,6 +13,9 @@ HOST_PROGRAM ?= $(DESIGN_DIR)/ps.cpp
+ 
+ BP_NCPUS ?= 1
+ 
++# Only this design exposes the direct core hierarchy used by timeout snapshots.
++CFLAGS += -DBP_SIM_MINIMAL_PROCESSOR_STATE
++
+ PROG ?= hello_world
+ NBF_FILE ?= prog.nbf
+ 
+diff --git a/cosim/include/verilator/bsg_zynq_pl.h b/cosim/include/verilator/bsg_zynq_pl.h
+index 76745e38..b19b9b61 100644
+--- a/cosim/include/verilator/bsg_zynq_pl.h
++++ b/cosim/include/verilator/bsg_zynq_pl.h
+@@ -22,7 +22,9 @@
+ 
+ #include "Vbsg_nonsynth_zynq_testbench.h"
+ #include "Vbsg_nonsynth_zynq_testbench___024root.h"
++#ifdef BP_SIM_MINIMAL_PROCESSOR_STATE
+ #include "Vbsg_nonsynth_zynq_testbench_bp_be_csr__Bz2.h"
++#endif
+ #include "bsg_zynq_pl_simulation.h"
+ #include "verilated.h"
+ 
+@@ -119,6 +121,7 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
+     // the simulated program has not brought up its console yet. This is a
+     // simulation-only observation of Verilator state; it does not perturb RTL.
+     void print_processor_state(void) {
++#ifdef BP_SIM_MINIMAL_PROCESSOR_STATE
+         auto *root = tb->rootp;
+         auto *csr = root
+             ->__PVT__bsg_nonsynth_zynq_testbench__DOT__dut__DOT__top_fpga_inst__DOT__blackparrot__DOT__core_minimal__DOT__be__DOT__calculator__DOT__pipe_sys__DOT__csr__DOT__gen_csr__BRA__0__KET____DOT__csr_inst;
+@@ -140,6 +143,9 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
+                     (unsigned long long)csr->__PVT__dpc_reg__DOT__data_r << 1,
+                     (unsigned long long)csr->__PVT__mtvec_reg__DOT__data_r << 2,
+                     (unsigned long long)csr->__PVT__satp_reg__DOT__data_r);
++#else
++        bsg_pr_info("ps.cpp: processor snapshot unavailable for this hierarchy\n");
++#endif
+     }
+ 
+     void *allocate_dram(unsigned long len_in_bytes,
+diff --git a/cosim/mk/Makefile.verilator b/cosim/mk/Makefile.verilator
+index 47a401b0..fe1ad0c1 100644
+--- a/cosim/mk/Makefile.verilator
++++ b/cosim/mk/Makefile.verilator
+@@ -69,7 +69,9 @@ MODEL_AXI_DEPTH_DEFINE := $(lastword $(filter BP_AXI_MEM_READ_QUEUE_DEPTH BP_AXI
+ MODEL_AXI_LATENCY := $(if $(MODEL_AXI_LATENCY_DEFINE),$(if $(filter BP_AXI_MEM_READ_LATENCY,$(MODEL_AXI_LATENCY_DEFINE)),1,$(patsubst BP_AXI_MEM_READ_LATENCY=%,%,$(MODEL_AXI_LATENCY_DEFINE))),40)
+ MODEL_AXI_DEPTH := $(if $(MODEL_AXI_DEPTH_DEFINE),$(if $(filter BP_AXI_MEM_READ_QUEUE_DEPTH,$(MODEL_AXI_DEPTH_DEFINE)),1,$(patsubst BP_AXI_MEM_READ_QUEUE_DEPTH=%,%,$(MODEL_AXI_DEPTH_DEFINE))),4)
+ MODEL_AXI_MEM_TAG := $(if $(filter BP_AXI_MEM_PIPELINED BP_AXI_MEM_PIPELINED=%,$(DEFINES)),-axipipe-lat$(MODEL_AXI_LATENCY)-q$(MODEL_AXI_DEPTH),)
+-MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)
++# Capture is an ifdef-selected hardware mode: even MACRO=0 enables it.
++MODEL_ICACHE_DEMAND_CAPTURE_TAG := $(if $(filter BP_ICACHE_REPLAY_DEMAND_CAPTURE BP_ICACHE_REPLAY_DEMAND_CAPTURE=%,$(DEFINES)),-icapture,)
++MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)
+ MODEL_CONFIG_STAMP := obj_dir/.build_config-$(MODEL_CONFIG_TAG)
+ 
+ $(MODEL_CONFIG_STAMP): | $(BUILD_COLLATERAL)
+diff --git a/import/black-parrot b/import/black-parrot
+index 684e5d8b..ffc9bd76 160000
+--- a/import/black-parrot
++++ b/import/black-parrot
+@@ -1 +1 @@
+-Subproject commit 684e5d8bcc45306a1cd02f89a521542f2e27e8ef
++Subproject commit ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57
+diff --git a/linux-tests/Makefile b/linux-tests/Makefile
+index 4655b7d7..6ba2f212 100644
+--- a/linux-tests/Makefile
++++ b/linux-tests/Makefile
+@@ -41,6 +41,8 @@ PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmar
+ TAGGED_REPLAY_BENCH_APP := $(OUT)/scheduler_tagged_replay_benchmark
+ TAGGED_REPLAY_BENCH_DYNAMIC_APP := $(OUT)/scheduler_tagged_replay_benchmark_dynamic
+ PIPE_HINT_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_dynamic
++PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_dynamic
++PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_dynamic
+ PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
+ PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
+ BP_HOST_CC ?= cc
+@@ -76,8 +78,9 @@ LINUX_DATA_PATCHES := \
+ 	$(CURDIR)/kernel-patches/0023-blackparrot-explicit-instruction-prefix-trigger.patch \
+ 	$(CURDIR)/kernel-patches/0024-blackparrot-select-instruction-prefix-range.patch \
+ 	$(CURDIR)/kernel-patches/0025-blackparrot-explicit-data-replay-trigger.patch \
+-	$(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch
+-LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0025-blackparrot-explicit-data-replay-trigger.patch
++	$(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch \
++	$(CURDIR)/kernel-patches/0027-blackparrot-icache-retention-control.patch
++LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch
+ LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
+ GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
+ GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
+@@ -216,6 +219,16 @@ $(PIPE_HINT_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.
+ 	@mkdir -p $(OUT)
+ 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+ 
++# A distinct ELF preserves the exact plain-workload comparison corpus.
++$(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
++	@mkdir -p $(OUT)
++	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -o $@ $< -lz >&2
++
++# Keep runtime-policy/whole-cell instrumentation out of the historical ELF.
++$(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
++	@mkdir -p $(OUT)
++	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
++
+ $(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
+ 	@mkdir -p $(OUT)
+ 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
+@@ -282,6 +295,23 @@ emit-pipe-hint-benchmark-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benc
+ 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
+ 	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
+ 
++.PHONY: pipe-hint-benchmark-zlib-dynamic emit-pipe-hint-benchmark-zlib-dynamic-transfer
++pipe-hint-benchmark-zlib-dynamic: $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP)
++
++.PHONY: pipe-hint-benchmark-retention-dynamic emit-pipe-hint-benchmark-retention-dynamic-transfer
++pipe-hint-benchmark-retention-dynamic: $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP)
++
++emit-pipe-hint-benchmark-retention-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-dynamic
++	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'
++	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
++	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
++
++# The guest destination stays compatible with the hash-bound serialized runner.
++emit-pipe-hint-benchmark-zlib-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-zlib-dynamic
++	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'
++	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
++	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
++
+ emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
+ 	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture.b64'
+ 	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture.b64|"
+@@ -390,6 +420,9 @@ stage-linux-data-preview: stage-linux-prefix-trigger
+ 	@if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+ 		< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+ 		echo "physical data-preview stack already applied"; \
++	elif grep -Eq 'PR_BP_ICACHE_RETENTION_(CONTROL|STATUS)|bp_icache_retention_' \
++		$(LINUX_BUILD_DIR)/kernel/sys.c $(LINUX_BUILD_DIR)/include/uapi/linux/prctl.h; then \
++		echo "partial I-retention patch; restore the complete previous stack before staging" >&2; exit 1; \
+ 	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+ 		< $(LINUX_DATA_PREVIOUS_TAIL) >/dev/null 2>&1; then \
+ 		patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+diff --git a/linux-tests/analyze_scheduler_pipe_hint.py b/linux-tests/analyze_scheduler_pipe_hint.py
+index 0ed17905..68744254 100644
+--- a/linux-tests/analyze_scheduler_pipe_hint.py
++++ b/linux-tests/analyze_scheduler_pipe_hint.py
+@@ -14,10 +14,10 @@ from analyze_scheduler_tagged_replay import percentile
+ 
+ CONFIG = re.compile(
+     r"^PIPE_HINT_CONFIG loops=(\d+) repeats=(\d+) warmup=(\d+) "
+-    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed))?"
++    r"configured_entries=(\d+)(?: policy=(continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed|retention-rr|retention-first))?"
+     r"(?: sync=(pipe|futex))?(?: profile=(plain|legs))?"
+     r"(?: working_set_kib=(\d+))?"
+-    r"(?: workload=(scan|lookup|parse|chase))?"
++    r"(?: workload=(scan|lookup|parse|chase|deflate))?"
+     r"(?: terminal_handshake=([01]))?$", re.MULTILINE
+ )
+ ROW = re.compile(
+@@ -34,6 +34,100 @@ STATUS = re.compile(
+     re.MULTILINE,
+ )
+ 
++WHOLE = re.compile(
++    r"^PIPE_HINT_WHOLE repeat=(\d+) order=(\d+) enabled=([01]) "
++    r"cycles=(\d+) loops=(\d+)$", re.MULTILINE
++)
++RETENTION = re.compile(
++    r"^PIPE_HINT_RETENTION repeat=(\d+) order=(\d+) enabled=([01]) "
++    r"raw=0x([0-9a-fA-F]{16}) capability=([01]) mode=([0-3]) "
++    r"completed=([01]) consumed_fetches=(\d+)$", re.MULTILINE
++)
++RETENTION_POLICIES = {"retention-rr": 1, "retention-first": 2}
++
++
++def retention_rows(text, parsed, policy, loops, repeats, profile):
++    """Bind every raw post-teardown diagnostic and whole cell to steady work."""
++    if loops <= 0 or repeats < 2:
++        raise ValueError("retention comparison requires positive loops and at least two repeats")
++    patterns = {"CONFIG": CONFIG, "RESULT": ROW, "LEGS": LEGS,
++                "WHOLE": WHOLE, "RETENTION": RETENTION, "STATUS": STATUS,
++                "PASS": re.compile(r"^PIPE_HINT_PASS$")}
++    actual_markers = []
++    for line in text.splitlines():
++        if not line.startswith("PIPE_HINT_"):
++            continue
++        name = line.split(" ", 1)[0].removeprefix("PIPE_HINT_")
++        if name not in patterns or not patterns[name].fullmatch(line):
++            raise ValueError("malformed or unexpected retention protocol marker")
++        actual_markers.append(name)
++    cell_markers = ["RESULT"] + (["LEGS"] if profile == "legs" else []) + ["WHOLE", "RETENTION"]
++    if actual_markers != ["CONFIG"] + cell_markers * (repeats * 2) + ["STATUS", "PASS"]:
++        raise ValueError("retention cell markers missing, duplicated, or out of order")
++    expected_keys = [(repeat, order, (repeat & 1) ^ order)
++                     for repeat in range(repeats) for order in range(2)]
++    key = lambda row: (row["repeat"], row["order"], row["enabled"])
++    if [key(row) for row in parsed] != expected_keys:
++        raise ValueError("retention result row order or identity differs")
++    whole = [dict(repeat=int(a), order=int(b), enabled=int(c),
++                  cycles=int(d), loops=int(e)) for a,b,c,d,e in WHOLE.findall(text)]
++    diagnostics = []
++    allowed = (1 << 63) | (0xffff << 16) | 7
++    for a,b,c,raw_hex,cap,mode,completed,consumed in RETENTION.findall(text):
++        raw = int(raw_hex, 16)
++        decoded = {"capability": raw >> 63, "mode": raw & 3,
++                   "completed": (raw >> 2) & 1,
++                   "consumed_fetches": (raw >> 16) & 0xffff}
++        printed = dict(zip(decoded, map(int, (cap,mode,completed,consumed))))
++        if raw & ~allowed or decoded != printed:
++            raise ValueError("retention raw status has forbidden bits or printed decode mismatch")
++        enabled = int(c)
++        if decoded["capability"] != 1 or decoded["mode"] != (RETENTION_POLICIES[policy] if enabled else 0):
++            raise ValueError("retention capability or policy mode mismatch")
++        if not enabled and (decoded["completed"] or decoded["consumed_fetches"]):
++            raise ValueError("disabled retention cell contains stale capture or side-hit diagnostics")
++        diagnostics.append(dict(repeat=int(a), order=int(b), enabled=enabled,
++                                raw=f"0x{raw:016x}", **decoded))
++    if [key(row) for row in whole] != expected_keys or [key(row) for row in diagnostics] != expected_keys:
++        raise ValueError("whole/retention rows are not a bijection with steady results")
++    if profile == "legs":
++        leg_keys = [tuple(map(int, row[:3])) for row in LEGS.findall(text)]
++        if leg_keys != expected_keys:
++            raise ValueError("retention leg row order or identity differs")
++    for steady, cell in zip(parsed, whole):
++        if cell["loops"] != loops or cell["cycles"] < steady["cycles"]:
++            raise ValueError("whole cell loop count differs or cycles are below steady result")
++    return whole, diagnostics
++
++
++def summarize_whole_cells(rows, repeats, bootstrap_samples):
++    """Keep complete-cell paired uncertainty separate from steady throughput."""
++    pairs = []
++    for repeat in range(repeats):
++        cells = [row for row in rows if row["repeat"] == repeat]
++        disabled = next(row for row in cells if not row["enabled"])
++        enabled = next(row for row in cells if row["enabled"])
++        pairs.append({"repeat": repeat, "enabled_order": enabled["order"],
++                      "disabled_cycles_per_cell": disabled["cycles"],
++                      "enabled_cycles_per_cell": enabled["cycles"],
++                      "saved_cycles_per_cell": disabled["cycles"] - enabled["cycles"],
++                      "saved_percent": 100.0 * (disabled["cycles"] - enabled["cycles"]) / disabled["cycles"]})
++    rng = random.Random(0x57484f4c)
++    saved = [pair["saved_cycles_per_cell"] for pair in pairs]
++    percent = [pair["saved_percent"] for pair in pairs]
++    boot = [statistics.median(rng.choices(saved, k=len(saved))) for _ in range(bootstrap_samples)]
++    boot_percent = [statistics.median(rng.choices(percent, k=len(percent))) for _ in range(bootstrap_samples)]
++    return {"pairs": pairs, "metrics": {
++        "disabled_median_cycles_per_cell": statistics.median(pair["disabled_cycles_per_cell"] for pair in pairs),
++        "enabled_median_cycles_per_cell": statistics.median(pair["enabled_cycles_per_cell"] for pair in pairs),
++        "paired_median_saved_cycles_per_cell": statistics.median(saved),
++        "paired_95pct_ci_saved_cycles_per_cell": [percentile(boot, 0.025), percentile(boot, 0.975)],
++        "paired_median_saved_percent": statistics.median(percent),
++        "paired_95pct_ci_saved_percent": [percentile(boot_percent, 0.025), percentile(boot_percent, 0.975)],
++        "saved_cycles_by_enabled_order": {str(order): statistics.median(
++            pair["saved_cycles_per_cell"] for pair in pairs if pair["enabled_order"] == order) for order in (0,1)}},
++        "scope": "Complete measured cell includes allocation, fork, setup, warmup, steady work, checks, teardown, status reads and policy reset; printed rows are outside timing."}
++
+ 
+ def sha256(path):
+     return hashlib.sha256(path.read_bytes()).hexdigest()
+@@ -74,6 +168,10 @@ def analyze(path, bootstrap_samples=20000):
+         if marker not in text:
+             raise ValueError(f"missing terminal marker {marker}")
+ 
++    if "zlib_library_sha256" in runner and not re.fullmatch(
++            r"[0-9a-f]{64}", str(runner["zlib_library_sha256"])):
++        raise ValueError("status lacks valid zlib_library_sha256")
++
+     configs = CONFIG.findall(text)
+     statuses = STATUS.findall(text)
+     if len(configs) != 1 or len(statuses) != 1:
+@@ -131,6 +229,10 @@ def analyze(path, bootstrap_samples=20000):
+             raise ValueError("profiled handoffs exceed complete transaction")
+         row.update(child_resume=leg["child_resume"],
+                    parent_resume=leg["parent_resume"])
++    whole_rows, diagnostics = (retention_rows(text, parsed, policy, loops, repeats, profile)
++                               if policy in RETENTION_POLICIES else (None, None))
++    if policy not in RETENTION_POLICIES and (WHOLE.search(text) or RETENTION.search(text)):
++        raise ValueError("retention markers require a retention policy")
+     pairs = []
+     for repeat in range(repeats):
+         rows = [row for row in parsed if row["repeat"] == repeat]
+@@ -181,7 +283,12 @@ def analyze(path, bootstrap_samples=20000):
+             "resident_query_pending", "resident_drops")):
+         raise ValueError("instruction-prefix baseline is not clean")
+     expected_entries = min(0xffff, repeats * configured)
+-    if policy == "preseed":
++    if policy in RETENTION_POLICIES:
++        if (int(printed_dropped) or any(after[key] for key in (
++                "busy", "entry_held", "read_pending", "next_index", "accepted_entries",
++                "accepted_triggers", "dropped_triggers", "resident_query_pending", "resident_drops"))):
++            raise ValueError("retention cell contains stale explicit prefix hint activity")
++    elif policy == "preseed":
+         expected_triggers = min(0xff, repeats)
+         expected_resident_drops = 0
+         entries_ok = after["accepted_entries"] == expected_entries
+@@ -207,7 +314,7 @@ def analyze(path, bootstrap_samples=20000):
+         expected_resident_drops = min(
+             0x1ff, (total_triggers - repeats) * configured)
+         entries_ok = after["accepted_entries"] == expected_entries
+-    if (after["next_index"] != configured
++    if policy not in RETENTION_POLICIES and (after["next_index"] != configured
+             or not entries_ok
+             or after["accepted_triggers"] != expected_triggers
+             or after["resident_drops"] != expected_resident_drops
+@@ -254,10 +361,11 @@ def analyze(path, bootstrap_samples=20000):
+             metrics[f"paired_median_{key}"] = statistics.median(values)
+             metrics[f"paired_95pct_ci_{key}"] = [
+                 percentile(draws, 0.025), percentile(draws, 0.975)]
+-    mechanism = ("kernel-integrated instruction replay"
++    mechanism = ("demand-populated instruction retention" if policy in RETENTION_POLICIES else
++                 "kernel-integrated instruction replay"
+                  if policy in ("futex-early", "futex-early-both")
+                  else "matched explicit instruction hints")
+-    return {
++    result = {
+         "purpose": (f"Measure sustained {sync} roundtrip throughput with "
+                     f"{workload} work and {mechanism}."),
+         "transcript": str(path),
+@@ -282,6 +390,18 @@ def analyze(path, bootstrap_samples=20000):
+         ],
+     }
+ 
++    if "zlib_library_sha256" in runner:
++        result["identity"]["zlib_library_sha256"] = runner["zlib_library_sha256"]
++    if policy in RETENTION_POLICIES:
++        result["whole_cell"] = summarize_whole_cells(whole_rows, repeats, bootstrap_samples)
++        result["retention_status"] = {
++            "rows": diagnostics,
++            "scope": "Actual raw hardware cumulative consumed side-only I-cache fetch responses, after the setup policy write/reset through warmup, steady work and teardown until the status read; not steady-only retired instructions or cache lines.",
++            "mechanism": "Demand admission reuses the existing retained capacity and refill stream without additional prefetch traffic; mode 1 is RR, mode 2 pins first completed lines per bank. Zero consumed fetches and negative paired effects remain valid controls."}
++        result["interpretation_limits"].append(
++            "Retention diagnostics are post-teardown cumulative; positive counts do not alone prove a complete-cell benefit, and zero counts do not invalidate a negative control.")
++    return result
++
+ 
+ def main(argv=None):
+     parser = argparse.ArgumentParser(description=__doc__)
+diff --git a/linux-tests/compare_scheduler_pipe_hint_policies.py b/linux-tests/compare_scheduler_pipe_hint_policies.py
+index 44a6807f..9769f743 100644
+--- a/linux-tests/compare_scheduler_pipe_hint_policies.py
++++ b/linux-tests/compare_scheduler_pipe_hint_policies.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Compare seed-only and continuous pipe hints across independent boots."""
++"""Compare retained-prefix and refresh policies across independent boots."""
+ 
+ import argparse
+ import json
+@@ -32,21 +32,32 @@ def _draw_hierarchical(rng, strata):
+ 
+ 
+ def compare(seed_paths, continuous_paths, bootstrap_samples=20000,
+-            baseline_policy="seed"):
+-    """Return continuous-minus-baseline effects with strict identity."""
+-    if baseline_policy not in ("seed", "preseed", "continuous-unmatched"):
++            baseline_policy="seed", comparison_policy="continuous"):
++    """Return comparison-minus-baseline effects with strict identity.
++
++    The original positional path arguments and continuous output aliases remain
++    supported; new callers can select deployment-shaped futex policies.
++    """
++    if baseline_policy not in ("seed", "preseed", "continuous-unmatched", "futex-early"):
+         raise ValueError(
+-            "baseline policy must be seed, preseed, or continuous-unmatched")
++            "baseline policy must be seed, preseed, continuous-unmatched, or futex-early")
++    if comparison_policy not in ("continuous", "futex-early", "futex-early-both"):
++        raise ValueError("comparison policy must be continuous, futex-early, or futex-early-both")
++    if comparison_policy == baseline_policy:
++        raise ValueError("comparison and baseline policies must differ")
+     if len(seed_paths) < 2 or len(continuous_paths) < 2:
+         raise ValueError("each policy requires at least two independent boots")
++    all_paths = [path.resolve() for path in (*seed_paths, *continuous_paths)]
++    if len(set(all_paths)) != len(all_paths):
++        raise ValueError("independent boots require distinct transcript paths")
+     if bootstrap_samples <= 0:
+         raise ValueError("bootstrap sample count must be positive")
+     seed = _load(seed_paths, baseline_policy)
+-    continuous = _load(continuous_paths, "continuous")
++    continuous = _load(continuous_paths, comparison_policy)
+     reference_identity = seed[0]["identity"]
+     reference_config = {key: value for key, value in seed[0]["config"].items()
+                         if key != "policy"}
+-    for label, results in (("seed", seed), ("continuous", continuous)):
++    for label, results in ((baseline_policy, seed), (comparison_policy, continuous)):
+         for index, result in enumerate(results):
+             config = {key: value for key, value in result["config"].items()
+                       if key != "policy"}
+@@ -88,39 +99,46 @@ def compare(seed_paths, continuous_paths, bootstrap_samples=20000,
+     }
+     output = {
+         "purpose": (
+-            "Measure the incremental sustained benefit of continuous hints "
++            f"Measure the incremental sustained benefit of {comparison_policy} "
+             f"over {baseline_policy} using one exact ELF."
+         ),
+         "baseline_policy": baseline_policy,
++        "comparison_policy": comparison_policy,
+         "identity": reference_identity,
+         "config": reference_config,
+-        "seed_replicates": [str(path) for path in seed_paths],
+-        "continuous_replicates": [str(path) for path in continuous_paths],
++        "baseline_replicates": [str(path) for path in seed_paths],
++        "comparison_replicates": [str(path) for path in continuous_paths],
+         "bootstrap_samples": bootstrap_samples,
+-        "seed_saved_cycles_per_boot": [statistics.median(boot)
+-                                       for boot in seed_cycles],
+-        "continuous_saved_cycles_per_boot": [statistics.median(boot)
+-                                             for boot in continuous_cycles],
+-        "continuous_minus_baseline": effect,
++        "baseline_saved_cycles_per_boot": [statistics.median(boot) for boot in seed_cycles],
++        "comparison_saved_cycles_per_boot": [statistics.median(boot) for boot in continuous_cycles],
++        "comparison_minus_baseline": effect,
+     }
+-    if baseline_policy == "seed":
+-        output["continuous_minus_seed"] = effect
++    if comparison_policy == "continuous":
++        output["seed_replicates"] = output["baseline_replicates"]
++        output["continuous_replicates"] = output["comparison_replicates"]
++        output["seed_saved_cycles_per_boot"] = output["baseline_saved_cycles_per_boot"]
++        output["continuous_saved_cycles_per_boot"] = output["comparison_saved_cycles_per_boot"]
++        output["continuous_minus_baseline"] = effect
++        if baseline_policy == "seed":
++            output["continuous_minus_seed"] = effect
+     return output
+ 
+ 
+ def main(argv=None):
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--seed", nargs="+", required=True, type=Path)
+-    parser.add_argument("--continuous", nargs="+", required=True, type=Path)
++    parser.add_argument("--seed", "--baseline", nargs="+", required=True, type=Path)
++    parser.add_argument("--continuous", "--comparison", nargs="+", required=True, type=Path)
+     parser.add_argument("--baseline-policy",
+-                        choices=("seed", "preseed", "continuous-unmatched"),
++                        choices=("seed", "preseed", "continuous-unmatched", "futex-early"),
+                         default="seed")
++    parser.add_argument("--comparison-policy", choices=("continuous", "futex-early", "futex-early-both"),
++                        default="continuous")
+     parser.add_argument("--bootstrap-samples", type=int, default=20000)
+     parser.add_argument("--output", type=Path)
+     args = parser.parse_args(argv)
+     try:
+         result = compare(args.seed, args.continuous, args.bootstrap_samples,
+-                         args.baseline_policy)
++                         args.baseline_policy, args.comparison_policy)
+     except ValueError as error:
+         raise SystemExit(str(error)) from error
+     rendered = json.dumps(result, indent=2) + "\n"
+diff --git a/linux-tests/resume_workload.h b/linux-tests/resume_workload.h
+index 0558fb55..798df0fc 100644
+--- a/linux-tests/resume_workload.h
++++ b/linux-tests/resume_workload.h
+@@ -10,7 +10,16 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-enum resume_workload_kind { resume_scan, resume_lookup, resume_parse, resume_chase };
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++#include <zlib.h>
++#define RESUME_ZLIB_BLOCK_BYTES 4096U
++#endif
++
++enum resume_workload_kind { resume_scan, resume_lookup, resume_parse, resume_chase
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	, resume_deflate
++#endif
++};
+ 
+ struct resume_lookup_slot { uint64_t key, value; };
+ struct resume_chase_node { uint64_t next, value; unsigned char padding[48]; };
+@@ -20,6 +29,17 @@ struct resume_workload {
+ 	unsigned char *data;
+ 	size_t bytes, count, records, cursor;
+ 	uint64_t seed, runs, constant_expected;
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	/* bytes is the immutable input corpus, not the full working footprint.
++	 * Scratch additionally occupies compressBound(4096) + 4096 bytes, plus
++	 * four expected-CRC bytes per corpus block. zlib's own allocations and
++	 * all compress2/uncompress work remain inside each measured request.
++	 */
++	unsigned char *zlib_compressed, *zlib_output;
++	uint32_t *zlib_expected_crc;
++	size_t zlib_blocks, zlib_compressed_capacity;
++	int zlib_error;
++#endif
+ };
+ 
+ static inline uint64_t resume_workload_mix(uint64_t x)
+@@ -41,10 +61,80 @@ static inline uint64_t resume_workload_key(const struct resume_workload *w,
+ 
+ static inline void resume_workload_free(struct resume_workload *w)
+ {
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	free(w->zlib_compressed);
++	free(w->zlib_output);
++	free(w->zlib_expected_crc);
++#endif
+ 	free(w->data);
+ 	memset(w, 0, sizeof(*w));
+ }
+ 
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++static inline int resume_workload_zlib_prepare(struct resume_workload *w)
++{
++	if (!w->bytes) return 0;
++	w->zlib_blocks = 1 + (w->bytes - 1) / RESUME_ZLIB_BLOCK_BYTES;
++	w->zlib_compressed_capacity = (size_t)compressBound(RESUME_ZLIB_BLOCK_BYTES);
++	w->zlib_compressed = malloc(w->zlib_compressed_capacity);
++	w->zlib_output = malloc(RESUME_ZLIB_BLOCK_BYTES);
++	w->zlib_expected_crc = calloc(w->zlib_blocks, sizeof(*w->zlib_expected_crc));
++	if (!w->zlib_compressed || !w->zlib_output || !w->zlib_expected_crc) {
++		int saved_errno = errno;
++		resume_workload_free(w);
++		errno = saved_errno ? saved_errno : ENOMEM;
++		return -1;
++	}
++	/* Freeze the pristine input CRCs before timing. Include the generator's
++	 * zero-filled final tail so exactly bytes, not just complete text records,
++	 * participates in the rotating block requests.
++	 */
++	for (size_t block = 0; block < w->zlib_blocks; ++block) {
++		size_t offset = block * RESUME_ZLIB_BLOCK_BYTES;
++		size_t bytes = w->bytes - offset;
++		uLong initial = crc32(0L, Z_NULL, 0);
++		if (bytes > RESUME_ZLIB_BLOCK_BYTES) bytes = RESUME_ZLIB_BLOCK_BYTES;
++		w->zlib_expected_crc[block] = (uint32_t)crc32(initial,
++				w->data + offset, (uInt)bytes);
++	}
++	return 0;
++}
++
++static inline uint64_t resume_workload_zlib_run(struct resume_workload *w)
++{
++	size_t offset, bytes;
++	uLongf compressed_bytes, output_bytes;
++	int error;
++	if (w->zlib_error || !w->zlib_blocks || w->cursor >= w->zlib_blocks) {
++		if (!w->zlib_error) w->zlib_error = Z_STREAM_ERROR;
++		errno = EIO;
++		return UINT64_MAX;
++	}
++	offset = w->cursor * RESUME_ZLIB_BLOCK_BYTES;
++	bytes = w->bytes - offset;
++	if (bytes > RESUME_ZLIB_BLOCK_BYTES) bytes = RESUME_ZLIB_BLOCK_BYTES;
++	if (++w->cursor == w->zlib_blocks) w->cursor = 0;
++	compressed_bytes = (uLongf)w->zlib_compressed_capacity;
++	error = compress2(w->zlib_compressed, &compressed_bytes,
++			w->data + offset, (uLong)bytes, Z_DEFAULT_COMPRESSION);
++	if (error == Z_OK) {
++		output_bytes = (uLongf)bytes;
++		error = uncompress(w->zlib_output, &output_bytes,
++				w->zlib_compressed, compressed_bytes);
++		if (error == Z_OK && output_bytes != bytes) error = Z_DATA_ERROR;
++	}
++	if (error != Z_OK) {
++		/* Sticky failure cannot disappear through checksum accumulation or a
++		 * later successful request. The caller checks totals outside timing.
++		 */
++		w->zlib_error = error;
++		errno = error == Z_MEM_ERROR ? ENOMEM : EIO;
++		return UINT64_MAX;
++	}
++	return (uint32_t)crc32(crc32(0L, Z_NULL, 0), w->zlib_output, (uInt)bytes);
++}
++#endif
++
+ static inline int resume_workload_init(struct resume_workload *w,
+ 		const char *mode, unsigned kib, uint64_t seed)
+ {
+@@ -58,6 +148,9 @@ static inline int resume_workload_init(struct resume_workload *w,
+ 	else if (!strcmp(mode, "lookup")) w->kind = resume_lookup;
+ 	else if (!strcmp(mode, "parse")) w->kind = resume_parse;
+ 	else if (!strcmp(mode, "chase")) w->kind = resume_chase;
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	else if (!strcmp(mode, "deflate")) w->kind = resume_deflate;
++#endif
+ 	else {
+ 		errno = EINVAL;
+ 		return -1;
+@@ -87,7 +180,11 @@ static inline int resume_workload_init(struct resume_workload *w,
+ 			slots[slot].key = i;
+ 			slots[slot].value = resume_workload_mix(seed ^ i);
+ 		}
+-	} else if (w->kind == resume_parse) {
++	} else if (w->kind == resume_parse
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++		   || w->kind == resume_deflate
++#endif
++	) {
+ 		/* Compact text records: decimal key, colon, variable payload, newline.
+ 		 * Unlike a fixed-stride load loop, field lengths control the next read.
+ 		 */
+@@ -130,6 +227,9 @@ static inline int resume_workload_init(struct resume_workload *w,
+ 		w->cursor = order[0];
+ 		free(order);
+ 	}
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	if (w->kind == resume_deflate) return resume_workload_zlib_prepare(w);
++#endif
+ 	return 0;
+ }
+ 
+@@ -138,6 +238,9 @@ static inline uint64_t resume_workload_run(struct resume_workload *w)
+ 	uint64_t result = 0, epoch = w->runs++;
+ 	size_t i;
+ 	if (!w->bytes) return 0;
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	if (w->kind == resume_deflate) return resume_workload_zlib_run(w);
++#endif
+ 	if (w->kind == resume_scan) {
+ 		volatile unsigned char *data = w->data;
+ 		for (i = 0; i < w->bytes; i += 64) result += data[i];
+@@ -184,6 +287,10 @@ static inline uint64_t resume_workload_expected(const struct resume_workload *w,
+ 	uint64_t expected = 0;
+ 	size_t i;
+ 	if (!w->bytes) return 0;
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	if (w->kind == resume_deflate)
++		return w->zlib_expected_crc[epoch % w->zlib_blocks];
++#endif
+ 	if (w->kind == resume_scan || w->kind == resume_parse)
+ 		return w->constant_expected;
+ 	if (w->kind == resume_lookup) {
+@@ -202,6 +309,9 @@ static inline uint64_t resume_workload_expected(const struct resume_workload *w,
+ static inline int resume_workload_check(const struct resume_workload *w,
+ 		uint64_t observed)
+ {
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	if (w->kind == resume_deflate && w->zlib_error) return 0;
++#endif
+ 	return w->runs && observed == resume_workload_expected(w, w->runs - 1);
+ }
+ 
+@@ -209,6 +319,9 @@ static inline int resume_workload_check_total(const struct resume_workload *w,
+ 		uint64_t observed)
+ {
+ 	uint64_t expected = 0, epoch;
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	if (w->kind == resume_deflate && w->zlib_error) return 0;
++#endif
+ 	if (w->kind == resume_scan || w->kind == resume_parse)
+ 		expected = w->constant_expected * w->runs;
+ 	else
+diff --git a/linux-tests/run_resume_workload_session.py b/linux-tests/run_resume_workload_session.py
+index 6eeba2dd..f4fbf78c 100755
+--- a/linux-tests/run_resume_workload_session.py
++++ b/linux-tests/run_resume_workload_session.py
+@@ -36,9 +36,9 @@ def recover(host, env):
+ 
+ 
+ def cell(text):
+-    match = re.fullmatch(r'(scan|lookup|parse|chase):(\d+):(futex-early|futex-early-both|preseed)', text)
++    match = re.fullmatch(r'(scan|lookup|parse|chase|deflate):(\d+):(futex-early|futex-early-both|preseed|retention-rr|retention-first)', text)
+     if not match or int(match[2]) > 65536:
+-        raise argparse.ArgumentTypeError('cell must be workload:kib:policy (early, both, or preseed)')
++        raise argparse.ArgumentTypeError('cell must be workload:kib:policy (early, both, preseed, or retention)')
+     return match[1], int(match[2]), match[3]
+ 
+ 
+@@ -50,6 +50,7 @@ def main(argv=None):
+     parser.add_argument('package', type=Path)
+     parser.add_argument('output', type=Path)
+     parser.add_argument('--bitstream-sha256', required=True)
++    parser.add_argument('--zlib-library', type=Path)
+     parser.add_argument('--host', default='xilinx@192.168.4.35')
+     parser.add_argument('--cell', action='append', type=cell, required=True)
+     parser.add_argument('--loops', type=int, default=64)
+@@ -72,6 +73,7 @@ def main(argv=None):
+             '--sync', 'futex', '--policy', policy, '--loops', str(args.loops),
+             '--warmup', str(args.warmup), '--repeats', str(args.repeats)])
+         plan.append(parsed)
++        parsed.zlib_library = args.zlib_library
+     env = os.environ.copy()
+     if not env.get('PYNQ_POWER_STATE_URL'):
+         # Existing local fallback, never echo or retain the credential.
+diff --git a/linux-tests/run_scheduler_pipe_hint.py b/linux-tests/run_scheduler_pipe_hint.py
+index 989480e7..181d71fe 100644
+--- a/linux-tests/run_scheduler_pipe_hint.py
++++ b/linux-tests/run_scheduler_pipe_hint.py
+@@ -22,9 +22,19 @@ from run_scheduler_tagged_replay import (
+ 
+ 
+ GUEST_ELF = "/tmp/scheduler_pipe_hint_benchmark_dynamic"
++GUEST_ZLIB = "/tmp/libz.so.1"
+ MAX_GUEST_COMMAND_LENGTH = 768
+ 
+ 
++def library_transfer(path):
++    """Generate bounded, fixed-destination commands for an optional RV64 library."""
++    payload = base64.b64encode(path.read_bytes()).decode("ascii")
++    return [f": > {GUEST_ZLIB}.b64", *(
++        f"echo '{payload[index:index + 192]}' >> {GUEST_ZLIB}.b64"
++        for index in range(0, len(payload), 192)),
++        f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}"]
++
++
+ def sha256(path):
+     return hashlib.sha256(path.read_bytes()).hexdigest()
+ 
+@@ -65,14 +75,16 @@ def parse_args(argv=None):
+     parser.add_argument("--repeats", type=int, default=8)
+     parser.add_argument("--policy", choices=("continuous", "continuous-unmatched",
+                                               "futex-early", "futex-early-both",
+-                                              "seed", "preseed"),
++                                              "seed", "preseed", "retention-rr", "retention-first"),
+                         default="continuous")
+     parser.add_argument("--warmup", type=int, default=32)
+     parser.add_argument("--sync", choices=("pipe", "futex"), default="pipe")
+     parser.add_argument("--profile", choices=("plain", "legs"), default="plain")
+     parser.add_argument("--working-set-kib", type=int, default=0)
+-    parser.add_argument("--workload", choices=("scan", "lookup", "parse", "chase"),
++    parser.add_argument("--workload", choices=("scan", "lookup", "parse", "chase", "deflate"),
+                         default="scan")
++    parser.add_argument("--zlib-library", type=Path,
++                        help="exact RV64 libz.so.1 staged with this ELF and bound by SHA-256")
+     parser.add_argument("--legacy-no-terminal-handshake", action="store_true",
+                         help="bind an older seven-argument guest without the final verification barrier")
+     parser.add_argument(
+@@ -105,6 +117,8 @@ def validate_args(args):
+         raise ValueError("legacy four-argument CLI requires pipe/plain")
+     if not args.nbf.is_file() or not args.transfer.is_file():
+         raise ValueError("NBF and transfer files must exist")
++    if args.zlib_library is not None and not args.zlib_library.is_file():
++        raise ValueError("zlib library must exist")
+     if not args.log.parent.is_dir():
+         raise ValueError("log parent directory must exist")
+     validate_transfer(args.transfer, args.elf_sha256)
+@@ -117,6 +131,8 @@ def build_guest_command(args):
+         command += f" {args.sync} {args.profile} {args.working_set_kib}"
+         if args.workload != "scan":
+             command += f" {args.workload}"
++    if args.zlib_library is not None:
++        command = "LD_LIBRARY_PATH=/tmp " + command
+     return command
+ 
+ 
+@@ -145,6 +161,8 @@ def run(args):
+         "legacy_four_arg_cli": args.legacy_four_arg_cli,
+         "command": command,
+     }
++    if args.zlib_library is not None:
++        status["zlib_library_sha256"] = sha256(args.zlib_library)
+     env = os.environ.copy()
+     env["PYNQ_CONTROL_PROGRAM_SHA256"] = args.control_sha256
+     env["PYNQ_CONTROL_PROGRAM_TIMEOUT_MS"] = str(args.runtime_ms)
+@@ -159,6 +177,13 @@ def run(args):
+         with args.log.open("w") as log:
+             child.logfile_read = log
+             expect_shell_prompt(child, 300, "Linux boot")
++            if args.zlib_library is not None:
++                for transfer_command in library_transfer(args.zlib_library):
++                    child.sendline(transfer_command)
++                    expect_shell_prompt(child, 180, "guest zlib transfer")
++                child.sendline(f"/bin/busybox sha256sum {GUEST_ZLIB}")
++                child.expect_exact(f"{status['zlib_library_sha256']}  {GUEST_ZLIB}")
++                expect_shell_prompt(child, 180, "guest zlib verification")
+             for transfer_command in args.transfer.read_text().splitlines():
+                 child.sendline(transfer_command)
+                 expect_shell_prompt(child, 180, "guest ELF transfer")
+diff --git a/linux-tests/scheduler_pipe_hint_benchmark.c b/linux-tests/scheduler_pipe_hint_benchmark.c
+index 11cb51eb..4d0b7755 100644
+--- a/linux-tests/scheduler_pipe_hint_benchmark.c
++++ b/linux-tests/scheduler_pipe_hint_benchmark.c
+@@ -24,6 +24,11 @@
+ #include <unistd.h>
+ #include <time.h>
+ #include "resume_workload.h"
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++#include <signal.h>
++#define PR_BP_ICACHE_RETENTION_CONTROL 0x42505061
++#define PR_BP_ICACHE_RETENTION_STATUS 0x42505062
++#endif
+ 
+ #if !defined(BP_RESUME_HOST_VERIFY) && (!defined(__riscv) || __riscv_xlen != 64)
+ #error "This benchmark requires RV64 BlackParrot"
+@@ -53,6 +58,10 @@ enum hint_policy {
+ 	hint_futex_early_both,
+ 	hint_seed_once,
+ 	hint_preseed,
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	hint_retention_rr,
++	hint_retention_first,
++#endif
+ };
+ 
+ enum sync_policy {
+@@ -181,7 +190,15 @@ static enum hint_policy parse_policy(const char *text)
+ 		return hint_seed_once;
+ 	if (!strcmp(text, "preseed"))
+ 		return hint_preseed;
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	if (!strcmp(text, "retention-rr"))
++		return hint_retention_rr;
++	if (!strcmp(text, "retention-first"))
++		return hint_retention_first;
++	fprintf(stderr, "policy must be continuous, continuous-unmatched, futex-early, futex-early-both, seed, preseed, retention-rr, or retention-first\n");
++#else
+ 	fprintf(stderr, "policy must be continuous, continuous-unmatched, futex-early, futex-early-both, seed, or preseed\n");
++#endif
+ 	exit(2);
+ }
+ 
+@@ -222,7 +239,12 @@ static unsigned long prefix_status(void)
+ static void issue_hint(unsigned enabled)
+ {
+ #ifdef BP_RESUME_HOST_VERIFY
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	extern void bp_resume_host_retention_hint(unsigned enabled);
++	bp_resume_host_retention_hint(enabled);
++#else
+ 	(void)enabled;
++#endif
+ #else
+ 	if (prctl(PR_BP_PREVIEW_ICACHE_TRIGGER, enabled, 0UL, 0UL, 0UL))
+ 		fail("instruction-prefix trigger");
+@@ -232,6 +254,10 @@ static void issue_hint(unsigned enabled)
+ static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
+ 				 unsigned iteration)
+ {
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	if (policy == hint_retention_rr || policy == hint_retention_first)
++		return;
++#endif
+ 	if (policy == hint_continuous_unmatched) {
+ 		if (enabled)
+ 			issue_hint(1);
+@@ -243,7 +269,12 @@ static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
+ static void set_futex_early_mode(unsigned enabled)
+ {
+ #ifdef BP_RESUME_HOST_VERIFY
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	extern void bp_resume_host_retention_task_mode(unsigned enabled);
++	bp_resume_host_retention_task_mode(enabled);
++#else
+ 	(void)enabled;
++#endif
+ #else
+ 	if (prctl(PR_BP_PREVIEW_ENABLE, enabled ? 14UL : 0UL, 0UL, 0UL, 0UL))
+ 		fail("futex-early preview mode");
+@@ -255,6 +286,118 @@ static int is_futex_early(enum hint_policy policy)
+ 	return policy == hint_futex_early || policy == hint_futex_early_both;
+ }
+ 
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++#ifdef BP_RESUME_HOST_VERIFY
++/* Host tests must supply an explicit shared-state hardware mock. */
++extern int bp_resume_host_retention_prctl(int option, unsigned long arg2,
++		unsigned long arg3, unsigned long arg4, unsigned long arg5);
++#define retention_prctl bp_resume_host_retention_prctl
++#else
++#define retention_prctl prctl
++#endif
++
++static pid_t retention_owner, retention_child;
++static unsigned retention_armed;
++
++static uint64_t retention_read_status(void)
++{
++	uint64_t status = 0;
++
++	if (retention_prctl(PR_BP_ICACHE_RETENTION_STATUS,
++			    (unsigned long)&status, 0UL, 0UL, 0UL))
++		fail("I-retention status/probe");
++	if (!(status & (UINT64_C(1) << 63))) {
++		errno = ENODEV;
++		fail("I-retention capability absent");
++	}
++	return status;
++}
++
++static void retention_cleanup(void)
++{
++	int status;
++	pid_t waited;
++
++	/* The policy is CPU-global. Inherited child exit handlers must never
++	 * disable it during the parent's measurement or another child's work.
++	 */
++	if (getpid() != retention_owner)
++		return;
++	if (retention_child > 0) {
++		do { waited = waitpid(retention_child, &status, WNOHANG); }
++		while (waited < 0 && errno == EINTR);
++		if (!waited) {
++			kill(retention_child, SIGKILL);
++			while (waitpid(retention_child, &status, 0) < 0 && errno == EINTR) { }
++		}
++		retention_child = 0;
++	}
++	if (retention_armed) {
++		if (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, 0UL, 0UL, 0UL, 0UL)) {
++			perror("I-retention error cleanup/reset");
++			_Exit(1);
++		}
++		retention_armed = 0;
++	}
++}
++
++static void retention_initialize(void)
++{
++	retention_owner = getpid();
++	if (atexit(retention_cleanup))
++		fail("I-retention cleanup registration");
++	(void)retention_read_status();
++	retention_armed = 1;
++	/* Exec need not clear an old per-task preview mode. Retention tests
++	 * must not accidentally inherit kernel wake hints from earlier code.
++	 * Explicit futex policies rearm their own mode later as before.
++	 */
++	set_futex_early_mode(0);
++}
++
++static unsigned retention_mode(enum hint_policy policy, unsigned enabled)
++{
++	if (!enabled)
++		return 0;
++	return policy == hint_retention_rr ? 1 : policy == hint_retention_first ? 2 : 0;
++}
++
++static void retention_start_cell(enum hint_policy policy, unsigned enabled)
++{
++	unsigned mode = retention_mode(policy, enabled);
++
++	retention_armed = 1;
++	/* Both processes have allocated private state and completed setup fences.
++	 * One global write/fence resets this cell; no per-wake hint is emitted.
++	 */
++	if (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, (unsigned long)mode,
++			    0UL, 0UL, 0UL))
++		fail("I-retention policy control");
++	if ((retention_read_status() & 3) != mode) {
++		errno = EIO;
++		fail("I-retention policy readback");
++	}
++}
++
++static uint64_t retention_finish_cell(enum hint_policy policy, unsigned enabled)
++{
++	uint64_t status = retention_read_status();
++
++	if ((status & 3) != retention_mode(policy, enabled)) {
++		errno = EIO;
++		fail("I-retention policy changed during cell");
++	}
++	if (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, 0UL, 0UL, 0UL, 0UL))
++		fail("I-retention normal reset");
++	if (retention_read_status() & 3) {
++		errno = EIO;
++		fail("I-retention reset readback");
++	}
++	retention_armed = 0;
++	return status;
++}
++#endif
++
+ static void futex_wait_for(_Atomic uint32_t *word, uint32_t wanted)
+ {
+ 	for (;;) {
+@@ -295,6 +438,10 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
+ 	child = fork();
+ 	if (child < 0)
+ 		fail("fork");
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	if (child)
++		retention_child = child;
++#endif
+ 	if (!child) {
+ 		struct resume_workload child_working_set =
+ 			allocate_working_set(working_set_kib, 0x5a, workload);
+@@ -324,6 +471,9 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
+ 	close(ready[1]);
+ 	transfer(ready[0], &token, 0);
+ 	flush_instruction_state();
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	retention_start_cell(policy, enabled);
++#endif
+ 	if (policy == hint_preseed)
+ 		issue_hint(enabled);
+ 	for (unsigned i = 0; i < warmup; ++i) {
+@@ -351,6 +501,9 @@ static struct cell_result run_pipe_cell(unsigned enabled, unsigned loops,
+ 	close(to_child[1]);
+ 	close(to_parent[0]);
+ 	close(ready[0]);
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	retention_child = 0;
++#endif
+ 	check_working_set(&parent_working_set, parent_checksum);
+ 	return (struct cell_result){ .elapsed = end - begin };
+ }
+@@ -381,6 +534,10 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
+ 	child = fork();
+ 	if (child < 0)
+ 		fail("fork");
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	if (child)
++		retention_child = child;
++#endif
+ 	if (!child) {
+ 		struct resume_workload child_working_set =
+ 			allocate_working_set(working_set_kib, 0x3c, workload);
+@@ -418,6 +575,9 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
+ 	close(ready[1]);
+ 	transfer(ready[0], &token, 0);
+ 	flush_instruction_state();
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	retention_start_cell(policy, enabled);
++#endif
+ 	if (policy == hint_preseed)
+ 		issue_hint(enabled);
+ 	for (unsigned i = 0; i < warmup; ++i) {
+@@ -447,6 +607,9 @@ static struct cell_result run_futex_cell(unsigned enabled, unsigned loops,
+ 		exit(1);
+ 	}
+ 	close(ready[0]);
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	retention_child = 0;
++#endif
+ 	struct cell_result result = {
+ 		.elapsed = end - begin,
+ 		.child_resume = shared->child_resume,
+@@ -471,7 +634,11 @@ int main(int argc, char **argv)
+ 	unsigned long before, after;
+ 
+ 	if (argc > 9) {
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed|retention-rr|retention-first] [warmup] [pipe|futex] [plain|legs] [working-set-kib] [scan|lookup|parse|chase]\n",
++#else
+ 		fprintf(stderr, "usage: %s [loops] [repeats] [continuous|continuous-unmatched|futex-early|futex-early-both|seed|preseed] [warmup] [pipe|futex] [plain|legs] [working-set-kib] [scan|lookup|parse|chase]\n",
++#endif
+ 			argv[0]);
+ 		return 2;
+ 	}
+@@ -492,7 +659,11 @@ int main(int argc, char **argv)
+ 	if (argc > 8)
+ 		workload = argv[8];
+ 	if (strcmp(workload, "scan") && strcmp(workload, "lookup")
+-	    && strcmp(workload, "parse") && strcmp(workload, "chase")) {
++	    && strcmp(workload, "parse") && strcmp(workload, "chase")
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	    && strcmp(workload, "deflate")
++#endif
++	   ) {
+ 		fputs("invalid resume workload\n", stderr);
+ 		return 2;
+ 	}
+@@ -504,6 +675,14 @@ int main(int argc, char **argv)
+ 		fputs("futex-early policy requires futex synchronization\n", stderr);
+ 		return 2;
+ 	}
++#if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
++	if (!strcmp(workload, "deflate"))
++		printf(PIPE_HINT_LABEL("LIBRARY") " name=zlib version=%s block_bytes=%u input_corpus_kib=%u\n",
++		       zlibVersion(), RESUME_ZLIB_BLOCK_BYTES, working_set_kib);
++#endif
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	retention_initialize();
++#endif
+ 	before = prefix_status();
+ #ifdef BP_RESUME_HOST_VERIFY
+ 	fputs("Software protocol verification only; host nanoseconds are not BlackParrot cycles.\n", stderr);
+@@ -514,6 +693,10 @@ int main(int argc, char **argv)
+ 	       : policy == hint_continuous_unmatched ? "continuous-unmatched"
+ 	       : policy == hint_futex_early ? "futex-early"
+ 	       : policy == hint_futex_early_both ? "futex-early-both"
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++	       : policy == hint_retention_rr ? "retention-rr"
++	       : policy == hint_retention_first ? "retention-first"
++#endif
+ 	       : policy == hint_seed_once ? "seed" : "preseed",
+ 	       sync == sync_pipe ? "pipe" : "futex",
+ 	       profile == profile_plain ? "plain" : "legs", working_set_kib, workload);
+@@ -522,11 +705,21 @@ int main(int argc, char **argv)
+ 
+ 		for (unsigned order = 0; order < 2; ++order) {
+ 			unsigned enabled = first ^ order;
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++			uint64_t whole_begin = cycle(), whole_elapsed, retention_status;
++#endif
+ 			struct cell_result result = sync == sync_pipe
+ 				? run_pipe_cell(enabled, loops, warmup, policy,
+ 						working_set_kib, workload)
+ 				: run_futex_cell(enabled, loops, warmup, policy,
+ 						  profile, working_set_kib, workload);
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++			/* Charge allocation, fork, setup, warmup, verification, teardown,
++			 * status reads and policy reset separately from steady work.
++			 */
++			retention_status = retention_finish_cell(policy, enabled);
++			whole_elapsed = cycle() - whole_begin;
++#endif
+ 
+ 			printf(PIPE_HINT_LABEL("RESULT") " repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
+ 			       repeat, order, enabled,
+@@ -537,6 +730,15 @@ int main(int argc, char **argv)
+ 				       (unsigned long long)result.child_resume,
+ 				       (unsigned long long)result.parent_resume,
+ 				       loops);
++#if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
++			printf(PIPE_HINT_LABEL("WHOLE") " repeat=%u order=%u enabled=%u cycles=%llu loops=%u\n",
++			       repeat, order, enabled, (unsigned long long)whole_elapsed, loops);
++			printf(PIPE_HINT_LABEL("RETENTION") " repeat=%u order=%u enabled=%u raw=0x%016llx capability=%u mode=%u completed=%u consumed_fetches=%u\n",
++			       repeat, order, enabled, (unsigned long long)retention_status,
++			       (unsigned)(retention_status >> 63), (unsigned)(retention_status & 3),
++			       (unsigned)((retention_status >> 2) & 1),
++			       (unsigned)((retention_status >> 16) & 0xffff));
++#endif
+ 			fflush(stdout);
+ 		}
+ 	}
+diff --git a/linux-tests/test_compare_scheduler_pipe_hint_policies.py b/linux-tests/test_compare_scheduler_pipe_hint_policies.py
+index 05a4abb6..e820165d 100644
+--- a/linux-tests/test_compare_scheduler_pipe_hint_policies.py
++++ b/linux-tests/test_compare_scheduler_pipe_hint_policies.py
+@@ -3,9 +3,11 @@
+ 
+ import unittest
+ from pathlib import Path
++import json
++import tempfile
+ from unittest import mock
+ 
+-from compare_scheduler_pipe_hint_policies import compare
++from compare_scheduler_pipe_hint_policies import compare, main
+ 
+ 
+ def result(policy, identity, effects):
+@@ -22,6 +24,89 @@ def result(policy, identity, effects):
+ 
+ 
+ class PipeHintPolicyComparatorTests(unittest.TestCase):
++    def deployment_results(self, baseline_policy, comparison_policy):
++        samples = [result(baseline_policy, "same", [(10.0, 1.0)]),
++                   result(baseline_policy, "same", [(20.0, 2.0)]),
++                   result(comparison_policy, "same", [(40.0, 4.0)]),
++                   result(comparison_policy, "same", [(50.0, 5.0)])]
++        for sample in samples:
++            sample["config"].update(workload="lookup", working_set_kib=32,
++                                    terminal_handshake=1, sync="futex")
++            sample["identity"].update(nbf_sha256="same-nbf", bitstream_sha256="same-bitstream")
++        return samples
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_compares_parent_with_explicit_both_direction_registration(self, analyze):
++        analyze.side_effect = self.deployment_results("futex-early", "futex-early-both")
++        output = compare([Path("p1"), Path("p2")], [Path("b1"), Path("b2")], 100,
++                         baseline_policy="futex-early", comparison_policy="futex-early-both")
++        self.assertEqual(output["comparison_policy"], "futex-early-both")
++        self.assertEqual(output["comparison_minus_baseline"]["saved_cycles_per_roundtrip"], 30.0)
++        self.assertEqual(output["comparison_minus_baseline"]["saved_percentage_points"], 3.0)
++        self.assertEqual(output["config"]["terminal_handshake"], 1)
++        self.assertIn("futex-early-both over futex-early", output["purpose"])
++        self.assertNotIn("continuous_minus_baseline", output)
++        self.assertNotIn("continuous_replicates", output)
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_compares_retained_preseed_with_deployment_early_refresh(self, analyze):
++        for policy in ("futex-early", "futex-early-both"):
++            with self.subTest(policy=policy):
++                analyze.side_effect = self.deployment_results("preseed", policy)
++                output = compare([Path("s1"), Path("s2")], [Path("r1"), Path("r2")], 10,
++                                 baseline_policy="preseed", comparison_policy=policy)
++                self.assertEqual(output["baseline_policy"], "preseed")
++                self.assertEqual(output["comparison_minus_baseline"]["saved_cycles_per_roundtrip"], 30.0)
++                self.assertNotIn("continuous_minus_baseline", output)
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_new_policies_reject_workload_endpoint_and_footprint_changes(self, analyze):
++        for field, value in (("workload", "parse"), ("terminal_handshake", 0),
++                             ("working_set_kib", 256), ("warmup", 64)):
++            with self.subTest(field=field):
++                samples = self.deployment_results("futex-early", "futex-early-both")
++                samples[-1]["config"][field] = value
++                analyze.side_effect = samples
++                with self.assertRaisesRegex(ValueError, "configuration mismatch"):
++                    compare([Path("p1"), Path("p2")], [Path("b1"), Path("b2")], 10,
++                            baseline_policy="futex-early", comparison_policy="futex-early-both")
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_new_policies_reject_software_or_physical_identity_change(self, analyze):
++        for field in ("elf_sha256", "nbf_sha256", "bitstream_sha256"):
++            with self.subTest(field=field):
++                samples = self.deployment_results("preseed", "futex-early")
++                samples[-1]["identity"][field] = "different"
++                analyze.side_effect = samples
++                with self.assertRaisesRegex(ValueError, "identity mismatch"):
++                    compare([Path("s1"), Path("s2")], [Path("r1"), Path("r2")], 10,
++                            baseline_policy="preseed", comparison_policy="futex-early")
++
++    def test_rejects_insufficient_or_repeated_boot_paths_and_invalid_policies(self):
++        for baseline, comparison, kwargs, message in (
++                ([Path("a")], [Path("b"), Path("c")], {}, "two independent"),
++                ([Path("a"), Path("a")], [Path("b"), Path("c")], {}, "distinct transcript"),
++                ([Path("a"), Path("b")], [Path("c"), Path("d")],
++                 {"comparison_policy": "unknown"}, "comparison policy"),
++                ([Path("a"), Path("b")], [Path("c"), Path("d")],
++                 {"baseline_policy": "futex-early", "comparison_policy": "futex-early"}, "must differ")):
++            with self.subTest(message=message):
++                with self.assertRaisesRegex(ValueError, message):
++                    compare(baseline, comparison, **kwargs)
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.compare")
++    def test_cli_selects_deployment_policies_without_continuous_labels(self, comparison):
++        comparison.return_value = {"comparison_policy": "futex-early-both"}
++        with tempfile.TemporaryDirectory() as directory:
++            output = Path(directory) / "comparison.json"
++            main(["--baseline", "p1", "p2", "--comparison", "b1", "b2",
++                  "--baseline-policy", "futex-early", "--comparison-policy", "futex-early-both",
++                  "--output", str(output)])
++            self.assertEqual(json.loads(output.read_text()), comparison.return_value)
++        comparison.assert_called_once_with([Path("p1"), Path("p2")],
++                                           [Path("b1"), Path("b2")], 20000,
++                                           "futex-early", "futex-early-both")
++
+     @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+     def test_rejects_different_workloads_between_policies(self, analyze):
+         samples = [result("preseed", "same", [(10.0, 1.0)]) for _ in range(2)]
+@@ -47,6 +132,9 @@ class PipeHintPolicyComparatorTests(unittest.TestCase):
+             output["continuous_minus_seed"]["saved_cycles_per_roundtrip"],
+             30.0,
+         )
++        self.assertEqual(output["comparison_minus_baseline"], output["continuous_minus_seed"])
++        self.assertEqual(output["seed_replicates"], output["baseline_replicates"])
++        self.assertEqual(output["continuous_replicates"], output["comparison_replicates"])
+ 
+     @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+     def test_rejects_nonmatching_elf(self, analyze):
+diff --git a/linux-tests/test_resume_workload.py b/linux-tests/test_resume_workload.py
+index e013ec51..2d395e29 100644
+--- a/linux-tests/test_resume_workload.py
++++ b/linux-tests/test_resume_workload.py
+@@ -9,6 +9,7 @@ import re
+ import subprocess
+ import tempfile
+ import unittest
++import zlib
+ 
+ HERE = Path(__file__).resolve().parent
+ MASK = (1 << 64) - 1
+@@ -106,6 +107,198 @@ int main(int argc, char **argv)
+ '''
+ 
+ 
++def record_corpus(kib, seed):
++    """Independent parse-generator corpus, including its unused zero tail."""
++    corpus = bytearray(kib * 1024)
++    offset = number = 0
++    while True:
++        random = mix(seed + number)
++        key = 1 + random % 1000000
++        length = 16 + (random >> 24) % 97
++        payload = bytes(97 + ((random + j * 7) & MASK) % 26
++                        for j in range(length))
++        record = str(key).encode() + b":" + payload + b"\n"
++        if offset + len(record) + 1 > len(corpus):
++            break
++        corpus[offset:offset + len(record)] = record
++        offset += len(record)
++        number += 1
++    return bytes(corpus), offset
++
++
++ZLIB_DRIVER = r'''
++#include <assert.h>
++#include <inttypes.h>
++#include <stdio.h>
++#include "resume_workload.h"
++
++static int fault;
++static unsigned compress_calls, uncompress_calls;
++static uLong request_bytes;
++int __real_compress2(Bytef *, uLongf *, const Bytef *, uLong, int);
++int __real_uncompress(Bytef *, uLongf *, const Bytef *, uLong);
++int __wrap_compress2(Bytef *out, uLongf *out_bytes,
++                     const Bytef *in, uLong in_bytes, int level)
++{
++    ++compress_calls;
++    request_bytes = in_bytes;
++    assert(level == Z_DEFAULT_COMPRESSION);
++    if (fault == 1) return Z_STREAM_ERROR;
++    if (fault == 2) return Z_MEM_ERROR;
++    int result = __real_compress2(out, out_bytes, in, in_bytes, level);
++    if (fault == 3 && result == Z_OK) out[0] ^= 0xff;
++    return result;
++}
++int __wrap_uncompress(Bytef *out, uLongf *out_bytes,
++                      const Bytef *in, uLong in_bytes)
++{
++    ++uncompress_calls;
++    if (fault == 4) return Z_DATA_ERROR;
++    int result = __real_uncompress(out, out_bytes, in, in_bytes);
++    if (result == Z_OK && fault == 5) --*out_bytes;
++    if (result == Z_OK && fault == 6) out[0] ^= 1;
++    return result;
++}
++int main(int argc, char **argv)
++{
++    struct resume_workload w;
++    uint64_t seed, total = 0, ideal_total = 0;
++    unsigned kib, epochs;
++    const char *action;
++    if (argc != 5) return 2;
++    kib = strtoul(argv[1], NULL, 0);
++    seed = strtoull(argv[2], NULL, 0);
++    action = argv[3];
++    epochs = strtoul(argv[4], NULL, 0);
++    if (resume_workload_init(&w, "deflate", kib, seed)) return 3;
++    assert(resume_workload_check_total(&w, 0));
++    printf("META %zu %zu %zu %zu\n", w.bytes, w.count,
++           w.zlib_blocks, w.zlib_compressed_capacity);
++    if (!strcmp(action, "input-corrupt") || !strcmp(action, "last-corrupt")) {
++        if (!w.bytes) return 4;
++        w.data[!strcmp(action, "last-corrupt") ? w.bytes - 1 : 0] ^= 1;
++    } else if (!strcmp(action, "compress-error")) fault = 1;
++    else if (!strcmp(action, "memory-error")) fault = 2;
++    else if (!strcmp(action, "compressed-corrupt")) fault = 3;
++    else if (!strcmp(action, "uncompress-error")) fault = 4;
++    else if (!strcmp(action, "short-output")) fault = 5;
++    else if (!strcmp(action, "output-corrupt")) fault = 6;
++    else assert(!strcmp(action, "run"));
++    for (unsigned epoch = 0; epoch < epochs; ++epoch) {
++        uint64_t expected = resume_workload_expected(&w, epoch);
++        uint64_t result = resume_workload_run(&w);
++        ideal_total += expected;
++        total += result;
++        if (fault && fault != 6) {
++            assert(result == UINT64_MAX && w.zlib_error != Z_OK);
++            assert(!resume_workload_check(&w, result));
++            /* Even a forged matching total must fail after a library error. */
++            assert(!resume_workload_check_total(&w, ideal_total));
++        } else {
++            int damaged = fault == 6 ||
++                (!strcmp(action, "input-corrupt") && epoch % w.zlib_blocks == 0) ||
++                (!strcmp(action, "last-corrupt") &&
++                 epoch % w.zlib_blocks == w.zlib_blocks - 1);
++            assert(resume_workload_check(&w, result) == !damaged);
++            assert(w.zlib_error == Z_OK);
++        }
++        printf("ROW %u %lu %" PRIu64 "\n", epoch, request_bytes, result);
++    }
++    if (!strcmp(action, "run")) {
++        assert(resume_workload_check_total(&w, total));
++        assert(!resume_workload_check_total(&w, total + 1));
++        assert(compress_calls == (w.bytes ? epochs : 0));
++        assert(uncompress_calls == compress_calls);
++        if (w.bytes) assert(w.cursor == epochs % w.zlib_blocks);
++    } else assert(!resume_workload_check_total(&w, total));
++    printf("TOTAL %" PRIu64 "\n", total);
++    resume_workload_free(&w);
++    assert(!w.data && !w.bytes && !w.runs && !w.zlib_compressed
++           && !w.zlib_output && !w.zlib_expected_crc && !w.zlib_blocks);
++    return 0;
++}
++'''
++
++
++class ResumeZlibWorkloadTests(unittest.TestCase):
++    """Use the real host libz; wrap only explicit failure-injection boundaries."""
++
++    @classmethod
++    def setUpClass(cls):
++        cls.temp = tempfile.TemporaryDirectory(prefix="resume-zlib-")
++        cls.addClassCleanup(cls.temp.cleanup)
++        source = Path(cls.temp.name) / "driver.c"
++        source.write_text(ZLIB_DRIVER)
++        cls.binary = source.with_suffix("")
++        subprocess.run([os.environ.get("BP_HOST_CC", "cc"), "-std=c11", "-O2",
++                        "-Wall", "-Wextra", "-Werror", "-DBP_RESUME_ZLIB=1",
++                        "-I", str(HERE), str(source), "-lz",
++                        "-Wl,--wrap=compress2", "-Wl,--wrap=uncompress",
++                        "-o", str(cls.binary)],
++                       check=True, capture_output=True, timeout=30)
++
++    def run_workload(self, kib, seed, action="run", epochs=17):
++        return subprocess.run([str(self.binary), str(kib), str(seed), action, str(epochs)],
++                              capture_output=True, text=True, timeout=30)
++
++    def test_real_library_requests_match_pristine_python_block_crcs(self):
++        for kib in (0, 1, 3, 4, 5, 7, 32, 257):
++            for seed in (0, 0x1234, MASK):
++                with self.subTest(kib=kib, seed=seed):
++                    epochs = max(17, (kib + 3) // 4 + 2)
++                    run = self.run_workload(kib, seed, epochs=epochs)
++                    self.assertEqual(run.returncode, 0, run.stderr)
++                    corpus, record_bytes = record_corpus(kib, seed)
++                    blocks = [corpus[i:i + 4096] for i in range(0, len(corpus), 4096)]
++                    rows = re.findall(r"^ROW (\d+) (\d+) (\d+)$", run.stdout, re.M)
++                    self.assertEqual(len(rows), epochs)
++                    expected_total = 0
++                    for epoch, size, observed in map(lambda row: map(int, row), rows):
++                        block = blocks[epoch % len(blocks)] if blocks else b""
++                        expected = zlib.crc32(block)
++                        self.assertEqual(size, len(block))
++                        self.assertEqual(observed, expected)
++                        expected_total += expected
++                    metadata = re.search(r"^META (\d+) (\d+) (\d+) (\d+)$", run.stdout, re.M)
++                    size, records, count, scratch = map(int, metadata.groups())
++                    self.assertEqual((size, records, count), (len(corpus), record_bytes, len(blocks)))
++                    self.assertGreater(scratch, 4096) if blocks else self.assertEqual(scratch, 0)
++                    self.assertIn(f"TOTAL {expected_total}\n", run.stdout)
++
++    def test_rotating_requests_change_blocks_and_wrap(self):
++        run = self.run_workload(5, 0x1234, epochs=9)
++        self.assertEqual(run.returncode, 0, run.stderr)
++        rows = re.findall(r"^ROW \d+ (\d+) (\d+)$", run.stdout, re.M)
++        self.assertEqual([int(row[0]) for row in rows], [4096, 1024] * 4 + [4096])
++        self.assertEqual(rows[0], rows[2])
++        self.assertNotEqual(rows[0][1], rows[1][1])
++
++    def test_input_and_output_corruption_are_rejected(self):
++        for action in ("input-corrupt", "last-corrupt", "output-corrupt"):
++            with self.subTest(action=action):
++                run = self.run_workload(5, 1234, action, epochs=5)
++                self.assertEqual(run.returncode, 0, run.stderr)
++
++    def test_library_errors_and_wrong_output_lengths_are_sticky_failures(self):
++        for action in ("compress-error", "memory-error", "compressed-corrupt",
++                       "uncompress-error", "short-output"):
++            with self.subTest(action=action):
++                run = self.run_workload(5, 1234, action, epochs=3)
++                self.assertEqual(run.returncode, 0, run.stderr)
++
++    def test_zero_flag_excludes_optional_fields_code_and_library(self):
++        source = Path(self.temp.name) / "plain.c"
++        source.write_text(DRIVER)
++        command = [os.environ.get("BP_HOST_CC", "cc"), "-std=c11", "-E", "-P",
++                   "-I", str(HERE), str(source)]
++        plain = subprocess.run(command, check=True, capture_output=True, timeout=30).stdout
++        disabled = subprocess.run(command + ["-DBP_RESUME_ZLIB=0"],
++                                  check=True, capture_output=True, timeout=30).stdout
++        self.assertEqual(plain, disabled)
++        self.assertNotIn(b'"deflate"', plain)
++        self.assertNotIn(b"zlib_expected_crc", plain)
++
++
+ class ResumeWorkloadTests(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
+@@ -143,6 +336,11 @@ class ResumeWorkloadTests(unittest.TestCase):
+         self.assertEqual(run.returncode, 3)
+         self.assertEqual(run.stdout, "")
+ 
++    def test_deflate_is_absent_from_plain_build(self):
++        run = self.run_workload("deflate", 32, 1)
++        self.assertEqual(run.returncode, 3)
++        self.assertEqual(run.stdout, "")
++
+ 
+ class ResumeProtocolHostTests(unittest.TestCase):
+     """Exercise actual fork, pipe/futex exchange, drain, and checksum checks."""
+diff --git a/linux-tests/test_run_scheduler_pipe_hint.py b/linux-tests/test_run_scheduler_pipe_hint.py
+index c262dffb..8618db5b 100644
+--- a/linux-tests/test_run_scheduler_pipe_hint.py
++++ b/linux-tests/test_run_scheduler_pipe_hint.py
+@@ -13,10 +13,37 @@ from run_scheduler_pipe_hint import (
+     parse_args,
+     validate_args,
+     validate_transfer,
++    library_transfer,
++    GUEST_ZLIB,
+ )
+ 
+ 
+ class PipeHintRunnerTests(unittest.TestCase):
++    def test_optional_library_has_only_bounded_fixed_destination_commands(self):
++        with tempfile.TemporaryDirectory() as directory:
++            path = Path(directory) / "library"
++            payload = bytes(range(256)) * 11
++            path.write_bytes(payload)
++            commands = library_transfer(path)
++            self.assertEqual(commands[0], f": > {GUEST_ZLIB}.b64")
++            self.assertEqual(commands[-1], f"base64 -d {GUEST_ZLIB}.b64 > {GUEST_ZLIB}")
++            self.assertTrue(all(len(command) <= 768 for command in commands))
++            encoded = "".join(command.split("'")[1] for command in commands[1:-1])
++            self.assertEqual(base64.b64decode(encoded), payload)
++
++    def test_retention_and_deflate_arguments_bind_optional_library(self):
++        for policy in ("retention-rr", "retention-first"):
++            args = parse_args([
++                "image.nbf", "transfer", "a" * 64, "result.log",
++                "--bitstream-sha256", "b" * 64, "--policy", policy,
++                "--workload", "deflate", "--working-set-kib", "32",
++                "--zlib-library", "exact-libz.so.1",
++            ])
++            command = build_guest_command(args)
++            self.assertTrue(command.startswith("LD_LIBRARY_PATH=/tmp " + GUEST_ELF))
++            self.assertIn(policy, command)
++            self.assertTrue(command.endswith("pipe plain 32 deflate"))
++
+     def test_seed_policy_is_bound_into_runner_arguments(self):
+         args = parse_args([
+             "image.nbf", "transfer", "a" * 64, "result.log",
+diff --git a/testing/rtl/uce_icache_replay_driver.cpp b/testing/rtl/uce_icache_replay_driver.cpp
+index 7bf5ff84..107f4fd4 100644
+--- a/testing/rtl/uce_icache_replay_driver.cpp
++++ b/testing/rtl/uce_icache_replay_driver.cpp
+@@ -21,6 +21,9 @@ class Test {
+   VerilatedFstC trace;
+   unsigned cycles = 0, data_writes = 0, side_writes = 0, publishes = 0;
+   std::vector<Header> sent;
++  bool expect_normal_addr = false;
++  uint64_t normal_line_addr = 0;
++  unsigned normal_addr_beats = 0;
+ 
+   Handshake step() {
+     require(++cycles < 4000, "global I-cache replay cycle limit");
+@@ -38,14 +41,27 @@ class Test {
+     if (!dut.reset_i && dut.fwd_v_o && dut.fwd_ready_i)
+       sent.push_back({dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o,
+                       dut.fwd_state_o, dut.fwd_addr_o, bool(dut.fwd_prefetch_o)});
++    if (!dut.reset_i && expect_normal_addr && dut.data_v_o
++        && dut.arrays_accept_i && dut.data_opcode_o == 0) {
++      unsigned beat = 0, mask = dut.data_fill_o;
++      require(mask && !(mask & (mask-1)), "ordinary refill emitted invalid fill mask");
++      while ((1u << beat) != mask) ++beat;
++      require(dut.data_addr_o == normal_line_addr + beat*16,
++              "ordinary refill packet lost physical beat address");
++      ++normal_addr_beats;
++    }
+     if (!dut.reset_i && dut.data_v_o && dut.arrays_accept_i
+         && dut.data_opcode_o == (dut.side_buffer_o ? 3 : 0)) {
+       unsigned beat = 0, mask = dut.data_fill_o;
+       require(mask && !(mask & (mask-1)), "installer emitted invalid fill mask");
+       while ((1u << beat) != mask) ++beat;
+-      require(dut.data_word0_o == seed + beat*2
+-              && dut.data_word1_o == seed + beat*2 + 1,
+-              "installer corrupted a replay beat");
++      if (!(dut.data_word0_o == seed + beat*2
++            && dut.data_word1_o == seed + beat*2 + 1)) {
++        std::cerr << "beat mismatch mask=" << mask << " expected_index=" << beat
++                  << " normal=" << expect_normal_addr << " data0=0x" << std::hex
++                  << dut.data_word0_o << " addr=0x" << dut.data_addr_o << std::dec << '\n';
++        throw std::runtime_error("installer corrupted a replay beat");
++      }
+       if (dut.side_buffer_o) ++side_writes;
+       else ++data_writes;
+     }
+@@ -96,10 +112,15 @@ class Test {
+     throw std::runtime_error("memory request timeout");
+   }
+   void response(const Header &h, unsigned first = 0) {
++    expect_normal_addr = !h.prefetch;
++    normal_line_addr = h.addr & ~UINT64_C(63);
+     for (unsigned beat = first; beat < 4; ++beat) {
+       dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
+       dut.rev_way_i = h.way; dut.rev_state_i = h.state;
+       dut.rev_prefetch_i = h.prefetch;
++      // This wrapper's widest configured beat is one complete line, so
++      // even an unaligned request returns sectors in aligned wire order.
++      // The pump separately marks the requested sector as critical.
+       dut.rev_word0_i = seed + beat*2; dut.rev_word1_i = seed + beat*2 + 1;
+       dut.rev_v_i = 1;
+       bool accepted = false;
+@@ -109,6 +130,7 @@ class Test {
+       require(accepted, "reverse replay response timeout");
+       dut.rev_v_i = 0; step();
+     }
++    expect_normal_addr = false;
+   }
+   void one_response_beat(const Header &h) {
+     dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
+@@ -156,6 +178,14 @@ public:
+             "same-cycle collision did not preserve only ordinary demand");
+     response(sent[0]); wait_idle_empty();
+     sent.clear();
++    // An unaligned ordinary request must still expose the current physical
++    // beat address as well as its SRAM index/way and fill mask.
++    request(miss_load, 0x8000f020); wait_sent(1);
++    require(!sent[0].prefetch && sent[0].addr == 0x8000f020,
++            "ordinary request lost its critical-sector offset");
++    response(sent[0]); wait_idle_empty();
++    require(normal_addr_beats == 8, "ordinary physical-address gate missed refill beats");
++    sent.clear();
+     data_writes = 0; side_writes = 0; publishes = 0;
+ 
+     // A complete reply must install all four beats before publishing its tag.
+diff --git a/testing/rtl/uce_icache_replay_tb.sv b/testing/rtl/uce_icache_replay_tb.sv
+index ef233d9a..122a8bd3 100644
+--- a/testing/rtl/uce_icache_replay_tb.sv
++++ b/testing/rtl/uce_icache_replay_tb.sv
+@@ -38,6 +38,7 @@ module uce_icache_replay_tb
+    output [3:0] fwd_type_o,
+    output [2:0] fwd_size_o,
+    output [63:0] fwd_addr_o,
++   output [63:0] data_addr_o,
+    output [7:0] fwd_way_o,
+    output [2:0] fwd_state_o,
+    output fwd_prefetch_o,
+@@ -96,6 +97,7 @@ module uce_icache_replay_tb
+   assign data_opcode_o = data_pkt.opcode;
+   assign stat_opcode_o = stat_pkt.opcode;
+   assign data_fill_o = data_pkt.fill_index;
++  assign data_addr_o = 64'(data_pkt.addr);
+   assign data_word0_o = data_pkt.data[0+:64];
+   assign data_word1_o = data_pkt.data[64+:64];
+   assign fwd_type_o = fwd.msg_type;
+diff --git a/testing/test_check_run.py b/testing/test_check_run.py
+index 72b88e70..81479825 100644
+--- a/testing/test_check_run.py
++++ b/testing/test_check_run.py
+@@ -194,6 +194,11 @@ class HarnessTests(unittest.TestCase):
+                      (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=0 BP_AXI_MEM_READ_QUEUE_DEPTH=0",
+                       "-axipipe-lat0-q0"),
+                      (4, "BP_AXI_MEM_READ_LATENCY=60 BP_AXI_MEM_READ_QUEUE_DEPTH=8", ""),
++                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE", "-icapture"),
++                     (4, "", ""),
++                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE=0", "-icapture"),
++                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE BP_AXI_MEM_PIPELINED",
++                      "-axipipe-lat40-q4-icapture"),
+                      (4, "", ""))
+             for contexts, defines, suffix in cases:
+                 stamp = ".build_config-nt2-nc{}-cfgtest-trace1{}".format(

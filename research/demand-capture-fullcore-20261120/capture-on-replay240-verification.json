@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "scope": "full-core simulator correctness; no FPGA acceptance or Linux performance",
+  "top_commit": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+  "bp_commit": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57",
+  "threads": 2,
+  "contexts": 4,
+  "trace": 1,
+  "defines": [
+    "BP_ICACHE_REPLAY_DEMAND_CAPTURE",
+    "BP_AXI_MEM_PIPELINED",
+    "BP_AXI_MEM_READ_LATENCY=40",
+    "BP_AXI_MEM_READ_QUEUE_DEPTH=4"
+  ],
+  "native_limit_seconds": 240,
+  "artifact_sha256": {
+    "capture-on-replay240.log": "c4d7166745220a40888cc37feecf2b338af4d38188c36b808d1e1a84ae7db211",
+    "capture-on-build.log": "b6508b475da083e8896c26d53d2975becc72b355df86ecb89e95c2241d02a6c6",
+    "capture-on-replay240.riscv": "004d8c683fcb1f454e547c63a59f6990ad6b481688a7a4601b76c8db5f9fe7b8",
+    "capture-on-replay240.nbf": "984ce1156f8c8bed9f7b909938b7ff463fed93cf8130822dc077f2a0e5b7f41a",
+    "capture-on-replay240.fst": "0048f59521c6b882d505cddd1e4ecf77695a96f3ce630fad38e18f9a20703438"
+  }
+}

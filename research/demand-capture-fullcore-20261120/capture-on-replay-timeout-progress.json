@@ -1,0 +1,808 @@
+{
+  "scope": "architectural progress only; no performance/RTL acceptance",
+  "sampling": "stable values before actual be.clk_i rising edges",
+  "timescale": "1ps",
+  "signals": {
+    "clock": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.clk_i",
+    "reset": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.reset_i",
+    "commit_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.calculator.commit_pkt_cast_o.instret",
+    "commit_pc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.calculator.commit_pkt_cast_o.pc",
+    "expected_npc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.director.expected_npc_o",
+    "dispatch_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.scheduler.dispatch_pkt_cast_o.v",
+    "dispatch_pc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.be.scheduler.dispatch_pkt_cast_o.pc",
+    "icache_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.fe.icache.state_r",
+    "capture_active": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.core_minimal.fe.icache.demand_capture_active_r"
+  },
+  "be_edges": 383219,
+  "retired": 17900,
+  "nop_stream_retired": 15264,
+  "longest_nop_stream_commit_gap_cycles": 658,
+  "cycles_since_final_commit": 97,
+  "phase_store_commits": [
+    {
+      "cycle": 39186,
+      "timestamp": 1959325000,
+      "pc": "0x8000029e",
+      "phase": 1
+    },
+    {
+      "cycle": 42210,
+      "timestamp": 2110525000,
+      "pc": "0x800002aa",
+      "phase": 2
+    },
+    {
+      "cycle": 42908,
+      "timestamp": 2145425000,
+      "pc": "0x800002dc",
+      "phase": 3
+    },
+    {
+      "cycle": 45862,
+      "timestamp": 2293125000,
+      "pc": "0x80000342",
+      "phase": 4
+    },
+    {
+      "cycle": 46667,
+      "timestamp": 2333375000,
+      "pc": "0x80000380",
+      "phase": 5
+    }
+  ],
+  "last_1000cycle_bins": [
+    {
+      "start_cycle": 368000,
+      "retired": 32,
+      "first_pc": "0x80007980",
+      "last_pc": "0x800079be"
+    },
+    {
+      "start_cycle": 369000,
+      "retired": 33,
+      "first_pc": "0x800079c0",
+      "last_pc": "0x80007a00"
+    },
+    {
+      "start_cycle": 370000,
+      "retired": 63,
+      "first_pc": "0x80007a02",
+      "last_pc": "0x80007a7e"
+    },
+    {
+      "start_cycle": 371000,
+      "retired": 32,
+      "first_pc": "0x80007a80",
+      "last_pc": "0x80007abe"
+    },
+    {
+      "start_cycle": 372000,
+      "retired": 64,
+      "first_pc": "0x80007ac0",
+      "last_pc": "0x80007b3e"
+    },
+    {
+      "start_cycle": 373000,
+      "retired": 32,
+      "first_pc": "0x80007b40",
+      "last_pc": "0x80007b7e"
+    },
+    {
+      "start_cycle": 374000,
+      "retired": 64,
+      "first_pc": "0x80007b80",
+      "last_pc": "0x80007bfe"
+    },
+    {
+      "start_cycle": 375000,
+      "retired": 32,
+      "first_pc": "0x80007c00",
+      "last_pc": "0x80007c3e"
+    },
+    {
+      "start_cycle": 376000,
+      "retired": 64,
+      "first_pc": "0x80007c40",
+      "last_pc": "0x80007cbe"
+    },
+    {
+      "start_cycle": 377000,
+      "retired": 32,
+      "first_pc": "0x80007cc0",
+      "last_pc": "0x80007cfe"
+    },
+    {
+      "start_cycle": 378000,
+      "retired": 64,
+      "first_pc": "0x80007d00",
+      "last_pc": "0x80007d7e"
+    },
+    {
+      "start_cycle": 379000,
+      "retired": 32,
+      "first_pc": "0x80007d80",
+      "last_pc": "0x80007dbe"
+    },
+    {
+      "start_cycle": 380000,
+      "retired": 32,
+      "first_pc": "0x80007dc0",
+      "last_pc": "0x80007dfe"
+    },
+    {
+      "start_cycle": 381000,
+      "retired": 64,
+      "first_pc": "0x80007e00",
+      "last_pc": "0x80007e7e"
+    },
+    {
+      "start_cycle": 382000,
+      "retired": 32,
+      "first_pc": "0x80007e80",
+      "last_pc": "0x80007ebe"
+    },
+    {
+      "start_cycle": 383000,
+      "retired": 32,
+      "first_pc": "0x80007ec0",
+      "last_pc": "0x80007efe"
+    }
+  ],
+  "last_commits": [
+    {
+      "cycle": 381023,
+      "timestamp": 19051175000,
+      "pc": "0x80007e00"
+    },
+    {
+      "cycle": 381024,
+      "timestamp": 19051225000,
+      "pc": "0x80007e02"
+    },
+    {
+      "cycle": 381025,
+      "timestamp": 19051275000,
+      "pc": "0x80007e04"
+    },
+    {
+      "cycle": 381026,
+      "timestamp": 19051325000,
+      "pc": "0x80007e06"
+    },
+    {
+      "cycle": 381027,
+      "timestamp": 19051375000,
+      "pc": "0x80007e08"
+    },
+    {
+      "cycle": 381028,
+      "timestamp": 19051425000,
+      "pc": "0x80007e0a"
+    },
+    {
+      "cycle": 381029,
+      "timestamp": 19051475000,
+      "pc": "0x80007e0c"
+    },
+    {
+      "cycle": 381030,
+      "timestamp": 19051525000,
+      "pc": "0x80007e0e"
+    },
+    {
+      "cycle": 381031,
+      "timestamp": 19051575000,
+      "pc": "0x80007e10"
+    },
+    {
+      "cycle": 381032,
+      "timestamp": 19051625000,
+      "pc": "0x80007e12"
+    },
+    {
+      "cycle": 381033,
+      "timestamp": 19051675000,
+      "pc": "0x80007e14"
+    },
+    {
+      "cycle": 381034,
+      "timestamp": 19051725000,
+      "pc": "0x80007e16"
+    },
+    {
+      "cycle": 381035,
+      "timestamp": 19051775000,
+      "pc": "0x80007e18"
+    },
+    {
+      "cycle": 381036,
+      "timestamp": 19051825000,
+      "pc": "0x80007e1a"
+    },
+    {
+      "cycle": 381037,
+      "timestamp": 19051875000,
+      "pc": "0x80007e1c"
+    },
+    {
+      "cycle": 381038,
+      "timestamp": 19051925000,
+      "pc": "0x80007e1e"
+    },
+    {
+      "cycle": 381039,
+      "timestamp": 19051975000,
+      "pc": "0x80007e20"
+    },
+    {
+      "cycle": 381040,
+      "timestamp": 19052025000,
+      "pc": "0x80007e22"
+    },
+    {
+      "cycle": 381041,
+      "timestamp": 19052075000,
+      "pc": "0x80007e24"
+    },
+    {
+      "cycle": 381042,
+      "timestamp": 19052125000,
+      "pc": "0x80007e26"
+    },
+    {
+      "cycle": 381043,
+      "timestamp": 19052175000,
+      "pc": "0x80007e28"
+    },
+    {
+      "cycle": 381044,
+      "timestamp": 19052225000,
+      "pc": "0x80007e2a"
+    },
+    {
+      "cycle": 381045,
+      "timestamp": 19052275000,
+      "pc": "0x80007e2c"
+    },
+    {
+      "cycle": 381046,
+      "timestamp": 19052325000,
+      "pc": "0x80007e2e"
+    },
+    {
+      "cycle": 381047,
+      "timestamp": 19052375000,
+      "pc": "0x80007e30"
+    },
+    {
+      "cycle": 381048,
+      "timestamp": 19052425000,
+      "pc": "0x80007e32"
+    },
+    {
+      "cycle": 381049,
+      "timestamp": 19052475000,
+      "pc": "0x80007e34"
+    },
+    {
+      "cycle": 381050,
+      "timestamp": 19052525000,
+      "pc": "0x80007e36"
+    },
+    {
+      "cycle": 381051,
+      "timestamp": 19052575000,
+      "pc": "0x80007e38"
+    },
+    {
+      "cycle": 381052,
+      "timestamp": 19052625000,
+      "pc": "0x80007e3a"
+    },
+    {
+      "cycle": 381053,
+      "timestamp": 19052675000,
+      "pc": "0x80007e3c"
+    },
+    {
+      "cycle": 381054,
+      "timestamp": 19052725000,
+      "pc": "0x80007e3e"
+    },
+    {
+      "cycle": 381712,
+      "timestamp": 19085625000,
+      "pc": "0x80007e40"
+    },
+    {
+      "cycle": 381713,
+      "timestamp": 19085675000,
+      "pc": "0x80007e42"
+    },
+    {
+      "cycle": 381714,
+      "timestamp": 19085725000,
+      "pc": "0x80007e44"
+    },
+    {
+      "cycle": 381715,
+      "timestamp": 19085775000,
+      "pc": "0x80007e46"
+    },
+    {
+      "cycle": 381716,
+      "timestamp": 19085825000,
+      "pc": "0x80007e48"
+    },
+    {
+      "cycle": 381717,
+      "timestamp": 19085875000,
+      "pc": "0x80007e4a"
+    },
+    {
+      "cycle": 381718,
+      "timestamp": 19085925000,
+      "pc": "0x80007e4c"
+    },
+    {
+      "cycle": 381719,
+      "timestamp": 19085975000,
+      "pc": "0x80007e4e"
+    },
+    {
+      "cycle": 381720,
+      "timestamp": 19086025000,
+      "pc": "0x80007e50"
+    },
+    {
+      "cycle": 381721,
+      "timestamp": 19086075000,
+      "pc": "0x80007e52"
+    },
+    {
+      "cycle": 381722,
+      "timestamp": 19086125000,
+      "pc": "0x80007e54"
+    },
+    {
+      "cycle": 381723,
+      "timestamp": 19086175000,
+      "pc": "0x80007e56"
+    },
+    {
+      "cycle": 381724,
+      "timestamp": 19086225000,
+      "pc": "0x80007e58"
+    },
+    {
+      "cycle": 381725,
+      "timestamp": 19086275000,
+      "pc": "0x80007e5a"
+    },
+    {
+      "cycle": 381726,
+      "timestamp": 19086325000,
+      "pc": "0x80007e5c"
+    },
+    {
+      "cycle": 381727,
+      "timestamp": 19086375000,
+      "pc": "0x80007e5e"
+    },
+    {
+      "cycle": 381728,
+      "timestamp": 19086425000,
+      "pc": "0x80007e60"
+    },
+    {
+      "cycle": 381729,
+      "timestamp": 19086475000,
+      "pc": "0x80007e62"
+    },
+    {
+      "cycle": 381730,
+      "timestamp": 19086525000,
+      "pc": "0x80007e64"
+    },
+    {
+      "cycle": 381731,
+      "timestamp": 19086575000,
+      "pc": "0x80007e66"
+    },
+    {
+      "cycle": 381732,
+      "timestamp": 19086625000,
+      "pc": "0x80007e68"
+    },
+    {
+      "cycle": 381733,
+      "timestamp": 19086675000,
+      "pc": "0x80007e6a"
+    },
+    {
+      "cycle": 381734,
+      "timestamp": 19086725000,
+      "pc": "0x80007e6c"
+    },
+    {
+      "cycle": 381735,
+      "timestamp": 19086775000,
+      "pc": "0x80007e6e"
+    },
+    {
+      "cycle": 381736,
+      "timestamp": 19086825000,
+      "pc": "0x80007e70"
+    },
+    {
+      "cycle": 381737,
+      "timestamp": 19086875000,
+      "pc": "0x80007e72"
+    },
+    {
+      "cycle": 381738,
+      "timestamp": 19086925000,
+      "pc": "0x80007e74"
+    },
+    {
+      "cycle": 381739,
+      "timestamp": 19086975000,
+      "pc": "0x80007e76"
+    },
+    {
+      "cycle": 381740,
+      "timestamp": 19087025000,
+      "pc": "0x80007e78"
+    },
+    {
+      "cycle": 381741,
+      "timestamp": 19087075000,
+      "pc": "0x80007e7a"
+    },
+    {
+      "cycle": 381742,
+      "timestamp": 19087125000,
+      "pc": "0x80007e7c"
+    },
+    {
+      "cycle": 381743,
+      "timestamp": 19087175000,
+      "pc": "0x80007e7e"
+    },
+    {
+      "cycle": 382401,
+      "timestamp": 19120075000,
+      "pc": "0x80007e80"
+    },
+    {
+      "cycle": 382402,
+      "timestamp": 19120125000,
+      "pc": "0x80007e82"
+    },
+    {
+      "cycle": 382403,
+      "timestamp": 19120175000,
+      "pc": "0x80007e84"
+    },
+    {
+      "cycle": 382404,
+      "timestamp": 19120225000,
+      "pc": "0x80007e86"
+    },
+    {
+      "cycle": 382405,
+      "timestamp": 19120275000,
+      "pc": "0x80007e88"
+    },
+    {
+      "cycle": 382406,
+      "timestamp": 19120325000,
+      "pc": "0x80007e8a"
+    },
+    {
+      "cycle": 382407,
+      "timestamp": 19120375000,
+      "pc": "0x80007e8c"
+    },
+    {
+      "cycle": 382408,
+      "timestamp": 19120425000,
+      "pc": "0x80007e8e"
+    },
+    {
+      "cycle": 382409,
+      "timestamp": 19120475000,
+      "pc": "0x80007e90"
+    },
+    {
+      "cycle": 382410,
+      "timestamp": 19120525000,
+      "pc": "0x80007e92"
+    },
+    {
+      "cycle": 382411,
+      "timestamp": 19120575000,
+      "pc": "0x80007e94"
+    },
+    {
+      "cycle": 382412,
+      "timestamp": 19120625000,
+      "pc": "0x80007e96"
+    },
+    {
+      "cycle": 382413,
+      "timestamp": 19120675000,
+      "pc": "0x80007e98"
+    },
+    {
+      "cycle": 382414,
+      "timestamp": 19120725000,
+      "pc": "0x80007e9a"
+    },
+    {
+      "cycle": 382415,
+      "timestamp": 19120775000,
+      "pc": "0x80007e9c"
+    },
+    {
+      "cycle": 382416,
+      "timestamp": 19120825000,
+      "pc": "0x80007e9e"
+    },
+    {
+      "cycle": 382417,
+      "timestamp": 19120875000,
+      "pc": "0x80007ea0"
+    },
+    {
+      "cycle": 382418,
+      "timestamp": 19120925000,
+      "pc": "0x80007ea2"
+    },
+    {
+      "cycle": 382419,
+      "timestamp": 19120975000,
+      "pc": "0x80007ea4"
+    },
+    {
+      "cycle": 382420,
+      "timestamp": 19121025000,
+      "pc": "0x80007ea6"
+    },
+    {
+      "cycle": 382421,
+      "timestamp": 19121075000,
+      "pc": "0x80007ea8"
+    },
+    {
+      "cycle": 382422,
+      "timestamp": 19121125000,
+      "pc": "0x80007eaa"
+    },
+    {
+      "cycle": 382423,
+      "timestamp": 19121175000,
+      "pc": "0x80007eac"
+    },
+    {
+      "cycle": 382424,
+      "timestamp": 19121225000,
+      "pc": "0x80007eae"
+    },
+    {
+      "cycle": 382425,
+      "timestamp": 19121275000,
+      "pc": "0x80007eb0"
+    },
+    {
+      "cycle": 382426,
+      "timestamp": 19121325000,
+      "pc": "0x80007eb2"
+    },
+    {
+      "cycle": 382427,
+      "timestamp": 19121375000,
+      "pc": "0x80007eb4"
+    },
+    {
+      "cycle": 382428,
+      "timestamp": 19121425000,
+      "pc": "0x80007eb6"
+    },
+    {
+      "cycle": 382429,
+      "timestamp": 19121475000,
+      "pc": "0x80007eb8"
+    },
+    {
+      "cycle": 382430,
+      "timestamp": 19121525000,
+      "pc": "0x80007eba"
+    },
+    {
+      "cycle": 382431,
+      "timestamp": 19121575000,
+      "pc": "0x80007ebc"
+    },
+    {
+      "cycle": 382432,
+      "timestamp": 19121625000,
+      "pc": "0x80007ebe"
+    },
+    {
+      "cycle": 383090,
+      "timestamp": 19154525000,
+      "pc": "0x80007ec0"
+    },
+    {
+      "cycle": 383091,
+      "timestamp": 19154575000,
+      "pc": "0x80007ec2"
+    },
+    {
+      "cycle": 383092,
+      "timestamp": 19154625000,
+      "pc": "0x80007ec4"
+    },
+    {
+      "cycle": 383093,
+      "timestamp": 19154675000,
+      "pc": "0x80007ec6"
+    },
+    {
+      "cycle": 383094,
+      "timestamp": 19154725000,
+      "pc": "0x80007ec8"
+    },
+    {
+      "cycle": 383095,
+      "timestamp": 19154775000,
+      "pc": "0x80007eca"
+    },
+    {
+      "cycle": 383096,
+      "timestamp": 19154825000,
+      "pc": "0x80007ecc"
+    },
+    {
+      "cycle": 383097,
+      "timestamp": 19154875000,
+      "pc": "0x80007ece"
+    },
+    {
+      "cycle": 383098,
+      "timestamp": 19154925000,
+      "pc": "0x80007ed0"
+    },
+    {
+      "cycle": 383099,
+      "timestamp": 19154975000,
+      "pc": "0x80007ed2"
+    },
+    {
+      "cycle": 383100,
+      "timestamp": 19155025000,
+      "pc": "0x80007ed4"
+    },
+    {
+      "cycle": 383101,
+      "timestamp": 19155075000,
+      "pc": "0x80007ed6"
+    },
+    {
+      "cycle": 383102,
+      "timestamp": 19155125000,
+      "pc": "0x80007ed8"
+    },
+    {
+      "cycle": 383103,
+      "timestamp": 19155175000,
+      "pc": "0x80007eda"
+    },
+    {
+      "cycle": 383104,
+      "timestamp": 19155225000,
+      "pc": "0x80007edc"
+    },
+    {
+      "cycle": 383105,
+      "timestamp": 19155275000,
+      "pc": "0x80007ede"
+    },
+    {
+      "cycle": 383106,
+      "timestamp": 19155325000,
+      "pc": "0x80007ee0"
+    },
+    {
+      "cycle": 383107,
+      "timestamp": 19155375000,
+      "pc": "0x80007ee2"
+    },
+    {
+      "cycle": 383108,
+      "timestamp": 19155425000,
+      "pc": "0x80007ee4"
+    },
+    {
+      "cycle": 383109,
+      "timestamp": 19155475000,
+      "pc": "0x80007ee6"
+    },
+    {
+      "cycle": 383110,
+      "timestamp": 19155525000,
+      "pc": "0x80007ee8"
+    },
+    {
+      "cycle": 383111,
+      "timestamp": 19155575000,
+      "pc": "0x80007eea"
+    },
+    {
+      "cycle": 383112,
+      "timestamp": 19155625000,
+      "pc": "0x80007eec"
+    },
+    {
+      "cycle": 383113,
+      "timestamp": 19155675000,
+      "pc": "0x80007eee"
+    },
+    {
+      "cycle": 383114,
+      "timestamp": 19155725000,
+      "pc": "0x80007ef0"
+    },
+    {
+      "cycle": 383115,
+      "timestamp": 19155775000,
+      "pc": "0x80007ef2"
+    },
+    {
+      "cycle": 383116,
+      "timestamp": 19155825000,
+      "pc": "0x80007ef4"
+    },
+    {
+      "cycle": 383117,
+      "timestamp": 19155875000,
+      "pc": "0x80007ef6"
+    },
+    {
+      "cycle": 383118,
+      "timestamp": 19155925000,
+      "pc": "0x80007ef8"
+    },
+    {
+      "cycle": 383119,
+      "timestamp": 19155975000,
+      "pc": "0x80007efa"
+    },
+    {
+      "cycle": 383120,
+      "timestamp": 19156025000,
+      "pc": "0x80007efc"
+    },
+    {
+      "cycle": 383121,
+      "timestamp": 19156075000,
+      "pc": "0x80007efe"
+    }
+  ],
+  "final": {
+    "cycle": 383218,
+    "timestamp": 19160925000,
+    "values": {
+      "capture_active": 1,
+      "icache_state": 1,
+      "expected_npc": 2147516160,
+      "commit_pc": 2147516160,
+      "commit_v": 0,
+      "dispatch_pc": 2147516160,
+      "dispatch_v": 0,
+      "reset": 0,
+      "clock": 0
+    }
+  }
+}

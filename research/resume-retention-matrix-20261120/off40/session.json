@@ -1,0 +1,294 @@
+{
+  "scope": "Synthetic full-core nonresident instruction-prefix study; not Linux or FPGA performance.",
+  "state": "complete",
+  "model": {
+    "stamp": ".build_config-nt2-nc4-cfge_bp_custom_cfg-trace1-axipipe-lat40-q4",
+    "verilator_command": "verilator /home/coyang/zynq-parrot-linux-research/cosim/v/waiver.vlt --cc --sv --exe --build --build-jobs 8 -Wno-fatal -top-module bsg_nonsynth_zynq_testbench -CFLAGS \"-D_DEFAULT_SOURCE -D_BSD_SOURCE -DGP0_ADDR_BASE=0x40000000U -DGP0_HIER_BASE=TOP.bsg_nonsynth_zynq_testbench.axil0 -DHP0_ADDR_BASE=0x00000000U -DAXI_MEM_ENABLE -DGP0_ENABLE=1 -DGP0_ADDR_WIDTH=10 -DGP0_DATA_WIDTH=32 -DHP0_ENABLE=1 -DHP0_DATA_WIDTH=32 -DHP0_ADDR_WIDTH=32 -DACLK_MHZ=20 -DBP_NCPUS=1 -DBP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p -DBP_NUM_THREADS=2 -DBRANCH_METADATA_FWD_WIDTH=50 -DBP_NUM_CONTEXTS=4 -DHOST_ZYNQ -DBSG_NO_TIMESCALE -DSIMULATION -DBP_AXI_MEM_PIPELINED -DBP_AXI_MEM_READ_LATENCY=40 -DBP_AXI_MEM_READ_QUEUE_DEPTH=4 -I/home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/src/ -I/home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/verilator -I/home/coyang/zynq-parrot-linux-research/cosim/include/common -I/home/coyang/zynq-parrot-linux-research/cosim/include/verilator -I/home/coyang/zynq-parrot-linux-research/install/include -I/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_mem -I/home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/src -I/home/coyang/zynq-parrot-linux-research/import/bsg_replicant/libraries -I/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test -L/home/coyang/zynq-parrot-linux-research/install/lib\" -LDFLAGS \" -L/home/coyang/zynq-parrot-linux-research/install/lib -lboost_coroutine -lboost_context -lboost_system\" +define+GP0_ADDR_BASE=0x40000000U +define+GP0_HIER_BASE=TOP.bsg_nonsynth_zynq_testbench.axil0 +define+HP0_ADDR_BASE=0x00000000U +define+AXI_MEM_ENABLE +define+GP0_ENABLE=1 +define+GP0_ADDR_WIDTH=10 +define+GP0_DATA_WIDTH=32 +define+HP0_ENABLE=1 +define+HP0_DATA_WIDTH=32 +define+HP0_ADDR_WIDTH=32 +define+ACLK_MHZ=20 +define+BP_NCPUS=1 +define+BP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p +define+BP_NUM_THREADS=2 +define+BRANCH_METADATA_FWD_WIDTH=50 +define+BP_NUM_CONTEXTS=4 +define+HOST_ZYNQ +define+BSG_NO_TIMESCALE +define+SIMULATION +define+BP_AXI_MEM_PIPELINED +define+BP_AXI_MEM_READ_LATENCY=40 +define+BP_AXI_MEM_READ_QUEUE_DEPTH=4 +incdir+/home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/verilator +incdir+/home/coyang/zynq-parrot-linux-research/cosim/include/verilator +incdir+/home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/v +incdir+/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_async +incdir+/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_misc +incdir+/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_noc +incdir+/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_tag +incdir+/home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/manycore/v +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dmc +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_test +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/RISCV +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/include +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/include +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/include +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/include +incdir+/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/include --trace-fst --trace-structs +define+FSTON +define+BSG_NONSYNTH_WAVEFORM_TRACER_ENABLE +define+BSG_NONSYNTH_WAVEFORM_TRACER_DEPTH=0 +define+BSG_NONSYNTH_WAVEFORM_TRACER_HIER=bsg_nonsynth_zynq_testbench.dut +define+BSG_NONSYNTH_WAVEFORM_TRACER_FST /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_tag/bsg_tag_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_axi/bsg_axi_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_cache/bsg_cache_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_dmc/bsg_dmc_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_link/bsg_link_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_noc/bsg_mesh_router_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_noc/bsg_noc_pkg.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_noc/bsg_wormhole_router_pkg.sv /home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/v/zynq_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_noc_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router_pkg.sv /home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/v/bp_common_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/include/bp_fe_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/include/bp_be_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/include/bp_me_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/include/bp_top_pkg.sv bsg_blackparrot_pkg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_async/bsg_async_fifo.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_async/bsg_launch_sync_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_async/bsg_sync_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_async/bsg_async_ptr_gray.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_dma.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_dma_to_wormhole.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_miss.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_decode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_sbuf.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_tbuf.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_buffer_queue.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_wormhole_to_cache_dma_fanout.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_channel_tunnel.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_channel_tunnel_in.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_channel_tunnel_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_1_to_n_tagged_fifo.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_1_to_n_tagged.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_1r1w_large.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_1r1w_pseudo_large.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_1r1w_small.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_1r1w_small_unhardened.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_1rw_large.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_tracker.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_flow_counter.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_one_fifo.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_parallel_in_serial_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_parallel_in_serial_out_dynamic.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_parallel_in_serial_out_passthrough.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_parallel_in_serial_out_passthrough_dynamic.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_serial_in_parallel_out_passthrough_dynamic.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_round_robin_1_to_n.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_round_robin_2_to_2.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_round_robin_n_to_1.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_serial_in_parallel_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_serial_in_parallel_out_dynamic.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_serial_in_parallel_out_full.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_serial_in_parallel_out_passthrough.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_shift_reg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_two_fifo.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_cam_1r1w_replacement.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_cam_1r1w_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_cam_1r1w_tag_array.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w_one_hot.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w_sync_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync_mask_write_bit.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync_mask_write_bit_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync_mask_write_byte.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync_mask_write_byte_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_2r1w_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_2r1w_sync_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_3r1w_sync.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_3r1w_sync_synth.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_adder_cin.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_adder_one_hot.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_adder_ripple_carry.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_arb_fixed.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_arb_round_robin.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_array_concentrate_static.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_buf.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_buf_ctrl.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_circular_ptr.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_concentrate_static.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counting_leading_zeros.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_clear_up.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_clear_up_one_hot.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_clock_downsample.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_set_down.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_set_en.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_up_down.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_counter_up_down_variable.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_crossbar_o_by_i.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_crossbar_control_locking_o_by_i.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_cycle_counter.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_decode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_decode_with_v.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_chain.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_en.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_en_bypass.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_reset.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_reset_en.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_reset_en_bypass.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dff_reset_set_clear.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_dlatch.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_edge_detect.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_encode_one_hot.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_expand_bitmask.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_gray_to_binary.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_hash_bank.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_hash_bank_reverse.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_imul_iterative.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_idiv_iterative.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_idiv_iterative_controller.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_lfsr.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_lru_pseudo_tree_backup.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_lru_pseudo_tree_decode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_lru_pseudo_tree_encode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_locking_arb_fixed.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mul_add_unsigned.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mux.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mux_bitwise.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mux_butterfly.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mux_one_hot.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mux_segmented.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_muxi2_gatestack.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_mux2_gatestack.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_nor2.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_nor3.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_nand.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_popcount.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_priority_encode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_priority_encode_one_hot_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_reduce.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_reduce_segmented.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_rotate_left.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_rotate_right.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_round_robin_arb.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_scan.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_strobe.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_swap.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_thermometer_count.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_transpose.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_unconcentrate_static.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_misc/bsg_xnor.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_mesh_stitch.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_noc_repeater_node.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_concentrator.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_concentrator_in.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_concentrator_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router_adapter_in.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router_adapter_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router_decoder_dor.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router_input_control.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_noc/bsg_wormhole_router_output_control.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/compareRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/divSqrtRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/divSqrtRecFN_medium.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/divSqrtRecFN_small.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/fNToRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/HardFloat_primitives.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/HardFloat_rawFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/iNToRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/isSigNaNRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/mulAddRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/mulRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/recFNToFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/recFNToIN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/recFNToRecFN.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/HardFloat/source/RISCV/HardFloat_specialize.v /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_bus_pack.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bp_mmu.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bp_pma.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bp_tlb.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_top.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_context_mem.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_calculator_top.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_csr.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_csr_wrapper_mt.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_fp_box.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_fp_rebox.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_fp_unbox.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_int_unbox.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_int_box.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_int.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_aux.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_fma.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_long.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_mem.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_sys.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_ptw.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_rec_to_raw.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_reservation.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_cmd_queue.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_detector.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_director.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_expander.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_instr_decoder.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_issue_queue.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_regfile.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_regfile_mt.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_scheduler.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_checker/bp_be_scoreboard.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache_decoder.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache_wbuf.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_ras.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_bht.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_btb.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_controller.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_icache.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_scan.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_pc_gen.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_realigner.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_fe/src/v/bp_fe_top.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/lce/bp_lce.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/lce/bp_lce_req.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/lce/bp_lce_cmd.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_bedrock_register.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_cache_controller.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_dram_hash_decode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_dram_hash_encode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_cache_slice.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_cfg_slice.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_clint_slice.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/dev/bp_me_loopback.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_alu.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_arbitrate.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_branch.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_dir.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_dir_lru_extract.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_dir_segment.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_dir_tag_checker.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_gad.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_inst_decode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_inst_predecode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_inst_ram.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_inst_stall.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_msg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_pending_bits.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_pma.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_reg.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_spec_bits.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_src_sel.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_io_cce.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_fsm.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_cce_wrapper.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_bedrock_size_to_len.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/cce/bp_uce.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_addr_to_cce_id.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_cce_id_to_cord.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_cord_to_id.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_lce_id_to_cord.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_stream_pump.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_stream_pump_in.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_stream_pump_out.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_stream_pump_control.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_stream_to_wormhole.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_wormhole_header_encode.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_wormhole_to_stream.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_wormhole_stream_control.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_xbar_stream.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_me/src/v/network/bp_me_stream_gearbox.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_nd_socket.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_cacc_vdp.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_cacc_tile.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_cacc_tile_node.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_cacc_complex.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_sacc_vdp.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_sacc_scratchpad.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_sacc_tile.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_sacc_tile_node.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_sacc_complex.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_core.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_core_lite.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_core_minimal.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_core_complex.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_l2e_tile.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_l2e_tile_node.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_io_complex.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_io_link_to_lce.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_io_tile.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_io_tile_node.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_mem_complex.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_multicore.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_unicore.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_icache_replay_ctrl.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_dcache_replay_ctrl.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_core_tile.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_core_tile_node.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/src/v/bp_processor.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_async_noc_link.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_dff_sync_read.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_rom_param.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/src/v/bsg_fifo_1r1w_edge.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi_ordering.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi_tx.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi_rx.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_dataflow/bsg_fifo_reorder.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_axi_top.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_axil_master.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_axil_client.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_endpoint_to_fifos.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_prefetch_axi_master.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/axi/v/bsg_axil_fifo_client.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/axi/v/bsg_axil_fifo_master.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/axi/v/bsg_axil_store_packer.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/axi/v/bsg_axil_demux.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/axi/v/bsg_axil_mux.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_tag/bsg_tag_master_decentralized.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_tag/bsg_tag_bitbang.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/external/basejump_stl/bsg_tag/bsg_tag_client.sv bsg_bootrom.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_zynq_pl_shell.sv /home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/v/top_zynq.sv /home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/v/top.v /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_misc/bsg_cycle_counter.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_clock_gen.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_reset_gen.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_clock_gen.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_cycle_counter.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_from_fifo.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_gpio.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_to_fifo.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_rom.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_axi_mem.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bp_nonsynth_axi_mem_pipelined.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/test/common/bsg_nonsynth_waveform_tracer.sv /home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_top/test/common/bsg_nonsynth_assert.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_nonsynth_dpi_to_axil.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_nonsynth_axil_to_dpi.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_nonsynth_dpi_to_axis.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_nonsynth_axis_to_dpi.sv /home/coyang/zynq-parrot-linux-research/cosim/v/bsg_nonsynth_zynq_testbench.sv /home/coyang/zynq-parrot-linux-research/import/basejump_stl/bsg_test/bsg_nonsynth_dpi_clock_gen.cpp /home/coyang/zynq-parrot-linux-research/cosim/src/main.cpp /home/coyang/zynq-parrot-linux-research/cosim/black-parrot-minimal-example/ps.cpp 2>&1 | tee -i build.log",
+    "defines": {
+      "GP0_ADDR_BASE": "0x40000000U",
+      "GP0_HIER_BASE": "TOP.bsg_nonsynth_zynq_testbench.axil0",
+      "HP0_ADDR_BASE": "0x00000000U",
+      "AXI_MEM_ENABLE": "1",
+      "GP0_ENABLE": "1",
+      "GP0_ADDR_WIDTH": "10",
+      "GP0_DATA_WIDTH": "32",
+      "HP0_ENABLE": "1",
+      "HP0_DATA_WIDTH": "32",
+      "HP0_ADDR_WIDTH": "32",
+      "ACLK_MHZ": "20",
+      "BP_NCPUS": "1",
+      "BP_CUSTOM_BASE_CFG": "bp_unicore_zynqparrot_cfg_p",
+      "BP_NUM_THREADS": "2",
+      "BRANCH_METADATA_FWD_WIDTH": "50",
+      "BP_NUM_CONTEXTS": "4",
+      "HOST_ZYNQ": "1",
+      "BSG_NO_TIMESCALE": "1",
+      "SIMULATION": "1",
+      "BP_AXI_MEM_PIPELINED": "1",
+      "BP_AXI_MEM_READ_LATENCY": "40",
+      "BP_AXI_MEM_READ_QUEUE_DEPTH": "4",
+      "FSTON": "1",
+      "BSG_NONSYNTH_WAVEFORM_TRACER_ENABLE": "1",
+      "BSG_NONSYNTH_WAVEFORM_TRACER_DEPTH": "0",
+      "BSG_NONSYNTH_WAVEFORM_TRACER_HIER": "bsg_nonsynth_zynq_testbench.dut",
+      "BSG_NONSYNTH_WAVEFORM_TRACER_FST": "1"
+    },
+    "physical_threads": 2,
+    "logical_contexts": 4,
+    "trace": "FST",
+    "capture": "off",
+    "configured_axi_memory_latency_ticks": 40,
+    "memory_queue_depth": 4,
+    "axi_data_width_bits": 32,
+    "aclk_mhz": 20,
+    "memory_return_pacing": "unchanged model defaults",
+    "binary": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/model/Vbsg_nonsynth_zynq_testbench",
+      "sha256": "16bac3b96c1ab61f6e5a6b6aa2296b9be29d61e7223fb132a359998870765df2",
+      "bytes": 12629888
+    },
+    "build_log": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/model/build.log",
+      "sha256": "9c14348dca83293d11b8ed60d5e03b9bb7b2ed2c5e98503330c51ba315864207",
+      "bytes": 467439
+    }
+  },
+  "runs": [
+    {
+      "mode": 0,
+      "exit_code": -6,
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode0/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode0/prog.nbf",
+        "sha256": "3956d686d4ca099d4c7f95fff59c1bf89a77510117f6f022c9d18674ba50d8ef",
+        "bytes": 158249
+      },
+      "patch": {
+        "RUN_INPUT": "0",
+        "RUN_INPUT_ADDR": "0x80008538",
+        "BSG_RUNTIME_PATCH_VALUE": "0",
+        "BSG_RUNTIME_PATCH_ADDR": "0x80008538",
+        "BSG_TRACE_TIMEOUT_S": "240"
+      },
+      "patch_file": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode0/runtime-patch.json",
+        "sha256": "b0e0bfc56a8c3c3dd974a12339addf74d334a6742ac40523ced201445f62b193",
+        "bytes": 165
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode0/run.log",
+        "sha256": "7daf853680e4f7571d3b42058d06fa6292be9dd7e32ab0349f9198ecd3d6f610",
+        "bytes": 58967
+      },
+      "acceptance": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode0/acceptance.log",
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a",
+        "bytes": 31
+      },
+      "state": "pass",
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode0/dump.fst",
+        "sha256": "27336919f644f25c7cc894f91d61e1c8ddb695e5cbfeeb471472bee8cccd42b6",
+        "bytes": 19672338
+      },
+      "resume_core_global_cycles": 5544,
+      "counter": "CSR 0xCC0 core global cycles",
+      "checksum": "0x60"
+    },
+    {
+      "mode": 1,
+      "exit_code": -6,
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode1/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode1/prog.nbf",
+        "sha256": "3956d686d4ca099d4c7f95fff59c1bf89a77510117f6f022c9d18674ba50d8ef",
+        "bytes": 158249
+      },
+      "patch": {
+        "RUN_INPUT": "1",
+        "RUN_INPUT_ADDR": "0x80008538",
+        "BSG_RUNTIME_PATCH_VALUE": "1",
+        "BSG_RUNTIME_PATCH_ADDR": "0x80008538",
+        "BSG_TRACE_TIMEOUT_S": "240"
+      },
+      "patch_file": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode1/runtime-patch.json",
+        "sha256": "6c5fa3fc577a6fd78aada0b16a59266fc1b9c84c408dc64b80df818bc06ebbdc",
+        "bytes": 165
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode1/run.log",
+        "sha256": "ee0703dfbcf26826dd9628e31edb54db819e17842ac9694e2e96f6ef742b926f",
+        "bytes": 58967
+      },
+      "acceptance": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode1/acceptance.log",
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a",
+        "bytes": 31
+      },
+      "state": "pass",
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode1/dump.fst",
+        "sha256": "b5caf7b19566403802ed1f32ac65d29784442d1947aba35b62688c4b506061d4",
+        "bytes": 20011342
+      },
+      "resume_core_global_cycles": 807,
+      "counter": "CSR 0xCC0 core global cycles",
+      "checksum": "0x60"
+    },
+    {
+      "mode": 2,
+      "exit_code": -6,
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode2/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode2/prog.nbf",
+        "sha256": "3956d686d4ca099d4c7f95fff59c1bf89a77510117f6f022c9d18674ba50d8ef",
+        "bytes": 158249
+      },
+      "patch": {
+        "RUN_INPUT": "2",
+        "RUN_INPUT_ADDR": "0x80008538",
+        "BSG_RUNTIME_PATCH_VALUE": "2",
+        "BSG_RUNTIME_PATCH_ADDR": "0x80008538",
+        "BSG_TRACE_TIMEOUT_S": "240"
+      },
+      "patch_file": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode2/runtime-patch.json",
+        "sha256": "28df01651d31e68d2900df1fad1b2647fdd554829d6adc714b818d179f4df340",
+        "bytes": 165
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode2/run.log",
+        "sha256": "de167a645284b30a7e5f0121670dbec19285eb767b9e1b6000c8661276e52a48",
+        "bytes": 58967
+      },
+      "acceptance": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode2/acceptance.log",
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a",
+        "bytes": 31
+      },
+      "state": "pass",
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode2/dump.fst",
+        "sha256": "461eb5cb926c26daa659e11a9f2399cb4dcacd5707ec4ec29c95ade82f55412a",
+        "bytes": 20041225
+      },
+      "resume_core_global_cycles": 1474,
+      "counter": "CSR 0xCC0 core global cycles",
+      "checksum": "0x60"
+    },
+    {
+      "mode": 3,
+      "exit_code": -6,
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode3/prog.riscv",
+        "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+        "bytes": 176008
+      },
+      "nbf": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode3/prog.nbf",
+        "sha256": "3956d686d4ca099d4c7f95fff59c1bf89a77510117f6f022c9d18674ba50d8ef",
+        "bytes": 158249
+      },
+      "patch": {
+        "RUN_INPUT": "3",
+        "RUN_INPUT_ADDR": "0x80008538",
+        "BSG_RUNTIME_PATCH_VALUE": "3",
+        "BSG_RUNTIME_PATCH_ADDR": "0x80008538",
+        "BSG_TRACE_TIMEOUT_S": "240"
+      },
+      "patch_file": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode3/runtime-patch.json",
+        "sha256": "bb057e622af7e983d8a5bb8580d2c22ee81ed6100dadce3ccd6779b807c8f315",
+        "bytes": 165
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode3/run.log",
+        "sha256": "86ee3ffd7ccbcdabd16594984a56717116bf940c6c1e94701582b7d8efeb8d94",
+        "bytes": 58967
+      },
+      "acceptance": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode3/acceptance.log",
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a",
+        "bytes": 31
+      },
+      "state": "pass",
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/mode3/dump.fst",
+        "sha256": "89edc4445d4a92e10adef24976849d521215c1c00737f778e5a9ded2b190c920",
+        "bytes": 19150627
+      },
+      "resume_core_global_cycles": 721,
+      "counter": "CSR 0xCC0 core global cycles",
+      "checksum": "0x60"
+    }
+  ],
+  "top_revision": "9dbea5f7fc59c76fd18e0fc9502d3bb2abbd98a8",
+  "blackparrot_revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57",
+  "elf_provenance": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/on40/session.json",
+    "sha256": "240fcf38ae2b04880d823656a8b64b84176a3a7ea0c51df23e4b4e4f651cce1f",
+    "bytes": 50603
+  },
+  "program": {
+    "elf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/program/benchmark.riscv",
+      "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+      "bytes": 176008
+    },
+    "source": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/program/mt_context_resume_prefix_benchmark.c",
+      "sha256": "c99daa1a807d94e6904588045f0e56f6223e43ba51d0f3499d9454f49147f431",
+      "bytes": 3584
+    },
+    "compile_command": [
+      "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+      "-O2",
+      "-I/home/coyang/zynq-parrot-linux-research/software/include",
+      "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+      "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+      "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+      "-DNUM_THREADS=2",
+      "-DBP_NUM_THREADS=2",
+      "-DBP_NUM_CONTEXTS=4",
+      "-DBENCH_DIAGNOSTIC=0",
+      "-DBENCH_BARRIER=0",
+      "-o",
+      "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/on40/program/benchmark.riscv",
+      "/home/coyang/zynq-parrot-linux-research/testing/mt_context_resume_prefix_benchmark.c"
+    ],
+    "nbf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/program/prog.nbf",
+      "sha256": "3956d686d4ca099d4c7f95fff59c1bf89a77510117f6f022c9d18674ba50d8ef",
+      "bytes": 158249
+    },
+    "mem": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/program/prog.mem",
+      "sha256": "de354aa9e9485e0c9393515b42f2fc651de38f75efad57c52272b8bc4533bf68",
+      "bytes": 102538
+    },
+    "nbf_command": [
+      "/usr/bin/python3",
+      "/home/coyang/zynq-parrot-linux-research/import/black-parrot/bp_common/software/py/nbf.py",
+      "--skip_zeros",
+      "--keep_mem_zeros",
+      "--mem",
+      "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/off40/program/prog.mem",
+      "--ncpus",
+      "1"
+    ],
+    "benchmark_mode_address": "0x80008538"
+  }
+}

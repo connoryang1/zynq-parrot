@@ -1,0 +1,385 @@
+diff --git a/RESEARCH_LEDGER.md b/RESEARCH_LEDGER.md
+index 761ae64f..9cc23001 100644
+--- a/RESEARCH_LEDGER.md
++++ b/RESEARCH_LEDGER.md
+@@ -1387,6 +1387,10 @@ For the cache-resume architecture, RL-086/087 reject per-switch clear-and-refill
+ 
+ ## Delta log
+ 
++- **2026-11-20 — Full-core temporary output restored after clean:** the first clean full-core build removed the `obj_dir` symlink prepared for RAM-backed output. Its generated code then reached the nearly full disk; the owned build/remaining compiler Make process were stopped, the failed generated directory was preserved in approved RAM space, and no runtime result was accepted. Create and verify the output symlink **after** clean, keep the FST in the same approved temporary area, and require a successful complete rebuild before simulation.
++
++- **2026-11-20 — Sparse host-suite fixture restored:** the expanded Linux host suite ran 349 tests; 345 passed and four failed before assertions because sparse checkout omitted the historical prefix JSON required by `test_icache_prefix.py`. Materialize that exact fixture from `git show HEAD:logs/icache-prefix-status-20261106/stable-cfs-anchor-prefix16-results.json` before rerunning the four tests; no feature behavior was inferred from the failed fixture loads.
++
+ - **2026-11-20 — Isolated checkout and board preflight:** the first full worktree checkout exhausted free space and was automatically removed by Git; a no-checkout worktree followed by sparse checkout excluding archived `logs/` succeeded (the new worktree's missing `info/` directory had to be created first). Existing archived evidence was preserved. The first board workload invocation failed before SSH/NBF execution because sandbox network access was denied, while the independent board recovery was still pending. Keep recovery completion as a strict dependency, use the approved network escalation, retain failed statuses, and never infer guest behavior from these host preflight failures.
+ 
+ - **2026-11-08 — Patch whitespace recheck path corrected:** after converting patch 0026 to zero-context hunks so staged whitespace validation would accept the patch-as-data, the first reverse dry-run used a repository-root-relative filename from inside `linux-tests/` and failed before opening the file. Use the local `kernel-patches/0026-...patch` path from that directory; only the corrected reverse dry-run is evidence.
+diff --git a/cosim/mk/Makefile.verilator b/cosim/mk/Makefile.verilator
+index 47a401b0..fe1ad0c1 100644
+--- a/cosim/mk/Makefile.verilator
++++ b/cosim/mk/Makefile.verilator
+@@ -69,7 +69,9 @@ MODEL_AXI_DEPTH_DEFINE := $(lastword $(filter BP_AXI_MEM_READ_QUEUE_DEPTH BP_AXI
+ MODEL_AXI_LATENCY := $(if $(MODEL_AXI_LATENCY_DEFINE),$(if $(filter BP_AXI_MEM_READ_LATENCY,$(MODEL_AXI_LATENCY_DEFINE)),1,$(patsubst BP_AXI_MEM_READ_LATENCY=%,%,$(MODEL_AXI_LATENCY_DEFINE))),40)
+ MODEL_AXI_DEPTH := $(if $(MODEL_AXI_DEPTH_DEFINE),$(if $(filter BP_AXI_MEM_READ_QUEUE_DEPTH,$(MODEL_AXI_DEPTH_DEFINE)),1,$(patsubst BP_AXI_MEM_READ_QUEUE_DEPTH=%,%,$(MODEL_AXI_DEPTH_DEFINE))),4)
+ MODEL_AXI_MEM_TAG := $(if $(filter BP_AXI_MEM_PIPELINED BP_AXI_MEM_PIPELINED=%,$(DEFINES)),-axipipe-lat$(MODEL_AXI_LATENCY)-q$(MODEL_AXI_DEPTH),)
+-MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)
++# Capture is an ifdef-selected hardware mode: even MACRO=0 enables it.
++MODEL_ICACHE_DEMAND_CAPTURE_TAG := $(if $(filter BP_ICACHE_REPLAY_DEMAND_CAPTURE BP_ICACHE_REPLAY_DEMAND_CAPTURE=%,$(DEFINES)),-icapture,)
++MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)
+ MODEL_CONFIG_STAMP := obj_dir/.build_config-$(MODEL_CONFIG_TAG)
+ 
+ $(MODEL_CONFIG_STAMP): | $(BUILD_COLLATERAL)
+diff --git a/import/black-parrot b/import/black-parrot
+index 684e5d8b..ffc9bd76 160000
+--- a/import/black-parrot
++++ b/import/black-parrot
+@@ -1 +1 @@
+-Subproject commit 684e5d8bcc45306a1cd02f89a521542f2e27e8ef
++Subproject commit ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57
+diff --git a/linux-tests/compare_scheduler_pipe_hint_policies.py b/linux-tests/compare_scheduler_pipe_hint_policies.py
+index 44a6807f..9769f743 100644
+--- a/linux-tests/compare_scheduler_pipe_hint_policies.py
++++ b/linux-tests/compare_scheduler_pipe_hint_policies.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Compare seed-only and continuous pipe hints across independent boots."""
++"""Compare retained-prefix and refresh policies across independent boots."""
+ 
+ import argparse
+ import json
+@@ -32,21 +32,32 @@ def _draw_hierarchical(rng, strata):
+ 
+ 
+ def compare(seed_paths, continuous_paths, bootstrap_samples=20000,
+-            baseline_policy="seed"):
+-    """Return continuous-minus-baseline effects with strict identity."""
+-    if baseline_policy not in ("seed", "preseed", "continuous-unmatched"):
++            baseline_policy="seed", comparison_policy="continuous"):
++    """Return comparison-minus-baseline effects with strict identity.
++
++    The original positional path arguments and continuous output aliases remain
++    supported; new callers can select deployment-shaped futex policies.
++    """
++    if baseline_policy not in ("seed", "preseed", "continuous-unmatched", "futex-early"):
+         raise ValueError(
+-            "baseline policy must be seed, preseed, or continuous-unmatched")
++            "baseline policy must be seed, preseed, continuous-unmatched, or futex-early")
++    if comparison_policy not in ("continuous", "futex-early", "futex-early-both"):
++        raise ValueError("comparison policy must be continuous, futex-early, or futex-early-both")
++    if comparison_policy == baseline_policy:
++        raise ValueError("comparison and baseline policies must differ")
+     if len(seed_paths) < 2 or len(continuous_paths) < 2:
+         raise ValueError("each policy requires at least two independent boots")
++    all_paths = [path.resolve() for path in (*seed_paths, *continuous_paths)]
++    if len(set(all_paths)) != len(all_paths):
++        raise ValueError("independent boots require distinct transcript paths")
+     if bootstrap_samples <= 0:
+         raise ValueError("bootstrap sample count must be positive")
+     seed = _load(seed_paths, baseline_policy)
+-    continuous = _load(continuous_paths, "continuous")
++    continuous = _load(continuous_paths, comparison_policy)
+     reference_identity = seed[0]["identity"]
+     reference_config = {key: value for key, value in seed[0]["config"].items()
+                         if key != "policy"}
+-    for label, results in (("seed", seed), ("continuous", continuous)):
++    for label, results in ((baseline_policy, seed), (comparison_policy, continuous)):
+         for index, result in enumerate(results):
+             config = {key: value for key, value in result["config"].items()
+                       if key != "policy"}
+@@ -88,39 +99,46 @@ def compare(seed_paths, continuous_paths, bootstrap_samples=20000,
+     }
+     output = {
+         "purpose": (
+-            "Measure the incremental sustained benefit of continuous hints "
++            f"Measure the incremental sustained benefit of {comparison_policy} "
+             f"over {baseline_policy} using one exact ELF."
+         ),
+         "baseline_policy": baseline_policy,
++        "comparison_policy": comparison_policy,
+         "identity": reference_identity,
+         "config": reference_config,
+-        "seed_replicates": [str(path) for path in seed_paths],
+-        "continuous_replicates": [str(path) for path in continuous_paths],
++        "baseline_replicates": [str(path) for path in seed_paths],
++        "comparison_replicates": [str(path) for path in continuous_paths],
+         "bootstrap_samples": bootstrap_samples,
+-        "seed_saved_cycles_per_boot": [statistics.median(boot)
+-                                       for boot in seed_cycles],
+-        "continuous_saved_cycles_per_boot": [statistics.median(boot)
+-                                             for boot in continuous_cycles],
+-        "continuous_minus_baseline": effect,
++        "baseline_saved_cycles_per_boot": [statistics.median(boot) for boot in seed_cycles],
++        "comparison_saved_cycles_per_boot": [statistics.median(boot) for boot in continuous_cycles],
++        "comparison_minus_baseline": effect,
+     }
+-    if baseline_policy == "seed":
+-        output["continuous_minus_seed"] = effect
++    if comparison_policy == "continuous":
++        output["seed_replicates"] = output["baseline_replicates"]
++        output["continuous_replicates"] = output["comparison_replicates"]
++        output["seed_saved_cycles_per_boot"] = output["baseline_saved_cycles_per_boot"]
++        output["continuous_saved_cycles_per_boot"] = output["comparison_saved_cycles_per_boot"]
++        output["continuous_minus_baseline"] = effect
++        if baseline_policy == "seed":
++            output["continuous_minus_seed"] = effect
+     return output
+ 
+ 
+ def main(argv=None):
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--seed", nargs="+", required=True, type=Path)
+-    parser.add_argument("--continuous", nargs="+", required=True, type=Path)
++    parser.add_argument("--seed", "--baseline", nargs="+", required=True, type=Path)
++    parser.add_argument("--continuous", "--comparison", nargs="+", required=True, type=Path)
+     parser.add_argument("--baseline-policy",
+-                        choices=("seed", "preseed", "continuous-unmatched"),
++                        choices=("seed", "preseed", "continuous-unmatched", "futex-early"),
+                         default="seed")
++    parser.add_argument("--comparison-policy", choices=("continuous", "futex-early", "futex-early-both"),
++                        default="continuous")
+     parser.add_argument("--bootstrap-samples", type=int, default=20000)
+     parser.add_argument("--output", type=Path)
+     args = parser.parse_args(argv)
+     try:
+         result = compare(args.seed, args.continuous, args.bootstrap_samples,
+-                         args.baseline_policy)
++                         args.baseline_policy, args.comparison_policy)
+     except ValueError as error:
+         raise SystemExit(str(error)) from error
+     rendered = json.dumps(result, indent=2) + "\n"
+diff --git a/linux-tests/test_compare_scheduler_pipe_hint_policies.py b/linux-tests/test_compare_scheduler_pipe_hint_policies.py
+index 05a4abb6..e820165d 100644
+--- a/linux-tests/test_compare_scheduler_pipe_hint_policies.py
++++ b/linux-tests/test_compare_scheduler_pipe_hint_policies.py
+@@ -3,9 +3,11 @@
+ 
+ import unittest
+ from pathlib import Path
++import json
++import tempfile
+ from unittest import mock
+ 
+-from compare_scheduler_pipe_hint_policies import compare
++from compare_scheduler_pipe_hint_policies import compare, main
+ 
+ 
+ def result(policy, identity, effects):
+@@ -22,6 +24,89 @@ def result(policy, identity, effects):
+ 
+ 
+ class PipeHintPolicyComparatorTests(unittest.TestCase):
++    def deployment_results(self, baseline_policy, comparison_policy):
++        samples = [result(baseline_policy, "same", [(10.0, 1.0)]),
++                   result(baseline_policy, "same", [(20.0, 2.0)]),
++                   result(comparison_policy, "same", [(40.0, 4.0)]),
++                   result(comparison_policy, "same", [(50.0, 5.0)])]
++        for sample in samples:
++            sample["config"].update(workload="lookup", working_set_kib=32,
++                                    terminal_handshake=1, sync="futex")
++            sample["identity"].update(nbf_sha256="same-nbf", bitstream_sha256="same-bitstream")
++        return samples
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_compares_parent_with_explicit_both_direction_registration(self, analyze):
++        analyze.side_effect = self.deployment_results("futex-early", "futex-early-both")
++        output = compare([Path("p1"), Path("p2")], [Path("b1"), Path("b2")], 100,
++                         baseline_policy="futex-early", comparison_policy="futex-early-both")
++        self.assertEqual(output["comparison_policy"], "futex-early-both")
++        self.assertEqual(output["comparison_minus_baseline"]["saved_cycles_per_roundtrip"], 30.0)
++        self.assertEqual(output["comparison_minus_baseline"]["saved_percentage_points"], 3.0)
++        self.assertEqual(output["config"]["terminal_handshake"], 1)
++        self.assertIn("futex-early-both over futex-early", output["purpose"])
++        self.assertNotIn("continuous_minus_baseline", output)
++        self.assertNotIn("continuous_replicates", output)
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_compares_retained_preseed_with_deployment_early_refresh(self, analyze):
++        for policy in ("futex-early", "futex-early-both"):
++            with self.subTest(policy=policy):
++                analyze.side_effect = self.deployment_results("preseed", policy)
++                output = compare([Path("s1"), Path("s2")], [Path("r1"), Path("r2")], 10,
++                                 baseline_policy="preseed", comparison_policy=policy)
++                self.assertEqual(output["baseline_policy"], "preseed")
++                self.assertEqual(output["comparison_minus_baseline"]["saved_cycles_per_roundtrip"], 30.0)
++                self.assertNotIn("continuous_minus_baseline", output)
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_new_policies_reject_workload_endpoint_and_footprint_changes(self, analyze):
++        for field, value in (("workload", "parse"), ("terminal_handshake", 0),
++                             ("working_set_kib", 256), ("warmup", 64)):
++            with self.subTest(field=field):
++                samples = self.deployment_results("futex-early", "futex-early-both")
++                samples[-1]["config"][field] = value
++                analyze.side_effect = samples
++                with self.assertRaisesRegex(ValueError, "configuration mismatch"):
++                    compare([Path("p1"), Path("p2")], [Path("b1"), Path("b2")], 10,
++                            baseline_policy="futex-early", comparison_policy="futex-early-both")
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
++    def test_new_policies_reject_software_or_physical_identity_change(self, analyze):
++        for field in ("elf_sha256", "nbf_sha256", "bitstream_sha256"):
++            with self.subTest(field=field):
++                samples = self.deployment_results("preseed", "futex-early")
++                samples[-1]["identity"][field] = "different"
++                analyze.side_effect = samples
++                with self.assertRaisesRegex(ValueError, "identity mismatch"):
++                    compare([Path("s1"), Path("s2")], [Path("r1"), Path("r2")], 10,
++                            baseline_policy="preseed", comparison_policy="futex-early")
++
++    def test_rejects_insufficient_or_repeated_boot_paths_and_invalid_policies(self):
++        for baseline, comparison, kwargs, message in (
++                ([Path("a")], [Path("b"), Path("c")], {}, "two independent"),
++                ([Path("a"), Path("a")], [Path("b"), Path("c")], {}, "distinct transcript"),
++                ([Path("a"), Path("b")], [Path("c"), Path("d")],
++                 {"comparison_policy": "unknown"}, "comparison policy"),
++                ([Path("a"), Path("b")], [Path("c"), Path("d")],
++                 {"baseline_policy": "futex-early", "comparison_policy": "futex-early"}, "must differ")):
++            with self.subTest(message=message):
++                with self.assertRaisesRegex(ValueError, message):
++                    compare(baseline, comparison, **kwargs)
++
++    @mock.patch("compare_scheduler_pipe_hint_policies.compare")
++    def test_cli_selects_deployment_policies_without_continuous_labels(self, comparison):
++        comparison.return_value = {"comparison_policy": "futex-early-both"}
++        with tempfile.TemporaryDirectory() as directory:
++            output = Path(directory) / "comparison.json"
++            main(["--baseline", "p1", "p2", "--comparison", "b1", "b2",
++                  "--baseline-policy", "futex-early", "--comparison-policy", "futex-early-both",
++                  "--output", str(output)])
++            self.assertEqual(json.loads(output.read_text()), comparison.return_value)
++        comparison.assert_called_once_with([Path("p1"), Path("p2")],
++                                           [Path("b1"), Path("b2")], 20000,
++                                           "futex-early", "futex-early-both")
++
+     @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+     def test_rejects_different_workloads_between_policies(self, analyze):
+         samples = [result("preseed", "same", [(10.0, 1.0)]) for _ in range(2)]
+@@ -47,6 +132,9 @@ class PipeHintPolicyComparatorTests(unittest.TestCase):
+             output["continuous_minus_seed"]["saved_cycles_per_roundtrip"],
+             30.0,
+         )
++        self.assertEqual(output["comparison_minus_baseline"], output["continuous_minus_seed"])
++        self.assertEqual(output["seed_replicates"], output["baseline_replicates"])
++        self.assertEqual(output["continuous_replicates"], output["comparison_replicates"])
+ 
+     @mock.patch("compare_scheduler_pipe_hint_policies.analyze")
+     def test_rejects_nonmatching_elf(self, analyze):
+diff --git a/testing/rtl/uce_icache_replay_driver.cpp b/testing/rtl/uce_icache_replay_driver.cpp
+index 7bf5ff84..107f4fd4 100644
+--- a/testing/rtl/uce_icache_replay_driver.cpp
++++ b/testing/rtl/uce_icache_replay_driver.cpp
+@@ -21,6 +21,9 @@ class Test {
+   VerilatedFstC trace;
+   unsigned cycles = 0, data_writes = 0, side_writes = 0, publishes = 0;
+   std::vector<Header> sent;
++  bool expect_normal_addr = false;
++  uint64_t normal_line_addr = 0;
++  unsigned normal_addr_beats = 0;
+ 
+   Handshake step() {
+     require(++cycles < 4000, "global I-cache replay cycle limit");
+@@ -38,14 +41,27 @@ class Test {
+     if (!dut.reset_i && dut.fwd_v_o && dut.fwd_ready_i)
+       sent.push_back({dut.fwd_type_o, dut.fwd_size_o, dut.fwd_way_o,
+                       dut.fwd_state_o, dut.fwd_addr_o, bool(dut.fwd_prefetch_o)});
++    if (!dut.reset_i && expect_normal_addr && dut.data_v_o
++        && dut.arrays_accept_i && dut.data_opcode_o == 0) {
++      unsigned beat = 0, mask = dut.data_fill_o;
++      require(mask && !(mask & (mask-1)), "ordinary refill emitted invalid fill mask");
++      while ((1u << beat) != mask) ++beat;
++      require(dut.data_addr_o == normal_line_addr + beat*16,
++              "ordinary refill packet lost physical beat address");
++      ++normal_addr_beats;
++    }
+     if (!dut.reset_i && dut.data_v_o && dut.arrays_accept_i
+         && dut.data_opcode_o == (dut.side_buffer_o ? 3 : 0)) {
+       unsigned beat = 0, mask = dut.data_fill_o;
+       require(mask && !(mask & (mask-1)), "installer emitted invalid fill mask");
+       while ((1u << beat) != mask) ++beat;
+-      require(dut.data_word0_o == seed + beat*2
+-              && dut.data_word1_o == seed + beat*2 + 1,
+-              "installer corrupted a replay beat");
++      if (!(dut.data_word0_o == seed + beat*2
++            && dut.data_word1_o == seed + beat*2 + 1)) {
++        std::cerr << "beat mismatch mask=" << mask << " expected_index=" << beat
++                  << " normal=" << expect_normal_addr << " data0=0x" << std::hex
++                  << dut.data_word0_o << " addr=0x" << dut.data_addr_o << std::dec << '\n';
++        throw std::runtime_error("installer corrupted a replay beat");
++      }
+       if (dut.side_buffer_o) ++side_writes;
+       else ++data_writes;
+     }
+@@ -96,10 +112,15 @@ class Test {
+     throw std::runtime_error("memory request timeout");
+   }
+   void response(const Header &h, unsigned first = 0) {
++    expect_normal_addr = !h.prefetch;
++    normal_line_addr = h.addr & ~UINT64_C(63);
+     for (unsigned beat = first; beat < 4; ++beat) {
+       dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
+       dut.rev_way_i = h.way; dut.rev_state_i = h.state;
+       dut.rev_prefetch_i = h.prefetch;
++      // This wrapper's widest configured beat is one complete line, so
++      // even an unaligned request returns sectors in aligned wire order.
++      // The pump separately marks the requested sector as critical.
+       dut.rev_word0_i = seed + beat*2; dut.rev_word1_i = seed + beat*2 + 1;
+       dut.rev_v_i = 1;
+       bool accepted = false;
+@@ -109,6 +130,7 @@ class Test {
+       require(accepted, "reverse replay response timeout");
+       dut.rev_v_i = 0; step();
+     }
++    expect_normal_addr = false;
+   }
+   void one_response_beat(const Header &h) {
+     dut.rev_type_i = h.type; dut.rev_size_i = h.size; dut.rev_addr_i = h.addr;
+@@ -156,6 +178,14 @@ public:
+             "same-cycle collision did not preserve only ordinary demand");
+     response(sent[0]); wait_idle_empty();
+     sent.clear();
++    // An unaligned ordinary request must still expose the current physical
++    // beat address as well as its SRAM index/way and fill mask.
++    request(miss_load, 0x8000f020); wait_sent(1);
++    require(!sent[0].prefetch && sent[0].addr == 0x8000f020,
++            "ordinary request lost its critical-sector offset");
++    response(sent[0]); wait_idle_empty();
++    require(normal_addr_beats == 8, "ordinary physical-address gate missed refill beats");
++    sent.clear();
+     data_writes = 0; side_writes = 0; publishes = 0;
+ 
+     // A complete reply must install all four beats before publishing its tag.
+diff --git a/testing/rtl/uce_icache_replay_tb.sv b/testing/rtl/uce_icache_replay_tb.sv
+index ef233d9a..122a8bd3 100644
+--- a/testing/rtl/uce_icache_replay_tb.sv
++++ b/testing/rtl/uce_icache_replay_tb.sv
+@@ -38,6 +38,7 @@ module uce_icache_replay_tb
+    output [3:0] fwd_type_o,
+    output [2:0] fwd_size_o,
+    output [63:0] fwd_addr_o,
++   output [63:0] data_addr_o,
+    output [7:0] fwd_way_o,
+    output [2:0] fwd_state_o,
+    output fwd_prefetch_o,
+@@ -96,6 +97,7 @@ module uce_icache_replay_tb
+   assign data_opcode_o = data_pkt.opcode;
+   assign stat_opcode_o = stat_pkt.opcode;
+   assign data_fill_o = data_pkt.fill_index;
++  assign data_addr_o = 64'(data_pkt.addr);
+   assign data_word0_o = data_pkt.data[0+:64];
+   assign data_word1_o = data_pkt.data[64+:64];
+   assign fwd_type_o = fwd.msg_type;
+diff --git a/testing/test_check_run.py b/testing/test_check_run.py
+index 72b88e70..81479825 100644
+--- a/testing/test_check_run.py
++++ b/testing/test_check_run.py
+@@ -194,6 +194,11 @@ class HarnessTests(unittest.TestCase):
+                      (4, "BP_AXI_MEM_PIPELINED BP_AXI_MEM_READ_LATENCY=0 BP_AXI_MEM_READ_QUEUE_DEPTH=0",
+                       "-axipipe-lat0-q0"),
+                      (4, "BP_AXI_MEM_READ_LATENCY=60 BP_AXI_MEM_READ_QUEUE_DEPTH=8", ""),
++                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE", "-icapture"),
++                     (4, "", ""),
++                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE=0", "-icapture"),
++                     (4, "BP_ICACHE_REPLAY_DEMAND_CAPTURE BP_AXI_MEM_PIPELINED",
++                      "-axipipe-lat40-q4-icapture"),
+                      (4, "", ""))
+             for contexts, defines, suffix in cases:
+                 stamp = ".build_config-nt2-nc{}-cfgtest-trace1{}".format(

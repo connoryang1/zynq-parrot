@@ -1,0 +1,90 @@
+{
+  "scope": "full-core minimal wrapper functional/capacity control; no Linux/FPGA or line-DRAM projection",
+  "rows": [
+    {
+      "mode": 0,
+      "cycles": 5544,
+      "accepted_misses": 39,
+      "captured_beats": 312,
+      "complete_epochs": 39,
+      "side_consumed": 0,
+      "timed_prefix_cache": 50,
+      "timed_prefix_side": 0,
+      "prefix_ready_begin": 0
+    },
+    {
+      "mode": 1,
+      "cycles": 807,
+      "accepted_misses": 39,
+      "captured_beats": 312,
+      "complete_epochs": 39,
+      "side_consumed": 0,
+      "timed_prefix_cache": 50,
+      "timed_prefix_side": 0,
+      "prefix_ready_begin": 7
+    },
+    {
+      "mode": 2,
+      "cycles": 1474,
+      "accepted_misses": 39,
+      "captured_beats": 312,
+      "complete_epochs": 39,
+      "side_consumed": 0,
+      "timed_prefix_cache": 50,
+      "timed_prefix_side": 0,
+      "prefix_ready_begin": 7
+    },
+    {
+      "mode": 3,
+      "cycles": 721,
+      "accepted_misses": 32,
+      "captured_beats": 256,
+      "complete_epochs": 32,
+      "side_consumed": 0,
+      "timed_prefix_cache": 0,
+      "timed_prefix_side": 0,
+      "prefix_ready_begin": 0
+    }
+  ],
+  "sha256": {
+    "tools/analyze_icache_demand_capture_vcd.py": "8ab06a7b03e85a1510c2337b1a6a8bf52772fab640200aa50f6e379c595c100e",
+    "tools/analyze_axi_word_service_vcd.py": "e347e1d5434a9b60d827b38d0686115c2a61892b15a2250c428d35be374ca9b0",
+    "research/resume-retention-matrix-20261120/on40/mode0/capture-engagement.json": "0bf69e86ff535bdc6b801e7abefc736d26e815e15c27c7ad41616b64e1dfe9d2",
+    "research/resume-retention-matrix-20261120/on40/mode0/dump.fst": "6964fc897713b893a6a1dc75f9b9a5341d428a65567ec63dfb93005067662faf",
+    "research/resume-retention-matrix-20261120/on40/mode0/prog.riscv": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+    "research/resume-retention-matrix-20261120/on40/mode1/capture-engagement.json": "07947542258d9dde568b8e3bcbda6f9983764e725d8702a110c8c5553f5fc5b7",
+    "research/resume-retention-matrix-20261120/on40/mode1/dump.fst": "1eea64c3c11b28d3fbf15fd7fe7642e7fbd6e98121a225a025b878d2333f0ef3",
+    "research/resume-retention-matrix-20261120/on40/mode1/prog.riscv": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+    "research/resume-retention-matrix-20261120/on40/mode2/capture-engagement.json": "4785960dad3aa5758f8dc06fba8831a1c7280a4f1c13c72b7268c1123183a9d2",
+    "research/resume-retention-matrix-20261120/on40/mode2/dump.fst": "c7a673da555833bb6592a8ba0182e79969dcb082053c779719e819635024c308",
+    "research/resume-retention-matrix-20261120/on40/mode2/prog.riscv": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+    "research/resume-retention-matrix-20261120/on40/mode3/capture-engagement.json": "e05d748478196672f992a2962a97e7e4b7d28b388c5a8bcc2352ddf7c4829b47",
+    "research/resume-retention-matrix-20261120/on40/mode3/dump.fst": "f9e8dec148c5ef13d0627dab6b1697334418703de72859ff66bd3d401531573b",
+    "research/resume-retention-matrix-20261120/on40/mode3/prog.riscv": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+    "research/resume-retention-matrix-20261120/on40/mode0/axi-word-service.json": "3ea99dda8ea40a89260048dae3d065ca8c30df94e138315ac32942f50b7a1d48",
+    "research/resume-retention-matrix-20261120/on200/mode0/dump.fst": "9dcb50796ad8d2c168e51995da10a867ccdfe10f83978d12a42c00e1535424fe",
+    "research/resume-retention-matrix-20261120/on200/mode0/axi-word-service.json": "b7a84b2afe6ee1f2d4a26eca3a61d5bce9f832537dc5a2ea198477aa5ef986ef",
+    "research/resume-retention-matrix-20261120/CAPTURE_ENGAGEMENT.md": "778203591a6e1df34cf7ee9ee9e0d962cb5f1eba57c482fd6db9afd9816247b5",
+    "research/resume-retention-matrix-20261120/VICTIM_CONTROL_REVIEW.md": "de9741e524ac442c8faa044b2029ac1bd425f3fb1bd3671a240bd52e2e9204f3"
+  },
+  "word_service_audit": {
+    "on40": {
+      "cycles": 5544,
+      "accepted_ar": 128,
+      "arlen": 0,
+      "bytes_per_request": 4,
+      "first_r_ticks": 40,
+      "max_outstanding_ar": 1
+    },
+    "on200": {
+      "cycles": 26024,
+      "accepted_ar": 128,
+      "arlen": 0,
+      "bytes_per_request": 4,
+      "first_r_ticks": 200,
+      "max_outstanding_ar": 1
+    },
+    "clock_ratio": "identical VCD signal; BE:AXI=1:1",
+    "scope": "serialized per-word latency sensitivity, not line DRAM latency or FPGA projection"
+  }
+}
