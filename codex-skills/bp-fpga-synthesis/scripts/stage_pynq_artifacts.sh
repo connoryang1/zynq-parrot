@@ -105,6 +105,12 @@ remote_bit_sha=$(ssh -o BatchMode=yes "$ssh_host" \
   exit 1
 }
 
+# Recovery may hard-power-cycle immediately after staging. A checksum read
+# verifies cached bytes, but does not make the new file or rename durable.
+# Flush the completed package, overlay aliases and NBFs before reporting ready.
+ssh -o BatchMode=yes "$ssh_host" "sync"
+echo "STAGE_DURABLE_SYNC_OK=1"
+
 for nbf in "$@"; do
   nbf_name=$(basename "$nbf")
   local_sha=$(sha256sum "$nbf" | awk '{print $1}')

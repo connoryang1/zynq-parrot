@@ -29,7 +29,7 @@ remote_dir='~/zynq-parrot/cosim/black-parrot-example/zynq'
 remote_nbf_sha=$(ssh -o BatchMode=yes "$ssh_host" \
   "cd $remote_dir && sha256sum '$image'" | awk '{print $1}')
 [[ "$remote_nbf_sha" == "$expected_nbf_sha" ]] || {
-  echo "remote NBF SHA mismatch" >&2
+  echo "remote NBF SHA mismatch image=$image expected=$expected_nbf_sha actual=$remote_nbf_sha" >&2
   exit 1
 }
 
