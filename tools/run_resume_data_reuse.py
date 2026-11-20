@@ -22,10 +22,16 @@ from patch_nbf_memory_records import patch
 
 MODEL_SESSION = ROOT / 'research/resume-retention-matrix-20261120/burst-off40/session.json'
 MODEL_SHA = '85505d381643fca1a118c9e5d6930468e9bcce736ebfd0a926fb36419064af8b'
+SCOPED_SHA = '77f76ae7527c2e9ed796fad48a8344e2dbbc10a5d90a69ccfb829e0bc2754ad5'
+SCOPED_BUILD_SHA = '55c32689aa0dac158aa67c801fb3459de0ad40df1cc23b3b673f92b303c27f88'
+SCOPED_VALIDATION_SHA = '2dad534ec94bc3036d6bd32f5674bea89c20227b8ba5b1ccd5dae53cfa664b5a'
+REPEAT_ELF_SHA = 'cc97e23db7f56f59dd25be41b7e179d8643078fdee9d71e96d1ab3597216c204'
 BP_REV = 'ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57'
 PASS = '[BSG-PASS] checked nonresident data reuse ring lookup'
 MASK = (1 << 64) - 1
 TRACE_LIMIT = 150 * 1024 * 1024
+DEPENDENCIES = ('testing/mt_resume_data_reuse_benchmark.c', 'testing/mt_seed.h',
+                'linux-tests/resume_workload.h', 'testing/check_run.py')
 
 
 def sha(path):
@@ -53,6 +59,95 @@ def checked_copy(source, target, expected=None):
     if sha(source) != expected or sha(target) != expected:
         raise ValueError('source changed while copying: ' + str(source))
     return record(target)
+
+
+def verify_record(item, relocated=None):
+    """A relocation is allowed only where the caller explicitly defines it."""
+    path = Path(relocated) if relocated is not None else Path(item['path'])
+    if not path.is_file() or path.is_symlink() or sha(path) != item['sha256'] or path.stat().st_size != item['bytes']:
+        raise ValueError('bound artifact missing/changed: ' + str(path))
+    return path
+
+
+def selected_model(scoped_validation=None):
+    old = json.loads(MODEL_SESSION.read_text())
+    model = Path(old['model']['binary']['path'])
+    if (old['state'] != 'complete' or old['blackparrot_revision'] != BP_REV
+            or old['model']['capture'] != 'off' or old['model']['transport'] != 'full-burst'
+            or old['model']['configured_axi_memory_latency_ticks'] != 40 or sha(model) != MODEL_SHA):
+        raise ValueError('immutable full-burst off40 model identity differs')
+    if scoped_validation is None:
+        return old, model, None
+    scoped_validation = Path(scoped_validation).resolve()
+    if sha(scoped_validation) != SCOPED_VALIDATION_SHA:
+        raise ValueError('scoped validation is not the approved complete mode0 gate')
+    gate = json.loads(scoped_validation.read_text())
+    if (gate['state'] != 'pass-no-data-reuse-admission' or gate['complete_ring_cycles'] != 664
+            or gate['required_signal_count'] != 105 or not gate['accepted_event_streams_byte_identical']
+            or not gate['original_model_still_unchanged']):
+        raise ValueError('scoped equivalence gate incomplete')
+    if verify_record(gate['old_session']) != MODEL_SESSION.resolve():
+        raise ValueError('scoped gate belongs to a different original session')
+    if gate['build_manifest']['sha256'] != SCOPED_BUILD_SHA:
+        raise ValueError('unapproved scoped build')
+    # These two durable, exact relocations preserve the original RAM records;
+    # arbitrary model path overrides and RAM-only execution are not admitted.
+    build_path = verify_record(gate['build_manifest'], scoped_validation.parent / 'model/build.json')
+    build = json.loads(build_path.read_text())
+    prefix = 'Vbsg_nonsynth_zynq_testbench'
+    allowed = {prefix, prefix+'__ALL.a', prefix+'__Syms.cpp', prefix+'__Syms.o', prefix+'__Syms.d'}
+    if (build['state'] != 'built-not-validated' or set(build['changed_files']) != allowed
+            or build['original_model']['sha256'] != MODEL_SHA
+            or build['baseline_relinked_model']['sha256'] != MODEL_SHA
+            or build['binary'] != gate['binary'] or build['binary']['sha256'] != SCOPED_SHA):
+        raise ValueError('scoped build did not preserve the accepted model')
+    before, after = build['original_archive_members'], build['final_archive_members']
+    if list(before) != list(after) or [key for key in before if before[key] != after[key]] != [prefix+'__Syms.o']:
+        raise ValueError('scoped archive changed beyond trace registration')
+    for key in ('old_report', 'scoped_report', 'old_events', 'scoped_events', 'run_log', 'checker', 'stopped_fst'):
+        verify_record(gate[key])
+    if gate['old_events']['sha256'] != gate['scoped_events']['sha256']:
+        raise ValueError('scoped full accepted event streams differ')
+    previous = json.loads(Path(gate['old_report']['path']).read_text())
+    current = json.loads(Path(gate['scoped_report']['path']).read_text())
+    if (previous['validation'] != 'passed' or current['validation'] != 'passed'
+            or previous['stats'] != current['stats'] or len(current['signals']) != 105):
+        raise ValueError('scoped access audit incomplete')
+    model = verify_record(gate['binary'], scoped_validation.parent / 'model' / prefix)
+    admission = {'validation':record(scoped_validation), 'original_build_binding':gate['build_manifest'],
+                 'durable_build':record(build_path), 'original_binary_binding':gate['binary'],
+                 'durable_binary':record(model), 'original_model_sha256':MODEL_SHA,
+                 'event_stream_sha256':gate['scoped_events']['sha256'],
+                 'scope':'Approved trace-only equivalence for this exact copied model; no data-reuse result yet.'}
+    return old, model, admission
+
+
+def reuse_program(path, repeat, kib, model_sha, sources):
+    earlier = json.loads(Path(path).read_text())
+    if repeat:
+        if (kib != 1 or model_sha != SCOPED_SHA or earlier['state'] != 'failed'
+                or earlier['footprint_kib'] != 1 or earlier['model']['sha256'] != MODEL_SHA
+                or earlier['program']['elf']['sha256'] != REPEAT_ELF_SHA):
+            raise ValueError('repeat requires the exact failed1KiB program and admitted scoped model')
+    elif (earlier['state'] != 'pass' or earlier['footprint_kib'] != 1
+          or earlier['model']['sha256'] != model_sha):
+        raise ValueError('first program requires completed accepted1KiB gate on the selected model')
+    if earlier['blackparrot_revision'] != BP_REV or set(earlier['source']) != set(sources):
+        raise ValueError('program source identity differs')
+    verify_record(earlier['model'])
+    for name, source in sources.items():
+        verify_record(earlier['source'][name])
+        if source['sha256'] != earlier['source'][name]['sha256']:
+            raise ValueError('source changed since first ELF: ' + name)
+    for key in ('elf', 'mem', 'nbf', 'symbol_file', 'disassembly'):
+        verify_record(earlier['program'][key])
+    verify_record(earlier['runtime_nbf'])
+    symbols = earlier['program']['symbols']
+    patched = patch_config(Path(earlier['program']['nbf']['path']).read_text(),
+                           int(symbols['resume_data_config'],16), 1)
+    if hashlib.sha256(patched.encode()).hexdigest() != earlier['runtime_nbf']['sha256']:
+        raise ValueError('earlier runtime NBF is not the exact1KiB config patch')
+    return earlier
 
 
 def mix(x):
@@ -170,18 +265,23 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--footprint-kib', type=int, choices=(1,32), default=1)
-    p.add_argument('--program-from', type=Path, help='first accepted session.json; exact ELF reuse required for32KiB')
+    reuse = p.add_mutually_exclusive_group()
+    reuse.add_argument('--program-from', type=Path, help='first accepted session.json; exact ELF reuse required for32KiB')
+    reuse.add_argument('--repeat-program-from', type=Path, help='repeat exact failed1KiB ELF only with the approved scoped model')
+    p.add_argument('--scoped-validation', type=Path, help='approved complete mode0 gate and durable copied model binding')
     p.add_argument('--bp', type=Path, default=Path('/home/coyang/bp-linux-demand-copy-control'))
     p.add_argument('--toolchain', type=Path, default=Path('/home/coyang/zynq-parrot/install'))
     a = p.parse_args(argv)
     output = a.output.resolve()
     if output.exists(): p.error('output must be new; no retained evidence overwrite')
     if a.footprint_kib == 32 and not a.program_from: p.error('validate1KiB and reuse its exact program before32KiB')
+    if a.repeat_program_from and (a.footprint_kib != 1 or not a.scoped_validation):
+        p.error('failed-program repeat is only for1KiB with --scoped-validation')
     if shutil.disk_usage(output.parent if output.parent.exists() else ROOT).free < 2 * TRACE_LIMIT + 128 * 1024 * 1024:
         p.error('insufficient free workspace for bounded trace and recovery margin')
-    old = json.loads(MODEL_SESSION.read_text());model=Path(old['model']['binary']['path'])
-    if old['state'] != 'complete' or old['blackparrot_revision'] != BP_REV or old['model']['capture'] != 'off' or old['model']['transport'] != 'full-burst' or old['model']['configured_axi_memory_latency_ticks'] != 40 or sha(model) != MODEL_SHA:
-        raise ValueError('immutable full-burst off40 model identity differs')
+    old, model, scoped_admission = selected_model(a.scoped_validation)
+    if a.scoped_validation and not (a.repeat_program_from or a.program_from):
+        p.error('scoped model requires exact program reuse; no new ELF compilation')
     bp = a.bp.resolve()
     if not (bp/'.git').exists() or subprocess.check_output(['git','-C',str(bp),'rev-parse','HEAD'],text=True).strip()!=BP_REV:
         raise ValueError('selected NBF converter must belong to exact initialized FFC checkout')
@@ -193,24 +293,22 @@ def main(argv=None):
            'model_session':record(MODEL_SESSION),'model':record(model),'blackparrot_revision':BP_REV,
            'physical_slots':2,'logical_contexts':4,'footprint_kib':a.footprint_kib,
            'trace_limit_bytes':TRACE_LIMIT,'native_runtime_seconds':600,'nbf_converter':record(tool)}
+    if scoped_admission is not None:state['scoped_model_admission']=scoped_admission
     manifest=output/'session.json';save(manifest,state)
     try:
         source=output/'source';program=output/'program';runtime=output/'runtime'
         program.mkdir();runtime.mkdir()
-        dependencies=(('testing/mt_resume_data_reuse_benchmark.c'),('testing/mt_seed.h'),('linux-tests/resume_workload.h'),('testing/check_run.py'))
-        records={name:checked_copy(ROOT/name,source/name)for name in dependencies}
+        records={name:checked_copy(ROOT/name,source/name)for name in DEPENDENCIES}
         checked_copy(Path(__file__).resolve(),output/'runner.py')
         state['source']=records
         elf=program/'benchmark.riscv';mem=program/'prog.mem';nbf=program/'prog.nbf';install=a.toolchain.resolve()
-        if a.program_from:
-            earlier=json.loads(a.program_from.read_text())
-            if earlier['state']!='pass' or earlier['footprint_kib']!=1 or earlier['model']['sha256']!=MODEL_SHA:
-                raise ValueError('first program requires completed accepted1KiB gate')
-            for name,rec in records.items():
-                if rec['sha256']!=earlier['source'][name]['sha256']: raise ValueError('source changed since first ELF')
+        reuse_path = a.program_from or a.repeat_program_from
+        if reuse_path:
+            earlier=reuse_program(reuse_path, bool(a.repeat_program_from), a.footprint_kib, sha(model), records)
             for key,target in (('elf',elf),('mem',mem),('nbf',nbf)):
                 checked_copy(Path(earlier['program'][key]['path']),target,earlier['program'][key]['sha256'])
-            compile_command=earlier['program']['compile_command'];state['program_from']=record(a.program_from)
+            compile_command=earlier['program']['compile_command']
+            state['repeat_program_from' if a.repeat_program_from else 'program_from']=record(reuse_path)
         else:
             compile_command=[str(install/'bin/riscv64-unknown-elf-gcc'),'-O2','-I'+str(install/'riscv64-unknown-elf/include'),
                 '--specs='+str(install/'riscv64-unknown-elf/lib/dramfs.specs'),'--specs='+str(install/'riscv64-unknown-elf/lib/perch.specs'),
@@ -227,6 +325,8 @@ def main(argv=None):
         checked_copy(elf,runtime/'prog.riscv');(runtime/'prog.nbf').write_text(patch_config(nbf.read_text(),symbols['resume_data_config'],a.footprint_kib))
         state['runtime_nbf']=record(runtime/'prog.nbf')
         cmd=[str(model),'+c_args=prog.nbf 600000','+bsg_trace=dump.fst'];state['command']=cmd;save(runtime/'command.json',cmd)
+        if sha(model) != state['model']['sha256']:
+            raise ValueError('selected model changed after admission')
         env=os.environ.copy()
         for key in ('BSG_RUNTIME_PATCH_ADDR','BSG_RUNTIME_PATCH_VALUE','BSG_TRACE_TIMEOUT_S'): env.pop(key,None)
         env['LD_LIBRARY_PATH']=str(install/'lib')+':'+env.get('LD_LIBRARY_PATH','')

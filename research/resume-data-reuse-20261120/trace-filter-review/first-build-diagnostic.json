@@ -1,0 +1,36 @@
+{
+  "state": "failed-first-build-before-target",
+  "cause": "Original .slow include alias exists only as .slow.gch, not as text; initial driver omitted .gch without mapping the include to its actual source header.",
+  "baseline_relink_reproduced_accepted_model": true,
+  "raw_evidence": {
+    "baseline-link.argv.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/trace-filter-review/failed-first-build/baseline-link.argv.json",
+      "bytes": 412,
+      "sha256": "85eb8ca7bf562cdd6151e8b46ce43ad4efc87479a1d764c434e9d8d641206af5"
+    },
+    "baseline-link.log": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/trace-filter-review/failed-first-build/baseline-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/trace-filter-review/failed-first-build/build.json",
+      "bytes": 142378,
+      "sha256": "7b07c2723adf1d175d7375e47bf71b59f039c00cf26d442f1fb0fe4c1705b499"
+    },
+    "compile-syms.argv.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/trace-filter-review/failed-first-build/compile-syms.argv.json",
+      "bytes": 2688,
+      "sha256": "0986ffbf414923656c7261b762d12b42be52b448fa0ecf01c9317195b1788f23"
+    },
+    "compile-syms.log": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/trace-filter-review/failed-first-build/compile-syms.log",
+      "bytes": 114,
+      "sha256": "19f412a67ef156c28070649ec303196c25d74ef42b9b0b7f7f835c6ad903d635"
+    }
+  },
+  "correction": "Verify original slow-PCH command uses .h with exact same preprocessing/compiler flag prefix, then change only -include .h.slow to -include .h.",
+  "new_output_required": "/dev/shm/zp-linux-resume-capacity-20261120/burst-off40-scoped-v2",
+  "target_execution_occurred": false,
+  "new_build_execution_by_preparing_agent": false
+}
