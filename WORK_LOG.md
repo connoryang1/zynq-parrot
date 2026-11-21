@@ -2,6 +2,12 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **FPGA configuration loss repaired — 2026-11-21:** the first64-line fit was canceled and rejected because environment-only retention settings never reached Verilog compilation. Validated allowlist reinjection now covers producer, IP-edit and final projects; actual launched child synthesis of packaged RTL decodes all192 requested bits, while a same-package negative control exposes the defaults. No retained fit or maximum is inferred from the rejected94.5BRAM snapshot (`research/vivado-retained-defines-20261121/`).
+
+- **ABI29 compatibility accepted physically — 2026-11-21:** the new actual46MiB kernel completes feature-absent/argument/privilege checks on existing f744 hardware, normal shell return, CORE/HOST PASS and final f744 recovery before shared reservation release. This establishes software compatibility only; the new retained hardware is not deployed (`research/retained29-physical-absent-20261121/`).
+
+- **Scaled whole-core and common-delay gates — 2026-11-21:** configured1280full64B lines/side with256retainedsets passes integrity/privilege/nonresident handoff and actual advisory-hit/full-L1-write gates; ordinary L1 dimensions are unchanged. Separately, whole-core N200 preserves all5184Rbeats/487Bresponses while shifting first/full responses exactly200cycles, with checked execution; the first64 FPGA fit is running and historical4KiB-versus-new16KiB L2 geometry is explicit (`research/{retained-system-geometry-20261121,hp0-closed-trace-20261121}/`).
+
 - **Actual retained restoration verified — 2026-11-21:** closed advisory08 proves I/D PF-owned publication, exact512-bit retained hits, eight actual non-aborted L1 SRAM writes per side and checked completion. The earlier completed07 fixture remains rejected: tree pseudo-LRU left its targetway1 resident; first-touch coldness corrects the test without changing RTL or tuning replay addresses (`research/retained-control-abi-20261121/advisory-trace-validator/closed07-08-review/`).
 
 - **Capacity service scaling measured — 2026-11-21:** all12 retained-buffer geometries/24 traced unit runs pass, checking56,656 complete64B slot reads. At1536lines/side, changing only retained sets64→256 reduces full-set lookup service49→13 own-lane cycles; this is a quantified interface cost, without application or FPGA inference (`testing/rtl/retained-line-geometry/`).

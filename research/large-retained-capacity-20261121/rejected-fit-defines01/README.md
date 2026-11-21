@@ -1,0 +1,3 @@
+This evidence preserves the rejected first64-line-per-side FPGA build. Its generated Tcl exported retention settings as environment variables while actual Verilog compilation omitted those settings. It cannot establish retained-buffer area, timing, or a capacity limit.
+
+The maintained farm cancellation completed successfully before the worker was reused. Source-project and packaged-IP metadata, generated Tcl, the synthesis snapshot and logs are retained here; the snapshot reports94.5RAMB36-equivalent blocks with no valid retention configuration. The corrected flow must establish effective defines in each fresh project and the actual child synthesis before another fit result is accepted.
