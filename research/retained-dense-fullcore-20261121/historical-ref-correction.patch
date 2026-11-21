@@ -1,0 +1,11 @@
+--- checkpoint142/run_full.py
++++ corrected/run_full.py
+@@ -208,7 +208,7 @@
+     if args.prepare_only == args.execute:raise ValueError('choose exactly one of --prepare-only/--execute')
+     if shutil.disk_usage(BASE.parent).free < RESERVE+ALLOCATION:raise ValueError('need3GiBreserve+768MiBallocation')
+     validate_source_tree(ROOT)
+-    if git(ROOT,'rev-parse','refs/heads/experiment/linux-retained-native1792-r1') != R1:raise ValueError('r1 ref changed')
++    if git(ROOT,'rev-parse','refs/heads/experiment/linux-retained-native1280-r1') != R1:raise ValueError('r1 ref changed')
+     repos = [(ROOT,git(ROOT,'rev-parse','HEAD')),(ROOT/'import/black-parrot',BP)]
+     for relative,sha in [('external/basejump_stl','3dff9f43af8e1bb850da0b41696514396fa0fa7e'),
+                          ('external/HardFloat','5b7d5fe2df7e297b5ba095b3eb8a9517dc2e9d88'),
