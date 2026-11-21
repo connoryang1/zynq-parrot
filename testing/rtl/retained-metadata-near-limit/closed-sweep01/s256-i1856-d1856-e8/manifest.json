@@ -1,0 +1,153 @@
+{
+  "state": "PASS-metadata-cycle-payload-coherence-miter",
+  "parameters": {
+    "output": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8",
+    "sets": 256,
+    "i_lines": 1856,
+    "d_lines": 1856,
+    "epoch_width": 8
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 18690,
+      "sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata-near-limit/reference-d766.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata-near-limit/retained_metadata_wrapper.sv",
+      "bytes": 6214,
+      "sha256": "a872cb5a3ee494b0bb115ed1781dfe9999f23ef42d0c186e1c05ba25b6223e3c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata-near-limit/driver.cpp",
+      "bytes": 17605,
+      "sha256": "8421ef52e480501f90d9fdedfb46ff24b1e397ba295178257eb172ec8701473e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata-near-limit/run.py",
+      "bytes": 4545,
+      "sha256": "092cf177192e80a00573ef1653a5e7c2ace3327c1cda0c3985c53a87e8647bd1"
+    }
+  ],
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.13006403401959687,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_metadata_wrapper",
+        "-GI_LINES=1856",
+        "-GD_LINES=1856",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=8",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/obj",
+        "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/source/bp_retained_line_store_reference.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata-near-limit/retained_metadata_wrapper.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata-near-limit/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.381802096031606,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/build.log",
+        "bytes": 4435,
+        "sha256": "347a6223d386150b8b5342288bd0b6d72319614081c24d47055770f88234fbb9"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/obj/Vretained_metadata_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 3.181588741019368,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/run-inverted.log",
+        "bytes": 528,
+        "sha256": "cf6c4017c94f0bfdad831f17cda57a47f83cf05f134be456cabdb46845d10c09"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/obj/Vretained_metadata_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 3.6473688919795677,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/run-different-periods.log",
+        "bytes": 546,
+        "sha256": "d6f46bf46005c344cb9d619312332ef0c84d6775088386d19d1e21d953ab4a56"
+      }
+    }
+  ],
+  "scope": "Component cycle/payload/coherence equivalence only; no synthesis, full-core, route, area or application claim.",
+  "compiled_reference": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/source/bp_retained_line_store_reference.sv",
+    "bytes": 15844,
+    "sha256": "0bcd45dd57d54f641f5b8871c348b19219d1da2ee198104c33b49845c2344e6e"
+  },
+  "executable": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/obj/Vretained_metadata_wrapper",
+    "bytes": 455296,
+    "sha256": "53d2e5aa08fd49c356ec5e60fbcec756bd33bd5325ae33d7d8edbbe64872067f"
+  },
+  "runs": [
+    {
+      "mode": "inverted",
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/inverted/retained-line-store.fst",
+        "bytes": 4961653,
+        "sha256": "6e89f57e6c52a0c1276ba4f8f0011ccebb457d59f42277ef4f205dd1793e6ebd"
+      }
+    },
+    {
+      "mode": "different-periods",
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-near-limit-20261121/sweep01/s256-i1856-d1856-e8/different-periods/retained-line-store.fst",
+        "bytes": 4714482,
+        "sha256": "4f60de1fb14f90024c16640ada1a92cceae710dd8e5ab6084bd062dc0b3e72b4"
+      }
+    }
+  ]
+}
