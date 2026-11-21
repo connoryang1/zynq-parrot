@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Real zlib completion gate — 2026-11-20:** the separately registered bounded/scoped zlib pilot passes all four checked cells, actual library/ELF hashes, normal shell return, CORE/BSG and runner0. It is excluded from performance inference; the fixed full-size A/B/B/A codec acquisition has started (`research/codec-mode14-20261120/PILOT.md`).
+
 - **Fixed whole-cell FPGA control closed — 2026-11-20:** all sixteen bounded/scoped boots in the four-workload mode14 ABBA matrix pass the full admission audit. Removing the late-selection trigger yields no supported whole-cell or absolute enabled-cost improvement; all intervals include zero, and negative/null results, raw cell totals and both failed attempts are retained in `research/complete-policy-scope-20261120/RESULTS.md`. The separately registered real-zlib functional pilot is now running under a new complete-session reservation.
 
 - **Accepted-rootfs kernel qualified offline — 2026-11-20:** the retention syscall kernel now embeds the exact accepted initramfs, preserves the configuration/build banner and nonkernel records, and reverses byte-for-byte to the accepted NBF; linked CSR and exception-fixup checks pass. Restoring twenty installed compiler runtime objects from the exact pinned archive reproduces the historical `e943...` ELF; the physical unsupported-hardware probe remains pending after an NBF hash guard blocked launch (RL-126).
