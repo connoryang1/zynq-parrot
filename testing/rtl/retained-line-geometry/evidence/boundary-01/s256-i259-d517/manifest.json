@@ -1,0 +1,177 @@
+{
+  "state": "PASS-retained-geometry",
+  "i_lines": 259,
+  "d_lines": 517,
+  "retained_sets": 256,
+  "sources": {
+    "bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15424,
+      "sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e"
+    },
+    "retained_line_geometry_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/retained_line_geometry_wrapper.sv",
+      "bytes": 2210,
+      "sha256": "ef9c2c4d89582fa1cedc88841f7c7a741cf5024308c8040358604acd4669006c"
+    },
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/driver.cpp",
+      "bytes": 12872,
+      "sha256": "82f7956d11f7bbbc43029da439678309170c7e47b035ca1466a97d541c8567d4"
+    },
+    "service.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/service.py",
+      "bytes": 9737,
+      "sha256": "29e77770ace6a697d6648fc2799cbe2000c038abfdb4d9d799b06ce379326a9b"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/run.py",
+      "bytes": 6121,
+      "sha256": "8109cfb7d4a0c5f828d1e0f6bd0a02237dac712c73b1535c3956e589db011d24"
+    }
+  },
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.12978199101053178,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/evidence/boundary-01/s256-i259-d517/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_geometry_wrapper",
+        "-GI_LINES=259",
+        "-GD_LINES=517",
+        "-GRETAINED_SETS=256",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517/obj",
+        "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/retained_line_geometry_wrapper.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 11.011123898089863,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/evidence/boundary-01/s256-i259-d517/build.log",
+        "bytes": 4375,
+        "sha256": "54bb9ab069a671cdb6339343cec8863821c6d60fda2b9973ecd2e13284394296"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517/obj/Vretained_line_geometry_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.28467236389406025,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/evidence/boundary-01/s256-i259-d517/run-inverted.log",
+        "bytes": 417,
+        "sha256": "c3c81eee4a0432dc0ec5dffa42745c619df95c72b3ad52f972a04b9d93aff601"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517/obj/Vretained_line_geometry_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.3319826410152018,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/evidence/boundary-01/s256-i259-d517/run-different-periods.log",
+        "bytes": 435,
+        "sha256": "592335f1fd0e4f87bac63e9f115c75dbe822b8807ec7734a61278a4d121ed280"
+      }
+    }
+  ],
+  "clock_results": [
+    {
+      "clock_mode": "inverted",
+      "counts": [
+        [
+          "0",
+          "278",
+          "278",
+          "273",
+          "273",
+          "269"
+        ],
+        [
+          "1",
+          "531",
+          "531",
+          "526",
+          "526",
+          "525"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/evidence/boundary-01/s256-i259-d517/inverted/retained-line-store.fst",
+        "bytes": 384940,
+        "sha256": "ef695e69780ade903e657f1187ee04ac6811d0d3df6d2321915dbd2f130c747d"
+      }
+    },
+    {
+      "clock_mode": "different-periods",
+      "counts": [
+        [
+          "0",
+          "278",
+          "278",
+          "273",
+          "273",
+          "269"
+        ],
+        [
+          "1",
+          "531",
+          "531",
+          "526",
+          "526",
+          "525"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-geometry/evidence/boundary-01/s256-i259-d517/different-periods/retained-line-store.fst",
+        "bytes": 389796,
+        "sha256": "2927014ad1284f6e49e83a5943b808faee71b4717d8cd7fdb0697a0fd435b80c"
+      }
+    }
+  ],
+  "scope": "Full64B backend functional capacity and own-lane accepted-edge service only; ordinary L1 unchanged. No application, unique-retention, fit, routed timing or FPGA claim.",
+  "executable": {
+    "path": "/dev/shm/zp-retained-geometry-boundary-20261121/s256-i259-d517/obj/Vretained_line_geometry_wrapper",
+    "bytes": 406320,
+    "sha256": "38f27f8c7ead553a8c1ab576ea1837d69d0738a9e06a219d05aa14c6bf608e44"
+  }
+}
