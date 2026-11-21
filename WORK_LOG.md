@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Stable retained RAM decomposition found — 2026-11-21:** actual-store inference reproduces the area-attribute compiler crash with ordinary options, retiming off and a verified single process. Changing only the two attributes to `power` compiles with 36 payload + 3.5 tag RAM tiles, saving 28 tiles versus native inference at an isolated cost of 548 LUTs / 14 FFs. A separate private I/D RAM prototype passes 24 functional/equivalence cases and is undergoing inference comparison; neither result establishes full-device fit (`research/retained-ram-inference-20261121/power-closed01/verification.json`).
+
 - **Corrected full synthesis hits a compiler crash — 2026-11-21:** the actual six retained defines reach child synthesis, but job `20261121T125734Z-cc01fdf32` terminates with SIGSEGV in Vivado 2024.2 graph-width pruning and merge resynthesis. The failed run provides no final resource, timing or capacity limit; exact source, child Tcl and crash logs are retained before smaller controlled tool tests (`research/fpga-native1280-area-r3-20261121/failed-synth01/failure.json`).
 
 - **Corrected near-limit FPGA implementation launched — 2026-11-21:** `bp1` job `20261121T125734Z-cc01fdf32` now builds the acyclic maintenance control and two RAM-area attributes at 1,280 full lines per side, with counters and unchanged ordinary caches. Clean static 16 KiB-L2 full-core correctness, strict I/D restoration and counter gates pass; actual routed fit and maximum capacity remain pending (`research/fpga-native1280-area-r3-20261121/admission.json`).
