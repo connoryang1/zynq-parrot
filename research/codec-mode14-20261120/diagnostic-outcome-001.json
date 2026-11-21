@@ -1,0 +1,64 @@
+{
+  "state": "one full-size diagnostic complete without reproduced Oops; no performance admission",
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/diagnostic-admission-001.json",
+    "bytes": 7776,
+    "sha256": "c17bc8cfebbe8c545f20da60e38de03aeef33bd7fc447a177492340c3179951c"
+  },
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/session.json",
+    "bytes": 2600,
+    "sha256": "fb1c314f75cc214182d76a4ba9956ae9be3066c154e4d3b3f0bfbe3756489748"
+  },
+  "extra_wrapper_metadata": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001-diagnostic-host/diagnostic-wrapper.json",
+    "bytes": 3679,
+    "sha256": "cc050bd137f263a8a0c9dc843a5887b2876e571e8eef2cc442e5b24a8721e40a"
+  },
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/0-deflate32-futex-early.log",
+    "bytes": 37777,
+    "sha256": "51f2d846b968e8b78d48a8eee417a51494a7c2ef87365f689ba07feb23daf399"
+  },
+  "status": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/0-deflate32-futex-early.log.status.json",
+    "bytes": 974,
+    "sha256": "eb2dd460a734876ad22ffd8bff832b88edcb14fa15f2730e3816d3f51b81ddb3"
+  },
+  "config": {
+    "loops": 64,
+    "repeats": 4,
+    "warmup": 32,
+    "configured_entries": 32,
+    "policy": "futex-early",
+    "sync": "futex",
+    "profile": "plain",
+    "working_set_kib": 32,
+    "workload": "deflate",
+    "terminal_handshake": 1,
+    "complete_policy_scope": 1,
+    "resource_stats": 1
+  },
+  "library": {
+    "name": "zlib",
+    "version": "1.2.13",
+    "block_bytes": 4096,
+    "input_corpus_kib": 32
+  },
+  "memory_bound": {
+    "allocation_bytes": 48234496,
+    "linux_total_kib": 47104,
+    "linux_mem_limit_mb": 46,
+    "dma32_begin": "0x80000000",
+    "dma32_end": "0x82dfffff",
+    "next_arg1": "0x82200000",
+    "maximum_normal_ram_offset": "0x2dfffff",
+    "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+  },
+  "whole_cell_count": 8,
+  "tail_events": [],
+  "normal_return": true,
+  "original_failure_unresolved": true,
+  "performance_admission": false,
+  "interpretation": "One non-reproducing diagnostic does not erase or explain the original failed A1, establish reliability, or replace any primary performance slot."
+}
