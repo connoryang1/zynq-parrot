@@ -1,0 +1,65 @@
+{
+  "state": "PASS pre-execution guard-v2 host-only closure; DRAFT no target/reader execution",
+  "tests": {
+    "returncode": 0,
+    "count": 13,
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/guard-v2/host-tests.log",
+      "bytes": 1279,
+      "sha256": "8b32c5e84765fd2d07a35d84a4ca533072052ff33c32080113c7c928a2b72e0c"
+    }
+  },
+  "original_b448": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/guard-v2/parent-b448.json",
+    "bytes": 4828,
+    "sha256": "02a934845f4c1e98fe428b7e65bf6eca9c289b889ca3bf017d0c1420bfa5498d"
+  },
+  "failed_gate": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/guard-v2/failed-host-gate01.json",
+    "bytes": 1698,
+    "sha256": "c871f4997a6bd572a16b99be592a9c70b90a5b98346c5127229e6e0fab9d70f0"
+  },
+  "reader": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+    "bytes": 151200,
+    "sha256": "a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541"
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/audit1792.py",
+      "bytes": 11797,
+      "sha256": "83e4e5c8a752f2d51fa669305f184952df1ee6cf500363af77a0fada8354e449"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/run1792.py",
+      "bytes": 16506,
+      "sha256": "089df307f097dba1a989c164ba2fbe128fcb6f82a593bfb6cafd569347bb0df6"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/budget1792.py",
+      "bytes": 3298,
+      "sha256": "2fabf20b0a4011bd118cc03d7ca32ff94d791dffc080dbb9c1a9ea752b08340d"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/frozen.py",
+      "bytes": 593,
+      "sha256": "cf0aebfb78f06af211cf329ff6ab6af03c45b600e776e2fb3c6eeee36957cb7f"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/test_preparation.py",
+      "bytes": 5273,
+      "sha256": "49606a090415d20b3084ca440592cb942d14abfabfa4bbf2d1863077c838efe5"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-runner-20261121/test_audit_guard.py",
+      "bytes": 4531,
+      "sha256": "ccbd30f0618f10bcdc49a05c42d6bc1e977ba8082c7d2d2ceef5e1e273e10474"
+    }
+  ],
+  "semantics": "Shared unchanged budget checker; audit phase250ms resource watcher including finalization;>1s gap failclosed; fresh readerPG SIGTERM/INT/deadline/resource cleanup<=5s; exact admitted reader and immutable runtime sources; late failure retracts own PASS beforeflock release.",
+  "native_fix": "Dedicated RuntimeError-derived interruption also closes selectors InterruptedError swallowing in newnativewrapper.",
+  "common_validator_changed": false,
+  "target_runs": 0,
+  "FST_reader_runs": 0,
+  "stage_or_model_touched": false
+}

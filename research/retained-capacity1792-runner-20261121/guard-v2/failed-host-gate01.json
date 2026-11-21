@@ -1,0 +1,29 @@
+{
+  "state": "FAIL host-only12-test gate before target;11pass/1failure",
+  "command": "python3 -B -m unittest discover -s research/retained-capacity1792-runner-20261121 -p test_*.py -v",
+  "returncode": 1,
+  "failure": "test_SIGTERM_reaps_reader_and_preserves_unrelated_host_process: expected InterruptedError, got ValueError audit fixed reader deadline after3s",
+  "cause": "selectors.select handles InterruptedError internally. A signal handler raising that built-in exception is unsuitable for propagating termination through the selector.",
+  "sources": [
+    {
+      "path": "audit1792.py",
+      "bytes": 10237,
+      "sha256": "ebbf8dd3ad67e604b544763f6b1475cee7c920a3103c8d32e442a119445e2d6e",
+      "snapshot": "guard-v2/parent-snapshots/ebbf8dd3ad67e604b544763f6b1475cee7c920a3103c8d32e442a119445e2d6e.gz"
+    },
+    {
+      "path": "run1792.py",
+      "bytes": 16222,
+      "sha256": "d43e69a402f84b4bf7044c6ae5acaa7af0b9e8acea92a4d0491d54a319c57e37",
+      "snapshot": "guard-v2/parent-snapshots/d43e69a402f84b4bf7044c6ae5acaa7af0b9e8acea92a4d0491d54a319c57e37.gz"
+    },
+    {
+      "path": "test_audit_guard.py",
+      "bytes": 3147,
+      "sha256": "cdec5b03d45f1195117093e9d0294a8768e3a899edb36561658d6e0c08d38d11",
+      "snapshot": "guard-v2/parent-snapshots/cdec5b03d45f1195117093e9d0294a8768e3a899edb36561658d6e0c08d38d11.gz"
+    }
+  ],
+  "cleanup": "Known temporary readerPG killed/reaped by audit helper; unrelated sentinel remained live until fixture finally killed/reaped it. Fixture subprocess reaped by bounded parent. No target/FST reader executed.",
+  "fix": "Dedicated RuntimeError-derived interrupt classes in NEW native/audit wrappers; unchanged common validator."
+}

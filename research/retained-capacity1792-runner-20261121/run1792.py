@@ -19,8 +19,13 @@ from types import SimpleNamespace
 from build import ROOT, bind, require, verify_coverage
 from run_case import primary_counts
 from audit1792 import source_bindings
+import audit1792
+import budget1792
+from budget1792 import check_budget
 
 ORDER = ('d-enabled', 'd-off', 'i-enabled')
+
+class NativeInterrupted(RuntimeError):pass
 
 
 def previous_gate(cohort, role):
@@ -42,7 +47,7 @@ def check_inputs(preparation):
     frozen.verify()
     for record in preparation['linked_libraries']:
         require(bind(record['path'])==record,'qualified runtime library drift')
-    for key in ('model', 'model_stamp', 'compiled_sources', 'compiled_metadata', 'host_dependency', 'program', 'preparer', 'root_session', 'leaf_coverage', 'stage_guard'):
+    for key in ('model', 'model_stamp', 'compiled_sources', 'compiled_metadata', 'host_dependency', 'program', 'preparer', 'root_session', 'leaf_coverage', 'stage_guard', 'reader'):
         record = preparation[key]
         require(bind(record['path']) == record, 'frozen preparation changed: ' + key)
     for record in preparation['critical_sources']:
@@ -56,6 +61,7 @@ def check_inputs(preparation):
     require(coverage['state']=='PASS exact167 actual-clone header coverage' and all(coverage['model'][k]==preparation['model'][k] for k in ('bytes','sha256')),'actual clone/header coverage required')
     guard=json.loads(Path(preparation['stage_guard']['path']).read_text())
     require(guard['state']=='ROOT-APPROVED fixed512MiB in-driver phase/sum/owned-group guard' and guard['runner']==bind(__file__) and guard['stage']==str(Path(preparation['case_paths']['d-enabled']).parent),'reviewed source-bound stage guard')
+    require(guard['auditor']==bind(audit1792.__file__) and guard['budget_helper']==bind(budget1792.__file__) and guard['reader']==preparation['reader'],'approved audit/budget/reader transitive bindings')
     require(guard['RAM_stage_cap_bytes']==512*1024**2 and guard['phase_caps']==dict(raw_total=384*1024**2,raw_per_case=128*1024**2,audit_total=96*1024**2,audit_per_case=32*1024**2,other_total=32*1024**2),'exact guard phase split')
     resources=guard['actual_ROOT_host_resources'];identity=guard['actual_stage_identity']
     require(isinstance(resources,dict) and isinstance(identity,dict),'actual root-host admission fields required')
@@ -77,33 +83,12 @@ def check_inputs(preparation):
     return program
 
 
-def check_budget(cohort, preparation):
-    fixed=dict(per_trace_cap_bytes=128*1024**2,raw_cohort_cap_bytes=384*1024**2,
-               audit_cohort_cap_bytes=96*1024**2,per_audit_cap_bytes=32*1024**2,other_stage_cap_bytes=32*1024**2,native_runtime_ms=1800000,outer_timeout_s=1980,
-               preparation_cap_bytes=16*1024**2,HOME_reserve_bytes=3*1024**3,
-               RAM_stage_cap_bytes=512*1024**2,RAM_reserve_bytes=1024**3)
-    require(all(preparation.get(k)==v for k,v in fixed.items()),'fixed reviewed budgets')
-    total=sum(path.stat().st_size for path in cohort.rglob('*') if path.is_file())
-    raw=sum(path.stat().st_size for path in cohort.glob('*/trace.fst'))
-    audits=sum(path.stat().st_size for path in cohort.glob('*-audit/*') if path.is_file())
-    require(total<=fixed['RAM_stage_cap_bytes'] and raw<=fixed['raw_cohort_cap_bytes'] and audits<=fixed['audit_cohort_cap_bytes'] and total-raw-audits<=fixed['other_stage_cap_bytes'],'exact combined/raw/audit/other caps')
-    require(all(path.stat().st_size<=fixed['per_trace_cap_bytes'] for path in cohort.glob('*/trace.fst')),'per-case trace cap')
-    require(all(sum(p.stat().st_size for p in d.rglob('*') if p.is_file())<=fixed['per_audit_cap_bytes'] for d in cohort.glob('*-audit') if d.is_dir()),'per-case audit cap')
-    home=Path(preparation['HOME_preparation_path']);require(home.is_dir(),'explicit HOME preparation')
-    require(sum(p.stat().st_size for p in home.rglob('*') if p.is_file())<=fixed['preparation_cap_bytes'],'HOME preparation cap')
-    if preparation['storage']=='HOME':
-        require(shutil.disk_usage(cohort).free>=fixed['HOME_reserve_bytes']+max(0,fixed['RAM_stage_cap_bytes']-total)+fixed['preparation_cap_bytes'],'HOME budget plus3GiB reserve')
-    elif preparation['storage']=='ROOT-host-RAM':
-        require(str(cohort.resolve()).startswith('/dev/shm/'),'explicit root-host RAM path only')
-        require(total<=fixed['RAM_stage_cap_bytes'] and shutil.disk_usage(cohort).free>=fixed['RAM_reserve_bytes']+fixed['RAM_stage_cap_bytes']-total,'bounded RAM stage plus1GiB reserve')
-        require(shutil.disk_usage(home).free>=fixed['HOME_reserve_bytes']+fixed['preparation_cap_bytes'],'HOME3GiB reserve')
-    else:raise ValueError('reviewed storage path required')
 
 
 def owned_run(command,cwd,env,log_path,timeout,limits,guard,allowance):
     """Bound only this fresh process group; never retry or extend execution."""
     guard();start=time.monotonic();process=None;failure=None;saved_handlers={}
-    def interrupted(signum,frame):raise InterruptedError('caught signal '+str(signum))
+    def interrupted(signum,frame):raise NativeInterrupted('caught signal '+str(signum))
     try:
         for signum in (signal.SIGTERM,signal.SIGINT):
             saved_handlers[signum]=signal.signal(signum,interrupted)
@@ -185,7 +170,7 @@ def main():
                          preparation=bind(args.preparation), runtime_sources=bind(frozen),
                          program=preparation['program'], model=preparation['model'], compiled_sources=preparation['compiled_sources'],
                          elf=bind(output / 'prog.riscv'), nbf=bind(output / 'prog.nbf'), coverage=coverage, command=command,
-                         native_runtime_ms=1800000, outer_timeout_s=1980, fst_cap_bytes=128*1024**2, negative_control=args.role == 'd-off')
+                         native_runtime_ms=1800000, outer_timeout_s=1980, fst_cap_bytes=128*1024**2, negative_control=args.role == 'd-off', reader=preparation['reader'])
         (output / 'admission.json').write_text(json.dumps(admission, indent=2) + '\n')
         env = os.environ.copy()
         for name in ('BSG_RUNTIME_PATCH_ADDR', 'BSG_RUNTIME_PATCH_VALUE', 'BSG_TRACE_TIMEOUT_S'):
