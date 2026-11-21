@@ -1,0 +1,30 @@
+{
+  "state": "FAILED helper post-validation comparison; no acceptance",
+  "source": {
+    "sha256": "53b7331815aaf99e3d05467f15bff9bd86954a8de762e062e7c23a66ef052fd0",
+    "bytes": 11566
+  },
+  "projection": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification/capacity64/gp0-counter-projection.tsv.gz",
+    "bytes": 3194,
+    "sha256": "2cef42c92a2c89d440a4dac76c8789c0d9d3a60bfbb99a6a0b4dc54ea52bcaeb"
+  },
+  "error": "ValueError: byte-identical complete semantic proof (excluding only original bindings)",
+  "cause": "Live Validator address dictionary keys are ints; accepted JSON address dictionary keys are strings. Compare canonical serialized semantics, preserving every field.",
+  "input_stream": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity64-d-enabled-audit01/selected-events.tsv.gz",
+    "bytes": 5133323,
+    "sha256": "db9519dc02cff9089e9bf252919e92a0da59cb951b7ee74c26649d8333d4fed7"
+  },
+  "raw_stream_digest_captured_by_failed_attempt": false,
+  "same_immutable_input_digest_from_corrected_replay": {
+    "sha256": "c318004b3007dc5ac5a631aad75973949a25350cda1675fde81e49b7c4fdf856",
+    "bytes": 38482343,
+    "lines": 1824362,
+    "events": 1824193,
+    "counter_events": 643,
+    "exact_end_records": 1,
+    "reader_returncode": 0
+  },
+  "accepted_package_written": false
+}

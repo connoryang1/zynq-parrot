@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "research/retained-stream-archive-20261121/archive_stream.py", line 242, in <module>
+    main()
+  File "research/retained-stream-archive-20261121/archive_stream.py", line 231, in main
+    print(json.dumps(qualify(args), sort_keys=True))
+  File "research/retained-stream-archive-20261121/archive_stream.py", line 181, in qualify
+    require(result == {k: v for k, v in old.items() if k != 'bindings'},
+  File "research/retained-stream-archive-20261121/archive_stream.py", line 28, in require
+    raise ValueError(message)
+ValueError: byte-identical complete semantic proof (excluding only original bindings)

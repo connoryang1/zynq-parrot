@@ -1,0 +1,81 @@
+{
+  "state": "PASS negative archive qualification only",
+  "cases": [
+    {
+      "case": "actual noncounter512b insert data bit",
+      "rejected": "full512-bit publication payload",
+      "mutations": 12,
+      "consumed_bytes": 23414275,
+      "consumed_lines": 1288000,
+      "consumed_prefix_sha256": "89df7c309eb3838a7c49d279eda1e84cff16aca44bec72e5e49e256ea6ae7c58",
+      "complete_stream": false
+    },
+    {
+      "case": "actual500-line prefix without EOF",
+      "rejected": "closed complete FST",
+      "prefix_sha256": "4b340f08e86dfe38e720d84f5fb5024966a535b10648b8861d7f6bfd2756b44f",
+      "complete_stream": false
+    },
+    {
+      "case": "actual final GP0 word bit flip",
+      "checker_returncode": 1,
+      "rejected": true
+    }
+  ],
+  "bindings": {
+    "accepted_archive": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification/capacity64-corrected/acceptance.json",
+      "bytes": 5834,
+      "sha256": "c2490bf49f4918b0a42cf894a04f2144835ad6520e150b09b34502770f7aa555"
+    },
+    "original_audit": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity64-d-enabled-audit01/verification.json",
+      "bytes": 119521,
+      "sha256": "14b5cb932649779bfff0797b19564c95c04b4d236f2a113ec09f136ba6c76021"
+    }
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/audit.py",
+      "bytes": 16172,
+      "sha256": "b5aaad15855351d386420da592cbdb66feb80e38df0af794b2786f4fe64f325a"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/audit1280.py",
+      "bytes": 5035,
+      "sha256": "ea491631d33f27571785fb9350203da5af642c22347f51e3b474172487bf005a"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/build.py",
+      "bytes": 9463,
+      "sha256": "d7dd7adf1a2999becdcf9a5b6c48d4851cc58b021b51e68ea279372f0345d6c2"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/generate.py",
+      "bytes": 2308,
+      "sha256": "8ffef8031d0ebd57361f6a26e1ff4f826b3e2f688313bd4c6b8cb397fd8e8876"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/check_counter_words.py",
+      "bytes": 2177,
+      "sha256": "7286e6db5300f5f458cc26d245b37d3e677fb5ad2691684b345a0c9c3dc17892"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-advisory-trace/validate.py",
+      "bytes": 25559,
+      "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/negative_cases.py",
+      "bytes": 5985,
+      "sha256": "5e8510caad93f2342745ff67a9e65f2750d5391833e5b7d1a250a77f0c934eec"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/archive_stream.py",
+      "bytes": 12277,
+      "sha256": "15a7aa77dc67c42a3c9c30e1c5ae317b23a643b9fae086977166bf1e19e63a0e"
+    }
+  ],
+  "elapsed_s": 63.55659218400251,
+  "limits": "Corrupted host replay/prefix/projection only; no target or FST reader; no accepted corrupted proof."
+}

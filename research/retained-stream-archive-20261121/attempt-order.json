@@ -1,0 +1,33 @@
+{
+  "order": [
+    {
+      "name": "initial host tests",
+      "result": "6PASS1test-import-error",
+      "note": "fixed explicit unittest.mock import"
+    },
+    {
+      "name": "capacity64 first helper",
+      "result": "FAILED post-validation Python/JSON object-key comparison",
+      "accepted": false,
+      "evidence": "failed01/failure.json"
+    },
+    {
+      "name": "capacity64 corrected",
+      "result": "PASS exact serialized semantic equality",
+      "evidence": "qualification/capacity64-corrected/acceptance.json"
+    },
+    {
+      "name": "capacity1280 corrected",
+      "result": "PASS exact serialized semantic equality",
+      "evidence": "qualification/capacity1280/acceptance.json"
+    },
+    {
+      "name": "actual64D negative host fixtures",
+      "result": "PASS all three expected rejections",
+      "evidence": "qualification/negative64/verification.json"
+    }
+  ],
+  "target_runs": 0,
+  "FST_reader_runs": 0,
+  "model_builds": 0
+}

@@ -1,0 +1,12 @@
+Working directory: /home/coyang/zynq-parrot-linux-host-observer
+
+1. python3 -m unittest discover -s research/retained-stream-archive-20261121 -p test_archive_stream.py -v
+
+2. Corrected64D host replay (actual session5272, exit0):
+PYTHONDONTWRITEBYTECODE=1 python3 research/retained-stream-archive-20261121/archive_stream.py --audit /home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity64-d-enabled-audit01 --source-dir /home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture --profile 64 --out /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification/capacity64-corrected --budget-root /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification --timeout 600
+
+3.1280D host replay (actual session95387, exit0):
+PYTHONDONTWRITEBYTECODE=1 python3 research/retained-stream-archive-20261121/archive_stream.py --audit /home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity1280-cohort01/d-enabled-audit --source-dir /home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture --profile 1280 --out /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification/capacity1280 --budget-root /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification --timeout 3600
+
+4. Actual negative host fixtures (session8811, fixed600s):
+PYTHONDONTWRITEBYTECODE=1 python3 research/retained-stream-archive-20261121/negative_cases.py --audit /home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity64-d-enabled-audit01 --qualified /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification/capacity64-corrected --source-dir /home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture --out /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification/negative64 --budget-root /home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/qualification
