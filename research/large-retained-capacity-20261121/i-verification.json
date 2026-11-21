@@ -1,0 +1,53 @@
+{
+  "scope": "I-side directed functional acceptance only; no full-core, FPGA fit/timing or application performance claim",
+  "actual_full_line_capacities": [
+    64,
+    65,
+    128,
+    256,
+    512,
+    1024
+  ],
+  "payload_bytes": [
+    4096,
+    4160,
+    8192,
+    16384,
+    32768,
+    65536
+  ],
+  "source_sha256": {
+    "import/black-parrot/bp_fe/src/v/bp_fe_icache.sv": "90ff3a3411e629ed6d8bb877e0851ce1511629e7951b97bb175923809dd0c5fd",
+    "import/black-parrot/bp_fe/src/v/bp_fe_icache_retained_bram.sv": "d392a2b850f0aef43426e8d7f62a052047a6b4bf50c21582cf6e0faec51fa851",
+    "testing/rtl/icache_retained_bram_driver.cpp": "1c83d048eef3b8754a8f7b4f81408b33a79d370562de06c1751583930ca44f41",
+    "testing/rtl/run_icache_retained_bram_adapter.py": "8b61310e283b4dba6a1807d03527535d79866c6b096d78ecd761406818096278",
+    "testing/rtl/icache_retained_large_tb.sv": "2b9ae748584cc7e34ad77376d1043f0a8c09b810cf67a19face4afcf047c19a9",
+    "testing/rtl/icache_retained_large_driver.cpp": "23c89807838c9a10db4894153c8b919f53b5be1895b49ab18ed21653e2e2ba02",
+    "testing/rtl/run_icache_retained_large.py": "c901ee57d5eb025a27efbbfdc7b3806d599bde6876b889308ad2cf8022134656"
+  },
+  "gate_sha256": {
+    "adapter-09/verification.json": "c237e5a2b4ccb92129586029077225ead2788302b098467e76bf4287c492ecfe",
+    "i-legacy-final/gate.json": "55498f2c55125aef61edf759f3fc51176381b12eb6eb534ae75b39a39c15af8a",
+    "i-capacity-final-01/64/verification.json": "166ae2d55d4dc1f9ca80679242daa34cf71d6980919970ac64a8d117fdacde73",
+    "i-capacity-final-01/65/verification.json": "1b6d8e3406d93d9e598666fa6a75b3e843d7c88a897e621d6e9b96e2e0f80921",
+    "i-capacity-final-01/128/verification.json": "1955e41a765fe76e541c878e743f6d0837a53ccb351b1ccf4f53ebeff922e177",
+    "i-capacity-final-01/256/verification.json": "112e25820c746f497ccc8d613c9ea0452526c724abd7ed014566b4a49913edf7",
+    "i-capacity-final-01/512/verification.json": "5d30ec96b1cf6d78946523060d4dddfa50aa3d7dc35a3a2a37edf057e782b096",
+    "i-capacity-final-01/1024/verification.json": "cdd66d3f3e4fe86ec05ce887396919bf15a2ad62fdb21fcd8321d08a5cfe0f75",
+    "i64-zero-fix/64/verification.json": "df7e1f65be90d9178dde8cb9f67bdc4211ed413ad32c3fdb1f8bacbf8f936e69"
+  },
+  "snapshots_sha256": {
+    "i-source-snapshot/run_icache_retained_bram_adapter.py.gz": "0732944b31dbca6d2d6d998b132574972781fab9aefd8010c4c66c9020d38328",
+    "i-source-snapshot/bp_retained_line_store.sv.gz": "87c5245f8c64c5b9b85a3abbfa8b3f107a672a0de2191a4ee7bd4c62cb250df1",
+    "i-source-snapshot/icache_retained_large_driver.cpp.gz": "6f2b46ab5dd200a930d6da304f0b404453e9a1022ff17f780e2bc0d3d9f7231f",
+    "i-source-snapshot/bp_fe_icache.sv.gz": "3ff93b6ef80d1d15340f8a4932c9e753ff6c46a8faa9485e437f73fc8c032aaa",
+    "i-source-snapshot/bp_fe_icache_retained_bram.sv.gz": "7d99fb56d827fc6356caf163c000024acb97f35b77007e5718f86f78a02dee58",
+    "i-source-snapshot/icache_retained_bram_driver.cpp.gz": "fb3a10ad370aed4a5d240a7ab2c586767c64b80835749876b4d24f489f38a8f4",
+    "i-source-snapshot/icache_retained_large_tb.sv.gz": "9b97eb8fcd62a6ff47da57d4c78706ed951b059947d440c2837b94e5e336ab4c",
+    "i-source-snapshot/run_icache_retained_large.py.gz": "7eecad511dd091ba9b6d95a44f7921d165a2d28a19c972ab3db25e210fdb0daf",
+    "i-source-snapshot/bp_retained_line_store.zero-fix.sv.gz": "7a38d1382010c13a3910e7d8c9e3016c35898ff5c8fad6437c34de376ec70fed"
+  },
+  "post_gate_changes": [
+    "Only removal of extra blank line at EOF of test wrapper. Exact compiled original source is preserved in gzip snapshot; RTL and all stimulus logic unchanged."
+  ]
+}

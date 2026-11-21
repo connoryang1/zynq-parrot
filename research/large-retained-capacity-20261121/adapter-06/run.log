@@ -1,0 +1,55 @@
+=================================================================
+==41==ERROR: AddressSanitizer: heap-use-after-free on address 0x603000013780 at pc 0x55c4b1bac1f2 bp 0x7ffcde7ad770 sp 0x7ffcde7ad760
+READ of size 8 at 0x603000013780 thread T0
+    #0 0x55c4b1bac1f1 in std::__cxx11::list<std::pair<void (*)(void*), void*>, std::allocator<std::pair<void (*)(void*), void*> > >::remove(std::pair<void (*)(void*), void*> const&) (/dev/shm/evidence-review-large-i/adapter-06/obj/Vbp_fe_icache_retained_bram+0x3e1f1)
+    #1 0x55c4b1b94b67 in removeCbFlush /home/coyang/zynq-parrot/install/share/verilator/include/verilated.cpp:3111
+    #2 0x55c4b1b94b67 in Verilated::removeFlushCb(void (*)(void*), void*) /home/coyang/zynq-parrot/install/share/verilator/include/verilated.cpp:3124
+    #3 0x55c4b1c08142 in VerilatedTrace<VerilatedFst, VerilatedFstBuffer>::~VerilatedTrace() /home/coyang/zynq-parrot/install/share/verilator/include/verilated_trace_imp.h:296
+    #4 0x7f785616e8a6 in __run_exit_handlers /build/glibc-B3wQXB/glibc-2.31/stdlib/exit.c:108
+    #5 0x7f785616ea5f in __GI_exit /build/glibc-B3wQXB/glibc-2.31/stdlib/exit.c:139
+    #6 0x7f785614c089 in __libc_start_main ../csu/libc-start.c:342
+    #7 0x55c4b1b8994d in _start (/dev/shm/evidence-review-large-i/adapter-06/obj/Vbp_fe_icache_retained_bram+0x1b94d)
+
+0x603000013780 is located 0 bytes inside of 32-byte region [0x603000013780,0x6030000137a0)
+freed by thread T0 here:
+    #0 0x7f78567c151f in operator delete(void*) ../../../../src/libsanitizer/asan/asan_new_delete.cc:165
+    #1 0x55c4b1bae8a5 in std::__cxx11::_List_base<std::pair<void (*)(void*), void*>, std::allocator<std::pair<void (*)(void*), void*> > >::_M_clear() (/dev/shm/evidence-review-large-i/adapter-06/obj/Vbp_fe_icache_retained_bram+0x408a5)
+
+previously allocated by thread T0 here:
+    #0 0x7f78567c0587 in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cc:104
+    #1 0x55c4b1bac4a8 in std::__cxx11::list<std::pair<void (*)(void*), void*>, std::allocator<std::pair<void (*)(void*), void*> > >::push_back(std::pair<void (*)(void*), void*> const&) (/dev/shm/evidence-review-large-i/adapter-06/obj/Vbp_fe_icache_retained_bram+0x3e4a8)
+
+SUMMARY: AddressSanitizer: heap-use-after-free (/dev/shm/evidence-review-large-i/adapter-06/obj/Vbp_fe_icache_retained_bram+0x3e1f1) in std::__cxx11::list<std::pair<void (*)(void*), void*>, std::allocator<std::pair<void (*)(void*), void*> > >::remove(std::pair<void (*)(void*), void*> const&)
+Shadow bytes around the buggy address:
+  0x0c067fffa6a0: fa fa fd fd fd fd fa fa fd fd fd fd fa fa fd fd
+  0x0c067fffa6b0: fd fa fa fa fd fd fd fd fa fa fd fd fd fd fa fa
+  0x0c067fffa6c0: fd fd fd fd fa fa fd fd fd fd fa fa fd fd fd fd
+  0x0c067fffa6d0: fa fa fd fd fd fd fa fa fd fd fd fd fa fa fd fd
+  0x0c067fffa6e0: fd fd fa fa fd fd fd fd fa fa fd fd fd fd fa fa
+=>0x0c067fffa6f0:[fd]fd fd fd fa fa fd fd fd fd fa fa fd fd fd fd
+  0x0c067fffa700: fa fa fd fd fd fd fa fa fa fa fa fa fa fa fa fa
+  0x0c067fffa710: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c067fffa720: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c067fffa730: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c067fffa740: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==41==ABORTING
