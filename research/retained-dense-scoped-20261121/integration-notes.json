@@ -1,0 +1,19 @@
+{
+  "purpose": "Preserve root integration-only mistakes and guardrails without changing sealed experiment evidence",
+  "events": [
+    {
+      "symptom": "Portable fixture recheck from main rejected reviewed preparation source",
+      "cause": "Original close.py compared a binding including the original absolute worktree path",
+      "correction": "Original sealed verifier rerun at original path; separately committed byte-bound portable verifier passes relocated main copy and rejects source/archive/proof corruption",
+      "provenance": "research/retained-capacity1792-preparation-20261121/PORTABILITY.json",
+      "target_effect": "none; no recompilation or runtime"
+    },
+    {
+      "symptom": "git cherry-pick -q printed usage and exited129",
+      "cause": "Installed Git cherry-pick has no -q option",
+      "correction": "Reran supported git cherry-pick without -q; set-e stopped dependent commands on first failure",
+      "guardrail": "Use supported command options; keep git mutations sequential and stop on failure",
+      "target_effect": "none; rejected invocation did not mutate index or repository"
+    }
+  ]
+}
