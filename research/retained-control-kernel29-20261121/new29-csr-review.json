@@ -1,0 +1,109 @@
+{
+  "elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/vmlinux",
+    "bytes": 22075880,
+    "sha256": "bb25f407c6cb62cf94a547373b6222fce756feb220643c676fd882aabe028237"
+  },
+  "command": [
+    "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+    "-d",
+    "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/vmlinux"
+  ],
+  "scope": "decoded executable ELF sections and every-halfword executable-section potential encodings",
+  "matches": [
+    {
+      "address": "0xffffffff80020e9e",
+      "word": "0x5c102773",
+      "asm": "csrr\ta4,0x5c1",
+      "csr": "0x5c1",
+      "funct3": 2,
+      "rd": 14,
+      "rs1": 0,
+      "functions": [
+        "bp_icache_retention_probe"
+      ],
+      "next_instruction": {
+        "address": "0xffffffff80020ea2",
+        "word": "0xeb81",
+        "asm": "bnez\ta5,ffffffff80020eb2 <bp_icache_retention_probe+0x1e>"
+      }
+    },
+    {
+      "address": "0xffffffff80020ec0",
+      "word": "0x5c202773",
+      "asm": "csrr\ta4,0x5c2",
+      "csr": "0x5c2",
+      "funct3": 2,
+      "rd": 14,
+      "rs1": 0,
+      "functions": [
+        "bp_retained_probe"
+      ],
+      "next_instruction": {
+        "address": "0xffffffff80020ec4",
+        "word": "0xeb81",
+        "asm": "bnez\ta5,ffffffff80020ed4 <bp_retained_probe+0x1e>"
+      }
+    },
+    {
+      "address": "0xffffffff800242d4",
+      "word": "0x5c199073",
+      "asm": "csrw\t0x5c1,s3",
+      "csr": "0x5c1",
+      "funct3": 1,
+      "rd": 0,
+      "rs1": 19,
+      "functions": [
+        "__do_sys_prctl"
+      ],
+      "next_instruction": {
+        "address": "0xffffffff800242d8",
+        "word": "0x100f",
+        "asm": "fence.i"
+      }
+    },
+    {
+      "address": "0xffffffff8002459a",
+      "word": "0x5c299073",
+      "asm": "csrw\t0x5c2,s3",
+      "csr": "0x5c2",
+      "funct3": 1,
+      "rd": 0,
+      "rs1": 19,
+      "functions": [
+        "__do_sys_prctl"
+      ],
+      "next_instruction": {
+        "address": "0xffffffff8002459e",
+        "word": "0xbb3d",
+        "asm": "j\tffffffff800242dc <__do_sys_prctl+0xa6>"
+      }
+    }
+  ],
+  "executable_potentials": [
+    {
+      "address": "0xffffffff80020e9e",
+      "word": "0x5c102773",
+      "section": ".text",
+      "classification": "decoded CSR instruction"
+    },
+    {
+      "address": "0xffffffff80020ec0",
+      "word": "0x5c202773",
+      "section": ".text",
+      "classification": "decoded CSR instruction"
+    },
+    {
+      "address": "0xffffffff800242d4",
+      "word": "0x5c199073",
+      "section": ".text",
+      "classification": "decoded CSR instruction"
+    },
+    {
+      "address": "0xffffffff8002459a",
+      "word": "0x5c299073",
+      "section": ".text",
+      "classification": "decoded CSR instruction"
+    }
+  ]
+}

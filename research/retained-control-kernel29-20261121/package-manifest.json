@@ -1,0 +1,192 @@
+{
+  "state": "offline-linked-0029-bounded46-NBF-verified; target pending",
+  "build_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/build-manifest.json",
+    "bytes": 23280,
+    "sha256": "9ae212621afc4bb1b5a4d9edaa9a34c066f15ae7cb489ab8e79740264d368342"
+  },
+  "package_script": {
+    "path": "research/retained-control-kernel29-20261121/package.py",
+    "bytes": 14574,
+    "sha256": "ca06c41897d0899ae37d92e64ef3507a6bed5c0681c3eb0fb7f5e66b62ecbd66"
+  },
+  "source_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+    "bytes": 70906578,
+    "sha256": "a1fbac904a8604939ee55b0c91ca2812cc9b9451220a7a53df97cfd88acf97d5"
+  },
+  "candidate": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/linux-retained-control29-accepted-rootfs-mem46-shell.nbf",
+    "bytes": 70907577,
+    "sha256": "1a06cae9ce4c93eeb634d109ce1e58d6b7d6cade85ec966e7bcd848828ef9d33"
+  },
+  "linked_elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/vmlinux",
+    "bytes": 22075880,
+    "sha256": "bb25f407c6cb62cf94a547373b6222fce756feb220643c676fd882aabe028237"
+  },
+  "stripped_elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/vmlinux-stripped",
+    "bytes": 18330752,
+    "sha256": "4a22e3db38fd2920c5c86eb4217e2c3ee3d2959716a71927851bc064e18c5ed7"
+  },
+  "binary": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/vmlinux.bin",
+    "bytes": 24034304,
+    "sha256": "71ebef424d68af8d2ad36ca6a940049478cc820c4f4d466d6a2d17336ea196eb"
+  },
+  "conversions": [
+    [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-strip",
+      "-o",
+      "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/vmlinux-stripped",
+      "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/vmlinux"
+    ],
+    [
+      "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+      "-O",
+      "binary",
+      "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/vmlinux-stripped",
+      "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/vmlinux.bin"
+    ]
+  ],
+  "extracted": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/candidate-extracted.bin",
+    "bytes": 24034304,
+    "sha256": "71ebef424d68af8d2ad36ca6a940049478cc820c4f4d466d6a2d17336ea196eb"
+  },
+  "exact_reverse": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/reverse-to-c7-mem46.nbf",
+    "bytes": 70906578,
+    "sha256": "a1fbac904a8604939ee55b0c91ca2812cc9b9451220a7a53df97cfd88acf97d5"
+  },
+  "forward": {
+    "base": 2149580800,
+    "bytes": 24034304,
+    "old_records": 1899330,
+    "new_records": 1899357,
+    "preserved_records": 17064
+  },
+  "backward": {
+    "base": 2149580800,
+    "bytes": 24034304,
+    "old_records": 1899357,
+    "new_records": 1899330,
+    "preserved_records": 17064
+  },
+  "identical_nonkernel_records": {
+    "records": 17064,
+    "ordered_bytes_sha256": "ad2a9a85b43239d81b7816c2e8fbb865c6c50dd6c11760d848656fab69accc31"
+  },
+  "accepted27_csr_scan": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/accepted27-csr-review.json",
+    "bytes": 1694,
+    "sha256": "aab6e1b93ac354366e4fea5d8b71baee34dc80ef0ac07b41949b8ecfd40b860d"
+  },
+  "new29_csr_scan": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/new29-csr-review.json",
+    "bytes": 2876,
+    "sha256": "4b677478a7897053bf35692bfe8b2d734250d12d43591c8de4f30dfd2d188cd2"
+  },
+  "linked_optional_probe_entries": [
+    {
+      "csr": "0x5c1",
+      "fault_pc": "0xffffffff80020e9e",
+      "fixup_pc": "0xffffffff80020ea2",
+      "type": 3,
+      "error_register": 15,
+      "zero_register": 14,
+      "encoded_data": "0x1cf"
+    },
+    {
+      "csr": "0x5c2",
+      "fault_pc": "0xffffffff80020ec0",
+      "fixup_pc": "0xffffffff80020ec4",
+      "type": 3,
+      "error_register": 15,
+      "zero_register": 14,
+      "encoded_data": "0x1cf"
+    }
+  ],
+  "unchanged_firmware_halfword_scan": {
+    "base": "0x80000000",
+    "bytes": 2097152,
+    "sha256": "fed50df8584ef6c2713bd45fbad3d25526b9668c2abcf359c9ef0bbeda4cdd57",
+    "optional_csr_encodings": [],
+    "unwritten_bytes": "nominal zero-fill; not an arbitrary stale-DRAM claim"
+  },
+  "rootfs": {
+    "compressed": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/usr/initramfs_inc_data",
+      "bytes": 3303052,
+      "sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf"
+    },
+    "kernel_offset": "0xc126b0",
+    "cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+    "cpio_bytes": 8194560,
+    "exact_accepted_compressed_and_uncompressed": true
+  },
+  "bootargs": {
+    "bytes": 49,
+    "data": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  "
+  },
+  "load_bound": {
+    "ddr_write_count": 1916410,
+    "separate_config_or_mmio_records": 11,
+    "maximum_load_end_exclusive": "0x818eba68",
+    "maximum_load_offset": "0x18eba67",
+    "allocation_bytes": 48234496,
+    "all_write_tails_within_allocation": true
+  },
+  "dtb_bounds": {
+    "source": "0x80016000",
+    "runtime_destination": "0x82200000",
+    "declared_bytes": 1209,
+    "rounded_bytes": 1216,
+    "owned_end_exclusive": "0x82e00000"
+  },
+  "kernel_runtime_extent": {
+    "virtual_start": "0xffffffff80000000",
+    "virtual_end": "0xffffffff8174e000",
+    "physical_start": "0x80200000",
+    "physical_end_exclusive": "0x8194e000",
+    "includes_linked_bss": true,
+    "fits_before_fdt_destination_and_owned_end": true
+  },
+  "helpers": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/splice_linux_kernel_nbf.py",
+      "bytes": 3999,
+      "sha256": "36df8731e3b02da1beee773a6784002054633ae7247f44e6aa81dc0df320a30a"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/extract_linux_kernel_nbf.py",
+      "bytes": 2085,
+      "sha256": "d47d6e750b1e0277340406210e9cf9d3987750976301426ba3b476a7752dd560"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/embedded46-20261120/build_pair.py",
+      "bytes": 19891,
+      "sha256": "f06f3574a90c5fb06f86253141ab7012ef0dac2f28a74a9d1431879ed7bd917d"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/embedded46-20261120/verify_pair.py",
+      "bytes": 6474,
+      "sha256": "d48ccc9a3806fdb5b6929adf4e440ec88cc7512c4ba6557a16fcc7b42e6e80e3"
+    }
+  ],
+  "expected_runtime": {
+    "allocation_bytes": 48234496,
+    "memory_kib": 47104,
+    "memory_notice": "Memory limited to 46MB",
+    "dma32_last_byte": "0x82dfffff",
+    "next_arg1": "0x82200000"
+  },
+  "limits": [
+    "New kernel/image baseline; no target boot, absent/present capability or performance acceptance",
+    "0028 omitted; historical mode14 includes early wake and scheduler selection sites",
+    "Old prefix-table bytes preserved, usefulness for relocated new kernel unproven",
+    "Busy is a UCE/client/backend snapshot, not global lower-memory drain",
+    "Physical eligibility requires independent complete runtime/probe/integrity gate"
+  ]
+}

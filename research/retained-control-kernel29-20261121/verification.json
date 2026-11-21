@@ -1,0 +1,65 @@
+{
+  "state": "PASS offline actual-linked-kernel and bounded-NBF verification; runtime pending",
+  "verifier": {
+    "path": "research/retained-control-kernel29-20261121/verify.py",
+    "bytes": 5908,
+    "sha256": "827eb78861e2a3c84d1fe6611d389df64177e83dc6508d23fe184211abfb1464"
+  },
+  "build_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/build-manifest.json",
+    "bytes": 23280,
+    "sha256": "9ae212621afc4bb1b5a4d9edaa9a34c066f15ae7cb489ab8e79740264d368342"
+  },
+  "package_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/package-manifest.json",
+    "bytes": 7685,
+    "sha256": "99911a55ab9574d21c239e8eac4cd1c33b3fd6e9f5b28d1cbdc3054cb85791a3"
+  },
+  "readback": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/independent-readback.bin",
+    "bytes": 24034304,
+    "sha256": "71ebef424d68af8d2ad36ca6a940049478cc820c4f4d466d6a2d17336ea196eb"
+  },
+  "extraction": {
+    "base": 2149580800,
+    "bytes": 24034304,
+    "records": 1899357
+  },
+  "load_bound": {
+    "ddr_write_count": 1916410,
+    "separate_config_or_mmio_records": 11,
+    "maximum_load_end_exclusive": "0x818eba68",
+    "maximum_load_offset": "0x18eba67",
+    "allocation_bytes": 48234496,
+    "all_write_tails_within_allocation": true
+  },
+  "optional_csr_instructions_match_actual_nbf": true,
+  "both_linked_extable_entries_checked": true,
+  "accepted_rootfs_compressed_and_uncompressed_exact": true,
+  "optional0028_absent": true,
+  "old_accepted_and_canonical_input_snapshots_unchanged": true,
+  "all_package_build_bindings_verified": true,
+  "repositories": {
+    "SDK": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk",
+      "head": "358fc159277de603aca1fe7e33eb45f6ec63c37c",
+      "qualification": "repository HEAD only; actual patched/build inputs are hash-bound separately"
+    },
+    "SDK_linux": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux",
+      "head": "1f6984827521f612102ac62836c8b9748807dd17",
+      "qualification": "repository HEAD only; actual patched/build inputs are hash-bound separately"
+    },
+    "worktree": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity",
+      "head": "fde11596f4034a79a082dae59a7b5548429d98b5",
+      "qualification": "repository HEAD only; actual patched/build inputs are hash-bound separately"
+    }
+  },
+  "packaging_host_tests": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/packaging-host-tests.log",
+    "bytes": 858,
+    "sha256": "f873911de61142f7ea831ba0d97db6441ee6422da09682cb2a6e4ece17e275d0"
+  },
+  "limits": "No board run, actual boot bounds, illegal-CSR trap execution or performance acceptance."
+}

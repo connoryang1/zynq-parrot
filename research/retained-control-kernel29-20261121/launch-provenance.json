@@ -1,0 +1,39 @@
+{
+  "purpose": "Bind original offline launch cwd and resolve script records without rewriting frozen build/package/verification manifests.",
+  "cwd": "/home/coyang/zynq-parrot-linux-capacity",
+  "commands": [
+    [
+      "python3",
+      "research/retained-control-kernel29-20261121/build.py",
+      "prepare"
+    ],
+    [
+      "python3",
+      "research/retained-control-kernel29-20261121/build.py",
+      "build"
+    ],
+    [
+      "python3",
+      "research/retained-control-kernel29-20261121/package.py"
+    ],
+    [
+      "python3",
+      "research/retained-control-kernel29-20261121/verify.py"
+    ]
+  ],
+  "absolute_script_bindings": {
+    "build_script": {
+      "repo_relative": "research/retained-control-kernel29-20261121/build.py",
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/build.py",
+      "bytes": 10601,
+      "sha256": "0659831804aa267ceec74df61de9d46f673a47d9918c344701bd2a1fcedf69e4"
+    },
+    "verifier": {
+      "repo_relative": "research/retained-control-kernel29-20261121/verify.py",
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/verify.py",
+      "bytes": 5908,
+      "sha256": "827eb78861e2a3c84d1fe6611d389df64177e83dc6508d23fe184211abfb1464"
+    }
+  },
+  "no_target_execution": true
+}
