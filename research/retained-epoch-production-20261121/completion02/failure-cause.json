@@ -1,0 +1,31 @@
+{
+  "state": "PRESERVED-component-attempt01-infrastructure-compile-failure-not-payload-failure",
+  "receipt": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/closed01/manifest.json",
+    "bytes": 26672,
+    "sha256": "f6de1ff4014573b5453dd9e657c429ad93f989fcc6c83f5d47c3cfa8c365adba"
+  },
+  "archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/closed01/component-stage.tar.gz",
+    "bytes": 9779263,
+    "sha256": "09827c1dbabd0846616180cc883c102da75eea91aab4595aea238727a924bdae"
+  },
+  "failed_log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/prior-build-failure.log",
+    "bytes": 2896,
+    "sha256": "6c2004123bc732f3b0a6e375c12cf2414cd889856ed40623031a1c11ec5b55bb"
+  },
+  "errors": [
+    "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/source/driver.cpp:57:23: error: \u2018class Vretained_metadata_wrapper___024root\u2019 has no member named \u2018retained_metadata_wrapper__DOT__miter__BRA__0__KET____DOT__epoch_mismatch\u2019",
+    "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/source/driver.cpp:58:23: error: \u2018class Vretained_metadata_wrapper___024root\u2019 has no member named \u2018retained_metadata_wrapper__DOT__miter__BRA__1__KET____DOT__epoch_mismatch\u2019"
+  ],
+  "completed_normal_cases": 4,
+  "remaining_normal_cases": 2,
+  "negative_remaining": true,
+  "production_unchanged": {
+    "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+    "bytes": 20341,
+    "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+  },
+  "correction": "Only explicit epoch/protocol diagnostic wrapper outputs replace generated-internal C++ access. Actual all-cell/protocol/payload/RAM-port comparison logic and normal stimulus are byte-identical after removing diagnostic additions."
+}

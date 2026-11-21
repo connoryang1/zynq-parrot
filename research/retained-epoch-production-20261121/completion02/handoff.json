@@ -1,0 +1,57 @@
+{
+  "state": "PREPARED-HOLD-root-review-two-fallback-plus-negative-only",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/admission.json",
+    "bytes": 19177,
+    "sha256": "d35ad66fa7bb38ffccd685a6fe078716a2bde44d4c6e56256b2e2489e8f1d47a"
+  },
+  "driver": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/run_host.py",
+    "bytes": 17249,
+    "sha256": "18fb26c7b2a9044b9d57083b8c9e3fe0e97d08c7022b8406a2d26c0bac0df22a"
+  },
+  "source": {
+    "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+    "bytes": 20341,
+    "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+  },
+  "diagnostic_only_diff": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/harness-only.diff",
+    "bytes": 11411,
+    "sha256": "080a1fe2e881f7e160788ae0ebe16ae211318ac0740e431f94a15b69949af885"
+  },
+  "failure_cause": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/failure-cause.json",
+    "bytes": 1949,
+    "sha256": "10519b3e1cddf5f41aa77f6ccf38071f3ed2dd46585696e4042b05cbf9a916ad"
+  },
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/test_preparation.py"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/host-tests.log",
+        "bytes": 109,
+        "sha256": "40e6a3053d86436d6aa245501343227a2e81436f4f14da71a21257468605aff6"
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/run_host.py",
+        "--preflight"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/source-preflight.log",
+        "bytes": 4440,
+        "sha256": "32d0c92bb53a8f50faf8b7c9fc580ebfad3ad7fb6be024a3aead7fd096d9af39"
+      }
+    }
+  ],
+  "host_command": "PYTHONDONTWRITEBYTECODE=1 python3 /home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/run_host.py --execute",
+  "component_executed": false
+}

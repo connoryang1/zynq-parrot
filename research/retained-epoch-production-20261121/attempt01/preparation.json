@@ -1,0 +1,57 @@
+{
+  "state": "PASS-preparation-only-no-component-execution",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/helper/test_preparation.py"
+      ],
+      "returncode": 0,
+      "output": "host-tests.log"
+    },
+    {
+      "argv": [
+        "python3",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/helper/run_host.py",
+        "--preflight"
+      ],
+      "returncode": 0,
+      "output": "source-preflight.log"
+    }
+  ],
+  "input_admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/admission.json",
+    "bytes": 18005,
+    "sha256": "a7131ef3443f9b113a699aa8f28ef6d8430c8cf5d81d95c4b100ffd297d77488"
+  },
+  "driver": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/helper/run_host.py",
+    "bytes": 13546,
+    "sha256": "9d276fee089edbf9ac3c0e3297b19da8c851d7edf4f94df7fb5233f77d8174d7"
+  },
+  "tests": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/helper/test_preparation.py",
+    "bytes": 3840,
+    "sha256": "59c6fd6cc2df1af1ad9e2951ea91adf0d0af7776a3df00462e942daeb55963f8"
+  },
+  "production": {
+    "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+    "bytes": 20341,
+    "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+  },
+  "logs": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/host-tests.log",
+      "bytes": 107,
+      "sha256": "7c758af7411e05fc2e6c4fb89045f7a03d9a5957d5305092903a23a66373d034"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/source-preflight.log",
+      "bytes": 671,
+      "sha256": "15f23aa82339d60ebfd08e1f636c5211ac619e88865adece3a31bddfbd7f0e65"
+    }
+  ],
+  "home_free_bytes": 3284160512,
+  "source_freeze": "Only the declared production file differs from BP225. No target/component/model/Vivado/board run.",
+  "preparation_correction": "Initial read-only preflight compared a git-formatted diff to the preserved difflib diff and rejected formatting. Checker now reconstructs the existing difflib representation; production source unchanged."
+}

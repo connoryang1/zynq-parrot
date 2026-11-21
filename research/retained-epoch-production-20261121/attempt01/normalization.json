@@ -1,0 +1,19 @@
+{
+  "state": "PREPARED-source-normalization-only-no-component-execution",
+  "base_BP": "225489a435cb0b2a2c0b237077f94418dc89549b",
+  "worktree": "/home/coyang/bp-retained-canonical-epochs-20261121",
+  "branch": "experiment/retained-canonical-epochs-20261121",
+  "sealed_backend_sha256": "b69e51e216e6aa17f51be17aa2054a87ff800ab117f44cf91e525a78674ea4e9",
+  "sealed_module_sha256": "a7673ffc8151b005fcfbfeb4a9e020098e0a2d409b2b79c0bebb2ebe9e0d8720",
+  "production_source": {
+    "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+    "bytes": 20341,
+    "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+  },
+  "moves": [
+    "wire [epoch_width_p-1:0] line_epoch, inv_epoch;",
+    "wire last_slot;"
+  ],
+  "module_suffix": "\n/* verilator lint_off DECLFILENAME */\n/* Canonical no-reset single-write/two-asynchronous-read epoch storage.\n * The owning controller supplies the existing clear sweep and invalidation\n * priority. No initialization, policy, latency or additional BRAM is implied.\n */\nmodule bp_retained_epoch_ram\n #(parameter int unsigned sets_p = 256\n   , parameter int unsigned width_p = 8\n   , localparam int addr_width_lp = (sets_p > 1) ? $clog2(sets_p) : 1\n   )\n  (input logic clk_i\n   , input logic write_v_i\n   , input logic [addr_width_lp-1:0] write_addr_i\n   , input logic [width_p-1:0] write_data_i\n   , input logic [addr_width_lp-1:0] read_addr_i, invalidate_addr_i\n   , output logic [width_p-1:0] read_data_o, invalidate_data_o\n   );\n  (* ram_style = \"distributed\" *) logic [width_p-1:0] mem [sets_p];\n  assign read_data_o = mem[read_addr_i];\n  assign invalidate_data_o = mem[invalidate_addr_i];\n  always_ff @(posedge clk_i)\n    if (write_v_i) mem[write_addr_i] <= write_data_i;\nendmodule\n/* verilator lint_on DECLFILENAME */\n",
+  "scope": "Only forward declarations moved and exact auxiliary module appended with file-naming lint comments; no expressions/FSM/policy/geometry/staging changes."
+}

@@ -1,0 +1,798 @@
+{
+  "state": "PASS-integrated-production-six-normal-across-two-attempts-plus-allcell-negative",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/admission.json",
+    "bytes": 19177,
+    "sha256": "d35ad66fa7bb38ffccd685a6fe078716a2bde44d4c6e56256b2e2489e8f1d47a"
+  },
+  "archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/closed01/component-stage.tar.gz",
+    "bytes": 4448759,
+    "sha256": "602d838bbf515aa340a1e000f69639d43682c083065bac8c133564682e73d20e"
+  },
+  "session": {
+    "state": "PASS-integrated-production-six-normal-across-two-attempts-plus-allcell-negative",
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/admission.json",
+      "bytes": 19177,
+      "sha256": "d35ad66fa7bb38ffccd685a6fe078716a2bde44d4c6e56256b2e2489e8f1d47a"
+    },
+    "preflight": {
+      "inherited": [
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/obj/Vretained_metadata_wrapper"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/inverted",
+          "returncode": 0,
+          "seconds": 3.6470312000019476,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/run-inverted.log",
+            "bytes": 528,
+            "sha256": "335db92e1b64bb0924df627e469fdee5ac50f3c78c7286b70c8034f1cef2a4dc"
+          },
+          "case": "actual1792",
+          "mode": "inverted",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/inverted/retained-line-store.fst",
+            "bytes": 4872364,
+            "sha256": "1ad4b8d799e11ec16f349f7fddbc7056dca5271b007eac437aa4467d8c894cd9"
+          }
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/obj/Vretained_metadata_wrapper",
+            "different-periods"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/different-periods",
+          "returncode": 0,
+          "seconds": 4.063986802008003,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/run-different-periods.log",
+            "bytes": 546,
+            "sha256": "b3cf8abf28ed108cf69f627586bd73c668f62bedbd42e91eefd6c1eacc8d1d75"
+          },
+          "case": "actual1792",
+          "mode": "different-periods",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/different-periods/retained-line-store.fst",
+            "bytes": 4622236,
+            "sha256": "c35688505b89a0519d67d1af50ba946cd9355f74b11680f9935afdee551bd6fe"
+          }
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/obj/Vretained_metadata_wrapper"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/inverted",
+          "returncode": 0,
+          "seconds": 0.5373415319481865,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/run-inverted.log",
+            "bytes": 483,
+            "sha256": "9eba609e55185a3d1b3cf3bd20df982bcbc641b6bdc2749f9212691eadd229c3"
+          },
+          "case": "small-fallback",
+          "mode": "inverted",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/inverted/retained-line-store.fst",
+            "bytes": 2687561,
+            "sha256": "41a7caa36f7a91c8536ee8f0bd34d508d960b22d570f486ec52e456da444d3e6"
+          }
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/obj/Vretained_metadata_wrapper",
+            "different-periods"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/different-periods",
+          "returncode": 0,
+          "seconds": 0.5435024480102584,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/run-different-periods.log",
+            "bytes": 490,
+            "sha256": "58861d54d1c0588aea87f7305f7f08a8942a5172029f371896827865a4c01aa3"
+          },
+          "case": "small-fallback",
+          "mode": "different-periods",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/different-periods/retained-line-store.fst",
+            "bytes": 2402907,
+            "sha256": "486b2a71dc2889e79b62ae39da3bc5a1837c8f00e4bb63cc65641d52ef534e4c"
+          }
+        }
+      ],
+      "state": "PASS-preexecution-source-normalization-only",
+      "candidate": {
+        "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+        "bytes": 20341,
+        "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+      },
+      "reference": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/bp_retained_line_store_reference.sv",
+        "bytes": 18700,
+        "sha256": "3ede461a14acbffe81a8e8f96b12dbd3e974bd2c2976e3376405a7f538378e0b"
+      },
+      "negative_sha256": "51fc623e501a8904d310a8bd4558eb05f00f98d45dfbfb40718b3dbb8ce19711",
+      "component_executed": false
+    },
+    "owner_pid": 963193,
+    "stage": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02",
+    "commands": [
+      {
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--build",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_metadata_wrapper",
+          "-GI_LINES=0",
+          "-GD_LINES=3",
+          "-GRETAINED_SETS=1",
+          "-GEPOCH_WIDTH=2",
+          "-CFLAGS",
+          "-std=c++14",
+          "-j",
+          "1",
+          "-MAKEFLAGS",
+          "VM_PARALLEL_BUILDS=0",
+          "--Mdir",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/obj",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/retained_metadata_wrapper.sv",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/driver.cpp"
+        ],
+        "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I",
+        "returncode": 0,
+        "seconds": 21.837308285059407,
+        "log": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/build.log",
+          "bytes": 4323,
+          "sha256": "9e8fd508d1440f6ade83f1807bec51507f547b96b03f89f93e98889d109a5acb"
+        }
+      },
+      {
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--build",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_metadata_wrapper",
+          "-GI_LINES=1792",
+          "-GD_LINES=1792",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=8",
+          "-CFLAGS",
+          "-std=c++14",
+          "-j",
+          "1",
+          "-MAKEFLAGS",
+          "VM_PARALLEL_BUILDS=0",
+          "--Mdir",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/obj",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/retained_metadata_wrapper.sv",
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/source/driver.cpp"
+        ],
+        "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0",
+        "returncode": 0,
+        "seconds": 21.919311086065136,
+        "log": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/build.log",
+          "bytes": 4355,
+          "sha256": "9aa7525c3901f3e584e7a8bf12d30fd8dd1a0295b073b7f94c0a230ba6ec871a"
+        }
+      }
+    ],
+    "runs": [
+      {
+        "argv": [
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/obj/Vretained_metadata_wrapper"
+        ],
+        "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/inverted",
+        "returncode": 0,
+        "seconds": 0.31764589296653867,
+        "log": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/run-inverted.log",
+          "bytes": 474,
+          "sha256": "dd36c5827aa043354eac1431a61b0265c8e2c0ecd9e8c3eee6828139ffde088b"
+        },
+        "case": "single-set-disabled-I",
+        "mode": "inverted",
+        "expected_rejection": false,
+        "fst": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/inverted/retained-line-store.fst",
+          "bytes": 2377418,
+          "sha256": "b0e86df5f6bcb29f5be82504f5ed4b81f44c72bb3ce9b2448ced4a25baa760f9"
+        }
+      },
+      {
+        "argv": [
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/obj/Vretained_metadata_wrapper",
+          "different-periods"
+        ],
+        "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/different-periods",
+        "returncode": 0,
+        "seconds": 0.318665113998577,
+        "log": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/run-different-periods.log",
+          "bytes": 488,
+          "sha256": "f8838b5fa2ffe6e70fd5aa109568f5181b98af4bf611fff264808c8d53b6d56f"
+        },
+        "case": "single-set-disabled-I",
+        "mode": "different-periods",
+        "expected_rejection": false,
+        "fst": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/different-periods/retained-line-store.fst",
+          "bytes": 2086060,
+          "sha256": "50576cf44e3bc75db78efeb702829e4088c7d09428a8b4a63d56efb0631704e2"
+        }
+      },
+      {
+        "argv": [
+          "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/obj/Vretained_metadata_wrapper"
+        ],
+        "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/inverted",
+        "returncode": 1,
+        "seconds": 0.11411926394794136,
+        "log": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/run-inverted.log",
+          "bytes": 136,
+          "sha256": "7c113210abd13b73e734d1793698b6852f3b9ac48130b52791018cbedd6a5cd2"
+        },
+        "all_cell_witness": {
+          "tick": 70,
+          "total": 2,
+          "epochI": 0,
+          "epochD": 1,
+          "protocol": 0
+        },
+        "case": "negative-clear0",
+        "mode": "inverted",
+        "expected_rejection": true,
+        "fst": {
+          "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/inverted/retained-line-store.fst",
+          "bytes": 4018,
+          "sha256": "5021f7e47a2c9ce889505ceecc38ff459e238121e4bda74501117d755ed5a31a"
+        }
+      }
+    ],
+    "frozen_inputs": [
+      {
+        "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+        "bytes": 20341,
+        "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_line_store.sv",
+        "bytes": 19317,
+        "sha256": "b69e51e216e6aa17f51be17aa2054a87ff800ab117f44cf91e525a78674ea4e9"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_epoch_ram.sv",
+        "bytes": 948,
+        "sha256": "a7673ffc8151b005fcfbfeb4a9e020098e0a2d409b2b79c0bebb2ebe9e0d8720"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/reference-bp225.sv",
+        "bytes": 18690,
+        "sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/handoff.json",
+        "bytes": 9393,
+        "sha256": "c5fc1eaf9c7af5d167bdc1d40f0d7b51142821e285d3513c63cc17ae63119546"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/normalization.json",
+        "bytes": 2024,
+        "sha256": "b20f61d7e8e3c08041bc8c5291934a73b42c9c339bd5ac39e332675db07e48a8"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/production.diff",
+        "bytes": 5097,
+        "sha256": "f860deb682fe7405d9de203242fb56a347b3647223f77ac54d69c70085b17cf8"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/bp_retained_line_store_reference.sv",
+        "bytes": 18700,
+        "sha256": "3ede461a14acbffe81a8e8f96b12dbd3e974bd2c2976e3376405a7f538378e0b"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/driver.cpp",
+        "bytes": 17944,
+        "sha256": "dabb00c1d665ec40646d8d7bc541da22145ed8b3c2b4c937dec5e1db9bef754b"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/retained_metadata_wrapper.sv",
+        "bytes": 7668,
+        "sha256": "d09c2584a153ff5d6b91b9f034e7598f5766d27160a11b2b8f2e6fb3b0a972e1"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/run_host.py",
+        "bytes": 17249,
+        "sha256": "18fb26c7b2a9044b9d57083b8c9e3fe0e97d08c7022b8406a2d26c0bac0df22a"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/test_preparation.py",
+        "bytes": 4010,
+        "sha256": "a79113ca79afda4101e8a47c07411fc603dae3233fe940ff06f636e11b1fec7c"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot-retained-dense/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "bytes": 18690,
+        "sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/preparation01/closed01/manifest.json",
+        "bytes": 18441,
+        "sha256": "79601bff770c27dfc33aa2ff044815ccd712360b6bb29c54e561ffb4e4832aa6"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/preparation01/run01/remote/vivado.log",
+        "bytes": 101688,
+        "sha256": "ba1f2d98c82c623aaab44856ba3f242fae5480ddaf4874053c7773ffc4bcb0c7"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/bin/verilator",
+        "bytes": 26031,
+        "sha256": "2f5bd5dff146a41379df67c50b3de6788ebfeaad1041bddd20f46561c8b6aac1"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/bin/verilator_bin",
+        "bytes": 13249056,
+        "sha256": "e727d230bbbc7d23a88629c288e0d5c08650d907907741e5934b8e0a85e1877e"
+      },
+      {
+        "path": "/usr/bin/g++",
+        "bytes": 1158288,
+        "sha256": "0c0b987719385f8e242819dfef6a3e97b4b2540ce4035dbc11565df2966bd69e"
+      },
+      {
+        "path": "/usr/bin/make",
+        "bytes": 230968,
+        "sha256": "0d4e89c3b814ce99c4900b2a4c758ab780303ae98dddd71ab0dd82ec0ca07fa6"
+      },
+      {
+        "path": "/usr/bin/ar",
+        "bytes": 68024,
+        "sha256": "fbddd167b3b66b83e789d444824772d02004f31c2c3a1ea2d36ca77a11ce0a4d"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fastlz.c",
+        "bytes": 13561,
+        "sha256": "35d2b3ab8ea04615cc56dee1a7017610f459b57aef51d9de69c71c24bd9ee719"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fastlz.h",
+        "bytes": 3685,
+        "sha256": "4dd943f4063e0d13034a87bd66a54f689014b3ea5f92c07b9938f271ffa38a0c"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fst_config.h",
+        "bytes": 429,
+        "sha256": "d8b84770187034bb7aee6c41eeb49725e84ad9dc1d3302903dfc979b03b4d6ad"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fst_win_unistd.h",
+        "bytes": 1593,
+        "sha256": "15ec1054e9c5fa8118060ca5b5dab0bbb2d4879c43b53c9457cb416fce97b19f"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.c",
+        "bytes": 257277,
+        "sha256": "6a09b5a4aea241f12939e8005f7e2c1b2c60f28e39d66a1d02d3edd69c80a1c8"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.h",
+        "bytes": 18479,
+        "sha256": "9b401991a1d433eec862a8636e2d218e9e572df7a4e62643ebccbf88fc417377"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/lz4.c",
+        "bytes": 115587,
+        "sha256": "af9087bb6d6155079cccaf8635acc6590b8a6f2fc98efce35e926f30f79366b8"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/lz4.h",
+        "bytes": 44985,
+        "sha256": "46c366fa9984a5f0aeecf64bf630f23011ced936b9650a1f06531f79c29b7b15"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/wavealloca.h",
+        "bytes": 1431,
+        "sha256": "c328c316a145aba0473ac6a5201ca832da4bbb5c97374e914cb4ac400b0bb235"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated.cpp",
+        "bytes": 142415,
+        "sha256": "46cce25fc45bd199d139cb028e7c3c82b8a23da78ae32dbf977ca63f14c10d3b"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated.h",
+        "bytes": 46537,
+        "sha256": "e98d9c97711b9b1019831a6b9d0f21220735a93e28d456a65e6f0a3c3cadcb1c"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated.mk",
+        "bytes": 12396,
+        "sha256": "da923b3209cc9660358e1d6c1d2284d64cbc8e8fbce879b212e500b36d400e36"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_config.h",
+        "bytes": 1204,
+        "sha256": "6818d50c0907dd5a0b9308de976a9594628dad60c12e461cf69b8e3963905729"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_cov.cpp",
+        "bytes": 21434,
+        "sha256": "cdc227794292ba3920b3eb6041e356caabd19bd60dbb14c57dd4c8cebe07241f"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_cov.h",
+        "bytes": 7675,
+        "sha256": "d939684fff6d0ff97a6f50c31ade314383065cbf5c6cbbbd5e80bb4bbfda8a30"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_cov_key.h",
+        "bytes": 3911,
+        "sha256": "161e775d21f12cafc838ce80bd17618141342cf407791414320757c17fad853c"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_dpi.cpp",
+        "bytes": 33336,
+        "sha256": "0437c9adff628bae032d99baeb1b5ae05da7cca7f80e16b7a035ad36d33735b7"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_dpi.h",
+        "bytes": 3754,
+        "sha256": "69fa17a0144e9649f40c4dff4469b4890afb65d31217ef8dc6f19a1b7b827db3"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_fst_c.cpp",
+        "bytes": 15847,
+        "sha256": "32d09b0c8c873c0acf36b0b29c8098b5971a8e83750453ce974dd2affd3cee97"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_fst_c.h",
+        "bytes": 10613,
+        "sha256": "6bc5892583c090f464a720ef9a82bcf7cfc6f7195e4c86db462f635ae68bcd1f"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_fst_sc.cpp",
+        "bytes": 971,
+        "sha256": "4db20e688619bdaa82267405104a182038b5061b90ff02c43ca738050013b5e3"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_fst_sc.h",
+        "bytes": 1993,
+        "sha256": "6620d7d758b5b217b84511c1b44dda9146fc6ec0e7d348a7d9e8a4952cefaf08"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_funcs.h",
+        "bytes": 122097,
+        "sha256": "861897911dc58554909f3d61f82628b3aad53290b1f35e1f1252183105429909"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_imp.h",
+        "bytes": 23453,
+        "sha256": "f4a0b0692c9418852df9def2ca3bafc24462d1a5b2eae16b516ff718271a0465"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_intrinsics.h",
+        "bytes": 1559,
+        "sha256": "6bb62292a39a5c206463423e42f78cd2b5bf5279b1623757587e2354e67d9707"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_probdist.cpp",
+        "bytes": 7469,
+        "sha256": "f8f68f04f6d68afef939c39123169659d6699a8ed7d9b149c5130a1f99bd9bca"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_profiler.cpp",
+        "bytes": 8756,
+        "sha256": "ae6ac91ca46a46587bd33834e507c3499b10cd97a07990b57a7bb3287282df5b"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_profiler.h",
+        "bytes": 9938,
+        "sha256": "f4836c8eaeeba19ad3858a513825a0ef50530f17b4a11e083ae7e44c89608317"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_random.cpp",
+        "bytes": 16891,
+        "sha256": "8ced247f687165b1513649828d05099231bb3f4c2e7140d1f6c46a86de5f1ad6"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_random.h",
+        "bytes": 9317,
+        "sha256": "cc960b43e608b3d3a70fe96221d421882aced41bfe0da5f905637319845859be"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_save.cpp",
+        "bytes": 9626,
+        "sha256": "4962b583cb1ba039648d883f915dac6665770a255f6d4d25682cef54affbb155"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_save.h",
+        "bytes": 12237,
+        "sha256": "e25098f63bd1866afa751c24846bf1962b8fc37e87fff192ee817ca0a4fe9d29"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_sc.h",
+        "bytes": 2135,
+        "sha256": "22881611a751634ecaf7eb30836199b944dba6a9e80efae7bb2da04d66a1b991"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_sc_trace.h",
+        "bytes": 9551,
+        "sha256": "f5b2f6c4c40cafcacbd3225d2d3977ec61c71c836d8bc5addf721391c1a824a9"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_sym_props.h",
+        "bytes": 10406,
+        "sha256": "a1dbc1e3a05adf95b3d8d8e849f648c02a06d309e758c1ac129ebcd62e5ff623"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_syms.h",
+        "bytes": 2696,
+        "sha256": "06d17236598b393538d3b5fb3da253bd372f9a3a02dadab0b19413c3341f3db2"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_threads.cpp",
+        "bytes": 3505,
+        "sha256": "c1290e944bb50e80ee5bf27ab1efdc032aac023ade148ef74d6a45db8bb6f132"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_threads.h",
+        "bytes": 7842,
+        "sha256": "137d3319acf4254d0b863c3db90accd49278e8f581d242a70e449e95a55afe71"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_timing.cpp",
+        "bytes": 8757,
+        "sha256": "0ac9f511963da4f8683b4d0619e099e7de3fae56758d29181be90ea3ed6cb31e"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_timing.h",
+        "bytes": 20032,
+        "sha256": "69257edb917f9fbcbd51139efc46499a11bdbeb39fc42bba563fbad8f3c5b0f5"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_trace.h",
+        "bytes": 24951,
+        "sha256": "a465193fc90bdd1b480cb624f50de9b31f6a01107e6203c38a76b70cf621f3a1"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_trace_imp.h",
+        "bytes": 36095,
+        "sha256": "3ffd55e7136c2be62d37a69b54817b8b6edebda180a2705bae18e4a8a86ffa5e"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_types.h",
+        "bytes": 75058,
+        "sha256": "9ad79fdaacb4f37bfc44bba9f88036ab65e34cadc66a1f075f83c158f786edc7"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_vcd_c.cpp",
+        "bytes": 24562,
+        "sha256": "3c37bde5627ac3784844e09eb7bc6a75ea25c683016c38786cd8a50ac6580ef0"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_vcd_c.h",
+        "bytes": 14026,
+        "sha256": "8a5f338c4ab897c30539b33117910393c93979096400821442881b20585fa604"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_vcd_sc.cpp",
+        "bytes": 976,
+        "sha256": "f8d7875cc945086238dc0db55b729ced24ed1f1d8a62b3235b277bad2dcbb0eb"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_vcd_sc.h",
+        "bytes": 2049,
+        "sha256": "1f62f52c30cdec9113598c0abd698a50cafa515c26cf9e24cd13e28cbbd8f6f8"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_vpi.cpp",
+        "bytes": 123041,
+        "sha256": "e1d9ba56c44ebbf9e52995f48a49b3dbf31e3fc0a24d862f1932f3f6be5f4546"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilated_vpi.h",
+        "bytes": 2682,
+        "sha256": "577e21f88dba4d1dc0943800024db32d8186cc76ecbb5670bf175d5c0ec3c521"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilatedos.h",
+        "bytes": 26728,
+        "sha256": "c981ef6b92c72e7da1633b7d06d57611468bbf9e70fbe4c82e4a7018f903adfe"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/verilatedos_c.h",
+        "bytes": 4635,
+        "sha256": "892c8ba9080983a5347646846a133ec64dbbe9bf3c44adc27f553e2f72b64c9c"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/vltstd/sv_vpi_user.h",
+        "bytes": 23563,
+        "sha256": "c9e43aed99b7845af2eea8642d8a06b0e35f5e6fdec9155709fa66924866ddf2"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/vltstd/svdpi.h",
+        "bytes": 20054,
+        "sha256": "2528c8e529b66dd8e795c8a0fee326166cc51f7dee8fc6a0c6c930534fc780a6"
+      },
+      {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/vltstd/vpi_user.h",
+        "bytes": 45761,
+        "sha256": "32a9cdd018660b47ca22c7962aa135f4170c3f2564dc7d277d626125c0e007e5"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/closed01/manifest.json",
+        "bytes": 26672,
+        "sha256": "f6de1ff4014573b5453dd9e657c429ad93f989fcc6c83f5d47c3cfa8c365adba"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/closed01/component-stage.tar.gz",
+        "bytes": 9779263,
+        "sha256": "09827c1dbabd0846616180cc883c102da75eea91aab4595aea238727a924bdae"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/helper/driver.cpp",
+        "bytes": 18698,
+        "sha256": "c45e9fe5931df5280535ca5e1036f89a3fe6a9ba4c7781a458ff35ab08cfba2d"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121/helper/retained_metadata_wrapper.sv",
+        "bytes": 7196,
+        "sha256": "b88c4d5014d99001fb06a035ed44e4e2fb9fb2bb7c08b597da6181bf80185685"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/harness-only.diff",
+        "bytes": 11411,
+        "sha256": "080a1fe2e881f7e160788ae0ebe16ae211318ac0740e431f94a15b69949af885"
+      }
+    ],
+    "executables": {
+      "single-set-disabled-I": {
+        "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/single-set-disabled-I/obj/Vretained_metadata_wrapper",
+        "bytes": 459320,
+        "sha256": "1d8293e15412e507b369c539599acde02b18b49bc6a81137ce9df2211813989c"
+      },
+      "negative-clear0": {
+        "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/obj/Vretained_metadata_wrapper",
+        "bytes": 464040,
+        "sha256": "5d7d4a86b738dfc8b733ed902861799dee393fe6e130ae63bdf031441d77e25d"
+      }
+    },
+    "negative_source": {
+      "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-02/negative-clear0/bp_retained_line_store.sv",
+      "bytes": 20363,
+      "sha256": "51fc623e501a8904d310a8bd4558eb05f00f98d45dfbfb40718b3dbb8ce19711"
+    },
+    "final_source_check": {
+      "inherited": [
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/obj/Vretained_metadata_wrapper"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/inverted",
+          "returncode": 0,
+          "seconds": 3.6470312000019476,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/run-inverted.log",
+            "bytes": 528,
+            "sha256": "335db92e1b64bb0924df627e469fdee5ac50f3c78c7286b70c8034f1cef2a4dc"
+          },
+          "case": "actual1792",
+          "mode": "inverted",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/inverted/retained-line-store.fst",
+            "bytes": 4872364,
+            "sha256": "1ad4b8d799e11ec16f349f7fddbc7056dca5271b007eac437aa4467d8c894cd9"
+          }
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/obj/Vretained_metadata_wrapper",
+            "different-periods"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/different-periods",
+          "returncode": 0,
+          "seconds": 4.063986802008003,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/run-different-periods.log",
+            "bytes": 546,
+            "sha256": "b3cf8abf28ed108cf69f627586bd73c668f62bedbd42e91eefd6c1eacc8d1d75"
+          },
+          "case": "actual1792",
+          "mode": "different-periods",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/actual1792/different-periods/retained-line-store.fst",
+            "bytes": 4622236,
+            "sha256": "c35688505b89a0519d67d1af50ba946cd9355f74b11680f9935afdee551bd6fe"
+          }
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/obj/Vretained_metadata_wrapper"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/inverted",
+          "returncode": 0,
+          "seconds": 0.5373415319481865,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/run-inverted.log",
+            "bytes": 483,
+            "sha256": "9eba609e55185a3d1b3cf3bd20df982bcbc641b6bdc2749f9212691eadd229c3"
+          },
+          "case": "small-fallback",
+          "mode": "inverted",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/inverted/retained-line-store.fst",
+            "bytes": 2687561,
+            "sha256": "41a7caa36f7a91c8536ee8f0bd34d508d960b22d570f486ec52e456da444d3e6"
+          }
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/obj/Vretained_metadata_wrapper",
+            "different-periods"
+          ],
+          "cwd": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/different-periods",
+          "returncode": 0,
+          "seconds": 0.5435024480102584,
+          "log": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/run-different-periods.log",
+            "bytes": 490,
+            "sha256": "58861d54d1c0588aea87f7305f7f08a8942a5172029f371896827865a4c01aa3"
+          },
+          "case": "small-fallback",
+          "mode": "different-periods",
+          "expected_rejection": false,
+          "fst": {
+            "path": "/dev/shm/zp-retained-canonical-epochs-production-20261121-01/small-fallback/different-periods/retained-line-store.fst",
+            "bytes": 2402907,
+            "sha256": "486b2a71dc2889e79b62ae39da3bc5a1837c8f00e4bb63cc65641d52ef534e4c"
+          }
+        }
+      ],
+      "state": "PASS-preexecution-source-normalization-only",
+      "candidate": {
+        "path": "/home/coyang/bp-retained-canonical-epochs-20261121/bp_common/src/v/bp_retained_line_store.sv",
+        "bytes": 20341,
+        "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+      },
+      "reference": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/helper/bp_retained_line_store_reference.sv",
+        "bytes": 18700,
+        "sha256": "3ede461a14acbffe81a8e8f96b12dbd3e974bd2c2976e3376405a7f538378e0b"
+      },
+      "negative_sha256": "51fc623e501a8904d310a8bd4558eb05f00f98d45dfbfb40718b3dbb8ce19711",
+      "component_executed": false
+    },
+    "resources": {
+      "stage_bytes": 9187555,
+      "durable_bytes": 0
+    }
+  }
+}
