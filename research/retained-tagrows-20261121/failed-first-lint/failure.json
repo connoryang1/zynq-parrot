@@ -1,0 +1,19 @@
+{
+  "state": "FAIL first prototype lint; no executable or result",
+  "argv": [
+    "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+    "--lint-only",
+    "--assert",
+    "-Wall",
+    "--top-module",
+    "retained_line_geometry_wrapper",
+    "-GI_LINES=1280",
+    "-GD_LINES=1280",
+    "-GRETAINED_SETS=256",
+    "/home/coyang/zynq-parrot-linux-tagrows/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+    "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-line-geometry/retained_line_geometry_wrapper.sv"
+  ],
+  "returncode": 1,
+  "source_sha256": "b238cb6b9d2c837cbdae18207a11c85abf5ae502471c39bb5569bb1a3d086714",
+  "cause": "Explicit serial assignment width and unsigned assertion-bound casts needed; no simulation ran"
+}

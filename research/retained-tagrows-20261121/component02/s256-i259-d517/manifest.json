@@ -1,0 +1,177 @@
+{
+  "state": "PASS-retained-tagrows",
+  "i_lines": 259,
+  "d_lines": 517,
+  "retained_sets": 256,
+  "sources": {
+    "bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 19383,
+      "sha256": "fe60f746e4c3d64acb4fac17866ec1deafa029fa305d8240cd2bf52b871d736b"
+    },
+    "retained_tagrows_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/retained_tagrows_wrapper.sv",
+      "bytes": 2414,
+      "sha256": "56a4f00254832ab55722fdd87799a9f93dabd4ce06213193c2c812abf087181b"
+    },
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/driver.cpp",
+      "bytes": 15516,
+      "sha256": "b13c6300f578671d6308d07f219da7c15527a5f1c4b78c060ab3ab4b34f6e997"
+    },
+    "service.py": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/service.py",
+      "bytes": 11480,
+      "sha256": "4059b6fbe5d74ebbe04eea273597e125249d056c74e4fbe0cde34655b216f58a"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/run.py",
+      "bytes": 6020,
+      "sha256": "53f4740bf106f1f93b8489874328bb9795e9f1bbd640fa3fef43e53b258250a5"
+    }
+  },
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.13017890602350235,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s256-i259-d517/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_tagrows_wrapper",
+        "-GI_LINES=259",
+        "-GD_LINES=517",
+        "-GRETAINED_SETS=256",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517/obj",
+        "/home/coyang/zynq-parrot-linux-tagrows/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/retained_tagrows_wrapper.sv",
+        "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/driver.cpp"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 17.567717424943112,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s256-i259-d517/build.log",
+        "bytes": 4280,
+        "sha256": "9cd2e5e5a1aed64f7c82cf234ef5b332437f1c9e33405f5f194abcba80c253de"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517/obj/Vretained_tagrows_wrapper"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.3392032759729773,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s256-i259-d517/run-inverted.log",
+        "bytes": 568,
+        "sha256": "70ff16deec23ba05f677a7874607b03d1248c8a6e1b3dd275480f3197d99f5fd"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517/obj/Vretained_tagrows_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.33936948294285685,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s256-i259-d517/run-different-periods.log",
+        "bytes": 586,
+        "sha256": "16594c8319475bce680c2b6c39d3c118cce36c39c6eb9b8ae7e02e75b19e987f"
+      }
+    }
+  ],
+  "clock_results": [
+    {
+      "clock_mode": "inverted",
+      "counts": [
+        [
+          "0",
+          "278",
+          "278",
+          "273",
+          "273",
+          "269"
+        ],
+        [
+          "1",
+          "538",
+          "538",
+          "537",
+          "537",
+          "535"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s256-i259-d517/inverted/retained-line-store.fst",
+        "bytes": 379787,
+        "sha256": "749253b41034862356948d8a013adfb798ca68cb3e6c6f18735b4f080d305ea7"
+      }
+    },
+    {
+      "clock_mode": "different-periods",
+      "counts": [
+        [
+          "0",
+          "278",
+          "278",
+          "273",
+          "273",
+          "269"
+        ],
+        [
+          "1",
+          "538",
+          "538",
+          "537",
+          "537",
+          "535"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s256-i259-d517/different-periods/retained-line-store.fst",
+        "bytes": 380848,
+        "sha256": "0af8ef881a8b0140de90ca0d4b40c0e09811548427e987b439646449237e42dc"
+      }
+    }
+  ],
+  "scope": "Full64B backend functional capacity and own-lane accepted-edge service only; ordinary L1 unchanged. No application, unique-retention, fit, routed timing or FPGA claim.",
+  "executable": {
+    "path": "/home/coyang/zynq-parrot-linux-tagrows/.tagrows-unit02/s256-i259-d517/obj/Vretained_tagrows_wrapper",
+    "bytes": 413944,
+    "sha256": "dec87b3b234086cd29bc6579d5bb35e978d1c798b6dc12f0eea73c150d7c96a9"
+  }
+}

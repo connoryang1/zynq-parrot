@@ -1,0 +1,11 @@
+%Warning-WIDTHEXPAND: /home/coyang/zynq-parrot-linux-tagrows/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:241:42: Operator ASSIGN expects 115 bits on the Assign RHS, but Assign RHS's CONCAT generates 23 bits.
+                                                                                                                                 : ... note: In instance 'retained_line_geometry_wrapper.dut'
+  241 |                 end else tag_wdata[lane] = tag_info_s'{valid:1'b1, epoch:insert_epoch_r, tag:ptag_r};
+      |                                          ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.030
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-UNSIGNED: /home/coyang/zynq-parrot-linux-tagrows/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:354:53: Comparison is constant due to unsigned arithmetic
+                                                                                                                              : ... note: In instance 'retained_line_geometry_wrapper.dut'
+  354 |         ? ((lines_lp != 0) && (int'(tag_addr[lane]) >= lane*sets_p) && (int'(tag_addr[lane]) < (lane+1)*sets_p))
+      |                                                     ^~
+%Error: Exiting due to 2 warning(s)

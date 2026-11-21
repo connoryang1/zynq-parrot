@@ -1,0 +1,574 @@
+{
+  "scope": "Accepted own-lane rising-edge request to accepted response / observed terminal pulse. Includes interface handshake edge; not application time, FPGA timing, or memory latency.",
+  "input_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s64-i1280-d1280/manifest.json",
+    "bytes": 6281,
+    "sha256": "b95fc64cce2da83e9f571ab4121519706dcc90de7ded2511d1a4037dd555512b"
+  },
+  "analyzer": {
+    "path": "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-tagrows/service.py",
+    "bytes": 11480,
+    "sha256": "4059b6fbe5d74ebbe04eea273597e125249d056c74e4fbe0cde34655b216f58a"
+  },
+  "converter": {
+    "path": "/usr/bin/fst2vcd",
+    "bytes": 117296,
+    "sha256": "fc3615cd98505501573604dc94312cdc4e233340422faadb3fd35a6b9845346a"
+  },
+  "retained_sets": 64,
+  "runs": [
+    {
+      "clock_mode": "inverted",
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s64-i1280-d1280/inverted/retained-line-store.fst",
+        "bytes": 1418449,
+        "sha256": "5ffb9834865b59960d3a814d6c514de86ba70304024eb6cc271a94465e450ca7"
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s64-i1280-d1280/run-inverted.log",
+        "bytes": 667,
+        "sha256": "8021fbb7149116e45d37524c264b6853942127da09def40db22b91e951353b92"
+      },
+      "counts": [
+        [
+          1323,
+          1323,
+          1339,
+          1339,
+          1334
+        ],
+        [
+          1318,
+          1318,
+          1334,
+          1334,
+          1332
+        ]
+      ],
+      "service_cycles": {
+        "lane0/all_slot_hit": {
+          "count": 1280,
+          "min": 12,
+          "median": 31.0,
+          "max": 50,
+          "histogram": {
+            "12": 64,
+            "14": 64,
+            "16": 64,
+            "18": 64,
+            "20": 64,
+            "22": 64,
+            "24": 64,
+            "26": 64,
+            "28": 64,
+            "30": 64,
+            "32": 64,
+            "34": 64,
+            "36": 64,
+            "38": 64,
+            "40": 64,
+            "42": 64,
+            "44": 64,
+            "46": 64,
+            "48": 64,
+            "50": 64
+          }
+        },
+        "lane0/empty_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane0/fill_insert": {
+          "count": 1280,
+          "min": 50,
+          "median": 50.0,
+          "max": 50,
+          "histogram": {
+            "50": 1280
+          }
+        },
+        "lane0/full_set_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane0/pinned_refusal": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane0/refresh_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane0/refresh_insert": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane0/replacement_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane0/replacement_insert": {
+          "count": 1,
+          "min": 50,
+          "median": 50,
+          "max": 50,
+          "histogram": {
+            "50": 1
+          }
+        },
+        "lane0/retained_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/all_slot_hit": {
+          "count": 1280,
+          "min": 12,
+          "median": 31.0,
+          "max": 50,
+          "histogram": {
+            "12": 64,
+            "14": 64,
+            "16": 64,
+            "18": 64,
+            "20": 64,
+            "22": 64,
+            "24": 64,
+            "26": 64,
+            "28": 64,
+            "30": 64,
+            "32": 64,
+            "34": 64,
+            "36": 64,
+            "38": 64,
+            "40": 64,
+            "42": 64,
+            "44": 64,
+            "46": 64,
+            "48": 64,
+            "50": 64
+          }
+        },
+        "lane1/empty_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane1/fill_insert": {
+          "count": 1280,
+          "min": 50,
+          "median": 50.0,
+          "max": 50,
+          "histogram": {
+            "50": 1280
+          }
+        },
+        "lane1/full_set_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane1/pinned_refusal": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane1/refresh_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/refresh_insert": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/replacement_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/replacement_insert": {
+          "count": 1,
+          "min": 50,
+          "median": 50,
+          "max": 50,
+          "histogram": {
+            "50": 1
+          }
+        },
+        "lane1/retained_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        }
+      },
+      "clear_cycles": [
+        [
+          1281,
+          1281,
+          1281,
+          1281,
+          1281,
+          1281,
+          1281
+        ],
+        [
+          1281,
+          1281,
+          1281,
+          1281,
+          1281
+        ]
+      ],
+      "trace": {
+        "last_trace_tick": 2438085,
+        "groups": 498290,
+        "own_lane_edges": [
+          243809,
+          243808
+        ]
+      },
+      "converter_clean_eof": true
+    },
+    {
+      "clock_mode": "different-periods",
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s64-i1280-d1280/different-periods/retained-line-store.fst",
+        "bytes": 1425575,
+        "sha256": "db6ffad513e0c84067d2f19e605a4ce3e545bb9a6b20b448ae9becdc3e21df41"
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/component02/s64-i1280-d1280/run-different-periods.log",
+        "bytes": 685,
+        "sha256": "57b7632e0fa9deaa8e8947800f369de6033508c71b62e59f855dc5ae2798022a"
+      },
+      "counts": [
+        [
+          1323,
+          1323,
+          1339,
+          1339,
+          1334
+        ],
+        [
+          1318,
+          1318,
+          1334,
+          1334,
+          1332
+        ]
+      ],
+      "service_cycles": {
+        "lane0/all_slot_hit": {
+          "count": 1280,
+          "min": 12,
+          "median": 31.0,
+          "max": 50,
+          "histogram": {
+            "12": 64,
+            "14": 64,
+            "16": 64,
+            "18": 64,
+            "20": 64,
+            "22": 64,
+            "24": 64,
+            "26": 64,
+            "28": 64,
+            "30": 64,
+            "32": 64,
+            "34": 64,
+            "36": 64,
+            "38": 64,
+            "40": 64,
+            "42": 64,
+            "44": 64,
+            "46": 64,
+            "48": 64,
+            "50": 64
+          }
+        },
+        "lane0/empty_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane0/fill_insert": {
+          "count": 1280,
+          "min": 50,
+          "median": 50.0,
+          "max": 50,
+          "histogram": {
+            "50": 1280
+          }
+        },
+        "lane0/full_set_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane0/pinned_refusal": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane0/refresh_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane0/refresh_insert": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane0/replacement_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane0/replacement_insert": {
+          "count": 1,
+          "min": 50,
+          "median": 50,
+          "max": 50,
+          "histogram": {
+            "50": 1
+          }
+        },
+        "lane0/retained_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/all_slot_hit": {
+          "count": 1280,
+          "min": 12,
+          "median": 31.0,
+          "max": 50,
+          "histogram": {
+            "12": 64,
+            "14": 64,
+            "16": 64,
+            "18": 64,
+            "20": 64,
+            "22": 64,
+            "24": 64,
+            "26": 64,
+            "28": 64,
+            "30": 64,
+            "32": 64,
+            "34": 64,
+            "36": 64,
+            "38": 64,
+            "40": 64,
+            "42": 64,
+            "44": 64,
+            "46": 64,
+            "48": 64,
+            "50": 64
+          }
+        },
+        "lane1/empty_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane1/fill_insert": {
+          "count": 1280,
+          "min": 50,
+          "median": 50.0,
+          "max": 50,
+          "histogram": {
+            "50": 1280
+          }
+        },
+        "lane1/full_set_miss": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane1/pinned_refusal": {
+          "count": 1,
+          "min": 41,
+          "median": 41,
+          "max": 41,
+          "histogram": {
+            "41": 1
+          }
+        },
+        "lane1/refresh_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/refresh_insert": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/replacement_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        },
+        "lane1/replacement_insert": {
+          "count": 1,
+          "min": 50,
+          "median": 50,
+          "max": 50,
+          "histogram": {
+            "50": 1
+          }
+        },
+        "lane1/retained_hit": {
+          "count": 1,
+          "min": 12,
+          "median": 12,
+          "max": 12,
+          "histogram": {
+            "12": 1
+          }
+        }
+      },
+      "clear_cycles": [
+        [
+          1281,
+          1281,
+          1281,
+          1281,
+          1281,
+          1281,
+          1281
+        ],
+        [
+          1281,
+          1281,
+          1281,
+          1281,
+          1281
+        ]
+      ],
+      "trace": {
+        "last_trace_tick": 2919842,
+        "groups": 926682,
+        "own_lane_edges": [
+          291984,
+          208560
+        ]
+      },
+      "converter_clean_eof": true
+    }
+  ],
+  "state": "PASS-closed-trace-service-audit"
+}
