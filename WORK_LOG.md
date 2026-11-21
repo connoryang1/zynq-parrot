@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Near-limit synthesis stopped for a source fix — 2026-11-21:** maintained cancellation closes the original 1,280-line-per-side job after confirming structural maintenance feedback; all old Vivado processes are gone and exact child definitions/logs are preserved. No final area, route or fitted-capacity result is claimed. A bounded RAM-only default/area/banked inference comparison now precedes the corrected full build (`research/fpga-native1280-r2-20261121/canceled01/closure.json`).
+
 - **Large payload correctness closed — 2026-11-21:** separate I and D fixtures each restore all 1,280 distinct full 64-byte lines through retained hits and eight real L1 writes, with all 20,480 instruction words / 10,240 data loads checked. A same-ELF D-off control completes through ordinary memory and fails the retained-use gate as intended; all 54 compact snapshots round-trip exactly. This is model evidence for 80 KiB per side separately, with no physical fit or application benefit implied (`research/fpga-native1280-r2-20261121/capacity-correctness-review.json`).
 
 - **Actual retained fit exposes maintenance feedback — 2026-11-21:** corrected1280-line/side synthesis recognizes both real retained RAMs, then reports Synth8-326 feedback through D-UCE retained clear/maintenance and automatically disables a timing arc. The immutable job continues for closed resource/failure evidence; timing/deployment acceptance is withheld while source/netlist equivalence is investigated (`research/fpga-native1280-r2-20261121/warning01/record.json`).
