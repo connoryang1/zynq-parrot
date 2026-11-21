@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Corrected near-limit FPGA implementation launched — 2026-11-21:** `bp1` job `20261121T125734Z-cc01fdf32` now builds the acyclic maintenance control and two RAM-area attributes at 1,280 full lines per side, with counters and unchanged ordinary caches. Clean static 16 KiB-L2 full-core correctness, strict I/D restoration and counter gates pass; actual routed fit and maximum capacity remain pending (`research/fpga-native1280-area-r3-20261121/admission.json`).
+
 - **Actual RAM packing improvement measured — 2026-11-21:** the isolated Vivado 2024.2 probe reproduces the original 64-payload/3.5-tag block mapping; `ram_decomp="area"` reduces it to 36-payload/3-tag blocks, versus 40/3 with explicit banking. The attribute-only arm adds 299 LUTs and 10 FFs in this fixture; whole-system fit, timing and capacity remain unproven. Preserve the existing store/FSM and carry only the inference attributes into the corrected candidate (`research/retained-ram-inference-20261121/closed01/verification.json`).
 
 - **Near-limit synthesis stopped for a source fix — 2026-11-21:** maintained cancellation closes the original 1,280-line-per-side job after confirming structural maintenance feedback; all old Vivado processes are gone and exact child definitions/logs are preserved. No final area, route or fitted-capacity result is claimed. A bounded RAM-only default/area/banked inference comparison now precedes the corrected full build (`research/fpga-native1280-r2-20261121/canceled01/closure.json`).
