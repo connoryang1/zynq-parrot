@@ -1,0 +1,32 @@
+{
+  "state": "Recovered checkpoint push selection errors; no source modification",
+  "failed": [
+    {
+      "command": "git push origin experiment/linux-retained-tagrows (BlackParrot submodule)",
+      "reason": "origin is upstream HTTPS without credentials; no push occurred"
+    },
+    {
+      "command": "read-only ssh localhost:30041",
+      "reason": "wrong endpoint refused connection; no job action"
+    }
+  ],
+  "corrected": [
+    {
+      "command": "git push connoryang experiment/linux-retained-tagrows",
+      "result": "PASS BP54c065652 saved to owned SSH remote"
+    },
+    {
+      "command": "git push origin experiment/linux-retained-tagrows (top worktree)",
+      "result": "PASS TOP629ed3e7a saved after BP push"
+    },
+    {
+      "command": "git push origin experiment/linux-retained-payload-capacity",
+      "result": "PASS TOPa9fb93acc saved"
+    },
+    {
+      "command": "read-only ssh coyang@haight.chillysky.com:30041",
+      "result": "PASS actual Vivado796021 active"
+    }
+  ],
+  "guardrail": "Use farm inventory endpoint and owned connoryang BlackParrot remote; inspect remote names before pushing nested worktrees."
+}

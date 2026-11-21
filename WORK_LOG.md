@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Actual retained fit exposes maintenance feedback — 2026-11-21:** corrected1280-line/side synthesis recognizes both real retained RAMs, then reports Synth8-326 feedback through D-UCE retained clear/maintenance and automatically disables a timing arc. The immutable job continues for closed resource/failure evidence; timing/deployment acceptance is withheld while source/netlist equivalence is investigated (`research/fpga-native1280-r2-20261121/warning01/record.json`).
+
 - **Large retained-store complete cost measured — 2026-11-21:** one closed same-ELF1280-line/side native-simulation pair passes full normal-cache, retained-payload and identical-access audits, but joint retention raises WHOLE1,159,423→1,191,569cycles (+2.7726%) and timed ring366,663→375,588 (+2.4341%). It produces772timed D hits and no I hits; this is extra ordinary-demand retention with no advisory source, not Linux/FPGA benefit or prefetch effectiveness (`research/retained-natural-control-20261121/CLOSURE_V3.md`).
 
 - **FPGA configuration loss repaired — 2026-11-21:** the first64-line fit was canceled and rejected because environment-only retention settings never reached Verilog compilation. Validated allowlist reinjection now covers producer, IP-edit and final projects; actual launched child synthesis of packaged RTL decodes all192 requested bits, while a same-package negative control exposes the defaults. No retained fit or maximum is inferred from the rejected94.5BRAM snapshot (`research/vivado-retained-defines-20261121/`).

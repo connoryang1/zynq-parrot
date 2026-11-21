@@ -1,0 +1,32 @@
+{
+  "state": "OPEN actual synthesis timing-loop warning; no fit/deployment acceptance",
+  "recorded_utc": "2026-11-21T12:17:24.028184+00:00",
+  "job": "20261121T102215Z-15288321b",
+  "top": "15288321bfb1443c5ce39318014f60cd979890f9",
+  "bp": "e10992a3eea3ba2ef6ae3ccb42ff5e8c658286a8",
+  "log": "/home/coyang/fpga-logs-linux-retained-native1280-r2/20261121T102215Z-15288321b/console.log",
+  "snippet": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/fpga-native1280-r2-20261121/warning01/synthesis-warning.log",
+    "bytes": 18060,
+    "sha256": "205cf071ccc526e70f3695d06e515be85881a480066ff75d617c273b4cc9515e"
+  },
+  "confirmed": "Vivado Synth8-326 cuts an arc on a feedback path through actual D UCE retained_clear_i and retained_maintenance_o. Source feeds own accepted maintenance pulse back as clear.",
+  "unresolved": [
+    "Whether opcode exclusivity makes the feedback a logically false path; source/netlist proof pending.",
+    "Actual routed area/timing/DRC/bitstream; synthesis still active."
+  ],
+  "acceptance": "Do not deploy or treat automatic timing-loop cut as timing acceptance. Continue immutable job for closed resource/failure evidence. Diagnose and validate an equivalent acyclic control implementation separately if required.",
+  "physical_operations": 0,
+  "source_bindings": {
+    "import/black-parrot/bp_me/src/v/cce/bp_uce.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+      "bytes": 106161,
+      "sha256": "f7fc772129f9560bc25287ad780b352fa909219ee08f686a9bb4f5ab0fe1bbc9"
+    },
+    "import/black-parrot/bp_top/src/v/bp_unicore_lite.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+      "bytes": 31356,
+      "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+    }
+  }
+}

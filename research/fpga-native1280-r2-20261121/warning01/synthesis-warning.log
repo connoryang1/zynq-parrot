@@ -1,0 +1,90 @@
+|\slices[0].l2s                                                                                                                                                                | cache_controller/bank_response.ordinary_order/unhardened.un.fifo/mem_1r1w/synth/nz.mem_reg   | Implied        | 8 x 1                | RAM16X1D x 1     | 
+|\slices[0].l2s                                                                                                                                                                | cache_controller/bank_response.out/gearbox/fifo/mem_1r1w/synth/nz.mem_reg                    | Implied        | 2 x 123              | RAM32M x 21      | 
+|fwd_xbar                                                                                                                                                                      | buffer[0].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 126              | RAM32M x 21      | 
+|fwd_xbar                                                                                                                                                                      | buffer[1].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 126              | RAM32M x 21      | 
+|fwd_xbar                                                                                                                                                                      | buffer[2].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 126              | RAM32M x 21      | 
+|rev_xbar                                                                                                                                                                      | buffer[0].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 125              | RAM32M x 21      | 
+|rev_xbar                                                                                                                                                                      | buffer[1].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 125              | RAM32M x 21      | 
+|rev_xbar                                                                                                                                                                      | buffer[2].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 125              | RAM32M x 21      | 
+|rev_xbar                                                                                                                                                                      | buffer[3].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 125              | RAM32M x 21      | 
+|rev_xbar                                                                                                                                                                      | buffer[4].in_fifo/mem_1r1w/synth/nz.mem_reg                                                  | Implied        | 2 x 125              | RAM32M x 21      | 
+|loopback                                                                                                                                                                      | fwd_pump_in/gearbox/fifo/mem_1r1w/synth/nz.mem_reg                                           | Implied        | 2 x 123              | RAM32M x 21      | 
+|loopback                                                                                                                                                                      | rev_pump_out/gearbox/fifo/mem_1r1w/synth/nz.mem_reg                                          | Implied        | 2 x 123              | RAM32M x 21      | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | io2axil/stream_pump/in/gearbox/fifo/mem_1r1w/synth/nz.mem_reg                                | Implied        | 2 x 123              | RAM32M x 21      | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | io2axil/stream_pump/stream_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                 | Implied        | 2 x 59               | RAM32M x 10      | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | io2axil/stream_pump/out/gearbox/fifo/mem_1r1w/synth/nz.mem_reg                               | Implied        | 2 x 91               | RAM32M x 16      | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | cache2axi/axi_rx/tag_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                       | Implied        | 2 x 1                | RAM16X1D x 1     | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | cache2axi/axi_rx/piso/two_fifo.fifo0/mem_1r1w/synth/nz.mem_reg                               | Implied        | 2 x 64               | RAM32M x 11      | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | cache2axi/axi_tx/tag_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                       | Implied        | 2 x 9                | RAM32M x 2       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | cache2axi/axi_tx/sipo/fifos[0].twofifo.fifo/mem_1r1w/synth/nz.mem_reg                        | Implied        | 2 x 64               | RAM32M x 11      | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | cache2axi/axi_tx/strb_sipo/fifos[0].twofifo.fifo/mem_1r1w/synth/nz.mem_reg                   | Implied        | 2 x 8                | RAM32M x 2       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | zps/rof2[0].fifo/unhardened.un.fifo/mem_1r1w/synth/nz.mem_reg                                | Implied        | 4 x 32               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | zps/pl_to_ps[0].fifo/unhardened.un.fifo/mem_1r1w/synth/nz.mem_reg                            | Implied        | 4 x 32               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_demux/input_awaddr_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                    | Implied        | 2 x 35               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_demux/input_wdata_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                     | Implied        | 2 x 36               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_demux/input_araddr_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                    | Implied        | 2 x 35               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_demux/write_resp_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                      | Implied        | 2 x 1                | RAM16X1D x 1     | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_demux/read_resp_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                       | Implied        | 2 x 1                | RAM16X1D x 1     | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/input_awaddr_fifo_0/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                    | Implied        | 2 x 35               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/input_wdata_fifo_0/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                     | Implied        | 2 x 36               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/input_araddr_fifo_0/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                    | Implied        | 2 x 35               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/input_awaddr_fifo_1/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                    | Implied        | 2 x 35               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/input_wdata_fifo_1/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                     | Implied        | 2 x 36               | RAM32M x 6       | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/write_resp_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                        | Implied        | 2 x 1                | RAM16X1D x 1     | 
+|black_parrot_bd_1_i/top_0                                                                                                                                                     | axil_mux/read_resp_fifo/unhardened.tf.twof/mem_1r1w/synth/nz.mem_reg                         | Implied        | 2 x 1                | RAM16X1D x 1     | 
+|black_parrot_bd_1_i/vps_0/insti_0/\smartconnect_2/s00_couplers/auto_pc /\inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_BURSTS.cmd_queue/inst/fifo_gen_inst  | inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.mem/gdm.dm_gen.dm/RAM_reg                | User Attribute | 32 x 10              | RAM32M x 2       | 
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+----------------+----------------------+------------------+
+
+Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
+
+DSP: Preliminary Mapping Report (see note below. The ' indicates corresponding REG is set)
++--------------------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|Module Name               | DSP Mapping    | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
++--------------------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|mulAddRecFNToRaw_preMul   | A*B            | 11     | 11     | -      | -      | 22     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|mulAddRecFNToRaw_preMul   | C+A*B          | 11     | 11     | 11     | -      | 11     | 0    | 0    | 0    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | A*B            | 20     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | PCIN+A*B       | 20     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | (PCIN>>17)+A*B | 20     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | A*B            | 20     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | PCIN+A*B       | 18     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | PCIN+A*B       | 20     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | A*B            | 18     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | (PCIN>>17)+A*B | 18     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|black_parrot_bd_1_top_0_0 | PCIN+A*B       | 18     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
++--------------------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+
+Note: The table above is a preliminary report that shows the DSPs inferred at the current stage of the synthesis flow. Some DSP may be reimplemented as non DSP primitives later in the synthesis flow. Multiple instantiated DSPs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5578] Moved timing constraint from pin 'black_parrot_bd_1_i/vps_0/inst/clk_wiz_0/inst/clk_in1' to pin 'processing_system7_0/inst/buffer_fclk_clk_0.FCLK_CLK_0_BUFG/O'
+INFO: [Synth 8-5819] Moved 1 constraints on hierarchical pins to their respective driving/loading pins
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 02:56:14 ; elapsed = 01:37:49 . Memory (MB): peak = 7228.359 ; gain = 5671.984 ; free physical = 6218 ; free virtual = 90541
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/i_1/retained_clear_i
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/retained_clear_i
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/i_4/clear_i[1]
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/i_4/retained_maintenance_1
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/retained_maintenance_o
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/i_1/retained_maintenance_o
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/i_1/I26
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/retained_clear_inferred__0/out
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/retained_clear_inferred__0/in0
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/retained_clear_inferred/out
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/retained_clear_inferred/in0
+      : black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/i_1/in00
+WARNING: [Synth 8-326] inferred exception to break timing loop: 'set_disable_timing black_parrot_bd_1_i/top_0/unicore_litei_45/dcache_uce/i_1/i_476 -from I1 -to O'
+      : black_parrot_bd_1_i/top_0/unicore_litei_22/\inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/dcache_uce /i_1/I26
+      : black_parrot_bd_1_i/top_0/unicore_litei_22/\inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/dcache_uce /retained_clear_inferred__0/out
+      : black_parrot_bd_1_i/top_0/unicore_litei_22/\inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/dcache_uce /retained_clear_inferred__0/in0
+      : black_parrot_bd_1_i/top_0/unicore_litei_22/\inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/dcache_uce /retained_clear_inferred/out
+      : black_parrot_bd_1_i/top_0/unicore_litei_22/\inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/dcache_uce /retained_clear_inferred/in0
+      : black_parrot_bd_1_i/top_0/unicore_litei_22/\inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/dcache_uce /i_1/in00
