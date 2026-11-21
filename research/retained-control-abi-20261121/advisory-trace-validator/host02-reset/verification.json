@@ -1,0 +1,100 @@
+{
+  "accepted": true,
+  "scope": "host fixture tests + existing closed-FST names/widths only; no advisory execution acceptance",
+  "tests_command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "reader_build_command": [
+    "python3",
+    "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/build_reader.py",
+    "--output",
+    "/dev/shm/advisory-reader-header-aflyiyuo/fst_events"
+  ],
+  "header_command": [
+    "/dev/shm/advisory-reader-header-aflyiyuo/fst_events",
+    "/home/coyang/zynq-parrot-linux-capacity/research/large-retained-capacity-20261121/advisory-full-system07/retained-advisory07.fst",
+    "--list"
+  ],
+  "header_fst": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/large-retained-capacity-20261121/advisory-full-system07/retained-advisory07.fst",
+    "bytes": 18907099,
+    "sha256": "d7b8bfea245090e1eb153a2334b5fe7ed0ce2787e6c32c5e8543e19163461af0"
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/build_reader.py",
+      "bytes": 2041,
+      "sha256": "79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/fst_events.c",
+      "bytes": 3497,
+      "sha256": "b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/test_reader.py",
+      "bytes": 4272,
+      "sha256": "b04dbad2b25dbd20fcb3d48fc7f8734e04ebe5d78fd2b18b0e5a6b94ed323a79"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/test_validate.py",
+      "bytes": 12816,
+      "sha256": "1fb263cdc9de6fd0c5d6bd0fbb07a3308f922d9b1857360df770ec4e577eeb00"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/validate.py",
+      "bytes": 25559,
+      "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/verify_host.py",
+      "bytes": 3800,
+      "sha256": "710a6c6ec6775b85357e457d4673b1cd31fc67cbbf9b1be22eeb31e483677b80"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/header.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/header.tsv.gz",
+      "bytes": 613533,
+      "sha256": "549ef08f799f32bb07c2df5e8892bafdce459ac6cd565a8202e7e0abbf80c639"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/reader-build-command.log",
+      "bytes": 52,
+      "sha256": "2709adcb37abe6c419766d715d6cd773463a065c05ff930c2ae7713f53c2b3c2"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/reader.build.json",
+      "bytes": 2392,
+      "sha256": "3c7918b285e62f66271da00897388c703d4ddf3b770454f07a2f39973a119e46"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/reader.build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/selected-header-map.json",
+      "bytes": 34426,
+      "sha256": "11985e474197a62d119bfe3a4a4a4ed9d88b16f2adfb28d8a2a0e6398252235c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-trace-validator/host02-reset/tests.log",
+      "bytes": 2245,
+      "sha256": "685cfd5b8f17cdd9e3e21cab54b49631ce8af5b53de4355927a7b139535bd548"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 /* Protocol fixture for direct advisory I/D full64B retention, demand-copy off.
- * Ten 4096-byte-spaced lines evict target zero from each unchanged 8-way L1.
+ * Target zero is never demanded before its advisory request. Other sparse
+ * lines exercise ordinary traffic without assuming a replacement victim.
  * Checked execution is not proof of retained hits: acceptance also requires a
  * closed trace showing both backend hits and all eight normal-L1 fill beats.
  */
@@ -24,7 +25,8 @@ static volatile uint64_t retained_advisory_data[10][512]
 
 /* Every function is exactly one complete line, with sixteen 32-bit executed
  * instructions. Zero alignment fill avoids emitting thousands of NOPs into
- * the sparse NBF. Function zero is called first, then nine same-set evictors.
+ * the sparse NBF. Only functions one through nine run before submission;
+ * target zero's first demand follows completed advisory publication.
  */
 #define CODE_TARGET(n, base) \
   extern uint64_t retained_advisory_code##n(void); \
@@ -124,13 +126,9 @@ int HOT main(void)
   policy(0);
   (void)wait_idle(0, 0, 2);
   uint64_t sum = 0;
-  for (unsigned w = 0; w < 8; ++w)
-    sum += retained_advisory_data[0][w];
   for (unsigned line = 1; line < 10; ++line)
     sum += retained_advisory_data[line][0];
   uint64_t expected_sum = 54;
-  for (unsigned w = 0; w < 8; ++w)
-    expected_sum += WORD(w);
   if (sum != expected_sum)
     fail(3, sum);
 
@@ -140,7 +138,7 @@ int HOT main(void)
     retained_advisory_code6, retained_advisory_code7, retained_advisory_code8,
     retained_advisory_code9
   };
-  for (unsigned line = 0; line < 10; ++line)
+  for (unsigned line = 1; line < 10; ++line)
     if (code[line]() != 206 + line)
       fail(4, line);
 

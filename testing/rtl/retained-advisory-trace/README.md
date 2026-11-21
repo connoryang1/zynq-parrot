@@ -1,0 +1,22 @@
+This gate checks advisory full-line restoration in a closed whole-core simulator trace. It distinguishes backend acceptance, acknowledged cache packets and actual L1 SRAM writes, and binds the checked bytes to the exact fixture ELF. It is synthetic correctness evidence and supports no application performance, useful-capacity or FPGA claim.
+
+Build and consume the reader in one parent shell/RAM namespace:
+
+```sh
+python3 testing/rtl/retained-advisory-trace/build_reader.py --output /dev/shm/advisory-reader/fst_events
+python3 testing/rtl/retained-advisory-trace/validate.py --fst CLOSED.fst --reader /dev/shm/advisory-reader/fst_events --model-source-list actual-source-list.json --log completed.log --exit-code ACTUAL_STATUS --out FRESH_VERIFICATION_DIRECTORY
+```
+
+The reader uses installed FSTAPI, FastLZ and LZ4 directly, masks all but selected signals and writes a gzip event transcript. No full-wave VCD conversion is used. `--list` reads only signal hierarchy for a name/width check. Reader compilation and waveform decoding are bounded; the main decoder watchdog defaults to600 seconds.
+
+Both lanes require an accepted advisory-owned insertion and successful publication under control3 with demand-copy disabled; a later accepted backend lookup and hit response containing all512 correct bits; and an ascending eight-beat retained-fill burst. Backend storage ports are cross-checked against UCE aliases. The normal cache packet's address, word, fill mask, index, way, critical and last indicators are checked. Actual per-bank SRAM write strobes, enable, address and data are checked, including full D byte masks and ordinary first-beat tag installation. D request word3 must be critical. I's critical word follows its actual accepted miss address.
+
+I-cache can acknowledge an aborted fill without writing SRAM. Any abort across an active burst disqualifies it; all such bursts remain in diagnostics. At least one complete non-aborted real-writing burst is mandatory. All16 instructions in code0 must retire in order with exact ELF instruction bits after publication and before the completed marker, and the checked guest-return marker must precede CORE PASS; the maintained `testing/check_run.py` enforces CORE/HOST PASS and exit policy.
+
+Signals are sampled from stable values **before** each rising local clock edge, grouping every FST update at a timestamp. I-cache, D-cache and both backend/UCE lanes use their own traced clocks; D's local clock is inverted from the core clock. This avoids treating post-edge next-beat values as current writes. FST cannot establish intra-timestamp simulator evaluation order. FE may fetch the target before BE retires the demand marker; qualifying hits begin after PF publication and must lead to checked completion, rather than being restricted to that BE marker.
+
+No randomized pre-reset state qualifies as a transaction. Each BE/UCE/cache/backend domain must first observe its actual asserted reset at a local rising edge. Checks begin only after that domain's reset deasserts; reset clears its tracked ownership and qualifying burst evidence. Unknown reset after initialization, or any post-reset protocol violation, fails closed. The original reader lacked this qualification and rejected randomized pre-reset publication; its exact source and partial event evidence are preserved separately. Plain and gzip completed logs are accepted; the compiled-source list may use its original flat schema or the losslessly wrapped `sources` schema, with identical per-file identity checks.
+
+The five critical RTL sources must match the supplied consumed model's closed source list. Their hashes and the ELF, fixture manifest, transcript, FST, reader, analyzer, exact selection and selected events are retained. The parent run manifest must additionally bind the consumed model binary, build flags/assertion scope, runtime inputs and completed FST; this validator does not infer those identities from waveforms. CSR busy/ready observations and this correctness gate do not prove lower-L2/AXI/DRAM quiescence.
+
+Host tests generate a tiny real FST and exercise the installed API reader,512-bit values, aliases and missing selections. Analyzer fixtures reject corrupted full responses, wrong advisory provenance, demand-copy, missing ownership, ACK-only aborted fills, corrupt SRAM data, wrong masks/ways/critical words/tags and missing or corrupt retirement. `verify_host.py` archives these tests and a header-only mapping from an existing closed waveform without running a RISC-V program.

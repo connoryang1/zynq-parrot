@@ -1,0 +1,5 @@
+This is the distinct first-touch advisory protocol fixture used by accepted whole-core run08. It preserves target0's exact instruction/data payload while warming only code/data1–9, without relying on a pseudo-LRU victim or adding L1 maintenance. It is synthetic correctness work, not application performance evidence.
+
+`manifest.json` remains the unchanged static build record for ELF3fe09617…; the original fixture's different manifest/ELF426d0faf… remains under `advisory-fixture`. Dynamic acceptance is recorded in `research/large-retained-capacity-20261121/advisory-full-system08/trace-audit01/verification.json`. The complete07/08 review, linked startup/BSS bound proof and durable archive verification are in `advisory-trace-validator/closed07-08-review`.
+
+The linked data payload is outside BSS, and all TLS sizes are zero. The accepted trace requires actual advisory publication, I/D backend hits and complete real L1 SRAM writes, plus checked guest/CORE/HOST completion. One first-touch line per side does not demonstrate useful capacity, a Linux benefit or FPGA fit/timing.

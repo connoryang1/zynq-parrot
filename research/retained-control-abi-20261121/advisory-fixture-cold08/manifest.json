@@ -1,0 +1,97 @@
+{
+  "state": "crosscompiled and static layout/payload checks PASS; execution pending",
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained_advisory_full_line_test.c",
+    "bytes": 6705,
+    "sha256": "1c71bbe4a8db46ae7c19b9faa14fd8949668bf0ca68ba04d7498897e513df4bc"
+  },
+  "build_script": {
+    "path": "research/retained-control-abi-20261121/advisory-fixture-cold08/build.py",
+    "bytes": 5743,
+    "sha256": "d7ff94c849d56effefac0feb7b5498156cdab068f550c3b7913fd0a8aecfaf7d"
+  },
+  "command": [
+    "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-I/home/coyang/zynq-parrot-linux-capacity/software/include",
+    "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+    "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+    "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+    "-DNUM_THREADS=2",
+    "-DBP_NUM_THREADS=2",
+    "-DBP_NUM_CONTEXTS=4",
+    "-o",
+    "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/retained_advisory_full_line_test.elf",
+    "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained_advisory_full_line_test.c"
+  ],
+  "compiler": {
+    "path": "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+    "bytes": 2816320,
+    "sha256": "35cb02feeed5585a1d682fdd6dd439bea79b63be1894aeccb86c6a191c0c0bea"
+  },
+  "specs": [
+    {
+      "path": "/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+      "bytes": 596,
+      "sha256": "21d71169d9124c838208a202cc429fc7a4cadcc3fb2a413e2f2fd2ba421dae52"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+      "bytes": 579,
+      "sha256": "c779dba18fc9973cc1ff352eb069b11f3a1d6725ea265d49283f74650f8a82d5"
+    }
+  ],
+  "elf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/retained_advisory_full_line_test.elf",
+    "bytes": 260760,
+    "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+  },
+  "targets": [
+    2147487744,
+    2147491840,
+    2147495936,
+    2147500032,
+    2147504128,
+    2147508224,
+    2147512320,
+    2147516416,
+    2147520512,
+    2147524608
+  ],
+  "hot_page": 2147528704,
+  "hot_end": 2147529460,
+  "data_address": 2147557376,
+  "data_bytes": 40960,
+  "markers": {
+    "submit": 2147529268,
+    "demand": 2147529286,
+    "completed": 2147529394
+  },
+  "logs": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/compile.log",
+      "bytes": 297,
+      "sha256": "9b0ce8db2da75515ae10835707b79a30e0c332e6197793c26c2de9f04f1d1f53"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/symbols.log",
+      "bytes": 11643,
+      "sha256": "6c5f2fb5c67303c69561532f2ad045d86835f37c83370356212aa91d2c48bb24"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/disassembly.log",
+      "bytes": 513743,
+      "sha256": "76ae03c969bb53bb59bed76f10143db68e6d95f361c0e24299d384087d2bb30a"
+    }
+  ],
+  "required_runtime_gate": "closed FST: true I/D retained backend hits, all eight normal-L1 refill beats, checked completion",
+  "limits": [
+    "No model execution or target result",
+    "No retry on dropped/unsampled advisory hint",
+    "CSR busy/ready snapshots are not global lower-memory drain proof",
+    "No performance, application-capacity or FPGA claim"
+  ]
+}
