@@ -1,0 +1,31 @@
+{
+  "status": "offline FPGA variant compile/layout/package only; physical execution pending routed acceptance and entire-session reservation",
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained_advisory_full_line_test.c",
+    "bytes": 6705,
+    "sha256": "1c71bbe4a8db46ae7c19b9faa14fd8949668bf0ca68ba04d7498897e513df4bc"
+  },
+  "elf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-fpga11/retained_advisory_full_line_test.elf",
+    "bytes": 260760,
+    "sha256": "ab9219e91bb0976353648199b3c6b7eacbba032012c53f1d8015c8c5fd2a64ab"
+  },
+  "nbf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-fpga11/retained_advisory_full_line_test.nbf",
+    "bytes": 159618,
+    "sha256": "37a63ac75c9a95546ba757213b1778ee92a72370ce7c20da68f35397b5831afa"
+  },
+  "command": [
+    "python3",
+    "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/software/py/nbf.py",
+    "--skip_zeros",
+    "--config",
+    "--mem",
+    "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-fpga11/prog.mem",
+    "--ncpus",
+    "1"
+  ],
+  "debug_exit_removed": true,
+  "nbf_debug_flag": false,
+  "requirements": "Fresh exact overlay, serialized board runner, checked allwords marker plusCORE/HOSTPASS, normalreturn. Physical programPASS doesnotestablishPFhitwithoutindependentmechanismevidence."
+}
