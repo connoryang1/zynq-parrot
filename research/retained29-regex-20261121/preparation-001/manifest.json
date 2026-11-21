@@ -1,0 +1,1074 @@
+{
+  "state": "PASS-host-oracle-ASAN-UBSAN-and-RV64-link-only",
+  "scope": "new module only; host correctness and RV64 ABI/link preparation, no target execution",
+  "inputs": {
+    "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_regex_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_regex_workload.h",
+      "bytes": 9938,
+      "sha256": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/linux-tests/test_retained29_regex_workload.c": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/test_retained29_regex_workload.c",
+      "bytes": 7038,
+      "sha256": "d5b2e4eaf814bb0a647544bbbe495d67aaec2928f6732fa54fc3130641ea0642"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/functional_driver.c": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/functional_driver.c",
+      "bytes": 1599,
+      "sha256": "b3fe375b72274b11819e948bfc26901b1e3f7eb091cba82421e6717a69fb9183"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/abi_probe.c": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/abi_probe.c",
+      "bytes": 911,
+      "sha256": "1ad10e4f2d489630fe4f5fcd4996fd77fb021fb43f1af2d34adb81c74106e9a0"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/prepare.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/prepare.py",
+      "bytes": 11325,
+      "sha256": "94f3cfce04a84ec86a07233242a9d0c255e9009471bbb3f51ca8af0627693e69"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_benchmark.c",
+      "bytes": 19953,
+      "sha256": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/linux-tests/resume_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/resume_workload.h",
+      "bytes": 10958,
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/research/regex-natural-demand-20261121/prepare.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/regex-natural-demand-20261121/prepare.py",
+      "bytes": 12852,
+      "sha256": "8f4543261c4450d8175fda40cc4908a11d57af83a9245efc321ca764f58c24ba"
+    },
+    "/home/coyang/zynq-parrot-linux-capacity/research/regex-natural-demand-20261121/preparation-003/manifest.json": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/regex-natural-demand-20261121/preparation-003/manifest.json",
+      "bytes": 35999,
+      "sha256": "4e63e56c366d20772dcf52ffbf247993359f701742e6d286f1d00f20fccfd4c5"
+    }
+  },
+  "commands": [
+    {
+      "label": "cross-sysroot",
+      "argv": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+        "-print-sysroot"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-sysroot.stdout",
+        "bytes": 111,
+        "sha256": "9e68d8052ce210bd1e8364a1fb4bb0c1954ee406ac903d72ebabbbe4b225c000"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-sysroot.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "cross-abi",
+      "argv": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source",
+        "-O2",
+        "-march=rv64imafdc",
+        "-mabi=lp64d",
+        "-fno-pie",
+        "-no-pie",
+        "-H",
+        "-c",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source/abi_probe.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/abi_probe.o"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-abi.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-abi.stderr",
+        "bytes": 11057,
+        "sha256": "42788e0128fb467bae9d520b54145669e9701d259a410860d11044677f6a8ac5"
+      }
+    },
+    {
+      "label": "cross-build",
+      "argv": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source",
+        "-O2",
+        "-march=rv64imafdc",
+        "-mabi=lp64d",
+        "-fno-pie",
+        "-no-pie",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source/functional_driver.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/regex-functional.riscv"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-build.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "cross-readelf",
+      "argv": [
+        "readelf",
+        "-h",
+        "-l",
+        "-d",
+        "-V",
+        "-Ws",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/regex-functional.riscv"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-readelf.stdout",
+        "bytes": 13528,
+        "sha256": "a754cad8315a89c5dab18c9df27254e1f4d4dfe0db405105f226a38c37ad7231"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/cross-readelf.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "accepted-runtime-symbols",
+      "argv": [
+        "readelf",
+        "-Ws",
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/libc.so.6",
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/ld-linux-riscv64-lp64d.so.1"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/accepted-runtime-symbols.stdout",
+        "bytes": 308805,
+        "sha256": "6196314f69a36e16ea634d6a67ec63ad7c640d00b843462c1bd1a567d5b535a3"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/accepted-runtime-symbols.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-version",
+      "argv": [
+        "cc",
+        "--version"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-version.stdout",
+        "bytes": 243,
+        "sha256": "a2c6f19b6698aa4249442367c19c93accd1bb85cfcd901fce4c02116f30da891"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-version.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-libc",
+      "argv": [
+        "getconf",
+        "GNU_LIBC_VERSION"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-libc.stdout",
+        "bytes": 11,
+        "sha256": "34612da5134bf684319aab5a37c81e61d66f7bb1564a77a6a31b774af3e12616"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-libc.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-check-build",
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source",
+        "-O1",
+        "-g",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fsanitize=address,undefined",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source/test_retained29_regex_workload.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-checks"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-check-build.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-check-build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-checks",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-checks"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-checks.stdout",
+        "bytes": 27,
+        "sha256": "c47aa2128adbe827f7eedad247cb470d323c76fe5032e6976a15f6e563f364f0"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-checks.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-production-build",
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source",
+        "-O1",
+        "-g",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fsanitize=address,undefined",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/source/functional_driver.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-production-build.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-production-build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-32-0",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "0",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-0.stdout",
+        "bytes": 78193,
+        "sha256": "cf3943c70048150ff2101f5cd54ce3f65adc142bec099e3d9801997c60753b65"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-0.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-32-7",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "7",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-7.stdout",
+        "bytes": 78175,
+        "sha256": "43276c3562b283dd88f4ddd35d2444e610b4456c4839b34c2cc61835875c2938"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-7.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-32-1311768467463790320",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "1311768467463790320",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-1311768467463790320.stdout",
+        "bytes": 78199,
+        "sha256": "900d6cd4393435df634ed609a93b7089667572223ba774984f8a493b0fc90db5"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-1311768467463790320.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-32-18446744073709551615",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "18446744073709551615",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-18446744073709551615.stdout",
+        "bytes": 78250,
+        "sha256": "a7c54ac0759c36243e959077e40ef9352cab934571cabaf96c15bbd36336b758"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-32-18446744073709551615.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-128-0",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "128",
+        "0",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-0.stdout",
+        "bytes": 313201,
+        "sha256": "312889ab34dd17e02a29807237f780fc387e8219fcd0807e7ac8935f75dc241e"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-0.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-128-7",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "128",
+        "7",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-7.stdout",
+        "bytes": 313197,
+        "sha256": "acaa13d9a13db1a2c64b974e086d30d706a803d57f8afd323fa5ef3a3960b1be"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-7.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-128-1311768467463790320",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "128",
+        "1311768467463790320",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-1311768467463790320.stdout",
+        "bytes": 313309,
+        "sha256": "4d4e02354884d72ab1c2b7669a0fe695b9cebc0e2041029f6ccea2021efd7a62"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-1311768467463790320.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-128-18446744073709551615",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "128",
+        "18446744073709551615",
+        "17",
+        "--dump"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-18446744073709551615.stdout",
+        "bytes": 313249,
+        "sha256": "1921218a8f2abccb10ecf29a3faebb75eddfe37e5bb261e3f268e80257bb1e75"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/oracle-128-18446744073709551615.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "bad-args-0",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "129",
+        "1",
+        "1"
+      ],
+      "returncode": 2,
+      "expected_returncode": 2,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-0.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-0.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "bad-args-1",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "-1",
+        "1"
+      ],
+      "returncode": 2,
+      "expected_returncode": 2,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-1.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-1.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "bad-args-2",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "1",
+        "1001"
+      ],
+      "returncode": 2,
+      "expected_returncode": 2,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-2.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-2.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "bad-args-3",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+        "32",
+        "abc",
+        "1"
+      ],
+      "returncode": 2,
+      "expected_returncode": 2,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-3.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/bad-args-3.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "accepted_runtime_ABI": {
+    "prior_proof": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/regex-natural-demand-20261121/preparation-003/manifest.json",
+      "bytes": 35999,
+      "sha256": "4e63e56c366d20772dcf52ffbf247993359f701742e6d286f1d00f20fccfd4c5"
+    },
+    "reused_helpers": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/regex-natural-demand-20261121/prepare.py",
+      "bytes": 12852,
+      "sha256": "8f4543261c4450d8175fda40cc4908a11d57af83a9245efc321ca764f58c24ba"
+    },
+    "accepted_CPIO": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+      "bytes": 8194560,
+      "sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50"
+    },
+    "members": {
+      "lib/ld-linux-riscv64-lp64d.so.1": {
+        "member": "lib/ld-linux-riscv64-lp64d.so.1",
+        "bytes": 173736,
+        "sha256": "ffebe0ecd6336c972bee51db6f1056146ca7776a1b1e826a1b3669ac851d88a7"
+      },
+      "lib/libc.so.6": {
+        "member": "lib/libc.so.6",
+        "bytes": 1459064,
+        "sha256": "d3f60c3e773fa76856457df96dc151609db7d1041e031c55477a62ff74cde43b"
+      }
+    },
+    "compiler": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/toolchain-wrapper",
+      "bytes": 14680,
+      "sha256": "d622d63cceefe24a106c8ff485a60bf494264323377cb50e8cac1dbdf5dfda7b"
+    },
+    "headers": {
+      "features.h": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/riscv64-buildroot-linux-gnu/sysroot/usr/include/features.h",
+        "bytes": 18161,
+        "sha256": "b6fd8bf3ea381fe2b36138fbadbefb0fa67e3473e64ea457f79eac77fabb8773"
+      },
+      "regex.h": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/riscv64-buildroot-linux-gnu/sysroot/usr/include/regex.h",
+        "bytes": 25904,
+        "sha256": "51f4afc1b9c92424a95d63d1988fdde928007f444b0d586addf6ee0df5e5c3f4"
+      }
+    },
+    "libc": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/libc.so.6",
+      "bytes": 1459064,
+      "sha256": "d3f60c3e773fa76856457df96dc151609db7d1041e031c55477a62ff74cde43b"
+    },
+    "loader": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/ld-linux-riscv64-lp64d.so.1",
+      "bytes": 173736,
+      "sha256": "ffebe0ecd6336c972bee51db6f1056146ca7776a1b1e826a1b3669ac851d88a7"
+    },
+    "equal_allocated_libc_sections": {
+      ".hash": {
+        "type": 5,
+        "flags": 2,
+        "address": 680,
+        "bytes": 15712,
+        "sha256": "81c95e8da06dd79587b7df0b2abd2f08698576a2cf6eb84e747f6f3081b72f86"
+      },
+      ".gnu.hash": {
+        "type": 1879048182,
+        "flags": 2,
+        "address": 16392,
+        "bytes": 17652,
+        "sha256": "a18ba110bcffb141628761326f2f7d25023c407e3e70d6dedc1e7c9a49e6f10d"
+      },
+      ".dynsym": {
+        "type": 11,
+        "flags": 2,
+        "address": 34048,
+        "bytes": 69816,
+        "sha256": "30a6cbc2837fd23e8f1abd19892c1aa8bc236d9e2602bed69880bb579d11783d"
+      },
+      ".dynstr": {
+        "type": 3,
+        "flags": 2,
+        "address": 103864,
+        "bytes": 31802,
+        "sha256": "30f9da8e975d35082083fc976bd246325feabdd2a97eb04812406e91fe6cf66c"
+      },
+      ".gnu.version": {
+        "type": 1879048191,
+        "flags": 2,
+        "address": 135666,
+        "bytes": 5818,
+        "sha256": "65e81c07a6646f7ee5796350cacb6131aa9d21a43e0d9394d3740ac85d22e9ca"
+      },
+      ".gnu.version_d": {
+        "type": 1879048189,
+        "flags": 2,
+        "address": 141488,
+        "bytes": 444,
+        "sha256": "3d57f4c0d7ac940ad2a9828c11fa1c416d51cb26f7b098cf2a051da7bb4938ee"
+      },
+      ".gnu.version_r": {
+        "type": 1879048190,
+        "flags": 2,
+        "address": 141936,
+        "bytes": 48,
+        "sha256": "4734df8691306db12f50c57a905738dcd96aff38a9bcd231bd1c078123049970"
+      },
+      ".rela.dyn": {
+        "type": 4,
+        "flags": 2,
+        "address": 141984,
+        "bytes": 28440,
+        "sha256": "17867025c90aeb18f5890fef8a4430a63ee1f3d35ec47364706cdf64db99735b"
+      },
+      ".rela.plt": {
+        "type": 4,
+        "flags": 66,
+        "address": 170424,
+        "bytes": 408,
+        "sha256": "87849cb8a06a43651ad7a35d72da680996d24f9d725e7170f540b18c5cc88854"
+      },
+      ".plt": {
+        "type": 1,
+        "flags": 6,
+        "address": 170832,
+        "bytes": 304,
+        "sha256": "51e6f16b17aef8118eef14632775cdd4d74fc452aa3326cb62cd9f408f150603"
+      },
+      ".text": {
+        "type": 1,
+        "flags": 6,
+        "address": 171136,
+        "bytes": 950916,
+        "sha256": "881aab5168cb1f6069949a5fe0804d06cb64c7db3c463cd9142b59cc065ef095"
+      },
+      "__libc_freeres_fn": {
+        "type": 1,
+        "flags": 6,
+        "address": 1122052,
+        "bytes": 3844,
+        "sha256": "88494d53a8002440dedcb61e04bc43034f3e0484d54d3a3f13da5a6c7629c533"
+      },
+      ".rodata": {
+        "type": 1,
+        "flags": 2,
+        "address": 1125904,
+        "bytes": 139200,
+        "sha256": "0f51067c0d037dc38dfb0aeb3d858b5987200bf5c0369c2981d587404056070e"
+      },
+      ".interp": {
+        "type": 1,
+        "flags": 2,
+        "address": 1265104,
+        "bytes": 33,
+        "sha256": "9ac872c437600d47ee410e1f78ac424bf71eb8d580d08536d6d4fbd41260847c"
+      },
+      ".eh_frame_hdr": {
+        "type": 1,
+        "flags": 2,
+        "address": 1265140,
+        "bytes": 27532,
+        "sha256": "b62ef9f1eb9f93ddd6dab3afc7adb8cd615fb7ec46f68d1e70bfa2a81b5498ba"
+      },
+      ".eh_frame": {
+        "type": 1,
+        "flags": 2,
+        "address": 1292672,
+        "bytes": 139012,
+        "sha256": "b1c84e79eb609c8b4e9019026cd59749636733c38633e5463a5186a5d8d16bf6"
+      },
+      ".gcc_except_table": {
+        "type": 1,
+        "flags": 2,
+        "address": 1431684,
+        "bytes": 832,
+        "sha256": "e06f498402a783f2e5ca384548d4e81fd9b3c982f219d4514ecd3a4922a09a3a"
+      },
+      ".note.ABI-tag": {
+        "type": 7,
+        "flags": 2,
+        "address": 1432516,
+        "bytes": 32,
+        "sha256": "8cdce5f880d02a85ff95c078d913b2979a16710487fb5c203f4b6e8d58437795"
+      },
+      ".tdata": {
+        "type": 1,
+        "flags": 1027,
+        "address": 1434368,
+        "bytes": 16,
+        "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+      },
+      ".tbss": {
+        "type": 8,
+        "flags": 1027,
+        "address": 1434384,
+        "bytes": 120,
+        "sha256": null
+      },
+      ".init_array": {
+        "type": 14,
+        "flags": 3,
+        "address": 1434384,
+        "bytes": 16,
+        "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+      },
+      "__libc_subfreeres": {
+        "type": 1,
+        "flags": 2097155,
+        "address": 1434400,
+        "bytes": 232,
+        "sha256": "c4fcd50d9f0c893c46288b57d8e62b18523145956b249b6ecd6c21718be49065"
+      },
+      "__libc_IO_vtables": {
+        "type": 1,
+        "flags": 3,
+        "address": 1434632,
+        "bytes": 2352,
+        "sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+      },
+      ".data.rel.ro": {
+        "type": 1,
+        "flags": 3,
+        "address": 1436984,
+        "bytes": 8424,
+        "sha256": "63b796e6fb5ae82d8973955b0f998644f9e668ec950c1763cbeb847f98038f79"
+      },
+      ".dynamic": {
+        "type": 6,
+        "flags": 3,
+        "address": 1445408,
+        "bytes": 480,
+        "sha256": "86b2210df3a544205ad3d6b788294940e614c45bffda9645e26d19da1c8f89b4"
+      },
+      ".data": {
+        "type": 1,
+        "flags": 3,
+        "address": 1445888,
+        "bytes": 5376,
+        "sha256": "96993ea1412592ecf6d37bff83467862f6a9dd3770ccaa841711c73517f82a06"
+      },
+      ".got": {
+        "type": 1,
+        "flags": 3,
+        "address": 1451264,
+        "bytes": 760,
+        "sha256": "e34cdb1957bb2a60fe28b6cf11dfb9dc8923cc99e5199459eb33b31058d9daf4"
+      },
+      ".bss": {
+        "type": 8,
+        "flags": 3,
+        "address": 1452024,
+        "bytes": 51400,
+        "sha256": null
+      }
+    },
+    "equal_allocated_loader_sections": {
+      ".hash": {
+        "type": 5,
+        "flags": 2,
+        "address": 456,
+        "bytes": 316,
+        "sha256": "fffc167b02c1e767b0eebcad835724b05e87b89352cb3a121a0c1bd9dcd7986d"
+      },
+      ".gnu.hash": {
+        "type": 1879048182,
+        "flags": 2,
+        "address": 776,
+        "bytes": 348,
+        "sha256": "663af3424bc8712314627f5217d73b4cac5d007934e012ab8ec0fbb3f922fd98"
+      },
+      ".dynsym": {
+        "type": 11,
+        "flags": 2,
+        "address": 1128,
+        "bytes": 960,
+        "sha256": "8f8c0a9d71be03b9435ad3d1ff4697105f5a33a51417ff7b4e6bccc721420bec"
+      },
+      ".dynstr": {
+        "type": 3,
+        "flags": 2,
+        "address": 2088,
+        "bytes": 717,
+        "sha256": "0fb0f9a9bdb769b21d467ba88389281b68787c9136ad33179840bd29d7704558"
+      },
+      ".gnu.version": {
+        "type": 1879048191,
+        "flags": 2,
+        "address": 2806,
+        "bytes": 80,
+        "sha256": "8acef4b94ae657823f4aff5123e843b44903db60501da217c385238f85ef7a2b"
+      },
+      ".gnu.version_d": {
+        "type": 1879048189,
+        "flags": 2,
+        "address": 2888,
+        "bytes": 164,
+        "sha256": "92605828c1459ae934d4d6e858ea54f95518e5d8a834ff106693bcf94e51d873"
+      },
+      ".rela.dyn": {
+        "type": 4,
+        "flags": 2,
+        "address": 3056,
+        "bytes": 312,
+        "sha256": "0f111970b8af06d585bbc86f360028b7aa8266c115e85aee444782fdf63347a3"
+      },
+      ".text": {
+        "type": 1,
+        "flags": 6,
+        "address": 3368,
+        "bytes": 97076,
+        "sha256": "7f67a05cb83a03a8dc0d54f5ecf771c91dca5492a1d2d0514b695ef8b1d7b4e5"
+      },
+      ".rodata": {
+        "type": 1,
+        "flags": 2,
+        "address": 100448,
+        "bytes": 21656,
+        "sha256": "ff1a13ef12f102884f736db2d6d7e896b7a602a146f830cf61097dd1f579024d"
+      },
+      ".eh_frame_hdr": {
+        "type": 1,
+        "flags": 2,
+        "address": 122104,
+        "bytes": 2428,
+        "sha256": "098983d532200d3792466f46e071b578c40cb9b3acb5de7276c3d59a26bb6150"
+      },
+      ".eh_frame": {
+        "type": 1,
+        "flags": 2,
+        "address": 124536,
+        "bytes": 12336,
+        "sha256": "830b1b56ef1a48295d288e4b6a3d3d3a54369c26b50975ba685d8dca2d0136e4"
+      },
+      ".data.rel.ro": {
+        "type": 1,
+        "flags": 3,
+        "address": 139392,
+        "bytes": 3632,
+        "sha256": "4437d809d3eb8efa59ef73c4b003828453e711ed05ff2c1c8bb94f19789966ba"
+      },
+      ".dynamic": {
+        "type": 6,
+        "flags": 3,
+        "address": 143024,
+        "bytes": 336,
+        "sha256": "93b41e51600b5532530f98d321d706ef5eee65cd3c38cd687a9810a65843ce13"
+      },
+      ".got": {
+        "type": 1,
+        "flags": 3,
+        "address": 143360,
+        "bytes": 48,
+        "sha256": "74560f76dbf12b1c24c3e6cd00a63f4742e92719fe934ba0c81a94de2d114a69"
+      },
+      ".sdata": {
+        "type": 1,
+        "flags": 3,
+        "address": 143408,
+        "bytes": 4296,
+        "sha256": "d3326873c2f6e52d3e04db43c211d86467e2180d6622791a779d0fa96825f59e"
+      },
+      ".bss": {
+        "type": 8,
+        "flags": 3,
+        "address": 147704,
+        "bytes": 408,
+        "sha256": null
+      }
+    },
+    "ABI_probe": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/abi_probe.o",
+      "bytes": 1304,
+      "sha256": "3f0d9ddcd68c505ad6c5c7a7748b38141f87468da0e495f9c5f88b27cf111b2d"
+    },
+    "versioned_imports": [
+      "__errno_location@GLIBC_2.27",
+      "__libc_start_main@GLIBC_2.34",
+      "__stack_chk_fail@GLIBC_2.27",
+      "calloc@GLIBC_2.27",
+      "free@GLIBC_2.27",
+      "malloc@GLIBC_2.27",
+      "memcpy@GLIBC_2.27",
+      "memset@GLIBC_2.27",
+      "printf@GLIBC_2.27",
+      "putc@GLIBC_2.27",
+      "puts@GLIBC_2.27",
+      "regcomp@GLIBC_2.27",
+      "regexec@GLIBC_2.27",
+      "regfree@GLIBC_2.27",
+      "setlocale@GLIBC_2.27",
+      "strcmp@GLIBC_2.27",
+      "strtoull@GLIBC_2.27"
+    ],
+    "NEEDED": [
+      "libc.so.6",
+      "ld-linux-riscv64-lp64d.so.1"
+    ],
+    "limit": "No RV64 execution; public glibc2.37 ABI and accepted allocated images, not local glibc2.42 sources or fresh Bootlin authentication"
+  },
+  "oracle_cases": [
+    {
+      "kib": 32,
+      "seed": 0,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 427,
+      "negative_calls": 661,
+      "records": 744,
+      "corpus_bytes": 32768,
+      "descriptor_bytes": 11904
+    },
+    {
+      "kib": 32,
+      "seed": 7,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 422,
+      "negative_calls": 666,
+      "records": 744,
+      "corpus_bytes": 32768,
+      "descriptor_bytes": 11904
+    },
+    {
+      "kib": 32,
+      "seed": 1311768467463790320,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 440,
+      "negative_calls": 648,
+      "records": 744,
+      "corpus_bytes": 32768,
+      "descriptor_bytes": 11904
+    },
+    {
+      "kib": 32,
+      "seed": 18446744073709551615,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 426,
+      "negative_calls": 662,
+      "records": 744,
+      "corpus_bytes": 32768,
+      "descriptor_bytes": 11904
+    },
+    {
+      "kib": 128,
+      "seed": 0,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 452,
+      "negative_calls": 636,
+      "records": 2977,
+      "corpus_bytes": 131072,
+      "descriptor_bytes": 47632
+    },
+    {
+      "kib": 128,
+      "seed": 7,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 451,
+      "negative_calls": 637,
+      "records": 2977,
+      "corpus_bytes": 131072,
+      "descriptor_bytes": 47632
+    },
+    {
+      "kib": 128,
+      "seed": 1311768467463790320,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 432,
+      "negative_calls": 656,
+      "records": 2980,
+      "corpus_bytes": 131072,
+      "descriptor_bytes": 47680
+    },
+    {
+      "kib": 128,
+      "seed": 18446744073709551615,
+      "requests": 17,
+      "actual_regexec_calls": 1088,
+      "positive_calls": 420,
+      "negative_calls": 668,
+      "records": 2975,
+      "corpus_bytes": 131072,
+      "descriptor_bytes": 47600
+    }
+  ],
+  "cross_ELF": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/regex-functional.riscv",
+    "bytes": 13784,
+    "sha256": "5276532f68e45c3ab97d2cdbc97424b5506f1352ff14d29d0b993857f6e183ca"
+  },
+  "host_checks": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-checks",
+    "bytes": 394200,
+    "sha256": "e5775a2cb5d943e01d5b7b4625300ffbcada3675a49495ccaad8bc6fa7c83df2"
+  },
+  "host_driver": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-20261121/preparation-001/host-functional",
+    "bytes": 135888,
+    "sha256": "b495f870eccc2c3a3b173dc51dfdaebe79a83e45d0f70b553deaa1077f93f063"
+  },
+  "sanitizer_environment": {
+    "LC_ALL": "C",
+    "ASAN_OPTIONS": "detect_leaks=0:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "limits": [
+    "No RV64/model/FPGA execution or performance result",
+    "Libc DSO internals uninstrumented; LSan disabled, no whole-library leak or memory bound proof",
+    "Corpus32/128KiB excludes descriptors, regex opaque/lazy allocations, allocator overhead, stack and code; later full resource admission required",
+    "Future whole-cell scope must charge init/regcomp, every request, check_total/integrity and regfree/free"
+  ]
+}

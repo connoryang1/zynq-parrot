@@ -1,0 +1,212 @@
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           RISC-V
+  Version:                           0x1
+  Entry point address:               0x112e8
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          11928 (bytes into file)
+  Flags:                             0x5, RVC, double-float ABI
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         10
+  Size of section headers:           64 (bytes)
+  Number of section headers:         29
+  Section header string table index: 28
+
+Program Headers:
+  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
+  PHDR           0x000040 0x0000000000010040 0x0000000000010040 0x000230 0x000230 R   0x8
+  INTERP         0x000270 0x0000000000010270 0x0000000000010270 0x000021 0x000021 R   0x1
+      [Requesting program interpreter: /lib/ld-linux-riscv64-lp64d.so.1]
+  LOPROC+0x3     0x0020de 0x0000000000000000 0x0000000000000000 0x000053 0x000000 R   0x1
+  LOAD           0x000000 0x0000000000010000 0x0000000000010000 0x001dac 0x001dac R E 0x1000
+  LOAD           0x001dd0 0x0000000000012dd0 0x0000000000012dd0 0x0002e0 0x0002f0 RW  0x1000
+  DYNAMIC        0x001df0 0x0000000000012df0 0x0000000000012df0 0x000210 0x000210 RW  0x8
+  NOTE           0x000294 0x0000000000010294 0x0000000000010294 0x000020 0x000020 R   0x4
+  GNU_EH_FRAME   0x001b20 0x0000000000011b20 0x0000000000011b20 0x000054 0x000054 R   0x4
+  GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RW  0x10
+  GNU_RELRO      0x001dd0 0x0000000000012dd0 0x0000000000012dd0 0x000230 0x000230 R   0x1
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .interp 
+   02     .riscv.attributes 
+   03     .interp .note.ABI-tag .hash .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .plt .text .rodata .eh_frame_hdr .eh_frame 
+   04     .preinit_array .init_array .fini_array .data.rel.ro .dynamic .got .sdata .bss 
+   05     .dynamic 
+   06     .note.ABI-tag 
+   07     .eh_frame_hdr 
+   08     
+   09     .preinit_array .init_array .fini_array .data.rel.ro .dynamic 
+
+Dynamic section at offset 0x1df0 contains 28 entries:
+  Tag        Type                         Name/Value
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-riscv64-lp64d.so.1]
+ 0x0000000000000020 (PREINIT_ARRAY)      0x12dd0
+ 0x0000000000000021 (PREINIT_ARRAYSZ)    0x8
+ 0x0000000000000019 (INIT_ARRAY)         0x12dd8
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x12de0
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x0000000000000004 (HASH)               0x102b8
+ 0x000000006ffffef5 (GNU_HASH)           0x10360
+ 0x0000000000000005 (STRTAB)             0x10628
+ 0x0000000000000006 (SYMTAB)             0x10418
+ 0x000000000000000a (STRSZ)              251 (bytes)
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000015 (DEBUG)              0x0
+ 0x0000000000000003 (PLTGOT)             0x13000
+ 0x0000000000000002 (PLTRELSZ)           408 (bytes)
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000017 (JMPREL)             0x107e8
+ 0x0000000000000007 (RELA)               0x107a0
+ 0x0000000000000008 (RELASZ)             480 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x0000000000000018 (BIND_NOW)           
+ 0x000000006ffffffb (FLAGS_1)            Flags: NOW
+ 0x000000006ffffffe (VERNEED)            0x10750
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x000000006ffffff0 (VERSYM)             0x10724
+ 0x0000000000000000 (NULL)               0x0
+
+Symbol table '.dynsym' contains 22 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000000109a0     0 FUNC    GLOBAL DEFAULT  UND regfree@GLIBC_2.27 (2)
+     2: 0000000000010ab0  2102 FUNC    GLOBAL DEFAULT   12 main
+     3: 0000000000010a90     0 FUNC    GLOBAL DEFAULT  UND memset@GLIBC_2.27 (2)
+     4: 0000000000010aa0     0 FUNC    GLOBAL DEFAULT  UND free@GLIBC_2.27 (2)
+     5: 0000000000010a20     0 FUNC    GLOBAL DEFAULT  UND regcomp@GLIBC_2.27 (2)
+     6: 00000000000109b0     0 FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2.34 (3)
+     7: 00000000000109d0     0 FUNC    GLOBAL DEFAULT  UND regexec@GLIBC_2.27 (2)
+     8: 0000000000013800     0 NOTYPE  GLOBAL DEFAULT  ABS __global_pointer$
+     9: 00000000000109e0     0 FUNC    GLOBAL DEFAULT  UND __errno_location@GLIBC_2.27 (2)
+    10: 0000000000010a70     0 FUNC    GLOBAL DEFAULT  UND calloc@GLIBC_2.27 (2)
+    11: 0000000000010a80     0 FUNC    GLOBAL DEFAULT  UND strcmp@GLIBC_2.27 (2)
+    12: 0000000000010a40     0 FUNC    GLOBAL DEFAULT  UND strtoull@GLIBC_2.27 (2)
+    13: 0000000000010a50     0 FUNC    GLOBAL DEFAULT  UND puts@GLIBC_2.27 (2)
+    14: 00000000000109f0     0 FUNC    GLOBAL DEFAULT  UND __stack_chk_fail@GLIBC_2.27 (2)
+    15: 0000000000010a00     0 FUNC    GLOBAL DEFAULT  UND memcpy@GLIBC_2.27 (2)
+    16: 0000000000010a10     0 FUNC    GLOBAL DEFAULT  UND setlocale@GLIBC_2.27 (2)
+    17: 0000000000010a30     0 FUNC    GLOBAL DEFAULT  UND putc@GLIBC_2.27 (2)
+    18: 00000000000109c0     0 FUNC    GLOBAL DEFAULT  UND malloc@GLIBC_2.27 (2)
+    19: 0000000000010a60     0 FUNC    GLOBAL DEFAULT  UND printf@GLIBC_2.27 (2)
+    20: 0000000000012de8     8 OBJECT  GLOBAL DEFAULT   19 __stack_chk_guard@GLIBC_2.27 (4)
+    21: 00000000000130b0     8 OBJECT  GLOBAL DEFAULT   23 stdout@GLIBC_2.27 (2)
+
+Symbol table '.symtab' contains 89 entries:
+   Num:    Value          Size Type    Bind   Vis      Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 0000000000010270     0 SECTION LOCAL  DEFAULT    1 
+     2: 0000000000010294     0 SECTION LOCAL  DEFAULT    2 
+     3: 00000000000102b8     0 SECTION LOCAL  DEFAULT    3 
+     4: 0000000000010360     0 SECTION LOCAL  DEFAULT    4 
+     5: 0000000000010418     0 SECTION LOCAL  DEFAULT    5 
+     6: 0000000000010628     0 SECTION LOCAL  DEFAULT    6 
+     7: 0000000000010724     0 SECTION LOCAL  DEFAULT    7 
+     8: 0000000000010750     0 SECTION LOCAL  DEFAULT    8 
+     9: 00000000000107a0     0 SECTION LOCAL  DEFAULT    9 
+    10: 00000000000107e8     0 SECTION LOCAL  DEFAULT   10 
+    11: 0000000000010980     0 SECTION LOCAL  DEFAULT   11 
+    12: 0000000000010ab0     0 SECTION LOCAL  DEFAULT   12 
+    13: 00000000000118f0     0 SECTION LOCAL  DEFAULT   13 
+    14: 0000000000011b20     0 SECTION LOCAL  DEFAULT   14 
+    15: 0000000000011b78     0 SECTION LOCAL  DEFAULT   15 
+    16: 0000000000012dd0     0 SECTION LOCAL  DEFAULT   16 
+    17: 0000000000012dd8     0 SECTION LOCAL  DEFAULT   17 
+    18: 0000000000012de0     0 SECTION LOCAL  DEFAULT   18 
+    19: 0000000000012de8     0 SECTION LOCAL  DEFAULT   19 
+    20: 0000000000012df0     0 SECTION LOCAL  DEFAULT   20 
+    21: 0000000000013000     0 SECTION LOCAL  DEFAULT   21 
+    22: 00000000000130a8     0 SECTION LOCAL  DEFAULT   22 
+    23: 00000000000130b0     0 SECTION LOCAL  DEFAULT   23 
+    24: 0000000000000000     0 SECTION LOCAL  DEFAULT   24 
+    25: 0000000000000000     0 SECTION LOCAL  DEFAULT   25 
+    26: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS abi-note.c
+    27: 0000000000010294    32 OBJECT  LOCAL  DEFAULT    2 __abi_tag
+    28: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS start.o
+    29: 00000000000112e8     0 NOTYPE  LOCAL  DEFAULT   12 $xrv64i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0
+    30: 0000000000011318     0 NOTYPE  LOCAL  DEFAULT   12 load_gp
+    31: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS init.c
+    32: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS static-reloc.c
+    33: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS functional_driver.c
+    34: 00000000000113b8   128 FUNC    LOCAL  DEFAULT   12 number
+    35: 00000000000113b8     0 NOTYPE  LOCAL  DEFAULT   12 $xrv64i2p1_m2p0_a2p1_f2p2_d2p2_c2p0_zicsr2p0_zmmul1p0
+    36: 0000000000011438    70 FUNC    LOCAL  DEFAULT   12 retained29_regex_free.part.0
+    37: 000000000001147e  1138 FUNC    LOCAL  DEFAULT   12 retained29_regex_generate
+    38: 0000000000010ab0     0 NOTYPE  LOCAL  DEFAULT   12 $xrv64i2p1_m2p0_a2p1_f2p2_d2p2_c2p0_zicsr2p0_zmmul1p0
+    39: 0000000000011b08    24 OBJECT  LOCAL  DEFAULT   13 patterns.0
+    40: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS crtstuff.c
+    41: 0000000000011324     0 FUNC    LOCAL  DEFAULT   12 deregister_tm_clones
+    42: 0000000000011324     0 NOTYPE  LOCAL  DEFAULT   12 $xrv64i2p1_m2p0_a2p1_f2p2_d2p2_zicsr2p0_zifencei2p0_zmmul1p0
+    43: 000000000001134c     0 FUNC    LOCAL  DEFAULT   12 register_tm_clones
+    44: 0000000000011384     0 FUNC    LOCAL  DEFAULT   12 __do_global_dtors_aux
+    45: 00000000000130b8     1 OBJECT  LOCAL  DEFAULT   23 completed.0
+    46: 0000000000012de0     0 OBJECT  LOCAL  DEFAULT   18 __do_global_dtors_aux_fini_array_entry
+    47: 00000000000113b4     0 FUNC    LOCAL  DEFAULT   12 frame_dummy
+    48: 0000000000012dd8     0 OBJECT  LOCAL  DEFAULT   17 __frame_dummy_init_array_entry
+    49: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS crtstuff.c
+    50: 0000000000011da8     0 OBJECT  LOCAL  DEFAULT   15 __FRAME_END__
+    51: 0000000000000000     0 FILE    LOCAL  DEFAULT  ABS 
+    52: 0000000000010980     0 OBJECT  LOCAL  DEFAULT   11 _PROCEDURE_LINKAGE_TABLE_
+    53: 0000000000012df0     0 OBJECT  LOCAL  DEFAULT   20 _DYNAMIC
+    54: 0000000000011b20     0 NOTYPE  LOCAL  DEFAULT   14 __GNU_EH_FRAME_HDR
+    55: 0000000000013098     0 OBJECT  LOCAL  DEFAULT   21 _GLOBAL_OFFSET_TABLE_
+    56: 00000000000109a0     0 FUNC    GLOBAL DEFAULT  UND regfree@GLIBC_2.27
+    57: 00000000000109b0     0 FUNC    GLOBAL DEFAULT  UND __libc_start_main@GLIBC_2.34
+    58: 0000000000013000     0 NOTYPE  WEAK   DEFAULT   21 data_start
+    59: 00000000000130c0     0 NOTYPE  GLOBAL DEFAULT   23 __BSS_END__
+    60: 00000000000109c0     0 FUNC    GLOBAL DEFAULT  UND malloc@GLIBC_2.27
+    61: 00000000000130b0     0 NOTYPE  GLOBAL DEFAULT   22 _edata
+    62: 00000000000130a8     0 NOTYPE  GLOBAL DEFAULT   22 __SDATA_BEGIN__
+    63: 0000000000013000     0 NOTYPE  GLOBAL DEFAULT   21 __DATA_BEGIN__
+    64: 00000000000109d0     0 FUNC    GLOBAL DEFAULT  UND regexec@GLIBC_2.27
+    65: 00000000000109e0     0 FUNC    GLOBAL DEFAULT  UND __errno_location@GLIBC_2.27
+    66: 00000000000109f0     0 FUNC    GLOBAL DEFAULT  UND __stack_chk_fail@GLIBC_2.27
+    67: 0000000000010a00     0 FUNC    GLOBAL DEFAULT  UND memcpy@GLIBC_2.27
+    68: 0000000000010a10     0 FUNC    GLOBAL DEFAULT  UND setlocale@GLIBC_2.27
+    69: 0000000000013000     0 NOTYPE  GLOBAL DEFAULT   21 __data_start
+    70: 0000000000012de8     8 OBJECT  GLOBAL DEFAULT   19 __stack_chk_guard@GLIBC_2.27
+    71: 00000000000130a8     0 OBJECT  GLOBAL HIDDEN    22 __dso_handle
+    72: 0000000000010a20     0 FUNC    GLOBAL DEFAULT  UND regcomp@GLIBC_2.27
+    73: 00000000000118f0     4 OBJECT  GLOBAL DEFAULT   13 _IO_stdin_used
+    74: 0000000000010a30     0 FUNC    GLOBAL DEFAULT  UND putc@GLIBC_2.27
+    75: 0000000000010a40     0 FUNC    GLOBAL DEFAULT  UND strtoull@GLIBC_2.27
+    76: 00000000000130c0     0 NOTYPE  GLOBAL DEFAULT   23 _end
+    77: 00000000000112e8    48 FUNC    GLOBAL DEFAULT   12 _start
+    78: 0000000000013800     0 NOTYPE  GLOBAL DEFAULT  ABS __global_pointer$
+    79: 0000000000010a50     0 FUNC    GLOBAL DEFAULT  UND puts@GLIBC_2.27
+    80: 00000000000130b0     0 NOTYPE  GLOBAL DEFAULT   23 __bss_start
+    81: 0000000000010ab0  2102 FUNC    GLOBAL DEFAULT   12 main
+    82: 0000000000010a60     0 FUNC    GLOBAL DEFAULT  UND printf@GLIBC_2.27
+    83: 0000000000010a70     0 FUNC    GLOBAL DEFAULT  UND calloc@GLIBC_2.27
+    84: 0000000000013000     0 OBJECT  GLOBAL HIDDEN    21 __TMC_END__
+    85: 0000000000010a80     0 FUNC    GLOBAL DEFAULT  UND strcmp@GLIBC_2.27
+    86: 00000000000130b0     8 OBJECT  GLOBAL DEFAULT   23 stdout@GLIBC_2.27
+    87: 0000000000010a90     0 FUNC    GLOBAL DEFAULT  UND memset@GLIBC_2.27
+    88: 0000000000010aa0     0 FUNC    GLOBAL DEFAULT  UND free@GLIBC_2.27
+
+Version symbols section '.gnu.version' contains 22 entries:
+ Addr: 0x0000000000010724  Offset: 0x000724  Link: 5 (.dynsym)
+  000:   0 (*local*)       2 (GLIBC_2.27)    1 (*global*)      2 (GLIBC_2.27) 
+  004:   2 (GLIBC_2.27)    2 (GLIBC_2.27)    3 (GLIBC_2.34)    2 (GLIBC_2.27) 
+  008:   1 (*global*)      2 (GLIBC_2.27)    2 (GLIBC_2.27)    2 (GLIBC_2.27) 
+  00c:   2 (GLIBC_2.27)    2 (GLIBC_2.27)    2 (GLIBC_2.27)    2 (GLIBC_2.27) 
+  010:   2 (GLIBC_2.27)    2 (GLIBC_2.27)    2 (GLIBC_2.27)    2 (GLIBC_2.27) 
+  014:   4 (GLIBC_2.27)    2 (GLIBC_2.27) 
+
+Version needs section '.gnu.version_r' contains 2 entries:
+ Addr: 0x0000000000010750  Offset: 0x000750  Link: 6 (.dynstr)
+  000000: Version: 1  File: ld-linux-riscv64-lp64d.so.1  Cnt: 1
+  0x0010:   Name: GLIBC_2.27  Flags: none  Version: 4
+  0x0020: Version: 1  File: libc.so.6  Cnt: 2
+  0x0030:   Name: GLIBC_2.34  Flags: none  Version: 3
+  0x0040:   Name: GLIBC_2.27  Flags: none  Version: 2
