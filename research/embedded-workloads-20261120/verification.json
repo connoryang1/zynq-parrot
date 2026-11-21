@@ -1,0 +1,46 @@
+{
+  "state": "PASS",
+  "scope": "offline only; new rootfs baseline, no board/performance acceptance",
+  "manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workloads-20261120/manifest.json",
+    "sha256": "a043486bb4e43823dad9415499ed0132f6ecc6758a01f2139cc53a0cad7208ac",
+    "bytes": 19154
+  },
+  "verifier": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workloads-20261120/verify_pair.py",
+    "sha256": "fc7be13b9cb198bd4ab1e097ba880febbb286d36ca40ca30e7150771960c405f",
+    "bytes": 6244
+  },
+  "full_payload_differences": [
+    {
+      "offset": "0x813fe8",
+      "original": "0x1d",
+      "control": "0x21"
+    }
+  ],
+  "full_elf_differences": [
+    {
+      "offset": "0x814fe8",
+      "original": "0x1d",
+      "control": "0x21"
+    }
+  ],
+  "sole_nbf_difference": {
+    "line": 1075385,
+    "original": "03_0000000080a13fe8_1073e0f77de3471d\n",
+    "control": "03_0000000080a13fe8_1073e0f77de34721\n"
+  },
+  "changed_modes": [
+    14
+  ],
+  "original_cpio_members": 419,
+  "only_changed_original_member": "usr/bin/ctxtsw_user_smoke",
+  "all_other_original_raw_records_and_metadata_exact": true,
+  "embedded_payloads_byte_exact": true,
+  "gzip_crc_isize_nul_padding_verified": true,
+  "both_elf_objcopy_and_nbf_extractions_exact": true,
+  "both_reverse_nbf_byte_exact": true,
+  "both_nonkernel_record_streams_unchanged": true,
+  "both_executable_section_sets_unchanged_during_embedding": true,
+  "original_accepted_inputs_unchanged": true
+}

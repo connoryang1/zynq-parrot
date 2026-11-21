@@ -1,0 +1,85 @@
+{
+  "state": "offline preregistered embedded-baseline plan; known-flow runtime gate pending",
+  "question": "Does removing scheduler-selection replay improve complete execution across private post-resume demands at unchanged retained capacity?",
+  "hypothesis": "Removing duplicate/unscheduled selection sweeps can reduce trigger work and interference; losing useful late replay may instead hurt. No gain is assumed.",
+  "fixed_controls": {
+    "image_pair": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workloads-20261120/manifest.json",
+      "bytes": 19154,
+      "sha256": "a043486bb4e43823dad9415499ed0132f6ecc6758a01f2139cc53a0cad7208ac"
+    },
+    "elf_manifest": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/plain-resources/manifest.json",
+      "sha256": "aea8d7eefb22ece08356f06d864d52b67df575b128f52aff66962ed56adc31a4",
+      "bytes": 4197
+    },
+    "elf_sha256": "ce0a21a67a36f522c46c590cf790b18bc535f09b85e8d8f20fd36e9a591cec70",
+    "transfer_sha256": "847a53aa6468d0f9ecb981ae49a36cb4eae1e3d6bebf32161d211a98b6268be1",
+    "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "loops": 64,
+    "warmup": 32,
+    "repeats": 4,
+    "working_set_kib": 32,
+    "policy": "futex-early",
+    "sync": "futex",
+    "terminal_handshake": 1,
+    "resource_stats": 1,
+    "zlib": false,
+    "retention_CSR": false,
+    "baseline_nbf_sha256": "e9aeba407073407cd01f91e2a687c21c4c8a6917b70886d997ce6852270b4508",
+    "control_nbf_sha256": "edd3e71672241c40f1b6ee3f2b4b130367a35e7823cf30dd988d4cff0e1d3bb4"
+  },
+  "workloads": [
+    "scan",
+    "lookup",
+    "parse",
+    "chase"
+  ],
+  "first_block": [
+    "scan",
+    "parse"
+  ],
+  "negative_or_unresolved_controls": [
+    "lookup",
+    "chase"
+  ],
+  "boot_plan": {
+    "minimum_per_image_per_workload": 2,
+    "image_order_per_block": [
+      "accepted_old",
+      "early_only",
+      "early_only",
+      "accepted_old"
+    ],
+    "workload_order_per_image_visit": [
+      "forward",
+      "forward",
+      "reverse",
+      "reverse"
+    ],
+    "maximum_cells_per_shared_session": 2,
+    "each_cell": "fresh power-recovered boot, global flock retained through recovery; release between sessions for other owners"
+  },
+  "primary_endpoint": "control-minus-old change in paired off-on whole-cell benefit; allocation/fork/warmup/checks/reaping/frees/resource observation included",
+  "secondary_endpoint": "paired complete two-switch steady transaction, including kernel trigger work/interference",
+  "resources": "actual whole-cell OS faults/switches/user/system counters; not cache-miss proxies",
+  "analysis": "dedicated comparator --image-pair embedded; original protocol/replication/whole-cell criteria retained",
+  "failure_policy": "Preserve native timeout, transfer/kernel/terminal failures and recover before lock release; never accept partial rows. No count-based or performance-based stopping/cherry-picking inside an accepted boot.",
+  "interpretation_limits": [
+    "Counter pilots10/11 have different ELF and loop counts and are not pooled with performance runs.",
+    "No new retained capacity, address table, rootfs or hardware is introduced by this pair.",
+    "A single workload or unreplicated boot cannot establish general application benefit.",
+    "If whole-cell cost regresses despite a local/steady gain, reject the optimization claim."
+  ],
+  "original_plan": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/mode14-early-only-20261120/performance-admission.json",
+    "bytes": 3283,
+    "sha256": "f865fc93abc682f9d339cd843612867944d560db26fcc1ca9ca03a4f151c31fc"
+  },
+  "changed_baseline": "identical new rootfs across both arms; no pooling with original rootfs",
+  "transport_manifest": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-transfer-manifest.json",
+    "bytes": 1082,
+    "sha256": "5f1fde185964860c7f35bdf407fd2a51ec91ea91a2bf91659f7ffe29771ccc80"
+  }
+}

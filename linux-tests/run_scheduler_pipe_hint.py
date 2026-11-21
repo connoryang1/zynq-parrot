@@ -26,6 +26,41 @@ from run_scheduler_tagged_replay import (
 GUEST_ELF = "/tmp/scheduler_pipe_hint_benchmark_dynamic"
 GUEST_ZLIB = "/tmp/libz.so.1"
 MAX_GUEST_COMMAND_LENGTH = 768
+EMBEDDED_HEADER = "# bp-resume-embedded-copy-v1 "
+EMBEDDED_DIRECTORY = "/opt/bp-resume/"
+
+
+def embedded_commands(elf_sha256, source, library_sha256=None):
+    """Describe a fixed-namespace copy; guest hashes still precede execution.
+
+    Unlike a wire payload this is a declaration, not an offline proof of the
+    embedded bytes. The image builder binds those bytes separately, and run()
+    must verify the copied ELF/library inside the guest before launching it.
+    """
+    if not re.fullmatch(r"[a-z][a-z0-9_]{0,31}", source):
+        raise ValueError("embedded source must be a simple fixed-namespace name")
+    if not re.fullmatch(r"[0-9a-f]{64}", elf_sha256):
+        raise ValueError("embedded ELF SHA-256 is invalid")
+    header = EMBEDDED_HEADER + f"elf_sha256={elf_sha256} source={source}"
+    if library_sha256 is not None:
+        if not re.fullmatch(r"[0-9a-f]{64}", library_sha256):
+            raise ValueError("embedded library SHA-256 is invalid")
+        header += " library_sha256=" + library_sha256
+    return [header, f"cp {EMBEDDED_DIRECTORY}{source} {GUEST_ELF}",
+            f"chmod +x {GUEST_ELF}"]
+
+
+def embedded_description(commands, elf_sha256):
+    if not commands or not commands[0].startswith("# bp-resume-embedded"):
+        return None
+    match = re.fullmatch(re.escape(EMBEDDED_HEADER)
+                         + r"elf_sha256=([0-9a-f]{64}) source=([a-z][a-z0-9_]{0,31})"
+                         + r"(?: library_sha256=([0-9a-f]{64}))?", commands[0])
+    if match is None or match[1] != elf_sha256:
+        raise ValueError("embedded transfer ELF SHA-256/header mismatch")
+    if commands != embedded_commands(match[1], match[2], match[3]):
+        raise ValueError("embedded transfer contains unexpected shell commands")
+    return {"source": EMBEDDED_DIRECTORY + match[2], "library_sha256": match[3]}
 
 
 def library_transfer(path):
@@ -52,6 +87,9 @@ def validate_transfer(path, elf_sha256):
         raise ValueError(
             f"transfer command exceeds {MAX_GUEST_COMMAND_LENGTH} characters"
         )
+    embedded = embedded_description(commands, elf_sha256)
+    if embedded is not None:
+        return embedded
     plain_tail = [f"base64 -d {b64_path} > {GUEST_ELF}", f"chmod +x {GUEST_ELF}"]
     gzip_tail = [f"base64 -d {b64_path} > {GUEST_ELF}.gz",
                  f"/bin/busybox gunzip -c {GUEST_ELF}.gz > {GUEST_ELF}",
@@ -141,7 +179,21 @@ def validate_args(args):
         raise ValueError("zlib library must exist")
     if not args.log.parent.is_dir():
         raise ValueError("log parent directory must exist")
-    validate_transfer(args.transfer, args.elf_sha256)
+    embedded = validate_transfer(args.transfer, args.elf_sha256)
+    if embedded is not None:
+        expected_library = (sha256(args.zlib_library)
+                            if args.zlib_library is not None else None)
+        if embedded["library_sha256"] != expected_library:
+            raise ValueError("embedded library declaration requires the exact --zlib-library")
+
+
+def library_commands(args, embedded):
+    if embedded is not None:
+        expected = sha256(args.zlib_library)
+        if embedded["library_sha256"] != expected:
+            raise ValueError("embedded library identity changed before staging")
+        return [f"cp {EMBEDDED_DIRECTORY}libz.so.1 {GUEST_ZLIB}"]
+    return library_transfer(args.zlib_library)
 
 
 def build_guest_command(args):
@@ -163,6 +215,7 @@ def run(args):
     runner = repo / "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh"
     status_path = args.log.with_suffix(args.log.suffix + ".status.json")
     command = build_guest_command(args)
+    embedded = validate_transfer(args.transfer, args.elf_sha256)
     pass_marker = (f"ICACHE_RETENTION_PROBE_PASS capability={args.retention_probe}"
                    if args.retention_probe else "PIPE_HINT_PASS")
     status = {
@@ -187,7 +240,11 @@ def run(args):
     }
     if args.zlib_library is not None:
         status["zlib_library_sha256"] = sha256(args.zlib_library)
-        status["zlib_transfer_encoding"] = "gzip-base64-v1"
+        status["zlib_transfer_encoding"] = ("embedded-copy-v1" if embedded is not None
+                                             else "gzip-base64-v1")
+    if embedded is not None:
+        status["transfer_encoding"] = "embedded-copy-v1"
+        status["embedded_elf_source"] = embedded["source"]
     if args.retention_probe:
         status["retention_probe_capability"] = args.retention_probe
     env = os.environ.copy()
@@ -205,7 +262,7 @@ def run(args):
             child.logfile_read = log
             expect_shell_prompt(child, 300, "Linux boot")
             if args.zlib_library is not None:
-                for transfer_command in library_transfer(args.zlib_library):
+                for transfer_command in library_commands(args, embedded):
                     child.sendline(transfer_command)
                     expect_shell_prompt(child, 180, "guest zlib transfer")
                 child.sendline(f"/bin/busybox sha256sum {GUEST_ZLIB}")

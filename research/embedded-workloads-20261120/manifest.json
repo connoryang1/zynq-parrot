@@ -1,0 +1,419 @@
+{
+  "state": "embedded-pair-offline-verified",
+  "image_pair": "embedded",
+  "scope": "New rootfs baseline; interactive rdinit=/bin/sh only; no board or performance acceptance",
+  "original_cpio": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+    "sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+    "bytes": 8194560
+  },
+  "original_gzip": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio.gz",
+    "sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+    "bytes": 3303052
+  },
+  "feasibility_generator": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workload-feasibility-20261120/reproduce_feasibility.py",
+    "sha256": "e3a64b598f2c740e37347dabf85464434e0972bb7cbfab21759734bcc9c79afe",
+    "bytes": 6828
+  },
+  "feasibility_source_proof": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workload-feasibility-20261120/feasibility.json",
+    "sha256": "abc3bdf8f9ff223c7d4636242047c04184709b73acf8068503f9bd59cf7a257b",
+    "bytes": 10371
+  },
+  "embedded_cpio": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/embedded-rootfs.cpio",
+    "sha256": "2c2947254da730b962b17ba043f53eef279d1b232b1fb659669e46a6b284e9d7",
+    "bytes": 7699828
+  },
+  "appendix": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/embedded-appendix.cpio",
+    "sha256": "233f6e76d1bfe862a78c2d1da924c31ceb7a38f5762c8b10eae194ca764a7186",
+    "bytes": 181976
+  },
+  "padded_gzip": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/embedded-rootfs.cpio.gz.padded",
+    "sha256": "f1b4b240e06ffc5fb5387d775c4dca207abab79683a45d1794600da6b8258aa7",
+    "bytes": 3303052
+  },
+  "compression": {
+    "gzip_bytes": 3073651,
+    "padding_bytes": 229401,
+    "span_bytes": 3303052,
+    "crc32": "0x87a86df7",
+    "isize": 7699828,
+    "gzip_sha256": "e10885c820b8141d93fe55b72a03d3c32e80a24493575e9a6c1b737ca8d80955",
+    "padded_sha256": "f1b4b240e06ffc5fb5387d775c4dca207abab79683a45d1794600da6b8258aa7"
+  },
+  "cpio_preservation": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/cpio-preservation.json",
+    "sha256": "085dd47b97c9fe38ff449d2c50d7cd8ce8c3e5c813460bdf82e7eb634371705d",
+    "bytes": 247892
+  },
+  "payloads": [
+    {
+      "destination": "opt/bp-resume/plain",
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/scheduler_pipe_hint_benchmark_dynamic",
+      "sha256": "e943befa9eed8b9a4258c88c5c822745017c42ef1d5af9f3bc07c56a0eade86a",
+      "bytes": 22752
+    },
+    {
+      "destination": "opt/bp-resume/plain_resources",
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/plain-resources/scheduler_pipe_hint_benchmark_plain_resources_dynamic",
+      "sha256": "ce0a21a67a36f522c46c590cf790b18bc535f09b85e8d8f20fd36e9a591cec70",
+      "bytes": 22888
+    },
+    {
+      "destination": "opt/bp-resume/probe",
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/icache_retention_probe_dynamic",
+      "sha256": "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2",
+      "bytes": 14184
+    },
+    {
+      "destination": "opt/bp-resume/zlib",
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/out/scheduler_pipe_hint_benchmark_zlib_dynamic",
+      "sha256": "407fd9ec2edb0e67cce2e3b7c7049cc3cfa85809189619d99d13dabc51574308",
+      "bytes": 23112
+    },
+    {
+      "destination": "opt/bp-resume/libz.so.1",
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/libz.so.1",
+      "sha256": "e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b",
+      "bytes": 98120
+    }
+  ],
+  "obsolete_smoke": {
+    "name": "usr/bin/ctxtsw_user_smoke",
+    "original_sha256": "1f8676bdc62331a7790f61aa0496f5ee76ff92fc411e803ec6184d9bab5160a5",
+    "stub": "#!/bin/sh\nexit 1\n",
+    "stub_sha256": "275239824e00e61b0a220e61a41791c7e9b4bd726f8b0c27077a338f8131c9dc"
+  },
+  "fixed_span": {
+    "offset": "0xc126b0",
+    "bytes": 3303052,
+    "end_exclusive": "0xf38d3c"
+  },
+  "primary_linux_source": [
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/init/initramfs.c",
+      "bytes": 17546,
+      "sha256": "1039b445af77d589fe18631d65d8a438dad9de1161f7e17654bad9da7166048f",
+      "facts": {
+        "361": "TRAILER clears hard-link table and transitions toReset",
+        "459": "flush_buffer resumes at following newc header after archive padding",
+        "500": "Outer unpack loop accepts compressed/uncompressed members while input length remains",
+        "509": "Outer unpack loop skips arbitrary NUL padding",
+        "519": "decompressor consumes its member and reports my_inptr",
+        "692": "Built-in unpack input length is __initramfs_size"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-source-proof/init/initramfs.c",
+        "sha256": "1039b445af77d589fe18631d65d8a438dad9de1161f7e17654bad9da7166048f",
+        "bytes": 17546
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/lib/decompress_inflate.c",
+      "bytes": 4873,
+      "sha256": "1f0ef737c3c9978746b84ba252fa365404d8bced3138dd0b170cc929521f9951",
+      "facts": {
+        "53": "flush-output path allocates a32KiB streaming buffer",
+        "156": "Repeated raw inflate plus output flush, so output is not limited to old archive size",
+        "170": "Stops at Z_STREAM_END",
+        "181": "Returns compressed consumed position plus8 trailer bytes; remaining padded input is left to outer loop"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-source-proof/lib/decompress_inflate.c",
+        "sha256": "1f0ef737c3c9978746b84ba252fa365404d8bced3138dd0b170cc929521f9951",
+        "bytes": 4873
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/usr/initramfs_data.S",
+      "bytes": 1243,
+      "sha256": "a084b18f567d6535d0160a1fe6604b1b113e5c905f462cf15fae810a2a736cbd",
+      "facts": {
+        "25": "Compressed bytes reside in .init.ramfs",
+        "33": "__initramfs_size is compressed incbin byte count, not uncompressed ISIZE"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-source-proof/usr/initramfs_data.S",
+        "sha256": "a084b18f567d6535d0160a1fe6604b1b113e5c905f462cf15fae810a2a736cbd",
+        "bytes": 1243
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/init/main.c",
+      "bytes": 38587,
+      "sha256": "c81e14e12af6758462fc07bb32b04417fdd5a6ccfa69eb98a9bd5bdc5e9bb1af",
+      "facts": {
+        "589": "rdinit overrides ramdisk_execute_command",
+        "1462": "Successful direct execution returns before /sbin/init fallback"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-source-proof/init/main.c",
+        "sha256": "c81e14e12af6758462fc07bb32b04417fdd5a6ccfa69eb98a9bd5bdc5e9bb1af",
+        "bytes": 38587
+      }
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/Documentation/driver-api/early-userspace/buffer-format.rst",
+      "bytes": 4857,
+      "sha256": "33d806e12230952301bdc1860f554262f746bc97799a3860bf6d00427a29ad60",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-source-proof/Documentation/driver-api/early-userspace/buffer-format.rst",
+        "sha256": "33d806e12230952301bdc1860f554262f746bc97799a3860bf6d00427a29ad60",
+        "bytes": 4857
+      }
+    }
+  ],
+  "arms": {
+    "baseline": {
+      "source_nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/linux-prefix32-futex-usersyscall-shell.nbf",
+        "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+        "bytes": 70904691
+      },
+      "source_elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf",
+        "sha256": "0792746ba2caf6b2370d923319187f62243c8a0262c876c19a18e2946257d4a3",
+        "bytes": 18330752
+      },
+      "source_payload": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/old-reconstructed.bin",
+        "sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d",
+        "bytes": 24034304
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-baseline-shell.nbf",
+        "sha256": "e9aeba407073407cd01f91e2a687c21c4c8a6917b70886d997ce6852270b4508",
+        "bytes": 69843716
+      },
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline.elf",
+        "sha256": "536590114e8e5b5244424e8a1b98c86a7784fbce774add3b1722b57dd9511e0f",
+        "bytes": 18330752
+      },
+      "payload": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline.bin",
+        "sha256": "6116cd8d1316a59a74549c5dfd91245acd9288daf920a91b0b862a7d94dd230a",
+        "bytes": 24034304
+      },
+      "converted": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline-from-elf.bin",
+        "sha256": "6116cd8d1316a59a74549c5dfd91245acd9288daf920a91b0b862a7d94dd230a",
+        "bytes": 24034304
+      },
+      "extracted": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline-extracted.bin",
+        "sha256": "6116cd8d1316a59a74549c5dfd91245acd9288daf920a91b0b862a7d94dd230a",
+        "bytes": 24034304
+      },
+      "reverse": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline-reverse.nbf",
+        "sha256": "ef50be197b458b512f82ed8a9deccc0bdfcfadba760ccd119d67e46837501cf4",
+        "bytes": 70904691
+      },
+      "objcopy_command": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+        "-O",
+        "binary",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline.elf",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/baseline-from-elf.bin"
+      ],
+      "forward_splice": {
+        "base": 2149580800,
+        "bytes": 24034304,
+        "old_records": 1899285,
+        "new_records": 1870610,
+        "preserved_records": 17058
+      },
+      "nonkernel_records": {
+        "records": 17058,
+        "ordered_bytes_sha256": "fc6b8becc65aa2709c91fc48f6ca0e437f2cbd393d07bdc674a239dbd2f7ff8d"
+      },
+      "executable_sections_unchanged": [
+        {
+          "section": ".head.text",
+          "bytes": 7824,
+          "sha256": "3447c5656f77bf9ccc581f62c42c1c4a5e1584f23911659faf1886d82f6a8c01"
+        },
+        {
+          "section": ".text",
+          "bytes": 8489608,
+          "sha256": "d3a35ff187342e7e9016836e0dd5532900dc34350482ffea773251300cda3eab"
+        },
+        {
+          "section": ".init.text",
+          "bytes": 234460,
+          "sha256": "605e92112a7fd06b79f29a48b01900a5c22fa4dcf03d002b6207850af0a82022"
+        },
+        {
+          "section": ".exit.text",
+          "bytes": 6830,
+          "sha256": "991a0f5aa48e9a568115b243db3f044a633de23c78d26188e5aca2e8997a94bc"
+        },
+        {
+          "section": ".init.pi",
+          "bytes": 9494,
+          "sha256": "fae9d60b8ed91cf4ff9b7989ea16795e94258cea70e475ce5a4485fdba955977"
+        }
+      ],
+      "rootfs_elf_offset": "0xa4d6b0",
+      "final_partial_word_outside_bytes": "00000000",
+      "outside_rootfs_prefix_sha256": "b31c2f666225bd9ff4f64bf4220d8732ce984f9980179d5371b77e5936566d80",
+      "outside_rootfs_suffix_sha256": "653532d3989271f091fa9ad14a518a1248c47c4dcd8a3b3a916bd316b1fa5bab"
+    },
+    "control": {
+      "source_nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/linux-prefix32-mode14-early-only-shell.nbf",
+        "sha256": "d14dc8b00908bb7c7a310d4c517f31752a9db4f5836b5d60b5d916d596a7847b",
+        "bytes": 70904691
+      },
+      "source_elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.elf",
+        "sha256": "9628496c7742dafb8f67595a34c52dbb0d180029891fa84aa10256b7b0c15f3c",
+        "bytes": 18330752
+      },
+      "source_payload": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/mode14-early-only.bin",
+        "sha256": "f5744fc63c6bcca79c6252dbae0fa9462cd49fd06fe797c2431ee40c82bea481",
+        "bytes": 24034304
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-control-shell.nbf",
+        "sha256": "edd3e71672241c40f1b6ee3f2b4b130367a35e7823cf30dd988d4cff0e1d3bb4",
+        "bytes": 69843716
+      },
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control.elf",
+        "sha256": "2923014a96aba6658b63f0480de17d63c64b04b038f53f9b7394e94e6f61b053",
+        "bytes": 18330752
+      },
+      "payload": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control.bin",
+        "sha256": "c9945c141f545624046e7f3a86dcd71425bc75e6cfc8f370cae5f6c0b8ba8c5a",
+        "bytes": 24034304
+      },
+      "converted": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control-from-elf.bin",
+        "sha256": "c9945c141f545624046e7f3a86dcd71425bc75e6cfc8f370cae5f6c0b8ba8c5a",
+        "bytes": 24034304
+      },
+      "extracted": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control-extracted.bin",
+        "sha256": "c9945c141f545624046e7f3a86dcd71425bc75e6cfc8f370cae5f6c0b8ba8c5a",
+        "bytes": 24034304
+      },
+      "reverse": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control-reverse.nbf",
+        "sha256": "d14dc8b00908bb7c7a310d4c517f31752a9db4f5836b5d60b5d916d596a7847b",
+        "bytes": 70904691
+      },
+      "objcopy_command": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objcopy",
+        "-O",
+        "binary",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control.elf",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/control-from-elf.bin"
+      ],
+      "forward_splice": {
+        "base": 2149580800,
+        "bytes": 24034304,
+        "old_records": 1899285,
+        "new_records": 1870610,
+        "preserved_records": 17058
+      },
+      "nonkernel_records": {
+        "records": 17058,
+        "ordered_bytes_sha256": "fc6b8becc65aa2709c91fc48f6ca0e437f2cbd393d07bdc674a239dbd2f7ff8d"
+      },
+      "executable_sections_unchanged": [
+        {
+          "section": ".head.text",
+          "bytes": 7824,
+          "sha256": "3447c5656f77bf9ccc581f62c42c1c4a5e1584f23911659faf1886d82f6a8c01"
+        },
+        {
+          "section": ".text",
+          "bytes": 8489608,
+          "sha256": "eeeee3efaa57884bf9143cfbe6e59bde6091add1727e2f46ecc37fc58c065765"
+        },
+        {
+          "section": ".init.text",
+          "bytes": 234460,
+          "sha256": "605e92112a7fd06b79f29a48b01900a5c22fa4dcf03d002b6207850af0a82022"
+        },
+        {
+          "section": ".exit.text",
+          "bytes": 6830,
+          "sha256": "991a0f5aa48e9a568115b243db3f044a633de23c78d26188e5aca2e8997a94bc"
+        },
+        {
+          "section": ".init.pi",
+          "bytes": 9494,
+          "sha256": "fae9d60b8ed91cf4ff9b7989ea16795e94258cea70e475ce5a4485fdba955977"
+        }
+      ],
+      "rootfs_elf_offset": "0xa4d6b0",
+      "final_partial_word_outside_bytes": "00000000",
+      "outside_rootfs_prefix_sha256": "15dba8a9cfe58c5b43f538e16f58282ed80e75e851be75bac987b2cbee16a2a8",
+      "outside_rootfs_suffix_sha256": "653532d3989271f091fa9ad14a518a1248c47c4dcd8a3b3a916bd316b1fa5bab"
+    }
+  },
+  "source_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-baseline-shell.nbf",
+    "sha256": "e9aeba407073407cd01f91e2a687c21c4c8a6917b70886d997ce6852270b4508",
+    "bytes": 69843716
+  },
+  "candidate_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-control-shell.nbf",
+    "sha256": "edd3e71672241c40f1b6ee3f2b4b130367a35e7823cf30dd988d4cff0e1d3bb4",
+    "bytes": 69843716
+  },
+  "changed_modes": [
+    14
+  ],
+  "all_modes": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/all-256-mode-proof.json",
+    "sha256": "d97d52d0a4eab6042e60f81ae6dc2e3f81b10beb464ff572f6bd491874f0d9b0",
+    "bytes": 21420
+  },
+  "sole_nbf_difference": {
+    "line": 1075385,
+    "original": "03_0000000080a13fe8_1073e0f77de3471d\n",
+    "control": "03_0000000080a13fe8_1073e0f77de34721\n"
+  },
+  "reverse_nbf_byte_exact": true,
+  "source_inputs_unchanged": true,
+  "kernel_pair_differences": [
+    {
+      "offset": "0x813fe8",
+      "original": "0x1d",
+      "control": "0x21"
+    }
+  ],
+  "elf_pair_differences": [
+    {
+      "offset": "0x814fe8",
+      "original": "0x1d",
+      "control": "0x21"
+    }
+  ],
+  "runtime_library": "Copy or use opt/bp-resume/libz.so.1 with explicit LD_LIBRARY_PATH; embedded files do not alter the system library.",
+  "limits": [
+    "Cannot pool with original e2f7 rootfs measurements.",
+    "Legacy /sbin/init auto-smoke workflow is intentionally unsupported; the stub exits 1.",
+    "Linux source confirms concatenated newc, gzip termination and NUL padding behavior; runtime boot still requires a reserved-board gate."
+  ],
+  "environment": {
+    "python": "3.8.10 (default, Mar 18 2025, 20:04:55) \n[GCC 9.4.0]",
+    "zlib": "1.2.11"
+  },
+  "driver": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workloads-20261120/build_pair.py",
+    "sha256": "20cd163aac7cdd659d3233ec2584114f68733c04861393db4d3b1b83faddfd71",
+    "bytes": 22250
+  }
+}
