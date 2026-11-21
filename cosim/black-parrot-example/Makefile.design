@@ -67,8 +67,9 @@ DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
 DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
 
 # Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
-# default0 preserves the original eight-register shell and host read sequence.
-BP_RETAINED_OBSERVE ?= 0
+# This r2 capacity candidate includes observation in its actual fit cost;
+# explicit0 remains available for matched diagnostic comparison only.
+BP_RETAINED_OBSERVE ?= 1
 ifneq ($(filter $(BP_RETAINED_OBSERVE),0 1),$(BP_RETAINED_OBSERVE))
 $(error BP_RETAINED_OBSERVE must be 0 or 1)
 endif
