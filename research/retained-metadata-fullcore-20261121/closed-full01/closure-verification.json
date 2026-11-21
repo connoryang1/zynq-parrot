@@ -1,0 +1,393 @@
+{
+  "state": "PASS-closed-single-admitted-metadata-fullcore-functional-attempt",
+  "closed_utc": "2026-11-21T16:50:24.516291+00:00",
+  "exec_session_id": 62198,
+  "flow_returncode": 0,
+  "source_top": "742013265fcf494ecd9e8c76934427d278d6710e",
+  "compiled_tree_baseline": "55ed51a341bbbe90950d38659217b9d418569f9c",
+  "source_bp": "19bd0da2afa835230a19669ecb06e40498373a4b",
+  "model": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15835168,
+    "sha256": "21260ba185f242517ce1285d49f3ce18418270d3e194b11b5a68e59393294b49",
+    "inode": 13691914,
+    "mtime_ns": 1795279413946479524,
+    "ctime_ns": 1795279413946479524
+  },
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/session.json",
+    "bytes": 29202,
+    "sha256": "9b9d6f471f214aad308809583901d88259cac6d44bc5e680f905e930a18ab9a0"
+  },
+  "root_admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/admission02.json",
+    "bytes": 12551,
+    "sha256": "852fee559a8d251ec24ace8eb3024fce8490ce05ff2dac666e20c74b6e1b7bac"
+  },
+  "prepared02": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/prepared02/session.json",
+    "bytes": 13287,
+    "sha256": "b73421d7e41cfea2b78df7d00d2205c01fc1fb397ca7f2a178b396918c7c21b8"
+  },
+  "compact_closure": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/research/retained-metadata-fullcore-20261121/closed-full01/manifest.json",
+    "bytes": 33247,
+    "sha256": "8ace93728c21890c579b518830c7ffd78ffca8eb8fe9dbf23b7b16d6252b4ab8"
+  },
+  "lossless_archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/lossless/manifest.json",
+    "bytes": 185173,
+    "sha256": "41d3e84698ed96e5e98ad21f6b5b8119003d6afce693722307d5ea911a743f82"
+  },
+  "extra_snapshots": [
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/admission02.json",
+        "bytes": 12551,
+        "sha256": "852fee559a8d251ec24ace8eb3024fce8490ce05ff2dac666e20c74b6e1b7bac"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-metadata/research/retained-metadata-fullcore-20261121/closed-full01/root-admission02.json.gz",
+        "bytes": 3361,
+        "sha256": "3eed738254cb475a8782db2a9d88f529685f5f729c63beb8ea04deee58875da5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/prepared02/session.json",
+        "bytes": 13287,
+        "sha256": "b73421d7e41cfea2b78df7d00d2205c01fc1fb397ca7f2a178b396918c7c21b8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-metadata/research/retained-metadata-fullcore-20261121/closed-full01/prepared02-session.json.gz",
+        "bytes": 3585,
+        "sha256": "1ca10205cf67e5a29287efd343676a121364cacb52d3a0d0d4120e95f4c1f78f"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/lossless/manifest.json",
+        "bytes": 185173,
+        "sha256": "41d3e84698ed96e5e98ad21f6b5b8119003d6afce693722307d5ea911a743f82"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-metadata/research/retained-metadata-fullcore-20261121/closed-full01/lossless-archive-manifest.json.gz",
+        "bytes": 29536,
+        "sha256": "fbd09e4934f0da45379f78a99ef200c11fbe210dc3e3c02ed9bc21ece786d0d0"
+      }
+    }
+  ],
+  "actual_commands": [
+    {
+      "label": "make-preflight",
+      "argv": [
+        "make",
+        "-f",
+        "/home/coyang/zynq-parrot-retained-metadata/cosim/black-parrot-example/verilator/Makefile",
+        "TOP=/home/coyang/zynq-parrot-retained-metadata",
+        "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+        "COSIM_MK_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/mk",
+        "COSIM_INCLUDE_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/include",
+        "MAIN_PROGRAM=/home/coyang/zynq-parrot-retained-metadata/cosim/src/main.cpp",
+        "BP_RTL_DIR=/home/coyang/zynq-parrot-retained-metadata/import/black-parrot",
+        "DESIGN_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/black-parrot-example",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+        "BP_AXI_RESPONSE_DELAY=0",
+        "TRACE=1",
+        "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+        "VERILATOR_SUPPORT_SOURCES=/home/coyang/zynq-parrot-retained-metadata/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv",
+        "VERILATOR_BUILD_JOBS=3",
+        "VERILATOR=/home/coyang/zynq-parrot-linux-research/install/bin/verilator --assert",
+        "ZP_IMPORT_DIR=/home/coyang/zynq-parrot-retained-metadata/import",
+        "COSIM_VSRC_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/v",
+        "-n",
+        "build"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.5882003910373896,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/make-preflight.log",
+        "bytes": 43745,
+        "sha256": "a0d27be93886c6c606d03f2820e14ef02ce19467b6438bb0ed22253d128a0407"
+      }
+    },
+    {
+      "label": "clean",
+      "argv": [
+        "make",
+        "-f",
+        "/home/coyang/zynq-parrot-retained-metadata/cosim/black-parrot-example/verilator/Makefile",
+        "TOP=/home/coyang/zynq-parrot-retained-metadata",
+        "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+        "COSIM_MK_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/mk",
+        "COSIM_INCLUDE_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/include",
+        "MAIN_PROGRAM=/home/coyang/zynq-parrot-retained-metadata/cosim/src/main.cpp",
+        "BP_RTL_DIR=/home/coyang/zynq-parrot-retained-metadata/import/black-parrot",
+        "DESIGN_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/black-parrot-example",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+        "BP_AXI_RESPONSE_DELAY=0",
+        "TRACE=1",
+        "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+        "VERILATOR_SUPPORT_SOURCES=/home/coyang/zynq-parrot-retained-metadata/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv",
+        "VERILATOR_BUILD_JOBS=3",
+        "VERILATOR=/home/coyang/zynq-parrot-linux-research/install/bin/verilator --assert",
+        "ZP_IMPORT_DIR=/home/coyang/zynq-parrot-retained-metadata/import",
+        "COSIM_VSRC_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/v",
+        "clean"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.4393506759079173,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/clean.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "make",
+        "-f",
+        "/home/coyang/zynq-parrot-retained-metadata/cosim/black-parrot-example/verilator/Makefile",
+        "TOP=/home/coyang/zynq-parrot-retained-metadata",
+        "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+        "COSIM_MK_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/mk",
+        "COSIM_INCLUDE_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/include",
+        "MAIN_PROGRAM=/home/coyang/zynq-parrot-retained-metadata/cosim/src/main.cpp",
+        "BP_RTL_DIR=/home/coyang/zynq-parrot-retained-metadata/import/black-parrot",
+        "DESIGN_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/black-parrot-example",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+        "BP_AXI_RESPONSE_DELAY=0",
+        "TRACE=1",
+        "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+        "VERILATOR_SUPPORT_SOURCES=/home/coyang/zynq-parrot-retained-metadata/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv",
+        "VERILATOR_BUILD_JOBS=3",
+        "VERILATOR=/home/coyang/zynq-parrot-linux-research/install/bin/verilator --assert",
+        "ZP_IMPORT_DIR=/home/coyang/zynq-parrot-retained-metadata/import",
+        "COSIM_VSRC_DIR=/home/coyang/zynq-parrot-retained-metadata/cosim/v",
+        "build"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator",
+      "timeout_seconds": 3600,
+      "returncode": 0,
+      "elapsed_seconds": 173.39361590100452,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/build.log",
+        "bytes": 628861,
+        "sha256": "106e3bb77e926705f600474261fd17ee34363b1b1b41c48bcf1dd4b24676c68f"
+      }
+    },
+    {
+      "label": "loader",
+      "argv": [
+        "ldd",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.2879698630422354,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/loader.log",
+        "bytes": 651,
+        "sha256": "406bc4f6d77417fa9d89584f8d4e221ded95363b72fb9f5b1838fe2eee720e4d"
+      }
+    },
+    {
+      "label": "integrity-run",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 600000",
+        "+bsg_trace=/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/integrity/trace.fst"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/integrity",
+      "timeout_seconds": 780,
+      "returncode": -6,
+      "elapsed_seconds": 80.48190608806908,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/integrity-run.log",
+        "bytes": 32275,
+        "sha256": "bd5beaa4ece8264f304cb5c9fe3717fe1b73debfa3b54a2e7dd76739cef745bb"
+      }
+    },
+    {
+      "label": "integrity-checker",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/check_run.py",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/integrity/run.log",
+        "--exit-code",
+        "-6",
+        "--test",
+        "mt_large_retained_system_test"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.13169182208366692,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/integrity-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      }
+    },
+    {
+      "label": "advisory-run",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/trace.fst"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory",
+      "timeout_seconds": 240,
+      "returncode": -6,
+      "elapsed_seconds": 60.6628460889915,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-run.log",
+        "bytes": 32248,
+        "sha256": "471dff103398cd4cff8f2cc05476e194a6c4e5970af016f9254cfacddb1aa0e5"
+      }
+    },
+    {
+      "label": "advisory-checker",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/check_run.py",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/run.log",
+        "--exit-code",
+        "-6"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.135009667952545,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      }
+    },
+    {
+      "label": "advisory-strict",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-advisory-trace/validate.py",
+        "--fst",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--model-source-list",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/actual-source-list.json",
+        "--fixture-manifest",
+        "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+        "--log",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/run.log",
+        "--exit-code",
+        "-6",
+        "--reader-timeout",
+        "600",
+        "--out",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-strict01"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01",
+      "timeout_seconds": 660,
+      "returncode": 0,
+      "elapsed_seconds": 30.43355975090526,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-strict.log",
+        "bytes": 105,
+        "sha256": "afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c"
+      }
+    },
+    {
+      "label": "advisory-counter",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-metadata/research/retained-use-observation-20261121/verify_counters.py",
+        "--fst",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--strict-proof",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-strict01/verification.json",
+        "--run-proof",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/verification.json",
+        "--out",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-counter01"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01",
+      "timeout_seconds": 240,
+      "returncode": 0,
+      "elapsed_seconds": 10.306961740017869,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-counter.log",
+        "bytes": 123,
+        "sha256": "531775e6f9d557bc6e629b6e35c939160d9315d2e191896de6a4aa36d08aceb6"
+      }
+    },
+    {
+      "label": "advisory-geometry",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-metadata/research/retained-metadata-fullcore-20261121/geometry.py",
+        "--fst",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--out",
+        "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/actual-parameters01"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01",
+      "timeout_seconds": 660,
+      "returncode": 0,
+      "elapsed_seconds": 0.39807185903191566,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-metadata-fullcore-20261121/full01/advisory-geometry.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "final_geometry": {
+    "retained_store.storage.epoch_width_p": 8,
+    "retained_store.storage.sets_p": 256,
+    "retained_store.storage.i_lines_p": 1280,
+    "retained_store.storage.d_lines_p": 1280,
+    "l2_block_width_p": 512,
+    "dcache_block_width_p": 512,
+    "icache_block_width_p": 512,
+    "l2_sets_p": 64,
+    "dcache_sets_p": 64,
+    "icache_sets_p": 64,
+    "l2_assoc_p": 2,
+    "l2_banks_p": 2,
+    "num_threads_p": 2,
+    "num_contexts_p": 4,
+    "dcache_assoc_p": 8,
+    "icache_assoc_p": 8
+  },
+  "no_owned_runtime_or_build_processes": [],
+  "actual_source_count": 396,
+  "resource_admission": {
+    "reserve_bytes": 3221225472,
+    "allocation_bytes": 1610612736,
+    "per_runtime_file_bytes": 157286400
+  },
+  "resources_after_archive": {
+    "output_bytes": 417912457,
+    "free_bytes": 5064724480
+  },
+  "scope": "Synthetic scoped-assertion functional correctness only; firsttouch fullcore plus independent component capacity matrix. No production RAM inference/area/fit/FPGA/application/performance claim."
+}
