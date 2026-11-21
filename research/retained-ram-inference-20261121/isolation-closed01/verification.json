@@ -1,0 +1,723 @@
+{
+  "state": "CLOSED isolated actual-store control PASS / area-attribute compiler SIGSEGV",
+  "source_diff": "Exactly two ram_decomp area attributes; same full64B1280/1280/256 module and all-variable ports. No CPU, UCE, memory model or waveform change.",
+  "native_source_sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e",
+  "area_source_sha256": "f37957ae9254d6f106c222294d6eb2e7512af75a01c5b022f56e28cc64e230c8",
+  "synth_options": "AreaOptimized_high/global_retimingon/control_set_opt_threshold1, general.maxThreads8",
+  "clock_scope": "Standalone top ports, no full-project XDC: source/module and explicit synth options are controlled, not the complete production timing environment.",
+  "native_resources": {
+    "LUT": 6402,
+    "FF": 8062,
+    "RAMB36": 67,
+    "RAMB18": 1
+  },
+  "native_resource_limit": "All inputs variable including I invalidation. Full-system constants can prune metadata; these figures must not be added to a prior CPU baseline to infer fit.",
+  "failure": "SIGSEGV after true-dual-port payload template recognition; all original/partial tool evidence retained.",
+  "next_control": "Same exact area module and production options with only global_retiming off, new fixed output and no retry.",
+  "snapshots": [
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/admission.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/admission.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/collect.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/collect.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/no-orphans.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/no-orphans.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/probe.tcl",
+        "bytes": 730,
+        "sha256": "4a5ef98de982a7ea9cb1b1e30fb80a2d425023410f42b9891d41977adeac27ff"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/probe.tcl.gz",
+        "bytes": 433,
+        "sha256": "c28ddcacaf2c80a71e297067705f289d9c6a631582dcb40ab9f3bdc24fffc213"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/primitives.tsv",
+        "bytes": 3634,
+        "sha256": "da4075c47e08d42b13fba8373ac31d7c564ee0ed5aaa9312df0f77600ad10c66"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/remote/primitives.tsv.gz",
+        "bytes": 263,
+        "sha256": "2888fe17c7ad48ba8439dd8efc83238b0215f4e8e2272f2c364cb0e3d6b432ee"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/probe.tcl",
+        "bytes": 730,
+        "sha256": "4a5ef98de982a7ea9cb1b1e30fb80a2d425023410f42b9891d41977adeac27ff"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/remote/probe.tcl.gz",
+        "bytes": 433,
+        "sha256": "c28ddcacaf2c80a71e297067705f289d9c6a631582dcb40ab9f3bdc24fffc213"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/source.sv",
+        "bytes": 15424,
+        "sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/remote/source.sv.gz",
+        "bytes": 3772,
+        "sha256": "7a38d1382010c13a3910e7d8c9e3016c35898ff5c8fad6437c34de376ec70fed"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/utilization.rpt",
+        "bytes": 1534,
+        "sha256": "c6e0c14c5036ea2e3a13a66c7191c541e349efa3d3777c9747e3257769d6cbba"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/remote/utilization.rpt.gz",
+        "bytes": 517,
+        "sha256": "f339a566cabb85222a21708eb6e5fa3e02664366a7916ea4d914a9868f260e6e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/vivado.jou",
+        "bytes": 1124,
+        "sha256": "55fc66c2c230710a93a2f86f8048481ab7b0b9559d694af0bacc9fed73e508e0"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/remote/vivado.jou.gz",
+        "bytes": 528,
+        "sha256": "f598eeac727afd105edf1253bf1d16d6f9d7a775e63566900380b1f67171b8bd"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/vivado.log",
+        "bytes": 57822,
+        "sha256": "c3724b96898950bd88fe6075754399381d8b584e4fe31554d0ee95d0544b2bfd"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/remote/vivado.log.gz",
+        "bytes": 4941,
+        "sha256": "945f1713a913d94797d3ed37e26df5ae713f7b4f9e5ae23d5cf0231ad14ba8d0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/session.json",
+        "bytes": 5543,
+        "sha256": "501de0b2420a03e02b3a4165ec39bb8940eb9a65d96c48e4fed2a8c538db89fd"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/session.json.gz",
+        "bytes": 1276,
+        "sha256": "92db6f87a59749c7f18415890075b2b44a58c891c06d40e747c8055f770e2029"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/source.sv",
+        "bytes": 15424,
+        "sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/source.sv.gz",
+        "bytes": 3772,
+        "sha256": "7a38d1382010c13a3910e7d8c9e3016c35898ff5c8fad6437c34de376ec70fed"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/synthesis.log",
+        "bytes": 57115,
+        "sha256": "df1a8d0026d56a3f554166a23bf87c672cb4c85b3afb609d0363a5f83c722262"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/synthesis.log.gz",
+        "bytes": 4712,
+        "sha256": "e221133e40247accaebd94131b44f5fc8af6cb76f5c4317922186a64c50f3e0c"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/upload.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-native-prod01/upload.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/admission.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/admission.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/collect.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/collect.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/no-orphans.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/no-orphans.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/probe.tcl",
+        "bytes": 730,
+        "sha256": "4a5ef98de982a7ea9cb1b1e30fb80a2d425023410f42b9891d41977adeac27ff"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/probe.tcl.gz",
+        "bytes": 433,
+        "sha256": "c28ddcacaf2c80a71e297067705f289d9c6a631582dcb40ab9f3bdc24fffc213"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/.lpr",
+        "bytes": 418,
+        "sha256": "9b5de0e8b1b634beae42e39f97cb95d76683934c7c2d7214c2a95d5c93259244"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/.lpr.gz",
+        "bytes": 212,
+        "sha256": "33cab4f45c26671d9b8efb44d02e4ff29c015238ba091cdfb645d5986f36f9f0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/elab.rtd",
+        "bytes": 3216324,
+        "sha256": "b293123442860256411bebd038d78f1358cb93ac183b86d1598f0c27df58e091"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/elab.rtd.gz",
+        "bytes": 2348486,
+        "sha256": "a4d0580a611af478b09d03c4338f3c353f49ea31cbcc46043bc960578c5496a4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/childModToGenomes.map",
+        "bytes": 144512,
+        "sha256": "26e1e7141ec98ffcc5d67b2d23f6f29d87b374711c1a9d334f77399b05d23892"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/childModToGenomes.map.gz",
+        "bytes": 10702,
+        "sha256": "2e125db556e6bd6a6eb5581b29cdd7b2eed34cc62cf96d420d75c1152e85a455"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/e/elab.rtd",
+        "bytes": 3249495,
+        "sha256": "f69c51510d9e686760e96c0f602961c9696c089d0f26b105120fe979e916e863"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/e/elab.rtd.gz",
+        "bytes": 2449119,
+        "sha256": "6dc9a9acd8a2c63fcaa0ffe516b528d17922116fb4235ff6043e318772a498a7"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd",
+        "bytes": 13530055,
+        "sha256": "39b01a0b197d59f6db57c8b4bfd0ffbe35ba57408dd8e975f123807c89b86290"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.gz",
+        "bytes": 864312,
+        "sha256": "0dfb8d1e6e9a1bbe875f640edb165b343e951b8896d217788aba85d9c2b53bd1"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.straps.rtd",
+        "bytes": 18524,
+        "sha256": "3484ddd86de7941853b610696fe0be5c1d6fba3c4a02f08e31028338d70b709d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.straps.rtd.gz",
+        "bytes": 4823,
+        "sha256": "7db95fd031ff8bb3acf63a55fe40154e92a0d817ff47cc3a1a3d8d9cd9b6fc53"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.straps.rtd.pb",
+        "bytes": 16,
+        "sha256": "813d702fe80317b12421205e89a187b1d479bf586f7e8f2ed05b386f3caa7652"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.straps.rtd.pb.gz",
+        "bytes": 36,
+        "sha256": "b42557872ff821ac594aed5ee3e0b4544fc9ccb9134a78e57ad3321ebe4e9047"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.straps.rtd.pb.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/1436857123.rtd.straps.rtd.pb.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd",
+        "bytes": 3104291,
+        "sha256": "d3a47bb169d04d6a7a02bb6861ad0ebb938b81bdce9801e3b4ce7d0aa75235bf"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.gz",
+        "bytes": 213604,
+        "sha256": "3d4253f0023bbd8e8032d8316aa66238d03e841182082842c1adb1a1677898ab"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.straps.rtd",
+        "bytes": 11971,
+        "sha256": "5567d04eee81f67bc2064f4e0d09fc5cdec37cdb9c8efeb229b626b86a25b878"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.straps.rtd.gz",
+        "bytes": 3432,
+        "sha256": "91ff5532b3b2211d65240a67b073c7742f32855065e166455dd71cde3ec4beed"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.straps.rtd.pb",
+        "bytes": 16,
+        "sha256": "813d702fe80317b12421205e89a187b1d479bf586f7e8f2ed05b386f3caa7652"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.straps.rtd.pb.gz",
+        "bytes": 36,
+        "sha256": "b42557872ff821ac594aed5ee3e0b4544fc9ccb9134a78e57ad3321ebe4e9047"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.straps.rtd.pb.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/581141429.rtd.straps.rtd.pb.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/global_name.straps.rtd",
+        "bytes": 2553571,
+        "sha256": "552346c6ffc9978159f75392440e19b0a50fc034ff8e5143b64cff15c2c2b1dd"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/global_name.straps.rtd.gz",
+        "bytes": 981134,
+        "sha256": "aa8a2c432f7c70ad461e251d788fb02fbbd9265033792f5a2d36105c33af4672"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/instToEncGenName.map",
+        "bytes": 79,
+        "sha256": "3f202c3de191487617bfe785cda6a8945d62ee84c565f5a8a3487609e2b13af0"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/g/instToEncGenName.map.gz",
+        "bytes": 74,
+        "sha256": "657186c1fcae625e633d3266bc574157260815700de35bb22c8db325ee48ebdc"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/genomeDependencyGraph.out",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/genomeDependencyGraph.out.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/genomes.map",
+        "bytes": 74,
+        "sha256": "9fd0e7ebf9212b662c316fe138ba396d664eb9aef1fecf02a0b2ee9eea03c1f4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/genomes.map.gz",
+        "bytes": 70,
+        "sha256": "c590238af8ac96c5fde2a48897b05ba9e6b59f77f8cf038069bb06b9ca09eebc"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/genomes.txt",
+        "bytes": 56,
+        "sha256": "f6aa3b0f4d707680d785d1aa73957982011409d85df062e32c4977ca84c73274"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/genomes.txt.gz",
+        "bytes": 51,
+        "sha256": "1b5662c363b27673a212e940af58704b752cd15781b10afeca8f3347a6680ae2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/parentModToGenomes.map",
+        "bytes": 83,
+        "sha256": "5dbfa77b3ee328a9d632697beda24c770d4ccd24de091f6ba9df88a8e36fa663"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/parentModToGenomes.map.gz",
+        "bytes": 58,
+        "sha256": "50dc8161f618a538e2caf16ac5a06044363d215de4de8d56958538cb77452193"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/synthNameToElabName.map",
+        "bytes": 79672,
+        "sha256": "9444d28022e18858542f786e9b5f95076023041417a3d82b10dcc0402317aec8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/synthNameToElabName.map.gz",
+        "bytes": 18733,
+        "sha256": "7947ae164d48b52016d25396cd17400cb19edc80baa3b4e036cde29cbd2623b2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/2C624940.rtd",
+        "bytes": 10273,
+        "sha256": "318f95acd5fd5440341e1cf1e2102ef8336c74efbcb6c42db502d7f5f5b397da"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/2C624940.rtd.gz",
+        "bytes": 272,
+        "sha256": "ebc68476499ce38c1bd3ba58706cec6f5af660a0ab08d342034b9872ab23b69b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/3A59B720.rtd",
+        "bytes": 567,
+        "sha256": "8f13193439b4a673494201a2275a9efaeab8107c43995b5827cebeaec915bb51"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/3A59B720.rtd.gz",
+        "bytes": 125,
+        "sha256": "2e031947b339444d8a6d524a75f3464f8b4d425955bed556c522437ace6f2b0e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/design.rtd",
+        "bytes": 86247,
+        "sha256": "0374ab578bc6f736262b928447c6e31c425841298785ef247315428d02322d39"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/design.rtd.gz",
+        "bytes": 10175,
+        "sha256": "25c7fc2dad5f120541d9996b3c32e96fad42d49e7fffb0cb4a500d6682b971ae"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/files.rtd",
+        "bytes": 48,
+        "sha256": "38b9d2021c906f0465e36d4041231e2f0a77b508dfb4f242668edda8d81e0848"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/files.rtd.gz",
+        "bytes": 57,
+        "sha256": "4071d5853ce19bf39b10e479ec6fb32254a72e13966274297ddaa999293f43ac"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/straps.rtd",
+        "bytes": 2564868,
+        "sha256": "b5f83745519d9d929c298671dfd9d5817cbcb5c8d528651d177524bcc133888a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/t/straps.rtd.gz",
+        "bytes": 984574,
+        "sha256": "cabe48d5a4b67f3cacc0274c25ee309e8f52bcb70011453064de2ac3aaf105f8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/topModuleToGenome.map",
+        "bytes": 83,
+        "sha256": "5dbfa77b3ee328a9d632697beda24c770d4ccd24de091f6ba9df88a8e36fa663"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/incrSyn/2307373846/u/topModuleToGenome.map.gz",
+        "bytes": 58,
+        "sha256": "50dc8161f618a538e2caf16ac5a06044363d215de4de8d56958538cb77452193"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/realtime/bp_retained_line_store.tcl",
+        "bytes": 4429,
+        "sha256": "5218d76078e6e3e1e72eaa22d79a45f6da9584e2e3927bb540c167560bc217af"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/realtime/bp_retained_line_store.tcl.gz",
+        "bytes": 1449,
+        "sha256": "b847613f5937f7d697e02cfcdb2cdefae800a2bd0500e818413b072f7be5e3e7"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/realtime/dupFiles.rpt",
+        "bytes": 88,
+        "sha256": "3b7cc89ddea68013a7506e5ac193beec2254fc4eeeb739707de24d319f7d103d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/realtime/dupFiles.rpt.gz",
+        "bytes": 97,
+        "sha256": "cf0f9dddbd1d3c0cd8b4f4c3f6abbd168d395198f080300402ba7376751beee2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/wt/project.wpc",
+        "bytes": 62,
+        "sha256": "e1bd4932faa3b707d55b82fc531e93592f7959f5d97a41973e4457952530179d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/wt/project.wpc.gz",
+        "bytes": 73,
+        "sha256": "f7aadf46780d49f4d311de4d84943007e815d8426abcb510fdfda3e8b4e8b0f9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/wt/synthesis.wdf",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/wt/synthesis.wdf.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/wt/synthesis_details.wdf",
+        "bytes": 97,
+        "sha256": "c4ff454719c26184e19f790ac079af74fd805d9258f840ccda7b1a362f705859"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/.Xil/Vivado-819234-blackparrot1/wt/synthesis_details.wdf.gz",
+        "bytes": 89,
+        "sha256": "7f0a8904014bd20a83cf3ee807f88446288aac5c4fd8ba280d229de83e1587be"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/hs_err_pid819234.log",
+        "bytes": 123,
+        "sha256": "fa0afb2eec681a7f6675a85fca7b7fd6ab59130a332563635eed64976f655483"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/hs_err_pid819234.log.gz",
+        "bytes": 133,
+        "sha256": "5f1277155e5df227fd5c778d06fa392585c694a205b33bd06fdddfe92402defc"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/probe.tcl",
+        "bytes": 730,
+        "sha256": "4a5ef98de982a7ea9cb1b1e30fb80a2d425023410f42b9891d41977adeac27ff"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/probe.tcl.gz",
+        "bytes": 433,
+        "sha256": "c28ddcacaf2c80a71e297067705f289d9c6a631582dcb40ab9f3bdc24fffc213"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/source.sv",
+        "bytes": 15466,
+        "sha256": "f37957ae9254d6f106c222294d6eb2e7512af75a01c5b022f56e28cc64e230c8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/source.sv.gz",
+        "bytes": 3785,
+        "sha256": "3e97a62f8a02bb960652961991a241b7a606b74669787a92e9cca3e2479bb499"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/vivado.jou",
+        "bytes": 1118,
+        "sha256": "35e5606de52ba223abf51b28753c9dfc4fbc83c114ff0c8dc9d65df2c9e9f8f9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/vivado.jou.gz",
+        "bytes": 525,
+        "sha256": "1a1a9aee22d68bb006be4f15bc1b77cae8c60f418e3e6c35268bedaff56d026d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/remote/vivado.log",
+        "bytes": 17285,
+        "sha256": "0d14435e489081db8822134dee0ed985d2dbee44a6f4c925a40e0f6c86cd46dd"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/remote/vivado.log.gz",
+        "bytes": 2283,
+        "sha256": "2d6e43556e220c5907f0c2ff07e95b0ab4be434e41fb8ef4fafc059ee6868cae"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/session.json",
+        "bytes": 4731,
+        "sha256": "11bb1a005db8c6765633aa86dd6c102746ecdc37c304089696f9924e6698fabe"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/session.json.gz",
+        "bytes": 1105,
+        "sha256": "b40c746e7b02fe4a6bda5289bcf43c606a1750f83194dc7c8bb5862253f113ca"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/source.sv",
+        "bytes": 15466,
+        "sha256": "f37957ae9254d6f106c222294d6eb2e7512af75a01c5b022f56e28cc64e230c8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/source.sv.gz",
+        "bytes": 3785,
+        "sha256": "3e97a62f8a02bb960652961991a241b7a606b74669787a92e9cca3e2479bb499"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/synthesis.log",
+        "bytes": 16946,
+        "sha256": "134a4249117808142f6833931fc2930ab49b823e8d66432746cfdf932067cd83"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/synthesis.log.gz",
+        "bytes": 2231,
+        "sha256": "987680fc7c3eec6944ddc0710ed55d1a1bb278773847806ec7cfc6964a32acc8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-area-prod01/upload.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/store-area-prod01/upload.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/run_isolation.py",
+        "bytes": 4776,
+        "sha256": "4842533e252883d329bcc214c06a9b681cf7a1f51252daaf3a9b9b4a11727dec"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/isolation-closed01/run_isolation-used.py.gz",
+        "bytes": 2178,
+        "sha256": "f98b49a339388bc606995774e1681580d9b66d229560d666b8a69d8a815cba73"
+      }
+    }
+  ],
+  "external_checkpoints": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-ram-inference-20261121/store-native-prod01/remote/synthesized.dcp",
+      "bytes": 1225248,
+      "sha256": "a10710c993893d5f25ee593b7306d64f082cf5959ba1856c271c2ea6a626611a"
+    }
+  ],
+  "physical_operations": 0
+}
