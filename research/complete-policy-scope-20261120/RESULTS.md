@@ -4,14 +4,14 @@ This report closes the fixed sixteen-boot FPGA comparison of the historical comb
 
 All eight scheduled reservations completed, with two independent fresh boots per image/workload and all sixteen logs accepted by `closed-audit.json`. Acquisition followed the fixed ABBA image waves and forward/forward/reverse/reverse workload order, using the same scoped ELF, 32KiB working sets, 64 loops, 32 warmups and four paired repeats. The two failed B1-second attempts remain declared and excluded as entire attempts; the first complete replacement filled that fixed slot. `attempt-history-review.json` checks the retained session20–27 namespace against those declarations without claiming visibility into arbitrary unrecorded paths.
 
-The primary is B-minus-A paired off-on WHOLE benefit, in percentage points; positive favors removing the selection trigger. Every interval includes zero. Absolute enabled cost uses the opposite favorable sign: negative favors B.
+The registered primary is B-minus-A paired off-on WHOLE benefit, measured in cycles per cell; the table also gives its percentage-point presentation. Positive favors removing the selection trigger. Every interval includes zero. Absolute enabled cost uses the opposite favorable sign: negative favors B.
 
-| Workload | Primary benefit change, pp [95% bootstrap interval] | Enabled WHOLE cost change, cycles [95% interval] |
-| --- | ---: | ---: |
-| scan | +0.628 [-2.438, +3.130] | -102,203.5 [-554,321.5, +226,732] |
-| lookup | -2.961 [-5.180, +2.607] | +73,420 [-326,667.5, +641,784.5] |
-| parse | -0.443 [-1.301, +0.825] | +112,911 [-549,554, +932,959] |
-| chase | -2.642 [-4.240, +1.862] | +69,452.5 [-163,049.5, +417,971] |
+| Workload | Primary benefit change, cycles/cell [95% interval] | Benefit change, pp [95% interval] | Enabled WHOLE cost change, cycles [95% interval] |
+| --- | ---: | ---: | ---: |
+| scan | +123,489.5 [-501,615, +642,686] | +0.628 [-2.438, +3.130] | -102,203.5 [-554,321.5, +226,732] |
+| lookup | -494,859.5 [-852,876.5, +415,595.5] | -2.961 [-5.180, +2.607] | +73,420 [-326,667.5, +641,784.5] |
+| parse | -392,726 [-1,148,519, +753,028] | -0.443 [-1.301, +0.825] | +112,911 [-549,554, +932,959] |
+| chase | -341,394.5 [-557,920, +242,289] | -2.642 [-4.240, +1.862] | +69,452.5 [-163,049.5, +417,971] |
 
 The corresponding steady-loop benefit changes are +2.136, -1.108, -0.319 and +0.046pp; all their intervals also include zero. The earlier short counter control proved fewer trigger admissions, but fewer triggers do not establish faster execution. Keep patch0028 as an experimental mechanism control for the separately registered codec comparison; do not promote it as an accepted performance improvement.
 
@@ -30,4 +30,4 @@ WHOLE includes each cell's setup, allocations, fork, warmup, checked work, child
 
 Two boots per image leave limited between-boot evidence. The hierarchical bootstrap resamples repeat blocks within boots and does not resolve serial dependence, nonlinear drift or retained-line carryover; ABBA is not randomization. Mode-zero cleanup drains reported prefix-controller bits only, and completed lines can survive into subsequent initial setup. Saturated trigger counters cannot localize removed admissions. The low-level runner helper changed after the first three visits only in post-program cleanup, with explicit installation/source evidence; the eight frozen host drivers and guest timing endpoints stayed identical.
 
-The result rules out treating this control as an established broad improvement; it does not prove the true effect is exactly zero or identify a unique hardware bottleneck. The separate fixed zlib cohort and demand-retention controls remain necessary. Controlled D-service sensitivity and small conditional D-victim coverage remain simulation evidence, not numerical predictions for this FPGA result.
+The result rules out treating this control as an established broad improvement; it does not prove the true effect is exactly zero or identify a unique hardware bottleneck. This comparison concerns removing the extra late trigger, not whether instruction replay itself has exactly zero benefit. The separate fixed zlib cohort and demand-retention controls remain necessary. Controlled D-service sensitivity and small conditional D-victim coverage remain simulation evidence, not numerical predictions for this FPGA result.
