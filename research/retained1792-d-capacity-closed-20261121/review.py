@@ -22,6 +22,17 @@ def bind(path):
     return dict(path=str(path),bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
 
 
+def qualified_contract(bridge,local):
+    origin='/home/coyang/zynq-parrot-linux-host-observer/research/retained1792-audit-continuation-20261121/continuation.py'
+    expected='96e91eac0aed1085078f4a23c5360cc87ee0d31b241cca792d2e7d04b033cb00'
+    rows=[row for row in bridge['sources'] if row['path']==origin]
+    require(len(rows)==1 and rows[0]['sha256']==expected,'fixed producer contract source anchor')
+    require(bind(origin)==rows[0],'original pinned producer contract')
+    actual=bind(local)
+    require(all(actual[key]==rows[0][key] for key in ('bytes','sha256')),'local contract must be byte-identical to producer')
+    return Path(local)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out',required=True,type=Path)
@@ -59,8 +70,7 @@ def main():
     program=json.loads(resolve(full['bindings']['program']).read_text())
     # Import pinned original Validator only to calculate its static target
     # oracle; do not process events or run any executable.
-    contract=HERE.parent/'retained1792-audit-continuation-20261121/continuation.py'
-    require(bind(contract) in bridge['sources'],'pinned inherited contract')
+    contract=qualified_contract(bridge,HERE.parent/'retained1792-audit-continuation-20261121/continuation.py')
     spec=importlib.util.spec_from_file_location('closed_d_continuation',contract)
     c=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)
     expected=json.loads(json.dumps(c.original.Validator(program,'d-enabled').targets))
