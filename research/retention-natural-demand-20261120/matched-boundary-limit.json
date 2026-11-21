@@ -1,0 +1,102 @@
+{
+  "state": "pretarget-source-only-interpretation-limit-no-runtime-amendment",
+  "created_utc": "2026-11-21T01:29:51.317075+00:00",
+  "document": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/PRETARGET_MATCHED_BOUNDARY_LIMIT.md",
+    "bytes": 3277,
+    "sha256": "f26a0848a1bbeb5bbc3e29d8a2af8ecf2a63ad2c94617396a1ac8aa3bb541e90"
+  },
+  "frozen_admission": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/admission.json",
+    "bytes": 18382,
+    "sha256": "2b516262d5e36e81b93ad375910da89a452a43f46d5a2d156064f3fd2bf76f02"
+  },
+  "frozen_build_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/manifest.json",
+    "bytes": 11072,
+    "sha256": "cacbe7c195d52cb6db207f82f1e1d69f45a2bc72428d72f89691a3a03403fb96"
+  },
+  "elf": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/program/scheduler_pipe_hint_benchmark_plain_retention_resources_scoped_dynamic",
+    "bytes": 27720,
+    "sha256": "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf"
+  },
+  "transfer": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+    "bytes": 17960,
+    "sha256": "2d2178c36f72b7b2ac14f385a8b0d89d9a2ab6675a11881bd91da07576a7451d"
+  },
+  "fixed_checkpoint": "a61c9a175839611a2329b484b61807d517cb4591",
+  "source_proof": {
+    "benchmark": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/source/scheduler_pipe_hint_benchmark.c",
+      "bytes": 29605,
+      "sha256": "b242d76a3bc5fb754ea92a6167ede622397e19630c7b9e5a415715deb085378e",
+      "excerpts": [
+        {
+          "first_line": 481,
+          "last_line": 521,
+          "text": "481 static unsigned retention_mode(enum hint_policy policy, unsigned enabled)\n482 {\n483 \tif (!enabled)\n484 \t\treturn 0;\n485 \treturn policy == hint_retention_rr ? 1 : policy == hint_retention_first ? 2 : 0;\n486 }\n487 \n488 static void retention_start_cell(enum hint_policy policy, unsigned enabled)\n489 {\n490 \tunsigned mode = retention_mode(policy, enabled);\n491 \n492 \tretention_armed = 1;\n493 \t/* Both processes have allocated private state and completed setup fences.\n494 \t * One global write/fence resets this cell; no per-wake hint is emitted.\n495 \t */\n496 \tif (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, (unsigned long)mode,\n497 \t\t\t    0UL, 0UL, 0UL))\n498 \t\tfail(\"I-retention policy control\");\n499 \tif ((retention_read_status() & 3) != mode) {\n500 \t\terrno = EIO;\n501 \t\tfail(\"I-retention policy readback\");\n502 \t}\n503 }\n504 \n505 static uint64_t retention_finish_cell(enum hint_policy policy, unsigned enabled)\n506 {\n507 \tuint64_t status = retention_read_status();\n508 \n509 \tif ((status & 3) != retention_mode(policy, enabled)) {\n510 \t\terrno = EIO;\n511 \t\tfail(\"I-retention policy changed during cell\");\n512 \t}\n513 \tif (retention_prctl(PR_BP_ICACHE_RETENTION_CONTROL, 0UL, 0UL, 0UL, 0UL))\n514 \t\tfail(\"I-retention normal reset\");\n515 \tif (retention_read_status() & 3) {\n516 \t\terrno = EIO;\n517 \t\tfail(\"I-retention reset readback\");\n518 \t}\n519 \tretention_armed = 0;\n520 \treturn status;\n521 }"
+        },
+        {
+          "first_line": 591,
+          "last_line": 601,
+          "text": "591 \tparent_working_set = allocate_working_set(working_set_kib, 0xa5, workload);\n592 \tclose(to_child[0]);\n593 \tclose(to_parent[1]);\n594 \tclose(ready[1]);\n595 \ttransfer(ready[0], &token, 0);\n596 \tflush_instruction_state();\n597 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION\n598 \tretention_start_cell(policy, enabled);\n599 #endif\n600 \tif (policy == hint_preseed)\n601 \t\tissue_hint(enabled);"
+        },
+        {
+          "first_line": 696,
+          "last_line": 707,
+          "text": "696 \n697 \tparent_working_set = allocate_working_set(working_set_kib, 0xc3, workload);\n698 \tclose(ready[1]);\n699 \ttransfer(ready[0], &token, 0);\n700 \tflush_instruction_state();\n701 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION\n702 \tretention_start_cell(policy, enabled);\n703 #endif\n704 \tif (policy == hint_preseed)\n705 \t\tissue_hint(enabled);\n706 \tfor (unsigned i = 0; i < warmup; ++i) {\n707 \t\tif (policy != hint_preseed && !is_futex_early(policy))"
+        },
+        {
+          "first_line": 839,
+          "last_line": 877,
+          "text": "839 #if (defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION) \\\n840  || (defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS)\n841 \t\t\tuint64_t whole_begin = cycle(), whole_elapsed;\n842 #endif\n843 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION\n844 \t\t\tuint64_t retention_status;\n845 #endif\n846 #if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS\n847 \t\t\tstruct cell_resources resources_before = resource_snapshot();\n848 \t\t\tstruct cell_resource_delta resources;\n849 #endif\n850 \t\t\tstruct cell_result result = sync == sync_pipe\n851 \t\t\t\t? run_pipe_cell(enabled, loops, warmup, policy,\n852 \t\t\t\t\t\tworking_set_kib, workload)\n853 \t\t\t\t: run_futex_cell(enabled, loops, warmup, policy,\n854 \t\t\t\t\t\t  profile, working_set_kib, workload);\n855 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION\n856 \t\t\t/* Charge allocation, fork, setup, warmup, verification, teardown,\n857 \t\t\t * status reads and policy reset separately from steady work.\n858 \t\t\t */\n859 \t\t\tretention_status = retention_finish_cell(policy, enabled);\n860 #endif\n861 #if defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE\n862 \t\t\t/* run_*_cell has checked, reaped and freed both workloads. Charge\n863 \t\t\t * mode reset and bounded controller drain to this cell, before the\n864 \t\t\t * ending observers/timestamp and every result print. Both arms pay\n865 \t\t\t * this cleanup; the next cell's initial mmap/pipe starts in mode 0.\n866 \t\t\t */\n867 \t\t\tcomplete_policy_scope_reset();\n868 #endif\n869 #if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS\n870 \t\t\t/* Include verification, reaping, frees, and retention reset/status.\n871 \t\t\t * The whole-cell timer also charges both observer snapshots.\n872 \t\t\t */\n873 \t\t\tresources = resource_delta(resource_snapshot(), resources_before);\n874 #endif\n875 #if (defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION) \\\n876  || (defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS)\n877 \t\t\twhole_elapsed = cycle() - whole_begin;"
+        }
+      ]
+    },
+    "actual_accepted_kernel": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.c",
+      "bytes": 78666,
+      "sha256": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb",
+      "excerpts": [
+        {
+          "first_line": 106,
+          "last_line": 119,
+          "text": "106 static int bp_icache_retention_control(unsigned long mode)\n107 {\n108 \tu64 status;\n109 \tint error;\n110 \n111 \tpreempt_disable();\n112 \terror = bp_icache_retention_probe(&status);\n113 \tif (!error)\n114 \t\t/* Every accepted mode change, including mode zero, starts clean. */\n115 \t\tasm volatile(\"csrw 0x5c1, %0\\nfence.i\\n\"\n116 \t\t\t     : : \"r\" (mode) : \"memory\");\n117 \tpreempt_enable();\n118 \treturn error;\n119 }"
+        }
+      ]
+    },
+    "kernel_patch": {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/kernel-patches/0027-blackparrot-icache-retention-control.patch",
+      "bytes": 3506,
+      "sha256": "c48971940f38c27493d95fbff9e2e905c794550efe839625b9d1d1a38981dbd3"
+    }
+  },
+  "confirmed": {
+    "disabled_arm_global_control0_fence_and_status": true,
+    "per_cell_not_per_wake": true,
+    "matched_observer_and_policy_calls_in_both_arms": true,
+    "all_enabled_operations_within_frozen_whole_boundary_priced": true,
+    "startup_and_reporting_outside_whole": true,
+    "disabled_arm_is_unmodified_linux_deployment_baseline": false
+  },
+  "supported_estimand": "Paired retention-versus-mode0 benefit under matched instrumented per-cell lifecycle; RR-vs-first under same capacity/control sequence with independent boot uncertainty",
+  "unsupported_inference": "Positive paired benefit alone is not net unmodified Linux deployment gain; fences/observers alter cache/lifecycle state as well as execution time",
+  "future_deployment_requirement": "Separately authorize/preregister and actually execute an unmatched lifecycle baseline before deployment claim; no inferred net gain from subtraction/projection of measured syscall costs",
+  "mode14_scope": "Kernel A/B policy contrast remains legitimate under identical ABI/enabled-control preparation/boundary; inspect absolute enabled WHOLE to distinguish genuine enabled-path change from off-arm movement. No primary results assessed.",
+  "unchanged": [
+    "preregistration hash",
+    "ELF/transfer",
+    "production source",
+    "flags",
+    "runtime slots",
+    "endpoints/analysis",
+    "negative/null reporting",
+    "runners"
+  ],
+  "primary_data_read": false,
+  "target_execution": false,
+  "new_runtime_case": false,
+  "code_or_runner_edits": false
+}
