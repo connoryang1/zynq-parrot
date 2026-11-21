@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Observed1280 integration closed — 2026-11-21:** r2's clean actual fulltop passes unchanged integrity and cold08 execution with scoped runtime assertions; closed traces confirm1280/1280/256/native0 and ordinary L1 geometry, real512-bit I/D restoration, eight non-aborted L1 writes per side, and GP0/counter1/1/8 agreement. Model/program/source bindings and exact post-PASS GPIO exits are retained; parent-owned actual fit and physical useful-capacity/application qualification remain pending (`research/native1280-observe1-r2-20261121/closure01/`).
+
 - **1280 observation candidate prepared — 2026-11-21:** new r2 preserves immutable r1, combines the GP0 observer and committed actual-IP macro propagation repair, and defaults observation on so a future fit prices it. Make parsing/default expansion passes at1280/1280/256/native0; the isolated combined whole-core correctness/trace gate remains pending (`research/native1280-observe1-r2-20261121/`).
 
 - **FPGA configuration loss repaired — 2026-11-21:** the first64-line fit was canceled and rejected because environment-only retention settings never reached Verilog compilation. Validated allowlist reinjection now covers producer, IP-edit and final projects; actual launched child synthesis of packaged RTL decodes all192 requested bits, while a same-package negative control exposes the defaults. No retained fit or maximum is inferred from the rejected94.5BRAM snapshot (`research/vivado-retained-defines-20261121/`).
