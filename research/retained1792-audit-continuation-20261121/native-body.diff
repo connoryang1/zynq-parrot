@@ -1,0 +1,19 @@
+--- frozen/run_stream1792.py
++++ new/run_continued.py
+@@ -9,7 +9,7 @@
+ import re
+ import resource
+ import shutil
+-import contract as c
++import continuation as c
+ 
+ bind,require=c.bind,c.require
+ ROOT=c.native.ROOT
+@@ -29,6 +29,7 @@
+     args=parser.parse_args()
+     require(args.execute,'default offline; explicit ROOT admission and --execute required')
+     preparation,program=c.load(args.preparation,args.preparation_sha256)
++    c.require(args.role != 'd-enabled', 'D-enabled native is inherited; re-execution forbidden')
+     cohort=Path(preparation['stage'])
+     require(len(args.prior_audit_sha256)==c.ORDER.index(args.role),'all and only prior closed audit SHA anchors')
+     with (cohort/'acquisition.lock').open('a') as lock:

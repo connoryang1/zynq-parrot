@@ -1,0 +1,31 @@
+--- frozen/audit_stream1792.py
++++ new/audit_attempt.py
+@@ -9,7 +9,8 @@
+ from pathlib import Path
+ import signal
+ import sys
+-import contract as c
++import continuation as c
++c.AUDIT_PHASE = True
+ 
+ 
+ def main():
+@@ -22,7 +23,7 @@
+     args=parser.parse_args()
+     c.require(args.execute,'default offline; explicit ROOT admission and --execute required')
+     p,program=c.load(args.preparation,args.preparation_sha256)
+-    stage=Path(p['stage']);case=stage/args.role;out=stage/(args.role+'-audit')
++    stage=Path(p['stage']);case=stage/args.role;out=c.audit_output(stage,args.role)
+     def interrupted(signum,frame):raise RuntimeError('audit caught signal '+str(signum))
+     handlers={s:signal.signal(s,interrupted) for s in (signal.SIGINT,signal.SIGTERM,signal.SIGALRM)}
+     signal.alarm(c.CAPS['audit_outer_s'])
+@@ -69,7 +70,8 @@
+                 c.load(args.preparation,args.preparation_sha256)
+                 c.check_native(stage,args.role,p,args.preparation,args.native_sha256)
+                 names=('verification.json','selection.tsv','gp0-counter-projection.tsv.gz','counter-check-input/verification.json','counter-words.json','counter-checker.log','counter-checker.owned.json','reader.stderr','reader.owned.json')
+-                c.archive.write_json(out/'acceptance.json',dict(schema='retained1792-stream-acceptance-v1',role=args.role,
++                c.archive.write_json(out/'acceptance.json',dict(schema='retained1792-stream-continuation-acceptance-v1',role=args.role,
++                    attempt=2 if args.role=='d-enabled' else 1,inherited_native=args.role=='d-enabled',
+                     preparation=c.bind(args.preparation),sources=p['runtime_sources'],native_sha256=args.native_sha256,
+                     files=[c.bind(out/name) for name in names]))
+                 c.verify_audit(stage,args.role,p,args.preparation,c.bind(out/'acceptance.json')['sha256'])

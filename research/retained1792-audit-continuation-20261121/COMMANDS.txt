@@ -1,0 +1,10 @@
+ROOT review then PREPARATION ONLY (no model/reader):
+python3 /home/coyang/zynq-parrot-linux-host-observer/research/retained1792-audit-continuation-20261121/prepare.py --approve-continuation
+
+Record the printed SHA256 of /dev/shm/zp-retained1792-stream-canonical-20261121-01/audit-continuation.json as CONTINUATION_SHA. ROOT alone may then run the new audit attempt:
+python3 /home/coyang/zynq-parrot-linux-host-observer/research/retained1792-audit-continuation-20261121/audit_attempt.py --preparation /dev/shm/zp-retained1792-stream-canonical-20261121-01/audit-continuation.json --preparation-sha256 CONTINUATION_SHA --role d-enabled --native-sha256 5716c0e35d385ef38ff38ffb2a760a9b7f2f0f27b1cd5c3d1820350a3a929bae --execute
+
+Only after ROOT reviews new d-enabled-audit-attempt2/acceptance.json and captures D_AUDIT2_SHA, a separate native phase may use the same exact old model/software/settings and original3GiB HOME floor:
+python3 /home/coyang/zynq-parrot-linux-host-observer/research/retained1792-audit-continuation-20261121/run_continued.py --preparation /dev/shm/zp-retained1792-stream-canonical-20261121-01/audit-continuation.json --preparation-sha256 CONTINUATION_SHA --role d-off --prior-audit-sha256 D_AUDIT2_SHA --execute
+
+The D-off audit then uses audit_attempt.py with --role d-off and its actual externally captured native proof SHA. I-enabled native requires --prior-audit-sha256 D_AUDIT2_SHA --prior-audit-sha256 D_OFF_AUDIT_SHA, in that order, before its native/audit phases. No automatic next-case execution, retry or unanchored SHA substitution.
