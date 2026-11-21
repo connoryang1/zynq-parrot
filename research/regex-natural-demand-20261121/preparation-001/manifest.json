@@ -1,0 +1,739 @@
+{
+  "state": "FAILED-preparation-not-target-evidence",
+  "scope": "Future isolated regex functional core only; no timing or target execution.",
+  "commands": [
+    {
+      "label": "cross-sysroot",
+      "argv": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+        "-print-sysroot"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-sysroot.stdout",
+        "bytes": 111,
+        "sha256": "9e68d8052ce210bd1e8364a1fb4bb0c1954ee406ac903d72ebabbbe4b225c000"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-sysroot.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "cross-abi-probe",
+      "argv": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-march=rv64imafdc",
+        "-mabi=lp64d",
+        "-H",
+        "-c",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/abi_probe.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/abi_probe.o"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-abi-probe.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-abi-probe.stderr",
+        "bytes": 5539,
+        "sha256": "4236eb3d8d5411718f9efb3f50b0eadde725518a013c6dbd2c4e043576bf806c"
+      }
+    },
+    {
+      "label": "accepted-libc-symbols",
+      "argv": [
+        "/usr/bin/readelf",
+        "-Ws",
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/libc.so.6"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/accepted-libc-symbols.stdout",
+        "bytes": 246684,
+        "sha256": "66ed4ba404095de4049d39f4a028f1456e52603f0bde6709c8e983e81413fd84"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/accepted-libc-symbols.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-compiler-version",
+      "argv": [
+        "/usr/bin/cc",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-compiler-version.stdout",
+        "bytes": 243,
+        "sha256": "a2c6f19b6698aa4249442367c19c93accd1bb85cfcd901fce4c02116f30da891"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-compiler-version.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-sanitizer-build",
+      "argv": [
+        "/usr/bin/cc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fsanitize=address,undefined",
+        "-DRW_TESTING",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/regex_workload.c",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/host_checks.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host_checks"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-sanitizer-build.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-sanitizer-build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-sanitizer-checks",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host_checks"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-sanitizer-checks.stdout",
+        "bytes": 28,
+        "sha256": "f8d2f1835a71d7e3b1b505c26c01998066287ea3756dad6f8f5181b920955526"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-sanitizer-checks.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "host-production-build",
+      "argv": [
+        "/usr/bin/cc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fsanitize=address,undefined",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/regex_workload.c",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/functional_driver.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-production-build.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/host-production-build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-dump-0",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "--dump",
+        "0",
+        "0"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-0.stdout",
+        "bytes": 136,
+        "sha256": "975ed1dedcd56f847b6de2d76be0a5c7a8e2e76b9d5e756bbace6e10dff2afeb"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-0.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-requests-0",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "0",
+        "0",
+        "19"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-0.stdout",
+        "bytes": 2688,
+        "sha256": "dc771b3c1dc6952f4531ab2be18d1062202b29a3c8c5731c1fd995e2c8d37c95"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-0.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-dump-1",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "--dump",
+        "1",
+        "7"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-1.stdout",
+        "bytes": 138,
+        "sha256": "4778887bfdaf530430cdd344e72a4a89fad98ef86bd4854c55577ffe63211250"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-1.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-requests-1",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "1",
+        "7",
+        "19"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-1.stdout",
+        "bytes": 2688,
+        "sha256": "2df2a6ee460760ed6b10ceea71a66dd3840683dd55b06c39cd47fd6b20fda0d3"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-1.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-dump-2",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "--dump",
+        "4097",
+        "71"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-2.stdout",
+        "bytes": 8361,
+        "sha256": "9b4a65bab85e19a8af3ec210ab1d0cfd8987b7db917596d8c7b58b5d044296f0"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-2.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-requests-2",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "4097",
+        "71",
+        "19"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-2.stdout",
+        "bytes": 2724,
+        "sha256": "2468134c5196d633731716fbba81ed533505d1726385b8cc184b25787b6e174a"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-2.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-dump-3",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "--dump",
+        "8193",
+        "197"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-3.stdout",
+        "bytes": 16578,
+        "sha256": "4aca182b45a457ff2fb2ddf482d61d9feb925bb30b6ae66954fb473e27a6b487"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-3.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-requests-3",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "8193",
+        "197",
+        "19"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-3.stdout",
+        "bytes": 2733,
+        "sha256": "5eeb59bdb3d29feaa7af081f8fc6688e36229c6191d6c00044daf155243af3bc"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-3.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-dump-4",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "--dump",
+        "32769",
+        "991"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-4.stdout",
+        "bytes": 65882,
+        "sha256": "0454d7bb5742885d4d7a9417f8d126dd34138a5c146f1f1cc89deae39c175ac3"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-dump-4.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "oracle-requests-4",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/functional_driver",
+        "32769",
+        "991",
+        "19"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-4.stdout",
+        "bytes": 2747,
+        "sha256": "532944cf2d2f499a8e7f51b243cd1343f654f48a9ff5140f2e41b110913f5568"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/oracle-requests-4.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "cross-functional-build",
+      "argv": [
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-gcc",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-march=rv64imafdc",
+        "-mabi=lp64d",
+        "-fno-pie",
+        "-no-pie",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/regex_workload.c",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/functional_driver.c",
+        "-o",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/regex-functional.riscv"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-functional-build.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-functional-build.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "cross-functional-elf",
+      "argv": [
+        "/usr/bin/readelf",
+        "-h",
+        "-d",
+        "-V",
+        "-Ws",
+        "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/regex-functional.riscv"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-functional-elf.stdout",
+        "bytes": 12788,
+        "sha256": "1bd88afca0c731e5a233a64c53d87640afce2aa767e3ad8fc6ccdbc6e5a8e82c"
+      },
+      "stderr": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/cross-functional-elf.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source": {
+    "host_checks.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/host_checks.c",
+      "bytes": 3441,
+      "sha256": "0e89442f229ea0e965704faf71b90a5d0b7b8f4501bd8c38a3bd65d33cf816e4"
+    },
+    "prepare.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/prepare.py",
+      "bytes": 11307,
+      "sha256": "aa30274535402f42e9b020051640d71c0832c54f7610f03d219886cfa1d83d70"
+    },
+    "regex_workload.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/regex_workload.c",
+      "bytes": 10223,
+      "sha256": "a70d9d2663054c655cd949736faea9e17aea9609acfe3b01d28042a4dc17ded1"
+    },
+    "functional_driver.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/functional_driver.c",
+      "bytes": 2342,
+      "sha256": "ce329f06d321a916f5adecdbda0b32ec8ee90f42125906b5af5a17bbfa0c3067"
+    },
+    "abi_probe.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/abi_probe.c",
+      "bytes": 866,
+      "sha256": "ea93d3903824d1c28a73817863ca4e6dfc41baf400fa2ace4afdb69648b6e516"
+    },
+    "regex_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/regex_workload.h",
+      "bytes": 1851,
+      "sha256": "e12f394383a44192836f690d1589582a22d5ffd3fdbc147e3add46b3f1c099dd"
+    }
+  },
+  "abi_proof": {
+    "state": "actual cross2.37 public headers and accepted runtime allocated image verified",
+    "sysroot": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/riscv64-buildroot-linux-gnu/sysroot",
+    "compiler": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/toolchain-wrapper",
+      "bytes": 14680,
+      "sha256": "d622d63cceefe24a106c8ff485a60bf494264323377cb50e8cac1dbdf5dfda7b"
+    },
+    "headers": {
+      "regex.h": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/riscv64-buildroot-linux-gnu/sysroot/usr/include/regex.h",
+        "bytes": 25904,
+        "sha256": "51f4afc1b9c92424a95d63d1988fdde928007f444b0d586addf6ee0df5e5c3f4"
+      },
+      "features.h": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/riscv64-buildroot-linux-gnu/sysroot/usr/include/features.h",
+        "bytes": 18161,
+        "sha256": "b6fd8bf3ea381fe2b36138fbadbefb0fa67e3473e64ea457f79eac77fabb8773"
+      }
+    },
+    "sysroot_libc": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/riscv64-buildroot-linux-gnu/sysroot/lib/libc.so.6",
+      "bytes": 1928696,
+      "sha256": "f37578097e8f4b76eccbed73a06bff87c4ae90c60450c85f3a308097937ede97"
+    },
+    "accepted_target_libc": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/libc.so.6",
+      "bytes": 1459064,
+      "sha256": "d3f60c3e773fa76856457df96dc151609db7d1041e031c55477a62ff74cde43b"
+    },
+    "accepted_cpio": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+      "bytes": 8194560,
+      "sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50"
+    },
+    "accepted_member": {
+      "member": "lib/libc.so.6",
+      "bytes": 1459064,
+      "sha256": "d3f60c3e773fa76856457df96dc151609db7d1041e031c55477a62ff74cde43b"
+    },
+    "matching_allocated_sections": {
+      ".hash": {
+        "type": 5,
+        "flags": 2,
+        "address": 680,
+        "bytes": 15712,
+        "sha256": "81c95e8da06dd79587b7df0b2abd2f08698576a2cf6eb84e747f6f3081b72f86"
+      },
+      ".gnu.hash": {
+        "type": 1879048182,
+        "flags": 2,
+        "address": 16392,
+        "bytes": 17652,
+        "sha256": "a18ba110bcffb141628761326f2f7d25023c407e3e70d6dedc1e7c9a49e6f10d"
+      },
+      ".dynsym": {
+        "type": 11,
+        "flags": 2,
+        "address": 34048,
+        "bytes": 69816,
+        "sha256": "30a6cbc2837fd23e8f1abd19892c1aa8bc236d9e2602bed69880bb579d11783d"
+      },
+      ".dynstr": {
+        "type": 3,
+        "flags": 2,
+        "address": 103864,
+        "bytes": 31802,
+        "sha256": "30f9da8e975d35082083fc976bd246325feabdd2a97eb04812406e91fe6cf66c"
+      },
+      ".gnu.version": {
+        "type": 1879048191,
+        "flags": 2,
+        "address": 135666,
+        "bytes": 5818,
+        "sha256": "65e81c07a6646f7ee5796350cacb6131aa9d21a43e0d9394d3740ac85d22e9ca"
+      },
+      ".gnu.version_d": {
+        "type": 1879048189,
+        "flags": 2,
+        "address": 141488,
+        "bytes": 444,
+        "sha256": "3d57f4c0d7ac940ad2a9828c11fa1c416d51cb26f7b098cf2a051da7bb4938ee"
+      },
+      ".gnu.version_r": {
+        "type": 1879048190,
+        "flags": 2,
+        "address": 141936,
+        "bytes": 48,
+        "sha256": "4734df8691306db12f50c57a905738dcd96aff38a9bcd231bd1c078123049970"
+      },
+      ".rela.dyn": {
+        "type": 4,
+        "flags": 2,
+        "address": 141984,
+        "bytes": 28440,
+        "sha256": "17867025c90aeb18f5890fef8a4430a63ee1f3d35ec47364706cdf64db99735b"
+      },
+      ".rela.plt": {
+        "type": 4,
+        "flags": 66,
+        "address": 170424,
+        "bytes": 408,
+        "sha256": "87849cb8a06a43651ad7a35d72da680996d24f9d725e7170f540b18c5cc88854"
+      },
+      ".plt": {
+        "type": 1,
+        "flags": 6,
+        "address": 170832,
+        "bytes": 304,
+        "sha256": "51e6f16b17aef8118eef14632775cdd4d74fc452aa3326cb62cd9f408f150603"
+      },
+      ".text": {
+        "type": 1,
+        "flags": 6,
+        "address": 171136,
+        "bytes": 950916,
+        "sha256": "881aab5168cb1f6069949a5fe0804d06cb64c7db3c463cd9142b59cc065ef095"
+      },
+      "__libc_freeres_fn": {
+        "type": 1,
+        "flags": 6,
+        "address": 1122052,
+        "bytes": 3844,
+        "sha256": "88494d53a8002440dedcb61e04bc43034f3e0484d54d3a3f13da5a6c7629c533"
+      },
+      ".rodata": {
+        "type": 1,
+        "flags": 2,
+        "address": 1125904,
+        "bytes": 139200,
+        "sha256": "0f51067c0d037dc38dfb0aeb3d858b5987200bf5c0369c2981d587404056070e"
+      },
+      ".interp": {
+        "type": 1,
+        "flags": 2,
+        "address": 1265104,
+        "bytes": 33,
+        "sha256": "9ac872c437600d47ee410e1f78ac424bf71eb8d580d08536d6d4fbd41260847c"
+      },
+      ".eh_frame_hdr": {
+        "type": 1,
+        "flags": 2,
+        "address": 1265140,
+        "bytes": 27532,
+        "sha256": "b62ef9f1eb9f93ddd6dab3afc7adb8cd615fb7ec46f68d1e70bfa2a81b5498ba"
+      },
+      ".eh_frame": {
+        "type": 1,
+        "flags": 2,
+        "address": 1292672,
+        "bytes": 139012,
+        "sha256": "b1c84e79eb609c8b4e9019026cd59749636733c38633e5463a5186a5d8d16bf6"
+      },
+      ".gcc_except_table": {
+        "type": 1,
+        "flags": 2,
+        "address": 1431684,
+        "bytes": 832,
+        "sha256": "e06f498402a783f2e5ca384548d4e81fd9b3c982f219d4514ecd3a4922a09a3a"
+      },
+      ".note.ABI-tag": {
+        "type": 7,
+        "flags": 2,
+        "address": 1432516,
+        "bytes": 32,
+        "sha256": "8cdce5f880d02a85ff95c078d913b2979a16710487fb5c203f4b6e8d58437795"
+      },
+      ".tdata": {
+        "type": 1,
+        "flags": 1027,
+        "address": 1434368,
+        "bytes": 16,
+        "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+      },
+      ".tbss": {
+        "type": 8,
+        "flags": 1027,
+        "address": 1434384,
+        "bytes": 120,
+        "sha256": null
+      },
+      ".init_array": {
+        "type": 14,
+        "flags": 3,
+        "address": 1434384,
+        "bytes": 16,
+        "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+      },
+      "__libc_subfreeres": {
+        "type": 1,
+        "flags": 2097155,
+        "address": 1434400,
+        "bytes": 232,
+        "sha256": "c4fcd50d9f0c893c46288b57d8e62b18523145956b249b6ecd6c21718be49065"
+      },
+      "__libc_IO_vtables": {
+        "type": 1,
+        "flags": 3,
+        "address": 1434632,
+        "bytes": 2352,
+        "sha256": "f81c4fa3aa1ad49efe00502d9d9a92330a660f1b0325d9184f23bf478e96e22e"
+      },
+      ".data.rel.ro": {
+        "type": 1,
+        "flags": 3,
+        "address": 1436984,
+        "bytes": 8424,
+        "sha256": "63b796e6fb5ae82d8973955b0f998644f9e668ec950c1763cbeb847f98038f79"
+      },
+      ".dynamic": {
+        "type": 6,
+        "flags": 3,
+        "address": 1445408,
+        "bytes": 480,
+        "sha256": "86b2210df3a544205ad3d6b788294940e614c45bffda9645e26d19da1c8f89b4"
+      },
+      ".data": {
+        "type": 1,
+        "flags": 3,
+        "address": 1445888,
+        "bytes": 5376,
+        "sha256": "96993ea1412592ecf6d37bff83467862f6a9dd3770ccaa841711c73517f82a06"
+      },
+      ".got": {
+        "type": 1,
+        "flags": 3,
+        "address": 1451264,
+        "bytes": 760,
+        "sha256": "e34cdb1957bb2a60fe28b6cf11dfb9dc8923cc99e5199459eb33b31058d9daf4"
+      },
+      ".bss": {
+        "type": 8,
+        "flags": 3,
+        "address": 1452024,
+        "bytes": 51400,
+        "sha256": null
+      }
+    },
+    "target_abi_probe": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/regex-natural-demand-20261121/preparation-001/abi_probe.o",
+      "bytes": 1312,
+      "sha256": "105f38365e63770dde97d2e9020367f27a6c67ab8f3145700482ac6c4b9dac60"
+    },
+    "abi": {
+      "regex_t_bytes": 64,
+      "re_nsub_offset": 48,
+      "regoff_t_bytes": 4,
+      "regmatch_t_bytes": 8,
+      "pointer_bytes": 8
+    },
+    "source_limit": "SDK riscv-gnu-toolchain/glibc source2.42 is NOT this runtime; excluded. Bootlin archive not visible here; no fresh archive authentication claim."
+  },
+  "independent_python_oracle_cases": [
+    {
+      "input_bytes": 0,
+      "seed": 0,
+      "requests": 19,
+      "blocks": 1
+    },
+    {
+      "input_bytes": 1,
+      "seed": 7,
+      "requests": 19,
+      "blocks": 1
+    },
+    {
+      "input_bytes": 4097,
+      "seed": 71,
+      "requests": 19,
+      "blocks": 2
+    },
+    {
+      "input_bytes": 8193,
+      "seed": 197,
+      "requests": 19,
+      "blocks": 3
+    },
+    {
+      "input_bytes": 32769,
+      "seed": 991,
+      "requests": 19,
+      "blocks": 9
+    }
+  ],
+  "error": "AssertionError()"
+}
