@@ -1,0 +1,708 @@
+TOP ?= $(shell git rev-parse --show-toplevel)
+
+SDK_LINUX_DIR ?= $(TOP)/import/black-parrot-sdk/linux
+SDK_OPENSBI_DIR ?= $(SDK_LINUX_DIR)/opensbi
+LINUX_RISCV ?= $(SDK_LINUX_DIR)/linux.riscv
+BP_LINUX_CC ?= riscv64-unknown-linux-gnu-gcc
+BP_LINUX_CC_PATH := $(shell command -v $(BP_LINUX_CC) 2>/dev/null)
+BP_LINUX_PREFIX ?= $(patsubst %gcc,%,$(BP_LINUX_CC_PATH))
+BP_LINUX_TOOLCHAIN_BIN ?= $(dir $(BP_LINUX_CC_PATH))
+BP_LINUX_TARGET ?= $(patsubst %-gcc,%,$(notdir $(BP_LINUX_CC_PATH)))
+BP_LINUX_DYNAMIC_CC ?= $(SDK_LINUX_DIR)/work/buildroot/host/bin/riscv64-linux-gcc
+BP_OBJCOPY ?= $(TOP)/install/bin/riscv64-unknown-elf-objcopy
+BP_DTS_PYTHON ?= python3
+BP_CPIO ?= cpio
+NBF_TOOL ?= $(TOP)/import/black-parrot/bp_common/software/py/nbf.py
+NBF_CSR_CHECK ?= $(TOP)/codex-skills/bp-fpga-synthesis/scripts/check_nbf_csr_collisions.sh
+ELF_CSR_CHECK ?= $(TOP)/tools/check_elf_csr_collisions.py
+NBF_TIMER_PATCH ?= $(TOP)/tools/patch_linux_nbf_timer.py
+BASELINE_LINUX_NBF ?= $(TOP)/riscv/linux/linux-6.6-jhumphri-20250125.nbf
+TIMEBASE_FREQUENCY ?= 8000000
+MEM_SIZE ?= 64
+SIM_DIR ?= $(TOP)/cosim/black-parrot-minimal-example/verilator
+SIM_NUM_THREADS ?= 2
+SIM_NUM_CONTEXTS ?= 4
+SIM_TIMEOUT_S ?= 600
+
+OUT ?= $(CURDIR)/out
+APP := $(OUT)/ctxtsw_user_smoke
+TINY_APP := $(OUT)/ctxtsw_user_tiny
+SHELL_APP := $(OUT)/ctxtsw_user_shell
+BENCH_APP := $(OUT)/ctxtsw_user_benchmark
+REQUEST_APP := $(OUT)/request_benchmark
+REQUEST_DYNAMIC_APP := $(OUT)/request_benchmark_dynamic
+REQUEST_LOAD_AHEAD_APP := $(OUT)/request_benchmark_load_ahead
+REQUEST_LOAD_AHEAD_DYNAMIC_APP := $(OUT)/request_benchmark_load_ahead_dynamic
+REQUEST_HOST_APP := $(OUT)/request_benchmark_host
+TRACE_CAPTURE_APP := $(OUT)/cache_miss_trace_capture
+TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
+PHYSICAL_PREVIEW_BENCH_APP := $(OUT)/scheduler_physical_preview_benchmark
+PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
+TAGGED_REPLAY_BENCH_APP := $(OUT)/scheduler_tagged_replay_benchmark
+TAGGED_REPLAY_BENCH_DYNAMIC_APP := $(OUT)/scheduler_tagged_replay_benchmark_dynamic
+PIPE_HINT_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_dynamic
+PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_dynamic
+PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_dynamic
+ICACHE_RETENTION_PROBE_DYNAMIC_APP := $(OUT)/icache_retention_probe_dynamic
+PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_resources_dynamic
+PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_resources_dynamic
+PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_resources_dynamic
+PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_scoped_resources_dynamic
+PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_scoped_resources_dynamic
+RETAINED29_BENCH_DYNAMIC_APP := $(OUT)/scheduler_retained29_benchmark_dynamic
+PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
+PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
+BP_HOST_CC ?= cc
+APP_NBF := $(OUT)/linux-ctxtsw-user-smoke.nbf
+TINY_INIT_NBF := $(OUT)/linux-ctxtsw-tiny-init.nbf
+DEMO_GENDTS := $(CURDIR)/gendts_ctxtsw.py
+INIT_SCRIPT := $(CURDIR)/rootfs-overlay/etc/init.d/S200ctxtsw_user_smoke.sh
+OPENSBI_PLATFORM_OVERLAY := $(CURDIR)/opensbi-platform/blackparrot
+ICACHE_PREFIX_RESULTS ?= $(TOP)/logs/icache-prefix-status-20261106/stable-cfs-anchor-prefix16-results.json
+ICACHE_PREFIX_LIMIT ?=
+ICACHE_PREFIX_HEADER := $(OPENSBI_PLATFORM_OVERLAY)/icache_prefix.h
+ICACHE_PREFIX_GENERATOR := $(CURDIR)/emit_icache_prefix_header.py
+LINUX_PREFIX_PATCH := $(CURDIR)/kernel-patches/0001-blackparrot-trigger-shared-icache-prefix.patch
+LINUX_DATA_PATCHES := \
+	$(CURDIR)/kernel-patches/0002-blackparrot-same-mm-preview.patch \
+	$(CURDIR)/kernel-patches/0004-blackparrot-four-address-preview.patch \
+	$(CURDIR)/kernel-patches/0003-blackparrot-preview-hook-count.patch \
+	$(CURDIR)/kernel-patches/0005-blackparrot-preview-guard-reasons.patch \
+	$(CURDIR)/kernel-patches/0006-blackparrot-physical-data-preview.patch \
+	$(CURDIR)/kernel-patches/0007-blackparrot-select-preview-timing.patch \
+	$(CURDIR)/kernel-patches/0008-blackparrot-gate-instruction-replay.patch \
+	$(CURDIR)/kernel-patches/0009-blackparrot-wakeup-instruction-replay.patch \
+	$(CURDIR)/kernel-patches/0010-blackparrot-wakeup-replay-late-data.patch \
+	$(CURDIR)/kernel-patches/0013-blackparrot-wakeup-data-preview.patch \
+	$(CURDIR)/kernel-patches/0014-blackparrot-wakeup-pma-drop-control.patch \
+	$(CURDIR)/kernel-patches/0015-blackparrot-preview-hook-timing.patch \
+	$(CURDIR)/kernel-patches/0016-blackparrot-wakeup-data-only.patch \
+	$(CURDIR)/kernel-patches/0017-blackparrot-tagged-data-replay.patch \
+	$(CURDIR)/kernel-patches/0018-blackparrot-tagged-data-replay-late.patch \
+	$(CURDIR)/kernel-patches/0020-blackparrot-tagged-data-instruction-split.patch \
+	$(CURDIR)/kernel-patches/0021-blackparrot-dedicated-wakeup-instruction-replay.patch \
+	$(CURDIR)/kernel-patches/0022-blackparrot-icache-prefix-status.patch \
+	$(CURDIR)/kernel-patches/0023-blackparrot-explicit-instruction-prefix-trigger.patch \
+	$(CURDIR)/kernel-patches/0024-blackparrot-select-instruction-prefix-range.patch \
+	$(CURDIR)/kernel-patches/0025-blackparrot-explicit-data-replay-trigger.patch \
+	$(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch \
+	$(CURDIR)/kernel-patches/0027-blackparrot-icache-retention-control.patch \
+	$(CURDIR)/kernel-patches/0028-blackparrot-mode14-early-only.patch
+LINUX_DATA_PREVIOUS_TAIL := $(CURDIR)/kernel-patches/0027-blackparrot-icache-retention-control.patch
+LINUX_DATA_PRE_RETENTION_TAIL := $(CURDIR)/kernel-patches/0026-blackparrot-early-futex-instruction-replay.patch
+LINUX_BUILD_DIR ?= $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6
+GENERATED_DTS := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dts
+GENERATED_DTB := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/blackparrot.dtb
+ROOTFS_CPIO := $(SDK_LINUX_DIR)/work/buildroot/images/rootfs.cpio
+KERNEL_INITRAMFS := $(SDK_LINUX_DIR)/work/buildroot/build/linux-6.6/usr/initramfs_inc_data
+VMLINUX_BIN := $(SDK_LINUX_DIR)/work/buildroot/images/vmlinux.bin
+VMLINUX_ELF := $(SDK_LINUX_DIR)/work/buildroot/images/vmlinux
+OPENSBI_PAYLOAD := $(SDK_LINUX_DIR)/work/opensbi/platform/generic/blackparrot/firmware/fw_payload.elf
+TINY_BOOTARGS := console=hvc0 loglevel=8 rdinit=/ctxtsw_user_tiny
+TINY_TARGET_SYSCALL ?= 1
+BENCH_NUM_CONTEXTS ?= 4
+# The checked-in FPGA acceptance configuration has ten logical contexts.  The
+# CSR 0x802 register-seed ABI places its register field immediately above the
+# elaborated context-ID field, so this value must match the bitstream.
+REQUEST_NUM_CONTEXTS ?= 10
+
+CFLAGS := -O2 -static -Wall -Wextra -Werror \
+  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany
+# These two FPGA measurement programs were accepted with the SDK's explicit
+# fence.i ISA spelling and default code model. Keep their byte-exact build
+# provenance separate from the older medany test-program default above.
+PHYSICAL_PREVIEW_CFLAGS := -O2 -static -Wall -Wextra -Werror \
+  -march=rv64imafdc_zicsr_zifencei -mabi=lp64d
+# Keep the historical 76-column transfer by default, but allow longer chunks
+# for fragile slow-UART board sessions. Values well below the guest shell's
+# command-line limit reduce prompt round trips without changing ELF bytes.
+PHYSICAL_PREVIEW_TRANSFER_WIDTH ?= 76
+
+.PHONY: app tiny check-linux-cc check-linux-dynamic-cc check-image-toolchain icache-prefix-header stage-opensbi-platform stage-linux-prefix-trigger stage-linux-data-preview stage-rootfs linux-image tiny-init-linux-image tiny-init-linux-image-resume validate-tiny-init-image package-tiny-init-nbf simulate-tiny-init emit-tiny-transfer clean
+
+app: $(APP)
+
+# These small ELFs must reflect the selected compiler and flags on every call,
+# including A -> B -> A changes with the same output name. Keep compiler output
+# on stderr so redirected emit-*-transfer output remains executable shell text.
+.PHONY: FORCE check-harness
+.DELETE_ON_ERROR:
+FORCE:
+
+$(APP): ctxtsw_user_smoke.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -o $@ $< >&2
+
+# No-libc version for the first interactive-shell demonstration.  Its small
+# static ELF can be transferred through the BlackParrot console without
+# rebuilding Buildroot or the kernel.
+tiny: $(TINY_APP)
+
+$(TINY_APP): ctxtsw_user_tiny.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
+	  -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
+	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) \
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $< >&2
+
+# Keep the shell variant separate: do not change the PID-1 acceptance binary.
+.PHONY: shell-app emit-shell-transfer
+shell-app: $(SHELL_APP)
+
+.PHONY: benchmark emit-benchmark-transfer
+benchmark: $(BENCH_APP)
+
+# No CRT initializes gp: disable linker relaxation into gp-relative accesses.
+$(BENCH_APP): ctxtsw_user_benchmark.c ../testing/mt_seed.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) -Os -Wall -Wextra -Werror -static -nostdlib -nostartfiles \
+	  -ffreestanding -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -mno-relax \
+	  -DBP_NUM_CONTEXTS=$(BENCH_NUM_CONTEXTS) -o $@ $< >&2
+
+emit-benchmark-transfer: check-linux-cc benchmark
+	@printf '%s\n' ': > /tmp/ctxtsw_user_benchmark.b64'
+	@base64 -w 76 $(BENCH_APP) | sed "s|.*|echo '&' >> /tmp/ctxtsw_user_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_benchmark.b64 > /tmp/ctxtsw_user_benchmark' 'chmod +x /tmp/ctxtsw_user_benchmark'
+
+# These pthread comparisons are independent of the custom-CSR shell demo.
+.PHONY: request-benchmark request-benchmark-dynamic request-benchmark-load-ahead request-benchmark-load-ahead-dynamic request-benchmark-host check-request-benchmark emit-request-transfer emit-request-dynamic-transfer emit-request-load-ahead-transfer emit-request-load-ahead-dynamic-transfer cache-miss-trace-capture cache-miss-trace-capture-dynamic emit-cache-miss-trace-transfer emit-cache-miss-trace-dynamic-transfer physical-preview-benchmark physical-preview-benchmark-dynamic emit-physical-preview-benchmark-transfer emit-physical-preview-benchmark-dynamic-transfer tagged-replay-benchmark tagged-replay-benchmark-dynamic emit-tagged-replay-benchmark-transfer emit-tagged-replay-benchmark-dynamic-transfer physical-preview-trace physical-preview-trace-dynamic emit-physical-preview-trace-transfer emit-physical-preview-trace-dynamic-transfer
+request-benchmark: $(REQUEST_APP)
+request-benchmark-dynamic: $(REQUEST_DYNAMIC_APP)
+request-benchmark-load-ahead: $(REQUEST_LOAD_AHEAD_APP)
+request-benchmark-load-ahead-dynamic: $(REQUEST_LOAD_AHEAD_DYNAMIC_APP)
+request-benchmark-host: $(REQUEST_HOST_APP)
+cache-miss-trace-capture: $(TRACE_CAPTURE_APP)
+cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
+physical-preview-benchmark: $(PHYSICAL_PREVIEW_BENCH_APP)
+physical-preview-benchmark-dynamic: $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP)
+tagged-replay-benchmark: $(TAGGED_REPLAY_BENCH_APP)
+tagged-replay-benchmark-dynamic: $(TAGGED_REPLAY_BENCH_DYNAMIC_APP)
+physical-preview-trace: $(PHYSICAL_PREVIEW_TRACE_APP)
+physical-preview-trace-dynamic: $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP)
+
+# Separate output names retain the historical faulting-load control. The default
+# emits the implemented Zicbop hint in both C batching and resident assembly.
+$(REQUEST_APP) $(REQUEST_LOAD_AHEAD_APP): request_benchmark.c ../software/include/bp_prefetch.h ../software/include/bp_load_ahead.h ../testing/mt_seed.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=$(REQUEST_NUM_CONTEXTS) \
+	  -DBP_REQUEST_LOAD_AHEAD=$(if $(filter $(REQUEST_LOAD_AHEAD_APP),$@),1,0) -o $@ $< >&2
+
+# Optional compact shell-transfer ELF. The guest must provide the matching
+# RV64 lp64d dynamic loader and all required GLIBC symbol versions.
+$(REQUEST_DYNAMIC_APP) $(REQUEST_LOAD_AHEAD_DYNAMIC_APP): request_benchmark.c ../software/include/bp_prefetch.h ../software/include/bp_load_ahead.h ../testing/mt_seed.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread \
+	  -DBP_NUM_THREADS=2 -DBP_NUM_CONTEXTS=$(REQUEST_NUM_CONTEXTS) \
+	  -DBP_REQUEST_LOAD_AHEAD=$(if $(filter $(REQUEST_LOAD_AHEAD_DYNAMIC_APP),$@),1,0) -o $@ $< >&2
+
+$(REQUEST_HOST_APP): request_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_HOST_CC) -std=c11 -O2 -Wall -Wextra -Werror -pthread -o $@ $< >&2
+
+$(TRACE_CAPTURE_APP): cache_miss_trace_capture.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=c11 -pthread -o $@ $< >&2
+
+$(TRACE_CAPTURE_DYNAMIC_APP): cache_miss_trace_capture.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(CFLAGS)) -no-pie -std=c11 -pthread -o $@ $< >&2
+
+$(PHYSICAL_PREVIEW_BENCH_APP): scheduler_physical_preview_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
+
+$(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+$(TAGGED_REPLAY_BENCH_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
+
+$(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+$(PIPE_HINT_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+# Separate ABI29/markers/CLI; never rebuild a legacy artifact under new flags.
+$(RETAINED29_BENCH_DYNAMIC_APP): scheduler_retained29_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+.PHONY: retained29-benchmark-dynamic emit-retained29-benchmark-compressed-transfer
+retained29-benchmark-dynamic: $(RETAINED29_BENCH_DYNAMIC_APP)
+emit-retained29-benchmark-compressed-transfer: check-linux-dynamic-cc retained29-benchmark-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(RETAINED29_BENCH_DYNAMIC_APP)
+
+# A distinct ELF preserves the exact plain-workload comparison corpus.
+$(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -o $@ $< -lz >&2
+
+# Keep runtime-policy/whole-cell instrumentation out of the historical ELF.
+$(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
+
+$(ICACHE_RETENTION_PROBE_DYNAMIC_APP): icache_retention_probe.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+$(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -o $@ $< -lz >&2
+
+# Plain request workloads need resource/whole-cell timing without zlib or the
+# experimental retention CSR ABI. Keep every existing ELF recipe unchanged.
+$(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_RESOURCE_STATS=1 -o $@ $< >&2
+
+$(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
+
+# Scoped resources use distinct files: historical whole-cell ELFs retain their
+# exact recipes while new mode-14 cells reset/drain before observer output.
+$(PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_COMPLETE_POLICY_SCOPE=1 -o $@ $< >&2
+
+$(PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_COMPLETE_POLICY_SCOPE=1 -o $@ $< -lz >&2
+
+$(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
+
+$(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+emit-request-transfer: check-linux-cc request-benchmark
+	@printf '%s\n' ': > /tmp/request_benchmark.b64'
+	@base64 -w 76 $(REQUEST_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark.b64 > /tmp/request_benchmark' 'chmod +x /tmp/request_benchmark'
+
+emit-request-dynamic-transfer: check-linux-dynamic-cc request-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/request_benchmark_dynamic.b64'
+	@base64 -w 76 $(REQUEST_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark_dynamic.b64 > /tmp/request_benchmark_dynamic' 'chmod +x /tmp/request_benchmark_dynamic'
+
+emit-request-load-ahead-transfer: check-linux-cc request-benchmark-load-ahead
+	@printf '%s\n' ': > /tmp/request_benchmark_load_ahead.b64'
+	@base64 -w 76 $(REQUEST_LOAD_AHEAD_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_load_ahead.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark_load_ahead.b64 > /tmp/request_benchmark_load_ahead' 'chmod +x /tmp/request_benchmark_load_ahead'
+
+emit-request-load-ahead-dynamic-transfer: check-linux-dynamic-cc request-benchmark-load-ahead-dynamic
+	@printf '%s\n' ': > /tmp/request_benchmark_load_ahead_dynamic.b64'
+	@base64 -w 76 $(REQUEST_LOAD_AHEAD_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/request_benchmark_load_ahead_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/request_benchmark_load_ahead_dynamic.b64 > /tmp/request_benchmark_load_ahead_dynamic' 'chmod +x /tmp/request_benchmark_load_ahead_dynamic'
+
+emit-cache-miss-trace-transfer: check-linux-cc cache-miss-trace-capture
+	@printf '%s\n' ': > /tmp/cache_miss_trace_capture.b64'
+	@base64 -w 76 $(TRACE_CAPTURE_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture.b64|"
+	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture.b64 > /tmp/cache_miss_trace_capture' 'chmod +x /tmp/cache_miss_trace_capture'
+
+emit-cache-miss-trace-dynamic-transfer: check-linux-dynamic-cc cache-miss-trace-capture-dynamic
+	@printf '%s\n' ': > /tmp/cache_miss_trace_capture_dynamic.b64'
+	@base64 -w 76 $(TRACE_CAPTURE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/cache_miss_trace_capture_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/cache_miss_trace_capture_dynamic.b64 > /tmp/cache_miss_trace_capture_dynamic' 'chmod +x /tmp/cache_miss_trace_capture_dynamic'
+
+emit-physical-preview-benchmark-transfer: check-linux-cc physical-preview-benchmark
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark.b64 > /tmp/scheduler_physical_preview_benchmark' 'chmod +x /tmp/scheduler_physical_preview_benchmark'
+
+emit-physical-preview-benchmark-dynamic-transfer: check-linux-dynamic-cc physical-preview-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_benchmark_dynamic.b64 > /tmp/scheduler_physical_preview_benchmark_dynamic' 'chmod +x /tmp/scheduler_physical_preview_benchmark_dynamic'
+
+emit-tagged-replay-benchmark-transfer: check-linux-cc tagged-replay-benchmark
+	@printf '%s\n' ': > /tmp/scheduler_tagged_replay_benchmark.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark.b64 > /tmp/scheduler_tagged_replay_benchmark' 'chmod +x /tmp/scheduler_tagged_replay_benchmark'
+
+emit-tagged-replay-benchmark-dynamic-transfer: check-linux-dynamic-cc tagged-replay-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_tagged_replay_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(TAGGED_REPLAY_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_tagged_replay_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_tagged_replay_benchmark_dynamic.b64 > /tmp/scheduler_tagged_replay_benchmark_dynamic' 'chmod +x /tmp/scheduler_tagged_replay_benchmark_dynamic'
+
+.PHONY: pipe-hint-benchmark-dynamic emit-pipe-hint-benchmark-dynamic-transfer
+pipe-hint-benchmark-dynamic: $(PIPE_HINT_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
+
+.PHONY: pipe-hint-benchmark-zlib-dynamic emit-pipe-hint-benchmark-zlib-dynamic-transfer
+pipe-hint-benchmark-zlib-dynamic: $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-retention-dynamic emit-pipe-hint-benchmark-retention-dynamic-transfer
+pipe-hint-benchmark-retention-dynamic: $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP)
+
+.PHONY: icache-retention-probe-dynamic emit-icache-retention-probe-dynamic-transfer
+icache-retention-probe-dynamic: $(ICACHE_RETENTION_PROBE_DYNAMIC_APP)
+
+emit-icache-retention-probe-dynamic-transfer: check-linux-dynamic-cc icache-retention-probe-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(ICACHE_RETENTION_PROBE_DYNAMIC_APP)
+
+.PHONY: emit-pipe-hint-benchmark-zlib-compressed-transfer emit-pipe-hint-benchmark-retention-compressed-transfer
+emit-pipe-hint-benchmark-zlib-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-zlib-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-retention-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-resources-dynamic pipe-hint-benchmark-retention-resources-dynamic emit-pipe-hint-benchmark-resources-compressed-transfer emit-pipe-hint-benchmark-retention-resources-compressed-transfer
+pipe-hint-benchmark-resources-dynamic: $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)
+pipe-hint-benchmark-retention-resources-dynamic: $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-plain-resources-dynamic emit-pipe-hint-benchmark-plain-resources-compressed-transfer
+pipe-hint-benchmark-plain-resources-dynamic: $(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-plain-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-plain-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-plain-scoped-resources-dynamic pipe-hint-benchmark-zlib-scoped-resources-dynamic emit-pipe-hint-benchmark-plain-scoped-resources-compressed-transfer emit-pipe-hint-benchmark-zlib-scoped-resources-compressed-transfer
+pipe-hint-benchmark-plain-scoped-resources-dynamic: $(PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+pipe-hint-benchmark-zlib-scoped-resources-dynamic: $(PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-plain-scoped-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-plain-scoped-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-zlib-scoped-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-zlib-scoped-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-retention-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-retention-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-retention-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_RETENTION_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
+
+# The guest destination stays compatible with the hash-bound serialized runner.
+emit-pipe-hint-benchmark-zlib-dynamic-transfer: check-linux-dynamic-cc pipe-hint-benchmark-zlib-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_pipe_hint_benchmark_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_pipe_hint_benchmark_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_pipe_hint_benchmark_dynamic.b64 > /tmp/scheduler_pipe_hint_benchmark_dynamic' 'chmod +x /tmp/scheduler_pipe_hint_benchmark_dynamic'
+
+emit-physical-preview-trace-transfer: check-linux-cc physical-preview-trace
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture.b64 > /tmp/scheduler_physical_preview_trace_capture' 'chmod +x /tmp/scheduler_physical_preview_trace_capture'
+
+emit-physical-preview-trace-dynamic-transfer: check-linux-dynamic-cc physical-preview-trace-dynamic
+	@printf '%s\n' ': > /tmp/scheduler_physical_preview_trace_capture_dynamic.b64'
+	@base64 -w $(PHYSICAL_PREVIEW_TRANSFER_WIDTH) $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP) | sed "s|.*|echo '&' >> /tmp/scheduler_physical_preview_trace_capture_dynamic.b64|"
+	@printf '%s\n' 'base64 -d /tmp/scheduler_physical_preview_trace_capture_dynamic.b64 > /tmp/scheduler_physical_preview_trace_capture_dynamic' 'chmod +x /tmp/scheduler_physical_preview_trace_capture_dynamic'
+
+check-request-benchmark:
+	@BP_HOST_CC='$(BP_HOST_CC)' python3 -m unittest discover -s $(CURDIR) -p test_request_benchmark.py
+
+$(SHELL_APP): ctxtsw_user_tiny.c Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) -Os -static -nostdlib -nostartfiles -ffreestanding \
+	  -fno-stack-protector -ffixed-s11 -Wl,-e,_start -Wl,--build-id=none \
+	  -DBP_TARGET_SYSCALL=$(TINY_TARGET_SYSCALL) -DBP_POWEROFF_ON_PASS=0 \
+	  -march=rv64imafdc_zicsr -mabi=lp64d -mcmodel=medany -o $@ $< >&2
+
+# Print commands suitable for an interactive BusyBox shell.
+# The shell needs only its standard base64 applet and a writable /tmp.
+emit-tiny-transfer emit-shell-transfer: check-linux-cc shell-app
+	@printf '%s\n' ': > /tmp/ctxtsw_user_shell.b64'
+	@base64 -w 76 $(SHELL_APP) | sed "s|.*|echo '&' >> /tmp/ctxtsw_user_shell.b64|"
+	@printf '%s\n' 'base64 -d /tmp/ctxtsw_user_shell.b64 > /tmp/ctxtsw_user_shell' 'chmod +x /tmp/ctxtsw_user_shell'
+
+check-linux-cc:
+	@command -v $(BP_LINUX_CC) >/dev/null || { \
+	  echo "missing BP_LINUX_CC=$(BP_LINUX_CC); point it at the matching Linux SDK compiler" >&2; exit 2; \
+	}
+	@command -v $(BP_LINUX_PREFIX)strip >/dev/null || { \
+	  echo "missing matching Linux strip tool $(BP_LINUX_PREFIX)strip" >&2; exit 2; \
+	}
+	@command -v $(BP_LINUX_PREFIX)objcopy >/dev/null || { \
+	  echo "missing matching Linux objcopy tool $(BP_LINUX_PREFIX)objcopy" >&2; exit 2; \
+	}
+
+check-linux-dynamic-cc:
+	@test -x $(BP_LINUX_DYNAMIC_CC) || { \
+	  echo "missing BP_LINUX_DYNAMIC_CC=$(BP_LINUX_DYNAMIC_CC); prepare the matching Buildroot image toolchain" >&2; exit 2; \
+	}
+
+# Building an image additionally needs the bare-metal objcopy and the NBF
+# collision guard.  Keep those separate from the tiny shell-transfer path,
+# which only builds a Linux ELF and should have no unnecessary dependency.
+check-image-toolchain: check-linux-cc
+	@command -v $(BP_OBJCOPY) >/dev/null || { \
+	  echo "missing BP_OBJCOPY=$(BP_OBJCOPY)" >&2; exit 2; \
+	}
+	@command -v $(BP_DTS_PYTHON) >/dev/null || { \
+	  echo "missing BP_DTS_PYTHON=$(BP_DTS_PYTHON)" >&2; exit 2; \
+	}
+	@command -v $(BP_CPIO) >/dev/null || { \
+	  echo "missing BP_CPIO=$(BP_CPIO)" >&2; exit 2; \
+	}
+	@command -v dtc >/dev/null || { echo "missing dtc" >&2; exit 2; }
+	@command -v fdtget >/dev/null || { echo "missing fdtget" >&2; exit 2; }
+	@command -v gzip >/dev/null || { echo "missing gzip" >&2; exit 2; }
+	@command -v fdtput >/dev/null || { echo "missing fdtput" >&2; exit 2; }
+	@test -x $(NBF_CSR_CHECK)
+	@test -x $(ELF_CSR_CHECK)
+	@test -x $(NBF_TIMER_PATCH)
+	@test -f $(BASELINE_LINUX_NBF) || { \
+	  echo "missing BASELINE_LINUX_NBF=$(BASELINE_LINUX_NBF)" >&2; exit 2; \
+	}
+	$(NBF_CSR_CHECK) $(BASELINE_LINUX_NBF) 800 801 802 803 804
+
+# The pinned OpenSBI revision does not track BlackParrot's board platform even
+# though the SDK Makefile selects it.  Materialize the known-working platform
+# overlay explicitly so a clean checkout does not depend on Jack's old home
+# directory or an untracked nested-submodule file.
+icache-prefix-header:
+	python3 $(ICACHE_PREFIX_GENERATOR) --results $(ICACHE_PREFIX_RESULTS) \
+	  $(if $(ICACHE_PREFIX_LIMIT),--limit $(ICACHE_PREFIX_LIMIT)) \
+	  --output $(ICACHE_PREFIX_HEADER)
+
+stage-opensbi-platform: icache-prefix-header
+	@test -f $(OPENSBI_PLATFORM_OVERLAY)/platform.c
+	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/Kconfig $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/Kconfig
+	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/objects.mk $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/objects.mk
+	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/platform.c $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/platform.c
+	install -D -m 0644 $(ICACHE_PREFIX_HEADER) $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/icache_prefix.h
+	install -D -m 0644 $(OPENSBI_PLATFORM_OVERLAY)/configs/defconfig $(SDK_OPENSBI_DIR)/platform/generic/blackparrot/configs/defconfig
+
+# Apply the scheduler launch hook only after Buildroot has materialized the
+# pinned Linux 6.6 source tree. The reverse check makes this target idempotent.
+stage-linux-prefix-trigger:
+	@test -f $(LINUX_BUILD_DIR)/kernel/sched/core.c || { \
+	  echo "missing Linux build tree $(LINUX_BUILD_DIR); prepare the SDK work tree first" >&2; exit 2; \
+	}
+	@if grep -Fq 'asm volatile("csrw 0x5c0, zero"' $(LINUX_BUILD_DIR)/kernel/sched/core.c; then \
+	  echo "shared I-cache prefix trigger already present"; \
+	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse < $(LINUX_PREFIX_PATCH) >/dev/null 2>&1; then \
+	  echo "shared I-cache prefix trigger already applied"; \
+	else \
+	  patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward < $(LINUX_PREFIX_PATCH); \
+	  patch -d $(LINUX_BUILD_DIR) -p1 --forward < $(LINUX_PREFIX_PATCH); \
+	fi
+
+# Apply the measured data-preview stack after the independent instruction
+# trigger. Later patches rewrite context from earlier patches, so individual
+# reverse checks are not reliable. Recognize the complete current stack, the
+# preceding retention/early-futex tails, or a clean tree; reject partial tails.
+stage-linux-data-preview: stage-linux-prefix-trigger
+	@set -e; if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(LINUX_DATA_PREVIOUS_TAIL) >/dev/null 2>&1; then \
+		if patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+			< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+			echo "physical data-preview stack already applied"; \
+		else \
+			patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+				< $(lastword $(LINUX_DATA_PATCHES)); \
+			patch -d $(LINUX_BUILD_DIR) -p1 --forward \
+				< $(lastword $(LINUX_DATA_PATCHES)); \
+		fi; \
+	elif grep -Eq 'PR_BP_ICACHE_RETENTION_(CONTROL|STATUS)|bp_icache_retention_' \
+		$(LINUX_BUILD_DIR)/kernel/sys.c $(LINUX_BUILD_DIR)/include/uapi/linux/prctl.h; then \
+		echo "partial I-retention patch; restore the complete previous stack before staging" >&2; exit 1; \
+	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(lastword $(LINUX_DATA_PATCHES)) >/dev/null 2>&1; then \
+		echo "mode-14 tail present without complete I-retention patch" >&2; exit 1; \
+	elif patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --reverse \
+		< $(LINUX_DATA_PRE_RETENTION_TAIL) >/dev/null 2>&1; then \
+		patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+			< $(LINUX_DATA_PREVIOUS_TAIL); \
+		patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+			< $(lastword $(LINUX_DATA_PATCHES)); \
+		patch -d $(LINUX_BUILD_DIR) -p1 --forward \
+			< $(LINUX_DATA_PREVIOUS_TAIL); \
+		patch -d $(LINUX_BUILD_DIR) -p1 --forward \
+			< $(lastword $(LINUX_DATA_PATCHES)); \
+	else \
+		set -e; for patch_file in $(LINUX_DATA_PATCHES); do \
+			patch -d $(LINUX_BUILD_DIR) -p1 --dry-run --forward \
+				< $$patch_file >/dev/null; \
+			patch -d $(LINUX_BUILD_DIR) -p1 --forward < $$patch_file; \
+		done; \
+	fi
+
+# Build only the application and install it into an already-created SDK
+# sysroot.  This makes application-only edits cheap once a Linux work tree is
+# prepared, and keeps all generated rootfs state outside the source overlay.
+stage-rootfs: check-image-toolchain app
+	@test -d $(SDK_LINUX_DIR)/work/sysroot || { \
+	  echo "missing SDK sysroot; run make -C $(SDK_LINUX_DIR) sysroot first" >&2; exit 2; \
+	}
+	install -D -m 0755 $(APP) $(SDK_LINUX_DIR)/work/sysroot/usr/bin/ctxtsw_user_smoke
+	install -D -m 0755 $(INIT_SCRIPT) $(SDK_LINUX_DIR)/work/sysroot/etc/init.d/S200ctxtsw_user_smoke.sh
+
+# Rebuild a boot image with the smoke executable in its initramfs.  The SDK
+# Makefile does not track overlay-file changes, so clean_sysroot is deliberate:
+# it prevents a stale rootfs from being packaged as a purported demo image.
+linux-image: check-image-toolchain stage-opensbi-platform stage-linux-data-preview
+	$(MAKE) -C $(SDK_LINUX_DIR) clean_sysroot
+	$(MAKE) -C $(SDK_LINUX_DIR) sysroot WITH_SHELL=$(INIT_SCRIPT)
+	$(MAKE) stage-rootfs
+	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
+	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL=$(INIT_SCRIPT) \
+	  LINUX_TARGET=$(BP_LINUX_TARGET)
+	@mkdir -p $(OUT)
+	$(BP_OBJCOPY) -O verilog $(LINUX_RISCV) $(OUT)/linux-ctxtsw-user-smoke.mem
+	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-user-smoke.mem
+	# OpenSBI expects ordinary M-mode entry.  --debug raises BlackParrot's
+	# debug interrupt before release, causing synchronous traps to branch to the
+	# debug exception slot instead of mtvec until software executes dret.
+	python3 $(NBF_TOOL) --skip_zeros --config \
+	  --mem $(OUT)/linux-ctxtsw-user-smoke.mem --ncpus 1 > $(APP_NBF)
+	python3 $(NBF_TIMER_PATCH) --frequency $(TIMEBASE_FREQUENCY) \
+	  $(APP_NBF) $(APP_NBF).timer
+	mv $(APP_NBF).timer $(APP_NBF)
+	@echo "NBF=$(APP_NBF)"
+	@sha256sum $(APP_NBF)
+
+# Produce the acceptance image used for the FPGA/Linux proof.  A clean SDK
+# work directory is intentional: the SDK's fine-grained clean targets do not
+# reliably invalidate its embedded initramfs, so reusing them could package a
+# stale root filesystem.  Linux runs the tiny static ELF directly as PID 1,
+# before BusyBox rcS/sysctl, and the program powers off only after a proven
+# nonresident 0 -> 2 -> 0 handoff.
+tiny-init-linux-image: check-image-toolchain tiny stage-opensbi-platform
+	$(MAKE) -C $(SDK_LINUX_DIR) clean_buildroot
+	$(MAKE) -C $(SDK_LINUX_DIR) sysroot WITH_SHELL=
+	install -D -m 0755 $(TINY_APP) $(SDK_LINUX_DIR)/work/sysroot/ctxtsw_user_tiny
+	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
+	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
+	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
+	BP_DEMO_TIMEBASE_FREQUENCY='$(TIMEBASE_FREQUENCY)' \
+	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
+	  LINUX_TARGET=$(BP_LINUX_TARGET) \
+	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS) MEM_SIZE=$(MEM_SIZE)
+	$(MAKE) package-tiny-init-nbf
+
+# Resume only after a full tiny-init build reached a later packaging/toolchain
+# failure.  This preserves the compiled Buildroot/kernel checkpoint while
+# retaining the same explicit DTS generator and toolchain selection.
+tiny-init-linux-image-resume: check-image-toolchain tiny stage-opensbi-platform
+	@test -d $(SDK_LINUX_DIR)/work/buildroot || { \
+	  echo "missing prepared Buildroot work tree; run tiny-init-linux-image" >&2; exit 2; \
+	}
+	install -D -m 0755 $(TINY_APP) $(SDK_LINUX_DIR)/work/sysroot/ctxtsw_user_tiny
+	# The SDK target name does not encode generator, bootargs, timer, or memory
+	# inputs. Regenerate only these derived files so resume cannot reuse a DTB
+	# from another experiment while preserving the expensive kernel work tree.
+	$(RM) $(GENERATED_DTS) $(GENERATED_DTB)
+	PATH=$(BP_LINUX_TOOLCHAIN_BIN):$$PATH \
+	BP_BASE_GENDTS=$(SDK_LINUX_DIR)/gendts.py \
+	BP_DEMO_BOOTARGS='$(TINY_BOOTARGS)' \
+	BP_DEMO_TIMEBASE_FREQUENCY='$(TIMEBASE_FREQUENCY)' \
+	$(MAKE) -C $(SDK_LINUX_DIR) linux.riscv WITH_SHELL= \
+	  LINUX_TARGET=$(BP_LINUX_TARGET) \
+	  PYTHON=$(BP_DTS_PYTHON) GENDTS_PY=$(DEMO_GENDTS) MEM_SIZE=$(MEM_SIZE)
+	$(MAKE) package-tiny-init-nbf
+
+# Fail closed if either the DTS or initramfs is stale.  An NBF built from a
+# mismatched Linux image is not useful evidence even when its packaging works.
+validate-tiny-init-image: check-image-toolchain tiny
+	@test -f $(GENERATED_DTS) || { echo "missing generated DTS $(GENERATED_DTS)" >&2; exit 2; }
+	@grep -Fqx '        bootargs = "$(TINY_BOOTARGS)";' $(GENERATED_DTS) || { \
+	  echo "generated DTS does not contain the exact tiny-init bootargs" >&2; exit 2; \
+	}
+	@grep -Fqx '        timebase-frequency = <$(TIMEBASE_FREQUENCY)>;' $(GENERATED_DTS) || { \
+	  echo "generated DTS does not contain the exact timer frequency" >&2; exit 2; \
+	}
+	@test -f $(ROOTFS_CPIO) || { echo "missing initramfs $(ROOTFS_CPIO)" >&2; exit 2; }
+	@tmpdir=$$(mktemp -d); trap 'rm -rf "$$tmpdir"' EXIT HUP INT TERM; \
+	  cd "$$tmpdir"; \
+	  $(BP_CPIO) --quiet -id 'ctxtsw_user_tiny' < $(ROOTFS_CPIO); \
+	  test -x ctxtsw_user_tiny || { echo "initramfs PID 1 is missing or not executable" >&2; exit 2; }; \
+	  cmp -s ctxtsw_user_tiny $(TINY_APP) || { \
+	    echo "embedded ctxtsw_user_tiny differs from the current ELF" >&2; exit 2; \
+	  }
+	@test -f $(GENERATED_DTB) || { echo "missing generated DTB $(GENERATED_DTB)" >&2; exit 2; }
+	@bootargs=$$(dtc -I dtb -O dts $(GENERATED_DTB) 2>/dev/null \
+	  | sed -n 's/^[[:space:]]*bootargs = "\(.*\)";[[:space:]]*$$/\1/p'); \
+	  test "$$bootargs" = '$(TINY_BOOTARGS)' || { \
+	    echo "generated DTB does not contain the exact tiny-init bootargs" >&2; exit 2; \
+	  }
+	@timebase=$$(fdtget -t i $(GENERATED_DTB) /cpus timebase-frequency); \
+	  test "$$timebase" = '$(TIMEBASE_FREQUENCY)' || { \
+	    echo "generated DTB does not contain the exact timer frequency" >&2; exit 2; \
+	  }
+	@memory_reg=$$(fdtget -t x $(GENERATED_DTB) /memory@80000000 reg); \
+	  expected_size=$$(( $(MEM_SIZE) * 1024 * 1024 )); \
+	  expected_reg=$$(printf '0 80000000 %x %x' $$((expected_size >> 32)) $$((expected_size & 0xffffffff))); \
+	  test "$$memory_reg" = "$$expected_reg" || { \
+	    echo "generated DTB memory is '$$memory_reg', expected '$$expected_reg' for MEM_SIZE=$(MEM_SIZE)" >&2; exit 2; \
+	  }
+	@test -f $(KERNEL_INITRAMFS) || { echo "missing kernel initramfs input $(KERNEL_INITRAMFS)" >&2; exit 2; }
+	@tmpdir=$$(mktemp -d); trap 'rm -rf "$$tmpdir"' EXIT HUP INT TERM; \
+	  gzip -cd $(KERNEL_INITRAMFS) > "$$tmpdir/initramfs.cpio"; \
+	  cmp -s "$$tmpdir/initramfs.cpio" $(ROOTFS_CPIO) || { \
+	    echo "kernel embedded initramfs input differs from rootfs.cpio" >&2; exit 2; \
+	  }
+	@test -f $(VMLINUX_BIN) && test $(VMLINUX_BIN) -nt $(KERNEL_INITRAMFS) || { \
+	  echo "vmlinux payload is missing or older than its initramfs" >&2; exit 2; \
+	}
+	@test -f $(OPENSBI_PAYLOAD) \
+	  && test $(OPENSBI_PAYLOAD) -nt $(VMLINUX_BIN) \
+	  && test $(OPENSBI_PAYLOAD) -nt $(GENERATED_DTB) || { \
+	  echo "OpenSBI payload is missing or older than its kernel/DTB inputs" >&2; exit 2; \
+	}
+	@cmp -s $(OPENSBI_PAYLOAD) $(LINUX_RISCV) || { \
+	  echo "linux.riscv differs from the validated OpenSBI payload" >&2; exit 2; \
+	}
+	$(ELF_CSR_CHECK) --objdump $(BP_LINUX_PREFIX)objdump \
+	  $(VMLINUX_ELF) 800 801 802 803 804 805 806 807
+	$(ELF_CSR_CHECK) --objdump $(BP_LINUX_PREFIX)objdump --section .text \
+	  $(OPENSBI_PAYLOAD) 800 801 802 803 804 805 806 807
+	@echo "TINY_INIT_IMAGE_VALIDATED dts=$(GENERATED_DTS) dtb=$(GENERATED_DTB) rootfs=$(ROOTFS_CPIO) payload=$(LINUX_RISCV)"
+	@sha256sum $(TINY_APP) $(ROOTFS_CPIO) $(KERNEL_INITRAMFS) $(GENERATED_DTB) $(VMLINUX_BIN) $(OPENSBI_PAYLOAD) $(LINUX_RISCV)
+
+package-tiny-init-nbf: validate-tiny-init-image
+	@mkdir -p $(OUT)
+	$(BP_OBJCOPY) -O verilog $(LINUX_RISCV) $(OUT)/linux-ctxtsw-tiny-init.mem
+	sed -i 's/@8/@0/g' $(OUT)/linux-ctxtsw-tiny-init.mem
+	# OpenSBI contains no debug-mode resume stub; start it directly in M-mode.
+	python3 $(NBF_TOOL) --skip_zeros --config \
+	  --mem $(OUT)/linux-ctxtsw-tiny-init.mem --ncpus 1 > $(TINY_INIT_NBF)
+	python3 $(NBF_TIMER_PATCH) --frequency $(TIMEBASE_FREQUENCY) \
+	  $(TINY_INIT_NBF) $(TINY_INIT_NBF).timer
+	mv $(TINY_INIT_NBF).timer $(TINY_INIT_NBF)
+	@echo "NBF=$(TINY_INIT_NBF)"
+	@sha256sum $(TINY_APP) $(TINY_INIT_NBF)
+
+# The generic cosim host enters debug mode for legacy bare-metal payloads.
+# OpenSBI has no debug-ROM resume stub and must start directly in M mode.
+simulate-tiny-init:
+	@test -f $(TINY_INIT_NBF) || { echo "missing $(TINY_INIT_NBF); run package-tiny-init-nbf" >&2; exit 2; }
+	@test -x $(SIM_DIR)/obj_dir/Vbsg_nonsynth_zynq_testbench || { echo "missing Verilator model in $(SIM_DIR)" >&2; exit 2; }
+	BSG_SKIP_DEBUG_ENTRY=1 BSG_TRACE_TIMEOUT_S=$(SIM_TIMEOUT_S) \
+	  $(MAKE) -C $(SIM_DIR) run NUM_THREADS=$(SIM_NUM_THREADS) \
+	  NUM_CONTEXTS=$(SIM_NUM_CONTEXTS) NBF_FILE=$(abspath $(TINY_INIT_NBF))
+
+clean:
+	rm -rf $(OUT)
+
+check-harness:
+	@python3 -m unittest test_makefile.py test_gendts_ctxtsw.py test_icache_prefix.py \
+	  test_scheduler_physical_preview_sweep.py \
+	  test_analyze_scheduler_physical_preview_fixed_ab.py \
+	  test_compare_scheduler_physical_preview_fixed_ab.py \
+	  test_compare_scheduler_physical_preview_timing_fixed_ab.py \
+	  test_analyze_scheduler_physical_preview_table_ab.py \
+	  test_patch_nbf_memory_records.py \
+	  test_run_cache_miss_trace_capture.py test_analyze_persistent_preview_ab.py \
+	  test_run_scheduler_tagged_replay.py \
+	  test_analyze_scheduler_tagged_replay.py

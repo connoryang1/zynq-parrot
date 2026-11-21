@@ -49,6 +49,7 @@ PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_ben
 PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_resources_dynamic
 PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_scoped_resources_dynamic
 PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_scoped_resources_dynamic
+RETAINED29_BENCH_DYNAMIC_APP := $(OUT)/scheduler_retained29_benchmark_dynamic
 PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
 PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -226,6 +227,16 @@ $(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile
 $(PIPE_HINT_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+# Separate ABI29/markers/CLI; never rebuild a legacy artifact under new flags.
+$(RETAINED29_BENCH_DYNAMIC_APP): scheduler_retained29_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -o $@ $< >&2
+
+.PHONY: retained29-benchmark-dynamic emit-retained29-benchmark-compressed-transfer
+retained29-benchmark-dynamic: $(RETAINED29_BENCH_DYNAMIC_APP)
+emit-retained29-benchmark-compressed-transfer: check-linux-dynamic-cc retained29-benchmark-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(RETAINED29_BENCH_DYNAMIC_APP)
 
 # A distinct ELF preserves the exact plain-workload comparison corpus.
 $(PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
