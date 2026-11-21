@@ -1,0 +1,61 @@
+{
+  "state": "READ-ONLY shallow prefetch fill-bank inference review; no candidate or savings acceptance",
+  "inherited_d_slots": 4,
+  "hardcoded_i_slots": 4,
+  "fill_bits": 64,
+  "block_bits": 512,
+  "banks_per_uce": 8,
+  "slot_basis": "Exact static prefetch16k->prefetch_cfg inheritance, not genericdefault or independently extracted DCP parameters.",
+  "existing_r4_bram": {
+    "i_uce": 8,
+    "d_uce": 8
+  },
+  "existing_report": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/uce-capture-area-review-20261121/review.json",
+    "bytes": 5883,
+    "sha256": "be995e3c412cb925cc9921b31a53ac5fdaed6e51788c29b705a6d26820382acf"
+  },
+  "sources": {
+    "uce": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+      "bytes": 106931,
+      "sha256": "4669409939034afa5d6217de7f36096057d4a99aad3f960d0169b88f753cedca"
+    },
+    "unicore": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+      "bytes": 31356,
+      "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+    },
+    "endpoint": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/v/bp_common_pkg.sv",
+      "bytes": 7955,
+      "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7"
+    }
+  },
+  "vendor_primary": {
+    "xpm": {
+      "path": "/tools/Xilinx/Vivado/2024.2/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv",
+      "bytes": 494221,
+      "sha256": "103747b8aa5fec30dbcfe5b432a94e5a6153c02acc359b81e3d4d8692c479779"
+    },
+    "RAM32M": {
+      "path": "/tools/Xilinx/Vivado/2024.2/data/verilog/src/unisims/RAM32M.v",
+      "bytes": 11807,
+      "sha256": "e8a23fd698b66faa7143bbb17d40585f97ec4cf7a4fd351db2a63a3b87cb92a6"
+    }
+  },
+  "invariant": "Same-edge old-data output register, same enable/latency, no new serialization or ownership changes.",
+  "proposed_gate": "Attribute-only actual inference + vendor-netlist cycle miter before UCE integration; behavioral attribute-ignored equality is insufficient.",
+  "measured_candidate_lut_cost": null,
+  "measured_candidate_freed_bram": null,
+  "rtl_edits": 0,
+  "tests_run": 0,
+  "synthesis_runs": 0,
+  "models_run": 0,
+  "board_actions": 0,
+  "report": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/uce-capture-area-review-20261121/PREFETCH_BANKS.md",
+    "bytes": 6294,
+    "sha256": "2b9161895090ca0bc0fdbd1f0f6ad5fb9135127f2d3e581ef7e479e4e45fd6dd"
+  }
+}
