@@ -1,0 +1,27 @@
+This note verifies the primary-source rationale for hypothetical core-cycle latency sensitivity. It separates published measurement endpoints, arithmetic assumptions and the existing added-response-age controls. It contains no target, model, FPGA measurement, new sweep or policy result.
+
+The defensible claim is **coarse conditional sensitivity**, rather than a calibrated0.5–2GHz BlackParrot or a universal60–100ns memory latency. Existing+40/+200 controls probe different waiting regimes; they are not representative machine calibrations or a strict bracket of all plausible total latencies.
+
+[BlackParrot2020, authors' IEEE Micro paper](https://bsg.ai/papers/BlackParrot_IEEE_Micro_2020.pdf) establishes an ASIC implementation context: Figure4 describes a GF12 quad-core tapeout. This supports separating ASIC research from FPGA prototyping; it does not establish that the currently modified retained-store RTL achieves any frequency in our assumed0.5–2GHz grid. The paper is not used here as a measured-clock certificate for this design.
+
+[MemSys2018, Section4/Table5/Figure7](https://user.eng.umd.edu/~blj/papers/memsys2018-missing.pdf#page=8) reports **DRAM-minus-LLC benchmark latency differences**, not AXI request-to-first/full-line timing or bare DRAM-device latency. Random-read lmbench measurements retain software/translation effects. Table5 gives Nehalem2.8GHz, Haswell2.3, POWER8 3.49, ThunderX1.8, XGene1/2 2.4 and KNL1.4. [Figure7](https://user.eng.umd.edu/~blj/papers/memsys2018-missing.pdf#page=9) gives30ns(POWER8),71(Nehalem),73(Haswell),81(XGene2),82(ThunderX),124(XGene1),245(KNLDDR4),277(KNLMCDRAM). Thus60–100ns overlaps several cases but excludes documented fast and slow cases. The paper also finds that matching microbenchmark latency with different delay placements can produce different application behavior (§3); a matching scalar alone is insufficient validation.
+
+[Intel's official Memory Latency Checker documentation](https://www.intel.com/content/www/us/en/developer/articles/tool/intelr-memory-latency-checker.html) distinguishes idle/loaded latency, bandwidth and dependent-read measurement, and describes controlling hardware prefetchers. It supports reporting traffic and prefetch conditions, not a numerical40/200ns range.
+
+For explicitly hypothetical frequency fGHz and selected latency tns, `cycles=f×t`. These are independent unit conversions, reproduced by derive.py/derived.json:
+
+| Assumed frequency |60ns |100ns |Selected interval |
+|---:|---:|---:|---:|
+|0.5GHz |30cycles |50cycles |30–50cycles |
+|1GHz |60cycles |100cycles |60–100cycles |
+|2GHz |120cycles |200cycles |120–200cycles |
+
+This overall30–200cycle interval does not make40/200 a strict bracket:40 is above the30cycle low endpoint. Nor does this selected interval bound the complete published spread. The current FPGA clock remains20MHz; no GHz frequency is assigned to it by these conversions.
+
+The implemented parameter N sets **minimum extra response-queue age** on the common HP0 R and B streams; output backpressure can extend accepted age. The [closed SP fixture](/home/coyang/zynq-parrot-linux-capacity/research/retained-sp-latency-20261121/PATH_TIMING.md)'s measured AR→first/full accepted R endpoints are1/8cycles atN0,41/48 atN40 and201/208 atN200. They are distinct from the published DRAM-minus-LLC differences and from architectural load-use. Mapping a desired *total* to N would require an endpoint-compatible measured native baseline and accounted remaining path; neither subtracting the old41cycle load-use result nor using the published scalar directly is justified. At the actual20MHz FPGA target,+40/+200 mean2/10microseconds of additional age. At a hypothetical2GHz the same counts express20/100ns of added age; that is arithmetic, not an ASIC timing result.
+
+Hold bandwidth and actual concurrency visible. One accepted64-bit beat per core cycle corresponds arithmetically to4/8/16GB/s at the assumed0.5/1/2GHz, versus160MB/s at20MHz; latency injection alone does not calibrate these bandwidths, memory queues or a future CPU. The finite shim can change outstanding occupancy and backpressure. The closed SP fixture's two serialized response-age contributions produce101+2N I and76+2N D admission→publication intervals, so a one-burst+N calculation cannot substitute for the actual complete path. Required-word readiness, full64B arrival, SRAM completion and retained publication remain distinct.
+
+Use the existing native/+40/+200 results as explicitly labeled low/high sensitivity controls, with identical configuration for compared policies and complete execution including trigger, clear, interference and teardown costs. They justify no FPGA/ASIC/application speedup, no new frequency, and no new sweep. Physical native first/full calibration remains missing, as documented by the separate [physical observability audit](/home/coyang/fpga-artifacts/context-resume/physical-hp0-observability-review-20261121/README.md).
+
+All three primary URLs were inspected on2026-11-21 through the web reader. No PDF-byte hash is claimed: local PDF downloads were unnecessary, and the screenshot backend could not render the figures. Table5 frequencies and Figure7 values were verified against the PDF text and accompanying Section4 prose; Figure2 clock values in the BlackParrot paper are not asserted. source-manifest.json records URLs, locations, method and the bound local closed-path evidence.

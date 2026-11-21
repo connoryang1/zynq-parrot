@@ -1,0 +1,83 @@
+{
+  "state": "DERIVED-arithmetic-only-not-calibration-or-performance",
+  "formula": "cycles = GHz * ns; additional ns = added cycles / GHz",
+  "scenarios": [
+    {
+      "assumed_GHz": 0.5,
+      "selected_latency_ns": [
+        60,
+        100
+      ],
+      "derived_core_cycles": [
+        30,
+        50
+      ],
+      "assumed_peak_8B_per_cycle_GB_s": 4.0
+    },
+    {
+      "assumed_GHz": 1.0,
+      "selected_latency_ns": [
+        60,
+        100
+      ],
+      "derived_core_cycles": [
+        60,
+        100
+      ],
+      "assumed_peak_8B_per_cycle_GB_s": 8.0
+    },
+    {
+      "assumed_GHz": 2.0,
+      "selected_latency_ns": [
+        60,
+        100
+      ],
+      "derived_core_cycles": [
+        120,
+        200
+      ],
+      "assumed_peak_8B_per_cycle_GB_s": 16.0
+    }
+  ],
+  "existing_synthetic_endpoints": [
+    {
+      "added_response_age_cycles": 0,
+      "closed_SP_AR_first_accept_cycles": 1,
+      "closed_SP_AR_full_accept_cycles": 8,
+      "actual_20MHz_extra_microseconds": 0.0,
+      "hypothetical_added_ns_by_GHz": {
+        "0.5": 0.0,
+        "1.0": 0.0,
+        "2.0": 0.0
+      }
+    },
+    {
+      "added_response_age_cycles": 40,
+      "closed_SP_AR_first_accept_cycles": 41,
+      "closed_SP_AR_full_accept_cycles": 48,
+      "actual_20MHz_extra_microseconds": 2.0,
+      "hypothetical_added_ns_by_GHz": {
+        "0.5": 80.0,
+        "1.0": 40.0,
+        "2.0": 20.0
+      }
+    },
+    {
+      "added_response_age_cycles": 200,
+      "closed_SP_AR_first_accept_cycles": 201,
+      "closed_SP_AR_full_accept_cycles": 208,
+      "actual_20MHz_extra_microseconds": 10.0,
+      "hypothetical_added_ns_by_GHz": {
+        "0.5": 400.0,
+        "1.0": 200.0,
+        "2.0": 100.0
+      }
+    }
+  ],
+  "interpretation": "Selected60-100ns \u00d7 hypothetical0.5-2GHz spans30-200cycles. Added40/200 are coarse sensitivity controls, not a strict total-latency bracket or representative calibrated machine.",
+  "limitations": [
+    "No frequency claim for current20MHz FPGA or modified ASIC RTL.",
+    "Published latency differences are not HP0 AR-first/full measurements.",
+    "Bandwidth, outstanding requests, cache/UCE timing, source arbitration and complete execution remain separate."
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "state": "CLOSED-primary-source-audit-plus-derived-arithmetic-only",
+  "access_date": "2026-11-21",
+  "sources": [
+    {
+      "url": "https://bsg.ai/papers/BlackParrot_IEEE_Micro_2020.pdf",
+      "title": "BlackParrot: An Agile Open-Source RISC-V Multicore for Accelerator SoCs",
+      "location": "Figure4 / PDFpage6",
+      "role": "ASIC context only; hypothetical grid not claimed as measured modified-RTL clock"
+    },
+    {
+      "url": "https://user.eng.umd.edu/~blj/papers/memsys2018-missing.pdf",
+      "title": "Main Memory Latency Simulation: The Missing Link",
+      "location": "Section4/Table5 PDFpage8;Figure7 PDFpage9;Section3 delay-placement caveat",
+      "role": "Published benchmark latency difference and machine frequencies, not HP0 bus calibration"
+    },
+    {
+      "url": "https://www.intel.com/content/www/us/en/developer/articles/tool/intelr-memory-latency-checker.html",
+      "title": "Intel Memory Latency Checker",
+      "location": "What Does the Tool Measure / How Does It Work / HW Prefetcher Control",
+      "role": "Methodological distinction only; no numerical range inferred"
+    }
+  ],
+  "method": "Web PDF text plus accompanying prose; screenshot backend unavailable; no PDF-byte hashes claimed",
+  "local_evidence": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-sp-latency-20261121/PATH_TIMING.md",
+      "bytes": 3277,
+      "sha256": "4fb4620f47d8e89bc83b122218ba595d2cd07d10788302ece88ed06cc3fbbe8c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-sp-latency-20261121/path-timing.json",
+      "bytes": 1907,
+      "sha256": "d80cfa898d5a83e1c5096319b6f2920041f3ded833eea53e07e22bf6631acbdc"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/LATENCY_REGIMES.md",
+      "bytes": 4114,
+      "sha256": "2ea504f52aaa9c3f7d66ed9dec405b2bfbaeff6190391ca52b860bb0bf42f6a1"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/physical-hp0-observability-review-20261121/evidence.json",
+      "bytes": 10985,
+      "sha256": "48e4e63627748b47680db3692767c752d87e0c16f05db2a065e65bc0c8df21e2"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/primary-latency-rationale-20261121/README.md",
+      "bytes": 5441,
+      "sha256": "d5db90da3133f40ee4aa17e9467a4b1b2acb69f7d3affaf3e61ab442d5f3d489"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/primary-latency-rationale-20261121/derive.py",
+      "bytes": 1890,
+      "sha256": "b6ac355c5c2e1da481f7bc2db9596c83a5c7b9b3b35073f7fb76204182eed56d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/primary-latency-rationale-20261121/derived.json",
+      "bytes": 2227,
+      "sha256": "6da1020ca88c279e8e3d2a5a368c62cbd528042d0092a538bcf97e5eb034dbc5"
+    }
+  ],
+  "scope": "No targets, FPGA, simulation, new model, source edits or future-policy admission."
+}
