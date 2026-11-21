@@ -1,0 +1,171 @@
+{
+  "state": "PASS-directed-shared-retained-full-lines",
+  "i_lines": 256,
+  "d_lines": 256,
+  "scope": "Directed backend unit correctness; no full-core, synthesis, unique-capacity or performance claim.",
+  "sources": {
+    "bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15424,
+      "sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e"
+    },
+    "retained_line_store_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+      "bytes": 2102,
+      "sha256": "51a9e28317b56871e2796fce9064ab32c2cdcbf1c9dd8c65056d4f24f14a5265"
+    },
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/driver.cpp",
+      "bytes": 12505,
+      "sha256": "70caa701c04fd6c9cec3c2dcb28de88e532f798f952da0b462892f946de82c67"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/run.py",
+      "bytes": 5041,
+      "sha256": "3c5d65bdd2014c4628a0d7121b7b628dda284259ab22e220ed5034517d783c11"
+    }
+  },
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.1262501860037446,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=256",
+        "-GD_LINES=256",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/obj",
+        "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/driver.cpp"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 11.91078740998637,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/build.log",
+        "bytes": 4415,
+        "sha256": "121fcf5452e2adc9e0e0354fb1c59c3510e703045b33e0c8f33107ec242f1cef"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.23159458895679563,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/run-inverted.log",
+        "bytes": 357,
+        "sha256": "356b2fe867b517de081fc84b2ae4c6a5762e5f10ab60dabe9fcf5fea781cb663"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.23150742705911398,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/run-different-periods.log",
+        "bytes": 366,
+        "sha256": "3485abd025d035a0e37b3a06b554bca9b6bdbfc8fb3c7e87ad5e36aa792d838c"
+      }
+    }
+  ],
+  "free_bytes_before_build": 519102464,
+  "clock_results": [
+    {
+      "clock_mode": "inverted",
+      "counts": [
+        [
+          "0",
+          "275",
+          "275",
+          "270",
+          "270",
+          "266"
+        ],
+        [
+          "1",
+          "270",
+          "270",
+          "265",
+          "265",
+          "264"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/inverted/retained-line-store.fst",
+        "bytes": 252551,
+        "sha256": "10fc2c9c384367e6968ae9a6dfddc8159ad59560a22391a41d8aa032938d72a8"
+      }
+    },
+    {
+      "clock_mode": "different-periods",
+      "counts": [
+        [
+          "0",
+          "275",
+          "275",
+          "270",
+          "270",
+          "266"
+        ],
+        [
+          "1",
+          "270",
+          "270",
+          "265",
+          "265",
+          "264"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/different-periods/retained-line-store.fst",
+        "bytes": 253717,
+        "sha256": "883f08336f29bd27068d36c8ff8b6bf1d7aa2e9775d9ddcae2a2ae434177454a"
+      }
+    }
+  ],
+  "executable": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/capacity-matrix-02/i256-d256/obj/Vretained_line_store_wrapper",
+    "bytes": 405376,
+    "sha256": "ea2d35c0406b11c4aae5ebe500cb75feb42d36b961e41510b4d8cfb776b0cf18"
+  }
+}

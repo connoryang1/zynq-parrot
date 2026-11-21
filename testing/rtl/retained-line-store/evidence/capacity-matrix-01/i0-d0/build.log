@@ -1,0 +1,11 @@
+%Warning-UNSIGNED: /home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:144:45: Comparison is constant due to unsigned arithmetic
+                                                                                                                               : ... note: In instance 'retained_line_store_wrapper.dut'
+  144 |     wire last_slot = (int'(slot_r) + sets_p >= lines_lp);
+      |                                             ^~
+                   ... For warning description see https://verilator.org/warn/UNSIGNED?v=5.030
+                   ... Use "/* verilator lint_off UNSIGNED */" and lint_on around source to disable this message.
+%Warning-UNSIGNED: /home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:270:43: Comparison is constant due to unsigned arithmetic
+                                                                                                                               : ... note: In instance 'retained_line_store_wrapper.dut'
+  270 |                 if (int'(slot_r) + sets_p >= lines_lp) rr_r[set_r] <= '0;
+      |                                           ^~
+%Error: Exiting due to 2 warning(s)

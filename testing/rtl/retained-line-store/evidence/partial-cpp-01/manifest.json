@@ -1,0 +1,171 @@
+{
+  "state": "PASS-directed-shared-retained-full-lines",
+  "i_lines": 93,
+  "d_lines": 131,
+  "scope": "Directed backend unit correctness; no full-core, synthesis, unique-capacity or performance claim.",
+  "sources": {
+    "bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15295,
+      "sha256": "ada0052e0944d5b167206387e7545913f75a642a74c0a5ea61d8f9c37bdf8136"
+    },
+    "retained_line_store_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+      "bytes": 2102,
+      "sha256": "51a9e28317b56871e2796fce9064ab32c2cdcbf1c9dd8c65056d4f24f14a5265"
+    },
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/driver.cpp",
+      "bytes": 12505,
+      "sha256": "70caa701c04fd6c9cec3c2dcb28de88e532f798f952da0b462892f946de82c67"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/run.py",
+      "bytes": 5041,
+      "sha256": "3c5d65bdd2014c4628a0d7121b7b628dda284259ab22e220ed5034517d783c11"
+    }
+  },
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.1264183120802045,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=93",
+        "-GD_LINES=131",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/obj",
+        "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/driver.cpp"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 10.90589887497481,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/build.log",
+        "bytes": 4387,
+        "sha256": "9188df7fcb9d466d2adabb5da867c1bdeeffc89b341fe27c78abf574b26ca65b"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.12433927389793098,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/run-inverted.log",
+        "bytes": 355,
+        "sha256": "7644637ad71a9f76356cc80f0e9c1cea4fc2fcffa5378d7e73670facce654761"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.12701336399186403,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/run-different-periods.log",
+        "bytes": 364,
+        "sha256": "e3a56ba04588895df6bb5413d08ca2c2209f90ddf3d0e51855d50492fdbd847f"
+      }
+    }
+  ],
+  "free_bytes_before_build": 529666048,
+  "clock_results": [
+    {
+      "clock_mode": "inverted",
+      "counts": [
+        [
+          "0",
+          "112",
+          "112",
+          "107",
+          "107",
+          "103"
+        ],
+        [
+          "1",
+          "145",
+          "145",
+          "140",
+          "140",
+          "139"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/inverted/retained-line-store.fst",
+        "bytes": 119405,
+        "sha256": "03af24693df3b43e206ac28cdd85bc0dfaee42cee10fa27e3c4017303e07b9f5"
+      }
+    },
+    {
+      "clock_mode": "different-periods",
+      "counts": [
+        [
+          "0",
+          "112",
+          "112",
+          "107",
+          "107",
+          "103"
+        ],
+        [
+          "1",
+          "145",
+          "145",
+          "140",
+          "140",
+          "139"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/different-periods/retained-line-store.fst",
+        "bytes": 119673,
+        "sha256": "3952a0f006e65c4180d53a0bad90cc25c0cf2b71ff3d985f31943b4f504459ea"
+      }
+    }
+  ],
+  "executable": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-cpp-01/obj/Vretained_line_store_wrapper",
+    "bytes": 405376,
+    "sha256": "dcd87d8a396b9116f3a07068ba58d70be0519420cfa695e2c02fff46e2f78914"
+  }
+}

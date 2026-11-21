@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/home/coyang/zynq-parrot/install/bin/verilator",
+    "--lint-only",
+    "--timing",
+    "--assert",
+    "-Wall",
+    "--top-module",
+    "bp_retained_line_store",
+    "--Mdir",
+    "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/lint-obj",
+    "import/black-parrot/bp_common/src/v/bp_retained_line_store.sv"
+  ],
+  "returncode": 1,
+  "source_sha256": "cc91edb50e681e693ceadb50b1911c35e5f4bd8ff67f908199358f3487a69c2d",
+  "diagnosis": "Verilator treats independently clocked packed-vector slices as multiply driven; move per-port read/output registers to local generate scopes. Shared RAM multiwrite is intentional true dual port and separately partition-asserted."
+}

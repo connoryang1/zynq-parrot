@@ -1,0 +1,76 @@
+{
+  "state": "FAIL-preserved-no-result",
+  "i_lines": 93,
+  "d_lines": 131,
+  "scope": "Directed backend unit correctness; no full-core, synthesis, unique-capacity or performance claim.",
+  "sources": {
+    "bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15295,
+      "sha256": "ada0052e0944d5b167206387e7545913f75a642a74c0a5ea61d8f9c37bdf8136"
+    },
+    "retained_line_store_tb.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/retained_line_store_tb.sv",
+      "bytes": 10630,
+      "sha256": "4f74be0853da07e8f98a9b19fe6580dacdb03ba2e7d16d2955434731db02cb8d"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/run.py",
+      "bytes": 4460,
+      "sha256": "5f6e5c2d0aac72533b84aec974818af3e290efed4e6511207dc58ad7e12ecb10"
+    }
+  },
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-first",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.17943837807979435,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-first/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--binary",
+        "--build",
+        "--timing",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--timescale-override",
+        "1ns/1ps",
+        "--top-module",
+        "retained_line_store_tb",
+        "-GI_LINES=93",
+        "-GD_LINES=131",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-first/obj",
+        "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/retained_line_store_tb.sv"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-first",
+      "timeout_seconds": 300,
+      "returncode": 2,
+      "elapsed_seconds": 11.796779062016867,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-line-store/evidence/partial-first/build.log",
+        "bytes": 3214,
+        "sha256": "4359885cad72393fde85a4bb14dff429096b631254e1c1d1f920a7ca58a04519"
+      }
+    }
+  ],
+  "free_bytes_before_build": 589537280,
+  "error": "RuntimeError('build failed: 2')"
+}

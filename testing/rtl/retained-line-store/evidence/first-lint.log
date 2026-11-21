@@ -1,0 +1,38 @@
+%Warning-MULTIDRIVEN: import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:77:43: Signal has multiple driving blocks with different clocking: 'bp_retained_line_store.tag_rdata'
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:93:9: ... Location of first driving block
+   93 |         tag_rdata[port] <= tag_mem[tag_addr[port]];
+      |         ^~~~~~~~~
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:93:9: ... Location of other driving block
+   93 |         tag_rdata[port] <= tag_mem[tag_addr[port]];
+      |         ^~~~~~~~~
+                      ... For warning description see https://verilator.org/warn/MULTIDRIVEN?v=5.030
+                      ... Use "/* verilator lint_off MULTIDRIVEN */" and lint_on around source to disable this message.
+%Warning-MULTIDRIVEN: import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:78:33: Signal has multiple driving blocks with different clocking: 'bp_retained_line_store.data_rdata'
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:97:9: ... Location of first driving block
+   97 |         data_rdata[port] <= payload_mem[data_addr[port]];
+      |         ^~~~~~~~~~
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:97:9: ... Location of other driving block
+   97 |         data_rdata[port] <= payload_mem[data_addr[port]];
+      |         ^~~~~~~~~~
+%Warning-MULTIDRIVEN: import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:54:25: Signal has multiple driving blocks with different clocking: 'insert_done_o'
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:190:9: ... Location of first driving block
+  190 |         insert_done_o[lane] <= 1'b0; insert_published_o[lane] <= 1'b0; epoch_wrap_o[lane] <= 1'b0;
+      |         ^~~~~~~~~~~~~
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:190:9: ... Location of other driving block
+  190 |         insert_done_o[lane] <= 1'b0; insert_published_o[lane] <= 1'b0; epoch_wrap_o[lane] <= 1'b0;
+      |         ^~~~~~~~~~~~~
+%Warning-MULTIDRIVEN: import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:55:25: Signal has multiple driving blocks with different clocking: 'insert_published_o'
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:190:38: ... Location of first driving block
+  190 |         insert_done_o[lane] <= 1'b0; insert_published_o[lane] <= 1'b0; epoch_wrap_o[lane] <= 1'b0;
+      |                                      ^~~~~~~~~~~~~~~~~~
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:190:38: ... Location of other driving block
+  190 |         insert_done_o[lane] <= 1'b0; insert_published_o[lane] <= 1'b0; epoch_wrap_o[lane] <= 1'b0;
+      |                                      ^~~~~~~~~~~~~~~~~~
+%Warning-MULTIDRIVEN: import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:57:25: Signal has multiple driving blocks with different clocking: 'epoch_wrap_o'
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:190:72: ... Location of first driving block
+  190 |         insert_done_o[lane] <= 1'b0; insert_published_o[lane] <= 1'b0; epoch_wrap_o[lane] <= 1'b0;
+      |                                                                        ^~~~~~~~~~~~
+                      import/black-parrot/bp_common/src/v/bp_retained_line_store.sv:190:72: ... Location of other driving block
+  190 |         insert_done_o[lane] <= 1'b0; insert_published_o[lane] <= 1'b0; epoch_wrap_o[lane] <= 1'b0;
+      |                                                                        ^~~~~~~~~~~~
+%Error: Exiting due to 5 warning(s)
