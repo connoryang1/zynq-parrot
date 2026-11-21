@@ -1,0 +1,90 @@
+[
+  {
+    "label": "integrity-geometry",
+    "argv": [
+      "python3",
+      "-B",
+      "research/retained-tagrows-20261121/audit_geometry.py",
+      "--session",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/integrity/verification.json",
+      "--reader",
+      "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+      "--output",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/integrity-geometry01"
+    ],
+    "returncode": 0,
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/integrity-geometry.log",
+      "bytes": 372,
+      "sha256": "7c128d5e13278667f6328c1a4086472a818d5e8b10e56a53a57ef12fc4ffdc76"
+    }
+  },
+  {
+    "label": "strict-advisory",
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-tagrows/testing/rtl/retained-advisory-trace/validate.py",
+      "--fst",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/advisory/trace.fst",
+      "--reader",
+      "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+      "--model-source-list",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/actual-source-list.json",
+      "--fixture-manifest",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+      "--log",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/advisory/run.log",
+      "--exit-code",
+      "-6",
+      "--out",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/strict-advisory01"
+    ],
+    "returncode": 0,
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/strict-advisory.log",
+      "bytes": 105,
+      "sha256": "afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c"
+    }
+  },
+  {
+    "label": "counter-audit",
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-use-observation-20261121/verify_counters.py",
+      "--fst",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/advisory/trace.fst",
+      "--reader",
+      "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+      "--strict-proof",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/strict-advisory01/verification.json",
+      "--run-proof",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/advisory/verification.json",
+      "--out",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/counter-audit01"
+    ],
+    "returncode": 0,
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/counter-audit.log",
+      "bytes": 115,
+      "sha256": "d3ad4b75613820aaf1beda742c8148f014388882e097164a4c2eed37c24cd37a"
+    }
+  },
+  {
+    "label": "archive",
+    "argv": [
+      "python3",
+      "-B",
+      "research/retained-tagrows-20261121/close_fullcore.py",
+      "--run",
+      "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01"
+    ],
+    "returncode": 0,
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-tagrows/research/retained-tagrows-20261121/full01/archive.log",
+      "bytes": 123,
+      "sha256": "6cee590d38ad9f33491aa0c052a0ba66c4e08278c547c237bb7258b662354b27"
+    }
+  }
+]
