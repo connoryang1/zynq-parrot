@@ -1,0 +1,892 @@
+{
+  "state": "TERMINAL FAIL implementation LUT-overutilization; successful single read-only attribution query",
+  "job": "20261121T140517Z-11ca59a27",
+  "source": {
+    "BP_head": "d766d42cdf04ee43ca1e915fb9da06f5cc117dde",
+    "backend": {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7",
+      "mtime_ns": 1795269920239701510
+    }
+  },
+  "actual_define_evidence": [
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.tcl",
+      "line": 80,
+      "text": "set_property verilog_define {BP_RETAINED_BUFFER=1 BP_RETAINED_I_LINES=1280 BP_RETAINED_D_LINES=1280 BP_RETAINED_SETS=256 BP_RETAINED_OBSERVE=1 BP_AXI_RESPONSE_DELAY=0} [current_fileset]"
+    },
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "line": 111,
+      "text": "        <Verilog_Define Name=\"BP_RETAINED_BUFFER\" Val=\"1\"/>"
+    },
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "line": 112,
+      "text": "        <Verilog_Define Name=\"BP_RETAINED_I_LINES\" Val=\"1280\"/>"
+    },
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "line": 113,
+      "text": "        <Verilog_Define Name=\"BP_RETAINED_D_LINES\" Val=\"1280\"/>"
+    },
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "line": 114,
+      "text": "        <Verilog_Define Name=\"BP_RETAINED_SETS\" Val=\"256\"/>"
+    },
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "line": 115,
+      "text": "        <Verilog_Define Name=\"BP_RETAINED_OBSERVE\" Val=\"1\"/>"
+    },
+    {
+      "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "line": 116,
+      "text": "        <Verilog_Define Name=\"BP_AXI_RESPONSE_DELAY\" Val=\"0\"/>"
+    }
+  ],
+  "feedback_cut_warnings": [],
+  "synth": {
+    "total_LUT": 57373,
+    "available_LUT": 53200,
+    "logic_LUT": 53776,
+    "memory_LUT": 3597,
+    "FF": 33699,
+    "BRAM_tiles": 140,
+    "available_BRAM_tiles": 140
+  },
+  "opted_DRC": {
+    "rule": "UTLZ-1",
+    "required_logic_cells": 53344,
+    "compatible_sites": 53200
+  },
+  "synthesis_DCP": {
+    "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.dcp",
+    "bytes": 82388975,
+    "sha256": "3514bf6fd563fae17e6b8c4829810b7d60b706b85c79995f05a501361e247663"
+  },
+  "read_job_elapsed_seconds": 81.73092068592086,
+  "read_job_actual_exit": 0,
+  "final_process_DCP_check": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/end-check.json",
+    "bytes": 260,
+    "sha256": "ff67ac130a3d6c9ed052fd0671528d4ac05a5655842cb550827605a958546ebb"
+  },
+  "attribution": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/analysis.json",
+    "bytes": 9988,
+    "sha256": "e8c588ed66bec9cad53bee22c586e635093dee3a64719cce0151b800dace065d"
+  },
+  "no_routed_timing_or_placement": true,
+  "no_capacity_recommendation": true,
+  "no_further_launch": true,
+  "snapshots": [
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/README.md",
+        "bytes": 1659,
+        "sha256": "e5d035e40ea4edb0cbf38486d4c774ab50a2a3f67df76386a2e1ce5580a9680c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/README.md.gz",
+        "bytes": 969,
+        "sha256": "994b62c1dc9f7c9a00f2478c9b5cafcee118e5d22b1fa3e0c2d07b752baaeb51"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/TERMINAL_ANALYSIS.md",
+        "bytes": 3724,
+        "sha256": "d0014aa353b0a6575d34643e7803bb8a643f0d28ac0849596581cda293d9299b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/TERMINAL_ANALYSIS.md.gz",
+        "bytes": 1969,
+        "sha256": "dc5061445cea73947b955a64255f77c5c318cf97b0c9a8e113a647fa2f75478e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/close_terminal.py",
+        "bytes": 3240,
+        "sha256": "257e4f73a84485508fa7f89cd8d222b25db5010f983d868bdbee244c820b5019"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/close_terminal.py.gz",
+        "bytes": 1554,
+        "sha256": "710e5ca262eed66bad26c0a54f53b8ea5383e65a3f2a15c75189e99a209939b8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/current-review.json",
+        "bytes": 3468,
+        "sha256": "cd91dec8297053ca433e42d895e0539b60e3222a7b7f260e04227cdd7aa73472"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/current-review.json.gz",
+        "bytes": 1208,
+        "sha256": "cf1afb741f08113e11b99c229cd3d7ec83866d9c79ae53913538a3cce10ce475"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/live-status.json",
+        "bytes": 1032,
+        "sha256": "06342833c0c8eb9b257b281bc248e34bba975f749c878f5cef43d919e88341b7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/live-status.json.gz",
+        "bytes": 561,
+        "sha256": "4bf0b2d9357e7cd1eac741daf842c76d4c222ae2d99e9c3596a4c1a446ae3329"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/monitor.py",
+        "bytes": 2404,
+        "sha256": "ff7a3bb8fc0b16c174afdf4705c55770464a8eef4f3c1b1ba8a54a135b25e102"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/monitor.py.gz",
+        "bytes": 1097,
+        "sha256": "23cbb60c990f436568e1c89c11c957bfd094d559797a7bc012d9a7734ac04b47"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-001.json",
+        "bytes": 18746,
+        "sha256": "d5cb9c219679a19963938fc952e211e04e9fe293ecf5fb381e6ee5b179bbf545"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-001.json.gz",
+        "bytes": 2628,
+        "sha256": "ddd183e2a2c770f9221352d2ab71d7e91fead95d4c0ffc3a15d8f24e9e52f824"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-002.json",
+        "bytes": 221758,
+        "sha256": "ce9b2bafd64998939eccea0435c03e2adc6dda2823ac82e2ee27f39393a06624"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-002.json.gz",
+        "bytes": 7108,
+        "sha256": "faf167b013829ed68e0ea46c24bd09d5423b41bec330b308b43a1230ea532d2d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-003.json",
+        "bytes": 221758,
+        "sha256": "fb2b7c873cf04b39f18e6bad28ec9a49354614869f1a18c6ea0f0989cadcf919"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-003.json.gz",
+        "bytes": 7110,
+        "sha256": "cc435ed2f45aafd395844595b19995d1f7f351be90ca1a70904598190256b4b0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-004.json",
+        "bytes": 221758,
+        "sha256": "d6c0ee0f99aae5c71a72383dc2788822be925f8ed0dfe08b8a9f0ccf6240fe67"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-004.json.gz",
+        "bytes": 7110,
+        "sha256": "557f65f0c8864d681e0609c1b2a8cb3959081c26848e5090069d9adc95834957"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-005.json",
+        "bytes": 221758,
+        "sha256": "9f85ff0ce1b99aad67d632594d4ab202d610882c536d94b21c0e9901bc98caaf"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-005.json.gz",
+        "bytes": 7107,
+        "sha256": "dcdbab5d1314d644b42436da6eb88c93d9631686b187c63b98e7648ddc8170eb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-006.json",
+        "bytes": 223953,
+        "sha256": "09daeab6623668072c93da74a3369d0ba4a1f26c399cb17b26cf21955ce2501e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-006.json.gz",
+        "bytes": 7473,
+        "sha256": "d84d9229181565de824627316203f39facfa82c378564512b1b4722e08a023d4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-007.json",
+        "bytes": 223952,
+        "sha256": "d6d1b5d9721b061e5d1de8e85453816c0614198827b13153675b33239eba11e8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-007.json.gz",
+        "bytes": 7470,
+        "sha256": "a0feb840e21a576e95671bce262cbba8f5613c7a9b5b5ab1ee377776ca97f2ef"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-008.json",
+        "bytes": 223953,
+        "sha256": "31f7752bba2a5bec6316b5b533eb45916954511e39069463ec8742cdadb8346b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-008.json.gz",
+        "bytes": 7470,
+        "sha256": "ee7b2fa82fe0e13fd47d75f64d26d169ff1244740b298ae6b4656f563d80bc09"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-009.json",
+        "bytes": 223953,
+        "sha256": "351036cca156d48850c7abf36b621b7736da77e6cbfa6b4b1397d1add2e65fd9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-009.json.gz",
+        "bytes": 7471,
+        "sha256": "aad1a4d10b304cb2a48855037659f333ae8f4397452f517335d411f7bba972e0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-010.json",
+        "bytes": 234912,
+        "sha256": "ce6033c481ec72bc435df66f46b01bc6dacf03372328df6571eea139a0ff50ad"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-010.json.gz",
+        "bytes": 7979,
+        "sha256": "fbb5479b60cfb287ce847981f45436248617f21af6e4432882800845345cf10e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-011.json",
+        "bytes": 234912,
+        "sha256": "a79827cca6f48fc2d2a290f350e82bc45e75aa4b2fc3519a919788ddee7db2b4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-011.json.gz",
+        "bytes": 7979,
+        "sha256": "1127cb53844f3e36facb5efb974bd0ef9dd157f177fb13ff45c92781121376fb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-012.json",
+        "bytes": 234912,
+        "sha256": "f95ecb5c19fb47af1335250e5fac41dd62c76e1561ed486b328808846253a9f4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-012.json.gz",
+        "bytes": 7979,
+        "sha256": "b5baba43f2747e53672246ee463094949616c94d103445430fc77b56a40c0bc4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-013.json",
+        "bytes": 234912,
+        "sha256": "8228cb5c1d3466159a5649c92818dc43a6038cca2b8956b222595b155860000b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-013.json.gz",
+        "bytes": 7980,
+        "sha256": "a18af5bed3ea1b250e5b86ed00a14cfa39ffeac7d37f06b7bd336bb7525dc025"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-014.json",
+        "bytes": 234912,
+        "sha256": "8b7cdc3a51df89cf38413adb8f796e0acebacd75f8e07c38ee37b5acf5ed73f8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-014.json.gz",
+        "bytes": 7979,
+        "sha256": "c94462fe759a8ebe7c385772d8bb146259b2430d84fb2a65acfd2c5042fadca6"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-015.json",
+        "bytes": 234912,
+        "sha256": "551e7c2285f96aa14eef0e954666a0fa11fa6a7e642cd2f73d3c1efc4f88f61b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-015.json.gz",
+        "bytes": 7977,
+        "sha256": "681797990ae4e411980c51e01830d5c75c1ec812394c4ac6d84786f98b75c4bf"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-016.json",
+        "bytes": 234912,
+        "sha256": "339301c7b0bcf05cbf05ecb9ec611a0d0e4ffb7ffd6ae9027d8fcb4aeea5f6a6"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-016.json.gz",
+        "bytes": 7982,
+        "sha256": "eae06440ef026ddc0afc355487290c39e48e88c18b8f92b580bd36f25fd5628c"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-017.json",
+        "bytes": 234912,
+        "sha256": "6c98be0ad8215ce9ad9d0d6bf52391dcf25a06d0a7e1744e155034115de0b313"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-017.json.gz",
+        "bytes": 7986,
+        "sha256": "e33c42d757f033bfb07011723e98c9511b7cb52365c50b4c8255adaa91dad6b4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-018.json",
+        "bytes": 234912,
+        "sha256": "c98d47d8176341bc730f0e9e92c07fde3199cce187f19dcf2cca142db941d61f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-018.json.gz",
+        "bytes": 7977,
+        "sha256": "92d5780c1bd574e76359713158e7293f10a61c2db2e019acef0a1774aeef20c2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-019.json",
+        "bytes": 234912,
+        "sha256": "d1a4f8c3dfb3eaa7273a62aadaca25f1f191a37197b5f16db01d297a4d4426e1"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-019.json.gz",
+        "bytes": 7982,
+        "sha256": "82ca84359efdb11ca1e2ffb77819829811950131a645e3d498b0e4027b87b1c0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-020.json",
+        "bytes": 234912,
+        "sha256": "73b28c6891ddc62338e3aa5cf8600a2012dcf385a637a896a93a921f3c932321"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-020.json.gz",
+        "bytes": 7976,
+        "sha256": "d95a770744071dd801647a3f0945dd0b859fb22c5b92092fa6790de96bc0f6d8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-021.json",
+        "bytes": 234911,
+        "sha256": "ff0eae35dc6cb2732bd6897253088cefa911e90f96a958a2a18b7cdda8abe0b7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-021.json.gz",
+        "bytes": 7976,
+        "sha256": "73ae9a32aa2b8b2e1999094aba78cf93782bc1f99a5beccb4be03fcd9217b5df"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-022.json",
+        "bytes": 253063,
+        "sha256": "77cf81eb1ee728a135ec960805cc14a705c09af7ebfa8baa057f26ff116e50a1"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-022.json.gz",
+        "bytes": 8388,
+        "sha256": "dc11d9878c0ca28bceebc4ca6be8c4ac2bc8b67ad89f6a2064d4dcb976b174b8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-023.json",
+        "bytes": 256554,
+        "sha256": "8a56de11cc742548c19f32a71d401912c4eee4bd15e4d3abcfd59d9585d101ca"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-023.json.gz",
+        "bytes": 8292,
+        "sha256": "4bf0cb57349dba2f7fbdd60e2705c82ce6bc1ca3d022b8eaabecfaba96ca5481"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-024.json",
+        "bytes": 551374,
+        "sha256": "63a0ae0507f16bc03622151e371d0b4e572fa92a70e40627923ea78b5a9db689"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-024.json.gz",
+        "bytes": 11709,
+        "sha256": "d74bcf33f0a6518ae7a0333eec01d1233b0688d114a2005dcabe86ad59af515f"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-025.json",
+        "bytes": 556760,
+        "sha256": "f92cb2e4d100798d934f13d0cc6ac54f3cc9f4575716428ad482b6379b7c7d1c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-025.json.gz",
+        "bytes": 13863,
+        "sha256": "e3dc0f250e84d18642ea18848d01661995f199b703055fcd27582a100d62e829"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-026.json",
+        "bytes": 557409,
+        "sha256": "6c7bc75995d0b91d09a350bdf84c374810f0c4dcd469624ace0a14c7ba03bc8d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-026.json.gz",
+        "bytes": 14329,
+        "sha256": "8825276786e0a463b69209b605e4de17c6987263a062544fc547b79f75ac7e86"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/poll-027.json",
+        "bytes": 581460,
+        "sha256": "1ab9463f0f4a95d8f902d26cc62869e920d34d7eeba2ca55f6848cf5e39f4938"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/poll-027.json.gz",
+        "bytes": 15323,
+        "sha256": "168e0423061fbf47fa323c34827833b571ea71e0647c2df6a0e6b57a02c52f27"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/preliminary-retained-inference.json",
+        "bytes": 1828,
+        "sha256": "490d8b50517cc4fefebec9b4ca65761c24dce5cfa3c8d29cde7f326783293966"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/preliminary-retained-inference.json.gz",
+        "bytes": 706,
+        "sha256": "4ab69296f9447d93b2d4f044c86f7bb414d74bd2434684e66461d2b0d60ae812"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/analysis.json",
+        "bytes": 9988,
+        "sha256": "e8c588ed66bec9cad53bee22c586e635093dee3a64719cce0151b800dace065d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/analysis.json.gz",
+        "bytes": 3152,
+        "sha256": "d8aaf8daea4c0f14cd77e3ae17ae7043eeb2742e49d6e244ddec27d7e1cfeb22"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/analyze.py",
+        "bytes": 5052,
+        "sha256": "ccc4a318f09633173837a8692e2c428c57cce70549e79299eb521b92f58cf425"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/analyze.py.gz",
+        "bytes": 2471,
+        "sha256": "54ce1a016aa39e0aaca96d983779897f9db3d749dc856a42a2a096008a7c5038"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/end-check.json",
+        "bytes": 260,
+        "sha256": "ff67ac130a3d6c9ed052fd0671528d4ac05a5655842cb550827605a958546ebb"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/end-check.json.gz",
+        "bytes": 211,
+        "sha256": "a90a15b65688c63eacd3900bcf69dede27ad6302b5318f0e10cc48237eefb1f8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/query.tcl",
+        "bytes": 3502,
+        "sha256": "4207043dcdf820ec5cffd1c8e57b2356e33c62cff568921149737683d7fb23e8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/query.tcl.gz",
+        "bytes": 1303,
+        "sha256": "1e92dd46620b0e053223de7f075c20ddfc438d63992fd09b949bb09ffe99ca58"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/console.log",
+        "bytes": 6620,
+        "sha256": "c5f2d98fa4cbb622f39888585d75c9d2e3571b7ade15a7ff214cb10010cc172b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/console.log.gz",
+        "bytes": 2390,
+        "sha256": "3b5bb583aa6f026dfa23269e7be13533d310dff3bbff8f0d806582d03715cded"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-00.rpt",
+        "bytes": 8952,
+        "sha256": "4fba6fe932d49c96110cc0b95d9eb2b4ce755a576147a2690e57a2b7982bea75"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-00.rpt.gz",
+        "bytes": 1988,
+        "sha256": "c728d4a529a64350f628c547717abada3abbdfea0602fb7e1a1f8c15dcbdc3d1"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-01.rpt",
+        "bytes": 8746,
+        "sha256": "51224aa97c2103479b31cea83584b343a2284805096fba079331728c2853e234"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-01.rpt.gz",
+        "bytes": 1919,
+        "sha256": "9d20e65422c209f7b48ef18786271729a77c0cfb356d25a6e43037516e55721e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-02.rpt",
+        "bytes": 8224,
+        "sha256": "df775da12f3883f0e3c285ca86542f95493b48a671f0841e7826efbde5a77bd6"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-02.rpt.gz",
+        "bytes": 1766,
+        "sha256": "4fabf83cb8da8f926a003fdba337c80bad95807f82a8f717b178ce2da1ed6fdf"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-03.rpt",
+        "bytes": 8602,
+        "sha256": "b27f266b3848e67ac39fe3d0d50508c1e0e6523d72166975a437daf2fc0bd59f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-03.rpt.gz",
+        "bytes": 1866,
+        "sha256": "2cbff2e9fc20ebacc958ef6cb1bcde9404ce1814e1b8487cbb862011cb2c67c6"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-04.rpt",
+        "bytes": 8608,
+        "sha256": "c7407590353b2bea878c7f8dfc6422c42f15c216c9c79c0278af82fcbbbf9cb9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-04.rpt.gz",
+        "bytes": 1876,
+        "sha256": "9ff8ef00eb0b6bbb139bdca740ed3f451ca8e80b7284c95f24a414b33eecb3f7"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-05.rpt",
+        "bytes": 8608,
+        "sha256": "eef6011c50d670fb908b7e38f624befcb9ef955070ef78d2dd5c482b5b49f4e6"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-05.rpt.gz",
+        "bytes": 1876,
+        "sha256": "72dbe9fdddb5d42453c4a32f9646c6fb982cafa65b799507cb389adfb1109932"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-06.rpt",
+        "bytes": 8478,
+        "sha256": "1bf147f84fbfa7e23d4d357b737bbddc08a5fc61ff320c35eaf05560ca798334"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-06.rpt.gz",
+        "bytes": 1858,
+        "sha256": "8e4fe51608f4d37739bad79f05237507295a6cf7735316ad8367c4875b09d8b1"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-07.rpt",
+        "bytes": 7933,
+        "sha256": "8b409086bea7320ccfef1d6c5af2d1f1ce3603123e23ad94f755fe2b8a8f21cf"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-07.rpt.gz",
+        "bytes": 1698,
+        "sha256": "a02ffd5c2a50cc4acbcc882526eee143b3c9ab8b122fafe19a975116c12d85ba"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-hierarchy.tsv",
+        "bytes": 1244,
+        "sha256": "013c0cb0f62fa99c2bfde9aa0b6dd6ec2bd01bf2d335f51ac0dbca33a69723ce"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/focused-hierarchy.tsv.gz",
+        "bytes": 287,
+        "sha256": "85ec533ee697b088f2469fc7190bbc7f509dd28e63a54ff6a3bae605fd0b9be2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/primitive-counts.tsv",
+        "bytes": 7005,
+        "sha256": "f729da102a8882e812d580e596baf3093ef4286a8259b59d7f6f49b7e559b702"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/primitive-counts.tsv.gz",
+        "bytes": 1368,
+        "sha256": "eacf8b9b0ca9189fc7a5880c05fd46e5a8d0b3d667fba2a903d65c3cf2c12325"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/primitive-name-samples.tsv",
+        "bytes": 149986,
+        "sha256": "a61163bc04b26f89b786ee657931cfa69f5faf2a3db67898baa89df9d99ff3fc"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/primitive-name-samples.tsv.gz",
+        "bytes": 7071,
+        "sha256": "a63b40cd69f6a08b1a9e5d3e440a0de5414fc2433748b8ff30f373e2dbf5b529"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/query.tcl",
+        "bytes": 3502,
+        "sha256": "4207043dcdf820ec5cffd1c8e57b2356e33c62cff568921149737683d7fb23e8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/query.tcl.gz",
+        "bytes": 1303,
+        "sha256": "1e92dd46620b0e053223de7f075c20ddfc438d63992fd09b949bb09ffe99ca58"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/run_remote.py",
+        "bytes": 3736,
+        "sha256": "cf632a4d69058f0b4e9b1d7fbea1963781eac16f8365103b063d1073b62bb343"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/run_remote.py.gz",
+        "bytes": 1721,
+        "sha256": "e1721dc9d8ef28675e4320d67b3ffb296e782daa396e4669cb14ff924d95bb32"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/session.json",
+        "bytes": 4485,
+        "sha256": "aad96b41d1e54b7e4c95d556603528f9d45471cf345e0a169707c3f1c27aee33"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/session.json.gz",
+        "bytes": 1489,
+        "sha256": "13f8efaf321505665afa5161a3d5155ffa8924b393c4f24ec1234aeadc7a643e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/utilization_flat.rpt",
+        "bytes": 9314,
+        "sha256": "e8d039ec5a0a4cf931ccf0bba16b285f6f452ed3978178a2bd521efd3c286339"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/utilization_flat.rpt.gz",
+        "bytes": 2087,
+        "sha256": "e4f3b50bfba7b40a4369b11996bef752d8bef0b459d417bff1eb892cb4f1f6bb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/utilization_hierarchical.rpt",
+        "bytes": 346957,
+        "sha256": "8c225789f6fc4ce54b0f625b1cb080096b1a5265fdc31372cf3a34a51581d57a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/utilization_hierarchical.rpt.gz",
+        "bytes": 20434,
+        "sha256": "3b34e85c818a0b9b5b6ddb52f4bcbae7ad3241af4edd8883f94abed898486671"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/vivado.jou",
+        "bytes": 1109,
+        "sha256": "159dfe58fa04ce388e87db51eb5d12c24cd261e0bc13a1613d66f809f412ed92"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/vivado.jou.gz",
+        "bytes": 526,
+        "sha256": "e1796d2e4b7c44291bf39dab4c5efeb567e26c79c602fb3759d9643fc8032540"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/vivado.log",
+        "bytes": 7312,
+        "sha256": "b195875fa354e53f8e9357b3eb1cb52b20d1549ca063f790b80de01eb30cd6a6"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/remote/vivado.log.gz",
+        "bytes": 2630,
+        "sha256": "4a58b086d54719cde6939f89f64fbf5a89e311a519dc9eab1a9e2dfdbe3eb43e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/run_remote.py",
+        "bytes": 3736,
+        "sha256": "cf632a4d69058f0b4e9b1d7fbea1963781eac16f8365103b063d1073b62bb343"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/run_remote.py.gz",
+        "bytes": 1721,
+        "sha256": "e1721dc9d8ef28675e4320d67b3ffb296e782daa396e4669cb14ff924d95bb32"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/source-manifest.json",
+        "bytes": 481,
+        "sha256": "f4cf2c921579b7427411a8113b2821e2c4fb2c54c9fd4bfe2f63c28c8c852a4b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/source-manifest.json.gz",
+        "bytes": 271,
+        "sha256": "a9313f57fb2bf488f833732095e95048c57b81649e91b4041ccc7bb15a0c81bb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/ssh-run.log",
+        "bytes": 60,
+        "sha256": "b707938893927d3bdcb61f97b0b1c3cfb4f73964c29f35b85f4cb71292a47a68"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-hierarchy01/ssh-run.log.gz",
+        "bytes": 79,
+        "sha256": "7479d01d1dd49e66f8374ab21df2a1a8dc5cfcc57b36d0384ceda204afa90338"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-job-preflight.json",
+        "bytes": 1516,
+        "sha256": "668ef41bf45ea7136f969e1cfef2e67bc370eb0f5bdb6a3eecfb2c73177b9450"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/read-job-preflight.json.gz",
+        "bytes": 560,
+        "sha256": "525c86ff3abacb001be0f166f78bf48d12d9680a734e633ac105d2b347666c16"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/remote_probe.py",
+        "bytes": 3871,
+        "sha256": "366d9f7fadb1f233b34b98c5241843d1a1e702775614b22c1caff5fae41d4f12"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/remote_probe.py.gz",
+        "bytes": 1699,
+        "sha256": "1342f19e0a372c7b16114c7bb0bf78a380c0b99108cfd3855f809de436afcaf0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/synth-resource-facts.json",
+        "bytes": 3727,
+        "sha256": "399a7ca8ff554e8365f40c38b6e2f2193b0254593b35075bbbf8b5c1e28fe791"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/synth-resource-facts.json.gz",
+        "bytes": 1198,
+        "sha256": "9cd3107e764fc8a34d1de453bb28ae368a19adaf95642a59a94169883ec5b4fc"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/synth-utilization-exact.rpt",
+        "bytes": 9392,
+        "sha256": "4d7a6fb37773934d92fd3f12fb49d0e9fe0826e4bfd16e399a66291a4de6378a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/synth-utilization-exact.rpt.gz",
+        "bytes": 2097,
+        "sha256": "83a4f7ddeebee82631ae15d65416e634aa61bb66431e80927caec2b55fbeb924"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/synth-utilization-exact.rpt.gz",
+        "bytes": 2097,
+        "sha256": "83a4f7ddeebee82631ae15d65416e634aa61bb66431e80927caec2b55fbeb924"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/synth-utilization-exact.rpt.gz.gz",
+        "bytes": 2120,
+        "sha256": "0c7b8c51d18c0d2107b0d8c37ae7c65dc73bd98adf4308ba65e52235e99b5f48"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/terminal-drc-exact.rpt",
+        "bytes": 25766,
+        "sha256": "3a508a7922e011d71f7f76d120caf890d86f725c090fe06dd34bc7a3d2047e6e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/terminal-drc-exact.rpt.gz",
+        "bytes": 1840,
+        "sha256": "cbe46961f87ba5bf9e3f1c5799edbbc5ad1beb2d4185a83112252157d1bba1df"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-logs-linux-retained-native1280-sp-r4/20261121T140517Z-11ca59a27/console.log",
+        "bytes": 995821,
+        "sha256": "dda58a14bf37f0493085d2a59772304db89bfb4640aa1b16ad8c506ca8490911"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/closed-terminal01/original-job-console.log.gz",
+        "bytes": 75173,
+        "sha256": "7359e9df4b2da6509f09c700f630195b2e2901aff1f888ec8e98a1a7495835ec"
+      }
+    }
+  ],
+  "limitations": "Synthesis and optDRC resource endpoints differ; no fit/bit/physical acceptance. Read-only DCP reports do not establish savings from a prototype or justify removing required functionality."
+}
