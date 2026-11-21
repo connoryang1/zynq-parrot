@@ -1,0 +1,68 @@
+{
+  "state": "prospective bounded unsupported-hardware functional compatibility check; not launched",
+  "created_utc": "2026-11-21T03:33:00.331782+00:00",
+  "purpose": "Repeat the exact prior absent capability probe with owned46MiB RAM, closing its old64MiB ownership limitation; no performance inference.",
+  "guest_elf_sha256": "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2",
+  "nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+    "bytes": 70906578,
+    "sha256": "a1fbac904a8604939ee55b0c91ca2812cc9b9451220a7a53df97cfd88acf97d5"
+  },
+  "transfer": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-probe-v1.transfer",
+    "bytes": 7874,
+    "sha256": "24850264f31962c08879c9a5ff1acbc893a548197f6ca6553daf93cb0051e5aa"
+  },
+  "package": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+    "bytes": 1750672,
+    "sha256": "b139be87bdadf965f2d5e7eb7cd290bc56be76753a2377dc25f5c690a69d5ab1"
+  },
+  "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+  "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "source8": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+  },
+  "board_helper": {
+    "path": "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh",
+    "bytes": 3808,
+    "sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90"
+  },
+  "argv": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-probe-v1.transfer",
+    "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2",
+    "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-absent46-20261121",
+    "--bitstream-sha256",
+    "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "--host",
+    "xilinx@192.168.4.35",
+    "--retention-probe",
+    "absent",
+    "--all-three-acknowledged"
+  ],
+  "maximum_physical_guest_executions": 1,
+  "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-absent46-20261121/session.json",
+  "shared_session_lock": "/home/coyang/fpga-artifacts/pynq-session.lock",
+  "start_condition": "After current Oops diagnostic supervisor exits and completes any reserved recovery; acquire a new exclusive common reservation.",
+  "required": [
+    "Exact artifacts and actual guest ELF hash before execution",
+    "One actual46MiB bounded boot",
+    "Expected absent capability ENODEV, sentinel preservation, invalid-mode and actual nonroot EPERM checks",
+    "Normal shell return, CORE/BSG PASS, runner0",
+    "Exact executed helperde54 and all source8 snapshots"
+  ],
+  "not_a_prefetch_or_performance_result": true,
+  "automatic_retry": false
+}
