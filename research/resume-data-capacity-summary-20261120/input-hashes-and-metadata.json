@@ -1,0 +1,172 @@
+{
+  "purpose": "Static scientific conditional miss-count figure from closed audit JSONs only",
+  "inputs": {
+    "compact-one-kib-900/dcache-audit/summary.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/dcache-audit/summary.json",
+      "bytes": 9429,
+      "sha256": "4737a0f447dfaacb11e25b10dd48b743b61f9a80f15acb93463d308546303f1d"
+    },
+    "compact-one-kib-900/dcache-audit/analysis.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/dcache-audit/analysis.json",
+      "bytes": 42997,
+      "sha256": "ba4918145528cf26ec0ec506e5bafe568a21ecb60888a30f8399d13990325728"
+    },
+    "compact-one-kib-900/dcache-audit/manifest.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/dcache-audit/manifest.json",
+      "bytes": 10493,
+      "sha256": "9710919c19fceec66b7f33424563a2b0106629a733cd425c2a2c87e21eae34e3"
+    },
+    "compact-one-kib-900/session.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/session.json",
+      "bytes": 9390,
+      "sha256": "34f6620eb8918a1901d9676c37a5ce374767a37c2580e3515b8de4870843b001"
+    },
+    "compact-one-kib-900/trace-metadata.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/trace-metadata.json",
+      "bytes": 1295,
+      "sha256": "67ff3d79bb12817a528917aa8dc5b55cc2c0bee567108451cd9a608aca7dd3db"
+    },
+    "compact-thirtytwo-kib/dcache-audit/summary.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/dcache-audit/summary.json",
+      "bytes": 11073,
+      "sha256": "6cf70e8c497d9f8fb50d50e050847728eb7438e72d6541de0c2caff8b57817eb"
+    },
+    "compact-thirtytwo-kib/dcache-audit/analysis.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/dcache-audit/analysis.json",
+      "bytes": 51024,
+      "sha256": "a75dda29c3da07277582f9a882f337fe07f01067a2fd4b5a083c43f64d87f973"
+    },
+    "compact-thirtytwo-kib/dcache-audit/manifest.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/dcache-audit/manifest.json",
+      "bytes": 15736,
+      "sha256": "41949658aa0ccab468a73358ef05d1105102f2aef371ac9baf95a4a24f826b4a"
+    },
+    "compact-thirtytwo-kib/session.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/session.json",
+      "bytes": 8543,
+      "sha256": "ed7512587138883bc6044d30eeb3ce412d710a2d9111bf384f6bc992a929ec0e"
+    },
+    "compact-thirtytwo-kib/trace-metadata.json": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/trace-metadata.json",
+      "bytes": 1299,
+      "sha256": "e88e3fcf940bf77e5ecc5cb945d89106f642e2218f3b6c1902d6b12bc0f5a519"
+    }
+  },
+  "plotter": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-capacity-summary-20261120/plot_capacity.py",
+    "bytes": 9657,
+    "sha256": "62a2f17c97887557e75dab3c9adab09f8333142090b1b265e9f9acfb5991aa6c"
+  },
+  "cases": [
+    {
+      "footprint_kib_per_actor": 1,
+      "timed_target_loads": 5381,
+      "timed_target_normal_l1_hits": 5381,
+      "timed_target_ordinary_misses": 0,
+      "full_program_actual_replacement_evictions": 0,
+      "covered_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "footprint_kib_per_actor": 32,
+      "timed_target_loads": 5266,
+      "timed_target_normal_l1_hits": 3586,
+      "timed_target_ordinary_misses": 1680,
+      "full_program_actual_replacement_evictions": 5996,
+      "covered_counts": [
+        0,
+        5,
+        20,
+        39,
+        99,
+        207
+      ]
+    }
+  ],
+  "ffc_geometry_parameter_proof": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/accepted-cache-geometry-20261120/ffc-initial-parameters.json",
+    "bytes": 7500,
+    "sha256": "494e26ec2ec02e08ac3496260a4f41d752e7097d850d22402f46a68c0f221ab1"
+  },
+  "workload_source": {
+    "testing/mt_resume_data_reuse_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/source/testing/mt_resume_data_reuse_benchmark.c",
+      "bytes": 6447,
+      "sha256": "fe0b23e69946f0614634d82e1953c94c599ee3dfdc9b9430f6af510c4bea6945"
+    },
+    "linux-tests/resume_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/source/linux-tests/resume_workload.h",
+      "bytes": 10958,
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa"
+    }
+  },
+  "same_elf_sha256": "f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd",
+  "same_model_sha256": "77f76ae7527c2e9ed796fad48a8344e2dbbc10a5d90a69ccfb829e0bc2754ad5",
+  "model": {
+    "blackparrot_revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57",
+    "l2_banks": 1,
+    "l1d_bytes": 32768,
+    "l1d_sets": 64,
+    "l1d_ways": 8,
+    "line_bytes": 64,
+    "resident_slots": 2,
+    "logical_actors": 4,
+    "private_corpora": 4,
+    "timed_requests": 32,
+    "timed_laps": 8,
+    "generated_queries_per_request": 64
+  },
+  "metric": "Covered timed TARGET ordinary miss COUNT, never rate or speedup",
+  "scope": "Exclusive FIFO actual-baseline-eviction address ledger, fixed observed execution, no execution feedback or FPGA projection",
+  "zero_opportunity_policy": "1KiB has zero timed target ordinary misses; plot zero covered counts, no0/0 rate",
+  "advisory_limit": "No equivalence to actual accepted FPGA64B store consisting of four16B segments",
+  "timings": "Excluded: computation/probe counts differ, so ring timings cannot isolate capacity",
+  "environment": {
+    "python": "3.8.10",
+    "matplotlib": "3.7.5",
+    "packages": {
+      "pyparsing": "3.1.4",
+      "kiwisolver": "1.4.7",
+      "cycler": "0.12.1",
+      "tzdata": "2026.6",
+      "importlib_resources": "6.4.5",
+      "numpy": "1.24.4",
+      "python-dateutil": "3.0.0",
+      "matplotlib": "3.7.5",
+      "contourpy": "1.1.1",
+      "pillow": "10.4.0",
+      "fonttools": "4.57.0",
+      "packaging": "26.2",
+      "zipp": "3.20.2",
+      "six": "1.17.0"
+    }
+  },
+  "outputs": {
+    "timed-target-victim-coverage.csv": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-capacity-summary-20261120/timed-target-victim-coverage.csv",
+      "bytes": 1639,
+      "sha256": "24ba04a90b513f11a9b2f600baa17bf5113e25d187669a24717cf0d51e69275b"
+    },
+    "timed-target-victim-coverage.pdf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-capacity-summary-20261120/timed-target-victim-coverage.pdf",
+      "bytes": 24228,
+      "sha256": "9b44621be1ecf822d1ff3864698ed2a0d53a61c9f61b1d85e6f90ccc14389f6f"
+    },
+    "timed-target-victim-coverage.png": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-capacity-summary-20261120/timed-target-victim-coverage.png",
+      "bytes": 279660,
+      "sha256": "5e0563e9927fb70725481d05b14baff064415819836a835cfa0a6704df2686cb"
+    },
+    "timed-target-victim-coverage.svg": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-capacity-summary-20261120/timed-target-victim-coverage.svg",
+      "bytes": 13967,
+      "sha256": "b0a20c4248809a377f96cb95122b1b36cd0da966f0b5810b426b2c848e6b3dfe"
+    }
+  }
+}

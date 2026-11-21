@@ -1,0 +1,1201 @@
+{
+  "scope": "fixed-execution conditional address coverage only",
+  "exclusions": [
+    "no rescheduled execution",
+    "no measured speedup",
+    "no prefetch benefit",
+    "no FPGA projection",
+    "no retained-data correctness claim"
+  ],
+  "sampling": "stable pre-edge D-cache rising values; CSR-label commits on separate BE rising edges; physical CSR joins domains",
+  "l1": "actual 64-set 8-way 64-byte normal L1 tag SRAM, reconstructed only from observed masked writes",
+  "victim_policy": "exclusive FIFO of actual baseline replacement evictions; remove on actual refill; invalidate on stores and invalidation",
+  "stats": {
+    "validated_tag_read_rows": 33293,
+    "observed_initialization_slots": 512,
+    "accepted_cached_references": 31845,
+    "accepted_cached_stores": 9962,
+    "ordinary_misses": 324,
+    "unaccepted_tv_attempts": 311,
+    "matched_normal_fill_beats": 2592,
+    "matched_normal_tag_publications": 324,
+    "matched_complete_normal_refills": 324,
+    "normal_l1_hits": 31521,
+    "accepted_cached_loads": 21883,
+    "other_context_target_region_accesses": 726
+  },
+  "accepted_references_by_context": {
+    "0": 22739,
+    "1": 3077,
+    "2": 3029,
+    "3": 3000
+  },
+  "target_unique_lines": 64,
+  "requests": [
+    {
+      "context": 0,
+      "epoch": 0,
+      "phase": "warm",
+      "begin_be_edge": 161307,
+      "begin_global_cycle": 160065,
+      "stats": {
+        "target_loads": 166,
+        "normal_l1_hits": 166
+      },
+      "coverage": {},
+      "end_be_edge": 171735,
+      "end_global_cycle": 170493
+    },
+    {
+      "context": 1,
+      "epoch": 0,
+      "phase": "warm",
+      "begin_be_edge": 171859,
+      "begin_global_cycle": 170617,
+      "stats": {
+        "target_loads": 164,
+        "normal_l1_hits": 164
+      },
+      "coverage": {},
+      "end_be_edge": 181810,
+      "end_global_cycle": 180568
+    },
+    {
+      "context": 2,
+      "epoch": 0,
+      "phase": "warm",
+      "begin_be_edge": 181932,
+      "begin_global_cycle": 180690,
+      "stats": {
+        "target_loads": 144,
+        "normal_l1_hits": 144
+      },
+      "coverage": {},
+      "end_be_edge": 190834,
+      "end_global_cycle": 189592
+    },
+    {
+      "context": 3,
+      "epoch": 0,
+      "phase": "warm",
+      "begin_be_edge": 190905,
+      "begin_global_cycle": 189663,
+      "stats": {
+        "target_loads": 175,
+        "normal_l1_hits": 175
+      },
+      "coverage": {},
+      "end_be_edge": 201362,
+      "end_global_cycle": 200120
+    },
+    {
+      "context": 0,
+      "epoch": 1,
+      "phase": "warm",
+      "begin_be_edge": 201415,
+      "begin_global_cycle": 200173,
+      "stats": {
+        "target_loads": 160,
+        "normal_l1_hits": 160
+      },
+      "coverage": {},
+      "end_be_edge": 211120,
+      "end_global_cycle": 209878
+    },
+    {
+      "context": 1,
+      "epoch": 1,
+      "phase": "warm",
+      "begin_be_edge": 211174,
+      "begin_global_cycle": 209932,
+      "stats": {
+        "target_loads": 180,
+        "normal_l1_hits": 180
+      },
+      "coverage": {},
+      "end_be_edge": 221832,
+      "end_global_cycle": 220590
+    },
+    {
+      "context": 2,
+      "epoch": 1,
+      "phase": "warm",
+      "begin_be_edge": 221882,
+      "begin_global_cycle": 220640,
+      "stats": {
+        "target_loads": 164,
+        "normal_l1_hits": 164
+      },
+      "coverage": {},
+      "end_be_edge": 231751,
+      "end_global_cycle": 230509
+    },
+    {
+      "context": 3,
+      "epoch": 1,
+      "phase": "warm",
+      "begin_be_edge": 231801,
+      "begin_global_cycle": 230559,
+      "stats": {
+        "target_loads": 155,
+        "normal_l1_hits": 155
+      },
+      "coverage": {},
+      "end_be_edge": 241262,
+      "end_global_cycle": 240020
+    },
+    {
+      "context": 0,
+      "epoch": 2,
+      "phase": "warm",
+      "begin_be_edge": 241320,
+      "begin_global_cycle": 240078,
+      "stats": {
+        "target_loads": 161,
+        "normal_l1_hits": 161
+      },
+      "coverage": {},
+      "end_be_edge": 251049,
+      "end_global_cycle": 249807
+    },
+    {
+      "context": 1,
+      "epoch": 2,
+      "phase": "warm",
+      "begin_be_edge": 251103,
+      "begin_global_cycle": 249861,
+      "stats": {
+        "target_loads": 174,
+        "normal_l1_hits": 174
+      },
+      "coverage": {},
+      "end_be_edge": 261448,
+      "end_global_cycle": 260206
+    },
+    {
+      "context": 2,
+      "epoch": 2,
+      "phase": "warm",
+      "begin_be_edge": 261493,
+      "begin_global_cycle": 260251,
+      "stats": {
+        "target_loads": 175,
+        "normal_l1_hits": 175
+      },
+      "coverage": {},
+      "end_be_edge": 271958,
+      "end_global_cycle": 270716
+    },
+    {
+      "context": 3,
+      "epoch": 2,
+      "phase": "warm",
+      "begin_be_edge": 272009,
+      "begin_global_cycle": 270767,
+      "stats": {
+        "target_loads": 164,
+        "normal_l1_hits": 164
+      },
+      "coverage": {},
+      "end_be_edge": 281920,
+      "end_global_cycle": 280678
+    },
+    {
+      "context": 0,
+      "epoch": 3,
+      "phase": "warm",
+      "begin_be_edge": 281978,
+      "begin_global_cycle": 280736,
+      "stats": {
+        "target_loads": 165,
+        "normal_l1_hits": 165
+      },
+      "coverage": {},
+      "end_be_edge": 291904,
+      "end_global_cycle": 290662
+    },
+    {
+      "context": 1,
+      "epoch": 3,
+      "phase": "warm",
+      "begin_be_edge": 291949,
+      "begin_global_cycle": 290707,
+      "stats": {
+        "target_loads": 173,
+        "normal_l1_hits": 173
+      },
+      "coverage": {},
+      "end_be_edge": 302287,
+      "end_global_cycle": 301045
+    },
+    {
+      "context": 2,
+      "epoch": 3,
+      "phase": "warm",
+      "begin_be_edge": 302337,
+      "begin_global_cycle": 301095,
+      "stats": {
+        "target_loads": 168,
+        "normal_l1_hits": 168
+      },
+      "coverage": {},
+      "end_be_edge": 312419,
+      "end_global_cycle": 311177
+    },
+    {
+      "context": 3,
+      "epoch": 3,
+      "phase": "warm",
+      "begin_be_edge": 312474,
+      "begin_global_cycle": 311232,
+      "stats": {
+        "target_loads": 165,
+        "normal_l1_hits": 165
+      },
+      "coverage": {},
+      "end_be_edge": 322423,
+      "end_global_cycle": 321181
+    },
+    {
+      "context": 0,
+      "epoch": 4,
+      "phase": "warm",
+      "begin_be_edge": 322468,
+      "begin_global_cycle": 321226,
+      "stats": {
+        "target_loads": 154,
+        "normal_l1_hits": 154
+      },
+      "coverage": {},
+      "end_be_edge": 331853,
+      "end_global_cycle": 330611
+    },
+    {
+      "context": 1,
+      "epoch": 4,
+      "phase": "warm",
+      "begin_be_edge": 331907,
+      "begin_global_cycle": 330665,
+      "stats": {
+        "target_loads": 150,
+        "normal_l1_hits": 150
+      },
+      "coverage": {},
+      "end_be_edge": 341128,
+      "end_global_cycle": 339886
+    },
+    {
+      "context": 2,
+      "epoch": 4,
+      "phase": "warm",
+      "begin_be_edge": 341178,
+      "begin_global_cycle": 339936,
+      "stats": {
+        "target_loads": 156,
+        "normal_l1_hits": 156
+      },
+      "coverage": {},
+      "end_be_edge": 350739,
+      "end_global_cycle": 349497
+    },
+    {
+      "context": 3,
+      "epoch": 4,
+      "phase": "warm",
+      "begin_be_edge": 350785,
+      "begin_global_cycle": 349543,
+      "stats": {
+        "target_loads": 152,
+        "normal_l1_hits": 152
+      },
+      "coverage": {},
+      "end_be_edge": 360120,
+      "end_global_cycle": 358878
+    },
+    {
+      "context": 0,
+      "epoch": 5,
+      "phase": "warm",
+      "begin_be_edge": 360174,
+      "begin_global_cycle": 358932,
+      "stats": {
+        "target_loads": 161,
+        "normal_l1_hits": 161
+      },
+      "coverage": {},
+      "end_be_edge": 369875,
+      "end_global_cycle": 368633
+    },
+    {
+      "context": 1,
+      "epoch": 5,
+      "phase": "warm",
+      "begin_be_edge": 369929,
+      "begin_global_cycle": 368687,
+      "stats": {
+        "target_loads": 170,
+        "normal_l1_hits": 170
+      },
+      "coverage": {},
+      "end_be_edge": 380055,
+      "end_global_cycle": 378813
+    },
+    {
+      "context": 2,
+      "epoch": 5,
+      "phase": "warm",
+      "begin_be_edge": 380100,
+      "begin_global_cycle": 378858,
+      "stats": {
+        "target_loads": 165,
+        "normal_l1_hits": 165
+      },
+      "coverage": {},
+      "end_be_edge": 390024,
+      "end_global_cycle": 388782
+    },
+    {
+      "context": 3,
+      "epoch": 5,
+      "phase": "warm",
+      "begin_be_edge": 390075,
+      "begin_global_cycle": 388833,
+      "stats": {
+        "target_loads": 165,
+        "normal_l1_hits": 165
+      },
+      "coverage": {},
+      "end_be_edge": 400007,
+      "end_global_cycle": 398765
+    },
+    {
+      "context": 0,
+      "epoch": 6,
+      "phase": "warm",
+      "begin_be_edge": 400057,
+      "begin_global_cycle": 398815,
+      "stats": {
+        "target_loads": 157,
+        "normal_l1_hits": 157
+      },
+      "coverage": {},
+      "end_be_edge": 409594,
+      "end_global_cycle": 408352
+    },
+    {
+      "context": 1,
+      "epoch": 6,
+      "phase": "warm",
+      "begin_be_edge": 409639,
+      "begin_global_cycle": 408397,
+      "stats": {
+        "target_loads": 171,
+        "normal_l1_hits": 171
+      },
+      "coverage": {},
+      "end_be_edge": 419861,
+      "end_global_cycle": 418619
+    },
+    {
+      "context": 2,
+      "epoch": 6,
+      "phase": "warm",
+      "begin_be_edge": 419911,
+      "begin_global_cycle": 418669,
+      "stats": {
+        "target_loads": 165,
+        "normal_l1_hits": 165
+      },
+      "coverage": {},
+      "end_be_edge": 429828,
+      "end_global_cycle": 428586
+    },
+    {
+      "context": 3,
+      "epoch": 6,
+      "phase": "warm",
+      "begin_be_edge": 429883,
+      "begin_global_cycle": 428641,
+      "stats": {
+        "target_loads": 183,
+        "normal_l1_hits": 183
+      },
+      "coverage": {},
+      "end_be_edge": 440715,
+      "end_global_cycle": 439473
+    },
+    {
+      "context": 0,
+      "epoch": 7,
+      "phase": "warm",
+      "begin_be_edge": 440760,
+      "begin_global_cycle": 439518,
+      "stats": {
+        "target_loads": 174,
+        "normal_l1_hits": 174
+      },
+      "coverage": {},
+      "end_be_edge": 451141,
+      "end_global_cycle": 449899
+    },
+    {
+      "context": 1,
+      "epoch": 7,
+      "phase": "warm",
+      "begin_be_edge": 451195,
+      "begin_global_cycle": 449953,
+      "stats": {
+        "target_loads": 150,
+        "normal_l1_hits": 150
+      },
+      "coverage": {},
+      "end_be_edge": 460395,
+      "end_global_cycle": 459153
+    },
+    {
+      "context": 2,
+      "epoch": 7,
+      "phase": "warm",
+      "begin_be_edge": 460445,
+      "begin_global_cycle": 459203,
+      "stats": {
+        "target_loads": 168,
+        "normal_l1_hits": 168
+      },
+      "coverage": {},
+      "end_be_edge": 470569,
+      "end_global_cycle": 469327
+    },
+    {
+      "context": 3,
+      "epoch": 7,
+      "phase": "warm",
+      "begin_be_edge": 470615,
+      "begin_global_cycle": 469373,
+      "stats": {
+        "target_loads": 159,
+        "normal_l1_hits": 159
+      },
+      "coverage": {},
+      "end_be_edge": 480284,
+      "end_global_cycle": 479042
+    },
+    {
+      "context": 0,
+      "epoch": 8,
+      "phase": "timed",
+      "begin_be_edge": 480342,
+      "begin_global_cycle": 479100,
+      "stats": {
+        "target_loads": 177,
+        "normal_l1_hits": 177
+      },
+      "coverage": {},
+      "end_be_edge": 490860,
+      "end_global_cycle": 489618
+    },
+    {
+      "context": 1,
+      "epoch": 8,
+      "phase": "timed",
+      "begin_be_edge": 490966,
+      "begin_global_cycle": 489724,
+      "stats": {
+        "target_loads": 147,
+        "normal_l1_hits": 147
+      },
+      "coverage": {},
+      "end_be_edge": 500009,
+      "end_global_cycle": 498767
+    },
+    {
+      "context": 2,
+      "epoch": 8,
+      "phase": "timed",
+      "begin_be_edge": 500054,
+      "begin_global_cycle": 498812,
+      "stats": {
+        "target_loads": 186,
+        "normal_l1_hits": 186
+      },
+      "coverage": {},
+      "end_be_edge": 511011,
+      "end_global_cycle": 509769
+    },
+    {
+      "context": 3,
+      "epoch": 8,
+      "phase": "timed",
+      "begin_be_edge": 511062,
+      "begin_global_cycle": 509820,
+      "stats": {
+        "target_loads": 168,
+        "normal_l1_hits": 168
+      },
+      "coverage": {},
+      "end_be_edge": 521185,
+      "end_global_cycle": 519943
+    },
+    {
+      "context": 0,
+      "epoch": 9,
+      "phase": "timed",
+      "begin_be_edge": 521239,
+      "begin_global_cycle": 519997,
+      "stats": {
+        "target_loads": 166,
+        "normal_l1_hits": 166
+      },
+      "coverage": {},
+      "end_be_edge": 531213,
+      "end_global_cycle": 529971
+    },
+    {
+      "context": 1,
+      "epoch": 9,
+      "phase": "timed",
+      "begin_be_edge": 531258,
+      "begin_global_cycle": 530016,
+      "stats": {
+        "target_loads": 184,
+        "normal_l1_hits": 184
+      },
+      "coverage": {},
+      "end_be_edge": 542093,
+      "end_global_cycle": 540851
+    },
+    {
+      "context": 2,
+      "epoch": 9,
+      "phase": "timed",
+      "begin_be_edge": 542143,
+      "begin_global_cycle": 540901,
+      "stats": {
+        "target_loads": 148,
+        "normal_l1_hits": 148
+      },
+      "coverage": {},
+      "end_be_edge": 551231,
+      "end_global_cycle": 549989
+    },
+    {
+      "context": 3,
+      "epoch": 9,
+      "phase": "timed",
+      "begin_be_edge": 551282,
+      "begin_global_cycle": 550040,
+      "stats": {
+        "target_loads": 166,
+        "normal_l1_hits": 166
+      },
+      "coverage": {},
+      "end_be_edge": 561240,
+      "end_global_cycle": 559998
+    },
+    {
+      "context": 0,
+      "epoch": 10,
+      "phase": "timed",
+      "begin_be_edge": 561285,
+      "begin_global_cycle": 560043,
+      "stats": {
+        "target_loads": 178,
+        "normal_l1_hits": 178
+      },
+      "coverage": {},
+      "end_be_edge": 571859,
+      "end_global_cycle": 570617
+    },
+    {
+      "context": 1,
+      "epoch": 10,
+      "phase": "timed",
+      "begin_be_edge": 571917,
+      "begin_global_cycle": 570675,
+      "stats": {
+        "target_loads": 184,
+        "normal_l1_hits": 184
+      },
+      "coverage": {},
+      "end_be_edge": 582736,
+      "end_global_cycle": 581494
+    },
+    {
+      "context": 2,
+      "epoch": 10,
+      "phase": "timed",
+      "begin_be_edge": 582786,
+      "begin_global_cycle": 581544,
+      "stats": {
+        "target_loads": 162,
+        "normal_l1_hits": 162
+      },
+      "coverage": {},
+      "end_be_edge": 592571,
+      "end_global_cycle": 591329
+    },
+    {
+      "context": 3,
+      "epoch": 10,
+      "phase": "timed",
+      "begin_be_edge": 592617,
+      "begin_global_cycle": 591375,
+      "stats": {
+        "target_loads": 143,
+        "normal_l1_hits": 143
+      },
+      "coverage": {},
+      "end_be_edge": 601467,
+      "end_global_cycle": 600225
+    },
+    {
+      "context": 0,
+      "epoch": 11,
+      "phase": "timed",
+      "begin_be_edge": 601521,
+      "begin_global_cycle": 600279,
+      "stats": {
+        "target_loads": 177,
+        "normal_l1_hits": 177
+      },
+      "coverage": {},
+      "end_be_edge": 612052,
+      "end_global_cycle": 610810
+    },
+    {
+      "context": 1,
+      "epoch": 11,
+      "phase": "timed",
+      "begin_be_edge": 612106,
+      "begin_global_cycle": 610864,
+      "stats": {
+        "target_loads": 175,
+        "normal_l1_hits": 175
+      },
+      "coverage": {},
+      "end_be_edge": 622504,
+      "end_global_cycle": 621262
+    },
+    {
+      "context": 2,
+      "epoch": 11,
+      "phase": "timed",
+      "begin_be_edge": 622549,
+      "begin_global_cycle": 621307,
+      "stats": {
+        "target_loads": 176,
+        "normal_l1_hits": 176
+      },
+      "coverage": {},
+      "end_be_edge": 633009,
+      "end_global_cycle": 631767
+    },
+    {
+      "context": 3,
+      "epoch": 11,
+      "phase": "timed",
+      "begin_be_edge": 633060,
+      "begin_global_cycle": 631818,
+      "stats": {
+        "target_loads": 172,
+        "normal_l1_hits": 172
+      },
+      "coverage": {},
+      "end_be_edge": 643344,
+      "end_global_cycle": 642102
+    },
+    {
+      "context": 0,
+      "epoch": 12,
+      "phase": "timed",
+      "begin_be_edge": 643394,
+      "begin_global_cycle": 642152,
+      "stats": {
+        "target_loads": 151,
+        "normal_l1_hits": 151
+      },
+      "coverage": {},
+      "end_be_edge": 652656,
+      "end_global_cycle": 651414
+    },
+    {
+      "context": 1,
+      "epoch": 12,
+      "phase": "timed",
+      "begin_be_edge": 652701,
+      "begin_global_cycle": 651459,
+      "stats": {
+        "target_loads": 153,
+        "normal_l1_hits": 153
+      },
+      "coverage": {},
+      "end_be_edge": 662029,
+      "end_global_cycle": 660787
+    },
+    {
+      "context": 2,
+      "epoch": 12,
+      "phase": "timed",
+      "begin_be_edge": 662079,
+      "begin_global_cycle": 660837,
+      "stats": {
+        "target_loads": 162,
+        "normal_l1_hits": 162
+      },
+      "coverage": {},
+      "end_be_edge": 671924,
+      "end_global_cycle": 670682
+    },
+    {
+      "context": 3,
+      "epoch": 12,
+      "phase": "timed",
+      "begin_be_edge": 671975,
+      "begin_global_cycle": 670733,
+      "stats": {
+        "target_loads": 160,
+        "normal_l1_hits": 160
+      },
+      "coverage": {},
+      "end_be_edge": 681697,
+      "end_global_cycle": 680455
+    },
+    {
+      "context": 0,
+      "epoch": 13,
+      "phase": "timed",
+      "begin_be_edge": 681742,
+      "begin_global_cycle": 680500,
+      "stats": {
+        "target_loads": 175,
+        "normal_l1_hits": 175
+      },
+      "coverage": {},
+      "end_be_edge": 692143,
+      "end_global_cycle": 690901
+    },
+    {
+      "context": 1,
+      "epoch": 13,
+      "phase": "timed",
+      "begin_be_edge": 692197,
+      "begin_global_cycle": 690955,
+      "stats": {
+        "target_loads": 199,
+        "normal_l1_hits": 199
+      },
+      "coverage": {},
+      "end_be_edge": 703734,
+      "end_global_cycle": 702492
+    },
+    {
+      "context": 2,
+      "epoch": 13,
+      "phase": "timed",
+      "begin_be_edge": 703784,
+      "begin_global_cycle": 702542,
+      "stats": {
+        "target_loads": 179,
+        "normal_l1_hits": 179
+      },
+      "coverage": {},
+      "end_be_edge": 714373,
+      "end_global_cycle": 713131
+    },
+    {
+      "context": 3,
+      "epoch": 13,
+      "phase": "timed",
+      "begin_be_edge": 714419,
+      "begin_global_cycle": 713177,
+      "stats": {
+        "target_loads": 162,
+        "normal_l1_hits": 162
+      },
+      "coverage": {},
+      "end_be_edge": 724171,
+      "end_global_cycle": 722929
+    },
+    {
+      "context": 0,
+      "epoch": 14,
+      "phase": "timed",
+      "begin_be_edge": 724221,
+      "begin_global_cycle": 722979,
+      "stats": {
+        "target_loads": 170,
+        "normal_l1_hits": 170
+      },
+      "coverage": {},
+      "end_be_edge": 734338,
+      "end_global_cycle": 733096
+    },
+    {
+      "context": 1,
+      "epoch": 14,
+      "phase": "timed",
+      "begin_be_edge": 734392,
+      "begin_global_cycle": 733150,
+      "stats": {
+        "target_loads": 176,
+        "normal_l1_hits": 176
+      },
+      "coverage": {},
+      "end_be_edge": 744891,
+      "end_global_cycle": 743649
+    },
+    {
+      "context": 2,
+      "epoch": 14,
+      "phase": "timed",
+      "begin_be_edge": 744936,
+      "begin_global_cycle": 743694,
+      "stats": {
+        "target_loads": 181,
+        "normal_l1_hits": 181
+      },
+      "coverage": {},
+      "end_be_edge": 755619,
+      "end_global_cycle": 754377
+    },
+    {
+      "context": 3,
+      "epoch": 14,
+      "phase": "timed",
+      "begin_be_edge": 755670,
+      "begin_global_cycle": 754428,
+      "stats": {
+        "target_loads": 172,
+        "normal_l1_hits": 172
+      },
+      "coverage": {},
+      "end_be_edge": 765901,
+      "end_global_cycle": 764659
+    },
+    {
+      "context": 0,
+      "epoch": 15,
+      "phase": "timed",
+      "begin_be_edge": 765951,
+      "begin_global_cycle": 764709,
+      "stats": {
+        "target_loads": 155,
+        "normal_l1_hits": 155
+      },
+      "coverage": {},
+      "end_be_edge": 775437,
+      "end_global_cycle": 774195
+    },
+    {
+      "context": 1,
+      "epoch": 15,
+      "phase": "timed",
+      "begin_be_edge": 775482,
+      "begin_global_cycle": 774240,
+      "stats": {
+        "target_loads": 154,
+        "normal_l1_hits": 154
+      },
+      "coverage": {},
+      "end_be_edge": 784895,
+      "end_global_cycle": 783653
+    },
+    {
+      "context": 2,
+      "epoch": 15,
+      "phase": "timed",
+      "begin_be_edge": 784945,
+      "begin_global_cycle": 783703,
+      "stats": {
+        "target_loads": 157,
+        "normal_l1_hits": 157
+      },
+      "coverage": {},
+      "end_be_edge": 794497,
+      "end_global_cycle": 793255
+    },
+    {
+      "context": 3,
+      "epoch": 15,
+      "phase": "timed",
+      "begin_be_edge": 794548,
+      "begin_global_cycle": 793306,
+      "stats": {
+        "target_loads": 166,
+        "normal_l1_hits": 166
+      },
+      "coverage": {},
+      "end_be_edge": 804545,
+      "end_global_cycle": 803303
+    }
+  ],
+  "coverage": {
+    "0": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "4": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "16": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "32": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "64": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "128": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    }
+  },
+  "metadata": {
+    "begin_pc": 2147486172,
+    "end_pc": 2147486238,
+    "warmup_requests": 8,
+    "timed_requests": 8,
+    "regions": [
+      {
+        "context": 0,
+        "base": 2147528864,
+        "bytes": 1024
+      },
+      {
+        "context": 1,
+        "base": 2147529904,
+        "bytes": 1024
+      },
+      {
+        "context": 2,
+        "base": 2147530944,
+        "bytes": 1024
+      },
+      {
+        "context": 3,
+        "base": 2147531984,
+        "bytes": 1024
+      }
+    ],
+    "expected_target_loads_by_context": {
+      "0": [
+        166,
+        160,
+        161,
+        165,
+        154,
+        161,
+        157,
+        174,
+        177,
+        166,
+        178,
+        177,
+        151,
+        175,
+        170,
+        155
+      ],
+      "1": [
+        164,
+        180,
+        174,
+        173,
+        150,
+        170,
+        171,
+        150,
+        147,
+        184,
+        184,
+        175,
+        153,
+        199,
+        176,
+        154
+      ],
+      "2": [
+        144,
+        164,
+        175,
+        168,
+        156,
+        165,
+        165,
+        168,
+        186,
+        148,
+        162,
+        176,
+        162,
+        179,
+        181,
+        157
+      ],
+      "3": [
+        175,
+        155,
+        164,
+        165,
+        152,
+        165,
+        183,
+        159,
+        168,
+        166,
+        143,
+        172,
+        160,
+        162,
+        172,
+        166
+      ]
+    }
+  },
+  "active_dcache_edges": 1114198,
+  "reset_observed": true,
+  "validation": "passed",
+  "timescale": "1ps",
+  "signals": {
+    "num_threads": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.num_threads_p",
+    "num_contexts": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.num_contexts_p",
+    "clock": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.clk_i",
+    "reset": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.reset_i",
+    "context_0": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.physical_thread_context_id_r[0]",
+    "context_1": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.physical_thread_context_id_r[1]",
+    "commit_thread": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.retire_thread_id_lo",
+    "commit_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.commit_pkt_cast_o.instret",
+    "commit_pc": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.commit_pkt_cast_o.pc",
+    "sets": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.sets_p",
+    "ways": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.assoc_p",
+    "block_bits": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.block_width_p",
+    "cache_clock": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.clk_i",
+    "result_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.v_o",
+    "request_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.cache_req_v_o",
+    "request_yumi": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.cache_req_yumi_i",
+    "data_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_v_i",
+    "data_yumi": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_yumi_o",
+    "tag_packet_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_v_i",
+    "tag_packet_yumi": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_yumi_o",
+    "v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.v_tv_r",
+    "critical": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.critical_recv",
+    "complete": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.complete_recv",
+    "tag_opcode": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_cast_i.opcode",
+    "tag_v": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_v_li",
+    "tag_w": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_w_li",
+    "tag_index": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_addr_li",
+    "data_li_0_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[0].state",
+    "data_li_0_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[0].tag",
+    "data_li_1_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[1].state",
+    "data_li_1_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[1].tag",
+    "data_li_2_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[2].state",
+    "data_li_2_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[2].tag",
+    "data_li_3_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[3].state",
+    "data_li_3_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[3].tag",
+    "data_li_4_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[4].state",
+    "data_li_4_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[4].tag",
+    "data_li_5_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[5].state",
+    "data_li_5_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[5].tag",
+    "data_li_6_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[6].state",
+    "data_li_6_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[6].tag",
+    "data_li_7_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[7].state",
+    "data_li_7_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_li[7].tag",
+    "mask_li_0_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[0].state",
+    "mask_li_0_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[0].tag",
+    "mask_li_1_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[1].state",
+    "mask_li_1_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[1].tag",
+    "mask_li_2_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[2].state",
+    "mask_li_2_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[2].tag",
+    "mask_li_3_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[3].state",
+    "mask_li_3_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[3].tag",
+    "mask_li_4_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[4].state",
+    "mask_li_4_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[4].tag",
+    "mask_li_5_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[5].state",
+    "mask_li_5_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[5].tag",
+    "mask_li_6_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[6].state",
+    "mask_li_6_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[6].tag",
+    "mask_li_7_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[7].state",
+    "mask_li_7_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_mask_li[7].tag",
+    "data_lo_0_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[0].state",
+    "data_lo_0_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[0].tag",
+    "data_lo_1_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[1].state",
+    "data_lo_1_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[1].tag",
+    "data_lo_2_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[2].state",
+    "data_lo_2_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[2].tag",
+    "data_lo_3_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[3].state",
+    "data_lo_3_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[3].tag",
+    "data_lo_4_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[4].state",
+    "data_lo_4_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[4].tag",
+    "data_lo_5_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[5].state",
+    "data_lo_5_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[5].tag",
+    "data_lo_6_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[6].state",
+    "data_lo_6_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[6].tag",
+    "data_lo_7_state": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[7].state",
+    "data_lo_7_tag": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_data_lo[7].tag",
+    "data_address": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.addr",
+    "data_index": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.index",
+    "data_way": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.way_id",
+    "data_mask": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.fill_index",
+    "data_opcode": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.opcode",
+    "uncached": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.uncached_tv_r",
+    "snoop": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.snoop_tv_r",
+    "address": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.paddr_tv_r",
+    "load_vector": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.load_hit_v_tv_r",
+    "store_vector": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.store_hit_v_tv_r",
+    "load": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.decode_tv_r.load_op",
+    "prefetch": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.decode_tv_r.prefetch_op",
+    "store": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.decode_tv_r.store_op",
+    "ptw": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.decode_tv_r.ptw_op",
+    "cache_op": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.decode_tv_r.cache_op",
+    "thread": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.thread_id_tv_r",
+    "sc_fail": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.sc_fail_tv",
+    "replay": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.replay_tv_r",
+    "store_hit": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.store_hit_tv",
+    "cache_hit": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.cache_load_hit_tv",
+    "side_hit": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.prefetch_buffer_hit_tv",
+    "request_address": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.cache_req_cast_o.addr",
+    "load_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.load_req",
+    "store_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.store_req",
+    "binval_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.binval_req",
+    "inval_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.inval_req",
+    "flush_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.flush_req",
+    "prefetch_req": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.prefetch_req",
+    "tag_fast_write": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_fast_write",
+    "global_cycle": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_sys.csr.global_cycle_r"
+  }
+}

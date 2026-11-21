@@ -1,0 +1,258 @@
+{
+  "state": "complete-execution-and-full-access-audit-passed",
+  "scope": "One synthetic bare-metal four-logical-context/two-resident lookup1KiB-per-actor control; not Linux/FPGA/general-Dcapacity performance.",
+  "geometry": {
+    "sets": 64,
+    "ways": 8,
+    "line_bytes": 64,
+    "normal_l1_d_bytes": 32768
+  },
+  "complete_ring_cycles": 324256,
+  "timed_requests": 32,
+  "timed_context_switches": 32,
+  "program_requests": 64,
+  "request_counts_by_context": {
+    "0": 16,
+    "1": 16,
+    "2": 16,
+    "3": 16
+  },
+  "all64_independent_target_load_counts_match": true,
+  "phases": {
+    "warm": {
+      "requests": 32,
+      "target_loads": 5253,
+      "normal_l1_hits": 5253,
+      "target_ordinary_misses": 0
+    },
+    "timed": {
+      "requests": 32,
+      "target_loads": 5381,
+      "normal_l1_hits": 5381,
+      "target_ordinary_misses": 0
+    }
+  },
+  "target_request_observed_unique_lines": 64,
+  "full_program_stats": {
+    "validated_tag_read_rows": 33293,
+    "observed_initialization_slots": 512,
+    "accepted_cached_references": 31845,
+    "accepted_cached_stores": 9962,
+    "ordinary_misses": 324,
+    "unaccepted_tv_attempts": 311,
+    "matched_normal_fill_beats": 2592,
+    "matched_normal_tag_publications": 324,
+    "matched_complete_normal_refills": 324,
+    "normal_l1_hits": 31521,
+    "accepted_cached_loads": 21883,
+    "other_context_target_region_accesses": 726
+  },
+  "full_program_unique_normal_reference_lines": 324,
+  "all_normal_refs_in_printed_timed_interval": {
+    "l1_hit": 6118,
+    "store": 321,
+    "load": 5797
+  },
+  "event_counts": {
+    "reference": 31845,
+    "fill_beat": 2592,
+    "fill_complete": 324,
+    "begin": 64,
+    "end": 64
+  },
+  "conditional_exclusive_victim_curve": {
+    "0": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "4": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "16": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "32": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "64": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    },
+    "128": {
+      "warm_target_loads": 5253,
+      "timed_target_loads": 5381,
+      "unique_covered_lines": 0,
+      "warm_target_unique_lines_covered": 0,
+      "timed_target_unique_lines_covered": 0,
+      "peak_entries": 0,
+      "final_entries": 0
+    }
+  },
+  "conditional_scope": "fixed-execution conditional address coverage only",
+  "excluded_claims": [
+    "no rescheduled execution",
+    "no measured speedup",
+    "no prefetch benefit",
+    "no FPGA projection",
+    "no retained-data correctness claim"
+  ],
+  "interpretation": "All10634 target loads, including5381timed, hit normalL1; zeroactualevictions leaves everyadditionalvictimcapacity empty. This case validates a fitting-working-set negative control, not useful capacity at32KiB/chase/codec.",
+  "source_amdahl": "The unchanged lookup executes64 generated hash queries, mixes/remainders and linear probing; ring timing also includes handoffs/metadata. Avoided-miss coverage is not cycle coverage. No rescheduled execution or speedup projection is made.",
+  "analyzer_report": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/dcache-audit/analysis.json",
+    "sha256": "ba4918145528cf26ec0ec506e5bafe568a21ecb60888a30f8399d13990325728",
+    "bytes": 42997
+  },
+  "full_event_stream": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/dcache-audit/events.jsonl",
+    "sha256": "e6c796597b2e4240607a58b28ce45759aa9832dc7d3bb68f80fa9804e294c403",
+    "bytes": 10760410
+  },
+  "request_metadata": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/trace-metadata.json",
+    "sha256": "67ff3d79bb12817a528917aa8dc5b55cc2c0bee567108451cd9a608aca7dd3db",
+    "bytes": 1295
+  },
+  "session": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/session.json",
+    "sha256": "34f6620eb8918a1901d9676c37a5ce374767a37c2580e3515b8de4870843b001",
+    "bytes": 9390
+  },
+  "source_files": {
+    "testing/mt_resume_data_reuse_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/source/testing/mt_resume_data_reuse_benchmark.c",
+      "sha256": "fe0b23e69946f0614634d82e1953c94c599ee3dfdc9b9430f6af510c4bea6945",
+      "bytes": 6447
+    },
+    "testing/mt_seed.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/source/testing/mt_seed.h",
+      "sha256": "f2b82e27b9f242efec101b40b3ec77da9f7152114be196fb8bd3d5f88a5bcbe3",
+      "bytes": 3351
+    },
+    "linux-tests/resume_workload.h": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/source/linux-tests/resume_workload.h",
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+      "bytes": 10958
+    },
+    "testing/check_run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-one-kib-900/source/testing/check_run.py",
+      "sha256": "e1c8016f993d63a5ff2efc8e19c7d17e0db17894a357b0e74b27a5ac214845d6",
+      "bytes": 9427
+    }
+  },
+  "model_rtl_source_conditions": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_be_dcache.sv",
+      "bytes": 62116,
+      "sha256": "e870cb1f70ed6055c6aa304377b1f41690a2dff111dc3f03f60b9368873c74df",
+      "repository_path": "bp_be/src/v/bp_be_dcache/bp_be_dcache.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_be_pipe_mem.sv",
+      "bytes": 24783,
+      "sha256": "498ad8915b8bb511691ee404c9b4a3a7e198369964e39975222c67b67f354ed4",
+      "repository_path": "bp_be/src/v/bp_be_calculator/bp_be_pipe_mem.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_unicore_lite.sv",
+      "bytes": 21491,
+      "sha256": "e4a4a38bc8da53d8eb917af0cb54b7b8379ff1cc88dbaa8fe16e9a75b58b3c16",
+      "repository_path": "bp_top/src/v/bp_unicore_lite.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_uce.sv",
+      "bytes": 89440,
+      "sha256": "eac00dc10346da564d89d52435bf156427be263f8756e5811f25fa2b0be211af",
+      "repository_path": "bp_me/src/v/cce/bp_uce.sv",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_common_cache_engine_pkgdef.svh",
+      "bytes": 2730,
+      "sha256": "d2666cbbafcbe010eb9cdc8e9e49ca6281a0a0adb4c850401b8aad4a317cd7e1",
+      "repository_path": "bp_common/src/include/bp_common_cache_engine_pkgdef.svh",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/model-source/bp_common_bedrock_pkgdef.svh",
+      "bytes": 8324,
+      "sha256": "095fb04f72df80d2490bfb23d3fe7b9550ecfce4128e533a80fccd37eb634e6a",
+      "repository_path": "bp_common/src/include/bp_common_bedrock_pkgdef.svh",
+      "revision": "ffc9bd7641bc1d9b3df6cf530f3a432db3ebae57"
+    }
+  ],
+  "observed_target_loads_by_logical_context_and_physical_slot": [
+    {
+      "context": 0,
+      "slot": 0,
+      "loads": 1801
+    },
+    {
+      "context": 0,
+      "slot": 1,
+      "loads": 846
+    },
+    {
+      "context": 1,
+      "slot": 0,
+      "loads": 863
+    },
+    {
+      "context": 1,
+      "slot": 1,
+      "loads": 1841
+    },
+    {
+      "context": 2,
+      "slot": 0,
+      "loads": 1712
+    },
+    {
+      "context": 2,
+      "slot": 1,
+      "loads": 944
+    },
+    {
+      "context": 3,
+      "slot": 0,
+      "loads": 841
+    },
+    {
+      "context": 3,
+      "slot": 1,
+      "loads": 1786
+    }
+  ],
+  "all_four_logical_actors_observed_on_both_resident_slots": true
+}
