@@ -1,0 +1,549 @@
+{
+  "state": "PASS offline host/protocol and fixed accepted ELF bindings; all drafts UNLAUNCHABLE",
+  "sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+  },
+  "frozen17_before": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89"
+  },
+  "unchanged_base_commit": "47b8bb31bebe4d6be0a5388e1f68aa007472ae41",
+  "unchanged_sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/Makefile": "9486ff4f40916872935f3331323733b57e73f38db3a1e39a2bde50610200cf5d",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+  },
+  "preparer": {
+    "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/prepare.py",
+    "bytes": 10007,
+    "sha256": "45731559e4add177e69d590a937d03fbda8d2c3f8d70ce938e31d29060b187b2"
+  },
+  "commands": [
+    {
+      "label": "accepted-runtime-symbols",
+      "argv": [
+        "readelf",
+        "-Ws",
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/libc.so.6",
+        "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/ld-linux-riscv64-lp64d.so.1"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/accepted-runtime-symbols.log",
+        "bytes": 308805,
+        "sha256": "6196314f69a36e16ea634d6a67ec63ad7c640d00b843462c1bd1a567d5b535a3"
+      }
+    },
+    {
+      "label": "plain-readelf",
+      "argv": [
+        "readelf",
+        "-h",
+        "-l",
+        "-d",
+        "-V",
+        "-Ws",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/plain.elf"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/plain-readelf.log",
+        "bytes": 17821,
+        "sha256": "68673f96e861c6f271f2eb22ffb66f403d2a58940f33838a0d6d195e9e45753d"
+      }
+    },
+    {
+      "label": "regex-readelf",
+      "argv": [
+        "readelf",
+        "-h",
+        "-l",
+        "-d",
+        "-V",
+        "-Ws",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/regex.elf"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/regex-readelf.log",
+        "bytes": 18978,
+        "sha256": "fe317e7105d3c17b30d651dc01cd38fd05e6b0d5dd112b1b43d89fe58bfe7512"
+      }
+    },
+    {
+      "label": "probe-readelf",
+      "argv": [
+        "readelf",
+        "-h",
+        "-l",
+        "-d",
+        "-V",
+        "-Ws",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/probe.elf"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/probe-readelf.log",
+        "bytes": 14542,
+        "sha256": "dda249cc6029589065886708a00371662f93efe347da8738782ba6d0b500963c"
+      }
+    },
+    {
+      "label": "host-compiler-version",
+      "argv": [
+        "cc",
+        "--version"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/host-compiler-version.log",
+        "bytes": 243,
+        "sha256": "a2c6f19b6698aa4249442367c19c93accd1bb85cfcd901fce4c02116f30da891"
+      }
+    },
+    {
+      "label": "host-libc-version",
+      "argv": [
+        "getconf",
+        "GNU_LIBC_VERSION"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/host-libc-version.log",
+        "bytes": 11,
+        "sha256": "34612da5134bf684319aab5a37c81e61d66f7bb1564a77a6a31b774af3e12616"
+      }
+    },
+    {
+      "label": "application-tests",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_retained29_application"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29/linux-tests",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/application-tests.log",
+        "bytes": 2515,
+        "sha256": "05c0fdcafe53797f3aa957db191012125ac3f1be3dc4a950a588726fd100a596"
+      }
+    },
+    {
+      "label": "legacy17-regression",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_retained29_session",
+        "test_retained29_session_v2",
+        "test_retained29_stage_v2"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29/linux-tests",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/legacy17-regression.log",
+        "bytes": 3664,
+        "sha256": "f9b93eafe52b22b3077a2077e7a86f7a88b116d19ac56339df4fc1df8f24966a"
+      }
+    },
+    {
+      "label": "pilot-offline",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-matrix29/linux-tests/run_retained29_application_session.py",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/pilot.json"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/pilot-offline.log",
+        "bytes": 36,
+        "sha256": "6c842d6d41840c814a81bf8b5c5274c4786279eed511515c01bf88376b86322a"
+      }
+    },
+    {
+      "label": "performance-scan-offline",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-matrix29/linux-tests/run_retained29_application_session.py",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-scan.json"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/performance-scan-offline.log",
+        "bytes": 36,
+        "sha256": "6c842d6d41840c814a81bf8b5c5274c4786279eed511515c01bf88376b86322a"
+      }
+    },
+    {
+      "label": "performance-lookup-offline",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-matrix29/linux-tests/run_retained29_application_session.py",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-lookup.json"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/performance-lookup-offline.log",
+        "bytes": 36,
+        "sha256": "6c842d6d41840c814a81bf8b5c5274c4786279eed511515c01bf88376b86322a"
+      }
+    },
+    {
+      "label": "performance-parse-offline",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-matrix29/linux-tests/run_retained29_application_session.py",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-parse.json"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/performance-parse-offline.log",
+        "bytes": 36,
+        "sha256": "6c842d6d41840c814a81bf8b5c5274c4786279eed511515c01bf88376b86322a"
+      }
+    },
+    {
+      "label": "performance-chase-offline",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-matrix29/linux-tests/run_retained29_application_session.py",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-chase.json"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/performance-chase-offline.log",
+        "bytes": 36,
+        "sha256": "6c842d6d41840c814a81bf8b5c5274c4786279eed511515c01bf88376b86322a"
+      }
+    },
+    {
+      "label": "performance-regex-offline",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-matrix29/linux-tests/run_retained29_application_session.py",
+        "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-regex.json"
+      ],
+      "cwd": "/home/coyang/zynq-parrot-linux-matrix29",
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/performance-regex-offline.log",
+        "bytes": 36,
+        "sha256": "6c842d6d41840c814a81bf8b5c5274c4786279eed511515c01bf88376b86322a"
+      }
+    }
+  ],
+  "scope": "Offline protocol/host-library and accepted-RV64-input binding only; no physical operation or application performance claim",
+  "host_compiler": {
+    "path": "/usr/bin/x86_64-linux-gnu-gcc-9",
+    "bytes": 1158288,
+    "sha256": "6cb2d84ccd9fd3485d4e47ba032e626be65692601c38fad46866a6b565f3100f"
+  },
+  "frozen17_after": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89"
+  },
+  "programs": {
+    "plain": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/plain.elf",
+        "bytes": 27576,
+        "sha256": "24c66080e836bbc17c64c7fc82d53575860c6ccd3e40de3ffb0554c3c58b26c6"
+      },
+      "transfer": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/plain.transfer",
+        "bytes": 17748,
+        "sha256": "022a3a7af5a4cd5e2f3f88c96fc72f868bad209d8243bb6b3dc4a90b77f1935a"
+      }
+    },
+    "regex": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/regex.elf",
+        "bytes": 27968,
+        "sha256": "2b23a02ed44e6c5a34c418d8d3e9fa9d7f277d465a032a3860172cb9242de129"
+      },
+      "transfer": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/regex.transfer",
+        "bytes": 19438,
+        "sha256": "6a5f1523c9088607e1d0c99dcadb07dc01a4d3435d7163ca623556c844c0183f"
+      }
+    },
+    "probe": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/probe.elf",
+        "bytes": 14200,
+        "sha256": "9bb01f51b23ca190e7c1bc1c1bc935c01f3441bacab79463438312084c13f79a"
+      },
+      "transfer": {
+        "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/programs/probe.transfer",
+        "bytes": 8564,
+        "sha256": "438e3177799edc373270823e77623b4404405ad28ca257e52e7743033e42119b"
+      }
+    }
+  },
+  "versioned_imports": {
+    "plain": [
+      "_Exit@GLIBC_2.27",
+      "__cxa_atexit@GLIBC_2.27",
+      "__errno_location@GLIBC_2.27",
+      "__libc_start_main@GLIBC_2.34",
+      "__stack_chk_fail@GLIBC_2.27",
+      "_exit@GLIBC_2.27",
+      "calloc@GLIBC_2.27",
+      "close@GLIBC_2.27",
+      "exit@GLIBC_2.27",
+      "fflush@GLIBC_2.27",
+      "fork@GLIBC_2.27",
+      "fprintf@GLIBC_2.27",
+      "free@GLIBC_2.27",
+      "fwrite@GLIBC_2.27",
+      "getpid@GLIBC_2.27",
+      "getrusage@GLIBC_2.27",
+      "kill@GLIBC_2.27",
+      "malloc@GLIBC_2.27",
+      "memset@GLIBC_2.27",
+      "mmap@GLIBC_2.27",
+      "munmap@GLIBC_2.27",
+      "perror@GLIBC_2.27",
+      "pipe@GLIBC_2.27",
+      "prctl@GLIBC_2.27",
+      "printf@GLIBC_2.27",
+      "puts@GLIBC_2.27",
+      "read@GLIBC_2.27",
+      "strcmp@GLIBC_2.27",
+      "strtoul@GLIBC_2.27",
+      "syscall@GLIBC_2.27",
+      "waitpid@GLIBC_2.27",
+      "write@GLIBC_2.27"
+    ],
+    "regex": [
+      "_Exit@GLIBC_2.27",
+      "__cxa_atexit@GLIBC_2.27",
+      "__errno_location@GLIBC_2.27",
+      "__libc_start_main@GLIBC_2.34",
+      "__stack_chk_fail@GLIBC_2.27",
+      "_exit@GLIBC_2.27",
+      "calloc@GLIBC_2.27",
+      "close@GLIBC_2.27",
+      "exit@GLIBC_2.27",
+      "fflush@GLIBC_2.27",
+      "fork@GLIBC_2.27",
+      "fprintf@GLIBC_2.27",
+      "free@GLIBC_2.27",
+      "fwrite@GLIBC_2.27",
+      "getpid@GLIBC_2.27",
+      "getrusage@GLIBC_2.27",
+      "kill@GLIBC_2.27",
+      "malloc@GLIBC_2.27",
+      "memcpy@GLIBC_2.27",
+      "memset@GLIBC_2.27",
+      "mmap@GLIBC_2.27",
+      "munmap@GLIBC_2.27",
+      "perror@GLIBC_2.27",
+      "pipe@GLIBC_2.27",
+      "prctl@GLIBC_2.27",
+      "printf@GLIBC_2.27",
+      "puts@GLIBC_2.27",
+      "read@GLIBC_2.27",
+      "regcomp@GLIBC_2.27",
+      "regexec@GLIBC_2.27",
+      "regfree@GLIBC_2.27",
+      "setlocale@GLIBC_2.27",
+      "strcmp@GLIBC_2.27",
+      "strtoul@GLIBC_2.27",
+      "syscall@GLIBC_2.27",
+      "waitpid@GLIBC_2.27",
+      "write@GLIBC_2.27"
+    ],
+    "probe": [
+      "_Exit@GLIBC_2.27",
+      "__cxa_atexit@GLIBC_2.27",
+      "__errno_location@GLIBC_2.27",
+      "__libc_start_main@GLIBC_2.34",
+      "__stack_chk_fail@GLIBC_2.27",
+      "_exit@GLIBC_2.27",
+      "exit@GLIBC_2.27",
+      "fork@GLIBC_2.27",
+      "fprintf@GLIBC_2.27",
+      "getegid@GLIBC_2.27",
+      "geteuid@GLIBC_2.27",
+      "getpid@GLIBC_2.27",
+      "prctl@GLIBC_2.27",
+      "printf@GLIBC_2.27",
+      "setgid@GLIBC_2.27",
+      "setuid@GLIBC_2.27",
+      "strcmp@GLIBC_2.27",
+      "strerror@GLIBC_2.27",
+      "waitpid@GLIBC_2.27"
+    ]
+  },
+  "needed": {
+    "plain": [
+      "libc.so.6",
+      "ld-linux-riscv64-lp64d.so.1"
+    ],
+    "regex": [
+      "libc.so.6",
+      "ld-linux-riscv64-lp64d.so.1"
+    ],
+    "probe": [
+      "libc.so.6",
+      "ld-linux-riscv64-lp64d.so.1"
+    ]
+  },
+  "accepted_runtime": {
+    "libc.so.6": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/libc.so.6",
+      "bytes": 1459064,
+      "sha256": "d3f60c3e773fa76856457df96dc151609db7d1041e031c55477a62ff74cde43b"
+    },
+    "ld-linux-riscv64-lp64d.so.1": {
+      "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/target/lib/ld-linux-riscv64-lp64d.so.1",
+      "bytes": 173736,
+      "sha256": "ffebe0ecd6336c972bee51db6f1056146ca7776a1b1e826a1b3669ac851d88a7"
+    }
+  },
+  "accepted_CPIO": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/accepted-rootfs.cpio",
+    "bytes": 8194560,
+    "sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50"
+  },
+  "prior_regex_sanitizer_gate": {
+    "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-regex-benchmark-20261121/preparation-002/manifest.json",
+    "bytes": 31067,
+    "sha256": "6bc5cbd771729b318613830fd7b64d415d1f30d543d836a2bf364c2b3fd25c8e"
+  },
+  "prior_plain_gate": {
+    "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-natural-workload-20261121/preparation-002-cleanup/manifest.json",
+    "bytes": 17325,
+    "sha256": "0f00daf74ff7bef0661e19139a1c69d0ff87b18ad8c61ce4ac252e05453cb72e"
+  },
+  "drafts": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/pilot.json",
+      "bytes": 9701,
+      "sha256": "a03479892fe11a545014cd1ac5e02dc570f8a4e35afa3c100ae5cf2ee690a89b"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-scan.json",
+      "bytes": 9719,
+      "sha256": "ccc2b79f5b74c464291a0bc319818f106c890d35246eeb47f746c22c30c19d5c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-lookup.json",
+      "bytes": 9747,
+      "sha256": "6d6918fe1ec26d0e7db0235edbb6898ea9c740feec47310801b515852055ea3c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-parse.json",
+      "bytes": 9733,
+      "sha256": "37b9e23c15f52e244c03db1c7de040dceacb21018397bcd40b02f2d134330e12"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-chase.json",
+      "bytes": 9733,
+      "sha256": "61b7996072a9be9819efd987e8f5d9e9d192d47ac4775afb35d837fe597fef8e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-matrix29/research/retained29-application-matrix-20261121/preparation-006/drafts/performance-regex.json",
+      "bytes": 9733,
+      "sha256": "fcb032375570fbbb2b5d841b5f13a0fd267be5b34bdbf3a44638bad00c0e25f4"
+    }
+  ],
+  "limits": [
+    "No board/SSH/power/load/real runner action invoked",
+    "Original HOST_VERIFY outputs retained and refused by physical parser",
+    "Production-shaped parser/transport fixtures are synthetic, never FPGA evidence",
+    "Performance8-cell schemas are synthetic shape tests, not256-loop host/application performance",
+    "Prior ASAN/UBSAN gate applies to unchanged regex C/module; host libc DSO uninstrumented/LSan off"
+  ]
+}
