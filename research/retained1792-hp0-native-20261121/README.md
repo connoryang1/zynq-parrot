@@ -1,0 +1,7 @@
+This preserves the native1792 simulator HP0 audit and independent full-payload timing association. It separates common-memory bus response, cache ACK, retained publication and architectural performance; no FPGA or application effect is claimed.
+
+The unchanged maintained flow and source-bound helper execute once in29.24s, with all99required native signals and complete EOF. All648reads carry eight64b words with first/full acceptedR at1/8cycles;487writes completeAW-to-B at12cycles. The fixture observes one outstanding read/write and zero stalls, which is coverage rather than an architectural concurrency limit.
+
+Unique target-address plus all512payload-bit joins link HP0 bursts to strict publication,64linkedELF bytes and the actual winning eight L1 SRAM writes. I admission-to-AR/first/full/publication is41/42/49/109cycles; D is12.5/13.5/20.5/80. Full-memory-line to publication remains60I/59.5Dcycles. Later retained demands reach first/full cache ACK at14/21cycles, with D critical-word3 written at17; ACK is not CPUload-ready. The complete44I/48D request set also includes Dwrite operations and cache hits; RID0 does not label source.
+
+The exact command, preparation, source/compiler/reader provenance, bounded ROOT supervisor, full selected stream, transaction records, proofs and independent review are archived here. No native target was rerun; the already closed876trace was read in place. Original preparation/DRAFT receipts remain historical records beside the completed root session.
