@@ -1,0 +1,77 @@
+{
+  "state": "owned-publish clear/disable assertion blocker reproduced and fixed; component-only",
+  "old_component_bp_commit": "2667b9501cedceb8332ee991cb6572ffafa368a2",
+  "fix_bp_commit": "31f71850be1695e3a916e1df29ad2cb99aa06926",
+  "old_source_sha256": "2e174d3c2946c57ff9049e46e9927c6dfc7f92406dd3d6615a3c79705e8cfd84",
+  "new_source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+    "bytes": 106161,
+    "sha256": "f7fc772129f9560bc25287ad780b352fa909219ee08f686a9bb4f5ab0fe1bbc9"
+  },
+  "current_status": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-data-bram-20261121/CURRENT_STATUS.md",
+    "bytes": 1099,
+    "sha256": "e1960c083c55d2c9afece814f90afe38846de0269b3633e41f864d932b94247d"
+  },
+  "reproduction": {
+    "exit_signal": "SIGABRT",
+    "original_output": "/dev/shm/bp-linux002-owned-publish-clear-repro2",
+    "run_log": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-data-bram-20261121/publish-clear-fix/reproduction/run.log",
+      "bytes": 702,
+      "sha256": "387626b304607cf21a22afc21d62178f04f44e246eefc78e3b81268d44fa15d8"
+    }
+  },
+  "fixed_cases": [
+    {
+      "lane": "I",
+      "verification": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-data-bram-20261121/publish-clear-fix/I64/verification.json",
+        "bytes": 7344,
+        "sha256": "40781ad06e193d85c3af1267854e5f7d0ae6b3487d68215015635efd8a29732d"
+      },
+      "run_log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-data-bram-20261121/publish-clear-fix/I64/run.log",
+        "bytes": 791,
+        "sha256": "98f77cd7190f09f7d6ec42438951ccb934bee098cd815cb34c1195c9d897699e"
+      },
+      "original_output": "/dev/shm/bp-linux002-owned-publish-fix-I64"
+    },
+    {
+      "lane": "D",
+      "verification": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-data-bram-20261121/publish-clear-fix/D64/verification.json",
+        "bytes": 7347,
+        "sha256": "cf8f8bad6c4214cd37eb60ad47383e42e476b50a70de52160e81a7892ae794f2"
+      },
+      "run_log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-data-bram-20261121/publish-clear-fix/D64/run.log",
+        "bytes": 644,
+        "sha256": "f4a1d636ee750fc08b9dfcc8db3323e3d047fc84985aed2101d02a2f616c90e7"
+      },
+      "original_output": "/dev/shm/bp-linux002-owned-publish-fix-D64"
+    }
+  ],
+  "changed_logic": "One legacy assertion predicate adds !retained_buffer_p; no datapath changes.",
+  "source_outside_translate_off_regions_identical": true,
+  "source_outside_regions_sha256": "e56982ad2a380e8b3bc07e121518613b98cb516e61c2ced172fea8a2e9b68af5",
+  "test_sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/uce_retained_tb.sv",
+      "bytes": 8722,
+      "sha256": "70c7235210ad348f8e821d0d282065546dd2ec28fcc6cb4015523f37547f4532"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/uce_retained_driver.cpp",
+      "bytes": 16285,
+      "sha256": "13e5d9cda842bf8b14af7852146560bb0027a54e487fd4142838a1fbd47bdfb3"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/run_uce_retained.py",
+      "bytes": 5018,
+      "sha256": "5f675ac43f9f536e24c657781505f4a162dfc4b00cf1bea9857090751f9c59eb"
+    }
+  ],
+  "no_fullcore_routed_fpga_or_performance_claim": true,
+  "old_closed_matrix_manifests_unchanged": true
+}

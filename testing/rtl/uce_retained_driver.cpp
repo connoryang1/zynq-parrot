@@ -129,6 +129,18 @@ class Test {
   for(unsigned n=0;n<3;n++)require(!step().req,"new I fetch stole accepted UCE refill ownership");
   dut.req_v_i=0;
  }
+ void cancel_owned_prefetch(bool clear_command){
+  uint64_t addr=clear_command?UINT64_C(0x80400000):UINT64_C(0x80401000);
+  unsigned pub=dut.published_o,written=data_writes;
+  Header h=preview(addr);response(h);
+  for(unsigned n=0;n<2000&&!dut.prefetch_insert_owned_o;n++)step();
+  require(dut.prefetch_insert_owned_o&&dut.prefetch_state_o==8,"cancel test missed actual retained owned-publish boundary");
+  std::cout<<"phase="<<(clear_command?"clear":"disable")<<"-actual-prefetch-insert-owned-at-publish\n";
+  if(clear_command)dut.clear_i=1;else dut.enable_i=0;
+  step();dut.clear_i=0;idle();
+  require(dut.published_o==pub&&data_writes==written,"cancelled owned prefetch insert published or wrote L1");
+  dut.enable_i=1;demand_memory(addr);
+ }
  void instruction_cases(){
   constexpr uint64_t a=UINT64_C(0x80010000),b=UINT64_C(0x80024000),c=UINT64_C(0x80038000);
   unsigned pub=dut.published_o,before=reads.size();
@@ -193,6 +205,7 @@ public:
   demand_memory(a+24);require(dut.lookups_o==0&&dut.published_o==0,"disabled arm used retained storage");
   dut.enable_i=1;dut.demand_capture_i=1;demand_memory(a+24);require(dut.published_o==1,"complete normal refill not captured");
   demand_hit(a+24,true);
+  cancel_owned_prefetch(true);cancel_owned_prefetch(false);
   if(dut.instruction_o){instruction_cases();return;}
   mutate(a);demand_memory(a+8);demand_hit(a+8);
   // Full physical preview captures only after the normal-resident scan.

@@ -29,6 +29,8 @@ module uce_retained_tb
   ,output logic [31:0] lookups_o,hits_o,published_o
   ,output [31:0] capacity_o,fill_words_o,bus_words_o
   ,output instruction_o
+  ,output prefetch_insert_owned_o
+  ,output [3:0] prefetch_state_o
   );
  localparam sets_lp=4,assoc_lp=8,block_lp=512,fill_lp=instruction_p?icache_fill_width_p:64,id_lp=4;
  localparam cache_data_lp=instruction_p?icache_data_width_p:dcache_data_width_p;
@@ -86,6 +88,8 @@ module uce_retained_tb
  assign bus_words_o=bedrock_fill_width_p/64;
  if(bedrock_fill_width_p==128)assign rev_data={rev_word1_i,rev_word_i};else assign rev_data=rev_word_i;
  assign instruction_o=instruction_p;
+ assign prefetch_insert_owned_o=dut.retained_insert_owned_r&&dut.retained_insert_pf_r;
+ assign prefetch_state_o=dut.prefetch_install_state_r;
  assign preview_ready_o=instruction_p?detached_ready:preview_ready;
  assign lookup_v[0]=0;assign lookup_addr[0]='0;assign resp_ready[0]=1;
  assign insert_v[0]=0;assign insert_addr[0]='0;assign insert_data[0]='0;
