@@ -1,0 +1,133 @@
+{
+  "state": "PASS-single-set-dense-D-disabled-I-both-clocks",
+  "parent": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/session.json",
+    "bytes": 13589,
+    "sha256": "82c0d7b5481c5acf68e863c17365c26b83dd560fbbb68d4e2c30e986a9a41e3d"
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_epoch_ram.sv",
+      "bytes": 948,
+      "sha256": "a7673ffc8151b005fcfbfeb4a9e020098e0a2d409b2b79c0bebb2ebe9e0d8720"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_line_store.sv",
+      "bytes": 19317,
+      "sha256": "b69e51e216e6aa17f51be17aa2054a87ff800ab117f44cf91e525a78674ea4e9"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_line_store_reference.sv",
+      "bytes": 18700,
+      "sha256": "3ede461a14acbffe81a8e8f96b12dbd3e974bd2c2976e3376405a7f538378e0b"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/candidate.diff",
+      "bytes": 3284,
+      "sha256": "fd18f414992b685d7821f29224ef1d446771f13410386ae1ccb4b41cbbb7239e"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/driver.cpp",
+      "bytes": 17605,
+      "sha256": "8421ef52e480501f90d9fdedfb46ff24b1e397ba295178257eb172ec8701473e"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/epoch_reference.sv",
+      "bytes": 906,
+      "sha256": "26edff7c39f47b16b9357cf34d9bbd847800415e53256a2693aecd3a44706dca"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/reference-bp225.sv",
+      "bytes": 18690,
+      "sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/retained_metadata_wrapper.sv",
+      "bytes": 7195,
+      "sha256": "ab2febb5b98a2b1b7aeb1d6d924c0d703c87def805912c782e0309cd4ce1ed06"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_metadata_wrapper",
+        "-GI_LINES=0",
+        "-GD_LINES=3",
+        "-GRETAINED_SETS=1",
+        "-GEPOCH_WIDTH=2",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "1",
+        "-MAKEFLAGS",
+        "VM_PARALLEL_BUILDS=0",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/obj",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_epoch_ram.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/bp_retained_line_store_reference.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/retained_metadata_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I",
+      "returncode": 0,
+      "seconds": 21.493610956007615,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/build.log",
+        "bytes": 4371,
+        "sha256": "71c83f1b2546b3ee278d5916b8c88552e1ee530b1c2927acd5bd61d88cd647c1"
+      }
+    }
+  ],
+  "runs": [
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/obj/Vretained_metadata_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/inverted",
+      "returncode": 0,
+      "seconds": 0.3327197179896757,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/run-inverted.log",
+        "bytes": 474,
+        "sha256": "dd36c5827aa043354eac1431a61b0265c8e2c0ecd9e8c3eee6828139ffde088b"
+      },
+      "mode": "inverted",
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/inverted/retained-line-store.fst",
+        "bytes": 2377378,
+        "sha256": "7f3371528e6162829ea3168397dffdc478b4aa0af12fac92b6a63e06bee1f121"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/obj/Vretained_metadata_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/different-periods",
+      "returncode": 0,
+      "seconds": 0.33672163099981844,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/run-different-periods.log",
+        "bytes": 488,
+        "sha256": "f8838b5fa2ffe6e70fd5aa109568f5181b98af4bf611fff264808c8d53b6d56f"
+      },
+      "mode": "different-periods",
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-canonical-20261121/single-set-disabled-I/different-periods/retained-line-store.fst",
+        "bytes": 2086020,
+        "sha256": "d4a30321ed401fbb83a8538a12ae2683c1442cb67215eb55ebfe10680080dec0"
+      }
+    }
+  ],
+  "artifact_bytes": 28395674
+}
