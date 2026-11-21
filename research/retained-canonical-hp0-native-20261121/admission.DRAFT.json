@@ -1,0 +1,818 @@
+{
+  "state": "PREPARED-ONLY-canonicalb912-closed-trace-native99-HP0-audit-HOLD-root-review",
+  "purpose": "Measure NEW canonicalb912 native1792 HP0/commonUCE endpoints. Old876109/80 endpoints are not inherited.",
+  "argv": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+    "--fst",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/durable/advisory-trace.fst",
+    "--model-source-list",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/actual-source-list.json.gz",
+    "--log",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/advisory/run.log.gz",
+    "--exit-code",
+    "-6",
+    "--delay",
+    "0",
+    "--proof",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-hp0-native-20261121/inputs/original-strict.json",
+    "--out",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-hp0-native-20261121/audit01"
+  ],
+  "model": {
+    "path": "/dev/shm/zp-linux-canonical-fullcore-20261121-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15834992,
+    "sha256": "b912913adc5fa98a0675bd323e7b37da7cbaecdabbb787ca3f466edcc4851de9"
+  },
+  "fst": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/durable/advisory-trace.fst",
+    "bytes": 20435601,
+    "sha256": "35da7b2088acc410d6bf6bfd9853134c9d57223cbb6c6746dac00ec7f5a184ab"
+  },
+  "source_list": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/actual-source-list.json.gz",
+    "bytes": 25271,
+    "sha256": "58a8b0a411daa13c7a2c37670185acba249c3b0451181add84cd6e807e40558d"
+  },
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/advisory/run.log.gz",
+    "bytes": 2505,
+    "sha256": "37dc2ad92b8ccd060fdea6069a0e3c9bed6796cbac2eddd20919e1de9938c00e"
+  },
+  "process": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/advisory/process.json.gz",
+    "bytes": 43,
+    "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+  },
+  "actual_returncode": -6,
+  "strict_proof": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-hp0-native-20261121/inputs/original-strict.json",
+    "bytes": 11852,
+    "sha256": "21489a001c0f6e5590c66ab5fdd616e6ccb68c4de73a1f71be0b2f46266f14a4"
+  },
+  "common_path_source_current_exact": [
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+      "bytes": 5373,
+      "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+      "bytes": 5396,
+      "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 42343,
+      "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/v/bp_nonsynth_axi_mem_pipelined.sv",
+      "bytes": 10723,
+      "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/v/bsg_nonsynth_zynq_testbench.sv",
+      "bytes": 18810,
+      "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/basejump_stl/bsg_test/bsg_nonsynth_axi_mem.sv",
+      "bytes": 10364,
+      "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+    }
+  ],
+  "implementation": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+      "bytes": 13334,
+      "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+      "bytes": 18030,
+      "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+    }
+  ],
+  "checker": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/check_run.py",
+    "bytes": 9559,
+    "sha256": "cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985"
+  },
+  "reader_builder": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/build_reader.py",
+    "bytes": 2041,
+    "sha256": "79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4"
+  },
+  "reader_source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/fst_events.c",
+    "bytes": 3497,
+    "sha256": "b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13"
+  },
+  "reader_API_sources": [
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.c",
+      "bytes": 257277,
+      "sha256": "6a09b5a4aea241f12939e8005f7e2c1b2c60f28e39d66a1d02d3edd69c80a1c8"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fastlz.c",
+      "bytes": 13561,
+      "sha256": "35d2b3ab8ea04615cc56dee1a7017610f459b57aef51d9de69c71c24bd9ee719"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/lz4.c",
+      "bytes": 115587,
+      "sha256": "af9087bb6d6155079cccaf8635acc6590b8a6f2fc98efce35e926f30f79366b8"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.h",
+      "bytes": 18479,
+      "sha256": "9b401991a1d433eec862a8636e2d218e9e572df7a4e62643ebccbf88fc417377"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fst_config.h",
+      "bytes": 429,
+      "sha256": "d8b84770187034bb7aee6c41eeb49725e84ad9dc1d3302903dfc979b03b4d6ad"
+    }
+  ],
+  "prior_existing_reader": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+    "bytes": 151200,
+    "sha256": "a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541"
+  },
+  "qualified_header": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-scoped-20261121/original-hierarchy.tsv.gz",
+    "bytes": 613999,
+    "sha256": "2a32537cce2881630b97f117b5bcce62c0b752fbeee11dff3fe5014d2af746f2"
+  },
+  "selection99": [
+    {
+      "key": "clk",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.aclk",
+      "width": 1
+    },
+    {
+      "key": "resetn",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.aresetn",
+      "width": 1
+    },
+    {
+      "key": "arid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arid",
+      "width": 6
+    },
+    {
+      "key": "araddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_araddr",
+      "width": 32
+    },
+    {
+      "key": "arlen",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arlen",
+      "width": 8
+    },
+    {
+      "key": "arsize",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arsize",
+      "width": 3
+    },
+    {
+      "key": "arburst",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arburst",
+      "width": 2
+    },
+    {
+      "key": "arlock",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arlock",
+      "width": 1
+    },
+    {
+      "key": "arcache",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arcache",
+      "width": 4
+    },
+    {
+      "key": "arprot",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arprot",
+      "width": 3
+    },
+    {
+      "key": "arqos",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arqos",
+      "width": 4
+    },
+    {
+      "key": "arvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arvalid",
+      "width": 1
+    },
+    {
+      "key": "arready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_arready",
+      "width": 1
+    },
+    {
+      "key": "awid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awid",
+      "width": 6
+    },
+    {
+      "key": "awaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awaddr",
+      "width": 32
+    },
+    {
+      "key": "awlen",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awlen",
+      "width": 8
+    },
+    {
+      "key": "awsize",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awsize",
+      "width": 3
+    },
+    {
+      "key": "awburst",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awburst",
+      "width": 2
+    },
+    {
+      "key": "awlock",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awlock",
+      "width": 1
+    },
+    {
+      "key": "awcache",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awcache",
+      "width": 4
+    },
+    {
+      "key": "awprot",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awprot",
+      "width": 3
+    },
+    {
+      "key": "awqos",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awqos",
+      "width": 4
+    },
+    {
+      "key": "awvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awvalid",
+      "width": 1
+    },
+    {
+      "key": "awready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_awready",
+      "width": 1
+    },
+    {
+      "key": "wvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_wvalid",
+      "width": 1
+    },
+    {
+      "key": "wready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_wready",
+      "width": 1
+    },
+    {
+      "key": "wid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_wid",
+      "width": 6
+    },
+    {
+      "key": "wdata",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_wdata",
+      "width": 64
+    },
+    {
+      "key": "wstrb",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_wstrb",
+      "width": 8
+    },
+    {
+      "key": "wlast",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_wlast",
+      "width": 1
+    },
+    {
+      "key": "ext.rvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_rvalid",
+      "width": 1
+    },
+    {
+      "key": "core.rvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_rvalid_i",
+      "width": 1
+    },
+    {
+      "key": "ext.rready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_rready",
+      "width": 1
+    },
+    {
+      "key": "core.rready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_rready_o",
+      "width": 1
+    },
+    {
+      "key": "ext.rid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_rid",
+      "width": 6
+    },
+    {
+      "key": "core.rid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_rid_i",
+      "width": 6
+    },
+    {
+      "key": "ext.rdata",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_rdata",
+      "width": 64
+    },
+    {
+      "key": "core.rdata",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_rdata_i",
+      "width": 64
+    },
+    {
+      "key": "ext.rresp",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_rresp",
+      "width": 2
+    },
+    {
+      "key": "core.rresp",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_rresp_i",
+      "width": 2
+    },
+    {
+      "key": "ext.rlast",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_rlast",
+      "width": 1
+    },
+    {
+      "key": "core.rlast",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_rlast_i",
+      "width": 1
+    },
+    {
+      "key": "ext.bvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_bvalid",
+      "width": 1
+    },
+    {
+      "key": "core.bvalid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_bvalid_i",
+      "width": 1
+    },
+    {
+      "key": "ext.bready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_bready",
+      "width": 1
+    },
+    {
+      "key": "core.bready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_bready_o",
+      "width": 1
+    },
+    {
+      "key": "ext.bid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_bid",
+      "width": 6
+    },
+    {
+      "key": "core.bid",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_bid_i",
+      "width": 6
+    },
+    {
+      "key": "ext.bresp",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.hp0_axi_bresp",
+      "width": 2
+    },
+    {
+      "key": "core.bresp",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.m_axi_bresp_i",
+      "width": 2
+    },
+    {
+      "key": "i.clk",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.clk_i",
+      "width": 1
+    },
+    {
+      "key": "i.reset",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.reset_i",
+      "width": 1
+    },
+    {
+      "key": "i.reqv",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.cache_req_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.reqy",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.cache_req_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "i.reqaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.cache_req_cast_i.addr",
+      "width": 34
+    },
+    {
+      "key": "i.reqtype",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.cache_req_cast_i.msg_type",
+      "width": 4
+    },
+    {
+      "key": "i.datav",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.data_mem_pkt_v_o",
+      "width": 1
+    },
+    {
+      "key": "i.datay",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.data_mem_pkt_yumi_i",
+      "width": 1
+    },
+    {
+      "key": "i.dataaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.data_mem_pkt_cast_o.addr",
+      "width": 34
+    },
+    {
+      "key": "i.opcode",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.data_mem_pkt_cast_o.opcode",
+      "width": 2
+    },
+    {
+      "key": "i.fill",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.data_mem_pkt_cast_o.fill_index",
+      "width": 8
+    },
+    {
+      "key": "i.last",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.cache_req_last_o",
+      "width": 1
+    },
+    {
+      "key": "i.state",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.state_r",
+      "width": 5
+    },
+    {
+      "key": "i.detachedv",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.detached_prefetch_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.detachedready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.detached_prefetch_ready_and_o",
+      "width": 1
+    },
+    {
+      "key": "i.detachedaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.detached_prefetch_addr_i",
+      "width": 34
+    },
+    {
+      "key": "i.previewv",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.preview_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.previewready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.preview_ready_o",
+      "width": 1
+    },
+    {
+      "key": "i.previewaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.preview_paddr_i",
+      "width": 34
+    },
+    {
+      "key": "i.published",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.retained_insert_published_i",
+      "width": 1
+    },
+    {
+      "key": "i.done",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.retained_insert_done_i",
+      "width": 1
+    },
+    {
+      "key": "i.owned",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.retained_insert_owned_r",
+      "width": 1
+    },
+    {
+      "key": "i.pf",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.retained_insert_pf_r",
+      "width": 1
+    },
+    {
+      "key": "i.owned_addr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.icache_uce.retained_insert_addr_r",
+      "width": 34
+    },
+    {
+      "key": "i.aborted",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.core_minimal.fe.icache.abort_inflight",
+      "width": 1
+    },
+    {
+      "key": "d.clk",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.clk_i",
+      "width": 1
+    },
+    {
+      "key": "d.reset",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.reset_i",
+      "width": 1
+    },
+    {
+      "key": "d.reqv",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.cache_req_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.reqy",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.cache_req_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "d.reqaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.cache_req_cast_i.addr",
+      "width": 34
+    },
+    {
+      "key": "d.reqtype",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.cache_req_cast_i.msg_type",
+      "width": 4
+    },
+    {
+      "key": "d.datav",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.data_mem_pkt_v_o",
+      "width": 1
+    },
+    {
+      "key": "d.datay",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.data_mem_pkt_yumi_i",
+      "width": 1
+    },
+    {
+      "key": "d.dataaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.data_mem_pkt_cast_o.addr",
+      "width": 34
+    },
+    {
+      "key": "d.opcode",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.data_mem_pkt_cast_o.opcode",
+      "width": 2
+    },
+    {
+      "key": "d.fill",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.data_mem_pkt_cast_o.fill_index",
+      "width": 8
+    },
+    {
+      "key": "d.last",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.cache_req_last_o",
+      "width": 1
+    },
+    {
+      "key": "d.state",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.state_r",
+      "width": 5
+    },
+    {
+      "key": "d.detachedv",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.detached_prefetch_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.detachedready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.detached_prefetch_ready_and_o",
+      "width": 1
+    },
+    {
+      "key": "d.detachedaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.detached_prefetch_addr_i",
+      "width": 34
+    },
+    {
+      "key": "d.previewv",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.preview_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.previewready",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.preview_ready_o",
+      "width": 1
+    },
+    {
+      "key": "d.previewaddr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.preview_paddr_i",
+      "width": 34
+    },
+    {
+      "key": "d.published",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.retained_insert_published_i",
+      "width": 1
+    },
+    {
+      "key": "d.done",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.retained_insert_done_i",
+      "width": 1
+    },
+    {
+      "key": "d.owned",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.retained_insert_owned_r",
+      "width": 1
+    },
+    {
+      "key": "d.pf",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.retained_insert_pf_r",
+      "width": 1
+    },
+    {
+      "key": "d.owned_addr",
+      "path": "TOP.bsg_nonsynth_zynq_testbench.dut.top_fpga_inst.blackparrot.processor.u.unicore.unicore_lite.dcache_uce.retained_insert_addr_r",
+      "width": 34
+    }
+  ],
+  "prior_six_SP1280_audits": [
+    {
+      "delay": 0,
+      "program": "integrity",
+      "proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/verification.json",
+        "bytes": 14401,
+        "sha256": "820071834a9480b9232775818814384727ceab8a3cccc308e2a9b383c509cf14"
+      },
+      "implementations": [
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+          "bytes": 13334,
+          "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+        },
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+          "bytes": 18030,
+          "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+        }
+      ]
+    },
+    {
+      "delay": 0,
+      "program": "advisory",
+      "proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/verification.json",
+        "bytes": 14041,
+        "sha256": "eb1ba00d4319450854debde82e1484f4116343ab9c1dfbff63a71982a0f72916"
+      },
+      "implementations": [
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+          "bytes": 13334,
+          "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+        },
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+          "bytes": 18030,
+          "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+        }
+      ]
+    },
+    {
+      "delay": 40,
+      "program": "integrity",
+      "proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/verification.json",
+        "bytes": 14566,
+        "sha256": "5991e3a585ed077aab9b3fad046ca12a971c0b35e091992b9b1e59d8c2dace64"
+      },
+      "implementations": [
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+          "bytes": 13334,
+          "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+        },
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+          "bytes": 18030,
+          "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+        }
+      ]
+    },
+    {
+      "delay": 40,
+      "program": "advisory",
+      "proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/verification.json",
+        "bytes": 14052,
+        "sha256": "d737166c45caded76d6a38097287c27f63b4f8d674552d2d18b278766554e35d"
+      },
+      "implementations": [
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+          "bytes": 13334,
+          "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+        },
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+          "bytes": 18030,
+          "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+        }
+      ]
+    },
+    {
+      "delay": 200,
+      "program": "integrity",
+      "proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/verification.json",
+        "bytes": 14924,
+        "sha256": "d1dc162ee54ae42898d9e39704a40bebf3bec6dbe94033f1a604c7e62afe9be3"
+      },
+      "implementations": [
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+          "bytes": 13334,
+          "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+        },
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+          "bytes": 18030,
+          "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+        }
+      ]
+    },
+    {
+      "delay": 200,
+      "program": "advisory",
+      "proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/verification.json",
+        "bytes": 14136,
+        "sha256": "f6b41ee9a2b69b42a7f2e049451254c0a1553cce3d3df3cad2b8cb6f77c72dab"
+      },
+      "implementations": [
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+          "bytes": 13334,
+          "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+        },
+        {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+          "bytes": 18030,
+          "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+        }
+      ]
+    }
+  ],
+  "prior_summary": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-sp-latency-20261121/closed-cohort01/summary.json",
+    "bytes": 141262,
+    "sha256": "a1aae5152bcdf1b607f7788f56e37c395ea752e7d0925379b2ba9555a8b02ce7"
+  },
+  "budget": {
+    "HOME_total_output_bytes": 16777216,
+    "HOME_reserve_bytes": 3221225472,
+    "HOME_free_required_before_start": 3238002688,
+    "helper_RAM_bytes": 67108864,
+    "reader_build_subprocess_s": 150,
+    "builder_compiler_s": 120,
+    "reader_s": 600,
+    "outer_s": 780,
+    "owned_group_teardown_s": 5,
+    "attempts": 1,
+    "retries": 0,
+    "extensions": 0,
+    "helper_RAM_scope": "Combined fresh compiler TMPDIR plus own new hp0-closed-fst-* reader/output tempdir<=64MiB; raw closed FST is read in place, not copied."
+  },
+  "root_authorization": "PREPARED ONLY: one unchanged HP0 native99 audit/read-helper build; requires root review. No model/target/Vivado/board action.",
+  "ROOT_supervision_required": "Fresh owned process group for unchangedflow;<=1s monitor output<=16MiB and HOMEfree>=3GiB+remaining, plus own newlycreated hp0-closed-fst-* helpertempdir<=64MiB. Kill/reap only owned group on timeout/resource/signal within5s. ROOT actualhost namespace only. No autonomous reader. Root creates fresh compiler TMPDIR; include its bytes plus owned hp0-closed-fst-* directory in combined64MiB helperRAM guard.",
+  "measurement_limits": [
+    "Native model876 closed advisory fixture only; not physical1792/application/performance result.",
+    "HP0RID0 sharedL2 cannot label I/D/PF. UCEaccepted demand request\u2192first/full ACK measured separately; abortedI ACK may include discards.",
+    "PFadmission\u2192publication is separate. PF-associated HP0first/full must join targetaddress/full512payload with same-run transactions+strictproof; no inherited1280 endpoints.",
+    "Native0 uses unchanged99leaf grammar;107adds8positive-delay shim fields. Reset/EOF/ownership/AXIstream checks unchanged; no exception/waiver."
+  ],
+  "current_HOMEfree_bytes": 4578230272,
+  "no_reader_or_helper_started": true,
+  "environment": {
+    "TMPDIR": "/dev/shm/retained-canonical-hp0-helper-20261121-01"
+  },
+  "original_fullcore_closure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/manifest.json",
+    "bytes": 36117,
+    "sha256": "ae77bf7601d384c632f287b19135223ba1538f3244d60b193a0517016346e657"
+  },
+  "prior_dense876_audit": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained1792-hp0-preparation-20261121/audit01/verification.json",
+    "bytes": 13839,
+    "sha256": "78ed408c2af9750a48dd0553f64e243dc8cbf388bb55f35a977ef88ce744dab4"
+  }
+}
