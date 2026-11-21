@@ -1,0 +1,134 @@
+{
+  "state": "PREPARED analysis only; no physical cohort or performance result",
+  "schema": "bp-retained29-cost-analysis-preparation-v1",
+  "files": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_cost_cohort.py",
+      "bytes": 17021,
+      "sha256": "998760c72ee6ffd51458e593ee0f1cc2b4f618563fa5843838591fef51ef0d89",
+      "repo_relative": "linux-tests/analyze_retained29_cost_cohort.py"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/test_analyze_retained29_cost_cohort.py",
+      "bytes": 10893,
+      "sha256": "d33228f5d4818c13d676bfac881dced6cdd526b6757c4a5ec99af3138dba227f",
+      "repo_relative": "linux-tests/test_analyze_retained29_cost_cohort.py"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/COMMANDS.txt",
+      "bytes": 574,
+      "sha256": "da58ea12cfa24f867583e2159bec35829fda2bcbcc403f197782aea25f44852b",
+      "repo_relative": "research/retained29-cost-analysis-20261121/COMMANDS.txt"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/README.md",
+      "bytes": 2588,
+      "sha256": "51a3719cf9a6a8cbd29dba5fc5951461afdca741fcb47aaa52abb64670122458",
+      "repo_relative": "research/retained29-cost-analysis-20261121/README.md"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/TEST_ONLY-demo/RESULTS.md",
+      "bytes": 2767,
+      "sha256": "323d6a59339e26b086f9af5cbf1bfa037038fe98c8d00519925fa92fc6a6c6b6",
+      "repo_relative": "research/retained29-cost-analysis-20261121/TEST_ONLY-demo/RESULTS.md"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/TEST_ONLY-demo/analysis.json",
+      "bytes": 1919391,
+      "sha256": "548184a2eb35f26edf79df24d53160d172d4cf026dc92cc84376e7235a46a9cc",
+      "repo_relative": "research/retained29-cost-analysis-20261121/TEST_ONLY-demo/analysis.json"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/TEST_ONLY-demo/cells.csv",
+      "bytes": 206055,
+      "sha256": "1c12acb8f1702e5705e52823302dbed58f27a61c3301aa685f45094f82ce5242",
+      "repo_relative": "research/retained29-cost-analysis-20261121/TEST_ONLY-demo/cells.csv"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/TEST_ONLY-demo/configurations.csv",
+      "bytes": 8582,
+      "sha256": "d5523df6e0b737e5b9b39915aba70ed4991316369545d001bdde30c7db6777a6",
+      "repo_relative": "research/retained29-cost-analysis-20261121/TEST_ONLY-demo/configurations.csv"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/TEST_ONLY-demo/manifest.json",
+      "bytes": 1697,
+      "sha256": "6efa572f3689a93b063eb2451527d8d602f95c605f8e11ddf30ffe8318273b10",
+      "repo_relative": "research/retained29-cost-analysis-20261121/TEST_ONLY-demo/manifest.json"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/TEST_ONLY-demo/paired-repeats.csv",
+      "bytes": 78829,
+      "sha256": "79b7f94a4f3ccb3af210c35ad45d3bacc5c521fcadab8ec50becd6b469136856",
+      "repo_relative": "research/retained29-cost-analysis-20261121/TEST_ONLY-demo/paired-repeats.csv"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/host-tests.log",
+      "bytes": 1417,
+      "sha256": "2ad2e10eb0e3e1ed126abac2cb5c8f42865c0997fae43f21a00c9d114fc56d30",
+      "repo_relative": "research/retained29-cost-analysis-20261121/host-tests.log"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/preparation-notes.json",
+      "bytes": 433,
+      "sha256": "a29aee7dad3e75d1ceaacea592ce5f43b12bfaf40d2cbc91a97d2ab46b6430f0",
+      "repo_relative": "research/retained29-cost-analysis-20261121/preparation-notes.json"
+    }
+  ],
+  "host_tests": {
+    "passed": 12,
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-analysis-20261121/host-tests.log",
+      "bytes": 1417,
+      "sha256": "2ad2e10eb0e3e1ed126abac2cb5c8f42865c0997fae43f21a00c9d114fc56d30"
+    }
+  },
+  "declared_primary": {
+    "policy_mask": 15,
+    "endpoint": "WHOLE",
+    "ratio": "on/off",
+    "pairing": [
+      "boot",
+      "workload",
+      "kib",
+      "repeat"
+    ],
+    "hierarchy": [
+      {
+        "level": "repeat",
+        "count": 4,
+        "operation": "geometric-mean"
+      },
+      {
+        "level": "independent-boot-per-configuration",
+        "count": 3,
+        "operation": "geometric-mean"
+      },
+      {
+        "level": "workload-times-size",
+        "count": 10,
+        "operation": "equal-weight-geometric-mean"
+      }
+    ],
+    "incomplete_cohort_aggregate": "forbidden",
+    "pvalues": false,
+    "cell_independence_assumption": false,
+    "timing_based_exclusions": false
+  },
+  "frozen_declaration": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-cohort-20261121/cohort-draft.json",
+    "bytes": 61368,
+    "sha256": "a7cfd821be032dac5f42cd25b2d6e62e4df7a5ed591b1f2ba77585bf5c84eb9c"
+  },
+  "primary_plan_source": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-cohort-20261121/validate.py",
+    "bytes": 5936,
+    "sha256": "68b0b412b705c09636248f26560886e6f8f38fd535015bcf375f7bdfa0858185"
+  },
+  "actual_board_model_reader_target_runs": 0,
+  "physical_qualification_allowlist": {},
+  "observer_runtime_allowlist": {},
+  "synthetic_demo_scope": "TEST_ONLY_SYNTHETIC_NO_PHYSICAL_ADMISSION",
+  "production_entry": "CLI requires externally pinned complete promotion gate and recomputes all16actual sessions",
+  "limits": "Exact declared point hierarchy and boot ranges only; no bootstrap/CI/P, subset, oldscope/4KiBL2/simulation pooling, per-application hit or prefetch inference. Guest/ELFs/acquisition/active-stream sources unchanged."
+}

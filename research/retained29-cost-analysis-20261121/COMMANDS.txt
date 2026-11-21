@@ -1,0 +1,7 @@
+Host-only gate (no board/network/model/FST reader):
+python3 -m unittest discover -s linux-tests -p test_analyze_retained29_cost_cohort.py -v
+
+Future production use, ONLY after full physical qualification and all16 promoted sessions:
+python3 linux-tests/analyze_retained29_cost_cohort.py --complete-gate complete-cohort.json --complete-sha256 ROOT_CAPTURED_COMPLETE_SHA --out NEW_analysis_output
+
+There is no synthetic/subset/legacy/simulation override on the CLI. The TEST_ONLY demonstration is a direct pure-math unit fixture, not a physical admission or collected cohort.
