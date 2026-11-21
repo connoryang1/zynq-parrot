@@ -1,0 +1,26 @@
+{
+  "status": "Prepared conditional FPGA candidate; NOT launched or physically accepted",
+  "decision": "Measure actual routed resource/timing at1280 full64B retained slots/side with256retainedsets after first64/native route passes; actualmaximum remainsunknown",
+  "payload_bytes_per_side": 81920,
+  "ordinary_cache_geometry": "unchanged32KiB I and D; acceptedprefetch16k twoL2banks;20MHz;2resident/4logical",
+  "controls": {
+    "BP_RETAINED_BUFFER": 1,
+    "BP_RETAINED_I_LINES": 1280,
+    "BP_RETAINED_D_LINES": 1280,
+    "BP_RETAINED_SETS": 256,
+    "BP_AXI_RESPONSE_DELAY": 0
+  },
+  "BP_gitlink": "e10992a3eea3ba2ef6ae3ccb42ff5e8c658286a8",
+  "cheaper_gate": "research/retained-system-geometry-20261121/README.md: cleanwholecore1280/256 native0 integrity and actual PFpublication/retainedhit/fullL1write gates PASS; component allslotdata through1536 alreadyPASS",
+  "same_tested_hardware_sources": {
+    "cosim/black-parrot-example/v/top_zynq.sv": "839e7f0929205d51642690aab8145192396a9caf6a221d2df2c93c4e1f3e4589",
+    "cosim/black-parrot-example/v/bp_axi_response_delay.sv": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178",
+    "cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132",
+    "cosim/black-parrot-example/Makefile.hardware": "54af5a3b072c03795dcb177bafd2b949af0b523474908c910bddb977b90e5721"
+  },
+  "scalar_change": "Onlythreedefaultgeometry values differ from explicit1280/1280/256 overrides in passedmodel; native responsegenerate has noqueue",
+  "boundary_followup": "Continueabove1280toactualfit/timingboundaryincludingunequalpartitionswhenuseful; do notcall1280maxfromRAMmath",
+  "pass_action": "Preserveexactreports/artifacts; executecheckedserializedboardintegrity thencontinuecapacityboundarysearch andgeneralapplications",
+  "fail_action": "Preservefailedreports; localizeRAMinference/resource/timing vsgeometrycost beforeanothercandidate",
+  "prerequisite": "First64routedgate mustPASSbeforethisconditionalcandidateoccupiesbuilder; no competingVivadojob"
+}
