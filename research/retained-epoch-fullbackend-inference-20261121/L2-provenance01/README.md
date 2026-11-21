@@ -1,0 +1,13 @@
+This audit separates the accepted f744 ordinary-cache geometry from the current large-retention candidate and records why the named16KiB L2 endpoint exists. It uses canonical objects, the actual f744 archived revision record and an already completed r5b synthesis-DCP report. It changes no source/configuration and performs no vendor or board operation.
+
+| Configuration | L2 banks × sets/bank × ways × line bytes | Total L2 | L1I / L1D |
+|---|---|---:|---:|
+| f744 / TOP7edf / BP2958 recorded static prefetch_cfg | 2 ×16 ×2 ×64 | 4KiB | 32KiB each |
+| Current static prefetch16k_cfg | 2 ×64 ×2 ×64 | 16KiB | 32KiB each |
+| Old custom FFC/ef0 simulation configuration | 1 ×32 ×2 ×64 | 4KiB | 32KiB each |
+
+For f744, revisions.txt directly records CFG=e_bp_unicore_zynqparrot_prefetch_cfg and exact TOP7edf/BP2958 with default context/thread settings. Canonical7edf source derives its base with one L2 bank, then the named prefetch override sets two banks and halves base32sets to16/bank; BP2958 supplies two ways and512-bit lines. Thus the f744 source chain itself gives4KiB, independently of f091 or FFC. The original child-generated bsg package/XPR is not recovered in the retained local archive, so this is selected-source geometry rather than an independent elaborated-parameter proof. The packaged HWH exposes no CFG/L2 parameter. No new checkpoint query was used to bridge that limitation.
+
+TOP7195fbc30 introduced prefetch16k on2026-11-01 for RL106: the controlled same-ELF early-preview experiment retained all four targets after64interference lines at16KiB, while8KiB reread all four from DMA. The named endpoint changes only L2 sets to64/bank, and subsequent smoke/route/physical checks were separately recorded. RL107 resolved local data-load benefit but left Linux first use unresolved and explicitly did not justify further L2 growth. RL120 later rejected joint sequencing on both16KiB and default-cache routes;16KiB was not established as the common failure cause.
+
+The current integration/admissions explicitly carry forward that named16KiB endpoint. No audited source dependency requires the full-line retained buffer to have16KiB L2, and no new controlled4KiB-versus16KiB large-buffer result justifies a performance claim. The actual r5b hierarchy reports the L2 slice at4,187 adjusted LUTs (3,921logic+266LUTRAM),1,899FF and sixRAMB36. Raw primitive/leaf counts differ and must not be added. Those existing16KiB resources do not predict the saving from a4KiB alternative; minimum RAM granularity, optimization and topology need their own measured matched candidate. Ordinary L1 geometry stays separate. Any prospective L2 tradeoff requires explicit matched off/I/D/joint scope, correctness and routed-fit evidence; no geometry change is made here.

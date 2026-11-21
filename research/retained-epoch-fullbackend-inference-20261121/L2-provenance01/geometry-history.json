@@ -1,0 +1,182 @@
+{
+  "state": "read-only source/history and existing actual synth-report audit; no new configuration or tool",
+  "old_f744": {
+    "TOP": "7edf64d1ae45bf381cb37f21af5799e2cb8cd362",
+    "BP": "2958cd72137d195537b2c86ad11537ea9cd6388e",
+    "bit_sha256": "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+    "package_sha256": "07a48584e22de3e1d97cdaef16d27a92faabc1a9f3db82bafd5e76fe18f1bbe5",
+    "recorded_CFG": "e_bp_unicore_zynqparrot_prefetch_cfg",
+    "source_inferred": {
+      "L2_slices": 1,
+      "L2_banks": 2,
+      "L2_sets_per_bank": 16,
+      "L2_ways": 2,
+      "L2_line_bytes": 64,
+      "L2_total_bytes": 4096,
+      "L1I_bytes": 32768,
+      "L1D_bytes": 32768
+    },
+    "basis": "Direct archived f744 revisions record + canonical TOP7edf/BP2958 source; independently derived, not f091/FFC extrapolation",
+    "limitation": "Original child generated bsg package/XPR not recovered in this retained local archive. Source-inferred selected geometry, not independent recovered actual elaboration proof. HWH has no L2/CFG parameter, and no vendor query performed."
+  },
+  "origin": {
+    "commit": "7195fbc30e2e9a748bec0fd4f0816ef7d757a66e",
+    "date": "2026-11-01",
+    "RL": "RL-106",
+    "change": "Named prefetch16k derives staticprefetch cfg and overrides only l2_sets64:2banks*64sets*2ways*64B=16KiB",
+    "rationale": "Directed same-ELF early4previewlines+64interferencelines:8KiB2x32 lost4targets toDMA,16KiB2x64 retained4. Separate named static endpoint smoke/route followed.",
+    "later_limits": "RL107 local data benefit but unresolved wake-to-first-use; moreL2growth unsupported. RL120 joint failures occurred both16KiB/default, so16KiB not established cause."
+  },
+  "current": {
+    "CFG": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "L2_banks": 2,
+    "L2_sets_per_bank": 64,
+    "L2_ways": 2,
+    "L2_line_bytes": 64,
+    "L2_total_bytes": 16384,
+    "L1I_bytes": 32768,
+    "L1D_bytes": 32768,
+    "L2_actual_r5b_synthesis": {
+      "LUT": 4187,
+      "logic_LUT": 3921,
+      "LUTRAM": 266,
+      "FF": 1899,
+      "RAMB36": 6,
+      "RAMB18": 0
+    },
+    "evidence_row": "|                     slices[0].l2s                                                     |                                                     bp_me_cache_slice |       4187 |       3921 |     266 |    0 |  1899 |      6 |      0 |          0 |",
+    "selection": "Earlier named topology explicitly retained in current integration/build admissions; no source requirement found that full-line retained buffers need16KiBL2."
+  },
+  "distinctions": {
+    "accepted_f091": "Source-inferred same4KiB as2banksx16sets; no child routegeometry proof recovered there",
+    "old_custom_FFC_ef0": "Actual custom model4KiB as1bankx32sets; different bank mapping/concurrency; not f744geometry",
+    "policy": "Any prospectiveL2tradeoff needs separately matchedoff/I/D/joint builds+correctness+route and explicit geometry disclosure; no silent change or forecast resource saving."
+  },
+  "artifacts": [
+    {
+      "object": "7edf64d1ae45bf381cb37f21af5799e2cb8cd362:cosim/black-parrot-example/v/bp_common_pkg.sv",
+      "repository": "/home/coyang/zynq-parrot-linux-capacity",
+      "raw_bytes": 7955,
+      "raw_sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/7edf-top-package.sv.gz",
+        "bytes": 2084,
+        "sha256": "0a3bd7573689b3b222c190a3ccbf1933176208b443be88c1a634557bc2a0c3ea"
+      }
+    },
+    {
+      "object": "2958cd72137d195537b2c86ad11537ea9cd6388e:bp_common/src/include/bp_common_aviary_cfg_pkgdef.svh",
+      "repository": "/home/coyang/zynq-parrot-retained-dense/import/black-parrot",
+      "raw_bytes": 21844,
+      "raw_sha256": "1505b65cd6fba12f3cb4ccb8c49bae7aed7c27d4f67c74c897a9ab476763173f",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/2958-schema.svh.gz",
+        "bytes": 4397,
+        "sha256": "f45596631834258ed2d0367222e8602258c9ffd6ce8b0f4475f86e9aefca9644"
+      }
+    },
+    {
+      "object": "482a73b03c8c66bc10dc5b6c54cfa2a0e3267c75:cosim/black-parrot-example/v/bp_common_pkg.sv",
+      "repository": "/home/coyang/zynq-parrot-linux-capacity",
+      "raw_bytes": 7955,
+      "raw_sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/482-current-package.sv.gz",
+        "bytes": 2084,
+        "sha256": "0a3bd7573689b3b222c190a3ccbf1933176208b443be88c1a634557bc2a0c3ea"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/revisions.txt",
+        "bytes": 362,
+        "sha256": "d74b13bf9b647b827a46f2cc77d0984c16cf654de58a393ed4ae7d995612e702"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/f744-revisions.txt.gz",
+        "bytes": 244,
+        "sha256": "68f0dc537f29896f9a15d2b4255e4bb667223ca33a5c92153472031fff244e3a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/console.log",
+        "bytes": 1048465,
+        "sha256": "65f6024d98d29b428ae29a28907d679ce96130c87cf5c617ac05f7ce3bef8429"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/f744-console.log.gz",
+        "bytes": 81209,
+        "sha256": "f3e432d5862d69db2d2f9cf877f89c18ec57f2c866339a7989fa2f920934bbeb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retention-fit-20261120/manifest.json",
+        "bytes": 7523,
+        "sha256": "5746bf43c0985a0d7ace6741daa03acbd75cecd1787a9f04147a54408c281c10"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/f744-package-fit-manifest.json.gz",
+        "bytes": 2271,
+        "sha256": "90a74746b143f078a3d02120882fc2f8c41efeef33dae4f768278993fc465eb4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/preparation01/origin16k.gitshow.gz",
+        "bytes": 3753,
+        "sha256": "a6ad0aa36d70bea098480f0da5129edd78cd63d3ca69c53254e4ad81ec98d395"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/origin16k.gitshow.gz.gz",
+        "bytes": 3776,
+        "sha256": "f92589761c04f11657699fe9b1444fe1f44732f6c1d807ad2cc4a8a4816ab74a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/preparation01/L2-ledger-excerpts.md",
+        "bytes": 11435,
+        "sha256": "3ce36fa229489f06590921df242e5df9767c4e1e2b2d5ba410259996fa686966"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/L2-ledger-excerpts.md.gz",
+        "bytes": 4953,
+        "sha256": "62be610f679eebdfaf207a9e0058f7e35eae9d0a5ba00975443967a365ded401"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1792-dense-r5b-monitor-20261121/read-hierarchy-preparation01/run01/remote/utilization_hierarchical.rpt",
+        "bytes": 346713,
+        "sha256": "6b3067fb42338f79b570f644419d5f97d4e6dfcb4eeddb52721ea5d798ced68f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/r5b-synth-hierarchy.rpt.gz",
+        "bytes": 20425,
+        "sha256": "b137f65951e8b0d476aab75d9de17dd5e17b9e1888a004de6d84a9414fac8587"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/large-retained-capacity-20261121/fit-baseline-scope-correction.json",
+        "bytes": 1381,
+        "sha256": "b3c6ca1fd958bef53bb768bd3427e6884e6a277be53facea1e272354c1a29df1"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-fullbackend-inference-20261121/L2-provenance01/current-scope-correction.json.gz",
+        "bytes": 779,
+        "sha256": "6a0d688931aa4338bc3f72d39425f93fb2207164f1c4f6a1c12dc8759d578b16"
+      }
+    }
+  ],
+  "remote_operations": 0,
+  "vendor_operations": 0,
+  "source_edits": 0,
+  "report": {
+    "path": "README.md",
+    "bytes": 2778,
+    "sha256": "2efa545f9d7be48b08d72d35d2cd87e2045f4b8d425e0a3cf9b7dc99a7a7f448"
+  }
+}
