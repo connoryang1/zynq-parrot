@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Lenovo LP1492, original lab measurements",
+    "url": "https://lenovopress.lenovo.com/lp1492-configuring-memory-speed-for-optimal-memory-latency-amd-epyc",
+    "facts": "Tables1/2 local-node Multichase76/79/82ns Gen3,90/92/103ns Gen2. CPU-visible latency, not AXI/DRAM-chip timing."
+  },
+  {
+    "title": "DIVA-DRAM original research",
+    "url": "https://people.inf.ethz.ch/omutlu/pub/DIVA-low-latency-DRAM_sigmetrics17-paper.pdf",
+    "facts": "Table1 models3.2GHz CPU,64B lines andDDR3; section4 separates DRAM timing parameters. Does not calibrateBlackParrot."
+  },
+  {
+    "title": "AMD UG585 HP performance notes",
+    "url": "https://docs.amd.com/r/en-US/ug585-zynq-7000-SoC-TRM/Performance-Optimization-Summary",
+    "facts": "Readstream maygap/interleave; Bresponse depends onDDR/reordering/traffic. Does not specify one fixedHP0latency."
+  },
+  {
+    "title": "TUL-authored PYNQ-Z2 Reference Manual v1.0, university mirror",
+    "url": "https://pynq.tue.nl/doc/pynqz2_user_manual_v1_0.pdf",
+    "facts": "Pages4/10:512MB16-bit DDR3, up to525MHz/1050Mbps; pin-rate ceiling not measured configuration or delivered throughput."
+  }
+]

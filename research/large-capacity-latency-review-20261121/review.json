@@ -1,0 +1,105 @@
+{
+  "state": "read-only-audit-no-new-runs",
+  "scope": "No physical calibration, no fullcore/FPGA/application performance claim",
+  "closed_control": {
+    "elf_sha256": "f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd",
+    "patched_nbf_sha256": "18dbba12d432e6cfde94e7a16887d52f4e6edf0114b21a4fd227c0fbe4bc103d",
+    "ring_cycles": {
+      "40": 431132,
+      "200": 705445,
+      "delta": 274313
+    },
+    "accepted_D_misses_per_program": 6508,
+    "accepted_D_fill_beats_per_program": 52064,
+    "timed_misses": 1711,
+    "miss_to_first_fill_median": [
+      61,
+      221
+    ],
+    "miss_to_full_fill_median": [
+      69,
+      229
+    ],
+    "model_l2_banks": 1,
+    "physical_reference_l2_banks": 2,
+    "max_observed_normal_D_pending": 1,
+    "first_fill_is_not_critical_word": true
+  },
+  "intended_primary": {
+    "l2_banks": 2,
+    "l2_sets_per_bank": 64,
+    "l2_ways": 2,
+    "line_bytes": 64,
+    "l2_total_bytes": 16384,
+    "HP0_data_bits": 64,
+    "normal_ARID": 0,
+    "ARLEN_full_line": 7,
+    "ARSIZE": 3,
+    "AR_burst": "INCR",
+    "normal_read_fifo_bound": 2,
+    "direct_D_prefetch_bypass": false,
+    "I_D_prefetch_same_L2": true,
+    "design_target_mhz_not_measured_clock": 20,
+    "HP0_peak_bytes_per_core_cycle_not_delivered_bandwidth": 8
+  },
+  "prospective_cpu_scenarios": [
+    {
+      "assumed_cpu_ghz": 1,
+      "CPU_visible_local_memory_ns": [
+        76,
+        103
+      ],
+      "cycles_ceil": [
+        76,
+        103
+      ],
+      "claim": "arithmetic inference, not calibrated HP0 or BlackParrot ASIC"
+    },
+    {
+      "assumed_cpu_ghz": 2,
+      "CPU_visible_local_memory_ns": [
+        76,
+        103
+      ],
+      "cycles_ceil": [
+        152,
+        206
+      ],
+      "claim": "arithmetic inference, not calibrated HP0 or BlackParrot ASIC"
+    },
+    {
+      "assumed_cpu_ghz": 3.2,
+      "CPU_visible_local_memory_ns": [
+        76,
+        103
+      ],
+      "cycles_ceil": [
+        244,
+        330
+      ],
+      "claim": "arithmetic inference, not calibrated HP0 or BlackParrot ASIC"
+    }
+  ],
+  "additive_response_delay_proposal_not_preregistered": [
+    0,
+    64,
+    128,
+    256,
+    384
+  ],
+  "maximum_proposed_additive_delay": {
+    "cycles": 384,
+    "actual_20MHz_target_us": 19.2,
+    "assumed_3p2GHz_additional_ns": 120.0
+  },
+  "required_monitor_endpoints": [
+    "AR acceptance->first R offer",
+    "AR acceptance->first R acceptance",
+    "AR acceptance->accepted RLAST",
+    "UCE request acceptance->first/critical/full accepted SRAM fill",
+    "prefetch acceptance->full UCE packet",
+    "full UCE packet->retained publication",
+    "native R/B acceptance->delayed release"
+  ],
+  "no_shared_source_edits": true
+}
