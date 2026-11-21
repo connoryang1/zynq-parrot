@@ -1,4 +1,4 @@
-This is a fixed pretarget codec extension, separate from the running plain four-workload matrix. It uses existing zlib and the already built scoped zlib ELF; no new table, address/layout tuning, library build, kernel/rootfs image or source8 change is introduced. Execution starts only after the current primary16 completes and the excluded baseline functional pilot passes. This offline task executes no model or board and reads no primary data.
+This is a fixed pretarget codec extension, separate from the running plain four-workload matrix. It uses existing zlib and the already built scoped zlib ELF; no new table, address/layout tuning, library build, kernel/rootfs image or source8 change is introduced. The codec pilot follows the plain16-boot matrix; the primary codec comparison follows the successful excluded pilot. This offline task executes no model or board and reads no primary data.
 
 ## Fixed identities and workload
 
