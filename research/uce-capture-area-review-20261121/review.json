@@ -1,0 +1,129 @@
+{
+  "state": "OFFLINE source/evidence review only; no new implementation or savings claim",
+  "input_dcp": {
+    "path": "/tmp/zynq-parrot-fpga-20261121T140517Z-11ca59a27/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.dcp",
+    "bytes": 82388975,
+    "sha256": "3514bf6fd563fae17e6b8c4829810b7d60b706b85c79995f05a501361e247663"
+  },
+  "bp_head": "d766d42cdf04ee43ca1e915fb9da06f5cc117dde",
+  "reports": {
+    "session.json": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/session.json",
+      "bytes": 4485,
+      "sha256": "aad96b41d1e54b7e4c95d556603528f9d45471cf345e0a169707c3f1c27aee33"
+    },
+    "query.tcl": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/query.tcl",
+      "bytes": 3502,
+      "sha256": "4207043dcdf820ec5cffd1c8e57b2356e33c62cff568921149737683d7fb23e8"
+    },
+    "utilization_flat.rpt": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/utilization_flat.rpt",
+      "bytes": 9314,
+      "sha256": "e8d039ec5a0a4cf931ccf0bba16b285f6f452ed3978178a2bd521efd3c286339"
+    },
+    "focused-04.rpt": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-04.rpt",
+      "bytes": 8608,
+      "sha256": "c7407590353b2bea878c7f8dfc6422c42f15c216c9c79c0278af82fcbbbf9cb9"
+    },
+    "focused-05.rpt": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-05.rpt",
+      "bytes": 8608,
+      "sha256": "eef6011c50d670fb908b7e38f624befcb9ef955070ef78d2dd5c482b5b49f4e6"
+    },
+    "focused-06.rpt": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/focused-06.rpt",
+      "bytes": 8478,
+      "sha256": "1bf147f84fbfa7e23d4d357b737bbddc08a5fc61ff320c35eaf05560ca798334"
+    },
+    "primitive-counts.tsv": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/primitive-counts.tsv",
+      "bytes": 7005,
+      "sha256": "f729da102a8882e812d580e596baf3093ef4286a8259b59d7f6f49b7e559b702"
+    },
+    "primitive-name-samples.tsv": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1280-sp-r4-readonly-monitor-20261121/read-hierarchy01/remote/primitive-name-samples.tsv",
+      "bytes": 149986,
+      "sha256": "a61163bc04b26f89b786ee657931cfa69f5faf2a3db67898baa89df9d99ff3fc"
+    }
+  },
+  "sources": {
+    "bp_me/src/v/cce/bp_uce.sv": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+      "bytes": 106931,
+      "sha256": "4669409939034afa5d6217de7f36096057d4a99aad3f960d0169b88f753cedca"
+    },
+    "bp_top/src/v/bp_unicore_lite.sv": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+      "bytes": 31356,
+      "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+    },
+    "bp_common/src/v/bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    }
+  },
+  "existing_gate": {
+    "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/uce_retained_driver.cpp",
+    "bytes": 16285,
+    "sha256": "13e5d9cda842bf8b14af7852146560bb0027a54e487fd4142838a1fbd47bdfb3"
+  },
+  "synthesized_usage": {
+    "total_lut": 57373,
+    "available_lut": 53200,
+    "total_bram": 140,
+    "available_bram": 140,
+    "d_uce": {
+      "lut": 2460,
+      "logic_lut": 2222,
+      "memory_lut": 238,
+      "bram": 8
+    },
+    "i_uce": {
+      "lut": 2703,
+      "logic_lut": 2515,
+      "memory_lut": 188,
+      "bram": 8
+    },
+    "retained_store": {
+      "logic_lut": 3756,
+      "bram": 41
+    }
+  },
+  "recommendation": "One-edge delayed completed capture to pending, with independent PA/valid/kill and idle tracking; quantify mapped cones before savings claims.",
+  "uncertainty": "No UCE-specific cone attribution in four-samples-per-group reports; no predicted LUT savings or proof this closes fit.",
+  "rtl_edits": 0,
+  "new_tests": 0,
+  "new_models": 0,
+  "synthesis_runs": 0,
+  "board_actions": 0,
+  "report": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/uce-capture-area-review-20261121/README.md",
+    "bytes": 8687,
+    "sha256": "9ee3450ccb624a29a4103ae53edab5c46f3406c9cf8ae2a7bfe3bf8aae592ead"
+  },
+  "harness": {
+    "run_uce_retained.py": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/run_uce_retained.py",
+      "bytes": 5018,
+      "sha256": "5f675ac43f9f536e24c657781505f4a162dfc4b00cf1bea9857090751f9c59eb"
+    },
+    "uce_retained_tb.sv": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/uce_retained_tb.sv",
+      "bytes": 8722,
+      "sha256": "70c7235210ad348f8e821d0d282065546dd2ec28fcc6cb4015523f37547f4532"
+    },
+    "uce_retained_driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/uce_retained_driver.cpp",
+      "bytes": 16285,
+      "sha256": "13e5d9cda842bf8b14af7852146560bb0027a54e487fd4142838a1fbd47bdfb3"
+    }
+  },
+  "proposed_unexecuted_commands": [
+    "python3 testing/rtl/run_uce_retained.py --out NEW_D_DIRECTORY --lines 64",
+    "python3 testing/rtl/run_uce_retained.py --out NEW_I_DIRECTORY --lines 64 --icache"
+  ],
+  "harness_limits": "4-set/8-way supplied L1 endpoints,64-set backend, one local clock; response() low-valid edge per beat and demand_memory() idle wait; not zero-gap or fullcore proof."
+}
