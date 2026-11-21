@@ -1,0 +1,122 @@
+{
+  "state": "prospective root-reviewed fixed retention acquisition; no retention target results",
+  "created_utc": "2026-11-21T03:50:06.710534+00:00",
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/admission.json",
+    "bytes": 18382,
+    "sha256": "2b516262d5e36e81b93ad375910da89a452a43f46d5a2d156064f3fd2bf76f02"
+  },
+  "pins": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention-validator-pins.json",
+    "bytes": 6587,
+    "sha256": "c0b2cb81b4a1f2d161f6a7fe82b95996436930395ebb794c2eb3fd54e395c370"
+  },
+  "frozen_validator": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_admission.py",
+    "bytes": 17177,
+    "sha256": "5e435679136d9c47e4f22391c4fcaccfb35cd072c2012387f1d1ff6cd54a4671"
+  },
+  "operations": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_operations.py",
+    "bytes": 13368,
+    "sha256": "77f84b2e48249e0c01db8fafd4a639a15e65a5844967bb704bc2ef4397c12230"
+  },
+  "argv_table": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention-operations-argv.json",
+    "bytes": 14638,
+    "sha256": "2251c7a46c685d48aa2c80b4b55c1a75a556d6029737e86f28475f29cc634640"
+  },
+  "producer": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_supervisor.py",
+    "bytes": 4906,
+    "sha256": "0c8829b2882cb2db0f2e156bff95b41e990c3e91e99125450e5149e26d752f18"
+  },
+  "producer_host_validation": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/supervisor-proof.json",
+    "bytes": 2608,
+    "sha256": "c7b463cdd8213175a45cf3316999e24ae028ee210dbac0a48a33475bf05679eb"
+  },
+  "operations_host_validation": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention-operations-proof.json",
+    "bytes": 8672,
+    "sha256": "3451396662723615f4f085e9932e0fae55103049acbfcdc6d0bc174e55d40c6a"
+  },
+  "bounded_unsupported_hardware_gate": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-absent46-20261121/functional-admission.json",
+    "bytes": 5027,
+    "sha256": "53cb73a209dd67bb42eb44fa41d72cc8312d24628c949b51384942b379a8bd59"
+  },
+  "current_plain_primary_audit": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/closed-audit.json",
+    "bytes": 72768,
+    "sha256": "e336181cea962c8554316f4e979e78ca7fa1c8d16bbea24ec70da63f202b2c74"
+  },
+  "pilot_label": "pilot",
+  "pilot_cells": [
+    [
+      "retention-rr",
+      "scan"
+    ],
+    [
+      "retention-first",
+      "scan"
+    ]
+  ],
+  "pilot_argv": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+    "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+    "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/pilot",
+    "--bitstream-sha256",
+    "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+    "--host",
+    "xilinx@192.168.4.35",
+    "--loops",
+    "8",
+    "--warmup",
+    "4",
+    "--repeats",
+    "2",
+    "--all-three-acknowledged",
+    "--cell",
+    "scan:32:retention-rr",
+    "--cell",
+    "scan:32:retention-first"
+  ],
+  "producer_pilot_argv": [
+    "python3",
+    "-u",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_supervisor.py",
+    "pilot"
+  ],
+  "planned_labels": [
+    "pilot",
+    "R1a",
+    "R1b",
+    "F1a",
+    "F1b",
+    "F2a",
+    "F2b",
+    "R2a",
+    "R2b"
+  ],
+  "maximum_guest_executions_per_reservation": 2,
+  "global_session_lock": "/home/coyang/fpga-artifacts/pynq-session.lock",
+  "board_side_program_lock_retained": true,
+  "automatic_retry": false,
+  "performance_selection": false,
+  "matched_lifecycle": "Matched instrumented per-cell control/fence/status/observer lifecycle; mode0 is not unmodified Linux deployment.",
+  "claim_limits": [
+    "All policy/workload outcomes retained; zero active capture is valid.",
+    "Only completed whole-cohort fixed audit/analysis can admit performance.",
+    "Mode0 is matched instrumented control, not unmodified Linux deployment.",
+    "Demand capture changes use of existing physical I storage, not guaranteed unique capacity or prefetch effectiveness.",
+    "No codec timing, failed attempt, short pilot or one-bank D-model result is pooled."
+  ],
+  "receipt_source_history": "Actual return and launch provenance supplied by this frozen reviewed producer; prefix gate additionally checks complete released session and every strict guest gate."
+}
