@@ -1,0 +1,3 @@
+This evidence records the first completed physical feature-absent test of the new retained-store ABI29 Linux kernel. It verifies compatibility on the existing accepted f744 FPGA image within the actual46MiB RAM bound. It does not establish correctness, fit, or performance of the new retained hardware.
+
+Session03 completed guest/protocol/CORE/HOST checks and recovered f744 before releasing the shared reservation at09:49:08UTC. Earlier storage and PTY-framing failures remain preserved separately; the ELF was transferred and hashed before execution. The session manifest binds all sources, artifacts and reservation, and compact exact session files are archived here.
