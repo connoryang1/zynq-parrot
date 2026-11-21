@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Physical demand-retention pilot accepted — 2026-11-20:** both fresh RR/first scan32 functional boots pass strict provenance, scope/resource/CSR/zero-prefix/bounded-memory and normal-return gates. Demand publication and side-store response counters are observed physically; the short pilot is excluded from all performance inference, with saturated-counter and matched-lifecycle limits explicit (`research/retention-natural-demand-20261120/PILOT.md`).
+
 - **Bounded old-hardware retention fallback accepted — 2026-11-20:** the unchanged8f ABI probe completes on oldf091 hardware with the bounded a1f kernel and actual46MiB allocation/boot evidence. ENODEV/sentinel, malformed-input and actual nonroot privilege contracts pass with normal return and CORE/BSG/runner0, closing the previous uncapped compatibility limitation (`research/retention-kernel-20261120/bounded-absent-functional.json`).
 
 - **Full-size diagnostic did not reproduce Oops — 2026-11-20:** the one preregistered same-guest64/32/4 extended-tail diagnostic completes all eight checked codec cells with actual hashes/bounds and normal return. No Oops occurs; the execution remains wholly excluded from performance, replaces no primary slot and leaves the original failure unexplained (`research/codec-mode14-20261120/diagnostic-outcome-001.json`).
