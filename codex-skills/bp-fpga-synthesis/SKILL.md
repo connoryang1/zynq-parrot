@@ -159,6 +159,15 @@ Launch routed FPGA implementation in an isolated background worktree:
 codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh start
 ```
 
+When tracked historical evidence makes the source checkout large, set
+`FPGA_SPARSE_SOURCE=1`. The worker checks out the root files and the `ci`,
+`codex-skills`, `cosim`, `import`, `software`, `testing`, and `tools` directories
+directly, omitting uncompiled historical archives. Its commit, nested source
+pins, shared install/RISC-V prefixes, build commands and synthesis settings
+stay the same. The worker records `sparse_source` in `revisions.txt`; the default
+is the full checkout. Confirm that any additional build inputs are inside the
+retained directories before selecting this option for another flow.
+
 If the active checkout has unrelated tracked edits, do not weaken the dirty-tree
 guard or route those edits accidentally. Create a clean detached source snapshot
 at the committed checkpoint, initialize its pinned submodules, expose only the

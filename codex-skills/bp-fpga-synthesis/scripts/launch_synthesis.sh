@@ -29,6 +29,12 @@ fpga_threads=${FPGA_VIVADO_THREADS:-$(nproc)}
 fpga_num_threads=${FPGA_NUM_THREADS:-}
 fpga_num_contexts=${FPGA_NUM_CONTEXTS:-}
 fpga_aclk_mhz=${FPGA_ACLK_MHZ:-}
+fpga_sparse_source=${FPGA_SPARSE_SOURCE:-0}
+
+if [[ "$fpga_sparse_source" != 0 && "$fpga_sparse_source" != 1 ]]; then
+  echo "FPGA_SPARSE_SOURCE must be 0 or 1." >&2
+  exit 2
+fi
 
 if [[ -n "$fpga_num_threads" || -n "$fpga_num_contexts" ]]; then
   if [[ -z "$fpga_num_threads" || -z "$fpga_num_contexts" ]]; then
@@ -49,6 +55,7 @@ export FPGA_VIVADO_THREADS="$fpga_threads"
 export FPGA_NUM_THREADS="$fpga_num_threads"
 export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
 export FPGA_ACLK_MHZ="$fpga_aclk_mhz"
+export FPGA_SPARSE_SOURCE="$fpga_sparse_source"
 
 shell_quote() {
   # tmux 3.0 accepts a shell-command string. POSIX single quotes preserve even
@@ -58,7 +65,7 @@ shell_quote() {
 
 usage() {
   echo "usage: $0 start | list | status <job-id> | recheck <job-id> | worker <job-id> <commit>"
-  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, FPGA_SPARSE_SOURCE, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
 }
 
 case ${1:-} in
@@ -105,6 +112,7 @@ case ${1:-} in
       "FPGA_NUM_THREADS=$fpga_num_threads"
       "FPGA_NUM_CONTEXTS=$fpga_num_contexts"
       "FPGA_ACLK_MHZ=$fpga_aclk_mhz"
+      "FPGA_SPARSE_SOURCE=$fpga_sparse_source"
       "$script_dir/launch_synthesis.sh" worker "$job_id" "$commit"
     )
     worker_command="trap '' HUP; exec"
@@ -138,7 +146,20 @@ case ${1:-} in
       "$fpga_cfg" "$fpga_threads" "${fpga_num_threads:-<default>}" \
       "${fpga_num_contexts:-<default>}" "${fpga_aclk_mhz:-<default>}" \
       >>"$job_dir/revisions.txt"
-    git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
+    printf 'sparse_source=%s\n' "$fpga_sparse_source" >>"$job_dir/revisions.txt"
+    if [[ "$fpga_sparse_source" == 1 ]]; then
+      git -C "$repo_dir" worktree add --detach --no-checkout "$worktree" "$commit"
+      # Historical evidence archives are tracked but are not FPGA build inputs.
+      # Retain every build/source/tool directory and the root-level files.
+      # Git 2.25 needs this linked-worktree directory before sparse init.
+      mkdir -p "$(git -C "$worktree" rev-parse --absolute-git-dir)/info"
+      git -C "$worktree" sparse-checkout init --cone
+      git -C "$worktree" sparse-checkout set \
+        ci codex-skills cosim import software testing tools
+      git -C "$worktree" checkout --detach "$commit"
+    else
+      git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
+    fi
     # Optimization checkpoints may pin local BlackParrot or BaseJump commits
     # that have not been pushed upstream yet. Seed those submodules from the
     # source checkout; other immutable dependencies use their normal URLs.
