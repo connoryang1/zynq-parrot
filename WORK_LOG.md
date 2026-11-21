@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Private retained RAM component equivalence — 2026-11-21:** isolated BP `d766d42cdf` separates I/D tag and payload arrays into owning-clock read-first 1RW memories, preserving all FSM/policy/assertion logic. All twelve capacity geometries × two clock patterns pass full-payload/coherence checks and 23,401,321 settled-evaluation comparisons against original e109; deliberate reference corruption is rejected. Inference, full-core and routed fit remain separate pending gates (`research/retained-private-sp-ram-20261121/`).
+
 - **Observed1280 integration closed — 2026-11-21:** r2's clean actual fulltop passes unchanged integrity and cold08 execution with scoped runtime assertions; closed traces confirm1280/1280/256/native0 and ordinary L1 geometry, real512-bit I/D restoration, eight non-aborted L1 writes per side, and GP0/counter1/1/8 agreement. Model/program/source bindings and exact post-PASS GPIO exits are retained; parent-owned actual fit and physical useful-capacity/application qualification remain pending (`research/native1280-observe1-r2-20261121/closure01/`).
 
 - **1280 observation candidate prepared — 2026-11-21:** new r2 preserves immutable r1, combines the GP0 observer and committed actual-IP macro propagation repair, and defaults observation on so a future fit prices it. Make parsing/default expansion passes at1280/1280/256/native0; the isolated combined whole-core correctness/trace gate remains pending (`research/native1280-observe1-r2-20261121/`).

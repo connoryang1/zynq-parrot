@@ -1,0 +1,1696 @@
+{
+  "state": "PASS-private-single-port-directed-cycle-equivalence",
+  "scope": "Component functional and cycle equivalence only; no synthesis, fit, full-core, physical or performance claim.",
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/driver.cpp",
+      "bytes": 12649,
+      "sha256": "34f8424a28fb04fa29af08f402a824a795bf8e626ba7b79af4a8c2f09efeb90e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+      "bytes": 2102,
+      "sha256": "51a9e28317b56871e2796fce9064ab32c2cdcbf1c9dd8c65056d4f24f14a5265"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-private-sp/run.py",
+      "bytes": 8341,
+      "sha256": "e45b79cc940f7229e2e9fe08380a4b270f31821e422e7c7f3f48cd3f29b6f7a8"
+    }
+  ],
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.12865284807048738,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "i0-d0-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=0",
+        "-GD_LINES=0",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.380255180993117,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0-build.log",
+        "bytes": 4433,
+        "sha256": "26766e67773c9fd7894d1301b13e786acd346d43c3826f0f063c2d404d61db62"
+      }
+    },
+    {
+      "label": "i0-d0-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.022297644056379795,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0-inverted.log",
+        "bytes": 367,
+        "sha256": "9f86019189f3148f93aea073445167c204f13d6c89518e71fe45460c11945f20"
+      }
+    },
+    {
+      "label": "i0-d0-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.019430819898843765,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0-different-periods.log",
+        "bytes": 376,
+        "sha256": "3ca86aa1a0fbcfa36c152f7cf466b686f99de4ca8a88d86335884b077d0d4f2d"
+      }
+    },
+    {
+      "label": "i64-d0-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=64",
+        "-GD_LINES=0",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.437219623010606,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0-build.log",
+        "bytes": 4435,
+        "sha256": "940f3655e15da4935830fbad02c9313f697554f6a431ec5462bdc622c4f459a4"
+      }
+    },
+    {
+      "label": "i64-d0-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.04422652896028012,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0-inverted.log",
+        "bytes": 376,
+        "sha256": "b05ea8f495068c99384bc6712412109da36d27d9710967bbdd4ef71aeb2dea57"
+      }
+    },
+    {
+      "label": "i64-d0-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.07411446899641305,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0-different-periods.log",
+        "bytes": 385,
+        "sha256": "c85fc8d9d5b8d13bade5f1c29fe04254b109ea0306c8f177eff1f6a4ad6a9c41"
+      }
+    },
+    {
+      "label": "i0-d64-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=0",
+        "-GD_LINES=64",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.432856044033542,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64-build.log",
+        "bytes": 4435,
+        "sha256": "034088b0c6fb53e56109b6c0b82f7929acc80559e1ed8e4ed0cef6d0576be9cf"
+      }
+    },
+    {
+      "label": "i0-d64-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.07691061496734619,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64-inverted.log",
+        "bytes": 376,
+        "sha256": "f6873c5b2dbf0bbda7bf0247cfc922a845fabeaa4498b1af5b7a0cad17dcde05"
+      }
+    },
+    {
+      "label": "i0-d64-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.0769346400629729,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64-different-periods.log",
+        "bytes": 385,
+        "sha256": "d56f2c3bcc0119e94a5c48a2ad47bda0c27fb95cf7b4c0cc1e3f1cd86269606b"
+      }
+    },
+    {
+      "label": "i64-d64-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=64",
+        "-GD_LINES=64",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.641045594005845,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64-build.log",
+        "bytes": 4437,
+        "sha256": "83b44c1fa2e926103fea2c1d30bba9d5144e18a0bc9bded7024fde2c2a2e96ef"
+      }
+    },
+    {
+      "label": "i64-d64-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.12776894599664956,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64-inverted.log",
+        "bytes": 431,
+        "sha256": "319e417dd479af6b59f5d4eb1537b9802953d357b70aa7131e48938925f8bfb0"
+      }
+    },
+    {
+      "label": "i64-d64-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.12721524899825454,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64-different-periods.log",
+        "bytes": 449,
+        "sha256": "0dfddc311d172f33995fbfd36c611f4ae8127023ba0810a25ae1109c2eb5cabb"
+      }
+    },
+    {
+      "label": "i128-d128-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=128",
+        "-GD_LINES=128",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.730624001007527,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128-build.log",
+        "bytes": 4441,
+        "sha256": "19960a8db5a00824f020069baf7907d3a91118ec5d2f4cd6baa81f87b8ac7909"
+      }
+    },
+    {
+      "label": "i128-d128-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.17884797393344343,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128-inverted.log",
+        "bytes": 446,
+        "sha256": "a61ba6c1da3a5fa7c8e63aa772a67ed0ab7e394ddfe5c008da783fbf784fcc1f"
+      }
+    },
+    {
+      "label": "i128-d128-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.17695082002319396,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128-different-periods.log",
+        "bytes": 464,
+        "sha256": "1760b7ed7a33597fc402b9bd70ee9b587243951980a3f013060ca929952c5287"
+      }
+    },
+    {
+      "label": "i256-d256-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=256",
+        "-GD_LINES=256",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.543467279989272,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256-build.log",
+        "bytes": 4441,
+        "sha256": "67e7aa4800f21b5d7ae0470e8c2334e03342e362d64b285405497df4dccc4f88"
+      }
+    },
+    {
+      "label": "i256-d256-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.3327275940682739,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256-inverted.log",
+        "bytes": 446,
+        "sha256": "13dd84a5a540676fff0e260988d61e47b3f3f7bd3313aa329d4dfe648d2c8a96"
+      }
+    },
+    {
+      "label": "i256-d256-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.3390967940213159,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256-different-periods.log",
+        "bytes": 464,
+        "sha256": "7702e2e9f3cad24725eb6e4750322ec35cca28aff5ab95d8f4a168b74c0ce846"
+      }
+    },
+    {
+      "label": "i512-d512-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=512",
+        "-GD_LINES=512",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.53980741405394,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512-build.log",
+        "bytes": 4441,
+        "sha256": "ea15e1673cc64d500665b3394f4b945d503e84c44763e0d5a25526409a0dddda"
+      }
+    },
+    {
+      "label": "i512-d512-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.6960471280617639,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512-inverted.log",
+        "bytes": 446,
+        "sha256": "f4c7b65b0408ea4420afb1e5cb48ca61d9b1d0130c3676d9e46f3875725cf1bd"
+      }
+    },
+    {
+      "label": "i512-d512-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.8048191070556641,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512-different-periods.log",
+        "bytes": 464,
+        "sha256": "e7cf58ffbc97069c5558a8e8d8cc646f0d9fe38a32d036e29bf3e281c9dab185"
+      }
+    },
+    {
+      "label": "i1024-d1024-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=1024",
+        "-GD_LINES=1024",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.58138006797526,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024-build.log",
+        "bytes": 4445,
+        "sha256": "2293238237673a363ba867ca762774e3e725e6aa9a22c75a76694b627efe3609"
+      }
+    },
+    {
+      "label": "i1024-d1024-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 1.8391277459450066,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024-inverted.log",
+        "bytes": 461,
+        "sha256": "76ec9504a7ac11b01f91ba8116626c6dfb260809c05bac3beb75045847dfe970"
+      }
+    },
+    {
+      "label": "i1024-d1024-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 2.0997458630008623,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024-different-periods.log",
+        "bytes": 479,
+        "sha256": "eee5de63696dbe8df7313fcb9117027ae75a72e59f300d8637ec21ce0c4eb25f"
+      }
+    },
+    {
+      "label": "i1280-d1280-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=1280",
+        "-GD_LINES=1280",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.648509986000136,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280-build.log",
+        "bytes": 4445,
+        "sha256": "c6dddccaf73ab5df92ca6d704e73b6b21da2a90c058b1e0e855f9a0bd250be31"
+      }
+    },
+    {
+      "label": "i1280-d1280-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 2.619907121057622,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280-inverted.log",
+        "bytes": 461,
+        "sha256": "899058a9326bfe1c680ae474aca284ea9da3bb2357ce7772832f49508d443887"
+      }
+    },
+    {
+      "label": "i1280-d1280-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 2.926460916060023,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280-different-periods.log",
+        "bytes": 479,
+        "sha256": "064c4c5451e270a4caf44c0d653a958298eb93316b2b32d76673223fb2564971"
+      }
+    },
+    {
+      "label": "i1320-d1320-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=1320",
+        "-GD_LINES=1320",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.594713400001638,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320-build.log",
+        "bytes": 4445,
+        "sha256": "654fc015f886262031720345f73d5b83a434ab37828b1c7fde3be7219dd0ab59"
+      }
+    },
+    {
+      "label": "i1320-d1320-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 2.7278122559655458,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320-inverted.log",
+        "bytes": 461,
+        "sha256": "70912a2bedceb89f9d68d89e763776f11bea301bd53b4c186d2f908287a79abb"
+      }
+    },
+    {
+      "label": "i1320-d1320-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 3.0850757650332525,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320-different-periods.log",
+        "bytes": 479,
+        "sha256": "7266720d77ab1fdbeec762dac91b5785e0c0dd770d61d54f72d7e8a38d3acbf0"
+      }
+    },
+    {
+      "label": "i1536-d1536-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=1536",
+        "-GD_LINES=1536",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.539899930008687,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536-build.log",
+        "bytes": 4445,
+        "sha256": "d8cd75f61e118b964e738059a8c2aeef5b7b0f989ec27af2bf124cec75c27621"
+      }
+    },
+    {
+      "label": "i1536-d1536-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 3.3918854750227183,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536-inverted.log",
+        "bytes": 461,
+        "sha256": "7f6b247273bba4aa80a1590ebaba224528d3f3dfe50c563c5da1d425b8071ac8"
+      }
+    },
+    {
+      "label": "i1536-d1536-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 3.856765244039707,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536-different-periods.log",
+        "bytes": 479,
+        "sha256": "53b5c0f7452e4a4eb79d69b7b207274c2115c79a450b068cbf3f62b67483c34a"
+      }
+    },
+    {
+      "label": "i93-d131-build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=93",
+        "-GD_LINES=131",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.687604880076833,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131-build.log",
+        "bytes": 4439,
+        "sha256": "2adee898b92b55556a04198fc7329fb0d221dac2b66889eae6a562dae92b8be3"
+      }
+    },
+    {
+      "label": "i93-d131-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.13088804099243134,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131-inverted.log",
+        "bytes": 443,
+        "sha256": "ea0e7535777ae74902e4d79330a40b81806485567511250b9ecf173ff53258a9"
+      }
+    },
+    {
+      "label": "i93-d131-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.18196874693967402,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131-different-periods.log",
+        "bytes": 462,
+        "sha256": "5c8d74204f82db98cb4de23d9fc7c22855e17f2d122d7038579bf9b41dba62fe"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "i_lines": 0,
+      "d_lines": 0,
+      "clock_mode": "inverted",
+      "samples": 215,
+      "counts": [
+        [
+          "0",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/obj/Vretained_line_store_wrapper",
+        "bytes": 434584,
+        "sha256": "f94b5a0409b01f66b34e25d25fd20720ca412f25188ab14d0b43c7227f595b61"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/inverted/retained-line-store.fst",
+        "bytes": 3751,
+        "sha256": "fed36112e2df52a8060e02dec40a15a0694e664ef1acb0faf248d5795ee0dfe5"
+      }
+    },
+    {
+      "i_lines": 0,
+      "d_lines": 0,
+      "clock_mode": "different-periods",
+      "samples": 250,
+      "counts": [
+        [
+          "0",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/obj/Vretained_line_store_wrapper",
+        "bytes": 434584,
+        "sha256": "f94b5a0409b01f66b34e25d25fd20720ca412f25188ab14d0b43c7227f595b61"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d0/different-periods/retained-line-store.fst",
+        "bytes": 3798,
+        "sha256": "e00c2c88d967e95c792e797419aac30b8ee48facf36852f4eb9264515c899ed0"
+      }
+    },
+    {
+      "i_lines": 64,
+      "d_lines": 0,
+      "clock_mode": "inverted",
+      "samples": 21020,
+      "counts": [
+        [
+          "0",
+          "72",
+          "72",
+          "69",
+          "69",
+          "68"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/obj/Vretained_line_store_wrapper",
+        "bytes": 438680,
+        "sha256": "53d18cadd76847ba97221bc61d1ec82bdbc9d8587ba650a09a329ad470bb2312"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/inverted/retained-line-store.fst",
+        "bytes": 36891,
+        "sha256": "4a180bd45e7a21000ffca0777454e249461fb22f0b56ce50269b15d24f34bb9a"
+      }
+    },
+    {
+      "i_lines": 64,
+      "d_lines": 0,
+      "clock_mode": "different-periods",
+      "samples": 21040,
+      "counts": [
+        [
+          "0",
+          "72",
+          "72",
+          "69",
+          "69",
+          "68"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/obj/Vretained_line_store_wrapper",
+        "bytes": 438680,
+        "sha256": "53d18cadd76847ba97221bc61d1ec82bdbc9d8587ba650a09a329ad470bb2312"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d0/different-periods/retained-line-store.fst",
+        "bytes": 36954,
+        "sha256": "820df95cb3eca95d612d15cd93d7e4cfd1b0ee5ad2bcb4bf3a734b44e73f7321"
+      }
+    },
+    {
+      "i_lines": 0,
+      "d_lines": 64,
+      "clock_mode": "inverted",
+      "samples": 20975,
+      "counts": [
+        [
+          "0",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ],
+        [
+          "1",
+          "72",
+          "72",
+          "69",
+          "69",
+          "68"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/obj/Vretained_line_store_wrapper",
+        "bytes": 438680,
+        "sha256": "200e6ebf762a1189851d2c3f6ea2e34e79657ff4a94113b66ab708461a9290e3"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/inverted/retained-line-store.fst",
+        "bytes": 37051,
+        "sha256": "1ddf896c37e7dfae057e4f271e01dd2cab5ca963f6046b22237ac0d237780185"
+      }
+    },
+    {
+      "i_lines": 0,
+      "d_lines": 64,
+      "clock_mode": "different-periods",
+      "samples": 29216,
+      "counts": [
+        [
+          "0",
+          "1",
+          "1",
+          "1",
+          "1",
+          "0"
+        ],
+        [
+          "1",
+          "72",
+          "72",
+          "69",
+          "69",
+          "68"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/obj/Vretained_line_store_wrapper",
+        "bytes": 438680,
+        "sha256": "200e6ebf762a1189851d2c3f6ea2e34e79657ff4a94113b66ab708461a9290e3"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i0-d64/different-periods/retained-line-store.fst",
+        "bytes": 37280,
+        "sha256": "599d55de2acad77d95334b7621895e904c1017a8b7c4827f9ddd739f70aaf15b"
+      }
+    },
+    {
+      "i_lines": 64,
+      "d_lines": 64,
+      "clock_mode": "inverted",
+      "samples": 48782,
+      "counts": [
+        [
+          "0",
+          "82",
+          "82",
+          "77",
+          "77",
+          "73"
+        ],
+        [
+          "1",
+          "78",
+          "78",
+          "73",
+          "73",
+          "72"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "ab19bd6d1dd190d4727bd3e699a37ee640dd8d4a2c78d311aaccfd820ad325f4"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/inverted/retained-line-store.fst",
+        "bytes": 77839,
+        "sha256": "196404d0d43d2b15bd994995bbaf241c539799cca1dd268677f9244448ec86d4"
+      }
+    },
+    {
+      "i_lines": 64,
+      "d_lines": 64,
+      "clock_mode": "different-periods",
+      "samples": 58045,
+      "counts": [
+        [
+          "0",
+          "82",
+          "82",
+          "77",
+          "77",
+          "73"
+        ],
+        [
+          "1",
+          "78",
+          "78",
+          "73",
+          "73",
+          "72"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "ab19bd6d1dd190d4727bd3e699a37ee640dd8d4a2c78d311aaccfd820ad325f4"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i64-d64/different-periods/retained-line-store.fst",
+        "bytes": 78242,
+        "sha256": "4c8b1a5c883bbf4d7e77297f390e9d73aa0375adb12c0b3f3bc4e589c856073c"
+      }
+    },
+    {
+      "i_lines": 128,
+      "d_lines": 128,
+      "clock_mode": "inverted",
+      "samples": 100308,
+      "counts": [
+        [
+          "0",
+          "147",
+          "147",
+          "142",
+          "142",
+          "138"
+        ],
+        [
+          "1",
+          "142",
+          "142",
+          "137",
+          "137",
+          "136"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "ff94c0f27b43405e34948b3a2acbbf023e85babed2dd224ff59074594158fa17"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/inverted/retained-line-store.fst",
+        "bytes": 146725,
+        "sha256": "adda1d00096ebd012481dc1e118a208e059f705978cb5ff22ee4c0fa0bc20cd8"
+      }
+    },
+    {
+      "i_lines": 128,
+      "d_lines": 128,
+      "clock_mode": "different-periods",
+      "samples": 119447,
+      "counts": [
+        [
+          "0",
+          "147",
+          "147",
+          "142",
+          "142",
+          "138"
+        ],
+        [
+          "1",
+          "142",
+          "142",
+          "137",
+          "137",
+          "136"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "ff94c0f27b43405e34948b3a2acbbf023e85babed2dd224ff59074594158fa17"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i128-d128/different-periods/retained-line-store.fst",
+        "bytes": 146909,
+        "sha256": "7f56175964ae91adc868397d4cdc953fac6c352c150d3d617da4577a2863c079"
+      }
+    },
+    {
+      "i_lines": 256,
+      "d_lines": 256,
+      "clock_mode": "inverted",
+      "samples": 225572,
+      "counts": [
+        [
+          "0",
+          "275",
+          "275",
+          "270",
+          "270",
+          "266"
+        ],
+        [
+          "1",
+          "270",
+          "270",
+          "265",
+          "265",
+          "264"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "ae98f73b633900a8434a42c385a39df7ddc0c569e3238dc320784b68ad37c0b9"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/inverted/retained-line-store.fst",
+        "bytes": 280919,
+        "sha256": "ce4168f2b1d2fa09f396815b73ad31d48b71c4b7f719867cd0da219f52217345"
+      }
+    },
+    {
+      "i_lines": 256,
+      "d_lines": 256,
+      "clock_mode": "different-periods",
+      "samples": 268983,
+      "counts": [
+        [
+          "0",
+          "275",
+          "275",
+          "270",
+          "270",
+          "266"
+        ],
+        [
+          "1",
+          "270",
+          "270",
+          "265",
+          "265",
+          "264"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "ae98f73b633900a8434a42c385a39df7ddc0c569e3238dc320784b68ad37c0b9"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i256-d256/different-periods/retained-line-store.fst",
+        "bytes": 282172,
+        "sha256": "b2bb9354230afa69c6a78c92feb51a40b439a74459e18d68e2dc52afe16985c8"
+      }
+    },
+    {
+      "i_lines": 512,
+      "d_lines": 512,
+      "clock_mode": "inverted",
+      "samples": 568260,
+      "counts": [
+        [
+          "0",
+          "531",
+          "531",
+          "526",
+          "526",
+          "522"
+        ],
+        [
+          "1",
+          "526",
+          "526",
+          "521",
+          "521",
+          "520"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "d0593bf7594c7e0b34161a46451dff716f2f2e6a3baeb792436e7eb28011bc3d"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/inverted/retained-line-store.fst",
+        "bytes": 603983,
+        "sha256": "7735899bc336ba308fd98f2860fb094d726c4e7d45ef5985fc49a912c521d2e6"
+      }
+    },
+    {
+      "i_lines": 512,
+      "d_lines": 512,
+      "clock_mode": "different-periods",
+      "samples": 678627,
+      "counts": [
+        [
+          "0",
+          "531",
+          "531",
+          "526",
+          "526",
+          "522"
+        ],
+        [
+          "1",
+          "526",
+          "526",
+          "521",
+          "521",
+          "520"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "d0593bf7594c7e0b34161a46451dff716f2f2e6a3baeb792436e7eb28011bc3d"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i512-d512/different-periods/retained-line-store.fst",
+        "bytes": 606831,
+        "sha256": "66e37fdaabd9d03f9496ff9ed7ff64a49c2f0ba83447e6dd750961c03e8e71fd"
+      }
+    },
+    {
+      "i_lines": 1024,
+      "d_lines": 1024,
+      "clock_mode": "inverted",
+      "samples": 1622276,
+      "counts": [
+        [
+          "0",
+          "1043",
+          "1043",
+          "1038",
+          "1038",
+          "1034"
+        ],
+        [
+          "1",
+          "1038",
+          "1038",
+          "1033",
+          "1033",
+          "1032"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "0ff6f30689e49cc0dd488b70d3d8815d73e54992e9cd6dd9f21224c506027d4b"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/inverted/retained-line-store.fst",
+        "bytes": 1265463,
+        "sha256": "ac297c4046ab5f47a6aa5c182e5b605348bd0f5d5882dba059404bc34b7b9bc6"
+      }
+    },
+    {
+      "i_lines": 1024,
+      "d_lines": 1024,
+      "clock_mode": "different-periods",
+      "samples": 1940343,
+      "counts": [
+        [
+          "0",
+          "1043",
+          "1043",
+          "1038",
+          "1038",
+          "1034"
+        ],
+        [
+          "1",
+          "1038",
+          "1038",
+          "1033",
+          "1033",
+          "1032"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "0ff6f30689e49cc0dd488b70d3d8815d73e54992e9cd6dd9f21224c506027d4b"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1024-d1024/different-periods/retained-line-store.fst",
+        "bytes": 1269256,
+        "sha256": "45df2513b7af8e87c8308bb57cceef56602ff4ca85d9b22a0b54e6fa2f58095a"
+      }
+    },
+    {
+      "i_lines": 1280,
+      "d_lines": 1280,
+      "clock_mode": "inverted",
+      "samples": 2333604,
+      "counts": [
+        [
+          "0",
+          "1299",
+          "1299",
+          "1294",
+          "1294",
+          "1290"
+        ],
+        [
+          "1",
+          "1294",
+          "1294",
+          "1289",
+          "1289",
+          "1288"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "41a0763801c0412b765a74513c42f78bd63755bc9e40907d182787f50186181a"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/inverted/retained-line-store.fst",
+        "bytes": 1639328,
+        "sha256": "ee1671b5a4f8f80a012a8a4c2ce351bb1f440bfab60f0f9d5a4ca7783ee1fc4b"
+      }
+    },
+    {
+      "i_lines": 1280,
+      "d_lines": 1280,
+      "clock_mode": "different-periods",
+      "samples": 2792387,
+      "counts": [
+        [
+          "0",
+          "1299",
+          "1299",
+          "1294",
+          "1294",
+          "1290"
+        ],
+        [
+          "1",
+          "1294",
+          "1294",
+          "1289",
+          "1289",
+          "1288"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "41a0763801c0412b765a74513c42f78bd63755bc9e40907d182787f50186181a"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1280-d1280/different-periods/retained-line-store.fst",
+        "bytes": 1643366,
+        "sha256": "8825fc69ddc04e193b26288ed8ea908a546434bfdf104c1773675814a7c8450e"
+      }
+    },
+    {
+      "i_lines": 1320,
+      "d_lines": 1320,
+      "clock_mode": "inverted",
+      "samples": 2457004,
+      "counts": [
+        [
+          "0",
+          "1339",
+          "1339",
+          "1334",
+          "1334",
+          "1330"
+        ],
+        [
+          "1",
+          "1334",
+          "1334",
+          "1329",
+          "1329",
+          "1328"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "dc16eafdd5e6600669a4ad2983c90ccdcfe54a10a71bc5ebb755c880f91c8406"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/inverted/retained-line-store.fst",
+        "bytes": 1696151,
+        "sha256": "3efb359616d27e05c4879ada2906a752c66663fb2d5faa9ff74be8c7dcad9f4b"
+      }
+    },
+    {
+      "i_lines": 1320,
+      "d_lines": 1320,
+      "clock_mode": "different-periods",
+      "samples": 2940225,
+      "counts": [
+        [
+          "0",
+          "1339",
+          "1339",
+          "1334",
+          "1334",
+          "1330"
+        ],
+        [
+          "1",
+          "1334",
+          "1334",
+          "1329",
+          "1329",
+          "1328"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "dc16eafdd5e6600669a4ad2983c90ccdcfe54a10a71bc5ebb755c880f91c8406"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1320-d1320/different-periods/retained-line-store.fst",
+        "bytes": 1702288,
+        "sha256": "4cd319eb9705131d55234582ceb7cda6557fe9e067f99eb453c13043f0d6012b"
+      }
+    },
+    {
+      "i_lines": 1536,
+      "d_lines": 1536,
+      "clock_mode": "inverted",
+      "samples": 3167812,
+      "counts": [
+        [
+          "0",
+          "1555",
+          "1555",
+          "1550",
+          "1550",
+          "1546"
+        ],
+        [
+          "1",
+          "1550",
+          "1550",
+          "1545",
+          "1545",
+          "1544"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "0507020b6bdd9054d638113196272e63fcb3f238ad339fa6ad268066696c5a0b"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/inverted/retained-line-store.fst",
+        "bytes": 1969808,
+        "sha256": "ae7408fe01bd02730900fc54e6c8f6c69579e68a20018dbedfc1c51afeec1ba4"
+      }
+    },
+    {
+      "i_lines": 1536,
+      "d_lines": 1536,
+      "clock_mode": "different-periods",
+      "samples": 3791865,
+      "counts": [
+        [
+          "0",
+          "1555",
+          "1555",
+          "1550",
+          "1550",
+          "1546"
+        ],
+        [
+          "1",
+          "1550",
+          "1550",
+          "1545",
+          "1545",
+          "1544"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "0507020b6bdd9054d638113196272e63fcb3f238ad339fa6ad268066696c5a0b"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i1536-d1536/different-periods/retained-line-store.fst",
+        "bytes": 1977245,
+        "sha256": "938a7672dfad2088137248cc7d65f11453c74da439611611203c251308392a00"
+      }
+    },
+    {
+      "i_lines": 93,
+      "d_lines": 131,
+      "clock_mode": "inverted",
+      "samples": 87660,
+      "counts": [
+        [
+          "0",
+          "112",
+          "112",
+          "107",
+          "107",
+          "103"
+        ],
+        [
+          "1",
+          "145",
+          "145",
+          "140",
+          "140",
+          "139"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "07f178a2744dbdfcfba3c74be9942b2dfebfc36aaaa6f82116c0e2856825e8c7"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/inverted/retained-line-store.fst",
+        "bytes": 131413,
+        "sha256": "9905559c580911c64e041f6d094705bd875d7ad5f5fc0e3d3512936d3494ee44"
+      }
+    },
+    {
+      "i_lines": 93,
+      "d_lines": 131,
+      "clock_mode": "different-periods",
+      "samples": 107405,
+      "counts": [
+        [
+          "0",
+          "112",
+          "112",
+          "107",
+          "107",
+          "103"
+        ],
+        [
+          "1",
+          "145",
+          "145",
+          "140",
+          "140",
+          "139"
+        ]
+      ],
+      "executable": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/obj/Vretained_line_store_wrapper",
+        "bytes": 442776,
+        "sha256": "07f178a2744dbdfcfba3c74be9942b2dfebfc36aaaa6f82116c0e2856825e8c7"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/i93-d131/different-periods/retained-line-store.fst",
+        "bytes": 131823,
+        "sha256": "5443fcabd5a1108b9f951eb41af129bc5a2840fbb87175c557ea1141816e3b9d"
+      }
+    }
+  ],
+  "generation": {
+    "reference_revision": "e10992a3eea3ba2ef6ae3ccb42ff5e8c658286a8",
+    "fsm_policy_assertion_tail_byte_identical": true,
+    "comparison": "Every settled eval: all client controls, valid-hit 512-bit data, logical RAM enables/write enables and enabled global addresses/write data; existing directed assertions/checks retained."
+  },
+  "generated_sources": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/bp_retained_line_store_before.sv",
+      "bytes": 15431,
+      "sha256": "cc9ddc5f2d2f112f0595a9ec7306f65ba5f49600a9ad52058aaa77ade73d75c9"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/driver.cpp",
+      "bytes": 13060,
+      "sha256": "48bb9852e6580a368c92a598594d04806937bd918d2f72e65e20aabfb09020ad"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/input-bp_retained_line_store.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/input-driver.cpp",
+      "bytes": 12649,
+      "sha256": "34f8424a28fb04fa29af08f402a824a795bf8e626ba7b79af4a8c2f09efeb90e"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/input-retained_line_store_wrapper.sv",
+      "bytes": 2102,
+      "sha256": "51a9e28317b56871e2796fce9064ab32c2cdcbf1c9dd8c65056d4f24f14a5265"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/input-run.py",
+      "bytes": 8341,
+      "sha256": "e45b79cc940f7229e2e9fe08380a4b270f31821e422e7c7f3f48cd3f29b6f7a8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/equivalence-matrix01/source/retained_line_store_wrapper.sv",
+      "bytes": 4677,
+      "sha256": "52bf801e1a320a4dfedc6f5bad3b761ed3ff2dd7fe4ad565c4a94c923b5dffdc"
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "state": "PASS-directed-shared-retained-full-lines",
+  "i_lines": 93,
+  "d_lines": 131,
+  "scope": "Directed backend unit correctness; no full-core, synthesis, unique-capacity or performance claim.",
+  "sources": {
+    "bp_retained_line_store.sv": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    "retained_line_store_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+      "bytes": 2102,
+      "sha256": "51a9e28317b56871e2796fce9064ab32c2cdcbf1c9dd8c65056d4f24f14a5265"
+    },
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/driver.cpp",
+      "bytes": 12649,
+      "sha256": "34f8424a28fb04fa29af08f402a824a795bf8e626ba7b79af4a8c2f09efeb90e"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/run.py",
+      "bytes": 5041,
+      "sha256": "3c5d65bdd2014c4628a0d7121b7b628dda284259ab22e220ed5034517d783c11"
+    }
+  },
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.12727919698227197,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=93",
+        "-GD_LINES=131",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+        "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 11.55763031297829,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/build.log",
+        "bytes": 4380,
+        "sha256": "b7ec00bb60a133a16ee4aecc9758ff3eef8dc06f89f2e8d1d83084c6f4e4f66a"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.12784016004297882,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/run-inverted.log",
+        "bytes": 403,
+        "sha256": "83521f8083e2dc2448949f226a41c86f05c74da4a13028d3c89fb0ef004ea715"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/obj/Vretained_line_store_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.12779713794589043,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/run-different-periods.log",
+        "bytes": 421,
+        "sha256": "c78b63e9e6049bea1a8ab1a90fdc0cb35aa2f62a09b346b2cdb651f5b65940d0"
+      }
+    }
+  ],
+  "free_bytes_before_build": 10393133056,
+  "clock_results": [
+    {
+      "clock_mode": "inverted",
+      "counts": [
+        [
+          "0",
+          "112",
+          "112",
+          "107",
+          "107",
+          "103"
+        ],
+        [
+          "1",
+          "145",
+          "145",
+          "140",
+          "140",
+          "139"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/inverted/retained-line-store.fst",
+        "bytes": 130775,
+        "sha256": "ceb44887f59f17adcde210744b53fcd8fcd04c716c72419cbba7cf3b3035f636"
+      }
+    },
+    {
+      "clock_mode": "different-periods",
+      "counts": [
+        [
+          "0",
+          "112",
+          "112",
+          "107",
+          "107",
+          "103"
+        ],
+        [
+          "1",
+          "145",
+          "145",
+          "140",
+          "140",
+          "139"
+        ]
+      ],
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/different-periods/retained-line-store.fst",
+        "bytes": 131185,
+        "sha256": "c0697667f432650bdf9475ff499988ade4ab5970043d98edb4c26dd4620540cd"
+      }
+    }
+  ],
+  "executable": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/initial-unequal01/obj/Vretained_line_store_wrapper",
+    "bytes": 409208,
+    "sha256": "bb25eb89792375f4a3d87c4d5a65b9aeeed69474a8d750c15f4a5e97fb0552dd"
+  }
+}

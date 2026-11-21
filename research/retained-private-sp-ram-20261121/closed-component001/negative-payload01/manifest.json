@@ -1,0 +1,99 @@
+{
+  "state": "PASS-deliberate-reference-payload-corruption-rejected",
+  "scope": "Host component negative control only; deliberately corrupts the reference read data, never production RTL.",
+  "inputs": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/driver.cpp",
+      "bytes": 12649,
+      "sha256": "34f8424a28fb04fa29af08f402a824a795bf8e626ba7b79af4a8c2f09efeb90e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-line-store/retained_line_store_wrapper.sv",
+      "bytes": 2102,
+      "sha256": "51a9e28317b56871e2796fce9064ab32c2cdcbf1c9dd8c65056d4f24f14a5265"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-private-sp/run.py",
+      "bytes": 8341,
+      "sha256": "e45b79cc940f7229e2e9fe08380a4b270f31821e422e7c7f3f48cd3f29b6f7a8"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-private-sp/check_sensitivity.py",
+      "bytes": 3174,
+      "sha256": "1f471da7465f682d2769143c44a25e8c25449a9a6e04a59505620cbdeb92ce6b"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-research/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "retained_line_store_wrapper",
+        "-GI_LINES=64",
+        "-GD_LINES=64",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/obj",
+        "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/source/bp_retained_line_store_before.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/source/retained_line_store_wrapper.sv",
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/source/driver.cpp"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.675960033899173,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/build.log",
+        "bytes": 4415,
+        "sha256": "3a112b45809574c2d1874adcd6e1eb01c55357376e440caaa0b72e55f3529e93"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/obj/Vretained_line_store_wrapper"
+      ],
+      "cwd": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/runtime",
+      "timeout_seconds": 120,
+      "returncode": 1,
+      "elapsed_seconds": 0.02629477297887206,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/run.log",
+        "bytes": 56,
+        "sha256": "d6dafbda53531eea217d76e47c3819772fc2d48e919b599a624a8e8f2123a296"
+      }
+    }
+  ],
+  "mutation": "Original reference RAM read data XOR 1; production implementation and golden directed checks unchanged.",
+  "generated_sources": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/source/bp_retained_line_store_before.sv",
+      "bytes": 15439,
+      "sha256": "7c99c62b626648302eb23cd619a4b1b523b8d9c73af69ecd2321dcc093faaa9e"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/source/driver.cpp",
+      "bytes": 13060,
+      "sha256": "48bb9852e6580a368c92a598594d04806937bd918d2f72e65e20aabfb09020ad"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/negative-payload01/source/retained_line_store_wrapper.sv",
+      "bytes": 4677,
+      "sha256": "52bf801e1a320a4dfedc6f5bad3b761ed3ff2dd7fe4ad565c4a94c923b5dffdc"
+    }
+  ]
+}
