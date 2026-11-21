@@ -1,0 +1,47 @@
+{
+  "state": "root-owned one-reservation supervisor host validation PASS; no retention target launch",
+  "created_utc": "2026-11-21T03:47:11.740928+00:00",
+  "producer": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_supervisor.py",
+    "bytes": 4906,
+    "sha256": "0c8829b2882cb2db0f2e156bff95b41e990c3e91e99125450e5149e26d752f18"
+  },
+  "tests": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/test_retention_supervisor.py",
+    "bytes": 4383,
+    "sha256": "dcf8359669d1fc7bea011c15b8696d57857cd37d70dda59015aa9b20f64b6b42"
+  },
+  "documentation": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/RETENTION_SUPERVISOR.md",
+    "bytes": 2553,
+    "sha256": "828383b99b1da8d201458832a5d15f4437f74d26ce785eeea4e66539af516f68"
+  },
+  "test_command": "python3 -B -m unittest discover -s research/retention-natural-demand-20261120 -p test_retention_supervisor.py -v",
+  "host_tests_passed": 7,
+  "test_output": "Actual unittest stdout retained in tool transcript; no manufactured raw log.",
+  "operations": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_operations.py",
+    "bytes": 13368,
+    "sha256": "77f84b2e48249e0c01db8fafd4a639a15e65a5844967bb704bc2ef4397c12230"
+  },
+  "argv_table": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention-operations-argv.json",
+    "bytes": 14638,
+    "sha256": "2251c7a46c685d48aa2c80b4b55c1a75a556d6029737e86f28475f29cc634640"
+  },
+  "frozen_validator": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/retention_admission.py",
+    "bytes": 17177,
+    "sha256": "5e435679136d9c47e4f22391c4fcaccfb35cd072c2012387f1d1ff6cd54a4671"
+  },
+  "independent_read_only_reviewer": "/root/capacity_latency",
+  "review": "No blocking safety/concurrency gap under trusted root-owned reviewed-launch premise.",
+  "review_limits": [
+    "Producer/proof receipt fields are root-reviewed external provenance, not independently checked by the frozen prefix gate.",
+    "Missing/killed supervisor is not proof its serialized child has exited or released physical ownership."
+  ],
+  "development_note": "Initial local fixture pre-created the session output parent; the guard correctly refused before child execution. Fixture corrected; final7testsPASS.",
+  "no_board_actions_in_tests": true,
+  "no_auto_retry": true,
+  "no_deployment_or_performance_claim": true
+}
