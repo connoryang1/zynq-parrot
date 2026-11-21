@@ -4,7 +4,9 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -17,19 +19,36 @@ import retained29_safe_functional_protocol as functional
 import retained29_cost_protocol as cost
 import run_retained29_safe_functional as fclient
 import run_retained29_cost_session as cclient
-import test_retained_capacity_recovery_v3 as prior
 
 BIT='a'*64
+BOOT_A='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+BOOT_B='bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
+OLD_RUNNER=Path('/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/05-control-program')
+OBSERVER_RUNNER=Path('/home/coyang/fpga-artifacts/context-resume/native-retained-observer-host-20261121/compile02/control-program-native-observe1')
+OBSERVER_SHA='9c2648f1a9d2ceab2645895fdad74a5bc2c2ce62ad8f1161c6b3b72e74da42fa'
 
-def idle(boot=prior.BOOT_A):
+def idle(boot=BOOT_A):
     return dict(boot_id=boot,guard=None,control_sha256=p.RUNNER_SHA,helper_sha256=p.HELPER_SHA,
                 active_control=[],active_script=[],active_helper=[])
 
 
-class GuardRPC(prior.ActualGuardRPC):
-    """Reuse only inert temp-proc setup; execute the NEW fixed old2dd RPC."""
+class GuardRPC(unittest.TestCase):
+    """Self-contained inert temp-proc setup; execute the fixed old2dd RPC."""
     def setUp(self):
-        super().setUp()
+        self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name);self.board=self.root/'zynq';self.board.mkdir()
+        self.logs=self.root/'logs';self.logs.mkdir();self.proc=self.root/'proc';(self.proc/'sys/kernel/random').mkdir(parents=True)
+        self.boot=self.proc/'sys/kernel/random/boot_id';self.boot.write_text(BOOT_A+'\n');self.lock=self.logs/'.control-program.lock'
+        self.assertEqual(p.binding(OLD_RUNNER)['sha256'],p.RUNNER_SHA)
+        self.assertEqual(p.binding(OBSERVER_RUNNER)['sha256'],OBSERVER_SHA)
+        (self.board/'control-program').write_bytes(OLD_RUNNER.read_bytes())
+        helper=p.ROOT/'codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh'
+        self.assertEqual(p.binding(helper)['sha256'],p.HELPER_SHA)
+        (self.board/'run-blackparrot-interactive').write_bytes(helper.read_bytes())
+        self.active_control=self.root/'active-control';self.active_script=self.root/'active-script';self.active_helper=self.root/'active-helper'
+        for path in (self.active_control,self.active_script,self.active_helper):path.write_text('')
+        binpath=self.root/'bin';binpath.mkdir();pgrep=binpath/'pgrep'
+        pgrep.write_text('#!'+sys.executable+'\nimport os,pathlib,sys\np=pathlib.Path(os.environ["FAKE_CONTROL" if sys.argv[1]=="-x" else ("FAKE_HELPER" if sys.argv[2].startswith("[r]") else "FAKE_SCRIPT")])\ns=p.read_text();print(s,end="");sys.exit(0 if s else 1)\n');pgrep.chmod(0o755)
+        self.env=dict(os.environ,PATH=str(binpath)+':'+os.environ['PATH'],FAKE_CONTROL=str(self.active_control),FAKE_SCRIPT=str(self.active_script),FAKE_HELPER=str(self.active_helper))
         self.code=guard.RPC
         for before,after in [("pathlib.Path('/home/xilinx/zynq-parrot/cosim/black-parrot-example/zynq')",self.board),
             ("pathlib.Path('/home/xilinx/bp-logs')",self.logs),("pathlib.Path('/proc')",self.proc)]:
@@ -38,8 +57,6 @@ class GuardRPC(prior.ActualGuardRPC):
         # literal is substituted; old2dd/helper checks use their actual bytes.
         image=self.board/'kernel29.nbf';image.write_bytes(b'HOST_VERIFY inert kernel NBF\n')
         self.nbf=p.binding(image)['sha256'];self.code=self.code.replace(p.NBF_SHA,self.nbf)
-        accepted=json.loads((p.ROOT/'research/retained-capacity-physical-diagnostic-20261121/prepared03/diagnostic.DRAFT.json').read_text())
-        rollback=accepted['rollback_runner'];(self.board/'control-program').write_bytes(Path(rollback['path']).read_bytes())
         rc,self.preflight=self.rpc('probe');self.assertEqual(rc.returncode,0,rc.stderr)
         self.context=dict(token='1234567890abcdef',image='kernel29.nbf',pid=1359,
             log=str(self.logs/'kernel29-interactive-20261121T130000Z-1359.log'),bit_sha256=BIT,preflight=self.preflight)
@@ -49,6 +66,17 @@ class GuardRPC(prior.ActualGuardRPC):
             self.active_helper.write_text(str(pid)+'\n');where=self.proc/str(pid);where.mkdir()
             argv=['bash',str(self.board/'run-blackparrot-interactive'),'kernel29.nbf',self.nbf,p.RUNNER_SHA,'3600000',BIT]
             (where/'cmdline').write_bytes(b'\0'.join(s.encode() for s in argv)+b'\0');(where/'status').write_text('PPid:\t77\n')
+    def tearDown(self):self.tmp.cleanup()
+    def rpc(self,action,context=None,witness=None):
+        result=subprocess.run([sys.executable,'-c',self.code,json.dumps(dict(action=action,context=context,witness=witness))],env=self.env,text=True,capture_output=True,timeout=20)
+        return result,json.loads(result.stdout) if result.returncode==0 else None
+    def witness(self):
+        result,witness=self.rpc('witness',self.context);self.assertEqual(result.returncode,0,result.stderr);return witness
+    def reboot(self):
+        self.boot.write_text(BOOT_B+'\n')
+        for path in self.proc.iterdir():
+            if path.name.isdigit():shutil.rmtree(path)
+        for path in (self.active_control,self.active_script,self.active_helper):path.write_text('')
     def test_live_bash_helper_before_guard_is_not_idle(self):
         self.create();(self.lock/'owner').unlink();self.lock.rmdir()
         rc,value=self.rpc('probe');self.assertEqual(rc.returncode,0)
@@ -63,10 +91,64 @@ class GuardRPC(prior.ActualGuardRPC):
         (self.board/'run-blackparrot-interactive').write_bytes(b'changed')
         rc,_=self.rpc('witness',self.context);self.assertNotEqual(rc.returncode,0)
     def test_observer_runner_refused(self):
-        candidate=json.loads((p.ROOT/'research/retained-capacity-physical-diagnostic-20261121/prepared03/diagnostic.DRAFT.json').read_text())
-        (self.board/'control-program').write_bytes(Path(candidate['runner']['path']).read_bytes())
+        (self.board/'control-program').write_bytes(OBSERVER_RUNNER.read_bytes())
         rc,probe=self.rpc('probe');self.assertEqual(rc.returncode,0)
         with self.assertRaises(ValueError):guard.idle(probe)
+    def test_same_boot_refuses_removal(self):
+        self.create(live=False);witness=self.witness();result,_=self.rpc('remove-owned-stale',self.context,witness)
+        self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists())
+    def test_unknown_guard_owner_or_extra_contents_refused(self):
+        self.create(pid=999,live=False);result,_=self.rpc('witness',self.context)
+        self.assertNotEqual(result.returncode,0);self.assertEqual((self.lock/'owner').read_text(),'999\n')
+        (self.lock/'owner').write_text('1359\n');(self.lock/'extra').write_text('unowned')
+        result,_=self.rpc('witness',self.context);self.assertNotEqual(result.returncode,0);self.assertTrue((self.lock/'extra').exists())
+    def test_changed_owner_or_directory_identity_after_witness_refused(self):
+        self.create(live=False);witness=self.witness();self.reboot();(self.lock/'owner').write_text('999\n')
+        result,_=self.rpc('remove-owned-stale',self.context,witness);self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists())
+        self.lock.rename(self.logs/'previous-owned-guard');self.create(live=False)
+        result,_=self.rpc('remove-owned-stale',self.context,witness);self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists())
+    def test_same_pid_rewritten_owner_file_identity_refused(self):
+        self.create(live=False);witness=self.witness();self.reboot();path=self.lock/'owner';path.unlink();path.write_text('1359\n')
+        result,_=self.rpc('remove-owned-stale',self.context,witness);self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists())
+    def test_active_program_script_or_reused_owner_pid_after_boot_refused(self):
+        self.create(live=False);witness=self.witness();self.reboot()
+        for active in (self.active_control,self.active_script):
+            active.write_text('2000\n');result,_=self.rpc('remove-owned-stale',self.context,witness)
+            self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists());active.write_text('')
+        (self.proc/'1359').mkdir();result,_=self.rpc('remove-owned-stale',self.context,witness)
+        self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists())
+    def test_preexisting_guard_preflight_or_unowned_active_descendant_refused(self):
+        self.create(live=False);bad=copy.deepcopy(self.context);bad['preflight']['guard']={'preexisting':True}
+        result,_=self.rpc('witness',bad);self.assertNotEqual(result.returncode,0)
+        self.active_control.write_text('999\n');result,_=self.rpc('witness',self.context)
+        self.assertNotEqual(result.returncode,0);self.assertTrue(self.lock.exists())
+    def test_absent_after_reboot_is_verified_without_deleting_another_path(self):
+        witness=self.witness();self.reboot();result,receipt=self.rpc('remove-owned-stale',self.context,witness)
+        self.assertEqual(result.returncode,0,result.stderr);self.assertFalse(receipt['removed']);self.assertTrue(receipt['durable'])
+    def instrument_sync(self,fail_owner=False):
+        trace=self.root/'sync-events.jsonl'
+        prefix='''import os,json
+_real_fsync=os.fsync;_real_sync=os.sync
+def _record_sync(value):
+ with open(%r,'a') as _out:_out.write(json.dumps(value)+'\\n')
+def _fsync(fd):
+ path=os.readlink('/proc/self/fd/'+str(fd));_record_sync(['fsync',path])
+ if %r and path.endswith('/owner'):raise OSError('synthetic owner fsync failure')
+ return _real_fsync(fd)
+def _sync():
+ _record_sync(['sync']);return _real_sync()
+os.fsync=_fsync;os.sync=_sync
+'''%(str(trace),fail_owner)
+        self.code=prefix+self.code;return trace
+    def test_owner_directory_parent_fsync_and_sync_precede_witness(self):
+        self.create(live=False);trace=self.instrument_sync();witness=self.witness()
+        events=[json.loads(line) for line in trace.read_text().splitlines()]
+        self.assertEqual(events,[['fsync',str(self.lock/'owner')],['fsync',str(self.lock)],['fsync',str(self.logs)],['sync']])
+        self.assertTrue(witness['guard_durable']);self.assertTrue(witness['sync_complete'])
+        self.assertEqual(witness['synced_paths'],['owner','guard-directory','logs-parent'])
+    def test_fsync_failure_never_produces_durable_witness(self):
+        self.create(live=False);self.instrument_sync(fail_owner=True);result,value=self.rpc('witness',self.context)
+        self.assertNotEqual(result.returncode,0);self.assertIsNone(value);self.assertTrue(self.lock.exists())
 
 
 class Engine(unittest.TestCase):
