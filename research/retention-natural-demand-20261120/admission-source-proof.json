@@ -1,0 +1,202 @@
+{
+  "icache": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "2958cd72137d195537b2c86ad11537ea9cd6388e",
+    "path": "bp_fe/src/v/bp_fe_icache.sv",
+    "git_blob": "6bebc4a356054557f9db9f924680e63b29e8cf97",
+    "sha256": "a0521146aeb602c3591a41bbbf86d53c7a1ea51086df72ebb906a00827f3c6fe",
+    "excerpts": [
+      {
+        "first_line": 158,
+        "last_line": 170,
+        "text": "158   localparam replay_buffer_els_lp = replay_buffer_p ? replay_buffer_els_p : 1;\n159   localparam replay_buffer_slot_width_lp = `BSG_SAFE_CLOG2(replay_buffer_els_lp);\n160   localparam replay_words_per_line_lp = block_width_p / data_width_p;\n161   localparam replay_words_per_fill_lp = fill_width_p / data_width_p;\n162   // The 32-entry FPGA configuration is organized as four hashed banks of\n163   // eight associative ways.  Fixed-capacity banking removes the 32-way tag\n164   // search from the fetch path while preserving one monolithic 32-entry data\n165   // index.  The selected XORs distribute every retained Linux prefix used by\n166   // this project within eight ways; other capacities keep the legacy flat\n167   // organization and replacement policy.\n168   localparam replay_buffer_banks_lp = 4;\n169   localparam replay_buffer_bank_width_lp = `BSG_SAFE_CLOG2(replay_buffer_banks_lp);\n170   localparam replay_buffer_bank_ways_lp = replay_buffer_els_lp / replay_buffer_banks_lp;"
+      },
+      {
+        "first_line": 786,
+        "last_line": 810,
+        "text": "786   wire replay_buffer_inval = cache_req_yumi_i & inval_req;\n787   logic [1:0] retention_mode_r;\n788   logic retention_published_r;\n789   logic [15:0] retention_side_hits_r;\n790   wire demand_capture_enabled = replay_buffer_p & (retention_mode_r != 0);\n791   logic demand_capture_active_r, demand_capture_first_r;\n792   // Observe the ordinary SRAM handshake, never bypass or drive it. A write\n793   // can be held across frontend arbitration, so valid alone is insufficient.\n794   wire demand_capture_input = demand_capture_enabled\n795     & demand_capture_active_r & data_mem_pkt_yumi_o\n796     & (data_mem_pkt_cast_i.opcode == e_cache_data_mem_write)\n797     & ~retention_cmd_v_i & ~miss_abort_i & ~abort_inflight;\n798   wire replay_buffer_input = replay_buffer_prefetch_input | demand_capture_input;\n799   bp_fe_icache_data_mem_pkt_s replay_buffer_pkt_r;\n800   logic replay_buffer_pkt_v_r, replay_buffer_pkt_demand_r, replay_buffer_pkt_first_r;\n801   // Abort may arrive while the final accepted beat is in this register.\n802   // Suppress that pending demand publication as well as new capture beats.\n803   wire replay_buffer_pending_write = replay_buffer_pkt_v_r\n804     & (~replay_buffer_pkt_demand_r\n805        | (demand_capture_enabled & ~retention_cmd_v_i & ~miss_abort_i & ~abort_inflight));\n806   // First-completed admission pins complete entries in the selected bank.\n807   // Advisory replay keeps its historical replacement behavior in every mode.\n808   wire retention_pin = replay_buffer_pkt_demand_r & (retention_mode_r == 2);\n809   wire replay_buffer_write = replay_buffer_pending_write\n810     & (~retention_pin | replay_buffer_write_match | replay_buffer_write_free);"
+      },
+      {
+        "first_line": 898,
+        "last_line": 905,
+        "text": "898   always_ff @(posedge clk_i) begin\n899     if (reset_i | replay_buffer_inval) begin\n900       replay_buffer_alloc_r <= '0;\n901       replay_buffer_addr_r <= '0;\n902       replay_buffer_beat_v_r <= '0;\n903       replay_buffer_replace_r <= '0;\n904       replay_buffer_bank_replace_r <= '0;\n905     end else if (replay_buffer_write) begin"
+      },
+      {
+        "first_line": 943,
+        "last_line": 968,
+        "text": "943   // Count consumed side-only instructions, not cycles stalled at a hit.\n944   // Policy writes reset statistics but never invalidate retained contents;\n945   // software uses the ordinary fence.i path to begin a fresh admission epoch.\n946   always_ff @(posedge clk_i) begin\n947     if (reset_i) begin\n948       retention_mode_r <= '0;\n949       retention_published_r <= 1'b0;\n950       retention_side_hits_r <= '0;\n951     end else if (retention_cmd_v_i) begin\n952       retention_mode_r <= (replay_buffer_p & (retention_mode_i != 3))\n953         ? retention_mode_i : 2'b00;\n954       retention_published_r <= 1'b0;\n955       retention_side_hits_r <= '0;\n956     end else begin\n957       if (replay_buffer_write & replay_buffer_pkt_demand_r & (&retention_next_beats))\n958         retention_published_r <= 1'b1;\n959       if (replay_buffer_hit_tv & hit_v_o & yumi_i & !(&retention_side_hits_r))\n960         retention_side_hits_r <= retention_side_hits_r + 1'b1;\n961     end\n962   end\n963   always_comb begin\n964     retention_status_o = '0;\n965     retention_status_o[63] = replay_buffer_p;\n966     retention_status_o[1:0] = retention_mode_r;\n967     retention_status_o[2] = retention_published_r;\n968     retention_status_o[31:16] = retention_side_hits_r;"
+      }
+    ]
+  },
+  "unicore32": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "2958cd72137d195537b2c86ad11537ea9cd6388e",
+    "path": "bp_top/src/v/bp_unicore_lite.sv",
+    "git_blob": "b9b5da468e720a119352e0127ccec4c734c9dd77",
+    "sha256": "e4a4a38bc8da53d8eb917af0cb54b7b8379ff1cc88dbaa8fe16e9a75b58b3c16",
+    "excerpts": [
+      {
+        "first_line": 156,
+        "last_line": 169,
+        "text": "156   wire negedge_clk = ~clk_i;\n157 \n158   wire [did_width_p-1:0] did_li = cfg_bus_cast_i.did;\n159   wire [1:0][lce_id_width_p-1:0] lce_id_li = {cfg_bus_cast_i.dcache_id, cfg_bus_cast_i.icache_id};\n160   bp_core_minimal\n161    #(.bp_params_p(bp_params_p)\n162      ,.cache_miss_trace_p(cache_miss_trace_p)\n163      ,.icache_replay_buffer_p(1'b1)\n164      ,.icache_replay_buffer_els_p(32)\n165      )\n166    core_minimal\n167     (.clk_i(posedge_clk)\n168      ,.reset_i(reset_i)\n169      ,.cfg_bus_i(cfg_bus_cast_i)"
+      }
+    ]
+  },
+  "corebridge": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "2958cd72137d195537b2c86ad11537ea9cd6388e",
+    "path": "bp_top/src/v/bp_core_minimal.sv",
+    "git_blob": "2405adaac30cea619f4ce7e66b2ac94340f21eef",
+    "sha256": "3b63693ee9ce45f1e27dad312f337c5b50d4b8ffc315ed49cab7c9d7a004b3f5",
+    "excerpts": [
+      {
+        "first_line": 245,
+        "last_line": 251,
+        "text": "245 \n246   bp_fe_top\n247    #(.bp_params_p(bp_params_p)\n248      ,.icache_replay_buffer_p(icache_replay_buffer_p)\n249      ,.icache_replay_buffer_els_p(icache_replay_buffer_els_p)\n250      )\n251    fe"
+      }
+    ]
+  },
+  "febridge": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "2958cd72137d195537b2c86ad11537ea9cd6388e",
+    "path": "bp_fe/src/v/bp_fe_top.sv",
+    "git_blob": "d6150b9599da7e0205af13334255819620a5a00d",
+    "sha256": "24faf187c84418abbb90b67f11e67d5fd882d558c96a23be42d8a586783b6c34",
+    "excerpts": [
+      {
+        "first_line": 283,
+        "last_line": 290,
+        "text": "283      );\n284 \n285   bp_fe_icache\n286    #(.bp_params_p(bp_params_p)\n287      ,.replay_buffer_p(icache_replay_buffer_p)\n288      ,.replay_buffer_els_p(icache_replay_buffer_els_p)\n289      )\n290    icache"
+      }
+    ]
+  },
+  "csr": {
+    "repository": "/home/coyang/zynq-parrot-linux-research/import/black-parrot",
+    "revision": "2958cd72137d195537b2c86ad11537ea9cd6388e",
+    "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+    "git_blob": "19105792a19fd313ac7bbdcce117026705f05022",
+    "sha256": "c1701c7f86da7f1014f338fe5148af0f41e87d27f159fe50a18bae503c4635af",
+    "excerpts": [
+      {
+        "first_line": 1103,
+        "last_line": 1109,
+        "text": "1103   // Only retired S/M writes may change policy; generic CSR privilege checks\n1104   // also reject both U-mode reads and writes.\n1105   assign icache_retention_cmd_v_o = csr_w_v_li & retire_pkt_cast_i.instret\n1106     & (csr_addr_li == 12'h5c1) & (is_s_mode | is_m_mode);\n1107   assign icache_retention_mode_o = csr_data_li[1:0];\n1108   assign icache_prefix_trigger_v_o = csr_w_v_li & (csr_addr_li == 12'h5c0)\n1109                                       & (is_s_mode | is_m_mode);"
+      }
+    ]
+  },
+  "top_static_cfg": {
+    "repository": "/home/coyang/zynq-parrot-linux-research",
+    "revision": "7edf64d1ae45bf381cb37f21af5799e2cb8cd362",
+    "path": "cosim/black-parrot-example/v/bp_common_pkg.sv",
+    "git_blob": "020f49871fae426282a0b38a4f4311d600e11d6e",
+    "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7",
+    "excerpts": [
+      {
+        "first_line": 114,
+        "last_line": 130,
+        "text": "114   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch_cfg_override_p =\n115     '{l2_banks: 2\n116       // Four detached fills fit the PYNQ-Z2 target while the parameterized\n117       // simulator can still request ten for the ten-worker experiment.\n118       ,dcache_prefetch_els: 4\n119       // Branch metadata includes the resident thread ID. The default has four\n120       // slots; this two-slot endpoint needs one fewer bit (50 rather than 51).\n121       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width\n122                                   - $clog2(bp_default_cfg_p.num_threads)\n123                                   + $clog2(bp_unicore_zynqparrot_cfg_p.num_threads)\n124       ,l2_sets: (bp_unicore_zynqparrot_cfg_p.l2_banks\n125                  * bp_unicore_zynqparrot_cfg_p.l2_sets) / 2\n126       ,default: \"inv\"\n127       };\n128   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch_cfg_p\n129                         ,bp_unicore_zynqparrot_prefetch_cfg_override_p\n130                         ,bp_unicore_zynqparrot_cfg_p"
+      }
+    ]
+  },
+  "accepted_kernel_control": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/accepted-kernel_sys.c",
+    "bytes": 78666,
+    "sha256": "a4de89753064f9b291a92f264e222e36d088a7990846d64270f89b7651e6bfbb",
+    "excerpts": [
+      {
+        "first_line": 85,
+        "last_line": 120,
+        "text": "85 \n86 /* The illegal-instruction trap uses fixup_exception() for kernel faults.\n87  * This read therefore also works as a feature probe on pre-retention RTL.\n88  * Separate early-clobber outputs keep the extable error and zero registers\n89  * distinct even though both inputs start at zero.\n90  */\n91 static int bp_icache_retention_probe(u64 *status)\n92 {\n93 \tunsigned long err = 0, value = 0;\n94 \n95 \tasm volatile(\"1: csrr %[value], 0x5c1\\n\"\n96 \t\t     \"2:\\n\"\n97 \t\t     _ASM_EXTABLE_UACCESS_ERR_ZERO(1b, 2b, %[err], %[value])\n98 \t\t     : [err] \"+&r\" (err), [value] \"+&r\" (value)\n99 \t\t     : : \"memory\");\n100 \tif (err || !(value & (1UL << 63)))\n101 \t\treturn -ENODEV;\n102 \t*status = value;\n103 \treturn 0;\n104 }\n105 \n106 static int bp_icache_retention_control(unsigned long mode)\n107 {\n108 \tu64 status;\n109 \tint error;\n110 \n111 \tpreempt_disable();\n112 \terror = bp_icache_retention_probe(&status);\n113 \tif (!error)\n114 \t\t/* Every accepted mode change, including mode zero, starts clean. */\n115 \t\tasm volatile(\"csrw 0x5c1, %0\\nfence.i\\n\"\n116 \t\t\t     : : \"r\" (mode) : \"memory\");\n117 \tpreempt_enable();\n118 \treturn error;\n119 }\n120 "
+      },
+      {
+        "first_line": 2785,
+        "last_line": 2810,
+        "text": "2785 \tcase PR_BP_ICACHE_RETENTION_CONTROL:\n2786 \t\tif (arg2 > 2 || arg3 || arg4 || arg5) {\n2787 \t\t\terror = -EINVAL;\n2788 \t\t\tbreak;\n2789 \t\t}\n2790 \t\tif (!capable(CAP_SYS_ADMIN)) {\n2791 \t\t\terror = -EPERM;\n2792 \t\t\tbreak;\n2793 \t\t}\n2794 \t\t/* The retained store is CPU-global, not task or page-pin state. */\n2795 \t\tif (num_possible_cpus() != 1) {\n2796 \t\t\terror = -EOPNOTSUPP;\n2797 \t\t\tbreak;\n2798 \t\t}\n2799 \t\terror = bp_icache_retention_control(arg2);\n2800 \t\tbreak;\n2801 \tcase PR_BP_ICACHE_RETENTION_STATUS: {\n2802 \t\tu64 status = 0;\n2803 \n2804 \t\tif (!arg2 || arg3 || arg4 || arg5) {\n2805 \t\t\terror = -EINVAL;\n2806 \t\t\tbreak;\n2807 \t\t}\n2808 \t\tif (!capable(CAP_SYS_ADMIN)) {\n2809 \t\t\terror = -EPERM;\n2810 \t\t\tbreak;"
+      }
+    ]
+  },
+  "benchmark_boundaries": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/boundary-proof.json",
+    "bytes": 10246,
+    "sha256": "c8e9b588aed8298a4be70e82e64b522f03da2671b8c1a70153dbffa703756533"
+  },
+  "analyzer": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/analyze_scheduler_pipe_hint.py",
+    "bytes": 30876,
+    "sha256": "eb5a6b8f904dbae651435b188697c522d500a551d0c9182640f2176735a021ce",
+    "excerpts": [
+      {
+        "first_line": 60,
+        "last_line": 80,
+        "text": "60 def retention_rows(text, parsed, policy, loops, repeats, profile, resources=False):\n61     \"\"\"Bind every raw post-teardown diagnostic and whole cell to steady work.\"\"\"\n62     if loops <= 0 or repeats < 2:\n63         raise ValueError(\"retention comparison requires positive loops and at least two repeats\")\n64     patterns = {\"CONFIG\": CONFIG, \"RESULT\": ROW, \"LEGS\": LEGS,\n65                 \"WHOLE\": WHOLE, \"RETENTION\": RETENTION, \"STATUS\": STATUS,\n66                 \"RESOURCE\": RESOURCE, \"LIBRARY\": LIBRARY, \"SCOPE\": SCOPE,\n67                 \"PASS\": re.compile(r\"^PIPE_HINT_PASS$\")}\n68     actual_markers = []\n69     for line in text.splitlines():\n70         if not line.startswith(\"PIPE_HINT_\"):\n71             continue\n72         name = line.split(\" \", 1)[0][len(\"PIPE_HINT_\"):]\n73         if name not in patterns or not patterns[name].fullmatch(line):\n74             raise ValueError(\"malformed or unexpected retention protocol marker\")\n75         actual_markers.append(name)\n76     retained = policy in RETENTION_POLICIES or bool(RETENTION.search(text))\n77     cell_markers = ([\"RESULT\"] + ([\"LEGS\"] if profile == \"legs\" else []) + [\"WHOLE\"]\n78                     + ([\"RETENTION\"] if retained else []) + ([\"RESOURCE\"] if resources else []))\n79     prefix = ([\"LIBRARY\"] if LIBRARY.search(text) else []) + [\"CONFIG\"]\n80     if SCOPE.search(text):"
+      },
+      {
+        "first_line": 100,
+        "last_line": 115,
+        "text": "100             raise ValueError(\"retention raw status has forbidden bits or printed decode mismatch\")\n101         enabled = int(c)\n102         expected_mode = RETENTION_POLICIES.get(policy, 0) if enabled else 0\n103         if policy not in RETENTION_POLICIES and decoded[\"mode\"]:\n104             raise ValueError(\"retention markers require a retention policy for nonzero capture mode\")\n105         if decoded[\"capability\"] != 1 or decoded[\"mode\"] != expected_mode:\n106             raise ValueError(\"retention capability or policy mode mismatch\")\n107         if policy not in RETENTION_POLICIES and decoded[\"completed\"]:\n108             raise ValueError(\"legacy mode-zero telemetry cannot publish demand-capture lines\")\n109         if not enabled and (decoded[\"completed\"] or decoded[\"consumed_fetches\"]):\n110             raise ValueError(\"disabled retention cell contains stale capture or side-hit diagnostics\")\n111         diagnostics.append(dict(repeat=int(a), order=int(b), enabled=enabled,\n112                                 raw=f\"0x{raw:016x}\", **decoded))\n113     if ([key(row) for row in whole] != expected_keys\n114             or (retained and [key(row) for row in diagnostics] != expected_keys)):\n115         raise ValueError(\"whole/retention rows are not a bijection with steady results\")"
+      },
+      {
+        "first_line": 132,
+        "last_line": 159,
+        "text": "132 def summarize_whole_cells(rows, repeats, bootstrap_samples):\n133     \"\"\"Keep complete-cell paired uncertainty separate from steady throughput.\"\"\"\n134     pairs = []\n135     for repeat in range(repeats):\n136         cells = [row for row in rows if row[\"repeat\"] == repeat]\n137         disabled = next(row for row in cells if not row[\"enabled\"])\n138         enabled = next(row for row in cells if row[\"enabled\"])\n139         pairs.append({\"repeat\": repeat, \"enabled_order\": enabled[\"order\"],\n140                       \"disabled_cycles_per_cell\": disabled[\"cycles\"],\n141                       \"enabled_cycles_per_cell\": enabled[\"cycles\"],\n142                       \"saved_cycles_per_cell\": disabled[\"cycles\"] - enabled[\"cycles\"],\n143                       \"saved_percent\": 100.0 * (disabled[\"cycles\"] - enabled[\"cycles\"]) / disabled[\"cycles\"]})\n144     rng = random.Random(0x57484f4c)\n145     saved = [pair[\"saved_cycles_per_cell\"] for pair in pairs]\n146     percent = [pair[\"saved_percent\"] for pair in pairs]\n147     boot = [statistics.median(rng.choices(saved, k=len(saved))) for _ in range(bootstrap_samples)]\n148     boot_percent = [statistics.median(rng.choices(percent, k=len(percent))) for _ in range(bootstrap_samples)]\n149     return {\"pairs\": pairs, \"metrics\": {\n150         \"disabled_median_cycles_per_cell\": statistics.median(pair[\"disabled_cycles_per_cell\"] for pair in pairs),\n151         \"enabled_median_cycles_per_cell\": statistics.median(pair[\"enabled_cycles_per_cell\"] for pair in pairs),\n152         \"paired_median_saved_cycles_per_cell\": statistics.median(saved),\n153         \"paired_95pct_ci_saved_cycles_per_cell\": [percentile(boot, 0.025), percentile(boot, 0.975)],\n154         \"paired_median_saved_percent\": statistics.median(percent),\n155         \"paired_95pct_ci_saved_percent\": [percentile(boot_percent, 0.025), percentile(boot_percent, 0.975)],\n156         \"saved_cycles_by_enabled_order\": {str(order): statistics.median(\n157             pair[\"saved_cycles_per_cell\"] for pair in pairs if pair[\"enabled_order\"] == order) for order in (0,1)}},\n158         \"scope\": \"Complete measured cell includes allocation, fork, setup, warmup, steady work, checks and teardown, plus any enabled status, policy-reset and resource-observer calls; printed rows are outside timing.\"}\n159 "
+      },
+      {
+        "first_line": 346,
+        "last_line": 364,
+        "text": "346     before = decode_status(int(before_hex, 16))\n347     after = decode_status(int(after_hex, 16))\n348     if (configured != int(printed_configured)\n349             or configured != before[\"configured_entries\"]\n350             or configured != after[\"configured_entries\"]):\n351         raise ValueError(\"configured entry counts disagree\")\n352     if any(before[key] for key in (\n353             \"busy\", \"entry_held\", \"read_pending\", \"next_index\",\n354             \"accepted_entries\", \"accepted_triggers\", \"dropped_triggers\",\n355             \"resident_query_pending\", \"resident_drops\")):\n356         raise ValueError(\"instruction-prefix baseline is not clean\")\n357     expected_entries = min(0xffff, repeats * configured)\n358     if policy in RETENTION_POLICIES:\n359         if (int(printed_dropped) or any(after[key] for key in (\n360                 \"busy\", \"entry_held\", \"read_pending\", \"next_index\", \"accepted_entries\",\n361                 \"accepted_triggers\", \"dropped_triggers\", \"resident_query_pending\", \"resident_drops\"))):\n362             raise ValueError(\"retention cell contains stale explicit prefix hint activity\")\n363     elif policy == \"preseed\":\n364         expected_triggers = min(0xff, repeats)"
+      }
+    ]
+  },
+  "hierarchical_helpers": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/compare_scheduler_pipe_hint_mode14.py",
+    "bytes": 19727,
+    "sha256": "c12e26ba16489b127dfc33815bb85d8efaee28322d9eb87825af7f8d9824efdd",
+    "excerpts": [
+      {
+        "first_line": 177,
+        "last_line": 205,
+        "text": "177 def _strata(results):\n178     strata = []\n179     for result in results:\n180         whole, steady = result['whole_cell']['pairs'], result['pairs']\n181         if len(whole) != len(steady):\n182             raise ValueError('whole and steady pair counts differ')\n183         rows = []\n184         for a, b in zip(whole, steady):\n185             if (a['repeat'], a['enabled_order']) != (b['repeat'], b['enabled_order']):\n186                 raise ValueError('whole and steady pairs have different order')\n187             rows.append(dict(whole_cycles=a['saved_cycles_per_cell'], whole_percent=a['saved_percent'],\n188                              steady_cycles=b['saved_cycles_per_roundtrip'], steady_percent=b['saved_percent']))\n189         strata.append(rows)\n190     return strata\n191 \n192 \n193 def _median(strata):\n194     return {key: statistics.median(row[key] for boot in strata for row in boot)\n195             for key in strata[0][0]}\n196 \n197 \n198 def _draw(rng, strata):\n199     # Use the same sampled boots and pairs for whole and steady measurements.\n200     sampled = []\n201     for index in rng.choices(range(len(strata)), k=len(strata)):\n202         boot = strata[index]\n203         sampled.append(rng.choices(boot, k=len(boot)))\n204     return _median(sampled)\n205 "
+      }
+    ]
+  },
+  "percentile": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/analyze_scheduler_tagged_replay.py",
+    "bytes": 40284,
+    "sha256": "d324d5604fa8d4cd948ddc41d8ba64ba35a61ce1a6f481210bae4edd36563cfe",
+    "excerpts": [
+      {
+        "first_line": 68,
+        "last_line": 73,
+        "text": "68 def percentile(values, fraction):\n69     \"\"\"Return a nearest-rank value from an already finite sample.\"\"\"\n70     ordered = sorted(values)\n71     return ordered[round(fraction * (len(ordered) - 1))]\n72 \n73 "
+      }
+    ]
+  },
+  "kernel_patch_fence": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/kernel-patches/0027-blackparrot-icache-retention-control.patch",
+    "bytes": 3506,
+    "sha256": "c48971940f38c27493d95fbff9e2e905c794550efe839625b9d1d1a38981dbd3",
+    "excerpts": [
+      {
+        "first_line": 40,
+        "last_line": 62,
+        "text": "40 +\t\t     : : \"memory\");\n41 +\tif (err || !(value & (1UL << 63)))\n42 +\t\treturn -ENODEV;\n43 +\t*status = value;\n44 +\treturn 0;\n45 +}\n46 +\n47 +static int bp_icache_retention_control(unsigned long mode)\n48 +{\n49 +\tu64 status;\n50 +\tint error;\n51 +\n52 +\tpreempt_disable();\n53 +\terror = bp_icache_retention_probe(&status);\n54 +\tif (!error)\n55 +\t\t/* Every accepted mode change, including mode zero, starts clean. */\n56 +\t\tasm volatile(\"csrw 0x5c1, %0\\nfence.i\\n\"\n57 +\t\t\t     : : \"r\" (mode) : \"memory\");\n58 +\tpreempt_enable();\n59 +\treturn error;\n60 +}\n61 +\n62 +static int bp_icache_retention_status(u64 *status)"
+      },
+      {
+        "first_line": 84,
+        "last_line": 103,
+        "text": "84 +\tcase PR_BP_ICACHE_RETENTION_CONTROL:\n85 +\t\tif (arg2 > 2 || arg3 || arg4 || arg5) {\n86 +\t\t\terror = -EINVAL;\n87 +\t\t\tbreak;\n88 +\t\t}\n89 +\t\tif (!capable(CAP_SYS_ADMIN)) {\n90 +\t\t\terror = -EPERM;\n91 +\t\t\tbreak;\n92 +\t\t}\n93 +\t\t/* The retained store is CPU-global, not task or page-pin state. */\n94 +\t\tif (num_possible_cpus() != 1) {\n95 +\t\t\terror = -EOPNOTSUPP;\n96 +\t\t\tbreak;\n97 +\t\t}\n98 +\t\terror = bp_icache_retention_control(arg2);\n99 +\t\tbreak;\n100 +\tcase PR_BP_ICACHE_RETENTION_STATUS: {\n101 +\t\tu64 status = 0;\n102 +\n103 +\t\tif (!arg2 || arg3 || arg4 || arg5) {"
+      }
+    ]
+  },
+  "entry_clarification": {
+    "primary": "Fresh hard reset establishes RTL global mode0; no prior userspace CSR writes/other actors in each primary boot. Independently accepted probe19 is not rerun in each primary boot.",
+    "alternative": "Successful probe leaves mode0 in the same hardware state",
+    "source": "icache RTL reset lines946-950; accepted kernel control CSR+fence.i lines106-118",
+    "original_build_boundary_proof": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/boundary-proof.json",
+      "bytes": 10246,
+      "sha256": "c8e9b588aed8298a4be70e82e64b522f03da2671b8c1a70153dbffa703756533"
+    },
+    "original_wording_scope": "Original build proof AND wording was unnecessarily narrow; this clarification changes no build artifact, source or old manifest."
+  }
+}
