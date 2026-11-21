@@ -1,0 +1,153 @@
+{
+  "state": "PASS-metadata-cycle-payload-coherence-miter",
+  "parameters": {
+    "output": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2",
+    "sets": 64,
+    "i_lines": 64,
+    "d_lines": 0,
+    "epoch_width": 2
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 18690,
+      "sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/reference-d766.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/retained_metadata_wrapper.sv",
+      "bytes": 6214,
+      "sha256": "a872cb5a3ee494b0bb115ed1781dfe9999f23ef42d0c186e1c05ba25b6223e3c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/driver.cpp",
+      "bytes": 17605,
+      "sha256": "8421ef52e480501f90d9fdedfb46ff24b1e397ba295178257eb172ec8701473e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/run.py",
+      "bytes": 4546,
+      "sha256": "7abcddd52a571a824dfefa2bcea6a3aed09e2946828476e5a50a85661a4287da"
+    }
+  ],
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.12335492495913059,
+      "log": {
+        "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_metadata_wrapper",
+        "-GI_LINES=64",
+        "-GD_LINES=0",
+        "-GRETAINED_SETS=64",
+        "-GEPOCH_WIDTH=2",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/obj",
+        "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/source/bp_retained_line_store_reference.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/retained_metadata_wrapper.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/driver.cpp"
+      ],
+      "cwd": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2",
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 12.823757917038165,
+      "log": {
+        "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/build.log",
+        "bytes": 4254,
+        "sha256": "4ef96ec151f2441cea9a48bf85ccc4f13213d4556fee85b4308d3e1e4eb7dac5"
+      }
+    },
+    {
+      "label": "run-inverted",
+      "argv": [
+        "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/obj/Vretained_metadata_wrapper"
+      ],
+      "cwd": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/inverted",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.3300372490193695,
+      "log": {
+        "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/run-inverted.log",
+        "bytes": 478,
+        "sha256": "ab4f715a33d4ef04f0c0564cddc3b464055225d32cb387e12c5d3f9b820652ef"
+      }
+    },
+    {
+      "label": "run-different-periods",
+      "argv": [
+        "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/obj/Vretained_metadata_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/different-periods",
+      "timeout_seconds": 120,
+      "returncode": 0,
+      "elapsed_seconds": 0.2822192970197648,
+      "log": {
+        "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/run-different-periods.log",
+        "bytes": 487,
+        "sha256": "624f25e7fb75b7b1f8269f80f38d5c834ad23352e4f7ccfa9b265451e5b557f2"
+      }
+    }
+  ],
+  "scope": "Component cycle/payload/coherence equivalence only; no synthesis, full-core, route, area or application claim.",
+  "compiled_reference": {
+    "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/source/bp_retained_line_store_reference.sv",
+    "bytes": 15844,
+    "sha256": "0bcd45dd57d54f641f5b8871c348b19219d1da2ee198104c33b49845c2344e6e"
+  },
+  "executable": {
+    "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/obj/Vretained_metadata_wrapper",
+    "bytes": 454608,
+    "sha256": "1a2d491cdd849b1f00bc23a2fe8eb45ede46b953d9d19fe5ad34536b395f7b29"
+  },
+  "runs": [
+    {
+      "mode": "inverted",
+      "fst": {
+        "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/inverted/retained-line-store.fst",
+        "bytes": 2641547,
+        "sha256": "8cc664b8e9838b20a8a2be3b1df03a0b9834c9a648509fcae3e7dfd482d57d87"
+      }
+    },
+    {
+      "mode": "different-periods",
+      "fst": {
+        "path": "/tmp/retained-metadata-matrix02/s64-i64-d0-e2/different-periods/retained-line-store.fst",
+        "bytes": 2330713,
+        "sha256": "98f749c3aa25405f190ce85dcf3ca49ac07c8a26a5abbf845b1994b8f575e621"
+      }
+    }
+  ]
+}

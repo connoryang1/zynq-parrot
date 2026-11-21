@@ -1,0 +1,89 @@
+{
+  "state": "PASS-negative-metadata-clear-mutation-rejected-by-existing-cycle-miter",
+  "mutation": "Suppress only distributed D-epoch zero writes for set0 during tag-clear sweep; frozen original is unchanged.",
+  "original": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+    "bytes": 18690,
+    "sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24"
+  },
+  "variant": {
+    "path": "/tmp/retained-metadata-negative01/bp_retained_line_store.sv",
+    "bytes": 18721,
+    "sha256": "59c01dee7cd938ef1b1fb2d0c129b9fca39f60ed8a4b055b3bc672bbb818da0f"
+  },
+  "reference": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/reference-d766.sv",
+    "bytes": 15834,
+    "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+  },
+  "wrapper": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/retained_metadata_wrapper.sv",
+    "bytes": 6214,
+    "sha256": "a872cb5a3ee494b0bb115ed1781dfe9999f23ef42d0c186e1c05ba25b6223e3c"
+  },
+  "driver": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/driver.cpp",
+    "bytes": 17605,
+    "sha256": "8421ef52e480501f90d9fdedfb46ff24b1e397ba295178257eb172ec8701473e"
+  },
+  "commands": [
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_metadata_wrapper",
+        "-GI_LINES=9",
+        "-GD_LINES=13",
+        "-GRETAINED_SETS=4",
+        "-GEPOCH_WIDTH=2",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/tmp/retained-metadata-negative01/obj",
+        "/tmp/retained-metadata-negative01/bp_retained_line_store.sv",
+        "/tmp/retained-metadata-negative01/bp_retained_line_store_reference.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/retained_metadata_wrapper.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/driver.cpp"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/evidence/negative01/build.log",
+        "bytes": 4230,
+        "sha256": "0ad53ff5b7953e06fdecbd358ba72156a4b2076fa442e7951672834a86196b6b"
+      }
+    },
+    {
+      "label": "run",
+      "argv": [
+        "/tmp/retained-metadata-negative01/obj/Vretained_metadata_wrapper"
+      ],
+      "returncode": 1,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/evidence/negative01/run.log",
+        "bytes": 70,
+        "sha256": "cf4c0dc4b4c70e124962589f55762f235ddf3235489c4741790b560511a1e9bd"
+      }
+    }
+  ],
+  "fst": {
+    "path": "/tmp/retained-metadata-negative01/runtime/retained-line-store.fst",
+    "bytes": 6593,
+    "sha256": "68793a93c90a755cfe8df0b04831008b0d24f87fd5fa0cc62a235f86f6c677e0"
+  },
+  "frozen_original_unchanged": true,
+  "durable_fst": {
+    "path": "/home/coyang/retained-metadata-component-artifacts-20261121/negative-set0-clear.fst",
+    "bytes": 6593,
+    "sha256": "68793a93c90a755cfe8df0b04831008b0d24f87fd5fa0cc62a235f86f6c677e0"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "state": "FAIL-preserved",
+  "parameters": {
+    "output": "/tmp/retained-metadata-first02",
+    "sets": 4,
+    "i_lines": 9,
+    "d_lines": 13,
+    "epoch_width": 2
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 18692,
+      "sha256": "a612a72a8fe995fbaa71039e52d242bbc6e72af0b4cd19d8e1348ba5299e1b96"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/reference-d766.sv",
+      "bytes": 15834,
+      "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/retained_metadata_wrapper.sv",
+      "bytes": 5809,
+      "sha256": "5f2f4297a98f6bdf8fdfb3b6b420df8ab7b2a14b49d54f35b43ff4fafc2ee24c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/driver.cpp",
+      "bytes": 15928,
+      "sha256": "a14bf6aaaea83e78191730cc947046d78e1dffedce253a6987c4b35da04458f1"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/run.py",
+      "bytes": 4531,
+      "sha256": "1e718748700a238b8dd93d36fd80b016f6797f80f0661a4685cc68162be0c7c7"
+    }
+  ],
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "cwd": "/tmp/retained-metadata-first02",
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.12762302393093705,
+      "log": {
+        "path": "/tmp/retained-metadata-first02/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_metadata_wrapper",
+        "-GI_LINES=9",
+        "-GD_LINES=13",
+        "-GRETAINED_SETS=4",
+        "-GEPOCH_WIDTH=2",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/tmp/retained-metadata-first02/obj",
+        "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "/tmp/retained-metadata-first02/source/reference-renamed.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/retained_metadata_wrapper.sv",
+        "/home/coyang/zynq-parrot-retained-metadata/testing/rtl/retained-metadata/driver.cpp"
+      ],
+      "cwd": "/tmp/retained-metadata-first02",
+      "timeout_seconds": 300,
+      "returncode": 1,
+      "elapsed_seconds": 0.2819868520600721,
+      "log": {
+        "path": "/tmp/retained-metadata-first02/build.log",
+        "bytes": 537,
+        "sha256": "cd37713d5307818c618dc3099bf99f95676e02082abcd915c3e16c95daccbf49"
+      }
+    }
+  ],
+  "scope": "Component cycle/payload/coherence equivalence only; no synthesis, full-core, route, area or application claim.",
+  "compiled_reference": {
+    "path": "/tmp/retained-metadata-first02/source/reference-renamed.sv",
+    "bytes": 15844,
+    "sha256": "0bcd45dd57d54f641f5b8871c348b19219d1da2ee198104c33b49845c2344e6e"
+  },
+  "error": "AssertionError('build failed')"
+}

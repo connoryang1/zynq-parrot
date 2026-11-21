@@ -1,0 +1,32 @@
+{
+  "state": "PASS-production-no-verification-bitmap-and-Wall-lint-only",
+  "source_sha256": "bd4cd65c92bdaf8af80c9c6f4643383c8bfa7fd335ca131319d44c2e45ee2e24",
+  "commands": [
+    {
+      "label": "preprocess",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "-E",
+        "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv"
+      ],
+      "returncode": 0
+    },
+    {
+      "label": "lint",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "--top-module",
+        "bp_retained_line_store",
+        "-Gi_lines_p=1280",
+        "-Gd_lines_p=1280",
+        "-Gsets_p=256",
+        "-Gepoch_width_p=8",
+        "/home/coyang/zynq-parrot-retained-metadata/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv"
+      ],
+      "returncode": 0
+    }
+  ],
+  "scope": "Preprocessing/lint only, no synthesis/inference/area evidence."
+}
