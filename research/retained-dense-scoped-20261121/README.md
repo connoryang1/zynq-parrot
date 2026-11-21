@@ -1,0 +1,7 @@
+This preserves the qualified trace-only copy of the native 1,792-line simulator and its observation limits. It verifies diagnostic trace coverage and preserves the one completed qualification; it does not establish all-slot capacity, FPGA fit or application performance.
+
+An untouched relink reproduces original model876ddcf6 exactly. The only changed generated object is Syms trace registration, giving modelaedeba9e; no RTL or evaluation object changes. One cold08 run matches all selected literal streams through complete EOF in four domains: core252, observer45, strict162 and geometry16, whose union is413 leaves. The original full512b restoration, eight real L1 writes, I retirement and counter checks also pass. The758,540-byte raw FST is preserved durably alongside the model/source archives and compressed canonical streams.
+
+The future capacity audit requires167 leaves. This413-leaf copy omits the raw D-cache maintenance bit and all six aliases, so it is not admitted for that audit. A separate414-leaf copy must add and qualify that exact observation before capacity execution; the existing validator will keep its maintenance rejection.
+
+The proof snapshots retain the host driver, admission, source/archive deltas, terminal protocol, checkers and independent reviewer, including a corrected Python3.8 path-API compatibility failure in the separate reviewer. The external sources and large archives remain at the recorded immutable paths. No board action occurred.
