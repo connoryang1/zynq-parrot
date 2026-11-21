@@ -136,6 +136,62 @@ proc vivado_add_bd_parameter { name def } {
 }
 
 
+# Environment entries are not Verilog defines. Apply only the experiment's
+# explicit allowlist to BOTH the source IP and the final integrating project.
+# The latter matters for a BD packaged with imported HDL and no synthesis DCP.
+proc vivado_experiment_defines {} {
+    set names {BP_RETAINED_BUFFER BP_RETAINED_I_LINES BP_RETAINED_D_LINES BP_RETAINED_SETS}
+    set present 0
+    foreach name $names { if {[info exists ::env($name)]} { incr present } }
+    if {$present != 0 && $present != [llength $names]} {
+        error "incomplete retained-buffer Verilog configuration"
+    }
+    set result [list]
+    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY}] {
+        if {![info exists ::env($name)]} { continue }
+        set value $::env($name)
+        if {![regexp {^(0|[1-9][0-9]*)$} $value]} {
+            error "$name must be a canonical nonnegative integer, got '$value'"
+        }
+        if {$name in {BP_RETAINED_BUFFER BP_RETAINED_OBSERVE} && $value > 1} {
+            error "$name must be 0 or 1"
+        }
+        if {$name eq "BP_AXI_RESPONSE_DELAY" && $value > 384} {
+            error "$name must be in 0..384"
+        }
+        if {$name in {BP_RETAINED_I_LINES BP_RETAINED_D_LINES} && $value > 65535} {
+            error "$name exceeds the 16-bit reported line count"
+        }
+        if {$name eq "BP_RETAINED_SETS" && ($value < 1 || $value > 32768 || ($value & ($value-1)) != 0)} {
+            error "$name must be a power of two in 1..32768"
+        }
+        lappend result "$name=$value"
+    }
+    return $result
+}
+
+proc vivado_apply_experiment_defines {} {
+    set requested [vivado_experiment_defines]
+    if {[llength $requested] == 0} { return }
+    set fileset [get_filesets sources_1]
+    set effective [get_property verilog_define $fileset]
+    foreach entry $requested {
+        set name [lindex [split $entry =] 0]
+        foreach old $effective {
+            if {[lindex [split $old =] 0] eq $name && $old ne $entry} {
+                error "conflicting Verilog define $old versus $entry"
+            }
+        }
+        if {$entry ni $effective} { lappend effective $entry }
+    }
+    set_property verilog_define $effective $fileset
+    set actual [get_property verilog_define $fileset]
+    foreach entry $requested {
+        if {$entry ni $actual} { error "Vivado lost requested Verilog define $entry" }
+    }
+    puts "BP-EXPERIMENT-CONFIG: project=[current_project] effective=$actual"
+}
+
 proc vivado_create_design { vpackages vsources vincludes } {
     # TODO: Hardcoded BASEJUMP_STL_DIR
     set hard_root $::env(BASEJUMP_STL_DIR)/hard/ultrascale_plus
@@ -220,12 +276,14 @@ proc vivado_create_design { vpackages vsources vincludes } {
         puts "BP-CONTEXT-CONFIG: static cfg selected; ignored custom Verilog defines"
     }
 
+    vivado_apply_experiment_defines
     update_compile_order -verbose -fileset sources_1
 }
 
 proc vivado_customize_ip { proj_bd ip_name ip_script args } {
     ipx::unload_core ip_repo/${ip_name}/component.xml
     ipx::edit_ip_in_project -upgrade true -name tmp_edit_project -directory ip_repo ip_repo/${ip_name}/component.xml
+    vivado_apply_experiment_defines
 
     source -verbose ${ip_script}
     vivado_ipx_customize ${args}
@@ -257,6 +315,7 @@ proc vivado_package_ip { proj_bd ip_name ip_script } {
 
 proc vivado_create_ip_proj { proj_name proj_bd ip_name part ip_script args } {
     create_project -force ${proj_name} [pwd] -part ${part}
+    vivado_apply_experiment_defines
     vivado_create_bd_design ${proj_bd}
     source -verbose ${ip_script}
     vivado_create_ip ${args}
