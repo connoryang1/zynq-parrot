@@ -1,0 +1,33 @@
+{
+  "state": "host-and-rv64-byte-reproduction-verified; no FPGA result",
+  "head_at_review": "ee7d0443d12a2d717cb2f60b4a81c4c5139201cf",
+  "source_sha256": {
+    "linux-tests/scheduler_pipe_hint_benchmark.c": "b242d76a3bc5fb754ea92a6167ede622397e19630c7b9e5a415715deb085378e",
+    "linux-tests/Makefile": "fa6ef05cb38ab5a81b9e51814d7a1613450f81afcb8d0d297a0b441f4a5689a0",
+    "linux-tests/analyze_scheduler_pipe_hint.py": "eb5a6b8f904dbae651435b188697c522d500a551d0c9182640f2176735a021ce",
+    "linux-tests/compare_scheduler_pipe_hint_mode14.py": "c12e26ba16489b127dfc33815bb85d8efaee28322d9eb87825af7f8d9824efdd",
+    "linux-tests/test_compare_scheduler_pipe_hint_mode14.py": "1cffca18327746dab309867650feef9611e4806ffc8675164519fa5c207570a3",
+    "linux-tests/test_resume_complete_policy_scope.py": "ae226bd7f04f923cbb9bfb056a9701cc5016106421c0e9f4e984f5c3ddf6c2f7"
+  },
+  "focused_host_tests": {
+    "cwd": "linux-tests",
+    "command": "python3 -m unittest test_resume_complete_policy_scope test_resume_workload test_resume_retention_protocol test_resume_resource_accounting test_analyze_scheduler_pipe_hint test_analyze_scheduler_retention test_analyze_scheduler_resources test_compare_scheduler_pipe_hint_mode14 test_compare_scheduler_pipe_hint_policies test_compare_scheduler_pipe_hint_routes test_compare_scheduler_pipe_hint_tables test_compare_scheduler_pipe_hint_capacities test_pool_scheduler_pipe_hint_replicates",
+    "tests": 104,
+    "seconds": 25.984,
+    "result": "OK",
+    "exit_code": 0
+  },
+  "post_limit_wording_tests": {"command": "python3 -m unittest test_compare_scheduler_pipe_hint_mode14", "tests": 18, "seconds": 5.462, "result": "OK", "exit_code": 0},
+  "py_compile": "PASS",
+  "git_diff_check": "PASS",
+  "old_elf_recipe_blocks_unchanged": 7,
+  "rv64_preprocessed_variants_matching_archived_source": 6,
+  "archived_source_sha256": "b3322ac527cb95950f8a23869a01c5f3db4a8c25de59d4c324262b9eb31b2c55",
+  "host_gate_zero_binary_identity_variants": 4,
+  "drain": {"max_status_reads": 4096, "bits": [1, 2, 3, 54], "scope": "reported prefix controller only; not all UCE responses or memory requests"},
+  "rv64_build_manifest": {"path": "compiled/manifest.json", "sha256": "2f5b40b2b9ba1b537d6f3e23288596d8f0b1bee1f1749edf98c5a00d031cf194", "old_exact_binary_reproductions": 7, "new_scoped_exact_binary_reproductions": 2},
+  "fixed_admission": {"path": "admission.json", "sha256": "501d6b12eb0fa10b9f1d298a2be6cb365695c2be7aac96b0984ea4ffe5f4a360", "plan_checks": "PASS: 16 independent guests across 8 reservations, 2 complete boots/image/workload, ABBA; workload order forward/forward/reverse/reverse"},
+  "pending": ["coordinator reserved physical validation under fixed admission protocol"],
+  "board_actions": false,
+  "images_generated": false
+}

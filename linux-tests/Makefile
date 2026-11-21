@@ -47,6 +47,8 @@ ICACHE_RETENTION_PROBE_DYNAMIC_APP := $(OUT)/icache_retention_probe_dynamic
 PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_resources_dynamic
 PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_retention_resources_dynamic
 PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_resources_dynamic
+PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_plain_scoped_resources_dynamic
+PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_scoped_resources_dynamic
 PHYSICAL_PREVIEW_TRACE_APP := $(OUT)/scheduler_physical_preview_trace_capture
 PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_trace_capture_dynamic
 BP_HOST_CC ?= cc
@@ -253,6 +255,16 @@ $(PIPE_HINT_RETENTION_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_RETENTION=1 -o $@ $< -lz >&2
 
+# Scoped resources use distinct files: historical whole-cell ELFs retain their
+# exact recipes while new mode-14 cells reset/drain before observer output.
+$(PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_COMPLETE_POLICY_SCOPE=1 -o $@ $< >&2
+
+$(PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP): scheduler_pipe_hint_benchmark.c resume_workload.h Makefile FORCE | check-linux-dynamic-cc
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_DYNAMIC_CC) $(filter-out -static,$(PHYSICAL_PREVIEW_CFLAGS)) -no-pie -std=c11 -DBP_RESUME_ZLIB=1 -DBP_RESUME_RESOURCE_STATS=1 -DBP_RESUME_COMPLETE_POLICY_SCOPE=1 -o $@ $< -lz >&2
+
 $(PHYSICAL_PREVIEW_TRACE_APP): scheduler_physical_preview_trace_capture.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
@@ -347,6 +359,16 @@ pipe-hint-benchmark-plain-resources-dynamic: $(PIPE_HINT_PLAIN_RESOURCE_BENCH_DY
 
 emit-pipe-hint-benchmark-plain-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-plain-resources-dynamic
 	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_PLAIN_RESOURCE_BENCH_DYNAMIC_APP)
+
+.PHONY: pipe-hint-benchmark-plain-scoped-resources-dynamic pipe-hint-benchmark-zlib-scoped-resources-dynamic emit-pipe-hint-benchmark-plain-scoped-resources-compressed-transfer emit-pipe-hint-benchmark-zlib-scoped-resources-compressed-transfer
+pipe-hint-benchmark-plain-scoped-resources-dynamic: $(PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+pipe-hint-benchmark-zlib-scoped-resources-dynamic: $(PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-plain-scoped-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-plain-scoped-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_PLAIN_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
+
+emit-pipe-hint-benchmark-zlib-scoped-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-zlib-scoped-resources-dynamic
+	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_ZLIB_SCOPED_RESOURCE_BENCH_DYNAMIC_APP)
 
 emit-pipe-hint-benchmark-resources-compressed-transfer: check-linux-dynamic-cc pipe-hint-benchmark-resources-dynamic
 	@python3 $(CURDIR)/emit_resume_transfer.py $(PIPE_HINT_RESOURCE_BENCH_DYNAMIC_APP)

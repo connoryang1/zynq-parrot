@@ -35,7 +35,8 @@ class Mode14ComparatorTests(unittest.TestCase):
         lines = [f'[    0.000000] Linux version 6.6.0 PARSER_FIXTURE_{name}',
                  'PIPE_HINT_CONFIG loops=10 repeats=2 warmup=2 configured_entries=16 '
                  'policy=futex-early sync=futex profile=plain working_set_kib=32 '
-                 'workload=lookup terminal_handshake=1']
+                 'workload=lookup terminal_handshake=1',
+                 'PIPE_HINT_SCOPE version=1 mode=cell cleanup=mode0 drain=prefix-controller max_polls=4096']
         for repeat in range(2):
             for order in range(2):
                 enabled = (repeat & 1) ^ order
@@ -97,6 +98,67 @@ class Mode14ComparatorTests(unittest.TestCase):
         self.assertGreater(high, 300)
         self.assertEqual(result, self.compare(300))
 
+    def test_embedded_pair_is_explicit_and_cannot_mix_original_rootfs(self):
+        for path in self.baseline:
+            self.status(path, nbf_sha256=module.EMBEDDED_BASELINE_SHA)
+        for path in self.control:
+            self.status(path, nbf_sha256=module.EMBEDDED_CONTROL_SHA)
+        with self.assertRaisesRegex(ValueError, 'fixed reviewed NBF'):
+            self.compare()
+        result = module.compare(self.baseline, self.control, 10, image_pair='embedded')
+        self.assertEqual(result['image_pair'], 'embedded')
+        self.assertEqual(result['baseline']['nbf_sha256'], module.EMBEDDED_BASELINE_SHA)
+        self.assertEqual(result['primary_whole_cell_control_minus_baseline']['saved_cycles_per_cell'], -50)
+        self.image_gate.assert_called_once_with('embedded')
+        self.status(self.control[-1], nbf_sha256=module.CONTROL_SHA)
+        with self.assertRaisesRegex(ValueError, 'fixed reviewed NBF'):
+            module.compare(self.baseline, self.control, 10, image_pair='embedded')
+        with self.assertRaisesRegex(ValueError, 'image pair must be'):
+            module.compare(self.baseline, self.control, 10, image_pair='unreviewed')
+
+    def prepare_capped_fixtures(self):
+        for paths, identity in ((self.baseline, module.EMBEDDED46_BASELINE_SHA),
+                                (self.control, module.EMBEDDED46_CONTROL_SHA)):
+            for path in paths:
+                self.status(path, nbf_sha256=identity, control_program_sha256=module.OWNED46_CONTROL_SHA)
+                text = path.read_text()
+                boot, body = text.split('\n', 1)
+                header = ('INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496\n'
+                          'bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> fixture\n'
+                          'Domain0 Next Arg1         : 0x0000000082200000\n')
+                cap = ('[    0.000000] Memory limited to 46MB\n'
+                       '[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000082dfffff]\n'
+                       '[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  \n'
+                       '[    0.000000] Memory: 20000K/47104K available (fixture)\n')
+                path.write_text(header + boot + '\n' + cap + body)
+
+    def test_embedded46_requires_source_and_actual_runtime_bounds(self):
+        self.prepare_capped_fixtures()
+        result = module.compare(self.baseline, self.control, 10, image_pair='embedded46')
+        self.assertEqual(result['image_pair'], 'embedded46')
+        self.assertEqual(result['memory_cap_bytes'], 48234496)
+        self.assertEqual(result['control']['boots'][0]['memory_bound']['dma32_end'], '0x82dfffff')
+        self.image_gate.assert_called_once_with('embedded46')
+        with self.assertRaisesRegex(ValueError, 'fixed reviewed NBF'):
+            module.compare(self.baseline, self.control, 10, image_pair='embedded')
+        target = self.control[-1]
+        original = target.read_text()
+        for old, new in (('Memory limited to 46MB', 'notice missing'),
+                         ('/47104K available', '/65536K available'),
+                         ('82dfffff', '83ffffff'),
+                         ('mem=46M', 'mem=64M'),
+                         ('with size 48234496', 'with size 67108864'),
+                         ('0x0000000082200000', '0x0000000083000000')):
+            with self.subTest(old=old):
+                target.write_text(original.replace(old, new))
+                with self.assertRaisesRegex(ValueError, 'requires actual 46MB'):
+                    module.compare(self.baseline, self.control, 10, image_pair='embedded46')
+                target.write_text(original)
+        for path in self.baseline + self.control:
+            self.status(path, control_program_sha256='e' * 64)
+        with self.assertRaisesRegex(ValueError, 'immutable reviewed 46MiB runner'):
+            module.compare(self.baseline, self.control, 10, image_pair='embedded46')
+
     def test_requires_two_boots_and_distinct_paths_inodes_and_content(self):
         with self.assertRaisesRegex(ValueError, 'two independent'):
             module.compare(self.baseline[:1], self.control)
@@ -155,6 +217,31 @@ class Mode14ComparatorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'runner_exit zero'):
             self.compare()
 
+    def test_legacy_whole_analysis_is_qualified_but_not_a_causal_comparator_input(self):
+        for path in self.baseline + self.control:
+            path.write_text('\n'.join(line for line in path.read_text().splitlines()
+                                      if not line.startswith('PIPE_HINT_SCOPE')) + '\n')
+        result = module.analyze(self.baseline[0], bootstrap_samples=1)
+        self.assertEqual(result['config']['complete_policy_scope'], 0)
+        self.assertTrue(any('cannot support a causal' in text for text in result['interpretation_limits']))
+        with self.assertRaisesRegex(ValueError, 'requires complete policy SCOPE'):
+            self.compare()
+
+    def test_scope_marker_is_once_per_program_exact_and_before_cell_rows(self):
+        target = self.control[-1]
+        original = target.read_text()
+        marker = 'PIPE_HINT_SCOPE version=1 mode=cell cleanup=mode0 drain=prefix-controller max_polls=4096\n'
+        for changed in (original.replace(marker, marker * 2),
+                        original.replace('max_polls=4096', 'max_polls=0'),
+                        original.replace(marker, '') + marker):
+            target.write_text(changed)
+            with self.assertRaisesRegex(ValueError, 'SCOPE|markers'):
+                self.compare()
+        target.write_text(original)
+        self.status(target, complete_policy_scope=0)
+        with self.assertRaisesRegex(ValueError, 'scope differ'):
+            self.compare()
+
     def test_requires_one_boot_marker_and_reviewed_policy(self):
         target = self.control[-1]
         original = target.read_text()
@@ -196,6 +283,30 @@ class Mode14ImageGateTests(unittest.TestCase):
         result = module.verify_reviewed_images()
         self.assertEqual(result['baseline']['sha256'], module.BASELINE_SHA)
         self.assertEqual(result['control']['sha256'], module.CONTROL_SHA)
+        self.assertEqual(result['changed_record_line'], 1075385)
+
+    def test_actual_embedded_pair_when_local_artifacts_are_available(self):
+        if not (module.EMBEDDED_REVIEW / 'manifest.json').is_file():
+            self.skipTest('embedded pair artifacts unavailable')
+        manifest = json.loads((module.EMBEDDED_REVIEW / 'manifest.json').read_text())
+        if any(not Path(manifest[key]['path']).is_file()
+               for key in ('source_nbf', 'candidate_nbf', 'all_modes')):
+            self.skipTest('embedded external NBF/proof artifacts unavailable')
+        result = module.verify_reviewed_images('embedded')
+        self.assertEqual(result['baseline']['sha256'], module.EMBEDDED_BASELINE_SHA)
+        self.assertEqual(result['control']['sha256'], module.EMBEDDED_CONTROL_SHA)
+        self.assertEqual(result['changed_record_line'], 1075385)
+
+    def test_actual_embedded46_pair_when_local_artifacts_are_available(self):
+        if not (module.EMBEDDED46_REVIEW / 'manifest.json').is_file():
+            self.skipTest('embedded46 pair artifacts unavailable')
+        manifest = json.loads((module.EMBEDDED46_REVIEW / 'manifest.json').read_text())
+        if any(not Path(manifest[key]['path']).is_file()
+               for key in ('source_nbf', 'candidate_nbf', 'all_modes')):
+            self.skipTest('embedded46 external NBF/proof artifacts unavailable')
+        result = module.verify_reviewed_images('embedded46')
+        self.assertEqual(result['baseline']['sha256'], module.EMBEDDED46_BASELINE_SHA)
+        self.assertEqual(result['control']['sha256'], module.EMBEDDED46_CONTROL_SHA)
         self.assertEqual(result['changed_record_line'], 1075385)
 
     def test_rejects_another_change_or_unreviewed_actual_hash(self):

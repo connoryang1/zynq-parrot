@@ -1,0 +1,45 @@
+{
+  "state": "PASS functional gate; no performance admission",
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session18/session.json",
+    "bytes": 2425,
+    "sha256": "16c83bb5b06086a0886b3f4d66b88316df6b2741b032d3175570f1bb2d3654e3"
+  },
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session18/0-scan32-futex-early.log",
+    "bytes": 34760,
+    "sha256": "221744009c7008c5a2a17248309b790759806b67ecc884409514cf725d43801e"
+  },
+  "runner_status": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session18/0-scan32-futex-early.log.status.json",
+    "bytes": 797,
+    "sha256": "c41d330c48d2e8a0f53dd094504bc8871539e4549f448f400f8aa85869ed68bc"
+  },
+  "config": {
+    "loops": 8,
+    "repeats": 2,
+    "warmup": 4,
+    "configured_entries": 32,
+    "policy": "futex-early",
+    "sync": "futex",
+    "profile": "plain",
+    "working_set_kib": 32,
+    "workload": "scan",
+    "terminal_handshake": 1,
+    "complete_policy_scope": 1,
+    "resource_stats": 1
+  },
+  "memory_bound": {
+    "allocation_bytes": 48234496,
+    "linux_total_kib": 47104,
+    "linux_mem_limit_mb": 46,
+    "dma32_begin": "0x80000000",
+    "dma32_end": "0x82dfffff",
+    "next_arg1": "0x82200000",
+    "maximum_normal_ram_offset": "0x2dfffff",
+    "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+  },
+  "scope": "Modezero reset plus reported prefix-controller drain; not all UCE or memory-system drain",
+  "acceptance": "ExactguestELFhash, allchecks/WHOLE/resources, normalreturn,CORE/BSGPASS,runner0",
+  "excluded": "Short8loops/4warm/2repeats excluded fromfixed64/32/4 ABBA comparison"
+}

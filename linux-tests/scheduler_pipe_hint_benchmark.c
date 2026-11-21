@@ -27,6 +27,12 @@
 #if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
 #include <sys/resource.h>
 #endif
+#if defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE
+#if !defined(BP_RESUME_RESOURCE_STATS) || !BP_RESUME_RESOURCE_STATS
+#error "Complete policy scope requires resource/whole-cell timing"
+#endif
+#define COMPLETE_SCOPE_DRAIN_POLLS 4096U
+#endif
 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
 #include <signal.h>
 #define PR_BP_ICACHE_RETENTION_CONTROL 0x42505061
@@ -319,7 +325,8 @@ static enum profile_policy parse_profile(const char *text)
 
 static unsigned long prefix_status(void)
 {
-#ifdef BP_RESUME_HOST_VERIFY
+#if defined(BP_RESUME_HOST_VERIFY) \
+ && !(defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE)
 	return (32UL << 4) | 1;
 #else
 	unsigned long status;
@@ -333,7 +340,8 @@ static unsigned long prefix_status(void)
 
 static void issue_hint(unsigned enabled)
 {
-#ifdef BP_RESUME_HOST_VERIFY
+#if defined(BP_RESUME_HOST_VERIFY) \
+ && !(defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE)
 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
 	extern void bp_resume_host_retention_hint(unsigned enabled);
 	bp_resume_host_retention_hint(enabled);
@@ -363,7 +371,8 @@ static void issue_iteration_hint(unsigned enabled, enum hint_policy policy,
 
 static void set_futex_early_mode(unsigned enabled)
 {
-#ifdef BP_RESUME_HOST_VERIFY
+#if defined(BP_RESUME_HOST_VERIFY) \
+ && !(defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE)
 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
 	extern void bp_resume_host_retention_task_mode(unsigned enabled);
 	bp_resume_host_retention_task_mode(enabled);
@@ -380,6 +389,25 @@ static int is_futex_early(enum hint_policy policy)
 {
 	return policy == hint_futex_early || policy == hint_futex_early_both;
 }
+
+#if defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE
+static void complete_policy_scope_reset(void)
+{
+	const unsigned long pending = (1UL << 1) | (1UL << 2) | (1UL << 3)
+				      | (1UL << 54);
+
+	/* Task mode must be zero before polling: a reschedule during a status
+	 * syscall must not launch another selection-time mode-14 sweep. These
+	 * CSR bits describe the prefix controller, not all UCE response slots.
+	 */
+	set_futex_early_mode(0);
+	for (unsigned poll = 0; poll < COMPLETE_SCOPE_DRAIN_POLLS; ++poll)
+		if (!(prefix_status() & pending))
+			return;
+	errno = ETIMEDOUT;
+	fail("complete policy scope prefix-controller drain");
+}
+#endif
 
 #if defined(BP_RESUME_RETENTION) && BP_RESUME_RETENTION
 #ifdef BP_RESUME_HOST_VERIFY
@@ -770,6 +798,10 @@ int main(int argc, char **argv)
 		fputs("futex-early policy requires futex synchronization\n", stderr);
 		return 2;
 	}
+#if defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE
+	/* Establish a clean first cell before library/config observer output. */
+	complete_policy_scope_reset();
+#endif
 #if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
 	if (!strcmp(workload, "deflate"))
 		printf(PIPE_HINT_LABEL("LIBRARY") " name=zlib version=%s block_bytes=%u input_corpus_kib=%u\n",
@@ -795,6 +827,10 @@ int main(int argc, char **argv)
 	       : policy == hint_seed_once ? "seed" : "preseed",
 	       sync == sync_pipe ? "pipe" : "futex",
 	       profile == profile_plain ? "plain" : "legs", working_set_kib, workload);
+#if defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE
+	printf(PIPE_HINT_LABEL("SCOPE") " version=1 mode=cell cleanup=mode0 drain=prefix-controller max_polls=%u\n",
+	       COMPLETE_SCOPE_DRAIN_POLLS);
+#endif
 	for (unsigned repeat = 0; repeat < repeats; ++repeat) {
 		unsigned first = repeat & 1U;
 
@@ -821,6 +857,14 @@ int main(int argc, char **argv)
 			 * status reads and policy reset separately from steady work.
 			 */
 			retention_status = retention_finish_cell(policy, enabled);
+#endif
+#if defined(BP_RESUME_COMPLETE_POLICY_SCOPE) && BP_RESUME_COMPLETE_POLICY_SCOPE
+			/* run_*_cell has checked, reaped and freed both workloads. Charge
+			 * mode reset and bounded controller drain to this cell, before the
+			 * ending observers/timestamp and every result print. Both arms pay
+			 * this cleanup; the next cell's initial mmap/pipe starts in mode 0.
+			 */
+			complete_policy_scope_reset();
 #endif
 #if defined(BP_RESUME_RESOURCE_STATS) && BP_RESUME_RESOURCE_STATS
 			/* Include verification, reaping, frees, and retention reset/status.

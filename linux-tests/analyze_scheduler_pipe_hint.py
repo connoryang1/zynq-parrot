@@ -38,6 +38,9 @@ WHOLE = re.compile(
     r"^PIPE_HINT_WHOLE repeat=(\d+) order=(\d+) enabled=([01]) "
     r"cycles=(\d+) loops=(\d+)$", re.MULTILINE
 )
+SCOPE = re.compile(
+    r"^PIPE_HINT_SCOPE version=1 mode=cell cleanup=mode0 "
+    r"drain=prefix-controller max_polls=4096$", re.MULTILINE)
 RETENTION = re.compile(
     r"^PIPE_HINT_RETENTION repeat=(\d+) order=(\d+) enabled=([01]) "
     r"raw=0x([0-9a-fA-F]{16}) capability=([01]) mode=([0-3]) "
@@ -60,7 +63,7 @@ def retention_rows(text, parsed, policy, loops, repeats, profile, resources=Fals
         raise ValueError("retention comparison requires positive loops and at least two repeats")
     patterns = {"CONFIG": CONFIG, "RESULT": ROW, "LEGS": LEGS,
                 "WHOLE": WHOLE, "RETENTION": RETENTION, "STATUS": STATUS,
-                "RESOURCE": RESOURCE, "LIBRARY": LIBRARY,
+                "RESOURCE": RESOURCE, "LIBRARY": LIBRARY, "SCOPE": SCOPE,
                 "PASS": re.compile(r"^PIPE_HINT_PASS$")}
     actual_markers = []
     for line in text.splitlines():
@@ -74,6 +77,8 @@ def retention_rows(text, parsed, policy, loops, repeats, profile, resources=Fals
     cell_markers = (["RESULT"] + (["LEGS"] if profile == "legs" else []) + ["WHOLE"]
                     + (["RETENTION"] if retained else []) + (["RESOURCE"] if resources else []))
     prefix = (["LIBRARY"] if LIBRARY.search(text) else []) + ["CONFIG"]
+    if SCOPE.search(text):
+        prefix.append("SCOPE")
     if actual_markers != prefix + cell_markers * (repeats * 2) + ["STATUS", "PASS"]:
         raise ValueError("retention cell markers missing, duplicated, or out of order")
     expected_keys = [(repeat, order, (repeat & 1) ^ order)
@@ -229,6 +234,13 @@ def analyze(path, bootstrap_samples=20000):
     working_set_kib = int(configs[0][7] or 0)
     workload = configs[0][8] or "scan"
     terminal_handshake = int(configs[0][9] or 0)
+    scope_lines = [line for line in text.splitlines() if line.startswith("PIPE_HINT_SCOPE")]
+    if len(scope_lines) > 1 or any(not SCOPE.fullmatch(line) for line in scope_lines):
+        raise ValueError("malformed or duplicate complete policy SCOPE marker")
+    complete_policy_scope = int(bool(scope_lines))
+    if ("complete_policy_scope" in runner
+            and runner["complete_policy_scope"] != complete_policy_scope):
+        raise ValueError("transcript and runner complete policy scope differ")
     libraries = LIBRARY.findall(text)
     if workload == "deflate":
         if (len(libraries) != 1 or int(libraries[0][1]) != 4096
@@ -286,6 +298,8 @@ def analyze(path, bootstrap_samples=20000):
                    parent_resume=leg["parent_resume"])
     has_resources = bool(re.search(r"^PIPE_HINT_RESOURCE(?:[ =]|$)", text, re.MULTILINE))
     has_retention = bool(RETENTION.search(text))
+    if complete_policy_scope and not has_resources:
+        raise ValueError("complete policy scope requires WHOLE/resource rows")
     whole_rows, diagnostics, resource_rows = (
         retention_rows(text, parsed, policy, loops, repeats, profile, has_resources)
         if policy in RETENTION_POLICIES or has_resources or has_retention else (None, None, None))
@@ -445,7 +459,8 @@ def analyze(path, bootstrap_samples=20000):
                    "configured_entries": configured, "policy": policy,
                    "sync": sync, "profile": profile,
                    "working_set_kib": working_set_kib, "workload": workload,
-                   "terminal_handshake": terminal_handshake},
+                   "terminal_handshake": terminal_handshake,
+                   "complete_policy_scope": complete_policy_scope},
         "pairs": pairs,
         "metrics": metrics,
         "icache_prefix_status": {"before": before, "after": after},
@@ -476,6 +491,17 @@ def analyze(path, bootstrap_samples=20000):
             "The deflate corpus size excludes codec scratch space and internal library allocations.")
     if whole_rows is not None:
         result["whole_cell"] = summarize_whole_cells(whole_rows, repeats, bootstrap_samples)
+        result["whole_cell"]["complete_policy_scope"] = complete_policy_scope
+        if complete_policy_scope:
+            result["whole_cell"]["scope"] += (
+                " Mode zero and bounded prefix-controller drain follow checks/reap/free inside timing; "
+                "observer output and the next cell begin in mode zero. Startup reset/drain is outside cells.")
+            result["interpretation_limits"].append(
+                "SCOPE certifies reported prefix-controller bits only; old status does not expose all UCE response occupancy.")
+        elif policy in ("futex-early", "futex-early-both"):
+            result["interpretation_limits"].append(
+                "Legacy mode-14 WHOLE timing leaves policy armed during observer printing and the next cell's initial setup. "
+                "Those whole-cell values cannot support a causal policy comparison; steady functional data remain separately scoped.")
     if has_resources:
         result["config"]["resource_stats"] = 1
         result["resources"] = {"rows": resource_rows, "scope": (
