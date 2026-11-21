@@ -1,0 +1,108 @@
+{
+  "state": "PASS-clean-response-delay-unit",
+  "scope": "Response-stream protocol/added-clock unit gate only; not DRAM/load-use or FPGA calibration.",
+  "counter_width": 12,
+  "fifo_els": 512,
+  "commands": [
+    {
+      "label": "version",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--version"
+      ],
+      "timeout_seconds": 10,
+      "returncode": 0,
+      "elapsed_seconds": 0.24726807605475187,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/version.log",
+        "bytes": 38,
+        "sha256": "1cc30eeb597ed964e07a8b00f497ed9595287a875ffa023ed8f79cadb3b8e866"
+      }
+    },
+    {
+      "label": "build",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "axi_response_delay_wrapper",
+        "-GCOUNTER_WIDTH=12",
+        "-GFIFO_ELS=512",
+        "-CFLAGS",
+        "-std=c++14",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/obj",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/axi_response_delay_wrapper.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/driver.cpp"
+      ],
+      "timeout_seconds": 300,
+      "returncode": 0,
+      "elapsed_seconds": 22.207910649944097,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/build.log",
+        "bytes": 4371,
+        "sha256": "4ba9112cc725338317e168db47199e83a8c41d5080ce8d56b9ada949cc99d2eb"
+      }
+    },
+    {
+      "label": "run",
+      "argv": [
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/obj/Vaxi_response_delay_wrapper"
+      ],
+      "timeout_seconds": 60,
+      "returncode": 0,
+      "elapsed_seconds": 0.13272906804922968,
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/run.log",
+        "bytes": 1350,
+        "sha256": "4ba162c87a0b488283760a69a490c7f4e2176fa77752a020061476b9f92bc3b6"
+      }
+    }
+  ],
+  "sources": {
+    "bp_axi_response_delay.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+      "bytes": 5373,
+      "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+    },
+    "bp_axi_response_delay_fifo.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+      "bytes": 5396,
+      "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+    },
+    "axi_response_delay_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/axi_response_delay_wrapper.sv",
+      "bytes": 2201,
+      "sha256": "929d036f5a0528e41debcc92389ff7ec3ef3145b5eebb6133277552e1cb81bd4"
+    },
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/driver.cpp",
+      "bytes": 13235,
+      "sha256": "4ceb30303c6a88c71b635fb3150940fda176b21de8a0c5c7ac9be1e6a1b047bb"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/run.py",
+      "bytes": 3791,
+      "sha256": "accc25471d3f3eb8586ffbf4343101b029a970301d9430ccc75e6c865c1dad6a"
+    }
+  },
+  "executable": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/obj/Vaxi_response_delay_wrapper",
+    "bytes": 401392,
+    "sha256": "b30d016c2de7f5ae910036809aa1e1e727405532b07114a78629ffd024a56fd7"
+  },
+  "fst": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/axi-response-delay.fst",
+    "bytes": 273873,
+    "sha256": "71cc368a42f1f013fd9d09a0a96b67b38b207341bea9e872fcedca2a6f5a7e2c"
+  }
+}

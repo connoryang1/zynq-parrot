@@ -1,0 +1,272 @@
+{
+  "state": "PASS-source-bound-response-stream-unit-gates; inference and integration pending",
+  "RTL": {
+    "bp_axi_response_delay.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+      "bytes": 5373,
+      "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+    },
+    "bp_axi_response_delay_fifo.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+      "bytes": 5396,
+      "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+    }
+  },
+  "unit_sources": {
+    "driver.cpp": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/driver.cpp",
+      "bytes": 13235,
+      "sha256": "4ceb30303c6a88c71b635fb3150940fda176b21de8a0c5c7ac9be1e6a1b047bb"
+    },
+    "axi_response_delay_wrapper.sv": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/axi_response_delay_wrapper.sv",
+      "bytes": 2201,
+      "sha256": "929d036f5a0528e41debcc92389ff7ec3ef3145b5eebb6133277552e1cb81bd4"
+    },
+    "run.py": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/run.py",
+      "bytes": 3791,
+      "sha256": "accc25471d3f3eb8586ffbf4343101b029a970301d9430ccc75e6c865c1dad6a"
+    }
+  },
+  "cases": [
+    {
+      "name": "default-final",
+      "manifest": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/default-final/manifest.json",
+        "bytes": 4349,
+        "sha256": "742b691c6782a0aadfe53eee9e53b0a7cc00c1c663917172e1d8168da658c350"
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/default-final/run.log",
+        "bytes": 1414,
+        "sha256": "5d003cf3d67d8ba7259ec129b9aaa2958197bd397d03612e41d04f1f37838867"
+      },
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/default-final/axi-response-delay.fst",
+        "bytes": 236867,
+        "sha256": "d204ce0df3bf531b2332456652f157a40acc014e9cafeb404c3bcf19bc73cc37"
+      },
+      "fifo_els": 512,
+      "counter_width": 32,
+      "fixed_shift_rows": [
+        {
+          "N": 1,
+          "first_added": 1,
+          "full_added": 1,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 4294967284,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 2,
+          "first_added": 2,
+          "full_added": 2,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 4294967285,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 8,
+          "first_added": 8,
+          "full_added": 8,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 4294967291,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 40,
+          "first_added": 40,
+          "full_added": 40,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 27,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 200,
+          "first_added": 200,
+          "full_added": 200,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 187,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 384,
+          "first_added": 384,
+          "full_added": 384,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 371,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 1,
+          "first_added": 1,
+          "full_added": 1,
+          "input_cycle32": 4294967283,
+          "output_cycle32": 4294967284,
+          "B_same_N": true,
+          "spacing": 1
+        }
+      ],
+      "counts": "AXI_DELAY_COUNTS R_in=2621 R_out=2618 R_reset_drop=3 B_in=2621 B_out=2618 B_reset_drop=3 peakR=512 peakB=512 queuedIDs=64"
+    },
+    {
+      "name": "short-wrap-final",
+      "manifest": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/manifest.json",
+        "bytes": 4371,
+        "sha256": "4055159b58d86c4f5f17c670d678f9093e4b00d0d647781bd28b9b213551c83a"
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/run.log",
+        "bytes": 1350,
+        "sha256": "4ba162c87a0b488283760a69a490c7f4e2176fa77752a020061476b9f92bc3b6"
+      },
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/short-wrap-final/axi-response-delay.fst",
+        "bytes": 273873,
+        "sha256": "71cc368a42f1f013fd9d09a0a96b67b38b207341bea9e872fcedca2a6f5a7e2c"
+      },
+      "fifo_els": 512,
+      "counter_width": 12,
+      "fixed_shift_rows": [
+        {
+          "N": 1,
+          "first_added": 1,
+          "full_added": 1,
+          "input_cycle32": 4083,
+          "output_cycle32": 4084,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 2,
+          "first_added": 2,
+          "full_added": 2,
+          "input_cycle32": 4083,
+          "output_cycle32": 4085,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 8,
+          "first_added": 8,
+          "full_added": 8,
+          "input_cycle32": 4083,
+          "output_cycle32": 4091,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 40,
+          "first_added": 40,
+          "full_added": 40,
+          "input_cycle32": 4083,
+          "output_cycle32": 27,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 200,
+          "first_added": 200,
+          "full_added": 200,
+          "input_cycle32": 4083,
+          "output_cycle32": 187,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 384,
+          "first_added": 384,
+          "full_added": 384,
+          "input_cycle32": 4083,
+          "output_cycle32": 371,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 1,
+          "first_added": 1,
+          "full_added": 1,
+          "input_cycle32": 4083,
+          "output_cycle32": 4084,
+          "B_same_N": true,
+          "spacing": 1
+        }
+      ],
+      "counts": "AXI_DELAY_COUNTS R_in=2621 R_out=2618 R_reset_drop=3 B_in=2621 B_out=2618 B_reset_drop=3 peakR=512 peakB=512 queuedIDs=64"
+    },
+    {
+      "name": "nonpower-final",
+      "manifest": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/nonpower-final/manifest.json",
+        "bytes": 4352,
+        "sha256": "872c0a371a6dc30978abbf864cc4e2e45816f5f4993152d4e1f87f294caed4cf"
+      },
+      "log": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/nonpower-final/run.log",
+        "bytes": 873,
+        "sha256": "b7b36eb66cee82da474b0b13c17aa4c47006bc4f64b7acc31fa8b4dea5524406"
+      },
+      "fst": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/nonpower-final/axi-response-delay.fst",
+        "bytes": 211815,
+        "sha256": "7a16a89f07cbb63ab0a13dac640a569564c03ff9135662fdb6847d62e6a31887"
+      },
+      "fifo_els": 7,
+      "counter_width": 12,
+      "fixed_shift_rows": [
+        {
+          "N": 1,
+          "first_added": 1,
+          "full_added": 1,
+          "input_cycle32": 4083,
+          "output_cycle32": 4084,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 2,
+          "first_added": 2,
+          "full_added": 2,
+          "input_cycle32": 4083,
+          "output_cycle32": 4085,
+          "B_same_N": true,
+          "spacing": 1
+        },
+        {
+          "N": 1,
+          "first_added": 1,
+          "full_added": 1,
+          "input_cycle32": 4083,
+          "output_cycle32": 4084,
+          "B_same_N": true,
+          "spacing": 1
+        }
+      ],
+      "counts": "AXI_DELAY_COUNTS R_in=2084 R_out=2081 R_reset_drop=3 B_in=2084 B_out=2081 B_reset_drop=3 peakR=7 peakB=7 queuedIDs=7"
+    }
+  ],
+  "native_zero": "Combinational input/output valid,payload,ready identity; no FIFO accepts at N0.",
+  "response_delay_scope": "Minimum age from accepted R/B input beat in shim clock domain; not AR-first response, load-ready, memory-only latency or CPU stall attribution.",
+  "inference": {
+    "state": "NOT_EXECUTED_root_blocked",
+    "script": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/inference.tcl",
+      "bytes": 2030,
+      "sha256": "eb3bcb076844c3ccab4206ed1416dfcd88d83f0fa2d3166e98361d462876de51"
+    },
+    "no_BRAM_resource_or_routed_timing_claim": true
+  },
+  "preserved_rejected": {
+    "single_file_helper_filename_warning": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/first-lint.json",
+    "nonpower_tautological_assertion_lint": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/axi-response-delay/evidence/nonpower-01/manifest.json"
+  },
+  "no_fulltop_or_board_execution": true
+}
