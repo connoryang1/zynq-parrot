@@ -1,0 +1,7 @@
+This records the first full-device attempt at 1,792 retained 64-byte lines per instruction and data side, with unchanged ordinary cache geometry and clocks. It preserves both prelaunch decisions and the initial dependency failure so they cannot be mistaken for FPGA fit or application evidence.
+
+The first job, `20261121T181700Z-482a73b03`, failed before Vivado because the pinned nested `riscv-dbg` dependency was absent from the seed. The exact gitlink was materialized and verified without tracked source changes; the fresh job `20261121T182039Z-482a73b03` is running at the archived poll, with all six actual synthesis defines and critical source identities verified. The failed worker remains intact.
+
+The candidate retains 224 KiB combined full-line payload at 20 MHz, with 32 KiB ordinary L1I/L1D and 16 KiB L2. Component and full-core correctness precede this attempt; whole-device resources, route timing, physical capacity, larger-boundary fit and complete application costs remain open. The board reservation is released, and this build performs no board actions.
+
+Generic readiness missed the nested dependency; future launches must explicitly verify its initialized `.git`, repository root and recorded commit. A root inspection also guessed `status.txt` instead of the maintained `status` path; file discovery corrected the read, with no target effect.
