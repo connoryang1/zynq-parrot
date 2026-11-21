@@ -164,6 +164,7 @@ def analyze_admitted(audit_path):
     return dict(
         state='four-workload admitted analysis; no automatic optimization claim',
         audit=audit_record, admission=accepted['admission'], acquisition=accepted['acquisition'],
+        board_helper_protocol=accepted['board_helper_protocol'],
         analysis_source=artifact(Path(__file__)), analysis_limits_addendum=artifact(ADDENDUM),
         bootstrap_samples=BOOTSTRAP_SAMPLES, image_pair='embedded46',
         workload_order=list(WORKLOADS), workloads=workloads,
@@ -172,6 +173,7 @@ def analyze_admitted(audit_path):
             'The primary remains B-minus-A difference in paired off-on WHOLE benefit. Absolute cost contrasts use the opposite favorable sign: negative favors B.',
             'Repeated crossover can retain completed instruction lines into reporting/next initial setup; this is not isolated cold-cell or pure prefetch-versus-capacity evidence.',
             'Scope v1 drains reported prefix-controller bits only, not all UCE/memory responses.',
+            'A reviewed low-level board-helper durability change occurs only after program termination; its old/new versions and visit transition are explicit in the audited protocol, outside the frozen eight and timed guest execution.',
             '388 known parent early-wake opportunities saturate the eight-bit trigger counter at 255 in each valid run. Saturated counters cannot quantify removed late-selection triggers or locate admissions by phase.',
             'Positive paired benefit does not support an optimization claim if absolute enabled costs regress or remain uncertain, or carryover/drift remains unresolved.',
             'Two boots per image/workload provide limited between-boot evidence. All raw WHOLE cells, paired order and resource diagnostics remain required context.',

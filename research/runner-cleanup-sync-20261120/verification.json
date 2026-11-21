@@ -1,0 +1,37 @@
+{
+  "state": "host-verified; coordinator owns installation and physical retry",
+  "source_sha256": {
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/test_board_runner_cleanup.py": "79af0089fd6012f2dfeac5ddf5b043535d10d23dbcd97b2c8d3102f54d21f0b9",
+    "linux-tests/audit_admitted_matrix.py": "33f6090f6bc022b4157f5bec53597162f5dd24ad5adffdc0e57f6868324d7777",
+    "linux-tests/analyze_admitted_matrix.py": "e2cf914121410f81a980db492213fd1b7d2a1bcf73073481dc153be23878cd2a",
+    "linux-tests/test_audit_admitted_matrix.py": "58bc1b89349c28b29122f6a3f39a53a3edbe6f731e78e309ffcbcb8d73f60d3b"
+  },
+  "protocol_sha256": "8325114ac9affefdfa6fe24811edcfa8b1feb7d7888d554ba5b29135dded833f",
+  "old_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+  "new_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+  "tests": {
+    "command": "python3 -m unittest test_board_runner_cleanup test_audit_admitted_matrix test_analyze_admitted_matrix",
+    "count": 36,
+    "seconds": 5.97,
+    "result": "OK"
+  },
+  "bash_syntax": "PASS",
+  "py_compile": "PASS",
+  "git_diff_check": "PASS",
+  "frozen_eight_current_bytes_verified_unchanged": true,
+  "admission501d_changed": false,
+  "primary_estimators_changed": false,
+  "primary_effect_logs_opened": false,
+  "board_actions_by_implementation_agent": false,
+  "persistence_cause_proved": false,
+  "installation_metadata_gate": {
+    "state": "PASS",
+    "installation": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/runner-cleanup-sync-installation.json",
+      "bytes": 1063,
+      "sha256": "2d205f72250350683603f9518b613fa46f227d54d722cc56834f9451bc79b13c"
+    },
+    "guest_logs_opened": false
+  }
+}

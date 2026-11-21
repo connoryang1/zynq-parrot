@@ -77,10 +77,22 @@ class MatrixAdmissionTests(unittest.TestCase):
                             legacy_no_terminal_handshake=False, legacy_four_arg_cli=False, runtime_ms=3600000)
                 session['plan'].append(cell)
                 self.guest_fixture(log, cell, scheduled['label'])
+                if i >= 3:
+                    log.write_text(log.read_text() + 'BOARD_RUNNER_SOURCE_SHA256=' + module.HELPER_NEW_SHA + '\n')
             path = directory / 'session.json'
             self.write(path, session)
             self.sessions.append(path)
             self.acquisition['visits'].append(dict(label=scheduled['label'], session_manifest=str(path)))
+        self.write(self.acquisition_path, self.acquisition)
+        installation = self.root / 'helper-installation.json'
+        self.write(installation, dict(verified_utc='2026-11-20T01:02:45+00:00',
+                                     before_sha256=module.HELPER_OLD_SHA, after_sha256=module.HELPER_NEW_SHA,
+                                     active_programs=[], reservation=module.LOCK, atomic_replace=True,
+                                     remote_helper_path=module.REMOTE_HELPER))
+        self.acquisition['board_helper_protocol'] = dict(
+            review_sha256=module.HELPER_REVIEW_SHA, installation=module.artifact(installation),
+            visit_versions={visit['label']: module.HELPER_OLD_SHA if i<3 else module.HELPER_NEW_SHA
+                            for i,visit in enumerate(self.admission['reservation_plan'])})
         self.write(self.acquisition_path, self.acquisition)
         self.addCleanup(mock.patch.stopall)
         mock.patch.object(module, 'ADMISSION', self.admission_path).start()
@@ -159,6 +171,8 @@ class MatrixAdmissionTests(unittest.TestCase):
         self.assertNotIn('primary_whole_cell_control_minus_baseline', result)
         self.assertIn('not all UCE', result['limitations'][0])
         self.assertEqual(result['acquisition']['sha256'], module.sha(self.acquisition_path))
+        self.assertEqual(result['sessions'][2]['board_helper_sha256'], module.HELPER_OLD_SHA)
+        self.assertEqual(result['sessions'][3]['board_helper_sha256'], module.HELPER_NEW_SHA)
         self.image_gate.assert_called_once_with('embedded46')
 
     def test_incomplete_or_noncomplete_sessions_fail_before_guest_logs_are_parsed(self):
@@ -230,6 +244,61 @@ class MatrixAdmissionTests(unittest.TestCase):
         target = self.sessions[0].parent / 'host-sources' / next(iter(self.sources))
         target.write_bytes(b'different source with unchanged manifest hash')
         with self.assertRaisesRegex(ValueError, 'snapshot bytes'):
+            self.audit()
+
+    def test_helper_transition_requires_explicit_review_and_exact_visit_versions(self):
+        original = self.acquisition_path.read_text()
+        for change in (
+                lambda a: a.pop('board_helper_protocol'),
+                lambda a: a['board_helper_protocol'].update(review_sha256='0' * 64),
+                lambda a: a['board_helper_protocol']['visit_versions'].update({'B1-first': module.HELPER_NEW_SHA}),
+                lambda a: a['board_helper_protocol']['visit_versions'].update({'B1-second': module.HELPER_OLD_SHA})):
+            data = json.loads(original)
+            change(data)
+            self.write(self.acquisition_path, data)
+            with self.assertRaisesRegex(ValueError, 'board helper'):
+                self.audit()
+            self.acquisition_path.write_text(original)
+
+    def test_helper_installation_binding_identity_and_boundary_are_checked(self):
+        original = self.acquisition_path.read_text()
+        record = json.loads(original)['board_helper_protocol']['installation']
+        path = Path(record['path'])
+        installation = json.loads(path.read_text())
+        for changes, error in ((dict(after_sha256=module.HELPER_OLD_SHA), 'identity/reservation'),
+                               (dict(active_programs=[123]), 'identity/reservation'),
+                               (dict(atomic_replace=False), 'identity/reservation'),
+                               (dict(remote_helper_path='/tmp/other'), 'identity/reservation'),
+                               (dict(verified_utc='2026-11-20T01:00:00+00:00'), 'transition'),
+                               (dict(verified_utc='2026-11-20T01:04:00+00:00'), 'transition')):
+            data = dict(installation, **changes)
+            self.write(path, data)
+            acquisition = json.loads(original)
+            acquisition['board_helper_protocol']['installation'] = module.artifact(path)
+            self.write(self.acquisition_path, acquisition)
+            with self.assertRaisesRegex(ValueError, error):
+                self.audit()
+        self.write(path, installation)
+        self.acquisition_path.write_text(original)
+        path.write_text(path.read_text() + ' ')
+        with self.assertRaisesRegex(ValueError, 'installation binding'):
+            self.audit()
+
+    def test_new_phase_requires_actual_source_marker_after_all_terminals(self):
+        log = self.first_log(3)
+        original = log.read_text()
+        marker = 'BOARD_RUNNER_SOURCE_SHA256=' + module.HELPER_NEW_SHA + '\n'
+        for changed in (original.replace(marker, ''), original + marker,
+                        original + 'BOARD_RUNNER_SOURCE_SHA256=malformed\n',
+                        original.replace(module.HELPER_NEW_SHA, module.HELPER_OLD_SHA),
+                        marker + original.replace(marker, '')):
+            log.write_text(changed)
+            with self.assertRaisesRegex(ValueError, 'helper.*marker'):
+                self.audit()
+        log.write_text(original)
+        legacy = self.first_log(0)
+        legacy.write_text(legacy.read_text() + marker)
+        with self.assertRaisesRegex(ValueError, 'legacy board helper'):
             self.audit()
 
     def test_all_wrapper_parameters_identities_and_delivery_are_fixed(self):

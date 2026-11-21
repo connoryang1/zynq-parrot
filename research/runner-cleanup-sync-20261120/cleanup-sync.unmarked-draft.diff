@@ -1,0 +1,14 @@
+--- original
++++ cleanup-sync
+@@ -84,6 +84,11 @@
+   printf 'RUNNER_EXIT=%s\n' "$rc" > "$status"
+   rm -f "$lock/owner"
+   rmdir "$lock" 2>/dev/null || true
++  if ! sync; then
++    echo "RUNNER_CLEANUP_SYNC_FAILED" >&2
++    if [[ "$rc" -eq 0 ]]; then rc=74; fi
++  fi
++  exit "$rc"
+ }
+ trap cleanup EXIT
+ 

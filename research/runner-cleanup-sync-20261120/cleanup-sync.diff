@@ -1,0 +1,16 @@
+--- original
++++ cleanup-sync
+@@ -84,6 +84,13 @@
+   printf 'RUNNER_EXIT=%s\n' "$rc" > "$status"
+   rm -f "$lock/owner"
+   rmdir "$lock" 2>/dev/null || true
++  if ! sync; then
++    echo "RUNNER_CLEANUP_SYNC_FAILED" >&2
++    if [[ "$rc" -eq 0 ]]; then rc=74; fi
++  fi
++  source_sha=$(sha256sum "$0" | awk '{print $1}')
++  printf 'BOARD_RUNNER_SOURCE_SHA256=%s\n' "$source_sha"
++  exit "$rc"
+ }
+ trap cleanup EXIT
+ 
