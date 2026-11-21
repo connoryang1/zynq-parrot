@@ -1,0 +1,12 @@
+This directory applies the unchanged descriptive D-service interval analyzer to the CLOSED, fully audited 32KiB/200-tick control. It extends the separately frozen closed40 analysis; the top-level preparation README describes the earlier pre-200 state. Both cases are now closed. No target execution is performed by this analysis.
+
+The tool pairs all 6,508 accepted misses with eight unique accepted fill beats and full-line completion: 52,064 beats, 6,508 completions. Core-global cycle offsets remain D=1241 and BE=1242. All upstream counts, addresses, actor byte bounds and phase counts pass. First response here means **first accepted D-cache fill beat**, not first AXI response, requested critical word or load-ready time. For example, the first store miss requests word6 at `0x8008bff0`, while its first mask16 denotes word4.
+
+For all program misses, median miss-to-first-beat/completion is 221/229 cycles (ranges 9–440 and 16–448). The 1,711 misses accepted in the timed ring have medians 221/229 (ranges 9–397 and 16–405). Their pending unions clipped to `[2451948,3157393)` are 378,046/390,958 cycles. The 1,680 timed target misses have unions 373,731/386,400. Maximum pending depth is one; overlap and carry-in/out are zero. These are accepted-service occupancy measurements, not CPU stall/critical-path fractions or saved cycles. Queue/UCE/L2/transport, shared I-side interference and memory-only latency are not attributed separately. No FPGA projection is made.
+
+```sh
+python3 -B research/resume-data-service-intervals-20261120/analyze.py --events research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/dcache-audit/events.jsonl --guest research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/guest-observations.json --audit-report research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/dcache-audit/analysis.json --output NEW_OUTPUT_DIRECTORY
+python3 -B -m unittest discover -s research/resume-data-service-intervals-20261120 -p test_analyze.py -v
+```
+
+The 13 synthetic tests pass. `manifest.json` binds analyzer and input hashes; `misses.jsonl` retains every pairing and all beat timestamps; `summary.json` retains complete distributions and clipped unions. Local analyzer/test copies have byte-identical hashes to their frozen source. The full40-versus200 comparison and its limits are retained in `../../resume-data-reuse-latency200-20261120/closed-comparison/`.

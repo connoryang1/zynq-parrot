@@ -1,0 +1,1131 @@
+{
+  "state": "closed-complete-fixed-footprint-latency-comparison",
+  "scope": "Controlled synthetic first-response sensitivity only; not FPGA projection or exclusive causal-stall partition.",
+  "fixed_input_identities": {
+    "elf": true,
+    "mem": true,
+    "nbf": true,
+    "symbol_file": true,
+    "disassembly": true,
+    "runtime_nbf": true,
+    "source_hashes": true,
+    "corpus_checksums_bases_bytes_runs": true,
+    "static_peer_stacks": true,
+    "request_metadata": true
+  },
+  "complete_ring_cycles": {
+    "40": 431132,
+    "200": 705445,
+    "delta": 274313
+  },
+  "native_guard_seconds": {
+    "40": 1800,
+    "200": 2400
+  },
+  "timed_reference_semantic_sequence_identical": true,
+  "full_program_statistics": {
+    "accepted_cached_loads": {
+      "40": 28089,
+      "200": 28091,
+      "delta": 2
+    },
+    "accepted_cached_references": {
+      "40": 61885,
+      "200": 61887,
+      "delta": 2
+    },
+    "accepted_cached_stores": {
+      "40": 33796,
+      "200": 33796,
+      "delta": 0
+    },
+    "actual_replacement_evictions": {
+      "40": 5996,
+      "200": 5996,
+      "delta": 0
+    },
+    "matched_complete_normal_refills": {
+      "40": 6508,
+      "200": 6508,
+      "delta": 0
+    },
+    "matched_normal_fill_beats": {
+      "40": 52064,
+      "200": 52064,
+      "delta": 0
+    },
+    "matched_normal_tag_publications": {
+      "40": 6508,
+      "200": 6508,
+      "delta": 0
+    },
+    "normal_l1_hits": {
+      "40": 55377,
+      "200": 55379,
+      "delta": 2
+    },
+    "observed_initialization_slots": {
+      "40": 512,
+      "200": 512,
+      "delta": 0
+    },
+    "ordinary_misses": {
+      "40": 6508,
+      "200": 6508,
+      "delta": 0
+    },
+    "other_context_target_region_accesses": {
+      "40": 23256,
+      "200": 23256,
+      "delta": 0
+    },
+    "unaccepted_tv_attempts": {
+      "40": 2452,
+      "200": 2453,
+      "delta": 1
+    },
+    "validated_tag_read_rows": {
+      "40": 70757,
+      "200": 70920,
+      "delta": 163
+    }
+  },
+  "timed_reference_counts": {
+    "40": {
+      "miss": 1711,
+      "store": 321,
+      "l1_hit": 4292,
+      "load": 5682,
+      "target_miss": 1680,
+      "target_l1_hit": 3586
+    },
+    "200": {
+      "miss": 1711,
+      "store": 321,
+      "l1_hit": 4292,
+      "load": 5682,
+      "target_miss": 1680,
+      "target_l1_hit": 3586
+    }
+  },
+  "conditional_victim_curves": [
+    {
+      "extra_victim_lines": 0,
+      "full_conditional_counters_identical": true,
+      "40": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "unique_covered_lines": 0,
+        "warm_target_unique_lines_covered": 0,
+        "timed_target_unique_lines_covered": 0,
+        "peak_entries": 0,
+        "final_entries": 0
+      },
+      "200": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "unique_covered_lines": 0,
+        "warm_target_unique_lines_covered": 0,
+        "timed_target_unique_lines_covered": 0,
+        "peak_entries": 0,
+        "final_entries": 0
+      }
+    },
+    {
+      "extra_victim_lines": 4,
+      "full_conditional_counters_identical": true,
+      "40": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 6,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 5,
+        "insertions": 5996,
+        "replacements": 5960,
+        "covered_ordinary_misses": 32,
+        "actual_refill_removals": 30,
+        "store_invalidations": 2,
+        "unique_covered_lines": 31,
+        "warm_target_unique_lines_covered": 6,
+        "timed_target_unique_lines_covered": 5,
+        "peak_entries": 4,
+        "final_entries": 4
+      },
+      "200": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 6,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 5,
+        "insertions": 5996,
+        "replacements": 5960,
+        "covered_ordinary_misses": 32,
+        "actual_refill_removals": 30,
+        "store_invalidations": 2,
+        "unique_covered_lines": 31,
+        "warm_target_unique_lines_covered": 6,
+        "timed_target_unique_lines_covered": 5,
+        "peak_entries": 4,
+        "final_entries": 4
+      }
+    },
+    {
+      "extra_victim_lines": 16,
+      "full_conditional_counters_identical": true,
+      "40": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 24,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 20,
+        "insertions": 5996,
+        "replacements": 5845,
+        "covered_ordinary_misses": 135,
+        "actual_refill_removals": 126,
+        "store_invalidations": 9,
+        "unique_covered_lines": 125,
+        "warm_target_unique_lines_covered": 23,
+        "timed_target_unique_lines_covered": 20,
+        "peak_entries": 16,
+        "final_entries": 16
+      },
+      "200": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 24,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 20,
+        "insertions": 5996,
+        "replacements": 5845,
+        "covered_ordinary_misses": 135,
+        "actual_refill_removals": 126,
+        "store_invalidations": 9,
+        "unique_covered_lines": 125,
+        "warm_target_unique_lines_covered": 23,
+        "timed_target_unique_lines_covered": 20,
+        "peak_entries": 16,
+        "final_entries": 16
+      }
+    },
+    {
+      "extra_victim_lines": 32,
+      "full_conditional_counters_identical": true,
+      "40": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 53,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 39,
+        "insertions": 5996,
+        "replacements": 5695,
+        "covered_ordinary_misses": 269,
+        "actual_refill_removals": 254,
+        "store_invalidations": 15,
+        "unique_covered_lines": 244,
+        "warm_target_unique_lines_covered": 52,
+        "timed_target_unique_lines_covered": 39,
+        "peak_entries": 32,
+        "final_entries": 32
+      },
+      "200": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 53,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 39,
+        "insertions": 5996,
+        "replacements": 5695,
+        "covered_ordinary_misses": 269,
+        "actual_refill_removals": 254,
+        "store_invalidations": 15,
+        "unique_covered_lines": 244,
+        "warm_target_unique_lines_covered": 52,
+        "timed_target_unique_lines_covered": 39,
+        "peak_entries": 32,
+        "final_entries": 32
+      }
+    },
+    {
+      "extra_victim_lines": 64,
+      "full_conditional_counters_identical": true,
+      "40": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 98,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 99,
+        "insertions": 5996,
+        "replacements": 5406,
+        "covered_ordinary_misses": 526,
+        "actual_refill_removals": 496,
+        "store_invalidations": 30,
+        "unique_covered_lines": 457,
+        "warm_target_unique_lines_covered": 94,
+        "timed_target_unique_lines_covered": 95,
+        "peak_entries": 64,
+        "final_entries": 64
+      },
+      "200": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 98,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 99,
+        "insertions": 5996,
+        "replacements": 5406,
+        "covered_ordinary_misses": 526,
+        "actual_refill_removals": 496,
+        "store_invalidations": 30,
+        "unique_covered_lines": 457,
+        "warm_target_unique_lines_covered": 94,
+        "timed_target_unique_lines_covered": 95,
+        "peak_entries": 64,
+        "final_entries": 64
+      }
+    },
+    {
+      "extra_victim_lines": 128,
+      "full_conditional_counters_identical": true,
+      "40": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 192,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 207,
+        "insertions": 5996,
+        "replacements": 4961,
+        "covered_ordinary_misses": 907,
+        "actual_refill_removals": 867,
+        "store_invalidations": 40,
+        "unique_covered_lines": 699,
+        "warm_target_unique_lines_covered": 177,
+        "timed_target_unique_lines_covered": 188,
+        "peak_entries": 128,
+        "final_entries": 128
+      },
+      "200": {
+        "warm_target_loads": 5320,
+        "warm_target_ordinary_misses": 1720,
+        "warm_target_misses_covered": 192,
+        "timed_target_loads": 5266,
+        "timed_target_ordinary_misses": 1680,
+        "timed_target_misses_covered": 207,
+        "insertions": 5996,
+        "replacements": 4961,
+        "covered_ordinary_misses": 907,
+        "actual_refill_removals": 867,
+        "store_invalidations": 40,
+        "unique_covered_lines": 699,
+        "warm_target_unique_lines_covered": 177,
+        "timed_target_unique_lines_covered": 188,
+        "peak_entries": 128,
+        "final_entries": 128
+      }
+    }
+  ],
+  "accepted_miss_semantic_sequence_identical": true,
+  "paired_service_deltas": {
+    "all": {
+      "pairs": 6508,
+      "first_accepted_beat_delta": {
+        "count": 6508,
+        "min": 0,
+        "median": 160.0,
+        "p90": 320,
+        "p99": 320,
+        "max": 320,
+        "mean": 210.43623232944068
+      },
+      "complete_delta": {
+        "count": 6508,
+        "min": 0,
+        "median": 160.0,
+        "p90": 320,
+        "p99": 320,
+        "max": 320,
+        "mean": 210.43623232944068
+      },
+      "delta_histogram": {
+        "0": 126,
+        "19": 4,
+        "20": 1,
+        "21": 3,
+        "27": 1,
+        "33": 1,
+        "34": 1,
+        "35": 3,
+        "49": 1,
+        "54": 1,
+        "75": 1,
+        "83": 1,
+        "85": 3,
+        "86": 2,
+        "87": 1,
+        "88": 2,
+        "89": 3,
+        "100": 1,
+        "101": 1,
+        "102": 1,
+        "105": 1,
+        "152": 1,
+        "153": 4,
+        "154": 2,
+        "155": 9,
+        "156": 6,
+        "160": 3890,
+        "161": 3,
+        "163": 2,
+        "164": 2,
+        "165": 3,
+        "166": 3,
+        "167": 1,
+        "169": 5,
+        "170": 2,
+        "179": 1,
+        "180": 5,
+        "181": 10,
+        "182": 6,
+        "183": 10,
+        "184": 2,
+        "185": 1,
+        "187": 1,
+        "189": 1,
+        "193": 1,
+        "195": 3,
+        "196": 2,
+        "197": 17,
+        "198": 1,
+        "199": 1,
+        "201": 1,
+        "202": 1,
+        "203": 1,
+        "204": 1,
+        "205": 1,
+        "206": 4,
+        "207": 1,
+        "208": 2,
+        "209": 3,
+        "210": 2,
+        "211": 10,
+        "212": 5,
+        "213": 7,
+        "214": 1,
+        "215": 6,
+        "216": 14,
+        "217": 7,
+        "219": 1,
+        "220": 3,
+        "221": 1,
+        "226": 1,
+        "228": 1,
+        "234": 2,
+        "236": 1,
+        "237": 1,
+        "238": 2,
+        "245": 1,
+        "247": 9,
+        "248": 5,
+        "249": 18,
+        "250": 7,
+        "251": 6,
+        "255": 2,
+        "256": 2,
+        "257": 1,
+        "258": 1,
+        "259": 5,
+        "260": 10,
+        "261": 13,
+        "262": 19,
+        "263": 17,
+        "264": 8,
+        "265": 29,
+        "266": 57,
+        "267": 38,
+        "268": 34,
+        "269": 22,
+        "276": 1,
+        "283": 4,
+        "287": 7,
+        "291": 2,
+        "295": 1,
+        "307": 1,
+        "314": 1,
+        "315": 21,
+        "316": 23,
+        "317": 25,
+        "318": 26,
+        "320": 1858
+      }
+    },
+    "timed": {
+      "pairs": 1711,
+      "first_accepted_beat_delta": {
+        "count": 1711,
+        "min": 0,
+        "median": 160,
+        "p90": 160,
+        "p99": 251,
+        "max": 320,
+        "mean": 160.28462887200467
+      },
+      "complete_delta": {
+        "count": 1711,
+        "min": 0,
+        "median": 160,
+        "p90": 160,
+        "p99": 251,
+        "max": 320,
+        "mean": 160.28462887200467
+      },
+      "delta_histogram": {
+        "0": 12,
+        "160": 1675,
+        "206": 1,
+        "211": 1,
+        "213": 1,
+        "216": 2,
+        "217": 1,
+        "251": 1,
+        "260": 2,
+        "263": 1,
+        "265": 1,
+        "266": 4,
+        "267": 2,
+        "268": 1,
+        "269": 1,
+        "287": 2,
+        "320": 3
+      }
+    },
+    "target_timed": {
+      "pairs": 1680,
+      "first_accepted_beat_delta": {
+        "count": 1680,
+        "min": 160,
+        "median": 160.0,
+        "p90": 160,
+        "p99": 260,
+        "max": 320,
+        "mean": 161.4327380952381
+      },
+      "complete_delta": {
+        "count": 1680,
+        "min": 160,
+        "median": 160.0,
+        "p90": 160,
+        "p99": 260,
+        "max": 320,
+        "mean": 161.4327380952381
+      },
+      "delta_histogram": {
+        "160": 1656,
+        "206": 1,
+        "211": 1,
+        "213": 1,
+        "216": 2,
+        "217": 1,
+        "251": 1,
+        "260": 2,
+        "263": 1,
+        "265": 1,
+        "266": 4,
+        "267": 2,
+        "268": 1,
+        "269": 1,
+        "287": 2,
+        "320": 3
+      }
+    },
+    "same_way_and_rotated_mask_sequence": true,
+    "changed_relative_beat_schedules": 0
+  },
+  "service_intervals": {
+    "40": {
+      "scope": "Descriptive accepted D-cache service intervals only; not CPU stalls, critical path, or speedup.",
+      "first_response_definition": "First accepted D-cache fill_beat; not necessarily critical data or first AXI response.",
+      "interval_definition": "Half-open [accepted miss, accepted full-line completion), measured in physical core-global cycles.",
+      "attribution_limits": [
+        "Includes unseparated queue/UCE/hierarchy/transport/service timing.",
+        "Cannot attribute intervals to I-side interference, memory-only latency, or CPU blocked time.",
+        "No rescheduled execution or FPGA projection."
+      ],
+      "domain_edge_minus_global_offsets": {
+        "dcache": 1241,
+        "be": 1242
+      },
+      "source_event_counts": {
+        "reference": 61885,
+        "store": 33796,
+        "miss": 6508,
+        "misses": 6508,
+        "fill_beat": 52064,
+        "fill_complete": 6508,
+        "l1_hit": 55377,
+        "load": 28089,
+        "eviction": 5996,
+        "begin": 64,
+        "end": 64
+      },
+      "all_program": {
+        "misses": 6508,
+        "miss_to_first_accepted_beat_cycles": {
+          "count": 6508,
+          "min": 9,
+          "median": 61.0,
+          "p90": 104,
+          "p99": 104,
+          "max": 120,
+          "mean": 71.7140442532268
+        },
+        "miss_to_complete_cycles": {
+          "count": 6508,
+          "min": 16,
+          "median": 69.0,
+          "p90": 111,
+          "p99": 111,
+          "max": 128,
+          "mean": 78.99661954517516
+        },
+        "pending_to_first_beat": {
+          "half_open": true,
+          "intervals_with_positive_duration": 6508,
+          "sum_individual_pending_cycles": 466715,
+          "union_pending_cycles": 466715,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "pending_to_complete": {
+          "half_open": true,
+          "intervals_with_positive_duration": 6508,
+          "sum_individual_pending_cycles": 514110,
+          "union_pending_cycles": 514110,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        }
+      },
+      "timed_ring": {
+        "bounds": [
+          1274357,
+          1705489
+        ],
+        "complete_ring_cycles": 431132,
+        "misses_accepted_in_window": {
+          "misses": 1711,
+          "miss_to_first_accepted_beat_cycles": {
+            "count": 1711,
+            "min": 9,
+            "median": 61,
+            "p90": 61,
+            "p99": 61,
+            "max": 77,
+            "mean": 60.66569257744009
+          },
+          "miss_to_complete_cycles": {
+            "count": 1711,
+            "min": 16,
+            "median": 69,
+            "p90": 69,
+            "p99": 69,
+            "max": 85,
+            "mean": 68.21215663354764
+          },
+          "pending_to_first_beat": {
+            "half_open": true,
+            "intervals_with_positive_duration": 1711,
+            "sum_individual_pending_cycles": 103799,
+            "union_pending_cycles": 103799,
+            "cycles_with_at_least_two_pending": 0,
+            "multiplicity_excess_cycles": 0,
+            "max_pending": 1,
+            "carry_in_intervals": 0,
+            "carry_out_intervals": 0
+          },
+          "pending_to_complete": {
+            "half_open": true,
+            "intervals_with_positive_duration": 1711,
+            "sum_individual_pending_cycles": 116711,
+            "union_pending_cycles": 116711,
+            "cycles_with_at_least_two_pending": 0,
+            "multiplicity_excess_cycles": 0,
+            "max_pending": 1,
+            "carry_in_intervals": 0,
+            "carry_out_intervals": 0
+          }
+        },
+        "complete_intervals_intersecting_window": 1711,
+        "all_pending_to_first_beat_clipped": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1711,
+          "sum_individual_pending_cycles": 103799,
+          "union_pending_cycles": 103799,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "all_pending_to_complete_clipped": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1711,
+          "sum_individual_pending_cycles": 116711,
+          "union_pending_cycles": 116711,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        }
+      },
+      "target_timed": {
+        "misses": 1680,
+        "miss_to_first_accepted_beat_cycles": {
+          "count": 1680,
+          "min": 61,
+          "median": 61.0,
+          "p90": 61,
+          "p99": 61,
+          "max": 77,
+          "mean": 61.02619047619048
+        },
+        "miss_to_complete_cycles": {
+          "count": 1680,
+          "min": 68,
+          "median": 69.0,
+          "p90": 69,
+          "p99": 69,
+          "max": 85,
+          "mean": 68.5672619047619
+        },
+        "pending_to_first_beat": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1680,
+          "sum_individual_pending_cycles": 102524,
+          "union_pending_cycles": 102524,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "pending_to_complete": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1680,
+          "sum_individual_pending_cycles": 115193,
+          "union_pending_cycles": 115193,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "pending_to_complete_clipped": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1680,
+          "sum_individual_pending_cycles": 115193,
+          "union_pending_cycles": 115193,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        }
+      }
+    },
+    "200": {
+      "scope": "Descriptive accepted D-cache service intervals only; not CPU stalls, critical path, or speedup.",
+      "first_response_definition": "First accepted D-cache fill_beat; not necessarily critical data or first AXI response.",
+      "interval_definition": "Half-open [accepted miss, accepted full-line completion), measured in physical core-global cycles.",
+      "attribution_limits": [
+        "Includes unseparated queue/UCE/hierarchy/transport/service timing.",
+        "Cannot attribute intervals to I-side interference, memory-only latency, or CPU blocked time.",
+        "No rescheduled execution or FPGA projection."
+      ],
+      "domain_edge_minus_global_offsets": {
+        "dcache": 1241,
+        "be": 1242
+      },
+      "source_event_counts": {
+        "reference": 61887,
+        "store": 33796,
+        "miss": 6508,
+        "misses": 6508,
+        "fill_beat": 52064,
+        "fill_complete": 6508,
+        "l1_hit": 55379,
+        "load": 28091,
+        "eviction": 5996,
+        "begin": 64,
+        "end": 64
+      },
+      "all_program": {
+        "misses": 6508,
+        "miss_to_first_accepted_beat_cycles": {
+          "count": 6508,
+          "min": 9,
+          "median": 221.0,
+          "p90": 424,
+          "p99": 424,
+          "max": 440,
+          "mean": 282.15027658266746
+        },
+        "miss_to_complete_cycles": {
+          "count": 6508,
+          "min": 16,
+          "median": 229.0,
+          "p90": 431,
+          "p99": 431,
+          "max": 448,
+          "mean": 289.43285187461584
+        },
+        "pending_to_first_beat": {
+          "half_open": true,
+          "intervals_with_positive_duration": 6508,
+          "sum_individual_pending_cycles": 1836234,
+          "union_pending_cycles": 1836234,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "pending_to_complete": {
+          "half_open": true,
+          "intervals_with_positive_duration": 6508,
+          "sum_individual_pending_cycles": 1883629,
+          "union_pending_cycles": 1883629,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        }
+      },
+      "timed_ring": {
+        "bounds": [
+          2451948,
+          3157393
+        ],
+        "complete_ring_cycles": 705445,
+        "misses_accepted_in_window": {
+          "misses": 1711,
+          "miss_to_first_accepted_beat_cycles": {
+            "count": 1711,
+            "min": 9,
+            "median": 221,
+            "p90": 221,
+            "p99": 312,
+            "max": 397,
+            "mean": 220.95032144944477
+          },
+          "miss_to_complete_cycles": {
+            "count": 1711,
+            "min": 16,
+            "median": 229,
+            "p90": 229,
+            "p99": 320,
+            "max": 405,
+            "mean": 228.4967855055523
+          },
+          "pending_to_first_beat": {
+            "half_open": true,
+            "intervals_with_positive_duration": 1711,
+            "sum_individual_pending_cycles": 378046,
+            "union_pending_cycles": 378046,
+            "cycles_with_at_least_two_pending": 0,
+            "multiplicity_excess_cycles": 0,
+            "max_pending": 1,
+            "carry_in_intervals": 0,
+            "carry_out_intervals": 0
+          },
+          "pending_to_complete": {
+            "half_open": true,
+            "intervals_with_positive_duration": 1711,
+            "sum_individual_pending_cycles": 390958,
+            "union_pending_cycles": 390958,
+            "cycles_with_at_least_two_pending": 0,
+            "multiplicity_excess_cycles": 0,
+            "max_pending": 1,
+            "carry_in_intervals": 0,
+            "carry_out_intervals": 0
+          }
+        },
+        "complete_intervals_intersecting_window": 1711,
+        "all_pending_to_first_beat_clipped": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1711,
+          "sum_individual_pending_cycles": 378046,
+          "union_pending_cycles": 378046,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "all_pending_to_complete_clipped": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1711,
+          "sum_individual_pending_cycles": 390958,
+          "union_pending_cycles": 390958,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        }
+      },
+      "target_timed": {
+        "misses": 1680,
+        "miss_to_first_accepted_beat_cycles": {
+          "count": 1680,
+          "min": 221,
+          "median": 221.0,
+          "p90": 221,
+          "p99": 321,
+          "max": 397,
+          "mean": 222.45892857142857
+        },
+        "miss_to_complete_cycles": {
+          "count": 1680,
+          "min": 228,
+          "median": 229.0,
+          "p90": 229,
+          "p99": 328,
+          "max": 405,
+          "mean": 230.0
+        },
+        "pending_to_first_beat": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1680,
+          "sum_individual_pending_cycles": 373731,
+          "union_pending_cycles": 373731,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "pending_to_complete": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1680,
+          "sum_individual_pending_cycles": 386400,
+          "union_pending_cycles": 386400,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        },
+        "pending_to_complete_clipped": {
+          "half_open": true,
+          "intervals_with_positive_duration": 1680,
+          "sum_individual_pending_cycles": 386400,
+          "union_pending_cycles": 386400,
+          "cycles_with_at_least_two_pending": 0,
+          "multiplicity_excess_cycles": 0,
+          "max_pending": 1,
+          "carry_in_intervals": 0,
+          "carry_out_intervals": 0
+        }
+      }
+    }
+  },
+  "arithmetic_co_movement_not_partition": {
+    "timed_D_misses_40": 1711,
+    "configured_tick_delta": 160,
+    "miss_count_times_tick_delta": 273760,
+    "whole_ring_delta": 274313,
+    "whole_minus_nominal_product": 553,
+    "pending_union40": 116711,
+    "pending_union200": 390958,
+    "pending_union_delta": 274247,
+    "whole_delta_minus_pending_union_delta": 66,
+    "interpretation": "Numerical co-movement, not proof that pending occupancy is CPU stalls or that the residual exclusively belongs to I/queue/compute."
+  },
+  "full_reference_sequence_diagnostic": {
+    "40_is_200_subsequence_with_only_reported_insertions": false,
+    "ignores_physical_slot_and_timestamps": true,
+    "extra200_references": [],
+    "first_other_difference": {
+      "old_index": 59620,
+      "new_index": 59620,
+      "old": {
+        "event": "reference",
+        "domain": "dcache",
+        "cycle": 2011956,
+        "global_cycle": 2010715,
+        "address": "0x8008bf0f",
+        "line": "0x8008bf00",
+        "context": 0,
+        "thread": 0,
+        "operation": "load",
+        "outcome": "l1_hit",
+        "l1_resident": true,
+        "target": false,
+        "epoch": null,
+        "phase": null,
+        "victim_coverage": {
+          "0": false,
+          "4": false,
+          "16": false,
+          "32": false,
+          "64": false,
+          "128": false
+        }
+      },
+      "new": {
+        "event": "reference",
+        "domain": "dcache",
+        "cycle": 3470107,
+        "global_cycle": 3468866,
+        "address": "0x8008bef8",
+        "line": "0x8008bec0",
+        "context": 0,
+        "thread": 0,
+        "operation": "store",
+        "outcome": "l1_hit",
+        "l1_resident": true,
+        "target": false,
+        "epoch": null,
+        "phase": null,
+        "victim_coverage": {
+          "0": false,
+          "4": false,
+          "16": false,
+          "32": false,
+          "64": false,
+          "128": false
+        }
+      }
+    }
+  },
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/closed-comparison/compare.py",
+    "bytes": 11426,
+    "sha256": "26aa0b29630cd8bf2e641c62aafacda1744f17f9b7567cb8226c88ed43e1557e"
+  },
+  "service_analyzer_source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-service-intervals-20261120/analyze.py",
+    "bytes": 14381,
+    "sha256": "c72a1d25e163c5cc390f0518db4464bf903e339a39d77b8886187b65601717ca"
+  },
+  "service_tests_source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-service-intervals-20261120/test_analyze.py",
+    "bytes": 7529,
+    "sha256": "d7b89b8af841d39a01480beff5514f48e61e0429d3fac06938604ac87cbbd989"
+  },
+  "input_bindings": {
+    "40": {
+      "session.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/session.json",
+        "bytes": 8543,
+        "sha256": "ed7512587138883bc6044d30eeb3ce412d710a2d9111bf384f6bc992a929ec0e"
+      },
+      "guest-observations.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/guest-observations.json",
+        "bytes": 1307,
+        "sha256": "0338cd448472351ce3f03ecaf7b9b888fe6355b656d3e86e8ce7518a13413e14"
+      },
+      "trace-metadata.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/trace-metadata.json",
+        "bytes": 1299,
+        "sha256": "e88e3fcf940bf77e5ecc5cb945d89106f642e2218f3b6c1902d6b12bc0f5a519"
+      },
+      "dcache-audit/manifest.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/dcache-audit/manifest.json",
+        "bytes": 15736,
+        "sha256": "41949658aa0ccab468a73358ef05d1105102f2aef371ac9baf95a4a24f826b4a"
+      },
+      "dcache-audit/analysis.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/dcache-audit/analysis.json",
+        "bytes": 51024,
+        "sha256": "a75dda29c3da07277582f9a882f337fe07f01067a2fd4b5a083c43f64d87f973"
+      },
+      "dcache-audit/events.jsonl": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/compact-thirtytwo-kib/dcache-audit/events.jsonl",
+        "bytes": 27840842,
+        "sha256": "a6723caf7bce94d4e45840daa2c89d2ab4e36adedabd07b028946d561c88fa6e"
+      },
+      "model": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/scoped-mode0-validation/model/Vbsg_nonsynth_zynq_testbench",
+        "bytes": 15425248,
+        "sha256": "77f76ae7527c2e9ed796fad48a8344e2dbbc10a5d90a69ccfb829e0bc2754ad5"
+      },
+      "service_summary": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-service-intervals-20261120/closed40/summary.json",
+        "bytes": 5792,
+        "sha256": "7c3524005b8418d8052a95effa065646c010cfba5680ccfcb57e978945ab02be"
+      },
+      "service_manifest": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-service-intervals-20261120/closed40/manifest.json",
+        "bytes": 1752,
+        "sha256": "463cea790ee75944eaa66890d49ae46135dc4e8bc737a85aa77c4fcd62d0c258"
+      }
+    },
+    "200": {
+      "session.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/session.json",
+        "bytes": 10271,
+        "sha256": "017e004af2e182ce70a4a85d4649ef6711b176fddec83e63115569b826bc9e75"
+      },
+      "guest-observations.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/guest-observations.json",
+        "bytes": 1308,
+        "sha256": "9a401bfe04d85c29c6b541a0f7b798d805a61347a31fba687bee080ae227688a"
+      },
+      "trace-metadata.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/trace-metadata.json",
+        "bytes": 1299,
+        "sha256": "e88e3fcf940bf77e5ecc5cb945d89106f642e2218f3b6c1902d6b12bc0f5a519"
+      },
+      "dcache-audit/manifest.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/dcache-audit/manifest.json",
+        "bytes": 2587,
+        "sha256": "afe32ae73a134663b732d004365cc76eb38d758edbb5a960882a350bd5920f7a"
+      },
+      "dcache-audit/analysis.json": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/dcache-audit/analysis.json",
+        "bytes": 51070,
+        "sha256": "fbad5f7b84ef2b2b8c5a5085c5296ad06fc445cfa5f2e03edee6a37fdd92828b"
+      },
+      "dcache-audit/events.jsonl": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/compact-thirtytwo-kib/dcache-audit/events.jsonl",
+        "bytes": 27914715,
+        "sha256": "33abdb6e68397e59416756a37ed41d15b72325aa599fc4b19b92d424f286ad85"
+      },
+      "model": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/scoped-mode0-validation/model/Vbsg_nonsynth_zynq_testbench",
+        "bytes": 15425248,
+        "sha256": "e52fa2473b3e35f0c14ae13973ec8ebdd7f0cbf9414ac49dae5e379b42230c3f"
+      },
+      "service_summary": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-service-intervals-20261120/closed200/summary.json",
+        "bytes": 5810,
+        "sha256": "04e7e1d91393e28a34395e3542b70ad90784fb155247267f6b2c480ccf9fc9eb"
+      },
+      "service_manifest": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-service-intervals-20261120/closed200/manifest.json",
+        "bytes": 1787,
+        "sha256": "c2386db8d81c1240b81668a1fa43741659942d6842164abb1fbe67df7a60b55a"
+      }
+    }
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "scope": "Descriptive accepted D-cache service intervals only; not CPU stalls, critical path, or speedup.",
+  "first_response_definition": "First accepted D-cache fill_beat; not necessarily critical data or first AXI response.",
+  "interval_definition": "Half-open [accepted miss, accepted full-line completion), measured in physical core-global cycles.",
+  "attribution_limits": [
+    "Includes unseparated queue/UCE/hierarchy/transport/service timing.",
+    "Cannot attribute intervals to I-side interference, memory-only latency, or CPU blocked time.",
+    "No rescheduled execution or FPGA projection."
+  ],
+  "domain_edge_minus_global_offsets": {
+    "dcache": 1241,
+    "be": 1242
+  },
+  "source_event_counts": {
+    "reference": 61887,
+    "store": 33796,
+    "miss": 6508,
+    "misses": 6508,
+    "fill_beat": 52064,
+    "fill_complete": 6508,
+    "l1_hit": 55379,
+    "load": 28091,
+    "eviction": 5996,
+    "begin": 64,
+    "end": 64
+  },
+  "all_program": {
+    "misses": 6508,
+    "miss_to_first_accepted_beat_cycles": {
+      "count": 6508,
+      "min": 9,
+      "median": 221.0,
+      "p90": 424,
+      "p99": 424,
+      "max": 440,
+      "mean": 282.15027658266746
+    },
+    "miss_to_complete_cycles": {
+      "count": 6508,
+      "min": 16,
+      "median": 229.0,
+      "p90": 431,
+      "p99": 431,
+      "max": 448,
+      "mean": 289.43285187461584
+    },
+    "pending_to_first_beat": {
+      "half_open": true,
+      "intervals_with_positive_duration": 6508,
+      "sum_individual_pending_cycles": 1836234,
+      "union_pending_cycles": 1836234,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    },
+    "pending_to_complete": {
+      "half_open": true,
+      "intervals_with_positive_duration": 6508,
+      "sum_individual_pending_cycles": 1883629,
+      "union_pending_cycles": 1883629,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    }
+  },
+  "timed_ring": {
+    "bounds": [
+      2451948,
+      3157393
+    ],
+    "complete_ring_cycles": 705445,
+    "misses_accepted_in_window": {
+      "misses": 1711,
+      "miss_to_first_accepted_beat_cycles": {
+        "count": 1711,
+        "min": 9,
+        "median": 221,
+        "p90": 221,
+        "p99": 312,
+        "max": 397,
+        "mean": 220.95032144944477
+      },
+      "miss_to_complete_cycles": {
+        "count": 1711,
+        "min": 16,
+        "median": 229,
+        "p90": 229,
+        "p99": 320,
+        "max": 405,
+        "mean": 228.4967855055523
+      },
+      "pending_to_first_beat": {
+        "half_open": true,
+        "intervals_with_positive_duration": 1711,
+        "sum_individual_pending_cycles": 378046,
+        "union_pending_cycles": 378046,
+        "cycles_with_at_least_two_pending": 0,
+        "multiplicity_excess_cycles": 0,
+        "max_pending": 1,
+        "carry_in_intervals": 0,
+        "carry_out_intervals": 0
+      },
+      "pending_to_complete": {
+        "half_open": true,
+        "intervals_with_positive_duration": 1711,
+        "sum_individual_pending_cycles": 390958,
+        "union_pending_cycles": 390958,
+        "cycles_with_at_least_two_pending": 0,
+        "multiplicity_excess_cycles": 0,
+        "max_pending": 1,
+        "carry_in_intervals": 0,
+        "carry_out_intervals": 0
+      }
+    },
+    "complete_intervals_intersecting_window": 1711,
+    "all_pending_to_first_beat_clipped": {
+      "half_open": true,
+      "intervals_with_positive_duration": 1711,
+      "sum_individual_pending_cycles": 378046,
+      "union_pending_cycles": 378046,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    },
+    "all_pending_to_complete_clipped": {
+      "half_open": true,
+      "intervals_with_positive_duration": 1711,
+      "sum_individual_pending_cycles": 390958,
+      "union_pending_cycles": 390958,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    }
+  },
+  "target_timed": {
+    "misses": 1680,
+    "miss_to_first_accepted_beat_cycles": {
+      "count": 1680,
+      "min": 221,
+      "median": 221.0,
+      "p90": 221,
+      "p99": 321,
+      "max": 397,
+      "mean": 222.45892857142857
+    },
+    "miss_to_complete_cycles": {
+      "count": 1680,
+      "min": 228,
+      "median": 229.0,
+      "p90": 229,
+      "p99": 328,
+      "max": 405,
+      "mean": 230.0
+    },
+    "pending_to_first_beat": {
+      "half_open": true,
+      "intervals_with_positive_duration": 1680,
+      "sum_individual_pending_cycles": 373731,
+      "union_pending_cycles": 373731,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    },
+    "pending_to_complete": {
+      "half_open": true,
+      "intervals_with_positive_duration": 1680,
+      "sum_individual_pending_cycles": 386400,
+      "union_pending_cycles": 386400,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    },
+    "pending_to_complete_clipped": {
+      "half_open": true,
+      "intervals_with_positive_duration": 1680,
+      "sum_individual_pending_cycles": 386400,
+      "union_pending_cycles": 386400,
+      "cycles_with_at_least_two_pending": 0,
+      "multiplicity_excess_cycles": 0,
+      "max_pending": 1,
+      "carry_in_intervals": 0,
+      "carry_out_intervals": 0
+    }
+  }
+}
