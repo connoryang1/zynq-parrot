@@ -1,0 +1,713 @@
+{
+  "state": "PASS-complete-integrity-and-scaled-advisory",
+  "scope": "Synthetic checked full-system correctness only. Post-init BP/runtime assertion scope; guarded Basejump/library checks excluded, timezero parameter assertions suppressed until reset completes. No global assertion acceptance, full-capacity usage, physical fit, application or FPGA performance claim.",
+  "geometry": {
+    "retained_sets": 256,
+    "retained_i_lines": 1280,
+    "retained_d_lines": 1280,
+    "hp0_delay": 0,
+    "d_block_width_p": 512,
+    "i_block_width_p": 512,
+    "d_sets_p": 64,
+    "i_sets_p": 64,
+    "resident_slots": 2,
+    "logical_contexts": 4,
+    "d_assoc_p": 8,
+    "i_assoc_p": 8
+  },
+  "legacy_reproduction": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/legacy-reproduction.json",
+    "bytes": 1576,
+    "sha256": "17a0c508b44145792095453471d13944daa4adcbc0b9b0f07a61d18ff62f90ef"
+  },
+  "model": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15268256,
+    "sha256": "ef0c7c4c9e84e97d4b71d6c80e6c118d5670411be3a3b16e5469cb89239b5f5d"
+  },
+  "integrity_elf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/program/bp-tests/mt_large_retained_system_test.riscv",
+    "bytes": 211152,
+    "sha256": "2fab907445c24b77a3181fd870d7ae8370c72bfc80bff13b4b14ecfc4b3edac7"
+  },
+  "integrity_nbf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/prog.nbf",
+    "bytes": 125060,
+    "sha256": "7c47ff60c11d5639555ca10422b9ce7b8d023e9549a5f512131be427d01b4fe2"
+  },
+  "integrity_trace": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03-runtime01/retained1280-native0.fst",
+    "bytes": 46454717,
+    "sha256": "700a6af648302c29ab6de07c82332d97d81514c40770d853c0ec3c01d5b2d520"
+  },
+  "advisory_elf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/prog.riscv",
+    "bytes": 260760,
+    "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+  },
+  "advisory_nbf": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/prog.nbf",
+    "bytes": 159729,
+    "sha256": "627662f775f9c2645e5b5687a9df3bfaed25d42265e125a0386047ebe1daad4b"
+  },
+  "advisory_trace": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/retained1280-cold08-native0.fst",
+    "bytes": 19089802,
+    "sha256": "1fe872d8b488b750df123670bd166f0854685c632094b77bf8fa53b30d5682b1"
+  },
+  "advisory_evidence": {
+    "i": {
+      "publications": 1,
+      "hits": 1,
+      "complete_bursts": 1,
+      "beat_words": [
+        8
+      ],
+      "discarded": 0,
+      "active": null
+    },
+    "d": {
+      "publications": 1,
+      "hits": 1,
+      "complete_bursts": 1,
+      "beat_words": [
+        8
+      ],
+      "discarded": 0,
+      "active": null
+    }
+  },
+  "complete_execution": "Both guest fixtures then CORE PASS and host RC0/BSG PASS; maintained checker accepts only documented post-PASS GPIO teardown failure. Integrity post-init assertions restored1. Raw process signal -6 is preserved, not described as clean process exit.",
+  "exclusions": "Not exhaustive use of all1280 slots in full-core (component gates cover payload capacity). Not global/library assertion acceptance, routed fit, application performance, or FPGA evidence.",
+  "package_source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/package_closed.py",
+    "bytes": 5553,
+    "sha256": "6edfe73c31df217be044987f3de8665bf5707c23e189d099a76069c753dad9e0"
+  },
+  "artifacts": {
+    "attempt01-session.json.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-01/session.json",
+        "bytes": 745341,
+        "sha256": "669924de9dc649e423abe45dba8497770d62acb51c64886307af7d191f70fe88"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt01-session.json.gz",
+        "bytes": 123736,
+        "sha256": "ae9a9cd5a8ed582d6e808b2e6fbdb3530b10c561f96a418075a9d10d20450f05"
+      },
+      "gzip": true
+    },
+    "attempt01-build.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-01/build.log",
+        "bytes": 52427,
+        "sha256": "8b5aaa1292dec9509b2869cdce4dacd21f1ebf1d7858506ff1ef51ffd9f217b1"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt01-build.log.gz",
+        "bytes": 4899,
+        "sha256": "fd6dd5792207bc248dad12af9f77ea9f7a4cdd17fe022e21c264fd8e1e406c96"
+      },
+      "gzip": true
+    },
+    "attempt01-compile.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-01/compile.log",
+        "bytes": 72,
+        "sha256": "7ba4078d81213814ee8beb63fc518e187af73ca2ba339f5e0e9766356612d0c6"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt01-compile.log.gz",
+        "bytes": 90,
+        "sha256": "cd78f79f6c4573e080660f36a68e91047d588f41c140494ae3d73af5d1ac324c"
+      },
+      "gzip": true
+    },
+    "attempt02-session.json.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-02/session.json",
+        "bytes": 745369,
+        "sha256": "dd595637e0e5021afe420eecc5231b573816f5113511613be63106ee2a95db7e"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt02-session.json.gz",
+        "bytes": 123742,
+        "sha256": "bf3d9608f13c269e1711e690ac05c584a1c47f3620fa8b6ef7cec3c9a84eb31e"
+      },
+      "gzip": true
+    },
+    "attempt02-build.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-02/build.log",
+        "bytes": 357289,
+        "sha256": "ef7aa4c8e3360395f0fdd7bcfbb2e5b2dd708c9285d524af673ee53aaa8b7768"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt02-build.log.gz",
+        "bytes": 24595,
+        "sha256": "eb8bd98945e0098b5f3247ba516ff13930c4d3048edd8b7a06d8024b99d90667"
+      },
+      "gzip": true
+    },
+    "attempt02-compile.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-02/compile.log",
+        "bytes": 72,
+        "sha256": "7ba4078d81213814ee8beb63fc518e187af73ca2ba339f5e0e9766356612d0c6"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt02-compile.log.gz",
+        "bytes": 90,
+        "sha256": "cd78f79f6c4573e080660f36a68e91047d588f41c140494ae3d73af5d1ac324c"
+      },
+      "gzip": true
+    },
+    "attempt03-session.json.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/session.json",
+        "bytes": 805111,
+        "sha256": "44f86a6314b3ee3cddc80c252a4d8af2886416a28462be0c35c3cbd2294548d6"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt03-session.json.gz",
+        "bytes": 134571,
+        "sha256": "9c09056cff7316a156f77ff16c082054e03fdf1ce425506ddf27c043e252d56b"
+      },
+      "gzip": true
+    },
+    "attempt03-build.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/build.log",
+        "bytes": 634319,
+        "sha256": "9bd63ce0cb363df4722281750c20f2bacdcc7d1d189716311f6215a142dda2c7"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt03-build.log.gz",
+        "bytes": 25530,
+        "sha256": "45e8a5b5956b5b93961f2cfd0c7caf18a343a92c88c4e0fe6bb0306024c5e913"
+      },
+      "gzip": true
+    },
+    "attempt03-compile.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/compile.log",
+        "bytes": 72,
+        "sha256": "7ba4078d81213814ee8beb63fc518e187af73ca2ba339f5e0e9766356612d0c6"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt03-compile.log.gz",
+        "bytes": 90,
+        "sha256": "cd78f79f6c4573e080660f36a68e91047d588f41c140494ae3d73af5d1ac324c"
+      },
+      "gzip": true
+    },
+    "attempt03-nbf.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/nbf.log",
+        "bytes": 12,
+        "sha256": "1b3c3780c15267ca379b705724340f4658770aa831bf5ab9a35a13ea29d33f25"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt03-nbf.log.gz",
+        "bytes": 32,
+        "sha256": "31b720bd2e10f58b61b5a7cb84e6f229c42bd3384e524b4bb71fcbe9f0d0fbb9"
+      },
+      "gzip": true
+    },
+    "attempt03-run.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/run.log",
+        "bytes": 289,
+        "sha256": "e5ccf8b60320780df742885be064cb930455dfdbf3e25d4cda7c43d89af4ae9c"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt03-run.log.gz",
+        "bytes": 229,
+        "sha256": "77bd099bb7c34f46a713c0d44e95496ec7d6ec8e542377ffe5c756172e89a794"
+      },
+      "gzip": true
+    },
+    "attempt03-checker.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/checker.log",
+        "bytes": 43,
+        "sha256": "48758269ebc3e63b34809af6b5ad1d3c2129033b8cc372e404cd6ef142a25b80"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/attempt03-checker.log.gz",
+        "bytes": 59,
+        "sha256": "aee60153ab28a58bcf9ae1ac9af2f9447d0cca06128fa7718fe9108eb53d35c2"
+      },
+      "gzip": true
+    },
+    "failed-initial-top_zynq.sv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-01/source/failed-top_zynq.sv",
+        "bytes": 39467,
+        "sha256": "b450a4d69ad7889618c86e0e845b31b98625b041a1fb6582564ac9c790cb74c1"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/failed-initial-top_zynq.sv.gz",
+        "bytes": 8063,
+        "sha256": "39d6e65291775e9ce2d1d99230acc43f7b5212268b0dce4cc87c8b88b0163a1a"
+      },
+      "gzip": true
+    },
+    "actual-source-list.json.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/actual-source-list.json",
+        "bytes": 132558,
+        "sha256": "12d8ca778a742634c363293fbe3120bfb7c0c9dee200548e00280f1a4523dcc8"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/actual-source-list.json.gz",
+        "bytes": 23758,
+        "sha256": "887a34b0aef7098bb945828dc30d8779049767cea66b9f98a7194f7e0230e526"
+      },
+      "gzip": true
+    },
+    "model.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "bytes": 15268256,
+        "sha256": "ef0c7c4c9e84e97d4b71d6c80e6c118d5670411be3a3b16e5469cb89239b5f5d"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/model.gz",
+        "bytes": 3118890,
+        "sha256": "ae7925da3ae4d9ac109e1bb044a2d1f7af2430cba3659023ded81e2c2497e919"
+      },
+      "gzip": true
+    },
+    "verFiles.dat.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench__verFiles.dat",
+        "bytes": 132945,
+        "sha256": "9b4f91e379c8793546073a0ab31e3670673d4ae1c34110d88e057e4b3d9cad39"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/verFiles.dat.gz",
+        "bytes": 13859,
+        "sha256": "fb049a1260144bf9f6db7cd3f852d3d43a65f3f5db7a4703c2330ffe72370fe6"
+      },
+      "gzip": true
+    },
+    "bsg_blackparrot_pkg.sv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/bsg_blackparrot_pkg.sv",
+        "bytes": 121,
+        "sha256": "8da8d0caf7ccd60f60aa6ef4383de8d2cfc0ec0bd40b69fd865f41d7829f99c9"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/bsg_blackparrot_pkg.sv.gz",
+        "bytes": 109,
+        "sha256": "80f0ff7ebaef6d3dc55b79ef7420861f862045074ae3e2042c15e80bd244bf9f"
+      },
+      "gzip": true
+    },
+    "bsg_bootrom.sv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/bsg_bootrom.sv",
+        "bytes": 65783,
+        "sha256": "01db858645c0de46d73ccdb8be8ba06488977cf84883174f88b6170d0cd6934a"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/bsg_bootrom.sv.gz",
+        "bytes": 3254,
+        "sha256": "c860a399294e8b52a45ca075f109cb7a2c022d5a3946bb966fe9a7138072d60e"
+      },
+      "gzip": true
+    },
+    "integrity-session.json.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03-runtime01/session.json",
+        "bytes": 5225,
+        "sha256": "1e00a216f8ad0f270ef87ab6bb37fc55e2e4025b9d7d98e6b159c38f74dce247"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-session.json.gz",
+        "bytes": 1718,
+        "sha256": "73df3d0126cb558f8c75ff4402ee9a2e598ef1e0738c00a86b76e9e170fccea6"
+      },
+      "gzip": true
+    },
+    "integrity-run.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03-runtime01/run.log",
+        "bytes": 32097,
+        "sha256": "76a8222368476a4b1f6823b5c23114f3262d21df6d3f12f533c156e6814dc2b6"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-run.log.gz",
+        "bytes": 2488,
+        "sha256": "d2bba49c7881be78906587bd36a9009aaddbd506ab123ddbb92e4b2ef01ce93c"
+      },
+      "gzip": true
+    },
+    "integrity-checker.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03-runtime01/checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-checker.log.gz",
+        "bytes": 49,
+        "sha256": "3e936f4c0991577ef64f6cb72aa9e83e6a99bb482cdb5f930c610ca5bd82661a"
+      },
+      "gzip": true
+    },
+    "integrity-source/run_isolated.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03-runtime01/source/run_isolated.py",
+        "bytes": 9930,
+        "sha256": "01bb51a920c0ceede21b2c58d9d2c869f1f3bf06812d66fb14a10dbf48e01052"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-source/run_isolated.py",
+        "bytes": 9930,
+        "sha256": "01bb51a920c0ceede21b2c58d9d2c869f1f3bf06812d66fb14a10dbf48e01052"
+      },
+      "gzip": false
+    },
+    "integrity-source/run_closed_model.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03-runtime01/source/run_closed_model.py",
+        "bytes": 4577,
+        "sha256": "0146d8e5c0a261c9b435aa0905b06071ccd496c289e87a6dece6305be727389a"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-source/run_closed_model.py",
+        "bytes": 4577,
+        "sha256": "0146d8e5c0a261c9b435aa0905b06071ccd496c289e87a6dece6305be727389a"
+      },
+      "gzip": false
+    },
+    "advisory-session.json.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/session.json",
+        "bytes": 5222,
+        "sha256": "8ee03dffe72c08c653e9c7a18cf05873758739b87139606f2bf8cbd7a16006f4"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-session.json.gz",
+        "bytes": 1586,
+        "sha256": "782fa2d340c0d0269469b00b0adb2f30bd3149d1a84a28936fd3be3c68c44bc8"
+      },
+      "gzip": true
+    },
+    "advisory-run.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/run.log",
+        "bytes": 32080,
+        "sha256": "7b271308a51b127dc801f9b7d3a6631c8b2907e554e4bd60ba5651cfcd3732cd"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-run.log.gz",
+        "bytes": 2469,
+        "sha256": "3dbd9488368375293dd193c4d5fa6e71bdde872500f880140bc1d6bb7f55a73d"
+      },
+      "gzip": true
+    },
+    "advisory-checker.log.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-checker.log.gz",
+        "bytes": 49,
+        "sha256": "3e936f4c0991577ef64f6cb72aa9e83e6a99bb482cdb5f930c610ca5bd82661a"
+      },
+      "gzip": true
+    },
+    "advisory-source/run_isolated.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/source/run_isolated.py",
+        "bytes": 9930,
+        "sha256": "01bb51a920c0ceede21b2c58d9d2c869f1f3bf06812d66fb14a10dbf48e01052"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-source/run_isolated.py",
+        "bytes": 9930,
+        "sha256": "01bb51a920c0ceede21b2c58d9d2c869f1f3bf06812d66fb14a10dbf48e01052"
+      },
+      "gzip": false
+    },
+    "advisory-source/run_advisory.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/source/run_advisory.py",
+        "bytes": 4940,
+        "sha256": "bc4774af1af8ae43834f46fa8e88db4f0d35418e22887e910ab0660401fb5044"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-source/run_advisory.py",
+        "bytes": 4940,
+        "sha256": "bc4774af1af8ae43834f46fa8e88db4f0d35418e22887e910ab0660401fb5044"
+      },
+      "gzip": false
+    },
+    "legacy64.riscv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/legacy-64.riscv",
+        "bytes": 211152,
+        "sha256": "b73a7ecf719c07fc649732ac69a8c2863e07b9ce7415bb67037f71b2959135c6"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/legacy64.riscv.gz",
+        "bytes": 73544,
+        "sha256": "3c164112ab4f33b9d2e82a6a362a8f63ab8815673249c8496094051b94d10e8b"
+      },
+      "gzip": true
+    },
+    "integrity-prog.riscv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/program/bp-tests/mt_large_retained_system_test.riscv",
+        "bytes": 211152,
+        "sha256": "2fab907445c24b77a3181fd870d7ae8370c72bfc80bff13b4b14ecfc4b3edac7"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-prog.riscv.gz",
+        "bytes": 73550,
+        "sha256": "be3c811785b4c05c98bace4ddc595ad8a04303a30a1396b8d21d2bf802b20c2e"
+      },
+      "gzip": true
+    },
+    "integrity-prog.nbf.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-native0-03/design/verilator/prog.nbf",
+        "bytes": 125060,
+        "sha256": "7c47ff60c11d5639555ca10422b9ce7b8d023e9549a5f512131be427d01b4fe2"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/integrity-prog.nbf.gz",
+        "bytes": 34269,
+        "sha256": "ec2aab0e0554b35e2e83176ebd4d51753b01999c9d6fa71f6cb9846f276e1c77"
+      },
+      "gzip": true
+    },
+    "advisory-prog.riscv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/prog.riscv",
+        "bytes": 260760,
+        "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-prog.riscv.gz",
+        "bytes": 73684,
+        "sha256": "9caf24ed357cecf0dad70b7bdef661994b31e5b71b9d0247add3193f5cf0d164"
+      },
+      "gzip": true
+    },
+    "advisory-prog.nbf.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/full-system1280-cold08-native0-01/prog.nbf",
+        "bytes": 159729,
+        "sha256": "627662f775f9c2645e5b5687a9df3bfaed25d42265e125a0386047ebe1daad4b"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-prog.nbf.gz",
+        "bytes": 37148,
+        "sha256": "bc0576ddd2746c8db4986d5f3a08e4d8f67d909eadeadcd3b33c769ed7035d35"
+      },
+      "gzip": true
+    },
+    "geometry-verification.json": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/integrity-geometry-audit01/verification.json",
+        "bytes": 2664,
+        "sha256": "d5ccf1487165ec65a3cef5606c7774a57ba12958ed87bc4c7a877d8dbcb22446"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/geometry-verification.json",
+        "bytes": 2664,
+        "sha256": "d5ccf1487165ec65a3cef5606c7774a57ba12958ed87bc4c7a877d8dbcb22446"
+      },
+      "gzip": false
+    },
+    "geometry-selected-events.tsv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/integrity-geometry-audit01/selected-events.tsv",
+        "bytes": 5577328,
+        "sha256": "b87e9f346581f65f8914fbf9e1a10e4b0dafa827cea4b10a57823a2e8f3a3760"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/geometry-selected-events.tsv.gz",
+        "bytes": 686173,
+        "sha256": "d4c3498324bd357769c006230d2d58030beebd5b864dc817aa95aade908720df"
+      },
+      "gzip": true
+    },
+    "geometry-selection.tsv": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/integrity-geometry-audit01/selection.tsv",
+        "bytes": 1964,
+        "sha256": "2401b9323a0f47928546a0318079af77e9dd035da3b5827a89854fdb13148ed0"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/geometry-selection.tsv",
+        "bytes": 1964,
+        "sha256": "2401b9323a0f47928546a0318079af77e9dd035da3b5827a89854fdb13148ed0"
+      },
+      "gzip": false
+    },
+    "advisory-verification.json": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/scaled-advisory-trace-audit01/verification.json",
+        "bytes": 12385,
+        "sha256": "356d5ca867fe4bb8ecefee04513e4af294594685cfcf3ab244e7073c2acdbff7"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-verification.json",
+        "bytes": 12385,
+        "sha256": "356d5ca867fe4bb8ecefee04513e4af294594685cfcf3ab244e7073c2acdbff7"
+      },
+      "gzip": false
+    },
+    "advisory-selected-events.tsv.gz": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/scaled-advisory-trace-audit01/selected-events.tsv.gz",
+        "bytes": 1675030,
+        "sha256": "7adfaf13b89cf9c49209e46c4c693320b26b1a0390260cd03b28a8f6664328c0"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-selected-events.tsv.gz",
+        "bytes": 1675030,
+        "sha256": "7adfaf13b89cf9c49209e46c4c693320b26b1a0390260cd03b28a8f6664328c0"
+      },
+      "gzip": false
+    },
+    "advisory-selection.tsv": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/scaled-advisory-trace-audit01/selection.tsv",
+        "bytes": 10974,
+        "sha256": "6ba4ed7d4af426369be760c19bce54f243e05be26d6ed6250c16ec8e0af2b4a1"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/advisory-selection.tsv",
+        "bytes": 10974,
+        "sha256": "6ba4ed7d4af426369be760c19bce54f243e05be26d6ed6250c16ec8e0af2b4a1"
+      },
+      "gzip": false
+    },
+    "reader-fst_events.build.json": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/reader/fst_events.build.json",
+        "bytes": 2401,
+        "sha256": "244062f4a6aefa33049b3404dff7c940b5c66a4a635d4138a117d842bc6897e0"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/reader-fst_events.build.json",
+        "bytes": 2401,
+        "sha256": "244062f4a6aefa33049b3404dff7c940b5c66a4a635d4138a117d842bc6897e0"
+      },
+      "gzip": false
+    },
+    "reader-fst_events.build.log": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/reader/fst_events.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/reader-fst_events.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gzip": false
+    },
+    "source/validate.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/validate.py",
+        "bytes": 25559,
+        "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/validate.py",
+        "bytes": 25559,
+        "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+      },
+      "gzip": false
+    },
+    "source/fst_events.c": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/fst_events.c",
+        "bytes": 3497,
+        "sha256": "b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/fst_events.c",
+        "bytes": 3497,
+        "sha256": "b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13"
+      },
+      "gzip": false
+    },
+    "source/build_reader.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/build_reader.py",
+        "bytes": 2041,
+        "sha256": "79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/build_reader.py",
+        "bytes": 2041,
+        "sha256": "79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4"
+      },
+      "gzip": false
+    },
+    "source/check_run.py": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/check_run.py",
+        "bytes": 9559,
+        "sha256": "cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/check_run.py",
+        "bytes": 9559,
+        "sha256": "cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985"
+      },
+      "gzip": false
+    },
+    "source/bsg_clkgate_optional.sv": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv",
+        "bytes": 1302,
+        "sha256": "b00c8c7b9ebe3ae7b27c7d07d7eb43da183e97928ed5b70bc46e80ba5f8939a4"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/bsg_clkgate_optional.sv",
+        "bytes": 1302,
+        "sha256": "b00c8c7b9ebe3ae7b27c7d07d7eb43da183e97928ed5b70bc46e80ba5f8939a4"
+      },
+      "gzip": false
+    },
+    "source/large_retained_system_test.c": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/large_retained_system_test.c",
+        "bytes": 6285,
+        "sha256": "8d7d447d2d8d500361b89a4a7ddd356f0dba01dff017129418cf3571bf9dd03c"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/large_retained_system_test.c",
+        "bytes": 6285,
+        "sha256": "8d7d447d2d8d500361b89a4a7ddd356f0dba01dff017129418cf3571bf9dd03c"
+      },
+      "gzip": false
+    },
+    "source/testing-Makefile": {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/Makefile",
+        "bytes": 17777,
+        "sha256": "e76712c343a5bb2486caeda82d27e22726864339db9deabd447035cae29c16ef"
+      },
+      "archive": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-system-geometry-20261121/closure/source/testing-Makefile",
+        "bytes": 17777,
+        "sha256": "e76712c343a5bb2486caeda82d27e22726864339db9deabd447035cae29c16ef"
+      },
+      "gzip": false
+    }
+  }
+}

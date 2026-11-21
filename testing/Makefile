@@ -158,7 +158,8 @@ TEST_SOURCE_mt_icache_retention_control_test := $(TOP)/testing/rtl/retention_con
 TEST_SOURCE_mt_large_retained_system_test := $(TOP)/testing/rtl/large_retained_system_test.c
 BP_RETAINED_I_LINES ?= 64
 BP_RETAINED_D_LINES ?= 64
-$(ZP_RISCV_DIR)/bp-tests/mt_large_retained_system_test.riscv: CFLAGS += -I$(TOP)/testing -DBP_EXPECT_I_LINES=$(BP_RETAINED_I_LINES) -DBP_EXPECT_D_LINES=$(BP_RETAINED_D_LINES)
+BP_RETAINED_SETS ?= 64
+$(ZP_RISCV_DIR)/bp-tests/mt_large_retained_system_test.riscv: CFLAGS += -I$(TOP)/testing -DBP_EXPECT_I_LINES=$(BP_RETAINED_I_LINES) -DBP_EXPECT_D_LINES=$(BP_RETAINED_D_LINES) -DBP_EXPECT_RETAINED_SETS=$(BP_RETAINED_SETS)
 $(ZP_RISCV_DIR)/bp-tests/mt_icache_retention_control_test.riscv: CFLAGS += -I$(TOP)/testing
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 

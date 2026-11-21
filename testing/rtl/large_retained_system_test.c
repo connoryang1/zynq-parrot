@@ -11,6 +11,12 @@
 #ifndef BP_EXPECT_D_LINES
 #define BP_EXPECT_D_LINES 64
 #endif
+#ifndef BP_EXPECT_RETAINED_SETS
+#define BP_EXPECT_RETAINED_SETS 64
+#endif
+#if BP_EXPECT_RETAINED_SETS < 1 || (BP_EXPECT_RETAINED_SETS & (BP_EXPECT_RETAINED_SETS-1))
+#error "BP_EXPECT_RETAINED_SETS must be a positive power of two"
+#endif
 
 static uint64_t stacks[2][512];
 // Ten lines share one ordinary 8-way L1 set. This short integration fixture
@@ -116,7 +122,7 @@ int main(void) {
   phase=6;
   if (((policy_status()>>16)&0xffff)!=BP_EXPECT_I_LINES
       || ((policy_status()>>32)&0xffff)!=BP_EXPECT_D_LINES
-      || ((policy_status()>>48)&0xff)!=6
+      || ((policy_status()>>48)&0xff)!=(unsigned)__builtin_ctz((unsigned)BP_EXPECT_RETAINED_SETS)
       || ((policy_status()>>56)&3)!=3) fail();
   // Same data integrity task under disabled, I-only, D-only and joint control.
   for (unsigned mode=0; mode<4; ++mode) {
