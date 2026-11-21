@@ -1,0 +1,38 @@
+{
+  "state": "planning rationale only; physical native first/full calibration pending",
+  "retrieved_utc_date": "2026-11-21",
+  "sources": [
+    {
+      "url": "https://www.intel.cn/content/dam/develop/external/us/en/documents/performance-analysis-guide-181827.pdf",
+      "support": "Historical approximate60ns local/100ns remote DRAM, table2, printedpage22; explicitly platform dependent"
+    },
+    {
+      "url": "https://eri-summit.darpa.mil/docs/ERIsummit2019/posters/poster43.pdf",
+      "support": "Historical BlackParrot2-3GHz target, not modified-core measured frequency"
+    },
+    {
+      "url": "https://gem5.googlesource.com/public/gem5/+/1d03f6de941520860c673b5f7954c82a46e8b191/src/mem/DRAMInterface.py",
+      "support": "DDR3_1600_8x8 tRCD/tCL/tRP13.75ns and tBURST5ns; component timings distinct from complete response"
+    }
+  ],
+  "hypothetical_cpu_GHz": [
+    0.5,
+    1,
+    2
+  ],
+  "historical_DRAM_ns": [
+    60,
+    100
+  ],
+  "derived_core_cycle_range": [
+    30,
+    200
+  ],
+  "not_claimed": [
+    "FPGA native first/full calibration",
+    "prediction of faster CPU performance",
+    "equivalence of oldfullburst and newHP0 models",
+    "full-line prefetch latency equals historical41cycle loaduse"
+  ],
+  "scope": "Matched model/config arms and whole application costs required"
+}
