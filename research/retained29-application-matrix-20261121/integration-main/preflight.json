@@ -1,0 +1,6 @@
+{
+  "state": "First closure recheck PASS; unittest invocation preflight rejected before tests",
+  "symptom": "repo-root python -m unittest test_retained29_application could not import linux-tests module",
+  "cause": "missing test discovery start directory; no target/session/board action",
+  "guardrail": "Use unittest discover -s linux-tests -p test_retained29_application.py; preserve original closure and recheck it after integration"
+}

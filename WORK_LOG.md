@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Large retained-store complete cost measured — 2026-11-21:** one closed same-ELF1280-line/side native-simulation pair passes full normal-cache, retained-payload and identical-access audits, but joint retention raises WHOLE1,159,423→1,191,569cycles (+2.7726%) and timed ring366,663→375,588 (+2.4341%). It produces772timed D hits and no I hits; this is extra ordinary-demand retention with no advisory source, not Linux/FPGA benefit or prefetch effectiveness (`research/retained-natural-control-20261121/CLOSURE_V3.md`).
+
 - **FPGA configuration loss repaired — 2026-11-21:** the first64-line fit was canceled and rejected because environment-only retention settings never reached Verilog compilation. Validated allowlist reinjection now covers producer, IP-edit and final projects; actual launched child synthesis of packaged RTL decodes all192 requested bits, while a same-package negative control exposes the defaults. No retained fit or maximum is inferred from the rejected94.5BRAM snapshot (`research/vivado-retained-defines-20261121/`).
 
 - **ABI29 compatibility accepted physically — 2026-11-21:** the new actual46MiB kernel completes feature-absent/argument/privilege checks on existing f744 hardware, normal shell return, CORE/HOST PASS and final f744 recovery before shared reservation release. This establishes software compatibility only; the new retained hardware is not deployed (`research/retained29-physical-absent-20261121/`).
