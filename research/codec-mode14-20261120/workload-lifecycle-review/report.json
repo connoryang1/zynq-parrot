@@ -1,0 +1,233 @@
+{
+  "scope": "host-only sanitizer diagnostics; host zlib1.2.11, target runtime1.2.13; no FPGA correctness/performance claim",
+  "directory": "/tmp/codec-lifecycle-review-rr93vrhe",
+  "compile_commands": [
+    [
+      "cc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fno-omit-frame-pointer",
+      "-fsanitize=address,undefined",
+      "-no-pie",
+      "-DBP_RESUME_ZLIB=1",
+      "-I",
+      "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/source",
+      "/tmp/codec-lifecycle-review-rr93vrhe/zlib_driver.c",
+      "-Wl,--wrap=compress2",
+      "-Wl,--wrap=uncompress",
+      "-lz",
+      "-o",
+      "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan"
+    ],
+    [
+      "cc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fno-omit-frame-pointer",
+      "-fsanitize=address,undefined",
+      "-no-pie",
+      "-DBP_RESUME_ZLIB=1",
+      "-DBP_RESUME_HOST_VERIFY=1",
+      "-DBP_RESUME_RESOURCE_STATS=1",
+      "-DBP_RESUME_COMPLETE_POLICY_SCOPE=1",
+      "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/source/scheduler_pipe_hint_benchmark.c",
+      "/tmp/codec-lifecycle-review-rr93vrhe/scope_mock.c",
+      "-lz",
+      "-o",
+      "/tmp/codec-lifecycle-review-rr93vrhe/fork-asan",
+      "-Wl,--wrap=prctl",
+      "-Wl,--wrap=syscall",
+      "-Wl,--wrap=fork",
+      "-Wl,--wrap=mmap",
+      "-Wl,--wrap=pipe",
+      "-Wl,--wrap=waitpid",
+      "-Wl,--wrap=free",
+      "-Wl,--wrap=munmap",
+      "-Wl,--wrap=getrusage",
+      "-Wl,--wrap=clock_gettime",
+      "-Wl,--wrap=printf",
+      "-Wl,--wrap=puts",
+      "-Wl,--wrap=fflush"
+    ]
+  ],
+  "runs": [
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "32",
+        "195",
+        "run",
+        "10000"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "32",
+        "60",
+        "run",
+        "10000"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "0",
+        "0",
+        "run",
+        "96"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "1",
+        "0",
+        "run",
+        "96"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "5",
+        "18446744073709551615",
+        "run",
+        "96"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "257",
+        "1234",
+        "run",
+        "96"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "5",
+        "1234",
+        "input-corrupt",
+        "96"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "5",
+        "1234",
+        "output-corrupt",
+        "96"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "5",
+        "1234",
+        "memory-error",
+        "3"
+      ],
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "kind": "real-fork",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/fork-asan",
+        "64",
+        "4",
+        "futex-early",
+        "32",
+        "futex",
+        "plain",
+        "32",
+        "deflate"
+      ],
+      "returncode": 0,
+      "host_verify_pass": true,
+      "stderr": "Software protocol verification only; host nanoseconds are not BlackParrot cycles.\n"
+    }
+  ],
+  "leak_checker": "unavailable: LSan fatal under ptrace; no leak-check result; ASan/UBSan enabled with detect_leaks=0",
+  "normal_host_allocator": {
+    "command": [
+      "cc",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DBP_RESUME_ZLIB=1",
+      "-DBP_RESUME_HOST_VERIFY=1",
+      "-DBP_RESUME_RESOURCE_STATS=1",
+      "-DBP_RESUME_COMPLETE_POLICY_SCOPE=1",
+      "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/source/scheduler_pipe_hint_benchmark.c",
+      "/tmp/codec-lifecycle-review-rr93vrhe/scope_mock.c",
+      "-lz",
+      "-o",
+      "/tmp/codec-lifecycle-review-rr93vrhe/fork-normal",
+      "-Wl,--wrap=prctl",
+      "-Wl,--wrap=syscall",
+      "-Wl,--wrap=fork",
+      "-Wl,--wrap=mmap",
+      "-Wl,--wrap=pipe",
+      "-Wl,--wrap=waitpid",
+      "-Wl,--wrap=free",
+      "-Wl,--wrap=munmap",
+      "-Wl,--wrap=getrusage",
+      "-Wl,--wrap=clock_gettime",
+      "-Wl,--wrap=printf",
+      "-Wl,--wrap=puts",
+      "-Wl,--wrap=fflush"
+    ],
+    "returncode": 0,
+    "resources": [
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=0 order=0 enabled=0 minor_faults=3734 major_faults=1 user_us=11577 system_us=18592 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=0 order=1 enabled=1 minor_faults=3721 major_faults=1 user_us=18004 system_us=10569 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=1 order=0 enabled=1 minor_faults=3757 major_faults=1 user_us=11885 system_us=15519 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=1 order=1 enabled=0 minor_faults=3853 major_faults=1 user_us=13277 system_us=13695 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=2 order=0 enabled=0 minor_faults=3877 major_faults=1 user_us=16070 system_us=10896 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=2 order=1 enabled=1 minor_faults=3901 major_faults=1 user_us=7257 system_us=19713 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=3 order=0 enabled=1 minor_faults=3901 major_faults=1 user_us=16810 system_us=10982 voluntary_switches=99 involuntary_switches=97",
+      "PIPE_HINT_HOST_VERIFY_RESOURCE repeat=3 order=1 enabled=0 minor_faults=3911 major_faults=1 user_us=12134 system_us=15036 voluntary_switches=99 involuntary_switches=97"
+    ],
+    "scope": "hostzlib1.2.11/hostglibc; diagnostic counts not FPGA performance"
+  }
+}

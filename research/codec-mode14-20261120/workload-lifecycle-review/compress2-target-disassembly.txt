@@ -1,0 +1,93 @@
+
+/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/libz.so.1:     file format elf64-littleriscv
+
+
+Disassembly of section .plt:
+
+Disassembly of section .text:
+
+000000000000c830 <compress2>:
+    c830:	f3010113          	add	sp,sp,-208
+    c834:	0c813023          	sd	s0,192(sp)
+    c838:	0a913c23          	sd	s1,184(sp)
+    c83c:	0b213823          	sd	s2,176(sp)
+    c840:	0b313423          	sd	s3,168(sp)
+    c844:	0b413023          	sd	s4,160(sp)
+    c848:	09513c23          	sd	s5,152(sp)
+    c84c:	09613823          	sd	s6,144(sp)
+    c850:	09713423          	sd	s7,136(sp)
+    c854:	0c113423          	sd	ra,200(sp)
+    c858:	0000ab97          	auipc	s7,0xa
+    c85c:	948bbb83          	ld	s7,-1720(s7) # 161a0 <__stack_chk_guard@GLIBC_2.27>
+    c860:	00810b13          	add	s6,sp,8
+    c864:	0005ba83          	ld	s5,0(a1)
+    c868:	000bb783          	ld	a5,0(s7)
+    c86c:	06f13c23          	sd	a5,120(sp)
+    c870:	00000793          	li	a5,0
+    c874:	00050993          	mv	s3,a0
+    c878:	0005b023          	sd	zero,0(a1)
+    c87c:	00058a13          	mv	s4,a1
+    c880:	00060493          	mv	s1,a2
+    c884:	00068413          	mv	s0,a3
+    c888:	00004617          	auipc	a2,0x4
+    c88c:	d4860613          	add	a2,a2,-696 # 105d0 <deflate_copyright+0x258>
+    c890:	07000693          	li	a3,112
+    c894:	00070593          	mv	a1,a4
+    c898:	000b0513          	mv	a0,s6
+    c89c:	04013423          	sd	zero,72(sp)
+    c8a0:	04013823          	sd	zero,80(sp)
+    c8a4:	04013c23          	sd	zero,88(sp)
+    c8a8:	e49f50ef          	jal	26f0 <deflateInit_@plt>
+    c8ac:	00050913          	mv	s2,a0
+    c8b0:	08051463          	bnez	a0,c938 <compress2+0x108>
+    c8b4:	00913423          	sd	s1,8(sp)
+    c8b8:	fff00493          	li	s1,-1
+    c8bc:	03313023          	sd	s3,32(sp)
+    c8c0:	02012423          	sw	zero,40(sp)
+    c8c4:	00012823          	sw	zero,16(sp)
+    c8c8:	0204d493          	srl	s1,s1,0x20
+    c8cc:	02812783          	lw	a5,40(sp)
+    c8d0:	00079c63          	bnez	a5,c8e8 <compress2+0xb8>
+    c8d4:	000a8793          	mv	a5,s5
+    c8d8:	0154f463          	bgeu	s1,s5,c8e0 <compress2+0xb0>
+    c8dc:	00048793          	mv	a5,s1
+    c8e0:	02f12423          	sw	a5,40(sp)
+    c8e4:	40fa8ab3          	sub	s5,s5,a5
+    c8e8:	01012783          	lw	a5,16(sp)
+    c8ec:	00079c63          	bnez	a5,c904 <compress2+0xd4>
+    c8f0:	00040793          	mv	a5,s0
+    c8f4:	0084f463          	bgeu	s1,s0,c8fc <compress2+0xcc>
+    c8f8:	00048793          	mv	a5,s1
+    c8fc:	00f12823          	sw	a5,16(sp)
+    c900:	40f40433          	sub	s0,s0,a5
+    c904:	00143593          	seqz	a1,s0
+    c908:	00259593          	sll	a1,a1,0x2
+    c90c:	000b0513          	mv	a0,s6
+    c910:	d41f50ef          	jal	2650 <deflate@plt>
+    c914:	00050993          	mv	s3,a0
+    c918:	fa050ae3          	beqz	a0,c8cc <compress2+0x9c>
+    c91c:	03013783          	ld	a5,48(sp)
+    c920:	000b0513          	mv	a0,s6
+    c924:	00fa3023          	sd	a5,0(s4)
+    c928:	e49f50ef          	jal	2770 <deflateEnd@plt>
+    c92c:	00100793          	li	a5,1
+    c930:	00f98463          	beq	s3,a5,c938 <compress2+0x108>
+    c934:	00098913          	mv	s2,s3
+    c938:	07813703          	ld	a4,120(sp)
+    c93c:	000bb783          	ld	a5,0(s7)
+    c940:	00f747b3          	xor	a5,a4,a5
+    c944:	00000713          	li	a4,0
+    c948:	00078463          	beqz	a5,c950 <compress2+0x120>
+    c94c:	d15f50ef          	jal	2660 <__stack_chk_fail@plt>
+    c950:	0c813083          	ld	ra,200(sp)
+    c954:	0c013403          	ld	s0,192(sp)
+    c958:	0b813483          	ld	s1,184(sp)
+    c95c:	0a813983          	ld	s3,168(sp)
+    c960:	0a013a03          	ld	s4,160(sp)
+    c964:	09813a83          	ld	s5,152(sp)
+    c968:	09013b03          	ld	s6,144(sp)
+    c96c:	08813b83          	ld	s7,136(sp)
+    c970:	00090513          	mv	a0,s2
+    c974:	0b013903          	ld	s2,176(sp)
+    c978:	0d010113          	add	sp,sp,208
+    c97c:	00008067          	ret

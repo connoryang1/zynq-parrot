@@ -1,0 +1,75 @@
+{
+  "scope": "host-only sanitizer diagnostics; host zlib1.2.11, target runtime1.2.13; no FPGA correctness/performance claim",
+  "directory": "/tmp/codec-lifecycle-review-rr93vrhe",
+  "compile_commands": [
+    [
+      "cc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fno-omit-frame-pointer",
+      "-fsanitize=address,undefined",
+      "-no-pie",
+      "-DBP_RESUME_ZLIB=1",
+      "-I",
+      "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/source",
+      "/tmp/codec-lifecycle-review-rr93vrhe/zlib_driver.c",
+      "-Wl,--wrap=compress2",
+      "-Wl,--wrap=uncompress",
+      "-lz",
+      "-o",
+      "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan"
+    ],
+    [
+      "cc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fno-omit-frame-pointer",
+      "-fsanitize=address,undefined",
+      "-no-pie",
+      "-DBP_RESUME_ZLIB=1",
+      "-DBP_RESUME_HOST_VERIFY=1",
+      "-DBP_RESUME_RESOURCE_STATS=1",
+      "-DBP_RESUME_COMPLETE_POLICY_SCOPE=1",
+      "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/source/scheduler_pipe_hint_benchmark.c",
+      "/tmp/codec-lifecycle-review-rr93vrhe/scope_mock.c",
+      "-lz",
+      "-o",
+      "/tmp/codec-lifecycle-review-rr93vrhe/fork-asan",
+      "-Wl,--wrap=prctl",
+      "-Wl,--wrap=syscall",
+      "-Wl,--wrap=fork",
+      "-Wl,--wrap=mmap",
+      "-Wl,--wrap=pipe",
+      "-Wl,--wrap=waitpid",
+      "-Wl,--wrap=free",
+      "-Wl,--wrap=munmap",
+      "-Wl,--wrap=getrusage",
+      "-Wl,--wrap=clock_gettime",
+      "-Wl,--wrap=printf",
+      "-Wl,--wrap=puts",
+      "-Wl,--wrap=fflush"
+    ]
+  ],
+  "runs": [
+    {
+      "kind": "workload",
+      "argv": [
+        "/tmp/codec-lifecycle-review-rr93vrhe/workload-asan",
+        "32",
+        "195",
+        "run",
+        "10000"
+      ],
+      "returncode": 1,
+      "asan_stderr": true
+    }
+  ]
+}
