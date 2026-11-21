@@ -1,0 +1,110 @@
+{
+  "state": "FAIL Vivado compiler SIGSEGV; no resource/fit/timing conclusion",
+  "job": "20261121T125734Z-cc01fdf32",
+  "recorded_utc": "2026-11-21T13:10:23.699024+00:00",
+  "top": "cc01fdf32575ad32d0eca838e45abe5d99799ee8",
+  "bp": "20c74bfb1633c6580945c047828546d723384def",
+  "confirmed": "Actual child synthesis terminated signal11 in libxv_synth.so DFPin::travelBottomUpIter \u2192 HOptDfg::pruneBitWidths \u2192 HARTReSynthReInfer / merge-resynthesis partitions. Parent and workers segfaulted. All Vivado processes gone after terminalFAIL.",
+  "actual_child_synthesis_flags": "synth_design -top black_parrot_bd_1_wrapper -part xc7z020clg400-1 -directive AreaOptimized_high -global_retiming on -control_set_opt_threshold 1",
+  "actual_six_defines": {
+    "BP_RETAINED_BUFFER": 1,
+    "BP_RETAINED_I_LINES": 1280,
+    "BP_RETAINED_D_LINES": 1280,
+    "BP_RETAINED_SETS": 256,
+    "BP_RETAINED_OBSERVE": 1,
+    "BP_AXI_RESPONSE_DELAY": 0
+  },
+  "unresolved": [
+    "whether RAM area attributes interact with production synthesis options/hierarchy",
+    "whether parallel synthesis partitioning triggers the compiler failure",
+    "whether the fault is in the tool installation"
+  ],
+  "next": "Keep exact source immutable; use small controlled production-option/component synthesis gates to localize before changing source or full build strategy. No blind retry or capacity reduction.",
+  "copies": [
+    {
+      "source": "/home/coyang/fpga-logs-linux-retained-native1280-area-r3/20261121T125734Z-cc01fdf32/console.log",
+      "bytes": 723120,
+      "sha256": "a94ea147fa663719738846261c4adbf499c37b8724457c6cdd56d482f1519457",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/console.log.gz",
+      "snapshot_sha256": "5f591c85542bf901f82702bd87ed78ff24930dada4e72624d8d2d41698ec1229"
+    },
+    {
+      "source": "/home/coyang/fpga-logs-linux-retained-native1280-area-r3/20261121T125734Z-cc01fdf32/revisions.txt",
+      "bytes": 365,
+      "sha256": "213771f3384976f91738a376d832bdf93f7e61184fab1d84a67ceeb921d69231",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/revisions.txt.gz",
+      "snapshot_sha256": "82dcddf1f0f08d5664fde7e9fec65f8c78216c73520680b6aa2aa09a0ffb316a"
+    },
+    {
+      "source": "/home/coyang/fpga-logs-linux-retained-native1280-area-r3/20261121T125734Z-cc01fdf32/status",
+      "bytes": 5,
+      "sha256": "4f8e9e45f8a9e1843b81eaf3bdf52a6b778d415d23bf985774a9d34a43f69bd5",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/status.gz",
+      "snapshot_sha256": "6ba1abb0c7dfacedace9b8570221a30716df93c21f0a32fae02aece9fc8ec936"
+    },
+    {
+      "source": "/home/coyang/fpga-logs-linux-retained-native1280-area-r3/20261121T125734Z-cc01fdf32/pid",
+      "bytes": 7,
+      "sha256": "0f2baad838d5483537c178869bfe31dded441a4b17eeb70a31fd2c72fb020fa4",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/pid.gz",
+      "snapshot_sha256": "05b9af8c4063f4ee3ce5ccba41fd160bb225eae99ce49cc749780dd4e1d99354"
+    },
+    {
+      "source": "/home/coyang/fpga-logs-linux-retained-native1280-area-r3/20261121T125734Z-cc01fdf32/session",
+      "bytes": 35,
+      "sha256": "d3376d47cde75116309ea7613a7238242a4d097d3e6d8dbc5c485a15d967fc19",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/session.gz",
+      "snapshot_sha256": "3f52dd1828795bd6cf7e0c469f8a7b55dfb6fdf27ac909466158738a11d0f754"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/runme.log",
+      "bytes": 261193,
+      "sha256": "15ff8f1b97844e9ba0d0c0bbcfac3d7ea88e26b4fc671fa3158b57f70edf1f57",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/runme.log.gz",
+      "snapshot_sha256": "ee835f2f7d16f43743557460c7e4c69b8583042c72110a1647d780fe99ebd86e"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.tcl",
+      "bytes": 10380,
+      "sha256": "06013e7bb5275bd2437de1ecf2d26632d8fc7c64b8c66eb64bf8164f465c39ac",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/black_parrot_bd_1_wrapper.tcl.gz",
+      "snapshot_sha256": "1fec7664cbfa50307eafdeb7eb17dbdf78f440d87f6c561c2c17908386e5bf29"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/hs_err_pid816697.log",
+      "bytes": 6755,
+      "sha256": "a90f29dd3064abe672d5854d3f891a9afaa7be994fe302bb19498de8dae7dba9",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/hs_err_pid816697.log.gz",
+      "snapshot_sha256": "2665a4ebede44b57521fb416e387f84afaa017e5a88c24d1df6fd15e31b71c7c"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/hs_err_pid817101.log",
+      "bytes": 44,
+      "sha256": "5a7a9639275d722871331eef6716759c170f450ca1690d8b500853228c098f86",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/hs_err_pid817101.log.gz",
+      "snapshot_sha256": "59b0cd6bd3f2284cdd5d7861b1da1781148615180e0c2534b0612b52e60b6828"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/hs_err_pid817190.log",
+      "bytes": 3813,
+      "sha256": "0687c16b1552adb325a530a1666f0a4c9a836e1343600393a66bbbab6dbbeb8f",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/hs_err_pid817190.log.gz",
+      "snapshot_sha256": "83608276a804f5bf13b1f5ed0899466fe2f00f3d204c38c2971ebdcb903aec6d"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/hs_err_pid817016.log",
+      "bytes": 4999,
+      "sha256": "85a331411b0cbe19b16e191e8cce874de0667678951c50d1e18e587260036c79",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/hs_err_pid817016.log.gz",
+      "snapshot_sha256": "897b3dcef9692bdb242a5990923fddd547954af25deec58f0763a9fc8c3b4cf1"
+    },
+    {
+      "source": "/tmp/zynq-parrot-fpga-20261121T125734Z-cc01fdf32/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/hs_err_pid817145.log",
+      "bytes": 8193,
+      "sha256": "3bffdd4e03e5c4ff8bca2a746ca08f2e4578fc337fba1e764042d8690081a3a0",
+      "snapshot": "research/fpga-native1280-area-r3-20261121/failed-synth01/hs_err_pid817145.log.gz",
+      "snapshot_sha256": "1ad55267228726176df4567918af0160bbda9c3057d5b99bc0a21f2ca85eb27e"
+    }
+  ],
+  "physical_operations": 0
+}
