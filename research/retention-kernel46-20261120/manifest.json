@@ -1,0 +1,168 @@
+{
+  "state": "retention-kernel46-offline-verified-no-target-execution",
+  "purpose": "Bounded46MiB copy of exact c7 retention kernel27 with accepted rootfs; future capability-present probe only",
+  "source_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27-accepted-rootfs/linux-prefix32-retention27-accepted-rootfs-shell.nbf",
+    "sha256": "c7c1e214796644b1dbe728cc274ca3d776c1cd24d4eb7ff570e109f44b53e3ff",
+    "bytes": 70906356
+  },
+  "nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+    "sha256": "a1fbac904a8604939ee55b0c91ca2812cc9b9451220a7a53df97cfd88acf97d5",
+    "bytes": 70906578
+  },
+  "package_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel-20261120/accepted-rootfs/package-manifest.json",
+    "sha256": "6ae91f1f54bdef7da052de4443d7072e8f81177467c83f025bd886a9af1af8cb",
+    "bytes": 5839
+  },
+  "helper": {
+    "path": "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py",
+    "sha256": "c1fc609160b6e2a1d2fb28e5ecfb759fa883e854018dda4d4b19b01d55ced959",
+    "bytes": 3002
+  },
+  "helper_command": [
+    "/usr/bin/python3",
+    "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27-accepted-rootfs/linux-prefix32-retention27-accepted-rootfs-shell.nbf",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+    "--old",
+    "console=hvc0 loglevel=8 rdinit=/bin/sh          ",
+    "--new",
+    "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  "
+  ],
+  "helper_log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/helper.log",
+    "sha256": "dd1c6f04e84264d5ac4da0e3af663cc017e538c14429034a1a73662984aadc72",
+    "bytes": 78
+  },
+  "helper_tests": {
+    "command": "python3 -B -m unittest discover -s research/embedded46-20261120 -p test_build_pair.py -v",
+    "passed": 7
+  },
+  "reused_parser": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/build_pair.py",
+    "sha256": "f06f3574a90c5fb06f86253141ab7012ef0dac2f28a74a9d1431879ed7bd917d",
+    "bytes": 19891
+  },
+  "reused_load_guard": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/verify_pair.py",
+    "sha256": "d48ccc9a3806fdb5b6929adf4e440ec88cc7512c4ba6557a16fcc7b42e6e80e3",
+    "bytes": 6474
+  },
+  "prepare_source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/retention-kernel46-20261120/prepare.py",
+    "sha256": "9262f51bdcbc36387ccb61e15af8ee86a82fbe5516575bd33bab1119035f80d7",
+    "bytes": 8958
+  },
+  "source_inventory": [
+    {
+      "address": "0x80016000",
+      "valid": true,
+      "bytes": 1209
+    }
+  ],
+  "original_dtb": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/original.dtb",
+    "sha256": "0bfe298c94459fa94ad93c368b73b6d6892c8ffe8807e28e5479dafbce39215f",
+    "bytes": 1209
+  },
+  "capped_dtb": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/mem46.dtb",
+    "sha256": "2accef38a7a5e3a410643c2884ad8d9cd40ed07da04d1cad541ffaccc8392d6f",
+    "bytes": 1209
+  },
+  "bootargs": {
+    "address": "0x800163a0",
+    "property_bytes": 49,
+    "old": "console=hvc0 loglevel=8 rdinit=/bin/sh          ",
+    "new": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  ",
+    "only_nominal_changed_addresses": [
+      "0x800163c7",
+      "0x800163c8",
+      "0x800163c9",
+      "0x800163ca",
+      "0x800163cb",
+      "0x800163cc",
+      "0x800163cd"
+    ]
+  },
+  "record_proof": {
+    "source_records": 1916388,
+    "target_records": 1916394,
+    "inserted_records": 6,
+    "every_original_record_byte_identical": true,
+    "inserted_block": [
+      "03_00000000800163a0_3d656c6f736e6f63",
+      "03_00000000800163a8_676f6c2030637668",
+      "03_00000000800163b0_20383d6c6576656c",
+      "03_00000000800163b8_2f3d74696e696472",
+      "03_00000000800163c0_6d2068732f6e6962",
+      "03_00000000800163c8_20204d36343d6d65"
+    ],
+    "streamed_exact_reverse_sha256": "c7c1e214796644b1dbe728cc274ca3d776c1cd24d4eb7ff570e109f44b53e3ff",
+    "reverse_image_written": false
+  },
+  "kernel": {
+    "base": "0x80200000",
+    "bytes": 24034304,
+    "sha256": "64f993713e1d7d5fcae57c26e42b32369d0bccfa0235635dd0b0010871f57435",
+    "preserved": true
+  },
+  "rootfs": {
+    "kernel_offset": "0xc126b0",
+    "bytes": 3303052,
+    "sha256": "0fbebeabd9fb4e152c0f79efe19f7275d08fd5956c97f0f022f829221735b5cf",
+    "cpio_sha256": "e2f7dbc4d02d0ae99bb66832fe94b4882e19d7c95acd2cc0521299ff6aa73f50",
+    "preserved": true
+  },
+  "source_load_guard": {
+    "ddr_write_count": 1916377,
+    "separate_config_or_mmio_records": 11,
+    "maximum_load_end_exclusive": "0x818eba68",
+    "maximum_load_offset": "0x18eba67",
+    "allocation_bytes": 48234496,
+    "all_write_tails_within_allocation": true
+  },
+  "capped_load_guard": {
+    "ddr_write_count": 1916383,
+    "separate_config_or_mmio_records": 11,
+    "maximum_load_end_exclusive": "0x818eba68",
+    "maximum_load_offset": "0x18eba67",
+    "allocation_bytes": 48234496,
+    "all_write_tails_within_allocation": true
+  },
+  "dtb_bounds": {
+    "declared_bytes": 1209,
+    "rounded_copy_bytes": 1216,
+    "source_begin": "0x80016000",
+    "source_end_exclusive": "0x800164c0",
+    "runtime_begin": "0x82200000",
+    "runtime_end_exclusive": "0x822004c0",
+    "owned_end_exclusive": "0x82e00000",
+    "all_initial_copy_bytes_within_owned_buffer": true
+  },
+  "runtime_destination_evidence": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session12/0-retention-probe-absent.log",
+    "sha256": "b13e545837ee591975a6116c86a7bce06a0000f5b8f78457afac177534f1e960",
+    "bytes": 24290
+  },
+  "prior_memory_enforcement_proof": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/manifest.json",
+    "sha256": "099370428f6e568c474e119b5dca601604a71333ce8377aa05ca76e139a3ff32",
+    "bytes": 14157
+  },
+  "expected_runtime_bounds": {
+    "allocation_bytes": 48234496,
+    "memory_kib": 47104,
+    "notice": "Memory limited to 46MB",
+    "dma32_last_byte": "0x82dfffff",
+    "next_arg1": "0x82200000"
+  },
+  "limits": [
+    "No board execution, kernel/rootfs build, runner change or performance claim.",
+    "New capped-image runtime bound and capability-present retention ABI remain unverified until a complete fresh probe boot.",
+    "Kernel/rootfs/code addresses and all original NBF records are preserved; memory-node reg still advertises64MiB, constrained by Linux mem=46M.",
+    "Initial DTB copy bounds are source/log-derived, not observation of the new image runtime or a proof of earlier fault causation."
+  ]
+}
