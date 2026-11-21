@@ -1,0 +1,3 @@
+This admission records the first near-limit capacity candidate using the corrected actual Vivado configuration flow. The immutable candidate has160KiB of real full64B I/D payload and observation enabled, and passed the combined full-system correctness and retained-use gate before launch. Routed fit, physical behavior and application benefit remain pending.
+
+The maintained farm launched job20261121T102215Z-15288321b onbp1 at20MHz after the earlier misconfigured64-line fit was canceled. Both other builders refused connection. The JSON binds source geometry and the closed prelaunch gate; logs and any later resources/timing must be inspected before calling this a fitted capacity. No FPGA-board operation is performed by synthesis.
