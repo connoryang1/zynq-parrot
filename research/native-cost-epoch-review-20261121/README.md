@@ -1,0 +1,19 @@
+This reuses the accepted old native private-lookup comparison and its bounded semantic event streams to resolve epoch-wrap and clear attribution. It performs no target, model, board or raw-FST run. The old model uses the4KiB-L2 base (32sets×2ways×64B per slice,2slices), and is separate from the current16KiB-L2 candidate.
+
+Neither arm has a D epoch wrap inside WHOLE or the timed ring. Each full trace contains13 D wrap pulses, **all after WHOLE**, with its first exactly2586core cycles after WHOLE ends. I has no wraps. This is directly checked from the existing source-qualified semantic events and agrees with the accepted port audit; the reporting tail must not be charged to the primary endpoint.
+
+| D mutation source activity | Off0 | Joint15 |
+| --- | --- | --- |
+| WHOLE offers / accepted |25633 /25631|25633 /25631|
+| Timed ring offers / accepted |324 /324|324 /324|
+| Full trace offers / accepted |38220 /35321|38220 /35331|
+
+The source counts mutation offers whenever invalidate_v is sampled; an invalidation increments the set epoch only outside e_clear. The D-cache source generates this signal for write-buffer admissions (cached stores, AMOs, successful SC) and accepted uncached/WT mutations. These are not counts of distinct retired stores, valid retained lines removed, lost useful hits or critical-path stalls. Normal D-cache reference-store ledger counts are separately25633 WHOLE,324 timed and36772 full trace in each arm.
+
+Each arm has exactly two WHOLE control commands: off0→0 or joint15→0. Each produces one explicit clear pulse per lane one core cycle later; no wrap contributes to those clears. The accepted off ledger records2560busy samples per lane for two1280slot sweeps. The source enters e_clear on the command transition, then writes one tag/edge until slot1279. A command-edge-inclusive span can be called1281; **2×1281 is not the accepted busy-sample metric**, and neither convention establishes exclusive CPU stall cost. Initial reset and the13reporting-tail wrap sweeps are outside this WHOLE clear attribution.
+
+Already accepted service remains unchanged: all2930WHOLE D misses take11lane edges from accepted lookup to accepted response;1150hits take12/14/16/18/20edges (309/260/227/196/158;median16). Timed908misses take11;772hits have179/162/168/142/121counts;906published inserts take20edges and2unpublished terminals take7. I has69WHOLE misses and0hits. These exclude pre-acceptance waits, normal L1 refill/promotion and architectural readiness. The measured WHOLE loss32146cycles (+2.7726%) and timed loss8925 (+2.4341%) cannot be partitioned into exclusive lookup, mutation, clear or other stalls from these histograms/occupancies. No explicit advisory trigger is issued; this is demand-populated retention.
+
+Current COST plain/regex CONTROL rows already print actual active_raw and reset_raw. Source-bound CSR bits10(I)/11(D) are sticky wrap-seen flags; a control command resets their history. The active read occurs before cleanup0, so an enabled cell can reveal an earlier wrap since activation without new instrumentation. Flags provide occurrence, not count/timing. Disabled COST cells issue no retained-control command, so their sticky history can include previous cells/reporting. Cleanup resets the prior history and can itself race later mutation, so reset_raw does not recover every event over WHOLE. Existing parser accepts these allowed flags; it does not separately count wraps.
+
+`review.json` binds the accepted summaries/events, actual compiled source list and exact old RTL from git, model/trace identities, current read-only COST sources and this reviewer. Event reads are limited to16MiB compressed per arm,128MiB uncompressed and1MiB per line; output is capped128MiB with3GiB reserve. The actual streams total under8MiB decoded. No expensive prior analysis is repeated, and no source changes or new instrumentation are proposed before current fit.
