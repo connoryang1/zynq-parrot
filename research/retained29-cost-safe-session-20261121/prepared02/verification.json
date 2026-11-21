@@ -1,0 +1,634 @@
+{
+  "state": "PASS offline COST and safe-functional transitive runtime binding gate only",
+  "programs": {
+    "program_preparation": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-trigger-accounting-20261121/closed-cost01/verification.json",
+      "bytes": 11421,
+      "sha256": "8f185dfcfe41a7b4274387c9a1eabe525603680f7b03f8bf638cb1090e5a9a41"
+    },
+    "programs": {
+      "plain": {
+        "elf": {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/retained29-cost-plain",
+          "bytes": 27584,
+          "sha256": "770bbfdb7ee5e92ce78fdf53bd029ebfe9c68586870c80946f7dc1b2a09e31b1"
+        },
+        "transfer": {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/plain.transfer",
+          "bytes": 17808,
+          "sha256": "5756404303fdc8c09026647c80cf161881f3d4f4c5079189fc5af526e575bcab"
+        }
+      },
+      "regex": {
+        "elf": {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/retained29-cost-regex",
+          "bytes": 27976,
+          "sha256": "e1693d512042779b5496f755d67377681d35926ffbb46e69ca5ff7cc0998969e"
+        },
+        "transfer": {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/regex.transfer",
+          "bytes": 19498,
+          "sha256": "132277a0c83c31384926901250c3b077fc1f90040d4f1dda28157ba6eda0faac"
+        }
+      },
+      "probe": {
+        "elf": {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/retained_store_probe.elf",
+          "bytes": 14200,
+          "sha256": "9bb01f51b23ca190e7c1bc1c1bc935c01f3441bacab79463438312084c13f79a"
+        },
+        "transfer": {
+          "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-session-preparation-20261121/closed-preparation-002/probe.transfer",
+          "bytes": 8564,
+          "sha256": "438e3177799edc373270823e77623b4404405ad28ca257e52e7743033e42119b"
+        }
+      }
+    }
+  },
+  "legacy_sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+  },
+  "sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f",
+    "linux-tests/retained29_safe_guard.py": "4c979bf30b781afd3e962a297d5a49aa24e0258cc94992e6ed0e2acbd3bfd665",
+    "linux-tests/retained29_safe_session.py": "a322a3f2cea13c3ef7448e3cb2d7774331addc3fcb4d10b42ac303bd29541503",
+    "linux-tests/retained29_safe_functional_protocol.py": "d6ef6b464eec12e8283f70e583a8f49bdd2fe3697e9e8598204febaa71c63d74",
+    "linux-tests/run_retained29_safe_functional.py": "9eeb874aba50f4d2cb1ae22f5e3059f5b498a259c7160f769be6b3899e17ba0d",
+    "linux-tests/scheduler_retained29_cost_benchmark.c": "2f19b863264cec0842899e23bfc2a9d4a057beffe3ddb5cfd2cd5227af800f8e",
+    "linux-tests/scheduler_retained29_regex_cost_benchmark.c": "1bc842d91c1fdacd1bfc81c3ef4e9a4510984c86b8f5e12ee9d22e05de4fbd37",
+    "linux-tests/retained29_cost_protocol.py": "fd9507f8ee6095285844e1d2a08652d6ffeae2d03d2dcbf378c966ef946a272f",
+    "linux-tests/run_retained29_cost_session.py": "7a7aea2c65407445236e8559956bbb766b27bad890589af336f2e1947bfc6c3c"
+  },
+  "functional_sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_safe_guard.py": "4c979bf30b781afd3e962a297d5a49aa24e0258cc94992e6ed0e2acbd3bfd665",
+    "linux-tests/retained29_safe_session.py": "a322a3f2cea13c3ef7448e3cb2d7774331addc3fcb4d10b42ac303bd29541503",
+    "linux-tests/retained29_safe_functional_protocol.py": "d6ef6b464eec12e8283f70e583a8f49bdd2fe3697e9e8598204febaa71c63d74",
+    "linux-tests/run_retained29_safe_functional.py": "9eeb874aba50f4d2cb1ae22f5e3059f5b498a259c7160f769be6b3899e17ba0d",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490"
+  },
+  "tests": {
+    "linux-tests/test_retained29_cost_protocol.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/test_retained29_cost_protocol.py",
+      "bytes": 13247,
+      "sha256": "7b44ca362abcfffcf576c082c4ec30aeb8ab7a6984e49f97585e50e3a0a069df"
+    },
+    "linux-tests/test_retained29_cost_admission.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/test_retained29_cost_admission.py",
+      "bytes": 7100,
+      "sha256": "e3c1b57bb17472f4d83ec670bd2f5e6f1fa912846178e803efc26da54a3328a6"
+    },
+    "linux-tests/test_retained29_safe_session.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/test_retained29_safe_session.py",
+      "bytes": 20415,
+      "sha256": "09af04f13c3e9494f6a6564cc266b173563bde7247884e060c269f3f6bae79aa"
+    }
+  },
+  "preparer": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepare02.py",
+    "bytes": 4232,
+    "sha256": "2ae387a8aa151444fa0a67a1ef613edc7cb5bc90f6cb618270d91c3d0e729db6"
+  },
+  "documentation": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/FOLLOWUP.md",
+    "bytes": 1274,
+    "sha256": "c1fb43421b95ff43c8b7d1a30809ea6406ff3bfe5814c38506a9f8917829204f"
+  },
+  "prior_preparer": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepare.py",
+    "bytes": 8232,
+    "sha256": "a1f58d35cd29bb0237851cf17cc03a2a2f0d5757d97ab1fed3c0e402bd104e81"
+  },
+  "prior_preparation": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared01/verification.json",
+    "bytes": 39426,
+    "sha256": "b011eb3c2be718262b03f5ef29d3e660e0cf3373d6582de56c308cb1960614c8"
+  },
+  "prior_checkpoint": "d75cd31c689daef90dab25980cc15e5864e366d5",
+  "imported_runtime": {
+    "linux-tests/run_retained29_application_session.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/run_retained29_application_session.py",
+      "bytes": 16588,
+      "sha256": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a"
+    },
+    "linux-tests/retained29_application_protocol.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_application_protocol.py",
+      "bytes": 18686,
+      "sha256": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490"
+    }
+  },
+  "drafts": {
+    "benchmark-functional.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/benchmark-functional.DRAFT.json",
+      "bytes": 3799,
+      "sha256": "3366d79e660e7335e27aca0c8c2d8a3770b2cefe205d21426d9225e7447510b0"
+    },
+    "chase-cohort.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/chase-cohort.DRAFT.json",
+      "bytes": 4087,
+      "sha256": "d67d4b28ff99992b9c0bc15a659de6d3afd71c25b60a7ebdaea2e266dfef29af"
+    },
+    "chase-plan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/chase-plan.DRAFT.json",
+      "bytes": 5359,
+      "sha256": "8bdd85db7e45ff8396df1ccb7e14c03cbeebfe6a11c5be03405b4b63f13adff7"
+    },
+    "chase.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/chase.DRAFT.json",
+      "bytes": 10869,
+      "sha256": "ca1472bb53217c2d6ee52c1bdf415468b82dadf6983cfb37c7e559b1ae077d8d"
+    },
+    "lookup-cohort.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/lookup-cohort.DRAFT.json",
+      "bytes": 4087,
+      "sha256": "d67d4b28ff99992b9c0bc15a659de6d3afd71c25b60a7ebdaea2e266dfef29af"
+    },
+    "lookup-plan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/lookup-plan.DRAFT.json",
+      "bytes": 5372,
+      "sha256": "cbbcdd3339ef2c39c74db0544c8899038e1f971e56b2f2c2d7fa6681bec78808"
+    },
+    "lookup.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/lookup.DRAFT.json",
+      "bytes": 10882,
+      "sha256": "27f907a0b5b17aee3b9e58528af873b2908bf628f8293ce0bfdcd0e5f218dbd2"
+    },
+    "parse-cohort.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/parse-cohort.DRAFT.json",
+      "bytes": 4087,
+      "sha256": "d67d4b28ff99992b9c0bc15a659de6d3afd71c25b60a7ebdaea2e266dfef29af"
+    },
+    "parse-plan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/parse-plan.DRAFT.json",
+      "bytes": 5359,
+      "sha256": "8795ea07156348ee138fc97024fb2d2633344749d921c8ae2e595b810fa3fe8b"
+    },
+    "parse.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/parse.DRAFT.json",
+      "bytes": 10869,
+      "sha256": "df2a9fb5147f27f1cdfc3db0989728e7f1ae2e67544e455497533fd14b2a5821"
+    },
+    "pilot-cohort.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/pilot-cohort.DRAFT.json",
+      "bytes": 4087,
+      "sha256": "d67d4b28ff99992b9c0bc15a659de6d3afd71c25b60a7ebdaea2e266dfef29af"
+    },
+    "pilot-plan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/pilot-plan.DRAFT.json",
+      "bytes": 5346,
+      "sha256": "f81472d01ebf47891d280c733ab9ff3c4a15b1203d1f5312d472783bbbf2ea09"
+    },
+    "pilot.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/pilot.DRAFT.json",
+      "bytes": 10849,
+      "sha256": "000e365b3e3a4c384f305f104fc52dab29cc4bffe7a458c92e0020eef0e2f1bd"
+    },
+    "probe-present.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/probe-present.DRAFT.json",
+      "bytes": 3785,
+      "sha256": "972519dd7bd19c9616c1414725c2c5992ff1b975c4ba078f6d5fd4c36142eb7d"
+    },
+    "regex-cohort.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/regex-cohort.DRAFT.json",
+      "bytes": 4087,
+      "sha256": "d67d4b28ff99992b9c0bc15a659de6d3afd71c25b60a7ebdaea2e266dfef29af"
+    },
+    "regex-plan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/regex-plan.DRAFT.json",
+      "bytes": 5359,
+      "sha256": "a7fc8386d9fafab46a6a6e35e1c3fda7ab397134075bb07e54e300d93b693803"
+    },
+    "regex.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/regex.DRAFT.json",
+      "bytes": 10869,
+      "sha256": "fe1921c72a2501a1165ae5334b549405bc2965794834491160935f55377efdd7"
+    },
+    "scan-cohort.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/scan-cohort.DRAFT.json",
+      "bytes": 4087,
+      "sha256": "d67d4b28ff99992b9c0bc15a659de6d3afd71c25b60a7ebdaea2e266dfef29af"
+    },
+    "scan-plan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/scan-plan.DRAFT.json",
+      "bytes": 5346,
+      "sha256": "8e5e693cbd0ae453b456589a5cc550ce9d4b9998655712aeacea8a468cca12ca"
+    },
+    "scan.DRAFT.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/scan.DRAFT.json",
+      "bytes": 10856,
+      "sha256": "85e5dc2a5569dd384d46a3172941e0f852958f142a8f22edcc03057e34225aea"
+    }
+  },
+  "source_snapshots": {
+    "linux-tests/retained29_safe_guard.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/retained29_safe_guard.py",
+      "bytes": 8741,
+      "sha256": "4c979bf30b781afd3e962a297d5a49aa24e0258cc94992e6ed0e2acbd3bfd665"
+    },
+    "linux-tests/retained29_safe_session.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/retained29_safe_session.py",
+      "bytes": 18893,
+      "sha256": "a322a3f2cea13c3ef7448e3cb2d7774331addc3fcb4d10b42ac303bd29541503"
+    },
+    "linux-tests/retained29_safe_functional_protocol.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/retained29_safe_functional_protocol.py",
+      "bytes": 5879,
+      "sha256": "d6ef6b464eec12e8283f70e583a8f49bdd2fe3697e9e8598204febaa71c63d74"
+    },
+    "linux-tests/run_retained29_safe_functional.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/run_retained29_safe_functional.py",
+      "bytes": 1310,
+      "sha256": "9eeb874aba50f4d2cb1ae22f5e3059f5b498a259c7160f769be6b3899e17ba0d"
+    },
+    "linux-tests/scheduler_retained29_cost_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/scheduler_retained29_cost_benchmark.c",
+      "bytes": 20151,
+      "sha256": "2f19b863264cec0842899e23bfc2a9d4a057beffe3ddb5cfd2cd5227af800f8e"
+    },
+    "linux-tests/scheduler_retained29_regex_cost_benchmark.c": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/scheduler_retained29_regex_cost_benchmark.c",
+      "bytes": 20226,
+      "sha256": "1bc842d91c1fdacd1bfc81c3ef4e9a4510984c86b8f5e12ee9d22e05de4fbd37"
+    },
+    "linux-tests/retained29_cost_protocol.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/retained29_cost_protocol.py",
+      "bytes": 21676,
+      "sha256": "fd9507f8ee6095285844e1d2a08652d6ffeae2d03d2dcbf378c966ef946a272f"
+    },
+    "linux-tests/run_retained29_cost_session.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/run_retained29_cost_session.py",
+      "bytes": 6170,
+      "sha256": "7a7aea2c65407445236e8559956bbb766b27bad890589af336f2e1947bfc6c3c"
+    },
+    "linux-tests/test_retained29_cost_protocol.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/test_retained29_cost_protocol.py",
+      "bytes": 13247,
+      "sha256": "7b44ca362abcfffcf576c082c4ec30aeb8ab7a6984e49f97585e50e3a0a069df"
+    },
+    "linux-tests/test_retained29_cost_admission.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/test_retained29_cost_admission.py",
+      "bytes": 7100,
+      "sha256": "e3c1b57bb17472f4d83ec670bd2f5e6f1fa912846178e803efc26da54a3328a6"
+    },
+    "linux-tests/test_retained29_safe_session.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/test_retained29_safe_session.py",
+      "bytes": 20415,
+      "sha256": "09af04f13c3e9494f6a6564cc266b173563bde7247884e060c269f3f6bae79aa"
+    },
+    "linux-tests/run_retained29_application_session.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/run_retained29_application_session.py",
+      "bytes": 16588,
+      "sha256": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a"
+    },
+    "linux-tests/retained29_application_protocol.py": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/source/linux-tests/retained29_application_protocol.py",
+      "bytes": 18686,
+      "sha256": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490"
+    }
+  },
+  "host_command": [
+    "/usr/bin/python3",
+    "-B",
+    "-m",
+    "unittest",
+    "-v",
+    "test_retained29_cost_protocol",
+    "test_retained29_cost_admission",
+    "test_retained29_safe_session"
+  ],
+  "host_tests": 46,
+  "host_returncode": 0,
+  "logs": {
+    "stdout.log": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr.log": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/stderr.log",
+      "bytes": 5178,
+      "sha256": "3738b3f2e915d8ae16cb7d93d25d4424f1798b8ab6a039695d035eaec501a826"
+    },
+    "prior-seal.log": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/prior-seal.log",
+      "bytes": 88,
+      "sha256": "985da2b68324aceb6952fd707169f977c1030525dd3097ccc5f6e6e296d050c1"
+    }
+  },
+  "host_fixtures": {
+    "host-fixtures/chase-ordinary-d.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-d.events.json",
+      "bytes": 2819,
+      "sha256": "37d0b8163c0609b36034faee69e84b472c72de2c4050eb970a998551baa4f17f"
+    },
+    "host-fixtures/chase-ordinary-d.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-d.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/chase-ordinary-d.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-d.stdout",
+      "bytes": 4009,
+      "sha256": "9336ac3c464c49cc9a46b119a3acabdc492d029a15b4912c8bc0504b716c9092"
+    },
+    "host-fixtures/chase-ordinary-i.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-i.events.json",
+      "bytes": 2819,
+      "sha256": "82817cf7f6c9e66ff2312551a236886d9b941a38ac96d0053f526b19b7cb2ce1"
+    },
+    "host-fixtures/chase-ordinary-i.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-i.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/chase-ordinary-i.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-i.stdout",
+      "bytes": 4009,
+      "sha256": "a094b9c6ddf8c10975c5123694767042c04d96d6305a2c64b55d8a157174cd2e"
+    },
+    "host-fixtures/chase-ordinary-joint.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-joint.events.json",
+      "bytes": 2831,
+      "sha256": "1715df47c6598f8870f89a4570d6eb619a7fb86ae4fcc02a4cf4647a6d7e34de"
+    },
+    "host-fixtures/chase-ordinary-joint.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-joint.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/chase-ordinary-joint.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/chase-ordinary-joint.stdout",
+      "bytes": 4016,
+      "sha256": "f61818753d568d3bf83abf5808800ca68f0f7169a3430b9f1740fadd1e04223a"
+    },
+    "host-fixtures/lookup-ordinary-d.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-d.events.json",
+      "bytes": 2683,
+      "sha256": "7bd81e4395f2c0f161bef48d9872e8d3997a76859f5465bd366f47219de7c97b"
+    },
+    "host-fixtures/lookup-ordinary-d.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-d.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/lookup-ordinary-d.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-d.stdout",
+      "bytes": 4010,
+      "sha256": "d87c566195c75f10a9b3341460972c724a1ae6aa006b03fca042ab4cde478746"
+    },
+    "host-fixtures/lookup-ordinary-i.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-i.events.json",
+      "bytes": 2683,
+      "sha256": "a8eb0fd002a77c67745df0f40801525e38cb1a4e19cc23b97d603116c42b5499"
+    },
+    "host-fixtures/lookup-ordinary-i.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-i.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/lookup-ordinary-i.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-i.stdout",
+      "bytes": 4010,
+      "sha256": "f024d7f2a5b993ce2c528e7188c25b926206ea78e7357ed2356caec3f6828d0d"
+    },
+    "host-fixtures/lookup-ordinary-joint.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-joint.events.json",
+      "bytes": 2695,
+      "sha256": "03424106df811a3af53a0ed243107e02e39b66e91c25e11cbf9d1ed9620bc51c"
+    },
+    "host-fixtures/lookup-ordinary-joint.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-joint.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/lookup-ordinary-joint.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/lookup-ordinary-joint.stdout",
+      "bytes": 4016,
+      "sha256": "74617ea1c0909f7cb7af54638443364d1dcfb3a450a8878ae2f3bcaf9eecc045"
+    },
+    "host-fixtures/parse-ordinary-d.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-d.events.json",
+      "bytes": 2683,
+      "sha256": "0db4ea7b1ebb9ebaa29d722fbcd4cf8fde33b9319337151c24e5c89eff0f1cee"
+    },
+    "host-fixtures/parse-ordinary-d.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-d.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/parse-ordinary-d.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-d.stdout",
+      "bytes": 4008,
+      "sha256": "b60397e015adfb9403081979382d38b7f509d1c0085b469b30b7ed5a594d1ed3"
+    },
+    "host-fixtures/parse-ordinary-i.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-i.events.json",
+      "bytes": 2683,
+      "sha256": "fb5468ae29e462b3798f6f99aea1409b625c52e28c47bc5252238958fb0379a8"
+    },
+    "host-fixtures/parse-ordinary-i.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-i.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/parse-ordinary-i.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-i.stdout",
+      "bytes": 4008,
+      "sha256": "d96a361451fca50b70d645fdda6a058572e2a60ebf3624ce38aa9e3f058ba7ac"
+    },
+    "host-fixtures/parse-ordinary-joint.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-joint.events.json",
+      "bytes": 2695,
+      "sha256": "4fab86f6b1b022a9a9292509c6572446e1f3434dcce3f5460da97524d4b596ff"
+    },
+    "host-fixtures/parse-ordinary-joint.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-joint.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/parse-ordinary-joint.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/parse-ordinary-joint.stdout",
+      "bytes": 4015,
+      "sha256": "5f8f96eb630242ad5ec1a405202cd67052d089f0f838f2dbeb1d623ee4b54d21"
+    },
+    "host-fixtures/plain-host-binary": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/plain-host-binary",
+      "bytes": 40824,
+      "sha256": "2bc8287b5ca5f6131b23a68a27f88f4624126ba88d7908fe9cb6b951cba4346b"
+    },
+    "host-fixtures/plain-mock.c": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/plain-mock.c",
+      "bytes": 8245,
+      "sha256": "1acf24613b80308e14532b1346fe8a35b7438d85682bd349e6ff954d13c19976"
+    },
+    "host-fixtures/regex-host-binary": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-host-binary",
+      "bytes": 45656,
+      "sha256": "8803afa2fb82aaaf98c6231281a1bc263107cc775c593bc6927605f18c0b306a"
+    },
+    "host-fixtures/regex-mock.c": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-mock.c",
+      "bytes": 11396,
+      "sha256": "dbd76f1e13e9252c9401bdfb0d617655d8716f852fe9084f1488b0067462b1ce"
+    },
+    "host-fixtures/regex-ordinary-d.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-d.events.json",
+      "bytes": 63091,
+      "sha256": "1252af60f14d691cee1b54a82fe45ac320db2441d5c62b4e6d0a54702b760eb0"
+    },
+    "host-fixtures/regex-ordinary-d.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-d.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/regex-ordinary-d.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-d.stdout",
+      "bytes": 4178,
+      "sha256": "ade50b62d234d28ecb41ec8b0e156a2f76f7593887aafa14b27db162543a201d"
+    },
+    "host-fixtures/regex-ordinary-i.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-i.events.json",
+      "bytes": 63091,
+      "sha256": "3c77e91f11c8f81fe6ad45b94779818905500f71e0b1ec05bcf252061bbf84ad"
+    },
+    "host-fixtures/regex-ordinary-i.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-i.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/regex-ordinary-i.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-i.stdout",
+      "bytes": 4178,
+      "sha256": "cf32b36c36c00305038b24ff4b4ea3a13b0f401fc2948dd546a3ad31fee5dda3"
+    },
+    "host-fixtures/regex-ordinary-joint.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-joint.events.json",
+      "bytes": 63103,
+      "sha256": "a61c5d3c7899f4d05ff4bba6c9ad2f3db024f515a69bcb84d74ee7aeb0233f81"
+    },
+    "host-fixtures/regex-ordinary-joint.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-joint.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/regex-ordinary-joint.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/regex-ordinary-joint.stdout",
+      "bytes": 4185,
+      "sha256": "8d374bab9e6689fd5412d22905f7e93eae06fe758308d63bc2fa129cc47fd79f"
+    },
+    "host-fixtures/scan-ordinary-d.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-d.events.json",
+      "bytes": 2683,
+      "sha256": "a40f25d279e5da0ce34b4ab1fdfc06fd9384f47e21a26543fd288b6b28568b59"
+    },
+    "host-fixtures/scan-ordinary-d.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-d.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/scan-ordinary-d.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-d.stdout",
+      "bytes": 4007,
+      "sha256": "af69c355bfa14ebd2dc0b2c82742fef2071dda90908306d008264a41f698167c"
+    },
+    "host-fixtures/scan-ordinary-i.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-i.events.json",
+      "bytes": 2683,
+      "sha256": "5d303d8954e48bfdbd5aff4e52724c4a44c6a2883b1785b4d82cb38d39628155"
+    },
+    "host-fixtures/scan-ordinary-i.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-i.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/scan-ordinary-i.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-i.stdout",
+      "bytes": 4008,
+      "sha256": "dd2a2e3ecfe1da5f3e7caa012ea6195b50034f0388de81319c256707a44d5460"
+    },
+    "host-fixtures/scan-ordinary-joint.events.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-joint.events.json",
+      "bytes": 2695,
+      "sha256": "91cc8301e5f6c97d6c922ae9c19345226b0ee35c93d65a25327c08630857f7ee"
+    },
+    "host-fixtures/scan-ordinary-joint.stderr": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-joint.stderr",
+      "bytes": 75,
+      "sha256": "d3eb580933e82fc173769fe1b0a88f516acb21b35981c2d0e24d059d009ed688"
+    },
+    "host-fixtures/scan-ordinary-joint.stdout": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scan-ordinary-joint.stdout",
+      "bytes": 4015,
+      "sha256": "3ae835bc941b1cc341450f95892dd26bbfda34ea442713f2163bcd81c72b4958"
+    },
+    "host-fixtures/scope.json": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-safe-session-20261121/prepared02/host-fixtures/scope.json",
+      "bytes": 314,
+      "sha256": "09c9a30d1f2394ba20c8b641dc710d7c86210996580c05d14e5a64a9727c03d5"
+    }
+  },
+  "physical_actions": 0,
+  "model_runs": 0,
+  "launchable": false,
+  "actual_route": null,
+  "actual_present": null,
+  "actual_fixed_functional": null,
+  "actual_cost_cohort": null
+}

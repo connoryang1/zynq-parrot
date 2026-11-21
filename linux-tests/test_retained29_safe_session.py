@@ -264,4 +264,34 @@ class Wrappers(unittest.TestCase):
                 with self.assertRaises(ValueError):functional.verify_result(p.binding(path),'probe-present')
 
 
+class TransitiveSources(unittest.TestCase):
+    setUp=Engine.setUp
+    tearDown=Engine.tearDown
+    busy=Engine.busy
+    factory=Engine.factory
+    run_session=Engine.run_session
+
+    def test_imported_journal_clock_and_utc_are_snapshotted_and_drift_checked(self):
+        critical=('linux-tests/run_retained29_application_session.py','linux-tests/retained29_application_protocol.py')
+        sources=functional.source_hashes();self.assertTrue(set(critical)<=set(functional.SOURCE_FILES))
+        self.a=dict(supervisor_sources=sources);self.admission.write_text(json.dumps(self.a))
+        self.contract.bound_sources=functional.bound_sources;self.contract.verify_sources=functional.verify_sources
+        result=self.run_session();self.assertEqual(result['supervisor_sources'],sources)
+        real=functional.binding
+        for relative in critical:
+            original=p.ROOT/relative;snapshot=self.output/'host-sources'/relative
+            self.assertEqual(p.binding(snapshot)['sha256'],sources[relative])
+            def drift(path,target=original):
+                row=real(path)
+                return dict(row,sha256='0'*64) if Path(path)==target else row
+            with patch.object(functional,'binding',side_effect=drift):
+                with self.assertRaisesRegex(ValueError,'source drift'):functional.verify_sources(self.a)
+            data=snapshot.read_bytes();snapshot.write_bytes(data+b'\n# HOST_VERIFY drift\n')
+            op=s.Operations.__new__(s.Operations);op.sources=sources;op.output=self.output;op.steps=0
+            with patch.object(s.stage_client.Operations,'step') as parent:
+                with self.assertRaisesRegex(ValueError,'snapshot drift'):op.step('never',['NEVER_EXECUTE'])
+                parent.assert_not_called()
+            snapshot.write_bytes(data);self.assertEqual(p.binding(original)['sha256'],sources[relative])
+
+
 if __name__=='__main__':unittest.main()

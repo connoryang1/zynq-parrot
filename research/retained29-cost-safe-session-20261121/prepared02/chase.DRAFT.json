@@ -1,0 +1,193 @@
+{
+  "schema": "bp-retained29-cost-application-session-v1",
+  "state": "DRAFT-UNLAUNCHABLE",
+  "role": "cost-performance-acquisition",
+  "host": "xilinx@192.168.4.35",
+  "runtime_ms": 3600000,
+  "one_guest_boot": true,
+  "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+  "plan": {
+    "role": "cost-performance-acquisition",
+    "workload": "chase",
+    "rotation": 0,
+    "loops": 256,
+    "repeats": 4,
+    "warmup": 16,
+    "sync": "futex",
+    "profile": "plain",
+    "advisory_source": "none",
+    "cases": [
+      {
+        "id": "chase-32-ordinary-i",
+        "kind": "plain",
+        "workload": "chase",
+        "kib": 32,
+        "policy": "ordinary-i",
+        "mask": 9
+      },
+      {
+        "id": "chase-32-ordinary-d",
+        "kind": "plain",
+        "workload": "chase",
+        "kib": 32,
+        "policy": "ordinary-d",
+        "mask": 6
+      },
+      {
+        "id": "chase-32-ordinary-joint",
+        "kind": "plain",
+        "workload": "chase",
+        "kib": 32,
+        "policy": "ordinary-joint",
+        "mask": 15
+      },
+      {
+        "id": "chase-128-ordinary-i",
+        "kind": "plain",
+        "workload": "chase",
+        "kib": 128,
+        "policy": "ordinary-i",
+        "mask": 9
+      },
+      {
+        "id": "chase-128-ordinary-d",
+        "kind": "plain",
+        "workload": "chase",
+        "kib": 128,
+        "policy": "ordinary-d",
+        "mask": 6
+      },
+      {
+        "id": "chase-128-ordinary-joint",
+        "kind": "plain",
+        "workload": "chase",
+        "kib": 128,
+        "policy": "ordinary-joint",
+        "mask": 15
+      }
+    ]
+  },
+  "hardware": {
+    "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "l1i_bytes": 32768,
+    "l1d_bytes": 32768,
+    "l2_bytes": 16384,
+    "retained": {
+      "i_lines": 1280,
+      "d_lines": 1280,
+      "set_log2": 8
+    }
+  },
+  "hardware_binding_state": "proposed geometry only, no selected route/capability proof",
+  "artifacts": null,
+  "capability_gate": null,
+  "functional_gate": null,
+  "stage_admission": null,
+  "plan_record": null,
+  "cohort_record": null,
+  "visit_id": null,
+  "sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f",
+    "linux-tests/retained29_safe_guard.py": "4c979bf30b781afd3e962a297d5a49aa24e0258cc94992e6ed0e2acbd3bfd665",
+    "linux-tests/retained29_safe_session.py": "a322a3f2cea13c3ef7448e3cb2d7774331addc3fcb4d10b42ac303bd29541503",
+    "linux-tests/retained29_safe_functional_protocol.py": "d6ef6b464eec12e8283f70e583a8f49bdd2fe3697e9e8598204febaa71c63d74",
+    "linux-tests/run_retained29_safe_functional.py": "9eeb874aba50f4d2cb1ae22f5e3059f5b498a259c7160f769be6b3899e17ba0d",
+    "linux-tests/scheduler_retained29_cost_benchmark.c": "2f19b863264cec0842899e23bfc2a9d4a057beffe3ddb5cfd2cd5227af800f8e",
+    "linux-tests/scheduler_retained29_regex_cost_benchmark.c": "1bc842d91c1fdacd1bfc81c3ef4e9a4510984c86b8f5e12ee9d22e05de4fbd37",
+    "linux-tests/retained29_cost_protocol.py": "fd9507f8ee6095285844e1d2a08652d6ffeae2d03d2dcbf378c966ef946a272f",
+    "linux-tests/run_retained29_cost_session.py": "7a7aea2c65407445236e8559956bbb766b27bad890589af336f2e1947bfc6c3c"
+  },
+  "legacy_sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+  },
+  "unlaunchable_reasons": [
+    "Actual selected routed bit/package/fit binding pending; canceled r2 and AREA diagnostic fits cannot qualify.",
+    "Actual successful new-safe present probe and unchanged fixed functional on exact selected bit pending.",
+    "Actual verified previous overlay rollback triplet and reviewed V2 staging admission pending.",
+    "Independent reviewed plan/cohort/visit chronology pending; drafts are not preregistration or acquisition."
+  ],
+  "program_preparation": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-trigger-accounting-20261121/closed-cost01/verification.json",
+    "bytes": 11421,
+    "sha256": "8f185dfcfe41a7b4274387c9a1eabe525603680f7b03f8bf638cb1090e5a9a41"
+  },
+  "programs": {
+    "plain": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/retained29-cost-plain",
+        "bytes": 27584,
+        "sha256": "770bbfdb7ee5e92ce78fdf53bd029ebfe9c68586870c80946f7dc1b2a09e31b1"
+      },
+      "transfer": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/plain.transfer",
+        "bytes": 17808,
+        "sha256": "5756404303fdc8c09026647c80cf161881f3d4f4c5079189fc5af526e575bcab"
+      }
+    },
+    "regex": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/retained29-cost-regex",
+        "bytes": 27976,
+        "sha256": "e1693d512042779b5496f755d67377681d35926ffbb46e69ca5ff7cc0998969e"
+      },
+      "transfer": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/regex.transfer",
+        "bytes": 19498,
+        "sha256": "132277a0c83c31384926901250c3b077fc1f90040d4f1dda28157ba6eda0faac"
+      }
+    },
+    "probe": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/retained_store_probe.elf",
+        "bytes": 14200,
+        "sha256": "9bb01f51b23ca190e7c1bc1c1bc935c01f3441bacab79463438312084c13f79a"
+      },
+      "transfer": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-session-preparation-20261121/closed-preparation-002/probe.transfer",
+        "bytes": 8564,
+        "sha256": "438e3177799edc373270823e77623b4404405ad28ca257e52e7743033e42119b"
+      }
+    }
+  }
+}

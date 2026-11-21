@@ -14,7 +14,10 @@ SUCCESS_STATE='PASS-complete-recovered-functional-session'
 ROLES=('probe-present','benchmark-functional')
 SOURCE_FILES=(*base.SOURCE_FILES,*stage_client.NEW_SOURCES,'linux-tests/retained29_safe_guard.py',
     'linux-tests/retained29_safe_session.py','linux-tests/retained29_safe_functional_protocol.py',
-    'linux-tests/run_retained29_safe_functional.py')
+    'linux-tests/run_retained29_safe_functional.py',
+    # Runtime journal/clock and UTC validation imports predate this wrapper;
+    # include them even though the original base admission did not need them.
+    'linux-tests/run_retained29_application_session.py','linux-tests/retained29_application_protocol.py')
 require,binding,verify_binding=base.require,base.binding,base.verify_binding
 
 
