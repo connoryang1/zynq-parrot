@@ -2,6 +2,10 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Capacity service scaling measured — 2026-11-21:** all12 retained-buffer geometries/24 traced unit runs pass, checking56,656 complete64B slot reads. At1536lines/side, changing only retained sets64→256 reduces full-set lookup service49→13 own-lane cycles; this is a quantified interface cost, without application or FPGA inference (`testing/rtl/retained-line-geometry/`).
+
+- **Scoped runtime assertion gate complete — 2026-11-21:** the exact earlier64/64 full-core integrity/handoff/privilege ELF/NBF completes with post-reset BlackParrot runtime assertions active and an audited library-guard scope. Rejected global-library assertion runs remain excluded with their pre-NBF failure unresolved; complete sources, model, logs and losslessly compressed closed trace are retained (`research/large-retained-capacity-20261121/full-system-64-scoped06/`).
+
 - **Larger retained payload integration — 2026-11-21:** separate BRAM I/D partitions now restore complete ordinary L1 lines through their UCEs, with supervisor control, registered store invalidation and opposite-edge cancellation ownership. Exhaustive component payload gates and a complete64-line/side full-system integrity/privilege/handoff gate pass; final assertion-enabled full-core validation, routed capacity limits and FPGA application benefit remain pending (`research/large-retained-capacity-20261121/INTEGRATION.md`).
 
 - **Physical demand-retention pilot accepted — 2026-11-20:** both fresh RR/first scan32 functional boots pass strict provenance, scope/resource/CSR/zero-prefix/bounded-memory and normal-return gates. Demand publication and side-store response counters are observed physically; the short pilot is excluded from all performance inference, with saturated-counter and matched-lifecycle limits explicit (`research/retention-natural-demand-20261120/PILOT.md`).

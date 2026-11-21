@@ -49,6 +49,12 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
         // Randomization reset policy
         contextp->randReset(2);
 
+        // The first model edge precedes the reset coroutines. Randomized
+        // FIFO state is not meaningful until init() completes those resets.
+        // Preserve the caller's setting and check every later transaction.
+        const bool assertions_after_reset = contextp->assertOn();
+        contextp->assertOn(false);
+
         // Verilator must compute traced signals
         contextp->traceEverOn(true);
 
@@ -60,6 +66,9 @@ class bsg_zynq_pl : public bsg_zynq_pl_simulation {
                                                             "TOP");
         tick();
         init();
+        contextp->assertOn(assertions_after_reset);
+        bsg_pr_info("bsg_zynq_pl: reset complete; Verilator assertion setting restored to %u\n",
+                    unsigned(assertions_after_reset));
     }
 
     ~bsg_zynq_pl(void) {

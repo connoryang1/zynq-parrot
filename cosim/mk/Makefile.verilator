@@ -7,6 +7,11 @@ SHELL := /bin/bash
 DEFINES += SIMULATION
 DEFINES += $(EXTRA_DEFINES)
 
+# Validation-only definitions can preserve audited library declarations under
+# scoped assertion guards. Treat them as real source dependencies.
+VERILATOR_SUPPORT_SOURCES ?=
+VSOURCES += $(VERILATOR_SUPPORT_SOURCES)
+
 DUMP_FILE ?= dump.fst
 VERILATOR_BUILD_JOBS ?= $(shell nproc)
 
@@ -74,7 +79,10 @@ MODEL_ICACHE_DEMAND_CAPTURE_TAG := $(if $(filter BP_ICACHE_REPLAY_DEMAND_CAPTURE
 # Payload geometry changes both arrays and generated control. Include the
 # effective defines even when a design receives them through EXTRA_DEFINES.
 MODEL_RETAINED_TAG := $(subst $(bsg_var_space),,$(foreach retained_def,$(filter BP_RETAINED_%,$(DEFINES)),-$(subst =,_,$(retained_def))))
-MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)$(MODEL_RETAINED_TAG)
+# Verification scope is part of executable identity too. Presence selects the
+# BSG guard even when a caller spells BSG_HIDE_FROM_SYNTHESIS=0.
+MODEL_ASSERTION_TAG := $(if $(filter --assert,$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS)),-assert,)$(if $(filter BSG_HIDE_FROM_SYNTHESIS BSG_HIDE_FROM_SYNTHESIS=%,$(DEFINES)),-bsgsimhidden,)$(if $(strip $(VERILATOR_SUPPORT_SOURCES)),-support,)
+MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)$(MODEL_RETAINED_TAG)$(MODEL_ASSERTION_TAG)
 MODEL_CONFIG_STAMP := obj_dir/.build_config-$(MODEL_CONFIG_TAG)
 
 $(MODEL_CONFIG_STAMP): | $(BUILD_COLLATERAL)
