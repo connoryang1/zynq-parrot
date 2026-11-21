@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Metadata prototype passes components; inference times out — 2026-11-21:** frozenBP19bd replaces dense D epochs and I/D replacement metadata with swept, reset-free distributed-RAM intent;20 geometries ×two clocks preserve full payload and client cycles, and an intentionally skipped epoch clear is rejected. The all-variable actual-store synthesis reaches its580s limit without resource/DCP outputs; partial evidence and no-orphan confirmation are preserved before a separate production-input control (`research/retained-metadata-lutram-20261121/`).
+
 - **Large retained fit reaches a logic limit — 2026-11-21:** actual1280 full64-byte lines per side synthesize at57,373/53,200 total LUT and140/140 BRAM, then stop at implementation resource DRC before route. One closed read-only DCP query attributes3,756 LUT/41 BRAM to the retained store with zero LUTRAM;67 hash-verified lossless snapshots preserve the failure and attribution, and metadata overhead is the next component hypothesis (`research/fpga-native1280-sp-r4-20261121/closed-terminal01/manifest.json`).
 
 - **Stable retained RAM decomposition found — 2026-11-21:** actual-store inference reproduces the area-attribute compiler crash with ordinary options, retiming off and a verified single process. Changing only the two attributes to `power` compiles with 36 payload + 3.5 tag RAM tiles, saving 28 tiles versus native inference at an isolated cost of 548 LUTs / 14 FFs. A separate private I/D RAM prototype passes 24 functional/equivalence cases and is undergoing inference comparison; neither result establishes full-device fit (`research/retained-ram-inference-20261121/power-closed01/verification.json`).
