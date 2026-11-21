@@ -1,0 +1,64 @@
+{
+  "state": "ADMITTED clean canonical224KiB whole-device fit; cheaper gates PASS, no board action",
+  "top": "eb7d390134a0025331a2366a979a774263b146d5",
+  "bp": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "source": "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+  "seed": "/home/coyang/zynq-parrot-retained-dense",
+  "builder": "bp1/local blackparrot1",
+  "work_root": "/home/coyang/fpga-work-linux-retained-native1792-canonical-r6",
+  "persistent_log_root": "/home/coyang/fpga-logs-linux-retained-native1792-canonical-r6",
+  "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+  "aclk_mhz": 20,
+  "workers": 8,
+  "total_retained_payload_bytes": 229376,
+  "L1I_bytes": 32768,
+  "L1D_bytes": 32768,
+  "L2_bytes": 16384,
+  "resident": 2,
+  "logical": 4,
+  "response_delay": 0,
+  "decision": "Does canonical epoch RAM eliminate measured storage FF/packing bottleneck enough to route224KiB retained payload with unchanged geometry/clock?",
+  "cheaper_gates": "Integrated controller cycle/all512/allcells equivalence and clean fullcoreb912 pass; actualfullbackend synthesis maps D epochs96RAM/0FF. FullbackendXsim incomplete atelaboration240/600caps. Small changed-memory actual96LUTRAM mapping passes all256x8 cells/bothasyncports/65280RMW/512clear/reset/wrap, exactproductionleaf. This is compositional, not fullbackendmappedPASS. None proves physical placement/routing.",
+  "pass_action": "Verifyactualdefines/clocks/resources/setup+hold/no feedbackcut/package; then physicalABI/fullcapacity and complete broadCOST on/off I/D/joint under commonfullsessionlock; continuecapacityboundary.",
+  "fail_action": "Preserveactualfailedstage and inspectmeasuredremainingbottleneck beforeanotherRTLchange; no automaticunchangedretry.",
+  "resources": {
+    "work_cap_bytes": 1610612736,
+    "evidence_cap_bytes": 402653184,
+    "minimum_home_free_plus_remaining": 3221225472,
+    "minimum_shm_free_bytes": 536870912,
+    "deadline_seconds": 10800,
+    "free_home_start": 5577568256,
+    "free_shm_start": 2368905216
+  },
+  "bindings": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-fullcore-20261121/closed-full01/manifest.json",
+      "bytes": 36117,
+      "sha256": "ae77bf7601d384c632f287b19135223ba1538f3244d60b193a0517016346e657"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-production-20261121-02/closed01/manifest.json",
+      "bytes": 35801,
+      "sha256": "eb64f58e274f5c403f7c07b2fde2d44d3085cf658f1213a33cd813eca36ca457"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r6-preparation-20261121/remote_probe-template.py",
+      "bytes": 8066,
+      "sha256": "f12bde54cd04e0c05049c394047592facdb69d78e6b10db7204a4c1777a8ef0a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r6-preparation-20261121/monitor-template.py",
+      "bytes": 6792,
+      "sha256": "ea76b103dce0989cdcf599bc0f938494763617bdd041974b42ceaf9ecedf3a9e"
+    }
+  ],
+  "debug_seed": "618ee6e0e2610ef47e0dcc4df6748af3dffff731",
+  "changed_memory_gate": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/session.json",
+    "bytes": 15279,
+    "sha256": "2ec12e5d60dd86cf186fdbe7840d06c271cc53c385bb5c6a2eba2b2b6620a93a"
+  },
+  "board_actions": 0,
+  "utc": "2026-11-21T22:02:41.044092+00:00",
+  "changed_memory_admission_sha256": "d802735bae2ac2b9bc9adb20cfe1dd2198afd7377c041a8e6489116019f45b9b"
+}
