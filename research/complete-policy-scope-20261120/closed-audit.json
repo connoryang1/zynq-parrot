@@ -1,0 +1,1433 @@
+{
+  "state": "protocol-accepted; image contrasts not calculated",
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/admission.json",
+    "bytes": 2384,
+    "sha256": "501d6b12eb0fa10b9f1d298a2be6cb365695c2be7aac96b0984ea4ffe5f4a360"
+  },
+  "acquisition": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/acquisition.json",
+    "bytes": 7042,
+    "sha256": "b26cb3727e519c98d82d9ee49b09ad868f8e04b84a285e9a7bf06bbbd0338eab"
+  },
+  "audit_source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/audit_admitted_matrix.py",
+    "bytes": 20493,
+    "sha256": "33f6090f6bc022b4157f5bec53597162f5dd24ad5adffdc0e57f6868324d7777"
+  },
+  "frozen_host_sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+  },
+  "board_helper_protocol": {
+    "review": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/runner-cleanup-sync-20261120/protocol.json",
+      "bytes": 2190,
+      "sha256": "8325114ac9affefdfa6fe24811edcfa8b1feb7d7888d554ba5b29135dded833f"
+    },
+    "evidence": {
+      "state": "post-program-cleanup-only-source-difference-verified",
+      "source_name": "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh",
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/runner-cleanup-sync-20261120/board_run_pynq_interactive.original.sh",
+        "bytes": 3582,
+        "sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283"
+      },
+      "cleanup_sync": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/runner-cleanup-sync-20261120/board_run_pynq_interactive.cleanup-sync.sh",
+        "bytes": 3808,
+        "sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90"
+      },
+      "diff": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/runner-cleanup-sync-20261120/cleanup-sync.diff",
+        "bytes": 413,
+        "sha256": "f455588b1c25528ecf969e3afb8b5aa6b7e2a00299cee3510bf5ecc97cc5e68b"
+      },
+      "operational_addendum": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/OPERATIONAL_CLEANUP_ADDENDUM.md",
+        "bytes": 5347,
+        "sha256": "13ad8dc2e80fbc0e202ef40d0af460785c62ef117ac0c88df8865ed5f2e15350"
+      },
+      "inspection": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/runner-cleanup-sync-20261120/inspection.json",
+        "bytes": 931,
+        "sha256": "cd92e3c7aa44e97984587be8e57bd75a3bfb3ad0f7879965b6fbeedb3d21ebc4"
+      },
+      "known_owned_cleanup": {
+        "path": "/home/coyang/zynq-parrot-linux-research/research/runner-cleanup-sync-20261120/known-own-cleanup.json",
+        "bytes": 470,
+        "sha256": "4163535b19a86568af2ca4ce5bf8870c266ca6ee31825ebd5772ee143af183f9"
+      },
+      "first_cleanup_sync_visit_index": 3,
+      "first_cleanup_sync_visit_label": "B1-second",
+      "precleanup_bytes_unchanged": true,
+      "posttrap_launch_bytes_unchanged": true,
+      "timed_guest_code_or_parameters_changed": false,
+      "frozen_eight_changed": false,
+      "persistence_cause_proved": false,
+      "cleanup_tests": {
+        "command": "python3 -m unittest test_board_runner_cleanup",
+        "tests": 4,
+        "seconds": 0.205,
+        "result": "OK"
+      },
+      "board_actions_by_implementation_agent": false,
+      "actual_executed_source_marker": "BOARD_RUNNER_SOURCE_SHA256"
+    },
+    "installation": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/runner-cleanup-sync-installation.json",
+      "bytes": 1063,
+      "sha256": "2d205f72250350683603f9518b613fa46f227d54d722cc56834f9451bc79b13c"
+    },
+    "verified_utc": "2026-11-21T01:54:21.762497+00:00",
+    "visit_versions": {
+      "A1-first": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "A1-second": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "B1-first": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "B1-second": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "B2-first": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "B2-second": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "A2-first": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "A2-second": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90"
+    },
+    "first_cleanup_sync_visit_index": 3
+  },
+  "validator_sources": {
+    "analyze_scheduler_pipe_hint.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/analyze_scheduler_pipe_hint.py",
+      "bytes": 30876,
+      "sha256": "eb5a6b8f904dbae651435b188697c522d500a551d0c9182640f2176735a021ce"
+    },
+    "compare_scheduler_pipe_hint_mode14.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/compare_scheduler_pipe_hint_mode14.py",
+      "bytes": 19727,
+      "sha256": "c12e26ba16489b127dfc33815bb85d8efaee28322d9eb87825af7f8d9824efdd"
+    },
+    "run_scheduler_pipe_hint.py": {
+      "path": "/home/coyang/zynq-parrot-linux-research/linux-tests/run_scheduler_pipe_hint.py",
+      "bytes": 15725,
+      "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+    }
+  },
+  "host": "xilinx@192.168.4.35",
+  "sessions": [
+    {
+      "label": "A1-first",
+      "image": "A",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/session.json",
+        "bytes": 3594,
+        "sha256": "7b2322d409bc0d6861d32538c55b86816c74f647c4588fc9e9d1094eec31b379"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T00:29:24.308027+00:00",
+      "released_utc": "2026-11-21T00:39:36.950016+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/0-scan32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/1-lookup32-futex-early.log"
+      ]
+    },
+    {
+      "label": "A1-second",
+      "image": "A",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/session.json",
+        "bytes": 3594,
+        "sha256": "421cb929f4d7fda36ae432ec9d3079b1345be8c2f1f4dd90841a791ea223bf50"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T00:41:02.679810+00:00",
+      "released_utc": "2026-11-21T00:52:51.964188+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/0-parse32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/1-chase32-futex-early.log"
+      ]
+    },
+    {
+      "label": "B1-first",
+      "image": "B",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/session.json",
+        "bytes": 3592,
+        "sha256": "8e9fdfdcee7fa6ef64234715356a47aaae6d406bade8648b17bad36a652ca02b"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T00:54:09.939383+00:00",
+      "released_utc": "2026-11-21T01:04:29.199218+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/0-scan32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/1-lookup32-futex-early.log"
+      ]
+    },
+    {
+      "label": "B1-second",
+      "image": "B",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/session.json",
+        "bytes": 3606,
+        "sha256": "e17f58065d1ad551eb0a2cddab16014f051913b6c72e4110a5d27fcf5888f57a"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T01:56:37.509089+00:00",
+      "released_utc": "2026-11-21T02:07:53.545258+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/0-parse32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/1-chase32-futex-early.log"
+      ]
+    },
+    {
+      "label": "B2-first",
+      "image": "B",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/session.json",
+        "bytes": 3592,
+        "sha256": "73bcb3b832350aaf72f1fd99e194804e7f35c55626ce750f067a1fa7c783d909"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T02:08:37.565504+00:00",
+      "released_utc": "2026-11-21T02:19:50.676244+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/0-chase32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/1-parse32-futex-early.log"
+      ]
+    },
+    {
+      "label": "B2-second",
+      "image": "B",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/session.json",
+        "bytes": 3592,
+        "sha256": "70b195b123942ee9ebf1f797a64fe38401b98d710dd890b4eb9741d752a82e4d"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T02:24:59.586962+00:00",
+      "released_utc": "2026-11-21T02:35:21.479008+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/0-lookup32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/1-scan32-futex-early.log"
+      ]
+    },
+    {
+      "label": "A2-first",
+      "image": "A",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/session.json",
+        "bytes": 3594,
+        "sha256": "16f2bd3bbe16334ed0c2df210e545c6d695dd7f1946741185fa1efe7329ccbbd"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T02:35:40.863167+00:00",
+      "released_utc": "2026-11-21T02:46:46.062303+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/0-chase32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/1-parse32-futex-early.log"
+      ]
+    },
+    {
+      "label": "A2-second",
+      "image": "A",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/session.json",
+        "bytes": 3594,
+        "sha256": "b4f08edbef072417cc65074cf631edc150e706229e87627e3229acc46a27346b"
+      },
+      "host_sources": {
+        "linux-tests/run_resume_workload_session.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/linux-tests/run_resume_workload_session.py",
+          "bytes": 7745,
+          "sha256": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112"
+        },
+        "linux-tests/run_scheduler_pipe_hint.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/linux-tests/run_scheduler_pipe_hint.py",
+          "bytes": 15725,
+          "sha256": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3"
+        },
+        "linux-tests/run_scheduler_tagged_replay.py": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/linux-tests/run_scheduler_tagged_replay.py",
+          "bytes": 15889,
+          "sha256": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh",
+          "bytes": 4443,
+          "sha256": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh",
+          "bytes": 2143,
+          "sha256": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh",
+          "bytes": 1586,
+          "sha256": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh",
+          "bytes": 1285,
+          "sha256": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a"
+        },
+        "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/host-sources/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+          "bytes": 1757,
+          "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+        }
+      },
+      "started_utc": "2026-11-21T02:47:05.044414+00:00",
+      "released_utc": "2026-11-21T02:58:27.633125+00:00",
+      "logs": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/0-lookup32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/1-scan32-futex-early.log"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+      "bytes": 69843938,
+      "sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/workload-plain-scoped-resources-gzip.transfer",
+      "bytes": 16162,
+      "sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-control-shell.nbf",
+      "bytes": 69843938,
+      "sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa"
+    }
+  ],
+  "reviewed_images": {
+    "baseline": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+      "sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a"
+    },
+    "control": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-control-shell.nbf",
+      "sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa"
+    },
+    "changed_record_line": 1075385,
+    "original_record": "03_0000000080a13fe8_1073e0f77de3471d",
+    "control_record": "03_0000000080a13fe8_1073e0f77de34721",
+    "manifest": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/manifest.json",
+      "sha256": "099370428f6e568c474e119b5dca601604a71333ce8377aa05ca76e139a3ff32",
+      "bytes": 14157
+    },
+    "verification": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/verification.json",
+      "sha256": "0d2a9793007c507ae7d112e1acdd1eb273d8be4ee692835c60519bc503158ad4",
+      "bytes": 3401
+    },
+    "all_modes": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/all-256-mode-proof.json",
+      "sha256": "d97d52d0a4eab6042e60f81ae6dc2e3f81b10beb464ff572f6bd491874f0d9b0",
+      "bytes": 21420
+    }
+  },
+  "logs": [
+    {
+      "image": "A",
+      "workload": "scan",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "helper_identity_evidence": "legacy-no-per-run-marker",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/0-scan32-futex-early.log",
+        "bytes": 36009,
+        "sha256": "e181110444a59a5281ed0c2ff6807cdb254498dc8456e9611adb83985c777bc7"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/0-scan32-futex-early.log.status.json",
+        "bytes": 801,
+        "sha256": "d9b054e5c1c623a1f98ad24173baf3aecf550af1a7104c1e59e574d1e86a40e2"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "scan",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "lookup",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "helper_identity_evidence": "legacy-no-per-run-marker",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/1-lookup32-futex-early.log",
+        "bytes": 36010,
+        "sha256": "04a43eb494a7e32a99590613a664ded666f0ba312c89667ffd0f38d2e2c5f77d"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/1-lookup32-futex-early.log.status.json",
+        "bytes": 810,
+        "sha256": "ef18a079becb5376285962a39e1ef2e664f33a0282bebf41c3ff4e7e01baf4a7"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "lookup",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "parse",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "helper_identity_evidence": "legacy-no-per-run-marker",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/0-parse32-futex-early.log",
+        "bytes": 36024,
+        "sha256": "38ba8e142eb51f1e412d498cbb4a3bed882d43363a30d53115b86cc1b07eb6b8"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/0-parse32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "bcd84321fbffe9e2b5b402ce3eb07ebb6323ac871e13b67f9960896e47848d30"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "parse",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "chase",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "helper_identity_evidence": "legacy-no-per-run-marker",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/1-chase32-futex-early.log",
+        "bytes": 36007,
+        "sha256": "485b0ae5f5d6583861c5b75cce511f61abf6111a9742bd3ebede73bc7aa5a25e"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/1-chase32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "c27eec713df5a0ea3a48434c0a371e82a834abbaa94bfb05f866ad3359c9f170"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "chase",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "scan",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "helper_identity_evidence": "legacy-no-per-run-marker",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/0-scan32-futex-early.log",
+        "bytes": 36006,
+        "sha256": "3281a4ddf71b55b1015b16818317d0e811962590040586a53bd9b17fdb3af2ac"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/0-scan32-futex-early.log.status.json",
+        "bytes": 801,
+        "sha256": "512e9775dd2bd281e6f3ab13cabdfd6535d0353b18b13cbfb78317d2b174b639"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "scan",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "lookup",
+      "board_helper_sha256": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "helper_identity_evidence": "legacy-no-per-run-marker",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/1-lookup32-futex-early.log",
+        "bytes": 36009,
+        "sha256": "43d1e6de801f4a08673a6a4ab235681f006cf18e44b060a78b1ffc99fa1dda2e"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/1-lookup32-futex-early.log.status.json",
+        "bytes": 810,
+        "sha256": "9ac9ac6b7bbfcd88015e0f32172a12ba5a69003c3065a834405b3750c2752539"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "lookup",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "parse",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/0-parse32-futex-early.log",
+        "bytes": 36116,
+        "sha256": "451fc45b50b027d942b0c966e34efd3374853c2f458ffe4c23b3204b2d453df6"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/0-parse32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "7ade2cf3caa54ab500ee642a3833a252f14c85081777a8b3c77a3279352e745e"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "parse",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "chase",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/1-chase32-futex-early.log",
+        "bytes": 36097,
+        "sha256": "aec1e37535a0e59e1d5a8f5e45d25f73ed5d8ff9653f7497ac7cee17e6b33f75"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/1-chase32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "52cd4453eb31704fe44142ec37cd214ae349b1db0c43687c85be06eb0aa20d06"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "chase",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "chase",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/0-chase32-futex-early.log",
+        "bytes": 36096,
+        "sha256": "9f67a5dd044324a0074415aaab521aa44473dfc578b70b4c25c15931e1910bb2"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/0-chase32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "52cd4453eb31704fe44142ec37cd214ae349b1db0c43687c85be06eb0aa20d06"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "chase",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "parse",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/1-parse32-futex-early.log",
+        "bytes": 36116,
+        "sha256": "0d7d0d2a06c6f5e2daa4d4ebf945e2c914d36dc5742c6f3c86c05df408a7626b"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/1-parse32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "7ade2cf3caa54ab500ee642a3833a252f14c85081777a8b3c77a3279352e745e"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "parse",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "lookup",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/0-lookup32-futex-early.log",
+        "bytes": 36102,
+        "sha256": "aba007f9e2612bfddfb50298ec01d2f4a969a12b7c73201576d6183522f45889"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/0-lookup32-futex-early.log.status.json",
+        "bytes": 810,
+        "sha256": "9ac9ac6b7bbfcd88015e0f32172a12ba5a69003c3065a834405b3750c2752539"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "lookup",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "B",
+      "workload": "scan",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/1-scan32-futex-early.log",
+        "bytes": 36099,
+        "sha256": "abf90bf284245f37fde3283f31f7f91daea797b6c785c732c2d836968d636215"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/1-scan32-futex-early.log.status.json",
+        "bytes": 801,
+        "sha256": "512e9775dd2bd281e6f3ab13cabdfd6535d0353b18b13cbfb78317d2b174b639"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "scan",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "chase",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/0-chase32-futex-early.log",
+        "bytes": 36099,
+        "sha256": "11cc46d62a2f1cab971b4ed76c9b76609716d357d65921922a7db78d41b4dcc4"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/0-chase32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "c27eec713df5a0ea3a48434c0a371e82a834abbaa94bfb05f866ad3359c9f170"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "chase",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "parse",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/1-parse32-futex-early.log",
+        "bytes": 36117,
+        "sha256": "b45366b59bcfebd43936663a41cd6f39698a646a787e9671710df756601063e6"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/1-parse32-futex-early.log.status.json",
+        "bytes": 808,
+        "sha256": "bcd84321fbffe9e2b5b402ce3eb07ebb6323ac871e13b67f9960896e47848d30"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "parse",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "lookup",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/0-lookup32-futex-early.log",
+        "bytes": 36103,
+        "sha256": "0db36b398a2790aef0e564a70f67b4e22292e4fb7be02b9c0f7c9736c844aa86"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/0-lookup32-futex-early.log.status.json",
+        "bytes": 810,
+        "sha256": "ef18a079becb5376285962a39e1ef2e664f33a0282bebf41c3ff4e7e01baf4a7"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "lookup",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    },
+    {
+      "image": "A",
+      "workload": "scan",
+      "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "helper_identity_evidence": "actual-post-terminal-self-sha256",
+      "transcript": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/1-scan32-futex-early.log",
+        "bytes": 36101,
+        "sha256": "0bd08cc79f5445bf97eb6b59c116b14a05cdffd7f8374d47f5b67db4f43bfe35"
+      },
+      "status": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/1-scan32-futex-early.log.status.json",
+        "bytes": 801,
+        "sha256": "d9b054e5c1c623a1f98ad24173baf3aecf550af1a7104c1e59e574d1e86a40e2"
+      },
+      "config": {
+        "loops": 64,
+        "repeats": 4,
+        "warmup": 32,
+        "configured_entries": 32,
+        "policy": "futex-early",
+        "sync": "futex",
+        "profile": "plain",
+        "working_set_kib": 32,
+        "workload": "scan",
+        "terminal_handshake": 1,
+        "complete_policy_scope": 1,
+        "resource_stats": 1
+      },
+      "identity": {
+        "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "transfer_sha256": "dedced14f044f0ab9caaab4f91388d2ecca42a2749196caddc4558cb814cd138",
+        "elf_sha256": "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+        "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+        "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d"
+      },
+      "memory_bound": {
+        "allocation_bytes": 48234496,
+        "linux_total_kib": 47104,
+        "linux_mem_limit_mb": 46,
+        "dma32_begin": "0x80000000",
+        "dma32_end": "0x82dfffff",
+        "next_arg1": "0x82200000",
+        "maximum_normal_ram_offset": "0x2dfffff",
+        "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+      }
+    }
+  ],
+  "comparator_inputs": {
+    "scan": {
+      "baseline": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/0-scan32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/1-scan32-futex-early.log"
+      ],
+      "control": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/0-scan32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/1-scan32-futex-early.log"
+      ]
+    },
+    "lookup": {
+      "baseline": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/1-lookup32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/0-lookup32-futex-early.log"
+      ],
+      "control": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/1-lookup32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/0-lookup32-futex-early.log"
+      ]
+    },
+    "parse": {
+      "baseline": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/0-parse32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/1-parse32-futex-early.log"
+      ],
+      "control": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/0-parse32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/1-parse32-futex-early.log"
+      ]
+    },
+    "chase": {
+      "baseline": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/1-chase32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/0-chase32-futex-early.log"
+      ],
+      "control": [
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/1-chase32-futex-early.log",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/0-chase32-futex-early.log"
+      ]
+    }
+  },
+  "limitations": [
+    "Scope v1 covers reported prefix-controller bits only, not all UCE/memory responses.",
+    "The low-level board helper changed explicitly after three admitted visits, only in post-program cleanup durability. Frozen host-eight and all timed guest code/parameters remain unchanged; the reviewed transition is hash-bound.",
+    "Mode-zero cleanup does not invalidate retained cache contents. Initial setup before each cell fence can inherit completed lines; this is the fixed repeated-crossover schedule, not an isolated cold-cell measurement.",
+    "Two boots per image/workload give limited between-boot evidence; admission is not a performance conclusion.",
+    "Hash-bound provenance records the declared chronology and frozen wrapper plan; it is not a hardware attestation."
+  ]
+}

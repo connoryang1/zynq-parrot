@@ -1,0 +1,116 @@
+{
+  "state": "complete-fixed-acquisition-awaiting-full-audit",
+  "created_utc": "2026-11-21T00:29:24.225072+00:00",
+  "admission_sha256": "501d6b12eb0fa10b9f1d298a2be6cb365695c2be7aac96b0984ea4ffe5f4a360",
+  "host_sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+  },
+  "source_change": "optionalembeddedlibrarycopyflag addedwhileboardreservationreleased, defaultsunchanged;63hosttestspass",
+  "known_flow": "session18previousdefaultplainflowPASS; firstprimaryvisitretainsallindependentcompletechecks",
+  "visits": [
+    {
+      "label": "A1-first",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session20/session.json"
+    },
+    {
+      "label": "A1-second",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session21/session.json"
+    },
+    {
+      "label": "B1-first",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session22/session.json",
+      "session_sha256": "8e9fdfdcee7fa6ef64234715356a47aaae6d406bade8648b17bad36a652ca02b"
+    },
+    {
+      "label": "B1-second",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry2/session.json",
+      "session_sha256": "e17f58065d1ad551eb0a2cddab16014f051913b6c72e4110a5d27fcf5888f57a"
+    },
+    {
+      "label": "B2-first",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session24/session.json",
+      "session_sha256": "73bcb3b832350aaf72f1fd99e194804e7f35c55626ce750f067a1fa7c783d909"
+    },
+    {
+      "label": "B2-second",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session25/session.json",
+      "session_sha256": "70b195b123942ee9ebf1f797a64fe38401b98d710dd890b4eb9741d752a82e4d"
+    },
+    {
+      "label": "A2-first",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session26/session.json",
+      "session_sha256": "16f2bd3bbe16334ed0c2df210e545c6d695dd7f1946741185fa1efe7329ccbbd"
+    },
+    {
+      "label": "A2-second",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27/session.json",
+      "session_sha256": "b4f08edbef072417cc65074cf631edc150e706229e87627e3229acc46a27346b"
+    }
+  ],
+  "last_launch": {
+    "label": "A2-second",
+    "argv": [
+      "/usr/bin/python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/workload-plain-scoped-resources-gzip.transfer",
+      "8e64b984180436ffc15504ee6f47fe678aaedec3e6a7fedbeba68b75825f14bb",
+      "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27",
+      "--bitstream-sha256",
+      "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+      "--cell",
+      "lookup:32:futex-early",
+      "--cell",
+      "scan:32:futex-early",
+      "--all-three-acknowledged"
+    ],
+    "pid": 587494,
+    "pid_file": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27.pid",
+    "launcher_log": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session27-launcher.log",
+    "supervision": "detached serialized runner"
+  },
+  "failed_attempts": [
+    {
+      "label": "B1-second",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23/session.json",
+      "reason": "supervisorexit143, originalprocessesgone, manifestnonterminal, incompleteterminalgates",
+      "recovery_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-interruption-recovery/recovery.json",
+      "performance_admission": "FAIL excludeentireattempt; retryfixedslotafterrecovery"
+    },
+    {
+      "label": "B1-second",
+      "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry1/session.json",
+      "reason": "secondguestprelaunchACTIVE_RUNNERexit75; staleownerfromprecedingcompletedparse,predatesboot,noactiveprograms",
+      "recovery": "completebeforeoriginalreservationrelease",
+      "first_guest": "PASS butexcludedfromprimarybecausewhole-sessioncompletion/source-freezegatefailed; retaineddiagnosticnotselectedbyeffect",
+      "inspection_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry1-active-runner-inspection/inspection.json",
+      "stale_cleanup_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry1-stale-own-lock-cleanup/cleanup.json"
+    }
+  ],
+  "board_helper_protocol": {
+    "review_sha256": "8325114ac9affefdfa6fe24811edcfa8b1feb7d7888d554ba5b29135dded833f",
+    "installation": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/runner-cleanup-sync-installation.json",
+      "sha256": "2d205f72250350683603f9518b613fa46f227d54d722cc56834f9451bc79b13c"
+    },
+    "visit_versions": {
+      "A1-first": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "A1-second": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "B1-first": "8b0f12b655d3bfc071e96d5b05018971500dcc125ca88936ce28eae6f971c283",
+      "B1-second": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "B2-first": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "B2-second": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "A2-first": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "A2-second": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90"
+    }
+  }
+}
