@@ -1,0 +1,297 @@
+{
+  "accepted": true,
+  "scope": "same closed08/10 PF timing localization, not a target run or performance claim",
+  "script": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/verify.py",
+    "bytes": 6220,
+    "sha256": "e350a050a52c5ffbed82df16dac46422c02e12c04b73d93d47cc5e79910c586b"
+  },
+  "PF_extraction": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/localization.json",
+    "bytes": 27944,
+    "sha256": "07ce6533e1f1657f5bbf941933ae6e782f9a8ae6a74efd31638f64ad12a99772"
+  },
+  "lower_gate": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/lower-gate03/gate.json",
+    "bytes": 35485,
+    "sha256": "a97ce73ca8ae654f8a7fd95fffa83dea7841f3207271713f8131995c11e70925"
+  },
+  "cases": {
+    "native08-audit02": {
+      "lanes": {
+        "i": {
+          "admit": 6018475000,
+          "relative_clock_periods": {
+            "PF_FSM_issue": 2.0,
+            "accepted_UCE_forward": 3.0,
+            "target_AR": 29.0,
+            "BP_first_R": 30.0,
+            "BP_RLAST_complete": 37.0,
+            "UCE_first_PF_reply": 44.0,
+            "UCE_full_PF_reply": 51.0,
+            "PF_publication": 85.0
+          },
+          "blocking_controller_interval": {
+            "start": 6018925000,
+            "end_exclusive": 6019475000,
+            "cycles": 11,
+            "rr_v": 0,
+            "rr_yumi": 0,
+            "rr_addr": 0,
+            "rr_bank": 0,
+            "r_fence": 0,
+            "tag_ready": 1,
+            "ctrl_state": 3,
+            "fwd_v": 1,
+            "fwd_yumi": 0,
+            "fwd_addr": 2147529296,
+            "fwd_last": 0,
+            "bank": 1,
+            "pkt_v": 2,
+            "pkt_yumi": 0
+          },
+          "first_reply_to_full_cycles": 7,
+          "full_reply_to_publication_cycles": 34
+        },
+        "d": {
+          "admit": 6020350000,
+          "relative_clock_periods": {
+            "PF_FSM_issue": 2.0,
+            "accepted_UCE_forward": 3.0,
+            "target_AR": 12.5,
+            "BP_first_R": 13.5,
+            "BP_RLAST_complete": 20.5,
+            "UCE_first_PF_reply": 27.0,
+            "UCE_full_PF_reply": 34.0,
+            "PF_publication": 68.0
+          },
+          "blocking_controller_interval": {
+            "start": 6019975000,
+            "end_exclusive": 6020525000,
+            "cycles": 11,
+            "rr_v": 0,
+            "rr_yumi": 0,
+            "rr_addr": 0,
+            "rr_bank": 0,
+            "r_fence": 0,
+            "tag_ready": 1,
+            "ctrl_state": 3,
+            "fwd_v": 1,
+            "fwd_yumi": 0,
+            "fwd_addr": 2147487760,
+            "fwd_last": 0,
+            "bank": 0,
+            "pkt_v": 1,
+            "pkt_yumi": 0
+          },
+          "first_reply_to_full_cycles": 7,
+          "full_reply_to_publication_cycles": 34
+        }
+      },
+      "AR_sequence": [
+        {
+          "sequence": 637,
+          "address": 45632,
+          "request_time": 6018875000,
+          "first_offer": 6018925000,
+          "complete": 6019275000
+        },
+        {
+          "sequence": 638,
+          "address": 4096,
+          "request_time": 6019925000,
+          "first_offer": 6019975000,
+          "complete": 6020325000
+        },
+        {
+          "sequence": 639,
+          "address": 73728,
+          "request_time": 6020975000,
+          "first_offer": 6021025000,
+          "complete": 6021375000
+        }
+      ],
+      "AW_or_B_overlap": false,
+      "actual_bridge_num_cache": 2,
+      "actual_read_tag_slots": 2
+    },
+    "delay200-10-audit01": {
+      "lanes": {
+        "i": {
+          "admit": 12170225000,
+          "relative_clock_periods": {
+            "PF_FSM_issue": 2.0,
+            "accepted_UCE_forward": 3.0,
+            "target_AR": 229.0,
+            "BP_first_R": 430.0,
+            "BP_RLAST_complete": 437.0,
+            "UCE_first_PF_reply": 444.0,
+            "UCE_full_PF_reply": 451.0,
+            "PF_publication": 485.0
+          },
+          "blocking_controller_interval": {
+            "start": 12170675000,
+            "end_exclusive": 12181225000,
+            "cycles": 211,
+            "rr_v": 0,
+            "rr_yumi": 0,
+            "rr_addr": 0,
+            "rr_bank": 0,
+            "r_fence": 0,
+            "tag_ready": 1,
+            "ctrl_state": 3,
+            "fwd_v": 1,
+            "fwd_yumi": 0,
+            "fwd_addr": 2147529296,
+            "fwd_last": 0,
+            "bank": 1,
+            "pkt_v": 2,
+            "pkt_yumi": 0
+          },
+          "first_reply_to_full_cycles": 7,
+          "full_reply_to_publication_cycles": 34
+        },
+        "d": {
+          "admit": 12182100000,
+          "relative_clock_periods": {
+            "PF_FSM_issue": 2.0,
+            "accepted_UCE_forward": 3.0,
+            "target_AR": 212.5,
+            "BP_first_R": 413.5,
+            "BP_RLAST_complete": 420.5,
+            "UCE_first_PF_reply": 427.0,
+            "UCE_full_PF_reply": 434.0,
+            "PF_publication": 468.0
+          },
+          "blocking_controller_interval": {
+            "start": 12181725000,
+            "end_exclusive": 12192275000,
+            "cycles": 211,
+            "rr_v": 0,
+            "rr_yumi": 0,
+            "rr_addr": 0,
+            "rr_bank": 0,
+            "r_fence": 0,
+            "tag_ready": 1,
+            "ctrl_state": 3,
+            "fwd_v": 1,
+            "fwd_yumi": 0,
+            "fwd_addr": 2147487760,
+            "fwd_last": 0,
+            "bank": 0,
+            "pkt_v": 1,
+            "pkt_yumi": 0
+          },
+          "first_reply_to_full_cycles": 7,
+          "full_reply_to_publication_cycles": 34
+        }
+      },
+      "AR_sequence": [
+        {
+          "sequence": 637,
+          "address": 45632,
+          "request_time": 12170625000,
+          "first_offer": 12180675000,
+          "complete": 12181025000
+        },
+        {
+          "sequence": 638,
+          "address": 4096,
+          "request_time": 12181675000,
+          "first_offer": 12191725000,
+          "complete": 12192075000
+        },
+        {
+          "sequence": 639,
+          "address": 73728,
+          "request_time": 12192725000,
+          "first_offer": 12202775000,
+          "complete": 12203125000
+        }
+      ],
+      "AW_or_B_overlap": false,
+      "actual_bridge_num_cache": 2,
+      "actual_read_tag_slots": 2
+    }
+  },
+  "source_bindings": {
+    "bp_me_cache_controller.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/dev/bp_me_cache_controller.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bp_me_cache_controller.sv",
+        "bytes": 26232,
+        "sha256": "756e2fcf84fce3909fd67af58721d4447a47f7a02e74f08fa285949928bdc132"
+      }
+    },
+    "bp_me_cache_slice.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/dev/bp_me_cache_slice.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bp_me_cache_slice.sv",
+        "bytes": 6465,
+        "sha256": "ff5e3b00aa32e66f56925a9edfcd5b96d604c8fd5e6ce4e50c55a0befad16e54"
+      }
+    },
+    "bp_me_dram_hash_encode.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/dev/bp_me_dram_hash_encode.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bp_me_dram_hash_encode.sv",
+        "bytes": 5147,
+        "sha256": "8d779b1cc0be78526ac9a637e858022123683384f2e14e5a6507ad1e997063aa"
+      }
+    },
+    "bp_me_stream_pump_in.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/network/bp_me_stream_pump_in.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bp_me_stream_pump_in.sv",
+        "bytes": 5862,
+        "sha256": "6e14a3027a2c02dfdbbc898509d69f51e3133ec42dac105ffdec37834f0a6d90"
+      }
+    },
+    "bp_me_stream_pump_out.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/network/bp_me_stream_pump_out.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bp_me_stream_pump_out.sv",
+        "bytes": 5819,
+        "sha256": "0501da8b8f6ff67c56884cd46425db20fb90486ae10e9245ac40fb89ff7b5354"
+      }
+    },
+    "bsg_cache_to_axi.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bsg_cache_to_axi.sv",
+        "bytes": 9753,
+        "sha256": "4315db7bd9af93fb8b4e94f1d46e48f7b77ad05a6caf580aa583b17410876d03"
+      }
+    },
+    "bsg_cache_to_axi_ordering.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi_ordering.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bsg_cache_to_axi_ordering.sv",
+        "bytes": 5342,
+        "sha256": "dbe12cb60d8662c288b9276cc14890dba71d06d736c86558c4aa524a22bbaee3"
+      }
+    },
+    "bsg_cache_to_axi_rx.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/external/basejump_stl/bsg_cache/bsg_cache_to_axi_rx.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bsg_cache_to_axi_rx.sv",
+        "bytes": 4864,
+        "sha256": "9c866ad5550159f85dcdc8a9e905d39ad4d5a8e15a5bfe9de90e06b3f00f8335"
+      }
+    },
+    "bp_axi_top.sv": {
+      "compiled_path": "/home/coyang/zynq-parrot-linux-research/import/black-parrot-subsystems/blackparrot/v/bp_axi_top.sv",
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/hp0-closed-trace-20261121/pf-localization02/source/bp_axi_top.sv",
+        "bytes": 26779,
+        "sha256": "5fe2286b2b90b07b701c386063749428e7de60a3d45edcb66e446257362fcf75"
+      }
+    }
+  },
+  "conclusion": "The shared forward word-stream is held by the prior busy L2 bank; bridge read-RR is empty with tag capacity and no ordering fence. Extra N occurs before target AR and another N on its own read response. No writeback/B overlap or serialized-per-word delay.",
+  "limits": [
+    "Source and sampled gate identify the blocked forward command; exact storage location of queued PF headers upstream is not asserted",
+    "This local window does not establish a platform concurrency limit",
+    "No policy/refinement or benchmark source change; no physical/application timing result"
+  ]
+}
