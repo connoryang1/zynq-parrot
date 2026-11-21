@@ -1,0 +1,137 @@
+This adds a separate privileged full64B I/D retained-store control/status ABI.
+Apply after0027; experimental0028 is neither required nor modified. All old
+5c1 controls and benchmark protocols are preserved. Control submits a clear
+and masked write; callers separately poll the UCE/client busy snapshot, which
+is not lower-L2/AXI/DRAM drain evidence. Absent CSR reads use the actual RISC-V
+exception table before any write. No target execution is implied here.
+
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -342,4 +342,20 @@
+  */
+ #define PR_BP_ICACHE_RETENTION_STATUS	0x42505062
+ 
++/* Experimental CPU-global retained full64B stores, independent of 5c1.
++ * CONTROL arg2 bits: I lookup0, D lookup1, D demand-copy2, I demand-copy3.
++ * Every accepted command submits retained-store clear; no added fence.i or
++ * implicit wait. Capture bits require their lookup and a configured lane.
++ * Callers must poll STATUS and charge submission plus polling to their scope.
++ * CAP_SYS_ADMIN and exactly one possible CPU; all other arguments zero.
++ */
++#define PR_BP_RETAINED_CONTROL		0x42505063
++/* STATUS copies actual u64 to arg2. Bit63 capability;3:0 effective controls;
++ * 9:8 I/D UCE/client busy;11:10 I/D wrap-seen;31:16 I full64B line count;
++ * 47:32 D line count;55:48 log2 sets;56 full64B;57 same-set invalidation.
++ * Busy is not a lower-L2/AXI/DRAM quiescence guarantee. Other bits reserved.
++ */
++#define PR_BP_RETAINED_STATUS		0x42505064
++
++
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -139,6 +139,60 @@
+ }
+ #endif
+ 
++#if defined(CONFIG_RISCV) && defined(CONFIG_64BIT) && defined(CONFIG_MMU)
++/* A read must establish capability before any global write. The extable
++ * handles an illegal CSR on absent hardware without executing the write.
++ */
++static int bp_retained_probe(u64 *status)
++{
++	unsigned long err = 0, value = 0;
++
++	asm volatile("1: csrr %[value], 0x5c2\n"
++		     "2:\n"
++		     _ASM_EXTABLE_UACCESS_ERR_ZERO(1b, 2b, %[err], %[value])
++		     : [err] "+&r" (err), [value] "+&r" (value)
++		     : : "memory");
++	if (err || !(value & (1UL << 63)))
++		return -ENODEV;
++	*status = value;
++	return 0;
++}
++
++static int bp_retained_control(unsigned long mask)
++{
++	u64 status;
++	int error;
++
++	preempt_disable();
++	error = bp_retained_probe(&status);
++	if (!error)
++		/* Submission only: clears stores, without invalidating normal L1I. */
++		asm volatile("csrw 0x5c2, %0\n" : : "r" (mask) : "memory");
++	preempt_enable();
++	return error;
++}
++
++static int bp_retained_status(u64 *status)
++{
++	int error;
++
++	preempt_disable();
++	error = bp_retained_probe(status);
++	preempt_enable();
++	return error;
++}
++#else
++static int bp_retained_control(unsigned long mask)
++{
++	return -ENODEV;
++}
++
++static int bp_retained_status(u64 *status)
++{
++	return -ENODEV;
++}
++#endif
++
+ #ifndef SET_UNALIGN_CTL
+ # define SET_UNALIGN_CTL(a, b)	(-EINVAL)
+ #endif
+@@ -2782,6 +2836,43 @@
+ 	case PR_RISCV_V_GET_CONTROL:
+ 		error = RISCV_V_GET_CONTROL();
+ 		break;
++	case PR_BP_RETAINED_CONTROL:
++		if ((arg2 & ~15UL) || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		if (!capable(CAP_SYS_ADMIN)) {
++			error = -EPERM;
++			break;
++		}
++		if (num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		error = bp_retained_control(arg2);
++		break;
++	case PR_BP_RETAINED_STATUS: {
++		u64 status = 0;
++
++		if (!arg2 || arg3 || arg4 || arg5) {
++			error = -EINVAL;
++			break;
++		}
++		if (!capable(CAP_SYS_ADMIN)) {
++			error = -EPERM;
++			break;
++		}
++		if (num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		error = bp_retained_status(&status);
++		/* User copies may fault/sleep; preemption is enabled here. */
++		if (!error && copy_to_user((u64 __user *)arg2, &status,
++					   sizeof(status)))
++			error = -EFAULT;
++		break;
++	}
+ 	case PR_BP_ICACHE_RETENTION_CONTROL:
+ 		if (arg2 > 2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
