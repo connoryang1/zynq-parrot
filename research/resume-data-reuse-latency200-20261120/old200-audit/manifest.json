@@ -1,0 +1,109 @@
+{
+  "state": "passed-retained-old200",
+  "scope": "Read-only old200 mode0 full access validation; no new build or target execution. Never assumes old40 cache counts/timestamps.",
+  "old_session": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/session.json",
+    "sha256": "68edbecf3b012d73c9c926e7df2e690ed4ce887aa9307837859667091aff6b50",
+    "bytes": 52901
+  },
+  "mode0": {
+    "mode": 0,
+    "exit_code": -6,
+    "elf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/mode0/prog.riscv",
+      "sha256": "0bc79caf23b8f6f4f16525f2b4332752f91f6e10aeb6ed882e1d7467a27a93ca",
+      "bytes": 176008
+    },
+    "nbf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/mode0/prog.nbf",
+      "sha256": "279585f615445d2c6c64fb975ce40ad7d7d3ebbaad9e16d841d2bef763f5c768",
+      "bytes": 158471
+    },
+    "original_nbf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/program/prog.nbf",
+      "sha256": "512e926c14328c323ab79ac64f34791a3642b3a49f5ab637e89b2c5629365ab6",
+      "bytes": 158471
+    },
+    "patch": {
+      "method": "offline aligned NBF record",
+      "address": "0x80008538",
+      "expected_old_uint64": "0xffffffffffffffff",
+      "new_uint64": 0,
+      "TARGET_RUNTIME_MS": 600000
+    },
+    "patch_file": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/mode0/runtime-patch.json",
+      "sha256": "f7fab1fa97825fb73f2f4e22e25349887dd0d88ec7a85dfcdc47c5578da3b272",
+      "bytes": 169
+    },
+    "log": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/mode0/run.log",
+      "sha256": "c69d88ff7e264de38fd2c298eff6faef6f4416f61c13d4e39769749808dbf06c",
+      "bytes": 90509
+    },
+    "acceptance": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/mode0/acceptance.log",
+      "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a",
+      "bytes": 31
+    },
+    "state": "pass",
+    "fst": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-retention-matrix-20261120/burst-off200/mode0/dump.fst",
+      "sha256": "667e26fe5d748ce0872806c4b165cd3d2db8e947ab8c7f34e05aa0f5d7c56488",
+      "bytes": 29015502
+    },
+    "resume_core_global_cycles": 1944,
+    "counter": "CSR 0xCC0 core global cycles",
+    "checksum": "0x60"
+  },
+  "analyzer": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer/analyze_resume_data_reuse_vcd.py",
+    "sha256": "0caba4960b3cfacc2717fd2c6bcf5ab0bd42024f62051bdfc7641e0f32c80f61",
+    "bytes": 31814
+  },
+  "clock_helper": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-20261120/dcache-observability/analyzer/cache_overlap_vcd.py",
+    "sha256": "2aca0455d596126fdd9743cdb4ecc3d29a3da18a0833a86ad30f80b1e6f470cb",
+    "bytes": 14922
+  },
+  "converter": {
+    "path": "/usr/bin/fst2vcd",
+    "sha256": "fc3615cd98505501573604dc94312cdc4e233340422faadb3fd35a6b9845346a",
+    "bytes": 117296
+  },
+  "complete_converter_eof": true,
+  "analyzer_returncode": 0,
+  "converter_returncode": 0,
+  "elapsed_seconds": 87.9640666670166,
+  "report": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/old200-audit/analysis.json",
+    "sha256": "8dcfc5b3af1c446ada5ed28f79bada7acec5224c52281234d5da3f857b7d5e1c",
+    "bytes": 21158
+  },
+  "events": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/old200-audit/events.jsonl",
+    "sha256": "536f21200d76458a73f6c4f88e3cca7d710d1ba8a95d6fbbb0b00d4be52bc0f9",
+    "bytes": 1653688
+  },
+  "converter_stderr": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/old200-audit/converter.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "analysis_log": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/old200-audit/analysis.log",
+    "sha256": "fa87ce5721404e42c598687f558f30852fecedebea8e3c35019c90d8c26c4128",
+    "bytes": 1657
+  },
+  "maintained_checker_returncode": 0,
+  "checker": {
+    "path": "/home/coyang/zynq-parrot-linux-research/testing/check_run.py",
+    "sha256": "e1c8016f993d63a5ff2efc8e19c7d17e0db17894a357b0e74b27a5ac214845d6",
+    "bytes": 9427
+  },
+  "acceptance": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/old200-audit/acceptance.log",
+    "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a",
+    "bytes": 31
+  }
+}
