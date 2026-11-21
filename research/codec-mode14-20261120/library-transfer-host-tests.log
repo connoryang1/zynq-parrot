@@ -1,0 +1,29 @@
+test_abi_probe_retains_full_session_reservation (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_absent_lock_is_not_created (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_busy_lock_runs_nothing_and_creates_no_output (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_guest_failure_recovers_before_releasing_original_inode (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_host_snapshot_preserves_bytes_and_detects_changed_source (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_invalid_transfer_never_stages_recovers_or_launches (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_missing_host_library_rejected_before_reservation_or_commands (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... usage: python3 -m unittest [-h] --bitstream-sha256 BITSTREAM_SHA256
+                           [--zlib-library ZLIB_LIBRARY]
+                           [--embedded-zlib-library] [--host HOST]
+                           (--cell CELL | --retention-probe {absent,present})
+                           [--loops LOOPS] [--warmup WARMUP]
+                           [--repeats REPEATS] --all-three-acknowledged
+                           nbf transfer elf_sha256 package output
+python3 -m unittest: error: --embedded-zlib-library requires exact --zlib-library
+ok
+test_optional_flag_is_forwarded_and_bound_in_session_plan (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_recovery_failure_still_releases_lock_and_preserves_original_error (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_success_holds_one_inode_over_full_stage_recover_run_order (test_embedded_zlib_library.EmbeddedLibrarySessionTests) ... ok
+test_core_and_bsg_remain_mandatory (test_embedded_zlib_library.EmbeddedLibraryTests) ... ok
+test_default_gzip_library_encoding_and_commands_are_unchanged (test_embedded_zlib_library.EmbeddedLibraryTests) ... ok
+test_flag_does_not_bypass_embedded_elf_library_declaration (test_embedded_zlib_library.EmbeddedLibraryTests) ... ok
+test_flag_requires_host_library_before_spawn_and_default_stays_gzip (test_embedded_zlib_library.EmbeddedLibraryTests) ... ok
+test_gzip_elf_and_embedded_library_verify_both_before_execution (test_embedded_zlib_library.EmbeddedLibraryTests) ... ok
+test_wrong_library_hash_never_transfers_elf_or_executes (test_embedded_zlib_library.EmbeddedLibraryTests) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.210s
+
+OK
