@@ -1,0 +1,195 @@
+{
+  "state": "PASS exact extracted HP0 block N0/N384 and unsafe bypass rejection; no full core/FPGA fit",
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 39467,
+      "sha256": "b450a4d69ad7889618c86e0e845b31b98625b041a1fb6582564ac9c790cb74c1"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/Makefile.design",
+      "bytes": 5736,
+      "sha256": "7f2db1335ff778d134bd85124a22bc84d8ae49bcead50de1f953dbbcf8c7b512"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/Makefile.hardware",
+      "bytes": 23377,
+      "sha256": "54af5a3b072c03795dcb177bafd2b949af0b523474908c910bddb977b90e5721"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+      "bytes": 5373,
+      "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+      "bytes": 5396,
+      "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+      "bytes": 6406,
+      "sha256": "edfd7ed89e22bcf585b02f1462097e1625341a951786064fd26f7719fd8b61f3"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/run.py",
+      "bytes": 5451,
+      "sha256": "0340a44866e21fb775825927d3c46a34c98238c707597fa96e441a93faa8a6c5"
+    }
+  ],
+  "generated": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/hp0_response_path.sv",
+    "bytes": 4448,
+    "sha256": "591385cf505274cf4e915903993123ccb1fe2180eda63d158df7db263d53db8e"
+  },
+  "cases": [
+    {
+      "label": "default0",
+      "delay": 0,
+      "bypass": false,
+      "assertions_enabled": true,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/default0/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=0",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "--assert"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/default0/build.log",
+        "bytes": 4245,
+        "sha256": "343424b59e9887c76fac62d42019d1bf461be78a9331b6bd93891da7ad78806d"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/default0/run.log",
+        "bytes": 193,
+        "sha256": "7485e41667eabfdc0d80ea901e43e1ca6bcd9fbfa203d9ae9166615d6ebf83b7"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/default0/obj/Vhp0_response_path",
+        "bytes": 365384,
+        "sha256": "7812543e126a1e28c977cd29d8c2ec51674e17b38f5b5c4277620dc347502a09"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/default0/hp0-response-path.fst",
+        "bytes": 9152,
+        "sha256": "db507651aa52055d099eb547d21583987e74463cf6129dd4807f5fabb1c1c26b"
+      }
+    },
+    {
+      "label": "high384",
+      "delay": 384,
+      "bypass": false,
+      "assertions_enabled": true,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/high384/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=384",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "+define+BP_AXI_RESPONSE_DELAY=384",
+        "--assert"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/high384/build.log",
+        "bytes": 4253,
+        "sha256": "6097f5506da67493b9ad30303d9d04dda8e6fed91fb649104df5aa459d7f136a"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/high384/run.log",
+        "bytes": 196,
+        "sha256": "7acd474e2bce01c18bfe7e34223e72d3c8f951b1470b5f1a9df4280051dda575"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/high384/obj/Vhp0_response_path",
+        "bytes": 386304,
+        "sha256": "0cc85adf2b23eec7b5d970a0ac5198fec85f8a62db90ca72a2d1a2804858a064"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/high384/hp0-response-path.fst",
+        "bytes": 216159,
+        "sha256": "fa690b68160d4b696381c27f79c7c6d62dc319718812232f54ae7942cff7671b"
+      }
+    },
+    {
+      "label": "unsafe_bypass",
+      "delay": 0,
+      "bypass": true,
+      "assertions_enabled": false,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/unsafe_bypass/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=0",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "-GBYPASS=1'b1"
+      ],
+      "build_exit": 0,
+      "run_exit": -6,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/unsafe_bypass/build.log",
+        "bytes": 4255,
+        "sha256": "a2b64b23f80ed12a600092a1c8788a359a73bbced4ffab22d9b9a1e3e6f50efe"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/unsafe_bypass/run.log",
+        "bytes": 293,
+        "sha256": "81bc95995ec6e8112ec613ece9f8368762918cf94408bb942575bdf1107e8492"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/unsafe_bypass/obj/Vhp0_response_path",
+        "bytes": 365496,
+        "sha256": "34b46bd00b6cccb74ba3cfe6fbe702fb39bd8abb2832590dbc9d6a5cf631a099"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate04/unsafe_bypass/hp0-response-path.fst",
+        "bytes": 1141,
+        "sha256": "b6b27b910482eb6fdc10667d6a3eb01ddc80d2f15c0194622f87fac5d73f6fa2"
+      }
+    }
+  ]
+}

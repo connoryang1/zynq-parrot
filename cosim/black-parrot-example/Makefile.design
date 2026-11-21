@@ -66,6 +66,21 @@ DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
 DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
 DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
 
+# Static common HP0 response age, in aclk cycles. This affects every returned
+# R/B beat; it is not AR-to-data or CPU load-use latency. Zero elaborates only
+# direct wires. Use this variable, not a conflicting EXTRA_DEFINES override.
+BP_AXI_RESPONSE_DELAY ?= 0
+ifneq ($(words $(BP_AXI_RESPONSE_DELAY)),1)
+$(error BP_AXI_RESPONSE_DELAY must be one integer in 0..384)
+endif
+ifneq ($(filter $(BP_AXI_RESPONSE_DELAY),$(shell seq 0 384)),$(BP_AXI_RESPONSE_DELAY))
+$(error BP_AXI_RESPONSE_DELAY must be one integer in 0..384)
+endif
+ifneq ($(filter BP_AXI_RESPONSE_DELAY BP_AXI_RESPONSE_DELAY=%,$(EXTRA_DEFINES)),)
+$(error Set BP_AXI_RESPONSE_DELAY=<0..384> instead of an EXTRA_DEFINES override)
+endif
+DEFINES += BP_AXI_RESPONSE_DELAY=$(BP_AXI_RESPONSE_DELAY)
+
 # The PYNQ-Z2 context-cache configuration uses two resident hardware slots
 # and four software-visible contexts.  Keep this aligned with the targeted
 # nonresident tests and pass the generated custom configuration into Vivado;

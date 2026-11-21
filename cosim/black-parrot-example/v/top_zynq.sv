@@ -4,6 +4,10 @@
 `include "bp_be_defines.svh"
 `include "bp_me_defines.svh"
 
+`ifndef BP_AXI_RESPONSE_DELAY
+`define BP_AXI_RESPONSE_DELAY 0
+`endif
+
 module top_zynq
  import zynq_pkg::*;
  import bsg_blackparrot_pkg::*;
@@ -171,6 +175,7 @@ module top_zynq
    localparam bp_axil_data_width_lp = 32;
    localparam bp_axi_addr_width_lp  = 32;
    localparam bp_axi_data_width_lp  = 64;
+   localparam integer axi_response_delay_lp = `BP_AXI_RESPONSE_DELAY;
 `ifdef BP_PREFETCH_AXI_BYPASS
    localparam prefetch_axi_bypass_lp = 1'b1;
 `else
@@ -182,6 +187,70 @@ module top_zynq
    localparam num_regs_pl_to_ps_lp  = 8;
    localparam num_fifos_ps_to_pl_lp = 1;
    localparam num_fifos_pl_to_ps_lp = 1;
+
+   // BEGIN COMMON_HP0_RESPONSE_PATH
+   // One common return path, BEFORE blackparrot's ordinary/prefetch ID demux.
+   // All I/D demand and prefetch responses that reach HP0 share this setting.
+   // AR/AW/W and all cache geometry remain unchanged. Queue reset is the AXI
+   // transaction-domain reset, never a live BP/control reset or drain command.
+   logic bp_hp0_bvalid, bp_hp0_bready;
+   logic [5:0] bp_hp0_bid;
+   logic [1:0] bp_hp0_bresp;
+   logic bp_hp0_rvalid, bp_hp0_rready, bp_hp0_rlast;
+   logic [5:0] bp_hp0_rid;
+   logic [C_HP0_AXI_DATA_WIDTH-1:0] bp_hp0_rdata;
+   logic [1:0] bp_hp0_rresp;
+
+   initial begin
+      if (axi_response_delay_lp < 0 || axi_response_delay_lp > 384)
+        $fatal(1,"BP_AXI_RESPONSE_DELAY must be in 0..384");
+      // A direct DRAM prefetch can miss dirty allocating-L2 data. Retaining
+      // that reply would turn an old advisory preview into stale demand data.
+      if (retained_buffer_p && prefetch_axi_bypass_lp)
+        $fatal(1,"retained full-line stores require allocating L2; disable prefetch AXI bypass");
+   end
+
+   if (axi_response_delay_lp == 0) begin : hp0_native_response
+      assign bp_hp0_rvalid = hp0_axi_rvalid;
+      assign {bp_hp0_rid, bp_hp0_rdata, bp_hp0_rresp, bp_hp0_rlast}
+        = {hp0_axi_rid, hp0_axi_rdata, hp0_axi_rresp, hp0_axi_rlast};
+      assign hp0_axi_rready = bp_hp0_rready;
+      assign bp_hp0_bvalid = hp0_axi_bvalid;
+      assign {bp_hp0_bid, bp_hp0_bresp} = {hp0_axi_bid, hp0_axi_bresp};
+      assign hp0_axi_bready = bp_hp0_bready;
+   end else begin : hp0_delayed_response
+      // These trace-visible quantities measure return-queue occupancy/stalls,
+      // not CPU stalls or DRAM service time. No runtime configuration exists.
+      logic cfg_ready, cfg_accepted, cfg_error, idle;
+      logic [8:0] active_delay;
+      logic [31:0] cycle_count, r_full_stall_cycles, b_full_stall_cycles;
+      logic [9:0] r_occupancy, b_occupancy;
+      logic r_full, b_full;
+      bp_axi_response_delay
+       #(.r_payload_width_p(C_HP0_AXI_DATA_WIDTH+9), .b_payload_width_p(8)
+         ,.max_delay_p(384), .fifo_els_p(512), .cycle_width_p(32)
+         ,.reset_delay_p(axi_response_delay_lp)) return_delay
+        (.clk_i(aclk), .reset_i(~aresetn)
+         ,.cfg_v_i(1'b0), .cfg_safe_i(1'b0), .cfg_delay_i('0)
+         ,.cfg_ready_o(cfg_ready), .cfg_accepted_o(cfg_accepted), .cfg_error_o(cfg_error)
+         ,.idle_o(idle), .active_delay_o(active_delay), .cycle_o(cycle_count)
+         ,.r_v_i(hp0_axi_rvalid), .r_ready_o(hp0_axi_rready)
+         ,.r_payload_i({hp0_axi_rid,hp0_axi_rdata,hp0_axi_rresp,hp0_axi_rlast})
+         ,.r_v_o(bp_hp0_rvalid), .r_ready_i(bp_hp0_rready)
+         ,.r_payload_o({bp_hp0_rid,bp_hp0_rdata,bp_hp0_rresp,bp_hp0_rlast})
+         ,.b_v_i(hp0_axi_bvalid), .b_ready_o(hp0_axi_bready)
+         ,.b_payload_i({hp0_axi_bid,hp0_axi_bresp})
+         ,.b_v_o(bp_hp0_bvalid), .b_ready_i(bp_hp0_bready)
+         ,.b_payload_o({bp_hp0_bid,bp_hp0_bresp})
+         ,.r_occupancy_o(r_occupancy), .b_occupancy_o(b_occupancy)
+         ,.r_full_o(r_full), .b_full_o(b_full)
+         ,.r_full_stall_cycles_o(r_full_stall_cycles)
+         ,.b_full_stall_cycles_o(b_full_stall_cycles));
+      wire unused_status = &{1'b0,cfg_ready,cfg_accepted,cfg_error,idle,active_delay,
+                              cycle_count,r_occupancy,b_occupancy,r_full,b_full,
+                              r_full_stall_cycles,b_full_stall_cycles};
+   end
+   // END COMMON_HP0_RESPONSE_PATH
 
    ///////////////////////////////////////////////////////////////////////////////////////
    // csr_data_lo:
@@ -789,10 +858,10 @@ module top_zynq
       ,.m_axi_wlast_o(hp0_axi_wlast)
       ,.m_axi_wstrb_o(hp0_axi_wstrb)
 
-      ,.m_axi_bvalid_i(hp0_axi_bvalid)
-      ,.m_axi_bready_o(hp0_axi_bready)
-      ,.m_axi_bid_i(hp0_axi_bid)
-      ,.m_axi_bresp_i(hp0_axi_bresp)
+      ,.m_axi_bvalid_i(bp_hp0_bvalid)
+      ,.m_axi_bready_o(bp_hp0_bready)
+      ,.m_axi_bid_i(bp_hp0_bid)
+      ,.m_axi_bresp_i(bp_hp0_bresp)
 
       ,.m_axi_araddr_o(axi_araddr)
       ,.m_axi_arvalid_o(hp0_axi_arvalid)
@@ -806,12 +875,12 @@ module top_zynq
       ,.m_axi_arburst_o(hp0_axi_arburst)
       ,.m_axi_arqos_o(hp0_axi_arqos)
 
-      ,.m_axi_rdata_i(hp0_axi_rdata)
-      ,.m_axi_rvalid_i(hp0_axi_rvalid)
-      ,.m_axi_rready_o(hp0_axi_rready)
-      ,.m_axi_rid_i(hp0_axi_rid)
-      ,.m_axi_rlast_i(hp0_axi_rlast)
-      ,.m_axi_rresp_i(hp0_axi_rresp)
+      ,.m_axi_rdata_i(bp_hp0_rdata)
+      ,.m_axi_rvalid_i(bp_hp0_rvalid)
+      ,.m_axi_rready_o(bp_hp0_rready)
+      ,.m_axi_rid_i(bp_hp0_rid)
+      ,.m_axi_rlast_i(bp_hp0_rlast)
+      ,.m_axi_rresp_i(bp_hp0_rresp)
       );
 
    // synopsys translate_off

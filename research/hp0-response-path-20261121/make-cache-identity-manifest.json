@@ -1,0 +1,439 @@
+{
+  "state": "PASS 16 read-only make propagation/cache-identity/source-list/refusal checks; no build or Vivado invocation",
+  "test": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/test_make.py",
+    "bytes": 3588,
+    "sha256": "58fc5b0bf92974f03e8bd759850dce31d3f1c64e02cf7e17d1d56e4490b05260"
+  },
+  "design": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/Makefile.design",
+    "bytes": 5736,
+    "sha256": "7f2db1335ff778d134bd85124a22bc84d8ae49bcead50de1f953dbbcf8c7b512"
+  },
+  "hardware": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/Makefile.hardware",
+    "bytes": 23377,
+    "sha256": "54af5a3b072c03795dcb177bafd2b949af0b523474908c910bddb977b90e5721"
+  },
+  "verilator_make": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/mk/Makefile.verilator",
+    "bytes": 5763,
+    "sha256": "db229fd3a0b27e20899f3ad744816dd6d75271797439329a8d3d92ecc1875bab"
+  },
+  "cases": [
+    {
+      "tool": "verilator",
+      "label": "default",
+      "accepted": true,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-default.log",
+        "bytes": 35253,
+        "sha256": "03d44776d02a3a14fbdc0e4441d4fd579e42a872cb0b135aec0fdfd8423e3632"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "high",
+      "accepted": true,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=384"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-high.log",
+        "bytes": 35257,
+        "sha256": "36b704e654e702dea1ec98e1f3e97ba54a2352e2f965b2a501062f23d792199c"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "negative",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=-1"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-negative.log",
+        "bytes": 87,
+        "sha256": "11a5f175cc7242e57905f95d624b900847770e6ab65f8b201e69897dc2541726"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "too_high",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=385"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-too_high.log",
+        "bytes": 87,
+        "sha256": "11a5f175cc7242e57905f95d624b900847770e6ab65f8b201e69897dc2541726"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "empty",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY="
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-empty.log",
+        "bytes": 87,
+        "sha256": "d3f85d113b4b0eee55e1d4beb50207aa546778c2f7b80cabb5c7d23c5181c6e1"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "multiple",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=1 2"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-multiple.log",
+        "bytes": 87,
+        "sha256": "d3f85d113b4b0eee55e1d4beb50207aa546778c2f7b80cabb5c7d23c5181c6e1"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "pattern",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=%"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-pattern.log",
+        "bytes": 87,
+        "sha256": "11a5f175cc7242e57905f95d624b900847770e6ab65f8b201e69897dc2541726"
+      }
+    },
+    {
+      "tool": "verilator",
+      "label": "override",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/verilator",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "EXTRA_DEFINES=BP_AXI_RESPONSE_DELAY=40"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/verilator-override.log",
+        "bytes": 107,
+        "sha256": "68f3234bd870c378efbd47666143363bb4c831f8e4cba698579f6b1b75f11a15"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "default",
+      "accepted": true,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-default.log",
+        "bytes": 33037,
+        "sha256": "e0eeadd6a45071295a4fbc0b70ad61bfd8cc428338ea8152db796b65fd62a012"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "high",
+      "accepted": true,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=384"
+      ],
+      "returncode": 0,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-high.log",
+        "bytes": 33039,
+        "sha256": "dd3e9baddb6ceed4aa6f98b3593aae4062a8f72bb9a538508d6ab0e14d63e417"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "negative",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=-1"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-negative.log",
+        "bytes": 87,
+        "sha256": "11a5f175cc7242e57905f95d624b900847770e6ab65f8b201e69897dc2541726"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "too_high",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=385"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-too_high.log",
+        "bytes": 87,
+        "sha256": "11a5f175cc7242e57905f95d624b900847770e6ab65f8b201e69897dc2541726"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "empty",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY="
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-empty.log",
+        "bytes": 87,
+        "sha256": "d3f85d113b4b0eee55e1d4beb50207aa546778c2f7b80cabb5c7d23c5181c6e1"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "multiple",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=1 2"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-multiple.log",
+        "bytes": 87,
+        "sha256": "d3f85d113b4b0eee55e1d4beb50207aa546778c2f7b80cabb5c7d23c5181c6e1"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "pattern",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "BP_AXI_RESPONSE_DELAY=%"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-pattern.log",
+        "bytes": 87,
+        "sha256": "11a5f175cc7242e57905f95d624b900847770e6ab65f8b201e69897dc2541726"
+      }
+    },
+    {
+      "tool": "vivado",
+      "label": "override",
+      "accepted": false,
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-s",
+        "-C",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/vivado",
+        "-f",
+        "Makefile",
+        "-f",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/print.mk",
+        "hp0_configuration_only",
+        "TOOL=vivado",
+        "CFG=e_bp_unicore_zynqparrot_prefetch_cfg",
+        "EXTRA_DEFINES=BP_AXI_RESPONSE_DELAY=40"
+      ],
+      "returncode": 2,
+      "log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/make02-cache-identity/vivado-override.log",
+        "bytes": 107,
+        "sha256": "68f3234bd870c378efbd47666143363bb4c831f8e4cba698579f6b1b75f11a15"
+      }
+    }
+  ]
+}
