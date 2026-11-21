@@ -1,0 +1,59 @@
+{
+  "state": "PASS physical capable ABI and bounded memory; no performance acceptance",
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session19/session.json",
+    "bytes": 2438,
+    "sha256": "6d82d677d5d304117d36509f522147201ab36b120dfd0f280859069abc74c081"
+  },
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session19/0-retention-probe-present.log",
+    "bytes": 24339,
+    "sha256": "88ca02878a8086b770369d60dc2882ab6097cee541a55fede5a630d4dc588cf3"
+  },
+  "runner_status": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session19/0-retention-probe-present.log.status.json",
+    "bytes": 815,
+    "sha256": "bd8bcd4ee43840f081196b2bcb3dd36b061996183ccf451e080ecbdac8c4c641"
+  },
+  "memory_bound": {
+    "allocation_bytes": 48234496,
+    "linux_total_kib": 47104,
+    "linux_mem_limit_mb": 46,
+    "dma32_begin": "0x80000000",
+    "dma32_end": "0x82dfffff",
+    "next_arg1": "0x82200000",
+    "maximum_normal_ram_offset": "0x2dfffff",
+    "boot_command_line": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M"
+  },
+  "identity": {
+    "status": "PASS",
+    "nbf_sha256": "a1fbac904a8604939ee55b0c91ca2812cc9b9451220a7a53df97cfd88acf97d5",
+    "transfer_sha256": "24850264f31962c08879c9a5ff1acbc893a548197f6ca6553daf93cb0051e5aa",
+    "elf_sha256": "8f8887579c81e4633ebe445ada38ab7311aae58c21656f4b98a38bbc6ac0c9a2",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+    "loops": 512,
+    "repeats": 8,
+    "policy": "continuous",
+    "warmup": 32,
+    "sync": "pipe",
+    "profile": "plain",
+    "working_set_kib": 0,
+    "workload": "scan",
+    "terminal_handshake": 1,
+    "legacy_four_arg_cli": false,
+    "command": "/tmp/scheduler_pipe_hint_benchmark_dynamic present",
+    "retention_probe_capability": "present",
+    "runner_exit": 0
+  },
+  "checked_contract": [
+    "presentcapability bit",
+    "mode0/1/2control/readback",
+    "parentmodeunchangedbyunprivilegedchild",
+    "realuid/gid65534EPERM",
+    "invalidargsEINVAL",
+    "normalresetandreturn",
+    "CORE/BSGPASS andrunner0"
+  ],
+  "limits": "This validates privileged control and fallback contract, not useful retained capacity or application speedup."
+}
