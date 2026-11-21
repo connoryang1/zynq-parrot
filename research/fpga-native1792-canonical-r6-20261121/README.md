@@ -1,0 +1,5 @@
+This records the canonical epoch-RAM224KiB retained-payload FPGA fit candidate. It preserves the previous dense1792 geometry and clock, changing only the BlackParrot epoch-storage source. Full-core and compositional mapped-memory gates pass; the implementation job remains active, so no fit, timing or application result is claimed.
+
+The sole vendor job is20261121T220319Z-eb7d39013 onbp1, worker983092, monitored by984545. It uses the maintained repository launcher, exact pushed TOPeb7d/BP8df,20MHz, two resident/four logical contexts and static16KiB L2. Both L1s remain32KiB; each retained partition contains1792 full64B lines. bp2 andbp3 refuse connections.
+
+The immutable worker uses a separate HOME work root with a1.5GiB cap; evidence is capped at384MiB, preserving3GiB free plus remaining allocation. The monitor permits only exact-owner maintained cancellation for admitted bounds, configuration or identity violations. Every physical operation remains separate and requires the entire-session shared FPGA flock.
