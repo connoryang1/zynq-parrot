@@ -1,0 +1,2917 @@
+{
+  "state": "PASS closed matched SP N0/N40/N200 simulator correctness and common-HP0 response-age gates only",
+  "observed_acquisition_outer_exit_code": 0,
+  "source": {
+    "top": "11ca59a270b878e45c99fbfdb23a7fba01800d5c",
+    "bp": "d766d42cdf04ee43ca1e915fb9da06f5cc117dde",
+    "backend_sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+  },
+  "acquisition": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/session.json",
+    "bytes": 50273,
+    "sha256": "86d6d548ed72da535813547b6cede51e864f6d16969f90e7cecacdeab8c6a376"
+  },
+  "code": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-v1/acquire.py",
+    "bytes": 18747,
+    "sha256": "a291501643cc8cb94f0b7053660527d3c4ff5173c0ece9e989677e9ee338f764"
+  },
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-v1/launch-admission.json",
+    "bytes": 28733,
+    "sha256": "c6dea3c05c9733a7baf9f0257875a1fa9ce2e4b5a07f2df88618cc208f30b77c"
+  },
+  "models": {
+    "0": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+      "bytes": 15835112,
+      "sha256": "f65c04d85f495e4412d782b32e362dd0ce09914787f8fbe61284964b7b34444e",
+      "inode": 14215655,
+      "mtime_ns": 1795269538157599696,
+      "ctime_ns": 1795269538157599696
+    },
+    "40": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+      "bytes": 15864288,
+      "sha256": "19630d8c85a304dfe30620888243505ee99e14d75a83e63f2c1cdb27697c51b5",
+      "inode": 14216189,
+      "ctime_ns": 1795271558123304053,
+      "mtime_ns": 1795271558123304053
+    },
+    "200": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+      "bytes": 15864288,
+      "sha256": "15adfc55f6459537de2c1e8537ee98b7b344f303ea40e0dc628682403dbf74e6",
+      "inode": 14347004,
+      "ctime_ns": 1795272231325436046,
+      "mtime_ns": 1795272231325436046
+    }
+  },
+  "cases": [
+    {
+      "delay": 0,
+      "program": "integrity",
+      "HP0_proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/verification.json",
+        "bytes": 14401,
+        "sha256": "820071834a9480b9232775818814384727ceab8a3cccc308e2a9b383c509cf14"
+      },
+      "raw_FST": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/trace.fst",
+        "bytes": 47372750,
+        "sha256": "47293c4c0317561af967dcabbb5fa74583bd9a763a98211c60b527f0bc169863"
+      },
+      "process": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "actual_returncode": -6,
+      "known_postPASS_GPIO_exception": true,
+      "whole_process_seconds": 82.0008114730008,
+      "post_loader_polling_interval_ns": 39959846775,
+      "AR": 911,
+      "AW": 538,
+      "R_beats": 7288,
+      "B_responses": 538,
+      "R_age": {
+        "count": 7288,
+        "minimum": 0,
+        "maximum": 0,
+        "histogram": {
+          "0": 7288
+        }
+      },
+      "B_age": {
+        "count": 538,
+        "minimum": 0,
+        "maximum": 0,
+        "histogram": {
+          "0": 538
+        }
+      },
+      "BP_AR_to_first_R": {
+        "count": 911,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 911
+        }
+      },
+      "BP_AR_to_full_R": {
+        "count": 911,
+        "minimum": 8,
+        "maximum": 8,
+        "histogram": {
+          "8": 911
+        }
+      },
+      "within_burst_R_gap": {
+        "count": 6377,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 6377
+        }
+      },
+      "R_queue_peak": 0,
+      "B_queue_peak": 0,
+      "R_full_stalls": 0,
+      "B_full_stalls": 0,
+      "external_read_outstanding_peak": 1,
+      "external_write_outstanding_peak": 1
+    },
+    {
+      "delay": 0,
+      "program": "advisory",
+      "HP0_proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/verification.json",
+        "bytes": 14041,
+        "sha256": "eb1ba00d4319450854debde82e1484f4116343ab9c1dfbff63a71982a0f72916"
+      },
+      "raw_FST": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/trace.fst",
+        "bytes": 19925006,
+        "sha256": "07a6429d984d95f768d33f097aca6a47d3305785510b0ce4d2413a5ec9577bf3"
+      },
+      "process": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "actual_returncode": -6,
+      "known_postPASS_GPIO_exception": true,
+      "whole_process_seconds": 58.85031250293832,
+      "post_loader_polling_interval_ns": 9014122927,
+      "AR": 648,
+      "AW": 487,
+      "R_beats": 5184,
+      "B_responses": 487,
+      "R_age": {
+        "count": 5184,
+        "minimum": 0,
+        "maximum": 0,
+        "histogram": {
+          "0": 5184
+        }
+      },
+      "B_age": {
+        "count": 487,
+        "minimum": 0,
+        "maximum": 0,
+        "histogram": {
+          "0": 487
+        }
+      },
+      "BP_AR_to_first_R": {
+        "count": 648,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 648
+        }
+      },
+      "BP_AR_to_full_R": {
+        "count": 648,
+        "minimum": 8,
+        "maximum": 8,
+        "histogram": {
+          "8": 648
+        }
+      },
+      "within_burst_R_gap": {
+        "count": 4536,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 4536
+        }
+      },
+      "R_queue_peak": 0,
+      "B_queue_peak": 0,
+      "R_full_stalls": 0,
+      "B_full_stalls": 0,
+      "external_read_outstanding_peak": 1,
+      "external_write_outstanding_peak": 1
+    },
+    {
+      "delay": 40,
+      "program": "integrity",
+      "HP0_proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/verification.json",
+        "bytes": 14566,
+        "sha256": "5991e3a585ed077aab9b3fad046ca12a971c0b35e091992b9b1e59d8c2dace64"
+      },
+      "raw_FST": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/trace.fst",
+        "bytes": 50597361,
+        "sha256": "c942044d539f80285fd526fafdbe7231ada43f7e7d1ef158b26c90bdcafe4175"
+      },
+      "process": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "actual_returncode": -6,
+      "known_postPASS_GPIO_exception": true,
+      "whole_process_seconds": 98.05932981101796,
+      "post_loader_polling_interval_ns": 50365448346,
+      "AR": 911,
+      "AW": 538,
+      "R_beats": 7288,
+      "B_responses": 538,
+      "R_age": {
+        "count": 7288,
+        "minimum": 40,
+        "maximum": 40,
+        "histogram": {
+          "40": 7288
+        }
+      },
+      "B_age": {
+        "count": 538,
+        "minimum": 40,
+        "maximum": 40,
+        "histogram": {
+          "40": 538
+        }
+      },
+      "BP_AR_to_first_R": {
+        "count": 911,
+        "minimum": 41,
+        "maximum": 41,
+        "histogram": {
+          "41": 911
+        }
+      },
+      "BP_AR_to_full_R": {
+        "count": 911,
+        "minimum": 48,
+        "maximum": 48,
+        "histogram": {
+          "48": 911
+        }
+      },
+      "within_burst_R_gap": {
+        "count": 6377,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 6377
+        }
+      },
+      "R_queue_peak": 8,
+      "B_queue_peak": 1,
+      "R_full_stalls": 0,
+      "B_full_stalls": 0,
+      "external_read_outstanding_peak": 1,
+      "external_write_outstanding_peak": 1
+    },
+    {
+      "delay": 40,
+      "program": "advisory",
+      "HP0_proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/verification.json",
+        "bytes": 14052,
+        "sha256": "d737166c45caded76d6a38097287c27f63b4f8d674552d2d18b278766554e35d"
+      },
+      "raw_FST": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/trace.fst",
+        "bytes": 22874787,
+        "sha256": "25a58a28e17363bab91a2828757985cc1e2d85a4f2abdb513e99692d1ced1167"
+      },
+      "process": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "actual_returncode": -6,
+      "known_postPASS_GPIO_exception": true,
+      "whole_process_seconds": 112.79630540497601,
+      "post_loader_polling_interval_ns": 19708963584,
+      "AR": 648,
+      "AW": 487,
+      "R_beats": 5184,
+      "B_responses": 487,
+      "R_age": {
+        "count": 5184,
+        "minimum": 40,
+        "maximum": 40,
+        "histogram": {
+          "40": 5184
+        }
+      },
+      "B_age": {
+        "count": 487,
+        "minimum": 40,
+        "maximum": 40,
+        "histogram": {
+          "40": 487
+        }
+      },
+      "BP_AR_to_first_R": {
+        "count": 648,
+        "minimum": 41,
+        "maximum": 41,
+        "histogram": {
+          "41": 648
+        }
+      },
+      "BP_AR_to_full_R": {
+        "count": 648,
+        "minimum": 48,
+        "maximum": 48,
+        "histogram": {
+          "48": 648
+        }
+      },
+      "within_burst_R_gap": {
+        "count": 4536,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 4536
+        }
+      },
+      "R_queue_peak": 8,
+      "B_queue_peak": 1,
+      "R_full_stalls": 0,
+      "B_full_stalls": 0,
+      "external_read_outstanding_peak": 1,
+      "external_write_outstanding_peak": 1
+    },
+    {
+      "delay": 200,
+      "program": "integrity",
+      "HP0_proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/verification.json",
+        "bytes": 14924,
+        "sha256": "d1dc162ee54ae42898d9e39704a40bebf3bec6dbe94033f1a604c7e62afe9be3"
+      },
+      "raw_FST": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/trace.fst",
+        "bytes": 60390317,
+        "sha256": "9e881a7c207cec79f19edae6a78b64fcb2edda3e8edf4a447f00741563ac37fc"
+      },
+      "process": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "actual_returncode": -6,
+      "known_postPASS_GPIO_exception": true,
+      "whole_process_seconds": 151.7635698360391,
+      "post_loader_polling_interval_ns": 76463476521,
+      "AR": 911,
+      "AW": 538,
+      "R_beats": 7288,
+      "B_responses": 538,
+      "R_age": {
+        "count": 7288,
+        "minimum": 200,
+        "maximum": 200,
+        "histogram": {
+          "200": 7288
+        }
+      },
+      "B_age": {
+        "count": 538,
+        "minimum": 200,
+        "maximum": 200,
+        "histogram": {
+          "200": 538
+        }
+      },
+      "BP_AR_to_first_R": {
+        "count": 911,
+        "minimum": 201,
+        "maximum": 201,
+        "histogram": {
+          "201": 911
+        }
+      },
+      "BP_AR_to_full_R": {
+        "count": 911,
+        "minimum": 208,
+        "maximum": 208,
+        "histogram": {
+          "208": 911
+        }
+      },
+      "within_burst_R_gap": {
+        "count": 6377,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 6377
+        }
+      },
+      "R_queue_peak": 8,
+      "B_queue_peak": 1,
+      "R_full_stalls": 0,
+      "B_full_stalls": 0,
+      "external_read_outstanding_peak": 1,
+      "external_write_outstanding_peak": 1
+    },
+    {
+      "delay": 200,
+      "program": "advisory",
+      "HP0_proof": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/verification.json",
+        "bytes": 14136,
+        "sha256": "f6b41ee9a2b69b42a7f2e049451254c0a1553cce3d3df3cad2b8cb6f77c72dab"
+      },
+      "raw_FST": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/trace.fst",
+        "bytes": 28032146,
+        "sha256": "8e877a1dbd769267be7b26c90595241db6cfd7ea8d9cc0b6d4bd4ba6a55654f5"
+      },
+      "process": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "actual_returncode": -6,
+      "known_postPASS_GPIO_exception": true,
+      "whole_process_seconds": 108.9480599219678,
+      "post_loader_polling_interval_ns": 16020066374,
+      "AR": 648,
+      "AW": 487,
+      "R_beats": 5184,
+      "B_responses": 487,
+      "R_age": {
+        "count": 5184,
+        "minimum": 200,
+        "maximum": 200,
+        "histogram": {
+          "200": 5184
+        }
+      },
+      "B_age": {
+        "count": 487,
+        "minimum": 200,
+        "maximum": 200,
+        "histogram": {
+          "200": 487
+        }
+      },
+      "BP_AR_to_first_R": {
+        "count": 648,
+        "minimum": 201,
+        "maximum": 201,
+        "histogram": {
+          "201": 648
+        }
+      },
+      "BP_AR_to_full_R": {
+        "count": 648,
+        "minimum": 208,
+        "maximum": 208,
+        "histogram": {
+          "208": 648
+        }
+      },
+      "within_burst_R_gap": {
+        "count": 4536,
+        "minimum": 1,
+        "maximum": 1,
+        "histogram": {
+          "1": 4536
+        }
+      },
+      "R_queue_peak": 8,
+      "B_queue_peak": 1,
+      "R_full_stalls": 0,
+      "B_full_stalls": 0,
+      "external_read_outstanding_peak": 1,
+      "external_write_outstanding_peak": 1
+    }
+  ],
+  "budget": {
+    "stage_bytes": 3221225472,
+    "reserve_bytes": 3221225472,
+    "runtime_FST_bytes": 268435456,
+    "monitor_period_seconds": 0.25
+  },
+  "final_resources": {
+    "label": "PASS all fixed N40/N200 execution and same-run transport/correctness gates",
+    "used_bytes": 876503040,
+    "free_bytes": 6387159040,
+    "remaining_stage_bytes": 2344722432,
+    "reserve_headroom_bytes": 821211136
+  },
+  "observed_min_free_bytes": 5712388096,
+  "observed_min_reserve_headroom_bytes": 55521280,
+  "geometry": {
+    "retained_lines_each": 1280,
+    "retained_sets": 256,
+    "full_payload_bytes": 64,
+    "observe": 1,
+    "L1I_bytes": 32768,
+    "L1D_bytes": 32768,
+    "L2_bytes": 16384,
+    "L2_banks": 2,
+    "L2_sets_per_bank": 64,
+    "L2_ways": 2,
+    "L2_line_bytes": 64
+  },
+  "new_target_attempts": 4,
+  "existing_native_target_executions": 0,
+  "retries": 0,
+  "limit_extensions": 0,
+  "application_measurements": 0,
+  "FPGA_operations": 0,
+  "Vivado_operations": 0,
+  "timing_scope": {
+    "host_source": {
+      "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/ps.cpp",
+      "bytes": 22893,
+      "sha256": "4f16e30a6cbb14fff9ded5a14ddac2a280202ac4436fd2ca22d5e2c40ff95120"
+    },
+    "nbf_loader_lines": 487,
+    "loader_shell_write_lines": 531,
+    "nbf_load_then_unfreeze_lines": 308,
+    "clock_gettime_start_line": 311,
+    "runtime_guard_line": 350,
+    "note": "NBF loader uses GP1 shell_write through BP/L2/HP0, so commonHP0 delay can affect loading. Native runtime/polling timing begins after nbf_load/unfreeze; whole-process elapsed also includes loading/setup/teardown. These host-time observations are operational sizing, not application speed, simulated CPU performance or physical calibration. Old N200 whole-process elapsed was unrecorded and never substituted for a verified margin."
+  },
+  "limits": [
+    "Same-run opaque R/B integrity is independently checked for each N. Equal observed transaction counts are not a claim of cross-model all-traffic payload identity; cycle-dependent values can change.",
+    "N is response age after shim acceptance, not DRAM service, AR latency or architectural load-use latency. Unstalled full8beat burst shifts once byN, retaining one-beat-per-clock spacing.",
+    "Traces include loading/setup/runtime traffic. Observed peaks are fixture coverage, not a platform concurrency limit. Cache/retained/L2 hits not reachingHP0 do not receive this added delay.",
+    "Scoped runtime assertions retain maintained library/timezero exclusions. Actual-6 postPASSGPIO returns remain recorded, not rewritten0.",
+    "No application benefit, Linux/FPGA projection, physical calibration, routed fit or new all-slot physical-capacity claim. Old custom one-bank4KiB-L2 application model is not pooled."
+  ],
+  "snapshots": [
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/actual-source-list.json",
+        "bytes": 175398,
+        "sha256": "ad1058c5074a52e44d2d5e3d1b7a866062cbc35e580405775cd1725e22b643b6"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/ad1058c5074a52e44d2d5e3d1b7a866062cbc35e580405775cd1725e22b643b6.gz",
+        "bytes": 25405,
+        "sha256": "1cdc46aa85a354692651a6b3db0e0c3d739a9b66d0761ad27c3d17e3e6de5e4b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7.gz",
+        "bytes": 43,
+        "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/verification.json",
+        "bytes": 2824,
+        "sha256": "db726ba3dd6758810b878f349365417adae5fa494f0af22ec3a845e478ba8b07"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/db726ba3dd6758810b878f349365417adae5fa494f0af22ec3a845e478ba8b07.gz",
+        "bytes": 847,
+        "sha256": "66422f10ca1fb26afaa3f780c44b3d96185cbc70330885ad28e3f242bdd9c0ac"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory-strict01/verification.json",
+        "bytes": 11975,
+        "sha256": "57e3fb9070fa4d398528aa6deb9f59fdd7814d11266b242b60a309c59244736e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/57e3fb9070fa4d398528aa6deb9f59fdd7814d11266b242b60a309c59244736e.gz",
+        "bytes": 2827,
+        "sha256": "8e0d6684f346dfaf61dc956280b65f7535ca7e76c905dac53b0f5c85e277c15a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7.gz",
+        "bytes": 43,
+        "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/verification.json",
+        "bytes": 2725,
+        "sha256": "341332b9c9e2311585f93a751fe67e8d838eb28f7e35a42ff4b7fa75504cd96a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/341332b9c9e2311585f93a751fe67e8d838eb28f7e35a42ff4b7fa75504cd96a.gz",
+        "bytes": 809,
+        "sha256": "eba1124c1dc8732a585cd55818fab98473965253f8e5219234b69b4098ab439d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/session.json",
+        "bytes": 19000,
+        "sha256": "4252668022582de65404437030e34bda1f2eba0f6a694b345defa99affb07e66"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4252668022582de65404437030e34bda1f2eba0f6a694b345defa99affb07e66.gz",
+        "bytes": 3653,
+        "sha256": "8b2c11745dad08d06addb093e263a83b2e2193bd9f8b49d08603199634de54a2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/verilator/obj_dir/.build_config-nt-nc-cfge_bp_unicore_zynqparrot_prefetch16k_cfg-trace1-BP_AXI_RESPONSE_DELAY_0-BP_RETAINED_BUFFER_1-BP_RETAINED_I_LINES_1280-BP_RETAINED_D_LINES_1280-BP_RETAINED_SETS_256-BP_RETAINED_OBSERVE_1-assert-bsgsimhidden-support",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench__verFiles.dat",
+        "bytes": 130488,
+        "sha256": "d9e1e5aa90ea4f593ab77f16f2baf6f99c6b546f2dd1513f54780bee8179ddbd"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/d9e1e5aa90ea4f593ab77f16f2baf6f99c6b546f2dd1513f54780bee8179ddbd.gz",
+        "bytes": 12961,
+        "sha256": "8ecf1f800e6e3500c27f7116a1a5e9887b3cc1fcf0e9a61a97d6acdbfb647e30"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/reader-build-command.log",
+        "bytes": 44,
+        "sha256": "0ac0cf5ba36ece1a2b981e1c6454b9d40c67601b42b075cd9cd11453de477476"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0ac0cf5ba36ece1a2b981e1c6454b9d40c67601b42b075cd9cd11453de477476.gz",
+        "bytes": 62,
+        "sha256": "d14fcaa4a58c746b9ae2824c2f8b2092efe23015cfa84f27d7f924e3f7b84737"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/reader.build.json",
+        "bytes": 2368,
+        "sha256": "61d0659a36c7438e401152a747ba1316735a7da6fd2facdd37e02ffff3c1dae7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/61d0659a36c7438e401152a747ba1316735a7da6fd2facdd37e02ffff3c1dae7.gz",
+        "bytes": 840,
+        "sha256": "02152fd89235ccf4ca0d58f18d6aea726f8b910dc7b8884b7bb551963ad681be"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/reader.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/reader.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/selected-events.tsv.gz",
+        "bytes": 1597567,
+        "sha256": "9aed67f6f8eaf6971d0c3761cfbdf2d9d3e33cc492c0c3a2a4a39a9f5ba84442"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9aed67f6f8eaf6971d0c3761cfbdf2d9d3e33cc492c0c3a2a4a39a9f5ba84442.gz",
+        "bytes": 532957,
+        "sha256": "84ce7a468966668fe5e74f0aa57540687aa03f450224c0d5fbeea06b1045c7ae"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/selection.tsv",
+        "bytes": 4575,
+        "sha256": "15ae4c4c0f23495c764515805188fc20d9e8a190879aa3e5b02a8c9076971281"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/15ae4c4c0f23495c764515805188fc20d9e8a190879aa3e5b02a8c9076971281.gz",
+        "bytes": 800,
+        "sha256": "f3738f77a75fe4c4c205c2e23b7207b5717a6529148a6fd8d191505678e96436"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/source/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/source/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/source/bp_nonsynth_axi_mem_pipelined.sv",
+        "bytes": 10723,
+        "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e.gz",
+        "bytes": 3132,
+        "sha256": "01a46d41e7cbdfd47ae942b4173e4d1cb6c7432866ce7de0ba09549564d4ae12"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/source/bsg_nonsynth_axi_mem.sv",
+        "bytes": 10364,
+        "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45.gz",
+        "bytes": 2342,
+        "sha256": "8a5085c2cc173aa9b3d6af2f817b6cb92fd163b75b149907e7091f9820f41a57"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/source/bsg_nonsynth_zynq_testbench.sv",
+        "bytes": 18810,
+        "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7.gz",
+        "bytes": 3088,
+        "sha256": "7071fd06b0df2bbfa50b9c007a66af7a6ad2b27a956a145c1ceae8652b09fa5a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/source/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/transactions.json.gz",
+        "bytes": 504790,
+        "sha256": "4db2399fbfddcdd0497487ae5e0e967da499b8212cbebb8b8d90a21b65980f68"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4db2399fbfddcdd0497487ae5e0e967da499b8212cbebb8b8d90a21b65980f68.gz",
+        "bytes": 484510,
+        "sha256": "c483ab32f6cfe2a2f021f91e946e9a51773af2477c446adf51f3caa532dea528"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0/verification.json",
+        "bytes": 14041,
+        "sha256": "eb1ba00d4319450854debde82e1484f4116343ab9c1dfbff63a71982a0f72916"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/eb1ba00d4319450854debde82e1484f4116343ab9c1dfbff63a71982a0f72916.gz",
+        "bytes": 2842,
+        "sha256": "90873939e90827b37470b61d30759b6bbfd6bb78ed1ded96c564518da814f7e3"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-advisory-HP0.log",
+        "bytes": 4676,
+        "sha256": "fb06a83aa0f7ea156121edfff28e9b32f94e6cb0c34408da8e9d956b89e86f5f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/fb06a83aa0f7ea156121edfff28e9b32f94e6cb0c34408da8e9d956b89e86f5f.gz",
+        "bytes": 568,
+        "sha256": "b9865753cc6be1a6747b2b0d54e5dde53f4effa8eb245863842caebb8a9723c2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/reader-build-command.log",
+        "bytes": 44,
+        "sha256": "9df6185285869fa348f2805debd78ba7a30d8fc807814865c20270a554bec0a7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9df6185285869fa348f2805debd78ba7a30d8fc807814865c20270a554bec0a7.gz",
+        "bytes": 62,
+        "sha256": "e344921f54a9d9d1b84c8ffd057290a7b86e78786c9c48a2347e27d7ef30baa7"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/reader.build.json",
+        "bytes": 2368,
+        "sha256": "765bd252e77714fb5adc1221e0c74061cf2414a0423853e2b2a3d5bd566c36dc"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/765bd252e77714fb5adc1221e0c74061cf2414a0423853e2b2a3d5bd566c36dc.gz",
+        "bytes": 839,
+        "sha256": "aa6c1205a269fcaf546f614f6129fc14d2323087f2ed1c2a40825168b13c8457"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/reader.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/reader.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/selected-events.tsv.gz",
+        "bytes": 2069695,
+        "sha256": "88d802ddea9efc71a3bb3ab2b003b4df886f1de025c0cb5665c720a12ca3661a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/88d802ddea9efc71a3bb3ab2b003b4df886f1de025c0cb5665c720a12ca3661a.gz",
+        "bytes": 1114685,
+        "sha256": "3c21f8c21ce11508d5b8d421302514231a17ad95fc18e550c407960535539039"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/selection.tsv",
+        "bytes": 4575,
+        "sha256": "15ae4c4c0f23495c764515805188fc20d9e8a190879aa3e5b02a8c9076971281"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/15ae4c4c0f23495c764515805188fc20d9e8a190879aa3e5b02a8c9076971281.gz",
+        "bytes": 800,
+        "sha256": "f3738f77a75fe4c4c205c2e23b7207b5717a6529148a6fd8d191505678e96436"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/source/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/source/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/source/bp_nonsynth_axi_mem_pipelined.sv",
+        "bytes": 10723,
+        "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e.gz",
+        "bytes": 3132,
+        "sha256": "01a46d41e7cbdfd47ae942b4173e4d1cb6c7432866ce7de0ba09549564d4ae12"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/source/bsg_nonsynth_axi_mem.sv",
+        "bytes": 10364,
+        "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45.gz",
+        "bytes": 2342,
+        "sha256": "8a5085c2cc173aa9b3d6af2f817b6cb92fd163b75b149907e7091f9820f41a57"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/source/bsg_nonsynth_zynq_testbench.sv",
+        "bytes": 18810,
+        "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7.gz",
+        "bytes": 3088,
+        "sha256": "7071fd06b0df2bbfa50b9c007a66af7a6ad2b27a956a145c1ceae8652b09fa5a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/source/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/transactions.json.gz",
+        "bytes": 635068,
+        "sha256": "be06cffc49c9726600ab671d686accefaf49eebf30810d2f4408eeeb1f7286eb"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/be06cffc49c9726600ab671d686accefaf49eebf30810d2f4408eeeb1f7286eb.gz",
+        "bytes": 609670,
+        "sha256": "b46dcea76cfa07471f96068d3f565477840533a122ce1c4ed1e48a71fafec6dc"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0/verification.json",
+        "bytes": 14401,
+        "sha256": "820071834a9480b9232775818814384727ceab8a3cccc308e2a9b383c509cf14"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/820071834a9480b9232775818814384727ceab8a3cccc308e2a9b383c509cf14.gz",
+        "bytes": 2852,
+        "sha256": "1ca136473028394b11fe08c4c79177da1d49f987acaabe08083330852d127537"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N0-integrity-HP0.log",
+        "bytes": 4676,
+        "sha256": "685a02641c5cafdae80b8ccaf618a000bcc2f52d970509f7cd82b662a21cb5db"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/685a02641c5cafdae80b8ccaf618a000bcc2f52d970509f7cd82b662a21cb5db.gz",
+        "bytes": 568,
+        "sha256": "bd432c85162fd1f879f13e4297d55f4466a920445cc8ed4da3c00e46aade4ca4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/reader-build-command.log",
+        "bytes": 44,
+        "sha256": "8587c3eb5987e0f8c35a7933aa4e5ec2f3e7f3a894aed1141c517c403477428e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/8587c3eb5987e0f8c35a7933aa4e5ec2f3e7f3a894aed1141c517c403477428e.gz",
+        "bytes": 62,
+        "sha256": "5ca438a6f47a0057bbd8c1be5b852a9d44c8906e9d0d5c60ef4b4bc999148f8f"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/reader.build.json",
+        "bytes": 2368,
+        "sha256": "5f1651ac8116732405ed6e8949e92d2c3e3ad5a665ebed203262363de83b4ced"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/5f1651ac8116732405ed6e8949e92d2c3e3ad5a665ebed203262363de83b4ced.gz",
+        "bytes": 840,
+        "sha256": "21618979b0b84c6824e4db8b8da871aa44c6181e514f0f2edef577c4a3fb18aa"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/reader.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/reader.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/selection.tsv",
+        "bytes": 5076,
+        "sha256": "7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be.gz",
+        "bytes": 896,
+        "sha256": "5e49ba7060cefdf144fb3c6494e64404c6ce9a7f0def8888bbb05edb241fba45"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/source/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/source/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/source/bp_nonsynth_axi_mem_pipelined.sv",
+        "bytes": 10723,
+        "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e.gz",
+        "bytes": 3132,
+        "sha256": "01a46d41e7cbdfd47ae942b4173e4d1cb6c7432866ce7de0ba09549564d4ae12"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/source/bsg_nonsynth_axi_mem.sv",
+        "bytes": 10364,
+        "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45.gz",
+        "bytes": 2342,
+        "sha256": "8a5085c2cc173aa9b3d6af2f817b6cb92fd163b75b149907e7091f9820f41a57"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/source/bsg_nonsynth_zynq_testbench.sv",
+        "bytes": 18810,
+        "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7.gz",
+        "bytes": 3088,
+        "sha256": "7071fd06b0df2bbfa50b9c007a66af7a6ad2b27a956a145c1ceae8652b09fa5a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/source/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/transactions.json.gz",
+        "bytes": 499527,
+        "sha256": "9692f4a65e623fd0323066093db4662f8794faedd812ad485b55434d2b47cef1"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9692f4a65e623fd0323066093db4662f8794faedd812ad485b55434d2b47cef1.gz",
+        "bytes": 482459,
+        "sha256": "fb256ef4f3201d2f085f69ea8038f0a62a46a8c769d36e9b1ad43dafa95e01f8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/verification.json",
+        "bytes": 14136,
+        "sha256": "f6b41ee9a2b69b42a7f2e049451254c0a1553cce3d3df3cad2b8cb6f77c72dab"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f6b41ee9a2b69b42a7f2e049451254c0a1553cce3d3df3cad2b8cb6f77c72dab.gz",
+        "bytes": 2887,
+        "sha256": "41e6199531ddfe8be01393094cf276d9afeeee09f64c6ee844767442cfe7c30a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0.log",
+        "bytes": 4734,
+        "sha256": "8702cd5ae5948d3f812e5026043ef64175eff7e08963d465a1fdfb0684021d51"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/8702cd5ae5948d3f812e5026043ef64175eff7e08963d465a1fdfb0684021d51.gz",
+        "bytes": 624,
+        "sha256": "bb94f266d54b346436c85ae003950dc719b953aa88f514068b0bd32e56aa9dcd"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a.gz",
+        "bytes": 49,
+        "sha256": "49d00a5c4754803f9a61ce2fecbe0c502140e453eb3c84c9c89d110dcc938bb9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-run.log",
+        "bytes": 32253,
+        "sha256": "468a6f3af479934ff12903bfc69be877abb61c1e34b7ce0f8b4eb1c7b16df7b3"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/468a6f3af479934ff12903bfc69be877abb61c1e34b7ce0f8b4eb1c7b16df7b3.gz",
+        "bytes": 2541,
+        "sha256": "9b268cfcdc5828438e0a9e967195a9bb977b7d3e72363e585a905a525269e4b2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-build.log",
+        "bytes": 617589,
+        "sha256": "980f7e2fa19952ae8d44f8b7d70d2e03f50742be944654902d8324a08360b020"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/980f7e2fa19952ae8d44f8b7d70d2e03f50742be944654902d8324a08360b020.gz",
+        "bytes": 24283,
+        "sha256": "4574d221bda653fa5381821868339fcddcbedfab5e856acc9b2660249dc7229e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-clean.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-counter.log",
+        "bytes": 133,
+        "sha256": "3ea4be6b3aff2c6d514f9700c7d0328563ee3527c4f7667eadff83212e46cfd7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/3ea4be6b3aff2c6d514f9700c7d0328563ee3527c4f7667eadff83212e46cfd7.gz",
+        "bytes": 123,
+        "sha256": "ae5a61909874003015745aa8ba8b29b08ce59afe3715292f9171fda798bbf949"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/reader-build-command.log",
+        "bytes": 44,
+        "sha256": "1577d23f9fc207dcef589f7b4c1502181f9e7930de05b0f347a6bcda8a5e35ad"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1577d23f9fc207dcef589f7b4c1502181f9e7930de05b0f347a6bcda8a5e35ad.gz",
+        "bytes": 62,
+        "sha256": "0a59e7690a52ba966ffbf90c6434fdd15ea5d36effcb83632b6ab608320fe212"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/reader.build.json",
+        "bytes": 2368,
+        "sha256": "715a25b5131886ece44cd60a95cba8846199cb43c687d152c7e5c24739e1db66"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/715a25b5131886ece44cd60a95cba8846199cb43c687d152c7e5c24739e1db66.gz",
+        "bytes": 841,
+        "sha256": "f6cf2672847ac27cc51347696a8da8b9b5ae60a8736746f603f88d30057add15"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/reader.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/reader.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/selection.tsv",
+        "bytes": 5076,
+        "sha256": "7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be.gz",
+        "bytes": 896,
+        "sha256": "5e49ba7060cefdf144fb3c6494e64404c6ce9a7f0def8888bbb05edb241fba45"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/source/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/source/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/source/bp_nonsynth_axi_mem_pipelined.sv",
+        "bytes": 10723,
+        "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e.gz",
+        "bytes": 3132,
+        "sha256": "01a46d41e7cbdfd47ae942b4173e4d1cb6c7432866ce7de0ba09549564d4ae12"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/source/bsg_nonsynth_axi_mem.sv",
+        "bytes": 10364,
+        "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45.gz",
+        "bytes": 2342,
+        "sha256": "8a5085c2cc173aa9b3d6af2f817b6cb92fd163b75b149907e7091f9820f41a57"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/source/bsg_nonsynth_zynq_testbench.sv",
+        "bytes": 18810,
+        "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7.gz",
+        "bytes": 3088,
+        "sha256": "7071fd06b0df2bbfa50b9c007a66af7a6ad2b27a956a145c1ceae8652b09fa5a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/source/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/transactions.json.gz",
+        "bytes": 632587,
+        "sha256": "64b94b7d95b053f8f12b57b291d88960bddc39dd25abd79cb6dc894b809875db"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/64b94b7d95b053f8f12b57b291d88960bddc39dd25abd79cb6dc894b809875db.gz",
+        "bytes": 606544,
+        "sha256": "7757ad15a0a41f1edd8f5b7925b665eade77f9a25750ff8636d34e6070693f8c"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0/verification.json",
+        "bytes": 14924,
+        "sha256": "d1dc162ee54ae42898d9e39704a40bebf3bec6dbe94033f1a604c7e62afe9be3"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/d1dc162ee54ae42898d9e39704a40bebf3bec6dbe94033f1a604c7e62afe9be3.gz",
+        "bytes": 2936,
+        "sha256": "6c2837bf7448cf1ebc32c8c36a94357ca552cff1c8bb9a1113ec62ca28f45224"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-HP0.log",
+        "bytes": 4734,
+        "sha256": "9a9ffcd9f2e3f859b26c65dbfcdff8b8f7012a8fcf29144c81bcf487fada52b9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9a9ffcd9f2e3f859b26c65dbfcdff8b8f7012a8fcf29144c81bcf487fada52b9.gz",
+        "bytes": 624,
+        "sha256": "882c4d17bf9a973f03513936b80471b339697d6065cff1089cb4245f7c23e626"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a.gz",
+        "bytes": 49,
+        "sha256": "49d00a5c4754803f9a61ce2fecbe0c502140e453eb3c84c9c89d110dcc938bb9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-integrity-run.log",
+        "bytes": 32280,
+        "sha256": "d68b6e45bf311da35f51bbee0d364213918f407c4bdc0de434617cc629a6d900"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/d68b6e45bf311da35f51bbee0d364213918f407c4bdc0de434617cc629a6d900.gz",
+        "bytes": 2573,
+        "sha256": "d7155d0561746fc83027e43697f6b687f82d46f81f4e55d321f73673256f656c"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-loader.log",
+        "bytes": 651,
+        "sha256": "8573e3960d481c70888ec07d0e5902447a8335f04aff4b0c9a1083ddf7e86f59"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/8573e3960d481c70888ec07d0e5902447a8335f04aff4b0c9a1083ddf7e86f59.gz",
+        "bytes": 253,
+        "sha256": "aee73868cfc703d963e594740985d06085805b4aa8ad604484ca61646c1b8e2d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-make-preflight.log",
+        "bytes": 41422,
+        "sha256": "2ef35bb99326dd81b9e3e0b71f71c5ba4a6aee20e3e6d9f6c1fe8cd08a990246"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/2ef35bb99326dd81b9e3e0b71f71c5ba4a6aee20e3e6d9f6c1fe8cd08a990246.gz",
+        "bytes": 4042,
+        "sha256": "c110fc9ea9875256f76bbc46d758d907ccfb7e0eef245537ae56280b01973105"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-strict.log",
+        "bytes": 105,
+        "sha256": "afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c.gz",
+        "bytes": 117,
+        "sha256": "860ede2bde56231d061f1ca9fe07b0531cb42c11d6cac9d3d22c23ab64da81d5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/reader-build-command.log",
+        "bytes": 44,
+        "sha256": "b8d9824bcfa8c2f9ecbe5c362f006030682d65d1e30c9faf5ab7a30f4e6936f6"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/b8d9824bcfa8c2f9ecbe5c362f006030682d65d1e30c9faf5ab7a30f4e6936f6.gz",
+        "bytes": 62,
+        "sha256": "3dc64d1c1ef019496fe9cdf642f34452b91acac3ddac26c18e064998cd6c64b9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/reader.build.json",
+        "bytes": 2368,
+        "sha256": "0e220cf49e147d80e6f23a52b397d274c1e31406f3064d61d74a983c9d8e259d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0e220cf49e147d80e6f23a52b397d274c1e31406f3064d61d74a983c9d8e259d.gz",
+        "bytes": 840,
+        "sha256": "5c781a3718611d97696e772c8a744d8105b322fc0c3ebb30fdb6dfa4f1472849"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/reader.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/reader.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/selection.tsv",
+        "bytes": 5076,
+        "sha256": "7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be.gz",
+        "bytes": 896,
+        "sha256": "5e49ba7060cefdf144fb3c6494e64404c6ce9a7f0def8888bbb05edb241fba45"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/source/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/source/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/source/bp_nonsynth_axi_mem_pipelined.sv",
+        "bytes": 10723,
+        "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e.gz",
+        "bytes": 3132,
+        "sha256": "01a46d41e7cbdfd47ae942b4173e4d1cb6c7432866ce7de0ba09549564d4ae12"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/source/bsg_nonsynth_axi_mem.sv",
+        "bytes": 10364,
+        "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45.gz",
+        "bytes": 2342,
+        "sha256": "8a5085c2cc173aa9b3d6af2f817b6cb92fd163b75b149907e7091f9820f41a57"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/source/bsg_nonsynth_zynq_testbench.sv",
+        "bytes": 18810,
+        "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7.gz",
+        "bytes": 3088,
+        "sha256": "7071fd06b0df2bbfa50b9c007a66af7a6ad2b27a956a145c1ceae8652b09fa5a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/source/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/transactions.json.gz",
+        "bytes": 501608,
+        "sha256": "2f508c8abd62e4cc71ae2dab7468d2198e5bf01381d3e59d029a7400ecb84a47"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/2f508c8abd62e4cc71ae2dab7468d2198e5bf01381d3e59d029a7400ecb84a47.gz",
+        "bytes": 484564,
+        "sha256": "dc5919f4fa6e8dcea410a597983fe6755d516e80fb8935bb391ea7bd6edc723e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/verification.json",
+        "bytes": 14052,
+        "sha256": "d737166c45caded76d6a38097287c27f63b4f8d674552d2d18b278766554e35d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/d737166c45caded76d6a38097287c27f63b4f8d674552d2d18b278766554e35d.gz",
+        "bytes": 2873,
+        "sha256": "a43e89fd95a7f7f7cd40001746760e8f755e4ec3ad4306107b1660a95a5a4dd5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0.log",
+        "bytes": 4702,
+        "sha256": "73645e1d9690276559c62ecd447c46e6ce36cd8ff869374fd4300da9d8094952"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/73645e1d9690276559c62ecd447c46e6ce36cd8ff869374fd4300da9d8094952.gz",
+        "bytes": 621,
+        "sha256": "af2db91e2e3427c922af792269c485087a824342e3e49293743b1c0e826600c5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a.gz",
+        "bytes": 49,
+        "sha256": "49d00a5c4754803f9a61ce2fecbe0c502140e453eb3c84c9c89d110dcc938bb9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-run.log",
+        "bytes": 32251,
+        "sha256": "42b3d2e42d4e6b1e8ee5476c6710d58b8a466ec0984571966f12a6bd95a80ec1"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/42b3d2e42d4e6b1e8ee5476c6710d58b8a466ec0984571966f12a6bd95a80ec1.gz",
+        "bytes": 2538,
+        "sha256": "0c6ca1b099b875a79a575ed4342d5aebcd00cd2e6b2bf80fc5f30235b7d82991"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-build.log",
+        "bytes": 617307,
+        "sha256": "4190e4e78ff6e20fd531c8263a3c905914a1cb909be695bb6dfce77e2c2379e4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4190e4e78ff6e20fd531c8263a3c905914a1cb909be695bb6dfce77e2c2379e4.gz",
+        "bytes": 24277,
+        "sha256": "2cf8b8b317c7f7c1676baf60530ef2c327c4ae2fd5d3ff8ae148b616a05ef7b4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-clean.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-counter.log",
+        "bytes": 132,
+        "sha256": "8f9e997377592fc77df56ba21ec2271d3f24e803998cd5ff8b5528e154b58240"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/8f9e997377592fc77df56ba21ec2271d3f24e803998cd5ff8b5528e154b58240.gz",
+        "bytes": 123,
+        "sha256": "0fa8107f08baf2dc79b268002a20f8759fea83f315c38f7262e0622da53815f8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/reader-build-command.log",
+        "bytes": 44,
+        "sha256": "fb49483909d7949274ea010767bb4f4aff9b781c64265e9646e2d4f7d4d7041b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/fb49483909d7949274ea010767bb4f4aff9b781c64265e9646e2d4f7d4d7041b.gz",
+        "bytes": 62,
+        "sha256": "a714d25c7e16350a9f3edb12682b07e9a152a87a9f00b5d5a25743234a22592e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/reader.build.json",
+        "bytes": 2368,
+        "sha256": "3c193965ad203dc036a913a058a8b206e09816c84d62b23b5e3cf234e822e75a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/3c193965ad203dc036a913a058a8b206e09816c84d62b23b5e3cf234e822e75a.gz",
+        "bytes": 840,
+        "sha256": "9a27e055aebd5ce43813342fd6482354d0079616870ebf22b3bdfe10bdaac105"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/reader.build.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/reader.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/selection.tsv",
+        "bytes": 5076,
+        "sha256": "7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7adbb39a335e658564e3c43901b0387a94618be1bde899e618bca5576dc052be.gz",
+        "bytes": 896,
+        "sha256": "5e49ba7060cefdf144fb3c6494e64404c6ce9a7f0def8888bbb05edb241fba45"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/source/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/source/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/source/bp_nonsynth_axi_mem_pipelined.sv",
+        "bytes": 10723,
+        "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e.gz",
+        "bytes": 3132,
+        "sha256": "01a46d41e7cbdfd47ae942b4173e4d1cb6c7432866ce7de0ba09549564d4ae12"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/source/bsg_nonsynth_axi_mem.sv",
+        "bytes": 10364,
+        "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45.gz",
+        "bytes": 2342,
+        "sha256": "8a5085c2cc173aa9b3d6af2f817b6cb92fd163b75b149907e7091f9820f41a57"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/source/bsg_nonsynth_zynq_testbench.sv",
+        "bytes": 18810,
+        "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7.gz",
+        "bytes": 3088,
+        "sha256": "7071fd06b0df2bbfa50b9c007a66af7a6ad2b27a956a145c1ceae8652b09fa5a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/source/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/transactions.json.gz",
+        "bytes": 633198,
+        "sha256": "c8fb675fc4a357e8a6ccd2a92d9eb9bba4bedd2553252a593602403e0addf655"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/c8fb675fc4a357e8a6ccd2a92d9eb9bba4bedd2553252a593602403e0addf655.gz",
+        "bytes": 610082,
+        "sha256": "f17c92982d032272b57f42a8305e1ea128339312931b7dd6d3dd103c29f4d58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0/verification.json",
+        "bytes": 14566,
+        "sha256": "5991e3a585ed077aab9b3fad046ca12a971c0b35e091992b9b1e59d8c2dace64"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/5991e3a585ed077aab9b3fad046ca12a971c0b35e091992b9b1e59d8c2dace64.gz",
+        "bytes": 2882,
+        "sha256": "a63d81f83cd364a3887e2141aef77485aa1161e911019d4bf7ab42b213e16ede"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-HP0.log",
+        "bytes": 4702,
+        "sha256": "9a4a547dbe2189521e72e469e7d30bf6b5b1730e8535d5a167c3234ac1e191d1"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9a4a547dbe2189521e72e469e7d30bf6b5b1730e8535d5a167c3234ac1e191d1.gz",
+        "bytes": 623,
+        "sha256": "78d3600787a65b51f5332f60ae08b0827dcec10af31debe69df72f386b1141f4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a.gz",
+        "bytes": 49,
+        "sha256": "49d00a5c4754803f9a61ce2fecbe0c502140e453eb3c84c9c89d110dcc938bb9"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-integrity-run.log",
+        "bytes": 32278,
+        "sha256": "8861513defbabbfc38950bb190d26cb5b28d1a4bfc95ca959996adba51631577"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/8861513defbabbfc38950bb190d26cb5b28d1a4bfc95ca959996adba51631577.gz",
+        "bytes": 2570,
+        "sha256": "7ea41d78be851f7a66df5a7cf1372d6defa145e119caac560a5c7578407d1d00"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-loader.log",
+        "bytes": 651,
+        "sha256": "6b66924857a882217af5181e81e2d21015da6bb5d45100e75a96b1f043d0d751"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6b66924857a882217af5181e81e2d21015da6bb5d45100e75a96b1f043d0d751.gz",
+        "bytes": 252,
+        "sha256": "e8ac1033ee4445629feb398528e574e62a46d31f209ebd8c8c247617e0972510"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-make-preflight.log",
+        "bytes": 41417,
+        "sha256": "fe5750f92e7472221aeec67b93e199128fb4f64435cedd8e6141efd5c51ef74f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/fe5750f92e7472221aeec67b93e199128fb4f64435cedd8e6141efd5c51ef74f.gz",
+        "bytes": 4042,
+        "sha256": "da7ee9a00297fdc3cabb637c7a036d194b7be30b4631e69c890ee5861e79a53e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-strict.log",
+        "bytes": 105,
+        "sha256": "afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c.gz",
+        "bytes": 117,
+        "sha256": "860ede2bde56231d061f1ca9fe07b0531cb42c11d6cac9d3d22c23ab64da81d5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/session.json",
+        "bytes": 50273,
+        "sha256": "86d6d548ed72da535813547b6cede51e864f6d16969f90e7cecacdeab8c6a376"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/86d6d548ed72da535813547b6cede51e864f6d16969f90e7cecacdeab8c6a376.gz",
+        "bytes": 5869,
+        "sha256": "d7661bd0268cd3e9a0e0dfdfa746d73ea295b69cfbea7c1548cd0637c447cd44"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-v1/acquire.py",
+        "bytes": 18747,
+        "sha256": "a291501643cc8cb94f0b7053660527d3c4ff5173c0ece9e989677e9ee338f764"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/a291501643cc8cb94f0b7053660527d3c4ff5173c0ece9e989677e9ee338f764.gz",
+        "bytes": 6650,
+        "sha256": "796a54f5b1d12a2b7e1fd26c94b34965e25ecbdceb16fb270384c515f4aaaa38"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-v1/launch-admission.json",
+        "bytes": 28733,
+        "sha256": "c6dea3c05c9733a7baf9f0257875a1fa9ce2e4b5a07f2df88618cc208f30b77c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/c6dea3c05c9733a7baf9f0257875a1fa9ce2e4b5a07f2df88618cc208f30b77c.gz",
+        "bytes": 6172,
+        "sha256": "764fbd5e1640f1c3dbbe4a13b2de0cb8b49fcca39494daa9d74f9543a86f1026"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/actual-source-list.json",
+        "bytes": 175463,
+        "sha256": "4b46efe810cdbe552885287f080502be062f4174281a0b5ecff2a03a84cbeff8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4b46efe810cdbe552885287f080502be062f4174281a0b5ecff2a03a84cbeff8.gz",
+        "bytes": 25418,
+        "sha256": "f0fdbfcc74e33ab976994579f367fc3c6fe1c17e5719ed2aef1c93c93115542a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/admission.json",
+        "bytes": 1356,
+        "sha256": "cf9f3736ff7fd89fdf599a1d5a578f82c9e59333d6ef6d62e45cbfd8d0129d2d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/cf9f3736ff7fd89fdf599a1d5a578f82c9e59333d6ef6d62e45cbfd8d0129d2d.gz",
+        "bytes": 567,
+        "sha256": "51994dfa2d37323c4055fba69969203fd144dbbd4bb9fb8c6bb351452774fc2c"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7.gz",
+        "bytes": 43,
+        "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/verification.json",
+        "bytes": 2671,
+        "sha256": "b6328bfbcaf842a70198a4dea491179eb106dbd1a79940e4d88cf1c04a0ef8de"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/b6328bfbcaf842a70198a4dea491179eb106dbd1a79940e4d88cf1c04a0ef8de.gz",
+        "bytes": 794,
+        "sha256": "51531fea965f3d4be1847d4d5f5553c6b788df66c14dba6dc4187da05fbef321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory-counter01/verification.json",
+        "bytes": 6099,
+        "sha256": "caea46a16e16ef5eef88739080063403a3b7f66c443fe0cfa1ada7169b91af9c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/caea46a16e16ef5eef88739080063403a3b7f66c443fe0cfa1ada7169b91af9c.gz",
+        "bytes": 1223,
+        "sha256": "639ced0aab16f0215551e8f90b9c6e739c1fee48d5e6ff9e38a1a926a1574a24"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory-strict01/verification.json",
+        "bytes": 12117,
+        "sha256": "02b06778b46f8c6cc65bd197221c8ea5e41594a26a3f645bbccd790c228c94c9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/02b06778b46f8c6cc65bd197221c8ea5e41594a26a3f645bbccd790c228c94c9.gz",
+        "bytes": 2845,
+        "sha256": "25e6081a1115e8a8440470e007def684e2e158aff1bf5a3f48842d830993db64"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/geometry.json",
+        "bytes": 4871,
+        "sha256": "cf03bb16f9ca3005c79e8dcc94f05c3c288a9684399426e539d6f958367170b9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/cf03bb16f9ca3005c79e8dcc94f05c3c288a9684399426e539d6f958367170b9.gz",
+        "bytes": 1250,
+        "sha256": "55e2011faa694fd97ede19efd061c437bac37005e22decf6fe19f6c4ef77710a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/admission.json",
+        "bytes": 1359,
+        "sha256": "05121512f86e3162c6031604c2ab7bb031dc021e5dbe76805aa2fb4fa386f07e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/05121512f86e3162c6031604c2ab7bb031dc021e5dbe76805aa2fb4fa386f07e.gz",
+        "bytes": 567,
+        "sha256": "3ed33dbd7d5657f2caa98ab06c15b058a9c17e2f4691e680eed81799e8eaf3e4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7.gz",
+        "bytes": 43,
+        "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/verification.json",
+        "bytes": 2564,
+        "sha256": "e4bd63727477f8318564a6fc92eff724254ee25e3d50e37b671dae7ee8029a3e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e4bd63727477f8318564a6fc92eff724254ee25e3d50e37b671dae7ee8029a3e.gz",
+        "bytes": 748,
+        "sha256": "d63b5395647d5eb2e1c9b2b18f017ae98987eb234dc67d060c7764a3b13306ff"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/session.json",
+        "bytes": 648,
+        "sha256": "7591e512136b5108358b40a6b3087de09f2a8b20ab97d2f9b64c223b4e58e845"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7591e512136b5108358b40a6b3087de09f2a8b20ab97d2f9b64c223b4e58e845.gz",
+        "bytes": 357,
+        "sha256": "ae07b7223c567109ebc74f76024c0ae84043dcd2f3319400a5101dd99088e029"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/bsg_blackparrot_pkg.sv",
+        "bytes": 145,
+        "sha256": "5f880c802f61a1e59840f9a69a2f794e04625c49e562b25251715c7a55640fa4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/5f880c802f61a1e59840f9a69a2f794e04625c49e562b25251715c7a55640fa4.gz",
+        "bytes": 129,
+        "sha256": "60a3b9fea0a4f2b5c814f1f82712effd7e7f89aae2ed3de897ab91cceaf39879"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench___024root.h",
+        "bytes": 2130986,
+        "sha256": "7abdde1b9f8a8cfd0327eff36269542a1716dea5130cd0215bbe51c0f5958c7e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7abdde1b9f8a8cfd0327eff36269542a1716dea5130cd0215bbe51c0f5958c7e.gz",
+        "bytes": 56055,
+        "sha256": "1a005985fc1ecba3ffe5dbb465b75fdad0814afd7a9c15bd26b9ccd590c1b3c1"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench__verFiles.dat",
+        "bytes": 130544,
+        "sha256": "5f1b63dd6a56461599400b488c6d838f4dc00b2c2e983adbefb8194945fd864b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/5f1b63dd6a56461599400b488c6d838f4dc00b2c2e983adbefb8194945fd864b.gz",
+        "bytes": 13017,
+        "sha256": "fe676b219cd104d08203b9b4bf83f31eea6fa542b61f7cc2b006bc21da669154"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench_bsg_cache__pi36.h",
+        "bytes": 19799,
+        "sha256": "dafb941ea589f11bc5e45070da0455f5e5c76f7feb327f79dc60fab7f0527d4b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dafb941ea589f11bc5e45070da0455f5e5c76f7feb327f79dc60fab7f0527d4b.gz",
+        "bytes": 2507,
+        "sha256": "c955cc3701b6235633c7491dcc1186c836cffbe4a1e3634c0a461435d694c2e8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench_bsg_mem_1rw_sync__pi117.h",
+        "bytes": 1490,
+        "sha256": "c4078ff46aec3739bfab65a454855fd4095974f86b2b13d186e859e5ffb20dce"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/c4078ff46aec3739bfab65a454855fd4095974f86b2b13d186e859e5ffb20dce.gz",
+        "bytes": 619,
+        "sha256": "59550295a60ed335358e16be5350c6fe93b66e1acaa6e2aca33e21e12b491eeb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/actual-source-list.json",
+        "bytes": 175458,
+        "sha256": "09e0e185f05eb491cfec38f27855361e74ff7b2aa5094994c02819eb6807ddc2"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/09e0e185f05eb491cfec38f27855361e74ff7b2aa5094994c02819eb6807ddc2.gz",
+        "bytes": 25420,
+        "sha256": "bec9ac155ea732f10385ea237dbdbf04efc6e0e799311c4ad73bd310eb71481b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/admission.json",
+        "bytes": 1352,
+        "sha256": "1bb49b800e4f68a93757eb2d24bd1da6f83d40314573c2c9ac64d09b170b744f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1bb49b800e4f68a93757eb2d24bd1da6f83d40314573c2c9ac64d09b170b744f.gz",
+        "bytes": 566,
+        "sha256": "33674e67df742c86e282ab6d3803ccf63cf9ab9b80515f95c00466b7ee568d3e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7.gz",
+        "bytes": 43,
+        "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/verification.json",
+        "bytes": 2664,
+        "sha256": "fb6d79fd0b710f7e5f194f996c2fddf9a01b51137a1183e865932382e9c8188c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/fb6d79fd0b710f7e5f194f996c2fddf9a01b51137a1183e865932382e9c8188c.gz",
+        "bytes": 806,
+        "sha256": "7395eaf23a6de56d9d920d2be3ab3441576cc160592a5e5e422f3fad80a9021a"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory-counter01/verification.json",
+        "bytes": 6074,
+        "sha256": "416171552fde2660e14309dc83144c58304c2b8faac90686b8e333745fa906db"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/416171552fde2660e14309dc83144c58304c2b8faac90686b8e333745fa906db.gz",
+        "bytes": 1221,
+        "sha256": "8cc1ef0b4d127a539d20bd2a2003a9a525fba4e092dac3fc92c1a1fa1920e473"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory-strict01/verification.json",
+        "bytes": 12059,
+        "sha256": "4b7f326e2210ec449d3464fe7c5a693bdd91e4bf05b5b5611d7f0f0e31f00102"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4b7f326e2210ec449d3464fe7c5a693bdd91e4bf05b5b5611d7f0f0e31f00102.gz",
+        "bytes": 2839,
+        "sha256": "5145d25971584f0c7ba875fe4e4b1cb9c20c9920ed8a1565df89eb6b7481b64d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/geometry.json",
+        "bytes": 4860,
+        "sha256": "6ed6c61f4dae2b56d9819c010ac8e27040ac372532f0150ffb5838da1e2b8173"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6ed6c61f4dae2b56d9819c010ac8e27040ac372532f0150ffb5838da1e2b8173.gz",
+        "bytes": 1247,
+        "sha256": "d5fc3d8621ddff1b33ae042f0be705f76dbe4a7d6e7f82e56c00711d60abe231"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/admission.json",
+        "bytes": 1355,
+        "sha256": "6b9c8118611052a4ddfb32e954c398ca95db4c0e186de8001ab6de40e8b63780"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6b9c8118611052a4ddfb32e954c398ca95db4c0e186de8001ab6de40e8b63780.gz",
+        "bytes": 565,
+        "sha256": "c9b293c25758aa3735a7a72ea0854e513878d1cb412adf300ad1807c94afe093"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/process.json",
+        "bytes": 23,
+        "sha256": "6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6f451a3ae09d9d3f0a8736d57d44c9cfb195cc3c33e1b18425ec55529ed659f7.gz",
+        "bytes": 43,
+        "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/verification.json",
+        "bytes": 2557,
+        "sha256": "a13b7a5b98d182d5f08d71736f6afd1554eebfe91f30d324c30d18ff2f7f42c8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/a13b7a5b98d182d5f08d71736f6afd1554eebfe91f30d324c30d18ff2f7f42c8.gz",
+        "bytes": 733,
+        "sha256": "305cae37ecb9b1ab1e2c6161e52529a344dbec3725a49f3c3c449b449de944bf"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/session.json",
+        "bytes": 646,
+        "sha256": "7f3e8ed7601ddd3e2416007a94227fd370c5f62c8ec7b39af77c65770ce5dc3f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7f3e8ed7601ddd3e2416007a94227fd370c5f62c8ec7b39af77c65770ce5dc3f.gz",
+        "bytes": 355,
+        "sha256": "f80fb16c7b8809942fd316e542f716b76653a72adedcdaa8540eb18cc14928d5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/bsg_blackparrot_pkg.sv",
+        "bytes": 145,
+        "sha256": "5f880c802f61a1e59840f9a69a2f794e04625c49e562b25251715c7a55640fa4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/5f880c802f61a1e59840f9a69a2f794e04625c49e562b25251715c7a55640fa4.gz",
+        "bytes": 129,
+        "sha256": "60a3b9fea0a4f2b5c814f1f82712effd7e7f89aae2ed3de897ab91cceaf39879"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench___024root.h",
+        "bytes": 2130986,
+        "sha256": "7abdde1b9f8a8cfd0327eff36269542a1716dea5130cd0215bbe51c0f5958c7e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7abdde1b9f8a8cfd0327eff36269542a1716dea5130cd0215bbe51c0f5958c7e.gz",
+        "bytes": 56055,
+        "sha256": "1a005985fc1ecba3ffe5dbb465b75fdad0814afd7a9c15bd26b9ccd590c1b3c1"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench__verFiles.dat",
+        "bytes": 130538,
+        "sha256": "a287ddb8b9bf322159613824cbbf760eb15ef00b87c2345133841ed991897a57"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/a287ddb8b9bf322159613824cbbf760eb15ef00b87c2345133841ed991897a57.gz",
+        "bytes": 12985,
+        "sha256": "33afc11cffd3dce7298edb4a008798f824f6ecd7951d10829e8aadf3723a0890"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench_bsg_cache__pi36.h",
+        "bytes": 19799,
+        "sha256": "dafb941ea589f11bc5e45070da0455f5e5c76f7feb327f79dc60fab7f0527d4b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dafb941ea589f11bc5e45070da0455f5e5c76f7feb327f79dc60fab7f0527d4b.gz",
+        "bytes": 2507,
+        "sha256": "c955cc3701b6235633c7491dcc1186c836cffbe4a1e3634c0a461435d694c2e8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench_bsg_mem_1rw_sync__pi117.h",
+        "bytes": 1490,
+        "sha256": "c4078ff46aec3739bfab65a454855fd4095974f86b2b13d186e859e5ffb20dce"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/c4078ff46aec3739bfab65a454855fd4095974f86b2b13d186e859e5ffb20dce.gz",
+        "bytes": 619,
+        "sha256": "59550295a60ed335358e16be5350c6fe93b66e1acaa6e2aca33e21e12b491eeb"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/preparation01/admission.json",
+        "bytes": 28033,
+        "sha256": "775b1e280084a7fe7a015aaadd369c40e5508634e4274072056af4292721b69e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/775b1e280084a7fe7a015aaadd369c40e5508634e4274072056af4292721b69e.gz",
+        "bytes": 5598,
+        "sha256": "5d08f3ae7bcc99497457c0251cd215514d6134aecd9d5dc5706bcfd387b45c0d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/preparation01/filter-specifications.json",
+        "bytes": 28234,
+        "sha256": "7bbfd478ad1a6f6b7ef3b11becb1c4e5d367c312c65c9a736588b62c1b644586"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7bbfd478ad1a6f6b7ef3b11becb1c4e5d367c312c65c9a736588b62c1b644586.gz",
+        "bytes": 1652,
+        "sha256": "d8639cdac19c383043b1fb2bb0507269cddd57cb8d3bf92e5725decac5037cf5"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "bytes": 151200,
+        "sha256": "a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541.gz",
+        "bytes": 72012,
+        "sha256": "f606126a3a0124a74abba88cb1864105dca5fb0a271874bc16bd042354a303de"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fastlz.c",
+        "bytes": 13561,
+        "sha256": "35d2b3ab8ea04615cc56dee1a7017610f459b57aef51d9de69c71c24bd9ee719"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/35d2b3ab8ea04615cc56dee1a7017610f459b57aef51d9de69c71c24bd9ee719.gz",
+        "bytes": 3803,
+        "sha256": "a8cd73a45f8f8decafbec62ad876bd44ee533cb90567bec7f73270933554543c"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fst_config.h",
+        "bytes": 429,
+        "sha256": "d8b84770187034bb7aee6c41eeb49725e84ad9dc1d3302903dfc979b03b4d6ad"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/d8b84770187034bb7aee6c41eeb49725e84ad9dc1d3302903dfc979b03b4d6ad.gz",
+        "bytes": 284,
+        "sha256": "96daf2e9cea255873331972fac4f82d3982022e058f31aa4939343de930e2a65"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.c",
+        "bytes": 257277,
+        "sha256": "6a09b5a4aea241f12939e8005f7e2c1b2c60f28e39d66a1d02d3edd69c80a1c8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6a09b5a4aea241f12939e8005f7e2c1b2c60f28e39d66a1d02d3edd69c80a1c8.gz",
+        "bytes": 42217,
+        "sha256": "9ff41d817b7f41966e3cc8fa9f48564cb6abf6dca6c0922fb7a816405ad8e11e"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.h",
+        "bytes": 18479,
+        "sha256": "9b401991a1d433eec862a8636e2d218e9e572df7a4e62643ebccbf88fc417377"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9b401991a1d433eec862a8636e2d218e9e572df7a4e62643ebccbf88fc417377.gz",
+        "bytes": 4776,
+        "sha256": "b2ddd66edf1c0ffd791cfc2ca3fbd5d2dc95b36e9cc573f84bf1ef54c6d563e2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/lz4.c",
+        "bytes": 115587,
+        "sha256": "af9087bb6d6155079cccaf8635acc6590b8a6f2fc98efce35e926f30f79366b8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/af9087bb6d6155079cccaf8635acc6590b8a6f2fc98efce35e926f30f79366b8.gz",
+        "bytes": 26232,
+        "sha256": "a2982186c929cd36bf53d02f2771133dc0745064e4badf49428e1678d71285e2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/retained_advisory_full_line_test.elf",
+        "bytes": 260760,
+        "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8.gz",
+        "bytes": 73430,
+        "sha256": "e030255db91f665c0652a2a7b661c09821502bbdce08742fc64531145b28bfd6"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+        "bytes": 18030,
+        "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f.gz",
+        "bytes": 4725,
+        "sha256": "1b72cccafb5b985850d54bb30126893453ed9aa36a0b6b372c157328a9c21043"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+        "bytes": 13334,
+        "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804.gz",
+        "bytes": 4436,
+        "sha256": "950da24ab7f8845b160e7029cc5915f6a7adaf948f77d2deec5e885902d81d23"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/build_reader.py",
+        "bytes": 2041,
+        "sha256": "79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4.gz",
+        "bytes": 997,
+        "sha256": "d3731e887196f903e14d035938a8c6de228cb83cb44f47a08808b37f1bd06e7f"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/fst_events.c",
+        "bytes": 3497,
+        "sha256": "b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13.gz",
+        "bytes": 1345,
+        "sha256": "02dd827b5519c8b267938a57734ffd9e0ae13969fd92ad3785136ab65614b0a3"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained_advisory_full_line_test.c",
+        "bytes": 6705,
+        "sha256": "1c71bbe4a8db46ae7c19b9faa14fd8949668bf0ca68ba04d7498897e513df4bc"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1c71bbe4a8db46ae7c19b9faa14fd8949668bf0ca68ba04d7498897e513df4bc.gz",
+        "bytes": 2586,
+        "sha256": "c19049fceb4529290a6a50d60d5d0a3bf455798b9ac70eeba37031d2dcfdf391"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+        "bytes": 3710,
+        "sha256": "977bfe0c4502d36fb367137e96c56e6db50c024ad634a63ee06ef3cb94ee3e0d"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/977bfe0c4502d36fb367137e96c56e6db50c024ad634a63ee06ef3cb94ee3e0d.gz",
+        "bytes": 1336,
+        "sha256": "389632791db2c3f05c9f09fbc1d1caf431024fa24b4c30808c6a555522b5142f"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/Makefile.design",
+        "bytes": 6404,
+        "sha256": "a0f0f47a9bf3bc244aa07052730d6b9b63aa8903d41b78ed3e492efcb2b44470"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/a0f0f47a9bf3bc244aa07052730d6b9b63aa8903d41b78ed3e492efcb2b44470.gz",
+        "bytes": 2558,
+        "sha256": "d0d7fd0372937151fbcb03dce4b85e1bebab24a0069fb4f9c7859480fc624c17"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/Makefile.hardware",
+        "bytes": 23432,
+        "sha256": "1434d29f1376df64617c60b681a27c18e9e9066de49c8ea8ebfb378c849ed7a9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1434d29f1376df64617c60b681a27c18e9e9066de49c8ea8ebfb378c849ed7a9.gz",
+        "bytes": 2487,
+        "sha256": "0d4ace131baabf04556acc2c665b077878e6db0fc951beca93c41494e076dc5b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/ps.cpp",
+        "bytes": 22893,
+        "sha256": "4f16e30a6cbb14fff9ded5a14ddac2a280202ac4436fd2ca22d5e2c40ff95120"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4f16e30a6cbb14fff9ded5a14ddac2a280202ac4436fd2ca22d5e2c40ff95120.gz",
+        "bytes": 5937,
+        "sha256": "e216fb86c1af9f5077ccdd4b13ad1e104cba54fc7b2c5f741894c87279ee6685"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/ps.hpp",
+        "bytes": 2213,
+        "sha256": "10e24a34553a0cf30e48f49b505442568eddb539082f591c5a12495fb953f03e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/10e24a34553a0cf30e48f49b505442568eddb539082f591c5a12495fb953f03e.gz",
+        "bytes": 590,
+        "sha256": "4fd0a7ef38274cc2a425494eb77065f4cd753f3e5f67c8660197ed2d81ef6655"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "bytes": 5373,
+        "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178.gz",
+        "bytes": 1669,
+        "sha256": "d9037fa2c7451206194a91edb989bd5bbf1dde8587c2f35df38e88fd43abb80d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "bytes": 5396,
+        "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132.gz",
+        "bytes": 1838,
+        "sha256": "ecc9e66dd039d1e1ae5ae5e1fb75f987f9b8bf296ba1a569d6380084c3f7e321"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/v/bp_common_pkg.sv",
+        "bytes": 7955,
+        "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7.gz",
+        "bytes": 2084,
+        "sha256": "0a3bd7573689b3b222c190a3ccbf1933176208b443be88c1a634557bc2a0c3ea"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/black-parrot-example/v/top_zynq.sv",
+        "bytes": 42343,
+        "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c.gz",
+        "bytes": 8856,
+        "sha256": "818e572b3e8abb19850b6c683272ce212ccca88a0fc9308f999331bb5c08b58b"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/mk/Makefile.verilator",
+        "bytes": 5763,
+        "sha256": "db229fd3a0b27e20899f3ad744816dd6d75271797439329a8d3d92ecc1875bab"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/db229fd3a0b27e20899f3ad744816dd6d75271797439329a8d3d92ecc1875bab.gz",
+        "bytes": 2190,
+        "sha256": "0e778c621196caf7a12963f5184d438b0a281b2ed38b8a67b87893c269612007"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/src/main.cpp",
+        "bytes": 1661,
+        "sha256": "1cd45421120a364c58a33c43cedaabfe34d5c312028e978382620df8b68d1752"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/1cd45421120a364c58a33c43cedaabfe34d5c312028e978382620df8b68d1752.gz",
+        "bytes": 728,
+        "sha256": "588ce9fe8fa08a7dcde7a4c001d93b8c2fe6fda2a357e8ef9af4d5329fa4697d"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/tcl/vivado-utils.tcl",
+        "bytes": 13161,
+        "sha256": "6ec06de506ddcbfb980893521467de23053ad9bd436cc88d3741e62f5030804e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6ec06de506ddcbfb980893521467de23053ad9bd436cc88d3741e62f5030804e.gz",
+        "bytes": 3865,
+        "sha256": "957c4508a04b0a85cc71b9dc5d1db07ea7e71ef05a9ce3e22a6bfb8ff607bffe"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/cosim/v/bp_retained_use_counters.sv",
+        "bytes": 1255,
+        "sha256": "9d20aedb75bbe695baf6d9df793c411786e01eec052b941e2a1b23bd5b064c3a"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/9d20aedb75bbe695baf6d9df793c411786e01eec052b941e2a1b23bd5b064c3a.gz",
+        "bytes": 555,
+        "sha256": "45c7ffd5ab1220eada521a99174511cbc585f6dd163f7403b0e8b7708de2a3c7"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "bytes": 15834,
+        "sha256": "aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/aa36581844c5563f77bcc12f531776a4c858b1470a202d8f8394c7a02a7f8ea7.gz",
+        "bytes": 3853,
+        "sha256": "74c05abc03b7f3b6f739336a1f2d1e2dfd1733bc0144de5df733764fba58e8f0"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+        "bytes": 106931,
+        "sha256": "4669409939034afa5d6217de7f36096057d4a99aad3f960d0169b88f753cedca"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/4669409939034afa5d6217de7f36096057d4a99aad3f960d0169b88f753cedca.gz",
+        "bytes": 19636,
+        "sha256": "bd05a6979f8d03a022f2ee6ed826275ebb33c7873e0f918644a637502a6f0153"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+        "bytes": 31356,
+        "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9.gz",
+        "bytes": 5603,
+        "sha256": "c2dff6d193091475ab19efb40e5521c5ffc32d154160f2ff9597c60181c2d396"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/research/retained-maintenance-acyclic-20261121/bind_geometry.py",
+        "bytes": 5357,
+        "sha256": "6dd735aa8e91d2e736c19edab86043dbe220ccf5db30b41244de409cb816482b"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/6dd735aa8e91d2e736c19edab86043dbe220ccf5db30b41244de409cb816482b.gz",
+        "bytes": 2283,
+        "sha256": "851dff9097c1c283df29aca772f65ccfa27b8cec5c93440d7126254381438ca8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/research/retained-private-sp-ram-20261121/closed-full001/manifest.json",
+        "bytes": 29773,
+        "sha256": "7fecbef78010e46b878d2839f80af07d0fd16b0660159e41072101ba06088fdb"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7fecbef78010e46b878d2839f80af07d0fd16b0660159e41072101ba06088fdb.gz",
+        "bytes": 6141,
+        "sha256": "9b9dc97538de1c9247f6897ac97ceecdaa2540f56cf3672e0cad78c7a63fca59"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/research/retained-private-sp-ram-20261121/run_full.py",
+        "bytes": 13200,
+        "sha256": "f4259c0d1c42e5c0c0240b4e4bab33bff4ad5cbf856d23970ae071af1255d692"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/f4259c0d1c42e5c0c0240b4e4bab33bff4ad5cbf856d23970ae071af1255d692.gz",
+        "bytes": 5149,
+        "sha256": "6d9e0c15314854ebedd41fd7da69870026d0adb502800547488330f943a26cd2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/research/retained-use-observation-20261121/build_full.py",
+        "bytes": 4556,
+        "sha256": "7e8873dad73ce7ff931b8dea9f803dafa1e01121051d580f13c322d8bc4eafb0"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/7e8873dad73ce7ff931b8dea9f803dafa1e01121051d580f13c322d8bc4eafb0.gz",
+        "bytes": 1855,
+        "sha256": "bcebda3596efcc4a2f127005fd47db57ea44167c7ac8c37cff39de4d99532319"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/research/retained-use-observation-20261121/verify_counters.py",
+        "bytes": 7132,
+        "sha256": "291b97fc35df8f4b4b5d64531b024ac341e280095dc87e121036b64a9c785aa0"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/291b97fc35df8f4b4b5d64531b024ac341e280095dc87e121036b64a9c785aa0.gz",
+        "bytes": 2819,
+        "sha256": "d19a89314ebe4e238ca33bad5c77adb807510c85a18bbe48b1eae68c3f39f917"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/testing/check_run.py",
+        "bytes": 9559,
+        "sha256": "cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985.gz",
+        "bytes": 3156,
+        "sha256": "55dda9220666b0ab8888012ba8fd56b22b1112af5b608a174e13fd27ef9f6776"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/retained-advisory-trace/validate.py",
+        "bytes": 25559,
+        "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21.gz",
+        "bytes": 7647,
+        "sha256": "728bca1deb4fbccc6e6c56cd8ca43598b89ba2c895b37a023dbedee030a0bf69"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv",
+        "bytes": 1302,
+        "sha256": "b00c8c7b9ebe3ae7b27c7d07d7eb43da183e97928ed5b70bc46e80ba5f8939a4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/b00c8c7b9ebe3ae7b27c7d07d7eb43da183e97928ed5b70bc46e80ba5f8939a4.gz",
+        "bytes": 661,
+        "sha256": "06ffa4f3ccfa02801ca31eb8fedef3a87d2a78c24b43ff48fcd531a861c6e7c4"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/zynq-parrot-retained-sp/testing/rtl/uce-maintenance/run_endpoint.py",
+        "bytes": 4936,
+        "sha256": "e5c2f3c86fe9886ca263f2875681116c9c402f3155be5384418afbfa649a07a4"
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/closed-cohort01/blobs/e5c2f3c86fe9886ca263f2875681116c9c402f3155be5384418afbfa649a07a4.gz",
+        "bytes": 2103,
+        "sha256": "981da4a4bdc151839635923b718d73e0ae4a15e290299542bbc32975c2e291c2"
+      }
+    }
+  ],
+  "large_external_artifacts": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/trace.fst",
+      "bytes": 47372750,
+      "sha256": "47293c4c0317561af967dcabbb5fa74583bd9a763a98211c60b527f0bc169863"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/prog.riscv",
+      "bytes": 211152,
+      "sha256": "2fab907445c24b77a3181fd870d7ae8370c72bfc80bff13b4b14ecfc4b3edac7"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/integrity/prog.nbf",
+      "bytes": 125060,
+      "sha256": "7c47ff60c11d5639555ca10422b9ce7b8d023e9549a5f512131be427d01b4fe2"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/trace.fst",
+      "bytes": 19925006,
+      "sha256": "07a6429d984d95f768d33f097aca6a47d3305785510b0ce4d2413a5ec9577bf3"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/prog.riscv",
+      "bytes": 260760,
+      "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-private-sp-ram-20261121/full01/advisory/prog.nbf",
+      "bytes": 159729,
+      "sha256": "627662f775f9c2645e5b5687a9df3bfaed25d42265e125a0386047ebe1daad4b"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/trace.fst",
+      "bytes": 50597361,
+      "sha256": "c942044d539f80285fd526fafdbe7231ada43f7e7d1ef158b26c90bdcafe4175"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/prog.riscv",
+      "bytes": 211152,
+      "sha256": "2fab907445c24b77a3181fd870d7ae8370c72bfc80bff13b4b14ecfc4b3edac7"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/integrity/prog.nbf",
+      "bytes": 125060,
+      "sha256": "7c47ff60c11d5639555ca10422b9ce7b8d023e9549a5f512131be427d01b4fe2"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/trace.fst",
+      "bytes": 22874787,
+      "sha256": "25a58a28e17363bab91a2828757985cc1e2d85a4f2abdb513e99692d1ced1167"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/prog.riscv",
+      "bytes": 260760,
+      "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/advisory/prog.nbf",
+      "bytes": 159729,
+      "sha256": "627662f775f9c2645e5b5687a9df3bfaed25d42265e125a0386047ebe1daad4b"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n40-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+      "bytes": 15864288,
+      "sha256": "19630d8c85a304dfe30620888243505ee99e14d75a83e63f2c1cdb27697c51b5"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/trace.fst",
+      "bytes": 60390317,
+      "sha256": "9e881a7c207cec79f19edae6a78b64fcb2edda3e8edf4a447f00741563ac37fc"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/prog.riscv",
+      "bytes": 211152,
+      "sha256": "2fab907445c24b77a3181fd870d7ae8370c72bfc80bff13b4b14ecfc4b3edac7"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/integrity/prog.nbf",
+      "bytes": 125060,
+      "sha256": "7c47ff60c11d5639555ca10422b9ce7b8d023e9549a5f512131be427d01b4fe2"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/trace.fst",
+      "bytes": 28032146,
+      "sha256": "8e877a1dbd769267be7b26c90595241db6cfd7ea8d9cc0b6d4bd4ba6a55654f5"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/prog.riscv",
+      "bytes": 260760,
+      "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/advisory/prog.nbf",
+      "bytes": 159729,
+      "sha256": "627662f775f9c2645e5b5687a9df3bfaed25d42265e125a0386047ebe1daad4b"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/n200-full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+      "bytes": 15864288,
+      "sha256": "15adfc55f6459537de2c1e8537ee98b7b344f303ea40e0dc628682403dbf74e6"
+    }
+  ]
+}
