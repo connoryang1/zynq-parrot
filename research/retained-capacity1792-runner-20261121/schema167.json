@@ -1,0 +1,852 @@
+{
+  "state": "PREPARED exact frozen capacity167 suffix/width contract; unchanged for1792",
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/audit.py",
+      "bytes": 16172,
+      "sha256": "b5aaad15855351d386420da592cbdb66feb80e38df0af794b2786f4fe64f325a"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-advisory-trace/validate.py",
+      "bytes": 25559,
+      "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+    }
+  ],
+  "leaves": [
+    {
+      "key": "control",
+      "suffix": "unicore_lite.retained_control_r",
+      "width": 4
+    },
+    {
+      "key": "be.clk",
+      "suffix": "unicore_lite.core_minimal.be.clk_i",
+      "width": 1
+    },
+    {
+      "key": "be.reset",
+      "suffix": "unicore_lite.core_minimal.be.reset_i",
+      "width": 1
+    },
+    {
+      "key": "store.reset",
+      "suffix": "unicore_lite.retained_store.storage.reset_i",
+      "width": 2
+    },
+    {
+      "key": "store.lv",
+      "suffix": "unicore_lite.retained_store.storage.lookup_v_i",
+      "width": 2
+    },
+    {
+      "key": "store.lr",
+      "suffix": "unicore_lite.retained_store.storage.lookup_ready_o",
+      "width": 2
+    },
+    {
+      "key": "store.rv",
+      "suffix": "unicore_lite.retained_store.storage.resp_v_o",
+      "width": 2
+    },
+    {
+      "key": "store.rr",
+      "suffix": "unicore_lite.retained_store.storage.resp_ready_i",
+      "width": 2
+    },
+    {
+      "key": "store.rh",
+      "suffix": "unicore_lite.retained_store.storage.resp_hit_o",
+      "width": 2
+    },
+    {
+      "key": "store.iv",
+      "suffix": "unicore_lite.retained_store.storage.insert_v_i",
+      "width": 2
+    },
+    {
+      "key": "store.ir",
+      "suffix": "unicore_lite.retained_store.storage.insert_ready_o",
+      "width": 2
+    },
+    {
+      "key": "store.done",
+      "suffix": "unicore_lite.retained_store.storage.insert_done_o",
+      "width": 2
+    },
+    {
+      "key": "store.published",
+      "suffix": "unicore_lite.retained_store.storage.insert_published_o",
+      "width": 2
+    },
+    {
+      "key": "store.i.la",
+      "suffix": "unicore_lite.retained_store.storage.lookup_addr_i[0]",
+      "width": 34
+    },
+    {
+      "key": "store.i.rd",
+      "suffix": "unicore_lite.retained_store.storage.resp_data_o[0]",
+      "width": 512
+    },
+    {
+      "key": "store.i.ia",
+      "suffix": "unicore_lite.retained_store.storage.insert_addr_i[0]",
+      "width": 34
+    },
+    {
+      "key": "store.i.id",
+      "suffix": "unicore_lite.retained_store.storage.insert_data_i[0]",
+      "width": 512
+    },
+    {
+      "key": "store.d.la",
+      "suffix": "unicore_lite.retained_store.storage.lookup_addr_i[1]",
+      "width": 34
+    },
+    {
+      "key": "store.d.rd",
+      "suffix": "unicore_lite.retained_store.storage.resp_data_o[1]",
+      "width": 512
+    },
+    {
+      "key": "store.d.ia",
+      "suffix": "unicore_lite.retained_store.storage.insert_addr_i[1]",
+      "width": 34
+    },
+    {
+      "key": "store.d.id",
+      "suffix": "unicore_lite.retained_store.storage.insert_data_i[1]",
+      "width": 512
+    },
+    {
+      "key": "be.instret",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instret",
+      "width": 1
+    },
+    {
+      "key": "be.pc",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.pc",
+      "width": 39
+    },
+    {
+      "key": "be.ctxtsw",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.ctxtsw",
+      "width": 1
+    },
+    {
+      "key": "be.exception",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.exception",
+      "width": 1
+    },
+    {
+      "key": "be.instr.funct7",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instr.t.rtype.funct7",
+      "width": 7
+    },
+    {
+      "key": "be.instr.rs2_addr",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instr.t.rtype.rs2_addr",
+      "width": 5
+    },
+    {
+      "key": "be.instr.rs1_addr",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instr.t.rtype.rs1_addr",
+      "width": 5
+    },
+    {
+      "key": "be.instr.funct3",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instr.t.rtype.funct3",
+      "width": 3
+    },
+    {
+      "key": "be.instr.rd_addr",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instr.t.rtype.rd_addr",
+      "width": 5
+    },
+    {
+      "key": "be.instr.opcode",
+      "suffix": "unicore_lite.core_minimal.be.commit_pkt.instr.t.rtype.opcode",
+      "width": 7
+    },
+    {
+      "key": "i.bclk",
+      "suffix": "unicore_lite.icache_uce.clk_i",
+      "width": 1
+    },
+    {
+      "key": "i.breset",
+      "suffix": "unicore_lite.icache_uce.reset_i",
+      "width": 1
+    },
+    {
+      "key": "i.enable",
+      "suffix": "unicore_lite.icache_uce.retained_enable_i",
+      "width": 1
+    },
+    {
+      "key": "i.demand_copy",
+      "suffix": "unicore_lite.icache_uce.retained_demand_capture_i",
+      "width": 1
+    },
+    {
+      "key": "i.lv",
+      "suffix": "unicore_lite.icache_uce.retained_lookup_v_o",
+      "width": 1
+    },
+    {
+      "key": "i.lr",
+      "suffix": "unicore_lite.icache_uce.retained_lookup_ready_i",
+      "width": 1
+    },
+    {
+      "key": "i.la",
+      "suffix": "unicore_lite.icache_uce.retained_lookup_addr_o",
+      "width": 34
+    },
+    {
+      "key": "i.rv",
+      "suffix": "unicore_lite.icache_uce.retained_resp_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.rr",
+      "suffix": "unicore_lite.icache_uce.retained_resp_ready_o",
+      "width": 1
+    },
+    {
+      "key": "i.rh",
+      "suffix": "unicore_lite.icache_uce.retained_resp_hit_i",
+      "width": 1
+    },
+    {
+      "key": "i.rd",
+      "suffix": "unicore_lite.icache_uce.retained_resp_data_i",
+      "width": 512
+    },
+    {
+      "key": "i.iv",
+      "suffix": "unicore_lite.icache_uce.retained_insert_v_o",
+      "width": 1
+    },
+    {
+      "key": "i.ir",
+      "suffix": "unicore_lite.icache_uce.retained_insert_ready_i",
+      "width": 1
+    },
+    {
+      "key": "i.ia",
+      "suffix": "unicore_lite.icache_uce.retained_insert_addr_o",
+      "width": 34
+    },
+    {
+      "key": "i.id",
+      "suffix": "unicore_lite.icache_uce.retained_insert_data_o",
+      "width": 512
+    },
+    {
+      "key": "i.done",
+      "suffix": "unicore_lite.icache_uce.retained_insert_done_i",
+      "width": 1
+    },
+    {
+      "key": "i.published",
+      "suffix": "unicore_lite.icache_uce.retained_insert_published_i",
+      "width": 1
+    },
+    {
+      "key": "i.owned",
+      "suffix": "unicore_lite.icache_uce.retained_insert_owned_r",
+      "width": 1
+    },
+    {
+      "key": "i.pf",
+      "suffix": "unicore_lite.icache_uce.retained_insert_pf_r",
+      "width": 1
+    },
+    {
+      "key": "i.owned_addr",
+      "suffix": "unicore_lite.icache_uce.retained_insert_addr_r",
+      "width": 34
+    },
+    {
+      "key": "i.state",
+      "suffix": "unicore_lite.icache_uce.state_r",
+      "width": 5
+    },
+    {
+      "key": "i.req_addr",
+      "suffix": "unicore_lite.icache_uce.cache_req_r.addr",
+      "width": 34
+    },
+    {
+      "key": "i.cclk",
+      "suffix": "unicore_lite.core_minimal.fe.icache.clk_i",
+      "width": 1
+    },
+    {
+      "key": "i.creset",
+      "suffix": "unicore_lite.core_minimal.fe.icache.reset_i",
+      "width": 1
+    },
+    {
+      "key": "i.v",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.yumi",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "i.slow",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_slow_write",
+      "width": 8
+    },
+    {
+      "key": "i.mem_v",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_v_li",
+      "width": 8
+    },
+    {
+      "key": "i.mem_w",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_w_li",
+      "width": 8
+    },
+    {
+      "key": "i.critical",
+      "suffix": "unicore_lite.core_minimal.fe.icache.cache_req_critical_i",
+      "width": 1
+    },
+    {
+      "key": "i.last",
+      "suffix": "unicore_lite.core_minimal.fe.icache.cache_req_last_i",
+      "width": 1
+    },
+    {
+      "key": "i.tv",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.ty",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "i.pkt.addr",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.addr",
+      "width": 34
+    },
+    {
+      "key": "i.pkt.index",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.index",
+      "width": 6
+    },
+    {
+      "key": "i.pkt.way_id",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.way_id",
+      "width": 3
+    },
+    {
+      "key": "i.pkt.data",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.data",
+      "width": 64
+    },
+    {
+      "key": "i.pkt.fill_index",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.fill_index",
+      "width": 8
+    },
+    {
+      "key": "i.pkt.opcode",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_pkt_cast_i.opcode",
+      "width": 2
+    },
+    {
+      "key": "i.tag.index",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_cast_i.index",
+      "width": 6
+    },
+    {
+      "key": "i.tag.way_id",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_cast_i.way_id",
+      "width": 3
+    },
+    {
+      "key": "i.tag.tag",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_cast_i.tag",
+      "width": 20
+    },
+    {
+      "key": "i.tag.opcode",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_cast_i.opcode",
+      "width": 3
+    },
+    {
+      "key": "i.tag.state",
+      "suffix": "unicore_lite.core_minimal.fe.icache.tag_mem_pkt_cast_i.state",
+      "width": 3
+    },
+    {
+      "key": "i.mem.addr.0",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[0]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.0",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[0]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.1",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[1]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.1",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[1]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.2",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[2]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.2",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[2]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.3",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[3]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.3",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[3]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.4",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[4]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.4",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[4]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.5",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[5]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.5",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[5]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.6",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[6]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.6",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[6]",
+      "width": 64
+    },
+    {
+      "key": "i.mem.addr.7",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_addr_li[7]",
+      "width": 9
+    },
+    {
+      "key": "i.mem.data.7",
+      "suffix": "unicore_lite.core_minimal.fe.icache.data_mem_data_li[7]",
+      "width": 64
+    },
+    {
+      "key": "i.abort_miss",
+      "suffix": "unicore_lite.core_minimal.fe.icache.abort_miss",
+      "width": 1
+    },
+    {
+      "key": "i.abort_miss_r",
+      "suffix": "unicore_lite.core_minimal.fe.icache.abort_miss_r",
+      "width": 1
+    },
+    {
+      "key": "i.miss_abort_i",
+      "suffix": "unicore_lite.core_minimal.fe.icache.miss_abort_i",
+      "width": 1
+    },
+    {
+      "key": "d.bclk",
+      "suffix": "unicore_lite.dcache_uce.clk_i",
+      "width": 1
+    },
+    {
+      "key": "d.breset",
+      "suffix": "unicore_lite.dcache_uce.reset_i",
+      "width": 1
+    },
+    {
+      "key": "d.enable",
+      "suffix": "unicore_lite.dcache_uce.retained_enable_i",
+      "width": 1
+    },
+    {
+      "key": "d.demand_copy",
+      "suffix": "unicore_lite.dcache_uce.retained_demand_capture_i",
+      "width": 1
+    },
+    {
+      "key": "d.lv",
+      "suffix": "unicore_lite.dcache_uce.retained_lookup_v_o",
+      "width": 1
+    },
+    {
+      "key": "d.lr",
+      "suffix": "unicore_lite.dcache_uce.retained_lookup_ready_i",
+      "width": 1
+    },
+    {
+      "key": "d.la",
+      "suffix": "unicore_lite.dcache_uce.retained_lookup_addr_o",
+      "width": 34
+    },
+    {
+      "key": "d.rv",
+      "suffix": "unicore_lite.dcache_uce.retained_resp_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.rr",
+      "suffix": "unicore_lite.dcache_uce.retained_resp_ready_o",
+      "width": 1
+    },
+    {
+      "key": "d.rh",
+      "suffix": "unicore_lite.dcache_uce.retained_resp_hit_i",
+      "width": 1
+    },
+    {
+      "key": "d.rd",
+      "suffix": "unicore_lite.dcache_uce.retained_resp_data_i",
+      "width": 512
+    },
+    {
+      "key": "d.iv",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_v_o",
+      "width": 1
+    },
+    {
+      "key": "d.ir",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_ready_i",
+      "width": 1
+    },
+    {
+      "key": "d.ia",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_addr_o",
+      "width": 34
+    },
+    {
+      "key": "d.id",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_data_o",
+      "width": 512
+    },
+    {
+      "key": "d.done",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_done_i",
+      "width": 1
+    },
+    {
+      "key": "d.published",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_published_i",
+      "width": 1
+    },
+    {
+      "key": "d.owned",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_owned_r",
+      "width": 1
+    },
+    {
+      "key": "d.pf",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_pf_r",
+      "width": 1
+    },
+    {
+      "key": "d.owned_addr",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_addr_r",
+      "width": 34
+    },
+    {
+      "key": "d.state",
+      "suffix": "unicore_lite.dcache_uce.state_r",
+      "width": 5
+    },
+    {
+      "key": "d.req_addr",
+      "suffix": "unicore_lite.dcache_uce.cache_req_r.addr",
+      "width": 34
+    },
+    {
+      "key": "d.cclk",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.clk_i",
+      "width": 1
+    },
+    {
+      "key": "d.creset",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.reset_i",
+      "width": 1
+    },
+    {
+      "key": "d.v",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.yumi",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "d.slow",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_slow_write",
+      "width": 8
+    },
+    {
+      "key": "d.mem_v",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_v_li",
+      "width": 8
+    },
+    {
+      "key": "d.mem_w",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_w_li",
+      "width": 8
+    },
+    {
+      "key": "d.critical",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.cache_req_critical_i",
+      "width": 1
+    },
+    {
+      "key": "d.last",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.cache_req_last_i",
+      "width": 1
+    },
+    {
+      "key": "d.tv",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.ty",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "d.pkt.addr",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.addr",
+      "width": 34
+    },
+    {
+      "key": "d.pkt.index",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.index",
+      "width": 6
+    },
+    {
+      "key": "d.pkt.way_id",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.way_id",
+      "width": 3
+    },
+    {
+      "key": "d.pkt.data",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.data",
+      "width": 64
+    },
+    {
+      "key": "d.pkt.fill_index",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.fill_index",
+      "width": 8
+    },
+    {
+      "key": "d.pkt.opcode",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_pkt_cast_i.opcode",
+      "width": 2
+    },
+    {
+      "key": "d.tag.index",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_cast_i.index",
+      "width": 6
+    },
+    {
+      "key": "d.tag.way_id",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_cast_i.way_id",
+      "width": 3
+    },
+    {
+      "key": "d.tag.tag",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_cast_i.tag",
+      "width": 20
+    },
+    {
+      "key": "d.tag.opcode",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_cast_i.opcode",
+      "width": 3
+    },
+    {
+      "key": "d.tag.state",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.tag_mem_pkt_cast_i.state",
+      "width": 3
+    },
+    {
+      "key": "d.mem.addr.0",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[0]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.0",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[0]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.0",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[0]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.1",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[1]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.1",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[1]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.1",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[1]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.2",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[2]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.2",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[2]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.2",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[2]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.3",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[3]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.3",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[3]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.3",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[3]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.4",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[4]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.4",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[4]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.4",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[4]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.5",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[5]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.5",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[5]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.5",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[5]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.6",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[6]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.6",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[6]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.6",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[6]",
+      "width": 8
+    },
+    {
+      "key": "d.mem.addr.7",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_addr_li[7]",
+      "width": 9
+    },
+    {
+      "key": "d.mem.data.7",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_data_li[7]",
+      "width": 64
+    },
+    {
+      "key": "d.mem.mask.7",
+      "suffix": "unicore_lite.core_minimal.be.calculator.pipe_mem.dcache.data_mem_mask_li[7]",
+      "width": 8
+    },
+    {
+      "key": "mutation",
+      "suffix": "unicore_lite.dcache_retained_mutation_v",
+      "width": 1
+    },
+    {
+      "key": "maintenance",
+      "suffix": "unicore_lite.dcache_retained_maintenance_v",
+      "width": 1
+    },
+    {
+      "key": "obs.hits",
+      "suffix": "retained_observe.counts.hits_o",
+      "width": 32
+    },
+    {
+      "key": "obs.published",
+      "suffix": "retained_observe.counts.published_o",
+      "width": 32
+    },
+    {
+      "key": "obs.beats",
+      "suffix": "retained_observe.counts.write_beats_o",
+      "width": 32
+    }
+  ]
+}
