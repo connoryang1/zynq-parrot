@@ -1,0 +1,5 @@
+This preserves the canonical1792 trace-observation clone and its composite acceptance. The original target and all five complete selected event streams pass; a checker initially ran from the old source root and rejected source provenance. Only the remaining three checkers were rerun against the saved trace from the correct source root, with no target retry.
+
+Root independently reproduces the exact composite closure8191cf19. The scoped modelb9f7f127 is a trace-registration-only relink of originalb912, with exactly414 selected leaves including the raw maintenance bit and167-signal capacity domain. Actual full-line data, eight L1 writes, instruction retirement, observer counters and16 geometry fields pass; all1792-line capacity, FPGA fit and application performance remain separate gates.
+
+The source/model/rawFST and ten full canonical streams are durably retained at external HOME paths in the frozen manifest. This repository stores compact source, failure, admission, runtime and checker evidence with exact bindings instead of duplicating those large files.
