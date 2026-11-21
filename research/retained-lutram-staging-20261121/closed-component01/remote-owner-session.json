@@ -1,0 +1,555 @@
+{
+  "state": "PASS Xsim-only immutable inferred-netlist cycle gate; no new synthesis/wholeCPU/physical result",
+  "owner": {
+    "pid": 862619,
+    "start_ticks": 89714245
+  },
+  "admission_sha256": "7bdfe0c329fe5846815b0032c6b5a52549e1a4dc39027574d028626178605faa",
+  "owned": {
+    "862620": {
+      "pid": 862620,
+      "ppid": 862619,
+      "pgrp": 862620,
+      "start_ticks": 89714262,
+      "state": "Z",
+      "comm": "python3"
+    },
+    "862621": {
+      "pid": 862621,
+      "ppid": 862620,
+      "pgrp": 862620,
+      "start_ticks": 89714270,
+      "state": "S",
+      "comm": "python3"
+    },
+    "862662": {
+      "pid": 862662,
+      "ppid": 862640,
+      "pgrp": 862622,
+      "start_ticks": 89714297,
+      "state": "R",
+      "comm": "xvlog"
+    },
+    "862640": {
+      "pid": 862640,
+      "ppid": 862622,
+      "pgrp": 862622,
+      "start_ticks": 89714283,
+      "state": "S",
+      "comm": "loader"
+    },
+    "862622": {
+      "pid": 862622,
+      "ppid": 862621,
+      "pgrp": 862622,
+      "start_ticks": 89714279,
+      "state": "S",
+      "comm": "xvlog"
+    },
+    "862663": {
+      "pid": 862663,
+      "ppid": 862621,
+      "pgrp": 862663,
+      "start_ticks": 89714489,
+      "state": "S",
+      "comm": "xvlog"
+    },
+    "862703": {
+      "pid": 862703,
+      "ppid": 862681,
+      "pgrp": 862663,
+      "start_ticks": 89714507,
+      "state": "R",
+      "comm": "xvlog"
+    },
+    "862681": {
+      "pid": 862681,
+      "ppid": 862663,
+      "pgrp": 862663,
+      "start_ticks": 89714492,
+      "state": "S",
+      "comm": "loader"
+    },
+    "862722": {
+      "pid": 862722,
+      "ppid": 862704,
+      "pgrp": 862704,
+      "start_ticks": 89714707,
+      "state": "S",
+      "comm": "loader"
+    },
+    "862733": {
+      "pid": 862733,
+      "ppid": 862722,
+      "pgrp": 862704,
+      "start_ticks": 89714711,
+      "state": "S",
+      "comm": "ldlibpath.sh"
+    },
+    "862704": {
+      "pid": 862704,
+      "ppid": 862621,
+      "pgrp": 862704,
+      "start_ticks": 89714703,
+      "state": "S",
+      "comm": "xvlog"
+    },
+    "862744": {
+      "pid": 862744,
+      "ppid": 862722,
+      "pgrp": 862704,
+      "start_ticks": 89714723,
+      "state": "R",
+      "comm": "xvlog"
+    },
+    "862764": {
+      "pid": 862764,
+      "ppid": 862746,
+      "pgrp": 862746,
+      "start_ticks": 89714923,
+      "state": "S",
+      "comm": "loader"
+    },
+    "862775": {
+      "pid": 862775,
+      "ppid": 862764,
+      "pgrp": 862746,
+      "start_ticks": 89714926,
+      "state": "S",
+      "comm": "ldlibpath.sh"
+    },
+    "862746": {
+      "pid": 862746,
+      "ppid": 862621,
+      "pgrp": 862746,
+      "start_ticks": 89714919,
+      "state": "S",
+      "comm": "xelab"
+    },
+    "862786": {
+      "pid": 862786,
+      "ppid": 862764,
+      "pgrp": 862746,
+      "start_ticks": 89714938,
+      "state": "R",
+      "comm": "xelab"
+    },
+    "862810": {
+      "pid": 862810,
+      "ppid": 862621,
+      "pgrp": 862810,
+      "start_ticks": 89715844,
+      "state": "S",
+      "comm": "xsim"
+    },
+    "862850": {
+      "pid": 862850,
+      "ppid": 862828,
+      "pgrp": 862810,
+      "start_ticks": 89715863,
+      "state": "S",
+      "comm": "xsim"
+    },
+    "862828": {
+      "pid": 862828,
+      "ppid": 862810,
+      "pgrp": 862810,
+      "start_ticks": 89715848,
+      "state": "S",
+      "comm": "loader"
+    },
+    "862853": {
+      "pid": 862853,
+      "ppid": 862850,
+      "pgrp": 862810,
+      "start_ticks": 89716039,
+      "state": "S",
+      "comm": "lsb_release"
+    },
+    "862858": {
+      "pid": 862858,
+      "ppid": 862850,
+      "pgrp": 862810,
+      "start_ticks": 89716321,
+      "state": "S",
+      "comm": "xsimk"
+    }
+  },
+  "checks": [],
+  "physical_operations": 0,
+  "phase": {
+    "label": "xsim",
+    "monotonic_started": 897142.699933717,
+    "argv": [
+      "bash",
+      "-c",
+      "source /tools/Xilinx/Vivado/2024.2/settings64.sh; exec python3 \"$1\" --admission-sha256 \"$2\" --execute",
+      "xsim-bank-driver",
+      "/tmp/uce-prefetch-bank-xsim-adapter03-20261121-run01/preparation01/simulate.py",
+      "19aa49ec704c8084c2d4c3de2a3e4f63eb3be71ad4e0019d555ba8d023a7494c"
+    ]
+  },
+  "last_resource_check": {
+    "allocated_bytes": 5558272,
+    "free_bytes": 4957507584,
+    "remaining_stage_bytes": 262877184
+  },
+  "owned_remaining": {},
+  "reaped_adopted": [],
+  "worker_returncode": 0,
+  "elapsed_seconds": 23.56917142495513,
+  "global_tool_processes": [],
+  "source_endcheck": "PASS",
+  "outputs": [
+    {
+      "path": "worker.json",
+      "bytes": 493,
+      "sha256": "1b41b118c7e810bc7e584870a518327723f5c6f9e91e4dc7ee3b317dc7216267"
+    },
+    {
+      "path": "xsim.log",
+      "bytes": 109,
+      "sha256": "590cf5b3f249b2895f1c0ea8a2604d3d2d8aef4ed48d9c64c166e19b9d5e7c6f"
+    },
+    {
+      "path": "remote_guard.py",
+      "bytes": 9166,
+      "sha256": "6fc86631110c9fed3847f7e81aed440fbd01d533f8a99f90212fd8c9d4fccdd4"
+    },
+    {
+      "path": "worker-console.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "launch-admission.json",
+      "bytes": 15952,
+      "sha256": "7bdfe0c329fe5846815b0032c6b5a52549e1a4dc39027574d028626178605faa"
+    },
+    {
+      "path": "phase.json",
+      "bytes": 396,
+      "sha256": "ec2f5316dbd38814b66895ca5b24f2646cbfaf13811fe0714ebae9e3f0412448"
+    },
+    {
+      "path": "preparation01/adapters.sv",
+      "bytes": 2735,
+      "sha256": "5ec57cba215c4cf318efbe07b5074bd7a835fcb1953978391987231db4109563"
+    },
+    {
+      "path": "preparation01/reference-timed.sv",
+      "bytes": 1123,
+      "sha256": "36d739225cf5f85f06d0369e507c7c41ef886cab752faf03ede10f28b6c89370"
+    },
+    {
+      "path": "preparation01/original-failure.json",
+      "bytes": 6298,
+      "sha256": "d26df9780d65562b868c61a220020854bcef650d8130a03e6740f0605a123010"
+    },
+    {
+      "path": "preparation01/timescale-proof.json",
+      "bytes": 3269,
+      "sha256": "27ed6f6f6c6adc702e31d09bce7afa8a564272383468d345b9614e8ee5463a88"
+    },
+    {
+      "path": "preparation01/run.tcl",
+      "bytes": 13,
+      "sha256": "6218ffa4f2392f3c61113605d4ab2cd023186e11f1da826b920e510a9a797efb"
+    },
+    {
+      "path": "preparation01/verify_adapter.py",
+      "bytes": 4156,
+      "sha256": "65b6a69900496c65a6ea26baa9b188d9bfd41bffd13a432dd13e5e32e6bc7cf8"
+    },
+    {
+      "path": "preparation01/port-binding-proof.json",
+      "bytes": 9099,
+      "sha256": "75d3ade1b227ea930185a5efc9d05538948a4bf8270c029280919ae18ca332d5"
+    },
+    {
+      "path": "preparation01/original-miter.sv",
+      "bytes": 3395,
+      "sha256": "37f5b870d5933e77a0ee48515098c88825efce7fb618430cca5494c0591fe952"
+    },
+    {
+      "path": "preparation01/README.md",
+      "bytes": 3046,
+      "sha256": "11a9b9979db6cdd1758121c83d697fd966185611337036a349f07aff0fe90e45"
+    },
+    {
+      "path": "preparation01/block.sv",
+      "bytes": 1104,
+      "sha256": "76c2e3916374f5554d0868859a522c5bb68690f6ea56a3a3595691d082a832c7"
+    },
+    {
+      "path": "preparation01/prospective-admission.json",
+      "bytes": 5265,
+      "sha256": "19aa49ec704c8084c2d4c3de2a3e4f63eb3be71ad4e0019d555ba8d023a7494c"
+    },
+    {
+      "path": "preparation01/miter.sv",
+      "bytes": 3411,
+      "sha256": "e73806baa8d738ff559e0fea4199bc31d754ea0d613b061c13874de79320914e"
+    },
+    {
+      "path": "preparation01/adapter02-change-proof.json",
+      "bytes": 2083,
+      "sha256": "f2d80adea73499279ffdb164023d99a7f78065affb85c1db1dd58e766077518a"
+    },
+    {
+      "path": "preparation01/check_timescales.py",
+      "bytes": 1849,
+      "sha256": "4403425921592c71b2239c1e8e7e948b4e353ff515c529c3c959f81aae8b76b2"
+    },
+    {
+      "path": "preparation01/simulate.py",
+      "bytes": 5907,
+      "sha256": "25bf6e3b3ddd5ecc4510d01d6c7e4aac64260beb408bbc2dee6d98b1ff3c0fd1"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.jou",
+      "bytes": 1338,
+      "sha256": "582a891a3f5bc09340183c5ff8f157f6588e57457be0629deb29542859cbc8ed"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.log",
+      "bytes": 1818,
+      "sha256": "758aca109ba11b00f224c54580783e2dc2ea149531504eb7853d09b331caa485"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xvlog.pb",
+      "bytes": 966,
+      "sha256": "78eabc1b176187d69840aa1d0087a0d9527ab4073baf3eb1bee31a0e5a4ae1ad"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xvlog-reference.log",
+      "bytes": 712,
+      "sha256": "80a21ca24c87bb5f7b6496a57490fdcd120497ec7a77b522f298d53cea7d2ba3"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xelab.log",
+      "bytes": 1317,
+      "sha256": "a1fe9bda679a0ab280a34a430326106aa3cd790515d4c2aac04744b287049e31"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xvlog.log",
+      "bytes": 712,
+      "sha256": "80a21ca24c87bb5f7b6496a57490fdcd120497ec7a77b522f298d53cea7d2ba3"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xelab.pb",
+      "bytes": 2594,
+      "sha256": "ebab8ff6ba609e1f71783b45961e38f43a80c32b9969539cf3fa4839a96f7b5e"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim_862850.backup.log",
+      "bytes": 1011,
+      "sha256": "8b9b31acb09e53994379564b94a98b2602203d025c98bc1090748514d9c71111"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xvlog-global.log",
+      "bytes": 158,
+      "sha256": "c77d9ab4390000f3cf45156f7744769d7523fd134f49346343b7e8fa61e67599"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xvlog-netlists.log",
+      "bytes": 434,
+      "sha256": "3b37a967d87cac9bd0487c769c88fbaf063a76a0d89d56fbb1afce4787750753"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/session.json",
+      "bytes": 11984,
+      "sha256": "dcb275975da690f80b009e54afd3a08e59d7c6b144a64ce7d5a43e26542c89b2"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/work.rlx",
+      "bytes": 1125,
+      "sha256": "b3d5f9b471aa822e8d51649699db027a58286fd29e6aca0489721efbdd6152d3"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/uce_prefetch_fill_block_adapter.sdb",
+      "bytes": 2801,
+      "sha256": "3349974ab4152bf0cc6996a51835848d8ce44cff6439eba9feb6afdafa71e03a"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/uce_prefetch_fill_probe.sdb",
+      "bytes": 3194,
+      "sha256": "86abc880138378b1339a04caa00fba1f624311c27ceded145635878b939576b5"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/uce_prefetch_fill_distributed.sdb",
+      "bytes": 568042,
+      "sha256": "02b0b370e0d25307e4b8d43b39ec7e6651bb3c0353dda0ee78be6311f3e14bd8"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/uce_prefetch_fill_block.sdb",
+      "bytes": 199048,
+      "sha256": "4898a79c8a99e549c23c80df948a034799dfb7130d8aa6df2c913063338b7ad2"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/glbl.sdb",
+      "bytes": 5523,
+      "sha256": "4726964c5b08b2e5fac32ae8c8ccb979dfc9701d16f9f1928711e4db991672bf"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/uce_prefetch_fill_distributed_adapter.sdb",
+      "bytes": 2819,
+      "sha256": "3e128ddb2710f0aee606900e39a22ea7d6eaab024a805d61bf555b02d9d98ae3"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/work/uce_prefetch_miter.sdb",
+      "bytes": 14391,
+      "sha256": "cc29dc6240030eb3bb9244eb7c6568cbc2b6c6c848bcd0028d0bca9a5f0bc6c0"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.mem",
+      "bytes": 254777,
+      "sha256": "610b61777d3ea46c10d91b0ba97dac431a5fc2f6927e8a2e3694b936cc15a2d7"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.type",
+      "bytes": 24,
+      "sha256": "cf1c5a4aa3dd8007f3756f2f3d607d67751cd98e99c8f5038c3f8b9fd06aa8c8"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsimk",
+      "bytes": 2735064,
+      "sha256": "c4e18a105cfe1e722729bf6e19b41ea9e2c50e19a7777da78e9e6cc13124a47a"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/TempBreakPointFile.txt",
+      "bytes": 28,
+      "sha256": "b4cb40d28ae548744312392beffad452d7b3cc0d8a3c187635a7e3925f3c3aa7"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.xdbg",
+      "bytes": 64,
+      "sha256": "637a3688b8cf9a1c51751ee18c74e6a125c2c5585555eeaf1500592c1562d3a3"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsimcrash.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsimkernel.log",
+      "bytes": 333,
+      "sha256": "2ae0281b2c1d5b9363c9cb78536ea407488acc5411a90051e2c8c8924a1c2594"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.reloc",
+      "bytes": 372744,
+      "sha256": "408893cd4e1170fc081c9597d230908619d0de781b8d92ae6f36eda7085dc2b4"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim_script.tcl",
+      "bytes": 127,
+      "sha256": "2210880bc1c555702d416df6cd6c1963db7a128e728b7982b6dd74a48baf8c4e"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.svtype",
+      "bytes": 202,
+      "sha256": "e97fc235c2c979ca9a3af476f2bcd28696a76eabdc02ac0c1c692b34369d6cb8"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/Compile_Options.txt",
+      "bytes": 112,
+      "sha256": "8140b608066e4dc8aa8e3b9fca37e1b58ef6bc3df2d311f4566f4056cfb3dc6b"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.rtti",
+      "bytes": 669,
+      "sha256": "485163f5c6b1b65558b0dc36cd7a694ecc8f279bbc6d79d21ddfb1c22fec1564"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsimSettings.ini",
+      "bytes": 1364,
+      "sha256": "3c6403ed7bdc72d65bb1a620761579e42b0925ec3a9f13df9d0bb3ed6166b9ab"
+    },
+    {
+      "path": "preparation01/xsim-cycle-miter01/xsim.dir/uce_prefetch_miter/xsim.dbg",
+      "bytes": 123224,
+      "sha256": "403f6a4180a76aaa1826223cdd7485451ee7d972e466678d57d67bcf1ae4497a"
+    },
+    {
+      "path": "preparation01/block/functional.v",
+      "bytes": 120553,
+      "sha256": "c194c490a4fb7d5a3a33f6b736e1fe41c35d5bb2013722140e1532a045c07170"
+    },
+    {
+      "path": "preparation01/block/utilization.rpt",
+      "bytes": 1541,
+      "sha256": "265c336ea8b06ca420869c26b9eab24d3f6363f04e1e60dc74dbe0d989dded32"
+    },
+    {
+      "path": "preparation01/block/synthesized.dcp",
+      "bytes": 84430,
+      "sha256": "6bc03a88e426807bc76c7c28e3fa5bc5a0d68cd1184034665049b248968f921c"
+    },
+    {
+      "path": "preparation01/block/primitives.tsv",
+      "bytes": 36913,
+      "sha256": "2004960d5f63584b0a514cfe2f81fa552ce548043f579927a6f1e7262b97f297"
+    },
+    {
+      "path": "preparation01/original-failure/remote-owner-session.json",
+      "bytes": 13459,
+      "sha256": "7ab0a14f09436b2e7ea9a6088f2218c83c8e2f7aa96675342df8bbf7ad3f48d2"
+    },
+    {
+      "path": "preparation01/original-failure/local-session.json",
+      "bytes": 6544,
+      "sha256": "48fba0d44de9b3a588a46f8c6a406901f6da85100efe12f6e14371fdcace8aac"
+    },
+    {
+      "path": "preparation01/original-failure/xsim-session.json",
+      "bytes": 9564,
+      "sha256": "71f043ebd67b8d2cac3e0c9f6d191ae6dc6ef2676f185f21f6d02ad8181b49fc"
+    },
+    {
+      "path": "preparation01/original-failure/xelab.log",
+      "bytes": 1670,
+      "sha256": "455f12ad8bf3ccc327bed1b106c91d484793cce3d0e26b1127c8cf520fdfcff1"
+    },
+    {
+      "path": "preparation01/adapter01-failure/remote-owner-session.json",
+      "bytes": 11242,
+      "sha256": "99479bebbdd4fd60c9a30534adf7c6c2e81fc7d2021538440ef3402e5d0cb4ca"
+    },
+    {
+      "path": "preparation01/adapter01-failure/local-session.json",
+      "bytes": 6579,
+      "sha256": "7109a25593d54fa987e07076976cad17a7c765ad6cbef1ccd37f9cde925a1ce7"
+    },
+    {
+      "path": "preparation01/adapter01-failure/xsim-session.json",
+      "bytes": 10004,
+      "sha256": "5f5b127c53b592ca8ee595693d77292b8829df48e8c60840d577bba77afd2b6d"
+    },
+    {
+      "path": "preparation01/adapter01-failure/xelab.log",
+      "bytes": 716,
+      "sha256": "11e61af3e5c4c7e74d7c233ee7ad14deb4ad26b8feb99025004bf4426b2af573"
+    },
+    {
+      "path": "preparation01/distributed/functional.v",
+      "bytes": 356972,
+      "sha256": "6c63ba55c00b17ba42629c27dc1bec0d1be3c761e2328c8b7afd869e54c57fdb"
+    },
+    {
+      "path": "preparation01/distributed/utilization.rpt",
+      "bytes": 1547,
+      "sha256": "8bcd4aa69a6572c533c9673af61537474d7bd5273f2eea92e7205225e2c4955c"
+    },
+    {
+      "path": "preparation01/distributed/synthesized.dcp",
+      "bytes": 143914,
+      "sha256": "5f0b34b5d13d7e222a68d71e42b38ed6320f87d6dda7c2e01d8bb0823a744a6c"
+    },
+    {
+      "path": "preparation01/distributed/primitives.tsv",
+      "bytes": 133185,
+      "sha256": "92056adc85c3f5a21b61b14d4ec4d8149ff6688506c8a54fa4eb3d5db45b3a65"
+    }
+  ]
+}

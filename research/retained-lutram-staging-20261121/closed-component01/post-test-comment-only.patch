@@ -1,0 +1,11 @@
+--- tested-source/bp_uce.sv
++++ final-source/bp_uce.sv
+@@ -959,7 +959,7 @@
+ 
+   // Bank by line beat so every bank has one response-write port and one
+   // independent installer-read port. Selecting an install slot loads the
+-  // complete line into the BRAM output registers in parallel; the existing
++  // complete line into registered outputs in parallel; the existing
+   // L1 port can then drain one beat per accepted cycle with no RAM-read bubble.
+   for (genvar i = 0; i < block_size_in_fill_lp; i++) begin : prefetch_fill_bank
+     // Retained production uses shallow four-slot banks. Use LUTRAM while
