@@ -13,7 +13,7 @@ ROOT = HERE.parents[2]
 DESIGN = ROOT / 'cosim/black-parrot-example'
 TOP = DESIGN / 'v/top_zynq.sv'
 
-HEADER = '''module hp0_response_path #(parameter bit RETAINED=1, BYPASS=0)
+HEADER = '''module hp0_response_path #(parameter bit BYPASS=0)
  (input logic aclk,aresetn,hp0_axi_rvalid,hp0_axi_bvalid,consume_rready,consume_bready,
   input logic [63:0] hp0_axi_rdata, input logic [5:0] hp0_axi_rid,hp0_axi_bid,
   input logic [1:0] hp0_axi_rresp,hp0_axi_bresp, input logic hp0_axi_rlast,
@@ -21,7 +21,7 @@ HEADER = '''module hp0_response_path #(parameter bit RETAINED=1, BYPASS=0)
   output logic [63:0] rdata_o, output logic [5:0] rid_o,bid_o,
   output logic [1:0] rresp_o,bresp_o, output logic rlast_o);
  localparam C_HP0_AXI_DATA_WIDTH=64;
- localparam retained_buffer_p=RETAINED, prefetch_axi_bypass_lp=BYPASS;
+ localparam prefetch_axi_bypass_lp=BYPASS;
  wire unused_native_inputs = &{1'b0,aclk,aresetn};
 '''
 FOOTER = '''assign bp_hp0_rready=consume_rready,bp_hp0_bready=consume_bready;
@@ -64,11 +64,13 @@ def main():
     results = dict(state='running',sources=before,generated=record(generated),cases=[])
     verilator = Path('/home/coyang/zynq-parrot/install/bin/verilator')
     try:
-        for label,n,bypass in (('default0',0,False),('high384',384,False),('unsafe_bypass',0,True)):
+        for label,n,bypass,retained in (('default0',0,False,1),('high384',384,False,1),
+                                      ('unsafe_bypass',0,True,1),('legacy_bypass',0,True,0)):
             case = out/label; case.mkdir()
             command = [verilator,'--cc','--exe','--build','--trace-fst','-Wall','--top-module','hp0_response_path',
                        '-j','2','--Mdir',case/'obj','-CFLAGS',f'-std=c++14 -DDELAY={n}',
                        generated,inputs[3],inputs[4],HERE/'driver.cpp']
+            command += ['+define+BP_RETAINED_BUFFER='+str(retained)]
             if n: command += ['+define+BP_AXI_RESPONSE_DELAY='+str(n)]
             if bypass: command += ["-GBYPASS=1'b1"]
             else: command += ['--assert']
@@ -79,14 +81,14 @@ def main():
             with (case/'run.log').open('wb') as log:
                 ran = subprocess.run([str(binary)],cwd=case,stdout=log,stderr=subprocess.STDOUT,timeout=30,preexec_fn=limit)
             text = (case/'run.log').read_text()
-            if bypass:
+            if bypass and retained:
                 assert ran.returncode!=0 and 'require allocating L2' in text and 'HP0_RESPONSE_PATH_PASS' not in text
             else:
                 assert ran.returncode==0 and text.count(f'HP0_RESPONSE_PATH_PASS N={n} ')==1
                 assert 'HP0_RESPONSE_PATH_EXIT_CLEAN' in text
                 generated_cpp = '\n'.join(p.read_text() for p in (case/'obj').glob('*.h'))
                 assert ('return_delay' in generated_cpp)==bool(n),'native branch still elaborated a delay instance'
-            results['cases'].append(dict(label=label,delay=n,bypass=bypass,
+            results['cases'].append(dict(label=label,delay=n,bypass=bypass,retained=retained,
                 assertions_enabled=not bypass,build_argv=list(map(str,command)),build_exit=built.returncode,
                 run_exit=ran.returncode,build_log=record(case/'build.log'),run_log=record(case/'run.log'),
                 binary=record(binary),fst=record(case/'hp0-response-path.fst')))

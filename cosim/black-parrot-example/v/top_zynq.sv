@@ -193,6 +193,13 @@ module top_zynq
    // All I/D demand and prefetch responses that reach HP0 share this setting.
    // AR/AW/W and all cache geometry remain unchanged. Queue reset is the AXI
    // transaction-domain reset, never a live BP/control reset or drain command.
+   // Match the unicore parameter's macro/default; it is not a parameter of
+   // this wrapper and is not exported by declare_bp_proc_params.
+`ifdef BP_RETAINED_BUFFER
+   localparam bit hp0_retained_buffer_lp = `BP_RETAINED_BUFFER;
+`else
+   localparam bit hp0_retained_buffer_lp = 1'b0;
+`endif
    logic bp_hp0_bvalid, bp_hp0_bready;
    logic [5:0] bp_hp0_bid;
    logic [1:0] bp_hp0_bresp;
@@ -206,7 +213,7 @@ module top_zynq
         $fatal(1,"BP_AXI_RESPONSE_DELAY must be in 0..384");
       // A direct DRAM prefetch can miss dirty allocating-L2 data. Retaining
       // that reply would turn an old advisory preview into stale demand data.
-      if (retained_buffer_p && prefetch_axi_bypass_lp)
+      if (hp0_retained_buffer_lp && prefetch_axi_bypass_lp)
         $fatal(1,"retained full-line stores require allocating L2; disable prefetch AXI bypass");
    end
 

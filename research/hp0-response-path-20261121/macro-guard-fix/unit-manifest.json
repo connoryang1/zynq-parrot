@@ -1,0 +1,252 @@
+{
+  "state": "PASS exact extracted HP0 block N0/N384 and unsafe bypass rejection; no full core/FPGA fit",
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 39766,
+      "sha256": "839e7f0929205d51642690aab8145192396a9caf6a221d2df2c93c4e1f3e4589"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/Makefile.design",
+      "bytes": 5736,
+      "sha256": "7f2db1335ff778d134bd85124a22bc84d8ae49bcead50de1f953dbbcf8c7b512"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/Makefile.hardware",
+      "bytes": 23377,
+      "sha256": "54af5a3b072c03795dcb177bafd2b949af0b523474908c910bddb977b90e5721"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+      "bytes": 5373,
+      "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+      "bytes": 5396,
+      "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+      "bytes": 6406,
+      "sha256": "edfd7ed89e22bcf585b02f1462097e1625341a951786064fd26f7719fd8b61f3"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/run.py",
+      "bytes": 5592,
+      "sha256": "672dfc509ed454ddfba1f045cb79445467c9cfaa931aa4290a1111e7d84543ab"
+    }
+  ],
+  "generated": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/hp0_response_path.sv",
+    "bytes": 4707,
+    "sha256": "e4e85a096885e4b865cf351e7a408ae5bdb4f9a6e93d55e85bc0df246b6fdc47"
+  },
+  "cases": [
+    {
+      "label": "default0",
+      "delay": 0,
+      "bypass": false,
+      "retained": 1,
+      "assertions_enabled": true,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/default0/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=0",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "+define+BP_RETAINED_BUFFER=1",
+        "--assert"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/default0/build.log",
+        "bytes": 4287,
+        "sha256": "54ada789c24e1e5a6e432cdaeea4de3650d32782f17a1185d667efa3160ff14f"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/default0/run.log",
+        "bytes": 193,
+        "sha256": "7485e41667eabfdc0d80ea901e43e1ca6bcd9fbfa203d9ae9166615d6ebf83b7"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/default0/obj/Vhp0_response_path",
+        "bytes": 365384,
+        "sha256": "79013c4d9627d69ddb56247ddf459472b95f81e998f9e821b187e00143f7bbc7"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/default0/hp0-response-path.fst",
+        "bytes": 9142,
+        "sha256": "b3baad2087443808ef4428524312991b92c3958b5ddc392a18183ecfeffe2ed5"
+      }
+    },
+    {
+      "label": "high384",
+      "delay": 384,
+      "bypass": false,
+      "retained": 1,
+      "assertions_enabled": true,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/high384/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=384",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "+define+BP_RETAINED_BUFFER=1",
+        "+define+BP_AXI_RESPONSE_DELAY=384",
+        "--assert"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/high384/build.log",
+        "bytes": 4295,
+        "sha256": "4f608957302e205278a80fbf5797a06bf0bc9f74d65b1a86a5837eb7eb796017"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/high384/run.log",
+        "bytes": 196,
+        "sha256": "7acd474e2bce01c18bfe7e34223e72d3c8f951b1470b5f1a9df4280051dda575"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/high384/obj/Vhp0_response_path",
+        "bytes": 386304,
+        "sha256": "a74c382aeb6ca007e5dd99322eb4b5e9ee73b498f0cbccf43d2d172463a759a1"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/high384/hp0-response-path.fst",
+        "bytes": 216152,
+        "sha256": "bf77d5a492f86241159a64ee2c9e1cbffbfbaac662e9f996fbac58445f7deb57"
+      }
+    },
+    {
+      "label": "unsafe_bypass",
+      "delay": 0,
+      "bypass": true,
+      "retained": 1,
+      "assertions_enabled": false,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/unsafe_bypass/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=0",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "+define+BP_RETAINED_BUFFER=1",
+        "-GBYPASS=1'b1"
+      ],
+      "build_exit": 0,
+      "run_exit": -6,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/unsafe_bypass/build.log",
+        "bytes": 4297,
+        "sha256": "cd5004e789c8631166be9ae4af3ab9fe962777934768f7d0cf9f70e016d02b4c"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/unsafe_bypass/run.log",
+        "bytes": 314,
+        "sha256": "e4580b44cd03a81938c358ac11c3035dcb9437cea8784efecad957d1c9585553"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/unsafe_bypass/obj/Vhp0_response_path",
+        "bytes": 365496,
+        "sha256": "3c78919fdfa704008dd519e8c40053499e12b2ba9bea62b39d12e61629bfbd08"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/unsafe_bypass/hp0-response-path.fst",
+        "bytes": 1131,
+        "sha256": "db849b06e6235414b5dd4ac744a345e746a3659bba4b99fc6647a8416fda6953"
+      }
+    },
+    {
+      "label": "legacy_bypass",
+      "delay": 0,
+      "bypass": true,
+      "retained": 0,
+      "assertions_enabled": false,
+      "build_argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--build",
+        "--trace-fst",
+        "-Wall",
+        "--top-module",
+        "hp0_response_path",
+        "-j",
+        "2",
+        "--Mdir",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/legacy_bypass/obj",
+        "-CFLAGS",
+        "-std=c++14 -DDELAY=0",
+        "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/hp0_response_path.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+        "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-response-path/driver.cpp",
+        "+define+BP_RETAINED_BUFFER=0",
+        "-GBYPASS=1'b1"
+      ],
+      "build_exit": 0,
+      "run_exit": 0,
+      "build_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/legacy_bypass/build.log",
+        "bytes": 4297,
+        "sha256": "c56a5126b789e44b4e94fac26d85f854543e0af2c843ac4200344e5b5ed18378"
+      },
+      "run_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/legacy_bypass/run.log",
+        "bytes": 193,
+        "sha256": "7485e41667eabfdc0d80ea901e43e1ca6bcd9fbfa203d9ae9166615d6ebf83b7"
+      },
+      "binary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/legacy_bypass/obj/Vhp0_response_path",
+        "bytes": 365384,
+        "sha256": "954854b5acd8249f46684144cbcb8e252a66d3ef94c04d6025a996085987cdf9"
+      },
+      "fst": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-response-path-20261121/gate07-real-retention-macro/legacy_bypass/hp0-response-path.fst",
+        "bytes": 9142,
+        "sha256": "8f16b7c0d2f87b0cde70e75d81d856651c8d5c2a095f7ca260fd4c7e8b465c8a"
+      }
+    }
+  ]
+}
