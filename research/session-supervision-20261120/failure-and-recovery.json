@@ -1,0 +1,38 @@
+{
+  "state": "failed attempt preserved; separate reserved recovery complete; retry pending",
+  "label": "B1-second",
+  "supervising_tool_session": 50244,
+  "supervising_tool_exit": 143,
+  "cause": "unknown; no guest/kernel or infrastructure root cause established",
+  "failed_session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23/session.json",
+    "bytes": 3538,
+    "sha256": "4a7679be8d5b4ec06a6c4a99a0cd7c80acd06eac336d23b7df8fdd4f9560d32f"
+  },
+  "partial_log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23/0-parse32-futex-early.log",
+    "bytes": 32324,
+    "sha256": "c91b29bf2d32453fd4853d05800238256ea4e500f6a04fc7cf29e675818bdfdb"
+  },
+  "missing": [
+    "terminal guest checks/PASS",
+    "CORE/BSG PASS",
+    "runner status",
+    "session release metadata",
+    "second guest execution"
+  ],
+  "observed_local_state": "original supervising/session/runner processes absent; no global reservation held before new recovery reservation",
+  "recovery": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-interruption-recovery/recovery.json",
+    "bytes": 791,
+    "sha256": "dc25579d16e0ed57c0f67ffe7dc9fa2c3d324091409282e8b363dd8a76e02e3e"
+  },
+  "admission": "Entire session23 excluded; no partial timing accepted. Fixed slot retried with unchanged artifacts/parameters.",
+  "retry": "session23-retry1",
+  "supervision_guard": "setsid --fork, regular-file stdout/stderr, stdin /dev/null, explicit PID; existing serialized runner retains global flock. No frozen runner changes.",
+  "retry_pid_file": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session23-retry1.pid",
+    "bytes": 7,
+    "sha256": "65b1eb6ab4f2214e6dacdb9521c60e700fba556ce46b30ac675cf75e4a14bedc"
+  }
+}
