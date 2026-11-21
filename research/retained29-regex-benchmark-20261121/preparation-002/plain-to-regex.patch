@@ -1,0 +1,126 @@
+--- /home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_benchmark.c
++++ /home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_regex_benchmark.c
+@@ -1,5 +1,5 @@
+ /* SPDX-License-Identifier: GPL-2.0
+- * Separate ABI29 matched-lifecycle experiment, not a legacy policy alias.
++ * Separate real-POSIX-regex ABI29 derivative; see retained29-regex-benchmark provenance.
+  * Work generators and the two-process pipe/futex protocol follow the maintained
+  * scheduler_pipe_hint_benchmark; legacy sources and ELF flags remain untouched.
+  * No advisory source is generated here. Ordinary-copy and advisory-only masks
+@@ -22,18 +22,18 @@
+ #include <sys/wait.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include "resume_workload.h"
++#include "retained29_regex_workload.h"
+ 
+ #if defined(BP_RESUME_ZLIB) && BP_RESUME_ZLIB
+-#error "The ABI29 natural-workload experiment does not include zlib"
++#error "The ABI29 regex experiment does not include zlib"
+ #endif
+ #if !defined(BP_RETAINED29_HOST_VERIFY) && (!defined(__riscv) || __riscv_xlen != 64)
+ #error "This benchmark requires RV64 BlackParrot"
+ #endif
+ #ifdef BP_RETAINED29_HOST_VERIFY
+-#define LABEL(name) "RESUME_RETAINED29_HOST_VERIFY_" name
++#define LABEL(name) "RESUME_RETAINED29_REGEX_HOST_VERIFY_" name
+ #else
+-#define LABEL(name) "RESUME_RETAINED29_" name
++#define LABEL(name) "RESUME_RETAINED29_REGEX_" name
+ #endif
+ #define PR_BP_PREVIEW_ENABLE 0x4250505a
+ #define PR_BP_PREVIEW_ICACHE_STATUS 0x4250505e
+@@ -339,17 +339,16 @@
+ 	if (syscall(SYS_futex, (uint32_t *)&t->shared->turn, FUTEX_WAKE, 1, NULL, NULL, 0) < 0) fail("futex wake");
+ }
+ 
+-static struct resume_workload allocate_work(unsigned kib, unsigned salt, const char *kind)
+-{
+-	struct resume_workload work;
+-	if (resume_workload_init(&work, kind, kib, salt)) fail("working-set allocation");
+-	return work;
+-}
+-
+-static void check_free(struct resume_workload *work, uint64_t sum)
+-{
+-	if (!resume_workload_check_total(work, sum)) { errno = EIO; fail("working-set checksum"); }
+-	resume_workload_free(work);
++static void allocate_work(struct retained29_regex_workload *work, unsigned kib, unsigned salt, const char *kind)
++{
++	(void)kind; /* CLI admits only regex; keep the plain transport signature. */
++	if (retained29_regex_init(work, kib, salt)) fail("regex workload allocation/compile");
++}
++
++static void check_free(struct retained29_regex_workload *work, uint64_t sum)
++{
++	if (!retained29_regex_check_total(work, sum)) { errno = EIO; fail("regex workload checksum"); }
++	retained29_regex_free(work);
+ }
+ 
+ struct result { uint64_t steady, child_resume, parent_resume; };
+@@ -377,7 +376,8 @@
+ 	if (child) active_child = child;
+ 	if (!child) {
+ 		if (source_off()) fail("child preview disable");
+-		struct resume_workload work = allocate_work(kib, pipe_mode ? 0x5a : 0x3c, kind);
++		struct retained29_regex_workload work;
++		allocate_work(&work, kib, pipe_mode ? 0x5a : 0x3c, kind);
+ 		close(t.ready[0]);
+ 		if (pipe_mode) { close(t.to_child[1]); close(t.to_parent[0]); }
+ 		flush_instruction_state();
+@@ -386,7 +386,7 @@
+ 		for (unsigned n = 0; n < warmup + loops; ++n) {
+ 			wait_turn(&t, 1);
+ 			if (legs && n >= warmup) child_resume += cycle() - t.shared->parent_launch;
+-			checksum += resume_workload_run(&work);
++			checksum += retained29_regex_run(&work);
+ 			if (legs && n >= warmup) t.shared->child_launch = cycle();
+ 			send_turn(&t, 0);
+ 		}
+@@ -396,7 +396,8 @@
+ 		if (source_off()) fail("child ending preview disable");
+ 		_exit(0);
+ 	}
+-	struct resume_workload work = allocate_work(kib, pipe_mode ? 0xa5 : 0xc3, kind);
++	struct retained29_regex_workload work;
++	allocate_work(&work, kib, pipe_mode ? 0xa5 : 0xc3, kind);
+ 	close(t.ready[1]);
+ 	if (pipe_mode) { close(t.to_child[0]); close(t.to_parent[1]); }
+ 	transfer(t.ready[0], &token, 0);
+@@ -407,7 +408,7 @@
+ 		send_turn(&t, 1);
+ 		wait_turn(&t, 0);
+ 		if (legs && n >= warmup) result.parent_resume += cycle() - t.shared->child_launch;
+-		checksum += resume_workload_run(&work);
++		checksum += retained29_regex_run(&work);
+ 	}
+ 	result.steady = cycle() - begin;
+ 	send_turn(&t, 2);
+@@ -427,9 +428,9 @@
+ int main(int argc, char **argv)
+ {
+ 	unsigned loops = 512, repeats = 8, warmup = 32, kib = 32;
+-	const char *policy = "ordinary-joint", *kind = "scan", *sync = "futex", *profile = "plain";
++	const char *policy = "ordinary-joint", *kind = "regex", *sync = "futex", *profile = "plain";
+ 	if (argc > 10) {
+-		fprintf(stderr, "usage: %s [loops] [repeats] [ordinary-i|ordinary-d|ordinary-joint|advisory-i|advisory-d|advisory-joint] [warmup] [pipe|futex] [plain|legs] [corpus-kib] [scan|lookup|parse|chase] [none]\n", argv[0]);
++		fprintf(stderr, "usage: %s [loops] [repeats] [ordinary-i|ordinary-d|ordinary-joint|advisory-i|advisory-d|advisory-joint] [warmup] [pipe|futex] [plain|legs] [corpus-kib] [regex] [none]\n", argv[0]);
+ 		return 2;
+ 	}
+ 	if (argc > 1) loops = parse_number(argv[1], "loops", 1, 1000000);
+@@ -438,13 +439,13 @@
+ 	if (argc > 4) warmup = parse_number(argv[4], "warmup", 1, 1000000);
+ 	if (argc > 5) sync = argv[5];
+ 	if (argc > 6) profile = argv[6];
+-	if (argc > 7) kib = parse_number(argv[7], "corpus-kib", 0, 65536);
++	if (argc > 7) kib = parse_number(argv[7], "corpus-kib", 32, 128);
+ 	if (argc > 8) kind = argv[8];
+ 	unsigned mask = policy_mask(policy);
+ 	int pipe_mode = !strcmp(sync, "pipe"), legs = !strcmp(profile, "legs");
+ 	if ((strcmp(sync, "pipe") && strcmp(sync, "futex"))
+ 	    || (strcmp(profile, "plain") && strcmp(profile, "legs")) || (pipe_mode && legs)
+-	    || (strcmp(kind, "scan") && strcmp(kind, "lookup") && strcmp(kind, "parse") && strcmp(kind, "chase"))
++	    || (strcmp(kind, "regex") || (kib != 32 && kib != 128))
+ 	    || (argc > 9 && strcmp(argv[9], "none"))) {
+ 		fputs("invalid synchronization/profile/workload/advisory source (only none is supported)\n", stderr);
+ 		return 2;

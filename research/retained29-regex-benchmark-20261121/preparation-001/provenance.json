@@ -1,0 +1,104 @@
+{
+  "base": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_benchmark.c",
+  "base_sha256": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+  "derivative": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_regex_benchmark.c",
+  "derivative_sha256": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+  "replacements": [
+    {
+      "before": " * Separate ABI29 matched-lifecycle experiment, not a legacy policy alias.",
+      "after": " * Separate real-POSIX-regex ABI29 derivative; see retained29-regex-benchmark provenance.",
+      "occurrences": 1
+    },
+    {
+      "before": "#include \"resume_workload.h\"",
+      "after": "#include \"retained29_regex_workload.h\"",
+      "occurrences": 1
+    },
+    {
+      "before": "ABI29 natural-workload experiment does not include zlib",
+      "after": "ABI29 regex experiment does not include zlib",
+      "occurrences": 1
+    },
+    {
+      "before": "\"RESUME_RETAINED29_HOST_VERIFY_\"",
+      "after": "\"RESUME_RETAINED29_REGEX_HOST_VERIFY_\"",
+      "occurrences": 1
+    },
+    {
+      "before": "\"RESUME_RETAINED29_\"",
+      "after": "\"RESUME_RETAINED29_REGEX_\"",
+      "occurrences": 1
+    },
+    {
+      "before": "resume_workload_",
+      "after": "retained29_regex_",
+      "occurrences": 5
+    },
+    {
+      "before": "struct resume_workload",
+      "after": "struct retained29_regex_workload",
+      "occurrences": 5
+    },
+    {
+      "before": "if (retained29_regex_init(&work, kind, kib, salt)) fail(\"working-set allocation\");",
+      "after": "(void)kind; /* CLI admits only regex; keep the plain transport signature. */\n\tif (retained29_regex_init(&work, kib, salt)) fail(\"regex workload allocation/compile\");",
+      "occurrences": 1
+    },
+    {
+      "before": "fail(\"working-set checksum\")",
+      "after": "fail(\"regex workload checksum\")",
+      "occurrences": 1
+    },
+    {
+      "before": "static struct retained29_regex_workload allocate_work(unsigned kib, unsigned salt, const char *kind)",
+      "after": "static void allocate_work(struct retained29_regex_workload *work, unsigned kib, unsigned salt, const char *kind)",
+      "occurrences": 1
+    },
+    {
+      "before": "\n\tstruct retained29_regex_workload work;\n\t(void)kind;",
+      "after": "\n\t(void)kind;",
+      "occurrences": 1
+    },
+    {
+      "before": "retained29_regex_init(&work, kib, salt)",
+      "after": "retained29_regex_init(work, kib, salt)",
+      "occurrences": 1
+    },
+    {
+      "before": "\n\treturn work;\n}\n\nstatic void check_free",
+      "after": "\n}\n\nstatic void check_free",
+      "occurrences": 1
+    },
+    {
+      "before": "struct retained29_regex_workload work = allocate_work(kib, pipe_mode ? 0x5a : 0x3c, kind);",
+      "after": "struct retained29_regex_workload work;\n\t\tallocate_work(&work, kib, pipe_mode ? 0x5a : 0x3c, kind);",
+      "occurrences": 1
+    },
+    {
+      "before": "struct retained29_regex_workload work = allocate_work(kib, pipe_mode ? 0xa5 : 0xc3, kind);",
+      "after": "struct retained29_regex_workload work;\n\tallocate_work(&work, kib, pipe_mode ? 0xa5 : 0xc3, kind);",
+      "occurrences": 1
+    },
+    {
+      "before": "*kind = \"scan\"",
+      "after": "*kind = \"regex\"",
+      "occurrences": 1
+    },
+    {
+      "before": "[scan|lookup|parse|chase]",
+      "after": "[regex]",
+      "occurrences": 1
+    },
+    {
+      "before": "\"corpus-kib\", 0, 65536",
+      "after": "\"corpus-kib\", 32, 128",
+      "occurrences": 1
+    },
+    {
+      "before": "(strcmp(kind, \"scan\") && strcmp(kind, \"lookup\") && strcmp(kind, \"parse\") && strcmp(kind, \"chase\"))",
+      "after": "(strcmp(kind, \"regex\") || (kib != 32 && kib != 128))",
+      "occurrences": 1
+    }
+  ],
+  "invariant": "All bytes outside these substitutions equal the frozen plain source; controller, transport, WHOLE/resource/cleanup ordering preserved"
+}

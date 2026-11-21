@@ -1,0 +1,119 @@
+{
+  "state": "EXPECTED-REJECTION-host-mock-object-identity-only",
+  "command": [
+    "cc",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DBP_RETAINED29_HOST_VERIFY=1",
+    "-I/home/coyang/zynq-parrot-linux-capacity/linux-tests",
+    "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/rejected-by-value-adapter/reconstructed_initial.c",
+    "/dev/shm/regex-adapter-repro-2a6wn7r5/mock.c",
+    "-o",
+    "/dev/shm/regex-adapter-repro-2a6wn7r5/by_value",
+    "-Wl,--wrap=prctl",
+    "-Wl,--wrap=fork",
+    "-Wl,--wrap=waitpid",
+    "-Wl,--wrap=free",
+    "-Wl,--wrap=munmap",
+    "-Wl,--wrap=getrusage",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=malloc",
+    "-Wl,--wrap=printf",
+    "-Wl,--wrap=puts",
+    "-Wl,--wrap=regcomp",
+    "-Wl,--wrap=regexec",
+    "-Wl,--wrap=regfree"
+  ],
+  "argv": [
+    "/dev/shm/regex-adapter-repro-2a6wn7r5/by_value",
+    "3",
+    "2",
+    "ordinary-joint",
+    "2",
+    "pipe",
+    "plain",
+    "32",
+    "regex",
+    "none"
+  ],
+  "returncode": 1,
+  "reconstructed_initial": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/rejected-by-value-adapter/reconstructed_initial.c",
+    "bytes": 20056,
+    "sha256": "a515c89619b6c4608b193516af458ae7b2d0e41d58570fc30068141671ceb4ff"
+  },
+  "omitted_corrections": [
+    {
+      "before": "static struct retained29_regex_workload allocate_work(unsigned kib, unsigned salt, const char *kind)",
+      "after": "static void allocate_work(struct retained29_regex_workload *work, unsigned kib, unsigned salt, const char *kind)"
+    },
+    {
+      "before": "\n\tstruct retained29_regex_workload work;\n\t(void)kind;",
+      "after": "\n\t(void)kind;"
+    },
+    {
+      "before": "retained29_regex_init(&work, kib, salt)",
+      "after": "retained29_regex_init(work, kib, salt)"
+    },
+    {
+      "before": "\n\treturn work;\n}\n\nstatic void check_free",
+      "after": "\n}\n\nstatic void check_free"
+    },
+    {
+      "before": "struct retained29_regex_workload work = allocate_work(kib, pipe_mode ? 0x5a : 0x3c, kind);",
+      "after": "struct retained29_regex_workload work;\n\t\tallocate_work(&work, kib, pipe_mode ? 0x5a : 0x3c, kind);"
+    },
+    {
+      "before": "struct retained29_regex_workload work = allocate_work(kib, pipe_mode ? 0xa5 : 0xc3, kind);",
+      "after": "struct retained29_regex_workload work;\n\tallocate_work(&work, kib, pipe_mode ? 0xa5 : 0xc3, kind);"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_benchmark.c",
+      "bytes": 19953,
+      "sha256": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_regex_workload.h",
+      "bytes": 9938,
+      "sha256": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/test_retained29_regex_benchmark.py",
+      "bytes": 10028,
+      "sha256": "6b93e8d86665ffd65879037151a41d232151a2e66c26b68dad81668dde3c2733"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/reproduce_initial_adapter.py",
+      "bytes": 3773,
+      "sha256": "61e433cb2a5a0536c128480b8f3c6aee351914ae56373a7fc946e80cddb3c8b6"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/rejected-by-value-adapter/mock.c",
+      "bytes": 11427,
+      "sha256": "23a8977822d46a00d13b6374d6386ccfe63df947093fb25ad956405a62aea48b"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/rejected-by-value-adapter/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/rejected-by-value-adapter/run.log",
+      "bytes": 556,
+      "sha256": "ef1e00efd1d10cd04b5536c1ef16d03bb239a69b4b7b5ce4cfa42cc338c8afc0"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-regex-benchmark-20261121/rejected-by-value-adapter/events.log",
+      "bytes": 1190,
+      "sha256": "51d52d023af33075734c740cc302084a256c9cb96627712e6cf767f00bd6e556"
+    }
+  ],
+  "limit": "Reproduces the test's original regex_t address-ownership rejection after a struct copy; does not prove a production glibc malfunction. Corrected variant initializes caller storage in place."
+}
