@@ -1,0 +1,97 @@
+{
+  "state": "PASS",
+  "scope": "offline allocation-policy proof; runtime boot gates still required",
+  "manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/manifest.json",
+    "sha256": "099370428f6e568c474e119b5dca601604a71333ce8377aa05ca76e139a3ff32",
+    "bytes": 14157
+  },
+  "verifier": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/verify_pair.py",
+    "sha256": "d48ccc9a3806fdb5b6929adf4e440ec88cc7512c4ba6557a16fcc7b42e6e80e3",
+    "bytes": 6474
+  },
+  "ddr_load_and_fdt_bounds": {
+    "baseline": {
+      "source": {
+        "ddr_write_count": 1887657,
+        "separate_config_or_mmio_records": 11,
+        "maximum_load_end_exclusive": "0x818eba68",
+        "maximum_load_offset": "0x18eba67",
+        "allocation_bytes": 48234496,
+        "all_write_tails_within_allocation": true
+      },
+      "capped": {
+        "ddr_write_count": 1887663,
+        "separate_config_or_mmio_records": 11,
+        "maximum_load_end_exclusive": "0x818eba68",
+        "maximum_load_offset": "0x18eba67",
+        "allocation_bytes": 48234496,
+        "all_write_tails_within_allocation": true
+      },
+      "fdt": {
+        "declared_bytes": 1209,
+        "copied_buffer_bytes": 1216,
+        "source_begin": "0x80016000",
+        "source_end": "0x800164c0",
+        "runtime_begin": "0x82200000",
+        "runtime_end": "0x822004c0",
+        "entire_initial_fdt_and_rounded_copy_fit": true
+      }
+    },
+    "control": {
+      "source": {
+        "ddr_write_count": 1887657,
+        "separate_config_or_mmio_records": 11,
+        "maximum_load_end_exclusive": "0x818eba68",
+        "maximum_load_offset": "0x18eba67",
+        "allocation_bytes": 48234496,
+        "all_write_tails_within_allocation": true
+      },
+      "capped": {
+        "ddr_write_count": 1887663,
+        "separate_config_or_mmio_records": 11,
+        "maximum_load_end_exclusive": "0x818eba68",
+        "maximum_load_offset": "0x18eba67",
+        "allocation_bytes": 48234496,
+        "all_write_tails_within_allocation": true
+      },
+      "fdt": {
+        "declared_bytes": 1209,
+        "copied_buffer_bytes": 1216,
+        "source_begin": "0x80016000",
+        "source_end": "0x800164c0",
+        "runtime_begin": "0x82200000",
+        "runtime_end": "0x822004c0",
+        "entire_initial_fdt_and_rounded_copy_fit": true
+      }
+    }
+  },
+  "all_kernel_payloads_unchanged": {
+    "baseline": "6116cd8d1316a59a74549c5dfd91245acd9288daf920a91b0b862a7d94dd230a",
+    "control": "c9945c141f545624046e7f3a86dcd71425bc75e6cfc8f370cae5f6c0b8ba8c5a"
+  },
+  "full_nbf_ascii_pair_differences": [
+    {
+      "offset": "0x25f22ba",
+      "original": "0x31",
+      "control": "0x32"
+    },
+    {
+      "offset": "0x25f22bb",
+      "original": "0x64",
+      "control": "0x31"
+    }
+  ],
+  "changed_modes": [
+    14
+  ],
+  "all_changes_only_existing_bootargs_ascii_padding": true,
+  "fdt_property_length_total_size_memory_reg_and_other_properties_unchanged": true,
+  "original_and_embedded_rootfs_unchanged": true,
+  "reverse_nbf_byte_exact": true,
+  "expected_dma32_end": "0x82dfffff",
+  "expected_memory_total_kib": 47104,
+  "expected_runner_allocation_bytes": 48234496,
+  "runtime_limits": "Source intent is not a runtime proof. Require actual46MB notice,47104K total,DMA32end82dfffff and48234496-byte owned allocation before performance acceptance."
+}

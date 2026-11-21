@@ -1,0 +1,325 @@
+{
+  "state": "embedded46-pair-offline-verified",
+  "image_pair": "embedded46",
+  "scope": "FDT bootarg allocation bound only; no board/kernel build or SIG11 causality claim",
+  "source_embedded_manifest": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded-workloads-20261120/manifest.json",
+    "sha256": "a043486bb4e43823dad9415499ed0132f6ecc6758a01f2139cc53a0cad7208ac",
+    "bytes": 19154
+  },
+  "helper": {
+    "path": "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py",
+    "sha256": "c1fc609160b6e2a1d2fb28e5ecfb759fa883e854018dda4d4b19b01d55ced959",
+    "bytes": 3002
+  },
+  "accepted_boot_evidence": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/session1/0-scan32-futex-early.log",
+    "sha256": "7b070e372317b3193abb0bf6d155393d0105e5aa3976fae30989e54a34da424e",
+    "bytes": 53282
+  },
+  "dtb_inventory": {
+    "baseline": [
+      {
+        "address": "0x80016000",
+        "valid": true,
+        "bytes": 1209
+      }
+    ],
+    "control": [
+      {
+        "address": "0x80016000",
+        "valid": true,
+        "bytes": 1209
+      }
+    ]
+  },
+  "active_fdt": {
+    "embedded_physical": "0x80016000",
+    "firmware_offset": "0x16000",
+    "runtime_next_arg1": "0x82200000",
+    "relationship": "Only NBF-loaded DTB is firmware source; unchanged OpenSBI copies its totalsize bytes to next_arg1 before Linux."
+  },
+  "source_proof": [
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/arch/riscv/mm/init.c",
+        "sha256": "573814778113cc63e7a9159d4bf16c1910ba488ce7c29288897dfd9fb27415d4",
+        "bytes": 45605
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/0-init.c",
+        "sha256": "573814778113cc63e7a9159d4bf16c1910ba488ce7c29288897dfd9fb27415d4",
+        "bytes": 45605
+      }
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/arch/riscv/kernel/setup.c",
+        "sha256": "7c96e5f7b0dbf4c7426a67d4cc9a07def97655948df25772c87dc54c1e15ad46",
+        "bytes": 9143
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/1-setup.c",
+        "sha256": "7c96e5f7b0dbf4c7426a67d4cc9a07def97655948df25772c87dc54c1e15ad46",
+        "bytes": 9143
+      }
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/mm/memblock.c",
+        "sha256": "49004c95259760df45e4955dbb7e8216856b483739b4f41c0880be8200152148",
+        "bytes": 64453
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/2-memblock.c",
+        "sha256": "49004c95259760df45e4955dbb7e8216856b483739b4f41c0880be8200152148",
+        "bytes": 64453
+      }
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/build/linux-6.6/lib/cmdline.c",
+        "sha256": "18d94acd858d0cfbdbe4b4a6b06d14402c8ef12065fa9eda8a69aef581d58c8a",
+        "bytes": 5983
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/3-cmdline.c",
+        "sha256": "18d94acd858d0cfbdbe4b4a6b06d14402c8ef12065fa9eda8a69aef581d58c8a",
+        "bytes": 5983
+      }
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/opensbi/firmware/fw_base.S",
+        "sha256": "8cbdd52a8c5444cea34bafcfaa27ca3b69a678ed2b7d393f405a0f58bda1490d",
+        "bytes": 17128
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/4-fw_base.S",
+        "sha256": "8cbdd52a8c5444cea34bafcfaa27ca3b69a678ed2b7d393f405a0f58bda1490d",
+        "bytes": 17128
+      }
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/opensbi/firmware/fw_payload.S",
+        "sha256": "d898bc7f442eb2aa7c55a68e98a831591f5c91857158228326b7f36c6a9d3a6f",
+        "bytes": 2069
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/5-fw_payload.S",
+        "sha256": "d898bc7f442eb2aa7c55a68e98a831591f5c91857158228326b7f36c6a9d3a6f",
+        "bytes": 2069
+      }
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/opensbi/platform/generic/blackparrot/objects.mk",
+        "sha256": "6685fe3d53e62244601f699f4b43321094bca84ffe58f71ec4eb7006697d89d6",
+        "bytes": 2618
+      },
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/source-proof/6-objects.mk",
+        "sha256": "6685fe3d53e62244601f699f4b43321094bca84ffe58f71ec4eb7006697d89d6",
+        "bytes": 2618
+      }
+    }
+  ],
+  "arms": {
+    "baseline": {
+      "source_nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-baseline-shell.nbf",
+        "sha256": "e9aeba407073407cd01f91e2a687c21c4c8a6917b70886d997ce6852270b4508",
+        "bytes": 69843716
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+        "sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+        "bytes": 69843938
+      },
+      "reverse": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/baseline-reverse.nbf",
+        "sha256": "e9aeba407073407cd01f91e2a687c21c4c8a6917b70886d997ce6852270b4508",
+        "bytes": 69843716
+      },
+      "original_dtb": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/baseline-original.dtb",
+        "sha256": "0bfe298c94459fa94ad93c368b73b6d6892c8ffe8807e28e5479dafbce39215f",
+        "bytes": 1209
+      },
+      "capped_dtb": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/baseline-mem46.dtb",
+        "sha256": "2accef38a7a5e3a410643c2884ad8d9cd40ed07da04d1cad541ffaccc8392d6f",
+        "bytes": 1209
+      },
+      "helper_command": [
+        "/usr/bin/python3",
+        "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-baseline-shell.nbf",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+        "--old",
+        "console=hvc0 loglevel=8 rdinit=/bin/sh          ",
+        "--new",
+        "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  "
+      ],
+      "helper_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/baseline-helper.log",
+        "sha256": "dd1c6f04e84264d5ac4da0e3af663cc017e538c14429034a1a73662984aadc72",
+        "bytes": 78
+      },
+      "inserted_records": [
+        "03_00000000800163a0_3d656c6f736e6f63",
+        "03_00000000800163a8_676f6c2030637668",
+        "03_00000000800163b0_20383d6c6576656c",
+        "03_00000000800163b8_2f3d74696e696472",
+        "03_00000000800163c0_6d2068732f6e6962",
+        "03_00000000800163c8_20204d36343d6d65"
+      ],
+      "insertion_line": 1887666,
+      "changed_physical_bytes": [
+        "0x800163c7",
+        "0x800163c8",
+        "0x800163c9",
+        "0x800163ca",
+        "0x800163cb",
+        "0x800163cc",
+        "0x800163cd"
+      ],
+      "outside_fdt_unchanged": true,
+      "all_original_nbf_records_unchanged": true,
+      "kernel_payload_sha256": "6116cd8d1316a59a74549c5dfd91245acd9288daf920a91b0b862a7d94dd230a",
+      "highest_loaded_dram_end": "0x818eba68",
+      "bootargs_property": {
+        "node": "/chosen",
+        "offset": 928,
+        "bytes": 49,
+        "physical": "0x800163a0",
+        "original": "console=hvc0 loglevel=8 rdinit=/bin/sh          ",
+        "capped": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  "
+      },
+      "fdt_total_size": 1209,
+      "unchanged_memory_reg": "00000000800000000000000004000000",
+      "unchanged_reservations": []
+    },
+    "control": {
+      "source_nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-control-shell.nbf",
+        "sha256": "edd3e71672241c40f1b6ee3f2b4b130367a35e7823cf30dd988d4cff0e1d3bb4",
+        "bytes": 69843716
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-control-shell.nbf",
+        "sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+        "bytes": 69843938
+      },
+      "reverse": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/control-reverse.nbf",
+        "sha256": "edd3e71672241c40f1b6ee3f2b4b130367a35e7823cf30dd988d4cff0e1d3bb4",
+        "bytes": 69843716
+      },
+      "original_dtb": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/control-original.dtb",
+        "sha256": "0bfe298c94459fa94ad93c368b73b6d6892c8ffe8807e28e5479dafbce39215f",
+        "bytes": 1209
+      },
+      "capped_dtb": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/control-mem46.dtb",
+        "sha256": "2accef38a7a5e3a410643c2884ad8d9cd40ed07da04d1cad541ffaccc8392d6f",
+        "bytes": 1209
+      },
+      "helper_command": [
+        "/usr/bin/python3",
+        "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/make_linux_shell_nbf.py",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/linux-prefix32-embedded-control-shell.nbf",
+        "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-control-shell.nbf",
+        "--old",
+        "console=hvc0 loglevel=8 rdinit=/bin/sh          ",
+        "--new",
+        "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  "
+      ],
+      "helper_log": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/control-helper.log",
+        "sha256": "dd1c6f04e84264d5ac4da0e3af663cc017e538c14429034a1a73662984aadc72",
+        "bytes": 78
+      },
+      "inserted_records": [
+        "03_00000000800163a0_3d656c6f736e6f63",
+        "03_00000000800163a8_676f6c2030637668",
+        "03_00000000800163b0_20383d6c6576656c",
+        "03_00000000800163b8_2f3d74696e696472",
+        "03_00000000800163c0_6d2068732f6e6962",
+        "03_00000000800163c8_20204d36343d6d65"
+      ],
+      "insertion_line": 1887666,
+      "changed_physical_bytes": [
+        "0x800163c7",
+        "0x800163c8",
+        "0x800163c9",
+        "0x800163ca",
+        "0x800163cb",
+        "0x800163cc",
+        "0x800163cd"
+      ],
+      "outside_fdt_unchanged": true,
+      "all_original_nbf_records_unchanged": true,
+      "kernel_payload_sha256": "c9945c141f545624046e7f3a86dcd71425bc75e6cfc8f370cae5f6c0b8ba8c5a",
+      "highest_loaded_dram_end": "0x818eba68",
+      "bootargs_property": {
+        "node": "/chosen",
+        "offset": 928,
+        "bytes": 49,
+        "physical": "0x800163a0",
+        "original": "console=hvc0 loglevel=8 rdinit=/bin/sh          ",
+        "capped": "console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  "
+      },
+      "fdt_total_size": 1209,
+      "unchanged_memory_reg": "00000000800000000000000004000000",
+      "unchanged_reservations": []
+    }
+  },
+  "source_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+    "sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+    "bytes": 69843938
+  },
+  "candidate_nbf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-control-shell.nbf",
+    "sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+    "bytes": 69843938
+  },
+  "changed_modes": [
+    14
+  ],
+  "all_modes": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded-workloads/all-256-mode-proof.json",
+    "sha256": "d97d52d0a4eab6042e60f81ae6dc2e3f81b10beb464ff572f6bd491874f0d9b0",
+    "bytes": 21420
+  },
+  "sole_nbf_difference": {
+    "line": 1075385,
+    "original": "03_0000000080a13fe8_1073e0f77de3471d\n",
+    "control": "03_0000000080a13fe8_1073e0f77de34721\n"
+  },
+  "reverse_nbf_byte_exact": true,
+  "source_inputs_unchanged": true,
+  "rootfs_cpio_sha256": "2c2947254da730b962b17ba043f53eef279d1b232b1fb659669e46a6b284e9d7",
+  "expected_bound": {
+    "mem_arg": "mem=46M",
+    "bytes": 48234496,
+    "base": "0x80000000",
+    "ram_end_exclusive": "0x82e00000",
+    "expected_dma32_end": "0x82dfffff",
+    "maximum_normal_ram_offset": "0x2dfffff",
+    "runtime_gate": "Require Linux Memory limited to46MB and DMA32 ending82dfffff before workload acceptance."
+  },
+  "limits": [
+    "Memory node remains64MiB; Linux early parameter enforces46MiB ordinary RAM.",
+    "No observed SIG11 cause has been established by this offline change.",
+    "Old uncapped original/embedded results cannot be pooled with embedded46."
+  ],
+  "driver": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/embedded46-20261120/build_pair.py",
+    "sha256": "f06f3574a90c5fb06f86253141ab7012ef0dac2f28a74a9d1431879ed7bd917d",
+    "bytes": 19891
+  }
+}
