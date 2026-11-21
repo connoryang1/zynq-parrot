@@ -1,0 +1,1051 @@
+{
+  "state": "PASS closed actual isolated changed-memory compositional proof",
+  "root_execution": {
+    "session": 31639,
+    "exit_code": 0,
+    "basis": "Root actual exit acknowledgment"
+  },
+  "admission_sha256": "d802735bae2ac2b9bc9adb20cfe1dd2198afd7377c041a8e6489116019f45b9b",
+  "coverage": {
+    "cells": "256x8",
+    "asynchronous_ports": 2,
+    "unique_cells": 256,
+    "allones_cells": 256,
+    "clear_writes": 512,
+    "RMW": 65280,
+    "wrap": 1,
+    "reset_blocks": 2,
+    "qualified_checks": 132361
+  },
+  "owner_seconds": 18.79198889201507,
+  "actual_tool_exits": [
+    {
+      "label": "xvlog-global",
+      "returncode": 0,
+      "seconds": 2.096817300072871
+    },
+    {
+      "label": "xvlog-netlist",
+      "returncode": 0,
+      "seconds": 2.065304417978041
+    },
+    {
+      "label": "xvlog-reference",
+      "returncode": 0,
+      "seconds": 2.0578642858890817
+    },
+    {
+      "label": "xelab",
+      "returncode": 0,
+      "seconds": 4.507143209921196
+    },
+    {
+      "label": "xsim",
+      "returncode": 0,
+      "seconds": 7.89589567494113
+    }
+  ],
+  "source_endcheck": "PASS local+collected all inputs",
+  "cleanup": {
+    "owned_group_gone": true,
+    "vendor_remaining": [],
+    "independent_no_orphans_exit": 0,
+    "collection_exit": 0
+  },
+  "leaf_exact_in_production": {
+    "source_leaf_sha256": "a7673ffc8151b005fcfbfeb4a9e020098e0a2d409b2b79c0bebb2ebe9e0d8720",
+    "production_sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6",
+    "byte_offset": 19356,
+    "BP_commit": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c"
+  },
+  "mapping": {
+    "artifacts": {
+      "netlist": {
+        "bytes": 53796,
+        "sha256": "4b1bbda88862edae221f93b914fc5932fef311eb29c2357283f5e6834849d951"
+      },
+      "DCP": {
+        "bytes": 43650,
+        "sha256": "c4aa54f4c0016a4ad4b8547ada624b8b3d37b4aa5422ea537f3c4806f3955be2"
+      }
+    },
+    "raw_refs": {
+      "IBUF": 49,
+      "OBUF": 20,
+      "BUFG": 1,
+      "GND": 1,
+      "LUT5": 3,
+      "LUT6": 34,
+      "RAM64M": 24,
+      "RAMD64E": 96,
+      "LUT2": 1,
+      "LUT3": 10,
+      "LUT4": 8
+    },
+    "scope": "Closed isolated canonical epoch_probe real distributed RAM; macro/leaf counts overlap"
+  },
+  "prior_failure": "52efb4cc: unsized watchdog overflow explicitly corrected; no coverage/budget extension",
+  "fullcontext_limit": "199ports, exact module primitive-complete but not original memory API; fullbackend mapped equivalence remains open",
+  "scope": "Compositional changed-memory function only. Fullbackend RAM mapping, RTLcomponent/fullcore separate. No resynthesis/query/route/board/performance result.",
+  "snapshots": [
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/admission.json",
+      "logical": "admission.json",
+      "raw": {
+        "bytes": 8090,
+        "sha256": "d802735bae2ac2b9bc9adb20cfe1dd2198afd7377c041a8e6489116019f45b9b"
+      },
+      "gzip": {
+        "path": "admission.json.gz",
+        "bytes": 2181,
+        "sha256": "987c923f26ba6b911dc51ae9ed20ed77bc1458790d297e35dfa367758d4676da"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-extraction-20261121/preparation01/extract.py",
+      "logical": "fullcontext-extraction/extract.py",
+      "raw": {
+        "bytes": 2880,
+        "sha256": "c49b9a5b3ebb357a9b48c91f692bbe29f521e2e8527ce6e0eac7f8ec223a7293"
+      },
+      "gzip": {
+        "path": "fullcontext-extraction__extract.py.gz",
+        "bytes": 1556,
+        "sha256": "7cf5a3d1f70a58b33e1e4332003fc7b4851e6ff6203dd248615dcc903ae9fd8e"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-extraction-20261121/preparation01/extraction.json",
+      "logical": "fullcontext-extraction/extraction.json",
+      "raw": {
+        "bytes": 21879,
+        "sha256": "6dfa362d85af68ba83f9fc939427a27777231937afd92c2ec75e868e7d7b2c9b"
+      },
+      "gzip": {
+        "path": "fullcontext-extraction__extraction.json.gz",
+        "bytes": 1951,
+        "sha256": "db3876186a49b4aec439c7e3d259537168eeb874e1b537d266c93aa73a5f34b3"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-extraction-20261121/preparation01/mapped-epoch-extracted.v",
+      "logical": "fullcontext-extraction/mapped-epoch-extracted.v",
+      "raw": {
+        "bytes": 125203,
+        "sha256": "3a39651641c70384ca440f1eaf88ff9470b2e5cfa7af9ee99de79af65c2f12c9"
+      },
+      "gzip": {
+        "path": "fullcontext-extraction__mapped-epoch-extracted.v.gz",
+        "bytes": 9220,
+        "sha256": "9e8b8d5b052511bef4a8c6f34bed76b76067fb006e98b002175a31a355c96c8c"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-extraction-20261121/preparation01/module-raw.v",
+      "logical": "fullcontext-extraction/module-raw.v",
+      "raw": {
+        "bytes": 125183,
+        "sha256": "2d135c7ab765b598bf3c09ce9b0796db0373d515ae1baedcad3b2ebdd4eee0b4"
+      },
+      "gzip": {
+        "path": "fullcontext-extraction__module-raw.v.gz",
+        "bytes": 9200,
+        "sha256": "08cce4e4f066d1c2ebeeb7dab9b29395efb1aee4b57ed0e061b07e08c0d9381b"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/README.md",
+      "logical": "input/README.md",
+      "raw": {
+        "bytes": 1920,
+        "sha256": "5087703be381f865939440ac222f805becaf39efed407cf50042ae32857605f9"
+      },
+      "gzip": {
+        "path": "input__README.md.gz",
+        "bytes": 1060,
+        "sha256": "858e24f817a4016eaee8e455e843402e01837ebefb2764f6a3f761b21881212f"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/acquire.py",
+      "logical": "input/acquire.py",
+      "raw": {
+        "bytes": 5001,
+        "sha256": "1c0a8d4865f335e83423bfb352c3186a13bc92d76c0018bd3d19d0b6dd0cff3d"
+      },
+      "gzip": {
+        "path": "input__acquire.py.gz",
+        "bytes": 2170,
+        "sha256": "f5fce4e19ea41d09ede06d1675fb0e780d8f615bbb57715b147a28732f8c4506"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/bp_retained_epoch_ram.sv",
+      "logical": "input/bp_retained_epoch_ram.sv",
+      "raw": {
+        "bytes": 948,
+        "sha256": "a7673ffc8151b005fcfbfeb4a9e020098e0a2d409b2b79c0bebb2ebe9e0d8720"
+      },
+      "gzip": {
+        "path": "input__bp_retained_epoch_ram.sv.gz",
+        "bytes": 460,
+        "sha256": "24c04689ffd8ad2ee87163c4e116f392071220ee63c604fd754ac05c5233131f"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-equivalence-20261121/preparation01/run01/remote/candidate-final.sv",
+      "logical": "input/candidate-final.sv",
+      "raw": {
+        "bytes": 20341,
+        "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+      },
+      "gzip": {
+        "path": "input__candidate-final.sv.gz",
+        "bytes": 5093,
+        "sha256": "5e11b0c5b5c9d4ddfe50fe48b28be274a191b4ccfa4730527b27384a78f2b579"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/run01/remote/canonical-functional.v",
+      "logical": "input/canonical-functional.v",
+      "raw": {
+        "bytes": 53796,
+        "sha256": "4b1bbda88862edae221f93b914fc5932fef311eb29c2357283f5e6834849d951"
+      },
+      "gzip": {
+        "path": "input__canonical-functional.v.gz",
+        "bytes": 5425,
+        "sha256": "77efa4ad212bdad8d8a1b42024467aac3916e0f0da957c29f7cc9cb5ffcbc17d"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/run01/remote/canonical-primitives.tsv",
+      "logical": "input/canonical-primitives.tsv",
+      "raw": {
+        "bytes": 10274,
+        "sha256": "9de173eea214c1f47d4ae8504fb9a435ca8b650b17d5ba6f3557c16a07f92146"
+      },
+      "gzip": {
+        "path": "input__canonical-primitives.tsv.gz",
+        "bytes": 968,
+        "sha256": "2855b5c54fadaf02966b07f98577a42e5c50a2441350985a8cebcd5398759672"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/run01/remote/canonical-synthesized.dcp",
+      "logical": "input/canonical-synthesized.dcp",
+      "raw": {
+        "bytes": 43650,
+        "sha256": "c4aa54f4c0016a4ad4b8547ada624b8b3d37b4aa5422ea537f3c4806f3955be2"
+      },
+      "gzip": {
+        "path": "input__canonical-synthesized.dcp.gz",
+        "bytes": 42300,
+        "sha256": "59e2740a92d7b0fd5131e7011c9137a5cf596bc9211426a4c32fdb13a08d7278"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/run01/remote/canonical-utilization.rpt",
+      "logical": "input/canonical-utilization.rpt",
+      "raw": {
+        "bytes": 1816,
+        "sha256": "ac62248be9910559722aa58b930d1b70c4306f9d51a4b7a7ffbe156e2bbcac3f"
+      },
+      "gzip": {
+        "path": "input__canonical-utilization.rpt.gz",
+        "bytes": 571,
+        "sha256": "6bf6b75b6ab00d3316e4ab5cfc1dcd45b07e045f34bad278421c876dd8bdb47b"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/canonical-wrapper.sv",
+      "logical": "input/canonical-wrapper.sv",
+      "raw": {
+        "bytes": 2957,
+        "sha256": "fc175c3022329ca5549bceb8d9337a340d37de132a99d590897a2ecd2c163518"
+      },
+      "gzip": {
+        "path": "input__canonical-wrapper.sv.gz",
+        "bytes": 984,
+        "sha256": "19b8b446e6fd8075288d3585f82aee35cd0a9bd595984f5d8f7e3cf816b1e5df"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-equivalence-20261121/preparation01/component-final.json",
+      "logical": "input/component-final.json",
+      "raw": {
+        "bytes": 1018,
+        "sha256": "49f5fd879e240a5bc46466032d186082acb780f98fbb0784a6fc9ca970e0f19e"
+      },
+      "gzip": {
+        "path": "input__component-final.json.gz",
+        "bytes": 624,
+        "sha256": "8922ce32007327637502495091c87978312f2d6491e224bdd0ac78839154f955"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/current.sv",
+      "logical": "input/current.sv",
+      "raw": {
+        "bytes": 2708,
+        "sha256": "8187a0b2deb107a9df92deccea59c985054de31edaf88a998674b806e2d3a6e6"
+      },
+      "gzip": {
+        "path": "input__current.sv.gz",
+        "bytes": 948,
+        "sha256": "2268ac920b4ef530c73c819dcb3f59ac69b1b32d8bf79912e1792258b8171318"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/miter.sv",
+      "logical": "input/miter.sv",
+      "raw": {
+        "bytes": 5726,
+        "sha256": "8715b413a8dfd6c4c9cc4ec4b832399b709291875b8ae2f10b6d3d0b8d98cb8b"
+      },
+      "gzip": {
+        "path": "input__miter.sv.gz",
+        "bytes": 1787,
+        "sha256": "7ef3b4001e37c7f5c90a4d45059ca16a1b5d6856be895f3aadf306a29c5f9797"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/owner.py",
+      "logical": "input/owner.py",
+      "raw": {
+        "bytes": 4392,
+        "sha256": "6788ca732e3b1db028c8137efb7513f2a0afae3b03cf18c1cb1f033fe8ae54af"
+      },
+      "gzip": {
+        "path": "input__owner.py.gz",
+        "bytes": 2004,
+        "sha256": "0d538edc8ca8a41c56c33980606873ea3298f25223444cf7b77e7467db59d71f"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/pipeline.py",
+      "logical": "input/pipeline.py",
+      "raw": {
+        "bytes": 4113,
+        "sha256": "b8eedf991f0508793a1f304ea306f8af492e1986052f50b0c3d84468ac177c80"
+      },
+      "gzip": {
+        "path": "input__pipeline.py.gz",
+        "bytes": 2052,
+        "sha256": "65b69d6ea26dbb446ca95b4ab77090c45fd48769917e1ab010aa9cb56178565a"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/prepare.py",
+      "logical": "input/prepare.py",
+      "raw": {
+        "bytes": 5334,
+        "sha256": "eae69e320446ad9f4f2c6baee2d6c99fe382c36ffee01d98270a4017a3d9581f"
+      },
+      "gzip": {
+        "path": "input__prepare.py.gz",
+        "bytes": 2425,
+        "sha256": "2abac673fef04414612786dbfab528b2f03529be1bfc7148c34a1c800a6ee8f8"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/prior-failure.json",
+      "logical": "input/prior-failure.json",
+      "raw": {
+        "bytes": 698,
+        "sha256": "e6bbd92a6b00752b4f3f8c682a146734daeb05ecad855af0a9d484e3672a8cfa"
+      },
+      "gzip": {
+        "path": "input__prior-failure.json.gz",
+        "bytes": 469,
+        "sha256": "44bbfb13f3fd6c49d9d8f00b4a7df84b91fb410fb264f02962b09ec9bcba5171"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/reference.sv",
+      "logical": "input/reference.sv",
+      "raw": {
+        "bytes": 2718,
+        "sha256": "743d0e51ed7d9cb1fc009fbffd270f41a68ee5a95152af4e4740968a1bd71de6"
+      },
+      "gzip": {
+        "path": "input__reference.sv.gz",
+        "bytes": 955,
+        "sha256": "998587a714c02811e27c0739a9665840e14cf868cce02263d79f8098aecd9f09"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-mapped-equivalence-20261121/preparation01/root-component-manifest.json",
+      "logical": "input/root-component-manifest.json",
+      "raw": {
+        "bytes": 35801,
+        "sha256": "eb64f58e274f5c403f7c07b2fde2d44d3085cf658f1213a33cd813eca36ca457"
+      },
+      "gzip": {
+        "path": "input__root-component-manifest.json.gz",
+        "bytes": 6839,
+        "sha256": "a4060c36b28740be4865624aa6897ecd1b246c18c09ab35676a9dfec8e1a6f56"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run.tcl",
+      "logical": "input/run.tcl",
+      "raw": {
+        "bytes": 13,
+        "sha256": "6218ffa4f2392f3c61113605d4ab2cd023186e11f1da826b920e510a9a797efb"
+      },
+      "gzip": {
+        "path": "input__run.tcl.gz",
+        "bytes": 33,
+        "sha256": "f35ac4ca9e1dee79057157f47a2d19f021415b48f90440111a60e889143e0d75"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-D-epoch-paired-inference-20261121/preparation01/source-proof.json",
+      "logical": "input/source-proof.json",
+      "raw": {
+        "bytes": 1421,
+        "sha256": "70d5a6211781207589f790c137f0d1b3d6938f3ea88674714d4a260d7effcd3d"
+      },
+      "gzip": {
+        "path": "input__source-proof.json.gz",
+        "bytes": 803,
+        "sha256": "ee99698531c57e538bef027473fd65c72788beddeed909f29093a0f8a6239925"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/watchdog-only.diff",
+      "logical": "input/watchdog-only.diff",
+      "raw": {
+        "bytes": 453,
+        "sha256": "04c5411609d92901301a9c737a985449c53d6af090c940d71fe66ce470a97c45"
+      },
+      "gzip": {
+        "path": "input__watchdog-only.diff.gz",
+        "bytes": 290,
+        "sha256": "de9452fe65cb0866898c1d1fa9cc7ef966a52b2508f35db4fb4ac8e03838f0e3"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/closed-files.log",
+      "logical": "local/closed-files.log",
+      "raw": {
+        "bytes": 3906,
+        "sha256": "0c58518a7dd6bf2f8e7e9b97de8473b692d5ebca43bbbe61aa553faa64f48d21"
+      },
+      "gzip": {
+        "path": "local__closed-files.log.gz",
+        "bytes": 1792,
+        "sha256": "d813cba89bf46e47a331bccd867f49ba3e08e5844322fcadd8008884a8de41c2"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/collect.log",
+      "logical": "local/collect.log",
+      "raw": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gzip": {
+        "path": "local__collect.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/idle-fresh.log",
+      "logical": "local/idle-fresh.log",
+      "raw": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gzip": {
+        "path": "local__idle-fresh.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/no-orphans.log",
+      "logical": "local/no-orphans.log",
+      "raw": {
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "gzip": {
+        "path": "local__no-orphans.log.gz",
+        "bytes": 23,
+        "sha256": "abc129be8d26e8d4afe9ce45f9d5a73c8ed9aa62810ca24ee789fe4581dc4a80"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/pipeline.log",
+      "logical": "local/pipeline.log",
+      "raw": {
+        "bytes": 47,
+        "sha256": "ab0075ad7b29e91a4c0c3f27ca483d4c6669bcd31ba95411a1dc36a33f9a3fc1"
+      },
+      "gzip": {
+        "path": "local__pipeline.log.gz",
+        "bytes": 64,
+        "sha256": "4aaf34dfc7068cadb4311ed5b5b14edcb68ebe88a126143b64c8118012b1ce57"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/session.json",
+      "logical": "local/session.json",
+      "raw": {
+        "bytes": 15279,
+        "sha256": "2ec12e5d60dd86cf186fdbe7840d06c271cc53c385bb5c6a2eba2b2b6620a93a"
+      },
+      "gzip": {
+        "path": "local__session.json.gz",
+        "bytes": 2885,
+        "sha256": "ebdb0fcd83fdb8e470d6baecf9315132c64840015306dec4f8ea592e9a038949"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/upload.log",
+      "logical": "local/upload.log",
+      "raw": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gzip": {
+        "path": "local__upload.log.gz",
+        "bytes": 20,
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/closed01/close.py",
+      "logical": "prior-failure/close.py",
+      "raw": {
+        "bytes": 3199,
+        "sha256": "ba93fb5c80ce676ceaae5d1803a99f95eee6a580fad35a8c7299dbfa4074bbd4"
+      },
+      "gzip": {
+        "path": "prior-failure__close.py.gz",
+        "bytes": 1550,
+        "sha256": "a72c997d91e6ab567eb08362e315239a2829411a5dab85d01885aed1400b7781"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/closed01/manifest.json",
+      "logical": "prior-failure/manifest.json",
+      "raw": {
+        "bytes": 30782,
+        "sha256": "52efb4ccf9ddad2a8832c71506ac9aada881adcd8146965126c6f6e32fe686c4"
+      },
+      "gzip": {
+        "path": "prior-failure__manifest.json.gz",
+        "bytes": 5292,
+        "sha256": "e7e4c892a56cf2e46c558db54c63e64fc2cf06eecbeb8aba423fa36a93121e55"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/miter.sv",
+      "logical": "prior-failure/miter.sv",
+      "raw": {
+        "bytes": 5720,
+        "sha256": "1c05d4aa4b5055fbb2c5e37126eda92daeb6ba6db54b761f5836eb555cca09ee"
+      },
+      "gzip": {
+        "path": "prior-failure__miter.sv.gz",
+        "bytes": 1779,
+        "sha256": "77a7ef9cca894e19c6d7022a8545085544f678d999ec884dca43aa03e46ff4f4"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/run01/remote/owner.json",
+      "logical": "prior-failure/remote/owner.json",
+      "raw": {
+        "bytes": 525,
+        "sha256": "476699445acdbf282c66f7fe0ceed9cc05f6433d4d7c4336f884e70b4b596d6a"
+      },
+      "gzip": {
+        "path": "prior-failure__remote__owner.json.gz",
+        "bytes": 362,
+        "sha256": "96164c892636a1aec43b18d801dd23a9b419d59ad3847b05b49e4846ca5552d6"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/run01/remote/pipeline.json",
+      "logical": "prior-failure/remote/pipeline.json",
+      "raw": {
+        "bytes": 3765,
+        "sha256": "b37fdc2ea04ba43f492ad54d6a016aea468e11ec3426f67e82353174dd451e61"
+      },
+      "gzip": {
+        "path": "prior-failure__remote__pipeline.json.gz",
+        "bytes": 1231,
+        "sha256": "4c4c1c57473cf3c6377346bf61dc5cd53638eaa7c9a06be9bf397016ea8b61bb"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/run01/remote/xsim.log",
+      "logical": "prior-failure/remote/xsim.log",
+      "raw": {
+        "bytes": 1013,
+        "sha256": "052cd5d24c163ee27a288daf2d188e7cb3acbfa52b22dd4d08ba458be14b39bc"
+      },
+      "gzip": {
+        "path": "prior-failure__remote__xsim.log.gz",
+        "bytes": 529,
+        "sha256": "503b801feb5d023e9ad29f6c6e49ed6e42f83c7ef60940a3807aa3fcb0590806"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/run01/remote/xvlog-reference.log",
+      "logical": "prior-failure/remote/xvlog-reference.log",
+      "raw": {
+        "bytes": 575,
+        "sha256": "607de349e563fbb9daab90b66c5b3872ccdbe3b675ab494faf53fd9981239d5b"
+      },
+      "gzip": {
+        "path": "prior-failure__remote__xvlog-reference.log.gz",
+        "bytes": 271,
+        "sha256": "83400711557072704d3bb5aec1daa2ad6303c1bf9247f4aef59f4743edb48803"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/preparation01/run01/session.json",
+      "logical": "prior-failure/session.json",
+      "raw": {
+        "bytes": 10312,
+        "sha256": "f95a59ce5f1afa89e9948aeb7cceeabb5271af8ce9ac23d543d565a8a3258b7c"
+      },
+      "gzip": {
+        "path": "prior-failure__session.json.gz",
+        "bytes": 1712,
+        "sha256": "6200644aa38eb03cd0e640d8190352326f8e883e0097d606bd00668c9e938a64"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/README.md",
+      "logical": "remote/README.md",
+      "raw": {
+        "bytes": 1920,
+        "sha256": "5087703be381f865939440ac222f805becaf39efed407cf50042ae32857605f9"
+      },
+      "gzip": {
+        "path": "remote__README.md.gz",
+        "bytes": 1060,
+        "sha256": "858e24f817a4016eaee8e455e843402e01837ebefb2764f6a3f761b21881212f"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/acquire.py",
+      "logical": "remote/acquire.py",
+      "raw": {
+        "bytes": 5001,
+        "sha256": "1c0a8d4865f335e83423bfb352c3186a13bc92d76c0018bd3d19d0b6dd0cff3d"
+      },
+      "gzip": {
+        "path": "remote__acquire.py.gz",
+        "bytes": 2170,
+        "sha256": "f5fce4e19ea41d09ede06d1675fb0e780d8f615bbb57715b147a28732f8c4506"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/admission.json",
+      "logical": "remote/admission.json",
+      "raw": {
+        "bytes": 8090,
+        "sha256": "d802735bae2ac2b9bc9adb20cfe1dd2198afd7377c041a8e6489116019f45b9b"
+      },
+      "gzip": {
+        "path": "remote__admission.json.gz",
+        "bytes": 2181,
+        "sha256": "987c923f26ba6b911dc51ae9ed20ed77bc1458790d297e35dfa367758d4676da"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/bp_retained_epoch_ram.sv",
+      "logical": "remote/bp_retained_epoch_ram.sv",
+      "raw": {
+        "bytes": 948,
+        "sha256": "a7673ffc8151b005fcfbfeb4a9e020098e0a2d409b2b79c0bebb2ebe9e0d8720"
+      },
+      "gzip": {
+        "path": "remote__bp_retained_epoch_ram.sv.gz",
+        "bytes": 460,
+        "sha256": "24c04689ffd8ad2ee87163c4e116f392071220ee63c604fd754ac05c5233131f"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/candidate-final.sv",
+      "logical": "remote/candidate-final.sv",
+      "raw": {
+        "bytes": 20341,
+        "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+      },
+      "gzip": {
+        "path": "remote__candidate-final.sv.gz",
+        "bytes": 5093,
+        "sha256": "5e11b0c5b5c9d4ddfe50fe48b28be274a191b4ccfa4730527b27384a78f2b579"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/canonical-functional.v",
+      "logical": "remote/canonical-functional.v",
+      "raw": {
+        "bytes": 53796,
+        "sha256": "4b1bbda88862edae221f93b914fc5932fef311eb29c2357283f5e6834849d951"
+      },
+      "gzip": {
+        "path": "remote__canonical-functional.v.gz",
+        "bytes": 5425,
+        "sha256": "77efa4ad212bdad8d8a1b42024467aac3916e0f0da957c29f7cc9cb5ffcbc17d"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/canonical-primitives.tsv",
+      "logical": "remote/canonical-primitives.tsv",
+      "raw": {
+        "bytes": 10274,
+        "sha256": "9de173eea214c1f47d4ae8504fb9a435ca8b650b17d5ba6f3557c16a07f92146"
+      },
+      "gzip": {
+        "path": "remote__canonical-primitives.tsv.gz",
+        "bytes": 968,
+        "sha256": "2855b5c54fadaf02966b07f98577a42e5c50a2441350985a8cebcd5398759672"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/canonical-synthesized.dcp",
+      "logical": "remote/canonical-synthesized.dcp",
+      "raw": {
+        "bytes": 43650,
+        "sha256": "c4aa54f4c0016a4ad4b8547ada624b8b3d37b4aa5422ea537f3c4806f3955be2"
+      },
+      "gzip": {
+        "path": "remote__canonical-synthesized.dcp.gz",
+        "bytes": 42300,
+        "sha256": "59e2740a92d7b0fd5131e7011c9137a5cf596bc9211426a4c32fdb13a08d7278"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/canonical-utilization.rpt",
+      "logical": "remote/canonical-utilization.rpt",
+      "raw": {
+        "bytes": 1816,
+        "sha256": "ac62248be9910559722aa58b930d1b70c4306f9d51a4b7a7ffbe156e2bbcac3f"
+      },
+      "gzip": {
+        "path": "remote__canonical-utilization.rpt.gz",
+        "bytes": 571,
+        "sha256": "6bf6b75b6ab00d3316e4ab5cfc1dcd45b07e045f34bad278421c876dd8bdb47b"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/canonical-wrapper.sv",
+      "logical": "remote/canonical-wrapper.sv",
+      "raw": {
+        "bytes": 2957,
+        "sha256": "fc175c3022329ca5549bceb8d9337a340d37de132a99d590897a2ecd2c163518"
+      },
+      "gzip": {
+        "path": "remote__canonical-wrapper.sv.gz",
+        "bytes": 984,
+        "sha256": "19b8b446e6fd8075288d3585f82aee35cd0a9bd595984f5d8f7e3cf816b1e5df"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/component-final.json",
+      "logical": "remote/component-final.json",
+      "raw": {
+        "bytes": 1018,
+        "sha256": "49f5fd879e240a5bc46466032d186082acb780f98fbb0784a6fc9ca970e0f19e"
+      },
+      "gzip": {
+        "path": "remote__component-final.json.gz",
+        "bytes": 624,
+        "sha256": "8922ce32007327637502495091c87978312f2d6491e224bdd0ac78839154f955"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/current.sv",
+      "logical": "remote/current.sv",
+      "raw": {
+        "bytes": 2708,
+        "sha256": "8187a0b2deb107a9df92deccea59c985054de31edaf88a998674b806e2d3a6e6"
+      },
+      "gzip": {
+        "path": "remote__current.sv.gz",
+        "bytes": 948,
+        "sha256": "2268ac920b4ef530c73c819dcb3f59ac69b1b32d8bf79912e1792258b8171318"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/glbl.v",
+      "logical": "remote/glbl.v",
+      "raw": {
+        "bytes": 1762,
+        "sha256": "6270251cf35e1fce3119fc79f8fb968912f7983027e43cf030409ba68f048936"
+      },
+      "gzip": {
+        "path": "remote__glbl.v.gz",
+        "bytes": 617,
+        "sha256": "469e10f4e10c4e2acf1143551329d60a7eb136bd148b5741b35bc6d48fc8d4cc"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/miter.sv",
+      "logical": "remote/miter.sv",
+      "raw": {
+        "bytes": 5726,
+        "sha256": "8715b413a8dfd6c4c9cc4ec4b832399b709291875b8ae2f10b6d3d0b8d98cb8b"
+      },
+      "gzip": {
+        "path": "remote__miter.sv.gz",
+        "bytes": 1787,
+        "sha256": "7ef3b4001e37c7f5c90a4d45059ca16a1b5d6856be895f3aadf306a29c5f9797"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/owner.json",
+      "logical": "remote/owner.json",
+      "raw": {
+        "bytes": 4799,
+        "sha256": "7e22e6381c10bc8d70d4e407c7502ba8cc4210715d616103a36e8098eef0e3e1"
+      },
+      "gzip": {
+        "path": "remote__owner.json.gz",
+        "bytes": 1616,
+        "sha256": "69965e67de3f5ab5c89c66da34d3e8ab2b03bab58cf7f18086e590b2394d190a"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/owner.py",
+      "logical": "remote/owner.py",
+      "raw": {
+        "bytes": 4392,
+        "sha256": "6788ca732e3b1db028c8137efb7513f2a0afae3b03cf18c1cb1f033fe8ae54af"
+      },
+      "gzip": {
+        "path": "remote__owner.py.gz",
+        "bytes": 2004,
+        "sha256": "0d538edc8ca8a41c56c33980606873ea3298f25223444cf7b77e7467db59d71f"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/phase.json",
+      "logical": "remote/phase.json",
+      "raw": {
+        "bytes": 287,
+        "sha256": "3fec70bc86d7f2c90f8958a6eaddd67c67eb02f641e2a42d6a76e6f0fa846b90"
+      },
+      "gzip": {
+        "path": "remote__phase.json.gz",
+        "bytes": 213,
+        "sha256": "3e5fef8aa5e5c95cded2e43b861340ac28ed4fe6948e482c79e74b1798e212a4"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/pipeline-console.log",
+      "logical": "remote/pipeline-console.log",
+      "raw": {
+        "bytes": 109,
+        "sha256": "a5d9429c428b38fa6afe2e0028d345d95d75c6c145669c5c6429ba0358af1d67"
+      },
+      "gzip": {
+        "path": "remote__pipeline-console.log.gz",
+        "bytes": 113,
+        "sha256": "f5d671c6707bae7fb6da36521eec3ac22064fcb733ca415637a1cb24a32dce50"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/pipeline.json",
+      "logical": "remote/pipeline.json",
+      "raw": {
+        "bytes": 3906,
+        "sha256": "56e62ec0a78037e9f1c0d00383e7cf7a1bb7d3528335a5d026cca1fffbefca65"
+      },
+      "gzip": {
+        "path": "remote__pipeline.json.gz",
+        "bytes": 1323,
+        "sha256": "b194e641645bd65f7921423604c93a8b6843086cf96170b981e7ad7be11a1833"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/pipeline.py",
+      "logical": "remote/pipeline.py",
+      "raw": {
+        "bytes": 4113,
+        "sha256": "b8eedf991f0508793a1f304ea306f8af492e1986052f50b0c3d84468ac177c80"
+      },
+      "gzip": {
+        "path": "remote__pipeline.py.gz",
+        "bytes": 2052,
+        "sha256": "65b69d6ea26dbb446ca95b4ab77090c45fd48769917e1ab010aa9cb56178565a"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/prepare.py",
+      "logical": "remote/prepare.py",
+      "raw": {
+        "bytes": 5334,
+        "sha256": "eae69e320446ad9f4f2c6baee2d6c99fe382c36ffee01d98270a4017a3d9581f"
+      },
+      "gzip": {
+        "path": "remote__prepare.py.gz",
+        "bytes": 2425,
+        "sha256": "2abac673fef04414612786dbfab528b2f03529be1bfc7148c34a1c800a6ee8f8"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/prior-failure.json",
+      "logical": "remote/prior-failure.json",
+      "raw": {
+        "bytes": 698,
+        "sha256": "e6bbd92a6b00752b4f3f8c682a146734daeb05ecad855af0a9d484e3672a8cfa"
+      },
+      "gzip": {
+        "path": "remote__prior-failure.json.gz",
+        "bytes": 469,
+        "sha256": "44bbfb13f3fd6c49d9d8f00b4a7df84b91fb410fb264f02962b09ec9bcba5171"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/reference.sv",
+      "logical": "remote/reference.sv",
+      "raw": {
+        "bytes": 2718,
+        "sha256": "743d0e51ed7d9cb1fc009fbffd270f41a68ee5a95152af4e4740968a1bd71de6"
+      },
+      "gzip": {
+        "path": "remote__reference.sv.gz",
+        "bytes": 955,
+        "sha256": "998587a714c02811e27c0739a9665840e14cf868cce02263d79f8098aecd9f09"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/root-component-manifest.json",
+      "logical": "remote/root-component-manifest.json",
+      "raw": {
+        "bytes": 35801,
+        "sha256": "eb64f58e274f5c403f7c07b2fde2d44d3085cf658f1213a33cd813eca36ca457"
+      },
+      "gzip": {
+        "path": "remote__root-component-manifest.json.gz",
+        "bytes": 6839,
+        "sha256": "a4060c36b28740be4865624aa6897ecd1b246c18c09ab35676a9dfec8e1a6f56"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/run.tcl",
+      "logical": "remote/run.tcl",
+      "raw": {
+        "bytes": 13,
+        "sha256": "6218ffa4f2392f3c61113605d4ab2cd023186e11f1da826b920e510a9a797efb"
+      },
+      "gzip": {
+        "path": "remote__run.tcl.gz",
+        "bytes": 33,
+        "sha256": "f35ac4ca9e1dee79057157f47a2d19f021415b48f90440111a60e889143e0d75"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/source-proof.json",
+      "logical": "remote/source-proof.json",
+      "raw": {
+        "bytes": 1421,
+        "sha256": "70d5a6211781207589f790c137f0d1b3d6938f3ea88674714d4a260d7effcd3d"
+      },
+      "gzip": {
+        "path": "remote__source-proof.json.gz",
+        "bytes": 803,
+        "sha256": "ee99698531c57e538bef027473fd65c72788beddeed909f29093a0f8a6239925"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/watchdog-only.diff",
+      "logical": "remote/watchdog-only.diff",
+      "raw": {
+        "bytes": 453,
+        "sha256": "04c5411609d92901301a9c737a985449c53d6af090c940d71fe66ce470a97c45"
+      },
+      "gzip": {
+        "path": "remote__watchdog-only.diff.gz",
+        "bytes": 290,
+        "sha256": "de9452fe65cb0866898c1d1fa9cc7ef966a52b2508f35db4fb4ac8e03838f0e3"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/xelab.log",
+      "logical": "remote/xelab.log",
+      "raw": {
+        "bytes": 1212,
+        "sha256": "7f12e95c2b3a0944b01fae1c990475399fb16dac11cb328fa8c15aa564f439d2"
+      },
+      "gzip": {
+        "path": "remote__xelab.log.gz",
+        "bytes": 486,
+        "sha256": "6b3e5179dfde37f5c1f4afe7726e19564ee1e535cd684007de66019fd11ff82b"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/xsim.log",
+      "logical": "remote/xsim.log",
+      "raw": {
+        "bytes": 1031,
+        "sha256": "9b45e2c0e1413309ccee706fc876b0ba7e36afcf834d23a3b5c547dfdfbce887"
+      },
+      "gzip": {
+        "path": "remote__xsim.log.gz",
+        "bytes": 572,
+        "sha256": "f1a77d5362fa41bba8d10d9dcbf78b00d732a25282714a85f27b3c06ecfda64b"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/xvlog-global.log",
+      "logical": "remote/xvlog-global.log",
+      "raw": {
+        "bytes": 170,
+        "sha256": "e1feac12846de8e48aa994af9d22636bfdbdd9216be6198f4bf7bdfdb18ddc70"
+      },
+      "gzip": {
+        "path": "remote__xvlog-global.log.gz",
+        "bytes": 160,
+        "sha256": "d01d6794f4fb3d9a8361a2c5a53095fab676fa690e0dec9ca82b2cd8c459730d"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/xvlog-netlist.log",
+      "logical": "remote/xvlog-netlist.log",
+      "raw": {
+        "bytes": 256,
+        "sha256": "b5114b748c7828cedc863b738ace8dbe640223d77f4e30bca5f4e605f89fb08f"
+      },
+      "gzip": {
+        "path": "remote__xvlog-netlist.log.gz",
+        "bytes": 184,
+        "sha256": "6614a5d31c53a160b3231ff4380b57d5325623bbea8f8b2d310604dffeb5d96e"
+      }
+    },
+    {
+      "original": "/home/coyang/fpga-artifacts/context-resume/retained-epoch-compositional-mapped-20261121/attempt02/run01/remote/xvlog-reference.log",
+      "logical": "remote/xvlog-reference.log",
+      "raw": {
+        "bytes": 391,
+        "sha256": "bb7efa4bec9b70d4c5b9d731b37785d1dc4c561f1e0a10355a4fdc6e4c4aa951"
+      },
+      "gzip": {
+        "path": "remote__xvlog-reference.log.gz",
+        "bytes": 195,
+        "sha256": "c8ce6c24949e6f3d581adde92adf54c7762752ce99502e5fccecdf934325639a"
+      }
+    }
+  ],
+  "closure_files": {
+    "close.py": {
+      "bytes": 5320,
+      "sha256": "e8a1e51b9ed481fff54bca6d462a54389dc6a0e0df26a94a2efd951fc281f34d"
+    },
+    "README.md": {
+      "bytes": 1268,
+      "sha256": "8117037bb9af62fda966ee80215c24a5cf445f362f190d95831b310f27676e1d"
+    }
+  }
+}
