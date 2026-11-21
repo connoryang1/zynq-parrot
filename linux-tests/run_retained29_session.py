@@ -114,11 +114,11 @@ def run_guest(admission,log_path,env,spawn=pexpect.spawn,runner=None):
             for command in protocol.transfer_commands(admission):
                 child.sendline(command);expect_shell_prompt(child,180,'ABI29 ELF transfer')
             child.sendline('/bin/busybox sha256sum '+guest)
-            guarded(child,re.compile(r'(?:^|\r?\n)([0-9a-f]{64})  '+re.escape(guest)+r'\r?\n'),180,'guest hash')
+            guarded(child,re.compile(r'(?:^|\r*\n)([0-9a-f]{64})  '+re.escape(guest)+r'\r*\n'),180,'guest hash')
             protocol.require(child.match.group(1)==admission['artifacts']['elf']['sha256'],'actual guest ELF hash mismatch')
             expect_shell_prompt(child,180,'ABI29 verified guest ELF')
             child.sendline(protocol.guest_command(role))
-            guarded(child,re.compile(r'(?:^|\r?\n)RETAINED29_EXIT rc=([0-9]+)\r?\n'),1800,'ABI29 guest execution')
+            guarded(child,re.compile(r'(?:^|\r*\n)RETAINED29_EXIT rc=([0-9]+)\r*\n'),1800,'ABI29 guest execution')
             protocol.require(child.match.group(1)=='0','actual guest exit nonzero')
             expect_shell_prompt(child,300,'ABI29 normal guest return')
             log.flush();protocol.parse_guest(log_path.read_text(errors='replace'),admission)

@@ -1,0 +1,5 @@
+This corrects host console framing after the new bounded kernel booted but the client stopped before executing its ABI probe. The actual transferred ELF hash matched, and the raw terminal line contained three carriage returns before its newline. The failed session and its completed recovery remain preserved; the new admission binds only the corrected host source.
+
+The hash and command-exit guards now accept repeated CRs at line boundaries. Exact digest/path values, numeric exit status, failure markers, shell return and complete terminal/recovery checks remain mandatory. The captured raw hash line fails the original guard and passes the corrected one;37 host tests cover LF, CRLF and triple-CRLF, including wrong-hash refusal before app execution.
+
+`probe-absent-v2.admission.json` reuses the verified staged kernel29/f744 bundle through explicit sync and full post-power hash checks. It validates locally with the current source identity and requests no board action by itself. No ABI probe or retained-buffer physical/performance acceptance is inferred from the earlier shell boot.

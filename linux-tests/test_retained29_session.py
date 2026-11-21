@@ -126,9 +126,10 @@ class Protocol(unittest.TestCase):
 
 
 class FakeChild:
-    def __init__(self,a,wrong_hash=False,nonzero=False,missing_pass=False,exitstatus=0,failure=None):
+    def __init__(self,a,wrong_hash=False,nonzero=False,missing_pass=False,exitstatus=0,failure=None,line_ending="\n"):
         self.a=a;self.wrong_hash=wrong_hash;self.nonzero=nonzero;self.missing_pass=missing_pass
         self.exitstatus=exitstatus;self.signalstatus=None;self.failure=failure
+        self.line_ending=line_ending
         self.commands=[];self.pending=boot(a)+'# ';self.live=True;self.match=None
     def setwinsize(self,*args):pass
     def sendline(self,command):
@@ -139,7 +140,7 @@ class FakeChild:
             self.pending=(guest(self.a) if not self.missing_pass else '')+f'RETAINED29_EXIT rc={1 if self.nonzero else 0}\n# '
         elif command=='poweroff -f':self.pending=footer()
         else:self.pending='# '
-        self.pending='\n'+self.pending
+        self.pending=('\n'+self.pending).replace('\n',self.line_ending)
     def expect(self,patterns,timeout):
         if patterns is pexpect.EOF:return 0
         if self.failure:raise self.failure('simulated transport interruption')
@@ -166,6 +167,19 @@ class GuestProtocol(unittest.TestCase):
         self.assertEqual(result['runner_exit'],0)
         self.assertLess(child.commands.index('/bin/busybox sha256sum /tmp/bp-retained29-probe'),child.commands.index(p.guest_command('probe-present')))
         self.assertEqual(child.commands[-1],'poweroff -f')
+
+    def test_repeated_pty_carriage_returns_preserve_hash_and_exit_checks(self):
+        # Closed board session02 used three CRs before each LF. Both the
+        # hash and the shell return must match, while wrong hashes refuse.
+        for ending in ("\n", "\r\n", "\r\r\r\n"):
+            with self.subTest(ending=repr(ending)):
+                child,result=self.run_child(line_ending=ending)
+                self.assertEqual(result['guest_exit'],0)
+                a=admission('probe-present');bad=FakeChild(a,wrong_hash=True,line_ending=ending)
+                with tempfile.TemporaryDirectory() as tmp,patch.object(p,'transfer_commands',return_value=[]):
+                    with self.assertRaisesRegex(ValueError,'actual guest ELF hash'):
+                        s.run_guest(a,Path(tmp)/'console.log',{},spawn=lambda *args,**kw:bad)
+                self.assertNotIn(p.guest_command(a['role']),bad.commands)
 
     def test_wrong_actual_hash_never_executes(self):
         a=admission('probe-present');child=FakeChild(a,wrong_hash=True)

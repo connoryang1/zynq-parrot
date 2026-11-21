@@ -1,0 +1,46 @@
+{
+  "state": "PASS host framing correction and exact fresh local admission; physicalprobe not yetexecuted",
+  "observed_failure": "session02 bootskernel29within46MiB and transfersactual9bbELFhash; oldguardrejects actual3CR LF framing thenrecoversf744. Probecommandwasnot sent; noABIacceptance.",
+  "fix": "only hash/exit line ending CR? toCR*; digest/path/exit/markers/normalreturn/fullrecoverychecks preserved",
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/run_retained29_session.py",
+    "bytes": 11049,
+    "sha256": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a"
+  },
+  "test": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/test_retained29_session.py",
+    "bytes": 19969,
+    "sha256": "5953eba4b7fcf682d7bacbe198ca4c6d87497fd97fa0404aa621d387076aa40d"
+  },
+  "raw_actual_hash_line": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-pty-framing-20261121/actual-hash-line.bin",
+    "bytes": 94,
+    "sha256": "59da791a6cfe0ee85b6c2408a6abfbf5c4a6cbe83e7675adb94aea7e05afb272"
+  },
+  "host_tests": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-pty-framing-20261121/host-tests.log",
+    "bytes": 3664,
+    "sha256": "77a9f0a9ae3447fe1003109349ec28c125ca57263408fdc172d6e0b78afd56e7"
+  },
+  "new_base_admission": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-pty-framing-20261121/probe-absent.admission.json",
+    "bytes": 4404,
+    "sha256": "399b42ec24a58d441d222d7021d4f94105fdbb0669d74196084bb43c34f04bd6"
+  },
+  "new_v2_admission": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-pty-framing-20261121/probe-absent-v2.admission.json",
+    "bytes": 1660,
+    "sha256": "2808edeffa6acd68204e6e609d5b140b245e56a9b8593d712f894cd65ee3dec1"
+  },
+  "failed_session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained29-absent-f744-20261121-session02/session.json",
+    "bytes": 9253,
+    "sha256": "6ea09500422b4453f572997553f396177e50c468df7539d5abd60548ad4e054b"
+  },
+  "preflight_note": "Initialpatchscriptusedrepo-relativepathsfromlinux-tests cwdandmade noedit; old36testbaseline result notfixevidence. Correctedactualpatchfollowedby37testPASS andactualrawline check.",
+  "limits": [
+    "No probe app wasexecutedinsession02",
+    "No largerbufferFPGAorperformance result",
+    "Oldclosedadmissions/snapshotsremainunchanged; newadmissionbindscurrentupdatedv1source"
+  ]
+}
