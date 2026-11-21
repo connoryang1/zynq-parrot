@@ -2,6 +2,8 @@ This derives full-burst and retained-publication timing from the three matched c
 
 All arms use the same cold08 program, static16KiB L2, ordinary32KiB L1I/D, and1280 retained64-byte lines per side. The opaque HP0 stream auditors and strict full-payload/SRAM/counter checks pass. `path-timing.json` binds the exact closed evidence and derives publication intervals from accepted advisory and publication timestamps using the observed50000-FST-tick AXI clock period.
 
+The FST timebase is1ps, so the observed AXI/core clock is20MHz. The compiled testbench separately requests a2500000ps real-time-clock period (0.4MHz), while the FPGA configuration requests8MHz for that clock. CSR0xcc0 is the core-wide counter incremented on core clock edges, independent of context save/restore. These bare-metal correctness and HP0 cycle observations therefore do not establish matched Linux timer/scheduling behavior or real-time FPGA performance.
+
 | Added response age | AR→first accepted word | AR→accepted full8-word line | I advisory admission→publication | D advisory admission→publication |
 |---:|---:|---:|---:|---:|
 |0|1|8|101|76|
