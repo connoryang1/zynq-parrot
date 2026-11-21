@@ -1,0 +1,63 @@
+{
+  "state": "PASS-D64-I64-original-UCE-gates-with-specific-short-assert-and-drain",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-lutram-staging-20261121/component01/admission.json",
+    "bytes": 9763,
+    "sha256": "8a0a2586d1be43d0887e1eeaff43ac2162c8fbb496e3369aa2a8b92142a64a9e"
+  },
+  "gates": [
+    {
+      "id": "d64",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/coyang/zynq-parrot-retained-dense/testing/rtl/run_uce_retained.py",
+        "--lines",
+        "64",
+        "--out",
+        "/home/coyang/fpga-artifacts/context-resume/retained-lutram-staging-20261121/component01/d64"
+      ],
+      "owned_pgid": 17,
+      "returncode": 0,
+      "elapsed_seconds": 19.983877671998926,
+      "verification": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-lutram-staging-20261121/component01/d64/verification.json",
+        "bytes": 7387,
+        "sha256": "854c682ad617ee8b50c72999ce27e286b46aed6ba4d99e8d0eb0729291d0e376"
+      },
+      "resources": {
+        "output_bytes": 115952552,
+        "free_bytes": 4345573376
+      }
+    },
+    {
+      "id": "i64-bedrock64",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/coyang/zynq-parrot-retained-dense/testing/rtl/run_uce_retained.py",
+        "--lines",
+        "64",
+        "--out",
+        "/home/coyang/fpga-artifacts/context-resume/retained-lutram-staging-20261121/component01/i64-bedrock64",
+        "--icache",
+        "--icache-fill-width",
+        "64"
+      ],
+      "owned_pgid": 148,
+      "returncode": 0,
+      "elapsed_seconds": 20.044065595953725,
+      "verification": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-lutram-staging-20261121/component01/i64-bedrock64/verification.json",
+        "bytes": 7384,
+        "sha256": "7308112770357a66980df6957e5f528fbd936d665296682f83ae499053d278e5"
+      },
+      "resources": {
+        "output_bytes": 231886551,
+        "free_bytes": 4229378048
+      }
+    }
+  ],
+  "resources_after": {
+    "output_bytes": 231886997,
+    "free_bytes": 4229378048
+  }
+}

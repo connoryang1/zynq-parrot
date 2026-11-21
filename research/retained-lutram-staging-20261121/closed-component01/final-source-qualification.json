@@ -1,0 +1,107 @@
+{
+  "state": "PASS-final-source-differs-from-component-tested-source-by-approved-comment-only",
+  "tested_source": {
+    "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/source/bp_uce.sv",
+    "bytes": 107087,
+    "sha256": "4b3a588e45957e8f06e028e365d119d471fc62d4d73db3cb7af3a8c7c257d905"
+  },
+  "final_current_source": {
+    "path": "/home/coyang/zynq-parrot-retained-dense/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+    "bytes": 107080,
+    "sha256": "5ff8627b7373bfc9ce9be5cbd315d222d6b0efdec2e887b3d976038be84af725"
+  },
+  "final_snapshot": {
+    "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/final-source/bp_uce.sv",
+    "bytes": 107080,
+    "sha256": "5ff8627b7373bfc9ce9be5cbd315d222d6b0efdec2e887b3d976038be84af725"
+  },
+  "exact_comment_replacement_only": true,
+  "comment_only_diff": {
+    "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/post-test-comment-only.patch",
+    "bytes": 611,
+    "sha256": "3332812d5688d1e8cbe8afe07d24685becd6b9882a80fb6baed80c381e2ac935"
+  },
+  "runtime_repeated": false,
+  "source_rule": "After completed D64/I64 gates, root authorized replacing stale BRAM-output-register prose with registered-outputs; actual RTL expression/latency unchanged. Existing frozen admission/tested hashes remain historical.",
+  "mapped_prerequisite_copies": [
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/uce-prefetch-bank-inference-20261121/xsim-only-adapter03/acquisition-v1/run01/remote/preparation01/xsim-cycle-miter01/session.json",
+        "bytes": 11984,
+        "sha256": "dcb275975da690f80b009e54afd3a08e59d7c6b144a64ce7d5a43e26542c89b2"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/mapped-session.json",
+        "bytes": 11984,
+        "sha256": "dcb275975da690f80b009e54afd3a08e59d7c6b144a64ce7d5a43e26542c89b2"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/uce-prefetch-bank-inference-20261121/xsim-only-adapter03/acquisition-v1/run01/remote/session.json",
+        "bytes": 17265,
+        "sha256": "b0d279f182b97bf11ffe649901d00ca10e7d3abaee7424b84648de5c715af0b8"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/remote-owner-session.json",
+        "bytes": 17265,
+        "sha256": "b0d279f182b97bf11ffe649901d00ca10e7d3abaee7424b84648de5c715af0b8"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/uce-prefetch-bank-inference-20261121/xsim-only-adapter03/acquisition-v1/run01/remote/preparation01/block/utilization.rpt",
+        "bytes": 1541,
+        "sha256": "265c336ea8b06ca420869c26b9eab24d3f6363f04e1e60dc74dbe0d989dded32"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/block-utilization.rpt",
+        "bytes": 1541,
+        "sha256": "265c336ea8b06ca420869c26b9eab24d3f6363f04e1e60dc74dbe0d989dded32"
+      }
+    },
+    {
+      "original": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/uce-prefetch-bank-inference-20261121/xsim-only-adapter03/acquisition-v1/run01/remote/preparation01/distributed/utilization.rpt",
+        "bytes": 1547,
+        "sha256": "8bcd4aa69a6572c533c9673af61537474d7bd5273f2eea92e7205225e2c4955c"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-lutram-staging-20261121/closed-component01/distributed-utilization.rpt",
+        "bytes": 1547,
+        "sha256": "8bcd4aa69a6572c533c9673af61537474d7bd5273f2eea92e7205225e2c4955c"
+      }
+    }
+  ],
+  "four_slot_mapped_resources": {
+    "block": {
+      "LUT": 11,
+      "logic_LUT": 11,
+      "LUTRAM": 0,
+      "SRL": 0,
+      "FF": 0,
+      "RAMB36": 8,
+      "RAMB18": 0,
+      "DSP": 0,
+      "tile_equivalents": 8.0
+    },
+    "distributed": {
+      "LUT": 363,
+      "logic_LUT": 11,
+      "LUTRAM": 352,
+      "SRL": 0,
+      "FF": 512,
+      "RAMB36": 0,
+      "RAMB18": 0,
+      "DSP": 0,
+      "tile_equivalents": 0.0
+    }
+  },
+  "four_slot_actual_cycle_gate": {
+    "checked_edges": 428,
+    "same_slot_writes": 96,
+    "no_write_edges": 108,
+    "output_bits": 512
+  },
+  "scope": "Mapped four-slot bank group proof plus separate two-slot UCE integration; no whole-system16tile fit guarantee, timing/FPGA/app/performance result."
+}

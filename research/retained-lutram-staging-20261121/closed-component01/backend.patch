@@ -1,0 +1,15 @@
+diff --git a/bp_me/src/v/cce/bp_uce.sv b/bp_me/src/v/cce/bp_uce.sv
+index 466873229..56ec4dd01 100644
+--- a/bp_me/src/v/cce/bp_uce.sv
++++ b/bp_me/src/v/cce/bp_uce.sv
+@@ -962,7 +962,9 @@ module bp_uce
+   // complete line into the BRAM output registers in parallel; the existing
+   // L1 port can then drain one beat per accepted cycle with no RAM-read bubble.
+   for (genvar i = 0; i < block_size_in_fill_lp; i++) begin : prefetch_fill_bank
+-    (* ram_style = "block" *)
++    // Retained production uses shallow four-slot banks. Use LUTRAM while
++    // preserving the registered read and same-slot old-data RTL semantics.
++    (* ram_style = "distributed" *)
+     logic [fill_width_p-1:0] mem [prefetch_els_p];
+     always_ff @(posedge clk_i) begin
+       if (prefetch_full_line_p) begin

@@ -1,0 +1,2124 @@
+/**
+ *
+ * Name:
+ *   bp_uce.sv
+ *
+ * Description:
+ *   This is the top level module for the UCE
+ *
+ */
+
+`include "bp_common_defines.svh"
+`include "bp_me_defines.svh"
+
+module bp_uce
+  import bp_common_pkg::*;
+  import bp_me_pkg::*;
+  #(parameter bp_params_e bp_params_p = e_bp_default_cfg
+    `declare_bp_proc_params(bp_params_p)
+    `declare_bp_bedrock_if_widths(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p)
+    , parameter `BSG_INV_PARAM(writeback_p)
+    , parameter `BSG_INV_PARAM(assoc_p)
+    , parameter `BSG_INV_PARAM(sets_p)
+    , parameter `BSG_INV_PARAM(block_width_p)
+    , parameter `BSG_INV_PARAM(fill_width_p)
+    , parameter `BSG_INV_PARAM(data_width_p)
+    , parameter `BSG_INV_PARAM(tag_width_p)
+    , parameter `BSG_INV_PARAM(id_width_p)
+    // Noncoherent data-cache hints warm the next cache level. Each hint is a
+    // single-word read, so a banked L2 can begin the next line's miss before
+    // the preceding line has returned. Returned words are never architectural.
+    , parameter prefetch_p = writeback_p
+    , parameter prefetch_els_p = 2
+    , parameter bit prefetch_full_line_p = 1'b0
+    // Instruction replay must never lock out an architectural cache request.
+    // In this mode cache fast paths win SRAM arbitration, and a demand miss
+    // cancels any advisory installation before the demand enters the UCE.
+    , parameter bit prefetch_demand_priority_p = 1'b0
+    // D-cache full-line mode may forward the requested sector into its side
+    // buffer. I-cache replay has no such buffer and captures every beat only
+    // in the detached line store until installation.
+    , parameter bit prefetch_critical_forward_p = 1'b1
+    // Completed full-line replies may retire into a cache-local advisory
+    // buffer instead of replacing a line in the live cache arrays. This is
+    // required for instruction replay: asynchronous slow-path writes to a
+    // running banked I-cache cannot preserve the frontend's SRAM epoch.
+    , parameter bit prefetch_side_buffer_p = 1'b0
+    // Permit the context-cache integration to drain ordinary traffic without
+    // waiting for detached hint responses.  Standalone CCE users retain the
+    // conservative fence semantics by default.
+    , parameter prefetch_ignore_credits_p = 1'b0
+    // A physically indexed full-line lookaside behind ordinary L1 load misses.
+    // Its storage is external/shared; legacy UCE behavior is unchanged at 0.
+    , parameter bit retained_buffer_p = 1'b0
+
+    `declare_bp_cache_engine_generic_if_widths(paddr_width_p, tag_width_p, sets_p, assoc_p, data_width_p, block_width_p, fill_width_p, id_width_p, cache)
+    )
+   (input                                            clk_i
+    , input                                          reset_i
+
+    , input [did_width_p-1:0]                        did_i
+    , input [lce_id_width_p-1:0]                     lce_id_i
+
+    , input [cache_req_width_lp-1:0]                 cache_req_i
+    , input                                          cache_req_v_i
+    , output logic                                   cache_req_yumi_o
+    , output logic                                   cache_req_lock_o
+    , input [cache_req_metadata_width_lp-1:0]        cache_req_metadata_i
+    , input                                          cache_req_metadata_v_i
+    // Physical, permission-checked data previews enter independently of the
+    // architectural cache request/metadata pair. They warm L2 only.
+    , input [paddr_width_p-1:0]                      preview_paddr_i
+    , input                                          preview_v_i
+    , input                                          preview_cancel_i
+    , output logic                                   preview_ready_o
+    , output logic                                   preview_idle_o
+    , input                                          retained_enable_i
+    , input                                          retained_demand_capture_i
+    // Instruction redirect/abort cancels copying, not architectural request
+    // ownership. Data clients tie this low and use address-qualified kills.
+    , input                                          retained_capture_cancel_i
+    , input                                          retained_clear_i
+    , output logic                                   retained_maintenance_o
+    , input                                          retained_mutation_v_i
+    , input [paddr_width_p-1:0]                      retained_mutation_paddr_i
+    , output logic                                   retained_idle_o
+    // All lane signals use this UCE's clock (physical negative edge).
+    , output logic                                   retained_lookup_v_o
+    , input                                          retained_lookup_ready_i
+    , output logic [paddr_width_p-1:0]               retained_lookup_addr_o
+    , input                                          retained_resp_v_i
+    , output logic                                   retained_resp_ready_o
+    , input                                          retained_resp_hit_i
+    , input [block_width_p-1:0]                     retained_resp_data_i
+    , output logic                                   retained_insert_v_o
+    , input                                          retained_insert_ready_i
+    , output logic [paddr_width_p-1:0]               retained_insert_addr_o
+    , output logic [block_width_p-1:0]               retained_insert_data_o
+    , output logic                                   retained_insert_replace_o
+    , output logic                                   retained_insert_cancel_o
+    , input                                          retained_insert_done_i
+    , input                                          retained_insert_published_i
+    , input                                          retained_backend_busy_i
+    , output logic [id_width_p-1:0]                  cache_req_id_o
+    , output logic                                   cache_req_critical_o
+    , output logic                                   cache_req_last_o
+    , output logic                                   cache_req_credits_full_o
+    , output logic                                   cache_req_credits_empty_o
+
+    // Physical-address replay ingress. Full-line replay enters here so it
+    // never consumes the architectural cache request pipeline.
+    , input [paddr_width_p-1:0]                      detached_prefetch_addr_i
+    , input                                          detached_prefetch_v_i
+    , output logic                                   detached_prefetch_ready_and_o
+    // Instantaneous slot telemetry lets software distinguish controller
+    // admission from memory completion and cache retirement.  Counts include
+    // both architectural and detached prefetch ingress because they share the
+    // same slot table and downstream transport.
+    , output logic [`BSG_WIDTH(prefetch_els_p+1)-1:0] prefetch_outstanding_o
+    , output logic [`BSG_WIDTH(prefetch_els_p+1)-1:0] prefetch_complete_o
+
+    , output logic [cache_tag_mem_pkt_width_lp-1:0]  tag_mem_pkt_o
+    , output logic                                   tag_mem_pkt_v_o
+    , input                                          tag_mem_pkt_yumi_i
+    , input [cache_tag_info_width_lp-1:0]            tag_mem_i
+
+    , output logic [cache_data_mem_pkt_width_lp-1:0] data_mem_pkt_o
+    , output logic                                   data_mem_pkt_v_o
+    , input                                          data_mem_pkt_yumi_i
+    , input [block_width_p-1:0]                      data_mem_i
+
+    , output logic [cache_stat_mem_pkt_width_lp-1:0] stat_mem_pkt_o
+    , output logic                                   stat_mem_pkt_v_o
+    , input                                          stat_mem_pkt_yumi_i
+    , input [cache_stat_info_width_lp-1:0]           stat_mem_i
+
+    , output logic [mem_fwd_header_width_lp-1:0]     mem_fwd_header_o
+    , output logic [bedrock_fill_width_p-1:0]        mem_fwd_data_o
+    , output logic                                   mem_fwd_v_o
+    , input                                          mem_fwd_ready_and_i
+
+    , input [mem_rev_header_width_lp-1:0]            mem_rev_header_i
+    , input [bedrock_fill_width_p-1:0]               mem_rev_data_i
+    , input                                          mem_rev_v_i
+    , output logic                                   mem_rev_ready_and_o
+    );
+
+  localparam bank_width_lp = block_width_p / assoc_p;
+  localparam num_dwords_per_bank_lp = bank_width_lp / dword_width_gp;
+  localparam byte_offset_width_lp  = `BSG_SAFE_CLOG2(bank_width_lp>>3);
+  // Words per line == associativity
+  localparam bank_offset_width_lp  = `BSG_SAFE_CLOG2(assoc_p);
+  localparam block_offset_width_lp = (assoc_p > 1) ? (bank_offset_width_lp + byte_offset_width_lp) : byte_offset_width_lp;
+  localparam index_width_lp = `BSG_SAFE_CLOG2(sets_p);
+  localparam way_width_lp = `BSG_SAFE_CLOG2(assoc_p);
+  localparam block_size_in_fill_lp = block_width_p / fill_width_p;
+  localparam fill_size_in_bank_lp = fill_width_p / bank_width_lp;
+  localparam fill_cnt_width_lp = `BSG_SAFE_CLOG2(block_size_in_fill_lp);
+  localparam fill_offset_width_lp = `BSG_SAFE_CLOG2(fill_width_p>>3);
+  localparam bank_sub_offset_width_lp = $clog2(fill_size_in_bank_lp);
+  localparam prefetch_slot_width_lp = `BSG_SAFE_CLOG2(prefetch_els_p);
+  localparam prefetch_match_offset_width_lp = prefetch_full_line_p ? block_offset_width_lp : 4;
+  localparam prefetch_tag_width_lp = `BSG_SAFE_CLOG2(lce_assoc_p);
+  localparam prefetch_state_width_lp = $bits(bp_coh_states_e);
+  localparam prefetch_id_width_lp = prefetch_tag_width_lp + prefetch_state_width_lp;
+  localparam preview_queue_els_lp = 4;
+  localparam preview_queue_ptr_width_lp = `BSG_SAFE_CLOG2(preview_queue_els_lp);
+  localparam preview_queue_count_width_lp = `BSG_SAFE_CLOG2(preview_queue_els_lp+1);
+
+  localparam bp_bedrock_msg_size_e block_msg_size_lp = (block_width_p == 512)
+                                                       ? e_bedrock_msg_size_64
+                                                       : (block_width_p == 256)
+                                                         ? e_bedrock_msg_size_32
+                                                         : (block_width_p == 128)
+                                                           ? e_bedrock_msg_size_16
+                                                           : (block_width_p == 64)
+                                                             ? e_bedrock_msg_size_8
+                                                             : e_bedrock_msg_size_64;
+  localparam bp_bedrock_msg_size_e prefetch_msg_size_lp
+    = prefetch_full_line_p ? block_msg_size_lp : e_bedrock_msg_size_16;
+
+  `declare_bp_bedrock_if(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p);
+  `declare_bp_cache_engine_generic_if(paddr_width_p, tag_width_p, sets_p, assoc_p, data_width_p, block_width_p, fill_width_p, id_width_p, cache);
+
+  `bp_cast_i(bp_cache_req_s, cache_req);
+  `bp_cast_i(bp_cache_req_metadata_s, cache_req_metadata);
+  `bp_cast_o(bp_cache_tag_mem_pkt_s, tag_mem_pkt);
+  `bp_cast_o(bp_cache_data_mem_pkt_s, data_mem_pkt);
+  `bp_cast_o(bp_cache_stat_mem_pkt_s, stat_mem_pkt);
+
+  wire prefetch_v_li = prefetch_p & cache_req_v_i
+    & (cache_req_cast_i.msg_type == e_cache_prefetch);
+  wire detached_prefetch_v_li = prefetch_p & prefetch_full_line_p
+    & detached_prefetch_v_i;
+  logic [prefetch_els_p-1:0] prefetch_valid_r, prefetch_sent_r, prefetch_way_v_r;
+  logic [prefetch_els_p-1:0] prefetch_cancel_r;
+  logic [prefetch_els_p-1:0] prefetch_complete_r;
+  logic [prefetch_els_p-1:0] prefetch_preview_r;
+  logic [prefetch_els_p-1:0][paddr_width_p-1:0] prefetch_addr_r;
+  logic [prefetch_els_p-1:0][block_offset_width_lp-1:4] prefetch_critical_segment_r;
+  logic [prefetch_els_p-1:0][`BSG_SAFE_CLOG2(assoc_p)-1:0] prefetch_way_r;
+  logic [prefetch_els_p-1:0][fill_cnt_width_lp-1:0] prefetch_fill_count_r;
+  // Full-line mode decouples memory reception from L1 installation. Each
+  // detached request owns one line buffer, allowing responses to complete at
+  // memory speed while the single cache write port drains lines later.
+  logic [block_size_in_fill_lp-1:0][fill_width_p-1:0] prefetch_install_line_r;
+  logic prefetch_free_v, prefetch_issue_v, prefetch_duplicate_v;
+  logic detached_prefetch_duplicate_v, detached_prefetch_demand_match;
+  logic detached_prefetch_resident_demand_match;
+  logic detached_prefetch_accepted_demand_match;
+  logic [prefetch_slot_width_lp-1:0] prefetch_free_slot, prefetch_issue_slot;
+  logic prefetch_demand_match;
+  logic prefetch_issue, prefetch_response, prefetch_response_yumi;
+  logic [prefetch_slot_width_lp-1:0] prefetch_response_slot;
+  logic [prefetch_id_width_lp-1:0] prefetch_response_id;
+  logic prefetch_response_id_v;
+  logic prefetch_metadata_pending_v_r, prefetch_metadata_pending_allocated_r;
+  logic [prefetch_slot_width_lp-1:0] prefetch_metadata_pending_slot_r;
+  logic [assoc_p-1:0] prefetch_reserved_ways;
+  logic prefetch_reserved_way_available;
+  logic [`BSG_SAFE_CLOG2(assoc_p)-1:0] prefetch_reserved_way;
+  wire prefetch_metadata_can_accept = ~prefetch_metadata_pending_v_r
+    | cache_req_metadata_v_i;
+  assign prefetch_outstanding_o
+    = `BSG_WIDTH(prefetch_els_p+1)'($countones(prefetch_valid_r));
+  assign prefetch_complete_o
+    = `BSG_WIDTH(prefetch_els_p+1)'($countones(prefetch_valid_r
+                                               & prefetch_complete_r));
+  wire prefetch_accept = cache_req_yumi_o & prefetch_v_li;
+  wire prefetch_allocate = prefetch_accept & prefetch_free_v & ~prefetch_duplicate_v;
+  wire prefetch_drop = prefetch_accept & (~prefetch_free_v | prefetch_duplicate_v);
+  wire detached_prefetch_accept = detached_prefetch_v_li
+    & detached_prefetch_ready_and_o;
+  wire detached_prefetch_allocate = detached_prefetch_accept
+    & prefetch_free_v & ~detached_prefetch_duplicate_v
+    & ~detached_prefetch_demand_match;
+  bp_cache_req_s cache_req_r;
+  logic cache_req_v_r;
+  logic [preview_queue_els_lp-1:0][paddr_width_p-1:0] preview_queue_r;
+  logic [preview_queue_ptr_width_lp-1:0] preview_head_r, preview_tail_r;
+  logic [preview_queue_count_width_lp-1:0] preview_count_r;
+  logic preview_duplicate_v;
+  wire [paddr_width_p-1:0] preview_head_addr = preview_queue_r[preview_head_r];
+  assign preview_ready_o = prefetch_p & (~prefetch_full_line_p | retained_buffer_p)
+    & ~reset_i & ~preview_cancel_i & ~retained_clear
+    & (preview_count_r < preview_queue_els_lp);
+  // Page ownership may be released only after cancellation removes queued
+  // work and every issued physical reply has drained from the shared link.
+  assign preview_idle_o = (preview_count_r == '0)
+    & ~(|(prefetch_valid_r & prefetch_preview_r));
+  wire preview_enqueue = preview_v_i & preview_ready_o;
+  wire preview_demand_match = cache_req_v_r
+    & (cache_req_r.addr[paddr_width_p-1:prefetch_match_offset_width_lp]
+       == preview_head_addr[paddr_width_p-1:prefetch_match_offset_width_lp]);
+  // Demand retains priority. A queued hint takes a detached slot only when
+  // the architectural ingress is idle; duplicates and overtaken hints retire.
+  wire preview_dequeue = (preview_count_r != '0) & ~cache_req_v_i
+    & ~preview_cancel_i & ~retained_clear & ~prefetch_accept
+    & (prefetch_free_v | preview_duplicate_v | preview_demand_match);
+  wire preview_allocate = preview_dequeue & ~preview_duplicate_v
+    & ~preview_demand_match;
+
+  always_ff @(posedge clk_i) begin
+    if (reset_i | preview_cancel_i | retained_clear) begin
+      preview_head_r <= '0;
+      preview_tail_r <= '0;
+      preview_count_r <= '0;
+    end else begin
+      if (preview_enqueue) begin
+        preview_queue_r[preview_tail_r]
+          <= {preview_paddr_i[paddr_width_p-1:prefetch_match_offset_width_lp]
+              ,prefetch_match_offset_width_lp'(0)};
+        preview_tail_r <= preview_tail_r + 1'b1;
+      end
+      if (preview_dequeue)
+        preview_head_r <= preview_head_r + 1'b1;
+      case ({preview_enqueue, preview_dequeue})
+        2'b10: preview_count_r <= preview_count_r + 1'b1;
+        2'b01: preview_count_r <= preview_count_r - 1'b1;
+        default: preview_count_r <= preview_count_r;
+      endcase
+    end
+  end
+
+  // The cache replacement metadata is computed independently for each hint.
+  // Prevent multiple outstanding fills to the same set from reserving the
+  // same victim way. Prefer the cache's replacement choice, then take the
+  // lowest unreserved way. Publication updates LRU so subsequent ordinary
+  // replacement observes the installed line as recently used.
+  always_comb begin
+    prefetch_reserved_ways = '0;
+    for (int i = 0; i < prefetch_els_p; i++) begin
+      if (prefetch_valid_r[i] & prefetch_way_v_r[i] & ~prefetch_preview_r[i]
+          & (prefetch_slot_width_lp'(i) != prefetch_metadata_pending_slot_r)
+          & (prefetch_addr_r[i][block_offset_width_lp+:index_width_lp]
+             == prefetch_addr_r[prefetch_metadata_pending_slot_r][block_offset_width_lp+:index_width_lp]))
+        prefetch_reserved_ways[prefetch_way_r[i]] = 1'b1;
+    end
+    prefetch_reserved_way = cache_req_metadata_cast_i.hit_or_repl_way;
+    prefetch_reserved_way_available
+      = ~prefetch_reserved_ways[cache_req_metadata_cast_i.hit_or_repl_way];
+    for (int i = 0; i < assoc_p; i++) begin
+      if (!prefetch_reserved_way_available && !prefetch_reserved_ways[i]) begin
+        prefetch_reserved_way = way_width_lp'(i);
+        prefetch_reserved_way_available = 1'b1;
+      end
+    end
+  end
+
+  // Slots remain reserved until a narrow reply completes or a buffered full
+  // line is installed/dropped. A following demand waits behind a hint to the
+  // same physical line unless its critical sector hits in the D-cache buffer.
+  always_comb begin
+    prefetch_free_v = 1'b0;
+    prefetch_free_slot = '0;
+    prefetch_issue_v = 1'b0;
+    prefetch_issue_slot = '0;
+    prefetch_duplicate_v = 1'b0;
+    detached_prefetch_duplicate_v = 1'b0;
+    detached_prefetch_resident_demand_match = cache_req_v_r
+      & (cache_req_r.addr[paddr_width_p-1:prefetch_match_offset_width_lp]
+         == detached_prefetch_addr_i[paddr_width_p-1:prefetch_match_offset_width_lp]);
+    // The detached ingress and ordinary cache-request FIFO are independent.
+    // Include a same-edge ordinary miss acceptance so both cannot acquire the
+    // same line before either side becomes visible to the other comparator.
+    detached_prefetch_accepted_demand_match = cache_req_yumi_o
+      & ~prefetch_v_li & (miss_load_v_li | miss_store_v_li)
+      & (cache_req_cast_i.addr[paddr_width_p-1:prefetch_match_offset_width_lp]
+         == detached_prefetch_addr_i[paddr_width_p-1:prefetch_match_offset_width_lp]);
+    detached_prefetch_demand_match = detached_prefetch_resident_demand_match
+      | detached_prefetch_accepted_demand_match;
+    preview_duplicate_v = 1'b0;
+    prefetch_demand_match = 1'b0;
+    for (int i = prefetch_els_p-1; i >= 0; i--) begin
+      if (!prefetch_valid_r[i]) begin
+        prefetch_free_v = 1'b1;
+        prefetch_free_slot = prefetch_slot_width_lp'(i);
+      end
+      if (prefetch_valid_r[i] & ~prefetch_cancel_r[i]
+          & prefetch_way_v_r[i] & ~prefetch_sent_r[i]) begin
+        prefetch_issue_v = 1'b1;
+        prefetch_issue_slot = prefetch_slot_width_lp'(i);
+      end
+      if (cache_req_v_r & prefetch_valid_r[i] & ~prefetch_cancel_r[i]
+          & (prefetch_addr_r[i][paddr_width_p-1:prefetch_match_offset_width_lp]
+             == cache_req_r.addr[paddr_width_p-1:prefetch_match_offset_width_lp])) begin
+        prefetch_demand_match = 1'b1;
+      end
+      prefetch_duplicate_v |= prefetch_valid_r[i] & ~prefetch_cancel_r[i]
+        & (prefetch_addr_r[i][paddr_width_p-1:prefetch_match_offset_width_lp]
+           == cache_req_cast_i.addr[paddr_width_p-1:prefetch_match_offset_width_lp]);
+      detached_prefetch_duplicate_v |= prefetch_valid_r[i] & ~prefetch_cancel_r[i]
+        & (prefetch_addr_r[i][paddr_width_p-1:prefetch_match_offset_width_lp]
+           == detached_prefetch_addr_i[paddr_width_p-1:prefetch_match_offset_width_lp]);
+      preview_duplicate_v |= prefetch_valid_r[i] & ~prefetch_cancel_r[i]
+        & (prefetch_addr_r[i][paddr_width_p-1:prefetch_match_offset_width_lp]
+           == preview_head_addr[paddr_width_p-1:prefetch_match_offset_width_lp]);
+    end
+  end
+  // A duplicate is acknowledged because an existing slot already covers it.
+  // A replay overtaken by a same-line demand that is resident or accepted on
+  // this edge is also acknowledged but not allocated. That demand cannot
+  // withdraw to observe a later advisory-buffer publication; issuing the
+  // replay first only stalls it and then causes a redundant ordinary refill.
+  // A genuinely new line waits for capacity without occupying an I-cache
+  // stage.
+  assign detached_prefetch_ready_and_o = prefetch_p & prefetch_full_line_p
+    & (prefetch_free_v | detached_prefetch_duplicate_v
+       | detached_prefetch_demand_match)
+    & ~is_reset & ~is_init & ~inval_v_li & ~inval_v_r & ~retained_clear;
+  assign prefetch_response_id = {fsm_rev_header_li.payload.state
+                                 ,fsm_rev_header_li.payload.way_id};
+  assign prefetch_response_slot = prefetch_response_id[0+:prefetch_slot_width_lp];
+  assign prefetch_response_id_v = prefetch_response_id < prefetch_els_p;
+  wire [paddr_width_p-1:0] prefetch_response_addr
+    = prefetch_addr_r[prefetch_response_slot]
+      + (paddr_width_p'(prefetch_fill_count_r[prefetch_response_slot]) << 3);
+  wire prefetch_response_critical
+    = prefetch_response_addr[block_offset_width_lp-1:4]
+      == prefetch_critical_segment_r[prefetch_response_slot];
+
+  enum logic [4:0] {
+    e_reset
+    ,e_init
+    ,e_backoff
+    ,e_inval
+    ,e_clean_read
+    ,e_clean_scan
+    ,e_clean_write
+    ,e_clean_fence
+    ,e_bclean_evict
+    ,e_bclean_writeback_req
+    ,e_ready
+    ,e_uc_writeback_evict
+    ,e_uc_writeback_write_req
+    ,e_send_critical
+    ,e_writeback_evict
+    ,e_writeback_read_wait
+    ,e_writeback_write_req
+    ,e_write_wait
+    ,e_read_wait
+    ,e_uc_read_wait
+    ,e_retained_lookup
+    ,e_retained_wait
+    ,e_retained_fill
+  } state_n, state_r;
+
+  wire is_reset           = (state_r == e_reset);
+  wire is_backoff         = (state_r == e_backoff);
+  wire is_inval           = (state_r == e_inval);
+  wire is_init            = (state_r == e_init);
+  wire is_clean_read      = (state_r == e_clean_read);
+  wire is_clean_scan      = (state_r == e_clean_scan);
+  wire is_clean_write     = (state_r == e_clean_write);
+  wire is_clean_fence     = (state_r == e_clean_fence);
+  wire is_ready           = (state_r == e_ready);
+  wire is_send_critical   = (state_r == e_send_critical);
+  wire is_writeback_evict = (state_r == e_writeback_evict); // read dirty data from cache to UCE
+  wire is_writeback_read  = (state_r == e_writeback_read_wait); // read data from L2 to cache
+  wire is_writeback_wb    = (state_r == e_writeback_write_req); // send dirty data from UCE to L2
+  wire is_write_request   = (state_r == e_write_wait);
+  wire is_read_request    = (state_r == e_read_wait);
+  wire is_uc_read_wait    = (state_r == e_uc_read_wait);
+
+  logic cache_req_ready_lo;
+  logic cache_req_done;
+  bsg_two_fifo
+   #(.width_p($bits(bp_cache_req_s)), .ready_THEN_valid_p(1))
+   cache_req_fifo
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.data_i(cache_req_cast_i)
+     ,.v_i(cache_req_yumi_o & ~prefetch_v_li)
+     ,.ready_param_o(cache_req_ready_lo)
+
+     ,.data_o(cache_req_r)
+     ,.v_o(cache_req_v_r)
+     ,.yumi_i(cache_req_v_r & cache_req_done)
+     );
+
+  bp_cache_req_metadata_s cache_req_metadata, cache_req_metadata_r;
+  logic cache_req_metadata_v_r;
+  bsg_two_fifo
+   #(.width_p($bits(bp_cache_req_metadata_s)), .ready_THEN_valid_p(1))
+   cache_req_metadata_fifo
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.data_i(cache_req_metadata_cast_i)
+     ,.v_i(cache_req_metadata_v_i & ~prefetch_metadata_pending_v_r
+           & (cache_req_metadata_v_r | ~cache_req_done))
+     ,.ready_param_o(/* Follows cache req fifo */)
+
+     ,.data_o(cache_req_metadata_r)
+     ,.v_o(cache_req_metadata_v_r)
+     ,.yumi_i(cache_req_metadata_v_r & cache_req_done)
+     );
+  assign cache_req_metadata = cache_req_metadata_v_r ? cache_req_metadata_r : cache_req_metadata_cast_i;
+  wire cache_req_metadata_v = cache_req_metadata_v_i | cache_req_metadata_v_r;
+
+  logic [block_width_p-1:0] dirty_data_r;
+  wire dirty_data_read = data_mem_pkt_v_o & (data_mem_pkt_cast_o.opcode == e_cache_data_mem_read);
+  bsg_dff_sync_read
+   #(.width_p(block_width_p), .bypass_p(1))
+   dirty_data_reg
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.data_i(data_mem_i)
+     ,.v_n_i(dirty_data_read)
+
+     ,.data_o(dirty_data_r)
+     );
+
+  bp_cache_tag_info_s dirty_tag_r;
+  wire dirty_tag_read = tag_mem_pkt_v_o & (tag_mem_pkt_cast_o.opcode == e_cache_tag_mem_read);
+  bsg_dff_sync_read
+   #(.width_p($bits(bp_cache_tag_info_s)), .bypass_p(1))
+   dirty_tag_reg
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.data_i(tag_mem_i)
+     ,.v_n_i(dirty_tag_read)
+
+     ,.data_o(dirty_tag_r)
+     );
+
+  bp_cache_stat_info_s dirty_stat_r;
+  wire dirty_stat_read = stat_mem_pkt_v_o & (stat_mem_pkt_cast_o.opcode == e_cache_stat_mem_read);
+  bsg_dff_sync_read
+   #(.width_p($bits(bp_cache_stat_info_s)), .bypass_p(1))
+   dirty_stat_reg
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.data_i(stat_mem_i)
+     ,.v_n_i(dirty_stat_read)
+
+     ,.data_o(dirty_stat_r)
+     );
+
+  bp_bedrock_mem_fwd_header_s fsm_fwd_header_lo;
+  logic [fill_width_p-1:0] fsm_fwd_data_lo;
+  logic fsm_fwd_v_lo, fsm_fwd_ready_then_li;
+  logic [paddr_width_p-1:0] fsm_fwd_addr_lo;
+  logic fsm_fwd_new_lo, fsm_fwd_critical_lo, fsm_fwd_last_lo;
+  bp_me_stream_pump_out
+   #(.bp_params_p(bp_params_p)
+     ,.data_width_p(fill_width_p)
+     ,.payload_width_p(mem_fwd_payload_width_lp)
+     ,.msg_stream_mask_p(mem_fwd_stream_mask_gp)
+     ,.fsm_stream_mask_p(mem_fwd_stream_mask_gp)
+     )
+   fwd_pump_out
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.msg_header_o(mem_fwd_header_o)
+     ,.msg_data_o(mem_fwd_data_o)
+     ,.msg_v_o(mem_fwd_v_o)
+     ,.msg_ready_and_i(mem_fwd_ready_and_i)
+
+     ,.fsm_header_i(fsm_fwd_header_lo)
+     ,.fsm_data_i(fsm_fwd_data_lo)
+     ,.fsm_v_i(fsm_fwd_v_lo)
+     ,.fsm_ready_then_o(fsm_fwd_ready_then_li)
+     ,.fsm_addr_o(fsm_fwd_addr_lo)
+     ,.fsm_new_o(fsm_fwd_new_lo)
+     ,.fsm_critical_o(fsm_fwd_critical_lo)
+     ,.fsm_last_o(fsm_fwd_last_lo)
+     );
+
+  bp_bedrock_mem_rev_header_s fsm_rev_header_li;
+  logic [fill_width_p-1:0] fsm_rev_data_li;
+  logic fsm_rev_v_li, fsm_rev_yumi_lo;
+  logic [paddr_width_p-1:0] fsm_rev_addr_li;
+  logic fsm_rev_new_li, fsm_rev_critical_li, fsm_rev_last_li;
+  bp_me_stream_pump_in
+   #(.bp_params_p(bp_params_p)
+     ,.data_width_p(fill_width_p)
+     ,.payload_width_p(mem_rev_payload_width_lp)
+     ,.msg_stream_mask_p(mem_rev_stream_mask_gp)
+     ,.fsm_stream_mask_p(mem_rev_stream_mask_gp)
+     )
+   rev_pump_in
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.msg_header_i(mem_rev_header_i)
+     ,.msg_data_i(mem_rev_data_i)
+     ,.msg_v_i(mem_rev_v_i)
+     ,.msg_ready_and_o(mem_rev_ready_and_o)
+
+     ,.fsm_header_o(fsm_rev_header_li)
+     ,.fsm_data_o(fsm_rev_data_li)
+     ,.fsm_v_o(fsm_rev_v_li)
+     ,.fsm_yumi_i(fsm_rev_yumi_lo)
+     ,.fsm_addr_o(fsm_rev_addr_li)
+     ,.fsm_new_o(fsm_rev_new_li)
+     ,.fsm_critical_o(fsm_rev_critical_li)
+     ,.fsm_last_o(fsm_rev_last_li)
+     );
+
+  // We check for uncached stores ealier than other requests, because they get sent out in ready
+  wire miss_load_v_li   = cache_req_v_i & cache_req_cast_i.msg_type inside {e_miss_load};
+  wire miss_store_v_li  = cache_req_v_i & cache_req_cast_i.msg_type inside {e_miss_store};
+  wire miss_v_li        = cache_req_v_i & miss_load_v_li | miss_store_v_li;
+  wire wt_store_v_li    = cache_req_v_i & cache_req_cast_i.msg_type inside {e_wt_store};
+  wire uc_load_v_li     = cache_req_v_i & cache_req_cast_i.msg_type inside {e_uc_load};
+  wire uc_store_v_li    = cache_req_v_i & cache_req_cast_i.msg_type inside {e_uc_store};
+  wire uc_amo_v_li      = cache_req_v_i & cache_req_cast_i.msg_type inside {e_uc_amo};
+  wire uc_evict_v_li    = (uc_load_v_li | uc_store_v_li | uc_amo_v_li) & writeback_p & cache_req_cast_i.hit;
+  wire inval_v_li       = cache_req_v_i & cache_req_cast_i.msg_type inside {e_cache_inval};
+  wire clean_v_li       = cache_req_v_i & cache_req_cast_i.msg_type inside {e_cache_clean};
+  wire flush_v_li       = cache_req_v_i & cache_req_cast_i.msg_type inside {e_cache_flush};
+  wire binval_v_li      = cache_req_v_i & cache_req_cast_i.msg_type inside {e_cache_binval};
+  wire bclean_v_li      = cache_req_v_i & cache_req_cast_i.msg_type inside {e_cache_bclean};
+  wire nonblocking_v_li = cache_req_v_i & (uc_store_v_li | wt_store_v_li) & ~uc_evict_v_li;
+  // A fence.i is complete only after the ordinary invalidation request is
+  // accepted. At that boundary, no replay line from the preceding instruction
+  // epoch may subsequently become visible in L1. Unsent/buffered lines can be
+  // discarded immediately; issued packets retain their slots solely so their
+  // tagged replies can be drained from the shared reverse link.
+  wire prefetch_cancel_all = (cache_req_yumi_o & inval_v_li)
+    | retained_clear;
+
+  wire store_resp_v_li  = fsm_rev_v_li & fsm_rev_header_li.msg_type inside {e_bedrock_mem_wr};
+  wire load_resp_v_li   = fsm_rev_v_li & ~fsm_rev_header_li.payload.prefetch
+    & fsm_rev_header_li.msg_type inside {e_bedrock_mem_rd, e_bedrock_mem_amo};
+  wire prefetch_response_header = prefetch_p & fsm_rev_v_li
+    & fsm_rev_header_li.payload.prefetch
+    & (fsm_rev_header_li.msg_type == e_bedrock_mem_rd);
+  assign prefetch_response = prefetch_response_header & prefetch_response_id_v
+    & (prefetch_response_id_v
+       ? prefetch_valid_r[prefetch_response_slot]
+         & prefetch_sent_r[prefetch_response_slot]
+       : 1'b0);
+  wire miss_load_v_r   = cache_req_v_r & cache_req_r.msg_type inside {e_miss_load};
+  wire miss_store_v_r  = cache_req_v_r & cache_req_r.msg_type inside {e_miss_store};
+  wire miss_v_r        = cache_req_v_r & miss_load_v_r | miss_store_v_r;
+  wire wt_store_v_r    = cache_req_v_r & cache_req_r.msg_type inside {e_wt_store};
+  wire uc_load_v_r     = cache_req_v_r & cache_req_r.msg_type inside {e_uc_load};
+  wire uc_store_v_r    = cache_req_v_r & cache_req_r.msg_type inside {e_uc_store};
+  wire uc_amo_v_r      = cache_req_v_r & cache_req_r.msg_type inside {e_uc_amo};
+  wire uc_evict_v_r    = (uc_load_v_r | uc_store_v_r | uc_amo_v_r) & writeback_p & cache_req_r.hit;
+  wire inval_v_r       = cache_req_v_r & cache_req_r.msg_type inside {e_cache_inval};
+  wire clean_v_r       = cache_req_v_r & cache_req_r.msg_type inside {e_cache_clean};
+  wire flush_v_r       = cache_req_v_r & cache_req_r.msg_type inside {e_cache_flush};
+  wire binval_v_r      = cache_req_v_r & cache_req_r.msg_type inside {e_cache_binval};
+  wire bclean_v_r      = cache_req_v_r & cache_req_r.msg_type inside {e_cache_bclean};
+  wire nonblocking_v_r = cache_req_v_r & (uc_store_v_r | wt_store_v_r) & ~uc_evict_v_r;
+
+  wire [block_size_in_fill_lp-1:0] fill_index_shift = (assoc_p > 1) ? (fsm_rev_addr_li[byte_offset_width_lp+:bank_offset_width_lp] >> bank_sub_offset_width_lp) : '0;
+
+  logic retained_hit_r;
+  logic [block_width_p-1:0] retained_hit_data_r;
+  logic [fill_cnt_width_lp-1:0] retained_fill_count_r;
+  logic [block_width_p-1:0] retained_capture_data_r, retained_pending_data_r;
+  logic [block_size_in_fill_lp-1:0] retained_capture_mask_r;
+  logic retained_demand_cancel_r, retained_pending_v_r;
+  logic [paddr_width_p-1:0] retained_pending_addr_r;
+  logic retained_insert_owned_r, retained_insert_pf_r;
+  logic [paddr_width_p-1:0] retained_insert_addr_r;
+  wire retained_mutation = retained_buffer_p & retained_mutation_v_i;
+  wire retained_maintenance_v_li
+    = inval_v_li | clean_v_li | flush_v_li | binval_v_li | bclean_v_li;
+  wire retained_clear = retained_buffer_p & (retained_clear_i | retained_maintenance_o);
+  wire retained_demand_mutation = retained_mutation
+    & (retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]
+       == cache_req_r.addr[paddr_width_p-1:block_offset_width_lp]);
+  wire retained_pending_mutation = retained_mutation
+    & (retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]
+       == retained_pending_addr_r[paddr_width_p-1:block_offset_width_lp]);
+  wire retained_owned_mutation = retained_mutation
+    & (retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]
+       == retained_insert_addr_r[paddr_width_p-1:block_offset_width_lp]);
+  assign retained_lookup_v_o = retained_buffer_p & retained_enable_i & ~retained_clear
+    & (state_r == e_retained_lookup);
+  assign retained_lookup_addr_o
+    = {cache_req_r.addr[paddr_width_p-1:block_offset_width_lp],block_offset_width_lp'(0)};
+  assign retained_resp_ready_o = retained_buffer_p & (state_r == e_retained_wait);
+  assign retained_insert_replace_o = 1'b1;
+  assign retained_insert_cancel_o = retained_buffer_p
+    & (retained_clear | (retained_insert_owned_r
+       & (retained_owned_mutation
+          | (retained_insert_pf_r ? ~retained_enable_i
+             : (~retained_demand_capture_i | retained_capture_cancel_i)))));
+
+  logic [index_width_lp-1:0] index_cnt;
+  logic index_clear, index_up;
+  bsg_counter_clear_up
+   #(.max_val_p(sets_p-1)
+     ,.init_val_p(0)
+     ,.disable_overflow_warning_p(1)
+     )
+   index_counter
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.clear_i(index_clear)
+     ,.up_i(index_up)
+
+     ,.count_o(index_cnt)
+     );
+  wire index_done = index_up && ((sets_p == 1) || (index_cnt == sets_p-1));
+
+  logic [`BSG_SAFE_CLOG2(assoc_p)-1:0] way_cnt;
+  logic way_clear, way_up;
+  bsg_counter_clear_up
+   #(.max_val_p(assoc_p-1)
+     ,.init_val_p(0)
+     ,.disable_overflow_warning_p(1)
+     )
+   way_counter
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     ,.clear_i(way_clear)
+     ,.up_i(way_up)
+
+     ,.count_o(way_cnt)
+     );
+  wire way_done = way_up && ((assoc_p == 1) || (way_cnt == assoc_p-1));
+
+  // Outstanding Requests Counter - counts all requests, cached and uncached
+  //
+  logic [`BSG_WIDTH(coh_noc_max_credits_p)-1:0] credit_count_lo;
+  bsg_flow_counter
+   #(.els_p(coh_noc_max_credits_p), .ready_THEN_valid_p(1))
+   credit_counter
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+
+     // Count a transaction as outstanding as soon as its first forward beat is
+     // accepted. Store responses can return before the final beat of a streamed
+     // write leaves the UCE.
+     ,.v_i(fsm_fwd_v_lo & fsm_fwd_new_lo)
+     ,.ready_param_i(fsm_fwd_ready_then_li)
+
+     // credit returned when memory response fully consumed
+     ,.yumi_i(fsm_rev_yumi_lo & fsm_rev_last_li)
+     ,.count_o(credit_count_lo)
+     );
+  assign cache_req_credits_full_o  = (credit_count_lo == coh_noc_max_credits_p);
+  // Context handoff may proceed when the only outstanding credits belong to
+  // detached hints.  Their responses are independently matched and installed
+  // in L1, so making the architectural switch wait for them serializes the
+  // very latency that prefetching is intended to hide.
+  wire [`BSG_WIDTH(coh_noc_max_credits_p)-1:0] prefetch_outstanding_count
+    = `BSG_WIDTH(coh_noc_max_credits_p)'($countones(prefetch_sent_r & ~prefetch_complete_r));
+
+  // Detached hints reserve distinct ways relative to one another, but stores
+  // and ordinary fills may change the set while memory is outstanding. Validate
+  // the current victim under a short cache lock when the reply arrives. An
+  // unsafe reply remains advisory and can be drained without touching L1.
+  typedef enum logic [3:0] {
+    e_pf_idle, e_pf_drain, e_pf_read_tag, e_pf_check_tag,
+    e_pf_read_stat, e_pf_check_stat,
+    e_pf_invalidate, e_pf_fill, e_pf_publish, e_pf_drop
+  } prefetch_install_state_e;
+  prefetch_install_state_e prefetch_install_state_r;
+  logic [prefetch_slot_width_lp-1:0] prefetch_install_slot_r;
+  logic [`BSG_SAFE_CLOG2(assoc_p)-1:0] prefetch_install_probe_way_r;
+  logic [fill_cnt_width_lp-1:0] prefetch_install_count_r;
+  logic [1:0] prefetch_install_drain_r;
+  logic prefetch_install_clean_r;
+  bp_cache_stat_info_s prefetch_install_stat;
+  assign prefetch_install_stat = stat_mem_i;
+  bp_cache_tag_info_s prefetch_install_tag;
+  assign prefetch_install_tag = tag_mem_i;
+  wire prefetch_install_tag_match
+    = (prefetch_install_tag.state != e_COH_I)
+      & (prefetch_install_tag.tag
+         == prefetch_addr_r[prefetch_install_slot_r]
+              [block_offset_width_lp+index_width_lp+:tag_width_p]);
+
+  logic [assoc_p-1:0] prefetch_install_reserved_ways;
+  logic prefetch_install_way_available;
+  logic [`BSG_SAFE_CLOG2(assoc_p)-1:0] prefetch_install_way;
+  logic [`BSG_SAFE_MINUS(assoc_p, 2):0] prefetch_install_lru_modify_mask;
+  logic [`BSG_SAFE_MINUS(assoc_p, 2):0] prefetch_install_lru_modify_data;
+  logic [`BSG_SAFE_MINUS(assoc_p, 2):0] prefetch_install_lru;
+  logic [`BSG_SAFE_CLOG2(assoc_p)-1:0] prefetch_install_lru_way;
+
+  bsg_lru_pseudo_tree_backup
+   #(.ways_p(assoc_p))
+   prefetch_install_lru_backup
+    (.disabled_ways_i(prefetch_install_stat.dirty | prefetch_install_reserved_ways)
+     ,.modify_mask_o(prefetch_install_lru_modify_mask)
+     ,.modify_data_o(prefetch_install_lru_modify_data)
+     );
+
+  assign prefetch_install_lru
+    = (prefetch_install_stat.lru & ~prefetch_install_lru_modify_mask)
+      | (prefetch_install_lru_modify_data & prefetch_install_lru_modify_mask);
+
+  bsg_lru_pseudo_tree_encode
+   #(.ways_p(assoc_p))
+   prefetch_install_lru_encoder
+    (.lru_i(prefetch_install_lru)
+     ,.way_id_o(prefetch_install_lru_way)
+     );
+
+  always_comb begin
+    prefetch_install_reserved_ways = '0;
+    for (int i = 0; i < prefetch_els_p; i++) begin
+      if (prefetch_valid_r[i] & prefetch_way_v_r[i] & ~prefetch_preview_r[i]
+          & (prefetch_slot_width_lp'(i) != prefetch_install_slot_r)
+          & (prefetch_addr_r[i][block_offset_width_lp+:index_width_lp]
+             == prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp]))
+        prefetch_install_reserved_ways[prefetch_way_r[i]] = 1'b1;
+    end
+
+    // Keep the reserved choice when it is still safe. If its line became
+    // dirty while memory was outstanding, select another clean way that is
+    // not owned by a same-set detached fill. The full dirty vector is only
+    // authoritative after the locked stat-memory read below.
+    prefetch_install_way = prefetch_way_r[prefetch_install_slot_r];
+    prefetch_install_way_available
+      = ~prefetch_install_stat.dirty[prefetch_way_r[prefetch_install_slot_r]]
+        & ~prefetch_install_reserved_ways[prefetch_way_r[prefetch_install_slot_r]];
+    if (!prefetch_install_way_available) begin
+      prefetch_install_way = prefetch_install_lru_way;
+      prefetch_install_way_available
+        = ~&(prefetch_install_stat.dirty | prefetch_install_reserved_ways);
+    end
+  end
+
+  logic prefetch_complete_v;
+  logic [prefetch_slot_width_lp-1:0] prefetch_complete_slot;
+  always_comb begin
+    prefetch_complete_v = 1'b0;
+    prefetch_complete_slot = '0;
+    for (int i = prefetch_els_p-1; i >= 0; i--)
+      if (prefetch_complete_r[i] & ~prefetch_cancel_r[i]) begin
+        prefetch_complete_v = 1'b1;
+        prefetch_complete_slot = prefetch_slot_width_lp'(i);
+      end
+  end
+
+  // Live-cache full-line replies first land in per-request fill buffers and
+  // the installer drains completed buffers independently. Detached I-cache
+  // replies stream to the cache-local advisory store instead; narrow mode
+  // retains only the two useful words in the D-cache side buffer. Both modes
+  // therefore leave this installer idle.
+  wire prefetch_install_begin = prefetch_full_line_p & ~prefetch_side_buffer_p
+    & prefetch_complete_v
+    & (prefetch_install_state_r == e_pf_idle);
+  wire prefetch_install_safe_to_wait
+    = (credit_count_lo == prefetch_outstanding_count);
+  wire prefetch_install_available = prefetch_install_safe_to_wait
+    & (is_ready | is_backoff)
+    & ~cache_req_v_r & ~cache_req_metadata_v_r & ~cache_req_metadata_v_i
+    & ~prefetch_metadata_pending_v_r
+    // Do not acquire the installer in the same cycle that demand priority
+    // allows an architectural request to enter the UCE. Otherwise both become
+    // resident at the following edge and each waits for the other to retire.
+    & ~(prefetch_demand_priority_p & cache_req_v_i);
+  wire prefetch_install_acquire = prefetch_install_begin & prefetch_install_available;
+  wire prefetch_install_owned = prefetch_install_acquire
+    | (prefetch_install_state_r inside {e_pf_drain, e_pf_read_tag, e_pf_check_tag,
+                                       e_pf_read_stat, e_pf_check_stat,
+                                       e_pf_invalidate, e_pf_fill, e_pf_publish});
+  // Hold cache-array ownership through data installation and tag publication.
+  // Per-port handshakes prevent an individual write collision, but they do
+  // not make a multi-beat line replacement atomic with respect to a live
+  // I-cache frontend: a fetch can otherwise observe a partially replaced way
+  // or the publication boundary with stale SRAM output state.
+  wire prefetch_install_lock = ~prefetch_side_buffer_p
+    & (prefetch_install_acquire
+       | (prefetch_install_state_r inside {e_pf_drain, e_pf_read_tag, e_pf_check_tag,
+                                          e_pf_read_stat, e_pf_check_stat,
+                                          e_pf_invalidate, e_pf_fill, e_pf_publish}));
+  // Maintenance and prefetch opcodes are exclusive. Derive the exact ordinary
+  // maintenance acceptance independently of the mixed request yumi: prefetch
+  // yumi depends on retained_clear, which includes this same-cycle pulse.
+  // Preserve the final installer's ordinary-request suppression, including
+  // demand priority. No clear is delayed and the common yumi path is unchanged.
+  assign retained_maintenance_o = retained_buffer_p & retained_maintenance_v_li
+    & is_ready & cache_req_ready_lo & ~cache_req_v_r
+    & ~(prefetch_install_owned & ~(prefetch_demand_priority_p & cache_req_v_i));
+  wire prefetch_install_retire
+    = (prefetch_install_state_r == e_pf_drop)
+      | (prefetch_side_buffer_p
+         & (prefetch_install_state_r == e_pf_fill)
+         & data_mem_pkt_v_o & data_mem_pkt_yumi_i
+         & (prefetch_install_count_r == fill_cnt_width_lp'(block_size_in_fill_lp-1)))
+      | ((prefetch_install_state_r == e_pf_publish)
+         & (retained_buffer_p
+            ? (retained_insert_owned_r & retained_insert_pf_r & retained_insert_done_i)
+            : (tag_mem_pkt_v_o & tag_mem_pkt_yumi_i & stat_mem_pkt_yumi_i)));
+  wire prefetch_install_packet = prefetch_response
+    & (prefetch_response_slot == prefetch_install_slot_r);
+  wire prefetch_install_full = prefetch_complete_r[prefetch_install_slot_r];
+  // A physical preview may have read old L2 data before a dirty normal line
+  // was evicted. Once that line leaves L1, the resident scan alone cannot
+  // identify the stale reply. Cancel the still-owned packet at the actual
+  // writeback boundary; ordinary ownership/credits prevent publication until
+  // after this boundary. Later reads observe the ordered writeback instead.
+  wire retained_writeback = retained_buffer_p & fsm_fwd_v_lo & fsm_fwd_ready_then_li
+    & (fsm_fwd_header_lo.msg_type == e_bedrock_mem_wr);
+
+  wire retained_prefetch_mutation = retained_mutation
+    & (retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]
+       == prefetch_addr_r[prefetch_install_slot_r][paddr_width_p-1:block_offset_width_lp]);
+  wire retained_pending_safe = retained_pending_v_r & ~retained_pending_mutation
+    & retained_demand_capture_i & ~retained_capture_cancel_i;
+  wire retained_prefetch_safe = (prefetch_install_state_r == e_pf_publish)
+    & prefetch_install_full & ~prefetch_cancel_r[prefetch_install_slot_r]
+    & ~retained_prefetch_mutation;
+  assign retained_insert_v_o = retained_buffer_p & ~retained_clear
+    & ~retained_insert_owned_r & (retained_pending_safe | (retained_prefetch_safe & retained_enable_i));
+  assign retained_insert_addr_o = retained_pending_safe ? retained_pending_addr_r
+    : prefetch_addr_r[prefetch_install_slot_r];
+  assign retained_insert_data_o = retained_pending_safe ? retained_pending_data_r
+    : prefetch_install_line_r;
+  wire retained_insert_accept = retained_insert_v_o & retained_insert_ready_i;
+  assign retained_idle_o = !retained_buffer_p
+    | (~retained_backend_busy_i & ~retained_pending_v_r & ~retained_insert_owned_r
+       & (is_ready | is_backoff) & ~cache_req_v_r & ~cache_req_metadata_v_r
+       & ~cache_req_v_i & ~cache_req_metadata_v_i
+       & ~preview_v_i & ~detached_prefetch_v_i
+       & ~prefetch_metadata_pending_v_r & (credit_count_lo == '0)
+       & ~(|prefetch_valid_r) & (preview_count_r == '0));
+
+  // Capture only accepted ordinary full load-refill beats. The memory stream
+  // can be critical-first; use its actual physical fill index, not arrival
+  // order. A partial/cancelled packet never becomes a retained full line.
+  wire retained_capture_beat = retained_buffer_p & miss_load_v_r
+    & load_resp_v_li & load_resp_yumi_lo
+    & (fsm_rev_header_li.size == block_msg_size_lp);
+  logic [block_width_p-1:0] retained_capture_next_data;
+  logic [block_size_in_fill_lp-1:0] retained_capture_next_mask;
+  always_comb begin
+    retained_capture_next_data = retained_capture_data_r;
+    retained_capture_next_data[fill_width_p*fill_index_shift+:fill_width_p] = fsm_rev_data_li;
+    retained_capture_next_mask = (fsm_rev_new_li ? '0 : retained_capture_mask_r)
+      | (block_size_in_fill_lp'(1) << fill_index_shift);
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (reset_i) begin
+      retained_hit_r <= 1'b0;
+      retained_fill_count_r <= '0;
+      retained_capture_mask_r <= '0;
+      retained_demand_cancel_r <= 1'b0;
+      retained_pending_v_r <= 1'b0;
+      retained_pending_addr_r <= '0;
+      retained_insert_owned_r <= 1'b0;
+      retained_insert_pf_r <= 1'b0;
+      retained_insert_addr_r <= '0;
+    end else if (retained_buffer_p) begin
+      if (cache_req_yumi_o & ~prefetch_v_li) begin
+        retained_hit_r <= 1'b0;
+        retained_capture_mask_r <= '0;
+        retained_demand_cancel_r <= ~retained_demand_capture_i | retained_capture_cancel_i | retained_clear
+          | (retained_mutation
+             & (retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]
+                == cache_req_cast_i.addr[paddr_width_p-1:block_offset_width_lp]));
+      end else if (retained_clear | ~retained_demand_capture_i | retained_capture_cancel_i | retained_demand_mutation)
+        retained_demand_cancel_r <= 1'b1;
+      if (retained_resp_v_i & retained_resp_ready_o) begin
+        retained_hit_r <= retained_resp_hit_i & retained_enable_i
+          & ~retained_clear & ~retained_demand_mutation;
+        retained_hit_data_r <= retained_resp_data_i;
+        retained_fill_count_r <= '0;
+      end
+      if ((state_r == e_retained_fill) & data_mem_pkt_yumi_i
+          & ((retained_fill_count_r != '0) | tag_mem_pkt_yumi_i))
+        retained_fill_count_r <= retained_fill_count_r + 1'b1;
+      if (retained_insert_accept) begin
+        retained_insert_owned_r <= 1'b1;
+        retained_insert_pf_r <= ~retained_pending_safe;
+        retained_insert_addr_r <= retained_insert_addr_o;
+        if (retained_pending_safe) retained_pending_v_r <= 1'b0;
+      end
+      if (retained_insert_owned_r & retained_insert_done_i)
+        retained_insert_owned_r <= 1'b0;
+      if (retained_capture_beat) begin
+        retained_capture_data_r <= retained_capture_next_data;
+        retained_capture_mask_r <= retained_capture_next_mask;
+        if (fsm_rev_last_li & (&retained_capture_next_mask)
+            & retained_demand_capture_i & ~retained_capture_cancel_i & ~retained_clear & ~retained_demand_cancel_r
+            & ~retained_demand_mutation) begin
+          // This pending copy is advisory. The architectural memory response
+          // never waits for a retained insertion port. An older unpublished
+          // pending copy may be replaced; no partial line is ever exposed.
+          retained_pending_v_r <= 1'b1;
+          retained_pending_data_r <= retained_capture_next_data;
+          retained_pending_addr_r <= retained_lookup_addr_o;
+        end
+      end
+      // Mutation/clear wins same-cycle accepted insertion and final refill.
+      if (retained_clear | ~retained_demand_capture_i | retained_capture_cancel_i | retained_pending_mutation)
+        retained_pending_v_r <= 1'b0;
+    end
+  end
+
+  // Bank by line beat so every bank has one response-write port and one
+  // independent installer-read port. Selecting an install slot loads the
+  // complete line into registered outputs in parallel; the existing
+  // L1 port can then drain one beat per accepted cycle with no RAM-read bubble.
+  for (genvar i = 0; i < block_size_in_fill_lp; i++) begin : prefetch_fill_bank
+    // Retained production uses shallow four-slot banks. Use LUTRAM while
+    // preserving the registered read and same-slot old-data RTL semantics.
+    (* ram_style = "distributed" *)
+    logic [fill_width_p-1:0] mem [prefetch_els_p];
+    always_ff @(posedge clk_i) begin
+      if (prefetch_full_line_p) begin
+        if (prefetch_response_yumi
+            && (prefetch_fill_count_r[prefetch_response_slot] == fill_cnt_width_lp'(i)))
+          mem[prefetch_response_slot] <= fsm_rev_data_li;
+        prefetch_install_line_r[i] <= mem[prefetch_install_slot_r];
+      end
+    end
+  end
+  assign cache_req_credits_empty_o = ~cache_req_v_r
+    && (prefetch_ignore_credits_p
+        ? (credit_count_lo == prefetch_outstanding_count)
+        : ((credit_count_lo == 0) && !(|prefetch_valid_r)
+           && (preview_count_r == '0)));
+  wire cache_req_credit_ready_lo = ~cache_req_credits_full_o | ~fsm_fwd_new_lo;
+  logic [fill_width_p-1:0] writeback_data;
+  wire [fill_cnt_width_lp-1:0] dirty_data_select = fsm_fwd_addr_lo[fill_offset_width_lp+:fill_cnt_width_lp];
+  bsg_mux
+   #(.width_p(fill_width_p), .els_p(block_size_in_fill_lp))
+   writeback_mux
+    (.data_i(dirty_data_r)
+     ,.sel_i(dirty_data_select)
+     ,.data_o(writeback_data)
+     );
+
+  bp_cache_req_wr_subop_e cache_wr_subop;
+  bp_bedrock_wr_subop_e mem_wr_subop;
+  always_comb
+    begin
+      cache_wr_subop = cache_req_r.subop;
+      unique case (cache_wr_subop)
+        e_req_amolr  : mem_wr_subop = e_bedrock_amolr;
+        e_req_amosc  : mem_wr_subop = e_bedrock_amosc;
+        e_req_amoswap: mem_wr_subop = e_bedrock_amoswap;
+        e_req_amoadd : mem_wr_subop = e_bedrock_amoadd;
+        e_req_amoxor : mem_wr_subop = e_bedrock_amoxor;
+        e_req_amoand : mem_wr_subop = e_bedrock_amoand;
+        e_req_amoor  : mem_wr_subop = e_bedrock_amoor;
+        e_req_amomin : mem_wr_subop = e_bedrock_amomin;
+        e_req_amomax : mem_wr_subop = e_bedrock_amomax;
+        e_req_amominu: mem_wr_subop = e_bedrock_amominu;
+        e_req_amomaxu: mem_wr_subop = e_bedrock_amomaxu;
+        default : mem_wr_subop = e_bedrock_store;
+      endcase
+    end
+
+  // We ack mem_revs for stores no matter what, so load_resp_yumi_lo is for other responses
+  logic load_resp_yumi_lo;
+  // Installed replies retire after tag publication; dropped replies simply drain.
+  assign fsm_rev_yumi_lo = load_resp_yumi_lo | store_resp_v_li | prefetch_response_yumi;
+  assign cache_req_id_o = cache_req_r.id;
+  // Demand priority controls whether a newly visible miss aborts advisory
+  // installation; it must not disable the cache-array exclusion lock.  In
+  // particular, I-cache hits never enter the UCE as cache_req_v_i, so masking
+  // this lock in demand-priority mode lets live frontend SRAM reads interleave
+  // with the installer's tag/stat/invalidate transactions.
+  assign cache_req_lock_o = is_reset | is_init | inval_v_r | clean_v_r | flush_v_r
+    | prefetch_install_lock;
+  logic blocking_req_v_lo;
+  always_comb
+    begin
+      cache_req_yumi_o = '0;
+
+      index_up    = '0;
+      index_clear = '0;
+      way_up      = '0;
+      way_clear   = '0;
+
+      tag_mem_pkt_cast_o  = '0;
+      tag_mem_pkt_v_o     = '0;
+      data_mem_pkt_cast_o = '0;
+      data_mem_pkt_v_o    = '0;
+      stat_mem_pkt_cast_o = '0;
+      stat_mem_pkt_v_o    = '0;
+
+      cache_req_critical_o = '0;
+      cache_req_last_o = '0;
+      cache_req_done = '0;
+
+      fsm_fwd_header_lo = '0;
+      fsm_fwd_data_lo = '0;
+      fsm_fwd_v_lo = '0;
+
+      load_resp_yumi_lo = '0;
+      prefetch_response_yumi = '0;
+      prefetch_issue = '0;
+
+      state_n = state_r;
+
+      unique case (state_r)
+        e_reset:
+          begin
+            state_n = e_init;
+          end
+
+        e_init, e_inval:
+          begin
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_clear;
+            tag_mem_pkt_cast_o.index  = index_cnt;
+            tag_mem_pkt_v_o = 1'b1;
+
+            stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_set_clear;
+            stat_mem_pkt_cast_o.index  = index_cnt;
+            stat_mem_pkt_v_o = 1'b1;
+
+            index_up = tag_mem_pkt_yumi_i & stat_mem_pkt_yumi_i;
+
+            cache_req_critical_o = is_inval & index_done;
+            cache_req_last_o = cache_req_critical_o;
+            cache_req_done = cache_req_last_o;
+
+            state_n = (index_done & index_up) ? e_ready : state_r;
+          end
+
+        e_backoff:
+          begin
+            state_n = fsm_fwd_ready_then_li ? e_ready : state_r;
+          end
+
+        e_clean_read:
+          begin
+            stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_read;
+            stat_mem_pkt_cast_o.index  = index_cnt;
+            stat_mem_pkt_v_o = 1'b1;
+
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_inval;
+            tag_mem_pkt_cast_o.index = index_cnt;
+            tag_mem_pkt_v_o = flush_v_r;
+
+            state_n = (stat_mem_pkt_yumi_i & (~tag_mem_pkt_v_o | tag_mem_pkt_yumi_i))
+                      ? e_clean_scan
+                      : state_r;
+          end
+
+        e_clean_scan:
+          if (~|dirty_stat_r)
+            begin
+              way_clear = 1'b1;
+              index_up  = way_clear;
+
+              state_n = index_done
+                        ? e_clean_fence
+                        : e_clean_read;
+            end
+          else if (dirty_stat_r[way_cnt])
+            begin
+              data_mem_pkt_cast_o.opcode     = e_cache_data_mem_read;
+              data_mem_pkt_cast_o.index      = index_cnt;
+              data_mem_pkt_cast_o.way_id     = way_cnt;
+              data_mem_pkt_cast_o.fill_index = {block_size_in_fill_lp{1'b1}};
+              data_mem_pkt_v_o = 1'b1;
+
+              tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_read;
+              tag_mem_pkt_cast_o.index  = index_cnt;
+              tag_mem_pkt_cast_o.way_id = way_cnt;
+              tag_mem_pkt_v_o = 1'b1;
+
+              stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_clear_dirty;
+              stat_mem_pkt_cast_o.index  = index_cnt;
+              stat_mem_pkt_cast_o.way_id = way_cnt;
+              stat_mem_pkt_v_o = 1'b1;
+
+              state_n = (data_mem_pkt_yumi_i & tag_mem_pkt_yumi_i & stat_mem_pkt_yumi_i)
+                        ? e_clean_write
+                        : state_r;
+            end
+          else
+            begin
+              way_up   = 1'b1;
+              index_up = way_done;
+
+              state_n = (index_done & way_done)
+                        ? e_clean_fence
+                        : way_done
+                          ? e_clean_read
+                          : e_clean_scan;
+            end
+
+        e_clean_write:
+          begin
+            fsm_fwd_header_lo.msg_type       = e_bedrock_mem_wr;
+            fsm_fwd_header_lo.addr           = {dirty_tag_r.tag, index_cnt, block_offset_width_lp'(0)};
+            fsm_fwd_header_lo.size           = block_msg_size_lp;
+            fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+            fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+            fsm_fwd_header_lo.payload.src_did = did_i;
+            fsm_fwd_data_lo                  = writeback_data;
+            fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo;
+
+            way_up = fsm_fwd_v_lo & fsm_fwd_last_lo;
+            index_up = way_done;
+
+            state_n = (index_done & way_done)
+                      ? e_clean_fence
+                      : index_up
+                        ? e_clean_read
+                        : way_up
+                          ? e_clean_scan
+                          : e_clean_write;
+          end
+
+        e_clean_fence:
+          begin
+            cache_req_critical_o = (credit_count_lo == '0);
+            cache_req_last_o = cache_req_critical_o;
+            cache_req_done = cache_req_last_o;
+
+            state_n = cache_req_last_o ? e_ready : state_r;
+          end
+
+        e_bclean_evict:
+          begin
+            data_mem_pkt_cast_o.opcode     = e_cache_data_mem_read;
+            data_mem_pkt_cast_o.index      = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+            data_mem_pkt_cast_o.way_id     = cache_req_metadata.hit_or_repl_way;
+            data_mem_pkt_cast_o.fill_index = {block_size_in_fill_lp{1'b1}};
+            data_mem_pkt_v_o = 1'b1;
+
+            state_n = data_mem_pkt_yumi_i ? e_bclean_writeback_req : state_r;
+          end
+
+        e_bclean_writeback_req:
+          begin
+            fsm_fwd_header_lo.msg_type       = e_bedrock_mem_wr;
+            fsm_fwd_header_lo.addr           = {cache_req_r.addr[paddr_width_p-1:block_offset_width_lp], block_offset_width_lp'(0)};
+            fsm_fwd_header_lo.size           = block_msg_size_lp;
+            fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+            fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+            fsm_fwd_data_lo                  = writeback_data;
+            fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_metadata.dirty;
+
+            cache_req_done = ~cache_req_metadata.dirty || (fsm_fwd_v_lo & fsm_fwd_last_lo);
+
+            state_n = cache_req_done ? e_ready : state_r;
+          end
+
+        e_ready:
+          begin
+            if (prefetch_v_li) begin
+              // A duplicate is already covered by its live slot. If every
+              // slot holds another line, refuse this execution so the memory
+              // pipe can replay it after capacity becomes available.
+              cache_req_yumi_o = ~cache_req_v_r & prefetch_metadata_can_accept
+                & (prefetch_free_v | prefetch_duplicate_v) & ~retained_clear;
+            end else begin
+            // Keep a same-line demand miss at the LCE request boundary while
+            // its detached hint is live.  The dcache recomputes its tag hit
+            // while the request is held; once the hint publishes the line,
+            // the miss withdraws instead of entering the UCE with stale miss
+            // metadata and issuing a duplicate refill.
+            cache_req_yumi_o = cache_req_v_i & cache_req_ready_lo
+              & (~cache_req_v_r | nonblocking_v_li)
+              & ~((miss_load_v_li | miss_store_v_li) & prefetch_duplicate_v);
+
+            state_n = cache_req_yumi_o
+                      ? (flush_v_li | clean_v_li)
+                        ? e_clean_read
+                        : inval_v_li
+                          ? e_inval
+                          : bclean_v_li
+                            ? e_bclean_evict
+                            : uc_evict_v_li
+                              ? e_uc_writeback_evict
+                              : nonblocking_v_li
+                                ? e_ready
+                                : (retained_buffer_p & retained_enable_i & miss_load_v_li & ~retained_clear)
+                                  ? e_retained_lookup : e_send_critical
+                      : cache_req_v_i ? e_backoff : state_r;
+            end
+          end
+
+        e_uc_writeback_evict:
+          begin
+            data_mem_pkt_cast_o.opcode = e_cache_data_mem_read;
+            data_mem_pkt_cast_o.index  = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+            data_mem_pkt_cast_o.way_id = cache_req_metadata.hit_or_repl_way;
+            data_mem_pkt_cast_o.fill_index = {block_size_in_fill_lp{1'b1}};
+            data_mem_pkt_v_o = cache_req_metadata.dirty;
+
+            stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_clear_dirty;
+            stat_mem_pkt_cast_o.index  = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+            stat_mem_pkt_cast_o.way_id = cache_req_metadata.hit_or_repl_way;
+            stat_mem_pkt_v_o = cache_req_metadata.dirty;
+
+            state_n = cache_req_metadata.dirty
+                      ? (data_mem_pkt_yumi_i & stat_mem_pkt_yumi_i)
+                        ? e_uc_writeback_write_req
+                        : state_r
+                      : e_send_critical;
+          end
+
+        e_uc_writeback_write_req:
+          begin
+            fsm_fwd_header_lo.msg_type       = e_bedrock_mem_wr;
+            fsm_fwd_header_lo.addr           = {cache_req_r.addr[paddr_width_p-1:block_offset_width_lp], block_offset_width_lp'(0)};
+            fsm_fwd_header_lo.size           = block_msg_size_lp;
+            fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+            fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+            fsm_fwd_header_lo.payload.src_did = did_i;
+            fsm_fwd_data_lo                   = writeback_data;
+            fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo;
+
+            state_n = (fsm_fwd_v_lo & fsm_fwd_last_lo)
+                      ? e_send_critical
+                      : state_r;
+          end
+
+        e_retained_lookup: begin
+          if (~retained_enable_i | retained_clear)
+            state_n = e_send_critical;
+          else if (retained_lookup_v_o & retained_lookup_ready_i)
+            state_n = e_retained_wait;
+        end
+
+        e_retained_wait: begin
+          // Every accepted lookup returns once, even when a store/clear
+          // revokes a held hit. Never abandon response ownership on disable.
+          if (retained_resp_v_i & retained_resp_ready_o)
+            state_n = (retained_resp_hit_i & retained_enable_i
+                       & ~retained_clear & ~retained_demand_mutation)
+              ? (cache_req_metadata.dirty ? e_writeback_evict : e_retained_fill)
+              : e_send_critical;
+        end
+
+        e_retained_fill: begin
+          // Install a complete retained line through the ordinary L1 ports.
+          // No external read was issued, so no memory credit is fabricated.
+          tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_tag;
+          tag_mem_pkt_cast_o.index = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+          tag_mem_pkt_cast_o.way_id = cache_req_metadata.hit_or_repl_way;
+          tag_mem_pkt_cast_o.state = e_COH_M;
+          tag_mem_pkt_cast_o.tag = cache_req_r.addr[block_offset_width_lp+index_width_lp+:tag_width_p];
+          tag_mem_pkt_v_o = (retained_fill_count_r == '0) & cache_req_metadata_v;
+          data_mem_pkt_cast_o.opcode = e_cache_data_mem_write;
+          data_mem_pkt_cast_o.addr = retained_lookup_addr_o
+            + (paddr_width_p'(retained_fill_count_r) << fill_offset_width_lp);
+          data_mem_pkt_cast_o.index = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+          data_mem_pkt_cast_o.way_id = cache_req_metadata.hit_or_repl_way;
+          data_mem_pkt_cast_o.data = retained_hit_data_r[fill_width_p*retained_fill_count_r+:fill_width_p];
+          data_mem_pkt_cast_o.fill_index = block_size_in_fill_lp'(1) << retained_fill_count_r;
+          data_mem_pkt_v_o = cache_req_metadata_v;
+          cache_req_critical_o = data_mem_pkt_v_o
+            & (retained_fill_count_r == cache_req_r.addr[fill_offset_width_lp+:fill_cnt_width_lp]);
+          cache_req_last_o = data_mem_pkt_v_o
+            & (retained_fill_count_r == fill_cnt_width_lp'(block_size_in_fill_lp-1));
+          if (data_mem_pkt_yumi_i & ((retained_fill_count_r != '0) | tag_mem_pkt_yumi_i)
+              & cache_req_last_o) begin
+            cache_req_done = ~cache_req_metadata.dirty;
+            state_n = cache_req_metadata.dirty ? e_writeback_write_req : e_ready;
+          end
+        end
+
+        e_send_critical:
+          if (miss_v_r)
+            begin
+              fsm_fwd_header_lo.msg_type = e_bedrock_mem_rd;
+              fsm_fwd_header_lo.addr     = cache_req_r.addr;
+              fsm_fwd_header_lo.size     = bp_bedrock_msg_size_e'(cache_req_r.size);
+              fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+              fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+              fsm_fwd_header_lo.payload.src_did = did_i;
+              fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo
+                & ~prefetch_demand_match;
+
+              state_n = (fsm_fwd_v_lo & fsm_fwd_last_lo)
+                        ? cache_req_metadata.dirty
+                          ? e_writeback_evict
+                          : e_read_wait
+                        : state_r;
+            end
+          else if (uc_load_v_r | uc_amo_v_r)
+            begin
+              fsm_fwd_header_lo.msg_type = uc_load_v_r ? e_bedrock_mem_rd : e_bedrock_mem_amo;
+              fsm_fwd_header_lo.addr     = cache_req_r.addr;
+              fsm_fwd_header_lo.size     = bp_bedrock_msg_size_e'(cache_req_r.size);
+              fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+              fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+              fsm_fwd_header_lo.payload.src_did = did_i;
+              fsm_fwd_header_lo.subop    = mem_wr_subop;
+              fsm_fwd_data_lo            = {fill_width_p/dword_width_gp{cache_req_r.data}};
+              fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo;
+
+              state_n = (fsm_fwd_v_lo & fsm_fwd_last_lo) ? e_uc_read_wait : state_r;
+            end
+          else if (uc_store_v_r)
+            begin
+              fsm_fwd_header_lo.msg_type = e_bedrock_mem_wr;
+              fsm_fwd_header_lo.addr     = cache_req_r.addr;
+              fsm_fwd_header_lo.size     = bp_bedrock_msg_size_e'(cache_req_r.size);
+              fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+              fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+              fsm_fwd_header_lo.payload.src_did = did_i;
+              fsm_fwd_header_lo.subop    = mem_wr_subop;
+              fsm_fwd_data_lo            = {fill_width_p/dword_width_gp{cache_req_r.data}};
+              fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo;
+
+              cache_req_done = fsm_fwd_v_lo & fsm_fwd_last_lo;
+
+              state_n = cache_req_done ? e_ready : state_r;
+            end
+
+        e_writeback_evict:
+          begin
+            data_mem_pkt_cast_o.opcode = e_cache_data_mem_read;
+            data_mem_pkt_cast_o.index  = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+            data_mem_pkt_cast_o.way_id = cache_req_metadata.hit_or_repl_way;
+            data_mem_pkt_cast_o.fill_index = {block_size_in_fill_lp{1'b1}};
+            data_mem_pkt_v_o = 1'b1;
+
+            tag_mem_pkt_cast_o.opcode  = e_cache_tag_mem_read;
+            tag_mem_pkt_cast_o.index   = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+            tag_mem_pkt_cast_o.way_id  = cache_req_metadata.hit_or_repl_way;
+            tag_mem_pkt_v_o = 1'b1;
+
+            stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_clear_dirty;
+            stat_mem_pkt_cast_o.index  = cache_req_r.addr[block_offset_width_lp+:index_width_lp];
+            stat_mem_pkt_cast_o.way_id = cache_req_metadata.hit_or_repl_way;
+            stat_mem_pkt_v_o = 1'b1;
+
+            state_n = (data_mem_pkt_yumi_i & tag_mem_pkt_yumi_i & stat_mem_pkt_yumi_i)
+              ? ((retained_buffer_p & retained_hit_r) ? e_retained_fill : e_writeback_read_wait)
+              : e_writeback_evict;
+          end
+
+        e_writeback_read_wait:
+          begin
+            // send the sub-block from L2 to cache
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_tag;
+            tag_mem_pkt_cast_o.index  = fsm_rev_addr_li[block_offset_width_lp+:index_width_lp];
+            // We fill in M because we don't want to trigger additional coherence traffic
+            tag_mem_pkt_cast_o.way_id = fsm_rev_header_li.payload.way_id[0+:`BSG_SAFE_CLOG2(assoc_p)];
+            tag_mem_pkt_cast_o.state  = e_COH_M;
+            tag_mem_pkt_cast_o.tag    = fsm_rev_addr_li[block_offset_width_lp+index_width_lp+:tag_width_p];
+            tag_mem_pkt_v_o = load_resp_v_li & fsm_rev_new_li;
+
+            data_mem_pkt_cast_o.opcode     = e_cache_data_mem_write;
+            data_mem_pkt_cast_o.addr       = fsm_rev_addr_li;
+            data_mem_pkt_cast_o.index      = fsm_rev_addr_li[block_offset_width_lp+:index_width_lp];
+            data_mem_pkt_cast_o.way_id     = fsm_rev_header_li.payload.way_id[0+:`BSG_SAFE_CLOG2(assoc_p)];
+            data_mem_pkt_cast_o.data       = fsm_rev_data_li;
+            data_mem_pkt_cast_o.fill_index = 1'b1 << fill_index_shift;
+            data_mem_pkt_v_o = load_resp_v_li;
+
+            load_resp_yumi_lo = (~fsm_rev_new_li | tag_mem_pkt_yumi_i) && data_mem_pkt_yumi_i;
+
+            cache_req_critical_o = load_resp_v_li & fsm_rev_critical_li;
+            cache_req_last_o = load_resp_v_li & fsm_rev_last_li;
+
+            state_n = (load_resp_yumi_lo & cache_req_last_o) ? e_writeback_write_req : e_writeback_read_wait;
+          end
+
+        e_writeback_write_req:
+          begin
+            fsm_fwd_header_lo.msg_type       = e_bedrock_mem_wr;
+            fsm_fwd_header_lo.addr           = {dirty_tag_r.tag, cache_req_r.addr[block_offset_width_lp+:index_width_lp], block_offset_width_lp'(0)};
+            fsm_fwd_header_lo.size           = block_msg_size_lp;
+            fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+            fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+            fsm_fwd_header_lo.payload.src_did = did_i;
+            fsm_fwd_data_lo                  = writeback_data;
+            fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo;
+
+            cache_req_done = fsm_fwd_v_lo & fsm_fwd_last_lo;
+
+            state_n = cache_req_done ? e_ready : e_writeback_write_req;
+          end
+
+        e_read_wait:
+          begin
+            // send the sub-block from L2 to cache
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_tag;
+            tag_mem_pkt_cast_o.index  = fsm_rev_addr_li[block_offset_width_lp+:index_width_lp];
+            // We fill in M because we don't want to trigger additional coherence traffic
+            tag_mem_pkt_cast_o.way_id = fsm_rev_header_li.payload.way_id[0+:`BSG_SAFE_CLOG2(assoc_p)];
+            tag_mem_pkt_cast_o.state  = e_COH_M;
+            tag_mem_pkt_cast_o.tag    = fsm_rev_addr_li[block_offset_width_lp+index_width_lp+:tag_width_p];
+            tag_mem_pkt_v_o = load_resp_v_li & fsm_rev_new_li;
+
+            data_mem_pkt_cast_o.opcode = e_cache_data_mem_write;
+            data_mem_pkt_cast_o.addr   = fsm_rev_addr_li;
+            data_mem_pkt_cast_o.index  = fsm_rev_addr_li[block_offset_width_lp+:index_width_lp];
+            data_mem_pkt_cast_o.way_id = fsm_rev_header_li.payload.way_id[0+:`BSG_SAFE_CLOG2(assoc_p)];
+            data_mem_pkt_cast_o.data   = fsm_rev_data_li;
+            data_mem_pkt_cast_o.fill_index = 1'b1 << fill_index_shift;
+            data_mem_pkt_v_o = load_resp_v_li;
+
+            load_resp_yumi_lo = (~fsm_rev_new_li | tag_mem_pkt_yumi_i) && data_mem_pkt_yumi_i;
+
+            cache_req_critical_o = load_resp_v_li & fsm_rev_critical_li;
+            cache_req_last_o = load_resp_v_li & fsm_rev_last_li;
+            cache_req_done = cache_req_last_o & load_resp_yumi_lo;
+
+            state_n = cache_req_done ? e_ready : e_read_wait;
+          end
+
+        e_uc_read_wait:
+          begin
+            data_mem_pkt_cast_o.opcode = e_cache_data_mem_uncached;
+            data_mem_pkt_cast_o.data = {(fill_width_p/dword_width_gp){fsm_rev_data_li[0+:dword_width_gp]}};
+            data_mem_pkt_v_o = load_resp_v_li;
+
+            load_resp_yumi_lo = data_mem_pkt_yumi_i;
+
+            cache_req_critical_o = load_resp_v_li & fsm_rev_critical_li;
+            cache_req_last_o = load_resp_v_li & fsm_rev_last_li;
+            cache_req_done = cache_req_last_o & load_resp_yumi_lo;
+
+            state_n = cache_req_done ? e_ready : e_uc_read_wait;
+          end
+        default: state_n = e_reset;
+      endcase
+
+      // Prefetches are detached advisory requests.  Accept them directly
+      // into the slot table even while the serialized demand FSM is waiting
+      // for a refill; otherwise the dcache holds the hint at its request
+      // interface and no second transaction can ever be in flight.
+      if (prefetch_v_li & (prefetch_free_v | prefetch_duplicate_v)
+          & prefetch_metadata_can_accept
+          & ~is_reset & ~is_init & ~retained_clear)
+        cache_req_yumi_o = 1'b1;
+
+      // Fire off a non-blocking request opportunistically if we have one
+      // Could eke out some performance by changing ~fsm_fwd_v_lo to blocking_req_v_lo
+      //if (nonblocking_v_r & ~fsm_fwd_v_lo)
+      if (is_ready & nonblocking_v_r)
+        begin
+          fsm_fwd_header_lo.msg_type       = e_bedrock_mem_wr;
+          fsm_fwd_header_lo.addr           = cache_req_r.addr;
+          fsm_fwd_header_lo.size           = bp_bedrock_msg_size_e'(cache_req_r.size);
+          fsm_fwd_header_lo.payload.way_id = lce_assoc_p'(cache_req_metadata.hit_or_repl_way);
+          fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+          fsm_fwd_header_lo.payload.src_did = did_i;
+          fsm_fwd_header_lo.subop          = wt_store_v_r ? e_bedrock_store : mem_wr_subop;
+          fsm_fwd_data_lo                  = {fill_width_p/dword_width_gp{cache_req_r.data}};
+          fsm_fwd_v_lo = fsm_fwd_ready_then_li & cache_req_credit_ready_lo;
+
+          cache_req_done = fsm_fwd_v_lo & fsm_fwd_last_lo;
+        end
+
+      // Demand traffic has priority.  Hints may use otherwise idle forward
+      // pump cycles while a demand/refill response is being waited on.  This
+      // is the key overlap path for nonresident context switches: the UCE can
+      // admit the next worker's line while the current worker's register or
+      // data refill is outstanding.  A same-line demand remains deferred
+      // until its hint has been issued, preventing duplicate ownership.
+      if (prefetch_p & prefetch_issue_v
+          // Retained data mode must not replace an already selected ordinary
+          // nonblocking write with a preview read and still retire its FIFO.
+          & (!retained_buffer_p | ~(is_ready & nonblocking_v_r))
+          & ((is_ready | is_read_request | is_uc_read_wait | is_writeback_read)
+             & ~prefetch_demand_match
+             | (is_send_critical & miss_v_r & prefetch_demand_match))
+          & ~load_resp_v_li & ~store_resp_v_li & ~prefetch_response
+          & ~cache_req_credits_full_o & ~inval_v_li & ~inval_v_r & ~retained_clear
+          & ~(retained_mutation
+              & (retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]
+                 == prefetch_addr_r[prefetch_issue_slot][paddr_width_p-1:block_offset_width_lp]))) begin
+        fsm_fwd_header_lo = '0;
+        fsm_fwd_header_lo.msg_type = e_bedrock_mem_rd;
+        fsm_fwd_header_lo.addr = prefetch_addr_r[prefetch_issue_slot];
+        fsm_fwd_header_lo.size = prefetch_msg_size_lp;
+        fsm_fwd_header_lo.payload.prefetch = 1'b1;
+        // Physical previews warm the coherent L2 and discard their replies;
+        // translated architectural hints retain the D-cache side buffer.
+        fsm_fwd_header_lo.payload.speculative = prefetch_preview_r[prefetch_issue_slot];
+        fsm_fwd_header_lo.payload.way_id = prefetch_tag_width_lp'(prefetch_issue_slot);
+        fsm_fwd_header_lo.payload.state = bp_coh_states_e'
+          (prefetch_issue_slot >> prefetch_tag_width_lp);
+        fsm_fwd_header_lo.payload.lce_id = lce_id_i;
+        fsm_fwd_header_lo.payload.src_did = did_i;
+        fsm_fwd_data_lo = '0;
+        fsm_fwd_v_lo = fsm_fwd_ready_then_li;
+        prefetch_issue = fsm_fwd_v_lo & fsm_fwd_last_lo;
+      end
+
+      // Narrow detached replies bypass L1 replacement. Each returned word is
+      // written into the D$ side buffer and therefore never locks the cache
+      // SRAMs or blocks an unrelated hit.
+      if (!prefetch_full_line_p && prefetch_response) begin
+        if (inval_v_li | prefetch_cancel_r[prefetch_response_slot]
+            | prefetch_preview_r[prefetch_response_slot]) begin
+          prefetch_response_yumi = 1'b1;
+        end else begin
+          data_mem_pkt_cast_o = '0;
+          data_mem_pkt_cast_o.opcode = e_cache_data_mem_prefetch;
+          data_mem_pkt_cast_o.addr = prefetch_addr_r[prefetch_response_slot]
+            + (paddr_width_p'(prefetch_fill_count_r[prefetch_response_slot]) << 3);
+          data_mem_pkt_cast_o.data = fsm_rev_data_li;
+          data_mem_pkt_v_o = 1'b1;
+          prefetch_response_yumi = data_mem_pkt_yumi_i;
+        end
+      end else if (prefetch_full_line_p && prefetch_response) begin
+        // Capture every beat in its request slot, but immediately forward the
+        // requested 16-byte sector to the D-cache's ordinary advisory buffer.
+        // Noncritical beats have no cache-port dependency and are accepted
+        // directly. L1 installation proceeds later from the completed buffer.
+        if (inval_v_li | prefetch_cancel_r[prefetch_response_slot]
+            | (retained_buffer_p & (~retained_enable_i | retained_clear))) begin
+          prefetch_response_yumi = 1'b1;
+        end else if (retained_buffer_p) begin
+          // Full data replies remain in their transport slot until the
+          // locked normal-resident scan authorizes retained publication.
+          // Never forward a narrow sector or install directly into L1 here.
+          prefetch_response_yumi = 1'b1;
+        end else if (prefetch_side_buffer_p) begin
+          // The I-cache advisory store already assembles a tagged line and
+          // keeps it invisible until every beat is present. Stream replies
+          // there directly instead of retaining a second full-line copy in
+          // the UCE installer. Besides removing redundant storage, this lets
+          // architectural misses proceed independently of replay retirement.
+          data_mem_pkt_cast_o = '0;
+          data_mem_pkt_cast_o.opcode = e_cache_data_mem_prefetch;
+          data_mem_pkt_cast_o.addr = prefetch_addr_r[prefetch_response_slot];
+          data_mem_pkt_cast_o.data = fsm_rev_data_li;
+          data_mem_pkt_cast_o.fill_index
+            = 1'b1 << prefetch_fill_count_r[prefetch_response_slot];
+          data_mem_pkt_v_o = 1'b1;
+          prefetch_response_yumi = data_mem_pkt_yumi_i;
+        end else if (prefetch_critical_forward_p & prefetch_response_critical) begin
+          data_mem_pkt_cast_o = '0;
+          data_mem_pkt_cast_o.opcode = e_cache_data_mem_prefetch;
+          data_mem_pkt_cast_o.addr = prefetch_response_addr;
+          data_mem_pkt_cast_o.data = fsm_rev_data_li;
+          data_mem_pkt_v_o = 1'b1;
+          prefetch_response_yumi = data_mem_pkt_yumi_i;
+        end else begin
+          prefetch_response_yumi = 1'b1;
+        end
+      end
+
+      // The shared reverse stream must make progress even if an ordinary miss
+      // is waiting for a response behind this hint. Never wait for that FSM to
+      // become idle: a busy-at-first-beat decision drops the entire packet.
+      if (prefetch_install_state_r == e_pf_drop)
+        prefetch_response_yumi = prefetch_response;
+
+      // Ordinary requests remain held throughout installation. Once victim
+      // selection is complete, new detached hints may allocate alongside
+      // background fill writes; their metadata read naturally arbitrates with
+      // publication through the D-cache SRAM handshakes.
+      if (prefetch_install_owned
+          & ~(prefetch_demand_priority_p & cache_req_v_i)) begin
+        if (prefetch_install_lock | ~prefetch_v_li)
+          cache_req_yumi_o = 1'b0;
+        cache_req_critical_o = 1'b0;
+        cache_req_last_o = 1'b0;
+        cache_req_done = 1'b0;
+        // Victim selection must exclude new traffic. Once the victim is
+        // invalid and the installer is only draining buffered data, detached
+        // requests already in other slots may continue onto the memory link.
+        if (prefetch_install_lock) begin
+          fsm_fwd_v_lo = 1'b0;
+          prefetch_issue = 1'b0;
+        end
+        load_resp_yumi_lo = 1'b0;
+        state_n = state_r;
+        data_mem_pkt_v_o = 1'b0;
+        tag_mem_pkt_v_o = 1'b0;
+        stat_mem_pkt_v_o = 1'b0;
+
+        unique case (prefetch_install_state_r)
+          e_pf_read_tag: begin
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_read;
+            tag_mem_pkt_cast_o.index = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp];
+            tag_mem_pkt_cast_o.way_id = prefetch_install_probe_way_r;
+            tag_mem_pkt_v_o = 1'b1;
+          end
+          e_pf_read_stat: begin
+            stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_read;
+            stat_mem_pkt_cast_o.index = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp];
+            stat_mem_pkt_cast_o.way_id = prefetch_way_r[prefetch_install_slot_r];
+            stat_mem_pkt_v_o = 1'b1;
+          end
+          e_pf_invalidate: begin
+            // set_state targets one way; set_inval would invalidate every way.
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_state;
+            tag_mem_pkt_cast_o.index = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp];
+            tag_mem_pkt_cast_o.way_id = prefetch_way_r[prefetch_install_slot_r];
+            tag_mem_pkt_cast_o.state = e_COH_I;
+            tag_mem_pkt_v_o = 1'b1;
+          end
+          e_pf_fill: begin
+            data_mem_pkt_cast_o.opcode = prefetch_side_buffer_p
+              ? e_cache_data_mem_prefetch : e_cache_data_mem_write;
+            data_mem_pkt_cast_o.addr = prefetch_addr_r[prefetch_install_slot_r];
+            data_mem_pkt_cast_o.index = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp];
+            data_mem_pkt_cast_o.way_id = prefetch_way_r[prefetch_install_slot_r];
+            data_mem_pkt_cast_o.data = prefetch_install_line_r[prefetch_install_count_r];
+            data_mem_pkt_cast_o.fill_index = 1'b1 << prefetch_install_count_r;
+            data_mem_pkt_v_o = prefetch_install_full;
+          end
+          e_pf_publish: begin
+            if (!retained_buffer_p) begin
+            tag_mem_pkt_cast_o.opcode = e_cache_tag_mem_set_tag;
+            tag_mem_pkt_cast_o.index = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp];
+            tag_mem_pkt_cast_o.way_id = prefetch_way_r[prefetch_install_slot_r];
+            tag_mem_pkt_cast_o.state = e_COH_M;
+            tag_mem_pkt_cast_o.tag = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+index_width_lp+:tag_width_p];
+            tag_mem_pkt_v_o = prefetch_install_full;
+            stat_mem_pkt_cast_o.opcode = e_cache_stat_mem_set_lru;
+            stat_mem_pkt_cast_o.index = prefetch_addr_r[prefetch_install_slot_r][block_offset_width_lp+:index_width_lp];
+            stat_mem_pkt_cast_o.way_id = prefetch_way_r[prefetch_install_slot_r];
+            stat_mem_pkt_v_o = tag_mem_pkt_v_o;
+            end
+          end
+          default: begin end
+        endcase
+        // A returning critical sector takes priority over a background fill
+        // write. Noncritical beats only write their request buffer and can be
+        // accepted alongside tag/stat installer operations.
+        if (prefetch_full_line_p && prefetch_response) begin
+          if (inval_v_li | prefetch_cancel_r[prefetch_response_slot] | retained_buffer_p) begin
+            prefetch_response_yumi = 1'b1;
+          end else if (prefetch_critical_forward_p & prefetch_response_critical) begin
+            data_mem_pkt_cast_o = '0;
+            data_mem_pkt_cast_o.opcode = e_cache_data_mem_prefetch;
+            data_mem_pkt_cast_o.addr = prefetch_response_addr;
+            data_mem_pkt_cast_o.data = fsm_rev_data_li;
+            data_mem_pkt_v_o = 1'b1;
+            prefetch_response_yumi = data_mem_pkt_yumi_i;
+          end else begin
+            prefetch_response_yumi = 1'b1;
+          end
+        end
+      end
+    end
+
+  always_ff @(posedge clk_i) begin
+    if (reset_i) begin
+      prefetch_install_state_r <= e_pf_idle;
+      prefetch_install_slot_r <= '0;
+      prefetch_install_probe_way_r <= '0;
+      prefetch_install_count_r <= '0;
+      prefetch_install_drain_r <= '0;
+      prefetch_install_clean_r <= 1'b0;
+    end else begin
+      if (retained_buffer_p
+          & (retained_clear | ~retained_enable_i | retained_prefetch_mutation
+             | ~prefetch_install_full)
+          & (prefetch_install_state_r inside {e_pf_drain,e_pf_read_tag,e_pf_check_tag,
+                e_pf_read_stat,e_pf_check_stat,e_pf_invalidate,e_pf_fill,e_pf_publish})
+          & ~(retained_insert_owned_r & retained_insert_pf_r)) begin
+        prefetch_install_state_r <= e_pf_drop;
+      end else if (prefetch_demand_priority_p & cache_req_v_i
+          & (prefetch_install_state_r != e_pf_idle)
+          // Once the first advisory-buffer beat is visible, finish the
+          // four-beat line atomically. Aborting here would strand a partial
+          // entry; at most three independent-buffer writes remain.
+          & ~(prefetch_side_buffer_p
+              & (prefetch_install_state_r == e_pf_fill)
+              & (prefetch_install_count_r != '0)
+              // An accepted fence clears the cache-local partial entry, so
+              // cancellation must win instead of finishing stale beats.
+              & ~inval_v_li)) begin
+        // The line remains invalid if installation had already started.
+        // Retire the advisory buffer and let the ordinary request proceed in
+        // the same cycle through the main UCE FSM.
+        prefetch_install_state_r <= e_pf_drop;
+      end else unique case (prefetch_install_state_r)
+        e_pf_idle: if (prefetch_install_begin & prefetch_install_available) begin
+          prefetch_install_slot_r <= prefetch_complete_slot;
+          prefetch_install_count_r <= '0;
+          prefetch_install_probe_way_r <= '0;
+          prefetch_install_clean_r <= 1'b0;
+          prefetch_install_drain_r <= '0;
+          prefetch_install_state_r <= prefetch_side_buffer_p ? e_pf_fill : e_pf_drain;
+        end else if (prefetch_install_begin & cache_req_v_r) begin
+          // A demand already resident in the UCE may be waiting for this same
+          // replay line. It cannot withdraw and recompute its cache hit like a
+          // request held at the LCE boundary, while installation cannot take
+          // ownership until the resident request retires. Drop the advisory
+          // line so the architectural request can issue on the next cycle.
+          prefetch_install_slot_r <= prefetch_complete_slot;
+          prefetch_install_count_r <= '0;
+          prefetch_install_probe_way_r <= '0;
+          prefetch_install_clean_r <= 1'b0;
+          prefetch_install_drain_r <= '0;
+          prefetch_install_state_r <= e_pf_drop;
+        end else if (prefetch_install_begin & ~prefetch_install_safe_to_wait) begin
+          // Do not hold an ordinary response behind an advisory reply. Local
+          // cache-pipeline conflicts are transient and retain the packet;
+          // an ordinary outstanding credit or malformed size must drain it.
+          prefetch_install_slot_r <= prefetch_complete_slot;
+          prefetch_install_count_r <= '0;
+          prefetch_install_probe_way_r <= '0;
+          prefetch_install_clean_r <= 1'b0;
+          prefetch_install_drain_r <= '0;
+          prefetch_install_state_r <= e_pf_drop;
+        end
+        e_pf_drain: begin
+          // cache_req_lock_o disables new TL entries. Existing TL/TV stages
+          // drain in two cycles; the two-entry write buffer then drains in at
+          // most two more (no new TL reads compete with wbuf_yumi_li). No slow
+          // data/tag/stat operations or critical-response snoops run here.
+          prefetch_install_drain_r <= prefetch_install_drain_r + 1'b1;
+          if (&prefetch_install_drain_r)
+            prefetch_install_state_r <= e_pf_read_tag;
+        end
+        e_pf_read_tag: if (tag_mem_pkt_v_o & tag_mem_pkt_yumi_i)
+          prefetch_install_state_r <= e_pf_check_tag;
+        e_pf_check_tag: begin
+          // Direct physical replay bypasses the ordinary I-cache tag lookup.
+          // Installing an already-resident line into a second way would make
+          // the hit vector non-one-hot and can select corrupt instructions.
+          // Scan every way under the existing short lock and drop duplicate
+          // advisory work rather than disturbing the resident copy.
+          if (prefetch_install_tag_match)
+            prefetch_install_state_r <= e_pf_drop;
+          else if (prefetch_install_probe_way_r
+                   == `BSG_SAFE_CLOG2(assoc_p)'(assoc_p-1))
+            prefetch_install_state_r <= retained_buffer_p ? e_pf_publish : e_pf_read_stat;
+          else begin
+            prefetch_install_probe_way_r <= prefetch_install_probe_way_r + 1'b1;
+            prefetch_install_state_r <= e_pf_read_tag;
+          end
+        end
+        e_pf_read_stat: if (stat_mem_pkt_v_o & stat_mem_pkt_yumi_i)
+          prefetch_install_state_r <= e_pf_check_stat;
+        e_pf_check_stat: begin
+          // This is the synchronous result of the ACCEPTED preceding read.
+          // A dirty or reserved victim is left intact. Choose another clean,
+          // unreserved way when one exists, and use that way consistently for
+          // invalidation, data installation, publication, and LRU update.
+          prefetch_install_clean_r <= prefetch_install_way_available;
+          prefetch_install_state_r <= prefetch_install_way_available
+            ? e_pf_invalidate : e_pf_drop;
+        end
+        e_pf_invalidate: if (tag_mem_pkt_v_o & tag_mem_pkt_yumi_i)
+          prefetch_install_state_r <= e_pf_fill;
+        e_pf_fill: if (data_mem_pkt_v_o & data_mem_pkt_yumi_i
+                       & (data_mem_pkt_cast_o.opcode
+                          == (prefetch_side_buffer_p
+                              ? e_cache_data_mem_prefetch
+                              : e_cache_data_mem_write))) begin
+          if (prefetch_install_count_r == fill_cnt_width_lp'(block_size_in_fill_lp-1))
+            prefetch_install_state_r <= prefetch_side_buffer_p ? e_pf_idle : e_pf_publish;
+          else
+            prefetch_install_count_r <= prefetch_install_count_r + 1'b1;
+        end
+        e_pf_publish: begin
+          if (retained_buffer_p) begin
+            if (retained_insert_owned_r & retained_insert_pf_r & retained_insert_done_i)
+              prefetch_install_state_r <= e_pf_idle;
+          end else if (tag_mem_pkt_v_o & tag_mem_pkt_yumi_i & stat_mem_pkt_yumi_i)
+            prefetch_install_state_r <= e_pf_idle;
+        end
+        e_pf_drop: prefetch_install_state_r <= e_pf_idle;
+        default: prefetch_install_state_r <= e_pf_idle;
+      endcase
+    end
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (reset_i) begin
+      prefetch_valid_r <= '0;
+      prefetch_sent_r <= '0;
+      prefetch_way_v_r <= '0;
+      prefetch_cancel_r <= '0;
+      prefetch_complete_r <= '0;
+      prefetch_preview_r <= '0;
+      prefetch_addr_r <= '0;
+      prefetch_critical_segment_r <= '0;
+      prefetch_way_r <= '0;
+      prefetch_fill_count_r <= '0;
+      prefetch_metadata_pending_v_r <= 1'b0;
+      prefetch_metadata_pending_allocated_r <= 1'b0;
+      prefetch_metadata_pending_slot_r <= '0;
+    end else begin
+      // Keep every prefetch slot field in this sequential process. Some FPGA
+      // synthesis flows do not merge disjoint indexed writes to an unpacked
+      // array when they originate in separate always_ff blocks.
+      if (prefetch_install_state_r == e_pf_check_stat)
+        prefetch_way_r[prefetch_install_slot_r] <= prefetch_install_way;
+      if (cache_req_metadata_v_i & prefetch_metadata_pending_v_r) begin
+        prefetch_metadata_pending_v_r <= 1'b0;
+        if (prefetch_metadata_pending_allocated_r) begin
+          if (prefetch_reserved_way_available) begin
+            prefetch_way_r[prefetch_metadata_pending_slot_r]
+              <= prefetch_reserved_way;
+            prefetch_way_v_r[prefetch_metadata_pending_slot_r] <= 1'b1;
+          end else begin
+            // More same-set fills than ways cannot be retained safely.
+            prefetch_valid_r[prefetch_metadata_pending_slot_r] <= 1'b0;
+            prefetch_sent_r[prefetch_metadata_pending_slot_r] <= 1'b0;
+            prefetch_way_v_r[prefetch_metadata_pending_slot_r] <= 1'b0;
+          end
+        end
+      end
+      if (prefetch_accept) begin
+        prefetch_metadata_pending_v_r <= 1'b1;
+        prefetch_metadata_pending_allocated_r
+          <= prefetch_free_v & ~prefetch_duplicate_v;
+        prefetch_metadata_pending_slot_r <= prefetch_free_slot;
+      end
+      if (prefetch_allocate) begin
+        prefetch_valid_r[prefetch_free_slot] <= 1'b1;
+        prefetch_sent_r[prefetch_free_slot] <= 1'b0;
+        prefetch_way_v_r[prefetch_free_slot] <= 1'b0;
+        prefetch_cancel_r[prefetch_free_slot] <= 1'b0;
+        prefetch_complete_r[prefetch_free_slot] <= 1'b0;
+        prefetch_preview_r[prefetch_free_slot] <= 1'b0;
+        prefetch_addr_r[prefetch_free_slot]
+          <= {cache_req_cast_i.addr[paddr_width_p-1:prefetch_match_offset_width_lp]
+              ,prefetch_match_offset_width_lp'(0)};
+        prefetch_critical_segment_r[prefetch_free_slot]
+          <= cache_req_cast_i.addr[block_offset_width_lp-1:4];
+        prefetch_fill_count_r[prefetch_free_slot] <= '0;
+      end
+      if (detached_prefetch_allocate) begin
+        prefetch_valid_r[prefetch_free_slot] <= 1'b1;
+        prefetch_sent_r[prefetch_free_slot] <= 1'b0;
+        // Direct replay bypasses the cache lookup that normally supplies
+        // replacement metadata. Give each slot a distinct provisional way;
+        // the installer re-reads and validates current LRU/dirty state under
+        // its cache lock before changing any tag or data RAM.
+        prefetch_way_v_r[prefetch_free_slot] <= 1'b1;
+        prefetch_way_r[prefetch_free_slot]
+          <= `BSG_SAFE_CLOG2(assoc_p)'(prefetch_free_slot);
+        prefetch_cancel_r[prefetch_free_slot] <= 1'b0;
+        prefetch_complete_r[prefetch_free_slot] <= 1'b0;
+        prefetch_preview_r[prefetch_free_slot] <= 1'b0;
+        prefetch_addr_r[prefetch_free_slot]
+          <= {detached_prefetch_addr_i[paddr_width_p-1:prefetch_match_offset_width_lp]
+              ,prefetch_match_offset_width_lp'(0)};
+        prefetch_critical_segment_r[prefetch_free_slot]
+          <= detached_prefetch_addr_i[block_offset_width_lp-1:4];
+        prefetch_fill_count_r[prefetch_free_slot] <= '0;
+      end
+      if (preview_allocate) begin
+        prefetch_valid_r[prefetch_free_slot] <= 1'b1;
+        prefetch_sent_r[prefetch_free_slot] <= 1'b0;
+        // Physical previews never install into L1, but the existing issue
+        // selector uses way_v as its admission-ready bit.
+        prefetch_way_v_r[prefetch_free_slot] <= 1'b1;
+        prefetch_way_r[prefetch_free_slot] <= '0;
+        prefetch_cancel_r[prefetch_free_slot] <= 1'b0;
+        prefetch_complete_r[prefetch_free_slot] <= 1'b0;
+        prefetch_preview_r[prefetch_free_slot] <= 1'b1;
+        prefetch_addr_r[prefetch_free_slot] <= preview_head_addr;
+        prefetch_critical_segment_r[prefetch_free_slot] <= '0;
+        prefetch_fill_count_r[prefetch_free_slot] <= '0;
+      end
+      if (prefetch_issue)
+        prefetch_sent_r[prefetch_issue_slot] <= 1'b1;
+      if (prefetch_full_line_p && prefetch_response_yumi) begin
+        if (fsm_rev_last_li
+            & (prefetch_cancel_r[prefetch_response_slot]
+               | prefetch_side_buffer_p
+               | (retained_buffer_p
+                  & (~retained_enable_i | retained_clear
+                     | (fsm_rev_header_li.size != block_msg_size_lp)
+                     | (prefetch_fill_count_r[prefetch_response_slot]
+                        != fill_cnt_width_lp'(block_size_in_fill_lp-1)))))) begin
+          // Cancellation cannot retract a request already accepted by memory.
+          // Consume its final beat, then release the slot. In instruction
+          // side-buffer mode every accepted beat has already gone directly
+          // to the cache-local advisory store, so no installer work remains.
+          prefetch_valid_r[prefetch_response_slot] <= 1'b0;
+          prefetch_sent_r[prefetch_response_slot] <= 1'b0;
+          prefetch_way_v_r[prefetch_response_slot] <= 1'b0;
+          prefetch_cancel_r[prefetch_response_slot] <= 1'b0;
+          prefetch_complete_r[prefetch_response_slot] <= 1'b0;
+          prefetch_fill_count_r[prefetch_response_slot] <= '0;
+        end else if (fsm_rev_last_li) begin
+          prefetch_complete_r[prefetch_response_slot] <= 1'b1;
+          prefetch_fill_count_r[prefetch_response_slot] <= '0;
+        end else begin
+          prefetch_fill_count_r[prefetch_response_slot]
+            <= prefetch_fill_count_r[prefetch_response_slot] + 1'b1;
+        end
+      end
+      if (prefetch_full_line_p && prefetch_install_retire) begin
+        prefetch_valid_r[prefetch_install_slot_r] <= 1'b0;
+        prefetch_sent_r[prefetch_install_slot_r] <= 1'b0;
+        prefetch_way_v_r[prefetch_install_slot_r] <= 1'b0;
+        prefetch_cancel_r[prefetch_install_slot_r] <= 1'b0;
+        prefetch_complete_r[prefetch_install_slot_r] <= 1'b0;
+        prefetch_preview_r[prefetch_install_slot_r] <= 1'b0;
+      end else if (!prefetch_full_line_p && prefetch_response_yumi & fsm_rev_last_li) begin
+        prefetch_valid_r[prefetch_response_slot] <= 1'b0;
+        prefetch_sent_r[prefetch_response_slot] <= 1'b0;
+        prefetch_way_v_r[prefetch_response_slot] <= 1'b0;
+        prefetch_cancel_r[prefetch_response_slot] <= 1'b0;
+        prefetch_preview_r[prefetch_response_slot] <= 1'b0;
+        prefetch_fill_count_r[prefetch_response_slot] <= '0;
+      end else if (!prefetch_full_line_p && prefetch_response_yumi) begin
+        prefetch_fill_count_r[prefetch_response_slot]
+          <= prefetch_fill_count_r[prefetch_response_slot] + 1'b1;
+      end
+
+      if (preview_cancel_i) begin
+        for (int i = 0; i < prefetch_els_p; i++) begin
+          if (prefetch_valid_r[i] & prefetch_preview_r[i]) begin
+            if (prefetch_sent_r[i]
+                & ~(prefetch_response_yumi & fsm_rev_last_li
+                    & (prefetch_response_slot == prefetch_slot_width_lp'(i)))) begin
+              // An issued memory request cannot be retracted; retain only its
+              // response identity and drain the returning packet.
+              prefetch_cancel_r[i] <= 1'b1;
+            end else begin
+              prefetch_valid_r[i] <= 1'b0;
+              prefetch_sent_r[i] <= 1'b0;
+              prefetch_way_v_r[i] <= 1'b0;
+              prefetch_cancel_r[i] <= 1'b0;
+              prefetch_complete_r[i] <= 1'b0;
+              prefetch_preview_r[i] <= 1'b0;
+              prefetch_fill_count_r[i] <= '0;
+            end
+          end
+        end
+      end
+
+      if (retained_mutation | retained_writeback) begin
+        for (int i = 0; i < prefetch_els_p; i++) begin
+          if (prefetch_valid_r[i]
+              & ((retained_mutation
+                  & (prefetch_addr_r[i][paddr_width_p-1:block_offset_width_lp]
+                     == retained_mutation_paddr_i[paddr_width_p-1:block_offset_width_lp]))
+                 | (retained_writeback
+                    & (prefetch_addr_r[i][paddr_width_p-1:block_offset_width_lp]
+                       == fsm_fwd_header_lo.addr[paddr_width_p-1:block_offset_width_lp])))) begin
+            if (prefetch_sent_r[i] & ~prefetch_complete_r[i]
+                & ~(prefetch_response_yumi & fsm_rev_last_li
+                    & (prefetch_response_slot == prefetch_slot_width_lp'(i)))) begin
+              // Keep ownership only to drain every already-issued reply.
+              prefetch_cancel_r[i] <= 1'b1;
+            end else begin
+              prefetch_valid_r[i] <= 1'b0;
+              prefetch_sent_r[i] <= 1'b0;
+              prefetch_way_v_r[i] <= 1'b0;
+              prefetch_cancel_r[i] <= 1'b0;
+              prefetch_complete_r[i] <= 1'b0;
+              prefetch_preview_r[i] <= 1'b0;
+              prefetch_fill_count_r[i] <= '0;
+            end
+          end
+        end
+      end
+
+      if (prefetch_cancel_all) begin
+        prefetch_metadata_pending_v_r <= 1'b0;
+        prefetch_metadata_pending_allocated_r <= 1'b0;
+        for (int i = 0; i < prefetch_els_p; i++) begin
+          if (prefetch_valid_r[i]) begin
+            if (prefetch_sent_r[i] & ~prefetch_complete_r[i]
+                & ~(prefetch_response_yumi & fsm_rev_last_li
+                    & (prefetch_response_slot == prefetch_slot_width_lp'(i)))) begin
+              // Preserve only the identity needed to recognize and drain the
+              // outstanding reply. It is excluded from issue, duplicate,
+              // demand-match, and installation selection immediately.
+              prefetch_cancel_r[i] <= 1'b1;
+              prefetch_complete_r[i] <= 1'b0;
+            end else begin
+              prefetch_valid_r[i] <= 1'b0;
+              prefetch_sent_r[i] <= 1'b0;
+              prefetch_way_v_r[i] <= 1'b0;
+              prefetch_cancel_r[i] <= 1'b0;
+              prefetch_complete_r[i] <= 1'b0;
+              prefetch_preview_r[i] <= 1'b0;
+              prefetch_fill_count_r[i] <= '0;
+            end
+          end
+        end
+      end
+    end
+  end
+
+  // synopsys translate_off
+  // The BedRock stream pump has one packet counter: replies from different
+  // prefetch slots must not interleave within a packet. This is the existing
+  // bridge/stream contract, not a new guarantee about arbitrary AXI RID order.
+  always_ff @(negedge clk_i) if (!reset_i) begin
+    assert (retained_maintenance_o
+            == (retained_buffer_p & cache_req_yumi_o & retained_maintenance_v_li))
+      else $error("UCE retained maintenance differs from accepted maintenance request");
+    if (!prefetch_full_line_p && prefetch_install_begin)
+      assert (fsm_rev_new_li && prefetch_fill_count_r[prefetch_response_slot] == '0)
+        else $error("UCE prefetch installation did not start at a packet boundary");
+    if (!prefetch_full_line_p && prefetch_install_state_r != e_pf_idle && fsm_rev_v_li)
+      assert (prefetch_install_packet)
+        else $error("UCE reverse packet interleaved while installing/dropping a prefetch");
+    if (prefetch_full_line_p && prefetch_install_begin)
+      assert (prefetch_complete_r[prefetch_complete_slot])
+        else $error("UCE prefetch installation selected an incomplete fill buffer");
+    if (prefetch_install_owned) begin
+      assert ((prefetch_demand_priority_p & cache_req_v_i)
+              || ((!cache_req_yumi_o || (prefetch_v_li & ~prefetch_install_lock))
+              && (!prefetch_install_lock || (!fsm_fwd_v_lo && !prefetch_issue))
+              && !cache_req_critical_o && !cache_req_last_o && state_n == state_r))
+        else $error("UCE ordinary request advanced during exclusive prefetch installation");
+      assert (!cache_req_v_r
+              && (!prefetch_install_lock
+                  || (!cache_req_metadata_v_r && !cache_req_metadata_v_i
+                      && !prefetch_metadata_pending_v_r))
+              && credit_count_lo == prefetch_outstanding_count)
+        else $error("UCE prefetch installation overlaps accepted ordinary work");
+    end
+    if (!prefetch_side_buffer_p && !retained_buffer_p
+        && prefetch_install_state_r inside {e_pf_invalidate, e_pf_fill, e_pf_publish})
+      assert (prefetch_install_clean_r)
+        else $error("UCE prefetch modifies a victim without a fresh clean decision");
+    if (prefetch_install_state_r == e_pf_check_stat && prefetch_install_way_available)
+      assert (!prefetch_install_stat.dirty[prefetch_install_way]
+              && !prefetch_install_reserved_ways[prefetch_install_way])
+        else $error("UCE prefetch selected a dirty or reserved install way");
+    if (!prefetch_side_buffer_p && !retained_buffer_p && prefetch_install_state_r == e_pf_publish)
+      assert (prefetch_install_full && !data_mem_pkt_v_o && stat_mem_pkt_v_o)
+        else $error("UCE prefetch publishes before complete data installation");
+    if (!prefetch_side_buffer_p && !retained_buffer_p && prefetch_install_state_r == e_pf_publish)
+      assert (!prefetch_cancel_r[prefetch_install_slot_r] && !prefetch_cancel_all)
+        else $error("UCE published a detached prefetch across fence.i");
+    if (prefetch_issue)
+      assert (!prefetch_cancel_r[prefetch_issue_slot] && !inval_v_li && !inval_v_r)
+        else $error("UCE issued a cancelled detached prefetch");
+  end
+  always_ff @(negedge clk_i) if (!reset_i && prefetch_response_header) begin
+    assert (prefetch_response_id_v
+      && prefetch_valid_r[prefetch_response_slot]
+      && prefetch_sent_r[prefetch_response_slot]
+      && (fsm_rev_header_li.size == prefetch_msg_size_lp))
+      else $error("UCE prefetch response has no live slot");
+    assert (prefetch_response_id_v
+      && fsm_rev_header_li.addr == prefetch_addr_r[prefetch_response_slot])
+      else $error("UCE prefetch response address does not match its slot");
+  end
+  initial assert (prefetch_els_p > 0 && prefetch_els_p <= (1 << prefetch_id_width_lp))
+    else $error("UCE prefetch queue exceeds the echoed response identifier capacity");
+  always_ff @(negedge clk_i) if (!reset_i && detached_prefetch_v_i)
+    assert (prefetch_p && prefetch_full_line_p)
+      else $error("UCE detached replay ingress requires full-line prefetch mode");
+  always_ff @(negedge clk_i) if (!reset_i && preview_v_i)
+    assert (prefetch_p && (!prefetch_full_line_p || retained_buffer_p))
+      else $error("UCE physical data preview requires narrow or retained full-line mode");
+  initial if (retained_buffer_p) begin
+    assert (prefetch_full_line_p && !prefetch_side_buffer_p
+            && !prefetch_critical_forward_p && block_width_p == 512)
+      else $error("Retained lookaside requires full64B transport and no legacy critical/L1 prefetch installation");
+  end
+  // synopsys translate_on
+
+  // synopsys sync_set_reset "reset_i"
+  always_ff @(posedge clk_i)
+    if (reset_i)
+      state_r <= e_reset;
+    else
+      state_r <= state_n;
+
+  // synopsys translate_off
+  always_ff @(negedge clk_i)
+    assert(reset_i !== '0 || (writeback_p == 1) || !(state_r inside {e_uc_writeback_evict, e_writeback_evict, e_uc_writeback_write_req, e_writeback_read_wait, e_writeback_write_req}))
+      else $error("writethrough cache should not be in writeback states");
+  // synopsys translate_on
+
+endmodule
+
+`BSG_ABSTRACT_MODULE(bp_uce)
