@@ -1,0 +1,112 @@
+{
+  "purpose": "Document the relocated-path-only verifier failure while preserving the original sealed1792 proof; provide independent content verification for main without recompilation or target execution.",
+  "original_absolute_directory": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121",
+  "main_relocated_directory": "/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121",
+  "original_preparation_script": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/prepare.py",
+  "root_integration_commit": "73a996cb357233f3f8361083da4bed546e4fa68a",
+  "sealed_proofs_unchanged": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verification.json",
+      "bytes": 73565,
+      "sha256": "abbe776d950270daa7d70be754c4107e2584716de9b86dd0fa8c8be30269d71b"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121/verification.json",
+      "bytes": 73565,
+      "sha256": "abbe776d950270daa7d70be754c4107e2584716de9b86dd0fa8c8be30269d71b"
+    }
+  ],
+  "portable_verifier": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py",
+    "bytes": 3758,
+    "sha256": "71e832741bfe5984416a1ef5bd17ead8fb33988d817ef32362f723abf78591df"
+  },
+  "tests": [
+    {
+      "label": "original-at-original-path",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/close.py"
+      ],
+      "returncode": 0,
+      "output": "PASS static1792 ELF/three NBF/source/CRT/toolchain/layout/46MiB/archive proof; runtime pending\n"
+    },
+    {
+      "label": "original-at-relocated-main-path",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121/close.py"
+      ],
+      "returncode": 1,
+      "output": "Traceback (most recent call last):\n  File \"/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121/close.py\", line 39, in <module>\n    ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--archive',action='store_true');args=ap.parse_args();x=inspect();target=HERE/'verification.json'\n  File \"/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121/close.py\", line 19, in inspect\n    require(x['source']==bind(HERE/'prepare.py'),'reviewed preparation source')\n  File \"/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121/close.py\", line 13, in require\n    if not ok:raise ValueError(message)\nValueError: reviewed preparation source\n"
+    },
+    {
+      "label": "portable-original",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py",
+        "--archive-dir",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121"
+      ],
+      "returncode": 0,
+      "output": "{\"archive_directory\": \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121\", \"external_records\": 33, \"sealed_sha256\": \"abbe776d950270daa7d70be754c4107e2584716de9b86dd0fa8c8be30269d71b\", \"snapshots\": 58, \"state\": \"PASS portable independent static/archive verification; no recompile or target run\"}\n"
+    },
+    {
+      "label": "portable-main-relocated",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py",
+        "--archive-dir",
+        "/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121"
+      ],
+      "returncode": 0,
+      "output": "{\"archive_directory\": \"/home/coyang/zynq-parrot-linux-capacity/research/retained-capacity1792-preparation-20261121\", \"external_records\": 33, \"sealed_sha256\": \"abbe776d950270daa7d70be754c4107e2584716de9b86dd0fa8c8be30269d71b\", \"snapshots\": 58, \"state\": \"PASS portable independent static/archive verification; no recompile or target run\"}\n"
+    },
+    {
+      "label": "changed-local-source-rejected",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py",
+        "--archive-dir",
+        "/tmp/retained1792-portability-kwmnxfgd/copy"
+      ],
+      "returncode": 1,
+      "output": "Traceback (most recent call last):\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 50, in <module>\n    print(json.dumps(verify(args.archive_dir),sort_keys=True))\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 24, in verify\n    x=json.loads(Path(v['preparation_manifest']['path']).read_text());check(directory/'prepare.py',x['source'])\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 14, in check\n    def check(path,row):require(content(Path(path).read_bytes())=={k:row[k] for k in ('bytes','sha256')},'content binding '+str(path))\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 12, in require\n    if not ok:raise ValueError(message)\nValueError: content binding /tmp/retained1792-portability-kwmnxfgd/copy/prepare.py\n"
+    },
+    {
+      "label": "changed-archive-rejected",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py",
+        "--archive-dir",
+        "/tmp/retained1792-portability-kwmnxfgd/copy"
+      ],
+      "returncode": 1,
+      "output": "Traceback (most recent call last):\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 50, in <module>\n    print(json.dumps(verify(args.archive_dir),sort_keys=True))\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 40, in verify\n    require(Path(name).parts==('snapshots',Path(name).name) and Path(name).suffix=='.gz','bounded archive relative path');check(directory/name,row)\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 14, in check\n    def check(path,row):require(content(Path(path).read_bytes())=={k:row[k] for k in ('bytes','sha256')},'content binding '+str(path))\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 12, in require\n    if not ok:raise ValueError(message)\nValueError: content binding /tmp/retained1792-portability-kwmnxfgd/copy/snapshots/472a84e536689fc48e861b2415b229742e133d09bbf1c8fd8e0fe89ab5712f04.gz\n"
+    },
+    {
+      "label": "changed-sealed-proof-rejected",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py",
+        "--archive-dir",
+        "/tmp/retained1792-portability-kwmnxfgd/copy"
+      ],
+      "returncode": 1,
+      "output": "Traceback (most recent call last):\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 50, in <module>\n    print(json.dumps(verify(args.archive_dir),sort_keys=True))\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 18, in verify\n    require(hashlib.sha256(raw).hexdigest()==SEALED_SHA,'fixed sealed proof identity');v=json.loads(raw)\n  File \"/home/coyang/zynq-parrot-linux-host-observer/research/retained-capacity1792-preparation-20261121/verify_portable.py\", line 12, in require\n    if not ok:raise ValueError(message)\nValueError: fixed sealed proof identity\n"
+    }
+  ],
+  "scope": "Only local reviewed source/document/archive location may relocate. External source/binary/CRT/toolchain/dependency paths and all sizes/hashes remain required. Pinned original sealed verification identity prevents altered static claims. No source, original proof, binary or main-index edits; no recompile, model, FPGA or board run.",
+  "procedure": [
+    "Original close.py remains valid at the original absolute directory; preserve its historical pathname binding.",
+    "Run verify_portable.py --archive-dir MAIN/research/retained-capacity1792-preparation-20261121 for relocated copies.",
+    "This new verifier checks content bytes for prepare.py/close.py/README and local gzip containers, every external/static/dependency binding, and every decompressed snapshot. It adds no runtime/fit approval."
+  ]
+}
