@@ -1,0 +1,566 @@
+{
+  "state": "PASS-actual-offer-wait-and-gating-audit",
+  "mode": 0,
+  "comparison": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-natural-control-20261121/comparison-v3-01/comparison.json",
+    "bytes": 16767,
+    "sha256": "ada9f5d99311e80d091abeeae35bb1a6ef92a66f3b0487900ee0694e941d1634"
+  },
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/offer_waits.py",
+    "bytes": 12699,
+    "sha256": "409e091a09b10988ab38a511512e859368cc4abb8e316aec4fa8e5b0dc069d31"
+  },
+  "FSM_sources": {
+    "backend": {
+      "compiled": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+        "bytes": 15424,
+        "sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/source/bp_retained_line_store.sv",
+        "bytes": 15424,
+        "sha256": "06dfafa133e612f214ea3cb5c5755505602984ed47ff6dac1a1af06afc4d7a4e"
+      }
+    },
+    "UCE": {
+      "compiled": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+        "bytes": 106161,
+        "sha256": "f7fc772129f9560bc25287ad780b352fa909219ee08f686a9bb4f5ab0fe1bbc9"
+      },
+      "snapshot": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/source/bp_uce.sv",
+        "bytes": 106161,
+        "sha256": "f7fc772129f9560bc25287ad780b352fa909219ee08f686a9bb4f5ab0fe1bbc9"
+      }
+    }
+  },
+  "retained_proof": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-natural-control-20261121/audits-v3-01/mode0-retained/analysis.json",
+    "bytes": 4265,
+    "sha256": "c927071d42a3cb7484c63716a021aae7624873748fe4403ecbb0c18c776cfd91"
+  },
+  "retained_saved_stream": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-natural-control-20261121/audits-v3-01/mode0-retained/selected-events.tsv.gz",
+    "bytes": 29997325,
+    "sha256": "4bb8b82e87fe8e69daac6a55992c1b8f32d518b8433784b6e87ee8df6e72e2e1"
+  },
+  "HP0_proof": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode0-hp0/analysis.json",
+    "bytes": 17176,
+    "sha256": "af3d08e7397bbaf734843a0189f402060271e1eb3eefa4c08d8d23d9d32cf5b1"
+  },
+  "UCE_saved_stream": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode0-hp0/selected-events.tsv.gz",
+    "bytes": 34994234,
+    "sha256": "4ce027f7e785b5f687ec1abc9e87ea96ff3c2774a6daacb53ace90de459ba46b"
+  },
+  "results": {
+    "program": {
+      "i": {
+        "lookup": {
+          "accepted": 0,
+          "accepted_offer_to_accept_histogram": {},
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "ordinary_cached_request": {
+          "accepted": 110,
+          "accepted_offer_to_accept_histogram": {
+            "0": 110
+          },
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "clear_episodes": [
+          {
+            "origin": "reset",
+            "request_tick": 125000,
+            "request_cycle": 0,
+            "request_edge": 3,
+            "clear_state_samples": 1,
+            "request_not_observed": true,
+            "termination": "restarted_by_actual_reset"
+          },
+          {
+            "origin": "reset",
+            "request_tick": 62125000,
+            "request_cycle": 0,
+            "request_edge": 1243,
+            "clear_state_samples": 1280,
+            "request_not_observed": true,
+            "ready_tick": 126125000,
+            "ready_cycle": 1280,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "explicit_clear",
+            "request_tick": 5969225000,
+            "request_cycle": 118142,
+            "request_edge": 119385,
+            "clear_state_samples": 1280,
+            "ready_tick": 6033275000,
+            "ready_cycle": 119423,
+            "request_to_lookup_ready_lane_cycles": 1281
+          },
+          {
+            "origin": "explicit_clear",
+            "request_tick": 63865475000,
+            "request_cycle": 1276067,
+            "request_edge": 1277310,
+            "clear_state_samples": 1280,
+            "ready_tick": 63929525000,
+            "ready_cycle": 1277348,
+            "request_to_lookup_ready_lane_cycles": 1281
+          }
+        ]
+      },
+      "d": {
+        "lookup": {
+          "accepted": 0,
+          "accepted_offer_to_accept_histogram": {},
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "ordinary_cached_request": {
+          "accepted": 6467,
+          "accepted_offer_to_accept_histogram": {
+            "0": 6467
+          },
+          "blocked_valid_sample_cycles": 34,
+          "blocked_conditions": {
+            "reason": {
+              "observed_cache_request_backpressure": 34
+            },
+            "backend_state": {
+              "1": 34
+            },
+            "clear_pin": {
+              "0": 34
+            },
+            "wrap_pulse": {
+              "0": 34
+            },
+            "clear_origin": {
+              "none": 34
+            },
+            "UCE_insert_owned": {
+              "0": 34
+            },
+            "UCE_state": {
+              "16": 34
+            }
+          },
+          "unaccepted_offers": 34
+        },
+        "clear_episodes": [
+          {
+            "origin": "reset",
+            "request_tick": 100000,
+            "request_cycle": 0,
+            "request_edge": 2,
+            "clear_state_samples": 1,
+            "request_not_observed": true,
+            "termination": "restarted_by_actual_reset"
+          },
+          {
+            "origin": "reset",
+            "request_tick": 62100000,
+            "request_cycle": 0,
+            "request_edge": 1242,
+            "clear_state_samples": 1280,
+            "request_not_observed": true,
+            "ready_tick": 126100000,
+            "ready_cycle": 1280,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "explicit_clear",
+            "request_tick": 5969200000,
+            "request_cycle": 118142,
+            "request_edge": 119384,
+            "clear_state_samples": 1280,
+            "ready_tick": 6033250000,
+            "ready_cycle": 119423,
+            "request_to_lookup_ready_lane_cycles": 1281
+          },
+          {
+            "origin": "explicit_clear",
+            "request_tick": 63865450000,
+            "request_cycle": 1276067,
+            "request_edge": 1277309,
+            "clear_state_samples": 1280,
+            "ready_tick": 63929500000,
+            "ready_cycle": 1277348,
+            "request_to_lookup_ready_lane_cycles": 1281
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 64059700000,
+            "request_cycle": 1279952,
+            "request_edge": 1281194,
+            "clear_state_samples": 1280,
+            "ready_tick": 64123700000,
+            "ready_cycle": 1281232,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 64290200000,
+            "request_cycle": 1284562,
+            "request_edge": 1285804,
+            "clear_state_samples": 1280,
+            "ready_tick": 64354200000,
+            "ready_cycle": 1285842,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 64523550000,
+            "request_cycle": 1289229,
+            "request_edge": 1290471,
+            "clear_state_samples": 1280,
+            "ready_tick": 64587550000,
+            "ready_cycle": 1290509,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 64753650000,
+            "request_cycle": 1293831,
+            "request_edge": 1295073,
+            "clear_state_samples": 1280,
+            "ready_tick": 64817650000,
+            "ready_cycle": 1295111,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 64987400000,
+            "request_cycle": 1298506,
+            "request_edge": 1299748,
+            "clear_state_samples": 1280,
+            "ready_tick": 65051400000,
+            "ready_cycle": 1299786,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 65216150000,
+            "request_cycle": 1303081,
+            "request_edge": 1304323,
+            "clear_state_samples": 1280,
+            "ready_tick": 65280150000,
+            "ready_cycle": 1304361,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 65448050000,
+            "request_cycle": 1307719,
+            "request_edge": 1308961,
+            "clear_state_samples": 1280,
+            "ready_tick": 65512050000,
+            "ready_cycle": 1308999,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 65677850000,
+            "request_cycle": 1312315,
+            "request_edge": 1313557,
+            "clear_state_samples": 1280,
+            "ready_tick": 65741850000,
+            "ready_cycle": 1313595,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 65906550000,
+            "request_cycle": 1316889,
+            "request_edge": 1318131,
+            "clear_state_samples": 1280,
+            "ready_tick": 65970550000,
+            "ready_cycle": 1318169,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 66118700000,
+            "request_cycle": 1321132,
+            "request_edge": 1322374,
+            "clear_state_samples": 1280,
+            "ready_tick": 66182700000,
+            "ready_cycle": 1322412,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 66354550000,
+            "request_cycle": 1325849,
+            "request_edge": 1327091,
+            "clear_state_samples": 1280,
+            "ready_tick": 66418550000,
+            "ready_cycle": 1327129,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 66581750000,
+            "request_cycle": 1330393,
+            "request_edge": 1331635,
+            "clear_state_samples": 1280,
+            "ready_tick": 66645750000,
+            "ready_cycle": 1331673,
+            "request_to_lookup_ready_lane_cycles": 1280
+          },
+          {
+            "origin": "observed_epoch_wrap_pulse",
+            "request_tick": 66798150000,
+            "request_cycle": 1334721,
+            "request_edge": 1335963,
+            "clear_state_samples": 1280,
+            "ready_tick": 66862150000,
+            "ready_cycle": 1336001,
+            "request_to_lookup_ready_lane_cycles": 1280
+          }
+        ]
+      }
+    },
+    "whole": {
+      "i": {
+        "lookup": {
+          "accepted": 0,
+          "accepted_offer_to_accept_histogram": {},
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "ordinary_cached_request": {
+          "accepted": 73,
+          "accepted_offer_to_accept_histogram": {
+            "0": 73
+          },
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "clear_episodes": [
+          {
+            "origin": "explicit_clear",
+            "request_tick": 5969225000,
+            "request_cycle": 118142,
+            "request_edge": 119385,
+            "clear_state_samples": 1280,
+            "ready_tick": 6033275000,
+            "ready_cycle": 119423,
+            "request_to_lookup_ready_lane_cycles": 1281
+          },
+          {
+            "origin": "explicit_clear",
+            "request_tick": 63865475000,
+            "request_cycle": 1276067,
+            "request_edge": 1277310,
+            "clear_state_samples": 1280,
+            "ready_tick": 63929525000,
+            "ready_cycle": 1277348,
+            "request_to_lookup_ready_lane_cycles": 1281
+          }
+        ]
+      },
+      "d": {
+        "lookup": {
+          "accepted": 0,
+          "accepted_offer_to_accept_histogram": {},
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "ordinary_cached_request": {
+          "accepted": 6206,
+          "accepted_offer_to_accept_histogram": {
+            "0": 6206
+          },
+          "blocked_valid_sample_cycles": 34,
+          "blocked_conditions": {
+            "reason": {
+              "observed_cache_request_backpressure": 34
+            },
+            "backend_state": {
+              "1": 34
+            },
+            "clear_pin": {
+              "0": 34
+            },
+            "wrap_pulse": {
+              "0": 34
+            },
+            "clear_origin": {
+              "none": 34
+            },
+            "UCE_insert_owned": {
+              "0": 34
+            },
+            "UCE_state": {
+              "16": 34
+            }
+          },
+          "unaccepted_offers": 34
+        },
+        "clear_episodes": [
+          {
+            "origin": "explicit_clear",
+            "request_tick": 5969200000,
+            "request_cycle": 118142,
+            "request_edge": 119384,
+            "clear_state_samples": 1280,
+            "ready_tick": 6033250000,
+            "ready_cycle": 119423,
+            "request_to_lookup_ready_lane_cycles": 1281
+          },
+          {
+            "origin": "explicit_clear",
+            "request_tick": 63865450000,
+            "request_cycle": 1276067,
+            "request_edge": 1277309,
+            "clear_state_samples": 1280,
+            "ready_tick": 63929500000,
+            "ready_cycle": 1277348,
+            "request_to_lookup_ready_lane_cycles": 1281
+          }
+        ]
+      }
+    },
+    "timed_ring": {
+      "i": {
+        "lookup": {
+          "accepted": 0,
+          "accepted_offer_to_accept_histogram": {},
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "ordinary_cached_request": {
+          "accepted": 1,
+          "accepted_offer_to_accept_histogram": {
+            "0": 1
+          },
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "clear_episodes": []
+      },
+      "d": {
+        "lookup": {
+          "accepted": 0,
+          "accepted_offer_to_accept_histogram": {},
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "ordinary_cached_request": {
+          "accepted": 1696,
+          "accepted_offer_to_accept_histogram": {
+            "0": 1696
+          },
+          "blocked_valid_sample_cycles": 0,
+          "blocked_conditions": {
+            "reason": {},
+            "backend_state": {},
+            "clear_pin": {},
+            "wrap_pulse": {},
+            "clear_origin": {},
+            "UCE_insert_owned": {},
+            "UCE_state": {}
+          },
+          "unaccepted_offers": 0
+        },
+        "clear_episodes": []
+      }
+    }
+  },
+  "limits": [
+    "Offer waiting is measured separately from accepted\u2192consumed service. Canceled/superseded/unaccepted offers remain explicit.",
+    "Raw UCE insert ownership and backend/clear/wrap conditions are simultaneous observations, not mutually exclusive causal stalls.",
+    "Explicit-clear request\u2192lookup-ready and observed-wrap-pulse\u2192ready use different start signals. State-clear sample count is separate.",
+    "No target execution, source/model change, performance partition or FPGA projection."
+  ]
+}

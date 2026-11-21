@@ -1,0 +1,1266 @@
+{
+  "state": "PASS-closed-matched-service-and-HP0-join",
+  "comparison": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-natural-control-20261121/comparison-v3-01/comparison.json",
+    "bytes": 16767,
+    "sha256": "ada9f5d99311e80d091abeeae35bb1a6ef92a66f3b0487900ee0694e941d1634"
+  },
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/join_service.py",
+    "bytes": 10477,
+    "sha256": "2e73162350ad4ead54bc24b7a8f91801cfd26838cd2066eb14c9770d31e35623"
+  },
+  "inputs": {
+    "0": {
+      "dp": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode0-dcache/analysis.json",
+        "bytes": 2797,
+        "sha256": "01c81860482f0aed91ce67846b3b5aeb3ca17f2ef675c3a99b0bd82b0a628725"
+      },
+      "hp": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode0-hp0/analysis.json",
+        "bytes": 17176,
+        "sha256": "af3d08e7397bbaf734843a0189f402060271e1eb3eefa4c08d8d23d9d32cf5b1"
+      },
+      "tp": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode0-time-index/analysis.json",
+        "bytes": 1779,
+        "sha256": "147e87fa1fb3eb6cce27e82f362cee35b20c559a178b96534fd3a1cfe83fddf8"
+      }
+    },
+    "15": {
+      "dp": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode15-dcache/analysis.json",
+        "bytes": 2803,
+        "sha256": "c4f44aacbd16886ab72abadc172530eccfbdd7365a53c4be9069291533a5480a"
+      },
+      "hp": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode15-hp0/analysis.json",
+        "bytes": 18020,
+        "sha256": "d177ac95671dcea4e3b9f4aa2722badf612b473067d5036acc6d8d299fd42ba3"
+      },
+      "tp": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/mode15-time-index/analysis.json",
+        "bytes": 1783,
+        "sha256": "6d02013dbc07557c71e0b24a8238a9683d79420302824cb38f61eb427405922b"
+      }
+    }
+  },
+  "WHOLE_identical_cached_references": 43926,
+  "matched_D_lookups": 4080,
+  "matched_D_retained_hits": 1150,
+  "summary": {
+    "whole": {
+      "retained_hit": {
+        "count": 1150,
+        "categories": {
+          "baseline_matching_HP0_read": 1150
+        },
+        "target_count": 1146,
+        "joint_matching_HP0_reads": 0,
+        "accepted_to_consumed_lane_cycles": {
+          "count": 1150,
+          "minimum": 12,
+          "lower_median": 16,
+          "maximum": 20,
+          "histogram": {
+            "12": 309,
+            "14": 260,
+            "16": 227,
+            "18": 196,
+            "20": 158
+          }
+        },
+        "miss_to_first_Dcache_write": {
+          "baseline": {
+            "count": 1150,
+            "minimum": 22,
+            "lower_median": 22,
+            "maximum": 31,
+            "histogram": {
+              "22": 1122,
+              "31": 28
+            }
+          },
+          "joint": {
+            "count": 1150,
+            "minimum": 14,
+            "lower_median": 18,
+            "maximum": 30,
+            "histogram": {
+              "14": 304,
+              "15": 4,
+              "16": 259,
+              "17": 1,
+              "18": 225,
+              "19": 2,
+              "20": 191,
+              "21": 5,
+              "22": 156,
+              "23": 2,
+              "30": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 1150,
+            "minimum": -17,
+            "lower_median": -4,
+            "maximum": 8,
+            "histogram": {
+              "-17": 11,
+              "-16": 2,
+              "-15": 9,
+              "-13": 4,
+              "-11": 1,
+              "-9": 1,
+              "-8": 293,
+              "-7": 2,
+              "-6": 250,
+              "-5": 1,
+              "-4": 221,
+              "-3": 2,
+              "-2": 190,
+              "-1": 5,
+              "0": 155,
+              "1": 2,
+              "8": 1
+            }
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "baseline": {
+            "count": 1150,
+            "minimum": 22,
+            "lower_median": 22,
+            "maximum": 34,
+            "histogram": {
+              "22": 625,
+              "24": 494,
+              "25": 3,
+              "31": 14,
+              "33": 13,
+              "34": 1
+            }
+          },
+          "joint": {
+            "count": 1150,
+            "minimum": 14,
+            "lower_median": 20,
+            "maximum": 33,
+            "histogram": {
+              "14": 114,
+              "15": 2,
+              "16": 157,
+              "17": 1,
+              "18": 195,
+              "19": 2,
+              "20": 235,
+              "21": 4,
+              "22": 185,
+              "23": 4,
+              "24": 124,
+              "25": 1,
+              "26": 78,
+              "28": 46,
+              "29": 1,
+              "33": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 1150,
+            "minimum": -17,
+            "lower_median": -4,
+            "maximum": 8,
+            "histogram": {
+              "-17": 6,
+              "-16": 2,
+              "-15": 6,
+              "-13": 7,
+              "-11": 3,
+              "-9": 2,
+              "-8": 177,
+              "-7": 2,
+              "-6": 138,
+              "-5": 1,
+              "-4": 247,
+              "-3": 2,
+              "-2": 211,
+              "-1": 5,
+              "0": 170,
+              "1": 2,
+              "2": 91,
+              "3": 1,
+              "4": 75,
+              "5": 1,
+              "8": 1
+            }
+          }
+        },
+        "miss_to_full_L1_write": {
+          "baseline": {
+            "count": 1150,
+            "minimum": 29,
+            "lower_median": 29,
+            "maximum": 40,
+            "histogram": {
+              "29": 575,
+              "30": 545,
+              "31": 2,
+              "38": 17,
+              "39": 10,
+              "40": 1
+            }
+          },
+          "joint": {
+            "count": 1150,
+            "minimum": 21,
+            "lower_median": 25,
+            "maximum": 37,
+            "histogram": {
+              "21": 223,
+              "22": 83,
+              "23": 202,
+              "24": 59,
+              "25": 172,
+              "26": 56,
+              "27": 139,
+              "28": 56,
+              "29": 118,
+              "30": 40,
+              "31": 1,
+              "37": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 1150,
+            "minimum": -18,
+            "lower_median": -5,
+            "maximum": 8,
+            "histogram": {
+              "-18": 2,
+              "-17": 9,
+              "-16": 3,
+              "-15": 8,
+              "-14": 2,
+              "-13": 2,
+              "-12": 1,
+              "-9": 71,
+              "-8": 223,
+              "-7": 66,
+              "-6": 187,
+              "-5": 44,
+              "-4": 177,
+              "-3": 46,
+              "-2": 146,
+              "-1": 47,
+              "0": 113,
+              "1": 2,
+              "8": 1
+            }
+          }
+        }
+      },
+      "retained_miss": {
+        "count": 2930,
+        "categories": {
+          "baseline_matching_HP0_read": 2776,
+          "baseline_normal_miss_without_HP0_read": 154
+        },
+        "target_count": 2245,
+        "joint_matching_HP0_reads": 2774,
+        "accepted_to_consumed_lane_cycles": {
+          "count": 2930,
+          "minimum": 11,
+          "lower_median": 11,
+          "maximum": 11,
+          "histogram": {
+            "11": 2930
+          }
+        },
+        "miss_to_first_Dcache_write": {
+          "baseline": {
+            "count": 2930,
+            "minimum": 9,
+            "lower_median": 22,
+            "maximum": 62,
+            "histogram": {
+              "9": 138,
+              "11": 8,
+              "13": 6,
+              "22": 2455,
+              "24": 2,
+              "26": 31,
+              "28": 24,
+              "30": 4,
+              "31": 233,
+              "34": 1,
+              "35": 4,
+              "36": 1,
+              "37": 4,
+              "39": 2,
+              "41": 3,
+              "42": 9,
+              "44": 1,
+              "45": 1,
+              "51": 2,
+              "62": 1
+            }
+          },
+          "joint": {
+            "count": 2930,
+            "minimum": 21,
+            "lower_median": 34,
+            "maximum": 62,
+            "histogram": {
+              "21": 154,
+              "32": 2,
+              "34": 2496,
+              "42": 8,
+              "43": 263,
+              "44": 1,
+              "45": 2,
+              "51": 2,
+              "53": 1,
+              "62": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 2930,
+            "minimum": -8,
+            "lower_median": 12,
+            "maximum": 21,
+            "histogram": {
+              "-8": 1,
+              "-7": 2,
+              "-5": 1,
+              "-1": 2,
+              "0": 14,
+              "2": 2,
+              "3": 18,
+              "4": 3,
+              "6": 28,
+              "8": 41,
+              "9": 1,
+              "10": 10,
+              "12": 2768,
+              "21": 39
+            }
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "baseline": {
+            "count": 2930,
+            "minimum": 9,
+            "lower_median": 22,
+            "maximum": 64,
+            "histogram": {
+              "9": 70,
+              "10": 1,
+              "11": 69,
+              "12": 4,
+              "13": 5,
+              "15": 3,
+              "22": 1400,
+              "23": 6,
+              "24": 1047,
+              "25": 4,
+              "26": 17,
+              "28": 24,
+              "29": 1,
+              "30": 16,
+              "31": 123,
+              "33": 110,
+              "34": 1,
+              "35": 3,
+              "36": 1,
+              "37": 4,
+              "39": 4,
+              "42": 1,
+              "43": 2,
+              "44": 5,
+              "45": 4,
+              "46": 2,
+              "52": 2,
+              "64": 1
+            }
+          },
+          "joint": {
+            "count": 2930,
+            "minimum": 21,
+            "lower_median": 34,
+            "maximum": 64,
+            "histogram": {
+              "21": 81,
+              "22": 1,
+              "23": 68,
+              "24": 4,
+              "32": 1,
+              "34": 1410,
+              "35": 10,
+              "36": 1071,
+              "37": 6,
+              "43": 149,
+              "44": 4,
+              "45": 119,
+              "46": 2,
+              "52": 2,
+              "56": 1,
+              "64": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 2930,
+            "minimum": -8,
+            "lower_median": 12,
+            "maximum": 21,
+            "histogram": {
+              "-8": 1,
+              "-7": 2,
+              "-5": 1,
+              "-1": 2,
+              "0": 14,
+              "2": 2,
+              "3": 18,
+              "4": 3,
+              "6": 28,
+              "8": 41,
+              "9": 1,
+              "10": 10,
+              "12": 2768,
+              "21": 39
+            }
+          }
+        },
+        "miss_to_full_L1_write": {
+          "baseline": {
+            "count": 2930,
+            "minimum": 16,
+            "lower_median": 29,
+            "maximum": 69,
+            "histogram": {
+              "16": 131,
+              "17": 7,
+              "18": 8,
+              "20": 6,
+              "29": 1437,
+              "30": 1017,
+              "31": 3,
+              "33": 31,
+              "35": 24,
+              "37": 2,
+              "38": 169,
+              "39": 66,
+              "41": 1,
+              "42": 4,
+              "43": 1,
+              "44": 4,
+              "46": 1,
+              "47": 1,
+              "48": 3,
+              "49": 4,
+              "50": 1,
+              "51": 5,
+              "54": 1,
+              "59": 2,
+              "69": 1
+            }
+          },
+          "joint": {
+            "count": 2930,
+            "minimum": 28,
+            "lower_median": 41,
+            "maximum": 69,
+            "histogram": {
+              "28": 147,
+              "29": 7,
+              "39": 2,
+              "41": 1488,
+              "42": 1007,
+              "43": 1,
+              "49": 3,
+              "50": 186,
+              "51": 83,
+              "52": 1,
+              "54": 1,
+              "59": 2,
+              "60": 1,
+              "69": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 2930,
+            "minimum": -8,
+            "lower_median": 12,
+            "maximum": 21,
+            "histogram": {
+              "-8": 1,
+              "-7": 2,
+              "-5": 1,
+              "-1": 2,
+              "0": 14,
+              "2": 2,
+              "3": 18,
+              "4": 3,
+              "6": 28,
+              "8": 41,
+              "9": 1,
+              "10": 10,
+              "11": 1,
+              "12": 2767,
+              "21": 39
+            }
+          }
+        }
+      }
+    },
+    "timed_ring": {
+      "retained_hit": {
+        "count": 772,
+        "categories": {
+          "baseline_matching_HP0_read": 772
+        },
+        "target_count": 771,
+        "joint_matching_HP0_reads": 0,
+        "accepted_to_consumed_lane_cycles": {
+          "count": 772,
+          "minimum": 12,
+          "lower_median": 16,
+          "maximum": 20,
+          "histogram": {
+            "12": 179,
+            "14": 162,
+            "16": 168,
+            "18": 142,
+            "20": 121
+          }
+        },
+        "miss_to_first_Dcache_write": {
+          "baseline": {
+            "count": 772,
+            "minimum": 22,
+            "lower_median": 22,
+            "maximum": 31,
+            "histogram": {
+              "22": 766,
+              "31": 6
+            }
+          },
+          "joint": {
+            "count": 772,
+            "minimum": 14,
+            "lower_median": 18,
+            "maximum": 23,
+            "histogram": {
+              "14": 179,
+              "16": 162,
+              "18": 166,
+              "19": 2,
+              "20": 141,
+              "21": 1,
+              "22": 120,
+              "23": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 772,
+            "minimum": -17,
+            "lower_median": -4,
+            "maximum": 1,
+            "histogram": {
+              "-17": 2,
+              "-15": 2,
+              "-11": 1,
+              "-9": 1,
+              "-8": 177,
+              "-6": 160,
+              "-4": 166,
+              "-3": 2,
+              "-2": 140,
+              "-1": 1,
+              "0": 119,
+              "1": 1
+            }
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "baseline": {
+            "count": 772,
+            "minimum": 22,
+            "lower_median": 22,
+            "maximum": 33,
+            "histogram": {
+              "22": 421,
+              "24": 344,
+              "25": 1,
+              "31": 1,
+              "33": 5
+            }
+          },
+          "joint": {
+            "count": 772,
+            "minimum": 14,
+            "lower_median": 20,
+            "maximum": 28,
+            "histogram": {
+              "14": 62,
+              "16": 97,
+              "18": 130,
+              "19": 2,
+              "20": 151,
+              "21": 1,
+              "22": 138,
+              "23": 2,
+              "24": 90,
+              "26": 64,
+              "28": 35
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 772,
+            "minimum": -15,
+            "lower_median": -2,
+            "maximum": 4,
+            "histogram": {
+              "-15": 2,
+              "-13": 2,
+              "-8": 107,
+              "-7": 1,
+              "-6": 83,
+              "-5": 1,
+              "-4": 169,
+              "-3": 1,
+              "-2": 147,
+              "-1": 1,
+              "0": 126,
+              "1": 2,
+              "2": 70,
+              "4": 60
+            }
+          }
+        },
+        "miss_to_full_L1_write": {
+          "baseline": {
+            "count": 772,
+            "minimum": 29,
+            "lower_median": 30,
+            "maximum": 39,
+            "histogram": {
+              "29": 381,
+              "30": 384,
+              "31": 1,
+              "38": 2,
+              "39": 4
+            }
+          },
+          "joint": {
+            "count": 772,
+            "minimum": 21,
+            "lower_median": 25,
+            "maximum": 31,
+            "histogram": {
+              "21": 129,
+              "22": 50,
+              "23": 126,
+              "24": 35,
+              "25": 123,
+              "26": 46,
+              "27": 99,
+              "28": 43,
+              "29": 90,
+              "30": 30,
+              "31": 1
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 772,
+            "minimum": -18,
+            "lower_median": -4,
+            "maximum": 1,
+            "histogram": {
+              "-18": 2,
+              "-15": 2,
+              "-12": 1,
+              "-9": 40,
+              "-8": 138,
+              "-7": 42,
+              "-6": 118,
+              "-5": 30,
+              "-4": 136,
+              "-3": 39,
+              "-2": 103,
+              "-1": 36,
+              "0": 84,
+              "1": 1
+            }
+          }
+        }
+      },
+      "retained_miss": {
+        "count": 908,
+        "categories": {
+          "baseline_matching_HP0_read": 906,
+          "baseline_normal_miss_without_HP0_read": 2
+        },
+        "target_count": 905,
+        "joint_matching_HP0_reads": 906,
+        "accepted_to_consumed_lane_cycles": {
+          "count": 908,
+          "minimum": 11,
+          "lower_median": 11,
+          "maximum": 11,
+          "histogram": {
+            "11": 908
+          }
+        },
+        "miss_to_first_Dcache_write": {
+          "baseline": {
+            "count": 908,
+            "minimum": 9,
+            "lower_median": 22,
+            "maximum": 31,
+            "histogram": {
+              "9": 2,
+              "22": 891,
+              "31": 15
+            }
+          },
+          "joint": {
+            "count": 908,
+            "minimum": 21,
+            "lower_median": 34,
+            "maximum": 43,
+            "histogram": {
+              "21": 2,
+              "34": 885,
+              "43": 21
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 908,
+            "minimum": 3,
+            "lower_median": 12,
+            "maximum": 21,
+            "histogram": {
+              "3": 4,
+              "12": 894,
+              "21": 10
+            }
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "baseline": {
+            "count": 908,
+            "minimum": 11,
+            "lower_median": 22,
+            "maximum": 33,
+            "histogram": {
+              "11": 1,
+              "12": 1,
+              "22": 504,
+              "24": 386,
+              "25": 1,
+              "31": 8,
+              "33": 7
+            }
+          },
+          "joint": {
+            "count": 908,
+            "minimum": 23,
+            "lower_median": 34,
+            "maximum": 45,
+            "histogram": {
+              "23": 1,
+              "24": 1,
+              "34": 499,
+              "36": 385,
+              "37": 1,
+              "43": 13,
+              "45": 8
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 908,
+            "minimum": 3,
+            "lower_median": 12,
+            "maximum": 21,
+            "histogram": {
+              "3": 4,
+              "12": 894,
+              "21": 10
+            }
+          }
+        },
+        "miss_to_full_L1_write": {
+          "baseline": {
+            "count": 908,
+            "minimum": 16,
+            "lower_median": 30,
+            "maximum": 39,
+            "histogram": {
+              "16": 2,
+              "29": 432,
+              "30": 458,
+              "31": 1,
+              "38": 7,
+              "39": 8
+            }
+          },
+          "joint": {
+            "count": 908,
+            "minimum": 28,
+            "lower_median": 42,
+            "maximum": 51,
+            "histogram": {
+              "28": 2,
+              "41": 427,
+              "42": 457,
+              "43": 1,
+              "50": 12,
+              "51": 9
+            }
+          },
+          "joint_minus_baseline": {
+            "count": 908,
+            "minimum": 3,
+            "lower_median": 12,
+            "maximum": 21,
+            "histogram": {
+              "3": 4,
+              "12": 894,
+              "21": 10
+            }
+          }
+        }
+      }
+    }
+  },
+  "normal_D_service": {
+    "0": {
+      "whole": {
+        "owned_misses": 6206,
+        "pending_D_interval_union_cycles": 206185,
+        "miss_to_first_Dcache_write": {
+          "count": 6206,
+          "minimum": 9,
+          "lower_median": 22,
+          "maximum": 62,
+          "histogram": {
+            "9": 148,
+            "11": 11,
+            "13": 6,
+            "22": 3880,
+            "23": 4,
+            "24": 2,
+            "25": 1,
+            "26": 72,
+            "28": 24,
+            "30": 5,
+            "31": 271,
+            "33": 1,
+            "34": 2,
+            "35": 1713,
+            "36": 1,
+            "37": 5,
+            "39": 5,
+            "41": 4,
+            "42": 12,
+            "43": 1,
+            "44": 33,
+            "45": 1,
+            "48": 1,
+            "51": 2,
+            "62": 1
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "count": 6206,
+          "minimum": 9,
+          "lower_median": 24,
+          "maximum": 64,
+          "histogram": {
+            "9": 72,
+            "10": 3,
+            "11": 69,
+            "12": 10,
+            "13": 5,
+            "14": 1,
+            "15": 3,
+            "17": 2,
+            "22": 2310,
+            "23": 10,
+            "24": 1548,
+            "25": 16,
+            "26": 58,
+            "27": 2,
+            "28": 24,
+            "29": 2,
+            "30": 16,
+            "31": 144,
+            "32": 1,
+            "33": 124,
+            "34": 6,
+            "35": 1707,
+            "36": 1,
+            "37": 6,
+            "38": 4,
+            "39": 4,
+            "41": 2,
+            "42": 3,
+            "43": 6,
+            "44": 37,
+            "45": 4,
+            "46": 2,
+            "50": 1,
+            "52": 2,
+            "64": 1
+          }
+        },
+        "miss_to_full_L1_write": {
+          "count": 6206,
+          "minimum": 16,
+          "lower_median": 30,
+          "maximum": 69,
+          "histogram": {
+            "16": 141,
+            "17": 7,
+            "18": 9,
+            "20": 6,
+            "23": 2,
+            "29": 2315,
+            "30": 1562,
+            "31": 8,
+            "32": 1,
+            "33": 72,
+            "35": 24,
+            "36": 1,
+            "37": 3,
+            "38": 196,
+            "39": 76,
+            "40": 2,
+            "41": 2,
+            "42": 1713,
+            "43": 1,
+            "44": 5,
+            "46": 4,
+            "47": 1,
+            "48": 4,
+            "49": 7,
+            "50": 2,
+            "51": 37,
+            "54": 1,
+            "55": 1,
+            "59": 2,
+            "69": 1
+          }
+        }
+      },
+      "timed_ring": {
+        "owned_misses": 1696,
+        "pending_D_interval_union_cycles": 50149,
+        "miss_to_first_Dcache_write": {
+          "count": 1696,
+          "minimum": 9,
+          "lower_median": 22,
+          "maximum": 31,
+          "histogram": {
+            "9": 7,
+            "11": 1,
+            "22": 1665,
+            "23": 1,
+            "30": 1,
+            "31": 21
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "count": 1696,
+          "minimum": 10,
+          "lower_median": 22,
+          "maximum": 33,
+          "histogram": {
+            "10": 1,
+            "11": 1,
+            "12": 5,
+            "17": 1,
+            "22": 933,
+            "24": 730,
+            "25": 2,
+            "29": 1,
+            "31": 9,
+            "32": 1,
+            "33": 12
+          }
+        },
+        "miss_to_full_L1_write": {
+          "count": 1696,
+          "minimum": 16,
+          "lower_median": 30,
+          "maximum": 39,
+          "histogram": {
+            "16": 7,
+            "23": 1,
+            "29": 821,
+            "30": 842,
+            "31": 2,
+            "36": 1,
+            "37": 1,
+            "38": 9,
+            "39": 12
+          }
+        }
+      }
+    },
+    "15": {
+      "whole": {
+        "owned_misses": 6204,
+        "pending_D_interval_union_cycles": 234939,
+        "miss_to_first_Dcache_write": {
+          "count": 6204,
+          "minimum": 9,
+          "lower_median": 34,
+          "maximum": 62,
+          "histogram": {
+            "9": 11,
+            "11": 3,
+            "14": 304,
+            "15": 4,
+            "16": 259,
+            "17": 1,
+            "18": 225,
+            "19": 2,
+            "20": 191,
+            "21": 159,
+            "22": 458,
+            "23": 6,
+            "25": 1,
+            "26": 42,
+            "30": 1,
+            "31": 10,
+            "32": 2,
+            "33": 1,
+            "34": 2497,
+            "35": 1708,
+            "37": 1,
+            "39": 3,
+            "41": 1,
+            "42": 10,
+            "43": 264,
+            "44": 33,
+            "45": 2,
+            "51": 2,
+            "53": 1,
+            "55": 1,
+            "62": 1
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "count": 6204,
+          "minimum": 9,
+          "lower_median": 35,
+          "maximum": 64,
+          "histogram": {
+            "9": 2,
+            "10": 2,
+            "11": 1,
+            "12": 6,
+            "14": 115,
+            "15": 2,
+            "16": 157,
+            "17": 3,
+            "18": 195,
+            "19": 2,
+            "20": 235,
+            "21": 85,
+            "22": 470,
+            "23": 76,
+            "24": 135,
+            "25": 10,
+            "26": 120,
+            "27": 2,
+            "28": 46,
+            "29": 2,
+            "31": 6,
+            "32": 1,
+            "33": 3,
+            "34": 1414,
+            "35": 1713,
+            "36": 1071,
+            "37": 8,
+            "38": 4,
+            "41": 2,
+            "42": 2,
+            "43": 152,
+            "44": 36,
+            "45": 119,
+            "46": 2,
+            "52": 2,
+            "56": 2,
+            "64": 1
+          }
+        },
+        "miss_to_full_L1_write": {
+          "count": 6204,
+          "minimum": 16,
+          "lower_median": 41,
+          "maximum": 69,
+          "histogram": {
+            "16": 11,
+            "18": 1,
+            "21": 223,
+            "22": 83,
+            "23": 204,
+            "24": 59,
+            "25": 172,
+            "26": 56,
+            "27": 139,
+            "28": 203,
+            "29": 427,
+            "30": 40,
+            "31": 4,
+            "32": 1,
+            "33": 42,
+            "36": 1,
+            "37": 1,
+            "38": 10,
+            "39": 2,
+            "40": 1,
+            "41": 1489,
+            "42": 2715,
+            "43": 1,
+            "44": 1,
+            "46": 3,
+            "48": 1,
+            "49": 5,
+            "50": 187,
+            "51": 115,
+            "52": 1,
+            "54": 1,
+            "59": 2,
+            "60": 1,
+            "62": 1,
+            "69": 1
+          }
+        }
+      },
+      "timed_ring": {
+        "owned_misses": 1696,
+        "pending_D_interval_union_cycles": 57482,
+        "miss_to_first_Dcache_write": {
+          "count": 1696,
+          "minimum": 9,
+          "lower_median": 34,
+          "maximum": 43,
+          "histogram": {
+            "9": 6,
+            "11": 1,
+            "14": 179,
+            "16": 162,
+            "18": 166,
+            "19": 2,
+            "20": 141,
+            "21": 3,
+            "22": 128,
+            "23": 2,
+            "34": 885,
+            "43": 21
+          }
+        },
+        "miss_to_critical_receive_flag": {
+          "count": 1696,
+          "minimum": 10,
+          "lower_median": 34,
+          "maximum": 45,
+          "histogram": {
+            "10": 1,
+            "11": 1,
+            "12": 4,
+            "14": 62,
+            "16": 97,
+            "17": 1,
+            "18": 130,
+            "19": 2,
+            "20": 151,
+            "21": 1,
+            "22": 146,
+            "23": 3,
+            "24": 91,
+            "26": 64,
+            "28": 35,
+            "29": 1,
+            "34": 499,
+            "36": 385,
+            "37": 1,
+            "43": 13,
+            "45": 8
+          }
+        },
+        "miss_to_full_L1_write": {
+          "count": 1696,
+          "minimum": 16,
+          "lower_median": 41,
+          "maximum": 51,
+          "histogram": {
+            "16": 6,
+            "21": 129,
+            "22": 50,
+            "23": 127,
+            "24": 35,
+            "25": 123,
+            "26": 46,
+            "27": 99,
+            "28": 45,
+            "29": 98,
+            "30": 30,
+            "31": 1,
+            "36": 1,
+            "41": 427,
+            "42": 457,
+            "43": 1,
+            "50": 12,
+            "51": 9
+          }
+        }
+      }
+    }
+  },
+  "actual_HP0_traffic_by_observed_core_counter": {
+    "0": {
+      "whole": {
+        "AR": 9105,
+        "AW": 2993,
+        "R_beats": 72840,
+        "B": 2993
+      },
+      "timed_ring": {
+        "AR": 1709,
+        "AW": 21,
+        "R_beats": 13672,
+        "B": 21
+      }
+    },
+    "15": {
+      "whole": {
+        "AR": 7950,
+        "AW": 2992,
+        "R_beats": 63600,
+        "B": 2992
+      },
+      "timed_ring": {
+        "AR": 937,
+        "AW": 21,
+        "R_beats": 7496,
+        "B": 21
+      }
+    }
+  },
+  "joins": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-native-service-20261121/matched-service01/counterpart-joins.jsonl.gz",
+    "bytes": 110256,
+    "sha256": "e3001ed560a7cb796f659e5919b19fb3b6accdc528ea7d7b268f7c0656ae09dc"
+  },
+  "limits": [
+    "Exact same cached-reference sequence; unique physical-line/owned-time-window association, not RID0 source inference.",
+    "No matching HP0 AR is service without observed external read, not automatically an L2 hit. No actual advisory admissions in either complete stream.",
+    "First/critical-receive/full-write intervals are not architectural load readiness. Pending-interval union and per-event deltas do not partition critical-path stalls or WHOLE time.",
+    "Native HP0 first/full is measured1/8AXIcycles for full64B bursts, not calibrated DRAM or FPGA/Linux timing. No projection or new execution."
+  ]
+}
