@@ -1,0 +1,107 @@
+{
+  "state": "recorded inputs and mapped normal-RAM base match; no cause assigned",
+  "reviewer": "/root/evidence_review",
+  "logs": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/0-deflate32-futex-early.log",
+      "bytes": 34694,
+      "sha256": "9dc97717c760e82dddc1a6434a67cf574ce1440114a543f7f7f58d07f06b727a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/0-deflate32-futex-early.log",
+      "bytes": 37777,
+      "sha256": "51f2d846b968e8b78d48a8eee417a51494a7c2ef87365f689ba07feb23daf399"
+    }
+  ],
+  "statuses": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/0-deflate32-futex-early.log.status.json",
+      "bytes": 1130,
+      "sha256": "ef6693078776e35263f175201d21fb7cecdacdf22b209956b36cfa8900e11c94"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/0-deflate32-futex-early.log.status.json",
+      "bytes": 974,
+      "sha256": "eb2dd460a734876ad22ffd8bff832b88edcb14fa15f2730e3816d3f51b81ddb3"
+    }
+  ],
+  "sessions": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/session.json",
+      "bytes": 2690,
+      "sha256": "9f74c491ccb699957a204dbacf5a3e5c0ae8df605ee41399eaf4c733e15b6386"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/session.json",
+      "bytes": 2600,
+      "sha256": "fb1c314f75cc214182d76a4ba9956ae9be3066c154e4d3b3f0bfbe3756489748"
+    }
+  ],
+  "common_status_fields": {
+    "nbf_sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+    "transfer_sha256": "580da454d65c866aa4c0a880d63fec8948f1f813ea9791128357b892eea340d8",
+    "elf_sha256": "079f974d671908f6aa922122f6901b3123cf16ec244be25e3432b4df500b465b",
+    "zlib_library_sha256": "e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b",
+    "zlib_transfer_encoding": "embedded-copy-v1",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "command": "LD_LIBRARY_PATH=/tmp /tmp/scheduler_pipe_hint_benchmark_dynamic 64 4 futex-early 32 futex plain 32 deflate",
+    "loops": 64,
+    "warmup": 32,
+    "repeats": 4,
+    "policy": "futex-early",
+    "sync": "futex",
+    "profile": "plain",
+    "working_set_kib": 32,
+    "workload": "deflate",
+    "terminal_handshake": 1,
+    "legacy_four_arg_cli": false
+  },
+  "source8": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+  },
+  "linux_boot_banner": [
+    "[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #25 SMP Sun Nov  8 15:29:25 EST 2026"
+  ],
+  "allocation_bytes": 48234496,
+  "physical_base": "0x16900000",
+  "guest_normal_ram": [
+    "0x80000000",
+    "0x82e00000"
+  ],
+  "source_mapped_host_interval": [
+    "0x16900000",
+    "0x19700000"
+  ],
+  "source_mapping": "(BP_address XOR 0x80000000) + physical_base",
+  "ownership_audit": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/guest-ram-ownership-20261120/audit.json",
+    "bytes": 6965,
+    "sha256": "513c40cbd21292c6676fd115e62f3cb71c044570fe8abf3e8ac17f8904f6b1e2"
+  },
+  "mapping_source_evidence": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/guest-ram-ownership-20261120/source-proof.json",
+    "bytes": 9452,
+    "sha256": "89e7a2d51512df6efaf5da5c44669b36f949c915cb68af430e090706f67a7b8c"
+  },
+  "profiler_format": {
+    "source": "b4c82ade:cosim/black-parrot-example/ps.cpp",
+    "format": "%-8.8d%-8.8d%-8.8d%-8.8d",
+    "low_chunk_decimal": 63,
+    "low_chunk_hex": "0x3f",
+    "meaning": "bins0through5; coarse final8MiB bucket does not prove a46MiB overrun"
+  },
+  "limits": [
+    "Matching recorded inputs do not prove matching unobserved runtime state or every executed memory transaction.",
+    "Only ARM virtual host buffer pointers differ in allocation announcements; recorded physical bases match.",
+    "The host-only failure-tail branch was not entered in the successful diagnostic.",
+    "No performance contrast, failure exclusion reversal, kernel/hardware root cause or reliability claim follows."
+  ]
+}
