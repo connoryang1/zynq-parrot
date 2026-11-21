@@ -1,0 +1,13 @@
+This static scientific figure shows two distinct observations from the CLOSED fixed-32KiB40-versus200 memory-latency control. Panel A is complete timed-ring core-global cycles (431,132 / 705,445); panel B is median accepted D-cache miss to first accepted D-cache fill beat (61 / 221 cycles), across 1,711 timed misses in each case. Both axes begin at zero. No pending-occupancy decomposition, causal stall partition or projected prefetch speedup is plotted.
+
+Both observations come exclusively from the hash-pinned closed comparison `../resume-data-reuse-latency200-20261120/closed-comparison/results.json` (SHA256 `acbdd8a0d32617e69b9601cc5b594cc4780b288c53cec18f86dfd59b317c3f1f`). The same ELF is `f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd`; the same patched NBF is `18dbba12d432e6cfde94e7a16887d52f4e6edf0114b21a4fd227c0fbe4bc103d`. Each actor has a checked32KiB lookup corpus, with four logical actors/two resident slots, capture off and 32 timed requests/handoffs. The model has one L2 bank,64-bit beats and queue depth4; the physical reference has two L2 banks. The first-response settings are40/200 model ticks. These controlled synthetic results are not Linux measurements or FPGA projections. First accepted D-cache fill beat is not necessarily requested critical-word or load-ready time.
+
+`latency-summary.svg`, `.png` (200dpi) and `.pdf` are standalone artifacts with the full scope caption. `data.csv` contains the four plotted values, metric names, units and sample scopes. `manifest.json` binds the closed input, reproducer, dependency lock, font and generated outputs. `review.json` records PNG visual inspection and byte-identical SVG/PNG/PDF/CSV reproduction in a separate output directory. The original closed evidence and all target/model sources remain unchanged; no simulation or board action was used to make the figure.
+
+Reproduce using the already available isolated dependencies (no global changes):
+
+```sh
+PYTHONPATH=/tmp/resource-capacity-plot-deps MPLCONFIGDIR=/tmp/resume-memory-latency-mpl python3 -B research/resume-memory-latency-summary-20261120/plot.py --output /tmp/resume-memory-latency-summary-reproduction
+```
+
+`requirements.txt` pins the package versions present in that isolated directory; `plot.py` checks each version, closed input hash, workload identities and expected scope/counts before writing. If recreating the dependency directory elsewhere, install that lock into an isolated target and set `PYTHONPATH` to it. No package installation was performed for this figure. SVG/PDF timestamps and SVG identifiers are fixed for reproducibility. Exact font bytes are recorded in the manifest.

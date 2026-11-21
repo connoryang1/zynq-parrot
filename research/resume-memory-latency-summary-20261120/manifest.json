@@ -1,0 +1,75 @@
+{
+  "state": "closed-descriptive-two-panel-figure",
+  "input": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-data-reuse-latency200-20261120/closed-comparison/results.json",
+    "bytes": 35463,
+    "sha256": "acbdd8a0d32617e69b9601cc5b594cc4780b288c53cec18f86dfd59b317c3f1f"
+  },
+  "workload_identity": {
+    "elf_sha256": "f35e5da8dcb527cfa04c16edab0616f1f80a7715c9b05278500799c9b66393dd",
+    "patched_nbf_sha256": "18dbba12d432e6cfde94e7a16887d52f4e6edf0114b21a4fd227c0fbe4bc103d",
+    "private_bytes_per_actor": 32768,
+    "logical_actors": 4,
+    "resident_slots": 2,
+    "model_l2_banks": 1,
+    "physical_reference_l2_banks": 2,
+    "memory_beat_bits": 64,
+    "memory_queue_depth": 4,
+    "capture": "off"
+  },
+  "source": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-memory-latency-summary-20261120/plot.py",
+    "bytes": 7210,
+    "sha256": "fd8b086ec96ecb30495a94258869845999ba3c51d07f4953549b4c192d6a973f"
+  },
+  "dependency_lock": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/resume-memory-latency-summary-20261120/requirements.txt",
+    "bytes": 238,
+    "sha256": "50faf8e56c455e4bb433d12eaaa292640be978d6e46b9b85892dbc0c9df5e2a2"
+  },
+  "python": "3.8.10",
+  "dependencies": {
+    "contourpy": "1.1.1",
+    "cycler": "0.12.1",
+    "fonttools": "4.57.0",
+    "importlib_resources": "6.4.5",
+    "kiwisolver": "1.4.7",
+    "matplotlib": "3.7.5",
+    "numpy": "1.24.4",
+    "packaging": "26.2",
+    "pillow": "10.4.0",
+    "pyparsing": "3.1.4",
+    "python-dateutil": "3.0.0",
+    "six": "1.17.0",
+    "tzdata": "2026.6",
+    "zipp": "3.20.2"
+  },
+  "font": {
+    "path": "/tmp/resource-capacity-plot-deps/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf",
+    "bytes": 756072,
+    "sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22"
+  },
+  "caption": "Same checked 32 KiB private lookup corpus per actor; 4 logical actors / 2 resident slots; capture off.\nModel: one L2 bank, 64-bit beats, queue depth 4. Physical reference: two L2 banks; no FPGA projection.\nA: complete timed ring, 32 requests and handoffs. B: median across 1,711 accepted timed D-cache misses.\nFirst accepted D-cache fill beat is not necessarily the requested critical word or load-ready time.\nSeparate descriptive metrics; no causal stall partition or projected prefetch speedup.",
+  "outputs": {
+    "data.csv": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-memory-latency-summary-20261120/data.csv",
+      "bytes": 416,
+      "sha256": "a9999156ca48a189771d5157d35807aabb589c5d00d5e6dfc9bdd657cb68ae6c"
+    },
+    "latency-summary.svg": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-memory-latency-summary-20261120/latency-summary.svg",
+      "bytes": 79704,
+      "sha256": "df451f35a9df03c3aaf91622aa3b6dadd7fba4c3c94bc8f193e36ae8818593a4"
+    },
+    "latency-summary.png": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-memory-latency-summary-20261120/latency-summary.png",
+      "bytes": 199599,
+      "sha256": "e358cd07d4fa16bc948bc346b9407afefc1e5a8fdd3f0ff298c33c033984d7ba"
+    },
+    "latency-summary.pdf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/resume-memory-latency-summary-20261120/latency-summary.pdf",
+      "bytes": 20613,
+      "sha256": "59293f98d16caf89e91c6bd81970d25b342ad1013b5f5e1f16dad9958b35c5bb"
+    }
+  }
+}
