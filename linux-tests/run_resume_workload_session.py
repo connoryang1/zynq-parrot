@@ -77,6 +77,8 @@ def main(argv=None):
     parser.add_argument('output', type=Path)
     parser.add_argument('--bitstream-sha256', required=True)
     parser.add_argument('--zlib-library', type=Path)
+    parser.add_argument("--embedded-zlib-library", action="store_true",
+                        help="copy fixed embedded library; requires exact --zlib-library")
     parser.add_argument('--host', default='xilinx@192.168.4.35')
     operation = parser.add_mutually_exclusive_group(required=True)
     operation.add_argument('--cell', action='append', type=cell)
@@ -86,6 +88,8 @@ def main(argv=None):
     parser.add_argument('--repeats', type=int, default=4)
     parser.add_argument('--all-three-acknowledged', action='store_true', required=True)
     args = parser.parse_args(argv)
+    if args.embedded_zlib_library and args.zlib_library is None:
+        parser.error("--embedded-zlib-library requires exact --zlib-library")
     if not args.package.is_file():
         parser.error('verified package must exist')
     if args.output.exists():
@@ -102,6 +106,7 @@ def main(argv=None):
             '--warmup', str(args.warmup), '--repeats', str(args.repeats)])
         plan.append(parsed)
         parsed.zlib_library = args.zlib_library
+        parsed.embedded_zlib_library = args.embedded_zlib_library
     if args.retention_probe:
         plan.append(guest_args([
             str(args.nbf), str(args.transfer), args.elf_sha256,

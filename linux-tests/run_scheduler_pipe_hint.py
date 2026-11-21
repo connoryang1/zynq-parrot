@@ -139,6 +139,8 @@ def parse_args(argv=None):
                         default="scan")
     parser.add_argument("--zlib-library", type=Path,
                         help="exact RV64 libz.so.1 staged with this ELF and bound by SHA-256")
+    parser.add_argument("--embedded-zlib-library", action="store_true",
+                        help="copy fixed /opt/bp-resume/libz.so.1; requires exact --zlib-library")
     parser.add_argument("--retention-probe", choices=("absent", "present"),
                         help="run the separately bound ABI diagnostic instead of a benchmark")
     parser.add_argument("--legacy-no-terminal-handshake", action="store_true",
@@ -153,6 +155,8 @@ def parse_args(argv=None):
 
 
 def validate_args(args):
+    if args.embedded_zlib_library and args.zlib_library is None:
+        raise ValueError("--embedded-zlib-library requires exact --zlib-library")
     for label, value in (("ELF", args.elf_sha256),
                          ("control program", args.control_sha256),
                          ("bitstream", args.bitstream_sha256)):
@@ -192,6 +196,8 @@ def library_commands(args, embedded):
         expected = sha256(args.zlib_library)
         if embedded["library_sha256"] != expected:
             raise ValueError("embedded library identity changed before staging")
+        return [f"cp {EMBEDDED_DIRECTORY}libz.so.1 {GUEST_ZLIB}"]
+    if args.embedded_zlib_library:
         return [f"cp {EMBEDDED_DIRECTORY}libz.so.1 {GUEST_ZLIB}"]
     return library_transfer(args.zlib_library)
 
@@ -241,6 +247,7 @@ def run(args):
     if args.zlib_library is not None:
         status["zlib_library_sha256"] = sha256(args.zlib_library)
         status["zlib_transfer_encoding"] = ("embedded-copy-v1" if embedded is not None
+                                             or args.embedded_zlib_library
                                              else "gzip-base64-v1")
     if embedded is not None:
         status["transfer_encoding"] = "embedded-copy-v1"

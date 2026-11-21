@@ -1,0 +1,24 @@
+This directory records an optional fixed-path copy of the existing embedded zlib independently of ELF delivery. The draft was reviewed and tested without changing active runners, then applied only after session19 completed and released its reservation. Maintained host tests pass; the first default-flow physical regression is recorded separately, and this change has no performance claim.
+
+# Optional embedded library with a gzip ELF
+
+`draft/embedded-zlib-library.patch` adds `--embedded-zlib-library` to the guest runner and session wrapper. The boolean requires an existing exact host `--zlib-library`; it supplies no guest path or shell text. When selected, the library staging command is exactly `cp /opt/bp-resume/libz.so.1 /tmp/libz.so.1`, independent of whether the ELF transfer is gzip, legacy base64, or an embedded-copy declaration. Existing embedded ELF declarations still require their exact matching library hash, including when the new flag is set. Without the new flag, existing behavior remains unchanged.
+
+The runner still obtains the host library's SHA-256 and requires the actual guest `/tmp/libz.so.1` SHA-256 before even transferring the ELF. It then requires the actual guest ELF SHA-256 before issuing the application command. Wrong copied-library bytes fail without ELF transfer or application execution. Status reports `zlib_transfer_encoding=embedded-copy-v1` for this option, independently of ELF encoding; gzip ELF delivery is never mislabeled as an embedded ELF. PIPE_HINT, CORE and BSG completion and runner exit checks remain mandatory. The session wrapper forwards the boolean into each guest plan and retains the existing reservation/recovery behavior.
+
+This supports the already built scoped zlib ELF SHA `079f974d671908f6aa922122f6901b3123cf16ec244be25e3432b4df500b465b` and gzip transfer SHA `580da454d65c866aa4c0a880d63fec8948f1f813ea9791128357b892eea340d8` with the existing embedded `libz.so.1` SHA `e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b`. That is a possible later workload extension, separate from the fixed plain four-workload ABBA protocol. It needs no rootfs or image change, and its eventual physical results cannot be pooled with a different ELF/library/transfer configuration. Scope v1 remains limited to reported prefix-controller activity; library delivery does not expand that drain guarantee.
+
+## Review and validation
+
+- Patch SHA-256: `747e592e9c4c4d7b5942bfc4e866f7f5532c0d0a19ff34b2c58f1332a31c2588`.
+- Active guest-runner hash, unchanged: `f0325e86230504655aa5048e2ec67b22c01811acd04e6f0e7d2a8f07f740fa6c`.
+- Active session-wrapper hash, unchanged: `a398e55ac62d6b67132a3c776f399f3e692a73ff89d93663a2ba586d98f5a4e1`.
+- 63 copied-module host tests passed in 0.863 seconds, including gzip ELF plus copied library success, wrong-library no-execution, missing host-library rejection before reservation/spawn, session forwarding, mandatory CORE/BSG, preserved default gzip-library status/commands, and preservation of strict embedded-ELF declarations.
+- Zero-fuzz patch application and reversal round-trip the temporary source copies exactly. `draft/{original,proposed}` preserve both versions, and `draft/manifest.json` records their hashes. `draft/host-tests.{stdout,stderr}` retain actual test output.
+- Python compilation and `git diff --check` passed. The initial generator attempt failed on a quote-style anchor before producing a patch; the first tested draft (61 passing tests) is retained separately. The final patch removes that incidental quote change and adds two preservation tests.
+
+`prepare_and_test.py` generates the draft from exact current source, applies it only under a fresh temporary directory, runs the existing and new host tests there, reverses it, and finally asserts both active runners are byte-unchanged. It refuses to overwrite an existing draft. The two new tests that reuse session fixtures mock every command; copied staging/recovery scripts are only read for source snapshots.
+
+Preparation kept the patch isolated until the active reservation became terminal and released. The two original hashes above bound the reviewed source versions. The maintained application below is a separate step from those copied-module tests.
+
+Root applied the reviewed patch after session19's terminal success/release, verifying exact agreement with both proposed source hashes. All 63 tests then passed against the maintained modules. `applied-verification.json` binds the exact source and test logs, including an initial wrong test-module name that caused an import failure before the corrected invocation. The earlier draft's assertions that runners were unchanged describe its preparation phase; the two runners are now intentionally updated. No image, guest library, guest ELF, workload, policy or default transfer protocol changed. Host sources are frozen before the first primary ABBA visit and will remain unchanged throughout that matrix.

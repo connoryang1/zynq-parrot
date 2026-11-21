@@ -1,0 +1,23 @@
+......usage: python3 -m unittest [-h] --bitstream-sha256 BITSTREAM_SHA256
+                           [--zlib-library ZLIB_LIBRARY]
+                           [--embedded-zlib-library] [--host HOST]
+                           (--cell CELL | --retention-probe {absent,present})
+                           [--loops LOOPS] [--warmup WARMUP]
+                           [--repeats REPEATS] --all-three-acknowledged
+                           nbf transfer elf_sha256 package output
+python3 -m unittest: error: --embedded-zlib-library requires exact --zlib-library
+.................................................E
+======================================================================
+ERROR: test_resume_workload_session (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_resume_workload_session
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'test_resume_workload_session'
+
+
+----------------------------------------------------------------------
+Ran 56 tests in 0.747s
+
+FAILED (errors=1)

@@ -1,0 +1,65 @@
+--- a/linux-tests/run_scheduler_pipe_hint.py
++++ b/linux-tests/run_scheduler_pipe_hint.py
+@@ -139,6 +139,8 @@
+                         default="scan")
+     parser.add_argument("--zlib-library", type=Path,
+                         help="exact RV64 libz.so.1 staged with this ELF and bound by SHA-256")
++    parser.add_argument("--embedded-zlib-library", action="store_true",
++                        help="copy fixed /opt/bp-resume/libz.so.1; requires exact --zlib-library")
+     parser.add_argument("--retention-probe", choices=("absent", "present"),
+                         help="run the separately bound ABI diagnostic instead of a benchmark")
+     parser.add_argument("--legacy-no-terminal-handshake", action="store_true",
+@@ -153,6 +155,8 @@
+ 
+ 
+ def validate_args(args):
++    if args.embedded_zlib_library and args.zlib_library is None:
++        raise ValueError("--embedded-zlib-library requires exact --zlib-library")
+     for label, value in (("ELF", args.elf_sha256),
+                          ("control program", args.control_sha256),
+                          ("bitstream", args.bitstream_sha256)):
+@@ -193,6 +197,8 @@
+         if embedded["library_sha256"] != expected:
+             raise ValueError("embedded library identity changed before staging")
+         return [f"cp {EMBEDDED_DIRECTORY}libz.so.1 {GUEST_ZLIB}"]
++    if args.embedded_zlib_library:
++        return [f"cp {EMBEDDED_DIRECTORY}libz.so.1 {GUEST_ZLIB}"]
+     return library_transfer(args.zlib_library)
+ 
+ 
+@@ -241,6 +247,7 @@
+     if args.zlib_library is not None:
+         status["zlib_library_sha256"] = sha256(args.zlib_library)
+         status["zlib_transfer_encoding"] = ("embedded-copy-v1" if embedded is not None
++                                             or args.embedded_zlib_library
+                                              else "gzip-base64-v1")
+     if embedded is not None:
+         status["transfer_encoding"] = "embedded-copy-v1"
+--- a/linux-tests/run_resume_workload_session.py
++++ b/linux-tests/run_resume_workload_session.py
+@@ -77,6 +77,8 @@
+     parser.add_argument('output', type=Path)
+     parser.add_argument('--bitstream-sha256', required=True)
+     parser.add_argument('--zlib-library', type=Path)
++    parser.add_argument("--embedded-zlib-library", action="store_true",
++                        help="copy fixed embedded library; requires exact --zlib-library")
+     parser.add_argument('--host', default='xilinx@192.168.4.35')
+     operation = parser.add_mutually_exclusive_group(required=True)
+     operation.add_argument('--cell', action='append', type=cell)
+@@ -86,6 +88,8 @@
+     parser.add_argument('--repeats', type=int, default=4)
+     parser.add_argument('--all-three-acknowledged', action='store_true', required=True)
+     args = parser.parse_args(argv)
++    if args.embedded_zlib_library and args.zlib_library is None:
++        parser.error("--embedded-zlib-library requires exact --zlib-library")
+     if not args.package.is_file():
+         parser.error('verified package must exist')
+     if args.output.exists():
+@@ -102,6 +106,7 @@
+             '--warmup', str(args.warmup), '--repeats', str(args.repeats)])
+         plan.append(parsed)
+         parsed.zlib_library = args.zlib_library
++        parsed.embedded_zlib_library = args.embedded_zlib_library
+     if args.retention_probe:
+         plan.append(guest_args([
+             str(args.nbf), str(args.transfer), args.elf_sha256,
