@@ -1,0 +1,273 @@
+--- dense/run_full.py
++++ canonical/run_full.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Prepared metadata-only fullcore gate; build/runtime require explicit --execute admission."""
++"""Prepared canonical epoch-only fullcore gate; build/runtime require explicit --execute admission."""
+ import argparse
+ import gzip
+ import hashlib
+@@ -16,18 +16,22 @@
+ import time
+ 
+ sys.dont_write_bytecode = True
+-ROOT = Path(__file__).resolve().parents[2]
++ROOT = Path('/dev/shm/zp-linux-canonical-fulltop-20261121-01')
++OLD_ROOT = Path('/home/coyang/zynq-parrot-retained-dense')
+ INSTALL = Path('/home/coyang/zynq-parrot-linux-research/install')
+ READER = Path('/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events')
+ R1 = '6f29d685332a44e89dcaba5b5adb33520b678da4'
+-BP = '225489a435cb0b2a2c0b237077f94418dc89549b'
+-SOURCE_TOP = '9a188f87fdf19a72c64c24a9c425f6876be4ea37'
++BP = '8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c'
++SOURCE_TOP = '482a73b03c8c66bc10dc5b6c54cfa2a0e3267c75'
+ RESERVE = 3*1024**3
+ ALLOCATION = 768*1024**2
++RAM_RESERVE = 1024**3
++DURABLE_ALLOCATION = 128*1024**2
+ FST_LIMIT = 150*1024**2
+-BASE = Path('/home/coyang/fpga-artifacts/context-resume/retained-dense-fullcore-20261121')
++BASE = Path('/dev/shm/zp-linux-canonical-fullcore-20261121-01')
++OLD_BASE = Path('/home/coyang/fpga-artifacts/context-resume/retained-dense-fullcore-20261121')
+ HERE = Path(__file__).resolve().parent
+-PROGRAM_DIR = BASE/'program02'
++PROGRAM_DIR = OLD_BASE/'program02'
+ PROGRAM_PROOF = PROGRAM_DIR/'program-proof.json'
+ FIXTURE = Path('/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json')
+ READER_SHA = 'a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541'
+@@ -74,21 +78,20 @@
+ def validate_source_tree(root):
+     subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',SOURCE_TOP,'HEAD'],check=True)
+     changed=git(root,'diff',SOURCE_TOP,'--name-only').splitlines()
+-    if any(p!='cosim/black-parrot-example/Makefile.design' and not p.startswith('research/retained-dense-fullcore-20261121/') for p in changed):
+-        raise ValueError('compiled source differs from frozen TOP55ed tree')
+-    if git(root/'import/black-parrot','rev-parse','HEAD')!=BP:raise ValueError('metadata BP pin')
++    if changed != ['import/black-parrot']:
++        raise ValueError('only BP gitlink may differ from exact dense TOP482')
++    if git(root/'import/black-parrot','rev-parse','HEAD') != BP:raise ValueError('canonical BP pin')
+     config='cosim/black-parrot-example/Makefile.design'
+-    original=subprocess.check_output(['git','-C',str(root),'show',SOURCE_TOP+':'+config]).decode()
+-    expected=original.replace('BP_RETAINED_I_LINES ?= 1280','BP_RETAINED_I_LINES ?= 1792').replace('BP_RETAINED_D_LINES ?= 1280','BP_RETAINED_D_LINES ?= 1792')
+-    if (root/config).read_text()!=expected:raise ValueError('only two authorized retained defaults may change')
++    original=subprocess.check_output(['git','-C',str(root),'show',SOURCE_TOP+':'+config])
++    if (root/config).read_bytes()!=original:raise ValueError('unchanged1792 defaults required')
+ 
+ 
+ def input_bindings():
+-    files=[PROGRAM_PROOF,HERE/'prepare_programs.py',READER,FIXTURE,ROOT/'research/retained-private-sp-ram-20261121/run_full.py',
+-           ROOT/'research/retained-private-sp-ram-20261121/close_full.py',
++    files=[PROGRAM_PROOF,OLD_ROOT/'research/retained-dense-fullcore-20261121/prepare_programs.py',READER,FIXTURE,OLD_ROOT/'research/retained-private-sp-ram-20261121/run_full.py',
++           OLD_ROOT/'research/retained-private-sp-ram-20261121/close_full.py',
+            ROOT/'testing/check_run.py',ROOT/'testing/rtl/retained-advisory-trace/validate.py',
+-           ROOT/'research/retained-use-observation-20261121/verify_counters.py',
+-           ROOT/'research/retained-maintenance-acyclic-20261121/bind_geometry.py',
++           OLD_ROOT/'research/retained-use-observation-20261121/verify_counters.py',
++           OLD_ROOT/'research/retained-maintenance-acyclic-20261121/bind_geometry.py',
+            HERE/'geometry.py',HERE/'close_full.py']
+     files += [PROGRAM_DIR/(kind+'-prog.'+suffix+'.gz')
+               for kind in PROGRAMS for suffix in ('riscv','nbf')]
+@@ -144,9 +147,12 @@
+ 
+ 
+ def resource_check(out):
+-    used=directory_bytes(BASE);free=shutil.disk_usage(BASE).free
+-    if used>ALLOCATION or free<RESERVE+max(0,ALLOCATION-used):
+-        raise ValueError('fixed768MiBallocation/3GiBreserve violated')
++    used=directory_bytes(BASE)+directory_bytes(ROOT)
++    if used>ALLOCATION or shutil.disk_usage('/dev/shm').free<RAM_RESERVE+max(0,ALLOCATION-used):
++        raise ValueError('combined sparse source/build768MiB allocation and1GiB RAM reserve violated')
++    durable=directory_bytes(HERE)
++    if durable>DURABLE_ALLOCATION or shutil.disk_usage(HERE).free<RESERVE+max(0,DURABLE_ALLOCATION-durable):
++        raise ValueError('128MiB totaldurable allocation and3GiB HOME reserve violated')
+ 
+ 
+ def monitored_run(argv,cwd,env,log,timeout,out,runtime):
+@@ -176,7 +182,7 @@
+ def run_closed_audits(out,record,run):
+     # Reuse the unchanged generated-bank/RAM auditor, exact strict payload/I
+     # retirement validator, and independent real-edge/GP0 counter validator.
+-    spec=importlib.util.spec_from_file_location('metadata_geometry_base',ROOT/'research/retained-maintenance-acyclic-20261121/bind_geometry.py')
++    spec=importlib.util.spec_from_file_location('metadata_geometry_base',OLD_ROOT/'research/retained-maintenance-acyclic-20261121/bind_geometry.py')
+     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+     facts,paths=module.inspect(out,record['model']['sha256'])
+     write(out/'geometry.json',dict(state='PASS actual generated STATIC16KiB L2 geometry',facts=facts,
+@@ -186,7 +192,7 @@
+           '--fst',advisory/'trace.fst','--reader',READER,'--model-source-list',out/'actual-source-list.json',
+           '--fixture-manifest',FIXTURE,'--log',advisory/'run.log','--exit-code',str(rc),'--reader-timeout','600',
+           '--out',out/'advisory-strict01'],timeout=660):raise ValueError('strict fullpayload/Iretire/eight-L1-write proof failed')
+-    if run('advisory-counter',['python3','-B',ROOT/'research/retained-use-observation-20261121/verify_counters.py',
++    if run('advisory-counter',['python3','-B',OLD_ROOT/'research/retained-use-observation-20261121/verify_counters.py',
+           '--fst',advisory/'trace.fst','--reader',READER,'--strict-proof',out/'advisory-strict01/verification.json',
+           '--run-proof',advisory/'verification.json','--out',out/'advisory-counter01'],timeout=240):
+         raise ValueError('actual edge/reset/GP0 transition proof failed')
+@@ -206,9 +212,9 @@
+     args = parser.parse_args(); out = args.out.resolve()
+     validate_output(out)
+     if args.prepare_only == args.execute:raise ValueError('choose exactly one of --prepare-only/--execute')
+-    if shutil.disk_usage(BASE.parent).free < RESERVE+ALLOCATION:raise ValueError('need3GiBreserve+768MiBallocation')
++    resource_check(out)
+     validate_source_tree(ROOT)
+-    if git(ROOT,'rev-parse','refs/heads/experiment/linux-retained-native1280-r1') != R1:raise ValueError('r1 ref changed')
++    if git(OLD_ROOT,'rev-parse','refs/heads/experiment/linux-retained-native1280-r1') != R1:raise ValueError('historical r1 ref changed')
+     repos = [(ROOT,git(ROOT,'rev-parse','HEAD')),(ROOT/'import/black-parrot',BP)]
+     for relative,sha in [('external/basejump_stl','3dff9f43af8e1bb850da0b41696514396fa0fa7e'),
+                          ('external/HardFloat','5b7d5fe2df7e297b5ba095b3eb8a9517dc2e9d88'),
+@@ -228,7 +234,7 @@
+     BASE.mkdir(exist_ok=True)
+     out.mkdir(); runtime=out/'verilator';runtime.mkdir()
+     (out/'Makefile.design').symlink_to(ROOT/'cosim/black-parrot-example/Makefile.design')
+-    recipe=ROOT/'research/hp0-response-path-20261121/full-system-delay200-10/source-before.json.gz'
++    recipe=OLD_ROOT/'research/hp0-response-path-20261121/full-system-delay200-10/source-before.json.gz'
+     command=json.loads(gzip.decompress(recipe.read_bytes()))['command_prefix']
+     command=[arg.replace('/home/coyang/zynq-parrot-linux-capacity',str(ROOT)) for arg in command]
+     # Admit defaults from the candidate Makefile rather than forcing the four
+@@ -253,7 +259,7 @@
+         fresh_program_proof=bind(PROGRAM_PROOF),
+         geometry=dict(i_lines=1792,d_lines=1792,sets=256,line_bytes=64,observe=1,delay=0,resident=2,logical=4,l2_bytes=16384,aclk_mhz=20),
+         source_tree_baseline=SOURCE_TOP,source_bp=BP,free_before=shutil.disk_usage(out).free,
+-        resource_admission=dict(reserve_bytes=RESERVE,allocation_bytes=ALLOCATION,per_runtime_file_bytes=FST_LIMIT),
++        resource_admission=dict(home_reserve_bytes=RESERVE,RAM_reserve_bytes=RAM_RESERVE,combined_RAM_allocation_bytes=ALLOCATION,durable_allocation_bytes=DURABLE_ALLOCATION,per_runtime_file_bytes=FST_LIMIT),
+         scope='Synthetic scoped actual-fulltop correctness; runtime BP assertions after reset, guarded library/timezero checks excluded. No all-slot fullcore utilization, FPGA fit or application performance claim.')
+ 
+     def run(label,argv,cwd=out,timeout=120):
+@@ -274,6 +280,7 @@
+             prepared=json.loads(args.prepared.read_text())
+             if not prepared['state'].startswith('PASS prepared-only') or prepared['launchable'] is not False:
+                 raise ValueError('preparation scope')
++            if prepared['source_repositories']!=before_repos:raise ValueError('prepared source commits/status changed')
+             if prepared['script']!=bind(__file__) or prepared['inputs']!=record['inputs'] or prepared['command_prefix']!=command:
+                 raise ValueError('prepared flow/input/command changed')
+             if prepared['geometry']!=record['geometry'] or prepared['resource_admission']!=record['resource_admission']:
+@@ -356,10 +363,11 @@
+         for row in before_repos:
+             if git(row['path'],'rev-parse','HEAD')!=row['head'] or git(row['path'],'status','--porcelain','--untracked-files=normal'):
+                 raise ValueError('source repository changed during gate '+row['path'])
+-        record['state']='PASS dense1792 fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-geometry-source-audits'
++        record['state']='PASS canonical1792 fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-geometry-source-audits'
+         validate_source_tree(ROOT)
+         record['free_after']=shutil.disk_usage(out).free
+         record['output_bytes_after']=directory_bytes(BASE)
++        record['combined_RAM_bytes_after']=directory_bytes(BASE)+directory_bytes(ROOT)
+     except BaseException as error:
+         record.update(state='FAIL preserved, no accepted result',error=repr(error));raise
+     finally:
+--- dense/close_full.py
++++ canonical/close_full.py
+@@ -7,11 +7,20 @@
+ from pathlib import Path
+ import re
+ import sys
++import shutil
++import tarfile
+ 
+-ROOT=Path(__file__).resolve().parents[2]
++ROOT=Path('/dev/shm/zp-linux-canonical-fulltop-20261121-01')
++OLD_ROOT=Path('/home/coyang/zynq-parrot-retained-dense')
+ HERE=Path(__file__).resolve().parent
+ sys.path.insert(0,str(ROOT/'testing/rtl/uce-maintenance'))
+ from run_endpoint import bind
++
++
++def durable_guard():
++    used=sum(p.stat().st_size for p in HERE.rglob('*') if p.is_file())
++    if used>128*1024**2 or shutil.disk_usage(HERE).free<3*1024**3+max(0,128*1024**2-used):
++        raise ValueError('128MiB totaldurable cap /3GiB HOME reserve')
+ 
+ 
+ def main():
+@@ -19,11 +28,11 @@
+     parser.add_argument('--external',type=Path,required=True)
+     parser.add_argument('--out',type=Path,required=True)
+     args=parser.parse_args();external=args.external.resolve()
+-    if external.parent!=Path('/home/coyang/fpga-artifacts/context-resume/retained-dense-fullcore-20261121'):raise ValueError('metadata artifacts only')
++    if external.parent!=Path('/dev/shm/zp-linux-canonical-fullcore-20261121-01'):raise ValueError('metadata artifacts only')
+     session=json.loads((external/'session.json').read_text())
+     strict=json.loads((external/'advisory-strict01/verification.json').read_text())
+     counter=json.loads((external/'advisory-counter01/verification.json').read_text())
+-    if session['state']!='PASS dense1792 fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-geometry-source-audits' or strict['accepted'] is not True or not counter['state'].startswith('PASS actual counter transitions'):
++    if session['state']!='PASS canonical1792 fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-geometry-source-audits' or strict['accepted'] is not True or not counter['state'].startswith('PASS actual counter transitions'):
+         raise ValueError('combined gate incomplete')
+     if bind(session['model']['path'])['sha256']!=session['model']['sha256']:raise ValueError('model drift')
+     for key in ('strict','run','fst','reader','auditor','selection','events'):
+@@ -36,13 +45,13 @@
+     if parameters['facts']['clean_eof'] is not True:raise ValueError('actual parameter/EOF proof missing')
+     for key,record in session['closed_audits'].items():
+         if bind(record['path'])!=record:raise ValueError('audit drift '+key)
+-    if session['source_bp']!='225489a435cb0b2a2c0b237077f94418dc89549b':raise ValueError('metadata BP pin')
++    if session['source_bp']!='8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c':raise ValueError('metadata BP pin')
+     out=args.out.resolve()
+     if out.parent!=HERE:raise ValueError('own compact output only')
+     out.mkdir(exist_ok=False)
+     source_paths=[HERE/name for name in ('run_full.py','README.md','close_full.py','geometry.py','test_flow.py')]
+     source_paths += [ROOT/name for name in ('testing/rtl/retained-advisory-trace/validate.py',
+-        'research/retained-use-observation-20261121/verify_counters.py','testing/check_run.py',
++        'testing/check_run.py','testing/check_run.py',
+         'import/black-parrot/bp_me/src/v/cce/bp_uce.sv','import/black-parrot/bp_common/src/v/bp_retained_line_store.sv')]
+     evidence=[external/name for name in ('session.json','make-preflight.log','clean.log','build.log','loader.log','actual-source-list.json',
+        'integrity-run.log','integrity-checker.log','advisory-run.log','advisory-checker.log',
+@@ -52,24 +61,61 @@
+     for kind in ('advisory-strict01','advisory-counter01'):
+         evidence += [external/kind/name for name in ('selection.tsv','verification.json','reader.stderr')]
+     fixture=Path(strict['bindings']['fixture_manifest']['path'])
+-    fixture_data=json.loads(fixture.read_text());source_paths += [fixture,Path(fixture_data['source']['path'])]
++    fixture_data=json.loads(fixture.read_text());source_paths += [fixture,Path(fixture_data['source']['path']),OLD_ROOT/'research/retained-use-observation-20261121/verify_counters.py']
+     geometry=json.loads((external/'geometry.json').read_text())
+     evidence += [external/'geometry.json',external/'actual-parameters01/verification.json',external/'actual-parameters01/selection.tsv',external/'actual-parameters01/events.tsv']+[Path(p) for p in geometry['snapshot_paths']]
+     source_paths += [Path(geometry['source_auditor']['path'])]+[Path(p['path']) for p in geometry['facts']['geometry_sources']]
+     copies=[]
+-    for source in source_paths+evidence:
++    for source in dict.fromkeys(source_paths+evidence):
++        durable_guard()
+         if source in evidence:relative=str(source.relative_to(external))
+         elif str(source).startswith(str(ROOT)+'/'):relative='sources/'+str(source.relative_to(ROOT))
+         else:relative='frozen-cold08/'+source.name
+         target=out/(relative+'.gz');target.parent.mkdir(parents=True,exist_ok=True)
+         target.write_bytes(gzip.compress(source.read_bytes(),mtime=0));copies.append(dict(original=bind(source),snapshot=bind(target)))
++    # Retain exact model, both full rawFSTs and every consumed source on HOME.
++    durable=out/'durable';durable.mkdir()
++    model_gz=durable/'model.gz'
++    durable_guard()
++    with Path(session['model']['path']).open('rb') as src,gzip.open(model_gz,'wb') as dst:
++        shutil.copyfileobj(src,dst,1024*1024)
++    actual=json.loads((external/'actual-source-list.json').read_text())['sources']
++    source_archive=durable/'consumed-sources.tar.gz'
++    with tarfile.open(source_archive,'w:gz') as tar:
++        for index,(name,record) in enumerate(sorted(actual.items())):
++            durable_guard()
++            if bind(name)['sha256']!=record['sha256']:raise ValueError('consumed source drift before preservation')
++            tar.add(name,arcname='sources/'+str(index)+'/'+Path(name).name,recursive=False)
++    if hashlib.sha256(gzip.decompress(model_gz.read_bytes())).hexdigest()!=session['model']['sha256']:
++        raise ValueError('lossless model archive mismatch')
++    with tarfile.open(source_archive,'r:gz') as tar:
++        if len(tar.getmembers())!=len(actual):raise ValueError('source archive member count')
++        for index,(name,record) in enumerate(sorted(actual.items())):
++            raw=tar.extractfile('sources/'+str(index)+'/'+Path(name).name).read()
++            if len(raw)!=record['bytes'] or hashlib.sha256(raw).hexdigest()!=record['sha256']:
++                raise ValueError('lossless consumed source archive mismatch')
++    durable_copies=[dict(original=bind(session['model']['path']),snapshot=bind(model_gz)),dict(index=bind(external/'actual-source-list.json'),snapshot=bind(source_archive))]
++    for kind in ('integrity','advisory'):
++        source=external/kind/'trace.fst';target=durable/(kind+'-trace.fst')
++        durable_guard()
++        shutil.copyfile(source,target)
++        if bind(source)['sha256']!=bind(target)['sha256']:raise ValueError('rawFST copy mismatch')
++        durable_copies.append(dict(original=bind(source),snapshot=bind(target)))
++        for suffix in ('riscv','nbf'):
++            source=external/kind/('prog.'+suffix);target=durable/(kind+'-prog.'+suffix+'.gz')
++            target.write_bytes(gzip.compress(source.read_bytes(),mtime=0))
++            durable_copies.append(dict(original=bind(source),snapshot=bind(target)))
++    header=external/'verilator/obj_dir/Vbsg_nonsynth_zynq_testbench___024root.h'
++    target=durable/'generated-root.h.gz';target.write_bytes(gzip.compress(header.read_bytes(),mtime=0))
++    durable_copies.append(dict(original=bind(header),snapshot=bind(target)))
++    durable_guard()
+     large=[bind(Path(session['model']['path']))]
+     for kind in ('integrity','advisory'):
+         large += [bind(external/kind/name) for name in ('prog.riscv','prog.nbf','trace.fst')]
+     large += [bind(external/kind/'selected-events.tsv.gz') for kind in ('advisory-strict01','advisory-counter01')]
+-    result=dict(state='PASS metadata prototype clean fullcore integrity/cold08 strict payload+counter+actual-parameter correctness; no FPGA/fit/performance claim',
++    result=dict(state='PASS canonical epoch clean fullcore integrity/cold08 strict payload+counter+actual-parameter correctness; no FPGA/fit/performance claim',
+                 executed_top=session['source_repositories'][0],executed_bp=session['source_repositories'][1],
+-                model=session['model'],geometry=session['geometry'],actual_l2=geometry['facts']['l2'],compact_evidence=copies,external_large_artifacts=large,
++                durable_copies=durable_copies,model=session['model'],geometry=session['geometry'],actual_l2=geometry['facts']['l2'],compact_evidence=copies,external_large_artifacts=large,
+                 actual_build_maintenance_unoptflat=[],firsttouch_counts=counter['firsttouch_counts'],
+                 scope=session['scope'],
+                 retained_limitations='Firsttouch fullcore correctness only; no all-slot fullcore/application/FPGA claim. Component metadata equivalence is separate from actual production-options inference and full-system routed fit.',

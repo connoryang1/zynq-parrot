@@ -1,0 +1,79 @@
+{
+  "state": "PASS sparse source materialized; not built",
+  "prior_failures": [
+    "source-creation.json: missing linked-worktree info dir; fixed metadata only",
+    "source-creation02.json: root incorrectly required unused/uninitialized top-level HardFloat; maintained fullcore repo list instead requires top bsg_replicant. No build launched."
+  ],
+  "commands": [
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-retained-dense/import/black-parrot-subsystems",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/black-parrot-subsystems",
+      "f6ce99ea7ebdcb97a46f73c296505071e9fb22ab"
+    ],
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-retained-dense/import/bsg_replicant",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/bsg_replicant",
+      "83e2441b3bab646a69159fa9dee80de2af9b24ae"
+    ],
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-retained-dense/import/black-parrot/external/basejump_stl",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/black-parrot/external/basejump_stl",
+      "3dff9f43af8e1bb850da0b41696514396fa0fa7e"
+    ],
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-retained-dense/import/black-parrot/external/HardFloat",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/black-parrot/external/HardFloat",
+      "5b7d5fe2df7e297b5ba095b3eb8a9517dc2e9d88"
+    ],
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-retained-dense/import/black-parrot/external/bedrock",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/black-parrot/external/bedrock",
+      "ed68e749079df57afa4b2e153184bf9301137bf2"
+    ],
+    [
+      "git",
+      "-C",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "add",
+      "import/black-parrot"
+    ],
+    [
+      "git",
+      "-C",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "commit",
+      "-m",
+      "Map retained data epochs through canonical distributed RAM"
+    ]
+  ],
+  "root": "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+  "top": "eb7d390134a0025331a2366a979a774263b146d5",
+  "BP": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "source_bytes": 38301780,
+  "free_RAM": 2413895680
+}

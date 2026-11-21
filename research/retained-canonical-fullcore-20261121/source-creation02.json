@@ -1,0 +1,60 @@
+{
+  "state": "FAIL preserved source materialization; no build",
+  "prior_failure": "source-creation.json: Git2.25 linked worktree sparse init requires info directory before lock creation. No compiledsource existed/changed; create only this worktree metadata directory.",
+  "commands": [
+    [
+      "git",
+      "-C",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "sparse-checkout",
+      "init",
+      "--cone"
+    ],
+    [
+      "git",
+      "-C",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "sparse-checkout",
+      "set",
+      "cosim",
+      "testing",
+      "codex-skills",
+      "tools",
+      "software",
+      "import",
+      "research/retained-private-sp-ram-20261121",
+      "research/retained-use-observation-20261121",
+      "research/retained-maintenance-acyclic-20261121",
+      "research/retained-dense-fullcore-20261121"
+    ],
+    [
+      "git",
+      "-C",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "checkout",
+      "experiment/retained-canonical-fullcore-20261121"
+    ],
+    [
+      "git",
+      "-C",
+      "/home/coyang/bp-retained-canonical-epochs-20261121",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/black-parrot",
+      "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c"
+    ],
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-retained-dense/import/basejump_stl",
+      "worktree",
+      "add",
+      "--detach",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/basejump_stl",
+      "6cd7d830b732079ab7316c6288e2e819e3fab474"
+    ]
+  ],
+  "root": "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+  "error": "AssertionError()"
+}

@@ -1,0 +1,27 @@
+{
+  "state": "FAIL preserved source materialization; no build",
+  "commands": [
+    [
+      "git",
+      "-C",
+      "/home/coyang/zynq-parrot-linux-capacity",
+      "worktree",
+      "add",
+      "--no-checkout",
+      "-b",
+      "experiment/retained-canonical-fullcore-20261121",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "482a73b03c8c66bc10dc5b6c54cfa2a0e3267c75"
+    ],
+    [
+      "git",
+      "-C",
+      "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+      "sparse-checkout",
+      "init",
+      "--cone"
+    ]
+  ],
+  "root": "/dev/shm/zp-linux-canonical-fulltop-20261121-01",
+  "error": "CalledProcessError(128, ['git', '-C', '/dev/shm/zp-linux-canonical-fulltop-20261121-01', 'sparse-checkout', 'init', '--cone'])"
+}
