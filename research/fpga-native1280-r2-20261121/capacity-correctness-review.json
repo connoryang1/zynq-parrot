@@ -1,0 +1,84 @@
+{
+  "state": "PASS root read-only compact evidence review; simulation only",
+  "proof_worktree": "/home/coyang/zynq-parrot-retained-observation",
+  "proof_commit": "bd36799235330204cd3131c92830fb3e3e106203",
+  "manifest": {
+    "path": "/home/coyang/zynq-parrot-retained-observation/research/retained-capacity-correctness-20261121/closed1280-proof001/manifest.json",
+    "bytes": 39287,
+    "sha256": "e72c0d881b433f1a22973f6ce1e3a4d92a57590cf607fa87ea228667081e935d"
+  },
+  "root_verified_compact_gzip_roundtrips": 54,
+  "cases": [
+    {
+      "role": "d-enabled",
+      "counters": [
+        0,
+        1280,
+        0,
+        1280,
+        0,
+        10240
+      ],
+      "targets": 1280,
+      "publications": 1280,
+      "hits": 1280,
+      "retained_bursts": 1280,
+      "ordinary_bursts": 0,
+      "d_load_retirements": 10240,
+      "i_instruction_retirements": 0,
+      "primary_gate_rejected": false
+    },
+    {
+      "role": "d-off",
+      "counters": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "targets": 1280,
+      "publications": 0,
+      "hits": 0,
+      "retained_bursts": 0,
+      "ordinary_bursts": 1280,
+      "d_load_retirements": 10240,
+      "i_instruction_retirements": 0,
+      "primary_gate_rejected": true
+    },
+    {
+      "role": "i-enabled",
+      "counters": [
+        1280,
+        0,
+        1280,
+        0,
+        10240,
+        0
+      ],
+      "targets": 1280,
+      "publications": 1280,
+      "hits": 1280,
+      "retained_bursts": 1280,
+      "ordinary_bursts": 0,
+      "d_load_retirements": 0,
+      "i_instruction_retirements": 20480,
+      "primary_gate_rejected": false
+    }
+  ],
+  "model": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity1280-cohort01/model/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15840256,
+    "sha256": "bdc8b908f55fbdb6e5b9dce22d8588cc163020fff74a44eda8a83a451a1ad8cf"
+  },
+  "program": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/capacity1280-build01/manifest.json",
+    "bytes": 150720,
+    "sha256": "bea554ccfe813ea9a696e8566bfcde1c11ff6efe4e8858a6c7708032329efd08"
+  },
+  "limits": "Separate I/D cases demonstrate80KiB full payload per actual partition in this exact scoped model. No physical fit/capacity, speedup or Linux claim. Aggregate physical counter equality is weaker than this per-address proof. Fixed sequence/budgets, one attempt per case; no retries.",
+  "no_new_target_runs": true,
+  "maintenance_warning_unresolved": true,
+  "reviewed_utc": "2026-11-21T12:22:38.424621+00:00"
+}

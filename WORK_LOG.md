@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Large payload correctness closed — 2026-11-21:** separate I and D fixtures each restore all 1,280 distinct full 64-byte lines through retained hits and eight real L1 writes, with all 20,480 instruction words / 10,240 data loads checked. A same-ELF D-off control completes through ordinary memory and fails the retained-use gate as intended; all 54 compact snapshots round-trip exactly. This is model evidence for 80 KiB per side separately, with no physical fit or application benefit implied (`research/fpga-native1280-r2-20261121/capacity-correctness-review.json`).
+
 - **Actual retained fit exposes maintenance feedback — 2026-11-21:** corrected1280-line/side synthesis recognizes both real retained RAMs, then reports Synth8-326 feedback through D-UCE retained clear/maintenance and automatically disables a timing arc. The immutable job continues for closed resource/failure evidence; timing/deployment acceptance is withheld while source/netlist equivalence is investigated (`research/fpga-native1280-r2-20261121/warning01/record.json`).
 
 - **Large retained-store complete cost measured — 2026-11-21:** one closed same-ELF1280-line/side native-simulation pair passes full normal-cache, retained-payload and identical-access audits, but joint retention raises WHOLE1,159,423→1,191,569cycles (+2.7726%) and timed ring366,663→375,588 (+2.4341%). It produces772timed D hits and no I hits; this is extra ordinary-demand retention with no advisory source, not Linux/FPGA benefit or prefetch effectiveness (`research/retained-natural-control-20261121/CLOSURE_V3.md`).
