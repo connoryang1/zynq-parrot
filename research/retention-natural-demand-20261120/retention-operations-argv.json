@@ -1,0 +1,371 @@
+[
+  {
+    "label": "pilot",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/pilot/session.json",
+    "pilot": true,
+    "cells": [
+      [
+        "retention-rr",
+        "scan"
+      ],
+      [
+        "retention-first",
+        "scan"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/pilot",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "8",
+      "--warmup",
+      "4",
+      "--repeats",
+      "2",
+      "--all-three-acknowledged",
+      "--cell",
+      "scan:32:retention-rr",
+      "--cell",
+      "scan:32:retention-first"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/pilot-supervisor.json"
+  },
+  {
+    "label": "R1a",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R1a/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-rr",
+        "scan"
+      ],
+      [
+        "retention-rr",
+        "lookup"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R1a",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "scan:32:retention-rr",
+      "--cell",
+      "lookup:32:retention-rr"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R1a-supervisor.json"
+  },
+  {
+    "label": "R1b",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R1b/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-rr",
+        "parse"
+      ],
+      [
+        "retention-rr",
+        "chase"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R1b",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "parse:32:retention-rr",
+      "--cell",
+      "chase:32:retention-rr"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R1b-supervisor.json"
+  },
+  {
+    "label": "F1a",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F1a/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-first",
+        "scan"
+      ],
+      [
+        "retention-first",
+        "lookup"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F1a",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "scan:32:retention-first",
+      "--cell",
+      "lookup:32:retention-first"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F1a-supervisor.json"
+  },
+  {
+    "label": "F1b",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F1b/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-first",
+        "parse"
+      ],
+      [
+        "retention-first",
+        "chase"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F1b",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "parse:32:retention-first",
+      "--cell",
+      "chase:32:retention-first"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F1b-supervisor.json"
+  },
+  {
+    "label": "F2a",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F2a/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-first",
+        "chase"
+      ],
+      [
+        "retention-first",
+        "parse"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F2a",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "chase:32:retention-first",
+      "--cell",
+      "parse:32:retention-first"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F2a-supervisor.json"
+  },
+  {
+    "label": "F2b",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F2b/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-first",
+        "lookup"
+      ],
+      [
+        "retention-first",
+        "scan"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F2b",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "lookup:32:retention-first",
+      "--cell",
+      "scan:32:retention-first"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/F2b-supervisor.json"
+  },
+  {
+    "label": "R2a",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R2a/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-rr",
+        "chase"
+      ],
+      [
+        "retention-rr",
+        "parse"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R2a",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "chase:32:retention-rr",
+      "--cell",
+      "parse:32:retention-rr"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R2a-supervisor.json"
+  },
+  {
+    "label": "R2b",
+    "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R2b/session.json",
+    "pilot": false,
+    "cells": [
+      [
+        "retention-rr",
+        "lookup"
+      ],
+      [
+        "retention-rr",
+        "scan"
+      ]
+    ],
+    "argv": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-research/linux-tests/run_resume_workload_session.py",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-kernel46-20261120/linux-prefix32-retention27-accepted-rootfs-mem46-shell.nbf",
+      "/home/coyang/zynq-parrot-linux-research/research/retention-natural-demand-20261120/plain-retention-resources-scoped.transfer",
+      "e565fcea920cc56c177e2c6b36b9bee3d0cdf7a68c925bdb382ab4da1cbeebdf",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R2b",
+      "--bitstream-sha256",
+      "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f",
+      "--host",
+      "xilinx@192.168.4.35",
+      "--loops",
+      "64",
+      "--warmup",
+      "32",
+      "--repeats",
+      "4",
+      "--all-three-acknowledged",
+      "--cell",
+      "lookup:32:retention-rr",
+      "--cell",
+      "scan:32:retention-rr"
+    ],
+    "supervisor_receipt": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/R2b-supervisor.json"
+  }
+]
