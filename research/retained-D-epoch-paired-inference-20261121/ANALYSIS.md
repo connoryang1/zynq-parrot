@@ -1,0 +1,12 @@
+The paired isolated D-epoch inference completed successfully with both forms already mapping to distributed RAM. This establishes an important context limitation: the current extracted writer can infer RAM, although the actual r5b full backend used 2,048 epoch FFs. The canonical module has not yet demonstrated a remedy in that production context.
+
+| Same-wrapper arm | Total LUT | Logic LUT | LUTRAM | FF | BRAM |
+|---|---:|---:|---:|---:|---:|
+| Current extracted writer | 154 | 58 | 96 | 0 | 0 |
+| Canonical leaf module | 151 | 55 | 96 | 0 | 0 |
+
+Both primitive inventories contain 24 RAM64M macros and 96 RAMD64E leaves; these overlap and must not be added. The isolated three-logic-LUT difference is not a full-backend saving estimate. Both externally driven wrappers observe the raw invalidation read, state/read controls and epoch comparison, so this result cannot resolve the effect of the integrated controller and optimization context. An actual-backend candidate comparison remains necessary before selecting an implementation on area grounds.
+
+The one vendor invocation exited zero after 89.0034 seconds, within the fixed 180-second total allowance. Idle, upload, paired execution, no-orphans, closed-file inventory and collection all exited zero; remote input before/after bindings, local admission inputs and source end checks match. Actual tool receipts identify Vivado 2024.2 and eight threads; both arms use the same 50 ns owning-clock constraint and production synthesis options. All collected top-level files total 339,766 bytes, below 32 MiB. The runtime guard reaped its owned process group and the independent no-orphans receipt found no Vivado process; closure performed no further remote operation.
+
+The full console is retained losslessly. Its single critical warning concerns parsing the unrelated vcu128 board-store XML, while both synthesis arms completed without synthesis errors; unused physical-address and high clear-slot bits are expected because this probe consumes only set indices. Parallel synthesis criteria were not met. There is no Synth 8-326 warning. No inferred-netlist functional simulation, source integration, whole-core run, routed fit, FPGA execution or performance claim is established by this inference probe. The initial local closure helper expected the wrong tool-marker spelling; that postprocessing failure and correction are preserved separately and did not rerun or change the actual acquisition.
