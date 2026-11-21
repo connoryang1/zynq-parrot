@@ -1,0 +1,59 @@
+{
+  "state": "exact static callsite bytes verified against executed NBF; no runtime jump-source attribution",
+  "inputs": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf",
+      "bytes": 18330752,
+      "sha256": "0792746ba2caf6b2370d923319187f62243c8a0262c876c19a18e2946257d4a3"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/mode14-early-only-control/old-reconstructed.bin",
+      "bytes": 24034304,
+      "sha256": "bf0318e848701a99a58a27436861f88d43340245071c036788488e58dcf7be6d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+      "bytes": 69843938,
+      "sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a"
+    }
+  ],
+  "physical_kernel_payload_base": "0x80200000",
+  "verified_virtual_interval": [
+    "0xffffffff8000a730",
+    "0xffffffff8000a790"
+  ],
+  "nbf_full_width_writes_in_interval": 12,
+  "bytes_verified": 96,
+  "interval_sha256": "692216d4d05904a24b7f0c0ef7fd826438ac070cf5c19b319fe272ff09003579",
+  "expected_direct_call": {
+    "pc": "0xffffffff8000a778",
+    "instruction": "0x451500ef",
+    "rd": "ra",
+    "encoded_target": "0xffffffff8005b3c8",
+    "encoded_return_address": "0xffffffff8000a77c"
+  },
+  "observed_fault": {
+    "epc": "0x0",
+    "ra": "0xffffffff8000a77c",
+    "sp": "0xffffffc80017be70"
+  },
+  "command": [
+    "/home/coyang/zynq-parrot/import/black-parrot-sdk/linux/work/buildroot/host/bin/riscv64-linux-objdump",
+    "-d",
+    "--start-address=0xffffffff8000a730",
+    "--stop-address=0xffffffff8000a790",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf"
+  ],
+  "disassembly": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/failure-callsite/exact-callsite.disassembly.txt",
+    "bytes": 1954,
+    "sha256": "2a8b7281f865b5eb26a877a97d2250327dbea028c690d8f055372843d72a0984"
+  },
+  "limits": [
+    "Observed EPC0/RA are captured fault context, not proof that this static direct call executed immediately before the fault.",
+    "The encoded direct-call target is nonzero. No NULL callback, faulty JAL, callee identity or bad return is established.",
+    "Expected loaded instruction bytes do not verify runtime I-cache contents or the instruction actually executed.",
+    "Register dump truncation omits s7 and later state; a0 at the fault is not proven input at the prior call.",
+    "Nearby newer/historical symbol-bearing builds differ in linked code bytes and are not substituted for exact-kernel symbol attribution."
+  ]
+}

@@ -1,0 +1,39 @@
+
+/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/kernel27/oldstripped.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+ffffffff8000a730 <.text+0x8730>:
+ffffffff8000a730:	35460613          	add	a2,a2,852
+ffffffff8000a734:	35400c13          	li	s8,852
+ffffffff8000a738:	b559                	j	0xffffffff8000a5be
+ffffffff8000a73a:	711c                	ld	a5,32(a0)
+ffffffff8000a73c:	8b8d                	and	a5,a5,3
+ffffffff8000a73e:	ee0798e3          	bnez	a5,0xffffffff8000a62e
+ffffffff8000a742:	b775                	j	0xffffffff8000a6ee
+ffffffff8000a744:	85da                	mv	a1,s6
+ffffffff8000a746:	8552                	mv	a0,s4
+ffffffff8000a748:	0012c097          	auipc	ra,0x12c
+ffffffff8000a74c:	b42080e7          	jalr	-1214(ra) # 0xffffffff8013628a
+ffffffff8000a750:	8baa                	mv	s7,a0
+ffffffff8000a752:	10050363          	beqz	a0,0xffffffff8000a858
+ffffffff8000a756:	711c                	ld	a5,32(a0)
+ffffffff8000a758:	8b89                	and	a5,a5,2
+ffffffff8000a75a:	10078263          	beqz	a5,0xffffffff8000a85e
+ffffffff8000a75e:	6605                	lui	a2,0x1
+ffffffff8000a760:	25560613          	add	a2,a2,597 # 0x1255
+ffffffff8000a764:	25500c13          	li	s8,597
+ffffffff8000a768:	bd99                	j	0xffffffff8000a5be
+ffffffff8000a76a:	00822783          	lw	a5,8(tp) # 0x8
+ffffffff8000a76e:	2785                	addw	a5,a5,1
+ffffffff8000a770:	00f22423          	sw	a5,8(tp) # 0x8
+ffffffff8000a774:	030bb503          	ld	a0,48(s7)
+ffffffff8000a778:	451500ef          	jal	0xffffffff8005b3c8
+ffffffff8000a77c:	00822783          	lw	a5,8(tp) # 0x8
+ffffffff8000a780:	37fd                	addw	a5,a5,-1
+ffffffff8000a782:	00f22423          	sw	a5,8(tp) # 0x8
+ffffffff8000a786:	bdc9                	j	0xffffffff8000a658
+ffffffff8000a788:	6785                	lui	a5,0x1
+ffffffff8000a78a:	97d6                	add	a5,a5,s5
+ffffffff8000a78c:	ad37bc23          	sd	s3,-1320(a5) # 0xad8

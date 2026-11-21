@@ -1,0 +1,43 @@
+{
+  "state": "coordinator source review complete; failed target was stopped before next visit",
+  "reviewer": "/root/resource_accounting",
+  "sources": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/coordinate-fixed-cohort.py",
+      "bytes": 5274,
+      "sha256": "674ccbc2bc724076336a406c1ae9b2e9fe6dc2312990fc64c53b3d879720e9d6"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/slot-completion-gate-v2.py",
+      "bytes": 4795,
+      "sha256": "4483c22131e224afb6efc859f2d209d39579da92b54284c5c5b94a4ed11747a0"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/launch-fixed-slot.py",
+      "bytes": 2793,
+      "sha256": "a77dcc421aa894f6cc13e4bd5a75b61c8d0dbf190eff2847801c6b85a3e648d7"
+    }
+  ],
+  "prelaunch_tests_observed": [
+    "Actual completed pilot accepted by v2 gate.",
+    "Actual still-incomplete A1 rejected before a next launch.",
+    "Actual coordinator entrypoint refused a held local singleton lock before journal/future-slot creation.",
+    "All five A/B label path selections checked."
+  ],
+  "fixed_before_start": [
+    "B-image planned NBF path now selects control.",
+    "Lifetime local singleton NBflock prevents competing coordinator starts.",
+    "Acquisition template is pinned and final paths must equal actual completed sessions.",
+    "Unreadable session metadata with missing supervisor stops without board action."
+  ],
+  "physical_exclusion": "Every physical session remains owned by unchanged serialized wrapper using common board flock and board-side program lock.",
+  "actual_stop": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/coordinator-journal.json",
+    "bytes": 1997,
+    "sha256": "728af7f68d3e6a978abf6173cbcd7449cb60cc1cbba30ad1fa8814a1aaa6a95c"
+  },
+  "limits": [
+    "Source review and host gates are not FPGA workload performance evidence.",
+    "No automatic retry/recovery by the coordinator; failed wrapper performed its own reserved recovery."
+  ]
+}

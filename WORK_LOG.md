@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Full-size codec gate rejected — 2026-11-20:** A1 hits a kernel NULL-pointer Oops after three completed cell reports, so the whole boot is excluded and no later codec slot starts. The wrapper recovers before releasing the shared reservation; a separate read-only reservation retrieves original board-side EPC0/RA`ffffffff8000a77c` and partial registers (`research/codec-mode14-20261120/FAILURE.md`). Root cause remains unknown; offline mapping and a host-only longer-Oops capture diagnostic precede any performance retry.
+
 - **Real zlib completion gate — 2026-11-20:** the separately registered bounded/scoped zlib pilot passes all four checked cells, actual library/ELF hashes, normal shell return, CORE/BSG and runner0. It is excluded from performance inference; the fixed full-size A/B/B/A codec acquisition has started (`research/codec-mode14-20261120/PILOT.md`).
 
 - **Fixed whole-cell FPGA control closed — 2026-11-20:** all sixteen bounded/scoped boots in the four-workload mode14 ABBA matrix pass the full admission audit. Removing the late-selection trigger yields no supported whole-cell or absolute enabled-cost improvement; all intervals include zero, and negative/null results, raw cell totals and both failed attempts are retained in `research/complete-policy-scope-20261120/RESULTS.md`. The separately registered real-zlib functional pilot is now running under a new complete-session reservation.

@@ -1,0 +1,80 @@
+{
+  "state": "fixed codec cohort incomplete; A1 entire boot excluded; no image contrasts admitted",
+  "recorded_utc": "2026-11-21T03:19:27.697413+00:00",
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/admission.json",
+    "bytes": 9475,
+    "sha256": "731138cd7226294e02d85bfc7289dc9182f58fb702ad68186c57f56a05593fbd"
+  },
+  "failed_attempt": {
+    "label": "A1",
+    "session": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/session.json",
+      "bytes": 2690,
+      "sha256": "9f74c491ccb699957a204dbacf5a3e5c0ae8df605ee41399eaf4c733e15b6386"
+    },
+    "log": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/0-deflate32-futex-early.log",
+      "bytes": 34694,
+      "sha256": "9dc97717c760e82dddc1a6434a67cf574ce1440114a543f7f7f58d07f06b727a"
+    },
+    "status": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/0-deflate32-futex-early.log.status.json",
+      "bytes": 1130,
+      "sha256": "ef6693078776e35263f175201d21fb7cecdacdf22b209956b36cfa8900e11c94"
+    },
+    "error": "RuntimeError('kernel failure marker: Oops ')",
+    "recovery": "complete before reservation release",
+    "released_utc": "2026-11-21T03:14:15.603424+00:00"
+  },
+  "coordinator": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/coordinator-journal.json",
+    "bytes": 1997,
+    "sha256": "728af7f68d3e6a978abf6173cbcd7449cb60cc1cbba30ad1fa8814a1aaa6a95c"
+  },
+  "unattempted_slots": [
+    "B1",
+    "B2",
+    "A2"
+  ],
+  "inspection": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-failure-inspection/inspection.json",
+    "bytes": 1360,
+    "sha256": "a0286512fff871fda839bfa0d89c28517035f3b312d2521ea647770fb1afa1eb"
+  },
+  "inspection_files": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-failure-inspection/linux-prefix32-embedded46-baseline-shell-interactive-20261121T030816Z-1359.log",
+      "bytes": 35065,
+      "sha256": "5e0e9b09a482869b2b6bf5045a5a55ce2b4a375331ea8d77b76d5b430bb98ba0"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-failure-inspection/linux-prefix32-embedded46-baseline-shell-interactive-20261121T030816Z-1359.status",
+      "bytes": 14,
+      "sha256": "92fa48783974cb041ff4ac4dea12ce713dc121a8e7109e7a2f5a6e722b9e30cf"
+    }
+  ],
+  "confirmed": [
+    "Actual library and ELF hashes verified before execution; actual RAM bounds present.",
+    "Three complete cells printed; a later kernel NULL-pointer Oops prevents full completion. Exact phase after the third resource row is unlocalized.",
+    "Original board-side log contains epc0, ra0xffffffff8000a77c, sp0xffffffc80017be70 and partial registers; remainder truncated.",
+    "Coordinator stopped before B1; original wrapper recovered under common reservation and released.",
+    "Read-only original remote log was retrieved under a separate exclusive reservation; no re-execution for this inspection."
+  ],
+  "unknown": [
+    "Root cause and exact phase after the third completed cell; inter-cell reporting and subsequent setup/work are not distinguished.",
+    "Whether prior trigger activity, cache/translation/memory behavior, allocator pressure, or another kernel/platform path contributes.",
+    "No exclusive attribution to the old 64MiB issue: this actual run was bounded to46MiB."
+  ],
+  "next_diagnostic": {
+    "prospective": true,
+    "decision_maker": "root coordinator within authorized research task; no new user approval required",
+    "purpose": "Recover complete Oops context on one exact full-size diagnostic execution if needed after offline mapping",
+    "same_guest_artifacts_and_configuration": true,
+    "host_only_change": "Retain up to20s additional console tail only after recognized kernel failure; original guard still fails and serialized recovery remains mandatory",
+    "inference": "diagnostic only, entirely excluded from fixed primary performance cohort",
+    "launch_state": "not yet launched; diagnostic wrapper under independent host-only validation"
+  },
+  "original_plan_unchanged": true,
+  "no_performance_retry_authorized_by_this_record": true
+}

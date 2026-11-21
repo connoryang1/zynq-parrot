@@ -1,0 +1,140 @@
+{
+  "state": "prospective one-guest diagnostic; no performance replacement",
+  "created_utc": "2026-11-21T03:29:48.583137+00:00",
+  "maximum_physical_guest_executions": 1,
+  "original_admission": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/admission.json",
+    "bytes": 9475,
+    "sha256": "731138cd7226294e02d85bfc7289dc9182f58fb702ad68186c57f56a05593fbd"
+  },
+  "original_failed_attempt": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1/session.json",
+    "bytes": 2690,
+    "sha256": "9f74c491ccb699957a204dbacf5a3e5c0ae8df605ee41399eaf4c733e15b6386"
+  },
+  "failure_amendment": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/failure-amendment-001.json",
+    "bytes": 4447,
+    "sha256": "ce5dfe90801bec873bfa38fe3a91d1602b7ec2f795b33ea250685b21e72ae54d"
+  },
+  "wrapper": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/diagnostic_kernel_tail.py",
+    "bytes": 5947,
+    "sha256": "47edf8ac750d4e8c3bfe94eda51c5e0f3b43e53ba6161cf23a3555572920e65f"
+  },
+  "host_validation": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/diagnostic-kernel-tail-proof.json",
+    "bytes": 3477,
+    "sha256": "c0faa41b572f1cf3cbe4e1aa89ee83694f4f2b51dd7c394874b0703c7b2ed621"
+  },
+  "independent_real_pty_smoke": {
+    "path": "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/diagnostic-real-pty-smoke.json",
+    "bytes": 801,
+    "sha256": "d99e690fd69093d537aa3d9a3710031d884efdd22f7494aa9b498d4ce60f0132"
+  },
+  "source8": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+  },
+  "board_helper": {
+    "path": "/home/coyang/zynq-parrot-linux-research/codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh",
+    "bytes": 3808,
+    "sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90"
+  },
+  "argv": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-research/research/codec-mode14-20261120/diagnostic_kernel_tail.py",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+    "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/workload-zlib-scoped-resources-gzip.transfer",
+    "079f974d671908f6aa922122f6901b3123cf16ec244be25e3432b4df500b465b",
+    "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001",
+    "--bitstream-sha256",
+    "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "--host",
+    "xilinx@192.168.4.35",
+    "--cell",
+    "deflate:32:futex-early",
+    "--loops",
+    "64",
+    "--warmup",
+    "32",
+    "--repeats",
+    "4",
+    "--zlib-library",
+    "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/libz.so.1",
+    "--embedded-zlib-library",
+    "--all-three-acknowledged"
+  ],
+  "expected_config": {
+    "loops": 64,
+    "repeats": 4,
+    "warmup": 32,
+    "policy": "futex-early",
+    "sync": "futex",
+    "profile": "plain",
+    "working_set_kib": 32,
+    "workload": "deflate",
+    "terminal_handshake": 1,
+    "configured_entries": 32,
+    "complete_policy_scope": 1,
+    "resource_stats": 1
+  },
+  "guest_artifacts": {
+    "elf": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/rebuilt/scheduler_pipe_hint_benchmark_zlib_scoped_resources_dynamic",
+      "bytes": 23264,
+      "sha256": "079f974d671908f6aa922122f6901b3123cf16ec244be25e3432b4df500b465b"
+    },
+    "transfer": {
+      "path": "/home/coyang/zynq-parrot-linux-research/research/complete-policy-scope-20261120/compiled/workload-zlib-scoped-resources-gzip.transfer",
+      "bytes": 17398,
+      "sha256": "580da454d65c866aa4c0a880d63fec8948f1f813ea9791128357b892eea340d8"
+    },
+    "zlib_library": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/libz.so.1",
+      "bytes": 98120,
+      "sha256": "e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b"
+    },
+    "baseline_nbf": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-baseline-shell.nbf",
+      "sha256": "2e5ccc94a801fe724fd5b8787f5086fb6e939795c4ec98e49ef7a702ad9c024a",
+      "bytes": 69843938
+    },
+    "control_nbf": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/embedded46-workloads/linux-prefix32-embedded46-control-shell.nbf",
+      "sha256": "32db338b492964d3e1aecdc35fbb9dc77a7b1959740f9717a71f689a144d0efa",
+      "bytes": 69843938
+    },
+    "package": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/icache-replay32-banked-20261107/fpga/20261107T231643Z-b4c82ade/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "bytes": 1750672,
+      "sha256": "b139be87bdadf965f2d5e7eb7cd290bc56be76753a2377dc25f5c690a69d5ab1"
+    }
+  },
+  "expected_identity": {
+    "elf_sha256": "079f974d671908f6aa922122f6901b3123cf16ec244be25e3432b4df500b465b",
+    "transfer_sha256": "580da454d65c866aa4c0a880d63fec8948f1f813ea9791128357b892eea340d8",
+    "zlib_library_sha256": "e2c082d208dc2c6041fdef01579e1e86a441bb0dbc930e13fe8e2eee9eedc63b",
+    "bitstream_sha256": "f0910fa4ee537963088cbeb6b21379ddb6b237af900a0aea7b12b87c0426fc3d",
+    "control_program_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30"
+  },
+  "session_manifest": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001/session.json",
+  "extra_source_metadata": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/codec-mode14-20261120/A1-oops-diagnostic-001-diagnostic-host/diagnostic-wrapper.json",
+  "shared_board_reservation": "/home/coyang/fpga-artifacts/pynq-session.lock",
+  "entire_session_reservation": true,
+  "existing_program_lock_retained": true,
+  "host_only_intervention": "Observe up to20s more console after an exact kernel-failure match; restore and propagate original failure, never promote to PASS.",
+  "guest_or_timing_interventions": false,
+  "selection": "No effect-based decision or reduced workload. Full64/32/4 held fixed. Even normal successful diagnostic completion is excluded from primary performance.",
+  "purpose": "Get full fault registers/cause/stack trace before designing a local reproduction or attributing crash cause.",
+  "recovery": "Unchanged serialized wrapper recovers before release after any failed/interrupted guest.",
+  "automatic_retry": false
+}
