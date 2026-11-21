@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Metadata full-core correctness closed — 2026-11-21:** one clean native19bd model21260b passes complete integrity/cold08, strict512b restoration/eight real L1 writes/I retirement, actual counters and16 geometry parameters with396 consumed sources and model archived losslessly. Both production-option metadata inference arms hit580s limits, while the matched I-invalidation-zero SP control completes; no metadata saving or fitted-capacity result follows (`research/retained-metadata-fullcore-20261121/root-verification.json`).
+
 - **Metadata prototype passes components; inference times out — 2026-11-21:** frozenBP19bd replaces dense D epochs and I/D replacement metadata with swept, reset-free distributed-RAM intent;20 geometries ×two clocks preserve full payload and client cycles, and an intentionally skipped epoch clear is rejected. The all-variable actual-store synthesis reaches its580s limit without resource/DCP outputs; partial evidence and no-orphan confirmation are preserved before a separate production-input control (`research/retained-metadata-lutram-20261121/`).
 
 - **Large retained fit reaches a logic limit — 2026-11-21:** actual1280 full64-byte lines per side synthesize at57,373/53,200 total LUT and140/140 BRAM, then stop at implementation resource DRC before route. One closed read-only DCP query attributes3,756 LUT/41 BRAM to the retained store with zero LUTRAM;67 hash-verified lossless snapshots preserve the failure and attribution, and metadata overhead is the next component hypothesis (`research/fpga-native1280-sp-r4-20261121/closed-terminal01/manifest.json`).
