@@ -1,0 +1,50 @@
+{
+  "state": "PASS syntax/lint only; expected independent-clock multidrivers retained",
+  "arms": [
+    {
+      "arm": "native",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "retained_probe",
+        "-GAREA=0",
+        "-GBANKED=0",
+        "research/retained-ram-inference-20261121/retained_probe.sv"
+      ],
+      "returncode": 0
+    },
+    {
+      "arm": "area",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "retained_probe",
+        "-GAREA=1",
+        "-GBANKED=0",
+        "research/retained-ram-inference-20261121/retained_probe.sv"
+      ],
+      "returncode": 0
+    },
+    {
+      "arm": "banked",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "retained_probe",
+        "-GAREA=0",
+        "-GBANKED=1",
+        "research/retained-ram-inference-20261121/retained_probe.sv"
+      ],
+      "returncode": 0
+    }
+  ]
+}

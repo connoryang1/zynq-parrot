@@ -1,0 +1,26 @@
+%Warning-DECLFILENAME: research/retained-ram-inference-20261121/retained_probe.sv:17:8: Filename 'retained_probe' does not match MODULE name: 'retained_probe_ram'
+   17 | module retained_probe_ram #(parameter WIDTH=64, DEPTH=20480, AW=15, AREA=0, BANKED=0)
+      |        ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/DECLFILENAME?v=5.030
+                       ... Use "/* verilator lint_off DECLFILENAME */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: research/retained-ram-inference-20261121/retained_probe.sv:23:5: Logical operator GENIF expects 1 bit on the If, but If's VARREF 'AREA' generates 32 bits.
+                                                                                    : ... note: In instance 'retained_probe.payload'
+   23 |     if (AREA) begin : area_mapping
+      |     ^~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:24:68: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.flat.area_mapping.mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:29:22: ... Location of first driving block
+   29 |           if(w_i[p]) mem[addr_i[p]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:29:22: ... Location of other driving block
+   29 |           if(w_i[p]) mem[addr_i[p]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:24:68: Signal has multiple driving blocks with different clocking: 'retained_probe.tags.flat.area_mapping.mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:29:22: ... Location of first driving block
+   29 |           if(w_i[p]) mem[addr_i[p]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:29:22: ... Location of other driving block
+   29 |           if(w_i[p]) mem[addr_i[p]]<=data_i[p];
+      |                      ^~~
+- V e r i l a t i o n   R e p o r t: Verilator 5.030 2024-10-27 rev v5.030
+- Verilator: Built from 0.015 MB sources in 3 modules, into 0.024 MB in 5 C++ files needing 0.000 MB
+- Verilator: Walltime 0.022 s (elab=0.002, cvt=0.004, bld=0.000); cpu 0.022 s on 1 threads; alloced 8.648 MB

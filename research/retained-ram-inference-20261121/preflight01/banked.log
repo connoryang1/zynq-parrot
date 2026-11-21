@@ -1,0 +1,209 @@
+%Warning-DECLFILENAME: research/retained-ram-inference-20261121/retained_probe.sv:17:8: Filename 'retained_probe' does not match MODULE name: 'retained_probe_ram'
+   17 | module retained_probe_ram #(parameter WIDTH=64, DEPTH=20480, AW=15, AREA=0, BANKED=0)
+      |        ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/DECLFILENAME?v=5.030
+                       ... Use "/* verilator lint_off DECLFILENAME */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: research/retained-ram-inference-20261121/retained_probe.sv:22:7: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'BANKED' generates 32 bits.
+                                                                                    : ... note: In instance 'retained_probe.payload'
+   22 |   if (!BANKED) begin : flat
+      |       ^
+%Warning-WIDTHTRUNC: research/retained-ram-inference-20261121/retained_probe.sv:58:25: Bit extraction of array[511:0] requires 9 bit index, not 10 bits.
+                                                                                     : ... note: In instance 'retained_probe.tags'
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                         ^
+%Warning-WIDTHTRUNC: research/retained-ram-inference-20261121/retained_probe.sv:59:23: Bit extraction of array[511:0] requires 9 bit index, not 10 bits.
+                                                                                     : ... note: In instance 'retained_probe.tags'
+   59 |           q[p][b]<=mem[addr_i[p][9:0]];
+      |                       ^
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:48:25: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.selected_r'
+                      research/retained-ram-inference-20261121/retained_probe.sv:50:45: ... Location of first driving block
+   50 |       always @(posedge clk_i[p]) if(v_i[p]) selected_r[p]<=BW'(addr_i[p]>>10);
+      |                                             ^~~~~~~~~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:50:45: ... Location of other driving block
+   50 |       always @(posedge clk_i[p]) if(v_i[p]) selected_r[p]<=BW'(addr_i[p]>>10);
+      |                                             ^~~~~~~~~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[0].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:47:35: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.q'
+                      research/retained-ram-inference-20261121/retained_probe.sv:59:11: ... Location of first driving block
+   59 |           q[p][b]<=mem[addr_i[p][9:0]];
+      |           ^
+                      research/retained-ram-inference-20261121/retained_probe.sv:59:11: ... Location of other driving block
+   59 |           q[p][b]<=mem[addr_i[p][9:0]];
+      |           ^
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[1].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[2].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[3].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[4].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[5].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[6].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[7].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[8].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[9].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[10].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[11].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[12].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[13].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[14].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[15].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[16].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[17].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[18].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.payload.banks.bank[19].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:48:25: Signal has multiple driving blocks with different clocking: 'retained_probe.tags.banks.selected_r'
+                      research/retained-ram-inference-20261121/retained_probe.sv:50:45: ... Location of first driving block
+   50 |       always @(posedge clk_i[p]) if(v_i[p]) selected_r[p]<=BW'(addr_i[p]>>10);
+      |                                             ^~~~~~~~~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:50:45: ... Location of other driving block
+   50 |       always @(posedge clk_i[p]) if(v_i[p]) selected_r[p]<=BW'(addr_i[p]>>10);
+      |                                             ^~~~~~~~~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.tags.banks.bank[0].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:47:35: Signal has multiple driving blocks with different clocking: 'retained_probe.tags.banks.q'
+                      research/retained-ram-inference-20261121/retained_probe.sv:59:11: ... Location of first driving block
+   59 |           q[p][b]<=mem[addr_i[p][9:0]];
+      |           ^
+                      research/retained-ram-inference-20261121/retained_probe.sv:59:11: ... Location of other driving block
+   59 |           q[p][b]<=mem[addr_i[p][9:0]];
+      |           ^
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.tags.banks.bank[1].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+%Warning-MULTIDRIVEN: research/retained-ram-inference-20261121/retained_probe.sv:55:49: Signal has multiple driving blocks with different clocking: 'retained_probe.tags.banks.bank[2].mem'
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of first driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+                      research/retained-ram-inference-20261121/retained_probe.sv:58:22: ... Location of other driving block
+   58 |           if(w_i[p]) mem[addr_i[p][9:0]]<=data_i[p];
+      |                      ^~~
+- V e r i l a t i o n   R e p o r t: Verilator 5.030 2024-10-27 rev v5.030
+- Verilator: Built from 0.015 MB sources in 3 modules, into 0.135 MB in 5 C++ files needing 0.000 MB
+- Verilator: Walltime 0.053 s (elab=0.010, cvt=0.024, bld=0.000); cpu 0.053 s on 1 threads; alloced 10.000 MB
