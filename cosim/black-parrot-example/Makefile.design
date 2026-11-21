@@ -53,6 +53,19 @@ DEFINES += TAG_ENABLE=1
 #DEFINES += ZERO_DRAM
 DEFINES += BP_NCPUS=$(BP_NCPUS)
 
+# Optional real full-line I/D retention. These are payload slots in a separate
+# BRAM store; ordinary L1 and L2 dimensions stay in the named configuration.
+# This dedicated experiment builds real retention by default. Set 0 to
+# reproduce the legacy replay datapath; the accepted source branch is intact.
+BP_RETAINED_BUFFER ?= 1
+BP_RETAINED_I_LINES ?= 64
+BP_RETAINED_D_LINES ?= 64
+BP_RETAINED_SETS ?= 64
+DEFINES += BP_RETAINED_BUFFER=$(BP_RETAINED_BUFFER)
+DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
+DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
+DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
+
 # The PYNQ-Z2 context-cache configuration uses two resident hardware slots
 # and four software-visible contexts.  Keep this aligned with the targeted
 # nonresident tests and pass the generated custom configuration into Vivado;

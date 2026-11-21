@@ -60,6 +60,7 @@ SMOKE_TESTS := \
     mt_regfile_test
 
 CORRECTNESS_TESTS := \
+    mt_large_retained_system_test \
     mt_icache_retention_control_test \
     mt_machine_trap_test \
     mt_protected_rpc_reference_test \
@@ -154,6 +155,10 @@ run-$(1): $(ZP_RISCV_DIR)/bp-tests/$(1).riscv
 endef
 
 TEST_SOURCE_mt_icache_retention_control_test := $(TOP)/testing/rtl/retention_control_test.c
+TEST_SOURCE_mt_large_retained_system_test := $(TOP)/testing/rtl/large_retained_system_test.c
+BP_RETAINED_I_LINES ?= 64
+BP_RETAINED_D_LINES ?= 64
+$(ZP_RISCV_DIR)/bp-tests/mt_large_retained_system_test.riscv: CFLAGS += -I$(TOP)/testing -DBP_EXPECT_I_LINES=$(BP_RETAINED_I_LINES) -DBP_EXPECT_D_LINES=$(BP_RETAINED_D_LINES)
 $(ZP_RISCV_DIR)/bp-tests/mt_icache_retention_control_test.riscv: CFLAGS += -I$(TOP)/testing
 $(foreach t,$(TESTS),$(eval $(call TEST_RULES,$(t))))
 

@@ -1,0 +1,67 @@
+{
+  "created_utc": "2026-11-21T05:22:22.274076+00:00",
+  "priority": "User BP-LINUX-002: retain as much actual I/D cache payload as practical fit/timing allows; BP-LINUX-003 calibrated latency sensitivity allowed",
+  "status": "implementation and correctness underway; no large-buffer routed or FPGA application result yet",
+  "unit": {
+    "line_bytes": 64,
+    "payload_not_address_lists": true,
+    "separate_from_L1_geometry": true
+  },
+  "primary_architecture": "shared independently clocked I/D BRAM partitions behind ordinary UCE full-line refill; optional per-word I adapter component retained separately",
+  "control_CSR": "0x5c2",
+  "bits": {
+    "0": "I lookup and prefetch capture",
+    "1": "D lookup and prefetch capture",
+    "2": "D ordinary demand-copy (requires bit1)",
+    "3": "I ordinary demand-copy (requires bit0)"
+  },
+  "command_cost": "Every retired S/M command starts both tag-clear sweeps; accepted transactions drain; all lifecycle costs included",
+  "fit_search": {
+    "initial_full_top_lines_per_side": 64,
+    "increasing_candidates": [
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "continue_after_1024": true,
+    "upper_boundary": "demonstrated synthesis/routed resource and timing boundary, not spare-RAM arithmetic",
+    "near_boundary": "refine payload count and consider asymmetric I/D partitions; record each exact failed and successful revision/clock/resource/timing result",
+    "qualification": "routed fit/timing plus checked board execution; state tested lower bound versus measured maximum and tool-search limits honestly"
+  },
+  "controls": [
+    "runtime off",
+    "I advisory-only",
+    "I with ordinary-copy",
+    "D advisory-only",
+    "D with ordinary-copy",
+    "joint advisory-only",
+    "joint ordinary-copy"
+  ],
+  "interpretation": "Matched same-hardware off/retention/prefetch controls distinguish mechanisms. Also execute accepted physical baseline for end-to-end deployment comparisons. No subtraction of trigger costs or failed executions. Capacity and latency regimes prioritized over same-capacity replacement-policy matrices.",
+  "workload_scope": "General private-working-set scan/lookup/parse/chase and real-library application phases; retain unresolved codec failure and never count partial work as a completed transaction. Avoid address-specific tuning.",
+  "memory_regimes": {
+    "native": "unchanged accepted prefetch16k topology, no direct AXI prefetch bypass; all demand I/D and prefetch share L2/offchip return path",
+    "injection": "common all-ID R+B response stream, native0 exact bypass, first/full response endpoints measured separately; preserve/report bandwidth, concurrency, queue saturation; same N baseline/optimized",
+    "models": "historical audited full-burst40/200 models reused as conditional sensitivity, one L2 bank differs physical two-bank primary; never numerical FPGA projection"
+  },
+  "coherence_limit": "Conservative same-set D mutation invalidation and epoch-wrap sweeps; configured payload slots do not guarantee useful unique lines. Measured lookup/capture/drop/clear/interference costs required.",
+  "board_protocol": {
+    "path": "/home/coyang/fpga-artifacts/pynq-session.lock",
+    "exclusive_entire_session": true,
+    "all_three_acknowledged": true,
+    "runner_program_lock_preserved": true,
+    "never_recreate_lock": true
+  },
+  "previous_study_closeout": {
+    "priority_transition": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/retention-natural-demand-20261120/BP-LINUX-002-priority-transition.json",
+    "R1a": "completed normally under session reservation; scan/lookup gate passed; prefix activity gate is not performance evidence",
+    "remaining": "R1b and later same-capacity groups canceled by explicit user reprioritization before effect comparison; incomplete cohort not promoted",
+    "old_worktree": "/home/coyang/zynq-parrot-linux-research"
+  },
+  "constraints": {
+    "disk": "HOME tight; source/evidence durable small, generated models and traces isolated in RAM/remote; no competing cleanup",
+    "builders": "2026-11-21 probe bp1 active unrelated Vivado, bp2/bp3 SSH connection refused; no competing build launched"
+  }
+}

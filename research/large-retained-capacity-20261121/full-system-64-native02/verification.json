@@ -1,0 +1,42 @@
+{
+  "utc": "2026-11-21T05:37:59.511486+00:00",
+  "passed_complete_execution": true,
+  "test": "mt_large_retained_system_test",
+  "scope": "Full actual core+L1/UCE/backend with64full64B slots per side, primary acceptedprefetch16k endpoint;10line same-L1-set integrity fixture, runtime0/I/D/joint ordinary-copy controls, nonresident contexthandoff andS/M/U privilege checks. No application performance or FPGA/capacity-limit claim.",
+  "model_UCE_SHA256": "2e174d3c2946c57ff9049e46e9927c6dfc7f92406dd3d6615a3c79705e8cfd84",
+  "assertions": "Legacy full-systemMakefile did not enable Verilator--assert. Separately reviewed assertion-only publishcancel bug fixed inlaterf7fc...; final assertion-enabled clean full-core gate pending.",
+  "process_exit_code": 134,
+  "guest_and_host": "test-specific marker then COREPASS and BSGPASS/hostRC0; checker accepts documented postPASS GPIO finalization failure only",
+  "checker": "python3 testing/check_run.py run02.log --test mt_large_retained_system_test --exit-code134: VALID RUN",
+  "trace": {
+    "closed": true,
+    "sha256": "afc3422b61fbad12691fe55a094f3bcc4da445cca7d276999f18537128287984"
+  },
+  "build_provenance": "../full-system-64-native-preflight01/source-before-final.json.gz,actual-source-list.json,compiled-source-snapshot.tar.gz,verFiles.dat.gz,build-final.log.gz",
+  "artifacts": {
+    "run02.log.gz": {
+      "sha256": "2f3853819ea6772679363654baf6383780ba2da6af31399bee0400f807523b04",
+      "bytes": 4302
+    },
+    "large_retained_system_test.c.gz": {
+      "sha256": "bd1d61079e5b3920a8f5175d3c6e9251494552952ab0b577f46a5cdc230e6437",
+      "bytes": 2076
+    },
+    "prog02.riscv.gz": {
+      "sha256": "3c164112ab4f33b9d2e82a6a362a8f63ab8815673249c8496094051b94d10e8b",
+      "bytes": 73544
+    },
+    "Vbsg_nonsynth_zynq_testbench.gz": {
+      "sha256": "f2b0391f37e582d0e50f5c928531f2395dd832d3a2d28f089d0d551730b7a132",
+      "bytes": 3228802
+    },
+    "prog02.nbf.gz": {
+      "sha256": "523ef80079effc60418c917edfe1e3f493ce1d168fe8b569c0ef812e4999f5b0",
+      "bytes": 34280
+    },
+    "large-retained-system02.fst": {
+      "sha256": "afc3422b61fbad12691fe55a094f3bcc4da445cca7d276999f18537128287984",
+      "bytes": 46824222
+    }
+  }
+}

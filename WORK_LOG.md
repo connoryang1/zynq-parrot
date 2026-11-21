@@ -2,6 +2,8 @@ This file records major accepted milestones and new engineering progress. Detail
 
 # Work log
 
+- **Larger retained payload integration — 2026-11-21:** separate BRAM I/D partitions now restore complete ordinary L1 lines through their UCEs, with supervisor control, registered store invalidation and opposite-edge cancellation ownership. Exhaustive component payload gates and a complete64-line/side full-system integrity/privilege/handoff gate pass; final assertion-enabled full-core validation, routed capacity limits and FPGA application benefit remain pending (`research/large-retained-capacity-20261121/INTEGRATION.md`).
+
 - **Physical demand-retention pilot accepted — 2026-11-20:** both fresh RR/first scan32 functional boots pass strict provenance, scope/resource/CSR/zero-prefix/bounded-memory and normal-return gates. Demand publication and side-store response counters are observed physically; the short pilot is excluded from all performance inference, with saturated-counter and matched-lifecycle limits explicit (`research/retention-natural-demand-20261120/PILOT.md`).
 
 - **Bounded old-hardware retention fallback accepted — 2026-11-20:** the unchanged8f ABI probe completes on oldf091 hardware with the bounded a1f kernel and actual46MiB allocation/boot evidence. ENODEV/sentinel, malformed-input and actual nonroot privilege contracts pass with normal return and CORE/BSG/runner0, closing the previous uncapped compatibility limitation (`research/retention-kernel-20261120/bounded-absent-functional.json`).

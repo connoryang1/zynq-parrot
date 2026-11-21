@@ -1,0 +1,31 @@
+{
+  "utc": "2026-11-21T05:31:37.586611+00:00",
+  "accepted": false,
+  "status": "target runtime limit; no test-specific PASS or complete execution; not a performance result",
+  "exit_code": 134,
+  "host_target_return": 124,
+  "native_runtime_limit_ms": 180000,
+  "observed_runtime_limit_ms": 189918,
+  "build": "clean TRACE=1 fulltop64I+64D compiled; legacy maintained fullsim Makefile does not enable --assert, so not an assertion acceptance gate",
+  "source": "UCE2e174 plus rootintegration frozen; exactbeforehashes retained; independentreviewfound publish-clear assertion-only blocker for separate correction",
+  "diagnosis": "Direct FST final samples locate advancing PCs0x80000458/45a/45e/466/46a in the 1280-line initialization-store loop. The final sampled PC45a retired. This establishes continuing corpus initialization near the cutoff, not completed execution or proof against an unobserved earlier/later stall. Largefixture requires a larger native time budget; shorter integration fixture completed separately.",
+  "trace": {
+    "path": "/dev/shm/linux-retained-fulltop-20261121-01/verilator/large-retained-system.fst",
+    "sha256": "cc1781330b5c9cddd187cda4c60bb77ba1c6d530027f7a5bd1e4fabeb456c3a6",
+    "bytes": 87959226,
+    "retention": "closed raw RAM artifact currently; durable compact failure/log/source/NBF retained; storage tight"
+  },
+  "artifacts": {
+    "run.log.gz": "10ce61cff298f201758bcb7d5f48dbefebe338c18aad439af7a11354651961ce",
+    "prog.nbf.gz": "927fea5212ca376fe661332e38e07cc11eace85bb9a7360673c0bdd86d1f1898",
+    "build-final.log.gz": "521fe4af4bef90d6cb1993604f6b7689e9d2607a7f2fb8e8a54c8f5c5b428db2",
+    "source-before-final.json.gz": "81e5580dff6f8ed14fd66c634c1f2d2302281360662031c6b8d5d2b667e95d99",
+    "build-invocation.log.gz": "1c1d5bbb398bf6806f1a47b85d2bc93c97305b4a4be7555cf90beed00fbec844",
+    "prog.riscv.gz": "66c2f5f247da809a01d7291f7f877ee7c79f96b129105e679c8c4f7777677eee"
+  },
+  "parser_diagnostics": [
+    "Initial fullFST-to-VCD stream was too costly; terminated ONLY verified own processgroup632515, preserving rawtrace. No parsed results from that attempt.",
+    "Standalone fstapi compile first required FST_CONFIG_INCLUDE=fst_config.h; vector-name matching then required stripping trailing printed ranges; final direct-reader exit0 and originalsource retained.",
+    "Values sampled at end minus100000000/10000000/1000000/100000/0 picoseconds; these are signal states, not a full retired-instruction trace."
+  ]
+}

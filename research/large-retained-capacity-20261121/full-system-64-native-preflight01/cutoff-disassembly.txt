@@ -1,0 +1,34 @@
+
+/dev/shm/linux-retained-fulltop-20261121-01/verilator/prog.riscv:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000080000432 <main+0x206>:
+    80000432:	4781                	li	a5,0
+    80000434:	00178813          	addi	a6,a5,1
+    80000438:	02d808b3          	mul	a7,a6,a3
+    8000043c:	02079593          	slli	a1,a5,0x20
+    80000440:	01d5d613          	srli	a2,a1,0x1d
+    80000444:	4581                	li	a1,0
+    80000446:	02059793          	slli	a5,a1,0x20
+    8000044a:	9381                	srli	a5,a5,0x20
+    8000044c:	97b2                	add	a5,a5,a2
+    8000044e:	078e                	slli	a5,a5,0x3
+    80000450:	97fa                	add	a5,a5,t5
+    80000452:	02658533          	mul	a0,a1,t1
+    80000456:	0585                	addi	a1,a1,1
+    80000458:	953a                	add	a0,a0,a4
+    8000045a:	01154533          	xor	a0,a0,a7
+    8000045e:	e388                	sd	a0,0(a5)
+    80000460:	47a1                	li	a5,8
+    80000462:	fef592e3          	bne	a1,a5,80000446 <main+0x21a>
+    80000466:	50000613          	li	a2,1280
+    8000046a:	87c2                	mv	a5,a6
+    8000046c:	fcc814e3          	bne	a6,a2,80000434 <main+0x208>
+    80000470:	4809                	li	a6,2
+    80000472:	4781                	li	a5,0
+    80000474:	00178893          	addi	a7,a5,1
+    80000478:	02d88e33          	mul	t3,a7,a3
+    8000047c:	02079593          	slli	a1,a5,0x20
+    80000480:	01d5d613          	srli	a2,a1,0x1d
