@@ -1,0 +1,13 @@
+PREPARATION ONLY. No executable model/reader command is admitted now.
+
+Software/schema draft check:
+python3 -c 'import sys; sys.path.insert(0,"research/retained1792-stream-cohort-20261121"); import contract as c; p=c.HERE/"preparation.DRAFT.json"; c.load(p,c.bind(p)["sha256"],approved=False)'
+
+Future sequence, ONLY after root reviews canonical fullcore/observation/source/model/stage proofs and binds a fresh approved admission SHA:
+1. run_stream1792.py --preparation APPROVED.json --preparation-sha256 TRUSTED_SHA --role d-enabled --execute
+2. audit_stream1792.py --preparation APPROVED.json --preparation-sha256 TRUSTED_SHA --role d-enabled --native-sha256 ROOT_CAPTURED_D_NATIVE_SHA --execute
+3. run_stream1792.py --preparation APPROVED.json --preparation-sha256 TRUSTED_SHA --role d-off --prior-audit-sha256 ROOT_CAPTURED_D_AUDIT_SHA --execute
+4. audit_stream1792.py --preparation APPROVED.json --preparation-sha256 TRUSTED_SHA --role d-off --native-sha256 ROOT_CAPTURED_OFF_NATIVE_SHA --execute
+5. run_stream1792.py --preparation APPROVED.json --preparation-sha256 TRUSTED_SHA --role i-enabled --prior-audit-sha256 ROOT_CAPTURED_D_AUDIT_SHA --prior-audit-sha256 ROOT_CAPTURED_OFF_AUDIT_SHA --execute
+6. audit_stream1792.py --preparation APPROVED.json --preparation-sha256 TRUSTED_SHA --role i-enabled --native-sha256 ROOT_CAPTURED_I_NATIVE_SHA --execute
+7. Verify all three complete audit receipts with their root-captured SHA anchors. No next case on any failure; no retries or budget expansion.

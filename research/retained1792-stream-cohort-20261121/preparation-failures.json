@@ -1,0 +1,17 @@
+{
+  "state": "Host fixture issues before any model/reader/target execution",
+  "gate": "12tests:10PASS2fixtureERROR",
+  "errors": [
+    {
+      "test": "incomplete full schema input",
+      "error": "list_iterator has no close() under contextlib.closing",
+      "fix": "use a real closeable generator to match guarded_reader API"
+    },
+    {
+      "test": "native mocked closed-log parse",
+      "error": "mock omitted trace.fst file expected in fixed native proof bindings",
+      "fix": "write explicitly inert never-read trace fixture in fake owned_run"
+    }
+  ],
+  "production_sources_changed_for_these_fixes": false
+}
