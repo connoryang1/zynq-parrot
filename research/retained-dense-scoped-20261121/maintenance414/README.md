@@ -1,0 +1,5 @@
+This adds the exact raw D-cache maintenance observation required by the unchanged capacity audit. It preserves the separately qualified414-leaf trace-only model and closes the413-leaf observation gap, without changing RTL or claiming all-slot correctness or performance.
+
+The untouched relink reproduces876ddcf6; only Syms trace registration changes, giving modela5d62093. One cold08 run matches five complete literal domains through EOF, including all167 capacity signals and1,412,907 events in that domain. The original strict512b/eight-L1-write/I-retirement, counter, terminal-protocol and16geometry checks pass; twelve driver and eleven independent reviewer fixtures pass. Native180s/outer360s and fixed512MiB stage/64MiB HOME budgets remain unchanged, and the758,542-byte raw trace is retained durably.
+
+The exact maintenance signal is included rather than deriving it from another control signal. Large model/source/canonical archives remain at the bound external paths. This qualification admits the observation selection for subsequent separately bounded capacity tests; no capacity/application target or FPGA operation occurred here.
