@@ -1,0 +1,59 @@
+{
+  "state": "diagnostic-only host validation PASS; no target execution",
+  "diagnostic_only": true,
+  "excluded_from_performance_inference": true,
+  "host_test_command": "python3 -B -m unittest discover -s research/codec-mode14-20261120 -p test_diagnostic_kernel_tail.py -v",
+  "host_tests_passed": 10,
+  "test_log": {
+    "path": "research/codec-mode14-20261120/diagnostic-kernel-tail-tests.log",
+    "bytes": 1355,
+    "sha256": "55382700052baea2cb6366c0faea1ec1172e0eab6aec2dbea99a00dbd36fe79a"
+  },
+  "wrapper": {
+    "path": "research/codec-mode14-20261120/diagnostic_kernel_tail.py",
+    "bytes": 5947,
+    "sha256": "47edf8ac750d4e8c3bfe94eda51c5e0f3b43e53ba6161cf23a3555572920e65f"
+  },
+  "tests": {
+    "path": "research/codec-mode14-20261120/test_diagnostic_kernel_tail.py",
+    "bytes": 10246,
+    "sha256": "7ca571b071d3a7ea3f568bdaab8b9762f4c3321628c1ffc5de23c78883c83822"
+  },
+  "documentation": {
+    "path": "research/codec-mode14-20261120/DIAGNOSTIC_KERNEL_TAIL.md",
+    "bytes": 3260,
+    "sha256": "871aa7f9c09defa02ed449d5ae6e05128077d61651284299c70ab6b5b4757554"
+  },
+  "frozen_codec_admission": {
+    "path": "research/codec-mode14-20261120/admission.json",
+    "bytes": 9475,
+    "sha256": "731138cd7226294e02d85bfc7289dc9182f58fb702ad68186c57f56a05593fbd"
+  },
+  "frozen_codec_validator": {
+    "path": "research/codec-mode14-20261120/codec_admission.py",
+    "bytes": 11762,
+    "sha256": "0d1b3ac262cd52a5409253dafebd7ac3ef2b554731d0d91c93b731e62670d0d1"
+  },
+  "base_source8_sha256": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+  },
+  "base_source8_matches_frozen_admission": true,
+  "metadata_trailing_newline_ast_verified": true,
+  "guard_integration": "Fake low-level expect through unchanged real guest guard/run writes FAIL, retains fake call trace, restores exact original match object and closes child.",
+  "ownership": "All locks, staging, recovery and final failure remain delegated to unchanged run_resume_workload_session.main.",
+  "capture": "One window of at most 20 seconds per spawn, only after exact KERNEL_FAILURE_MARKER object selected. EOF/TIMEOUT/read errors preserve original failure; cancellation restores match then propagates.",
+  "limitations": [
+    "No board/model/ELF execution by this task.",
+    "No claim of failure cause or performance benefit.",
+    "No new runtime flag, cohort retry or coordinator launch.",
+    "A separately preregistered diagnostic remains excluded even if PASS."
+  ],
+  "existing_artifacts_modified": false
+}
