@@ -66,6 +66,20 @@ DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
 DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
 DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
 
+# Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
+# default0 preserves the original eight-register shell and host read sequence.
+BP_RETAINED_OBSERVE ?= 0
+ifneq ($(filter $(BP_RETAINED_OBSERVE),0 1),$(BP_RETAINED_OBSERVE))
+$(error BP_RETAINED_OBSERVE must be 0 or 1)
+endif
+ifneq ($(words $(BP_RETAINED_OBSERVE)),1)
+$(error BP_RETAINED_OBSERVE must be 0 or 1)
+endif
+ifneq ($(filter BP_RETAINED_OBSERVE BP_RETAINED_OBSERVE=%,$(EXTRA_DEFINES)),)
+$(error Set BP_RETAINED_OBSERVE=0 or 1 instead of EXTRA_DEFINES)
+endif
+DEFINES += BP_RETAINED_OBSERVE=$(BP_RETAINED_OBSERVE)
+
 # Static common HP0 response age, in aclk cycles. This affects every returned
 # R/B beat; it is not AR-to-data or CPU load-use latency. Zero elaborates only
 # direct wires. Use this variable, not a conflicting EXTRA_DEFINES override.

@@ -18,6 +18,10 @@
 #define GP0_RD_MEM_PROF_2        (GP0_RD_MEM_PROF_1        + 0x4)
 #define GP0_RD_MEM_PROF_3        (GP0_RD_MEM_PROF_2        + 0x4)
 #define GP0_RD_BOOTROM_DATA      (GP0_RD_MEM_PROF_3        + 0x4)
+// Append only; old runner read/write/FIFO locations are unchanged.
+#define GP0_RD_RETAINED_HITS     (GP0_RD_BOOTROM_DATA      + 0x4)
+#define GP0_RD_RETAINED_PUBLISHED (GP0_RD_RETAINED_HITS     + 0x4)
+#define GP0_RD_RETAINED_WRITES   (GP0_RD_RETAINED_PUBLISHED + 0x4)
 
 // GP0 Write Memory Map
 #define GP0_WR_CSR_SYS_RESETN    GP0_RD_CSR_SYS_RESETN

@@ -466,6 +466,17 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
         zpl->shell_read(GP0_RD_MEM_PROF_3), zpl->shell_read(GP0_RD_MEM_PROF_2),
         zpl->shell_read(GP0_RD_MEM_PROF_1), zpl->shell_read(GP0_RD_MEM_PROF_0));
     bsg_pr_info("ps.cpp: freeing DRAM buffer\n");
+#if defined(BP_RETAINED_OBSERVE) && BP_RETAINED_OBSERVE
+    // Optional separately built diagnostic host; the accepted board runner is
+    // unchanged. Read after the existing stop, before freeing owned DRAM.
+    const uint32_t retained_hits = zpl->shell_read(GP0_RD_RETAINED_HITS);
+    const uint32_t retained_published = zpl->shell_read(GP0_RD_RETAINED_PUBLISHED);
+    const uint32_t retained_writes = zpl->shell_read(GP0_RD_RETAINED_WRITES);
+    bsg_pr_info("RETAINED_USE_COUNTERS version=1 i_hits=%u d_hits=%u i_published=%u d_published=%u i_write_beats=%u d_write_beats=%u saturating_bits=16 reset=axi_only\n",
+                retained_hits & 0xffffU, retained_hits >> 16,
+                retained_published & 0xffffU, retained_published >> 16,
+                retained_writes & 0xffffU, retained_writes >> 16);
+#endif
     zpl->free_dram((void *)buf);
     zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);
 

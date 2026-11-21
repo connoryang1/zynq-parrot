@@ -7,6 +7,9 @@
 `ifndef BP_AXI_RESPONSE_DELAY
 `define BP_AXI_RESPONSE_DELAY 0
 `endif
+`ifndef BP_RETAINED_OBSERVE
+`define BP_RETAINED_OBSERVE 0
+`endif
 
 module top_zynq
  import zynq_pkg::*;
@@ -184,7 +187,8 @@ module top_zynq
      || (bp_params_p == e_bp_unicore_zynqparrot_prefetch5_cfg);
 `endif
    localparam num_regs_ps_to_pl_lp  = 5;
-   localparam num_regs_pl_to_ps_lp  = 8;
+   localparam retained_observe_lp = `BP_RETAINED_OBSERVE;
+   localparam num_regs_pl_to_ps_lp  = retained_observe_lp ? 10 : 8;
    localparam num_fifos_ps_to_pl_lp = 1;
    localparam num_fifos_pl_to_ps_lp = 1;
 
@@ -458,6 +462,46 @@ module top_zynq
      assign minstret_lo = blackparrot.processor.m.multicore.cc.y[0].x[0].tile_node.tile.core.core_lite.core_minimal.be.calculator.pipe_sys.csr.gen_csr[0].csr_inst.minstret_lo;
    else
      assign minstret_lo = blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_sys.csr.gen_csr[0].csr_inst.minstret_lo;
+
+   // Existing GP0 indices0..6 and all FIFO/write addresses stay fixed. Three
+   // optional read-only words at indices7/8/9 (0x3c/40/44) pack I low16,D high16.
+   // Like the existing minstret probe this is FPGA-wrapper observation only:
+   // no new BP/kernel CSR/ports and no change to cache geometry or controls.
+   if (retained_observe_lp && (cce_type_p == e_cce_uce)) begin : retained_observe
+`define OBS_U blackparrot.processor.u.unicore.unicore_lite
+`define OBS_I `OBS_U.core_minimal.fe.icache
+`define OBS_D `OBS_U.core_minimal.be.calculator.pipe_mem.dcache
+     wire [1:0] hit, published, write_beat;
+     assign hit[0] = `OBS_U.retained_resp_v[0] & `OBS_U.retained_resp_ready[0]
+       & `OBS_U.retained_resp_hit[0] & `OBS_U.icache_uce.retained_enable_i
+       & ~`OBS_U.icache_uce.retained_clear & ~`OBS_U.icache_uce.retained_demand_mutation;
+     assign hit[1] = `OBS_U.retained_resp_v[1] & `OBS_U.retained_resp_ready[1]
+       & `OBS_U.retained_resp_hit[1] & `OBS_U.dcache_uce.retained_enable_i
+       & ~`OBS_U.dcache_uce.retained_clear & ~`OBS_U.dcache_uce.retained_demand_mutation;
+     assign published = `OBS_U.retained_insert_published & `OBS_U.retained_insert_done;
+     // e_retained_fill is state22 in the bound UCE source. Count packet beats,
+     // not bank enables. Require actual normal SRAM write enables as well as
+     // accepted UCE data, excluding both same-cycle and latched I aborts.
+     assign write_beat[0] = (`OBS_U.icache_uce.state_r == 5'd22)
+       & `OBS_U.icache_data_mem_pkt_v_li & `OBS_U.icache_data_mem_pkt_yumi_lo
+       & (|`OBS_I.data_mem_slow_write) & ~`OBS_I.abort_inflight;
+     assign write_beat[1] = (`OBS_U.dcache_uce.state_r == 5'd22)
+       & `OBS_U.dcache_data_mem_pkt_v_li & `OBS_U.dcache_data_mem_pkt_yumi_lo
+       & (|`OBS_D.data_mem_slow_write);
+     bp_retained_use_counters counts
+       (.clk_i({~aclk,aclk}), .reset_i(~aresetn), .bp_reset_i(bp_reset_li)
+        ,.hit_i(hit), .published_i(published), .write_beat_i(write_beat)
+        ,.hits_o(csr_data_li[7]), .published_o(csr_data_li[8]), .write_beats_o(csr_data_li[9]));
+`undef OBS_D
+`undef OBS_I
+`undef OBS_U
+   end else begin : no_retained_observe
+     assign csr_data_li[7] = '0;
+   end
+   if (retained_observe_lp && (cce_type_p != e_cce_uce)) begin : unsupported_retained_observe
+     assign csr_data_li[8+:2] = '0;
+     initial $error("BP_RETAINED_OBSERVE requires the unicore UCE endpoint");
+   end
 
  `declare_bp_be_if(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p, fetch_ptr_p, issue_ptr_p);
   bp_be_commit_pkt_s commit_pkt;
