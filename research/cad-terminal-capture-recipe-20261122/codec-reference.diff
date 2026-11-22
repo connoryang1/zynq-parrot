@@ -1,0 +1,34 @@
+--- qualified-cancel-codec
++++ prospective-terminal-codec
+@@ -2,11 +2,11 @@
+ """Lossless live-file member compression/roundtrip; no model or FST reader."""
+ import argparse,hashlib,io,json,lzma,os,tarfile,time
+ from pathlib import Path
+-CAP=160*1024**2
++CAP=256*1024**2
+ class Writer:
+  def __init__(self,p):self.f=p.open('xb');self.c=lzma.LZMACompressor(format=lzma.FORMAT_XZ,check=lzma.CHECK_SHA256,filters=[dict(id=lzma.FILTER_LZMA2,preset=6,dict_size=64*1024**2)]);self.n=0
+  def put(self,b):
+-  if self.n+len(b)>CAP:raise ValueError('fixed160MiB capture ceiling inside unchanged192MiB family; preserve partial')
++  if self.n+len(b)>CAP:raise ValueError('fixed prospective256MiB archive ceiling; preserve partial')
+   self.f.write(b);self.n+=len(b)
+  def write(self,b):self.put(self.c.compress(b));return len(b)
+  def flush(self):self.f.flush()
+@@ -18,7 +18,7 @@
+  def finish(self):
+   if self.n!=self.row['bytes'] or self.h.hexdigest()!=self.row['sha256'] or self.f.read(1):raise ValueError('source mismatch '+self.row['path'])
+ def main():
+- a=argparse.ArgumentParser();a.add_argument('--inventory',type=Path,required=True);a.add_argument('--output',type=Path,required=True);a.add_argument('--action',choices=['compress','roundtrip'],required=True);x=a.parse_args();raw=x.inventory.read_bytes();c=json.loads(raw);rows=c['members'];expected={r['member']:r for r in rows}
++ a=argparse.ArgumentParser();a.add_argument('--inventory',type=Path,required=True);a.add_argument('--output',type=Path,required=True);a.add_argument('--action',choices=['compress','roundtrip'],required=True);x=a.parse_args();raw=x.inventory.read_bytes();c=json.loads(raw);allrows=c['members'];rows=[r for r in allrows if r.get('preservation')!='external'];expected={r['member']:r for r in rows}
+  if len(expected)!=len(rows):raise ValueError('duplicate member')
+  if x.action=='compress':
+   out=Writer(x.output)
+@@ -35,7 +35,7 @@
+      ti.size=r['bytes']
+      with Path(r['path']).open('rb') as f:
+       checked=Checked(f,r);tar.addfile(ti,checked);checked.finish()
+-  out.finish();print('PASS compressed all members',len(rows),flush=True)
++  out.finish();print('PASS compressed payload members',len(rows),'externally preserved',len(allrows)-len(rows),flush=True)
+  else:
+   seen=set();total=0
+   with lzma.open(x.output,'rb') as stream:
