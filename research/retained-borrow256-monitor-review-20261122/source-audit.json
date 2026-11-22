@@ -1,0 +1,48 @@
+{
+  "state": "SOURCE FINDING; actual ROOT failure receipts pending HOME export; no target retry",
+  "source_bindings": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-borrow256-allslots-preparation02-20261122/ledger.py",
+      "bytes": 7101,
+      "sha256": "2f8f3a0c111da9a2f7353aca56604353087c727bd66d094d5401f08a2fc7dab1"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-borrow256-allslots-preparation02-20261122/process_monitor.py",
+      "bytes": 7632,
+      "sha256": "e6ac409bb8db17d4c93bb733f4c7210b9113824556c6d97c0c4be54b0bd3aced"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-borrow256-allslots-preparation02-20261122/run_native.py",
+      "bytes": 8986,
+      "sha256": "cdf22da240a45edb092e935bd83529e195951f05331a8366be882be223a1942f"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-borrow256-allslots-preparation02-20261122/contract.py",
+      "bytes": 12429,
+      "sha256": "b5ebe1219fdda223c5e65457e5f57b11fd14d12347eec6a163baf08a30da92f2"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-borrow256-allslots-preparation02-20261122/source-plan.json",
+      "bytes": 17767,
+      "sha256": "9d9c789692754c598578ade6cac946f2a95ae5980bfe83672b38cd9e10f17f24"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/retained-borrow256-trace0-preparation-20261122/reservations.py",
+      "bytes": 4577,
+      "sha256": "53edf9876fd52e0838044041095ffb3f58ea8b3792827561132aa658a6c2a02c"
+    }
+  ],
+  "call_path": [
+    "native owned_run parent guard -> contract.check_budget -> ACTIVE_GUARD -> serialized process_monitor parent guard",
+    "separate _scanner -> Ledger.check -> scan(current mutable output), phase caps, reservations.cad(), statvfs",
+    "reservations.cad -> recursive rglob/is_file/stat of CAD_WORK plus both CAD_EVIDENCE roots; evidence resolve per file"
+  ],
+  "limits_unchanged": {
+    "scanner_duration_s": 0.5,
+    "poll_gap_s": 1,
+    "poll_interval_s": 0.25
+  },
+  "finding": "The added CAD recursion occurs on essentially every scanner iteration: next_cad is current+.25 and scanner waits.25 after each callback. Accepted RO04 sealed_budget.check only scanned its current mutable output.",
+  "attribution_limit": "Monitor measures entire callback wall time; source alone does not establish per-component timing or separate scheduler/I/O delay. No model/data/RTL failure established.",
+  "next_policy": "New separately admitted source only: no live CAD tree walk; fixed conservative prospective CAD reserves or ROOT-bound terminal closed-CAD seal, with replacement-root reserve explicit. Preserve failed outputs/program/Validator/qualified model/thresholds."
+}
