@@ -1,0 +1,11 @@
+--- /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation02-20261122/preparation01/driver.cpp
++++ /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation03-20261122/preparation01/driver.cpp
+@@ -74,7 +74,7 @@
+  bool collision=argc>1&&std::strcmp(argv[1],"--collision")==0;
+  auto step=[&](){o.tick(t);};
+  try {
+-  t.reset_i=1;t.miss_i=0;t.commit_i=0;t.redirect_i=0;t.drain_i=0;t.dirty_i=1;t.fe_yumi_i=0;t.target_i=0;t.w_v_i=0;t.w_context_i=0;t.w_reg_i=0;for(auto& x:t.w_data_i)x=0;
++  t.reset_i=1;t.miss_i=0;t.commit_i=0;t.redirect_i=0;t.drain_i=0;t.dirty_i=1;t.fe_yumi_i=0;t.target_i=0;t.w_v_i=0;t.w_context_i=0;t.w_reg_i=0;t.w_data_i[0]=0;t.w_data_i[1]=0;t.w_data_i[2]=0;t.w_data_i[3]=0;
+   // Initial reset followed by idle proves response-invalid/zero-metadata;
+   // raw payload before first valid request is deliberately not observed.
+   t.clk_i=0;t.eval();t.clk_i=1;t.eval();o.cycles++;t.clk_i=0;t.eval();o.verify(t);step();t.reset_i=0;

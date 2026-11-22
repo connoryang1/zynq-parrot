@@ -1,0 +1,45 @@
+--- /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-owned-execution-preparation02-20261122/preparation01/run_host.py
++++ /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-owned-execution-preparation03-20261122/preparation01/run_host.py
+@@ -10,14 +10,14 @@
+ sys.dont_write_bytecode=True
+ import software_owned_v2 as owned
+ HERE=Path(__file__).resolve().parent
+-PACKET=Path('/home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation02-20261122/preparation01')
++PACKET=Path('/home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation03-20261122/preparation01')
+ PRODUCTION=Path('/dev/shm/zp-linux-csr-unmasked256-fpga-source-20261122-03')
+-RUN=Path('/run/user/1001/zp-gpr-prefetch-borrow-component-20261122-02')
++RUN=Path('/run/user/1001/zp-gpr-prefetch-borrow-component-20261122-03')
+ VERILATOR=Path('/home/coyang/zynq-parrot/install/bin/verilator')
+ VINC=Path('/home/coyang/zynq-parrot/install/share/verilator/include')
+ PREPARED=HERE/'prepared.json'
+ FINAL=HERE/'admission.ROOT.json'
+-PACKET_SHA='6c9b276a17ff6f0ed2d621be91187bd72f5eae127146a19c73efa52ef2847680'
++PACKET_SHA='8af7890cc28d8282b2b300ed8dbd99127a306072d2a75c43bf5261b58fed96b9'
+ OWNER_SHA='52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5'
+ CLAIM='ONE GPR first-copy/final-borrow component; normal+collision+two mutations; no integration or area claim'
+ CAP=128*1024**2
+@@ -53,6 +53,8 @@
+  for row in packet['history_inputs']:check(row)
+  failure=json.loads(Path(packet['history_inputs'][1]['path']).read_text())
+  need(failure['state']=='FAIL preserve all; no retries' and failure['source_endcheck']=='PASS' and failure['owned_groups_absent'] is True and failure['all_original_bytes_preserved'] is True,'preserved precompile generation failure/ownership/source closure')
++ check(packet['failure02_closure_binding']);failure02=json.loads(Path(packet['failure02_closure_binding']['path']).read_text())
++ need(failure02['state']=='FAIL preserve all; no retries' and failure02['source_endcheck']=='PASS' and failure02['owned_groups_absent'] is True and failure02['all_original_bytes_preserved'] is True,'exact preserved02 pre-runtime C++ failure')
+  for row in packet['sources']:check(row)
+  check(packet['source_contract'])
+  need(size(PACKET.parent)<=LIMITS['original_source_packet_bytes'],'original whole source family cap')
+@@ -105,6 +107,7 @@
+  other=a['fixed_OTHER_reservations'];need(set(other)=={'RUN_bytes','HOME_bytes','SHM_bytes'} and all(type(v) is int and v>=0 for v in other.values()),'all-volume prospective OTHER templates ROOT priced')
+  need(release['fixed_OTHER_reservations']==other and release['ROOT_no_foreign_producer_writes_to_GPR_roots'] is True,'ROOT artifact ownership/pricing')
+  packet=json.loads((PACKET/'handoff.json').read_text());need(release['failed01_closure']==packet['history_inputs'][1],'ROOT exact preserved failure01 anchor')
++ need(release['failed02_closure']==packet['failure02_closure_binding'],'ROOT exact preserved failure02 anchor')
+  need(socket.gethostname()==release['actual_host'],'exact ROOT host namespace')
+  return a,p
+ 
+@@ -158,6 +161,7 @@
+    row['log']=bind(RUN/(row['label']+'.log'));row['analysis']=log_gate(row,(RUN/(row['label']+'.log')).read_text())
+    if row['kind']=='generate':
+     ingestion=RUN/row['variant']/'Vgpr_prefetch_miter__verFiles.dat';text=ingestion.read_text();need(all(str(PACKET/n) in text for n in SOURCE_NAMES),'actual all five frozen source ingestion');row['source_ingestion']=bind(ingestion)
++    header=RUN/row['variant']/'Vgpr_prefetch_miter.h';need('VL_INW(&w_data_i,127,0,4);' in header.read_text(),'actual four32-bit input words');row['actual_header']=bind(header)
+    if row['kind']=='build':
+     obj=RUN/row['variant'];need(not list(obj.rglob('*.gch')) and not list(obj.rglob('*.pch')),'no PCH actual generated files');row['executable']=bind(obj/'Vgpr_prefetch_miter')
+    guard();save(RUN/'session.json',state)

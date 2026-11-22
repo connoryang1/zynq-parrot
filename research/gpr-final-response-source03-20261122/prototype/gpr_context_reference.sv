@@ -1,0 +1,40 @@
+// SOURCE PROTOTYPE ONLY. Fixed actual geometry: 4 contexts, 32 x64 GPR,
+// 16 banks, two1024b lines. No production module/source is replaced here.
+module gpr_context_reference
+ (input logic clk_i,reset_i,input logic [1:0] w_v_i,
+  input logic [1:0][1:0] w_context_i,input logic [1:0][4:0] w_reg_i,
+  input logic [1:0][63:0] w_data_i,input logic r_v_i,
+  input logic [1:0] r_context_i,input logic r_line_i,
+  output logic r_v_o,output logic [1:0] r_context_o,
+  output logic r_line_o,output logic [1023:0] r_data_o,
+  output logic collision_o);
+  // Independent scalar-organized reference reproduces the existing BSG
+  // address register/no_llr and live-valid mask, including idle X addressing.
+  logic [63:0] words[4][32];
+  logic [3:0][31:0] valid_r;
+  logic [2:0] ram_read_addr_r;
+  wire port_sel=w_v_i[1];
+  wire [1:0] wc=w_context_i[port_sel];
+  wire [4:0] wr=w_reg_i[port_sel];
+  assign collision_o=(|w_v_i)&&r_v_i&&({wc,wr[4]}=={r_context_i,r_line_i});
+  always_ff @(posedge clk_i) begin
+    // Like existing leaf RAM, writes/reads remain independent of reset;
+    // reset invalidates metadata/tokens rather than clearing payload RAM.
+    if (|w_v_i) words[wc][wr]<=w_data_i[port_sel];
+    if(r_v_i)ram_read_addr_r<={r_context_i,r_line_i};
+    else ram_read_addr_r<='x;
+    if(reset_i)begin valid_r<='0;r_v_o<=0;r_context_o<='0;r_line_o<=0;end
+    else begin
+      r_v_o<=r_v_i;
+      if(r_v_i)begin r_context_o<=r_context_i;r_line_o<=r_line_i;end
+      if(|w_v_i)valid_r[wc][wr]<=1;
+    end
+  end
+  always_comb begin
+    r_data_o='0;
+    for(int k=0;k<16;k++)
+      if(valid_r[r_context_o][{r_line_o,4'(k)}])
+        r_data_o[64*k+:64]=words[ram_read_addr_r[2:1]][{ram_read_addr_r[0],4'(k)}];
+  end
+endmodule
+

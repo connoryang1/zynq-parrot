@@ -1,0 +1,62 @@
+--- /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation-20261122/preparation01/gpr_context_held.sv
++++ /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation02-20261122/preparation01/gpr_context_held.sv
+@@ -13,13 +13,13 @@
+   wire [4:0] wr=w_reg_i[port_sel];
+   assign collision_o=(|w_v_i)&&r_v_i&&({wc,wr[4]}=={r_context_i,r_line_i});
+   for(genvar k=0;k<16;k++)begin:lane
+-    (* ram_style="block" *) logic [63:0] mem[8];
++    (* ram_style="block" *) logic [63:0] payload_ram[8];
+     // Canonical independent synchronous 1R1W. The read-port enable holds
+     // its actual response across idle/writes, NOT an extra bypass/hold latch.
+     // Inference/mapped primitive mode/hold must still be measured/qualified.
+     always_ff @(posedge clk_i)begin
+-      if((|w_v_i)&&(wr[3:0]==4'(k)))mem[{wc,wr[4]}]<=w_data_i[port_sel];
+-      if(r_v_i)held_raw_o[64*k+:64]<=mem[{r_context_i,r_line_i}];
++      if((|w_v_i)&&(wr[3:0]==4'(k)))payload_ram[{wc,wr[4]}]<=w_data_i[port_sel];
++      if(r_v_i)held_raw_o[64*k+:64]<=payload_ram[{r_context_i,r_line_i}];
+     end
+     assign r_data_o[64*k+:64]=held_valid_o[k]?held_raw_o[64*k+:64]:64'd0;
+   end
+--- /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation-20261122/preparation01/gpr_prefetch_shell.sv
++++ /home/coyang/fpga-artifacts/context-resume/gpr-prefetch-final-borrow-preparation02-20261122/preparation01/gpr_prefetch_shell.sv
+@@ -16,17 +16,22 @@
+   logic [2:0] state_r;
+   logic [1:0] target_r,line_v_r;
+   logic issue_done_r,issue_line_r,install_line_r;
+-  wire [1023:0] raw;
+-  wire [15:0] mask;
+   logic [1023:0] first_line_r;
+   // Elaboration removes this entirely in the borrowed candidate.
+   if(!borrow_p)begin:old_copy
+     logic [1023:0] second_line_r;
++    gpr_context_reference mem(.*,.r_v_i(req_o),.r_context_i(req_context_o),.r_line_i(req_line_o),
++      .r_v_o(response_o),.r_context_o(response_context_o),.r_line_o(response_line_o),.r_data_o(response_data_o));
+     always_ff @(posedge clk_i)
+       if(reset_i)second_line_r<='0;
+       else if(response_o&&response_line_o)second_line_r<=response_data_o;
+     assign line_data_o=install_line_r?second_line_r:first_line_r;
+   end else begin:borrow_final
++    wire [1023:0] raw;
++    wire [15:0] mask;
++    gpr_context_held mem(.*,.r_v_i(req_o),.r_context_i(req_context_o),.r_line_i(req_line_o),
++      .r_v_o(response_o),.r_context_o(response_context_o),.r_line_o(response_line_o),
++      .r_data_o(response_data_o),.held_raw_o(raw),.held_valid_o(mask));
+     wire [15:0] effective_mask=mask ^ ((negative_p==2&&install_line_r)?16'h8000:16'd0);
+     for(genvar k=0;k<16;k++)begin:out_lane
+       wire [63:0] value=effective_mask[k]?raw[64*k+:64]:64'd0;
+@@ -34,15 +39,6 @@
+         ?value ^ ((negative_p==1&&k==15)?64'h8000_0000_0000_0000:64'd0)
+         :first_line_r[64*k+:64];
+     end
+-  end
+-  if(borrow_p)begin:new_leaf
+-    gpr_context_held mem(.*,.r_v_i(req_o),.r_context_i(req_context_o),.r_line_i(req_line_o),
+-      .r_v_o(response_o),.r_context_o(response_context_o),.r_line_o(response_line_o),
+-      .r_data_o(response_data_o),.held_raw_o(raw),.held_valid_o(mask));
+-  end else begin:old_leaf
+-    gpr_context_reference mem(.*,.r_v_i(req_o),.r_context_i(req_context_o),.r_line_i(req_line_o),
+-      .r_v_o(response_o),.r_context_o(response_context_o),.r_line_o(response_line_o),.r_data_o(response_data_o));
+-    assign raw='0;assign mask='0;
+   end
+   assign req_o=((state_r==wait_commit)||(state_r==wait_drain))&&!issue_done_r;
+   assign req_context_o=target_r;assign req_line_o=issue_line_r;

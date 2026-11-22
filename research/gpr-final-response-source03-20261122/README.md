@@ -1,0 +1,5 @@
+This is a source-only checkpoint of the final-response borrowing component and its bounded execution helper. It preserves the proposed storage change and independent oracle before functional or mapped-resource qualification.
+
+The candidate retains the first1024-bit restore copy and borrows the held final backing-memory response with16 captured validity bits. Ordinary caches, retained-buffer capacities and production RTL remain unchanged. Both failed harness attempts are retained externally; source03 corrects the generated128-bit port initialization to four32-bit stores. Metadata preparation passes, but source03 generation, compilation, functional execution, inference and whole-core qualification remain pending. No saving is claimed.
+
+These copies are recovery material. The executable helper deliberately pins the original external source paths and exact byte identities; relocation requires a fresh reviewed admission. `source-copy.json` records every original path and copied hash. All HDL/compiler warnings, independent full1024-bit oracle checks, collision rejection and both mutation controls remain required.
