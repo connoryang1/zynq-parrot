@@ -1,0 +1,32 @@
+{
+  "state": "PASS receipt-only structural positive/three negative checks, no reader/model/compiler",
+  "actual_runtime_commands": 12,
+  "only_missing": {
+    "argv": [
+      "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+      "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods/retained-line-store.fst",
+      "--list"
+    ],
+    "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods",
+    "timeout_seconds": 30,
+    "case": "disabled-I-dense16cells",
+    "mode": "different-periods"
+  },
+  "tests": [
+    {
+      "kind": "last_rc",
+      "state": "rejected",
+      "reason": "all actual command returns/owned groups"
+    },
+    {
+      "kind": "wrong_failure",
+      "state": "rejected",
+      "reason": "only exact post-run resource failure"
+    },
+    {
+      "kind": "missing_command",
+      "state": "rejected",
+      "reason": "original complete-command shape"
+    }
+  ]
+}

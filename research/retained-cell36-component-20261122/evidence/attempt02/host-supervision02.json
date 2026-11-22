@@ -1,0 +1,2601 @@
+{
+  "state": "FAIL preserved; no retry/extension/coverage claim",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/attempt02/admission.json",
+    "bytes": 10903,
+    "sha256": "7c4e163bff6c698872d6506aac6721319a21b3d99655a50a850776bd77e64cc6"
+  },
+  "preflight": {
+    "state": "PASS source-only preflight; no component executed",
+    "candidate": {
+      "path": "/home/coyang/bp-retained-cell36-packing-20261121/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 25046,
+      "sha256": "2f7b8985c180f2f32673a5e6dbe531599f88776ccdf65db085d07da3e5dd9b39"
+    },
+    "baseline": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/attempt02/helper/baseline-8df.sv.txt",
+      "bytes": 20341,
+      "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+    },
+    "cases": 6,
+    "expected_runtimes": 12
+  },
+  "stage": "/dev/shm/zp-retained-cell36-unit-20261121-02",
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=1792",
+        "-GD_LINES=1792",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=8",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=1792",
+          "-GD_LINES=1792",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=8",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+        ],
+        "owned_pgid": 1086032,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.4802400389453396
+      },
+      "seconds": 0.48733313602861017,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/generate.log",
+        "bytes": 287,
+        "sha256": "3fbefb040bdebc9927690eeefd3b51c15b04d818e0305fda1e7bb2519091adb0"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086032,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj",
+        "-f",
+        "Vretained_cell36_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792",
+      "deadline_seconds": 180,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj",
+          "-f",
+          "Vretained_cell36_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+          "-j4",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1086035,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.740681429975666
+      },
+      "seconds": 8.748930541914888,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/compile.log",
+        "bytes": 3970,
+        "sha256": "aaab42348a59956370a132a54ea2893fa8c982a476e1b3524b037cfe4d60c60a"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086035,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086067,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.379249503952451
+      },
+      "seconds": 4.387191592017189,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted.log",
+        "bytes": 603,
+        "sha256": "fe09171e22b9843318aee6c9771d1cae010a0cd30b77b8fb01e65de971af5487"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086067,
+      "owned_group_remaining": false,
+      "case": "lines1792",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted/retained-line-store.fst",
+        "bytes": 7240456,
+        "sha256": "6473a84ce35829e84a70631dc4c0c5c75a0d8ca51889a34abb3db7aca7cfbd1a"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086089,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.09708434098865837
+      },
+      "seconds": 0.10529517906252295,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted-hierarchy.tsv",
+        "bytes": 29659,
+        "sha256": "c2da91650626655b875d3da38ab4edf1483a1dc222214e501983a02121d27c87"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086089,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086090,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.699441431090236
+      },
+      "seconds": 4.707325411960483,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods.log",
+        "bytes": 621,
+        "sha256": "711bbcefdb0b9be0e5c9e20cdddccec279c461ff3721ccf5f2b03a0f53a96640"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086090,
+      "owned_group_remaining": false,
+      "case": "lines1792",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods/retained-line-store.fst",
+        "bytes": 6987056,
+        "sha256": "ed206b1ea43e86c0446ea49b60ed43a3121c4048cbb9020d6323b4bc7712b282"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086102,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.0937151899561286
+      },
+      "seconds": 0.10272501304280013,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods-hierarchy.tsv",
+        "bytes": 29659,
+        "sha256": "c1ab052bba44093fc6d78b6fb30a964f59cdb0fa23a6166139fc9dead34e40c4"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086102,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=1856",
+        "-GD_LINES=1856",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=8",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=1856",
+          "-GD_LINES=1856",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=8",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+        ],
+        "owned_pgid": 1086103,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.43109903496224433
+      },
+      "seconds": 0.4395889589795843,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/generate.log",
+        "bytes": 287,
+        "sha256": "28c47630ffe22ab0a93d84c2d7337231a9f2d82eeabefc1abc94927da1423a80"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086103,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj",
+        "-f",
+        "Vretained_cell36_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856",
+      "deadline_seconds": 180,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj",
+          "-f",
+          "Vretained_cell36_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+          "-j4",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1086106,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.50874365400523
+      },
+      "seconds": 8.518444627989084,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/compile.log",
+        "bytes": 3970,
+        "sha256": "3d8c0bacb275bec96a35ea9c13c4bbc01b51e8da3c17c526e2d8afe882b3f5a8"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086106,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086139,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.480578683083877
+      },
+      "seconds": 4.490783912013285,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted.log",
+        "bytes": 603,
+        "sha256": "68ddfc11d7ec754e855cd55b63ebe4e66085f8ff92db661757196e4c102687d8"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086139,
+      "owned_group_remaining": false,
+      "case": "lines1856",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted/retained-line-store.fst",
+        "bytes": 7431853,
+        "sha256": "b1eb4a49edece249deb798268049249f09e0afb5ec905fa74d7a881228f873e3"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086153,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.10093818802852184
+      },
+      "seconds": 0.11119621805846691,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted-hierarchy.tsv",
+        "bytes": 29658,
+        "sha256": "fbe70b4f59a1b60efc86ead905ea5f4fa3c735bf4515594030eb71eb8abc1467"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086153,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086154,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.911632695933804
+      },
+      "seconds": 4.922067845007405,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods.log",
+        "bytes": 621,
+        "sha256": "cebe0dd382faa11947f237b5705a692609d62fdbfe2abf8e034d831318edcab0"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086154,
+      "owned_group_remaining": false,
+      "case": "lines1856",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods/retained-line-store.fst",
+        "bytes": 7165069,
+        "sha256": "81efbc869b91c48ce2b2027dc4b792c2b04ad0d7e8ee4b4ea0ed66095879fd43"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086166,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.10314824990928173
+      },
+      "seconds": 0.11395802698098123,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods-hierarchy.tsv",
+        "bytes": 29658,
+        "sha256": "d0532a596887f3d3c0fd2d00e45be1960cdde7090c70bb6de06ce208937a933c"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086166,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=1911",
+        "-GD_LINES=1911",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=8",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=1911",
+          "-GD_LINES=1911",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=8",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+        ],
+        "owned_pgid": 1086167,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.5078801769996062
+      },
+      "seconds": 0.5182211789069697,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/generate.log",
+        "bytes": 287,
+        "sha256": "ba2f2f613775ad2e0cd2009a49249e8f0f0412c5da93f8fdeeb7cff1db531c9d"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086167,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj",
+        "-f",
+        "Vretained_cell36_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911",
+      "deadline_seconds": 180,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj",
+          "-f",
+          "Vretained_cell36_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+          "-j4",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1086170,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.547808520961553
+      },
+      "seconds": 8.560072398046032,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/compile.log",
+        "bytes": 3970,
+        "sha256": "51cc9f0729bebd0a94b56ce1127931440c4cf5eb8c5e1f276bbe9d3ae772d113"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086170,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086202,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.778791124001145
+      },
+      "seconds": 4.790919227991253,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted.log",
+        "bytes": 603,
+        "sha256": "b97b68f2dd31abb84304eff8a01454466ca5d4b2ded76b9602b9a65fa73ff4bc"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086202,
+      "owned_group_remaining": false,
+      "case": "lines1911",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted/retained-line-store.fst",
+        "bytes": 7534671,
+        "sha256": "dd7bfaf6dd1369b9bad9ed9c0fe47f411e0c4b98713f3d66d3158b5bbf314240"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086219,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.11002511496189982
+      },
+      "seconds": 0.12258316203951836,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted-hierarchy.tsv",
+        "bytes": 29658,
+        "sha256": "2e5baba1931fbf6d6a9c964b065f0f137f137319c1b4f214f614c92ed0deb6d6"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086219,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086220,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 5.114631979959086
+      },
+      "seconds": 5.126741924905218,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods.log",
+        "bytes": 621,
+        "sha256": "5306da9700b8619a37923cff05bad451925d9252e041b10dd2c226cacbf20796"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086220,
+      "owned_group_remaining": false,
+      "case": "lines1911",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods/retained-line-store.fst",
+        "bytes": 7312049,
+        "sha256": "e888de22d91cb012425e59d9f8d3ca9495f86427f1dd9b0dd8506c58bac903ce"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086232,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.10661433706991374
+      },
+      "seconds": 0.11918020702432841,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods-hierarchy.tsv",
+        "bytes": 29658,
+        "sha256": "6ad68478a1baa518fc516962f27978f2598c58c61202e40fc661f0c1541cc6f5"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086232,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=1920",
+        "-GD_LINES=1920",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=8",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=1920",
+          "-GD_LINES=1920",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=8",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+        ],
+        "owned_pgid": 1086233,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.4462610260816291
+      },
+      "seconds": 0.45883583603426814,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/generate.log",
+        "bytes": 287,
+        "sha256": "f8c7555a597accff008e71a336d7697d3fde63cb48b15f8a914c721cb9f896d7"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086233,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj",
+        "-f",
+        "Vretained_cell36_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920",
+      "deadline_seconds": 180,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj",
+          "-f",
+          "Vretained_cell36_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+          "-j4",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1086236,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.675021652015857
+      },
+      "seconds": 8.690207693027332,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/compile.log",
+        "bytes": 3970,
+        "sha256": "bb6860651c0069c8820cd6bbf74d97a3e721038c4f87ef6fe0b9a6de98aad1e4"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086236,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086395,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.87615133903455
+      },
+      "seconds": 4.890976438997313,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted.log",
+        "bytes": 603,
+        "sha256": "a15234d1375a47d809d4ac63a35c7b66e0905a4952f90b15e39065523ffb579a"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086395,
+      "owned_group_remaining": false,
+      "case": "lines1920",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted/retained-line-store.fst",
+        "bytes": 7554997,
+        "sha256": "9f5363e4e6df7cb980c2c85a7241d2e964f380c21887bbc7392bbacaeeba4b72"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086407,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.11307913693599403
+      },
+      "seconds": 0.12770029995590448,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted-hierarchy.tsv",
+        "bytes": 29658,
+        "sha256": "add351c9b257706ca72b41f96ab8be6998724a1ab11863352d2784560c245c0d"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086407,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086408,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 5.174975111964159
+      },
+      "seconds": 5.1897881999611855,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods.log",
+        "bytes": 621,
+        "sha256": "34f0fb227854edb25ebef31c17b7d4cf01f425c9e921611e2efc6ac364884fca"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086408,
+      "owned_group_remaining": false,
+      "case": "lines1920",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods/retained-line-store.fst",
+        "bytes": 7341032,
+        "sha256": "d307c997b2c335772d8ce43e2048882108b50a360fb4215546d6af3a10c0816c"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086421,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.11252710898406804
+      },
+      "seconds": 0.1271932510426268,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods-hierarchy.tsv",
+        "bytes": 29658,
+        "sha256": "24cb625867351e1c2b8a618d7e0b30a184269fac5a44e37f9293e7a89d6c7ce3"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086421,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=93",
+        "-GD_LINES=131",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=2",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=93",
+          "-GD_LINES=131",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=2",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+        ],
+        "owned_pgid": 1086422,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.45200896298047155
+      },
+      "seconds": 0.4670818609884009,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/generate.log",
+        "bytes": 287,
+        "sha256": "07404b70546ee366074d3da03c906449c6d6e7aa68b35db85ae6473667641b18"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086422,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj",
+        "-f",
+        "Vretained_cell36_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal",
+      "deadline_seconds": 180,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj",
+          "-f",
+          "Vretained_cell36_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+          "-j4",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1086425,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.611990089993924
+      },
+      "seconds": 8.627689045970328,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/compile.log",
+        "bytes": 3980,
+        "sha256": "69542c6b142ef9a3582f58ef2abada94e0bf94e57e273515b00fc02f3aad9272"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086425,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086462,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.5631573960417882
+      },
+      "seconds": 0.5809230990707874,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted.log",
+        "bytes": 558,
+        "sha256": "c68fe5fa59b091bde321326f7c07e64b0b2604869811caeda27fa219b960d82c"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086462,
+      "owned_group_remaining": false,
+      "case": "sparse-unequal",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted/retained-line-store.fst",
+        "bytes": 2718028,
+        "sha256": "2b8b2030085f1e54da2f3a0f951624f53a6ef9c2241d19be8a2862b531b0213a"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086474,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.11414826801046729
+      },
+      "seconds": 0.13107224204577506,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted-hierarchy.tsv",
+        "bytes": 24537,
+        "sha256": "d43cfb3a0a9ea7d8056e32c85f155fb6079b51b7be8b457df8af79beffa49581"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086474,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086475,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.5660429639974609
+      },
+      "seconds": 0.582564371987246,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods.log",
+        "bytes": 565,
+        "sha256": "10af698f1bffc43fad42bfea12258ff6113d159d3f27cf85049646a5ad6c76ef"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086475,
+      "owned_group_remaining": false,
+      "case": "sparse-unequal",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods/retained-line-store.fst",
+        "bytes": 2431245,
+        "sha256": "922183a57ab3a0947a838ae49a9640ffac4bb6c55091cf5959867fc03e5bc10a"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086487,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.11777527304366231
+      },
+      "seconds": 0.13470427505671978,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods-hierarchy.tsv",
+        "bytes": 24537,
+        "sha256": "9aa5686051cd644cf38d26844db41807f9f344f8fb406772818cdb44cdad7cf8"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086487,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=0",
+        "-GD_LINES=3",
+        "-GRETAINED_SETS=1",
+        "-GEPOCH_WIDTH=2",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=0",
+          "-GD_LINES=3",
+          "-GRETAINED_SETS=1",
+          "-GEPOCH_WIDTH=2",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/driver.cpp"
+        ],
+        "owned_pgid": 1086488,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.43012987391557544
+      },
+      "seconds": 0.4487691529793665,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/generate.log",
+        "bytes": 287,
+        "sha256": "60ae64baaae5c13a6fd471e186bab9235946381b63d0123bf3197cd7a339504a"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086488,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj",
+        "-f",
+        "Vretained_cell36_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells",
+      "deadline_seconds": 180,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj",
+          "-f",
+          "Vretained_cell36_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/source/no-pch.mk",
+          "-j4",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1086491,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.461273010936566
+      },
+      "seconds": 8.479161635041237,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/compile.log",
+        "bytes": 3956,
+        "sha256": "b849d7309df21f3706f89a0bc94c015ac61d05b3923709d973090e2331923c48"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086491,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086524,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.3997108549810946
+      },
+      "seconds": 0.4192357240244746,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted.log",
+        "bytes": 549,
+        "sha256": "0a7fe60b60c419c82be6dcd1a751215ca836d535125129e0fea1c8dd9268bc72"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086524,
+      "owned_group_remaining": false,
+      "case": "disabled-I-dense16cells",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted/retained-line-store.fst",
+        "bytes": 2485609,
+        "sha256": "375323a112e3a1a0d8107651da00a41d20eef44f92ec30dc222608295be885d1"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted",
+      "deadline_seconds": 30,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1086536,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.11504335410427302
+      },
+      "seconds": 0.13415029202587903,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted-hierarchy.tsv",
+        "bytes": 28966,
+        "sha256": "ecedf6a376a40f0122644901fa09a208b18ee2bc8ffa516991409cf58b2cfb45"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086536,
+      "owned_group_remaining": false
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "exception_before_cleanup",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086537,
+        "returncode": 0,
+        "failure": "ValueError('128MiB stage /64MiB aggregate family trace cap')",
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.3997209119843319
+      },
+      "failure": "ValueError('128MiB stage /64MiB aggregate family trace cap')",
+      "seconds": 0.4192980219377205,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods.log",
+        "bytes": 563,
+        "sha256": "18d86630c0504706a73d93598a4fcd1e955696578a32513e2c805ead17429131"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086537,
+      "owned_group_remaining": false
+    }
+  ],
+  "runs": [
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086067,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.379249503952451
+      },
+      "seconds": 4.387191592017189,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted.log",
+        "bytes": 603,
+        "sha256": "fe09171e22b9843318aee6c9771d1cae010a0cd30b77b8fb01e65de971af5487"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086067,
+      "owned_group_remaining": false,
+      "case": "lines1792",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/inverted/retained-line-store.fst",
+        "bytes": 7240456,
+        "sha256": "6473a84ce35829e84a70631dc4c0c5c75a0d8ca51889a34abb3db7aca7cfbd1a"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086090,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.699441431090236
+      },
+      "seconds": 4.707325411960483,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods.log",
+        "bytes": 621,
+        "sha256": "711bbcefdb0b9be0e5c9e20cdddccec279c461ff3721ccf5f2b03a0f53a96640"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086090,
+      "owned_group_remaining": false,
+      "case": "lines1792",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/different-periods/retained-line-store.fst",
+        "bytes": 6987056,
+        "sha256": "ed206b1ea43e86c0446ea49b60ed43a3121c4048cbb9020d6323b4bc7712b282"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086139,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.480578683083877
+      },
+      "seconds": 4.490783912013285,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted.log",
+        "bytes": 603,
+        "sha256": "68ddfc11d7ec754e855cd55b63ebe4e66085f8ff92db661757196e4c102687d8"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086139,
+      "owned_group_remaining": false,
+      "case": "lines1856",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/inverted/retained-line-store.fst",
+        "bytes": 7431853,
+        "sha256": "b1eb4a49edece249deb798268049249f09e0afb5ec905fa74d7a881228f873e3"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086154,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.911632695933804
+      },
+      "seconds": 4.922067845007405,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods.log",
+        "bytes": 621,
+        "sha256": "cebe0dd382faa11947f237b5705a692609d62fdbfe2abf8e034d831318edcab0"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086154,
+      "owned_group_remaining": false,
+      "case": "lines1856",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/different-periods/retained-line-store.fst",
+        "bytes": 7165069,
+        "sha256": "81efbc869b91c48ce2b2027dc4b792c2b04ad0d7e8ee4b4ea0ed66095879fd43"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086202,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.778791124001145
+      },
+      "seconds": 4.790919227991253,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted.log",
+        "bytes": 603,
+        "sha256": "b97b68f2dd31abb84304eff8a01454466ca5d4b2ded76b9602b9a65fa73ff4bc"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086202,
+      "owned_group_remaining": false,
+      "case": "lines1911",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/inverted/retained-line-store.fst",
+        "bytes": 7534671,
+        "sha256": "dd7bfaf6dd1369b9bad9ed9c0fe47f411e0c4b98713f3d66d3158b5bbf314240"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086220,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 5.114631979959086
+      },
+      "seconds": 5.126741924905218,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods.log",
+        "bytes": 621,
+        "sha256": "5306da9700b8619a37923cff05bad451925d9252e041b10dd2c226cacbf20796"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086220,
+      "owned_group_remaining": false,
+      "case": "lines1911",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/different-periods/retained-line-store.fst",
+        "bytes": 7312049,
+        "sha256": "e888de22d91cb012425e59d9f8d3ca9495f86427f1dd9b0dd8506c58bac903ce"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086395,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 4.87615133903455
+      },
+      "seconds": 4.890976438997313,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted.log",
+        "bytes": 603,
+        "sha256": "a15234d1375a47d809d4ac63a35c7b66e0905a4952f90b15e39065523ffb579a"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086395,
+      "owned_group_remaining": false,
+      "case": "lines1920",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/inverted/retained-line-store.fst",
+        "bytes": 7554997,
+        "sha256": "9f5363e4e6df7cb980c2c85a7241d2e964f380c21887bbc7392bbacaeeba4b72"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086408,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 5.174975111964159
+      },
+      "seconds": 5.1897881999611855,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods.log",
+        "bytes": 621,
+        "sha256": "34f0fb227854edb25ebef31c17b7d4cf01f425c9e921611e2efc6ac364884fca"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086408,
+      "owned_group_remaining": false,
+      "case": "lines1920",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/different-periods/retained-line-store.fst",
+        "bytes": 7341032,
+        "sha256": "d307c997b2c335772d8ce43e2048882108b50a360fb4215546d6af3a10c0816c"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086462,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.5631573960417882
+      },
+      "seconds": 0.5809230990707874,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted.log",
+        "bytes": 558,
+        "sha256": "c68fe5fa59b091bde321326f7c07e64b0b2604869811caeda27fa219b960d82c"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086462,
+      "owned_group_remaining": false,
+      "case": "sparse-unequal",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/inverted/retained-line-store.fst",
+        "bytes": 2718028,
+        "sha256": "2b8b2030085f1e54da2f3a0f951624f53a6ef9c2241d19be8a2862b531b0213a"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper",
+        "different-periods"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper",
+          "different-periods"
+        ],
+        "owned_pgid": 1086475,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.5660429639974609
+      },
+      "seconds": 0.582564371987246,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods.log",
+        "bytes": 565,
+        "sha256": "10af698f1bffc43fad42bfea12258ff6113d159d3f27cf85049646a5ad6c76ef"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086475,
+      "owned_group_remaining": false,
+      "case": "sparse-unequal",
+      "mode": "different-periods",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/different-periods/retained-line-store.fst",
+        "bytes": 2431245,
+        "sha256": "922183a57ab3a0947a838ae49a9640ffac4bb6c55091cf5959867fc03e5bc10a"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper"
+        ],
+        "owned_pgid": 1086524,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.3997108549810946
+      },
+      "seconds": 0.4192357240244746,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted.log",
+        "bytes": 549,
+        "sha256": "0a7fe60b60c419c82be6dcd1a751215ca836d535125129e0fea1c8dd9268bc72"
+      },
+      "returncode": 0,
+      "owned_pgid": 1086524,
+      "owned_group_remaining": false,
+      "case": "disabled-I-dense16cells",
+      "mode": "inverted",
+      "fst": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/inverted/retained-line-store.fst",
+        "bytes": 2485609,
+        "sha256": "375323a112e3a1a0d8107651da00a41d20eef44f92ec30dc222608295be885d1"
+      }
+    }
+  ],
+  "no_model_or_vendor_or_board": true,
+  "executables": {
+    "lines1792": {
+      "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1792/obj/Vretained_cell36_wrapper",
+      "bytes": 484992,
+      "sha256": "110ff8b168cd1abe793f70a06e027c5f0b8588d7bcb05448c2ed86b828700043"
+    },
+    "lines1856": {
+      "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1856/obj/Vretained_cell36_wrapper",
+      "bytes": 484992,
+      "sha256": "4d544dc622ee2504ec1e015c5f7d628a7d2f8a037d60439270236231ff9b775d"
+    },
+    "lines1911": {
+      "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1911/obj/Vretained_cell36_wrapper",
+      "bytes": 484992,
+      "sha256": "1400b13850dc72b0d9785a874b5540ec2e4d420a6321225c9e0156e7716bcacb"
+    },
+    "lines1920": {
+      "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/lines1920/obj/Vretained_cell36_wrapper",
+      "bytes": 484992,
+      "sha256": "4c2b28e139ade6e4c25ed520eaf37162bed491634077c993798004354e2a329c"
+    },
+    "sparse-unequal": {
+      "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/sparse-unequal/obj/Vretained_cell36_wrapper",
+      "bytes": 467752,
+      "sha256": "4022102e7a5ae1d4a3a274646691aae2911c1723f9ddea7b3f6f76bf944148d7"
+    },
+    "disabled-I-dense16cells": {
+      "path": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/obj/Vretained_cell36_wrapper",
+      "bytes": 471704,
+      "sha256": "57d6d5eb755bcc03a1046143d3365121cde32a5ade587f58807ec0762feb2bc0"
+    }
+  },
+  "error": "ValueError('128MiB stage /64MiB aggregate family trace cap')"
+}

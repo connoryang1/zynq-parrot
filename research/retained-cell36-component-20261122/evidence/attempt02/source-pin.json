@@ -1,0 +1,18 @@
+{
+  "state": "Untested candidate attempt02 explicit cast-width correction only",
+  "base": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "branch": "experiment/retained-cell36-packing-20261121",
+  "candidate": {
+    "path": "/home/coyang/bp-retained-cell36-packing-20261121/bp_common/src/v/bp_retained_line_store.sv",
+    "bytes": 25046,
+    "sha256": "2f7b8985c180f2f32673a5e6dbe531599f88776ccdf65db085d07da3e5dd9b39"
+  },
+  "failed_candidate": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/failed01-preservation/candidate-bb795.sv",
+    "bytes": 25044,
+    "sha256": "bb795d766372c46c8ddbf88dc6b1420062376a2b14173b2a27c9497d5d86ccfe"
+  },
+  "correction": "int'(local_data_addr >> 3) \u2192 (int'(local_data_addr) >> 3)",
+  "warning_suppression": false,
+  "controller_unchanged": true
+}

@@ -1,0 +1,11 @@
+--- failed01-bb795
++++ attempt02-correct-cast
+@@ -125,7 +125,7 @@
+           cell_v[1] = (int'(local_data_addr[2:0])*2+1 < cells_per_line_lp);
+           cell_w = {2{data_w[lane]}};
+           for (int port=0; port<2; port++) begin
+-            cell_addr[port] = cell_addr_width_lp'(int'(local_data_addr >> 3)*cells_per_line_lp
++            cell_addr[port] = cell_addr_width_lp'((int'(local_data_addr) >> 3)*cells_per_line_lp
+                                                  + int'(local_data_addr[2:0])*2 + port);
+             cell_wdata[port] = insert_line[(int'(local_data_addr[2:0])*2+port)*36+:36];
+           end

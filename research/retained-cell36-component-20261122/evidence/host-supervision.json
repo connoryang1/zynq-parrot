@@ -1,0 +1,113 @@
+{
+  "state": "FAIL preserved; no retry/extension/coverage claim",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/admission.json",
+    "bytes": 8646,
+    "sha256": "44b0ef1d08d359d1720396f3c1e1670c5400aec11ac219328d57a9a483869424"
+  },
+  "preflight": {
+    "state": "PASS source-only preflight; no component executed",
+    "candidate": {
+      "path": "/home/coyang/bp-retained-cell36-packing-20261121/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 25044,
+      "sha256": "bb795d766372c46c8ddbf88dc6b1420062376a2b14173b2a27c9497d5d86ccfe"
+    },
+    "baseline": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/helper/baseline-8df.sv.txt",
+      "bytes": 20341,
+      "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+    },
+    "cases": 6,
+    "expected_runtimes": 12
+  },
+  "stage": "/dev/shm/zp-retained-cell36-unit-20261121-01",
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-DBP_RETAINED_METADATA_VERIFY",
+        "--top-module",
+        "retained_cell36_wrapper",
+        "-GI_LINES=1792",
+        "-GD_LINES=1792",
+        "-GRETAINED_SETS=256",
+        "-GEPOCH_WIDTH=8",
+        "-CFLAGS",
+        "-std=c++14",
+        "--Mdir",
+        "/dev/shm/zp-retained-cell36-unit-20261121-01/lines1792/obj",
+        "/dev/shm/zp-retained-cell36-unit-20261121-01/source/bp_retained_line_store.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-01/source/bp_retained_line_store_reference.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-01/source/retained_cell36_wrapper.sv",
+        "/dev/shm/zp-retained-cell36-unit-20261121-01/source/driver.cpp"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-01/lines1792",
+      "deadline_seconds": 120,
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-DBP_RETAINED_METADATA_VERIFY",
+          "--top-module",
+          "retained_cell36_wrapper",
+          "-GI_LINES=1792",
+          "-GD_LINES=1792",
+          "-GRETAINED_SETS=256",
+          "-GEPOCH_WIDTH=8",
+          "-CFLAGS",
+          "-std=c++14",
+          "--Mdir",
+          "/dev/shm/zp-retained-cell36-unit-20261121-01/lines1792/obj",
+          "/dev/shm/zp-retained-cell36-unit-20261121-01/source/bp_retained_line_store.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-01/source/bp_retained_line_store_reference.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-01/source/retained_cell36_wrapper.sv",
+          "/dev/shm/zp-retained-cell36-unit-20261121-01/source/driver.cpp"
+        ],
+        "owned_pgid": 1085799,
+        "returncode": 1,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.48423627100419253
+      },
+      "failure": "ValueError('component command failed /dev/shm/zp-retained-cell36-unit-20261121-01/lines1792/generate.log')",
+      "seconds": 0.48829713300801814,
+      "log": {
+        "path": "/dev/shm/zp-retained-cell36-unit-20261121-01/lines1792/generate.log",
+        "bytes": 808,
+        "sha256": "346ad92483f1be8fc47f67fb314d1626f9aec9e03137a790d7b009866b319e30"
+      },
+      "returncode": 1,
+      "owned_pgid": 1085799,
+      "owned_group_remaining": false
+    }
+  ],
+  "runs": [],
+  "no_model_or_vendor_or_board": true,
+  "error": "ValueError('component command failed /dev/shm/zp-retained-cell36-unit-20261121-01/lines1792/generate.log')"
+}

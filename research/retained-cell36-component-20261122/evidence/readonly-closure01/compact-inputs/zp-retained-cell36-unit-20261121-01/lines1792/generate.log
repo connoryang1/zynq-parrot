@@ -1,0 +1,7 @@
+%Warning-WIDTHEXPAND: /dev/shm/zp-retained-cell36-unit-20261121-01/source/bp_retained_line_store.sv:128:72: Operator SHIFTR expects 32 bits on the LHS, but LHS's VARREF 'local_data_addr' generates 14 bits.
+                                                                                                          : ... note: In instance 'retained_cell36_wrapper.dut'
+  128 |             cell_addr[port] = cell_addr_width_lp'(int'(local_data_addr >> 3)*cells_per_line_lp
+      |                                                                        ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.030
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Error: Exiting due to 1 warning(s)

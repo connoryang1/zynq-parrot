@@ -1,0 +1,12 @@
+This is fresh attempt02 preparation, not a successful component result. Original attempt01 stopped in strict Verilator generation on one WIDTHEXPAND warning: int'(local_data_addr >>3) context-expanded a14b value. Its actual generation returned1, owned group1085799 was fully gone, no C++compile/runtime/FST occurred. Original admission/helper/receipt and candidatebb795 are preserved; no warning is disabled.
+
+The ONLY production correction is int'(local_data_addr >>3) → (int'(local_data_addr) >>3), narrowing the context before shift. Candidate2f7b8985c180f2f32673a5e6dbe531599f88776ccdf65db085d07da3e5dd9b39. Cast-correction.diff proves exactly that one line; unchanged-controller source proof passes. Packing, consumer contract, full trace99, sixmodels/twelve runtimes, independent clocks, all512 hit/coherence/partial72 hazards, PCH/cacheoff and deadlines remain unchanged from parent preparation. Baseline8df remains preserved. No new attempt02 compiler/reader/component has run.
+
+Prospective fixed FAMILY guard now explicitly sums old /dev/shm/zp-retained-cell36-unit-20261121-01 plus new...-02 against128MiB stage and64MiB FST, including failures. HOME8MiB includes the complete original external tree with BOTH helper generations and the BP worktree;3GiB HOME and512MiB RAM floors plus remaining allocation. Fresh receipt is attempt02/host-supervision02.json. Root namespace checks prior strict log hash and prior actual source snapshot before allocating new stage. No delete, retry-in-place, case omission, deadline/budget raise, hardware or accepted result.
+
+ROOT review commands:
+
+    python3 -B /home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/attempt02/helper/run_host.py --preflight
+    python3 -B /home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/attempt02/helper/run_host.py --execute
+
+Seven source/admission checks (including old+new total cap rejection) and four small-Python-child owned-adapter checks pass; source-only preflight passes. Existing qualified software_owned_v2 remains byte-identical, subreaper/reap/strict-live-child refusal/always-owned receipts unchanged. Separate --cc120 then explicit no-pch make -j4/OBJCACHE=180, CCACHE/SCCACHE disable, no.gch, runtime120, teardown5s. Raw artifacts stay in owned RAM; compact HOME receipts only. No source/fullmodel/vendor/board operation beyond isolated one-line draft change.

@@ -1,0 +1,45 @@
+{
+  "base": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "sources": [
+    {
+      "relative": "bp_me/src/v/cce/bp_uce.sv",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/consumer-source/bp_uce.sv.gz",
+        "bytes": 19719,
+        "sha256": "fdabac34121c145df0e6cfc4c17a48d9c85c4c9a6bcb92c2d85f79c736b47d9b"
+      },
+      "original_sha256": "5ff8627b7373bfc9ce9be5cbd315d222d6b0efdec2e887b3d976038be84af725"
+    },
+    {
+      "relative": "bp_top/src/v/bp_unicore_lite.sv",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/consumer-source/bp_unicore_lite.sv.gz",
+        "bytes": 5603,
+        "sha256": "c2dff6d193091475ab19efb40e5521c5ffc32d154160f2ff9597c60181c2d396"
+      },
+      "original_sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+    },
+    {
+      "relative": "bp_fe/src/v/bp_fe_icache.sv",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/consumer-source/bp_fe_icache.sv.gz",
+        "bytes": 11657,
+        "sha256": "3ff93b6ef80d1d15340f8a4932c9e753ff6c46a8faa9485e437f73fc8c032aaa"
+      },
+      "original_sha256": "90ff3a3411e629ed6d8bb877e0851ce1511629e7951b97bb175923809dd0c5fd"
+    },
+    {
+      "relative": "bp_fe/src/v/bp_fe_icache_retained_bram.sv",
+      "snapshot": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/consumer-source/bp_fe_icache_retained_bram.sv.gz",
+        "bytes": 1696,
+        "sha256": "7d99fb56d827fc6356caf163c000024acb97f35b77007e5718f86f78a02dee58"
+      },
+      "original_sha256": "d392a2b850f0aef43426e8d7f62a052047a6b4bf50c21582cf6e0faec51fa851"
+    }
+  ],
+  "primary_wiring": "bp_unicore_lite474\u2013477,609\u2013612 connects both lanes to UCE;301\u2013304 ties FE alternative off",
+  "UCE_contract": "bp_uce923\u2013927 may latch miss data, but1286\u20131291 only qualified hit enters retained_fill (possibly through dirty eviction);1307 is the sole retained payload read in retained_fill. Miss/clear/mutation goes ordinary send_critical. Defined hit data, all handshake/control cycles, held response stability are compared; arbitrary miss/partial-collector register contents are not compared between implementations.",
+  "fallback": "Sparse/disabled and metadata>64 preserve old tag/payload arrays and64b collection; epochs/RR fallback code unchanged",
+  "new_data_registers": "Only pair-of36bit RAM outputs plus separate valid output; existing512bit insert_data_r/resp_data_r reused; no new512bit staging"
+}

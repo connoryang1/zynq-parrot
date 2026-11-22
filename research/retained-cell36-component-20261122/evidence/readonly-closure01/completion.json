@@ -1,0 +1,84 @@
+{
+  "state": "PASS separate derived component correctness; original execution FAIL trace-budget noncompliance preserved",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/readonly-closure01/admission.json",
+    "bytes": 79010,
+    "sha256": "51ffbff468033ffc6992d3cd1f55278a1f6270480386f83d1bb91d1e9f7fe05b"
+  },
+  "original_operational_budget_compliance": false,
+  "derived_component_correctness": true,
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods/retained-line-store.fst",
+        "--list"
+      ],
+      "cwd": "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods",
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "/dev/shm/zp-retained-cell36-unit-20261121-02/disabled-I-dense16cells/different-periods/retained-line-store.fst",
+          "--list"
+        ],
+        "owned_pgid": 1087056,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 30,
+        "teardown_s": 5,
+        "elapsed_s": 0.13409580697771162
+      }
+    }
+  ],
+  "last_FST_metadata": {
+    "file": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/readonly-closure01/last-hierarchy.tsv",
+      "bytes": 28966,
+      "sha256": "9b76640cda1be0f0cf637a6ca5938005513cda89b2f856489bf3036bd393a323"
+    },
+    "facts": {
+      "start": 0,
+      "end": 86572,
+      "timescale": -12,
+      "clean_list_EOF": true
+    }
+  },
+  "source_controller_byteproof": {
+    "state": "PASS source-only preflight; no component executed",
+    "candidate": {
+      "path": "/home/coyang/bp-retained-cell36-packing-20261121/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 25046,
+      "sha256": "2f7b8985c180f2f32673a5e6dbe531599f88776ccdf65db085d07da3e5dd9b39"
+    },
+    "baseline": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-packing-20261121/attempt02/helper/baseline-8df.sv.txt",
+      "bytes": 20341,
+      "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+    },
+    "cases": 6,
+    "expected_runtimes": 12
+  },
+  "no_PCH_artifacts": true,
+  "actual_family_stage_bytes": {
+    "/dev/shm/zp-retained-cell36-unit-20261121-01": 1215224,
+    "/dev/shm/zp-retained-cell36-unit-20261121-02": 84207521
+  },
+  "immutable_trace_bytes": 68366449,
+  "scope": "Component only at stated six geometries/two clocks, not synthesis/mapping/fullcore/fit/application/FPGA; no target retry or budget extension."
+}
