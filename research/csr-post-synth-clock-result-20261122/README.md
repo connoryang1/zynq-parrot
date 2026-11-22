@@ -1,0 +1,5 @@
+This records the completed mapped-clock qualification for the two fixed post-synthesis area controls. It replaces the failed logical-hierarchy pin assumption with observed primitive sinks while retaining the actual checkpoint constraints.
+
+Both read-only commands pass in221.947s with34,766 clock pins each, identical five-clock definitions, ports, exported XDC and full sink signatures. All16,390 clocked core pins use the core clock; the processor also retains the same128 CLINT dual-clock pins. The same41 explicit ground-driven primitive clock pins remain, with no added exemption.
+
+The existing42 tag-programming no-clock pins and76 unconstrained endpoints match exactly between stages; all76 belong to those42 cells. The optimized checkpoint inserts a BUFG in that programming path, while verbose timing still identifies the same source register Q. These are retained baseline limitations, not a zero-unconstrained timing claim. Full tables, constraints, raw reports and the ROOT policy are durably byte-verified in the external closure. New unexplained domains or exception changes must stop for review before placement.
