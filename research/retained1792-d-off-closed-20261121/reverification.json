@@ -1,0 +1,79 @@
+{
+  "state": "PASS independent D-off ordinary-payload negative control review",
+  "closures": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained1792-stream-canonical-20261121/accepted-d-off-audit01/root-closure.json",
+      "bytes": 4666,
+      "sha256": "cdb44adad482a632b5b4fb5ef33d27adbcd39b739504bb4d49fa1eac7fd84f9d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained1792-stream-canonical-20261121/d-off-native01/root-closure.json",
+      "bytes": 3123,
+      "sha256": "feb4f768c4744c08887b0df81227e6ab30b9c4819f73d089a9dc8c68f922b698"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained1792-stream-canonical-20261121/accepted-d-enabled-audit02/root-closure.json",
+      "bytes": 5196,
+      "sha256": "e9e1cc9237cac997918255a38503bf3d4378432542966a4617469640f3ea7248"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained1792-stream-canonical-20261121/stopped-audit01/root-stop.json",
+      "bytes": 7338,
+      "sha256": "cf8cdaa0b987406a1ffaf94a3386fc33b5c562e8dc75add5d7d5af6431b87bcb"
+    }
+  ],
+  "acceptance": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained1792-stream-canonical-20261121/accepted-d-off-audit01/d-off-audit/acceptance.json",
+    "bytes": 7136,
+    "sha256": "b3836100e588c699b4ecc7be92983637aadd4b90c332480e11b7bd53a7ef6309"
+  },
+  "full_stream": {
+    "sha256": "794cd45deea2c58e0c5990857c648287a61ce1bfa881773ecff737e1e0ac891a",
+    "bytes": 279338025,
+    "lines": 13039139,
+    "events": 13038970,
+    "counter_events": 3,
+    "exact_end_records": 1,
+    "reader_returncode": 0
+  },
+  "raw_fst": {
+    "path": "/dev/shm/zp-retained1792-stream-canonical-20261121-01/d-off/trace.fst",
+    "bytes": 14192591,
+    "sha256": "137c73c020afb4d5842ed26d4100659753ed9f54782703718a50394ae25e8c40"
+  },
+  "distinct_ordinary_targets": 1792,
+  "actual_sram_words": 14336,
+  "protected_load_retirements": 14336,
+  "retained_publications": 0,
+  "retained_hits": 0,
+  "retained_bursts": 0,
+  "counter_words": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "paired_d_synthetic_intervals": {
+    "d-enabled": {
+      "markers": {
+        "populate_begin": 95747975000,
+        "verify_begin": 106416125000,
+        "verified": 118962775000
+      },
+      "population_and_check_ps": 23214800000,
+      "target_check_only_ps": 12546650000
+    },
+    "d-off": {
+      "markers": {
+        "populate_begin": 95748175000,
+        "verify_begin": 102155725000,
+        "verified": 114893975000
+      },
+      "population_and_check_ps": 19145800000,
+      "target_check_only_ps": 12738250000
+    }
+  },
+  "limits": "Both intervals reported for both closed D cases, no subset selection. Synthetic correctness timings exclude mode setup/reset/drain/report and are not application/complete-COST performance. I capacity/fullcohort/FPGA/fit pending. Full-validator receipt plus serialized all-address review; no FST/model/native replay. Qualified model hash inherited, not raw executable rehashed."
+}
