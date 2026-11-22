@@ -1,0 +1,38 @@
+make: Entering directory '/dev/shm/zp-hp0-observer-unit-20261122-01/obj'
+g++  -I.  -MMD -I/home/coyang/zynq-parrot/install/share/verilator/include -I/home/coyang/zynq-parrot/install/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -std=c++17   -Os  -c -o driver.o /dev/shm/zp-hp0-observer-unit-20261122-01/driver.cpp
+g++ -Os  -I.  -MMD -I/home/coyang/zynq-parrot/install/share/verilator/include -I/home/coyang/zynq-parrot/install/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -std=c++17   -c -o verilated.o /home/coyang/zynq-parrot/install/share/verilator/include/verilated.cpp
+g++ -Os  -I.  -MMD -I/home/coyang/zynq-parrot/install/share/verilator/include -I/home/coyang/zynq-parrot/install/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -std=c++17   -c -o verilated_fst_c.o /home/coyang/zynq-parrot/install/share/verilator/include/verilated_fst_c.cpp
+g++ -Os  -I.  -MMD -I/home/coyang/zynq-parrot/install/share/verilator/include -I/home/coyang/zynq-parrot/install/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -std=c++17   -c -o verilated_threads.o /home/coyang/zynq-parrot/install/share/verilator/include/verilated_threads.cpp
+In file included from /usr/include/c++/9/bits/specfun.h:45,
+                 from /usr/include/c++/9/cmath:1927,
+                 from /home/coyang/zynq-parrot/install/share/verilator/include/verilatedos.h:350,
+                 from /home/coyang/zynq-parrot/install/share/verilator/include/verilated.h:42,
+                 from ./Vhp0_observer_tb_top.h:11,
+                 from /dev/shm/zp-hp0-observer-unit-20261122-01/driver.cpp:1:
+/usr/include/c++/9/bits/stl_algobase.h: In instantiation of ‘bool std::__equal_aux(_II1, _II1, _II2) [with _II1 = std::array<unsigned int, 8>; _II2 = const char*]’:
+/usr/include/c++/9/bits/stl_algobase.h:1069:30:   required from ‘bool std::equal(_II1, _II1, _II2) [with _II1 = std::array<unsigned int, 8>; _II2 = const char*]’
+/dev/shm/zp-hp0-observer-unit-20261122-01/driver.cpp:74:101:   required from here
+/usr/include/c++/9/bits/stl_algobase.h:843:58: error: no type named ‘value_type’ in ‘struct std::iterator_traits<std::array<unsigned int, 8> >’
+  843 |       typedef typename iterator_traits<_II1>::value_type _ValueType1;
+      |                                                          ^~~~~~~~~~~
+/usr/include/c++/9/bits/stl_algobase.h:846:10: error: no type named ‘value_type’ in ‘struct std::iterator_traits<std::array<unsigned int, 8> >’
+  845 |       const bool __simple = ((__is_integer<_ValueType1>::__value
+      |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  846 |          || __is_pointer<_ValueType1>::__value)
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/9/bits/stl_algobase.h:846:10: error: no type named ‘value_type’ in ‘struct std::iterator_traits<std::array<unsigned int, 8> >’
+/usr/include/c++/9/bits/stl_algobase.h:849:9: error: no type named ‘value_type’ in ‘struct std::iterator_traits<std::array<unsigned int, 8> >’
+  845 |       const bool __simple = ((__is_integer<_ValueType1>::__value
+      |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  846 |          || __is_pointer<_ValueType1>::__value)
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  847 |         && __is_pointer<_II1>::__value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  848 |         && __is_pointer<_II2>::__value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  849 |         && __are_same<_ValueType1, _ValueType2>::__value);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 /home/coyang/zynq-parrot/install/share/verilator/bin/verilator_includer -DVL_INCLUDE_OPT=include Vhp0_observer_tb_top.cpp Vhp0_observer_tb_top___024root__DepSet_h37688371__0.cpp Vhp0_observer_tb_top___024root__DepSet_h32903d34__0.cpp Vhp0_observer_tb_top__Trace__0.cpp Vhp0_observer_tb_top__ConstPool_0.cpp Vhp0_observer_tb_top___024root__Slow.cpp Vhp0_observer_tb_top___024root__DepSet_h37688371__0__Slow.cpp Vhp0_observer_tb_top___024root__DepSet_h32903d34__0__Slow.cpp Vhp0_observer_tb_top__Syms.cpp Vhp0_observer_tb_top__Trace__0__Slow.cpp Vhp0_observer_tb_top__TraceDecls__0__Slow.cpp > Vhp0_observer_tb_top__ALL.cpp
+make: *** [Vhp0_observer_tb_top.mk:65: driver.o] Error 1
+make: *** Waiting for unfinished jobs....
+make: Leaving directory '/dev/shm/zp-hp0-observer-unit-20261122-01/obj'

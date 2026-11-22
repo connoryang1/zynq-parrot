@@ -1,0 +1,542 @@
+{
+  "state": "CLOSED standalone passive prototype41 directed cases PASS; no physical/inference/integration claim",
+  "module": {
+    "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/hp0_passive_read_timing_observer.sv",
+    "bytes": 13796,
+    "sha256": "73b4d74a3dff50e8674a321b36d1dfeaa395ac5b9e7d653c04f9ebd1fb29cfe5"
+  },
+  "final_manifest": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt04/manifest.json",
+    "bytes": 5026,
+    "sha256": "23e787519ba403487c29b18716d3159149c91414703461bddc165dc2d1f93352"
+  },
+  "attempts": [
+    {
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt01/manifest.json",
+        "bytes": 3802,
+        "sha256": "5ed6ec62cbd6964fa608880796f3010928dc24b7bc152f567b4a92c0eb7e3853"
+      },
+      "state": "FAIL preserved standalone attempt",
+      "trace": null,
+      "commands": [
+        {
+          "argv": [
+            "/home/coyang/zynq-parrot/install/bin/verilator",
+            "--cc",
+            "--exe",
+            "--trace-fst",
+            "--assert",
+            "--Wall",
+            "--top-module",
+            "hp0_observer_tb_top",
+            "--Mdir",
+            "/dev/shm/zp-hp0-observer-unit-20261122-01/obj",
+            "-CFLAGS",
+            "-std=c++17",
+            "/dev/shm/zp-hp0-observer-unit-20261122-01/hp0_passive_read_timing_observer.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-01/hp0_observer_tb_top.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-01/driver.cpp"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.3098952970467508,
+          "deadline_s": 60
+        },
+        {
+          "argv": [
+            "make",
+            "-C",
+            "/dev/shm/zp-hp0-observer-unit-20261122-01/obj",
+            "-f",
+            "Vhp0_observer_tb_top.mk",
+            "-f",
+            "/dev/shm/zp-hp0-observer-unit-20261122-01/no-pch.mk",
+            "-j4",
+            "OBJCACHE="
+          ],
+          "returncode": 2,
+          "failure": "RuntimeError('phase exit 2')",
+          "owned_group_remaining": false,
+          "elapsed_s": 10.068944580038078,
+          "deadline_s": 180
+        }
+      ]
+    },
+    {
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt02/manifest.json",
+        "bytes": 5028,
+        "sha256": "02a5ffd7873bed878a3c2f54f9bf4f6fa9e8bec8e31205cc756dea406d4fe884"
+      },
+      "state": "PASS standalone protocol scoreboard TRACE1; inference/area/integration unverified",
+      "trace": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt02/unit.fst",
+        "bytes": 52104,
+        "sha256": "8c26881ae8541cedbab6fb67ddcb7b1addf637f32b4b6a20fbbbe5140914709e"
+      },
+      "commands": [
+        {
+          "argv": [
+            "/home/coyang/zynq-parrot/install/bin/verilator",
+            "--cc",
+            "--exe",
+            "--trace-fst",
+            "--assert",
+            "--Wall",
+            "--top-module",
+            "hp0_observer_tb_top",
+            "--Mdir",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/obj",
+            "-CFLAGS",
+            "-std=c++17",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/hp0_passive_read_timing_observer.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/hp0_observer_tb_top.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/driver.cpp"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.31953940307721496,
+          "deadline_s": 60
+        },
+        {
+          "argv": [
+            "make",
+            "-C",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/obj",
+            "-f",
+            "Vhp0_observer_tb_top.mk",
+            "-f",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/no-pch.mk",
+            "-j4",
+            "OBJCACHE="
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 10.919874374056235,
+          "deadline_s": 180
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/obj/Vhp0_observer_tb_top",
+            "/dev/shm/zp-hp0-observer-unit-20261122-02/unit.fst"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.11062964389566332,
+          "deadline_s": 30
+        }
+      ]
+    },
+    {
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt03/manifest.json",
+        "bytes": 5026,
+        "sha256": "683bd2c98f05bdb8d6fa742ee0ad5806896b34ce625f6505eede2ab51ae96345"
+      },
+      "state": "PASS standalone protocol scoreboard TRACE1; inference/area/integration unverified",
+      "trace": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt03/unit.fst",
+        "bytes": 55766,
+        "sha256": "2d6514250ff6e18df2bde6899df3c3a3a3509ea197e40eb704706afa4ded4e69"
+      },
+      "commands": [
+        {
+          "argv": [
+            "/home/coyang/zynq-parrot/install/bin/verilator",
+            "--cc",
+            "--exe",
+            "--trace-fst",
+            "--assert",
+            "--Wall",
+            "--top-module",
+            "hp0_observer_tb_top",
+            "--Mdir",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/obj",
+            "-CFLAGS",
+            "-std=c++17",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/hp0_passive_read_timing_observer.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/hp0_observer_tb_top.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/driver.cpp"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.3284590650582686,
+          "deadline_s": 60
+        },
+        {
+          "argv": [
+            "make",
+            "-C",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/obj",
+            "-f",
+            "Vhp0_observer_tb_top.mk",
+            "-f",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/no-pch.mk",
+            "-j4",
+            "OBJCACHE="
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 10.547360211028717,
+          "deadline_s": 180
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/obj/Vhp0_observer_tb_top",
+            "/dev/shm/zp-hp0-observer-unit-20261122-03/unit.fst"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.1154913610080257,
+          "deadline_s": 30
+        }
+      ]
+    },
+    {
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt04/manifest.json",
+        "bytes": 5026,
+        "sha256": "23e787519ba403487c29b18716d3159149c91414703461bddc165dc2d1f93352"
+      },
+      "state": "PASS standalone protocol scoreboard TRACE1; inference/area/integration unverified",
+      "trace": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/hp0-passive-timing-observer-20261121/attempt04/unit.fst",
+        "bytes": 56379,
+        "sha256": "7cf094654b7743d726aec63196520dc7a2837006dac12129aeb3e51f74eef51e"
+      },
+      "commands": [
+        {
+          "argv": [
+            "/home/coyang/zynq-parrot/install/bin/verilator",
+            "--cc",
+            "--exe",
+            "--trace-fst",
+            "--assert",
+            "--Wall",
+            "--top-module",
+            "hp0_observer_tb_top",
+            "--Mdir",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/obj",
+            "-CFLAGS",
+            "-std=c++17",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/hp0_passive_read_timing_observer.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/hp0_observer_tb_top.sv",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/driver.cpp"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.3335509019671008,
+          "deadline_s": 60
+        },
+        {
+          "argv": [
+            "make",
+            "-C",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/obj",
+            "-f",
+            "Vhp0_observer_tb_top.mk",
+            "-f",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/no-pch.mk",
+            "-j4",
+            "OBJCACHE="
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 9.672113607055508,
+          "deadline_s": 180
+        },
+        {
+          "argv": [
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/obj/Vhp0_observer_tb_top",
+            "/dev/shm/zp-hp0-observer-unit-20261122-04/unit.fst"
+          ],
+          "returncode": 0,
+          "failure": null,
+          "owned_group_remaining": false,
+          "elapsed_s": 0.11735718802083284,
+          "deadline_s": 30
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 7105,
+      "sha256": "ca0a9e688c702a9d8f30d9a9698176fa9cd1cac8dcfe0c4d024f1ec606972ea2"
+    },
+    {
+      "path": "driver.cpp",
+      "bytes": 13776,
+      "sha256": "0998ad5d7f474a501a07070dcb1c015b5a90ef2e08aab959ece6194dc12dc203"
+    },
+    {
+      "path": "evidence/attempt01/compile.log",
+      "bytes": 5605,
+      "sha256": "79a99cd53286bd8544725258571af55c4d8c50eb3277f044ce6725adc297607a"
+    },
+    {
+      "path": "evidence/attempt01/compile.log.owned.json",
+      "bytes": 386,
+      "sha256": "63ce5d918cf170e05eb5abb333f1378bf0f1afb553eceab63dcf11953ee95e7e"
+    },
+    {
+      "path": "evidence/attempt01/driver.cpp",
+      "bytes": 11934,
+      "sha256": "8a9627c8ff457b12d697b556375f60d7ac8dcce01852d687284f82e193180440"
+    },
+    {
+      "path": "evidence/attempt01/generate.log",
+      "bytes": 287,
+      "sha256": "dd9ba47951b449fad75fa31dccd820ab10f2267834cfb436560dfe8bb291e103"
+    },
+    {
+      "path": "evidence/attempt01/generate.log.owned.json",
+      "bytes": 638,
+      "sha256": "b145dd847cf84ee16a4718f815f73a4cbc28e1a150a37d3600b7e9d9bf647148"
+    },
+    {
+      "path": "evidence/attempt01/hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "evidence/attempt01/hp0_passive_read_timing_observer.sv",
+      "bytes": 13669,
+      "sha256": "44b27232d242cb774d5b51e5b3b019408e930b8f058bd31138c5f63c481e80f0"
+    },
+    {
+      "path": "evidence/attempt01/manifest.json",
+      "bytes": 3802,
+      "sha256": "5ed6ec62cbd6964fa608880796f3010928dc24b7bc152f567b4a92c0eb7e3853"
+    },
+    {
+      "path": "evidence/attempt01/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    },
+    {
+      "path": "evidence/attempt02/compile.log",
+      "bytes": 3862,
+      "sha256": "14ef1750bdd89a7ef8f868ba652b40ac5b5bf6e9657613b7230885e2c282cc30"
+    },
+    {
+      "path": "evidence/attempt02/compile.log.owned.json",
+      "bytes": 360,
+      "sha256": "5980f13e2e96969c2bb42f627f60a1da875a2c8ef7d1855a17937ac35cccf57d"
+    },
+    {
+      "path": "evidence/attempt02/driver.cpp",
+      "bytes": 12054,
+      "sha256": "b11bced885d1c7502daa168fcf653c3a23440db54a92a578c0def2d655961d4d"
+    },
+    {
+      "path": "evidence/attempt02/generate.log",
+      "bytes": 287,
+      "sha256": "8cf5b102bd46494907892e179f24b20a9037297c83b3df62f0ca211ac48c6e5b"
+    },
+    {
+      "path": "evidence/attempt02/generate.log.owned.json",
+      "bytes": 639,
+      "sha256": "4fc0c530bd15664365a85742d237bcba40b1d383998e54c93f349cfb78555491"
+    },
+    {
+      "path": "evidence/attempt02/hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "evidence/attempt02/hp0_passive_read_timing_observer.sv",
+      "bytes": 13669,
+      "sha256": "44b27232d242cb774d5b51e5b3b019408e930b8f058bd31138c5f63c481e80f0"
+    },
+    {
+      "path": "evidence/attempt02/manifest.json",
+      "bytes": 5028,
+      "sha256": "02a5ffd7873bed878a3c2f54f9bf4f6fa9e8bec8e31205cc756dea406d4fe884"
+    },
+    {
+      "path": "evidence/attempt02/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    },
+    {
+      "path": "evidence/attempt02/run_unit.py",
+      "bytes": 4670,
+      "sha256": "945d50906ffd4a163c90181475206fde1dcd046aa1e7f37cd936ab8d25415bbe"
+    },
+    {
+      "path": "evidence/attempt02/unit.log",
+      "bytes": 1036,
+      "sha256": "73398fe34ef1eff2d743cb97893cc047f3b7ad8cff658f3d3af0a6b97c587e3f"
+    },
+    {
+      "path": "evidence/attempt02/unit.log.owned.json",
+      "bytes": 279,
+      "sha256": "87f95b1b8b94fb80b26a1fe05b2362438c6c0fd604d36feaffa28cc5f205b97d"
+    },
+    {
+      "path": "evidence/attempt03/compile.log",
+      "bytes": 3862,
+      "sha256": "b7cb4733dacad37b9aa31c2a1beed1d932b9357a19243f2ec29c68050fbee352"
+    },
+    {
+      "path": "evidence/attempt03/compile.log.owned.json",
+      "bytes": 360,
+      "sha256": "95d591310897f17ca996f8eef1f48602c13c7b25c017dfe6587504b8b241328b"
+    },
+    {
+      "path": "evidence/attempt03/driver.cpp",
+      "bytes": 13523,
+      "sha256": "4242d3577eea77295cf0df13261f8f34bbf46fadae8b31353cd09bb1d85bfd60"
+    },
+    {
+      "path": "evidence/attempt03/generate.log",
+      "bytes": 287,
+      "sha256": "9c49759342e9b9a3d01f71d502b4f91e176bf8a65c6c8fd8a412a896cf78b4e9"
+    },
+    {
+      "path": "evidence/attempt03/generate.log.owned.json",
+      "bytes": 638,
+      "sha256": "6db08aef94eaade45cc2214d1590cd0562b9193eebf330d41440041e8e6a4ab5"
+    },
+    {
+      "path": "evidence/attempt03/hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "evidence/attempt03/hp0_passive_read_timing_observer.sv",
+      "bytes": 13749,
+      "sha256": "0e933afe4b28d23d51758c9caf81ee16ad117cea590d85c20a84e8c08d955680"
+    },
+    {
+      "path": "evidence/attempt03/manifest.json",
+      "bytes": 5026,
+      "sha256": "683bd2c98f05bdb8d6fa742ee0ad5806896b34ce625f6505eede2ab51ae96345"
+    },
+    {
+      "path": "evidence/attempt03/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    },
+    {
+      "path": "evidence/attempt03/run_unit.py",
+      "bytes": 4670,
+      "sha256": "945d50906ffd4a163c90181475206fde1dcd046aa1e7f37cd936ab8d25415bbe"
+    },
+    {
+      "path": "evidence/attempt03/unit.log",
+      "bytes": 1196,
+      "sha256": "160f5cea326bfc30ad7cabcf5e775ce8e933335a91381f7526b658bcf9bafa9c"
+    },
+    {
+      "path": "evidence/attempt03/unit.log.owned.json",
+      "bytes": 278,
+      "sha256": "d62296ed3bcd084c2977479de90018f6b8e1b44f5d725f4a40a7c4ae1369dd1e"
+    },
+    {
+      "path": "evidence/attempt04/compile.log",
+      "bytes": 3862,
+      "sha256": "a54ecf51b04f0304ea573e05986b536a47d6f6b55a916f26873f63e510fd4298"
+    },
+    {
+      "path": "evidence/attempt04/compile.log.owned.json",
+      "bytes": 359,
+      "sha256": "64c2043145301464027fd4e8ad6ba8bc1a7faae549e03029d73571809f9b0931"
+    },
+    {
+      "path": "evidence/attempt04/driver.cpp",
+      "bytes": 13776,
+      "sha256": "0998ad5d7f474a501a07070dcb1c015b5a90ef2e08aab959ece6194dc12dc203"
+    },
+    {
+      "path": "evidence/attempt04/generate.log",
+      "bytes": 287,
+      "sha256": "9142825fcb015f993c9af723383fde1d30d8745b4ea262a00f92298f9527fe51"
+    },
+    {
+      "path": "evidence/attempt04/generate.log.owned.json",
+      "bytes": 638,
+      "sha256": "dbf660c88f009bf0761781c5acd88edb023b57877d7d82f1f093d054418f6034"
+    },
+    {
+      "path": "evidence/attempt04/hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "evidence/attempt04/hp0_passive_read_timing_observer.sv",
+      "bytes": 13796,
+      "sha256": "73b4d74a3dff50e8674a321b36d1dfeaa395ac5b9e7d653c04f9ebd1fb29cfe5"
+    },
+    {
+      "path": "evidence/attempt04/manifest.json",
+      "bytes": 5026,
+      "sha256": "23e787519ba403487c29b18716d3159149c91414703461bddc165dc2d1f93352"
+    },
+    {
+      "path": "evidence/attempt04/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    },
+    {
+      "path": "evidence/attempt04/run_unit.py",
+      "bytes": 4670,
+      "sha256": "945d50906ffd4a163c90181475206fde1dcd046aa1e7f37cd936ab8d25415bbe"
+    },
+    {
+      "path": "evidence/attempt04/unit.log",
+      "bytes": 1232,
+      "sha256": "3323aa955ecaa5b23c4d76038a26867ae2740b1300cb03f375c6a73586e5be8d"
+    },
+    {
+      "path": "evidence/attempt04/unit.log.owned.json",
+      "bytes": 279,
+      "sha256": "03c1773aa482d651048b0f052b39ce904df2a133a8891aba1b787024a9390ce7"
+    },
+    {
+      "path": "evidence/failed-lint01/failure.json",
+      "bytes": 378,
+      "sha256": "74b3d3bf6363b72b495dd50d906a57e746c47aa456af5e85710791d9186d62b3"
+    },
+    {
+      "path": "evidence/failed-lint01/observer.sv",
+      "bytes": 13380,
+      "sha256": "eafc955363ebabee92adf057dc671a8230458cb64333e863efb90192414a0f6d"
+    },
+    {
+      "path": "hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "hp0_passive_read_timing_observer.sv",
+      "bytes": 13796,
+      "sha256": "73b4d74a3dff50e8674a321b36d1dfeaa395ac5b9e7d653c04f9ebd1fb29cfe5"
+    },
+    {
+      "path": "no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    },
+    {
+      "path": "run_unit.py",
+      "bytes": 4670,
+      "sha256": "945d50906ffd4a163c90181475206fde1dcd046aa1e7f37cd936ab8d25415bbe"
+    }
+  ],
+  "total_tracked_bytes": 242234,
+  "vendor_board_fullmodel_runs": 0,
+  "final_source_frozen": true
+}

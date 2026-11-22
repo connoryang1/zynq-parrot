@@ -1,0 +1,106 @@
+{
+  "state": "FAIL preserved standalone attempt",
+  "sources_before": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/hp0_passive_read_timing_observer.sv",
+      "bytes": 13669,
+      "sha256": "44b27232d242cb774d5b51e5b3b019408e930b8f058bd31138c5f63c481e80f0"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/driver.cpp",
+      "bytes": 11934,
+      "sha256": "8a9627c8ff457b12d697b556375f60d7ac8dcce01852d687284f82e193180440"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    }
+  ],
+  "sources_after": [
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/hp0_passive_read_timing_observer.sv",
+      "bytes": 13669,
+      "sha256": "44b27232d242cb774d5b51e5b3b019408e930b8f058bd31138c5f63c481e80f0"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/hp0_observer_tb_top.sv",
+      "bytes": 4451,
+      "sha256": "615da2b10092664f237b86c2ace0a28529d6eae3ec2b19e059e57db9f5834600"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/driver.cpp",
+      "bytes": 11934,
+      "sha256": "8a9627c8ff457b12d697b556375f60d7ac8dcce01852d687284f82e193180440"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/hp0-passive-timing-observer/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    }
+  ],
+  "verilator": {
+    "path": "/home/coyang/zynq-parrot/install/bin/verilator",
+    "bytes": 26031,
+    "sha256": "2f5bd5dff146a41379df67c50b3de6788ebfeaad1041bddd20f46561c8b6aac1"
+  },
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "--Wall",
+        "--top-module",
+        "hp0_observer_tb_top",
+        "--Mdir",
+        "/dev/shm/zp-hp0-observer-unit-20261122-01/obj",
+        "-CFLAGS",
+        "-std=c++17",
+        "/dev/shm/zp-hp0-observer-unit-20261122-01/hp0_passive_read_timing_observer.sv",
+        "/dev/shm/zp-hp0-observer-unit-20261122-01/hp0_observer_tb_top.sv",
+        "/dev/shm/zp-hp0-observer-unit-20261122-01/driver.cpp"
+      ],
+      "returncode": 0,
+      "failure": null,
+      "owned_group_remaining": false,
+      "elapsed_s": 0.3098952970467508,
+      "deadline_s": 60
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-hp0-observer-unit-20261122-01/obj",
+        "-f",
+        "Vhp0_observer_tb_top.mk",
+        "-f",
+        "/dev/shm/zp-hp0-observer-unit-20261122-01/no-pch.mk",
+        "-j4",
+        "OBJCACHE="
+      ],
+      "returncode": 2,
+      "failure": "RuntimeError('phase exit 2')",
+      "owned_group_remaining": false,
+      "elapsed_s": 10.068944580038078,
+      "deadline_s": 180
+    }
+  ],
+  "stage": "/dev/shm/zp-hp0-observer-unit-20261122-01",
+  "stage_peak_allocated_bytes": 1241088,
+  "stage_cap_bytes": 134217728,
+  "trace_cap_bytes": 8388608,
+  "PCH": false,
+  "compiler_cache": false,
+  "compiler_workers": 4,
+  "trace": null,
+  "model": null,
+  "limits": "No top wiring, synthesis, board, memory-traffic interference, latency attribution or performance claim"
+}
