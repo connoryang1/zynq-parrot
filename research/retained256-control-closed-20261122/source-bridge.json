@@ -1,0 +1,13 @@
+{
+  "state": "PASS exact Git-object two-default-only matched source bridge",
+  "large_TOP": "eb7d390134a0025331a2366a979a774263b146d5",
+  "small_TOP": "596e4677fdcbbf59706be254384f778861f0cc36",
+  "BP": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "changed_paths": [
+    "cosim/black-parrot-example/Makefile.design"
+  ],
+  "patch": "diff --git a/cosim/black-parrot-example/Makefile.design b/cosim/black-parrot-example/Makefile.design\nindex 1c4303845..7fbef79be 100644\n--- a/cosim/black-parrot-example/Makefile.design\n+++ b/cosim/black-parrot-example/Makefile.design\n@@ -58,8 +58,8 @@ DEFINES += BP_NCPUS=$(BP_NCPUS)\n # This dedicated experiment builds real retention by default. Set 0 to\n # reproduce the legacy replay datapath; the accepted source branch is intact.\n BP_RETAINED_BUFFER ?= 1\n-BP_RETAINED_I_LINES ?= 1792\n-BP_RETAINED_D_LINES ?= 1792\n+BP_RETAINED_I_LINES ?= 256\n+BP_RETAINED_D_LINES ?= 256\n BP_RETAINED_SETS ?= 256\n DEFINES += BP_RETAINED_BUFFER=$(BP_RETAINED_BUFFER)\n DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)\n",
+  "large_file_sha256": "fe9f679ac28e6000f830994ca4914fe04ea8328125980c2f97b0e4d976f87cca",
+  "small_file_sha256": "db28bf6deea966ca389b1546ab45b950f2199969c305c8621d61ce15f10f8c42",
+  "scope": "Source relationship only; large routed capacity unselected and application outcomes absent."
+}
