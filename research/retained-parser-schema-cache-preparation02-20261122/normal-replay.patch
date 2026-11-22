@@ -1,0 +1,63 @@
+--- preparation01/profile_replay.py
++++ preparation02/profile_replay.py
+@@ -4,3 +4,2 @@
+ from contextlib import redirect_stdout
+-import cProfile
+ import gzip
+@@ -11,3 +10,2 @@
+ from pathlib import Path
+-import pstats
+ import shutil
+@@ -46,4 +44,4 @@
+     source=Path(plan['source_dir']);sys.path.insert(0,str(source))
+-    original=module('schema_cache_original',HERE/'parser-original.py')
+-    candidate=module('schema_cache_candidate',HERE/'parser-candidate.py')
++    original=module('schema_cache_original',plan['sources']['original_snapshot']['path'])
++    candidate=module('schema_cache_candidate',plan['sources']['candidate']['path'])
+     archive=module('schema_cache_archive',plan['sources']['archive']['path'])
+@@ -66,3 +64,2 @@
+     signal.alarm(600)
+-    profile=cProfile.Profile()
+     try:
+@@ -73,8 +70,4 @@
+         with gzip.open(plan['inputs']['events']['path'],'rb') as stream,gzip.open(projection,'wb') as saved:
+-            profile.enable()
+-            try:
+-                result,digest=archive.validate_complete(stream,saved,original.selection(),
+-                    original.Validator(program,run['role']),edges,0,guard)
+-            finally:
+-                profile.disable();profile.dump_stats(str(arm/'python.prof'))
++            result,digest=archive.validate_complete(stream,saved,original.selection(),
++                original.Validator(program,run['role']),edges,0,guard)
+         require(digest==plan['expected_full_stream'],'all original bytes/events/counts/SHA/EOF, inherited closed reader0')
+@@ -96,8 +89,5 @@
+         require(counter['state']=='PASS final FST counter words equal actual GP0 reads' and counter['values']==plan['expected_counter_words'],'unchanged independent counter checker/all six words')
+-        stats=pstats.Stats(profile)
+-        top=[dict(file=key[0],line=key[1],function=key[2],primitive_calls=value[0],calls=value[1],self_s=value[2],cumulative_s=value[3])
+-            for key,value in sorted(stats.stats.items(),key=lambda row:row[1][2],reverse=True)[:30]]
+         summary=dict(state='PASS host equivalence only',arm=name,full_stream=digest,
+             semantic_sha256=hashlib.sha256(archive.semantic_bytes(result)).hexdigest(),
+-            counter_words=counter['values'],elapsed_s_host_verification_only=time.monotonic()-started,profile_top=top)
++            counter_words=counter['values'],elapsed_s_host_verification_only=time.monotonic()-started)
+         archive.write_json(arm/'summary.json',summary);guard();return summary
+@@ -119,3 +109,3 @@
+     release=json.loads(args.release.read_text())
+-    require(release['schema']=='retained-parser-cache-host-release-v1' and release['ROOT_approved'] is True and release['plan']==binding(path) and release['qualified_outer_guard_prices_all_current_OTHER'] is True,'actual ROOT ownership/resource pricing first')
++    require(release['schema']=='retained-parser-cache-host-release-v2-normal' and release['ROOT_approved'] is True and release['plan']==binding(path) and release['qualified_outer_guard_prices_all_current_OTHER'] is True,'actual ROOT ownership/resource pricing first')
+     require(release['fixed_selection_no_mutator_precondition_reviewed'] is True,'fixed selected mapping, not arbitrary caller mutation')
+@@ -124,3 +114,6 @@
+     out=Path(release['output_root']);require(out.is_absolute() and not out.exists() and release['output_cap_bytes']==32*1024**2 and release['per_arm_timeout_s']==600 and release['outer_timeout_s']==1280,'fresh fixed32MiB/600-per-arm/1280-outer release')
++    prior_bytes=release['preserved_prior_attempt_output_bytes']
++    require(type(prior_bytes) is int and 0<=prior_bytes<32*1024**2,'ROOT measured closed prior output inside unchanged combined cap')
+     for row in plan['inputs'].values():verify(row)
++    for row in plan['prior_attempt']['bindings'].values():verify(row)
+     original,candidate,archive,checker=load_sources(plan)
+@@ -132,3 +125,3 @@
+         previous=now;require(now-started<1280,'fixed1280s complete host batch')
+-        used=sum(p.stat().st_size for p in out.rglob('*') if p.is_file())
++        used=prior_bytes+sum(p.stat().st_size for p in out.rglob('*') if p.is_file())
+         require(used<=32*1024**2,'same32MiB output cap')
+@@ -143,2 +136,3 @@
+     for row in plan['inputs'].values():verify(row)
++    for row in plan['prior_attempt']['bindings'].values():verify(row)
+     archive.write_json(out/'equivalence.json',dict(state='PASS HOST ONLY parser-cache equivalence; no production promotion',
