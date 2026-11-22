@@ -1,0 +1,77 @@
+{
+  "schema": "borrow256-shared-reserve-policy-v1",
+  "state": "PREPARED exact shared prospective policy; ROOT launch/source/idle guards still required",
+  "source": {
+    "TOP": "1008854d30e5d923c86c3232fc22af039467d552",
+    "BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+    "root": "/dev/shm/zp-linux-borrow256-fpga-source-20261122-01"
+  },
+  "basis": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow256-native-monitor-failure-20261122/preflight-export01/allslots-resource-preflight01.json",
+    "bytes": 156304,
+    "sha256": "ca5878f852d05ac4941c9571f0401071f619d0abc4a2dd3d2af6bcb4c82bfe81"
+  },
+  "old_R8_freeze": {
+    "complete": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r8-freeze-complete.json",
+      "bytes": 1751,
+      "sha256": "09075ffd134c175155d9299b498ed9c1bbe0c2d635e463fc941f2fb50880b5c7"
+    },
+    "work": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r8-work.json",
+      "bytes": 2302805,
+      "sha256": "27dbc7e99783672633e23cb50091430cf6dfb91213427c769c2215f18f855a37"
+    },
+    "evidence": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r8-evidence.json",
+      "bytes": 36466,
+      "sha256": "e5af52fb91c1f93bbf01f23a40eae24cb0bc9d63b6b71fd2ac36d9648e99336c"
+    },
+    "freeze_pair_id": "e8a2a8d42ae27429ec1ab6a7a7fb72b2ab9bd0bc47131bec2d273080779d0884",
+    "all_three_required": true,
+    "old_caps_unchanged": true
+  },
+  "new_CAD": {
+    "work_root": "/run/user/1001/zp-linux-borrow256-trace0-cad-20261122-01",
+    "work_cap_bytes": 2684354560,
+    "evidence_roots": [
+      "/home/coyang/fpga-logs-linux-retained-borrow256-trace0",
+      "/home/coyang/fpga-artifacts/context-resume/borrow256-fpga-preparation-20261122/preparation01"
+    ],
+    "evidence_cap_bytes": 201326592,
+    "work_floor_bytes": 1073741824,
+    "HOME_floor_bytes": 2684354560,
+    "shm_floor_bytes": 536870912,
+    "deadline_seconds": 10800
+  },
+  "native": {
+    "pool": "/run/user/1001/zp-retained-borrow256-trace0-fullcore-20261122-01",
+    "pool_cap_bytes": 805306368,
+    "new_cohort_cap_inside_pool_bytes": 268435456,
+    "durable_root": "/home/coyang/fpga-artifacts/context-resume/retained-borrow256-trace0-fullcore-20261122",
+    "durable_cap_bytes": 67108864,
+    "durable_bytes_at_policy": 47509654,
+    "durable_remaining_reserved_bytes": 19599210,
+    "allslot_durable_prospective_bytes_inside_same_cap": 16777216,
+    "shared_helper_cap_bytes": 1048576
+  },
+  "fixed_other_for_CAD_monitor": {
+    "RAM_bytes": 1928678834,
+    "HOME_bytes": 49424582,
+    "old_RAM_future_by_family": {
+      "matched": 329830081,
+      "scratch": 397346275,
+      "borrow1792": 396196110
+    },
+    "old_RAM_future_sum_bytes": 1123372466,
+    "native_POOL_full_conservative_reserve_bytes": 805306368,
+    "HOME_nonCAD_base_including_floor_bytes": 2713131356,
+    "HOME_nonCAD_extra_above_floor_bytes": 28776796,
+    "native_durable_remaining_conservative_bytes": 19599210,
+    "shared_helper_full_conservative_reserve_bytes": 1048576
+  },
+  "native_guard_contract": "Use native sealed+mutable pool accounting under unchanged768MiB, cohort256MiB inside(not additive); reserve FULL prospective newCAD work/evidence conservatively plus fixed old family/home bases. No old budget.check/materialize.budget/cad() in new live paths.",
+  "CAD_guard_contract": "For each actual device combine max(floors) + SUM(own remaining work/evidence + fixed OTHER role constants). Work-other=1928678834;HOME-other=49424582. Shared device sums both; floors never sum. Cross-device free bytes never borrowed. Native256 cohort and16MiB durable are nested, not additional caps.",
+  "conservative_scope": "Fixed FULL other envelopes deliberately do not discount their occupied bytes or growth; may refuse earlier than exact dynamic accounting. No unsupported performance/fit claim or limit relaxation.",
+  "no_old_source_or_budget_edit": true
+}
