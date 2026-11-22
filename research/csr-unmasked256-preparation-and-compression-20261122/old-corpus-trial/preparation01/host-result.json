@@ -1,0 +1,69 @@
+{
+  "state": "PASS old corpus only; no futurefullproof/compressedgzip identity claim",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-old-corpus-xz-feasibility-20261122/preparation01/admission.ROOT.json",
+    "bytes": 2958,
+    "sha256": "00055e4afdc0a41c23519dcaa4758ef3aa6cbc35243c5a4e4a1b0d20a0764c64"
+  },
+  "preflight": {
+    "RUN_bytes": 0,
+    "HOME_bytes": 683890
+  },
+  "originals_unchanged": true,
+  "owned": {
+    "group_states": [
+      {
+        "phase": "normal_parent_exit_before_reap",
+        "members": []
+      },
+      {
+        "phase": "normal_parent_exit_after_reap",
+        "members": []
+      },
+      {
+        "phase": "cleanup_complete",
+        "members": []
+      }
+    ],
+    "reaped_owned_children": [],
+    "argv": [
+      "/usr/bin/python3",
+      "/home/coyang/fpga-artifacts/context-resume/csr-old-corpus-xz-feasibility-20261122/preparation01/codec.py",
+      "--inputs",
+      "/home/coyang/fpga-artifacts/context-resume/csr-old-corpus-xz-feasibility-20261122/preparation01/input-list.json",
+      "--stage",
+      "/run/user/1001/zp-csr-old-corpus-xz-feasibility-20261122-01"
+    ],
+    "owned_pgid": 1273813,
+    "returncode": 0,
+    "failure": null,
+    "owned_group_remaining": false,
+    "timeout_s": 780,
+    "teardown_s": 5,
+    "elapsed_s": 83.05892242095433
+  },
+  "result": {
+    "state": "PASS old corpus fits fixed32MiB and every original byte roundtrips; future freshproof fit not guaranteed",
+    "members": 910,
+    "dictionary_bytes": 67108864,
+    "archive_cap_bytes": 33554432,
+    "codec": "LZMA2preset6/XZcheckSHA256/singleprocess",
+    "models_adjacent": true,
+    "archive_bytes": 24924608,
+    "archive_sha256": "32eadc4d0a5b095cffb788761dff67e4fb5585b2702998978136507f2080bce7",
+    "raw_member_bytes": 244033486,
+    "roundtripped_members": 910,
+    "canonical_actual_regeneration": "PENDING separate ROOTreader admission; recipe/hashes included, no gzipwrapper identity claim",
+    "elapsed_seconds": 82.75751630798914,
+    "maxrss_KiB": 778928
+  },
+  "resources": {
+    "RUN_bytes": 24925453,
+    "HOME_bytes": 684282
+  },
+  "result_binding": {
+    "path": "/run/user/1001/zp-csr-old-corpus-xz-feasibility-20261122-01/codec-result.json",
+    "bytes": 663,
+    "sha256": "71148654f1c951613ffbdebe5b4f7419baf2188eb0ff3384c0d433b9d21aba84"
+  }
+}
