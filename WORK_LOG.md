@@ -762,3 +762,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Raw vendor report whitespace retained:** the compact failed-CAD checkpoint hit a blank-line-at-EOF check in the byte-exact utilization report, and ROOT committed before inspecting that returned check. Preserve the report hash with a narrowly scoped `.gitattributes` exception; inspect sequential check results before any later commit. No source or evidence bytes were normalized.
+
+
+**Fixed-state probes remain scoped:** currentSYN read-only query finishes52.060s, leavesDCPd5eeec32 unchanged, and durably preserves all mapped connectivity in5,083,561B; the surviving hierarchy has remapped ports and3332 unclassified original payload positions, so it is not a valid bit-constant projection. Generic FF candidate then passes actual6668FF/noRAM/SRL/BRAM/DSP realization in331.683s at4183logicLUT, versus the exact-source oldRAM4459total/3347logic+1112LUTRAM/4FF control. Setup+45.517ns andhold−.321ns(6668fails) are unplaced results, not signoff. Complete source/rawstage is preserved under8MiB; primary realCSRbank cost and mapped correctness remain pending before any whole build.
