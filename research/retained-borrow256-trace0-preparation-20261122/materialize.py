@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+"""Exact sparse borrow-only source collection, no compiler/model/reader."""
+import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import closed_scratch
+import reservations
+
+HERE=Path(__file__).resolve().parent
+SOURCE=Path('/home/coyang/zynq-parrot-linux-borrow256-profile')
+TOP='1008854d30e5d923c86c3232fc22af039467d552'
+BP='bb575a764c200f07c6f3259a179bdc861dd7593f'
+PREVIOUS=Path('/home/coyang/zynq-parrot-linux-host-observer/research/retained256-qualification-20261122')
+SOURCE_CAP=4*1024**2;HELPER_CAP=8*1024**2;FLOOR=2560*1024**2
+V1=HERE.parent/'retained-borrow-trace0-preparation-20261122'
+V2=HERE.parent/'retained-borrow-trace0-preparation02-20261122'
+INHERITED=Path('/home/coyang/zynq-parrot-linux-host-observer/research/scratch-trace-profile-preparation02-20261122')
+INHERITED_V1=INHERITED.parent/'scratch-trace-profile-preparation-20261122'
+
+
+def require(ok,message):
+    if not ok:raise ValueError(message)
+
+def size(path):return sum(p.stat().st_size for p in Path(path).rglob('*') if p.is_file()) if Path(path).exists() else 0
+def bind(path):
+    p=Path(path);raw=p.read_bytes();return dict(path=str(p.resolve()),bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
+
+def git(repo,*args):
+    repo=Path(repo);marker=repo/'.git';require(marker.is_file() or marker.is_dir(),'initialized .git before Git invocation')
+    admin=Path(marker.read_text().strip().split(': ',1)[1]) if marker.is_file() else marker
+    if not admin.is_absolute():admin=(repo/admin).resolve()
+    env={k:v for k,v in os.environ.items() if not k.startswith('GIT_')};env.update(GIT_DIR=str(admin),GIT_WORK_TREE=str(repo.resolve()))
+    return subprocess.check_output(['git','-c','core.sparseCheckout=true','-c','core.sparseCheckoutCone=false',*args],cwd=repo,env=env,timeout=60)
+
+def budget():
+    used,helpers=size(SOURCE),size(HERE)
+    require(used<=SOURCE_CAP and helpers<=HELPER_CAP,'new source4MiB/helpers8MiB caps')
+    # Preserve the existing matched256 HOME reservations as well as new ones.
+    oldsource=Path('/home/coyang/zp-retained256-source-20261122');durable=Path('/home/coyang/fpga-artifacts/context-resume/retained256-qualification-20261122')
+    old_remaining=max(0,SOURCE_CAP-size(oldsource))+max(0,HELPER_CAP-size(PREVIOUS))+reservations.control()['remaining_growth']
+    # Existing scratch source/helpers/durable are frozen but their original
+    # reserved allocation remains explicitly priced rather than borrowed.
+    closed=closed_scratch.verify()
+    # Occupied bytes remain in actual filesystem/free-space and immutable
+    # footprint checks. ROOT released ONLY the closed archive's unused cap.
+    old_remaining+=max(0,SOURCE_CAP-size(Path('/home/coyang/zynq-parrot-linux-scratch-profile')))+max(0,HELPER_CAP-size(INHERITED)-size(INHERITED_V1))
+    require(closed['original_allocation_bytes']-closed['occupied_bytes']==closed['unused_reservation_released_bytes'],'exact closed unused reservation release')
+    old_borrow_source=Path('/home/coyang/zynq-parrot-linux-borrow-profile')
+    old_borrow_helpers=[HERE.parent/n for n in ('retained-borrow-trace0-preparation-20261122','retained-borrow-trace0-preparation02-20261122','retained-borrow-trace0-preparation03-20261122','retained-borrow-trace0-closure-preparation-20261122')]
+    old_borrow_durable=Path('/home/coyang/fpga-artifacts/context-resume/retained-borrow-trace0-fullcore-20261122')
+    old_remaining+=max(0,SOURCE_CAP-size(old_borrow_source))+max(0,HELPER_CAP-sum(size(p)for p in old_borrow_helpers))+0 # ROOT borrow61d1 closure releases ONLY unused reserve
+    reservations.borrow();active_cad=reservations.cad();old_remaining+=active_cad['remaining_evidence']
+    need=FLOOR+SOURCE_CAP-used+HELPER_CAP-helpers+old_remaining
+    require(shutil.disk_usage(HERE).free>=need,'NEWsmall HOME2.5GiB plus ALL own/old/CAD remaining allocations')
+    return dict(source_bytes=used,helper_bytes=helpers,old_remaining_bytes=old_remaining,closed_archive=closed,closed_borrow=reservations.borrow(),old_control=reservations.control(),active_CAD=active_cad,required_free_bytes=need,free_bytes=shutil.disk_usage(HERE).free)
+
+def main():
+    original=PREVIOUS/'source-plan-v4.json';plan=copy.deepcopy(json.loads(original.read_text()))
+    require(bind(original)['sha256']=='a39b7e42177d3c9ed32ea77c005746a14548002ad28e5acde3c75dfe8e4ca765','fixed complete392HDL/host-include lineage')
+    require(git(SOURCE,'rev-parse','HEAD').decode().strip()==TOP,'borrow-only TOP')
+    original_design=git(SOURCE,'show','3daedee66a3c94014b4a666fea037b17cc9b0943:cosim/black-parrot-example/Makefile.design').decode()
+    expected=original_design.replace('BP_RETAINED_I_LINES ?= 1792','BP_RETAINED_I_LINES ?= 256').replace('BP_RETAINED_D_LINES ?= 1792','BP_RETAINED_D_LINES ?= 256')
+    require((SOURCE/'cosim/black-parrot-example/Makefile.design').read_text()==expected,'ONLY exact two capacity-default substitutions')
+    require(git(SOURCE,'diff','--name-only','3daedee66a3c94014b4a666fea037b17cc9b0943',TOP).decode().splitlines()==['cosim/black-parrot-example/Makefile.design'],'only borrow-only gitlink composition')
+    reference=Path('/home/coyang/bp-retained-hit-borrow-20261122')
+    require(git(reference,'diff','--name-only','8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c',BP).decode().splitlines()==['bp_common/src/v/bp_retained_line_store.sv','bp_me/src/v/cce/bp_uce.sv'],'only UCE borrowed payload plus backend lease assertions')
+    plan.update(schema='scratch-trace-profile-source-plan-v1',source=str(SOURCE),TOP=TOP,BP=BP,
+                capacity_selection=None,prospective_run_defines=dict(BP_CACHE_MISS_TRACE=0),source_cap=SOURCE_CAP)
+    plan['repositories'][0].update(commit=TOP,reference=str(SOURCE))
+    plan['repositories'][0]['files']['testing/rtl/retained-advisory-trace/validate.py']={}
+    for row in plan['repositories']:
+        if row['relative']=='import/black-parrot':row.update(commit=BP,reference=str(reference))
+        names=list(row['files']);raw=git(Path(row['reference']),'ls-tree','-l',row['commit'],'--',*names).decode().splitlines()
+        actual={}
+        for line in raw:
+            fields,name=line.split('\t',1);mode,kind,blob,n=fields.split();require(kind=='blob','selected source blob only')
+            actual[name]=dict(mode=mode,blob=blob,bytes=int(n))
+        require(set(actual)==set(names),'same full source/host closure paths')
+        row['files']=actual
+    plan['planned_file_bytes']=sum(p['bytes'] for r in plan['repositories'] for p in r['files'].values())
+    require(plan['planned_file_bytes']+4096<=SOURCE_CAP,'source cap before nested checkout')
+    output=HERE/'source-plan256-04.json'
+    with output.open('x') as f:json.dump(plan,f,indent=2);f.write('\n')
+    record=dict(state='RUNNING exact source-only materialization',script=bind(__file__),previous_plan=bind(original),plan=bind(output),repositories=[])
+    try:
+        for row in plan['repositories']:
+            budget();target=SOURCE/row['relative'];ref=Path(row['reference'])
+            common=Path(git(ref,'rev-parse','--git-common-dir').decode().strip())
+            if not common.is_absolute():common=(ref/common).resolve()
+            before=bind(common/'config')
+            if not (target/'.git').is_file():
+                require(not target.exists() or not any(target.iterdir()),'no foreign/partial repository')
+                git(ref,'worktree','add','--detach','--no-checkout',str(target),row['commit'])
+            require((target/'.git').is_file(),'actual .git before child Git')
+            admin=Path((target/'.git').read_text().strip().split(': ',1)[1]).resolve()
+            require((admin/(admin/'commondir').read_text().strip()).resolve()==common,'expected shared Git identity')
+            require(Path((admin/'gitdir').read_text().strip()).resolve()==target/'.git','own worktree backreference')
+            (admin/'config.worktree').write_text('[core]\n\tworktree = '+str(target)+'\n\tsparseCheckout = true\n\tsparseCheckoutCone = false\n')
+            (admin/'info').mkdir(exist_ok=True);(admin/'info/sparse-checkout').write_text('\n'.join('/'+p for p in list(row['files'])+row['children'])+'\n')
+            git(target,'read-tree','-mu','HEAD')
+            require(git(target,'rev-parse','HEAD').decode().strip()==row['commit'],'exact repo HEAD')
+            for name,wanted in row['files'].items():
+                path=target/name;data=os.readlink(path).encode() if wanted['mode']=='120000' else path.read_bytes()
+                require(len(data)==wanted['bytes'] and hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==wanted['blob'],'exact source blob '+str(path))
+            require(bind(common/'config')==before,'shared common config unchanged')
+            record['repositories'].append(dict(path=str(target),head=row['commit'],common_config_unchanged=before))
+        for row in record['repositories']:
+            require(not git(Path(row['path']),'status','--porcelain','--untracked-files=normal').decode(),'clean real source worktree '+row['path'])
+        record.update(state='PASS exact borrow-only source prepared; no compiler/model/reader; final capacity pending',resources=budget(),
+            files=[bind(SOURCE/r['relative']/name) for r in plan['repositories'] for name in r['files']],
+            source_defaults_are_lineage_only=dict(i_lines=256,d_lines=256,sets=256),prospective_run_defines=dict(BP_CACHE_MISS_TRACE=0),capacity_selection=None)
+    except BaseException as error:record.update(state='FAIL source preparation preserved',error=repr(error));raise
+    finally:
+        with (HERE/'source-materialization256-04.json').open('x') as f:json.dump(record,f,indent=2);f.write('\n')
+    print(HERE/'source-materialization256-04.json',record['state'])
+
+
+if __name__=='__main__':main()
