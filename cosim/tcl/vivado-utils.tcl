@@ -109,6 +109,33 @@ proc vivado_impl_wrap { do_impl threads } {
             puts "BSG-INFO: implementation strategy ${strategy}"
             set_property strategy ${strategy} [get_runs impl_1]
         }
+        # Override only opt_design after the existing named strategy has
+        # populated all implementation steps; never select a new strategy.
+        set selected [vivado_env_default IMPL_OPT_DIRECTIVE "Explore"]
+        if {$selected ni {Explore ExploreArea ExploreSequentialArea}} {
+            error "unsupported IMPL_OPT_DIRECTIVE '$selected'"
+        }
+        set run [get_runs impl_1]
+        set changed_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE
+        set before [dict create]
+        foreach name [lsort [list_property $run]] {
+            if {[string match STEPS.* $name] && $name ne $changed_property} {
+                dict set before $name [get_property $name $run]
+            }
+        }
+        set_property $changed_property $selected $run
+        if {[get_property $changed_property $run] ne $selected} {
+            error "Vivado lost requested opt_design directive"
+        }
+        set receipt [open implementation-selection.tsv w]
+        puts $receipt "selected_opt_directive\t$selected"
+        dict for {name expected} $before {
+            set actual [get_property $name $run]
+            puts $receipt "$name\t[list $expected]\t[list $actual]"
+            if {$actual ne $expected} {error "opt-only selection changed $name"}
+        }
+        close $receipt
+        puts "BP-IMPL-OPT-CONFIG: requested=$selected actual=[get_property $changed_property $run] other_step_properties_unchanged=1"
         launch_runs impl_1 -to_step write_bitstream -jobs ${threads}
         wait_on_run impl_1
         open_run impl_1 -name impl_1
