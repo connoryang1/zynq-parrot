@@ -1,0 +1,3 @@
+This records the newly linked joint instruction/data capacity guest and its static proof. The six-command build completes in 6.439 seconds with exact source and cleanup checks. Model execution and full waveform audit remain pending, so this is not evidence that both full buffers work together or improve performance.
+
+The guest fills 256 complete instruction lines and 256 complete data lines in advisory-only mode. Linked checks cover all generated payloads, guards, ELF ABI, NBF file-backed bytes and the protected path with one declared instruction-call site and one data-load site. Full inputs and ELF/NBF are recoverable in the bound external archive, with every original retained; the native 46 MiB bound grants no physical FPGA memory allocation.

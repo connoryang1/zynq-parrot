@@ -1,0 +1,343 @@
+{
+  "state": "PASS one NEW joint guest software/static proof only; no model/audit/board",
+  "source_plan": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-joint-build-preparation-20261122/plan.json",
+    "bytes": 16827,
+    "sha256": "1aaffd1527058fbf0c864d0cb66e42443b60d96a507a1afb0e22504f4335b516"
+  },
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-joint-build-preparation-20261122/admission.FINAL.json",
+    "bytes": 1222,
+    "sha256": "07b0aebbe012eb043af916f68607fbcf4ce860ce2106543f503d2f629be3d9f9"
+  },
+  "commands": [
+    {
+      "label": "compile",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I/home/coyang/zynq-parrot-retained-observation/software/include",
+        "-I/run/user/1001/zp-csr-joint-software-20261122-01",
+        "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+        "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+        "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+        "-DBP_FPGA_PROGRAM=1",
+        "-DNUM_THREADS=2",
+        "-DBP_NUM_THREADS=2",
+        "-DBP_NUM_CONTEXTS=4",
+        "-DCAP_MAX_LINES=1792",
+        "-DCAP_MAX_SETS=256",
+        "-DCAP_CODE_FUNCTIONS=1792",
+        "-o",
+        "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/csr-joint-capacity-preparation-20261122/retained_joint_capacity_test.c",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/csr-joint-capacity-preparation-20261122/retained_joint_capacity.S"
+      ],
+      "timeout_seconds": 60,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-gcc",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-I/home/coyang/zynq-parrot-retained-observation/software/include",
+          "-I/run/user/1001/zp-csr-joint-software-20261122-01",
+          "-I/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include",
+          "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/dramfs.specs",
+          "--specs=/home/coyang/zynq-parrot/install/riscv64-unknown-elf/lib/perch.specs",
+          "-DBP_FPGA_PROGRAM=1",
+          "-DNUM_THREADS=2",
+          "-DBP_NUM_THREADS=2",
+          "-DBP_NUM_CONTEXTS=4",
+          "-DCAP_MAX_LINES=1792",
+          "-DCAP_MAX_SETS=256",
+          "-DCAP_CODE_FUNCTIONS=1792",
+          "-o",
+          "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf",
+          "/home/coyang/zynq-parrot-linux-host-observer/research/csr-joint-capacity-preparation-20261122/retained_joint_capacity_test.c",
+          "/home/coyang/zynq-parrot-linux-host-observer/research/csr-joint-capacity-preparation-20261122/retained_joint_capacity.S"
+        ],
+        "owned_pgid": 1543581,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 60,
+        "teardown_s": 5,
+        "elapsed_s": 0.35871870699338615
+      },
+      "log": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/compile.log",
+        "bytes": 234,
+        "sha256": "30242f8183ccffb0d4ff4bf6f0c35436a2ab6cfff3dd39a36282337b3ab7668c"
+      }
+    },
+    {
+      "label": "symbols",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-nm",
+        "-n",
+        "-S",
+        "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+      ],
+      "timeout_seconds": 60,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-nm",
+          "-n",
+          "-S",
+          "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+        ],
+        "owned_pgid": 1543588,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 60,
+        "teardown_s": 5,
+        "elapsed_s": 0.09026403399184346
+      },
+      "log": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/symbols.log",
+        "bytes": 130097,
+        "sha256": "b27eaa17436bc0e12e722351b25a8cd85770c09ed52868472145b31fbce90916"
+      }
+    },
+    {
+      "label": "disassembly",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-objdump",
+        "-d",
+        "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+      ],
+      "timeout_seconds": 60,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-objdump",
+          "-d",
+          "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+        ],
+        "owned_pgid": 1543589,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 60,
+        "teardown_s": 5,
+        "elapsed_s": 0.30460336501710117
+      },
+      "log": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/disassembly.log",
+        "bytes": 2526022,
+        "sha256": "64223be9b5c7a29c3591576fbf3e2513287a7723c011b1a62d1f96e6734d018d"
+      }
+    },
+    {
+      "label": "readelf",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-readelf",
+        "-a",
+        "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+      ],
+      "timeout_seconds": 60,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-readelf",
+          "-a",
+          "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+        ],
+        "owned_pgid": 1543590,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 60,
+        "teardown_s": 5,
+        "elapsed_s": 0.08609035599511117
+      },
+      "log": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/readelf.log",
+        "bytes": 457331,
+        "sha256": "7dc5b46f8690bc07540af77a5eb71deee0c55a2ae0a3d1f30e6c4a5b0bc5c2a7"
+      }
+    },
+    {
+      "label": "compiler-comment",
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-readelf",
+        "-p",
+        ".comment",
+        "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+      ],
+      "timeout_seconds": 60,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/riscv64-unknown-elf-readelf",
+          "-p",
+          ".comment",
+          "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf"
+        ],
+        "owned_pgid": 1543591,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 60,
+        "teardown_s": 5,
+        "elapsed_s": 0.07954433001577854
+      },
+      "log": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/compiler-comment.log",
+        "bytes": 110,
+        "sha256": "2fbde8f0a9fac97d36c6479ee16dcb2ce5632d41d658ad7223414b1ed4a3bdd4"
+      }
+    },
+    {
+      "label": "nbf",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/coyang/zynq-parrot-retained-observation/import/black-parrot/bp_common/software/py/nbf.py",
+        "--skip_zeros",
+        "--keep_mem_zeros",
+        "--config",
+        "--mem",
+        "/run/user/1001/zp-csr-joint-software-20261122-01/prog.mem",
+        "--ncpus",
+        "1"
+      ],
+      "timeout_seconds": 60,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/zynq-parrot-retained-observation/import/black-parrot/bp_common/software/py/nbf.py",
+          "--skip_zeros",
+          "--keep_mem_zeros",
+          "--config",
+          "--mem",
+          "/run/user/1001/zp-csr-joint-software-20261122-01/prog.mem",
+          "--ncpus",
+          "1"
+        ],
+        "owned_pgid": 1543592,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 60,
+        "teardown_s": 5,
+        "elapsed_s": 1.108676181989722
+      },
+      "log": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/nbf.log",
+        "bytes": 2641208,
+        "sha256": "11721c8556d0ffe309d986c9c4413cb43bb7a12f05f3c56565cd2de00d002869"
+      }
+    }
+  ],
+  "process": {
+    "pid": 1543580,
+    "pgid": 1543580
+  },
+  "no_model_audit_board_vendor": true,
+  "generated": {
+    "path": "/run/user/1001/zp-csr-joint-software-20261122-01/capacity_targets.inc",
+    "bytes": 1000980,
+    "sha256": "30c7a07a845c5e6d1b70af51a7e6bb5e247539ac09adb11f5ebbfdd57a9444d7"
+  },
+  "program": {
+    "path": "/run/user/1001/zp-csr-joint-software-20261122-01/manifest.json",
+    "bytes": 236028,
+    "sha256": "0ac7bbd2b3a2dddccef9d510714b18d0486ee87cceccdaa94c19179326231900"
+  },
+  "source_endcheck": "PASS",
+  "elapsed_seconds": 6.43913158797659,
+  "owned_group_remaining": false
+}
