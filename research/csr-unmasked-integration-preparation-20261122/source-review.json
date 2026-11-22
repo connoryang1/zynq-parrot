@@ -1,0 +1,154 @@
+{
+  "schema": "csr-unmasked-integration-source-preview-v1",
+  "state": "UNLAUNCHABLE UNCOMPILED SOURCE ONLY",
+  "baseline_BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "baseline_TOP": "1008854d30e5d923c86c3232fc22af039467d552",
+  "exact_mapped_module_sha256": "e5a1518bd6a587157e73895c2e962dd467438e2c25565ea3223d2fb259e5f805",
+  "preview_top_sha256": "96915d9ea91370349975b758b862eddd031e8f44e961c224e69dddf5a115a79c",
+  "old_masked_top_preview_byte_identical": true,
+  "old_masked_preview_commit": "9aaf068a856ca4718fff9872770f9233aedc6027",
+  "six_edit_regions": [
+    {
+      "purpose": "CSR array declaration",
+      "old_bytes": 83,
+      "new_bytes": 68
+    },
+    {
+      "purpose": "single-write store instance and qualified intents",
+      "old_bytes": 78,
+      "new_bytes": 1382
+    },
+    {
+      "purpose": "sole snapshot read",
+      "old_bytes": 77,
+      "new_bytes": 39
+    },
+    {
+      "purpose": "CSR reset assignments",
+      "old_bytes": 94,
+      "new_bytes": 0
+    },
+    {
+      "purpose": "CSR save assignments",
+      "old_bytes": 170,
+      "new_bytes": 0
+    },
+    {
+      "purpose": "CSR seed-only block",
+      "old_bytes": 631,
+      "new_bytes": 0
+    }
+  ],
+  "all_non_CSR_bytes_outside_six_regions_unchanged": true,
+  "actual_candidate_source": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation05/candidate.sv",
+    "bytes": 1326,
+    "sha256": "e5a1518bd6a587157e73895c2e962dd467438e2c25565ea3223d2fb259e5f805"
+  },
+  "assertions": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+    "bytes": 5738,
+    "sha256": "1754071b0512ab5974219a7c9c7d0d834e20ec008405388b16efeeed3f17b3ec"
+  },
+  "assertions_compiled": false,
+  "isolated_patch_apply_reverse": "PASS",
+  "production_sources_changed": false,
+  "compiler_model_reader_vendor_runs": 0,
+  "promotion_approved": false,
+  "pending_gates": [
+    "complete mapped consumer result, independent review",
+    "fresh integration model with exact source inclusion and assertions",
+    "fullcore/nonresident/privilege/interrupt/RPC regressions",
+    "whole-device fit before application qualification"
+  ],
+  "sources": [
+    {
+      "git_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "path": "bp_be/src/v/bp_be_top.sv",
+      "bytes": 87687,
+      "sha256": "c8a14b45e8a0034c2926c3fe66c87ac7263a1f948f9c8e280f911b78fb3b32ca"
+    },
+    {
+      "git_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "bytes": 53492,
+      "sha256": "2a13acd2135c43e6ea00b8c3f9cb55d6ee70456c3935b334b4927f9cd4456d8d"
+    },
+    {
+      "git_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "path": "bp_be/src/v/bp_be_csr_wrapper_mt.sv",
+      "bytes": 22479,
+      "sha256": "cf013686c8aac9dc78adf60c05644b6c8a9be130fbf3eb4d11e7c18b77bb514e"
+    },
+    {
+      "git_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_pipe_sys.sv",
+      "bytes": 16586,
+      "sha256": "2b75573cd851ebbfbae7ff6e868f25f01d25f572808be28ccc220a80d1920b72"
+    },
+    {
+      "git_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "path": "bp_common/src/include/bp_common_aviary_defines.svh",
+      "bytes": 32097,
+      "sha256": "534fb7f884e50131d4089e8b16f2be804db7af1ef38226e551dec448d30f6f8f"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_context_csr_rebind_test.c",
+      "bytes": 3836,
+      "sha256": "620accc7140d9f6796932080709e7c0c2407815e379ba44abadeeff9d29ff5ca"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_umode_nonresident_sv39_data_handoff_test.c",
+      "bytes": 344,
+      "sha256": "95c9563fe5a65e3c15c276a51e2686db6fd63faea685d07e840bf0e1183a3993"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_umode_nonresident_handoff_test.c",
+      "bytes": 7377,
+      "sha256": "6edaed04ae5e1e8f2c127a83234f93fae4e71407c2a6fe0994ef77428e9229d4"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_resident_reseed_irq_test.c",
+      "bytes": 369,
+      "sha256": "cb07bd418a6454483a06c95e7dadb4e9371c495aa218020892b7da26fdc0ae29"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_resident_reseed_fetch_test.c",
+      "bytes": 13783,
+      "sha256": "095a920bb4d995c4c9a07a7c00475409ba894a8039213f51e56d31d9db6a7f3a"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_protected_rpc_hardware_test.c",
+      "bytes": 13302,
+      "sha256": "0b4e68e53f7385a48b4a6ea3c83d228412df146ec12341b368c0aa7af3e748f5"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/mt_seed.h",
+      "bytes": 3351,
+      "sha256": "f2b82e27b9f242efec101b40b3ec77da9f7152114be196fb8bd3d5f88a5bcbe3"
+    },
+    {
+      "git_commit": "1008854d30e5d923c86c3232fc22af039467d552",
+      "path": "testing/Makefile",
+      "bytes": 17777,
+      "sha256": "e76712c343a5bb2486caeda82d27e22726864339db9deabd447035cae29c16ef"
+    }
+  ],
+  "prior_masked_source_review_origin": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-snapshot-integration-preparation-20261122/source-review.json",
+    "bytes": 6020,
+    "sha256": "23d1a31fa6b8e4cabadcd5b443e753d6907f0900699beba7b4c09d8f5edeeb69"
+  },
+  "prior_masked_source_review": {
+    "path": "masked-source-review.json",
+    "bytes": 6020,
+    "sha256": "23d1a31fa6b8e4cabadcd5b443e753d6907f0900699beba7b4c09d8f5edeeb69"
+  }
+}
