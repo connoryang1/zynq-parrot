@@ -1,0 +1,155 @@
+{
+  "state": "PASS four unchanged architectural tests on new CSR-unmasked qualified model; no performance claim",
+  "model": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15954328,
+    "sha256": "9473086b6efb79a562c9f27882f435a6eaa558b0d363b1ce8184f19d02124a71"
+  },
+  "scope": "architectural/CSR/privilege correctness only",
+  "tests": [
+    {
+      "test": "mt_context_csr_rebind_test",
+      "state": "PASS checked architectural return on new qualified model",
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-regression-preparation-20261122/software/mt_context_csr_rebind_test.c",
+        "bytes": 3836,
+        "sha256": "620accc7140d9f6796932080709e7c0c2407815e379ba44abadeeff9d29ff5ca"
+      },
+      "elf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_context_csr_rebind_test/prog.riscv",
+        "bytes": 168720,
+        "sha256": "d211a02176de8ad391b690f611354d21ea0e2cfe9fb169db894c3fba1eb1d772"
+      },
+      "nbf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_context_csr_rebind_test/prog.nbf",
+        "bytes": 121471,
+        "sha256": "8a759a072461910507c3704ae04814dd8dbae14b9443df0e10a515c2dbabdc7e"
+      },
+      "trace": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_context_csr_rebind_test/trace.fst",
+        "bytes": 559384,
+        "sha256": "93770ea777b3d0a973ada9264cc490f8ffe9d69a00aa77d9208a6e84167b5f43"
+      },
+      "returncode": -6,
+      "seconds": 41.78388676093891,
+      "argv": [
+        "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_context_csr_rebind_test/trace.fst"
+      ],
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_context_csr_rebind_test/run.log",
+        "bytes": 32290,
+        "sha256": "f66d1f2f0281604ecaf4ddcf4c63df845d3bc31294f3ab5b8e43e2bff67b5611"
+      }
+    },
+    {
+      "test": "mt_umode_nonresident_sv39_data_handoff_test",
+      "state": "PASS checked architectural return on new qualified model",
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-regression-preparation-20261122/software/mt_umode_nonresident_sv39_data_handoff_test.c",
+        "bytes": 344,
+        "sha256": "95c9563fe5a65e3c15c276a51e2686db6fd63faea685d07e840bf0e1183a3993"
+      },
+      "elf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_umode_nonresident_sv39_data_handoff_test/prog.riscv",
+        "bytes": 184184,
+        "sha256": "da3287b62c5ce3adc5fcea0dc412f33dcfbd4f50dedf2c00b3bc83ac2b1f5cc5"
+      },
+      "nbf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_umode_nonresident_sv39_data_handoff_test/prog.nbf",
+        "bytes": 177637,
+        "sha256": "23039d55bdf35966ee3e39e553ad62b672a9bafedf55f34986738c6f89f25e56"
+      },
+      "trace": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_umode_nonresident_sv39_data_handoff_test/trace.fst",
+        "bytes": 957157,
+        "sha256": "4ec6b3bf926a10a07e029af8eee9fa7123b242e418274c04353770ca96aeaef5"
+      },
+      "returncode": -6,
+      "seconds": 62.613664807984605,
+      "argv": [
+        "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_umode_nonresident_sv39_data_handoff_test/trace.fst"
+      ],
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_umode_nonresident_sv39_data_handoff_test/run.log",
+        "bytes": 32388,
+        "sha256": "5c2845e55415b6e19a3e88f9bce0d25c02e183412f29f2237f4f6ccb3ee8dbfe"
+      }
+    },
+    {
+      "test": "mt_resident_reseed_irq_test",
+      "state": "PASS checked architectural return on new qualified model",
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-regression-preparation-20261122/software/mt_resident_reseed_irq_test.c",
+        "bytes": 369,
+        "sha256": "cb07bd418a6454483a06c95e7dadb4e9371c495aa218020892b7da26fdc0ae29"
+      },
+      "elf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_resident_reseed_irq_test/prog.riscv",
+        "bytes": 191232,
+        "sha256": "a98580b12f13492b36b0a9911877d47537c893c3524eaf3e07e6c1b7cf0022fe"
+      },
+      "nbf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_resident_reseed_irq_test/prog.nbf",
+        "bytes": 156991,
+        "sha256": "e805e14d4341051005569d7b1fc23de1baab14dc912ffc3126c297d5e7f5426b"
+      },
+      "trace": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_resident_reseed_irq_test/trace.fst",
+        "bytes": 1275279,
+        "sha256": "fac7c46644592e67fed62e19be36b06cad0b1c6e320d6faa63f1b117938d9423"
+      },
+      "returncode": -6,
+      "seconds": 67.42846753599588,
+      "argv": [
+        "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_resident_reseed_irq_test/trace.fst"
+      ],
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_resident_reseed_irq_test/run.log",
+        "bytes": 32360,
+        "sha256": "b8c752701422c7e914cb4ad3082449aa6ab334578f67f003f89f43c105ca8b79"
+      }
+    },
+    {
+      "test": "mt_protected_rpc_hardware_test",
+      "state": "PASS checked architectural return on new qualified model",
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-regression-preparation-20261122/software/mt_protected_rpc_hardware_test.c",
+        "bytes": 13302,
+        "sha256": "0b4e68e53f7385a48b4a6ea3c83d228412df146ec12341b368c0aa7af3e748f5"
+      },
+      "elf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_protected_rpc_hardware_test/prog.riscv",
+        "bytes": 180152,
+        "sha256": "1d42ad068c1e87edfbbfe8f0f9ed4c7437669feebfd274333a59d1506815b37a"
+      },
+      "nbf": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_protected_rpc_hardware_test/prog.nbf",
+        "bytes": 157879,
+        "sha256": "f38584367a66ba8c5921d39cc94af4abecc89a8917b3b3136ab944200f33efab"
+      },
+      "trace": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_protected_rpc_hardware_test/trace.fst",
+        "bytes": 1918943,
+        "sha256": "9b6c33c7b5647729a28c6c5167dcb2b8396e8294218e25888651a27b15573e27"
+      },
+      "returncode": -6,
+      "seconds": 82.73512428102549,
+      "argv": [
+        "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_protected_rpc_hardware_test/trace.fst"
+      ],
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/architectural-regressions01/mt_protected_rpc_hardware_test/run.log",
+        "bytes": 32452,
+        "sha256": "d03f7de1d4e6ee4cdd11bda9c08b15c20cbbb810ba375c727a66bde12d12f010"
+      }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "state": "PASS estimator/schedule/outputs/complete-ledger/acquisition/recovery/reconcile preserved",
+  "baseline_commit": "bf0e88043feea53c7881700ce997488de1e70399",
+  "exact_schema_literals_normalized": {
+    "bp-retained29-borrow-trace0-capacity-analysis-v2": "VERSIONED_ANALYSIS_SCHEMA",
+    "bp-retained29-csr-trace0-capacity-analysis-v2": "VERSIONED_ANALYSIS_SCHEMA",
+    "bp-retained29-borrow-trace0-capacity-ledger-v2": "VERSIONED_LEDGER_SCHEMA",
+    "bp-retained29-csr-trace0-capacity-ledger-v2": "VERSIONED_LEDGER_SCHEMA"
+  },
+  "checks": [
+    {
+      "old": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_borrow_study.py",
+        "bytes": 22117,
+        "sha256": "e9ae4829c5dcd0cd1fc8acb8ecd0695e32b7ead372b74910fb7851179c069c62"
+      },
+      "new": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_csr_study.py",
+        "bytes": 25672,
+        "sha256": "6e784bbf151b51d5af2a01b400713584023808612e57f461831dba64cbe2fd12"
+      },
+      "unchanged_function_bodies": [
+        "schedule",
+        "source_hashes",
+        "matched_hardware",
+        "verify_study",
+        "estimate",
+        "analyze",
+        "write_outputs",
+        "main"
+      ],
+      "changed_functions": [
+        "validate_declaration",
+        "image_source_profile"
+      ],
+      "new_functions": [
+        "common_mechanism",
+        "literal_domain_equal"
+      ]
+    },
+    {
+      "old": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/run_retained29_capacity_borrow_study.py",
+        "bytes": 20469,
+        "sha256": "b53cd692a7e89d2891ceb753e8e57ffa01f6d5fecdab3dc04cface6d828f6708"
+      },
+      "new": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/run_retained29_capacity_csr_study.py",
+        "bytes": 20457,
+        "sha256": "6bd02be1de00b14eb58c8cbf4ed9da2441541f9f3e9dc10e087d887c6c1cca8a"
+      },
+      "unchanged_function_bodies": [
+        "sources",
+        "read_record",
+        "save",
+        "exact_common_busy",
+        "validate",
+        "image_ledger",
+        "prefix",
+        "expected_prior",
+        "current_snapshot",
+        "verify_prefix_snapshot",
+        "actual_start",
+        "engine_for",
+        "reconcile",
+        "prepare_dispatch",
+        "advance",
+        "main"
+      ],
+      "changed_functions": [],
+      "new_functions": []
+    }
+  ],
+  "old_test_count": 27,
+  "new_test_count": 29,
+  "new_test_cases": [
+    "all raw stream semantic fields reject corruption while path/gzip provenance differs",
+    "no predetermined large capacity or old common mechanism"
+  ],
+  "allowlists": {
+    "capacity_bridge": {},
+    "physical": {},
+    "observer": {}
+  },
+  "preparation_check_correction": "Initial AST checklist omitted the intentional ledger-schema literal; exact old/new literals were added to the version-only normalization before source-lineage PASS."
+}

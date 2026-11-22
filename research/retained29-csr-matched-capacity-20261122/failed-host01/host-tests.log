@@ -1,0 +1,66 @@
+test_both_complete_gates_recomputed_before_mathematics (test_analyze_retained29_capacity_csr_study.Admission) ... ok
+test_draft_exact_schedule_and_no_hardware_promotion (test_analyze_retained29_capacity_csr_study.Admission) ... ERROR
+test_external_study_sha_checked_before_other_inputs (test_analyze_retained29_capacity_csr_study.Admission) ... ok
+test_global_order_failures_subsets_reused_uuid_and_recovery_gap_rejected (test_analyze_retained29_capacity_csr_study.Admission) ... ok
+test_each_capacity_requires_new_CSR_BP_consumed_sources_and_three_trace0_contexts (test_analyze_retained29_capacity_csr_study.ExplicitCSRProfile) ... ok
+test_large_selection_pending_and_no_old_mechanism_approval (test_analyze_retained29_capacity_csr_study.ExplicitCSRProfile) ... ok
+test_absolute_enabled_regression_cannot_be_replaced_by_favorable_onoff (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_complete_neutral_study_and_pilot_exclusion (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_exact_repeat_boot_equal10_hierarchy (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_missing_reused_wrong_geometry_policy_or_program_rejected (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_one_configuration_cannot_gain_cycle_weight (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_test_only_exports_preserve_all_raw_cells_and_diagnostics (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_three_boot_points_and_cross_size_cluster_retained (test_analyze_retained29_capacity_csr_study.Mathematics) ... ok
+test_actual_failure_stops_whole_study_with_history_preserved (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_actual_start_precedes_target_claim_and_pass_binds_both_ledgers (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_all32_complete_slots_keep16_unique_ids_each_and_both_pilots (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_arbitrary_eagain_not_mislabeled_common_busy (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_crash_after_authoritative_pass_reconciles_no_new_collector (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_crash_after_dispatch_before_acquisition_blocks_without_reexecution (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_crash_after_known_busy_outcome_reconciles_deferred_without_retry (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_cross_image_duplicate_uuid_never_passes (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_exact_common_busy_defers_without_acquisition_then_same_slot (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_fixed_image_order_and_global_lock (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_misordered_deferred_slot_and_copied_source_corruption_rejected (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_running_authority_remains_blocked_and_no_retry (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_source_change_prevents_dispatch_and_unbound_outcome_redirect_rejected (test_run_retained29_capacity_csr_study.Coordinator) ... ok
+test_actual_draft_has_empty_approvals_and_cannot_invoke_collector (test_run_retained29_capacity_csr_study.ProductionDefault) ... ERROR
+test_cli_deferred_and_failed_states_do_not_exit_success (test_run_retained29_capacity_csr_study.ProductionDefault) ... ok
+
+======================================================================
+ERROR: test_draft_exact_schedule_and_no_hardware_promotion (test_analyze_retained29_capacity_csr_study.Admission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/test_analyze_retained29_capacity_csr_study.py", line 105, in test_draft_exact_schedule_and_no_hardware_promotion
+    d=json.loads(a.DECLARATION.read_text());a.validate_declaration(d)
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_csr_study.py", line 92, in validate_declaration
+    common_mechanism(d['common_mechanism_bridge'])
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_csr_study.py", line 68, in common_mechanism
+    require(set(q['domains'])=={'core252','observer_and_geometry','SP_strict162','capacity167','actual_geometry17'} and
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_protocol.py", line 41, in require
+    if not condition: raise ValueError(message)
+ValueError: five complete new-model literal trace domains
+
+======================================================================
+ERROR: test_actual_draft_has_empty_approvals_and_cannot_invoke_collector (test_run_retained29_capacity_csr_study.ProductionDefault)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/test_run_retained29_capacity_csr_study.py", line 211, in test_actual_draft_has_empty_approvals_and_cannot_invoke_collector
+    c.validate(value,approved=False)
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/run_retained29_capacity_csr_study.py", line 48, in validate
+    analysis.validate_declaration(read_record(config['study']));return
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_csr_study.py", line 92, in validate_declaration
+    common_mechanism(d['common_mechanism_bridge'])
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_csr_study.py", line 68, in common_mechanism
+    require(set(q['domains'])=={'core252','observer_and_geometry','SP_strict162','capacity167','actual_geometry17'} and
+  File "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_protocol.py", line 41, in require
+    if not condition: raise ValueError(message)
+ValueError: five complete new-model literal trace domains
+
+----------------------------------------------------------------------
+Ran 28 tests in 11.723s
+
+FAILED (errors=2)
+CAPACITY_ACQUISITION_STATE=DEFERRED
+CAPACITY_ACQUISITION_STATE=BLOCKED
+CAPACITY_ACQUISITION_STATE=FAIL

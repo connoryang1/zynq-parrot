@@ -1,0 +1,29 @@
+{
+  "scope": "Host/source preparation only; no physical, native-model, compiler or FST-reader execution",
+  "attempts": [
+    {
+      "id": "failed-host01",
+      "state": "FAIL two host draft-validation errors",
+      "reason": "Compared whole reader summary dictionaries including different command paths and gzip container records. All raw literal stream summary fields actually equal. Failed analyzer and all four source hashes/bytes preserved; corrected exact semantic comparison has field-corruption regression."
+    },
+    {
+      "id": "failed-host02",
+      "state": "FAIL host harness aborted before test completion; owned child cleaned/reaped",
+      "reason": "Caught FileNotFoundError while monitoring transient unittest temp files. No failing filepath/traceback was persisted; race attribution is source-supported, not an observed kernel/target failure. Revised owned-temp accounting ignores only disappeared fixture files; other failures remain fatal."
+    },
+    {
+      "id": "host-proof.json",
+      "state": "PASS29 synthetic host tests",
+      "limits": {
+        "wall_s": 90,
+        "CPU_s": 60,
+        "output_bytes": 8388608,
+        "address_space_bytes": 268435456
+      },
+      "no_remaining_owned_group": true
+    }
+  ],
+  "source_preparation_cap_bytes": 1048576,
+  "selected_large_TOP": null,
+  "selected_large_lines_per_side": null
+}

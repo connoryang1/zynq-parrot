@@ -1,0 +1,65 @@
+{
+  "schema": "bp-retained29-csr-trace0-capacity-defaults-bridge-v2",
+  "state": "DRAFT UNLAUNCHABLE",
+  "fixed": {
+    "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+    "retained_sets": 256,
+    "epoch_bits": 8,
+    "line_bytes": 64,
+    "l1i_bytes": 32768,
+    "l1d_bytes": 32768,
+    "l1_sets": 64,
+    "l1_ways": 8,
+    "l2_bytes": 16384,
+    "core_hz": 20000000,
+    "axi_hz": 20000000,
+    "num_threads": 2,
+    "num_contexts": 4,
+    "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "build_defines": {
+      "BP_RETAINED_BUFFER": 1,
+      "BP_RETAINED_OBSERVE": 1,
+      "BP_AXI_RESPONSE_DELAY": 0,
+      "BP_RETAINED_SETS": 256,
+      "BP_CACHE_MISS_TRACE": 0
+    },
+    "capture_masks": {
+      "ordinary_i": 9,
+      "ordinary_d": 6,
+      "ordinary_joint": 15
+    },
+    "source": "none",
+    "kernel_nbf_sha256": "1a06cae9ce4c93eeb634d109ce1e58d6b7d6cade85ec966e7bcd848828ef9d33",
+    "application_runtime": {
+      "profile": "old2dd-no-application-gp0-v1",
+      "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "application_gp0": false
+    }
+  },
+  "small_lines_per_side": 256,
+  "large_lines_per_side": null,
+  "source_TOPs": {
+    "small": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+    "large": null
+  },
+  "common_mechanism_bridge": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-csr-matched-capacity-20261122/mechanism-bridge.PREPARED.json",
+    "bytes": 4610,
+    "sha256": "a85f26ea05953b01ac4ea15c5c8ba0431b234e9f4901fb58e56ee5c230399657"
+  },
+  "allowed_changed_defines": [
+    "BP_RETAINED_I_LINES",
+    "BP_RETAINED_D_LINES"
+  ],
+  "selection_basis": "maximum balanced routed-fit/timing/correctness before application outcomes",
+  "selected_utc": null,
+  "source_diff_proof": null,
+  "small_fit_correctness": null,
+  "large_fit_correctness": null,
+  "cohorts": {
+    "small": null,
+    "large": null
+  },
+  "approval_entries": {}
+}
