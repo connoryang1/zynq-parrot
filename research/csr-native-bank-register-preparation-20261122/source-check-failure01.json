@@ -1,0 +1,12 @@
+{
+  "state": "FAIL_SOURCE_PREFLIGHT_ONLY",
+  "command": "python3 -B verify_sources.py",
+  "exit": 1,
+  "exception": "RuntimeError: header count",
+  "cause": "Suffix-only selector omitted actual include bsg_defines.sv, which uses .sv extension. Metadata source-context45 includes it; no source-byte/RTL/tool failure.",
+  "failed_script_sha256": "705fdef92006b0956489a4edf5110aaf6774ba29094cfbb8dd4343e512695b85",
+  "reconstruct_failed_script_from_fixed": "replace exact corrected_text with original_text once",
+  "original_text": "if Path(row[\"path\"]).suffix in (\".svh\", \".vh\", \".vi\")]",
+  "corrected_text": "if Path(row[\"path\"]).suffix in (\".svh\", \".vh\", \".vi\")\n               or Path(row[\"path\"]).name == \"bsg_defines.sv\"]",
+  "no_elaboration_mapping_or_target": true
+}
