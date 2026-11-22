@@ -1,0 +1,5 @@
+This records the first executed architectural-interface comparison for the real two-bank CSR storage boundary. It tests the RAM-backed candidate against an independently constructed old FF snapshot implementation, while keeping the actual CSR banks and production configuration.
+
+All five sequential simulator commands passed in28.644s. The positive run completed170 full-output comparisons over90 cycles, with29 architectural reads,6 saves and13 reloads; the independent MEPC bit2 mutation was detected at cycle39/check73. Exact sources, seven feature defines, timescale-only temporary transformations and source-end checks passed.
+
+The comparison covers the external bank interface and explicit controller-state cuts. It does not prove unrestricted scheduler reachability, mapped primitive behavior, whole-core timing, physical fit or application benefit. Those gates remain separate. The full144-member WORK plus source/authority packet is durably copied and byte/mode/link verified under the external closure recorded in `result.json`; original files remain and only unused future growth closes.

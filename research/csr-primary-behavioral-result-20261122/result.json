@@ -1,0 +1,66 @@
+{
+  "state": "PASS behavioral RAM real-CSR primary equivalence plus observable MEPC negative; not mapped/fullcore",
+  "elapsed_seconds": 28.64435760001652,
+  "source_plan": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-primary-behavioral-preparation-20261122/plan.json",
+    "bytes": 32717,
+    "sha256": "354d1b12a6466535bbd32d815fce2d235a0f2397d942c91884de70c069bce8a1"
+  },
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-primary-behavioral-preparation-20261122/admission.FINAL.json",
+    "bytes": 1130,
+    "sha256": "4ba1c17560c28d3f1cd560f3afba75dc87dd1fe290db15233d156f688dc18103"
+  },
+  "source_endcheck": "PASS",
+  "commands": [
+    {
+      "label": "xvlog-global",
+      "elapsed_seconds": 2.258151671034284,
+      "returncode": 0,
+      "owned_group_remaining": false,
+      "analysis": null,
+      "actual_xelab_slave_threads": null
+    },
+    {
+      "label": "xvlog-RTL",
+      "elapsed_seconds": 2.5333013420458883,
+      "returncode": 0,
+      "owned_group_remaining": false,
+      "analysis": null,
+      "actual_xelab_slave_threads": null
+    },
+    {
+      "label": "xelab",
+      "elapsed_seconds": 8.773795518907718,
+      "returncode": 0,
+      "owned_group_remaining": false,
+      "analysis": null,
+      "actual_xelab_slave_threads": 10
+    },
+    {
+      "label": "negative",
+      "elapsed_seconds": 6.963196433032863,
+      "returncode": 0,
+      "owned_group_remaining": false,
+      "analysis": {
+        "marker": "CSR_PRIMARY_NEGATIVE_DETECTED interface=mepc bit=2 cycles=39 checks=73"
+      },
+      "actual_xelab_slave_threads": null
+    },
+    {
+      "label": "positive",
+      "elapsed_seconds": 6.889828384038992,
+      "returncode": 0,
+      "owned_group_remaining": false,
+      "analysis": {
+        "marker": "CSR_PRIMARY_EQUIVALENCE_PASS checks=170 cycles=90 reads=29 saves=6 reloads=13"
+      },
+      "actual_xelab_slave_threads": null
+    }
+  ],
+  "closure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-primary-behavioral-20261122/closed01/complete.json",
+    "sha256": "7c818babfeea2666f0fa8ae5ad835dff258404f1baf4bad41ae03282175ae003"
+  },
+  "scope": "Behavioral RAM DUT, actual2CSRbanks/4logicalcontexts, controller-state cuts; not mapped/wholecore/fit/performance qualification"
+}
