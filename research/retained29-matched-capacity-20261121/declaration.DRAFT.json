@@ -1,0 +1,1367 @@
+{
+  "schema": "bp-retained29-matched-capacity-study-v1",
+  "state": "DRAFT UNLAUNCHABLE",
+  "fixed": {
+    "BP": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+    "retained_sets": 256,
+    "epoch_bits": 8,
+    "line_bytes": 64,
+    "l1i_bytes": 32768,
+    "l1d_bytes": 32768,
+    "l1_sets": 64,
+    "l1_ways": 8,
+    "l2_bytes": 16384,
+    "core_hz": 20000000,
+    "axi_hz": 20000000,
+    "num_threads": 2,
+    "num_contexts": 4,
+    "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "build_defines": {
+      "BP_RETAINED_BUFFER": 1,
+      "BP_RETAINED_OBSERVE": 1,
+      "BP_AXI_RESPONSE_DELAY": 0
+    },
+    "capture_masks": {
+      "ordinary_i": 9,
+      "ordinary_d": 6,
+      "ordinary_joint": 15
+    },
+    "source": "none",
+    "kernel_nbf_sha256": "1a06cae9ce4c93eeb634d109ce1e58d6b7d6cade85ec966e7bcd848828ef9d33",
+    "application_runtime": {
+      "profile": "old2dd-no-application-gp0-v1",
+      "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+      "helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+      "application_gp0": false
+    }
+  },
+  "primary": {
+    "policy": "ordinary-joint",
+    "mask": 15,
+    "endpoint": "whole",
+    "contrast": "enabled_large/enabled_small",
+    "repeats": "GM four paired repeat ratios within same indexed workload boot",
+    "boots": "GM three boot estimates per workload/size configuration",
+    "configurations": "equal-weight GM ten workload/size configurations",
+    "uncertainty": "all three boot estimates and ranges; no CI/P/bootstrap"
+  },
+  "small_lines_per_side": 256,
+  "small_total_payload_bytes": 32768,
+  "selected_large_lines_per_side": null,
+  "candidate_large_lines_per_side": 1792,
+  "candidate_total_payload_bytes": 229376,
+  "candidate_scope": "R7 proposed1792-per-side, not fitted/selected/physical PASS",
+  "source_capacity_bridge": null,
+  "cohorts": {
+    "small": null,
+    "large": null
+  },
+  "attempt_ledger_path": null,
+  "sources": {
+    "analysis": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_study.py",
+      "bytes": 17818,
+      "sha256": "88ef0a03513a3bb7733c7544a90f55b301a7bd721bea00a59472e394305ddd8c"
+    },
+    "within_analysis": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_cost_cohort.py",
+      "bytes": 17021,
+      "sha256": "998760c72ee6ffd51458e593ee0f1cc2b4f618563fa5843838591fef51ef0d89"
+    },
+    "promotion_verifier": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_cost_cohort_protocol.py",
+      "bytes": 13279,
+      "sha256": "f8b0b84b0cbde973c66f811551b68ea0f7893f31b1acf4fc5c55e84fd5f478b6"
+    }
+  },
+  "program_sha256": {
+    "plain": "770bbfdb7ee5e92ce78fdf53bd029ebfe9c68586870c80946f7dc1b2a09e31b1",
+    "regex": "e1693d512042779b5496f755d67377681d35926ffbb46e69ca5ff7cc0998969e",
+    "probe": "9bb01f51b23ca190e7c1bc1c1bc935c01f3441bacab79463438312084c13f79a"
+  },
+  "visits_per_image": [
+    {
+      "id": "pilot",
+      "order": 0,
+      "round": null,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-pilot-functional",
+        "workload": null,
+        "rotation": 0,
+        "loops": 8,
+        "repeats": 2,
+        "warmup": 4,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "lookup-32-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "lookup-32-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "lookup-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "regex-32-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "regex-32-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "regex-32-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "r0-scan",
+      "order": 1,
+      "round": 0,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "scan",
+        "rotation": 0,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "scan-32-ordinary-i",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "scan-32-ordinary-d",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "scan-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "scan-128-ordinary-i",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "scan-128-ordinary-d",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "scan-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "r0-lookup",
+      "order": 2,
+      "round": 0,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "lookup",
+        "rotation": 0,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "lookup-32-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "lookup-32-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "lookup-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "lookup-128-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "lookup-128-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "lookup-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "r0-parse",
+      "order": 3,
+      "round": 0,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "parse",
+        "rotation": 0,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "parse-32-ordinary-i",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "parse-32-ordinary-d",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "parse-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "parse-128-ordinary-i",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "parse-128-ordinary-d",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "parse-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "r0-chase",
+      "order": 4,
+      "round": 0,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "chase",
+        "rotation": 0,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "chase-32-ordinary-i",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "chase-32-ordinary-d",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "chase-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "chase-128-ordinary-i",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "chase-128-ordinary-d",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "chase-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "r0-regex",
+      "order": 5,
+      "round": 0,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "regex",
+        "rotation": 0,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "regex-32-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "regex-32-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "regex-32-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "regex-128-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "regex-128-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "regex-128-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "r1-regex",
+      "order": 6,
+      "round": 1,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "regex",
+        "rotation": 2,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "regex-32-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "regex-128-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "regex-128-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "regex-128-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "regex-32-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "regex-32-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "r1-chase",
+      "order": 7,
+      "round": 1,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "chase",
+        "rotation": 2,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "chase-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "chase-128-ordinary-i",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "chase-128-ordinary-d",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "chase-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "chase-32-ordinary-i",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "chase-32-ordinary-d",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "r1-parse",
+      "order": 8,
+      "round": 1,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "parse",
+        "rotation": 2,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "parse-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "parse-128-ordinary-i",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "parse-128-ordinary-d",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "parse-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "parse-32-ordinary-i",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "parse-32-ordinary-d",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "r1-lookup",
+      "order": 9,
+      "round": 1,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "lookup",
+        "rotation": 2,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "lookup-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "lookup-128-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "lookup-128-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "lookup-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "lookup-32-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "lookup-32-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "r1-scan",
+      "order": 10,
+      "round": 1,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "scan",
+        "rotation": 2,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "scan-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "scan-128-ordinary-i",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "scan-128-ordinary-d",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "scan-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "scan-32-ordinary-i",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "scan-32-ordinary-d",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "r2-lookup",
+      "order": 11,
+      "round": 2,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "lookup",
+        "rotation": 4,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "lookup-128-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "lookup-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "lookup-32-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "lookup-32-ordinary-d",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "lookup-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "lookup-128-ordinary-i",
+            "kind": "plain",
+            "workload": "lookup",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "r2-chase",
+      "order": 12,
+      "round": 2,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "chase",
+        "rotation": 4,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "chase-128-ordinary-d",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "chase-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "chase-32-ordinary-i",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "chase-32-ordinary-d",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "chase-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "chase-128-ordinary-i",
+            "kind": "plain",
+            "workload": "chase",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "r2-scan",
+      "order": 13,
+      "round": 2,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "scan",
+        "rotation": 4,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "scan-128-ordinary-d",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "scan-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "scan-32-ordinary-i",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "scan-32-ordinary-d",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "scan-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "scan-128-ordinary-i",
+            "kind": "plain",
+            "workload": "scan",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "r2-regex",
+      "order": 14,
+      "round": 2,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "regex",
+        "rotation": 4,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "regex-128-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "regex-128-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "regex-32-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "regex-32-ordinary-d",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "regex-32-ordinary-joint",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "regex-128-ordinary-i",
+            "kind": "regex",
+            "workload": "regex",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          }
+        ]
+      }
+    },
+    {
+      "id": "r2-parse",
+      "order": 15,
+      "round": 2,
+      "independent_boot": true,
+      "plan": {
+        "role": "cost-performance-acquisition",
+        "workload": "parse",
+        "rotation": 4,
+        "loops": 256,
+        "repeats": 4,
+        "warmup": 16,
+        "sync": "futex",
+        "profile": "plain",
+        "advisory_source": "none",
+        "cases": [
+          {
+            "id": "parse-128-ordinary-d",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "parse-128-ordinary-joint",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "parse-32-ordinary-i",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-i",
+            "mask": 9
+          },
+          {
+            "id": "parse-32-ordinary-d",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-d",
+            "mask": 6
+          },
+          {
+            "id": "parse-32-ordinary-joint",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 32,
+            "policy": "ordinary-joint",
+            "mask": 15
+          },
+          {
+            "id": "parse-128-ordinary-i",
+            "kind": "plain",
+            "workload": "parse",
+            "kib": 128,
+            "policy": "ordinary-i",
+            "mask": 9
+          }
+        ]
+      }
+    }
+  ],
+  "schedule": [
+    {
+      "order": 0,
+      "image": "small",
+      "visit_id": "pilot",
+      "cohort_index": 0
+    },
+    {
+      "order": 1,
+      "image": "large",
+      "visit_id": "pilot",
+      "cohort_index": 0
+    },
+    {
+      "order": 2,
+      "image": "small",
+      "visit_id": "r0-scan",
+      "cohort_index": 1
+    },
+    {
+      "order": 3,
+      "image": "large",
+      "visit_id": "r0-scan",
+      "cohort_index": 1
+    },
+    {
+      "order": 4,
+      "image": "large",
+      "visit_id": "r0-lookup",
+      "cohort_index": 2
+    },
+    {
+      "order": 5,
+      "image": "small",
+      "visit_id": "r0-lookup",
+      "cohort_index": 2
+    },
+    {
+      "order": 6,
+      "image": "small",
+      "visit_id": "r0-parse",
+      "cohort_index": 3
+    },
+    {
+      "order": 7,
+      "image": "large",
+      "visit_id": "r0-parse",
+      "cohort_index": 3
+    },
+    {
+      "order": 8,
+      "image": "large",
+      "visit_id": "r0-chase",
+      "cohort_index": 4
+    },
+    {
+      "order": 9,
+      "image": "small",
+      "visit_id": "r0-chase",
+      "cohort_index": 4
+    },
+    {
+      "order": 10,
+      "image": "small",
+      "visit_id": "r0-regex",
+      "cohort_index": 5
+    },
+    {
+      "order": 11,
+      "image": "large",
+      "visit_id": "r0-regex",
+      "cohort_index": 5
+    },
+    {
+      "order": 12,
+      "image": "large",
+      "visit_id": "r1-regex",
+      "cohort_index": 6
+    },
+    {
+      "order": 13,
+      "image": "small",
+      "visit_id": "r1-regex",
+      "cohort_index": 6
+    },
+    {
+      "order": 14,
+      "image": "small",
+      "visit_id": "r1-chase",
+      "cohort_index": 7
+    },
+    {
+      "order": 15,
+      "image": "large",
+      "visit_id": "r1-chase",
+      "cohort_index": 7
+    },
+    {
+      "order": 16,
+      "image": "large",
+      "visit_id": "r1-parse",
+      "cohort_index": 8
+    },
+    {
+      "order": 17,
+      "image": "small",
+      "visit_id": "r1-parse",
+      "cohort_index": 8
+    },
+    {
+      "order": 18,
+      "image": "small",
+      "visit_id": "r1-lookup",
+      "cohort_index": 9
+    },
+    {
+      "order": 19,
+      "image": "large",
+      "visit_id": "r1-lookup",
+      "cohort_index": 9
+    },
+    {
+      "order": 20,
+      "image": "large",
+      "visit_id": "r1-scan",
+      "cohort_index": 10
+    },
+    {
+      "order": 21,
+      "image": "small",
+      "visit_id": "r1-scan",
+      "cohort_index": 10
+    },
+    {
+      "order": 22,
+      "image": "small",
+      "visit_id": "r2-lookup",
+      "cohort_index": 11
+    },
+    {
+      "order": 23,
+      "image": "large",
+      "visit_id": "r2-lookup",
+      "cohort_index": 11
+    },
+    {
+      "order": 24,
+      "image": "large",
+      "visit_id": "r2-chase",
+      "cohort_index": 12
+    },
+    {
+      "order": 25,
+      "image": "small",
+      "visit_id": "r2-chase",
+      "cohort_index": 12
+    },
+    {
+      "order": 26,
+      "image": "small",
+      "visit_id": "r2-scan",
+      "cohort_index": 13
+    },
+    {
+      "order": 27,
+      "image": "large",
+      "visit_id": "r2-scan",
+      "cohort_index": 13
+    },
+    {
+      "order": 28,
+      "image": "large",
+      "visit_id": "r2-regex",
+      "cohort_index": 14
+    },
+    {
+      "order": 29,
+      "image": "small",
+      "visit_id": "r2-regex",
+      "cohort_index": 14
+    },
+    {
+      "order": 30,
+      "image": "small",
+      "visit_id": "r2-parse",
+      "cohort_index": 15
+    },
+    {
+      "order": 31,
+      "image": "large",
+      "visit_id": "r2-parse",
+      "cohort_index": 15
+    }
+  ],
+  "failure_policy": "first failed attempt stops study; no retries, subsets or winner selection",
+  "unresolved": [
+    "large routed-fit/timing plus full capacity correctness selection",
+    "small256 baseline routed-fit/timing/full capacity correctness",
+    "both exact physical source/clock/capacity/observer/capability/functional proofs",
+    "two predeclared promotion cohorts plus their passed COST pilots",
+    "registered root-reviewed defaults-only capacity bridge",
+    "source-bound global32attempt collector/ledger and actual acquisitions"
+  ],
+  "prior_declaration": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained29-cost-cohort-20261121/cohort-draft.json",
+    "bytes": 61368,
+    "sha256": "a7cfd821be032dac5f42cd25b2d6e62e4df7a5ed591b1f2ba77585bf5c84eb9c"
+  },
+  "physical_allowlist_entries": {},
+  "observer_allowlist_entries": {},
+  "capacity_bridge_allowlist_entries": {}
+}
