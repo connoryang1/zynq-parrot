@@ -1,0 +1,79 @@
+{
+  "schema": "csr-cancel-cache-retirement-compact-checkpoint-v1",
+  "state": "Compact source/receipt review only; no capture/member reader/deletion rerun",
+  "cache_retirement": {
+    "completion": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/legacy-native-cache-retirement-20261122/completion.json",
+      "bytes": 352544,
+      "sha256": "d8fe8e271a477c9fee3a6e6a3032894cf2981f5e5355be4fb0ac6fa38531b9cc"
+    },
+    "manifest": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/legacy-native-cache-retirement-20261122/retirement-manifest.json",
+      "bytes": 1245952,
+      "sha256": "ca807e51bf29b291d19f2b856760646edd492617dfa256e80d068ba287e76ea3"
+    },
+    "deleted_files": 575,
+    "deleted_logical_bytes": 865154496,
+    "deleted_allocated_bytes": 866222080,
+    "protected_before_after_sha256": "b3adc02cd663088278303aecdd6726b73f329358aa8ff86b20145f97a0fcf2e8",
+    "RUN_free_after": 6133313536,
+    "original_caps_and_fixed_OTHER_unchanged": true
+  },
+  "cancel": {
+    "job": "20261122T142728Z-a44c03bb7",
+    "terminal": {
+      "status": "CANCELLED",
+      "cause": [
+        {
+          "kind": "volume_reserve",
+          "device": 2050,
+          "names": [
+            "home"
+          ],
+          "actual": 2672771072,
+          "minimum": 2673199452,
+          "floor": 2415919104,
+          "remaining_allocation": 257280348
+        }
+      ],
+      "post_snapshot": "post-cancel-status.json.gz"
+    },
+    "terminal_binding": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/run-20261122T142728Z-a44c03bb7/terminal-status.json",
+      "bytes": 326,
+      "sha256": "161be977ffba6dc55b1070fe884607625acfbaef1f1a924ea9de27be72119bf2"
+    },
+    "capture": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/manifest.json",
+      "bytes": 3788,
+      "sha256": "5f7939dd8c3b56a9dbaa996936424407329cee94c25fd1d14751044712980f89"
+    },
+    "archive": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/full-cancelled-work-source.tar.xz",
+      "bytes": 61138600,
+      "sha256": "46647672aa76782684b9e08b49b2b41f98a7bfe70c7f1c2516fc8597d3829555"
+    },
+    "inventory": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/inventory.json",
+      "bytes": 8973413,
+      "sha256": "2e3425c7819e802b4b1fcbf7e4f51e7f0352838ad632e16e035cb4fe0bdf3cb7"
+    },
+    "members": 14345,
+    "logical_bytes": 274793536,
+    "no_fit_or_area_result": true,
+    "work_retirement": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/work-retirement.json",
+      "bytes": 2592123,
+      "sha256": "da48b74914ca79bdb866626398f4c81ac25f32f94fe864607d1bae2a811dec66"
+    },
+    "removed_WORK_members": 7152,
+    "SOURCE_Gitadmin_LOG_ART_native_unchanged": true,
+    "no_git_prune": true,
+    "root_final_cancellation": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/ROOT-cancelled-closure.ROOT.json",
+      "bytes": 1833,
+      "sha256": "2fb458ef961e25dc42a53ece6066c136bb5abdfb856fff73a563c26806998c66"
+    }
+  },
+  "scope": "Operational capture/duplicate cache retirement only. New adapter04 CAD is independent active work, no acceptance claimed."
+}

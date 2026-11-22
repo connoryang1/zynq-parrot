@@ -1,0 +1,109 @@
+{
+  "state": "PASS complete lossless canceled CAD WORK+SOURCE+Gitadmin+LOGS+ART+helpers capture; no fit result",
+  "admission": {
+    "path": "admission.ROOT.json",
+    "bytes": 4171,
+    "sha256": "ab7085525c9c91241a2679df0f19de523ed41f9b5167c1f1bb840fe15b702730"
+  },
+  "inventory": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/inventory.json",
+    "bytes": 8973413,
+    "sha256": "2e3425c7819e802b4b1fcbf7e4f51e7f0352838ad632e16e035cb4fe0bdf3cb7"
+  },
+  "commands": [
+    {
+      "action": "compress",
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/cancel-capture-preparation01/codec.py",
+          "--inventory",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/full-cancelled-work-source.tar.xz",
+          "--action",
+          "compress"
+        ],
+        "owned_pgid": 1285828,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 600,
+        "teardown_s": 5,
+        "elapsed_s": 139.03172169299796
+      }
+    },
+    {
+      "action": "roundtrip",
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/cancel-capture-preparation01/codec.py",
+          "--inventory",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/full-cancelled-work-source.tar.xz",
+          "--action",
+          "roundtrip"
+        ],
+        "owned_pgid": 1285856,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 8.147667143959552
+      }
+    }
+  ],
+  "archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/full-cancelled-work-source.tar.xz",
+    "bytes": 61138600,
+    "sha256": "46647672aa76782684b9e08b49b2b41f98a7bfe70c7f1c2516fc8597d3829555"
+  },
+  "all_members": 14345,
+  "raw_member_bytes": 274793536,
+  "all_originals_unchanged": true,
+  "absence": {
+    "all_owned_children_absent": true,
+    "global_vendor_absent": true,
+    "old_worker": {
+      "pid": 1282496,
+      "startticks": 97345930,
+      "absent_by_identity": true
+    }
+  },
+  "original_limits_unchanged": true,
+  "no_hardware_or_guest_changes": true,
+  "elapsed_seconds": 152.71553211007267
+}
