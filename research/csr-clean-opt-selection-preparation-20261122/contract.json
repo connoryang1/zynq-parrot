@@ -1,0 +1,86 @@
+{
+  "schema": "unadmitted-clean-opt-selection-contract-v1",
+  "ROOT_approved": false,
+  "integration_selected": false,
+  "TOP_basis": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+  "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "default": "Explore",
+  "allowed_values": [
+    "Explore",
+    "ExploreArea",
+    "ExploreSequentialArea"
+  ],
+  "selection_channel": {
+    "launcher": "FPGA_OPT_DIRECTIVE",
+    "Make": "IMPL_OPT_DIRECTIVE",
+    "Tcl_environment": "IMPL_OPT_DIRECTIVE",
+    "actual_property": "STEPS.OPT_DESIGN.ARGS.DIRECTIVE",
+    "revision": "opt_directive",
+    "actual_marker": "BP-IMPL-OPT-CONFIG",
+    "receipt": "implementation-selection.tsv"
+  },
+  "unchanged_expected": {
+    "synth_design": [
+      "synth_design -top black_parrot_bd_1_wrapper -part xc7z020clg400-1 -directive AreaOptimized_high -global_retiming on -control_set_opt_threshold 1"
+    ],
+    "place_design": [
+      "place_design -directive Explore"
+    ],
+    "phys_opt_design": [
+      "phys_opt_design -directive Explore",
+      "phys_opt_design -directive Explore"
+    ],
+    "route_design": [
+      "route_design -directive Explore -tns_cleanup"
+    ],
+    "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "strategy": "Performance_ExplorePostRoutePhysOpt",
+    "SYNTH_STRATEGY": "Flow_AreaOptimized_high",
+    "core_MHz": 20,
+    "secondary_MHz": 8,
+    "workers": 8,
+    "BP_RETAINED_BUFFER": 1,
+    "BP_RETAINED_I_LINES": 256,
+    "BP_RETAINED_D_LINES": 256,
+    "BP_RETAINED_SETS": 256,
+    "BP_RETAINED_OBSERVE": 1,
+    "BP_AXI_RESPONSE_DELAY": 0,
+    "BP_CACHE_MISS_TRACE": 0
+  },
+  "source_qualification": "Same consumed HDL/BP/ordinary cache/policy, updated exact build-script identities. New source readiness/actual Make-n and default/selected propagation gates required after ROOT admits them; not executed now.",
+  "provenance_extension": [
+    "ROOT-selected exact option in fresh admission and full launch environment",
+    "new operational launcher byte binding; new clean TOP build-script file bindings",
+    "revisions.txt/config.tcl/implementation-selection.tsv actual XPR option and child command agree",
+    "all actual other command lines and STEPS property values unchanged",
+    "existing clock/constraint coverage plus all source/geometry/route/package gates retained"
+  ],
+  "references": [
+    {
+      "path": "/dev/shm/zp-linux-csr-unmasked256-fpga-source-20261122-03/cosim/black-parrot-example/Makefile.design",
+      "bytes": 7015,
+      "sha256": "2f7b1457423f4b45d972245850acf4f34be3b590c166865fff0cec0fd7ca51c5"
+    },
+    {
+      "path": "/run/user/1001/zp-linux-csr-unmasked256-trace0-cad-20261122-02/zynq-parrot-fpga-20261122T151115Z-a44c03bb7/cosim/black-parrot-example/vivado/config.tcl",
+      "bytes": 265,
+      "sha256": "c511e6f3d023021d096404de4176d07a71ecafed31497b5977d76000ac67cc97"
+    },
+    {
+      "path": "/run/user/1001/zp-linux-csr-unmasked256-trace0-cad-20261122-02/zynq-parrot-fpga-20261122T151115Z-a44c03bb7/cosim/black-parrot-example/vivado/black_parrot_bd_proj.xpr",
+      "bytes": 13805,
+      "sha256": "0aeeb1ddf78a5675559343132cd513398e3f630ac2f3514edb6814351764eba8"
+    },
+    {
+      "path": "/run/user/1001/zp-linux-csr-unmasked256-trace0-cad-20261122-02/zynq-parrot-fpga-20261122T151115Z-a44c03bb7/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.tcl",
+      "bytes": 11851,
+      "sha256": "bf7a0bf205079fcc315769595a9416faf9187a4ef4757f90af22e36c6d46ca4c"
+    },
+    {
+      "path": "/run/user/1001/zp-linux-csr-unmasked256-trace0-cad-20261122-02/zynq-parrot-fpga-20261122T151115Z-a44c03bb7/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/impl_1/black_parrot_bd_1_wrapper.tcl",
+      "bytes": 14740,
+      "sha256": "9498853f0f68ed94b66bd0d542a0088d728ebd6d59f7c019265aeb34843b5e3c"
+    }
+  ],
+  "no_execution_or_admission": true
+}
