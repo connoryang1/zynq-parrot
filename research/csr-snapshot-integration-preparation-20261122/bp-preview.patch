@@ -1,0 +1,86 @@
+--- a/bp_be/src/v/bp_be_top.sv
++++ b/bp_be/src/v/bp_be_top.sv
+@@ -236 +236 @@
+-  logic [num_contexts_p-1:0][csr_context_width_lp-1:0] virtual_context_csr_state_r;
++  logic [csr_context_width_lp-1:0] virtual_context_csr_read_data_lo;
+@@ -360,0 +361,26 @@
++  // Only inactive CSR snapshots move to the single-write store. The exact
++  // retirement decoder excludes simultaneous committed save and NPC seed.
++  wire [context_id_width_p-1:0] csr_snapshot_save_context_id_li =
++    context_cache_commit_v_li
++    ? context_cache_victim_virtual_context_id_r : current_virtual_context_id_r;
++  wire csr_snapshot_save_v_li = commit_pkt.ctxtsw
++    && (csr_snapshot_save_context_id_li < num_contexts_p);
++  wire csr_snapshot_seed_v_li = ctx_npc_write_v_lo
++    && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)
++    && (ctx_npc_write_rebind_lo
++        || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]);
++  bp_be_csr_snapshot_store_production
++   #(.contexts_p(num_contexts_p)
++     ,.width_p(csr_context_width_lp)
++     ,.addr_width_p(context_id_width_p))
++   csr_snapshot_store
++    (.clk_i(clk_i)
++     ,.reset_i(reset_i)
++     ,.write_v_i(csr_snapshot_save_v_li | csr_snapshot_seed_v_li)
++     ,.write_addr_i(csr_snapshot_seed_v_li
++                    ? ctx_npc_write_virtual_context_id_lo : csr_snapshot_save_context_id_li)
++     ,.read_addr_i(context_cache_target_virtual_context_id_r)
++     ,.write_data_i(csr_context_save_data_lo)
++     ,.valid_o(virtual_context_csr_valid_r)
++     ,.read_valid_o()
++     ,.read_data_o(virtual_context_csr_read_data_lo));
+@@ -399 +425 @@
+-    ? virtual_context_csr_state_r[context_cache_target_virtual_context_id_r]
++    ? virtual_context_csr_read_data_lo
+@@ -849,2 +874,0 @@
+-        virtual_context_csr_valid_r[i] <= 1'b0;
+-        virtual_context_csr_state_r[i] <= '0;
+@@ -879,2 +902,0 @@
+-          virtual_context_csr_state_r[save_virtual_context_id_li] <= csr_context_save_data_lo;
+-          virtual_context_csr_valid_r[save_virtual_context_id_li] <= 1'b1;
+@@ -903,11 +924,0 @@
+-        end
+-
+-        if (ctx_npc_write_rebind_lo
+-            || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]) begin
+-          // A bootstrap target has no prior CSR image.  Clone the seeding
+-          // context's architectural CSR state so a first launch
+-          // preserves the caller's privilege mode and SATP translation root.
+-          // Never overwrite CSR state when only reseeding an existing NPC.
+-          virtual_context_csr_state_r[ctx_npc_write_virtual_context_id_lo]
+-            <= csr_context_save_data_lo;
+-          virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo] <= 1'b1;
+--- /dev/null
++++ b/bp_be/src/v/bp_be_csr_snapshot_store_production.sv
+@@ -0,0 +1,30 @@
++// Experimental single-write inactive CSR store. Integration is not performed.
++// The bb575 producer proves save and seed mutually exclusive; both use one
++// common save-data wire. Preserve the qualification/owner logic outside RAM.
++module bp_be_csr_snapshot_store_production
++ #(parameter int contexts_p=4, width_p=1666
++   , parameter int addr_width_p=(contexts_p>1)?$clog2(contexts_p):1)
++  (input logic clk_i, reset_i, write_v_i
++   ,input logic [addr_width_p-1:0] write_addr_i,read_addr_i
++   ,input logic [width_p-1:0] write_data_i
++   ,output logic [contexts_p-1:0] valid_o
++   ,output logic read_valid_o
++   ,output logic [width_p-1:0] read_data_o);
++  (* ram_style="distributed" *) logic [width_p-1:0] mem [0:contexts_p-1];
++  logic [contexts_p-1:0] valid_r;
++  always_ff @(posedge clk_i)
++    if (!reset_i && write_v_i && int'(write_addr_i)<contexts_p)
++      mem[write_addr_i]<=write_data_i;
++  always_ff @(posedge clk_i) begin
++    if (reset_i)valid_r<='0;
++    else if (write_v_i && int'(write_addr_i)<contexts_p)valid_r[write_addr_i]<=1'b1;
++  end
++  assign valid_o=valid_r;
++  always_comb begin
++    read_valid_o=1'b0;read_data_o='0;
++    if (int'(read_addr_i)<contexts_p)begin
++      read_valid_o=valid_r[read_addr_i];
++      if (valid_r[read_addr_i])read_data_o=mem[read_addr_i];
++    end
++  end
++endmodule
