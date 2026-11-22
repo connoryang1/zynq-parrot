@@ -1,0 +1,69 @@
+{
+  "schema": "strict-I-capture-pending-source-review-v1",
+  "state": "SOURCE_ONLY; no implementation, validation, synthesis or adoption",
+  "source_BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "generic_D_verdict": "Not strict under allowed insertion backpressure/unrelated mutation; HOLD first-beat drop changes behavior",
+  "production_I_verdict": "Source-supported conditional invariant only; functional proof and actual area remain open",
+  "invariant": "capture_beat && pending_safe implies insert_accept (pre-edge)",
+  "assumptions": [
+    "I invalidate/mutation tied0",
+    "capture implies lookup-enable",
+    "one UCE/backend lane master",
+    "unchanged backend atomic insert snapshot and response ownership",
+    "unchanged serialized normal-request FSM",
+    "control/clear/reset/capture-abort priorities preserved"
+  ],
+  "excluded": [
+    "backend response/insert merge during active direct-hit lease",
+    "PF insertion borrowed lease with demand-priority drop/reselection",
+    "PF registered READ_FIRST output deletion"
+  ],
+  "area_attempt04": "baseline600s timeout, no candidate or paired area result; no repeat",
+  "inputs": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+      "bytes": 109697,
+      "sha256": "94d989246a8d2d247da8835081f2ba9385ab568e10425d0b872f376df3ea4ad4"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 21660,
+      "sha256": "c04764548493f2a1109c36f25881c32444d0171b434e777c9e2b5fc2f631bcf2"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+      "bytes": 31356,
+      "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache.sv",
+      "bytes": 63318,
+      "sha256": "ced6e04a2ba845fe8a36bd723cf15342a19ca4ecf6834af6f677fa543aa0768c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_common/src/include/bp_common_aviary_cfg_pkgdef.svh",
+      "bytes": 21844,
+      "sha256": "1505b65cd6fba12f3cb4ccb8c49bae7aed7c27d4f67c74c897a9ab476763173f"
+    },
+    {
+      "path": "/home/coyang/bp-retained-demand-capture-shared-20261122/bp_me/src/v/cce/bp_uce.sv",
+      "bytes": 110123,
+      "sha256": "6dd1f61bb36a0a2b5628812e6dd5e070ad5d6f6512dffc56d3eab2eff50c64d9"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-demand-capture-shared-20261122/preparation01/HOLD.json",
+      "bytes": 1804,
+      "sha256": "f5c614cc8f73333777b4a312cbd2977ec8003365d758cc1fc1a8bf695393b758"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-insert-payload-lease-review-20261122/README.md",
+      "bytes": 4461,
+      "sha256": "bc63447db55585cf09e074c18f85a2e14c8c0c5e723bdc7d4a0f9eac459fecf9"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-uce-scratch-area-20261122/area-attempt04/session.json",
+      "bytes": 5062,
+      "sha256": "ea9fcb7cbf1d1576487619e5ec44249051bb45d70964d61e9109417baeea92d3"
+    }
+  ]
+}
