@@ -7,6 +7,10 @@
 `ifndef BP_AXI_RESPONSE_DELAY
 `define BP_AXI_RESPONSE_DELAY 0
 `endif
+
+`ifndef BP_CACHE_MISS_TRACE
+`define BP_CACHE_MISS_TRACE 1
+`endif
 `ifndef BP_RETAINED_OBSERVE
 `define BP_RETAINED_OBSERVE 0
 `endif
@@ -830,7 +834,7 @@ module top_zynq
       ,.axi_core_clk_async_p(0)
       ,.prefetch_bypass_p(prefetch_axi_bypass_lp)
       ,.prefetch_outstanding_p(1)
-      ,.cache_miss_trace_p(1'b1)
+      ,.cache_miss_trace_p(`BP_CACHE_MISS_TRACE)
       )
    blackparrot
      (.axi_clk_i(aclk)

@@ -66,6 +66,20 @@ DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
 DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
 DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
 
+# Accepted physical-demand-miss history, separate from retained payload and
+# ordinary cache geometry. Keep existing traced images as the default.
+BP_CACHE_MISS_TRACE ?= 1
+ifneq ($(words $(BP_CACHE_MISS_TRACE)),1)
+$(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
+endif
+ifneq ($(filter $(BP_CACHE_MISS_TRACE),0 1),$(BP_CACHE_MISS_TRACE))
+$(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
+endif
+ifneq ($(filter BP_CACHE_MISS_TRACE BP_CACHE_MISS_TRACE=%,$(EXTRA_DEFINES)),)
+$(error Set BP_CACHE_MISS_TRACE=<0|1> instead of an EXTRA_DEFINES override)
+endif
+DEFINES += BP_CACHE_MISS_TRACE=$(BP_CACHE_MISS_TRACE)
+
 # Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
 # This r2 capacity candidate includes observation in its actual fit cost;
 # explicit0 remains available for matched diagnostic comparison only.

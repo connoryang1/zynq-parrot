@@ -1,0 +1,69 @@
+{
+  "state": "PASS focused host Make/generated-Tcl/mock-fileset checks; actual model/CAD pending",
+  "base_TOP": "eb7d390134a0025331a2366a979a774263b146d5",
+  "BP_gitlink": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "branch": "experiment/linux-cache-miss-trace-profile",
+  "files": [
+    {
+      "path": "cosim/black-parrot-example/Makefile.design",
+      "bytes": 7017,
+      "sha256": "5e647fb8e8c96b3a175191d1e1853ea6ab18f8573dac3914d8df9c6e6f261af2"
+    },
+    {
+      "path": "cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 42425,
+      "sha256": "cd071d14cb555fc6a9f2257b578442136af0ccc6019b52a2d4b3424723e80214"
+    },
+    {
+      "path": "cosim/mk/Makefile.verilator",
+      "bytes": 6332,
+      "sha256": "ae935ff7ba610bb597b37f05aa6c349107fe10b8c44bef3ea9c1b41398cac36f"
+    },
+    {
+      "path": "cosim/tcl/vivado-utils.tcl",
+      "bytes": 13201,
+      "sha256": "56e18601878674fed3d307a5f1e01047dedaded90791cd3c2977a0156cf11a48"
+    },
+    {
+      "path": "testing/rtl/cache-miss-trace-profile/test_profile.py",
+      "bytes": 6953,
+      "sha256": "fa4004f29a8aebdf1a98f987e7d09af54d085a15d053561444fc81869b86b4d5"
+    },
+    {
+      "path": "cosim/mk/Makefile.vivado",
+      "bytes": 5413,
+      "sha256": "6636494b930f499158a576305b85212a464aec9a396faa8a5533112816c81dc4"
+    },
+    {
+      "path": "research/cache-miss-trace-profile-20261122/README.md",
+      "bytes": 3353,
+      "sha256": "1b1eb8e2cc393aedf8f59601854bda6758382f628687378e17976a63e4a70272"
+    },
+    {
+      "path": "research/cache-miss-trace-profile-20261122/host-tests.log",
+      "bytes": 515,
+      "sha256": "113d5ea6ce4f1abecb055ea036d07f3420c1a3281f34302c04b606c623b1153c"
+    }
+  ],
+  "tests": {
+    "count": 5,
+    "returncode": 0,
+    "command": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "-v",
+      "test_profile"
+    ]
+  },
+  "default_on_literal_top_substitution_recreates_parent_bytes": true,
+  "parent_top_source_sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c",
+  "preserved_default": {
+    "BP_CACHE_MISS_TRACE": 1
+  },
+  "physical_allowlists": {},
+  "actual_vendor_execution": false,
+  "actual_model_execution": false,
+  "limitations": "Three mocked fresh contexts exercise actual Tcl helper and Make-generated env; not actual IP packaging/child synthesis, inference, fit/timing or application evidence."
+}

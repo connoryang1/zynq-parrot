@@ -1,0 +1,16 @@
+This adds a default-on `BP_CACHE_MISS_TRACE` profile to the full production example. `1` keeps the accepted physical I/D demand-miss recorder; `0` selects the existing generic off branch without changing BlackParrot, ordinary cache geometry, retained payload or capture policy. The minimal AXI-Lite example remains unchanged and traced. The profile is prepared, not accepted by a model/FPGA gate.
+
+The isolated TOP branch starts at `eb7d390134a0025331a2366a979a774263b146d5`; its BP gitlink stays `8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c`. No submodule was initialized or modified. The only production changes are the full-design Make boolean/define, TOP macro default1 and existing parameter connection, a separate `-miss-trace0|1` model-stamp field, and the optional seventh boolean in the common Vivado define allowlist. The existing source-IP, final-BD and IP-edit application calls remain in place. Make refuses empty/noncanonical values and conflicting EXTRA_DEFINES overrides; Tcl rejects invalid booleans, conflicting existing definitions and lost readback.
+
+Five host tests passed. They run the actual Make declaration/stamp and actual `Makefile.vivado` Tcl-generation recipe with inert include stubs. Tclsh then sources the generated environment and actual helper, applying all seven definitions to three independent **mocked** project/fileset contexts. Tests also retain existing defines, reject invalid values/conflicts/readback loss and inspect the three real application call sites. These are host configuration/propagation checks. They do not prove actual Vivado packaging, child synthesis defines, inferred RAM removal, placed/routed area/timing or target correctness. No compiler, simulator, FST reader, vendor or board operation ran.
+
+The first generalized host fixture incorrectly requested retained observation through EXTRA_DEFINES, which the existing candidate correctly rejects. The fixture was corrected to use its existing dedicated variable (or the older design's explicit define when that variable is absent). The production patch did not change for this fixture correction. Geometry expectations are read from the actual design defaults so this common profile test can also be cherry-picked to the smaller integration configuration.
+
+The prior read-only audit (`23078c94f`) binds the existing optimized R7 trace history to twoRAMB36,53rawLUT,54FF and8CARRY4, and finds no805/806/807 instruction encodings in the six exact requested executable ELFs. Trace-off loses this diagnostic capability;805/807 read zero rather than gaining a new absent-feature trap/capability bit. Dedicated cache-miss trace tests/tools must retain trace-on. Actual resource reuse, larger fit and complete application benefit remain unproven; raw primitive counts are not an additive whole-device forecast.
+
+Both future capacity arms must use the same trace profile and new exact source/model/image qualifications before application measurements. Historical traced controls remain preserved. The new stamp deliberately prevents reuse of a stale differently configured executable, so default-on functional intent does not imply byte-identical simulator identity. Hardware allowlists and all frozen guest programs, runtime clients and admissions remain untouched.
+
+```
+cd testing/rtl/cache-miss-trace-profile
+python3 -B -m unittest -v test_profile
+```
