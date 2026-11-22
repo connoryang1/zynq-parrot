@@ -1,0 +1,68 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
+| Date         : Sun Nov 22 16:02:03 2026
+| Host         : blackparrot1 running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_control_sets -return_string
+| Design       : black_parrot_bd_1_wrapper
+| Device       : xc7z020
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+
+1. Summary
+----------
+
++---------------------------------------------------+-------+
+|                       Status                      | Count |
++---------------------------------------------------+-------+
+| Total control sets                                |  1248 |
+|    Minimum number of control sets                 |  1248 |
+|    Addition due to synthesis replication          |     0 |
+|    Addition due to physical synthesis replication |     0 |
++---------------------------------------------------+-------+
+* Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
+** Run report_qor_suggestions for automated merging and remapping suggestions
+
+
+2. Histogram
+------------
+
++--------------------+-------+
+|       Fanout       | Count |
++--------------------+-------+
+| Total control sets |  1248 |
+| >= 0 to < 4        |   752 |
+| >= 4 to < 6        |    46 |
+| >= 6 to < 8        |    35 |
+| >= 8 to < 10       |    37 |
+| >= 10 to < 12      |    11 |
+| >= 12 to < 14      |    17 |
+| >= 14 to < 16      |     9 |
+| >= 16              |   341 |
++--------------------+-------+
+* Control sets can be remapped at either synth_design or opt_design
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |            4637 |         1603 |
+| No           | No                    | Yes                    |              42 |           14 |
+| No           | Yes                   | No                     |            2652 |         1235 |
+| Yes          | No                    | No                     |           11292 |         3417 |
+| Yes          | No                    | Yes                    |             156 |           42 |
+| Yes          | Yes                   | No                     |            8128 |         3326 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+

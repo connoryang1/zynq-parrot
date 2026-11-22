@@ -1,0 +1,5 @@
+This records the first routed diagnostic lower point for the fixed CSR retained-payload implementation. It preserves final resources, timing, routing, DRC and clock coverage so a capacity search can distinguish a real routed result from synthesis or spare-RAM estimates. Clean-build, physical correctness and application-performance qualification remain pending.
+
+The design retains 256 full 64-byte instruction lines and 256 data lines, 32 KiB combined, with ordinary caches and clocks unchanged. It routes all 84,324 nets with zero routing errors and meets constrained setup and hold timing; the existing 42 tag-clock sinks and their 76 unconstrained endpoints remain an explicit baseline limitation.
+
+`result.json` binds both saved routed checkpoints and the original terminal session. Full immutable WORK/source preservation is handled by the external bounded closure; these compact reports do not replace that archive. Slice use is 13,299/13,300 despite only 93.5/140 block-RAM tiles, so additional useful capacity requires actual placement and timing checks. No FPGA test or complete-application speedup has been measured for this route.
