@@ -1,0 +1,122 @@
+{
+  "state": "Conditional source/old-mapping arithmetic only; new CSR whole-device mapping pending",
+  "old_mapping_evidence": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-packing-design-review-20261121/findings.json",
+    "bytes": 8945,
+    "sha256": "62e226235de93f3f1bf1de5c9699713a9bc7fd3c470bb467561ef26475eda2f4"
+  },
+  "old_measured_backend_tiles": {
+    "1792": 56.0,
+    "1856": 60.0,
+    "1920": 60.0,
+    "1793": 60,
+    "1824": 60
+  },
+  "configured_payload_bytes_per_side": 114688,
+  "configured_payload_bytes_total": 229376,
+  "tag_width_PA34_sets256_epoch8": 29,
+  "raw_payload_plus_tags_bits_1792": 1938944,
+  "raw_payload_plus_tags_bits_1793": 1940026,
+  "conditional_boundary": {
+    "1792_old_backend_tiles": 56,
+    "1793_old_canonical_backend_measured_tiles": 60,
+    "old_measured_step": 4,
+    "new_CSR_whole_device_budget": "conditional on actual current lower mapping/other resources; no new1793 fit claim"
+  },
+  "whole_device_condition": "If new lower256 whole BRAM is B256 and its actual backend part is T256, unchanged-other arithmetic would be B256-T256+Tnew. B256/T256 and const-propagation/remapping require actual reports; do not set other=84 from old140-56 or treat arithmetic as fitted area.",
+  "limits": [
+    "The separate canonical1793/1824 actual reports resolve the initial five-arm-only uncertainty: both really mapped60tiles under old source68d. This is not a newCSR whole-device fit or maximum.",
+    "Raw bit capacity is not an inferred RAM packing/port/timing guarantee.",
+    "Even if BRAM permits a candidate, LUT/controlset/SLICEM/placement/timing may fail.",
+    "NewCSR source changes logic; old1792 placement failures are not an accepted upper bound for this source.",
+    "Configured lines are not occupancy or useful retained-hit guarantees."
+  ],
+  "resolved_primary_boundary_evidence": {
+    "session": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/session.json",
+      "bytes": 67935,
+      "sha256": "a6090b4b887fa1779ecaf1efd7f994250ef88a1b55179d8ea671e27f175a5da2"
+    },
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/admission.json",
+      "bytes": 7804,
+      "sha256": "4a0966bac67f9476e1985de915bca95260d1bfd88e2e64cf69019e4d0fcbfb63"
+    },
+    "old_canonical_backend": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/backend-canonical.sv",
+      "bytes": 20341,
+      "sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6"
+    },
+    "source_revision_family": "canonical BP8df source68d; actual standalone production-I-invalidate-zero wrapper, not the newCSR whole device",
+    "arms": [
+      {
+        "arm": "canonical1793",
+        "returncode": 0,
+        "resources": {
+          "LUT": 1123,
+          "logic_LUT": 995,
+          "LUTRAM": 128,
+          "SRL": 0,
+          "FF": 2213,
+          "RAMB36": 58,
+          "RAMB18": 4,
+          "DSP": 0,
+          "BRAM36_tiles": 60.0
+        },
+        "report": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1793/utilization.rpt",
+          "bytes": 2350,
+          "sha256": "627205432853b7a492d393045a8e8502324f9682bd14b250469698faf1527dfd"
+        },
+        "report_top_row_line": 25,
+        "report_backend_row_line": 27,
+        "block_ports": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1793/block-ports.tsv",
+          "bytes": 5565,
+          "sha256": "909ea481c4e0cfcbbdd43f45185216546fca531cc1e2b97ea64cd10ee710a543"
+        }
+      },
+      {
+        "arm": "canonical1824",
+        "returncode": 0,
+        "resources": {
+          "LUT": 1112,
+          "logic_LUT": 984,
+          "LUTRAM": 128,
+          "SRL": 0,
+          "FF": 2213,
+          "RAMB36": 58,
+          "RAMB18": 4,
+          "DSP": 0,
+          "BRAM36_tiles": 60.0
+        },
+        "report": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1824/utilization.rpt",
+          "bytes": 2350,
+          "sha256": "53c8641c4e5ed1fe2a5af82294b33787f86f237a15812e1d7c79a35d85927850"
+        },
+        "report_top_row_line": 25,
+        "report_backend_row_line": 27,
+        "block_ports": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1824/block-ports.tsv",
+          "bytes": 5565,
+          "sha256": "909ea481c4e0cfcbbdd43f45185216546fca531cc1e2b97ea64cd10ee710a543"
+        }
+      }
+    ]
+  },
+  "old_vs_current_source": {
+    "new_BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+    "new_backend": {
+      "path": "/dev/shm/zp-linux-csr-unmasked256-fpga-source-20261122-03/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+      "bytes": 21660,
+      "sha256": "c04764548493f2a1109c36f25881c32444d0171b434e777c9e2b5fc2f631bcf2"
+    },
+    "old_backend_sha256": "68d1dd0c7df7e56ffe76317f9bae5a3ca3e09d13cb44d1167c0f737acefcbea6",
+    "owning_clock_RAM_declarations_and_access_chunk_byte_equal": true,
+    "chunk_sha256": "55a9af998708f532305e36ac755d857e05de8e6ac2e85e3d1df53221e4db467d",
+    "whole_source_not_claimed_equal": true,
+    "new_whole_CSR_mapping_unknown": true
+  },
+  "verification_scope": "Read-only existing small report/session/source review. No vendor, netlist query, model, reader or repeat synthesis."
+}

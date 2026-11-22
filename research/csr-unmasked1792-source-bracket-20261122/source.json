@@ -1,0 +1,37 @@
+{
+  "state": "PREPARED source-only bracket; no model/CAD/fit/selected-winner claim",
+  "parent_TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+  "candidate_TOP": "4d8dbaac3b952e242be92f707d9658da65566dfa",
+  "branch": "experiment/linux-csr-unmasked1792-trace0-bracket-20261122",
+  "BP_unchanged": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "changed_file": "cosim/black-parrot-example/Makefile.design",
+  "diff": "diff --git a/cosim/black-parrot-example/Makefile.design b/cosim/black-parrot-example/Makefile.design\nindex b5ee1d0ee..376daf7fd 100644\n--- a/cosim/black-parrot-example/Makefile.design\n+++ b/cosim/black-parrot-example/Makefile.design\n@@ -58,8 +58,8 @@ DEFINES += BP_NCPUS=$(BP_NCPUS)\n # This dedicated experiment builds real retention by default. Set 0 to\n # reproduce the legacy replay datapath; the accepted source branch is intact.\n BP_RETAINED_BUFFER ?= 1\n-BP_RETAINED_I_LINES ?= 256\n-BP_RETAINED_D_LINES ?= 256\n+BP_RETAINED_I_LINES ?= 1792\n+BP_RETAINED_D_LINES ?= 1792\n BP_RETAINED_SETS ?= 256\n DEFINES += BP_RETAINED_BUFFER=$(BP_RETAINED_BUFFER)\n DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)\n",
+  "baseline_sha256": "2f7b1457423f4b45d972245850acf4f34be3b590c166865fff0cec0fd7ca51c5",
+  "candidate_sha256": "5e647fb8e8c96b3a175191d1e1853ea6ab18f8573dac3914d8df9c6e6f261af2",
+  "changed_defaults": {
+    "BP_RETAINED_I_LINES": [
+      256,
+      1792
+    ],
+    "BP_RETAINED_D_LINES": [
+      256,
+      1792
+    ]
+  },
+  "index_initialization": {
+    "read_tree": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+    "initial_write_tree_matches_parent": true,
+    "index_bytes": 756197,
+    "temporary_index_RAM_only": true
+  },
+  "submodule_safety": "No worktree/submodule directory was created or used as git cwd; exact BP gitlink is verified from candidate tree. Future physical/model materialization must initialize all submodule Git explicitly.",
+  "only_changed_path": [
+    "cosim/black-parrot-example/Makefile.design"
+  ],
+  "future_gates": [
+    "current lower256 actual fit outcome",
+    "current reservations/closure and new honest resource preflight",
+    "new candidate native/regression/actual-source qualification",
+    "new routed implementation before capacity acceptance"
+  ]
+}
