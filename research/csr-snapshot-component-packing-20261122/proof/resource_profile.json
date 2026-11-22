@@ -1,0 +1,30 @@
+{
+  "schema": "csr-component-packing-resource-v1",
+  "all_other_charged_reserves_included": true,
+  "basis_records": [
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/retained-borrow256-shared-budget-preparation-20261122/policy.json",
+      "bytes": 3990,
+      "sha256": "865f8008175d2049a0c9e7e362962b75a5bedc4600a12ef8cc2cdf1d2a8ca10a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r9-freeze-complete.json",
+      "bytes": 1743,
+      "sha256": "d520e5060940f394c8c75ad7d4f54f9e16ae50921238051b8f178cf2bcbd36e4"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/manifest.json",
+      "bytes": 6604,
+      "sha256": "2ed7df458f1be2da9033a41da2d0a294047f56054b0b9183ac8d73bfd4020a85"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-mapped-functional-20261122/failed02-closed/manifest.json",
+      "bytes": 7007,
+      "sha256": "aeee1cae9509bfb0878ce076c8b111c6a695a89c793ffc961251f199fe204fde"
+    }
+  ],
+  "other_HOME_bytes": 59284055,
+  "other_RUN_bytes": 2062896562,
+  "other_SHM_bytes": 335544320,
+  "explanation": "Original fixed R9 OTHER work/home envelopes retained conservatively; add FULL prospective corrected mapped03 128MiB/8MiB, old mapping remaining422289B and extra1MiB helper reserve. Old mapped02 has terminal failure, complete durable archive, no future run; current occupied bytes remain charged by filesystem free. Old component SHM64MiB and extra256MiB remain fully charged. No cross-device borrowing."
+}

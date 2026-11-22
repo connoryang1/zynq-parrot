@@ -1,0 +1,138 @@
+{
+  "schema": "csr-component-packing-v1",
+  "launchable": false,
+  "ROOT_terminal_release": null,
+  "resource_profile": null,
+  "target_hostname": "blackparrot1",
+  "cases": [
+    "baseline04",
+    "unmasked05"
+  ],
+  "settings": {
+    "device": "xc7z020clg400-1",
+    "Vivado": "2024.2",
+    "max_threads": 2,
+    "clock_period_ns": 50,
+    "clock_waveform_ns": [
+      0,
+      25
+    ],
+    "input_output_delay_ns": 0,
+    "out_of_context": true,
+    "opt_directive": "Default",
+    "place_directive": "Default",
+    "synthesis": false,
+    "physical_optimization": false,
+    "routing": false
+  },
+  "DCP_inputs": {
+    "baseline04": {
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/all-mapping04-output.tar.gz",
+        "bytes": 3000332,
+        "sha256": "38e5fb9534a703e6df86f9abbf348f94d6513b3b21d4a0b1c51fce07d93b5b99"
+      },
+      "member": "baseline-single-source/synthesized.dcp",
+      "bytes": 1424056,
+      "sha256": "36cd27a19c5c12810907a237f085fd80c6bbeba8ef37bcb72179f93fdb111cad",
+      "OOC": true,
+      "DisableAutoIOBuffers": true
+    },
+    "unmasked05": {
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/all-mapping05-output.tar.gz",
+        "bytes": 1143384,
+        "sha256": "a7af28e3c092737a20f37b28c8651e882c348f492980f93a1297563ccfb38c74"
+      },
+      "member": "resetless-unmasked/synthesized.dcp",
+      "bytes": 1032086,
+      "sha256": "4649174a9a655bddf5c5d62ee000317d2253fe8f8e298cf176ce910e04de85a3",
+      "OOC": true,
+      "DisableAutoIOBuffers": true
+    }
+  },
+  "inputs": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/README.md",
+      "bytes": 3902,
+      "sha256": "34c4aa4b009585ad7dd4e174b804c1f13aa22b2bd5e65e8f2137c289e1ec3704"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/pack.tcl",
+      "bytes": 2791,
+      "sha256": "264024aeadd379d3af0f2bd7d20f42fc6d3fa8fdaca196a0bda105958bc23d72"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/promote_admission.py",
+      "bytes": 1893,
+      "sha256": "34a00674b8ec958a4306b23f3f5471b16cf2de8e1093ea1298f61f14b32dacb1"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/software_owned_v2.py",
+      "bytes": 3997,
+      "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/worker.py",
+      "bytes": 16146,
+      "sha256": "b660567731017bf8ed8fd1d7528336cbd543778ecdd2e73fdf6653cf2489b083"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/manifest.json",
+      "bytes": 12124,
+      "sha256": "55a4a46b4dcdf751293822cb0db71e69d936a60cbbcc27f8a92a65f7caacaaa8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/session.json",
+      "bytes": 14904,
+      "sha256": "497cb8ccfd5876a89eb977d9c22986417017a08f4a4ad099f4011a22d437dd2f"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/manifest.json",
+      "bytes": 6604,
+      "sha256": "2ed7df458f1be2da9033a41da2d0a294047f56054b0b9183ac8d73bfd4020a85"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/session.json",
+      "bytes": 8443,
+      "sha256": "822a52c7702bcea55d0189aa5c568deb210aad81dbfb2f36917c11bdd93634f0"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/all-mapping04-output.tar.gz",
+      "bytes": 3000332,
+      "sha256": "38e5fb9534a703e6df86f9abbf348f94d6513b3b21d4a0b1c51fce07d93b5b99"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/all-mapping05-output.tar.gz",
+      "bytes": 1143384,
+      "sha256": "a7af28e3c092737a20f37b28c8651e882c348f492980f93a1297563ccfb38c74"
+    }
+  ],
+  "tool_wrapper": {
+    "path": "/home/coyang/zynq-parrot/codex-skills/bp-fpga-synthesis/scripts/run_vivado_2024_2.sh",
+    "bytes": 1825,
+    "sha256": "fac7d69ac29e6f46d227b3d674d37ad5cfaa7c25ed66557b9d9c2edd6857d3f7"
+  },
+  "ownership": {
+    "basis": "coordinator conditional release + ROOT perVM onejobprotocol",
+    "linux_claim": "matched OOC CSR component Default packing, no synthesis/wholedevice/board"
+  },
+  "limits": {
+    "per_arm_native_seconds": 580,
+    "per_arm_parent_seconds": 600,
+    "batch_seconds": 1250,
+    "fresh_RUN_stage_bytes": 268435456,
+    "new_HOME_source_durable_bytes": 8388608,
+    "HOME_floor_bytes": 2684354560,
+    "RUN_floor_bytes": 1073741824,
+    "SHM_floor_bytes": 536870912,
+    "attempts_per_arm": 1,
+    "retries": 0,
+    "extensions": 0
+  },
+  "prospective": {
+    "known_total_input_DCP_bytes": 2456142,
+    "ROOT_actual_RUN_namespace_and_global_reserves_pending": true,
+    "agent_HOME_free": 2789961728
+  }
+}

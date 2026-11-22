@@ -1,0 +1,302 @@
+{
+  "schema": "csr-snapshot-isolated-component-packing-checkpoint-v1",
+  "state": "PASS matched isolated OOC component Default packing; no wholeCPU/fit or mapped-function claim",
+  "purpose": "Preserve matched actual component placement evidence before any integrated qualification; no wholeCPU subtraction or timing-closed claim",
+  "elapsed_seconds": 158.4014613700565,
+  "results": {
+    "baseline04": {
+      "actual_unique_occupied_slices": {
+        "SLICEL": 1441,
+        "SLICEM": 812,
+        "total": 2253
+      },
+      "post_place_pre_route_estimated_timing": {
+        "setup_WNS_ns": 44.123,
+        "setup_TNS_ns": 0.0,
+        "setup_failing_endpoints": 0,
+        "setup_total_endpoints": 21676,
+        "hold_WHS_ns": -0.317,
+        "hold_THS_ns": -673.213,
+        "hold_failing_endpoints": 7213,
+        "hold_total_endpoints": 21676,
+        "pulse_WPWS_ns": 24.5,
+        "pulse_TPWS_ns": 0.0,
+        "pulse_failing_endpoints": 0,
+        "pulse_total_endpoints": 6668
+      }
+    },
+    "unmasked05": {
+      "actual_unique_occupied_slices": {
+        "SLICEL": 714,
+        "SLICEM": 452,
+        "total": 1166
+      },
+      "post_place_pre_route_estimated_timing": {
+        "setup_WNS_ns": 44.245,
+        "setup_TNS_ns": 0.0,
+        "setup_failing_endpoints": 0,
+        "setup_total_endpoints": 10022,
+        "hold_WHS_ns": -0.139,
+        "hold_THS_ns": -5.09,
+        "hold_failing_endpoints": 198,
+        "hold_total_endpoints": 10022,
+        "pulse_WPWS_ns": 23.75,
+        "pulse_TPWS_ns": 0.0,
+        "pulse_failing_endpoints": 0,
+        "pulse_total_endpoints": 2228
+      }
+    }
+  },
+  "both_native_statuses": [
+    0,
+    0
+  ],
+  "source_endcheck": "PASS",
+  "ownership_final": "RELEASED",
+  "synthesis_invocations": 0,
+  "RTL_elaboration_invocations": 0,
+  "strategy": {
+    "device": "xc7z020clg400-1",
+    "Vivado": "2024.2",
+    "max_threads": 2,
+    "clock_period_ns": 50,
+    "clock_waveform_ns": [
+      0,
+      25
+    ],
+    "input_output_delay_ns": 0,
+    "out_of_context": true,
+    "opt_directive": "Default",
+    "place_directive": "Default",
+    "synthesis": false,
+    "physical_optimization": false,
+    "routing": false
+  },
+  "input_DCPs": {
+    "baseline04": {
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/all-mapping04-output.tar.gz",
+        "bytes": 3000332,
+        "sha256": "38e5fb9534a703e6df86f9abbf348f94d6513b3b21d4a0b1c51fce07d93b5b99"
+      },
+      "member": "baseline-single-source/synthesized.dcp",
+      "bytes": 1424056,
+      "sha256": "36cd27a19c5c12810907a237f085fd80c6bbeba8ef37bcb72179f93fdb111cad",
+      "OOC": true,
+      "DisableAutoIOBuffers": true
+    },
+    "unmasked05": {
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/all-mapping05-output.tar.gz",
+        "bytes": 1143384,
+        "sha256": "a7af28e3c092737a20f37b28c8651e882c348f492980f93a1297563ccfb38c74"
+      },
+      "member": "resetless-unmasked/synthesized.dcp",
+      "bytes": 1032086,
+      "sha256": "4649174a9a655bddf5c5d62ee000317d2253fe8f8e298cf176ce910e04de85a3",
+      "OOC": true,
+      "DisableAutoIOBuffers": true
+    }
+  },
+  "archive_external_only": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/all-component-packing-output.tar.gz",
+    "bytes": 6072204,
+    "sha256": "79e91db6f843c2098cb695e2951c96b133d05816ff6a239918d8cbe063765a8b"
+  },
+  "external_manifest": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/manifest.json",
+    "bytes": 11351,
+    "sha256": "dbe2fa8b2bc664190fb9a85ad6afd9ae74fa7dd891d9064d7cb34a39e3fa9395"
+  },
+  "limits": [
+    "Empty-device out-of-context component result, not wholeCPU slice saving",
+    "Default placement only; no route/phys_opt/board/app execution",
+    "Hold timing is negative for BOTH arms; timing NOT CLOSED",
+    "Integrated correctness remains unqualified; actual mapped functional gate separately pending"
+  ],
+  "files": [
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/README.md",
+        "bytes": 3902,
+        "sha256": "34c4aa4b009585ad7dd4e174b804c1f13aa22b2bd5e65e8f2137c289e1ec3704"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/README.md",
+      "sha256": "34c4aa4b009585ad7dd4e174b804c1f13aa22b2bd5e65e8f2137c289e1ec3704"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/admission.DRAFT.json",
+        "bytes": 5357,
+        "sha256": "9d48fe823bffff2cff23b588363cc8d6aa1003a76bc74a0e9de13fa4a9e0df49"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/admission.DRAFT.json",
+      "sha256": "9d48fe823bffff2cff23b588363cc8d6aa1003a76bc74a0e9de13fa4a9e0df49"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/admission.FINAL.json",
+        "bytes": 6073,
+        "sha256": "e1149734d3fa272f6a9444922ad2a538724bfeb46e42c0a7ecdf07faf68dc352"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/admission.FINAL.json",
+      "sha256": "e1149734d3fa272f6a9444922ad2a538724bfeb46e42c0a7ecdf07faf68dc352"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/pack.tcl",
+        "bytes": 2791,
+        "sha256": "264024aeadd379d3af0f2bd7d20f42fc6d3fa8fdaca196a0bda105958bc23d72"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/pack.tcl",
+      "sha256": "264024aeadd379d3af0f2bd7d20f42fc6d3fa8fdaca196a0bda105958bc23d72"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/promote_admission.py",
+        "bytes": 1893,
+        "sha256": "34a00674b8ec958a4306b23f3f5471b16cf2de8e1093ea1298f61f14b32dacb1"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/promote_admission.py",
+      "sha256": "34a00674b8ec958a4306b23f3f5471b16cf2de8e1093ea1298f61f14b32dacb1"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/software_owned_v2.py",
+        "bytes": 3997,
+        "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/software_owned_v2.py",
+      "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/preparation01/worker.py",
+        "bytes": 16146,
+        "sha256": "b660567731017bf8ed8fd1d7528336cbd543778ecdd2e73fdf6653cf2489b083"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/source/worker.py",
+      "sha256": "b660567731017bf8ed8fd1d7528336cbd543778ecdd2e73fdf6653cf2489b083"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/borrow256-terminal-release-20261122/component-packing-resource01.json",
+        "bytes": 1628,
+        "sha256": "e945d9eabccdaa3d43c5f097bd713bc29ab49db8a813eb30e42d6ba1e574f386"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/resource_profile.json",
+      "sha256": "e945d9eabccdaa3d43c5f097bd713bc29ab49db8a813eb30e42d6ba1e574f386"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/borrow256-terminal-release-20261122/component-packing-release01.json",
+        "bytes": 940,
+        "sha256": "6e66074b740c4d132b9685e3f351405f378c26a598dd17e3fc09b8ef22a99360"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/ROOT_terminal_release.json",
+      "sha256": "6e66074b740c4d132b9685e3f351405f378c26a598dd17e3fc09b8ef22a99360"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/manifest.json",
+        "bytes": 11351,
+        "sha256": "dbe2fa8b2bc664190fb9a85ad6afd9ae74fa7dd891d9064d7cb34a39e3fa9395"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/manifest.json",
+      "sha256": "dbe2fa8b2bc664190fb9a85ad6afd9ae74fa7dd891d9064d7cb34a39e3fa9395"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/session.json",
+        "bytes": 14319,
+        "sha256": "594f4f0b10e3e664ff2000e6474eb742cf7e95e204fd146a07cf4e4923577fe2"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/session.json",
+      "sha256": "594f4f0b10e3e664ff2000e6474eb742cf7e95e204fd146a07cf4e4923577fe2"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/baseline04/timing-summary.rpt",
+        "bytes": 17040,
+        "sha256": "361d36e77391ecd5697a02f7f6d4029190b097b1e41c0c01bb5a4daafec7704b"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/baseline04/timing-summary.rpt.gz",
+      "sha256": "c404315912d155bc80bfd31b8530d8d0a05ac09f9cac7d32f2b114b22c11b8a9",
+      "raw_sha256": "361d36e77391ecd5697a02f7f6d4029190b097b1e41c0c01bb5a4daafec7704b",
+      "storage_encoding": "gzip"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/baseline04/slice-summary.tsv",
+        "bytes": 34,
+        "sha256": "e7cc5a51b443bd188b0bd0c518fef3f4d075517b00571f5c8c088b9def9457b1"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/baseline04/slice-summary.tsv",
+      "sha256": "e7cc5a51b443bd188b0bd0c518fef3f4d075517b00571f5c8c088b9def9457b1"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/baseline04/control-sets.rpt",
+        "bytes": 4416,
+        "sha256": "400e244de8d96aa17ab16a8b34dfab27eea520b7aa99b58658ab130e6b2f7106"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/baseline04/control-sets.rpt.gz",
+      "sha256": "5bdccb756621ca5b5b9ce9e726460d6c0c4bbb07ca52fad3584626909792c2df",
+      "raw_sha256": "400e244de8d96aa17ab16a8b34dfab27eea520b7aa99b58658ab130e6b2f7106",
+      "storage_encoding": "gzip"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/baseline04/placed-flat-utilization.rpt",
+        "bytes": 10282,
+        "sha256": "3a1c303e55f4ab34193b82469abb4dec15d5ba3e7683d81a689e56c443ec369a"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/baseline04/placed-flat-utilization.rpt.gz",
+      "sha256": "fea2925bcb8ed8753fd79eaadc1187d01317fca2736450b32dab345dac7aa3b7",
+      "raw_sha256": "3a1c303e55f4ab34193b82469abb4dec15d5ba3e7683d81a689e56c443ec369a",
+      "storage_encoding": "gzip"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/unmasked05/timing-summary.rpt",
+        "bytes": 17805,
+        "sha256": "0aebd49043f34504f316002b1a935f5ff3122d41cc6e962db681ad41c923bd6f"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/unmasked05/timing-summary.rpt.gz",
+      "sha256": "d92b763580d81a0f7b8eb9a999def55ca2f414327fdd9e8522403b6a3a02d919",
+      "raw_sha256": "0aebd49043f34504f316002b1a935f5ff3122d41cc6e962db681ad41c923bd6f",
+      "storage_encoding": "gzip"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/unmasked05/slice-summary.tsv",
+        "bytes": 33,
+        "sha256": "b51889da30f4a8b30b3e0133894160384b5032f09ebe82796d2c813542e2977c"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/unmasked05/slice-summary.tsv",
+      "sha256": "b51889da30f4a8b30b3e0133894160384b5032f09ebe82796d2c813542e2977c"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/unmasked05/control-sets.rpt",
+        "bytes": 4371,
+        "sha256": "c5bb3255a9c61fdd5aa6001f110a1a14530d87e07b7670088bb6b9efdca21d8b"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/unmasked05/control-sets.rpt.gz",
+      "sha256": "c4aa5404e40221b79a4c133eecae58c28bd57f54b47b8f8fce7cb6d23980ea0a",
+      "raw_sha256": "c5bb3255a9c61fdd5aa6001f110a1a14530d87e07b7670088bb6b9efdca21d8b",
+      "storage_encoding": "gzip"
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-component-packing-20261122/closed01/unmasked05/placed-flat-utilization.rpt",
+        "bytes": 10560,
+        "sha256": "7786fab8ee6c60f0d626d8bdd867c51b6d4bd4390aa008c9ab727326ed4a73b3"
+      },
+      "checkpoint_path": "research/csr-snapshot-component-packing-20261122/proof/unmasked05/placed-flat-utilization.rpt.gz",
+      "sha256": "f606df0e05456d4acd5292ae7d311970a41060554d2829a70795d9626d390951",
+      "raw_sha256": "7786fab8ee6c60f0d626d8bdd867c51b6d4bd4390aa008c9ab727326ed4a73b3",
+      "storage_encoding": "gzip"
+    }
+  ]
+}
