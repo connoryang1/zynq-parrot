@@ -1,0 +1,116 @@
+{
+  "state": "PASS closed replay; actual placement FAIL/no route",
+  "gzip_roundtrips": 20,
+  "public_sources": 3,
+  "six_child_flags": {
+    "BP_RETAINED_BUFFER": [
+      1
+    ],
+    "BP_RETAINED_I_LINES": [
+      1792
+    ],
+    "BP_RETAINED_D_LINES": [
+      1792
+    ],
+    "BP_RETAINED_SETS": [
+      256
+    ],
+    "BP_RETAINED_OBSERVE": [
+      1
+    ],
+    "BP_AXI_RESPONSE_DELAY": [
+      0
+    ]
+  },
+  "geometry": {
+    "L1I_bytes": 32768,
+    "L1D_bytes": 32768,
+    "L2_banks": 2,
+    "L2_sets_per_bank": 64,
+    "L2_ways": 2,
+    "line_bytes": 64,
+    "L2_bytes": 16384
+  },
+  "r7_synthesis": {
+    "LUT": 54617,
+    "logic_LUT": 50700,
+    "memory_LUT": 3917,
+    "FF": 31011,
+    "BRAM_tiles": 140
+  },
+  "r7_placement": {
+    "available_remaining_slices": 10871,
+    "required_remaining_slices": 11275,
+    "gap": 404,
+    "control_sets": 1181,
+    "combined_LUT": 57154,
+    "total_LUT": 66496,
+    "FF": 31022
+  },
+  "r5b_synthesis": {
+    "LUT": 56251,
+    "FF": 33071,
+    "BRAM_tiles": 140
+  },
+  "r5b_placement": {
+    "available_remaining_slices": 10893,
+    "required_remaining_slices": 11715,
+    "gap": 822,
+    "control_sets": 1437,
+    "combined_LUT": 58801,
+    "total_LUT": 68193,
+    "FF": 33077
+  },
+  "optimized_whole": {
+    "LUT": 54170,
+    "logic_LUT": 50253,
+    "memory_LUT": 3917,
+    "FF": 31011,
+    "BRAM_tiles": 140
+  },
+  "optimized_focused_nonadditive": {
+    "0": {
+      "LUT": 37516,
+      "FF": 17782,
+      "BRAM_tiles": 77
+    },
+    "4": {
+      "LUT": 2779,
+      "FF": 2998,
+      "BRAM_tiles": 0
+    },
+    "5": {
+      "LUT": 3011,
+      "FF": 2839,
+      "BRAM_tiles": 0
+    },
+    "6": {
+      "LUT": 1097,
+      "FF": 2211,
+      "BRAM_tiles": 56
+    }
+  },
+  "optimized_FD_name_groups": {
+    "I_UCE": {
+      "detached_prefetch_control_named": 158,
+      "ordinary_UCE_other": 589,
+      "retained_capture_response_buffer_or_mux_named": 1536,
+      "retained_control_named": 44,
+      "staging_RAM_or_interface_named": 512
+    },
+    "D_UCE": {
+      "detached_prefetch_control_named": 165,
+      "ordinary_UCE_other": 713,
+      "retained_capture_response_buffer_or_mux_named": 1536,
+      "retained_control_named": 72,
+      "staging_RAM_or_interface_named": 512
+    }
+  },
+  "D_epoch_parent_leaf_counts_not_additive": {
+    "RAM64M": 24,
+    "RAMD64E": 96,
+    "FD": 9
+  },
+  "external_DCPs_rehashed": true,
+  "interpretation": "Same-stage resource comparison only. Packing gap cannot be converted to hard LUT-saving requirement; no maxcapacity/fit/timing/application claim."
+}
