@@ -1,0 +1,57 @@
+{
+  "state": "SOURCE AST/import/bindings PASS; DRAFT unlaunchable",
+  "source_plan": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/source-plan.json",
+    "bytes": 12505,
+    "sha256": "4fe74bcf1c9b0a3d3f1f1e442eb2050a6510b3e051d44e3f6353e915c2abf1c1"
+  },
+  "ROOT_commands": {
+    "prepare": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/prepare_cohort.py",
+      "--prepare",
+      "--source-sha",
+      "4fe74bcf1c9b0a3d3f1f1e442eb2050a6510b3e051d44e3f6353e915c2abf1c1",
+      "--authority-sha",
+      "ROOT_FINAL_AUTHORITY_SHA"
+    ],
+    "native_first": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/run_native.py",
+      "--execute",
+      "--preparation",
+      "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/preparation.json",
+      "--preparation-sha256",
+      "NEW_PREPARATION_SHA",
+      "--role",
+      "d-enabled"
+    ],
+    "audit_first": [
+      "python3",
+      "-B",
+      "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/audit_full.py",
+      "--execute",
+      "--preparation",
+      "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/preparation.json",
+      "--preparation-sha256",
+      "NEW_PREPARATION_SHA",
+      "--role",
+      "d-enabled",
+      "--native-sha256",
+      "ACTUAL_D_NATIVE_PROOF_SHA"
+    ]
+  },
+  "next_roles": "D-off then I-enabled native require exact prior complete audit SHA(s), no subset/retry",
+  "fixtures": "unchanged062a/88546c software adequate for actual256",
+  "monitor_byte_exact": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/process_monitor.py",
+    "bytes": 7632,
+    "sha256": "e6ac409bb8db17d4c93bb733f4c7210b9113824556c6d97c0c4be54b0bd3aced"
+  },
+  "runtime_source_rows": 43,
+  "all_runtime_commands_executed": 0,
+  "source_bytes": 81466,
+  "prior_unexecuted_checkpoint": "908156ee8"
+}
