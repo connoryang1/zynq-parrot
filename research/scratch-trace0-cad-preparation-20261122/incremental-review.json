@@ -1,0 +1,67 @@
+{
+  "state": "CLOSED read-only incremental feasibility audit; no probe or reuse accepted",
+  "R7_synth_checkpoint": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/closed-terminal01/synthesis.dcp",
+    "bytes": 78469324,
+    "sha256": "74cf4433a92db1da700e5d9eeca81f4c35ca7d867d9ae4307720736003093766"
+  },
+  "R7_manifest": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/closed-terminal01/manifest.json",
+    "bytes": 14482,
+    "sha256": "e6d59ed8fc1a3a634b5b55038bddc65aa3749d7bd437cc7dad58dd691e02b4b6"
+  },
+  "R7_child_script": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/closed-terminal01/014-black_parrot_bd_1_wrapper.tcl.gz",
+    "bytes": 2502,
+    "sha256": "154427fd2d4a54489e3cdb4ac235b679e423cb6023e703b53a6f8a342f080195"
+  },
+  "R7_checkpoint_contains_incr_dataset": [
+    {
+      "name": "black_parrot_bd_1_wrapper.incr",
+      "compressed_bytes": 83,
+      "uncompressed_bytes": 142,
+      "CRC": 2738210641
+    }
+  ],
+  "R7_writeSynthRtdsInDcp": 1,
+  "prior_evidence": {
+    "findings": {
+      "path": "/home/coyang/fpga-artifacts/build-speed-20261121/workflow-findings.json",
+      "bytes": 994,
+      "sha256": "1bffa5ca6fd5b5cf9424bf2c71eee496ee148401cebe78d75ef8eedcfac6d56c"
+    },
+    "oldseed": {
+      "path": "/home/coyang/fpga-artifacts/build-speed-20261121/whole-canonical/area-incremental-oldseed/timing.json",
+      "bytes": 574,
+      "sha256": "487ad5e013798cb7941cf9a5237e65cf8bb2e75f916a2eaf80fdcbaf05f71d7d"
+    },
+    "capacity": {
+      "path": "/home/coyang/fpga-artifacts/build-speed-20261121/capacity-comparison/area-capacity1536-incremental/timing.json",
+      "bytes": 892,
+      "sha256": "48c4eb66f0ae26a7ff1008093b54733d871a3f5b8ead1b0cd240d02fffbc4ba7"
+    },
+    "same_capacity_ram_fix_impacted": [
+      29,
+      48
+    ],
+    "capacity_change_impacted": [
+      48,
+      48
+    ]
+  },
+  "candidate": {
+    "TOP": "4dadebbfdddfe958eff432b7f87280cfb9b5d991",
+    "BP": "7566c67aad9b93f5546fcc5e258e405402a47850",
+    "capacity_each": 1792,
+    "sets": 256,
+    "trace": 0,
+    "ordinary_geometry_unchanged": true,
+    "retained_backend_source_unchanged": true,
+    "changes": [
+      "UCE scratch snapshot logic with unchanged ports",
+      "accepted-miss recorder enable1\u21920 propagated through core hierarchy"
+    ]
+  },
+  "conclusion": "R7 is a technically plausible reference: same1792 geometry/ordinary caches/store backend, embedded incremental data and enabled RTDS preservation. The prior1536 capacity-wide invalidation does not directly apply. But trace parameter propagation through ancestor modules and two UCE changes can still affect many synthesis partitions; the prior same-capacity RAM change already impacted29/48. No source-only argument proves fewer than half impacted or predicts reuse/speed. Clean flow remains primary; any later coordinator eligibility probe must be separate, bounded, stop on fallback, and cannot replace clean final qualification.",
+  "actual_probe_or_vendor_calls": 0
+}

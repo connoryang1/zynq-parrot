@@ -1,0 +1,524 @@
+{
+  "state": "PASS scratch-only1792 trace0 composite first-native integrity/cold08 strict512b-eight-real-writes-Iretire-counter-17parameters-generatedL2",
+  "preparation": {
+    "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native-prepared01.json",
+    "bytes": 7317,
+    "sha256": "ef31324b5f3a8fe81779a3ea87a098e44721c44f49c0e025655594bac33c7439"
+  },
+  "original_failure": {
+    "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/session.json",
+    "bytes": 21513,
+    "sha256": "68f27565809db79e6f69485c14ded19daa6ab666498d876798c638d203dc36dc"
+  },
+  "model": {
+    "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15834992,
+    "sha256": "3f3e8b766f19746cb434e99200c0bde49853e4c0cc27aeec7a0dbacec7f6b2df",
+    "inode": 26328,
+    "mtime_ns": 1795321307625520689,
+    "ctime_ns": 1795321307625520689
+  },
+  "actual_source_list": {
+    "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/actual-source-list.json",
+    "bytes": 183167,
+    "sha256": "48876bdcbe9bf8569616d6cf799ff6d905369e43ec02d0519ab2eefb6fa6808c"
+  },
+  "source_tree_baseline": "4dadebbfdddfe958eff432b7f87280cfb9b5d991",
+  "source_bp": "7566c67aad9b93f5546fcc5e258e405402a47850",
+  "geometry": {
+    "i_lines": 1792,
+    "d_lines": 1792,
+    "sets": 256,
+    "epoch": 8,
+    "line_bytes": 64,
+    "observe": 1,
+    "cache_miss_trace": 0,
+    "delay": 0,
+    "resident": 2,
+    "logical": 4,
+    "l2_bytes": 16384,
+    "aclk_mhz": 20
+  },
+  "environment": {
+    "LD_LIBRARY_PATH": "/home/coyang/zynq-parrot-linux-research/install/lib",
+    "CCACHE_DISABLE": "1",
+    "SCCACHE_DISABLE": "1",
+    "OBJCACHE": "",
+    "TMPDIR": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/tmp"
+  },
+  "commands": [
+    {
+      "label": "loader",
+      "argv": [
+        "ldd",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "ldd",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench"
+        ],
+        "owned_pgid": 1102018,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 1.1902574700070545
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/loader.log",
+        "bytes": 651,
+        "sha256": "d0b7ecadd01c3ced9b21ed3b732046888dd5ef1bff713da3f709e6df711fd3cb"
+      },
+      "elapsed_seconds": 1.7576259879861027
+    },
+    {
+      "label": "integrity-run",
+      "argv": [
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 600000",
+        "+bsg_trace=/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity/trace.fst"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity",
+      "timeout_s": 780,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+          "+c_args=prog.nbf 600000",
+          "+bsg_trace=/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity/trace.fst"
+        ],
+        "owned_pgid": 1102028,
+        "returncode": -6,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 780,
+        "teardown_s": 5,
+        "elapsed_s": 83.21971694903914
+      },
+      "returncode": -6,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity-run.log",
+        "bytes": 32271,
+        "sha256": "f349036f271a56be7b95899b26542f488c7e9075ec120bb772b9166f0a4650e1"
+      },
+      "elapsed_seconds": 83.76924345397856
+    },
+    {
+      "label": "integrity-checker",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-scratch-profile/testing/check_run.py",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity/run.log",
+        "--exit-code",
+        "-6",
+        "--test",
+        "mt_large_retained_system_test"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-linux-scratch-profile/testing/check_run.py",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity/run.log",
+          "--exit-code",
+          "-6",
+          "--test",
+          "mt_large_retained_system_test"
+        ],
+        "owned_pgid": 1102085,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 1.197460216935724
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/integrity-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "elapsed_seconds": 1.746311702998355
+    },
+    {
+      "label": "advisory-run",
+      "argv": [
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory",
+      "timeout_s": 240,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+          "+c_args=prog.nbf 180000",
+          "+bsg_trace=/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst"
+        ],
+        "owned_pgid": 1102087,
+        "returncode": -6,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 240,
+        "teardown_s": 5,
+        "elapsed_s": 64.33941245102324
+      },
+      "returncode": -6,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory-run.log",
+        "bytes": 32244,
+        "sha256": "4266f09701a0732c7884384715000aaadee9a137d35a35e0d72f09f8f6b3620e"
+      },
+      "elapsed_seconds": 64.88637374190148
+    },
+    {
+      "label": "advisory-checker",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-scratch-profile/testing/check_run.py",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/run.log",
+        "--exit-code",
+        "-6"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-linux-scratch-profile/testing/check_run.py",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/run.log",
+          "--exit-code",
+          "-6"
+        ],
+        "owned_pgid": 1102600,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 1.211830994929187
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "elapsed_seconds": 1.7448744880966842
+    },
+    {
+      "label": "strict",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-scratch-profile/testing/rtl/retained-advisory-trace/validate.py",
+        "--fst",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--model-source-list",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/actual-source-list.json",
+        "--fixture-manifest",
+        "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+        "--log",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/run.log",
+        "--exit-code",
+        "-6",
+        "--reader-timeout",
+        "600",
+        "--out",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/strict01"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01",
+      "timeout_s": 660,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-linux-scratch-profile/testing/rtl/retained-advisory-trace/validate.py",
+          "--fst",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst",
+          "--reader",
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "--model-source-list",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/full01/actual-source-list.json",
+          "--fixture-manifest",
+          "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+          "--log",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/run.log",
+          "--exit-code",
+          "-6",
+          "--reader-timeout",
+          "600",
+          "--out",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/strict01"
+        ],
+        "owned_pgid": 1102601,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 660,
+        "teardown_s": 5,
+        "elapsed_s": 32.34612791403197
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/strict.log",
+        "bytes": 105,
+        "sha256": "afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c"
+      },
+      "elapsed_seconds": 32.885495141963474
+    },
+    {
+      "label": "counter",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-dense/research/retained-use-observation-20261121/verify_counters.py",
+        "--fst",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--strict-proof",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/strict01/verification.json",
+        "--run-proof",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/verification.json",
+        "--out",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/counter01"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01",
+      "timeout_s": 240,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-retained-dense/research/retained-use-observation-20261121/verify_counters.py",
+          "--fst",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst",
+          "--reader",
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "--strict-proof",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/strict01/verification.json",
+          "--run-proof",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/verification.json",
+          "--out",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/counter01"
+        ],
+        "owned_pgid": 1102708,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 240,
+        "teardown_s": 5,
+        "elapsed_s": 11.156360139022581
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/counter.log",
+        "bytes": 106,
+        "sha256": "a9280e152bd94d4fbddc0b6a3e36f8c8c32afb7256204b802ec3109642027d96"
+      },
+      "elapsed_seconds": 11.699492646032013
+    },
+    {
+      "label": "parameters",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/scratch-trace-profile-preparation02-20261122/geometry.py",
+        "--fst",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--lines",
+        "1792",
+        "--out",
+        "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/parameters01"
+      ],
+      "cwd": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01",
+      "timeout_s": 660,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-linux-host-observer/research/scratch-trace-profile-preparation02-20261122/geometry.py",
+          "--fst",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/advisory/trace.fst",
+          "--reader",
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "--lines",
+          "1792",
+          "--out",
+          "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/parameters01"
+        ],
+        "owned_pgid": 1102713,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 660,
+        "teardown_s": 5,
+        "elapsed_s": 1.2129260438960046
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/parameters.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "elapsed_seconds": 1.7642693979432806
+    }
+  ],
+  "closed_audits": {
+    "strict": {
+      "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/strict01/verification.json",
+      "bytes": 11965,
+      "sha256": "3ba32d125497d592d8ae01625e800efe2da3e8b5777ebfcc1205f8e840f5a76a"
+    },
+    "counter": {
+      "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/counter01/verification.json",
+      "bytes": 5965,
+      "sha256": "44ac4ddd3c3d288a807a7535196b74d78b13888db3fc6cb40e3cb92a89d4e55c"
+    },
+    "parameters": {
+      "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/parameters01/verification.json",
+      "bytes": 2121,
+      "sha256": "33f1ba94c1bc6efdbf7dc439155d04348762c13ad0802d92cf0ed37f753c923d"
+    },
+    "generated_l2": {
+      "path": "/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02/first-native01/generated-geometry.json",
+      "bytes": 3990,
+      "sha256": "b047e2390060ab7578eb5acb94d78efaaed555136cc1f991794ac05870b89d9d"
+    }
+  },
+  "limits": "Area-fit candidate1792 only, not selected maximum; no rebuild/native retry, area/fit/FPGA/all-slot/application claim. Original66309 remains FAIL."
+}
