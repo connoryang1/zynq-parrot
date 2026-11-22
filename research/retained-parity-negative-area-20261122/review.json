@@ -1,0 +1,313 @@
+{
+  "state": "PASS read-only negative parity area/current RAM boundary review",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-parity-banks-mapping-20261122/preparation01/admission.json",
+    "bytes": 8536,
+    "sha256": "8e4f706c3ae481f274ae9bf137c60110f3c6ba1c9d9c5f23fc085b6b70562fee"
+  },
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-parity-banks-mapping-20261122/preparation01/run01/session.json",
+    "bytes": 64645,
+    "sha256": "26f1bde6e251c3759659eb44798860d91a34570268bb8d4c9a8f642992fd18bd"
+  },
+  "settings": {
+    "top": "retained_production_controls",
+    "device": "xc7z020clg400-1",
+    "Vivado": "2024.2",
+    "max_threads": 8,
+    "paddr_width": 34,
+    "sets": 256,
+    "epoch_width": 8,
+    "I_invalidate": 0,
+    "I_invalidate_address": 0,
+    "D_invalidate": "variable",
+    "all_other_client_ports": "live",
+    "clock_period_ns": 50,
+    "I_waveform_ns": [
+      0,
+      25
+    ],
+    "D_waveform_ns": [
+      25,
+      50
+    ],
+    "synthesis_directive": "AreaOptimized_high",
+    "global_retiming": "on",
+    "control_set_opt_threshold": 1,
+    "KEEP_attributes_added": false,
+    "implementation_or_route": false
+  },
+  "arms": {
+    "baseline1792": {
+      "resources": {
+        "LUT": 1142,
+        "logic_LUT": 1014,
+        "LUTRAM": 128,
+        "SRL": 0,
+        "FF": 2211,
+        "RAMB36": 54,
+        "RAMB18": 4,
+        "DSP": 0,
+        "BRAM36_tiles": 56.0
+      },
+      "seconds": 164.9502756119473,
+      "actual_port_groups": {
+        "RAMB36E1/9/0/READ_FIRST/WRITE_FIRST": 21,
+        "RAMB18E1/2/0/READ_FIRST/WRITE_FIRST": 1,
+        "RAMB18E1/4/0/READ_FIRST/WRITE_FIRST": 1,
+        "RAMB36E1/18/0/READ_FIRST/WRITE_FIRST": 8,
+        "RAMB36E1/9/9/READ_FIRST/WRITE_FIRST": 21,
+        "RAMB18E1/2/2/READ_FIRST/WRITE_FIRST": 1,
+        "RAMB18E1/4/4/READ_FIRST/WRITE_FIRST": 1,
+        "RAMB36E1/18/18/READ_FIRST/WRITE_FIRST": 4
+      }
+    },
+    "parity1792": {
+      "resources": {
+        "LUT": 1591,
+        "logic_LUT": 1407,
+        "LUTRAM": 184,
+        "SRL": 0,
+        "FF": 2221,
+        "RAMB36": 56,
+        "RAMB18": 0,
+        "DSP": 0,
+        "BRAM36_tiles": 56.0
+      },
+      "seconds": 270.0497469200054,
+      "actual_port_groups": {
+        "RAMB36E1/9/0/READ_FIRST/WRITE_FIRST": 24,
+        "RAMB36E1/18/0/READ_FIRST/WRITE_FIRST": 4,
+        "RAMB36E1/9/9/READ_FIRST/WRITE_FIRST": 24,
+        "RAMB36E1/18/18/READ_FIRST/WRITE_FIRST": 4
+      }
+    }
+  },
+  "raw_artifacts": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-parity-banks-mapping-20261122/preparation01/run01/baseline1792/functional.v",
+      "bytes": 1796898,
+      "sha256": "57983f9e62e297c1baf75224935ce33482640fb557a2353c95864b207fb0a580"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-parity-banks-mapping-20261122/preparation01/run01/baseline1792/synthesized.dcp",
+      "bytes": 880533,
+      "sha256": "33ddacdea2f3dc503fb367b6109bfc06b7b7dbf013f6fa37316a1745870a0523"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-parity-banks-mapping-20261122/preparation01/run01/parity1792/functional.v",
+      "bytes": 2154316,
+      "sha256": "7a7f33b3c985f3ef640ceba7003f2acb611b007654a1363357f17ad46a3a2447"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-cell36-parity-banks-mapping-20261122/preparation01/run01/parity1792/synthesized.dcp",
+      "bytes": 1001768,
+      "sha256": "b754b85b2eaba331ffb03595ee58e31b4297c217d09778828be890ff541d95b9"
+    }
+  ],
+  "boundary": {
+    "ram_source_bridge": {
+      "parameters_sha256": "484731def3a661e3025c7a2f62614d3b919ff4c87e7df5e25033b917779fc3af",
+      "storage_sha256": "55a9af998708f532305e36ac755d857e05de8e6ac2e85e3d1df53221e4db467d"
+    },
+    "old_RAM_only_settings": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/probe.tcl",
+      "bytes": 2046,
+      "sha256": "6b6a30ce5ea92aa445fc6e4b2448ea0a087c17758e3206c64cab264199c1e132"
+    },
+    "old_source_proof": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/source-proof.json",
+      "bytes": 1934,
+      "sha256": "6b131efa13e2120e4ae62f4434e3dd904b45d6304a24f44a72f60781055ff07f"
+    },
+    "old_session": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/session.json",
+      "bytes": 91332,
+      "sha256": "58e63703b46cc36b48c77097580a51bcd7415359fc298efa3b491badb3ab3f88"
+    },
+    "observed_mappings": {
+      "1792": {
+        "tiles": 56.0,
+        "parts": {
+          "0:payload_mem": {
+            "RAMB36E1/9/0": 21,
+            "RAMB18E1/2/0": 1,
+            "RAMB18E1/4/0": 1,
+            "RAMB36E1/18/0": 4
+          },
+          "0:tag_mem": {
+            "RAMB36E1/18/0": 2
+          },
+          "1:payload_mem": {
+            "RAMB36E1/9/0": 21,
+            "RAMB18E1/2/0": 1,
+            "RAMB18E1/4/0": 1,
+            "RAMB36E1/18/0": 4
+          },
+          "1:tag_mem": {
+            "RAMB36E1/18/0": 2
+          }
+        },
+        "ports": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1792-primitives.tsv",
+          "bytes": 5128,
+          "sha256": "1ff53bc2deb47c90286b0c59e7ed6e7145ecd20e2e6b1d7fa0054d9e901ce62e"
+        },
+        "report": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1792-utilization.rpt",
+          "bytes": 1563,
+          "sha256": "9760be9980c21efeb4e91e6b482e1c1c0f849695491c4ad5ecf7236f53adfaa3"
+        },
+        "checkpoint": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1792-synthesized.dcp",
+          "bytes": 235080,
+          "sha256": "719f6036aaa9e562e35654ad2dcb1b6c622ec73871a8a3e4bb308488b6dfc4f1"
+        }
+      },
+      "1856": {
+        "tiles": 60.0,
+        "parts": {
+          "0:payload_mem": {
+            "RAMB36E1/9/0": 21,
+            "RAMB18E1/2/0": 1,
+            "RAMB18E1/4/0": 1,
+            "RAMB36E1/18/0": 4,
+            "RAMB36E1/36/0": 2
+          },
+          "0:tag_mem": {
+            "RAMB36E1/18/0": 2
+          },
+          "1:payload_mem": {
+            "RAMB36E1/9/0": 21,
+            "RAMB18E1/2/0": 1,
+            "RAMB18E1/4/0": 1,
+            "RAMB36E1/18/0": 4,
+            "RAMB36E1/36/0": 2
+          },
+          "1:tag_mem": {
+            "RAMB36E1/18/0": 2
+          }
+        },
+        "ports": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1856-primitives.tsv",
+          "bytes": 5484,
+          "sha256": "11571a47519cfb72d8aefe90446787aaeb1feb2a342752673e60b874a42f686c"
+        },
+        "report": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1856-utilization.rpt",
+          "bytes": 1563,
+          "sha256": "8505f47d5bb3319b5a6af64e8e2923e2f6c30a13ee23e915f0c7b2e9331b2a44"
+        },
+        "checkpoint": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1856-synthesized.dcp",
+          "bytes": 234599,
+          "sha256": "45a7f7f307d70c9583517c52e678964a3b3d6eaedc2830fad88f6fd6b6d57e44"
+        }
+      },
+      "1920": {
+        "tiles": 60.0,
+        "parts": {
+          "0:payload_mem": {
+            "RAMB36E1/9/0": 21,
+            "RAMB18E1/2/0": 1,
+            "RAMB18E1/4/0": 1,
+            "RAMB36E1/18/0": 4,
+            "RAMB36E1/36/0": 2
+          },
+          "0:tag_mem": {
+            "RAMB36E1/18/0": 2
+          },
+          "1:payload_mem": {
+            "RAMB36E1/9/0": 21,
+            "RAMB18E1/2/0": 1,
+            "RAMB18E1/4/0": 1,
+            "RAMB36E1/18/0": 4,
+            "RAMB36E1/36/0": 2
+          },
+          "1:tag_mem": {
+            "RAMB36E1/18/0": 2
+          }
+        },
+        "ports": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1920-primitives.tsv",
+          "bytes": 5484,
+          "sha256": "11571a47519cfb72d8aefe90446787aaeb1feb2a342752673e60b874a42f686c"
+        },
+        "report": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1920-utilization.rpt",
+          "bytes": 1563,
+          "sha256": "a43fcb2adc48d708ef8203580668cbb1791c65562ca07d14f88465c64a1aeca5"
+        },
+        "checkpoint": {
+          "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-ram-packing-20261121/preparation01/run01/remote/lines1920-synthesized.dcp",
+          "bytes": 234672,
+          "sha256": "ab99e31799ff17ab682d6c768f58585f7549174123ac83dcf554aa6b134fd13e"
+        }
+      }
+    },
+    "source_geometry": {
+      "1792": {
+        "payload_words": 14336,
+        "tag_bits": 29,
+        "local_tag_addr_bits": 11,
+        "local_payload_addr_bits": 14,
+        "global_tag_addr_bits": 12,
+        "global_payload_addr_bits": 15,
+        "ways": 7,
+        "RR_bits": 3,
+        "total_full64B_payload_bytes": 229376,
+        "mapped_in_existing_artifacts": true
+      },
+      "1793": {
+        "payload_words": 14344,
+        "tag_bits": 29,
+        "local_tag_addr_bits": 11,
+        "local_payload_addr_bits": 14,
+        "global_tag_addr_bits": 12,
+        "global_payload_addr_bits": 15,
+        "ways": 8,
+        "RR_bits": 3,
+        "total_full64B_payload_bytes": 229504,
+        "mapped_in_existing_artifacts": false
+      },
+      "1800": {
+        "payload_words": 14400,
+        "tag_bits": 29,
+        "local_tag_addr_bits": 11,
+        "local_payload_addr_bits": 14,
+        "global_tag_addr_bits": 12,
+        "global_payload_addr_bits": 15,
+        "ways": 8,
+        "RR_bits": 3,
+        "total_full64B_payload_bytes": 230400,
+        "mapped_in_existing_artifacts": false
+      },
+      "1824": {
+        "payload_words": 14592,
+        "tag_bits": 29,
+        "local_tag_addr_bits": 11,
+        "local_payload_addr_bits": 14,
+        "global_tag_addr_bits": 12,
+        "global_payload_addr_bits": 15,
+        "ways": 8,
+        "RR_bits": 3,
+        "total_full64B_payload_bytes": 233472,
+        "mapped_in_existing_artifacts": false
+      },
+      "1856": {
+        "payload_words": 14848,
+        "tag_bits": 29,
+        "local_tag_addr_bits": 11,
+        "local_payload_addr_bits": 14,
+        "global_tag_addr_bits": 12,
+        "global_payload_addr_bits": 15,
+        "ways": 8,
+        "RR_bits": 3,
+        "total_full64B_payload_bytes": 237568,
+        "mapped_in_existing_artifacts": true
+      }
+    },
+    "conclusion": "1793/1800/1824 are UNMEASURED; no address/tag/RR width cliff at1792, but ways7->8 and a partial final way.1856 adds two36-bit RAMB36 payload cells PERlane while tag mapping is unchanged. Cannot locate exact tail-allocation threshold or prove<=58tiles from these reports. No source/layout change or new mapping was run."
+  },
+  "scope": "Standalone source/resource evidence, not whole device fit/route/FPGA/application performance. Parity1792 has+449LUT/+10FF and no RAM benefit versus matched baseline and is not selected."
+}
