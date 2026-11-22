@@ -1,0 +1,82 @@
+{
+  "schema": "csr-physical-capacity-software-readback-authority-v1",
+  "ROOT_approved": true,
+  "resources_verified_by_ROOT": true,
+  "action": "offline-software-readback-only",
+  "plan": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation01/plan.DRAFT.json",
+    "bytes": 15258,
+    "sha256": "73c0b8730a6b41fae635400776a729226152e2190953c6e7515adfa485d29afb"
+  },
+  "worker": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation02/prepare_software.py",
+    "bytes": 6294,
+    "sha256": "98f988fa64fe3cf468ad15d8d1600fd62984bac208045d5ddc69d20dc2930966"
+  },
+  "output": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/result01",
+  "candidate_lines": 1536,
+  "correction": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation02/correction.json",
+    "bytes": 2781,
+    "sha256": "37416918baf572f19d2cf4022b28af80b1603d051b7c38638e618a5c923d13db"
+  },
+  "ROOT_qualified_owned_wrapper": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr1536-opt-whole-cad-preparation03-20261122/software_owned_v2.py",
+    "bytes": 3997,
+    "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+  },
+  "ROOT_all_OTHER_resource_profile": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/preparation03/ROOT-resource-profile.json",
+    "bytes": 7020,
+    "sha256": "746383478ccbb00f1b3d42d9ee9982532c43fef5a5763639c4d20a4628321f42"
+  },
+  "unlaunchable_reasons": [
+    "No fitted/package/physical/observer-install authority; software-only gate supplies none."
+  ],
+  "resource_envelope": {
+    "metadata_cap_bytes": 131072,
+    "metadata_is_subset_of_existing_4MiB_reserve": true,
+    "worker_AS_bytes": 268435456,
+    "worker_wall_seconds": 120,
+    "minimum_MemAvailable_bytes": 5368709120,
+    "no_new_RUN_SHM_disk_allocation": true
+  },
+  "source_successor_allocated_cap_bytes": 65536,
+  "source_correction": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation02/correction.json",
+    "bytes": 2781,
+    "sha256": "37416918baf572f19d2cf4022b28af80b1603d051b7c38638e618a5c923d13db"
+  },
+  "old_failure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback-20261122/session.json",
+    "bytes": 1740,
+    "sha256": "152313722f4dd96799f541f3b1fb2367581b7faf3f40584635f5d8d2be0446d9"
+  },
+  "ROOT_UTC": "2026-11-22T23:29:51.915091+00:00",
+  "ROOT_initial_resources": {
+    "resources": {
+      "volumes": {
+        "source": {
+          "device": 51,
+          "free_bytes": 3869028352
+        },
+        "work": {
+          "device": 51,
+          "free_bytes": 3869028352
+        },
+        "home": {
+          "device": 2050,
+          "free_bytes": 2257965056
+        },
+        "shm": {
+          "device": 25,
+          "free_bytes": 892874752
+        }
+      },
+      "source_allocated_bytes": 54415360,
+      "work_allocated_bytes": 498872320,
+      "evidence_allocated_bytes": 115851264
+    },
+    "MemAvailable_bytes": 35744960512
+  }
+}

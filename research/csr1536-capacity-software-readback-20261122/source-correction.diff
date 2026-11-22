@@ -1,0 +1,24 @@
+--- /home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation01/prepare_software.py
++++ /home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation02/prepare_software.py
+@@ -4,7 +4,7 @@
+ from pathlib import Path
+ sys.dont_write_bytecode=True
+ HERE=Path(__file__).resolve().parent
+-PLAN=HERE/'plan.DRAFT.json'
++PLAN=Path('/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation01/plan.DRAFT.json')
+ 
+ def need(v,m):
+     if not v:raise ValueError(m)
+@@ -41,6 +41,12 @@
+     need(s['elf']['sha256']==single['ELF_sha256'] and j['elf']['sha256']==joint['ELF_sha256'] and j['nbf']['sha256']==joint['NBF_sha256'],'actual unchanged physical/software payload identities')
+     tools=load(p['static_tools'],'bound_joint_static_tools');gen=load(p['generator'],'bound_capacity_generator')
+     image,payload=tools.verify_payloads(Path(j['elf']['path']),j['symbols'],gen,guard)
++    # The immutable producer JSON serializes these two list-of-tuples fields.
++    # Preserve every value/order; accept no arbitrary scalar/type conversion.
++    for name in ('hint_sites','checked_compare_failures'):
++        pairs=payload['static_CFG'][name]
++        need(type(pairs) is list and all(type(pair) is tuple and len(pair)==2 and all(type(v) is int for v in pair) for pair in pairs),'exact source-returned pair type '+name)
++        payload['static_CFG'][name]=[list(pair) for pair in pairs]
+     need(payload==j['payload_proof'],'all1792 linked joint payload/CFG proof exact; historical256 fields are not a new runtime claim')
+     del image
+     jc=tools.verify_coverage(Path(j['elf']['path']),Path(j['nbf']['path']),j['payload_proof']['config'],0xc641000000000000)

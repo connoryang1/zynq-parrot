@@ -1,0 +1,66 @@
+{
+  "schema": "csr-physical-capacity-software-readback-authority-v1",
+  "ROOT_approved": true,
+  "resources_verified_by_ROOT": true,
+  "action": "offline-software-readback-only",
+  "plan": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation01/plan.DRAFT.json",
+    "bytes": 15258,
+    "sha256": "73c0b8730a6b41fae635400776a729226152e2190953c6e7515adfa485d29afb"
+  },
+  "worker": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation01/prepare_software.py",
+    "bytes": 5691,
+    "sha256": "e641eae0a88135c99d400f007557ebcfdf49075621a94e01aeca7cf54a3fae02"
+  },
+  "output": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback-20261122/result01",
+  "candidate_lines": 1536,
+  "ROOT_qualified_owned_wrapper": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr1536-opt-whole-cad-preparation03-20261122/software_owned_v2.py",
+    "bytes": 3997,
+    "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+  },
+  "ROOT_all_OTHER_resource_profile": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/preparation03/ROOT-resource-profile.json",
+    "bytes": 7020,
+    "sha256": "746383478ccbb00f1b3d42d9ee9982532c43fef5a5763639c4d20a4628321f42"
+  },
+  "unlaunchable_reasons": [
+    "No fitted/package/physical/observer-install authority; software-only gate supplies none."
+  ],
+  "resource_envelope": {
+    "metadata_cap_bytes": 131072,
+    "metadata_is_subset_of_existing_4MiB_reserve": true,
+    "worker_AS_bytes": 268435456,
+    "worker_wall_seconds": 120,
+    "minimum_MemAvailable_bytes": 5368709120,
+    "no_new_RUN_SHM_disk_allocation": true
+  },
+  "ROOT_UTC": "2026-11-22T23:27:25.751198+00:00",
+  "ROOT_initial_resources": {
+    "resources": {
+      "volumes": {
+        "source": {
+          "device": 51,
+          "free_bytes": 4129554432
+        },
+        "work": {
+          "device": 51,
+          "free_bytes": 4129554432
+        },
+        "home": {
+          "device": 2050,
+          "free_bytes": 2258767872
+        },
+        "shm": {
+          "device": 25,
+          "free_bytes": 892874752
+        }
+      },
+      "source_allocated_bytes": 54415360,
+      "work_allocated_bytes": 238346240,
+      "evidence_allocated_bytes": 115781632
+    },
+    "MemAvailable_bytes": 37768282112
+  }
+}

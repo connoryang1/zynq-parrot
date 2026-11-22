@@ -1,0 +1,83 @@
+{
+  "state": "PASS offline software payload/NBF/static/46MiB-bounds readback; no dynamic/native/FPGA claim",
+  "authority": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/authority.FINAL.json",
+    "bytes": 3250,
+    "sha256": "8de35d5a3d64b9da0c28542a4d805dbadadfa5f80d130b2ad5c3f8f845fc02ec"
+  },
+  "supervisor": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/run.py",
+    "bytes": 4591,
+    "sha256": "870ffa1b7a57f016116f7f448fda47f9a61c56933d33b36fba5514429f911163"
+  },
+  "board_actions": false,
+  "other_charges_unchanged": true,
+  "ownership": {
+    "group_states": [
+      {
+        "phase": "normal_parent_exit_before_reap",
+        "members": []
+      },
+      {
+        "phase": "normal_parent_exit_after_reap",
+        "members": []
+      },
+      {
+        "phase": "cleanup_complete",
+        "members": []
+      }
+    ],
+    "reaped_owned_children": [],
+    "argv": [
+      "/usr/bin/python3",
+      "-B",
+      "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation02/prepare_software.py",
+      "--authority",
+      "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/authority.FINAL.json",
+      "--authority-sha",
+      "8de35d5a3d64b9da0c28542a4d805dbadadfa5f80d130b2ad5c3f8f845fc02ec",
+      "--out",
+      "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/result01",
+      "--candidate-lines",
+      "1536"
+    ],
+    "owned_pgid": 1561318,
+    "returncode": 0,
+    "failure": null,
+    "owned_group_remaining": false,
+    "timeout_s": 120,
+    "teardown_s": 5,
+    "elapsed_s": 9.3803102360107
+  },
+  "report": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/result01/software-readback.json",
+    "bytes": 9072,
+    "sha256": "42403f4f3ba803d5e1271307ac1a64c0f45f4e2994c0665ada99d2227fb64231"
+  },
+  "final_resources": {
+    "resources": {
+      "volumes": {
+        "source": {
+          "device": 51,
+          "free_bytes": 3869028352
+        },
+        "work": {
+          "device": 51,
+          "free_bytes": 3869028352
+        },
+        "home": {
+          "device": 2050,
+          "free_bytes": 2257899520
+        },
+        "shm": {
+          "device": 25,
+          "free_bytes": 892874752
+        }
+      },
+      "source_allocated_bytes": 54415360,
+      "work_allocated_bytes": 498872320,
+      "evidence_allocated_bytes": 115879936
+    },
+    "MemAvailable_bytes": 35754967040
+  }
+}

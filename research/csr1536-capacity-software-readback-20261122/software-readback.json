@@ -1,0 +1,316 @@
+{
+  "schema": "csr1536-physical-capacity-software-readback-v1",
+  "state": "PASS offline byte/static readback only; no physical/native execution authority",
+  "candidate_lines": 1536,
+  "sets": 256,
+  "max_lines": 1792,
+  "programs": {
+    "d-enabled": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/retained_capacity_test.elf",
+        "bytes": 998432,
+        "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/d-enabled/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "4a8512dfa3074997c7e6ecf63a733a5cc597595c455308397a7f3a88090d6921"
+      },
+      "coverage": {
+        "file_bytes": 570984,
+        "file_zero_bytes": 300118,
+        "missing_bytes": 0,
+        "wrong_bytes": 0,
+        "load_bound": {
+          "write_records": 71373,
+          "maximum_write_end_exclusive": "0x8008cbf0",
+          "allocation_bytes": 48234496
+        },
+        "declared_input": {
+          "address": "0x8008cb50",
+          "bytes": 8,
+          "value": "0xc640000000000002"
+        }
+      },
+      "expected_counts": [
+        0,
+        1536,
+        0,
+        1536,
+        0,
+        12288
+      ]
+    },
+    "d-off": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/retained_capacity_test.elf",
+        "bytes": 998432,
+        "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/d-off/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "b60a50bba248fd8c54a7cc1385a2e25eb852f1a7a53e39b162c479ed9087e9d4"
+      },
+      "coverage": {
+        "file_bytes": 570984,
+        "file_zero_bytes": 300119,
+        "missing_bytes": 0,
+        "wrong_bytes": 0,
+        "load_bound": {
+          "write_records": 71373,
+          "maximum_write_end_exclusive": "0x8008cbf0",
+          "allocation_bytes": 48234496
+        },
+        "declared_input": {
+          "address": "0x8008cb50",
+          "bytes": 8,
+          "value": "0xc640000000000000"
+        }
+      },
+      "expected_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "i-enabled": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/retained_capacity_test.elf",
+        "bytes": 998432,
+        "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/i-enabled/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "047f330163a22ba0eda3ec8cd559f655a718bec8300b4113c745a86f4d764267"
+      },
+      "coverage": {
+        "file_bytes": 570984,
+        "file_zero_bytes": 300118,
+        "missing_bytes": 0,
+        "wrong_bytes": 0,
+        "load_bound": {
+          "write_records": 71373,
+          "maximum_write_end_exclusive": "0x8008cbf0",
+          "allocation_bytes": 48234496
+        },
+        "declared_input": {
+          "address": "0x8008cb50",
+          "bytes": 8,
+          "value": "0xc640000000000003"
+        }
+      },
+      "expected_counts": [
+        1536,
+        0,
+        1536,
+        0,
+        12288,
+        0
+      ]
+    },
+    "i-off": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/retained_capacity_test.elf",
+        "bytes": 998432,
+        "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+      },
+      "nbf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/i-off/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "1879ad7932d3b03205e6a3a9b01b5c1fdac853223e7bb219aabc9a7b2bb3e717"
+      },
+      "coverage": {
+        "file_bytes": 570984,
+        "file_zero_bytes": 300118,
+        "missing_bytes": 0,
+        "wrong_bytes": 0,
+        "load_bound": {
+          "write_records": 71373,
+          "maximum_write_end_exclusive": "0x8008cbf0",
+          "allocation_bytes": 48234496
+        },
+        "declared_input": {
+          "address": "0x8008cb50",
+          "bytes": 8,
+          "value": "0xc640000000000001"
+        }
+      },
+      "expected_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "joint": {
+      "elf": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/retained_joint_capacity.elf",
+        "bytes": 998528,
+        "sha256": "cd562863f1758922ee7f55ce5e24410a5060a18fc64eff5c98d25b32de213062"
+      },
+      "nbf": {
+        "path": "/run/user/1001/zp-csr-joint-software-20261122-01/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "11721c8556d0ffe309d986c9c4413cb43bb7a12f05f3c56565cd2de00d002869"
+      },
+      "coverage": {
+        "file_bytes": 570984,
+        "file_zero_bytes": 300167,
+        "missing_bytes": 0,
+        "wrong_bytes": 0,
+        "load_bound": {
+          "write_records": 71373,
+          "maximum_write_end_exclusive": "0x8008cbf0",
+          "allocation_bytes": 48234496
+        },
+        "declared_input": {
+          "address": "0x8008cb50",
+          "bytes": 8,
+          "value": "0xc641000000000000"
+        }
+      },
+      "static_CFG": {
+        "state": "PASS linked protected CFG static extension; no target execution",
+        "function_start": 2147484864,
+        "function_end": 2147485776,
+        "protected_begin": 2147484948,
+        "verified": 2147485684,
+        "protected_instructions": 184,
+        "call_site": 2147485476,
+        "target_load_site": 2147485632,
+        "hint_sites": [
+          [
+            2147485084,
+            1984
+          ],
+          [
+            2147485248,
+            2496
+          ]
+        ],
+        "store_atomic_fence_control_writes": 0,
+        "error_escapes": [
+          {
+            "from_pc": 2147485040,
+            "to_pc": 2147485696
+          },
+          {
+            "from_pc": 2147485048,
+            "to_pc": 2147485696
+          },
+          {
+            "from_pc": 2147485080,
+            "to_pc": 2147485716
+          },
+          {
+            "from_pc": 2147485112,
+            "to_pc": 2147485696
+          },
+          {
+            "from_pc": 2147485156,
+            "to_pc": 2147485716
+          },
+          {
+            "from_pc": 2147485204,
+            "to_pc": 2147485696
+          },
+          {
+            "from_pc": 2147485212,
+            "to_pc": 2147485696
+          },
+          {
+            "from_pc": 2147485244,
+            "to_pc": 2147485716
+          },
+          {
+            "from_pc": 2147485276,
+            "to_pc": 2147485696
+          },
+          {
+            "from_pc": 2147485324,
+            "to_pc": 2147485716
+          },
+          {
+            "from_pc": 2147485480,
+            "to_pc": 2147485704
+          },
+          {
+            "from_pc": 2147485648,
+            "to_pc": 2147485712
+          }
+        ],
+        "checked_compare_failures": [
+          [
+            2147485040,
+            5
+          ],
+          [
+            2147485048,
+            5
+          ],
+          [
+            2147485112,
+            5
+          ],
+          [
+            2147485204,
+            5
+          ],
+          [
+            2147485212,
+            5
+          ],
+          [
+            2147485276,
+            5
+          ],
+          [
+            2147485480,
+            6
+          ],
+          [
+            2147485648,
+            7
+          ]
+        ],
+        "timeout_results": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "limits": "Target-call dynamic address and checked returns still require full execution/trace; generated callees separately checked exact16 instructions."
+      },
+      "expected_counts": [
+        1536,
+        1536,
+        1536,
+        1536,
+        12288,
+        12288
+      ],
+      "dynamic_runtime_proof": null
+    }
+  },
+  "source_plan": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-physical-capacity-readiness-20261122/preparation01/plan.DRAFT.json",
+    "bytes": 15258,
+    "sha256": "73c0b8730a6b41fae635400776a729226152e2190953c6e7515adfa485d29afb"
+  },
+  "authority": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-offline-software-readback02-20261122/authority.FINAL.json",
+    "bytes": 3250,
+    "sha256": "8de35d5a3d64b9da0c28542a4d805dbadadfa5f80d130b2ad5c3f8f845fc02ec"
+  },
+  "elapsed_seconds": 7.390305269975215,
+  "requires_fitted_image_and_actual46MiB_runner": true,
+  "native_all1536_full167_proof": null,
+  "joint_dynamic_target_liveness_proof": null
+}
