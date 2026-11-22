@@ -1,0 +1,197 @@
+{
+  "state": "READ-ONLY source contract only; no implementation, model, vendor, inventory or mapped query",
+  "TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+  "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "source_root": "/dev/shm/zp-linux-csr-unmasked256-fpga-source-20261122-03",
+  "actual_terminal_reported_by_ROOT": {
+    "job": "20261122T151115Z-a44c03bb7",
+    "terminal_sha256": "1b676ed09a60843bddd552c5dc8bbe848e97d8938e285b65a0c7b9eebe9593e6",
+    "synth": {
+      "LUT": 54072,
+      "logic_LUT": 50099,
+      "memory_LUT": 3973,
+      "FF": 26901,
+      "BRAM_tiles": 93.5,
+      "DSP": 11,
+      "elapsed": "01:24:16"
+    },
+    "placement": {
+      "required_slices": 10995,
+      "available_slices": 10873,
+      "deficit": 122,
+      "control_sets": 1153,
+      "combined_LUT_report": 56598,
+      "total_LUT_report": 65844,
+      "elapsed": "00:05:52"
+    },
+    "old256": {
+      "synth_LUT": 53514,
+      "logic_LUT": 50085,
+      "memory_LUT": 3429,
+      "FF": 29798,
+      "BRAM_tiles": 93.5,
+      "placement_required": 11176,
+      "placement_available": 11010,
+      "deficit": 166
+    },
+    "stage_specific_deltas": {
+      "synth_logic_LUT": 14,
+      "synth_memory_LUT": 544,
+      "synth_total_LUT": 558,
+      "synth_FF": -2897,
+      "required_slices": -181,
+      "available_slices": -137,
+      "deficit_improvement": 44
+    },
+    "no_route_or_fit": true
+  },
+  "selected_source_candidate_count": 1,
+  "candidate": {
+    "name": "Borrow the final prefetched integer-context line from a held synchronous backing-store read",
+    "scope": "Fixed nonresident-context machinery, independent of retained capacity/CSR policy; not another per-thread CSR bank merge.",
+    "current_payload_buffers": {
+      "lines": 2,
+      "registers_each_line": 16,
+      "data_bits_each_line": 1024,
+      "declared_total_bits": 2048
+    },
+    "possible_removed_duplicate_declared_bits": 1024,
+    "not_a_measured_FF_or_slice_saving": true,
+    "ports": {
+      "scalar_write_inputs": 2,
+      "accepted_scalar_writes_per_cycle": 1,
+      "priority": "port1 remote-write wins over port0 ordinary writeback exactly as existing scalar_w_port=w_v_i[1]",
+      "per_memory_bank": "one independent synchronous read plus one independent synchronous write, own same posedge clock, potentially simultaneous different addresses (1R1W). NOT the retained backend single-port1RW pattern.",
+      "bank_count": 16,
+      "width_bits": 64,
+      "depth": 8,
+      "full_line_read_bits": 1024
+    },
+    "read_schedule": "Exactly two requests during wait_ctxtsw_commit/wait_drain; issue_done blocks any third until next miss. Both response/slot-valid events and first/final RF install timing remain unchanged. Keep line0 snapshot. Use held final-line read plus captured16-bit validity mask for line1, gated by unchanged original line1-valid token.",
+    "current_hold_blocker": "bsg_mem_1r1w_sync default latch_last_read_p=0; its synth model writes r_addr_r=X on idle and no_llr exposes mem[r_addr_r]. Direct alias after response is invalid today.",
+    "strengthened_leaf_contract": "Canonical1R1W read snapshot updates ONLY on an accepted read, holds across all writes (including a later same-address write), and stays stable through final RF use. Existing synchronous request/response latency and read/write acceptance/priority do not change. Add16-bit validity snapshot at read acceptance; live valid_r must not change the borrowed old response after later seeding. Reset ends lease and clears token/validity metadata without requiring payload reset.",
+    "collision_contract": "Original read_write_same_addr_p=0 treats selected write to a bank at accepted read address as a prohibited collision/assertion. Preserve that rejection and defined legal-cycle semantics; do not silently legalize WRITE_FIRST or waive warnings. New primitive WRITE_MODE/EN behavior must be checked. In contrast, a write to held address AFTER read (r_v=0) is allowed: raw held data and saved mask must remain the old snapshot.",
+    "ownership": "No new context read before final borrowed RF line use, except cancel/reset terminates old lease; ordinary independent scalar writes remain permitted. Speculative redirect abort, incoming response, new miss and reset priorities remain source-exact.",
+    "forbidden_shortcuts": [
+      "Do not serialize read/write into1RW or stall either channel.",
+      "Do not remove both line copies: the second request overwrites the raw first response before delayed drain/install.",
+      "Do not enable generic latch_last_read and claim saving without counting any added1024-bit latch.",
+      "Do not repeatedly reread or change request/valid/restore/FE cycles.",
+      "Do not use live valid bitmap as held-response validity."
+    ]
+  },
+  "minimum_future_gates": [
+    "ROOT source selection before code or execution",
+    "Matched actual4context/32register/16-lane backing-store+two-line-buffer miter: every accepted full1024 payload, original request/response/slot-valid/restore/FE cycles, both scalar write intents and priority, independent read/write, post-read same-address writes, partial-valid contexts, arbitrary drain hold, abort/reset/new miss and final-line ownership. Original forbidden accepted-R/W collision must still reject.",
+    "Verification-only full1024 snapshot equality on every final-line RF write and no-next-read-before-last-use assertion; deliberate mutation of one held word/validmask must be rejected.",
+    "Small source-bound production-width component inference: baseline versus candidate same ports/clock/options, inspect actual RAM mode/read/write widths/enable/READ_FIRST/collision shape and actualFF/LUT/BRAM/controlsets; no wholeUCE synthesis repeat.",
+    "Actual mapped primitive/netlist read-during-write/hold test, then clean fullcore architectural/general-context/native qualification, only then a separately admitted whole-device fit."
+  ],
+  "not_selected": [
+    "Previous customCSR command hoist/shared64b payload audit already bounded its likely value; no renewed hundreds-LUT claim.",
+    "Per-resident vs virtual NPC/dirty mirrors need separate temporal proof across launch/copy/reseed priorities; no blind alias.",
+    "Moving a2deep1024wide resettable buffer into wide shallow LUTRAM can repeat the known CSRFF-to-LUT cost tradeoff; not proposed.",
+    "Two mirrored GPR operand memories, RPC argument shadows and pending RPC snapshot have independent ports/lifetimes; no port/copy deletion."
+  ],
+  "sources": [
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_top.sv",
+      "bytes": 88043,
+      "sha256": "96915d9ea91370349975b758b862eddd031e8f44e961c224e69dddf5a115a79c",
+      "line_ranges": [
+        [
+          307,
+          339
+        ],
+        [
+          449,
+          495
+        ],
+        [
+          500,
+          545
+        ],
+        [
+          1020,
+          1059
+        ],
+        [
+          1085,
+          1093
+        ],
+        [
+          1144,
+          1215
+        ],
+        [
+          1239,
+          1264
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_context_mem.sv",
+      "bytes": 4160,
+      "sha256": "84633dac0f1a25ef3032f4bbcafd287f2c1a19b257c5a68aa52e10af812a2feb",
+      "line_ranges": [
+        [
+          17,
+          47
+        ],
+        [
+          50,
+          104
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w_sync.sv",
+      "bytes": 3457,
+      "sha256": "6fa3b9101b6ea3ebbb76f4cf40c5bb3a037573e970bb849df3b5b47bcd1df62a",
+      "line_ranges": [
+        [
+          17,
+          27
+        ],
+        [
+          61,
+          80
+        ],
+        [
+          103,
+          116
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1r1w_sync_synth.sv",
+      "bytes": 3562,
+      "sha256": "c9825e0f7995e8ddd5d189bda1a5316b525b5296c0a29537a8b878f80a3c625e",
+      "line_ranges": [
+        [
+          49,
+          128
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_regfile_mt.sv",
+      "bytes": 17520,
+      "sha256": "bbe21da49a3a0d8537ac40cdee8df96d8f82070189c1bdb9cd4820cbe16d9a38",
+      "line_ranges": [
+        [
+          79,
+          88
+        ],
+        [
+          158,
+          164
+        ],
+        [
+          197,
+          224
+        ]
+      ]
+    }
+  ]
+}

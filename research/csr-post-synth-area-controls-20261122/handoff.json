@@ -1,0 +1,70 @@
+{
+  "state": "READY SOURCE ONLY; ROOT funding/approval required; no tool execution by agent",
+  "files": [
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/run.py",
+      "bytes": 12674,
+      "sha256": "04a416ac85f984cb7d9b7d6cac8a4e991c4e3a67a9b7dd825295f90711035feb"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/probe.tcl",
+      "bytes": 7323,
+      "sha256": "83be0d2c929c2931872cb9ab3146f78c068b709feef0e7f7624ff567b67dc394"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/ownership.py",
+      "bytes": 2914,
+      "sha256": "8fa7ff4c53781b3436b0989e7f98bc2b26ae20cc3ce58bc3872cde6b7fb6a73c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/software_owned_v2.py",
+      "bytes": 3997,
+      "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/admission.DRAFT.json",
+      "bytes": 6203,
+      "sha256": "488d05e727565b1767e62ba1849c5afb1be4d41df5637e25780985565b1d15bd"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/prior-controls.json",
+      "bytes": 10846,
+      "sha256": "9a5d3301e2b2656beba46105c2c1541f1d6fd828df38f571bcb2b73392d1d821"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/qualified-preopt-clocks.tsv",
+      "bytes": 639,
+      "sha256": "bd30c68a94918584187331c8d94a96fa25eae3bf899b1426fbbfdc447c7552f6"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/README.md",
+      "bytes": 4495,
+      "sha256": "7bc5305007eaec35ace6c75ab996e7475fb93830b2dbf0425246c59f342b16a4"
+    }
+  ],
+  "whitelist": [
+    "run.py",
+    "probe.tcl",
+    "ownership.py",
+    "software_owned_v2.py",
+    "admission.DRAFT.json",
+    "prior-controls.json",
+    "qualified-preopt-clocks.tsv",
+    "README.md",
+    "handoff.json"
+  ],
+  "command": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/run.py",
+    "--admission",
+    "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr-post-synth-area-controls-20261122/admission.ROOT.json",
+    "--admission-sha256",
+    "ROOT_FINAL_ADMISSION_SHA",
+    "--execute"
+  ],
+  "static_validation": "PASS allPythonAST/qualified52c89owner/source-onlyfieldbinding generation; no runtime/tool tests",
+  "primary_start": "implementation-input36b4, notrawSYNd5 andnotoptimizedba2f",
+  "clock_gate": "ROOT59579closedfiveclockstable plus mandatory runtimebaseline/entry/sourcepin/constraintverification BEFOREopt andagainbeforeplace",
+  "prospective_source_byte_cap": 65536
+}
