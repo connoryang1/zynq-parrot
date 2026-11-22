@@ -1,0 +1,72 @@
+{
+  "state": "Fixed synthetic all1792 D interval diagnostics only; no statistics/performance claim",
+  "review": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained1792-d-off-closed-20261121/review.json",
+    "bytes": 3033,
+    "sha256": "7a8741e46cfa592448a72a2ee10fdca271821706f136123c2571b3879c508caf"
+  },
+  "clock": {
+    "raw_tick_unit": "ps",
+    "ticks_per_core_cycle": 50000,
+    "model_aclk_hz": 20000000,
+    "basis": "ROOT-bound native synchronous model; exact compiled clock source; no FPGA calibration",
+    "compiled_source": {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/v/bsg_nonsynth_zynq_testbench.sv",
+      "bytes": 18810,
+      "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+    },
+    "local_identical_source": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/cosim/v/bsg_nonsynth_zynq_testbench.sv",
+      "bytes": 18810,
+      "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+    },
+    "compiled_inventory": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained1792-stream-canonical-20261121/stopped-audit01/compiled-sources.json",
+      "bytes": 142844,
+      "sha256": "3f5e4b2c2691275e57ec8b790832e9bbb87827c9bb84925351b8170ff58ca3e8"
+    }
+  },
+  "intervals": {
+    "population_and_check": {
+      "values": {
+        "d-enabled": {
+          "raw_ps": 23214800000,
+          "core_cycles": 464296
+        },
+        "d-off": {
+          "raw_ps": 19145800000,
+          "core_cycles": 382916
+        }
+      },
+      "on_divided_by_off_exact": "116074/95729",
+      "on_divided_by_off": 1.2125270294268196,
+      "on_minus_off_cycles": 81380,
+      "on_minus_off_percent_exact": "2034500/95729",
+      "on_minus_off_percent": 21.252702942681946
+    },
+    "target_check_only": {
+      "values": {
+        "d-enabled": {
+          "raw_ps": 12546650000,
+          "core_cycles": 250933
+        },
+        "d-off": {
+          "raw_ps": 12738250000,
+          "core_cycles": 254765
+        }
+      },
+      "on_divided_by_off_exact": "250933/254765",
+      "on_divided_by_off": 0.9849586874178164,
+      "on_minus_off_cycles": -3832,
+      "on_minus_off_percent_exact": "-76640/50953",
+      "on_minus_off_percent": -1.5041312582183581
+    }
+  },
+  "excluded": [
+    "prior retained activation/mode setup",
+    "subsequent mode reset",
+    "subsequent drains",
+    "reporting and completion"
+  ],
+  "limits": "Single closed native run per D mode, all1792 targets, both fixed intervals; no uncertainty/statistics or application/complete-WHOLE claim."
+}
