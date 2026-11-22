@@ -1,0 +1,434 @@
+{
+  "state": "CLOSED read-only cache-miss-recorder opportunity audit; no implementation or fit claim",
+  "source_bindings": [
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122",
+      "commit": "eb7d390134a0025331a2366a979a774263b146d5",
+      "path": "cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 42343,
+      "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c",
+      "excerpts": [
+        {
+          "first_line": 773,
+          "last_line": 793,
+          "text": "     ,.m00_axil_arvalid(bp_s_axil_arvalid)\n     ,.m00_axil_arready(bp_s_axil_arready)\n     ,.m00_axil_rdata  (bp_s_axil_rdata)\n     ,.m00_axil_rresp  (bp_s_axil_rresp)\n     ,.m00_axil_rvalid (bp_s_axil_rvalid)\n     ,.m00_axil_rready (bp_s_axil_rready)\n     );\n\n   logic [bp_axi_addr_width_lp-1:0] axi_awaddr;\n   logic [bp_axi_addr_width_lp-1:0] axi_araddr;\n\n   // to translate from BP DRAM space to ARM PS DRAM space\n   // we xor-subtract the BP DRAM base address (32'h8000_0000) and add the\n   // ARM PS allocated memory space physical address.\n\n   //always @(negedge aclk)\n   //  begin\n   //     if (hp0_axi_awvalid && ((axi_awaddr ^ 32'h8000_0000) >= memory_upper_limit_lp))\n   //       $display(\"top_zynq: unexpectedly high DRAM write: %x\",axi_awaddr);\n   //     if (hp0_axi_arvalid && ((axi_araddr ^ 32'h8000_0000) >= memory_upper_limit_lp))\n   //       $display(\"top_zynq: unexpectedly high DRAM read: %x\",axi_araddr);"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122/import/black-parrot-subsystems",
+      "commit": "f6ce99ea7ebdcb97a46f73c296505071e9fb22ab",
+      "path": "blackparrot/v/bp_axi_top.sv",
+      "bytes": 26779,
+      "sha256": "5fe2286b2b90b07b701c386063749428e7de60a3d45edcb66e446257362fcf75",
+      "excerpts": [
+        {
+          "first_line": 10,
+          "last_line": 22,
+          "text": " import bp_me_pkg::*;\n import bsg_cache_pkg::*;\n import bsg_axi_pkg::*;\n // see bp_common/src/include/bp_common_aviary_pkgdef.svh for a list of configurations that you can try!\n #(parameter bp_params_e bp_params_p = e_bp_default_cfg\n   `declare_bp_proc_params(bp_params_p)\n   , parameter axi_core_clk_async_p = 0\n   , parameter prefetch_bypass_p = 0\n   , parameter prefetch_outstanding_p = 10\n   , parameter bit cache_miss_trace_p = 1'b0\n   , localparam lg_async_fifo_size_lp = 3\n\n   // AXI4-LITE PARAMS"
+        },
+        {
+          "first_line": 184,
+          "last_line": 196,
+          "text": "     ,.oclk_data_o(axi_reset_li)\n     );\n\n  wire [did_width_p-1:0] my_did_li = 1'b1;\n  wire [did_width_p-1:0] host_did_li = '1;\n  bp_processor\n   #(.bp_params_p(bp_params_p)\n     ,.prefetch_bypass_p(prefetch_bypass_p)\n     ,.cache_miss_trace_p(cache_miss_trace_p)\n     )\n   processor\n    (.clk_i(core_clk_i)\n     ,.rt_clk_i(rt_clk_i)"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122/import/black-parrot",
+      "commit": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+      "path": "bp_top/src/v/bp_processor.sv",
+      "bytes": 13470,
+      "sha256": "69d662173b43af5e4ac8ddbefd458bf5e27eff43128c30bb6421c46584cc53be",
+      "excerpts": [
+        {
+          "first_line": 12,
+          "last_line": 23,
+          "text": "module bp_processor\n import bp_common_pkg::*;\n import bp_be_pkg::*;\n import bp_me_pkg::*;\n import bsg_noc_pkg::*;\n #(parameter bp_params_e bp_params_p = e_bp_default_cfg\n   , parameter prefetch_bypass_p = 0\n   , parameter bit cache_miss_trace_p = 1'b0\n   `declare_bp_proc_params(bp_params_p)\n\n   `declare_bp_bedrock_if_widths(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p)\n"
+        },
+        {
+          "first_line": 311,
+          "last_line": 325,
+          "text": "              assign dma_data_ready_and_o[i][j] = dma_data_ready_and_lo[col_lp][col_pos_lp];\n            end\n        end\n    end\n  else\n    begin : u\n      bp_unicore\n       #(.bp_params_p(bp_params_p)\n         ,.prefetch_bypass_p(prefetch_bypass_p)\n         ,.cache_miss_trace_p(cache_miss_trace_p)\n         )\n       unicore\n        (.my_cord_i('0), .*);\n    end\n"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122/import/black-parrot",
+      "commit": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+      "path": "bp_top/src/v/bp_unicore.sv",
+      "bytes": 18171,
+      "sha256": "2f9309352534976b3a851404b30ed0bac1655c8c7a46233ccfbe7147cc63c5b9",
+      "excerpts": [
+        {
+          "first_line": 25,
+          "last_line": 36,
+          "text": " import bp_top_pkg::*;\n import bsg_noc_pkg::*;\n import bsg_cache_pkg::*;\n #(parameter bp_params_e bp_params_p = e_bp_default_cfg\n   , parameter prefetch_bypass_p = 0\n   // Temporary diagnostic. Set to zero at this boundary to compile out both\n   // trace RAMs and every associated counter/control path.\n   , parameter bit cache_miss_trace_p = 1'b0\n   `declare_bp_proc_params(bp_params_p)\n\n   `declare_bp_bedrock_if_widths(paddr_width_p, lce_id_width_p, cce_id_width_p, did_width_p, lce_assoc_p)\n"
+        },
+        {
+          "first_line": 129,
+          "last_line": 144,
+          "text": "  logic [num_dev_lp-1:0][bedrock_fill_width_p-1:0] dev_fwd_data_li;\n  logic [num_dev_lp-1:0] dev_fwd_v_li, dev_fwd_ready_and_lo;\n  bp_bedrock_mem_rev_header_s [num_dev_lp-1:0] dev_rev_header_lo;\n  logic [num_dev_lp-1:0][bedrock_fill_width_p-1:0] dev_rev_data_lo;\n  logic [num_dev_lp-1:0] dev_rev_v_lo, dev_rev_ready_and_li;\n\n  bp_cfg_bus_s cfg_bus_lo;\n  logic debug_irq_li, timer_irq_li, software_irq_li, m_external_irq_li, s_external_irq_li;\n  bp_unicore_lite\n   #(.bp_params_p(bp_params_p)\n     ,.cache_miss_trace_p(cache_miss_trace_p)\n     )\n   unicore_lite\n    (.clk_i(clk_i)\n     ,.reset_i(reset_r)\n     ,.cfg_bus_i(cfg_bus_lo)"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122/import/black-parrot",
+      "commit": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+      "path": "bp_top/src/v/bp_unicore_lite.sv",
+      "bytes": 31356,
+      "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9",
+      "excerpts": [
+        {
+          "first_line": 8,
+          "last_line": 18,
+          "text": " import bsg_wormhole_router_pkg::*;\n import bp_common_pkg::*;\n import bp_be_pkg::*;\n import bp_fe_pkg::*;\n import bp_me_pkg::*;\n import bsg_noc_pkg::*;\n #(parameter bp_params_e bp_params_p = e_bp_default_cfg\n   , parameter bit cache_miss_trace_p = 1'b0\n   // These dimensions count retained 64-byte payload lines, never L1 ways,\n   // replay addresses or outstanding request slots. Legacy elaboration is 0.\n`ifdef BP_RETAINED_BUFFER"
+        },
+        {
+          "first_line": 274,
+          "last_line": 285,
+          "text": "    assign retained_epoch_wrap = '0;\n  end\n\n  wire [did_width_p-1:0] did_li = cfg_bus_cast_i.did;\n  wire [1:0][lce_id_width_p-1:0] lce_id_li = {cfg_bus_cast_i.dcache_id, cfg_bus_cast_i.icache_id};\n  bp_core_minimal\n   #(.bp_params_p(bp_params_p)\n     ,.cache_miss_trace_p(cache_miss_trace_p)\n     ,.retained_buffer_p(retained_buffer_p)\n     ,.icache_replay_buffer_p(~retained_buffer_p)\n     ,.icache_replay_buffer_els_p(32)\n     )"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122/import/black-parrot",
+      "commit": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+      "path": "bp_top/src/v/bp_core_minimal.sv",
+      "bytes": 21978,
+      "sha256": "cf459156fc41ea0e4340f309e21130415340e53c61630156fb61e4c02ef2ca46",
+      "excerpts": [
+        {
+          "first_line": 17,
+          "last_line": 26,
+          "text": "   , parameter bit icache_replay_buffer_bram_p = 1'b0\n   , parameter bit icache_replay_buffer_p = 1'b0\n   , parameter icache_replay_buffer_els_p = 16\n   `declare_bp_proc_params(bp_params_p)\n   `declare_bp_fe_icache_engine_if_widths(paddr_width_p, icache_tag_width_p, icache_sets_p, icache_assoc_p, icache_data_width_p, icache_block_width_p, icache_fill_width_p, icache_req_id_width_p)\n   `declare_bp_be_dcache_engine_if_widths(paddr_width_p, dcache_tag_width_p, dcache_sets_p, dcache_assoc_p, dcache_data_width_p, dcache_block_width_p, dcache_fill_width_p, dcache_req_id_width_p)\n   , parameter bit cache_miss_trace_p = 1'b0\n   , localparam cfg_bus_width_lp = `bp_cfg_bus_width(vaddr_width_p, hio_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, did_width_p)\n   )\n  (input                                             clk_i"
+        },
+        {
+          "first_line": 191,
+          "last_line": 272,
+          "text": "  // This temporary measurement block records accepted physical demand misses,\n  // after translation and before the I/D memory engines. Separate memories\n  // preserve simultaneous I- and D-side events and map to one RAMB18 each.\n  if (cache_miss_trace_p) begin : gen_cache_miss_trace\n    bp_fe_icache_req_s icache_req_cast;\n    bp_be_dcache_req_s dcache_req_cast;\n    assign icache_req_cast = icache_req_o;\n    assign dcache_req_cast = dcache_req_o;\n\n    logic armed_r, icache_overflow_r, dcache_overflow_r;\n    logic [8:0] icache_count_r, dcache_count_r;\n    logic [31:0] cycle_r;\n    (* ram_style = \"block\" *) logic [63:0] icache_trace_mem [0:255];\n    (* ram_style = \"block\" *) logic [63:0] dcache_trace_mem [0:255];\n    logic [63:0] icache_trace_data_r, dcache_trace_data_r;\n    logic miss_trace_read_source_r;\n\n    wire icache_miss_accept = armed_r & icache_req_v_o & icache_req_yumi_i\n                              & (icache_req_cast.msg_type == e_miss_load);\n    wire dcache_miss_accept = armed_r & dcache_req_v_o & dcache_req_yumi_i\n                              & (dcache_req_cast.msg_type == e_miss_load);\n\n    assign miss_trace_status_li =\n      {{(dword_width_gp-21){1'b0}}, armed_r, dcache_overflow_r, icache_overflow_r\n       ,dcache_count_r, icache_count_r};\n    assign miss_trace_data_li = miss_trace_read_source_r\n                                ? dcache_trace_data_r\n                                : icache_trace_data_r;\n\n    always_ff @(posedge clk_i)\n      if (reset_i) begin\n        armed_r <= 1'b0;\n        icache_overflow_r <= 1'b0;\n        dcache_overflow_r <= 1'b0;\n        icache_count_r <= '0;\n        dcache_count_r <= '0;\n        cycle_r <= '0;\n        miss_trace_read_source_r <= 1'b0;\n      end else begin\n        cycle_r <= cycle_r + 1'b1;\n\n        if (miss_trace_ctrl_v_lo)\n          armed_r <= miss_trace_arm_lo;\n\n        if (miss_trace_clear_lo) begin\n          icache_overflow_r <= 1'b0;\n          dcache_overflow_r <= 1'b0;\n          icache_count_r <= '0;\n          dcache_count_r <= '0;\n        end else begin\n          if (icache_miss_accept) begin\n            if (icache_count_r < 9'd256) begin\n              icache_trace_mem[icache_count_r[7:0]]\n                <= {cycle_r, icache_req_cast.msg_type, icache_req_cast.addr[33:6]};\n              icache_count_r <= icache_count_r + 1'b1;\n            end else\n              icache_overflow_r <= 1'b1;\n          end\n\n          if (dcache_miss_accept) begin\n            if (dcache_count_r < 9'd256) begin\n              dcache_trace_mem[dcache_count_r[7:0]]\n                <= {cycle_r, dcache_req_cast.msg_type, dcache_req_cast.addr[33:6]};\n              dcache_count_r <= dcache_count_r + 1'b1;\n            end else\n              dcache_overflow_r <= 1'b1;\n          end\n        end\n\n        if (miss_trace_read_v_lo) begin\n          // Keep the two registered read ports structurally independent so\n          // Vivado can infer one simple dual-port block RAM per history.\n          icache_trace_data_r <= icache_trace_mem[miss_trace_read_index_lo];\n          dcache_trace_data_r <= dcache_trace_mem[miss_trace_read_index_lo];\n          miss_trace_read_source_r <= miss_trace_read_source_lo;\n        end\n      end\n  end else begin : gen_no_cache_miss_trace\n    assign miss_trace_status_li = '0;\n    assign miss_trace_data_li = '0;\n  end\n"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122/import/black-parrot",
+      "commit": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "bytes": 53492,
+      "sha256": "2a13acd2135c43e6ea00b8c3f9cb55d6ee70456c3935b334b4927f9cd4456d8d",
+      "excerpts": [
+        {
+          "first_line": 210,
+          "last_line": 218,
+          "text": "\n  wire is_debug_mode = debug_mode_r;\n  // Debug Mode grants pseudo M-mode permission\n  wire is_m_mode = is_debug_mode | (priv_mode_r == `PRIV_MODE_M);\n  wire is_s_mode = (priv_mode_r == `PRIV_MODE_S);\n  wire is_u_mode = (priv_mode_r == `PRIV_MODE_U);\n  wire legacy_context_access_li = legacy_context_user_enable_i | is_m_mode;\n\n  `declare_csr(dcsr);"
+        },
+        {
+          "first_line": 578,
+          "last_line": 584,
+          "text": "        12'h805:  // Accepted cache-miss trace control/status\n          csr_data_lo = legacy_context_access_li ? miss_trace_status_i : '0;\n        12'h806:  // Trace read selector - write-only, reads as 0\n          csr_data_lo = '0;\n        12'h807:  // Selected trace record\n          csr_data_lo = legacy_context_access_li ? miss_trace_data_i : '0;\n        12'h808:  // Protected call capability operand / status"
+        },
+        {
+          "first_line": 1075,
+          "last_line": 1086,
+          "text": "  // A control write sets the desired armed state directly. Bit 1 also clears\n  // counts and overflow flags. A selector write initiates the recorder's\n  // synchronous BRAM read; bit 8 chooses D (1) or I (0), bits 7:0 select entry.\n  assign miss_trace_ctrl_v_o = csr_w_v_li & (csr_addr_li == 12'h805)\n                               & legacy_context_access_li;\n  assign miss_trace_arm_o = csr_data_li[0];\n  assign miss_trace_clear_o = miss_trace_ctrl_v_o & csr_data_li[1];\n  assign miss_trace_read_v_o = csr_w_v_li & (csr_addr_li == 12'h806)\n                               & legacy_context_access_li;\n  assign miss_trace_read_source_o = csr_data_li[8];\n  assign miss_trace_read_index_o = csr_data_li[7:0];\n"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122",
+      "commit": "eb7d390134a0025331a2366a979a774263b146d5",
+      "path": "cosim/mk/Makefile.verilator",
+      "bytes": 5763,
+      "sha256": "db229fd3a0b27e20899f3ad744816dd6d75271797439329a8d3d92ecc1875bab",
+      "excerpts": [
+        {
+          "first_line": 79,
+          "last_line": 89,
+          "text": "MODEL_HP0_DELAY_TAG := $(subst =,_,$(addprefix -,$(filter BP_AXI_RESPONSE_DELAY=%,$(DEFINES))))\n# Capture is an ifdef-selected hardware mode: even MACRO=0 enables it.\nMODEL_ICACHE_DEMAND_CAPTURE_TAG := $(if $(filter BP_ICACHE_REPLAY_DEMAND_CAPTURE BP_ICACHE_REPLAY_DEMAND_CAPTURE=%,$(DEFINES)),-icapture,)\n# Payload geometry changes both arrays and generated control. Include the\n# effective defines even when a design receives them through EXTRA_DEFINES.\nMODEL_RETAINED_TAG := $(subst $(bsg_var_space),,$(foreach retained_def,$(filter BP_RETAINED_%,$(DEFINES)),-$(subst =,_,$(retained_def))))\n# Verification scope is part of executable identity too. Presence selects the\n# BSG guard even when a caller spells BSG_HIDE_FROM_SYNTHESIS=0.\nMODEL_ASSERTION_TAG := $(if $(filter --assert,$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS)),-assert,)$(if $(filter BSG_HIDE_FROM_SYNTHESIS BSG_HIDE_FROM_SYNTHESIS=%,$(DEFINES)),-bsgsimhidden,)$(if $(strip $(VERILATOR_SUPPORT_SOURCES)),-support,)\nMODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_HP0_DELAY_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)$(MODEL_RETAINED_TAG)$(MODEL_ASSERTION_TAG)\nMODEL_CONFIG_STAMP := obj_dir/.build_config-$(MODEL_CONFIG_TAG)"
+        }
+      ]
+    },
+    {
+      "repo": "/home/coyang/zp-retained256-source-20261122",
+      "commit": "eb7d390134a0025331a2366a979a774263b146d5",
+      "path": "cosim/tcl/vivado-utils.tcl",
+      "bytes": 13161,
+      "sha256": "6ec06de506ddcbfb980893521467de23053ad9bd436cc88d3741e62f5030804e",
+      "excerpts": [
+        {
+          "first_line": 139,
+          "last_line": 174,
+          "text": "# Environment entries are not Verilog defines. Apply only the experiment's\n# explicit allowlist to BOTH the source IP and the final integrating project.\n# The latter matters for a BD packaged with imported HDL and no synthesis DCP.\nproc vivado_experiment_defines {} {\n    set names {BP_RETAINED_BUFFER BP_RETAINED_I_LINES BP_RETAINED_D_LINES BP_RETAINED_SETS}\n    set present 0\n    foreach name $names { if {[info exists ::env($name)]} { incr present } }\n    if {$present != 0 && $present != [llength $names]} {\n        error \"incomplete retained-buffer Verilog configuration\"\n    }\n    set result [list]\n    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY}] {\n        if {![info exists ::env($name)]} { continue }\n        set value $::env($name)\n        if {![regexp {^(0|[1-9][0-9]*)$} $value]} {\n            error \"$name must be a canonical nonnegative integer, got '$value'\"\n        }\n        if {$name in {BP_RETAINED_BUFFER BP_RETAINED_OBSERVE} && $value > 1} {\n            error \"$name must be 0 or 1\"\n        }\n        if {$name eq \"BP_AXI_RESPONSE_DELAY\" && $value > 384} {\n            error \"$name must be in 0..384\"\n        }\n        if {$name in {BP_RETAINED_I_LINES BP_RETAINED_D_LINES} && $value > 65535} {\n            error \"$name exceeds the 16-bit reported line count\"\n        }\n        if {$name eq \"BP_RETAINED_SETS\" && ($value < 1 || $value > 32768 || ($value & ($value-1)) != 0)} {\n            error \"$name must be a power of two in 1..32768\"\n        }\n        lappend result \"$name=$value\"\n    }\n    return $result\n}\n\nproc vivado_apply_experiment_defines {} {\n    set requested [vivado_experiment_defines]"
+        }
+      ]
+    }
+  ],
+  "software_source_bindings": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/source/linux-tests/scheduler_retained29_cost_benchmark.c",
+      "bytes": 20151,
+      "sha256": "2f19b863264cec0842899e23bfc2a9d4a057beffe3ddb5cfd2cd5227af800f8e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/source/linux-tests/scheduler_retained29_regex_cost_benchmark.c",
+      "bytes": 20226,
+      "sha256": "1bc842d91c1fdacd1bfc81c3ef4e9a4510984c86b8f5e12ee9d22e05de4fbd37"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/source/linux-tests/resume_workload.h",
+      "bytes": 10958,
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/source/linux-tests/retained29_regex_workload.h",
+      "bytes": 9938,
+      "sha256": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-dense/testing/rtl/large_retained_system_test.c",
+      "bytes": 6285,
+      "sha256": "8d7d447d2d8d500361b89a4a7ddd356f0dba01dff017129418cf3571bf9dd03c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-dense/testing/mt_seed.h",
+      "bytes": 3351,
+      "sha256": "f2b82e27b9f242efec101b40b3ec77da9f7152114be196fb8bd3d5f88a5bcbe3"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/riscv64-unknown-elf/include/bp_utils.h",
+      "bytes": 836,
+      "sha256": "319158f19852559d8581911666f1b9bf8294dc9b649f16d9df4220e5ac9b566f"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/retained_capacity_test.c",
+      "bytes": 4879,
+      "sha256": "72514010fac1eb61ccb798369f587b8685e7a3c0f3c80cd209ef081e9df1e84b"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-observation/testing/rtl/retained-capacity-fixture/retained_capacity.S",
+      "bytes": 2355,
+      "sha256": "5509cd2264a3a09ce3f471ed8548c49359a593958b0567983865ca39c2abb0c5"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/source/kernel/sys.c",
+      "bytes": 80646,
+      "sha256": "6946e8555af2ab46d18c3a3e1005ee3b7450d147a830fb72f7b604449699f4c4"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/kernel-patches/0029-blackparrot-retained-control.patch",
+      "bytes": 3921,
+      "sha256": "e95007acf320f399c6d22cd844e826c2298dc32081a5a45dd8daab75c92069d3"
+    }
+  ],
+  "software_manifests": {
+    "COST": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/manifest.json",
+      "bytes": 18486,
+      "sha256": "ad77521b792ee706d1047deaab1da3de69ab67fc84d61437f177900e6d050b6f"
+    },
+    "kernel29": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-kernel29-20261121/package-manifest.json",
+      "bytes": 7685,
+      "sha256": "99911a55ab9574d21c239e8eac4cd1c33b3fd6e9f5b28d1cbdc3054cb85791a3"
+    },
+    "integrity-cold08": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-dense-fullcore-20261121/program02/program-proof.json",
+      "bytes": 15613,
+      "sha256": "05ff02b7d070e74b437376374df4cde2e62d894d320d40528b8c320c4430819b"
+    },
+    "capacity": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/manifest.json",
+      "bytes": 196913,
+      "sha256": "88546c8afc17c482e42cb731459f44c2a40f2f6aeee2c172321534c872dabd72"
+    }
+  },
+  "executable_scans": {
+    "COST-plain": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/retained29-cost-plain",
+        "bytes": 27584,
+        "sha256": "770bbfdb7ee5e92ce78fdf53bd029ebfe9c68586870c80946f7dc1b2a09e31b1"
+      },
+      "executable_sections": [
+        {
+          "index": 11,
+          "address": 69168,
+          "file_offset": 3632,
+          "bytes": 544
+        },
+        {
+          "index": 12,
+          "address": 69712,
+          "file_offset": 4176,
+          "bytes": 7684
+        }
+      ],
+      "scanned_bytes": 8228,
+      "csr_805_806_807_candidates": [],
+      "method": "Every2-byte boundary of every SHF_EXECINSTR PROGBITS section; valid CSR funct3=1,2,3,5,6,7. No disassembly/reachability assumption. No other firmware/DSO claim."
+    },
+    "COST-regex": {
+      "elf": {
+        "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-trigger-accounting-20261121/prepared-cost01/retained29-cost-regex",
+        "bytes": 27976,
+        "sha256": "e1693d512042779b5496f755d67377681d35926ffbb46e69ca5ff7cc0998969e"
+      },
+      "executable_sections": [
+        {
+          "index": 11,
+          "address": 69488,
+          "file_offset": 3952,
+          "bytes": 624
+        },
+        {
+          "index": 12,
+          "address": 70112,
+          "file_offset": 4576,
+          "bytes": 8504
+        }
+      ],
+      "scanned_bytes": 9128,
+      "csr_805_806_807_candidates": [],
+      "method": "Every2-byte boundary of every SHF_EXECINSTR PROGBITS section; valid CSR funct3=1,2,3,5,6,7. No disassembly/reachability assumption. No other firmware/DSO claim."
+    },
+    "kernel29": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/vmlinux-stripped",
+        "bytes": 18330752,
+        "sha256": "4a22e3db38fd2920c5c86eb4217e2c3ee3d2959716a71927851bc064e18c5ed7"
+      },
+      "executable_sections": [
+        {
+          "index": 1,
+          "address": 18446744071562067968,
+          "file_offset": 4096,
+          "bytes": 7824
+        },
+        {
+          "index": 2,
+          "address": 18446744071562076160,
+          "file_offset": 12288,
+          "bytes": 8490032
+        },
+        {
+          "index": 3,
+          "address": 18446744071572553728,
+          "file_offset": 10485760,
+          "bytes": 234460
+        },
+        {
+          "index": 4,
+          "address": 18446744071572788192,
+          "file_offset": 10720224,
+          "bytes": 6830
+        },
+        {
+          "index": 6,
+          "address": 18446744071578029384,
+          "file_offset": 14105928,
+          "bytes": 9494
+        }
+      ],
+      "scanned_bytes": 8748640,
+      "csr_805_806_807_candidates": [],
+      "method": "Every2-byte boundary of every SHF_EXECINSTR PROGBITS section; valid CSR funct3=1,2,3,5,6,7. No disassembly/reachability assumption. No other firmware/DSO claim."
+    },
+    "integrity": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-dense-fullcore-20261121/program02/integrity-prog.riscv",
+        "bytes": 211152,
+        "sha256": "6dc1d67b880e85d9841c8a2ae5fc86043e2944f2925e5384c6edb8416dfc1277"
+      },
+      "executable_sections": [
+        {
+          "index": 1,
+          "address": 2147483648,
+          "file_offset": 4096,
+          "bytes": 23944
+        }
+      ],
+      "scanned_bytes": 23944,
+      "csr_805_806_807_candidates": [],
+      "method": "Every2-byte boundary of every SHF_EXECINSTR PROGBITS section; valid CSR funct3=1,2,3,5,6,7. No disassembly/reachability assumption. No other firmware/DSO claim."
+    },
+    "advisory": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-dense-fullcore-20261121/program02/advisory-prog.riscv",
+        "bytes": 260760,
+        "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+      },
+      "executable_sections": [
+        {
+          "index": 1,
+          "address": 2147483648,
+          "file_offset": 4096,
+          "bytes": 71000
+        }
+      ],
+      "scanned_bytes": 71000,
+      "csr_805_806_807_candidates": [],
+      "method": "Every2-byte boundary of every SHF_EXECINSTR PROGBITS section; valid CSR funct3=1,2,3,5,6,7. No disassembly/reachability assumption. No other firmware/DSO claim."
+    },
+    "capacity": {
+      "elf": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/retained_capacity_test.elf",
+        "bytes": 998432,
+        "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+      },
+      "executable_sections": [
+        {
+          "index": 1,
+          "address": 2147483648,
+          "file_offset": 16384,
+          "bytes": 449562
+        }
+      ],
+      "scanned_bytes": 449562,
+      "csr_805_806_807_candidates": [],
+      "method": "Every2-byte boundary of every SHF_EXECINSTR PROGBITS section; valid CSR funct3=1,2,3,5,6,7. No disassembly/reachability assumption. No other firmware/DSO claim."
+    }
+  },
+  "actual_closed_primitive_evidence": {
+    "files": [
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/read-optimized-hierarchy01/primitive-counts.tsv",
+        "bytes": 11374,
+        "sha256": "40d4f46e35a299f56341260b4a1e3c538d495228374a39004256b41fe44edafa"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/read-optimized-hierarchy01/primitive-name-samples.tsv",
+        "bytes": 200390,
+        "sha256": "2a4f76e4daa84f8de6e152c242045e05c3f3129a5cc88d68eb37d8d5d8b4ed9c"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/read-optimized-hierarchy01/query.tcl",
+        "bytes": 5547,
+        "sha256": "2a6b3b349d65b823d47ee2ef86ca0caa5b041e70d8528b226a87cb0c5e8abe0d"
+      },
+      {
+        "path": "/home/coyang/fpga-artifacts/context-resume/native1792-canonical-r7-preparation-20261121/read-optimized-hierarchy01/session.json",
+        "bytes": 9728,
+        "sha256": "3c7b171e6cb8da94860f2121f4a28cee02434b66d5ac65814671f8522bb1db23"
+      }
+    ],
+    "trace_named_primitives": {
+      "CARRY4": 8,
+      "FDRE": 54,
+      "LUT1": 4,
+      "LUT2": 10,
+      "LUT3": 12,
+      "LUT4": 6,
+      "LUT5": 9,
+      "LUT6": 12,
+      "RAMB36E1": 2
+    },
+    "raw_LUTs": 53,
+    "raw_FFs": 54,
+    "RAMB36E1": 2,
+    "exact_memory_samples": [
+      "trace_named\tall\tRAMB36E1\tblack_parrot_bd_1_i/top_0/inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/core_minimal/gen_cache_miss_trace.dcache_trace_mem_reg",
+      "trace_named\tall\tRAMB36E1\tblack_parrot_bd_1_i/top_0/inst/top/inst/top_fpga_inst/blackparrot/processor/u.unicore/unicore_lite/core_minimal/gen_cache_miss_trace.icache_trace_mem_reg"
+    ]
+  },
+  "limits": "Mapped existing diagnostic trace cost only; removing it is untested. No additive fit/placement/timing savings, larger capacity acceptance, application result, all-firmware/DSO reachability claim or trace-profile equivalence."
+}
