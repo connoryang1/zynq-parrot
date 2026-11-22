@@ -1,0 +1,3 @@
+This preserves the first bounded host-only parser equivalence attempt and its profiling failure. All partial outputs and owned resource receipts are retained; no target, reader, model or vendor tool ran.
+
+The malformed-input gate passed, but full-stream cProfile instrumentation caused the parser callback interval to exceed its one-second bound after1,025 lines. The separate resource watcher passed, every owned group exited, and the complete partial output was copied to durable storage. This is not full semantic equivalence or a runtime improvement. A fresh normally timed replay must preserve the same checks and bounds.

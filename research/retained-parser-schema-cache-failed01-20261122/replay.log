@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "profile_replay.py", line 150, in <module>
+    if __name__=='__main__':main()
+  File "profile_replay.py", line 139, in main
+    results=[replay(name,edges,original,archive,checker,plan,out,guard)
+  File "profile_replay.py", line 139, in <listcomp>
+    results=[replay(name,edges,original,archive,checker,plan,out,guard)
+  File "profile_replay.py", line 76, in replay
+    result,digest=archive.validate_complete(stream,saved,original.selection(),
+  File "/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/archive_stream.py", line 124, in validate_complete
+    for t, clocks, values in edges(traced, selected):
+  File "/home/coyang/zynq-parrot-linux-host-observer/research/retained-parser-schema-cache-preparation-20261122/parser-original.py", line 36, in edges
+    for line in lines:
+  File "/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/archive_stream.py", line 82, in __iter__
+    self.guard()
+  File "profile_replay.py", line 131, in guard
+    if previous is not None:max_gap=max(max_gap,now-previous);require(now-previous<=1,'host replay guard gap over1s')
+  File "profile_replay.py", line 23, in require
+    if not ok:raise ValueError(message)
+ValueError: host replay guard gap over1s
