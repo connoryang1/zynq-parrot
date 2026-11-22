@@ -1,0 +1,69 @@
+{
+  "state": "PASS estimator/schedule/output arithmetic and acquisition/reconcile/recovery bodies unchanged; qualification/outputschema only",
+  "checks": [
+    {
+      "old": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_study.py",
+        "bytes": 17818,
+        "sha256": "88ef0a03513a3bb7733c7544a90f55b301a7bd721bea00a59472e394305ddd8c"
+      },
+      "new": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/analyze_retained29_capacity_borrow_study.py",
+        "bytes": 22117,
+        "sha256": "e9ae4829c5dcd0cd1fc8acb8ecd0695e32b7ead372b74910fb7851179c069c62"
+      },
+      "changed_existing_functions": [
+        "validate_declaration",
+        "verify_study",
+        "analyze"
+      ],
+      "unchanged_functions": [
+        "schedule",
+        "source_hashes",
+        "matched_hardware",
+        "estimate",
+        "write_outputs",
+        "main"
+      ],
+      "added_functions": [
+        "image_source_profile"
+      ],
+      "analysis_entry": "output schema literal only"
+    },
+    {
+      "old": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/run_retained29_capacity_study.py",
+        "bytes": 20240,
+        "sha256": "843c19d07230b24e8eadda5d68ff46883e51c975a826c2caffa835a9578fa26f"
+      },
+      "new": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/run_retained29_capacity_borrow_study.py",
+        "bytes": 20469,
+        "sha256": "b53cd692a7e89d2891ceb753e8e57ffa01f6d5fecdab3dc04cface6d828f6708"
+      },
+      "changed_existing_functions": [
+        "validate"
+      ],
+      "unchanged_functions": [
+        "sources",
+        "read_record",
+        "save",
+        "exact_common_busy",
+        "image_ledger",
+        "prefix",
+        "expected_prior",
+        "current_snapshot",
+        "verify_prefix_snapshot",
+        "actual_start",
+        "engine_for",
+        "reconcile",
+        "prepare_dispatch",
+        "advance",
+        "main"
+      ],
+      "added_functions": [],
+      "analysis_entry": "same source/dispatch/reconcile/lock/recovery functions except strictervalidate"
+    }
+  ],
+  "preparation_check_correction": "Initial AST checklist omitted the intentional new output-schema literal inside analyze; normalized exact one literal and proved the entire remaining function identical. No math or runtime correction."
+}

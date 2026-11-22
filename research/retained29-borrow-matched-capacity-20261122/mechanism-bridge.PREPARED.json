@@ -1,0 +1,55 @@
+{
+  "schema": "bp-retained29-common-borrow-trace0-mechanism-v1",
+  "state": "PREPARED source/correctness bridge only; no hardware approval",
+  "baseline_BP": "8dfdbdeec84cb47f902bc1426d69ecb3efd91c7c",
+  "BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "architecture_TOP": "3daedee66a3c94014b4a666fea037b17cc9b0943",
+  "common_run_profile": {
+    "BP_CACHE_MISS_TRACE": 0,
+    "BP_RETAINED_BUFFER": 1,
+    "BP_RETAINED_SETS": 256,
+    "BP_RETAINED_OBSERVE": 1,
+    "BP_AXI_RESPONSE_DELAY": 0
+  },
+  "source_diff": {
+    "path": "common-borrow-source.patch",
+    "bytes": 7187,
+    "sha256": "c6f4f1e38dce25086aca60c9f7325cdb2a931e0674428fedd6ec022bad2c6d11"
+  },
+  "trace_knob_diff": {
+    "path": "common-trace-profile.patch",
+    "bytes": 5203,
+    "sha256": "8f3f15f4fbbe5e231b751f782928fc7c352e0cefaabc8c6042daa0dbc1714c6e"
+  },
+  "unit": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-hit-payload-borrow-20261122/attempt01/manifest.json",
+    "bytes": 290045,
+    "sha256": "8340f4dba6841135ffdfee69691154d5fa74cdbdd4b785fbd896e866f47eaec4"
+  },
+  "large_fullcore": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow-trace0-fullcore-20261122/home-proof01/full-session.json",
+    "bytes": 40259,
+    "sha256": "13eeb4ac85245e5b6f2f3f52c86a880638fff8127cc60bfd03b21718aed69fcf"
+  },
+  "large_archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow-trace0-fullcore-20261122/closed01/archive.json",
+    "bytes": 526919,
+    "sha256": "4c7d0c341c1aa4d98bb2001733d14d5111685193dc0a78d68b0d8ce49634d7f8"
+  },
+  "small_source_TOP": "1008854d30e5d923c86c3232fc22af039467d552",
+  "small_parent_TOP": "3daedee66a3c94014b4a666fea037b17cc9b0943",
+  "small_source_diff": {
+    "path": "small-capacity-defaults.patch",
+    "bytes": 706,
+    "sha256": "49f8ddfdfa114a4c510cf959dd4bac4846fd9d74826e202b2ef35e42cee28220"
+  },
+  "small_native_fit_physical": null,
+  "large_fit_physical": null,
+  "scope": "Common architecture refactor applied identically to both images. Capacity treatment changes only I/Dline defaults. No old8df/trace1 result is transferred as qualification or application outcome.",
+  "trace_knob_source_files": [
+    "cosim/black-parrot-example/Makefile.design",
+    "cosim/black-parrot-example/v/top_zynq.sv",
+    "cosim/mk/Makefile.verilator",
+    "cosim/tcl/vivado-utils.tcl"
+  ]
+}

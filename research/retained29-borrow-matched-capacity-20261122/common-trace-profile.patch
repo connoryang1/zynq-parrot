@@ -1,0 +1,90 @@
+diff --git a/cosim/black-parrot-example/Makefile.design b/cosim/black-parrot-example/Makefile.design
+index 1c4303845..376daf7fd 100644
+--- a/cosim/black-parrot-example/Makefile.design
++++ b/cosim/black-parrot-example/Makefile.design
+@@ -66,6 +66,20 @@ DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
+ DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
+ DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
+ 
++# Accepted physical-demand-miss history, separate from retained payload and
++# ordinary cache geometry. Keep existing traced images as the default.
++BP_CACHE_MISS_TRACE ?= 1
++ifneq ($(words $(BP_CACHE_MISS_TRACE)),1)
++$(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
++endif
++ifneq ($(filter $(BP_CACHE_MISS_TRACE),0 1),$(BP_CACHE_MISS_TRACE))
++$(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
++endif
++ifneq ($(filter BP_CACHE_MISS_TRACE BP_CACHE_MISS_TRACE=%,$(EXTRA_DEFINES)),)
++$(error Set BP_CACHE_MISS_TRACE=<0|1> instead of an EXTRA_DEFINES override)
++endif
++DEFINES += BP_CACHE_MISS_TRACE=$(BP_CACHE_MISS_TRACE)
++
+ # Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
+ # This r2 capacity candidate includes observation in its actual fit cost;
+ # explicit0 remains available for matched diagnostic comparison only.
+diff --git a/cosim/black-parrot-example/v/top_zynq.sv b/cosim/black-parrot-example/v/top_zynq.sv
+index 2714dc2bf..b93ecced1 100644
+--- a/cosim/black-parrot-example/v/top_zynq.sv
++++ b/cosim/black-parrot-example/v/top_zynq.sv
+@@ -7,6 +7,10 @@
+ `ifndef BP_AXI_RESPONSE_DELAY
+ `define BP_AXI_RESPONSE_DELAY 0
+ `endif
++
++`ifndef BP_CACHE_MISS_TRACE
++`define BP_CACHE_MISS_TRACE 1
++`endif
+ `ifndef BP_RETAINED_OBSERVE
+ `define BP_RETAINED_OBSERVE 0
+ `endif
+@@ -830,7 +834,7 @@ module top_zynq
+       ,.axi_core_clk_async_p(0)
+       ,.prefetch_bypass_p(prefetch_axi_bypass_lp)
+       ,.prefetch_outstanding_p(1)
+-      ,.cache_miss_trace_p(1'b1)
++      ,.cache_miss_trace_p(`BP_CACHE_MISS_TRACE)
+       )
+    blackparrot
+      (.axi_clk_i(aclk)
+diff --git a/cosim/mk/Makefile.verilator b/cosim/mk/Makefile.verilator
+index 8d5a0cd44..296a211dc 100644
+--- a/cosim/mk/Makefile.verilator
++++ b/cosim/mk/Makefile.verilator
+@@ -82,10 +82,15 @@ MODEL_ICACHE_DEMAND_CAPTURE_TAG := $(if $(filter BP_ICACHE_REPLAY_DEMAND_CAPTURE
+ # Payload geometry changes both arrays and generated control. Include the
+ # effective defines even when a design receives them through EXTRA_DEFINES.
+ MODEL_RETAINED_TAG := $(subst $(bsg_var_space),,$(foreach retained_def,$(filter BP_RETAINED_%,$(DEFINES)),-$(subst =,_,$(retained_def))))
++# Full production top defaults to tracing accepted misses. Record the effective
++# setting separately; this diagnostic is not a BP_RETAINED_* payload feature.
++MODEL_CACHE_MISS_TRACE_DEFINE := $(lastword $(filter BP_CACHE_MISS_TRACE BP_CACHE_MISS_TRACE=%,$(DEFINES)))
++MODEL_CACHE_MISS_TRACE := $(if $(MODEL_CACHE_MISS_TRACE_DEFINE),$(if $(filter BP_CACHE_MISS_TRACE,$(MODEL_CACHE_MISS_TRACE_DEFINE)),1,$(patsubst BP_CACHE_MISS_TRACE=%,%,$(MODEL_CACHE_MISS_TRACE_DEFINE))),1)
++MODEL_CACHE_MISS_TRACE_TAG := -miss-trace$(MODEL_CACHE_MISS_TRACE)
+ # Verification scope is part of executable identity too. Presence selects the
+ # BSG guard even when a caller spells BSG_HIDE_FROM_SYNTHESIS=0.
+ MODEL_ASSERTION_TAG := $(if $(filter --assert,$(VERILATOR) $(VV_BUILD_OPTS) $(BUILD_ARGS)),-assert,)$(if $(filter BSG_HIDE_FROM_SYNTHESIS BSG_HIDE_FROM_SYNTHESIS=%,$(DEFINES)),-bsgsimhidden,)$(if $(strip $(VERILATOR_SUPPORT_SOURCES)),-support,)
+-MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_HP0_DELAY_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)$(MODEL_RETAINED_TAG)$(MODEL_ASSERTION_TAG)
++MODEL_CONFIG_TAG := nt$(NUM_THREADS)-nc$(NUM_CONTEXTS)-cfg$(CFG)-trace$(if $(TRACE),1,0)$(MODEL_PREFETCH_BANK_TAG)$(MODEL_PREFETCH_ELS_TAG)$(MODEL_AXI_MEM_TAG)$(MODEL_HP0_DELAY_TAG)$(MODEL_ICACHE_DEMAND_CAPTURE_TAG)$(MODEL_RETAINED_TAG)$(MODEL_CACHE_MISS_TRACE_TAG)$(MODEL_ASSERTION_TAG)
+ MODEL_CONFIG_STAMP := obj_dir/.build_config-$(MODEL_CONFIG_TAG)
+ 
+ $(MODEL_CONFIG_STAMP): | $(BUILD_COLLATERAL)
+diff --git a/cosim/tcl/vivado-utils.tcl b/cosim/tcl/vivado-utils.tcl
+index 344d849b6..4a3fa19d8 100644
+--- a/cosim/tcl/vivado-utils.tcl
++++ b/cosim/tcl/vivado-utils.tcl
+@@ -147,13 +147,13 @@ proc vivado_experiment_defines {} {
+         error "incomplete retained-buffer Verilog configuration"
+     }
+     set result [list]
+-    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY}] {
++    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE}] {
+         if {![info exists ::env($name)]} { continue }
+         set value $::env($name)
+         if {![regexp {^(0|[1-9][0-9]*)$} $value]} {
+             error "$name must be a canonical nonnegative integer, got '$value'"
+         }
+-        if {$name in {BP_RETAINED_BUFFER BP_RETAINED_OBSERVE} && $value > 1} {
++        if {$name in {BP_RETAINED_BUFFER BP_RETAINED_OBSERVE BP_CACHE_MISS_TRACE} && $value > 1} {
+             error "$name must be 0 or 1"
+         }
+         if {$name eq "BP_AXI_RESPONSE_DELAY" && $value > 384} {
