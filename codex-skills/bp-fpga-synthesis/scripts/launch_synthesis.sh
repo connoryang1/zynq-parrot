@@ -30,6 +30,12 @@ fpga_num_threads=${FPGA_NUM_THREADS:-}
 fpga_num_contexts=${FPGA_NUM_CONTEXTS:-}
 fpga_aclk_mhz=${FPGA_ACLK_MHZ:-}
 fpga_sparse_source=${FPGA_SPARSE_SOURCE:-0}
+fpga_cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
+
+if [[ -n "$fpga_cache_miss_trace" && "$fpga_cache_miss_trace" != 0 && "$fpga_cache_miss_trace" != 1 ]]; then
+  echo "FPGA_CACHE_MISS_TRACE must be unset, 0 or 1." >&2
+  exit 2
+fi
 
 if [[ "$fpga_sparse_source" != 0 && "$fpga_sparse_source" != 1 ]]; then
   echo "FPGA_SPARSE_SOURCE must be 0 or 1." >&2
@@ -56,6 +62,7 @@ export FPGA_NUM_THREADS="$fpga_num_threads"
 export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
 export FPGA_ACLK_MHZ="$fpga_aclk_mhz"
 export FPGA_SPARSE_SOURCE="$fpga_sparse_source"
+export FPGA_CACHE_MISS_TRACE="$fpga_cache_miss_trace"
 
 shell_quote() {
   # tmux 3.0 accepts a shell-command string. POSIX single quotes preserve even
@@ -65,7 +72,7 @@ shell_quote() {
 
 usage() {
   echo "usage: $0 start | list | status <job-id> | recheck <job-id> | worker <job-id> <commit>"
-  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, FPGA_SPARSE_SOURCE, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, FPGA_SPARSE_SOURCE, FPGA_CACHE_MISS_TRACE, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
 }
 
 case ${1:-} in
@@ -113,6 +120,7 @@ case ${1:-} in
       "FPGA_NUM_CONTEXTS=$fpga_num_contexts"
       "FPGA_ACLK_MHZ=$fpga_aclk_mhz"
       "FPGA_SPARSE_SOURCE=$fpga_sparse_source"
+      "FPGA_CACHE_MISS_TRACE=$fpga_cache_miss_trace"
       "$script_dir/launch_synthesis.sh" worker "$job_id" "$commit"
     )
     worker_command="trap '' HUP; exec"
@@ -147,6 +155,7 @@ case ${1:-} in
       "${fpga_num_contexts:-<default>}" "${fpga_aclk_mhz:-<default>}" \
       >>"$job_dir/revisions.txt"
     printf 'sparse_source=%s\n' "$fpga_sparse_source" >>"$job_dir/revisions.txt"
+    printf 'cache_miss_trace=%s\n' "${fpga_cache_miss_trace:-default}" >>"$job_dir/revisions.txt"
     if [[ "$fpga_sparse_source" == 1 ]]; then
       git -C "$repo_dir" worktree add --detach --no-checkout "$worktree" "$commit"
       # Historical evidence archives are tracked but are not FPGA build inputs.
@@ -251,11 +260,17 @@ case ${1:-} in
       "ZP_INSTALL_DIR=$repo_dir/install"
       "ZP_RISCV_DIR=$repo_dir/riscv"
     )
+    # Only the explicit launcher setting controls this profile. An old tmux
+    # server may retain a direct Make variable from an unrelated invocation.
+    unset BP_CACHE_MISS_TRACE
     if [[ -n "$fpga_num_threads" ]]; then
       build_args+=("NUM_THREADS=$fpga_num_threads" "NUM_CONTEXTS=$fpga_num_contexts")
     fi
     if [[ -n "$fpga_aclk_mhz" ]]; then
       build_args+=("ACLK_MHZ=$fpga_aclk_mhz")
+    fi
+    if [[ -n "$fpga_cache_miss_trace" ]]; then
+      build_args+=("BP_CACHE_MISS_TRACE=$fpga_cache_miss_trace")
     fi
     make -j1 -C "$worktree/cosim/black-parrot-example/vivado" clean "${build_args[@]}"
     make -j1 -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \

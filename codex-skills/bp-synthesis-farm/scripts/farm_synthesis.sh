@@ -224,6 +224,11 @@ case ${1:-} in
     bp_branch=${5:?BlackParrot branch required}
     IFS=$'\t' read -r target port host_cores default_workers < <(builder_fields "$builder")
     workers=${6:-$default_workers}
+    cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
+    if [[ -n "$cache_miss_trace" && "$cache_miss_trace" != 0 && "$cache_miss_trace" != 1 ]]; then
+      echo "FPGA_CACHE_MISS_TRACE must be unset, 0 or 1." >&2
+      exit 2
+    fi
     if [[ ! $label =~ ^[A-Za-z0-9._-]+$ || ! $workers =~ ^[1-9][0-9]*$ ]]; then
       echo "Label or worker count is invalid." >&2
       exit 2
@@ -245,13 +250,14 @@ case ${1:-} in
     fi
     print_admission "$admission_file"
     mkdir -p "$manifest_root/$builder"
-    output=$(ssh_builder "$builder" bash -s -- "$label" "$top_branch" "$bp_branch" "$workers" "$admission_fpga_cfg" <<'REMOTE'
+    output=$(ssh_builder "$builder" bash -s -- "$label" "$top_branch" "$bp_branch" "$workers" "$admission_fpga_cfg" "$cache_miss_trace" <<'REMOTE'
 set -euo pipefail
 label=$1
 top_branch=$2
 bp_branch=$3
 workers=$4
 fpga_cfg=$5
+cache_miss_trace=$6
 main=/home/coyang/zynq-parrot
 bp_seed=$main/import/black-parrot
 source_root=/home/coyang/fpga-sources
@@ -325,6 +331,7 @@ launch_output=$(env \
   ZP_FPGA_LOG_ROOT="$log_root" \
   FPGA_CFG="$fpga_cfg" \
   FPGA_VIVADO_THREADS="$workers" \
+  FPGA_CACHE_MISS_TRACE="$cache_miss_trace" \
   "$main/codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh" start)
 printf '%s\n' "$launch_output"
 job_id=$(printf '%s\n' "$launch_output" | sed -n 's/^job=//p' | head -1)
