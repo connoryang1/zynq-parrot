@@ -1,0 +1,117 @@
+{
+  "state": "PASS complete terminal capture with explicit durable opaque references; no fit interpretation or reservation release",
+  "admission": {
+    "path": "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/cad-terminal-capture-recipe-20261122/admission.ROOT.json",
+    "bytes": 5897,
+    "sha256": "7f41ff7cdab8889c25983c0d96d3320d29d2b4060bdc9e01ce28f37338840a52"
+  },
+  "inventory": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-cad-terminal-preservation-20261122/20261122T151115Z-a44c03bb7/closed01/inventory.json",
+    "bytes": 9254016,
+    "sha256": "a9e0a42aa297198fd842277a9e9be5a466e7ea249af35c5598013e00dea96862"
+  },
+  "commands": [
+    {
+      "action": "compress",
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/cad-terminal-capture-recipe-20261122/codec.py",
+          "--inventory",
+          "/home/coyang/fpga-artifacts/context-resume/csr-cad-terminal-preservation-20261122/20261122T151115Z-a44c03bb7/closed01/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-cad-terminal-preservation-20261122/20261122T151115Z-a44c03bb7/closed01/full-terminal.tar.xz",
+          "--action",
+          "compress"
+        ],
+        "owned_pgid": 1353434,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 900,
+        "teardown_s": 5,
+        "elapsed_s": 243.75359821598977
+      }
+    },
+    {
+      "action": "roundtrip",
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/cad-terminal-capture-recipe-20261122/codec.py",
+          "--inventory",
+          "/home/coyang/fpga-artifacts/context-resume/csr-cad-terminal-preservation-20261122/20261122T151115Z-a44c03bb7/closed01/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-cad-terminal-preservation-20261122/20261122T151115Z-a44c03bb7/closed01/full-terminal.tar.xz",
+          "--action",
+          "roundtrip"
+        ],
+        "owned_pgid": 1353523,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 240,
+        "teardown_s": 5,
+        "elapsed_s": 10.172704928088933
+      }
+    }
+  ],
+  "archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-cad-terminal-preservation-20261122/20261122T151115Z-a44c03bb7/closed01/full-terminal.tar.xz",
+    "bytes": 166423784,
+    "sha256": "adf75de870c275d721afd17ba8e2c2d45321127737416fd6ce608e4c8ae325aa"
+  },
+  "all_original_paths": 14788,
+  "new_archive_payload_members": 14787,
+  "opaque_reference_members": 1,
+  "opaque_references": [
+    {
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/manifest.json",
+        "bytes": 3788,
+        "sha256": "5f7939dd8c3b56a9dbaa996936424407329cee94c25fd1d14751044712980f89"
+      },
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fpga-preparation-20261122/preparation03/closed-cancel01/full-cancelled-work-source.tar.xz",
+        "bytes": 61138600,
+        "sha256": "46647672aa76782684b9e08b49b2b41f98a7bfe70c7f1c2516fc8597d3829555"
+      },
+      "members": 14345
+    }
+  ],
+  "all_originals_unchanged": true,
+  "no_reservation_release": true,
+  "no_cleanup": true,
+  "terminal_outcome": "FAIL",
+  "elapsed_seconds": 264.9226637419779
+}

@@ -1,0 +1,5 @@
+This records the clean whole-device result for the new CSR storage implementation at256 retained lines per side. Synthesis passed, but detailed placement failed; there is still no routed lower bound for this fixed16KiB-L2 profile.
+
+The design uses54,072LUTs/26,901registers/93.5BRAMtiles/11DSPs after84:16 of synthesis. Placement requires10,995slices with10,873available, a122-slice deficit after5:52. The earlier same-capacity design was166slices short: required slices fell181, available slices fell137, improving the deficit by44. The isolated component saving was therefore not additive whole-core headroom.
+
+All14,788 current paths and three checkpoints are preserved in the full166,423,784B archive, with the old canceled archive retained as an exact verified reference. Independent full-member readback and paired CAD freeze passed. Both native archives and the entire pool/helper/durable double inventory also passed; no files were deleted. The1,792-line branch remains a source-only candidate. Next work is targeted component evidence for fixed logic/storage, followed by full-core and routed gates if justified. No FPGA or application improvement is claimed.
