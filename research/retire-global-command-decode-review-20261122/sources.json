@@ -1,0 +1,60 @@
+{
+  "schema": "retire-owner-global-command-source-review-v1",
+  "state": "SOURCE_ONLY; candidate not recommended for component build on current evidence",
+  "source_BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "decision": "No source-supported hundreds-of-LUT saving; zero/few-tens possible; no independently removable wide payload FF or replicated wide per-command mux",
+  "addresses": [
+    "7c0",
+    "7c1",
+    "7c2",
+    "5c0",
+    "5c1",
+    "5c2",
+    "9c0",
+    "9c1",
+    "9c2",
+    "9c3"
+  ],
+  "narrow_surface": "one wrapper file can open unused existing per-bank global-command outputs and compute same equations once; unchanged bp_be_csr and upstream RMW",
+  "potential_removal": "at most one shared64-bit global-output selection cone before optimization, not multiplied by command aliases; standard per-bank gated data remains live",
+  "R9_capture_sha256": "8d87128bd56b6f6ece65c7b23fd57a3d0991433697e66dd0911d3e8d90238926",
+  "R9_freeze_complete_sha256": "d520e5060940f394c8c75ad7d4f54f9e16ae50921238051b8f178cf2bcbd36e4",
+  "limitations": [
+    "R9 aggregate report has no isolated command cone count",
+    "R7 hierarchy different stage/context not removable cost",
+    "No synthesis/model/test/source implementation executed",
+    "No ordinary geometry/context/state/policy/capability change"
+  ],
+  "inputs": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_be/src/v/bp_be_csr_wrapper_mt.sv",
+      "bytes": 22479,
+      "sha256": "cf013686c8aac9dc78adf60c05644b6c8a9be130fbf3eb4d11e7c18b77bb514e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "bytes": 53492,
+      "sha256": "2a13acd2135c43e6ea00b8c3f9cb55d6ee70456c3935b334b4927f9cd4456d8d"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_sys.sv",
+      "bytes": 16586,
+      "sha256": "2b75573cd851ebbfbae7ff6e868f25f01d25f572808be28ccc220a80d1920b72"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/per-thread-headroom-source-audit-20261122/README.md",
+      "bytes": 7677,
+      "sha256": "59055a6d933fd0c46f5c357b60e8c668917bf1d5149756ccfbbfa5018f386aa7"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/per-thread-headroom-source-audit-20261122/sources.json",
+      "bytes": 4855,
+      "sha256": "5a864b6ff7f7843265e379634af9e5730f63dce30e94929194afc273d5e88c63"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/borrow256-synthesis-only-20261122/summary.json",
+      "bytes": 1465,
+      "sha256": "8d046010d4e1de9523fb5d0689bacafefcfdfa85ec42e72485bba3316d83bfa1"
+    }
+  ]
+}
