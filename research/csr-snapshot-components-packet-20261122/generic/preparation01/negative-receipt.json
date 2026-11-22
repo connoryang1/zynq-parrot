@@ -1,0 +1,238 @@
+{
+  "state": "PASS composite inherited positive plus negative witness; original familyFAIL preserved; area/integration pending",
+  "preflight": {
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/negative-admission.json",
+      "bytes": 5298,
+      "sha256": "380e9a05ab6bdc1f84e748e35486c2de6770d386e094a07f59df8be5a054394b"
+    },
+    "inherited_positive": {
+      "name": "actual-and-single",
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj/Vcsr_snapshot_wrapper",
+        "bytes": 390208,
+        "sha256": "e28f1cb6c26c154b441269d58d348e381b414fdd7d95f3564b4975690f703a1f"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/snapshot.fst",
+        "bytes": 827900,
+        "sha256": "a82179609001e01eadd9d329e734287e5793bc62687f531991e6146f27d68cba"
+      }
+    },
+    "resources": {
+      "stage_bytes": 2932769,
+      "FST_bytes": 827900,
+      "HOME_bytes": 75942
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-Wno-DECLFILENAME",
+        "--top-module",
+        "csr_snapshot_wrapper",
+        "-Gnegative_p=1'b1",
+        "--Mdir",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj",
+        "-CFLAGS",
+        "-std=c++14",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/candidate.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/reference.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/wrapper.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/driver.cpp"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-Wno-DECLFILENAME",
+          "--top-module",
+          "csr_snapshot_wrapper",
+          "-Gnegative_p=1'b1",
+          "--Mdir",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj",
+          "-CFLAGS",
+          "-std=c++14",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/candidate.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/reference.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/wrapper.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/driver.cpp"
+        ],
+        "owned_pgid": 1197993,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.2858538950094953
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/generate.log",
+        "bytes": 287,
+        "sha256": "3c500a76e688eeed853779b3b57d167c3d2949bfe396b3aa854fe04b7622e7e9"
+      }
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj",
+        "-f",
+        "Vcsr_snapshot_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/no-pch.mk",
+        "-j2",
+        "OBJCACHE="
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj",
+          "-f",
+          "Vcsr_snapshot_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/no-pch.mk",
+          "-j2",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1197996,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 11.60366722708568
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/compile.log",
+        "bytes": 3956,
+        "sha256": "f0acaedd473c379c52c89e0305b6fff922f8ce94009cff2b045f8376f721bf73"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj/Vcsr_snapshot_wrapper",
+        "negative"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj/Vcsr_snapshot_wrapper",
+          "negative"
+        ],
+        "owned_pgid": 1198029,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.11617603804916143
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/runtime.log",
+        "bytes": 64,
+        "sha256": "a15288b3ff5e9779fbda0473afe53dc11e72f1409a77d0fab5e61d898727b86c"
+      }
+    }
+  ],
+  "negative": {
+    "executable": {
+      "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj/Vcsr_snapshot_wrapper",
+      "bytes": 390208,
+      "sha256": "d6ccfe4ef8ec50b3f369070f03d1192e08fbedab6732ef86331c21b1fa78a3e4"
+    },
+    "FST": {
+      "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/snapshot.fst",
+      "bytes": 1726,
+      "sha256": "fbe64acd83b5c060194b2da688c3ebb645e5fce668928f3d9e13a5801749e626"
+    }
+  },
+  "final_immutable_check": {
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/negative-admission.json",
+      "bytes": 5298,
+      "sha256": "380e9a05ab6bdc1f84e748e35486c2de6770d386e094a07f59df8be5a054394b"
+    },
+    "inherited_positive": {
+      "name": "actual-and-single",
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj/Vcsr_snapshot_wrapper",
+        "bytes": 390208,
+        "sha256": "e28f1cb6c26c154b441269d58d348e381b414fdd7d95f3564b4975690f703a1f"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/snapshot.fst",
+        "bytes": 827900,
+        "sha256": "a82179609001e01eadd9d329e734287e5793bc62687f531991e6146f27d68cba"
+      }
+    },
+    "resources": {
+      "stage_bytes": 4527366,
+      "FST_bytes": 829626,
+      "HOME_bytes": 82173
+    }
+  },
+  "resources": {
+    "stage_bytes": 4527366,
+    "FST_bytes": 829626,
+    "HOME_bytes": 82173
+  }
+}

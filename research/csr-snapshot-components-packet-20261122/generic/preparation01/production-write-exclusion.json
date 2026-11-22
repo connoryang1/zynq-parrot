@@ -1,0 +1,236 @@
+{
+  "schema": "csr-snapshot-production-write-exclusion-v1",
+  "source_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "proof_type": "combinational Boolean substitution through exact same output bank selector; no trace inference",
+  "per_bank": {
+    "T": "retire_ctxtsw_v_i",
+    "C": "retire_pkt_cast_i.special.csrw",
+    "I": "retire_pkt_cast_i.instret",
+    "W": "C AND NOT T",
+    "ctxtsw": "I AND T",
+    "npc_seed": "W AND address801 AND privilege",
+    "product": "(I AND T) AND (C AND NOT T AND address801 AND privilege) = 0"
+  },
+  "wrapper": "commit_pkt_o and ctx_npc_write_v_o select identical current_physical_thread_id_i bank, including differing reservation/retire/save owners",
+  "top": "save intent further ANDs valid save virtual ID; reseed intent further ANDs valid target and rebind-or-invalid. These guards cannot defeat base exclusion. Both write-data expressions are csr_context_save_data_lo.",
+  "limits": "Proven only for exact integrated source and ownership selectors. Generic extracted two-independent-input component intentionally stronger and retains both writes. No proposed single-writer implementation or integration change.",
+  "sources": [
+    {
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "sha256": "2a13acd2135c43e6ea00b8c3f9cb55d6ee70456c3935b334b4927f9cd4456d8d",
+      "matched_lines": [
+        {
+          "line": 309,
+          "text": "  assign csr_context_save_data_o = csr_context_save;"
+        },
+        {
+          "line": 394,
+          "text": "  wire                               csr_w_v_li = retire_pkt_cast_i.special.csrw & ~retire_ctxtsw_v_i;"
+        },
+        {
+          "line": 396,
+          "text": "  wire [rv64_csr_addr_width_gp-1:0] csr_addr_li = retire_pkt_cast_i.instr.t.itype.imm12;"
+        },
+        {
+          "line": 947,
+          "text": "  wire ctxt_csr_addr_li = (csr_addr_li == 12'h800)"
+        },
+        {
+          "line": 948,
+          "text": "                           | (csr_addr_li == 12'h801)"
+        },
+        {
+          "line": 949,
+          "text": "                           | (csr_addr_li == 12'h802)"
+        },
+        {
+          "line": 950,
+          "text": "                           | (csr_addr_li == 12'h803)"
+        },
+        {
+          "line": 951,
+          "text": "                           | (csr_addr_li == 12'h804)"
+        },
+        {
+          "line": 952,
+          "text": "                           | (csr_addr_li == 12'h805)"
+        },
+        {
+          "line": 953,
+          "text": "                           | (csr_addr_li == 12'h806)"
+        },
+        {
+          "line": 954,
+          "text": "                           | (csr_addr_li == 12'h807)"
+        },
+        {
+          "line": 955,
+          "text": "                           | (csr_addr_li == 12'h808)"
+        },
+        {
+          "line": 956,
+          "text": "                           | (csr_addr_li == 12'h809)"
+        },
+        {
+          "line": 957,
+          "text": "                           | (csr_addr_li == 12'h9c0)"
+        },
+        {
+          "line": 958,
+          "text": "                           | (csr_addr_li == 12'h9c1)"
+        },
+        {
+          "line": 959,
+          "text": "                           | (csr_addr_li == 12'h9c2)"
+        },
+        {
+          "line": 960,
+          "text": "                           | (csr_addr_li == 12'h9c3);"
+        },
+        {
+          "line": 992,
+          "text": "  assign commit_pkt_cast_o.ctxtsw            = retire_pkt_cast_i.instret & retire_ctxtsw_v_i;"
+        },
+        {
+          "line": 1040,
+          "text": "  assign ctx_npc_write_v_o   = csr_w_v_li & (csr_addr_li == 12'h801)"
+        },
+        {
+          "line": 1058,
+          "text": "  wire rpush_v = csr_w_v_li & (csr_addr_li == 12'h802)"
+        },
+        {
+          "line": 1066,
+          "text": "  wire ctx_l1_data_write_v_li = csr_w_v_li & (csr_addr_li == 12'h803)"
+        },
+        {
+          "line": 1068,
+          "text": "  wire ctx_l1_cmd_write_v_li = csr_w_v_li & (csr_addr_li == 12'h804)"
+        },
+        {
+          "line": 1078,
+          "text": "  assign miss_trace_ctrl_v_o = csr_w_v_li & (csr_addr_li == 12'h805)"
+        },
+        {
+          "line": 1082,
+          "text": "  assign miss_trace_read_v_o = csr_w_v_li & (csr_addr_li == 12'h806)"
+        },
+        {
+          "line": 1094,
+          "text": "  assign icache_replay_v_o = csr_w_v_li & (csr_addr_li == 12'h7c0)"
+        },
+        {
+          "line": 1106,
+          "text": "  assign icache_prefix_entry_v_o = csr_w_v_li & (csr_addr_li == 12'h7c1)"
+        },
+        {
+          "line": 1110,
+          "text": "  assign icache_prefix_count_v_o = csr_w_v_li & (csr_addr_li == 12'h7c2)"
+        },
+        {
+          "line": 1119,
+          "text": "    & (csr_addr_li == 12'h5c1) & (is_s_mode | is_m_mode);"
+        },
+        {
+          "line": 1122,
+          "text": "    & retire_pkt_cast_i.instret & (csr_addr_li == 12'h5c2)"
+        },
+        {
+          "line": 1125,
+          "text": "  assign icache_prefix_trigger_v_o = csr_w_v_li & (csr_addr_li == 12'h5c0)"
+        },
+        {
+          "line": 1135,
+          "text": "                                & (csr_addr_li == 12'h9c0)"
+        },
+        {
+          "line": 1146,
+          "text": "                                    & (csr_addr_li == 12'h9c1)"
+        },
+        {
+          "line": 1149,
+          "text": "                                     & (csr_addr_li == 12'h9c2)"
+        },
+        {
+          "line": 1152,
+          "text": "                                      & (csr_addr_li == 12'h9c3)"
+        }
+      ]
+    },
+    {
+      "path": "bp_be/src/v/bp_be_csr_wrapper_mt.sv",
+      "sha256": "cf013686c8aac9dc78adf60c05644b6c8a9be130fbf3eb4d11e7c18b77bb514e",
+      "matched_lines": [
+        {
+          "line": 226,
+          "text": "    assign retire_pkt_gated[i]  = retire_active ? retire_pkt_i : '0;"
+        },
+        {
+          "line": 227,
+          "text": "    assign retire_ctxtsw_v_gated[i] = retire_ctxtsw_v_i & retire_active;"
+        },
+        {
+          "line": 249,
+          "text": "       ,.retire_pkt_i(retire_pkt_gated[i])"
+        },
+        {
+          "line": 250,
+          "text": "       ,.retire_ctxtsw_v_i(retire_ctxtsw_v_gated[i])"
+        },
+        {
+          "line": 335,
+          "text": "  assign commit_pkt_o          = commit_pkt_co[current_physical_thread_id_i];"
+        },
+        {
+          "line": 342,
+          "text": "  assign ctx_npc_write_v_o     = ctx_npc_write_v_co[current_physical_thread_id_i];"
+        },
+        {
+          "line": 387,
+          "text": "  assign csr_context_save_data_o = csr_context_save_data_co[csr_context_save_physical_thread_id_i];"
+        }
+      ]
+    },
+    {
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_pipe_sys.sv",
+      "sha256": "2b75573cd851ebbfbae7ff6e868f25f01d25f572808be28ccc220a80d1920b72",
+      "matched_lines": [
+        {
+          "line": 166,
+          "text": "  wire csr_v_li = (reservation.decode.csr_r_v | reservation.decode.csr_w_v) & ~reservation.ctxtsw_v;"
+        },
+        {
+          "line": 167,
+          "text": "  wire [rv64_csr_addr_width_gp-1:0] csr_addr_li = instr.t.itype.imm12;"
+        },
+        {
+          "line": 201,
+          "text": "     ,.retire_ctxtsw_v_i(retire_ctxtsw_r)"
+        },
+        {
+          "line": 317,
+          "text": "      retire_ctxtsw_r  <= 1'b0;"
+        },
+        {
+          "line": 320,
+          "text": "      retire_ctxtsw_r  <= retire_nctxtsw_r;"
+        }
+      ]
+    },
+    {
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_calculator_top.sv",
+      "sha256": "d48301cabc538536425fb96b671c566d7e2033332b5380ee7acc8da12c6c01c4",
+      "matched_lines": [
+        {
+          "line": 204,
+          "text": "  `bp_cast_o(bp_be_commit_pkt_s, commit_pkt);"
+        },
+        {
+          "line": 368,
+          "text": "     ,.commit_pkt_o(commit_pkt_cast_o)"
+        }
+      ]
+    }
+  ],
+  "commit_path": "CSR wrapper -> bp_be_pipe_sys commit_pkt_cast_o (202) -> bp_be_calculator_top commit_pkt_cast_o (368) -> bp_be_top commit_pkt (1538); direct output wiring, no alternate ctxtsw producer."
+}

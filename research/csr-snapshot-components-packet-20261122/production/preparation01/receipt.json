@@ -1,0 +1,389 @@
+{
+  "state": "PASS production-contract component independent raw gates/all-bit/all-context only; mapping/integration pending",
+  "preflight": {
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/admission.json",
+      "bytes": 3890,
+      "sha256": "2d9a457e3246dcaed676953535a9eb980f6a3ad304d8649524c32ace94dc2d64"
+    },
+    "resources": {
+      "stage_bytes": 0,
+      "FST_bytes": 0,
+      "HOME_source_helper_receipt_bytes": 32922
+    },
+    "component_only": true
+  },
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-Wno-DECLFILENAME",
+        "--top-module",
+        "csr_snapshot_production_wrapper",
+        "-Gnegative_p=1'b0",
+        "--Mdir",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj",
+        "-CFLAGS",
+        "-std=c++14",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/candidate.sv",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/reference.sv",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/wrapper.sv",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/driver.cpp"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-Wno-DECLFILENAME",
+          "--top-module",
+          "csr_snapshot_production_wrapper",
+          "-Gnegative_p=1'b0",
+          "--Mdir",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj",
+          "-CFLAGS",
+          "-std=c++14",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/candidate.sv",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/reference.sv",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/wrapper.sv",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/driver.cpp"
+        ],
+        "owned_pgid": 1198716,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.2921424249652773
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/generate.log",
+        "bytes": 287,
+        "sha256": "26e8056f8bd5bba7d46647232089d9f8ba5c45cc79a2a2693942da67e9b5f950"
+      }
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj",
+        "-f",
+        "Vcsr_snapshot_production_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/no-pch.mk",
+        "-j2",
+        "OBJCACHE="
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj",
+          "-f",
+          "Vcsr_snapshot_production_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/no-pch.mk",
+          "-j2",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1198719,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 11.492886135936715
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/compile.log",
+        "bytes": 4192,
+        "sha256": "7b6e65f7c4eab32433867026831cd6ba4149a7c5a8ad49f8ccdccaac36f950b2"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj/Vcsr_snapshot_production_wrapper"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj/Vcsr_snapshot_production_wrapper"
+        ],
+        "owned_pgid": 1198780,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.7957153129391372
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/runtime.log",
+        "bytes": 128,
+        "sha256": "89fa2223a6f3a1478ff6c1fc006c2b50bde9bebfbf73618c715daecaa952b045"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-Wno-DECLFILENAME",
+        "--top-module",
+        "csr_snapshot_production_wrapper",
+        "-Gnegative_p=1'b1",
+        "--Mdir",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj",
+        "-CFLAGS",
+        "-std=c++14",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/candidate.sv",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/reference.sv",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/wrapper.sv",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/driver.cpp"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-Wno-DECLFILENAME",
+          "--top-module",
+          "csr_snapshot_production_wrapper",
+          "-Gnegative_p=1'b1",
+          "--Mdir",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj",
+          "-CFLAGS",
+          "-std=c++14",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/candidate.sv",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/reference.sv",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/wrapper.sv",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/driver.cpp"
+        ],
+        "owned_pgid": 1198792,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.2844501599902287
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/generate.log",
+        "bytes": 287,
+        "sha256": "394bee54da3fa76a81a84981e0e8945fb0ae68e3921b2c418d888294fd5f20af"
+      }
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj",
+        "-f",
+        "Vcsr_snapshot_production_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/no-pch.mk",
+        "-j2",
+        "OBJCACHE="
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj",
+          "-f",
+          "Vcsr_snapshot_production_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/source/no-pch.mk",
+          "-j2",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1198795,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 11.166302219964564
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/compile.log",
+        "bytes": 4182,
+        "sha256": "eb18352c2c9686fb1bab9e883d8f7e2f7f5cf67f31b1a4bf9e53073b428a02ea"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj/Vcsr_snapshot_production_wrapper",
+        "negative"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj/Vcsr_snapshot_production_wrapper",
+          "negative"
+        ],
+        "owned_pgid": 1198856,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.14120442094281316
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/runtime.log",
+        "bytes": 68,
+        "sha256": "3784ac56fbfb74910e5b24f32960a3c88178b8796e9f0805966554743bd313f6"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "actual-raw-production-contract",
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/obj/Vcsr_snapshot_production_wrapper",
+        "bytes": 387248,
+        "sha256": "eb9d88647491f69c7b7753f4cc791bb39d3456f0e8ae4e21e52243ebfeb96f0e"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/actual-raw-production-contract/snapshot.fst",
+        "bytes": 1133346,
+        "sha256": "5930aaf4d43f28d99c28ce9234d78a2b3e012e4d99c4fcf5e3203a9de82dacc1"
+      }
+    },
+    {
+      "name": "suppressed-write-negative",
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/obj/Vcsr_snapshot_production_wrapper",
+        "bytes": 383096,
+        "sha256": "c33a6e5c96ad8a011ed063cadbe147edd414e6455e10af40aacbad91eb41aa5d"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/suppressed-write-negative/snapshot.fst",
+        "bytes": 1679,
+        "sha256": "65bb5c81bc604466087bb63d03419ea619e3e6c4ab412ad2f56a0c738b0c1380"
+      }
+    }
+  ],
+  "final_source_check": {
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/admission.json",
+      "bytes": 3890,
+      "sha256": "2d9a457e3246dcaed676953535a9eb980f6a3ad304d8649524c32ace94dc2d64"
+    },
+    "resources": {
+      "stage_bytes": 4247538,
+      "FST_bytes": 1135025,
+      "HOME_source_helper_receipt_bytes": 45476
+    },
+    "component_only": true
+  }
+}

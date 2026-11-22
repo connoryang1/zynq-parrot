@@ -1,0 +1,271 @@
+{
+  "state": "FAIL preserved; no retry/extension/area claim",
+  "preflight": {
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/admission_v2.json",
+      "bytes": 3961,
+      "sha256": "2b42a1558a4d4b7c9183c2698783d803f0564c70fd26937db188f8dc82641154"
+    },
+    "resources": {
+      "stage_bytes": 0,
+      "FST_bytes": 0,
+      "HOME_source_helper_receipt_bytes": 55550
+    },
+    "component_only": true
+  },
+  "commands": [
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-Wno-DECLFILENAME",
+        "--top-module",
+        "csr_snapshot_wrapper",
+        "-Gnegative_p=0",
+        "--Mdir",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj",
+        "-CFLAGS",
+        "-std=c++14",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/candidate.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/reference.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/wrapper.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/driver.cpp"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-Wno-DECLFILENAME",
+          "--top-module",
+          "csr_snapshot_wrapper",
+          "-Gnegative_p=0",
+          "--Mdir",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj",
+          "-CFLAGS",
+          "-std=c++14",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/candidate.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/reference.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/wrapper.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/driver.cpp"
+        ],
+        "owned_pgid": 1197701,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.33944505802355707
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/generate.log",
+        "bytes": 287,
+        "sha256": "91b9eae1d93c5a935de9972d4f208fd802e51e84bcc285fdf4899c95ac31b11b"
+      }
+    },
+    {
+      "argv": [
+        "make",
+        "-C",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj",
+        "-f",
+        "Vcsr_snapshot_wrapper.mk",
+        "-f",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/no-pch.mk",
+        "-j2",
+        "OBJCACHE="
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-C",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj",
+          "-f",
+          "Vcsr_snapshot_wrapper.mk",
+          "-f",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/no-pch.mk",
+          "-j2",
+          "OBJCACHE="
+        ],
+        "owned_pgid": 1197704,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 12.60528392100241
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/compile.log",
+        "bytes": 3944,
+        "sha256": "4dcff731204df33de8e7c6344fd367f6bc4d39d0d9dbdee06487cfc8e8e5b187"
+      }
+    },
+    {
+      "argv": [
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj/Vcsr_snapshot_wrapper"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj/Vcsr_snapshot_wrapper"
+        ],
+        "owned_pgid": 1197740,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.4984324430115521
+      },
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/runtime.log",
+        "bytes": 128,
+        "sha256": "ac66e41232b7bf53161e7fdb23970d4648da50acb34a7665bde0f7fb3b56a2cc"
+      }
+    },
+    {
+      "argv": [
+        "/home/coyang/zynq-parrot/install/bin/verilator",
+        "--cc",
+        "--exe",
+        "--trace-fst",
+        "--assert",
+        "-Wall",
+        "-Wno-DECLFILENAME",
+        "--top-module",
+        "csr_snapshot_wrapper",
+        "-Gnegative_p=1",
+        "--Mdir",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/suppressed-seed-negative/obj",
+        "-CFLAGS",
+        "-std=c++14",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/candidate.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/reference.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/wrapper.sv",
+        "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/driver.cpp"
+      ],
+      "timeout_seconds": 120,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/install/bin/verilator",
+          "--cc",
+          "--exe",
+          "--trace-fst",
+          "--assert",
+          "-Wall",
+          "-Wno-DECLFILENAME",
+          "--top-module",
+          "csr_snapshot_wrapper",
+          "-Gnegative_p=1",
+          "--Mdir",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/suppressed-seed-negative/obj",
+          "-CFLAGS",
+          "-std=c++14",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/candidate.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/reference.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/wrapper.sv",
+          "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/source/driver.cpp"
+        ],
+        "owned_pgid": 1197752,
+        "returncode": 1,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.34811544604599476
+      },
+      "error": "ValueError('component command failed /dev/shm/zp-csr-snapshot-dual-writer-20261122-01/suppressed-seed-negative/generate.log')",
+      "log": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/suppressed-seed-negative/generate.log",
+        "bytes": 677,
+        "sha256": "041ff659c2c34d1bb5aee13f9097663e219033e8b6d06a39d3f8bac23f3136cc"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "actual-and-single",
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj/Vcsr_snapshot_wrapper",
+        "bytes": 390208,
+        "sha256": "e28f1cb6c26c154b441269d58d348e381b414fdd7d95f3564b4975690f703a1f"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/snapshot.fst",
+        "bytes": 827900,
+        "sha256": "a82179609001e01eadd9d329e734287e5793bc62687f531991e6146f27d68cba"
+      }
+    }
+  ],
+  "error": "ValueError('component command failed /dev/shm/zp-csr-snapshot-dual-writer-20261122-01/suppressed-seed-negative/generate.log')"
+}

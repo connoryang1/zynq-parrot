@@ -1,0 +1,77 @@
+{
+  "source_commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "source_path": "bp_be/src/v/bp_be_top.sv",
+  "sha256": "c8a14b45e8a0034c2926c3fe66c87ac7263a1f948f9c8e280f911b78fb3b32ca",
+  "all_payload_and_valid_occurrences": [
+    {
+      "line": 235,
+      "text": "  logic [num_contexts_p-1:0] virtual_context_csr_valid_r;"
+    },
+    {
+      "line": 236,
+      "text": "  logic [num_contexts_p-1:0][csr_context_width_lp-1:0] virtual_context_csr_state_r;"
+    },
+    {
+      "line": 370,
+      "text": "        || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo])"
+    },
+    {
+      "line": 384,
+      "text": "    && virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]"
+    },
+    {
+      "line": 396,
+      "text": "    & ~virtual_context_csr_valid_r[context_cache_target_virtual_context_id_r];"
+    },
+    {
+      "line": 399,
+      "text": "    ? virtual_context_csr_state_r[context_cache_target_virtual_context_id_r]"
+    },
+    {
+      "line": 849,
+      "text": "        virtual_context_csr_valid_r[i] <= 1'b0;"
+    },
+    {
+      "line": 850,
+      "text": "        virtual_context_csr_state_r[i] <= '0;"
+    },
+    {
+      "line": 879,
+      "text": "          virtual_context_csr_state_r[save_virtual_context_id_li] <= csr_context_save_data_lo;"
+    },
+    {
+      "line": 880,
+      "text": "          virtual_context_csr_valid_r[save_virtual_context_id_li] <= 1'b1;"
+    },
+    {
+      "line": 906,
+      "text": "            || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]) begin"
+    },
+    {
+      "line": 911,
+      "text": "          virtual_context_csr_state_r[ctx_npc_write_virtual_context_id_lo]"
+    },
+    {
+      "line": 913,
+      "text": "          virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo] <= 1'b1;"
+    }
+  ],
+  "intent_mapping": {
+    "save_v": "commit_pkt.ctxtsw && save_virtual_context_id_li < num_contexts_p",
+    "save_addr": "save_virtual_context_id_li",
+    "save_data": "csr_context_save_data_lo",
+    "seed_v": "ctx_npc_write_v_lo && ctx_npc_write_virtual_context_id_lo < num_contexts_p && (ctx_npc_write_rebind_lo || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo])",
+    "seed_addr": "ctx_npc_write_virtual_context_id_lo",
+    "seed_data": "csr_context_save_data_lo",
+    "read_addr": "context_cache_target_virtual_context_id_r"
+  },
+  "priority": "reset > later reseed for same address; different-address save and reseed both retained",
+  "integration": "NOT implemented; all original owner/privilege/consumer logic stays outside candidate",
+  "candidate_interface": {
+    "payload_read_ports": 1,
+    "full_valid_vector": "unchanged independent consumer availability",
+    "writes": "two independent address/data intents; later reseed priority",
+    "cycle_semantics": "asynchronous read; write visibility after owning positive edge",
+    "cold": "zero payload/read_valid/valid_vector after reset edge, no pre-reset promise"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schema": "csr-snapshot-production-contract-component-v1",
+  "state": "PREPARED-ONLY-ROOT-REVIEW-REQUIRED",
+  "base": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+  "stage": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01",
+  "limits": {
+    "stage": 67108864,
+    "FST": 4194304,
+    "HOME": 98304,
+    "RAM_floor": 536870912,
+    "workers": 2,
+    "phase_seconds": 120
+  },
+  "inputs": [
+    {
+      "path": "/home/coyang/bp-csr-snapshot-production-contract-20261122/bp_be/src/v/bp_be_csr_snapshot_store_production.sv",
+      "bytes": 1298,
+      "sha256": "0ed6f85da9ca9ee47de25d99bc79d9f43710742014fa4c6f607f06d1f66a4067"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/README.md",
+      "bytes": 5150,
+      "sha256": "b8211fcb52a4fe18f83b2178afbc712c66bb6290eb343ebb766744ccbff43aa2"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/driver.cpp",
+      "bytes": 5955,
+      "sha256": "4653e7bce17da315d11d5240e113f423a59aa38ed5dbf33eca660fe328530b88"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/generic-head-preservation.json",
+      "bytes": 614,
+      "sha256": "2502d0170f999f003f66b8220a41df1f653322e218f1733c6ed4882092dce700"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/no-pch.mk",
+      "bytes": 207,
+      "sha256": "08d5103e343431d70099baf00c2b2c53caf76ca91929d1084fb41bada4123b6b"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/reference.sv",
+      "bytes": 1444,
+      "sha256": "7c36d0a1e398f55ff049cfc697354d06aa7a71389bd009157b26baf5cf0a47e8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/run_host.py",
+      "bytes": 6494,
+      "sha256": "1776b12a1809f85da6cc4485e1f1b1b2a66a5457a97d54984a3b5f26b8217d6b"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/software_owned_v2.py",
+      "bytes": 3997,
+      "sha256": "52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-contract-20261122/preparation01/wrapper.sv",
+      "bytes": 2974,
+      "sha256": "06b560003735540e12593380bef01c1af8e5a7adeee13945daf4e5efcd0f4b23"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/production-write-exclusion.json",
+      "bytes": 8266,
+      "sha256": "22982102c56242df4afb7f54633d187d68f962c1cd09ffc1a5e0cf98cc135d42"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/checkpoint01/summary.json",
+      "bytes": 3725,
+      "sha256": "e44bb89054cb443753e8a63eead02e26243bdb0db868af7439cd9e095077bfac"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/negative-receipt.json",
+      "bytes": 7845,
+      "sha256": "ef523a6c2aa832c89c1d6ef67e2735ed800ab99451f86496a6d4b2b4ca9651e3"
+    }
+  ],
+  "geometry": {
+    "contexts": 4,
+    "image_bits": 1666,
+    "read_ports": 1,
+    "write_ports": 1,
+    "valid_vector_bits": 4,
+    "payload_reset": false
+  },
+  "production_contract": "same current-bank selection of complementary T/~T gates; shared save-data wire",
+  "expected_positive": {
+    "cycles": 22054,
+    "checks": 176428,
+    "raw_combinations": 8192
+  },
+  "negative": "suppressed candidate write; sized CLI1bit",
+  "ROOT_fresh_concurrent_reservation_required": true,
+  "no_execution_by_agent": true
+}

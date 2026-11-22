@@ -1,0 +1,89 @@
+{
+  "schema": "csr-snapshot-component-composite-checkpoint-v1",
+  "state": "PASS extracted component positive plus separate negative; original helper FAIL retained",
+  "BP_commit": "c4a0fc2c8dca303bad930bea83d36c5a53d7bad4",
+  "only_BP_change": "new bp_be/src/v/bp_be_csr_snapshot_store.sv",
+  "candidate_sha256": "1066c40eb474545079c31aa70d25b9a7899f89d6e407088eece95a1bf686fb2d",
+  "positive": {
+    "cycles": 7234,
+    "all_context_checks": 57868,
+    "contexts": 4,
+    "width": 1666,
+    "small_corner": "1x65",
+    "artifacts": {
+      "name": "actual-and-single",
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/obj/Vcsr_snapshot_wrapper",
+        "bytes": 390208,
+        "sha256": "e28f1cb6c26c154b441269d58d348e381b414fdd7d95f3564b4975690f703a1f"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/actual-and-single/snapshot.fst",
+        "bytes": 827900,
+        "sha256": "a82179609001e01eadd9d329e734287e5793bc62687f531991e6146f27d68cba"
+      }
+    },
+    "owned_statuses": [
+      0,
+      0,
+      0
+    ]
+  },
+  "negative": {
+    "artifacts": {
+      "executable": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/obj/Vcsr_snapshot_wrapper",
+        "bytes": 390208,
+        "sha256": "d6ccfe4ef8ec50b3f369070f03d1192e08fbedab6732ef86331c21b1fa78a3e4"
+      },
+      "FST": {
+        "path": "/dev/shm/zp-csr-snapshot-dual-writer-20261122-01/negative-continuation02/snapshot.fst",
+        "bytes": 1726,
+        "sha256": "fbe64acd83b5c060194b2da688c3ebb645e5fce668928f3d9e13a5801749e626"
+      }
+    },
+    "owned_statuses": [
+      0,
+      0,
+      0
+    ],
+    "mutation": "suppress candidate seed writes",
+    "CLI_literal": "-Gnegative_p=1'b1"
+  },
+  "original_failures": {
+    "sentinel_before_allocation": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/preexecution-sentinel-failure01.json",
+      "bytes": 994,
+      "sha256": "f7bac04aa63ac76f7c9e17b220e9cded7dafe2c8e36e9add933f2e07f9a86528"
+    },
+    "negative_unsized_parameter_generation": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/receipt.json",
+      "bytes": 8869,
+      "sha256": "a1b24e55415dbfcefb8b6afac9413c8e97ba52011db953967d00e7d4f0259b5b"
+    }
+  },
+  "negative_composite_receipt": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/negative-receipt.json",
+    "bytes": 7845,
+    "sha256": "ef523a6c2aa832c89c1d6ef67e2735ed800ab99451f86496a6d4b2b4ca9651e3"
+  },
+  "source_recipe_proof_archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/checkpoint01/source-and-component-receipts.tar.gz",
+    "bytes": 15501,
+    "sha256": "ca8c3a39c32ff89c075f8f63a0e00587c829324fa9f478b4b8f29aaa3e34615f"
+  },
+  "production_write_exclusion": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/production-write-exclusion.json",
+    "bytes": 8266,
+    "sha256": "22982102c56242df4afb7f54633d187d68f962c1cd09ffc1a5e0cf98cc135d42"
+  },
+  "original_bp_top_source": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-dual-writer-20261122/preparation01/original-bp_be_top.sv.gz",
+    "bytes": 12821,
+    "sha256": "f8c5869c0ab72f8d3c7116d0f413824617c78120c5e32746f6475278c98c13c1"
+  },
+  "ROOT_only_execution": true,
+  "no_area_timing_fullcore_route_or_physical_claim": true,
+  "all_raw_FST_executables_remain_external_RAM_paths_in_receipts": true,
+  "preserves_active_lower256_CAD_source_helpers": true
+}
