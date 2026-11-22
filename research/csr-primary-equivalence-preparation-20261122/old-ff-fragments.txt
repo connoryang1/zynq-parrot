@@ -1,0 +1,200 @@
+OLD bb575a764c200f07c6f3259a179bdc861dd7593f bp_be_top.sv selected verbatim ranges; full blob pinned in construction.json
+
+LINES 235..236
+  logic [num_contexts_p-1:0] virtual_context_csr_valid_r;
+  logic [num_contexts_p-1:0][csr_context_width_lp-1:0] virtual_context_csr_state_r;
+
+LINES 356..404
+  logic [csr_context_width_lp-1:0] csr_context_save_data_lo;
+  wire [thread_id_width_p-1:0] csr_context_save_physical_thread_id_li =
+    context_cache_commit_v_li
+    ? context_cache_victim_physical_thread_id_r
+    : pending_ctxtsw_sent_r ? pending_ctxtsw_prev_physical_thread_id_r : current_physical_thread_id_lo;
+  // First NPC seeding clones the caller's CSR image. A resident target never
+  // takes the context-cache install path, so initialize its inactive physical
+  // bank at that same committed seed. Existing contexts keep their own CSRs
+  // when reseeded; a self-seed must not restore over its retiring instruction.
+  wire csr_context_cache_restore_v_li = context_cache_launch_v_li;
+  wire csr_context_resident_init_v_li = ctx_npc_write_resident_v_li
+    && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)
+    && (ctx_npc_write_physical_thread_id_li < num_threads_p)
+    && (ctx_npc_write_rebind_lo
+        || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo])
+    && (ctx_npc_write_physical_thread_id_li != csr_context_save_physical_thread_id_li);
+  wire csr_context_restore_v_li = csr_context_cache_restore_v_li | csr_context_resident_init_v_li;
+  // A committed NPC write to an initialized inactive resident bank changes
+  // its next trap PC without cloning the caller's architectural CSR image.
+  // Pending switches can separate active, retiring, and save-bank ownership;
+  // exclude all three so a self-seed cannot replace live retirement state.
+  wire rpc_target_apc_write_v_li = commit_pkt.ctxtsw
+    && pending_rpc_call_v_r
+    && (pending_ctxtsw_physical_thread_id_r < num_threads_p);
+  wire csr_context_apc_write_v_li = rpc_target_apc_write_v_li
+    || (ctx_npc_write_resident_v_li
+    && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)
+    && (ctx_npc_write_physical_thread_id_li < num_threads_p)
+    && virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]
+    && !ctx_npc_write_rebind_lo
+    && (ctx_npc_write_physical_thread_id_li != current_physical_thread_id_lo)
+    && (ctx_npc_write_physical_thread_id_li != retire_thread_id_lo)
+    && (ctx_npc_write_physical_thread_id_li != csr_context_save_physical_thread_id_li)
+    && !csr_context_restore_v_li);
+  wire [thread_id_width_p-1:0] csr_context_restore_physical_thread_id_li =
+    csr_context_cache_restore_v_li ? context_cache_victim_physical_thread_id_r
+    : rpc_target_apc_write_v_li ? pending_ctxtsw_physical_thread_id_r
+    : ctx_npc_write_physical_thread_id_li;
+  wire csr_context_restore_reset_li =
+    csr_context_cache_restore_v_li
+    & ~virtual_context_csr_valid_r[context_cache_target_virtual_context_id_r];
+  wire [csr_context_width_lp-1:0] csr_context_restore_data_li =
+    csr_context_cache_restore_v_li
+    ? virtual_context_csr_state_r[context_cache_target_virtual_context_id_r]
+    : csr_context_save_data_lo;
+  wire [vaddr_width_p-1:0] csr_context_restore_npc_li =
+    csr_context_cache_restore_v_li
+    ? virtual_context_npc_r[context_cache_target_virtual_context_id_r]
+    : rpc_target_apc_write_v_li ? rpc_entry_r : ctx_npc_write_npc_lo;
+
+LINES 849..850
+        virtual_context_csr_valid_r[i] <= 1'b0;
+        virtual_context_csr_state_r[i] <= '0;
+
+LINES 853..862
+      if (commit_pkt.ctxtsw) begin
+        logic [thread_id_width_p-1:0] save_physical_thread_id_li;
+        logic [context_id_width_p-1:0] save_virtual_context_id_li;
+        logic [vaddr_width_p-1:0] save_resume_npc_li;
+        save_physical_thread_id_li = context_cache_commit_v_li
+                            ? context_cache_victim_physical_thread_id_r
+                            : pending_ctxtsw_prev_physical_thread_id_r;
+        save_virtual_context_id_li = context_cache_commit_v_li
+                             ? context_cache_victim_virtual_context_id_r
+                             : current_virtual_context_id_r;
+
+LINES 874..881
+        if (save_virtual_context_id_li < num_contexts_p) begin
+          virtual_context_npc_r[save_virtual_context_id_li] <= save_resume_npc_li;
+          virtual_context_priv_mode_r[save_virtual_context_id_li] <= commit_pkt.priv_n;
+          virtual_context_translation_en_r[save_virtual_context_id_li] <= commit_pkt.translation_en_n;
+          virtual_context_asid_r[save_virtual_context_id_li] <= trans_info_lo.asid;
+          virtual_context_csr_state_r[save_virtual_context_id_li] <= csr_context_save_data_lo;
+          virtual_context_csr_valid_r[save_virtual_context_id_li] <= 1'b1;
+        end
+
+LINES 894..894
+      if (ctx_npc_write_v_lo && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)) begin
+
+LINES 905..914
+        if (ctx_npc_write_rebind_lo
+            || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]) begin
+          // A bootstrap target has no prior CSR image.  Clone the seeding
+          // context's architectural CSR state so a first launch
+          // preserves the caller's privilege mode and SATP translation root.
+          // Never overwrite CSR state when only reseeding an existing NPC.
+          virtual_context_csr_state_r[ctx_npc_write_virtual_context_id_lo]
+            <= csr_context_save_data_lo;
+          virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo] <= 1'b1;
+        end
+
+OLD pipe_sys exact CSR instance
+  bp_be_csr_wrapper_mt
+   #(.bp_params_p(bp_params_p)
+     ,.retained_buffer_p(retained_buffer_p))
+    csr
+    (.clk_i(clk_i)
+     ,.reset_i(reset_i)
+     ,.retained_control_status_i(retained_control_status_i)
+     ,.retained_control_cmd_v_o(retained_control_cmd_v_o)
+     ,.retained_control_o(retained_control_o)
+
+     ,.cfg_bus_i(cfg_bus_i)
+
+     ,.csr_r_v_i(csr_v_li)
+     ,.csr_r_addr_i(csr_addr_li)
+     ,.csr_r_data_o(csr_data_lo)
+     ,.csr_r_illegal_o(illegal_instr_o)
+
+     ,.fflags_acc_i(fflags_acc_li)
+     ,.frf_w_v_i(fwb_pkt_cast_i.frd_w_v)
+
+     ,.debug_irq_i(debug_irq_i)
+     ,.timer_irq_i(timer_irq_i)
+     ,.software_irq_i(software_irq_i)
+     ,.m_external_irq_i(m_external_irq_i)
+     ,.s_external_irq_i(s_external_irq_i)
+     ,.irq_pending_o(irq_pending_o)
+     ,.irq_waiting_o(irq_waiting_o)
+
+     ,.retire_pkt_i(retire_pkt)
+     ,.retire_ctxtsw_v_i(retire_ctxtsw_r)
+     ,.commit_pkt_o(commit_pkt_cast_o)
+     ,.decode_info_o(decode_info_cast_o)
+     ,.trans_info_o(trans_info_cast_o)
+     ,.reservation_trans_info_o(reservation_trans_info_cast_o)
+     ,.frm_dyn_o(frm_dyn_o)
+     // Current selects slow CSR state; reservation thread owns CSR reads
+     // and memory translation information.
+     ,.current_physical_thread_id_i(current_physical_thread_id_i)
+     ,.current_virtual_context_id_i(current_virtual_context_id_i)
+     ,.legacy_context_user_enable_i(legacy_context_user_enable_i)
+     ,.csr_thread_id_i(reservation_physical_thread_id)
+     ,.retire_thread_id_i(retire_thread_id_i)
+     ,.csr_context_restore_v_i(csr_context_restore_v_i)
+     ,.csr_context_apc_write_v_i(csr_context_apc_write_v_i)
+     ,.csr_context_restore_reset_i(csr_context_restore_reset_i)
+     ,.csr_context_restore_physical_thread_id_i(csr_context_restore_physical_thread_id_i)
+     ,.csr_context_restore_data_i(csr_context_restore_data_i)
+     ,.csr_context_restore_npc_i(csr_context_restore_npc_i)
+     ,.csr_context_save_physical_thread_id_i(csr_context_save_physical_thread_id_i)
+     ,.csr_context_save_data_o(csr_context_save_data_o)
+     ,.ctx_npc_write_v_o(ctx_npc_write_v_o)
+     ,.ctx_npc_write_rebind_o(ctx_npc_write_rebind_o)
+     ,.ctx_npc_write_rpc_entry_o(ctx_npc_write_rpc_entry_o)
+     ,.ctx_npc_write_virtual_context_id_o(ctx_npc_write_virtual_context_id_o)
+     ,.ctx_npc_write_npc_o(ctx_npc_write_npc_o)
+     ,.ctx_rpush_v_o(ctx_rpush_v_o)
+     ,.ctx_rpush_fp_v_o(ctx_rpush_fp_v_o)
+     ,.ctx_rpush_virtual_context_id_o(ctx_rpush_virtual_context_id_o)
+     ,.ctx_rpush_reg_o(ctx_rpush_reg_o)
+     ,.ctx_rpush_data_o(ctx_rpush_data_o)
+     ,.ctx_l1_ready_i(ctx_l1_ready_i)
+     ,.ctx_l1_resp_v_i(ctx_l1_resp_v_i)
+     ,.ctx_l1_resp_data_i(ctx_l1_resp_data_i)
+     ,.ctx_l1_cmd_v_o(ctx_l1_cmd_v_o)
+     ,.ctx_l1_cmd_w_o(ctx_l1_cmd_w_o)
+     ,.ctx_l1_cmd_paddr_o(ctx_l1_cmd_paddr_o)
+     ,.ctx_l1_cmd_data_o(ctx_l1_cmd_data_o)
+     ,.miss_trace_status_i(miss_trace_status_i)
+     ,.miss_trace_data_i(miss_trace_data_i)
+     ,.miss_trace_ctrl_v_o(miss_trace_ctrl_v_o)
+     ,.miss_trace_arm_o(miss_trace_arm_o)
+     ,.miss_trace_clear_o(miss_trace_clear_o)
+     ,.miss_trace_read_v_o(miss_trace_read_v_o)
+     ,.miss_trace_read_source_o(miss_trace_read_source_o)
+     ,.miss_trace_read_index_o(miss_trace_read_index_o)
+     ,.icache_replay_ready_i(icache_replay_ready_i)
+     ,.icache_replay_v_o(icache_replay_v_o)
+     ,.icache_replay_paddr_o(icache_replay_paddr_o)
+       ,.icache_retention_status_i(icache_retention_status_i)
+       ,.icache_retention_cmd_v_o(icache_retention_cmd_v_o)
+       ,.icache_retention_mode_o(icache_retention_mode_o)
+     ,.icache_prefix_status_i(icache_prefix_status_i)
+     ,.icache_prefix_entry_v_o(icache_prefix_entry_v_o)
+     ,.icache_prefix_entry_index_o(icache_prefix_entry_index_o)
+     ,.icache_prefix_entry_paddr_o(icache_prefix_entry_paddr_o)
+     ,.icache_prefix_count_v_o(icache_prefix_count_v_o)
+     ,.icache_prefix_count_o(icache_prefix_count_o)
+     ,.icache_prefix_trigger_v_o(icache_prefix_trigger_v_o)
+     ,.icache_prefix_trigger_range_v_o(icache_prefix_trigger_range_v_o)
+     ,.icache_prefix_trigger_start_o(icache_prefix_trigger_start_o)
+     ,.icache_prefix_trigger_count_o(icache_prefix_trigger_count_o)
+     ,.icache_prefix_clear_v_o(icache_prefix_clear_v_o)
+     ,.physical_preview_idle_i(physical_preview_idle_i)
+     ,.physical_preview_v_o(physical_preview_v_o)
+     ,.physical_preview_paddr_o(physical_preview_paddr_o)
+     ,.dcache_replay_status_i(dcache_replay_status_i)
+     ,.dcache_replay_entry_v_o(dcache_replay_entry_v_o)
+     ,.dcache_replay_config_v_o(dcache_replay_config_v_o)
+     ,.dcache_replay_trigger_v_o(dcache_replay_trigger_v_o)
+     ,.dcache_replay_payload_o(dcache_replay_payload_o)
+     );
