@@ -1,0 +1,319 @@
+{
+  "schema": "retained-general-app-observability-source-review-v1",
+  "scope": "SOURCE_ONLY; no runtime qualification or changes to frozen primary guest/collector/estimator",
+  "basis": {
+    "TOP": "1008854d30e5d923c86c3232fc22af039467d552",
+    "BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+    "trace": 0,
+    "observe": 1,
+    "L1I_KiB": 32,
+    "L1D_KiB": 32,
+    "L2_KiB": 16,
+    "resident_contexts": 2,
+    "logical_contexts": 4
+  },
+  "commits": {
+    "cost_guests": "52652c6ef13100bad00747fa5bde1ec498582bb1",
+    "cost_collector_parser": "e0d6af6f87ceab843683ec520fad7d81982c8797",
+    "cost_promotion": "da335cc0ce125a4841d30caa8f7e3ccc3e597216"
+  },
+  "host_elf": {
+    "observer9c_sha256": "9c2648f1a9d2ceab2645895fdad74a5bc2c2ce62ad8f1161c6b3b72e74da42fa",
+    "frozen_COST_runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "build_receipts": "/home/coyang/fpga-artifacts/context-resume/native-retained-observer-host-20261121/compile02",
+    "ownership_MiB": 46,
+    "GP0_base": 1073741824
+  },
+  "physical_counters": {
+    "fields": [
+      "I_hit",
+      "D_hit",
+      "I_published",
+      "D_published",
+      "I_write_beats",
+      "D_write_beats"
+    ],
+    "packed_offsets": [
+      60,
+      64,
+      68
+    ],
+    "I_bits": "15:0",
+    "D_bits": "31:16",
+    "field_bits": 16,
+    "saturates_at": 65535,
+    "reset": "external AXI reset only",
+    "per_cell_difference_after_saturation": "UNRECOVERABLE",
+    "occupancy": false,
+    "unique_address_identity": false,
+    "prefetch_vs_demand_source_identity": false,
+    "observer9c_sampling": "two post-stop triples separated by 1000us; nonsaturation/equality required; not atomic/global-drain proof"
+  },
+  "frozen_COST": {
+    "physical_counter_rows": false,
+    "application_gp0": false,
+    "whole_scope": "setup/allocate/fork/warm/work/check/reap/free/source-control/resources; enabled two retained control writes, off zero",
+    "source_telemetry": "PREFIX/REPLAY are distinct from GP0 retained-use counts",
+    "primary_changed": false
+  },
+  "diagnostic_feasibility": {
+    "existing_ELF_one_case_aggregate": "possible with NEW diagnostic collector/runtime binding and existing9c, separate fresh AXI-reset boot; no pre-case active probe contaminating counted epoch",
+    "existing_collector_supports_role": false,
+    "per_cell_boundary": "requires NEW guest/collector keyed barriers outside WHOLE; UART output alone insufficient",
+    "new_kernel_ABI_required_for_host_GP0": false,
+    "minimum_existing_CLI": {
+      "loops": 1,
+      "repeats": 1,
+      "warmup": 1,
+      "active_workload_passes": 4
+    },
+    "target_only_bounds": {
+      "scan_32KiB_loads": 2048,
+      "scan_128KiB_loads": 8192,
+      "scan_32KiB_one_restore_per_load_word_writes": 16384,
+      "scan_128KiB_one_restore_per_load_word_writes": 65536,
+      "lookup_32KiB_loose_loads": 524544,
+      "lookup_128KiB_loose_loads": 2097408,
+      "chase_loads": 512,
+      "chase_one_restore_per_load_word_writes": 4096,
+      "regex_regexec_calls": 256,
+      "regex_regcomp_calls": 6
+    },
+    "target_bounds_exclude": [
+      "setup/check/free",
+      "I execution",
+      "kernel/interrupts",
+      "regex library internals",
+      "speculative/retried hardware events"
+    ],
+    "all_six_below65535_certified": false,
+    "meaning": "failure to certify, not prediction of actual saturation",
+    "minimal_distinct_guest_candidate": "mode0 setup/check/free; one enabled work pass per actor; zero active warmup; same workload generators; still needs global bound or explicit qualitative nonsaturation acceptance",
+    "interpretation": "no performance percentage; fixed all-workload/control outcomes including zero/negative/saturated/unstable, no adaptive shrinking/retry; primary complete application study remains efficacy evidence"
+  },
+  "sources": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 42425,
+      "sha256": "cd071d14cb555fc6a9f2257b578442136af0ccc6019b52a2d4b3424723e80214",
+      "lines_inclusive": [
+        [
+          193,
+          195
+        ],
+        [
+          470,
+          507
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/cosim/v/bp_retained_use_counters.sv",
+      "bytes": 1255,
+      "sha256": "9d20aedb75bbe695baf6d9df793c411786e01eec052b941e2a1b23bd5b064c3a",
+      "lines_inclusive": [
+        [
+          1,
+          29
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-borrow256-profile/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+      "bytes": 109697,
+      "sha256": "94d989246a8d2d247da8835081f2ba9385ab568e10425d0b872f376df3ea4ad4",
+      "lines_inclusive": [
+        [
+          621,
+          621
+        ],
+        [
+          870,
+          896
+        ],
+        [
+          928,
+          928
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/native-retained-observer-host-20261121/prepared-v2/source/src/ps.cpp",
+      "bytes": 21519,
+      "sha256": "ceb737222c2635525eabf5f3ced496f142796121be06692b756855de116cdc84",
+      "lines_inclusive": [
+        [
+          273,
+          283
+        ],
+        [
+          323,
+          330
+        ],
+        [
+          390,
+          424
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/native-retained-observer-host-20261121/prepared-v2/source/src/ps.hpp",
+      "bytes": 2213,
+      "sha256": "10e24a34553a0cf30e48f49b505442568eddb539082f591c5a12495fb953f03e",
+      "lines_inclusive": [
+        [
+          4,
+          24
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_cost_benchmark.c",
+      "bytes": 20151,
+      "sha256": "2f19b863264cec0842899e23bfc2a9d4a057beffe3ddb5cfd2cd5227af800f8e",
+      "lines_inclusive": [
+        [
+          172,
+          198
+        ],
+        [
+          238,
+          268
+        ],
+        [
+          282,
+          306
+        ],
+        [
+          358,
+          425
+        ],
+        [
+          430,
+          505
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/scheduler_retained29_regex_cost_benchmark.c",
+      "bytes": 20226,
+      "sha256": "1bc842d91c1fdacd1bfc81c3ef4e9a4510984c86b8f5e12ee9d22e05de4fbd37",
+      "lines_inclusive": [
+        [
+          430,
+          506
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/resume_workload.h",
+      "bytes": 10958,
+      "sha256": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+      "lines_inclusive": [
+        [
+          162,
+          228
+        ],
+        [
+          236,
+          281
+        ],
+        [
+          294,
+          330
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_regex_workload.h",
+      "bytes": 9938,
+      "sha256": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f",
+      "lines_inclusive": [
+        [
+          15,
+          44
+        ],
+        [
+          128,
+          185
+        ],
+        [
+          195,
+          260
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_cost_protocol.py",
+      "bytes": 21676,
+      "sha256": "fd9507f8ee6095285844e1d2a08652d6ffeae2d03d2dcbf378c966ef946a272f",
+      "lines_inclusive": [
+        [
+          14,
+          79
+        ],
+        [
+          139,
+          139
+        ],
+        [
+          180,
+          182
+        ],
+        [
+          194,
+          230
+        ],
+        [
+          269,
+          284
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/run_retained29_cost_session.py",
+      "bytes": 6170,
+      "sha256": "7a7aea2c65407445236e8559956bbb766b27bad890589af336f2e1947bfc6c3c",
+      "lines_inclusive": [
+        [
+          37,
+          88
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_cost_cohort_protocol.py",
+      "bytes": 13279,
+      "sha256": "f8b0b84b0cbde973c66f811551b68ea0f7893f31b1acf4fc5c55e84fd5f478b6",
+      "lines_inclusive": [
+        [
+          18,
+          21
+        ],
+        [
+          46,
+          89
+        ]
+      ]
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/kernel-patches/0029-blackparrot-retained-control.patch",
+      "bytes": 3921,
+      "sha256": "e95007acf320f399c6d22cd844e826c2298dc32081a5a45dd8daab75c92069d3",
+      "lines_inclusive": [
+        [
+          14,
+          27
+        ],
+        [
+          45,
+          66
+        ],
+        [
+          98,
+          133
+        ]
+      ]
+    }
+  ]
+}
