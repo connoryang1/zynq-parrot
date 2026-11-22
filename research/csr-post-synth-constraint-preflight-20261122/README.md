@@ -1,0 +1,5 @@
+This records a stopped read-only clock preflight before the two bounded post-synthesis area controls. It preserves the failure separately from placement results and explains the next constraint check.
+
+All five actual clocks passed; the requested logical `core_minimal/clk_i` endpoint had been renamed by synthesis. The failed attempt performed no new optimization, placement, routing or board operation. Its complete WORK and source packet are copied and hash-verified under the external closure in `record.json`; originals remain, owned groups are gone, and only that attempt's future growth reservation closes.
+
+The implementation-entry timing report already contains 42 no-clock pins under the tag-programming root and 76 unconstrained internal endpoints. These require explicit baseline attribution and preservation; they are not permission to waive new unconstrained core sinks or to invent clocks. Compare identical preoptimization checkpoints exactly, then verify mapped domains after optimization without assuming unchanged internal hierarchy names. A later routed result still needs constraint review and final clean qualification.
