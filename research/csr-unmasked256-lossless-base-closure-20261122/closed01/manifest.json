@@ -1,0 +1,129 @@
+{
+  "state": "PASS lossless base full+clone+STD archival; all256 delta pending",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/closure-preparation02/admission.ROOT.json",
+    "bytes": 5662,
+    "sha256": "cec700f49dad20503f390bdf3d25a78941dfad50fce83b5ff40b63f3bc35f40c"
+  },
+  "inventory": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/closure-records02/inventory.json",
+    "bytes": 1020980,
+    "sha256": "21603274ee4bae94c717444874160cb2dbad45ae1aaf7fe5c50814b4f48402e3"
+  },
+  "commands": [
+    {
+      "action": "compress",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/closure-preparation02/codec.py",
+        "--inventory",
+        "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/closure-records02/inventory.json",
+        "--output",
+        "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-20261122/base-full-clone-std-closed01/whole-proof.tar.xz",
+        "--action",
+        "compress"
+      ],
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/closure-preparation02/codec.py",
+          "--inventory",
+          "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/closure-records02/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-20261122/base-full-clone-std-closed01/whole-proof.tar.xz",
+          "--action",
+          "compress"
+        ],
+        "owned_pgid": 1278924,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 600,
+        "teardown_s": 5,
+        "elapsed_s": 77.37582072394434
+      }
+    },
+    {
+      "action": "roundtrip",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/closure-preparation02/codec.py",
+        "--inventory",
+        "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/closure-records02/inventory.json",
+        "--output",
+        "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-20261122/base-full-clone-std-closed01/whole-proof.tar.xz",
+        "--action",
+        "roundtrip"
+      ],
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/closure-preparation02/codec.py",
+          "--inventory",
+          "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/closure-records02/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-20261122/base-full-clone-std-closed01/whole-proof.tar.xz",
+          "--action",
+          "roundtrip"
+        ],
+        "owned_pgid": 1278985,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 4.869681625976227
+      }
+    }
+  ],
+  "archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-20261122/base-full-clone-std-closed01/whole-proof.tar.xz",
+    "bytes": 24298544,
+    "sha256": "cca7058949c02b0fbefa38f61ad95ef536d972d1ca1ff1a393074315970093be"
+  },
+  "embedded_inventory": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/closure-records02/inventory.json",
+    "bytes": 1020980,
+    "sha256": "21603274ee4bae94c717444874160cb2dbad45ae1aaf7fe5c50814b4f48402e3"
+  },
+  "members": 1364,
+  "raw_member_bytes": 261798244,
+  "originals_unchanged": true,
+  "resource": {
+    "RUN": 375480100,
+    "HOME": 24302692,
+    "helper": 408047
+  },
+  "no_cleanup": true,
+  "elapsed_seconds": 82.99361569690518
+}
