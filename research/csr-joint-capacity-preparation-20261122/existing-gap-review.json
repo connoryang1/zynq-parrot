@@ -1,0 +1,124 @@
+{
+  "state": "BOUNDED_SOURCE_AND_CLOSED_RECEIPT_REVIEW_ONLY",
+  "decision": "GAP: no reviewed current fullcore case consumes both configured populations in one retained lifetime",
+  "cohort_complete": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/ROOT-cohort-complete.json",
+    "bytes": 3635,
+    "sha256": "a5ab8e3636a9ac890effac410823af5059c2900dd493004f23b1035e7bc5ca01"
+  },
+  "separate_roles": {
+    "d-enabled": {
+      "native": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/d-enabled/verification.json",
+        "bytes": 2503,
+        "sha256": "1f0fd35ae4853ece3ca7e6296290d004712b2ab9fce8797b751ed36826438a43"
+      },
+      "audit": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/d-enabled-audit/verification.json",
+        "bytes": 470051,
+        "sha256": "125da337cc09e9a2d2f9755577585dbc92fef54a823789f8f0b5b2dd43242f04"
+      },
+      "GP0": [
+        0,
+        256,
+        0,
+        256,
+        0,
+        2048
+      ],
+      "lines": 256,
+      "targets": 256,
+      "publications": 256,
+      "hits": 256,
+      "retained_bursts": 256,
+      "ordinary_bursts": 0,
+      "scope": "separate lane native case, never joint fullcapacity"
+    },
+    "d-off": {
+      "native": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/d-off/verification.json",
+        "bytes": 2479,
+        "sha256": "42de966326a60b223019adace5be967afae38ca98c6127d5f810aebc762cbf7c"
+      },
+      "audit": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/d-off-audit/verification.json",
+        "bytes": 413177,
+        "sha256": "d1a03248fe3134c1839db4f2fe11cbdb6c3dc2de7062ee4d1a0c033a6b8b2cfb"
+      },
+      "GP0": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "lines": 256,
+      "targets": 256,
+      "publications": 0,
+      "hits": 0,
+      "retained_bursts": 0,
+      "ordinary_bursts": 256,
+      "scope": "separate lane native case, never joint fullcapacity"
+    },
+    "i-enabled": {
+      "native": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/i-enabled/verification.json",
+        "bytes": 2503,
+        "sha256": "eb471a04af691f894bbdb4051057a697e32283330bb56f0533ab1d49fc871c95"
+      },
+      "audit": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/i-enabled-audit/verification.json",
+        "bytes": 539795,
+        "sha256": "53a8d141cd97a00daa5dad51490dc1bde481d5590de927699343e42befde98c9"
+      },
+      "GP0": [
+        256,
+        0,
+        256,
+        0,
+        2048,
+        0
+      ],
+      "lines": 256,
+      "targets": 256,
+      "publications": 256,
+      "hits": 256,
+      "retained_bursts": 256,
+      "ordinary_bursts": 0,
+      "scope": "separate lane native case, never joint fullcapacity"
+    }
+  },
+  "cold08_qualification": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/qualification01/qualification.json",
+    "bytes": 39786,
+    "sha256": "80ffcfa5c83e87a667b57f1a3c8ac4d9bd08808469b6ffc928f2f67ccb7d15ea"
+  },
+  "strict": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/qualification01/strict/verification.json",
+    "bytes": 12072,
+    "sha256": "2560269fe35a017644445a72aec9dc2aadb03a8911f806a182123d3b2a6ddf49"
+  },
+  "observer": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/scoped-csr01/qualification01/observer/verification.json",
+    "bytes": 5987,
+    "sha256": "06ccaa2eb098c0dfb611bb1c454620bb8241c33bdb322168a21b9f4d91b68710"
+  },
+  "integrity_source": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/source/testing/rtl/large_retained_system_test.c",
+    "bytes": 6285,
+    "sha256": "8d7d447d2d8d500361b89a4a7ddd356f0dba01dff017129418cf3571bf9dd03c"
+  },
+  "advisory_source": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/source/testing/rtl/retained_advisory_full_line_test.c",
+    "bytes": 6705,
+    "sha256": "1c71bbe4a8db46ae7c19b9faa14fd8949668bf0ca68ba04d7498897e513df4bc"
+  },
+  "component_scope_source": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-borrow-correctness-20261122/README.md",
+    "bytes": 3992,
+    "sha256": "ff80ba80abecf59c2be0f99ebefa22e0e1bdcc26232a0d3af9f38e8497bfd8bb"
+  },
+  "component_scope": "64line UCE component arms + generic dualport storage checks are not new1e7 fullcore256+256 execution",
+  "no_model_reader_or_codec_execution": true
+}
