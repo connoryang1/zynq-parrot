@@ -1,0 +1,202 @@
+{
+  "schema": "ordinary-cache-physical-payload-accounting-v1",
+  "state": "READ-ONLY source proof; no geometry/RTL/area/physical-result change",
+  "source_root": "/dev/shm/zp-linux-csr-unmasked256-fpga-source-20261122-03",
+  "TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+  "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "conclusion": "L1I32KiB and L1D32KiB are TOTAL physical data payload per core, each shared across the2resident/4logical contexts. They are NOT32KiB per resident. Do not multiply either by num_threads=2.",
+  "paper_field_labels": {
+    "ordinary_L1I_payload_bytes_per_core": 32768,
+    "ordinary_L1D_payload_bytes_per_core": 32768,
+    "ordinary_L1I_plus_L1D_payload_bytes_per_core": 65536,
+    "resident_hardware_thread_slots_per_core": 2,
+    "logical_contexts_per_core": 4,
+    "ordinary_cache_private_payload_bytes_per_resident": "not applicable: one shared cache per side"
+  },
+  "cache_geometry_each": {
+    "sets": 64,
+    "ways": 8,
+    "line_bytes": 64,
+    "resident_line_slots_total": 512,
+    "data_RAM_banks": 8,
+    "data_RAM_bank_width_bits": 64,
+    "data_RAM_bank_depth_words": 512,
+    "data_RAM_bytes_each_bank": 4096,
+    "total_payload_bytes": 32768
+  },
+  "exact_array_contract": {
+    "I": "bank_width_lp=block_width_p/assoc_p=512/8=64. for(bank=0;bank<assoc_p;bank++): bsg_mem_1rw_sync width=bank_width_lp, els=sets_p*assoc_p=512. Eight64x512bit RAMs total32768B.",
+    "D": "bank_width_lp=block_width_p/assoc_p=64. for(i=0;i<assoc_p;i++): bsg_mem_1rw_sync_mask_write_byte data_width=bank_width_lp, els=sets_p*assoc_p. Eight64x512bit RAMs total32768B.",
+    "tags": "Each cache has one tag_mem width assoc_p*tag_info, depth sets_p. Neither tag nor payload arrays have an outer num_threads dimension. Data banks interleave words/ways; bank count8 is associativity, not resident-thread replication."
+  },
+  "instantiation_chain": {
+    "I": "one unicore_lite.core_minimal \u2192 one core_minimal.fe(bp_fe_top) \u2192 one fe.icache(bp_fe_icache)",
+    "D": "one core_minimal.be(bp_be_top) \u2192 one be.calculator \u2192 one calculator.pipe_mem \u2192 one pipe_mem.dcache(bp_be_dcache)",
+    "resident_state": "num_threads indexes thread/register/CSR/context control elsewhere; cache request thread IDs track operation ownership, not a duplicate data-array dimension."
+  },
+  "retained_scope_distinct": {
+    "future1792_payload_bytes_I_per_core": 114688,
+    "future1792_payload_bytes_D_per_core": 114688,
+    "future1792_total_per_core": 229376,
+    "interpretation": "224KiB configured retained I+D total, global across contexts, unchanged by this clarification. Ordinary cache total64KiB excludes tags/state and retained/transient UCE copies. Configured capacity is not occupancy/unique usefulness/hit benefit."
+  },
+  "limits": [
+    "Source-level physical array accounting, not a new mapped BRAM/resource/fit claim.",
+    "No change to cache geometry, resident/logical counts or active source/admission/estimator.",
+    "No FPGA, model, compiler, reader, vendor, cleanup or helper execution."
+  ],
+  "sources": [
+    {
+      "path": "cosim/black-parrot-example/v/bp_common_pkg.sv",
+      "commit": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+      "bytes": 7955,
+      "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7",
+      "line_ranges": [
+        [
+          20,
+          28
+        ],
+        [
+          114,
+          132
+        ],
+        [
+          164,
+          171
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_common/src/include/bp_common_aviary_cfg_pkgdef.svh",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 21844,
+      "sha256": "1505b65cd6fba12f3cb4ccb8c49bae7aed7c27d4f67c74c897a9ab476763173f",
+      "line_ranges": [
+        [
+          326,
+          328
+        ],
+        [
+          340,
+          342
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 31356,
+      "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9",
+      "line_ranges": [
+        [
+          279,
+          286
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_top/src/v/bp_core_minimal.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 21978,
+      "sha256": "cf459156fc41ea0e4340f309e21130415340e53c61630156fb61e4c02ef2ca46",
+      "line_ranges": [
+        [
+          277,
+          286
+        ],
+        [
+          361,
+          365
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_fe/src/v/bp_fe_top.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 20151,
+      "sha256": "9f7a6858f4c21259c6ec070579eb3dd470753140ddd7762e046c9591ee44d66b",
+      "line_ranges": [
+        [
+          308,
+          314
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_fe/src/v/bp_fe_icache.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 54307,
+      "sha256": "90ff3a3411e629ed6d8bb877e0851ce1511629e7951b97bb175923809dd0c5fd",
+      "line_ranges": [
+        [
+          169,
+          171
+        ],
+        [
+          289,
+          292
+        ],
+        [
+          307,
+          317
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_top.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 88043,
+      "sha256": "96915d9ea91370349975b758b862eddd031e8f44e961c224e69dddf5a115a79c",
+      "line_ranges": [
+        [
+          1526,
+          1530
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_calculator_top.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 42277,
+      "sha256": "d48301cabc538536425fb96b671c566d7e2033332b5380ee7acc8da12c6c01c4",
+      "line_ranges": [
+        [
+          587,
+          591
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_calculator/bp_be_pipe_mem.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 25189,
+      "sha256": "868389cbb8cba32376950fe3bdca689d99d95887f5c1beae00baff5d52e78994",
+      "line_ranges": [
+        [
+          380,
+          384
+        ]
+      ]
+    },
+    {
+      "path": "import/black-parrot/bp_be/src/v/bp_be_dcache/bp_be_dcache.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "bytes": 63318,
+      "sha256": "ced6e04a2ba845fe8a36bd723cf15342a19ca4ecf6834af6f677fa543aa0768c",
+      "line_ranges": [
+        [
+          192,
+          193
+        ],
+        [
+          273,
+          276
+        ],
+        [
+          301,
+          308
+        ]
+      ]
+    }
+  ]
+}

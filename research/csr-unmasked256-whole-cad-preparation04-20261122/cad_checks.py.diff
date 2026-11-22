@@ -1,0 +1,23 @@
+--- sealed03/cad_checks.py
++++ new04/cad_checks.py
+@@ -1,9 +1,9 @@
+ """Exact new CSR CAD source/evidence gates, separate from source-only authority."""
+ import json
+ from pathlib import Path
+-from contracts import ART,HERE,TOP,BP,SOURCE,WORK,LOGS,bind,exact,require,profile,native,cad_limits,freeze_records,source_authority
++from contracts import ART,HERE,TOP,BP,SOURCE,WORK,LOGS,bind,exact,require,profile,native,cad_limits,freeze_records,source_authority,SOURCE_HERE,SOURCE_ART
+ OPS=Path('/home/coyang/zynq-parrot-linux-capacity')
+-SCHEMA='csr-unmasked256-trace0-private-fpga-source-cad-v1'
++SCHEMA='csr-unmasked256-trace0-private-fpga-source-cad-adapter04-v1'
+ 
+ def evidence(row):
+  q=exact(row);require(q['schema']=='csr256-CAD-evidence-gates-v1' and q['ROOT_verified'] is True and q['TOP']==TOP and q['BP']==BP,'ROOT final source/evidence gate required')
+@@ -30,7 +30,7 @@
+  launch=a['direct_launch'];expected_env=dict(ZP_REPO_DIR=str(SOURCE),ZP_FPGA_SEED_REPO_DIR=str(SOURCE),ZP_FPGA_LOG_ROOT=str(LOGS),ZP_FPGA_WORK_ROOT=str(WORK),FPGA_CFG='e_bp_unicore_zynqparrot_prefetch16k_cfg',FPGA_VIVADO_THREADS='8',FPGA_NUM_THREADS='',FPGA_NUM_CONTEXTS='',FPGA_ACLK_MHZ='20',FPGA_SPARSE_SOURCE='1',FPGA_CACHE_MISS_TRACE='0')
+  require(launch==dict(working_directory=str(SOURCE),environment=expected_env,argv=[str(OPS/'codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh'),'start']),'exact maintained one-job launch, never called by this checker')
+  setup=exact(a['source_preparation']);require(setup['state']=='PASS private-clone exact FPGA source/readiness/static Make dryrun; no CAD launch' and setup['source']==str(SOURCE) and setup['TOP']==TOP and setup['BP']==BP and len(setup['repositories'])==9,'fresh actual source/readiness')
+- require(setup['script']==bind(HERE/'prepare_source.py') and [c['label'] for c in setup['commands']][-2:]==['readiness','make-dryrun'],'exact source helper/maintained gates')
++ require(setup['script']==bind(SOURCE_HERE/'prepare_source.py') and [c['label'] for c in setup['commands']][-2:]==['readiness','make-dryrun'],'exact source helper/maintained gates')
+  require(all(c['ownership']['returncode']==0 and c['ownership']['failure'] is None and not c['ownership']['owned_group_remaining'] for c in setup['commands']),'all source/readiness commands actual0/reaped')
+  authority=source_authority(Path(setup['authority']['path']));require(bind(setup['authority']['path'])==setup['authority'],'source authority immutable')
+  e,n=evidence(a['evidence_gates']);require(n['source_tree_baseline']==TOP and n['source_bp']==BP,'same fullcore source')
