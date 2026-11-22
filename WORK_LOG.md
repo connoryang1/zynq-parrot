@@ -783,3 +783,9 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **GPR harness width corrected separately:** successor02 passes strict HDL generation, then C++ rejects range-for initialization of generated `VL_INW(...127,0,4)`. Complete02 evidence is preserved in external `gpr-prefetch-borrow-component-20261122/failed02`; source03 changes only that initialization to four indexed32-bit stores and remains unexecuted pending runtime funding. No RTL behavior, test oracle, source-warning gate or hardware claim changes.
+
+
+**Area control is incomplete, not unfitted:** ExploreArea passes the exact input and mapped clock gates, producing53370LUT/26901FF/93.5BRAM/11DSP. The matched existingExplore checkpoint is53618LUT, so the incremental saving is248logicLUT; an earlier702 figure compared against synthesis54072 and was immediately corrected. Fixed600s placement guard stops during small-shape detailed placement without a resource deficit or fit conclusion; area2 is unexecuted. All82 WORK/source members are losslessly archived21,933,180B and independently read back in7.55s under external `partial04`; fresh05 resumes exactc95 with a prospectively declared1800s placement allowance and no resynthesis, starting19:17:40UTC/ROOT86435. Compare metrics at identical CAD stages.
+
+
+**GPR borrowing behavior passes:** source03 completes all10 strict commands in21.975s,8512 positive cycles/4480 64-bit word comparisons covering all16 words,91 reads/7293 writes/60 RF installs, exact collision rejection and both payload/validity mutation detections at cycle229. The2107 launch counter counts FE-valid cycles including holds, not unique handshakes. Complete WORK/prototype/helper copies are byte/mode/link verified3,439,433B under external `closed03`; source/end and group checks pass. Production-BSG paired mapping, actual memory hold/collision realization, fullcore and fit remain required before claiming any saved hardware.

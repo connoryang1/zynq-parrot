@@ -1,0 +1,100 @@
+{
+  "state": "PASS GPR full1024 leaf/controller oracle, collision and both mutations; no production/area/fit claim",
+  "elapsed_seconds": 21.975263784988783,
+  "source_endcheck": "PASS",
+  "owned_groups_absent": true,
+  "commands": [
+    {
+      "label": "normal-generate",
+      "seconds": 0.2563120159320533,
+      "returncode": 0,
+      "analysis": {
+        "no_warning_or_error": true
+      }
+    },
+    {
+      "label": "normal-build",
+      "seconds": 6.48185777803883,
+      "returncode": 0,
+      "analysis": {
+        "no_warning_or_error": true
+      }
+    },
+    {
+      "label": "normal-run",
+      "seconds": 0.1001781050581485,
+      "returncode": 0,
+      "analysis": {
+        "cycles": 8512,
+        "checks": 4480,
+        "reads": 91,
+        "writes": 7293,
+        "installs": 60,
+        "launches": 2107
+      }
+    },
+    {
+      "label": "normal-collision",
+      "seconds": 0.09433642809744924,
+      "returncode": 0,
+      "analysis": {
+        "collision_rejected": true
+      }
+    },
+    {
+      "label": "negative1-generate",
+      "seconds": 0.2651054640300572,
+      "returncode": 0,
+      "analysis": {
+        "no_warning_or_error": true
+      }
+    },
+    {
+      "label": "negative1-build",
+      "seconds": 6.422577315941453,
+      "returncode": 0,
+      "analysis": {
+        "no_warning_or_error": true
+      }
+    },
+    {
+      "label": "negative1-run",
+      "seconds": 0.09398536593653262,
+      "returncode": 0,
+      "analysis": {
+        "full1024_mutation_rejected": "GPR_BORROW_NEGATIVE_REJECTED full1024 cycle=229"
+      }
+    },
+    {
+      "label": "negative2-generate",
+      "seconds": 0.3179171299561858,
+      "returncode": 0,
+      "analysis": {
+        "no_warning_or_error": true
+      }
+    },
+    {
+      "label": "negative2-build",
+      "seconds": 6.589742039097473,
+      "returncode": 0,
+      "analysis": {
+        "no_warning_or_error": true
+      }
+    },
+    {
+      "label": "negative2-run",
+      "seconds": 0.09497935196850449,
+      "returncode": 0,
+      "analysis": {
+        "full1024_mutation_rejected": "GPR_BORROW_NEGATIVE_REJECTED full1024 cycle=229"
+      }
+    }
+  ],
+  "launch_counter_meaning": "Valid cycles sampled by if(t.launch_o), including FE backpressure; not unique handshakes",
+  "closure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/gpr-prefetch-borrow-component-20261122/closed03/complete.json",
+    "sha256": "fee1fe73aaf77300f308f32d8823b80e52449b7ac7c49f5d3c2e685b42b311b5"
+  },
+  "scope": "Behavioral leaf/controller cut only; actual production-BSG paired inference, mapped hold/collision, fullcore, route and performance pending",
+  "positive_check_counter_units": "64-bit word comparisons, grouped across all16 words of each defined1024-bit response/install; not4480 independent full-line transactions"
+}
