@@ -1,0 +1,168 @@
+{
+  "state": "PASS independent closed canonical1793/1824 resource review",
+  "session": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/session.json",
+    "bytes": 67935,
+    "sha256": "a6090b4b887fa1779ecaf1efd7f994250ef88a1b55179d8ea671e27f175a5da2"
+  },
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/admission.json",
+    "bytes": 7804,
+    "sha256": "4a0966bac67f9476e1985de915bca95260d1bfd88e2e64cf69019e4d0fcbfb63"
+  },
+  "settings": {
+    "top": "retained_production_controls",
+    "device": "xc7z020clg400-1",
+    "Vivado": "2024.2",
+    "max_threads": 8,
+    "paddr_width": 34,
+    "sets": 256,
+    "epoch_width": 8,
+    "I_invalidate": 0,
+    "I_invalidate_address": 0,
+    "D_invalidate": "variable",
+    "all_other_client_ports": "live",
+    "clock_period_ns": 50,
+    "I_waveform_ns": [
+      0,
+      25
+    ],
+    "D_waveform_ns": [
+      25,
+      50
+    ],
+    "synthesis_directive": "AreaOptimized_high",
+    "global_retiming": "on",
+    "control_set_opt_threshold": 1,
+    "KEEP_attributes_added": false,
+    "implementation_or_route": false
+  },
+  "baseline1792": {
+    "LUT": 1142,
+    "logic_LUT": 1014,
+    "LUTRAM": 128,
+    "SRL": 0,
+    "FF": 2211,
+    "RAMB36": 54,
+    "RAMB18": 4,
+    "DSP": 0,
+    "BRAM36_tiles": 56.0
+  },
+  "arms": {
+    "canonical1793": {
+      "resources": {
+        "LUT": 1123,
+        "logic_LUT": 995,
+        "LUTRAM": 128,
+        "SRL": 0,
+        "FF": 2213,
+        "RAMB36": 58,
+        "RAMB18": 4,
+        "DSP": 0,
+        "BRAM36_tiles": 60.0
+      },
+      "native_seconds": 146.10984441789333,
+      "RAM_groups": {
+        "0:payload_mem": {
+          "RAMB36E1/9/0": 21,
+          "RAMB18E1/2/0": 1,
+          "RAMB18E1/4/0": 1,
+          "RAMB36E1/18/0": 4,
+          "RAMB36E1/36/0": 2
+        },
+        "0:tag_mem": {
+          "RAMB36E1/18/0": 2
+        },
+        "1:payload_mem": {
+          "RAMB36E1/9/9": 21,
+          "RAMB18E1/2/2": 1,
+          "RAMB18E1/4/4": 1,
+          "RAMB36E1/18/18": 4,
+          "RAMB36E1/36/36": 2
+        },
+        "1:tag_mem": {
+          "RAMB36E1/18/0": 2
+        }
+      }
+    },
+    "canonical1824": {
+      "resources": {
+        "LUT": 1112,
+        "logic_LUT": 984,
+        "LUTRAM": 128,
+        "SRL": 0,
+        "FF": 2213,
+        "RAMB36": 58,
+        "RAMB18": 4,
+        "DSP": 0,
+        "BRAM36_tiles": 60.0
+      },
+      "native_seconds": 145.9368988199858,
+      "RAM_groups": {
+        "0:payload_mem": {
+          "RAMB36E1/9/0": 21,
+          "RAMB18E1/2/0": 1,
+          "RAMB18E1/4/0": 1,
+          "RAMB36E1/18/0": 4,
+          "RAMB36E1/36/0": 2
+        },
+        "0:tag_mem": {
+          "RAMB36E1/18/0": 2
+        },
+        "1:payload_mem": {
+          "RAMB36E1/9/9": 21,
+          "RAMB18E1/2/2": 1,
+          "RAMB18E1/4/4": 1,
+          "RAMB36E1/18/18": 4,
+          "RAMB36E1/36/36": 2
+        },
+        "1:tag_mem": {
+          "RAMB36E1/18/0": 2
+        }
+      }
+    }
+  },
+  "external_raw_artifacts": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1793/functional.v",
+      "bytes": 1823950,
+      "sha256": "bba7b80d11e00a7ea5d9b1b7bd43f95150ec35be864f175402a3be95bf0e810c"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1793/synthesized.dcp",
+      "bytes": 900999,
+      "sha256": "112fa4af0b8e70053776fde56a1fb0e13713d3d93e9193ffc72f7ea9c14714ca"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1824/functional.v",
+      "bytes": 1820076,
+      "sha256": "b6a60bf54c30cbd48176823a7ace960b9087c7b3b13a3e67d3e58e97e9524da9"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-boundary-mapping-20261122/preparation01/run01/canonical1824/synthesized.dcp",
+      "bytes": 895699,
+      "sha256": "ea284e9a8e98d1c87606e838072ac264cd41ce0e15afbae5c3f73e9acea2c737"
+    }
+  ],
+  "interpretation": "In this exact canonical production source/options context,1792->1793 increases standalone store56->60tiles;1824 also60. It does not establish a global maximum or all intervening mappings. No new-depth functional/whole-device fit claim.",
+  "conditional_old_R7_budget": {
+    "source": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/fpga-native1792-canonical-r7-closed-20261122/verification.json",
+      "bytes": 2545,
+      "sha256": "2a08f420f1bef5e02c2518e07f6f9c82a098dde91e9d9d706b779fe1e6b1aecf"
+    },
+    "old_optimized_whole_tiles": 140,
+    "old_retained_tiles": 56,
+    "old_others_including_trace": 84,
+    "old_trace_named_tiles": 2,
+    "trace_primitive_proof": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/cache-miss-trace-opportunity-20261122/audit.json",
+      "bytes": 29145,
+      "sha256": "b460f518fc65cc97178cc5965ade76a94d31e79a2857e8acfca780bbb805bf39"
+    },
+    "projected_others_if_only_those_two_removed": 82,
+    "projected_total_with60tile_store": 142,
+    "scope": "Arithmetic projection from old placement-failed R7 hierarchy. Borrow/traceoff may change other mappings; current whole-device job not read or evaluated."
+  },
+  "no_vendor_model_board_or_reader_run_by_review": true
+}
