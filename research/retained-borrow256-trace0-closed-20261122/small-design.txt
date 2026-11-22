@@ -1,0 +1,161 @@
+TOP ?= $(shell git rev-parse --show-toplevel)
+include $(TOP)/Makefile.common
+include $(TOP)/Makefile.env
+
+#############################
+# Design Settings
+#############################
+TB_MODULE  ?= bsg_nonsynth_zynq_testbench
+BASENAME   ?= black_parrot
+
+MAIN_PROGRAM ?= $(COSIM_CSRC_DIR)/main.cpp
+HOST_PROGRAM ?= $(DESIGN_DIR)/ps.cpp
+
+BP_NCPUS ?= 1
+
+PROG ?= hello_world
+NBF_FILE ?= prog.nbf
+TARGET_RUNTIME_MS ?=
+
+# GP2 watchdog heartbeat transactions can legitimately take longer than the
+# default AXI timeout threshold in this full-system cosim path.
+CFLAGS += -DZYNQ_AXI_TIMEOUT=100000
+
+RUN_ARGS += +c_args="$(NBF_FILE)$(if $(TARGET_RUNTIME_MS), $(TARGET_RUNTIME_MS))"
+
+#############################
+# Design Defines
+#############################
+DEFINES += GP0_ENABLE=1
+DEFINES += GP0_ADDR_WIDTH=10 GP0_DATA_WIDTH=32
+DEFINES += GP1_ENABLE=1
+DEFINES += GP1_ADDR_WIDTH=30 GP1_DATA_WIDTH=32
+DEFINES += GP2_ENABLE=1
+DEFINES += GP2_ADDR_WIDTH=30 GP2_DATA_WIDTH=32
+DEFINES += HP0_ENABLE=1
+DEFINES += HP0_ADDR_WIDTH=32 HP0_DATA_WIDTH=64
+DEFINES += HP1_ENABLE=1
+DEFINES += HP1_ADDR_WIDTH=32 HP1_DATA_WIDTH=32
+# The dense ten-context endpoint routes through the same long backend-to-I$
+# metadata path as the smaller configurations, but has less placement freedom.
+# Give that endpoint explicit timing margin while keeping existing qualified
+# images at 20 MHz.  Cycle-count benchmarks remain directly comparable.
+ifeq ($(CFG),e_bp_unicore_zynqparrot_prefetch10_cfg)
+ACLK_MHZ ?= 18
+else
+ACLK_MHZ ?= 20
+endif
+DEFINES += ACLK_MHZ=$(ACLK_MHZ)
+DEFINES += RTCLK_MHZ=8
+DEFINES += RT_CLK_ENABLE=1
+DEFINES += TAG_ENABLE=1
+#DEFINES += DRAM_TEST
+#DEFINES += ZERO_DRAM
+DEFINES += BP_NCPUS=$(BP_NCPUS)
+
+# Optional real full-line I/D retention. These are payload slots in a separate
+# BRAM store; ordinary L1 and L2 dimensions stay in the named configuration.
+# This dedicated experiment builds real retention by default. Set 0 to
+# reproduce the legacy replay datapath; the accepted source branch is intact.
+BP_RETAINED_BUFFER ?= 1
+BP_RETAINED_I_LINES ?= 256
+BP_RETAINED_D_LINES ?= 256
+BP_RETAINED_SETS ?= 256
+DEFINES += BP_RETAINED_BUFFER=$(BP_RETAINED_BUFFER)
+DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
+DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
+DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
+
+# Accepted physical-demand-miss history, separate from retained payload and
+# ordinary cache geometry. Keep existing traced images as the default.
+BP_CACHE_MISS_TRACE ?= 1
+ifneq ($(words $(BP_CACHE_MISS_TRACE)),1)
+$(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
+endif
+ifneq ($(filter $(BP_CACHE_MISS_TRACE),0 1),$(BP_CACHE_MISS_TRACE))
+$(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
+endif
+ifneq ($(filter BP_CACHE_MISS_TRACE BP_CACHE_MISS_TRACE=%,$(EXTRA_DEFINES)),)
+$(error Set BP_CACHE_MISS_TRACE=<0|1> instead of an EXTRA_DEFINES override)
+endif
+DEFINES += BP_CACHE_MISS_TRACE=$(BP_CACHE_MISS_TRACE)
+
+# Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
+# This r2 capacity candidate includes observation in its actual fit cost;
+# explicit0 remains available for matched diagnostic comparison only.
+BP_RETAINED_OBSERVE ?= 1
+ifneq ($(filter $(BP_RETAINED_OBSERVE),0 1),$(BP_RETAINED_OBSERVE))
+$(error BP_RETAINED_OBSERVE must be 0 or 1)
+endif
+ifneq ($(words $(BP_RETAINED_OBSERVE)),1)
+$(error BP_RETAINED_OBSERVE must be 0 or 1)
+endif
+ifneq ($(filter BP_RETAINED_OBSERVE BP_RETAINED_OBSERVE=%,$(EXTRA_DEFINES)),)
+$(error Set BP_RETAINED_OBSERVE=0 or 1 instead of EXTRA_DEFINES)
+endif
+DEFINES += BP_RETAINED_OBSERVE=$(BP_RETAINED_OBSERVE)
+
+# Static common HP0 response age, in aclk cycles. This affects every returned
+# R/B beat; it is not AR-to-data or CPU load-use latency. Zero elaborates only
+# direct wires. Use this variable, not a conflicting EXTRA_DEFINES override.
+BP_AXI_RESPONSE_DELAY ?= 0
+ifneq ($(words $(BP_AXI_RESPONSE_DELAY)),1)
+$(error BP_AXI_RESPONSE_DELAY must be one integer in 0..384)
+endif
+ifneq ($(filter $(BP_AXI_RESPONSE_DELAY),$(shell seq 0 384)),$(BP_AXI_RESPONSE_DELAY))
+$(error BP_AXI_RESPONSE_DELAY must be one integer in 0..384)
+endif
+ifneq ($(filter BP_AXI_RESPONSE_DELAY BP_AXI_RESPONSE_DELAY=%,$(EXTRA_DEFINES)),)
+$(error Set BP_AXI_RESPONSE_DELAY=<0..384> instead of an EXTRA_DEFINES override)
+endif
+DEFINES += BP_AXI_RESPONSE_DELAY=$(BP_AXI_RESPONSE_DELAY)
+
+# The PYNQ-Z2 context-cache configuration uses two resident hardware slots
+# and four software-visible contexts.  Keep this aligned with the targeted
+# nonresident tests and pass the generated custom configuration into Vivado;
+# otherwise e_bp_custom_cfg falls back to the four-resident-thread default,
+# which exceeds the device's LUT capacity.
+ifneq ($(NUM_THREADS),)
+NUM_CONTEXTS ?= $(NUM_THREADS)
+THREAD_ID_WIDTH := $(shell awk 'BEGIN { n=$(NUM_THREADS)-1; w=0; while (n > 0) { w++; n=int(n/2); } print w; }')
+BRANCH_METADATA_FWD_WIDTH ?= $(shell awk 'BEGIN { print 49 + $(THREAD_ID_WIDTH); }')
+CFG ?= e_bp_custom_cfg
+DEFINES += BP_CUSTOM_BASE_CFG=bp_unicore_zynqparrot_cfg_p
+DEFINES += BP_NUM_THREADS=$(NUM_THREADS)
+DEFINES += BP_NUM_CONTEXTS=$(NUM_CONTEXTS)
+DEFINES += BRANCH_METADATA_FWD_WIDTH=$(BRANCH_METADATA_FWD_WIDTH)
+endif
+
+# The prefetch endpoints are at or above the xc7z020's default-flow packing
+# limit once the instruction-prefix replay lane is present. Select the tool's
+# named area strategies for every static prefetch endpoint; the four-entry
+# endpoint previously fit with the defaults, but no longer does with the
+# replay lane enabled.
+ifneq ($(filter $(CFG),e_bp_unicore_zynqparrot_prefetch_cfg e_bp_unicore_zynqparrot_prefetch5_cfg e_bp_unicore_zynqparrot_prefetch10_cfg e_bp_unicore_zynqparrot_prefetch16k_cfg),)
+SYNTH_STRATEGY ?= Flow_AreaOptimized_high
+# The replay-enabled endpoint remains area constrained, but Area_Explore can
+# leave the long frontend/realigner feedback path unroutable at the 50 MHz
+# target after tiny netlist changes.  Keep area-oriented synthesis, then use
+# the timing-focused implementation flow with post-route physical cleanup.
+IMPL_STRATEGY ?= Performance_ExplorePostRoutePhysOpt
+endif
+
+include $(COSIM_MK_DIR)/Makefile.master
+
+# A custom aviary configuration without explicit dimensions silently uses the
+# package defaults (currently four resident threads).  That configuration is
+# not placeable on the PYNQ-Z2, so reject it before collateral generation or
+# Vivado can spend hours on an invalid implementation.
+ifeq ($(CFG),e_bp_custom_cfg)
+ifeq ($(strip $(NUM_THREADS)),)
+$(error CFG=e_bp_custom_cfg requires NUM_THREADS=<resident slots> and NUM_CONTEXTS=<logical contexts>; use NUM_THREADS=2 NUM_CONTEXTS=4 for the PYNQ-Z2 context-cache build)
+endif
+ifeq ($(strip $(NUM_CONTEXTS)),)
+$(error CFG=e_bp_custom_cfg requires NUM_CONTEXTS=<logical contexts>; use NUM_THREADS=2 NUM_CONTEXTS=4 for the PYNQ-Z2 context-cache build)
+endif
+endif
+ifneq ($(strip $(NUM_THREADS)),)
+ifneq ($(CFG),e_bp_custom_cfg)
+$(error NUM_THREADS/NUM_CONTEXTS select custom context-cache dimensions and require CFG=e_bp_custom_cfg)
+endif
+endif
