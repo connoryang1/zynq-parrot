@@ -1,0 +1,56 @@
+{
+  "schema": "csr256-CAD-rollforward-profile-v1",
+  "ROOT_approved": false,
+  "basis_profile": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/preparation02/ROOT-resource-profile02.json",
+    "bytes": 2488,
+    "sha256": "e7a234ff8f61dfd4e684c2b4c2965089cc658ba23d541c557841733932eee25e"
+  },
+  "old_frozen_records": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r9-freeze-complete.json",
+      "bytes": 1743,
+      "sha256": "d520e5060940f394c8c75ad7d4f54f9e16ae50921238051b8f178cf2bcbd36e4"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r9-work.json",
+      "bytes": 2296524,
+      "sha256": "212a93cb8e57b59e02f7159e98fd1804326b059685659e0ee39732c06899f56d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r9-evidence.json",
+      "bytes": 54399,
+      "sha256": "368f3cff2c4860219ec2ac56474f72afe64ad6d9d6aeaa54a7c2e0cdc5d57dd4"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow256-trace0-fullcore-20261122/obsolete-profile-closed01/reservation-complete.json",
+      "bytes": 1011,
+      "sha256": "65fd0aeebfbaa12f821f852319f4c22b3c3c5b5313685ce0cde419a1c34aaec3"
+    }
+  ],
+  "own_CAD": {
+    "work_cap_bytes": 2684354560,
+    "evidence_cap_bytes": 201326592,
+    "work_floor_bytes": 1073741824,
+    "home_floor_bytes": 2415919104,
+    "shm_floor_bytes": 536870912,
+    "deadline_seconds": 10800
+  },
+  "own_source_cap_bytes": 134217728,
+  "own_helper_cap_bytes": 1048576,
+  "source_reserve_attribution": {
+    "ROOT_approved": true,
+    "existing_OTHER_SHM_bytes": 335544320,
+    "new_SOURCE_within_existing_bytes": 134217728,
+    "remaining_OTHER_SHM_bytes": 201326592,
+    "total_global_reserve_unchanged": true
+  },
+  "current_CSR_native_future": {
+    "RUN": 1073741824,
+    "HOME": 33554432,
+    "helper": 1048576,
+    "zero_authority": null
+  },
+  "additional_basis_records": [],
+  "explanation": "DRAFT ROOT must countersign before source preparation. ROOT explicitly assigns128MiB new SOURCE within existing extra256MiB conservative source reserve, preserving original335544320total. Correct subtraction201326592 supersedes message arithmetic typo207618048. All current native/clone/regression caps remain FULL until finalized zero authority. OldR9future0 only via exact paired freeze; no old cap/data deletion. New CAD2.25GiBHOMEfloor is a fresh prospective choice; oldR9floor unchanged."
+}
