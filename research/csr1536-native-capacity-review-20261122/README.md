@@ -1,0 +1,3 @@
+This retains the source and recorded-resource review for later full1536 native capacity checks. It establishes that the already-qualified415-leaf observation model contains all167 required leaves, while keeping the actual all1536 and joint execution gates pending. No model, trace reader, codec, compiler, vendor or board job ran for this review.
+
+ROOT independently checked the exact bound proposal/schema files and found one matching leaf at the expected width for each required suffix. The byte-exact original narrative is original-review.txt; review.json binds historical runtimes and trace sizes plus the current model/qualification/archive inputs. Proposed allocation/deadline values are preparation, not launch authority or measured1536 performance.
