@@ -1,0 +1,38 @@
+{
+  "state": "SOURCE AST/bindings PASS only",
+  "source_plan": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-observation-preparation-20261122/preparation-source.json",
+    "bytes": 6466,
+    "sha256": "9871feeda004075f0a120d0214fde9ce89823cad98f7ce1d04cc8cf4ff2e79f3"
+  },
+  "helper_AST": [
+    "bounded.py",
+    "canonical.py",
+    "common.py",
+    "framing.py",
+    "host_flow.py",
+    "launch.py",
+    "prepare_host.py",
+    "protocol.py"
+  ],
+  "copied_unchanged_semantic_helpers": [
+    "canonical.py",
+    "framing.py",
+    "protocol.py"
+  ],
+  "source_only": true,
+  "compiler_native_reader_runs": 0,
+  "first_ROOT_command": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-observation-preparation-20261122/helper/launch.py",
+    "--phase",
+    "prepare",
+    "--execute",
+    "--source-sha",
+    "9871feeda004075f0a120d0214fde9ce89823cad98f7ce1d04cc8cf4ff2e79f3",
+    "--fullcore-sha",
+    "ROOT_ACCEPTED_COMPLETE_FULL_SESSION_SHA"
+  ],
+  "next_ROOT_command": "same launch.py --phase qualify --execute --source-sha SAME --fullcore-sha SAME --approval-sha NEW_RECORDS_ADMISSION_SHA"
+}
