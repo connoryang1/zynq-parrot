@@ -1,0 +1,57 @@
+{
+  "state": "SOURCE_REVIEW_ONLY",
+  "actual_top": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/source/import/black-parrot/bp_top/src/v/bp_unicore_lite.sv",
+    "bytes": 31356,
+    "sha256": "32bfc7e6c0670fd6c38c9388d0383b47f1274d96fe4f9c1845733e34ff77faa9"
+  },
+  "I_enable_copy_bits": [
+    0,
+    3
+  ],
+  "D_enable_copy_bits": [
+    1,
+    2
+  ],
+  "mode3": {
+    "I_enable": 1,
+    "D_enable": 1,
+    "I_copy": 0,
+    "D_copy": 0
+  },
+  "source_port_lines": [
+    {
+      "line": 463,
+      "text": "     ,.retained_enable_i(retained_control_r[0])"
+    },
+    {
+      "line": 464,
+      "text": "     ,.retained_demand_capture_i(retained_control_r[3])"
+    },
+    {
+      "line": 598,
+      "text": "     ,.retained_enable_i(retained_control_r[1])"
+    },
+    {
+      "line": 599,
+      "text": "     ,.retained_demand_capture_i(retained_control_r[2])"
+    }
+  ],
+  "strict_cold_both": {
+    "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/source/testing/rtl/retained-advisory-trace/validate.py",
+    "bytes": 25559,
+    "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+  },
+  "strict_conditions": [
+    {
+      "line": 249,
+      "text": "                        require(get(\"control\") == 3 and g(\"enable\") and not g(\"demand_copy\"),"
+    },
+    {
+      "line": 265,
+      "text": "                        require(get(\"control\") == 3 and not g(\"demand_copy\"),"
+    }
+  ],
+  "constructor": "Existing joint LaneValidator self.mode=3 matches the actual GLOBAL control word for both lanes; both exact unchanged sample/finish bodies remain frozen in977 packet.",
+  "no_runtime_claim": true
+}
