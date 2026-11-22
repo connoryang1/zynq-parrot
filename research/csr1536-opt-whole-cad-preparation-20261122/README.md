@@ -1,0 +1,36 @@
+This packet prepares one clean whole-device CAD attempt for the 1536-line I/D candidate with the OPT-only `ExploreArea` selection. It reuses the maintained private-source materializer and local whole-CAD monitor; no source materialization, Make, compiler, native run, reader, launcher, or vendor command has run from this packet. Native1536 qualification and fresh resource funding are pending, so this packet is unlaunchable.
+
+The exact source is TOP `a8fbd5fa6911160ab0845d75c6096549806af7b7`, BP `1e7aa2fdc94a56373a26f95b145aff361d4d0aaa`; the isolated maintained OPS carrier is `cfc7fac2a2a0f693809d3a73038164aded1ed719`. TOP59ee adds only the two OPT carrier files to a44; TOPa8 then changes only the two retained capacity defaults to1536. HDL, policy, 256 retained sets, epoch8, ordinary L1I/D32KiB, static16KiB L2, 2resident/4logical, native response delay0, observe1, trace0, 20MHz CPU/8MHz timer remain fixed. Conditional RAM estimates are not device-fit evidence.
+
+The latest native attempt built a model but stopped during integrity on a HOME-reservation guard. Its failure is preserved by ROOT; it is not a native PASS or RTL failure. The anticipated fresh adapter must bind the actual inherited eleven-phase receipt and the actual1536 geometry, model, consumed sources, and strict/counter/17-parameter/generated-L2 proofs. The inherited historical `unmasked256` label alone is rejected. A later native continuation/composite with a different schema needs explicit source review, never an old proof substituted into these fields.
+
+The `ROOT-resource-profile.TEMPLATE.json` is deliberately false/pending, including a mandatory new funding disposition after that native stop. It describes prospective SOURCE128MiB and WORK512MiB on RUN, evidence192MiB HOME, 8workers, 3h, RUNfloor1GiB, HOMEfloor1.75GiB, SHMfloor512MiB. Source-evidence8MiB is inside192MiB. SOURCE and WORK reserves are summed when they share a filesystem. Fixed OTHER charges retain the FULL native1GiB/32MiB, BASE_RUN1,156,926,898B, BASE_HOME36,260,188B, logging128MiB, metadata4MiB, SHM335,544,320B; there is no new CAD SHM allocation. The source helper is inside metadata4MiB. ROOT must reprice/admit prospectively if any of these pending envelopes changes; no automatic release follows PASS, archive, or idle status.
+
+The new paths are SOURCE `/run/user/1001/zp-linux-csr-opt1536-fpga-source-20261122-01`, WORK `/run/user/1001/zp-linux-csr-opt1536-trace0-cad-20261122-01`, evidence `/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122`, logs `/home/coyang/fpga-logs-linux-csr-opt1536-trace0`. No path has been allocated by this preparation. Source assembly uses nine private local shared-object clones, pinned commits/gitlinks and private configs; it preserves native/common configs, privately copies generated PLIC/bootrom bytes, pins shared tools, and compares every consumed production source with the qualified native source. The one exact ghost exclusion remains explicit. Readiness checks the actual top BaseJump `ram_style_p` wrapper, then actual maintained BUILD READY and Make-n with explicit `IMPL_OPT_DIRECTIVE=ExploreArea`.
+
+Once ROOT has the actual native PASS and fresh resource disposition, export the exact `adapter-session.json`, inherited receipt and `actual-source-list.json` into `preparation01/native-proof` while retaining each original absolute binding. Supply `ROOT-resource-profile.json` and `ROOT-evidence-gates.json` as fresh signed records; placeholders below are not runnable authorities. The inherited complete durable-base, qualified-clone and architectural-regression gates remain mandatory; no historical256 proof transfers automatically. The existing full-capacity-followup gate alone retains its explicit source-specific ROOT deferral option. Any proposed source-capacity bridge for a prerequisite needs separate ROOT review, not a permissive default in this helper.
+
+ROOT commands, run separately with the exact returned SHA at every step:
+
+```bash
+P=/home/coyang/zynq-parrot-linux-host-observer/research/csr1536-opt-whole-cad-preparation-20261122
+A=/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/preparation01
+python3 -B "$P/bind_source_authority.py" --resource-profile "$A/ROOT-resource-profile.json" --resource-profile-sha256 "$PROFILE_SHA" --output "$A/ROOT-source-authority.json"
+python3 -B "$P/prepare_source.py" --authority "$A/ROOT-source-authority.json" --authority-sha256 "$SOURCE_AUTHORITY_SHA"
+python3 -B "$P/prepare_source.py" --authority "$A/ROOT-source-authority.json" --authority-sha256 "$SOURCE_AUTHORITY_SHA" --execute-root
+python3 -B "$P/prepare_packet.py" --resource-profile "$A/ROOT-resource-profile.json" --resource-profile-sha256 "$PROFILE_SHA" --evidence-gates "$A/ROOT-evidence-gates.json" --evidence-gates-sha256 "$EVIDENCE_SHA"
+python3 -B "$P/prepare_admission.py" --draft-sha256 "$DRAFT_SHA" --root-release "$A/ROOT-release.json" --root-release-sha256 "$RELEASE_SHA" --output "$A/admission.FINAL.json"
+python3 -B "$P/monitor_local.py" --admission "$A/admission.FINAL.json" --admission-sha256 "$ADMISSION_SHA" --job "$JOB" --preflight
+```
+
+Only after ROOT's actual preflight PASS and exact one-builder release, the separately maintained launcher uses this exact source/environment:
+
+```bash
+cd /run/user/1001/zp-linux-csr-opt1536-fpga-source-20261122-01
+env ZP_REPO_DIR="$PWD" ZP_FPGA_SEED_REPO_DIR="$PWD" ZP_FPGA_LOG_ROOT=/home/coyang/fpga-logs-linux-csr-opt1536-trace0 ZP_FPGA_WORK_ROOT=/run/user/1001/zp-linux-csr-opt1536-trace0-cad-20261122-01 FPGA_CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg FPGA_VIVADO_THREADS=8 FPGA_NUM_THREADS= FPGA_NUM_CONTEXTS= FPGA_ACLK_MHZ=20 FPGA_SPARSE_SOURCE=1 FPGA_CACHE_MISS_TRACE=0 FPGA_OPT_DIRECTIVE=ExploreArea /home/coyang/zynq-parrot-csr-opt-ops-20261122/codex-skills/bp-fpga-synthesis/scripts/launch_synthesis.sh start
+python3 -B "$P/monitor_local.py" --admission "$A/admission.FINAL.json" --admission-sha256 "$ADMISSION_SHA" --job "$JOB" --worker-pid "$WORKER_PID" --worker-startticks "$WORKER_STARTTICKS" --execute
+```
+
+The immutable launch includes separate clean/build, exact source/revision/env/config, all7 actual child defines in all3 contexts, actual20MHz/8MHz XCI, clean synthesis, PID/starttick/history ownership, conservative foreign launcher/vendor detection, resource caps/deadline and terminal disappearance. `opt_checks.py` additionally requires actual OPT property readback and `implementation-selection.tsv`, the actual generated `opt_design -directive ExploreArea` command and unchanged subsequent commands, and an XPR delta only at OPT Directive against the pinned old XPR. It treats XPR enum numbers as opaque, joining them to property/child evidence. Missing OPT evidence cannot yield monitor PASS. This is not an incremental-reuse admission.
+
+The old monitor source was copied, not executed. Pure source/OPT fixtures may be run by ROOT later under a fresh lightweight host admission (the six existing `test_opt_checks.py` methods from the sealed selector packet use mocks only), followed by actual source-readiness/Make-n. No fixture launcher basenames or vendor process may run concurrently with admitted CAD. All prior helpers, failures, models and admissions are untouched. `CHECKPOINT.json` records source-only static checks; it is not a runtime test or CAD acceptance.
