@@ -1,0 +1,762 @@
+{
+  "state": "PREPARED-ONLY-newcanonical1792-N40-positive107-HP0-audit",
+  "purpose": "Read one already closed N40 cold08 FST; no model execution or transferred endpoint assumptions.",
+  "argv": [
+    "python3",
+    "-B",
+    "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+    "--fst",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/durable/advisory-trace.fst",
+    "--model-source-list",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/actual-source-list.json.gz",
+    "--log",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/advisory/run.log.gz",
+    "--exit-code",
+    "-6",
+    "--delay",
+    "40",
+    "--proof",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/inputs/original-strict.json",
+    "--out",
+    "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/audit01"
+  ],
+  "model": {
+    "path": "/dev/shm/zp-canonical-latency40-8workers-20261121-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15872512,
+    "sha256": "a183aa7f912ce5a7346672ab57470912b2eb8627800e31443a596360cf9ee803"
+  },
+  "fst": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/durable/advisory-trace.fst",
+    "bytes": 23346610,
+    "sha256": "f5c6da026551ba5c1ca3169e6f7d9cf90385dc87a1b0932bdf1a09304d862c90"
+  },
+  "source_list": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/actual-source-list.json.gz",
+    "bytes": 25300,
+    "sha256": "149c3c79c6880045a3648226d353c48745c258d551ec874c55c99029e0e29c9a"
+  },
+  "source_archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/durable/consumed-sources.tar.gz",
+    "bytes": 4953539,
+    "sha256": "a5adc71e04055c215cfb299ea429f985040cb8af0fa7904ef00a0069210c21a1"
+  },
+  "log": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/advisory/run.log.gz",
+    "bytes": 2516,
+    "sha256": "8d3e41f418ff78eab2be4893dde14ddc5a5947b368770c215b215fd247f43891"
+  },
+  "process": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/advisory/process.json.gz",
+    "bytes": 43,
+    "sha256": "9eacd60fe06ebf915f2e82b3678b81b7f8200cd8d534b93000e78550c708dd07"
+  },
+  "actual_returncode": -6,
+  "strict_proof": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/inputs/original-strict.json",
+    "bytes": 11880,
+    "sha256": "4097ba20f82b0d0b7736ab8a46efbea054e64ceaa89b093e8a158033095ad026"
+  },
+  "strict_original": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/advisory-strict01/verification.json.gz",
+    "bytes": 2850,
+    "sha256": "c3e1da41b3c117c90bd2513149dcae01561c3d34bb7c28e3a50f24b88ff8be89"
+  },
+  "original_fullcore_closure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/closed-full01/manifest.json",
+    "bytes": 38041,
+    "sha256": "8081af005bfc7d5dda6fe69d4d850742730b062a3166976f70b6ada46b65efe8"
+  },
+  "common_path_source_current_exact": [
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/black-parrot-example/v/bp_axi_response_delay.sv",
+      "bytes": 5373,
+      "sha256": "f82354755bb179c880510478a1cf61f33196edac2d3dfd88655b8687b885c178"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/black-parrot-example/v/bp_axi_response_delay_fifo.sv",
+      "bytes": 5396,
+      "sha256": "1ab801a64d1192a9e779e5af86a56a66f894dd3aeebdec08d881cac0b5273132"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/black-parrot-example/v/top_zynq.sv",
+      "bytes": 42343,
+      "sha256": "dd7604e22469aaeb02d7c951c88946909f8c05aabb8e935f23c6156e478f796c"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/v/bp_nonsynth_axi_mem_pipelined.sv",
+      "bytes": 10723,
+      "sha256": "098c7da25a96fdaf9d6fc2296a90c9f89ff37a669ccd9746a0ac779baede817e"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/cosim/v/bsg_nonsynth_zynq_testbench.sv",
+      "bytes": 18810,
+      "sha256": "87b0308f4a5a63e8e2f0dfbeabc964c8878e81e12491712dd407c5c340ef97f7"
+    },
+    {
+      "path": "/dev/shm/zp-linux-canonical-fulltop-20261121-01/import/basejump_stl/bsg_test/bsg_nonsynth_axi_mem.sv",
+      "bytes": 10364,
+      "sha256": "0937a14a2afbee6c0265e590d05b21860f819e7ea3b5011cf61a3525ea0abd45"
+    }
+  ],
+  "implementation": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/run.py",
+      "bytes": 13334,
+      "sha256": "4b92d807664ba0ce09f36b82ad9d6a481780a46b6e770761650a8d8e86372804"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/hp0-closed-trace/audit.py",
+      "bytes": 18030,
+      "sha256": "4434dfa62fc9cfbc07d982ce5c94d5da64ae369b7f7bfe70731035e255da469f"
+    }
+  ],
+  "checker": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/check_run.py",
+    "bytes": 9559,
+    "sha256": "cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985"
+  },
+  "reader_builder": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/build_reader.py",
+    "bytes": 2041,
+    "sha256": "79f8f43f9710dcec3a92a4fa241c4bcdb9e6297996c1226e7d1eb7479bbf58c4"
+  },
+  "reader_source": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/testing/rtl/retained-advisory-trace/fst_events.c",
+    "bytes": 3497,
+    "sha256": "b95a67451d2c196c2fa90a2c34a9dff90621094e851936e91634168787e10e13"
+  },
+  "reader_API_sources": [
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.c",
+      "bytes": 257277,
+      "sha256": "6a09b5a4aea241f12939e8005f7e2c1b2c60f28e39d66a1d02d3edd69c80a1c8"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fastlz.c",
+      "bytes": 13561,
+      "sha256": "35d2b3ab8ea04615cc56dee1a7017610f459b57aef51d9de69c71c24bd9ee719"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/lz4.c",
+      "bytes": 115587,
+      "sha256": "af9087bb6d6155079cccaf8635acc6590b8a6f2fc98efce35e926f30f79366b8"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fstapi.h",
+      "bytes": 18479,
+      "sha256": "9b401991a1d433eec862a8636e2d218e9e572df7a4e62643ebccbf88fc417377"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot/install/share/verilator/include/gtkwave/fst_config.h",
+      "bytes": 429,
+      "sha256": "d8b84770187034bb7aee6c41eeb49725e84ad9dc1d3302903dfc979b03b4d6ad"
+    }
+  ],
+  "prior_existing_reader": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+    "bytes": 151200,
+    "sha256": "a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541"
+  },
+  "selection107": [
+    {
+      "key": "clk",
+      "suffix": "top_fpga_inst.aclk",
+      "width": 1
+    },
+    {
+      "key": "resetn",
+      "suffix": "top_fpga_inst.aresetn",
+      "width": 1
+    },
+    {
+      "key": "arid",
+      "suffix": "top_fpga_inst.hp0_axi_arid",
+      "width": 6
+    },
+    {
+      "key": "araddr",
+      "suffix": "top_fpga_inst.hp0_axi_araddr",
+      "width": 32
+    },
+    {
+      "key": "arlen",
+      "suffix": "top_fpga_inst.hp0_axi_arlen",
+      "width": 8
+    },
+    {
+      "key": "arsize",
+      "suffix": "top_fpga_inst.hp0_axi_arsize",
+      "width": 3
+    },
+    {
+      "key": "arburst",
+      "suffix": "top_fpga_inst.hp0_axi_arburst",
+      "width": 2
+    },
+    {
+      "key": "arlock",
+      "suffix": "top_fpga_inst.hp0_axi_arlock",
+      "width": 1
+    },
+    {
+      "key": "arcache",
+      "suffix": "top_fpga_inst.hp0_axi_arcache",
+      "width": 4
+    },
+    {
+      "key": "arprot",
+      "suffix": "top_fpga_inst.hp0_axi_arprot",
+      "width": 3
+    },
+    {
+      "key": "arqos",
+      "suffix": "top_fpga_inst.hp0_axi_arqos",
+      "width": 4
+    },
+    {
+      "key": "arvalid",
+      "suffix": "top_fpga_inst.hp0_axi_arvalid",
+      "width": 1
+    },
+    {
+      "key": "arready",
+      "suffix": "top_fpga_inst.hp0_axi_arready",
+      "width": 1
+    },
+    {
+      "key": "awid",
+      "suffix": "top_fpga_inst.hp0_axi_awid",
+      "width": 6
+    },
+    {
+      "key": "awaddr",
+      "suffix": "top_fpga_inst.hp0_axi_awaddr",
+      "width": 32
+    },
+    {
+      "key": "awlen",
+      "suffix": "top_fpga_inst.hp0_axi_awlen",
+      "width": 8
+    },
+    {
+      "key": "awsize",
+      "suffix": "top_fpga_inst.hp0_axi_awsize",
+      "width": 3
+    },
+    {
+      "key": "awburst",
+      "suffix": "top_fpga_inst.hp0_axi_awburst",
+      "width": 2
+    },
+    {
+      "key": "awlock",
+      "suffix": "top_fpga_inst.hp0_axi_awlock",
+      "width": 1
+    },
+    {
+      "key": "awcache",
+      "suffix": "top_fpga_inst.hp0_axi_awcache",
+      "width": 4
+    },
+    {
+      "key": "awprot",
+      "suffix": "top_fpga_inst.hp0_axi_awprot",
+      "width": 3
+    },
+    {
+      "key": "awqos",
+      "suffix": "top_fpga_inst.hp0_axi_awqos",
+      "width": 4
+    },
+    {
+      "key": "awvalid",
+      "suffix": "top_fpga_inst.hp0_axi_awvalid",
+      "width": 1
+    },
+    {
+      "key": "awready",
+      "suffix": "top_fpga_inst.hp0_axi_awready",
+      "width": 1
+    },
+    {
+      "key": "wvalid",
+      "suffix": "top_fpga_inst.hp0_axi_wvalid",
+      "width": 1
+    },
+    {
+      "key": "wready",
+      "suffix": "top_fpga_inst.hp0_axi_wready",
+      "width": 1
+    },
+    {
+      "key": "wid",
+      "suffix": "top_fpga_inst.hp0_axi_wid",
+      "width": 6
+    },
+    {
+      "key": "wdata",
+      "suffix": "top_fpga_inst.hp0_axi_wdata",
+      "width": 64
+    },
+    {
+      "key": "wstrb",
+      "suffix": "top_fpga_inst.hp0_axi_wstrb",
+      "width": 8
+    },
+    {
+      "key": "wlast",
+      "suffix": "top_fpga_inst.hp0_axi_wlast",
+      "width": 1
+    },
+    {
+      "key": "ext.rvalid",
+      "suffix": "top_fpga_inst.hp0_axi_rvalid",
+      "width": 1
+    },
+    {
+      "key": "core.rvalid",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_rvalid_i",
+      "width": 1
+    },
+    {
+      "key": "ext.rready",
+      "suffix": "top_fpga_inst.hp0_axi_rready",
+      "width": 1
+    },
+    {
+      "key": "core.rready",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_rready_o",
+      "width": 1
+    },
+    {
+      "key": "ext.rid",
+      "suffix": "top_fpga_inst.hp0_axi_rid",
+      "width": 6
+    },
+    {
+      "key": "core.rid",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_rid_i",
+      "width": 6
+    },
+    {
+      "key": "ext.rdata",
+      "suffix": "top_fpga_inst.hp0_axi_rdata",
+      "width": 64
+    },
+    {
+      "key": "core.rdata",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_rdata_i",
+      "width": 64
+    },
+    {
+      "key": "ext.rresp",
+      "suffix": "top_fpga_inst.hp0_axi_rresp",
+      "width": 2
+    },
+    {
+      "key": "core.rresp",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_rresp_i",
+      "width": 2
+    },
+    {
+      "key": "ext.rlast",
+      "suffix": "top_fpga_inst.hp0_axi_rlast",
+      "width": 1
+    },
+    {
+      "key": "core.rlast",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_rlast_i",
+      "width": 1
+    },
+    {
+      "key": "ext.bvalid",
+      "suffix": "top_fpga_inst.hp0_axi_bvalid",
+      "width": 1
+    },
+    {
+      "key": "core.bvalid",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_bvalid_i",
+      "width": 1
+    },
+    {
+      "key": "ext.bready",
+      "suffix": "top_fpga_inst.hp0_axi_bready",
+      "width": 1
+    },
+    {
+      "key": "core.bready",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_bready_o",
+      "width": 1
+    },
+    {
+      "key": "ext.bid",
+      "suffix": "top_fpga_inst.hp0_axi_bid",
+      "width": 6
+    },
+    {
+      "key": "core.bid",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_bid_i",
+      "width": 6
+    },
+    {
+      "key": "ext.bresp",
+      "suffix": "top_fpga_inst.hp0_axi_bresp",
+      "width": 2
+    },
+    {
+      "key": "core.bresp",
+      "suffix": "top_fpga_inst.blackparrot.m_axi_bresp_i",
+      "width": 2
+    },
+    {
+      "key": "shim.delay",
+      "suffix": "top_fpga_inst.hp0_delayed_response.active_delay",
+      "width": 9
+    },
+    {
+      "key": "shim.cycle",
+      "suffix": "top_fpga_inst.hp0_delayed_response.cycle_count",
+      "width": 32
+    },
+    {
+      "key": "shim.r.occupancy",
+      "suffix": "top_fpga_inst.hp0_delayed_response.r_occupancy",
+      "width": 10
+    },
+    {
+      "key": "shim.r.full",
+      "suffix": "top_fpga_inst.hp0_delayed_response.r_full",
+      "width": 1
+    },
+    {
+      "key": "shim.r.full_stalls",
+      "suffix": "top_fpga_inst.hp0_delayed_response.r_full_stall_cycles",
+      "width": 32
+    },
+    {
+      "key": "shim.b.occupancy",
+      "suffix": "top_fpga_inst.hp0_delayed_response.b_occupancy",
+      "width": 10
+    },
+    {
+      "key": "shim.b.full",
+      "suffix": "top_fpga_inst.hp0_delayed_response.b_full",
+      "width": 1
+    },
+    {
+      "key": "shim.b.full_stalls",
+      "suffix": "top_fpga_inst.hp0_delayed_response.b_full_stall_cycles",
+      "width": 32
+    },
+    {
+      "key": "i.clk",
+      "suffix": "unicore_lite.icache_uce.clk_i",
+      "width": 1
+    },
+    {
+      "key": "i.reset",
+      "suffix": "unicore_lite.icache_uce.reset_i",
+      "width": 1
+    },
+    {
+      "key": "i.reqv",
+      "suffix": "unicore_lite.icache_uce.cache_req_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.reqy",
+      "suffix": "unicore_lite.icache_uce.cache_req_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "i.reqaddr",
+      "suffix": "unicore_lite.icache_uce.cache_req_cast_i.addr",
+      "width": 34
+    },
+    {
+      "key": "i.reqtype",
+      "suffix": "unicore_lite.icache_uce.cache_req_cast_i.msg_type",
+      "width": 4
+    },
+    {
+      "key": "i.datav",
+      "suffix": "unicore_lite.icache_uce.data_mem_pkt_v_o",
+      "width": 1
+    },
+    {
+      "key": "i.datay",
+      "suffix": "unicore_lite.icache_uce.data_mem_pkt_yumi_i",
+      "width": 1
+    },
+    {
+      "key": "i.dataaddr",
+      "suffix": "unicore_lite.icache_uce.data_mem_pkt_cast_o.addr",
+      "width": 34
+    },
+    {
+      "key": "i.opcode",
+      "suffix": "unicore_lite.icache_uce.data_mem_pkt_cast_o.opcode",
+      "width": 2
+    },
+    {
+      "key": "i.fill",
+      "suffix": "unicore_lite.icache_uce.data_mem_pkt_cast_o.fill_index",
+      "width": 8
+    },
+    {
+      "key": "i.last",
+      "suffix": "unicore_lite.icache_uce.cache_req_last_o",
+      "width": 1
+    },
+    {
+      "key": "i.state",
+      "suffix": "unicore_lite.icache_uce.state_r",
+      "width": 5
+    },
+    {
+      "key": "i.detachedv",
+      "suffix": "unicore_lite.icache_uce.detached_prefetch_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.detachedready",
+      "suffix": "unicore_lite.icache_uce.detached_prefetch_ready_and_o",
+      "width": 1
+    },
+    {
+      "key": "i.detachedaddr",
+      "suffix": "unicore_lite.icache_uce.detached_prefetch_addr_i",
+      "width": 34
+    },
+    {
+      "key": "i.previewv",
+      "suffix": "unicore_lite.icache_uce.preview_v_i",
+      "width": 1
+    },
+    {
+      "key": "i.previewready",
+      "suffix": "unicore_lite.icache_uce.preview_ready_o",
+      "width": 1
+    },
+    {
+      "key": "i.previewaddr",
+      "suffix": "unicore_lite.icache_uce.preview_paddr_i",
+      "width": 34
+    },
+    {
+      "key": "i.published",
+      "suffix": "unicore_lite.icache_uce.retained_insert_published_i",
+      "width": 1
+    },
+    {
+      "key": "i.done",
+      "suffix": "unicore_lite.icache_uce.retained_insert_done_i",
+      "width": 1
+    },
+    {
+      "key": "i.owned",
+      "suffix": "unicore_lite.icache_uce.retained_insert_owned_r",
+      "width": 1
+    },
+    {
+      "key": "i.pf",
+      "suffix": "unicore_lite.icache_uce.retained_insert_pf_r",
+      "width": 1
+    },
+    {
+      "key": "i.owned_addr",
+      "suffix": "unicore_lite.icache_uce.retained_insert_addr_r",
+      "width": 34
+    },
+    {
+      "key": "i.aborted",
+      "suffix": "unicore_lite.core_minimal.fe.icache.abort_inflight",
+      "width": 1
+    },
+    {
+      "key": "d.clk",
+      "suffix": "unicore_lite.dcache_uce.clk_i",
+      "width": 1
+    },
+    {
+      "key": "d.reset",
+      "suffix": "unicore_lite.dcache_uce.reset_i",
+      "width": 1
+    },
+    {
+      "key": "d.reqv",
+      "suffix": "unicore_lite.dcache_uce.cache_req_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.reqy",
+      "suffix": "unicore_lite.dcache_uce.cache_req_yumi_o",
+      "width": 1
+    },
+    {
+      "key": "d.reqaddr",
+      "suffix": "unicore_lite.dcache_uce.cache_req_cast_i.addr",
+      "width": 34
+    },
+    {
+      "key": "d.reqtype",
+      "suffix": "unicore_lite.dcache_uce.cache_req_cast_i.msg_type",
+      "width": 4
+    },
+    {
+      "key": "d.datav",
+      "suffix": "unicore_lite.dcache_uce.data_mem_pkt_v_o",
+      "width": 1
+    },
+    {
+      "key": "d.datay",
+      "suffix": "unicore_lite.dcache_uce.data_mem_pkt_yumi_i",
+      "width": 1
+    },
+    {
+      "key": "d.dataaddr",
+      "suffix": "unicore_lite.dcache_uce.data_mem_pkt_cast_o.addr",
+      "width": 34
+    },
+    {
+      "key": "d.opcode",
+      "suffix": "unicore_lite.dcache_uce.data_mem_pkt_cast_o.opcode",
+      "width": 2
+    },
+    {
+      "key": "d.fill",
+      "suffix": "unicore_lite.dcache_uce.data_mem_pkt_cast_o.fill_index",
+      "width": 8
+    },
+    {
+      "key": "d.last",
+      "suffix": "unicore_lite.dcache_uce.cache_req_last_o",
+      "width": 1
+    },
+    {
+      "key": "d.state",
+      "suffix": "unicore_lite.dcache_uce.state_r",
+      "width": 5
+    },
+    {
+      "key": "d.detachedv",
+      "suffix": "unicore_lite.dcache_uce.detached_prefetch_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.detachedready",
+      "suffix": "unicore_lite.dcache_uce.detached_prefetch_ready_and_o",
+      "width": 1
+    },
+    {
+      "key": "d.detachedaddr",
+      "suffix": "unicore_lite.dcache_uce.detached_prefetch_addr_i",
+      "width": 34
+    },
+    {
+      "key": "d.previewv",
+      "suffix": "unicore_lite.dcache_uce.preview_v_i",
+      "width": 1
+    },
+    {
+      "key": "d.previewready",
+      "suffix": "unicore_lite.dcache_uce.preview_ready_o",
+      "width": 1
+    },
+    {
+      "key": "d.previewaddr",
+      "suffix": "unicore_lite.dcache_uce.preview_paddr_i",
+      "width": 34
+    },
+    {
+      "key": "d.published",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_published_i",
+      "width": 1
+    },
+    {
+      "key": "d.done",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_done_i",
+      "width": 1
+    },
+    {
+      "key": "d.owned",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_owned_r",
+      "width": 1
+    },
+    {
+      "key": "d.pf",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_pf_r",
+      "width": 1
+    },
+    {
+      "key": "d.owned_addr",
+      "suffix": "unicore_lite.dcache_uce.retained_insert_addr_r",
+      "width": 34
+    }
+  ],
+  "prior_positive_output_sizes": [
+    {
+      "delay": 40,
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0",
+      "total_bytes": 3391344,
+      "verification": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N40-advisory-HP0/verification.json",
+        "bytes": 14052,
+        "sha256": "d737166c45caded76d6a38097287c27f63b4f8d674552d2d18b278766554e35d"
+      }
+    },
+    {
+      "delay": 200,
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0",
+      "total_bytes": 5013200,
+      "verification": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-sp-latency-preparation-20261121/acquisition-session01/N200-advisory-HP0/verification.json",
+        "bytes": 14136,
+        "sha256": "f6b41ee9a2b69b42a7f2e049451254c0a1553cce3d3df3cad2b8cb6f77c72dab"
+      }
+    }
+  ],
+  "native_canonical_precedent": {
+    "admission": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-hp0-native-20261121/admission.DRAFT.json",
+      "bytes": 31242,
+      "sha256": "94106bfa5a443293ebd246ed360d56f2a988cc9608c196ad0e15da123a2430dd"
+    },
+    "session": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-hp0-native-20261121/root-session.json",
+      "bytes": 2038,
+      "sha256": "43f303cd058f204b5be5d9e1e84b93ea9364bc65db5f103fb402e4149d567f7e"
+    },
+    "proof": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-hp0-native-20261121/audit01/verification.json",
+      "bytes": 13861,
+      "sha256": "0296d002afc3e372a1fc63cb29ef3df19b98b1ae9359471af48130a60db6742f"
+    }
+  },
+  "budget": {
+    "HOME_new_audit_total_bytes": 33554432,
+    "HOME_N40_all_artifacts_total_bytes": 134217728,
+    "HOME_existing_before_preparation_bytes": 83220597,
+    "HOME_reserve_bytes": 3221225472,
+    "helper_RAM_bytes": 67108864,
+    "helper_RAM_reserve_bytes": 1073741824,
+    "reader_build_subprocess_s": 150,
+    "builder_compiler_s": 120,
+    "reader_s": 600,
+    "outer_s": 780,
+    "owned_group_teardown_s": 5,
+    "attempts": 1,
+    "retries": 0,
+    "extensions": 0
+  },
+  "environment": {
+    "TMPDIR": "/dev/shm/retained-canonical-hp0-N40-helper-20261121-01"
+  },
+  "root_authorization": "PREPARED ONLY; root reviews/executes one reader audit. No target/model/CAD/board.",
+  "measurement_limits": [
+    "Fresh actual N40 endpoints and queue behavior are measured, not inherited from SP1280 or canonical native.",
+    "107 selected leaves include8 shim fields; all opaque R/B payloads/order, first offer/accept, full, bandwidth/stalls/observed outstanding must pass maintained auditor.",
+    "No CPU-ready, exclusive-stall, architectural-concurrency, FPGA or application claim.",
+    "Independent all512 target/ELF/eight actual L1-write join follows closed HP0 proof, no additional reader."
+  ]
+}

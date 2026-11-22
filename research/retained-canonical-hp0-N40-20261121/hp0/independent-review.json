@@ -1,0 +1,130 @@
+{
+  "state": "PASS independent canonical1792 N40HP0/full512target/ELF/L1-write association",
+  "model": {
+    "path": "/dev/shm/zp-canonical-latency40-8workers-20261121-02/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15872512,
+    "sha256": "a183aa7f912ce5a7346672ab57470912b2eb8627800e31443a596360cf9ee803"
+  },
+  "rows": [
+    {
+      "lane": "i",
+      "address": "0x80001000",
+      "advisory_kind": "detached",
+      "admit_to_AR": 81.0,
+      "external_AR_to_first_offer": 1,
+      "external_AR_to_first_accept": 1,
+      "external_AR_to_full": 8,
+      "BP_AR_to_first_offer": 41,
+      "BP_AR_to_first_accept": 41,
+      "BP_AR_to_full": 48,
+      "external_beat_gaps": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "BP_beat_gaps": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "admit_to_firstR": 122.0,
+      "admit_to_fullR": 129.0,
+      "admit_to_publication": 189.0,
+      "fullR_to_publication": 60.0,
+      "predecessor_full_to_target_AR": 13.0,
+      "overlapping_write_sequences": [],
+      "all512_bits_match_ELF_publication_and_eight_L1_writes": true,
+      "demand_to_firstACK": 14.0,
+      "demand_to_fullACK": 21.0,
+      "lookup_to_hit": 12.0,
+      "critical_word": 0,
+      "critical_word_write_cycles": 14.0
+    },
+    {
+      "lane": "d",
+      "address": "0x80012000",
+      "advisory_kind": "preview",
+      "admit_to_AR": 52.5,
+      "external_AR_to_first_offer": 1,
+      "external_AR_to_first_accept": 1,
+      "external_AR_to_full": 8,
+      "BP_AR_to_first_offer": 41,
+      "BP_AR_to_first_accept": 41,
+      "BP_AR_to_full": 48,
+      "external_beat_gaps": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "BP_beat_gaps": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "admit_to_firstR": 93.5,
+      "admit_to_fullR": 100.5,
+      "admit_to_publication": 160.0,
+      "fullR_to_publication": 59.5,
+      "predecessor_full_to_target_AR": 13.0,
+      "overlapping_write_sequences": [],
+      "all512_bits_match_ELF_publication_and_eight_L1_writes": true,
+      "demand_to_firstACK": 14.0,
+      "demand_to_fullACK": 21.0,
+      "lookup_to_hit": 12.0,
+      "critical_word": 3,
+      "critical_word_write_cycles": 17.0
+    }
+  ],
+  "clock_FST_ticks": 50000,
+  "reads": 648,
+  "writes": 487,
+  "bindings": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/root-session.json",
+      "bytes": 2353,
+      "sha256": "b503ab60732d34d76981bc5ba0ded27de787f77161f46c4b3e3c5d4f9d4489b4"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/audit01/verification.json",
+      "bytes": 14416,
+      "sha256": "1dc192889ff21836b7aa03be0fb00524d36ae51ca92101a18006921304c42840"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/audit01/transactions.json.gz",
+      "bytes": 501665,
+      "sha256": "0e12181bc0f7e4f429cde15c09419ad49e40957760bb27acd2743fc1b65b41cb"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/inputs/original-strict.json",
+      "bytes": 11880,
+      "sha256": "4097ba20f82b0d0b7736ab8a46efbea054e64ceaa89b093e8a158033095ad026"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained-control-abi-20261121/advisory-fixture-cold08/retained_advisory_full_line_test.elf",
+      "bytes": 260760,
+      "sha256": "3fe096173e3a63b2656c1fadf0a058a328fb5f1ee375be652176408856f897b8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-canonical-latency40-8workers-preparation02-20261121/hp0-audit-preparation01/review.py",
+      "bytes": 6718,
+      "sha256": "54f80882fc5762230a178702f42997b6ac9a9c11cdedfef8ecee771afae43c14"
+    }
+  ],
+  "scope": "New a183 canonical1792 N40 only; request/source joins use unique address+window+all512bits, not RID0 alone. ACK/critical word write is not CPUload/fetch readiness. Added response age is not physical calibration or CPU-ready/critical-path attribution. No application/FPGA/architecture-concurrency claim."
+}
