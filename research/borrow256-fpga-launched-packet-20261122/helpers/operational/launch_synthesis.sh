@@ -1,0 +1,333 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_dir=${ZP_REPO_DIR:-$(git -C "$script_dir" rev-parse --show-toplevel)}
+repo_dir=$(cd "$repo_dir" && pwd)
+seed_repo_dir=${ZP_FPGA_SEED_REPO_DIR:-$repo_dir}
+seed_repo_dir=$(cd "$seed_repo_dir" && pwd)
+run_root=${ZP_FPGA_LOG_ROOT:-"$repo_dir/logs/fpga"}
+run_root=$(mkdir -p "$run_root" && cd "$run_root" && pwd)
+work_root=${ZP_FPGA_WORK_ROOT:-/tmp}
+work_root=$(mkdir -p "$work_root" && cd "$work_root" && pwd)
+# Allow a clean detached source snapshot to drive the build while retaining
+# logs in the active checkout.  This avoids mixing unrelated development edits
+# into an otherwise immutable routed implementation.
+export ZP_REPO_DIR="$repo_dir"
+export ZP_FPGA_SEED_REPO_DIR="$seed_repo_dir"
+export ZP_FPGA_LOG_ROOT="$run_root"
+export ZP_FPGA_WORK_ROOT="$work_root"
+
+# Keep the immutable worker and its recorded configuration in lock-step.  The
+# historical full-system flow defaults to the stock aviary configuration, but
+# the context-cache PYNQ build must explicitly select its custom dimensions.
+fpga_cfg=${FPGA_CFG:-e_bp_unicore_zynqparrot_cfg}
+# A routed implementation is the sole heavyweight Vivado job by policy, so
+# let that one job use the host's available CPU parallelism unless a caller
+# deliberately supplies a smaller memory-aware cap.
+fpga_threads=${FPGA_VIVADO_THREADS:-$(nproc)}
+fpga_num_threads=${FPGA_NUM_THREADS:-}
+fpga_num_contexts=${FPGA_NUM_CONTEXTS:-}
+fpga_aclk_mhz=${FPGA_ACLK_MHZ:-}
+fpga_sparse_source=${FPGA_SPARSE_SOURCE:-0}
+fpga_cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
+
+if [[ -n "$fpga_cache_miss_trace" && "$fpga_cache_miss_trace" != 0 && "$fpga_cache_miss_trace" != 1 ]]; then
+  echo "FPGA_CACHE_MISS_TRACE must be unset, 0 or 1." >&2
+  exit 2
+fi
+
+if [[ "$fpga_sparse_source" != 0 && "$fpga_sparse_source" != 1 ]]; then
+  echo "FPGA_SPARSE_SOURCE must be 0 or 1." >&2
+  exit 2
+fi
+
+if [[ -n "$fpga_num_threads" || -n "$fpga_num_contexts" ]]; then
+  if [[ -z "$fpga_num_threads" || -z "$fpga_num_contexts" ]]; then
+    echo "FPGA_NUM_THREADS and FPGA_NUM_CONTEXTS must be supplied together." >&2
+    exit 2
+  fi
+fi
+
+if [[ -n "$fpga_aclk_mhz" && ! "$fpga_aclk_mhz" =~ ^[1-9][0-9]*(\.[0-9]+)?$ ]]; then
+  echo "FPGA_ACLK_MHZ must be a positive decimal frequency in MHz." >&2
+  exit 2
+fi
+
+# Export for local subprocesses. An existing tmux server has its own older
+# environment, so the worker command below also passes every value explicitly.
+export FPGA_CFG="$fpga_cfg"
+export FPGA_VIVADO_THREADS="$fpga_threads"
+export FPGA_NUM_THREADS="$fpga_num_threads"
+export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
+export FPGA_ACLK_MHZ="$fpga_aclk_mhz"
+export FPGA_SPARSE_SOURCE="$fpga_sparse_source"
+export FPGA_CACHE_MISS_TRACE="$fpga_cache_miss_trace"
+
+shell_quote() {
+  # tmux 3.0 accepts a shell-command string. POSIX single quotes preserve even
+  # spaces, newlines, and shell metacharacters without assuming a Bash pane.
+  printf "'%s'" "${1//\'/\'\\\'\'}"
+}
+
+usage() {
+  echo "usage: $0 start | list | status <job-id> | recheck <job-id> | worker <job-id> <commit>"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, FPGA_SPARSE_SOURCE, FPGA_CACHE_MISS_TRACE, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
+}
+
+case ${1:-} in
+  start)
+    "$script_dir/check_build_ready.sh"
+    # The worker builds an isolated worktree at the recorded commit.  Untracked
+    # analysis artifacts cannot affect it and should not block a routed build;
+    # tracked modifications still make the requested revision ambiguous.
+    if [[ -n "$(git -C "$repo_dir" status --porcelain --untracked-files=no)" ]]; then
+      echo "Refusing comparison build from a dirty checkout." >&2
+      exit 1
+    fi
+    mkdir -p "$run_root"
+    for status_file in "$run_root"/*/status; do
+      [[ -e "$status_file" ]] || continue
+      [[ "$(cat "$status_file")" == RUNNING ]] || continue
+      active_dir=$(dirname "$status_file")
+      active_session=$(cat "$active_dir/session" 2>/dev/null || true)
+      active_pid=$(cat "$active_dir/pid" 2>/dev/null || true)
+      if { [[ -n "$active_session" ]] && tmux has-session -t "$active_session" 2>/dev/null; } \
+        || { [[ "$active_pid" =~ ^[0-9]+$ ]] && kill -0 "$active_pid" 2>/dev/null; }; then
+        echo "Refusing to compete with active job $(basename "$active_dir")." >&2
+        exit 1
+      fi
+      echo "STALE" >"$status_file"
+    done
+    job_id=$(date -u +%Y%m%dT%H%M%SZ)-$(git -C "$repo_dir" rev-parse --short HEAD)
+    job_dir="$run_root/$job_id"
+    mkdir -p "$job_dir"
+    commit=$(git -C "$repo_dir" rev-parse HEAD)
+    session_name="bp-fpga-$job_id"
+    # A Codex turn interruption can tear down tmux even though the routed job
+    # must continue independently.  Ignore SIGHUP before exec so the worker,
+    # make, and Vivado children inherit that disposition and survive loss of
+    # the tmux server/PTY.  The pane PID becomes the worker PID after exec and
+    # is also used above as an independent liveness check.
+    worker_args=(env
+      "ZP_REPO_DIR=$repo_dir"
+      "ZP_FPGA_SEED_REPO_DIR=$seed_repo_dir"
+      "ZP_FPGA_LOG_ROOT=$run_root"
+      "ZP_FPGA_WORK_ROOT=$work_root"
+      "FPGA_CFG=$fpga_cfg"
+      "FPGA_VIVADO_THREADS=$fpga_threads"
+      "FPGA_NUM_THREADS=$fpga_num_threads"
+      "FPGA_NUM_CONTEXTS=$fpga_num_contexts"
+      "FPGA_ACLK_MHZ=$fpga_aclk_mhz"
+      "FPGA_SPARSE_SOURCE=$fpga_sparse_source"
+      "FPGA_CACHE_MISS_TRACE=$fpga_cache_miss_trace"
+      "$script_dir/launch_synthesis.sh" worker "$job_id" "$commit"
+    )
+    worker_command="trap '' HUP; exec"
+    for arg in "${worker_args[@]}"; do
+      worker_command+=" $(shell_quote "$arg")"
+    done
+    worker_command+=" >$(shell_quote "$job_dir/console.log") 2>&1"
+    tmux new-session -d -s "$session_name" "$worker_command"
+    pid=$(tmux display-message -p -t "$session_name" '#{pane_pid}')
+    printf '%s\n' "$session_name" >"$job_dir/session"
+    printf '%s\n' "$pid" >"$job_dir/pid"
+    printf 'RUNNING\n' >"$job_dir/status"
+    printf 'job=%s\npid=%s\nlog=%s\nconfig=%s threads=%s contexts=%s aclk_mhz=%s\n' \
+      "$job_id" "$pid" "$job_dir/console.log" "$fpga_cfg" \
+      "${fpga_num_threads:-<default>}" "${fpga_num_contexts:-<default>}" \
+      "${fpga_aclk_mhz:-<default>}"
+    ;;
+  worker)
+    job_id=$2
+    commit=$3
+    job_dir="$run_root/$job_id"
+    worktree="$work_root/zynq-parrot-fpga-$job_id"
+    # A shell exit code alone is not enough: interrupted Vivado child runs have
+    # previously made GNU make print "No child processes" while the worker's
+    # EXIT trap still observed zero.  Keep the pessimistic marker until every
+    # routed acceptance artifact has been checked explicitly.
+    worker_ok=0
+    trap 'code=$?; if (( worker_ok )); then printf "PASS\n" >"$job_dir/status"; else printf "FAIL\n" >"$job_dir/status"; fi; exit $code' EXIT
+    printf 'top_commit=%s\n' "$commit" >"$job_dir/revisions.txt"
+    printf 'cfg=%s\nvivado_threads=%s\nnum_threads=%s\nnum_contexts=%s\naclk_mhz=%s\n' \
+      "$fpga_cfg" "$fpga_threads" "${fpga_num_threads:-<default>}" \
+      "${fpga_num_contexts:-<default>}" "${fpga_aclk_mhz:-<default>}" \
+      >>"$job_dir/revisions.txt"
+    printf 'sparse_source=%s\n' "$fpga_sparse_source" >>"$job_dir/revisions.txt"
+    printf 'cache_miss_trace=%s\n' "${fpga_cache_miss_trace:-default}" >>"$job_dir/revisions.txt"
+    if [[ "$fpga_sparse_source" == 1 ]]; then
+      git -C "$repo_dir" worktree add --detach --no-checkout "$worktree" "$commit"
+      # Historical evidence archives are tracked but are not FPGA build inputs.
+      # Retain every build/source/tool directory and the root-level files.
+      # Git 2.25 needs this linked-worktree directory before sparse init.
+      mkdir -p "$(git -C "$worktree" rev-parse --absolute-git-dir)/info"
+      git -C "$worktree" sparse-checkout init --cone
+      git -C "$worktree" sparse-checkout set \
+        ci codex-skills cosim import software testing tools
+      git -C "$worktree" checkout --detach "$commit"
+    else
+      git -C "$repo_dir" worktree add --detach "$worktree" "$commit"
+    fi
+    # Optimization checkpoints may pin local BlackParrot or BaseJump commits
+    # that have not been pushed upstream yet. Seed those submodules from the
+    # source checkout; other immutable dependencies use their normal URLs.
+    git -C "$worktree" submodule init \
+      import/basejump_stl import/black-parrot import/black-parrot-subsystems
+    git -C "$worktree" config --local submodule.import/black-parrot.url "$repo_dir/import/black-parrot"
+    git -C "$worktree" config --local submodule.import/black-parrot-subsystems.url "$repo_dir/import/black-parrot-subsystems"
+    git -C "$worktree" config --local submodule.import/basejump_stl.url "$repo_dir/import/basejump_stl"
+    git -c protocol.file.allow=always -C "$worktree" submodule update --init \
+      import/basejump_stl import/black-parrot import/black-parrot-subsystems
+    git -C "$worktree/import/black-parrot" submodule init \
+      external/basejump_stl external/HardFloat external/bedrock
+    git -C "$worktree/import/black-parrot" config --local \
+      submodule.external/basejump_stl.url \
+      "$seed_repo_dir/import/black-parrot/external/basejump_stl"
+    git -C "$worktree/import/black-parrot" config --local \
+      submodule.external/HardFloat.url \
+      "$seed_repo_dir/import/black-parrot/external/HardFloat"
+    git -C "$worktree/import/black-parrot" config --local \
+      submodule.external/bedrock.url \
+      "$seed_repo_dir/import/black-parrot/external/bedrock"
+    # A detached source worktree may have only the top-level BlackParrot
+    # gitlink populated.  Seed its pinned nested dependencies before using it
+    # as the local source for the isolated implementation worktree below.
+    # A detached source snapshot may have only gitlinks, while the active
+    # checkout owns pinned nested submodule objects that old upstream remotes
+    # no longer advertise. Seed the snapshot from that checkout before the
+    # implementation worktree asks for the same exact objects.
+    for nested in external/basejump_stl external/HardFloat external/bedrock; do
+      if [[ ! -d "$seed_repo_dir/import/black-parrot/$nested/.git" \
+            && ! -f "$seed_repo_dir/import/black-parrot/$nested/.git" ]]; then
+        echo "Missing nested submodule seed: $seed_repo_dir/import/black-parrot/$nested" >&2
+        exit 1
+      fi
+    done
+    git -C "$repo_dir/import/black-parrot" config --local \
+      submodule.external/basejump_stl.url \
+      "$seed_repo_dir/import/black-parrot/external/basejump_stl"
+    git -C "$repo_dir/import/black-parrot" config --local \
+      submodule.external/HardFloat.url \
+      "$seed_repo_dir/import/black-parrot/external/HardFloat"
+    git -C "$repo_dir/import/black-parrot" config --local \
+      submodule.external/bedrock.url \
+      "$seed_repo_dir/import/black-parrot/external/bedrock"
+    git -C "$repo_dir/import/black-parrot" submodule init \
+      external/basejump_stl external/HardFloat external/bedrock
+    git -c protocol.file.allow=always -C "$repo_dir/import/black-parrot" \
+      submodule update --init \
+      external/basejump_stl external/HardFloat external/bedrock
+    git -c protocol.file.allow=always -C "$worktree/import/black-parrot" \
+      submodule update --init \
+      external/basejump_stl external/HardFloat external/bedrock
+    # The build only needs riscv-dbg from this submodule. Seed it from the
+    # canonical checkout so an immutable FPGA job does not depend on network
+    # access or on an upstream object remaining fetchable.
+    git -C "$worktree/import/black-parrot-subsystems" submodule init \
+      import/riscv-dbg
+    git -C "$worktree/import/black-parrot-subsystems" config --local \
+      submodule.import/riscv-dbg.url \
+      "$seed_repo_dir/import/black-parrot-subsystems/import/riscv-dbg"
+    git -c protocol.file.allow=always \
+      -C "$worktree/import/black-parrot-subsystems" submodule update --init \
+      import/riscv-dbg
+    for required in \
+      import/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
+      import/black-parrot/external/basejump_stl/bsg_mem/bsg_mem_1rw_sync.sv \
+      import/black-parrot/external/HardFloat/source/HardFloat_primitives.v \
+      import/black-parrot-subsystems/blackparrot/v/bp_axi_top.sv; do
+      if [[ ! -f "$worktree/$required" ]]; then
+        echo "Missing required FPGA source: $required" >&2
+        exit 1
+      fi
+    done
+    if [[ ! -s "$repo_dir/install/gen/v/rv_plic/rtl/rv_plic_reg_pkg.sv" ]]; then
+      echo "Missing generated OpenTitan PLIC RTL in the shared install prefix." >&2
+      exit 1
+    fi
+    git -C "$worktree/import/black-parrot" rev-parse HEAD | sed 's/^/black_parrot_commit=/' >>"$job_dir/revisions.txt"
+    git -C "$worktree/import/basejump_stl" rev-parse HEAD | sed 's/^/basejump_commit=/' >>"$job_dir/revisions.txt"
+    git -C "$worktree/import/black-parrot/external/basejump_stl" rev-parse HEAD \
+      | sed 's/^/black_parrot_basejump_commit=/' >>"$job_dir/revisions.txt"
+    build_args=(
+      "BOARDNAME=pynqz2"
+      "VIVADO_VERSION=2024.2"
+      "VIVADO_MODE=batch"
+      "CFG=$fpga_cfg"
+      "THREADS=$fpga_threads"
+      "VIVADO_RUN=$script_dir/run_vivado_2024_2.sh"
+      "ZP_INSTALL_DIR=$repo_dir/install"
+      "ZP_RISCV_DIR=$repo_dir/riscv"
+    )
+    # Only the explicit launcher setting controls this profile. An old tmux
+    # server may retain a direct Make variable from an unrelated invocation.
+    unset BP_CACHE_MISS_TRACE
+    if [[ -n "$fpga_num_threads" ]]; then
+      build_args+=("NUM_THREADS=$fpga_num_threads" "NUM_CONTEXTS=$fpga_num_contexts")
+    fi
+    if [[ -n "$fpga_aclk_mhz" ]]; then
+      build_args+=("ACLK_MHZ=$fpga_aclk_mhz")
+    fi
+    if [[ -n "$fpga_cache_miss_trace" ]]; then
+      build_args+=("BP_CACHE_MISS_TRACE=$fpga_cache_miss_trace")
+    fi
+    make -j1 -C "$worktree/cosim/black-parrot-example/vivado" clean "${build_args[@]}"
+    make -j1 -C "$worktree/cosim/black-parrot-example/vivado" fpga_build pack_bitstream \
+      "${build_args[@]}"
+    vivado_dir="$worktree/cosim/black-parrot-example/vivado"
+    example_dir="$worktree/cosim/black-parrot-example"
+    "$script_dir/accept_vivado_build.sh" "$vivado_dir" "$example_dir" "$job_dir"
+    worker_ok=1
+    ;;
+  list)
+    mkdir -p "$run_root"
+    for status in "$run_root"/*/status; do
+      [[ -e "$status" ]] || continue
+      printf '%s %s\n' "$(basename "$(dirname "$status")")" "$(cat "$status")"
+    done
+    ;;
+  status)
+    job_id=${2:?job id required}
+    job_dir="$run_root/$job_id"
+    cat "$job_dir/status"
+    [[ ! -e "$job_dir/revisions.txt" ]] || cat "$job_dir/revisions.txt"
+    [[ ! -e "$job_dir/summary.txt" ]] || cat "$job_dir/summary.txt"
+    echo "log=$job_dir/console.log"
+    ;;
+  recheck)
+    job_id=${2:?job id required}
+    job_dir="$run_root/$job_id"
+    worktree="$work_root/zynq-parrot-fpga-$job_id"
+    [[ -d "$job_dir" && -d "$worktree" ]] || {
+      echo "Missing completed job or implementation worktree: $job_id" >&2
+      exit 1
+    }
+    [[ "$(cat "$job_dir/status" 2>/dev/null || true)" != RUNNING ]] || {
+      echo "Refusing to recheck a running job: $job_id" >&2
+      exit 1
+    }
+    recorded_top=$(sed -n 's/^top_commit=//p' "$job_dir/revisions.txt")
+    actual_top=$(git -C "$worktree" rev-parse HEAD)
+    [[ -n "$recorded_top" && "$actual_top" == "$recorded_top" ]] || {
+      echo "Implementation worktree does not match recorded top-level revision." >&2
+      exit 1
+    }
+    recorded_bp=$(sed -n 's/^black_parrot_commit=//p' "$job_dir/revisions.txt")
+    actual_bp=$(git -C "$worktree/import/black-parrot" rev-parse HEAD)
+    [[ -n "$recorded_bp" && "$actual_bp" == "$recorded_bp" ]] || {
+      echo "Implementation worktree does not match recorded BlackParrot revision." >&2
+      exit 1
+    }
+    vivado_dir="$worktree/cosim/black-parrot-example/vivado"
+    example_dir="$worktree/cosim/black-parrot-example"
+    "$script_dir/accept_vivado_build.sh" "$vivado_dir" "$example_dir" "$job_dir"
+    printf 'PASS\n' >"$job_dir/status"
+    printf 'rechecked_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$job_dir/recheck.txt"
+    cat "$job_dir/status"
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
