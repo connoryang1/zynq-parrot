@@ -1,0 +1,18 @@
+--- a/cad_checks.py
++++ b/cad_checks.py
+@@ -5,2 +5,3 @@
+-OPS=Path('/home/coyang/zynq-parrot-linux-capacity')
+-SCHEMA='csr-unmasked256-trace0-private-fpga-source-cad-adapter04-v1'
++OPS=Path('/home/coyang/zynq-parrot-csr-opt-ops-20261122')
++from opt_checks import check_launch,expected_defines
++SCHEMA='csr-unmasked1536-trace0-ExploreArea-private-source-cad-v1'
+@@ -20 +21 @@
+- require(q['all_source_and_memory_geometry_unchanged_except_reviewed_CSR'] is True,'no ordinary geometry/policy changes')
++ require(q['ordinary_geometry_policy_unchanged_capacity1536_opt_only'] is True,'no ordinary geometry/policy changes')
+@@ -29,2 +30,2 @@
+- require(cfg['expected_defines']==dict(BP_RETAINED_BUFFER=1,BP_RETAINED_I_LINES=256,BP_RETAINED_D_LINES=256,BP_RETAINED_SETS=256,BP_RETAINED_OBSERVE=1,BP_AXI_RESPONSE_DELAY=0,BP_CACHE_MISS_TRACE=0),'all7 fixed compiled flags')
+- launch=a['direct_launch'];expected_env=dict(ZP_REPO_DIR=str(SOURCE),ZP_FPGA_SEED_REPO_DIR=str(SOURCE),ZP_FPGA_LOG_ROOT=str(LOGS),ZP_FPGA_WORK_ROOT=str(WORK),FPGA_CFG='e_bp_unicore_zynqparrot_prefetch16k_cfg',FPGA_VIVADO_THREADS='8',FPGA_NUM_THREADS='',FPGA_NUM_CONTEXTS='',FPGA_ACLK_MHZ='20',FPGA_SPARSE_SOURCE='1',FPGA_CACHE_MISS_TRACE='0')
++ require(cfg['expected_defines']==expected_defines(TOP),'all7 fixed compiled flags')
++ launch=a['direct_launch'];expected_env=dict(ZP_REPO_DIR=str(SOURCE),ZP_FPGA_SEED_REPO_DIR=str(SOURCE),ZP_FPGA_LOG_ROOT=str(LOGS),ZP_FPGA_WORK_ROOT=str(WORK),FPGA_CFG='e_bp_unicore_zynqparrot_prefetch16k_cfg',FPGA_VIVADO_THREADS='8',FPGA_NUM_THREADS='',FPGA_NUM_CONTEXTS='',FPGA_ACLK_MHZ='20',FPGA_SPARSE_SOURCE='1',FPGA_CACHE_MISS_TRACE='0',FPGA_OPT_DIRECTIVE='ExploreArea')
+@@ -31,0 +33 @@
++ check_launch(launch,SOURCE,WORK,LOGS,TOP,BP)
