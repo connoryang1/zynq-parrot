@@ -109,10 +109,41 @@ class Carrier(unittest.TestCase):
         for setting in (None,'0','1'):
             with self.subTest(setting=setting),tempfile.TemporaryDirectory() as td:
                 f=Fixture(Path(td));extra={k:'HOST_TEST_ONLY' for k in ('BP_SYNTH_DECISION','BP_SYNTH_CHEAPER_GATES','BP_SYNTH_PASS_ACTION','BP_SYNTH_FAIL_ACTION')}
-                r=f.run(f.farm,['admit','bp1','fixture','topbranch','bpbranch','1','e_bp_unicore_zynqparrot_prefetch16k_cfg'],extra=extra);self.assertEqual(r.returncode,0,r.stderr)
+                r=f.run(f.farm,['admit','bp1','fixture','topbranch','bpbranch','1','e_bp_unicore_zynqparrot_prefetch16k_cfg'],setting,extra=extra);self.assertEqual(r.returncode,0,r.stderr)
                 r=f.run(f.farm,['launch','bp1','fixture','topbranch','bpbranch','8'],setting);self.assertEqual(r.returncode,0,r.stderr)
                 remote=json.loads((f.base/'remote.json').read_text());self.assertEqual(remote['args'][-1],setting or '')
                 self.assertIn('cache_miss_trace=$6',remote['body']);self.assertIn('FPGA_CACHE_MISS_TRACE="$cache_miss_trace"',remote['body'])
+
+    def admit(self,f,setting=None,legacy=False):
+        extra={k:'HOST_TEST_ONLY' for k in ('BP_SYNTH_DECISION','BP_SYNTH_CHEAPER_GATES','BP_SYNTH_PASS_ACTION','BP_SYNTH_FAIL_ACTION')}
+        r=f.run(f.farm,['admit','bp1','fixture','topbranch','bpbranch','1','e_bp_unicore_zynqparrot_prefetch16k_cfg'],setting,extra=extra)
+        self.assertEqual(r.returncode,0,r.stderr)
+        path=f.base/'farm-manifests/admissions/bp1/fixture.env'
+        if legacy:path.write_text(''.join(line for line in path.read_text().splitlines(True) if not line.startswith('admission_cache_miss_trace=')))
+        return path
+
+    def test_admitted_zero_survives_unset_launch_environment(self):
+        with tempfile.TemporaryDirectory() as td:
+            f=Fixture(Path(td));path=self.admit(f,'0');self.assertIn('admission_cache_miss_trace=0',path.read_text())
+            r=f.run(f.farm,['launch','bp1','fixture','topbranch','bpbranch','8'])
+            self.assertEqual(r.returncode,0,r.stderr);self.assertIn('cache_miss_trace=0',r.stdout)
+            self.assertEqual(json.loads((f.base/'remote.json').read_text())['args'][-1],'0')
+
+    def test_admitted_one_conflicting_launch_zero_refused_before_ssh(self):
+        with tempfile.TemporaryDirectory() as td:
+            f=Fixture(Path(td));path=self.admit(f,'1');before=path.read_bytes()
+            r=f.run(f.farm,['launch','bp1','fixture','topbranch','bpbranch','8'],'0')
+            self.assertNotEqual(r.returncode,0);self.assertIn('conflicts with immutable admission',r.stderr)
+            self.assertFalse((f.base/'remote.json').exists());self.assertEqual(path.read_bytes(),before)
+
+    def test_legacy_unset_preserved_and_explicit_change_requires_new_label(self):
+        for setting,success in ((None,True),('0',False)):
+            with self.subTest(setting=setting),tempfile.TemporaryDirectory() as td:
+                f=Fixture(Path(td));path=self.admit(f,legacy=True)
+                r=f.run(f.farm,['launch','bp1','fixture','topbranch','bpbranch','8'],setting)
+                self.assertEqual(r.returncode==0,success,r.stderr)
+                if success:self.assertEqual(json.loads((f.base/'remote.json').read_text())['args'][-1],'')
+                else:self.assertIn('use a new label',r.stderr);self.assertFalse((f.base/'remote.json').exists())
 
 
 if __name__=='__main__':unittest.main()

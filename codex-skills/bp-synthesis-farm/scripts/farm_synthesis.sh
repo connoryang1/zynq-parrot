@@ -46,6 +46,7 @@ load_admission() {
   admission_bp_branch=
   admission_priority=
   admission_fpga_cfg=
+  admission_cache_miss_trace=
   admission_decision=
   admission_cheaper_gates=
   admission_pass_action=
@@ -56,6 +57,11 @@ load_admission() {
   # shellcheck disable=SC1090
   source "$file"
   admission_fpga_cfg=${admission_fpga_cfg:-e_bp_unicore_zynqparrot_cfg}
+  admission_cache_miss_trace=${admission_cache_miss_trace:-}
+  if [[ -n $admission_cache_miss_trace && $admission_cache_miss_trace != 0 && $admission_cache_miss_trace != 1 ]]; then
+    echo "Admission cache-miss trace setting must be unset, 0 or 1." >&2
+    return 2
+  fi
   require_admission_text admission_decision "$admission_decision"
   require_admission_text admission_cheaper_gates "$admission_cheaper_gates"
   require_admission_text admission_pass_action "$admission_pass_action"
@@ -72,6 +78,7 @@ print_admission() {
     "$admission_builder" "$admission_label" "$admission_top_branch" \
     "$admission_bp_branch" "$admission_priority"
   printf 'fpga_config=%s\n' "$admission_fpga_cfg"
+  printf 'cache_miss_trace=%s\n' "${admission_cache_miss_trace:-default}"
   printf 'decision=%s\ncheaper_gates_insufficient=%s\npass_next=%s\nfail_next=%s\n' \
     "$admission_decision" "$admission_cheaper_gates" \
     "$admission_pass_action" "$admission_fail_action"
@@ -160,6 +167,11 @@ case ${1:-} in
     bp_branch=${5:?BlackParrot branch required}
     priority=${6:?candidate priority required; use 1 for highest}
     fpga_cfg=${7:-e_bp_unicore_zynqparrot_cfg}
+    cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
+    if [[ -n $cache_miss_trace && $cache_miss_trace != 0 && $cache_miss_trace != 1 ]]; then
+      echo "FPGA_CACHE_MISS_TRACE must be unset, 0 or 1." >&2
+      exit 2
+    fi
     builder_fields "$builder" >/dev/null
     if [[ ! $label =~ ^[A-Za-z0-9._-]+$ || ! $priority =~ ^[1-9][0-9]*$ \
        || ! $fpga_cfg =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
@@ -188,6 +200,7 @@ case ${1:-} in
       printf 'admission_bp_branch=%q\n' "$bp_branch"
       printf 'admission_priority=%q\n' "$priority"
       printf 'admission_fpga_cfg=%q\n' "$fpga_cfg"
+      printf 'admission_cache_miss_trace=%q\n' "$cache_miss_trace"
       printf 'admission_decision=%q\n' "$decision"
       printf 'admission_cheaper_gates=%q\n' "$cheaper_gates"
       printf 'admission_pass_action=%q\n' "$pass_action"
@@ -224,8 +237,8 @@ case ${1:-} in
     bp_branch=${5:?BlackParrot branch required}
     IFS=$'\t' read -r target port host_cores default_workers < <(builder_fields "$builder")
     workers=${6:-$default_workers}
-    cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
-    if [[ -n "$cache_miss_trace" && "$cache_miss_trace" != 0 && "$cache_miss_trace" != 1 ]]; then
+    caller_cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
+    if [[ -n "$caller_cache_miss_trace" && "$caller_cache_miss_trace" != 0 && "$caller_cache_miss_trace" != 1 ]]; then
       echo "FPGA_CACHE_MISS_TRACE must be unset, 0 or 1." >&2
       exit 2
     fi
@@ -240,6 +253,11 @@ case ${1:-} in
       exit 1
     fi
     load_admission "$admission_file"
+    if [[ -n $caller_cache_miss_trace && $caller_cache_miss_trace != "$admission_cache_miss_trace" ]]; then
+      echo "Caller cache-miss trace setting conflicts with immutable admission; use a new label." >&2
+      exit 1
+    fi
+    cache_miss_trace=$admission_cache_miss_trace
     if ! require_admission_match "$builder" "$label" "$top_branch" "$bp_branch"; then
       print_admission "$admission_file" >&2
       exit 1
