@@ -1,0 +1,1037 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
+| Date         : Sun Nov 22 06:04:57 2026
+| Host         : blackparrot1 running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_timing -max_paths 20 -file timing-paths.rpt
+| Design       : csr_snapshot_consumer_wrapper
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[0]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/restored_image_o[1665]_INST_0_i_1/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/restored_image_o[1665]_INST_0_i_1_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[0]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[0]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[0]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[0]
+                                                                      r  restored_image_o[0] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1000]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1000]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1000]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1000]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1000]
+                                                                      r  restored_image_o[1000] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1001]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1001]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1001]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1001]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1001]
+                                                                      r  restored_image_o[1001] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1002]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1002]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1002]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1002]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1002]
+                                                                      r  restored_image_o[1002] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1003]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1003]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1003]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1003]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1003]
+                                                                      r  restored_image_o[1003] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1004]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1004]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1004]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1004]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1004]
+                                                                      r  restored_image_o[1004] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1005]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1005]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1005]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1005]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1005]
+                                                                      r  restored_image_o[1005] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1006]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1006]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1006]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1006]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1006]
+                                                                      r  restored_image_o[1006] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1007]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1007]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1007]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1007]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1007]
+                                                                      r  restored_image_o[1007] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1008]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1008]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1008]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1008]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1008]
+                                                                      r  restored_image_o[1008] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1009]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1009]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1009]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1009]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1009]
+                                                                      r  restored_image_o[1009] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[100]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/restored_image_o[1665]_INST_0_i_1/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/restored_image_o[1665]_INST_0_i_1_n_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[100]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[100]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[100]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[100]
+                                                                      r  restored_image_o[100] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1010]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1010]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1010]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1010]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1010]
+                                                                      r  restored_image_o[1010] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1011]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1011]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1011]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1011]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1011]
+                                                                      r  restored_image_o[1011] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1012]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1012]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1012]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1012]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1012]
+                                                                      r  restored_image_o[1012] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1013]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1013]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1013]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1013]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1013]
+                                                                      r  restored_image_o[1013] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1014]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1014]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1014]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1014]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1014]
+                                                                      r  restored_image_o[1014] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1015]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1015]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1015]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1015]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1015]
+                                                                      r  restored_image_o[1015] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1016]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1016]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1016]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1016]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1016]
+                                                                      r  restored_image_o[1016] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+Slack (MET) :             44.931ns  (required time - arrival time)
+  Source:                 storage/valid_r_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Destination:            restored_image_o[1017]
+                            (output port clocked by owning_clock  {rise@0.000ns fall@25.000ns period=50.000ns})
+  Path Group:             owning_clock
+  Path Type:              Max at Slow Process Corner
+  Requirement:            50.000ns  (owning_clock rise@50.000ns - owning_clock rise@0.000ns)
+  Data Path Delay:        4.061ns  (logic 1.061ns (26.127%)  route 3.000ns (73.873%))
+  Logic Levels:           3  (LUT5=1 LUT6=2)
+  Output Delay:           0.000ns
+  Clock Path Skew:        -0.973ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns = ( 50.000 - 50.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock owning_clock rise edge)
+                                                      0.000     0.000 r  
+                                                      0.000     0.000 r  clk_i (IN)
+                         net (fo=2227, unset)         0.973     0.973    storage/clk_i
+                         FDRE                                         r  storage/valid_r_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+                         FDRE (Prop_fdre_C_Q)         0.518     1.491 r  storage/valid_r_reg[3]/Q
+                         net (fo=4, unplaced)         0.989     2.480    storage/valid_o[3]
+                         LUT6 (Prop_lut6_I0_O)        0.295     2.775 r  storage/read_valid_o_INST_0/O
+                         net (fo=1111, unplaced)      0.589     3.364    storage/valid_r_reg[3]_0
+                         LUT6 (Prop_lut6_I3_O)        0.124     3.488 r  storage/restored_image_o[1017]_INST_0_i_1/O
+                         net (fo=1, unplaced)         0.449     3.937    storage/selected_restore_data[1017]
+                         LUT5 (Prop_lut5_I3_O)        0.124     4.061 r  storage/restored_image_o[1017]_INST_0/O
+                         net (fo=0)                   0.973     5.034    restored_image_o[1017]
+                                                                      r  restored_image_o[1017] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock owning_clock rise edge)
+                                                     50.000    50.000 r  
+                         clock pessimism              0.000    50.000    
+                         clock uncertainty           -0.035    49.965    
+                         output delay                -0.000    49.965    
+  -------------------------------------------------------------------
+                         required time                         49.965    
+                         arrival time                          -5.034    
+  -------------------------------------------------------------------
+                         slack                                 44.931    
+
+
+
+

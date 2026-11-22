@@ -1,0 +1,44 @@
+{
+  "state": "Closure duplicate-export cap failure preserved; lossless representation of exact redundant copies, original RAM and verified archive unchanged",
+  "utc": "2026-11-22T11:08:29.639852+00:00",
+  "original_family_bytes": 12831703,
+  "cap": 8388608,
+  "projected_bytes": 6701268,
+  "confirmed_cause": "All output archive plus unnecessary uncompressed display duplicates exceeded cap; final assertion caught after copies, prospective copy-size check missing",
+  "guardrail": "Compute complete prospective copy bytes before writes; use compressed exported views",
+  "compressed_duplicates": [
+    {
+      "original_path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/baseline-single-source/functional.v",
+      "original_bytes": 2606817,
+      "original_sha256": "b9653ad72aacade9315a89d59767f88aea8aa3233a47cb549541cf38321b7fb6",
+      "compressed": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/baseline-single-source/functional.v.gz",
+        "bytes": 140131,
+        "sha256": "22267e6334c33a1b9c3f5d2d56c1a5d6ca3578e62f3dd2f4d63faab2de8dd634"
+      },
+      "roundtrip": true
+    },
+    {
+      "original_path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/baseline-single-source/storage-properties.tsv",
+      "original_bytes": 2699891,
+      "original_sha256": "4fa17ba5295e3a0165abf6495b5c1e62887cf67bc3296dd03068f4b1d9a3e48e",
+      "compressed": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/baseline-single-source/storage-properties.tsv.gz",
+        "bytes": 147956,
+        "sha256": "351c74774464335bfea46fd7b2c0cd4be2d9c0896c875752782edb8b7c81b99a"
+      },
+      "roundtrip": true
+    },
+    {
+      "original_path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/resetless-single/storage-properties.tsv",
+      "original_bytes": 1173875,
+      "original_sha256": "95aa0a2198ba3bf039881c047567f099d5445cc23218f76f7a02f31a5a51f29a",
+      "compressed": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed04/resetless-single/storage-properties.tsv.gz",
+        "bytes": 62061,
+        "sha256": "acf1d79d309ecbe24ed0030d86ff35df3a93c6b1e213d9845e1e9d85f1f2d397"
+      },
+      "roundtrip": true
+    }
+  ]
+}

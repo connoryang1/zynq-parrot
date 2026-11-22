@@ -1,0 +1,106 @@
+{
+  "state": "DEFERRED/ABORTED preserved; no retries or foreign signaling",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation03/admission.FINAL.json",
+    "bytes": 8079,
+    "sha256": "bfe3399cfb9e28655a6b99679e4482562eab50022d0c1f7e0bdcf81ec75fbb6d"
+  },
+  "ownership_receipt": {
+    "path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/mapping03/ROOT-ownership-initial.json",
+    "bytes": 669,
+    "sha256": "5bb69338371283bff409d9cc5b01e526959d0b9b4999c1b29c0444ae6b253117"
+  },
+  "ownership_current_path": "/dev/shm/zp-csr-snapshot-production-contract-20261122-01/mapping03/ROOT-ownership.json",
+  "ownership_identity": {
+    "hostname": "blackparrot1",
+    "pid": 1265054,
+    "startticks": 96023393,
+    "pgid": 1265054,
+    "nonce": "ff50fed4b22146b98fc1ef9d7019613b"
+  },
+  "arms": [
+    {
+      "arm": "baseline-single-source",
+      "prelaunch_global_idle": {
+        "utc": "2026-11-22T10:47:03.813071+00:00",
+        "vendor_processes": []
+      },
+      "argv": [
+        "/home/coyang/zynq-parrot/codex-skills/bp-fpga-synthesis/scripts/run_vivado_2024_2.sh",
+        "-mode",
+        "batch",
+        "-source",
+        "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation03/probe.tcl",
+        "-log",
+        "vivado.log",
+        "-journal",
+        "vivado.jou",
+        "-tclargs",
+        "baseline-single-source"
+      ],
+      "owned_receipt": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/home/coyang/zynq-parrot/codex-skills/bp-fpga-synthesis/scripts/run_vivado_2024_2.sh",
+          "-mode",
+          "batch",
+          "-source",
+          "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation03/probe.tcl",
+          "-log",
+          "vivado.log",
+          "-journal",
+          "vivado.jou",
+          "-tclargs",
+          "baseline-single-source"
+        ],
+        "owned_pgid": 1265056,
+        "returncode": 1,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 580,
+        "teardown_s": 5,
+        "elapsed_s": 13.429796788026579
+      }
+    }
+  ],
+  "foreign_inventory_events": [],
+  "no_board_operations": true,
+  "error": "ValueError('native Vivado arm failed')",
+  "source_endcheck": "PASS",
+  "elapsed_seconds": 13.67747422598768,
+  "ownership_final": {
+    "schema": "bp1-root-pervm-cad-ownership-receipt-v1",
+    "hostname": "blackparrot1",
+    "pid": 1265054,
+    "startticks": 96023393,
+    "pgid": 1265054,
+    "nonce": "ff50fed4b22146b98fc1ef9d7019613b",
+    "utc": "2026-11-22T10:47:03.667018+00:00",
+    "admission_sha256": "bfe3399cfb9e28655a6b99679e4482562eab50022d0c1f7e0bdcf81ec75fbb6d",
+    "linux_claim_state": "RELEASED",
+    "linux_claim": "CSR-production-contract paired mapping AFTER lower256 terminal only",
+    "basis": "coordinator conditional release + ROOT perVM onejobprotocol",
+    "all_vendor_inventory_empty": {
+      "utc": "2026-11-22T10:47:03.660941+00:00",
+      "vendor_processes": []
+    },
+    "atomic_global_lock": false,
+    "release_utc": "2026-11-22T10:47:17.344867+00:00",
+    "outcome": "DEFERRED/ABORTED preserved; no retries or foreign signaling",
+    "owned_group_remaining": false
+  }
+}
