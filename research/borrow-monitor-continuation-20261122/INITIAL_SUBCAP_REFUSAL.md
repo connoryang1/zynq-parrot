@@ -1,0 +1,7 @@
+ROOT's first read-only probe refused the 16 MiB recovery-family allocation because a temporary raw watcher had created 30,249,744 bytes across 15 snapshots. The refusal was resource accounting, not an identity/RTL/fit failure. No source, admission, compiled input or 384 MiB original evidence allocation changed.
+
+After exact parent/PID/start/argv checks, ROOT stopped only its temporary Python watcher 1125617/start 94866402; vendor processes were untouched. The first stop-script attempt had a Python syntax error before doing anything; the corrected identity-specific stop succeeded. The exact stop and preservation receipts are copied under proof/.
+
+ROOT moved the 15 unbound raw snapshots into the original evidence root's unbound-readonly-recovery-history-01 directory. Each original recovery path remains a symlink to its retained file. This curation independently checked all 15 link destinations and all 30,249,744 bytes/SHA values against the preserved manifest. There was no deletion, filename exclusion or unaccounted growth: real files are counted at their destination in the original 384 MiB union; recovery symlinks are counted as links. Recovery then occupied about 2.2 MiB and the total old+new evidence was about 111 MiB at ROOT's report, within the unchanged union.
+
+The subsequent exact probe passed under unchanged continuation admission 76bc56a4… and readiness receipt d13ccfd4…. Later active observation remains outside this checkpoint. This note does not relabel the initial resource refusal as passing or claim a whole-device outcome.

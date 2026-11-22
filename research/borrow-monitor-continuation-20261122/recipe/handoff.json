@@ -1,0 +1,54 @@
+{
+  "state": "PREPARED read-only ROOT continuation; no live probe, signal or launcher by child",
+  "sources": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/ownership_ledger.py",
+      "bytes": 2987,
+      "sha256": "417d38f21bbe3409443d23752b83eee55ad9749cb1de65eeba9ac3d9b283731a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/continuation.py",
+      "bytes": 7179,
+      "sha256": "237c0c19880341f7b5c607bfae9eac33a07c1df3defb28af2549c457de2c2793"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/test_ledger.py",
+      "bytes": 2106,
+      "sha256": "93b117104c25c0262e3f9d9707897ea389a6da2abc74935f81538d445699085e"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/README.md",
+      "bytes": 3124,
+      "sha256": "24ec9691057b4c6dc4b2faebf16e6b91d901fd969fc2ebea6b6aa0a83c27d993"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/history-proof.json",
+      "bytes": 420,
+      "sha256": "7a564b16018a956efc9aaccce65e9f44e8212940928bc95cf4648f2fff0f4975"
+    }
+  ],
+  "prepare_command": [
+    "python3",
+    "-B",
+    "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/continuation.py",
+    "--prepare"
+  ],
+  "probe_command": [
+    "python3",
+    "-B",
+    "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/continuation.py",
+    "--probe",
+    "--admission-sha256",
+    "ACTUAL_ROOT_PREPARED_SHA"
+  ],
+  "observe_command_after_passed_probe": [
+    "python3",
+    "-B",
+    "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/continuation.py",
+    "--observe",
+    "--admission-sha256",
+    "SAME_ACTUAL_ROOT_PREPARED_SHA"
+  ],
+  "no_signal_or_cancellation_implementation": true,
+  "original_limits_unchanged": true
+}
