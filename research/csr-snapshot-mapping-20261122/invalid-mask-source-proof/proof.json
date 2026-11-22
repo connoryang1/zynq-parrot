@@ -1,0 +1,187 @@
+{
+  "schema": "csr-snapshot-invalid-payload-noninterference-source-proof-v1",
+  "state": "SOURCE-ONLY-PATCH-NO-EXECUTION-NO-MAPPING-CAUSE-CLAIM",
+  "qualified_source": {
+    "path": "/home/coyang/bp-csr-snapshot-production-contract-20261122/bp_be/src/v/bp_be_csr_snapshot_store_production.sv",
+    "bytes": 1298,
+    "sha256": "0ed6f85da9ca9ee47de25d99bc79d9f43710742014fa4c6f607f06d1f66a4067"
+  },
+  "production_conditions": {
+    "R": "cache_restore OR resident_init",
+    "C": "cache_restore",
+    "V": "valid[target]",
+    "D": "snapshot_data[target]",
+    "P": "existing lower-priority next image",
+    "S": "common save data",
+    "Z": "26zero words plus privM=1666d3"
+  },
+  "observable": "!R?P : (C&&!V)?Z : C?D:S",
+  "proof_cases": [
+    "R=0 => outputP independentD",
+    "R=1,C=0 => outputS independentD",
+    "R=1,C=1,V=0 => outputZ independentD",
+    "R=1,C=1,V=1 => outputD and raw read is defined/valid"
+  ],
+  "other_controls": "valid vector/read_valid, producer qualification, write payload/address, reset write suppression, context ownership, NPC restore separatewire unchanged",
+  "raw_contract_difference": "unmasked read_data while invalid may be stale/X; NOT compatible with generic zero-invalid raw-data API; original raw componentPASS cannot certify this patch",
+  "defined_boundary": "post-reset, sole proven consumer selection; no guarantee before first reset or for any additional raw snapshot observer",
+  "source_uses": [
+    {
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "bytes": 53492,
+      "sha256": "2a13acd2135c43e6ea00b8c3f9cb55d6ee70456c3935b334b4927f9cd4456d8d",
+      "all_payload_uses": [
+        {
+          "line": 897,
+          "text": "          priv_mode_n = csr_context_restore.priv_mode;"
+        },
+        {
+          "line": 898,
+          "text": "          fcsr_li = csr_context_restore.fcsr;"
+        },
+        {
+          "line": 900,
+          "text": "          stvec_li = csr_context_restore.stvec;"
+        },
+        {
+          "line": 901,
+          "text": "          scounteren_li = csr_context_restore.scounteren;"
+        },
+        {
+          "line": 902,
+          "text": "          sscratch_li = csr_context_restore.sscratch;"
+        },
+        {
+          "line": 903,
+          "text": "          sepc_li = csr_context_restore.sepc;"
+        },
+        {
+          "line": 904,
+          "text": "          scause_li = csr_context_restore.scause;"
+        },
+        {
+          "line": 905,
+          "text": "          stval_li = csr_context_restore.stval;"
+        },
+        {
+          "line": 906,
+          "text": "          satp_li = csr_context_restore.satp;"
+        },
+        {
+          "line": 908,
+          "text": "          mstatus_li = csr_context_restore.mstatus;"
+        },
+        {
+          "line": 909,
+          "text": "          medeleg_li = csr_context_restore.medeleg;"
+        },
+        {
+          "line": 910,
+          "text": "          mideleg_li = csr_context_restore.mideleg;"
+        },
+        {
+          "line": 911,
+          "text": "          mie_li = csr_context_restore.mie;"
+        },
+        {
+          "line": 912,
+          "text": "          mtvec_li = csr_context_restore.mtvec;"
+        },
+        {
+          "line": 913,
+          "text": "          mcounteren_li = csr_context_restore.mcounteren;"
+        },
+        {
+          "line": 914,
+          "text": "          mscratch_li = csr_context_restore.mscratch;"
+        },
+        {
+          "line": 915,
+          "text": "          mepc_li = csr_context_restore.mepc;"
+        },
+        {
+          "line": 916,
+          "text": "          mcause_li = csr_context_restore.mcause;"
+        },
+        {
+          "line": 917,
+          "text": "          mtval_li = csr_context_restore.mtval;"
+        },
+        {
+          "line": 918,
+          "text": "          mip_li = csr_context_restore.mip;"
+        },
+        {
+          "line": 919,
+          "text": "          mcycle_li = csr_context_restore.mcycle;"
+        },
+        {
+          "line": 920,
+          "text": "          minstret_li = csr_context_restore.minstret;"
+        },
+        {
+          "line": 921,
+          "text": "          mcountinhibit_li = csr_context_restore.mcountinhibit;"
+        },
+        {
+          "line": 923,
+          "text": "          dcsr_li = csr_context_restore.dcsr;"
+        },
+        {
+          "line": 924,
+          "text": "          dpc_li = csr_context_restore.dpc;"
+        },
+        {
+          "line": 925,
+          "text": "          dscratch0_li = csr_context_restore.dscratch0;"
+        },
+        {
+          "line": 926,
+          "text": "          dscratch1_li = csr_context_restore.dscratch1;"
+        }
+      ]
+    },
+    {
+      "path": "bp_be/src/v/bp_be_top.sv",
+      "commit": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+      "bytes": 87687,
+      "sha256": "c8a14b45e8a0034c2926c3fe66c87ac7263a1f948f9c8e280f911b78fb3b32ca",
+      "all_payload_uses": [
+        {
+          "line": 236,
+          "text": "  logic [num_contexts_p-1:0][csr_context_width_lp-1:0] virtual_context_csr_state_r;"
+        },
+        {
+          "line": 399,
+          "text": "    ? virtual_context_csr_state_r[context_cache_target_virtual_context_id_r]"
+        },
+        {
+          "line": 850,
+          "text": "        virtual_context_csr_state_r[i] <= '0;"
+        },
+        {
+          "line": 879,
+          "text": "          virtual_context_csr_state_r[save_virtual_context_id_li] <= csr_context_save_data_lo;"
+        },
+        {
+          "line": 911,
+          "text": "          virtual_context_csr_state_r[ctx_npc_write_virtual_context_id_lo]"
+        }
+      ]
+    }
+  ],
+  "patch_intent": "one functional line only; no production worktree edit, RAM/geometry/clock/producer/validity change",
+  "unimplemented_nextgate": "same source-bound producer+consumer miter including cold/reset-image3/bypass/hold/allvalidbits; actual source mapping and primitive semantics required before any integration",
+  "reported_pair_not_yet_terminal": {
+    "baseline_logic_LUT": 4178,
+    "baseline_FF": 6668,
+    "candidate_logic_LUT": 5014,
+    "candidate_LUTRAM": 1112,
+    "candidate_FF": 4,
+    "total_LUT_delta": 1948,
+    "logic_LUT_delta": 836,
+    "source": "ROOT-reported actual interim mapping04 result; no actual candidate netlist accessible yet"
+  },
+  "cause_status": "extra logic not localized; masking is a bounded structural hypothesis, not measured removable savings"
+}

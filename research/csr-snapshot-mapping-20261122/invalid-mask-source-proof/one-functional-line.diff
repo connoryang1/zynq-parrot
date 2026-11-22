@@ -1,0 +1,11 @@
+--- qualified-masked-store.sv
++++ production-consumer-only-unmasked-store.sv
+@@ -24,7 +24,7 @@
+     read_valid_o=1'b0;read_data_o='0;
+     if (int'(read_addr_i)<contexts_p)begin
+       read_valid_o=valid_r[read_addr_i];
+-      if (valid_r[read_addr_i])read_data_o=mem[read_addr_i];
++      read_data_o=mem[read_addr_i]; // undefined while invalid; consumed only when valid
+     end
+   end
+ endmodule

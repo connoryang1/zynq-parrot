@@ -1,0 +1,93 @@
+{
+  "schema": "csr-actual-mapping04-logic-localization-v1",
+  "scope": "read-only exact netlist/count/INIT truth-table evidence; no removable-saving/fit claim",
+  "netlists": {
+    "baseline-single-source": {
+      "functional_raw_bytes": 2606817,
+      "functional_raw_sha256": "b9653ad72aacade9315a89d59767f88aea8aa3233a47cb549541cf38321b7fb6",
+      "scalar_logic_LUT_cells": {
+        "LUT2": 2,
+        "LUT6": 3339,
+        "LUT3": 1666,
+        "LUT4": 1,
+        "LUT5": 3
+      },
+      "scalar_logic_total": 5011,
+      "SOFT_HLUTNM_groups": 833,
+      "pair_type_counts": {
+        "('LUT3', 'LUT3')": 833
+      },
+      "first_examples": [
+        [
+          "soft_lutpair0",
+          [
+            [
+              "LUT3",
+              "\\restored_image_o[0]_INST_0_i_1"
+            ],
+            [
+              "LUT3",
+              "\\restored_image_o[1]_INST_0_i_1"
+            ]
+          ]
+        ],
+        [
+          "soft_lutpair500",
+          [
+            [
+              "LUT3",
+              "\\restored_image_o[1000]_INST_0_i_1"
+            ],
+            [
+              "LUT3",
+              "\\restored_image_o[1001]_INST_0_i_1"
+            ]
+          ]
+        ]
+      ]
+    },
+    "resetless-single": {
+      "functional_raw_bytes": 1611112,
+      "functional_raw_sha256": "c967dee303184c0165c0998d4d838932c2afcb247bc3b8b37ca31677019fb937",
+      "scalar_logic_LUT_cells": {
+        "LUT3": 1669,
+        "LUT6": 1674,
+        "LUT2": 2,
+        "LUT5": 1669,
+        "LUT4": 1
+      },
+      "scalar_logic_total": 5015,
+      "SOFT_HLUTNM_groups": 1,
+      "pair_type_counts": {
+        "('LUT2', 'LUT5')": 1
+      },
+      "first_examples": [
+        [
+          "soft_lutpair0",
+          [
+            [
+              "LUT2",
+              "restore_reset_o_INST_0"
+            ],
+            [
+              "LUT5",
+              "\\restored_image_o[1109]_INST_0"
+            ]
+          ]
+        ]
+      ]
+    }
+  },
+  "reported_logic_LUTs": {
+    "baseline": 4178,
+    "masked": 5014
+  },
+  "exact_difference": "836 = (5015-5011)+(833-1); four extra scalar cells and832 fewer combining adjustments",
+  "other_memory_cost": "candidate1112LUTRAM in addition to logic, noBRAM/DSP;4FF vs6668FF",
+  "selected_restore_LUT6_INIT": "FF000000B8B8B8B8",
+  "selected_restore_function": "cache ? (valid & RAMbit) : (save_bank ? bank1bit : bank0bit)",
+  "zero_mask_status": "fused into1666selected-restore LUT6s; not833separatemaskcells",
+  "source_counterfactual": "remove only invalid read-zero contract. May alter decomposition/combining, not proved to reduce logic sites. Actual map needed.",
+  "baseline_count_correction": "5005 counts only3339LUT6+1666LUT3;6other scalarLUTs bring total5011",
+  "new_variant_functional_scope": "source noninterference proof only; old raw-zero componentPASS not transferred"
+}
