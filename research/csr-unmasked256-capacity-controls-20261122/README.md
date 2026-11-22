@@ -1,0 +1,3 @@
+This records the three completed separate simulation controls for the new CSR storage implementation at256 retained full64-byte lines per side. The raw FSTs and full audit outputs remain in the admitted RAM pool pending their separately reserved durable archive after CAD terminates. These results establish lane capacity correctness and ordinary-memory fallback, not joint full-capacity behavior, FPGA fit or application gains.
+
+The unchanged programs, exact model/source lineage, native proofs, complete full167 stream digests and owned-process closures are bound by `ROOT-cohort-complete.json`. The existing base fullcore/trace/architectural archive remains durable; this compact progress record does not impersonate the pending raw-capacity archive.
