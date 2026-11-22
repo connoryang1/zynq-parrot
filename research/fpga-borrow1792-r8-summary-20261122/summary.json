@@ -1,0 +1,664 @@
+{
+  "state": "TERMINAL detailed-placement FAIL; no routed bitstream or accepted physical capacity",
+  "job": "20261122T062351Z-3daedee66",
+  "source": {
+    "TOP": "3daedee66a3c94014b4a666fea037b17cc9b0943",
+    "BP": "bb575a764c200f07c6f3259a179bdc861dd7593f",
+    "critical_RTL": [
+      {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/worker_sources.tar.gz",
+          "bytes": 11119096,
+          "sha256": "b6d35bf7bf9723991023fb4b799c19b65a082e1a10420ea8a5477a6c0c119ad0"
+        },
+        "member": "files/2581/bp_retained_line_store.sv",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/import/black-parrot/bp_common/src/v/bp_retained_line_store.sv",
+          "bytes": 21660,
+          "sha256": "c04764548493f2a1109c36f25881c32444d0171b434e777c9e2b5fc2f631bcf2"
+        }
+      },
+      {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/worker_sources.tar.gz",
+          "bytes": 11119096,
+          "sha256": "b6d35bf7bf9723991023fb4b799c19b65a082e1a10420ea8a5477a6c0c119ad0"
+        },
+        "member": "files/2643/bp_uce.sv",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/import/black-parrot/bp_me/src/v/cce/bp_uce.sv",
+          "bytes": 109697,
+          "sha256": "94d989246a8d2d247da8835081f2ba9385ab568e10425d0b872f376df3ea4ad4"
+        }
+      }
+    ]
+  },
+  "configuration": {
+    "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "retained_full64B_lines_per_side": 1792,
+    "configured_retained_payload_bytes_total": 229376,
+    "retained_sets": 256,
+    "observer": 1,
+    "HP0_delay": 0,
+    "actual_cache_miss_trace": 0,
+    "source_trace_default": 1,
+    "trace_note": "Explicit actual synthesis override0 is authoritative; do not confuse source default1 with compiled identity.",
+    "resident_contexts": 2,
+    "logical_contexts": 4,
+    "L1I_bytes": 32768,
+    "L1D_bytes": 32768,
+    "L2_banks": 2,
+    "L2_sets_per_bank": 64,
+    "L2_ways": 2,
+    "L2_line_bytes": 64,
+    "L2_bytes": 16384,
+    "aclk_MHz": 20,
+    "rtclk_MHz": 8,
+    "Vivado_workers": 8
+  },
+  "synthesis": {
+    "synth_LUT": 54001,
+    "synth_FF": 29859,
+    "synth_BRAM_tiles": 140,
+    "synth_DSP": 11,
+    "synth_elapsed": "01:26:11",
+    "placement_required_slices": 11211,
+    "placement_available_slices": 10988,
+    "slice_gap": 223,
+    "control_sets": 1169,
+    "combined_LUT": 56452,
+    "total_LUT": 65987,
+    "placement_FF": 29863
+  },
+  "placement_failure": {
+    "error": "Place30-487",
+    "required_remaining_slices": 11211,
+    "available_remaining_slices": 10988,
+    "gap": 223,
+    "control_sets": 1169,
+    "combined_LUT": 56452,
+    "total_LUT": 65987,
+    "FF": 29863
+  },
+  "RAM_mapping_accounting": {
+    "retained_each_lane": {
+      "payload_RAMB36": 25,
+      "payload_RAMB18": 2,
+      "tag_RAMB36": 2,
+      "tile_equivalent": 28
+    },
+    "retained_total_tiles": 56,
+    "R7_trace_RAMB36": 2,
+    "R8_trace_RAM_entries": 0,
+    "R7_shallow_memories": "Two512x8 BHTs:24RAM64M each; D128x34 footprint:24RAM64M; I256x34 prefix:48RAM64M",
+    "R8_same_shallow_memories_RAMB18": 4,
+    "whole_R8_RAMB36": 136,
+    "whole_R8_RAMB18": 8,
+    "whole_tiles": 140,
+    "interpretation": "Observed inference-table accounting: trace removal coincides with four other memories mapping to four half-tiles, so wholeBRAM stays140. This is not exclusive causal attribution, a physical-port guarantee, or56tiles of spare device capacity."
+  },
+  "provenance": {
+    "terminal": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01/observe01/terminal-status.json",
+      "bytes": 2019,
+      "sha256": "b67c89c00caa5168819bdf5adfeb124116a2a37d4f92b2f3931ee9a4ce7b8c84"
+    },
+    "capture_manifest": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/manifest.json",
+      "sha256": "f2d11985ae3c5c05a9f0449d29d0ffdc896ed7c0dbf43d319c83f801d860079b"
+    },
+    "independent_verification": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-terminal-independent-20261122/verification02.json",
+      "sha256": "6a1dbfe203c4ef66e00e6a6ae73bdcb64c78d2cc806998cfc6aaea1f4a1cc7b0"
+    },
+    "freeze_complete": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r8-freeze-complete.json",
+      "sha256": "09075ffd134c175155d9299b498ed9c1bbe0c2d635e463fc941f2fb50880b5c7"
+    },
+    "work_freeze": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r8-work.json",
+      "bytes": 2302805,
+      "sha256": "27dbc7e99783672633e23cb50091430cf6dfb91213427c769c2215f18f855a37"
+    },
+    "evidence_freeze": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/reservation-closures-20261122/r8-evidence.json",
+      "bytes": 36466,
+      "sha256": "e5af52fb91c1f93bbf01f23a40eae24cb0bc9d63b6b71fd2ac36d9648e99336c"
+    },
+    "freeze_pair_id": "e8a2a8d42ae27429ec1ab6a7a7fb72b2ab9bd0bc47131bec2d273080779d0884",
+    "old_monitor046_history": [
+      {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/provenance.tar.gz",
+          "bytes": 6545849,
+          "sha256": "29bd38a1e5ba939bcff11bf40b5df97b9fd3fdd511091e4f5c0c96b23ba19937"
+        },
+        "member": "files/0045/live-status.json",
+        "original": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/run-20261122T062351Z-3daedee66/live-status.json",
+          "bytes": 18989,
+          "sha256": "cb2802666739b14509537afda4fcb5449218d800fa16b4593cbc8c91c0fc4d26"
+        }
+      },
+      {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/provenance.tar.gz",
+          "bytes": 6545849,
+          "sha256": "29bd38a1e5ba939bcff11bf40b5df97b9fd3fdd511091e4f5c0c96b23ba19937"
+        },
+        "member": "files/0046/poll-046.json",
+        "original": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/run-20261122T062351Z-3daedee66/poll-046.json",
+          "bytes": 2016649,
+          "sha256": "2fdb4dd3091f07338eece4813bca290ec387d82e36f247d70ba426d521dec073"
+        }
+      }
+    ],
+    "repair_history_root": "/home/coyang/fpga-artifacts/context-resume/retained-borrow1792-monitor-recovery-20261122/preparation01",
+    "ROOT_native_qualification_session_sha256": "13eeb4ac85245e5b6f2f3f52c86a880638fff8127cc60bfd03b21718aed69fcf",
+    "ROOT_native_model_sha256": "61d1d3cb15edc62901782a174f783cad2de1c2a83af3751b9b58524ab82049cd"
+  },
+  "checkpoints": [
+    {
+      "stage": "synth",
+      "original": {
+        "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.dcp",
+        "bytes": 78040085,
+        "sha256": "3e676d7db0ba989e3725fb1ffa12bc1c73c774959ad19f6e0cd622fdcdc4320a"
+      },
+      "copy": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/synth.dcp",
+        "bytes": 78040085,
+        "sha256": "3e676d7db0ba989e3725fb1ffa12bc1c73c774959ad19f6e0cd622fdcdc4320a"
+      },
+      "routed_or_accepted": false
+    },
+    {
+      "stage": "optimized",
+      "original": {
+        "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/impl_1/black_parrot_bd_1_wrapper_opt.dcp",
+        "bytes": 22939192,
+        "sha256": "372d39092b8f7f71078812aed7e1704f8c16e557a3ff8af84cf5e06acf82d027"
+      },
+      "copy": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/optimized.dcp",
+        "bytes": 22939192,
+        "sha256": "372d39092b8f7f71078812aed7e1704f8c16e557a3ff8af84cf5e06acf82d027"
+      },
+      "routed_or_accepted": false
+    },
+    {
+      "stage": "impl-wrapper-not-routed",
+      "original": {
+        "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/impl_1/black_parrot_bd_1_wrapper.dcp",
+        "bytes": 23292982,
+        "sha256": "8c2cc311c1ae5332ca9b914fc6cb4e19e8ef55e7faa8b3ac4b4b1646b0e9823b"
+      },
+      "copy": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/impl-wrapper-not-routed.dcp",
+        "bytes": 23292982,
+        "sha256": "8c2cc311c1ae5332ca9b914fc6cb4e19e8ef55e7faa8b3ac4b4b1646b0e9823b"
+      },
+      "routed_or_accepted": false
+    }
+  ],
+  "freeze_accounting": {
+    "work": {
+      "actual_closed_logical_bytes": 308841441,
+      "actual_closed_allocated_bytes": 323502080,
+      "original_allocation_bytes": 2684354560,
+      "unused_allocation_released_bytes": 2360852480
+    },
+    "evidence": {
+      "actual_closed_logical_bytes": 260489788,
+      "actual_closed_allocated_bytes": 260763648,
+      "original_allocation_bytes": 402653184,
+      "unused_allocation_released_bytes": 141889536
+    },
+    "no_cleanup": true,
+    "original_caps_unchanged": true
+  },
+  "report_and_source_excerpts": {
+    "R8_synthesis_utilization": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/generated.tar.gz",
+          "bytes": 5059449,
+          "sha256": "c0c528f343b770d51854a5ffd407aa5c76e0fdf4f263b7a91d3e4a0e6f8068b9"
+        },
+        "member": "files/0028/black_parrot_bd_1_wrapper_utilization_synth.rpt",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper_utilization_synth.rpt",
+          "bytes": 9392,
+          "sha256": "f5c9ea32d916b9d3131d4fbeee2547f07895e3bed1c303e17223f7860510a74a"
+        }
+      },
+      "lines": [
+        {
+          "number": 34,
+          "text": "| Slice LUTs*                | 54001 |     0 |          0 |     53200 | 101.51 |"
+        },
+        {
+          "number": 35,
+          "text": "|   LUT as Logic             | 50520 |     0 |          0 |     53200 |  94.96 |"
+        },
+        {
+          "number": 36,
+          "text": "|   LUT as Memory            |  3481 |     0 |          0 |     17400 |  20.01 |"
+        },
+        {
+          "number": 39,
+          "text": "| Slice Registers            | 29859 |     0 |          0 |    106400 |  28.06 |"
+        },
+        {
+          "number": 75,
+          "text": "| Block RAM Tile    |  140 |     0 |          0 |       140 | 100.00 |"
+        },
+        {
+          "number": 76,
+          "text": "|   RAMB36/FIFO*    |  136 |     0 |          0 |       140 |  97.14 |"
+        },
+        {
+          "number": 78,
+          "text": "|   RAMB18          |    8 |     0 |          0 |       280 |   2.86 |"
+        },
+        {
+          "number": 90,
+          "text": "| DSPs           |   11 |     0 |          0 |       220 |  5.00 |"
+        }
+      ]
+    },
+    "R8_synthesis_time": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/generated.tar.gz",
+          "bytes": 5059449,
+          "sha256": "c0c528f343b770d51854a5ffd407aa5c76e0fdf4f263b7a91d3e4a0e6f8068b9"
+        },
+        "member": "files/0031/runme.log",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/runme.log",
+          "bytes": 567481,
+          "sha256": "8b632cc99c67764665fc2c8e6717724cb67fb599b1b2f1b489c76112efda8349"
+        }
+      },
+      "lines": [
+        {
+          "number": 3167,
+          "text": "synth_design completed successfully"
+        },
+        {
+          "number": 3168,
+          "text": "synth_design: Time (s): cpu = 02:05:25 ; elapsed = 01:26:11 . Memory (MB): peak = 7120.219 ; gain = 5756.828 ; free physical = 12488 ; free virtual = 98348"
+        }
+      ]
+    },
+    "R8_detail_placement": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/generated.tar.gz",
+          "bytes": 5059449,
+          "sha256": "c0c528f343b770d51854a5ffd407aa5c76e0fdf4f263b7a91d3e4a0e6f8068b9"
+        },
+        "member": "files/0021/runme.log",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/impl_1/runme.log",
+          "bytes": 29247,
+          "sha256": "48c568045254e3c3abf9bf594af6f1ac267b25e16dae43909601195ef1d8a5df"
+        }
+      },
+      "lines": [
+        {
+          "number": 392,
+          "text": "ERROR: [Place 30-487] The packing of instances into the device could not be obeyed. There are a total of 13300 slices in the device, of which 10988 slices are available, however, the unplaced instances require 11211 slices. Please analyze your design to determine if the number of LUTs, FFs, and/or control sets can be reduced."
+        },
+        {
+          "number": 393,
+          "text": ""
+        },
+        {
+          "number": 394,
+          "text": "Number of control sets and instances constrained to the design"
+        },
+        {
+          "number": 395,
+          "text": "\tControl sets: 1169"
+        },
+        {
+          "number": 396,
+          "text": "\tLuts: 56452 (combined) 65987 (total), available capacity: 53200 "
+        },
+        {
+          "number": 397,
+          "text": "\tFlip flops: 29863, available capacity: 106400"
+        }
+      ]
+    },
+    "R8_RAM_inference": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/generated.tar.gz",
+          "bytes": 5059449,
+          "sha256": "c0c528f343b770d51854a5ffd407aa5c76e0fdf4f263b7a91d3e4a0e6f8068b9"
+        },
+        "member": "files/0031/runme.log",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/runme.log",
+          "bytes": 567481,
+          "sha256": "8b632cc99c67764665fc2c8e6717724cb67fb599b1b2f1b489c76112efda8349"
+        }
+      },
+      "lines": [
+        {
+          "number": 2137,
+          "text": "|Module Name                                    | RTL Object                                                     | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | "
+        },
+        {
+          "number": 2198,
+          "text": "|\\fe/pc_gen                                     | bht_gen[0].bht_inst/bht_mem/ram/ram_reg                        | 512 x 8(READ_FIRST)    | W |   | 512 x 8(WRITE_FIRST)   |   | R | Port A and B     | 1      | 0      | "
+        },
+        {
+          "number": 2199,
+          "text": "|\\fe/pc_gen                                     | bht_gen[1].bht_inst/bht_mem/ram/ram_reg                        | 512 x 8(READ_FIRST)    | W |   | 512 x 8(WRITE_FIRST)   |   | R | Port A and B     | 1      | 0      | "
+        },
+        {
+          "number": 2209,
+          "text": "|\\retained_store.storage                        | lane_fsm[0].tag_mem_reg                                        | 1 K x 29(READ_FIRST)   | W | R |                        |   |   | Port A           | 0      | 2      | "
+        },
+        {
+          "number": 2210,
+          "text": "|\\retained_store.storage                        | lane_fsm[0].payload_mem_reg                                    | 14 K x 64(READ_FIRST)  | W | R |                        |   |   | Port A           | 2      | 25     | "
+        },
+        {
+          "number": 2211,
+          "text": "|\\retained_store.storage                        | lane_fsm[1].tag_mem_reg                                        | 1 K x 29(READ_FIRST)   | W | R |                        |   |   | Port A           | 0      | 2      | "
+        },
+        {
+          "number": 2212,
+          "text": "|\\retained_store.storage                        | lane_fsm[1].payload_mem_reg                                    | 14 K x 64(READ_FIRST)  | W |   | 14 K x 64(WRITE_FIRST) |   | R | Port A and B     | 2      | 25     | "
+        },
+        {
+          "number": 2213,
+          "text": "|bp_unicore_lite__GCB1                          | dcache_replay_ctrl/footprint_mem_reg                           | 128 x 34(READ_FIRST)   | W |   | 128 x 34(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | "
+        },
+        {
+          "number": 2214,
+          "text": "|bp_unicore_lite__GCB2                          | icache_replay_ctrl/prefix_mem_reg                              | 256 x 34(READ_FIRST)   | W |   | 256 x 34(WRITE_FIRST)  |   | R | Port A and B     | 1      | 0      | "
+        },
+        {
+          "number": 3124,
+          "text": "|21    |RAMB18E1   |     8|"
+        },
+        {
+          "number": 3125,
+          "text": "|27    |RAMB36E1   |   136|"
+        }
+      ]
+    },
+    "R7_RAM_inference": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/provenance.tar.gz",
+          "bytes": 6545849,
+          "sha256": "29bd38a1e5ba939bcff11bf40b5df97b9fd3fdd511091e4f5c0c96b23ba19937"
+        },
+        "member": "files/0189/runme.log",
+        "original": {
+          "path": "/run/user/1001/zp-linux-canonical-r7-20261121/zynq-parrot-fpga-20261122T003339Z-eb7d39013/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/runme.log",
+          "bytes": 562333,
+          "sha256": "71bda28d441224a99172a677c9abee922a44a295021cd7f2c97530a8c75ba256"
+        }
+      },
+      "lines": [
+        {
+          "number": 2156,
+          "text": "|Module Name                                    | RTL Object                                                     | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | "
+        },
+        {
+          "number": 2226,
+          "text": "|bp_core_minimal__GC0                           | gen_cache_miss_trace.icache_trace_mem_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | "
+        },
+        {
+          "number": 2227,
+          "text": "|bp_core_minimal__GC0                           | gen_cache_miss_trace.dcache_trace_mem_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | "
+        },
+        {
+          "number": 2228,
+          "text": "|\\retained_store.storage                        | lane_fsm[0].tag_mem_reg                                        | 1 K x 29(READ_FIRST)   | W | R |                        |   |   | Port A           | 0      | 2      | "
+        },
+        {
+          "number": 2229,
+          "text": "|\\retained_store.storage                        | lane_fsm[0].payload_mem_reg                                    | 14 K x 64(READ_FIRST)  | W | R |                        |   |   | Port A           | 2      | 25     | "
+        },
+        {
+          "number": 2230,
+          "text": "|\\retained_store.storage                        | lane_fsm[1].tag_mem_reg                                        | 1 K x 29(READ_FIRST)   | W | R |                        |   |   | Port A           | 0      | 2      | "
+        },
+        {
+          "number": 2231,
+          "text": "|\\retained_store.storage                        | lane_fsm[1].payload_mem_reg                                    | 14 K x 64(READ_FIRST)  | W |   | 14 K x 64(WRITE_FIRST) |   | R | Port A and B     | 2      | 25     | "
+        },
+        {
+          "number": 2249,
+          "text": "|black_parrot_bd_1_i/top_0/core_minimali_40/\\fe/pc_gen                                                                                                                         | bht_gen[0].bht_inst/bht_mem/ram/ram_reg                                                      | Implied        | 512 x 8              | RAM64M x 24   | "
+        },
+        {
+          "number": 2250,
+          "text": "|black_parrot_bd_1_i/top_0/core_minimali_40/\\fe/pc_gen                                                                                                                         | bht_gen[1].bht_inst/bht_mem/ram/ram_reg                                                      | Implied        | 512 x 8              | RAM64M x 24   | "
+        },
+        {
+          "number": 2267,
+          "text": "|black_parrot_bd_1_i/top_0                                                                                                                                                     | dcache_replay_ctrl/footprint_mem_reg                                                         | Implied        | 128 x 34             | RAM64M x 24   | "
+        },
+        {
+          "number": 2280,
+          "text": "|black_parrot_bd_1_i/top_0                                                                                                                                                     | icache_replay_ctrl/prefix_mem_reg                                                            | Implied        | 256 x 34             | RAM64M x 48   | "
+        },
+        {
+          "number": 3148,
+          "text": "|22    |RAMB18E1   |     4|"
+        },
+        {
+          "number": 3149,
+          "text": "|26    |RAMB36E1   |   138|"
+        }
+      ]
+    },
+    "R8_actual_synthesis_command": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/generated.tar.gz",
+          "bytes": 5059449,
+          "sha256": "c0c528f343b770d51854a5ffd407aa5c76e0fdf4f263b7a91d3e4a0e6f8068b9"
+        },
+        "member": "files/0036/black_parrot_bd_1_wrapper.tcl",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/vivado/black_parrot_bd_proj.runs/synth_1/black_parrot_bd_1_wrapper.tcl",
+          "bytes": 11728,
+          "sha256": "f555a75a5256e7a056dd27aeeaed26faf7bb9f8858d03b4b8ba7ae3d14a3a1d6"
+        }
+      },
+      "lines": [
+        {
+          "number": 80,
+          "text": "set_property verilog_define {BP_RETAINED_BUFFER=1 BP_RETAINED_I_LINES=1792 BP_RETAINED_D_LINES=1792 BP_RETAINED_SETS=256 BP_RETAINED_OBSERVE=1 BP_AXI_RESPONSE_DELAY=0 BP_CACHE_MISS_TRACE=0} [current_fileset]"
+        },
+        {
+          "number": 119,
+          "text": "synth_design -top black_parrot_bd_1_wrapper -part xc7z020clg400-1 -directive AreaOptimized_high -global_retiming on -control_set_opt_threshold 1"
+        }
+      ]
+    },
+    "R8_revision_record": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/provenance.tar.gz",
+          "bytes": 6545849,
+          "sha256": "29bd38a1e5ba939bcff11bf40b5df97b9fd3fdd511091e4f5c0c96b23ba19937"
+        },
+        "member": "files/0088/revisions.txt",
+        "original": {
+          "path": "/home/coyang/fpga-logs-linux-retained-borrow1792-trace0/20261122T062351Z-3daedee66/revisions.txt",
+          "bytes": 393,
+          "sha256": "bf8c2177516da2d44ca1560e2f81b4cf276fdbea95152c40e5a4220cf16c7834"
+        }
+      },
+      "lines": [
+        {
+          "number": 1,
+          "text": "top_commit=3daedee66a3c94014b4a666fea037b17cc9b0943"
+        },
+        {
+          "number": 2,
+          "text": "cfg=e_bp_unicore_zynqparrot_prefetch16k_cfg"
+        },
+        {
+          "number": 3,
+          "text": "vivado_threads=8"
+        },
+        {
+          "number": 4,
+          "text": "num_threads=<default>"
+        },
+        {
+          "number": 5,
+          "text": "num_contexts=<default>"
+        },
+        {
+          "number": 6,
+          "text": "aclk_mhz=20"
+        },
+        {
+          "number": 7,
+          "text": "sparse_source=1"
+        },
+        {
+          "number": 8,
+          "text": "cache_miss_trace=0"
+        },
+        {
+          "number": 9,
+          "text": "black_parrot_commit=bb575a764c200f07c6f3259a179bdc861dd7593f"
+        },
+        {
+          "number": 10,
+          "text": "basejump_commit=6cd7d830b732079ab7316c6288e2e819e3fab474"
+        },
+        {
+          "number": 11,
+          "text": "black_parrot_basejump_commit=3dff9f43af8e1bb850da0b41696514396fa0fa7e"
+        }
+      ]
+    },
+    "source_capacity_defaults": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/worker_sources.tar.gz",
+          "bytes": 11119096,
+          "sha256": "b6d35bf7bf9723991023fb4b799c19b65a082e1a10420ea8a5477a6c0c119ad0"
+        },
+        "member": "files/0095/Makefile.design",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/Makefile.design",
+          "bytes": 7017,
+          "sha256": "5e647fb8e8c96b3a175191d1e1853ea6ab18f8573dac3914d8df9c6e6f261af2"
+        }
+      },
+      "lines": [
+        {
+          "number": 60,
+          "text": "BP_RETAINED_BUFFER ?= 1"
+        },
+        {
+          "number": 61,
+          "text": "BP_RETAINED_I_LINES ?= 1792"
+        },
+        {
+          "number": 62,
+          "text": "BP_RETAINED_D_LINES ?= 1792"
+        },
+        {
+          "number": 63,
+          "text": "BP_RETAINED_SETS ?= 256"
+        },
+        {
+          "number": 71,
+          "text": "BP_CACHE_MISS_TRACE ?= 1"
+        },
+        {
+          "number": 86,
+          "text": "BP_RETAINED_OBSERVE ?= 1"
+        },
+        {
+          "number": 101,
+          "text": "BP_AXI_RESPONSE_DELAY ?= 0"
+        }
+      ]
+    },
+    "source_STATIC16KiB_L2": {
+      "reference": {
+        "archive": {
+          "path": "/home/coyang/zynq-parrot-linux-host-observer/research/borrow-fpga-cad-preparation-20261122/closed-terminal01/worker_sources.tar.gz",
+          "bytes": 11119096,
+          "sha256": "b6d35bf7bf9723991023fb4b799c19b65a082e1a10420ea8a5477a6c0c119ad0"
+        },
+        "member": "files/0103/bp_common_pkg.sv",
+        "original": {
+          "path": "/run/user/1001/zp-linux-borrow1792-trace0-cad-20261122-01/zynq-parrot-fpga-20261122T062351Z-3daedee66/cosim/black-parrot-example/v/bp_common_pkg.sv",
+          "bytes": 7955,
+          "sha256": "ec1e3c4802c66fea3b017932140c9642bda1ac3fc03fbdf60ef92428536965d7"
+        }
+      },
+      "lines": [
+        {
+          "number": 161,
+          "text": "  // Retention-capacity experiment for early Linux data previews.  Keep the"
+        },
+        {
+          "number": 162,
+          "text": "  // accepted four-context/four-slot endpoint unchanged except for growing"
+        },
+        {
+          "number": 163,
+          "text": "  // each two-way L2 bank from 16 to 64 sets (4 KiB to 16 KiB total)."
+        },
+        {
+          "number": 164,
+          "text": "  localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p ="
+        },
+        {
+          "number": 165,
+          "text": "    '{l2_sets: 64"
+        },
+        {
+          "number": 166,
+          "text": "      ,default: \"inv\""
+        },
+        {
+          "number": 167,
+          "text": "      };"
+        },
+        {
+          "number": 168,
+          "text": "  `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch16k_cfg_p"
+        },
+        {
+          "number": 169,
+          "text": "                        ,bp_unicore_zynqparrot_prefetch16k_cfg_override_p"
+        },
+        {
+          "number": 170,
+          "text": "                        ,bp_unicore_zynqparrot_prefetch_cfg_p"
+        }
+      ]
+    }
+  },
+  "curation_scope": "Selected durable HOME archive/report reads only; no full hash replay, source edits, DCP copies, RAM-target access, tools, native or cleanup. Prior ROOT verification/freeze remain authoritative.",
+  "limits": [
+    "No route/bitstream/physical fit or maximum-capacity conclusion",
+    "The223 remaining-slice gap is a placement-stage count, not a hard requiredLUT-saving target",
+    "Synthesis and placement resource totals are distinct stages; not summed",
+    "Configured retained payload is not proof of allslots uniquely resident or useful",
+    "No application timing/performance/benefit or Linux deployment claim"
+  ]
+}
