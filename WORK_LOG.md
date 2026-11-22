@@ -777,3 +777,9 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **GPR prototype first lint gate:** the isolated final-response borrowing candidate stops before compilation because `--Wall` rejects a `mem` namespace collision and two unused debug wires. Complete failed WORK, prototype/history and immutable helper/authorities are byte/mode/link verified under external `gpr-prefetch-borrow-component-20261122/failed01`; source checks pass and owned groups are gone. A separate successor may correct those connections without warning suppression; no simulation, inferred saving or production change is accepted.
+
+
+**Vendor Python launch isolated:** controls03 collects the exact preopt clock table, then stops before optimization because Tcl `exec python3` resolves Vivado's damaged bundled Python and its site module contains null bytes. Full failed WORK/source bytes are preserved in external `csr-post-synth-area-controls-20261122/preflight03`; controls04 pins `/usr/bin/env` and host Python3.8.10, unsets vendor Python/library environment and uses isolated mode without changing directives, clocks, policy or limits. ROOT separately verifies complete original/durable membership and closed groups for three finished probes, releasing only their576MiB RUN/24MiB HOME unused future growth; actual files/caps remain. Fresh controls04 starts18:51:37UTC under ROOT87183/admission947b6f59.
+
+
+**GPR harness width corrected separately:** successor02 passes strict HDL generation, then C++ rejects range-for initialization of generated `VL_INW(...127,0,4)`. Complete02 evidence is preserved in external `gpr-prefetch-borrow-component-20261122/failed02`; source03 changes only that initialization to four indexed32-bit stores and remains unexecuted pending runtime funding. No RTL behavior, test oracle, source-warning gate or hardware claim changes.
