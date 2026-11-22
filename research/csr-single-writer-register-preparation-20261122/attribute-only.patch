@@ -1,0 +1,11 @@
+--- store-ram.sv
++++ store-registers.sv
+@@ -10,7 +10,7 @@
+    ,output logic [contexts_p-1:0] valid_o
+    ,output logic read_valid_o
+    ,output logic [width_p-1:0] read_data_o);
+-  (* ram_style="distributed" *) logic [width_p-1:0] mem [0:contexts_p-1];
++  (* ram_style="registers" *) logic [width_p-1:0] mem [0:contexts_p-1];
+   logic [contexts_p-1:0] valid_r;
+   always_ff @(posedge clk_i)
+     if (!reset_i && write_v_i && int'(write_addr_i)<contexts_p)

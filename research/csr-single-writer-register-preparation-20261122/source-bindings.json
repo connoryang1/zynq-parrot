@@ -1,0 +1,103 @@
+{
+  "state": "SOURCE READ ONLY; exact committed producer/consumer, no source assembly",
+  "TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+  "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "sources": [
+    {
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "path": "bp_be/src/v/bp_be_csr_snapshot_store_production.sv",
+      "bytes": 1326,
+      "sha256": "e5a1518bd6a587157e73895c2e962dd467438e2c25565ea3223d2fb259e5f805"
+    },
+    {
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "path": "bp_be/src/v/bp_be_top.sv",
+      "bytes": 88043,
+      "sha256": "96915d9ea91370349975b758b862eddd031e8f44e961c224e69dddf5a115a79c"
+    },
+    {
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "path": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "bytes": 53492,
+      "sha256": "2a13acd2135c43e6ea00b8c3f9cb55d6ee70456c3935b334b4927f9cd4456d8d"
+    },
+    {
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "path": "bp_common/src/include/bp_common_rv64_csr_defines.svh",
+      "bytes": 69901,
+      "sha256": "171e4147c5f0a2a7b04f40757c9fe4a734764b0ac6b6794518e2b4d303239f36"
+    }
+  ],
+  "excerpts": [
+    {
+      "source": "bp_be/src/v/bp_be_csr_snapshot_store_production.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 1,
+      "end": 30,
+      "text": "// Experimental single-write inactive CSR store. Integration is not performed.\n// The bb575 producer proves save and seed mutually exclusive; both use one\n// common save-data wire. Preserve the qualification/owner logic outside RAM.\nmodule bp_be_csr_snapshot_store_production\n #(parameter int contexts_p=4, width_p=1666\n   , parameter int addr_width_p=(contexts_p>1)?$clog2(contexts_p):1)\n  (input logic clk_i, reset_i, write_v_i\n   ,input logic [addr_width_p-1:0] write_addr_i,read_addr_i\n   ,input logic [width_p-1:0] write_data_i\n   ,output logic [contexts_p-1:0] valid_o\n   ,output logic read_valid_o\n   ,output logic [width_p-1:0] read_data_o);\n  (* ram_style=\"distributed\" *) logic [width_p-1:0] mem [0:contexts_p-1];\n  logic [contexts_p-1:0] valid_r;\n  always_ff @(posedge clk_i)\n    if (!reset_i && write_v_i && int'(write_addr_i)<contexts_p)\n      mem[write_addr_i]<=write_data_i;\n  always_ff @(posedge clk_i) begin\n    if (reset_i)valid_r<='0;\n    else if (write_v_i && int'(write_addr_i)<contexts_p)valid_r[write_addr_i]<=1'b1;\n  end\n  assign valid_o=valid_r;\n  always_comb begin\n    read_valid_o=1'b0;read_data_o='0;\n    if (int'(read_addr_i)<contexts_p)begin\n      read_valid_o=valid_r[read_addr_i];\n      read_data_o=mem[read_addr_i]; // undefined while invalid; consumed only when valid\n    end\n  end\nendmodule\n"
+    },
+    {
+      "source": "bp_be/src/v/bp_be_top.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 355,
+      "end": 386,
+      "text": "  logic context_cache_fp_save_done_n_li, context_cache_fp_restore_done_n_li;\n  logic [csr_context_width_lp-1:0] csr_context_save_data_lo;\n  wire [thread_id_width_p-1:0] csr_context_save_physical_thread_id_li =\n    context_cache_commit_v_li\n    ? context_cache_victim_physical_thread_id_r\n    : pending_ctxtsw_sent_r ? pending_ctxtsw_prev_physical_thread_id_r : current_physical_thread_id_lo;\n  // Only inactive CSR snapshots move to the single-write store. The exact\n  // retirement decoder excludes simultaneous committed save and NPC seed.\n  wire [context_id_width_p-1:0] csr_snapshot_save_context_id_li =\n    context_cache_commit_v_li\n    ? context_cache_victim_virtual_context_id_r : current_virtual_context_id_r;\n  wire csr_snapshot_save_v_li = commit_pkt.ctxtsw\n    && (csr_snapshot_save_context_id_li < num_contexts_p);\n  wire csr_snapshot_seed_v_li = ctx_npc_write_v_lo\n    && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)\n    && (ctx_npc_write_rebind_lo\n        || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]);\n  bp_be_csr_snapshot_store_production\n   #(.contexts_p(num_contexts_p)\n     ,.width_p(csr_context_width_lp)\n     ,.addr_width_p(context_id_width_p))\n   csr_snapshot_store\n    (.clk_i(clk_i)\n     ,.reset_i(reset_i)\n     ,.write_v_i(csr_snapshot_save_v_li | csr_snapshot_seed_v_li)\n     ,.write_addr_i(csr_snapshot_seed_v_li\n                    ? ctx_npc_write_virtual_context_id_lo : csr_snapshot_save_context_id_li)\n     ,.read_addr_i(context_cache_target_virtual_context_id_r)\n     ,.write_data_i(csr_context_save_data_lo)\n     ,.valid_o(virtual_context_csr_valid_r)\n     ,.read_valid_o()\n     ,.read_data_o(virtual_context_csr_read_data_lo));\n"
+    },
+    {
+      "source": "bp_be/src/v/bp_be_top.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 390,
+      "end": 428,
+      "text": "  // when reseeded; a self-seed must not restore over its retiring instruction.\n  wire csr_context_cache_restore_v_li = context_cache_launch_v_li;\n  wire csr_context_resident_init_v_li = ctx_npc_write_resident_v_li\n    && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)\n    && (ctx_npc_write_physical_thread_id_li < num_threads_p)\n    && (ctx_npc_write_rebind_lo\n        || !virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo])\n    && (ctx_npc_write_physical_thread_id_li != csr_context_save_physical_thread_id_li);\n  wire csr_context_restore_v_li = csr_context_cache_restore_v_li | csr_context_resident_init_v_li;\n  // A committed NPC write to an initialized inactive resident bank changes\n  // its next trap PC without cloning the caller's architectural CSR image.\n  // Pending switches can separate active, retiring, and save-bank ownership;\n  // exclude all three so a self-seed cannot replace live retirement state.\n  wire rpc_target_apc_write_v_li = commit_pkt.ctxtsw\n    && pending_rpc_call_v_r\n    && (pending_ctxtsw_physical_thread_id_r < num_threads_p);\n  wire csr_context_apc_write_v_li = rpc_target_apc_write_v_li\n    || (ctx_npc_write_resident_v_li\n    && (ctx_npc_write_virtual_context_id_lo < num_contexts_p)\n    && (ctx_npc_write_physical_thread_id_li < num_threads_p)\n    && virtual_context_csr_valid_r[ctx_npc_write_virtual_context_id_lo]\n    && !ctx_npc_write_rebind_lo\n    && (ctx_npc_write_physical_thread_id_li != current_physical_thread_id_lo)\n    && (ctx_npc_write_physical_thread_id_li != retire_thread_id_lo)\n    && (ctx_npc_write_physical_thread_id_li != csr_context_save_physical_thread_id_li)\n    && !csr_context_restore_v_li);\n  wire [thread_id_width_p-1:0] csr_context_restore_physical_thread_id_li =\n    csr_context_cache_restore_v_li ? context_cache_victim_physical_thread_id_r\n    : rpc_target_apc_write_v_li ? pending_ctxtsw_physical_thread_id_r\n    : ctx_npc_write_physical_thread_id_li;\n  wire csr_context_restore_reset_li =\n    csr_context_cache_restore_v_li\n    & ~virtual_context_csr_valid_r[context_cache_target_virtual_context_id_r];\n  wire [csr_context_width_lp-1:0] csr_context_restore_data_li =\n    csr_context_cache_restore_v_li\n    ? virtual_context_csr_read_data_lo\n    : csr_context_save_data_lo;\n  wire [vaddr_width_p-1:0] csr_context_restore_npc_li =\n    csr_context_cache_restore_v_li\n"
+    },
+    {
+      "source": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 157,
+      "end": 185,
+      "text": "  typedef struct packed {\n    logic [dword_width_gp-1:0] dcsr;\n    logic [dword_width_gp-1:0] dpc;\n    logic [dword_width_gp-1:0] dscratch0;\n    logic [dword_width_gp-1:0] dscratch1;\n    logic [dword_width_gp-1:0] mstatus;\n    logic [dword_width_gp-1:0] medeleg;\n    logic [dword_width_gp-1:0] mideleg;\n    logic [dword_width_gp-1:0] mie;\n    logic [dword_width_gp-1:0] mtvec;\n    logic [dword_width_gp-1:0] mcounteren;\n    logic [dword_width_gp-1:0] mscratch;\n    logic [dword_width_gp-1:0] mepc;\n    logic [dword_width_gp-1:0] mcause;\n    logic [dword_width_gp-1:0] mtval;\n    logic [dword_width_gp-1:0] mip;\n    logic [dword_width_gp-1:0] mcycle;\n    logic [dword_width_gp-1:0] minstret;\n    logic [dword_width_gp-1:0] mcountinhibit;\n    logic [dword_width_gp-1:0] stvec;\n    logic [dword_width_gp-1:0] scounteren;\n    logic [dword_width_gp-1:0] sscratch;\n    logic [dword_width_gp-1:0] sepc;\n    logic [dword_width_gp-1:0] scause;\n    logic [dword_width_gp-1:0] stval;\n    logic [dword_width_gp-1:0] satp;\n    logic [dword_width_gp-1:0] fcsr;\n    logic [rv64_priv_width_gp-1:0] priv_mode;\n  } bp_be_csr_context_s;\n"
+    },
+    {
+      "source": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 280,
+      "end": 309,
+      "text": "  assign csr_context_save =\n    '{dcsr: dword_width_gp'(dcsr_lo)\n      ,dpc: dword_width_gp'(dpc_lo)\n      ,dscratch0: dword_width_gp'(dscratch0_lo)\n      ,dscratch1: dword_width_gp'(dscratch1_lo)\n      ,mstatus: dword_width_gp'(mstatus_lo)\n      ,medeleg: dword_width_gp'(medeleg_lo)\n      ,mideleg: dword_width_gp'(mideleg_lo)\n      ,mie: dword_width_gp'(mie_lo)\n      ,mtvec: dword_width_gp'(mtvec_lo)\n      ,mcounteren: dword_width_gp'(mcounteren_lo)\n      ,mscratch: dword_width_gp'(mscratch_lo)\n      ,mepc: dword_width_gp'(mepc_lo)\n      ,mcause: dword_width_gp'(mcause_lo)\n      ,mtval: dword_width_gp'(mtval_lo)\n      ,mip: dword_width_gp'(mip_lo)\n      ,mcycle: dword_width_gp'(mcycle_lo)\n      ,minstret: dword_width_gp'(minstret_lo)\n      ,mcountinhibit: dword_width_gp'(mcountinhibit_lo)\n      ,stvec: dword_width_gp'(stvec_lo)\n      ,scounteren: dword_width_gp'(scounteren_lo)\n      ,sscratch: dword_width_gp'(sscratch_lo)\n      ,sepc: dword_width_gp'(sepc_lo)\n      ,scause: dword_width_gp'(scause_lo)\n      ,stval: dword_width_gp'(stval_lo)\n      ,satp: dword_width_gp'(satp_lo)\n      ,fcsr: dword_width_gp'(fcsr_lo)\n      ,priv_mode: priv_mode_r\n      };\n  assign csr_context_save_data_o = csr_context_save;\n"
+    },
+    {
+      "source": "bp_be/src/v/bp_be_calculator/bp_be_csr.sv",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 864,
+      "end": 930,
+      "text": "      if (csr_context_restore_v_i) begin\n        if (csr_context_restore_reset_i) begin\n          priv_mode_n = `PRIV_MODE_M;\n          fcsr_li = '0;\n\n          stvec_li = '0;\n          scounteren_li = '0;\n          sscratch_li = '0;\n          sepc_li = '0;\n          scause_li = '0;\n          stval_li = '0;\n          satp_li = '0;\n\n          mstatus_li = '0;\n          medeleg_li = '0;\n          mideleg_li = '0;\n          mie_li = '0;\n          mtvec_li = '0;\n          mcounteren_li = '0;\n          mscratch_li = '0;\n          mepc_li = '0;\n          mcause_li = '0;\n          mtval_li = '0;\n          mip_li = '0;\n          mcycle_li = '0;\n          minstret_li = '0;\n          mcountinhibit_li = '0;\n\n          dcsr_li = '0;\n          dpc_li = '0;\n          dscratch0_li = '0;\n          dscratch1_li = '0;\n        end else begin\n          priv_mode_n = csr_context_restore.priv_mode;\n          fcsr_li = csr_context_restore.fcsr;\n\n          stvec_li = csr_context_restore.stvec;\n          scounteren_li = csr_context_restore.scounteren;\n          sscratch_li = csr_context_restore.sscratch;\n          sepc_li = csr_context_restore.sepc;\n          scause_li = csr_context_restore.scause;\n          stval_li = csr_context_restore.stval;\n          satp_li = csr_context_restore.satp;\n\n          mstatus_li = csr_context_restore.mstatus;\n          medeleg_li = csr_context_restore.medeleg;\n          mideleg_li = csr_context_restore.mideleg;\n          mie_li = csr_context_restore.mie;\n          mtvec_li = csr_context_restore.mtvec;\n          mcounteren_li = csr_context_restore.mcounteren;\n          mscratch_li = csr_context_restore.mscratch;\n          mepc_li = csr_context_restore.mepc;\n          mcause_li = csr_context_restore.mcause;\n          mtval_li = csr_context_restore.mtval;\n          mip_li = csr_context_restore.mip;\n          mcycle_li = csr_context_restore.mcycle;\n          minstret_li = csr_context_restore.minstret;\n          mcountinhibit_li = csr_context_restore.mcountinhibit;\n\n          dcsr_li = csr_context_restore.dcsr;\n          dpc_li = csr_context_restore.dpc;\n          dscratch0_li = csr_context_restore.dscratch0;\n          dscratch1_li = csr_context_restore.dscratch1;\n        end\n      end\n\n      satp_li.asid = satp_li.asid & satp_asid_mask_lp;\n"
+    },
+    {
+      "source": "bp_common/src/include/bp_common_rv64_csr_defines.svh",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 775,
+      "end": 817,
+      "text": "  `define compress_satp_s(data_cast_mp, vaddr_width_mp, paddr_width_mp) \\\n    '{mode: data_cast_mp.mode[3]   \\\n      ,asid: data_cast_mp.asid     \\\n      ,ppn: data_cast_mp.ppn[(paddr_width_mp-page_offset_width_gp)-1:0] \\\n      }\n\n  `define decompress_satp_s(data_comp_mp) \\\n    '{mode: {data_comp_mp.mode, 3'b000} \\\n      ,asid: data_comp_mp.asid           \\\n      ,ppn: {16'h0, data_comp_mp.ppn}   \\\n      }\n\n  `define compress_mstatus_s(data_cast_mp, vaddr_width_mp, paddr_width_mp) \\\n    '{tsr  : data_cast_mp.tsr  \\\n      ,tw  : data_cast_mp.tw   \\\n      ,tvm : data_cast_mp.tvm  \\\n      ,mxr : data_cast_mp.mxr  \\\n      ,sum : data_cast_mp.sum  \\\n      ,mprv: data_cast_mp.mprv \\\n      ,fs  : data_cast_mp.fs   \\\n      ,mpp : data_cast_mp.mpp  \\\n      ,spp : data_cast_mp.spp  \\\n      ,mpie: data_cast_mp.mpie \\\n      ,spie: data_cast_mp.spie \\\n      ,mie : data_cast_mp.mie  \\\n      ,sie : data_cast_mp.sie  \\\n      }\n\n  `define decompress_mstatus_s(data_comp_mp) \\\n    '{sd   : (data_comp_mp.fs == 2'b11) \\\n      ,sxl : 2'b10             \\\n      ,uxl : 2'b10             \\\n      ,tsr : data_comp_mp.tsr  \\\n      ,tvm : data_comp_mp.tvm  \\\n      ,tw  : data_comp_mp.tw   \\\n      ,mxr : data_comp_mp.mxr  \\\n      ,sum : data_comp_mp.sum  \\\n      ,mprv: data_comp_mp.mprv \\\n      ,fs  : data_comp_mp.fs   \\\n      ,mpp : data_comp_mp.mpp  \\\n      ,spp : data_comp_mp.spp  \\\n      ,mpie: data_comp_mp.mpie \\\n      ,spie: data_comp_mp.spie \\\n"
+    },
+    {
+      "source": "bp_common/src/include/bp_common_rv64_csr_defines.svh",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 875,
+      "end": 881,
+      "text": "  `define compress_mtvec_s(data_cast_mp, vaddr_width_mp, paddr_width_mp) \\\n    '{word_addr: data_cast_mp.base[0+:`BSG_MAX(vaddr_width_mp, paddr_width_mp)-2]}\n\n  `define decompress_mtvec_s(data_comp_mp) \\\n    '{base : `BSG_SIGN_EXTEND(data_comp_mp.word_addr, 62) \\\n      ,mode: 2'b00                                \\\n      }\n"
+    },
+    {
+      "source": "bp_common/src/include/bp_common_rv64_csr_defines.svh",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 971,
+      "end": 985,
+      "text": "  `define compress_mcause_s(data_cast_mp, vaddr_width_mp, paddr_width_mp) \\\n    '{_interrupt: data_cast_mp._interrupt \\\n      ,ecode: data_cast_mp.ecode[0+:4]  \\\n      }\n\n  `define decompress_mcause_s(data_comp_mp) \\\n    '{_interrupt: data_comp_mp._interrupt \\\n      ,ecode: 63'(data_comp_mp.ecode)   \\\n      }\n\n  `define compress_mcounter_s(data_cast_mp, vaddr_width_mp, paddr_width_mp) \\\n    bp_mcounter_s'(data_cast_mp[0+:48])\n\n  `define decompress_mcounter_s(data_comp_mp) \\\n    rv64_mcounter_s'(data_comp_mp)\n"
+    },
+    {
+      "source": "bp_common/src/include/bp_common_rv64_csr_defines.svh",
+      "commit": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "start": 1060,
+      "end": 1073,
+      "text": "  `define declare_csr_addr(csr_name_mp, vaddr_width_mp, paddr_width_mp)                           \\\n    /* verilator lint_off UNUSED */                                                               \\\n    rv64_``csr_name_mp``_s ``csr_name_mp``_li, ``csr_name_mp``_lo;                                \\\n    bp_``csr_name_mp``_s ``csr_name_mp``_n, ``csr_name_mp``_r;                                    \\\n    bsg_dff_reset                                                                                 \\\n     #(.width_p($bits(bp_``csr_name_mp``_s)))                                                     \\\n    ``csr_name_mp``_reg                                                                           \\\n      (.clk_i(clk_i), .reset_i(reset_i), .data_i(``csr_name_mp``_n), .data_o(``csr_name_mp``_r)); \\\n    assign ``csr_name_mp``_lo = `decompress_``csr_name_mp``_s(``csr_name_mp``_r);                 \\\n    assign ``csr_name_mp``_n  = `compress_``csr_name_mp``_s(``csr_name_mp``_li, vaddr_width_mp, paddr_width_mp)\n    /* verilator lint_on UNUSED */\n\n  `define declare_csr(csr_name_mp) \\\n    `declare_csr_addr(csr_name_mp, 0, 0)\n"
+    }
+  ]
+}

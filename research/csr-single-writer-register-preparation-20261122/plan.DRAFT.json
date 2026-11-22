@@ -1,0 +1,229 @@
+{
+  "schema": "csr-single-writer-register-counterfactual-preparation-v1",
+  "state": "SOURCE ONLY UNEXECUTED; all ROOT execution gates pending",
+  "launchable": false,
+  "TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+  "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "candidate": {
+    "baseline": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/store-ram.sv",
+      "bytes": 1326,
+      "sha256": "e5a1518bd6a587157e73895c2e962dd467438e2c25565ea3223d2fb259e5f805"
+    },
+    "candidate": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/store-registers.sv",
+      "bytes": 1324,
+      "sha256": "17d7b4c69cf4e69f2f94d758684aea3c0cd9657a6c1f79c872e8acdf5e8b3e9e"
+    },
+    "only_change": "one distributed\u2192registers ram_style attribute token",
+    "source_construction_exact_inverse": true,
+    "behavior_write_gate_read_reset_valid_unchanged": true,
+    "nonsemantic_attribute_not_realization_proof": true
+  },
+  "integrated_producer_consumer": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/source-bindings.json",
+    "bytes": 16873,
+    "sha256": "ba24d1039af71e239124b42a066c52491eeb7dd43fa13cf55bd33463a60d200c"
+  },
+  "primary": {
+    "state": "BLOCKED missing qualified actual256 specialization",
+    "route": "one read-only exact current synthesized-DCP query after complete CAD archive/paired freeze",
+    "query_source": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/query-specialization.tcl",
+      "bytes": 3556,
+      "sha256": "7c01fd14e448e874dd8eab290df026f419bd803af12a589e8aba070ca0e53852"
+    },
+    "actual_DCP": null,
+    "actual_DCP_sha256": null,
+    "ROOT_full_CAD_archive_and_freeze": null,
+    "required_acquisition": [
+      "actual TOPa44/BP1e7/source/clock bound synthesized DCP, no phase substitution",
+      "exact csr_snapshot_store hierarchy or refuse flattened boundary",
+      "actual input/qualifier pin/net/driver identities and constants",
+      "all1666 write/read port positions exposed or explicitly unclassified if absent",
+      "actual shared dynamic nets/aliases and consumer destinations with mapped+source proof",
+      "same actual producer/consumer wrapper/constants for both arms; no assumed all1666-bit liveness"
+    ],
+    "alternate": "instantiate real bp_be_csr banks and literal current top save/reseed/read/valid/reset connections with actual compiledCFG packages; no guessed types/widths/constants",
+    "projection": null,
+    "projection_proof": null,
+    "actual_compiled_cfg_dimensions": null,
+    "missing_bit_means_zero": false,
+    "no_synthesis_or_DCP_mutation_in_query": true
+  },
+  "secondary": {
+    "state": "UNEXECUTED controlled all-variable consumer; never primary",
+    "arms": [
+      "ram",
+      "registers"
+    ],
+    "source": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/secondary-wrapper.sv",
+      "bytes": 3182,
+      "sha256": "e9481a6248e114dd520bf35a960695746504eed3417de2a32a443a9d9f3a5959"
+    },
+    "same_as_old_source": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation05/wrapper.sv",
+      "bytes": 3182,
+      "sha256": "e9481a6248e114dd520bf35a960695746504eed3417de2a32a443a9d9f3a5959"
+    },
+    "recipe": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/probe-secondary.tcl",
+      "bytes": 7148,
+      "sha256": "ae1d683d8ef5521679abc62082902b6683f7ac83a0fbabe47ae65ff4874e80ac"
+    },
+    "clock": {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr-single-writer-register-preparation-20261122/clock.xdc",
+      "bytes": 249,
+      "sha256": "cc662e2e34d4003ab664a6dcc8f115e8a3b8403181919d2119c6677a1c580fbc"
+    },
+    "settings": {
+      "top": "csr_snapshot_consumer_wrapper",
+      "device": "xc7z020clg400-1",
+      "Vivado": "2024.2",
+      "max_threads": 2,
+      "contexts": 4,
+      "image_bits": 1666,
+      "producer_gates": "exact complementary T/notT same current owner",
+      "data": "common save-bank-selected wire",
+      "read_ports": 1,
+      "valid_vector_bits": 4,
+      "clock_period_ns": 50,
+      "clock_waveform_ns": [
+        0,
+        25
+      ],
+      "input_output_delay_ns": 0,
+      "synthesis_directive": "AreaOptimized_high",
+      "global_retiming": "on",
+      "control_set_opt_threshold": 1,
+      "out_of_context": true,
+      "implementation_or_route": false,
+      "consumer": "exact cache/resident restore selection and reset-priority full-image envelope"
+    },
+    "exact_old_recipe": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation05/probe.tcl",
+      "bytes": 5971,
+      "sha256": "8194d9482827b19c275a3e9661c6639771723a249abfaaafa524aa311cdb16ec"
+    },
+    "fresh_ROOT_admission": null,
+    "execution_worker_pending": true,
+    "FF_realization_required": {
+      "no_RAM_or_SRL_storage": true,
+      "no_BRAM_or_DSP": true,
+      "actual_data_FF_present": true,
+      "no_saving_inferred": true
+    },
+    "required_reports": [
+      "all payload port/driver identities",
+      "primitive/storage/REF properties",
+      "actual logic_LUT/LUTRAM/FF/control sets",
+      "utilization and timing with50ns clock",
+      "same physical packing recipe/slices/timing for both arms if mapped comparison justifies it",
+      "source-end/ownedgroup/globalforeign closure",
+      "functional netlist and DCP"
+    ]
+  },
+  "correctness": {
+    "state": "PENDING exact new mapped netlist",
+    "miter": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-mapped-functional-20261122/preparation03/miter.sv",
+      "bytes": 8116,
+      "sha256": "6cc41b1e970992c568d171f0ba0262e3bf99d8d88abcb96e05fcfdac2c9d4d0d"
+    },
+    "reference": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-mapped-functional-20261122/preparation03/reference.sv",
+      "bytes": 1463,
+      "sha256": "dd160991c9f064b532cdf8ab909d3785c29caa2aec87147b4bee6441f5abe48e"
+    },
+    "reference_wrapper": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-mapped-functional-20261122/preparation03/reference-wrapper.sv",
+      "bytes": 3203,
+      "sha256": "f6950a76e320dbcea7b5becdbdce7605c9d9af7d7154c1a2416dae465563d328"
+    },
+    "prior_actual_full_mapped_closure": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-mapped-functional-20261122/full05-closed/manifest.json",
+      "bytes": 25938,
+      "sha256": "f2c1aa92f01c80eeede3507feb9bede2723829b50872393008cb7079bf0bfb6b"
+    },
+    "expected_counts": {
+      "checks": 705712,
+      "cycles": 22054,
+      "raw_combinations": 8192,
+      "walk_writes": 13328
+    },
+    "negative": "full1666 payload bit1665 must be detected at exact consumer boundary",
+    "no_prior_mapped_PASS_transfer": true,
+    "clock_readwrite_reset_owner_semantics_unchanged": true
+  },
+  "resource_and_admission": {
+    "ROOT_release": null,
+    "current_OTHER_and_source_end_freeze_required": true,
+    "no_agent_tool_runs": true,
+    "source_packet_cap_bytes": 65536,
+    "mapping_recipe_previous_bounds": {
+      "per_arm_native_seconds": 580,
+      "per_arm_parent_seconds": 600,
+      "batch_seconds": 650,
+      "shared_component_stage_bytes": 67108864,
+      "new_HOME_source_durable_bytes": 8388608,
+      "HOME_floor_bytes": 2684354560,
+      "RAM_floor_bytes": 536870912,
+      "attempts_per_arm": 1,
+      "retries": 0,
+      "extensions": 0
+    },
+    "bounds_status": "previous bounds provenance only; new query/pair/mapped runtime must be prospectively ROOT-priced, no automatic allocation/extension/retry"
+  },
+  "current_whole_results_reported_by_ROOT_not_independently_reextracted": {
+    "placement": "FAIL",
+    "required_slices": 10995,
+    "available_slices": 10873,
+    "deficit": 122,
+    "control_sets": 1153,
+    "LUT": 54072,
+    "logic_LUT": 50099,
+    "memory_LUT": 3973,
+    "FF": 26901,
+    "BRAM_tiles": 93.5,
+    "DSP": 11,
+    "old_logic_LUT": 50085,
+    "old_memory_LUT": 3429,
+    "old_FF": 29798,
+    "old_deficit": 166
+  },
+  "prior_mapped_component": {
+    "unmasked_closure": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/closed05/manifest.json",
+      "bytes": 6604,
+      "sha256": "2ed7df458f1be2da9033a41da2d0a294047f56054b0b9183ac8d73bfd4020a85"
+    },
+    "unmasked_resources": {
+      "LUT": 4459,
+      "logic_LUT": 3347,
+      "LUTRAM": 1112,
+      "SRL": 0,
+      "FF": 4,
+      "RAMB36": 0,
+      "RAMB18": 0,
+      "DSP": 0
+    },
+    "combining_localization": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-snapshot-production-mapping-20261122/preparation05/actual04-localization.json",
+      "bytes": 2848,
+      "sha256": "86950d58c93bee7437c9f28604e6d384022ee7dd5179852b6653d67fdc849105"
+    },
+    "scope": "generic allvariable consumer; not additive wholeCPU headroom"
+  },
+  "progression": [
+    "attribute-only source proof",
+    "actual intended FF realization + complete mapped consumer/owner/negative correctness",
+    "primary actual-specialization paired mapped resource/physicalpacking/timing evidence",
+    "fresh fullcore/CSR/privilege/IRQ/RPC+all256 payload only if component evidence justifies it",
+    "separate clean whole-device routed gate only after actual correctness/resource admission"
+  ],
+  "no_BRAm_or_multicycle_variant": true,
+  "no_capacity_or_geometry_change": true,
+  "no_source_or_production_admission_changed": true,
+  "no_measured_saving_or_122slice_recovery_claim": true
+}
