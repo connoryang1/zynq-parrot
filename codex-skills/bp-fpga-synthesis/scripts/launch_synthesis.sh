@@ -31,6 +31,11 @@ fpga_num_contexts=${FPGA_NUM_CONTEXTS:-}
 fpga_aclk_mhz=${FPGA_ACLK_MHZ:-}
 fpga_sparse_source=${FPGA_SPARSE_SOURCE:-0}
 fpga_cache_miss_trace=${FPGA_CACHE_MISS_TRACE:-}
+fpga_opt_directive=${FPGA_OPT_DIRECTIVE:-Explore}
+case "$fpga_opt_directive" in
+  Explore|ExploreArea|ExploreSequentialArea) ;;
+  *) echo "FPGA_OPT_DIRECTIVE must be Explore, ExploreArea or ExploreSequentialArea." >&2; exit 2 ;;
+esac
 
 if [[ -n "$fpga_cache_miss_trace" && "$fpga_cache_miss_trace" != 0 && "$fpga_cache_miss_trace" != 1 ]]; then
   echo "FPGA_CACHE_MISS_TRACE must be unset, 0 or 1." >&2
@@ -63,6 +68,7 @@ export FPGA_NUM_CONTEXTS="$fpga_num_contexts"
 export FPGA_ACLK_MHZ="$fpga_aclk_mhz"
 export FPGA_SPARSE_SOURCE="$fpga_sparse_source"
 export FPGA_CACHE_MISS_TRACE="$fpga_cache_miss_trace"
+export FPGA_OPT_DIRECTIVE="$fpga_opt_directive"
 
 shell_quote() {
   # tmux 3.0 accepts a shell-command string. POSIX single quotes preserve even
@@ -72,7 +78,7 @@ shell_quote() {
 
 usage() {
   echo "usage: $0 start | list | status <job-id> | recheck <job-id> | worker <job-id> <commit>"
-  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, FPGA_SPARSE_SOURCE, FPGA_CACHE_MISS_TRACE, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
+  echo "optional environment: FPGA_CFG, FPGA_VIVADO_THREADS, FPGA_NUM_THREADS, FPGA_NUM_CONTEXTS, FPGA_ACLK_MHZ, FPGA_SPARSE_SOURCE, FPGA_CACHE_MISS_TRACE, FPGA_OPT_DIRECTIVE, ZP_FPGA_SEED_REPO_DIR, ZP_FPGA_WORK_ROOT"
 }
 
 case ${1:-} in
@@ -121,6 +127,7 @@ case ${1:-} in
       "FPGA_ACLK_MHZ=$fpga_aclk_mhz"
       "FPGA_SPARSE_SOURCE=$fpga_sparse_source"
       "FPGA_CACHE_MISS_TRACE=$fpga_cache_miss_trace"
+      "FPGA_OPT_DIRECTIVE=$fpga_opt_directive"
       "$script_dir/launch_synthesis.sh" worker "$job_id" "$commit"
     )
     worker_command="trap '' HUP; exec"
@@ -156,6 +163,7 @@ case ${1:-} in
       >>"$job_dir/revisions.txt"
     printf 'sparse_source=%s\n' "$fpga_sparse_source" >>"$job_dir/revisions.txt"
     printf 'cache_miss_trace=%s\n' "${fpga_cache_miss_trace:-default}" >>"$job_dir/revisions.txt"
+    printf 'opt_directive=%s\n' "$fpga_opt_directive" >>"$job_dir/revisions.txt"
     if [[ "$fpga_sparse_source" == 1 ]]; then
       git -C "$repo_dir" worktree add --detach --no-checkout "$worktree" "$commit"
       # Historical evidence archives are tracked but are not FPGA build inputs.
@@ -256,13 +264,14 @@ case ${1:-} in
       "VIVADO_MODE=batch"
       "CFG=$fpga_cfg"
       "THREADS=$fpga_threads"
+      "IMPL_OPT_DIRECTIVE=$fpga_opt_directive"
       "VIVADO_RUN=$script_dir/run_vivado_2024_2.sh"
       "ZP_INSTALL_DIR=$repo_dir/install"
       "ZP_RISCV_DIR=$repo_dir/riscv"
     )
     # Only the explicit launcher setting controls this profile. An old tmux
     # server may retain a direct Make variable from an unrelated invocation.
-    unset BP_CACHE_MISS_TRACE
+    unset BP_CACHE_MISS_TRACE IMPL_OPT_DIRECTIVE
     if [[ -n "$fpga_num_threads" ]]; then
       build_args+=("NUM_THREADS=$fpga_num_threads" "NUM_CONTEXTS=$fpga_num_contexts")
     fi
