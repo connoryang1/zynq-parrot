@@ -1,0 +1,328 @@
+{
+  "state": "PASS host-only option plumbing; no vendor or hardware qualification",
+  "commands": [
+    {
+      "label": "unit",
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_opt_checks"
+      ],
+      "expected": 0,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "-B",
+          "-m",
+          "unittest",
+          "-v",
+          "test_opt_checks"
+        ],
+        "owned_pgid": 1547062,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 20,
+        "teardown_s": 5,
+        "elapsed_s": 0.21347673202399164
+      }
+    },
+    {
+      "label": "tcl-mock",
+      "argv": [
+        "tclsh",
+        "/home/coyang/zynq-parrot-linux-capacity/research/csr-opt-selector-integration-20261122/test_impl_mock.tcl",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/tcl/vivado-utils.tcl"
+      ],
+      "expected": 0,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "tclsh",
+          "/home/coyang/zynq-parrot-linux-capacity/research/csr-opt-selector-integration-20261122/test_impl_mock.tcl",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/tcl/vivado-utils.tcl"
+        ],
+        "owned_pgid": 1547063,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 20,
+        "teardown_s": 5,
+        "elapsed_s": 0.09474671503994614
+      }
+    },
+    {
+      "label": "selected",
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+        "ECHO=echo",
+        "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/selected.tcl",
+        "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+        "BITSTREAM_FILES=unused.bit",
+        "COMPONENT_FILES=unused/component.xml",
+        "THREADS=8",
+        "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+        "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+        "IMPL_OPT_DIRECTIVE=ExploreArea",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/selected.tcl"
+      ],
+      "expected": 0,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "--no-print-directory",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+          "ECHO=echo",
+          "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/selected.tcl",
+          "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+          "BITSTREAM_FILES=unused.bit",
+          "COMPONENT_FILES=unused/component.xml",
+          "THREADS=8",
+          "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+          "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+          "IMPL_OPT_DIRECTIVE=ExploreArea",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/selected.tcl"
+        ],
+        "owned_pgid": 1547064,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 20,
+        "teardown_s": 5,
+        "elapsed_s": 0.11352111294399947
+      }
+    },
+    {
+      "label": "default",
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+        "ECHO=echo",
+        "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/default.tcl",
+        "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+        "BITSTREAM_FILES=unused.bit",
+        "COMPONENT_FILES=unused/component.xml",
+        "THREADS=8",
+        "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+        "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/default.tcl"
+      ],
+      "expected": 0,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "--no-print-directory",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+          "ECHO=echo",
+          "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/default.tcl",
+          "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+          "BITSTREAM_FILES=unused.bit",
+          "COMPONENT_FILES=unused/component.xml",
+          "THREADS=8",
+          "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+          "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/default.tcl"
+        ],
+        "owned_pgid": 1547074,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 20,
+        "teardown_s": 5,
+        "elapsed_s": 0.11241395503748208
+      }
+    },
+    {
+      "label": "invalid",
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+        "ECHO=echo",
+        "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/invalid.tcl",
+        "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+        "BITSTREAM_FILES=unused.bit",
+        "COMPONENT_FILES=unused/component.xml",
+        "THREADS=8",
+        "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+        "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+        "IMPL_OPT_DIRECTIVE=invalid",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/invalid.tcl"
+      ],
+      "expected": 2,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "--no-print-directory",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+          "ECHO=echo",
+          "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/invalid.tcl",
+          "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+          "BITSTREAM_FILES=unused.bit",
+          "COMPONENT_FILES=unused/component.xml",
+          "THREADS=8",
+          "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+          "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+          "IMPL_OPT_DIRECTIVE=invalid",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/invalid.tcl"
+        ],
+        "owned_pgid": 1547084,
+        "returncode": 2,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 20,
+        "teardown_s": 5,
+        "elapsed_s": 0.09846851206384599
+      }
+    },
+    {
+      "label": "multiword",
+      "argv": [
+        "make",
+        "--no-print-directory",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+        "ECHO=echo",
+        "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/multiword.tcl",
+        "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+        "BITSTREAM_FILES=unused.bit",
+        "COMPONENT_FILES=unused/component.xml",
+        "THREADS=8",
+        "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+        "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+        "IMPL_OPT_DIRECTIVE=ExploreArea Explore",
+        "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/multiword.tcl"
+      ],
+      "expected": 2,
+      "owned": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "--no-print-directory",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/source/cosim/mk/Makefile.vivado",
+          "ECHO=echo",
+          "CONFIG_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/multiword.tcl",
+          "VIVADO_TCL=/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/unused.tcl",
+          "BITSTREAM_FILES=unused.bit",
+          "COMPONENT_FILES=unused/component.xml",
+          "THREADS=8",
+          "SYNTH_STRATEGY=Flow_AreaOptimized_high",
+          "IMPL_STRATEGY=Performance_ExplorePostRoutePhysOpt",
+          "IMPL_OPT_DIRECTIVE=ExploreArea Explore",
+          "/run/user/1001/zp-csr-unmasked1536-fullcore-20261122-01/opt-host-checks/multiword.tcl"
+        ],
+        "owned_pgid": 1547085,
+        "returncode": 2,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 20,
+        "teardown_s": 5,
+        "elapsed_s": 0.09275841596536338
+      }
+    }
+  ],
+  "elapsed_seconds": 0.7304317520465702,
+  "source_TOP": "a8fbd5fa6911160ab0845d75c6096549806af7b7",
+  "independent_output_directory": true
+}
