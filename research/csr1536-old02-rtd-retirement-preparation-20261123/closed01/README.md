@@ -1,0 +1,5 @@
+This closes the review and retirement of transient synthesis caches from the cancelled second 192 KiB build. It adds a current disposition without rewriting the historical full-preservation receipt.
+
+The review verifies all 14,789 archive members, including every regular-file SHA and mode/link/type, then rechecks the exact 172 RTD originals and their ownership before and after. ROOT separately approves unlinking only those recoverable caches. The retirement worker rechecks each original and its descriptors before unlink, records every action, exits successfully in 8.057 seconds and closes its process group. It releases 398,135,690 raw bytes of RAM-backed storage; every removed byte and mode remains recoverable from the unchanged full-cancelled-work-source.tar.xz archive with SHA 0c06c3e5.
+
+All source, generated HDL, netlists/checkpoints, programs, traces, logs and current build families remain. Other-user descriptors were not inspected, and the same two identity-bound desktop FD permission exceptions are explicitly recorded. This operation changes no remaining resource reservation or fit conclusion.

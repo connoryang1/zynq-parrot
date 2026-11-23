@@ -885,3 +885,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Inactive synthesis caches preserved and reclaimed:** bounded R6 cache-pack04 archives130 untracked transient .rtd files213594504B to42286452B22c9fa6f, verifies every member byte/mode, stable originals and live compiler/FD inactivity before unlink; allbytesrecoverable. Worker21.491s exits0 with closed groups, net~171MB funds nextwholeCAD HOME envelope; source/netlists/checkpoints/traces/images/logs unchanged. `research/r6-cache-preservation-20261123` keeps recovery identities and pre-mutation preparation refusals.
+
+
+**Archived transient RTDs release RAM build space:** source helper1b94951d review17.057s decodes every14789 old02 archive member and rechecks172 exact originals/ownership beforeROOT9a7a2af6 separate narrowunlink approval. Retire8.057s checks eachSHA/stat/FD, removesonly398135690B alreadyrecoverable RTDs and closesallgroups; layeredee08d6ca leaves historicalcancelclosure/archive0c06 unchanged. `research/csr1536-old02-rtd-retirement-preparation-20261123/closed01` preserves receipts; allnonselectedsource/netlists/checkpoints/models/traces remain. RUNfree~4.14GB before currentclone; no reservation release implied.
