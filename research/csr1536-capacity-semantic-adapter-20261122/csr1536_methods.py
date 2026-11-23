@@ -180,4 +180,3 @@ class JointMethods:
                     expected_six_GP0=[256,256,256,256,2048,2048],
                     actual_GP0='Must be separately checked against unchanged counter projection/checker and complete native result',
                     scope='One sequential survival/interference correctness case; not simultaneous peak lookup throughput or a natural demand workload.')
-
