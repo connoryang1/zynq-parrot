@@ -1,0 +1,151 @@
+{
+  "state": "PASS complete failed-placement03 WORK+SOURCE+Gitadmin+LOGS+ART03+helpers preservation; no routed fit",
+  "admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-failed-placement-capture-root-20261123/admission.FINAL.json",
+    "bytes": 5489,
+    "sha256": "b185b043e13a29f45c3b3b561c970876a27609feeae4b8bee1074d8845fcce22"
+  },
+  "inventory": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-fail03/inventory.json",
+    "bytes": 9006966,
+    "sha256": "dbcf1bd266632972e258bfacbdd42f79337e45a4be6ea2e158761126ec36e8bf"
+  },
+  "commands": [
+    {
+      "action": "compress",
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr1536-failed-placement-capture-preparation-20261123/codec.py",
+          "--inventory",
+          "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-fail03/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-fail03/full-failed-placement-work-source.tar.xz",
+          "--action",
+          "compress"
+        ],
+        "owned_pgid": 1628356,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 600,
+        "teardown_s": 5,
+        "elapsed_s": 221.86718838801607
+      }
+    },
+    {
+      "action": "roundtrip",
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/usr/bin/python3",
+          "/home/coyang/zynq-parrot-hp0-timing-diagnostic-20261122/research/csr1536-failed-placement-capture-preparation-20261123/codec.py",
+          "--inventory",
+          "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-fail03/inventory.json",
+          "--output",
+          "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-fail03/full-failed-placement-work-source.tar.xz",
+          "--action",
+          "roundtrip"
+        ],
+        "owned_pgid": 1628545,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 180,
+        "teardown_s": 5,
+        "elapsed_s": 9.724695342942141
+      }
+    }
+  ],
+  "archive": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-fail03/full-failed-placement-work-source.tar.xz",
+    "bytes": 162542420,
+    "sha256": "69013701293f6e94b071b5e345521b1a5ad80d5b8387420d525ddae79b673e62"
+  },
+  "all_members": 14434,
+  "raw_member_bytes": 361264894,
+  "all_originals_unchanged": true,
+  "absence": {
+    "all_owned_children_absent": true,
+    "global_vendor_absent": true,
+    "old_worker": {
+      "pid": 1558674,
+      "startticks": 100536789,
+      "absent_by_identity": true
+    }
+  },
+  "original_limits_unchanged": true,
+  "opaque_references": [
+    {
+      "role": "old02",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-cancel02/manifest.json",
+        "bytes": 3741,
+        "sha256": "ce2e5cb59fe848ab4824b8b2753508b4b72b202240e3352b15c7185e667b3562"
+      },
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-cancel02/full-cancelled-work-source.tar.xz",
+        "bytes": 84539640,
+        "sha256": "0c06c3e50a6bb5c9b69a966840dea372328498f6d92e697c2d2395f4f8a9b6e8"
+      },
+      "receipt": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1536-fpga-preparation-20261122/closed-cancel02/ROOT-cancelled-closure.json",
+        "bytes": 1947,
+        "sha256": "cd1377a808b9699b35724f020336414df70c6b8037f6fbedfbae87824a2b871b"
+      },
+      "scope": "already durable full-member readback/ROOT closure; archive body remains external and is not duplicated"
+    },
+    {
+      "role": "nativebase",
+      "manifest": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-base-standalone64-20261122/closed01/manifest.json",
+        "bytes": 4627,
+        "sha256": "63742334279a5e42d26e330482cb9a581be083d370299526e896303631d13161"
+      },
+      "archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-base-standalone64-20261122/closed01/whole-proof.tar.xz",
+        "bytes": 25592028,
+        "sha256": "edb9658fe1446d38f3d323069bb9e5dc11c666f538b392f3019c30acf3cfeb64"
+      },
+      "receipt": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr1536-base-standalone64-20261122/closed01/ROOT-native-future-freeze.json",
+        "bytes": 1595,
+        "sha256": "dbfa01d917f106e76fde8085474a57132daa0b68020f668c7e7359c999da0e47"
+      },
+      "scope": "already durable full-member readback/ROOT closure; archive body remains external and is not duplicated"
+    }
+  ],
+  "launched_evidence_cap_bytes": 201326592,
+  "preservation_evidence_cap_bytes": 335544320,
+  "no_hardware_or_guest_changes": true,
+  "elapsed_seconds": 238.44226547097787
+}
