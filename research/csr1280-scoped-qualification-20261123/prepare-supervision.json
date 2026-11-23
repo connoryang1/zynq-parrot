@@ -1,0 +1,66 @@
+{
+  "state": "PASS separate prepare",
+  "source_plan": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1280-observation-preparation-20261122/preparation-source.json",
+    "bytes": 12902,
+    "sha256": "f6b3841e9485a7ae635e7808da204c86df4ab860e8a31de9f8138cfaf989ef86"
+  },
+  "phase": "prepare",
+  "original_resource_snapshot": {
+    "RUN": 272140503,
+    "HOME": 0,
+    "clone": 0,
+    "helper": 126895
+  },
+  "source_helper_snapshot": {
+    "required_floor": 1879048192,
+    "OTHER": 174672220,
+    "new_source_inside_existing_logging": true
+  },
+  "deadline_seconds": 3600,
+  "resource_after": {
+    "RUN": 303051294,
+    "HOME": 0,
+    "clone": 30910791,
+    "helper": 126895
+  },
+  "result": {
+    "path": "/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/scoped-csr01/records/prepared-handoff.json",
+    "bytes": 963,
+    "sha256": "40d7c309c9f74f264b51b7b0893b8cd5f6c7d4d269bfca96b4198aff1b1071b1"
+  },
+  "ownership": {
+    "group_states": [
+      {
+        "phase": "normal_parent_exit_before_reap",
+        "members": []
+      },
+      {
+        "phase": "normal_parent_exit_after_reap",
+        "members": []
+      },
+      {
+        "phase": "cleanup_complete",
+        "members": []
+      }
+    ],
+    "reaped_owned_children": [],
+    "argv": [
+      "/usr/bin/python3",
+      "-B",
+      "/home/coyang/fpga-artifacts/context-resume/csr1280-observation-preparation-20261122/helper/prepare_host.py",
+      "--prepare-only",
+      "--worker",
+      "--fullcore-sha",
+      "bf2a4ff4d80e7bf254b4e7a3037b9b0f5bbc40d9310ced076d91185d6a753f41"
+    ],
+    "owned_pgid": 1631474,
+    "returncode": 0,
+    "failure": null,
+    "owned_group_remaining": false,
+    "timeout_s": 3600,
+    "teardown_s": 5,
+    "elapsed_s": 125.68614478898235
+  },
+  "elapsed_seconds": 126.27012580703013
+}

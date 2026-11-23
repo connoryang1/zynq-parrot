@@ -888,3 +888,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Archived transient RTDs release RAM build space:** source helper1b94951d review17.057s decodes every14789 old02 archive member and rechecks172 exact originals/ownership beforeROOT9a7a2af6 separate narrowunlink approval. Retire8.057s checks eachSHA/stat/FD, removesonly398135690B alreadyrecoverable RTDs and closesallgroups; layeredee08d6ca leaves historicalcancelclosure/archive0c06 unchanged. `research/csr1536-old02-rtd-retirement-preparation-20261123/closed01` preserves receipts; allnonselectedsource/netlists/checkpoints/models/traces remain. RUNfree~4.14GB before currentclone; no reservation release implied.
+
+
+**160KiB observation clone qualifies:** actual415-path/five-domain preparation126.270s, untouchedrelink exact95699e2a, Syms-registration-only clonebc6f17f4 and onecold08 native56.097s. Qualification221.539s passes allfive complete literalstreams, maintained strict512/eightwinningwrites/Iretire, independentcounter and17geometry audits; bothownedgroupsclose. `research/csr1280-scoped-qualification-20261123` preserves proofs. Four unchanged architectural tests now run under newnative model; allcapacity/routed/FPGA/application claims remain pending.
