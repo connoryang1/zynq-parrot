@@ -1,0 +1,3 @@
+This records the explicit stop of future writes into four obsolete HOME source/helper families. Every original byte remains in place on durable HOME; this is an operational reservation closure, not a new correctness result.
+
+ROOT compared two complete2851-entry SHA/mode/link/inode/time/membership inventories and checked named original producers plus compiler/vendor absence. Exactly28,776,796bytes of unused HOME source/helper write allowances stop, leaving BASE_HOME7,483,392bytes. RUN1,156,926,898bytes, logging128MiB, metadata4MiB and all safety floors remain unchanged. Full inventory and ROOT receipt live at the bound external artifact path; future changes to these frozen roots require new priced authority.
