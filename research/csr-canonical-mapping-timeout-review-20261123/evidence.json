@@ -1,0 +1,87 @@
+{
+  "state": "READ_ONLY reviewed failed mapping01; no runtime launched",
+  "session": {
+    "path": "/run/user/1001/zp-csr-canonical-paired-mapping-20261123-01/session.json",
+    "bytes": 4601,
+    "sha256": "3eee1ebfa8963ad0fa1dadc6df3294bc0edbeffda95a186ca7cd0b933a02e431"
+  },
+  "log": {
+    "path": "/run/user/1001/zp-csr-canonical-paired-mapping-20261123-01/raw/console.log",
+    "bytes": 40577,
+    "sha256": "e679b0abf2180aa57137a9d44d661dba4d72939ed8f91c6794783a1b8a201ad4"
+  },
+  "native_tool_seconds": 580,
+  "actual_owned_elapsed_seconds": 580.3962394300615,
+  "actual_worker_elapsed_seconds": 580.7200334499357,
+  "source_endcheck": "PASS",
+  "ownership_final": {
+    "schema": "bp1-root-pervm-cad-ownership-receipt-v1",
+    "hostname": "blackparrot1",
+    "pid": 1713115,
+    "pgid": 1713115,
+    "startticks": 102863504,
+    "nonce": "5e3494ce33974ddfa56ed5310559ff37",
+    "admission_sha256": "df5e6c3a1a30491951b34f7dbaa5705efee2ed3f900910a938e6d259a0bc1fbe",
+    "linux_claim_state": "RELEASED",
+    "linux_claim": "ONE paired real-CSR raw1666 RAM then canonical741 RAM OOC mapping; no mapped/fullcore/fit claim",
+    "basis": "coordinator conditional release + ROOT perVM onejobprotocol",
+    "atomic_global_lock": false,
+    "initial_idle": {
+      "utc": "2026-11-23T05:47:04.802655+00:00",
+      "vendor_processes": []
+    },
+    "owned_group_remaining": false,
+    "outcome": "FAIL preserved; no retries"
+  },
+  "global_vendor_at_end": {
+    "utc": "2026-11-23T05:56:45.499233+00:00",
+    "vendor_processes": []
+  },
+  "native_returncode": -9,
+  "failure": "TimeoutError('fixed software tool deadline')",
+  "phase_anchors": [
+    {
+      "line": 63,
+      "text": "# puts \"PRIMARY_TOOL [version -short] THREADS [get_param general.maxThreads]\""
+    },
+    {
+      "line": 64,
+      "text": "PRIMARY_TOOL 2024.2 THREADS 2"
+    },
+    {
+      "line": 289,
+      "text": "Finished RTL Elaboration : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 3512.613 ; gain = 2013.676 ; free physical = 17433 ; free virtual = 104133"
+    },
+    {
+      "line": 315,
+      "text": "Finished Constraint Validation : Time (s): cpu = 00:00:24 ; elapsed = 00:00:25 . Memory (MB): peak = 3576.645 ; gain = 2077.707 ; free physical = 17430 ; free virtual = 104130"
+    },
+    {
+      "line": 331,
+      "text": "Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 3584.648 ; gain = 2085.711 ; free physical = 17427 ; free virtual = 104129"
+    },
+    {
+      "line": 392,
+      "text": "Start Cross Boundary and Area Optimization"
+    },
+    {
+      "line": 394,
+      "text": "WARNING: [Synth 8-7080] Parallel synthesis criteria is not met"
+    },
+    {
+      "line": 396,
+      "text": "Start Pre Area Optimization"
+    },
+    {
+      "line": 399,
+      "text": "Start Iterative Area Optimization"
+    }
+  ],
+  "complete_artifacts_present": {
+    "synthesized.dcp": false,
+    "functional.v": false,
+    "utilization.rpt": false,
+    "mapped-bit-ports.tsv": false
+  },
+  "canonical_run": false
+}
