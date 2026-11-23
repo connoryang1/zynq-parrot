@@ -1,0 +1,94 @@
+--- /home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/run_native.py
++++ run_native.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Qualified scoped256 cohort native phase; externally anchored admission required."""
++"""Qualified scoped1280 cohort native phase; externally anchored admission required."""
+ import argparse
+ import fcntl
+ import importlib.util
+@@ -51,7 +51,7 @@
+             shutil.copyfile(case['nbf']['path'], output / 'prog.nbf')
+             coverage = verify_coverage(output / 'prog.riscv', output / 'prog.nbf', program['symbols']['retained_capacity_config']['address'], int(case['input_word'], 16))
+             command = [preparation['model']['path'], '+c_args=prog.nbf 1800000', '+bsg_trace=' + str(output / 'trace.fst')]
+-            admission = dict(schema='csr-unmasked256-capacity-stream-native-v1', role=args.role,
++            admission = dict(schema='csr-unmasked1280-capacity-stream-native-v1', role=args.role,
+                              preparation=bind(args.preparation), runtime_sources=bind(frozen),
+                              program=preparation['program'], model=preparation['model'], compiled_sources=preparation['compiled_sources'],
+                              elf=bind(output / 'prog.riscv'), nbf=bind(output / 'prog.nbf'), coverage=coverage, command=command,
+@@ -86,7 +86,7 @@
+                 require(len(rows) == 1, 'one exact config')
+                 config = dict(word.split('=') for word in rows[0].split())
+                 lane, active = args.role[0], args.role.endswith('enabled')
+-                expected = dict(version='1', lane=lane, active=str(int(active)), lines='256', sets='256', max_lines='1792', line_bytes='64',
++                expected = dict(version='1', lane=lane, active=str(int(active)), lines='1280', sets='256', max_lines='1792', line_bytes='64',
+                                 data_base='0x%016x' % program['data_base'], code_base='0x%016x' % program['code_base'], code_stride='192', copy='0')
+                 require(config == expected and len(rows[0].split()) == len(expected), 'exact actual geometry/role/config')
+                 fields = re.findall(r'RETAINED_USE_COUNTERS version=1 i_hits=(\d+) d_hits=(\d+) i_published=(\d+) d_published=(\d+) i_write_beats=(\d+) d_write_beats=(\d+) saturating_bits=16 reset=axi_only', text)
+@@ -94,11 +94,11 @@
+                 values = tuple(map(int, fields[0]))
+                 rejected = False
+                 if active:
+-                    primary_counts(lane, 256, values)
++                    primary_counts(lane, 1280, values)
+                 else:
+                     require(values == (0, 0, 0, 0, 0, 0), 'negative zero retained events')
+                     try:
+-                        primary_counts(lane, 256, values)
++                        primary_counts(lane, 1280, values)
+                     except ValueError:
+                         rejected = True
+                     require(rejected, 'negative primary gate rejected')
+@@ -106,7 +106,7 @@
+                 require(c.runtime_sources() == sources, 'source drift during execution')
+                 check_budget(cohort,preparation)
+                 require(sum(path.stat().st_size for path in cohort.glob('*/trace.fst')) <= c.CAPS['raw_total'], 'raw cohort cap')
+-                report = dict(state='PASS primary256 functional/counter gate; per-address closed trace pending' if active else 'PASS negative checked execution with primary retained-use gate rejected; closed trace pending',
++                report = dict(state='PASS primary1280 functional/counter gate; per-address closed trace pending' if active else 'PASS negative checked execution with primary retained-use gate rejected; closed trace pending',
+                               role=args.role, config=config, counters=values, primary_use_gate_rejected=rejected, actual_returncode=process.returncode,
+                               admission=bind(output / 'admission.json'), files=[bind(output / name) for name in ('prog.riscv', 'prog.nbf', 'run.log', 'process.json', 'trace.fst')],
+                               limits='No FPGA/fit/performance result. Per-address full-payload audit and counter corroboration required before next case.')
+--- /home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/audit_full.py
++++ audit_full.py
+@@ -52,6 +52,7 @@
+                         result,digest=c.archive.validate_complete((line.encode('ascii') for line in lines),saved,
+                             selected,c.Validator(program,args.role),c.original.audit.edges,completion,guard)
+                 c.require(c.bind(case/'trace.fst')==fst,'closed rawFST unchanged')
++                result['actual_count_summary']=dict(lines=1280,sets=256,role=args.role,expected_six_GP0=c.counters_for(args.role),D_target_loads=10240 if args.role[0]=='d' else 0,I_target_instructions=20480 if args.role[0]=='i' else 0)
+                 result['bindings']=dict(fst=fst,run=c.bind(case/'verification.json'),admission=c.bind(case/'admission.json'),
+                     program=p['program'],model=p['model'],reader=p['reader'],selection=c.bind(selection),preparation=c.bind(args.preparation))
+                 result['archive']=dict(schema='full167-digest-explicit-counter-projection-v1',full_stream=digest,
+@@ -70,7 +71,7 @@
+                 c.load(args.preparation,args.preparation_sha256)
+                 c.check_native(stage,args.role,p,args.preparation,args.native_sha256)
+                 names=('verification.json','selection.tsv','gp0-counter-projection.tsv.gz','counter-check-input/verification.json','counter-words.json','counter-checker.log','counter-checker.owned.json','reader.stderr','reader.owned.json')
+-            c.archive.write_json(out/'acceptance.json',dict(schema='csr-unmasked256-stream-acceptance-v1',role=args.role,
++            c.archive.write_json(out/'acceptance.json',dict(schema='csr-unmasked1280-stream-acceptance-v1',role=args.role,
+                 preparation=c.bind(args.preparation),sources=p['runtime_sources'],native_sha256=args.native_sha256,
+                 resource_phase=c.bind(out/'resource-phase.json'),sealed_inputs=c.bind(out/'sealed-exit.json'),
+                 files=[c.bind(out/name) for name in names]))
+--- /home/coyang/zynq-parrot-linux-host-observer/research/csr-unmasked256-allslots-preparation02-20261122/ledger.py
++++ ledger.py
+@@ -63,10 +63,10 @@
+ def boundary(stage,p):
+     c.require(Path(stage)==c.BASE,'fixed NEW fresh correctness stage')
+     row=policy_row(p);snapshot=fixed.snapshot(row)
+-    whole=sum(scan(c.bridge.POOL).values());used=sum(scan(stage).values())
+-    c.require(whole-used+c.CAPS['stage_total']<=snapshot['policy']['limits']['pool_cap_bytes'],'all current full/clone/STD plus fresh256MiB INSIDE1GiB')
++    whole=sum(scan(stage).values());used=whole
++    c.require(whole-used+c.CAPS['stage_total']<=snapshot['policy']['limits']['pool_cap_bytes'],'standalone128MiB cohort; original sealed pool remains separate')
+     q=phase_caps(scan(stage),stage,c.CAPS)
+-    helpers=sum(sum(scan(root).values())for root in (c.HERE,*c.bridge.OTHER_HELPERS))
++    helpers=sum(scan(c.HERE).values())
+     durable=sum(scan(c.bridge.DURABLE).values())
+     resources=fixed.live_check(snapshot,whole,durable,helpers,stage)
+     if p:
+@@ -79,7 +79,7 @@
+         started=time.monotonic();self.stage=Path(stage);self.out=Path(out);self.p=p;self.sources=sources
+         c.require(self.stage==c.BASE and self.out.parent==self.stage and self.out.name in (*c.ORDER,*(r+'-audit'for r in c.ORDER)),'explicit fixed native or audit mutable output')
+         self.policy_row=policy_row(p);fixed.load(self.policy_row['path'],self.policy_row['sha256'],full=True);self.initial=fixed.snapshot(self.policy_row)
+-        self.roots=dict(pool=c.bridge.POOL,source=c.SOURCE,helpers=c.HERE,durable=c.bridge.DURABLE,**{'prior_helpers_'+str(i):root for i,root in enumerate(c.bridge.OTHER_HELPERS)})
++        self.roots=dict(pool=self.stage,original_pool=c.bridge.ORIGINAL_POOL,helpers=c.HERE,durable=c.bridge.DURABLE)
+         self.ids={k:(p.stat().st_dev,p.stat().st_ino)for k,p in self.roots.items()}
+         self.seals={k:inventory(p,self.out if k=='pool' else None)for k,p in self.roots.items()}
+         self.basepool=sum(r['bytes']for r in self.seals['pool'].values())
