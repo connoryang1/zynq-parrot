@@ -1,0 +1,266 @@
+{
+  "schema": "csr768-physical-capacity-functional-v1",
+  "state": "DRAFT-UNLAUNCHABLE",
+  "role": "capacity-physical-diagnostic",
+  "host": "xilinx@192.168.4.35",
+  "schedule": [
+    "d-enabled",
+    "d-off",
+    "i-enabled"
+  ],
+  "runtime_ms": 300000,
+  "outer_timeout_s": 420,
+  "performance_inference": false,
+  "unlaunchable_reasons": [
+    "TAG STA and final image/fit/elaboration approval still NULL",
+    "ROOT source/funding/physical reservation and model-completion envelope not promoted",
+    "NBF copies and local rollbackHWH extraction not performed by this source preparation"
+  ],
+  "hardware": {
+    "cfg": "e_bp_unicore_zynqparrot_prefetch16k_cfg",
+    "l1i_bytes": 32768,
+    "l1d_bytes": 32768,
+    "l2_bytes": 16384,
+    "resident_slots": 2,
+    "logical_contexts": 4,
+    "line_bytes": 64,
+    "retained_i_lines": 768,
+    "retained_d_lines": 768,
+    "retained_sets": 256,
+    "observe": 1,
+    "response_age": 0
+  },
+  "sources": {
+    "linux-tests/run_resume_workload_session.py": "8d527a4884ff548c0d025ee297a4e0fdc240dadb98b175898b56554e500dd112",
+    "linux-tests/run_scheduler_pipe_hint.py": "ea5663812145fe37fd35dd569d218ecc59b58181e2203250c39fe93a3242aeb3",
+    "linux-tests/run_scheduler_tagged_replay.py": "0725b8532711c9b791c3a40942efe0df7374d772bbc4d67b59b24764b8c0f286",
+    "codex-skills/bp-fpga-synthesis/scripts/stage_pynq_artifacts.sh": "f827e7c4851ae06bd8b3f85fbe2b00fa6ae8d2105ef189956eaea2a51eb33b20",
+    "codex-skills/bp-fpga-synthesis/scripts/power_cycle_pynq.sh": "7b85c3ebd10eac5175f0ce67c4fa529c0f12683ec631b70408c4d47aff0c8271",
+    "codex-skills/bp-fpga-synthesis/scripts/wait_pynq_ready.sh": "4684cda9302bf0e4cd55a73a95ec1555e9c832d1c7dd4ec948eecee220ef656a",
+    "codex-skills/bp-fpga-synthesis/scripts/load_pynq_overlay.sh": "0d3736302864de21500639bb0fb5f49224df955746825aed6e61d469ad69594a",
+    "codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5",
+    "codex-skills/bp-fpga-synthesis/scripts/verify_pynq_package.sh": "0f5af4f8bd5a1a9bd8dd8e8676a05e5e29710163036653341eca283f3a68253f",
+    "codex-skills/bp-fpga-synthesis/scripts/board_run_pynq_interactive.sh": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "linux-tests/retained29_protocol.py": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787",
+    "linux-tests/run_retained29_session.py": "b4e4cc1039edbfaf4bf16ee5366f2be9beb6c1fc14564a087f088d5bbd20924a",
+    "linux-tests/retained_store_probe.c": "46def535f3bc7c22de70acfb667000e8784508e9f542d22ab15e43b88c392111",
+    "linux-tests/scheduler_retained29_benchmark.c": "65adf577913f2c869ee7f97e9f43b706698e714f8634a0df12135569b9d52be9",
+    "linux-tests/resume_workload.h": "5d4766cb71b144a93e2b896acf970fce05b349688233a0fae1a5b3458ebe6caa",
+    "linux-tests/retained29_stage_v2.py": "174328d4623d07249d41bdb2630cde448cd10f0dd2e4d6fe08d05391217e4376",
+    "linux-tests/run_retained29_session_v2.py": "14d99ef91250658305123a2c9c89e41d7d1e3fda15d55a4e1aed7c259e4d0d89",
+    "linux-tests/retained29_application_protocol.py": "978527ac6eb8878c1a2464e5e7a21cb4c61e99fb9c17d3dfb9550dd0603ec490",
+    "linux-tests/run_retained29_application_session.py": "ea72f70c9c531c95ff8bea5541ffe6f1050df6ffa41f79c696dc35fb8434b64a",
+    "linux-tests/scheduler_retained29_regex_benchmark.c": "813acc1ada619bf65f226ec171b3ddf13800e2f7894b3cc62402246e38f89e9d",
+    "linux-tests/retained29_regex_workload.h": "9324d1301711e501140ae28b9630b3ab036207b078b24550d552afaf7481ca1f",
+    "linux-tests/retained_capacity_diagnostic.py": "8c2399400c60a88bd2aa7e131f07a9386afe48c98752b9595789ef0628c7b76a",
+    "linux-tests/retained_capacity_install.py": "9b3b37f4d4fc716ee679cb1cb20b42ffb79d22542b8572e4e7a2a24e4500ea21",
+    "linux-tests/run_retained_capacity_diagnostic.py": "357688e00bfa7d7380aeec43d7c6d8a59f536a741991854f49906a4abc48a6c7",
+    "linux-tests/retained_capacity_diagnostic_v2.py": "7fbfcb4cc3b459c8998331da0dd219a0d9c20ebc5952b5ba68474b4d2166ac27",
+    "linux-tests/retained_capacity_recovery.py": "051e97e457af5dc0390088ab1c4feec3bd213843282ce4e27253f1b4c5a4d6cc",
+    "linux-tests/run_retained_capacity_diagnostic_v2.py": "1e661a659d1bf253e810484748f26c0312cf626b2256ca113abcdb4229fa84cc",
+    "linux-tests/retained_capacity_diagnostic_v3.py": "07faa3bd4d160bd5d4fee4e8707e134c944d58bcb8ae6b0a3f06fae7375b3578",
+    "linux-tests/retained_capacity_recovery_v3.py": "cd5cc8c69902bed0cdbc65331baa1c76fe6ec957c7934072c1a1d63a6dfb1492",
+    "linux-tests/run_retained_capacity_diagnostic_v3.py": "d26431b4e00b82ead825977902e92370c4570ccdad8e9a795c2abd00f304dc42",
+    "csr768-physical/protocol.py": "bcc252d8f37df6dfd56f20d57db5c800bd647731ac9f37f865aac24e187caba9",
+    "csr768-physical/collector.py": "fa1f217939928b3d0f3b4a05f5d2bb66ac0759245e6b008fd40092fba71256c0",
+    "csr768-physical/recovery.py": "1071c89246ea99ec89ea9caa9f6d543e3cfb71ff333d2775d17b7177a5ecd7bf"
+  },
+  "runner": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/native-retained-observer-host-20261121/compile02/control-program-native-observe1",
+    "bytes": 35984,
+    "sha256": "9c2648f1a9d2ceab2645895fdad74a5bc2c2ce62ad8f1161c6b3b72e74da42fa"
+  },
+  "rollback_runner": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/05-control-program",
+    "bytes": 35860,
+    "sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30"
+  },
+  "compile_gate": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/native-retained-observer-compile-20261121/closure01/verification.json",
+    "bytes": 10509,
+    "sha256": "4ed7da7f3a69394e8bc115a6748fdbc8f9cd6d7ccd01014c72126af482b20d72"
+  },
+  "elf": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/retained_capacity_test.elf",
+    "bytes": 998432,
+    "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+  },
+  "build_gate": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/manifest.json",
+    "bytes": 196913,
+    "sha256": "88546c8afc17c482e42cb731459f44c2a40f2f6aeee2c172321534c872dabd72"
+  },
+  "model_preparation": null,
+  "candidate_bridge": null,
+  "programs": {
+    "d-enabled": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/retained-capacity768-d-enabled.nbf",
+      "bytes": 2641208,
+      "sha256": "4a8512dfa3074997c7e6ecf63a733a5cc597595c455308397a7f3a88090d6921"
+    },
+    "d-off": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/retained-capacity768-d-off.nbf",
+      "bytes": 2641208,
+      "sha256": "b60a50bba248fd8c54a7cc1385a2e25eb852f1a7a53e39b162c479ed9087e9d4"
+    },
+    "i-enabled": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/retained-capacity768-i-enabled.nbf",
+      "bytes": 2641208,
+      "sha256": "047f330163a22ba0eda3ec8cd559f655a718bec8300b4113c745a86f4d764267"
+    }
+  },
+  "model_audits": {
+    "d-enabled": {
+      "path": "/run/user/1001/zp-csr768-allslots-native-20261123-01/d-enabled-audit/verification.json",
+      "bytes": 1411416,
+      "sha256": "bf73e9486879f271f61b041776e30aa9c501e043fda0c2b3e7318f8b3a02856b"
+    },
+    "d-off": {
+      "path": "/run/user/1001/zp-csr768-allslots-native-20261123-01/d-off-audit/verification.json",
+      "bytes": 1237088,
+      "sha256": "62f71fa0b7b50d6feabafbaaf44cee208a09af620b8232d1464e1a424cddf45e"
+    },
+    "i-enabled": {
+      "path": "/run/user/1001/zp-csr768-allslots-native-20261123-01/i-enabled-audit/verification.json",
+      "bytes": 1620972,
+      "sha256": "78c8f8f9292586b013216794f50e7c33a813a9c0c28da7701eee9c581a8ca6a3"
+    }
+  },
+  "artifacts": {
+    "package": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+      "bytes": 1772638,
+      "sha256": "44d0e12ea4655d3db85fccb9585db068c85b34329244c0a93bb41a05c93d15e8"
+    },
+    "bit": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1.bit",
+      "bytes": 4045685,
+      "sha256": "d30262cbd6aa0baec34f77730dc17cc3662a4fa3ba7499776c61e96ffd892ccb"
+    },
+    "hwh": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1.hwh",
+      "bytes": 311517,
+      "sha256": "f40b69e61a717a5ec515be1bf39a92408efea001437bc821f58c819eff385dc2"
+    },
+    "map": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1.map",
+      "bytes": 81,
+      "sha256": "cc43f4d00b80bf04c4c0050a7f2af1dc64599c330909ae5bcd3117d1564eb2ef"
+    },
+    "fit": null,
+    "elaboration": null
+  },
+  "rollback_overlay": {
+    "bit": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained29-session-preparation-20261121/closed-preparation-002/accepted-f744.bit",
+      "bytes": 4045685,
+      "sha256": "f744228b33b8c7c4bed552fb607ceee3d28418fe05569b60a42f547bbea8be9f"
+    },
+    "hwh": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/rollback-f744.hwh",
+      "bytes": 311517,
+      "sha256": "9c4d36c5a576a861e4732ee14b78e58fc96d29a60a71c78f04d2312c1bf8c2fb"
+    },
+    "map": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1.map",
+      "bytes": 81,
+      "sha256": "cc43f4d00b80bf04c4c0050a7f2af1dc64599c330909ae5bcd3117d1564eb2ef"
+    }
+  },
+  "approvals": null,
+  "ROOT_deployment_authority": null,
+  "ROOT_resources": null,
+  "input_provenance": {
+    "selected_image": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/ROOT-selected-image.json",
+      "bytes": 3702,
+      "sha256": "68a11107fef916df970e2a90c86c2be1199c9905893c3b128ac564ded889fbd0"
+    },
+    "selected_routed_DCP": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1_wrapper_postroute_physopt.dcp",
+      "bytes": 37353589,
+      "sha256": "60910bee4cc7f6ec0641228183eb8988aa797d73da76892db3b57bc79acc66f1"
+    },
+    "actual_board_rollback_inventory": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-board-rollback-inventory-20261123/inventory.json",
+      "bytes": 1281,
+      "sha256": "123a101b5c4ef9305b7c3628d85e51824ba551a1a3fb67111d9386004c6e489b"
+    },
+    "native_shapes_export": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-board-source-shape-20261123/actual-shapes.json",
+      "bytes": 13690,
+      "sha256": "237c41490eb1665654a2fc47900d164f1039b8509d947030d94e5617ec0ca935"
+    },
+    "actual_completed_cohort": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr768-cohort-closure-authority-20261123/ROOT-cohort-acceptance.json",
+      "bytes": 3614,
+      "sha256": "e5f658f7ec7df48040a8fbfc7e871d9ad1172153fd128d910268ac9f31925aeb"
+    },
+    "source_commit": "5b4c50cffa5087b1b368187bb64ccd26c344a527",
+    "source_membership": "RecordedV1 24-source roster + exactV2/V3six-source declarations +new3 modules; no producer imports."
+  },
+  "pending_local_staging": {
+    "d-enabled": {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/d-enabled/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "4a8512dfa3074997c7e6ecf63a733a5cc597595c455308397a7f3a88090d6921"
+      },
+      "destination": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/retained-capacity768-d-enabled.nbf",
+        "bytes": 2641208,
+        "sha256": "4a8512dfa3074997c7e6ecf63a733a5cc597595c455308397a7f3a88090d6921"
+      },
+      "created": false
+    },
+    "d-off": {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/d-off/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "b60a50bba248fd8c54a7cc1385a2e25eb852f1a7a53e39b162c479ed9087e9d4"
+      },
+      "destination": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/retained-capacity768-d-off.nbf",
+        "bytes": 2641208,
+        "sha256": "b60a50bba248fd8c54a7cc1385a2e25eb852f1a7a53e39b162c479ed9087e9d4"
+      },
+      "created": false
+    },
+    "i-enabled": {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/i-enabled/prog.nbf",
+        "bytes": 2641208,
+        "sha256": "047f330163a22ba0eda3ec8cd559f655a718bec8300b4113c745a86f4d764267"
+      },
+      "destination": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/retained-capacity768-i-enabled.nbf",
+        "bytes": 2641208,
+        "sha256": "047f330163a22ba0eda3ec8cd559f655a718bec8300b4113c745a86f4d764267"
+      },
+      "created": false
+    },
+    "rollback_HWH": {
+      "local_archive": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/natural-demand-20261120/fpga-fit/20261120T211416Z-7edf64d1/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64",
+        "bytes": 1775321,
+        "sha256": "07a48584e22de3e1d97cdaef16d27a92faabc1a9f3db82bafd5e76fe18f1bbe5"
+      },
+      "member": "black_parrot_bd_1.hwh",
+      "member_binding": {
+        "bytes": 311517,
+        "sha256": "9c4d36c5a576a861e4732ee14b78e58fc96d29a60a71c78f04d2312c1bf8c2fb"
+      },
+      "closed_member_evidence": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained29-absent-f744-20261121-session03/stage-v2-receipt.json",
+        "bytes": 11256,
+        "sha256": "3a9efcb364fa7e27dd8fc68b3a3b0ad613d4cdaa0657d5afa02faf08b149f868"
+      },
+      "destination": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/csr768-physical-functional-20261123/inputs01/rollback-f744.hwh",
+        "bytes": 311517,
+        "sha256": "9c4d36c5a576a861e4732ee14b78e58fc96d29a60a71c78f04d2312c1bf8c2fb"
+      },
+      "created": false
+    }
+  }
+}
