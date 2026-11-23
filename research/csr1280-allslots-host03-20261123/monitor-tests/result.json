@@ -1,0 +1,49 @@
+{
+  "state": "PASS host-accounting03 scheduling/cap/staleness/real-scan tests only",
+  "source_handoff_sha256": "d45c91c41804ad45c665ee7e86f1b9c58cde18f9d13751c009b79c8389340494",
+  "model_executed": false,
+  "FST_read": false,
+  "board_actions": false,
+  "tests": [
+    {
+      "name": "scheduled-700ms-scan-accepted",
+      "expected_error": null,
+      "actual_error": null,
+      "elapsed_seconds": 3.63826573593542,
+      "receipt_sha256": "6622e38970193576d9985abe765e9136ad92b9541ab376e0c65f7dd27c84b604",
+      "max_scan_seconds": 0.7038957660552114,
+      "max_callback_age_s": 0.4121784759918228,
+      "owned_group_remaining": false
+    },
+    {
+      "name": "artifact-cap-still-rejected",
+      "expected_error": "controlled artifact cap violation",
+      "actual_error": "ValueError(\"ValueError('controlled artifact cap violation')\")",
+      "elapsed_seconds": 1.5130378929898143,
+      "receipt_sha256": "3e85c8f172c7da870a15811266563acf49ad3aee28cacabe289b64cda018e57f",
+      "max_scan_seconds": 2.9054004698991776e-05,
+      "max_callback_age_s": 0,
+      "owned_group_remaining": false
+    },
+    {
+      "name": "stale-monitor-still-rejected",
+      "expected_error": "snapshot stale over5s",
+      "actual_error": "ValueError('phase resource snapshot stale over5s')",
+      "elapsed_seconds": 5.112141730962321,
+      "receipt_sha256": "a4fe18cf06044d3cb81a69f599a48d9ddb76ff0dfc55dca69600c5a049d394b4",
+      "max_scan_seconds": 2.9052956961095333e-05,
+      "max_callback_age_s": 5.011577758938074,
+      "owned_group_remaining": false
+    },
+    {
+      "name": "actual-CAD-allocation-scan",
+      "expected_error": null,
+      "actual_error": null,
+      "elapsed_seconds": 3.9733030690113083,
+      "receipt_sha256": "fc1ec9434ad5674b4588133426600d1ab447991d754cf4f3927706abffda9e84",
+      "max_scan_seconds": 0.27458435599692166,
+      "max_callback_age_s": 1.1140442540636286,
+      "owned_group_remaining": false
+    }
+  ]
+}
